@@ -36,6 +36,9 @@ COMMISSIONING_STAGE_MAX_WAIT_SEC = 10
 # The maximum amount of time to test that the launchURL is sent from the Linux tv-casting-app and received on the tv-app before timeout.
 TEST_LAUNCHURL_MAX_WAIT_SEC = 10
 
+# The maximum amount of time to verify the subscription state in the Linux tv-casting-app output before timeout.
+VERIFY_SUBSCRIPTION_STATE_MAX_WAIT_SEC = 10
+
 # File names of logs for the Linux tv-casting-app and the Linux tv-app.
 LINUX_TV_APP_LOGS = 'Linux-tv-app-logs.txt'
 LINUX_TV_CASTING_APP_LOGS = 'Linux-tv-casting-app-logs.txt'
@@ -45,6 +48,10 @@ LINUX_TV_CASTING_APP_LOGS = 'Linux-tv-casting-app-logs.txt'
 VENDOR_ID = 0xFFF1   # Spec 7.20.2.1 MEI code: test vendor IDs are 0xFFF1 to 0xFFF4
 PRODUCT_ID = 0x8001  # Test product id
 DEVICE_TYPE_CASTING_VIDEO_PLAYER = 0x23    # Device type library 10.3: Casting Video Player
+
+# Values to verify the subscription state against from the `ReportDataMessage` in the Linux tv-casting-app output.
+CLUSTER_MEDIA_PLAYBACK = '0x506'  # Application Cluster Spec 6.10.3 Cluster ID: Media Playback
+ATTRIBUTE_CURRENT_PLAYBACK_STATE = '0x0000_0000'  # Application Cluster Spec 6.10.6 Attribute ID: Current State of Playback
 
 
 class ProcessManager:
@@ -96,13 +103,19 @@ def extract_value_from_string(line: str) -> str:
 
     The string is expected to be in the following format as it is received
     from the Linux tv-casting-app output:
+    \x1b[0;34m[1715206773402] [20056:2842184] [DMG]  Cluster = 0x506,\x1b[0m
+    The substring to be extracted here is '0x506'.
+    Or:
     \x1b[0;34m[1713741926895] [7276:9521344] [DIS] Vendor ID: 65521\x1b[0m
     The integer value to be extracted here is 65521.
     Or:
     \x1b[0;34m[1714583616179] [7029:2386956] [SVR] 	device Name: Test TV casting app\x1b[0m
     The substring to be extracted here is 'Test TV casting app'.
     """
-    value = line.split(':')[-1].strip().replace('\x1b[0m', '')
+    if '=' in line:
+        value = line.split('=')[-1].strip().replace(',\x1b[0m', '')
+    else:
+        value = line.split(':')[-1].strip().replace('\x1b[0m', '')
 
     return value
 
@@ -211,7 +224,8 @@ def validate_identification_declaration_message_on_tv_app(tv_app_info: Tuple[sub
     while True:
         # Check if we exceeded the maximum wait time for validating the device information from the Linux tv-app to the corresponding values from the Linux tv-app.
         if time.time() - start_wait_time > COMMISSIONING_STAGE_MAX_WAIT_SEC:
-            logging.erro('The device information from the Linux tv-app output was not validated against the corresponding values from the Linux tv-casting-app output within the timeout.')
+            logging.error(
+                'The device information from the Linux tv-app output was not validated against the corresponding values from the Linux tv-casting-app output within the timeout.')
             return False
 
         tv_app_line = tv_app_process.stdout.readline()
@@ -221,7 +235,7 @@ def validate_identification_declaration_message_on_tv_app(tv_app_info: Tuple[sub
             linux_tv_app_log_file.flush()
 
             if 'Identification Declaration Start' in tv_app_line:
-                logging.info('"Identification Declaration" block from the Linux tv-app output:')
+                logging.info('Found the `Identification Declaration` block in the Linux tv-app output:')
                 logging.info(tv_app_line.rstrip('\n'))
                 parsing_identification_block = True
             elif parsing_identification_block:
@@ -310,6 +324,56 @@ def validate_commissioning_success(tv_casting_app_info: Tuple[subprocess.Popen, 
                 return True
 
 
+def parse_tv_casting_app_for_report_data_msg(tv_casting_app_info: Tuple[subprocess.Popen, TextIO], log_paths: List[str]):
+    """Parse the Linux tv-casting-app for `ReportDataMessage` block and return the first message block with valid `Cluster` and `Attribute` values."""
+    tv_casting_app_process, linux_tv_casting_app_log_file = tv_casting_app_info
+
+    continue_parsing = False
+    report_data_message = []
+
+    start_wait_time = time.time()
+
+    while True:
+        # Check if we exceeded the maximum wait time to parse the Linux tv-casting-app output for `ReportDataMessage` block.
+        if time.time() - start_wait_time > VERIFY_SUBSCRIPTION_STATE_MAX_WAIT_SEC:
+            logging.error(
+                'The relevant `ReportDataMessage` block was not found in the Linux tv-casting-app process within the timeout.')
+            report_data_message.clear()
+            return report_data_message
+
+        tv_casting_line = tv_casting_app_process.stdout.readline()
+
+        if tv_casting_line:
+            linux_tv_casting_app_log_file.write(tv_casting_line)
+            linux_tv_casting_app_log_file.flush()
+
+            if 'ReportDataMessage =' in tv_casting_line:
+                report_data_message.append(tv_casting_line.rstrip('\n'))
+                continue_parsing = True
+            elif continue_parsing:
+                report_data_message.append(tv_casting_line.rstrip('\n'))
+
+                if 'Cluster =' in tv_casting_line:
+                    cluster_value = extract_value_from_string(tv_casting_line)
+                    if cluster_value != CLUSTER_MEDIA_PLAYBACK:
+                        report_data_message.clear()
+                        continue_parsing = False
+
+                elif 'Attribute =' in tv_casting_line:
+                    attribute_value = extract_value_from_string(tv_casting_line)
+                    if attribute_value != ATTRIBUTE_CURRENT_PLAYBACK_STATE:
+                        report_data_message.clear()
+                        continue_parsing = False
+
+                elif 'InteractionModelRevision' in tv_casting_line:
+                    # Capture the closing brace `}` of the `ReportDataMessage` block.
+                    tv_casting_line = tv_casting_app_process.stdout.readline()
+                    linux_tv_casting_app_log_file.write(tv_casting_line)
+                    linux_tv_casting_app_log_file.flush()
+                    report_data_message.append(tv_casting_line.rstrip('\n'))
+                    return report_data_message
+
+
 def parse_tv_app_output_for_launchUrl_msg_success(tv_app_info: Tuple[subprocess.Popen, TextIO], log_paths: List[str]):
     """Parse the Linux tv-app output for the relevant string indicating that the launchUrl was received."""
 
@@ -359,7 +423,7 @@ def parse_tv_casting_app_output_for_launchUrl_msg_success(tv_casting_app_info: T
             linux_tv_casting_app_log_file.flush()
 
             if 'InvokeResponseMessage =' in tv_casting_line:
-                logging.info('Found the InvokeResponseMessage block in the Linux tv-casting-app output:')
+                logging.info('Found the `InvokeResponseMessage` block in the Linux tv-casting-app output:')
                 logging.info(tv_casting_line.rstrip('\n'))
                 continue_parsing_invoke_response_msg_block = True
 
@@ -415,7 +479,7 @@ def test_discovery_fn(tv_casting_app_info: Tuple[subprocess.Popen, TextIO], log_
 
         # A valid commissioner has VENDOR_ID, PRODUCT_ID, and DEVICE TYPE in its list of entries.
         if valid_vendor_id and valid_product_id and valid_device_type:
-            logging.info('Found a valid commissioner in the Linux tv-casting-app logs:')
+            logging.info('Found a valid commissioner in the Linux tv-casting-app output:')
             logging.info(valid_discovered_commissioner)
             logging.info(valid_vendor_id)
             logging.info(valid_product_id)
@@ -445,6 +509,23 @@ def test_commissioning_fn(valid_discovered_commissioner_number, tv_casting_app_i
         handle_casting_failure('Commissioning', log_paths)
 
 
+def test_subscription_fn(tv_casting_app_info: Tuple[subprocess.Popen, TextIO], log_paths: List[str]):
+    """Test the subscription state of the Linux tv-casting-app by validating the `ReportDataMessage` block."""
+
+    valid_report_data_msg = parse_tv_casting_app_for_report_data_msg(tv_casting_app_info, log_paths)
+
+    if valid_report_data_msg:
+        logging.info('Found the `ReportDataMessage` block in the Linux tv-casting-app output:')
+
+        for line in valid_report_data_msg:
+            logging.info(line)
+
+        logging.info('Testing subscription success!\n')
+        valid_report_data_msg.clear()
+    else:
+        handle_casting_failure('Testing subscription', log_paths)
+
+
 def test_launchUrl_fn(tv_casting_app_info: Tuple[subprocess.Popen, TextIO], tv_app_info: Tuple[subprocess.Popen, TextIO], log_paths: List[str]):
     """Test that the Linux tv-casting-app sent the launchUrl and that the Linux tv-app received the launchUrl."""
 
@@ -454,7 +535,7 @@ def test_launchUrl_fn(tv_casting_app_info: Tuple[subprocess.Popen, TextIO], tv_a
     if not parse_tv_casting_app_output_for_launchUrl_msg_success(tv_casting_app_info, log_paths):
         handle_casting_failure('Testing launchUrl', log_paths)
 
-    logging.info('Testing launchUrl success!\n')
+    logging.info('Testing launchUrl success!')
 
 
 @click.command()
@@ -504,7 +585,7 @@ def test_casting_fn(tv_app_rel_path, tv_casting_app_rel_path):
                     valid_discovered_commissioner_number = valid_discovered_commissioner.split('#')[-1].replace('\x1b[0m', '')
 
                     test_commissioning_fn(valid_discovered_commissioner_number, tv_casting_app_info, tv_app_info, log_paths)
-
+                    test_subscription_fn(tv_casting_app_info, log_paths)
                     test_launchUrl_fn(tv_casting_app_info, tv_app_info, log_paths)
 
 
