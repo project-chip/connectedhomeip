@@ -171,7 +171,7 @@ static void low_level_input(struct netif * netif, uint8_t * b, uint16_t len)
         }
 #ifdef WIFI_DEBUG_ENABLED
         ChipLogProgress(DeviceLayer,
-                        "%s: ACCEPT %d, [%02x:%02x:%02x:%02x:%02x:%02x]<-[%02x:%02x:%02x:%02x:%02x:%02x] type=%02x%02x", __func__,
+                        "%s: ACCEPT %ld, [%02x:%02x:%02x:%02x:%02x:%02x]<-[%02x:%02x:%02x:%02x:%02x:%02x] type=%02x%02x", __func__,
                         bufferoffset,
 
                         dst_mac[0], dst_mac[1], dst_mac[2], dst_mac[3], dst_mac[4], dst_mac[5],
