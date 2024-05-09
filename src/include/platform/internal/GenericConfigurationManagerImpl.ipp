@@ -351,20 +351,20 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSecondaryPairingHint
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSoftwareVersionString(char * buf, size_t bufSize)
 {
-    ChipError err       = CHIP_NO_ERROR;
+    ChipError err                   = CHIP_NO_ERROR;
     size_t softwareVersionStringLen = 0; // without counting null-terminator
 
     err = ReadConfigValueStr(ConfigClass::kConfigKey_SoftwareVersionString, buf, bufSize, softwareVersionStringLen);
-#ifdef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
+
     if (CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING[0] != 0 && err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
         memcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING, sizeof(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING));
         softwareVersionStringLen = sizeof(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING) - 1;
-        err          = CHIP_NO_ERROR;
+        err                      = CHIP_NO_ERROR;
     }
-#endif
-    ReturnErrorOnFailure(err);
+
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
     ReturnErrorCodeIf(softwareVersionStringLen >= bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
     ReturnErrorCodeIf(buf[softwareVersionStringLen] != 0, CHIP_ERROR_INVALID_STRING_LENGTH);
@@ -373,29 +373,32 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSoftwareVersionStrin
 }
 
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreSerialNumber(const char * serialNum, size_t serialNumLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreSerialNumber(chip::Span<const char> serialNumber)
 {
-    return WriteConfigValueStr(ConfigClass::kConfigKey_SerialNum, serialNum, serialNumLen);
+    return WriteConfigValueStr(ConfigClass::kConfigKey_SerialNum, serialNumber.data(), serialNumber.size());
 }
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreVendorName(const char * vendorName, size_t vendorNameLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreVendorName(chip::Span<const char> vendorName)
 {
-    return WriteConfigValueStr(ConfigClass::kConfigKey_VendorName, vendorName, vendorNameLen);
+
+    return WriteConfigValueStr(ConfigClass::kConfigKey_VendorName, vendorName.data(), vendorName.size());
 }
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreProductName(const char * productName, size_t productNameLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreProductName(chip::Span<const char> productName)
 {
-    return WriteConfigValueStr(ConfigClass::kConfigKey_ProductName, productName, productNameLen);
+    return WriteConfigValueStr(ConfigClass::kConfigKey_ProductName, productName.data(), productName.size());
 }
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreHardwareVersionString(const char * hardwareVersionString, size_t hardwareVersionStringLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreHardwareVersionString(chip::Span<const char> hardwareVersionString)
 {
-    return WriteConfigValueStr(ConfigClass::kConfigKey_HardwareVersionString, hardwareVersionString, hardwareVersionStringLen);
+    return WriteConfigValueStr(ConfigClass::kConfigKey_HardwareVersionString, hardwareVersionString.data(),
+                               hardwareVersionString.size());
 }
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreSoftwareVersionString(const char * softwareVersionString, size_t softwareVersionStringLen)
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreSoftwareVersionString(chip::Span<const char> softwareVersionString)
 {
-    return WriteConfigValueStr(ConfigClass::kConfigKey_SoftwareVersionString, softwareVersionString, softwareVersionStringLen);
+    return WriteConfigValueStr(ConfigClass::kConfigKey_SoftwareVersionString, softwareVersionString.data(),
+                               softwareVersionString.size());
 }
 
 template <class ConfigClass>
