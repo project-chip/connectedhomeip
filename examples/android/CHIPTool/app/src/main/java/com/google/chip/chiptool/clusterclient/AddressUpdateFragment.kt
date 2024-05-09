@@ -21,7 +21,6 @@ import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.databinding.AddressUpdateFragmentBinding
 import com.google.chip.chiptool.util.DeviceIdUtil
 import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -54,6 +53,8 @@ class AddressUpdateFragment : ICDCheckInCallback, Fragment() {
     get() = binding.icdActiveDurationEd.text.toString().toLong() * 1000
 
   private val handler = Handler(Looper.getMainLooper())
+
+  private var externalICDCheckInMessageCallback: ICDCheckInMessageCallback? = null
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -128,11 +129,12 @@ class AddressUpdateFragment : ICDCheckInCallback, Fragment() {
       }
 
     val cluster = ChipClusters.IcdManagementCluster(devicePtr, 0)
-    val duration = suspendCoroutine { cont ->
+    val retDuration = suspendCoroutine { cont ->
       cluster.stayActiveRequest(
         object : ChipClusters.IcdManagementCluster.StayActiveResponseCallback {
           override fun onError(error: Exception) {
-            cont.resumeWithException(error)
+            Log.d(TAG, "onError", error)
+            cont.resume(0L)
           }
 
           override fun onSuccess(promisedActiveDuration: Long) {
@@ -143,12 +145,11 @@ class AddressUpdateFragment : ICDCheckInCallback, Fragment() {
       )
     }
     isSendingStayActiveCommand = false
-    return duration
+    return retDuration
   }
 
   private fun updateUIForICDInteractionSwitch(isEnabled: Boolean): Boolean {
-    val isICD =
-      deviceController.icdClientInfo.firstOrNull { info -> info.peerNodeId == deviceId } != null
+    val isICD = isICDDevice()
     if (isEnabled && !isICD) {
       binding.icdInteractionSwitch.isChecked = false
       return false
@@ -188,7 +189,13 @@ class AddressUpdateFragment : ICDCheckInCallback, Fragment() {
     return binding.deviceIdEd.text.toString().toULong(16)
   }
 
+  fun isICDDevice(): Boolean {
+    return deviceController.icdClientInfo.firstOrNull { info -> info.peerNodeId == deviceId } !=
+      null
+  }
+
   override fun notifyCheckInMessage(info: ICDClientInfo) {
+    externalICDCheckInMessageCallback?.notifyCheckInMessage()
     if (info.peerNodeId != icdDeviceId) {
       return
     }
@@ -204,6 +211,14 @@ class AddressUpdateFragment : ICDCheckInCallback, Fragment() {
         Log.d(TAG, "ChipClusterException", e)
       }
     }
+  }
+
+  fun setNotifyCheckInMessageCallback(callback: ICDCheckInMessageCallback?) {
+    externalICDCheckInMessageCallback = callback
+  }
+
+  interface ICDCheckInMessageCallback {
+    fun notifyCheckInMessage()
   }
 
   private fun turnOnActiveMode() {
