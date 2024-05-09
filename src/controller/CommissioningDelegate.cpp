@@ -70,6 +70,9 @@ const char * StageToString(CommissioningStage stage)
     case kAttestationVerification:
         return "AttestationVerification";
 
+    case kAttestationRevocationCheck:
+        return "AttestationRevocationCheck";
+
     case kSendOpCertSigningRequest:
         return "SendOpCertSigningRequest";
 

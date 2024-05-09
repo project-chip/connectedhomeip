@@ -34,9 +34,9 @@ kConfigRegulatory = 5
 kSendPAICertificateRequest = 10
 kSendDACCertificateRequest = 11
 kSendAttestationRequest = 12
-kSendOpCertSigningRequest = 14
-kSendTrustedRootCert = 17
-kSendNOC = 18
+kSendOpCertSigningRequest = 15
+kSendTrustedRootCert = 18
+kSendNOC = 19
 
 
 class TC_CGEN_2_4(MatterBaseTest):
