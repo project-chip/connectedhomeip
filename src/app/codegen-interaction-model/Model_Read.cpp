@@ -369,8 +369,7 @@ CHIP_ERROR EncodeEmberValue(ByteSpan data, const EmberAfAttributeMetadata * meta
 } // namespace
 
 /// separated-out ReadAttribute implementation (given existing complexity)
-CHIP_ERROR Model::ReadAttribute(const InteractionModel::ReadAttributeRequest & request, InteractionModel::ReadState & state,
-                                AttributeValueEncoder & encoder)
+CHIP_ERROR Model::ReadAttribute(const InteractionModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder)
 {
     ChipLogDetail(DataManagement,
                   "Reading attribute: Cluster=" ChipLogFormatMEI " Endpoint=%x AttributeId=" ChipLogFormatMEI " (expanded=%d)",
@@ -402,14 +401,7 @@ CHIP_ERROR Model::ReadAttribute(const InteractionModel::ReadAttributeRequest & r
         Compatibility::GlobalAttributeReader aai(attributeCluster);
         aai_result = TryReadViaAccessInterface(request.path, &aai, encoder);
     }
-
-    if (aai_result.has_value())
-    {
-        // save the reading state for later use (if lists are being decoded)
-        state.listEncodeStart = encoder.GetState().CurrentEncodingListIndex();
-        return *aai_result;
-    }
-    state.listEncodeStart = kInvalidListIndex;
+    ReturnErrorCodeIf(aai_result.has_value(), *aai_result);
 
     // At this point, we have to use ember directly to read the data.
     EmberAfAttributeSearchRecord record;

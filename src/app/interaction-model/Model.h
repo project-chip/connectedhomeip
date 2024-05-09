@@ -55,22 +55,17 @@ public:
     // event emitting, path marking and other operations
     virtual InteractionModelActions CurrentActions() { return mActions; }
 
-    /// List reading has specific handling logic:
-    ///   `state` contains in/out data about the current list reading. MUST start with kInvalidListIndex on first call
-    ///
     /// Return codes:
-    ///   CHIP_ERROR_MORE_LIST_DATA_AVAILABLE (NOTE: new error defined for this purpose)
-    ///      - partial data written to the destination
-    ///      - destination will contain AT LEAST one valid list entry fully serialized
-    ///      - destination will be fully valid (it will be rolled back on partial list writes)
+    ///   CHIP_ERROR_ACCESS_DENIED:
+    ///      - May be ignored if reads use path expansion (e.g. to skip inaccessible attributes
+    ///        during subscription requests). This code MUST be used for ACL failures and only for ACL failures.
     ///   CHIP_IM_GLOBAL_STATUS(code):
     ///      - error codes that are translatable in IM status codes (otherwise we expect Failure to be reported)
-    ///      - In particular, some handlers rely on special handling for:
-    ///        - `UnsupportedAccess`  - for ACL checks (e.g. wildcard expansion may choose to skip these)
     ///      - to check for this, CHIP_ERROR provides:
     ///        - ::IsPart(ChipError::SdkPart::kIMGlobalStatus) -> bool
     ///        - ::GetSdkCode() -> uint8_t to translate to the actual code
-    virtual CHIP_ERROR ReadAttribute(const ReadAttributeRequest & request, ReadState & state, AttributeValueEncoder & encoder) = 0;
+    ///   other internal falures
+    virtual CHIP_ERROR ReadAttribute(const ReadAttributeRequest & request, AttributeValueEncoder & encoder) = 0;
 
     /// Requests a write of an attribute.
     ///

@@ -57,13 +57,6 @@ struct ReadAttributeRequest : OperationRequest
     BitFlags<ReadFlags> readFlags;
 };
 
-struct ReadState
-{
-    // When reading lists, reading will start at this index.
-    // As list data is read, this index is incremented
-    ListIndex listEncodeStart = kInvalidListIndex;
-};
-
 enum class WriteFlags : uint32_t
 {
     kTimed     = 0x0001, // Received as a 2nd command after a timed invoke
