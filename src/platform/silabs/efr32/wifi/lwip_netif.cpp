@@ -28,7 +28,6 @@
 #include "wfx_host_events.h"
 #include "wifi_config.h"
 
-#include "AppConfig.h"
 #include "dhcp_client.h"
 #include "ethernetif.h"
 
@@ -36,6 +35,7 @@
 #include "event_groups.h"
 #include "task.h"
 
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
