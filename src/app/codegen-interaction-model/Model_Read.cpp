@@ -93,19 +93,17 @@ FindAttributeMetadata(const ConcreteAttributePath & aPath)
     return metadata;
 }
 
+/// Validates access to the given path
+///
+/// Notable errors:
+///   CHIP_ERROR_ACCESS_DENIED will be returned on permission failures. Such
+///   an error may trigger a "skip" of attributes on wildcard reads/subscriptions
 CHIP_ERROR CheckAccessPrivilege(const ConcreteAttributePath & path, const chip::Access::SubjectDescriptor & descriptor)
 {
     Access::RequestPath requestPath{ .cluster = path.mClusterId, .endpoint = path.mEndpointId };
     Access::Privilege requestPrivilege = RequiredPrivilege::ForReadAttribute(path);
-    CHIP_ERROR err                     = Access::GetAccessControl().Check(descriptor, requestPath, requestPrivilege);
 
-    // access denied sent as-is
-    ReturnErrorCodeIf(err == CHIP_ERROR_ACCESS_DENIED, CHIP_ERROR_ACCESS_DENIED);
-
-    // anything else is an opaque failure
-    ReturnErrorCodeIf(err != CHIP_NO_ERROR, CHIP_IM_GLOBAL_STATUS(UnsupportedAccess));
-
-    return CHIP_NO_ERROR;
+    return Access::GetAccessControl().Check(descriptor, requestPath, requestPrivilege);
 }
 
 /// Attempts to read via an attribute access interface (AAI)
