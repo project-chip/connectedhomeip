@@ -142,12 +142,14 @@ std::optional<CHIP_ERROR> TryReadViaAccessInterface(const ConcreteAttributePath 
     return encoder.TriedEncode() ? std::make_optional(CHIP_NO_ERROR) : std::nullopt;
 }
 
+/// Metadata of what a ember/pascal short string means (prepended by a u8 length)
 struct ShortPascalString
 {
     using LengthType                        = uint8_t;
     static constexpr LengthType kNullLength = 0xFF;
 };
 
+/// Metadata of what a ember/pascal LONG string means (prepended by a u16 length)
 struct LongPascalString
 {
     using LengthType                        = uint16_t;
@@ -158,6 +160,9 @@ struct LongPascalString
 static_assert(sizeof(ShortPascalString::LengthType) == 1);
 static_assert(sizeof(LongPascalString::LengthType) == 2);
 
+/// Given a ByteSpan containing data from ember, interpret it 
+/// as a span of type OUT (i.e. ByteSpan or CharSpan) given a ENCODING
+/// where ENCODING is Short or Long pascal strings.
 template <class OUT, class ENCODING>
 std::optional<OUT> ExtractEmberString(ByteSpan data)
 {
@@ -175,6 +180,12 @@ std::optional<OUT> ExtractEmberString(ByteSpan data)
     return std::make_optional<OUT>(reinterpret_cast<typename OUT::pointer>(data.data() + sizeof(len)), len);
 }
 
+/// Encode a value inside `encoder`
+///
+/// The value encoded will be of type T (e.g. CharSpan or ByteSpan) and it will be decoded
+/// via the given ENCODING (i.e. ShortPascalString or LongPascalString)
+///
+/// isNullable defines if the value of NULL is allowed to be encoded.
 template <typename T, class ENCODING>
 CHIP_ERROR EncodeStringLike(ByteSpan data, bool isNullable, AttributeValueEncoder & encoder)
 {
@@ -192,6 +203,9 @@ CHIP_ERROR EncodeStringLike(ByteSpan data, bool isNullable, AttributeValueEncode
     return encoder.Encode(*value);
 }
 
+/// Encodes a numeric data value of type T from the given ember-encoded buffer `data`.
+///
+/// isNullable defines if the value of NULL is allowed to be encoded.
 template <typename T>
 CHIP_ERROR EncodeFromSpan(ByteSpan data, bool isNullable, AttributeValueEncoder & encoder)
 {
@@ -214,6 +228,9 @@ CHIP_ERROR EncodeFromSpan(ByteSpan data, bool isNullable, AttributeValueEncoder 
 }
 
 /// Converts raw ember data from `data` into the encoder
+///
+/// Uses the attribute `metadata` to determine how the data is encoded into `data` and
+/// write a suitable value into `encoder`.
 CHIP_ERROR EncodeEmberValue(ByteSpan data, const EmberAfAttributeMetadata * metadata, AttributeValueEncoder & encoder)
 {
     VerifyOrReturnError(metadata != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -279,6 +296,11 @@ CHIP_ERROR EncodeEmberValue(ByteSpan data, const EmberAfAttributeMetadata * meta
 } // namespace
 
 /// separated-out ReadAttribute implementation (given existing complexity)
+///
+/// Generally will:
+///    - validate ACL (only for non-internal requests)
+///    - Try to read attribute via the AttributeAccessInterface
+///    - Try to read the value from ember RAM storage
 CHIP_ERROR Model::ReadAttribute(const InteractionModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder)
 {
     ChipLogDetail(DataManagement,
