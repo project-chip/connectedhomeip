@@ -25,7 +25,6 @@
  */
 
 #include <inttypes.h>
-#include <iostream>
 #include <stdint.h>
 #include <string.h>
 
@@ -232,3 +231,4 @@ TEST(TestCHIPErrorStr, CheckCoreErrorStrWithoutSourceLocation)
 #endif // CHIP_CONFIG_ERROR_SOURCE
     }
 }
+ 
