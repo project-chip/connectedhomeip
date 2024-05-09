@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/util/ember-io-storage.h"
 #include <app/util/ember-compatibility-functions.h>
 
 #include <access/AccessControl.h>
@@ -34,6 +35,7 @@
 #include <app/util/attribute-table.h>
 #include <app/util/config.h>
 #include <app/util/ember-global-attribute-access-interface.h>
+#include <app/util/ember-io-storage.h>
 #include <app/util/odd-sized-integers.h>
 #include <app/util/util.h>
 #include <lib/core/CHIPCore.h>
@@ -55,118 +57,18 @@ using chip::Protocols::InteractionModel::Status;
 using namespace chip;
 using namespace chip::app;
 using namespace chip::Access;
+using namespace chip::app::Compatibility;
+using namespace chip::app::Compatibility::Internal;
 
 namespace chip {
 namespace app {
-namespace Compatibility {
 namespace {
-// On some apps, ATTRIBUTE_LARGEST can as small as 3, making compiler unhappy since data[kAttributeReadBufferSize] cannot hold
-// uint64_t. Make kAttributeReadBufferSize at least 8 so it can fit all basic types.
-constexpr size_t kAttributeReadBufferSize = (ATTRIBUTE_LARGEST >= 8 ? ATTRIBUTE_LARGEST : 8);
-
-// BasicType maps the type to basic int(8|16|32|64)(s|u) types.
-EmberAfAttributeType BaseType(EmberAfAttributeType type)
-{
-    switch (type)
-    {
-    case ZCL_ACTION_ID_ATTRIBUTE_TYPE:  // Action Id
-    case ZCL_FABRIC_IDX_ATTRIBUTE_TYPE: // Fabric Index
-    case ZCL_BITMAP8_ATTRIBUTE_TYPE:    // 8-bit bitmap
-    case ZCL_ENUM8_ATTRIBUTE_TYPE:      // 8-bit enumeration
-    case ZCL_STATUS_ATTRIBUTE_TYPE:     // Status Code
-    case ZCL_PERCENT_ATTRIBUTE_TYPE:    // Percentage
-        static_assert(std::is_same<chip::Percent, uint8_t>::value,
-                      "chip::Percent is expected to be uint8_t, change this when necessary");
-        return ZCL_INT8U_ATTRIBUTE_TYPE;
-
-    case ZCL_ENDPOINT_NO_ATTRIBUTE_TYPE:   // Endpoint Number
-    case ZCL_GROUP_ID_ATTRIBUTE_TYPE:      // Group Id
-    case ZCL_VENDOR_ID_ATTRIBUTE_TYPE:     // Vendor Id
-    case ZCL_ENUM16_ATTRIBUTE_TYPE:        // 16-bit enumeration
-    case ZCL_BITMAP16_ATTRIBUTE_TYPE:      // 16-bit bitmap
-    case ZCL_PERCENT100THS_ATTRIBUTE_TYPE: // 100ths of a percent
-        static_assert(std::is_same<chip::EndpointId, uint16_t>::value,
-                      "chip::EndpointId is expected to be uint16_t, change this when necessary");
-        static_assert(std::is_same<chip::GroupId, uint16_t>::value,
-                      "chip::GroupId is expected to be uint16_t, change this when necessary");
-        static_assert(std::is_same<chip::Percent100ths, uint16_t>::value,
-                      "chip::Percent100ths is expected to be uint16_t, change this when necessary");
-        return ZCL_INT16U_ATTRIBUTE_TYPE;
-
-    case ZCL_CLUSTER_ID_ATTRIBUTE_TYPE: // Cluster Id
-    case ZCL_ATTRIB_ID_ATTRIBUTE_TYPE:  // Attribute Id
-    case ZCL_FIELD_ID_ATTRIBUTE_TYPE:   // Field Id
-    case ZCL_EVENT_ID_ATTRIBUTE_TYPE:   // Event Id
-    case ZCL_COMMAND_ID_ATTRIBUTE_TYPE: // Command Id
-    case ZCL_TRANS_ID_ATTRIBUTE_TYPE:   // Transaction Id
-    case ZCL_DEVTYPE_ID_ATTRIBUTE_TYPE: // Device Type Id
-    case ZCL_DATA_VER_ATTRIBUTE_TYPE:   // Data Version
-    case ZCL_BITMAP32_ATTRIBUTE_TYPE:   // 32-bit bitmap
-    case ZCL_EPOCH_S_ATTRIBUTE_TYPE:    // Epoch Seconds
-    case ZCL_ELAPSED_S_ATTRIBUTE_TYPE:  // Elapsed Seconds
-        static_assert(std::is_same<chip::ClusterId, uint32_t>::value,
-                      "chip::Cluster is expected to be uint32_t, change this when necessary");
-        static_assert(std::is_same<chip::AttributeId, uint32_t>::value,
-                      "chip::AttributeId is expected to be uint32_t, change this when necessary");
-        static_assert(std::is_same<chip::AttributeId, uint32_t>::value,
-                      "chip::AttributeId is expected to be uint32_t, change this when necessary");
-        static_assert(std::is_same<chip::EventId, uint32_t>::value,
-                      "chip::EventId is expected to be uint32_t, change this when necessary");
-        static_assert(std::is_same<chip::CommandId, uint32_t>::value,
-                      "chip::CommandId is expected to be uint32_t, change this when necessary");
-        static_assert(std::is_same<chip::TransactionId, uint32_t>::value,
-                      "chip::TransactionId is expected to be uint32_t, change this when necessary");
-        static_assert(std::is_same<chip::DeviceTypeId, uint32_t>::value,
-                      "chip::DeviceTypeId is expected to be uint32_t, change this when necessary");
-        static_assert(std::is_same<chip::DataVersion, uint32_t>::value,
-                      "chip::DataVersion is expected to be uint32_t, change this when necessary");
-        return ZCL_INT32U_ATTRIBUTE_TYPE;
-
-    case ZCL_AMPERAGE_MA_ATTRIBUTE_TYPE: // Amperage milliamps
-    case ZCL_ENERGY_MWH_ATTRIBUTE_TYPE:  // Energy milliwatt-hours
-    case ZCL_POWER_MW_ATTRIBUTE_TYPE:    // Power milliwatts
-    case ZCL_VOLTAGE_MV_ATTRIBUTE_TYPE:  // Voltage millivolts
-        return ZCL_INT64S_ATTRIBUTE_TYPE;
-
-    case ZCL_EVENT_NO_ATTRIBUTE_TYPE:   // Event Number
-    case ZCL_FABRIC_ID_ATTRIBUTE_TYPE:  // Fabric Id
-    case ZCL_NODE_ID_ATTRIBUTE_TYPE:    // Node Id
-    case ZCL_BITMAP64_ATTRIBUTE_TYPE:   // 64-bit bitmap
-    case ZCL_EPOCH_US_ATTRIBUTE_TYPE:   // Epoch Microseconds
-    case ZCL_POSIX_MS_ATTRIBUTE_TYPE:   // POSIX Milliseconds
-    case ZCL_SYSTIME_MS_ATTRIBUTE_TYPE: // System time Milliseconds
-    case ZCL_SYSTIME_US_ATTRIBUTE_TYPE: // System time Microseconds
-        static_assert(std::is_same<chip::EventNumber, uint64_t>::value,
-                      "chip::EventNumber is expected to be uint64_t, change this when necessary");
-        static_assert(std::is_same<chip::FabricId, uint64_t>::value,
-                      "chip::FabricId is expected to be uint64_t, change this when necessary");
-        static_assert(std::is_same<chip::NodeId, uint64_t>::value,
-                      "chip::NodeId is expected to be uint64_t, change this when necessary");
-        return ZCL_INT64U_ATTRIBUTE_TYPE;
-
-    case ZCL_TEMPERATURE_ATTRIBUTE_TYPE: // Temperature
-        return ZCL_INT16S_ATTRIBUTE_TYPE;
-
-    default:
-        return type;
-    }
-}
-
-} // namespace
-
-} // namespace Compatibility
-
-using namespace chip::app::Compatibility;
-
-namespace {
-// Common buffer for ReadSingleClusterData & WriteSingleClusterData
-uint8_t attributeData[kAttributeReadBufferSize];
 
 template <typename T>
 CHIP_ERROR attributeBufferToNumericTlvData(TLV::TLVWriter & writer, bool isNullable)
 {
     typename NumericAttributeTraits<T>::StorageType value;
-    memcpy(&value, attributeData, sizeof(value));
+    memcpy(&value, gEmberAttributeIOBufferSpan.data(), sizeof(value));
     TLV::Tag tag = TLV::ContextTag(AttributeDataIB::Tag::kData);
     if (isNullable && NumericAttributeTraits<T>::IsNullValue(value))
     {
@@ -467,7 +369,8 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
     record.endpoint    = aPath.mEndpointId;
     record.clusterId   = aPath.mClusterId;
     record.attributeId = aPath.mAttributeId;
-    Status status      = emAfReadOrWriteAttribute(&record, &attributeMetadata, attributeData, sizeof(attributeData),
+    Status status      = emAfReadOrWriteAttribute(&record, &attributeMetadata, gEmberAttributeIOBufferSpan.data(),
+                                                  static_cast<uint16_t>(gEmberAttributeIOBufferSpan.size()),
                                                   /* write = */ false);
 
     if (status == Status::Success)
@@ -477,7 +380,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         TLV::TLVWriter * writer            = attributeDataIBBuilder.GetWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_NO_ERROR);
         TLV::Tag tag = TLV::ContextTag(AttributeDataIB::Tag::kData);
-        switch (BaseType(attributeType))
+        switch (AttributeBaseType(attributeType))
         {
         case ZCL_NO_DATA_ATTRIBUTE_TYPE: // No data
             ReturnErrorOnFailure(writer->PutNull(tag));
@@ -583,8 +486,8 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         }
         case ZCL_CHAR_STRING_ATTRIBUTE_TYPE: // Char string
         {
-            char * actualData  = reinterpret_cast<char *>(attributeData + 1);
-            uint8_t dataLength = attributeData[0];
+            char * actualData  = reinterpret_cast<char *>(gEmberAttributeIOBufferSpan.data() + 1);
+            uint8_t dataLength = gEmberAttributeIOBufferSpan[0];
             if (dataLength == 0xFF)
             {
                 if (isNullable)
@@ -603,9 +506,10 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
             break;
         }
         case ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE: {
-            char * actualData = reinterpret_cast<char *>(attributeData + 2); // The pascal string contains 2 bytes length
+            char * actualData =
+                reinterpret_cast<char *>(gEmberAttributeIOBufferSpan.data() + 2); // The pascal string contains 2 bytes length
             uint16_t dataLength;
-            memcpy(&dataLength, attributeData, sizeof(dataLength));
+            memcpy(&dataLength, gEmberAttributeIOBufferSpan.data(), sizeof(dataLength));
             if (dataLength == 0xFFFF)
             {
                 if (isNullable)
@@ -625,8 +529,8 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         }
         case ZCL_OCTET_STRING_ATTRIBUTE_TYPE: // Octet string
         {
-            uint8_t * actualData = attributeData + 1;
-            uint8_t dataLength   = attributeData[0];
+            uint8_t * actualData = gEmberAttributeIOBufferSpan.data() + 1;
+            uint8_t dataLength   = gEmberAttributeIOBufferSpan[0];
             if (dataLength == 0xFF)
             {
                 if (isNullable)
@@ -645,9 +549,9 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
             break;
         }
         case ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE: {
-            uint8_t * actualData = attributeData + 2; // The pascal string contains 2 bytes length
+            uint8_t * actualData = gEmberAttributeIOBufferSpan.data() + 2; // The pascal string contains 2 bytes length
             uint16_t dataLength;
-            memcpy(&dataLength, attributeData, sizeof(dataLength));
+            memcpy(&dataLength, gEmberAttributeIOBufferSpan.data(), sizeof(dataLength));
             if (dataLength == 0xFFFF)
             {
                 if (isNullable)
@@ -685,7 +589,8 @@ template <typename T>
 CHIP_ERROR numericTlvDataToAttributeBuffer(TLV::TLVReader & aReader, bool isNullable, uint16_t & dataLen)
 {
     typename NumericAttributeTraits<T>::StorageType value;
-    static_assert(sizeof(value) <= sizeof(attributeData), "Value cannot fit into attribute data");
+    VerifyOrDie(sizeof(value) <= gEmberAttributeIOBufferSpan.size());
+
     if (isNullable && aReader.GetType() == TLV::kTLVType_Null)
     {
         NumericAttributeTraits<T>::SetNull(value);
@@ -698,7 +603,7 @@ CHIP_ERROR numericTlvDataToAttributeBuffer(TLV::TLVReader & aReader, bool isNull
         NumericAttributeTraits<T>::WorkingToStorage(val, value);
     }
     dataLen = sizeof(value);
-    memcpy(attributeData, &value, sizeof(value));
+    memcpy(gEmberAttributeIOBufferSpan.data(), &value, sizeof(value));
     return CHIP_NO_ERROR;
 }
 
@@ -711,7 +616,7 @@ CHIP_ERROR stringTlvDataToAttributeBuffer(TLV::TLVReader & aReader, bool isOctet
     {
         // Null is represented by an 0xFF or 0xFFFF length, respectively.
         len = std::numeric_limits<T>::max();
-        memcpy(&attributeData[0], &len, sizeof(len));
+        memcpy(gEmberAttributeIOBufferSpan.data(), &len, sizeof(len));
         dataLen = sizeof(len);
     }
     else
@@ -723,10 +628,10 @@ CHIP_ERROR stringTlvDataToAttributeBuffer(TLV::TLVReader & aReader, bool isOctet
         ReturnErrorOnFailure(aReader.GetDataPtr(data));
         len = static_cast<T>(aReader.GetLength());
         VerifyOrReturnError(len != std::numeric_limits<T>::max(), CHIP_ERROR_MESSAGE_TOO_LONG);
-        VerifyOrReturnError(len + sizeof(len) /* length at the beginning of data */ <= sizeof(attributeData),
+        VerifyOrReturnError(len + sizeof(len) /* length at the beginning of data */ <= gEmberAttributeIOBufferSpan.size(),
                             CHIP_ERROR_MESSAGE_TOO_LONG);
-        memcpy(&attributeData[0], &len, sizeof(len));
-        memcpy(&attributeData[sizeof(len)], data, len);
+        memcpy(gEmberAttributeIOBufferSpan.data(), &len, sizeof(len));
+        memcpy(gEmberAttributeIOBufferSpan.data() + sizeof(len), data, len);
         dataLen = static_cast<uint16_t>(len + sizeof(len));
     }
     return CHIP_NO_ERROR;
@@ -734,7 +639,7 @@ CHIP_ERROR stringTlvDataToAttributeBuffer(TLV::TLVReader & aReader, bool isOctet
 
 CHIP_ERROR prepareWriteData(const EmberAfAttributeMetadata * attributeMetadata, TLV::TLVReader & aReader, uint16_t & dataLen)
 {
-    EmberAfAttributeType expectedType = BaseType(attributeMetadata->attributeType);
+    EmberAfAttributeType expectedType = AttributeBaseType(attributeMetadata->attributeType);
     bool isNullable                   = attributeMetadata->IsNullable();
     switch (expectedType)
     {
@@ -895,8 +800,8 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
         return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::InvalidValue);
     }
 
-    auto status = emAfWriteAttributeExternal(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, attributeData,
-                                             attributeMetadata->attributeType);
+    auto status = emAfWriteAttributeExternal(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
+                                             gEmberAttributeIOBufferSpan.data(), attributeMetadata->attributeType);
     return apWriteHandler->AddStatus(aPath, status);
 }
 
