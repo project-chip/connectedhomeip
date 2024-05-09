@@ -26,7 +26,7 @@ namespace app {
 namespace Compatibility {
 namespace Internal {
 
-/// A buffer guaranteed to be sized to contain any individual value from 
+/// A buffer guaranteed to be sized to contain any individual value from
 /// ember (i.e. a buffer that can be used to read ember data into).
 extern MutableByteSpan gEmberAttributeIOBufferSpan;
 

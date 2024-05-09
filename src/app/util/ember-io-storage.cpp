@@ -16,13 +16,12 @@
  */
 #include <app/util/ember-io-storage.h>
 
-#include <zap-generated/endpoint_config.h>
 #include <app-common/zap-generated/attribute-type.h>
+#include <zap-generated/endpoint_config.h>
 
 #include <cstddef>
 
-namespace chip
-{
+namespace chip {
 namespace app {
 namespace Compatibility {
 namespace Internal {
