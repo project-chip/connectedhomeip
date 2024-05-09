@@ -5300,12 +5300,12 @@ MTR_NEWLY_AVAILABLE
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRValveConfigurationAndControlClusterOpenParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nullable openDuration MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable openDuration MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable targetLevel MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable targetLevel MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5332,7 +5332,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRValveConfigurationAndControlClusterCloseParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).

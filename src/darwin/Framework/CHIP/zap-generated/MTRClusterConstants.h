@@ -148,7 +148,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeHEPAFilterMonitoringID MTR_NEWLY_AVAILABLE = 0x00000071,
     MTRClusterIDTypeActivatedCarbonFilterMonitoringID MTR_NEWLY_AVAILABLE = 0x00000072,
     MTRClusterIDTypeBooleanStateConfigurationID MTR_NEWLY_AVAILABLE = 0x00000080,
-    MTRClusterIDTypeValveConfigurationAndControlID MTR_PROVISIONALLY_AVAILABLE = 0x00000081,
+    MTRClusterIDTypeValveConfigurationAndControlID MTR_NEWLY_AVAILABLE = 0x00000081,
     MTRClusterIDTypeElectricalPowerMeasurementID MTR_NEWLY_AVAILABLE = 0x00000090,
     MTRClusterIDTypeElectricalEnergyMeasurementID MTR_NEWLY_AVAILABLE = 0x00000091,
     MTRClusterIDTypeDemandResponseLoadControlID MTR_PROVISIONALLY_AVAILABLE = 0x00000096,
@@ -2561,23 +2561,23 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeClusterRevisionID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster ValveConfigurationAndControl attributes
-    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeOpenDurationID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeDefaultOpenDurationID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeAutoCloseTimeID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeRemainingDurationID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
-    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeCurrentStateID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
-    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeTargetStateID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
-    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeCurrentLevelID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
-    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeTargetLevelID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
-    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeDefaultOpenLevelID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
-    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeValveFaultID MTR_PROVISIONALLY_AVAILABLE = 0x00000009,
-    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeLevelStepID MTR_PROVISIONALLY_AVAILABLE = 0x0000000A,
-    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeOpenDurationID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeDefaultOpenDurationID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeAutoCloseTimeID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeRemainingDurationID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeCurrentStateID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeTargetStateID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeCurrentLevelID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeTargetLevelID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeDefaultOpenLevelID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeValveFaultID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeLevelStepID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
-    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeAttributeListID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeFeatureMapID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeClusterRevisionID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster ElectricalPowerMeasurement attributes
     MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributePowerModeID MTR_NEWLY_AVAILABLE = 0x00000000,
@@ -6270,8 +6270,8 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterBooleanStateConfigurationCommandEnableDisableAlarmID MTR_NEWLY_AVAILABLE = 0x00000001,
 
     // Cluster ValveConfigurationAndControl commands
-    MTRCommandIDTypeClusterValveConfigurationAndControlCommandOpenID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRCommandIDTypeClusterValveConfigurationAndControlCommandCloseID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterValveConfigurationAndControlCommandOpenID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterValveConfigurationAndControlCommandCloseID MTR_NEWLY_AVAILABLE = 0x00000001,
 
     // Cluster DemandResponseLoadControl commands
     MTRCommandIDTypeClusterDemandResponseLoadControlCommandRegisterLoadControlProgramRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
@@ -7195,8 +7195,8 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterBooleanStateConfigurationEventSensorFaultID MTR_NEWLY_AVAILABLE = 0x00000001,
 
     // Cluster ValveConfigurationAndControl events
-    MTREventIDTypeClusterValveConfigurationAndControlEventValveStateChangedID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTREventIDTypeClusterValveConfigurationAndControlEventValveFaultID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTREventIDTypeClusterValveConfigurationAndControlEventValveStateChangedID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTREventIDTypeClusterValveConfigurationAndControlEventValveFaultID MTR_NEWLY_AVAILABLE = 0x00000001,
 
     // Cluster ElectricalPowerMeasurement events
     MTREventIDTypeClusterElectricalPowerMeasurementEventMeasurementPeriodRangesID MTR_NEWLY_AVAILABLE = 0x00000000,
