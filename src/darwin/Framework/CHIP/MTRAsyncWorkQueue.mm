@@ -197,7 +197,8 @@ MTR_DIRECT_MEMBERS
     os_unfair_lock _lock;
     __weak id _context;
     NSMutableArray<MTRAsyncWorkItem *> * _items;
-    NSInteger _runningWorkItemCount;
+    NSUInteger _runningWorkItemCount;
+    NSUInteger _width;
 }
 
 // A helper struct that facilitates access to _context while
@@ -217,10 +218,16 @@ struct ContextSnapshot {
 
 - (instancetype)initWithContext:(id)context
 {
+    return [self initWithContext:context width:1];
+}
+
+- (instancetype)initWithContext:(id)context width:(NSUInteger)width
+{
     NSParameterAssert(context);
     if (self = [super init]) {
         _context = context;
         _items = [NSMutableArray array];
+        _width = width;
     }
     return self;
 }
@@ -286,35 +293,84 @@ struct ContextSnapshot {
 {
     os_unfair_lock_assert_owner(&_lock);
 
-    MTRAsyncWorkItem * runningWorkItem = (_runningWorkItemCount) ? _items.firstObject : nil;
-    if (workItem != runningWorkItem) {
+    BOOL foundWorkItem = NO;
+    NSUInteger indexOfWorkItem = 0;
+    for (NSUInteger i = 0; i < _width; i++) {
+        if (_items[i] == workItem) {
+            foundWorkItem = YES;
+            indexOfWorkItem = i;
+            break;
+        }
+    }
+    if (!foundWorkItem) {
         NSAssert(NO, @"work item to post-process is not running");
         return;
     }
 
+    // already part of the running work items allowed by width - retry directly
     if (retry) {
         MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@> retry needed for work item [%llu]", context.description, workItem.uniqueID);
-    } else {
-        [workItem markComplete];
-        [_items removeObjectAtIndex:0];
-        MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@, items count: %tu> completed work item [%llu]", context.description, _items.count, workItem.uniqueID);
+        [self _callWorkItem:workItem withContext:context];
+        return;
     }
 
-    // when "concurrency width" is implemented this will be decremented instead
-    _runningWorkItemCount = 0;
+    [workItem markComplete];
+    [_items removeObjectAtIndex:indexOfWorkItem];
+    MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@, items count: %tu> completed work item [%llu]", context.description, _items.count, workItem.uniqueID);
+
+    // sanity check running work item count is positive
+    if (_runningWorkItemCount == 0) {
+        NSAssert(NO, @"running work item count should be positive");
+        return;
+    }
+
+    _runningWorkItemCount--;
     [self _callNextReadyWorkItemWithContext:context];
+}
+
+- (void)_callWorkItem:(MTRAsyncWorkItem *)workItem withContext:(ContextSnapshot const &)context
+{
+    os_unfair_lock_assert_owner(&_lock);
+
+    mtr_weakify(self);
+    [workItem callReadyHandlerWithContext:context.reference completion:^(MTRAsyncWorkOutcome outcome) {
+        mtr_strongify(self);
+        BOOL handled = NO;
+        if (self) {
+            ContextSnapshot context(self); // re-acquire a new snapshot
+            std::lock_guard lock(self->_lock);
+            if (!workItem.isComplete) {
+                [self _postProcessWorkItem:workItem context:context retry:(outcome == MTRAsyncWorkNeedsRetry)];
+                handled = YES;
+            }
+        }
+        return handled;
+    }];
 }
 
 - (void)_callNextReadyWorkItemWithContext:(ContextSnapshot const &)context
 {
     os_unfair_lock_assert_owner(&_lock);
 
-    // when "concurrency width" is implemented this will be checked against the width
-    if (_runningWorkItemCount) {
-        return; // can't run next work item until the current one is done
+    // sanity check not running more than allowed
+    if (_runningWorkItemCount > _width) {
+        NSAssert(NO, @"running work item count larger than the maximum width");
+        return;
     }
 
-    if (!_items.count) {
+    // sanity check consistent counts
+    if (_items.count < _runningWorkItemCount) {
+        NSAssert(NO, @"work item count is less than running work item count");
+        return;
+    }
+
+    // can't run more work items if already running at max concurrent width
+    if (_runningWorkItemCount == _width) {
+        return;
+    }
+
+    // no more items to run
+    if (_items.count == _runningWorkItemCount) {
         return; // nothing to run
     }
 
@@ -324,16 +380,16 @@ struct ContextSnapshot {
         return;
     }
 
-    // when "concurrency width" is implemented this will be incremented instead
-    _runningWorkItemCount = 1;
+    NSUInteger nextWorkItemToRunIndex = _runningWorkItemCount;
+    MTRAsyncWorkItem * workItem = _items[nextWorkItemToRunIndex];
+    _runningWorkItemCount++;
 
-    MTRAsyncWorkItem * workItem = _items.firstObject;
-
-    // Check if batching is possible or needed. Only ask work item to batch once for simplicity
+    // Check if batching is possible or needed.
     auto batchingHandler = workItem.batchingHandler;
-    if (batchingHandler && workItem.retryCount == 0) {
-        while (_items.count >= 2) {
-            MTRAsyncWorkItem * nextWorkItem = _items[1];
+    if (batchingHandler) {
+        while (_items.count > _runningWorkItemCount) {
+            NSUInteger firstNonRunningItemIndex = _runningWorkItemCount;
+            MTRAsyncWorkItem * nextWorkItem = _items[firstNonRunningItemIndex];
             if (!nextWorkItem.batchingHandler || nextWorkItem.batchingID != workItem.batchingID) {
                 goto done; // next item is not eligible to merge with this one
             }
@@ -355,20 +411,7 @@ struct ContextSnapshot {
     done:;
     }
 
-    mtr_weakify(self);
-    [workItem callReadyHandlerWithContext:context.reference completion:^(MTRAsyncWorkOutcome outcome) {
-        mtr_strongify(self);
-        BOOL handled = NO;
-        if (self) {
-            ContextSnapshot context(self); // re-acquire a new snapshot
-            std::lock_guard lock(self->_lock);
-            if (!workItem.isComplete) {
-                [self _postProcessWorkItem:workItem context:context retry:(outcome == MTRAsyncWorkNeedsRetry)];
-                handled = YES;
-            }
-        }
-        return handled;
-    }];
+    [self _callWorkItem:workItem withContext:context];
 }
 
 - (BOOL)hasDuplicateForTypeID:(NSUInteger)opaqueDuplicateTypeID workItemData:(id)opaqueWorkItemData

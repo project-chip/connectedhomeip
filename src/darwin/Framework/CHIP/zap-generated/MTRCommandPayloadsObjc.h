@@ -5240,10 +5240,10 @@ MTR_NEWLY_AVAILABLE
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRBooleanStateConfigurationClusterSuppressAlarmParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull alarmsToSuppress MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull alarmsToSuppress MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5270,10 +5270,10 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRBooleanStateConfigurationClusterEnableDisableAlarmParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull alarmsToEnableDisable MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull alarmsToEnableDisable MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *

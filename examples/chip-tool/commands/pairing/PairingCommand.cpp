@@ -136,7 +136,7 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
         params.SetDSTOffsets(mDSTOffsetList);
     }
 
-    if (!mSkipICDRegistration.ValueOr(false))
+    if (mICDRegistration.ValueOr(false))
     {
         params.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
 

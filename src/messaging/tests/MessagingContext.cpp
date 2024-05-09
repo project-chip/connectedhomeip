@@ -21,6 +21,7 @@
 #include <credentials/tests/CHIPCert_unit_test_vectors.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/CodeUtils.h>
+#include <messaging/ReliableMessageMgr.h>
 #include <protocols/secure_channel/Constants.h>
 
 namespace chip {
@@ -70,6 +71,9 @@ CHIP_ERROR MessagingContext::Init(TransportMgrBase * transport, IOContext * ioCo
         ReturnErrorOnFailure(CreatePASESessionDavidToCharlie());
     }
 
+    // Set the additional MRP backoff to zero so that it does not affect the test execution time.
+    Messaging::ReliableMessageMgr::SetAdditionalMRPBackoffTime(MakeOptional(System::Clock::kZero));
+
     return CHIP_NO_ERROR;
 }
 
@@ -85,6 +89,9 @@ void MessagingContext::Shutdown()
     mFabricTable.Shutdown();
     mOpCertStore.Finish();
     mOpKeyStore.Finish();
+
+    // Reset the default additional MRP backoff.
+    Messaging::ReliableMessageMgr::SetAdditionalMRPBackoffTime(NullOptional);
 }
 
 CHIP_ERROR MessagingContext::InitFromExisting(const MessagingContext & existing)

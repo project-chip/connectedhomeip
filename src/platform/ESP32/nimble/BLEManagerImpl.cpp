@@ -503,6 +503,10 @@ bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const 
     uint8_t value[2];
     int rc;
     struct peer * peer = peer_find(conId);
+    if (peer == nullptr)
+    {
+        return false;
+    }
 
     dsc = peer_dsc_find_uuid(peer, (ble_uuid_t *) (&ShortUUID_CHIPoBLEService), (ble_uuid_t *) (&UUID_CHIPoBLEChar_TX),
                              (ble_uuid_t *) (&ShortUUID_CHIPoBLE_CharTx_Desc));
@@ -537,6 +541,10 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
     uint8_t value[2];
     int rc;
     struct peer * peer = peer_find(conId);
+    if (peer == nullptr)
+    {
+        return false;
+    }
 
     dsc = peer_dsc_find_uuid(peer, (ble_uuid_t *) (&ShortUUID_CHIPoBLEService), (ble_uuid_t *) (&UUID_CHIPoBLEChar_TX),
                              (ble_uuid_t *) (&ShortUUID_CHIPoBLE_CharTx_Desc));

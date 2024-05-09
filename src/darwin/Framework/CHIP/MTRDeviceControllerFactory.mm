@@ -1330,7 +1330,7 @@ void MTRSetMessageReliabilityParameters(NSNumber * _Nullable idleRetransmitMs,
         resetAdvertising = ReliableMessageProtocolConfig::SetLocalMRPConfig(NullOptional);
     } else {
         if (additionalRetransmitDelayMs != nil) {
-            System::Clock::Milliseconds64 additionalBackoff(additionalRetransmitDelayMs.unsignedLongLongValue);
+            System::Clock::Timeout additionalBackoff(additionalRetransmitDelayMs.unsignedLongValue);
             Messaging::ReliableMessageMgr::SetAdditionalMRPBackoffTime(MakeOptional(additionalBackoff));
         }
 
