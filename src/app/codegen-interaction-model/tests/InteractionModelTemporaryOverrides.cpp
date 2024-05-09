@@ -82,6 +82,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPat
 } // namespace app
 } // namespace chip
 
+/// TODO: this SHOULD be part of attribute-storage mocks.
 Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, const EmberAfAttributeMetadata ** metadata,
                                 uint8_t * buffer, uint16_t readLength, bool write)
 {

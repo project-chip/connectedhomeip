@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/codegen-interaction-model/Model.h>
+#include <optional>
 
 #include <access/AccessControl.h>
 #include <access/Privilege.h>
@@ -22,17 +22,39 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/GlobalAttributes.h>
 #include <app/RequiredPrivilege.h>
+#include <app/codegen-interaction-model/Model.h>
+#include <app/data-model/FabricScoped.h>
+#include <app/util/attribute-metadata.h>
 #include <app/util/attribute-storage-detail.h>
+#include <app/util/attribute-storage-null-handling.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/ember-global-attribute-access-interface.h>
 #include <app/util/endpoint-config-api.h>
-#include <optional>
+#include <app/util/odd-sized-integers.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
+
 #include <zap-generated/endpoint_config.h>
 
 namespace chip {
 namespace app {
+#if 0
+namespace DataModel {
+
+// Ensure odd sized integers are not considered fabric scoped for the purpose of
+// encoding via AttributeValueEncoder (they are just integers)
+template <int ByteSize, bool IsSigned>
+class IsFabricScoped<OddSizedInteger<ByteSize, IsSigned>>
+{
+public:
+    static constexpr bool value = false;
+};
+} // namespace DataModel
+#endif
+
 namespace CodegenDataModel {
 namespace {
 // On some apps, ATTRIBUTE_LARGEST can as small as 3, making compiler unhappy since data[kAttributeReadBufferSize] cannot hold
@@ -225,6 +247,147 @@ std::optional<CHIP_ERROR> TryReadViaAccessInterface(const ConcreteAttributePath 
     return encoder.TriedEncode() ? std::make_optional(CHIP_NO_ERROR) : std::nullopt;
 }
 
+static constexpr uint8_t kEmberStringNullLength      = 0xFF;
+static constexpr uint16_t kEmberLongStringNullLength = 0xFFFF;
+
+template <class T>
+std::optional<T> ExtractEmberShortString(ByteSpan data)
+{
+    uint8_t len = data[0];
+
+    if (len == kEmberStringNullLength)
+    {
+        return std::nullopt;
+    }
+    VerifyOrDie(static_cast<size_t>(len + 1) <= data.size());
+
+    return std::make_optional<T>(reinterpret_cast<typename T::pointer>(data.data() + 1), len);
+}
+
+template <class T>
+std::optional<T> ExtractEmberLongString(ByteSpan data)
+{
+    uint16_t len;
+
+    VerifyOrDie(sizeof(len) <= data.size());
+    memcpy(&len, data.data(), sizeof(len));
+
+    if (len == kEmberLongStringNullLength)
+    {
+        return std::nullopt;
+    }
+    VerifyOrDie(static_cast<size_t>(len + 1) <= data.size());
+
+    return std::make_optional<T>(reinterpret_cast<typename T::pointer>(data.data() + 1), len);
+}
+
+// TODO: string handling:
+//    - length (1 or 2 bytes, null is 0xFF or 0xFFFF)
+//    - either Put(ByteSpan) or PutString() -> this seems to need a Encoder equivalent?
+//       - Span calls EncodeString
+//       - ByteSpan calls Encode
+//
+
+template <typename T>
+CHIP_ERROR EncodeStringLike(std::optional<T> data, bool isNullable, AttributeValueEncoder & encoder)
+{
+    if (!data.has_value())
+    {
+        if (isNullable)
+        {
+            return encoder.EncodeNull();
+        }
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    // encode value as-is
+    return encoder.Encode(*data);
+}
+
+template <typename T>
+CHIP_ERROR EncodeFromSpan(ByteSpan data, bool isNullable, AttributeValueEncoder & encoder)
+{
+    typename NumericAttributeTraits<T>::StorageType value;
+
+    VerifyOrReturnError(data.size() >= sizeof(value), CHIP_ERROR_INVALID_ARGUMENT);
+    memcpy(&value, data.data(), sizeof(value));
+
+    if (isNullable && NumericAttributeTraits<T>::IsNullValue(value))
+    {
+        return encoder.EncodeNull();
+    }
+
+    if (!NumericAttributeTraits<T>::CanRepresentValue(isNullable, value))
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    return encoder.Encode(NumericAttributeTraits<T>::StorageToWorking(value));
+}
+
+/// Converts raw ember data from `data` into the encoder
+CHIP_ERROR EncodeEmberValue(ByteSpan data, const EmberAfAttributeMetadata * metadata, AttributeValueEncoder & encoder)
+{
+    VerifyOrReturnError(metadata != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    const bool isNullable = metadata->IsNullable();
+
+    switch (BaseType(metadata->attributeType))
+    {
+    case ZCL_NO_DATA_ATTRIBUTE_TYPE: // No data
+        return encoder.EncodeNull();
+    case ZCL_BOOLEAN_ATTRIBUTE_TYPE: // Boolean
+        return EncodeFromSpan<bool>(data, isNullable, encoder);
+    case ZCL_INT8U_ATTRIBUTE_TYPE: // Unsigned 8-bit integer
+        return EncodeFromSpan<uint8_t>(data, isNullable, encoder);
+    case ZCL_INT16U_ATTRIBUTE_TYPE: // Unsigned 16-bit integer
+        return EncodeFromSpan<uint16_t>(data, isNullable, encoder);
+    case ZCL_INT24U_ATTRIBUTE_TYPE: // Unsigned 24-bit integer
+        return EncodeFromSpan<OddSizedInteger<3, false>>(data, isNullable, encoder);
+    case ZCL_INT32U_ATTRIBUTE_TYPE: // Unsigned 32-bit integer
+        return EncodeFromSpan<uint32_t>(data, isNullable, encoder);
+    case ZCL_INT40U_ATTRIBUTE_TYPE: // Unsigned 40-bit integer
+        return EncodeFromSpan<OddSizedInteger<5, false>>(data, isNullable, encoder);
+    case ZCL_INT48U_ATTRIBUTE_TYPE: // Unsigned 48-bit integer
+        return EncodeFromSpan<OddSizedInteger<6, false>>(data, isNullable, encoder);
+    case ZCL_INT56U_ATTRIBUTE_TYPE: // Unsigned 56-bit integer
+        return EncodeFromSpan<OddSizedInteger<7, false>>(data, isNullable, encoder);
+    case ZCL_INT64U_ATTRIBUTE_TYPE: // Unsigned 64-bit integer
+        return EncodeFromSpan<uint64_t>(data, isNullable, encoder);
+    case ZCL_INT8S_ATTRIBUTE_TYPE: // Signed 8-bit integer
+        return EncodeFromSpan<int8_t>(data, isNullable, encoder);
+    case ZCL_INT16S_ATTRIBUTE_TYPE: // Signed 16-bit integer
+        return EncodeFromSpan<int16_t>(data, isNullable, encoder);
+    case ZCL_INT24S_ATTRIBUTE_TYPE: // Signed 24-bit integer
+        return EncodeFromSpan<OddSizedInteger<3, true>>(data, isNullable, encoder);
+    case ZCL_INT32S_ATTRIBUTE_TYPE: // Signed 32-bit integer
+        return EncodeFromSpan<int32_t>(data, isNullable, encoder);
+    case ZCL_INT40S_ATTRIBUTE_TYPE: // Signed 40-bit integer
+        return EncodeFromSpan<OddSizedInteger<5, true>>(data, isNullable, encoder);
+    case ZCL_INT48S_ATTRIBUTE_TYPE: // Signed 48-bit integer
+        return EncodeFromSpan<OddSizedInteger<6, true>>(data, isNullable, encoder);
+    case ZCL_INT56S_ATTRIBUTE_TYPE: // Signed 56-bit integer
+        return EncodeFromSpan<OddSizedInteger<7, true>>(data, isNullable, encoder);
+    case ZCL_INT64S_ATTRIBUTE_TYPE: // Signed 64-bit integer
+        return EncodeFromSpan<int64_t>(data, isNullable, encoder);
+    case ZCL_SINGLE_ATTRIBUTE_TYPE: // 32-bit float
+        return EncodeFromSpan<float>(data, isNullable, encoder);
+    case ZCL_DOUBLE_ATTRIBUTE_TYPE: // 64-bit float
+        return EncodeFromSpan<double>(data, isNullable, encoder);
+    case ZCL_CHAR_STRING_ATTRIBUTE_TYPE: // Char string
+        return EncodeStringLike(ExtractEmberShortString<CharSpan>(data), isNullable, encoder);
+    case ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE:
+        return EncodeStringLike(ExtractEmberLongString<CharSpan>(data), isNullable, encoder);
+    case ZCL_OCTET_STRING_ATTRIBUTE_TYPE: // Octet string
+        return EncodeStringLike(ExtractEmberShortString<ByteSpan>(data), isNullable, encoder);
+    case ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE:
+        return EncodeStringLike(ExtractEmberLongString<ByteSpan>(data), isNullable, encoder);
+    default:
+        ChipLogError(DataManagement, "Attribute type 0x%x not handled", static_cast<int>(metadata->attributeType));
+        return CHIP_IM_GLOBAL_STATUS(UnsupportedRead);
+    }
+}
+
 } // namespace
 
 /// separated-out ReadAttribute implementation (given existing complexity)
@@ -291,257 +454,7 @@ CHIP_ERROR Model::ReadAttribute(const InteractionModel::ReadAttributeRequest & r
         return ChipError(ChipError::SdkPart::kIMGlobalStatus, to_underlying(status), __FILE__, __LINE__);
     }
 
-    switch (BaseType(attributeMetadata->attributeType))
-    {
-    // FIXME: implement
-    default:
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedRead);
-    }
-
-    // TODO: return no error once we have a propper impl
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-
-#if 0
-    // Read attribute using Ember, if it doesn't have an override.
-
-    TLV::TLVWriter backup;
-    aAttributeReports.Checkpoint(backup);
-
-    AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
-    ReturnErrorOnFailure(aAttributeReports.GetError());
-
-    AttributeDataIB::Builder & attributeDataIBBuilder = attributeReport.CreateAttributeData();
-    ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
-
-    DataVersion version = 0;
-    ReturnErrorOnFailure(ReadClusterDataVersion(aPath, version));
-    attributeDataIBBuilder.DataVersion(version);
-    ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
-
-    AttributePathIB::Builder & attributePathIBBuilder = attributeDataIBBuilder.CreatePath();
-    ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
-
-    CHIP_ERROR err = attributePathIBBuilder.Endpoint(aPath.mEndpointId)
-                         .Cluster(aPath.mClusterId)
-                         .Attribute(aPath.mAttributeId)
-                         .EndOfAttributePathIB();
-    ReturnErrorOnFailure(err);
-
-    EmberAfAttributeSearchRecord record;
-    record.endpoint    = aPath.mEndpointId;
-    record.clusterId   = aPath.mClusterId;
-    record.attributeId = aPath.mAttributeId;
-    Status status      = emAfReadOrWriteAttribute(&record, &attributeMetadata, attributeData, sizeof(attributeData),
-                                                  /* write = */ false);
-
-    if (status == Status::Success)
-    {
-        EmberAfAttributeType attributeType = attributeMetadata->attributeType;
-        bool isNullable                    = attributeMetadata->IsNullable();
-        TLV::TLVWriter * writer            = attributeDataIBBuilder.GetWriter();
-        VerifyOrReturnError(writer != nullptr, CHIP_NO_ERROR);
-        TLV::Tag tag = TLV::ContextTag(AttributeDataIB::Tag::kData);
-        switch (BaseType(attributeType))
-        {
-        case ZCL_NO_DATA_ATTRIBUTE_TYPE: // No data
-            ReturnErrorOnFailure(writer->PutNull(tag));
-            break;
-        case ZCL_BOOLEAN_ATTRIBUTE_TYPE: // Boolean
-            ReturnErrorOnFailure(attributeBufferToNumericTlvData<bool>(*writer, isNullable));
-            break;
-        case ZCL_INT8U_ATTRIBUTE_TYPE: // Unsigned 8-bit integer
-            ReturnErrorOnFailure(attributeBufferToNumericTlvData<uint8_t>(*writer, isNullable));
-            break;
-        case ZCL_INT16U_ATTRIBUTE_TYPE: // Unsigned 16-bit integer
-        {
-            ReturnErrorOnFailure(attributeBufferToNumericTlvData<uint16_t>(*writer, isNullable));
-            break;
-        }
-        case ZCL_INT24U_ATTRIBUTE_TYPE: // Unsigned 24-bit integer
-        {
-            using IntType = OddSizedInteger<3, false>;
-            ReturnErrorOnFailure(attributeBufferToNumericTlvData<IntType>(*writer, isNullable));
-            break;
-        }
-        case ZCL_INT32U_ATTRIBUTE_TYPE: // Unsigned 32-bit integer
-        {
-            ReturnErrorOnFailure(attributeBufferToNumericTlvData<uint32_t>(*writer, isNullable));
-            break;
-        }
-        case ZCL_INT40U_ATTRIBUTE_TYPE: // Unsigned 40-bit integer
-        {
-            using IntType = OddSizedInteger<5, false>;
-            ReturnErrorOnFailure(attributeBufferToNumericTlvData<IntType>(*writer, isNullable));
-            break;
-        }
-        case ZCL_INT48U_ATTRIBUTE_TYPE: // Unsigned 48-bit integer
-        {
-            using IntType = OddSizedInteger<6, false>;
-            ReturnErrorOnFailure(attributeBufferToNumericTlvData<IntType>(*writer, isNullable));
-            break;
-        }
-        case ZCL_INT56U_ATTRIBUTE_TYPE: // Unsigned 56-bit integer
-        {
-            using IntType = OddSizedInteger<7, false>;
-            ReturnErrorOnFailure(attributeBufferToNumericTlvData<IntType>(*writer, isNullable));
-            break;
-        }
-        case ZCL_INT64U_ATTRIBUTE_TYPE: // Unsigned 64-bit integer
-        {
-            ReturnErrorOnFailure(attributeBufferToNumericTlvData<uint64_t>(*writer, isNullable));
-            break;
-        }
-        case ZCL_INT8S_ATTRIBUTE_TYPE: // Signed 8-bit integer
-        {
-            ReturnErrorOnFailure(attributeBufferToNumericTlvData<int8_t>(*writer, isNullable));
-            break;
-        }
-        case ZCL_INT16S_ATTRIBUTE_TYPE: // Signed 16-bit integer
-        {
-            ReturnErrorOnFailure(attributeBufferToNumericTlvData<int16_t>(*writer, isNullable));
-            break;
-        }
-        case ZCL_INT24S_ATTRIBUTE_TYPE: // Signed 24-bit integer
-        {
-            using IntType = OddSizedInteger<3, true>;
-            ReturnErrorOnFailure(attributeBufferToNumericTlvData<IntType>(*writer, isNullable));
-            break;
-        }
-        case ZCL_INT32S_ATTRIBUTE_TYPE: // Signed 32-bit integer
-        {
-            ReturnErrorOnFailure(attributeBufferToNumericTlvData<int32_t>(*writer, isNullable));
-            break;
-        }
-        case ZCL_INT40S_ATTRIBUTE_TYPE: // Signed 40-bit integer
-        {
-            using IntType = OddSizedInteger<5, true>;
-            ReturnErrorOnFailure(attributeBufferToNumericTlvData<IntType>(*writer, isNullable));
-            break;
-        }
-        case ZCL_INT48S_ATTRIBUTE_TYPE: // Signed 48-bit integer
-        {
-            using IntType = OddSizedInteger<6, true>;
-            ReturnErrorOnFailure(attributeBufferToNumericTlvData<IntType>(*writer, isNullable));
-            break;
-        }
-        case ZCL_INT56S_ATTRIBUTE_TYPE: // Signed 56-bit integer
-        {
-            using IntType = OddSizedInteger<7, true>;
-            ReturnErrorOnFailure(attributeBufferToNumericTlvData<IntType>(*writer, isNullable));
-            break;
-        }
-        case ZCL_INT64S_ATTRIBUTE_TYPE: // Signed 64-bit integer
-        {
-            ReturnErrorOnFailure(attributeBufferToNumericTlvData<int64_t>(*writer, isNullable));
-            break;
-        }
-        case ZCL_SINGLE_ATTRIBUTE_TYPE: // 32-bit float
-        {
-            ReturnErrorOnFailure(attributeBufferToNumericTlvData<float>(*writer, isNullable));
-            break;
-        }
-        case ZCL_DOUBLE_ATTRIBUTE_TYPE: // 64-bit float
-        {
-            ReturnErrorOnFailure(attributeBufferToNumericTlvData<double>(*writer, isNullable));
-            break;
-        }
-        case ZCL_CHAR_STRING_ATTRIBUTE_TYPE: // Char string
-        {
-            char * actualData  = reinterpret_cast<char *>(attributeData + 1);
-            uint8_t dataLength = attributeData[0];
-            if (dataLength == 0xFF)
-            {
-                if (isNullable)
-                {
-                    ReturnErrorOnFailure(writer->PutNull(tag));
-                }
-                else
-                {
-                    return CHIP_ERROR_INCORRECT_STATE;
-                }
-            }
-            else
-            {
-                ReturnErrorOnFailure(writer->PutString(tag, actualData, dataLength));
-            }
-            break;
-        }
-        case ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE: {
-            char * actualData = reinterpret_cast<char *>(attributeData + 2); // The pascal string contains 2 bytes length
-            uint16_t dataLength;
-            memcpy(&dataLength, attributeData, sizeof(dataLength));
-            if (dataLength == 0xFFFF)
-            {
-                if (isNullable)
-                {
-                    ReturnErrorOnFailure(writer->PutNull(tag));
-                }
-                else
-                {
-                    return CHIP_ERROR_INCORRECT_STATE;
-                }
-            }
-            else
-            {
-                ReturnErrorOnFailure(writer->PutString(tag, actualData, dataLength));
-            }
-            break;
-        }
-        case ZCL_OCTET_STRING_ATTRIBUTE_TYPE: // Octet string
-        {
-            uint8_t * actualData = attributeData + 1;
-            uint8_t dataLength   = attributeData[0];
-            if (dataLength == 0xFF)
-            {
-                if (isNullable)
-                {
-                    ReturnErrorOnFailure(writer->PutNull(tag));
-                }
-                else
-                {
-                    return CHIP_ERROR_INCORRECT_STATE;
-                }
-            }
-            else
-            {
-                ReturnErrorOnFailure(writer->Put(tag, chip::ByteSpan(actualData, dataLength)));
-            }
-            break;
-        }
-        case ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE: {
-            uint8_t * actualData = attributeData + 2; // The pascal string contains 2 bytes length
-            uint16_t dataLength;
-            memcpy(&dataLength, attributeData, sizeof(dataLength));
-            if (dataLength == 0xFFFF)
-            {
-                if (isNullable)
-                {
-                    ReturnErrorOnFailure(writer->PutNull(tag));
-                }
-                else
-                {
-                    return CHIP_ERROR_INCORRECT_STATE;
-                }
-            }
-            else
-            {
-                ReturnErrorOnFailure(writer->Put(tag, chip::ByteSpan(actualData, dataLength)));
-            }
-            break;
-        }
-        default:
-            ChipLogError(DataManagement, "Attribute type 0x%x not handled", static_cast<int>(attributeType));
-            status = Status::UnsupportedRead;
-        }
-    }
-
-    if (status == Protocols::InteractionModel::Status::Success)
-    {
-        return SendSuccessStatus(attributeReport, attributeDataIBBuilder);
-    }
-
-    return SendFailureStatus(aPath, aAttributeReports, status, &backup);
-#endif
+    return EncodeEmberValue(ByteSpan(attributeReadBufferSpace), attributeMetadata, encoder);
 }
 
 } // namespace CodegenDataModel
