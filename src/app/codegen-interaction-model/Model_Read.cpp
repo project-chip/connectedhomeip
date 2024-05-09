@@ -160,7 +160,7 @@ struct LongPascalString
 static_assert(sizeof(ShortPascalString::LengthType) == 1);
 static_assert(sizeof(LongPascalString::LengthType) == 2);
 
-/// Given a ByteSpan containing data from ember, interpret it 
+/// Given a ByteSpan containing data from ember, interpret it
 /// as a span of type OUT (i.e. ByteSpan or CharSpan) given a ENCODING
 /// where ENCODING is Short or Long pascal strings.
 template <class OUT, class ENCODING>
