@@ -551,6 +551,7 @@ def BuildCyw30739Target():
         TargetPart('light', app=Cyw30739App.LIGHT),
         TargetPart('light-switch', app=Cyw30739App.LIGHT_SWITCH),
         TargetPart('lock', app=Cyw30739App.LOCK),
+        TargetPart('thermostat', app=Cyw30739App.THERMOSTAT),
     ])
 
     return target

@@ -3306,41 +3306,41 @@ MTR_NEWLY_AVAILABLE
  * Cluster Boolean State Configuration
  *    This cluster is used to configure a boolean sensor.
  */
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRClusterBooleanStateConfiguration : MTRGenericCluster
 
-- (void)suppressAlarmWithParams:(MTRBooleanStateConfigurationClusterSuppressAlarmParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)enableDisableAlarmWithParams:(MTRBooleanStateConfigurationClusterEnableDisableAlarmParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)suppressAlarmWithParams:(MTRBooleanStateConfigurationClusterSuppressAlarmParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
+- (void)enableDisableAlarmWithParams:(MTRBooleanStateConfigurationClusterEnableDisableAlarmParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentSensitivityLevelWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
-- (void)writeAttributeCurrentSensitivityLevelWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_PROVISIONALLY_AVAILABLE;
-- (void)writeAttributeCurrentSensitivityLevelWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentSensitivityLevelWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeCurrentSensitivityLevelWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeCurrentSensitivityLevelWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeSupportedSensitivityLevelsWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSupportedSensitivityLevelsWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeDefaultSensitivityLevelWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeDefaultSensitivityLevelWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeAlarmsActiveWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAlarmsActiveWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeAlarmsSuppressedWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAlarmsSuppressedWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeAlarmsEnabledWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAlarmsEnabledWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeAlarmsSupportedWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAlarmsSupportedWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeSensorFaultWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSensorFaultWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -3355,7 +3355,7 @@ MTR_PROVISIONALLY_AVAILABLE
  */
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
-                                   queue:(dispatch_queue_t)queue MTR_PROVISIONALLY_AVAILABLE;
+                                   queue:(dispatch_queue_t)queue MTR_NEWLY_AVAILABLE;
 
 @end
 

@@ -147,7 +147,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeScenesManagementID MTR_PROVISIONALLY_AVAILABLE = 0x00000062,
     MTRClusterIDTypeHEPAFilterMonitoringID MTR_NEWLY_AVAILABLE = 0x00000071,
     MTRClusterIDTypeActivatedCarbonFilterMonitoringID MTR_NEWLY_AVAILABLE = 0x00000072,
-    MTRClusterIDTypeBooleanStateConfigurationID MTR_PROVISIONALLY_AVAILABLE = 0x00000080,
+    MTRClusterIDTypeBooleanStateConfigurationID MTR_NEWLY_AVAILABLE = 0x00000080,
     MTRClusterIDTypeValveConfigurationAndControlID MTR_PROVISIONALLY_AVAILABLE = 0x00000081,
     MTRClusterIDTypeElectricalPowerMeasurementID MTR_NEWLY_AVAILABLE = 0x00000090,
     MTRClusterIDTypeElectricalEnergyMeasurementID MTR_NEWLY_AVAILABLE = 0x00000091,
@@ -2545,20 +2545,20 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeClusterRevisionID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster BooleanStateConfiguration attributes
-    MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeCurrentSensitivityLevelID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeSupportedSensitivityLevelsID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeDefaultSensitivityLevelID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAlarmsActiveID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
-    MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAlarmsSuppressedID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
-    MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAlarmsEnabledID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
-    MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAlarmsSupportedID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
-    MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeSensorFaultID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
-    MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeCurrentSensitivityLevelID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeSupportedSensitivityLevelsID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeDefaultSensitivityLevelID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAlarmsActiveID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAlarmsSuppressedID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAlarmsEnabledID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAlarmsSupportedID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeSensorFaultID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
-    MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+    MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAttributeListID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeFeatureMapID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeClusterRevisionID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster ValveConfigurationAndControl attributes
     MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeOpenDurationID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
@@ -6266,8 +6266,8 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterActivatedCarbonFilterMonitoringCommandResetConditionID MTR_NEWLY_AVAILABLE = 0x00000000,
 
     // Cluster BooleanStateConfiguration commands
-    MTRCommandIDTypeClusterBooleanStateConfigurationCommandSuppressAlarmID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRCommandIDTypeClusterBooleanStateConfigurationCommandEnableDisableAlarmID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterBooleanStateConfigurationCommandSuppressAlarmID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterBooleanStateConfigurationCommandEnableDisableAlarmID MTR_NEWLY_AVAILABLE = 0x00000001,
 
     // Cluster ValveConfigurationAndControl commands
     MTRCommandIDTypeClusterValveConfigurationAndControlCommandOpenID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
@@ -7191,8 +7191,8 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterRVCOperationalStateEventOperationCompletionID MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x00000001,
 
     // Cluster BooleanStateConfiguration events
-    MTREventIDTypeClusterBooleanStateConfigurationEventAlarmsStateChangedID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTREventIDTypeClusterBooleanStateConfigurationEventSensorFaultID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTREventIDTypeClusterBooleanStateConfigurationEventAlarmsStateChangedID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTREventIDTypeClusterBooleanStateConfigurationEventSensorFaultID MTR_NEWLY_AVAILABLE = 0x00000001,
 
     // Cluster ValveConfigurationAndControl events
     MTREventIDTypeClusterValveConfigurationAndControlEventValveStateChangedID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
