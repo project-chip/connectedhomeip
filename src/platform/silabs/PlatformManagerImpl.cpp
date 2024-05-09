@@ -39,8 +39,6 @@
 #include <lwip/tcpip.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#include "AppConfig.h"
-
 using namespace chip::DeviceLayer::Internal;
 
 namespace chip {

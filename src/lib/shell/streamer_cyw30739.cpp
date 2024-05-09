@@ -18,8 +18,8 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/shell/streamer.h>
 #include <platform/PlatformManager.h>
+#include <wiced_hal_platform.h>
 #include <wiced_hal_puart.h>
-#include <wiced_platform.h>
 
 namespace chip {
 namespace Shell {

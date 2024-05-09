@@ -1000,6 +1000,14 @@ private:
      */
     CHIP_ERROR ProcessCertificateChain(const ByteSpan & certificate);
 
+    /**
+     * @brief
+     *   This function validates the revocation status of the DAC Chain sent by the device.
+     *
+     * @param[in] info Structure contatining all the required information for validating the device attestation.
+     */
+    CHIP_ERROR CheckForRevokedDACChain(const Credentials::DeviceAttestationVerifier::AttestationInfo & info);
+
     void HandleAttestationResult(CHIP_ERROR err);
 
     CommissioneeDeviceProxy * FindCommissioneeDevice(NodeId id);
@@ -1052,6 +1060,8 @@ private:
     // point, for non-concurrent-commissioning devices, we may not have a way to
     // extend it).
     void ExtendFailsafeBeforeNetworkEnable(DeviceProxy * device, CommissioningParameters & params, CommissioningStage step);
+
+    bool IsAttestationInformationMissing(const CommissioningParameters & params);
 
     chip::Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;

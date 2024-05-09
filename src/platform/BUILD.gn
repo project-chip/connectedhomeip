@@ -418,7 +418,9 @@ if (chip_device_platform != "none") {
   source_set("platform_base") {
     public_deps = [
       ":platform_config_header",
+      "${chip_root}/src/app/icd/server:icd-server-config",
       "${chip_root}/src/ble",
+      "${chip_root}/src/credentials:build_time_header",
       "${chip_root}/src/inet",
       "${chip_root}/src/lib/core",
       "${chip_root}/src/lib/support",
@@ -507,10 +509,7 @@ if (chip_device_platform != "none") {
 
     public_deps = [
       ":platform_base",
-      "${chip_root}/src/app:app_config",
       "${chip_root}/src/app/common:cluster-objects",
-      "${chip_root}/src/app/icd/server:icd-server-config",
-      "${chip_root}/src/credentials:build_time_header",
       "${chip_root}/src/crypto",
       "${chip_root}/src/lib/support",
     ]

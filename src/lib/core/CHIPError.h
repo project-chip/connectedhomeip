@@ -743,7 +743,14 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_INVALID_LIST_LENGTH                         CHIP_CORE_ERROR(0x1f)
 
-// AVAILABLE: 0x20
+/**
+ *  @def CHIP_ERROR_FAILED_DEVICE_ATTESTATION
+ *
+ *  @brief
+ *    Device Attestation failed.
+ *
+ */
+#define CHIP_ERROR_FAILED_DEVICE_ATTESTATION                   CHIP_CORE_ERROR(0x20)
 
 /**
  *  @def CHIP_END_OF_TLV
