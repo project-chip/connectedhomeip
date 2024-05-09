@@ -211,11 +211,9 @@ CHIP_ERROR CheckAccessPrivilege(const ConcreteAttributePath & path, const chip::
 
 /// Attempts to read via an attribute access interface (AAI)
 ///
-/// Expected returns:
-///   - CHIP_IM_GLOBAL_STATUS(UnsupportedRead) IF AND ONLY IF processing denied by the AAI (considered final)
-///   -
+/// If it returns a CHIP_ERROR, then this is a FINAL result (i.e. either failure or success):
+///    - in particular, CHIP_ERROR_ACCESS_DENIED will be used for UnsupportedRead AII returns
 ///
-/// If it returns a VALUE, then this is a FINAL result (i.e. either failure or success).
 /// If it returns std::nullopt, then there is no AAI to handle the given path
 /// and processing should figure out the value otherwise (generally from other ember data)
 std::optional<CHIP_ERROR> TryReadViaAccessInterface(const ConcreteAttributePath & path, AttributeAccessInterface * aai,
@@ -227,23 +225,24 @@ std::optional<CHIP_ERROR> TryReadViaAccessInterface(const ConcreteAttributePath 
         return std::nullopt;
     }
 
-    // TODO: AAI seems to NEVER be able to return anything else EXCEPT
-    // UnsupportedRead to be handled upward
-
+    // TODO: AAI returns:
+    //      - UnsupportedRead is FINAL
+    //      (this seems to be)
     CHIP_ERROR err = aai->Read(path, encoder);
 
-    // explict translate UnsupportedAccess to Access denied. This is to allow callers to determine a
+    // explict translate UnsupportedRead to Access denied. This is to allow callers to determine a
     // translation for this: usually wildcard subscriptions MAY just ignore these where as direct reads
     // MUST translate them to UnsupportedAccess
-    ReturnErrorCodeIf(err == CHIP_IM_GLOBAL_STATUS(UnsupportedAccess), CHIP_ERROR_ACCESS_DENIED);
+    ReturnErrorCodeIf(err == CHIP_IM_GLOBAL_STATUS(UnsupportedRead), CHIP_ERROR_ACCESS_DENIED);
 
     if (err != CHIP_NO_ERROR)
     {
         return std::make_optional(err);
     }
 
-    // if no attempt was made to encode anything, assume the AAI did not even
-    // try to handle it, so handling has to be deferred
+    // If the encoder tried to encode, then a value should have been written.
+    //   - if encode, assueme DONE (i.e. FINAL CHIP_NO_ERROR)
+    //     - if no encode, say that processing must continue
     return encoder.TriedEncode() ? std::make_optional(CHIP_NO_ERROR) : std::nullopt;
 }
 
@@ -280,13 +279,6 @@ std::optional<T> ExtractEmberLongString(ByteSpan data)
 
     return std::make_optional<T>(reinterpret_cast<typename T::pointer>(data.data() + 1), len);
 }
-
-// TODO: string handling:
-//    - length (1 or 2 bytes, null is 0xFF or 0xFFFF)
-//    - either Put(ByteSpan) or PutString() -> this seems to need a Encoder equivalent?
-//       - Span calls EncodeString
-//       - ByteSpan calls Encode
-//
 
 template <typename T>
 CHIP_ERROR EncodeStringLike(std::optional<T> data, bool isNullable, AttributeValueEncoder & encoder)
@@ -434,13 +426,6 @@ CHIP_ERROR Model::ReadAttribute(const InteractionModel::ReadAttributeRequest & r
     state.listEncodeStart = kInvalidListIndex;
 
     // At this point, we have to use ember directly to read the data.
-    // Available methods:
-    //   - emberAfReadOrWriteAttribute should do the processing of read vs write
-    //   - we write to a fixed buffer, so the actual type has to be determined
-    //     by the attributeType (base type)
-
-    // TODO: ember reading
-    //
     EmberAfAttributeSearchRecord record;
     record.endpoint    = request.path.mEndpointId;
     record.clusterId   = request.path.mClusterId;
