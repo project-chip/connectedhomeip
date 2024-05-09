@@ -102,31 +102,33 @@ CHIP_ERROR InitConfigurationManager(ConfigurationManagerImpl & configManager, Li
 
     if (options.vendorName.HasValue())
     {
-        const char * vendorName = options.vendorName.Value().c_str();
-        configManager.StoreVendorName(vendorName, strlen(vendorName));
+        chip::Span<const char> vendor_name(options.vendorName.Value().c_str(), options.vendorName.Value().size());
+        VerifyOrDie(configManager.StoreVendorName(vendor_name) == CHIP_NO_ERROR);
     }
     if (options.productName.HasValue())
     {
-        const char * productName = options.productName.Value().c_str();
-        configManager.StoreProductName(productName,strlen(productName));
+        chip::Span<const char> product_name(options.productName.Value().c_str(), options.productName.Value().size());
+        VerifyOrDie(configManager.StoreProductName(product_name) == CHIP_NO_ERROR);
     }
     if (options.hardwareVersionString.HasValue())
     {
-        const char * hardwareVersionString = options.hardwareVersionString.Value().c_str();
-        configManager.StoreHardwareVersionString(hardwareVersionString,strlen(hardwareVersionString));
+        chip::Span<const char> hardware_version_string(options.hardwareVersionString.Value().c_str(),
+                                                       options.hardwareVersionString.Value().size());
+        VerifyOrDie(configManager.StoreHardwareVersionString(hardware_version_string) == CHIP_NO_ERROR);
     }
     if (options.softwareVersionString.HasValue())
     {
-        const char * softwareVersionString = options.softwareVersionString.Value().c_str();
-        configManager.StoreSoftwareVersionString(softwareVersionString,strlen(softwareVersionString));
+        chip::Span<const char> software_version_string(options.softwareVersionString.Value().c_str(),
+                                                       options.softwareVersionString.Value().size());
+        VerifyOrDie(configManager.StoreSoftwareVersionString(software_version_string) == CHIP_NO_ERROR);
     }
-  
+
     if (options.serialNumber.HasValue())
     {
-        const char * serialNumber = options.serialNumber.Value().c_str();
-        configManager.StoreSerialNumber(serialNumber, strlen(serialNumber));
+        chip::Span<const char> serial_number(options.serialNumber.Value().c_str(), options.serialNumber.Value().size());
+        VerifyOrDie(configManager.StoreSerialNumber(serial_number) == CHIP_NO_ERROR);
     }
-    
+
     return CHIP_NO_ERROR;
 }
 
