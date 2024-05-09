@@ -41,20 +41,6 @@
 
 namespace chip {
 namespace app {
-#if 0
-namespace DataModel {
-
-// Ensure odd sized integers are not considered fabric scoped for the purpose of
-// encoding via AttributeValueEncoder (they are just integers)
-template <int ByteSize, bool IsSigned>
-class IsFabricScoped<OddSizedInteger<ByteSize, IsSigned>>
-{
-public:
-    static constexpr bool value = false;
-};
-} // namespace DataModel
-#endif
-
 namespace CodegenDataModel {
 namespace {
 // On some apps, ATTRIBUTE_LARGEST can as small as 3, making compiler unhappy since data[kAttributeReadBufferSize] cannot hold
