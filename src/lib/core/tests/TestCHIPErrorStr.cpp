@@ -231,4 +231,3 @@ TEST(TestCHIPErrorStr, CheckCoreErrorStrWithoutSourceLocation)
 #endif // CHIP_CONFIG_ERROR_SOURCE
     }
 }
- 
