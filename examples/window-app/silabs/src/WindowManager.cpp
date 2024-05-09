@@ -273,20 +273,28 @@ void WindowManager::Cover::ScheduleControlAction(ControlAction action, bool setN
     VerifyOrReturn(action <= ControlAction::Tilt);
     // Allocate a CoverWorkData. It will be freed by the Worker callback
     CoverWorkData * data = new CoverWorkData(this, setNewTarget);
+    VerifyOrDie(data != nullptr);
 
     AsyncWorkFunct workFunct = (action == ControlAction::Lift) ? LiftUpdateWorker : TiltUpdateWorker;
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(workFunct, reinterpret_cast<intptr_t>(data));
+    if (PlatformMgr().ScheduleWork(workFunct, reinterpret_cast<intptr_t>(data)) != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to schedule cover control action");
+        delete data;
+    }
 }
 
 void WindowManager::Cover::LiftUpdateWorker(intptr_t arg)
 {
-    CoverWorkData * data = reinterpret_cast<CoverWorkData *>(arg);
-    Cover * cover        = data->cover;
+    // Use a unique_prt so it's freed when leaving this context
+    std::unique_ptr<CoverWorkData> data(reinterpret_cast<CoverWorkData *>(arg));
+    Cover * cover = data->cover;
 
     NPercent100ths current, target;
 
-    Attributes::TargetPositionLiftPercent100ths::Get(cover->mEndpoint, target);
-    Attributes::CurrentPositionLiftPercent100ths::Get(cover->mEndpoint, current);
+    VerifyOrReturn(Attributes::TargetPositionLiftPercent100ths::Get(cover->mEndpoint, target) ==
+                   Protocols::InteractionModel::Status::Success);
+    VerifyOrReturn(Attributes::CurrentPositionLiftPercent100ths::Get(cover->mEndpoint, current) ==
+                   Protocols::InteractionModel::Status::Success);
 
     OperationalState opState = ComputeOperationalState(target, current);
 
@@ -328,20 +336,19 @@ void WindowManager::Cover::LiftUpdateWorker(intptr_t arg)
     {
         cover->mLiftTimer->Start();
     }
-
-    // CoverWorkData was allocated by the ScheduleControlAction that scheduled this worked.
-    // The worker is done with it and needs to free it.
-    delete data;
 }
 
 void WindowManager::Cover::TiltUpdateWorker(intptr_t arg)
 {
-    CoverWorkData * data = reinterpret_cast<CoverWorkData *>(arg);
-    Cover * cover        = data->cover;
+    // Use a unique_prt so it's freed when leaving this context
+    std::unique_ptr<CoverWorkData> data(reinterpret_cast<CoverWorkData *>(arg));
+    Cover * cover = data->cover;
 
     NPercent100ths current, target;
-    Attributes::TargetPositionTiltPercent100ths::Get(cover->mEndpoint, target);
-    Attributes::CurrentPositionTiltPercent100ths::Get(cover->mEndpoint, current);
+    VerifyOrReturn(Attributes::TargetPositionTiltPercent100ths::Get(cover->mEndpoint, target) ==
+                   Protocols::InteractionModel::Status::Success);
+    VerifyOrReturn(Attributes::CurrentPositionTiltPercent100ths::Get(cover->mEndpoint, current) ==
+                   Protocols::InteractionModel::Status::Success);
 
     OperationalState opState = ComputeOperationalState(target, current);
 
@@ -383,10 +390,6 @@ void WindowManager::Cover::TiltUpdateWorker(intptr_t arg)
     {
         cover->mTiltTimer->Start();
     }
-
-    // CoverWorkData was allocated by the ScheduleControlAction that scheduled this worked.
-    // The worker is done with it and needs to free it.
-    delete data;
 }
 
 void WindowManager::Cover::UpdateTargetPosition(OperationalState direction, ControlAction action)
