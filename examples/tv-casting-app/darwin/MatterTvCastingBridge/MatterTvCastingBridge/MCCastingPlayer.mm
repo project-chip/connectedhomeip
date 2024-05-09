@@ -97,6 +97,20 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
     return self;
 }
 
++ (MCCastingPlayer * _Nullable)getTargetCastingPlayer
+{
+    ChipLogProgress(AppServer, "MCCastingPlayer.getTargetCastingPlayer called");
+    VerifyOrReturnValue([[MCCastingApp getSharedInstance] isRunning], nil, ChipLogError(AppServer, "MCCastingApp NOT running"));
+    __block MCCastingPlayer * castingPlayer = nil;
+    dispatch_sync([[MCCastingApp getSharedInstance] getWorkQueue], ^{
+        matter::casting::core::CastingPlayer * cppCastingPlayer = matter::casting::core::CastingPlayer::GetTargetCastingPlayer();
+        if (cppCastingPlayer != nullptr) {
+            castingPlayer = [[MCCastingPlayer alloc] initWithCppCastingPlayer:std::make_shared<matter::casting::core::CastingPlayer>(*cppCastingPlayer)];
+        }
+    });
+    return castingPlayer;
+}
+
 - (NSString * _Nonnull)description
 {
     return [NSString stringWithFormat:@"%@ with Product ID: %hu and Vendor ID: %hu. Resolved IPAddr?: %@. Supports Commissioner Generated Passcode?: %@.",
@@ -131,6 +145,16 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
 - (bool)supportsCommissionerGeneratedPasscode
 {
     return _cppCastingPlayer->GetSupportsCommissionerGeneratedPasscode();
+}
+
+- (NSString * _Nonnull)hostName
+{
+    return [NSString stringWithCString:_cppCastingPlayer->GetHostName() encoding:NSUTF8StringEncoding];
+}
+
+- (NSString * _Nonnull)instanceName
+{
+    return [NSString stringWithCString:_cppCastingPlayer->GetInstanceName() encoding:NSUTF8StringEncoding];
 }
 
 - (NSArray * _Nonnull)ipAddresses

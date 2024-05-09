@@ -61,7 +61,7 @@ struct TvCastingApp: App {
                             
                             appParameters.onboardingPayload = onboardingParameters
                             
-                            let err = castingServerBridge.initializeApp(appParameters, clientQueue: DispatchQueue.main, initAppStatusHandler: { (result: Bool) -> () in
+                            let err = castingServerBridge.initializeApp(appParameters, clientQueue: DispatchQueue.main, initAppStatusHandler: { (result: MatterError) -> () in
                                 self.Log.info("initializeApp result \(result)")
                             })
                             self.Log.info("initializeApp return value \(err)")
