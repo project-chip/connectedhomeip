@@ -18,7 +18,7 @@
 #import "MTRQRCodeSetupPayloadParser.h"
 
 #import "MTRError_Internal.h"
-#import "MTRSetupPayload.h"
+#import "MTRSetupPayload_Internal.h"
 
 @implementation MTRQRCodeSetupPayloadParser {
     NSString * _base38Representation;

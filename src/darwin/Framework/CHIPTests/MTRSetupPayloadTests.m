@@ -44,30 +44,6 @@
     XCTAssertEqualObjects(payload.manualEntryCode, @"641286075300001000016");
 }
 
-- (void)testInitWithManualCode
-{
-    MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithManualPairingCode:@"641286075300001000016"];
-    XCTAssertNotNil(payload);
-    XCTAssertTrue(payload.hasShortDiscriminator);
-    XCTAssertEqual(payload.discriminator.unsignedIntegerValue, 10);
-    XCTAssertEqual(payload.setupPasscode.unsignedIntegerValue, 12345670);
-    XCTAssertEqual(payload.vendorID.unsignedIntegerValue, 1);
-    XCTAssertEqual(payload.productID.unsignedIntegerValue, 1);
-    XCTAssertEqual(payload.commissioningFlow, MTRCommissioningFlowCustom);
-    XCTAssertEqual(payload.version.unsignedIntegerValue, 0);
-    XCTAssertEqual(payload.discoveryCapabilities, MTRDiscoveryCapabilitiesUnknown);
-}
-
-- (void)testInitWithManualCode_Empty
-{
-    XCTAssertNil([[MTRSetupPayload alloc] initWithManualPairingCode:@""]);
-}
-
-- (void)testInitWithManualCode_QRCode
-{
-    XCTAssertNil([[MTRSetupPayload alloc] initWithManualPairingCode:@"MT:M5L90MP500K64J00000"]); // a valid QR code
-}
-
 - (void)testOnboardingPayloadParser_QRCode_NoError
 {
     NSError * error;
@@ -84,30 +60,6 @@
     XCTAssertEqual(payload.commissioningFlow, MTRCommissioningFlowStandard);
     XCTAssertEqual(payload.version.unsignedIntegerValue, 0);
     XCTAssertEqual(payload.discoveryCapabilities, MTRDiscoveryCapabilitiesSoftAP);
-}
-
-- (void)testInitWithQRCode
-{
-    MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithQRCode:@"MT:M5L90MP500K64J00000"];
-    XCTAssertNotNil(payload);
-    XCTAssertFalse(payload.hasShortDiscriminator);
-    XCTAssertEqual(payload.discriminator.unsignedIntegerValue, 128);
-    XCTAssertEqual(payload.setupPasscode.unsignedIntegerValue, 2048);
-    XCTAssertEqual(payload.vendorID.unsignedIntegerValue, 12);
-    XCTAssertEqual(payload.productID.unsignedIntegerValue, 1);
-    XCTAssertEqual(payload.commissioningFlow, MTRCommissioningFlowStandard);
-    XCTAssertEqual(payload.version.unsignedIntegerValue, 0);
-    XCTAssertEqual(payload.discoveryCapabilities, MTRDiscoveryCapabilitiesSoftAP);
-}
-
-- (void)testInitWithQRCode_WrongPrefix
-{
-    XCTAssertNil([[MTRSetupPayload alloc] initWithQRCode:@"XX:M5L90MP500K64J00000"]);
-}
-
-- (void)testInitWithQRCode_ManualCode
-{
-    XCTAssertNil([[MTRSetupPayload alloc] initWithQRCode:@"641286075300001000016"]); // a valid manual pairing code
 }
 
 - (void)testOnboardingPayloadParser_QRCode_WrongVersion
@@ -441,7 +393,7 @@
 
 - (void)testCopyingAndEquality
 {
-    MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithQRCode:@"MT:M5L9000000K64J00000"];
+    MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithPayload:@"MT:M5L9000000K64J00000"];
     XCTAssertFalse(payload.hasShortDiscriminator); // came from a QR code
     XCTAssert(payload.discriminator.integerValue > 0xf); // can't "accidentally" round-trip through a short discriminator
 

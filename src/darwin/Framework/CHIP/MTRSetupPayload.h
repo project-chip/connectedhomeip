@@ -120,18 +120,6 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  */
 - (nullable instancetype)initWithPayload:(NSString *)payload MTR_NEWLY_AVAILABLE;
 
-/**
- * Initializes the payload object from a QR Code string.
- * Returns nil if the QR Code string is invalid.
- */
-- (nullable instancetype)initWithQRCode:(NSString *)qrCodePayload MTR_NEWLY_AVAILABLE;
-
-/**
- * Initializes the payload object from a Manual Pairing Code string.
- * Returns nil if the pairing code is not valid.
- */
-- (nullable instancetype)initWithManualPairingCode:(NSString *)manualCode MTR_NEWLY_AVAILABLE;
-
 @property (nonatomic, copy) NSNumber * version;
 @property (nonatomic, copy) NSNumber * vendorID;
 @property (nonatomic, copy) NSNumber * productID;

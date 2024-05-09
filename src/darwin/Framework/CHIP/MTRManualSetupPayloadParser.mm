@@ -18,7 +18,7 @@
 #import "MTRManualSetupPayloadParser.h"
 
 #import "MTRError_Internal.h"
-#import "MTRSetupPayload.h"
+#import "MTRSetupPayload_Internal.h"
 
 @implementation MTRManualSetupPayloadParser {
     NSString * _decimalStringRepresentation;
