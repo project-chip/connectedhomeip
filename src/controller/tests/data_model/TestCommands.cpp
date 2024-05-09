@@ -185,11 +185,8 @@ public:
     // Performs shared setup for all tests in the test suite
     static void SetUpTestSuite()
     {
-        if (mpContext == nullptr)
-        {
-            mpContext = new TestContext();
-            ASSERT_NE(mpContext, nullptr);
-        }
+        mpContext = new TestContext();
+        ASSERT_NE(mpContext, nullptr);
         mpContext->SetUpTestSuite();
     }
 
@@ -197,11 +194,7 @@ public:
     static void TearDownTestSuite()
     {
         mpContext->TearDownTestSuite();
-        if (mpContext != nullptr)
-        {
-            delete mpContext;
-            mpContext = nullptr;
-        }
+        delete mpContext;
     }
 
 protected:
