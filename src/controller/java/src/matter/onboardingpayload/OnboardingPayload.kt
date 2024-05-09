@@ -206,7 +206,8 @@ class OnboardingPayload(
       return false
     }
 
-    val allValid = setOf(DiscoveryCapability.BLE, DiscoveryCapability.ON_NETWORK)
+    val allValid =
+      setOf(DiscoveryCapability.BLE, DiscoveryCapability.ON_NETWORK, DiscoveryCapability.SOFT_AP)
 
     // If discoveryCapabilities is not empty and discoveryCapabilities contains values outside
     // of allValid
