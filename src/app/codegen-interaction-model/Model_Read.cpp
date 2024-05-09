@@ -14,7 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/util/af-types.h"
 #include <optional>
+#include <variant>
 
 #include <access/AccessControl.h>
 #include <access/Privilege.h>
@@ -137,28 +139,30 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
     }
 }
 
-// Will set at most one of the out-params (aAttributeCluster or
-// aAttributeMetadata) to non-null.  Both null means attribute not supported,
-// aAttributeCluster non-null means this is a supported global attribute that
-// does not have metadata.
-CHIP_ERROR FindAttributeMetadata(const ConcreteAttributePath & aPath, const EmberAfCluster ** aAttributeCluster,
-                                 const EmberAfAttributeMetadata ** aAttributeMetadata)
+// Fetch the source for the given attribute path: either a cluster (for global ones) or attribute
+// path.
+//
+// if returning a CHIP_ERROR, it will NEVER be CHIP_NO_ERROR.
+std::variant<const EmberAfCluster *,           // global attribute, data from a cluster
+             const EmberAfAttributeMetadata *, // a specific attribute stored by ember
+             CHIP_ERROR                        // error, this will NEVER be CHIP_NO_ERROR
+             >
+FindAttributeMetadata(const ConcreteAttributePath & aPath)
 {
-    *aAttributeCluster  = nullptr;
-    *aAttributeMetadata = nullptr;
-
     for (auto & attr : GlobalAttributesNotInMetadata)
     {
         if (attr == aPath.mAttributeId)
         {
-            *aAttributeCluster = emberAfFindServerCluster(aPath.mEndpointId, aPath.mClusterId);
-            return CHIP_NO_ERROR;
+            const EmberAfCluster * cluster = emberAfFindServerCluster(aPath.mEndpointId, aPath.mClusterId);
+            ReturnErrorCodeIf(cluster == nullptr, CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+            return cluster;
         }
     }
 
-    *aAttributeMetadata = emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+    const EmberAfAttributeMetadata * metadata =
+        emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
 
-    if (*aAttributeMetadata == nullptr)
+    if (metadata == nullptr)
     {
         const EmberAfEndpointType * type = emberAfFindEndpointType(aPath.mEndpointId);
         if (type == nullptr)
@@ -177,7 +181,7 @@ CHIP_ERROR FindAttributeMetadata(const ConcreteAttributePath & aPath, const Embe
         return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
     }
 
-    return CHIP_NO_ERROR;
+    return metadata;
 }
 
 CHIP_ERROR CheckAccessPrivilege(const ConcreteAttributePath & path, const chip::Access::SubjectDescriptor & descriptor)
@@ -376,12 +380,6 @@ CHIP_ERROR Model::ReadAttribute(const InteractionModel::ReadAttributeRequest & r
                   ChipLogValueMEI(request.path.mClusterId), request.path.mEndpointId, ChipLogValueMEI(request.path.mAttributeId),
                   request.path.mExpanded);
 
-    const EmberAfCluster * attributeCluster            = nullptr;
-    const EmberAfAttributeMetadata * attributeMetadata = nullptr;
-
-    ReturnErrorOnFailure(FindAttributeMetadata(request.path, &attributeCluster, &attributeMetadata));
-    VerifyOrDie(attributeMetadata != nullptr); // this is the contract of FindAttributeMetadata
-
     // ACL check for non-internal requests
     if (!request.operationFlags.Has(InteractionModel::OperationFlags::kInternal))
     {
@@ -391,17 +389,34 @@ CHIP_ERROR Model::ReadAttribute(const InteractionModel::ReadAttributeRequest & r
 
     std::optional<CHIP_ERROR> aai_result;
 
-    if (attributeCluster != nullptr)
+    auto metadata = FindAttributeMetadata(request.path);
+
+    if (const CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&metadata))
+    {
+        VerifyOrDie(*err != CHIP_NO_ERROR);
+        return *err;
+    }
+
+    if (const EmberAfCluster ** cluster = std::get_if<const EmberAfCluster *>(&metadata))
+    {
+        Compatibility::GlobalAttributeReader aai(*cluster);
+        aai_result = TryReadViaAccessInterface(request.path, &aai, encoder);
+    }
+    else
     {
         aai_result = TryReadViaAccessInterface(
             request.path, GetAttributeAccessOverride(request.path.mEndpointId, request.path.mClusterId), encoder);
     }
-    else
-    {
-        Compatibility::GlobalAttributeReader aai(attributeCluster);
-        aai_result = TryReadViaAccessInterface(request.path, &aai, encoder);
-    }
     ReturnErrorCodeIf(aai_result.has_value(), *aai_result);
+
+    if (!std::holds_alternative<const EmberAfAttributeMetadata *>(metadata))
+    {
+        // if we only got a cluster, this was for a global attribute. We cannot read ember attributes
+        // at this point, so give up (although GlobalAttributeReader should have returned something here).
+        // Return a permanent failure...
+        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+    }
+    const EmberAfAttributeMetadata * attributeMetadata = std::get<const EmberAfAttributeMetadata *>(metadata);
 
     // At this point, we have to use ember directly to read the data.
     EmberAfAttributeSearchRecord record;

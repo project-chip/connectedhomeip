@@ -59,6 +59,10 @@ public:
     ///   CHIP_ERROR_ACCESS_DENIED:
     ///      - May be ignored if reads use path expansion (e.g. to skip inaccessible attributes
     ///        during subscription requests). This code MUST be used for ACL failures and only for ACL failures.
+    ///   CHIP_ERROR_NO_MEMORY or CHIP_ERROR_BUFFER_TOO_SMALL:
+    ///      - Indicates that list encoding had insufficient buffer space to encode elements.
+    ///      - encoder::GetState().AllowPartialData() determines if these errors are permanent (no partial
+    ///        data allowed) or further encoding can be retried (AllowPartialData true for list encoding)
     ///   CHIP_IM_GLOBAL_STATUS(code):
     ///      - error codes that are translatable in IM status codes (otherwise we expect Failure to be reported)
     ///      - to check for this, CHIP_ERROR provides:
