@@ -79,13 +79,13 @@ class TestContext : public chip::Test::AppContext
 {
 public:
     // Performs shared setup for all tests in the test suite
-    void SetUpTestSuite() override
+    static void SetUpTestSuite()
     {
         chip::Test::AppContext::SetUpTestSuite();
         gRealClock = &chip::System::SystemClock();
         chip::System::Clock::Internal::SetSystemClockForTesting(&gMockClock);
 
-        if (mSyncScheduler)
+        if (sSyncScheduler)
         {
             gReportScheduler = chip::app::reporting::GetSynchronizedReportScheduler();
             sUsingSubSync    = true;
@@ -96,14 +96,8 @@ public:
         }
     }
 
-    static int nlTestSetUpTestSuite_Sync(void * context)
-    {
-        static_cast<TestContext *>(context)->mSyncScheduler = true;
-        return nlTestSetUpTestSuite(context);
-    }
-
     // Performs shared teardown for all tests in the test suite
-    void TearDownTestSuite() override
+    static void TearDownTestSuite()
     {
         chip::System::Clock::Internal::SetSystemClockForTesting(gRealClock);
         chip::Test::AppContext::TearDownTestSuite();
@@ -133,9 +127,21 @@ public:
         chip::Test::AppContext::TearDown();
     }
 
-private:
+protected:
     chip::MonotonicallyIncreasingCounter<chip::EventNumber> mEventCounter;
-    bool mSyncScheduler = false;
+    static bool sSyncScheduler;
+};
+
+bool TestContext::sSyncScheduler = false;
+
+class TestSyncContext : public TestContext
+{
+public:
+    static void SetUpTestSuite()
+    {
+        sSyncScheduler = true;
+        TestContext::SetUpTestSuite();
+    }
 };
 
 class TestEventGenerator : public chip::app::EventLoggingDelegate
@@ -1363,8 +1369,7 @@ void TestReadInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void 
         public:
             DirtyingMockDelegate(AttributePathParams (&aReadPaths)[2], int & aNumAttributeResponsesWhenSetDirty,
                                  int & aNumArrayItemsWhenSetDirty) :
-                mReadPaths(aReadPaths),
-                mNumAttributeResponsesWhenSetDirty(aNumAttributeResponsesWhenSetDirty),
+                mReadPaths(aReadPaths), mNumAttributeResponsesWhenSetDirty(aNumAttributeResponsesWhenSetDirty),
                 mNumArrayItemsWhenSetDirty(aNumArrayItemsWhenSetDirty)
             {}
 
@@ -5146,19 +5151,19 @@ const nlTest sTests[] = {
 nlTestSuite sSuite = {
     "TestReadInteraction",
     &sTests[0],
-    TestContext::nlTestSetUpTestSuite,
-    TestContext::nlTestTearDownTestSuite,
-    TestContext::nlTestSetUp,
-    TestContext::nlTestTearDown,
+    NL_TEST_WRAP_FUNCTION(TestContext::SetUpTestSuite),
+    NL_TEST_WRAP_FUNCTION(TestContext::TearDownTestSuite),
+    NL_TEST_WRAP_METHOD(TestContext, SetUp),
+    NL_TEST_WRAP_METHOD(TestContext, TearDown),
 };
 
 nlTestSuite sSyncSuite = {
     "TestSyncReadInteraction",
     &sTests[0],
-    TestContext::nlTestSetUpTestSuite_Sync,
-    TestContext::nlTestTearDownTestSuite,
-    TestContext::nlTestSetUp,
-    TestContext::nlTestTearDown,
+    NL_TEST_WRAP_FUNCTION(TestSyncContext::SetUpTestSuite),
+    NL_TEST_WRAP_FUNCTION(TestSyncContext::TearDownTestSuite),
+    NL_TEST_WRAP_METHOD(TestSyncContext, SetUp),
+    NL_TEST_WRAP_METHOD(TestSyncContext, TearDown),
 };
 
 } // namespace

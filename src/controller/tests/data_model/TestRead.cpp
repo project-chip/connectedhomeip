@@ -4971,8 +4971,8 @@ void TestReadInteraction::TestReadHandler_KeepSubscriptionTest(nlTestSuite * apS
 
     readParam.mAttributePathParamsListSize = 0;
     readClient                             = std::make_unique<app::ReadClient>(app::InteractionModelEngine::GetInstance(),
-                                                   app::InteractionModelEngine::GetInstance()->GetExchangeManager(), readCallback,
-                                                   app::ReadClient::InteractionType::Subscribe);
+                                                                               app::InteractionModelEngine::GetInstance()->GetExchangeManager(), readCallback,
+                                                                               app::ReadClient::InteractionType::Subscribe);
     NL_TEST_ASSERT(apSuite, readClient->SendRequest(readParam) == CHIP_NO_ERROR);
 
     ctx.DrainAndServiceIO();
@@ -5054,10 +5054,10 @@ const nlTest sTests[] =
 nlTestSuite sSuite = {
     "TestRead",
     &sTests[0],
-    TestContext::nlTestSetUpTestSuite,
-    TestContext::nlTestTearDownTestSuite,
-    TestContext::nlTestSetUp,
-    TestContext::nlTestTearDown,
+    NL_TEST_WRAP_FUNCTION(TestContext::SetUpTestSuite),
+    NL_TEST_WRAP_FUNCTION(TestContext::TearDownTestSuite),
+    NL_TEST_WRAP_METHOD(TestContext, SetUp),
+    NL_TEST_WRAP_METHOD(TestContext, TearDown),
 };
 
 } // namespace
