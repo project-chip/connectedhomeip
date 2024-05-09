@@ -15,16 +15,21 @@
  *    limitations under the License.
  */
 
-#include <array>
 #include <cstdint>
-#include <memory>
-#include <numeric>
+#include <cstring>
+#include <string>
 #include <type_traits>
+#include <utility>
 
 #include <gtest/gtest.h>
 
+#include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/Span.h>
+#include <lib/support/TypeTraits.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 
 #define _CHIP_BLE_BLE_H
