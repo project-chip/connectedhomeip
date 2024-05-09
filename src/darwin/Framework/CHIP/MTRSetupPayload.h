@@ -109,7 +109,7 @@ MTR_NEWLY_AVAILABLE
  * will not work, because some required information will be missing.
  *
  * This class can also be used to create an onboarding payload directly
- * from the underlying values
+ * from the underlying values (passcode, discriminator, etc).
  */
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRSetupPayload : NSObject <NSSecureCoding> /* also <NSCopying> (see below) */
