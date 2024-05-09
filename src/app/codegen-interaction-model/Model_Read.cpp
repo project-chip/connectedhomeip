@@ -303,16 +303,17 @@ CHIP_ERROR Model::ReadAttribute(const InteractionModel::ReadAttributeRequest & r
                                                               RequiredPrivilege::ForReadAttribute(request.path)));
     }
 
-    std::optional<CHIP_ERROR> aai_result;
-
     auto metadata = FindAttributeMetadata(request.path);
 
+    // Explicit failure in finding a suitable metadata
     if (const CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&metadata))
     {
         VerifyOrDie(*err != CHIP_NO_ERROR);
         return *err;
     }
 
+    // Read via AAI
+    std::optional<CHIP_ERROR> aai_result;
     if (const EmberAfCluster ** cluster = std::get_if<const EmberAfCluster *>(&metadata))
     {
         Compatibility::GlobalAttributeReader aai(*cluster);
