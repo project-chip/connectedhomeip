@@ -19,6 +19,7 @@
 package com.google.chip.chiptool.setuppayloadscanner
 
 import android.os.Parcelable
+import android.util.Log
 import kotlinx.parcelize.Parcelize
 import matter.onboardingpayload.DiscoveryCapability
 import matter.onboardingpayload.OnboardingPayload
@@ -60,11 +61,13 @@ data class CHIPDeviceInfo(
   }
 
   companion object {
+    private const val TAG = "CHIPDeviceInfo"
     fun fromSetupPayload(setupPayload: OnboardingPayload): CHIPDeviceInfo {
       val serialNumber =
         try {
           setupPayload.getSerialNumber()
         } catch (e: OnboardingPayloadException) {
+          Log.d(TAG, "serialNumber Exception", e)
           ""
         }
       return CHIPDeviceInfo(

@@ -93,6 +93,13 @@ class CHIPDeviceDetailsFragment : Fragment() {
       QRCodeOnboardingPayloadGenerator(onBoardingPayload)
         .payloadBase38RepresentationWithAutoTLVBuffer()
 
+    setDiscoveryCapabilitiesEditTextListener()
+    setQRCodeButtonListener()
+
+    return binding.root
+  }
+
+  private fun setDiscoveryCapabilitiesEditTextListener() {
     binding.discoveryCapabilitiesEd.setText(onBoardingPayload.getRendezvousInformation().toString())
     binding.discoveryCapabilitiesEd.addTextChangedListener(
       object : TextWatcher {
@@ -104,11 +111,18 @@ class CHIPDeviceDetailsFragment : Fragment() {
           binding.discoveryCapabilitiesTv.text = "${onBoardingPayload.discoveryCapabilities}"
         }
 
-        override fun afterTextChanged(p0: Editable?) {}
+        override fun afterTextChanged(p0: Editable?) {
+          // no_op
+        }
 
-        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+          // no_op
+        }
       }
     )
+  }
+
+  private fun setQRCodeButtonListener() {
     binding.showQRCodeBtn.setOnClickListener {
       onBoardingPayload.apply {
         version = binding.versionEd.text.toString().toInt()
@@ -121,7 +135,7 @@ class CHIPDeviceDetailsFragment : Fragment() {
         try {
           removeSerialNumber()
         } catch (e: OnboardingPayloadException) {
-          Log.d(TAG, "Serial Number not set!")
+          Log.d(TAG, "Serial Number not set!", e)
         }
         if (serialNumber.isNotEmpty()) {
           addSerialNumber(binding.serialNumberEd.text.toString())
@@ -140,8 +154,6 @@ class CHIPDeviceDetailsFragment : Fragment() {
       val intent = Intent(Intent.ACTION_VIEW, Uri.parse(qrCodeUri))
       startActivity(intent)
     }
-
-    return binding.root
   }
 
   override fun onDestroyView() {
