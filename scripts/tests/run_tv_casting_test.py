@@ -33,6 +33,9 @@ TV_APP_MAX_START_WAIT_SEC = 2
 # The maximum amount of time to commission the Linux tv-casting-app and the tv-app before timeout.
 COMMISSIONING_STAGE_MAX_WAIT_SEC = 10
 
+# The maximum amount of time to test that the launchURL is sent from the Linux tv-casting-app and received on the tv-app before timeout.
+TEST_LAUNCHURL_MAX_WAIT_SEC = 10
+
 # File names of logs for the Linux tv-casting-app and the Linux tv-app.
 LINUX_TV_APP_LOGS = 'Linux-tv-app-logs.txt'
 LINUX_TV_CASTING_APP_LOGS = 'Linux-tv-casting-app-logs.txt'
@@ -303,8 +306,78 @@ def validate_commissioning_success(tv_casting_app_info: Tuple[subprocess.Popen, 
 
             if 'PROMPT USER: commissioning success' in tv_app_line:
                 logging.info('Commissioning success noted on the Linux tv-app output:')
+                logging.info(tv_app_line)
+                return True
+
+
+def parse_tv_app_output_for_launchUrl_msg_success(tv_app_info: Tuple[subprocess.Popen, TextIO], log_paths: List[str]):
+    """Parse the Linux tv-app output for the relevant string indicating that the launchUrl was received."""
+
+    tv_app_process, linux_tv_app_log_file = tv_app_info
+
+    start_wait_time = time.time()
+
+    while True:
+        # Check if we exceeded the maximum wait time to parse the Linux tv-app output for the string related to the launchUrl.
+        if time.time() - start_wait_time > COMMISSIONING_STAGE_MAX_WAIT_SEC:
+            logging.error(
+                'The relevant launchUrl string was not found in the Linux tv-app process within the timeout.')
+            return False
+
+        tv_app_line = tv_app_process.stdout.readline()
+
+        if tv_app_line:
+            linux_tv_app_log_file.write(tv_app_line)
+            linux_tv_app_log_file.flush()
+
+            if 'ContentLauncherManager::HandleLaunchUrl TEST CASE ContentURL=https://www.test.com/videoid DisplayString=Test video' in tv_app_line:
+                logging.info('Found the launchUrl in the Linux tv-app output:')
                 logging.info(tv_app_line.rstrip('\n'))
                 return True
+
+
+def parse_tv_casting_app_output_for_launchUrl_msg_success(tv_casting_app_info: Tuple[subprocess.Popen, TextIO], log_paths: List[str]):
+    """Parse the Linux tv-casting-app output for relevant strings indicating that the launchUrl was sent."""
+
+    tv_casting_app_process, linux_tv_casting_app_log_file = tv_casting_app_info
+
+    continue_parsing_invoke_response_msg_block = False
+    found_example_data_msg = False
+    start_wait_time = time.time()
+
+    while True:
+        # Check if we exceeded the maximum wait time to parse the Linux tv-casting-app output for strings related to the launchUrl.
+        if time.time() - start_wait_time > TEST_LAUNCHURL_MAX_WAIT_SEC:
+            logging.error(
+                'The relevant launchUrl strings were not found in the Linux tv-casting-app process within the timeout.')
+            return False
+
+        tv_casting_line = tv_casting_app_process.stdout.readline()
+
+        if tv_casting_line:
+            linux_tv_casting_app_log_file.write(tv_casting_line)
+            linux_tv_casting_app_log_file.flush()
+
+            if 'InvokeResponseMessage =' in tv_casting_line:
+                logging.info('Found the InvokeResponseMessage block in the Linux tv-casting-app output:')
+                logging.info(tv_casting_line.rstrip('\n'))
+                continue_parsing_invoke_response_msg_block = True
+
+            elif continue_parsing_invoke_response_msg_block:
+                # Sanity check for `exampleData` in the `InvokeResponseMessage` block.
+                if 'exampleData' in tv_casting_line:
+                    found_example_data_msg = True
+
+                elif 'Received Command Response Data' in tv_casting_line:
+                    if not found_example_data_msg:
+                        logging.error('The `exampleData` string was not found in the `InvokeResponseMessage` block.')
+                        return False
+
+                    logging.info('Found the `Received Command Response Data` string in the Linux tv-casting-app output:')
+                    logging.info(tv_casting_line.rstrip('\n'))
+                    return True
+
+                logging.info(tv_casting_line.rstrip('\n'))
 
 
 def test_discovery_fn(tv_casting_app_info: Tuple[subprocess.Popen, TextIO], log_paths: List[str]) -> Optional[str]:
@@ -347,7 +420,7 @@ def test_discovery_fn(tv_casting_app_info: Tuple[subprocess.Popen, TextIO], log_
             logging.info(valid_vendor_id)
             logging.info(valid_product_id)
             logging.info(valid_device_type)
-            logging.info('Discovery success!')
+            logging.info('Discovery success!\n')
             break
 
     return valid_discovered_commissioner
@@ -370,6 +443,18 @@ def test_commissioning_fn(valid_discovered_commissioner_number, tv_casting_app_i
 
     if not validate_commissioning_success(tv_casting_app_info, tv_app_info, log_paths):
         handle_casting_failure('Commissioning', log_paths)
+
+
+def test_launchUrl_fn(tv_casting_app_info: Tuple[subprocess.Popen, TextIO], tv_app_info: Tuple[subprocess.Popen, TextIO], log_paths: List[str]):
+    """Test that the Linux tv-casting-app sent the launchUrl and that the Linux tv-app received the launchUrl."""
+
+    if not parse_tv_app_output_for_launchUrl_msg_success(tv_app_info, log_paths):
+        handle_casting_failure('Testing launchUrl', log_paths)
+
+    if not parse_tv_casting_app_output_for_launchUrl_msg_success(tv_casting_app_info, log_paths):
+        handle_casting_failure('Testing launchUrl', log_paths)
+
+    logging.info('Testing launchUrl success!\n')
 
 
 @click.command()
@@ -419,6 +504,8 @@ def test_casting_fn(tv_app_rel_path, tv_casting_app_rel_path):
                     valid_discovered_commissioner_number = valid_discovered_commissioner.split('#')[-1].replace('\x1b[0m', '')
 
                     test_commissioning_fn(valid_discovered_commissioner_number, tv_casting_app_info, tv_app_info, log_paths)
+
+                    test_launchUrl_fn(tv_casting_app_info, tv_app_info, log_paths)
 
 
 if __name__ == '__main__':
