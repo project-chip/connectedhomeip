@@ -113,6 +113,7 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectCallback onCompleted, uns
         ChipLogProgress(AppServer, "CastingPlayer::VerifyOrEstablishConnection() Forcing expiry of armed FailSafe timer");
         // ChipDeviceEventHandler will handle the kFailSafeTimerExpired event by Opening the Basic Commissioning Window and Sending
         // the User Directed Commissioning Request
+        support::ChipDeviceEventHandler::SetUdcStatus(false);
         chip::Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();
     }
     else

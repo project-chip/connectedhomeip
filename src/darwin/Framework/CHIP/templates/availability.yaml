@@ -8515,6 +8515,7 @@
       clusters:
           - ActivatedCarbonFilterMonitoring
           - AirQuality
+          - BooleanStateConfiguration
           - ElectricalEnergyMeasurement
           - ElectricalPowerMeasurement
           - HEPAFilterMonitoring
@@ -8545,6 +8546,20 @@
               - ClusterRevision
           AirQuality:
               - AirQuality
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          BooleanStateConfiguration:
+              - CurrentSensitivityLevel
+              - SupportedSensitivityLevels
+              - DefaultSensitivityLevel
+              - AlarmsActive
+              - AlarmsSuppressed
+              - AlarmsEnabled
+              - AlarmsSupported
+              - SensorFault
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
@@ -8791,6 +8806,9 @@
               - FeatureMap
               - ClusterRevision
       commands:
+          BooleanStateConfiguration:
+              - SuppressAlarm
+              - EnableDisableAlarm
           ActivatedCarbonFilterMonitoring:
               - ResetCondition
           FanControl:
@@ -8800,6 +8818,11 @@
           SmokeCOAlarm:
               - SelfTestRequest
       command fields:
+          BooleanStateConfiguration:
+              SuppressAlarm:
+                  - alarmsToSuppress
+              EnableDisableAlarm:
+                  - alarmsToEnableDisable
           FanControl:
               Step:
                   - direction
@@ -8887,6 +8910,9 @@
                   - productIdentifierType
                   - productIdentifierValue
       events:
+          BooleanStateConfiguration:
+              - AlarmsStateChanged
+              - SensorFault
           ElectricalEnergyMeasurement:
               - CumulativeEnergyMeasured
               - PeriodicEnergyMeasured
@@ -8905,6 +8931,12 @@
               - InterconnectCOAlarm
               - AllClear
       event fields:
+          BooleanStateConfiguration:
+              AlarmsStateChanged:
+                  - alarmsActive
+                  - alarmsSuppressed
+              SensorFault:
+                  - sensorFault
           ElectricalEnergyMeasurement:
               CumulativeEnergyMeasured:
                   - energyImported
@@ -9292,6 +9324,10 @@
               - Feature
           AirQuality:
               - Feature
+          BooleanStateConfiguration:
+              - Feature
+              - AlarmModeBitmap
+              - SensorFaultBitmap
           ElectricalEnergyMeasurement:
               - Feature
           ElectricalPowerMeasurement:
@@ -9332,6 +9368,17 @@
                   - Moderate
                   - VeryPoor
                   - ExtremelyPoor
+          BooleanStateConfiguration:
+              Feature:
+                  - Visual
+                  - Audible
+                  - AlarmSuppress
+                  - SensitivityLevel
+              AlarmModeBitmap:
+                  - Visual
+                  - Audible
+              SensorFaultBitmap:
+                  - GeneralFault
           ElectricalEnergyMeasurement:
               Feature:
                   - ImportedEnergy
