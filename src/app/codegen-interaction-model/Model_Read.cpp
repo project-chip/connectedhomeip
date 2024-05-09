@@ -233,47 +233,44 @@ std::optional<CHIP_ERROR> TryReadViaAccessInterface(const ConcreteAttributePath 
     return encoder.TriedEncode() ? std::make_optional(CHIP_NO_ERROR) : std::nullopt;
 }
 
-static constexpr uint8_t kEmberStringNullLength      = 0xFF;
-static constexpr uint16_t kEmberLongStringNullLength = 0xFFFF;
-
-template <class T>
-std::optional<T> ExtractEmberShortString(ByteSpan data)
+struct ShortPascalString
 {
-    uint8_t len = data[0];
+    using LengthType                        = uint8_t;
+    static constexpr LengthType kNullLength = 0xFF;
+};
 
-    if (len == kEmberStringNullLength)
+struct LongPascalString
+{
+    using LengthType                        = uint16_t;
+    static constexpr LengthType kNullLength = 0xFFFF;
+};
+
+// ember assumptions ... should just work
+static_assert(sizeof(ShortPascalString::LengthType) == 1);
+static_assert(sizeof(LongPascalString::LengthType) == 2);
+
+template <class OUT, class ENCODING>
+std::optional<OUT> ExtractEmberString(ByteSpan data)
+{
+    typename ENCODING::LengthType len;
+
+    VerifyOrDie(sizeof(len) <= data.size());
+    memcpy(&len, data.data(), sizeof(len));
+
+    if (len == ENCODING::kNullLength)
     {
         return std::nullopt;
     }
 
-    VerifyOrDie(static_cast<size_t>(len + 1) <= data.size());
-    return std::make_optional<T>(reinterpret_cast<typename T::pointer>(data.data() + 1), len);
+    VerifyOrDie(static_cast<size_t>(len + sizeof(len)) <= data.size());
+    return std::make_optional<OUT>(reinterpret_cast<typename OUT::pointer>(data.data() + sizeof(len)), len);
 }
 
-static constexpr size_t kLongStringLengthBytes = 2;
-
-template <class T>
-std::optional<T> ExtractEmberLongString(ByteSpan data)
+template <typename T, class ENCODING>
+CHIP_ERROR EncodeStringLike(ByteSpan data, bool isNullable, AttributeValueEncoder & encoder)
 {
-    uint16_t len;
-    static_assert(sizeof(len) == kLongStringLengthBytes);
-
-    VerifyOrDie(kLongStringLengthBytes <= data.size());
-    memcpy(&len, data.data(), kLongStringLengthBytes);
-
-    if (len == kEmberLongStringNullLength)
-    {
-        return std::nullopt;
-    }
-
-    VerifyOrDie(static_cast<size_t>(len + kLongStringLengthBytes) <= data.size());
-    return std::make_optional<T>(reinterpret_cast<typename T::pointer>(data.data() + kLongStringLengthBytes), len);
-}
-
-template <typename T>
-CHIP_ERROR EncodeStringLike(std::optional<T> data, bool isNullable, AttributeValueEncoder & encoder)
-{
-    if (!data.has_value())
+    std::optional<T> value = ExtractEmberString<T, ENCODING>(data);
+    if (!value.has_value())
     {
         if (isNullable)
         {
@@ -283,7 +280,7 @@ CHIP_ERROR EncodeStringLike(std::optional<T> data, bool isNullable, AttributeVal
     }
 
     // encode value as-is
-    return encoder.Encode(*data);
+    return encoder.Encode(*value);
 }
 
 template <typename T>
@@ -357,13 +354,13 @@ CHIP_ERROR EncodeEmberValue(ByteSpan data, const EmberAfAttributeMetadata * meta
     case ZCL_DOUBLE_ATTRIBUTE_TYPE: // 64-bit float
         return EncodeFromSpan<double>(data, isNullable, encoder);
     case ZCL_CHAR_STRING_ATTRIBUTE_TYPE: // Char string
-        return EncodeStringLike(ExtractEmberShortString<CharSpan>(data), isNullable, encoder);
+        return EncodeStringLike<CharSpan, ShortPascalString>(data, isNullable, encoder);
     case ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE:
-        return EncodeStringLike(ExtractEmberLongString<CharSpan>(data), isNullable, encoder);
+        return EncodeStringLike<CharSpan, LongPascalString>(data, isNullable, encoder);
     case ZCL_OCTET_STRING_ATTRIBUTE_TYPE: // Octet string
-        return EncodeStringLike(ExtractEmberShortString<ByteSpan>(data), isNullable, encoder);
+        return EncodeStringLike<ByteSpan, ShortPascalString>(data, isNullable, encoder);
     case ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE:
-        return EncodeStringLike(ExtractEmberLongString<ByteSpan>(data), isNullable, encoder);
+        return EncodeStringLike<ByteSpan, LongPascalString>(data, isNullable, encoder);
     default:
         ChipLogError(DataManagement, "Attribute type 0x%x not handled", static_cast<int>(metadata->attributeType));
         return CHIP_IM_GLOBAL_STATUS(UnsupportedRead);
