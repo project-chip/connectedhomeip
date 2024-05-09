@@ -55,6 +55,7 @@ if (chip_build_tests) {
   chip_test_group("tests") {
     deps = []
     tests = [
+      "${chip_root}/src/app/interaction-model/tests",
       "${chip_root}/src/access/tests",
       "${chip_root}/src/crypto/tests",
       "${chip_root}/src/inet/tests",
@@ -67,7 +68,6 @@ if (chip_build_tests) {
       "${chip_root}/src/protocols/user_directed_commissioning/tests",
       "${chip_root}/src/transport/retransmit/tests",
       "${chip_root}/src/app/icd/server/tests",
-      "${chip_root}/src/app/icd/server/tests:tests_nltest",
     ]
 
     # Skip DNSSD tests for Mbed platform due to flash memory size limitations

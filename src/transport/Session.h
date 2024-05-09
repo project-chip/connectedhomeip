@@ -45,6 +45,48 @@ class Session;
  *    as pending removal but not actually removed yet. During this period, the handle is functional, but the underlying session
  *    won't be able to be grabbed by any SessionHolder. SessionHandle->IsActiveSession can be used to check if the session is
  *    active.
+ *
+ *    A `SessionHandle` exists to guarantee that the object it points to will not be released while allowing passing
+ *    the handle as a reference, to not incur extra reference-counted Retain/Release calls.
+ *
+ *    Example code that breaks assumptions (hard to reason about/maintain):
+ *
+ *       void Process(ReferenceCountedHandle<Session> &handle);
+ *       class Foo {
+ *          ReferenceCountedHandle<Session> mSession;
+ *          void ResetSession() { mSession = createNewSession(); }
+ *          void DoProcessing() {
+ *             Process(mSession);
+ *          }
+ *
+ *          static Foo& GetInstance();
+ *       };
+ *
+ *       void Process(ReferenceCountedHandle<Session> &handle) {
+ *          Foo::GetInstance()->ResetSession(); // this changes the passed in handle
+ *          // trying to use "&handle" here may point to something else altogether.
+ *       }
+ *
+ *   Above would be fixed if we would pass in the handles by value, however that adds extra code
+ *   to call Retain/Release every time. We could also by design say that passed in references will
+ *   not change, however historically the codebase is complex enough that this could not be ensured.
+ *
+ *   The end result is the existence of SessionHandle which is NOT allowed to be held and it serves
+ *   as a marker of "Retain has been called and stays valid". The code above becomes:
+ *
+ *      void Process(SessionHandle &handle);
+ *
+ *      ....
+ *      void Foo::DoProcessing() {
+ *         SessionHandle handle(mSession);  // retains the session and mSession can be independently changed
+ *         Process(&handle);  // reference is now safe to use.
+ *      }
+ *
+ *   To meet the requirements of "you should not store this", the Handle has additional restrictions
+ *   preventing modification (no assignment or copy constructor) and allows only move.
+ *   NOTE: `move` should likely also not be allowed, however we need to have the ability to
+ *         return such objects from method calls, so it is currently allowed.
+ *
  */
 class SessionHandle
 {
@@ -114,8 +156,8 @@ public:
 
     Transport::Session * operator->() const { return &mSession.Value().Get(); }
 
-    // There is not delegate, nothing to do here
-    virtual void DispatchSessionEvent(SessionDelegate::Event event) {}
+    // There is no delegate, nothing to do here
+    virtual void OnSessionHang() {}
 
 protected:
     // Helper for use by the Grab methods.
@@ -147,7 +189,7 @@ public:
             SessionHolder::ShiftToSession(session);
     }
 
-    void DispatchSessionEvent(SessionDelegate::Event event) override { (mDelegate.*event)(); }
+    void OnSessionHang() override { mDelegate.OnSessionHang(); }
 
 private:
     SessionDelegate & mDelegate;
@@ -237,7 +279,7 @@ public:
     void SetTCPConnection(ActiveTCPConnectionState * conn) { mTCPConnection = conn; }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
-    void DispatchSessionEvent(SessionDelegate::Event event)
+    void NotifySessionHang()
     {
         // Holders might remove themselves when notified.
         auto holder = mHolders.begin();
@@ -245,7 +287,7 @@ public:
         {
             auto cur = holder;
             ++holder;
-            cur->DispatchSessionEvent(event);
+            cur->OnSessionHang();
         }
     }
 

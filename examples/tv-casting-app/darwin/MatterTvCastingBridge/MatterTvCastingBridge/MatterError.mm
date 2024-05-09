@@ -23,7 +23,7 @@
 
 @implementation MatterError
 
-MatterError * MATTER_NO_ERROR = [[MatterError alloc] initWithCode:0 message:nil];
+MatterError * MATTER_NO_ERROR = [[MatterError alloc] initWithCode:0 message:@"No error"];
 
 MatterError * MATTER_ERROR_INCORRECT_STATE =
     [[MatterError alloc] initWithCode:CHIP_ERROR_INCORRECT_STATE.AsInteger()

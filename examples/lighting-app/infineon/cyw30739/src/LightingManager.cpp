@@ -28,13 +28,6 @@ using namespace chip::app::Clusters;
 
 LightingManager LightingManager::sLight;
 
-CHIP_ERROR LightingManager::Init()
-{
-    mState = kState_OffCompleted;
-
-    return CHIP_NO_ERROR;
-}
-
 void LightingManager::SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB)
 {
     mActionInitiated_CB = aActionInitiated_CB;

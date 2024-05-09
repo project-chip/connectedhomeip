@@ -367,6 +367,7 @@ CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t p
                 {
                     ChipLogProgress(AppServer, "TLV end of array");
                     ReturnErrorOnFailure(reader.ExitContainer(listContainerType));
+                    err = CHIP_NO_ERROR;
                 }
             }
             break;

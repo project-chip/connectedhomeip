@@ -35,6 +35,7 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/TLVData.h>
 #include <lib/core/TLVUtilities.h>
+#include <lib/support/IntrusiveList.h>
 #include <lib/support/TypeTraits.h>
 #include <platform/LockTracker.h>
 #include <protocols/secure_channel/Constants.h>
@@ -56,6 +57,11 @@ CommandHandler::CommandHandler(TestOnlyOverrides & aTestOverride, Callback * apC
     {
         SetExchangeInterface(aTestOverride.commandResponder);
     }
+}
+
+CommandHandler::~CommandHandler()
+{
+    InvalidateHandles();
 }
 
 CHIP_ERROR CommandHandler::AllocateBuffer()
@@ -266,6 +272,7 @@ void CommandHandler::Close()
     // reference is the stack shutting down, in which case Close() is not called. So the below check should always pass.
     VerifyOrDieWithMsg(mPendingWork == 0, DataManagement, "CommandHandler::Close() called with %u unfinished async work items",
                        static_cast<unsigned int>(mPendingWork));
+    InvalidateHandles();
 
     if (mpCallback)
     {
@@ -273,16 +280,40 @@ void CommandHandler::Close()
     }
 }
 
-void CommandHandler::IncrementHoldOff()
+void CommandHandler::AddToHandleList(Handle * apHandle)
 {
-    mPendingWork++;
+    mpHandleList.PushBack(apHandle);
 }
 
-void CommandHandler::DecrementHoldOff()
+void CommandHandler::RemoveFromHandleList(Handle * apHandle)
 {
+    VerifyOrDie(mpHandleList.Contains(apHandle));
+    mpHandleList.Remove(apHandle);
+}
+
+void CommandHandler::InvalidateHandles()
+{
+    for (auto handle = mpHandleList.begin(); handle != mpHandleList.end(); ++handle)
+    {
+        handle->Invalidate();
+    }
+}
+
+void CommandHandler::IncrementHoldOff(Handle * apHandle)
+{
+    mPendingWork++;
+    AddToHandleList(apHandle);
+}
+
+void CommandHandler::DecrementHoldOff(Handle * apHandle)
+{
+
     mPendingWork--;
     ChipLogDetail(DataManagement, "Decreasing reference count for CommandHandler, remaining %u",
                   static_cast<unsigned int>(mPendingWork));
+
+    RemoveFromHandleList(apHandle);
+
     if (mPendingWork != 0)
     {
         return;
@@ -771,35 +802,35 @@ FabricIndex CommandHandler::GetAccessingFabricIndex() const
     return mpResponder->GetAccessingFabricIndex();
 }
 
+void CommandHandler::Handle::Init(CommandHandler * handler)
+{
+    if (handler != nullptr)
+    {
+        handler->IncrementHoldOff(this);
+        mpHandler = handler;
+    }
+}
+
 CommandHandler * CommandHandler::Handle::Get()
 {
     // Not safe to work with CommandHandler in parallel with other Matter work.
     assertChipStackLockedByCurrentThread();
 
-    return (mMagic == InteractionModelEngine::GetInstance()->GetMagicNumber()) ? mpHandler : nullptr;
+    return mpHandler;
 }
 
 void CommandHandler::Handle::Release()
 {
     if (mpHandler != nullptr)
     {
-        if (mMagic == InteractionModelEngine::GetInstance()->GetMagicNumber())
-        {
-            mpHandler->DecrementHoldOff();
-        }
-        mpHandler = nullptr;
-        mMagic    = 0;
+        mpHandler->DecrementHoldOff(this);
+        Invalidate();
     }
 }
 
-CommandHandler::Handle::Handle(CommandHandler * handle)
+CommandHandler::Handle::Handle(CommandHandler * handler)
 {
-    if (handle != nullptr)
-    {
-        handle->IncrementHoldOff();
-        mpHandler = handle;
-        mMagic    = InteractionModelEngine::GetInstance()->GetMagicNumber();
-    }
+    Init(handler);
 }
 
 CHIP_ERROR CommandHandler::FinalizeInvokeResponseMessageAndPrepareNext()

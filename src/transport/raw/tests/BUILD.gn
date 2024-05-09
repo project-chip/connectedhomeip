@@ -49,6 +49,8 @@ chip_test_suite("tests") {
     test_sources += [ "TestTCP.cpp" ]
   }
 
+  sources = [ "TCPBaseTestAccess.h" ]
+
   public_deps = [
     ":helpers",
     "${chip_root}/src/inet/tests:helpers",
