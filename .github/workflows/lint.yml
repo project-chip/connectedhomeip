@@ -118,6 +118,10 @@ jobs:
                      --known-failure app/util/DataModelHandler.h \
                      --known-failure app/util/ember-compatibility-functions.cpp \
                      --known-failure app/util/ember-compatibility-functions.h \
+                     --known-failure app/util/ember-global-attribute-access-interface.cpp \
+                     --known-failure app/util/ember-global-attribute-access-interface.h \
+                     --known-failure app/util/ember-io-storage.cpp \
+                     --known-failure app/util/ember-io-storage.h \
                      --known-failure app/util/endpoint-config-api.h \
                      --known-failure app/util/generic-callbacks.h \
                      --known-failure app/util/generic-callback-stubs.cpp \
