@@ -62,6 +62,7 @@ data class CHIPDeviceInfo(
 
   companion object {
     private const val TAG = "CHIPDeviceInfo"
+
     fun fromSetupPayload(setupPayload: OnboardingPayload): CHIPDeviceInfo {
       val serialNumber =
         try {
