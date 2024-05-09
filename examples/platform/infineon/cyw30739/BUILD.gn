@@ -22,6 +22,8 @@ static_library("platform") {
   sources = [
     "LEDWidget.h",
     "OTAConfig.h",
+    "SoftwareDiagnostics.h",
+    "TestEventTriggerHandler.h",
     "main.cpp",
   ]
 
