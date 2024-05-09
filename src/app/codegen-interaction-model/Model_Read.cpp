@@ -245,26 +245,29 @@ std::optional<T> ExtractEmberShortString(ByteSpan data)
     {
         return std::nullopt;
     }
-    VerifyOrDie(static_cast<size_t>(len + 1) <= data.size());
 
+    VerifyOrDie(static_cast<size_t>(len + 1) <= data.size());
     return std::make_optional<T>(reinterpret_cast<typename T::pointer>(data.data() + 1), len);
 }
+
+static constexpr size_t kLongStringLengthBytes = 2;
 
 template <class T>
 std::optional<T> ExtractEmberLongString(ByteSpan data)
 {
     uint16_t len;
+    static_assert(sizeof(len) == kLongStringLengthBytes);
 
-    VerifyOrDie(sizeof(len) <= data.size());
-    memcpy(&len, data.data(), sizeof(len));
+    VerifyOrDie(kLongStringLengthBytes <= data.size());
+    memcpy(&len, data.data(), kLongStringLengthBytes);
 
     if (len == kEmberLongStringNullLength)
     {
         return std::nullopt;
     }
-    VerifyOrDie(static_cast<size_t>(len + 1) <= data.size());
 
-    return std::make_optional<T>(reinterpret_cast<typename T::pointer>(data.data() + 1), len);
+    VerifyOrDie(static_cast<size_t>(len + kLongStringLengthBytes) <= data.size());
+    return std::make_optional<T>(reinterpret_cast<typename T::pointer>(data.data() + kLongStringLengthBytes), len);
 }
 
 template <typename T>
