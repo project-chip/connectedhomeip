@@ -215,9 +215,6 @@ std::optional<CHIP_ERROR> TryReadViaAccessInterface(const ConcreteAttributePath 
         return std::nullopt;
     }
 
-    // TODO: AAI returns:
-    //      - UnsupportedRead is FINAL
-    //      (this seems to be)
     CHIP_ERROR err = aai->Read(path, encoder);
 
     // explict translate UnsupportedRead to Access denied. This is to allow callers to determine a
