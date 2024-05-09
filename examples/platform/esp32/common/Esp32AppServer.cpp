@@ -51,19 +51,20 @@ static constexpr char TAG[] = "ESP32Appserver";
 
 namespace {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
 constexpr chip::EndpointId kNetworkCommissioningEndpointWiFi = 0xFFFE;
 #else
 constexpr chip::EndpointId kNetworkCommissioningEndpointWiFi = 0;
 #endif
 app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointWiFi, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
-#elif CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
 static app::Clusters::NetworkCommissioning::Instance
     sEthernetNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPEthernetDriver::GetInstance()));
 #endif
 
-#if CONFIG_TEST_EVENT_TRIGGER_ENABLED
+#if CONFIG_TEST_EVENT_TRIGGER_ENABLED && CONFIG_ENABLE_OTA_REQUESTOR
 static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
                                                                                           0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
                                                                                           0xcc, 0xdd, 0xee, 0xff };
@@ -73,7 +74,7 @@ static ICDSubscriptionCallback sICDSubscriptionHandler;
 #endif
 } // namespace
 
-#if CONFIG_TEST_EVENT_TRIGGER_ENABLED
+#if CONFIG_TEST_EVENT_TRIGGER_ENABLED && CONFIG_ENABLE_OTA_REQUESTOR
 static int hex_digit_to_int(char hex)
 {
     if ('A' <= hex && hex <= 'F')
@@ -112,7 +113,7 @@ static size_t hex_string_to_binary(const char * hex_string, uint8_t * buf, size_
 
     return buf_size;
 }
-#endif // CONFIG_TEST_EVENT_TRIGGER_ENABLED
+#endif // CONFIG_TEST_EVENT_TRIGGER_ENABLED && CONFIG_ENABLE_OTA_REQUESTOR
 
 void Esp32AppServer::DeInitBLEIfCommissioned(void)
 {
@@ -140,7 +141,7 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
     VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler) == CHIP_NO_ERROR);
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
-#endif // CONFIG_TEST_EVENT_TRIGGER_ENABLED
+#endif // CONFIG_TEST_EVENT_TRIGGER_ENABLED && CONFIG_ENABLE_OTA_REQUESTOR
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     if (sAppDelegate != nullptr)
     {
@@ -154,6 +155,9 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     sWiFiNetworkCommissioningInstance.Init();
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+    sEthernetNetworkCommissioningInstance.Init();
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     if (chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned() &&
