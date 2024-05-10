@@ -27,10 +27,6 @@
 #include <lib/core/CHIPConfig.h>
 #include <system/SystemConfig.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-#include <lwip/opt.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
 /**
  * CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP
  *

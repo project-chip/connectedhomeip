@@ -30,10 +30,6 @@
 #include <system/SystemClock.h>
 #include <system/SystemConfig.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-#include <lwip/opt.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
 namespace chip {
 
 /**

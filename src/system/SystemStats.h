@@ -27,6 +27,7 @@
 // Include configuration headers
 #include <inet/InetConfig.h>
 #include <lib/core/CHIPConfig.h>
+#include <system/SystemConfig.h>
 
 // Include dependent headers
 #include <lib/support/DLLUtil.h>
