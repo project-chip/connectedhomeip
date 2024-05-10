@@ -771,3 +771,20 @@ struct LwIPEvent;
 #define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_EVENTFD 0
 #endif
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_EVENTFD
+
+/**
+ * @def CHIP_SYSTEM_CONFIG_LWIP_PBUF_FROM_CUSTOM_POOL
+ *
+ * @brief
+ *     Enable the use of lwIP pbufs from a custom pool
+ *
+ * This config option exist because not all platforms defines LWIP_PBUF_FROM_CUSTOM_POOLS in lwip/opt.h
+ * Defaults to LWIP_PBUF_FROM_CUSTOM_POOLS if defined, otherwise 0
+ */
+#ifndef CHIP_SYSTEM_CONFIG_LWIP_PBUF_FROM_CUSTOM_POOL
+#if defined(LWIP_PBUF_FROM_CUSTOM_POOLS)
+#define CHIP_SYSTEM_CONFIG_LWIP_PBUF_FROM_CUSTOM_POOL LWIP_PBUF_FROM_CUSTOM_POOLS
+#else
+#define CHIP_SYSTEM_CONFIG_LWIP_PBUF_FROM_CUSTOM_POOL 0
+#endif // LWIP_PBUF_FROM_CUSTOM_POOLS
+#endif // CHIP_SYSTEM_CONFIG_LWIP_PBUF_FROM_CUSTOM_POOL

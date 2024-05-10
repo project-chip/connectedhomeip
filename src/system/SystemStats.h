@@ -47,7 +47,7 @@ namespace Stats {
 
 enum
 {
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_PBUF_FROM_CUSTOM_POOLS
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_LWIP_PBUF_FROM_CUSTOM_POOL
 #define LWIP_PBUF_MEMPOOL(name, num, payload, desc) kSystemLayer_Num##name,
 #include "lwippools.h"
 #undef LWIP_PBUF_MEMPOOL
