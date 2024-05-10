@@ -30,7 +30,7 @@ namespace Internal {
 /// ember (i.e. a buffer that can be used to read ember data into).
 extern MutableByteSpan gEmberAttributeIOBufferSpan;
 
-/// Maps a generic attribute to a basic int(8|16|32|64)(s|u) type
+/// Maps an attribute type that is not an integer but can be represented as an integer to the corresponding basic int(8|16|32|64)(s|u) type
 ///
 /// For example:
 ///    ZCL_ENUM8_ATTRIBUTE_TYPE maps to ZCL_INT8U_ATTRIBUTE_TYPE
