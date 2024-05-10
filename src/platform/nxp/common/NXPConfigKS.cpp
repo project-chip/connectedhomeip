@@ -420,14 +420,13 @@ bool NXPConfig::ConfigValueExists(Key key)
     found       = false;
     readValue_p = NULL;
     outLen      = 0;
-    /* Max number of bytes read when getting a value */
-    bufSize = 256;
+    bufSize     = 0;
 
     if (ValidConfigKey(key))
     {
         /* Get the first occurence */
         status = KS_GetKeyInt(ks_handle_p, (int) key, (char *) NS_INT, readValue_p, bufSize, &outLen);
-        found  = (status == KS_ERROR_NONE && outLen != 0);
+        found  = (status != KS_ERROR_KEY_NOT_FOUND);
     }
     return found;
 }
