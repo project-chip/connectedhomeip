@@ -38,8 +38,8 @@ typedef NS_ENUM(NSUInteger, MTRCommissioningFlow) {
     MTRCommissioningFlowStandard = 0, // Device automatically enters commissioning mode upon power-up
     MTRCommissioningFlowUserActionRequired = 1, // Device requires a user interaction to enter commissioning mode
     MTRCommissioningFlowCustom = 2, // Commissioning steps should be retrieved from the distributed compliance ledger
-    MTRCommissioningFlowInvalid MTR_NEWLY_DEPRECATED("Not a valid MTRCommissioningFlow value") = 3,
-};
+    MTRCommissioningFlowInvalid MTR_DEPRECATED("Not a valid MTRCommissioningFlow value", ios(16.1, 17.6), macos(13.0, 14.6), watchos(9.1, 10.6), tvos(16.1, 17.6)) = 3,
+} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
     MTROptionalQRCodeInfoTypeUnknown MTR_DEPRECATED(
@@ -65,13 +65,13 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Initializes the object with a tag and string value.
  * The tag must be in the range 0x80 - 0xFF.
  */
-- (instancetype)initWithTag:(NSNumber *)tag stringValue:(NSString *)value MTR_NEWLY_AVAILABLE;
+- (instancetype)initWithTag:(NSNumber *)tag stringValue:(NSString *)value MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
  * Initializes the object with a tag and int32 value.
  * The tag must be in the range 0x80 - 0xFF.
  */
-- (instancetype)initWithTag:(NSNumber *)tag int32Value:(int32_t)value MTR_NEWLY_AVAILABLE;
+- (instancetype)initWithTag:(NSNumber *)tag int32Value:(int32_t)value MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 @property (nonatomic, readonly, assign) MTROptionalQRCodeInfoType type MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
@@ -96,7 +96,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 @end
 
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @interface MTROptionalQRCodeInfo () <NSCopying>
 @end
 
@@ -118,7 +118,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Initializes the payload object from the provide QR Code or Manual Pairing Code string.
  * Returns nil if the payload is not valid.
  */
-- (nullable instancetype)initWithPayload:(NSString *)payload MTR_NEWLY_AVAILABLE;
+- (nullable instancetype)initWithPayload:(NSString *)payload MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 @property (nonatomic, copy) NSNumber * version;
 @property (nonatomic, copy) NSNumber * vendorID;
@@ -153,24 +153,24 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * The list of Manufacturer-specific extension elements contained in the setup code. May be empty.
  */
-@property (nonatomic, readonly, copy) NSArray<MTROptionalQRCodeInfo *> * vendorElements MTR_NEWLY_AVAILABLE;
+@property (nonatomic, readonly, copy) NSArray<MTROptionalQRCodeInfo *> * vendorElements MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
  * Returns the Manufacturer-specific extension element with the specified tag, if any.
  * The tag must be in the range 0x80 - 0xFF.
  */
-- (nullable MTROptionalQRCodeInfo *)vendorElementWithTag:(NSNumber *)tag MTR_NEWLY_AVAILABLE;
+- (nullable MTROptionalQRCodeInfo *)vendorElementWithTag:(NSNumber *)tag MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
  * Removes the extension element with the specified tag, if any.
  * The tag must be in the range 0x80 - 0xFF.
  */
-- (void)removeVendorElementWithTag:(NSNumber *)tag MTR_NEWLY_AVAILABLE;
+- (void)removeVendorElementWithTag:(NSNumber *)tag MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
  * Adds or replaces a Manufacturer-specific extension element.
  */
-- (void)addOrReplaceVendorElement:(MTROptionalQRCodeInfo *)element MTR_NEWLY_AVAILABLE;
+- (void)addOrReplaceVendorElement:(MTROptionalQRCodeInfo *)element MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
  * Generate a random Matter-valid setup PIN.
@@ -212,25 +212,25 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * - discriminator (must be long)
  * - discoveryCapabilities (not MTRDiscoveryCapabilitiesUnknown)
  */
-- (NSString * _Nullable)qrCodeString MTR_NEWLY_AVAILABLE;
+- (NSString * _Nullable)qrCodeString MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 @end
 
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @interface MTRSetupPayload () <NSCopying>
 @end
 
 @interface MTROptionalQRCodeInfo (Deprecated)
 
-- (instancetype)init MTR_NEWLY_DEPRECATED("Please use -initWithTag:...value:");
+- (instancetype)init MTR_DEPRECATED("Please use -initWithTag:...value:", ios(16.1, 17.6), macos(13.0, 14.6), watchos(9.1, 10.6), tvos(16.1, 17.6));
 
 @property (nonatomic, copy) NSNumber * infoType
     MTR_DEPRECATED("Please use type", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
-- (void)setType:(MTROptionalQRCodeInfoType)type MTR_NEWLY_DEPRECATED("MTROptionalQRCodeInfo is immutable");
-- (void)setTag:(NSNumber *)tag MTR_NEWLY_DEPRECATED("MTROptionalQRCodeInfo is immutable");
-- (void)setIntegerValue:(NSNumber *)integerValue MTR_NEWLY_DEPRECATED("MTROptionalQRCodeInfo is immutable");
-- (void)setStringValue:(NSString *)stringValue MTR_NEWLY_DEPRECATED("MTROptionalQRCodeInfo is immutable");
+- (void)setType:(MTROptionalQRCodeInfoType)type MTR_DEPRECATED("MTROptionalQRCodeInfo is immutable", ios(16.1, 17.6), macos(13.0, 14.6), watchos(9.1, 10.6), tvos(16.1, 17.6));
+- (void)setTag:(NSNumber *)tag MTR_DEPRECATED("MTROptionalQRCodeInfo is immutable", ios(16.1, 17.6), macos(13.0, 14.6), watchos(9.1, 10.6), tvos(16.1, 17.6));
+- (void)setIntegerValue:(NSNumber *)integerValue MTR_DEPRECATED("MTROptionalQRCodeInfo is immutable", ios(16.1, 17.6), macos(13.0, 14.6), watchos(9.1, 10.6), tvos(16.1, 17.6));
+- (void)setStringValue:(NSString *)stringValue MTR_DEPRECATED("MTROptionalQRCodeInfo is immutable", ios(16.1, 17.6), macos(13.0, 14.6), watchos(9.1, 10.6), tvos(16.1, 17.6));
 @end
 
 @interface MTRSetupPayload (Deprecated)
@@ -249,15 +249,13 @@ MTR_NEWLY_AVAILABLE
 
 + (MTRSetupPayload * _Nullable)setupPayloadWithOnboardingPayload:(NSString *)onboardingPayload
                                                            error:(NSError * __autoreleasing *)error
-    MTR_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
-        MTR_NEWLY_DEPRECATED("Please use -initWithPayload:");
+    MTR_DEPRECATED("Please use -initWithPayload:", ios(16.2, 17.6), macos(13.1, 14.6), watchos(9.2, 10.6), tvos(16.2, 17.6));
 
 - (NSString * _Nullable)qrCodeString:(NSError * __autoreleasing *)error
-    MTR_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
-        MTR_NEWLY_DEPRECATED("Please use -qrCodeString");
+    MTR_DEPRECATED("Please use -qrCodeString", ios(16.2, 17.6), macos(13.1, 14.6), watchos(9.2, 10.6), tvos(16.2, 17.6));
 
 - (NSArray<MTROptionalQRCodeInfo *> * _Nullable)getAllOptionalVendorData:(NSError * __autoreleasing *)error
-    MTR_NEWLY_DEPRECATED("Please use -vendorElements");
+    MTR_DEPRECATED("Please use -vendorElements", ios(16.1, 17.6), macos(13.0, 14.6), watchos(9.1, 10.6), tvos(16.1, 17.6));
 
 @end
 

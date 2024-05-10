@@ -58,7 +58,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * on the controller to avoid leaking it.
  */
 - (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
-                                      error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+                                      error:(NSError * __autoreleasing *)error MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
  * If true, the controller has not been shut down yet.
@@ -68,7 +68,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * The ID assigned to this controller at creation time.
  */
-@property (readonly, nonatomic) NSUUID * uniqueIdentifier MTR_NEWLY_AVAILABLE;
+@property (readonly, nonatomic) NSUUID * uniqueIdentifier MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
  * Return the Node ID assigned to the controller.  Will return nil if the
@@ -178,8 +178,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                                         error:(NSError * __autoreleasing *)error
     MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
-- (void)preWarmCommissioningSession MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    MTR_NEWLY_DEPRECATED("-[MTRDeviceControllerFactory preWarmCommissioningSession]");
+- (void)preWarmCommissioningSession MTR_DEPRECATED("-[MTRDeviceControllerFactory preWarmCommissioningSession]", ios(16.4, 17.6), macos(13.3, 14.6), watchos(9.4, 10.6), tvos(16.4, 17.6));
 
 /**
  * Set the Delegate for the device controller  as well as the Queue on which the Delegate callbacks will be triggered
@@ -223,20 +222,20 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * 1) There is already an endpoint defined with the given endpoint id.
  * 2) There are too many endpoints defined already.
  */
-- (BOOL)addServerEndpoint:(MTRServerEndpoint *)endpoint MTR_NEWLY_AVAILABLE;
+- (BOOL)addServerEndpoint:(MTRServerEndpoint *)endpoint MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
  * Remove the given server endpoint from this controller.  If the endpoint is
  * not attached to this controller, will just call the completion and do nothing
  * else.
  */
-- (void)removeServerEndpoint:(MTRServerEndpoint *)endpoint queue:(dispatch_queue_t)queue completion:(dispatch_block_t)completion MTR_NEWLY_AVAILABLE;
+- (void)removeServerEndpoint:(MTRServerEndpoint *)endpoint queue:(dispatch_queue_t)queue completion:(dispatch_block_t)completion MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
  * Remove the given server endpoint without being notified when the removal
  * completes.
  */
-- (void)removeServerEndpoint:(MTRServerEndpoint *)endpoint MTR_NEWLY_AVAILABLE;
+- (void)removeServerEndpoint:(MTRServerEndpoint *)endpoint MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
  * Compute a PASE verifier for the desired setup passcode.
