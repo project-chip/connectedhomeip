@@ -39,15 +39,15 @@ void OnSoftwareFaultEventHandler(const char * faultRecordString)
 
     if (DeviceLayer::PlatformMgrImpl().IsCurrentTask())
     {
-        softwareFault.name.SetValue(CharSpan::fromCharString("Matter"));
+        softwareFault.name.SetValue("Matter"_span);
     }
     else if (DeviceLayer::ThreadStackMgrImpl().IsCurrentTask())
     {
-        softwareFault.name.SetValue(CharSpan::fromCharString("Thread"));
+        softwareFault.name.SetValue("Thread"_span);
     }
     else
     {
-        softwareFault.name.SetValue(CharSpan::fromCharString("App"));
+        softwareFault.name.SetValue("App"_span);
     }
 
     softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(faultRecordString), strlen(faultRecordString)));
