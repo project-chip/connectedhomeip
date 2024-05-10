@@ -1163,12 +1163,16 @@ static NSString * const sAttributesKey = @"attributes";
     }
 }
 
-- (void)_handleAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
-{
+- (void)_handleAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription {
     std::lock_guard lock(_lock);
 
     // _getAttributesToReportWithReportedValues will log attribute paths reported
-    [self _reportAttributes:[self _getAttributesToReportWithReportedValues:attributeReport]];
+    [self _reportAttributes:[self _getAttributesToReportWithReportedValues:attributeReport fromSubscription:isFromSubscription]];
+}
+
+- (void)_handleAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
+{
+    [self _handleAttributeReport:attributeReport fromSubscription:NO];
 }
 
 #ifdef DEBUG
@@ -1378,11 +1382,11 @@ static NSString * const sAttributesKey = @"attributes";
     return clusterData.attributes[path.attribute];
 }
 
-- (void)_setCachedAttributeValue:(MTRDeviceDataValueDictionary _Nullable)value forPath:(MTRAttributePath *)path
+- (void)_setCachedAttributeValue:(MTRDeviceDataValueDictionary _Nullable)value forPath:(MTRAttributePath *)path fromSubscription:(BOOL)isFromSubscription
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
-    // We need an actual MTRClusterPath, not a subsclass, to do _clusterDataForPath.
+    // We need an actual MTRClusterPath, not a subclass, to do _clusterDataForPath.
     auto * clusterPath = [MTRClusterPath clusterPathWithEndpointID:path.endpoint clusterID:path.cluster];
 
     MTRDeviceClusterData * clusterData = [self _clusterDataForPath:clusterPath];
@@ -1396,6 +1400,16 @@ static NSString * const sAttributesKey = @"attributes";
     }
 
     [clusterData storeValue:value forAttribute:path.attribute];
+    
+    if (value != nil
+        && isFromSubscription
+        && !_receivingPrimingReport
+        && AttributeHasChangesOmittedQuality(path)) {
+        // do not cache new values for Changes Omitted Quality attributes unless
+        // they're part of a Priming Report or from a read response.
+        // (removals are OK)
+        return;
+    }
 
     if (_clusterDataToPersist == nil) {
         _clusterDataToPersist = [NSMutableDictionary dictionary];
@@ -1521,7 +1535,7 @@ static NSString * const sAttributesKey = @"attributes";
                            MTR_LOG_INFO("%@ got attribute report %@", self, value);
                            dispatch_async(self.queue, ^{
                                // OnAttributeData
-                               [self _handleAttributeReport:value];
+                               [self _handleAttributeReport:value fromSubscription:YES];
 #ifdef DEBUG
                                self->_unitTestAttributesReportedSinceLastCheck += value.count;
 #endif
@@ -2523,7 +2537,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 }
 
 // assume lock is held
-- (NSArray *)_getAttributesToReportWithReportedValues:(NSArray<NSDictionary<NSString *, id> *> *)reportedAttributeValues
+- (NSArray *)_getAttributesToReportWithReportedValues:(NSArray<NSDictionary<NSString *, id> *> *)reportedAttributeValues fromSubscription:(BOOL)isFromSubscription
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
@@ -2557,7 +2571,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 _expectedValueCache[attributePath], previousValue);
             _expectedValueCache[attributePath] = nil;
             // TODO: Is this clearing business really what we want?
-            [self _setCachedAttributeValue:nil forPath:attributePath];
+            [self _setCachedAttributeValue:nil forPath:attributePath fromSubscription:isFromSubscription];
         } else {
             // First separate data version and restore data value to a form without data version
             NSNumber * dataVersion = attributeDataValue[MTRDataVersionKey];
@@ -2575,7 +2589,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                     [self _noteDataVersion:dataVersion forClusterPath:clusterPath];
                 }
 
-                [self _setCachedAttributeValue:attributeDataValue forPath:attributePath];
+                [self _setCachedAttributeValue:attributeDataValue forPath:attributePath fromSubscription:isFromSubscription];
                 if (!_deviceConfigurationChanged) {
                     _deviceConfigurationChanged = [self _attributeAffectsDeviceConfiguration:attributePath];
                     if (_deviceConfigurationChanged) {
