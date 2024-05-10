@@ -86,8 +86,8 @@ static void HandleNodeBrowse(void * context, DnssdService * services, size_t ser
         auto & ipAddress = services[i].mAddress;
 
         // Check that this is not operational browse result and if SRV, TXT and AAAA records were received in DNS responses
-        if (strncmp(services[i].mType, kOperationalServiceName, sizeof(kOperationalServiceName)) != 0
-            && (strlen(services[i].mHostName) == 0 || services[i].mTextEntrySize == 0 || !ipAddress.has_value()))
+        if (strncmp(services[i].mType, kOperationalServiceName, sizeof(kOperationalServiceName)) != 0 &&
+            (strlen(services[i].mHostName) == 0 || services[i].mTextEntrySize == 0 || !ipAddress.has_value()))
         {
             ChipDnssdResolve(&services[i], services[i].mInterface, HandleNodeResolve, context);
         }

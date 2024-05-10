@@ -137,7 +137,7 @@ private:
         chip::System::Clock::Timeout mNextRetryDelay = chip::System::Clock::Seconds16(1);
         chip::System::Clock::Timeout mNextQueryDelay = chip::System::Clock::Seconds16(60);
         std::atomic_bool mStopped{ false };
-        AvahiServiceBrowser *mBrowser;
+        AvahiServiceBrowser * mBrowser;
     };
 
     struct ResolveContext

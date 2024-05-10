@@ -775,7 +775,7 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
 
             // Clear retry info and services.
             context->mNextRetryDelay = chip::System::Clock::Seconds16(1);
-            context->mBrowseRetries = 0;
+            context->mBrowseRetries  = 0;
             context->mServices.clear();
             // Hand the ownership of the context over to the timer. It will either schedule a new browse on the context,
             // triggering this function, or it will delete and not reschedule (if stopped).
@@ -810,7 +810,7 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
                 service.mInterface = static_cast<chip::Inet::InterfaceId>(interface);
             }
             service.mType[kDnssdTypeMaxSize] = 0;
-            service.mTtlSeconds = 0;
+            service.mTtlSeconds              = 0;
             context->mCallback(context->mContext, &service, 1, false, CHIP_NO_ERROR);
         }
 
