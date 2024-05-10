@@ -148,19 +148,26 @@ static dispatch_queue_t sSharedResolverQueue;
             return;
         }
         nw_connection_set_queue(connection, sSharedResolverQueue);
+        mtr_weakify(self);
         nw_connection_set_path_changed_handler(connection, ^(nw_path_t _Nonnull path) {
-            nw_path_status_t status = nw_path_get_status(path);
-            if (status == nw_path_status_satisfied) {
-                MTR_LOG_INFO("%@ path is satisfied", self);
-                std::lock_guard lock(sConnectivityMonitorLock);
-                [self _callHandler];
+            mtr_strongify(self);
+            if (self) {
+                nw_path_status_t status = nw_path_get_status(path);
+                if (status == nw_path_status_satisfied) {
+                    MTR_LOG_INFO("%@ path is satisfied", self);
+                    std::lock_guard lock(sConnectivityMonitorLock);
+                    [self _callHandler];
+                }
             }
         });
         nw_connection_set_viability_changed_handler(connection, ^(bool viable) {
-            if (viable) {
-                std::lock_guard lock(sConnectivityMonitorLock);
-                MTR_LOG_INFO("%@ connectivity now viable", self);
-                [self _callHandler];
+            mtr_strongify(self);
+            if (self) {
+                if (viable) {
+                    std::lock_guard lock(sConnectivityMonitorLock);
+                    MTR_LOG_INFO("%@ connectivity now viable", self);
+                    [self _callHandler];
+                }
             }
         });
         nw_connection_start(connection);

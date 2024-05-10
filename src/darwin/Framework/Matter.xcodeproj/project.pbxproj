@@ -109,6 +109,8 @@
 		3D0C484B29DA4FA0006D811F /* MTRErrorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D0C484A29DA4FA0006D811F /* MTRErrorTests.m */; };
 		3D3928D72BBCEA3D00CDEBB2 /* MTRAvailabilityTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D3928D62BBCEA3D00CDEBB2 /* MTRAvailabilityTests.m */; settings = {COMPILER_FLAGS = "-UMTR_NO_AVAILABILITY -Wno-unguarded-availability-new"; }; };
 		3D4733AF2BDF1B80003DC19B /* MTRSetupPayloadTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D4733AE2BDF1B80003DC19B /* MTRSetupPayloadTests.m */; };
+		3D4733B32BE2D1DA003DC19B /* MTRUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D4733B22BE2D1CF003DC19B /* MTRUtilities.h */; };
+		3D4733B52BE2D3D7003DC19B /* MTRUtilities.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3D4733B42BE2D3D1003DC19B /* MTRUtilities.mm */; };
 		3D69868529383096007314E7 /* com.csa.matter.plist in Copy Logging Preferences */ = {isa = PBXBuildFile; fileRef = 3D69868029382EF4007314E7 /* com.csa.matter.plist */; };
 		3D843711294977000070D20A /* NSStringSpanConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D84370E294977000070D20A /* NSStringSpanConversion.h */; };
 		3D843712294977000070D20A /* MTRCallbackBridgeBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D84370F294977000070D20A /* MTRCallbackBridgeBase.h */; };
@@ -504,6 +506,8 @@
 		3D0C484A29DA4FA0006D811F /* MTRErrorTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRErrorTests.m; sourceTree = "<group>"; };
 		3D3928D62BBCEA3D00CDEBB2 /* MTRAvailabilityTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRAvailabilityTests.m; sourceTree = "<group>"; };
 		3D4733AE2BDF1B80003DC19B /* MTRSetupPayloadTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRSetupPayloadTests.m; sourceTree = "<group>"; };
+		3D4733B22BE2D1CF003DC19B /* MTRUtilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRUtilities.h; sourceTree = "<group>"; };
+		3D4733B42BE2D3D1003DC19B /* MTRUtilities.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRUtilities.mm; sourceTree = "<group>"; };
 		3D69868029382EF4007314E7 /* com.csa.matter.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = com.csa.matter.plist; sourceTree = "<group>"; };
 		3D84370E294977000070D20A /* NSStringSpanConversion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSStringSpanConversion.h; sourceTree = "<group>"; };
 		3D84370F294977000070D20A /* MTRCallbackBridgeBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRCallbackBridgeBase.h; sourceTree = "<group>"; };
@@ -1363,6 +1367,8 @@
 				997DED152695343400975E97 /* MTRThreadOperationalDataset.mm */,
 				51C659D72BA3787500C54922 /* MTRTimeUtils.h */,
 				51C659D82BA3787500C54922 /* MTRTimeUtils.mm */,
+				3D4733B22BE2D1CF003DC19B /* MTRUtilities.h */,
+				3D4733B42BE2D3D1003DC19B /* MTRUtilities.mm */,
 				3D843710294977000070D20A /* NSDataSpanConversion.h */,
 				3D84370E294977000070D20A /* NSStringSpanConversion.h */,
 				5117DD3729A931AE00FFA1AA /* MTROperationalBrowser.h */,
@@ -1651,6 +1657,7 @@
 				514C7A022B64223400DD6D7B /* MTRServerEndpoint_Internal.h in Headers */,
 				511913FC28C100EF009235E9 /* MTRBaseSubscriptionCallback.h in Headers */,
 				51565CB12A7AD77600469F18 /* MTRDeviceControllerDataStore.h in Headers */,
+				3D4733B32BE2D1DA003DC19B /* MTRUtilities.h in Headers */,
 				3D843713294977000070D20A /* NSDataSpanConversion.h in Headers */,
 				991DC08B247704DC00C13860 /* MTRLogging_Internal.h in Headers */,
 				51FE723F2ACDEF3E00437032 /* MTRCommandPayloadExtensions_Internal.h in Headers */,
@@ -1903,6 +1910,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3D4733B52BE2D3D7003DC19B /* MTRUtilities.mm in Sources */,
 				2C8C8FC2253E0C2100797F05 /* MTRPersistentStorageDelegateBridge.mm in Sources */,
 				99AECC802798A57F00B6355B /* MTRCommissioningParameters.mm in Sources */,
 				2CB7163C252E8A7C0026E2BB /* MTRDeviceControllerDelegateBridge.mm in Sources */,
