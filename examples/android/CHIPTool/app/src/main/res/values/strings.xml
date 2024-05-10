@@ -10,8 +10,9 @@
     <string name="chip_device_info_product_id_label">Product ID:</string>
     <string name="chip_device_info_discriminator_label">Discriminator:</string>
     <string name="chip_device_info_setup_code_label">Setup PIN Code:</string>
+    <string name="chip_device_info_serial_number_label">Serial Number:</string>
+    <string name="chip_device_info_discovery_capabilities_label">Discovery capabilities:</string>
     <string name="chip_device_info_optional_vendor_tags_label">Optional Vendor tags:</string>
-    <string name="chip_device_info_discovery_capabilities_text">Discovery capabilities: %1s</string>
     <string name="camera_permission_missing_alert_title">Camera permission missing</string>
     <string name="camera_permission_missing_alert_subtitle">Camera permission required to be able to scan the QR code.</string>
     <string name="camera_permission_missing_alert_try_again">Try again</string>
@@ -206,6 +207,9 @@
     <string name="provision_custom_flow_btn_text">Provision CHIP device with Custom Flow</string>
     <string name="chip_device_info_commissioning_flow_label">Commissioning Flow:</string>
     <string name="chip_device_info_custom_flow_btn_text">Read from Ledger</string>
+    <string name="chip_device_info_show_qr_code_btn_text">Show QR Code Value</string>
+    <string name="chip_device_info_show_qr_code_uri_btn_text">Show QR Code</string>
+    <string name="chip_device_info_qrcode_uri">https://project-chip.github.io/connectedhomeip/qrcode.html?data=%1$s</string>
     <string name="chip_ledger_info_title">Device Model Info</string>
     <string name="chip_ledger_info_commissioning_flow_url_label">Commissioning Url:</string>
     <string name="chip_ledger_info_commissioning_flow_url_text">Loading...</string>
