@@ -35,7 +35,7 @@ namespace Internal {
 /// max-sized data that ember is aware of.
 extern MutableByteSpan gEmberAttributeIOBufferSpan;
 
-/// Maps an attribute type that is not an integer but can be represented as an integer to the 
+/// Maps an attribute type that is not an integer but can be represented as an integer to the
 /// corresponding basic int(8|16|32|64)(s|u) type
 ///
 /// For example:
