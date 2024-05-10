@@ -1614,7 +1614,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
 // TODO: This might want to go in a separate test file, with some shared setup
 // across multiple tests, maybe.  Would need to factor out
 // startControllerWithRootKeys into a test helper.
-- (void)testControllerServer
+- (void)test011_TestControllerServer
 {
 #ifdef DEBUG
     // Force our controllers to only advertise on localhost, to avoid DNS-SD
@@ -2273,7 +2273,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     XCTAssertFalse([controller isRunning]);
 }
 
-- (void)testSubscriptionPool
+- (void)test012_TestSubscriptionPool
 {
     // QRCodes generated for discriminators 1111~1115 and passcodes 1001~1005
     NSDictionary<NSNumber *, NSString *> * deviceOnboardingPayloads = @{
@@ -2296,6 +2296,981 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
 
     [self doTestSubscriptionPoolWithSize:1 deviceOnboardingPayloads:deviceOnboardingPayloads];
     [self doTestSubscriptionPoolWithSize:2 deviceOnboardingPayloads:deviceOnboardingPayloads];
+}
+
+- (void)test013_TestDataStoreMTRDeviceDoNotPruneOrphanedEndpoints
+{
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type queue = dispatch_get_main_queue();
+
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    NSNumber * nodeID = @(123);
+    NSNumber * fabricID = @(456);
+
+    NSError * error;
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+    MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:fabricID
+                                                                  nodeID:nodeID
+                                                                 storage:storageDelegate
+                                                                   error:&error
+                                                       certificateIssuer:&certificateIssuer];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    XCTAssertEqualObjects(controller.controllerNodeID, nodeID);
+
+    // Now commission the device, to test that that works.
+    NSNumber * deviceID = @(17);
+    certificateIssuer.nextNodeID = deviceID;
+    [self commissionWithController:controller newNodeID:deviceID];
+
+    // We should have established CASE using our operational key.
+    XCTAssertEqual(operationalKeys.signatureCount, 1);
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:deviceID controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up"];
+    
+    __block unsigned attributeReportsReceived = 0;
+    __block NSNumber * dataVersionForPartsList;
+    __block NSNumber * rootEndpoint = @0;
+    __block NSNumber * notToBeDeletedEndpoint1 = @1;
+    __block NSNumber * notToBeDeletedEndpoint2 = @2;
+    __block NSNumber * toBeAddedEndpoint = @3;
+
+    // This test will do the following -
+    // 1. Get the data version and attribute value of the parts list for endpoint 0 to inject a fake report with an added endpoint so we do
+    //    not prune any endpoints or clusters.
+    // 2. The data store is populated with cluster index and cluster data for endpoints 0, 1 and 2 initially.
+    //    Also _persistedClusters and _persistedClusterData has the cluster paths for all clusters in the cluster index for each endpoint.
+    // 3. After the fake attribute report is injected, make sure the data store is still populated with cluster index and cluster data for endpoints 0, 1 and 2.
+    //    Also _persistedClusters and _persistedClusterData has the cluster paths for all clusters in the cluster index.
+    __block NSMutableArray * testClusterDataValueForPartsList;
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
+        attributeReportsReceived += attributeReport.count;
+        XCTAssert(attributeReportsReceived > 0);
+
+        for (NSDictionary<NSString *, id> * attributeDict in attributeReport) {
+            MTRAttributePath * attributePath = attributeDict[MTRAttributePathKey];
+            XCTAssertNotNil(attributePath);
+            
+            if ([attributePath.endpoint isEqualToNumber:rootEndpoint] && attributePath.cluster.unsignedLongValue == MTRClusterIDTypeDescriptorID && attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterDescriptorAttributePartsListID) {
+                NSDictionary * data = attributeDict[MTRDataKey];
+                XCTAssertNotNil(data);
+                dataVersionForPartsList = data[MTRDataVersionKey];
+                id dataValue = data[MTRValueKey];
+                XCTAssertNotNil(dataValue);
+                testClusterDataValueForPartsList = [dataValue mutableCopy];
+            }
+        }
+    };
+    
+    __block NSMutableArray<NSArray<NSNumber *> *> * initialClusterIndex = [[NSMutableArray alloc]init];
+    
+    // TODO: Build the test endpoints from the attribute data value
+    __block NSArray<NSNumber *> * testEndpoints = @[ rootEndpoint, notToBeDeletedEndpoint1, notToBeDeletedEndpoint2];
+    delegate.onReportEnd = ^{
+        XCTAssertNotNil(dataVersionForPartsList);
+        XCTAssertNotNil(testClusterDataValueForPartsList);
+        
+        // Verify that the data store is populated with cluster index and cluster data for endpoints 0, 1 and 2.
+        // Also _persistedClusters and _persistedClusterData has the cluster paths for all clusters in the cluster index.
+        dispatch_sync(self->_storageQueue, ^{
+            XCTAssertTrue([[controller.controllerDataStore _fetchEndpointIndexForNodeID:deviceID] isEqualToArray:testEndpoints]);
+            for (NSNumber * endpoint in testEndpoints)
+            {
+                [initialClusterIndex insertObject:[controller.controllerDataStore _fetchClusterIndexForNodeID:deviceID endpointID:endpoint] atIndex:endpoint.unsignedShortValue];
+                XCTAssertNotNil(initialClusterIndex);
+                for (NSNumber * cluster in [initialClusterIndex objectAtIndex:endpoint.unsignedShortValue])
+                {
+                    XCTAssertNotNil([controller.controllerDataStore _fetchClusterDataForNodeID:deviceID endpointID:endpoint clusterID:cluster]);
+                    MTRClusterPath * path = [MTRClusterPath clusterPathWithEndpointID:endpoint clusterID:cluster];
+                    XCTAssertTrue([device _persistedClusterContains:path]);
+                    XCTAssertNotNil([device _getPersistedClusterDataForPath:path]);
+                }
+            }
+        });
+        [subscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+    
+    // Inject a fake attribute report adding endpoint 3 to the parts list at endpoint 0.
+    dataVersionForPartsList = [NSNumber numberWithUnsignedLongLong:(dataVersionForPartsList.unsignedLongLongValue + 1)];
+    [testClusterDataValueForPartsList addObject:@{
+        MTRDataKey : @ {
+            MTRTypeKey : MTRUnsignedIntegerValueType,
+            MTRValueKey : toBeAddedEndpoint,
+        }
+    }];
+
+    NSArray<NSDictionary<NSString *, id> *> * attributeReport = @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:rootEndpoint clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributePartsListID)],
+        MTRDataKey : @ {
+            MTRDataVersionKey : dataVersionForPartsList,
+            MTRTypeKey : MTRArrayValueType,
+            MTRValueKey : testClusterDataValueForPartsList,
+        }
+    } ];
+
+    XCTestExpectation * attributeDataReceivedExpectation = [self expectationWithDescription:@"Injected Attribute data received"];
+    XCTestExpectation * reportEndExpectation = [self expectationWithDescription:@"Injected Attribute data report ended"];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
+        attributeReportsReceived += attributeReport.count;
+        XCTAssert(attributeReportsReceived > 0);
+        [attributeDataReceivedExpectation fulfill];
+    };
+    
+    delegate.onReportEnd = ^{
+
+        // Verify that the data store is still populated with cluster index and cluster data for endpoints 0, 1 and 2.
+        // Also _persistedClusters and _persistedClusterData has the cluster paths for all clusters in the cluster index.
+        dispatch_sync(self->_storageQueue, ^{
+            XCTAssertTrue([[controller.controllerDataStore _fetchEndpointIndexForNodeID:deviceID] isEqualToArray:testEndpoints]);
+            for (NSNumber * endpoint in testEndpoints)
+            {
+                XCTAssertNotNil(initialClusterIndex);
+                for (NSNumber * cluster in [initialClusterIndex objectAtIndex:endpoint.unsignedShortValue])
+                {
+                    XCTAssertNotNil([controller.controllerDataStore _fetchClusterDataForNodeID:deviceID endpointID:endpoint clusterID:cluster]);
+                    MTRClusterPath * path = [MTRClusterPath clusterPathWithEndpointID:endpoint clusterID:cluster];
+                    XCTAssertTrue([device _persistedClusterContains:path]);
+                    XCTAssertNotNil([device _getPersistedClusterDataForPath:path]);
+                }
+            }
+        });
+        [reportEndExpectation fulfill];
+    };
+    
+    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
+    
+    [self waitForExpectations:@[ attributeDataReceivedExpectation, reportEndExpectation] timeout:60];
+    
+    [controller.controllerDataStore clearAllStoredClusterData];
+    NSDictionary * storedClusterDataAfterClear = [controller.controllerDataStore getStoredClusterDataForNodeID:deviceID];
+    XCTAssertEqual(storedClusterDataAfterClear.count, 0);
+
+    [controller removeDevice:device];
+    // Reset our commissionee.
+    __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
+    ResetCommissionee(baseDevice, queue, self, kTimeoutInSeconds);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+}
+
+- (void)test014_TestDataStoreMTRDevicePruneOrphanedEndpoints
+{
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type queue = dispatch_get_main_queue();
+
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    NSNumber * nodeID = @(123);
+    NSNumber * fabricID = @(456);
+
+    NSError * error;
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+    MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:fabricID
+                                                                  nodeID:nodeID
+                                                                 storage:storageDelegate
+                                                                   error:&error
+                                                       certificateIssuer:&certificateIssuer];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    XCTAssertEqualObjects(controller.controllerNodeID, nodeID);
+
+    // Now commission the device, to test that that works.
+    NSNumber * deviceID = @(17);
+    certificateIssuer.nextNodeID = deviceID;
+    [self commissionWithController:controller newNodeID:deviceID];
+
+    // We should have established CASE using our operational key.
+    XCTAssertEqual(operationalKeys.signatureCount, 1);
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:deviceID controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up"];
+    
+    __block unsigned attributeReportsReceived = 0;
+    __block NSNumber * dataVersionForPartsList;
+    __block NSNumber * rootEndpoint = @0;
+    __block NSNumber * notToBeDeletedEndpoint = @1;
+    __block NSNumber * toBeDeletedEndpoint = @2;
+
+    // This test will do the following -
+    // 1. Get the data version and attribute value of the parts list for endpoint 0 to inject a fake report with a removed endpoint (endpoint 2) so we
+    //    prune endpoint 2 and all its clusters.
+    // 2. The data store is populated with cluster index and cluster data for endpoints 0, 1 and 2 initially.
+    //    Also _persistedClusters and _persistedClusterData has the cluster paths for all clusters in the cluster index for each endpoint.
+    // 3. After the fake attribute report is injected, make sure the data store is still populated with cluster index and cluster data for endpoints 0 and 1 but not for endpoint 2.
+    //    Also _persistedClusters and _persistedClusterData has the cluster paths for all clusters in the cluster index for endpoints 0 and 1 but not for endpoint 2.
+    __block NSMutableArray * testClusterDataValueForPartsList;
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
+        attributeReportsReceived += attributeReport.count;
+        XCTAssert(attributeReportsReceived > 0);
+
+        for (NSDictionary<NSString *, id> * attributeDict in attributeReport) {
+            MTRAttributePath * attributePath = attributeDict[MTRAttributePathKey];
+            XCTAssertNotNil(attributePath);
+            
+            if ([attributePath.endpoint isEqualToNumber:rootEndpoint] && attributePath.cluster.unsignedLongValue == MTRClusterIDTypeDescriptorID && attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterDescriptorAttributePartsListID) {
+                NSDictionary * data = attributeDict[MTRDataKey];
+                XCTAssertNotNil(data);
+                dataVersionForPartsList = data[MTRDataVersionKey];
+                id dataValue = data[MTRValueKey];
+                XCTAssertNotNil(dataValue);
+                testClusterDataValueForPartsList = [dataValue mutableCopy];
+            }
+        }
+    };
+    
+    __block NSMutableArray<NSArray<NSNumber *> *> * initialClusterIndex = [[NSMutableArray alloc]init];
+    
+    // TODO: Build the test endpoints from the attribute data value
+    __block NSArray<NSNumber *> * testEndpoints = @[ rootEndpoint, notToBeDeletedEndpoint, toBeDeletedEndpoint];
+    delegate.onReportEnd = ^{
+        XCTAssertNotNil(dataVersionForPartsList);
+        XCTAssertNotNil(testClusterDataValueForPartsList);
+                
+        // Verify that the data store is populated with cluster index and cluster data for endpoints 0, 1 and 2.
+        // Also _persistedClusters and _persistedClusterData has the cluster paths for all clusters in the cluster index.
+        dispatch_sync(self->_storageQueue, ^{
+            XCTAssertTrue([[controller.controllerDataStore _fetchEndpointIndexForNodeID:deviceID] isEqualToArray:testEndpoints]);
+            for (NSNumber * endpoint in testEndpoints)
+            {
+                [initialClusterIndex insertObject:[controller.controllerDataStore _fetchClusterIndexForNodeID:deviceID endpointID:endpoint] atIndex:endpoint.unsignedShortValue];
+                XCTAssertNotNil(initialClusterIndex);
+                for (NSNumber * cluster in [initialClusterIndex objectAtIndex:endpoint.unsignedShortValue])
+                {
+                    XCTAssertNotNil([controller.controllerDataStore _fetchClusterDataForNodeID:deviceID endpointID:endpoint clusterID:cluster]);
+                    MTRClusterPath * path = [MTRClusterPath clusterPathWithEndpointID:endpoint clusterID:cluster];
+                    XCTAssertTrue([device _persistedClusterContains:path]);
+                    XCTAssertNotNil([device _getPersistedClusterDataForPath:path]);
+                }
+            }
+        });
+        [subscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+    
+    // Inject a fake attribute report deleting endpoint 2 from the parts list at the root endpoint.
+    dataVersionForPartsList = [NSNumber numberWithUnsignedLongLong:(dataVersionForPartsList.unsignedLongLongValue + 1)];
+    // TODO: try to delete entries from the actual data received in the initila attribute report to make the neunsignedIntegerArrayValue
+    NSArray<NSDictionary<NSString *, id> *> * unsignedIntegerArrayValue = @[
+        @{
+            MTRDataKey : @ {
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : notToBeDeletedEndpoint,
+            }
+        },
+     ];
+
+    NSArray<NSDictionary<NSString *, id> *> * attributeReport = @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:rootEndpoint clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributePartsListID)],
+        MTRDataKey : @ {
+            MTRDataVersionKey : dataVersionForPartsList,
+            MTRTypeKey : MTRArrayValueType,
+            MTRValueKey : unsignedIntegerArrayValue,
+        }
+    } ];
+
+    XCTestExpectation * attributeDataReceivedExpectation = [self expectationWithDescription:@"Injected Attribute data received"];
+    XCTestExpectation * reportEndExpectation = [self expectationWithDescription:@"Injected Attribute data report ended"];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
+        attributeReportsReceived += attributeReport.count;
+        XCTAssert(attributeReportsReceived > 0);
+        [attributeDataReceivedExpectation fulfill];
+    };
+    
+    delegate.onReportEnd = ^{
+        // Verify that the data store is still populated with cluster index and cluster data for endpoints 0 and 1 but not for endpoint 2.
+        // Also _persistedClusters and _persistedClusterData has the cluster paths for all clusters in the cluster index for endpoints 0 and 1 but not endpoint 2.
+        NSMutableArray * newTestEndpoints = [testEndpoints mutableCopy];
+        [newTestEndpoints removeObject:toBeDeletedEndpoint];
+        dispatch_sync(self->_storageQueue, ^{
+            XCTAssertTrue([[controller.controllerDataStore _fetchEndpointIndexForNodeID:deviceID] isEqualToArray:newTestEndpoints]);
+            for (NSNumber * endpoint in testEndpoints)
+            {
+                XCTAssertNotNil(initialClusterIndex);
+                for (NSNumber * cluster in [initialClusterIndex objectAtIndex:endpoint.unsignedShortValue])
+                {
+                    MTRClusterPath * path = [MTRClusterPath clusterPathWithEndpointID:endpoint clusterID:cluster];
+                    if (![endpoint isEqualToNumber:toBeDeletedEndpoint])
+                    {
+                        XCTAssertNotNil([controller.controllerDataStore _fetchClusterDataForNodeID:deviceID endpointID:endpoint clusterID:cluster]);
+                        XCTAssertTrue([device _persistedClusterContains:path]);
+                        XCTAssertNotNil([device _getPersistedClusterDataForPath:path]);
+                    } else
+                    {
+                        XCTAssertNil([controller.controllerDataStore _fetchClusterDataForNodeID:deviceID endpointID:endpoint clusterID:cluster]);
+                        XCTAssertFalse([device _persistedClusterContains:path]);
+                        XCTAssertNil([device _getPersistedClusterDataForPath:path]);
+                    }
+                }
+            }
+        });
+        [reportEndExpectation fulfill];
+    };
+    
+    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
+    
+    [self waitForExpectations:@[ attributeDataReceivedExpectation, reportEndExpectation] timeout:60];
+    
+    [controller.controllerDataStore clearAllStoredClusterData];
+    NSDictionary * storedClusterDataAfterClear = [controller.controllerDataStore getStoredClusterDataForNodeID:deviceID];
+    XCTAssertEqual(storedClusterDataAfterClear.count, 0);
+
+    [controller removeDevice:device];
+    // Reset our commissionee.
+    __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
+    ResetCommissionee(baseDevice, queue, self, kTimeoutInSeconds);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+}
+
+- (void)test015_TestDataStoreMTRDeviceDoNotPruneOrphanedClusters
+{
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type queue = dispatch_get_main_queue();
+
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    NSNumber * nodeID = @(123);
+    NSNumber * fabricID = @(456);
+
+    NSError * error;
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+    MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:fabricID
+                                                                  nodeID:nodeID
+                                                                 storage:storageDelegate
+                                                                   error:&error
+                                                       certificateIssuer:&certificateIssuer];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    XCTAssertEqualObjects(controller.controllerNodeID, nodeID);
+
+    // Now commission the device, to test that that works.
+    NSNumber * deviceID = @(17);
+    certificateIssuer.nextNodeID = deviceID;
+    [self commissionWithController:controller newNodeID:deviceID];
+
+    // We should have established CASE using our operational key.
+    XCTAssertEqual(operationalKeys.signatureCount, 1);
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:deviceID controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up"];
+    
+    __block unsigned attributeReportsReceived = 0;
+    __block NSNumber * dataVersionForServerList;
+    __block NSNumber * testEndpoint = @1;
+
+    // This test will do the following -
+    // 1. Get the data version and attribute value of the server list for endpoint 1 to inject a fake report with a cluster added to the server list.
+    // 2. The data store is populated with cluster index and cluster data for endpoints 0, 1 and 2 initially.
+    //    Also _persistedClusters and _persistedClusterData has the cluster paths for all clusters in the cluster index for each endpoint.
+    // 3. After the fake attribute report is injected, make sure the data store is still populated with cluster index and cluster data for endpoints 0, 1 and 2. Nothing was deleted.
+    //    Also _persistedClusters and _persistedClusterData has the cluster paths for all clusters in the cluster index for endpoints 0, 1 and 2.
+    __block NSMutableArray * testClusterDataValue;
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
+        attributeReportsReceived += attributeReport.count;
+        XCTAssert(attributeReportsReceived > 0);
+
+        for (NSDictionary<NSString *, id> * attributeDict in attributeReport) {
+            MTRAttributePath * attributePath = attributeDict[MTRAttributePathKey];
+            XCTAssertNotNil(attributePath);
+            
+            if ([attributePath.endpoint isEqualToNumber:testEndpoint] && attributePath.cluster.unsignedLongValue == MTRClusterIDTypeDescriptorID && attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterDescriptorAttributeServerListID) {
+                NSDictionary * data = attributeDict[MTRDataKey];
+                XCTAssertNotNil(data);
+                dataVersionForServerList = data[MTRDataVersionKey];
+                id dataValue = data[MTRValueKey];
+                XCTAssertNotNil(dataValue);
+                testClusterDataValue = [dataValue mutableCopy];
+            }
+        }
+    };
+    
+    __block NSMutableArray<NSArray<NSNumber *> *> * initialClusterIndex = [[NSMutableArray alloc]init];
+    
+    // TODO: Build the test endpoints from the attribute data value
+    __block NSArray<NSNumber *> * testEndpoints = @[ @0, testEndpoint, @2];
+    delegate.onReportEnd = ^{
+        XCTAssertNotNil(dataVersionForServerList);
+        XCTAssertNotNil(testClusterDataValue);
+
+        // Verify that the data store is populated with cluster index and cluster data for endpoints 0, 1 and 2.
+        // Also _persistedClusters and _persistedClusterData has the cluster paths for all clusters in the cluster index.
+        dispatch_sync(self->_storageQueue, ^{
+            XCTAssertTrue([[controller.controllerDataStore _fetchEndpointIndexForNodeID:deviceID] isEqualToArray:testEndpoints]);
+            for (NSNumber * endpoint in testEndpoints)
+            {
+                [initialClusterIndex insertObject:[controller.controllerDataStore _fetchClusterIndexForNodeID:deviceID endpointID:endpoint] atIndex:endpoint.unsignedShortValue];
+                XCTAssertNotNil(initialClusterIndex);
+                for (NSNumber * cluster in [initialClusterIndex objectAtIndex:endpoint.unsignedShortValue])
+                {
+                    XCTAssertNotNil([controller.controllerDataStore _fetchClusterDataForNodeID:deviceID endpointID:endpoint clusterID:cluster]);
+                    MTRClusterPath * path = [MTRClusterPath clusterPathWithEndpointID:endpoint clusterID:cluster];
+                    XCTAssertTrue([device _persistedClusterContains:path]);
+                    XCTAssertNotNil([device _getPersistedClusterDataForPath:path]);
+                }
+            }
+        });
+        [subscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+    
+    // Inject a fake attribute report adding a cluster to endpoint 1 to the server list.
+    dataVersionForServerList = [NSNumber numberWithUnsignedLongLong:(dataVersionForServerList.unsignedLongLongValue + 1)];
+    [testClusterDataValue addObject: @{
+        MTRDataKey : @ {
+            MTRTypeKey : MTRUnsignedIntegerValueType,
+            MTRValueKey : @(5),
+        }
+     }];
+
+    NSArray<NSDictionary<NSString *, id> *> * attributeReport = @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:testEndpoint clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeServerListID)],
+        MTRDataKey : @ {
+            MTRDataVersionKey : dataVersionForServerList,
+            MTRTypeKey : MTRArrayValueType,
+            MTRValueKey : testClusterDataValue,
+        }
+    } ];
+
+    XCTestExpectation * attributeDataReceivedExpectation = [self expectationWithDescription:@"Injected Attribute data received"];
+    XCTestExpectation * reportEndExpectation = [self expectationWithDescription:@"Injected Attribute data report ended"];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
+        attributeReportsReceived += attributeReport.count;
+        XCTAssert(attributeReportsReceived > 0);
+        [attributeDataReceivedExpectation fulfill];
+    };
+    
+    delegate.onReportEnd = ^{
+        // Verify that the data store is populated with cluster index and cluster data for endpoints 0, 1 and 2.
+        // Also _persistedClusters and _persistedClusterData has the cluster paths for all clusters in the cluster index. Nothing is deleted.
+        dispatch_sync(self->_storageQueue, ^{
+            XCTAssertTrue([[controller.controllerDataStore _fetchEndpointIndexForNodeID:deviceID] isEqualToArray:testEndpoints]);
+            for (NSNumber * endpoint in testEndpoints)
+            {
+                XCTAssertNotNil(initialClusterIndex);
+                for (NSNumber * cluster in [initialClusterIndex objectAtIndex:endpoint.unsignedShortValue])
+                {
+                    XCTAssertNotNil([controller.controllerDataStore _fetchClusterDataForNodeID:deviceID endpointID:endpoint clusterID:cluster]);
+                    MTRClusterPath * path = [MTRClusterPath clusterPathWithEndpointID:endpoint clusterID:cluster];
+                    XCTAssertTrue([device _persistedClusterContains:path]);
+                    XCTAssertNotNil([device _getPersistedClusterDataForPath:path]);
+                }
+            }
+        });
+        
+       [reportEndExpectation fulfill];
+    };
+    
+    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
+    
+    [self waitForExpectations:@[ attributeDataReceivedExpectation, reportEndExpectation] timeout:60];
+    
+    [controller.controllerDataStore clearAllStoredClusterData];
+    NSDictionary * storedClusterDataAfterClear = [controller.controllerDataStore getStoredClusterDataForNodeID:deviceID];
+    XCTAssertEqual(storedClusterDataAfterClear.count, 0);
+
+    [controller removeDevice:device];
+    // Reset our commissionee.
+    __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
+    ResetCommissionee(baseDevice, queue, self, kTimeoutInSeconds);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+}
+
+- (void)test016_TestDataStoreMTRDevicePruneOrphanedClusters
+{
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type queue = dispatch_get_main_queue();
+
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    NSNumber * nodeID = @(123);
+    NSNumber * fabricID = @(456);
+
+    NSError * error;
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+    MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:fabricID
+                                                                  nodeID:nodeID
+                                                                 storage:storageDelegate
+                                                                   error:&error
+                                                       certificateIssuer:&certificateIssuer];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    XCTAssertEqualObjects(controller.controllerNodeID, nodeID);
+
+    // Now commission the device, to test that that works.
+    NSNumber * deviceID = @(17);
+    certificateIssuer.nextNodeID = deviceID;
+    [self commissionWithController:controller newNodeID:deviceID];
+
+    // We should have established CASE using our operational key.
+    XCTAssertEqual(operationalKeys.signatureCount, 1);
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:deviceID controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up"];
+    
+    __block unsigned attributeReportsReceived = 0;
+    __block NSNumber * dataVersionForServerList;
+    __block NSNumber * testEndpoint = @1;
+
+    // This test will do the following -
+    // 1. Get the data version and attribute value of the server list for endpoint 0 to inject a fake report with all clusters removed except the descriptor cluster.
+    // 2. The data store is populated with cluster index and cluster data for endpoints 0, 1 and 2 initially.
+    //    Also _persistedClusters and _persistedClusterData has the cluster paths for all clusters in the cluster index for each endpoint.
+    // 3. After the fake attribute report is injected, make sure the data store is still populated with cluster index and cluster data for endpoints 0, 1 and 2. But the cluster index and data for endpoint 1 only has the descriptor cluster.
+    //    Also _persistedClusters and _persistedClusterData has the cluster paths for all clusters in the cluster index for endpoints 0 and 2 but only descriptor cluster for endpoint 1.
+    __block NSArray * testClusterDataValue;
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
+        attributeReportsReceived += attributeReport.count;
+        XCTAssert(attributeReportsReceived > 0);
+
+        for (NSDictionary<NSString *, id> * attributeDict in attributeReport) {
+            MTRAttributePath * attributePath = attributeDict[MTRAttributePathKey];
+            XCTAssertNotNil(attributePath);
+            
+            if ([attributePath.endpoint isEqualToNumber:testEndpoint] && attributePath.cluster.unsignedLongValue == MTRClusterIDTypeDescriptorID && attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterDescriptorAttributeServerListID) {
+                NSDictionary * data = attributeDict[MTRDataKey];
+                XCTAssertNotNil(data);
+                dataVersionForServerList = data[MTRDataVersionKey];
+                id dataValue = data[MTRValueKey];
+                XCTAssertNotNil(dataValue);
+                testClusterDataValue = [dataValue copy];
+            }
+        }
+    };
+    
+    __block NSMutableArray<NSArray<NSNumber *> *> * initialClusterIndex = [[NSMutableArray alloc]init];
+    
+    // TODO: Build the test endpoints from the attribute data value
+    __block NSArray<NSNumber *> * testEndpoints = @[ @0, testEndpoint, @2];
+    __block NSNumber * notToBeDeletedClusterID = @29;
+    delegate.onReportEnd = ^{
+        XCTAssertNotNil(dataVersionForServerList);
+        XCTAssertNotNil(testClusterDataValue);
+
+        // Verify that the data store is populated with cluster index and cluster data for endpoints 0, 1 and 2.
+        // Also _persistedClusters and _persistedClusterData has the cluster paths for all clusters in the cluster index.
+        dispatch_sync(self->_storageQueue, ^{
+            XCTAssertTrue([[controller.controllerDataStore _fetchEndpointIndexForNodeID:deviceID] isEqualToArray:testEndpoints]);
+            for (NSNumber * endpoint in testEndpoints)
+            {
+                [initialClusterIndex insertObject:[controller.controllerDataStore _fetchClusterIndexForNodeID:deviceID endpointID:endpoint] atIndex:endpoint.unsignedShortValue];
+                XCTAssertNotNil(initialClusterIndex);
+                for (NSNumber * cluster in [initialClusterIndex objectAtIndex:endpoint.unsignedShortValue])
+                {
+                    XCTAssertNotNil([controller.controllerDataStore _fetchClusterDataForNodeID:deviceID endpointID:endpoint clusterID:cluster]);
+                    MTRClusterPath * path = [MTRClusterPath clusterPathWithEndpointID:endpoint clusterID:cluster];
+                    XCTAssertTrue([device _persistedClusterContains:path]);
+                    XCTAssertNotNil([device _getPersistedClusterDataForPath:path]);
+                }
+            }
+        });
+        [subscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+    
+    // Inject a fake attribute report deleting all clusters except descriptor cluster for endpoint 1 from the server list.
+    dataVersionForServerList = [NSNumber numberWithUnsignedLongLong:(dataVersionForServerList.unsignedLongLongValue + 1)];
+    NSArray<NSDictionary<NSString *, id> *> * unsignedIntegerArrayValue = @[
+        @{
+            MTRDataKey : @ {
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : notToBeDeletedClusterID,
+            }
+        },
+     ];
+
+    NSArray<NSDictionary<NSString *, id> *> * attributeReport = @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:testEndpoint clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeServerListID)],
+        MTRDataKey : @ {
+            MTRDataVersionKey : dataVersionForServerList,
+            MTRTypeKey : MTRArrayValueType,
+            MTRValueKey : unsignedIntegerArrayValue,
+        }
+    } ];
+
+    XCTestExpectation * attributeDataReceivedExpectation = [self expectationWithDescription:@"Injected Attribute data received"];
+    XCTestExpectation * reportEndExpectation = [self expectationWithDescription:@"Injected Attribute data report ended"];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
+        attributeReportsReceived += attributeReport.count;
+        XCTAssert(attributeReportsReceived > 0);
+        [attributeDataReceivedExpectation fulfill];
+    };
+    
+    delegate.onReportEnd = ^{
+        // Verify that the data store is populated with cluster index and cluster data for endpoints 0 and 2.
+        // Also _persistedClusters and _persistedClusterData has the cluster paths for all clusters in the cluster index for endpoints 0 and 2.
+        // For endpoint 1, we should only have 1 entry in the clusterIndex for descriptor cluster. Everything else must be deleted.
+        dispatch_sync(self->_storageQueue, ^{
+            XCTAssertTrue([[controller.controllerDataStore _fetchEndpointIndexForNodeID:deviceID] isEqualToArray:testEndpoints]);
+            for (NSNumber * endpoint in testEndpoints)
+            {
+                XCTAssertNotNil(initialClusterIndex);
+                for (NSNumber * cluster in [initialClusterIndex objectAtIndex:endpoint.unsignedShortValue])
+                {
+                    MTRClusterPath * path = [MTRClusterPath clusterPathWithEndpointID:endpoint clusterID:cluster];
+                    if (![endpoint isEqualToNumber:testEndpoint])
+                    {
+                        XCTAssertNotNil([controller.controllerDataStore _fetchClusterDataForNodeID:deviceID endpointID:endpoint clusterID:cluster]);
+                        XCTAssertTrue([device _persistedClusterContains:path]);
+                        XCTAssertNotNil([device _getPersistedClusterDataForPath:path]);
+                    }
+                    else
+                    {
+                        if ([cluster isEqualToNumber:notToBeDeletedClusterID])
+                        {
+                            XCTAssertNotNil([controller.controllerDataStore _fetchClusterDataForNodeID:deviceID endpointID:endpoint clusterID:cluster]);
+                            XCTAssertTrue([device _persistedClusterContains:path]);
+                            XCTAssertNotNil([device _getPersistedClusterDataForPath:path]);
+                        }
+                        else
+                        {
+                            XCTAssertNil([controller.controllerDataStore _fetchClusterDataForNodeID:deviceID endpointID:endpoint clusterID:cluster]);
+                            XCTAssertFalse([device _persistedClusterContains:path]);
+                            XCTAssertNil([device _getPersistedClusterDataForPath:path]);
+                        }
+                    }
+                }
+            }
+        });
+        
+       [reportEndExpectation fulfill];
+    };
+    
+    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
+    
+    [self waitForExpectations:@[ attributeDataReceivedExpectation, reportEndExpectation] timeout:60];
+    
+    [controller.controllerDataStore clearAllStoredClusterData];
+    NSDictionary * storedClusterDataAfterClear = [controller.controllerDataStore getStoredClusterDataForNodeID:deviceID];
+    XCTAssertEqual(storedClusterDataAfterClear.count, 0);
+
+    [controller removeDevice:device];
+    // Reset our commissionee.
+    __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
+    ResetCommissionee(baseDevice, queue, self, kTimeoutInSeconds);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+}
+
+- (void)test017_TestDataStoreMTRDevicePruneOrphanedAttributes
+{
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type queue = dispatch_get_main_queue();
+
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    NSNumber * nodeID = @(123);
+    NSNumber * fabricID = @(456);
+
+    NSError * error;
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+    MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:fabricID
+                                                                  nodeID:nodeID
+                                                                 storage:storageDelegate
+                                                                   error:&error
+                                                       certificateIssuer:&certificateIssuer];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    XCTAssertEqualObjects(controller.controllerNodeID, nodeID);
+
+    // Now commission the device, to test that that works.
+    NSNumber * deviceID = @(17);
+    certificateIssuer.nextNodeID = deviceID;
+    [self commissionWithController:controller newNodeID:deviceID];
+
+    // We should have established CASE using our operational key.
+    XCTAssertEqual(operationalKeys.signatureCount, 1);
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:deviceID controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up"];
+    
+    __block unsigned attributeReportsReceived = 0;
+    __block NSNumber * dataVersionForIdentify;
+    __block NSNumber * testEndpoint = @(1);
+    __block NSNumber * toBeDeletedAttribute = @(1);
+    __block NSMutableArray * testClusterDataValue;
+    
+    // This test will do the following -
+    // 1. Get the data version and attribute value of the attribute list for endpoint 1 to inject a fake report with attribute 1 removed.
+    // 2. The data store is populated with cluster index and cluster data for endpoints 0, 1 and 2 initially.
+    //    Also _persistedClusters and _persistedClusterData has the cluster paths for all clusters in the cluster index for each endpoint.
+    // 3. After the fake attribute report is injected, make sure the data store is still populated with cluster index and cluster data for endpoints 0, 1 and 2.
+    //    Also _persistedClusters and _persistedClusterData has the cluster data for all clusters in the cluster index for endpoints 0, 1 and 2.
+    //    The cluster data for endpoint 1 for the Identify cluster should have attribute 1 deleted.
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
+        attributeReportsReceived += attributeReport.count;
+        XCTAssert(attributeReportsReceived > 0);
+
+        for (NSDictionary<NSString *, id> * attributeDict in attributeReport) {
+            MTRAttributePath * attributePath = attributeDict[MTRAttributePathKey];
+            XCTAssertNotNil(attributePath);
+            
+            if ([attributePath.endpoint isEqualToNumber:testEndpoint] && attributePath.cluster.unsignedLongValue == MTRClusterIDTypeIdentifyID && attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeGlobalAttributeAttributeListID) {
+                NSDictionary * data = attributeDict[MTRDataKey];
+                XCTAssertNotNil(data);
+                dataVersionForIdentify = data[MTRDataVersionKey];
+                id dataValue = data[MTRValueKey];
+                XCTAssertNotNil(dataValue);
+                testClusterDataValue = [dataValue mutableCopy];
+            }
+        }
+    };
+    
+    __block NSMutableArray<NSArray<NSNumber *> *> * initialClusterIndex = [[NSMutableArray alloc]init];
+    
+    // TODO: Build the test endpoints from the attribute data value
+    __block NSArray<NSNumber *> * testEndpoints = @[ @0, testEndpoint, @2];
+    delegate.onReportEnd = ^{
+        XCTAssertNotNil(dataVersionForIdentify);
+        XCTAssertNotNil(testClusterDataValue);
+        
+        // Verify that the data store is populated with cluster index and cluster data for endpoints 0, 1 and 2.
+        // Also _persistedClusters and _persistedClusterData has the cluster paths for all clusters in the cluster index.
+        dispatch_sync(self->_storageQueue, ^{
+            XCTAssertTrue([[controller.controllerDataStore _fetchEndpointIndexForNodeID:deviceID] isEqualToArray:testEndpoints]);
+            for (NSNumber * endpoint in testEndpoints)
+            {
+                [initialClusterIndex insertObject:[controller.controllerDataStore _fetchClusterIndexForNodeID:deviceID endpointID:endpoint] atIndex:endpoint.unsignedShortValue];
+                XCTAssertNotNil(initialClusterIndex);
+
+                for (NSNumber * cluster in [initialClusterIndex objectAtIndex:endpoint.unsignedShortValue])
+                {
+                    MTRDeviceClusterData * clusterData = [controller.controllerDataStore _fetchClusterDataForNodeID:deviceID endpointID:endpoint clusterID:cluster];
+                    XCTAssertNotNil(clusterData);
+                    MTRClusterPath * path = [MTRClusterPath clusterPathWithEndpointID:endpoint clusterID:cluster];
+                    XCTAssertTrue([device _persistedClusterContains:path]);
+                    XCTAssertNotNil([device _getPersistedClusterDataForPath:path]);
+                    
+                    // For endpoint 1 and the identify cluster make sure the attributes that are present in the persisted cluster and data storage matched the ones received in the attribute report.
+                    if ([endpoint isEqualToNumber:testEndpoint] && [cluster isEqualToNumber:@(MTRClusterIDTypeIdentifyID)])
+                    {
+                        MTRDeviceClusterData * data = [device _getPersistedClusterDataForPath:path];
+                        XCTAssertNotNil(data);
+                        XCTAssertNotNil(data.attributes);
+                        
+                        NSDictionary * dict = [data.attributes objectForKey:@(MTRAttributeIDTypeGlobalAttributeAttributeListID)];
+                        XCTAssertNotNil(dict);
+                        
+                        NSMutableArray * persistedAttributes = [device arrayOfNumbersFromAttributeValue:dict];
+                        NSMutableArray * testAttributes = [device arrayOfNumbersFromAttributeValue:@ { MTRTypeKey : MTRArrayValueType, MTRValueKey : testClusterDataValue }];
+                        XCTAssertNotNil(persistedAttributes);
+                        for (NSNumber * attribute in testAttributes)
+                        {
+                            XCTAssertTrue([persistedAttributes containsObject:attribute]);
+                        }
+                        
+                        XCTAssertNotNil(clusterData.attributes);
+                        NSDictionary * dictFromStore = [clusterData.attributes objectForKey:@(MTRAttributeIDTypeGlobalAttributeAttributeListID)];
+                        XCTAssertNotNil(dictFromStore);
+                        
+                        NSMutableArray * dataStoreAttributes = [device arrayOfNumbersFromAttributeValue:dictFromStore];
+                        XCTAssertNotNil(dataStoreAttributes);
+                        for (NSNumber * attribute in testAttributes)
+                         {
+                             XCTAssertTrue([dataStoreAttributes containsObject:attribute]);
+                         }
+                    }
+                }
+            }
+        });
+        
+        [subscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+    
+    dataVersionForIdentify = [NSNumber numberWithUnsignedLongLong:(dataVersionForIdentify.unsignedLongLongValue + 1)];
+    
+    [testClusterDataValue removeObjectAtIndex:1];
+
+    NSArray<NSDictionary<NSString *, id> *> * attributeReport = @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:testEndpoint clusterID:@(MTRClusterIDTypeIdentifyID) attributeID:@(MTRAttributeIDTypeGlobalAttributeAttributeListID)],
+        MTRDataKey : @ {
+            MTRDataVersionKey : dataVersionForIdentify,
+            MTRTypeKey : MTRArrayValueType,
+            MTRValueKey : testClusterDataValue,
+        }
+    } ];
+
+    XCTestExpectation * attributeDataReceivedExpectation = [self expectationWithDescription:@"Injected Attribute data received"];
+    XCTestExpectation * reportEndExpectation = [self expectationWithDescription:@"Injected Attribute data report ended"];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
+        attributeReportsReceived += attributeReport.count;
+        XCTAssert(attributeReportsReceived > 0);
+        [attributeDataReceivedExpectation fulfill];
+    };
+    
+    delegate.onReportEnd = ^{
+        // For endpoints 0, 1 and 2, verify that the cluster index exists and the cluster data exists. for endpoint 1, since we deleted attribute 1 from Identify cluster
+        // we need to make sure that cluster data for attribute 1 is not present in persisted cluster data or data storage.
+        dispatch_sync(self->_storageQueue, ^{
+            XCTAssertTrue([[controller.controllerDataStore _fetchEndpointIndexForNodeID:deviceID] isEqualToArray:testEndpoints]);
+            for (NSNumber * endpoint in testEndpoints)
+            {
+                [initialClusterIndex insertObject:[controller.controllerDataStore _fetchClusterIndexForNodeID:deviceID endpointID:endpoint] atIndex:endpoint.unsignedShortValue];
+                XCTAssertNotNil(initialClusterIndex);
+
+                for (NSNumber * cluster in [initialClusterIndex objectAtIndex:endpoint.unsignedShortValue])
+                {
+                    MTRDeviceClusterData * clusterData = [controller.controllerDataStore _fetchClusterDataForNodeID:deviceID endpointID:endpoint clusterID:cluster];
+                    XCTAssertNotNil(clusterData);
+                    MTRClusterPath * path = [MTRClusterPath clusterPathWithEndpointID:endpoint clusterID:cluster];
+                    XCTAssertTrue([device _persistedClusterContains:path]);
+                    XCTAssertNotNil([device _getPersistedClusterDataForPath:path]);
+                    
+                    // For endpoint 1, identify cluster make sure the only attribute remaining is attribute 0.
+                    if ([endpoint isEqualToNumber:testEndpoint] && [cluster isEqualToNumber:@(MTRClusterIDTypeIdentifyID)])
+                    {
+                        MTRDeviceClusterData * data = [device _getPersistedClusterDataForPath:path];
+                        XCTAssertNotNil(data);
+                        XCTAssertNotNil(data.attributes);
+                        
+                        NSDictionary * dict = [data.attributes objectForKey:@(MTRAttributeIDTypeGlobalAttributeAttributeListID)];
+                        XCTAssertNotNil(dict);
+                        
+                        NSMutableArray * persistedAttributes = [device arrayOfNumbersFromAttributeValue:dict];
+                        NSMutableArray * testAttributes = [device arrayOfNumbersFromAttributeValue:@ { MTRTypeKey : MTRArrayValueType, MTRValueKey : testClusterDataValue }];
+                        XCTAssertNotNil(persistedAttributes);
+                        for (NSNumber * attribute in testAttributes)
+                        {
+                            if ([attribute isEqualToNumber:toBeDeletedAttribute])
+                            {
+                                XCTAssertFalse([persistedAttributes containsObject:attribute]);
+                            }
+                            else
+                            {
+                                XCTAssertTrue([persistedAttributes containsObject:attribute]);
+                            }
+                        }
+                        
+                        // for the data store make sure the cluster path exists and the cluster data has attribute values
+                        XCTAssertNotNil(clusterData.attributes);
+                        
+                        NSDictionary * dictFromStore = [clusterData.attributes objectForKey:@(MTRAttributeIDTypeGlobalAttributeAttributeListID)];
+                        XCTAssertNotNil(dictFromStore);
+                        
+                        NSMutableArray * dataStoreAttributes = [device arrayOfNumbersFromAttributeValue:dictFromStore];
+                        XCTAssertNotNil(dataStoreAttributes);
+                        for (NSNumber * attribute in testAttributes)
+                        {
+                            if ([attribute isEqualToNumber:toBeDeletedAttribute])
+                            {
+                                XCTAssertFalse([dataStoreAttributes containsObject:attribute]);
+                            }
+                            else
+                            {
+                                XCTAssertTrue([dataStoreAttributes containsObject:attribute]);
+                            }
+                         }
+                    }
+                }
+            }
+         });
+        
+       [reportEndExpectation fulfill];
+    };
+    
+    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
+    
+    [self waitForExpectations:@[ attributeDataReceivedExpectation, reportEndExpectation] timeout:60];
+    
+    [controller.controllerDataStore clearAllStoredClusterData];
+    NSDictionary * storedClusterDataAfterClear = [controller.controllerDataStore getStoredClusterDataForNodeID:deviceID];
+    XCTAssertEqual(storedClusterDataAfterClear.count, 0);
+
+    [controller removeDevice:device];
+    // Reset our commissionee.
+    __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
+    ResetCommissionee(baseDevice, queue, self, kTimeoutInSeconds);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
 }
 
 @end

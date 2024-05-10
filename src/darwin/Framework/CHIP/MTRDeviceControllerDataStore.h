@@ -76,6 +76,8 @@ typedef void (^MTRDeviceControllerDataStoreClusterDataHandler)(NSDictionary<NSNu
 - (nullable MTRDeviceClusterData *)getStoredClusterDataForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
 - (void)storeClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData forNodeID:(NSNumber *)nodeID;
 - (void)clearStoredClusterDataForNodeID:(NSNumber *)nodeID;
+- (void)clearStoredClusterDataForNodeIDWithEndpointID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID;
+- (void)clearStoredClusterDataForNodeIDWithClusterID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
 - (void)clearAllStoredClusterData;
 
 /**
