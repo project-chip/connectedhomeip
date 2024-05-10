@@ -8693,9 +8693,14 @@ PICS:
       id: ICDM.S.A0006
 
     - label:
-          "Does the device implement the UserActiveModeTriggerInstruction
+          "Does the device implement the OperatingMode?
           attribute?"
       id: ICDM.S.A0007
+
+    - label:
+          "Does the device implement the UserActiveModeTriggerInstruction
+          attribute?"
+      id: ICDM.S.A0008
 
     #
     # Client Attribute
