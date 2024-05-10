@@ -363,7 +363,6 @@ void MinMdnsResolver::AdvancePendingResolverStates()
     {
         if (!resolver->IsActive())
         {
-            ChipLogError(Discovery, "resolver inactive, continue to next");
             continue;
         }
 
