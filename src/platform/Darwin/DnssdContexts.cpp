@@ -607,7 +607,7 @@ bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceInde
     {
         auto delegate = static_cast<DiscoverNodeDelegate *>(context);
         DiscoveredNodeData nodeData;
-        service.ToDiscoveredNodeData(addresses, nodeData);
+        service.ToDiscoveredCommissionNodeData(addresses, nodeData);
         delegate->OnNodeDiscovered(nodeData);
     }
     else

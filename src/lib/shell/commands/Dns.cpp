@@ -261,6 +261,13 @@ CHIP_ERROR BrowseOperationalHandler(int argc, char ** argv)
     return sResolverProxy.DiscoverOperationalNodes(filter);
 }
 
+CHIP_ERROR BrowseStopHandler(int argc, char ** argv)
+{
+    streamer_printf(streamer_get(), "Stopping browse...\r\n");
+
+    return sResolverProxy.StopDiscovery();
+}
+
 } // namespace
 
 void RegisterDnsCommands()
@@ -270,18 +277,14 @@ void RegisterDnsCommands()
           "Browse Matter commissionables. Usage: dns browse commissionable [subtype]" },
         { &BrowseCommissionerHandler, "commissioner", "Browse Matter commissioners. Usage: dns browse commissioner [subtype]" },
         { &BrowseOperationalHandler, "operational", "Browse Matter operational nodes. Usage: dns browse operational" },
+        { &BrowseStopHandler, "stop", "Stop ongoing browse. USage: dns browse stop"},
+
     };
 
     static constexpr Command subCommands[] = {
         { &ResolveHandler, "resolve",
           "Resolve Matter operational service. Usage: dns resolve fabricid nodeid (e.g. dns resolve 5544332211 1)" },
         { &SubShellCommand<ArraySize(browseSubCommands), browseSubCommands>, "browse", "Browse Matter DNS services" },
-    };
 
     static constexpr Command dnsCommand = { &SubShellCommand<ArraySize(subCommands), subCommands>, "dns", "DNS client commands" };
-
-    Engine::Root().RegisterCommands(&dnsCommand, 1);
-}
-
-} // namespace Shell
 } // namespace chip

@@ -50,7 +50,17 @@ static void HandleNodeResolve(void * context, DnssdService * result, const Span<
     }
 
     DiscoveredNodeData nodeData;
-    result->ToDiscoveredNodeData(addresses, nodeData);
+
+    if (0 == strncmp(result->mType, kOperationalServiceName, sizeof(kOperationalServiceName)))
+    {
+        result->ToDiscoveredOperationalNodeBrowseData(nodeData);
+
+        nodeData.Get<OperationalNodeBrowseData>().LogDetail();
+        discoveryContext->OnNodeDiscovered(nodeData);
+        return;
+    }
+
+    result->ToDiscoveredCommissionNodeData(addresses, nodeData);
 
     nodeData.Get<CommissionNodeData>().LogDetail();
     discoveryContext->OnNodeDiscovered(nodeData);
@@ -75,8 +85,9 @@ static void HandleNodeBrowse(void * context, DnssdService * services, size_t ser
 
         auto & ipAddress = services[i].mAddress;
 
-        // Check if SRV, TXT and AAAA records were received in DNS responses
-        if (strlen(services[i].mHostName) == 0 || services[i].mTextEntrySize == 0 || !ipAddress.has_value())
+        // Check that this is not operational browse result and if SRV, TXT and AAAA records were received in DNS responses
+        if (strncmp(services[i].mType, kOperationalServiceName, sizeof(kOperationalServiceName)) != 0
+            && (strlen(services[i].mHostName) == 0 || services[i].mTextEntrySize == 0 || !ipAddress.has_value()))
         {
             ChipDnssdResolve(&services[i], services[i].mInterface, HandleNodeResolve, context);
         }
@@ -340,7 +351,15 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, DnssdService * r
     impl->mOperationalDelegate->OnOperationalNodeResolved(nodeData);
 }
 
-void DnssdService::ToDiscoveredNodeData(const Span<Inet::IPAddress> & addresses, DiscoveredNodeData & nodeData)
+void DnssdService::ToDiscoveredOperationalNodeBrowseData(DiscoveredNodeData & nodeData)
+{
+    nodeData.Set<OperationalNodeBrowseData>();
+
+    ExtractIdFromInstanceName(mName, &nodeData.Get<OperationalNodeBrowseData>().peerId);
+    nodeData.Get<OperationalNodeBrowseData>().hasZeroTTL = (mTtlSeconds == 0);
+}
+
+void DnssdService::ToDiscoveredCommissionNodeData(const Span<Inet::IPAddress> & addresses, DiscoveredNodeData & nodeData)
 {
     nodeData.Set<CommissionNodeData>();
     auto & discoveredData = nodeData.Get<CommissionNodeData>();
@@ -746,6 +765,31 @@ CHIP_ERROR DiscoveryImplPlatform::DiscoverCommissioners(DiscoveryFilter filter, 
     return error;
 }
 
+CHIP_ERROR DiscoveryImplPlatform::DiscoverOperational(DiscoveryFilter filter, DiscoveryContext & context)
+{
+    ReturnErrorOnFailure(InitImpl());
+    StopDiscovery(context);
+
+    char serviceName[kMaxCommissionerServiceNameSize];
+    ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kOperational));
+
+    intptr_t browseIdentifier;
+    // Increase the reference count of the context to keep it alive until HandleNodeBrowse is called back.
+    CHIP_ERROR error = ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolTcp, Inet::IPAddressType::kAny,
+                                       Inet::InterfaceId::Null(), HandleNodeBrowse, context.Retain(), &browseIdentifier);
+
+    if (error == CHIP_NO_ERROR)
+    {
+        context.SetBrowseIdentifier(browseIdentifier);
+    }
+    else
+    {
+        context.Release();
+    }
+
+    return error;
+}
+
 CHIP_ERROR DiscoveryImplPlatform::StartDiscovery(DiscoveryType type, DiscoveryFilter filter, DiscoveryContext & context)
 {
     switch (type)
@@ -755,7 +799,7 @@ CHIP_ERROR DiscoveryImplPlatform::StartDiscovery(DiscoveryType type, DiscoveryFi
     case DiscoveryType::kCommissionerNode:
         return DiscoverCommissioners(filter, context);
     case DiscoveryType::kOperational:
-        return CHIP_ERROR_NOT_IMPLEMENTED;
+        return DiscoverOperational(filter, context);
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }

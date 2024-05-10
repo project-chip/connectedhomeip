@@ -689,6 +689,11 @@ void CopyTypeWithoutProtocol(char (&dest)[N], const char * typeAndProtocol)
 void MdnsAvahi::BrowseRetryCallback(chip::System::Layer * aLayer, void * appState)
 {
     BrowseContext * context = static_cast<BrowseContext *>(appState);
+
+    // free existing browser handle
+    avahi_service_browser_free(context->mBrowser);
+    context->mBrowser = nullptr;
+
     // Don't schedule anything new if we've stopped.
     if (context->mStopped.load())
     {
@@ -743,19 +748,38 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
     case AVAHI_BROWSER_ALL_FOR_NOW: {
         ChipLogProgress(DeviceLayer, "Avahi browse: all for now");
         bool needRetries = context->mBrowseRetries++ < kMaxBrowseRetries && !context->mStopped.load();
+
         // If we were already asked to stop, no need to send a callback - no one is listening.
         if (!context->mStopped.load())
         {
             context->mCallback(context->mContext, context->mServices.data(), context->mServices.size(), !needRetries,
                                CHIP_NO_ERROR);
+            
+            // Clearing records/services already passed to application through delegate. Keeping it may cause 
+            // duplicates in next query / retry attempt as currently found will also come again from cache. 
+            context->mServices.clear();            
         }
-        avahi_service_browser_free(browser);
+        // hold on to browser handle so we don't lose out any message, this will be freed just before next query 
+        context->mBrowser = browser;
+
         if (needRetries)
         {
             context->mNextRetryDelay *= 2;
             // Hand the ownership of the context over to the timer. It will either schedule a new browse on the context,
             // triggering this function, or it will delete and not reschedule (if stopped).
             DeviceLayer::SystemLayer().StartTimer(context->mNextRetryDelay / 2, BrowseRetryCallback, context);
+        }
+        else if (!context->mStopped.load())
+        {
+            // Re-trigger query until StopBrowse() is called
+
+            // Clear retry info and services.
+            context->mNextRetryDelay = chip::System::Clock::Seconds16(1);
+            context->mBrowseRetries = 0;
+            context->mServices.clear();
+            // Hand the ownership of the context over to the timer. It will either schedule a new browse on the context,
+            // triggering this function, or it will delete and not reschedule (if stopped).
+            DeviceLayer::SystemLayer().StartTimer(context->mNextQueryDelay, BrowseRetryCallback, context);
         }
         else
         {
@@ -772,7 +796,24 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
                 std::remove_if(context->mServices.begin(), context->mServices.end(), [name, type](const DnssdService & service) {
                     return strcmp(name, service.mName) == 0 && type == GetFullType(service.mType, service.mProtocol);
                 }));
+
+            DnssdService service = {};
+
+            Platform::CopyString(service.mName, name);
+            CopyTypeWithoutProtocol(service.mType, type);
+            service.mProtocol      = GetProtocolInType(type);
+            service.mAddressType   = context->mAddressType;
+            service.mTransportType = ToAddressType(protocol);
+            service.mInterface     = Inet::InterfaceId::Null();
+            if (interface != AVAHI_IF_UNSPEC)
+            {
+                service.mInterface = static_cast<chip::Inet::InterfaceId>(interface);
+            }
+            service.mType[kDnssdTypeMaxSize] = 0;
+            service.mTtlSeconds = 0;
+            context->mCallback(context->mContext, &service, 1, false, CHIP_NO_ERROR);
         }
+
         break;
     case AVAHI_BROWSER_CACHE_EXHAUSTED:
         ChipLogProgress(DeviceLayer, "Avahi browse: cache exhausted");
