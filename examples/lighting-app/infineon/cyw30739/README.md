@@ -18,6 +18,7 @@ An example showing the use of Matter on the Infineon CYW30739 platform.
         -   [Commissionable Data](#commissionable-data)
         -   [Device Information](#device-information)
         -   [DAC / DAC Key / PAI Certificate / Certificate Declaration](#dac--dac-key--pai-certificate--certificate-declaration)
+        -   [Use Provisioned Optiga Trust M](#use-provisioned-optiga-trust-m)
     -   [Flashing the Application](#flashing-the-application)
         -   [Enter Recovery Mode](#enter-recovery-mode)
         -   [Run Flash Script](#run-flash-script)
@@ -162,6 +163,29 @@ keys, and CD by the following arguments:
     'matter_att_cert_password="password"' \
     'matter_cd="/path/to/cd.der"'
     ```
+
+### Use Provisioned Optiga Trust M
+
+For boards supported by Optiga Trust M, CYW30739 will provision factory data to
+the Optiga Trust M by default for easy development.
+
+The Optiga Trust M on a production board should come with provisioned factory
+data. To ensure its optimal use, please configure the Optiga using the following
+arguments:
+
+-   `use_provisioned_optiga`, `optiga_dac_object_id`,
+    `optiga_dac_key_object_id`, `optiga_pai_cert_object_id`
+
+    ```bash
+    $ cd ~/connectedhomeip
+    $ scripts/examples/gn_build_example.sh examples/lighting-app/infineon/cyw30739 out/cyw30739-light \
+    'optiga_dac_object_id="0xe0e0"' \
+    'optiga_dac_key_object_id="0xe0f0"' \
+    'optiga_pai_cert_object_id="0xe0e8"'
+    ```
+
+The developer must set the object IDs to corresponding values matching the
+configurations used in the Optiga provisioning procedure.
 
 ## Flashing the Application
 
