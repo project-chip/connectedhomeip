@@ -1400,7 +1400,7 @@ static NSString * const sAttributesKey = @"attributes";
     }
 
     [clusterData storeValue:value forAttribute:path.attribute];
-    
+
     if (value != nil
         && isFromSubscription
         && !_receivingPrimingReport
