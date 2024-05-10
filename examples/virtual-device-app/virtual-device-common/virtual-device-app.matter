@@ -1902,7 +1902,7 @@ provisional cluster ScenesManagement = 98 {
 
   struct AttributeValuePair {
     attrib_id attributeID = 0;
-    int32u attributeValue = 1;
+    int64u attributeValue = 1;
   }
 
   struct ExtensionFieldSet {

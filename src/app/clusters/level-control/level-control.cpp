@@ -177,7 +177,7 @@ public:
         }
         else
         {
-            chip::app::NumericAttributeTraits<uint32_t>::SetNull(pairs[0].attributeValue);
+            chip::app::NumericAttributeTraits<uint64_t>::SetNull(pairs[0].attributeValue);
         }
         size_t attributeCount = 1;
         if (LevelControlHasFeature(endpoint, LevelControl::Feature::kFrequency))

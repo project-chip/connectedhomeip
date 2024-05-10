@@ -18180,7 +18180,7 @@ struct Type
 {
 public:
     chip::AttributeId attributeID = static_cast<chip::AttributeId>(0);
-    uint32_t attributeValue       = static_cast<uint32_t>(0);
+    uint64_t attributeValue       = static_cast<uint64_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
