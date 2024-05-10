@@ -1163,7 +1163,8 @@ static NSString * const sAttributesKey = @"attributes";
     }
 }
 
-- (void)_handleAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription {
+- (void)_handleAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription
+{
     std::lock_guard lock(_lock);
 
     // _getAttributesToReportWithReportedValues will log attribute paths reported
