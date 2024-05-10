@@ -754,12 +754,12 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
         {
             context->mCallback(context->mContext, context->mServices.data(), context->mServices.size(), !needRetries,
                                CHIP_NO_ERROR);
-            
-            // Clearing records/services already passed to application through delegate. Keeping it may cause 
-            // duplicates in next query / retry attempt as currently found will also come again from cache. 
-            context->mServices.clear();            
+
+            // Clearing records/services already passed to application through delegate. Keeping it may cause
+            // duplicates in next query / retry attempt as currently found will also come again from cache.
+            context->mServices.clear();
         }
-        // hold on to browser handle so we don't lose out any message, this will be freed just before next query 
+        // hold on to browser handle so we don't lose out any message, this will be freed just before next query
         context->mBrowser = browser;
 
         if (needRetries)
