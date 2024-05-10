@@ -24,4 +24,4 @@ typedef NS_ENUM(NSInteger, MTRDiagnosticLogType) {
     MTRDiagnosticLogTypeEndUserSupport = 0, // End user support log is requested
     MTRDiagnosticLogTypeNetworkDiagnostics = 1, // Network Diagnostics log is requested
     MTRDiagnosticLogTypeCrash = 2 // Crash log is requested
-} MTR_NEWLY_AVAILABLE;
+} MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));

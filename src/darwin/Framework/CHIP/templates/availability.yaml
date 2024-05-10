@@ -8509,8 +8509,12 @@
               ContentLaunchStatusEnum:
                   - URLNotAvailable
 
-- release: "Future"
-  versions: "future"
+- release: "Middle of 2024"
+  versions:
+      iOS: "17.6"
+      macOS: "14.6"
+      watchOS: "10.6"
+      tvOS: "17.6"
   introduced:
       clusters:
           - ActivatedCarbonFilterMonitoring
@@ -9680,3 +9684,6 @@
                   # Not really part of the spec, need to think about whether to
                   # expose this.
                   - NoFeatures
+
+- release: "Future"
+  versions: "future"

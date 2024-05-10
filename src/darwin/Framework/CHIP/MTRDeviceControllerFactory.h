@@ -187,7 +187,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * The controller factory must be running for pre-warming to take place.  Pre-warming can take place
  * before any controllers are started.
  */
-- (void)preWarmCommissioningSession MTR_NEWLY_AVAILABLE;
+- (void)preWarmCommissioningSession MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 @end
 
@@ -224,7 +224,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *                                    the other side requests via its MRP
  *                                    parameters.
  */
-MTR_EXTERN MTR_NEWLY_AVAILABLE void MTRSetMessageReliabilityParameters(NSNumber * _Nullable idleRetransmitMs,
+MTR_EXTERN MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) void MTRSetMessageReliabilityParameters(NSNumber * _Nullable idleRetransmitMs,
     NSNumber * _Nullable activeRetransmitMs,
     NSNumber * _Nullable activeThresholdMs,
     NSNumber * _Nullable additionalRetransmitDelayMs);
