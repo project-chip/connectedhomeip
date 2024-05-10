@@ -15,39 +15,70 @@
 #    limitations under the License.
 #
 import logging
+from enum import IntEnum, IntFlag, auto
 
 import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
-from enum import Flag, auto
 
 logger = logging.getLogger(__name__)
 
-kRootEndpointId = 0
 
-
-class UserActiveModeTriggerHintBitmap(Flag):
-    SettingsMenu = Auto()
-    CustomInstruction = Auto()
-    DeviceManual = Auto()
-    ActuateSensor = Auto()
-    ActuateSensorSeconds = Auto()
-    ActuateSensorTimes = Auto()
-    ActuateSensorLightsBlink = Auto()
-    ResetButton = Auto()
-    ResetButtonLightsBlink = Auto()
-    ResetButtonSeconds = Auto()
-    ResetButtonTimes = Auto()
-    SetupButton = Auto()
-    SetupButtonSeconds = Auto()
-    SetupButtonLightsBlink = Auto()
-    SetupButtonTimes = Auto()
-    AppDefinedButton = Auto()
+class UserActiveModeTriggerHintBitmap(IntFlag):
+    PowerCycle = auto()
+    SettingsMenu = auto()
+    CustomInstruction = auto()
+    DeviceManual = auto()
+    ActuateSensor = auto()
+    ActuateSensorSeconds = auto()
+    ActuateSensorTimes = auto()
+    ActuateSensorLightsBlink = auto()
+    ResetButton = auto()
+    ResetButtonLightsBlink = auto()
+    ResetButtonSeconds = auto()
+    ResetButtonTimes = auto()
+    SetupButton = auto()
+    SetupButtonSeconds = auto()
+    SetupButtonLightsBlink = auto()
+    SetupButtonTimes = auto()
+    AppDefinedButton = auto()
 
 
 class OperatingModeEnum(IntEnum):
     SIT = 0
     LIT = 1
+
+
+kRootEndpointId = 0
+kMaxUserActiveModeBitmap = 0x1FFFF
+kMaxUserActiveModeTriggerInstructionByteLength = 128
+
+# BitMask for all user active mode trigger hints that are depedent on the UserActiveModeTriggerInstruction
+kUatInstructionDependentBitMask = UserActiveModeTriggerHintBitmap.CustomInstruction | UserActiveModeTriggerHintBitmap.ActuateSensorSeconds | UserActiveModeTriggerHintBitmap.ActuateSensorTimes | UserActiveModeTriggerHintBitmap.ActuateSensorLightsBlink | UserActiveModeTriggerHintBitmap.ResetButtonLightsBlink | UserActiveModeTriggerHintBitmap.ResetButtonSeconds | UserActiveModeTriggerHintBitmap.ResetButtonTimes | UserActiveModeTriggerHintBitmap.SetupButtonSeconds | UserActiveModeTriggerHintBitmap.SetupButtonLightsBlink | UserActiveModeTriggerHintBitmap.SetupButtonTimes | UserActiveModeTriggerHintBitmap.AppDefinedButton
+
+# BitMask for UserActiveModeTriggerHint that REQUIRE the prescense of the UserActiveModeTriggerInstruction
+kUatInstructionMandatoryBitMask = UserActiveModeTriggerHintBitmap.CustomInstruction | UserActiveModeTriggerHintBitmap.ActuateSensorSeconds | UserActiveModeTriggerHintBitmap.ActuateSensorTimes | UserActiveModeTriggerHintBitmap.ResetButtonSeconds | UserActiveModeTriggerHintBitmap.ResetButtonTimes | UserActiveModeTriggerHintBitmap.SetupButtonSeconds | UserActiveModeTriggerHintBitmap.SetupButtonTimes | UserActiveModeTriggerHintBitmap.AppDefinedButton
+
+# BitMask for all user active mode trigger hints that have the UserActiveModeTriggerInstruction as an uint
+kUatNumberInstructionBitMask = UserActiveModeTriggerHintBitmap.ActuateSensorSeconds | UserActiveModeTriggerHintBitmap.ActuateSensorTimes | UserActiveModeTriggerHintBitmap.ResetButtonSeconds | UserActiveModeTriggerHintBitmap.ResetButtonTimes | UserActiveModeTriggerHintBitmap.SetupButtonSeconds | UserActiveModeTriggerHintBitmap.SetupButtonTimes
+
+# BitMask for all user active mode trigger hints that provide a color in the UserActiveModeTriggerInstruction
+kUatColorInstructionBitMask = UserActiveModeTriggerHintBitmap.ActuateSensorLightsBlink | UserActiveModeTriggerHintBitmap.ResetButtonLightsBlink | UserActiveModeTriggerHintBitmap.SetupButtonLightsBlink
+
+
+@staticmethod
+def is_valid_uint32_value(var):
+    return isinstance(var, int) and 0 <= var <= 0xFFFFFFFF
+
+
+@staticmethod
+def is_valid_uint16_value(var):
+    return isinstance(var, int) and 0 <= var <= 0xFFFF
+
+
+@staticmethod
+def is_valid_uint8_value(var):
+    return isinstance(var, int) and 0 <= var <= 0xFF
 
 
 class TC_ICDM_2_1(MatterBaseTest):
@@ -70,21 +101,23 @@ class TC_ICDM_2_1(MatterBaseTest):
 
     def desc_TC_ICDM_2_1(self) -> str:
         """Returns a description of this test"""
-        return "[TC_ICDM_2_1]  Attributes with DUT as Server"
+        return "[TC_ICDM_2_1]  attributes with DUT as Server"
 
     def steps_TC_ICDM_2_1(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "Read ActiveModeThreshold attribute"),
-            TestStep(3, "Read ActiveModeDuration attribute"),
-            TestStep(4, "Read IdleModeDuration attribute"),
-            TestStep(5, "Read ClientsSupportedPerFabric attribute"),
-            TestStep(6, "Read RegisteredClients attribute"),
-            TestStep(7, "Read ICDCounter attribute"),
-            TestStep(8, "Read UserActiveModeTriggerHint attribute"),
-            TestStep(9, "Read UserActiveModeTriggerInstruction attribute"),
-            TestStep(10, "Read OperatingMode attribute"),
-
+            TestStep(2, "TH reads from the DUT the ActiveModeThreshold attribute."),
+            TestStep(3, "TH reads from the DUT the ActiveModeDuration attribute."),
+            TestStep(4, "TH reads from the DUT the IdleModeDuration attribute."),
+            TestStep(
+                5, "TH reads from the DUT the ClientsSupportedPerFabric attribute."),
+            TestStep(6, "TH reads from the DUT the RegisteredClients attribute."),
+            TestStep(7, "TH reads from the DUT the ICDCounter attribute."),
+            TestStep(
+                8, "TH reads from the DUT the UserActiveModeTriggerHint attribute."),
+            TestStep(
+                9, "TH reads from the DUT the UserActiveModeTriggerInstruction attribute"),
+            TestStep(10, "TH reads from the DUT the OperatingMode attribute."),
         ]
         return steps
 
@@ -103,20 +136,18 @@ class TC_ICDM_2_1(MatterBaseTest):
     async def test_TC_ICDM_2_1(self):
 
         cluster = Clusters.Objects.IcdManagement
-        attribute = cluster.Attributes
+        attributes = cluster.Attributes
 
         # Commissioning
         self.step(1)
 
-        # Wildcard Read cluster attributes
-        icdmAttributes = await self._wildcard_cluster_read()
-
         # Validate ActiveModeThreshold
         self.step(2)
         if self.check_pics("ICDM.S.A0002"):
-            activeModeThreshold = icdmAttributes[kRootEndpointId][cluster][attribute.ActiveModeThreshold]
-            # Verify ActiveModeThreshold is not bigger than uint32
-            asserts.assert_true(0 <= activeModeThreshold <= 65535,
+            activeModeThreshold = await self._read_icdm_attribute_expect_success(
+                attributes.ActiveModeThreshold)
+            # Verify ActiveModeThreshold is not bigger than uint16
+            asserts.assert_true(is_valid_uint16_value(activeModeThreshold),
                                 "ActiveModeThreshold attribute does not fit in a uint16.")
         else:
             asserts.assert_true(
@@ -125,9 +156,10 @@ class TC_ICDM_2_1(MatterBaseTest):
         # Validate ActiveModeDuration
         self.step(3)
         if self.check_pics("ICDM.S.A0001"):
-            activeModeDuration = icdmAttributes[kRootEndpointId][cluster][attribute.ActiveModeDuration]
+            activeModeDuration = await self._read_icdm_attribute_expect_success(
+                attributes.ActiveModeDuration)
             # Verify ActiveModeDuration is not bigger than uint32
-            asserts.assert_true(0 <= activeModeDuration <= 4294967295,
+            asserts.assert_true(is_valid_uint32_value(activeModeDuration),
                                 "ActiveModeDuration attribute does not fit in a uint32")
         else:
             asserts.assert_true(
@@ -135,8 +167,9 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Validate IdleModeDuration
         self.step(4)
-        if self.check_pics("ICDM.S.A0001"):
-            idleModeDuration = icdmAttributes[kRootEndpointId][cluster][attribute.IdleModeDuration]
+        if self.check_pics("ICDM.S.A0000"):
+            idleModeDuration = await self._read_icdm_attribute_expect_success(
+                attributes.IdleModeDuration)
             # Verify IdleModeDuration is not bigger than uint32
             asserts.assert_greater_equal(
                 idleModeDuration, 1, "IdleModeDuration attribute is smaller than minimum value (1).")
@@ -151,110 +184,94 @@ class TC_ICDM_2_1(MatterBaseTest):
         # Validate ClientsSupportedPerFabric
         self.step(5)
         if self.pics_guard(self.check_pics("ICDM.S.A0005")):
-            clientsSupportedPerFabric = icdmAttributes[kRootEndpointId][
-                cluster][attribute.ClientsSupportedPerFabric]
+            clientsSupportedPerFabric = await self._read_icdm_attribute_expect_success(
+                attributes.ClientsSupportedPerFabric)
 
-            # Verify ClientsSupportedPerFabric is not bigger than uint32
+            # Verify ClientsSupportedPerFabric is not bigger than uint16
+            asserts.assert_true(is_valid_uint16_value(clientsSupportedPerFabric),
+                                "ClientsSupportedPerFabric attribute does not fit in a uint16.")
+
             asserts.assert_greater_equal(
                 clientsSupportedPerFabric, 1, "ClientsSupportedPerFabric attribute is smaller than minimum value (1).")
 
-            asserts.assert_less_equal(activeModeThreshold, 65535,
-                                      "ClientsSupportedPerFabric attribute does not fit in a uint16.")
-
         # Validate RegisteredClients
         self.step(6)
-        if self.pics_guard(self.check_pics("ICDM.S.A0005")):
-            registeredClients = icdmAttributes[kRootEndpointId][cluster][attribute.RegisteredClients]
+        if self.pics_guard(self.check_pics("ICDM.S.A0003")):
+            registeredClients = await self._read_icdm_attribute_expect_success(
+                attributes.RegisteredClients)
 
             asserts.assert_true(isinstance(
                 registeredClients, list), "RegisteredClients is not a list.")
 
         # Validate ICDCounter
         self.step(7)
-        if self.pics_guard(self.check_pics("ICDM.S.A0005")):
+        if self.pics_guard(self.check_pics("ICDM.S.A0004")):
 
-            icdCounter = icdmAttributes[kRootEndpointId][cluster][attribute.ICDCounter]
+            icdCounter = await self._read_icdm_attribute_expect_success(
+                attributes.ICDCounter)
             # Verify ICDCounter is not bigger than uint32
-            asserts.assert_true(0 <= icdCounter <= 4294967295,
+            asserts.assert_true(is_valid_uint32_value(icdCounter),
                                 "ActiveModeDuration attribute does not fit in a uint32")
 
         # Validate UserActiveModeTriggerHint
         self.step(8)
-        userActiveModeTriggerHint = icdmAttributes[kRootEndpointId][cluster][attribute.UserActiveModeTriggerHint]
+        if self.pics_guard(self.check_pics("ICDM.S.A0006")):
+            userActiveModeTriggerHint = await self._read_icdm_attribute_expect_success(
+                attributes.UserActiveModeTriggerHint)
+
+            # Verify that it is a bitmap32 - Only the first 16 bits are used
+            asserts.assert_true(0 <= userActiveModeTriggerHint <= kMaxUserActiveModeBitmap,
+                                "UserActiveModeTriggerHint attribute does not fit in a bitmap32")
+
+            # Verify that only a single UserActiveModeTriggerInstruction dependent bit is set
+            uatHintInstructionDepedentBitmap = UserActiveModeTriggerHintBitmap(
+                userActiveModeTriggerHint) & kUatInstructionDependentBitMask
+
+            asserts.assert_less_equal(
+                uatHintInstructionDepedentBitmap.bit_count(), 1, "UserActiveModeTriggerHint has more than 1 bit that is dependent on the UserActiveModeTriggerInstruction")
 
         # Valdate UserActiveModeTriggerInstruction
         self.step(9)
+        if self.check_pics("ICDM.S.A0007"):
+            userActiveModeTriggerInstruction = await self._read_icdm_attribute_expect_success(
+                attributes.UserActiveModeTriggerInstruction)
 
-        # Validate OperatingMode
+            # Verify that the UserActiveModeTriggerInstruction has the correct encoding
+            try:
+                encodedUATInstruction = userActiveModeTriggerInstruction.encode(
+                    'utf-8')
+            except Exception as e:
+                asserts.assert_true(
+                    false, "UserActiveModeTriggerInstruction is not encoded in the correct format (utf-8).")
+
+            # Verify byte length of the UserActiveModeTirggerInstruction
+            asserts.assert_less_equal(
+                len(encodedUATInstruction), kMaxUserActiveModeTriggerInstructionByteLength, "UserActiveModeTriggerInstruction is longuer than the maximum allowed length (128).")
+
+            if uatHintInstructionDepedentBitmap in kUatNumberInstructionBitMask:
+                # Validate Instruction is a decimal unsigned integer using the ASCII digits 0-9, and without leading zeros.
+                asserts.assert_true(userActiveModeTriggerInstruction.isdigit(
+                ), "UserActiveModeTriggerInstruction is not in the correct format for the associated UserActiveModeTriggerHint")
+
+            if uatHintInstructionDepedentBitmap in kUatColorInstructionBitMask:
+                # TODO: https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/9194
+                asserts.assert_true(true, "Nothing to do for now")
+        else:
+            # Check if the UserActiveModeTriggerInstruction was required
+            asserts.assert_false(uatHintInstructionDepedentBitmap in kUatInstructionMandatoryBitMask,
+                                 "UserActiveModeTriggerHint requires the UserActiveModeTriggerInstruction")
+
+        # Verify OperatingMode
         self.step(10)
+        if self.pics_guard(self.check_pics("ICDM.S.A0008")):
+            operatingMode = await self._read_icdm_attribute_expect_success(
+                attributes.OperatingMode)
 
-        # Idle Mode Duration attribute test
-        # if (self.check_pics("ICDM.S.A0000")):
-        #     self.print_step(2, "Read IdleModeDuration Attribute")
+            asserts.assert_true(is_valid_uint8_value(operatingMode),
+                                "OperatingMode does not fit in an enum8")
 
-        #     idleModeDuration = await self.read_icdm_attribute_expect_success(
-        #         attribute=attributes.IdleModeDuration)
-        #     asserts.assert_greater_equal(
-        #         idleModeDuration, 1, "IdleModeDuration attribute is smaller than minimum value (1).")
-        #     asserts.assert_less_equal(
-        #         idleModeDuration, 64800, "IdleModeDuration attribute is greater than maximum value (64800).")
-        # else:
-        #     asserts.assert_true(
-        #         False, "IdleModeDuration is a mandatory attribute and must be present in the PICS file")
-
-        # # Active Mode Duration attribute test
-        # if (self.check_pics("ICDM.S.A0001")):
-        #     self.print_step(2, "Read ActiveModeDuration Attribute")
-
-        #     idleModeDuration *= 1000  # Convert seconds to milliseconds
-        #     activeModeDuration = await self.read_icdm_attribute_expect_success(endpoint=endpoint,
-        #                                                                        attribute=attributes.ActiveModeDuration)
-        #     asserts.assert_true(0 <= activeModeDuration <= 65535,
-        #                         "ActiveModeDuration attribute does not fit in a uint16.")
-        #     asserts.assert_less_equal(activeModeDuration, idleModeDuration,
-        #                               "ActiveModeDuration attribute is greater than the IdleModeDuration attrbiute.")
-        # else:
-        #     asserts.assert_true(
-        #         False, "ActiveModeDuration is a mandatory attribute and must be present in the PICS file")
-
-        # # Active Mode Threshold attribute test
-        # if (self.check_pics("ICDM.S.A0002")):
-        #     self.print_step(2, "Read ActiveModeThreshold Attribute")
-
-        #     activeModeThreshold = await self.read_icdm_attribute_expect_success(endpoint=endpoint,
-        #                                                                         attribute=attributes.ActiveModeThreshold)
-        #     asserts.assert_true(0 <= activeModeThreshold <= 65535,
-        #                         "ActiveModeThreshold attribute does not fit in a uint16.")
-        # else:
-        #     asserts.assert_true(
-        #         False, "ActiveModeThreshold is a mandatory attribute and must be present in the PICS file")
-
-        # # RegisteredClients attribute test
-        # if (self.check_pics("ICDM.S.A0003")):
-        #     self.print_step(2, "Read RegisteredClients Attribute")
-
-        #     await self.read_icdm_attribute_expect_success(endpoint=endpoint,
-        #                                                   attribute=attributes.RegisteredClients)
-
-        # # ICDCounter attribute test
-        # if (self.check_pics("ICDM.S.A0003")):
-        #     self.print_step(2, "Read ICDCounter Attribute")
-
-        #     ICDCounter = await self.read_icdm_attribute_expect_success(endpoint=endpoint,
-        #                                                                attribute=attributes.ICDCounter)
-        #     asserts.assert_true(0 <= ICDCounter <= 4294967295,
-        #                         "ICDCounter attribute does not fit in a uint32.")
-
-        # # ClientsSupportedPerFabric attribute test
-        # if (self.check_pics("ICDM.S.A0003")):
-        #     self.print_step(2, "Read ClientsSupportedPerFabric Attribute")
-
-        #     clientsSupportedPerFabric = await self.read_icdm_attribute_expect_success(endpoint=endpoint,
-        #                                                                               attribute=attributes.ClientsSupportedPerFabric)
-        #     asserts.assert_true(0 <= clientsSupportedPerFabric <= 65535,
-        #                         "ActiveModeThreshold ClientsSupportedPerFabric does not fit in a uint16.")
-        #     asserts.assert_greater_equal(clientsSupportedPerFabric, 1,
-        #                                  "ClientsSupportedPerFabric attribute is smaller than minimum value (1).")
+            asserts.assert_less_equal(
+                operatingMode, 1, "OperatingMode can only have 0 and 1 as valid values")
 
 
 if __name__ == "__main__":
