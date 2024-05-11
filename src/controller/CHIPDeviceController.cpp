@@ -1999,7 +1999,7 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, Messaging::Exchange
                                              const SessionHandle & sessionHandle)
 {
     // CASE session established.
-    MATTER_LOG_METRIC_END(kMetricDeviceOperationalSetup, CHIP_NO_ERROR);
+    MATTER_LOG_METRIC_END(kMetricDeviceCommissioningOperationalSetup, CHIP_NO_ERROR);
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     VerifyOrDie(commissioner->mCommissioningStage == CommissioningStage::kFindOperationalForStayActive ||
                 commissioner->mCommissioningStage == CommissioningStage::kFindOperationalForCommissioningComplete);
@@ -2014,7 +2014,7 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, Messaging::Exchange
 void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
 {
     // CASE session establishment failed.
-    MATTER_LOG_METRIC_END(kMetricDeviceOperationalSetup, error);
+    MATTER_LOG_METRIC_END(kMetricDeviceCommissioningOperationalSetup, error);
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     VerifyOrDie(commissioner->mCommissioningStage == CommissioningStage::kFindOperationalForStayActive ||
                 commissioner->mCommissioningStage == CommissioningStage::kFindOperationalForCommissioningComplete);
@@ -3412,7 +3412,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     case CommissioningStage::kFindOperationalForCommissioningComplete: {
         // If there is an error, CommissioningStageComplete will be called from OnDeviceConnectionFailureFn.
         auto scopedPeerId = GetPeerScopedId(proxy->GetDeviceId());
-        MATTER_LOG_METRIC_BEGIN(kMetricDeviceOperationalSetup);
+        MATTER_LOG_METRIC_BEGIN(kMetricDeviceCommissioningOperationalSetup);
         mSystemState->CASESessionMgr()->FindOrEstablishSession(scopedPeerId, &mOnDeviceConnectedCallback,
                                                                &mOnDeviceConnectionFailureCallback
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES

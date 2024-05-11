@@ -147,115 +147,115 @@ const char * MetricKeyForCommissioningStage(CommissioningStage stage)
     switch (stage)
     {
     case kError:
-        return "core_cm_stg_error";
+        return "core_commissioning_stage_error";
 
     case kSecurePairing:
-        return "core_cm_stg_secure_pairing";
+        return "core_commissioning_stage_secure_pairing";
 
     case kReadCommissioningInfo:
-        return "core_cm_stg_rd_comm_info";
+        return "core_commissioning_stage_read_commissioning_info";
 
     case kReadCommissioningInfo2:
-        return "core_cm_stg_rd_comm_info2";
+        return "core_commissioning_stage_read_commissioning_info2";
 
     case kArmFailsafe:
-        return "core_cm_stg_afs";
+        return "core_commissioning_stage_arm_failsafe";
 
     case kScanNetworks:
-        return "core_cm_stg_scn_nws";
+        return "core_commissioning_stage_scan_networks";
 
     case kConfigRegulatory:
-        return "core_cm_stg_cfg_reg";
+        return "core_commissioning_stage_config_regulatory";
 
     case kConfigureUTCTime:
-        return "core_cm_stg_cfg_utc";
+        return "core_commissioning_stage_configure_utc_time";
 
     case kConfigureTimeZone:
-        return "core_cm_stg_cfg_tmz";
+        return "core_commissioning_stage_configure_timezone";
 
     case kConfigureDSTOffset:
-        return "core_cm_stg_cfg_dst_off";
+        return "core_commissioning_stage_configure_dst_offset";
 
     case kConfigureDefaultNTP:
-        return "core_cm_stg_cfg_ntp";
+        return "core_commissioning_stage_configure_default_ntp";
 
     case kSendPAICertificateRequest:
-        return "core_cm_stg_csr_req";
+        return "core_commissioning_stage_send_pai_certificate_request";
 
     case kSendDACCertificateRequest:
-        return "core_cm_stg_dac_req";
+        return "core_commissioning_stage_send_dac_certificate_request";
 
     case kSendAttestationRequest:
-        return "core_cm_stg_att_req";
+        return "core_commissioning_stage_send_attestation_request";
 
     case kAttestationVerification:
-        return "core_cm_stg_att_ver";
+        return "core_commissioning_stage_attestation_verification";
 
     case kSendOpCertSigningRequest:
-        return "core_cm_stg_opcrt_csr";
+        return "core_commissioning_stage_opcert_signing_request";
 
     case kValidateCSR:
-        return "core_cm_stg_val_csr";
+        return "core_commissioning_stage_validate_csr";
 
     case kGenerateNOCChain:
-        return "core_cm_stg_gen_noc";
+        return "core_commissioning_stage_generate_noc_chain";
 
     case kSendTrustedRootCert:
-        return "core_cm_stg_trust_rca";
+        return "core_commissioning_stage_send_trusted_root_cert";
 
     case kSendNOC:
-        return "core_cm_stg_snd_noc";
+        return "core_commissioning_stage_send_noc";
 
     case kConfigureTrustedTimeSource:
-        return "core_cm_stg_cfg_tms";
+        return "core_commissioning_stage_configure_trusted_time_source";
 
     case kICDGetRegistrationInfo:
-        return "core_cm_stg_icd_reg_info";
+        return "core_commissioning_stage_icd_get_registration_info";
 
     case kICDRegistration:
-        return "core_cm_stg_icd_reg";
+        return "core_commissioning_stage_icd_registration";
 
     case kWiFiNetworkSetup:
-        return "core_cm_stg_wifi_nw_cred";
+        return "core_commissioning_stage_wifi_network_setup";
 
     case kThreadNetworkSetup:
-        return "core_cm_stg_thrd_nw_cred";
+        return "core_commissioning_stage_thread_network_setup";
 
     case kFailsafeBeforeWiFiEnable:
-        return "core_cm_stg_afs_bf_wifi";
+        return "core_commissioning_stage_failsafe_before_wifi_enable";
 
     case kFailsafeBeforeThreadEnable:
-        return "core_cm_stg_afs_bf_thrd";
+        return "core_commissioning_stage_failsafe_before_thread_enable";
 
     case kWiFiNetworkEnable:
-        return "core_cm_stg_wifi_enbl";
+        return "core_commissioning_stage_wifi_network_enable";
 
     case kThreadNetworkEnable:
-        return "core_cm_stg_thrd_enbl";
+        return "core_commissioning_stage_thread_network_enable";
 
     case kEvictPreviousCaseSessions:
-        return "core_cm_stg_evict_case";
+        return "core_commissioning_stage_evict_previous_case_sessions";
 
     case kFindOperationalForStayActive:
-        return "core_cm_stg_op_stay_active";
+        return "core_commissioning_stage_find_operational_for_stay_active";
 
     case kFindOperationalForCommissioningComplete:
-        return "core_cm_stg_op_cm_comp";
+        return "core_commissioning_stage_find_operational_for_commissioning_complete";
 
     case kICDSendStayActive:
-        return "core_cm_stg_icd_stay_act";
+        return "core_commissioning_stage_icd_send_stay_active";
 
     case kSendComplete:
-        return "core_cm_stg_snd_comp";
+        return "core_commissioning_stage_send_complete";
 
     case kCleanup:
-        return "core_cm_stg_cleanup";
+        return "core_commissioning_stage_cleanup";
 
     case kNeedsNetworkCreds:
-        return "core_cm_stg_need_nw_creds";
+        return "core_commissioning_stage_need_network_creds";
 
     default:
-        return "core_cm_stg_unknown";
+        return "core_commissioning_stage_unknown";
     }
 }
 #endif

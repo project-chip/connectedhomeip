@@ -47,7 +47,6 @@
 #include <system/SystemClock.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <tracing/macros.h>
-#include <tracing/metric_event.h>
 #include <transport/SessionManager.h>
 
 namespace {

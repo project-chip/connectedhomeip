@@ -35,21 +35,21 @@ constexpr MetricKey kMetricWiFiRSSI = "wifi_rssi";
 constexpr MetricKey kMetricDeviceCommissionerPASESession = "core_dcm_pase_session";
 
 // Overall commissioning into a fabric
-constexpr MetricKey kMetricDeviceCommissionerCommission = "core_dcm_commission";
+constexpr MetricKey kMetricDeviceCommissionerCommission = "core_dcm_commission_device";
 
-constexpr MetricKey kMetricDeviceCommissionerCommissionStage = "core_ccm_commission_stage";
+constexpr MetricKey kMetricDeviceCommissionerCommissionStage = "core_dcm_commission_stage";
 
 // Setup Code Pairer
-constexpr MetricKey kMetricSetupCodePairerPairDevice = "core_scp_pair_dev";
+constexpr MetricKey kMetricSetupCodePairerPairDevice = "core_setup_code_pairer_pair_dev";
 
-// Operational Setup (Discovery + CASE)
-constexpr MetricKey kMetricDeviceOperationalSetup = "core_dev_opr_setup";
+// Commissioning Operational Setup (Discovery + CASE)
+constexpr MetricKey kMetricDeviceCommissioningOperationalSetup = "core_dcm_operational_setup";
 
 // Operational Discovery
-constexpr MetricKey kMetricDeviceOperationalDiscovery = "core_dev_opr_discovery";
+constexpr MetricKey kMetricDeviceOperationalDiscovery = "core_dev_operational_discovery";
 
 // Operational Discovery Attempt Count
-constexpr MetricKey kMetricDeviceOperationalDiscoveryAttemptCount = "core_dev_opdisc_attempt_ctr";
+constexpr MetricKey kMetricDeviceOperationalDiscoveryAttemptCount = "ore_dev_operational_discovery_attempt_ctr";
 
 // CASE Session
 constexpr MetricKey kMetricDeviceCASESession = "core_dev_case_session";

@@ -248,8 +248,6 @@ void OperationalSessionSetup::UpdateDeviceData(const Transport::PeerAddress & ad
         return;
     }
 
-    MATTER_LOG_METRIC_END(kMetricDeviceOperationalDiscovery, CHIP_NO_ERROR);
-
     CHIP_ERROR err = EstablishConnection(config);
     LogErrorOnFailure(err);
     if (err == CHIP_NO_ERROR)
@@ -308,6 +306,9 @@ CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ReliableMessagePro
 
     mCASEClient = mClientPool->Allocate();
     ReturnErrorCodeIf(mCASEClient == nullptr, CHIP_ERROR_NO_MEMORY);
+
+    // Session has been established. This is when discovery is also stopped
+    MATTER_LOG_METRIC_END(kMetricDeviceOperationalDiscovery, CHIP_NO_ERROR);
 
     MATTER_LOG_METRIC_BEGIN(kMetricDeviceCASESession);
     CHIP_ERROR err = mCASEClient->EstablishSession(mInitParams, mPeerId, mDeviceAddress, config, this);
@@ -615,6 +616,8 @@ CHIP_ERROR OperationalSessionSetup::LookupPeerAddress()
         return CHIP_NO_ERROR;
     }
 
+    // This call be called multiple times for each discovered address.The metric backend can handle this 
+    // and always pick the earliest occurance as the start of the event.
     MATTER_LOG_METRIC_BEGIN(kMetricDeviceOperationalDiscovery);
 
     auto const * fabricInfo = mInitParams.fabricTable->FindFabricWithIndex(mPeerId.GetFabricIndex());
