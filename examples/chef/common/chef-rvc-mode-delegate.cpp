@@ -149,7 +149,8 @@ chip::Protocols::InteractionModel::Status chefRvcRunModeReadCallback(chip::Endpo
                                                                      const EmberAfAttributeMetadata * attributeMetadata,
                                                                      uint8_t * buffer, uint16_t maxReadLength)
 {
-    if(sizeof(*attributeMetadata) <= sizeof(buffer)) {
+    if (sizeof(*attributeMetadata) <= sizeof(buffer))
+    {
         memcpy(buffer, &attributeMetadata, sizeof(attributeMetadata));
         return chip::Protocols::InteractionModel::Status::Success;
     }
@@ -291,7 +292,8 @@ chip::Protocols::InteractionModel::Status chefRvcCleanModeReadCallback(chip::End
                                                                        const EmberAfAttributeMetadata * attributeMetadata,
                                                                        uint8_t * buffer, uint16_t maxReadLength)
 {
-    if(sizeof(*attributeMetadata) <= sizeof(buffer)) {
+    if (sizeof(*attributeMetadata) <= sizeof(buffer))
+    {
         memcpy(buffer, &attributeMetadata, sizeof(attributeMetadata));
         return chip::Protocols::InteractionModel::Status::Success;
     }

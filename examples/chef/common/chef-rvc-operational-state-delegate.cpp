@@ -231,7 +231,8 @@ chip::Protocols::InteractionModel::Status chefRvcOperationalStateReadCallback(ch
                                                                               const EmberAfAttributeMetadata * attributeMetadata,
                                                                               uint8_t * buffer, uint16_t maxReadLength)
 {
-    if(sizeof(*attributeMetadata) <= sizeof(buffer)) {
+    if (sizeof(*attributeMetadata) <= sizeof(buffer))
+    {
         memcpy(buffer, &attributeMetadata, sizeof(attributeMetadata));
         return chip::Protocols::InteractionModel::Status::Success;
     }
