@@ -16,6 +16,7 @@
 
 #import <Matter/Matter.h>
 #import <XCTest/XCTest.h>
+#import <os/lock.h>
 
 #import "MTRAsyncWorkQueue.h"
 

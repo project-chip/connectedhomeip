@@ -2,4 +2,3 @@ AppTests
 DataModelTests
 MessagingLayerTests
 SecureChannelTestsNL
-TransportLayerTests

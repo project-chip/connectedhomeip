@@ -41,6 +41,7 @@
 #include <lib/support/BitFlags.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
+#include <lib/support/IntrusiveList.h>
 #include <lib/support/Scoped.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeHolder.h>
@@ -110,29 +111,26 @@ public:
      * The Invoke Response will not be sent until all outstanding Handles have
      * been destroyed or have had Release called.
      */
-    class Handle
+    class Handle : public IntrusiveListNodeBase<>
     {
     public:
         Handle() {}
         Handle(const Handle & handle) = delete;
         Handle(Handle && handle)
         {
-            mpHandler        = handle.mpHandler;
-            mMagic           = handle.mMagic;
-            handle.mpHandler = nullptr;
-            handle.mMagic    = 0;
+            Init(handle.mpHandler);
+            handle.Release();
         }
         Handle(decltype(nullptr)) {}
-        Handle(CommandHandler * handle);
+        Handle(CommandHandler * handler);
         ~Handle() { Release(); }
 
         Handle & operator=(Handle && handle)
         {
             Release();
-            mpHandler        = handle.mpHandler;
-            mMagic           = handle.mMagic;
-            handle.mpHandler = nullptr;
-            handle.mMagic    = 0;
+            Init(handle.mpHandler);
+
+            handle.Release();
             return *this;
         }
 
@@ -143,16 +141,19 @@ public:
         }
 
         /**
-         * Get the CommandHandler object it holds. Get() may return a nullptr if the CommandHandler object is holds is no longer
+         * Get the CommandHandler object it holds. Get() may return a nullptr if the CommandHandler object it holds is no longer
          * valid.
          */
         CommandHandler * Get();
 
         void Release();
 
+        void Invalidate() { mpHandler = nullptr; }
+
     private:
+        void Init(CommandHandler * handler);
+
         CommandHandler * mpHandler = nullptr;
-        uint32_t mMagic            = 0;
     };
 
     // Previously we kept adding arguments with default values individually as parameters. This is because there
@@ -190,6 +191,14 @@ public:
      * The callback passed in has to outlive this CommandHandler object.
      */
     CommandHandler(Callback * apCallback);
+
+    /*
+     * Destructor.
+     *
+     * The call will also invalidate all Handles created for this CommandHandler.
+     *
+     */
+    ~CommandHandler();
 
     /*
      * Constructor to override the number of supported paths per invoke and command responder.
@@ -525,13 +534,13 @@ private:
      * Users should use CommandHandler::Handle for management the lifespan of the CommandHandler.
      * DefRef should be released in reasonable time, and Close() should only be called when the refcount reached 0.
      */
-    void IncrementHoldOff();
+    void IncrementHoldOff(Handle * apHandle);
 
     /**
      * DecrementHoldOff is used by CommandHandler::Handle for decreasing the refcount of the CommandHandler.
      * When refcount reached 0, CommandHandler will send the response to the peer and shutdown.
      */
-    void DecrementHoldOff();
+    void DecrementHoldOff(Handle * apHandle);
 
     /*
      * Allocates a packet buffer used for encoding an invoke response payload.
@@ -672,12 +681,20 @@ private:
 
     size_t MaxPathsPerInvoke() const { return mMaxPathsPerInvoke; }
 
+    void AddToHandleList(Handle * handle);
+
+    void RemoveFromHandleList(Handle * handle);
+
+    void InvalidateHandles();
+
     bool TestOnlyIsInIdleState() const { return mState == State::Idle; }
 
     Callback * mpCallback = nullptr;
     InvokeResponseMessage::Builder mInvokeResponseBuilder;
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
     size_t mPendingWork                    = 0;
+    /* List to store all currently-outstanding Handles for this Command Handler.*/
+    IntrusiveList<Handle> mpHandleList;
 
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
     TLV::TLVWriter mBackupWriter;

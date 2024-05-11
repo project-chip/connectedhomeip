@@ -55,6 +55,7 @@ if (chip_build_tests) {
   chip_test_group("tests") {
     deps = []
     tests = [
+      "${chip_root}/src/app/interaction-model/tests",
       "${chip_root}/src/access/tests",
       "${chip_root}/src/crypto/tests",
       "${chip_root}/src/inet/tests",
@@ -105,7 +106,7 @@ if (chip_build_tests) {
       ]
 
       if (matter_enable_tracing_support &&
-          matter_trace_config == "multiplexed") {
+          matter_trace_config == "${chip_root}/src/tracing/multiplexed") {
         tests += [ "${chip_root}/src/tracing/tests" ]
       }
     }

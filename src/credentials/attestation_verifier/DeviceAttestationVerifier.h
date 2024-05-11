@@ -387,6 +387,16 @@ public:
                                                            const ByteSpan & csrNonce) = 0;
 
     /**
+     * @brief Verify whether or not the given DAC chain is revoked.
+     *
+     * @param[in] info All of the information required to check for revoked DAC chain.
+     * @param[in] onCompletion Callback handler to provide Attestation Information Verification result to the caller of
+     *                         CheckForRevokedDACChain()
+     */
+    virtual void CheckForRevokedDACChain(const AttestationInfo & info,
+                                         Callback::Callback<OnAttestationInformationVerification> * onCompletion) = 0;
+
+    /**
      * @brief Get the trust store used for the attestation verifier.
      *
      * Returns nullptr if not supported. Be careful not to hold-on to the trust store

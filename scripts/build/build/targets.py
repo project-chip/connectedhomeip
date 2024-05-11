@@ -129,6 +129,7 @@ def BuildHostTarget():
         TargetPart('tv-app', app=HostApp.TV_APP),
         TargetPart('tv-casting-app', app=HostApp.TV_CASTING),
         TargetPart('bridge', app=HostApp.BRIDGE),
+        TargetPart('fabric-bridge', app=HostApp.FABRIC_BRIDGE),
         TargetPart('tests', app=HostApp.TESTS),
         TargetPart('chip-cert', app=HostApp.CERT_TOOL),
         TargetPart('address-resolve-tool', app=HostApp.ADDRESS_RESOLVE),
@@ -184,6 +185,8 @@ def BuildHostTarget():
     target.AppendModifier('rpc', enable_rpcs=True)
     target.AppendModifier('with-ui', imgui_ui=True)
     target.AppendModifier('evse-test-event', enable_test_event_triggers=['EVSE']).OnlyIfRe('-energy-management')
+    target.AppendModifier('enable-dnssd-tests', enable_dnssd_tests=True).OnlyIfRe('-tests')
+    target.AppendModifier('disable-dnssd-tests', enable_dnssd_tests=False).OnlyIfRe('-tests')
 
     return target
 
@@ -228,6 +231,7 @@ def BuildEfr32Target():
 
     # board
     target.AppendFixedTargets([
+        TargetPart('brd2703a', board=Efr32Board.BRD2703A),
         TargetPart('brd4161a', board=Efr32Board.BRD4161A),
         TargetPart('brd4187c', board=Efr32Board.BRD4187C),
         TargetPart('brd4186c', board=Efr32Board.BRD4186C),
@@ -549,6 +553,7 @@ def BuildCyw30739Target():
         TargetPart('light', app=Cyw30739App.LIGHT),
         TargetPart('light-switch', app=Cyw30739App.LIGHT_SWITCH),
         TargetPart('lock', app=Cyw30739App.LOCK),
+        TargetPart('thermostat', app=Cyw30739App.THERMOSTAT),
     ])
 
     return target

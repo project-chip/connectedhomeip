@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
  * interfaces inheriting from this one should be used to actually do the
  * initialization.
  */
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @interface MTRDeviceControllerAbstractParameters : NSObject
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -36,7 +36,7 @@ MTR_NEWLY_AVAILABLE
  * Parameters that can be used to initialize an MTRDeviceController which
  * has a node identity.
  */
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @interface MTRDeviceControllerParameters : MTRDeviceControllerAbstractParameters
 
 /**
@@ -79,7 +79,7 @@ MTR_NEWLY_AVAILABLE
 
 @end
 
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @interface MTRDeviceControllerExternalCertificateParameters : MTRDeviceControllerParameters
 
 - (instancetype)init NS_UNAVAILABLE;
