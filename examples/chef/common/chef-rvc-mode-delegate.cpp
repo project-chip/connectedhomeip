@@ -149,8 +149,11 @@ chip::Protocols::InteractionModel::Status chefRvcRunModeReadCallback(chip::Endpo
                                                                      const EmberAfAttributeMetadata * attributeMetadata,
                                                                      uint8_t * buffer, uint16_t maxReadLength)
 {
-
-    return chip::Protocols::InteractionModel::Status::Success;
+    if(sizeof(*attributeMetadata) <= sizeof(buffer)) {
+        memcpy(buffer, &attributeMetadata, sizeof(attributeMetadata));
+        return chip::Protocols::InteractionModel::Status::Success;
+    }
+    return chip::Protocols::InteractionModel::Status::ResourceExhausted;
 }
 
 void emberAfRvcRunModeClusterInitCallback(chip::EndpointId endpointId)
@@ -288,7 +291,11 @@ chip::Protocols::InteractionModel::Status chefRvcCleanModeReadCallback(chip::End
                                                                        const EmberAfAttributeMetadata * attributeMetadata,
                                                                        uint8_t * buffer, uint16_t maxReadLength)
 {
-    return chip::Protocols::InteractionModel::Status::Success;
+    if(sizeof(*attributeMetadata) <= sizeof(buffer)) {
+        memcpy(buffer, &attributeMetadata, sizeof(attributeMetadata));
+        return chip::Protocols::InteractionModel::Status::Success;
+    }
+    return chip::Protocols::InteractionModel::Status::ResourceExhausted;
 }
 
 void emberAfRvcCleanModeClusterInitCallback(chip::EndpointId endpointId)
