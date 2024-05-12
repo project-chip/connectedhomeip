@@ -264,8 +264,11 @@ static void ResolveCallback(
 
 - (void)stopMonitoring
 {
-    MTR_LOG_INFO("%@ stop connectivity monitoring for %@", self, _instanceName);
-    std::lock_guard lock(sConnectivityMonitorLock);
-    [self _stopMonitoring];
+    // DNSServiceRefDeallocate must be called on the same queue set on the shared connection.
+    dispatch_async(sSharedResolverQueue, ^{
+        MTR_LOG_INFO("%@ stop connectivity monitoring for %@", self, self->_instanceName);
+        std::lock_guard lock(sConnectivityMonitorLock);
+        [self _stopMonitoring];
+    });
 }
 @end
