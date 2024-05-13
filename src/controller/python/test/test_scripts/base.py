@@ -1097,20 +1097,24 @@ class BaseTestHelper:
         self.devCtrl.SetThreadOperationalDataset(bytes.fromhex(dataset))
         return True
 
-    def TestOnOffCluster(self, nodeid: int, endpoint: int, group: int):
+    async def TestOnOffCluster(self, nodeid: int, endpoint: int):
         self.logger.info(
             "Sending On/Off commands to device {} endpoint {}".format(nodeid, endpoint))
-        err, resp = self.devCtrl.ZCLSend("OnOff", "On", nodeid,
-                                         endpoint, group, {}, blocking=True)
-        if err != 0:
+
+        try:
+            await self.devCtrl.SendCommand(nodeid, endpoint,
+                                           Clusters.OnOff.Commands.On())
+        except IM.InteractionModelError as ex:
             self.logger.error(
-                "failed to send OnOff.On: error is {} with im response{}".format(err, resp))
+                "failed to send OnOff.On: error is {}".format(ex.status))
             return False
-        err, resp = self.devCtrl.ZCLSend("OnOff", "Off", nodeid,
-                                         endpoint, group, {}, blocking=True)
-        if err != 0:
+
+        try:
+            await self.devCtrl.SendCommand(nodeid, endpoint,
+                                           Clusters.OnOff.Commands.Off())
+        except IM.InteractionModelError as ex:
             self.logger.error(
-                "failed to send OnOff.Off: error is {} with im response {}".format(err, resp))
+                "failed to send OnOff.Off: error is {}".format(ex.status))
             return False
         return True
 
