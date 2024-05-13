@@ -308,6 +308,12 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     } else if (chip_device_platform == "stm32") {
       device_layer_target_define = "STM32"
       defines += [ "CHIP_DEVICE_LAYER_TARGET=stm32" ]
+    } else if (chip_device_platform == "nuttx") {
+      device_layer_target_define = "NUTTX"
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET=NuttX",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
+      ]
     } else {
       device_layer_target_define = ""
     }
@@ -346,6 +352,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "OPEN_IOT_SDK",
       "ASR",
       "STM32",
+      "NUTTX",
     ]
     foreach(possible_device_layer_target_define,
             possible_device_layer_target_defines) {
@@ -576,6 +583,8 @@ if (chip_device_platform != "none") {
       _platform_target = "ASR"
     } else if (chip_device_platform == "stm32") {
       _platform_target = "stm32"
+    } else if (chip_device_platform == "nuttx") {
+      _platform_target = "NuttX"
     } else {
       assert(false, "Unknown chip_device_platform: ${chip_device_platform}")
     }
