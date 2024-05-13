@@ -56,7 +56,9 @@ using namespace DeviceLayer::NetworkCommissioning;
 namespace {
 
 // For WiFi and Thread scan results, each item will cost ~60 bytes in TLV, thus 15 is a safe upper bound of scan results.
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP || CHIP_DEVICE_CONFIG_ENABLE_THREAD
 constexpr size_t kMaxNetworksInScanResponse = 15;
+#endif
 
 constexpr uint16_t kCurrentClusterRevision = 2;
 
@@ -544,6 +546,7 @@ bool CheckFailSafeArmed(CommandHandlerInterface::HandlerContext & ctx)
 
 void Instance::HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands::AddOrUpdateWiFiNetwork::DecodableType & req)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
     MATTER_TRACE_SCOPE("HandleAddOrUpdateWiFiNetwork", "NetworkCommissioning");
 
     VerifyOrReturn(CheckFailSafeArmed(ctx));
@@ -616,6 +619,7 @@ void Instance::HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands
         UpdateBreadcrumb(req.breadcrumb);
         ReportNetworksListChanged();
     }
+#endif
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
@@ -726,6 +730,8 @@ exit:
 
 void Instance::HandleAddOrUpdateThreadNetwork(HandlerContext & ctx, const Commands::AddOrUpdateThreadNetwork::DecodableType & req)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
     MATTER_TRACE_SCOPE("HandleAddOrUpdateThreadNetwork", "NetworkCommissioning");
 
     VerifyOrReturn(CheckFailSafeArmed(ctx));
@@ -743,6 +749,7 @@ void Instance::HandleAddOrUpdateThreadNetwork(HandlerContext & ctx, const Comman
         ReportNetworksListChanged();
         UpdateBreadcrumb(req.breadcrumb);
     }
+#endif
 }
 
 void Instance::UpdateBreadcrumb(const Optional<uint64_t> & breadcrumb)
@@ -978,6 +985,7 @@ void Instance::OnResult(Status commissioningError, CharSpan debugText, int32_t i
 
 void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseIterator * networks)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     CHIP_ERROR err        = CHIP_NO_ERROR;
     auto commandHandleRef = std::move(mAsyncCommandHandle);
     auto commandHandle    = commandHandleRef.Get();
@@ -1088,10 +1096,12 @@ exit:
         CommitSavedBreadcrumb();
     }
     networks->Release();
+#endif
 }
 
 void Instance::OnFinished(Status status, CharSpan debugText, WiFiScanResponseIterator * networks)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
     CHIP_ERROR err        = CHIP_NO_ERROR;
     auto commandHandleRef = std::move(mAsyncCommandHandle);
     auto commandHandle    = commandHandleRef.Get();
@@ -1168,6 +1178,7 @@ exit:
     {
         networks->Release();
     }
+#endif
 }
 
 void Instance::OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
