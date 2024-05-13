@@ -98,6 +98,12 @@ class MyUserPrompter : public UserPrompter
 
     // tv should override this with a dialog prompt
     inline void PromptCommissioningFailed(const char * commissioneeName, CHIP_ERROR error) override { return; }
+
+    // tv should override this with a dialog prompt
+    inline void PromptForAppInstallOKPermission(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override
+    {
+        return;
+    }
 };
 
 MyUserPrompter gMyUserPrompter;
@@ -145,6 +151,16 @@ class MyPasscodeService : public PasscodeService
     }
 };
 MyPasscodeService gMyPasscodeService;
+
+class MyAppInstallationService : public AppInstallationService
+{
+    bool HasContentApp(uint16_t vendorId, uint16_t productId) override
+    {
+        return ContentAppPlatform::GetInstance().LoadContentAppByClient(vendorId, productId) != nullptr;
+    }
+};
+
+MyAppInstallationService gMyAppInstallationService;
 
 class MyPostCommissioningListener : public PostCommissioningListener
 {
@@ -623,6 +639,7 @@ CHIP_ERROR AppTvInit()
     if (cdc != nullptr)
     {
         cdc->SetPasscodeService(&gMyPasscodeService);
+        cdc->SetAppInstallationService(&gMyAppInstallationService);
         cdc->SetUserPrompter(&gMyUserPrompter);
         cdc->SetPostCommissioningListener(&gMyPostCommissioningListener);
     }

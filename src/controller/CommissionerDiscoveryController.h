@@ -150,6 +150,22 @@ public:
      */
     virtual void PromptCommissioningFailed(const char * commissioneeName, CHIP_ERROR error) = 0;
 
+    /**
+     * @brief
+     *   Called to prompt the user for consent to allow the given commissioneeName/vendorId/productId to be commissioned.
+     * For example "[commissioneeName] is requesting permission to cast to this TV, approve?"
+     *
+     * If user responds with OK then implementor should call CommissionerRespondOk();
+     * If user responds with Cancel then implementor should call CommissionerRespondCancel();
+     *
+     *  @param[in]    vendorId           The vendorId in the DNS-SD advertisement of the requesting commissionee.
+     *  @param[in]    productId          The productId in the DNS-SD advertisement of the requesting commissionee.
+     *  @param[in]    commissioneeName   The commissioneeName in the DNS-SD advertisement of the requesting commissionee.
+     *
+     */
+    virtual void PromptForAppInstallOKPermission(uint16_t vendorId, uint16_t productId, const char * commissioneeName) = 0;
+
+
     virtual ~UserPrompter() = default;
 };
 
@@ -202,6 +218,27 @@ public:
     virtual void FetchCommissionPasscodeFromContentApp(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId) = 0;
 
     virtual ~PasscodeService() = default;
+};
+
+class DLL_EXPORT AppInstallationService
+{
+public:
+    /**
+     * @brief
+     *   Called to get the setup passcode from the content app corresponding to the given vendorId/productId.
+     *
+     * This will be called by the main chip thread so any blocking work should be moved to a separate thread.
+     *
+     * After attempting to obtain the passcode, implementor should call HandleContentAppPasscodeResponse();
+     *
+     *  @param[in]    vendorId           The vendorId in the DNS-SD advertisement of the requesting commissionee.
+     *  @param[in]    productId          The productId in the DNS-SD advertisement of the requesting commissionee.
+     *  @param[in]    rotatingId         The rotatingId in the DNS-SD advertisement of the requesting commissionee.
+     *
+     */
+    virtual bool HasContentApp(uint16_t vendorId, uint16_t productId) = 0;
+
+    virtual ~AppInstallationService() = default;
 };
 
 class DLL_EXPORT PostCommissioningListener
@@ -393,6 +430,11 @@ public:
     inline PasscodeService * GetPasscodeService() { return mPasscodeService; }
 
     /**
+     * Assign an AppInstallationService
+     */
+    inline void SetAppInstallationService(AppInstallationService * appInstallationService) { mAppInstallationService = appInstallationService; }
+
+    /**
      * Assign a Commissioner Callback to perform commissioning once user consent has been given
      */
     inline void SetCommissionerCallback(CommissionerCallback * commissionerCallback)
@@ -430,6 +472,7 @@ protected:
     UserDirectedCommissioningServer * mUdcServer           = nullptr;
     UserPrompter * mUserPrompter                           = nullptr;
     PasscodeService * mPasscodeService                     = nullptr;
+    AppInstallationService * mAppInstallationService       = nullptr;
     CommissionerCallback * mCommissionerCallback           = nullptr;
     PostCommissioningListener * mPostCommissioningListener = nullptr;
 };

@@ -244,6 +244,21 @@ void CommissionerDiscoveryController::InternalOk()
     CharSpan rotatingIdSpan(rotatingIdBuffer, 2 * rotatingIdLength);
 
     uint8_t targetAppCount = client->GetNumTargetAppInfos();
+
+    bool isContentAppInstalled = mAppInstallationService->HasContentApp(client->GetVendorId(), client->GetProductId());
+
+    if (!isContentAppInstalled) {
+        ChipLogError(AppServer, "UX InternalOk: app not installed.");
+
+        // dialog
+        ChipLogDetail(Controller,
+                        "------PROMPT USER: %s is requesting to install app on this TV, accept? [" ChipLogFormatMEI "," ChipLogFormatMEI "]",
+                        client->GetDeviceName(), ChipLogValueMEI(client->GetVendorId()), ChipLogValueMEI(client->GetProductId()));
+
+        mUserPrompter->PromptForAppInstallOKPermission(client->GetVendorId(), client->GetProductId(), client->GetDeviceName());
+        return;
+    }
+
     if (targetAppCount > 0)
     {
         ChipLogDetail(AppServer, "UX InternalOk: checking for each target app specified");
@@ -583,6 +598,7 @@ void CommissionerDiscoveryController::Cancel()
     }
     client->SetUDCClientProcessingState(UDCClientProcessingState::kUserDeclined);
     mPendingConsent = false;
+    ResetState();
 }
 
 void CommissionerDiscoveryController::CommissioningSucceeded(uint16_t vendorId, uint16_t productId, NodeId nodeId,
