@@ -64,8 +64,8 @@ public:
      *  of this instance, this method is invoked once after object
      *  construction until a call to Close is made to terminate the
      *  instance.
-     * 
-     *  @param[in] apWriteHandlerDelegate  A Valid pointer to the WriteHandlerDelegate. 
+     *
+     *  @param[in] apWriteHandlerDelegate  A Valid pointer to the WriteHandlerDelegate.
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
      *          kState_NotInitialized.
