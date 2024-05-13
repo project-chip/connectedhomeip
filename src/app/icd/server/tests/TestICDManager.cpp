@@ -1061,10 +1061,14 @@ TEST_F(TestICDManager, TestICDStateObserverOnTransitionToIdleModeEqualActiveMode
 
     // Expire IdleMode timer
     AdvanceClockAndRunEventLoop(1_s);
-    EXPECT_FALSE(mICDStateObserver.mOnTransitionToIdleCalled);
+    // In this scenario, The ICD state machine kicked a OnTransitionToIdle timer with a duration of 0 seconds.
+    // The freeRTOS systemlayer timer calls a 0s timer's callback instantly while on posix it take and 1 addition event loop.
+    // Thefore, the expect result diverges here based on the systemlayer implementation. Skip this check.
+    // EXPECT_FALSE(mICDStateObserver.mOnTransitionToIdleCalled);
 
     // Expire OnTransitionToIdleMode
     AdvanceClockAndRunEventLoop(1_ms32);
+    // All systems should have called the OnTransitionToIdle callback by now.
     EXPECT_TRUE(mICDStateObserver.mOnTransitionToIdleCalled);
 
     // Reset Old durations
