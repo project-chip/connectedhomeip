@@ -138,13 +138,13 @@ private:
         uint32_t size      = size_default;
 
         ReturnErrorOnFailure(SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_Creds_Base_Addr, base_addr));
-        address = (uint8_t *) (base_addr + offset);
 
         // Offset
         if (SilabsConfig::ConfigValueExists(offset_key))
         {
             ReturnErrorOnFailure(SilabsConfig::ReadConfigValue(offset_key, offset));
         }
+        address = (uint8_t *) (base_addr + offset);
 
         // Size
         if (SilabsConfig::ConfigValueExists(size_key))

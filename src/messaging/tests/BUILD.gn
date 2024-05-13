@@ -54,8 +54,10 @@ chip_test_suite_using_nltest("tests") {
   if (chip_device_platform != "efr32") {
     # TODO(#10447): ReliableMessage Test has HF, and ExchangeMgr hangs on EFR32.
     # And TestAbortExchangesForFabric does not link on EFR32 for some reason.
+    # TODO #33372: TestExchange.cpp asserts in ExchangeContext::SendMessage
     test_sources += [
       "TestAbortExchangesForFabric.cpp",
+      "TestExchange.cpp",
       "TestExchangeMgr.cpp",
       "TestReliableMessageProtocol.cpp",
     ]
