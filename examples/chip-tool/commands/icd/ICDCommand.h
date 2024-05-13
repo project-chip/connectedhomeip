@@ -52,7 +52,7 @@ public:
     ICDWaitForDeviceCommand(CredentialIssuerCommands * credIssuerCmds) : ClusterCommand("wait-for-device", credIssuerCmds)
     {
         ModelCommand::AddArguments(/*skipEndpoints=*/true);
-        AddArgument("stay-active-duration-seconds", 1, UINT32_MAX, &mStayActiveDurationSeconds,
+        AddArgument("stay-active-duration-seconds", 30, UINT32_MAX, &mStayActiveDurationSeconds,
                     "The duration in seconds for the device to stay active after check-in completes.");
     }
 
@@ -66,7 +66,7 @@ public:
 
 private:
     chip::ScopedNodeId mInterestedNode;
-    uint32_t mStayActiveDurationSeconds;
+    uint32_t mStayActiveDurationSeconds = 30;
 };
 
 void registerCommandsICD(Commands & commands, CredentialIssuerCommands * credsIssuerConfig);

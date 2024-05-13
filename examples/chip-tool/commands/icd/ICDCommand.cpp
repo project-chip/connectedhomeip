@@ -91,6 +91,7 @@ void ICDWaitForDeviceCommand::OnCheckInComplete(const chip::app::ICDClientInfo &
     ChipLogDetail(chipTool, "Received check-in message from the node, send stay active request to the device.");
     mInterestedNode = ScopedNodeId();
 
+    // Intentionally call RunCommand, since it includes all necessary steps for SendCommand.
     CHIP_ERROR err = ClusterCommand::RunCommand();
     if (err != CHIP_NO_ERROR)
     {

@@ -70,11 +70,7 @@ public:
     void Shutdown() override;
 
 protected:
-    bool IsPeerLIT()
-    {
-        CheckPeerICDType();
-        return mIsPeerLIT.ValueOr(false);
-    }
+    bool IsPeerLIT();
 
     chip::NodeId GetDestinationId() const { return mDestinationId; }
 
