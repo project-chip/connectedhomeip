@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -85,9 +85,9 @@ void AppTask::ActionCompleted(PumpManager::Action_t action, int32_t actor)
 void AppTask::PostStartActionRequest(int32_t actor, PumpManager::Action_t action)
 {
     AppEvent event;
-    event.Type              = AppEvent::kEventType_Start;
-    event.StartEvent.Actor  = actor;
-    event.StartEvent.Action = action;
+    event.Type              = AppEvent::kEventType_DeviceAction;
+    event.DeviceEvent.Actor  = actor;
+    event.DeviceEvent.Action = action;
     event.Handler           = StartActionEventHandler;
     sAppTask.PostEvent(&event);
 }
@@ -97,10 +97,10 @@ void AppTask::StartActionEventHandler(AppEvent * aEvent)
     PumpManager::Action_t action = PumpManager::INVALID_ACTION;
     int32_t actor                = 0;
 
-    if (aEvent->Type == AppEvent::kEventType_Start)
+    if (aEvent->Type == AppEvent::kEventType_DeviceAction)
     {
-        action = static_cast<PumpManager::Action_t>(aEvent->StartEvent.Action);
-        actor  = aEvent->StartEvent.Actor;
+        action = static_cast<PumpManager::Action_t>(aEvent->DeviceEvent.Action);
+        actor  = aEvent->DeviceEvent.Actor;
     }
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {

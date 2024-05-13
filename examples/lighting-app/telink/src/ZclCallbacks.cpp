@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,14 +42,14 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     {
         ChipLogDetail(Zcl, "Cluster OnOff: attribute OnOff set to %u", *value);
         GetAppTask().SetInitiateAction(*value ? AppTask::ON_ACTION : AppTask::OFF_ACTION,
-                                       static_cast<int32_t>(AppEvent::kEventType_Lighting), value);
+                                       static_cast<int32_t>(AppEvent::kEventType_DeviceAction), value);
     }
     else if (clusterId == LevelControl::Id && attributeId == LevelControl::Attributes::CurrentLevel::Id)
     {
         if (GetAppTask().IsTurnedOn())
         {
             ChipLogDetail(Zcl, "Cluster LevelControl: attribute CurrentLevel set to %u", *value);
-            GetAppTask().SetInitiateAction(AppTask::LEVEL_ACTION, static_cast<int32_t>(AppEvent::kEventType_Lighting), value);
+            GetAppTask().SetInitiateAction(AppTask::LEVEL_ACTION, static_cast<int32_t>(AppEvent::kEventType_DeviceAction), value);
         }
         else
         {
@@ -79,7 +79,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
             }
 
             ChipLogDetail(Zcl, "New XY color: %u|%u", xy.x, xy.y);
-            GetAppTask().SetInitiateAction(AppTask::COLOR_ACTION_XY, static_cast<int32_t>(AppEvent::kEventType_Lighting),
+            GetAppTask().SetInitiateAction(AppTask::COLOR_ACTION_XY, static_cast<int32_t>(AppEvent::kEventType_DeviceAction),
                                            (uint8_t *) &xy);
         }
         /* HSV color space */
@@ -101,14 +101,14 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
                 hsv.s = *value;
             }
             ChipLogDetail(Zcl, "New HSV color: hue = %u| saturation = %u", hsv.h, hsv.s);
-            GetAppTask().SetInitiateAction(AppTask::COLOR_ACTION_HSV, static_cast<int32_t>(AppEvent::kEventType_Lighting),
+            GetAppTask().SetInitiateAction(AppTask::COLOR_ACTION_HSV, static_cast<int32_t>(AppEvent::kEventType_DeviceAction),
                                            (uint8_t *) &hsv);
         }
         /* Temperature Mireds color space */
         else if (attributeId == ColorControl::Attributes::ColorTemperatureMireds::Id)
         {
             ChipLogDetail(Zcl, "New Temperature Mireds color = %u", *(uint16_t *) value);
-            GetAppTask().SetInitiateAction(AppTask::COLOR_ACTION_CT, static_cast<int32_t>(AppEvent::kEventType_Lighting), value);
+            GetAppTask().SetInitiateAction(AppTask::COLOR_ACTION_CT, static_cast<int32_t>(AppEvent::kEventType_DeviceAction), value);
         }
         else
         {
