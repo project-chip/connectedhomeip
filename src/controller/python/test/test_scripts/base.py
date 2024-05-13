@@ -178,29 +178,6 @@ class TestTimeout(threading.Thread):
             TestFail("Timeout", doCrash=True)
 
 
-class TestResult:
-    def __init__(self, operationName, result):
-        self.operationName = operationName
-        self.result = result
-
-    def assertStatusEqual(self, expected):
-        if self.result is None:
-            raise Exception(f"{self.operationName}: no result got")
-        if self.result.status != expected:
-            raise Exception(
-                f"{self.operationName}: expected status {expected}, got {self.result.status}")
-        return self
-
-    def assertValueEqual(self, expected):
-        self.assertStatusEqual(0)
-        if self.result is None:
-            raise Exception(f"{self.operationName}: no result got")
-        if self.result.value != expected:
-            raise Exception(
-                f"{self.operationName}: expected value {expected}, got {self.result.value}")
-        return self
-
-
 class BaseTestHelper:
     def __init__(self, nodeid: int, paaTrustStorePath: str, testCommissioner: bool = False,
                  keypair: p256keypair.P256Keypair = None):
