@@ -41,7 +41,7 @@ class WriteHandler;
 
 class WriteHandlerDelegate
 {
- public:
+public:
     virtual ~WriteHandlerDelegate() = default;
 
     /**
