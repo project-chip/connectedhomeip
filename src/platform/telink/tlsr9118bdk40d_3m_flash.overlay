@@ -13,19 +13,19 @@
 		};
 		slot0_partition: partition@20000 {
 			label = "image-0";
-			reg = <0x20000 0xec000>;
+			reg = <0x20000 0xe8000>;
 		};
-		factory_partition: partition@106000 {
+		factory_partition: partition@108000 {
 			label = "factory-data";
-			reg = <0x106000 0x1000>;
+			reg = <0x108000 0x1000>;
 		};
-		storage_partition: partition@107000 {
+		storage_partition: partition@109000 {
 			label = "storage";
-			reg = <0x107000 0xd000>;
+			reg = <0x109000 0xf000>;
 		};
-		slot1_partition: partition@114000 {
+		slot1_partition: partition@118000 {
 			label = "image-1";
-			reg = <0x114000 0xec000>;
+			reg = <0x118000 0xe8000>;
 		};
 		reserved_partition: partition@200000 {
 			label = "vendor-data";

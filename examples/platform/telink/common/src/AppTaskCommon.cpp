@@ -221,7 +221,7 @@ CHIP_ERROR AppTaskCommon::StartApp(void)
 #endif
 
 #ifdef CONFIG_BOOTLOADER_MCUBOOT
-    if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
+    if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned() && !chip::DeviceLayer::ConnectivityMgr().IsWiFiStationProvisioned())
     {
         LOG_INF("Confirm image.");
         OtaConfirmNewImage();
