@@ -27,20 +27,20 @@ namespace chip {
 #define CHIP_ERROR_TLV_PROCESSOR(e)                                                                                                \
     ChipError(ChipError::Range::kLastRange, ((uint8_t) ChipError::Range::kLastRange << 3) | e, __FILE__, __LINE__)
 
-#define CHIP_OTA_TLV_CONTINUE_PROCESSING CHIP_ERROR_TLV_PROCESSOR(0x01)
-#define CHIP_OTA_CHANGE_PROCESSOR CHIP_ERROR_TLV_PROCESSOR(0x02)
-#define CHIP_OTA_PROCESSOR_NOT_REGISTERED CHIP_ERROR_TLV_PROCESSOR(0x03)
-#define CHIP_OTA_PROCESSOR_ALREADY_REGISTERED CHIP_ERROR_TLV_PROCESSOR(0x04)
-#define CHIP_OTA_PROCESSOR_CLIENT_INIT CHIP_ERROR_TLV_PROCESSOR(0x05)
-#define CHIP_OTA_PROCESSOR_MAKE_ROOM CHIP_ERROR_TLV_PROCESSOR(0x06)
-#define CHIP_OTA_PROCESSOR_PUSH_CHUNK CHIP_ERROR_TLV_PROCESSOR(0x07)
-#define CHIP_OTA_PROCESSOR_IMG_AUTH CHIP_ERROR_TLV_PROCESSOR(0x08)
-#define CHIP_OTA_FETCH_ALREADY_SCHEDULED CHIP_ERROR_TLV_PROCESSOR(0x09)
-#define CHIP_OTA_PROCESSOR_IMG_COMMIT CHIP_ERROR_TLV_PROCESSOR(0x0A)
-#define CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED CHIP_ERROR_TLV_PROCESSOR(0x0B)
-#define CHIP_OTA_PROCESSOR_EEPROM_OFFSET CHIP_ERROR_TLV_PROCESSOR(0x0C)
-#define CHIP_OTA_PROCESSOR_EXTERNAL_STORAGE CHIP_ERROR_TLV_PROCESSOR(0x0D)
-#define CHIP_OTA_PROCESSOR_START_IMAGE CHIP_ERROR_TLV_PROCESSOR(0x0E)
+#define CHIP_ERROR_OTA_CHANGE_PROCESSOR CHIP_ERROR_TLV_PROCESSOR(0x02)
+#define CHIP_ERROR_OTA_PROCESSOR_NOT_REGISTERED CHIP_ERROR_TLV_PROCESSOR(0x03)
+#define CHIP_ERROR_OTA_PROCESSOR_ALREADY_REGISTERED CHIP_ERROR_TLV_PROCESSOR(0x04)
+#define CHIP_ERROR_OTA_PROCESSOR_CLIENT_INIT CHIP_ERROR_TLV_PROCESSOR(0x05)
+#define CHIP_ERROR_OTA_PROCESSOR_MAKE_ROOM CHIP_ERROR_TLV_PROCESSOR(0x06)
+#define CHIP_ERROR_OTA_PROCESSOR_PUSH_CHUNK CHIP_ERROR_TLV_PROCESSOR(0x07)
+#define CHIP_ERROR_OTA_PROCESSOR_IMG_AUTH CHIP_ERROR_TLV_PROCESSOR(0x08)
+#define CHIP_ERROR_OTA_FETCH_ALREADY_SCHEDULED CHIP_ERROR_TLV_PROCESSOR(0x09)
+#define CHIP_ERROR_OTA_PROCESSOR_IMG_COMMIT CHIP_ERROR_TLV_PROCESSOR(0x0A)
+#define CHIP_ERROR_OTA_PROCESSOR_CB_NOT_REGISTERED CHIP_ERROR_TLV_PROCESSOR(0x0B)
+#define CHIP_ERROR_OTA_PROCESSOR_EEPROM_OFFSET CHIP_ERROR_TLV_PROCESSOR(0x0C)
+#define CHIP_ERROR_OTA_PROCESSOR_EXTERNAL_STORAGE CHIP_ERROR_TLV_PROCESSOR(0x0D)
+#define CHIP_ERROR_OTA_PROCESSOR_START_IMAGE CHIP_ERROR_TLV_PROCESSOR(0x0E)
+#define CHIP_ERROR_OTA_PROCESSOR_DO_NOT_APPLY CHIP_ERROR_TLV_PROCESSOR(0x0F)
 
 // Descriptor constants
 constexpr size_t kVersionStringSize = 64;
@@ -77,13 +77,19 @@ struct OTATlvHeader
 class OTATlvProcessor
 {
 public:
+    enum class ApplyState : uint8_t
+    {
+        kApply = 0,
+        kDoNotApply
+    };
+
     virtual ~OTATlvProcessor() {}
 
     virtual CHIP_ERROR Init()        = 0;
     virtual CHIP_ERROR Clear()       = 0;
-    virtual CHIP_ERROR ApplyAction() = 0;
     virtual CHIP_ERROR AbortAction() = 0;
     virtual CHIP_ERROR ExitAction() { return CHIP_NO_ERROR; }
+    virtual CHIP_ERROR ApplyAction();
 
     CHIP_ERROR Process(ByteSpan & block);
     void RegisterDescriptorCallback(ProcessDescriptor callback) { mCallbackProcessDescriptor = callback; }
@@ -102,7 +108,7 @@ protected:
      * If more image chunks are needed, CHIP_ERROR_BUFFER_TOO_SMALL error is returned.
      * Other error codes indicate that an error occurred during processing. Fetching
      * next data is scheduled automatically by OTAImageProcessorImpl if the return value
-     * is neither an error code, nor CHIP_OTA_FETCH_ALREADY_SCHEDULED (which implies the
+     * is neither an error code, nor CHIP_ERROR_OTA_FETCH_ALREADY_SCHEDULED (which implies the
      * scheduling is done inside ProcessInternal or will be done in the future, through a
      * callback).
      *
@@ -110,13 +116,13 @@ protected:
      *              returns CHIP_NO_ERROR, the byte span is used to return a remaining part
      *              of the chunk, not used by current TLV processor.
      *
-     * @retval CHIP_NO_ERROR                    Block was processed successfully.
-     * @retval CHIP_ERROR_BUFFER_TOO_SMALL      Provided buffers are insufficient to decode some
-     *                                          metadata (e.g. a descriptor).
-     * @retval CHIP_OTA_FETCH_ALREADY_SCHEDULED Should be returned if ProcessInternal schedules
-     *                                          fetching next data (e.g. through a callback).
-     * @retval Error code                       Something went wrong. Current OTA process will be
-     *                                          canceled.
+     * @retval CHIP_NO_ERROR                          Block was processed successfully.
+     * @retval CHIP_ERROR_BUFFER_TOO_SMALL            Provided buffers are insufficient to decode some
+     *                                                metadata (e.g. a descriptor).
+     * @retval CHIP_ERROR_OTA_FETCH_ALREADY_SCHEDULED Should be returned if ProcessInternal schedules
+     *                                                fetching next data (e.g. through a callback).
+     * @retval Error code                             Something went wrong. Current OTA process will be
+     *                                                canceled.
      */
     virtual CHIP_ERROR ProcessInternal(ByteSpan & block) = 0;
 
@@ -130,9 +136,23 @@ protected:
     /* Expected byte size of the OTAEncryptionKeyLength */
     static constexpr size_t kOTAEncryptionKeyLength = 16;
 #endif
-    uint32_t mLength                             = 0;
-    uint32_t mProcessedLength                    = 0;
-    bool mWasSelected                            = false;
+    uint32_t mLength          = 0;
+    uint32_t mProcessedLength = 0;
+    bool mWasSelected         = false;
+
+    /**
+     * @brief A flag to account for corner cases during OTA apply
+     *
+     * Used by the default ApplyAction implementation.
+     *
+     * If something goes wrong during ExitAction of the TLV processor,
+     * then mApplyState should be set to kDoNotApply and the image processor
+     * should abort. In this case, the BDX transfer was already finished
+     * and calling CancelImageUpdate will not abort the transfer, hence
+     * the device will reboot even though it should not have. If ApplyAction
+     * fails during HandleApply, then the process will be aborted.
+     */
+    ApplyState mApplyState                       = ApplyState::kApply;
     ProcessDescriptor mCallbackProcessDescriptor = nullptr;
 };
 
