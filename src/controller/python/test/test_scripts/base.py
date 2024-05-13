@@ -1165,29 +1165,27 @@ class BaseTestHelper:
             self.logger.exception("Failed to resolve. {}".format(ex))
             return False
 
-    def TestReadBasicAttributes(self, nodeid: int, endpoint: int, group: int):
+    async def TestReadBasicAttributes(self, nodeid: int, endpoint: int):
+        attrs = Clusters.BasicInformation.Attributes
         basic_cluster_attrs = {
-            "VendorName": "TEST_VENDOR",
-            "VendorID": 0xFFF1,
-            "ProductName": "TEST_PRODUCT",
-            "ProductID": 0x8001,
-            "NodeLabel": "Test",
-            "Location": "XX",
-            "HardwareVersion": 0,
-            "HardwareVersionString": "TEST_VERSION",
-            "SoftwareVersion": 1,
-            "SoftwareVersionString": "1.0",
+            attrs.VendorName: "TEST_VENDOR",
+            attrs.VendorID: 0xFFF1,
+            attrs.ProductName: "TEST_PRODUCT",
+            attrs.ProductID: 0x8001,
+            attrs.NodeLabel: "Test",
+            attrs.Location: "XX",
+            attrs.HardwareVersion: 0,
+            attrs.HardwareVersionString: "TEST_VERSION",
+            attrs.SoftwareVersion: 1,
+            attrs.SoftwareVersionString: "1.0",
         }
         failed_zcl = {}
         for basic_attr, expected_value in basic_cluster_attrs.items():
             try:
-                res = self.devCtrl.ZCLReadAttribute(cluster="BasicInformation",
-                                                    attribute=basic_attr,
-                                                    nodeid=nodeid,
-                                                    endpoint=endpoint,
-                                                    groupid=group)
-                TestResult(f"Read attribute {basic_attr}", res).assertValueEqual(
-                    expected_value)
+                res = await self.devCtrl.ReadAttribute(nodeid, [(endpoint, basic_attr)])
+                readVal = res[endpoint][Clusters.BasicInformation][basic_attr]
+                if readVal != expected_value:
+                    raise Exception(f"Read attribute: expected value {expected_value}, got {readVal}")
             except Exception as ex:
                 failed_zcl[basic_attr] = str(ex)
         if failed_zcl:

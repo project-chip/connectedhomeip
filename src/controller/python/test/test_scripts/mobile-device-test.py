@@ -122,9 +122,8 @@ def TestDatamodel(test: BaseTestHelper, device_nodeid: int):
               "Failed when testing Python Cluster Object APIs")
 
     logger.info("Testing attribute reading")
-    FailIfNot(test.TestReadBasicAttributes(nodeid=device_nodeid,
-                                           endpoint=ENDPOINT_ID,
-                                           group=GROUP_ID),
+    FailIfNot(asyncio.run(test.TestReadBasicAttributes(nodeid=device_nodeid,
+                                                       endpoint=ENDPOINT_ID)),
               "Failed to test Read Basic Attributes")
 
     logger.info("Testing attribute writing")
@@ -133,9 +132,8 @@ def TestDatamodel(test: BaseTestHelper, device_nodeid: int):
               "Failed to test Write Basic Attributes")
 
     logger.info("Testing attribute reading basic again")
-    FailIfNot(test.TestReadBasicAttributes(nodeid=1,
-                                           endpoint=ENDPOINT_ID,
-                                           group=GROUP_ID),
+    FailIfNot(asyncio.run(test.TestReadBasicAttributes(nodeid=1,
+                                                       endpoint=ENDPOINT_ID)),
               "Failed to test Read Basic Attributes")
 
     logger.info("Testing subscription")
