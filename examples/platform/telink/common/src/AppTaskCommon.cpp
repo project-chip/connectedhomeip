@@ -221,7 +221,8 @@ CHIP_ERROR AppTaskCommon::StartApp(void)
 #endif
 
 #ifdef CONFIG_BOOTLOADER_MCUBOOT
-    if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned() && !chip::DeviceLayer::ConnectivityMgr().IsWiFiStationProvisioned())
+    if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned() &&
+        !chip::DeviceLayer::ConnectivityMgr().IsWiFiStationProvisioned())
     {
         LOG_INF("Confirm image.");
         OtaConfirmNewImage();
@@ -373,7 +374,8 @@ void AppTaskCommon::InitPwms()
 
 void AppTaskCommon::LinkPwms(PwmManager & pwmManager)
 {
-#if CONFIG_WS2812_STRIP || CONFIG_BOARD_TLSR9118BDK40D // TLSR9118BDK40D EVK buttons located on 4th PWM channel (see tlsr9118bdk40d.overlay)
+#if CONFIG_WS2812_STRIP ||                                                                                                         \
+    CONFIG_BOARD_TLSR9118BDK40D // TLSR9118BDK40D EVK buttons located on 4th PWM channel (see tlsr9118bdk40d.overlay)
     pwmManager.linkPwm(PwmManager::EAppPwm_Red, 0);
     pwmManager.linkPwm(PwmManager::EAppPwm_Green, 1);
     pwmManager.linkPwm(PwmManager::EAppPwm_Blue, 2);

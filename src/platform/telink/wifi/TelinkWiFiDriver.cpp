@@ -175,7 +175,7 @@ CHIP_ERROR TelinkWiFiDriver::RevertConfiguration()
 }
 
 Status TelinkWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
-                                         uint8_t & outNetworkIndex)
+                                            uint8_t & outNetworkIndex)
 {
     outDebugText    = {};
     outNetworkIndex = 0;
