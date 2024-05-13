@@ -131,7 +131,7 @@ class literal:
 
     def __call__(self):
         # This should never be called
-        raise ConformanceException(f'Literal conformance function should not be called - this is simply a value holder')
+        raise ConformanceException('Literal conformance function should not be called - this is simply a value holder')
 
     def __str__(self):
         return str(self.value)
