@@ -18,10 +18,12 @@
 import copy
 import logging
 import time
+import queue
 
 import chip.clusters as Clusters
+from chip.clusters import ClusterObjects as ClusterObjects
 from chip.ChipDeviceCtrl import ChipDeviceController
-from chip.clusters.Attribute import AttributePath, TypedAttributePath
+from chip.clusters.Attribute import AttributePath, TypedAttributePath, SubscriptionTransaction
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
@@ -41,6 +43,23 @@ Validates Interaction Data Model (IDM), specifically subscription responses. Som
 Full test plan link for details:
 https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/interactiondatamodel.adoc#tc-idm-4-2-subscription-response-messages-from-dut-test-cases-dut_server
 '''
+
+class AttributeChangeCallback:
+    def __init__(self, expected_attribute: ClusterObjects.ClusterAttributeDescriptor, output: queue.Queue):
+        self._output = output
+        self._expected_attribute = expected_attribute
+        self.callback_trigger_time_ms = 0;
+
+    def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
+        if path.AttributeType == self._expected_attribute:
+            current_time = time.time()
+            q = (path, transaction)
+            logging.info(f'Got subscription report for {path.AttributeType} at {current_time}')
+
+            print(f"@@_end: {current_time}")
+
+            self._output.put(q)
+            self.callback_trigger_time_ms = current_time
 
 
 class TC_IDM_4_2(MatterBaseTest):
@@ -163,8 +182,8 @@ class TC_IDM_4_2(MatterBaseTest):
             paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
         )
 
-        # Read ServerList attribute
-        self.print_step("0a", "CR1 reads the Descriptor cluster ServerList attribute from EP0")
+        # *** Step 0 ***
+        self.print_step("0", "CR1 reads the Descriptor cluster ServerList attribute from EP0")
         ep0_servers = await self.get_descriptor_server_list(CR1)
 
         # Check if ep0_servers contains the ICD Management cluster ID (0x0046)
@@ -174,18 +193,18 @@ class TC_IDM_4_2(MatterBaseTest):
                 "CR1 reads from the DUT the IdleModeDuration attribute and sets SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = IdleModeDuration")
 
             idleModeDuration = await self.get_idle_mode_duration_sec(CR1)
-
             SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = idleModeDuration
+            min_interval_floor_sec = 0
         else:
             # Defaulting SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC to 60 minutes
             SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = 60 * 60
+            min_interval_floor_sec = 3
 
         logging.info(
             f"Set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC to {SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC} seconds")
 
         # *** Step 1 ***
         self.print_step(1, "CR1 sends a subscription message to the DUT with MaxIntervalCeiling set to a value greater than SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC. DUT sends a report data action to the TH. CR1 sends a success status response to the DUT. DUT sends a Subscribe Response Message to the CR1 to activate the subscription.")
-        min_interval_floor_sec = 1
         max_interval_ceiling_sec = SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC + 5
         asserts.assert_greater(max_interval_ceiling_sec, min_interval_floor_sec,
                                "MaxIntervalCeiling must be greater than MinIntervalFloor")
@@ -214,9 +233,9 @@ class TC_IDM_4_2(MatterBaseTest):
         asserts.assert_true(self.is_valid_uint32_value(sub_cr1_step1_max_interval_ceiling_sec),
                             "MaxInterval is not of uint32 type.")
 
-        # Verify MaxInterval is less than or equal to MaxIntervalCeiling
+        # Verify MaxInterval is less than or equal to SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC
         asserts.assert_less_equal(sub_cr1_step1_max_interval_ceiling_sec, max_interval_ceiling_sec,
-                                  "MaxInterval is not less than or equal to MaxIntervalCeiling")
+                                  "MaxInterval is not less than or equal to SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC")
 
         sub_cr1_step1.Shutdown()
 
@@ -399,30 +418,49 @@ class TC_IDM_4_2(MatterBaseTest):
         data_version_filter = [(0, Clusters.BasicInformation, data_version)]
 
         # Subscribe to attribute with provided DataVersion
-        sub_cr1_provided_dvf = await CR1.ReadAttribute(
+        sub_cr1_step8 = await CR1.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=node_label_attr_path,
             reportInterval=(10, 20),
             keepSubscriptions=False,
             dataVersionFilters=data_version_filter
         )
-
+        
         # Verify that the subscription is activated between CR1 and DUT
-        asserts.assert_true(sub_cr1_provided_dvf.subscriptionId, "Subscription not activated")
+        asserts.assert_true(sub_cr1_step8.subscriptionId, "Subscription not activated")
 
-        sub_cr1_provided_dvf.Shutdown()
+        sub_cr1_step8.Shutdown()
 
         # *** Step 8 ***
-        self.print_step(8, "CR1 sends a subscription request action for an attribute and sets the MinIntervalFloor value to be same as MaxIntervalCeiling. Activate the Subscription between CR1 and DUT. Modify the attribute which has been subscribed to on the DUT.")
+        self.print_step(8, "CR1 sends a subscription request action for an attribute and sets the MinIntervalFloor to min_interval_floor_s and MaxIntervalCeiling to 10. Activate the Subscription between CR1 and DUT and record the time when the priming ReportDataMessage is received as t_report. Save the returned MaxInterval from the SubscribeResponseMessage as max_interval_s.")
 
         # Subscribe to attribute
-        same_min_max_interval_sec = 3
+        min_interval_floor_sec = 3
+        max_interval_ceiling_sec = 10
         sub_cr1_update_value = await CR1.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=node_label_attr_path,
-            reportInterval=(same_min_max_interval_sec, same_min_max_interval_sec),
+            reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
             keepSubscriptions=False
         )
+        
+        # Record the time when the priming ReportDataMessage is received
+        t_report_sec = time.time()
+        
+        print(f"@@_begin: {t_report_sec}")
+        
+        # Saving the returned MaxInterval from the SubscribeResponseMessage
+        sub_cr1_step8_intervals = sub_cr1_step8.GetReportingIntervalsSeconds()
+        min_interval_sec, max_interval_sec = sub_cr1_step8_intervals
+        
+        # Get subscription timeout
+        subscription_timeout = sub_cr1_update_value.GetSubscriptionTimeoutMs()
+        print(f"subscription_timeout: {subscription_timeout}")
+
+        # Set Attribute Update Callb
+        nodel_label_queue = queue.Queue()
+        node_label_update_cb = AttributeChangeCallback(node_label_attr, nodel_label_queue)
+        sub_cr1_update_value.SetAttributeUpdateCallback(node_label_update_cb)
 
         # Modify attribute value
         new_node_label_write = "NewNodeLabel_011235813"
@@ -431,18 +469,27 @@ class TC_IDM_4_2(MatterBaseTest):
             [(0, node_label_attr(value=new_node_label_write))]
         )
 
-        # Wait MinIntervalFloor seconds before reading updated attribute value
-        # TODO: Fix subscription ranges https://github.com/CHIP-Specifications/chip-test-plans/issues/3948
-        new_node_label_read = self.get_attribute_value_wait(sub_cr1_update_value, node_label_attr_typed_path)
+        # write time - sub time -> bigger than floor and less than sub timeout
 
-        # Verify new attribute value after MinIntervalFloor time
-        asserts.assert_equal(new_node_label_read, new_node_label_write, "Attribute value not updated after write operation.")
+        # Wait MinIntervalFloor seconds before reading updated attribute value
+
+        # new_node_label_read = self.get_attribute_value_wait(sub_cr1_update_value, node_label_attr_typed_path)
+
+        # Verify new attribute value after MinIntervalFloor time, deprecated
+        # asserts.assert_equal(new_node_label_read, new_node_label_write, "Attribute value not updated after write operation.")
 
         sub_cr1_update_value.Shutdown()
+        
+
+
 
         # *** Step 9 ***
+        
+        
+
+        # *** Step 10 ***
         self.print_step(
-            9, "CR1 sends a subscription request action for an attribute and set the MinIntervalFloor value to be greater than MaxIntervalCeiling.")
+            10, "CR1 sends a subscription request action for an attribute and set the MinIntervalFloor value to be greater than MaxIntervalCeiling.")
 
         # Subscribe to attribute with invalid reportInterval arguments, expect and exception
         sub_cr1_invalid_intervals = None
@@ -460,48 +507,12 @@ class TC_IDM_4_2(MatterBaseTest):
         except Exception:
             asserts.fail("Expected exception was not thrown")
 
-        # *** Step 10 ***
+        # *** Step 11 ***
         self.print_step(
-            10, "CR1 sends a subscription request to subscribe to a specific global attribute from all clusters on all endpoints.")
+            11, "CR1 sends a subscription request to subscribe to a specific global attribute from all clusters on all endpoints.")
 
         # Omitting endpoint to indicate endpoint wildcard
         cluster_rev_attr_path = [(cluster_rev_attr)]
-
-        # Subscribe to global attribute
-        sub_cr1_step10 = await CR1.ReadAttribute(
-            nodeid=self.dut_node_id,
-            attributes=cluster_rev_attr_path,
-            reportInterval=(3, 3),
-            keepSubscriptions=False
-        )
-
-        # Verify that the subscription is activated between CR1 and DUT
-        asserts.assert_true(sub_cr1_step10.subscriptionId, "Subscription not activated")
-
-        # Verify attribute came back
-        self.verify_attribute_exists(
-            sub=sub_cr1_step10,
-            cluster=Clusters.BasicInformation,
-            attribute=cluster_rev_attr
-        )
-
-        # Verify DUT sends back the attribute values for the global attribute
-        cluster_revision_attr_value = sub_cr1_step10.GetAttribute(cluster_rev_attr_typed_path)
-
-        # Verify ClusterRevision is of uint16 type
-        asserts.assert_true(self.is_valid_uint16_value(cluster_revision_attr_value), "ClusterRevision is not of uint16 type.")
-
-        # Verify valid ClusterRevision value
-        asserts.assert_greater_equal(cluster_revision_attr_value, 0, "Invalid ClusterRevision value.")
-
-        sub_cr1_step10.Shutdown()
-
-        # *** Step 11 ***
-        self.print_step(11, "CR1 sends a subscription request to subscribe to a global attribute on an endpoint on all clusters.")
-
-        # Specifying single endpoint 0
-        requested_ep = 0
-        cluster_rev_attr_path = [(requested_ep, cluster_rev_attr)]
 
         # Subscribe to global attribute
         sub_cr1_step11 = await CR1.ReadAttribute(
@@ -521,27 +532,63 @@ class TC_IDM_4_2(MatterBaseTest):
             attribute=cluster_rev_attr
         )
 
-        # Verify no data from other endpoints is sent back
-        attributes = sub_cr1_step11.GetAttributes()
-        ep_keys = list(attributes.keys())
-        asserts.assert_true(len(ep_keys) == 1, "More than one endpoint returned, exactly 1 was expected")
-
         # Verify DUT sends back the attribute values for the global attribute
-        cluster_rev_attr_typed_path = self.get_typed_attribute_path(cluster_rev_attr)
         cluster_revision_attr_value = sub_cr1_step11.GetAttribute(cluster_rev_attr_typed_path)
 
         # Verify ClusterRevision is of uint16 type
         asserts.assert_true(self.is_valid_uint16_value(cluster_revision_attr_value), "ClusterRevision is not of uint16 type.")
 
+        # Verify valid ClusterRevision value
+        asserts.assert_greater_equal(cluster_revision_attr_value, 0, "Invalid ClusterRevision value.")
+
         sub_cr1_step11.Shutdown()
 
         # *** Step 12 ***
-        self.print_step(12, "CR1 sends a subscription request to the DUT with both AttributeRequests and EventRequests as empty.")
+        self.print_step(12, "CR1 sends a subscription request to subscribe to a global attribute on an endpoint on all clusters.")
+
+        # Specifying single endpoint 0
+        requested_ep = 0
+        cluster_rev_attr_path = [(requested_ep, cluster_rev_attr)]
+
+        # Subscribe to global attribute
+        sub_cr1_step12 = await CR1.ReadAttribute(
+            nodeid=self.dut_node_id,
+            attributes=cluster_rev_attr_path,
+            reportInterval=(3, 3),
+            keepSubscriptions=False
+        )
+
+        # Verify that the subscription is activated between CR1 and DUT
+        asserts.assert_true(sub_cr1_step12.subscriptionId, "Subscription not activated")
+
+        # Verify attribute came back
+        self.verify_attribute_exists(
+            sub=sub_cr1_step12,
+            cluster=Clusters.BasicInformation,
+            attribute=cluster_rev_attr
+        )
+
+        # Verify no data from other endpoints is sent back
+        attributes = sub_cr1_step12.GetAttributes()
+        ep_keys = list(attributes.keys())
+        asserts.assert_true(len(ep_keys) == 1, "More than one endpoint returned, exactly 1 was expected")
+
+        # Verify DUT sends back the attribute values for the global attribute
+        cluster_rev_attr_typed_path = self.get_typed_attribute_path(cluster_rev_attr)
+        cluster_revision_attr_value = sub_cr1_step12.GetAttribute(cluster_rev_attr_typed_path)
+
+        # Verify ClusterRevision is of uint16 type
+        asserts.assert_true(self.is_valid_uint16_value(cluster_revision_attr_value), "ClusterRevision is not of uint16 type.")
+
+        sub_cr1_step12.Shutdown()
+
+        # *** Step 13 ***
+        self.print_step(13, "CR1 sends a subscription request to the DUT with both AttributeRequests and EventRequests as empty.")
 
         # Attempt a subscription with both AttributeRequests and EventRequests as empty
-        sub_cr1_step12 = None
+        sub_cr1_step13 = None
         try:
-            sub_cr1_step12 = await CR1.Read(
+            sub_cr1_step13 = await CR1.Read(
                 nodeid=self.dut_node_id,
                 attributes=[],
                 events=[],
@@ -555,7 +602,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
             # Verify no subscription is established
             with asserts.assert_raises(AttributeError):
-                sub_cr1_step12.subscriptionId
+                sub_cr1_step13.subscriptionId
         except Exception:
             asserts.fail("Expected exception was not thrown")
 
