@@ -1112,33 +1112,27 @@ class BaseTestHelper:
             return False
         return True
 
-    def TestLevelControlCluster(self, nodeid: int, endpoint: int, group: int):
+    async def TestLevelControlCluster(self, nodeid: int, endpoint: int):
         self.logger.info(
             f"Sending MoveToLevel command to device {nodeid} endpoint {endpoint}")
-        try:
-            commonArgs = dict(transitionTime=0, optionsMask=1, optionsOverride=1)
 
+        commonArgs = dict(transitionTime=0, optionsMask=1, optionsOverride=1)
+
+        async def _moveClusterLevel(setLevel):
+            await self.devCtrl.SendCommand(nodeid,
+                                           endpoint,
+                                           Clusters.LevelControl.Commands.MoveToLevel(**commonArgs, level=setLevel))
+            res = await self.devCtrl.ReadAttribute(nodeid, [(endpoint, Clusters.LevelControl.Attributes.CurrentLevel)])
+            readVal = res[endpoint][Clusters.LevelControl][Clusters.LevelControl.Attributes.CurrentLevel]
+            if readVal != setLevel:
+                raise Exception(f"Read attribute LevelControl.CurrentLevel: expected value {setLevel}, got {readVal}")
+
+        try:
             # Move to 1
-            self.devCtrl.ZCLSend("LevelControl", "MoveToLevel", nodeid,
-                                 endpoint, group, dict(**commonArgs, level=1), blocking=True)
-            res = self.devCtrl.ZCLReadAttribute(cluster="LevelControl",
-                                                attribute="CurrentLevel",
-                                                nodeid=nodeid,
-                                                endpoint=endpoint,
-                                                groupid=group)
-            TestResult("Read attribute LevelControl.CurrentLevel",
-                       res).assertValueEqual(1)
+            await _moveClusterLevel(1)
 
             # Move to 254
-            self.devCtrl.ZCLSend("LevelControl", "MoveToLevel", nodeid,
-                                 endpoint, group, dict(**commonArgs, level=254), blocking=True)
-            res = self.devCtrl.ZCLReadAttribute(cluster="LevelControl",
-                                                attribute="CurrentLevel",
-                                                nodeid=nodeid,
-                                                endpoint=endpoint,
-                                                groupid=group)
-            TestResult("Read attribute LevelControl.CurrentLevel",
-                       res).assertValueEqual(254)
+            await _moveClusterLevel(254)
 
             return True
         except Exception as ex:

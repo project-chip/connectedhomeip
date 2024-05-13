@@ -107,9 +107,8 @@ def TestDatamodel(test: BaseTestHelper, device_nodeid: int):
                                     group=GROUP_ID), "Failed to test on off cluster")
 
     logger.info("Testing level control cluster")
-    FailIfNot(test.TestLevelControlCluster(nodeid=device_nodeid,
-                                           endpoint=LIGHTING_ENDPOINT_ID,
-                                           group=GROUP_ID),
+    FailIfNot(asyncio.run(test.TestLevelControlCluster(nodeid=device_nodeid,
+                                                       endpoint=LIGHTING_ENDPOINT_ID)),
               "Failed to test level control cluster")
 
     logger.info("Testing sending commands to non exist endpoint")
