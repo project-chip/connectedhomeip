@@ -27,6 +27,7 @@ from builders.infineon import InfineonApp, InfineonBoard, InfineonBuilder
 from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
 from builders.mw320 import MW320App, MW320Builder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
+from builders.nuttx import NuttXApp, NuttXBoard, NuttXBuilder
 from builders.nxp import NxpApp, NxpBoard, NxpBuilder
 from builders.openiotsdk import OpenIotSdkApp, OpenIotSdkBuilder, OpenIotSdkCryptoBackend
 from builders.qpg import QpgApp, QpgBoard, QpgBuilder
@@ -129,6 +130,7 @@ def BuildHostTarget():
         TargetPart('tv-app', app=HostApp.TV_APP),
         TargetPart('tv-casting-app', app=HostApp.TV_CASTING),
         TargetPart('bridge', app=HostApp.BRIDGE),
+        TargetPart('fabric-bridge', app=HostApp.FABRIC_BRIDGE),
         TargetPart('tests', app=HostApp.TESTS),
         TargetPart('chip-cert', app=HostApp.CERT_TOOL),
         TargetPart('address-resolve-tool', app=HostApp.ADDRESS_RESOLVE),
@@ -319,6 +321,22 @@ def BuildNrfTarget():
     ])
 
     target.AppendModifier('rpc', enable_rpcs=True)
+
+    return target
+
+
+def BuildNuttXTarget():
+    target = BuildTarget('nuttx', NuttXBuilder)
+
+    # Boards
+    target.AppendFixedTargets([
+        TargetPart('x64', board=NuttXBoard.SIM),
+    ])
+
+    # Apps
+    target.AppendFixedTargets([
+        TargetPart('light', app=NuttXApp.LIGHT),
+    ])
 
     return target
 
@@ -794,6 +812,7 @@ BUILD_TARGETS = [
     BuildMW320Target(),
     BuildNrfTarget(),
     BuildNrfNativeTarget(),
+    BuildNuttXTarget(),
     BuildQorvoTarget(),
     BuildStm32Target(),
     BuildTizenTarget(),

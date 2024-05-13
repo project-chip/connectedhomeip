@@ -346,7 +346,7 @@ void BLEEndPoint::DoClose(uint8_t flags, CHIP_ERROR err)
                 DoCloseCallback(oldState, flags, err);
             }
 
-            if ((flags & kBleCloseFlag_SuppressCallback) != 0)
+            if (mBleTransport != nullptr && (flags & kBleCloseFlag_SuppressCallback) != 0)
             {
                 mBleTransport->OnEndPointConnectionClosed(this, err);
             }
@@ -367,7 +367,7 @@ void BLEEndPoint::FinalizeClose(uint8_t oldState, uint8_t flags, CHIP_ERROR err)
         DoCloseCallback(oldState, flags, err);
     }
 
-    if ((flags & kBleCloseFlag_SuppressCallback) != 0)
+    if (mBleTransport != nullptr && (flags & kBleCloseFlag_SuppressCallback) != 0)
     {
         mBleTransport->OnEndPointConnectionClosed(this, err);
     }
@@ -1290,7 +1290,7 @@ CHIP_ERROR BLEEndPoint::Receive(PacketBufferHandle && data)
         // Take ownership of message buffer
         System::PacketBufferHandle full_packet = mBtpEngine.TakeRxPacket();
 
-        ChipLogDebugBleEndPoint(Ble, "reassembled whole msg, len = %d", full_packet->DataLength());
+        ChipLogDebugBleEndPoint(Ble, "reassembled whole msg, len = %u", static_cast<unsigned>(full_packet->DataLength()));
 
         // If we have a message received callback, and end point is not closing...
         if (mBleTransport != nullptr && mState != kState_Closing)
