@@ -84,6 +84,10 @@ TEST(TestStaticSupportSmartPtr, TestCheckedGlobalInstanceReference)
         EXPECT_EQ(ref2->num, 321);
         EXPECT_STREQ(ref2->str, "test");
     }
+
+    // Check default constructed CheckedGlobalInstanceReference
+    CheckedGlobalInstanceReference<TestClass> ref_default;
+    ASSERT_TRUE(ref_default);
 }
 
 TEST(TestStaticSupportSmartPtr, TestSimpleInstanceReference)
