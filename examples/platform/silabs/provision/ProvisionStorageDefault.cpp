@@ -16,6 +16,7 @@
  */
 #include "AttestationKey.h"
 #include "ProvisionStorage.h"
+#include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMemString.h>

@@ -18,7 +18,7 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
-#include <platform/silabs/multi-ota/efr32/OTAFirmwareProcessor.h>
+#include <platform/silabs/multi-ota/OTAFirmwareProcessor.h>
 
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
@@ -32,8 +32,6 @@ extern "C" {
 
 /// No error, operation OK
 #define SL_BOOTLOADER_OK 0L
-// TODO: more descriptive error codes
-#define SL_OTA_ERROR 1L
 
 namespace chip {
 
@@ -72,7 +70,33 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
     if (!mDescriptorProcessed)
     {
         ReturnErrorOnFailure(ProcessDescriptor(block));
+#if OTA_ENCRYPTION_ENABLE
+        /* 16 bytes to used to store undecrypted data because of unalignment */
+        mAccumulator.Init(requestedOtaMaxBlockSize + 16);
+#endif
     }
+#if OTA_ENCRYPTION_ENABLE
+    MutableByteSpan mBlock = MutableByteSpan(mAccumulator.data(), mAccumulator.GetThreshold());
+    memcpy(&mBlock[0], &mBlock[requestedOtaMaxBlockSize], mUnalignmentNum);
+    memcpy(&mBlock[mUnalignmentNum], block.data(), block.size());
+
+    if (mUnalignmentNum + block.size() < requestedOtaMaxBlockSize)
+    {
+        uint32_t mAlignmentNum = (mUnalignmentNum + block.size()) / 16;
+        mAlignmentNum          = mAlignmentNum * 16;
+        mUnalignmentNum        = (mUnalignmentNum + block.size()) % 16;
+        memcpy(&mBlock[requestedOtaMaxBlockSize], &mBlock[mAlignmentNum], mUnalignmentNum);
+        mBlock.reduce_size(mAlignmentNum);
+    }
+    else
+    {
+        mUnalignmentNum = mUnalignmentNum + block.size() - requestedOtaMaxBlockSize;
+        mBlock.reduce_size(requestedOtaMaxBlockSize);
+    }
+
+    OTATlvProcessor::vOtaProcessInternalEncryption(mBlock);
+    block = mBlock;
+#endif
 
     uint32_t blockReadOffset = 0;
     while (blockReadOffset < block.size())
@@ -88,7 +112,7 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
             if (err != SL_STATUS_OK)
             {
                 ChipLogError(SoftwareUpdate, "sl_wfx_host_pre_bootloader_spi_transfer() error: %ld", err);
-                return;
+                return CHIP_ERROR_CANCELLED;
             }
 #endif // SL_BTLCTRL_MUX
             CORE_CRITICAL_SECTION(err = bootloader_eraseWriteStorage(mSlotId, mWriteOffset, writeBuffer, kAlignmentBytes);)
@@ -97,15 +121,12 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
             if (err != SL_STATUS_OK)
             {
                 ChipLogError(SoftwareUpdate, "sl_wfx_host_post_bootloader_spi_transfer() error: %ld", err);
-                return;
+                return CHIP_ERROR_CANCELLED;
             }
 #endif // SL_BTLCTRL_MUX
             if (err)
             {
                 ChipLogError(SoftwareUpdate, "bootloader_eraseWriteStorage() error: %ld", err);
-                // TODO: add this somewhere
-                // imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
-                // TODO: Replace CHIP_ERROR_CANCELLED with new error statement
                 return CHIP_ERROR_CANCELLED;
             }
             mWriteOffset += kAlignmentBytes;
