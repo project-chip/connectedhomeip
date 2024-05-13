@@ -16,10 +16,8 @@
 #
 import logging
 import re
-from enum import IntEnum, IntFlag, auto
 
 import chip.clusters as Clusters
-from chip.clusters import Attribute
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -230,7 +228,7 @@ class TC_ICDM_2_1(MatterBaseTest):
                     'utf-8')
             except Exception:
                 asserts.assert_true(
-                    false, "UserActiveModeTriggerInstruction is not encoded in the correct format (utf-8).")
+                    False, "UserActiveModeTriggerInstruction is not encoded in the correct format (utf-8).")
 
             # Verify byte length of the UserActiveModeTirggerInstruction
             asserts.assert_less_equal(
