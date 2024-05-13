@@ -368,15 +368,16 @@ class BaseTestHelper:
     def TestUsedTestCommissioner(self):
         return self.devCtrl.GetTestCommissionerUsed()
 
-    def TestFailsafe(self, nodeid: int):
+    async def TestFailsafe(self, nodeid: int):
         self.logger.info("Testing arm failsafe")
 
         self.logger.info("Setting failsafe on CASE connection")
-        err, resp = self.devCtrl.ZCLSend("GeneralCommissioning", "ArmFailSafe", nodeid,
-                                         0, 0, dict(expiryLengthSeconds=60, breadcrumb=1), blocking=True)
-        if err != 0:
+        try:
+            resp = await self.devCtrl.SendCommand(nodeid, 0,
+                                                  Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=60, breadcrumb=1))
+        except IM.InteractionModelError as ex:
             self.logger.error(
-                "Failed to send arm failsafe command error is {} with im response{}".format(err, resp))
+                "Failed to send arm failsafe command error is {}".format(ex.status))
             return False
 
         if resp.errorCode is not Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk:
@@ -387,12 +388,12 @@ class BaseTestHelper:
         self.logger.info(
             "Attempting to open basic commissioning window - this should fail since the failsafe is armed")
         try:
-            asyncio.run(self.devCtrl.SendCommand(
+            await self.devCtrl.SendCommand(
                 nodeid,
                 0,
                 Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180),
                 timedRequestTimeoutMs=10000
-            ))
+            )
             # we actually want the exception here because we want to see a failure, so return False here
             self.logger.error(
                 'Incorrectly succeeded in opening basic commissioning window')
@@ -413,13 +414,13 @@ class BaseTestHelper:
         self.logger.info(
             "Attempting to open enhanced commissioning window - this should fail since the failsafe is armed")
         try:
-            asyncio.run(self.devCtrl.SendCommand(
+            await self.devCtrl.SendCommand(
                 nodeid, 0, Clusters.AdministratorCommissioning.Commands.OpenCommissioningWindow(
                     commissioningTimeout=180,
                     PAKEPasscodeVerifier=verifier,
                     discriminator=discriminator,
                     iterations=iterations,
-                    salt=salt), timedRequestTimeoutMs=10000))
+                    salt=salt), timedRequestTimeoutMs=10000)
 
             # we actually want the exception here because we want to see a failure, so return False here
             self.logger.error(
@@ -429,23 +430,23 @@ class BaseTestHelper:
             pass
 
         self.logger.info("Disarming failsafe on CASE connection")
-        err, resp = self.devCtrl.ZCLSend("GeneralCommissioning", "ArmFailSafe", nodeid,
-                                         0, 0, dict(expiryLengthSeconds=0, breadcrumb=1), blocking=True)
-        if err != 0:
+        try:
+            resp = await self.devCtrl.SendCommand(nodeid, 0,
+                                                  Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=1))
+        except IM.InteractionModelError as ex:
             self.logger.error(
-                "Failed to send arm failsafe command error is {} with im response{}".format(err, resp))
+                "Failed to send arm failsafe command error is {}".format(ex.status))
             return False
 
         self.logger.info(
             "Opening Commissioning Window - this should succeed since the failsafe was just disarmed")
         try:
-            asyncio.run(
-                self.devCtrl.SendCommand(
-                    nodeid,
-                    0,
-                    Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180),
-                    timedRequestTimeoutMs=10000
-                ))
+            await self.devCtrl.SendCommand(
+                nodeid,
+                0,
+                Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180),
+                timedRequestTimeoutMs=10000
+            )
         except Exception:
             self.logger.error(
                 'Failed to open commissioning window after disarming failsafe')
@@ -453,11 +454,12 @@ class BaseTestHelper:
 
         self.logger.info(
             "Attempting to arm failsafe over CASE - this should fail since the commissioning window is open")
-        err, resp = self.devCtrl.ZCLSend("GeneralCommissioning", "ArmFailSafe", nodeid,
-                                         0, 0, dict(expiryLengthSeconds=60, breadcrumb=1), blocking=True)
-        if err != 0:
+        try:
+            resp = await self.devCtrl.SendCommand(nodeid, 0,
+                                                  Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=60, breadcrumb=1))
+        except IM.InteractionModelError as ex:
             self.logger.error(
-                "Failed to send arm failsafe command error is {} with im response{}".format(err, resp))
+                "Failed to send arm failsafe command error is {}".format(ex.status))
             return False
         if resp.errorCode is Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kBusyWithOtherAdmin:
             return True
