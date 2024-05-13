@@ -103,10 +103,10 @@ void AppTask::ActionCompleted(PumpManager::Action_t action, int32_t actor)
 void AppTask::PostStartActionRequest(int32_t actor, PumpManager::Action_t action)
 {
     AppEvent event;
-    event.Type              = AppEvent::kEventType_DeviceAction;
+    event.Type               = AppEvent::kEventType_DeviceAction;
     event.DeviceEvent.Actor  = actor;
     event.DeviceEvent.Action = action;
-    event.Handler           = StartActionEventHandler;
+    event.Handler            = StartActionEventHandler;
     sAppTask.PostEvent(&event);
 }
 

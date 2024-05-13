@@ -85,8 +85,8 @@ bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const
 {
     ChipLogProgress(Zcl, "Door Lock App: Unlock Command endpoint=%d", endpointId);
 
-    return LockMgr().LockAction(AppEvent::kEventType_DeviceAction, LockManager::UNLOCK_ACTION, LockManager::OperationSource::kRemote,
-                                endpointId, err, fabricIdx, nodeId, pinCode);
+    return LockMgr().LockAction(AppEvent::kEventType_DeviceAction, LockManager::UNLOCK_ACTION,
+                                LockManager::OperationSource::kRemote, endpointId, err, fabricIdx, nodeId, pinCode);
 }
 
 // TODO : Add helper function to call from the Unlock command if we establish Unbolt doesn't need a different behaviour than Unlock
@@ -96,8 +96,8 @@ bool emberAfPluginDoorLockOnDoorUnboltCommand(chip::EndpointId endpointId, const
 {
     ChipLogProgress(Zcl, "Door Lock App: Unbolt Command endpoint=%d", endpointId);
 
-    return LockMgr().LockAction(AppEvent::kEventType_DeviceAction, LockManager::UNBOLT_ACTION, LockManager::OperationSource::kRemote,
-                                endpointId, err, fabricIdx, nodeId, pinCode);
+    return LockMgr().LockAction(AppEvent::kEventType_DeviceAction, LockManager::UNBOLT_ACTION,
+                                LockManager::OperationSource::kRemote, endpointId, err, fabricIdx, nodeId, pinCode);
 }
 
 bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, CredentialTypeEnum credentialType,
@@ -170,5 +170,6 @@ DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t h
 void emberAfPluginDoorLockOnAutoRelock(chip::EndpointId endpointId)
 {
     // Apply the relock state in the application control
-    LockMgr().LockAction(AppEvent::kEventType_DeviceAction, LockManager::LOCK_ACTION, LockManager::OperationSource::kRemote, endpointId);
+    LockMgr().LockAction(AppEvent::kEventType_DeviceAction, LockManager::LOCK_ACTION, LockManager::OperationSource::kRemote,
+                         endpointId);
 }

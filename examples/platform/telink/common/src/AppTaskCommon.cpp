@@ -89,10 +89,8 @@ void OnIdentifyTriggerEffect(Identify * identify)
 }
 
 Identify sIdentify = {
-    kExampleEndpointId,
-    AppTask::IdentifyStartHandler,
-    AppTask::IdentifyStopHandler,
-    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
+    kExampleEndpointId,           AppTask::IdentifyStartHandler,
+    AppTask::IdentifyStopHandler, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
     OnIdentifyTriggerEffect,
 };
 
@@ -275,7 +273,7 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler) == CHIP_NO_ERROR);
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.appDelegate = &sCallbacks;
+    initParams.appDelegate              = &sCallbacks;
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
 
@@ -323,7 +321,7 @@ void AppTaskCommon::IdentifyStartHandler(Identify *)
     AppEvent event;
 
     event.Type    = AppEvent::kEventType_IdentifyStart;
-    event.Handler = [](AppEvent *event) {
+    event.Handler = [](AppEvent * event) {
         ChipLogProgress(Zcl, "OnIdentifyStart");
         PwmManager::getInstance().setPwmBlink(PwmManager::EAppPwm_Indication, kIdentifyBlinkRateMs, kIdentifyBlinkRateMs);
     };
@@ -335,7 +333,7 @@ void AppTaskCommon::IdentifyStopHandler(Identify *)
     AppEvent event;
 
     event.Type    = AppEvent::kEventType_IdentifyStop;
-    event.Handler = [](AppEvent *event) {
+    event.Handler = [](AppEvent * event) {
         ChipLogProgress(Zcl, "OnIdentifyStop");
         PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Indication, false);
     };

@@ -108,7 +108,8 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         else if (attributeId == ColorControl::Attributes::ColorTemperatureMireds::Id)
         {
             ChipLogDetail(Zcl, "New Temperature Mireds color = %u", *(uint16_t *) value);
-            GetAppTask().SetInitiateAction(AppTask::COLOR_ACTION_CT, static_cast<int32_t>(AppEvent::kEventType_DeviceAction), value);
+            GetAppTask().SetInitiateAction(AppTask::COLOR_ACTION_CT, static_cast<int32_t>(AppEvent::kEventType_DeviceAction),
+                                           value);
         }
         else
         {

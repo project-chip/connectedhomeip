@@ -329,11 +329,12 @@ template <class FlashFactoryData>
 CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetEnableKey(MutableByteSpan & enableKey)
 {
     ReturnErrorCodeIf(!mFactoryData.enable_key.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
-    ReturnErrorCodeIf(enableKey.size() < mFactoryData.enable_key.len/2, CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorCodeIf(enableKey.size() < mFactoryData.enable_key.len / 2, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    Encoding::HexToBytes((const char*)mFactoryData.enable_key.data, mFactoryData.enable_key.len, enableKey.data(), enableKey.size());
+    Encoding::HexToBytes((const char *) mFactoryData.enable_key.data, mFactoryData.enable_key.len, enableKey.data(),
+                         enableKey.size());
 
-    enableKey.reduce_size(mFactoryData.enable_key.len/2);
+    enableKey.reduce_size(mFactoryData.enable_key.len / 2);
 
     return CHIP_NO_ERROR;
 }
