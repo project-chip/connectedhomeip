@@ -644,6 +644,16 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
         sIsNetworkProvisioned = ConnectivityMgr().IsThreadProvisioned();
         sIsNetworkEnabled     = ConnectivityMgr().IsThreadEnabled();
         sIsThreadAttached     = ConnectivityMgr().IsThreadAttached();
+#elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    case DeviceEventType::kWiFiConnectivityChange:
+        sIsNetworkProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
+        sIsNetworkEnabled     = ConnectivityMgr().IsWiFiStationEnabled();
+#if CONFIG_CHIP_OTA_REQUESTOR
+        if (event->WiFiConnectivityChange.Result == kConnectivity_Established)
+        {
+            InitBasicOTARequestor();
+        }
+#endif
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_THREAD */
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
         UpdateStatusLED();
