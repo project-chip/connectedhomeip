@@ -23,7 +23,7 @@
  */
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributeAccessInterface.h>
+#include <app/AttributeValueDecoder.h>
 #include <app/MessageDef/AttributeDataIB.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -66,8 +66,8 @@ void TestOverwriteFabricIndexInStruct(nlTestSuite * aSuite, void * aContext)
 {
     TestSetup setup;
     CHIP_ERROR err;
-    Clusters::AccessControl::Structs::ExtensionEntry::Type item;
-    Clusters::AccessControl::Structs::ExtensionEntry::DecodableType decodeItem;
+    Clusters::AccessControl::Structs::AccessControlExtensionStruct::Type item;
+    Clusters::AccessControl::Structs::AccessControlExtensionStruct::DecodableType decodeItem;
     Access::SubjectDescriptor subjectDescriptor = { .fabricIndex = kTestFabricIndex };
 
     item.fabricIndex = 0;
@@ -99,7 +99,7 @@ void TestOverwriteFabricIndexInListOfStructs(nlTestSuite * aSuite, void * aConte
 {
     TestSetup setup;
     CHIP_ERROR err;
-    Clusters::AccessControl::Structs::ExtensionEntry::Type items[kTestListElements];
+    Clusters::AccessControl::Structs::AccessControlExtensionStruct::Type items[kTestListElements];
     Clusters::AccessControl::Attributes::Extension::TypeInfo::DecodableType decodeItems;
     Access::SubjectDescriptor subjectDescriptor = { .fabricIndex = kTestFabricIndex };
 
@@ -108,7 +108,7 @@ void TestOverwriteFabricIndexInListOfStructs(nlTestSuite * aSuite, void * aConte
         items[i].fabricIndex = i;
     }
 
-    err = setup.Encode(DataModel::List<Clusters::AccessControl::Structs::ExtensionEntry::Type>(items));
+    err = setup.Encode(DataModel::List<Clusters::AccessControl::Structs::AccessControlExtensionStruct::Type>(items));
     NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
 
     TLV::TLVReader reader;

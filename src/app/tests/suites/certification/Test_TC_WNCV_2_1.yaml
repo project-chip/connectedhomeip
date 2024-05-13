@@ -14,7 +14,10 @@
 
 # TODO : WindowCovering Test WNCV_2_1 add/complete some Conditional test using the FeatureMap (dynamics Mandatory and Optional attributes)
 
-name: Window Covering [TC-WNCV-2.1] Attributes with server as DUT
+name: Window Covering [TC-WNCV-2.1] Attributes [DUT as Server]
+
+PICS:
+    - WNCV.S
 
 config:
     nodeId: 0x12344321
@@ -22,7 +25,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,658 +34,319 @@ tests:
                 value: nodeId
 
     ### MANDATORY Attributes
+    ### 1 MANDATORY Attributes
     ### Attribute[  0]: Type  =======================================
-    - label: "2: read the RO mandatory attribute default: Type"
+    - label: "Step 1a: TH reads from the DUT the ( 0) Type attribute"
       command: "readAttribute"
       attribute: "Type"
+      PICS: WNCV.S.A0000
       response:
           constraints:
               type: enum8
               minValue: 0
               maxValue: 9
 
-    - label: "3a: write a value into the RO mandatory attribute: Type"
-      command: "writeAttribute"
-      attribute: "Type"
-      arguments:
-          value: 250
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "3b: reads back the RO mandatory attribute: Type"
-      command: "readAttribute"
-      attribute: "Type"
-      response:
-          constraints:
-              type: enum8
-              notValue: 250
-
     ### Attribute[  7]: ConfigStatus  ===============================
-    - label: "2: read the RO mandatory attribute default: ConfigStatus"
+    - label: "Step 1b: TH reads from the DUT the ( 7) ConfigStatus attribute"
       command: "readAttribute"
       attribute: "ConfigStatus"
+      PICS: WNCV.S.A0007
       response:
           constraints:
-              type: map8
+              type: bitmap8
               minValue: 0
-              maxValue: 63
-
-    - label: "3a: write a value into the RO mandatory attribute: ConfigStatus"
-      command: "writeAttribute"
-      attribute: "ConfigStatus"
-      arguments:
-          value: 128
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "3b: reads back the RO mandatory attribute: ConfigStatus"
-      command: "readAttribute"
-      attribute: "ConfigStatus"
-      response:
-          constraints:
-              type: map8
-              notValue: 128
+              maxValue: 127
 
     ### Attribute[ 10]: OperationalStatus  ==========================
-    - label: "2: read the RO mandatory attribute default: OperationalStatus"
-      command: "readAttribute"
-      attribute: "OperationalStatus"
-      response:
-          constraints:
-              type: map8
-              minValue: 0
-              maxValue: 63
-
     - label:
-          "3a: write a value into the RO mandatory attribute: OperationalStatus"
-      command: "writeAttribute"
-      attribute: "OperationalStatus"
-      arguments:
-          value: 128
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "3b: reads back the RO mandatory attribute: OperationalStatus"
+          "Step 1c: TH reads from the DUT the (10) OperationalStatus attribute:
+          OperationalStatus"
       command: "readAttribute"
       attribute: "OperationalStatus"
+      PICS: WNCV.S.A000a
       response:
           constraints:
-              type: map8
-              notValue: 128
+              type: bitmap8
+              minValue: 0
+              maxValue: 127
 
     ### Attribute[ 13]: EndProductType ==============================
-    - label: "2: read the RO mandatory attribute default: EndProductType"
+    - label: "Step 1d: TH reads from the DUT the (13) EndProductType attribute"
       command: "readAttribute"
       attribute: "EndProductType"
+      PICS: WNCV.S.A000d
       response:
           constraints:
               type: enum8
               minValue: 0
               maxValue: 23
 
-    - label: "3a: write a value into the RO mandatory attribute: EndProductType"
-      command: "writeAttribute"
-      attribute: "EndProductType"
-      arguments:
-          value: 250
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "3b: reads back the RO mandatory attribute: EndProductType"
-      command: "readAttribute"
-      attribute: "EndProductType"
-      response:
-          constraints:
-              type: enum8
-              notValue: 250
-
     ### Attribute[ 23]: Mode ========================================
-    - label: "2: read the RW mandatory attribute default: Mode"
+    - label: "Step 1e: TH reads from the DUT the (23) Mode attribute"
       command: "readAttribute"
       attribute: "Mode"
+      PICS: WNCV.S.A0017
       response:
           constraints:
-              type: map8
+              type: bitmap8
               minValue: 0
               maxValue: 15
 
-    - label: "3a: write a value into the RW mandatory attribute:: Mode"
+    - label: "Step 1f: TH writes to (23) Mode attribute the value 0"
       command: "writeAttribute"
       attribute: "Mode"
+      PICS: WNCV.S.A0017
       arguments:
-          value: 8
+          value: 0
 
-    - label: "3b: reads back the RW mandatory attribute: Mode"
-      command: "readAttribute"
-      attribute: "Mode"
-      response:
-          value: 8
-
-    ### CONDITIONALLY MANDATORY Attributes
+    ### 2 CONDITIONALLY MANDATORY Attributes
     ### Attribute[ 11]: TargetPositionLiftPercent100ths  ====================
     - label:
-          "2: read the RO optional attribute default:
-          TargetPositionLiftPercent100ths"
+          "Step 2a: TH reads from the DUT the (11)
+          TargetPositionLiftPercent100ths attribute"
       command: "readAttribute"
       attribute: "TargetPositionLiftPercent100ths"
+      PICS: WNCV.S.A000b
       response:
           constraints:
-              type: Percent100ths
+              type: percent100ths
               minValue: 0
               maxValue: 10000
-
-    - label:
-          "3a: write a value into the RO optional attribute:
-          TargetPositionLiftPercent100ths"
-      command: "writeAttribute"
-      attribute: "TargetPositionLiftPercent100ths"
-      arguments:
-          value: 20000
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label:
-          "3b: reads back the RO optional attribute:
-          TargetPositionLiftPercent100ths"
-      command: "readAttribute"
-      attribute: "TargetPositionLiftPercent100ths"
-      response:
-          constraints:
-              type: Percent100ths
-              notValue: 20000
 
     ### Attribute[ 12]: TargetPositionTiltPercent100ths  ====================
     - label:
-          "2: read the RO optional attribute default:
-          TargetPositionTiltPercent100ths"
+          "Step 2b: TH reads from the DUT the (12)
+          TargetPositionTiltPercent100ths attribute"
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
+      PICS: WNCV.S.A000c
       response:
           constraints:
-              type: Percent100ths
+              type: percent100ths
               minValue: 0
               maxValue: 10000
-
-    - label:
-          "3a: write a value into the RO optional attribute:
-          TargetPositionTiltPercent100ths"
-      command: "writeAttribute"
-      attribute: "TargetPositionTiltPercent100ths"
-      arguments:
-          value: 20000
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label:
-          "3b: reads back the RO optional attribute:
-          TargetPositionTiltPercent100ths"
-      command: "readAttribute"
-      attribute: "TargetPositionTiltPercent100ths"
-      response:
-          constraints:
-              type: Percent100ths
-              notValue: 20000
 
     ### Attribute[ 14]: CurrentPositionLiftPercent100ths  ====================
     - label:
-          "2: read the RO optional attribute default:
-          CurrentPositionLiftPercent100ths"
+          "Step 2c: TH reads from the DUT the (14)
+          CurrentPositionLiftPercent100ths attribute"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
+      PICS: WNCV.S.A000e
       response:
           constraints:
-              type: Percent100ths
+              type: percent100ths
               minValue: 0
               maxValue: 10000
-
-    - label:
-          "3a: write a value into the RO optional attribute:
-          CurrentPositionLiftPercent100ths"
-      command: "writeAttribute"
-      attribute: "CurrentPositionLiftPercent100ths"
-      arguments:
-          value: 20000
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label:
-          "3b: reads back the RO optional attribute:
-          CurrentPositionLiftPercent100ths"
-      command: "readAttribute"
-      attribute: "CurrentPositionLiftPercent100ths"
-      response:
-          constraints:
-              type: Percent100ths
-              notValue: 20000
 
     ### Attribute[ 15]: CurrentPositionTiltPercent100ths  ====================
     - label:
-          "2: read the RO optional attribute default:
-          CurrentPositionTiltPercent100ths"
+          "Step 2d: TH reads from the DUT the (15)
+          CurrentPositionTiltPercent100ths attribute"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
+      PICS: WNCV.S.A000f
       response:
           constraints:
-              type: Percent100ths
+              type: percent100ths
               minValue: 0
               maxValue: 10000
 
-    - label:
-          "3a: write a value into the RO optional attribute:
-          CurrentPositionTiltPercent100ths"
-      command: "writeAttribute"
-      attribute: "CurrentPositionTiltPercent100ths"
-      arguments:
-          value: 20000
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label:
-          "3b: reads back the RO optional attribute:
-          CurrentPositionTiltPercent100ths"
-      command: "readAttribute"
-      attribute: "CurrentPositionTiltPercent100ths"
-      response:
-          constraints:
-              type: Percent100ths
-              notValue: 20000
-
     ### Attribute[ 16]: InstalledOpenLimitLift  ====================
-    - label: "2: read the RO optional attribute default: InstalledOpenLimitLift"
-      command: "readAttribute"
-      attribute: "InstalledOpenLimitLift"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65535
-
     - label:
-          "3a: write a value into the RO optional attribute:
-          InstalledOpenLimitLift"
-      command: "writeAttribute"
-      attribute: "InstalledOpenLimitLift"
-      arguments:
-          value: 255
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "3b: reads back the RO optional attribute: InstalledOpenLimitLift"
+          "Step 2e: TH reads from the DUT the (16) InstalledOpenLimitLift
+          attribute"
       command: "readAttribute"
       attribute: "InstalledOpenLimitLift"
+      PICS: WNCV.S.A0010
       response:
+          saveAs: InstalledOpenLimitLiftValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
     ### Attribute[ 17]: InstalledClosedLimitLift  ====================
     - label:
-          "2: read the RO optional attribute default: InstalledClosedLimitLift"
+          "Step 2f: TH reads from the DUT the (17) InstalledClosedLimitLift
+          attribute"
       command: "readAttribute"
       attribute: "InstalledClosedLimitLift"
+      PICS: WNCV.S.A0011
       response:
+          saveAs: InstalledClosedLimitLiftValue
           constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65535
-
-    - label:
-          "3a: write a value into the RO optional attribute:
-          InstalledClosedLimitLift"
-      command: "writeAttribute"
-      attribute: "InstalledClosedLimitLift"
-      arguments:
-          value: 255
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label:
-          "3b: reads back the RO optional attribute: InstalledClosedLimitLift"
-      command: "readAttribute"
-      attribute: "InstalledClosedLimitLift"
-      response:
-          constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
     ### Attribute[ 18]: InstalledOpenLimitTilt  ====================
-    - label: "2: read the RO optional attribute default: InstalledOpenLimitTilt"
-      command: "readAttribute"
-      attribute: "InstalledOpenLimitTilt"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65535
-
     - label:
-          "3a: write a value into the RO optional attribute:
-          InstalledOpenLimitTilt"
-      command: "writeAttribute"
-      attribute: "InstalledOpenLimitTilt"
-      arguments:
-          value: 255
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "3b: reads back the RO optional attribute: InstalledOpenLimitTilt"
+          "Step 2g: TH reads from the DUT the (18) InstalledOpenLimitTilt
+          attribute"
       command: "readAttribute"
       attribute: "InstalledOpenLimitTilt"
+      PICS: WNCV.S.A0012
       response:
+          saveAs: InstalledOpenLimitTiltValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
     ### Attribute[ 19]: InstalledClosedLimitTilt  ====================
     - label:
-          "2: read the RO optional attribute default: InstalledClosedLimitTilt"
+          "Step 2h: TH reads from the DUT the (19) InstalledClosedLimitTilt
+          attribute"
       command: "readAttribute"
       attribute: "InstalledClosedLimitTilt"
+      PICS: WNCV.S.A0013
       response:
+          saveAs: InstalledClosedLimitTiltValue
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
-    - label:
-          "3a: write a value into the RO optional attribute:
-          InstalledClosedLimitTilt"
-      command: "writeAttribute"
-      attribute: "InstalledClosedLimitTilt"
-      arguments:
-          value: 255
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label:
-          "3b: reads back the RO optional attribute: InstalledClosedLimitTilt"
-      command: "readAttribute"
-      attribute: "InstalledClosedLimitTilt"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65535
-
-    ### CONDITIONALLY and PURELY OPTIONAL Attributes
+    ### 3 CONDITIONALLY and PURELY OPTIONAL Attributes
     ### Attribute[ 26]: SafetyStatus  ==========================
-    - label: "4: read the RO mandatory attribute default: SafetyStatus"
+    - label: "Step 3a: TH reads from the DUT the (26) SafetyStatus attribute"
       command: "readAttribute"
       attribute: "SafetyStatus"
+      PICS: WNCV.S.A001a
       response:
           constraints:
-              type: map16
+              type: bitmap16
               minValue: 0
               maxValue: 2047
 
-    - label: "5a: write a value into the RO mandatory attribute: SafetyStatus"
-      command: "writeAttribute"
-      attribute: "SafetyStatus"
-      arguments:
-          value: 4096
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "5b: reads back the RO mandatory attribute: SafetyStatus"
-      command: "readAttribute"
-      attribute: "SafetyStatus"
-      response:
-          constraints:
-              type: map16
-              notValue: 4096
-
     ### Attribute[  1]: PhysicalClosedLimitLift  ====================
     - label:
-          "4: read the RO optional attribute default: PhysicalClosedLimitLift"
-      disabled: true
+          "Step 3b: TH reads from the DUT the ( 1) PhysicalClosedLimitLift
+          attribute"
       command: "readAttribute"
       attribute: "PhysicalClosedLimitLift"
+      PICS: WNCV.S.A0001
       response:
           constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65535
-
-    - label:
-          "5a: write a value into the RO optional attribute:
-          PhysicalClosedLimitLift"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "PhysicalClosedLimitLift"
-      arguments:
-          value: 255
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "5b: reads back the RO optional attribute: PhysicalClosedLimitLift"
-      disabled: true
-      command: "readAttribute"
-      attribute: "PhysicalClosedLimitLift"
-      response:
-          constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
     ### Attribute[  2]: PhysicalClosedLimitTilt  ====================
     - label:
-          "4: read the RO optional attribute default: PhysicalClosedLimitTilt"
-      disabled: true
+          "Step 3c: TH reads from the DUT the ( 2) PhysicalClosedLimitTilt
+          attribute"
       command: "readAttribute"
       attribute: "PhysicalClosedLimitTilt"
+      PICS: WNCV.S.A0002
       response:
           constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65535
-
-    - label:
-          "5a: write a value into the RO optional attribute:
-          PhysicalClosedLimitTilt"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "PhysicalClosedLimitTilt"
-      arguments:
-          value: 255
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "5b: reads back the RO optional attribute: PhysicalClosedLimitTilt"
-      disabled: true
-      command: "readAttribute"
-      attribute: "PhysicalClosedLimitTilt"
-      response:
-          constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
     ### Attribute[  3]: CurrentPositionLift  ====================
-    - label: "4: read the RO optional attribute default: CurrentPositionLift"
+    - label:
+          "Step 3d: TH reads from the DUT the ( 3) CurrentPositionLift attribute"
       command: "readAttribute"
       attribute: "CurrentPositionLift"
+      PICS: WNCV.S.A0003 && !WNCV.S.A0010 && !WNCV.S.A0011
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
+    ### Attribute[  3]: CurrentPositionLift  ====================
     - label:
-          "5a: write a value into the RO optional attribute: CurrentPositionLift"
-      command: "writeAttribute"
-      attribute: "CurrentPositionLift"
-      arguments:
-          value: 255
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "5b: reads back the RO optional attribute: CurrentPositionLift"
+          "Step 3d: TH reads the RO optional attribute default:
+          CurrentPositionLift"
       command: "readAttribute"
       attribute: "CurrentPositionLift"
+      PICS: WNCV.S.A0003 && WNCV.S.A0010 && WNCV.S.A0011
       response:
           constraints:
-              type: uint16
+              type: int16u
+              minValue: InstalledOpenLimitLiftValue
+              maxValue: InstalledClosedLimitLiftValue
+
+    ### Attribute[  4]: CurrentPositionTilt  ====================
+    - label:
+          "Step 3e: TH reads from the DUT the ( 4) CurrentPositionTilt attribute"
+      command: "readAttribute"
+      attribute: "CurrentPositionTilt"
+      PICS: WNCV.S.A0004 && !WNCV.S.A0012 && !WNCV.S.A0013
+      response:
+          constraints:
+              type: int16u
               minValue: 0
               maxValue: 65535
 
     ### Attribute[  4]: CurrentPositionTilt  ====================
-    - label: "4: read the RO optional attribute default: CurrentPositionTilt"
-      command: "readAttribute"
-      attribute: "CurrentPositionTilt"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65535
-
     - label:
-          "5a: write a value into the RO optional attribute: CurrentPositionTilt"
-      command: "writeAttribute"
-      attribute: "CurrentPositionTilt"
-      arguments:
-          value: 255
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "5b: reads back the RO optional attribute: CurrentPositionTilt"
+          "Step 3e: TH reads the RO optional attribute default:
+          CurrentPositionTilt"
       command: "readAttribute"
       attribute: "CurrentPositionTilt"
+      PICS: WNCV.S.A0004 && WNCV.S.A0012 && WNCV.S.A0013
       response:
           constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65535
+              type: int16u
+              minValue: InstalledOpenLimitTiltValue
+              maxValue: InstalledClosedLimitTiltValue
 
     ### Attribute[  5]: NumberOfActuationsLift  ====================
-    - label: "4: read the RO optional attribute default: NumberOfActuationsLift"
-      disabled: true
-      command: "readAttribute"
-      attribute: "NumberOfActuationsLift"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65535
-
     - label:
-          "5a: write a value into the RO optional attribute:
-          NumberOfActuationsLift"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "NumberOfActuationsLift"
-      arguments:
-          value: 255
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "5b: reads back the RO optional attribute: NumberOfActuationsLift"
-      disabled: true
+          "Step 3f: TH reads from the DUT the ( 5) NumberOfActuationsLift
+          attribute"
       command: "readAttribute"
       attribute: "NumberOfActuationsLift"
+      PICS: WNCV.S.A0005
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
     ### Attribute[  6]: NumberOfActuationsTilt  ====================
-    - label: "4: read the RO optional attribute default: NumberOfActuationsTilt"
-      disabled: true
-      command: "readAttribute"
-      attribute: "NumberOfActuationsTilt"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65535
-
     - label:
-          "5a: write a value into the RO optional attribute:
-          NumberOfActuationsTilt"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "NumberOfActuationsTilt"
-      arguments:
-          value: 255
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "5b: reads back the RO optional attribute: NumberOfActuationsTilt"
-      disabled: true
+          "Step 3g: TH reads from the DUT the ( 6) NumberOfActuationsTilt
+          attribute"
       command: "readAttribute"
       attribute: "NumberOfActuationsTilt"
+      PICS: WNCV.S.A0006
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65535
 
     ### Attribute[  8]: CurrentPositionLiftPercentage  ====================
     - label:
-          "4: read the RO optional attribute default:
-          CurrentPositionLiftPercentage"
+          "Step 3h: TH reads from the DUT the ( 8) CurrentPositionLiftPercentage
+          attribute"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
+      PICS: WNCV.S.A0008
       response:
           constraints:
-              type: Percent
+              type: percent
               minValue: 0
               maxValue: 100
-
-    - label:
-          "5a: write a value into the RO optional attribute:
-          CurrentPositionLiftPercentage"
-      command: "writeAttribute"
-      attribute: "CurrentPositionLiftPercentage"
-      arguments:
-          value: 200
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label:
-          "5b: reads back the RO optional attribute:
-          CurrentPositionLiftPercentage"
-      command: "readAttribute"
-      attribute: "CurrentPositionLiftPercentage"
-      response:
-          constraints:
-              type: Percent
-              notValue: 200
 
     ### Attribute[  9]: CurrentPositionTiltPercentage  ====================
     - label:
-          "4: read the RO optional attribute default:
-          CurrentPositionTiltPercentage"
+          "Step 3i: TH reads from the DUT the ( 9) CurrentPositionTiltPercentage
+          attribute"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"
+      PICS: WNCV.S.A0009
       response:
           constraints:
-              type: Percent
+              type: percent
               minValue: 0
               maxValue: 100
-
-    - label:
-          "5a: write a value into the RO optional attribute:
-          CurrentPositionTiltPercentage"
-      command: "writeAttribute"
-      attribute: "CurrentPositionTiltPercentage"
-      arguments:
-          value: 200
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label:
-          "5b: reads back the RO optional attribute:
-          CurrentPositionTiltPercentage"
-      command: "readAttribute"
-      attribute: "CurrentPositionTiltPercentage"
-      response:
-          constraints:
-              type: Percent
-              notValue: 200
     ###################################################
     # FYI Non Tested deprecated attributes
     # 20 VelocityLift

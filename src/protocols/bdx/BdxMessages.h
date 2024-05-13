@@ -28,11 +28,15 @@
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CodeUtils.h>
 #include <protocols/Protocols.h>
+#include <protocols/bdx/StatusCode.h>
 #include <system/SystemPacketBuffer.h>
+
 namespace chip {
 namespace bdx {
 
-constexpr uint16_t kMaxFileDesignatorLen = 0xFF;
+inline constexpr uint16_t kMaxFileDesignatorLen = 0xFF;
+
+inline constexpr char kProtocolName[] = "BDX";
 
 enum class MessageType : uint8_t
 {
@@ -46,24 +50,6 @@ enum class MessageType : uint8_t
     BlockAck           = 0x13,
     BlockAckEOF        = 0x14,
     BlockQueryWithSkip = 0x15,
-};
-
-enum class StatusCode : uint16_t
-{
-    kLengthTooLarge             = 0x0012,
-    kLengthTooShort             = 0x0013,
-    kLengthMismatch             = 0x0014,
-    kLengthRequired             = 0x0015,
-    kBadMessageContents         = 0x0016,
-    kBadBlockCounter            = 0x0017,
-    kUnexpectedMessage          = 0x0018,
-    kResponderBusy              = 0x0019,
-    kTransferFailedUnknownError = 0x001F,
-    kTransferMethodNotSupported = 0x0050,
-    kFileDesignatorUnknown      = 0x0051,
-    kStartOffsetNotSupported    = 0x0052,
-    kVersionNotSupported        = 0x0053,
-    kUnknown                    = 0x005F,
 };
 
 enum class TransferControlFlags : uint8_t
@@ -312,6 +298,26 @@ template <>
 struct MessageTypeTraits<bdx::MessageType>
 {
     static constexpr const Protocols::Id & ProtocolId() { return BDX::Id; }
+
+    static auto GetTypeToNameTable()
+    {
+        static const std::array<MessageTypeNameLookup, 10> typeToNameTable = {
+            {
+                { bdx::MessageType::SendInit, "SendInit" },
+                { bdx::MessageType::SendAccept, "SendAccept" },
+                { bdx::MessageType::ReceiveInit, "ReceiveInit" },
+                { bdx::MessageType::ReceiveAccept, "ReceiveAccept" },
+                { bdx::MessageType::BlockQuery, "BlockQuery" },
+                { bdx::MessageType::Block, "Block" },
+                { bdx::MessageType::BlockEOF, "BlockEOF" },
+                { bdx::MessageType::BlockAck, "BlockAck" },
+                { bdx::MessageType::BlockAckEOF, "BlockAckEOF" },
+                { bdx::MessageType::BlockQueryWithSkip, "BlockQueryWithSkip" },
+            },
+        };
+
+        return &typeToNameTable;
+    }
 };
 } // namespace Protocols
 

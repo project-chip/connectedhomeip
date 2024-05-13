@@ -15,12 +15,10 @@
 #
 """Collect memory information from csv files."""
 
-import pandas as pd  # type: ignore
-
 import memdf.name
-
-from memdf.util.config import Config, ConfigDescription
+import pandas as pd  # type: ignore
 from memdf.df import DFs
+from memdf.util.config import Config, ConfigDescription
 
 CONFIG: ConfigDescription = {}
 

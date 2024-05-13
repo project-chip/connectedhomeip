@@ -1,0 +1,139 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.3.3. [TC-DD-3.3] User Directed Commissioning [DUT - Commissionee]
+
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+    - MCORE.DD.UI
+    - MCORE.DD.COMM_DISCOVERY
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Preconditions"
+      verification: |
+          1 - User must indicate the intention for commissioning using a display or other UI elements.
+          2 - TH is not advertising Commissioner Discovery Service at start
+      disabled: true
+
+    - label:
+          "Step 1: DUT start scanning for available commissioners using
+          Commissioner Discovery"
+      verification: |
+          DUT should make 4 retries with 100ms timeout
+      disabled: true
+
+    - label:
+          "Step 2: TH is instructed to advertise Commissioner Discovery service"
+      verification: |
+          chip-tv-app is used as dut
+
+           ./chip-tv-app
+
+          Verify in tv-app side
+          [1667820688.750031][13245:13245] CHIP:DL: Using wifi MAC for hostname
+          [1667820688.750083][13245:13245] CHIP:DIS: Advertise operational node 43D06D09FCEEDF78-FFFFFFEFFFFFFFFF
+          [1667820688.782144][13245:13245] CHIP:DIS: Responding with _matter._tcp.local
+          [1667820688.782192][13245:13245] CHIP:DIS: Responding with 43D06D09FCEEDF78-FFFFFFEFFFFFFFFF._matter._tcp.local
+          [1667820688.782220][13245:13245] CHIP:DIS: Responding with 43D06D09FCEEDF78-FFFFFFEFFFFFFFFF._matter._tcp.local
+          [1667820688.782240][13245:13245] CHIP:DIS: Responding with E45F016961B10000.local
+          [1667820688.782259][13245:13245] CHIP:DIS: Responding with E45F016961B10000.local
+          [1667820688.782284][13245:13245] CHIP:DIS: Responding with _I43D06D09FCEEDF78._sub._matter._tcp.local
+          [1667820688.782301][13245:13245] CHIP:DIS: CHIP minimal mDNS configured as 'Operational device'; instance name: 43D06D09FCEEDF78-FFFFFFEFFFFFFFFF.
+          [1667820688.824041][13245:13245] CHIP:DIS: mDNS service published: _matter._tcp
+      disabled: true
+
+    - label:
+          "Step 3: DUT start scanning for available commissioners using
+          Commissioner Discovery"
+      verification: |
+          In certification QA we are using chip-tv-casting-app as a reference app, In case of certification testing, DUT (app) vendor to provide instructions on how to scan for commissioners
+           ./chip-tv-casting-app
+
+          Verify for the commissioner advertisements from the TH in tv-casting-app side
+
+          CHIP:SVR: Discovered Commissioner #0
+          [1653478433.097515][3785:3785] CHIP:DIS:         Hostname: E45F010F19FF0000
+          [1653478433.097546][3785:3785] CHIP:DIS:         IP Address #1: fe80::d83a:21ff:fe24:b6d6
+          [1653478433.097570][3785:3785] CHIP:DIS:         Port: 5540
+          [1653478433.097593][3785:3785] CHIP:DIS:         Mrp Interval idle: 5000 ms
+          [1653478433.097615][3785:3785] CHIP:DIS:         Mrp Interval active: 300 ms
+          [1653478433.097641][3785:3785] CHIP:DIS:         Rotating ID: 0000406E4D7073744BF234AD391DAE869837
+          [1653478433.097664][3785:3785] CHIP:DIS:         Device Name: Test TV casting app
+          [1653478433.097686][3785:3785] CHIP:DIS:         Vendor ID: 65521
+          [1653478433.097709][3785:3785] CHIP:DIS:         Product ID: 32769
+          [1653478433.097731][3785:3785] CHIP:DIS:         Device Type: 35
+          [1653478433.097753][3785:3785] CHIP:DIS:         Pairing Hint: 33
+          [1653478433.097775][3785:3785] CHIP:DIS:         Instance Name: C1E39719B158802A
+          [1653478433.097797][3785:3785] CHIP:DIS:         Commissioning Mode: 0
+          [1653478433.097821][3785:3785] CHIP:SVR: Discovered Commissioner #1
+          [1653478433.097841][3785:3785] CHIP:DIS:         Hostname: E45F010F27530000
+          [1653478433.097867][3785:3785] CHIP:DIS:         IP Address #1: fe80::e65f:1ff:fe0f:2755
+          [1653478433.097890][3785:3785] CHIP:DIS:         Port: 5650
+          [1653478433.097912][3785:3785] CHIP:DIS:         Mrp Interval idle: 5000 ms
+          [1653478433.097934][3785:3785] CHIP:DIS:         Mrp Interval active: 300 ms
+          [1653478433.097956][3785:3785] CHIP:DIS:         Device Name: Test TV
+          [1653478433.097979][3785:3785] CHIP:DIS:         Vendor ID: 65521
+          [1653478433.098001][3785:3785] CHIP:DIS:         Product ID: 32769
+          [1653478433.098023][3785:3785] CHIP:DIS:         Device Type: 35
+          [1653478433.098056][3785:3785] CHIP:DIS:         Instance Name: 02DEC0D7B8A76577
+          [1653478433.098076][3785:3785] CHIP:DIS:         Commissioning Mode: 0
+          [1653478433.098103][3785:3785] CHIP:SVR: 2 commissioner(s) discovered. Select one (by number# above) to request commissioning from:
+          [1653478433.098124][3785:3785] CHIP:SVR: Example: cast request 0
+      disabled: true
+
+    - label:
+          "Step 4: DUT is instructed to start the commissioning procedure with
+          the TH found at Step 3"
+      verification: |
+          Out of scope
+      disabled: true
+
+    - label: "Step 5: TH verifies the Identification Declaration message"
+      verification: |
+          Out of scope
+      disabled: true
+
+    - label: "Step 6: TH start the commissioning procedure with DUT"
+      verification: |
+          Into the shell, enter "cast request 0" to send a user-directed-commissioning request to the DUT on tv-casting-app side
+
+          > cast request 1
+          [1653179218011] [47890:1899175] CHIP: [DL] request
+          [1653179218011] [47890:1899175] CHIP: [SVR]   ------- PrepareForCommissioning
+          [1653179218011] [47890:1899175] CHIP: [SVR] Server initializing...
+
+
+          UX will vary by product maker. The following is the tv-app shell output:
+
+          [1653179219087] [89108:1898759] CHIP: [CTL] ------PROMPT USER: Test TV casting app is requesting permission to cast to this TV, approve? [0x0000_FFF1,0x0000_8001,E0707BB1AFFA6F23,020096D16895275F1B49A07221F0E588E06B]
+
+          [1653179219087] [89108:1898759] CHIP: [CTL] ------Via Shell Enter: controller ux ok|cancel
+
+
+          Into the DUT UX, accept request for commissioning. Manufacturer may utilize a custom method for obtaining user consent other than an on-screen prompt.
+
+          The following is the tv-app shell command to accept the request
+
+          > controller ux ok
+
+          The commissioning success completion is indicated in the TH with the following shell output:
+
+          [1653088463910] [86837:1122544] CHIP: [SVR] Commissioning completed successfully
+      disabled: true

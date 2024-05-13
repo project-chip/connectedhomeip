@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <linux/types.h> /* for "caddr_t" et al      */
@@ -36,21 +37,24 @@ static constexpr uint16_t kWiFi_BAND_2_4_GHZ      = 2400;
 static constexpr uint16_t kWiFi_BAND_5_0_GHZ      = 5000;
 static constexpr char kWpaSupplicantServiceName[] = "fi.w1.wpa_supplicant1";
 static constexpr char kWpaSupplicantObjectPath[]  = "/fi/w1/wpa_supplicant1";
+static constexpr char kWpaSupplicantBlobUnknown[] = "fi.w1.wpa_supplicant1.BlobUnknown";
 
 class ConnectivityUtils
 {
 public:
     static uint16_t MapChannelToFrequency(const uint16_t inBand, const uint8_t inChannel);
     static uint8_t MapFrequencyToChannel(const uint16_t frequency);
-    static app::Clusters::GeneralDiagnostics::InterfaceType GetInterfaceConnectionType(const char * ifname);
+    static app::Clusters::GeneralDiagnostics::InterfaceTypeEnum GetInterfaceConnectionType(const char * ifname);
     static CHIP_ERROR GetInterfaceHardwareAddrs(const char * ifname, uint8_t * buf, size_t bufSize);
+    static CHIP_ERROR GetInterfaceIPv4Addrs(const char * ifname, uint8_t & size, NetworkInterface * ifp);
+    static CHIP_ERROR GetInterfaceIPv6Addrs(const char * ifname, uint8_t & size, NetworkInterface * ifp);
     static CHIP_ERROR GetWiFiInterfaceName(char * ifname, size_t bufSize);
     static CHIP_ERROR GetWiFiChannelNumber(const char * ifname, uint16_t & channelNumber);
     static CHIP_ERROR GetWiFiRssi(const char * ifname, int8_t & rssi);
     static CHIP_ERROR GetWiFiBeaconLostCount(const char * ifname, uint32_t & beaconLostCount);
     static CHIP_ERROR GetWiFiCurrentMaxRate(const char * ifname, uint64_t & currentMaxRate);
     static CHIP_ERROR GetEthInterfaceName(char * ifname, size_t bufSize);
-    static CHIP_ERROR GetEthPHYRate(const char * ifname, app::Clusters::EthernetNetworkDiagnostics::PHYRateType & pHYRate);
+    static CHIP_ERROR GetEthPHYRate(const char * ifname, app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum & pHYRate);
     static CHIP_ERROR GetEthFullDuplex(const char * ifname, bool & fullDuplex);
 
 private:

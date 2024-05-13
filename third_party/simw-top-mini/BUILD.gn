@@ -13,6 +13,11 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/nlassert.gni")
+
+import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/src/crypto/crypto.gni")
+import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/third_party/simw-top-mini/simw_config.gni")
 
 config("se05x_config") {
@@ -24,9 +29,9 @@ config("se05x_config") {
     "SMCOM_T1oI2C",
   ]
 
-  #defines += ["FLOW_VERBOSE"]
+  # defines += ["FLOW_VERBOSE"]
 
-  if (host == "host_k32w") {
+  if (chip_device_platform == "k32w0") {
     defines += [
       "AX_EMBEDDED",
       "LPC_K32W",
@@ -35,76 +40,75 @@ config("se05x_config") {
   }
 
   include_dirs = [
-    "${chip_root}/third_party/simw-top-mini/repo",
-    "${chip_root}/third_party/simw-top-mini/repo/sss/inc",
-    "${chip_root}/third_party/simw-top-mini/repo/sss/port/default",
-    "${chip_root}/third_party/simw-top-mini/repo/sss/ex/src",
-    "${chip_root}/third_party/simw-top-mini/repo/sss/ex/inc",
-    "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/inc",
-    "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/libCommon/infra",
-    "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/libCommon/smCom",
-    "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/libCommon/log",
-    "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/libCommon/smCom/T1oI2C",
-    "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/se05x_03_xx_xx",
-    "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/platform/inc",
-    "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/libCommon/smCom",
+    "repo",
+    "repo/sss/inc",
+    "repo/sss/port/default",
+    "repo/sss/ex/src",
+    "repo/sss/ex/inc",
+    "repo/hostlib/hostLib/inc",
+    "repo/hostlib/hostLib/libCommon/infra",
+    "repo/hostlib/hostLib/libCommon/smCom",
+    "repo/hostlib/hostLib/libCommon/log",
+    "repo/hostlib/hostLib/se05x_03_xx_xx",
+    "repo/hostlib/hostLib/platform/inc",
+    "repo/hostlib/hostLib/libCommon/smCom",
   ]
-  if (host == "host_k32w") {
+  include_dirs += [ "repo/hostlib/hostLib/libCommon/smCom/T1oI2C" ]
+  if (chip_device_platform == "k32w0") {
     include_dirs += [
-      "${chip_root}/third_party/simw-top-mini/repo/demos/ksdk/common/boards/DK6/wireless_examples/chip",
-      "${chip_root}/third_party/simw-top-mini/repo/demos/ksdk/common/freertos/boards/DK6",
+      "repo/demos/ksdk/common/boards/DK6/wireless_examples/chip",
+      "repo/demos/ksdk/common/freertos/boards/DK6",
     ]
   }
 }
 
-source_set("se05x") {
+static_library("se05x") {
   sources = [
-    "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/libCommon/infra/global_platf.c",
-    "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/libCommon/infra/sm_apdu.c",
-    "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/libCommon/infra/sm_connect.c",
-    "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/libCommon/infra/sm_errors.c",
-    "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/libCommon/infra/sm_printf.c",
-    "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/libCommon/log/nxLog.c",
-    "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/libCommon/smCom/smCom.c",
-    "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/platform/rsp/se05x_reset.c",
-    "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/se05x/src/se05x_ECC_curves.c",
-    "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/se05x/src/se05x_mw.c",
-    "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/se05x/src/se05x_tlv.c",
-    "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/se05x_03_xx_xx/se05x_APDU.c",
-    "${chip_root}/third_party/simw-top-mini/repo/sss/ex/src/ex_sss_boot.c",
-    "${chip_root}/third_party/simw-top-mini/repo/sss/ex/src/ex_sss_boot_connectstring.c",
-    "${chip_root}/third_party/simw-top-mini/repo/sss/ex/src/ex_sss_se05x.c",
-    "${chip_root}/third_party/simw-top-mini/repo/sss/ex/src/ex_sss_se05x_auth.c",
-    "${chip_root}/third_party/simw-top-mini/repo/sss/src/fsl_sss_apis.c",
-    "${chip_root}/third_party/simw-top-mini/repo/sss/src/fsl_sss_util_asn1_der.c",
-    "${chip_root}/third_party/simw-top-mini/repo/sss/src/fsl_sss_util_rsa_sign_utils.c",
-    "${chip_root}/third_party/simw-top-mini/repo/sss/src/keystore/keystore_cmn.c",
-    "${chip_root}/third_party/simw-top-mini/repo/sss/src/keystore/keystore_pc.c",
-    "${chip_root}/third_party/simw-top-mini/repo/sss/src/mbedtls/fsl_sss_mbedtls_apis.c",
-    "${chip_root}/third_party/simw-top-mini/repo/sss/src/se05x/fsl_sss_se05x_apis.c",
-    "${chip_root}/third_party/simw-top-mini/repo/sss/src/se05x/fsl_sss_se05x_mw.c",
-    "${chip_root}/third_party/simw-top-mini/repo/sss/src/se05x/fsl_sss_se05x_policy.c",
+    "repo/hostlib/hostLib/libCommon/infra/global_platf.c",
+    "repo/hostlib/hostLib/libCommon/infra/sm_apdu.c",
+    "repo/hostlib/hostLib/libCommon/infra/sm_connect.c",
+    "repo/hostlib/hostLib/libCommon/infra/sm_errors.c",
+    "repo/hostlib/hostLib/libCommon/infra/sm_printf.c",
+    "repo/hostlib/hostLib/libCommon/log/nxLog.c",
+    "repo/hostlib/hostLib/libCommon/smCom/smCom.c",
+    "repo/hostlib/hostLib/platform/rsp/se05x_reset.c",
+    "repo/hostlib/hostLib/se05x/src/se05x_ECC_curves.c",
+    "repo/hostlib/hostLib/se05x/src/se05x_mw.c",
+    "repo/hostlib/hostLib/se05x/src/se05x_tlv.c",
+    "repo/hostlib/hostLib/se05x_03_xx_xx/se05x_APDU.c",
+    "repo/sss/ex/src/ex_sss_boot.c",
+    "repo/sss/ex/src/ex_sss_boot_connectstring.c",
+    "repo/sss/ex/src/ex_sss_se05x.c",
+    "repo/sss/ex/src/ex_sss_se05x_auth.c",
+    "repo/sss/src/fsl_sss_apis.c",
+    "repo/sss/src/fsl_sss_util_asn1_der.c",
+    "repo/sss/src/fsl_sss_util_rsa_sign_utils.c",
+    "repo/sss/src/keystore/keystore_cmn.c",
+    "repo/sss/src/keystore/keystore_pc.c",
+    "repo/sss/src/mbedtls/fsl_sss_mbedtls_apis.c",
+    "repo/sss/src/se05x/fsl_sss_se05x_apis.c",
+    "repo/sss/src/se05x/fsl_sss_se05x_mw.c",
+    "repo/sss/src/se05x/fsl_sss_se05x_policy.c",
   ]
 
   sources += [
-    "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/libCommon/smCom/T1oI2C/phNxpEsePal_i2c.c",
-    "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/libCommon/smCom/T1oI2C/phNxpEseProto7816_3.c",
-    "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/libCommon/smCom/T1oI2C/phNxpEse_Api.c",
-    "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/libCommon/smCom/smComT1oI2C.c",
+    "repo/hostlib/hostLib/libCommon/smCom/T1oI2C/phNxpEsePal_i2c.c",
+    "repo/hostlib/hostLib/libCommon/smCom/T1oI2C/phNxpEseProto7816_3.c",
+    "repo/hostlib/hostLib/libCommon/smCom/T1oI2C/phNxpEse_Api.c",
+    "repo/hostlib/hostLib/libCommon/smCom/smComT1oI2C.c",
   ]
 
-  if (host == "host_k32w") {
+  if (chip_device_platform == "k32w0") {
     sources += [
-      "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/platform/ksdk/i2c_dk6.c",
-      "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/platform/ksdk/timer_kinetis_freertos.c",
+      "repo/hostlib/hostLib/platform/ksdk/i2c_dk6.c",
+      "repo/hostlib/hostLib/platform/ksdk/timer_kinetis_freertos.c",
     ]
-  } else if (host == "host_linux") {
+  } else if (chip_device_platform == "linux") {
     sources += [
-      "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/platform/generic/sm_timer.c",
-      "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/platform/linux/i2c_a7.c",
+      "repo/hostlib/hostLib/platform/generic/sm_timer.c",
+      "repo/hostlib/hostLib/platform/linux/i2c_a7.c",
     ]
   }
 
-  public_deps = [ "${chip_root}/third_party/mbedtls:mbedtls" ]
-  configs += [ ":se05x_config" ]
+  public_configs = [ ":se05x_config" ]
 }

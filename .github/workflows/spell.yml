@@ -16,6 +16,8 @@ name: Run misspell
 
 on:
     push:
+        branches-ignore:
+            - 'dependabot/**'
         paths:
             - "**.md"
             - ".github/.wordlist.txt"
@@ -25,29 +27,10 @@ on:
             - ".github/.wordlist.txt"
 
 jobs:
-    check-reviewdog:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: Wandalen/wretry.action@v1.0.11
-              name: Checkout
-              with:
-                  action: actions/checkout@v3
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-            - uses: reviewdog/action-misspell@v1
-              with:
-                  github_token: ${{ secrets.GITHUB_TOKEN }}
     check-spellcheck:
+        name: Check Spelling - pyspelling
         runs-on: ubuntu-latest
         steps:
-            - uses: Wandalen/wretry.action@v1.0.11
-              name: Checkout
-              with:
-                  action: actions/checkout@v3
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-            - uses: igsekor/pyspelling-any@v0.0.2
+            - name: Checkout
+              uses: actions/checkout@v4
+            - uses: rojopolis/spellcheck-github-actions@0.36.0

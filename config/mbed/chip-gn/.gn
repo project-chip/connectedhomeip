@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
 
 # The location of the build configuration file.
 buildconfig = "//build/config/BUILDCONFIG.gn"
@@ -24,10 +25,8 @@ default_args = {
   target_cpu = "arm"
   target_os = "mbed"
 
-  default_configs_warnings = [
-    "${build_root}/config/compiler:warnings_default",
-    "//:chip_custom_cflags_config",
-  ]
+  default_configs_warnings =
+      [ "${build_root}/config/compiler:warnings_default" ]
 
-  import("//args.gni")
+  import("${chip_root}/config/mbed/chip-gn/args.gni")
 }

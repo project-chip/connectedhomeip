@@ -1,1 +1,0 @@
-zap-generated/CHIPCallbackBridge_internal.h

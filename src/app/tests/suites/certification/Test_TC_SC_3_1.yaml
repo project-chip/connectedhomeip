@@ -1,0 +1,256 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 22.3.1. [TC-SC-3.1] Session Establishment - REMOVED
+
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Precondition"
+      verification: |
+          1. Underlying transport is reliable, either implicitly (i.e.: TCP) or explicitly (i.e.: MRP)
+          execute the below mentioned command to put DUT into a commissionable state, Pls use equivalent command on the respective DUT
+          ./chip-all-clusters-app  --trace_decode 1
+
+          Once DUT reach the  commissionable state pls send below mentioned command on TH. Pls use equivalent command on the respective DUT
+          ./chip-tool pairing onnetwork 1 20202021  --trace_decode 1
+          Verify the commissioning completed with success on TH(chip-tool) from DUT
+          [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success
+
+            # 1 Please use Interactive mode to Verify this test cases
+            Here the command to enter interactive mode:--
+            ./chip-tool interactive start   --trace_decode 1
+
+            #2. send a  subscribe request from chip-tool
+            onoff subscribe on-time 10 100 1 1   --trace_decode 1
+      disabled: true
+
+    - label:
+          "Step 1: Initiator constructs and sends a TLV-encoded Sigma1 message
+          containing a random initiation value, destination identifier, session
+          identifier, the public key for its ephemeral key pair, and optional
+          MRP parameters."
+      verification: |
+          On Initiator(chip-tool) verify that, Initiator(chip-tool) Initiator constructs and sends a TLV-encoded Sigma1 message containing a
+          random initiation value,
+          destination identifier,
+          session identifier,
+          the public key for its ephemeral key pair, and
+          optional MRP parameters.
+
+          Verify that the message is properly formatted:
+
+          1. I Flag is set to 1
+          2. S flag and DIZ fields of message flags are set to 0
+          3. Encryption Type of security flags is set to 0
+          4. The message payload follows the sigma-1-struct TLV encoding format
+          5. The Session Key Type field is set to 0
+          6. The Protocol ID field is set to 0 and Protocol Opcode field is set to 48 (0x30)
+
+          here is the log to verify on chip-tool
+
+          [1688031714.302565][2431:2433] CHIP:DMG: >> to UDP:[fe80::e65f:1ff:fe0f:19ff%eth0]:5540 | 248842226 | [Secure Channel  (0) / Certificate Authenticated Session Establishment Sigma '1' (0x30) / Session = 0 / Exchange = 50244]
+          [1688031714.302684][2431:2433] CHIP:DMG: Header Flags =
+          [1688031714.302740][2431:2433] CHIP:DMG: {
+          [1688031714.302811][2431:2433] CHIP:DMG:     Message (0x04) =
+          [1688031714.302864][2431:2433] CHIP:DMG:     {
+          [1688031714.302919][2431:2433] CHIP:DMG:         SourceNodeId = 23BBF785D3ABC710
+          [1688031714.302971][2431:2433] CHIP:DMG:     }
+          [1688031714.303049][2431:2433] CHIP:DMG:     Exchange (0x05) =
+          [1688031714.303103][2431:2433] CHIP:DMG:     {
+          [1688031714.303149][2431:2433] CHIP:DMG:         Initiator = true
+          [1688031714.303199][2431:2433] CHIP:DMG:         NeedsAck = true
+          [1688031714.303249][2431:2433] CHIP:DMG:     }
+          [1688031714.303315][2431:2433] CHIP:DMG: }
+          [1688031714.303366][2431:2433] CHIP:DMG:
+          [1688031714.303431][2431:2433] CHIP:DMG: Encrypted Payload (166 bytes) =
+          [1688031714.303483][2431:2433] CHIP:DMG: {
+          [1688031714.303533][2431:2433] CHIP:DMG:     data = 04000000f207d50e10c7abd385f7bb23053044c4000015300120e74196345c2e4d9f20bbebe1d1b2a12434b1f967f93b1391cf3eeeac6e34233c2502c55b300320770fd2eb6d97cbc32b4ab26637d77084cc9bc0e4f798098223fe57ebef74e4bc300441040e0f7a858f134c11bab5bcd788822e57e495e582a9966dfdbc3add489e523f952c8b568155cbe2c1f350ffa3df33fadca137279c84e68b0f4d40b1ab0b03432818
+          [1688031714.303594][2431:2433] CHIP:DMG:     buffer_ptr = 281473366155888
+          [1688031714.303644][2431:2433] CHIP:DMG: }
+          [1688031714.303692][2431:2433] CHIP:DMG:
+          [1688031714.303764][2431:2433] CHIP:DMG: Decrypted Payload (144 bytes) =
+          [1688031714.303816][2431:2433] CHIP:DMG: {
+          [1688031714.303866][2431:2433] CHIP:DMG:     data = 15300120e74196345c2e4d9f20bbebe1d1b2a12434b1f967f93b1391cf3eeeac6e34233c2502c55b300320770fd2eb6d97cbc32b4ab26637d77084cc9bc0e4f798098223fe57ebef74e4bc300441040e0f7a858f134c11bab5bcd788822e57e495e582a9966dfdbc3add489e523f952c8b568155cbe2c1f350ffa3df33fadca137279c84e68b0f4d40b1ab0b03432818
+          [1688031714.303924][2431:2433] CHIP:DMG: }
+          [1688031714.303972][2431:2433] CHIP:DMG:
+          [1688031714.304092][2431:2433] CHIP:DMG: Parameters =
+          [1688031714.304146][2431:2433] CHIP:DMG: {
+          [1688031714.304233][2431:2433] CHIP:DMG:     InitiatorRandom (32) = E74196345C2E4D9F20BBEBE1D1B2A12434B1F967F93B1391CF3EEEAC6E34233C
+          [1688031714.304288][2431:2433] CHIP:DMG:     InitiatorSessionId = 23493
+          [1688031714.304345][2431:2433] CHIP:DMG:     DestinationId (32) = 770FD2EB6D97CBC32B4AB26637D77084CC9BC0E4F798098223FE57EBEF74E4BC
+          [1688031714.304406][2431:2433] CHIP:DMG:     InitiatorEphPubKey (65) = 040E0F7A858F134C11BAB5BCD788822E57E495E582A9966DFDBC3ADD489E523F952C8B568155CBE2C1F350FFA3DF33FADCA137279C84E68B0F4D40B1AB0B034328
+          [1688031714.304466][2431:2433] CHIP:DMG: }
+          [1688031714.304516][2431:2433] CHIP:DMG:
+          [1688031714.304566][2431:2433] CHIP:DMG:
+
+
+          On Responder(all-clusters-app), Verify that the responder receives the message.
+          [1688031714.287968][101345:101345] CHIP:EM: Handling via exchange: 50244r, Delegate: 0xaaaac5439360
+          [1688031714.288066][101345:101345] CHIP:IN: CASE Server received Sigma1 message . Starting handshake. EC 0xaaaae8206290
+          [1688031714.288121][101345:101345] CHIP:IN: CASE Server disabling CASE session setups
+          [1688031714.288188][101345:101345] CHIP:SC: Received Sigma1 msg
+          [1688031714.288283][101345:101345] CHIP:SC: Peer assigned session key ID 23493
+          [1688031714.289272][101345:101345] CHIP:SC: CASE matched destination ID: fabricIndex 1, NodeID 0x0000000000000001
+          [1688031714.295271][101345:101345] CHIP:EM: <<< [E:50244r S:0 M:19977399 (Ack:248842226)] (U) Msg TX to 0:0000000000000000 [0000] --- Type 0000:31 (SecureChannel:CASE_Sigma2)
+          [1688031714.295651][101345:101345] CHIP:IN: (U) Sending msg 19977399 to IP address 'UDP:[fe80::e65f:1ff:fe0f:2877%eth0]:59102'
+      disabled: true
+
+    - label:
+          "Step 2: Responder validates the destination identifier contained in
+          the message."
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Step 3: Responder constructs and sends a TLV-encoded Sigma2 message
+          containing a random responder value, responder session id, trusted
+          root id, public key for its responder ephemeral key pair, and
+          encrypted integrity data."
+      verification: |
+          On Responder(all-clusters-app), verify that Responder constructs and sends a TLV-encoded Sigma2 message containing a random responder value, responder session id, trusted root id, public key for its responder ephemeral key pair, and encrypted integrity data.
+          Verify that the message is properly formatted:
+
+          1. I flag is set to 0
+          2. S flag and DIZ fields of message flags are set to 0
+          3. Encryption Type of security flags is set to 0
+          4. The message payload follows the sigma-2-struct TLV encoding format
+          5. The Session Key Type field is set to 0
+          6. The Protocol ID field is set to 0 and Protocol Opcode field is set to 49 (0x31)
+
+          If your device has a provision to verify the DUT log, here is the log to verify on all-clusters-app
+
+          [1688031714.288188][101345:101345] CHIP:SC: Received Sigma1 msg
+          [1688031714.288283][101345:101345] CHIP:SC: Peer assigned session key ID 23493
+          [1688031714.289272][101345:101345] CHIP:SC: CASE matched destination ID: fabricIndex 1, NodeID 0x0000000000000001
+          [1688031714.295271][101345:101345] CHIP:EM: <<< [E:50244r S:0 M:19977399 (Ack:248842226)] (U) Msg TX to 0:0000000000000000 [0000] --- Type 0000:31 (SecureChannel:CASE_Sigma2)
+          [1688031714.295651][101345:101345] CHIP:IN: (U) Sending msg 19977399 to IP address 'UDP:[fe80::e65f:1ff:fe0f:2877%eth0]:59102'
+          [1688031714.296468][101345:101345] CHIP:DMG: >> to UDP:[fe80::e65f:1ff:fe0f:2877%eth0]:59102 | 19977399 | [Secure Channel  (0) / Certificate Authenticated Session Establishment Sigma '2' (0x31) / Session = 0 / Exchange = 50244]
+          [1688031714.296560][101345:101345] CHIP:DMG: Header Flags =
+          [1688031714.296614][101345:101345] CHIP:DMG: {
+          [1688031714.296684][101345:101345] CHIP:DMG:     Message (0x01) =
+          [1688031714.296735][101345:101345] CHIP:DMG:     {
+          [1688031714.296789][101345:101345] CHIP:DMG:         DestinationNodeId = 23BBF785D3ABC710
+          [1688031714.296840][101345:101345] CHIP:DMG:     }
+          [1688031714.296911][101345:101345] CHIP:DMG:     Exchange (0x06) =
+          [1688031714.296962][101345:101345] CHIP:DMG:     {
+          [1688031714.297016][101345:101345] CHIP:DMG:         AckMsg = 248842226
+          [1688031714.297065][101345:101345] CHIP:DMG:         NeedsAck = true
+          [1688031714.297114][101345:101345] CHIP:DMG:     }
+          [1688031714.297180][101345:101345] CHIP:DMG: }
+          [1688031714.297228][101345:101345] CHIP:DMG:
+          [1688031714.297298][101345:101345] CHIP:DMG: Encrypted Payload (721 bytes) =
+          [1688031714.297349][101345:101345] CHIP:DMG: {
+          [1688031714.297399][101345:101345] CHIP:DMG:     data = 01000000b7d4300110c7abd385f7bb23063144c40000f207d50e1530012067099553353c99294801ed53986eaae5c13fcca4c2c832e01a8a6d20805a8ce22502ae8230034104ac6ac8bed847a07e83f2016eb4e169310e2546d6857589b82ff04f9a00d70a55635a041f64900ec9763a330943d80d85d6206d0073935bbc67bcd6adb36eedba31044602f8b9146dbda1448106f4e747b2d181a0e0de9688b7af4c150ecae495042aae83577f32eaba9b4da12518c8e4d67058eab679763f64ad9e96bb515f6df16b9d59a236f102382112fa25e0897078d988d3b4bd4e3b368fd236249efcc5aa385ccbb6292fd882a11a76f5a5dfc0c4fb3db6fc4c261d97fd6835ed5180fc4f91ef3c9fa1f81c1d60e9107d35bf2e13e234a0dc55bc3949df329bcef6222212011b5c048f558f2932bc2a553e5038d8148a3609758ccedcc15663e2ed38756109a7256c33dfc8086ff743e826162bdd5196e33ec6923e0cd0e7c4952e3ed292cc45e8aa2041dab23d5625869bd5959af20ac24832379db9de7e3be907cff4e1f8a885fc5c629c616f67b21167a319ce7b89946efaf82daf661bc45d23e638911f020690ee96876d44a6ed5ed66b4748311a8b06bd2bb0549ff79bdbf2faa8c92cd478fb73480a7768f9d7cde84e53be46bffae44f6bd54a71543b2a12af507d595d67dd161b5571dafccafb60b48c4d7ff985fa2da059ac7318a3ff2b4a594e3e23d52f6a0df7667396563c1962fb270c0611dfd1b0d6470e1ef7dd804e8ab1ae2b8b2eddf84b4055db501d173173589aca32ef0dfe24b923a32b512c6d615ec9b06147ed5b8222a20e2d12b7505a5f300f15b8467f3cf23713cbb06c9028f01b852816cf8033257fbb6cf3a59923e12ea8141972250bc0b866af2fefbef09867d49c455cf8d314232f282a4fc04923c5fa0eb3b587fa2ca86cc91ce87184a0701c13b705581488395ac522b74f843a71f4b30470b16c0f42c3d711bad9c89871615b4f811e552ff718
+          [1688031714.297517][101345:101345] CHIP:DMG:     buffer_ptr = 187651015603296
+          [1688031714.297567][101345:101345] CHIP:DMG: }
+          [1688031714.297615][101345:101345] CHIP:DMG:
+          [1688031714.297689][101345:101345] CHIP:DMG: Decrypted Payload (695 bytes) =
+          [1688031714.297740][101345:101345] CHIP:DMG: {
+          [1688031714.297790][101345:101345] CHIP:DMG:     data = 1530012067099553353c99294801ed53986eaae5c13fcca4c2c832e01a8a6d20805a8ce22502ae8230034104ac6ac8bed847a07e83f2016eb4e169310e2546d6857589b82ff04f9a00d70a55635a041f64900ec9763a330943d80d85d6206d0073935bbc67bcd6adb36eedba31044602f8b9146dbda1448106f4e747b2d181a0e0de9688b7af4c150ecae495042aae83577f32eaba9b4da12518c8e4d67058eab679763f64ad9e96bb515f6df16b9d59a236f102382112fa25e0897078d988d3b4bd4e3b368fd236249efcc5aa385ccbb6292fd882a11a76f5a5dfc0c4fb3db6fc4c261d97fd6835ed5180fc4f91ef3c9fa1f81c1d60e9107d35bf2e13e234a0dc55bc3949df329bcef6222212011b5c048f558f2932bc2a553e5038d8148a3609758ccedcc15663e2ed38756109a7256c33dfc8086ff743e826162bdd5196e33ec6923e0cd0e7c4952e3ed292cc45e8aa2041dab23d5625869bd5959af20ac24832379db9de7e3be907cff4e1f8a885fc5c629c616f67b21167a319ce7b89946efaf82daf661bc45d23e638911f020690ee96876d44a6ed5ed66b4748311a8b06bd2bb0549ff79bdbf2faa8c92cd478fb73480a7768f9d7cde84e53be46bffae44f6bd54a71543b2a12af507d595d67dd161b5571dafccafb60b48c4d7ff985fa2da059ac7318a3ff2b4a594e3e23d52f6a0df7667396563c1962fb270c0611dfd1b0d6470e1ef7dd804e8ab1ae2b8b2eddf84b4055db501d173173589aca32ef0dfe24b923a32b512c6d615ec9b06147ed5b8222a20e2d12b7505a5f300f15b8467f3cf23713cbb06c9028f01b852816cf8033257fbb6cf3a59923e12ea8141972250bc0b866af2fefbef09867d49c455cf8d314232f282a4fc04923c5fa0eb3b587fa2ca86cc91ce87184a0701c13b705581488395ac522b74f843a71f4b30470b16c0f42c3d711bad9c89871615b4f811e552ff718
+          [1688031714.297901][101345:101345] CHIP:DMG: }
+          [1688031714.297948][101345:101345] CHIP:DMG:
+          [1688031714.298203][101345:101345] CHIP:DMG: Parameters =
+          [1688031714.298256][101345:101345] CHIP:DMG: {
+          [1688031714.298312][101345:101345] CHIP:DMG:     ResponderRandom (32) = 67099553353C99294801ED53986EAAE5C13FCCA4C2C832E01A8A6D20805A8CE2
+          [1688031714.298367][101345:101345] CHIP:DMG:     ResponderSessionId = 33454
+          [1688031714.298426][101345:101345] CHIP:DMG:     ResponderEphPubKey (65) = 04AC6AC8BED847A07E83F2016EB4E169310E2546D6857589B82FF04F9A00D70A55635A041F64900EC9763A330943D80D85D6206D0073935BBC67BCD6ADB36EEDBA
+          [1688031714.298607][101345:101345] CHIP:DMG:     Encrypted2 (582) = F8B9146DBDA1448106F4E747B2D181A0E0DE9688B7AF4C150ECAE495042AAE83577F32EABA9B4DA12518C8E4D67058EAB679763F64AD9E96BB515F6DF16B9D59A236F102382112FA25E0897078D988D3B4BD4E3B368FD236249EFCC5AA385CCBB6292FD882A11A76F5A5DFC0C4FB3DB6FC4C261D97FD6835ED5180FC4F91EF3C9FA1F81C1D60E9107D35BF2E13E234A0DC55BC3949DF329BCEF6222212011B5C048F558F2932BC2A553E5038D8148A3609758CCEDCC15663E2ED38756109A7256C33DFC8086FF743E826162BDD5196E33EC6923E0CD0E7C4952E3ED292CC45E8AA2041DAB23D5625869BD5959AF20AC24832379DB9DE7E3BE907CFF4E1F8A885FC5C629C616F67B21167A319CE7B89946EFAF82DAF661BC45D23E638911F020690EE96876D44A6ED5ED66B4748311A8B06BD2BB0549FF79BDBF2FAA8C92CD478FB73480A7768F9D7CDE84E53BE46BFFAE44F6BD54A71543B2A12AF507D595D67DD161B5571DAFCCAFB60B48C4D7FF985FA2DA059AC7318A3FF2B4A594E3E23D52F6A0DF7667396563C1962FB270C0611DFD1B0D6470E1EF7DD804E8AB1AE2B8B2EDDF84B4055DB501D173173589ACA32EF0DFE24B923A32B512C6D615EC9B06147ED5B8222A20E2D12B7505A5F300F15B8467F3CF23713CBB06C9028F01B852816CF8033257FBB6CF3A59923E12EA8141972250BC0B866AF2FEFBEF09867D49C455CF8D314232F282A4FC04923C5FA0EB3B587FA2CA86CC91CE87184A0701C13B705581488395AC522B74F843A71F4B30470B16C0F42C3D711BAD9C89871615B4F811E552FF7
+          [1688031714.298727][101345:101345] CHIP:DMG: }
+          [1688031714.298775][101345:101345] CHIP:DMG:
+          [1688031714.298825][101345:101345] CHIP:DMG:
+          [1688031714.299226][101345:101345] CHIP:SC: Sent Sigma2 msg
+          [1688031714.317745][101345:101345] CHIP:DMG: << from UDP:[fe80::e65f:1ff:fe0f:2877%eth0]:59102 | 248842227 | [Secure Channel  (0) / Certificate Authenticated Session Establishment Sigma '3' (0x32) / Session = 0 / Exchange = 50244]
+
+          initiator(chip-tool), Verify that the initiator receives the message.
+          [1688031714.323047][2431:2433] CHIP:DMG: Additional Fields =
+          [1688031714.323101][2431:2433] CHIP:DMG: {
+          [1688031714.323159][2431:2433] CHIP:DMG:     peer_address = UDP:[fe80::e65f:1ff:fe0f:19ff%eth0]:5540
+          [1688031714.323212][2431:2433] CHIP:DMG: }
+          [1688031714.323261][2431:2433] CHIP:DMG:
+          [1688031714.323331][2431:2433] CHIP:EM: >>> [E:50244i S:0 M:19977399 (Ack:248842226)] (U) Msg RX from 0:0000000000000000 [0000] --- Type 0000:31 (SecureChannel:CASE_Sigma2)
+          [1688031714.323398][2431:2433] CHIP:EM: Found matching exchange: 50244i, Delegate: 0xffffa000d398
+          [1688031714.323480][2431:2433] CHIP:EM: Rxd Ack; Removing MessageCounter:248842226 from Retrans Table on exchange 50244i
+          [1688031714.323574][2431:2433] CHIP:SC: Received Sigma2 msg
+          [1688031714.323644][2431:2433] CHIP:SC: Peer assigned session session ID 33454
+      disabled: true
+
+    - label:
+          "Step 4: Initiator generates a shared secret, generates a S2K key, and
+          decrypts and verifies the message data, node operational certificate
+          (NOC), and signature data."
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Step 5: Initiator constructs and sends a TLV-encoded Sigma3 message
+          containing encrypted integrity data."
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Step 6: Responder decrypts and verifies the message data, NOC, and
+          signature data."
+      verification: |
+          On Initiator(chip-tool), verify If the verification succeed, the session is established and the responder sends a SigmaFinished StatusReport message with GeneralCode SUCCESS, ProtocolId PROTOCOL_ID_SECURE_CHANNEL, and ProtocolCode SessionEstablishmentSuccess.
+          [1686745149.979149][101507:101509] CHIP:DMG: << from UDP:[fe80::e9f6:2c08:2794:357d%wlp0s20f3]:5540 | 47090891 | [Secure Channel  (0) / Status Report (0x40) / Session = 0 / Exchange = 8254]
+          [1686745149.979178][101507:101509] CHIP:DMG: Header Flags =
+          [1686745149.979186][101507:101509] CHIP:DMG: {
+          [1686745149.979196][101507:101509] CHIP:DMG:     Message (0x01) =
+          [1686745149.979202][101507:101509] CHIP:DMG:     {
+          [1686745149.979209][101507:101509] CHIP:DMG:         DestinationNodeId = 92D1722684235749
+          [1686745149.979215][101507:101509] CHIP:DMG:     }
+          [1686745149.979228][101507:101509] CHIP:DMG:     Exchange (0x06) =
+          [1686745149.979233][101507:101509] CHIP:DMG:     {
+          [1686745149.979240][101507:101509] CHIP:DMG:         AckMsg = 174267096
+          [1686745149.979247][101507:101509] CHIP:DMG:         NeedsAck = true
+          [1686745149.979253][101507:101509] CHIP:DMG:     }
+          [1686745149.979262][101507:101509] CHIP:DMG: }
+          [1686745149.979268][101507:101509] CHIP:DMG:
+          [1686745149.979277][101507:101509] CHIP:DMG: Encrypted Payload (34 bytes) =
+          [1686745149.979282][101507:101509] CHIP:DMG: {
+          [1686745149.979287][101507:101509] CHIP:DMG:     data = 01000000cb8cce02495723842672d19206403e200000d81a630a0000000000000000
+          [1686745149.979293][101507:101509] CHIP:DMG:     buffer_ptr = 140478582433296
+          [1686745149.979300][101507:101509] CHIP:DMG: }
+          [1686745149.979305][101507:101509] CHIP:DMG:
+          [1686745149.979317][101507:101509] CHIP:DMG: Decrypted Payload (8 bytes) =
+          [1686745149.979322][101507:101509] CHIP:DMG: {
+          [1686745149.979328][101507:101509] CHIP:DMG:     data = 0000000000000000
+          [1686745149.979332][101507:101509] CHIP:DMG: }
+          [1686745149.979337][101507:101509] CHIP:DMG:
+          [1686745149.979348][101507:101509] CHIP:DMG: Parameters =
+          [1686745149.979354][101507:101509] CHIP:DMG: {
+          [1686745149.979360][101507:101509] CHIP:DMG:     GeneralStatusCode = 0
+          [1686745149.979366][101507:101509] CHIP:DMG:     ProtocolId = 0
+          [1686745149.979372][101507:101509] CHIP:DMG:     ProtocolCode = 0
+          [1686745149.979378][101507:101509] CHIP:DMG: }
+          [1686745149.979385][101507:101509] CHIP:DMG:
+          [1686745149.979391][101507:101509] CHIP:DMG:
+          [1686745149.979403][101507:101509] CHIP:DMG: Additional Fields =
+          [1686745149.979409][101507:101509] CHIP:DMG: {
+          [1686745149.979416][101507:101509] CHIP:DMG:     peer_address = UDP:[fe80::e9f6:2c08:2794:357d%wlp0s20f3]:5540
+          [1686745149.979422][101507:101509] CHIP:DMG: }
+          [1686745149.979427][101507:101509] CHIP:DMG:
+          [1686745149.979440][101507:101509] CHIP:EM: >>> [E:8254i S:0 M:47090891 (Ack:174267096)] (U) Msg RX from 0:0000000000000000 [0000] --- Type 0000:40 (SecureChannel:StatusReport)
+      disabled: true

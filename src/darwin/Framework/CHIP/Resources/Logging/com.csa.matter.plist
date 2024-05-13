@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>DEFAULT-OPTIONS</key>
+	<dict>
+		<key>Default-Privacy-Setting</key>
+		<string>public</string>
+		<key>Level</key>
+		<dict>
+			<key>Enable</key>
+			<string>info</string>
+			<key>Persist</key>
+			<string>default</string>
+		</dict>
+	</dict>
+</dict>
+</plist>

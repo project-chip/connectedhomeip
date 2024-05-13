@@ -26,15 +26,18 @@
 #include "Base38Encode.h"
 
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLV.h>
-#include <lib/core/CHIPTLVData.hpp>
-#include <lib/core/CHIPTLVDebug.hpp>
-#include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/core/TLV.h>
+#include <lib/core/TLVData.h>
+#include <lib/core/TLVDebug.h>
+#include <lib/core/TLVUtilities.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/ScopedBuffer.h>
 #include <protocols/Protocols.h>
 
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 namespace chip {
 
@@ -51,7 +54,8 @@ static CHIP_ERROR populateBits(uint8_t * bits, size_t & offset, uint64_t input, 
     {
         if (input & 1)
         {
-            bits[index / 8] |= static_cast<uint8_t>(1 << index % 8);
+            const uint8_t mask = static_cast<uint8_t>(1 << index % 8);
+            bits[index / 8]    = static_cast<uint8_t>(bits[index / 8] | mask);
         }
         index++;
         input >>= 1;
@@ -158,6 +162,11 @@ static CHIP_ERROR generateBitSet(PayloadContents & payload, MutableByteSpan & bi
     size_t totalPayloadSizeInBits = kTotalPayloadDataSizeInBits + (tlvDataLengthInBytes * 8);
     VerifyOrReturnError(bits.size() * 8 >= totalPayloadSizeInBits, CHIP_ERROR_BUFFER_TOO_SMALL);
 
+    // isValidQRCodePayload() has already performed all relevant checks (including that we have a
+    // long discriminator and rendevouz information). But if AllowInvalidPayload is set these
+    // requirements might be violated; in that case simply encode 0 for the relevant fields.
+    // Encoding an invalid (or partially valid) payload is useful for clients that need to be able
+    // to serialize and deserialize partially populated or invalid payloads.
     ReturnErrorOnFailure(
         populateBits(bits.data(), offset, payload.version, kVersionFieldLengthInBits, kTotalPayloadDataSizeInBits));
     ReturnErrorOnFailure(
@@ -166,10 +175,12 @@ static CHIP_ERROR generateBitSet(PayloadContents & payload, MutableByteSpan & bi
         populateBits(bits.data(), offset, payload.productID, kProductIDFieldLengthInBits, kTotalPayloadDataSizeInBits));
     ReturnErrorOnFailure(populateBits(bits.data(), offset, static_cast<uint64_t>(payload.commissioningFlow),
                                       kCommissioningFlowFieldLengthInBits, kTotalPayloadDataSizeInBits));
-    ReturnErrorOnFailure(populateBits(bits.data(), offset, payload.rendezvousInformation.Raw(), kRendezvousInfoFieldLengthInBits,
-                                      kTotalPayloadDataSizeInBits));
-    ReturnErrorOnFailure(populateBits(bits.data(), offset, payload.discriminator, kPayloadDiscriminatorFieldLengthInBits,
-                                      kTotalPayloadDataSizeInBits));
+    ReturnErrorOnFailure(populateBits(bits.data(), offset,
+                                      payload.rendezvousInformation.ValueOr(RendezvousInformationFlag::kNone).Raw(),
+                                      kRendezvousInfoFieldLengthInBits, kTotalPayloadDataSizeInBits));
+    auto const & pd = payload.discriminator;
+    ReturnErrorOnFailure(populateBits(bits.data(), offset, (!pd.IsShortDiscriminator() ? pd.GetLongValue() : 0),
+                                      kPayloadDiscriminatorFieldLengthInBits, kTotalPayloadDataSizeInBits));
     ReturnErrorOnFailure(
         populateBits(bits.data(), offset, payload.setUpPINCode, kSetupPINCodeFieldLengthInBits, kTotalPayloadDataSizeInBits));
     ReturnErrorOnFailure(populateBits(bits.data(), offset, 0, kPaddingFieldLengthInBits, kTotalPayloadDataSizeInBits));
@@ -196,6 +207,8 @@ static CHIP_ERROR payloadBase38RepresentationWithTLV(PayloadContents & payload, 
         MutableCharSpan subSpan = outBuffer.SubSpan(prefixLen, outBuffer.size() - prefixLen);
         memcpy(outBuffer.data(), kQRCodePrefix, prefixLen);
         err = base38Encode(bits, subSpan);
+        // Reduce output span size to be the size of written data
+        outBuffer.reduce_size(subSpan.size() + prefixLen);
     }
 
     return err;
@@ -206,6 +219,52 @@ CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBase38Representation(std::string 
     // 6.1.2.2. Table: Packed Binary Data Structure
     // The TLV Data should be 0 length if TLV is not included.
     return payloadBase38Representation(base38Representation, nullptr, 0);
+}
+
+CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBase38RepresentationWithAutoTLVBuffer(std::string & base38Representation)
+{
+    // Estimate the size of the needed buffer.
+    size_t estimate = 0;
+
+    auto dataItemSizeEstimate = [](const OptionalQRCodeInfo & item) {
+        // Each data item needs a control byte and a context tag.
+        size_t size = 2;
+
+        if (item.type == optionalQRCodeInfoTypeString)
+        {
+            // We'll need to encode the string length and then the string data.
+            // Length is at most 8 bytes.
+            size += 8;
+            size += item.data.size();
+        }
+        else
+        {
+            // Integer.  Assume it might need up to 8 bytes, for simplicity.
+            size += 8;
+        }
+        return size;
+    };
+
+    auto vendorData = mPayload.getAllOptionalVendorData();
+    for (auto & data : vendorData)
+    {
+        estimate += dataItemSizeEstimate(data);
+    }
+
+    auto extensionData = mPayload.getAllOptionalExtensionData();
+    for (auto & data : extensionData)
+    {
+        estimate += dataItemSizeEstimate(data);
+    }
+
+    estimate = TLV::EstimateStructOverhead(estimate);
+
+    VerifyOrReturnError(CanCastTo<uint32_t>(estimate), CHIP_ERROR_NO_MEMORY);
+
+    Platform::ScopedMemoryBuffer<uint8_t> buf;
+    VerifyOrReturnError(buf.Alloc(estimate), CHIP_ERROR_NO_MEMORY);
+
+    return payloadBase38Representation(base38Representation, buf.Get(), static_cast<uint32_t>(estimate));
 }
 
 CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBase38Representation(std::string & base38Representation, uint8_t * tlvDataStart,

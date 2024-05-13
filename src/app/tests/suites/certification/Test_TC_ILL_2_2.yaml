@@ -11,43 +11,107 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 69.2.2. [TC-ILL-2.2] Primary functionality with server as DUT
+name: 71.2.2. [TC-ILL-2.2] Primary Functionality with Server as DUT
+
+PICS:
+    - ILL.S
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+    cluster: "Illuminance Measurement"
+    endpoint: 1
 
 tests:
-    - label: "Commission DUT to TH"
-      verification: |
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-      disabled: true
+    - label: "Step 2a: TH reads MinMeasuredValue attribute from DUT"
+      PICS: ILL.S.A0001
+      command: "readAttribute"
+      attribute: "MinMeasuredValue"
+      response:
+          saveAs: MinMeasuredValueValue
+          constraints:
+              type: int16u
+
+    - label: "Step 2b: TH reads MaxMeasuredValue attribute from DUT"
+      PICS: ILL.S.A0002
+      command: "readAttribute"
+      attribute: "MaxMeasuredValue"
+      response:
+          saveAs: MaxMeasuredValueValue
+          constraints:
+              type: int16u
+
+    - label: "Step 3: Cover the sensor or darken the room"
+      verification: |
+          Manual operation
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for Success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Wait 1s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
 
     - label:
-          "Test Harness Client reads MinMeasuredValue and MaxMeasuredValue from
-          Server DUT"
+          "Step 4: After a few seconds, TH reads MeasuredValue attribute from
+          DUT."
+      PICS: ILL.S.A0000 && PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "MeasuredValue"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+
+    - label: "Step 5: Expose the sensor again to light"
       verification: |
-          ./chip-tool illuminancemeasurement read measured-value 1 1
-      disabled: true
+          Manual operation
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for Success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Cover the sensor or darken the room"
-      verification: |
+    - label: "Wait 1s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
 
-      disabled: true
-
-    - label: "After a few seconds, TH reads MeasuredValue attribute from DUT"
-      verification: |
-          ./chip-tool illuminancemeasurement read measured-value 1 1
-      disabled: true
-
-    - label: "Expose the sensor again to light"
-      verification: |
-
-      disabled: true
-
-    - label: "After a few seconds, TH reads MeasuredValue attribute from DUT"
-      verification: |
-          ./chip-tool illuminancemeasurement read measured-value 1 1
-      disabled: true
+    - label:
+          "Step 6: After a few seconds, TH reads MeasuredValue attribute from
+          DUT."
+      PICS: ILL.S.A0000 && PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "MeasuredValue"
+      response:
+          constraints:
+              type: int16u
+              maxValue: 65534

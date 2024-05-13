@@ -28,11 +28,6 @@
 class BindingHandler
 {
 public:
-    static void Init();
-    static void SwitchWorkerHandler(intptr_t);
-    static void PrintBindingTable();
-    static bool IsGroupBound();
-
     struct BindingData
     {
         chip::EndpointId EndpointId;
@@ -42,9 +37,25 @@ public:
         bool IsGroup{ false };
     };
 
+    void Init();
+    void PrintBindingTable();
+    bool IsGroupBound();
+
+    static void SwitchWorkerHandler(intptr_t);
+    static void OnInvokeCommandFailure(BindingData & aBindingData, CHIP_ERROR aError);
+
+    static BindingHandler & GetInstance()
+    {
+        static BindingHandler sBindingHandler;
+        return sBindingHandler;
+    }
+
 private:
-    static void OnOffProcessCommand(chip::CommandId, const EmberBindingTableEntry &, chip::DeviceProxy *, void *);
-    static void LevelControlProcessCommand(chip::CommandId, const EmberBindingTableEntry &, chip::DeviceProxy *, void *);
-    static void LightSwitchChangedHandler(const EmberBindingTableEntry &, chip::DeviceProxy *, void *);
+    static void OnOffProcessCommand(chip::CommandId, const EmberBindingTableEntry &, chip::OperationalDeviceProxy *, void *);
+    static void LevelControlProcessCommand(chip::CommandId, const EmberBindingTableEntry &, chip::OperationalDeviceProxy *, void *);
+    static void LightSwitchChangedHandler(const EmberBindingTableEntry &, chip::OperationalDeviceProxy *, void *);
+    static void LightSwitchContextReleaseHandler(void * context);
     static void InitInternal(intptr_t);
+
+    bool mCaseSessionRecovered = false;
 };

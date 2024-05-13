@@ -21,6 +21,7 @@
  */
 
 #include <lib/support/CodeUtils.h>
+#include <platform/DiagnosticDataProvider.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -37,8 +38,12 @@ DiagnosticDataProvider * gInstance = nullptr;
 
 DiagnosticDataProvider & GetDiagnosticDataProvider()
 {
-    VerifyOrDie(gInstance != nullptr);
-    return *gInstance;
+    if (gInstance != nullptr)
+    {
+        return *gInstance;
+    }
+
+    return GetDiagnosticDataProviderImpl();
 }
 
 void SetDiagnosticDataProvider(DiagnosticDataProvider * diagnosticDataProvider)

@@ -14,7 +14,6 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
@@ -27,6 +26,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/lib/asn1",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/platform",
-    "${nlunit_test_root}:nlunit-test",
   ]
+
+  cflags = [ "-Wconversion" ]
 }

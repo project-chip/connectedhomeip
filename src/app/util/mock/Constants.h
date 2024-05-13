@@ -25,24 +25,25 @@
 
 #include <app/ConcreteAttributePath.h>
 #include <lib/core/CHIPError.h>
-#include <lib/core/CHIPTLV.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/core/TLV.h>
 
 namespace chip {
 namespace Test {
-constexpr EndpointId kMockEndpoint1   = 0xFFFE;
-constexpr EndpointId kMockEndpoint2   = 0xFFFD;
-constexpr EndpointId kMockEndpoint3   = 0xFFFC;
-constexpr EndpointId kMockEndpointMin = 0xFFF1;
+inline constexpr EndpointId kMockEndpoint1   = 0xFFFE;
+inline constexpr EndpointId kMockEndpoint2   = 0xFFFD;
+inline constexpr EndpointId kMockEndpoint3   = 0xFFFC;
+inline constexpr EndpointId kMockEndpointMin = 0xFFF1;
 
 constexpr AttributeId MockAttributeId(const uint16_t & id)
 {
     return (0xFFF1'0000 | id);
 }
 
-constexpr AttributeId MockClusterId(const uint16_t & id)
+constexpr ClusterId MockClusterId(const uint16_t & id)
 {
-    return (0xFFF1'0000 | id);
+    // Vendor-specific cluster ids must be at least 0xFC00
+    return (0xFFF1'0000 | (0xFC00 + id));
 }
 
 constexpr EventId MockEventId(const uint16_t & id)

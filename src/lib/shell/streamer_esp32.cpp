@@ -18,7 +18,6 @@
 #include <lib/shell/Engine.h>
 #include <lib/shell/streamer.h>
 
-#include "driver/uart.h"
 #include "esp_console.h"
 #include "esp_vfs_dev.h"
 #include "linenoise/linenoise.h"
@@ -26,6 +25,13 @@
 #include <lib/core/CHIPError.h>
 #include <stdio.h>
 #include <string.h>
+#if CONFIG_ESP_CONSOLE_UART_DEFAULT || CONFIG_ESP_CONSOLE_UART_CUSTOM
+#include "driver/uart.h"
+#endif
+#if CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG
+#include "driver/usb_serial_jtag.h"
+#include "esp_vfs_usb_serial_jtag.h"
+#endif
 
 namespace chip {
 namespace Shell {
@@ -49,26 +55,48 @@ int streamer_esp32_init(streamer_t * streamer)
     fflush(stdout);
     fsync(fileno(stdout));
     setvbuf(stdin, NULL, _IONBF, 0);
-    esp_vfs_dev_uart_port_set_rx_line_endings(CONFIG_ESP_CONSOLE_UART_NUM, ESP_LINE_ENDINGS_CR);
-    esp_vfs_dev_uart_port_set_tx_line_endings(CONFIG_ESP_CONSOLE_UART_NUM, ESP_LINE_ENDINGS_CRLF);
-    if (!uart_is_driver_installed(CONFIG_ESP_CONSOLE_UART_NUM))
+#if CONFIG_ESP_CONSOLE_UART_DEFAULT || CONFIG_ESP_CONSOLE_UART_CUSTOM
+    esp_vfs_dev_uart_port_set_rx_line_endings((uart_port_t) CONFIG_ESP_CONSOLE_UART_NUM, ESP_LINE_ENDINGS_CR);
+    esp_vfs_dev_uart_port_set_tx_line_endings((uart_port_t) CONFIG_ESP_CONSOLE_UART_NUM, ESP_LINE_ENDINGS_CRLF);
+    if (!uart_is_driver_installed((uart_port_t) CONFIG_ESP_CONSOLE_UART_NUM))
     {
-        ESP_ERROR_CHECK(uart_driver_install(CONFIG_ESP_CONSOLE_UART_NUM, 256, 0, 0, NULL, 0));
+        ESP_ERROR_CHECK(uart_driver_install((uart_port_t) CONFIG_ESP_CONSOLE_UART_NUM, 256, 0, 0, NULL, 0));
     }
     uart_config_t uart_config = {
-        .baud_rate           = 115200,
+        .baud_rate           = CONFIG_ESP_CONSOLE_UART_BAUDRATE,
         .data_bits           = UART_DATA_8_BITS,
         .parity              = UART_PARITY_DISABLE,
         .stop_bits           = UART_STOP_BITS_1,
         .flow_ctrl           = UART_HW_FLOWCTRL_DISABLE,
         .rx_flow_ctrl_thresh = 0,
-        .source_clk          = UART_SCLK_APB,
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+        .source_clk = UART_SCLK_DEFAULT,
+#else
+        .source_clk = UART_SCLK_APB,
+#endif
     };
-    ESP_ERROR_CHECK(uart_param_config(CONFIG_ESP_CONSOLE_UART_NUM, &uart_config));
+    ESP_ERROR_CHECK(uart_param_config((uart_port_t) CONFIG_ESP_CONSOLE_UART_NUM, &uart_config));
     esp_vfs_dev_uart_use_driver(0);
+#endif // CONFIG_ESP_CONSOLE_UART_DEFAULT || CONFIG_ESP_CONSOLE_UART_CUSTOM
+
+#if CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG
+    esp_vfs_dev_usb_serial_jtag_set_rx_line_endings(ESP_LINE_ENDINGS_CR);
+    esp_vfs_dev_usb_serial_jtag_set_tx_line_endings(ESP_LINE_ENDINGS_CRLF);
+
+    fcntl(fileno(stdout), F_SETFL, O_NONBLOCK);
+    fcntl(fileno(stdin), F_SETFL, O_NONBLOCK);
+
+    usb_serial_jtag_driver_config_t usb_serial_jtag_config = {
+        .tx_buffer_size = 256,
+        .rx_buffer_size = 256,
+    };
+    usb_serial_jtag_driver_install(&usb_serial_jtag_config);
+    esp_vfs_usb_serial_jtag_use_driver();
+    esp_vfs_dev_uart_register();
+#endif // CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG
     esp_console_config_t console_config = {
-        .max_cmdline_length = 256,
-        .max_cmdline_args   = 32,
+        .max_cmdline_length = CONFIG_CHIP_SHELL_CMD_LINE_BUF_MAX_LENGTH,
+        .max_cmdline_args   = CONFIG_CHIP_SHELL_CMD_LINE_ARG_MAX_COUNT,
     };
     ESP_ERROR_CHECK(esp_console_init(&console_config));
     linenoiseSetMultiLine(1);
@@ -93,7 +121,12 @@ ssize_t streamer_esp32_read(streamer_t * streamer, char * buf, size_t len)
 
 ssize_t streamer_esp32_write(streamer_t * streamer, const char * buf, size_t len)
 {
-    return uart_write_bytes(CONFIG_ESP_CONSOLE_UART_NUM, buf, len);
+#if CONFIG_ESP_CONSOLE_UART_DEFAULT || CONFIG_ESP_CONSOLE_UART_CUSTOM
+    return uart_write_bytes((uart_port_t) CONFIG_ESP_CONSOLE_UART_NUM, buf, len);
+#endif
+#if CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG
+    return usb_serial_jtag_write_bytes(buf, len, 0);
+#endif
 }
 
 static streamer_t streamer_stdio = {

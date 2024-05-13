@@ -19,263 +19,23 @@
 
 #include <cstdint>
 #include <limits>
+#include <optional>
 #include <utility>
 
-#include "lib/support/logging/CHIPLogging.h"
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
 #include <lib/core/CHIPError.h>
-#include <lib/core/Optional.h>
 #include <lib/core/PeerId.h>
+#include <lib/core/ReferenceCounted.h>
 #include <lib/dnssd/Constants.h>
-#include <lib/support/BytesToHex.h>
-#include <messaging/ReliableMessageProtocolConfig.h>
+#include <lib/dnssd/Types.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace Dnssd {
 
-struct ResolvedNodeData
-{
-    // TODO: use pool to allow dynamic
-    static constexpr unsigned kMaxIPAddresses = 5;
-
-    void LogNodeIdResolved() const
-    {
-#if CHIP_PROGRESS_LOGGING
-        char addrBuffer[Inet::IPAddress::kMaxStringLength];
-
-        // Would be nice to log the interface id, but sorting out how to do so
-        // across our differnet InterfaceId implementations is a pain.
-        ChipLogProgress(Discovery, "Node ID resolved for " ChipLogFormatX64 ":" ChipLogFormatX64,
-                        ChipLogValueX64(mPeerId.GetCompressedFabricId()), ChipLogValueX64(mPeerId.GetNodeId()));
-        for (unsigned i = 0; i < mNumIPs; ++i)
-        {
-            mAddress[i].ToString(addrBuffer);
-            ChipLogProgress(Discovery, "    Addr %u: [%s]:%" PRIu16, i, addrBuffer, mPort);
-        }
-#endif // CHIP_PROGRESS_LOGGING
-    }
-
-    ReliableMessageProtocolConfig GetMRPConfig() const
-    {
-        const ReliableMessageProtocolConfig defaultConfig = GetLocalMRPConfig();
-        return ReliableMessageProtocolConfig(GetMrpRetryIntervalIdle().ValueOr(defaultConfig.mIdleRetransTimeout),
-                                             GetMrpRetryIntervalActive().ValueOr(defaultConfig.mActiveRetransTimeout));
-    }
-    Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalIdle() const { return mMrpRetryIntervalIdle; }
-    Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalActive() const { return mMrpRetryIntervalActive; }
-
-    bool IsDeviceTreatedAsSleepy(const ReliableMessageProtocolConfig * defaultMRPConfig) const
-    {
-        // If either retry interval (Idle - CRI, Active - CRA) has a value and that value is greater
-        // than the value passed to this function, then the peer device will be treated as if it is
-        // a Sleepy End Device (SED)
-        return (mMrpRetryIntervalIdle.HasValue() && (mMrpRetryIntervalIdle.Value() > defaultMRPConfig->mIdleRetransTimeout)) ||
-            (mMrpRetryIntervalActive.HasValue() && (mMrpRetryIntervalActive.Value() > defaultMRPConfig->mActiveRetransTimeout));
-    }
-
-    PeerId mPeerId;
-    size_t mNumIPs = 0;
-    Inet::InterfaceId mInterfaceId;
-    Inet::IPAddress mAddress[kMaxIPAddresses];
-    uint16_t mPort                         = 0;
-    char mHostName[kHostNameMaxLength + 1] = {};
-    bool mSupportsTcp                      = false;
-    Optional<System::Clock::Milliseconds32> mMrpRetryIntervalIdle;
-    Optional<System::Clock::Milliseconds32> mMrpRetryIntervalActive;
-    System::Clock::Timestamp mExpiryTime;
-};
-
-constexpr size_t kMaxDeviceNameLen         = 32;
-constexpr size_t kMaxRotatingIdLen         = 50;
-constexpr size_t kMaxPairingInstructionLen = 128;
-
-struct DiscoveredNodeData
-{
-    // TODO(cecille): is 4 OK? IPv6 LL, GUA, ULA, IPv4?
-    static constexpr unsigned kMaxIPAddresses = 5;
-    char hostName[kHostNameMaxLength + 1];
-    char instanceName[Commission::kInstanceNameMaxLength + 1];
-    uint16_t longDiscriminator;
-    uint16_t vendorId;
-    uint16_t productId;
-    uint8_t commissioningMode;
-    // TODO: possibly 32-bit - see spec issue #3226
-    uint16_t deviceType;
-    char deviceName[kMaxDeviceNameLen + 1];
-    uint8_t rotatingId[kMaxRotatingIdLen];
-    size_t rotatingIdLen;
-    uint16_t pairingHint;
-    char pairingInstruction[kMaxPairingInstructionLen + 1];
-    bool supportsTcp;
-    Optional<System::Clock::Milliseconds32> mrpRetryIntervalIdle;
-    Optional<System::Clock::Milliseconds32> mrpRetryIntervalActive;
-    uint16_t port;
-    unsigned numIPs;
-    Inet::InterfaceId interfaceId; // interface ID for the packet processed
-    Inet::IPAddress ipAddress[kMaxIPAddresses];
-
-    void Reset()
-    {
-        memset(hostName, 0, sizeof(hostName));
-        memset(instanceName, 0, sizeof(instanceName));
-        longDiscriminator = 0;
-        vendorId          = 0;
-        productId         = 0;
-        commissioningMode = 0;
-        deviceType        = 0;
-        memset(deviceName, 0, sizeof(deviceName));
-        memset(rotatingId, 0, sizeof(rotatingId));
-        rotatingIdLen = 0;
-        memset(pairingInstruction, 0, sizeof(pairingInstruction));
-        pairingHint            = 0;
-        supportsTcp            = false;
-        mrpRetryIntervalIdle   = NullOptional;
-        mrpRetryIntervalActive = NullOptional;
-        numIPs                 = 0;
-        port                   = 0;
-        for (unsigned i = 0; i < kMaxIPAddresses; ++i)
-        {
-            ipAddress[i] = chip::Inet::IPAddress::Any;
-        }
-    }
-    DiscoveredNodeData() { Reset(); }
-    bool IsHost(const char * host) const { return strcmp(host, hostName) == 0; }
-    bool IsInstanceName(const char * instance) const { return strcmp(instance, instanceName) == 0; }
-    bool IsValid() const { return !IsHost("") && ipAddress[0] != chip::Inet::IPAddress::Any; }
-    Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalIdle() const { return mrpRetryIntervalIdle; }
-    Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalActive() const { return mrpRetryIntervalActive; }
-
-    bool IsDeviceTreatedAsSleepy(const ReliableMessageProtocolConfig * defaultMRPConfig) const
-    {
-        // If either retry interval (Idle - CRI, Active - CRA) has a value and that value is greater
-        // than the value passed to this function, then the peer device will be treated as if it is
-        // a Sleepy End Device (SED)
-        return (mrpRetryIntervalIdle.HasValue() && (mrpRetryIntervalIdle.Value() > defaultMRPConfig->mIdleRetransTimeout)) ||
-            (mrpRetryIntervalActive.HasValue() && (mrpRetryIntervalActive.Value() > defaultMRPConfig->mActiveRetransTimeout));
-    }
-
-    void LogDetail() const
-    {
-        if (rotatingIdLen > 0)
-        {
-            char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-            Encoding::BytesToUppercaseHexString(rotatingId, rotatingIdLen, rotatingIdString, sizeof(rotatingIdString));
-            ChipLogDetail(Discovery, "\tRotating ID: %s", rotatingIdString);
-        }
-        if (strlen(deviceName) != 0)
-        {
-            ChipLogDetail(Discovery, "\tDevice Name: %s", deviceName);
-        }
-        if (vendorId > 0)
-        {
-            ChipLogDetail(Discovery, "\tVendor ID: %u", vendorId);
-        }
-        if (productId > 0)
-        {
-            ChipLogDetail(Discovery, "\tProduct ID: %u", productId);
-        }
-        if (deviceType > 0)
-        {
-            ChipLogDetail(Discovery, "\tDevice Type: %u", deviceType);
-        }
-        if (longDiscriminator > 0)
-        {
-            ChipLogDetail(Discovery, "\tLong Discriminator: %u", longDiscriminator);
-        }
-        if (strlen(pairingInstruction) != 0)
-        {
-            ChipLogDetail(Discovery, "\tPairing Instruction: %s", pairingInstruction);
-        }
-        if (pairingHint > 0)
-        {
-            ChipLogDetail(Discovery, "\tPairing Hint: %u", pairingHint);
-        }
-        if (!IsHost(""))
-        {
-            ChipLogDetail(Discovery, "\tHostname: %s", hostName);
-        }
-        if (!IsInstanceName(""))
-        {
-            ChipLogDetail(Discovery, "\tInstance Name: %s", instanceName);
-        }
-        for (unsigned j = 0; j < numIPs; j++)
-        {
-#if CHIP_DETAIL_LOGGING
-            char buf[Inet::IPAddress::kMaxStringLength];
-            char * ipAddressOut = ipAddress[j].ToString(buf);
-            ChipLogDetail(Discovery, "\tIP Address #%d: %s", j + 1, ipAddressOut);
-            (void) ipAddressOut;
-#endif // CHIP_DETAIL_LOGGING
-        }
-        if (port > 0)
-        {
-            ChipLogDetail(Discovery, "\tPort: %u", port);
-        }
-        ChipLogDetail(Discovery, "\tCommissioning Mode: %u", commissioningMode);
-        if (mrpRetryIntervalIdle.HasValue())
-        {
-            ChipLogDetail(Discovery, "\tMrp Interval idle: %" PRIu32 " ms", mrpRetryIntervalIdle.Value().count());
-        }
-        else
-        {
-            ChipLogDetail(Discovery, "\tMrp Interval idle: not present");
-        }
-        if (mrpRetryIntervalActive.HasValue())
-        {
-            ChipLogDetail(Discovery, "\tMrp Interval active: %" PRIu32 " ms", mrpRetryIntervalActive.Value().count());
-        }
-        else
-        {
-            ChipLogDetail(Discovery, "\tMrp Interval active: not present");
-        }
-    }
-};
-
-enum class DiscoveryFilterType : uint8_t
-{
-    kNone,
-    kShortDiscriminator,
-    kLongDiscriminator,
-    kVendorId,
-    kDeviceType,
-    kCommissioningMode,
-    kInstanceName,
-    kCommissioner,
-    kCompressedFabricId,
-};
-struct DiscoveryFilter
-{
-    DiscoveryFilterType type;
-    uint64_t code             = 0;
-    const char * instanceName = nullptr;
-    DiscoveryFilter() : type(DiscoveryFilterType::kNone), code(0) {}
-    DiscoveryFilter(const DiscoveryFilterType newType) : type(newType) {}
-    DiscoveryFilter(const DiscoveryFilterType newType, uint64_t newCode) : type(newType), code(newCode) {}
-    DiscoveryFilter(const DiscoveryFilterType newType, const char * newInstanceName) : type(newType), instanceName(newInstanceName)
-    {}
-    bool operator==(const DiscoveryFilter & other) const
-    {
-        if (type != other.type)
-        {
-            return false;
-        }
-        if (type == DiscoveryFilterType::kInstanceName)
-        {
-            return (instanceName != nullptr) && (other.instanceName != nullptr) && (strcmp(instanceName, other.instanceName) == 0);
-        }
-
-        return code == other.code;
-    }
-};
-enum class DiscoveryType
-{
-    kUnknown,
-    kOperational,
-    kCommissionableNode,
-    kCommissionerNode
-};
+/// Node resolution data common to both operational and commissionable discovery
 
 /// Callbacks for resolving operational node resolution
 class OperationalResolveDelegate
@@ -299,20 +59,41 @@ public:
     virtual void OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERROR error) = 0;
 };
 
-/// Callbacks for discovering nodes advertising non-operational status:
-///   - Commissioners
-///   - Nodes in commissioning modes over IP (e.g. ethernet devices, devices already
-///     connected to thread/wifi or devices with a commissioning window open)
-class CommissioningResolveDelegate
+/**
+ * Node discovery context class.
+ *
+ * This class enables multiple clients of the global DNS-SD resolver to start simultaneous
+ * discovery operations.
+ *
+ * An object of this class is shared between a resolver client and the concrete resolver
+ * implementation. The client is responsible for allocating the context and passing it to
+ * the resolver when initiating a discovery operation. The resolver, in turn, is supposed to retain
+ * the context until the operation is finished. This allows the client to release the ownership of
+ * the context at any time without putting the resolver at risk of using a deleted object.
+ */
+class DiscoveryContext : public ReferenceCounted<DiscoveryContext>
 {
 public:
-    virtual ~CommissioningResolveDelegate() = default;
+    void SetBrowseIdentifier(intptr_t identifier) { mBrowseIdentifier.emplace(identifier); }
+    void ClearBrowseIdentifier() { mBrowseIdentifier.reset(); }
+    const std::optional<intptr_t> & GetBrowseIdentifier() const { return mBrowseIdentifier; }
 
-    /// Called within the CHIP event loop once a node is discovered.
-    ///
-    /// May be called multiple times as more nodes send their answer to a
-    /// multicast discovery query
-    virtual void OnNodeDiscovered(const DiscoveredNodeData & nodeData) = 0;
+    void SetDiscoveryDelegate(DiscoverNodeDelegate * delegate) { mDelegate = delegate; }
+    void OnNodeDiscovered(const DiscoveredNodeData & nodeData)
+    {
+        if (mDelegate != nullptr)
+        {
+            mDelegate->OnNodeDiscovered(nodeData);
+        }
+        else
+        {
+            ChipLogError(Discovery, "Missing commissioning delegate. Data discarded");
+        }
+    }
+
+private:
+    DiscoverNodeDelegate * mDelegate = nullptr;
+    std::optional<intptr_t> mBrowseIdentifier;
 };
 
 /**
@@ -329,7 +110,14 @@ public:
      * The method must be called before other methods of this class.
      * If the resolver has already been initialized, the method exits immediately with no error.
      */
-    virtual CHIP_ERROR Init(chip::Inet::EndPointManager<Inet::UDPEndPoint> * endPointManager) = 0;
+    virtual CHIP_ERROR Init(Inet::EndPointManager<Inet::UDPEndPoint> * endPointManager) = 0;
+
+    /**
+     * Returns whether the resolver has completed the initialization.
+     *
+     * Returns true if the resolver is ready to take node resolution and discovery requests.
+     */
+    virtual bool IsInitialized() = 0;
 
     /**
      * Shuts down the resolver if it has been initialized before.
@@ -342,42 +130,91 @@ public:
     virtual void SetOperationalDelegate(OperationalResolveDelegate * delegate) = 0;
 
     /**
-     * If nullptr is passed, the previously registered delegate is unregistered.
-     */
-    virtual void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) = 0;
-
-    /**
      * Requests resolution of the given operational node service.
      *
      * This will trigger a DNSSD query.
      *
      * When the operation succeeds or fails, and a resolver delegate has been registered,
-     * the result of the operation is passed to the delegate's `OnNodeIdResolved` or
-     * `OnNodeIdResolutionFailed` method, respectively.
-     */
-    virtual CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) = 0;
-
-    /**
-     * Finds all commissionable nodes matching the given filter.
+     * the result of the operation is passed to the delegate's `OnOperationalNodeResolved` or
+     * `OnOperationalNodeResolutionFailed` method, respectively.
      *
-     * Whenever a new matching node is found and a resolver delegate has been registered,
-     * the node information is passed to the delegate's `OnNodeDiscoveryComplete` method.
-     */
-    virtual CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) = 0;
-
-    /**
-     * Finds all commissioner nodes matching the given filter.
+     * Multiple calls to ResolveNodeId may be coalesced by the implementation
+     * and lead to just one call to
+     * OnOperationalNodeResolved/OnOperationalNodeResolutionFailed, as long as
+     * the later calls cause the underlying querying mechanism to re-query as if
+     * there were no coalescing.
      *
-     * Whenever a new matching node is found and a resolver delegate has been registered,
-     * the node information is passed to the delegate's `OnNodeDiscoveryComplete` method.
+     * A single call to ResolveNodeId may lead to multiple calls to
+     * OnOperationalNodeResolved with different IP addresses.
+     *
+     * @see NodeIdResolutionNoLongerNeeded.
      */
-    virtual CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) = 0;
+    virtual CHIP_ERROR ResolveNodeId(const PeerId & peerId) = 0;
+
+    /*
+     * Notify the resolver that one of the consumers that called ResolveNodeId
+     * successfully no longer needs the resolution result (e.g. because it got
+     * the result via OnOperationalNodeResolved, or got an via
+     * OnOperationalNodeResolutionFailed, or no longer cares about future
+     * updates).
+     *
+     * There must be a NodeIdResolutionNoLongerNeeded call that matches every
+     * successful ResolveNodeId call.  In particular, implementations of
+     * OnOperationalNodeResolved and OnOperationalNodeResolutionFailed must call
+     * NodeIdResolutionNoLongerNeeded once for each prior successful call to
+     * ResolveNodeId for the relevant PeerId that has not yet had a matching
+     * NodeIdResolutionNoLongerNeeded call made.
+     */
+    virtual void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) = 0;
 
     /**
-     * Provides the system-wide implementation of the service resolver
+     * Finds all nodes of given type matching the given filter.
+     *
+     * Whenever a new matching node is found, the node information is passed to
+     * the `OnNodeDiscovered` method of the discovery delegate configured
+     * in the context object.
+     *
+     * This method is expected to increase the reference count of the context
+     * object for as long as it takes to complete the discovery request.
+     */
+    virtual CHIP_ERROR StartDiscovery(DiscoveryType type, DiscoveryFilter filter, DiscoveryContext & context) = 0;
+
+    /**
+     * Stop discovery (of all node types).
+     *
+     * Some back ends may not support stopping discovery, so consumers should
+     * not assume they will stop getting callbacks after calling this.
+     */
+    virtual CHIP_ERROR StopDiscovery(DiscoveryContext & context) = 0;
+
+    /**
+     * Verify the validity of an address that appears to be out of date (for example
+     * because establishing a connection to it has failed).
+     */
+    virtual CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) = 0;
+
+    /**
+     * Returns the system-wide implementation of the service resolver.
+     *
+     * The method returns a reference to the resolver object configured by
+     * a user using the \c Resolver::SetInstance() method, or the default
+     * resolver returned by the \c GetDefaultResolver() function.
      */
     static Resolver & Instance();
+
+    /**
+     * Overrides the default implementation of the service resolver
+     */
+    static void SetInstance(Resolver & resolver);
+
+private:
+    static Resolver * sInstance;
 };
+
+/**
+ * Returns the default implementation of the service resolver.
+ */
+extern Resolver & GetDefaultResolver();
 
 } // namespace Dnssd
 } // namespace chip

@@ -26,19 +26,22 @@
 
 #include <type_traits>
 
+#include "CommandSenderLegacyCallback.h"
+
 #include <app/CommandPathParams.h>
 #include <app/MessageDef/InvokeRequestMessage.h>
 #include <app/MessageDef/InvokeResponseMessage.h>
 #include <app/MessageDef/StatusIB.h>
+#include <app/PendingResponseTrackerImpl.h>
 #include <app/data-model/Encode.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/core/Optional.h>
+#include <lib/core/TLVDebug.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeHolder.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
@@ -53,51 +56,45 @@ namespace app {
 class CommandSender final : public Messaging::ExchangeDelegate
 {
 public:
-    /*
-     * Destructor - as part of destruction, it will abort the exchange context
-     * if a valid one still exists.
-     *
-     * See Abort() for details on when that might occur.
-     */
-    ~CommandSender() override { Abort(); }
-
-    /**
-     * Gets the inner exchange context object, without ownership.
-     *
-     * @return The inner exchange context, might be nullptr if no
-     *         exchange context has been assigned or the context
-     *         has been released.
-     */
-    Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
-
-    class Callback
+    // CommandSender::ExtendableCallback::OnResponse is public SDK API, so we cannot break
+    // source compatibility for it. To allow for additional values to be added at a future
+    // time without constantly changing the function's declaration parameter list, we are
+    // defining the struct ResponseData and adding that to the parameter list to allow for
+    // future extendability.
+    struct ResponseData
     {
-    public:
-        virtual ~Callback() = default;
+        // The command path field in invoke command response.
+        const ConcreteCommandPath & path;
+        // The status of the command. It can be any success status, including possibly a cluster-specific one.
+        // If `data` is not null, statusIB will always be a generic SUCCESS status with no-cluster specific
+        // information.
+        const StatusIB & statusIB;
+        // The command data, will be nullptr if the server returns a StatusIB.
+        TLV::TLVReader * data;
+        // Reference for the command. This should be associated with the reference value sent out in the initial
+        // invoke request.
+        Optional<uint16_t> commandRef;
+    };
 
-        /**
-         * OnResponse will be called when a successful response from server has been received and processed. Specifically:
-         *  - When a status code is received and it is IM::Success, aData will be nullptr.
-         *  - When a data response is received, aData will point to a valid TLVReader initialized to point at the struct container
-         *    that contains the data payload (callee will still need to open and process the container).
-         *
-         * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
-         * receives an OnDone call to destroy the object.
-         *
-         * @param[in] apCommandSender The command sender object that initiated the command transaction.
-         * @param[in] aPath           The command path field in invoke command response.
-         * @param[in] aStatusIB       It will always have a success status. If apData is null, it can be any success status,
-         *                            including possibly a cluster-specific one. If apData is not null it aStatusIB will always
-         *                            be a generic SUCCESS status with no-cluster specific information.
-         * @param[in] apData          The command data, will be nullptr if the server returns a StatusIB.
-         */
-        virtual void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath, const StatusIB & aStatusIB,
-                                TLV::TLVReader * apData)
-        {}
+    // CommandSender::ExtendableCallback::OnNoResponse is public SDK API, so we cannot break
+    // source compatibility for it. To allow for additional values to be added at a future
+    // time without constantly changing the function's declaration parameter list, we are
+    // defining the struct NoResponseData and adding that to the parameter list to allow for
+    // future extendability.
+    struct NoResponseData
+    {
+        uint16_t commandRef;
+    };
 
+    // CommandSender::ExtendableCallback::OnError is public SDK API, so we cannot break source
+    // compatibility for it. To allow for additional values to be added at a future time
+    // without constantly changing the function's declaration parameter list, we are
+    // defining the struct ErrorData and adding that to the parameter list
+    // to allow for future extendability.
+    struct ErrorData
+    {
         /**
-         * OnError will be called when an error occur *after* a successful call to SendCommandRequest(). The following
-         * errors will be delivered through this call in the aError field:
+         * The following errors will be delivered through `error`
          *
          * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
          * - CHIP_ERROR_*TLV*: A malformed, non-compliant response was received from the server.
@@ -105,14 +102,69 @@ public:
          *   status response from the server.  In that case,
          *   StatusIB::InitFromChipError can be used to extract the status.
          * - CHIP_ERROR*: All other cases.
+         */
+        CHIP_ERROR error;
+    };
+
+    /**
+     * @brief Callback that is extendable for future features, starting with batch commands
+     *
+     * The two major differences between ExtendableCallback and Callback are:
+     * 1. Path-specific errors go to OnResponse instead of OnError
+     *       - Note: Non-path-specific errors still go to OnError.
+     * 2. Instead of having new parameters at the end of the arguments list, with defaults,
+     *    as functionality expands, a parameter whose type is defined in this header is used
+     *    as the argument to the callbacks
+     *
+     * To support batch commands client must use ExtendableCallback.
+     */
+    class ExtendableCallback
+    {
+    public:
+        virtual ~ExtendableCallback() = default;
+
+        /**
+         * OnResponse will be called for all path specific responses from the server that have been received
+         * and processed. Specifically:
+         *  - When a status code is received and it is IM::Success, aData will be nullptr.
+         *  - When a status code is received and it is IM and/or cluster error, aData will be nullptr.
+         *      - These kinds of errors are referred to as path-specific errors.
+         *  - When a data response is received, aData will point to a valid TLVReader initialized to point at the struct container
+         *    that contains the data payload (callee will still need to open and process the container).
+         *
+         * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
+         * receives an OnDone call to destroy the object.
+         *
+         * @param[in] apCommandSender The command sender object that initiated the command transaction.
+         * @param[in] aResponseData   Information pertaining to the response.
+         */
+        virtual void OnResponse(CommandSender * commandSender, const ResponseData & aResponseData) {}
+
+        /**
+         * Called for each request that failed to receive a response after the server indicates completion of all requests.
+         *
+         * This callback may be omitted if clients have alternative ways to track non-responses.
+         *
+         * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
+         * receives an OnDone call to destroy the object.
+         *
+         * @param apCommandSender The CommandSender object that initiated the transaction.
+         * @param aNoResponseData Details about the request without a response.
+         */
+        virtual void OnNoResponse(CommandSender * commandSender, const NoResponseData & aNoResponseData) {}
+
+        /**
+         * OnError will be called when a non-path-specific error occurs *after* a successful call to SendCommandRequest().
          *
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy and free the object.
          *
+         * NOTE: Path specific errors do NOT come to OnError, but instead go to OnResponse.
+         *
          * @param[in] apCommandSender The command sender object that initiated the command transaction.
-         * @param[in] aError          A system error code that conveys the overall error code.
+         * @param[in] aErrorData      A error data regarding error that occurred.
          */
-        virtual void OnError(const CommandSender * apCommandSender, CHIP_ERROR aError) {}
+        virtual void OnError(const CommandSender * apCommandSender, const ErrorData & aErrorData) {}
 
         /**
          * OnDone will be called when CommandSender has finished all work and is safe to destroy and free the
@@ -131,6 +183,122 @@ public:
         virtual void OnDone(CommandSender * apCommandSender) = 0;
     };
 
+    // `Callback` exists for legacy purposes. If you are developing a new callback implementation,
+    // please use `ExtendableCallback`.
+    using Callback = CommandSenderLegacyCallback;
+
+    // SetCommandSenderConfig is a public SDK API, so we cannot break source compatibility
+    // for it. By having parameters to that API use this struct instead of individual
+    // function arguments, we centralize required changes to one file when adding new
+    // funtionality.
+    struct ConfigParameters
+    {
+        ConfigParameters & SetRemoteMaxPathsPerInvoke(uint16_t aRemoteMaxPathsPerInvoke)
+        {
+            remoteMaxPathsPerInvoke = aRemoteMaxPathsPerInvoke;
+            return *this;
+        }
+
+        // If remoteMaxPathsPerInvoke is 1, this will allow the CommandSender client to contain only one command and
+        // doesn't enforce other batch commands requirements.
+        uint16_t remoteMaxPathsPerInvoke = 1;
+    };
+
+    // AddRequestData is a public SDK API, so we must maintain source compatibility.
+    // Using this struct for API parameters instead of individual parameters allows us
+    // to make necessary changes for new functionality in a single location.
+    struct AddRequestDataParameters
+    {
+        // gcc bug requires us to have the constructor below
+        // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96645
+        AddRequestDataParameters() {}
+
+        AddRequestDataParameters(const Optional<uint16_t> & aTimedInvokeTimeoutMs) : timedInvokeTimeoutMs(aTimedInvokeTimeoutMs) {}
+
+        // When a value is provided for timedInvokeTimeoutMs, this invoke becomes a timed
+        // invoke. CommandSender will use the minimum of all provided timeouts for execution.
+        const Optional<uint16_t> timedInvokeTimeoutMs;
+        // The command reference is required when sending multiple commands. It allows the caller
+        // to associate this request with its corresponding response.
+        Optional<uint16_t> commandRef;
+    };
+
+    // PrepareCommand is a public SDK API, so we must maintain source compatibility.
+    // Using this struct for API parameters instead of individual parameters allows us
+    // to make necessary changes for new functionality in a single location.
+    struct PrepareCommandParameters
+    {
+        // gcc bug requires us to have the constructor below
+        // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96645
+        PrepareCommandParameters() {}
+
+        PrepareCommandParameters(const AddRequestDataParameters & aAddRequestDataParam) :
+            commandRef(aAddRequestDataParam.commandRef)
+        {}
+
+        PrepareCommandParameters & SetStartDataStruct(bool aStartDataStruct)
+        {
+            startDataStruct = aStartDataStruct;
+            return *this;
+        }
+
+        PrepareCommandParameters & SetCommandRef(uint16_t aCommandRef)
+        {
+            commandRef.SetValue(aCommandRef);
+            return *this;
+        }
+        // The command reference is required when sending multiple commands. It allows the caller
+        // to associate this request with its corresponding response. We validate the reference
+        // early in PrepareCommand, even though it's not used until FinishCommand. This proactive
+        // validation helps prevent unnecessary writing an InvokeRequest into the packet that later
+        // needs to be undone.
+        Optional<uint16_t> commandRef;
+        // If the InvokeRequest needs to be in a state with a started data TLV struct container
+        bool startDataStruct = false;
+    };
+
+    // FinishCommand is a public SDK API, so we must maintain source compatibility.
+    // Using this struct for API parameters instead of individual parameters allows us
+    // to make necessary changes for new functionality in a single location.
+    struct FinishCommandParameters
+    {
+        // gcc bug requires us to have the constructor below
+        // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96645
+        FinishCommandParameters() {}
+
+        FinishCommandParameters(const Optional<uint16_t> & aTimedInvokeTimeoutMs) : timedInvokeTimeoutMs(aTimedInvokeTimeoutMs) {}
+        FinishCommandParameters(const AddRequestDataParameters & aAddRequestDataParam) :
+            timedInvokeTimeoutMs(aAddRequestDataParam.timedInvokeTimeoutMs), commandRef(aAddRequestDataParam.commandRef)
+        {}
+
+        FinishCommandParameters & SetEndDataStruct(bool aEndDataStruct)
+        {
+            endDataStruct = aEndDataStruct;
+            return *this;
+        }
+
+        FinishCommandParameters & SetCommandRef(uint16_t aCommandRef)
+        {
+            commandRef.SetValue(aCommandRef);
+            return *this;
+        }
+
+        // When a value is provided for timedInvokeTimeoutMs, this invoke becomes a timed
+        // invoke. CommandSender will use the minimum of all provided timeouts for execution.
+        const Optional<uint16_t> timedInvokeTimeoutMs;
+        // The command reference is required when sending multiple commands. It allows the caller
+        // to associate this request with its corresponding response. This value must be
+        // the same as the one provided in PrepareCommandParameters when calling PrepareCommand.
+        Optional<uint16_t> commandRef;
+        // If InvokeRequest is in a state where the data TLV struct container is currently open
+        // and FinishCommand should close it.
+        bool endDataStruct = false;
+    };
+
+    class TestOnlyMarker
+    {
+    };
+
     /*
      * Constructor.
      *
@@ -138,10 +306,75 @@ public:
      * If used in a groups setting, callbacks do not need to be passed.
      * If callbacks are passed the only one that will be called in a group sesttings is the onDone
      */
-    CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false);
-    CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true);
-    CHIP_ERROR FinishCommand(bool aEndDataStruct = true);
+    CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
+                  bool aSuppressResponse = false);
+    CommandSender(std::nullptr_t, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
+                  bool aSuppressResponse = false) :
+        CommandSender(static_cast<Callback *>(nullptr), apExchangeMgr, aIsTimedRequest, aSuppressResponse)
+    {}
+    CommandSender(ExtendableCallback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
+                  bool aSuppressResponse = false);
+    // TODO(#32138): After there is a macro that is always defined for all unit tests, the constructor with
+    // TestOnlyMarker should only be compiled if that macro is defined.
+    CommandSender(TestOnlyMarker aTestMarker, ExtendableCallback * apCallback, Messaging::ExchangeManager * apExchangeMgr,
+                  PendingResponseTracker * apPendingResponseTracker, bool aIsTimedRequest = false, bool aSuppressResponse = false) :
+        CommandSender(apCallback, apExchangeMgr, aIsTimedRequest, aSuppressResponse)
+    {
+        mpPendingResponseTracker = apPendingResponseTracker;
+    }
+    ~CommandSender();
+
+    /**
+     * Enables additional features of CommandSender, for example sending batch commands.
+     *
+     * In the case of enabling batch commands, once set it ensures that commands contain all
+     * required data elements while building the InvokeRequestMessage. This must be called
+     * before PrepareCommand.
+     *
+     * @param [in] aConfigParams contains information to configure CommandSender behavior,
+     *                      such as such as allowing a max number of paths per invoke greater than one,
+     *                      based on how many paths the remote peer claims to support.
+     *
+     * @return CHIP_ERROR_INCORRECT_STATE
+     *             If device has previously called `PrepareCommand`.
+     * @return CHIP_ERROR_INVALID_ARGUMENT
+     *             Invalid argument value.
+     * @return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
+     *             Device has not enabled batch command support. To enable:
+     *               1. Enable the CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
+     *                  configuration option.
+     *               2. Ensure you provide ExtendableCallback.
+     */
+    CHIP_ERROR SetCommandSenderConfig(ConfigParameters & aConfigParams);
+
+    CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, PrepareCommandParameters & aPrepareCommandParams);
+
+    [[deprecated("PrepareCommand should migrate to calling PrepareCommand with PrepareCommandParameters")]] CHIP_ERROR
+    PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true)
+    {
+        PrepareCommandParameters prepareCommandParams;
+        prepareCommandParams.SetStartDataStruct(aStartDataStruct);
+        return PrepareCommand(aCommandPathParams, prepareCommandParams);
+    }
+
+    CHIP_ERROR FinishCommand(FinishCommandParameters & aFinishCommandParams);
+
+    [[deprecated("FinishCommand should migrate to calling FinishCommand with FinishCommandParameters")]] CHIP_ERROR
+    FinishCommand(bool aEndDataStruct = true)
+    {
+        FinishCommandParameters finishCommandParams;
+        finishCommandParams.SetEndDataStruct(aEndDataStruct);
+        return FinishCommand(finishCommandParams);
+    }
+    [[deprecated("FinishCommand should migrate to calling FinishCommand with FinishCommandParameters")]] CHIP_ERROR
+    FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs)
+    {
+        FinishCommandParameters finishCommandParams(aTimedInvokeTimeoutMs);
+        return FinishCommand(finishCommandParams);
+    }
+
     TLV::TLVWriter * GetCommandDataIBTLVWriter();
+
     /**
      * API for adding a data request.  The template parameter T is generally
      * expected to be a ClusterName::Commands::CommandName::Type struct, but any
@@ -154,51 +387,81 @@ public:
     template <typename CommandDataT, typename std::enable_if_t<!CommandDataT::MustUseTimedInvoke(), int> = 0>
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData)
     {
-        return AddRequestData(aCommandPath, aData, NullOptional);
+        AddRequestDataParameters addRequestDataParams;
+        return AddRequestData(aCommandPath, aData, addRequestDataParams);
     }
 
-    /**
-     * API for adding a data request that allows caller to provide a timed
-     * invoke timeout.  If provided, this invoke will be a timed invoke, using
-     * the minimum of the provided timeouts.
-     */
+    template <typename CommandDataT>
+    CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData,
+                              AddRequestDataParameters & aAddRequestDataParams)
+    {
+        VerifyOrReturnError(!CommandDataT::MustUseTimedInvoke() || aAddRequestDataParams.timedInvokeTimeoutMs.HasValue(),
+                            CHIP_ERROR_INVALID_ARGUMENT);
+
+        return AddRequestDataInternal(aCommandPath, aData, aAddRequestDataParams);
+    }
     template <typename CommandDataT>
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData,
                               const Optional<uint16_t> & aTimedInvokeTimeoutMs)
     {
-        VerifyOrReturnError(!CommandDataT::MustUseTimedInvoke() || aTimedInvokeTimeoutMs.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
-
-        return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs);
+        AddRequestDataParameters addRequestDataParams(aTimedInvokeTimeoutMs);
+        return AddRequestData(aCommandPath, aData, addRequestDataParams);
     }
 
-    CHIP_ERROR FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs);
+    /**
+     * @brief Returns the number of InvokeResponseMessages received.
+     *
+     * Responses to multiple requests might be split across several InvokeResponseMessages.
+     * This function helps track the total count. Primarily for test validation purposes.
+     */
+    size_t GetInvokeResponseMessageCount();
 
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     /**
      * Version of AddRequestData that allows sending a message that is
      * guaranteed to fail due to requiring a timed invoke but not providing a
      * timeout parameter.  For use in tests only.
      */
     template <typename CommandDataT>
-    CHIP_ERROR AddRequestDataNoTimedCheck(const CommandPathParams & aCommandPath, const CommandDataT & aData,
-                                          const Optional<uint16_t> & aTimedInvokeTimeoutMs, bool aSuppressResponse = false)
+    CHIP_ERROR TestOnlyAddRequestDataNoTimedCheck(const CommandPathParams & aCommandPath, const CommandDataT & aData,
+                                                  AddRequestDataParameters & aAddRequestDataParams)
     {
-        mSuppressResponse = aSuppressResponse;
-        return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs);
+        return AddRequestDataInternal(aCommandPath, aData, aAddRequestDataParams);
     }
-#endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
+
+    CHIP_ERROR TestOnlyFinishCommand(FinishCommandParameters & aFinishCommandParams)
+    {
+        if (mBatchCommandsEnabled)
+        {
+            VerifyOrReturnError(aFinishCommandParams.commandRef.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        }
+        return FinishCommandInternal(aFinishCommandParams);
+    }
+
+    /**
+     * Version of SendCommandRequest that sets the TimedRequest flag but does not send the TimedInvoke
+     * action. For use in tests only.
+     */
+    CHIP_ERROR TestOnlyCommandSenderTimedRequestFlagWithNoTimedInvoke(const SessionHandle & session,
+                                                                      Optional<System::Clock::Timeout> timeout = NullOptional);
+
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 private:
     template <typename CommandDataT>
     CHIP_ERROR AddRequestDataInternal(const CommandPathParams & aCommandPath, const CommandDataT & aData,
-                                      const Optional<uint16_t> & aTimedInvokeTimeoutMs)
+                                      AddRequestDataParameters & aAddRequestDataParams)
     {
-        ReturnErrorOnFailure(PrepareCommand(aCommandPath, /* aStartDataStruct = */ false));
+        PrepareCommandParameters prepareCommandParams(aAddRequestDataParams);
+        ReturnErrorOnFailure(PrepareCommand(aCommandPath, prepareCommandParams));
         TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(to_underlying(CommandDataIB::Tag::kData)), aData));
-        return FinishCommand(aTimedInvokeTimeoutMs);
+        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields), aData));
+        FinishCommandParameters finishCommandParams(aAddRequestDataParams);
+        return FinishCommand(finishCommandParams);
     }
+
+    CHIP_ERROR FinishCommandInternal(FinishCommandParameters & aFinishCommandParams);
 
 public:
     // Sends a queued up command request to the target encapsulated by the secureSession handle.
@@ -229,15 +492,23 @@ public:
 private:
     friend class TestCommandInteraction;
 
-    enum class State
+    enum class State : uint8_t
     {
         Idle,                ///< Default state that the object starts out in, where no work has commenced
         AddingCommand,       ///< In the process of adding a command.
         AddedCommand,        ///< A command has been completely encoded and is awaiting transmission.
         AwaitingTimedStatus, ///< Sent a Timed Request and waiting for response.
-        CommandSent,         ///< The command has been sent successfully.
+        AwaitingResponse,    ///< The command has been sent successfully, and we are awaiting invoke response.
         ResponseReceived,    ///< Received a response to our invoke and request and processing the response.
         AwaitingDestruction, ///< The object has completed its work and is awaiting destruction by the application.
+    };
+
+    union CallbackHandle
+    {
+        CallbackHandle(Callback * apCallback) : legacyCallback(apCallback) {}
+        CallbackHandle(ExtendableCallback * apExtendableCallback) : extendableCallback(apExtendableCallback) {}
+        Callback * legacyCallback;
+        ExtendableCallback * extendableCallback;
     };
 
     void MoveToState(const State aTargetState);
@@ -258,6 +529,7 @@ private:
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
 
+    void FlushNoCommandResponse();
     //
     // Called internally to signal the completion of all work on this object, gracefully close the
     // exchange (by calling into the base class) and finally, signal to the application that it's
@@ -273,16 +545,10 @@ private:
      */
     void Abort();
 
-    CHIP_ERROR ProcessInvokeResponse(System::PacketBufferHandle && payload);
+    CHIP_ERROR ProcessInvokeResponse(System::PacketBufferHandle && payload, bool & moreChunkedMessages);
     CHIP_ERROR ProcessInvokeResponseIB(InvokeResponseIB::Parser & aInvokeResponse);
 
-    // Handle a message received when we are expecting a status response to a
-    // Timed Request.  The caller is assumed to have already checked that our
-    // exchange context member is the one the message came in on.
-    //
-    // If the server returned an error status, that will be returned as an error
-    // value of CHIP_ERROR.
-    CHIP_ERROR HandleTimedStatus(const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+    void SetTimedInvokeTimeoutMs(const Optional<uint16_t> & aTimedInvokeTimeoutMs);
 
     // Send our queued-up Invoke Request message.  Assumes the exchange is ready
     // and mPendingInvokeData is populated.
@@ -290,8 +556,50 @@ private:
 
     CHIP_ERROR Finalize(System::PacketBufferHandle & commandPacket);
 
-    Messaging::ExchangeContext * mpExchangeCtx = nullptr;
-    Callback * mpCallback                      = nullptr;
+    CHIP_ERROR SendCommandRequestInternal(const SessionHandle & session, Optional<System::Clock::Timeout> timeout);
+
+    void OnResponseCallback(const ResponseData & aResponseData)
+    {
+        // mpExtendableCallback and mpCallback are mutually exclusive.
+        if (mUseExtendableCallback && mCallbackHandle.extendableCallback)
+        {
+            mCallbackHandle.extendableCallback->OnResponse(this, aResponseData);
+        }
+        else if (mCallbackHandle.legacyCallback)
+        {
+            mCallbackHandle.legacyCallback->OnResponse(this, aResponseData.path, aResponseData.statusIB, aResponseData.data);
+        }
+    }
+
+    void OnErrorCallback(CHIP_ERROR aError)
+    {
+        // mpExtendableCallback and mpCallback are mutually exclusive.
+        if (mUseExtendableCallback && mCallbackHandle.extendableCallback)
+        {
+            ErrorData errorData = { aError };
+            mCallbackHandle.extendableCallback->OnError(this, errorData);
+        }
+        else if (mCallbackHandle.legacyCallback)
+        {
+            mCallbackHandle.legacyCallback->OnError(this, aError);
+        }
+    }
+
+    void OnDoneCallback()
+    {
+        // mpExtendableCallback and mpCallback are mutually exclusive.
+        if (mUseExtendableCallback && mCallbackHandle.extendableCallback)
+        {
+            mCallbackHandle.extendableCallback->OnDone(this);
+        }
+        else if (mCallbackHandle.legacyCallback)
+        {
+            mCallbackHandle.legacyCallback->OnDone(this);
+        }
+    }
+
+    Messaging::ExchangeHolder mExchangeCtx;
+    CallbackHandle mCallbackHandle;
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InvokeRequestMessage::Builder mInvokeRequestBuilder;
     // TODO Maybe we should change PacketBufferTLVWriter so we can finalize it
@@ -302,12 +610,24 @@ private:
     // invoke.
     Optional<uint16_t> mTimedInvokeTimeoutMs;
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
-    bool mSuppressResponse                 = false;
-    bool mTimedRequest                     = false;
 
-    State mState = State::Idle;
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
-    bool mBufferAllocated = false;
+
+#if CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
+    PendingResponseTrackerImpl mNonTestPendingResponseTracker;
+#endif // CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
+    PendingResponseTracker * mpPendingResponseTracker = nullptr;
+
+    uint16_t mInvokeResponseMessageCount = 0;
+    uint16_t mFinishedCommandCount       = 0;
+    uint16_t mRemoteMaxPathsPerInvoke    = 1;
+
+    State mState                = State::Idle;
+    bool mSuppressResponse      = false;
+    bool mTimedRequest          = false;
+    bool mBufferAllocated       = false;
+    bool mBatchCommandsEnabled  = false;
+    bool mUseExtendableCallback = false;
 };
 
 } // namespace app

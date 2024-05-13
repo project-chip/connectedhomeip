@@ -30,12 +30,14 @@
 #include "common.h"
 
 #include <lib/core/CHIPCore.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/echo/Echo.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <system/SystemPacketBuffer.h>
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <transport/raw/TCP.h>
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <transport/raw/UDP.h>
 
 namespace {
@@ -44,13 +46,12 @@ namespace {
 chip::Protocols::Echo::EchoServer gEchoServer;
 chip::TransportMgr<chip::Transport::UDP> gUDPManager;
 chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
-chip::SecurePairingUsingTestSecret gTestPairing;
 chip::SessionHolder gSession;
 
 // Callback handler when a CHIP EchoRequest is received.
 void HandleEchoRequestReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle && payload)
 {
-    printf("Echo Request, len=%u ... sending response.\n", payload->DataLength());
+    printf("Echo Request, len=%" PRIu32 "... sending response.\n", static_cast<uint32_t>(payload->DataLength()));
 }
 
 } // namespace
@@ -58,7 +59,7 @@ void HandleEchoRequestReceived(chip::Messaging::ExchangeContext * ec, chip::Syst
 int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
+    chip::Transport::PeerAddress peer(chip::Transport::Type::kUndefined);
     bool useTCP      = false;
     bool disableEcho = false;
 
@@ -82,22 +83,14 @@ int main(int argc, char * argv[])
 
     InitializeChip();
 
-    err = gFabricTable.Init(&gStorage);
-    SuccessOrExit(err);
-
     if (useTCP)
     {
         err = gTCPManager.Init(chip::Transport::TcpListenParameters(chip::DeviceLayer::TCPEndPointManager())
-#if INET_CONFIG_ENABLE_IPV4
-                                   .SetAddressType(chip::Inet::IPAddressType::kIPv4)
-#else
-                                   .SetAddressType(chip::Inet::IPAddressType::kIPv6)
-#endif
-        );
+                                   .SetAddressType(chip::Inet::IPAddressType::kIPv6));
         SuccessOrExit(err);
 
         err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTCPManager, &gMessageCounterManager, &gStorage,
-                                   &gFabricTable);
+                                   &gFabricTable, gSessionKeystore);
         SuccessOrExit(err);
     }
     else
@@ -107,7 +100,7 @@ int main(int argc, char * argv[])
         SuccessOrExit(err);
 
         err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gUDPManager, &gMessageCounterManager, &gStorage,
-                                   &gFabricTable);
+                                   &gFabricTable, gSessionKeystore);
         SuccessOrExit(err);
     }
 
@@ -123,9 +116,8 @@ int main(int argc, char * argv[])
         SuccessOrExit(err);
     }
 
-    gTestPairing.Init(gSessionManager);
-    err = gSessionManager.NewPairing(gSession, peer, chip::kTestControllerNodeId, &gTestPairing,
-                                     chip::CryptoContext::SessionRole::kResponder, gFabricIndex);
+    err = gSessionManager.InjectPaseSessionWithTestKey(gSession, 1, chip::kTestControllerNodeId, 1, gFabricIndex, peer,
+                                                       chip::CryptoContext::SessionRole::kResponder);
     SuccessOrExit(err);
 
     if (!disableEcho)

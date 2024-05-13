@@ -5,46 +5,22 @@ device with one basic bolt. It uses buttons to test changing the lock and device
 states and LEDs to show the state of these changes. You can use this example as
 a reference for creating your own application.
 
-<p align="center">
-  <img src="../../platform/nrfconnect/doc/images/Logo_RGB_H-small.png" alt="Nordic Semiconductor logo"/>
-  <img src="../../platform/nrfconnect/doc/images/nRF52840-DK-small.png" alt="nRF52840 DK">
-</p>
+<img src="../../platform/nrfconnect/doc/images/Logo_RGB_H-small.png" alt="Nordic Semiconductor logo"/>
+<img src="../../platform/nrfconnect/doc/images/nRF52840-DK-small.png" alt="nRF52840 DK">
 
 The example is based on
 [Matter](https://github.com/project-chip/connectedhomeip) and Nordic
-Semiconductor's nRF Connect SDK, and supports remote access and control of a
-simulated door lock over a low-power, 802.15.4 Thread network.
+Semiconductor's nRF Connect SDK, and was created to facilitate testing and
+certification of a Matter device communicating over a low-power, 802.15.4 Thread
+network, or Wi-Fi network.
 
 The example behaves as a Matter accessory, that is a device that can be paired
-into an existing Matter network and can be controlled by this network.
+into an existing Matter network and can be controlled by this network. In the
+case of Thread, this device works as a Thread Sleepy End Device. Support for
+both Thread and Wi-Fi is mutually exclusive and depends on the hardware
+platform, so only one protocol can be supported for a specific lock device.
 
 <hr>
-
--   [Overview](#overview)
-    -   [Bluetooth LE advertising](#bluetooth-le-advertising)
-    -   [Bluetooth LE rendezvous](#bluetooth-le-rendezvous)
-    -   [Device Firmware Upgrade](#device-firmware-upgrade)
--   [Requirements](#requirements)
-    -   [Supported devices](#supported_devices)
--   [Device UI](#device-ui)
--   [Setting up the environment](#setting-up-the-environment)
-    -   [Using Docker container for setup](#using-docker-container-for-setup)
-    -   [Using native shell for setup](#using-native-shell-for-setup)
--   [Building](#building)
-    -   [Removing build artifacts](#removing-build-artifacts)
-    -   [Building with release configuration](#building-with-release-configuration)
-    -   [Building with low-power configuration](#building-with-low-power-configuration)
-    -   [Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
--   [Configuring the example](#configuring-the-example)
-    -   [Example build types](#example-build-types)
--   [Flashing and debugging](#flashing-and-debugging)
--   [Testing the example](#testing-the-example)
-    -   [Testing using CHIPTool](#testing-using-chiptool)
-    -   [Testing Device Firmware Upgrade](#testing-device-firmware-upgrade)
-
-<hr>
-
-<a name="overview"></a>
 
 ## Overview
 
@@ -55,25 +31,32 @@ and [Zephyr RTOS](https://zephyrproject.org/). Visit Matter's
 [nRF Connect platform overview](../../../docs/guides/nrfconnect_platform_overview.md)
 to read more about the platform structure and dependencies.
 
-The Matter device that runs the lock application is controlled by the Matter
-controller device over the Thread protocol. By default, the Matter device has
-Thread disabled, and it should be paired with Matter controller and get
-configuration from it. Some actions required before establishing full
-communication are described below.
+By default, the Matter accessory device has IPv6 networking disabled. You must
+pair it with the Matter controller over Bluetooth® LE to get the configuration
+from the controller to use the device within a Thread or Wi-Fi network. You have
+to make the device discoverable manually (for security reasons). See
+[Bluetooth LE advertising](#bluetooth-le-advertising) to learn how to do this.
+The controller must get the commissioning information from the Matter accessory
+device and provision the device into the network.
 
-The example also comes with a test mode, which allows to start Thread with the
-default settings by pressing button manually. However, this mode does not
-guarantee that the device will be able to communicate with the Matter controller
-and other devices.
+The sample uses buttons for changing the lock and device states, and LEDs to
+show the state of these changes. You can test it in the following ways:
 
-The example can be configured to use the secure bootloader and utilize it for
-performing over-the-air Device Firmware Upgrade using Bluetooth LE.
+-   Standalone, using a single DK that runs the door lock application.
+
+-   Remotely over the Thread or the Wi-Fi protocol, which in either case
+    requires more devices, including a Matter controller that you can configure
+    either on a PC or a mobile device.
 
 ### Bluetooth LE advertising
 
 In this example, to commission the device onto a Matter network, it must be
 discoverable over Bluetooth LE. For security reasons, you must start Bluetooth
-LE advertising manually after powering up the device by pressing **Button 4**.
+LE advertising manually after powering up the device by pressing:
+
+-   On nRF52840 DK, nRF5340 DK, and nRF21540 DK: **Button 4**.
+
+-   On nRF7002 DK: **Button 2**.
 
 ### Bluetooth LE rendezvous
 
@@ -83,16 +66,16 @@ commissioner role.
 
 To start the rendezvous, the controller must get the commissioning information
 from the Matter device. The data payload is encoded within a QR code, printed to
-the UART console, and shared using an NFC tag. NFC tag emulation starts
-automatically when Bluetooth LE advertising is started and stays enabled until
-Bluetooth LE advertising timeout expires.
+the UART console, and shared using an NFC tag. The emulation of the NFC tag
+emulation starts automatically when Bluetooth LE advertising is started and
+stays enabled until Bluetooth LE advertising timeout expires.
 
-#### Thread provisioning
+#### Thread or Wi-Fi provisioning
 
-Last part of the rendezvous procedure, the provisioning operation involves
-sending the Thread network credentials from the Matter controller to the Matter
-device. As a result, device is able to join the Thread network and communicate
-with other Thread devices in the network.
+The provisioning operation, which is the Last part of the rendezvous procedure,
+involves sending the Thread or Wi-Fi network credentials from the Matter
+controller to the Matter device. As a result, the device joins the Thread or
+Wi-Fi network and can communicate with other devices in the network.
 
 ### Device Firmware Upgrade
 
@@ -153,15 +136,11 @@ section to learn how to change MCUboot and flash configuration in this example.
 
 <hr>
 
-<a name="requirements"></a>
-
 ## Requirements
 
 The application requires a specific revision of the nRF Connect SDK to work
 correctly. See [Setting up the environment](#setting-up-the-environment) for
 more information.
-
-<a name="supported_devices"></a>
 
 ### Supported devices
 
@@ -171,10 +150,18 @@ The example supports building and running on the following devices:
 | ----------------------------------------------------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK) | `nrf52840dk_nrf52840`      | <details><summary>nRF52840 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF52840_DK_info-medium.jpg" alt="nRF52840 DK"/></details> |
 | [nRF5340 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF5340-DK)   | `nrf5340dk_nrf5340_cpuapp` | <details><summary>nRF5340 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF5340_DK_info-medium.jpg" alt="nRF5340 DK"/></details>    |
+| [nRF7002 DK](https://www.nordicsemi.com/Products/Development-hardware/nRF7002-DK)         | `nrf7002dk_nrf5340_cpuapp` | <details><summary>nRF7002 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF7002-DK_Front-small.png" alt="nRF7002 DK"/></details>    |
 
 <hr>
 
-<a name="device-ui"></a>
+### IPv6 network support
+
+The development kits for this sample offer the following IPv6 network support
+for Matter:
+
+-   Matter over Thread is supported for `nrf52840dk_nrf52840` and
+    `nrf5340dk_nrf5340_cpuapp`.
+-   Matter over Wi-Fi is supported for `nrf7002dk_nrf5340_cpuapp`.
 
 ## Device UI
 
@@ -194,11 +181,10 @@ following states are possible:
     Bluetooth LE.
 
 -   _Short Flash Off (950ms on/50ms off)_ &mdash; The device is fully
-    provisioned, but does not yet have full Thread network or service
-    connectivity.
+    provisioned, but does not yet have full connectivity for Thread or Wi-Fi
+    network.
 
--   _Solid On_ &mdash; The device is fully provisioned and has full Thread
-    network and service connectivity.
+-   _Solid On_ &mdash; The device is fully provisioned.
 
 **LED 2** simulates the lock bolt and shows the state of the lock. The following
 states are possible:
@@ -210,28 +196,46 @@ states are possible:
 -   _Rapid Even Flashing (100 ms on/100 ms off during 2 s)_ &mdash; The
     simulated bolt is in motion from one position to another.
 
-**Button 1** can be used for the following purposes:
+    Additionally, the LED starts blinking evenly (500 ms on/500 ms off) when the
+    Identify command of the Identify cluster is received on the endpoint 1. The
+    command’s argument can be used to specify the duration of the effect.
 
--   _Pressed for 6 s_ &mdash; Initiates the factory reset of the device.
-    Releasing the button within the 6-second window cancels the factory reset
-    procedure. **LEDs 1-4** blink in unison when the factory reset procedure is
-    initiated.
+**Button 1** can be used for the following purposes:
 
 -   _Pressed for less than 3 s_ &mdash; Initiates the OTA software update
     process. This feature is disabled by default, but can be enabled by
     following the
     [Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
-    instruction.
+    instructions.
+
+-   _Pressed for more than 3 s_ &mdash; initiates the factory reset of the
+    device. Releasing the button within the 3-second window cancels the factory
+    reset procedure.
 
 **Button 2** &mdash; Pressing the button once changes the lock state to the
 opposite one.
 
-**Button 3** &mdash; Pressing the button once starts the Thread networking in
-the test mode using the default configuration.
+-   On nRF52840 DK, nRF5340 DK, and nRF21540 DK: Changes the lock state to the
+    opposite one.
 
-**Button 4** &mdash; Pressing the button once starts the NFC tag emulation and
-enables Bluetooth LE advertising for the predefined period of time (15 minutes
-by default).
+-   On nRF7002 DK:
+
+    -   If pressed for less than three seconds, it changes the lock state to the
+        opposite one.
+
+    -   If pressed for more than three seconds, it starts the NFC tag emulation,
+        enables Bluetooth LE advertising for the predefined period of time (15
+        minutes by default), and makes the device discoverable over Bluetooth
+        LE.
+
+**Button 4**:
+
+-   On nRF52840 DK, nRF5340 DK, and nRF21540 DK: Starts the NFC tag emulation,
+    enables Bluetooth LE advertising for the predefined period of time (15
+    minutes by default), and makes the device discoverable over Bluetooth LE.
+    This button is used during the commissioning procedure.
+
+-   On nRF7002 DK: Not available.
 
 **SEGGER J-Link USB port** can be used to get logs from the device or
 communicate with it using the
@@ -249,104 +253,71 @@ NFC.
 Before building the example, check out the Matter repository and sync submodules
 using the following command:
 
-        $ git submodule update --init
+        $ python3 scripts/checkout_submodules.py --shallow --platform nrfconnect
 
-The example requires a specific revision of the nRF Connect SDK. You can either
-install it along with the related tools directly on your system or use a Docker
-image that has the tools pre-installed.
+> **Note**:
+>
+> For Linux operating system install
+> [SEGGER J-Link Software](https://www.segger.com/downloads/jlink/#J-LinkSoftwareAndDocumentationPack).
 
-If you are a macOS user, you won't be able to use the Docker container to flash
-the application onto a Nordic development kit due to
-[certain limitations of Docker for macOS](https://docs.docker.com/docker-for-mac/faqs/#can-i-pass-through-a-usb-device-to-a-container).
-Use the [native shell](#using-native-shell) for building instead.
+### Install Command Line Tools
 
-### Using Docker container for setup
+With admin permissions enabled, download and install the
+[nRF Command Line Tools](https://www.nordicsemi.com/Products/Development-tools/nrf-command-line-tools).
 
-To use the Docker container for setup, complete the following steps:
+### Install Toolchain Manager
 
-1.  If you do not have the nRF Connect SDK installed yet, create a directory for
-    it by running the following command:
+Toolchain Manager is available from
+[nRF Connect for Desktop](https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop),
+a cross-platform tool that provides different applications that simplify
+installing the nRF Connect SDK. Both the tool and the application are available
+for Windows, Linux, and macOS.
 
-        $ mkdir ~/nrfconnect
+To install the Toolchain Manager app, complete the following steps:
 
-2.  Download the latest version of the nRF Connect SDK Docker image by running
-    the following command:
+1.  [Download nRF Connect for Desktop](https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop/download#infotabs)
+    for your operating system.
 
-        $ docker pull nordicsemi/nrfconnect-chip
+2.  Install and run the tool on your machine.
 
-3.  Start Docker with the downloaded image by running the following command,
-    customized to your needs as described below:
+3.  In the **APPS** section, click **Install** button on the Toolchain Manager
+    tab.
 
-         $ docker run --rm -it -e RUNAS=$(id -u) -v ~/nrfconnect:/var/ncs -v ~/connectedhomeip:/var/chip \
-             -v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:* rmw" nordicsemi/nrfconnect-chip
+### Install nRF Connect SDK
 
-    In this command:
+Complete the following steps to install the nRF Connect SDK:
 
-    -   _~/nrfconnect_ can be replaced with an absolute path to the nRF Connect
-        SDK source directory.
-    -   _~/connectedhomeip_ must be replaced with an absolute path to the CHIP
-        source directory.
-    -   _-v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:_ rmw"\*
-        parameters can be omitted if you are not planning to flash the example
-        onto hardware. These parameters give the container access to USB devices
-        connected to your computer such as the nRF52840 DK.
-    -   _--rm_ can be omitted if you do not want the container to be
-        auto-removed when you exit the container shell session.
-    -   _-e RUNAS=\$(id -u)_ is needed to start the container session as the
-        current user instead of root.
+1.  Open Toolchain Manager in nRF Connect for Desktop.
 
-4.  Update the nRF Connect SDK to the most recent supported revision, by running
-    the following command:
+2.  Click the **Install** button next to the
+    [recommended](../../../config/nrfconnect/.nrfconnect-recommended-revision)
+    version of the nRF Connect SDK.
 
-         $ cd /var/chip
+3.  A pop-up window will inform you about the current installation directory. If
+    you want to change the directory, click the **Change directory** button.
+    Otherwise, click the **Continue installation** button.
+
+4.  When the nRF Connect SDK is installed on your machine, the **Install**
+    button changes to the **Open VS Code** button.
+
+5.  Click the dropdown menu next to the **Open VS Code** button for the
+    installed nRF Connect SDK version, and select **Open terminal**.
+
+6.  Make sure that the nRF Connect SDK version is compatible with the Matter SDK
+    version:
+
+    ```
+         $ cd {connectedhomeip directory}
          $ python3 scripts/setup/nrfconnect/update_ncs.py --update
-
-Now you can proceed with the [Building](#building) instruction.
-
-### Using native shell for setup
-
-To use the native shell for setup, complete the following steps:
-
-1.  Download and install the following additional software:
-
-    -   [nRF Command Line Tools](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Command-Line-Tools)
-    -   [GN meta-build system](https://gn.googlesource.com/gn/)
-
-2.  If you do not have the nRF Connect SDK installed, follow the
-    [guide](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_assistant.html#)
-    in the nRF Connect SDK documentation to install the latest stable nRF
-    Connect SDK version. Since command-line tools will be used for building the
-    example, installing SEGGER Embedded Studio is not required.
-
-    If you have the SDK already installed, continue to the next step and update
-    the nRF Connect SDK after initializing environment variables.
-
-3.  Initialize environment variables referred to by the CHIP and the nRF Connect
-    SDK build scripts. Replace _nrfconnect-dir_ with the path to your nRF
-    Connect SDK installation directory, and _toolchain-dir_ with the path to GNU
-    Arm Embedded Toolchain.
-
-         $ source nrfconnect-dir/zephyr/zephyr-env.sh
-         $ export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
-         $ export GNUARMEMB_TOOLCHAIN_PATH=toolchain-dir
-
-4.  Update the nRF Connect SDK to the most recent supported revision by running
-    the following command (replace _matter-dir_ with the path to Matter
-    repository directory):
-
-         $ cd matter-dir
-         $ python3 scripts/setup/nrfconnect/update_ncs.py --update
+    ```
 
 Now you can proceed with the [Building](#building) instruction.
 
 <hr>
 
-<a name="building"></a>
-
 ## Building
 
-Complete the following steps, regardless of the method used for setting up the
-environment:
+Complete the following steps to build the sample:
 
 1.  Navigate to the example's directory:
 
@@ -380,22 +351,6 @@ features like logs and command-line interface, run the following command:
 
 Remember to replace _build-target_ with the build target name of the Nordic
 Semiconductor's kit you own.
-
-### Building with low-power configuration
-
-You can build the example using the low-power configuration, which enables
-Thread's Sleepy End Device mode and disables debug features, such as the UART
-console or the **LED 1** usage.
-
-To build for the low-power configuration, run the following command with
-_build-target_ replaced with the build target name of the Nordic Semiconductor's
-kit you own (for example `nrf52840dk_nrf52840`):
-
-    $ west build -b build-target -- -DOVERLAY_CONFIG=overlay-low_power.conf
-
-For example, use the following command for `nrf52840dk_nrf52840`:
-
-    $ west build -b nrf52840dk_nrf52840 -- -DOVERLAY_CONFIG=overlay-low_power.conf
 
 ### Building with Device Firmware Upgrade support
 
@@ -447,8 +402,6 @@ example `nrf52840dk_nrf52840`), edit the `pm_static_dfu.yml` file located in the
 
 <hr>
 
-<a name="configuring"></a>
-
 ## Configuring the example
 
 The Zephyr ecosystem is based on Kconfig files and the settings can be modified
@@ -469,7 +422,7 @@ To make them persistent, save the configuration options in the `prj.conf` file.
 
 The example uses different configuration files depending on the supported
 features. Configuration files are provided for different build types and they
-are located in the `configuration/build-target` directory.
+are located in the application root directory.
 
 The `prj.conf` file represents a debug build type. Other build types are covered
 by dedicated files with the build type added as a suffix to the prj part, as per
@@ -497,8 +450,6 @@ page.
 
 <hr>
 
-<a name="flashing"></a>
-
 ## Flashing and debugging
 
 To flash the application to the device, use the west tool and run the following
@@ -521,13 +472,20 @@ directory:
 Check the [CLI tutorial](../../../docs/guides/nrfconnect_examples_cli.md) to
 learn how to use command-line interface of the application.
 
-### Testing using CHIPTool
+### Testing using Linux CHIPTool
+
+Read the [CHIP Tool user guide](../../../docs/guides/chip_tool_guide.md) to see
+how to use [CHIP Tool for Linux or mac OS](../../chip-tool/README.md) to
+commission and control the application within a Matter-enabled Thread or Wi-Fi
+network.
+
+### Testing using Android CHIPTool
 
 Read the
 [Android commissioning guide](../../../docs/guides/nrfconnect_android_commissioning.md)
-to see how to use [CHIPTool](../../../src/android/CHIPTool/README.md) for
+to see how to use [CHIPTool](../../../examples/android/CHIPTool/README.md) for
 Android smartphones to commission and control the application within a
-Matter-enabled Thread network.
+Matter-enabled Thread or Wi-Fi network.
 
 ### Testing Device Firmware Upgrade
 

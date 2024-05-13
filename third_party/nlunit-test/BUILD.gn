@@ -12,8 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
+import("${build_root}/config/compiler/compiler.gni")
+
 config("nlunit-test_config") {
   include_dirs = [ "repo/src" ]
+}
+
+config("nlunit-test_config_disable_warnings") {
+  cflags = [ "-Wno-conversion" ]
+
+  if (is_clang) {
+    cflags += [ "-Wno-shorten-64-to-32" ]
+  }
 }
 
 static_library("nlunit-test") {
@@ -27,4 +38,5 @@ static_library("nlunit-test") {
   ]
 
   public_configs = [ ":nlunit-test_config" ]
+  configs += [ ":nlunit-test_config_disable_warnings" ]
 }

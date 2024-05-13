@@ -24,7 +24,6 @@
 #include "ManualSetupPayloadGenerator.h"
 
 #include <inttypes.h>
-#include <limits>
 
 #include <lib/support/logging/CHIPLogging.h>
 #include <lib/support/verhoeff/Verhoeff.h>
@@ -38,14 +37,14 @@ static uint32_t chunk1PayloadRepresentation(const PayloadContents & payload)
      *     - <bit 2> VID/PID present flag
      */
 
-    constexpr int kDiscriminatorShift     = (kPayloadDiscriminatorFieldLengthInBits - kManualSetupChunk1DiscriminatorMsbitsLength);
+    constexpr int kDiscriminatorShift = (kManualSetupDiscriminatorFieldLengthInBits - kManualSetupChunk1DiscriminatorMsbitsLength);
     constexpr uint32_t kDiscriminatorMask = (1 << kManualSetupChunk1DiscriminatorMsbitsLength) - 1;
 
     static_assert(kManualSetupChunk1VidPidPresentBitPos >=
                       kManualSetupChunk1DiscriminatorMsbitsPos + kManualSetupChunk1DiscriminatorMsbitsLength,
                   "Discriminator won't fit");
 
-    uint32_t discriminatorChunk = (payload.discriminator >> kDiscriminatorShift) & kDiscriminatorMask;
+    uint32_t discriminatorChunk = (payload.discriminator.GetShortValue() >> kDiscriminatorShift) & kDiscriminatorMask;
     uint32_t vidPidPresentFlag  = payload.commissioningFlow != CommissioningFlow::kStandard ? 1 : 0;
 
     uint32_t result = (discriminatorChunk << kManualSetupChunk1DiscriminatorMsbitsPos) |
@@ -61,11 +60,10 @@ static uint32_t chunk2PayloadRepresentation(const PayloadContents & payload)
      *     - <bits 15..14> Discriminator <bits 9..8>
      */
 
-    constexpr int kDiscriminatorShift     = (kPayloadDiscriminatorFieldLengthInBits - kManualSetupDiscriminatorFieldLengthInBits);
     constexpr uint32_t kDiscriminatorMask = (1 << kManualSetupChunk2DiscriminatorLsbitsLength) - 1;
     constexpr uint32_t kPincodeMask       = (1 << kManualSetupChunk2PINCodeLsbitsLength) - 1;
 
-    uint32_t discriminatorChunk = (payload.discriminator >> kDiscriminatorShift) & kDiscriminatorMask;
+    uint32_t discriminatorChunk = payload.discriminator.GetShortValue() & kDiscriminatorMask;
 
     uint32_t result = ((payload.setUpPINCode & kPincodeMask) << kManualSetupChunk2PINCodeLsbitsPos) |
         (discriminatorChunk << kManualSetupChunk2DiscriminatorLsbitsPos);
@@ -151,6 +149,10 @@ CHIP_ERROR ManualSetupPayloadGenerator::payloadDecimalStringRepresentation(Mutab
 
     int checkDigit = Verhoeff10::CharToVal(Verhoeff10::ComputeCheckChar(outBuffer.data()));
     ReturnErrorOnFailure(decimalStringWithPadding(outBuffer.SubSpan(offset, 2), static_cast<uint32_t>(checkDigit)));
+    offset += 1;
+
+    // Reduce outBuffer span size to be the size of written data and to not include null-terminator.
+    outBuffer.reduce_size(offset);
 
     return CHIP_NO_ERROR;
 }

@@ -1,0 +1,89 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    12.4.5. [TC-CNET-4.5] [Wi-Fi] FAILSAFE_REQUIRED message Validation
+    [DUT-Server]
+
+PICS:
+    - CNET.S.F00
+
+config:
+    nodeId: 0x12344321
+    cluster: "Network Commissioning"
+    #PIXIT.CNET.ENDPOINT_WIFI
+    endpoint: 0
+    PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID:
+        type: octet_string
+        defaultValue: "hex:7A6967626565686F6D65"
+    PIXIT.CNET.WIFI_1ST_ACCESSPOINT_CREDENTIALS:
+        type: octet_string
+        defaultValue: "hex:70617373776f7264313233"
+
+tests:
+    - label: "Precondition: TH reads FeatureMap attribute from the DUT"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 1
+          constraints:
+              type: bitmap32
+
+    - label:
+          "Step 1: TH sends the AddOrUpdateWiFiNetwork command to the DUT with
+          the following fields: 1. SSID field set to PIXIT.CNET.WIFI_1S
+          T_ACCESSPOINT_SSI D 2. Credentials field set to PIXIT.CNET.WIFI_1S
+          T_ACCESSPOINT_CRE DENTIALS 3. Breadcrumb field set to 1"
+      PICS: CNET.S.C02.Rsp
+      command: "AddOrUpdateWiFiNetwork"
+      arguments:
+          values:
+              - name: "SSID"
+                value: PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
+              - name: "Credentials"
+                value: PIXIT.CNET.WIFI_1ST_ACCESSPOINT_CREDENTIALS
+              - name: "Breadcrumb"
+                value: 1
+      response:
+          error: FAILSAFE_REQUIRED
+
+    - label:
+          "Step 2: TH sends RemoveNetwork command to the DUT with NetworkID
+          field set to PIXIT.CNET.WIFI_1ST_ACCE SSPOINT_SSID and Breadcrumb
+          field set to 1"
+      PICS: CNET.S.C02.Rsp && CNET.S.C04.Rsp
+      command: "RemoveNetwork"
+      arguments:
+          values:
+              - name: "NetworkID"
+                value: PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
+              - name: "Breadcrumb"
+                value: 1
+      response:
+          error: FAILSAFE_REQUIRED
+
+    - label:
+          "Step 3: TH sends ConnectNetwork command to the DUT with NetworkID
+          field set to PIXIT.CNET.WIFI_1ST_ACCE SSPOINT_SSID and Breadcrumb
+          field set to 1"
+      PICS: CNET.S.C06.Rsp
+      command: "ConnectNetwork"
+      arguments:
+          values:
+              - name: "NetworkID"
+                value: PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
+              - name: "Breadcrumb"
+                value: 1
+      response:
+          error: FAILSAFE_REQUIRED

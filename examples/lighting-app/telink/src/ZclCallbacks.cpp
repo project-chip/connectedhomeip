@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,52 +17,102 @@
  */
 
 #include "AppTask.h"
-#include "LightingManager.h"
+#include "ColorFormat.h"
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
+
 using namespace chip;
 using namespace chip::app::Clusters;
 
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type,
-                                       uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
 {
+    static HsvColor_t hsv;
+    static XyColor_t xy;
     ClusterId clusterId     = attributePath.mClusterId;
     AttributeId attributeId = attributePath.mAttributeId;
-    ChipLogProgress(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
 
     if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::OnOff::Id)
     {
-        LightingMgr().InitiateAction(*value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION,
-                                     AppEvent::kEventType_Lighting, size, value);
+        ChipLogDetail(Zcl, "Cluster OnOff: attribute OnOff set to %u", *value);
+        GetAppTask().SetInitiateAction(*value ? AppTask::ON_ACTION : AppTask::OFF_ACTION,
+                                       static_cast<int32_t>(AppEvent::kEventType_Lighting), value);
     }
     else if (clusterId == LevelControl::Id && attributeId == LevelControl::Attributes::CurrentLevel::Id)
     {
-        ChipLogProgress(Zcl, "Value: %u, length %u", *value, size);
-        if (size == 1)
+        if (GetAppTask().IsTurnedOn())
         {
-            LightingMgr().InitiateAction(LightingManager::LEVEL_ACTION, AppEvent::kEventType_Lighting, size, value);
+            ChipLogDetail(Zcl, "Cluster LevelControl: attribute CurrentLevel set to %u", *value);
+            GetAppTask().SetInitiateAction(AppTask::LEVEL_ACTION, static_cast<int32_t>(AppEvent::kEventType_Lighting), value);
         }
         else
         {
-            ChipLogError(Zcl, "wrong length for level: %d", size);
+            ChipLogDetail(Zcl, "LED is off. Try to use move-to-level-with-on-off instead of move-to-level");
         }
     }
-}
+    else if (clusterId == ColorControl::Id)
+    {
+        /* Ignore several attributes that are currently not processed */
+        if ((attributeId == ColorControl::Attributes::RemainingTime::Id) ||
+            (attributeId == ColorControl::Attributes::EnhancedColorMode::Id) ||
+            (attributeId == ColorControl::Attributes::ColorMode::Id))
+        {
+            return;
+        }
 
-/** @brief OnOff Cluster Init
- *
- * This function is called when a specific cluster is initialized. It gives the
- * application an opportunity to take care of cluster initialization procedures.
- * It is called exactly once for each endpoint where cluster is present.
- *
- * @param endpoint   Ver.: always
- *
- */
-void emberAfOnOffClusterInitCallback(EndpointId endpoint)
-{
-    GetAppTask().UpdateClusterState();
+        /* XY color space */
+        if (attributeId == ColorControl::Attributes::CurrentX::Id || attributeId == ColorControl::Attributes::CurrentY::Id)
+        {
+            if (attributeId == ColorControl::Attributes::CurrentX::Id)
+            {
+                xy.x = *reinterpret_cast<uint16_t *>(value);
+            }
+            else if (attributeId == ColorControl::Attributes::CurrentY::Id)
+            {
+                xy.y = *reinterpret_cast<uint16_t *>(value);
+            }
+
+            ChipLogDetail(Zcl, "New XY color: %u|%u", xy.x, xy.y);
+            GetAppTask().SetInitiateAction(AppTask::COLOR_ACTION_XY, static_cast<int32_t>(AppEvent::kEventType_Lighting),
+                                           (uint8_t *) &xy);
+        }
+        /* HSV color space */
+        else if (attributeId == ColorControl::Attributes::CurrentHue::Id ||
+                 attributeId == ColorControl::Attributes::CurrentSaturation::Id ||
+                 attributeId == ColorControl::Attributes::EnhancedCurrentHue::Id)
+        {
+            if (attributeId == ColorControl::Attributes::EnhancedCurrentHue::Id)
+            {
+                hsv.h = (uint8_t) (((*reinterpret_cast<uint16_t *>(value)) & 0xFF00) >> 8);
+                hsv.s = (uint8_t) ((*reinterpret_cast<uint16_t *>(value)) & 0xFF);
+            }
+            else if (attributeId == ColorControl::Attributes::CurrentHue::Id)
+            {
+                hsv.h = *value;
+            }
+            else if (attributeId == ColorControl::Attributes::CurrentSaturation::Id)
+            {
+                hsv.s = *value;
+            }
+            ChipLogDetail(Zcl, "New HSV color: hue = %u| saturation = %u", hsv.h, hsv.s);
+            GetAppTask().SetInitiateAction(AppTask::COLOR_ACTION_HSV, static_cast<int32_t>(AppEvent::kEventType_Lighting),
+                                           (uint8_t *) &hsv);
+        }
+        /* Temperature Mireds color space */
+        else if (attributeId == ColorControl::Attributes::ColorTemperatureMireds::Id)
+        {
+            ChipLogDetail(Zcl, "New Temperature Mireds color = %u", *(uint16_t *) value);
+            GetAppTask().SetInitiateAction(AppTask::COLOR_ACTION_CT, static_cast<int32_t>(AppEvent::kEventType_Lighting), value);
+        }
+        else
+        {
+            ChipLogDetail(Zcl, "Ignore ColorControl attribute (%u) that is not currently processed!", attributeId);
+        }
+    }
 }

@@ -27,10 +27,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <lib/support/verhoeff/Verhoeff.h>
 
-#include <math.h>
-#include <string>
-#include <vector>
-
 namespace chip {
 
 CHIP_ERROR ManualSetupPayloadParser::CheckDecimalStringValidity(std::string decimalString,
@@ -38,7 +34,8 @@ CHIP_ERROR ManualSetupPayloadParser::CheckDecimalStringValidity(std::string deci
 {
     if (decimalString.length() < 2)
     {
-        ChipLogError(SetupPayload, "Failed decoding base10. Input was empty. %zu", decimalString.length());
+        ChipLogError(SetupPayload, "Failed decoding base10. Input was empty. %u",
+                     static_cast<unsigned int>(decimalString.length()));
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
     std::string repWithoutCheckChar = decimalString.substr(0, decimalString.length() - 1);
@@ -57,8 +54,8 @@ CHIP_ERROR ManualSetupPayloadParser::CheckCodeLengthValidity(const std::string &
     size_t expectedCharLength = isLongCode ? kManualSetupLongCodeCharLength : kManualSetupShortCodeCharLength;
     if (decimalString.length() != expectedCharLength)
     {
-        ChipLogError(SetupPayload, "Failed decoding base10. Input length %zu was not expected length %zu", decimalString.length(),
-                     expectedCharLength);
+        ChipLogError(SetupPayload, "Failed decoding base10. Input length %u was not expected length %u",
+                     static_cast<unsigned int>(decimalString.length()), static_cast<unsigned int>(expectedCharLength));
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
     return CHIP_NO_ERROR;
@@ -87,7 +84,8 @@ CHIP_ERROR ManualSetupPayloadParser::ReadDigitsFromDecimalString(const std::stri
 {
     if (decimalString.length() < numberOfCharsToRead || (numberOfCharsToRead + index > decimalString.length()))
     {
-        ChipLogError(SetupPayload, "Failed decoding base10. Input was too short. %zu", decimalString.length());
+        ChipLogError(SetupPayload, "Failed decoding base10. Input was too short. %u",
+                     static_cast<unsigned int>(decimalString.length()));
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
 
@@ -129,6 +127,12 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
         return result;
     }
 
+    // First digit of '8' or '9' would be invalid for v1 and would indicate new format (e.g. version 2)
+    if (chunk1 == 8 || chunk1 == 9)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     bool isLongCode = ((chunk1 >> kManualSetupChunk1VidPidPresentBitPos) & 1) == 1;
     result          = CheckCodeLengthValidity(representationWithoutCheckDigit, isLongCode);
     if (result != CHIP_NO_ERROR)
@@ -142,10 +146,6 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
     uint32_t discriminator = ((chunk2 >> kManualSetupChunk2DiscriminatorLsbitsPos) & kDiscriminatorLsbitsMask);
     discriminator |= ((chunk1 >> kManualSetupChunk1DiscriminatorMsbitsPos) & kDiscriminatorMsbitsMask)
         << kManualSetupChunk2DiscriminatorLsbitsLength;
-
-    // Since manual code only contains upper msbits of discriminator, re-align
-    constexpr int kDiscriminatorShift = (kPayloadDiscriminatorFieldLengthInBits - kManualSetupDiscriminatorFieldLengthInBits);
-    discriminator <<= kDiscriminatorShift;
 
     constexpr uint32_t kPincodeMsbitsMask = (1 << kManualSetupChunk3PINCodeMsbitsLength) - 1;
     constexpr uint32_t kPincodeLsbitsMask = (1 << kManualSetupChunk2PINCodeLsbitsLength) - 1;
@@ -192,9 +192,8 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
     outPayload.commissioningFlow = isLongCode ? CommissioningFlow::kCustom : CommissioningFlow::kStandard;
     static_assert(kSetupPINCodeFieldLengthInBits <= 32, "Won't fit in uint32_t");
     outPayload.setUpPINCode = static_cast<uint32_t>(setUpPINCode);
-    static_assert(kManualSetupDiscriminatorFieldLengthInBits <= 16, "Won't fit in uint16_t");
-    outPayload.discriminator        = static_cast<uint16_t>(discriminator);
-    outPayload.isShortDiscriminator = true;
+    static_assert(kManualSetupDiscriminatorFieldLengthInBits <= 8, "Won't fit in uint8_t");
+    outPayload.discriminator.SetShortValue(static_cast<uint8_t>(discriminator));
 
     return result;
 }

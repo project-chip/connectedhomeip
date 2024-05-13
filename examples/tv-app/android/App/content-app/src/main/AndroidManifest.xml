@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.contentapp">
+
+
+    <uses-permission android:name="com.matter.tv.app.api.permission.BIND_SERVICE_PERMISSION"/>
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:enabled="true"
+        android:theme="@style/Theme.ContentApp">
+        <meta-data android:name="com.matter.tv.app.api.clusters" android:resource="@raw/static_matter_clusters" />
+        <meta-data android:name="com.matter.tv.app.api.vendor_name" android:value="CSA" />
+        <meta-data android:name="com.matter.tv.app.api.vendor_id" android:value="65521" />
+        <meta-data android:name="com.matter.tv.app.api.product_id" android:value="5678" />
+        <activity
+            android:name="com.example.contentapp.MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <receiver
+            android:name=".receiver.MatterCommandReceiver"
+            android:permission="com.matter.tv.app.api.permission.SEND_DATA"
+            android:enabled="true"
+            android:exported="true">
+            <!-- Intent action for receiving an Matter directive-->
+            <intent-filter>
+                <action android:name="com.matter.tv.app.api.action.MATTER_COMMAND" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+
+</manifest>

@@ -23,13 +23,21 @@
 
 #pragma once
 
+#include <credentials/CHIPCert.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/Optional.h>
 #include <lib/support/ThreadOperationalDataset.h>
+#include <lib/support/TypeTraits.h>
+#include <lib/support/Variant.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
+#include <app-common/zap-generated/cluster-enums.h>
+
 #include <limits>
+#include <utility>
 
 namespace chip {
 namespace DeviceLayer {
@@ -45,7 +53,7 @@ namespace DeviceLayer {
  */
 namespace NetworkCommissioning {
 
-constexpr size_t kMaxNetworkIDLen = 32;
+inline constexpr size_t kMaxNetworkIDLen = 32;
 
 // TODO: This is exactly the same as the one in GroupDataProvider, this could be moved to src/lib/support
 template <typename T>
@@ -73,65 +81,30 @@ protected:
     Iterator() = default;
 };
 
-/**
- * The content should match the one in zap_generated/cluster-objects.h.
- * Matching is validated by cluster code.
- */
-enum class Status : uint8_t
-{
-    kSuccess                = 0x00,
-    kOutOfRange             = 0x01,
-    kBoundsExceeded         = 0x02,
-    kNetworkIDNotFound      = 0x03,
-    kDuplicateNetworkID     = 0x04,
-    kNetworkNotFound        = 0x05,
-    kRegulatoryError        = 0x06,
-    kAuthFailure            = 0x07,
-    kUnsupportedSecurity    = 0x08,
-    kOtherConnectionFailure = 0x09,
-    kIPV6Failed             = 0x0A,
-    kIPBindFailed           = 0x0B,
-    kUnknownError           = 0x0C,
-};
-
-enum class WiFiBand : uint8_t
-{
-    k2g4  = 0x00,
-    k3g65 = 0x01,
-    k5g   = 0x02,
-    k6g   = 0x03,
-    k60g  = 0x04,
-};
-
 // The following structs follows the generated cluster object structs.
 struct Network
 {
     uint8_t networkID[kMaxNetworkIDLen];
-    uint8_t networkIDLen;
-    bool connected;
+    uint8_t networkIDLen = 0;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+    Optional<Credentials::CertificateKeyIdStorage> networkIdentifier;
+    Optional<Credentials::CertificateKeyIdStorage> clientIdentifier;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+    bool connected = false;
 };
 
 static_assert(sizeof(Network::networkID) <= std::numeric_limits<decltype(Network::networkIDLen)>::max(),
               "Max length of networkID ssid exceeds the limit of networkIDLen field");
 
-enum class WiFiSecurity : uint8_t
-{
-    kUnencrypted  = 0x1,
-    kWepPersonal  = 0x2,
-    kWpaPersonal  = 0x4,
-    kWpa2Personal = 0x8,
-    kWpa3Personal = 0x10,
-};
-
 struct WiFiScanResponse
 {
 public:
-    chip::BitFlags<WiFiSecurity> security;
+    chip::BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> security;
     uint8_t ssid[DeviceLayer::Internal::kMaxWiFiSSIDLength];
     uint8_t ssidLen;
     uint8_t bssid[6];
     uint16_t channel;
-    WiFiBand wiFiBand;
+    app::Clusters::NetworkCommissioning::WiFiBandEnum wiFiBand;
     int8_t rssi;
 };
 
@@ -157,6 +130,14 @@ static_assert(sizeof(ThreadScanResponse::networkName) <= std::numeric_limits<dec
 using NetworkIterator            = Iterator<Network>;
 using WiFiScanResponseIterator   = Iterator<WiFiScanResponse>;
 using ThreadScanResponseIterator = Iterator<ThreadScanResponse>;
+using Status                     = app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum;
+using WiFiBandEnum               = app::Clusters::NetworkCommissioning::WiFiBandEnum;
+// For backwards compatibility with pre-rename enum values.
+using WiFiBand           = WiFiBandEnum;
+using WiFiSecurityBitmap = app::Clusters::NetworkCommissioning::WiFiSecurityBitmap;
+// For backwards compatibility with pre-rename bitmap values.
+using WiFiSecurity       = WiFiSecurityBitmap;
+using ThreadCapabilities = app::Clusters::NetworkCommissioning::ThreadCapabilitiesBitmap;
 
 // BaseDriver and WirelessDriver are the common interfaces for a network driver, platform drivers should not implement this
 // directly, instead, users are expected to implement WiFiDriver, ThreadDriver and EthernetDriver.
@@ -169,7 +150,7 @@ public:
     public:
         /**
          * @brief Callback for the network driver pushing the event of network status change to the network commissioning cluster.
-         * The platforms is explected to push the status from operations such as autonomous connection after loss of connectivity or
+         * The platforms is expected to push the status from operations such as autonomous connection after loss of connectivity or
          * during initial establishment.
          *
          * This function must be called in a thread-safe manner with CHIP stack.
@@ -188,7 +169,7 @@ public:
     /**
      * @brief Shuts down the driver, this function will be called when shutting down the network commissioning cluster.
      */
-    virtual CHIP_ERROR Shutdown() { return CHIP_NO_ERROR; }
+    virtual void Shutdown() {}
 
     /**
      * @brief Returns maximum number of network configs can be added to the driver.
@@ -304,10 +285,101 @@ public:
      * @brief Initializes a WiFi network scan. callback->OnFinished must be called, on both success and error. Callback can
      * be called inside ScanNetworks.
      *
-     * @param ssid    The interested SSID, the scanning MAY be restricted to to the given SSID.
+     * @param ssid        The interested SSID, the scanning SHALL be restricted to the given SSID if the ssid is not empty (i.e.
+     *                    ssid.empty() is false).
      * @param callback    Callback that will be invoked upon finishing the scan
      */
     virtual void ScanNetworks(ByteSpan ssid, ScanCallback * callback) = 0;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+    virtual bool SupportsPerDeviceCredentials() { return false; };
+
+    /**
+     * @brief Adds or updates a WiFi network with Per-Device Credentials on the device.
+     *
+     * @param ssid                          The SSID of the network to be added / updated.
+     * @param networkIdentity               The Network Identity of the network, in compact-pdc-identity format.
+     * @param clientIdentityNetworkIndex    If present, the index of the existing network configuration of which the Client
+     *                                      Identity is to be re-used. Otherwise a new Client Identity shall be generated.
+     * @param outStatus                     The application-level status code (Status::kSuccess on success).
+     * @param outDebugText                  A debug text buffer that may be populated by the driver. The size of the span
+     *                                      must be reduced to the length of text emitted (or 0, if none).
+     * @param outClientIdentity             On success, the Client Identity that was generated or copied, depending on the
+     *                                      presence of `clientIdentityNetworkIndex`.
+     * @param outNextworkIndex              On success, the index of the network entry that was added or updated.
+     *
+     * @retval CHIP_NO_ERROR and outStatus == kSuccess on success.
+     * @retval CHIP_NO_ERROR and outStatus != kSuccess for application-level errors. outDebugText should be populated.
+     * @retval CHIP_ERROR_* on internal errors. None of the output parameters will be examined in this case.
+     */
+    virtual CHIP_ERROR AddOrUpdateNetworkWithPDC(ByteSpan ssid, ByteSpan networkIdentity,
+                                                 Optional<uint8_t> clientIdentityNetworkIndex, Status & outStatus,
+                                                 MutableCharSpan & outDebugText, MutableByteSpan & outClientIdentity,
+                                                 uint8_t & outNetworkIndex)
+    {
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+
+    /**
+     * @brief Retrieves the Network Identity associated with a network.
+     *
+     * @param networkIndex          The 0-based index of the network.
+     * @param outNetworkIdentity    The output buffer to be populated with the Network
+     *                              Identity in compact-pdc-identity TLV format.
+     *
+     * @return CHIP_NO_ERROR on success or a CHIP_ERROR on failure.
+     */
+    virtual CHIP_ERROR GetNetworkIdentity(uint8_t networkIndex, MutableByteSpan & outNetworkIdentity)
+    {
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+
+    /**
+     * @brief Retrieves the Network Client Identity associated with a network.
+     *
+     * @param networkIndex          The 0-based index of the network.
+     * @param outNetworkIdentity    The output buffer to be populated with the Network
+     *                              Client Identity in compact-pdc-identity TLV format.
+     *
+     * @return CHIP_NO_ERROR on success or a CHIP_ERROR on failure.
+     */
+    virtual CHIP_ERROR GetClientIdentity(uint8_t networkIndex, MutableByteSpan & outClientIdentity)
+    {
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+
+    /**
+     * @brief Signs the specified message with the private key of a Network Client Identity.
+     */
+    virtual CHIP_ERROR SignWithClientIdentity(uint8_t networkIndex, const ByteSpan & message,
+                                              Crypto::P256ECDSASignature & outSignature)
+    {
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+
+    /**
+     *  @brief Provide all the frequency bands supported by the Wi-Fi interface.
+     *
+     *  The default implementation returns the 2.4 GHz band support.
+     *  Note: WiFi platforms should implement this function in their WiFiDriver to provide their complete device capabilities.
+     *
+     *  The returned bit mask has values of WiFiBandEnum packed into the bits. For example:
+     *
+     *    - Bit 0 = (WiFiBandEnum::k2g4 == 0) --> (1 << 0) == (1 << WiFiBandEnum::k2g4)
+     *    - Bit 2 = (WiFiBandEnum::k5g == 2) --> (1 << 2) == (1 << WiFiBandEnum::k5g)
+     *    - If both 2.4G and 5G are supported --> ((1 << k2g4) || (1 << k5g)) == (1 || 4) == 5
+     *
+     *  On error, return 0 (no bands supported). This should never happen... Note that
+     *  certification tests will REQUIRE at least one bit set in the set.
+     *
+     *  @return a bitmask of supported Wi-Fi bands where each bit is associated with a WiFiBandEnum value.
+     */
+    virtual uint32_t GetSupportedWiFiBandsMask() const
+    {
+        // Default to 2.4G support (100% example platform coverage as of Matter 1.3) listed.
+        return static_cast<uint32_t>(1UL << chip::to_underlying(WiFiBandEnum::k2g4));
+    }
 
     ~WiFiDriver() override = default;
 };
@@ -347,6 +419,16 @@ public:
      * be called inside ScanNetworks.
      */
     virtual void ScanNetworks(ScanCallback * callback) = 0;
+
+    /**
+     * @brief Provide all of the Thread features supported by the Thread interface
+     */
+    virtual ThreadCapabilities GetSupportedThreadFeatures() = 0;
+
+    /**
+     * @brief Return the Thread version supported by the Thread interface
+     */
+    virtual uint16_t GetThreadVersion() = 0;
 
     ~ThreadDriver() override = default;
 };

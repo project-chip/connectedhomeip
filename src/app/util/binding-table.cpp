@@ -20,6 +20,7 @@
  */
 
 #include <app/util/binding-table.h>
+#include <app/util/config.h>
 
 namespace chip {
 
@@ -32,12 +33,12 @@ BindingTable::BindingTable()
 
 CHIP_ERROR BindingTable::Add(const EmberBindingTableEntry & entry)
 {
-    if (entry.type == EMBER_UNUSED_BINDING)
+    if (entry.type == MATTER_UNUSED_BINDING)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     uint8_t newIndex = GetNextAvaiableIndex();
-    if (newIndex >= EMBER_BINDING_TABLE_SIZE)
+    if (newIndex >= MATTER_BINDING_TABLE_SIZE)
     {
         return CHIP_ERROR_NO_MEMORY;
     }
@@ -55,13 +56,13 @@ CHIP_ERROR BindingTable::Add(const EmberBindingTableEntry & entry)
         }
         if (error != CHIP_NO_ERROR)
         {
-            mStorage->SyncDeleteKeyValue(mKeyAllocator.BindingTableEntry(newIndex));
+            mStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::BindingTableEntry(newIndex).KeyName());
         }
     }
     if (error != CHIP_NO_ERROR)
     {
         // Roll back
-        mBindingTable[newIndex].type = EMBER_UNUSED_BINDING;
+        mBindingTable[newIndex].type = MATTER_UNUSED_BINDING;
         return error;
     }
 
@@ -96,11 +97,11 @@ CHIP_ERROR BindingTable::SaveEntryToStorage(uint8_t index, uint8_t nextIndex)
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::TLVType::kTLVType_Structure, container));
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagFabricIndex), entry.fabricIndex));
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagLocalEndpoint), entry.local));
-    if (entry.clusterId.HasValue())
+    if (entry.clusterId.has_value())
     {
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagCluster), entry.clusterId.Value()));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagCluster), *entry.clusterId));
     }
-    if (entry.type == EMBER_UNICAST_BINDING)
+    if (entry.type == MATTER_UNICAST_BINDING)
     {
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagRemoteEndpoint), entry.remote));
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagNodeId), entry.nodeId));
@@ -112,7 +113,7 @@ CHIP_ERROR BindingTable::SaveEntryToStorage(uint8_t index, uint8_t nextIndex)
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagNextEntry), nextIndex));
     ReturnErrorOnFailure(writer.EndContainer(container));
     ReturnErrorOnFailure(writer.Finalize());
-    return mStorage->SyncSetKeyValue(mKeyAllocator.BindingTableEntry(index), buffer,
+    return mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::BindingTableEntry(index).KeyName(), buffer,
                                      static_cast<uint16_t>(writer.GetLengthWritten()));
 }
 
@@ -127,7 +128,8 @@ CHIP_ERROR BindingTable::SaveListInfo(uint8_t head)
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagHead), head));
     ReturnErrorOnFailure(writer.EndContainer(container));
     ReturnErrorOnFailure(writer.Finalize());
-    return mStorage->SyncSetKeyValue(mKeyAllocator.BindingTable(), buffer, static_cast<uint16_t>(writer.GetLengthWritten()));
+    return mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::BindingTable().KeyName(), buffer,
+                                     static_cast<uint16_t>(writer.GetLengthWritten()));
 }
 
 CHIP_ERROR BindingTable::LoadFromStorage()
@@ -137,7 +139,7 @@ CHIP_ERROR BindingTable::LoadFromStorage()
     uint16_t size                        = sizeof(buffer);
     CHIP_ERROR error;
 
-    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(mKeyAllocator.BindingTable(), buffer, size));
+    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::BindingTable().KeyName(), buffer, size));
     TLV::TLVReader reader;
     reader.Init(buffer, size);
 
@@ -183,7 +185,7 @@ CHIP_ERROR BindingTable::LoadEntryFromStorage(uint8_t index, uint8_t & nextIndex
     uint16_t size                     = sizeof(buffer);
     EmberBindingTableEntry entry;
 
-    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(mKeyAllocator.BindingTableEntry(index), buffer, size));
+    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::BindingTableEntry(index).KeyName(), buffer, size));
     TLV::TLVReader reader;
     reader.Init(buffer, size);
 
@@ -198,25 +200,25 @@ CHIP_ERROR BindingTable::LoadEntryFromStorage(uint8_t index, uint8_t & nextIndex
     ReturnErrorOnFailure(reader.Next());
     if (reader.GetTag() == TLV::ContextTag(kTagCluster))
     {
-        uint16_t clusterId;
+        ClusterId clusterId;
         ReturnErrorOnFailure(reader.Get(clusterId));
-        entry.clusterId.SetValue(clusterId);
+        entry.clusterId.emplace(clusterId);
         ReturnErrorOnFailure(reader.Next());
     }
     else
     {
-        entry.clusterId = NullOptional;
+        entry.clusterId = std::nullopt;
     }
     if (reader.GetTag() == TLV::ContextTag(kTagRemoteEndpoint))
     {
-        entry.type = EMBER_UNICAST_BINDING;
+        entry.type = MATTER_UNICAST_BINDING;
         ReturnErrorOnFailure(reader.Get(entry.remote));
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagNodeId)));
         ReturnErrorOnFailure(reader.Get(entry.nodeId));
     }
     else
     {
-        entry.type = EMBER_MULTICAST_BINDING;
+        entry.type = MATTER_MULTICAST_BINDING;
         ReturnErrorCodeIf(reader.GetTag() != TLV::ContextTag(kTagGroupId), CHIP_ERROR_INVALID_TLV_TAG);
         ReturnErrorOnFailure(reader.Get(entry.groupId));
     }
@@ -259,11 +261,11 @@ CHIP_ERROR BindingTable::RemoveAt(Iterator & iter)
     if (error == CHIP_NO_ERROR)
     {
         // The remove is considered "submitted" once the change on prev node takes effect
-        if (mStorage->SyncDeleteKeyValue(mKeyAllocator.BindingTableEntry(iter.mIndex)) != CHIP_NO_ERROR)
+        if (mStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::BindingTableEntry(iter.mIndex).KeyName()) != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "Failed to remove binding table entry %u from storage", iter.mIndex);
         }
-        mBindingTable[iter.mIndex].type = EMBER_UNUSED_BINDING;
+        mBindingTable[iter.mIndex].type = MATTER_UNUSED_BINDING;
         mNextIndex[iter.mIndex]         = kNextNullIndex;
         mSize--;
     }
@@ -290,14 +292,14 @@ BindingTable::Iterator BindingTable::end()
 
 uint8_t BindingTable::GetNextAvaiableIndex()
 {
-    for (uint8_t i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
+    for (uint8_t i = 0; i < MATTER_BINDING_TABLE_SIZE; i++)
     {
-        if (mBindingTable[i].type == EMBER_UNUSED_BINDING)
+        if (mBindingTable[i].type == MATTER_UNUSED_BINDING)
         {
             return i;
         }
     }
-    return EMBER_BINDING_TABLE_SIZE;
+    return MATTER_BINDING_TABLE_SIZE;
 }
 
 BindingTable::Iterator BindingTable::Iterator::operator++()

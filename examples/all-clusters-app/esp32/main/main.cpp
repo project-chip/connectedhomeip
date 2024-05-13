@@ -18,11 +18,9 @@
 
 #include "AppTask.h"
 #include "BluetoothWidget.h"
-#include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
 #include "Globals.h"
 #include "LEDWidget.h"
-#include "OpenThreadLaunch.h"
 #include "QRCodeScreen.h"
 #include "ShellCommands.h"
 #include "WiFiWidget.h"
@@ -35,19 +33,17 @@
 #include "nvs_flash.h"
 #include "platform/PlatformManager.h"
 #include "shell_extension/launch.h"
-
-#include <app/clusters/network-commissioning/network-commissioning.h>
-#include <app/clusters/ota-requestor/BDXDownloader.h>
-#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
-#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
-#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/server/OnboardingCodesUtil.h>
-#include <app/util/af.h>
+#include <app/util/endpoint-config-api.h>
 #include <binding-handler.h>
+#include <common/CHIPDeviceManager.h>
+#include <common/Esp32AppServer.h>
+#include <common/Esp32ThreadInit.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <platform/ESP32/NetworkCommissioningDriver.h>
-#include <platform/ESP32/OTAImageProcessorImpl.h>
+#include <examples/platform/esp32/mode-support/static-supported-modes-manager.h>
+#include <platform/ESP32/ESP32Utils.h>
+#include <static-supported-temperature-levels.h>
 
 #if CONFIG_HAVE_DISPLAY
 #include "DeviceWithDisplay.h"
@@ -57,39 +53,35 @@
 #include "Rpc.h"
 #endif
 
-#if CONFIG_OPENTHREAD_ENABLED
-#include <platform/ThreadStackManager.h>
-#endif
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+#include <platform/ESP32/ESP32FactoryDataProvider.h>
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+
+#if CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
+#include <platform/ESP32/ESP32DeviceInfoProvider.h>
+#else
+#include <DeviceInfoProviderImpl.h>
+#endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 
 using namespace ::chip;
 using namespace ::chip::Shell;
-using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::Credentials;
 
 // Used to indicate that an IP address has been added to the QRCode
 #define EXAMPLE_VENDOR_TAG_IP 1
 
-const char * TAG = "all-clusters-app";
+extern const char TAG[] = "all-clusters-app";
 
-static DeviceCallbacks EchoCallbacks;
-
+static AppDeviceCallbacks EchoCallbacks;
+static AppDeviceCallbacksDelegate sAppDeviceCallbacksDelegate;
 namespace {
-
-#if CONFIG_ENABLE_OTA_REQUESTOR
-DefaultOTARequestor gRequestorCore;
-DefaultOTARequestorStorage gRequestorStorage;
-DefaultOTARequestorDriver gRequestorUser;
-BDXDownloader gDownloader;
-OTAImageProcessorImpl gImageProcessor;
-#endif
-
-app::Clusters::NetworkCommissioning::Instance
-    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
 
 class AppCallbacks : public AppDelegate
 {
 public:
+    void OnCommissioningSessionEstablishmentStarted() {}
     void OnCommissioningSessionStarted() override { bluetoothLED.Set(true); }
     void OnCommissioningSessionStopped() override
     {
@@ -102,40 +94,61 @@ public:
 
 AppCallbacks sCallbacks;
 
+app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
+
 constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
+
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+DeviceLayer::ESP32FactoryDataProvider sFactoryDataProvider;
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+
+#if CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
+DeviceLayer::ESP32DeviceInfoProvider gExampleDeviceInfoProvider;
+#else
+DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+#endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 
 } // namespace
 
 static void InitServer(intptr_t context)
 {
-    // Init ZCL Data Model and CHIP App Server
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.appDelegate = &sCallbacks;
-    chip::Server::GetInstance().Init(initParams);
+    Esp32AppServer::Init(&sCallbacks); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
 
+#if !(CHIP_DEVICE_CONFIG_ENABLE_WIFI && (CHIP_DEVICE_CONFIG_ENABLE_THREAD || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET))
     // We only have network commissioning on endpoint 0.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
+#endif
 
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-    sWiFiNetworkCommissioningInstance.Init();
-    InitBindingHandlers();
 #if CONFIG_DEVICE_TYPE_M5STACK
     SetupPretendDevices();
 #endif
+    CHIP_ERROR err =
+        app::Clusters::ModeSelect::StaticSupportedModesManager::getStaticSupportedModesManagerInstance().InitEndpointArray(
+            FIXED_ENDPOINT_COUNT);
+    if (err != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Failed to initialize endpoint array for supported-modes, err:%" CHIP_ERROR_FORMAT, err.Format());
+    }
+
+    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
 
-static void InitOTARequestor(void)
+// #include <laundry-washer-controls-server/laundry-washer-controls-server.h>
+#include <examples/all-clusters-app/all-clusters-common/include/laundry-washer-controls-delegate-impl.h>
+#include <src/app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
+
+using namespace chip::app::Clusters::LaundryWasherControls;
+void emberAfLaundryWasherControlsClusterInitCallback(EndpointId endpoint)
 {
-#if CONFIG_ENABLE_OTA_REQUESTOR
-    SetRequestorInstance(&gRequestorCore);
-    gRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
-    gRequestorCore.Init(Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
-    gImageProcessor.SetOTADownloader(&gDownloader);
-    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
-    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
-#endif
+    LaundryWasherControlsServer::SetDefaultDelegate(1, &LaundryWasherControlDelegate::getLaundryWasherControlDelegate());
+}
+
+#include <examples/all-clusters-app/all-clusters-common/include/laundry-dryer-controls-delegate-impl.h>
+#include <src/app/clusters/laundry-dryer-controls-server/laundry-dryer-controls-server.h>
+using namespace chip::app::Clusters::LaundryDryerControls;
+void emberAfLaundryDryerControlsClusterInitCallback(EndpointId endpoint)
+{
+    LaundryDryerControlsServer::SetDefaultDelegate(endpoint, &LaundryDryerControlDelegate::getLaundryDryerControlDelegate());
 }
 
 extern "C" void app_main()
@@ -145,6 +158,12 @@ extern "C" void app_main()
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "nvs_flash_init() failed: %s", esp_err_to_name(err));
+        return;
+    }
+    err = esp_event_loop_create_default();
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "esp_event_loop_create_default() failed: %s", esp_err_to_name(err));
         return;
     }
 #if CONFIG_ENABLE_PW_RPC
@@ -161,27 +180,42 @@ extern "C" void app_main()
     CASECommands::GetInstance().Register();
 #endif // CONFIG_ENABLE_CHIP_SHELL
 
-#if CONFIG_OPENTHREAD_ENABLED
-    LaunchOpenThread();
-    ThreadStackMgr().InitThreadStack();
-#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    if (DeviceLayer::Internal::ESP32Utils::InitWiFiStack() != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Failed to initialize the Wi-Fi stack");
+        return;
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+    DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
     CHIP_ERROR error              = deviceMgr.Init(&EchoCallbacks);
+    DeviceCallbacksDelegate::Instance().SetAppDelegate(&sAppDeviceCallbacksDelegate);
     if (error != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(error));
+        ESP_LOGE(TAG, "device.Init() failed: %" CHIP_ERROR_FORMAT, error.Format());
         return;
     }
 
-    InitOTARequestor();
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+    SetCommissionableDataProvider(&sFactoryDataProvider);
+    SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
+#if CONFIG_ENABLE_ESP32_DEVICE_INSTANCE_INFO_PROVIDER
+    SetDeviceInstanceInfoProvider(&sFactoryDataProvider);
+#endif
+#else
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
     ESP_LOGI(TAG, "------------------------Starting App Task---------------------------");
     error = GetAppTask().StartAppTask();
     if (error != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "GetAppTask().StartAppTask() failed : %s", ErrorStr(error));
+        ESP_LOGE(TAG, "GetAppTask().StartAppTask() failed : %" CHIP_ERROR_FORMAT, error.Format());
     }
+    ESPOpenThreadInit();
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 }

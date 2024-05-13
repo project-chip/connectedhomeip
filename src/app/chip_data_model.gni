@@ -14,111 +14,255 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("${chip_root}/build/chip/chip_codegen.gni")
+import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/platform/python.gni")
 
-import("${chip_root}/src/lib/core/core.gni")
-
 _app_root = get_path_info(".", "abspath")
-
-_zap_cluster_list_script = get_path_info("zap_cluster_list.py", "abspath")
 
 # Defines a source_set for CHIP data model.
 #
 # Arguments:
-#  zap_pregenerated_dir
-#    Path to the ZAP "gen" dir.
-#
 #  zap_file
 #    Path to the ZAP input file.
 #
-#  cluster_sources
-#    Names of the clusters directories to compile.
-#    Deprecated, specify zap_file instead.
+#  idl
+#    Path to the .matter IDL corresponding to the zap file. This is for
+#    dependencies on build-time code generation.
 #
 # Forwards all the remaining variables to the source_set.
+#
+#
+#
+# Additional underlying source sets that will be provided
+#
+#   - ${name}-endpoint-metadata
+#     contains HEADERS that define endpoint metadata from zap/matter files:
+#        - zap-generated/gen_config.h
+#        - zap-generated/endpoint_config.h
+#        - zap-generated/access.h
+#        - PluginApplicationCallbacks.h
+#   - ${name}-callbacks
+#     contains the callback implementation for cluster init:
+#        - cluster-init-callback.cpp
+#        - callback-stub.cpp (contains __weak__ implementations. TODO: we should not be using
+#          weak linkage over time at all)
+#   - ${name}-command-dispatch:
+#     contains the implementation of `DispatchServerCommand` which forwards data to
+#     `emberAf....Cluster...Callback` callbacks
+#        - zap-generated/IMClusterCommandHandler.cpp
 #
 template("chip_data_model") {
   _data_model_name = target_name
 
-  config("${_data_model_name}_config") {
-    include_dirs = []
-
-    if (defined(invoker.zap_pregenerated_dir)) {
-      include_dirs += [ "${invoker.zap_pregenerated_dir}/.." ]
-    }
+  if (defined(invoker.idl)) {
+    _idl = invoker.idl
+  } else {
+    # Assume that IDL name is the same as the zap file name, but instead of
+    # '.zap' use '.matter' as extension. This is currently the case in the
+    # sample apps, but may change in the future
+    _idl = string_replace(invoker.zap_file, ".zap", ".matter")
   }
 
-  _use_default_im_dispatch = !defined(invoker.use_default_im_dispatch) ||
-                             invoker.use_default_im_dispatch
+  chip_zapgen("${_data_model_name}_zapgen") {
+    input = rebase_path(invoker.zap_file)
+    generator = "app-templates"
 
-  _use_tests_apis = defined(invoker.use_tests_apis) && invoker.use_tests_apis
+    # NOTE: these files MUST be in sync with outputs in
+    #       src/app/zap-templates/app-templates.json
+    outputs = [
+      "zap-generated/access.h",
+      "zap-generated/gen_config.h",
+      "zap-generated/endpoint_config.h",
+    ]
+
+    if (!chip_build_controller_dynamic_server) {
+      outputs += [ "zap-generated/IMClusterCommandHandler.cpp" ]
+    }
+
+    if (!defined(deps)) {
+      deps = []
+    }
+
+    deps += [ "${chip_root}/src/app" ]
+  }
+
+  chip_codegen("${_data_model_name}_codegen") {
+    input = _idl
+    generator = "cpp-app"
+
+    outputs = [
+      "app/PluginApplicationCallbacks.h",
+      "app/callback-stub.cpp",
+      "app/cluster-init-callback.cpp",
+    ]
+
+    if (!defined(deps)) {
+      deps = []
+    }
+
+    deps += [
+      ":${_data_model_name}_zapgen",
+      "${chip_root}/src/app/common:cluster-objects",
+    ]
+  }
+
+  # Fixed source sets for allowing reasonable dependencies on things:
+  source_set("${_data_model_name}-endpoint-metadata") {
+    sources = filter_include(
+            get_target_outputs(":${_data_model_name}_codegen_generate"),
+            [ "*/PluginApplicationCallbacks.h" ])
+    sources += filter_include(
+            get_target_outputs(":${_data_model_name}_zapgen_generate"),
+            [
+              "*/access.h",
+              "*/endpoint_config.h",
+              "*/gen_config.h",
+            ])
+
+    deps = [
+      ":${_data_model_name}_codegen_generate",
+      ":${_data_model_name}_zapgen_generate",
+      "${chip_root}/src/access",
+      "${chip_root}/src/lib/core:chip_config_header",
+    ]
+  }
+
+  source_set("${_data_model_name}-callbacks") {
+    sources = filter_include(
+            get_target_outputs(":${_data_model_name}_codegen_generate"),
+            [
+              "*/callback-stup.cpp",
+              "*/cluster-init-callback.cpp",
+            ])
+
+    deps = [
+      ":${_data_model_name}_codegen_generate",
+      "${chip_root}/src/app/common:ids",
+      "${chip_root}/src/lib/support:span",
+      "${chip_root}/src/protocols/interaction_model",
+    ]
+  }
+
+  if (!chip_build_controller_dynamic_server) {
+    source_set("${_data_model_name}-command-dispatch") {
+      sources = filter_include(
+              get_target_outputs(":${_data_model_name}_zapgen_generate"),
+              [ "*/IMClusterCommandHandler.cpp" ])
+
+      deps = [
+        ":${_data_model_name}_zapgen_generate",
+        "${chip_root}/src/app",
+        "${chip_root}/src/app:interaction-model",
+        "${chip_root}/src/app/common:cluster-objects",
+        "${chip_root}/src/app/common:enums",
+        "${chip_root}/src/app/common:ids",
+        "${chip_root}/src/lib/core",
+        "${chip_root}/src/lib/support",
+      ]
+    }
+  }
 
   source_set(_data_model_name) {
     forward_variables_from(invoker,
                            "*",
                            [
-                             "zap_pregenerated_dir",
-                             "cluster_sources",
                              "zap_file",
                              "is_server",
+                             "external_clusters",
                            ])
 
     if (!defined(sources)) {
       sources = []
     }
 
+    if (!defined(is_server)) {
+      is_server = false
+    }
+
     sources += [
       "${_app_root}/clusters/barrier-control-server/barrier-control-server.h",
-      "${_app_root}/clusters/basic/basic.h",
+      "${_app_root}/clusters/basic-information/basic-information.h",
       "${_app_root}/clusters/color-control-server/color-control-server.h",
       "${_app_root}/clusters/door-lock-server/door-lock-server.h",
       "${_app_root}/clusters/groups-server/groups-server.h",
-      "${_app_root}/clusters/ias-zone-client/ias-zone-client.h",
-      "${_app_root}/clusters/ias-zone-server/ias-zone-server-tokens.h",
-      "${_app_root}/clusters/ias-zone-server/ias-zone-server.h",
       "${_app_root}/clusters/identify-server/identify-server.h",
       "${_app_root}/clusters/level-control/level-control.h",
       "${_app_root}/clusters/on-off-server/on-off-server.h",
-      "${_app_root}/clusters/scenes/scenes-tokens.h",
-      "${_app_root}/clusters/scenes/scenes.h",
-      "${_app_root}/reporting/reporting.h",
-      "${_app_root}/util/DataModelHandler.cpp",
-      "${_app_root}/util/af-event.cpp",
-      "${_app_root}/util/attribute-size-util.cpp",
-      "${_app_root}/util/attribute-storage.cpp",
-      "${_app_root}/util/attribute-table.cpp",
+      "${_app_root}/clusters/scenes-server/ExtensionFieldSets.h",
+      "${_app_root}/clusters/scenes-server/ExtensionFieldSetsImpl.h",
+      "${_app_root}/clusters/scenes-server/SceneHandlerImpl.h",
+      "${_app_root}/clusters/scenes-server/SceneTable.h",
+      "${_app_root}/clusters/scenes-server/SceneTableImpl.h",
+      "${_app_root}/clusters/scenes-server/scenes-server.h",
       "${_app_root}/util/binding-table.cpp",
       "${_app_root}/util/binding-table.h",
-      "${_app_root}/util/client-api.cpp",
-      "${_app_root}/util/ember-compatibility-functions.cpp",
-      "${_app_root}/util/ember-print.cpp",
-      "${_app_root}/util/error-mapping.cpp",
-      "${_app_root}/util/message.cpp",
+      "${_app_root}/util/generic-callback-stubs.cpp",
       "${_app_root}/util/privilege-storage.cpp",
-      "${_app_root}/util/util.cpp",
       "${chip_root}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp",
     ]
 
-    if (defined(invoker.cluster_sources)) {
-      _cluster_sources = invoker.cluster_sources
-    } else if (defined(invoker.zap_file)) {
-      _zap_path = rebase_path(invoker.zap_file, root_build_dir)
-      _script_path = rebase_path(_zap_cluster_list_script, root_build_dir)
-      _script_args = [ "--zap_file=" + _zap_path ]
+    if (!chip_build_controller_dynamic_server) {
+      sources += [
+        "${_app_root}/reporting/reporting.cpp",
+        "${_app_root}/util/DataModelHandler.cpp",
+        "${_app_root}/util/attribute-storage.cpp",
+        "${_app_root}/util/attribute-table.cpp",
+        "${_app_root}/util/ember-compatibility-functions.cpp",
+        "${_app_root}/util/util.cpp",
+      ]
+    }
 
-      _cluster_sources = exec_script("${build_root}/gn_run_binary.py",
-                                     [ _script_path ] + _script_args,
+    if (defined(invoker.zap_file)) {
+      _zap_file = rebase_path(invoker.zap_file, root_build_dir)
+      _script_args = [
+        "--zap_file",
+        _zap_file,
+      ]
+      if (defined(invoker.external_clusters)) {
+        _script_args += [ "--external-clusters" ]
+        _script_args += invoker.external_clusters
+      }
+      _cluster_sources = exec_script("${_app_root}/zap_cluster_list.py",
+                                     _script_args,
                                      "list lines",
                                      [ invoker.zap_file ])
     }
 
+    if (!defined(deps)) {
+      deps = []
+    }
+
+    if (!defined(cflags)) {
+      cflags = []
+    }
+
+    if (!defined(defines)) {
+      defines = []
+    }
+
     foreach(cluster, _cluster_sources) {
       if (cluster == "door-lock-server") {
-        sources += [ "${_app_root}/clusters/${cluster}/door-lock-server.cpp" ]
+        sources += [
+          "${_app_root}/clusters/${cluster}/door-lock-server-callback.cpp",
+          "${_app_root}/clusters/${cluster}/door-lock-server.cpp",
+        ]
       } else if (cluster == "mode-select-server") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/supported-modes-manager.h",
+        ]
+      } else if (cluster == "temperature-control-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/supported-temperature-levels-manager.h",
+        ]
+      } else if (cluster == "mode-base-server") {
+        sources += [
+          "${_app_root}/clusters/mode-base-server/mode-base-cluster-objects.cpp",
+          "${_app_root}/clusters/mode-base-server/mode-base-cluster-objects.h",
+          "${_app_root}/clusters/mode-base-server/mode-base-server.cpp",
+          "${_app_root}/clusters/mode-base-server/mode-base-server.h",
         ]
       } else if (cluster == "application-launcher-server") {
         sources += [
@@ -139,6 +283,8 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/DefaultOTARequestorUserConsent.h",
           "${_app_root}/clusters/${cluster}/ExtendedOTARequestorDriver.cpp",
           "${_app_root}/clusters/${cluster}/OTARequestorStorage.h",
+          "${_app_root}/clusters/${cluster}/OTATestEventTriggerHandler.cpp",
+          "${_app_root}/clusters/${cluster}/OTATestEventTriggerHandler.h",
         ]
       } else if (cluster == "bindings") {
         sources += [
@@ -148,26 +294,102 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/PendingNotificationMap.cpp",
           "${_app_root}/clusters/${cluster}/PendingNotificationMap.h",
         ]
+      } else if (cluster == "time-synchronization-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+          "${_app_root}/clusters/${cluster}/DefaultTimeSyncDelegate.cpp",
+          "${_app_root}/clusters/${cluster}/TimeSyncDataProvider.cpp",
+        ]
+      } else if (cluster == "scenes-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/scenes-server/ExtensionFieldSetsImpl.cpp",
+          "${_app_root}/clusters/scenes-server/SceneHandlerImpl.cpp",
+          "${_app_root}/clusters/scenes-server/SceneTableImpl.cpp",
+        ]
+      } else if (cluster == "operational-state-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+          "${_app_root}/clusters/${cluster}/operational-state-cluster-objects.h",
+        ]
+      } else if (cluster == "dishwasher-alarm-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+          "${_app_root}/clusters/${cluster}/dishwasher-alarm-delegate.h",
+        ]
+      } else if (cluster == "icd-management-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+        ]
+        deps += [
+          "${chip_root}/src/app/icd/server:configuration-data",
+          "${chip_root}/src/app/icd/server:icd-server-config",
+          "${chip_root}/src/app/icd/server:monitoring-table",
+          "${chip_root}/src/app/icd/server:notifier",
+        ]
+      } else if (cluster == "resource-monitoring-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+          "${_app_root}/clusters/${cluster}/replacement-product-list-manager.h",
+          "${_app_root}/clusters/${cluster}/resource-monitoring-cluster-objects.cpp",
+          "${_app_root}/clusters/${cluster}/resource-monitoring-cluster-objects.h",
+        ]
+      } else if (cluster == "concentration-measurement-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+          "${_app_root}/clusters/${cluster}/concentration-measurement-cluster-objects.h",
+        ]
+      } else if (cluster == "smoke-co-alarm-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+          "${_app_root}/clusters/${cluster}/SmokeCOTestEventTriggerHandler.h",
+        ]
+      } else if (cluster == "boolean-state-configuration-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+          "${_app_root}/clusters/${cluster}/BooleanStateConfigurationTestEventTriggerHandler.cpp",
+          "${_app_root}/clusters/${cluster}/BooleanStateConfigurationTestEventTriggerHandler.h",
+        ]
+      } else if (cluster == "air-quality-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+        ]
+      } else if (cluster == "energy-evse-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+          "${_app_root}/clusters/${cluster}/EnergyEvseTestEventTriggerHandler.h",
+        ]
+      } else if (cluster == "diagnostic-logs-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+          "${_app_root}/clusters/${cluster}/BDXDiagnosticLogsProvider.cpp",
+          "${_app_root}/clusters/${cluster}/BDXDiagnosticLogsProvider.h",
+          "${_app_root}/clusters/${cluster}/DiagnosticLogsProviderDelegate.h",
+        ]
+      } else if (cluster == "electrical-energy-measurement-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+          "${_app_root}/clusters/${cluster}/EnergyReportingTestEventTriggerHandler.h",
+        ]
+      } else if (cluster == "thread-network-diagnostics-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/thread-network-diagnostics-provider.cpp",
+          "${_app_root}/clusters/${cluster}/thread-network-diagnostics-provider.h",
+        ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
-      }
-    }
-
-    if (defined(invoker.zap_pregenerated_dir)) {
-      sources += [ "${invoker.zap_pregenerated_dir}/callback-stub.cpp" ]
-
-      if (chip_controller) {
-        sources += [ "${invoker.zap_pregenerated_dir}/CHIPClusters.h" ]
-      }
-
-      if (_use_default_im_dispatch) {
-        sources +=
-            [ "${invoker.zap_pregenerated_dir}/IMClusterCommandHandler.cpp" ]
-      }
-
-      if (_use_tests_apis) {
-        sources +=
-            [ "${invoker.zap_pregenerated_dir}/tests/CHIPClustersTest.h" ]
       }
     }
 
@@ -176,28 +398,24 @@ template("chip_data_model") {
     }
 
     public_deps += [
+      ":${_data_model_name}_codegen",
+      ":${_data_model_name}_zapgen",
+      "${chip_root}/src/access",
       "${chip_root}/src/app",
+      "${chip_root}/src/app/common:attribute-type",
       "${chip_root}/src/app/common:cluster-objects",
+      "${chip_root}/src/app/common:enums",
+      "${chip_root}/src/app/util:types",
       "${chip_root}/src/controller",
       "${chip_root}/src/lib/core",
       "${chip_root}/src/lib/support",
       "${chip_root}/src/protocols/secure_channel",
     ]
 
-    if (defined(invoker.is_server)) {
+    if (is_server) {
       public_deps += [ "${chip_root}/src/app/server" ]
     }
 
-    if (!defined(cflags)) {
-      cflags = []
-    }
-
     cflags += [ "-Wconversion" ]
-
-    if (!defined(public_configs)) {
-      public_configs = []
-    }
-
-    public_configs += [ ":${_data_model_name}_config" ]
   }
 }

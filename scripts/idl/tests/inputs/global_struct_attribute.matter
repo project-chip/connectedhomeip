@@ -1,9 +1,0 @@
-struct LabelStruct {
-    CHAR_STRING<16> label = 0;
-    CHAR_STRING<16> value = 1;
-}
-
-client cluster DemoCluster = 0x12 {
-    attribute LabelStruct singleLabel = 0x20;
-    attribute LabelStruct someLabels[] = 0x21;
-}

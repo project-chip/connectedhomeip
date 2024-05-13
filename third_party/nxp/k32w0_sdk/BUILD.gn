@@ -12,11 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/k32w0_sdk.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/chip.gni")
 import("//build_overrides/mbedtls.gni")
+import("//build_overrides/nxp_sdk.gni")
 
-import("${k32w0_sdk_build_root}/k32w0_sdk.gni")
 import("${mbedtls_root}/mbedtls.gni")
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
 
 declare_args() {
   # Build target to use for k32w0 SDK. Use this to set global SDK defines.
@@ -25,7 +29,7 @@ declare_args() {
 
 assert(k32w0_sdk_target != "", "k32w0_sdk_target must be specified")
 
-group("k32w0_sdk") {
+group("nxp_sdk") {
   public_deps = [ k32w0_sdk_target ]
 }
 
@@ -53,19 +57,48 @@ config("mbedtls_k32w0_config") {
     ]
   }
 
+  if (chip_with_factory_data == 1) {
+    defines += [
+      "MBEDTLS_X509_CRT_PARSE_C",
+      "MBEDTLS_X509_USE_C",
+    ]
+  }
+
+  if (chip_crypto == "platform" && chip_crypto_flavor == "tinycrypt") {
+    defines += [
+      "MBEDTLS_USE_TINYCRYPT",
+      "MBEDTLS_OPTIMIZE_TINYCRYPT_ASM",
+    ]
+  }
+
   include_dirs = [ chip_root ]
+
+  if (chip_crypto == "platform" && chip_crypto_flavor == "tinycrypt") {
+    include_dirs += [
+      "${chip_root}/third_party/openthread/ot-nxp/third_party/tinycrypt/inc",
+    ]
+  }
 }
 
 mbedtls_target("mbedtls") {
   sources = [
     "${k32w0_sdk_root}/middleware/mbedtls/port/ksdk/aes_alt.c",
-    "${k32w0_sdk_root}/middleware/mbedtls/port/ksdk/ksdk_mbedtls.c",
+    "${k32w0_sdk_root}/middleware/mbedtls/port/matter/ksdk_mbedtls.c",
   ]
+
+  if (chip_crypto == "platform" && chip_crypto_flavor == "tinycrypt") {
+    sources += [
+      "${chip_root}/third_party/openthread/ot-nxp/third_party/tinycrypt/src/ecc.c",
+      "${chip_root}/third_party/openthread/ot-nxp/third_party/tinycrypt/src/ecc_dh.c",
+      "${chip_root}/third_party/openthread/ot-nxp/third_party/tinycrypt/src/ecc_dsa.c",
+      "${chip_root}/third_party/openthread/ot-nxp/third_party/tinycrypt/src/tinycrypt_util.c",
+    ]
+  }
 
   public_configs = [ ":mbedtls_k32w0_config" ]
 
   public_deps = [
-    ":k32w0_sdk",
+    ":nxp_sdk",
     "${chip_root}/third_party/openthread/platforms/nxp/k32w/k32w0:openthread_mbedtls_config_k32w0",
   ]
 }

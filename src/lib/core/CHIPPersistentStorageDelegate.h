@@ -46,30 +46,26 @@ public:
      *   Caller is responsible to take care of any special formatting needs (e.g. byte
      *   order, null terminators, consistency checks or versioning).
      *
-     *   This API allows for determining the size of a stored value. Whenever
-     *   the passed `size` is smaller than needed and the key exists in storage, the error
-     *   CHIP_ERROR_BUFFER_TOO_SMALL will be given, and the `size` will be updated to the
-     *   size of the stored value. It is legal to use `nullptr` for `buffer` if `size` is 0.
-     *
      *   If a key is found and the `buffer`'s `size` is large enough, then the value will
      *   be copied to `buffer` and `size` will be updated to the actual size used.
      *
-     *   The easiest way to determine if a key exists (and the value's size if so) is to pass
-     *   `size` of 0, which is always valid to do, and will return CHIP_ERROR_BUFFER_TOO_SMALL
-     *   if the key exists and CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND if the
-     *   key is not found.
+     *   Whenever the passed `size` is smaller than the size of the stored value for the given key,
+     *   CHIP_ERROR_BUFFER_TOO_SMALL will be returned, but the `buffer` will still be filled with the
+     *   first `size` bytes of the stored value.
+     *
+     *   In the case where `size` of 0 is given, and the value stored is of size 0, CHIP_NO_ERROR is
+     *   returned. It is recommended to use helper method SyncDoesKeyExist(key) to determine if key
+     *   exists.
+     *
+     *   It is legal to use `nullptr` for `buffer` if `size` is 0.
      *
      * @param[in]      key Key to lookup
      * @param[out]     buffer Pointer to a buffer where the place the read value.
-     * @param[in, out] size Input is maximum buffer size, output updated to length of value.
+     * @param[in, out] size Input is maximum buffer size, output updated to number of bytes written into `buffer`.
      *
      * @return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND the key is not found in storage.
      * @return CHIP_ERROR_BUFFER_TOO_SMALL the provided buffer is not big enough.  In this case
-     *                                     "size" will indicate the needed buffer size. Some data
-     *                                     may or may not be placed in "buffer" in this case; consumers
-     *                                     should not rely on that behavior. CHIP_ERROR_BUFFER_TOO_SMALL
-     *                                     combined with setting "size" to 0 means the actual size was
-     *                                     too large to fit in uint16_t.
+     *                                     the first `size` bytes of the value will be placed in `buffer`.
      */
     virtual CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) = 0;
 
@@ -93,10 +89,27 @@ public:
      *
      * @param[in] key Key to be deleted
      *
-     * @return CHIP_NO_ERROR on success, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND the key is not found in storage,
+     * @return CHIP_NO_ERROR on success, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND if the key is not found in storage,
      *         or another CHIP_ERROR value from implementation on failure.
      */
     virtual CHIP_ERROR SyncDeleteKeyValue(const char * key) = 0;
+
+    /**
+     * @brief
+     *   Helper function that identifies if a key exists.
+     *
+     *   This may be overridden to provide an implementation that is simpler or more direct.
+     *
+     * @param[in] key Key to check if it exist
+     *
+     * @return true if key exists in storage. It returns false if key does not exist in storage or an internal error arises.
+     */
+    virtual bool SyncDoesKeyExist(const char * key)
+    {
+        uint16_t size  = 0;
+        CHIP_ERROR err = SyncGetKeyValue(key, nullptr, size);
+        return (err == CHIP_ERROR_BUFFER_TOO_SMALL) || (err == CHIP_NO_ERROR);
+    }
 };
 
 } // namespace chip

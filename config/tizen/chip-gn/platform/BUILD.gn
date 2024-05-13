@@ -35,6 +35,10 @@ pkg_config("glib") {
   ]
 }
 
+pkg_config("capi-system-info") {
+  packages = [ "capi-system-info" ]
+}
+
 if (chip_mdns == "platform") {
   pkg_config("nsd-dns-sd") {
     packages = [ "nsd-dns-sd" ]
@@ -45,9 +49,6 @@ if (chip_enable_wifi) {
   pkg_config("capi-network-wifi-manager") {
     packages = [ "capi-network-wifi-manager" ]
   }
-  pkg_config("capi-network-softap") {
-    packages = [ "capi-network-softap" ]
-  }
 }
 
 if (chip_enable_ble) {
@@ -56,11 +57,18 @@ if (chip_enable_ble) {
   }
 }
 
+if (chip_enable_openthread) {
+  pkg_config("capi-network-thread") {
+    packages = [ "capi-network-thread" ]
+  }
+}
+
 source_set("tizen") {
   public_configs = [
     ":dlog",
     ":glib",
     ":capi-appfw-preference",
+    ":capi-system-info",
   ]
 
   if (chip_mdns == "platform") {
@@ -68,13 +76,14 @@ source_set("tizen") {
   }
 
   if (chip_enable_wifi) {
-    public_configs += [
-      ":capi-network-wifi-manager",
-      ":capi-network-softap",
-    ]
+    public_configs += [ ":capi-network-wifi-manager" ]
   }
 
   if (chip_enable_ble) {
     public_configs += [ ":capi-network-bluetooth" ]
+  }
+
+  if (chip_enable_openthread) {
+    public_configs += [ ":capi-network-thread" ]
   }
 }

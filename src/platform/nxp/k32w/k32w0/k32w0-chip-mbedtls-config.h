@@ -104,7 +104,7 @@
  * RSA-2048 still requires the FREESCALE_PKHA_LONG_OPERANDS_ENABLE macro to be defined,
  * otherwise it fails at runtime.
  */
-//#define FREESCALE_PKHA_LONG_OPERANDS_ENABLE
+// #define FREESCALE_PKHA_LONG_OPERANDS_ENABLE
 #endif
 
 /* Enable AES use in library if there is AES on chip. */
@@ -121,9 +121,9 @@
 #if defined(FSL_FEATURE_SOC_SHA_COUNT) && (FSL_FEATURE_SOC_SHA_COUNT > 0)
 #include "fsl_sha.h"
 
-#define SHA_INSTANCE SHA0          /* SHA base register.*/
-#define MBEDTLS_FREESCALE_LPC_SHA1 /* Enable use of LPC SHA.*/
-//#define MBEDTLS_FREESCALE_LPC_SHA256 /* Enable use of LPC SHA256.*/
+#define SHA_INSTANCE SHA0            /* SHA base register.*/
+#define MBEDTLS_FREESCALE_LPC_SHA1   /* Enable use of LPC SHA.*/
+#define MBEDTLS_FREESCALE_LPC_SHA256 /* Enable use of LPC SHA256.*/
 
 #endif
 

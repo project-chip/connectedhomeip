@@ -11,72 +11,31 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 63.2.1. [TC-PSCFG-2.1] Attributes with server as DUT
+name: 65.2.1. [TC-PSCFG-2.1] Attributes with server as DUT
+
+PICS:
+    - PSCFG.S
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Power Source Configuration"
     endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH"
-      verification: |
+    - label: "Step 1: Commission DUT to TH"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-      disabled: true
-
-    - label: "TH reads the Sources attribute from the DUT"
-      verification: |
-          ./chip-tool powersourceconfiguration read sources 1234 0
-
-          The response should look like this:
-
-          [1641813530.468521][38091:38096] CHIP:EM: Removed CHIP MessageCounter:11072693 from RetransTable on exchange 57191i
-          [1641813530.468647][38091:38096] CHIP:DMG: ReportDataMessage =
-          [1641813530.468713][38091:38096] CHIP:DMG: {
-          [1641813530.468767][38091:38096] CHIP:DMG:         AttributeReportIBs =
-          [1641813530.468840][38091:38096] CHIP:DMG:         [
-          [1641813530.468900][38091:38096] CHIP:DMG:                 AttributeReportIB =
-          [1641813530.468976][38091:38096] CHIP:DMG:                 {
-          [1641813530.469073][38091:38096] CHIP:DMG:                         AttributeDataIB =
-          [1641813530.469316][38091:38096] CHIP:DMG:                         {
-          [1641813530.469549][38091:38096] CHIP:DMG:                                 DataVersion = 0x0,
-          [1641813530.469657][38091:38096] CHIP:DMG:                                 AttributePathIB =
-          [1641813530.469750][38091:38096] CHIP:DMG:                                 {
-          [1641813530.469827][38091:38096] CHIP:DMG:                                         Endpoint = 0x0,
-          [1641813530.469909][38091:38096] CHIP:DMG:                                         Cluster = 0x2e,
-          [1641813530.469986][38091:38096] CHIP:DMG:                                         Attribute = 0x0000_0000,
-          [1641813530.470055][38091:38096] CHIP:DMG:                                 }
-          [1641813530.470135][38091:38096] CHIP:DMG:
-          [1641813530.470210][38091:38096] CHIP:DMG:                                         Data = [
-          [1641813530.470290][38091:38096] CHIP:DMG:
-          [1641813530.470362][38091:38096] CHIP:DMG:                                         ],
-          [1641813530.470489][38091:38096] CHIP:DMG:                         },
-          [1641813530.470561][38091:38096] CHIP:DMG:
-          [1641813530.470627][38091:38096] CHIP:DMG:                 },
-          [1641813530.470715][38091:38096] CHIP:DMG:
-          [1641813530.470771][38091:38096] CHIP:DMG:                 AttributeReportIB =
-          [1641813530.470844][38091:38096] CHIP:DMG:                 {
-          [1641813530.470907][38091:38096] CHIP:DMG:                         AttributeDataIB =
-          [1641813530.470977][38091:38096] CHIP:DMG:                         {
-          [1641813530.471050][38091:38096] CHIP:DMG:                                 DataVersion = 0x0,
-          [1641813530.471115][38091:38096] CHIP:DMG:                                 AttributePathIB =
-          [1641813530.471194][38091:38096] CHIP:DMG:                                 {
-          [1641813530.471278][38091:38096] CHIP:DMG:                                         Endpoint = 0x0,
-          [1641813530.471361][38091:38096] CHIP:DMG:                                         Cluster = 0x2e,
-          [1641813530.471449][38091:38096] CHIP:DMG:                                         Attribute = 0x0000_0000,
-          [1641813530.471530][38091:38096] CHIP:DMG:                                         ListIndex = Null,
-          [1641813530.471602][38091:38096] CHIP:DMG:                                 }
-          [1641813530.471689][38091:38096] CHIP:DMG:
-          [1641813530.471768][38091:38096] CHIP:DMG:                                         Data = 1,
-          [1641813530.471840][38091:38096] CHIP:DMG:                         },
-          [1641813530.471948][38091:38096] CHIP:DMG:
-          [1641813530.472011][38091:38096] CHIP:DMG:                 },
-          [1641813530.472089][38091:38096] CHIP:DMG:
-          [1641813530.472143][38091:38096] CHIP:DMG:         ],
-          [1641813530.472221][38091:38096] CHIP:DMG:
-          [1641813530.472273][38091:38096] CHIP:DMG:         SuppressResponse = true,
-          [1641813530.472325][38091:38096] CHIP:DMG: }
-          [1641813530.472778][38091:38096] CHIP:TOO: PowerSourceConfiguration.Sources response: 1 entries
-          [1641813530.472872][38091:38096] CHIP:TOO:   [1]: 1
-      disabled: true
+    - label: "Step 2: TH reads the Sources attribute from the DUT"
+      PICS: PSCFG.S.A0000
+      command: "readAttribute"
+      attribute: "Sources"
+      response:
+          constraints:
+              type: list

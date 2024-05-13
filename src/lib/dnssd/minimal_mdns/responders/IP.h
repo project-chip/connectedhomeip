@@ -27,7 +27,8 @@ class IPv4Responder : public RecordResponder
 public:
     IPv4Responder(const FullQName & qname) : RecordResponder(QType::A, qname) {}
 
-    void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate) override;
+    void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate,
+                         const ResponseConfiguration & configuration) override;
 };
 
 class IPv6Responder : public RecordResponder
@@ -35,7 +36,8 @@ class IPv6Responder : public RecordResponder
 public:
     IPv6Responder(const FullQName & qname) : RecordResponder(QType::AAAA, qname) {}
 
-    void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate) override;
+    void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate,
+                         const ResponseConfiguration & configuration) override;
 };
 
 } // namespace Minimal

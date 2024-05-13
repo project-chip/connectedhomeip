@@ -29,7 +29,7 @@ class QueryData
 {
 public:
     QueryData() {}
-    QueryData(const QueryData &) = default;
+    QueryData(const QueryData &)             = default;
     QueryData & operator=(const QueryData &) = default;
 
     QueryData(QType type, QClass klass, bool unicast) : mType(type), mClass(klass), mAnswerViaUnicast(unicast) {}
@@ -42,10 +42,12 @@ public:
     QClass GetClass() const { return mClass; }
     bool RequestedUnicastAnswer() const { return mAnswerViaUnicast; }
 
-    /// Boot advertisement is an internal query meant to advertise all available
-    /// services at device startup time.
-    bool IsBootAdvertising() const { return mIsBootAdvertising; }
-    void SetIsBootAdvertising(bool isBootAdvertising) { mIsBootAdvertising = isBootAdvertising; }
+    /// Internal broadcasts will advertise all available data and will not apply
+    /// any broadcast filtering. Intent is for paths such as:
+    ///   - boot time advertisement: advertise all services available
+    ///   - stop-time advertisement: advertise a TTL of 0 as services are removed
+    bool IsAnnounceBroadcast() const { return mIsAnnounceBroadcast; }
+    void SetIsAnnounceBroadcast(bool isAnnounceBroadcast) { mIsAnnounceBroadcast = isAnnounceBroadcast; }
 
     SerializedQNameIterator GetName() const { return mNameIterator; }
 
@@ -65,9 +67,9 @@ private:
     bool mAnswerViaUnicast = false;
     SerializedQNameIterator mNameIterator;
 
-    /// Flag as a boot-time internal query. This allows query replies
-    /// to be built accordingly.
-    bool mIsBootAdvertising = false;
+    /// Flag as an internal broadcast, controls reply construction (e.g. no
+    /// filtering applied)
+    bool mIsAnnounceBroadcast = false;
 };
 
 class ResourceData
@@ -75,7 +77,7 @@ class ResourceData
 public:
     ResourceData() {}
 
-    ResourceData(const ResourceData &) = default;
+    ResourceData(const ResourceData &)             = default;
     ResourceData & operator=(const ResourceData &) = default;
 
     QType GetType() const { return mType; }

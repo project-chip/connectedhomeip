@@ -23,9 +23,9 @@
 
 #pragma once
 
+#include <ble/Ble.h>
 #include <jni.h>
-
-#include <ble/BleLayer.h>
+#include <lib/support/JniReferences.h>
 #include <platform/internal/BLEManager.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -52,13 +52,14 @@ public:
 
     void InitializeWithObject(jobject managerObject);
 
+    void OnConnectSuccess(void * appState, BLE_CONNECTION_OBJECT connObj);
+    void OnConnectFailed(void * appState, CHIP_ERROR err);
+
 private:
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init();
-    CHIP_ERROR _Shutdown() { return CHIP_NO_ERROR; }
-    CHIPoBLEServiceMode _GetCHIPoBLEServiceMode();
-    CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
+    void _Shutdown() {}
     bool _IsAdvertisingEnabled();
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
     bool _IsAdvertising();
@@ -92,7 +93,8 @@ private:
 
     // ===== Members that implement virtual methods on BleConnectionDelegate.
 
-    void NewConnection(BleLayer * bleLayer, void * appState, uint16_t connDiscriminator) override;
+    void NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) override;
+    void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override{};
     CHIP_ERROR CancelConnection() override;
 
     // ===== Members for internal use by the following friends.
@@ -122,7 +124,7 @@ private:
     CHIP_ERROR HasFlag(Flags flag, bool & has);
     CHIP_ERROR SetFlag(Flags flag, bool isSet);
 
-    jobject mBLEManagerObject = nullptr;
+    chip::JniGlobalReference mBLEManagerObject;
 
     jmethodID mInitMethod    = nullptr;
     jmethodID mSetFlagMethod = nullptr;

@@ -11,40 +11,149 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    31.6.1. [TC-SU-2.5] Tests the different scenarios on the DUT based on the
-    ApplyUpdateResponse response sent by the OTA-P
+    3.4.2. [TC-SU-2.5] Handling different ApplyUpdateResponse scenarios on
+    Requestor
+
+PICS:
+    - MCORE.OTA.Requestor
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:
     - label:
-          "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action
-          field is set to 'Proceed' DelayedActionTime is set to 0."
+          "Step 1: OTA-P/TH sends the ApplyUpdateResponse Command to the DUT.
+          Action field is set to 'Proceed', DelayedActionTime is set to 0."
       verification: |
+          ./chip-ota-provider-app --discriminator 3840 --secured-device-port 5540 --KVS ~/provider/chip_kvs_provider --filepath  ota-requestor-app.ota -a proceed -p 0
+
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
+
           Verify that the DUT starts updating its software.
-          Once the update is finished verify the software version on the DUT to match the version downloaded for the software update.
+          Once the update is finished verify the software version on the DUT  matches the version downloaded for the software update.
+
+          ./chip-tool  basicinformation read software-version 321 0
+
+          Verify the Software-Version value is 2 On TH(chip-tool) log:
+
+          [1653566686.505112][31729:31734] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_000A DataVersion: 259813380
+          [1653566686.505186][31729:31734] CHIP:TOO:   SoftwareVersion: 2
+
+
           Verify on the OTA-P/TH that there is no other ApplyUpdateRequest from the DUT.
       disabled: true
 
     - label:
-          "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action
-          field is set to 'Proceed' DelayedActionTime is set to 5 minutes"
+          "Step 2: OTA-P/TH sends the ApplyUpdateResponse Command to the DUT.
+          Action field is set to 'Proceed', DelayedActionTime is set to 3
+          minutes."
       verification: |
           Run the OTA Provider App using the command:
-          ./chip-ota-provider-app -f sw_image.txt -t 300
 
-          Verify that the DUT starts updating its software after 5 minutes. Once the update is finished verify the software version on the DUT to match the version downloaded for the software update.
+          ./chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin -p 180
+
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
+
+          Verify that the DUT starts updating its software after 3 minutes.Once the update is finished, verify the SoftwareVersion attribute from the Basic Information cluster on the DUT to match the version downloaded for the software update
+
+          [1653635778.270994][7933:7933] CHIP:SWU: ApplyUpdateResponse:
+          [1653635778.271015][7933:7933] CHIP:SWU:   action: 0
+          [1653635778.271031][7933:7933] CHIP:SWU:   delayedActionTime: 180 seconds
+
+          ./chip-tool  basicinformation read software-version 321 0
+
+          Verify the Software-Version value is 2 On TH(chip-tool) log:
+
+          [1653636406.637617][11116:11121] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_000A DataVersion: 1527020963
+          [1653636406.637708][11116:11121] CHIP:TOO:   SoftwareVersion: 2
       disabled: true
 
     - label:
-          "IF (PICS_DT_Vendor_Specific) Apply the OTA Update on DUT using vendor
-          specific mechanism."
+          "Step 3: OTA-P/TH sends the ApplyUpdateResponse Command to the DUT.
+          Action field is set to 'AwaitNextAction', DelayedActionTime is set to
+          1 minute."
       verification: |
-          Use vendor specific steps to apply OTA Update and verify that the DUT starts updating its software.
-          Once the update is finished verify the software version on the DUT to match the version downloaded for the software update.
+          Run the OTA Provider App using the command:
+
+          ./chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin -a awaitNextAction -p 60
+
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
+
+          Verify that the DUT waits for the minimum interval defined by spec which is 2 minutes before re-sending the ApplyUpdateRequest to the OTA-P.
+          Verify that the DUT does not apply the software update within this time.
+
+          [1653640038.385848][8303:8303] CHIP:SWU: ApplyUpdateResponse:
+          [1653640038.385873][8303:8303] CHIP:SWU:   action: 1
+          [1653640038.385895][8303:8303] CHIP:SWU:   delayedActionTime: 60 seconds
+      disabled: true
+
+    - label:
+          "Step 4: OTA-P/TH sends the ApplyUpdateResponse Command to the DUT.
+          Action field is set to 'AwaitNextAction', DelayedActionTime is set to
+          3 minutes. On the subsequent ApplyUpdateRequest command, TH/OTA-P
+          sends the ApplyUpdateResponse back to DUT. Action field is set to
+          'Proceed'."
+      verification: |
+          Run the OTA Provider App using the command:
+
+          ./chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin -a awaitNextAction -p 180
+
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
+
+          On OTA Requestor
+          Verify that the DUT waits for 3 minutes before sending the ApplyUpdateRequest to the OTA-P.
+          Verify that the DUT starts updating its software after the second ApplyUpdateResponse with Proceed action.
+          Once the update is finished, verify the software version from the Basic Information cluster on the DUT to match the version downloaded for the software update.
+
+          [1653651459.546867][9228:9228] CHIP:SWU: ApplyUpdateResponse:
+          [1653651459.546897][9228:9228] CHIP:SWU:   action: 1
+          [1653651459.546923][9228:9228] CHIP:SWU:   delayedActionTime: 180 seconds
+
+          ./chip-tool  basicinformation read software-version 321 0
+
+          Verify that SoftwareVersion value is 2 On TH(chip-tool) log:
+
+          [1653636406.637617][11116:11121] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_000A DataVersion: 1527020963
+          [1653636406.637708][11116:11121] CHIP:TOO:   SoftwareVersion: 2
+      disabled: true
+
+    - label:
+          "Step 5: OTA-P/TH sends the ApplyUpdateResponse Command to the DUT.
+          Action field is set to 'Discontinue'."
+      verification: |
+          Run the OTA Provider App using the command:
+          ./chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin -a  discontinue
+
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
+          Verify that the DUT does not send the NotifyUpdateApplied within a reasonable time.
+
+          Verify that the DUT clears its previously downloaded software image and resets the UpdateState Attribute to Idle (Value 1)
+          ./chip-tool otasoftwareupdaterequestor read update-state 321 0
+
+          Verify the UpdateSate value is 1 On TH(chip-tool) log:
+
+          [1655392988.539869][3147:3153] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002A Attribute 0x0000_0002 DataVersion: 1861243848
+          [1655392988.541680][3147:3153] CHIP:TOO:   UpdateState: 1
+
+          Verify the software version from the Basic Information cluster of the DUT to be the same as it was previously.
+          ./chip-tool  basicinformation read software-version 321 0
+
+          Verify the SoftwareVersion value is 1 On TH(chip-tool) log:
+
+          [1653636406.637617][11116:11121] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_000A DataVersion: 1527020963
+          [1653636406.637708][11116:11121] CHIP:TOO:   SoftwareVersion: 1
       disabled: true

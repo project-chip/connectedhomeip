@@ -24,10 +24,13 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/support/CHIPMemString.h>
+#include <platform/Ameba/AmebaUtils.h>
 #include <platform/Ameba/DiagnosticDataProviderImpl.h>
-#include <platform/DiagnosticDataProvider.h>
 
 #include <lwip_netconf.h>
+
+using namespace chip::DeviceLayer::Internal;
 
 namespace chip {
 namespace DeviceLayer {
@@ -54,6 +57,68 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
 {
     currentHeapHighWatermark = xPortGetTotalHeapSize() - xPortGetMinimumEverFreeHeapSize();
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
+{
+    // If implemented, the server SHALL set the value of the CurrentHeapHighWatermark attribute to the
+    // value of the CurrentHeapUsed.
+
+    xPortResetHeapMinimumEverFreeHeapSize();
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadMetricsOut)
+{
+    /* Obtain all available task information */
+    TaskStatus_t * taskStatusArray;
+    ThreadMetrics * head = nullptr;
+    unsigned long arraySize, x, dummy;
+
+    arraySize = uxTaskGetNumberOfTasks();
+
+    taskStatusArray = (TaskStatus_t *) pvPortMalloc(arraySize * sizeof(TaskStatus_t));
+
+    if (taskStatusArray != NULL)
+    {
+        /* Generate raw status information about each task. */
+        arraySize = uxTaskGetSystemState(taskStatusArray, arraySize, &dummy);
+        /* For each populated position in the taskStatusArray array,
+           format the raw data as human readable ASCII data. */
+
+        for (x = 0; x < arraySize; x++)
+        {
+            ThreadMetrics * thread = (ThreadMetrics *) pvPortMalloc(sizeof(ThreadMetrics));
+
+            Platform::CopyString(thread->NameBuf, taskStatusArray[x].pcTaskName);
+            thread->name.Emplace(CharSpan::fromCharString(thread->NameBuf));
+            thread->id = taskStatusArray[x].xTaskNumber;
+
+            thread->stackFreeMinimum.Emplace(taskStatusArray[x].usStackHighWaterMark);
+            thread->stackSize.Emplace(uxTaskGetStackSize(taskStatusArray[x].xHandle));
+            thread->stackFreeCurrent.Emplace(uxTaskGetFreeStackSize(taskStatusArray[x].xHandle));
+
+            thread->Next = head;
+            head         = thread;
+        }
+
+        *threadMetricsOut = head;
+        /* The array is no longer needed, free the memory it consumes. */
+        vPortFree(taskStatusArray);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void DiagnosticDataProviderImpl::ReleaseThreadMetrics(ThreadMetrics * threadMetrics)
+{
+    while (threadMetrics)
+    {
+        ThreadMetrics * del = threadMetrics;
+        threadMetrics       = threadMetrics->Next;
+        vPortFree(del);
+    }
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetRebootCount(uint16_t & rebootCount)
@@ -124,57 +189,49 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     NetworkInterface * head = NULL;
     struct ifaddrs * ifaddr = nullptr;
 
-    if (xnetif == NULL)
+    // xnetif is never null, no need to check. If we do check with -Werror=address, we get compiler error.
+    for (struct netif * ifa = xnetif; ifa != NULL; ifa = ifa->next)
     {
-        ChipLogError(DeviceLayer, "Failed to get network interfaces");
-    }
-    else
-    {
-        for (struct netif * ifa = xnetif; ifa != NULL; ifa = ifa->next)
+        NetworkInterface * ifp = new NetworkInterface();
+
+        Platform::CopyString(ifp->Name, ifa->name);
+
+        ifp->name          = CharSpan::fromCharString(ifp->Name);
+        ifp->isOperational = true;
+        if ((ifa->flags) & NETIF_FLAG_ETHERNET)
+            ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kEthernet;
+        else
+            ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kWiFi;
+        ifp->offPremiseServicesReachableIPv4.SetNull();
+        ifp->offPremiseServicesReachableIPv6.SetNull();
+
+        memcpy(ifp->MacAddress, ifa->hwaddr, sizeof(ifa->hwaddr));
+
+        if (0)
         {
-            NetworkInterface * ifp = new NetworkInterface();
-
-            strncpy(ifp->Name, ifa->name, Inet::InterfaceId::kMaxIfNameLength);
-            ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
-
-            ifp->name          = CharSpan::fromCharString(ifp->Name);
-            ifp->isOperational = true;
-            if ((ifa->flags) & NETIF_FLAG_ETHERNET)
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ETHERNET;
-            else
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
-            ifp->offPremiseServicesReachableIPv4.SetNull();
-            ifp->offPremiseServicesReachableIPv6.SetNull();
-
-            memcpy(ifp->MacAddress, ifa->hwaddr, sizeof(ifa->hwaddr));
-
-            if (0)
-            {
-                ChipLogError(DeviceLayer, "Failed to get network hardware address");
-            }
-            else
-            {
-                // Set 48-bit IEEE MAC Address
-                ifp->hardwareAddress = ByteSpan(ifp->MacAddress, 6);
-            }
-
-            if (ifa->ip_addr.u_addr.ip4.addr != 0)
-            {
-                memcpy(ifp->Ipv4AddressesBuffer[0], &(ifa->ip_addr.u_addr.ip4.addr), kMaxIPv4AddrSize);
-                ifp->Ipv4AddressSpans[0] = ByteSpan(ifp->Ipv4AddressesBuffer[0], kMaxIPv4AddrSize);
-                ifp->IPv4Addresses       = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv4AddressSpans, 1);
-            }
-
-            if (ifa->ip6_addr->u_addr.ip6.addr != 0)
-            {
-                memcpy(ifp->Ipv6AddressesBuffer[0], &(ifa->ip6_addr->u_addr.ip6.addr), kMaxIPv6AddrSize);
-                ifp->Ipv6AddressSpans[0] = ByteSpan(ifp->Ipv6AddressesBuffer[0], kMaxIPv6AddrSize);
-                ifp->IPv6Addresses       = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv6AddressSpans, 1);
-            }
-
-            ifp->Next = head;
-            head      = ifp;
+            ChipLogError(DeviceLayer, "Failed to get network hardware address");
         }
+        else
+        {
+            // Set 48-bit IEEE MAC Address
+            ifp->hardwareAddress = ByteSpan(ifp->MacAddress, 6);
+        }
+
+        if (ifa->ip_addr.u_addr.ip4.addr != 0)
+        {
+            memcpy(ifp->Ipv4AddressesBuffer[0], &(ifa->ip_addr.u_addr.ip4.addr), kMaxIPv4AddrSize);
+            ifp->Ipv4AddressSpans[0] = ByteSpan(ifp->Ipv4AddressesBuffer[0], kMaxIPv4AddrSize);
+            ifp->IPv4Addresses       = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv4AddressSpans, 1);
+        }
+
+        // ifa->ip6_addr->u_addr.ip6.addr is never null, no need to check. If we do check with -Werror=address, we get compiler
+        // error.
+        memcpy(ifp->Ipv6AddressesBuffer[0], &(ifa->ip6_addr->u_addr.ip6.addr), kMaxIPv6AddrSize);
+        ifp->Ipv6AddressSpans[0] = ByteSpan(ifp->Ipv6AddressesBuffer[0], kMaxIPv6AddrSize);
+        ifp->IPv6Addresses       = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv6AddressSpans, 1);
+
+        ifp->Next = head;
+        head      = ifp;
     }
 
     *netifpp = head;
@@ -192,125 +249,142 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & BssId)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & BssId)
 {
-    CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
-    static uint8_t ameba_bssid[6];
+    CHIP_ERROR err;
+    int32_t error;
 
-    if (wifi_get_ap_bssid(ameba_bssid) == 0)
+    constexpr size_t bssIdSize = 6;
+    VerifyOrReturnError(BssId.size() >= bssIdSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    error = matter_wifi_get_ap_bssid(BssId.data());
+    err   = AmebaUtils::MapError(error, AmebaErrorType::kWiFiError);
+
+    if (err != CHIP_NO_ERROR)
     {
-        err = CHIP_NO_ERROR;
-        ChipLogProgress(DeviceLayer, "%02x,%02x,%02x,%02x,%02x,%02x\n", ameba_bssid[0], ameba_bssid[1], ameba_bssid[2],
-                        ameba_bssid[3], ameba_bssid[4], ameba_bssid[5]);
+        return err;
     }
 
-    BssId = ameba_bssid;
+    BssId.reduce_size(bssIdSize);
+    ChipLogProgress(DeviceLayer, "%02x,%02x,%02x,%02x,%02x,%02x\n", BssId.data()[0], BssId.data()[1], BssId.data()[2],
+                    BssId.data()[3], BssId.data()[4], BssId.data()[5]);
 
-    return CHIP_NO_ERROR;
+    return err;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(uint8_t & wifiVersion)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wifiVersion)
 {
     // Support 802.11a/n Wi-Fi in AmebaD chipset
-    wifiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_802__11N;
+    // TODO: https://github.com/project-chip/connectedhomeip/issues/25542
+    wifiVersion = app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum::kN;
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(uint8_t & securityType)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType)
 {
+    CHIP_ERROR err;
+    int32_t error;
+
+    using app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum;
+
     unsigned int _auth_type;
-    unsigned short _security = 0;
+    unsigned short security = 0;
     rtw_wifi_setting_t setting;
 
-#ifdef CONFIG_PLATFORM_8721D
-    if (wext_get_enc_ext("wlan0", &_security, &setting.key_idx, setting.password) < 0)
+    error = matter_wifi_get_security_type(WLAN0_IDX, &security, &setting.key_idx, setting.password);
+    err   = AmebaUtils::MapError(error, AmebaErrorType::kWiFiError);
+    if (err != CHIP_NO_ERROR)
     {
-        securityType = 0;
+        securityType = SecurityTypeEnum::kUnspecified;
     }
+#ifdef CONFIG_PLATFORM_8721D
     else
     {
-        switch (_security)
+        switch (security)
         {
         case IW_ENCODE_ALG_NONE:
-            setting.security_type = EMBER_ZCL_SECURITY_TYPE_NONE;
+            securityType = SecurityTypeEnum::kNone;
             break;
         case IW_ENCODE_ALG_WEP:
-            setting.security_type = EMBER_ZCL_SECURITY_TYPE_WEP;
+            securityType = SecurityTypeEnum::kWep;
             break;
         case IW_ENCODE_ALG_TKIP:
-            setting.security_type = EMBER_ZCL_SECURITY_TYPE_WPA;
+            securityType = SecurityTypeEnum::kWpa;
             break;
         case IW_ENCODE_ALG_CCMP:
-            setting.security_type = EMBER_ZCL_SECURITY_TYPE_WPA2;
+            securityType = SecurityTypeEnum::kWpa2;
             break;
         default:
-            setting.security_type = EMBER_ZCL_SECURITY_TYPE_UNSPECIFIED;
+            securityType = SecurityTypeEnum::kUnspecified;
             break;
         }
-        securityType = setting.security_type;
     }
 #else
-    wext_get_enc_ext("wlan0", &_security, &setting.key_idx, setting.password);
-    if (wext_get_auth_type("wlan0", &_auth_type) < 0)
-    {
-        securityType = 0;
-    }
     else
     {
-        switch (_security)
+        switch (security)
         {
         case IW_ENCODE_ALG_NONE:
-            setting.security_type = EMBER_ZCL_SECURITY_TYPE_NONE;
+            securityType = SecurityTypeEnum::kNone;
             break;
         case IW_ENCODE_ALG_WEP:
-            setting.security_type = EMBER_ZCL_SECURITY_TYPE_WEP;
+            securityType = SecurityTypeEnum::kWep;
             break;
         case IW_ENCODE_ALG_TKIP:
             if (_auth_type == WPA_SECURITY)
-                setting.security_type = EMBER_ZCL_SECURITY_TYPE_WPA;
+                securityType = SecurityTypeEnum::kWpa;
             else if (_auth_type == WPA2_SECURITY)
-                setting.security_type = EMBER_ZCL_SECURITY_TYPE_WPA2;
+                securityType = SecurityTypeEnum::kWpa2;
             break;
         case IW_ENCODE_ALG_CCMP:
             if (_auth_type == WPA_SECURITY)
-                setting.security_type = EMBER_ZCL_SECURITY_TYPE_WPA;
+                securityType = SecurityTypeEnum::kWpa;
             else if (_auth_type == WPA2_SECURITY)
-                setting.security_type = EMBER_ZCL_SECURITY_TYPE_WPA2;
+                securityType = SecurityTypeEnum::kWpa2;
             else if (_auth_type == WPA3_SECURITY)
-                setting.security_type = EMBER_ZCL_SECURITY_TYPE_WPA3;
+                securityType = SecurityTypeEnum::kWpa3;
             break;
         default:
-            setting.security_type = EMBER_ZCL_SECURITY_TYPE_UNSPECIFIED;
+            securityType = SecurityTypeEnum::kUnspecified;
             break;
         }
-        securityType = setting.security_type;
     }
 #endif
 
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNumber)
 {
+    CHIP_ERROR err;
+    int32_t error;
     unsigned char channel;
 
-    if (wext_get_channel("wlan0", &channel) < 0)
+    error = matter_wifi_get_wifi_channel_number(WLAN0_IDX, &channel);
+    err   = AmebaUtils::MapError(error, AmebaErrorType::kWiFiError);
+    if (err != CHIP_NO_ERROR)
         channelNumber = 0;
     else
         channelNumber = (uint16_t) channel;
 
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
 {
-    int _rssi = 0;
-    if (wifi_get_rssi(&_rssi) < 0)
-        rssi = 0;
-    else
-        rssi = _rssi;
+    CHIP_ERROR err;
+    int32_t error;
 
-    return CHIP_NO_ERROR;
+    error = matter_wifi_get_rssi((int *) &rssi);
+    err   = AmebaUtils::MapError(error, AmebaErrorType::kWiFiError);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        // set rssi to 0 upon error
+        rssi = 0;
+    }
+
+    return err;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
@@ -360,6 +434,11 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()
     return CHIP_NO_ERROR;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
+{
+    return DiagnosticDataProviderImpl::GetDefaultInstance();
+}
 
 } // namespace DeviceLayer
 } // namespace chip

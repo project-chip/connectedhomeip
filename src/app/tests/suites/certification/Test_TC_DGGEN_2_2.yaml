@@ -1,0 +1,186 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 88.2.2. [TC-DGGEN-2.2] Event Functionality [DUT as Server]
+
+PICS:
+    - DGGEN.S
+
+config:
+    nodeId: "0x12344321"
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          "https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/linux#readme
+           Events to be executed as following
+           1. Compile app using below command in connectedhomeip folder
+           a. ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-clang build"
+           2. Build respective app (all-clusters-app)
+           3. Commission DUT to TH
+           4. Open 2nd terminal of DUT and provide the below command to obtain PID of DUT
+           ps  -aef|grep all-clusters-app
+           5. Follow the Verification step below to generate the event in 2nd terminal of DUT "
+      disabled: true
+
+    - label: "Step 1: Commission DUT to TH"
+      verification: |
+          execute the below mentioned command to put DUT into a commissionable state, Pls use equivalent command on the respective DUT
+           ./chip-all-clusters-app
+
+          Once DUT reach the  commissionable state pls send below mentioned command on TH. Pls use equivalent command on the respective DUT
+           ./chip-tool pairing onnetwork 1 20202021
+          Verify the commissioning completed with success on TH(chip-tool) from DUT
+          [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success
+
+          This step can be skipped if done in a preceding test
+      disabled: true
+
+    - label:
+          "Step 2: Induce a DUT hardware failure two times as addressed in
+          HardwareFault ENUM table 11.11.6.1. (Ex. Pull the DUT power plug off
+          causing power source failure, and rejoin DUT back to previous TH
+          fabric. Next, repeat power plug off and rejoining DUT back to previous
+          TH fabric one more time.)"
+      PICS: DGGEN.S.E00
+      verification: |
+          Optional Event so its not compulsory to get the expected outcome
+
+          To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
+          echo '{"Name":"HardwareFaultChange"}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of all-clusters-app)
+
+          ./chip-tool generaldiagnostics read-event hardware-fault-change 1 0
+
+          Verify that HardwareFaultChange Event SHALL indicate a change in the set of hardware faults currently
+          detected by the Node. The current and previous field SHALL represent the set of faults as per Section 11.11.6.1,
+          “HardwareFault enum”, On TH(chip-tool)
+
+          [1684144494.712474][50333:50335] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Event 0x0000_0000
+          [1684144494.712481][50333:50335] CHIP:TOO:   Event number: 4
+          [1684144494.712487][50333:50335] CHIP:TOO:   Priority: Critical
+          [1684144494.712491][50333:50335] CHIP:TOO:   Timestamp: 1684144478245
+          [1684144494.712532][50333:50335] CHIP:TOO:   HardwareFaultChange: {
+          [1684144494.712549][50333:50335] CHIP:TOO:     Current: 4 entries
+          [1684144494.712578][50333:50335] CHIP:TOO:       [1]: 1
+          [1684144494.712588][50333:50335] CHIP:TOO:       [2]: 2
+          [1684144494.712595][50333:50335] CHIP:TOO:       [3]: 5
+          [1684144494.712602][50333:50335] CHIP:TOO:       [4]: 8
+          [1684144494.712610][50333:50335] CHIP:TOO:     Previous: 2 entries
+          [1684144494.712617][50333:50335] CHIP:TOO:       [1]: 1
+          [1684144494.712623][50333:50335] CHIP:TOO:       [2]: 5
+          [1684144494.712630][50333:50335] CHIP:TOO:    }
+          [1684144494.712706][50333:50335] CHIP:EM: <<< [E:38263i S:20357 M:150922929 (Ack:189840504)] (S) Msg TX to 1:0000000000000001 [EDC1] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1684144494.712720][50333:50335] CHIP:IN: (S) Sending msg 150922929 on secure session with LSID: 20357
+      disabled: true
+
+    - label:
+          "Step 3: Induce a DUT radio failure two times as addressed in
+          RadioFault ENUM table 11.11.6.2. (Ex. Put the DUT under metallic cover
+          causing WiFi failure. Uncover DUT and make DUT rejoining DUT back to
+          previous TH fabric. Repeat the radio failure one more time and rejoin
+          DUT back to previous TH fabric."
+      PICS: DGGEN.S.E01
+      verification: |
+          Optional Event so its not compulsory to get the expected outcome
+
+          To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
+
+           echo '{"Name":"RadioFaultChange"}' > /tmp/chip_all_clusters_fifo_<PID>   (PID of all-clusters-app)
+
+          ./chip-tool generaldiagnostics read-event radio-fault-change 1 0
+
+          Verify that RadioFaultChange Event SHALL indicate a change in the set of radio faults currently detected
+          by the Node.TH receives RadioFaultChange event with current and previous data specified by RadioFault ENUM table 11.11.6.2 according to two repeated failures On TH(chip-tool) v
+
+          [1684144521.151145][50343:50345] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Event 0x0000_0001
+          [1684144521.151152][50343:50345] CHIP:TOO:   Event number: 5
+          [1684144521.151160][50343:50345] CHIP:TOO:   Priority: Critical
+          [1684144521.151167][50343:50345] CHIP:TOO:   Timestamp: 1684144512621
+          [1684144521.151208][50343:50345] CHIP:TOO:   RadioFaultChange: {
+          [1684144521.151223][50343:50345] CHIP:TOO:     Current: 4 entries
+          [1684144521.151236][50343:50345] CHIP:TOO:       [1]: 1
+          [1684144521.151248][50343:50345] CHIP:TOO:       [2]: 2
+          [1684144521.151260][50343:50345] CHIP:TOO:       [3]: 3
+          [1684144521.151270][50343:50345] CHIP:TOO:       [4]: 4
+          [1684144521.151283][50343:50345] CHIP:TOO:     Previous: 2 entries
+          [1684144521.151293][50343:50345] CHIP:TOO:       [1]: 1
+          [1684144521.151303][50343:50345] CHIP:TOO:       [2]: 3
+          [1684144521.151313][50343:50345] CHIP:TOO:    }
+          [1684144521.151392][50343:50345] CHIP:EM: <<< [E:9727i S:1308 M:147284449 (Ack:216976802)] (S) Msg TX to 1:0000000000000001 [EDC1] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1684144521.151406][50343:50345] CHIP:IN: (S) Sending msg 147284449 on secure session with LSID: 1308
+      disabled: true
+
+    - label:
+          "Step 4: Induce a DUT radio failure two times as addressed in
+          NetworkFault ENUM table 11.11.6.3. (Ex. Put the DUT under metallic
+          cover causing network failure. Uncover DUT and rejoin DUT back to
+          previous TH fabric. Pull the DUT power plug off causing power source
+          failure. rejoining DUT back to previous TH fabric.)"
+      PICS: DGGEN.S.E02
+      verification: |
+          Optional Event so its not compulsory to get the expected outcome
+
+          To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
+
+           echo '{"Name":"NetworkFaultChange"}' > /tmp/chip_all_clusters_fifo_<PID>   (PID of all-clusters-app)
+
+           ./chip-tool generaldiagnostics read-event network-fault-change 1 0
+
+          Verify that NetworkFaultChange Event SHALL indicate a change in the set of network faults currently
+          TH receives NetworkFaultChange event with current and previous data specified by NetworkFault ENUM table 11.11.2.3 according to two failure causes, On TH(chip-tool)
+
+          [1684144729.918248][50378:50380] CHIP:DMG: }
+          [1684144729.918277][50378:50380] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Event 0x0000_0002
+          [1684144729.918279][50378:50380] CHIP:TOO:   Event number: 6
+          [1684144729.918281][50378:50380] CHIP:TOO:   Priority: Critical
+          [1684144729.918282][50378:50380] CHIP:TOO:   Timestamp: 1684144547365
+          [1684144729.918299][50378:50380] CHIP:TOO:   NetworkFaultChange: {
+          [1684144729.918306][50378:50380] CHIP:TOO:     Current: 3 entries
+          [1684144729.918310][50378:50380] CHIP:TOO:       [1]: 1
+          [1684144729.918312][50378:50380] CHIP:TOO:       [2]: 2
+          [1684144729.918314][50378:50380] CHIP:TOO:       [3]: 3
+          [1684144729.918317][50378:50380] CHIP:TOO:     Previous: 2 entries
+          [1684144729.918319][50378:50380] CHIP:TOO:       [1]: 1
+          [1684144729.918321][50378:50380] CHIP:TOO:       [2]: 2
+          [1684144729.918323][50378:50380] CHIP:TOO:    }
+          [1684144729.918348][50378:50380] CHIP:EM: <<< [E:3897i S:30865 M:110094271 (Ack:224914158)] (S) Msg TX to 1:0000000000000001 [EDC1] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1684144729.918352][50378:50380] CHIP:IN: (S) Sending msg 110094271 on secure session with LSID: 30865
+      disabled: true
+
+    - label:
+          "Step 5: Reboot DUT with a normal reboot process. Rejoin DUT back to
+          previous TH fabric."
+      PICS: DGGEN.S.E03
+      verification: |
+          To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
+
+           echo '{"Name":"<BootReason>"}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of all-clusters-app)
+
+          ./chip-tool generaldiagnostics read-event boot-reason 1 0
+
+          Read the event data of BootReason specified by Table 103 BootReason ENUM table On TH(chip-tool)
+
+          [1684144762.620015][50386:50388] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Event 0x0000_0003
+          [1684144762.620021][50386:50388] CHIP:TOO:   Event number: 0
+          [1684144762.620026][50386:50388] CHIP:TOO:   Priority: Critical
+          [1684144762.620032][50386:50388] CHIP:TOO:   Timestamp: 1684144422477
+          [1684144762.620066][50386:50388] CHIP:TOO:   BootReason: {
+          [1684144762.620084][50386:50388] CHIP:TOO:     BootReason: 0
+          [1684144762.620090][50386:50388] CHIP:TOO:    }
+          [1684144762.620152][50386:50388] CHIP:EM: <<< [E:4771i S:40131 M:192514327 (Ack:118464853)] (S) Msg TX to 1:0000000000000001 [EDC1] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1684144762.620165][50386:50388] CHIP:IN: (S) Sending msg 192514327 on secure session with LSID: 40131
+      disabled: true

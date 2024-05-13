@@ -38,10 +38,6 @@
 
 namespace chip {
 
-namespace Transport {
-class TCPTest;
-};
-
 namespace Inet {
 
 class TCPTest;
@@ -274,7 +270,7 @@ public:
      *  received. The operational semantics are undefined if \c len is larger
      *  than the total outstanding unacknowledged received data.
      */
-    virtual CHIP_ERROR AckReceive(uint16_t len) = 0;
+    virtual CHIP_ERROR AckReceive(size_t len) = 0;
 
     /**
      * @brief   Set the receive queue, for testing.
@@ -295,7 +291,7 @@ public:
      *
      * @return  Number of untransmitted bytes in the transmit queue.
      */
-    uint32_t PendingSendLength();
+    size_t PendingSendLength();
 
     /**
      * @brief   Extract the length of the unacknowledged receive data.
@@ -303,28 +299,18 @@ public:
      * @return  Number of bytes in the receive queue that have not yet been
      *      acknowledged with <tt>AckReceive(uint16_t len)</tt>.
      */
-    uint32_t PendingReceiveLength();
+    size_t PendingReceiveLength();
 
     /**
      * @brief   Initiate TCP half close, in other words, finished with sending.
-     *
-     * @retval  CHIP_NO_ERROR           success: address and port extracted.
-     * @retval  CHIP_ERROR_INCORRECT_STATE  TCP connection not established.
-     *
-     * @retval  other                   another system or platform error
      */
-    CHIP_ERROR Shutdown();
+    void Shutdown();
 
     /**
      * @brief   Initiate TCP full close, in other words, finished with both send and
      *  receive.
-     *
-     * @retval  CHIP_NO_ERROR           success: address and port extracted.
-     * @retval  CHIP_ERROR_INCORRECT_STATE  TCP connection not established.
-     *
-     * @retval  other                   another system or platform error
      */
-    CHIP_ERROR Close();
+    void Close();
 
     /**
      * @brief   Abortively close the endpoint, in other words, send RST packets.
@@ -457,7 +443,7 @@ public:
      *  is the length of the message text added to the TCP transmit window,
      *  which are eligible for sending by the underlying network stack.
      */
-    typedef void (*OnDataSentFunct)(TCPEndPoint * endPoint, uint16_t len);
+    typedef void (*OnDataSentFunct)(TCPEndPoint * endPoint, size_t len);
 
     /**
      * The endpoint's message text transmission event handling function
@@ -539,7 +525,6 @@ public:
     constexpr static size_t kMaxReceiveMessageSize = System::PacketBuffer::kMaxSizeWithoutReserve;
 
 protected:
-    friend class ::chip::Transport::TCPTest;
     friend class TCPTest;
 
     TCPEndPoint(EndPointManager<TCPEndPoint> & endPointManager) :
@@ -609,7 +594,7 @@ protected:
     void DriveReceiving();
     void HandleConnectComplete(CHIP_ERROR err);
     void HandleAcceptError(CHIP_ERROR err);
-    CHIP_ERROR DoClose(CHIP_ERROR err, bool suppressCallback);
+    void DoClose(CHIP_ERROR err, bool suppressCallback);
     static bool IsConnected(State state);
 
     static void TCPConnectTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState);
@@ -635,7 +620,7 @@ protected:
 template <>
 struct EndPointProperties<TCPEndPoint>
 {
-    static constexpr const char * kName   = "TCP";
+    static constexpr char kName[]         = "TCP";
     static constexpr size_t kNumEndPoints = INET_CONFIG_NUM_TCP_ENDPOINTS;
     static constexpr int kSystemStatsKey  = System::Stats::kInetLayer_NumTCPEps;
 };

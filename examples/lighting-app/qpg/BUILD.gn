@@ -44,20 +44,18 @@ qpg_sdk("sdk") {
     "${qpg_project_dir}/include",
   ]
 
-  if (chip_enable_pw_rpc) {
-    defines = [ "PW_RPC_ENABLED" ]
-  }
+  defines = [ "PW_RPC_ENABLED=${chip_enable_pw_rpc}" ]
 }
 
 qpg_executable("lighting_app") {
   output_name = "chip-${qpg_target_ic}-lighting-example.out"
 
-  include_dirs = []
-
   sources = [
-    "${chip_root}/examples/lighting-app/lighting-common/color_format/color_format.cpp",
+    "${chip_root}/src/app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.cpp",
     "${examples_plat_dir}/app/main.cpp",
     "${examples_plat_dir}/ota/ota.cpp",
+    "${examples_plat_dir}/powercycle_counting.c",
+    "include/LightingManager.h",
     "src/AppTask.cpp",
     "src/LightingManager.cpp",
     "src/ZclCallbacks.cpp",
@@ -65,11 +63,16 @@ qpg_executable("lighting_app") {
 
   deps = [
     ":sdk",
-    "${chip_root}/examples/lighting-app/lighting-common",
+    "${chip_root}/examples/lighting-app/lighting-common:color-format",
+    "${chip_root}/examples/lighting-app/qpg/zap/",
+    "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
+    "${chip_root}/third_party/qpg_sdk:qpg_light_factorydata_lib",
+    "${chip_root}/third_party/qpg_sdk:qpg_light_factorydata_lib",
+    "${chip_root}/third_party/qpg_sdk:qpg_light_firmwaredata_lib",
   ]
 
   if (chip_openthread_ftd) {
@@ -81,14 +84,12 @@ qpg_executable("lighting_app") {
   include_dirs = [
     "include",
     "${examples_plat_dir}/ota",
-    "${chip_root}/examples/lighting-app/lighting-common/color_format",
   ]
 
-  defines = []
+  defines = [ "GP_APP_DIVERSITY_POWERCYCLECOUNTING" ]
 
   if (chip_enable_pw_rpc) {
     defines += [
-      "PW_RPC_ENABLED",
       "PW_RPC_ATTRIBUTE_SERVICE=1",
       "PW_RPC_BUTTON_SERVICE=1",
       "PW_RPC_DEVICE_SERVICE=1",
@@ -104,6 +105,7 @@ qpg_executable("lighting_app") {
     ]
 
     deps += [
+      "$dir_pw_hdlc:default_addresses",
       "$dir_pw_hdlc:rpc_channel_output",
       "$dir_pw_stream:sys_io_stream",
       "${chip_root}/config/qpg/lib/pw_rpc:pw_rpc",

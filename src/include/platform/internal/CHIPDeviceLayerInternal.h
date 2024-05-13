@@ -25,7 +25,7 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-extern const char * const TAG;
+extern const char TAG[];
 
 } // namespace Internal
 } // namespace DeviceLayer

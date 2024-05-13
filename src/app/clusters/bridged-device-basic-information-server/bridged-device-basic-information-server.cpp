@@ -22,22 +22,26 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/EventLogging.h>
-#include <app/util/af-enums.h>
+
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <tracing/macros.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::BridgedDeviceBasic;
+using namespace chip::app::Clusters::BridgedDeviceBasicInformation;
+
+using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
 void ReachableChanged(EndpointId endpointId)
 {
+    MATTER_TRACE_INSTANT("ReachableChanged", "BridgeBasicInfo");
     bool reachable = false;
-    if (EMBER_ZCL_STATUS_SUCCESS != Attributes::Reachable::Get(endpointId, &reachable))
+    if (Status::Success != Attributes::Reachable::Get(endpointId, &reachable))
     {
         ChipLogError(Zcl, "ReachabledChanged: Failed to get Reachable value");
     }
@@ -52,9 +56,9 @@ void ReachableChanged(EndpointId endpointId)
 
 } // anonymous namespace
 
-void MatterBridgedDeviceBasicClusterServerAttributeChangedCallback(const ConcreteAttributePath & attributePath)
+void MatterBridgedDeviceBasicInformationClusterServerAttributeChangedCallback(const ConcreteAttributePath & attributePath)
 {
-    if (attributePath.mClusterId != BridgedDeviceBasic::Id)
+    if (attributePath.mClusterId != BridgedDeviceBasicInformation::Id)
     {
         ChipLogError(Zcl, "MatterBridgedDeviceBasicClusterServerAttributeChangedCallback: Incorrect cluster ID");
         return;

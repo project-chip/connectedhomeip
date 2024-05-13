@@ -53,10 +53,9 @@ CHIP_ERROR LinuxThreadDriver::Init(BaseDriver::NetworkStatusChangeCallback * net
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LinuxThreadDriver::Shutdown()
+void LinuxThreadDriver::Shutdown()
 {
     ThreadStackMgrImpl().SetNetworkStatusChangeCallback(nullptr);
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR LinuxThreadDriver::CommitConfiguration()
@@ -196,6 +195,25 @@ bool LinuxThreadDriver::ThreadNetworkIterator::Next(Network & item)
     item.connected = true;
 
     return true;
+}
+
+ThreadCapabilities LinuxThreadDriver::GetSupportedThreadFeatures()
+{
+    BitMask<ThreadCapabilities> capabilites = 0;
+    capabilites.SetField(ThreadCapabilities::kIsBorderRouterCapable, CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER);
+    capabilites.SetField(ThreadCapabilities::kIsRouterCapable, CHIP_DEVICE_CONFIG_THREAD_FTD);
+    capabilites.SetField(ThreadCapabilities::kIsSleepyEndDeviceCapable, !CHIP_DEVICE_CONFIG_THREAD_FTD);
+    capabilites.SetField(ThreadCapabilities::kIsFullThreadDevice, CHIP_DEVICE_CONFIG_THREAD_FTD);
+    capabilites.SetField(ThreadCapabilities::kIsSynchronizedSleepyEndDeviceCapable,
+                         (!CHIP_DEVICE_CONFIG_THREAD_FTD && CHIP_DEVICE_CONFIG_THREAD_SSED));
+    return capabilites;
+}
+
+uint16_t LinuxThreadDriver::GetThreadVersion()
+{
+    // TODO https://github.com/project-chip/connectedhomeip/issues/30602
+    // Needs to be implemented with DBUS io.openthread.BorderRouter Thread API
+    return 0;
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD

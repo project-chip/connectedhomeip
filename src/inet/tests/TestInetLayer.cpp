@@ -25,10 +25,6 @@
  *
  */
 
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
-
 #include <signal.h>
 #include <stdint.h>
 #include <string.h>
@@ -80,7 +76,7 @@ struct TestState
 
 static void HandleSignal(int aSignal);
 static bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue);
-static bool HandleNonOptionArgs(const char * aProgram, int argc, char * argv[]);
+static bool HandleNonOptionArgs(const char * aProgram, int argc, char * const argv[]);
 
 static void StartTest();
 static void CleanupTest();
@@ -205,7 +201,7 @@ static void CheckSucceededOrFailed(TestState & aTestState, bool & aOutSucceeded,
 {
     const TransferStats & lStats = aTestState.mStats;
 
-#if DEBUG
+#ifdef DEBUG_TCP_TEST
     printf("%u/%u sent, %u/%u received\n", lStats.mTransmit.mActual, lStats.mTransmit.mExpected, lStats.mReceive.mActual,
            lStats.mReceive.mExpected);
 #endif
@@ -298,7 +294,7 @@ int main(int argc, char * argv[])
 
         CheckSucceededOrFailed(sTestState, lSucceeded, lFailed);
 
-#if DEBUG
+#ifdef DEBUG_TCP_TEST
         // clang-format off
         printf("%s %s number of expected bytes\n",
                ((lSucceeded) ? "successfully" :
@@ -429,7 +425,7 @@ static bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdent
     return (retval);
 }
 
-bool HandleNonOptionArgs(const char * aProgram, int argc, char * argv[])
+bool HandleNonOptionArgs(const char * aProgram, int argc, char * const argv[])
 {
     if (Common::IsSender())
     {
@@ -569,7 +565,7 @@ static void HandleTCPConnectionClosed(TCPEndPoint * aEndPoint, CHIP_ERROR aError
     }
 }
 
-static void HandleTCPDataSent(TCPEndPoint * aEndPoint, uint16_t len) {}
+static void HandleTCPDataSent(TCPEndPoint * aEndPoint, size_t len) {}
 
 static CHIP_ERROR HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBufferHandle && aBuffer)
 {
@@ -600,8 +596,8 @@ static CHIP_ERROR HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBufferHan
 
     lPeerAddress.ToString(lPeerAddressBuffer);
 
-    printf("TCP message received from %s:%u (%zu bytes)\n", lPeerAddressBuffer, lPeerPort,
-           static_cast<size_t>(aBuffer->DataLength()));
+    printf("TCP message received from %s:%u (%u bytes)\n", lPeerAddressBuffer, lPeerPort,
+           static_cast<unsigned int>(aBuffer->DataLength()));
 
     lCheckPassed = HandleDataReceived(aBuffer, lCheckBuffer, lFirstValue);
     VerifyOrExit(lCheckPassed == true, lStatus = CHIP_ERROR_UNEXPECTED_EVENT);
@@ -869,8 +865,6 @@ static void StartTest()
 
 static void CleanupTest()
 {
-    CHIP_ERROR lStatus;
-
     gSendIntervalExpired = false;
     gSystemLayer.CancelTimer(Common::HandleSendTimerComplete, nullptr);
 
@@ -878,9 +872,7 @@ static void CleanupTest()
 
     if (sTCPIPEndPoint != nullptr)
     {
-        lStatus = sTCPIPEndPoint->Close();
-        INET_FAIL_ERROR(lStatus, "TCPEndPoint::Close failed");
-
+        sTCPIPEndPoint->Close();
         sTCPIPEndPoint->Free();
     }
 

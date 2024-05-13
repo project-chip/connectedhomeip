@@ -25,16 +25,17 @@
  */
 
 #include <inet/InetConfig.h>
+#include <lib/core/CHIPConfig.h>
 
 #include <stdint.h>
 #include <string.h>
 
 #include <sys/time.h>
 
-#if INET_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/dns.h>
 #include <lwip/ip_addr.h>
-#endif // INET_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #include <CHIPVersion.h>
 
@@ -50,14 +51,14 @@ using namespace chip::Inet;
 
 #define TOOL_NAME "TestLwIPDNS"
 
-static bool HandleNonOptionArgs(const char * progName, int argc, char * argv[]);
+static bool HandleNonOptionArgs(const char * progName, int argc, char * const argv[]);
 
 // Globals
 
-#if INET_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 static uint8_t sNumIpAddrs = DNS_MAX_ADDRS_PER_NAME;
 static ip_addr_t sIpAddrs[DNS_MAX_ADDRS_PER_NAME];
-#endif // INET_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 static const char * sHostname      = nullptr;
 static const char * sDNSServerAddr = nullptr;
@@ -76,7 +77,7 @@ static ArgParser::OptionSet * gToolOptionSets[] =
 };
 // clang-format on
 
-#if INET_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 static void found_multi(const char * aName, ip_addr_t * aIpAddrs, uint8_t aNumIpAddrs, void * callback_arg)
 {
     printf("\tfound_multi response\n");
@@ -205,7 +206,7 @@ static void TestLwIPDNS(void)
         printf("\tdns_gethostbyname_multi: %d (expected : ERR_OK)\n", res);
     }
 }
-#endif // INET_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 int main(int argc, char * argv[])
 {
@@ -226,11 +227,11 @@ int main(int argc, char * argv[])
 
     InitNetwork();
 
-#if INET_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     TestLwIPDNS();
 #else
-    fprintf(stderr, "Please assert INET_LWIP to use this test.\n");
-#endif // INET_LWIP
+    fprintf(stderr, "Please assert CHIP_SYSTEM_CONFIG_USE_LWIP to use this test.\n");
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     ShutdownNetwork();
 
@@ -239,7 +240,7 @@ int main(int argc, char * argv[])
     return (EXIT_SUCCESS);
 }
 
-static bool HandleNonOptionArgs(const char * progName, int argc, char * argv[])
+static bool HandleNonOptionArgs(const char * progName, int argc, char * const argv[])
 {
     if (argc < 2)
     {

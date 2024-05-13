@@ -16,6 +16,8 @@
  */
 
 #include <app/clusters/ota-requestor/OTADownloader.h>
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
+#include <platform/CHIPDeviceEvent.h>
 #include <platform/ESP32/ESP32Utils.h>
 
 #include "OTAImageProcessorImpl.h"
@@ -24,6 +26,10 @@
 #include "esp_ota_ops.h"
 #include "esp_system.h"
 #include "lib/core/CHIPError.h"
+
+#if CONFIG_ENABLE_ENCRYPTED_OTA
+#include <esp_encrypted_img.h>
+#endif // CONFIG_ENABLE_ENCRYPTED_OTA
 
 #define TAG "OTAImageProcessor"
 using namespace chip::System;
@@ -36,7 +42,50 @@ void HandleRestart(Layer * systemLayer, void * appState)
 {
     esp_restart();
 }
+
+void PostOTAStateChangeEvent(DeviceLayer::OtaState newState)
+{
+    DeviceLayer::ChipDeviceEvent otaChange;
+    otaChange.Type                     = DeviceLayer::DeviceEventType::kOtaStateChanged;
+    otaChange.OtaStateChanged.newState = newState;
+    CHIP_ERROR error                   = DeviceLayer::PlatformMgr().PostEvent(&otaChange);
+
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(SoftwareUpdate, "Error while posting OtaChange event %" CHIP_ERROR_FORMAT, error.Format());
+    }
+}
+
 } // namespace
+
+bool OTAImageProcessorImpl::IsFirstImageRun()
+{
+    OTARequestorInterface * requestor = GetRequestorInstance();
+    if (requestor == nullptr)
+    {
+        return false;
+    }
+
+    return requestor->GetCurrentUpdateState() == OTARequestorInterface::OTAUpdateStateEnum::kApplying;
+}
+
+CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
+{
+    OTARequestorInterface * requestor = GetRequestorInstance();
+    if (requestor == nullptr)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    uint32_t currentVersion;
+    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(currentVersion));
+    if (currentVersion != requestor->GetTargetVersion())
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    return CHIP_NO_ERROR;
+}
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
@@ -100,18 +149,39 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
         imageProcessor->mDownloader->OnPreparedForDownload(ESP32Utils::MapError(err));
         return;
     }
+
+#if CONFIG_ENABLE_ENCRYPTED_OTA
+    CHIP_ERROR chipError = imageProcessor->DecryptStart();
+    if (chipError != CHIP_NO_ERROR)
+    {
+        ChipLogError(SoftwareUpdate, "Failed to start decryption process, err:%" CHIP_ERROR_FORMAT, chipError.Format());
+        imageProcessor->mDownloader->OnPreparedForDownload(chipError);
+        return;
+    }
+#endif // CONFIG_ENABLE_ENCRYPTED_OTA
+
     imageProcessor->mHeaderParser.Init();
     imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
+    PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadInProgress);
 }
 
 void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 {
-    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
-    if (imageProcessor == nullptr)
+    DeviceLayer::OtaState otaState = DeviceLayer::kOtaDownloadFailed;
+    auto * imageProcessor          = reinterpret_cast<OTAImageProcessorImpl *>(context);
+    VerifyOrReturn(imageProcessor, ChipLogError(SoftwareUpdate, "ImageProcessor context is null"));
+
+#if CONFIG_ENABLE_ENCRYPTED_OTA
+    if (CHIP_NO_ERROR != imageProcessor->DecryptEnd())
     {
-        ChipLogError(SoftwareUpdate, "ImageProcessor context is null");
+        ChipLogError(SoftwareUpdate, "Failed to end pre encrypted OTA");
+        esp_ota_abort(imageProcessor->mOTAUpdateHandle);
+        imageProcessor->ReleaseBlock();
+        PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed);
         return;
     }
+#endif // CONFIG_ENABLE_ENCRYPTED_OTA
+
     esp_err_t err = esp_ota_end(imageProcessor->mOTAUpdateHandle);
     if (err != ESP_OK)
     {
@@ -123,10 +193,15 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
         {
             ESP_LOGE(TAG, "esp_ota_end failed (%s)!", esp_err_to_name(err));
         }
-        return;
     }
+    else
+    {
+        ChipLogProgress(SoftwareUpdate, "OTA image downloaded to offset 0x%" PRIx32, imageProcessor->mOTAUpdatePartition->address);
+        otaState = DeviceLayer::kOtaDownloadComplete;
+    }
+
     imageProcessor->ReleaseBlock();
-    ChipLogProgress(SoftwareUpdate, "OTA image downloaded to offset 0x%x", imageProcessor->mOTAUpdatePartition->address);
+    PostOTAStateChangeEvent(otaState);
 }
 
 void OTAImageProcessorImpl::HandleAbort(intptr_t context)
@@ -137,11 +212,17 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
         ChipLogError(SoftwareUpdate, "ImageProcessor context is null");
         return;
     }
+
+#if CONFIG_ENABLE_ENCRYPTED_OTA
+    imageProcessor->DecryptAbort();
+#endif // CONFIG_ENABLE_ENCRYPTED_OTA
+
     if (esp_ota_abort(imageProcessor->mOTAUpdateHandle) != ESP_OK)
     {
         ESP_LOGE(TAG, "ESP OTA abort failed");
     }
     imageProcessor->ReleaseBlock();
+    PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadAborted);
 }
 
 void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
@@ -165,38 +246,68 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
     {
         ESP_LOGE(TAG, "Failed to process OTA image header");
         imageProcessor->mDownloader->EndDownload(error);
+        PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed);
         return;
     }
 
-    esp_err_t err = esp_ota_write(imageProcessor->mOTAUpdateHandle, block.data(), block.size());
+    esp_err_t err;
+    ByteSpan blockToWrite = block;
+
+#if CONFIG_ENABLE_ENCRYPTED_OTA
+    error = imageProcessor->DecryptBlock(block, blockToWrite);
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(SoftwareUpdate, "esp_encrypted_img_decrypt_data failed err:%d", err);
+        imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
+        PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed);
+        return;
+    }
+#endif // CONFIG_ENABLE_ENCRYPTED_OTA
+
+    err = esp_ota_write(imageProcessor->mOTAUpdateHandle, blockToWrite.data(), blockToWrite.size());
+
+#if CONFIG_ENABLE_ENCRYPTED_OTA
+    free((void *) (blockToWrite.data()));
+#endif // CONFIG_ENABLE_ENCRYPTED_OTA
+
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "esp_ota_write failed (%s)", esp_err_to_name(err));
         imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
+        PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed);
         return;
     }
-    imageProcessor->mParams.downloadedBytes += block.size();
+
+    imageProcessor->mParams.downloadedBytes += blockToWrite.size();
     imageProcessor->mDownloader->FetchNextData();
 }
 
 void OTAImageProcessorImpl::HandleApply(intptr_t context)
 {
+    PostOTAStateChangeEvent(DeviceLayer::kOtaApplyInProgress);
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     esp_err_t err         = esp_ota_set_boot_partition(imageProcessor->mOTAUpdatePartition);
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "esp_ota_set_boot_partition failed (%s)!", esp_err_to_name(err));
+        PostOTAStateChangeEvent(DeviceLayer::kOtaApplyFailed);
         return;
     }
-    ESP_LOGI(TAG, "Applying, Boot partition set offset:0x%x", imageProcessor->mOTAUpdatePartition->address);
+    ESP_LOGI(TAG, "Applying, Boot partition set offset:0x%" PRIx32, imageProcessor->mOTAUpdatePartition->address);
 
+    PostOTAStateChangeEvent(DeviceLayer::kOtaApplyComplete);
+
+#if CONFIG_OTA_AUTO_REBOOT_ON_APPLY
     // HandleApply is called after delayed action time seconds are elapsed, so it would be safe to schedule the restart
-    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(2 * 1000), HandleRestart, nullptr);
+    DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(CONFIG_OTA_AUTO_REBOOT_DELAY_MS), HandleRestart, nullptr);
+#else
+    ESP_LOGI(TAG, "Please reboot the device manually to apply the new image");
+#endif
 }
 
 CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
 {
-    if (!IsSpanUsable(block))
+    if (block.empty())
     {
         ReleaseBlock();
         return CHIP_NO_ERROR;
@@ -207,7 +318,7 @@ CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
         {
             ReleaseBlock();
         }
-        uint8_t * mBlock_ptr = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(block.size()));
+        uint8_t * mBlock_ptr = static_cast<uint8_t *>(Platform::MemoryAlloc(block.size()));
         if (mBlock_ptr == nullptr)
         {
             return CHIP_ERROR_NO_MEMORY;
@@ -227,7 +338,7 @@ CHIP_ERROR OTAImageProcessorImpl::ReleaseBlock()
 {
     if (mBlock.data() != nullptr)
     {
-        chip::Platform::MemoryFree(mBlock.data());
+        Platform::MemoryFree(mBlock.data());
     }
     mBlock = MutableByteSpan();
     return CHIP_NO_ERROR;
@@ -250,5 +361,87 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
 
     return CHIP_NO_ERROR;
 }
+
+#if CONFIG_ENABLE_ENCRYPTED_OTA
+CHIP_ERROR OTAImageProcessorImpl::InitEncryptedOTA(const CharSpan & key)
+{
+    VerifyOrReturnError(mEncryptedOTAEnabled == false, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(!key.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    mKey                 = key;
+    mEncryptedOTAEnabled = true;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OTAImageProcessorImpl::DecryptStart()
+{
+    VerifyOrReturnError(mEncryptedOTAEnabled, CHIP_ERROR_INCORRECT_STATE);
+
+    const esp_decrypt_cfg_t decryptionConfig = {
+        .rsa_priv_key     = mKey.data(),
+        .rsa_priv_key_len = mKey.size(),
+    };
+
+    mOTADecryptionHandle = esp_encrypted_img_decrypt_start(&decryptionConfig);
+    VerifyOrReturnError(mOTADecryptionHandle, CHIP_ERROR_INCORRECT_STATE);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OTAImageProcessorImpl::DecryptEnd()
+{
+    VerifyOrReturnError(mEncryptedOTAEnabled, CHIP_ERROR_INCORRECT_STATE);
+
+    esp_err_t err = esp_encrypted_img_decrypt_end(mOTADecryptionHandle);
+    if (err != ESP_OK)
+    {
+        ChipLogError(SoftwareUpdate, "Failed to end pre encrypted OTA esp_err:%d", err);
+    }
+    mOTADecryptionHandle = nullptr;
+    return ESP32Utils::MapError(err);
+}
+
+void OTAImageProcessorImpl::DecryptAbort()
+{
+    VerifyOrReturn(mEncryptedOTAEnabled);
+
+    esp_err_t err = esp_encrypted_img_decrypt_abort(mOTADecryptionHandle);
+    if (err != ESP_OK)
+    {
+        ChipLogError(SoftwareUpdate, "Failed to abort pre encrypted OTA esp_err:%d", err);
+    }
+    mOTADecryptionHandle = nullptr;
+}
+
+CHIP_ERROR OTAImageProcessorImpl::DecryptBlock(const ByteSpan & blockToDecrypt, ByteSpan & decryptedBlock)
+{
+    VerifyOrReturnError(mEncryptedOTAEnabled, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mOTADecryptionHandle, CHIP_ERROR_INCORRECT_STATE);
+
+    pre_enc_decrypt_arg_t preEncOtaDecryptArgs = {
+        .data_in      = reinterpret_cast<const char *>(blockToDecrypt.data()),
+        .data_in_len  = blockToDecrypt.size(),
+        .data_out     = nullptr,
+        .data_out_len = 0,
+    };
+
+    esp_err_t err = esp_encrypted_img_decrypt_data(mOTADecryptionHandle, &preEncOtaDecryptArgs);
+    if (err != ESP_OK && err != ESP_ERR_NOT_FINISHED)
+    {
+        ChipLogError(SoftwareUpdate, "esp_encrypted_img_decrypt_data failed err:%d", err);
+        return ESP32Utils::MapError(err);
+    }
+
+    ChipLogDetail(SoftwareUpdate, "esp_encrypted_img_decrypt_data data_in_len:%u, data_out_len:%u",
+                  preEncOtaDecryptArgs.data_in_len, preEncOtaDecryptArgs.data_out_len);
+
+    if (preEncOtaDecryptArgs.data_out == nullptr || preEncOtaDecryptArgs.data_out_len <= 0)
+    {
+        ChipLogProgress(SoftwareUpdate, "Decrypted data is null or out len is zero");
+    }
+
+    decryptedBlock = ByteSpan(reinterpret_cast<const uint8_t *>(preEncOtaDecryptArgs.data_out), preEncOtaDecryptArgs.data_out_len);
+    return CHIP_NO_ERROR;
+}
+#endif // CONFIG_ENABLE_ENCRYPTED_OTA
 
 } // namespace chip

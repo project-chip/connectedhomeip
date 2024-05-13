@@ -18,19 +18,24 @@
 #include <credentials/DeviceAttestationConstructor.h>
 #include <credentials/DeviceAttestationVendorReserved.h>
 #include <lib/core/CHIPError.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
-#include <lib/support/UnitTestRegistration.h>
 
 #include <cstdio>
-#include <nlunit-test.h>
+#include <gtest/gtest.h>
 
 using namespace chip;
 using namespace chip::Credentials;
 
-static void TestAttestationElements_Roundtrip(nlTestSuite * inSuite, void * inContext)
+struct TestDeviceAttestationConstruction : public ::testing::Test
+{
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+};
+
+TEST_F(TestDeviceAttestationConstruction, TestAttestationElements_Roundtrip)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::Platform::ScopedMemoryBuffer<uint8_t> attestationElements;
@@ -44,16 +49,21 @@ static void TestAttestationElements_Roundtrip(nlTestSuite * inSuite, void * inCo
         0xab, 0x66, 0x62, 0x2e, 0x9d, 0x26, 0x10, 0x41, 0xf8, 0x0e, 0x97, 0x49, 0xfe, 0xff, 0x78, 0x10, 0x02, 0x49, 0x67,
         0xae, 0xdf, 0x41, 0x38, 0x36, 0x5b, 0x0a, 0x22, 0x57, 0x14, 0x9c, 0x9a, 0x12, 0x3e, 0x0d, 0x30, 0xaa
     };
-    static constexpr uint8_t attestationNonce[] = { 0xe0, 0x42, 0x1b, 0x91, 0xc6, 0xfd, 0xcd, 0xb4, 0x0e, 0x2a, 0x4d,
-                                                    0x2c, 0xf3, 0x1d, 0xb2, 0xb4, 0xe1, 0x8b, 0x41, 0x1b, 0x1d, 0x3a,
-                                                    0xd4, 0xd1, 0x2a, 0x9d, 0x90, 0xaa, 0x8e, 0x52, 0xfa, 0xe2 };
-    static constexpr uint32_t timestamp         = 677103357;
-    static constexpr uint8_t vendorReserved1[]  = { 0x73, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x64, 0x6f,
-                                                   0x72, 0x5f, 0x72, 0x65, 0x73, 0x65, 0x72, 0x76, 0x65, 0x64, 0x31 };
-    static constexpr uint8_t vendorReserved3[]  = { 0x76, 0x65, 0x6e, 0x64, 0x6f, 0x72, 0x5f, 0x72, 0x65, 0x73, 0x65, 0x72,
-                                                   0x76, 0x65, 0x64, 0x33, 0x5f, 0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c, 0x65 };
-    static constexpr uint16_t vendorId          = 0xbeef;
-    static constexpr uint16_t profileNum        = 0xdead;
+    static constexpr uint8_t attestationNonce[] = {
+        0xe0, 0x42, 0x1b, 0x91, 0xc6, 0xfd, 0xcd, 0xb4, 0x0e, 0x2a, 0x4d, 0x2c, 0xf3, 0x1d, 0xb2, 0xb4,
+        0xe1, 0x8b, 0x41, 0x1b, 0x1d, 0x3a, 0xd4, 0xd1, 0x2a, 0x9d, 0x90, 0xaa, 0x8e, 0x52, 0xfa, 0xe2,
+    };
+    static constexpr uint32_t timestamp        = 677103357;
+    static constexpr uint8_t vendorReserved1[] = {
+        0x73, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x64, 0x6f,
+        0x72, 0x5f, 0x72, 0x65, 0x73, 0x65, 0x72, 0x76, 0x65, 0x64, 0x31,
+    };
+    static constexpr uint8_t vendorReserved3[] = {
+        0x76, 0x65, 0x6e, 0x64, 0x6f, 0x72, 0x5f, 0x72, 0x65, 0x73, 0x65, 0x72,
+        0x76, 0x65, 0x64, 0x33, 0x5f, 0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c, 0x65,
+    };
+    static constexpr uint16_t vendorId   = 0xbeef;
+    static constexpr uint16_t profileNum = 0xdead;
     VendorReservedElement vendorReservedArray[2];
     DeviceAttestationVendorReservedConstructor vendorReservedConstructor(vendorReservedArray, 2);
 
@@ -62,7 +72,7 @@ static void TestAttestationElements_Roundtrip(nlTestSuite * inSuite, void * inCo
     attestationElements.Alloc(attestationElementsLen);
     vendorReservedConstructor.addVendorReservedElement(vendorId, profileNum, 1, ByteSpan(vendorReserved1));
     vendorReservedConstructor.addVendorReservedElement(vendorId, profileNum, 3, ByteSpan(vendorReserved3));
-    NL_TEST_ASSERT(inSuite, attestationElements);
+    EXPECT_TRUE(attestationElements);
 
     {
         MutableByteSpan attestationElementsSpan(attestationElements.Get(), attestationElementsLen);
@@ -71,22 +81,22 @@ static void TestAttestationElements_Roundtrip(nlTestSuite * inSuite, void * inCo
         err = ConstructAttestationElements(ByteSpan(certificationDeclaration),
                                            ByteSpan(attestationNonce, sizeof(attestationNonce) - 1), timestamp, ByteSpan(),
                                            vendorReservedConstructor, attestationElementsSpan);
-        NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
 
         // Test with missing mandatory TLV entries
         err = ConstructAttestationElements(ByteSpan(), ByteSpan(attestationNonce), timestamp, ByteSpan(), vendorReservedConstructor,
                                            attestationElementsSpan);
-        NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
 
         // Test with missing mandatory TLV entries
         err = ConstructAttestationElements(ByteSpan(certificationDeclaration), ByteSpan(), timestamp, ByteSpan(),
                                            vendorReservedConstructor, attestationElementsSpan);
-        NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
 
         // Test for success with entirely valid arguments
         err = ConstructAttestationElements(ByteSpan(certificationDeclaration), ByteSpan(attestationNonce), timestamp, ByteSpan(),
                                            vendorReservedConstructor, attestationElementsSpan);
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
         attestationElementsLen = attestationElementsSpan.size();
     }
 
@@ -99,13 +109,13 @@ static void TestAttestationElements_Roundtrip(nlTestSuite * inSuite, void * inCo
     err =
         DeconstructAttestationElements(ByteSpan(attestationElements.Get(), attestationElementsLen), certificationDeclarationSpan,
                                        attestationNonceSpan, timestampDeconstructed, firmwareInfoSpan, vendorReservedDeconstructor);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, certificationDeclarationSpan.data_equal(ByteSpan(certificationDeclaration)));
-    NL_TEST_ASSERT(inSuite, attestationNonceSpan.data_equal(ByteSpan(attestationNonce)));
-    NL_TEST_ASSERT(inSuite, timestamp == timestampDeconstructed);
-    NL_TEST_ASSERT(inSuite, firmwareInfoSpan.empty());
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_TRUE(certificationDeclarationSpan.data_equal(ByteSpan(certificationDeclaration)));
+    EXPECT_TRUE(attestationNonceSpan.data_equal(ByteSpan(attestationNonce)));
+    EXPECT_EQ(timestamp, timestampDeconstructed);
+    EXPECT_TRUE(firmwareInfoSpan.empty());
 
-    NL_TEST_ASSERT(inSuite, vendorReservedConstructor.GetNumberOfElements() == vendorReservedDeconstructor.GetNumberOfElements());
+    EXPECT_EQ(vendorReservedConstructor.GetNumberOfElements(), vendorReservedDeconstructor.GetNumberOfElements());
 
     const VendorReservedElement * constructionElement = vendorReservedConstructor.cbegin();
     VendorReservedElement deconstructionElement;
@@ -113,13 +123,13 @@ static void TestAttestationElements_Roundtrip(nlTestSuite * inSuite, void * inCo
     while ((constructionElement = vendorReservedConstructor.Next()) != nullptr &&
            vendorReservedDeconstructor.GetNextVendorReservedElement(deconstructionElement) == CHIP_NO_ERROR)
     {
-        NL_TEST_ASSERT(inSuite, constructionElement->vendorId == deconstructionElement.vendorId);
-        NL_TEST_ASSERT(inSuite, constructionElement->profileNum == deconstructionElement.profileNum);
-        NL_TEST_ASSERT(inSuite, constructionElement->vendorReservedData.data_equal(deconstructionElement.vendorReservedData));
+        EXPECT_EQ(constructionElement->vendorId, deconstructionElement.vendorId);
+        EXPECT_EQ(constructionElement->profileNum, deconstructionElement.profileNum);
+        EXPECT_TRUE(constructionElement->vendorReservedData.data_equal(deconstructionElement.vendorReservedData));
     }
 }
 
-static void TestAttestationElements_Construction(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestDeviceAttestationConstruction, TestAttestationElements_Construction)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     Platform::ScopedMemoryBuffer<uint8_t> attestationElements;
@@ -147,16 +157,21 @@ static void TestAttestationElements_Construction(nlTestSuite * inSuite, void * i
         0xab, 0x66, 0x62, 0x2e, 0x9d, 0x26, 0x10, 0x41, 0xf8, 0x0e, 0x97, 0x49, 0xfe, 0xff, 0x78, 0x10, 0x02, 0x49, 0x67,
         0xae, 0xdf, 0x41, 0x38, 0x36, 0x5b, 0x0a, 0x22, 0x57, 0x14, 0x9c, 0x9a, 0x12, 0x3e, 0x0d, 0x30, 0xaa
     };
-    static constexpr uint8_t attestationNonce[] = { 0xe0, 0x42, 0x1b, 0x91, 0xc6, 0xfd, 0xcd, 0xb4, 0x0e, 0x2a, 0x4d,
-                                                    0x2c, 0xf3, 0x1d, 0xb2, 0xb4, 0xe1, 0x8b, 0x41, 0x1b, 0x1d, 0x3a,
-                                                    0xd4, 0xd1, 0x2a, 0x9d, 0x90, 0xaa, 0x8e, 0x52, 0xfa, 0xe2 };
-    static constexpr uint32_t timestamp         = 677103357;
-    static constexpr uint8_t vendorReserved1[]  = { 0x73, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x64, 0x6f,
-                                                   0x72, 0x5f, 0x72, 0x65, 0x73, 0x65, 0x72, 0x76, 0x65, 0x64, 0x31 };
-    static constexpr uint8_t vendorReserved3[]  = { 0x76, 0x65, 0x6e, 0x64, 0x6f, 0x72, 0x5f, 0x72, 0x65, 0x73, 0x65, 0x72,
-                                                   0x76, 0x65, 0x64, 0x33, 0x5f, 0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c, 0x65 };
-    static constexpr uint16_t vendorId          = 0xFFF1;
-    static constexpr uint16_t profileNum        = 0x003E;
+    static constexpr uint8_t attestationNonce[] = {
+        0xe0, 0x42, 0x1b, 0x91, 0xc6, 0xfd, 0xcd, 0xb4, 0x0e, 0x2a, 0x4d, 0x2c, 0xf3, 0x1d, 0xb2, 0xb4,
+        0xe1, 0x8b, 0x41, 0x1b, 0x1d, 0x3a, 0xd4, 0xd1, 0x2a, 0x9d, 0x90, 0xaa, 0x8e, 0x52, 0xfa, 0xe2,
+    };
+    static constexpr uint32_t timestamp        = 677103357;
+    static constexpr uint8_t vendorReserved1[] = {
+        0x73, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x64, 0x6f,
+        0x72, 0x5f, 0x72, 0x65, 0x73, 0x65, 0x72, 0x76, 0x65, 0x64, 0x31,
+    };
+    static constexpr uint8_t vendorReserved3[] = {
+        0x76, 0x65, 0x6e, 0x64, 0x6f, 0x72, 0x5f, 0x72, 0x65, 0x73, 0x65, 0x72,
+        0x76, 0x65, 0x64, 0x33, 0x5f, 0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c, 0x65,
+    };
+    static constexpr uint16_t vendorId   = 0xFFF1;
+    static constexpr uint16_t profileNum = 0x003E;
     VendorReservedElement vendorReservedArray[2];
     DeviceAttestationVendorReservedConstructor vendorReserved(vendorReservedArray, 2);
     vendorReserved.addVendorReservedElement(vendorId, profileNum, 1, ByteSpan(vendorReserved1));
@@ -165,21 +180,21 @@ static void TestAttestationElements_Construction(nlTestSuite * inSuite, void * i
     attestationElementsLen = sizeof(certificationDeclaration) + sizeof(attestationNonce) + sizeof(timestamp) +
         sizeof(vendorReserved1) + sizeof(vendorReserved3) + sizeof(uint64_t) * 5;
     attestationElements.Alloc(attestationElementsLen);
-    NL_TEST_ASSERT(inSuite, attestationElements);
+    EXPECT_TRUE(attestationElements);
 
     {
         MutableByteSpan attestationElementsSpan(attestationElements.Get(), attestationElementsLen);
 
         err = ConstructAttestationElements(ByteSpan(certificationDeclaration), ByteSpan(attestationNonce), timestamp, ByteSpan(),
                                            vendorReserved, attestationElementsSpan);
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
         attestationElementsLen = attestationElementsSpan.size();
 
-        NL_TEST_ASSERT(inSuite, attestationElementsSpan.data_equal(ByteSpan(attestationElementsTestVector)));
+        EXPECT_TRUE(attestationElementsSpan.data_equal(ByteSpan(attestationElementsTestVector)));
     }
 }
 
-static void TestAttestationElements_Deconstruction(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestDeviceAttestationConstruction, TestAttestationElements_Deconstruction)
 {
     // This is a test case with only the known TLV tags fields
     constexpr uint8_t attestationElementsTestVectorOnlyKnownTags[] = {
@@ -222,14 +237,19 @@ static void TestAttestationElements_Deconstruction(nlTestSuite * inSuite, void *
         0xab, 0x66, 0x62, 0x2e, 0x9d, 0x26, 0x10, 0x41, 0xf8, 0x0e, 0x97, 0x49, 0xfe, 0xff, 0x78, 0x10, 0x02, 0x49, 0x67,
         0xae, 0xdf, 0x41, 0x38, 0x36, 0x5b, 0x0a, 0x22, 0x57, 0x14, 0x9c, 0x9a, 0x12, 0x3e, 0x0d, 0x30, 0xaa
     };
-    constexpr uint8_t attestationNonceTestVector[] = { 0xe0, 0x42, 0x1b, 0x91, 0xc6, 0xfd, 0xcd, 0xb4, 0x0e, 0x2a, 0x4d,
-                                                       0x2c, 0xf3, 0x1d, 0xb2, 0xb4, 0xe1, 0x8b, 0x41, 0x1b, 0x1d, 0x3a,
-                                                       0xd4, 0xd1, 0x2a, 0x9d, 0x90, 0xaa, 0x8e, 0x52, 0xfa, 0xe2 };
-    constexpr uint32_t timestampTestVector         = 677103357;
-    constexpr uint8_t vendorReserved1TestVector[]  = { 0x73, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x64, 0x6f,
-                                                      0x72, 0x5f, 0x72, 0x65, 0x73, 0x65, 0x72, 0x76, 0x65, 0x64, 0x31 };
-    constexpr uint8_t vendorReserved3TestVector[]  = { 0x76, 0x65, 0x6e, 0x64, 0x6f, 0x72, 0x5f, 0x72, 0x65, 0x73, 0x65, 0x72,
-                                                      0x76, 0x65, 0x64, 0x33, 0x5f, 0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c, 0x65 };
+    constexpr uint8_t attestationNonceTestVector[] = {
+        0xe0, 0x42, 0x1b, 0x91, 0xc6, 0xfd, 0xcd, 0xb4, 0x0e, 0x2a, 0x4d, 0x2c, 0xf3, 0x1d, 0xb2, 0xb4,
+        0xe1, 0x8b, 0x41, 0x1b, 0x1d, 0x3a, 0xd4, 0xd1, 0x2a, 0x9d, 0x90, 0xaa, 0x8e, 0x52, 0xfa, 0xe2,
+    };
+    constexpr uint32_t timestampTestVector        = 677103357;
+    constexpr uint8_t vendorReserved1TestVector[] = {
+        0x73, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x64, 0x6f,
+        0x72, 0x5f, 0x72, 0x65, 0x73, 0x65, 0x72, 0x76, 0x65, 0x64, 0x31,
+    };
+    constexpr uint8_t vendorReserved3TestVector[] = {
+        0x76, 0x65, 0x6e, 0x64, 0x6f, 0x72, 0x5f, 0x72, 0x65, 0x73, 0x65, 0x72,
+        0x76, 0x65, 0x64, 0x33, 0x5f, 0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c, 0x65,
+    };
     const ByteSpan vendorReservedArrayTestVector[] = { ByteSpan{ vendorReserved1TestVector },
                                                        ByteSpan{ vendorReserved3TestVector } };
     constexpr uint16_t vendorIdTestVector          = 0xFFF1;
@@ -251,36 +271,36 @@ static void TestAttestationElements_Deconstruction(nlTestSuite * inSuite, void *
         err = DeconstructAttestationElements(attestationElementsTestCase, certificationDeclarationDeconstructed,
                                              attestationNonceDeconstructed, timestampDeconstructed, firmwareInfoDeconstructed,
                                              vendorReserved);
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
 
-        NL_TEST_ASSERT(inSuite, certificationDeclarationDeconstructed.data_equal(ByteSpan(certificationDeclarationTestVector)));
-        NL_TEST_ASSERT(inSuite, attestationNonceDeconstructed.data_equal(ByteSpan(attestationNonceTestVector)));
-        NL_TEST_ASSERT(inSuite, timestampTestVector == timestampDeconstructed);
-        NL_TEST_ASSERT(inSuite, firmwareInfoDeconstructed.empty());
-        NL_TEST_ASSERT(inSuite, ArraySize(vendorReservedArrayTestVector) == vendorReserved.GetNumberOfElements());
+        EXPECT_TRUE(certificationDeclarationDeconstructed.data_equal(ByteSpan(certificationDeclarationTestVector)));
+        EXPECT_TRUE(attestationNonceDeconstructed.data_equal(ByteSpan(attestationNonceTestVector)));
+        EXPECT_EQ(timestampTestVector, timestampDeconstructed);
+        EXPECT_TRUE(firmwareInfoDeconstructed.empty());
+        EXPECT_EQ(ArraySize(vendorReservedArrayTestVector), vendorReserved.GetNumberOfElements());
         struct VendorReservedElement element;
 
         while (vendorReserved.GetNextVendorReservedElement(element) == CHIP_NO_ERROR)
         {
-            NL_TEST_ASSERT(inSuite, vendorIdTestVector == element.vendorId);
-            NL_TEST_ASSERT(inSuite, profileNumTestVector == element.profileNum);
+            EXPECT_EQ(vendorIdTestVector, element.vendorId);
+            EXPECT_EQ(profileNumTestVector, element.profileNum);
             switch (element.tagNum)
             {
             case 1:
-                NL_TEST_ASSERT(inSuite, element.vendorReservedData.data_equal(vendorReservedArrayTestVector[0]));
+                EXPECT_TRUE(element.vendorReservedData.data_equal(vendorReservedArrayTestVector[0]));
                 break;
             case 3:
-                NL_TEST_ASSERT(inSuite, element.vendorReservedData.data_equal(vendorReservedArrayTestVector[1]));
+                EXPECT_TRUE(element.vendorReservedData.data_equal(vendorReservedArrayTestVector[1]));
                 break;
             default:
-                NL_TEST_ASSERT(inSuite, 0);
+                EXPECT_TRUE(0);
                 break;
             }
         }
     }
 }
 
-static void TestAttestationElements_DeconstructionNoVendorReserved(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestDeviceAttestationConstruction, TestAttestationElements_DeconstructionNoVendorReserved)
 {
     // This is a test case with only the known TLV tags fields
     constexpr uint8_t attestationElementsTestVectorNoVendor[] = {
@@ -302,10 +322,11 @@ static void TestAttestationElements_DeconstructionNoVendorReserved(nlTestSuite *
         0xab, 0x66, 0x62, 0x2e, 0x9d, 0x26, 0x10, 0x41, 0xf8, 0x0e, 0x97, 0x49, 0xfe, 0xff, 0x78, 0x10, 0x02, 0x49, 0x67,
         0xae, 0xdf, 0x41, 0x38, 0x36, 0x5b, 0x0a, 0x22, 0x57, 0x14, 0x9c, 0x9a, 0x12, 0x3e, 0x0d, 0x30, 0xaa
     };
-    constexpr uint8_t attestationNonceTestVector[] = { 0xe0, 0x42, 0x1b, 0x91, 0xc6, 0xfd, 0xcd, 0xb4, 0x0e, 0x2a, 0x4d,
-                                                       0x2c, 0xf3, 0x1d, 0xb2, 0xb4, 0xe1, 0x8b, 0x41, 0x1b, 0x1d, 0x3a,
-                                                       0xd4, 0xd1, 0x2a, 0x9d, 0x90, 0xaa, 0x8e, 0x52, 0xfa, 0xe2 };
-    constexpr uint32_t timestampTestVector         = 677103357;
+    constexpr uint8_t attestationNonceTestVector[] = {
+        0xe0, 0x42, 0x1b, 0x91, 0xc6, 0xfd, 0xcd, 0xb4, 0x0e, 0x2a, 0x4d, 0x2c, 0xf3, 0x1d, 0xb2, 0xb4,
+        0xe1, 0x8b, 0x41, 0x1b, 0x1d, 0x3a, 0xd4, 0xd1, 0x2a, 0x9d, 0x90, 0xaa, 0x8e, 0x52, 0xfa, 0xe2,
+    };
+    constexpr uint32_t timestampTestVector = 677103357;
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     ByteSpan certificationDeclarationDeconstructed;
@@ -317,19 +338,19 @@ static void TestAttestationElements_DeconstructionNoVendorReserved(nlTestSuite *
     err = DeconstructAttestationElements(ByteSpan{ attestationElementsTestVectorNoVendor }, certificationDeclarationDeconstructed,
                                          attestationNonceDeconstructed, timestampDeconstructed, firmwareInfoDeconstructed,
                                          vendorReserved);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, certificationDeclarationDeconstructed.data_equal(ByteSpan(certificationDeclarationTestVector)));
-    NL_TEST_ASSERT(inSuite, attestationNonceDeconstructed.data_equal(ByteSpan(attestationNonceTestVector)));
-    NL_TEST_ASSERT(inSuite, timestampTestVector == timestampDeconstructed);
-    NL_TEST_ASSERT(inSuite, firmwareInfoDeconstructed.empty());
-    NL_TEST_ASSERT(inSuite, 0 == vendorReserved.GetNumberOfElements());
+    EXPECT_TRUE(certificationDeclarationDeconstructed.data_equal(ByteSpan(certificationDeclarationTestVector)));
+    EXPECT_TRUE(attestationNonceDeconstructed.data_equal(ByteSpan(attestationNonceTestVector)));
+    EXPECT_EQ(timestampTestVector, timestampDeconstructed);
+    EXPECT_TRUE(firmwareInfoDeconstructed.empty());
+    EXPECT_EQ(vendorReserved.GetNumberOfElements(), 0u);
     struct VendorReservedElement element;
 
-    NL_TEST_ASSERT(inSuite, vendorReserved.GetNextVendorReservedElement(element) == CHIP_END_OF_TLV);
+    EXPECT_EQ(vendorReserved.GetNextVendorReservedElement(element), CHIP_END_OF_TLV);
 }
 
-static void TestVendorReservedData(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestDeviceAttestationConstruction, TestVendorReservedData)
 {
 
     struct VendorReservedElement inputArray[] = { { 3000, 100, 10 }, { 2999, 99, 10 },  { 10, 20, 100 },
@@ -347,7 +368,7 @@ static void TestVendorReservedData(nlTestSuite * inSuite, void * inContext)
             vendorReserved.addVendorReservedElement(inputArray[i].vendorId, inputArray[i].profileNum, inputArray[i].tagNum,
                                                     ByteSpan(strings[i], strlen(reinterpret_cast<char *>(strings[i]))));
 
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
     }
 
     // manually figure out the order these should be read out in when sorted
@@ -356,24 +377,23 @@ static void TestVendorReservedData(nlTestSuite * inSuite, void * inContext)
     };
 
     const struct VendorReservedElement * element = vendorReserved.cbegin();
-    NL_TEST_ASSERT(inSuite, element);
-    NL_TEST_ASSERT(inSuite, element = vendorReserved.Next());
+    EXPECT_TRUE(element);
+    EXPECT_TRUE(element = vendorReserved.Next());
 
     for (i = 0; element && i < ArraySize(desiredOrder); element = vendorReserved.Next(), i++)
     {
-        NL_TEST_ASSERT(inSuite,
-                       element->vendorId == desiredOrder[i]->vendorId && element->profileNum == desiredOrder[i]->profileNum &&
-                           element->tagNum == desiredOrder[i]->tagNum);
+        EXPECT_TRUE(element->vendorId == desiredOrder[i]->vendorId && element->profileNum == desiredOrder[i]->profileNum &&
+                    element->tagNum == desiredOrder[i]->tagNum);
     }
-    NL_TEST_ASSERT(inSuite, i == ArraySize(desiredOrder)); // check if previous loop matched for every array entry.
+    EXPECT_EQ(i, ArraySize(desiredOrder)); // check if previous loop matched for every array entry.
 
     // add another element, it should fail
     uint8_t testByteSpan[] = { 0x1, 0x2, 0x3 };
     CHIP_ERROR err         = vendorReserved.addVendorReservedElement(5, 10, 20, ByteSpan(testByteSpan));
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NO_MEMORY);
+    EXPECT_EQ(err, CHIP_ERROR_NO_MEMORY);
 }
 
-static void TestAttestationElements_DeconstructionWithFirmwareInfo(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestDeviceAttestationConstruction, TestAttestationElements_DeconstructionWithFirmwareInfo)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -404,11 +424,12 @@ static void TestAttestationElements_DeconstructionWithFirmwareInfo(nlTestSuite *
         0xab, 0x66, 0x62, 0x2e, 0x9d, 0x26, 0x10, 0x41, 0xf8, 0x0e, 0x97, 0x49, 0xfe, 0xff, 0x78, 0x10, 0x02, 0x49, 0x67,
         0xae, 0xdf, 0x41, 0x38, 0x36, 0x5b, 0x0a, 0x22, 0x57, 0x14, 0x9c, 0x9a, 0x12, 0x3e, 0x0d, 0x30, 0xaa
     };
-    static constexpr uint8_t attestationNonceTestVector[] = { 0xe0, 0x42, 0x1b, 0x91, 0xc6, 0xfd, 0xcd, 0xb4, 0x0e, 0x2a, 0x4d,
-                                                              0x2c, 0xf3, 0x1d, 0xb2, 0xb4, 0xe1, 0x8b, 0x41, 0x1b, 0x1d, 0x3a,
-                                                              0xd4, 0xd1, 0x2a, 0x9d, 0x90, 0xaa, 0x8e, 0x52, 0xfa, 0xe2 };
-    static constexpr uint32_t timestampTestVector         = 677103357;
-    static constexpr uint8_t firmwareInfoTestVector[]     = {
+    static constexpr uint8_t attestationNonceTestVector[] = {
+        0xe0, 0x42, 0x1b, 0x91, 0xc6, 0xfd, 0xcd, 0xb4, 0x0e, 0x2a, 0x4d, 0x2c, 0xf3, 0x1d, 0xb2, 0xb4,
+        0xe1, 0x8b, 0x41, 0x1b, 0x1d, 0x3a, 0xd4, 0xd1, 0x2a, 0x9d, 0x90, 0xaa, 0x8e, 0x52, 0xfa, 0xe2,
+    };
+    static constexpr uint32_t timestampTestVector     = 677103357;
+    static constexpr uint8_t firmwareInfoTestVector[] = {
         0x30, 0x67, 0x80, 0x01, 0x05, 0xA1, 0x62, 0x30, 0x2F, 0xA0, 0x0B, 0x80, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65,
         0x03, 0x04, 0x02, 0x01, 0x81, 0x20, 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA, 0xBB,
         0xCC, 0xDD, 0xEE, 0xFF, 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD,
@@ -416,8 +437,10 @@ static void TestAttestationElements_DeconstructionWithFirmwareInfo(nlTestSuite *
         0x20, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F, 0x10,
         0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F
     };
-    static constexpr uint8_t vendorReserved1TestVector[] = { 0x73, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x64, 0x6f,
-                                                             0x72, 0x5f, 0x72, 0x65, 0x73, 0x65, 0x72, 0x76, 0x65, 0x64, 0x31 };
+    static constexpr uint8_t vendorReserved1TestVector[] = {
+        0x73, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x64, 0x6f,
+        0x72, 0x5f, 0x72, 0x65, 0x73, 0x65, 0x72, 0x76, 0x65, 0x64, 0x31,
+    };
     static constexpr uint8_t vendorReserved3TestVector[] = {
         0x76, 0x65, 0x6e, 0x64, 0x6f, 0x72, 0x5f, 0x72, 0x65, 0x73, 0x65, 0x72,
         0x76, 0x65, 0x64, 0x33, 0x5f, 0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c, 0x65
@@ -437,39 +460,39 @@ static void TestAttestationElements_DeconstructionWithFirmwareInfo(nlTestSuite *
     err = DeconstructAttestationElements(ByteSpan(attestationElementsTestVectorWithFirmwareInfo),
                                          certificationDeclarationDeconstructed, attestationNonceDeconstructed,
                                          timestampDeconstructed, firmwareInfoDeconstructed, vendorReserved);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, certificationDeclarationDeconstructed.data_equal(ByteSpan(certificationDeclarationTestVector)));
-    NL_TEST_ASSERT(inSuite, attestationNonceDeconstructed.data_equal(ByteSpan(attestationNonceTestVector)));
-    NL_TEST_ASSERT(inSuite, timestampTestVector == timestampDeconstructed);
-    NL_TEST_ASSERT(inSuite, firmwareInfoDeconstructed.data_equal(ByteSpan(firmwareInfoTestVector)));
-    NL_TEST_ASSERT(inSuite, ArraySize(vendorReservedArrayTestVector) == vendorReserved.GetNumberOfElements());
+    EXPECT_TRUE(certificationDeclarationDeconstructed.data_equal(ByteSpan(certificationDeclarationTestVector)));
+    EXPECT_TRUE(attestationNonceDeconstructed.data_equal(ByteSpan(attestationNonceTestVector)));
+    EXPECT_EQ(timestampTestVector, timestampDeconstructed);
+    EXPECT_TRUE(firmwareInfoDeconstructed.data_equal(ByteSpan(firmwareInfoTestVector)));
+    EXPECT_EQ(ArraySize(vendorReservedArrayTestVector), vendorReserved.GetNumberOfElements());
     struct VendorReservedElement element;
     size_t elementsSeen = 0;
 
     while (vendorReserved.GetNextVendorReservedElement(element) == CHIP_NO_ERROR)
     {
-        NL_TEST_ASSERT(inSuite, vendorIdTestVector == element.vendorId);
-        NL_TEST_ASSERT(inSuite, profileNumTestVector == element.profileNum);
+        EXPECT_EQ(vendorIdTestVector, element.vendorId);
+        EXPECT_EQ(profileNumTestVector, element.profileNum);
         switch (element.tagNum)
         {
         case 1:
-            NL_TEST_ASSERT(inSuite, element.vendorReservedData.data_equal(vendorReservedArrayTestVector[0]));
+            EXPECT_TRUE(element.vendorReservedData.data_equal(vendorReservedArrayTestVector[0]));
             elementsSeen++;
             break;
         case 3:
-            NL_TEST_ASSERT(inSuite, element.vendorReservedData.data_equal(vendorReservedArrayTestVector[1]));
+            EXPECT_TRUE(element.vendorReservedData.data_equal(vendorReservedArrayTestVector[1]));
             elementsSeen++;
             break;
         default:
-            NL_TEST_ASSERT(inSuite, 0);
+            EXPECT_TRUE(0);
             break;
         }
     }
-    NL_TEST_ASSERT(inSuite, elementsSeen == ArraySize(vendorReservedArrayTestVector));
+    EXPECT_EQ(elementsSeen, ArraySize(vendorReservedArrayTestVector));
 }
 
-static void TestAttestationElements_DeconstructionUnordered(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestDeviceAttestationConstruction, TestAttestationElements_DeconstructionUnordered)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -497,17 +520,42 @@ static void TestAttestationElements_DeconstructionUnordered(nlTestSuite * inSuit
     err = DeconstructAttestationElements(ByteSpan(attestationElementsUnorderedTestVector), certificationDeclarationDeconstructed,
                                          attestationNonceDeconstructed, timestampDeconstructed, firmwareInfoDeconstructed,
                                          vendorReserved);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    EXPECT_EQ(err, CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
 }
 
-static void TestNocsrElements_Construction(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestDeviceAttestationConstruction, TestAttestationElements_DeconstructionCorruptedTLV)
 {
-    static constexpr uint8_t kNocsrNonce[32] = {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    using chip::FormatCHIPError;
+
+    // last element in the TLV 0x30 0x10 0x37 is engineered to generate a TLV
+    // underrun error -- the element claims to be an octet string with a length
+    // of 0x37 bytes but no data is actually present
+    constexpr uint8_t attestationElementsCorruptedTLVTestVector[] = {
+        0x15, 0x30, 0x01, 0x70, 0xd2, 0x84, 0x4b, 0xa2, 0x01, 0x26, 0x04, 0x46, 0x63, 0x73, 0x61, 0x63, 0x64, 0x30, 0xa0, 0x58,
+        0x1d, 0x15, 0x25, 0x01, 0x88, 0x99, 0x25, 0x02, 0xfe, 0xff, 0x25, 0x03, 0xd2, 0x04, 0x25, 0x04, 0x2e, 0x16, 0x24, 0x05,
+        0xaa, 0x25, 0x06, 0xde, 0xc0, 0x25, 0x07, 0x94, 0x26, 0x18, 0x58, 0x40, 0x96, 0x57, 0x2d, 0xd6, 0x3c, 0x03, 0x64, 0x0b,
+        0x28, 0x67, 0x02, 0xbd, 0x6b, 0xba, 0x48, 0xac, 0x7c, 0x83, 0x54, 0x9b, 0x68, 0x73, 0x29, 0x47, 0x48, 0xb9, 0x51, 0xd5,
+        0xab, 0x66, 0x62, 0x2e, 0x9d, 0x26, 0x10, 0x41, 0xf8, 0x0e, 0x97, 0x49, 0xfe, 0xff, 0x78, 0x10, 0x02, 0x49, 0x67, 0xae,
+        0xdf, 0x41, 0x38, 0x36, 0x5b, 0x0a, 0x22, 0x57, 0x14, 0x9c, 0x9a, 0x12, 0x3e, 0x0d, 0x30, 0xaa, 0x30, 0x02, 0x20, 0xe0,
+        0x42, 0x1b, 0x91, 0xc6, 0xfd, 0xcd, 0xb4, 0x0e, 0x2a, 0x4d, 0x2c, 0xf3, 0x1d, 0xb2, 0xb4, 0xe1, 0x8b, 0x41, 0x1b, 0x1d,
+        0x3a, 0xd4, 0xd1, 0x2a, 0x9d, 0x90, 0xaa, 0x8e, 0x52, 0xfa, 0xe2, 0x26, 0x03, 0xfd, 0xc6, 0x5b, 0x28, 0x30, 0x10, 0x37
+    };
+
+    DeviceAttestationVendorReservedDeconstructor vendorReserved;
+    size_t count = 2;
+    err          = vendorReserved.PrepareToReadVendorReservedElements(ByteSpan(attestationElementsCorruptedTLVTestVector), count);
+    EXPECT_EQ(err, CHIP_ERROR_TLV_UNDERRUN);
+}
+
+TEST_F(TestDeviceAttestationConstruction, TestNocsrElements_Construction)
+{
+    static constexpr uint8_t kNocsrNonce[] = {
         0x81, 0x4a, 0x4d, 0x4c, 0x1c, 0x4a, 0x8e, 0xbb, 0xea, 0xdb, 0x0a, 0xe2, 0x82, 0xf9, 0x91, 0xeb,
         0x13, 0xac, 0x5f, 0x9f, 0xce, 0x94, 0x30, 0x93, 0x19, 0xaa, 0x94, 0x09, 0x6c, 0x8c, 0xd4, 0xb8,
     };
 
-    static constexpr uint8_t kExampleCsr[221] = {
+    static constexpr uint8_t kExampleCsr[] = {
         0x30, 0x81, 0xda, 0x30, 0x81, 0x81, 0x02, 0x01, 0x00, 0x30, 0x0e, 0x31, 0x0c, 0x30, 0x0a, 0x06, 0x03, 0x55, 0x04,
         0x0a, 0x0c, 0x03, 0x43, 0x53, 0x41, 0x30, 0x59, 0x30, 0x13, 0x06, 0x07, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x02, 0x01,
         0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03, 0x01, 0x07, 0x03, 0x42, 0x00, 0x04, 0x5c, 0xa2, 0x79, 0xe3, 0x66,
@@ -522,17 +570,17 @@ static void TestNocsrElements_Construction(nlTestSuite * inSuite, void * inConte
         0x72, 0x1c, 0x58, 0x0b, 0x6e, 0xae, 0x21, 0xbe, 0x5e, 0x6d, 0x0c, 0x72,
     };
 
-    const uint8_t kVendorReserved1[23] = {
+    const uint8_t kVendorReserved1[] = {
         0x73, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x64, 0x6f,
         0x72, 0x5f, 0x72, 0x65, 0x73, 0x65, 0x72, 0x76, 0x65, 0x64, 0x31,
     };
 
-    const uint8_t kVendorReserved3[24] = {
+    const uint8_t kVendorReserved3[] = {
         0x76, 0x65, 0x6e, 0x64, 0x6f, 0x72, 0x5f, 0x72, 0x65, 0x73, 0x65, 0x72,
         0x76, 0x65, 0x64, 0x33, 0x5f, 0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c, 0x65,
     };
 
-    const uint8_t kNoCsrElementsVector[314] = {
+    const uint8_t kNoCsrElementsVector[] = {
         0x15, 0x30, 0x01, 0xdd, 0x30, 0x81, 0xda, 0x30, 0x81, 0x81, 0x02, 0x01, 0x00, 0x30, 0x0e, 0x31, 0x0c, 0x30, 0x0a, 0x06,
         0x03, 0x55, 0x04, 0x0a, 0x0c, 0x03, 0x43, 0x53, 0x41, 0x30, 0x59, 0x30, 0x13, 0x06, 0x07, 0x2a, 0x86, 0x48, 0xce, 0x3d,
         0x02, 0x01, 0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03, 0x01, 0x07, 0x03, 0x42, 0x00, 0x04, 0x5c, 0xa2, 0x79, 0xe3,
@@ -556,25 +604,25 @@ static void TestNocsrElements_Construction(nlTestSuite * inSuite, void * inConte
         TLV::EstimateStructOverhead(sizeof(kExampleCsr), sizeof(kNocsrNonce), sizeof(kVendorReserved1), sizeof(kVendorReserved3));
 
     nocsrElements.Alloc(nocsrElementsLen);
-    NL_TEST_ASSERT(inSuite, nocsrElements.Get() != nullptr);
+    ASSERT_NE(nocsrElements.Get(), nullptr);
 
     MutableByteSpan nocsrElementsSpan(nocsrElements.Get(), nocsrElementsLen);
 
     CHIP_ERROR err = ConstructNOCSRElements(ByteSpan(kExampleCsr), ByteSpan(kNocsrNonce), ByteSpan{ kVendorReserved1 }, ByteSpan{},
                                             ByteSpan{ kVendorReserved3 }, nocsrElementsSpan);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, nocsrElementsSpan.size() <= nocsrElementsLen);
-    NL_TEST_ASSERT(inSuite, nocsrElementsSpan.data_equal(ByteSpan(kNoCsrElementsVector)));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_LE(nocsrElementsSpan.size(), nocsrElementsLen);
+    EXPECT_TRUE(nocsrElementsSpan.data_equal(ByteSpan(kNoCsrElementsVector)));
 }
 
-static void TestNocsrElements_Deconstruction(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestDeviceAttestationConstruction, TestNocsrElements_Deconstruction)
 {
-    static constexpr uint8_t kNocsrNonce[32] = {
+    static constexpr uint8_t kNocsrNonce[] = {
         0x81, 0x4a, 0x4d, 0x4c, 0x1c, 0x4a, 0x8e, 0xbb, 0xea, 0xdb, 0x0a, 0xe2, 0x82, 0xf9, 0x91, 0xeb,
         0x13, 0xac, 0x5f, 0x9f, 0xce, 0x94, 0x30, 0x93, 0x19, 0xaa, 0x94, 0x09, 0x6c, 0x8c, 0xd4, 0xb8,
     };
 
-    static constexpr uint8_t kExampleCsr[221] = {
+    static constexpr uint8_t kExampleCsr[] = {
         0x30, 0x81, 0xda, 0x30, 0x81, 0x81, 0x02, 0x01, 0x00, 0x30, 0x0e, 0x31, 0x0c, 0x30, 0x0a, 0x06, 0x03, 0x55, 0x04,
         0x0a, 0x0c, 0x03, 0x43, 0x53, 0x41, 0x30, 0x59, 0x30, 0x13, 0x06, 0x07, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x02, 0x01,
         0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03, 0x01, 0x07, 0x03, 0x42, 0x00, 0x04, 0x5c, 0xa2, 0x79, 0xe3, 0x66,
@@ -589,17 +637,17 @@ static void TestNocsrElements_Deconstruction(nlTestSuite * inSuite, void * inCon
         0x72, 0x1c, 0x58, 0x0b, 0x6e, 0xae, 0x21, 0xbe, 0x5e, 0x6d, 0x0c, 0x72,
     };
 
-    const uint8_t kVendorReserved1[23] = {
+    const uint8_t kVendorReserved1[] = {
         0x73, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x5f, 0x76, 0x65, 0x6e, 0x64, 0x6f,
         0x72, 0x5f, 0x72, 0x65, 0x73, 0x65, 0x72, 0x76, 0x65, 0x64, 0x31,
     };
 
-    const uint8_t kVendorReserved3[24] = {
+    const uint8_t kVendorReserved3[] = {
         0x76, 0x65, 0x6e, 0x64, 0x6f, 0x72, 0x5f, 0x72, 0x65, 0x73, 0x65, 0x72,
         0x76, 0x65, 0x64, 0x33, 0x5f, 0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c, 0x65,
     };
 
-    const uint8_t kNoCsrElementsVector[314] = {
+    const uint8_t kNoCsrElementsVector[] = {
         0x15, 0x30, 0x01, 0xdd, 0x30, 0x81, 0xda, 0x30, 0x81, 0x81, 0x02, 0x01, 0x00, 0x30, 0x0e, 0x31, 0x0c, 0x30, 0x0a, 0x06,
         0x03, 0x55, 0x04, 0x0a, 0x0c, 0x03, 0x43, 0x53, 0x41, 0x30, 0x59, 0x30, 0x13, 0x06, 0x07, 0x2a, 0x86, 0x48, 0xce, 0x3d,
         0x02, 0x01, 0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03, 0x01, 0x07, 0x03, 0x42, 0x00, 0x04, 0x5c, 0xa2, 0x79, 0xe3,
@@ -625,65 +673,10 @@ static void TestNocsrElements_Deconstruction(nlTestSuite * inSuite, void * inCon
     ByteSpan vendorReserved3Span;
     CHIP_ERROR err = DeconstructNOCSRElements(ByteSpan(kNoCsrElementsVector), csrSpan, csrNonceSpan, vendorReserved1Span,
                                               vendorReserved2Span, vendorReserved3Span);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, csrSpan.data_equal(ByteSpan(kExampleCsr)));
-    NL_TEST_ASSERT(inSuite, csrNonceSpan.data_equal(ByteSpan(kNocsrNonce)));
-    NL_TEST_ASSERT(inSuite, vendorReserved1Span.data_equal(ByteSpan(kVendorReserved1)));
-    NL_TEST_ASSERT(inSuite, vendorReserved2Span.empty());
-    NL_TEST_ASSERT(inSuite, vendorReserved3Span.data_equal(ByteSpan(kVendorReserved3)));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_TRUE(csrSpan.data_equal(ByteSpan(kExampleCsr)));
+    EXPECT_TRUE(csrNonceSpan.data_equal(ByteSpan(kNocsrNonce)));
+    EXPECT_TRUE(vendorReserved1Span.data_equal(ByteSpan(kVendorReserved1)));
+    EXPECT_TRUE(vendorReserved2Span.empty());
+    EXPECT_TRUE(vendorReserved3Span.data_equal(ByteSpan(kVendorReserved3)));
 }
-
-/**
- *   Test Suite. It lists all the test functions.
- */
-// clang-format off
-static const nlTest sTests[] = {
-    NL_TEST_DEF("Test Device Attestation Elements Roundtrip", TestAttestationElements_Roundtrip),
-    NL_TEST_DEF("Test Device Attestation Elements Construction", TestAttestationElements_Construction),
-    NL_TEST_DEF("Test Device Attestation Elements Deconstruction", TestAttestationElements_Deconstruction),
-    NL_TEST_DEF("Test Vendor Reserved Data Ordering", TestVendorReservedData),
-    NL_TEST_DEF("Test Device Attestation Elements Deconstruction with Firmware Information", TestAttestationElements_DeconstructionWithFirmwareInfo),
-    NL_TEST_DEF("Test Device Attestation Elements Deconstruction - Corrupted/Out of Order TLV", TestAttestationElements_DeconstructionUnordered),
-    NL_TEST_DEF("Test Device Attestation Elements Deconstruction - No vendor reserved", TestAttestationElements_DeconstructionNoVendorReserved),
-    NL_TEST_DEF("Test Device NOCSR Elements Construction", TestNocsrElements_Construction),
-    NL_TEST_DEF("Test Device NOCSR Elements Deconstruction", TestNocsrElements_Deconstruction),
-    NL_TEST_SENTINEL()
-};
-// clang-format on
-
-/**
- *  Set up the test suite.
- */
-int TestDeviceAttestationElementsConstruction_Setup(void * inContext)
-{
-    CHIP_ERROR error = chip::Platform::MemoryInit();
-    if (error != CHIP_NO_ERROR)
-        return FAILURE;
-    return SUCCESS;
-}
-
-/**
- *  Tear down the test suite.
- */
-int TestDeviceAttestationElementsConstruction_Teardown(void * inContext)
-{
-    chip::Platform::MemoryShutdown();
-    return SUCCESS;
-}
-
-int TestDeviceAttestationElementsConstruction()
-{
-    // clang-format off
-    nlTestSuite theSuite =
-    {
-        "Device Attestation Elements Construction",
-        &sTests[0],
-        TestDeviceAttestationElementsConstruction_Setup,
-        TestDeviceAttestationElementsConstruction_Teardown
-    };
-    // clang-format on
-    nlTestRunner(&theSuite, nullptr);
-    return (nlTestRunnerStats(&theSuite));
-}
-
-CHIP_REGISTER_TEST_SUITE(TestDeviceAttestationElementsConstruction);

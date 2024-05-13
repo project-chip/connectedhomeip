@@ -14,30 +14,18 @@
 #    limitations under the License.
 #
 
-from chip.server import (
-    GetLibraryHandle,
-    NativeLibraryHandleMethodArguments,
-    PostAttributeChangeCallback,
-)
-
-from chip.exceptions import ChipStackError
-
-from ctypes import CFUNCTYPE, c_char_p, c_int32, c_uint8
-
-import sys
+import asyncio
 import os
-
-import textwrap
 import string
-
+import sys
+import textwrap
+import threading
 from cmd import Cmd
 
-import asyncio
-import threading
-
+from chip.server import GetLibraryHandle, PostAttributeChangeCallback
+from dali.address import Broadcast
 from dali.driver.hid import tridonic
-from dali.gear.general import RecallMaxLevel, Off, DAPC
-from dali.address import Broadcast, Short
+from dali.gear.general import DAPC, Off, RecallMaxLevel
 
 dali_loop = None
 dev = None
@@ -177,8 +165,6 @@ def attributeChangeCallback(
     endpoint: int,
     clusterId: int,
     attributeId: int,
-    mask: int,
-    manufacturerCode: int,
     xx_type: int,
     size: int,
     value: bytes,
@@ -218,7 +204,7 @@ class Lighting:
 
 
 if __name__ == "__main__":
-    l = Lighting()
+    lighting = Lighting()
 
     lightMgrCmd = LightingMgrCmd()
     print("Chip Lighting Device Shell")

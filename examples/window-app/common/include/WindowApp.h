@@ -112,13 +112,16 @@ public:
         void LiftContinueToTarget() { LiftUpdate(false); }
         void LiftStepToward(OperationalState direction);
         void LiftSchedulePositionSet(chip::Percent100ths position) { SchedulePositionSet(position, false); }
+        void LiftScheduleOperationalStateSet(OperationalState opState) { ScheduleOperationalStateSet(opState, false); }
 
         void TiltUpdate(bool newTarget);
         void TiltGoToTarget() { TiltUpdate(true); }
         void TiltContinueToTarget() { TiltUpdate(false); }
         void TiltStepToward(OperationalState direction);
         void TiltSchedulePositionSet(chip::Percent100ths position) { SchedulePositionSet(position, true); }
+        void TiltScheduleOperationalStateSet(OperationalState opState) { ScheduleOperationalStateSet(opState, true); }
 
+        void UpdateTargetPosition(OperationalState direction, bool isTilt);
         void StepToward(OperationalState direction, bool isTilt);
 
         Type CycleType();
@@ -127,11 +130,6 @@ public:
         static void OnTiltTimeout(Timer & timer);
 
         chip::EndpointId mEndpoint = 0;
-
-        // Attribute: Id 10 OperationalStatus
-        OperationalStatus mOperationalStatus = { .global = OperationalState::Stall,
-                                                 .lift   = OperationalState::Stall,
-                                                 .tilt   = OperationalState::Stall };
 
         Timer * mLiftTimer            = nullptr;
         Timer * mTiltTimer            = nullptr;
@@ -146,14 +144,14 @@ public:
             union
             {
                 chip::Percent100ths percent100ths;
-                OperationalStatus opStatus;
+                OperationalState opState;
             };
         };
 
         void SchedulePositionSet(chip::Percent100ths position, bool isTilt);
         static void CallbackPositionSet(intptr_t arg);
-        void ScheduleOperationalStatusSetWithGlobalUpdate(OperationalStatus opStatus);
-        static void CallbackOperationalStatusSetWithGlobalUpdate(intptr_t arg);
+        void ScheduleOperationalStateSet(OperationalState opState, bool isTilt);
+        static void CallbackOperationalStateSet(intptr_t arg);
     };
 
     static WindowApp & Instance();

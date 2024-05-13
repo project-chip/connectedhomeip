@@ -43,8 +43,8 @@
 #include <string.h>
 #include <sys/types.h>
 
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/ScopedBuffer.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS

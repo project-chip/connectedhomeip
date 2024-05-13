@@ -24,186 +24,14 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 
 namespace chip {
 namespace app {
-CHIP_ERROR
-CommandDataIB::Parser::ParseData(TLV::TLVReader & aReader, int aDepth) const
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+CHIP_ERROR CommandDataIB::Parser::PrettyPrint() const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-    if (aDepth == 0)
-    {
-        PRETTY_PRINT("\tCommandData = ");
-    }
-    else
-    {
-        if (TLV::IsContextTag(aReader.GetTag()))
-        {
-            PRETTY_PRINT("\t0x%" PRIx32 " = ", TLV::TagNumFromTag(aReader.GetTag()));
-        }
-        else if (TLV::IsProfileTag(aReader.GetTag()))
-        {
-            PRETTY_PRINT("\t0x%" PRIx32 "::0x%" PRIx32 " = ", TLV::ProfileIdFromTag(aReader.GetTag()),
-                         TLV::TagNumFromTag(aReader.GetTag()));
-        }
-        else
-        {
-            // Anonymous tag, don't print anything
-        }
-    }
-
-    switch (aReader.GetType())
-    {
-    case TLV::kTLVType_Structure:
-        PRETTY_PRINT("\t{");
-        break;
-
-    case TLV::kTLVType_Array:
-        PRETTY_PRINT_SAMELINE("[");
-        PRETTY_PRINT("\t\t");
-        break;
-
-    case TLV::kTLVType_SignedInteger: {
-        int64_t value_s64;
-
-        err = aReader.Get(value_s64);
-        SuccessOrExit(err);
-
-        PRETTY_PRINT_SAMELINE("%" PRId64 ", ", value_s64);
-        break;
-    }
-
-    case TLV::kTLVType_UnsignedInteger: {
-        uint64_t value_u64;
-
-        err = aReader.Get(value_u64);
-        SuccessOrExit(err);
-
-        PRETTY_PRINT_SAMELINE("%" PRIu64 ", ", value_u64);
-        break;
-    }
-
-    case TLV::kTLVType_FloatingPointNumber: {
-        double value_fp;
-
-        err = aReader.Get(value_fp);
-        SuccessOrExit(err);
-
-        PRETTY_PRINT_SAMELINE("%lf, ", value_fp);
-        break;
-    }
-    case TLV::kTLVType_Boolean: {
-        bool value_b;
-
-        err = aReader.Get(value_b);
-        SuccessOrExit(err);
-
-        PRETTY_PRINT_SAMELINE("%s, ", value_b ? "true" : "false");
-        break;
-    }
-
-    case TLV::kTLVType_UTF8String: {
-        char value_s[256];
-
-        err = aReader.GetString(value_s, sizeof(value_s));
-        VerifyOrExit(err == CHIP_NO_ERROR || err == CHIP_ERROR_BUFFER_TOO_SMALL, );
-
-        if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
-        {
-            PRETTY_PRINT_SAMELINE("... (byte string too long) ...");
-            err = CHIP_NO_ERROR;
-        }
-        else
-        {
-            PRETTY_PRINT_SAMELINE("\"%s\", ", value_s);
-        }
-        break;
-    }
-
-    case TLV::kTLVType_ByteString: {
-        uint8_t value_b[256];
-        uint32_t len, readerLen;
-
-        readerLen = aReader.GetLength();
-
-        err = aReader.GetBytes(value_b, sizeof(value_b));
-        VerifyOrExit(err == CHIP_NO_ERROR || err == CHIP_ERROR_BUFFER_TOO_SMALL, );
-
-        PRETTY_PRINT_SAMELINE("[");
-        PRETTY_PRINT("\t\t");
-
-        if (readerLen < sizeof(value_b))
-        {
-            len = readerLen;
-        }
-        else
-        {
-            len = sizeof(value_b);
-        }
-
-        if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
-        {
-            PRETTY_PRINT_SAMELINE("... (byte string too long) ...");
-        }
-        else
-        {
-            for (size_t i = 0; i < len; i++)
-            {
-                PRETTY_PRINT_SAMELINE("0x%x, ", value_b[i]);
-            }
-        }
-
-        err = CHIP_NO_ERROR;
-        PRETTY_PRINT("]");
-        break;
-    }
-
-    case TLV::kTLVType_Null:
-        PRETTY_PRINT_SAMELINE("NULL");
-        break;
-
-    default:
-        PRETTY_PRINT_SAMELINE("--");
-        break;
-    }
-
-    if (aReader.GetType() == TLV::kTLVType_Structure || aReader.GetType() == TLV::kTLVType_Array)
-    {
-        const char terminating_char = (aReader.GetType() == TLV::kTLVType_Structure) ? '}' : ']';
-        TLV::TLVType type;
-
-        IgnoreUnusedVariable(terminating_char);
-
-        err = aReader.EnterContainer(type);
-        SuccessOrExit(err);
-
-        while ((err = aReader.Next()) == CHIP_NO_ERROR)
-        {
-            PRETTY_PRINT_INCDEPTH();
-
-            err = ParseData(aReader, aDepth + 1);
-            SuccessOrExit(err);
-
-            PRETTY_PRINT_DECDEPTH();
-        }
-
-        PRETTY_PRINT("\t%c,", terminating_char);
-
-        err = aReader.ExitContainer(type);
-        SuccessOrExit(err);
-    }
-
-exit:
-    return err;
-}
-
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR CommandDataIB::Parser::CheckSchemaValidity() const
-{
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    int TagPresenceMask = 0;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("CommandDataIB =");
@@ -214,29 +42,35 @@ CHIP_ERROR CommandDataIB::Parser::CheckSchemaValidity() const
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         uint32_t tagNum = TLV::TagNumFromTag(reader.GetTag());
 
         switch (tagNum)
         {
-        case to_underlying(Tag::kPath):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kPath))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kPath));
-            {
-                CommandPathIB::Parser path;
-                ReturnErrorOnFailure(path.Init(reader));
-                PRETTY_PRINT_INCDEPTH();
-                ReturnErrorOnFailure(path.CheckSchemaValidity());
-                PRETTY_PRINT_DECDEPTH();
-            }
+        case to_underlying(Tag::kPath): {
+            CommandPathIB::Parser path;
+            ReturnErrorOnFailure(path.Init(reader));
+            PRETTY_PRINT_INCDEPTH();
+            ReturnErrorOnFailure(path.PrettyPrint());
+            PRETTY_PRINT_DECDEPTH();
+        }
 
+        break;
+        case to_underlying(Tag::kFields):
+            PRETTY_PRINT_INCDEPTH();
+            ReturnErrorOnFailure(CheckIMPayload(reader, 0, "CommandFields"));
+            PRETTY_PRINT_DECDEPTH();
             break;
-        case to_underlying(Tag::kData):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kData))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kData));
-            ReturnErrorOnFailure(ParseData(reader, 0));
+        case to_underlying(Tag::kRef):
+            VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+            {
+                uint16_t reference;
+                ReturnErrorOnFailure(reader.Get(reference));
+                PRETTY_PRINT("\tRef = 0x%x,", reference);
+            }
             break;
         default:
             PRETTY_PRINT("Unknown tag num %" PRIu32, tagNum);
@@ -245,40 +79,34 @@ CHIP_ERROR CommandDataIB::Parser::CheckSchemaValidity() const
     }
 
     PRETTY_PRINT("},");
-    PRETTY_PRINT("");
+    PRETTY_PRINT_BLANK_LINE();
 
     if (CHIP_END_OF_TLV == err)
     {
-        const int RequiredFields = 1 << to_underlying(Tag::kPath);
-
-        if ((TagPresenceMask & RequiredFields) == RequiredFields)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        else
-        {
-            err = CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_MESSAGE;
-        }
+        err = CHIP_NO_ERROR;
     }
 
     ReturnErrorOnFailure(err);
-    ReturnErrorOnFailure(reader.ExitContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
+    return reader.ExitContainer(mOuterContainerType);
 }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
 CHIP_ERROR CommandDataIB::Parser::GetPath(CommandPathIB::Parser * const apPath) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kPath)), reader));
-    ReturnErrorOnFailure(apPath->Init(reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kPath), reader));
+    return apPath->Init(reader);
+}
+
+CHIP_ERROR CommandDataIB::Parser::GetFields(TLV::TLVReader * const apReader) const
+{
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kFields), *apReader));
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandDataIB::Parser::GetData(TLV::TLVReader * const apReader) const
+CHIP_ERROR CommandDataIB::Parser::GetRef(uint16_t * const apRef) const
 {
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kData)), *apReader));
-    return CHIP_NO_ERROR;
+    return GetUnsignedInteger(to_underlying(Tag::kRef), apRef);
 }
 
 CommandPathIB::Builder & CommandDataIB::Builder::CreatePath()
@@ -287,10 +115,15 @@ CommandPathIB::Builder & CommandDataIB::Builder::CreatePath()
     return mPath;
 }
 
-CommandDataIB::Builder & CommandDataIB::Builder::EndOfCommandDataIB()
+CHIP_ERROR CommandDataIB::Builder::Ref(const uint16_t aRef)
+{
+    return mpWriter->Put(TLV::ContextTag(Tag::kRef), aRef);
+}
+
+CHIP_ERROR CommandDataIB::Builder::EndOfCommandDataIB()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip

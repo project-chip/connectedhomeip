@@ -1,0 +1,1214 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 123.2.2. [TC-S-2.2] Primary functionality with DUT as Server
+
+PICS:
+    - S.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Scenes Management"
+    endpoint: 1
+    G1:
+        type: group_id
+        defaultValue: 0x0001
+    G2:
+        type: group_id
+        defaultValue: 0x0002
+    GI:
+        type: group_id
+        defaultValue: 0x0099
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "TH reads from the DUT the (0x0006) SceneTableSize attribute"
+      PICS: S.S.A0001
+      command: "readAttribute"
+      attribute: "SceneTableSize"
+      response:
+          values:
+              - name: "SceneTableSize"
+                saveAs: maxScenes
+
+    - label: "Arithmetic operation to get the maxScenes - 1"
+      cluster: "Unit Testing"
+      command: "TestAddArguments"
+      arguments:
+          values:
+              - name: "arg1"
+                value: maxScenes - 1
+              - name: "arg2"
+                value: 0
+      response:
+          values:
+              - name: "returnValue"
+                saveAs: maxScenesMinusOne
+                value: maxScenes - 1
+
+    - label: "Arithmetic operation to get the fabric Capacity"
+      cluster: "Unit Testing"
+      command: "TestAddArguments"
+      arguments:
+          values:
+              - name: "arg1"
+                value: maxScenesMinusOne / 2
+              - name: "arg2"
+                value: 0
+      response:
+          values:
+              - name: "returnValue"
+                saveAs: fabricCapacity
+                value: maxScenesMinusOne / 2
+
+    - label:
+          "Step 0a :TH sends KeySetWrite command in the GroupKeyManagement
+          cluster to DUT using a key that is pre-installed on the TH.
+          GroupKeySet fields are as follows:"
+      cluster: "Group Key Management"
+      endpoint: 0
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1110000,
+                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+                        EpochStartTime1: 1110001,
+                        EpochKey2: "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf",
+                        EpochStartTime2: 1110002,
+                    }
+
+    - label:
+          "Step 0b: TH binds GroupIds 0x0001 and 0x0002 with GroupKeySetID
+          0x01a1 in the GroupKeyMap attribute list on GroupKeyManagement cluster
+          by writing the GroupKeyMap attribute with two entries as follows:"
+      cluster: "Group Key Management"
+      endpoint: 0
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value:
+              [
+                  { FabricIndex: 1, GroupId: G1, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: G2, GroupKeySetID: 0x01a1 },
+              ]
+
+    - label: "Step 0c: TH sends a RemoveAllGroups command to DUT."
+      PICS: G.S.C04.Rsp
+      cluster: "Groups"
+      endpoint: endpoint
+      command: "RemoveAllGroups"
+
+    - label:
+          "Step 1a: TH sends a AddGroup command to DUT with the GroupID field
+          set to G1."
+      PICS: G.S.C00.Rsp
+      cluster: "Groups"
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "GroupName"
+                value: "Group1"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: G1
+
+    - label:
+          "Step 1b: TH sends a RemoveAllScenes command to DUT with the GroupID
+          field set to G1."
+      PICS: S.S.C03.Rsp
+      command: "RemoveAllScenes"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "GroupID"
+                value: G1
+
+    - label:
+          "Step 1c: TH sends a RemoveAllScenes command to DUT with the GroupID
+          field set to GI (Where GI is a group currently absent from the group
+          table)."
+      PICS: S.S.C03.Rsp
+      command: "RemoveAllScenes"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: GI
+      response:
+          values:
+              - name: "Status"
+                value: 0x85
+              - name: "GroupID"
+                value: GI
+
+    - label:
+          "Step 1d: TH sends a GetSceneMembership command to DUT with the
+          GroupID field set to G1."
+      PICS: S.S.C06.Rsp
+      command: "GetSceneMembership"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "Capacity"
+                value: fabricCapacity
+              - name: "GroupID"
+                value: G1
+
+    - label:
+          "Step 1e: TH sends a GetSceneMembership command to DUT with the
+          GroupID field set to GI (Where GI is a group currently absent from the
+          group table)."
+      PICS: S.S.C06.Rsp
+      command: "GetSceneMembership"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: GI
+      response:
+          values:
+              - name: "Status"
+                value: 0x85
+              - name: "Capacity"
+                constraints:
+                    anyOf: [fabricCapacity, 0xfe, null]
+                value: null
+              - name: "GroupID"
+                value: GI
+
+    - label:
+          "Step 2a: TH configures AC1 on DUT for all implemented application
+          clusters supporting scenes."
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "Level Control"
+      command: "MoveToLevelWithOnOff"
+      arguments:
+          values:
+              - name: "Level"
+                value: 100
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label:
+          "Step 2a: TH configures AC1 on DUT for all implemented application
+          clusters supporting scenes."
+      verification: |
+          Is DUT configured with AC1?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please configure AC1 on DUT and enter 'y' after the
+                    configuration is complete"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 2b: TH sends a StoreScene command to DUT with the GroupID field
+          set to G1 and the SceneID field set to 0x01."
+      PICS: S.S.C04.Rsp
+      command: "StoreScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x01
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x01
+
+    - label:
+          "Step 2c: TH sends a StoreScene command to DUT with the GroupID field
+          set to GI (Where GI is a group currently absent from the group table)
+          and the SceneID field set to 0x01."
+      PICS: S.S.C04.Rsp
+      command: "StoreScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: GI
+              - name: "SceneID"
+                value: 0x01
+      response:
+          values:
+              - name: "Status"
+                value: 0x85
+              - name: "GroupID"
+                value: GI
+              - name: "SceneID"
+                value: 0x01
+
+    - label:
+          "Step 3a: TH configures AC2 on DUT for all implemented application
+          clusters supporting scenes."
+      cluster: "Level Control"
+      PICS: PICS_SDK_CI_ONLY
+      command: "MoveToLevelWithOnOff"
+      arguments:
+          values:
+              - name: "Level"
+                value: 200
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label:
+          "Step 3a: TH configures AC2 on DUT for all implemented application
+          clusters supporting scenes."
+      verification: |
+          Is DUT configured with AC2?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please configure AC2 on DUT and enter 'y' after the
+                    configuration is complete"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 3b: TH sends a RecallScene command to DUT with the GroupID field
+          set to G1 and the SceneID field set to 0x01."
+      PICS: S.S.C05.Rsp
+      command: "RecallScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x01
+
+    - label: "Step 3c: TH reads attribute SceneTableSize from DUT."
+      command: "readAttribute"
+      attribute: "SceneTableSize"
+      response:
+          saveAs: SceneTableSizeValue
+          constraints:
+              type: int16u
+
+    - label: "Step 3d: TH reads attribute FabricSceneInfo from DUT"
+      command: "readAttribute"
+      attribute: "FabricSceneInfo"
+      response:
+          value:
+              [
+                  {
+                      SceneCount: 1,
+                      CurrentScene: 0x01,
+                      CurrentGroup: G1,
+                      SceneValid: true,
+                      RemainingCapacity: fabricCapacity - 1,
+                  },
+              ]
+
+    - label: "Step 4a: Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      endpoint: 0
+      command: "Reboot"
+
+    - label: "Step 4a: Reboot target device(DUT)"
+      verification: |
+          Did the DUT successfully reboot?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Step 4c: TH configures AC2 on DUT for all implemented application
+          clusters supporting scenes."
+      cluster: "Level Control"
+      PICS: PICS_SDK_CI_ONLY
+      command: "MoveToLevelWithOnOff"
+      arguments:
+          values:
+              - name: "Level"
+                value: 200
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label:
+          "Step 4c: TH configures AC2 on DUT for all implemented application
+          clusters supporting scenes."
+      verification: |
+          Is DUT configured with AC2?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please configure AC2 on DUT and enter 'y' after the
+                    configuration is complete"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 4d: TH sends a RecallScene command to DUT with the GroupID field
+          set to G1 and the SceneID field set to 0x01."
+      PICS: S.S.C05.Rsp
+      command: "RecallScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x01
+
+    - label:
+          "Step 5a: TH sends a ViewScene command to DUT with the GroupID field
+          set to G1 and the SceneID field set to 0x01."
+      PICS: S.S.C01.Rsp && PICS_SDK_CI_ONLY
+      command: "ViewScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x01
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x01
+              - name: "TransitionTime"
+                value: 0x0000
+              - name: "ExtensionFieldSets"
+                constraints:
+                    type: list
+                    contains:
+                        [
+                            {
+                                ClusterID: 0x0006,
+                                AttributeValueList:
+                                    [
+                                        {
+                                            AttributeID: 0x0000,
+                                            AttributeValue: 0x01,
+                                        },
+                                    ],
+                            },
+                            {
+                                ClusterID: 0x0008,
+                                AttributeValueList:
+                                    [
+                                        {
+                                            AttributeID: 0x0000,
+                                            AttributeValue: 0x64,
+                                        },
+                                    ],
+                            },
+                        ]
+
+    - label:
+          "Step 5a: TH sends a ViewScene command to DUT with the GroupID field
+          set to G1 and the SceneID field set to 0x01."
+      PICS: S.S.C01.Rsp && PICS_SKIP_SAMPLE_APP
+      command: "ViewScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x01
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x01
+              - name: "TransitionTime"
+                value: 0x0000
+
+    - label:
+          "Step 5b: TH sends a ViewScene command to DUT with the GroupID field
+          set to GI (Where GI is a group currently absent from the group table)
+          and the SceneID field set to 0x01."
+      PICS: S.S.C01.Rsp
+      command: "ViewScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: GI
+              - name: "SceneID"
+                value: 0x01
+      response:
+          values:
+              - name: "Status"
+                value: 0x85
+              - name: "GroupID"
+                value: GI
+              - name: "SceneID"
+                value: 0x01
+
+    - label:
+          "Step 5c: TH sends a ViewScene command to DUT with the GroupID field
+          set to G1 and the SceneID field set to 0xFE."
+      PICS: S.S.C01.Rsp
+      command: "ViewScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0xFE
+      response:
+          values:
+              - name: "Status"
+                value: 0x8b
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0xFE
+
+    - label:
+          "Step 6: TH sends a GetSceneMembership command to DUT with the GroupID
+          field set to G1."
+      PICS: S.S.C06.Rsp
+      command: "GetSceneMembership"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "Capacity"
+                value: fabricCapacity - 1
+              - name: "GroupID"
+                value: G1
+              - name: "SceneList"
+                value: [0x01]
+
+    - label:
+          "Step 7a: TH sends a RemoveAllScenes command to DUT with the GroupID
+          field set to G1."
+      PICS: S.S.C03.Rsp
+      command: "RemoveAllScenes"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: G1
+
+    - label:
+          "Step 7b: TH sends a GetSceneMembership command to DUT with the
+          GroupID field set to G1."
+      PICS: S.S.C06.Rsp
+      command: "GetSceneMembership"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "Capacity"
+                constraints:
+                    anyOf: [fabricCapacity, 0xfe, null]
+              - name: "GroupID"
+                value: G1
+
+    - label:
+          "Step 8a: TH sends a AddScene command to DUT with the GroupID field
+          set to G1, the SceneID field set to 0x01, the TransitionTime field set
+          to 60 000 000 (60 000s) and a set of extension fields appropriate to
+          AC1."
+      PICS: S.S.C00.Rsp && PICS_SDK_CI_ONLY
+      command: "AddScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x01
+              - name: "TransitionTime"
+                value: 60000000
+              - name: "SceneName"
+                value: "Scene1"
+              - name: "ExtensionFieldSets"
+                value:
+                    [
+                        {
+                            ClusterID: 0x0006,
+                            AttributeValueList:
+                                [{ AttributeID: 0x0000, AttributeValue: 0x01 }],
+                        },
+                        {
+                            ClusterID: 0x0008,
+                            AttributeValueList:
+                                [{ AttributeID: 0x0000, AttributeValue: 0x64 }],
+                        },
+                    ]
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x01
+
+    - label:
+          "Step 8a: TH sends a AddScene command to DUT with the GroupID field
+          set to G1, the SceneID field set to 0x01, the TransitionTime field set
+          to 60 000 000 (60 000s) and a set of extension fields appropriate to
+          AC1."
+      verification: |
+          ./chip-tool scenesmanagement add-scene 0x0001 0x01 60000000 "scene name" '[{"clusterID": "0x0300", "attributeValueList":[{"attributeID": "0x4001", "attributeValue": "0x01"}]}]' 1 1
+
+          Verify DUT sends a AddSceneResponse command to TH with the Status field set to 0x00 (SUCCESS), the GroupID field set to G1 and the SceneID field set to 0x01 on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
+
+          [1706763610.675038][4232:4234] CHIP:DMG: },
+          [1706763610.675108][4232:4234] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0062 Command=0x0000_0000
+          [1706763610.675134][4232:4234] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Command 0x0000_0000
+          [1706763610.675187][4232:4234] CHIP:TOO:   AddSceneResponse: {
+          [1706763610.675215][4232:4234] CHIP:TOO:     status: 0
+          [1706763610.675229][4232:4234] CHIP:TOO:     groupID: 1
+          [1706763610.675244][4232:4234] CHIP:TOO:     sceneID: 1
+          [1706763610.675258][4232:4234] CHIP:TOO:    }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please execute the add scene command with
+                    extensionfieldsets in accordance with AC1 on DUT and enter
+                    'y' if the command is successful"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 8b: TH sends a AddScene command to DUT with the GroupID field
+          set to GI (Where GI is a group currently absent from the group table),
+          the SceneID field set to 0x01, the TransitionTime field set to 1000
+          (1s) and a set of extension fields appropriate to AC1."
+      PICS: S.S.C00.Rsp
+      command: "AddScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: GI
+              - name: "SceneID"
+                value: 0x01
+              - name: "TransitionTime"
+                value: 1000
+              - name: "SceneName"
+                value: "Scene1"
+              - name: "ExtensionFieldSets"
+                value: []
+      response:
+          values:
+              - name: "Status"
+                value: 0x85
+              - name: "GroupID"
+                value: GI
+              - name: "SceneID"
+                value: 0x01
+
+    - label:
+          "Step 8c: TH sends a GetSceneMembership command to DUT with the
+          GroupID field set to G1."
+      PICS: S.S.C06.Rsp
+      command: "GetSceneMembership"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "Capacity"
+                constraints:
+                    anyOf: [fabricCapacity - 1, 0xfe, 0x89]
+              - name: "GroupID"
+                value: G1
+              - name: "SceneList"
+                value: [0x01]
+
+    - label:
+          "Step 8d: TH sends a AddScene command to DUT with the GroupID field
+          set to G1, the SceneID field set to 0x01, the TransitionTime field set
+          to 70 000 000 (70 000s) and no extension field sets. This should fail
+          and return a status of 0x85 (INVALID_COMMAND)."
+      PICS: S.S.C00.Rsp
+      command: "AddScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x01
+              - name: "TransitionTime"
+                value: 70000000
+              - name: "SceneName"
+                value: "Scene1"
+              - name: "ExtensionFieldSets"
+                value: []
+      response:
+          values:
+              - name: "Status"
+                value: 0x85
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x01
+
+    - label:
+          "Step 8e: TH sends a AddScene command to DUT with the GroupID field
+          set to G1, the SceneID field set to 0x01, the TransitionTime field set
+          to 60 000 001 (60 000.001s) and no extension field sets. This should
+          fail and return a status of 0x85 (INVALID_COMMAND)."
+      PICS: S.S.C00.Rsp
+      command: "AddScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x01
+              - name: "TransitionTime"
+                value: 60000001
+              - name: "SceneName"
+                value: "Scene1"
+              - name: "ExtensionFieldSets"
+                value: []
+      response:
+          values:
+              - name: "Status"
+                value: 0x85
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x01
+
+    - label:
+          "Step 9a: TH sends a RemoveScene command to DUT with the GroupID field
+          set to G1 and the SceneID field set to 0x01."
+      PICS: S.S.C02.Rsp
+      command: "RemoveScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x01
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x01
+
+    - label:
+          "Step 9b: TH sends a RemoveScene command to DUT with the GroupID field
+          set to GI (Where GI is a group currently absent from the group table)
+          and the SceneID field set to 0x01."
+      PICS: S.S.C02.Rsp
+      command: "RemoveScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: GI
+              - name: "SceneID"
+                value: 0x01
+      response:
+          values:
+              - name: "Status"
+                value: 0x85
+              - name: "GroupID"
+                value: GI
+              - name: "SceneID"
+                value: 0x01
+
+    - label:
+          "Step 9c: TH sends a RemoveScene command to DUT with the GroupID field
+          set to G1 and the SceneID field set to 0x01."
+      PICS: S.S.C02.Rsp
+      command: "RemoveScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x01
+      response:
+          values:
+              - name: "Status"
+                value: 0x8b
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x01
+
+    - label:
+          "Step 9d: TH sends a GetSceneMembership command to DUT with the
+          GroupID field set to G1."
+      PICS: S.S.C06.Rsp
+      command: "GetSceneMembership"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "Capacity"
+                constraints:
+                    anyOf: [fabricCapacity, 0xfe, 0x89]
+              - name: "GroupID"
+                value: G1
+
+    - label:
+          "Step 10a: TH configures AC2 on DUT for all implemented application
+          clusters supporting scenes."
+      cluster: "Level Control"
+      PICS: PICS_SDK_CI_ONLY
+      command: "MoveToLevelWithOnOff"
+      arguments:
+          values:
+              - name: "Level"
+                value: 200
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label:
+          "Step 10a: TH configures AC2 on DUT for all implemented application
+          clusters supporting scenes."
+      verification: |
+          Is DUT configured with AC2?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please configure AC2 on DUT and enter 'y' after the
+                    configuration is complete"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 10b: TH sends a RecallScene command to DUT with the GroupID
+          field set to G1 and the SceneID field set to 0x01."
+      PICS: S.S.C05.Rsp
+      command: "RecallScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x01
+      response:
+          error: NOT_FOUND
+
+    - label:
+          "Step 11a: TH configures AC1 on DUT for all implemented application
+          clusters supporting scenes."
+      cluster: "Level Control"
+      PICS: PICS_SDK_CI_ONLY
+      command: "MoveToLevelWithOnOff"
+      arguments:
+          values:
+              - name: "Level"
+                value: 100
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label:
+          "Step 11a: TH configures AC1 on DUT for all implemented application
+          clusters supporting scenes."
+      verification: |
+          Is DUT configured with AC1?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please configure AC1 on DUT and enter 'y' after the
+                    configuration is complete"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 11b: TH sends a StoreScene command to DUT with the GroupID field
+          set to G1 and the SceneID field set to 0x01."
+      PICS: S.S.C04.Rsp
+      command: "StoreScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x01
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x01
+
+    - label:
+          "Step 12a: TH configures AC2 on DUT for all implemented application
+          clusters supporting scenes."
+      cluster: "Level Control"
+      PICS: PICS_SDK_CI_ONLY
+      command: "MoveToLevelWithOnOff"
+      arguments:
+          values:
+              - name: "Level"
+                value: 200
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label:
+          "Step 12a: TH configures AC2 on DUT for all implemented application
+          clusters supporting scenes."
+      verification: |
+          Is DUT configured with AC2?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please configure AC2 on DUT and enter 'y' after the
+                    configuration is complete"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 12b: TH sends a StoreScene command to DUT with the GroupID field
+          set to G1 and the SceneID field set to 0x02."
+      PICS: S.S.C04.Rsp
+      command: "StoreScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x02
+      response:
+          values:
+              - name: "Status"
+                saveAs: StoreStatus
+                constraints:
+                    anyOf: [0x00, 0x89]
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x02
+
+    - label:
+          "Verify that the status of previous command was either 0x00 (SUCCESS)
+          or 0x89 (INSUFFICIENT_SPACE)"
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: 0x00
+              - name: "Value2"
+                value: StoreStatus
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: ContinueTest
+
+    - label:
+          "Step 12c: TH sends a GetSceneMembership command to DUT with the
+          GroupID field set to G1."
+      runIf: ContinueTest
+      PICS: S.S.C06.Rsp
+      command: "GetSceneMembership"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "Capacity"
+                value: fabricCapacity - 2
+              - name: "GroupID"
+                value: G1
+              - name: "SceneList"
+                value: [0x01, 0x02]
+
+    - label:
+          "Step 13a: If capacity allows, TH sends a AddGroup command to DUT with
+          the GroupID field set to G2."
+      runIf: ContinueTest
+      PICS: G.S.C00.Rsp
+      cluster: "Groups"
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G2
+              - name: "GroupName"
+                value: "Group2"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: G2
+
+    - label:
+          "Step 13b: TH sends a RemoveAllScenes command to DUT with the GroupID
+          field set to G2."
+      runIf: ContinueTest
+      PICS: S.S.C03.Rsp
+      command: "RemoveAllScenes"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G2
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: G2
+
+    - label:
+          "Step 13c: TH sends a GetSceneMembership command to DUT with the
+          GroupID field set to G2."
+      runIf: ContinueTest
+      PICS: S.S.C06.Rsp
+      command: "GetSceneMembership"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G2
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "Capacity"
+                value: fabricCapacity - 2
+              - name: "GroupID"
+                value: G2
+
+    - label:
+          "Step 14a: TH configures AC3 on DUT for all implemented application
+          clusters supporting scenes."
+      runIf: ContinueTest
+      cluster: "Level Control"
+      PICS: PICS_SDK_CI_ONLY
+      command: "MoveToLevelWithOnOff"
+      arguments:
+          values:
+              - name: "Level"
+                value: 1
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label:
+          "Step 14a: TH configures AC3 on DUT for all implemented application
+          clusters supporting scenes."
+      runIf: ContinueTest
+      verification: |
+          Is DUT configured with AC3?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please configure AC3 on DUT and enter 'y' after the
+                    configuration is complete"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 14b: TH sends a StoreScene command to DUT with the GroupID field
+          set to G2 and the SceneID field set to 0x03."
+      runIf: ContinueTest
+      PICS: S.S.C04.Rsp
+      command: "StoreScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G2
+              - name: "SceneID"
+                value: 0x03
+      response:
+          values:
+              - name: "Status"
+                saveAs: StoredStatus
+                constraints:
+                    anyOf: [0x00, 0x89]
+              - name: "GroupID"
+                value: G2
+              - name: "SceneID"
+                value: 0x03
+
+    - label:
+          "Verify that the status of previous command was either 0x00 (SUCCESS)
+          or 0x89 (INSUFFICIENT_SPACE)"
+      runIf: ContinueTest
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: 0x00
+              - name: "Value2"
+                value: StoredStatus
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: ContinueStep14
+
+    - label:
+          "Step 14c: TH sends a GetSceneMembership command to DUT with the
+          GroupID field set to G2."
+      runIf: ContinueStep14
+      PICS: S.S.C06.Rsp
+      command: "GetSceneMembership"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G2
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "Capacity"
+                value: fabricCapacity - 3
+              - name: "GroupID"
+                value: G2
+              - name: "SceneList"
+                value: [0x03]
+
+    - label:
+          "Step 15: TH removes the Group key set that was added by sending a
+          KeySetRemove command to the GroupKeyManagement cluster with the
+          GroupKeySetID field set to 0x01a1"
+      cluster: "Group Key Management"
+      endpoint: 0
+      command: "KeySetRemove"
+      arguments:
+          values:
+              - name: GroupKeySetID
+                value: 0x01a1

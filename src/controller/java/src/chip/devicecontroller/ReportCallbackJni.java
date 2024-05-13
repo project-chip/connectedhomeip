@@ -17,20 +17,28 @@
  */
 package chip.devicecontroller;
 
-import androidx.annotation.Nullable;
+import chip.devicecontroller.model.ChipAttributePath;
+import chip.devicecontroller.model.ChipEventPath;
+import chip.devicecontroller.model.NodeState;
+import javax.annotation.Nullable;
 
 /** JNI wrapper callback class for {@link ReportCallback}. */
 public class ReportCallbackJni {
   @Nullable private SubscriptionEstablishedCallback wrappedSubscriptionEstablishedCallback;
+  @Nullable private ResubscriptionAttemptCallback wrappedResubscriptionAttemptCallback;
   private ReportCallback wrappedReportCallback;
   private long callbackHandle;
+  @Nullable private NodeState nodeState;
 
   public ReportCallbackJni(
       @Nullable SubscriptionEstablishedCallback subscriptionEstablishedCallback,
-      ReportCallback reportCallback) {
+      ReportCallback reportCallback,
+      ResubscriptionAttemptCallback resubscriptionAttemptCallback) {
     this.wrappedSubscriptionEstablishedCallback = subscriptionEstablishedCallback;
     this.wrappedReportCallback = reportCallback;
-    this.callbackHandle = newCallback(subscriptionEstablishedCallback, reportCallback);
+    this.wrappedResubscriptionAttemptCallback = resubscriptionAttemptCallback;
+    this.callbackHandle =
+        newCallback(subscriptionEstablishedCallback, resubscriptionAttemptCallback);
   }
 
   long getCallbackHandle() {
@@ -39,9 +47,47 @@ public class ReportCallbackJni {
 
   private native long newCallback(
       @Nullable SubscriptionEstablishedCallback subscriptionEstablishedCallback,
-      ReportCallback wrappedCallback);
+      @Nullable ResubscriptionAttemptCallback resubscriptionAttemptCallback);
 
   private native void deleteCallback(long callbackHandle);
+
+  // Called from native code only, which ignores access modifiers.
+  private void onReportBegin() {
+    nodeState = new NodeState();
+  }
+
+  private void onReportEnd() {
+    if (nodeState != null) {
+      wrappedReportCallback.onReport(nodeState);
+    }
+    nodeState = null;
+  }
+
+  private NodeState getNodeState() {
+    return nodeState;
+  }
+
+  private void onError(
+      boolean isAttributePath,
+      int attributeEndpointId,
+      long attributeClusterId,
+      long attributeId,
+      boolean isEventPath,
+      int eventEndpointId,
+      long eventClusterId,
+      long eventId,
+      Exception e) {
+    wrappedReportCallback.onError(
+        isAttributePath
+            ? ChipAttributePath.newInstance(attributeEndpointId, attributeClusterId, attributeId)
+            : null,
+        isEventPath ? ChipEventPath.newInstance(eventEndpointId, eventClusterId, eventId) : null,
+        e);
+  }
+
+  private void onDone() {
+    wrappedReportCallback.onDone();
+  }
 
   // TODO(#8578): Replace finalizer with PhantomReference.
   @SuppressWarnings("deprecation")

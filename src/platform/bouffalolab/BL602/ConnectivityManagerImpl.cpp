@@ -1,7 +1,6 @@
 /*
- *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Nest Labs, Inc.
+ *    Copyright (c) 2022 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,138 +14,89 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/* this file behaves like a config.h, comes first */
+
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <NetworkCommissioningDriver.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
-#include <platform/ConnectivityManager.h>
-#include <platform/internal/BLEManager.h>
 
-#include <hal_wifi.h>
-#include <wifi_mgmr_ext.h>
-
-#include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
-
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-#include <platform/internal/GenericConnectivityManagerImpl_BLE.ipp>
-#endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#include <platform/internal/GenericConnectivityManagerImpl_Thread.ipp>
-#endif
-
-#include <wifi_mgmr_ext.h>
-
-#include <FreeRTOS.h>
-#include <task.h>
-
-#include <lwip/netifapi.h>
-#include <mdns_server.h>
-#include <wifi_mgmr_ext.h>
-
-#include <FreeRTOS.h>
-#include <stdio.h>
-#include <string.h>
-#include <task.h>
-
-#define zero(S) memset(&S, 0, sizeof(S))
+#include <platform/DiagnosticDataProvider.h>
+#include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
 
 using namespace ::chip;
-using namespace ::chip::Dnssd;
-using namespace ::chip::Inet;
-using namespace ::chip::System;
-using namespace ::chip::TLV;
-using namespace ::chip::DeviceLayer::Internal;
 
 namespace chip {
 namespace DeviceLayer {
 
-ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
-static ConnectivityManager::WiFiStationState ConnectivityManagerImpl::mWiFiStationState =
-    ConnectivityManager::kWiFiStationState_NotConnected;
-
-void ConnectivityManagerImpl::WifiStationStateChange(void)
+void ConnectivityManagerImpl::OnWiFiStationDisconnected()
 {
-    ChipDeviceEvent event;
+    NetworkCommissioning::BLWiFiDriver::GetInstance().SetLastDisconnectReason(NULL);
+    uint16_t reason = NetworkCommissioning::BLWiFiDriver::GetInstance().GetLastDisconnectReason();
+    uint8_t associationFailureCause =
+        chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kUnknown);
+    WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
 
-    if (ConnectivityManagerImpl::mWiFiStationState == ConnectivityManager::kWiFiStationState_Connected)
+    ChipLogError(DeviceLayer, "WiFi station disconnect, reason %d.", reason);
+
+    switch (reason)
     {
-        event.Type                          = DeviceEventType::kWiFiConnectivityChange;
-        event.WiFiConnectivityChange.Result = kConnectivity_Established;
-        PlatformMgr().PostEventOrDie(&event);
+    case WLAN_FW_TX_ASSOC_FRAME_ALLOCATE_FAIILURE:
+    case WLAN_FW_ASSOCIATE_FAIILURE:
+    case WLAN_FW_4WAY_HANDSHAKE_ERROR_PSK_TIMEOUT_FAILURE:
+        associationFailureCause =
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kAssociationFailed);
+        if (delegate)
+        {
+            delegate->OnAssociationFailureDetected(associationFailureCause, reason);
+        }
+        break;
+    case WLAN_FW_TX_AUTH_FRAME_ALLOCATE_FAIILURE:
+    case WLAN_FW_AUTHENTICATION_FAIILURE:
+    case WLAN_FW_AUTH_ALGO_FAIILURE:
+    case WLAN_FW_DEAUTH_BY_AP_WHEN_NOT_CONNECTION:
+    case WLAN_FW_DEAUTH_BY_AP_WHEN_CONNECTION:
+    case WLAN_FW_4WAY_HANDSHAKE_TX_DEAUTH_FRAME_TRANSMIT_FAILURE:
+    case WLAN_FW_4WAY_HANDSHAKE_TX_DEAUTH_FRAME_ALLOCATE_FAIILURE:
+    case WLAN_FW_AUTH_OR_ASSOC_RESPONSE_TIMEOUT_FAILURE:
+    case WLAN_FW_DISCONNECT_BY_USER_WITH_DEAUTH:
+    case WLAN_FW_DISCONNECT_BY_USER_NO_DEAUTH:
+        associationFailureCause =
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kAuthenticationFailed);
+        if (delegate)
+        {
+            delegate->OnAssociationFailureDetected(associationFailureCause, reason);
+        }
+        break;
+    case WLAN_FW_SCAN_NO_BSSID_AND_CHANNEL:
+        associationFailureCause =
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kSsidNotFound);
+        if (delegate)
+        {
+            delegate->OnAssociationFailureDetected(associationFailureCause, reason);
+        }
+        break;
+    case WLAN_FW_BEACON_LOSS:
+    case WLAN_FW_JOIN_NETWORK_SECURITY_NOMATCH:
+    case WLAN_FW_JOIN_NETWORK_WEPLEN_ERROR:
+    case WLAN_FW_DISCONNECT_BY_FW_PS_TX_NULLFRAME_FAILURE:
+    case WLAN_FW_CREATE_CHANNEL_CTX_FAILURE_WHEN_JOIN_NETWORK:
+    case WLAN_FW_ADD_STA_FAILURE:
+    case WLAN_FW_JOIN_NETWORK_FAILURE:
+        break;
+
+    default:
+        if (delegate)
+        {
+            delegate->OnAssociationFailureDetected(associationFailureCause, reason);
+        }
+        break;
     }
-}
 
-void ConnectivityManagerImpl::DriveStationState()
-{
-
-exit:
-    return;
-}
-
-void ConnectivityManagerImpl::DriveStationState(::chip::System::Layer * aLayer, void * aAppState)
-{
-    sInstance.DriveStationState();
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(WiFiStationMode val)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
-exit:
-    return err;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_Init()
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // Initialize the generic base classes that require it.
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_Init();
-#endif
-
-    SuccessOrExit(err);
-
-    err = SetWiFiStationMode(kWiFiStationMode_Enabled);
-    NetworkCommissioning::BLWiFiDriver::GetInstance().ReConnectWiFiNetwork();
-
-    SuccessOrExit(err);
-
-exit:
-    return err;
-}
-
-void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
-{
-    // Forward the event to the generic base classes as needed.
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_OnPlatformEvent(event);
-#endif
-}
-
-bool ConnectivityManagerImpl::_IsWiFiStationEnabled(void)
-{
-    return GetWiFiStationMode() == kWiFiStationMode_Enabled;
-}
-
-void ConnectivityManagerImpl::OnStationConnected()
-{
-    NetworkCommissioning::BLWiFiDriver::GetInstance().OnConnectWiFiNetwork();
-    // TODO Invoke WARM to perform actions that occur when the WiFi station interface comes up.
-
-#if 0
-    // Alert other components of the new state.
-    ChipDeviceEvent event;
-    event.Type                          = DeviceEventType::kWiFiConnectivityChange;
-    event.WiFiConnectivityChange.Result = kConnectivity_Established;
-    PlatformMgr().PostEventOrDie(&event);
-
-    UpdateInternetConnectivityState();
-#endif
+    if (delegate)
+    {
+        delegate->OnDisconnectionDetected(reason);
+        delegate->OnConnectionStatusChanged(
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::ConnectionStatusEnum::kNotConnected));
+    }
 }
 
 } // namespace DeviceLayer

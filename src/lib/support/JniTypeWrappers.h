@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 
 #include <cstdint>
 #include <jni.h>
+#include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/Span.h>
 #include <string>
@@ -87,19 +88,41 @@ private:
 class UtfString
 {
 public:
-    UtfString(JNIEnv * env, const char * data) : mEnv(env) { mData = data != nullptr ? mEnv->NewStringUTF(data) : nullptr; }
+    UtfString(JNIEnv * env, const char * data) : mEnv(env)
+    {
+        jstring localRef = data != nullptr ? mEnv->NewStringUTF(data) : nullptr;
+        if (localRef == nullptr)
+        {
+            return;
+        }
+        mData = static_cast<jstring>(env->NewGlobalRef(localRef));
+    }
+
     UtfString(JNIEnv * env, chip::CharSpan data) : mEnv(env)
     {
         std::string str(data.data(), data.size());
-        mData = env->NewStringUTF(str.c_str());
+        jstring localRef = env->NewStringUTF(str.c_str());
+        if (localRef == nullptr)
+        {
+            return;
+        }
+        mData = static_cast<jstring>(env->NewGlobalRef(localRef));
     }
-    ~UtfString() { mEnv->DeleteLocalRef(mData); }
+
+    ~UtfString()
+    {
+        if (mEnv != nullptr && mData != nullptr)
+        {
+            mEnv->DeleteGlobalRef(mData);
+            mData = nullptr;
+        }
+    }
 
     jstring jniValue() { return mData; }
 
 private:
-    JNIEnv * mEnv;
-    jstring mData;
+    JNIEnv * mEnv = nullptr;
+    jstring mData = nullptr;
 };
 
 /// wrap a byte array as a JNI byte array
@@ -108,39 +131,54 @@ class ByteArray
 public:
     ByteArray(JNIEnv * env, const jbyte * data, jsize dataLen) : mEnv(env)
     {
-        mArray = data != nullptr ? mEnv->NewByteArray(dataLen) : nullptr;
-        if (mArray != nullptr)
+        jbyteArray localRef = data != nullptr ? mEnv->NewByteArray(dataLen) : nullptr;
+        if (localRef == nullptr)
         {
-            env->SetByteArrayRegion(mArray, 0, dataLen, data);
+            return;
         }
+        env->SetByteArrayRegion(localRef, 0, dataLen, data);
+        mArray = static_cast<jbyteArray>(env->NewGlobalRef(localRef));
     }
+
     ByteArray(JNIEnv * env, chip::ByteSpan data) : mEnv(env)
     {
-        mArray = mEnv->NewByteArray(static_cast<jsize>(data.size()));
-        if (mArray != nullptr)
+        jbyteArray localRef = mEnv->NewByteArray(static_cast<jsize>(data.size()));
+        if (localRef == nullptr)
         {
-            env->SetByteArrayRegion(mArray, 0, static_cast<jsize>(data.size()), reinterpret_cast<const jbyte *>(data.data()));
+            return;
+        }
+        env->SetByteArrayRegion(localRef, 0, static_cast<jsize>(data.size()), reinterpret_cast<const jbyte *>(data.data()));
+        mArray = static_cast<jbyteArray>(env->NewGlobalRef(localRef));
+    }
+
+    ~ByteArray()
+    {
+        if (mEnv != nullptr && mArray != nullptr)
+        {
+            mEnv->DeleteGlobalRef(mArray);
         }
     }
-    ~ByteArray() { mEnv->DeleteLocalRef(mArray); }
 
     jbyteArray jniValue() { return mArray; }
 
 private:
-    JNIEnv * mEnv;
-    jbyteArray mArray;
+    JNIEnv * mEnv     = nullptr;
+    jbyteArray mArray = nullptr;
 };
 
-/// Manages an pre-existing global reference to a jclass.
-class JniClass
+// Manages an pre-existing global reference to a jobject.
+class JniGlobalRefWrapper
 {
 public:
-    explicit JniClass(jclass mClassRef) : mClassRef(mClassRef) {}
-    ~JniClass() { chip::JniReferences::GetInstance().GetEnvForCurrentThread()->DeleteGlobalRef(mClassRef); }
-
-    jclass classRef() { return mClassRef; }
+    explicit JniGlobalRefWrapper(jobject mGlobalRef) : mGlobalRef(mGlobalRef) {}
+    ~JniGlobalRefWrapper()
+    {
+        chip::JniReferences::GetInstance().GetEnvForCurrentThread()->DeleteGlobalRef(mGlobalRef);
+        mGlobalRef = nullptr;
+    }
+    jobject classRef() { return mGlobalRef; }
 
 private:
-    jclass mClassRef;
+    jobject mGlobalRef = nullptr;
 };
 } // namespace chip

@@ -15,15 +15,16 @@
 #    limitations under the License.
 #
 #
-# (Uses default behaviour of compiling all source files in directory, adding 'include' to include path.)
+
+get_filename_component(CHIP_ROOT ${CMAKE_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
+
 set(PRIV_INCLUDE_DIRS_LIST
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/temperature-measurement-app/"
                       "${CMAKE_CURRENT_LIST_DIR}/include"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/providers"
 )
 set(SRC_DIRS_LIST
                       "${CMAKE_CURRENT_LIST_DIR}"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/temperature-measurement-app/zap-generated"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated/attributes"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/server"
@@ -31,7 +32,7 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/reporting"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/access-control-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/administrator-commissioning-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/basic"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/basic-information"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/bindings"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/descriptor"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/diagnostic-logs-server"
@@ -49,10 +50,10 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/general-commissioning-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/network-commissioning"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/operational-credentials-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/route_hook"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/ota-requestor"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/common"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/providers"
 )
-
-set(PRIV_REQUIRES_LIST chip QRCode bt)
 
 if (CONFIG_ENABLE_PW_RPC)
 # Append additional directories for RPC build
@@ -62,8 +63,14 @@ set(PRIV_INCLUDE_DIRS_LIST  "${PRIV_INCLUDE_DIRS_LIST}"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common/pigweed"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common/pigweed/esp32"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/lib/support"
-                     "${IDF_PATH}/components/freertos/include/freertos"
 )
+
+if (${IDF_VERSION_MAJOR} LESS 5)
+    list(APPEND PRIV_INCLUDE_DIRS_LIST "${IDF_PATH}/components/freertos/include/freertos")
+else()
+    list(APPEND PRIV_INCLUDE_DIRS_LIST "${IDF_PATH}/components/freertos/FreeRTOS-Kernel/include/freertos")
+endif()
+
 set(SRC_DIRS_LIST  "${SRC_DIRS_LIST}"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common/pigweed"
@@ -73,17 +80,19 @@ endif (CONFIG_ENABLE_PW_RPC)
 
 idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}
                        SRC_DIRS ${SRC_DIRS_LIST}
-                       PRIV_REQUIRES ${PRIV_REQUIRES_LIST})
+                       EMBED_FILES diagnostic_logs/end_user_support.log diagnostic_logs/network_diag.log)
+
+include("${CHIP_ROOT}/build/chip/esp32/esp32_codegen.cmake")
+chip_app_component_codegen("${CHIP_ROOT}/examples/temperature-measurement-app/temperature-measurement-common/temperature-measurement.matter")
+chip_app_component_zapgen("${CHIP_ROOT}/examples/temperature-measurement-app/temperature-measurement-common/temperature-measurement.zap")
 
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)
-target_compile_options(${COMPONENT_LIB} PRIVATE "-DLWIP_IPV6_SCOPES=0" "-DCHIP_HAVE_CONFIG_H")
+target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")
 target_compile_options(${COMPONENT_LIB} PUBLIC
            "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
 )
 
 if (CONFIG_ENABLE_PW_RPC)
-
-get_filename_component(CHIP_ROOT ${CMAKE_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 
 set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
 include(${PIGWEED_ROOT}/pw_build/pigweed.cmake)
@@ -100,7 +109,7 @@ pw_proto_library(attributes_service
   STRIP_PREFIX
     ${CHIP_ROOT}/examples/common/pigweed/protos
   DEPS
-    pw_protobuf.common_protos
+    pw_protobuf.common_proto
 )
 
 pw_proto_library(button_service
@@ -111,7 +120,7 @@ pw_proto_library(button_service
   STRIP_PREFIX
     ${CHIP_ROOT}/examples/common/pigweed/protos
   DEPS
-    pw_protobuf.common_protos
+    pw_protobuf.common_proto
 )
 
 pw_proto_library(descriptor_service
@@ -122,7 +131,7 @@ pw_proto_library(descriptor_service
   STRIP_PREFIX
     ${CHIP_ROOT}/examples/common/pigweed/protos
   DEPS
-    pw_protobuf.common_protos
+    pw_protobuf.common_proto
 )
 
 pw_proto_library(device_service
@@ -135,7 +144,7 @@ pw_proto_library(device_service
   STRIP_PREFIX
     ${CHIP_ROOT}/examples/common/pigweed/protos
   DEPS
-    pw_protobuf.common_protos
+    pw_protobuf.common_proto
 )
 
 pw_proto_library(wifi_service
@@ -146,7 +155,7 @@ pw_proto_library(wifi_service
   PREFIX
     wifi_service
   DEPS
-    pw_protobuf.common_protos
+    pw_protobuf.common_proto
   STRIP_PREFIX
     ${CHIP_ROOT}/examples/common/pigweed/protos
 )
@@ -161,6 +170,8 @@ target_link_libraries(${COMPONENT_LIB} PUBLIC
   pw_hdlc
   pw_log
   pw_rpc.server
+  pw_sys_io
+  pw_trace
   pw_trace_tokenized
   pw_trace_tokenized.trace_buffer
   pw_trace_tokenized.rpc_service
@@ -170,6 +181,7 @@ target_link_libraries(${COMPONENT_LIB} PUBLIC
 target_link_options(${COMPONENT_LIB}
   PUBLIC
     "-T${PIGWEED_ROOT}/pw_tokenizer/pw_tokenizer_linker_sections.ld"
+    "-L${PIGWEED_ROOT}/pw_tokenizer"
 )
 
 target_compile_options(${COMPONENT_LIB} PRIVATE

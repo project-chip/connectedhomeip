@@ -25,8 +25,6 @@
 
 #define CHIP_CONFIG_EVENT_LOGGING_NUM_EXTERNAL_CALLBACKS 2
 
-#define CHIP_CONFIG_EVENT_LOGGING_EXTERNAL_EVENT_SUPPORT 1
-
 // Uncomment this for a large Tunnel MTU.
 //#define CHIP_CONFIG_TUNNEL_INTERFACE_MTU                           (9000)
 
@@ -60,5 +58,7 @@
  AND the python tool would provide runtime options to enable/disable them */
 #define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY 1
 #define CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE 1
+
+#define CONFIG_BUILD_FOR_HOST_UNIT_TEST 1
 
 #endif /* CHIPPROJECTCONFIG_H */

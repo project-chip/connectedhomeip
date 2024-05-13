@@ -70,8 +70,10 @@ CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBufferHandle && payload, Me
         mExchangeCtx = nullptr;
     }
 
+    VerifyOrReturnError(mSecureSession, CHIP_ERROR_INVALID_MESSAGE_TYPE);
+
     // Create a new exchange context.
-    mExchangeCtx = mExchangeMgr->NewContext(mSecureSession.Get(), this);
+    mExchangeCtx = mExchangeMgr->NewContext(mSecureSession.Get().Value(), this);
     if (mExchangeCtx == nullptr)
     {
         return CHIP_ERROR_NO_MEMORY;

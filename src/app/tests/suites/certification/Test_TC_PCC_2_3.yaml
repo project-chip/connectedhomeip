@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 15.2.3. [TC-PCC-2.3] Primary functionality with server as DUT
+name: 16.2.3. [TC-PCC-2.3] Control Mode with Server as DUT
+
+PICS:
+    - PCC.S
 
 config:
     nodeId: 0x12344321
@@ -20,7 +23,9 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -28,105 +33,120 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Write 0 to the OperationMode attribute to DUT"
+    - label:
+          "Step 2a: TH write 0 (Normal) to the OperationMode attribute to DUT."
       command: "writeAttribute"
       attribute: "OperationMode"
-      PICS: A_OPERATIONMODE
+      PICS: PCC.S.A0020
       arguments:
           value: 0
 
-    - label: "Reads the attribute: EffectiveOperationMode"
+    - label:
+          "Step 2b: TH reads from the DUT the EffectiveOperationMode attribute"
       command: "readAttribute"
       attribute: "EffectiveOperationMode"
-      PICS: A_EFFECTIVEOPERATIONMODE
+      PICS: PCC.S.A0011
       response:
           value: 0
 
-    - label: "Write 0 to the ControlMode attribute to DUT"
+    - label:
+          "Step 3a: TH write 0 (ConstantSpeed) to the ControlMode attribute to
+          DUT one at a time."
       command: "writeAttribute"
       attribute: "ControlMode"
-      PICS: A_CONTROLMODE
+      PICS: PCC.S.F03 && PCC.S.A0021
       arguments:
           value: 0
 
-    - label: "Reads the attribute: EffectiveControlMode"
+    - label:
+          "Step 3b: TH reads from the DUT the EffectiveControlMode attribute."
       command: "readAttribute"
       attribute: "EffectiveControlMode"
-      PICS: A_EFFECTIVECONTROLMODE
+      PICS: PCC.S.F03 && PCC.S.A0012
       response:
           value: 0
 
-    - label: "Write 1 to the ControlMode attribute to DUT"
+    - label:
+          "Step 4a: TH write 1 (ConstantPressure) to the ControlMode attribute
+          to DUT one at a time."
       command: "writeAttribute"
       attribute: "ControlMode"
-      PICS: A_CONTROLMODE
+      PICS: PCC.S.F00 && PCC.S.A0021
       arguments:
           value: 1
 
-    - label: "Reads the attribute: EffectiveControlMode"
-      disabled: true
+    - label:
+          "Step 4b: TH reads from the DUT the EffectiveControlMode attribute."
       command: "readAttribute"
       attribute: "EffectiveControlMode"
-      PICS: A_EFFECTIVECONTROLMODE
+      PICS: PCC.S.F00 && PCC.S.A0012
       response:
           value: 1
 
-    - label: "Write 2 to the ControlMode attribute to DUT"
+    - label:
+          "Step 5a: TH write 2 (ProportionalPressure) to the ControlMode
+          attribute to DUT one at a time."
       command: "writeAttribute"
       attribute: "ControlMode"
-      PICS: A_CONTROLMODE
+      PICS: PCC.S.F01 && PCC.S.A0021
       arguments:
           value: 2
 
-    - label: "Reads the attribute: EffectiveControlMode"
-      disabled: true
+    - label:
+          "Step 5b: TH reads from the DUT the EffectiveControlMode attribute."
       command: "readAttribute"
       attribute: "EffectiveControlMode"
-      PICS: A_EFFECTIVECONTROLMODE
+      PICS: PCC.S.F01 && PCC.S.A0012
       response:
           value: 2
 
-    - label: "Write 3 to the ControlMode attribute to DUT"
+    - label:
+          "Step 6a: TH write 3 (ConstantFlow) to the ControlMode attribute to
+          DUT one at a time."
       command: "writeAttribute"
       attribute: "ControlMode"
-      PICS: A_CONTROLMODE
+      PICS: PCC.S.F02 && PCC.S.A0021
       arguments:
           value: 3
 
-    - label: "Reads the attribute: EffectiveControlMode"
-      disabled: true
+    - label:
+          "Step 6b: TH reads from the DUT the _EffectiveControlMode attribute."
       command: "readAttribute"
       attribute: "EffectiveControlMode"
-      PICS: A_EFFECTIVECONTROLMODE
+      PICS: PCC.S.F02 && PCC.S.A0012
       response:
           value: 3
 
-    - label: "Write 5 to the ControlMode attribute to DUT"
+    - label:
+          "Step 7a: TH write 5 (ConstantTemperature) to the ControlMode
+          attribute to DUT one at a time."
       command: "writeAttribute"
       attribute: "ControlMode"
-      PICS: A_CONTROLMODE
+      PICS: PCC.S.F04 && PCC.S.A0021
       arguments:
           value: 5
 
-    - label: "Reads the attribute: EffectiveControlMode"
-      disabled: true
+    - label:
+          "Step 7b: TH reads from the DUT the EffectiveControlMode attribute."
       command: "readAttribute"
       attribute: "EffectiveControlMode"
-      PICS: A_EFFECTIVECONTROLMODE
+      PICS: PCC.S.F04 && PCC.S.A0012
       response:
           value: 5
 
-    - label: "Write 7 to the ControlMode attribute to DUT"
+    - label:
+          "Step 8a: TH write 7 (Automatic) to the ControlMode attribute to DUT
+          one at a time."
       command: "writeAttribute"
       attribute: "ControlMode"
-      PICS: A_CONTROLMODE
+      PICS: PCC.S.F05 && PCC.S.A0021
       arguments:
           value: 7
 
-    - label: "Reads the attribute: EffectiveControlMode"
-      disabled: true
+    - label:
+          "Step 8b: TH reads from the DUT the EffectiveControlMode attribute."
       command: "readAttribute"
       attribute: "EffectiveControlMode"
-      PICS: A_EFFECTIVECONTROLMODE
+      PICS: PCC.S.F05 && PCC.S.A0012
       response:
           value: 7

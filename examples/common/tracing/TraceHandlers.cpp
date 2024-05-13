@@ -22,10 +22,10 @@
 #include <string>
 #include <vector>
 
-#include "transport/TraceMessage.h"
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <transport/TraceMessage.h>
 
 // For `s` std::string literal suffix
 using namespace std::string_literals;
@@ -33,72 +33,69 @@ using namespace std::string_literals;
 namespace chip {
 namespace trace {
 
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 namespace {
 
 // Handles the output from the trace handlers.
 class TraceOutput
 {
 public:
-    ~TraceOutput() { DeleteStream(); }
+    ~TraceOutput() { UnregisterAllStreams(); }
 
-    void SetStream(TraceStream * stream)
+    void RegisterStream(TraceStream * stream)
     {
         std::lock_guard<std::mutex> guard(mLock);
-        if (mStream)
-        {
-            delete mStream;
-            mStream = nullptr;
-        }
-        mStream = stream;
+        mStreams.push_back(stream);
     }
 
-    void DeleteStream() { SetStream(nullptr); }
+    void UnregisterAllStreams()
+    {
+        for (auto stream : mStreams)
+        {
+            delete stream;
+        }
+        mStreams.clear();
+    }
 
     void StartEvent(const std::string & label)
     {
         std::lock_guard<std::mutex> guard(mLock);
-        if (mStream)
+        for (auto stream : mStreams)
         {
-            mStream->StartEvent(label);
+            stream->StartEvent(label);
         }
     }
 
     void AddField(const std::string & tag, const std::string & data)
     {
         std::lock_guard<std::mutex> guard(mLock);
-        if (mStream)
+        for (auto stream : mStreams)
         {
-            mStream->AddField(tag, data);
+            stream->AddField(tag, data);
         }
     }
 
     void FinishEvent()
     {
         std::lock_guard<std::mutex> guard(mLock);
-        if (mStream)
+        for (auto stream : mStreams)
         {
-            mStream->FinishEvent();
+            stream->FinishEvent();
         }
     }
 
     bool HasStreamAvailable() const
     {
         std::lock_guard<std::mutex> guard(mLock);
-        return (mStream != nullptr);
+        return (mStreams.size());
     }
 
 private:
     mutable std::mutex mLock;
-    TraceStream * mStream = nullptr;
+    std::vector<TraceStream *> mStreams;
 };
 
-struct TraceHandlerContext
-{
-    TraceOutput * sink;
-};
-
-TraceOutput gTraceOutput;
-TraceHandlerContext gTraceHandlerContext = { .sink = &gTraceOutput };
+TraceOutput gTraceOutputs;
 
 std::string AsJsonKey(const std::string & key, const std::string & value, bool prepend_comma)
 {
@@ -202,7 +199,7 @@ std::string PayloadHeaderToJson(const PayloadHeader * payloadHeader)
 
     std::string jsonBody;
 
-    uint8_t exchangeFlags = payloadHeader->GetExhangeFlags();
+    uint8_t exchangeFlags = payloadHeader->GetExchangeFlags();
     jsonBody += AsFirstJsonKey("exchange_flags", std::to_string(exchangeFlags));
 
     uint16_t exchangeId = payloadHeader->GetExchangeID();
@@ -229,54 +226,14 @@ std::string PayloadHeaderToJson(const PayloadHeader * payloadHeader)
     return jsonBody;
 }
 
-std::string PreparedSecureMessageDataToJson(const TracePreparedSecureMessageData * data, const std::string & peerAddressKey)
-{
-    const System::PacketBuffer * packetBuffer = data->packetBuffer->operator->();
-    std::string jsonBody                      = "{";
-    jsonBody += AsFirstJsonKey(peerAddressKey, AsJsonString(data->peerAddress));
-    jsonBody += ", ";
-    jsonBody += AsFirstJsonKey("payload_size", std::to_string(packetBuffer->DataLength()));
-    jsonBody += ", ";
-    jsonBody += AsFirstJsonKey("payload_hex", AsJsonHexString(packetBuffer->Start(), packetBuffer->DataLength()));
-    jsonBody += ", ";
-    jsonBody += AsFirstJsonKey("buffer_ptr", std::to_string(reinterpret_cast<std::uintptr_t>(packetBuffer)));
-    jsonBody += "}";
-
-    return jsonBody;
-}
-
 void SecureMessageSentHandler(const TraceSecureMessageSentData * eventData)
 {
-    TraceOutput * sink = gTraceHandlerContext.sink;
-    if (!sink->HasStreamAvailable())
+    if (!gTraceOutputs.HasStreamAvailable())
     {
         return;
     }
 
-    std::string jsonBody = "{";
-    jsonBody += PacketHeaderToJson(eventData->packetHeader);
-    jsonBody += ", ";
-    jsonBody += PayloadHeaderToJson(eventData->payloadHeader);
-    jsonBody += ", ";
-    jsonBody += AsFirstJsonKey("payload_size", std::to_string(eventData->packetSize));
-    jsonBody += ", ";
-    jsonBody += AsFirstJsonKey("payload_hex", AsJsonHexString(eventData->packetPayload, eventData->packetSize));
-    jsonBody += "}";
-
-    sink->StartEvent(std::string{ kTraceMessageEvent } + "." + kTraceMessageSentDataFormat);
-    sink->AddField("json", jsonBody);
-    sink->FinishEvent();
-}
-
-void SecureMessageReceivedHandler(const TraceSecureMessageReceivedData * eventData)
-{
-    TraceOutput * sink = gTraceHandlerContext.sink;
-    if (!sink->HasStreamAvailable())
-    {
-        return;
-    }
-
-    std::string jsonBody = "{";
+    std::string jsonBody = "{ \"direction\": \"outbound\", ";
     jsonBody += AsFirstJsonKey("peer_address", AsJsonString(eventData->peerAddress));
     jsonBody += ", ";
     jsonBody += PacketHeaderToJson(eventData->packetHeader);
@@ -288,50 +245,40 @@ void SecureMessageReceivedHandler(const TraceSecureMessageReceivedData * eventDa
     jsonBody += AsFirstJsonKey("payload_hex", AsJsonHexString(eventData->packetPayload, eventData->packetSize));
     jsonBody += "}";
 
-    sink->StartEvent(std::string{ kTraceMessageEvent } + "." + kTraceMessageReceivedDataFormat);
-    sink->AddField("json", jsonBody);
-    sink->FinishEvent();
+    gTraceOutputs.StartEvent(std::string{ kTraceMessageEvent } + "." + kTraceMessageSentDataFormat);
+    gTraceOutputs.AddField("json", jsonBody);
+    gTraceOutputs.FinishEvent();
+}
+
+void SecureMessageReceivedHandler(const TraceSecureMessageReceivedData * eventData)
+{
+    if (!gTraceOutputs.HasStreamAvailable())
+    {
+        return;
+    }
+
+    std::string jsonBody = "{ \"direction\": \"inbound\", ";
+    jsonBody += AsFirstJsonKey("peer_address", AsJsonString(eventData->peerAddress));
+    jsonBody += ", ";
+    jsonBody += PacketHeaderToJson(eventData->packetHeader);
+    jsonBody += ", ";
+    jsonBody += PayloadHeaderToJson(eventData->payloadHeader);
+    jsonBody += ", ";
+    jsonBody += AsFirstJsonKey("payload_size", std::to_string(eventData->packetSize));
+    jsonBody += ", ";
+    jsonBody += AsFirstJsonKey("payload_hex", AsJsonHexString(eventData->packetPayload, eventData->packetSize));
+    jsonBody += "}";
+
+    gTraceOutputs.StartEvent(std::string{ kTraceMessageEvent } + "." + kTraceMessageReceivedDataFormat);
+    gTraceOutputs.AddField("json", jsonBody);
+    gTraceOutputs.FinishEvent();
 
     // Note that `eventData->session` is currently ignored.
 }
 
-void PreparedMessageSentHandler(const TracePreparedSecureMessageData * eventData)
-{
-    TraceOutput * sink = gTraceHandlerContext.sink;
-    if (!sink->HasStreamAvailable())
-    {
-        return;
-    }
-
-    sink->StartEvent(std::string{ kTraceMessageEvent } + "." + kTracePreparedMessageSentDataFormat);
-    sink->AddField("json", PreparedSecureMessageDataToJson(eventData, "destination"));
-    sink->FinishEvent();
-}
-
-void PreparedMessageReceivedHandler(const TracePreparedSecureMessageData * eventData)
-{
-    TraceOutput * sink = gTraceHandlerContext.sink;
-    if (!sink->HasStreamAvailable())
-    {
-        return;
-    }
-
-    sink->StartEvent(std::string{ kTraceMessageEvent } + "." + kTracePreparedMessageReceivedDataFormat);
-    sink->AddField("json", PreparedSecureMessageDataToJson(eventData, "source"));
-    sink->FinishEvent();
-}
-
 void TraceHandler(const char * type, const void * data, size_t size)
 {
-    if ((std::string{ type } == kTracePreparedMessageReceivedDataFormat) && (size == sizeof(TracePreparedSecureMessageData)))
-    {
-        PreparedMessageReceivedHandler(reinterpret_cast<const TracePreparedSecureMessageData *>(data));
-    }
-    else if ((std::string{ type } == kTracePreparedMessageSentDataFormat) && (size == sizeof(TracePreparedSecureMessageData)))
-    {
-        PreparedMessageSentHandler(reinterpret_cast<const TracePreparedSecureMessageData *>(data));
-    }
-    else if ((std::string{ type } == kTraceMessageSentDataFormat) && (size == sizeof(TraceSecureMessageSentData)))
+    if ((std::string{ type } == kTraceMessageSentDataFormat) && (size == sizeof(TraceSecureMessageSentData)))
     {
         SecureMessageSentHandler(reinterpret_cast<const TraceSecureMessageSentData *>(data));
     }
@@ -343,9 +290,9 @@ void TraceHandler(const char * type, const void * data, size_t size)
 
 } // namespace
 
-void SetTraceStream(TraceStream * stream)
+void AddTraceStream(TraceStream * stream)
 {
-    gTraceOutput.SetStream(stream);
+    gTraceOutputs.RegisterStream(stream);
 }
 
 void InitTrace()
@@ -355,8 +302,14 @@ void InitTrace()
 
 void DeInitTrace()
 {
-    gTraceOutput.DeleteStream();
+    gTraceOutputs.UnregisterAllStreams();
 }
+
+#else
+void AddTraceStream(TraceStream *) {}
+void InitTrace() {}
+void DeInitTrace() {}
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
 } // namespace trace
 } // namespace chip

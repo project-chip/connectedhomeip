@@ -45,14 +45,18 @@
  *
  * 0xFFF1: Test vendor.
  */
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
 #define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF1
+#endif // CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
  *
  * 0x8009: example persistent-storage
  */
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8009
+#endif // CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION
@@ -82,27 +86,12 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
 
 /**
- * CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
- *
- * Enables synchronizing the device's real time clock with a remote Chip Time service
- * using the Chip Time Sync protocol.
- */
-#define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 0
-
-/**
  * CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
  *
  * Enables the use of a hard-coded default serial number if none
  * is found in Chip NV storage.
  */
 #define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "TEST_SN"
-
-/**
- * CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE
- *
- * A size, in bytes, of the individual debug event logging buffer.
- */
-#define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
 
 /**
  * CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
@@ -112,25 +101,13 @@
 #define CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI 1
 
 /**
- *  @def CHIP_CONFIG_MAX_FABRICS
- *
- *  @brief
- *    Maximum number of fabrics the device can participate in.  Each fabric can
- *    provision the device with its unique operational credentials and manage
- *    its own access control lists.
- */
-#define CHIP_CONFIG_MAX_FABRICS 4 // 3 fabrics + 1 for rotation slack
-
-/**
  *  @name Interaction Model object pool configuration.
  *
  *  @brief
  *    The following definitions sets the maximum number of corresponding interaction model object pool size.
  *
  *      * #CHIP_IM_MAX_NUM_COMMAND_HANDLER
- *      * #CHIP_IM_MAX_NUM_READ_HANDLER
  *      * #CHIP_IM_MAX_REPORTS_IN_FLIGHT
- *      * #CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
  *      * #CHIP_IM_MAX_NUM_WRITE_HANDLER
  *      * #CHIP_IM_MAX_NUM_WRITE_CLIENT
  *
@@ -145,25 +122,11 @@
 #define CHIP_IM_MAX_NUM_COMMAND_HANDLER 2
 
 /**
- * @def CHIP_IM_MAX_NUM_READ_HANDLER
- *
- * @brief Defines the maximum number of ReadHandler, limits the number of active read transactions on server.
- */
-#define CHIP_IM_MAX_NUM_READ_HANDLER 3
-
-/**
  * @def CHIP_IM_MAX_REPORTS_IN_FLIGHT
  *
  * @brief Defines the maximum number of Reports, limits the traffic of read and subscription transactions.
  */
 #define CHIP_IM_MAX_REPORTS_IN_FLIGHT 2
-
-/**
- * @def CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
- *
- * @brief Defines the maximum number of path objects, limits the number of attributes being read or subscribed at the same time.
- */
-#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS 9
 
 /**
  * @def CHIP_IM_MAX_NUM_WRITE_HANDLER

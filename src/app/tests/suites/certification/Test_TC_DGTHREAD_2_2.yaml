@@ -1,0 +1,207 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 50.2.2. [TC-DGTHREAD-2.2] Attributes-Tx [DUT- Server]
+
+PICS:
+    - DGTHREAD.S
+    - DGTHREAD.S.F03
+
+config:
+    nodeId: 0x12344321
+    cluster: "Thread Network Diagnostics"
+    endpoint: 0
+
+tests:
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH reads TxTotalCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0016
+      command: "readAttribute"
+      attribute: "TxTotalCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 3: TH reads TxUnicastCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0017
+      command: "readAttribute"
+      attribute: "TxUnicastCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 4: TH reads TxBroadcastCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0018
+      command: "readAttribute"
+      attribute: "TxBroadcastCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 5: TH reads TxAckRequestedCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0019
+      command: "readAttribute"
+      attribute: "TxAckRequestedCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 6: TH reads TxAckedCount attribute value from DUT"
+      PICS: DGTHREAD.S.A001a
+      command: "readAttribute"
+      attribute: "TxAckedCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 7: TH reads TxNoAckRequestedCount attribute value from DUT"
+      PICS: DGTHREAD.S.A001b
+      command: "readAttribute"
+      attribute: "TxNoAckRequestedCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 8: TH reads TxDataCount attribute value from DUT"
+      PICS: DGTHREAD.S.A001c
+      command: "readAttribute"
+      attribute: "TxDataCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 9: TH reads TxDataPollCount attribute value from DUT"
+      PICS: DGTHREAD.S.A001d
+      command: "readAttribute"
+      attribute: "TxDataPollCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 10: TH reads TxBeaconCount attribute value from DUT"
+      PICS: DGTHREAD.S.A001e
+      command: "readAttribute"
+      attribute: "TxBeaconCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 11: TH reads TxBeaconRequestCount attribute value from DUT"
+      PICS: DGTHREAD.S.A001f
+      command: "readAttribute"
+      attribute: "TxBeaconRequestCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 12: TH reads TxOtherCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0020
+      command: "readAttribute"
+      attribute: "TxOtherCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 13: TH reads TxRetryCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0021
+      command: "readAttribute"
+      attribute: "TxRetryCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label:
+          "Step 14: TH reads TxDirectMaxRetryExpiryCount attribute value from
+          DUT"
+      PICS: DGTHREAD.S.A0022
+      command: "readAttribute"
+      attribute: "TxDirectMaxRetryExpiryCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label:
+          "Step 15: TH reads TxIndirectMaxRetryExpiryCount attribute value from
+          DUT"
+      PICS: DGTHREAD.S.A0023
+      command: "readAttribute"
+      attribute: "TxIndirectMaxRetryExpiryCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 16: TH reads TxErrCcaCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0024
+      command: "readAttribute"
+      attribute: "TxErrCcaCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 17: TH reads TxErrAbortCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0025
+      command: "readAttribute"
+      attribute: "TxErrAbortCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 18: TH reads TxErrBusyChannelCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0026
+      command: "readAttribute"
+      attribute: "TxErrBusyChannelCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF

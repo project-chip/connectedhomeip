@@ -23,6 +23,12 @@
 
 #pragma once
 
+#ifndef _CHIP_BLE_BLE_H
+#error "Please include <ble/Ble.h> instead!"
+#endif
+
+#include <cstdint>
+
 #include <lib/core/CHIPEncoding.h>
 
 namespace chip {
@@ -47,6 +53,7 @@ struct ChipBLEDeviceIdentificationInfo
 {
     constexpr static uint16_t kDiscriminatorMask            = 0xfff;
     constexpr static uint8_t kAdditionalDataFlagMask        = 0x1;
+    constexpr static uint8_t kExtendedAnnouncementFlagMask  = 0x2;
     constexpr static uint8_t kAdvertisementVersionMask      = 0xf0;
     constexpr static uint8_t kAdvertisementVersionShiftBits = 4u;
 
@@ -94,8 +101,8 @@ struct ChipBLEDeviceIdentificationInfo
     void SetDeviceDiscriminator(uint16_t deviceDiscriminator)
     {
         // Discriminator is 12-bit long, so don't overwrite bits 12th through 15th
-        deviceDiscriminator &= kDiscriminatorMask;
-        deviceDiscriminator |= static_cast<uint16_t>(DeviceDiscriminatorAndAdvVersion[1] << 8u & ~kDiscriminatorMask);
+        auto advVersion     = static_cast<uint16_t>(DeviceDiscriminatorAndAdvVersion[1] << 8u & ~kDiscriminatorMask);
+        deviceDiscriminator = static_cast<uint16_t>(advVersion | (deviceDiscriminator & kDiscriminatorMask));
         chip::Encoding::LittleEndian::Put16(DeviceDiscriminatorAndAdvVersion, deviceDiscriminator);
     }
 
@@ -112,6 +119,19 @@ struct ChipBLEDeviceIdentificationInfo
             AdditionalDataFlag &= static_cast<uint8_t>(~kAdditionalDataFlagMask);
         }
     }
+
+    void SetExtendedAnnouncementFlag(bool flag)
+    {
+        if (flag)
+        {
+            AdditionalDataFlag |= kExtendedAnnouncementFlagMask;
+        }
+        else
+        {
+            AdditionalDataFlag &= static_cast<uint8_t>(~kExtendedAnnouncementFlagMask);
+        }
+    }
+
 } __attribute__((packed));
 
 } /* namespace Ble */

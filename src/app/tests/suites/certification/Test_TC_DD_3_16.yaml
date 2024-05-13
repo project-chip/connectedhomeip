@@ -1,0 +1,297 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    3.3.16. [TC-DD-3.16] Commissioning Flow - 11-digit Manual Pairing Code -
+    Negative Scenario [DUT - Commissioner]
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+    - MCORE.DD.11_MANUAL_PC
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the DUT as commissioner test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Preconditions"
+      verification: |
+          1 - DUT is on an operational network and has accurate date, time, timezone, regulatory, and fabric information available.
+
+          2 - 5.1.4.2 - 11-digit Manual Pairing Code is printed on the Commissionee device or in additional provided materials (ex: manual, companion app, web service).
+
+          An example onboarding payload could be "34970112332" (following 5.1.4. Table 37. "Manual Pairing Code Elements") which each include:
+
+          - 1-bit VID_PID_PRESENT = 0 (11-digit only)
+
+          - 1-bit VERSION=0
+
+          - 4-bit SHORT DISCRIMINATOR=0xF00 (4 Most-significant bits of the 12-bits Discriminator value)
+
+          - 27-bit PASSCODE=20202021 (see section 5.1.6. Generation of the Passcode)
+
+          - 16-bit VENDOR_ID=0xFFF1 (as defined in section 2.5.2. "Vendor Identifier", for 21-digit Manual Pairing Code only)
+
+          - 16-bit PRODUCT_ID=0x8001 (as defined in section 2.5.3. "Product Identifier", present if and only if VID is present)
+
+          - A generated CHECK_DIGIT (see section 5.1.4. Manual Pairing Code, subsection "Check Digit")
+      disabled: true
+
+    - label:
+          "Step 1: Provide the 11-digit Manual Pairing Code from the
+          Commissionee to the DUT in any format supported by DUT"
+      verification: |
+          Verify on the TH (All-cluster-app)
+          ./chip-all-clusters-app --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --custom-flow 0 --capabilities 4 --discriminator 3840 --passcode 20202021
+
+          [1651180718.960383][13218:13218] CHIP:DL: Device Configuration:
+          [1651180718.960441][13218:13218] CHIP:DL:   Serial Number: TEST_SN
+          [1651180718.960477][13218:13218] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
+          [1651180718.960512][13218:13218] CHIP:DL:   Product Id: 32769 (0x8001)
+          [1651180718.960546][13218:13218] CHIP:DL:   Hardware Version: 0
+          [1651180718.960569][13218:13218] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
+          [1651180718.960597][13218:13218] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3840 (0xF00)
+          [1651180718.960627][13218:13218] CHIP:DL:   Manufacturing Date: (not set)
+          [1651180718.960650][13218:13218] CHIP:DL:   Device Type: 65535 (0xFFFF)
+          [1651180718.960671][13218:13218] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
+          [1651180718.960729][13218:13218] CHIP:SVR: SetupQRCode: [MT:-24J0AFN00KA0648G00]
+          [1651180718.960760][13218:13218] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
+          [1651180718.960781][13218:13218] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0AFN00KA0648G00
+          [1651180718.960814][13218:13218] CHIP:SVR: Manual pairing code: [34970112332]
+      disabled: true
+
+    - label:
+          "Step 2a: VERSION: Using the manual code from Step 1, generate a new
+          manual code but substituting out the current VERSION with an invalid
+          VERSION: 2"
+      verification: |
+          1. Use chip-tool's "payload verhoeff-generate" command to help generate the new, invalid Manual code
+          Verify on the DUT (Chip-tool):
+
+           ./chip-tool payload verhoeff-generate 8497011233
+
+          [1651186243492] [13415:349553] CHIP: [SPL] Generating Character for: 84970112331
+          [1651186243492] [13415:349553] CHIP: [SPL] Generated Char: 1
+          Manual Code: 84970112331
+      disabled: true
+
+    - label:
+          "Step 2b: Provide the Manual Pairing Code, generated in the previous
+          step, to the DUT in any format supported by the DUT"
+      verification: |
+          ./chip-tool pairing code 1 84970112331
+
+          Verify on the DUT (Chip-tool):
+
+          Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
+      disabled: true
+
+    - label:
+          "Step 3a: VID_PID_PRESENT: Using the manual code from Step 1, generate
+          a new manual code but substituting out the current VID_PID_PRESENT
+          with an invalid VID_PID_PRESENT set to 1"
+      verification: |
+          1. Use chip-tool's "payload generate-manualcode" command to help generate the new, invalid Manual code
+
+          Verify on the DUT (Chip-tool):
+           ./chip-tool payload generate-manualcode --discriminator 0xF00 --setup-pin-code 20202021 --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --commissioning-mode 2 --force-short-code 1
+
+          [1651181048462] [11611:269469] CHIP: [TOO] Manual Code: 74970112334
+      disabled: true
+
+    - label:
+          "Step 3b: Provide the Manual Pairing Code, generated in the previous
+          step, to the DUT in any format supported by the DUT"
+      verification: |
+          ./chip-tool pairing code 1 74970112334
+
+          Verify on the DUT (Chip-tool):
+          [1651184274318] [12512:321250] CHIP: [SPL] Failed decoding base10. Input length 10 was not expected length 20
+          ...
+          [1651184274321] [12512:321244] CHIP: [TOO] Run command failure: ../../examples/chip-tool/third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:63: CHIP Error 0x0000001E: Invalid string length
+      disabled: true
+
+    - label:
+          "Step 4a: SHORT DISCRIMINATOR: Using the manual code from Step 1,
+          generate a new manual code but substituting out the current SHORT
+          DISCRIMINATOR string with a discriminator value that makes the
+          generated manual code differ from Step 1s manual code (i.e. Choose a
+          discriminator value that changes any of the 4 most-significant bits of
+          Step 1s 12-bit discriminator value and adheres to rules of section
+          5.1.1.5. 'Discriminator value')"
+      verification: |
+          1. Use chip-tool's "payload generate-manualcode" command to help generate the new, invalid Manual code
+          Verify on the DUT (Chip-tool):
+
+           ./chip-tool payload generate-manualcode --existing-payload 34970112332 --discriminator 0xE00
+          [1657236763262] [31784:16850989] CHIP: [TOO] Manual Code: 33331712336
+      disabled: true
+
+    - label:
+          "Step 4b: Provide the Manual Pairing Code, generated in the previous
+          step, to the DUT in any format supported by the DUT"
+      verification: |
+          Verify on the DUT (Chip-tool):
+            ./chip-tool pairing code 1 33331712336
+
+          [1654001605.517505][3200:3205] CHIP:-: ../../third_party/connectedhomeip/src/platform/Linux/BLEManagerImpl.cpp:748: CHIP Error 0x0000002D: Not Implemented at ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:450
+          [1654001605.517563][3200:3205] CHIP:CTL: Stopping commissioning discovery over DNS-SD
+          [1654001605.517619][3200:3205] CHIP:TOO: Secure Pairing Failed
+      disabled: true
+
+    - label:
+          "Step 5a: Passcode: Using the manual code from Step 1, generate a new
+          manual code using all the same Onboarding Payload components except
+          for the Passcode. For each Passcode in the following list, set the
+          Passcode component to one of the invalid Passcode and generate a new
+          manual code using all the same Onboarding Payload components and one
+          Passcode from the list: 00000000, 11111111, 22222222, 33333333,
+          44444444, 55555555, 66666666, 77777777, 88888888, 99999999, 12345678,
+          87654321"
+      verification: |
+          1. Use these as examples of how to generate manual codes with invalid passcodes
+          Verify on the DUT (Chip-tool):
+
+          "34915200008" (00000000),
+           ./chip-tool payload generate-manualcode --discriminator 3840  --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --commissioning-mode 0 --allow-invalid-payload 1 --setup-pin-code 00000000
+          [1651182185732] [11790:282099] CHIP: [TOO] Manual Code: 34915200008
+
+          "35191106788" (11111111),
+           ./chip-tool payload generate-manualcode --discriminator 3840  --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --commissioning-mode 0 --allow-invalid-payload 1 --setup-pin-code 11111111
+          [1651182284292] [11799:283222] CHIP: [TOO] Manual Code: 35191106788
+
+          "35467013565" (22222222),
+           ./chip-tool payload generate-manualcode --discriminator 3840  --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --commissioning-mode 0 --allow-invalid-payload 1 --setup-pin-code 22222222
+          [1651182331458] [11817:283904] CHIP: [TOO] Manual Code: 35467013565
+
+          "35742920344" (33333333),
+           ./chip-tool payload generate-manualcode --discriminator 3840  --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --commissioning-mode 0 --allow-invalid-payload 1 --setup-pin-code 33333333
+          [1651182345419] [11876:284294] CHIP: [TOO] Manual Code: 35742920344
+
+          "36018827124" (44444444),
+           ./chip-tool payload generate-manualcode --discriminator 3840  --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --commissioning-mode 0 --allow-invalid-payload 1 --setup-pin-code 44444444
+          [1651182362963] [11944:284816] CHIP: [TOO] Manual Code: 36018827124
+
+          "36294733900" (55555555),
+           ./chip-tool payload generate-manualcode --discriminator 3840  --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --commissioning-mode 0 --allow-invalid-payload 1 --setup-pin-code 55555555
+          [1651182375363] [11945:284938] CHIP: [TOO] Manual Code: 36294733900
+
+          "34932240691" (66666666),
+           ./chip-tool payload generate-manualcode --discriminator 3840  --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --commissioning-mode 0 --allow-invalid-payload 1 --setup-pin-code 66666666
+          [1651182395140] [11958:285261] CHIP: [TOO] Manual Code: 34932240691
+
+          "35208147474" (77777777),
+           ./chip-tool payload generate-manualcode --discriminator 3840  --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --commissioning-mode 0 --allow-invalid-payload 1 --setup-pin-code 77777777
+          [1651182411341] [11966:285478] CHIP: [TOO] Manual Code: 35208147474
+
+          "35484054250" (88888888),
+           ./chip-tool payload generate-manualcode --discriminator 3840  --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --commissioning-mode 0 --allow-invalid-payload 1 --setup-pin-code 88888888
+          [1651182422264] [11967:285581] CHIP: [TOO] Manual Code: 35484054250
+
+          "35759961037" (99999999),
+           ./chip-tool payload generate-manualcode --discriminator 3840  --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --commissioning-mode 0 --allow-invalid-payload 1 --setup-pin-code 99999999
+          [1651182431755] [11968:285672] CHIP: [TOO] Manual Code: 35759961037
+
+          "35767807533" (12345678),
+           ./chip-tool payload generate-manualcode --discriminator 3840  --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --commissioning-mode 0 --allow-invalid-payload 1 --setup-pin-code 12345678
+          [1651182443511] [11969:285786] CHIP: [TOO] Manual Code: 35767807533
+
+          "36545753496" (87654321),
+           ./chip-tool payload generate-manualcode --discriminator 3840  --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --commissioning-mode 0 --allow-invalid-payload 1 --setup-pin-code 87654321
+          [1651182459737] [11970:285960] CHIP: [TOO] Manual Code: 36545753496
+      disabled: true
+
+    - label:
+          "Step 5b: Provide each of the Manual Pairing Codes, generated in the
+          previous step, to the DUT in any format supported by the DUT"
+      verification: |
+          Verify on the DUT (Chip-tool):
+          No applicable TH logs
+
+          (00000000)
+            ./chip-tool pairing code 1 34915200008
+          Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
+
+          (11111111)
+            ./chip-tool pairing code 1 35191106788
+          Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
+
+          (22222222)
+            ./chip-tool pairing code 1 35467013565
+          Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
+
+          (33333333)
+            ./chip-tool pairing code 1 35742920344
+          Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
+
+          (44444444)
+            ./chip-tool pairing code 1 36018827124
+          Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
+
+          (55555555)
+            ./chip-tool pairing code 1 36294733900
+          Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
+
+          (66666666)
+            ./chip-tool pairing code 1 34932240691
+          Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
+
+          (77777777)
+            ./chip-tool pairing code 1 35208147474
+          Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
+
+          (88888888)
+            ./chip-tool pairing code 1 35484054250
+          Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
+
+          (99999999)
+            ./chip-tool pairing code 1 35759961037
+          Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
+
+          (12345678)
+            ./chip-tool pairing code 1 35767807533
+          Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
+
+          (87654321)
+            ./chip-tool pairing code 1 36545753496
+          Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
+      disabled: true
+
+    - label:
+          "Step 6a: CHECK_DIGIT: Using the manual code from Step 1, generate a
+          new manual code but substituting out the current CHECK_DIGIT with an
+          invalid CHECK_DIGIT (i.e. Any different CHECK_DIGIT than the
+          commissionees CHECK_DIGIT while following Table 38. Encoding Method
+          without Vendor and Product IDs (VID_PID_Present == 0))"
+      verification: |
+          1. Manually change the last digit of the manual pairing code to a different digit
+          No applicable DUT or TH logs
+
+          Manual Code: 34970112331
+      disabled: true
+
+    - label:
+          "Step 6b: Provide the Manual Pairing Code, generated in the previous
+          step, to the DUT in any format supported by the DUT"
+      verification: |
+          Verify on the DUT (Chip-tool):
+           ./chip-tool pairing code 1 34970112331
+          [1657586218401] [10710:465838] CHIP: [TOO] Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:50: CHIP Error 0x00000013: Integrity check failed
+      disabled: true

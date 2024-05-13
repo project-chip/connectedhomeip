@@ -18,19 +18,20 @@
 
 #pragma once
 
-#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
 
-#include <app/AttributeAccessInterface.h>
-#include <app/util/af.h>
+#include <app/AttributeValueEncoder.h>
+#include <lib/support/CHIPMemString.h>
+
 #include <list>
+#include <string>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ApplicationBasic {
 
-using ApplicationBasicApplicationType = chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type;
+using ApplicationBasicApplicationType = chip::app::Clusters::ApplicationBasic::Structs::ApplicationStruct::Type;
 
 class DLL_EXPORT CatalogVendorApp
 {
@@ -81,7 +82,7 @@ public:
     virtual CHIP_ERROR HandleGetAllowedVendorList(app::AttributeValueEncoder & aEncoder)  = 0;
 
     inline void SetApplicationStatus(ApplicationStatusEnum status) { mApplicationStatus = status; }
-    bool Matches(ApplicationBasicApplication match);
+    bool Matches(const ApplicationBasicApplicationType & match);
 
     inline CatalogVendorApp * GetCatalogVendorApp() { return &mCatalogVendorApp; }
     virtual std::list<uint16_t> GetAllowedVendorList() = 0;

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -53,10 +53,11 @@ CHIP_ERROR ChipLinuxStorage::Init(const char * configFile)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
-    ChipLogDetail(DeviceLayer, "ChipLinuxStorage::Init: Using KVS config file: %s", configFile);
+    ChipLogDetail(DeviceLayer, "ChipLinuxStorage::Init: Using KVS config file: %s", StringOrNullMarker(configFile));
     if (mInitialized)
     {
-        ChipLogError(DeviceLayer, "ChipLinuxStorage::Init: Attempt to re-initialize with KVS config file: %s", configFile);
+        ChipLogError(DeviceLayer, "ChipLinuxStorage::Init: Attempt to re-initialize with KVS config file: %s",
+                     StringOrNullMarker(configFile));
         return CHIP_NO_ERROR;
     }
 
@@ -188,7 +189,7 @@ CHIP_ERROR ChipLinuxStorage::WriteValue(const char * key, uint16_t val)
 {
     char buf[16];
 
-    snprintf(buf, sizeof(buf), "%" PRIu16, val);
+    snprintf(buf, sizeof(buf), "%u", val);
 
     return WriteValueStr(key, buf);
 }

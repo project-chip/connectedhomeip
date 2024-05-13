@@ -51,7 +51,56 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
-    return CHIP_NO_ERROR;
+    CHIP_ERROR err;
+    uint32_t rebootCount;
+
+    if (MbedConfig::ConfigValueExists(MbedConfig::kCounterKey_RebootCount))
+    {
+        err = GetRebootCount(rebootCount);
+        SuccessOrExit(err);
+
+        err = StoreRebootCount(rebootCount + 1);
+        SuccessOrExit(err);
+    }
+    else
+    {
+        // The first boot after factory reset of the Node.
+        err = StoreRebootCount(1);
+        SuccessOrExit(err);
+    }
+
+    if (!MbedConfig::ConfigValueExists(MbedConfig::kCounterKey_TotalOperationalHours))
+    {
+        err = StoreTotalOperationalHours(0);
+        SuccessOrExit(err);
+    }
+
+    // Initialize the generic implementation base class.
+    err = Internal::GenericConfigurationManagerImpl<MbedConfig>::Init();
+    SuccessOrExit(err);
+
+exit:
+    return err;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
+{
+    return ReadConfigValue(MbedConfig::kCounterKey_RebootCount, rebootCount);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreRebootCount(uint32_t rebootCount)
+{
+    return WriteConfigValue(MbedConfig::kCounterKey_RebootCount, rebootCount);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
+{
+    return ReadConfigValue(MbedConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOperationalHours)
+{
+    return WriteConfigValue(MbedConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
@@ -184,6 +233,11 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     // Restart the system.
     ChipLogProgress(DeviceLayer, "System restarting");
     system_reset();
+}
+
+ConfigurationManager & ConfigurationMgrImpl()
+{
+    return ConfigurationManagerImpl::GetDefaultInstance();
 }
 
 } // namespace DeviceLayer

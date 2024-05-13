@@ -21,7 +21,7 @@
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/FabricScoped.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 
 namespace chip {
 namespace app {

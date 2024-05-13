@@ -119,12 +119,17 @@ uint64_t GetClock_MonotonicHiRes(void)
 
 CHIP_ERROR ClockImpl::GetClock_RealTime(Clock::Microseconds64 & aCurTime)
 {
+    // TODO(19081): This platform does not properly error out if wall clock has
+    //              not been set.  For now, short circuit this.
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#if 0
     if (sBootTimeUS == 0)
     {
         return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
     aCurTime = Clock::Microseconds64(sBootTimeUS + GetClock_Monotonic());
     return CHIP_NO_ERROR;
+#endif
 }
 
 CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Clock::Milliseconds64 & aCurTime)
@@ -157,6 +162,9 @@ CHIP_ERROR InitClock_RealTime()
         Clock::Microseconds64((static_cast<uint64_t>(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD) * UINT64_C(1000000)));
     // Use CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD as the initial value of RealTime.
     // Then the RealTime obtained from GetClock_RealTime will be always valid.
+    //
+    // TODO(19081): This is broken because it causes the platform to report
+    //              that it does have wall clock time when it actually doesn't.
     return System::SystemClock().SetClock_RealTime(curTime);
 }
 

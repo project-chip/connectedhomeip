@@ -21,10 +21,10 @@
 #include <system/SystemError.h>
 
 extern "C" {
-#include <init.h>
-#include <sys/math_extras.h>
-#include <sys/mutex.h>
-#include <sys/sys_heap.h>
+#include <zephyr/init.h>
+#include <zephyr/sys/math_extras.h>
+#include <zephyr/sys/mutex.h>
+#include <zephyr/sys/sys_heap.h>
 }
 
 #include <cstdint>
@@ -67,7 +67,7 @@ LockGuard::~LockGuard()
     }
 }
 
-int initHeap(const device *)
+int initHeap()
 {
     sys_heap_init(&sHeap, sHeapMemory, sizeof(sHeapMemory));
     return 0;
@@ -131,13 +131,19 @@ CHIP_ERROR GetStats(Stats & stats)
     LockGuard lockGuard;
     ReturnErrorOnFailure(lockGuard.Error());
 
-    sys_heap_runtime_stats sysHeapStats;
+    sys_memory_stats sysHeapStats;
     ReturnErrorOnFailure(System::MapErrorZephyr(sys_heap_runtime_stats_get(&sHeap, &sysHeapStats)));
 
-    stats.free = sysHeapStats.free_bytes;
-    stats.used = sysHeapStats.allocated_bytes;
+    stats.free    = sysHeapStats.free_bytes;
+    stats.used    = sysHeapStats.allocated_bytes;
+    stats.maxUsed = sysHeapStats.max_allocated_bytes;
 
     return CHIP_NO_ERROR;
+}
+
+void ResetMaxStats()
+{
+    (void) sys_heap_runtime_stats_reset_max(&sHeap);
 }
 
 #endif // CONFIG_SYS_HEAP_RUNTIME_STATS

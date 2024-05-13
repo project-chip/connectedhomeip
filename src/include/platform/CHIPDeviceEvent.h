@@ -25,6 +25,7 @@
 #pragma once
 #include <stdint.h>
 
+#include <inet/IPAddress.h>
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
@@ -133,13 +134,6 @@ enum PublicEventTypes
     kServiceConnectivityChange,
 
     /**
-     * Fabric Membership Change
-     *
-     * Signals a change in the device's membership in a chip fabric.
-     */
-    kFabricMembershipChange,
-
-    /**
      * Service Provisioning Change
      *
      * Signals a change to the device's service provisioning state.
@@ -147,32 +141,11 @@ enum PublicEventTypes
     kServiceProvisioningChange,
 
     /**
-     * Account Pairing Change
-     *
-     * Signals a change to the device's state with respect to being paired to a user account.
-     */
-    kAccountPairingChange,
-
-    /**
      * Time Sync Change
      *
      * Signals a change to the device's real time clock synchronization state.
      */
     kTimeSyncChange,
-
-    /**
-     * SED Polling Interval Change
-     *
-     * Signals a change to the sleepy end device polling interval.
-     */
-    kSEDPollingIntervalChange,
-
-    /**
-     * Security Session Established
-     *
-     * Signals that an external entity has established a new security session with the device.
-     */
-    kSessionEstablished,
 
     /**
      * CHIPoBLE Connection Established
@@ -187,6 +160,19 @@ enum PublicEventTypes
      * Signals that an external entity has closed existing CHIPoBLE connection with the device.
      */
     kCHIPoBLEConnectionClosed,
+
+    /**
+     * Request BLE connections to be closed.
+     * This is used in the supportsConcurrentConnection = False case.
+     */
+    kCloseAllBleConnections,
+
+    /**
+     * When supportsConcurrentConnection = False, the ConnectNetwork command cannot start until
+     * the BLE device is closed and the Operation Network device (e.g. WiFi) has been started.
+     */
+    kWiFiDeviceAvailable,
+    kOperationalNetworkStarted,
 
     /**
      * Thread State Change
@@ -232,9 +218,14 @@ enum PublicEventTypes
     kOperationalNetworkEnabled,
 
     /**
-     * Signals that DNS-SD platform layer was initialized and is ready to operate.
+     * Signals that DNS-SD has been initialized and is ready to operate.
      */
-    kDnssdPlatformInitialized,
+    kDnssdInitialized,
+
+    /**
+     * Signals that DNS-SD backend was restarted and services must be published again.
+     */
+    kDnssdRestartNeeded,
 
     /**
      * Signals that bindings were updated.
@@ -245,6 +236,20 @@ enum PublicEventTypes
      * Signals that the state of the OTA engine changed.
      */
     kOtaStateChanged,
+
+    /**
+     * Server initialization has completed.
+     *
+     * Signals that all server components have been initialized and the node is ready to establish
+     * connections with other nodes. This event can be used to trigger on-boot actions that require
+     * sending messages to other nodes.
+     */
+    kServerReady,
+
+    /**
+     * Signals that BLE is deinitialized.
+     */
+    kBLEDeinitialized,
 };
 
 /**
@@ -264,6 +269,12 @@ enum InternalEventTypes
     kCHIPoBLEUnsubscribe,
     kCHIPoBLEWriteReceived,
     kCHIPoBLEIndicateConfirm,
+
+    /**
+     * Post this event in case of a BLE connection error. This event should be posted
+     * if the BLE central disconnects without unsubscribing from the BLE characteristic.
+     * This event should populate CHIPoBLEConnectionError structure.
+     */
     kCHIPoBLEConnectionError,
     kCHIPoBLENotifyConfirm
 };
@@ -307,6 +318,34 @@ enum ActivityChange
 enum OtaState
 {
     kOtaSpaceAvailable = 0,
+    /**
+     * This state indicates that Node is currently downloading a software update.
+     */
+    kOtaDownloadInProgress,
+    /**
+     * This state indicates that Node has successfully downloaded a software update.
+     */
+    kOtaDownloadComplete,
+    /**
+     * This state indicates that Node has failed to download a software update.
+     */
+    kOtaDownloadFailed,
+    /**
+     * This state indicates that Node has aborted the download of a software update.
+     */
+    kOtaDownloadAborted,
+    /**
+     * This state indicate that Node is currently in the process of verifying and applying a software update.
+     */
+    kOtaApplyInProgress,
+    /**
+     * This state indicates that Node has successfully applied a software update.
+     */
+    kOtaApplyComplete,
+    /**
+     * This state indicates that Node has failed to apply a software update.
+     */
+    kOtaApplyFailed,
 };
 
 inline ConnectivityChange GetConnectivityChange(bool prevState, bool newState)
@@ -335,7 +374,7 @@ typedef void (*AsyncWorkFunct)(intptr_t arg);
 #include CHIPDEVICEPLATFORMEVENT_HEADER
 #endif // defined(CHIP_DEVICE_LAYER_TARGET)
 
-#include <ble/BleConfig.h>
+#include <ble/Ble.h>
 #include <inet/InetInterface.h>
 #include <lib/support/LambdaBridge.h>
 #include <system/SystemEvent.h>
@@ -373,7 +412,14 @@ struct ChipDeviceEvent final
         {
             ConnectivityChange IPv4;
             ConnectivityChange IPv6;
-            char address[INET6_ADDRSTRLEN];
+            // WARNING: There used to be `char address[INET6_ADDRSTRLEN]` here and it is
+            //          deprecated/removed since it was too large and only used for logging.
+            //          Consider not relying on ipAddress field either since the platform
+            //          layer *does not actually validate* that the actual internet is reachable
+            //          before issuing this event *and* there may be multiple addresses
+            //          (especially IPv6) so it's recommended to use `ChipDevicePlatformEvent`
+            //          instead and do something that is better for your platform.
+            chip::Inet::IPAddress ipAddress;
         } InternetConnectivityChange;
         struct
         {
@@ -462,15 +508,19 @@ struct ChipDeviceEvent final
 
         struct
         {
-            uint64_t PeerNodeId;
-            FabricIndex PeerFabricIndex;
+            uint64_t nodeId;
+            FabricIndex fabricIndex;
         } CommissioningComplete;
+        struct
+        {
+            FabricIndex fabricIndex;
+        } BindingsChanged;
 
         struct
         {
-            FabricIndex PeerFabricIndex;
-            bool AddNocCommandHasBeenInvoked;
-            bool UpdateNocCommandHasBeenInvoked;
+            FabricIndex fabricIndex;
+            bool addNocCommandHasBeenInvoked;
+            bool updateNocCommandHasBeenInvoked;
         } FailSafeTimerExpired;
 
         struct
@@ -485,7 +535,6 @@ struct ChipDeviceEvent final
         } OtaStateChanged;
     };
 
-    void Clear() { memset(this, 0, sizeof(*this)); }
     bool IsPublic() const { return DeviceEventType::IsPublic(Type); }
     bool IsInternal() const { return DeviceEventType::IsInternal(Type); }
     bool IsPlatformSpecific() const { return DeviceEventType::IsPlatformSpecific(Type); }

@@ -25,10 +25,6 @@
 #include <inet/EndPointStateSockets.h>
 #include <inet/TCPEndPoint.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-#include <dispatch/dispatch.h>
-#endif
-
 namespace chip {
 namespace Inet {
 
@@ -50,7 +46,7 @@ public:
     CHIP_ERROR EnableNoDelay() override;
     CHIP_ERROR EnableKeepAlive(uint16_t interval, uint16_t timeoutCount) override;
     CHIP_ERROR DisableKeepAlive() override;
-    CHIP_ERROR AckReceive(uint16_t len) override;
+    CHIP_ERROR AckReceive(size_t len) override;
 #if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
     void TCPUserTimeoutHandler() override;
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
@@ -74,14 +70,9 @@ private:
     CHIP_ERROR BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId intfId);
     static void HandlePendingIO(System::SocketEvents events, intptr_t data);
 
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    dispatch_source_t mReadableSource  = nullptr;
-    dispatch_source_t mWriteableSource = nullptr;
-#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
-
 #if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
     /// This counts the number of bytes written on the TCP socket since thelast probe into the TCP outqueue was made.
-    uint32_t mBytesWrittenSinceLastProbe;
+    size_t mBytesWrittenSinceLastProbe;
 
     /// This is the measured size(in bytes) of the kernel TCP send queue at the end of the last user timeout window.
     uint32_t mLastTCPKernelSendQueueLen;

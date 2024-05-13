@@ -19,10 +19,12 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <optional>
 
-#include <lib/core/Optional.h>
 #include <lib/core/PeerId.h>
 #include <lib/dnssd/Resolver.h>
+#include <lib/dnssd/minimal_mdns/core/HeapQName.h>
+#include <lib/support/Variant.h>
 #include <system/SystemClock.h>
 
 namespace mdns {
@@ -44,82 +46,6 @@ public:
 
     struct ScheduledAttempt
     {
-        enum AttemptType
-        {
-            kInvalid,
-            kResolve,
-            kBrowse,
-        };
-
-        ScheduledAttempt() : attemptType(kInvalid) {}
-        ScheduledAttempt(const chip::PeerId & peer, bool first) : attemptType(kResolve), peerId(peer), firstSend(first) {}
-        ScheduledAttempt(const chip::Dnssd::DiscoveryFilter discoveryFilter, const chip::Dnssd::DiscoveryType type, bool first) :
-            attemptType(kBrowse), browse(discoveryFilter, type), firstSend(first)
-        {}
-        bool operator==(const ScheduledAttempt & other) const { return Matches(other) && other.firstSend == firstSend; }
-        bool Matches(const ScheduledAttempt & other) const
-        {
-            if (other.attemptType != attemptType)
-            {
-                return false;
-            }
-            switch (attemptType)
-            {
-            case kInvalid:
-                return true;
-            case kBrowse:
-                return (other.browse.filter == browse.filter && other.browse.type == browse.type);
-            case kResolve:
-                return other.peerId == peerId;
-            default:
-                return false;
-            }
-        }
-        bool Matches(const chip::PeerId & peer) const { return (attemptType == kResolve) && (peerId == peer); }
-        bool Matches(const chip::Dnssd::DiscoveredNodeData & data) const
-        {
-            if (attemptType != kBrowse)
-            {
-                return false;
-            }
-            // TODO: we should mark returned node data based on the query
-            if (browse.type != chip::Dnssd::DiscoveryType::kCommissionableNode)
-            {
-                // We don't currently have markers in the returned DiscoveredNodeData to differentiate these, so assume all returned
-                // packets match
-                return true;
-            }
-            switch (browse.filter.type)
-            {
-            case chip::Dnssd::DiscoveryFilterType::kNone:
-                return true;
-            case chip::Dnssd::DiscoveryFilterType::kShortDiscriminator:
-                return browse.filter.code == static_cast<uint64_t>((data.longDiscriminator >> 8) & 0x0F);
-            case chip::Dnssd::DiscoveryFilterType::kLongDiscriminator:
-                return browse.filter.code == data.longDiscriminator;
-            case chip::Dnssd::DiscoveryFilterType::kVendorId:
-                return browse.filter.code == data.vendorId;
-            case chip::Dnssd::DiscoveryFilterType::kDeviceType:
-                return browse.filter.code == data.deviceType;
-            case chip::Dnssd::DiscoveryFilterType::kCommissioningMode:
-                return browse.filter.code == data.commissioningMode;
-            case chip::Dnssd::DiscoveryFilterType::kInstanceName:
-                return strncmp(browse.filter.instanceName, data.instanceName,
-                               chip::Dnssd::Commission::kInstanceNameMaxLength + 1) == 0;
-            case chip::Dnssd::DiscoveryFilterType::kCommissioner:
-            case chip::Dnssd::DiscoveryFilterType::kCompressedFabricId:
-            default:
-                // These are for other discovery types.
-                return false;
-            }
-        }
-        bool IsEmpty() const { return attemptType == kInvalid; }
-        bool IsResolve() const { return attemptType == kResolve; }
-        bool IsBrowse() const { return attemptType == kBrowse; }
-        void Clear() { attemptType = kInvalid; }
-
-        // Not using Variant because it assumes a heap impl
-        AttemptType attemptType;
         struct Browse
         {
             Browse(const chip::Dnssd::DiscoveryFilter discoveryFilter, const chip::Dnssd::DiscoveryType discoveryType) :
@@ -128,11 +54,190 @@ public:
             chip::Dnssd::DiscoveryFilter filter;
             chip::Dnssd::DiscoveryType type;
         };
-        union
+
+        struct Resolve
         {
-            chip::PeerId peerId; // Peer id for resolve attempts
-            Browse browse;
+            chip::PeerId peerId;
+            uint32_t consumerCount = 0;
+
+            Resolve(chip::PeerId id) : peerId(id) {}
         };
+
+        struct IpResolve
+        {
+            HeapQName hostName;
+            IpResolve(HeapQName && host) : hostName(std::move(host)) {}
+        };
+
+        ScheduledAttempt()
+        {
+            static_assert(sizeof(Resolve) <= sizeof(Browse) || sizeof(Resolve) <= sizeof(HeapQName),
+                          "Figure out where to put the Resolve counter so that Resolve is not making ScheduledAttempt bigger than "
+                          "it has to be anyway to handle the other attempt types.");
+        }
+        ScheduledAttempt(const chip::PeerId & peer, bool first) :
+            resolveData(chip::InPlaceTemplateType<Resolve>(), peer), firstSend(first)
+        {}
+        ScheduledAttempt(const chip::Dnssd::DiscoveryFilter discoveryFilter, const chip::Dnssd::DiscoveryType type, bool first) :
+            resolveData(chip::InPlaceTemplateType<Browse>(), discoveryFilter, type), firstSend(first)
+        {}
+
+        ScheduledAttempt(IpResolve && ipResolve, bool first) :
+            resolveData(chip::InPlaceTemplateType<IpResolve>(), ipResolve), firstSend(first)
+        {}
+
+        bool operator==(const ScheduledAttempt & other) const { return Matches(other) && other.firstSend == firstSend; }
+        bool Matches(const ScheduledAttempt & other) const
+        {
+            if (!resolveData.Valid())
+            {
+                return !other.resolveData.Valid();
+            }
+
+            if (resolveData.Is<Browse>())
+            {
+                if (!other.resolveData.Is<Browse>())
+                {
+                    return false;
+                }
+
+                auto & a = resolveData.Get<Browse>();
+                auto & b = other.resolveData.Get<Browse>();
+                return (a.filter == b.filter && a.type == b.type);
+            }
+
+            if (resolveData.Is<Resolve>())
+            {
+                if (!other.resolveData.Is<Resolve>())
+                {
+                    return false;
+                }
+                auto & a = resolveData.Get<Resolve>();
+                auto & b = other.resolveData.Get<Resolve>();
+
+                return a.peerId == b.peerId;
+            }
+
+            if (resolveData.Is<IpResolve>())
+            {
+                if (!other.resolveData.Is<IpResolve>())
+                {
+                    return false;
+                }
+                auto & a = resolveData.Get<IpResolve>();
+                auto & b = other.resolveData.Get<IpResolve>();
+
+                return a.hostName == b.hostName;
+            }
+            return false;
+        }
+
+        bool MatchesIpResolve(SerializedQNameIterator hostName) const
+        {
+            return resolveData.Is<IpResolve>() && (hostName == resolveData.Get<IpResolve>().hostName.Content());
+        }
+        bool Matches(const chip::PeerId & peer) const
+        {
+            return resolveData.Is<Resolve>() && (resolveData.Get<Resolve>().peerId == peer);
+        }
+        bool Matches(const chip::Dnssd::DiscoveredNodeData & data, chip::Dnssd::DiscoveryType type) const
+        {
+            if (!resolveData.Is<Browse>())
+            {
+                return false;
+            }
+
+            auto & browse = resolveData.Get<Browse>();
+
+            if (browse.type != type)
+            {
+                return false;
+            }
+            auto & nodeData = data.Get<chip::Dnssd::CommissionNodeData>();
+
+            switch (browse.filter.type)
+            {
+            case chip::Dnssd::DiscoveryFilterType::kNone:
+                return true;
+            case chip::Dnssd::DiscoveryFilterType::kShortDiscriminator:
+                return browse.filter.code == static_cast<uint64_t>((nodeData.longDiscriminator >> 8) & 0x0F);
+            case chip::Dnssd::DiscoveryFilterType::kLongDiscriminator:
+                return browse.filter.code == nodeData.longDiscriminator;
+            case chip::Dnssd::DiscoveryFilterType::kVendorId:
+                return browse.filter.code == nodeData.vendorId;
+            case chip::Dnssd::DiscoveryFilterType::kDeviceType:
+                return browse.filter.code == nodeData.deviceType;
+            case chip::Dnssd::DiscoveryFilterType::kCommissioningMode:
+                return browse.filter.code == nodeData.commissioningMode;
+            case chip::Dnssd::DiscoveryFilterType::kInstanceName:
+                return strncmp(browse.filter.instanceName, nodeData.instanceName,
+                               chip::Dnssd::Commission::kInstanceNameMaxLength + 1) == 0;
+            case chip::Dnssd::DiscoveryFilterType::kCommissioner:
+            case chip::Dnssd::DiscoveryFilterType::kCompressedFabricId:
+            default:
+                // These are for other discovery types.
+                return false;
+            }
+        }
+
+        bool IsEmpty() const { return !resolveData.Valid(); }
+        bool IsResolve() const { return resolveData.Is<Resolve>(); }
+        bool IsBrowse() const { return resolveData.Is<Browse>(); }
+        bool IsIpResolve() const { return resolveData.Is<IpResolve>(); }
+        void Clear() { resolveData = DataType(); }
+
+        // Called when this scheduled attempt will replace an existing scheduled
+        // attempt, because either they match or we have run out of attempt
+        // slots.  When this happens, we want to propagate the consumer count
+        // from the existing attempt to the new one, if they're matching resolve
+        // attempts.
+        void WillCoalesceWith(const ScheduledAttempt & existing)
+        {
+            if (!IsResolve())
+            {
+                // Consumer count is only tracked for resolve requests
+                return;
+            }
+
+            if (!existing.Matches(*this))
+            {
+                // Out of attempt slots, so just dropping the existing attempt.
+                return;
+            }
+
+            // Adding another consumer to the same query. Propagate along the
+            // consumer count to our new attempt, which will replace the
+            // existing one.
+            resolveData.Get<Resolve>().consumerCount = existing.resolveData.Get<Resolve>().consumerCount + 1;
+        }
+
+        void ConsumerRemoved()
+        {
+            if (!IsResolve())
+            {
+                return;
+            }
+
+            auto & count = resolveData.Get<Resolve>().consumerCount;
+            if (count > 0)
+            {
+                --count;
+            }
+
+            if (count == 0)
+            {
+                Clear();
+            }
+        }
+
+        const Browse & BrowseData() const { return resolveData.Get<Browse>(); }
+        const Resolve & ResolveData() const { return resolveData.Get<Resolve>(); }
+        const IpResolve & IpResolveData() const { return resolveData.Get<IpResolve>(); }
+
+        using DataType = chip::Variant<Browse, Resolve, IpResolve>;
+
+        DataType resolveData;
+
         // First packet send is marked separately: minMDNS logic can choose
         // to first send a unicast query followed by a multicast one.
         bool firstSend = false;
@@ -145,7 +250,17 @@ public:
 
     /// Mark a resolution as a success, removing it from the internal list
     void Complete(const chip::PeerId & peerId);
-    void Complete(const chip::Dnssd::DiscoveredNodeData & data);
+    void CompleteCommissioner(const chip::Dnssd::DiscoveredNodeData & data);
+    void CompleteCommissionable(const chip::Dnssd::DiscoveredNodeData & data);
+    void CompleteIpResolution(SerializedQNameIterator targetHostName);
+
+    /// Mark all browse-type scheduled attemptes as a success, removing them
+    /// from the internal list.
+    CHIP_ERROR CompleteAllBrowses();
+
+    /// Note that resolve attempts for the given peer id now have one fewer
+    /// consumer.
+    void NodeIdResolutionNoLongerNeeded(const chip::PeerId & peerId);
 
     /// Mark that a resolution is pending, adding it to the internal list
     ///
@@ -153,11 +268,12 @@ public:
     /// by NextScheduled (potentially with others as well)
     void MarkPending(const chip::PeerId & peerId);
     void MarkPending(const chip::Dnssd::DiscoveryFilter & filter, const chip::Dnssd::DiscoveryType type);
+    void MarkPending(ScheduledAttempt::IpResolve && resolve);
 
     // Get minimum time until the next pending reply is required.
     //
     // Returns missing if no actively tracked elements exist.
-    chip::Optional<chip::System::Clock::Timeout> GetTimeUntilNextExpectedResponse() const;
+    std::optional<chip::System::Clock::Timeout> GetTimeUntilNextExpectedResponse() const;
 
     // Get the peer Id that needs scheduling for a query
     //
@@ -167,7 +283,20 @@ public:
     //    now'
     //  - there is NO sorting implied by this call. Returned value will be
     //    any peer that needs a new request sent
-    chip::Optional<ScheduledAttempt> NextScheduled();
+    std::optional<ScheduledAttempt> NextScheduled();
+
+    /// Check if any of the pending queries are for the given host name for
+    /// IP resolution.
+    bool IsWaitingForIpResolutionFor(SerializedQNameIterator hostName) const;
+
+    /// Determines if address resolution for the given peer ID is required
+    ///
+    /// IP Addresses are required for active operational discovery of specific peers
+    /// or if an active browse is being performed.
+    bool ShouldResolveIpAddress(chip::PeerId peerId) const;
+
+    /// Check if a browse operation is active for the given discovery type
+    bool HasBrowseFor(chip::Dnssd::DiscoveryType type) const;
 
 private:
     struct RetryEntry
@@ -186,7 +315,7 @@ private:
         //      least a factor of two
         chip::System::Clock::Timeout nextRetryDelay = chip::System::Clock::Seconds16(1);
     };
-    void MarkPending(const ScheduledAttempt & attempt);
+    void MarkPending(ScheduledAttempt && attempt);
     chip::System::Clock::ClockBase * mClock;
     RetryEntry mRetryQueue[kRetryQueueSize];
 };

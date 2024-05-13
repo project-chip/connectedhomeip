@@ -1,0 +1,53 @@
+# These are the available tests for generators
+#
+# General format is:
+# <generator>
+#    <input_file>
+#      <output_file> : <golden_path>
+#
+# Where
+#   - generator is the type of generator to use
+#   - input_file is the input IDL
+#   - output_file/golden_path are the expected output file names
+#     and the expected content for those output files.
+java-class:
+    inputs/several_clusters.matter:
+        java/chip/devicecontroller/cluster/structs/SecondClusterFabricDescriptorStruct.kt: outputs/several_clusters/java/SecondClusterFabricDescriptorStruct.kt
+        java/chip/devicecontroller/ChipClusters.java: outputs/several_clusters/java/ChipClusters.java
+        java/chip/devicecontroller/ChipEventStructs.java: outputs/several_clusters/java/ChipEventStructs.java
+        java/chip/devicecontroller/ChipStructs.java: outputs/several_clusters/java/ChipStructs.java
+        java/chip/devicecontroller/ClusterInfoMapping.java: outputs/several_clusters/java/ClusterInfoMapping.java
+        java/chip/devicecontroller/ClusterWriteMapping.java: outputs/several_clusters/java/ClusterWriteMapping.java
+        java/chip/devicecontroller/ClusterReadMapping.java: outputs/several_clusters/java/ClusterReadMapping.java
+        java/chip/devicecontroller/ClusterIDMapping.java: outputs/several_clusters/java/ClusterIDMapping.java
+        java/chip/devicecontroller/cluster/files.gni: outputs/several_clusters/java/files.gni
+
+cpp-app:
+    inputs/several_clusters.matter:
+        app/PluginApplicationCallbacks.h: outputs/several_clusters/cpp-app/PluginApplicationCallbacks.h
+        app/callback-stub.cpp: outputs/several_clusters/cpp-app/callback-stub.cpp
+        app/cluster-init-callback.cpp: outputs/several_clusters/cpp-app/cluster-init-callback.cpp
+
+    inputs/large_all_clusters_app.matter:
+        app/PluginApplicationCallbacks.h: outputs/large_all_clusters_app/cpp-app/PluginApplicationCallbacks.h
+        app/callback-stub.cpp: outputs/large_all_clusters_app/cpp-app/callback-stub.cpp
+        app/cluster-init-callback.cpp: outputs/large_all_clusters_app/cpp-app/cluster-init-callback.cpp
+
+    inputs/large_lighting_app.matter:
+        app/PluginApplicationCallbacks.h: outputs/large_lighting_app/cpp-app/PluginApplicationCallbacks.h
+        app/callback-stub.cpp: outputs/large_lighting_app/cpp-app/callback-stub.cpp
+        app/cluster-init-callback.cpp: outputs/large_lighting_app/cpp-app/cluster-init-callback.cpp
+
+cpp-tlvmeta:
+    inputs/cluster_with_commands.matter:
+        tlv/meta/clusters_meta.cpp: outputs/cluster_with_commands/cpp-tlvmeta/clusters_meta.cpp
+        tlv/meta/clusters_meta.h: outputs/cluster_with_commands/cpp-tlvmeta/clusters_meta.h
+    inputs/cluster_struct_attribute.matter:
+        tlv/meta/clusters_meta.cpp: outputs/cluster_struct_attribute/cpp-tlvmeta/clusters_meta.cpp
+        tlv/meta/clusters_meta.h: outputs/cluster_struct_attribute/cpp-tlvmeta/clusters_meta.h
+
+custom-example-proto:
+    inputs/several_clusters.matter:
+        proto/first_cluster.proto: outputs/proto/first_cluster.proto
+        proto/second_cluster.proto: outputs/proto/second_cluster.proto
+        proto/third_cluster.proto: outputs/proto/third_cluster.proto

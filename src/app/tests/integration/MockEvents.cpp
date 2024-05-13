@@ -27,7 +27,7 @@
 #include "common.h"
 #include <app/EventLoggingTypes.h>
 #include <app/EventManagement.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <system/SystemPacketBuffer.h>
@@ -44,9 +44,9 @@ size_t EventGenerator::GetNumStates()
     return mNumStates;
 }
 
-LivenessEventGenerator::LivenessEventGenerator(void) : EventGenerator(10, 0) {}
+LivenessEventGenerator::LivenessEventGenerator() : EventGenerator(10, 0) {}
 
-void LivenessEventGenerator::Generate(void)
+void LivenessEventGenerator::Generate()
 {
     // Scenario: monitoring liveness for two devices -- self and remote.  Remote device goes offline and returns.
     switch (mState)
@@ -131,13 +131,13 @@ chip::EventNumber LivenessEventGenerator::LogLiveness(chip::NodeId aNodeId, chip
     return number;
 }
 
-MockEventGenerator * MockEventGenerator::GetInstance(void)
+MockEventGenerator * MockEventGenerator::GetInstance()
 {
     static MockEventGeneratorImpl gMockEventGenerator;
     return &gMockEventGenerator;
 }
 
-MockEventGeneratorImpl::MockEventGeneratorImpl(void) :
+MockEventGeneratorImpl::MockEventGeneratorImpl() :
     mpExchangeMgr(nullptr), mTimeBetweenEvents(0), mEventWraparound(false), mpEventGenerator(nullptr), mEventsLeft(0)
 {}
 

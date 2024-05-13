@@ -66,29 +66,11 @@
 #define CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION 1
 
 /**
- * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
- *
- * A string identifying the software version running on the device.
- * CHIP service currently expects the software version to be in the format
- * {MAJOR_VERSION}.0d{MINOR_VERSION}
- */
-#ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
-#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "0.1ALPHA"
-#endif
-/**
  * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
  *
  * Enable support for Chip-over-BLE (CHIPoBLE).
  */
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
-
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
- *
- * Enables synchronizing the device's real time clock with a remote Chip Time service
- * using the Chip Time Sync protocol.
- */
-#define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 0
 
 /**
  * CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER
@@ -99,11 +81,11 @@
 #define CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER "DUMMY_SN"
 
 /**
- * CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
+ * CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
  *
  * Enable recording UTC timestamps.
  */
-#define CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS 1
+#define CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS 1
 
 /**
  * CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE
@@ -142,12 +124,5 @@
  */
 #define CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT (30 * 1000)
 
-/**
- * CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT
- *
- * The amount of time in miliseconds after which BLE advertisement should be disabled, counting
- * from the moment of slow advertisement commencement.
- *
- * Defaults to 9000000 (15 minutes).
- */
-#define CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT (15 * 60 * 1000)
+// Enable unit-test only features
+#define CONFIG_BUILD_FOR_HOST_UNIT_TEST 1

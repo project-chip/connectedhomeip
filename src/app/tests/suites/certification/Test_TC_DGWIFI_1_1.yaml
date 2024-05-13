@@ -1,0 +1,195 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 53.1.1. [TC-DGWIFI-1.1] Global Attributes [DUT as Server]
+
+PICS:
+    - DGWIFI.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "WiFi Network Diagnostics"
+    endpoint: 0
+
+tests:
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH reads the ClusterRevision from DUT"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 1
+          constraints:
+              type: int16u
+
+    - label: "Step 3a: TH reads the FeatureMap from DUT"
+      PICS: ( !DGWIFI.S.F00 && !DGWIFI.S.F01 )
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
+
+    - label:
+          "Step 3b: Given DGWIFI.S.F00(PacketCounts) ensure featuremap has the
+          correct bit set"
+      PICS: DGWIFI.S.F00
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
+
+    - label:
+          "Step 3c: Given DGWIFI.S.F01(ErrorCounts) ensure featuremap has the
+          correct bit set"
+      PICS: DGWIFI.S.F01
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2]
+
+    - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains:
+                  [0, 1, 2, 3, 4, 65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 2, 3, 4, 65528, 65529, 65531, 65532, 65533]
+
+    - label:
+          "Step 4b: TH reads Feature dependent(DGWIFI.S.F00) attributes in
+          attributeList from DUT"
+      PICS: DGWIFI.S.F00
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [6, 7, 8, 9, 10]
+
+    - label:
+          "Step 4c: TH reads Feature dependent(DGWIFI.S.F01) attributes in
+          attributeList from DUT"
+      PICS: DGWIFI.S.F01
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [5, 12]
+
+    - label:
+          "Step 4d: TH reads optional attribute (CurrentMaxRate) in
+          AttributeList from DUT"
+      PICS: DGWIFI.S.A000b
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [11]
+
+    - label: "Step 5a: TH reads EventList from DUT"
+      PICS:
+          " !DGWIFI.S.E00 && !DGWIFI.S.E01 && !DGWIFI.S.E02 &&
+          PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label:
+          "Step 5b: TH reads optional attribute (Disconnection) in EventList
+          from DUT"
+      PICS: DGWIFI.S.E00 && PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
+
+    - label:
+          "Step 5c: TH reads optional attribute (AssociationFailure) in
+          EventList from DUT"
+      PICS: DGWIFI.S.E01 && PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [1]
+
+    - label:
+          "Step 5d: TH reads optional attribute (ConnectionStatus) in EventList
+          from DUT"
+      PICS: DGWIFI.S.E02 && PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [2]
+
+    - label: "Step 6a: TH reads AcceptedCommandList from DUT"
+      PICS: " !DGWIFI.S.F01 "
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label:
+          "Step 6b: TH reads Feature dependent(DGWIFI.S.F01) command in
+          AcceptedCommandList from DUT"
+      PICS: DGWIFI.S.F01
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
+
+    - label: "Step 7: TH reads GeneratedCommandList from DUT"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list

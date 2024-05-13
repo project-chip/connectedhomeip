@@ -1,19 +1,19 @@
 /*
  *
- *    Copyright (c) 2020 Nest Labs, Inc.
- *    All rights reserved.
+ *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2019 Nest Labs, Inc.
  *
- *    This document is the property of Nest. It is considered
- *    confidential and proprietary information.
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
  *
- *    This document may not be reproduced or transmitted in any form,
- *    in whole or in part, without the express written permission of
- *    Nest.
+ *       http://www.apache.org/licenses/LICENSE-2.0
  *
- *    Description:
- *      This file defines processor-architecture- and toolchain-
- *      specific constants and types required for building
- *      LwIP against FreeRTOS.
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
  *
  */
 #pragma once

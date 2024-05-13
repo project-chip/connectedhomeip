@@ -1,0 +1,113 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+config("libwebsockets_config") {
+  include_dirs = [
+    ".",
+    "repo/include",
+  ]
+
+  defines = []
+}
+
+config("libwebsockets_config_disable_warnings") {
+  cflags = [
+    "-Wno-shadow",
+    "-Wno-unreachable-code",
+    "-Wno-format-nonliteral",
+    "-Wno-implicit-fallthrough",
+  ]
+}
+
+source_set("libwebsockets") {
+  include_dirs = [
+    "repo/lib/plat/windows",
+    "repo/lib/plat/freertos",
+    "repo/lib/plat/unix",
+    "repo/lib/secure-streams",
+    "repo/lib/event-libs",
+    "repo/lib/roles",
+    "repo/lib/roles/http",
+    "repo/lib/roles/h1",
+    "repo/lib/roles/h2",
+    "repo/lib/roles/ws",
+    "repo/lib/system/metrics",
+    "repo/lib/system/smd",
+    "repo/lib/system/async-dns",
+    "repo/lib/core",
+    "repo/lib/core-net",
+  ]
+
+  sources = [
+    "repo/lib/core-net/adopt.c",
+    "repo/lib/core-net/close.c",
+    "repo/lib/core-net/dummy-callback.c",
+    "repo/lib/core-net/network.c",
+    "repo/lib/core-net/output.c",
+    "repo/lib/core-net/pollfd.c",
+    "repo/lib/core-net/service.c",
+    "repo/lib/core-net/sorted-usec-list.c",
+    "repo/lib/core-net/vhost.c",
+    "repo/lib/core-net/wsi-timeout.c",
+    "repo/lib/core-net/wsi.c",
+    "repo/lib/core/alloc.c",
+    "repo/lib/core/buflist.c",
+    "repo/lib/core/context.c",
+    "repo/lib/core/libwebsockets.c",
+    "repo/lib/core/logs.c",
+    "repo/lib/core/lws_dll2.c",
+    "repo/lib/event-libs/poll/poll.c",
+    "repo/lib/misc/base64-decode.c",
+    "repo/lib/misc/sha-1.c",
+    "repo/lib/roles/h1/ops-h1.c",
+    "repo/lib/roles/http/date.c",
+    "repo/lib/roles/http/header.c",
+    "repo/lib/roles/http/parsers.c",
+    "repo/lib/roles/http/server/server.c",
+    "repo/lib/roles/listen/ops-listen.c",
+    "repo/lib/roles/pipe/ops-pipe.c",
+    "repo/lib/roles/raw-skt/ops-raw-skt.c",
+    "repo/lib/roles/ws/ops-ws.c",
+    "repo/lib/roles/ws/server-ws.c",
+    "repo/lib/system/system.c",
+  ]
+
+  if (current_os == "freertos") {
+    sources += [
+      "repo/lib/plat/freertos/freertos-fds.c",
+      "repo/lib/plat/freertos/freertos-init.c",
+      "repo/lib/plat/freertos/freertos-misc.c",
+      "repo/lib/plat/freertos/freertos-pipe.c",
+      "repo/lib/plat/freertos/freertos-service.c",
+      "repo/lib/plat/freertos/freertos-sockets.c",
+    ]
+
+    cflags = [ "-DLWS_PLAT_FREERTOS" ]
+  } else {
+    sources += [
+      "repo/lib/plat/unix/unix-caps.c",
+      "repo/lib/plat/unix/unix-fds.c",
+      "repo/lib/plat/unix/unix-init.c",
+      "repo/lib/plat/unix/unix-misc.c",
+      "repo/lib/plat/unix/unix-pipe.c",
+      "repo/lib/plat/unix/unix-service.c",
+      "repo/lib/plat/unix/unix-sockets.c",
+    ]
+
+    cflags = [ "-DLWS_PLAT_UNIX" ]
+  }
+
+  public_configs = [ ":libwebsockets_config" ]
+  configs += [ ":libwebsockets_config_disable_warnings" ]
+}

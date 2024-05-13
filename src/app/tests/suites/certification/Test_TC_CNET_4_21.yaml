@@ -1,0 +1,197 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    12.4.19. [TC-CNET-4.21] [Thread] Verification for commands check
+    [DUT-Client]
+
+PICS:
+    - CNET.C.F01
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Preconditions"
+      verification: |
+          1. DUT supports CNET.C.F01(TH)
+          2. TH has a Network Commissioning cluster on endpoint PIXIT.CNET.ENDPOINT_THREAD with FeatureMap attribute of 2
+      disabled: true
+
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Commission TH and DUT on Thread setup"
+      verification: |
+
+      disabled: true
+
+    - label: "Step 1: DUT sends the ScanNetwork command to the TH"
+      PICS: CNET.C.C00.Tx
+      verification: |
+          ./chip-tool networkcommissioning scan-networks 54 0
+
+          Verify TH receives ScanNetwork command received response on TH(all-clusters-app) log:
+
+          D: 14385336 [SC]Allocated SecureSession (0x20003510) - waiting for Sigma1 msg
+          I: 14385344 [EM]Received message of type 0x8 with protocolId (0, 1) and MessageCounter:197483196 on exchr
+          D: 14385354 [EM]Handling via exchange: 9330r, Delegate: 0x200070ec
+          D: 14385361 [DMG]Received command for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0000
+          D: 14385369 [DMG]Decreasing reference count for CommandHandler, remaining 1
+          I: 14385377 [EM]Received message of type 0x10 with protocolId (0, 0) and MessageCounter:178528543 on excr
+          D: 14385387 [EM]Found matching exchange: 9329r, Delegate: (nil)
+          D: 14385393 [EM]Rxd Ack; Removing MessageCounter:53368092 from Retrans Table on exchange 9329r
+          D: 14385401 [EM]Removed CHIP MessageCounter:53368092 from RetransTable on exchange 9329r
+          I: 14385432 [DL]Thread Network: GRL Panid 0xface Channel 11 RSSI -85 LQI 28 Version 4
+          D: 14385560 [EM]Sending Standalone Ack for MessageCounter:197483196 on exchange 9330r
+          I: 14385569 [IN]Prepared secure message 0x2002d4a8 to 0x000000000001B669 (1)  of type 0x10 and protocolI.
+          I: 14385583 [IN]Sending encrypted msg 0x2002d4a8 with MessageCounter:136422877 to 0x000000000001B669 (1)c
+          I: 14386621 [DL]Thread Network: OpenThpeudkomku Panid 0x1234 Channel 15 RSSI -62 LQI 120 Version 3
+          I: 14386712 [DL]Thread Network: GRL Panid 0xface Channel 15 RSSI -89 LQI 20 Version 4
+          D: 14390254 [DMG]ICR moving to [ Preparing]
+          D: 14390258 [DMG]ICR moving to [AddingComm]
+          D: 14390263 [DMG]ICR moving to [AddedComma]
+          D: 14390267 [DMG]Decreasing reference count for CommandHandler, remaining 0
+          I: 14390276 [IN]Prepared secure message 0x2000489c to 0x000000000001B669 (1)  of type 0x9 and protocolId.
+          I: 14390291 [IN]Sending encrypted msg 0x2000489c with MessageCounter:136422878 to 0x000000000001B669 (1)c
+          D: 14390305 [DMG]ICR moving to [CommandSen]
+      disabled: true
+
+    - label: "Step 2: DUT sends the ArmFailSafe command to the TH"
+      verification: |
+          ./chip-tool generalcommissioning arm-fail-safe 900 1 54 0
+
+          Verify TH receives ArmFailSafe command received response on TH(all-clusters-app) log:
+
+          D: 14447757 [SC]Allocated SecureSession (0x200035c8) - waiting for Sigma1 msg
+          I: 14447765 [EM]Received message of type 0x8 with protocolId (0, 1) and MessageCounter:60910764 on exchar
+          D: 14447775 [EM]Handling via exchange: 51913r, Delegate: 0x200070ec
+          D: 14447782 [DMG]Received command for Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0000
+          I: 14447790 [FS]GeneralCommissioning: Received ArmFailSafe (90s)
+          D: 14447796 [DMG]Endpoint 0, Cluster 0x0000_0030 update version to feff759c
+          D: 14447802 [DMG]ICR moving to [ Preparing]
+          D: 14447806 [DMG]ICR moving to [AddingComm]
+          D: 14447810 [DMG]ICR moving to [AddedComma]
+          D: 14447814 [DMG]Decreasing reference count for CommandHandler, remaining 0
+          I: 14447822 [IN]Prepared secure message 0x200048b4 to 0x000000000001B669 (1)  of type 0x9 and protocolId.
+          I: 14447839 [IN]Sending encrypted msg 0x200048b4 with MessageCounter:10799379 to 0x000000000001B669 (1) c
+          D: 14447853 [DMG]ICR moving to [CommandSen]
+      disabled: true
+
+    - label: "Step 3: DUT sends the AddOrUpdateThreadNetwork command to the TH"
+      PICS: CNET.C.C03.Tx
+      verification: |
+          ./chip-tool networkcommissioning add-or-update-thread-network-network hex:<your network id in hex> 1 0
+
+          Below is an example:
+
+          ./chip-tool networkcommissioning add-or-update-thread-network hex:0e080000000000010000000300000f35060004001fffe0020811111111072222220708fd9957a92dadc7aa051000112233445966778899aabbccddeeff030f4f70656e54687265616444656d6f6a0102123404106ad73489ca556d19f8c47fd2150e58e30c0402a0fff8 54 0
+
+          Verify TH receives AddOrUpdateThreadNetwork command received response on TH(all-clusters-app) log:
+
+          D: 14484538 [SC]Allocated SecureSession (0x20003680) - waiting for Sigma1 msg
+          D: 14484545 [EM]Retransmitting MessageCounter:53368100 on exchange 24385r Send Cnt 1
+          I: 14484553 [IN]Sending unauthenticated msg 0x2000489c with MessageCounter:53368100 to 0x000000000000000c
+          I: 14484568 [EM]Received message of type 0x8 with protocolId (0, 1) and MessageCounter:77079850 on exchar
+          D: 14484580 [EM]Handling via exchange: 24386r, Delegate: 0x200070ec
+          D: 14484587 [DMG]Received command for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0003
+          D: 14484597 [DMG]ICR moving to [ Preparing]
+          D: 14484601 [DMG]ICR moving to [AddingComm]
+          D: 14484606 [DMG]ICR moving to [AddedComma]
+          D: 14484611 [DMG]Decreasing reference count for CommandHandler, remaining 0
+          I: 14484619 [IN]Prepared secure message 0x200048b4 to 0x000000000001B669 (1)  of type 0x9 and protocolId.
+          I: 14484633 [IN]Sending encrypted msg 0x200048b4 with MessageCounter:249890633 to 0x000000000001B669 (1)c
+          D: 14484648 [DMG]ICR moving to [CommandSen]
+      disabled: true
+
+    - label: "Step 4: DUT sends the ConnectNetwork command to the TH"
+      PICS: CNET.C.C06.Tx
+      verification: |
+          ./chip-tool networkcommissioning connect-network hex:<your network id in hex> 1 0
+
+          Below is an example:
+
+          ./chip-tool networkcommissioning connect-network hex:1111111107222222 54 0
+
+          Verify TH receives ConnectNetwork command received response on TH(all-clusters-app) log:
+
+          D: 14513760 [IN]SecureSession[0x20003738]: Allocated Type:2 LSID:13367
+          D: 14513766 [SC]Allocated SecureSession (0x20003738) - waiting for Sigma1 msg
+          I: 14513774 [EM]Received message of type 0x8 with protocolId (0, 1) and MessageCounter:239166765 on exchr
+          D: 14513784 [EM]Handling via exchange: 65498r, Delegate: 0x200070ec
+          D: 14513791 [DMG]Received command for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0006
+          D: 14513799 [DMG]ICR moving to [ Preparing]
+          D: 14513803 [DMG]ICR moving to [AddingComm]
+          D: 14513807 [DMG]ICR moving to [AddedComma]
+          D: 14513813 [DMG]Decreasing reference count for CommandHandler, remaining 1
+          D: 14513820 [DMG]Decreasing reference count for CommandHandler, remaining 0
+          I: 14513827 [IN]Prepared secure message 0x200048b4 to 0x000000000001B669 (1)  of type 0x9 and protocolId.
+          I: 14513842 [IN]Sending encrypted msg 0x200048b4 with MessageCounter:17976666 to 0x000000000001B669 (1) c
+          D: 14513856 [DMG]ICR moving to [CommandSen]
+      disabled: true
+
+    - label: "Step 5: DUT sends the ReorderNetwork command to the TH"
+      PICS: CNET.C.C08.Tx
+      verification: |
+          ./chip-tool networkcommissioning reorder-network hex:<your network id in hex> 1 0
+
+          Below is an example:
+
+          ./chip-tool networkcommissioning reorder-network hex:0119100899082022 3 54 0
+
+          Verify TH receives ReorderNetwork command received response on TH(all-clusters-app) log:
+
+          D: 14569275 [IN]SecureSession[0x20002c70]: Allocated Type:2 LSID:13369
+          D: 14569282 [SC]Allocated SecureSession (0x20002c70) - waiting for Sigma1 msg
+          I: 14569289 [EM]Received message of type 0x8 with protocolId (0, 1) and MessageCounter:42856299 on exchar
+          D: 14569300 [EM]Handling via exchange: 57898r, Delegate: 0x200070ec
+          D: 14569306 [DMG]Received command for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0008
+          D: 14569314 [DMG]ICR moving to [ Preparing]
+          D: 14569318 [DMG]ICR moving to [AddingComm]
+          D: 14569322 [DMG]ICR moving to [AddedComma]
+          D: 14569326 [DMG]Decreasing reference count for CommandHandler, remaining 0
+          I: 14569333 [IN]Prepared secure message 0x200048b4 to 0x000000000001B669 (1)  of type 0x9 and protocolId.
+          I: 14569348 [IN]Sending encrypted msg 0x200048b4 with MessageCounter:151956957 to 0x000000000001B669 (1)c
+          D: 14569362 [DMG]ICR moving to [CommandSen]
+      disabled: true
+
+    - label: "Step 6: DUT sends the RemoveNetwork command to the TH"
+      PICS: CNET.C.C04.Tx
+      verification: |
+          ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0
+
+          Below is an example:
+
+          ./chip-tool networkcommissioning  remove-network hex:0119100899082022 54 0
+
+          Verify TH receives RemoveNetwork command received response on TH(all-clusters-app) log:
+
+          D: 14591036 [IN]SecureSession[0x20002de0]: Allocated Type:2 LSID:13370
+          D: 14591042 [SC]Allocated SecureSession (0x20002de0) - waiting for Sigma1 msg
+          I: 14591050 [EM]Received message of type 0x8 with protocolId (0, 1) and MessageCounter:7121068 on exchanr
+          D: 14591060 [EM]Handling via exchange: 20338r, Delegate: 0x200070ec
+          D: 14591066 [DMG]Received command for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0004
+          D: 14591074 [DMG]ICR moving to [ Preparing]
+          D: 14591078 [DMG]ICR moving to [AddingComm]
+          D: 14591082 [DMG]ICR moving to [AddedComma]
+          D: 14591086 [DMG]Decreasing reference count for CommandHandler, remaining 0
+          I: 14591096 [IN]Prepared secure message 0x200048b4 to 0x000000000001B669 (1)  of type 0x9 and protocolId.
+          I: 14591110 [IN]Sending encrypted msg 0x200048b4 with MessageCounter:241944247 to 0x000000000001B669 (1)c
+          D: 14591124 [DMG]ICR moving to [CommandSen]
+      disabled: true

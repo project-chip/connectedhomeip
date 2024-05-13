@@ -32,8 +32,8 @@
 using namespace ::chip;
 using namespace chip::app::Clusters;
 
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type,
-                                       uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
 {
     EndpointId endpoint     = attributePath.mEndpointId;
     ClusterId clusterId     = attributePath.mClusterId;
@@ -65,63 +65,81 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
             return;
         }
 
-        if ((attributeId != ColorControl::Attributes::CurrentX::Id) && (attributeId != ColorControl::Attributes::CurrentY::Id) &&
-            (attributeId != ColorControl::Attributes::CurrentHue::Id) &&
-            (attributeId != ColorControl::Attributes::CurrentSaturation::Id))
+        /* XY color space */
+        if (attributeId == ColorControl::Attributes::CurrentX::Id || attributeId == ColorControl::Attributes::CurrentY::Id)
         {
-            ChipLogProgress(Zcl, "Unknown attribute ID: " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
-            return;
-        }
-
-        if (size == sizeof(uint16_t))
-        {
+            if (size != sizeof(uint16_t))
+            {
+                ChipLogError(Zcl, "Wrong length for ColorControl value: %d", size);
+                return;
+            }
             XyColor_t xy;
             if (attributeId == ColorControl::Attributes::CurrentX::Id)
             {
                 xy.x = *reinterpret_cast<uint16_t *>(value);
                 // get Y from cluster value storage
-                EmberAfStatus status = ColorControl::Attributes::CurrentY::Get(endpoint, &xy.y);
-                assert(status == EMBER_ZCL_STATUS_SUCCESS);
+                Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentY::Get(endpoint, &xy.y);
+                assert(status == Protocols::InteractionModel::Status::Success);
             }
             if (attributeId == ColorControl::Attributes::CurrentY::Id)
             {
                 xy.y = *reinterpret_cast<uint16_t *>(value);
                 // get X from cluster value storage
-                EmberAfStatus status = ColorControl::Attributes::CurrentX::Get(endpoint, &xy.x);
-                assert(status == EMBER_ZCL_STATUS_SUCCESS);
+                Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentX::Get(endpoint, &xy.x);
+                assert(status == Protocols::InteractionModel::Status::Success);
             }
+
             ChipLogProgress(Zcl, "New XY color: %u|%u", xy.x, xy.y);
             LightingMgr().InitiateAction(LightingManager::COLOR_ACTION_XY, 0, sizeof(xy), (uint8_t *) &xy);
         }
-        else if (size == sizeof(uint8_t))
+        /* HSV color space */
+        else if (attributeId == ColorControl::Attributes::CurrentHue::Id ||
+                 attributeId == ColorControl::Attributes::CurrentSaturation::Id ||
+                 attributeId == ColorControl::Attributes::EnhancedCurrentHue::Id)
         {
+            if (size != sizeof(uint8_t))
+            {
+                ChipLogError(Zcl, "Wrong length for ColorControl value: %d", size);
+                return;
+            }
             HsvColor_t hsv;
-            if (attributeId == ColorControl::Attributes::CurrentHue::Id)
+            if (attributeId == ColorControl::Attributes::EnhancedCurrentHue::Id)
+            {
+                // We only support 8-bit hue. Assuming hue is linear, normalize 16-bit to 8-bit.
+                hsv.h = (uint8_t) ((*reinterpret_cast<uint16_t *>(value)) >> 8);
+                // get saturation from cluster value storage
+                Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentSaturation::Get(endpoint, &hsv.s);
+                assert(status == Protocols::InteractionModel::Status::Success);
+            }
+            else if (attributeId == ColorControl::Attributes::CurrentHue::Id)
             {
                 hsv.h = *value;
                 // get saturation from cluster value storage
-                EmberAfStatus status = ColorControl::Attributes::CurrentSaturation::Get(endpoint, &hsv.s);
-                assert(status == EMBER_ZCL_STATUS_SUCCESS);
+                Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentSaturation::Get(endpoint, &hsv.s);
+                assert(status == Protocols::InteractionModel::Status::Success);
             }
-            if (attributeId == ColorControl::Attributes::CurrentSaturation::Id)
+            else if (attributeId == ColorControl::Attributes::CurrentSaturation::Id)
             {
                 hsv.s = *value;
                 // get hue from cluster value storage
-                EmberAfStatus status = ColorControl::Attributes::CurrentHue::Get(endpoint, &hsv.h);
-                assert(status == EMBER_ZCL_STATUS_SUCCESS);
+                Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentHue::Get(endpoint, &hsv.h);
+                assert(status == Protocols::InteractionModel::Status::Success);
             }
             ChipLogProgress(Zcl, "New HSV color: %u|%u", hsv.h, hsv.s);
             LightingMgr().InitiateAction(LightingManager::COLOR_ACTION_HSV, 0, sizeof(hsv), (uint8_t *) &hsv);
         }
+        else if (attributeId == ColorControl::Attributes::ColorTemperatureMireds::Id)
+        {
+            CtColor_t ct;
+            ct.ctMireds = *reinterpret_cast<uint16_t *>(value);
+            ChipLogProgress(Zcl, "New CT color: %u", ct.ctMireds);
+            LightingMgr().InitiateAction(LightingManager::COLOR_ACTION_CT, 0, sizeof(ct), (uint8_t *) &ct.ctMireds);
+        }
         else
         {
-            ChipLogError(Zcl, "Wrong length for ColorControl value: %d", size);
+            ChipLogProgress(Zcl, "Unknown attribute ID: " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
+            return;
         }
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "Unknown cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
-        return;
     }
 }
 
@@ -142,5 +160,41 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
  */
 void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 {
-    GetAppTask().UpdateClusterState();
+    uint8_t levelValue;
+    XyColor_t xy;
+    bool onOffValue = false;
+    app::DataModel::Nullable<uint8_t> currentLevel;
+    Protocols::InteractionModel::Status status;
+
+    status = OnOff::Attributes::OnOff::Get(1, &onOffValue);
+
+    if (status == Protocols::InteractionModel::Status::Success)
+    {
+        LightingMgr().InitiateAction(onOffValue ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION, 0, 1,
+                                     (uint8_t *) onOffValue);
+    }
+
+    /* restore values saved by DeferredAttributePersistenceProvider */
+    status = LevelControl::Attributes::CurrentLevel::Get(endpoint, currentLevel);
+    if (status != Protocols::InteractionModel::Status::Success || currentLevel.IsNull())
+    {
+        return;
+    }
+
+    levelValue = currentLevel.Value();
+
+    status = ColorControl::Attributes::CurrentY::Get(endpoint, &xy.y);
+    if (status != Protocols::InteractionModel::Status::Success)
+    {
+        return;
+    }
+    status = ColorControl::Attributes::CurrentX::Get(endpoint, &xy.x);
+    if (status != Protocols::InteractionModel::Status::Success)
+    {
+        return;
+    }
+    ChipLogProgress(Zcl, "restore level: %u", levelValue);
+    LightingMgr().InitiateAction(LightingManager::LEVEL_ACTION, 0, 1, &levelValue);
+    ChipLogProgress(Zcl, "restore XY color: %u|%u", xy.x, xy.y);
+    LightingMgr().InitiateAction(LightingManager::COLOR_ACTION_XY, 0, sizeof(xy), (uint8_t *) &xy);
 }

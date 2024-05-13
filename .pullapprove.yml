@@ -15,9 +15,6 @@ overrides:
     ############################################################
     #  Draft PRs
     ############################################################
-    - if: "draft or 'WIP' in title"
-      status: pending
-      explanation: "PR is draft, pending review"
     - if: "draft"
       status: pending
       explanation: "PR is draft, pending review"
@@ -39,10 +36,17 @@ overrides:
     ############################################################
     #  Required status checks
     ############################################################
-#     Disabled given restyled seems broken right now
-#     - if: "'*restyle*' not in statuses.successful"
-#       status: failure
-#       explanation: "Style must be inline before reviewing can be complete"
+    - if: "'*restyle*' not in statuses.successful"
+      status: failure
+      explanation: "Style must be inline before reviewing can be complete"
+
+    ############################################################
+    #  Require Issues
+    ############################################################
+    # disabling until we have PRs up to date
+    #     - if: "'*issue*' not in statuses.successful"
+    #       status: failure
+    #       explanation: "An issue is required for all PRs"
 
     ############################################################
     #  Fast tracking
@@ -89,12 +93,28 @@ groups:
             teams: [reviewers-apple]
         reviews:
             request: 10
+    shared-reviewers-bosch:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-bosch]
+        reviews:
+            request: 10
     shared-reviewers-comcast:
         type: optional
         conditions:
             - files.include('*')
         reviewers:
             teams: [reviewers-comcast]
+        reviews:
+            request: 10
+    shared-reviewers-dyson:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-dyson]
         reviews:
             request: 10
     shared-reviewers-espressif:
@@ -113,6 +133,14 @@ groups:
             teams: [reviewers-google]
         reviews:
             request: 10
+    shared-reviewers-irobot:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-irobot]
+        reviews:
+            request: 10
     shared-reviewers-lg:
         type: optional
         conditions:
@@ -121,6 +149,14 @@ groups:
             teams: [reviewers-lg]
         reviews:
             request: 10
+    shared-reviewers-logitech:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-logitech]
+        reviews:
+            request: 0 # Requested to be only on demand
     shared-reviewers-nordic:
         type: optional
         conditions:
@@ -137,12 +173,42 @@ groups:
             teams: [reviewers-samsung]
         reviews:
             request: 10
+    shared-reviewers-eve:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-eve]
+        reviews:
+            request: 10
+    # shared-reviewers-signify disabled for now, because the reviewers-signify
+    # team is empty and pullapprove seems to mis-handle that badly and treats
+    # _all_ reviewers as being in this group.
+    #
+    # See https://github.com/dropseed/pullapprove/issues/71
+    #
+    # shared-reviewers-signify:
+    #     type: optional
+    #     conditions:
+    #         - files.include('*')
+    #     reviewers:
+    #         teams: [reviewers-signify]
+    #     reviews:
+    #         request: 10
     shared-reviewers-silabs:
         type: optional
         conditions:
             - files.include('*')
         reviewers:
             teams: [reviewers-silabs]
+        reviews:
+            request: 10
+    shared-reviewers-somfy:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-somfy]
         reviews:
             request: 10
     shared-reviewers-tcl:
@@ -152,7 +218,15 @@ groups:
         reviewers:
             teams: [reviewers-tcl]
         reviews:
-            request: 1
+            request: 10
+    shared-reviewers-qorvo:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-qorvo]
+        reviews:
+            request: 10
 
     ############################################################
     #  Base Required Reviewers

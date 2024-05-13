@@ -23,6 +23,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <platform/AttributeList.h>
 
 namespace chip {
@@ -66,7 +67,7 @@ public:
 
     using FixedLabelType = app::Clusters::FixedLabel::Structs::LabelStruct::Type;
     using UserLabelType  = app::Clusters::UserLabel::Structs::LabelStruct::Type;
-    using CalendarType   = app::Clusters::TimeFormatLocalization::CalendarType;
+    using CalendarType   = app::Clusters::TimeFormatLocalization::CalendarTypeEnum;
 
     using FixedLabelIterator             = Iterator<FixedLabelType>;
     using UserLabelIterator              = Iterator<UserLabelType>;
@@ -78,10 +79,18 @@ public:
     virtual ~DeviceInfoProvider() = default;
 
     // Not copyable
-    DeviceInfoProvider(const DeviceInfoProvider &) = delete;
+    DeviceInfoProvider(const DeviceInfoProvider &)             = delete;
     DeviceInfoProvider & operator=(const DeviceInfoProvider &) = delete;
 
+    /**
+     * @brief Set the storage implementation used for non-volatile storage of device information data.
+     *
+     * @param storage Pointer to storage instance to set. Cannot be nullptr, will assert.
+     */
+    void SetStorageDelegate(PersistentStorageDelegate * storage);
+
     CHIP_ERROR SetUserLabelList(EndpointId endpoint, const AttributeList<UserLabelType, kMaxUserLabelListLength> & labelList);
+    CHIP_ERROR ClearUserLabelList(EndpointId endpoint);
     CHIP_ERROR AppendUserLabel(EndpointId endpoint, const UserLabelType & label);
 
     // Iterators
@@ -112,6 +121,8 @@ public:
     virtual SupportedCalendarTypesIterator * IterateSupportedCalendarTypes() = 0;
 
 protected:
+    PersistentStorageDelegate * mStorage = nullptr;
+
     /**
      * @brief Set the UserLabel at the specified index of the UserLabelList on a given endpoint
      *
@@ -122,6 +133,16 @@ protected:
      *         or other CHIP_ERROR values from implementation on other errors.
      */
     virtual CHIP_ERROR SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel) = 0;
+
+    /**
+     * @brief Delete the UserLabel at the specified index of the UserLabelList on a given endpoint
+     *
+     * @param endpoint - id to UserLabelList on which to delete the UserLabel.
+     * @param index - index within the UserLabelList for which to remove the UserLabel.
+     * @return CHIP_NO_ERROR on success, CHIP_ERROR_INVALID_KEY_ID if index exceed the range (Total length - 1),
+     *         or other CHIP_ERROR values from implementation on other errors.
+     */
+    virtual CHIP_ERROR DeleteUserLabelAt(EndpointId endpoint, size_t index) = 0;
 
     /**
      * @brief Set the total length of the UserLabelList on a given endpoint

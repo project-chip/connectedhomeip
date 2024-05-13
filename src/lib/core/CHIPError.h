@@ -33,8 +33,11 @@
 
 #include <inttypes.h>
 #include <limits>
-#include <stdint.h>
 #include <type_traits>
+
+#if __cplusplus >= 202002L
+#include <source_location>
+#endif // __cplusplus >= 202002L
 
 namespace chip {
 
@@ -113,9 +116,13 @@ public:
 
     // Helper for declaring constructors without too much repetition.
 #if CHIP_CONFIG_ERROR_SOURCE
-#define CHIP_INITIALIZE_ERROR_SOURCE(f, l) , mFile((f)), mLine((l))
-#else // CHIP_CONFIG_ERROR_SOURCE
-#define CHIP_INITIALIZE_ERROR_SOURCE(f, l)
+#if __cplusplus >= 202002L
+#define CHIP_INITIALIZE_ERROR_SOURCE(f, l, loc) , mFile((f)), mLine((l)), mSourceLocation((loc))
+#else
+#define CHIP_INITIALIZE_ERROR_SOURCE(f, l, loc) , mFile((f)), mLine((l))
+#endif // __cplusplus >= 202002L
+#else  // CHIP_CONFIG_ERROR_SOURCE
+#define CHIP_INITIALIZE_ERROR_SOURCE(f, l, loc)
 #endif // CHIP_CONFIG_ERROR_SOURCE
 
     /**
@@ -124,12 +131,17 @@ public:
      * @note
      *  The result is valid only if CanEncapsulate() is true.
      */
-    constexpr ChipError(Range range, ValueType value) :
-        mError(MakeInteger(range, (value & MakeMask(0, kValueLength)))) CHIP_INITIALIZE_ERROR_SOURCE(nullptr, 0)
+    constexpr ChipError(Range range, ValueType value) : ChipError(range, value, /*file=*/nullptr, /*line=*/0) {}
+#if __cplusplus >= 202002L
+    constexpr ChipError(Range range, ValueType value, const char * file, unsigned int line,
+                        std::source_location location = std::source_location::current()) :
+        mError(MakeInteger(range, (value & MakeMask(0, kValueLength)))) CHIP_INITIALIZE_ERROR_SOURCE(file, line, location)
     {}
+#else
     constexpr ChipError(Range range, ValueType value, const char * file, unsigned int line) :
-        mError(MakeInteger(range, (value & MakeMask(0, kValueLength)))) CHIP_INITIALIZE_ERROR_SOURCE(file, line)
+        mError(MakeInteger(range, (value & MakeMask(0, kValueLength)))) CHIP_INITIALIZE_ERROR_SOURCE(file, line, /*loc=*/nullptr)
     {}
+#endif // __cplusplus >= 202002L
 
     /**
      * Construct a CHIP_ERROR for SdkPart @a part with @a code.
@@ -137,10 +149,17 @@ public:
      * @note
      *  The macro version CHIP_SDK_ERROR checks that the numeric value is constant and well-formed.
      */
-    constexpr ChipError(SdkPart part, uint8_t code) : mError(MakeInteger(part, code)) CHIP_INITIALIZE_ERROR_SOURCE(nullptr, 0) {}
-    constexpr ChipError(SdkPart part, uint8_t code, const char * file, unsigned int line) :
-        mError(MakeInteger(part, code)) CHIP_INITIALIZE_ERROR_SOURCE(file, line)
+    constexpr ChipError(SdkPart part, uint8_t code) : ChipError(part, code, /*file=*/nullptr, /*line=*/0) {}
+#if __cplusplus >= 202002L
+    constexpr ChipError(SdkPart part, uint8_t code, const char * file, unsigned int line,
+                        std::source_location location = std::source_location::current()) :
+        mError(MakeInteger(part, code)) CHIP_INITIALIZE_ERROR_SOURCE(file, line, location)
     {}
+#else
+    constexpr ChipError(SdkPart part, uint8_t code, const char * file, unsigned int line) :
+        mError(MakeInteger(part, code)) CHIP_INITIALIZE_ERROR_SOURCE(file, line, /*loc=*/nullptr)
+    {}
+#endif // __cplusplus >= 202002L
 
     /**
      * Construct a CHIP_ERROR constant for SdkPart @a part with @a code at the current source line.
@@ -160,10 +179,17 @@ public:
      * @note
      *  This is intended to be used only in foreign function interfaces.
      */
-    explicit constexpr ChipError(StorageType error) : mError(error) CHIP_INITIALIZE_ERROR_SOURCE(nullptr, 0) {}
-    explicit constexpr ChipError(StorageType error, const char * file, unsigned int line) :
-        mError(error) CHIP_INITIALIZE_ERROR_SOURCE(file, line)
+    explicit constexpr ChipError(StorageType error) : ChipError(error, /*file=*/nullptr, /*line=*/0) {}
+#if __cplusplus >= 202002L
+    explicit constexpr ChipError(StorageType error, const char * file, unsigned int line,
+                                 std::source_location location = std::source_location::current()) :
+        mError(error) CHIP_INITIALIZE_ERROR_SOURCE(file, line, location)
     {}
+#else
+    explicit constexpr ChipError(StorageType error, const char * file, unsigned int line) :
+        mError(error) CHIP_INITIALIZE_ERROR_SOURCE(file, line, /*loc=*/nullptr)
+    {}
+#endif // __cplusplus >= 202002L
 
 #undef CHIP_INITIALIZE_ERROR_SOURCE
 
@@ -300,6 +326,12 @@ public:
      */
     unsigned int GetLine() const { return mLine; }
 
+#if __cplusplus >= 202002L
+    /**
+     * Get the source_location of the point where the error occurred.
+     */
+    const std::source_location & GetSourceLocation() { return mSourceLocation; }
+#endif // __cplusplus >= 202002L
 #endif // CHIP_CONFIG_ERROR_SOURCE
 
 private:
@@ -366,6 +398,9 @@ private:
 #if CHIP_CONFIG_ERROR_SOURCE
     const char * mFile;
     unsigned int mLine;
+#if __cplusplus >= 202002L
+    std::source_location mSourceLocation;
+#endif // __cplusplus >= 202002L
 #endif // CHIP_CONFIG_ERROR_SOURCE
 
 public:
@@ -374,13 +409,13 @@ public:
      *
      * This template ensures that the numeric value is constant and well-formed.
      */
-    template <SdkPart PART, StorageType CODE>
+    template <SdkPart PART, StorageType SCODE>
     struct SdkErrorConstant
     {
         static_assert(FitsInField(kSdkPartLength, to_underlying(PART)), "part is too large");
-        static_assert(FitsInField(kSdkCodeLength, CODE), "code is too large");
-        static_assert(MakeInteger(PART, CODE) != 0, "value is zero");
-        static constexpr StorageType value = MakeInteger(PART, CODE);
+        static_assert(FitsInField(kSdkCodeLength, SCODE), "code is too large");
+        static_assert(MakeInteger(PART, SCODE) != 0, "value is zero");
+        static constexpr StorageType value = MakeInteger(PART, SCODE);
     };
 };
 
@@ -401,7 +436,8 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_CORE_ERROR(e) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kCore, (e))
 
 #define CHIP_IM_GLOBAL_STATUS(type)                                                                                                \
-    CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kIMGlobalStatus, to_underlying(Protocols::InteractionModel::Status::type))
+    CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kIMGlobalStatus,                                                                    \
+                   ::chip::to_underlying(::chip::Protocols::InteractionModel::Status::type))
 
 //
 // type must be a compile-time constant as mandated by CHIP_SDK_ERROR.
@@ -466,13 +502,9 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_MESSAGE_TOO_LONG                            CHIP_CORE_ERROR(0x04)
 
 /**
- *  @def CHIP_ERROR_UNSUPPORTED_EXCHANGE_VERSION
- *
- *  @brief
- *    An exchange version is not supported.
- *
+ *    Recursion depth overflow
  */
-#define CHIP_ERROR_UNSUPPORTED_EXCHANGE_VERSION                CHIP_CORE_ERROR(0x05)
+#define CHIP_ERROR_RECURSION_DEPTH_LIMIT                       CHIP_CORE_ERROR(0x05)
 
 /**
  *  @def CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS
@@ -585,14 +617,13 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_WRONG_ENCRYPTION_TYPE                       CHIP_CORE_ERROR(0x11)
 
 /**
- *  @def CHIP_ERROR_TOO_MANY_KEYS
+ *  @def CHIP_ERROR_INVALID_UTF8
  *
  *  @brief
- *    The attempt to allocate a key failed because the number of active keys
- *    exceeds the maximum limit.
+ *    Invalid UTF8 string (contains some characters that are invalid)
  *
  */
-#define CHIP_ERROR_TOO_MANY_KEYS                               CHIP_CORE_ERROR(0x12)
+#define CHIP_ERROR_INVALID_UTF8                                CHIP_CORE_ERROR(0x12)
 
 /**
  *  @def CHIP_ERROR_INTEGRITY_CHECK_FAILED
@@ -614,22 +645,22 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_INVALID_SIGNATURE                           CHIP_CORE_ERROR(0x14)
 
 /**
- *  @def CHIP_ERROR_UNSUPPORTED_MESSAGE_VERSION
+ *  @def CHIP_ERROR_INVALID_TLV_CHAR_STRING
  *
  *  @brief
- *    A message version is unsupported.
+ *    Invalid TLV character string (e.g. null terminator)
  *
  */
-#define CHIP_ERROR_UNSUPPORTED_MESSAGE_VERSION                 CHIP_CORE_ERROR(0x15)
+#define CHIP_ERROR_INVALID_TLV_CHAR_STRING                     CHIP_CORE_ERROR(0x15)
 
 /**
- *  @def CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE
+ *  @def CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT
  *
  *  @brief
- *    An encryption type is unsupported.
+ *    Subscription timeout caused by LIT ICD device inactive mode
  *
  */
-#define CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE                 CHIP_CORE_ERROR(0x16)
+#define CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT              CHIP_CORE_ERROR(0x16)
 
 /**
  *  @def CHIP_ERROR_UNSUPPORTED_SIGNATURE_TYPE
@@ -677,22 +708,22 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_WRONG_KEY_TYPE                              CHIP_CORE_ERROR(0x1b)
 
 /**
- *  @def CHIP_ERROR_WELL_UNINITIALIZED
+ *  @def CHIP_ERROR_UNINITIALIZED
  *
  *  @brief
  *    A requested object is uninitialized.
  *
  */
-#define CHIP_ERROR_WELL_UNINITIALIZED                          CHIP_CORE_ERROR(0x1c)
+#define CHIP_ERROR_UNINITIALIZED                               CHIP_CORE_ERROR(0x1c)
 
 /**
- *  @def CHIP_ERROR_WELL_EMPTY
+ *  @def CHIP_ERROR_INVALID_IPK
  *
  *  @brief
- *    A requested object is empty.
+ *    The IPK is invalid
  *
  */
-#define CHIP_ERROR_WELL_EMPTY                                  CHIP_CORE_ERROR(0x1d)
+#define CHIP_ERROR_INVALID_IPK                                 CHIP_CORE_ERROR(0x1d)
 
 /**
  *  @def CHIP_ERROR_INVALID_STRING_LENGTH
@@ -713,13 +744,13 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_INVALID_LIST_LENGTH                         CHIP_CORE_ERROR(0x1f)
 
 /**
- *  @def CHIP_ERROR_INVALID_INTEGRITY_TYPE
+ *  @def CHIP_ERROR_FAILED_DEVICE_ATTESTATION
  *
  *  @brief
- *    An integrity type is invalid.
+ *    Device Attestation failed.
  *
  */
-#define CHIP_ERROR_INVALID_INTEGRITY_TYPE                      CHIP_CORE_ERROR(0x20)
+#define CHIP_ERROR_FAILED_DEVICE_ATTESTATION                   CHIP_CORE_ERROR(0x20)
 
 /**
  *  @def CHIP_END_OF_TLV
@@ -787,23 +818,8 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_TLV_CONTAINER_OPEN                          CHIP_CORE_ERROR(0x27)
 
-/**
- *  @def CHIP_ERROR_INVALID_TRANSFER_MODE
- *
- *  @brief
- *    A transfer mode is invalid.
- *
- */
-#define CHIP_ERROR_INVALID_TRANSFER_MODE                       CHIP_CORE_ERROR(0x28)
-
-/**
- *  @def CHIP_ERROR_INVALID_PROFILE_ID
- *
- *  @brief
- *    A profile id is invalid.
- *
- */
-#define CHIP_ERROR_INVALID_PROFILE_ID                          CHIP_CORE_ERROR(0x29)
+// AVAILABLE: 0x28
+// AVAILABLE: 0x29
 
 /**
  *  @def CHIP_ERROR_INVALID_MESSAGE_TYPE
@@ -823,14 +839,7 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_UNEXPECTED_TLV_ELEMENT                      CHIP_CORE_ERROR(0x2b)
 
-/**
- *  @def CHIP_ERROR_STATUS_REPORT_RECEIVED
- *
- *  @brief
- *    A status report is received from a peer node.
- *
- */
-#define CHIP_ERROR_STATUS_REPORT_RECEIVED                      CHIP_CORE_ERROR(0x2c)
+// AVAILABLE: 0x2c
 
 /**
  *  @def CHIP_ERROR_NOT_IMPLEMENTED
@@ -895,42 +904,10 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR                   CHIP_CORE_ERROR(0x33)
 
-/**
- *  @def CHIP_ERROR_UNSUPPORTED_DEVICE_DESCRIPTOR_VERSION
- *
- *  @brief
- *    A device descriptor version is unsupported.
- *
- */
-#define CHIP_ERROR_UNSUPPORTED_DEVICE_DESCRIPTOR_VERSION       CHIP_CORE_ERROR(0x34)
-
-/**
- *  @def CHIP_END_OF_INPUT
- *
- *  @brief
- *    An input ended.
- *
- */
-#define CHIP_ERROR_END_OF_INPUT                                CHIP_CORE_ERROR(0x35)
-#define CHIP_END_OF_INPUT CHIP_ERROR_END_OF_INPUT
-
-/**
- *  @def CHIP_ERROR_RATE_LIMIT_EXCEEDED
- *
- *  @brief
- *    A rate limit is exceeded.
- *
- */
-#define CHIP_ERROR_RATE_LIMIT_EXCEEDED                         CHIP_CORE_ERROR(0x36)
-
-/**
- *  @def CHIP_ERROR_SECURITY_MANAGER_BUSY
- *
- *  @brief
- *    A security manager is busy.
- *
- */
-#define CHIP_ERROR_SECURITY_MANAGER_BUSY                       CHIP_CORE_ERROR(0x37)
+// AVAILABLE: 0x34
+// AVAILABLE: 0x35
+// AVAILABLE: 0x36
+// AVAILABLE: 0x37
 
 /**
  *  @def CHIP_ERROR_INVALID_PASE_PARAMETER
@@ -941,23 +918,8 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_INVALID_PASE_PARAMETER                      CHIP_CORE_ERROR(0x38)
 
-/**
- *  @def CHIP_ERROR_PASE_SUPPORTS_ONLY_CONFIG1
- *
- *  @brief
- *    PASE supports only config1.
- *
- */
-#define CHIP_ERROR_PASE_SUPPORTS_ONLY_CONFIG1                  CHIP_CORE_ERROR(0x39)
-
-/**
- *  @def CHIP_ERROR_KEY_CONFIRMATION_FAILED
- *
- *  @brief
- *    A key confirmation failed.
- *
- */
-#define CHIP_ERROR_KEY_CONFIRMATION_FAILED                     CHIP_CORE_ERROR(0x3a)
+// AVAILABLE: 0x39
+// AVAILABLE: 0x3a
 
 /**
  *  @def CHIP_ERROR_INVALID_USE_OF_SESSION_KEY
@@ -995,23 +957,8 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_RANDOM_DATA_UNAVAILABLE                     CHIP_CORE_ERROR(0x3e)
 
-/**
- *  @def CHIP_ERROR_UNSUPPORTED_HOST_PORT_ELEMENT
- *
- *  @brief
- *    A type in host/port list is unsupported.
- *
- */
-#define CHIP_ERROR_UNSUPPORTED_HOST_PORT_ELEMENT               CHIP_CORE_ERROR(0x3f)
-
-/**
- *  @def CHIP_ERROR_INVALID_HOST_SUFFIX_INDEX
- *
- *  @brief
- *    A suffix index in host/port list is invalid.
- *
- */
-#define CHIP_ERROR_INVALID_HOST_SUFFIX_INDEX                   CHIP_CORE_ERROR(0x40)
+// AVAILABLE: 0x3f
+// AVAILABLE: 0x40
 
 /**
  *  @def CHIP_ERROR_HOST_PORT_LIST_EMPTY
@@ -1022,32 +969,9 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_HOST_PORT_LIST_EMPTY                        CHIP_CORE_ERROR(0x41)
 
-/**
- *  @def CHIP_ERROR_UNSUPPORTED_AUTH_MODE
- *
- *  @brief
- *    An authentication mode is unsupported.
- *
- */
-#define CHIP_ERROR_UNSUPPORTED_AUTH_MODE                       CHIP_CORE_ERROR(0x42)
-
-/**
- *  @def CHIP_ERROR_INVALID_SERVICE_EP
- *
- *  @brief
- *    A service endpoint is invalid.
- *
- */
-#define CHIP_ERROR_INVALID_SERVICE_EP                          CHIP_CORE_ERROR(0x43)
-
-/**
- *  @def CHIP_ERROR_INVALID_DIRECTORY_ENTRY_TYPE
- *
- *  @brief
- *    A directory entry type is unknown.
- *
- */
-#define CHIP_ERROR_INVALID_DIRECTORY_ENTRY_TYPE                CHIP_CORE_ERROR(0x44)
+// AVAILABLE: 0x42
+// AVAILABLE: 0x43
+// AVAILABLE: 0x44
 
 /**
  *  @def CHIP_ERROR_FORCED_RESET
@@ -1086,14 +1010,7 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_NOT_CONNECTED                               CHIP_CORE_ERROR(0x48)
 
-/**
- *  @def CHIP_ERROR_NO_SW_UPDATE_AVAILABLE
- *
- *  @brief
- *    No software update is available.
- *
- */
-#define CHIP_ERROR_NO_SW_UPDATE_AVAILABLE                      CHIP_CORE_ERROR(0x49)
+// AVAILABLE: 0x49
 
 /**
  *  @def CHIP_ERROR_CA_CERT_NOT_FOUND
@@ -1167,15 +1084,7 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_UNSUPPORTED_ELLIPTIC_CURVE                  CHIP_CORE_ERROR(0x51)
 
-/**
- *  @def CHIP_CERT_NOT_USED
- *
- *  @brief
- *    A certificate was not used during the chain validation.
- *
- */
-#define CHIP_ERROR_CERT_NOT_USED                               CHIP_CORE_ERROR(0x52)
-#define CHIP_CERT_NOT_USED CHIP_ERROR_CERT_NOT_USED
+// AVAILABLE: 0x52
 
 /**
  *  @def CHIP_ERROR_CERT_NOT_FOUND
@@ -1195,14 +1104,7 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_INVALID_CASE_PARAMETER                      CHIP_CORE_ERROR(0x54)
 
-/**
- *  @def CHIP_ERROR_UNSUPPORTED_CASE_CONFIGURATION
- *
- *  @brief
- *    A CASE configuration is unsupported.
- *
- */
-#define CHIP_ERROR_UNSUPPORTED_CASE_CONFIGURATION              CHIP_CORE_ERROR(0x55)
+// AVAILABLE: 0x55
 
 /**
  *  @def CHIP_ERROR_CERT_LOAD_FAILED
@@ -1222,14 +1124,7 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_CERT_NOT_TRUSTED                            CHIP_CORE_ERROR(0x57)
 
-/**
- *  @def CHIP_ERROR_INVALID_ACCESS_TOKEN
- *
- *  @brief
- *    An access token is invalid.
- *
- */
-#define CHIP_ERROR_INVALID_ACCESS_TOKEN                        CHIP_CORE_ERROR(0x58)
+// AVAILABLE: 0x58
 
 /**
  *  @def CHIP_ERROR_WRONG_CERT_DN
@@ -1240,23 +1135,8 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_WRONG_CERT_DN                               CHIP_CORE_ERROR(0x59)
 
-/**
- *  @def CHIP_ERROR_INVALID_PROVISIONING_BUNDLE
- *
- *  @brief
- *    A provisioning bundle is invalid.
- *
- */
-#define CHIP_ERROR_INVALID_PROVISIONING_BUNDLE                 CHIP_CORE_ERROR(0x5a)
-
-/**
- *  @def CHIP_ERROR_PROVISIONING_BUNDLE_DECRYPTION_ERROR
- *
- *  @brief
- *    A provision bundle encountered a decryption error.
- *
- */
-#define CHIP_ERROR_PROVISIONING_BUNDLE_DECRYPTION_ERROR        CHIP_CORE_ERROR(0x5b)
+// AVAILABLE: 0x5a
+// AVAILABLE: 0x5b
 
 /**
  *  @def CHIP_ERROR_WRONG_NODE_ID
@@ -1267,68 +1147,13 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_WRONG_NODE_ID                               CHIP_CORE_ERROR(0x5c)
 
-/**
- *  @def CHIP_ERROR_CONN_ACCEPTED_ON_WRONG_PORT
- *
- *  @brief
- *    A connection is accepted on a wrong port.
- *
- */
-#define CHIP_ERROR_CONN_ACCEPTED_ON_WRONG_PORT                 CHIP_CORE_ERROR(0x5d)
-
-/**
- *  @def CHIP_ERROR_CALLBACK_REPLACED
- *
- *  @brief
- *    An application callback has been replaced.
- *
- */
-#define CHIP_ERROR_CALLBACK_REPLACED                           CHIP_CORE_ERROR(0x5e)
-
-/**
- *  @def CHIP_ERROR_NO_CASE_AUTH_DELEGATE
- *
- *  @brief
- *    No CASE authentication delegate is set.
- *
- */
-#define CHIP_ERROR_NO_CASE_AUTH_DELEGATE                       CHIP_CORE_ERROR(0x5f)
-
-/**
- *  @def CHIP_ERROR_DEVICE_LOCATE_TIMEOUT
- *
- *  @brief
- *    The attempt to locate device timed out.
- *
- */
-#define CHIP_ERROR_DEVICE_LOCATE_TIMEOUT                       CHIP_CORE_ERROR(0x60)
-
-/**
- *  @def CHIP_ERROR_DEVICE_CONNECT_TIMEOUT
- *
- *  @brief
- *    The attempt to connect device timed out.
- *
- */
-#define CHIP_ERROR_DEVICE_CONNECT_TIMEOUT                      CHIP_CORE_ERROR(0x61)
-
-/**
- *  @def CHIP_ERROR_DEVICE_AUTH_TIMEOUT
- *
- *  @brief
- *    The attempt to authenticate device timed out.
- *
- */
-#define CHIP_ERROR_DEVICE_AUTH_TIMEOUT                         CHIP_CORE_ERROR(0x62)
-
-/**
- *  @def CHIP_ERROR_MESSAGE_NOT_ACKNOWLEDGED
- *
- *  @brief
- *    A message is not acknowledged after max retries.
- *
- */
-#define CHIP_ERROR_MESSAGE_NOT_ACKNOWLEDGED                    CHIP_CORE_ERROR(0x63)
+// AVAILABLE: 0x5d
+// AVAILABLE: 0x5e
+// AVAILABLE: 0x5f
+// AVAILABLE: 0x60
+// AVAILABLE: 0x61
+// AVAILABLE: 0x62
+// AVAILABLE: 0x63
 
 /**
  *  @def CHIP_ERROR_RETRANS_TABLE_FULL
@@ -1339,32 +1164,9 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_RETRANS_TABLE_FULL                          CHIP_CORE_ERROR(0x64)
 
-/**
- *  @def CHIP_ERROR_INVALID_ACK_MESSAGE_COUNTER
- *
- *  @brief
- *    An acknowledgment id is invalid.
- *
- */
-#define CHIP_ERROR_INVALID_ACK_MESSAGE_COUNTER                 CHIP_CORE_ERROR(0x65)
-
-/**
- *  @def CHIP_ERROR_SEND_THROTTLED
- *
- *  @brief
- *    A send is throttled.
- *
- */
-#define CHIP_ERROR_SEND_THROTTLED                              CHIP_CORE_ERROR(0x66)
-
-/**
- *  @def CHIP_ERROR_WRONG_MSG_VERSION_FOR_EXCHANGE
- *
- *  @brief
- *    A message version is not supported by the current exchange context.
- *
- */
-#define CHIP_ERROR_WRONG_MSG_VERSION_FOR_EXCHANGE              CHIP_CORE_ERROR(0x67)
+// AVAILABLE: 0x65
+// AVAILABLE: 0x66
+// AVAILABLE: 0x67
 
 /**
  *  @def CHIP_ERROR_TRANSACTION_CANCELED
@@ -1375,32 +1177,17 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_TRANSACTION_CANCELED                        CHIP_CORE_ERROR(0x68)
 
-/**
- *  @def CHIP_ERROR_LISTENER_ALREADY_STARTED
- *
- *  @brief
- *    A listener has already started.
- *
- */
-#define CHIP_ERROR_LISTENER_ALREADY_STARTED                    CHIP_CORE_ERROR(0x69)
+// AVAILABLE: 0x69
+// AVAILABLE: 0x6a
 
 /**
- *  @def CHIP_ERROR_LISTENER_ALREADY_STOPPED
+ *  @def CHIP_ERROR_INVALID_SUBSCRIPTION
  *
  *  @brief
- *    A listener has already stopped.
+ *    A message was received as part of a subscription exchange that has a mis-matching subscription id.
  *
  */
-#define CHIP_ERROR_LISTENER_ALREADY_STOPPED                    CHIP_CORE_ERROR(0x6a)
-
-/**
- *  @def CHIP_ERROR_UNKNOWN_TOPIC
- *
- *  @brief
- *    A topic ID was unknown to the recipient.
- *
- */
-#define CHIP_ERROR_UNKNOWN_TOPIC                               CHIP_CORE_ERROR(0x6b)
+#define CHIP_ERROR_INVALID_SUBSCRIPTION                               CHIP_CORE_ERROR(0x6b)
 
 /**
  *  @def CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
@@ -1412,33 +1199,6 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE                    CHIP_CORE_ERROR(0x6c)
 
 /**
- *  @def CHIP_ERROR_PASE_RECONFIGURE_REQUIRED
- *
- *  @brief
- *    PASE is required to reconfigure.
- *
- */
-#define CHIP_ERROR_PASE_RECONFIGURE_REQUIRED                   CHIP_CORE_ERROR(0x6d)
-
-/**
- *  @def CHIP_ERROR_INVALID_PASE_CONFIGURATION
- *
- *  @brief
- *    A PASE configuration is invalid.
- *
- */
-#define CHIP_ERROR_INVALID_PASE_CONFIGURATION                  CHIP_CORE_ERROR(0x6e)
-
-/**
- *  @def CHIP_ERROR_NO_COMMON_PASE_CONFIGURATIONS
- *
- *  @brief
- *    No PASE configuration is in common.
- *
- */
-#define CHIP_ERROR_NO_COMMON_PASE_CONFIGURATIONS               CHIP_CORE_ERROR(0x6f)
-
-/**
  *  @def CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR
  *
  *  @brief
@@ -1448,13 +1208,13 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR               CHIP_CORE_ERROR(0x70)
 
 /**
- *  @def CHIP_ERROR_INVALID_FABRIC_ID
+ *  @def CHIP_ERROR_INVALID_FABRIC_INDEX
  *
  *  @brief
- *    A fabric id is invalid.
+ *    A fabric index is invalid.
  *
  */
-#define CHIP_ERROR_INVALID_FABRIC_ID                           CHIP_CORE_ERROR(0x71)
+#define CHIP_ERROR_INVALID_FABRIC_INDEX                        CHIP_CORE_ERROR(0x71)
 
 /**
  *  @def CHIP_ERROR_TOO_MANY_CONNECTIONS
@@ -1472,24 +1232,17 @@ using CHIP_ERROR = ::chip::ChipError;
  * @brief
  *   The operation cancelled because a shut down was initiated
  */
-#define CHIP_ERROR_SHUT_DOWN                     CHIP_CORE_ERROR(0x73)
+#define CHIP_ERROR_SHUT_DOWN                                   CHIP_CORE_ERROR(0x73)
 
 /**
- * @def CHIP_ERROR_SHUT_DOWN
+ * @def CHIP_ERROR_CANCELLED
  *
  * @brief
  *   The operation has been cancelled, generally by calling a cancel/abort request.
  */
-#define CHIP_ERROR_CANCELLED                     CHIP_CORE_ERROR(0x74)
+#define CHIP_ERROR_CANCELLED                                   CHIP_CORE_ERROR(0x74)
 
-/**
- *  @def CHIP_ERROR_DRBG_ENTROPY_SOURCE_FAILED
- *
- *  @brief
- *    DRBG entropy source failed to generate entropy data.
- *
- */
-#define CHIP_ERROR_DRBG_ENTROPY_SOURCE_FAILED                  CHIP_CORE_ERROR(0x75)
+// AVAILABLE: 0x75
 
 /**
  *  @def CHIP_ERROR_TLV_TAG_NOT_FOUND
@@ -1500,19 +1253,44 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_TLV_TAG_NOT_FOUND                           CHIP_CORE_ERROR(0x76)
 
-// unused CHIP_CORE_ERROR(0x77)
+/**
+ * @def CHIP_ERROR_MISSING_SECURE_SESSION
+ *
+ * @brief
+ *
+ *  A secure session is needed to do work, but is missing/is not present.
+ */
+#define CHIP_ERROR_MISSING_SECURE_SESSION                      CHIP_CORE_ERROR(0x77)
 
-// unused CHIP_CORE_ERROR(0x78)
+/**
+ * @def CHIP_ERROR_INVALID_ADMIN_SUBJECT
+ *
+ * @brief
+ *   The CaseAdminSubject field is not valid in AddNOC command.
+ *
+ */
+#define CHIP_ERROR_INVALID_ADMIN_SUBJECT                      CHIP_CORE_ERROR(0x78)
 
-// unused CHIP_CORE_ERROR(0x79)
+/**
+ * @def CHIP_ERROR_INSUFFICIENT_PRIVILEGE
+ *
+ * @brief
+ *   Required privilege was insufficient during an operation.
+ *
+ */
+#define CHIP_ERROR_INSUFFICIENT_PRIVILEGE                          CHIP_CORE_ERROR(0x79)
 
-// unused CHIP_CORE_ERROR(0x7a)
+// AVAILABLE: 0x7a
+// AVAILABLE: 0x7b
+// AVAILABLE: 0x7c
 
-// unused CHIP_CORE_ERROR(0x7b)
-
-// unused CHIP_CORE_ERROR(0x7c)
-
-// unused CHIP_CORE_ERROR(0x7d)
+/**
+ * @def CHIP_ERROR_MESSAGE_COUNTER_EXHAUSTED
+ *
+ * @brief
+ *   The message counter of the session is exhausted, the session should be closed.
+ */
+#define CHIP_ERROR_MESSAGE_COUNTER_EXHAUSTED                 CHIP_CORE_ERROR(0x7d)
 
 /**
  *  @def CHIP_ERROR_FABRIC_EXISTS
@@ -1524,13 +1302,13 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_FABRIC_EXISTS                               CHIP_CORE_ERROR(0x7e)
 
 /**
- *  @def CHIP_ERROR_KEY_NOT_FOUND_FROM_PEER
+ *  @def CHIP_ERROR_ENDPOINT_EXISTS
  *
  *  @brief
- *    The encryption key is not found error received from a peer node.
+ *    The endpoint with the given endpoint id already exists.
  *
  */
-#define CHIP_ERROR_KEY_NOT_FOUND_FROM_PEER                     CHIP_CORE_ERROR(0x7f)
+#define CHIP_ERROR_ENDPOINT_EXISTS                               CHIP_CORE_ERROR(0x7f)
 
 /**
  *  @def CHIP_ERROR_WRONG_ENCRYPTION_TYPE_FROM_PEER
@@ -1541,41 +1319,10 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_WRONG_ENCRYPTION_TYPE_FROM_PEER             CHIP_CORE_ERROR(0x80)
 
-/**
- *  @def CHIP_ERROR_UNKNOWN_KEY_TYPE_FROM_PEER
- *
- *  @brief
- *    The unknown key type error received from a peer node.
- *
- */
-#define CHIP_ERROR_UNKNOWN_KEY_TYPE_FROM_PEER                  CHIP_CORE_ERROR(0x81)
-
-/**
- *  @def CHIP_ERROR_INVALID_USE_OF_SESSION_KEY_FROM_PEER
- *
- *  @brief
- *    The invalid use of session key error received from a peer node.
- *
- */
-#define CHIP_ERROR_INVALID_USE_OF_SESSION_KEY_FROM_PEER        CHIP_CORE_ERROR(0x82)
-
-/**
- *  @def CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE_FROM_PEER
- *
- *  @brief
- *    An unsupported encryption type error received from a peer node.
- *
- */
-#define CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE_FROM_PEER       CHIP_CORE_ERROR(0x83)
-
-/**
- *  @def CHIP_ERROR_INTERNAL_KEY_ERROR_FROM_PEER
- *
- *  @brief
- *    The internal key error received from a peer node.
- *
- */
-#define CHIP_ERROR_INTERNAL_KEY_ERROR_FROM_PEER                CHIP_CORE_ERROR(0x84)
+// AVAILABLE: 0x81
+// AVAILABLE: 0x82
+// AVAILABLE: 0x83
+// AVAILABLE: 0x84
 
 /**
  *  @def CHIP_ERROR_INVALID_KEY_ID
@@ -1595,68 +1342,13 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_INVALID_TIME                                CHIP_CORE_ERROR(0x86)
 
-/**
- *  @def CHIP_ERROR_LOCKING_FAILURE
- *
- *  @brief
- *    Failure to acquire or release an OS provided mutex.
- *
- */
-#define CHIP_ERROR_LOCKING_FAILURE                             CHIP_CORE_ERROR(0x87)
-
-/**
- *  @def CHIP_ERROR_UNSUPPORTED_PASSCODE_CONFIG
- *
- *  @brief
- *    A passcode encryption configuration is unsupported.
- *
- */
-#define CHIP_ERROR_UNSUPPORTED_PASSCODE_CONFIG                 CHIP_CORE_ERROR(0x88)
-
-/**
- *  @def CHIP_ERROR_PASSCODE_AUTHENTICATION_FAILED
- *
- *  @brief
- *    The CHIP passcode authentication failed.
- *
- */
-#define CHIP_ERROR_PASSCODE_AUTHENTICATION_FAILED              CHIP_CORE_ERROR(0x89)
-
-/**
- *  @def CHIP_ERROR_PASSCODE_FINGERPRINT_FAILED
- *
- *  @brief
- *    The CHIP passcode fingerprint failed.
- *
- */
-#define CHIP_ERROR_PASSCODE_FINGERPRINT_FAILED                 CHIP_CORE_ERROR(0x8a)
-
-/**
- *  @def CHIP_ERROR_SERIALIZATION_ELEMENT_NULL
- *
- *  @brief
- *      The element of the struct is null.
- *
- */
-#define CHIP_ERROR_SERIALIZATION_ELEMENT_NULL                  CHIP_CORE_ERROR(0x8b)
-
-/**
- *  @def CHIP_ERROR_WRONG_CERT_SIGNATURE_ALGORITHM
- *
- *  @brief
- *    The certificate was not signed using the required signature algorithm.
- *
- */
-#define CHIP_ERROR_WRONG_CERT_SIGNATURE_ALGORITHM              CHIP_CORE_ERROR(0x8c)
-
-/**
- *  @def CHIP_ERROR_WRONG_CHIP_SIGNATURE_ALGORITHM
- *
- *  @brief
- *    The CHIP signature was not signed using the required signature algorithm.
- *
- */
-#define CHIP_ERROR_WRONG_CHIP_SIGNATURE_ALGORITHM              CHIP_CORE_ERROR(0x8d)
+// AVAILABLE: 0x87
+// AVAILABLE: 0x88
+// AVAILABLE: 0x89
+// AVAILABLE: 0x8a
+// AVAILABLE: 0x8b
+// AVAILABLE: 0x8c
+// AVAILABLE: 0x8d
 
 /**
  *  @def CHIP_ERROR_SCHEMA_MISMATCH
@@ -1676,23 +1368,8 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_INVALID_INTEGER_VALUE                       CHIP_CORE_ERROR(0x8f)
 
-/**
- *  @def CHIP_ERROR_CASE_RECONFIG_REQUIRED
- *
- *  @brief
- *    CASE is required to reconfigure.
- *
- */
-#define CHIP_ERROR_CASE_RECONFIG_REQUIRED                      CHIP_CORE_ERROR(0x90)
-
-/**
- *  @def CHIP_ERROR_TOO_MANY_CASE_RECONFIGURATIONS
- *
- *  @brief
- *    Too many CASE reconfigurations were received.
- *
- */
-#define CHIP_ERROR_TOO_MANY_CASE_RECONFIGURATIONS              CHIP_CORE_ERROR(0x91)
+// AVAILABLE: 0x90
+// AVAILABLE: 0x91
 
 /**
  *  @def CHIP_ERROR_BAD_REQUEST
@@ -1703,96 +1380,16 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_BAD_REQUEST                                 CHIP_CORE_ERROR(0x92)
 
-/**
- *  @def CHIP_ERROR_INVALID_MESSAGE_FLAG
- *
- *  @brief
- *    One or more message flags have invalid value.
- *
- */
-#define CHIP_ERROR_INVALID_MESSAGE_FLAG                        CHIP_CORE_ERROR(0x93)
-
-/**
- *  @def CHIP_ERROR_KEY_EXPORT_RECONFIGURE_REQUIRED
- *
- *  @brief
- *    Key export protocol required to reconfigure.
- *
- */
-#define CHIP_ERROR_KEY_EXPORT_RECONFIGURE_REQUIRED             CHIP_CORE_ERROR(0x94)
-
-/**
- *  @def CHIP_ERROR_INVALID_KEY_EXPORT_CONFIGURATION
- *
- *  @brief
- *    A key export protocol configuration is invalid.
- *
- */
-#define CHIP_ERROR_INVALID_KEY_EXPORT_CONFIGURATION            CHIP_CORE_ERROR(0x95)
-
-/**
- *  @def CHIP_ERROR_NO_COMMON_KEY_EXPORT_CONFIGURATIONS
- *
- *  @brief
- *    No key export protocol configuration is in common.
- *
- */
-#define CHIP_ERROR_NO_COMMON_KEY_EXPORT_CONFIGURATIONS         CHIP_CORE_ERROR(0x96)
-
-/**
- *  @def CHIP_ERROR_NO_KEY_EXPORT_DELEGATE
- *
- *  @brief
- *    No key export delegate is set.
- *
- */
-#define CHIP_ERROR_NO_KEY_EXPORT_DELEGATE                      CHIP_CORE_ERROR(0x97)
-
-/**
- *  @def CHIP_ERROR_UNAUTHORIZED_KEY_EXPORT_REQUEST
- *
- *  @brief
- *    Unauthorized key export request.
- *
- */
-#define CHIP_ERROR_UNAUTHORIZED_KEY_EXPORT_REQUEST             CHIP_CORE_ERROR(0x98)
-
-/**
- *  @def CHIP_ERROR_UNAUTHORIZED_KEY_EXPORT_RESPONSE
- *
- *  @brief
- *    Unauthorized key export response.
- *
- */
-#define CHIP_ERROR_UNAUTHORIZED_KEY_EXPORT_RESPONSE            CHIP_CORE_ERROR(0x99)
-
-/**
- *  @def CHIP_ERROR_EXPORTED_KEY_AUTHENTICATION_FAILED
- *
- *  @brief
- *    The CHIP exported encrypted key authentication failed.
- *
- */
-#define CHIP_ERROR_EXPORTED_KEY_AUTHENTICATION_FAILED          CHIP_CORE_ERROR(0x9a)
-
-/**
- *  @def CHIP_ERROR_TOO_MANY_SHARED_SESSION_END_NODES
- *
- *  @brief
- *    The number of shared secure sessions end nodes exceeds
- *    the maximum limit.
- *
- */
-#define CHIP_ERROR_TOO_MANY_SHARED_SESSION_END_NODES           CHIP_CORE_ERROR(0x9b)
-
-/**
- * @def CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_DATA_ELEMENT
- *
- * @brief
- *   The Attribute DataElement is malformed: it either does not contain
- *   the required elements
- */
-#define CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_DATA_ELEMENT         CHIP_CORE_ERROR(0x9c)
+// AVAILABLE: 0x93
+// AVAILABLE: 0x94
+// AVAILABLE: 0x95
+// AVAILABLE: 0x96
+// AVAILABLE: 0x97
+// AVAILABLE: 0x98
+// AVAILABLE: 0x99
+// AVAILABLE: 0x9a
+// AVAILABLE: 0x9b
+// AVAILABLE: 0x9c
 
 /**
  * @def CHIP_ERROR_WRONG_CERT_TYPE
@@ -1802,14 +1399,7 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_WRONG_CERT_TYPE                             CHIP_CORE_ERROR(0x9d)
 
-/**
- * @def CHIP_ERROR_DEFAULT_EVENT_HANDLER_NOT_CALLED
- *
- * @brief
- *   The application's event handler failed to call the default event handler function
- *   when presented with an unknown event.
- */
-#define CHIP_ERROR_DEFAULT_EVENT_HANDLER_NOT_CALLED            CHIP_CORE_ERROR(0x9e)
+// AVAILABLE: 0x9e
 
 /**
  *  @def CHIP_ERROR_PERSISTED_STORAGE_FAILED
@@ -1830,30 +1420,23 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND           CHIP_CORE_ERROR(0xa0)
 
 /**
- *  @def CHIP_ERROR_PROFILE_STRING_CONTEXT_ALREADY_REGISTERED
+ * @def CHIP_ERROR_IM_FABRIC_DELETED
  *
- *  @brief
- *    The specified profile string support context is already registered.
- *
+ * @brief
+ *   The fabric is deleted, and the corresponding IM resources are released
  */
-#define CHIP_ERROR_PROFILE_STRING_CONTEXT_ALREADY_REGISTERED   CHIP_CORE_ERROR(0xa1)
+#define CHIP_ERROR_IM_FABRIC_DELETED                            CHIP_CORE_ERROR(0xa1)
+
+// AVAILABLE: 0xa2
+// AVAILABLE: 0xa3
 
 /**
- *  @def CHIP_ERROR_PROFILE_STRING_CONTEXT_NOT_REGISTERED
+ * @def CHIP_ERROR_IN_PROGRESS
  *
- *  @brief
- *    The specified profile string support context is not registered.
- *
+ * @brief
+ *   The operation is still in progress
  */
-#define CHIP_ERROR_PROFILE_STRING_CONTEXT_NOT_REGISTERED       CHIP_CORE_ERROR(0xa2)
-
-/**
- *  @def CHIP_ERROR_INCOMPATIBLE_SCHEMA_VERSION
- *
- *  @brief
- *    Encountered a mismatch in compatibility w.r.t to IDL schema version
- */
-#define CHIP_ERROR_INCOMPATIBLE_SCHEMA_VERSION                 CHIP_CORE_ERROR(0xa3)
+#define CHIP_ERROR_IN_PROGRESS                                 CHIP_CORE_ERROR(0xa4)
 
 /**
  *  @def CHIP_ERROR_ACCESS_DENIED
@@ -1882,37 +1465,9 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_VERSION_MISMATCH                            CHIP_CORE_ERROR(0xa7)
 
-/**
- *  @def CHIP_ERROR_UNSUPPORTED_THREAD_NETWORK_CREATE
- *
- *  @brief
- *    Device doesn't support standalone Thread network creation.
- *    On some legacy devices new Thread network can only be created
- *    together with CHIP Fabric using CrateFabric() message.
- *
- */
-#define CHIP_ERROR_UNSUPPORTED_THREAD_NETWORK_CREATE           CHIP_CORE_ERROR(0xa8)
-
-/**
- *  @def CHIP_ERROR_INCONSISTENT_CONDITIONALITY
- *
- *  @brief
- *    A TraitPath was declared updated with a conditionality that
- *    does not match that of other TraitPaths already updated in the
- *    same Trait Instance.
- *
- */
-#define CHIP_ERROR_INCONSISTENT_CONDITIONALITY                 CHIP_CORE_ERROR(0xa9)
-
-/**
- *  @def CHIP_ERROR_LOCAL_DATA_INCONSISTENT
- *
- *  @brief
- *    The local data does not match any known version of the
- *    Trait Instance and cannot support the operation requested.
- *
- */
-#define CHIP_ERROR_LOCAL_DATA_INCONSISTENT                     CHIP_CORE_ERROR(0xaa)
+// AVAILABLE: 0xa8
+// AVAILABLE: 0xa9
+// AVAILABLE: 0xaa
 
 /**
  * @def CHIP_EVENT_ID_FOUND
@@ -1963,32 +1518,17 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_DECODE_FAILED                               CHIP_CORE_ERROR(0xb0)
 
-/**
- *  @def CHIP_ERROR_SESSION_KEY_SUSPENDED
- *
- *  @brief
- *    Use of the identified session key is suspended.
- *
- */
-#define CHIP_ERROR_SESSION_KEY_SUSPENDED                       CHIP_CORE_ERROR(0xb1)
+// AVAILABLE: 0xb1
+// AVAILABLE: 0xb2
 
 /**
- *  @def CHIP_ERROR_UNSUPPORTED_WIRELESS_REGULATORY_DOMAIN
+ *  @def CHIP_ERROR_DNS_SD_UNAUTHORIZED
  *
  *  @brief
- *    The specified wireless regulatory domain is unsupported.
+ *    The application is not authorized to do DNS_SD lookups.
  *
  */
-#define CHIP_ERROR_UNSUPPORTED_WIRELESS_REGULATORY_DOMAIN      CHIP_CORE_ERROR(0xb2)
-
-/**
- *  @def CHIP_ERROR_UNSUPPORTED_WIRELESS_OPERATING_LOCATION
- *
- *  @brief
- *    The specified wireless operating location is unsupported.
- *
- */
-#define CHIP_ERROR_UNSUPPORTED_WIRELESS_OPERATING_LOCATION     CHIP_CORE_ERROR(0xb3)
+#define CHIP_ERROR_DNS_SD_UNAUTHORIZED                        CHIP_CORE_ERROR(0xb3)
 
 /**
  *  @def CHIP_ERROR_MDNS_COLLISION
@@ -2000,67 +1540,52 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_MDNS_COLLISION                             CHIP_CORE_ERROR(0xb4)
 
 /**
- * @def CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH
+ * @def CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB
  *
  * @brief
- *   The Attribute path is malformed: it either does not contain
+ *   The Attribute path IB is malformed: it does not contain
  *   the required path
  */
-#define CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH                 CHIP_CORE_ERROR(0xb5)
+#define CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB                CHIP_CORE_ERROR(0xb5)
 
 /**
- * @def CHIP_ERROR_IM_MALFORMED_EVENT_PATH
+ * @def CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB
  *
  * @brief
- *   The Attribute Path is malformed: it either does not contain
+ *   The Event Path IB is malformed: it does not contain
  *   the required elements
  */
-#define CHIP_ERROR_IM_MALFORMED_EVENT_PATH                     CHIP_CORE_ERROR(0xb6)
+#define CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB                     CHIP_CORE_ERROR(0xb6)
+
+// AVAILABLE: 0xb7
+// AVAILABLE: 0xb8
 
 /**
- * @def CHIP_ERROR_IM_MALFORMED_COMMAND_PATH
+ * @def CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB
  *
  * @brief
- *   The Attribute DataElement is malformed: it either does not contain
+ *   The Command Data IB is malformed: it does not contain
  *   the required elements
  */
-#define CHIP_ERROR_IM_MALFORMED_COMMAND_PATH                   CHIP_CORE_ERROR(0xb7)
+#define CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB           CHIP_CORE_ERROR(0xb9)
 
 /**
- * @def CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_STATUS_ELEMENT
+ * @def CHIP_ERROR_IM_MALFORMED_EVENT_DATA_IB
  *
  * @brief
- *   The Attribute DataElement is malformed: it either does not contain
+ *   The Event Data IB is malformed: it does not contain
  *   the required elements
  */
-#define CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_STATUS_ELEMENT       CHIP_CORE_ERROR(0xb8)
+#define CHIP_ERROR_IM_MALFORMED_EVENT_DATA_IB             CHIP_CORE_ERROR(0xba)
 
 /**
- * @def CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT
+ * @def CHIP_ERROR_MAXIMUM_PATHS_PER_INVOKE_EXCEEDED
  *
  * @brief
- *   The Attribute DataElement is malformed: it either does not contain
- *   the required elements
+ *   Caller is trying to add more invoke command paths
+ *   than what the remote node reports supporting.
  */
-#define CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT           CHIP_CORE_ERROR(0xb9)
-
-/**
- * @def CHIP_ERROR_IM_MALFORMED_EVENT_DATA_ELEMENT
- *
- * @brief
- *   The Event DataElement is malformed: it either does not contain
- *   the required elements
- */
-#define CHIP_ERROR_IM_MALFORMED_EVENT_DATA_ELEMENT             CHIP_CORE_ERROR(0xba)
-
-/**
- * @def CHIP_ERROR_IM_MALFORMED_STATUS_CODE
- *
- * @brief
- *   The Attribute DataElement is malformed: it either does not contain
- *   the required elements
- */
-#define CHIP_ERROR_IM_MALFORMED_STATUS_CODE                    CHIP_CORE_ERROR(0xbb)
+#define CHIP_ERROR_MAXIMUM_PATHS_PER_INVOKE_EXCEEDED           CHIP_CORE_ERROR(0xbb)
 
 /**
  * @def CHIP_ERROR_PEER_NODE_NOT_FOUND
@@ -2078,13 +1603,7 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_HSM                                         CHIP_CORE_ERROR(0xbd)
 
-/**
- * @def CHIP_ERROR_INTERMEDIATE_CA_NOT_REQUIRED
- *
- * @brief
- *   The commissioner doesn't require an intermediate CA to sign the operational certificates.
- */
-#define CHIP_ERROR_INTERMEDIATE_CA_NOT_REQUIRED                CHIP_CORE_ERROR(0xbe)
+// AVAILABLE: 0xbe
 
 /**
  *  @def CHIP_ERROR_REAL_TIME_NOT_SYNCED
@@ -2153,21 +1672,8 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_FABRIC_MISMATCH_ON_ICA                      CHIP_CORE_ERROR(0xc6)
 
-/**
- * @def CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW
- *
- * @brief
- *   The message counter of the received message is out of receiving window
- */
-#define CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW               CHIP_CORE_ERROR(0xc7)
-
-/**
- * @def CHIP_ERROR_REBOOT_SIGNAL_RECEIVED
- *
- * @brief
- *   Termination signal is received
- */
-#define CHIP_ERROR_REBOOT_SIGNAL_RECEIVED                      CHIP_CORE_ERROR(0xc8)
+// AVAILABLE: 0xc7
+// AVAILABLE: 0xc8
 
 /**
  * @def CHIP_ERROR_NO_SHARED_TRUSTED_ROOT
@@ -2187,128 +1693,24 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_IM_STATUS_CODE_RECEIVED                     CHIP_CORE_ERROR(0xca)
 
-/**
- * @def CHIP_ERROR_IM_MALFORMED_COMMAND_STATUS_IB
- *
- * @brief
- *   The CommandStatusCodeIB is malformed: it either does not contain
- *   the required elements
- */
-#define CHIP_ERROR_IM_MALFORMED_COMMAND_STATUS_IB         CHIP_CORE_ERROR(0xcb)
-
-/**
- * @def CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_IB
- *
- * @brief
- *   The InvokeResponseIB is malformed: it either does not contain
- *   the required elements
- */
-#define CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_IB         CHIP_CORE_ERROR(0xcc)
-
-/**
- * @def CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_MESSAGE
- *
- * @brief
- *   The InvokeResponseMessage is malformed: it either does not contain
- *   the required elements
- */
-#define CHIP_ERROR_IM_MALFORMED_INVOKE_REQUEST_MESSAGE    CHIP_CORE_ERROR(0xcd)
-
-/**
- * @def CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_MESSAGE
- *
- * @brief
- *   The InvokeResponseMessage is malformed: it either does not contain
- *   the required elements
- */
-#define CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_MESSAGE    CHIP_CORE_ERROR(0xce)
-
-/**
- * @def CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_REPORT_MESSAGE
- *
- * @brief
- *   The InvokeResponseMessage is malformed: it either does not contain
- *   the required elements
- */
-#define CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_REPORT_MESSAGE    CHIP_CORE_ERROR(0xcf)
-
-/**
- * @def CHIP_ERROR_IM_MALFORMED_WRITE_REQUEST_MESSAGE
- *
- * @brief
- *   The WriteRequestMessage is malformed: it either does not contain
- *   the required elements
- */
-#define CHIP_ERROR_IM_MALFORMED_WRITE_REQUEST_MESSAGE    CHIP_CORE_ERROR(0xd0)
-
-/**
- * @def CHIP_ERROR_IM_MALFORMED_WRITE_RESPONSE_MESSAGE
- *
- * @brief
- *   The WriteResponseMessage is malformed: it either does not contain
- *   the required elements
- */
-#define CHIP_ERROR_IM_MALFORMED_WRITE_RESPONSE_MESSAGE    CHIP_CORE_ERROR(0xd1)
-
-/**
- * @def CHIP_ERROR_IM_MALFORMED_READ_REQUEST_MESSAGE
- *
- * @brief
- *   The ReadRequestMessage is malformed: it either does not contain
- *   the required elements
- */
-#define CHIP_ERROR_IM_MALFORMED_READ_REQUEST_MESSAGE    CHIP_CORE_ERROR(0xd2)
-
-/**
- * @def CHIP_ERROR_IM_MALFORMED_SUBSCRIBE_REQUEST_MESSAGE
- *
- * @brief
- *   The SubscribeRequestMessage is malformed: it either does not contain
- *   the required elements
- */
-#define CHIP_ERROR_IM_MALFORMED_SUBSCRIBE_REQUEST_MESSAGE    CHIP_CORE_ERROR(0xd3)
-
-/**
- * @def CHIP_ERROR_IM_MALFORMED_SUBSCRIBE_RESPONSE_MESSAGE
- *
- * @brief
- *   The SubscribeResponseMessage is malformed: it either does not contain
- *   the required elements
- */
-#define CHIP_ERROR_IM_MALFORMED_SUBSCRIBE_RESPONSE_MESSAGE    CHIP_CORE_ERROR(0xd4)
-
-/**
- * @def CHIP_ERROR_IM_MALFORMED_EVENT_REPORT_IB
- *
- * @brief
- *   The EventReportIB is malformed: it either does not contain
- *   the required elements
- */
-#define CHIP_ERROR_IM_MALFORMED_EVENT_REPORT_IB             CHIP_CORE_ERROR(0xd5)
-
-/*
- * @def CHIP_ERROR_ANOTHER_COMMISSIONING_IN_PROGRESS
- *
- * @brief
- *   Indicates that the commissioning window on the device is already open, and another
- *   commissioning is in progress
- */
-#define CHIP_ERROR_ANOTHER_COMMISSIONING_IN_PROGRESS           CHIP_CORE_ERROR(0xd6)
-
-/**
- * @def CHIP_ERROR_IM_MALFORMED_CLUSTER_PATH_IB
- *
- * @brief
- *   The ClusterPathIB is malformed: it either does not contain
- *   the required elements
- */
-#define CHIP_ERROR_IM_MALFORMED_CLUSTER_PATH_IB             CHIP_CORE_ERROR(0xd6)
+// AVAILABLEL 0xcb
+// AVAILABLEL 0xcc
+// AVAILABLEL 0xcd
+// AVAILABLEL 0xce
+// AVAILABLEL 0xcf
+// AVAILABLEL 0xd0
+// AVAILABLEL 0xd1
+// AVAILABLEL 0xd2
+// AVAILABLEL 0xd3
+// AVAILABLEL 0xd4
+// AVAILABLEL 0xd5
+// AVAILABLEL 0xd6
 
 /**
  * @def CHIP_ERROR_IM_MALFORMED_DATA_VERSION_FILTER_IB
  *
  * @brief
- *   The DataVersionFilterIB is malformed: it either does not contain
+ *   The Data Version Filter IB is malformed: it does not contain
  *   the required elements
  */
 #define CHIP_ERROR_IM_MALFORMED_DATA_VERSION_FILTER_IB             CHIP_CORE_ERROR(0xd7)
@@ -2321,39 +1723,7 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_NOT_FOUND                                       CHIP_CORE_ERROR(0xd8)
 
-/**
- * @def CHIP_ERROR_INVALID_SCHEME_PREFIX
- *
- * @brief
- *   The scheme field contains an invalid prefix
- */
-#define CHIP_ERROR_INVALID_SCHEME_PREFIX             CHIP_CORE_ERROR(0xd6)
-
-/**
- * @def CHIP_ERROR_MISSING_URI_SEPARATOR
- *
- * @brief
- *   The URI separator is missing
- */
-#define CHIP_ERROR_MISSING_URI_SEPARATOR             CHIP_CORE_ERROR(0xd7)
-
-/**
- * @def CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE
- *
- * @brief
- *   The Attribute DataElement is malformed: it either does not contain
- *   the required elements
- */
-#define CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE                    CHIP_CORE_ERROR(0xd8)
-
-/**
- * @def CHIP_ERROR_IM_MALFORMED_TIMED_REQUEST_MESSAGE
- *
- * @brief
- *   The Attribute DataElement is malformed: it either does not contain
- *   the required elements
- */
-#define CHIP_ERROR_IM_MALFORMED_TIMED_REQUEST_MESSAGE                    CHIP_CORE_ERROR(0xd9)
+// AVAILABLE: 0xd9
 
 /**
  * @def CHIP_ERROR_INVALID_FILE_IDENTIFIER
@@ -2370,17 +1740,57 @@ using CHIP_ERROR = ::chip::ChipError;
  * @brief
  *   The Resource is busy and cannot process the request. Trying again might work.
  */
-#define CHIP_ERROR_BUSY                     CHIP_CORE_ERROR(0xdb)
+#define CHIP_ERROR_BUSY                                        CHIP_CORE_ERROR(0xdb)
 
 /**
- *  @}
+  * @def CHIP_ERROR_MAX_RETRY_EXCEEDED
+  *
+  * @brief
+  *   The maximum retry limit has been exceeded.
+  */
+ #define CHIP_ERROR_MAX_RETRY_EXCEEDED                         CHIP_CORE_ERROR(0xdc)
+
+ /**
+  * @def CHIP_ERROR_PROVIDER_LIST_EXHAUSTED
+  *
+  * @brief
+  *   The provider list has been exhausted.
+  */
+ #define CHIP_ERROR_PROVIDER_LIST_EXHAUSTED                    CHIP_CORE_ERROR(0xdd)
+
+// AVAILABLE: 0xde
+
+/**
+ * @def CHIP_ERROR_INVALID_SCHEME_PREFIX
+ *
+ * @brief
+ *   The scheme field contains an invalid prefix
  */
+#define CHIP_ERROR_INVALID_SCHEME_PREFIX                      CHIP_CORE_ERROR(0xdf)
+
+/**
+ * @def CHIP_ERROR_MISSING_URI_SEPARATOR
+ *
+ * @brief
+ *   The URI separator is missing
+ */
+#define CHIP_ERROR_MISSING_URI_SEPARATOR                      CHIP_CORE_ERROR(0xe0)
+
+/**
+ * @def CHIP_ERROR_HANDLER_NOT_SET
+ *
+ * @brief
+ *   Callback function or callable object is not set
+ */
+#define CHIP_ERROR_HANDLER_NOT_SET                            CHIP_CORE_ERROR(0xe1)
+
+// WHEN ADDING A NEW ERROR CODE: Look for "AVAILABLE" comments above and fill in gaps.
 
 // clang-format on
 
 // !!!!! IMPORTANT !!!!!  If you add new CHIP errors, please update the translation
-// of error codes to strings in CHIPError.cpp, and add them to unittest
-// in test-apps/TestErrorStr.cpp
+// of error codes to strings in CHIPError.cpp, and add them to kTestElements[]
+// in core/tests/TestCHIPErrorStr.cpp
 
 namespace chip {
 

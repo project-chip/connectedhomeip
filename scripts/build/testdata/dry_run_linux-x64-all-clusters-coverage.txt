@@ -1,0 +1,11 @@
+# Commands will be run in CHIP project root.
+cd "{root}"
+
+# Generating linux-x64-all-clusters-coverage
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux --args=use_coverage=true {out}/linux-x64-all-clusters-coverage
+
+# Setting up Java deps
+third_party/java_deps/set_up_java_deps.sh
+
+# Building linux-x64-all-clusters-coverage
+ninja -C {out}/linux-x64-all-clusters-coverage

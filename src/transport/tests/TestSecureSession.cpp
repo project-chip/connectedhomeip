@@ -22,57 +22,53 @@
  */
 
 #include <errno.h>
-#include <nlunit-test.h>
-
-#include <lib/core/CHIPCore.h>
-#include <transport/CryptoContext.h>
-
-#include <lib/support/CodeUtils.h>
-#include <lib/support/UnitTestRegistration.h>
 #include <stdarg.h>
+
+#include <gtest/gtest.h>
+
+#include <crypto/DefaultSessionKeystore.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/CodeUtils.h>
+#include <transport/CryptoContext.h>
 
 using namespace chip;
 using namespace Crypto;
 
-void SecureChannelInitTest(nlTestSuite * inSuite, void * inContext)
+TEST(TestSecureSession, SecureChannelInitTest)
 {
+    Crypto::DefaultSessionKeystore sessionKeystore;
     CryptoContext channel;
 
     P256Keypair keypair;
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+    EXPECT_EQ(keypair.Initialize(ECPKeyTarget::ECDH), CHIP_NO_ERROR);
 
     P256Keypair keypair2;
-    NL_TEST_ASSERT(inSuite, keypair2.Initialize() == CHIP_NO_ERROR);
-
-    // Test all combinations of invalid parameters
-    NL_TEST_ASSERT(inSuite,
-                   channel.InitFromKeyPair(keypair, keypair2.Pubkey(), ByteSpan(nullptr, 10),
-                                           CryptoContext::SessionInfoType::kSessionEstablishment,
-                                           CryptoContext::SessionRole::kInitiator) == CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(keypair2.Initialize(ECPKeyTarget::ECDH), CHIP_NO_ERROR);
 
     // Test the channel is successfully created with valid parameters
-    NL_TEST_ASSERT(inSuite,
-                   channel.InitFromKeyPair(keypair, keypair2.Pubkey(), ByteSpan(nullptr, 0),
-                                           CryptoContext::SessionInfoType::kSessionEstablishment,
-                                           CryptoContext::SessionRole::kInitiator) == CHIP_NO_ERROR);
+    EXPECT_EQ(channel.InitFromKeyPair(sessionKeystore, keypair, keypair2.Pubkey(), ByteSpan(),
+                                      CryptoContext::SessionInfoType::kSessionEstablishment,
+                                      CryptoContext::SessionRole::kInitiator),
+              CHIP_NO_ERROR);
 
     // Test the channel cannot be reinitialized
-    NL_TEST_ASSERT(inSuite,
-                   channel.InitFromKeyPair(keypair, keypair2.Pubkey(), ByteSpan(nullptr, 0),
-                                           CryptoContext::SessionInfoType::kSessionEstablishment,
-                                           CryptoContext::SessionRole::kInitiator) == CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(channel.InitFromKeyPair(sessionKeystore, keypair, keypair2.Pubkey(), ByteSpan(),
+                                      CryptoContext::SessionInfoType::kSessionEstablishment,
+                                      CryptoContext::SessionRole::kInitiator),
+              CHIP_ERROR_INCORRECT_STATE);
 
     // Test the channel can be initialized with valid salt
     const char * salt = "Test Salt";
     CryptoContext channel2;
-    NL_TEST_ASSERT(inSuite,
-                   channel2.InitFromKeyPair(keypair, keypair2.Pubkey(), ByteSpan((const uint8_t *) salt, sizeof(salt)),
-                                            CryptoContext::SessionInfoType::kSessionEstablishment,
-                                            CryptoContext::SessionRole::kInitiator) == CHIP_NO_ERROR);
+    EXPECT_EQ(channel2.InitFromKeyPair(sessionKeystore, keypair, keypair2.Pubkey(), ByteSpan((const uint8_t *) salt, strlen(salt)),
+                                       CryptoContext::SessionInfoType::kSessionEstablishment,
+                                       CryptoContext::SessionRole::kInitiator),
+              CHIP_NO_ERROR);
 }
 
-void SecureChannelEncryptTest(nlTestSuite * inSuite, void * inContext)
+TEST(TestSecureSession, SecureChannelEncryptTest)
 {
+    Crypto::DefaultSessionKeystore sessionKeystore;
     CryptoContext channel;
     const uint8_t plain_text[] = { 0x86, 0x74, 0x64, 0xe5, 0x0b, 0xd4, 0x0d, 0x90, 0xe1, 0x17, 0xa3, 0x2d, 0x4b, 0xd4, 0xe1, 0xe6 };
     uint8_t output[128];
@@ -80,41 +76,40 @@ void SecureChannelEncryptTest(nlTestSuite * inSuite, void * inContext)
     MessageAuthenticationCode mac;
 
     packetHeader.SetSessionId(1);
-    NL_TEST_ASSERT(inSuite, packetHeader.IsEncrypted() == true);
-    NL_TEST_ASSERT(inSuite, packetHeader.MICTagLength() == 16);
+    EXPECT_TRUE(packetHeader.IsEncrypted());
+    EXPECT_EQ(packetHeader.MICTagLength(), 16);
 
     CryptoContext::NonceStorage nonce;
     CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(), 0);
 
     P256Keypair keypair;
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+    EXPECT_EQ(keypair.Initialize(ECPKeyTarget::ECDH), CHIP_NO_ERROR);
 
     P256Keypair keypair2;
-    NL_TEST_ASSERT(inSuite, keypair2.Initialize() == CHIP_NO_ERROR);
+    EXPECT_EQ(keypair2.Initialize(ECPKeyTarget::ECDH), CHIP_NO_ERROR);
 
     // Test uninitialized channel
-    NL_TEST_ASSERT(inSuite,
-                   channel.Encrypt(plain_text, sizeof(plain_text), output, nonce, packetHeader, mac) ==
-                       CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
+    EXPECT_EQ(channel.Encrypt(plain_text, sizeof(plain_text), output, nonce, packetHeader, mac),
+              CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
 
     const char * salt = "Test Salt";
-    NL_TEST_ASSERT(inSuite,
-                   channel.InitFromKeyPair(keypair, keypair2.Pubkey(), ByteSpan((const uint8_t *) salt, sizeof(salt)),
-                                           CryptoContext::SessionInfoType::kSessionEstablishment,
-                                           CryptoContext::SessionRole::kInitiator) == CHIP_NO_ERROR);
+    EXPECT_EQ(channel.InitFromKeyPair(sessionKeystore, keypair, keypair2.Pubkey(), ByteSpan((const uint8_t *) salt, strlen(salt)),
+                                      CryptoContext::SessionInfoType::kSessionEstablishment,
+                                      CryptoContext::SessionRole::kInitiator),
+              CHIP_NO_ERROR);
 
     // Test initialized channel, but invalid arguments
-    NL_TEST_ASSERT(inSuite, channel.Encrypt(nullptr, 0, nullptr, nonce, packetHeader, mac) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite, channel.Encrypt(plain_text, 0, nullptr, nonce, packetHeader, mac) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(
-        inSuite, channel.Encrypt(plain_text, sizeof(plain_text), nullptr, nonce, packetHeader, mac) == CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(channel.Encrypt(nullptr, 0, nullptr, nonce, packetHeader, mac), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(channel.Encrypt(plain_text, 0, nullptr, nonce, packetHeader, mac), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(channel.Encrypt(plain_text, sizeof(plain_text), nullptr, nonce, packetHeader, mac), CHIP_ERROR_INVALID_ARGUMENT);
 
     // Valid arguments
-    NL_TEST_ASSERT(inSuite, channel.Encrypt(plain_text, sizeof(plain_text), output, nonce, packetHeader, mac) == CHIP_NO_ERROR);
+    EXPECT_EQ(channel.Encrypt(plain_text, sizeof(plain_text), output, nonce, packetHeader, mac), CHIP_NO_ERROR);
 }
 
-void SecureChannelDecryptTest(nlTestSuite * inSuite, void * inContext)
+TEST(TestSecureSession, SecureChannelDecryptTest)
 {
+    Crypto::DefaultSessionKeystore sessionKeystore;
     CryptoContext channel;
     const uint8_t plain_text[] = { 0x86, 0x74, 0x64, 0xe5, 0x0b, 0xd4, 0x0d, 0x90, 0xe1, 0x17, 0xa3, 0x2d, 0x4b, 0xd4, 0xe1, 0xe6 };
     uint8_t encrypted[128];
@@ -122,8 +117,8 @@ void SecureChannelDecryptTest(nlTestSuite * inSuite, void * inContext)
     MessageAuthenticationCode mac;
 
     packetHeader.SetSessionId(1);
-    NL_TEST_ASSERT(inSuite, packetHeader.IsEncrypted() == true);
-    NL_TEST_ASSERT(inSuite, packetHeader.MICTagLength() == 16);
+    EXPECT_TRUE(packetHeader.IsEncrypted());
+    EXPECT_EQ(packetHeader.MICTagLength(), 16);
 
     CryptoContext::NonceStorage nonce;
     CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(), 0);
@@ -131,75 +126,34 @@ void SecureChannelDecryptTest(nlTestSuite * inSuite, void * inContext)
     const char * salt = "Test Salt";
 
     P256Keypair keypair;
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+    EXPECT_EQ(keypair.Initialize(ECPKeyTarget::ECDH), CHIP_NO_ERROR);
 
     P256Keypair keypair2;
-    NL_TEST_ASSERT(inSuite, keypair2.Initialize() == CHIP_NO_ERROR);
+    EXPECT_EQ(keypair2.Initialize(ECPKeyTarget::ECDH), CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite,
-                   channel.InitFromKeyPair(keypair, keypair2.Pubkey(), ByteSpan((const uint8_t *) salt, sizeof(salt)),
-                                           CryptoContext::SessionInfoType::kSessionEstablishment,
-                                           CryptoContext::SessionRole::kInitiator) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, channel.Encrypt(plain_text, sizeof(plain_text), encrypted, nonce, packetHeader, mac) == CHIP_NO_ERROR);
+    EXPECT_EQ(channel.InitFromKeyPair(sessionKeystore, keypair, keypair2.Pubkey(), ByteSpan((const uint8_t *) salt, strlen(salt)),
+                                      CryptoContext::SessionInfoType::kSessionEstablishment,
+                                      CryptoContext::SessionRole::kInitiator),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(channel.Encrypt(plain_text, sizeof(plain_text), encrypted, nonce, packetHeader, mac), CHIP_NO_ERROR);
 
     CryptoContext channel2;
     uint8_t output[128];
     // Uninitialized channel
-    NL_TEST_ASSERT(inSuite,
-                   channel2.Decrypt(encrypted, sizeof(plain_text), output, nonce, packetHeader, mac) ==
-                       CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
-    NL_TEST_ASSERT(inSuite,
-                   channel2.InitFromKeyPair(keypair2, keypair.Pubkey(), ByteSpan((const uint8_t *) salt, sizeof(salt)),
-                                            CryptoContext::SessionInfoType::kSessionEstablishment,
-                                            CryptoContext::SessionRole::kResponder) == CHIP_NO_ERROR);
+    EXPECT_EQ(channel2.Decrypt(encrypted, sizeof(plain_text), output, nonce, packetHeader, mac),
+              CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
+    EXPECT_EQ(channel2.InitFromKeyPair(sessionKeystore, keypair2, keypair.Pubkey(), ByteSpan((const uint8_t *) salt, strlen(salt)),
+                                       CryptoContext::SessionInfoType::kSessionEstablishment,
+                                       CryptoContext::SessionRole::kResponder),
+              CHIP_NO_ERROR);
 
     // Channel initialized, but invalid arguments to decrypt
-    NL_TEST_ASSERT(inSuite, channel2.Decrypt(nullptr, 0, nullptr, nonce, packetHeader, mac) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite, channel2.Decrypt(encrypted, 0, nullptr, nonce, packetHeader, mac) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(
-        inSuite, channel2.Decrypt(encrypted, sizeof(encrypted), nullptr, nonce, packetHeader, mac) == CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(channel2.Decrypt(nullptr, 0, nullptr, nonce, packetHeader, mac), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(channel2.Decrypt(encrypted, 0, nullptr, nonce, packetHeader, mac), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(channel2.Decrypt(encrypted, sizeof(encrypted), nullptr, nonce, packetHeader, mac), CHIP_ERROR_INVALID_ARGUMENT);
 
     // Valid arguments
-    NL_TEST_ASSERT(inSuite, channel2.Decrypt(encrypted, sizeof(plain_text), output, nonce, packetHeader, mac) == CHIP_NO_ERROR);
+    EXPECT_EQ(channel2.Decrypt(encrypted, sizeof(plain_text), output, nonce, packetHeader, mac), CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, memcmp(plain_text, output, sizeof(plain_text)) == 0);
+    EXPECT_EQ(memcmp(plain_text, output, sizeof(plain_text)), 0);
 }
-
-// Test Suite
-
-/**
- *  Test Suite that lists all the test functions.
- */
-// clang-format off
-static const nlTest sTests[] =
-{
-    NL_TEST_DEF("Init",    SecureChannelInitTest),
-    NL_TEST_DEF("Encrypt", SecureChannelEncryptTest),
-    NL_TEST_DEF("Decrypt", SecureChannelDecryptTest),
-
-    NL_TEST_SENTINEL()
-};
-// clang-format on
-
-// clang-format off
-static nlTestSuite sSuite =
-{
-    "Test-CHIP-CryptoContext",
-    &sTests[0],
-    nullptr,
-    nullptr
-};
-// clang-format on
-
-/**
- *  Main
- */
-int TestSecureSession()
-{
-    // Run test suit against one context
-    nlTestRunner(&sSuite, nullptr);
-
-    return (nlTestRunnerStats(&sSuite));
-}
-
-CHIP_REGISTER_TEST_SUITE(TestSecureSession)

@@ -1,0 +1,101 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    3.12.3. [TC-CONTENTLAUNCHER-10.4] Launch Content Verification (DUT as
+    Client)
+
+PICS:
+    - CONTENTLAUNCHER.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Preconditions"
+      verification: |
+          Commission TH to DUT, if not done so already. In some cases, such as with a Casting Video Player, the TH commissions the DUT.
+      disabled: true
+
+    - label: "Step 1: DUT sends LaunchContent command to TH"
+      PICS: CONTENTLAUNCHER.C.C00.Tx
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
+
+          ./chip-tool contentlauncher launch-content '{"parameterList": [ { "type": 0, "value": "exampleString", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 0 1 1 --Data '{"playbackPosition": 0, "textTrack": {"languageCode": "", "audioOutputIndex": 0}}'
+
+
+          ./chip-tv-casting-app contentlauncher launch-content '{"parameterList": [ { "type": 0, "value": "exampleString", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 0 1 1 --Data '{"playbackPosition": 0, "textTrack": {"languageCode": "", "audioOutputIndex": 0}}'
+
+
+          On TH (tv-app), Verify the launch content command is received successfully.
+          [1706167504.647497][12245:12245] CHIP:EM: >>> [E:12537r S:1570 M:15519558] (S) Msg RX from 2:000000000001B669 [9F65] --- Type 0001:08 (IM:InvokeCommandRequest)
+          [1706167504.647555][12245:12245] CHIP:EM: Handling via exchange: 12537r, Delegate: 0xaaaac9aaa7c8
+          [1706167504.647660][12245:12245] CHIP:DMG: InvokeRequestMessage =
+          [1706167504.647694][12245:12245] CHIP:DMG: {
+          [1706167504.647719][12245:12245] CHIP:DMG:         suppressResponse = false,
+          [1706167504.647748][12245:12245] CHIP:DMG:         timedRequest = false,
+          [1706167504.647774][12245:12245] CHIP:DMG:         InvokeRequests =
+          [1706167504.647822][12245:12245] CHIP:DMG:         [
+          [1706167504.647853][12245:12245] CHIP:DMG:                 CommandDataIB =
+          [1706167504.647887][12245:12245] CHIP:DMG:                 {
+          [1706167504.647917][12245:12245] CHIP:DMG:                         CommandPathIB =
+          [1706167504.647953][12245:12245] CHIP:DMG:                         {
+          [1706167504.647987][12245:12245] CHIP:DMG:                                 EndpointId = 0x1,
+          [1706167504.648023][12245:12245] CHIP:DMG:                                 ClusterId = 0x50a,
+          [1706167504.648058][12245:12245] CHIP:DMG:                                 CommandId = 0x0,
+          [1706167504.648090][12245:12245] CHIP:DMG:                         },
+          [1706167504.648124][12245:12245] CHIP:DMG:
+          [1706167504.648154][12245:12245] CHIP:DMG:                         CommandFields =
+          [1706167504.648186][12245:12245] CHIP:DMG:                         {
+          [1706167504.648217][12245:12245] CHIP:DMG:                                 0x0 =
+          [1706167504.648251][12245:12245] CHIP:DMG:                                 {
+          [1706167504.648285][12245:12245] CHIP:DMG:                                         0x0 = [
+          [1706167504.648322][12245:12245] CHIP:DMG:
+          [1706167504.648362][12245:12245] CHIP:DMG:                                                 {
+          [1706167504.648404][12245:12245] CHIP:DMG:                                                         0x0 = 0,
+          [1706167504.648449][12245:12245] CHIP:DMG:                                                         0x1 = "exampleString" (13 chars),
+          [1706167504.648491][12245:12245] CHIP:DMG:                                                         0x2 = [
+          [1706167504.648533][12245:12245] CHIP:DMG:
+          [1706167504.648583][12245:12245] CHIP:DMG:                                                                 {
+          [1706167504.648630][12245:12245] CHIP:DMG:                                                                         0x0 = "exampleName" (11 chars),
+          [1706167504.648684][12245:12245] CHIP:DMG:                                                                         0x1 = "exampleValue" (12 chars),
+          [1706167504.648733][12245:12245] CHIP:DMG:                                                                 },
+          [1706167504.648777][12245:12245] CHIP:DMG:                                                         ],
+          [1706167504.648819][12245:12245] CHIP:DMG:                                                 },
+          [1706167504.648859][12245:12245] CHIP:DMG:                                         ],
+          [1706167504.648895][12245:12245] CHIP:DMG:                                 },
+          [1706167504.648930][12245:12245] CHIP:DMG:                                 0x1 = false,
+          [1706167504.648963][12245:12245] CHIP:DMG:                                 0x3 =
+          [1706167504.648997][12245:12245] CHIP:DMG:                                 {
+          [1706167504.649033][12245:12245] CHIP:DMG:                                         0x0 = 0,
+          [1706167504.649069][12245:12245] CHIP:DMG:                                         0x1 =
+          [1706167504.649107][12245:12245] CHIP:DMG:                                         {
+          [1706167504.649147][12245:12245] CHIP:DMG:                                                 0x0 = "" (0 chars),
+          [1706167504.649191][12245:12245] CHIP:DMG:                                                 0x2 = 0,
+          [1706167504.649233][12245:12245] CHIP:DMG:                                         },
+          [1706167504.649271][12245:12245] CHIP:DMG:                                 },
+          [1706167504.649307][12245:12245] CHIP:DMG:                         },
+          [1706167504.649339][12245:12245] CHIP:DMG:                 },
+          [1706167504.649385][12245:12245] CHIP:DMG:
+          [1706167504.649412][12245:12245] CHIP:DMG:         ],
+          [1706167504.649457][12245:12245] CHIP:DMG:
+          [1706167504.649484][12245:12245] CHIP:DMG:         InteractionModelRevision = 11
+          [1706167504.649511][12245:12245] CHIP:DMG: },
+          [1706167504.649703][12245:12245] CHIP:DMG: AccessControl: checking f=2 a=c s=0x000000000001B669 t= c=0x0000_050A e=1 p=o
+          [1706167504.649746][12245:12245] CHIP:DMG: AccessControl: allowed
+      disabled: true

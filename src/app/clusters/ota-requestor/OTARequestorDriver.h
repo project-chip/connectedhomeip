@@ -42,18 +42,6 @@ struct UpdateDescription
     ByteSpan metadataForRequestor;
 };
 
-enum class UpdateFailureState
-{
-    kUnknown,
-    kIdle,
-    kQuerying,
-    kDownloading,
-    kApplying,
-    kNotifying,
-    kAwaitingNextAction,
-    kDelayedOnUserConsent,
-};
-
 enum class UpdateNotFoundReason
 {
     kBusy,
@@ -94,20 +82,17 @@ public:
     /// Set maximum supported download block size
     virtual void SetMaxDownloadBlockSize(uint16_t maxDownloadBlockSize) = 0;
 
-    /// Called when an error occurs at any OTA requestor operation
-    virtual void HandleError(UpdateFailureState state, CHIP_ERROR error) = 0;
-
     /// Called when OTA Requestor has exited the Idle state for which the driver may need to take various actions
     virtual void HandleIdleStateExit() = 0;
 
     // Called when the OTA Requestor has entered the Idle state for which the driver may need to take various actions
-    virtual void HandleIdleState(IdleStateReason reason) = 0;
+    virtual void HandleIdleStateEnter(IdleStateReason reason) = 0;
 
     /// Called when the latest query found a software update
     virtual void UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay) = 0;
 
     /// Called when the latest query did not find any software update
-    virtual void UpdateNotFound(UpdateNotFoundReason reason, System::Clock::Seconds32 delay) = 0;
+    virtual CHIP_ERROR UpdateNotFound(UpdateNotFoundReason reason, System::Clock::Seconds32 delay) = 0;
 
     /// Called when the download of a new software image has finished
     virtual void UpdateDownloaded() = 0;

@@ -20,9 +20,10 @@ Takes two filenames as arguments: the CI PICS values file and the PICS
 definition YAML file.
 """
 
-import yaml
-import sys
 import re
+import sys
+
+import yaml
 
 value_regexp = re.compile("=.*")
 
@@ -39,6 +40,10 @@ def main():
     with open(value_defs, "r") as stream:
         defined_values = set(map(lambda item: re.sub(
             value_regexp, "", item.rstrip()), stream.readlines()))
+        # Remove Comments w/ # and empty lines
+        for elem in list(defined_values):
+            if elem.startswith('#') or (elem == ""):
+                defined_values.discard(elem)
 
     with open(pics_yaml, "r") as stream:
         try:

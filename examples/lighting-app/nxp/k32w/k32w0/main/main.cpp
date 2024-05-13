@@ -31,6 +31,18 @@
 #include "FreeRtosHooks.h"
 #include "app_config.h"
 
+#if PDM_SAVE_IDLE
+#include <openthread/platform/settings.h>
+#endif
+
+#ifdef K32WMCM_APP_BUILD
+#define string string_shadow
+#include "AppApi.h"
+#include "MMAC.h"
+#include "mac_sap.h"
+#undef string
+#endif
+
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
@@ -42,6 +54,33 @@ extern InitFunc __init_array_end;
 
 /* needed for FreeRtos Heap 4 */
 uint8_t __attribute__((section(".heap"))) ucHeap[HEAP_SIZE];
+
+extern "C" void sched_enable();
+
+#define NORMAL_PWR_LIMIT 10 /* dBm */
+
+#ifdef K32WMCM_APP_BUILD
+/* Must be called before zps_eAplAfInit() */
+void APP_SetHighTxPowerMode();
+
+/* Must be called after zps_eAplAfInit() */
+void APP_SetMaxTxPower();
+
+#undef HIGH_TX_PWR_LIMIT
+#define HIGH_TX_PWR_LIMIT 15 /* dBm */
+/* High Tx power */
+void APP_SetHighTxPowerMode()
+{
+    if (CHIP_IS_HITXPOWER_CAPABLE())
+        vMMAC_SetTxPowerMode(TRUE);
+}
+
+void APP_SetMaxTxPower()
+{
+    if (CHIP_IS_HITXPOWER_CAPABLE())
+        eAppApiPlmeSet(PHY_PIB_ATTR_TX_POWER, HIGH_TX_PWR_LIMIT);
+}
+#endif
 
 extern "C" void main_task(void const * argument)
 {
@@ -71,6 +110,16 @@ extern "C" void main_task(void const * argument)
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
 
+#ifdef K32WMCM_APP_BUILD
+    APP_SetHighTxPowerMode();
+#endif
+
+#if PDM_SAVE_IDLE
+    /* OT Settings needs to be initialized
+     * early as XCVR is making use of it */
+    otPlatSettingsInit(NULL, NULL, 0);
+#endif
+
     err = PlatformMgr().InitChipStack();
     if (err != CHIP_NO_ERROR)
     {
@@ -85,18 +134,23 @@ extern "C" void main_task(void const * argument)
         goto exit;
     }
 
+    /* Enable the MAC scheduler after BLEManagerImpl::_Init() and V2MMAC_Enable().
+     * This is needed to register properly the active protocols.
+     */
+    sched_enable();
+
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
     if (err != CHIP_NO_ERROR)
     {
         goto exit;
     }
 
-    err = PlatformMgr().StartEventLoopTask();
-    if (err != CHIP_NO_ERROR)
-    {
-        K32W_LOG("Error during PlatformMgr().StartEventLoopTask();");
-        goto exit;
-    }
+#ifdef K32WMCM_APP_BUILD
+    APP_SetMaxTxPower();
+    otPlatRadioSetTransmitPower(ThreadStackMgrImpl().OTInstance(), HIGH_TX_PWR_LIMIT);
+#else
+    otPlatRadioSetTransmitPower(ThreadStackMgrImpl().OTInstance(), NORMAL_PWR_LIMIT);
+#endif
 
     // Start OpenThread task
     err = ThreadStackMgrImpl().StartThreadTask();
@@ -110,6 +164,13 @@ extern "C" void main_task(void const * argument)
     if (err != CHIP_NO_ERROR)
     {
         K32W_LOG("Error during GetAppTask().StartAppTask()");
+        goto exit;
+    }
+
+    err = PlatformMgr().StartEventLoopTask();
+    if (err != CHIP_NO_ERROR)
+    {
+        K32W_LOG("Error during PlatformMgr().StartEventLoopTask();");
         goto exit;
     }
 

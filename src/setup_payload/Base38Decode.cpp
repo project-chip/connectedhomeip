@@ -99,8 +99,8 @@ CHIP_ERROR base38Decode(std::string base38, std::vector<uint8_t> & result)
 {
     result.clear();
 
-    int base38CharactersNumber  = static_cast<int>(base38.length());
-    int decodedBase38Characters = 0;
+    size_t base38CharactersNumber  = base38.length();
+    size_t decodedBase38Characters = 0;
     while (base38CharactersNumber > 0)
     {
         uint8_t base38CharactersInChunk;
@@ -128,10 +128,10 @@ CHIP_ERROR base38Decode(std::string base38, std::vector<uint8_t> & result)
 
         uint32_t value = 0;
 
-        for (int i = (base38CharactersInChunk - 1); i >= 0; i--)
+        for (size_t i = base38CharactersInChunk; i > 0; i--)
         {
             uint8_t v      = 0;
-            CHIP_ERROR err = decodeChar(base38[static_cast<uint8_t>(decodedBase38Characters + i)], v);
+            CHIP_ERROR err = decodeChar(base38[decodedBase38Characters + i - 1], v);
 
             if (err != CHIP_NO_ERROR)
             {
@@ -143,7 +143,7 @@ CHIP_ERROR base38Decode(std::string base38, std::vector<uint8_t> & result)
         decodedBase38Characters += base38CharactersInChunk;
         base38CharactersNumber -= base38CharactersInChunk;
 
-        for (int i = 0; i < bytesInDecodedChunk; i++)
+        for (size_t i = 0; i < bytesInDecodedChunk; i++)
         {
             result.push_back(static_cast<uint8_t>(value));
             value >>= 8;

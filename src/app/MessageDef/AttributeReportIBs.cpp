@@ -28,15 +28,14 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 
 namespace chip {
 namespace app {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR AttributeReportIBs::Parser::CheckSchemaValidity() const
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+CHIP_ERROR AttributeReportIBs::Parser::PrettyPrint() const
 {
-    CHIP_ERROR err               = CHIP_NO_ERROR;
-    size_t numAttributeReportIBs = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("AttributeReportIBs =");
@@ -52,35 +51,23 @@ CHIP_ERROR AttributeReportIBs::Parser::CheckSchemaValidity() const
             AttributeReportIB::Parser AttributeReport;
             ReturnErrorOnFailure(AttributeReport.Init(reader));
             PRETTY_PRINT_INCDEPTH();
-            ReturnErrorOnFailure(AttributeReport.CheckSchemaValidity());
+            ReturnErrorOnFailure(AttributeReport.PrettyPrint());
             PRETTY_PRINT_DECDEPTH();
         }
-
-        ++numAttributeReportIBs;
     }
 
     PRETTY_PRINT("],");
-    PRETTY_PRINT("");
+    PRETTY_PRINT_BLANK_LINE();
 
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
-        // if we have at least one Attribute report
-        if (numAttributeReportIBs > 0)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        else
-        {
-            ChipLogError(DataManagement, "PROTOCOL ERROR: Empty Attribute reports");
-            err = CHIP_NO_ERROR;
-        }
+        err = CHIP_NO_ERROR;
     }
     ReturnErrorOnFailure(err);
-    ReturnErrorOnFailure(reader.ExitContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
+    return reader.ExitContainer(mOuterContainerType);
 }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
 AttributeReportIB::Builder & AttributeReportIBs::Builder::CreateAttributeReport()
 {
@@ -91,10 +78,10 @@ AttributeReportIB::Builder & AttributeReportIBs::Builder::CreateAttributeReport(
     return mAttributeReport;
 }
 
-AttributeReportIBs::Builder & AttributeReportIBs::Builder::EndOfAttributeReportIBs()
+CHIP_ERROR AttributeReportIBs::Builder::EndOfAttributeReportIBs()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 
 CHIP_ERROR AttributeReportIBs::Builder::EncodeAttributeStatus(const ConcreteReadAttributePath & aPath, const StatusIB & aStatus)
@@ -116,8 +103,8 @@ CHIP_ERROR AttributeReportIBs::Builder::EncodeAttributeStatus(const ConcreteRead
     statusIBBuilder.EncodeStatusIB(aStatus);
     ReturnErrorOnFailure(statusIBBuilder.GetError());
 
-    ReturnErrorOnFailure(attributeStatusIBBuilder.EndOfAttributeStatusIB().GetError());
-    return attributeReport.EndOfAttributeReportIB().GetError();
+    ReturnErrorOnFailure(attributeStatusIBBuilder.EndOfAttributeStatusIB());
+    return attributeReport.EndOfAttributeReportIB();
 }
 
 } // namespace app

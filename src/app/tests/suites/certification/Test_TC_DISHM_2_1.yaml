@@ -1,0 +1,229 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 263.3.1. [TC-DISHM-2.1] Change to Mode functionality with DUT as Server
+
+PICS:
+    - DISHM.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      verification: |
+
+      disabled: true
+
+    - label: "Step 2: TH reads from the DUT the SupportedModes attribute."
+      PICS: DISHM.S.A0000
+      verification: |
+          ./chip-tool dishwashermode  read supported-modes 1 1
+
+          Verify that the DUT response contains list of ModeOptionsStruct entries
+          - Verify that the list has two or more entries
+          - Verify that PIXIT.DISHM.MODE_CHANGE_FAIL is one of supported_modes_dut
+          - Save the Mode field values as supported_modes_dut on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
+
+          [1689998005.121163][360287:360289] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0000 DataVersion: 1994417976
+          [1689998005.121241][360287:360289] CHIP:TOO:   SupportedModes: 3 entries
+          [1689998005.121250][360287:360289] CHIP:TOO:     [1]: {
+          [1689998005.121256][360287:360289] CHIP:TOO:       Label: Normal
+          [1689998005.121261][360287:360289] CHIP:TOO:       Mode: 0
+          [1689998005.121264][360287:360289] CHIP:TOO:       ModeTags: 1 entries
+          [1689998005.121268][360287:360289] CHIP:TOO:         [1]: {
+          [1689998005.121270][360287:360289] CHIP:TOO:           Value: 16384
+          [1689998005.121272][360287:360289] CHIP:TOO:          }
+          [1689998005.121274][360287:360289] CHIP:TOO:      }
+          [1689998005.121278][360287:360289] CHIP:TOO:     [2]: {
+          [1689998005.121279][360287:360289] CHIP:TOO:       Label: Heavy
+          [1689998005.121280][360287:360289] CHIP:TOO:       Mode: 1
+          [1689998005.121283][360287:360289] CHIP:TOO:       ModeTags: 2 entries
+          [1689998005.121285][360287:360289] CHIP:TOO:         [1]: {
+          [1689998005.121287][360287:360289] CHIP:TOO:           Value: 7
+          [1689998005.121288][360287:360289] CHIP:TOO:          }
+          [1689998005.121291][360287:360289] CHIP:TOO:         [2]: {
+          [1689998005.121292][360287:360289] CHIP:TOO:           Value: 16385
+          [1689998005.121293][360287:360289] CHIP:TOO:          }
+          [1689998005.121295][360287:360289] CHIP:TOO:      }
+          [1689998005.121299][360287:360289] CHIP:TOO:     [3]: {
+          [1689998005.121300][360287:360289] CHIP:TOO:       Label: Light
+          [1689998005.121302][360287:360289] CHIP:TOO:       Mode: 2
+          [1689998005.121305][360287:360289] CHIP:TOO:       ModeTags: 3 entries
+          [1689998005.121307][360287:360289] CHIP:TOO:         [1]: {
+          [1689998005.121309][360287:360289] CHIP:TOO:           Value: 16386
+          [1689998005.121310][360287:360289] CHIP:TOO:          }
+          [1689998005.121312][360287:360289] CHIP:TOO:         [2]: {
+          [1689998005.121314][360287:360289] CHIP:TOO:           Value: 8
+          [1689998005.121315][360287:360289] CHIP:TOO:          }
+          [1689998005.121317][360287:360289] CHIP:TOO:         [3]: {
+          [1689998005.121319][360287:360289] CHIP:TOO:           Value: 2
+          [1689998005.121320][360287:360289] CHIP:TOO:          }
+          [1689998005.121321][360287:360289] CHIP:TOO:      }
+      disabled: true
+
+    - label: "Step 3: TH reads from the DUT the CurrentMode attribute."
+      PICS: DISHM.S.A0001
+      verification: |
+          ./chip-tool dishwashermode read current-mode 1 1
+
+          Verify on TH(chip-tool) logs, CurrentMode attribute value is an integer  value,
+          - Save the value as old_current_mode_dut
+          - Select a value which is NOT in supported_modes_dut and save it as invalid_mode_th,  below is the sample log provided for the raspi platform, Here CurrentMode attribute value is 0
+
+          [1685018283.726667][16418:16420] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 3898153349
+          [1685018283.726680][16418:16420] CHIP:TOO: CurrentMode: 0
+      disabled: true
+
+    - label:
+          "Step 4: TH sends a ChangeToMode command to the DUT with NewMode set
+          to old_current_mode_dut"
+      PICS: DISHM.S.C00.Rsp
+      verification: |
+          ./chip-tool dishwashermode change-to-mode 0 1 1
+
+          Verify on TH(chip-tool) log, DUT responds contains a ChangeToModeResponse command with a SUCCESS (value 0x00) status response and below is the sample log provided for the raspi platform:
+
+          [1690185977.976163][15730:15732] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Command 0x0000_0001
+          [1690185977.976178][15730:15732] CHIP:TOO:   ChangeToModeResponse: {
+          [1690185977.976182][15730:15732] CHIP:TOO:     status: 0
+          [1690185977.976185][15730:15732] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 5: Manually put the device in a state from which it will FAIL to
+          transition to PIXIT.DISHM.MODE_CHANGE_FAIL"
+      PICS: DISHM.S.M.CAN_TEST_MODE_FAILURE && DISHM.S.M.CAN_MANUALLY_CONTROLLED
+      verification: |
+          Manual operation required
+      disabled: true
+
+    - label: "Step 6: TH reads from the DUT the CurrentMode attribute."
+      PICS: DISHM.S.A0001 && DISHM.S.M.CAN_MANUALLY_CONTROLLED
+      verification: |
+          ./chip-tool dishwashermode read current-mode 1 1
+
+          Verify on TH(chip-tool) logs, CurrentMode attribute value is an integer  value,
+          - Save the value as old_current_mode_dut, below is the sample log provided for the raspi platform, Here CurrentMode attribute value is 0
+
+          [1685018283.726667][16418:16420] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 3898153349
+          [1685018283.726680][16418:16420] CHIP:TOO: CurrentMode: 0
+      disabled: true
+
+    - label:
+          "Step 7: TH sends a ChangeToMode command to the DUT with NewMode set
+          to PIXIT.DISHM.MODE_CHANGE_FAIL"
+      PICS: DISHM.S.M.CAN_TEST_MODE_FAILURE && DISHM.S.C00.Rsp
+      verification: |
+          Note : Please skip this step as SDK is not enabled with this failure response
+
+          ./chip-tool dishwashermode change-to-mode 2 1 1
+
+          Verify on TH(chip-tool) log, DUT responds contains a ChangeToModeResponse command with
+          Status field is set to GenericFailure(0x02), InvalidInMode(0x03) , or in the MfgCodes (0x80 to 0xBF) range and StatusText field has a length between 1 and 64,  below is the sample log provided for the raspi platform:
+
+          [1690264785.719168][29854:29856] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0059 Command=0x0000_0001
+          [1690264785.719200][29854:29856] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Command 0x0000_0001
+          [1690264785.719263][29854:29856] CHIP:TOO:   ChangeToModeResponse: {
+          [1690264785.719283][29854:29856] CHIP:TOO:     status: 0
+          [1690264785.719297][29854:29856] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 8: TH reads from the DUT the CurrentMode attribute."
+      PICS: DISHM.S.A0001
+      verification: |
+          ./chip-tool dishwashermode read current-mode 1 1
+
+          Verify on TH(chip-tool),  CurrentMode attribute value is an integer value and equal to old_current_mode_dut  below is the sample log provided for the raspi platform, Here CurrentMode attribute value is 0
+
+          [1690186182.071331][15758:15760] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0001 DataVersion: 74242726
+          [1690186182.071346][15758:15760] CHIP:TOO:   CurrentMode: 0
+      disabled: true
+
+    - label:
+          "Step 9: Manually put the device in a state from which it will
+          SUCCESSFULLY transition to PIXIT.DISHM.MODE_CHANGE_OK"
+      PICS: DISHM.S.M.CAN_MANUALLY_CONTROLLED
+      verification: |
+          Manual operation required
+      disabled: true
+
+    - label: "Step 10: TH reads from the DUT the CurrentMode attribute."
+      PICS: DISHM.S.A0001 && DISHM.S.M.CAN_MANUALLY_CONTROLLED
+      verification: |
+          ./chip-tool dishwashermode read current-mode 1 1
+
+          Verify on TH(chip-tool) logs, CurrentMode attribute value is an integer  value,
+          - Save the value as old_current_mode_dut, below is the sample log provided for the raspi platform, Here CurrentMode attribute value is 0
+
+          [1690186182.071331][15758:15760] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0001 DataVersion: 74242726
+          [1690186182.071346][15758:15760] CHIP:TOO:   CurrentMode: 0
+      disabled: true
+
+    - label:
+          "Step 11: TH sends a ChangeToMode command to the DUT with NewMode set
+          to PIXIT.DISHM.MODE_CHANGE_OK"
+      PICS: DISHM.S.C00.Rsp
+      verification: |
+          ./chip-tool dishwashermode change-to-mode 2 1 1
+
+          Verify on TH(chip-tool) log, DUT responds contains a ChangeToModeResponse command with a SUCCESS (value 0x00) status response and below is the sample log provided for the raspi platform:
+
+          [1690187929.904831][15897:15899] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Command 0x0000_0001
+          [1690187929.904845][15897:15899] CHIP:TOO:   ChangeToModeResponse: {
+          [1690187929.904852][15897:15899] CHIP:TOO:     status: 0
+          [1690187929.904855][15897:15899] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 12: TH reads from the DUT the CurrentMode attribute."
+      PICS: DISHM.S.A0001
+      verification: |
+          ./chip-tool dishwashermode read current-mode 1 1
+
+          Verify on TH(chip-tool) logs, CurrentMode attribute value is an integer  value and same as step 11,  below is the sample log provided for the raspi platform, Here CurrentMode attribute value is 2
+
+          [1690187960.116433][15901:15903] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0001 DataVersion: 74242727
+          [1690187960.116478][15901:15903] CHIP:TOO:   CurrentMode: 2
+      disabled: true
+
+    - label:
+          "Step 13: TH sends a ChangeToMode command to the DUT with NewMode set
+          to invalid_mode_th"
+      PICS: DISHM.S.C00.Rsp
+      verification: |
+          ./chip-tool dishwashermode change-to-mode 4 1 1
+
+          Verify on TH(chip-tool) log, DUT responds contains a ChangeToModeResponse command with a UnsupportedMode(0x01) status response and below is the sample log provided for the raspi platform:
+
+          [1690188004.105157][15906:15908] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Command 0x0000_0001
+          [1690188004.105172][15906:15908] CHIP:TOO:   ChangeToModeResponse: {
+          [1690188004.105178][15906:15908] CHIP:TOO:     status: 1
+          [1690188004.105181][15906:15908] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 14: TH reads from the DUT the CurrentMode attribute."
+      PICS: DISHM.S.A0001
+      verification: |
+          ./chip-tool dishwashermode read current-mode 1 1
+
+          Verify on TH(chip-tool) logs, CurrentMode attribute value is an integer  value and same as step 12,  below is the sample log provided for the raspi platform, Here CurrentMode attribute value is 2
+
+          [1690187960.116433][15901:15903] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0001 DataVersion: 74242727
+          [1690187960.116478][15901:15903] CHIP:TOO:   CurrentMode: 2
+      disabled: true

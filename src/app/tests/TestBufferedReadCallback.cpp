@@ -17,7 +17,7 @@
  */
 
 #include "app-common/zap-generated/ids/Attributes.h"
-#include "lib/core/CHIPTLVTags.h"
+#include "lib/core/TLVTags.h"
 #include "protocols/interaction_model/Constants.h"
 #include "system/SystemPacketBuffer.h"
 #include "system/TLVPacketBufferBackingStore.h"
@@ -26,6 +26,7 @@
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/Decode.h>
 #include <app/tests/AppTestContext.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 #include <vector>
@@ -81,7 +82,7 @@ public:
     void OnReportBegin() override;
     void OnReportEnd() override;
     void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
-    void OnDone() override {}
+    void OnDone(ReadClient *) override {}
 
     std::vector<ValidationInstruction> mInstructionList;
     uint32_t mCurrentInstruction = 0;
@@ -115,10 +116,10 @@ void DataSeriesValidator::OnAttributeData(const ConcreteDataAttributePath & aPat
     case ValidationInstruction::kSimpleAttributeA: {
         ChipLogProgress(DataManagement, "\t\t -- Validating A");
 
-        Clusters::TestCluster::Attributes::Int8u::TypeInfo::Type value;
+        Clusters::UnitTesting::Attributes::Int8u::TypeInfo::Type value;
         NL_TEST_ASSERT(gSuite,
-                       aPath.mEndpointId == 0 && aPath.mClusterId == Clusters::TestCluster::Id &&
-                           aPath.mAttributeId == Clusters::TestCluster::Attributes::Int8u::Id &&
+                       aPath.mEndpointId == 0 && aPath.mClusterId == Clusters::UnitTesting::Id &&
+                           aPath.mAttributeId == Clusters::UnitTesting::Attributes::Int8u::Id &&
                            aPath.mListOp == ConcreteDataAttributePath::ListOperation::NotList);
         NL_TEST_ASSERT(gSuite, DataModel::Decode(*apData, value) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(gSuite, value == mCurrentInstruction);
@@ -128,10 +129,10 @@ void DataSeriesValidator::OnAttributeData(const ConcreteDataAttributePath & aPat
     case ValidationInstruction::kSimpleAttributeB: {
         ChipLogProgress(DataManagement, "\t\t -- Validating B");
 
-        Clusters::TestCluster::Attributes::Int32u::TypeInfo::Type value;
+        Clusters::UnitTesting::Attributes::Int32u::TypeInfo::Type value;
         NL_TEST_ASSERT(gSuite,
-                       aPath.mEndpointId == 0 && aPath.mClusterId == Clusters::TestCluster::Id &&
-                           aPath.mAttributeId == Clusters::TestCluster::Attributes::Int32u::Id &&
+                       aPath.mEndpointId == 0 && aPath.mClusterId == Clusters::UnitTesting::Id &&
+                           aPath.mAttributeId == Clusters::UnitTesting::Attributes::Int32u::Id &&
                            aPath.mListOp == ConcreteDataAttributePath::ListOperation::NotList);
         NL_TEST_ASSERT(gSuite, DataModel::Decode(*apData, value) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(gSuite, value == mCurrentInstruction);
@@ -141,12 +142,12 @@ void DataSeriesValidator::OnAttributeData(const ConcreteDataAttributePath & aPat
     case ValidationInstruction::kListAttributeC_Empty: {
         ChipLogProgress(DataManagement, "\t\t -- Validating C[]");
 
-        Clusters::TestCluster::Attributes::ListStructOctetString::TypeInfo::DecodableType value;
+        Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo::DecodableType value;
         size_t len;
 
         NL_TEST_ASSERT(gSuite,
-                       aPath.mEndpointId == 0 && aPath.mClusterId == Clusters::TestCluster::Id &&
-                           aPath.mAttributeId == Clusters::TestCluster::Attributes::ListStructOctetString::Id &&
+                       aPath.mEndpointId == 0 && aPath.mClusterId == Clusters::UnitTesting::Id &&
+                           aPath.mAttributeId == Clusters::UnitTesting::Attributes::ListStructOctetString::Id &&
                            aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll);
         NL_TEST_ASSERT(gSuite, DataModel::Decode(*apData, value) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(gSuite, value.ComputeSize(&len) == CHIP_NO_ERROR);
@@ -168,12 +169,12 @@ void DataSeriesValidator::OnAttributeData(const ConcreteDataAttributePath & aPat
 
         ChipLogProgress(DataManagement, "\t\t -- Validating C[%" PRIu32 "]", expectedListLength);
 
-        Clusters::TestCluster::Attributes::ListStructOctetString::TypeInfo::DecodableType value;
+        Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo::DecodableType value;
         size_t len;
 
         NL_TEST_ASSERT(gSuite,
-                       aPath.mEndpointId == 0 && aPath.mClusterId == Clusters::TestCluster::Id &&
-                           aPath.mAttributeId == Clusters::TestCluster::Attributes::ListStructOctetString::Id &&
+                       aPath.mEndpointId == 0 && aPath.mClusterId == Clusters::UnitTesting::Id &&
+                           aPath.mAttributeId == Clusters::UnitTesting::Attributes::ListStructOctetString::Id &&
                            aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll);
         NL_TEST_ASSERT(gSuite, DataModel::Decode(*apData, value) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(gSuite, value.ComputeSize(&len) == CHIP_NO_ERROR);
@@ -185,7 +186,7 @@ void DataSeriesValidator::OnAttributeData(const ConcreteDataAttributePath & aPat
         while (iter.Next() && index < expectedListLength)
         {
             auto & iterValue = iter.GetValue();
-            NL_TEST_ASSERT(gSuite, iterValue.fabricIndex == (index));
+            NL_TEST_ASSERT(gSuite, iterValue.member1 == (index));
             index++;
         }
 
@@ -196,12 +197,12 @@ void DataSeriesValidator::OnAttributeData(const ConcreteDataAttributePath & aPat
     case ValidationInstruction::kListAttributeD_Empty: {
         ChipLogProgress(DataManagement, "\t\t -- Validating D[]");
 
-        Clusters::TestCluster::Attributes::ListInt8u::TypeInfo::DecodableType value;
+        Clusters::UnitTesting::Attributes::ListInt8u::TypeInfo::DecodableType value;
         size_t len;
 
         NL_TEST_ASSERT(gSuite,
-                       aPath.mEndpointId == 0 && aPath.mClusterId == Clusters::TestCluster::Id &&
-                           aPath.mAttributeId == Clusters::TestCluster::Attributes::ListInt8u::Id &&
+                       aPath.mEndpointId == 0 && aPath.mClusterId == Clusters::UnitTesting::Id &&
+                           aPath.mAttributeId == Clusters::UnitTesting::Attributes::ListInt8u::Id &&
                            aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll);
         NL_TEST_ASSERT(gSuite, DataModel::Decode(*apData, value) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(gSuite, value.ComputeSize(&len) == CHIP_NO_ERROR);
@@ -223,12 +224,12 @@ void DataSeriesValidator::OnAttributeData(const ConcreteDataAttributePath & aPat
 
         ChipLogProgress(DataManagement, "\t\t -- Validating D[%" PRIu32 "]", expectedListLength);
 
-        Clusters::TestCluster::Attributes::ListInt8u::TypeInfo::DecodableType value;
+        Clusters::UnitTesting::Attributes::ListInt8u::TypeInfo::DecodableType value;
         size_t len;
 
         NL_TEST_ASSERT(gSuite,
-                       aPath.mEndpointId == 0 && aPath.mClusterId == Clusters::TestCluster::Id &&
-                           aPath.mAttributeId == Clusters::TestCluster::Attributes::ListInt8u::Id &&
+                       aPath.mEndpointId == 0 && aPath.mClusterId == Clusters::UnitTesting::Id &&
+                           aPath.mAttributeId == Clusters::UnitTesting::Attributes::ListInt8u::Id &&
                            aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll);
         NL_TEST_ASSERT(gSuite, DataModel::Decode(*apData, value) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(gSuite, value.ComputeSize(&len) == CHIP_NO_ERROR);
@@ -252,8 +253,8 @@ void DataSeriesValidator::OnAttributeData(const ConcreteDataAttributePath & aPat
         ChipLogProgress(DataManagement, "\t\t -- Validating C|e");
 
         NL_TEST_ASSERT(gSuite,
-                       aPath.mEndpointId == 0 && aPath.mClusterId == Clusters::TestCluster::Id &&
-                           aPath.mAttributeId == Clusters::TestCluster::Attributes::ListStructOctetString::Id &&
+                       aPath.mEndpointId == 0 && aPath.mClusterId == Clusters::UnitTesting::Id &&
+                           aPath.mAttributeId == Clusters::UnitTesting::Attributes::ListStructOctetString::Id &&
                            aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll);
         NL_TEST_ASSERT(gSuite, aStatus.mStatus == Protocols::InteractionModel::Status::Failure);
         break;
@@ -263,8 +264,8 @@ void DataSeriesValidator::OnAttributeData(const ConcreteDataAttributePath & aPat
         ChipLogProgress(DataManagement, "\t\t -- Validating D|e");
 
         NL_TEST_ASSERT(gSuite,
-                       aPath.mEndpointId == 0 && aPath.mClusterId == Clusters::TestCluster::Id &&
-                           aPath.mAttributeId == Clusters::TestCluster::Attributes::ListInt8u::Id &&
+                       aPath.mEndpointId == 0 && aPath.mClusterId == Clusters::UnitTesting::Id &&
+                           aPath.mAttributeId == Clusters::UnitTesting::Attributes::ListInt8u::Id &&
                            aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll);
         NL_TEST_ASSERT(gSuite, aStatus.mStatus == Protocols::InteractionModel::Status::Failure);
 
@@ -296,7 +297,7 @@ void DataSeriesGenerator::Generate()
 {
     System::PacketBufferHandle handle;
     System::PacketBufferTLVWriter writer;
-    ConcreteDataAttributePath path(0, Clusters::TestCluster::Id, 0);
+    ConcreteDataAttributePath path(0, Clusters::UnitTesting::Id, 0);
     System::PacketBufferTLVReader reader;
     ReadClient::Callback * callback = &mReadCallback;
     StatusIB status;
@@ -317,8 +318,8 @@ void DataSeriesGenerator::Generate()
         case ValidationInstruction::kSimpleAttributeA: {
             ChipLogProgress(DataManagement, "\t -- Generating A");
 
-            Clusters::TestCluster::Attributes::Int8u::TypeInfo::Type value = index;
-            path.mAttributeId                                              = Clusters::TestCluster::Attributes::Int8u::Id;
+            Clusters::UnitTesting::Attributes::Int8u::TypeInfo::Type value = index;
+            path.mAttributeId                                              = Clusters::UnitTesting::Attributes::Int8u::Id;
             path.mListOp                                                   = ConcreteDataAttributePath::ListOperation::NotList;
             NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), value) == CHIP_NO_ERROR);
             break;
@@ -327,8 +328,8 @@ void DataSeriesGenerator::Generate()
         case ValidationInstruction::kSimpleAttributeB: {
             ChipLogProgress(DataManagement, "\t -- Generating B");
 
-            Clusters::TestCluster::Attributes::Int32u::TypeInfo::Type value = index;
-            path.mAttributeId                                               = Clusters::TestCluster::Attributes::Int32u::Id;
+            Clusters::UnitTesting::Attributes::Int32u::TypeInfo::Type value = index;
+            path.mAttributeId                                               = Clusters::UnitTesting::Attributes::Int32u::Id;
             path.mListOp                                                    = ConcreteDataAttributePath::ListOperation::NotList;
             NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), value) == CHIP_NO_ERROR);
             break;
@@ -337,8 +338,8 @@ void DataSeriesGenerator::Generate()
         case ValidationInstruction::kListAttributeC_Empty: {
             ChipLogProgress(DataManagement, "\t -- Generating C[]");
 
-            Clusters::TestCluster::Attributes::ListStructOctetString::TypeInfo::Type value;
-            path.mAttributeId = Clusters::TestCluster::Attributes::ListStructOctetString::Id;
+            Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo::Type value;
+            path.mAttributeId = Clusters::UnitTesting::Attributes::ListStructOctetString::Id;
             path.mListOp      = ConcreteDataAttributePath::ListOperation::ReplaceAll;
             NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), value) == CHIP_NO_ERROR);
             break;
@@ -347,17 +348,17 @@ void DataSeriesGenerator::Generate()
         case ValidationInstruction::kListAttributeC_NotEmpty: {
             ChipLogProgress(DataManagement, "\t -- Generating C[2]");
 
-            Clusters::TestCluster::Structs::TestListStructOctet::Type listData[2];
-            Clusters::TestCluster::Attributes::ListStructOctetString::TypeInfo::Type value(listData);
+            Clusters::UnitTesting::Structs::TestListStructOctet::Type listData[2];
+            Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo::Type value(listData);
 
             uint8_t index2 = 0;
             for (auto & item : listData)
             {
-                item.fabricIndex = index2;
+                item.member1 = index2;
                 index2++;
             }
 
-            path.mAttributeId = Clusters::TestCluster::Attributes::ListStructOctetString::Id;
+            path.mAttributeId = Clusters::UnitTesting::Attributes::ListStructOctetString::Id;
             path.mListOp      = ConcreteDataAttributePath::ListOperation::ReplaceAll;
 
             NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), value) == CHIP_NO_ERROR);
@@ -367,8 +368,8 @@ void DataSeriesGenerator::Generate()
         case ValidationInstruction::kListAttributeD_Empty: {
             ChipLogProgress(DataManagement, "\t -- Generating D[]");
 
-            Clusters::TestCluster::Attributes::ListInt8u::TypeInfo::Type value;
-            path.mAttributeId = Clusters::TestCluster::Attributes::ListInt8u::Id;
+            Clusters::UnitTesting::Attributes::ListInt8u::TypeInfo::Type value;
+            path.mAttributeId = Clusters::UnitTesting::Attributes::ListInt8u::Id;
             path.mListOp      = ConcreteDataAttributePath::ListOperation::ReplaceAll;
             NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), value) == CHIP_NO_ERROR);
             break;
@@ -378,7 +379,7 @@ void DataSeriesGenerator::Generate()
             ChipLogProgress(DataManagement, "\t -- Generating D[2]");
 
             uint8_t listData[2];
-            Clusters::TestCluster::Attributes::ListInt8u::TypeInfo::Type value(listData);
+            Clusters::UnitTesting::Attributes::ListInt8u::TypeInfo::Type value(listData);
 
             uint8_t index2 = 0;
             for (auto & item : listData)
@@ -387,7 +388,7 @@ void DataSeriesGenerator::Generate()
                 index2++;
             }
 
-            path.mAttributeId = Clusters::TestCluster::Attributes::ListInt8u::Id;
+            path.mAttributeId = Clusters::UnitTesting::Attributes::ListInt8u::Id;
             path.mListOp      = ConcreteDataAttributePath::ListOperation::ReplaceAll;
 
             NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), value) == CHIP_NO_ERROR);
@@ -397,7 +398,7 @@ void DataSeriesGenerator::Generate()
         case ValidationInstruction::kListAttributeC_Error: {
             ChipLogProgress(DataManagement, "\t -- Generating C|e");
 
-            path.mAttributeId = Clusters::TestCluster::Attributes::ListStructOctetString::Id;
+            path.mAttributeId = Clusters::UnitTesting::Attributes::ListStructOctetString::Id;
             path.mListOp      = ConcreteDataAttributePath::ListOperation::ReplaceAll;
             status.mStatus    = Protocols::InteractionModel::Status::Failure;
             hasData           = false;
@@ -408,7 +409,7 @@ void DataSeriesGenerator::Generate()
         case ValidationInstruction::kListAttributeD_Error: {
             ChipLogProgress(DataManagement, "\t -- Generating D|e");
 
-            path.mAttributeId = Clusters::TestCluster::Attributes::ListInt8u::Id;
+            path.mAttributeId = Clusters::UnitTesting::Attributes::ListInt8u::Id;
             path.mListOp      = ConcreteDataAttributePath::ListOperation::ReplaceAll;
             status.mStatus    = Protocols::InteractionModel::Status::Failure;
             hasData           = false;
@@ -418,12 +419,12 @@ void DataSeriesGenerator::Generate()
 
         case ValidationInstruction::kListAttributeC_NotEmpty_Chunked: {
             hasData = false;
-            Clusters::TestCluster::Attributes::ListStructOctetString::TypeInfo::Type value;
+            Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo::Type value;
 
             {
                 ChipLogProgress(DataManagement, "\t -- Generating C[]");
 
-                path.mAttributeId = Clusters::TestCluster::Attributes::ListStructOctetString::Id;
+                path.mAttributeId = Clusters::UnitTesting::Attributes::ListStructOctetString::Id;
                 path.mListOp      = ConcreteDataAttributePath::ListOperation::ReplaceAll;
                 NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), value) == CHIP_NO_ERROR);
 
@@ -437,16 +438,16 @@ void DataSeriesGenerator::Generate()
 
             for (int i = 0; i < 512; i++)
             {
-                Clusters::TestCluster::Structs::TestListStructOctet::Type listItem;
+                Clusters::UnitTesting::Structs::TestListStructOctet::Type listItem;
 
                 handle = System::PacketBufferHandle::New(1000);
                 writer.Init(std::move(handle), true);
                 status = StatusIB();
 
-                path.mAttributeId = Clusters::TestCluster::Attributes::ListStructOctetString::Id;
+                path.mAttributeId = Clusters::UnitTesting::Attributes::ListStructOctetString::Id;
                 path.mListOp      = ConcreteDataAttributePath::ListOperation::AppendItem;
 
-                listItem.fabricIndex = (uint64_t) i;
+                listItem.member1 = (uint64_t) i;
 
                 NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), listItem) == CHIP_NO_ERROR);
 
@@ -461,12 +462,12 @@ void DataSeriesGenerator::Generate()
 
         case ValidationInstruction::kListAttributeD_NotEmpty_Chunked: {
             hasData = false;
-            Clusters::TestCluster::Attributes::ListInt8u::TypeInfo::Type value;
+            Clusters::UnitTesting::Attributes::ListInt8u::TypeInfo::Type value;
 
             {
                 ChipLogProgress(DataManagement, "\t -- Generating D[]");
 
-                path.mAttributeId = Clusters::TestCluster::Attributes::ListInt8u::Id;
+                path.mAttributeId = Clusters::UnitTesting::Attributes::ListInt8u::Id;
                 path.mListOp      = ConcreteDataAttributePath::ListOperation::ReplaceAll;
                 NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), value) == CHIP_NO_ERROR);
 
@@ -484,10 +485,10 @@ void DataSeriesGenerator::Generate()
                 writer.Init(std::move(handle), true);
                 status = StatusIB();
 
-                path.mAttributeId = Clusters::TestCluster::Attributes::ListInt8u::Id;
+                path.mAttributeId = Clusters::UnitTesting::Attributes::ListInt8u::Id;
                 path.mListOp      = ConcreteDataAttributePath::ListOperation::AppendItem;
 
-                NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), (uint8_t)(i)) == CHIP_NO_ERROR);
+                NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), (uint8_t) (i)) == CHIP_NO_ERROR);
 
                 writer.Finalize(&handle);
                 reader.Init(std::move(handle));
@@ -609,8 +610,10 @@ nlTestSuite theSuite =
 {
     "TestBufferedReadCallback",
     &sTests[0],
-    TestContext::InitializeAsync,
-    TestContext::Finalize
+    TestContext::nlTestSetUpTestSuite,
+    TestContext::nlTestTearDownTestSuite,
+    TestContext::nlTestSetUp,
+    TestContext::nlTestTearDown,
 };
 
 }
@@ -618,10 +621,8 @@ nlTestSuite theSuite =
 
 int TestBufferedReadCallback()
 {
-    TestContext gContext;
     gSuite = &theSuite;
-    nlTestRunner(&theSuite, &gContext);
-    return (nlTestRunnerStats(&theSuite));
+    return chip::ExecuteTestsWithContext<TestContext>(&theSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestBufferedReadCallback)

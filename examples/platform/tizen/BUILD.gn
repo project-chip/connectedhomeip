@@ -1,0 +1,61 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/tizen.gni")
+
+import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/lib/core/core.gni")
+import("${chip_root}/src/lib/lib.gni")
+
+import("${build_root}/config/linux/pkg_config.gni")
+import("${tizen_sdk_build_root}/tizen_sdk.gni")
+
+config("config") {
+  include_dirs = [ "." ]
+}
+
+pkg_config("capi-appfw-service-application") {
+  packages = [ "capi-appfw-service-application" ]
+}
+
+tizen_sdk_certificate("author-certificate-CHIP") {
+  # Data for dummy author certificate.
+  author_certificate_name = "Matter Example"
+  author_certificate_email = "matter@tizen.org"
+  author_certificate_password = "0123456789"
+  sign_security_profile = "CHIP"
+}
+
+source_set("app-main") {
+  sources = [
+    "OptionsProxy.cpp",
+    "OptionsProxy.h",
+    "TizenServiceAppMain.cpp",
+    "TizenServiceAppMain.h",
+  ]
+
+  defines = []
+
+  public_deps = [
+    "${chip_root}/examples/platform/linux:app-main",
+    "${chip_root}/src/lib",
+  ]
+
+  public_configs = [
+    ":capi-appfw-service-application",
+    ":config",
+  ]
+}

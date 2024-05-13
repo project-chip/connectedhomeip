@@ -14,7 +14,6 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
@@ -32,7 +31,7 @@ chip_test_suite("tests") {
   public_deps = [
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/dnssd/minimal_mdns",
+    "${chip_root}/src/lib/dnssd/minimal_mdns:default_policy",
     "${chip_root}/src/lib/dnssd/minimal_mdns/responders",
-    "${nlunit_test_root}:nlunit-test",
   ]
 }

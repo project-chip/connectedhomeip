@@ -24,15 +24,14 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 
 namespace chip {
 namespace app {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR EventPathIBs::Parser::CheckSchemaValidity() const
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+CHIP_ERROR EventPathIBs::Parser::PrettyPrint() const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    size_t NumPath = 0;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("EventPathIBs =");
@@ -51,15 +50,13 @@ CHIP_ERROR EventPathIBs::Parser::CheckSchemaValidity() const
             ReturnErrorOnFailure(path.Init(reader));
 
             PRETTY_PRINT_INCDEPTH();
-            ReturnErrorOnFailure(path.CheckSchemaValidity());
+            ReturnErrorOnFailure(path.PrettyPrint());
             PRETTY_PRINT_DECDEPTH();
         }
-
-        ++NumPath;
     }
 
     PRETTY_PRINT("],");
-    PRETTY_PRINT("");
+    PRETTY_PRINT_BLANK_LINE();
 
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
@@ -67,10 +64,9 @@ CHIP_ERROR EventPathIBs::Parser::CheckSchemaValidity() const
         err = CHIP_NO_ERROR;
     }
     ReturnErrorOnFailure(err);
-    ReturnErrorOnFailure(reader.ExitContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
+    return reader.ExitContainer(mOuterContainerType);
 }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
 EventPathIB::Builder & EventPathIBs::Builder::CreatePath()
 {
@@ -81,10 +77,10 @@ EventPathIB::Builder & EventPathIBs::Builder::CreatePath()
     return mEventPath;
 }
 
-EventPathIBs::Builder & EventPathIBs::Builder::EndOfEventPaths()
+CHIP_ERROR EventPathIBs::Builder::EndOfEventPaths()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 }; // namespace app
 }; // namespace chip

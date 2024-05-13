@@ -30,11 +30,12 @@
 
 #include <platform/mbed/BLEManagerImpl.h>
 
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/internal/BLEManager.h>
 #include <platform/CommissionableDataProvider.h>
+#include <platform/internal/BLEManager.h>
 
 // Show BLE status with LEDs
 #define _BLEMGRIMPL_USE_LEDS 0
@@ -245,7 +246,7 @@ class GapEventHandler : private mbed::NonCopyable<GapEventHandler>, public ble::
         {
             ChipLogError(DeviceLayer, "BLE connection failed, mbed-os error: %d", mbed_err);
         }
-        ChipLogProgress(DeviceLayer, "Current number of connections: %" PRIu16 "/%d", ble_manager.NumConnections(),
+        ChipLogProgress(DeviceLayer, "Current number of connections: %u/%d", ble_manager.NumConnections(),
                         ble_manager.kMaxConnections);
 
         // The connection established event is propagated when the client has subscribed to
@@ -309,7 +310,7 @@ class GapEventHandler : private mbed::NonCopyable<GapEventHandler>, public ble::
         PlatformMgrImpl().PostEventOrDie(&chip_event);
 
         ChipLogProgress(DeviceLayer, "BLE connection terminated, mbed-os reason: %d", reason.value());
-        ChipLogProgress(DeviceLayer, "Current number of connections: %" PRIu16 "/%d", ble_manager.NumConnections(),
+        ChipLogProgress(DeviceLayer, "Current number of connections: %u/%d", ble_manager.NumConnections(),
                         ble_manager.kMaxConnections);
 
         // Force a reconfiguration of advertising in case we switched to non-connectable mode when
@@ -330,7 +331,7 @@ class GapEventHandler : private mbed::NonCopyable<GapEventHandler>, public ble::
 struct CHIPService : public ble::GattServer::EventHandler
 {
     CHIPService() {}
-    CHIPService(const CHIPService &) = delete;
+    CHIPService(const CHIPService &)             = delete;
     CHIPService & operator=(const CHIPService &) = delete;
 
     CHIP_ERROR init(ble::BLE & ble_interface)
@@ -666,16 +667,6 @@ void BLEManagerImpl::DriveBLEState()
     if (!mFlags.Has(kFlag_AsyncInitCompleted))
     {
         mFlags.Set(kFlag_AsyncInitCompleted);
-
-        // If CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED is enabled,
-        // disable CHIPoBLE advertising if the device is fully provisioned.
-#if CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
-        if (ConfigurationMgr().IsFullyProvisioned())
-        {
-            mFlags.Clear(kFlag_AdvertisingEnabled);
-            ChipLogProgress(DeviceLayer, "CHIPoBLE advertising disabled because device is fully provisioned");
-        }
-#endif // CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
     }
 
     // If the application has enabled CHIPoBLE and BLE advertising...
@@ -780,7 +771,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
 
     dev_id_info.Init();
-    SuccessOrExit(ConfigurationMgr().GetBLEDeviceIdentificationInfo(dev_id_info));
+    SuccessOrExit(err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(dev_id_info));
     mbed_err = adv_data_builder.setServiceData(
         ShortUUID_CHIPoBLEService, mbed::make_Span<const uint8_t>(reinterpret_cast<uint8_t *>(&dev_id_info), sizeof dev_id_info));
     VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
@@ -828,23 +819,6 @@ exit:
     {
         ChipLogError(DeviceLayer, "StopAdvertising mbed-os error: %d", mbed_err);
     }
-    return err;
-}
-
-CHIP_ERROR BLEManagerImpl::_SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(val != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-    if (val != mServiceMode)
-    {
-        mServiceMode = val;
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
-    }
-
-exit:
     return err;
 }
 
@@ -1011,6 +985,9 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     ble::GattServer & gatt_server = ble::BLE::Instance().gattServer();
     ble::attribute_handle_t att_handle;
 
+    // For BLE, the buffer is capped at UINT16_MAX.
+    VerifyOrExit(CanCastTo<uint16_t>(pBuf->DataLength()), err = CHIP_ERROR_MESSAGE_TOO_LONG);
+
     // No need to do anything fancy here. Only 3 handles are used in this impl.
     if (UUIDsMatch(charId, &ChipUUID_CHIPoBLEChar_TX))
     {
@@ -1031,10 +1008,10 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
 
     ChipLogDetail(DeviceLayer,
                   "Sending indication for CHIPoBLE characteristic "
-                  "(connHandle=%d, attHandle=%d, data_len=%" PRIu16 ")",
+                  "(connHandle=%d, attHandle=%d, data_len=%u)",
                   conId, att_handle, pBuf->DataLength());
 
-    mbed_err = gatt_server.write(att_handle, pBuf->Start(), pBuf->DataLength(), false);
+    mbed_err = gatt_server.write(att_handle, pBuf->Start(), static_cast<uint16_t>(pBuf->DataLength()), false);
     VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
 
 exit:

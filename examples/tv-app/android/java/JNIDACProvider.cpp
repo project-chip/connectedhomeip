@@ -34,8 +34,8 @@ JNIDACProvider::JNIDACProvider(jobject provider)
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for JNIDACProvider"));
 
-    mJNIDACProviderObject = env->NewGlobalRef(provider);
-    VerifyOrReturn(mJNIDACProviderObject != nullptr, ChipLogError(Zcl, "Failed to NewGlobalRef JNIDACProvider"));
+    VerifyOrReturn(mJNIDACProviderObject.Init(provider) == CHIP_NO_ERROR,
+                   ChipLogError(Zcl, "Failed to init mJNIDACProviderObject"));
 
     jclass JNIDACProviderClass = env->GetObjectClass(provider);
     VerifyOrReturn(JNIDACProviderClass != nullptr, ChipLogError(Zcl, "Failed to get JNIDACProvider Java class"));
@@ -69,18 +69,10 @@ JNIDACProvider::JNIDACProvider(jobject provider)
         env->ExceptionClear();
     }
 
-    mGetDeviceAttestationCertPrivateKeyMethod = env->GetMethodID(JNIDACProviderClass, "GetDeviceAttestationCertPrivateKey", "()[B");
-    if (mGetDeviceAttestationCertPrivateKeyMethod == nullptr)
+    mSignWithDeviceAttestationKeyMethod = env->GetMethodID(JNIDACProviderClass, "SignWithDeviceAttestationKey", "([B)[B");
+    if (mSignWithDeviceAttestationKeyMethod == nullptr)
     {
-        ChipLogError(Zcl, "Failed to access JNIDACProvider 'GetDeviceAttestationCertPrivateKey' method");
-        env->ExceptionClear();
-    }
-
-    mGetDeviceAttestationCertPublicKeyKeyMethod =
-        env->GetMethodID(JNIDACProviderClass, "GetDeviceAttestationCertPublicKeyKey", "()[B");
-    if (mGetDeviceAttestationCertPublicKeyKeyMethod == nullptr)
-    {
-        ChipLogError(Zcl, "Failed to access JNIDACProvider 'GetDeviceAttestationCertPublicKeyKey' method");
+        ChipLogError(Zcl, "Failed to access JNIDACProvider 'SignWithDeviceAttestationKey' method");
         env->ExceptionClear();
     }
 }
@@ -88,11 +80,11 @@ JNIDACProvider::JNIDACProvider(jobject provider)
 CHIP_ERROR JNIDACProvider::GetJavaByteByMethod(jmethodID method, MutableByteSpan & out_buffer)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturnLogError(mJNIDACProviderObject != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnLogError(mJNIDACProviderObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnLogError(method != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnLogError(env != nullptr, CHIP_JNI_ERROR_NO_ENV);
 
-    jbyteArray outArray = (jbyteArray) env->CallObjectMethod(mJNIDACProviderObject, method);
+    jbyteArray outArray = (jbyteArray) env->CallObjectMethod(mJNIDACProviderObject.ObjectRef(), method);
     if (env->ExceptionCheck())
     {
         ChipLogError(Zcl, "Java exception in get Method");
@@ -100,6 +92,37 @@ CHIP_ERROR JNIDACProvider::GetJavaByteByMethod(jmethodID method, MutableByteSpan
         env->ExceptionClear();
         return CHIP_ERROR_INCORRECT_STATE;
     }
+
+    if (outArray == nullptr || env->GetArrayLength(outArray) <= 0)
+    {
+        out_buffer.reduce_size(0);
+        return CHIP_NO_ERROR;
+    }
+
+    JniByteArray JniOutArray(env, outArray);
+    return CopySpanToMutableSpan(JniOutArray.byteSpan(), out_buffer);
+}
+
+CHIP_ERROR JNIDACProvider::GetJavaByteByMethod(jmethodID method, const ByteSpan & in_buffer, MutableByteSpan & out_buffer)
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnLogError(mJNIDACProviderObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnLogError(method != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnLogError(env != nullptr, CHIP_JNI_ERROR_NO_ENV);
+
+    jbyteArray in_buffer_jbyteArray = env->NewByteArray((jsize) (in_buffer.size()));
+    env->SetByteArrayRegion(in_buffer_jbyteArray, 0, (int) in_buffer.size(), reinterpret_cast<const jbyte *>(in_buffer.data()));
+
+    jbyteArray outArray = (jbyteArray) env->CallObjectMethod(mJNIDACProviderObject.ObjectRef(), method, in_buffer_jbyteArray);
+    if (env->ExceptionCheck())
+    {
+        ChipLogError(Zcl, "Java exception in get Method");
+        env->ExceptionDescribe();
+        env->ExceptionClear();
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    env->DeleteLocalRef(in_buffer_jbyteArray);
 
     if (outArray == nullptr || env->GetArrayLength(outArray) <= 0)
     {
@@ -135,38 +158,20 @@ CHIP_ERROR JNIDACProvider::GetProductAttestationIntermediateCert(MutableByteSpan
     return GetJavaByteByMethod(mGetProductAttestationIntermediateCertMethod, out_pai_buffer);
 }
 
-// TODO: This should be moved to a method of P256Keypair
-CHIP_ERROR LoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key, Crypto::P256Keypair & keypair)
-{
-    Crypto::P256SerializedKeypair serialized_keypair;
-    ReturnErrorOnFailure(serialized_keypair.SetLength(private_key.size() + public_key.size()));
-    memcpy(serialized_keypair.Bytes(), public_key.data(), public_key.size());
-    memcpy(serialized_keypair.Bytes() + public_key.size(), private_key.data(), private_key.size());
-    return keypair.Deserialize(serialized_keypair);
-}
-
-CHIP_ERROR JNIDACProvider::SignWithDeviceAttestationKey(const ByteSpan & digest_to_sign, MutableByteSpan & out_signature_buffer)
+CHIP_ERROR JNIDACProvider::SignWithDeviceAttestationKey(const ByteSpan & message_to_sign, MutableByteSpan & out_signature_buffer)
 {
     ChipLogProgress(Zcl, "Received SignWithDeviceAttestationKey");
-    Crypto::P256ECDSASignature signature;
-    Crypto::P256Keypair keypair;
+    uint8_t mAsn1SignatureBytes[73];
 
-    VerifyOrReturnError(IsSpanUsable(out_signature_buffer), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(IsSpanUsable(digest_to_sign), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(out_signature_buffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    MutableByteSpan asn1_signature_buffer(mAsn1SignatureBytes, sizeof(mAsn1SignatureBytes));
 
-    uint8_t privateKeyBuf[Crypto::kP256_PrivateKey_Length];
-    MutableByteSpan privateKeyBufSpan(privateKeyBuf);
-    ReturnErrorOnFailure(GetJavaByteByMethod(mGetDeviceAttestationCertPrivateKeyMethod, privateKeyBufSpan));
+    CHIP_ERROR error = GetJavaByteByMethod(mSignWithDeviceAttestationKeyMethod, message_to_sign, asn1_signature_buffer);
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogProgress(Zcl, "SignWithDeviceAttestationKey failed");
+        return error;
+    }
 
-    uint8_t publicKeyBuf[Crypto::kP256_PublicKey_Length];
-    MutableByteSpan publicKeyBufSpan(publicKeyBuf);
-    ReturnErrorOnFailure(GetJavaByteByMethod(mGetDeviceAttestationCertPublicKeyKeyMethod, publicKeyBufSpan));
-
-    // In a non-exemplary implementation, the public key is not needed here. It is used here merely because
-    // Crypto::P256Keypair is only (currently) constructable from raw keys if both private/public keys are present.
-    ReturnErrorOnFailure(LoadKeypairFromRaw(privateKeyBufSpan, publicKeyBufSpan, keypair));
-    ReturnErrorOnFailure(keypair.ECDSA_sign_hash(digest_to_sign.data(), digest_to_sign.size(), signature));
-
-    return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, out_signature_buffer);
+    return chip::Crypto::EcdsaAsn1SignatureToRaw(32, ByteSpan(asn1_signature_buffer.data(), asn1_signature_buffer.size()),
+                                                 out_signature_buffer);
 }

@@ -1,35 +1,47 @@
+#include <app/util/config.h>
 #include <static-supported-modes-manager.h>
 
 using namespace std;
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ModeSelect;
+using chip::Protocols::InteractionModel::Status;
 
 using ModeOptionStructType = Structs::ModeOptionStruct::Type;
-using storage_value_type   = const ModeOptionStructType;
+using SemanticTag          = Structs::SemanticTagStruct::Type;
+template <typename T>
+using List               = app::DataModel::List<T>;
+using storage_value_type = const ModeOptionStructType;
 namespace {
-Structs::ModeOptionStruct::Type buildModeOptionStruct(const char * label, uint8_t mode, uint32_t semanticTag)
+Structs::ModeOptionStruct::Type buildModeOptionStruct(const char * label, uint8_t mode,
+                                                      const List<const SemanticTag> & semanticTags)
 {
     Structs::ModeOptionStruct::Type option;
-    option.label       = CharSpan::fromCharString(label);
-    option.mode        = mode;
-    option.semanticTag = semanticTag;
+    option.label        = CharSpan::fromCharString(label);
+    option.mode         = mode;
+    option.semanticTags = semanticTags;
     return option;
 }
 } // namespace
 
+constexpr SemanticTag semanticTagsBlack[]     = { { .value = 0 } };
+constexpr SemanticTag semanticTagsCappucino[] = { { .value = 0 } };
+constexpr SemanticTag semanticTagsEspresso[]  = { { .value = 0 } };
+
 // TODO: Configure your options for each endpoint
-storage_value_type StaticSupportedModesManager::coffeeOptions[] = { buildModeOptionStruct("Black", 0, 0),
-                                                                    buildModeOptionStruct("Cappuccino", 4, 0),
-                                                                    buildModeOptionStruct("Espresso", 7, 0) };
+storage_value_type StaticSupportedModesManager::coffeeOptions[] = {
+    buildModeOptionStruct("Black", 0, List<const SemanticTag>(semanticTagsBlack)),
+    buildModeOptionStruct("Cappuccino", 4, List<const SemanticTag>(semanticTagsCappucino)),
+    buildModeOptionStruct("Espresso", 7, List<const SemanticTag>(semanticTagsEspresso))
+};
 const StaticSupportedModesManager::EndpointSpanPair
-    StaticSupportedModesManager::supportedOptionsByEndpoints[EMBER_AF_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT] = {
+    StaticSupportedModesManager::supportedOptionsByEndpoints[MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT] = {
         EndpointSpanPair(1, Span<storage_value_type>(StaticSupportedModesManager::coffeeOptions)) // Options for Endpoint 1
     };
 
 const StaticSupportedModesManager StaticSupportedModesManager::instance = StaticSupportedModesManager();
 
-const SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeOptionsProvider(EndpointId endpointId) const
+SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeOptionsProvider(EndpointId endpointId) const
 {
     for (auto & endpointSpanPair : supportedOptionsByEndpoints)
     {
@@ -41,13 +53,13 @@ const SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::ge
     return ModeOptionsProvider(nullptr, nullptr);
 }
 
-EmberAfStatus StaticSupportedModesManager::getModeOptionByMode(unsigned short endpointId, unsigned char mode,
-                                                               const ModeOptionStructType ** dataPtr) const
+Status StaticSupportedModesManager::getModeOptionByMode(unsigned short endpointId, unsigned char mode,
+                                                        const ModeOptionStructType ** dataPtr) const
 {
     auto modeOptionsProvider = this->getModeOptionsProvider(endpointId);
     if (modeOptionsProvider.begin() == nullptr)
     {
-        return EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER;
+        return Status::UnsupportedCluster;
     }
     auto * begin = this->getModeOptionsProvider(endpointId).begin();
     auto * end   = this->getModeOptionsProvider(endpointId).end();
@@ -58,11 +70,11 @@ EmberAfStatus StaticSupportedModesManager::getModeOptionByMode(unsigned short en
         if (modeOption.mode == mode)
         {
             *dataPtr = &modeOption;
-            return EMBER_ZCL_STATUS_SUCCESS;
+            return Status::Success;
         }
     }
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "Cannot find the mode %u", mode);
-    return EMBER_ZCL_STATUS_INVALID_VALUE;
+    ChipLogProgress(Zcl, "Cannot find the mode %u", mode);
+    return Status::InvalidCommand;
 }
 
 const ModeSelect::SupportedModesManager * ModeSelect::getSupportedModesManager()

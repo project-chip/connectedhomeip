@@ -20,15 +20,22 @@
 #include <memory>
 #include <vector>
 
-#include <app/AttributeAccessInterface.h>
+#include <app/icd/server/ICDServerConfig.h>
 #include <lib/support/ThreadOperationalDataset.h>
-#include <platform/Linux/GlibTypeDeleter.h>
+#include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/dbus/openthread/introspect.h>
 #include <platform/NetworkCommissioning.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
 namespace chip {
+
+template <>
+struct GAutoPtrDeleter<OpenthreadIoOpenthreadBorderRouter>
+{
+    using deleter = GObjectDeleter;
+};
+
 namespace DeviceLayer {
 
 class ThreadStackManagerImpl : public ThreadStackManager
@@ -49,6 +56,11 @@ public:
     void _LockThreadStack() {}                              // Intentionally left blank
     bool _TryLockThreadStack() { return false; }            // Intentionally left blank
     void _UnlockThreadStack() {}                            // Intentionally left blank
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    void _WaitOnSrpClearAllComplete() {}
+    void _NotifySrpClearAllComplete() {}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
     bool _HaveRouteToAddress(const Inet::IPAddress & destAddr);
 
@@ -86,11 +98,9 @@ public:
 
     CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    CHIP_ERROR _GetSEDPollingConfig(ConnectivityManager::SEDPollingConfig & pollingConfig);
-    CHIP_ERROR _SetSEDPollingConfig(const ConnectivityManager::SEDPollingConfig & pollingConfig);
-    CHIP_ERROR _RequestSEDFastPollingMode(bool onOff);
-#endif
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    CHIP_ERROR _SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
+#endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
 
     bool _HaveMeshConnectivity();
 
@@ -106,11 +116,7 @@ public:
 
     CHIP_ERROR _GetPollPeriod(uint32_t & buf);
 
-    CHIP_ERROR _JoinerStart();
-
     void _ResetThreadNetworkDiagnosticsCounts();
-
-    CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
 
     CHIP_ERROR _StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback);
 
@@ -143,11 +149,14 @@ private:
         uint8_t lqi;
     };
 
-    std::unique_ptr<OpenthreadIoOpenthreadBorderRouter, GObjectDeleter> mProxy;
+    GAutoPtr<OpenthreadIoOpenthreadBorderRouter> mProxy;
 
+    static CHIP_ERROR GLibMatterContextInitThreadStack(ThreadStackManagerImpl * self);
+    static CHIP_ERROR GLibMatterContextCallAttach(ThreadStackManagerImpl * self);
+    static CHIP_ERROR GLibMatterContextCallScan(ThreadStackManagerImpl * self);
     static void OnDbusPropertiesChanged(OpenthreadIoOpenthreadBorderRouter * proxy, GVariant * changed_properties,
                                         const gchar * const * invalidated_properties, gpointer user_data);
-    void ThreadDevcieRoleChangedHandler(const gchar * role);
+    void ThreadDeviceRoleChangedHandler(const gchar * role);
 
     Thread::OperationalDataset mDataset = {};
 

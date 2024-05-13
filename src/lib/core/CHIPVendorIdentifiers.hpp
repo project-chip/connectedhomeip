@@ -42,6 +42,7 @@ namespace chip {
 enum VendorId : uint16_t
 {
     Common       = 0x0000u,
+    Unspecified  = 0x0000u,
     Apple        = 0x1349u,
     Google       = 0x6006u,
     TestVendor1  = 0xFFF1u,
@@ -54,6 +55,16 @@ enum VendorId : uint16_t
 constexpr bool IsTestVendorId(VendorId vid)
 {
     return (vid >= TestVendor1 && vid <= TestVendor4);
+}
+
+constexpr bool IsVendorIdValidOperationally(uint16_t vendorId)
+{
+    return (vendorId != static_cast<uint16_t>(VendorId::Common)) && (vendorId <= static_cast<uint16_t>(VendorId::TestVendor4));
+}
+
+constexpr bool IsVendorIdValidOperationally(VendorId vendorId)
+{
+    return IsVendorIdValidOperationally(static_cast<uint16_t>(vendorId));
 }
 
 } // namespace chip

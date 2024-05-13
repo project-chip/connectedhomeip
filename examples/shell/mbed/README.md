@@ -1,8 +1,6 @@
-<p align="center">
-  <img src="https://raw.githubusercontent.com/ARMmbed/mbed-os/master/logo.png" alt="ARM Mbed-OS logo"/>
-</p>
+![ARM Mbed-OS logo](https://raw.githubusercontent.com/ARMmbed/mbed-os/master/logo.png)
 
-<h1> Matter Arm Mbed OS Shell Example Application </h1>
+# Matter Arm Mbed OS Shell Example Application
 
 The Arm Mbed OS Shell Example exposes configuration and management APIs via a
 command line interface (CLI). Use the shell CLI to experiment with Matter
@@ -30,7 +28,7 @@ supports remote access and control of device over serial port.
 
 <hr>
 
-# Overview
+## Overview
 
 The Matter device that runs the shell application can be controlled over serial
 port. The shell is used to parse a command line and call the corresponding
@@ -38,9 +36,9 @@ service execution. There is a set of common shell commands which performs basic
 device operations. Mbed OS application also supports some custom services and
 corresponding shell commands allow them execution.
 
-# Run application
+## Run application
 
-## Environment setup
+### Environment setup
 
 Before building the example, check out the Matter repository and sync submodules
 using the following command:
@@ -86,7 +84,7 @@ environment:
 $ source ./scripts/activate.sh
 ```
 
-## Building
+### Building
 
 The shell application can be built in the same way as any other Matter example
 ported to the mbed-os platform.
@@ -104,7 +102,7 @@ ${MATTER_ROOT}/scripts/examples/mbed_example.sh -c=build -a=shell -b=<board name
 ```
 
 Both approaches are limited to supported evaluation boards which are listed in
-[Supported devices](#supported_devices) paragraph.
+[Supported devices](#supported-devices) paragraph.
 
 Mbed OS defines three building profiles: _develop, debug_ and _release_. For
 more details please visit
@@ -123,7 +121,7 @@ There are also three types of built application: _simple, boot_ and _upgrade_:
 When using the building script, it is possible expand the list of acceptable
 targets; this may be useful for rapid testing of a new mbed-targets.
 
-## Flashing
+### Flashing
 
 The shell application can be flashed in the same way as any other Matter example
 ported to mbed-os platform.
@@ -156,7 +154,7 @@ device.
 It is possible to connect to an external gdb-server session by using specific
 **'Flash Mbed examples [remote]'** task.
 
-## Debugging
+### Debugging
 
 Debugging can be performed in the same was as with any other Matter example
 ported to mbed-os platform.
@@ -172,9 +170,9 @@ Run and Debug (Ctrl+Shift+D) => Debug Mbed examples => Start Debugging (F5) => (
 It is possible to connect to an external gdb-server session by using specific
 **'Debug Mbed examples [remote]'** task.
 
-## Testing
+### Testing
 
-### Serial port terminal
+#### Serial port terminal
 
 To start communication open a serial terminal session and connect to the serial
 port of the device. You can use **mbed-tools** for this purpose
@@ -197,29 +195,28 @@ Example:
     Hello
     Done
 
-## Supported devices
+### Supported devices
 
 The example supports building and running on the following mbed-enabled devices:
 
-| Manufacturer                                          | Hardware platform                                                         | Build target          | Platform image                                                                                                                                                                 |       Status       | Platform components                                                                                                                                                                                           |
-| ----------------------------------------------------- | ------------------------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :----------------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Cypress<br> Semiconductor](https://www.cypress.com/) | [CY8CPROTO-062-4343W](https://os.mbed.com/platforms/CY8CPROTO-062-4343W/) | `CY8CPROTO_062_4343W` | <details><summary>CY8CPROTO-062-4343W</summary><img src="https://os.mbed.com/media/cache/platforms/p6_wifi-bt_proto.png.250x250_q85.jpg" alt="CY8CPROTO-062-4343W"/></details> | :heavy_check_mark: | <details><summary>LEDs</summary><ul><li>Unused</li></ul></details> <details><summary>Buttons</summary><ul><li>Unused</li></ul></details> <details><summary>Slider</summary><ul><li>Unused</li></ul></details> |
+| Manufacturer                                          | Hardware platform                                                         | Build target          | Platform image                                                                                                                                                                 | Status | Platform components                                                                                                                                                                                           |
+| ----------------------------------------------------- | ------------------------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :----: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Cypress<br> Semiconductor](https://www.cypress.com/) | [CY8CPROTO-062-4343W](https://os.mbed.com/platforms/CY8CPROTO-062-4343W/) | `CY8CPROTO_062_4343W` | <details><summary>CY8CPROTO-062-4343W</summary><img src="https://os.mbed.com/media/cache/platforms/p6_wifi-bt_proto.png.250x250_q85.jpg" alt="CY8CPROTO-062-4343W"/></details> |   ✔    | <details><summary>LEDs</summary><ul><li>Unused</li></ul></details> <details><summary>Buttons</summary><ul><li>Unused</li></ul></details> <details><summary>Slider</summary><ul><li>Unused</li></ul></details> |
 
-#### Notes
+##### Notes
 
 -   More details and guidelines about porting new hardware into the Matter
     project with Mbed OS can be found in
     [MbedNewTarget](../../../docs/guides/mbedos_add_new_target.md)
 -   Some useful information about HW platform specific settings can be found in
-    `shell/mbed/mbed_app.json`.  
-    Information about this file syntax and its meaning in mbed-os project can be
-    found here:
+    `shell/mbed/mbed_app.json`. Information about this file syntax and its
+    meaning in mbed-os project can be found here:
     [Mbed-Os configuration system](https://os.mbed.com/docs/mbed-os/latest/program-setup/advanced-configuration.html))
 
-# Shell commands
+## Shell commands
 
 The application supports common Matter shell commands. They are used to control
 the basic functionalities of the device.
 
 For more details visit:
-[Common shell commands](../README.md#chip-shell-command-details)
+[Common shell commands](../README.md#matter-shell-command-details)

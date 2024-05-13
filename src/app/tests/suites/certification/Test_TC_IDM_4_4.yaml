@@ -1,0 +1,99 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.4.3.[TC-IDM-4.4] Persistent Subscription Test Cases. [DUT as Server]
+
+PICS:
+    - MCORE.IDM.S
+    - MCORE.IDM.S.PersistentSubscription
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          1. The Cluster and Commands should be based on the cluster implementation on the DUT.
+          2. The cluster used in the below test steps is an example, User can use any supported chip cluster/attribute/command.
+      disabled: true
+
+    - label: "Precondition"
+      verification: |
+          1. Please use Interactive mode to Verify subscription test cases
+          2. Here the command to enter interactive mode:--   ./chip-tool interactive start
+      disabled: true
+
+    - label:
+          "Step 1: TH sends a subscription request action for an attribute to
+          the DUT. Activate the subscription between DUT and the TH."
+      verification: |
+          onoff subscribe on-time 10 100 1 1 --auto-resubscribe true
+          Verify on the TH(chip-tool) that the Report data messages are sent from the DUT(Reference app) for subscription request action to the TH(chip-tool) with the correct attribute values.
+
+          [1675085714.397242][208829:208831] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_4001 DataVersion: 4283808198
+          [1675085714.397263][208829:208831] CHIP:TOO:   OnTime: 0
+          [1675085714.397279][208829:208831] CHIP:DMG: MoveToState ReadClient[0x7f474801d330]: Moving to [AwaitingSu]
+          [1675085714.397311][208829:208831] CHIP:EM: <<< [E:17188i M:22097192 (Ack:128343668)] (S) Msg TX to 1:0000000000000001 [9666] --- Type 0001:01 (IM:StatusResponse)
+          [1675085714.397323][208829:208831] CHIP:IN: (S) Sending msg 22097192 on secure session with LSID: 50803
+          [1675085714.397742][208829:208831] CHIP:EM: >>> [E:17188i M:128343669 (Ack:22097192)] (S) Msg RX from 1:0000000000000001 [9666] --- Type 0001:04 (IM:SubscribeResponse)
+          [1675085714.397753][208829:208831] CHIP:EM: Found matching exchange: 17188i, Delegate: 0x7f474801d340
+          [1675085714.397764][208829:208831] CHIP:EM: Rxd Ack; Removing MessageCounter:22097192 from Retrans Table on exchange 17188i
+          [1675085714.397774][208829:208831] CHIP:DMG: SubscribeResponse is received
+          [1675085714.397787][208829:208831] CHIP:DMG: SubscribeResponseMessage =
+          [1675085714.397794][208829:208831] CHIP:DMG: {
+          [1675085714.397802][208829:208831] CHIP:DMG:         SubscriptionId = 0xa11efe71,
+          [1675085714.397810][208829:208831] CHIP:DMG:         MaxInterval = 0x64,
+          [1675085714.397819][208829:208831] CHIP:DMG:         InteractionModelRevision = 1
+          [1675085714.397825][208829:208831] CHIP:DMG: }
+          [1675085714.397832][208829:208831] CHIP:DMG: Subscription established with SubscriptionID = 0xa11efe71 MinInterval = 10s MaxInterval = 100s Peer = 01:0000000000000001
+      disabled: true
+
+    - label: "Step 2: Power off the DUT. Power on the DUT immediately."
+      verification: |
+          Verify on the TH(chip-tool) that the subscription between the DUT(Reference-app) and TH(chip-tool) is restablished and DUT(Reference-app) is able to send report data messages for the attribute which was subscribed to in step 1 within the MaxInterval time.
+
+
+          [1675085816.147288][208829:208831] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_4001 DataVersion: 1956782965
+          [1675085816.147302][208829:208831] CHIP:TOO:   OnTime: 0
+          [1675085816.147318][208829:208831] CHIP:DMG: MoveToState ReadClient[0x7f474801d330]: Moving to [AwaitingSu]
+          [1675085816.147360][208829:208831] CHIP:EM: <<< [E:17190i M:24372277 (Ack:66274424)] (S) Msg TX to 1:0000000000000001 [9666] --- Type 0001:01 (IM:StatusResponse)
+          [1675085816.147373][208829:208831] CHIP:IN: (S) Sending msg 24372277 on secure session with LSID: 50804
+          [1675085816.147908][208829:208831] CHIP:EM: >>> [E:17190i M:66274425 (Ack:24372277)] (S) Msg RX from 1:0000000000000001 [9666] --- Type 0001:04 (IM:SubscribeResponse)
+          [1675085816.147934][208829:208831] CHIP:EM: Found matching exchange: 17190i, Delegate: 0x7f474801d340
+          [1675085816.147950][208829:208831] CHIP:EM: Rxd Ack; Removing MessageCounter:24372277 from Retrans Table on exchange 17190i
+          [1675085816.147964][208829:208831] CHIP:DMG: SubscribeResponse is received
+          [1675085816.147980][208829:208831] CHIP:DMG: SubscribeResponseMessage =
+          [1675085816.147989][208829:208831] CHIP:DMG: {
+          [1675085816.147997][208829:208831] CHIP:DMG:         SubscriptionId = 0x2b5276ad,
+          [1675085816.148006][208829:208831] CHIP:DMG:         MaxInterval = 0x64,
+          [1675085816.148013][208829:208831] CHIP:DMG:         InteractionModelRevision = 1
+          [1675085816.148019][208829:208831] CHIP:DMG: }
+          [1675085816.148029][208829:208831] CHIP:DMG: Subscription established with SubscriptionID = 0x2b5276ad MinInterval = 10s MaxInterval = 100s Peer = 01:0000000000000001
+          [1675085816.148041][208829:208831] CHIP:DMG: MoveToState ReadClient[0x7f474801d330]: Moving to [Subscripti]
+          [1675085816.148055][208829:208831] CHIP:DMG: Refresh LivenessCheckTime for 101500 milliseconds with SubscriptionId = 0x2b5276ad Peer = 01:0000000000000001
+          [1675085816.148084][208829:208831] CHIP:EM: <<< [E:17190i M:24372278 (Ack:66274425)] (S) Msg TX to 1:0000000000000001 [9666] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1675085816.148097][208829:208831] CHIP:IN: (S) Sending msg 24372278 on secure session with LSID: 50804
+          [1675085816.148141][208829:208831] CHIP:EM: Flushed pending ack for MessageCounter:66274425 on exchange 17190i
+          [1675085916.246163][208829:208831] CHIP:EM: >>> [E:17698r M:66274426] (S) Msg RX from 1:0000000000000001 [9666] --- Type 0001:05 (IM:ReportData)
+          [1675085916.246182][208829:208831] CHIP:EM: Handling via exchange: 17698r, Delegate: 0x5572dfe7d328
+          [1675085916.246207][208829:208831] CHIP:DMG: ReportDataMessage =
+          [1675085916.246211][208829:208831] CHIP:DMG: {
+          [1675085916.246216][208829:208831] CHIP:DMG:         SubscriptionId = 0x2b5276ad,
+          [1675085916.246220][208829:208831] CHIP:DMG:         InteractionModelRevision = 1
+          [1675085916.246223][208829:208831] CHIP:DMG: }
+          [1675085916.246233][208829:208831] CHIP:DMG: Refresh LivenessCheckTime for 101500 milliseconds with SubscriptionId = 0x2b5276ad Peer = 01:0000000000000001
+      disabled: true

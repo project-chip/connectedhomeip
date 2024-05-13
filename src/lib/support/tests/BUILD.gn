@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlunit_test.gni")
+import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
@@ -22,6 +23,7 @@ chip_test_suite("tests") {
   output_name = "libSupportTests"
 
   test_sources = [
+    "TestBitMask.cpp",
     "TestBufferReader.cpp",
     "TestBufferWriter.cpp",
     "TestBytesCircularBuffer.cpp",
@@ -33,42 +35,54 @@ chip_test_suite("tests") {
     "TestErrorStr.cpp",
     "TestFixedBufferAllocator.cpp",
     "TestFold.cpp",
+    "TestIniEscaping.cpp",
     "TestIntrusiveList.cpp",
-    "TestOwnerOf.cpp",
+    "TestJsonToTlv.cpp",
+    "TestJsonToTlvToJson.cpp",
+    "TestPersistedCounter.cpp",
     "TestPool.cpp",
     "TestPrivateHeap.cpp",
     "TestSafeInt.cpp",
     "TestSafeString.cpp",
+    "TestScoped.cpp",
     "TestScopedBuffer.cpp",
-    "TestSerializableIntegerSet.cpp",
+    "TestSorting.cpp",
     "TestSpan.cpp",
     "TestStateMachine.cpp",
+    "TestStaticSupportSmartPtr.cpp",
     "TestStringBuilder.cpp",
+    "TestStringSplitter.cpp",
     "TestTestPersistentStorageDelegate.cpp",
     "TestThreadOperationalDataset.cpp",
     "TestTimeUtils.cpp",
+    "TestTlvJson.cpp",
     "TestTlvToJson.cpp",
+    "TestUtf8.cpp",
     "TestVariant.cpp",
     "TestZclString.cpp",
   ]
-  sources = []
-
   if (current_os != "mbed") {
     test_sources += [ "TestCHIPArgParser.cpp" ]
   }
 
-  if (current_os == "linux" || current_os == "mac") {
-    # persisted counter unit test uses file-based persistent storage
-    test_sources += [ "TestPersistedCounter.cpp" ]
-  }
+  sources = []
 
-  cflags = [ "-Wconversion" ]
+  cflags = [
+    "-Wconversion",
+
+    # TODO(#21255): work-around for SimpleStateMachine constructor issue.
+    "-Wno-uninitialized",
+
+    # TestStringSplitter intentionally validates string overflows.
+    "-Wno-stringop-truncation",
+  ]
 
   public_deps = [
     "${chip_root}/src/credentials",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support:static-support",
+    "${chip_root}/src/lib/support:testing",
     "${chip_root}/src/lib/support/jsontlv",
     "${chip_root}/src/platform",
-    "${nlunit_test_root}:nlunit-test",
   ]
 }

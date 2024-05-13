@@ -14,7 +14,6 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
@@ -23,13 +22,15 @@ chip_test_suite("tests") {
 
   test_sources = [
     "TestBleErrorStr.cpp",
+    "TestBleLayer.cpp",
     "TestBleUUID.cpp",
+    "TestBtpEngine.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
     "${chip_root}/src/ble",
-    "${nlunit_test_root}:nlunit-test",
+    "${chip_root}/src/platform",
   ]
 }

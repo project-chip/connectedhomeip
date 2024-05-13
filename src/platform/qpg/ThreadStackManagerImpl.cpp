@@ -25,14 +25,15 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.cpp>
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.cpp>
-
-#include <platform/OpenThread/OpenThreadUtils.h>
-#include <platform/ThreadStackManager.h>
+#include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.hpp>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
+#include <platform/OpenThread/OpenThreadUtils.h>
+#include <platform/ThreadStackManager.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/internal/DeviceNetworkInfo.h>
 
 #include <openthread/heap.h>
 // Qorvo OpenThread functions
@@ -66,7 +67,7 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
     // Initialize the generic implementation base classes.
     err = GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit();
     SuccessOrExit(err);
-    err = GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>::DoInit(otInst);
+    err = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(otInst);
     SuccessOrExit(err);
 
 exit:
@@ -82,6 +83,7 @@ bool ThreadStackManagerImpl::IsInitialized()
 } // namespace chip
 
 using namespace ::chip::DeviceLayer;
+using namespace ::chip;
 
 /**
  * Glue function called directly by the OpenThread stack when tasklet processing work

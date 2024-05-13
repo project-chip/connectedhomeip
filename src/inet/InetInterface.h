@@ -32,7 +32,7 @@
 #include <inet/InetError.h>
 #include <lib/support/DLLUtil.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 #include <lwip/netif.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -42,12 +42,16 @@ struct ifaddrs;
 #endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
-#include <device.h>
+#include <zephyr/device.h>
 
 struct net_if;
 struct net_if_ipv4;
 struct net_if_ipv6;
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+struct otIp6AddressInfo;
+#endif
 
 #include <stddef.h>
 #include <stdint.h>
@@ -76,7 +80,7 @@ enum class InterfaceType
 class InterfaceId
 {
 public:
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
     using PlatformType                       = struct netif *;
     static constexpr size_t kMaxIfNameLength = 13; // Names are formatted as %c%c%d
 #endif                                             // CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -89,6 +93,11 @@ public:
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
     using PlatformType                       = int;
     static constexpr size_t kMaxIfNameLength = Z_DEVICE_MAX_NAME_LEN;
+#endif
+
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+    using PlatformType                       = unsigned int;
+    static constexpr size_t kMaxIfNameLength = 6;
 #endif
 
     ~InterfaceId() = default;
@@ -176,13 +185,15 @@ public:
      *  @retval    #CHIP_ERROR_INVALID_ARGUMENT     If the link local address
      *                                              is nullptr.
      *  @retval    #INET_ERROR_ADDRESS_NOT_FOUND    If the link does not have
-     *                                              any address configured.
+     *                                              any address configured
+     *                                              or if no link local (fe80::)
+     *                                              address is present.
      *  @retval    #CHIP_NO_ERROR                   On success.
      */
     CHIP_ERROR GetLinkLocalAddr(IPAddress * llAddr) const;
 
 private:
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
     static constexpr PlatformType kPlatformNull = nullptr;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -193,6 +204,11 @@ private:
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
     static constexpr PlatformType kPlatformNull = 0;
 #endif
+
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+    static constexpr PlatformType kPlatformNull = 0;
+#endif
+
     PlatformType mPlatformInterface;
 };
 
@@ -295,6 +311,14 @@ public:
     bool IsUp();
 
     /**
+     * Returns whether the current network interface is a loopback interface
+     *
+     * @return  \c true if current network interface is a loopback interface, \c false
+     *          if not, or if the iterator is positioned beyond the end of the list.
+     */
+    bool IsLoopback();
+
+    /**
      * Returns whether the current network interface supports multicast.
      *
      * @return  \c true if current network interface supports multicast, \c false
@@ -327,7 +351,7 @@ public:
     CHIP_ERROR GetHardwareAddress(uint8_t * addressBuffer, uint8_t & addressSize, uint8_t addressBufferSize);
 
 protected:
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
     struct netif * mCurNetif;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -344,6 +368,9 @@ protected:
     InterfaceId::PlatformType mCurrentId = 1;
     net_if * mCurrentInterface           = nullptr;
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+    struct otIp6AddressInfo * mCurNetif;
+#endif
 };
 
 /**
@@ -486,6 +513,14 @@ public:
     bool IsUp();
 
     /**
+     * Returns whether the current network interface is a loopback interface
+     *
+     * @return  \c true if current network interface is a loopback interface, \c false
+     *          if not, or if the iterator is positioned beyond the end of the list.
+     */
+    bool IsLoopback();
+
+    /**
      * Returns whether the network interface associated with the current interface address supports multicast.
      *
      * @return  \c true if multicast is supported, \c false if not, or
@@ -502,7 +537,7 @@ public:
     bool HasBroadcastAddress();
 
 private:
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
     enum
     {
         kBeforeStartIndex = -1
@@ -522,9 +557,23 @@ private:
     net_if_ipv6 * mIpv6 = nullptr;
     int mCurAddrIndex   = -1;
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+    const otNetifAddress * mNetifAddrList;
+    const otNetifAddress * mCurAddr;
+#endif // #if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 };
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+inline InterfaceIterator::InterfaceIterator(void) {}
+inline InterfaceIterator::~InterfaceIterator()               = default;
+inline InterfaceAddressIterator::~InterfaceAddressIterator() = default;
+inline bool InterfaceIterator::HasCurrent(void)
+{
+    return mCurNetif != NULL;
+}
+#endif
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
 inline InterfaceIterator::InterfaceIterator(void)
 {

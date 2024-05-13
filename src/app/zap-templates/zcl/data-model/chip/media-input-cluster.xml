@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (c) 2021 Project CHIP Authors
+Copyright (c) 2021-2023 Project CHIP Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -23,14 +23,21 @@ limitations under the License.
     <define>MEDIA_INPUT_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
-    <!-- TODO: Add feature map once it is supported -->
+
     <description>This cluster provides an interface for controlling the Input Selector on a media device such as a TV.</description>
-    <attribute side="server" code="0x0000" define="MEDIA_INPUT_LIST"          type="ARRAY" entryType="InputInfo" length="254"           writable="false" optional="false">InputList</attribute>
-    <attribute side="server" code="0x0001" define="MEDIA_INPUT_CURRENT_INPUT" type="INT8U" default="0x00"        min="0x00" max="0xFF"  writable="false" optional="true">CurrentInput</attribute>
+
+    <features>
+      <feature bit="0" code="NU" name="NameUpdates" summary="Supports updates to the input names">
+        <optionalConform/>
+      </feature>
+    </features>
+
+    <attribute side="server" code="0x0000" define="MEDIA_INPUT_LIST"          type="array" entryType="InputInfoStruct" length="254"           writable="false" optional="false">InputList</attribute>
+    <attribute side="server" code="0x0001" define="MEDIA_INPUT_CURRENT_INPUT" type="int8u" default="0x00"              min="0x00" max="0xFF"  writable="false" optional="false">CurrentInput</attribute>
 
     <command source="client" code="0x00" name="SelectInput" optional="false">
       <description>Upon receipt, this SHALL change the input on the media device to the input at a specific index in the Input List.</description>
-      <arg name="index" type="INT8U"/>
+      <arg name="Index" type="int8u"/>
     </command>
 
     <command source="client" code="0x01" name="ShowInputStatus" optional="false">
@@ -41,41 +48,38 @@ limitations under the License.
       <description>Upon receipt, this SHALL hide the input list from the screen.</description>
     </command>
 
-    <command source="client" code="0x03" name="RenameInput" optional="false">
+    <command source="client" code="0x03" name="RenameInput" optional="true">
       <description>Upon receipt, this SHALL rename the input at a specific index in the Input List. Updates to the input name SHALL appear in the TV settings menus.    </description>
-      <arg name="index" type="INT8U"/>
-      <arg name="name" type="CHAR_STRING"/>
+      <access op="invoke" privilege="manage"/>
+      <arg name="Index" type="int8u"/>
+      <arg name="Name" type="char_string"/>
     </command>
 
   </cluster>
 
-  <struct name="InputInfo">
+  <struct name="InputInfoStruct">
     <cluster code="0x0507"/>
-    <item name="index" type="INT8U"/>
-    <item name="inputType" type="InputTypeEnum"/>
-    <item name="name" type="CHAR_STRING" length="32"/>
-    <item name="description" type="CHAR_STRING" length="32"/>
+    <item name="Index" type="int8u"/>
+    <item name="InputType" type="InputTypeEnum"/>
+    <item name="Name" type="char_string"/>
+    <item name="Description" type="char_string"/>
   </struct>
 
-  <enum name="InputTypeEnum" type="ENUM8">
+  <enum name="InputTypeEnum" type="enum8">
     <cluster code="0x0507"/>
     <item name="Internal" value="0x00"/>
     <item name="Aux" value="0x01"/>
     <item name="Coax" value="0x02"/>
     <item name="Composite" value="0x03"/>
-    <item name="Hdmi" value="0x04"/>
+    <item name="HDMI" value="0x04"/>
     <item name="Input" value="0x05"/>
     <item name="Line" value="0x06"/>
     <item name="Optical" value="0x07"/>
     <item name="Video" value="0x08"/>
-    <item name="Scart" value="0x09"/>
-    <item name="Usb" value="0x0A"/>
+    <item name="SCART" value="0x09"/>
+    <item name="USB" value="0x0A"/>
     <item name="Other" value="0x0B"/>
   </enum>
 
-  <bitmap name="MediaInputFeature" type="BITMAP32">
-    <cluster code="0x0507"/>
-    <field name="NameUpdates" mask="0x1"/>
-  </bitmap>
 
 </configurator>

@@ -63,7 +63,7 @@ DiagnosticLogsCommandHandler & GetLogProvider()
     return LogProvider;
 }
 
-void LoggingCallback(const char * module, uint8_t category, const char * msg, va_list args)
+void ENFORCE_FORMAT(3, 0) LoggingCallback(const char * module, uint8_t category, const char * msg, va_list args)
 {
     // Print the log on console for debug
     va_list argsCopy;
@@ -75,7 +75,9 @@ void LoggingCallback(const char * module, uint8_t category, const char * msg, va
     char buffer2[kMaxLogMessageLength];
     int s1 = vsnprintf(buffer1, sizeof(buffer1), msg, args);
     int s2 = snprintf(buffer2, sizeof(buffer2), "%s:%.*s", module, s1, buffer1);
-    GetLogProvider().PushLog(chip::ByteSpan(reinterpret_cast<uint8_t *>(buffer2), s2));
+
+    size_t len = chip::CanCastTo<size_t>(s2) ? static_cast<size_t>(s2) : SIZE_MAX;
+    GetLogProvider().PushLog(chip::ByteSpan(reinterpret_cast<uint8_t *>(buffer2), len));
 }
 
 int main(int argc, char * argv[])

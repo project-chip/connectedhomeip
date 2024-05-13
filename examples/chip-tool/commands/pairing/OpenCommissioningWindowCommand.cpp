@@ -27,15 +27,16 @@ CHIP_ERROR OpenCommissioningWindowCommand::RunCommand()
     mWindowOpener = Platform::MakeUnique<Controller::CommissioningWindowOpener>(&CurrentCommissioner());
     if (mCommissioningWindowOption == Controller::CommissioningWindowOpener::CommissioningWindowOption::kOriginalSetupCode)
     {
-        return mWindowOpener->OpenBasicCommissioningWindow(mNodeId, System::Clock::Seconds16(mTimeout),
+        return mWindowOpener->OpenBasicCommissioningWindow(mNodeId, System::Clock::Seconds16(mCommissioningWindowTimeout),
                                                            &mOnOpenBasicCommissioningWindowCallback);
     }
 
     if (mCommissioningWindowOption == Controller::CommissioningWindowOpener::CommissioningWindowOption::kTokenWithRandomPIN)
     {
         SetupPayload ignored;
-        return mWindowOpener->OpenCommissioningWindow(mNodeId, System::Clock::Seconds16(mTimeout), mIteration, mDiscriminator,
-                                                      NullOptional, NullOptional, &mOnOpenCommissioningWindowCallback, ignored,
+        return mWindowOpener->OpenCommissioningWindow(mNodeId, System::Clock::Seconds16(mCommissioningWindowTimeout), mIteration,
+                                                      mDiscriminator, NullOptional, NullOptional,
+                                                      &mOnOpenCommissioningWindowCallback, ignored,
                                                       /* readVIDPIDAttributes */ true);
     }
 

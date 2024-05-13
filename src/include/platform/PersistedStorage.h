@@ -57,7 +57,7 @@ struct EmptyKey<const char *>
 
 } // namespace internal
 
-constexpr Key kEmptyKey = internal::EmptyKey<Key>::value;
+inline constexpr Key kEmptyKey = internal::EmptyKey<Key>::value;
 
 /**
  *  @brief

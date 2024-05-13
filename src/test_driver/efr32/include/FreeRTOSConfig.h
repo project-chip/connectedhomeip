@@ -237,7 +237,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configENABLE_BACKWARD_COMPATIBILITY (1)
 #define configSUPPORT_STATIC_ALLOCATION (1)
 #define configSUPPORT_DYNAMIC_ALLOCATION (1)
-#define configTOTAL_HEAP_SIZE ((size_t)(16 * 1024))
+#define configTOTAL_HEAP_SIZE ((size_t) (32 * 1024))
 
 /* Optional functions - most linkers will remove unused functions anyway. */
 #define INCLUDE_vTaskPrioritySet (1)
@@ -285,8 +285,17 @@ standard names. */
 #define SysTick_Handler xPortSysTickHandler
 
 /* Thread local storage pointers used by the SDK */
+#ifndef configNUM_USER_THREAD_LOCAL_STORAGE_POINTERS
+#define configNUM_USER_THREAD_LOCAL_STORAGE_POINTERS 2
+#endif
+
 #ifndef configNUM_SDK_THREAD_LOCAL_STORAGE_POINTERS
-#define configNUM_SDK_THREAD_LOCAL_STORAGE_POINTERS 0
+#define configNUM_SDK_THREAD_LOCAL_STORAGE_POINTERS 2
+#endif
+
+#ifndef configNUM_THREAD_LOCAL_STORAGE_POINTERS
+#define configNUM_THREAD_LOCAL_STORAGE_POINTERS                                                                                    \
+    (configNUM_USER_THREAD_LOCAL_STORAGE_POINTERS + configNUM_SDK_THREAD_LOCAL_STORAGE_POINTERS + 1)
 #endif
 
 #if defined(__GNUC__)

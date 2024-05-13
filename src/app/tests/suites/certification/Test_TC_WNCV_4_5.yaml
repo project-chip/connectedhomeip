@@ -1,0 +1,178 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    Window Covering [TC-WNCV-4.5] Positions Storage Verification [DUT as Server]
+
+PICS:
+    - WNCV.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Window Covering"
+    endpoint: 1
+
+tests:
+    ################ Init Phase #############
+    - label: "Step 0a: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    ### Trying to randomize DUT's positions
+    - label: "Step 0b: TH sends UpOrOpen command to preposition the DUT"
+      command: "UpOrOpen"
+
+    ######## Command GoTo 1 #######
+    ### Step 1x -> Check GoToLiftPercentage NVM effects
+    - label:
+          "Step 1a: If (PA_LF & LF) TH sends GoToLiftPercentage command with
+          90%% to DUT"
+      command: "GoToLiftPercentage"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.C05.Rsp
+      arguments:
+          values:
+              - name: "liftPercent100thsValue"
+                value: 9000
+
+    #
+    # TODO: For some reason, the window-covering server impl arms a 5s timer before it actually
+    #       processes the GoToLiftPercentage command's effect on the current tile value.
+    #
+    - label: "Step 1b: TH Waits for 100ms-1s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "Step 1c: TH sends StopMotion command to DUT"
+      command: "StopMotion"
+      PICS: WNCV.S.C02.Rsp
+
+    - label: "Step 1d: TH Waits for 100ms-1s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 500
+
+    ######## Command GoTo 2 ######
+    ### Step 2x -> Check GoToTiltPercentage NVM effects
+    - label:
+          "Step 2a: If (PA_TL & TL) TH sends GoToTiltPercentage command with
+          90%% to DUT"
+      command: "GoToTiltPercentage"
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.C08.Rsp
+      arguments:
+          values:
+              - name: "tiltPercent100thsValue"
+                value: 9000
+
+    #
+    # TODO: For some reason, the window-covering server impl arms a 5s timer before it actually
+    #       processes the GoToTiltPercentage command's effect on the current tile value.
+    #
+    - label: "Step 2b: TH Waits for 100ms-1s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "Step 2c: TH sends StopMotion command to DUT"
+      command: "StopMotion"
+      PICS: WNCV.S.C02.Rsp
+
+    - label: "Step 2d: TH Waits for 100ms-1s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 500
+
+    ######## Check NVM ######
+    ### Step 3x -> Store Positions and Reboot
+    ### CONDITIONAL Lift Store CurrentPositionLiftPercent100ths this value for step 3e
+    - label: "Step 3a: TH reads CurrentPositionLiftPercent100ths from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionLiftPercent100ths"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
+      response:
+          saveAs: attrCurrentPositionLiftPercent100ths
+          constraints:
+              notValue: 0
+
+    ### CONDITIONAL Tilt Store CurrentPositionTiltPercent100ths this value for step 3f
+    - label: "Step 3b: TH reads CurrentPositionTiltPercent100ths from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionTiltPercent100ths"
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
+      response:
+          saveAs: attrCurrentPositionTiltPercent100ths
+          constraints:
+              notValue: 0
+
+    ### DUT TurnOff
+    - label: "Step 3c: reboot/restart the DUT"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      endpoint: 0
+      command: "Reboot"
+
+    - label: "Step Reboot target device(DUT)"
+      verification: |
+          Did the DUT successfully reboot?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
+
+    ### DUT GoesOff
+    - label: "Step 3d: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    ### CONDITIONAL Lift Compare CurrentPositionLiftPercent100ths with value for step 3a
+    - label: "Step 3e: TH reads CurrentPositionLiftPercent100ths from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionLiftPercent100ths"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
+      response:
+          value: attrCurrentPositionLiftPercent100ths
+
+    ### CONDITIONAL Tilt Compare CurrentPositionTiltPercent100ths with value for step 3b
+    - label: "Step 3f: TH reads CurrentPositionTiltPercent100ths from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionTiltPercent100ths"
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
+      response:
+          value: attrCurrentPositionTiltPercent100ths

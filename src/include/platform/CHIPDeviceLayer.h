@@ -41,16 +41,26 @@
 namespace chip {
 namespace DeviceLayer {
 
-void SetSystemLayerForTesting(System::LayerImpl * layer);
+void SetSystemLayerForTesting(System::Layer * layer);
 
 // These functions are defined in src/platform/Globals.cpp
-chip::Inet::EndPointManager<Inet::UDPEndPoint> * UDPEndPointManager();
-chip::Inet::EndPointManager<Inet::TCPEndPoint> * TCPEndPointManager();
 chip::System::Layer & SystemLayer();
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 chip::System::LayerSockets & SystemLayerSockets();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+inline chip::Inet::EndPointManager<Inet::UDPEndPoint> * UDPEndPointManager()
+{
+    return &ConnectivityMgr().UDPEndPointManager();
+}
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+inline chip::Inet::EndPointManager<Inet::TCPEndPoint> * TCPEndPointManager()
+{
+    return &ConnectivityMgr().TCPEndPointManager();
+}
+#endif
 
 } // namespace DeviceLayer
 } // namespace chip

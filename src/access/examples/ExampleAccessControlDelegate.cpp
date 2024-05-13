@@ -19,8 +19,6 @@
 #include "ExampleAccessControlDelegate.h"
 
 #include <lib/core/CHIPConfig.h>
-#include <lib/core/CHIPTLV.h>
-#include <lib/support/DefaultStorageKeyAllocator.h>
 
 #include <algorithm>
 #include <cstdint>
@@ -130,14 +128,6 @@ public:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    CHIP_ERROR Serialize(chip::TLV::TLVWriter & writer) const { return writer.Put(chip::TLV::AnonymousTag(), mNode); }
-
-    CHIP_ERROR Deserialize(chip::TLV::TLVReader & reader)
-    {
-        ReturnErrorOnFailure(reader.Next(chip::TLV::AnonymousTag()));
-        return reader.Get(mNode);
-    }
-
 private:
     static bool IsValid(NodeId node) { return node != kUndefinedNodeId; }
 
@@ -189,20 +179,6 @@ public:
             return CHIP_NO_ERROR;
         }
         return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    CHIP_ERROR Serialize(chip::TLV::TLVWriter & writer) const
-    {
-        ReturnErrorOnFailure(writer.Put(chip::TLV::AnonymousTag(), mCluster));
-        return writer.Put(chip::TLV::AnonymousTag(), mDeviceType);
-    }
-
-    CHIP_ERROR Deserialize(chip::TLV::TLVReader & reader)
-    {
-        ReturnErrorOnFailure(reader.Next(chip::TLV::AnonymousTag()));
-        ReturnErrorOnFailure(reader.Get(mCluster));
-        ReturnErrorOnFailure(reader.Next(chip::TLV::AnonymousTag()));
-        return reader.Get(mDeviceType);
     }
 
 private:
@@ -502,100 +478,8 @@ public:
         index = found ? toIndex : ArraySize(acl);
     }
 
-    static constexpr uint8_t kTagInUse       = 1;
-    static constexpr uint8_t kTagFabricIndex = 2;
-    static constexpr uint8_t kTagAuthMode    = 3;
-    static constexpr uint8_t kTagPrivilege   = 4;
-    static constexpr uint8_t kTagSubjects    = 5;
-    static constexpr uint8_t kTagTargets     = 6;
-
-    CHIP_ERROR Serialize(chip::PersistentStorageDelegate * storage, const char * key)
-    {
-        uint8_t buffer[kStorageBufferSize] = { 0 };
-        chip::TLV::TLVWriter writer;
-        writer.Init(buffer);
-        chip::TLV::TLVType container;
-        ReturnErrorOnFailure(writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::TLVType::kTLVType_Structure, container));
-
-        ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(kTagInUse), mInUse));
-        ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(kTagFabricIndex), mFabricIndex));
-        ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(kTagAuthMode), mAuthMode));
-        ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(kTagPrivilege), mPrivilege));
-
-        chip::TLV::TLVType internalContainer;
-        ReturnErrorOnFailure(
-            writer.StartContainer(chip::TLV::ContextTag(kTagSubjects), chip::TLV::TLVType::kTLVType_Array, internalContainer));
-        for (size_t i = 0; i < kMaxSubjects; ++i)
-        {
-            ReturnErrorOnFailure(mSubjects[i].Serialize(writer));
-        }
-        ReturnErrorOnFailure(writer.EndContainer(internalContainer));
-
-        ReturnErrorOnFailure(
-            writer.StartContainer(chip::TLV::ContextTag(kTagTargets), chip::TLV::TLVType::kTLVType_Array, internalContainer));
-        for (size_t i = 0; i < kMaxTargets; ++i)
-        {
-            ReturnErrorOnFailure(mTargets[i].Serialize(writer));
-        }
-        ReturnErrorOnFailure(writer.EndContainer(internalContainer));
-
-        ReturnErrorOnFailure(writer.EndContainer(container));
-        ReturnErrorOnFailure(writer.Finalize());
-
-        return storage->SyncSetKeyValue(key, buffer, static_cast<uint16_t>(writer.GetLengthWritten()));
-    }
-
-    CHIP_ERROR Deserialize(chip::PersistentStorageDelegate * storage, const char * key)
-    {
-        uint8_t buffer[kStorageBufferSize] = { 0 };
-        uint16_t bufferSize                = static_cast<uint16_t>(sizeof(buffer));
-        ReturnErrorOnFailure(storage->SyncGetKeyValue(key, buffer, bufferSize));
-        chip::TLV::TLVReader reader;
-        reader.Init(buffer, bufferSize);
-
-        ReturnErrorOnFailure(reader.Next(chip::TLV::TLVType::kTLVType_Structure, chip::TLV::AnonymousTag()));
-
-        chip::TLV::TLVType container;
-        ReturnErrorOnFailure(reader.EnterContainer(container));
-
-        ReturnErrorOnFailure(reader.Next(chip::TLV::ContextTag(kTagInUse)));
-        ReturnErrorOnFailure(reader.Get(mInUse));
-        ReturnErrorOnFailure(reader.Next(chip::TLV::ContextTag(kTagFabricIndex)));
-        ReturnErrorOnFailure(reader.Get(mFabricIndex));
-        ReturnErrorOnFailure(reader.Next(chip::TLV::ContextTag(kTagAuthMode)));
-        ReturnErrorOnFailure(reader.Get(mAuthMode));
-        ReturnErrorOnFailure(reader.Next(chip::TLV::ContextTag(kTagPrivilege)));
-        ReturnErrorOnFailure(reader.Get(mPrivilege));
-
-        chip::TLV::TLVType innerContainer;
-        ReturnErrorOnFailure(reader.Next(chip::TLV::TLVType::kTLVType_Array, chip::TLV::ContextTag(kTagSubjects)));
-        ReturnErrorOnFailure(reader.EnterContainer(innerContainer));
-        for (size_t i = 0; i < kMaxSubjects; ++i)
-        {
-            ReturnErrorOnFailure(mSubjects[i].Deserialize(reader));
-        }
-        ReturnErrorOnFailure(reader.ExitContainer(innerContainer));
-
-        ReturnErrorOnFailure(reader.Next(chip::TLV::TLVType::kTLVType_Array, chip::TLV::ContextTag(kTagTargets)));
-        ReturnErrorOnFailure(reader.EnterContainer(innerContainer));
-        for (size_t i = 0; i < kMaxTargets; ++i)
-        {
-            ReturnErrorOnFailure(mTargets[i].Deserialize(reader));
-        }
-        ReturnErrorOnFailure(reader.ExitContainer(innerContainer));
-
-        return reader.ExitContainer(container);
-    }
-
     static constexpr size_t kMaxSubjects = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY;
     static constexpr size_t kMaxTargets  = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_TARGETS_PER_ENTRY;
-
-    static constexpr uint8_t kApproxSizeSubject = 9;
-    static constexpr uint8_t kApproxSizeTarget  = 8;
-    static constexpr uint8_t kApproxSizeEntry   = 4;
-    // This value was chosen to be large enough to contain the data, but has not been fine-tuned.
-    static const size_t kStorageBufferSize =
-        kEntriesPerFabric * (kApproxSizeEntry + kApproxSizeSubject * kMaxSubjects + kApproxSizeTarget * kMaxTargets);
 
     bool mInUse;
     FabricIndex mFabricIndex;
@@ -841,6 +725,20 @@ public:
 
     EntryStorage * GetStorage() { return mStorage; }
 
+    // A storage is about to be deleted. If this delegate was
+    // using it, make a best effort to copy it to the pool.
+    void FixBeforeDelete(EntryStorage & storage)
+    {
+        if (mStorage == &storage)
+        {
+            // Best effort, OK if it fails.
+            EnsureStorageInPool();
+        }
+    }
+
+    // A storage was deleted, and others shuffled into its place.
+    // Fix this delegate (if necessary) to ensure it's using the
+    // correct storage.
     void FixAfterDelete(EntryStorage & storage)
     {
         constexpr auto & acl = EntryStorage::acl;
@@ -962,6 +860,9 @@ public:
 
     bool InUse() const { return mInUse; }
 
+    // A storage was deleted, and others shuffled into its place.
+    // Fix this delegate (if necessary) to ensure it's using the
+    // correct storage.
     void FixAfterDelete(EntryStorage & storage)
     {
         constexpr auto & acl = EntryStorage::acl;
@@ -1057,27 +958,53 @@ public:
     CHIP_ERROR Init() override
     {
         ChipLogProgress(DataManagement, "Examples::AccessControlDelegate::Init");
-        CHIP_ERROR err = LoadFromFlash();
-        if (err != CHIP_NO_ERROR)
+        for (auto & storage : EntryStorage::acl)
         {
-            ChipLogProgress(DataManagement, "AccessControl: unable to load stored ACL entries; using empty list instead");
-            for (auto & storage : EntryStorage::acl)
-            {
-                storage.Clear();
-            }
+            storage.Clear();
         }
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Finish() override
+    void Finish() override { ChipLogProgress(DataManagement, "Examples::AccessControlDelegate::Finish"); }
+
+    CHIP_ERROR GetMaxEntriesPerFabric(size_t & value) const override
     {
-        ChipLogProgress(DataManagement, "Examples::AccessControlDelegate::Finish");
-        return SaveToFlash();
+        value = EntryStorage::kEntriesPerFabric;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetMaxSubjectsPerEntry(size_t & value) const override
+    {
+        value = EntryStorage::kMaxSubjects;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetMaxTargetsPerEntry(size_t & value) const override
+    {
+        value = EntryStorage::kMaxTargets;
+        return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR GetMaxEntryCount(size_t & value) const override
     {
         value = ArraySize(EntryStorage::acl);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetEntryCount(FabricIndex fabric, size_t & value) const override
+    {
+        value = 0;
+        for (const auto & storage : EntryStorage::acl)
+        {
+            if (!storage.InUse())
+            {
+                break;
+            }
+            if (storage.mFabricIndex == fabric)
+            {
+                value++;
+            }
+        }
         return CHIP_NO_ERROR;
     }
 
@@ -1127,12 +1054,6 @@ public:
                         EntryStorage::ConvertIndex(*index, *fabricIndex, EntryStorage::ConvertDirection::kAbsoluteToRelative);
                     }
                 }
-
-                CHIP_ERROR saveError = SaveToFlash();
-                if (saveError != CHIP_NO_ERROR && saveError != CHIP_ERROR_INCORRECT_STATE)
-                {
-                    ChipLogProgress(DataManagement, "CreateEntry failed to save to flash");
-                }
             }
             return err;
         }
@@ -1157,16 +1078,7 @@ public:
     {
         if (auto * storage = EntryStorage::FindUsedInAcl(index, fabricIndex))
         {
-            CHIP_ERROR err = Copy(entry, *storage);
-            if (err == CHIP_NO_ERROR)
-            {
-                CHIP_ERROR saveError = SaveToFlash();
-                if (saveError != CHIP_NO_ERROR && saveError != CHIP_ERROR_INCORRECT_STATE)
-                {
-                    ChipLogProgress(DataManagement, "UpdateEntry failed to save to flash");
-                }
-            }
-            return err;
+            return Copy(entry, *storage);
         }
         return CHIP_ERROR_SENTINEL;
     }
@@ -1175,9 +1087,15 @@ public:
     {
         if (auto * storage = EntryStorage::FindUsedInAcl(index, fabricIndex))
         {
+            // Best effort attempt to preserve any outstanding delegates...
+            for (auto & delegate : EntryDelegate::pool)
+            {
+                delegate.FixBeforeDelete(*storage);
+            }
+
+            // ...then go through the access control list starting at the deleted storage...
             constexpr auto & acl = EntryStorage::acl;
             constexpr auto * end = acl + ArraySize(acl);
-            // Go through the access control list starting at the deleted storage...
             for (auto * next = storage + 1; storage < end; ++storage, ++next)
             {
                 // ...copying over each storage with its next one...
@@ -1192,6 +1110,7 @@ public:
                     break;
                 }
             }
+
             // ...then fix up all the delegates so they still use the proper storage.
             storage = acl + index;
             for (auto & delegate : EntryDelegate::pool)
@@ -1203,13 +1122,9 @@ public:
                 delegate.FixAfterDelete(*storage);
             }
 
-            CHIP_ERROR saveError = SaveToFlash();
-            if (saveError != CHIP_NO_ERROR && saveError != CHIP_ERROR_INCORRECT_STATE)
-            {
-                ChipLogProgress(DataManagement, "DeleteEntry failed to save to flash");
-            }
             return CHIP_NO_ERROR;
         }
+
         return CHIP_ERROR_SENTINEL;
     }
 
@@ -1228,67 +1143,6 @@ public:
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
-
-    void SetStorageDelegate(chip::PersistentStorageDelegate * storageDelegate) { mStorageDelegate = storageDelegate; }
-
-private:
-    chip::PersistentStorageDelegate * mStorageDelegate = nullptr;
-
-    // The version of the storage data format. Increment this key when the format of the data model changes.
-    static const uint32_t kExampleAclStorageVersion = 1;
-    // This value was chosen to be large enough to contain the data, but has not been fine-tuned.
-    static const size_t kStorageBufferSize = 32;
-    static constexpr uint8_t kTagVersion   = 1;
-
-    CHIP_ERROR LoadFromFlash()
-    {
-        VerifyOrReturnError(mStorageDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-        uint8_t buffer[kStorageBufferSize] = { 0 };
-        uint16_t size                      = static_cast<uint16_t>(sizeof(buffer));
-        chip::DefaultStorageKeyAllocator key;
-        ReturnErrorOnFailure(mStorageDelegate->SyncGetKeyValue(key.AccessControlList(), buffer, size));
-
-        chip::TLV::TLVReader reader;
-        reader.Init(buffer, size);
-
-        ReturnErrorOnFailure(reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag()));
-
-        chip::TLV::TLVType container;
-        ReturnErrorOnFailure(reader.EnterContainer(container));
-
-        ReturnErrorOnFailure(reader.Next(chip::TLV::ContextTag(kTagVersion)));
-        uint32_t version;
-        ReturnErrorOnFailure(reader.Get(version));
-        VerifyOrReturnError(version == kExampleAclStorageVersion, CHIP_ERROR_VERSION_MISMATCH);
-
-        for (size_t i = 0; i < EntryStorage::kNumberOfFabrics * EntryStorage::kEntriesPerFabric; ++i)
-        {
-            ReturnErrorOnFailure(EntryStorage::acl[i].Deserialize(mStorageDelegate, key.AccessControlEntry(i)));
-        }
-        return reader.ExitContainer(container);
-    }
-
-    CHIP_ERROR SaveToFlash()
-    {
-        VerifyOrReturnError(mStorageDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-        uint8_t buffer[kStorageBufferSize] = { 0 };
-        chip::TLV::TLVWriter writer;
-        writer.Init(buffer);
-        chip::DefaultStorageKeyAllocator key;
-        chip::TLV::TLVType container;
-        ReturnErrorOnFailure(writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::TLVType::kTLVType_Structure, container));
-        ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(kTagVersion), kExampleAclStorageVersion));
-        for (size_t i = 0; i < EntryStorage::kNumberOfFabrics * EntryStorage::kEntriesPerFabric; ++i)
-        {
-            ReturnErrorOnFailure(EntryStorage::acl[i].Serialize(mStorageDelegate, key.AccessControlEntry(i)));
-        }
-        ReturnErrorOnFailure(writer.EndContainer(container));
-        ReturnErrorOnFailure(writer.Finalize());
-
-        return mStorageDelegate->SyncSetKeyValue(key.AccessControlList(), buffer, static_cast<uint16_t>(writer.GetLengthWritten()));
-    }
 };
 
 static_assert(std::is_pod<SubjectStorage>(), "Storage type must be POD");
@@ -1306,10 +1160,9 @@ namespace chip {
 namespace Access {
 namespace Examples {
 
-AccessControl::Delegate * GetAccessControlDelegate(PersistentStorageDelegate * storageDelegate)
+AccessControl::Delegate * GetAccessControlDelegate()
 {
     static AccessControlDelegate accessControlDelegate;
-    accessControlDelegate.SetStorageDelegate(storageDelegate);
     return &accessControlDelegate;
 }
 

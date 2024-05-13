@@ -56,20 +56,18 @@ target_sources(app PRIVATE
                main/PumpManager.cpp
                main/main.cpp
                main/ZclCallbacks.cpp
-               ${GEN_DIR}/pump-app/zap-generated/callback-stub.cpp
-               ${GEN_DIR}/pump-app/zap-generated/IMClusterCommandHandler.cpp
-               ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
-               ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp)
+               ${NRFCONNECT_COMMON}/util/LEDWidget.cpp)
 
 chip_configure_data_model(app
     INCLUDE_SERVER
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../pump-common/pump-app.zap
 )
 
-if(CONFIG_CHIP_OTA_REQUESTOR)
+if(CONFIG_CHIP_OTA_REQUESTOR OR CONFIG_MCUMGR_TRANSPORT_BT)
     target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/OTAUtil.cpp)
 endif()
 
-if(CONFIG_MCUMGR_SMP_BT)
+if(CONFIG_MCUMGR_TRANSPORT_BT)
+    zephyr_library_link_libraries(MCUBOOT_BOOTUTIL)
     target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/DFUOverSMP.cpp)
 endif()

@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
@@ -26,7 +27,7 @@
 namespace chip {
 
 /// File signature (aka magic number) of a valid Matter OTA image
-constexpr uint32_t kOTAImageFileIdentifier = 0x1BEEF11E;
+inline constexpr uint32_t kOTAImageFileIdentifier = 0x1BEEF11E;
 
 enum class OTAImageDigestType : uint8_t
 {

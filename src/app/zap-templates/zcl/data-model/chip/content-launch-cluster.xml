@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (c) 2021 Project CHIP Authors
+Copyright (c) 2021-2023 Project CHIP Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,118 +20,169 @@ limitations under the License.
     <domain>Media</domain>
     <name>Content Launcher</name>
     <code>0x050a</code>
-    <define>CONTENT_LAUNCH_CLUSTER</define>
+    <define>CONTENT_LAUNCHER_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <description>This cluster provides an interface for launching content on a media player device such as a TV or Speaker.</description>
+    <globalAttribute side="either" code="0xFFFD" value="1"/>
 
-    <attribute side="server" code="0x0000" define="CONTENT_LAUNCHER_ACCEPT_HEADER"                 type="ARRAY" entryType="CHAR_STRING" length="254" writable="false" optional="true">AcceptHeader</attribute>
-    <attribute side="server" code="0x0001" define="CONTENT_LAUNCHER_SUPPORTED_STREAMING_PROTOCOLS" type="BITMAP32" default="0"                       writable="true"  optional="true">SupportedStreamingProtocols</attribute>
+    <attribute side="server" code="0x0000" define="CONTENT_LAUNCHER_ACCEPT_HEADER"                 type="array" entryType="char_string" length="254" writable="false" optional="true">AcceptHeader</attribute>
+    <attribute side="server" code="0x0001" define="CONTENT_LAUNCHER_SUPPORTED_STREAMING_PROTOCOLS" type="SupportedProtocolsBitmap" default="0"                       writable="false"  optional="true">SupportedStreamingProtocols</attribute>
 
-    <command source="client" code="0x00" name="LaunchContent" response="LaunchResponse" optional="false">
+    <command source="client" code="0x00" name="LaunchContent" response="LauncherResponse" optional="true">
       <description>Upon receipt, this SHALL launch the specified content with optional search criteria.</description>
-      <arg name="search" type="ContentSearch"/>
-      <arg name="autoPlay" type="BOOLEAN"/>
-      <arg name="data" type="CHAR_STRING" optional="true"/>
+      <arg name="Search" type="ContentSearchStruct"/>
+      <arg name="AutoPlay" type="boolean"/>
+      <arg name="Data" type="char_string" optional="true"/>
+      <arg name="PlaybackPreferences" type="PlaybackPreferencesStruct" optional="true"/>
+      <arg name="UseCurrentContext" type="boolean" optional="true"/>
     </command>
 
-    <command source="client" code="0x01" name="LaunchURL" response="LaunchResponse" optional="false">
+    <command source="client" code="0x01" name="LaunchURL" response="LauncherResponse" optional="true">
       <description>Upon receipt, this SHALL launch content from the specified URL.</description>
-      <arg name="contentURL" type="CHAR_STRING"/>
-      <arg name="displayString" type="CHAR_STRING" optional="true"/>
-      <arg name="brandingInformation" type="BrandingInformation" optional="true"/>
+      <arg name="ContentURL" type="char_string"/>
+      <arg name="DisplayString" type="char_string" optional="true"/>
+      <arg name="BrandingInformation" type="BrandingInformationStruct" optional="true"/>
     </command>
 
-    <command source="server" code="0x02" name="LaunchResponse" optional="false" disableDefaultResponse="true">
+    <command source="server" code="0x02" name="LauncherResponse" optional="true" disableDefaultResponse="true">
       <description>This command SHALL be generated in response to LaunchContent command.</description>
-      <arg name="status" type="StatusEnum"/>
-      <arg name="data" type="CHAR_STRING" optional="true"/>
+      <arg name="Status" type="StatusEnum"/>
+      <arg name="Data" type="char_string" optional="true"/>
     </command>
 
   </cluster>
 
-  <struct name="ContentSearch">
+  <struct name="ContentSearchStruct">
     <cluster code="0x050a"/>
-    <item name="parameterList" type="Parameter" array="true" optional="false"/>
+    <item name="ParameterList" type="ParameterStruct" array="true" optional="false"/>
   </struct>
 
-  <struct name="AdditionalInfo">
+  <struct name="AdditionalInfoStruct">
     <cluster code="0x050a"/>
-    <item name="name" type="CHAR_STRING"/>
-    <item name="value" type="CHAR_STRING"/>
+    <item name="Name" type="char_string" length="256" />
+    <!-- TODO: spec sets this max size, but seems impossible given UDP size limits -->
+    <item name="Value" type="char_string" length="8192" />
   </struct>
 
-  <enum name="MetricTypeEnum" type="ENUM8">
-    <cluster code="0x050a"/>
-    <item name="PIXELS" value="0x00"/>
-    <item name="PERCENTAGE" value="0x01"/>
+  <enum name="MetricTypeEnum" type="enum8">
+      <cluster code="0x050a"/>
+      <item name="Pixels" value="0x00"/>
+      <item name="Percentage" value="0x01"/>
   </enum>
 
-  <struct name="Dimension">
-    <cluster code="0x050a"/>
-    <item name="width" type="double" optional="false"/>
-    <item name="height" type="double" optional="false"/>
-    <item name="metric" type="MetricTypeEnum"/>
+  <struct name="DimensionStruct">
+      <cluster code="0x050a"/>
+      <item name="Width" type="double" optional="false"/>
+      <item name="Height" type="double" optional="false"/>
+      <item name="Metric" type="MetricTypeEnum"/>
   </struct>
 
-  <struct name="StyleInformation">
-    <cluster code="0x050a"/>
-    <item name="imageUrl" type="CHAR_STRING" optional="true"/>
-    <item name="color" type="CHAR_STRING" optional="true"/>
-    <item name="size" type="Dimension" optional="true"/>
+  <struct name="StyleInformationStruct">
+      <cluster code="0x050a"/>
+      <!-- TODO: spec sets this max size, but seems impossible given UDP size limits -->
+      <item name="ImageURL" type="char_string" length="8192" optional="true"/>
+      <item name="Color" type="char_string" length="9" optional="true"/>
+      <item name="Size" type="DimensionStruct" optional="true"/>
   </struct>
 
-  <struct name="BrandingInformation">
+  <struct name="BrandingInformationStruct">
     <cluster code="0x050a"/>
-    <item name="providerName" type="CHAR_STRING"/>
-    <item name="background" type="StyleInformation" optional="true"/>
-    <item name="logo" type="StyleInformation" optional="true"/>
-    <item name="progressBar" type="StyleInformation" optional="true"/>
-    <item name="splash" type="StyleInformation" optional="true"/>
-    <item name="waterMark" type="StyleInformation" optional="true"/>
+    <item name="ProviderName" type="char_string" length="256" />
+    <item name="Background" type="StyleInformationStruct" optional="true"/>
+    <item name="Logo" type="StyleInformationStruct" optional="true"/>
+    <item name="ProgressBar" type="StyleInformationStruct" optional="true"/>
+    <item name="Splash" type="StyleInformationStruct" optional="true"/>
+    <item name="WaterMark" type="StyleInformationStruct" optional="true"/>
   </struct>
 
 
-  <enum name="ParameterEnum" type="ENUM8">
+  <enum name="ParameterEnum" type="enum8">
     <cluster code="0x050a"/>
-    <item name="actor" value="0x00"/>
-    <item name="channel" value="0x01"/>
-    <item name="character" value="0x02"/>
-    <item name="director" value="0x03"/>
-    <item name="event" value="0x04"/>
-    <item name="franchise" value="0x05"/>
-    <item name="genre" value="0x06"/>
-    <item name="league" value="0x07"/>
-    <item name="popularity" value="0x08"/>
-    <item name="provider" value="0x09"/>
-    <item name="sport" value="0x0A"/>
-    <item name="sportsTeam" value="0x00B"/>
-    <item name="type" value="0x0C"/>
+    <item name="Actor" value="0x00"/>
+    <item name="Channel" value="0x01"/>
+    <item name="Character" value="0x02"/>
+    <item name="Director" value="0x03"/>
+    <item name="Event" value="0x04"/>
+    <item name="Franchise" value="0x05"/>
+    <item name="Genre" value="0x06"/>
+    <item name="League" value="0x07"/>
+    <item name="Popularity" value="0x08"/>
+    <item name="Provider" value="0x09"/>
+    <item name="Sport" value="0x0A"/>
+    <item name="SportsTeam" value="0x00B"/>
+    <item name="Type" value="0x0C"/>
+    <item name="Video" value="0x0D"/>
+    <item name="Season" value="0x0E"/>
+    <item name="Episode" value="0x0F"/>
+    <item name="Any" value="0x10"/>
   </enum>
 
-  <enum name="StatusEnum" type="ENUM8">
+  <enum name="StatusEnum" type="enum8">
     <cluster code="0x050a"/>
-    <item name="success" value="0x00"/>
-    <item name="urlNotAvailable" value="0x01"/>
-    <item name="authFailed" value="0x02"/>
+    <item name="Success" value="0x00"/>
+    <item name="URLNotAvailable" value="0x01"/>
+    <item name="AuthFailed" value="0x02"/>
+    <item name="TextTrackNotAvailable" value="0x03"/>
+    <item name="AudioTrackNotAvailable" value="0x04"/>
   </enum>
 
-  <struct name="Parameter">
+  <struct name="ParameterStruct">
     <cluster code="0x050a"/>
-    <item name="type" type="ParameterEnum"/>
-    <item name="value" type="CHAR_STRING"/>
-    <item name="externalIDList" type="AdditionalInfo" array="true" optional="true"/>
+    <item name="Type" type="ParameterEnum"/>
+    <item name="Value" type="char_string" length="1024" />
+    <item name="ExternalIDList" type="AdditionalInfoStruct" array="true" optional="true"/>
   </struct>
 
-  <bitmap name="SupportedStreamingProtocol" type="BITMAP32">
+  <struct name="PlaybackPreferencesStruct">
+    <cluster code="0x050a"/>
+    <item name="PlaybackPosition" type="int64u"/>
+    <item name="TextTrack" type="TrackPreferenceStruct"/>
+    <item name="AudioTracks" type="TrackPreferenceStruct" array="true" optional="true"/>
+  </struct>
+
+  <struct name="TrackPreferenceStruct">
+    <cluster code="0x050a"/>
+    <item name="LanguageCode" type="char_string" length="32" optional="false"/>
+    <item name="Characteristics" type="CharacteristicEnum" array="true" optional="true"/>
+    <item name="AudioOutputIndex" type="int8u"/>
+  </struct>
+
+  <enum name="CharacteristicEnum" type="enum8">
+    <cluster code="0x050a"/>
+    <item value="0x00" name="ForcedSubtitles"/>
+    <item value="0x01" name="DescribesVideo" />
+    <item value="0x02" name="EasyToRead"/>
+    <item value="0x03" name="FrameBased"/>
+    <item value="0x04" name="MainProgram"/>
+    <item value="0x05" name="OriginalContent"/>
+    <item value="0x06" name="VoiceOverTranslation"/>
+    <item value="0x07" name="Caption"/>
+    <item value="0x08" name="Subtitle"/>
+    <item value="0x09" name="Alternate"/>
+    <item value="0x0A" name="Supplementary"/>
+    <item value="0x0B" name="Commentary"/>
+    <item value="0x0C" name="DubbedTranslation"/>
+    <item value="0x0D" name="Description"/>
+    <item value="0x0E" name="Metadata"/>
+    <item value="0x0F" name="EnhancedAudioIntelligibility"/>
+    <item value="0x10" name="Emergency"/>
+    <item value="0x11" name="Karaoke"/>
+  </enum>
+
+  <bitmap name="SupportedProtocolsBitmap" type="bitmap32">
     <cluster code="0x050a"/>
     <field name="DASH" mask="0x1"/>
     <field name="HLS" mask="0x2"/>
   </bitmap>
 
-  <bitmap name="ContentLauncherFeature" type="BITMAP32">
-    <cluster code="0x050a"/>
-    <field name="ContentSearch" mask="0x1"/>
-    <field name="URLPlayback" mask="0x2"/>
-  </bitmap>
+  <bitmap name="Feature" type="bitmap32">
+     <cluster code="0x050a"/>
+     <field name="ContentSearch" mask="0x1"/>
+     <field name="URLPlayback" mask="0x2"/>
+     <field name="AdvancedSeek" mask="0x3"/>
+     <field name="TextTracks" mask="0x4"/>
+     <field name="AudioTracks" mask="0x5"/>
+   </bitmap>
+
 </configurator>

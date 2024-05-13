@@ -1,0 +1,106 @@
+{{> header excludeZapComment=true}}
+
+#import "MTRAttributeTLVValueDecoder_Internal.h"
+
+#import "MTRStructsObjc.h"
+#import "NSStringSpanConversion.h"
+#import "NSDataSpanConversion.h"
+
+#include <app/data-model/Decode.h>
+#include <app/data-model/DecodableList.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <lib/support/TypeTraits.h>
+#include <lib/core/DataModelTypes.h>
+
+using namespace chip;
+using namespace chip::app;
+
+static id _Nullable DecodeGlobalAttributeValue(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::Globals;
+    switch (aAttributeId) {
+        {{#zcl_attributes_server removeKeys='isOptional'}}
+        {{#unless clusterRef}}
+        {{#if (isSupported "" globalAttribute=(asUpperCamelCase name preserveAcronyms=true))}}
+        case Attributes::{{asUpperCamelCase name}}::Id: {
+            using TypeInfo = Attributes::{{asUpperCamelCase name}}::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nil;
+            }
+            {{asObjectiveCType type ""}} value;
+            {{>decode_value target="value" source="cppValue" cluster="" errorCode="*aError = err; return nil;" depth=0}}
+            return value;
+        }
+        {{/if}}
+        {{/unless}}
+        {{/zcl_attributes_server}}
+        default: {
+            break;
+        }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
+
+{{#zcl_clusters}}
+{{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+static id _Nullable DecodeAttributeValueFor{{asUpperCamelCase name preserveAcronyms=true}}Cluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::{{asUpperCamelCase name}};
+    switch (aAttributeId) {
+        {{#zcl_attributes_server removeKeys='isOptional'}}
+        {{#if clusterRef}}
+        {{#if (isSupported (asUpperCamelCase ../name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
+        case Attributes::{{asUpperCamelCase name}}::Id: {
+            using TypeInfo = Attributes::{{asUpperCamelCase name}}::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nil;
+            }
+            {{asObjectiveCType type parent.name}} value;
+            {{>decode_value target="value" source="cppValue" cluster=parent.name errorCode="*aError = err; return nil;" depth=0}}
+            return value;
+        }
+        {{/if}}
+        {{/if}}
+        {{/zcl_attributes_server}}
+        default: {
+            break;
+        }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
+{{/if}}
+{{/zcl_clusters}}
+
+id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    if (IsGlobalAttribute(aPath.mAttributeId)) {
+        return DecodeGlobalAttributeValue(aPath.mAttributeId, aReader, aError);
+    }
+
+    switch (aPath.mClusterId) {
+        {{#zcl_clusters}}
+        {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+        case Clusters::{{asUpperCamelCase name}}::Id: {
+            return DecodeAttributeValueFor{{asUpperCamelCase name preserveAcronyms=true}}Cluster(aPath.mAttributeId, aReader, aError);
+        }
+        {{/if}}
+        {{/zcl_clusters}}
+        default: {
+            break;
+        }
+    }
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}

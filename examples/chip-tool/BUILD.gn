@@ -16,20 +16,20 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/examples/chip-tool/chip-tool.gni")
 import("${chip_root}/src/lib/core/core.gni")
 
-assert(chip_build_tools)
-
-declare_args() {
-  # Use a separate eventloop for CHIP tasks
-  config_use_separate_eventloop = true
-  config_use_interactive_mode = true
-  config_enable_yaml_tests = true
+if (config_use_interactive_mode) {
+  import("//build_overrides/editline.gni")
 }
+
+assert(chip_build_tools)
 
 config("config") {
   include_dirs = [
     ".",
+    "${chip_root}/examples/common",
+    "${chip_root}/zzz_generated/app-common/app-common",
     "${chip_root}/zzz_generated/chip-tool",
     "${chip_root}/src/lib",
   ]
@@ -37,65 +37,81 @@ config("config") {
   defines = [
     "CONFIG_USE_SEPARATE_EVENTLOOP=${config_use_separate_eventloop}",
     "CONFIG_USE_INTERACTIVE_MODE=${config_use_interactive_mode}",
-    "CONFIG_ENABLE_YAML_TESTS=${config_enable_yaml_tests}",
   ]
 
-  cflags = [ "-Wconversion" ]
-
-  if (config_use_interactive_mode) {
-    libs = [ "readline" ]
+  # Note: CONFIG_USE_LOCAL_STORAGE is tested for via #ifdef, not #if.
+  if (config_use_local_storage) {
+    defines += [ "CONFIG_USE_LOCAL_STORAGE" ]
   }
+
+  cflags = [ "-Wconversion" ]
 }
 
 static_library("chip-tool-utils") {
   sources = [
-    "${chip_root}/src/app/tests/suites/include/ConstraintsChecker.h",
-    "${chip_root}/src/app/tests/suites/include/ValueChecker.h",
+    "${chip_root}/src/controller/ExamplePersistentStorage.cpp",
+    "${chip_root}/src/controller/ExamplePersistentStorage.h",
     "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.cpp",
     "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/logging/DataModelLogger.cpp",
     "commands/clusters/ModelCommand.cpp",
+    "commands/clusters/ModelCommand.h",
+    "commands/common/BDXDiagnosticLogsServerDelegate.cpp",
     "commands/common/CHIPCommand.cpp",
     "commands/common/CHIPCommand.h",
     "commands/common/Command.cpp",
-    "commands/common/CommandInvoker.h",
+    "commands/common/Command.h",
     "commands/common/Commands.cpp",
+    "commands/common/Commands.h",
     "commands/common/CredentialIssuerCommands.h",
+    "commands/common/HexConversion.h",
+    "commands/common/RemoteDataModelLogger.cpp",
+    "commands/common/RemoteDataModelLogger.h",
+    "commands/delay/SleepCommand.cpp",
+    "commands/delay/WaitForCommissioneeCommand.cpp",
     "commands/discover/DiscoverCommand.cpp",
     "commands/discover/DiscoverCommissionablesCommand.cpp",
     "commands/discover/DiscoverCommissionersCommand.cpp",
-
-    # TODO - enable CommissionedListCommand once DNS Cache is implemented
-    #    "commands/pairing/CommissionedListCommand.cpp",
-    #    "commands/pairing/CommissionedListCommand.h",
+    "commands/icd/ICDCommand.cpp",
+    "commands/icd/ICDCommand.h",
     "commands/pairing/OpenCommissioningWindowCommand.cpp",
     "commands/pairing/OpenCommissioningWindowCommand.h",
     "commands/pairing/PairingCommand.cpp",
+    "commands/pairing/ToTLVCert.cpp",
     "commands/payload/AdditionalDataParseCommand.cpp",
     "commands/payload/SetupPayloadGenerateCommand.cpp",
     "commands/payload/SetupPayloadParseCommand.cpp",
     "commands/payload/SetupPayloadVerhoeff.cpp",
-    "config/PersistentStorage.cpp",
+    "commands/session-management/CloseSessionCommand.cpp",
+    "commands/session-management/CloseSessionCommand.h",
+    "commands/storage/StorageManagementCommand.cpp",
   ]
+
+  deps = [ "${chip_root}/src/app:events" ]
 
   if (config_use_interactive_mode) {
     sources += [ "commands/interactive/InteractiveCommands.cpp" ]
+    deps += [
+      "${chip_root}/examples/common/websocket-server",
+      "${chip_root}/src/platform/logging:headers",
+      "${editline_root}:editline",
+    ]
   }
 
-  if (config_enable_yaml_tests) {
-    sources += [ "commands/tests/TestCommand.cpp" ]
+  if (chip_device_platform == "darwin") {
+    sources += [ "commands/common/DeviceScanner.cpp" ]
   }
 
   public_deps = [
+    "${chip_root}/examples/common/tracing:commandline",
+    "${chip_root}/src/app/icd/client:handler",
+    "${chip_root}/src/app/icd/client:manager",
     "${chip_root}/src/app/server",
-    "${chip_root}/src/app/tests/suites/commands/commissioner",
-    "${chip_root}/src/app/tests/suites/commands/delay",
-    "${chip_root}/src/app/tests/suites/commands/discovery",
-    "${chip_root}/src/app/tests/suites/commands/log",
-    "${chip_root}/src/app/tests/suites/commands/system",
-    "${chip_root}/src/app/tests/suites/pics",
+    "${chip_root}/src/app/tests/suites/commands/interaction_model",
     "${chip_root}/src/controller/data_model",
     "${chip_root}/src/credentials:file_attestation_trust_store",
     "${chip_root}/src/lib",
+    "${chip_root}/src/lib/core:types",
+    "${chip_root}/src/lib/support/jsontlv",
     "${chip_root}/src/platform",
     "${chip_root}/third_party/inipp",
     "${chip_root}/third_party/jsoncpp",
@@ -104,7 +120,8 @@ static_library("chip-tool-utils") {
   public_configs = [ ":config" ]
 
   if (chip_enable_transport_trace) {
-    public_deps += [ "${chip_root}/examples/common/tracing:trace_handlers" ]
+    public_deps +=
+        [ "${chip_root}/examples/common/tracing:trace_handlers_decoder" ]
   }
 
   output_dir = root_out_dir
@@ -113,7 +130,10 @@ static_library("chip-tool-utils") {
 executable("chip-tool") {
   sources = [ "main.cpp" ]
 
-  deps = [ ":chip-tool-utils" ]
+  deps = [
+    ":chip-tool-utils",
+    "${chip_root}/src/platform/logging:force_stdio",
+  ]
 
   output_dir = root_out_dir
 }

@@ -1,0 +1,328 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    26.1.1. [TC-SC-5.1] Adding member to a group - TH as Admin and DUT as Group
+    Member
+
+PICS:
+    - GRPKEY.S
+    - G.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Groups"
+    endpoint: 0
+
+    # Users should set endpoint value on the command line to PIXIT.G.ENDPOINT
+    Groups.Endpoint: 1
+
+tests:
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Read the commissioner node ID"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: commissionerNodeId
+
+    - label:
+          "Step 1: TH writes the ACL attribute in the Access Control cluster to
+          add Operate privileges for group 0x0103 and maintain the current
+          administrative privileges for the TH. The following access control
+          list shall be used : List item 1 (TH admin): a)Privilege: Administer
+          (5) b)AuthMode: CASE (2) c)Subjects: TH node id ([N1]) d)Targets: all
+          (null) List item 2 (group operate access): a)Privilege: Operate (3)
+          b)AuthMode: Group (3) c)Subjects: group 0x0103 ([0x0103]) d)Targets:
+          all (null)"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [commissionerNodeId],
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 3,
+                      AuthMode: 3,
+                      Subjects: [0x0103],
+                      Targets: null,
+                  },
+              ]
+
+    - label:
+          "Step 2a: TH sends KeySetWrite command in the GroupKeyManagement
+          cluster to DUT using a key that is NOT installed on the TH. This is
+          intended to test that the key set is correctly updated in the next
+          step. GroupKeySet fields are as follows :  1)GroupKeySetID: 0x01a3
+          2)GroupKeySecurityPolicy: TrustFirst (0) 3)EpochKey0:
+          00000000000000000000000000000001 4)EpochStartTime0: 111 5)EpochKey1:
+          00000000000000000000000000000002 6)EpochStartTime1: 222 7)EpochKey2:
+          00000000000000000000000000000003 8)EpochStartTime2: 333"
+      PICS: GRPKEY.S.C00.Rsp
+      cluster: "Group Key Management"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a3,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:00000000000000000000000000000001",
+                        EpochStartTime0: 111,
+                        EpochKey1: "hex:00000000000000000000000000000002",
+                        EpochStartTime1: 222,
+                        EpochKey2: "hex:00000000000000000000000000000003",
+                        EpochStartTime2: 333,
+                    }
+
+    - label:
+          "Step 2b: TH sends KeySetWrite command in the GroupKeyManagement
+          cluster to DUT using a key that is pre-installed on the TH.
+          GroupKeySet fields are as follows : 1)GroupKeySetID: 0x01a3
+          2)GroupKeySecurityPolicy: TrustFirst (0) 3)EpochKey0:
+          d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1 5)EpochKey1:
+          d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1:
+          18446744073709551613 7)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          8)EpochStartTime2: 18446744073709551614"
+      PICS: GRPKEY.S.C00.Rsp
+      cluster: "Group Key Management"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a3,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime0: 1,
+                        EpochKey1: "hex:d1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime1: 18446744073709551613,
+                        EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime2: 18446744073709551614,
+                    }
+
+    - label:
+          "Step 3: TH binds GroupId 0x0103 with GroupKeySetID 0x01a3 in the
+          GroupKeyMap attribute list on GroupKeyManagement cluster by writing
+          the GroupKeyMap attribute with one entry as follows: List item 1:
+          1)GroupId: 0x0103 2)GroupKeySetId: 0x01a3"
+      PICS: GRPKEY.S.A0000
+      cluster: "Group Key Management"
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value: [{ FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a3 }]
+
+    - label:
+          "Step 4: TH sends RemoveAllGroups command to the DUT on
+          PIXIT.G.ENDPOINT "
+      PICS: G.S.C04.Rsp
+      endpoint: Groups.Endpoint
+      command: "RemoveAllGroups"
+
+    - label:
+          "Step 5: TH sends AddGroup Command to DUT on PIXIT.G.ENDPOINT with the
+          the following settings 1)GroupID: 0x0103 2)GroupName: 'Test Group'"
+      PICS: G.S.C00.Rsp
+      endpoint: Groups.Endpoint
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0103
+              - name: GroupName
+                value: "Test Group"
+
+    - label:
+          "Step 6a: TH sends ViewGroup command with the GroupID to the Group
+          cluster on the DUT on PIXIT.G.ENDPOINT"
+      PICS: G.S.F00 && G.S.C01.Rsp
+      endpoint: Groups.Endpoint
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0103
+      response:
+          values:
+              - name: Status
+                value: 0
+              - name: GroupID
+                value: 0x0103
+              - name: GroupName
+                value: "Test Group"
+
+    - label:
+          "Step 6b: TH sends ViewGroup command with the GroupID to the Group
+          cluster on the DUT on PIXIT.G.ENDPOINT"
+      PICS: " !G.S.F00 && G.S.C01.Rsp "
+      endpoint: Groups.Endpoint
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0103
+      response:
+          values:
+              - name: Status
+                value: 0
+              - name: GroupID
+                value: 0x0103
+              - name: GroupName
+                value: ""
+
+    - label:
+          "Step 7: TH sends KeySetRead command to GroupKeyManagement cluster
+          with GroupKeySetID as 0x01a3"
+      PICS: GRPKEY.S.C01.Rsp
+      cluster: "Group Key Management"
+      command: "KeySetRead"
+      arguments:
+          values:
+              - name: GroupKeySetID
+                value: 0x01a3
+      response:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a3,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: null,
+                        EpochStartTime0: 1,
+                        EpochKey1: null,
+                        EpochStartTime1: 18446744073709551613,
+                        EpochKey2: null,
+                        EpochStartTime2: 18446744073709551614,
+                    }
+
+    - label:
+          "Step 8: TH reads GroupKeyMap Attribute from the GroupKeyManagement
+          cluster from DUT"
+      PICS: GRPKEY.S.A0000
+      cluster: "Group Key Management"
+      command: "readAttribute"
+      attribute: "GroupKeyMap"
+      response:
+          value: [{ FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a3 }]
+
+    - label:
+          "Step 9a: TH reads GroupTable attribute from GroupKeyManagement
+          cluster on DUT using a fabric-filtered read."
+      cluster: "Group Key Management"
+      PICS: G.S.F00 && GRPKEY.S.A0001
+      command: "readAttribute"
+      attribute: "GroupTable"
+      response:
+          value:
+              [
+                  {
+                      GroupId: 0x0103,
+                      Endpoints: [Groups.Endpoint],
+                      GroupName: "Test Group",
+                  },
+              ]
+
+    - label:
+          "Step 9b: TH reads GroupTable attribute from GroupKeyManagement
+          cluster on DUT using a fabric-filtered read"
+      cluster: "Group Key Management"
+      PICS: " !G.S.F00 && GRPKEY.S.A0001 "
+      command: "readAttribute"
+      attribute: "GroupTable"
+      response:
+          value:
+              [{ GroupId: 0x0103, Endpoints: [Groups.Endpoint], GroupName: "" }]
+
+    - label:
+          "Step 10: TH removes the Group key set that was added by sending a
+          KeySetRemove command to the GroupKeyManagement cluster with the
+          GroupKeySetID field set to 0x01a3"
+      PICS: GRPKEY.S.C03.Rsp
+      cluster: "Group Key Management"
+      command: "KeySetRemove"
+      arguments:
+          values:
+              - name: GroupKeySetID
+                value: 0x01a3
+
+    - label:
+          "Step 11: TH verifies that the key set removal in step 10 also removed
+          the corresponding entries in the GroupKeyMap by Reading the
+          GroupKeyMap attribute from the GroupKeyManagement cluster using a
+          fabric-filtered read."
+      PICS: GRPKEY.S.A0000
+      cluster: "Group Key Management"
+      command: "readAttribute"
+      attribute: "GroupKeyMap"
+      response:
+          value: []
+
+    - label:
+          "Step 12: TH cleans up groups using RemoveAllGroups command to the DUT
+          on PIXIT.G.ENDPOINT"
+      PICS: G.S.C04.Rsp
+      endpoint: Groups.Endpoint
+      command: "RemoveAllGroups"
+
+    - label:
+          "Step 13: TH reads verifies the group has been removed by reading the
+          GroupTable attribute from GroupKeyManagement cluster on DUT using a
+          fabric-filtered read."
+      PICS: GRPKEY.S.A0001
+      cluster: "Group Key Management"
+      command: "readAttribute"
+      attribute: "GroupTable"
+      response:
+          value: []
+
+    - label:
+          "Step 14: TH writes the ACL attribute in the Access Control cluster to
+          remove Operate privileges for group 0x0103 and maintain the current
+          administrative privileges for the TH. The following access control
+          list shall be used: List item 1 (TH admin): 1)Privilege: Administer
+          (5) 2)AuthMode: CASE (2) 3)Subjects: TH node id ([N1]) 4)Targets: all
+          (null)"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [commissionerNodeId],
+                      Targets: null,
+                  },
+              ]

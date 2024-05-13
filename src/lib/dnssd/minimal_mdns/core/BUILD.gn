@@ -19,8 +19,12 @@ static_library("core") {
     "BytesRange.h",
     "Constants.h",
     "DnsHeader.h",
+    "FlatAllocatedQName.h",
+    "HeapQName.h",
     "QName.cpp",
     "QName.h",
+    "QNameString.cpp",
+    "QNameString.h",
     "RecordWriter.cpp",
     "RecordWriter.h",
   ]

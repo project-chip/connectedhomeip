@@ -1,0 +1,293 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    12.4.18. [TC-CNET-4.20] [WiFi] Verification for commands check [DUT-Client]
+
+PICS:
+    - CNET.C.F00
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Preconditions"
+      verification: |
+          1. DUT supports CNET.C.F00(WI)
+          2. TH has a Network Commissioning cluster on endpoint PIXIT.CNET.ENDPOINT_WIFI with FeatureMap attribute of 1
+      disabled: true
+
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Commission TH and DUT over BLE to setup the Wi-Fi"
+      verification: |
+
+      disabled: true
+
+    - label: "Step 1: DUT sends the ScanNetwork command to the TH"
+      PICS: CNET.C.C00.Tx
+      verification: |
+          ./chip-tool networkcommissioning scan-networks 1 0 --Ssid null --Breadcrumb 1
+
+          Verify TH receives ScanNetwork command response on TH(all-clusters-app) log:
+
+          [1686201126.444991][2224:2224] CHIP:DMG: InvokeRequestMessage =
+          [1686201126.445054][2224:2224] CHIP:DMG: {
+          [1686201126.445106][2224:2224] CHIP:DMG:         suppressResponse = false,
+          [1686201126.445170][2224:2224] CHIP:DMG:         timedRequest = false,
+          [1686201126.445228][2224:2224] CHIP:DMG:         InvokeRequests =
+          [1686201126.445304][2224:2224] CHIP:DMG:         [
+          [1686201126.445362][2224:2224] CHIP:DMG:                 CommandDataIB =
+          [1686201126.445438][2224:2224] CHIP:DMG:                 {
+          [1686201126.445498][2224:2224] CHIP:DMG:                         CommandPathIB =
+          [1686201126.445571][2224:2224] CHIP:DMG:                         {
+          [1686201126.445644][2224:2224] CHIP:DMG:                                 EndpointId = 0x0,
+          [1686201126.445722][2224:2224] CHIP:DMG:                                 ClusterId = 0x31,
+          [1686201126.445797][2224:2224] CHIP:DMG:                                 CommandId = 0x0,
+          [1686201126.445868][2224:2224] CHIP:DMG:                         },
+          [1686201126.445941][2224:2224] CHIP:DMG:
+          [1686201126.446055][2224:2224] CHIP:DMG:                         CommandFields =
+          [1686201126.446132][2224:2224] CHIP:DMG:                         {
+          [1686201126.446206][2224:2224] CHIP:DMG:                                 0x0 = NULL
+          [1686201126.446284][2224:2224] CHIP:DMG:                                 0x1 = 1,
+          [1686201126.446359][2224:2224] CHIP:DMG:                         },
+          [1686201126.446425][2224:2224] CHIP:DMG:                 },
+          [1686201126.446497][2224:2224] CHIP:DMG:
+          [1686201126.446552][2224:2224] CHIP:DMG:         ],
+          [1686201126.446624][2224:2224] CHIP:DMG:
+          [1686201126.446680][2224:2224] CHIP:DMG:         InteractionModelRevision = 1
+          [1686201126.446734][2224:2224] CHIP:DMG: },
+          [1686201126.446888][2224:2224] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0031 e=0 p=a
+          [1686201126.446969][2224:2224] CHIP:DMG: AccessControl: allowed
+          [1686201126.447036][2224:2224] CHIP:DMG: Received command for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0000
+      disabled: true
+
+    - label: "Step 2: DUT sends the ArmFailSafe command to the TH"
+      verification: |
+          ./chip-tool generalcommissioning arm-fail-safe 60 0 1 0
+
+          Verify TH receives ArmFailSafeResponse command response on TH(all-clusters-app) log:
+
+          [1686202047.033792][2224:2224] CHIP:DMG: InvokeRequestMessage =
+          [1686202047.033855][2224:2224] CHIP:DMG: {
+          [1686202047.033909][2224:2224] CHIP:DMG:         suppressResponse = false,
+          [1686202047.034035][2224:2224] CHIP:DMG:         timedRequest = false,
+          [1686202047.034100][2224:2224] CHIP:DMG:         InvokeRequests =
+          [1686202047.034176][2224:2224] CHIP:DMG:         [
+          [1686202047.034233][2224:2224] CHIP:DMG:                 CommandDataIB =
+          [1686202047.034298][2224:2224] CHIP:DMG:                 {
+          [1686202047.034359][2224:2224] CHIP:DMG:                         CommandPathIB =
+          [1686202047.034430][2224:2224] CHIP:DMG:                         {
+          [1686202047.034503][2224:2224] CHIP:DMG:                                 EndpointId = 0x0,
+          [1686202047.034579][2224:2224] CHIP:DMG:                                 ClusterId = 0x31,
+          [1686202047.034654][2224:2224] CHIP:DMG:                                 CommandId = 0x0,
+          [1686202047.034724][2224:2224] CHIP:DMG:                         },
+          [1686202047.034798][2224:2224] CHIP:DMG:
+          [1686202047.034863][2224:2224] CHIP:DMG:                         CommandFields =
+          [1686202047.034936][2224:2224] CHIP:DMG:                         {
+          [1686202047.035009][2224:2224] CHIP:DMG:                                 0x0 = NULL
+          [1686202047.035087][2224:2224] CHIP:DMG:                                 0x1 = 1,
+          [1686202047.035162][2224:2224] CHIP:DMG:                         },
+          [1686202047.035228][2224:2224] CHIP:DMG:                 },
+          [1686202047.035300][2224:2224] CHIP:DMG:
+          [1686202047.035356][2224:2224] CHIP:DMG:         ],
+          [1686202047.035425][2224:2224] CHIP:DMG:
+          [1686202047.035480][2224:2224] CHIP:DMG:         InteractionModelRevision = 1
+          [1686202047.035535][2224:2224] CHIP:DMG: },
+          [1686202047.035691][2224:2224] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0031 e=0 p=a
+          [1686202047.035773][2224:2224] CHIP:DMG: AccessControl: allowed
+          [1686202047.035839][2224:2224] CHIP:DMG: Received command for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0000
+      disabled: true
+
+    - label: "Step 3: DUT sends the AddOrUpdateWiFiNetwork command to the TH"
+      PICS: CNET.C.C02.Tx
+      verification: |
+          ./chip-tool networkcommissioning add-or-update-wi-fi-network-network hex:<your network id in hex> <password> 1 0
+
+          Below is an example:
+
+          ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:47524C50726976617465 grlprivatewifi092010 1 0
+
+          Verify TH receives AddOrUpdateWiFiNetwork command response on TH(all-clusters-app) log:
+
+          [1686202105.669753][2224:2224] CHIP:DMG: InvokeRequestMessage =
+          [1686202105.669814][2224:2224] CHIP:DMG: {
+          [1686202105.669867][2224:2224] CHIP:DMG:         suppressResponse = false,
+          [1686202105.669930][2224:2224] CHIP:DMG:         timedRequest = false,
+          [1686202105.670062][2224:2224] CHIP:DMG:         InvokeRequests =
+          [1686202105.670142][2224:2224] CHIP:DMG:         [
+          [1686202105.670199][2224:2224] CHIP:DMG:                 CommandDataIB =
+          [1686202105.670276][2224:2224] CHIP:DMG:                 {
+          [1686202105.670339][2224:2224] CHIP:DMG:                         CommandPathIB =
+          [1686202105.670411][2224:2224] CHIP:DMG:                         {
+          [1686202105.670484][2224:2224] CHIP:DMG:                                 EndpointId = 0x0,
+          [1686202105.670560][2224:2224] CHIP:DMG:                                 ClusterId = 0x31,
+          [1686202105.670635][2224:2224] CHIP:DMG:                                 CommandId = 0x2,
+          [1686202105.670706][2224:2224] CHIP:DMG:                         },
+          [1686202105.670781][2224:2224] CHIP:DMG:
+          [1686202105.670842][2224:2224] CHIP:DMG:                         CommandFields =
+          [1686202105.670911][2224:2224] CHIP:DMG:                         {
+          [1686202105.670982][2224:2224] CHIP:DMG:                                 0x0 = [
+          [1686202105.671064][2224:2224] CHIP:DMG:                                                 0x47, 0x52, 0x4c, 0x50, 0x72, 0x69, 0x76, 0x61, 0x74, 0x65,
+          [1686202105.671150][2224:2224] CHIP:DMG:                                 ] (10 bytes)
+          [1686202105.671222][2224:2224] CHIP:DMG:                                 0x1 = [
+          [1686202105.671309][2224:2224] CHIP:DMG:                                                 0x67, 0x72, 0x6c, 0x70, 0x72, 0x69, 0x76, 0x61, 0x74, 0x65, 0x77, 0x69, 0x66, 0x69, 0x30, 0x39, 0x32, 0x30, 0x31, 0x30,
+          [1686202105.671401][2224:2224] CHIP:DMG:                                 ] (20 bytes)
+          [1686202105.671475][2224:2224] CHIP:DMG:                         },
+          [1686202105.671542][2224:2224] CHIP:DMG:                 },
+          [1686202105.671613][2224:2224] CHIP:DMG:
+          [1686202105.671668][2224:2224] CHIP:DMG:         ],
+          [1686202105.671740][2224:2224] CHIP:DMG:
+          [1686202105.671796][2224:2224] CHIP:DMG:         InteractionModelRevision = 1
+          [1686202105.671850][2224:2224] CHIP:DMG: },
+          [1686202105.672010][2224:2224] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0031 e=0 p=a
+          [1686202105.672093][2224:2224] CHIP:DMG: AccessControl: allowed
+          [1686202105.672157][2224:2224] CHIP:DMG: Received command for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0002
+      disabled: true
+
+    - label: "Step 4: DUT sends the ConnectNetwork command to the TH"
+      PICS: CNET.C.C06.Tx
+      verification: |
+          ./chip-tool networkcommissioning connect-network hex:<your network id in hex> 1 0
+
+          Below is an example:
+
+           ./chip-tool networkcommissioning connect-network hex:47524C50726976617465 1 0
+
+          Verify TH receives ConnectNetwork command received response on TH(all-clusters-app) log:
+
+          [1686202171.966551][2224:2224] CHIP:DMG: InvokeRequestMessage =
+          [1686202171.966612][2224:2224] CHIP:DMG: {
+          [1686202171.966664][2224:2224] CHIP:DMG:         suppressResponse = false,
+          [1686202171.966727][2224:2224] CHIP:DMG:         timedRequest = false,
+          [1686202171.966814][2224:2224] CHIP:DMG:         InvokeRequests =
+          [1686202171.966890][2224:2224] CHIP:DMG:         [
+          [1686202171.966969][2224:2224] CHIP:DMG:                 CommandDataIB =
+          [1686202171.967037][2224:2224] CHIP:DMG:                 {
+          [1686202171.967098][2224:2224] CHIP:DMG:                         CommandPathIB =
+          [1686202171.967210][2224:2224] CHIP:DMG:                         {
+          [1686202171.967283][2224:2224] CHIP:DMG:                                 EndpointId = 0x0,
+          [1686202171.967389][2224:2224] CHIP:DMG:                                 ClusterId = 0x31,
+          [1686202171.967465][2224:2224] CHIP:DMG:                                 CommandId = 0x6,
+          [1686202171.967564][2224:2224] CHIP:DMG:                         },
+          [1686202171.967639][2224:2224] CHIP:DMG:
+          [1686202171.967727][2224:2224] CHIP:DMG:                         CommandFields =
+          [1686202171.967799][2224:2224] CHIP:DMG:                         {
+          [1686202171.967869][2224:2224] CHIP:DMG:                                 0x0 = [
+          [1686202171.967948][2224:2224] CHIP:DMG:                                                 0x47, 0x52, 0x4c, 0x50, 0x72, 0x69, 0x76, 0x61, 0x74, 0x65,
+          [1686202171.968055][2224:2224] CHIP:DMG:                                 ] (10 bytes)
+          [1686202171.968134][2224:2224] CHIP:DMG:                         },
+          [1686202171.968199][2224:2224] CHIP:DMG:                 },
+          [1686202171.968293][2224:2224] CHIP:DMG:
+          [1686202171.968349][2224:2224] CHIP:DMG:         ],
+          [1686202171.968444][2224:2224] CHIP:DMG:
+          [1686202171.968500][2224:2224] CHIP:DMG:         InteractionModelRevision = 1
+          [1686202171.968554][2224:2224] CHIP:DMG: },
+          [1686202171.968732][2224:2224] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0031 e=0 p=a
+          [1686202171.968838][2224:2224] CHIP:DMG: AccessControl: allowed
+          [1686202171.968906][2224:2224] CHIP:DMG: Received command for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0006
+      disabled: true
+
+    - label: "Step 5: DUT sends the ReorderNetwork command to the TH"
+      PICS: CNET.C.C08.Tx
+      verification: |
+          ./chip-tool networkcommissioning reorder-network hex:<your network id in hex> 1 0
+
+          Below is an example:
+
+          ./chip-tool networkcommissioning reorder-network hex:47524C50726976617465 3 1 0
+
+          Verify TH receives ReorderNetwork command received response on TH(all-clusters-app) log:
+
+          [1686202203.173116][2224:2224] CHIP:DMG: InvokeRequestMessage =
+          [1686202203.173183][2224:2224] CHIP:DMG: {
+          [1686202203.173242][2224:2224] CHIP:DMG:         suppressResponse = false,
+          [1686202203.173304][2224:2224] CHIP:DMG:         timedRequest = false,
+          [1686202203.173361][2224:2224] CHIP:DMG:         InvokeRequests =
+          [1686202203.173435][2224:2224] CHIP:DMG:         [
+          [1686202203.173492][2224:2224] CHIP:DMG:                 CommandDataIB =
+          [1686202203.173556][2224:2224] CHIP:DMG:                 {
+          [1686202203.173616][2224:2224] CHIP:DMG:                         CommandPathIB =
+          [1686202203.173692][2224:2224] CHIP:DMG:                         {
+          [1686202203.173765][2224:2224] CHIP:DMG:                                 EndpointId = 0x0,
+          [1686202203.173842][2224:2224] CHIP:DMG:                                 ClusterId = 0x31,
+          [1686202203.173912][2224:2224] CHIP:DMG:                                 CommandId = 0x8,
+          [1686202203.174101][2224:2224] CHIP:DMG:                         },
+          [1686202203.174180][2224:2224] CHIP:DMG:
+          [1686202203.174243][2224:2224] CHIP:DMG:                         CommandFields =
+          [1686202203.174309][2224:2224] CHIP:DMG:                         {
+          [1686202203.174381][2224:2224] CHIP:DMG:                                 0x0 = [
+          [1686202203.174460][2224:2224] CHIP:DMG:                                                 0x47, 0x52, 0x4c, 0x50, 0x72, 0x69, 0x76, 0x61, 0x74, 0x65,
+          [1686202203.174544][2224:2224] CHIP:DMG:                                 ] (10 bytes)
+          [1686202203.174622][2224:2224] CHIP:DMG:                                 0x1 = 3,
+          [1686202203.174692][2224:2224] CHIP:DMG:                         },
+          [1686202203.174758][2224:2224] CHIP:DMG:                 },
+          [1686202203.174830][2224:2224] CHIP:DMG:
+          [1686202203.174885][2224:2224] CHIP:DMG:         ],
+          [1686202203.174959][2224:2224] CHIP:DMG:
+          [1686202203.175014][2224:2224] CHIP:DMG:         InteractionModelRevision = 1
+          [1686202203.175068][2224:2224] CHIP:DMG: },
+          [1686202203.175217][2224:2224] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0031 e=0 p=a
+          [1686202203.175295][2224:2224] CHIP:DMG: AccessControl: allowed
+          [1686202203.175359][2224:2224] CHIP:DMG: Received command for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0008
+      disabled: true
+
+    - label: "Step 6: DUT sends the RemoveNetwork command to the TH"
+      PICS: CNET.C.C04.Tx
+      verification: |
+          ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0
+
+          Below is an example:
+
+          ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1 0
+
+          Verify TH receives RemoveNetwork command received response on TH(all-clusters-app) log:
+
+          [1686202227.845491][2224:2224] CHIP:DMG: InvokeRequestMessage =
+          [1686202227.845563][2224:2224] CHIP:DMG: {
+          [1686202227.845620][2224:2224] CHIP:DMG:         suppressResponse = false,
+          [1686202227.845684][2224:2224] CHIP:DMG:         timedRequest = false,
+          [1686202227.845743][2224:2224] CHIP:DMG:         InvokeRequests =
+          [1686202227.845818][2224:2224] CHIP:DMG:         [
+          [1686202227.845875][2224:2224] CHIP:DMG:                 CommandDataIB =
+          [1686202227.845939][2224:2224] CHIP:DMG:                 {
+          [1686202227.846043][2224:2224] CHIP:DMG:                         CommandPathIB =
+          [1686202227.846133][2224:2224] CHIP:DMG:                         {
+          [1686202227.846207][2224:2224] CHIP:DMG:                                 EndpointId = 0x0,
+          [1686202227.846337][2224:2224] CHIP:DMG:                                 ClusterId = 0x31,
+          [1686202227.846469][2224:2224] CHIP:DMG:                                 CommandId = 0x4,
+          [1686202227.846591][2224:2224] CHIP:DMG:                         },
+          [1686202227.846714][2224:2224] CHIP:DMG:
+          [1686202227.846780][2224:2224] CHIP:DMG:                         CommandFields =
+          [1686202227.846896][2224:2224] CHIP:DMG:                         {
+          [1686202227.847022][2224:2224] CHIP:DMG:                                 0x0 = [
+          [1686202227.847157][2224:2224] CHIP:DMG:                                                 0x47, 0x52, 0x4c, 0x50, 0x72, 0x69, 0x76, 0x61, 0x74, 0x65,
+          [1686202227.847291][2224:2224] CHIP:DMG:                                 ] (10 bytes)
+          [1686202227.847417][2224:2224] CHIP:DMG:                         },
+          [1686202227.847530][2224:2224] CHIP:DMG:                 },
+          [1686202227.847607][2224:2224] CHIP:DMG:
+          [1686202227.847663][2224:2224] CHIP:DMG:         ],
+          [1686202227.847734][2224:2224] CHIP:DMG:
+          [1686202227.847789][2224:2224] CHIP:DMG:         InteractionModelRevision = 1
+          [1686202227.847846][2224:2224] CHIP:DMG: },
+          [1686202227.848006][2224:2224] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0031 e=0 p=a
+          [1686202227.848086][2224:2224] CHIP:DMG: AccessControl: allowed
+          [1686202227.848152][2224:2224] CHIP:DMG: Received command for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0004
+      disabled: true

@@ -21,6 +21,7 @@
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
 #include <controller/python/chip/interaction_model/Delegate.h>
+#include <controller/python/chip/native/PyChipError.h>
 #include <lib/support/TypeTraits.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -49,15 +50,13 @@ void pychip_InteractionModelDelegate_SetOnWriteResponseStatusCallback(PythonInte
 
 extern "C" {
 
-static_assert(std::is_same<uint32_t, chip::ChipError::StorageType>::value, "python assumes CHIP_ERROR maps to c_uint32");
-
-chip::ChipError::StorageType pychip_InteractionModel_GetCommandSenderHandle(uint64_t * commandSender)
+PyChipError pychip_InteractionModel_GetCommandSenderHandle(uint64_t * commandSender)
 {
     chip::app::CommandSender * commandSenderObj = nullptr;
-    VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
-    commandSenderObj = new chip::app::CommandSender(nullptr, nullptr);
-    VerifyOrReturnError(commandSenderObj != nullptr, (CHIP_ERROR_NO_MEMORY).AsInteger());
+    VerifyOrReturnError(commandSender != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+    commandSenderObj = new (std::nothrow) chip::app::CommandSender(nullptr, nullptr);
+    VerifyOrReturnError(commandSenderObj != nullptr, ToPyChipError((CHIP_ERROR_NO_MEMORY)));
     *commandSender = reinterpret_cast<uint64_t>(commandSenderObj);
-    return CHIP_NO_ERROR.AsInteger();
+    return ToPyChipError(CHIP_NO_ERROR);
 }
 }

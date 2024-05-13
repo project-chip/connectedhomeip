@@ -1,0 +1,342 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    30.1.16. [TC-CADMIN-1.16] Removing Fabrics from DUT and Fabric index
+    enumeration using BCM [DUT - Commissionee]
+
+PICS:
+    - CADMIN.S
+    - CADMIN.S.F00
+
+config:
+    nodeId: 0x12344321
+    nodeId2:
+        type: node_id
+        defaultValue: 0xCAFE
+    nodeId3:
+        type: node_id
+        defaultValue: 0xC00FEE
+    endpoint: 0
+    waitAfterCommissioning:
+        type: int16u
+        defaultValue: 5000
+    payload:
+        type: char_string
+        defaultValue: "MT:-24J0AFN00KA0648G00"
+    PIXIT.CADMIN.CwDuration:
+        type: int16u
+        defaultValue: 180
+
+tests:
+    - label: "Precondition: Reset Devices to factory defaults"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "FactoryReset"
+
+    - label: "Precondition: Reset Devices to factory defaults"
+      verification: |
+          Reset Devices to factory defaults
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Factory Reset the DUT and enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 1: TH_CR1 starts a commissioning process with DUT_CE"
+      identity: "alpha"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: payload
+
+    - label: "Step 1: TH_CR1 commissioned with DUT_CE"
+      identity: "alpha"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Step 2: TH_CR1 opens a commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
+      identity: "alpha"
+      cluster: "Administrator Commissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      PICS: CADMIN.S.C01.Rsp
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: PIXIT.CADMIN.CwDuration
+
+    - label: "Step 2a: Waiting after opening commissioning window"
+      PICS: CADMIN.S.C01.Rsp
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
+
+    - label: "Step 3: TH_CR2 starts a commissioning process with DUT_CE"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: payload
+
+    - label: "Step 3a: DUT_CE is commissioned to TH_CR2"
+      PICS: CADMIN.S
+      identity: "beta"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+
+    - label:
+          "Step 4: TH_CR1 opens a commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
+      identity: "alpha"
+      cluster: "Administrator Commissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      PICS: CADMIN.S.C01.Rsp
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: PIXIT.CADMIN.CwDuration
+
+    - label: "Step 4a: Waiting after opening commissioning window"
+      PICS: CADMIN.S.C01.Rsp
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
+
+    - label: "Step 5: TH_CR3 starts a commissioning process with DUT_CE"
+      PICS: CADMIN.S
+      identity: "gamma"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId3
+              - name: "payload"
+                value: payload
+
+    - label: "Step 5a: DUT_CE is commissioned to TH_CR3"
+      PICS: CADMIN.S
+      identity: "gamma"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId3
+
+    - label:
+          "Step 5b: TH3 reads CurrentFabricIndex attribute and save it for
+          future use."
+      identity: "gamma"
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: TH3FabricIndex
+
+    - label: "Step 6: TH_CR2 reads the list of Fabrics on DUT_CE"
+      identity: "beta"
+      cluster: "Operational Credentials"
+      PICS: OPCREDS.S.A0001
+      command: "readAttribute"
+      attribute: "Fabrics"
+      fabricFiltered: false
+      response:
+          value:
+              [
+                  { Label: "", FabricIndex: 1, NodeID: nodeId },
+                  { Label: "", FabricIndex: 2, NodeID: nodeId2 },
+                  { Label: "", FabricIndex: 3, NodeID: nodeId3 },
+              ]
+          constraints:
+              type: list
+
+    - label:
+          "Step 7: TH_CR2 sends RemoveFabric with FabricIndex = 2 command to
+          DUT_CE"
+      PICS: OPCREDS.S.C0a.Rsp
+      identity: "beta"
+      cluster: "Operational Credentials"
+      command: "RemoveFabric"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "FabricIndex"
+                value: 2
+
+    - label:
+          "Step 8a: TH_CR2 writes the Basic Information Clusters NodeLabel
+          mandatory attribute of DUT_CE"
+      PICS: BINFO.S.A0005
+      identity: "beta"
+      command: "writeAttribute"
+      cluster: "Basic Information"
+      attribute: "NodeLabel"
+      arguments:
+          value: "chiptest"
+      response:
+          error: FAILURE
+
+    - label:
+          "Step 8b: TH_CR2 reads the Basic Information Clusters NodeLabel
+          mandatory attribute of DUT_CE"
+      PICS: BINFO.S.A0005
+      identity: "beta"
+      command: "readAttribute"
+      cluster: "Basic Information"
+      attribute: "NodeLabel"
+      response:
+          error: FAILURE
+
+    - label: "Step 9: TH_CR1 reads the list of Fabrics on DUT_CE"
+      identity: "alpha"
+      PICS: OPCREDS.S.A0001
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "Fabrics"
+      fabricFiltered: false
+      response:
+          constraints:
+              type: list
+              contains:
+                  [
+                      { Label: "", FabricIndex: 1, NodeID: nodeId },
+                      { Label: "", FabricIndex: 3, NodeID: nodeId3 },
+                  ]
+
+    - label:
+          "Step 11: TH_CR1 opens a commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
+      identity: "alpha"
+      PICS: CADMIN.S.C01.Rsp
+      cluster: "Administrator Commissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: PIXIT.CADMIN.CwDuration
+
+    - label: "Step 11a: Waiting after opening commissioning window"
+      PICS: CADMIN.S.C01.Rsp
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
+
+    - label: "Step 12: TH_CR2 starts a commissioning process with DUT_CE"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: payload
+
+    - label: "Step 12a: DUT_CE is commissioned to TH_CR2"
+      PICS: CADMIN.S
+      identity: "beta"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+
+    - label:
+          "Step 12b: TH2 reads CurrentFabricIndex attribute and save it for
+          future use."
+      identity: "beta"
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: TH2FabricIndex
+
+    - label: "Step 13: TH_CR1 reads the list of Fabrics on DUT_CE"
+      identity: "alpha"
+      PICS: OPCREDS.S.A0001
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "Fabrics"
+      fabricFiltered: false
+      response:
+          constraints:
+              type: list
+              contains:
+                  [
+                      { Label: "", FabricIndex: 1, NodeID: nodeId },
+                      { Label: "", FabricIndex: 4, NodeID: nodeId2 },
+                      { Label: "", FabricIndex: 3, NodeID: nodeId3 },
+                  ]
+
+    - label: "Step 13a: Remove TH2 FabricIndex"
+      PICS: OPCREDS.S.C0a.Rsp && CADMIN.S
+      identity: "beta"
+      cluster: "Operational Credentials"
+      command: "RemoveFabric"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "FabricIndex"
+                value: TH2FabricIndex
+
+    - label: "Step 13b: Remove TH3 FabricIndex"
+      PICS: OPCREDS.S.C0a.Rsp && CADMIN.S
+      identity: "gamma"
+      cluster: "Operational Credentials"
+      command: "RemoveFabric"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "FabricIndex"
+                value: TH3FabricIndex

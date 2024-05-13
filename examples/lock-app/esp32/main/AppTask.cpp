@@ -16,19 +16,18 @@
  */
 
 #include "AppTask.h"
-#include "AppConfig.h"
-#include "AppEvent.h"
 #include "Button.h"
 #include "LEDWidget.h"
 #include "esp_log.h"
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
-#include <app/util/af-enums.h>
+
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
+#include <lock/AppConfig.h>
+#include <lock/AppEvent.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
@@ -79,19 +78,16 @@ CHIP_ERROR AppTask::StartAppTask()
 
 CHIP_ERROR AppTask::Init()
 {
-    // Create FreeRTOS sw timer for Function Selection.
+    // Create FreeRTOS sw timer for Function Selection
     sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel
                                   1,                // == default timer period (mS)
                                   false,            // no timer reload (==one-shot)
                                   (void *) this,    // init timer id = app task obj context
                                   TimerEventHandler // timer callback handler
     );
-    CHIP_ERROR err = BoltLockMgr().Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGI(TAG, "BoltLockMgr().Init() failed");
-        return err;
-    }
+
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = BoltLockMgr().InitLockState();
 
     BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
@@ -103,7 +99,7 @@ CHIP_ERROR AppTask::Init()
 
     sLockLED.Set(!BoltLockMgr().IsUnlocked());
 
-    chip::DeviceLayer::SystemLayer().ScheduleWork(UpdateClusterState, nullptr);
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -201,12 +197,12 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     int32_t actor;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (aEvent->Type == AppEvent::kEventType_Lock)
+    if (aEvent->mType == AppEvent::kEventType_Lock)
     {
-        action = static_cast<BoltLockManager::Action_t>(aEvent->LockEvent.Action);
-        actor  = aEvent->LockEvent.Actor;
+        action = static_cast<BoltLockManager::Action_t>(aEvent->mLockEvent.mAction);
+        actor  = aEvent->mLockEvent.mActor;
     }
-    else if (aEvent->Type == AppEvent::kEventType_Button)
+    else if (aEvent->mType == AppEvent::kEventType_Button)
     {
         if (BoltLockMgr().IsUnlocked())
         {
@@ -241,19 +237,19 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
         return;
     }
 
-    AppEvent button_event           = {};
-    button_event.Type               = AppEvent::kEventType_Button;
-    button_event.ButtonEvent.PinNo  = btnIdx;
-    button_event.ButtonEvent.Action = btnAction;
+    AppEvent button_event             = {};
+    button_event.mType                = AppEvent::kEventType_Button;
+    button_event.mButtonEvent.mPinNo  = btnIdx;
+    button_event.mButtonEvent.mAction = btnAction;
 
     if (btnIdx == APP_LOCK_BUTTON && btnAction == APP_BUTTON_PRESSED)
     {
-        button_event.Handler = LockActionEventHandler;
+        button_event.mHandler = LockActionEventHandler;
         sAppTask.PostEvent(&button_event);
     }
     else if (btnIdx == APP_FUNCTION_BUTTON)
     {
-        button_event.Handler = FunctionHandler;
+        button_event.mHandler = FunctionHandler;
         sAppTask.PostEvent(&button_event);
     }
 }
@@ -261,15 +257,15 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
 void AppTask::TimerEventHandler(TimerHandle_t xTimer)
 {
     AppEvent event;
-    event.Type               = AppEvent::kEventType_Timer;
-    event.TimerEvent.Context = (void *) xTimer;
-    event.Handler            = FunctionTimerEventHandler;
+    event.mType                = AppEvent::kEventType_Timer;
+    event.mTimerEvent.mContext = (void *) xTimer;
+    event.mHandler             = FunctionTimerEventHandler;
     sAppTask.PostEvent(&event);
 }
 
 void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 {
-    if (aEvent->Type != AppEvent::kEventType_Timer)
+    if (aEvent->mType != AppEvent::kEventType_Timer)
     {
         return;
     }
@@ -304,7 +300,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 
 void AppTask::FunctionHandler(AppEvent * aEvent)
 {
-    if (aEvent->ButtonEvent.PinNo != APP_FUNCTION_BUTTON)
+    if (aEvent->mButtonEvent.mPinNo != APP_FUNCTION_BUTTON)
     {
         return;
     }
@@ -316,7 +312,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
     // FACTORY_RESET_TRIGGER_TIMEOUT to signal factory reset has been initiated.
     // To cancel factory reset: release the APP_FUNCTION_BUTTON once all LEDs
     // start blinking within the FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
-    if (aEvent->ButtonEvent.Action == APP_BUTTON_PRESSED)
+    if (aEvent->mButtonEvent.mAction == APP_BUTTON_PRESSED)
     {
         if (!sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_NoneSelected)
         {
@@ -326,7 +322,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
     }
     else
     {
-        // If the button was released before factory reset got initiated, start BLE advertissement in fast mode
+        // If the button was released before factory reset got initiated, start BLE advertisement in fast mode
         if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_StartBleAdv)
         {
             sAppTask.CancelTimer();
@@ -340,7 +336,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
             }
             else
             {
-                ESP_LOGI(TAG, "Network is already provisioned, Ble advertissement not enabled");
+                ESP_LOGI(TAG, "Network is already provisioned, Ble advertisement not enabled");
             }
         }
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
@@ -426,15 +422,20 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
 
         sLockLED.Set(false);
     }
+    if (sAppTask.mSyncClusterToButtonAction)
+    {
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
+        sAppTask.mSyncClusterToButtonAction = false;
+    }
 }
 
 void AppTask::PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aAction)
 {
     AppEvent event;
-    event.Type             = AppEvent::kEventType_Lock;
-    event.LockEvent.Actor  = aActor;
-    event.LockEvent.Action = aAction;
-    event.Handler          = LockActionEventHandler;
+    event.mType              = AppEvent::kEventType_Lock;
+    event.mLockEvent.mActor  = aActor;
+    event.mLockEvent.mAction = aAction;
+    event.mHandler           = LockActionEventHandler;
     PostEvent(&event);
 }
 
@@ -451,9 +452,9 @@ void AppTask::PostEvent(const AppEvent * aEvent)
 
 void AppTask::DispatchEvent(AppEvent * aEvent)
 {
-    if (aEvent->Handler)
+    if (aEvent->mHandler)
     {
-        aEvent->Handler(aEvent);
+        aEvent->mHandler(aEvent);
     }
     else
     {
@@ -462,15 +463,14 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 }
 
 /* if unlocked then it locked it first*/
-void AppTask::UpdateClusterState(chip::System::Layer *, void * context)
+void AppTask::UpdateClusterState(intptr_t context)
 {
     uint8_t newValue = !BoltLockMgr().IsUnlocked();
 
     // write the new on/off value
-    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                                 (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    Protocols::InteractionModel::Status status = chip::app::Clusters::OnOff::Attributes::OnOff::Set(1, newValue);
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        ESP_LOGI(TAG, "ERR: updating on/off %x", status);
+        ESP_LOGI(TAG, "ERR: updating on/off %x", to_underlying(status));
     }
 }

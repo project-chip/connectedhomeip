@@ -39,3 +39,7 @@ executable("chip-shell") {
 group("standalone") {
   deps = [ ":chip-shell" ]
 }
+
+group("default") {
+  deps = [ ":chip-shell" ]
+}

@@ -16,11 +16,13 @@ scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug 
 
 In addition to the general options available to all Linux applications, the
 following command line options are available for the OTA Requestor application.
+Note that these options are for testing purposes.
 
 | Command Line Option                                      | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | -a, --autoApplyImage                                     | If supplied, apply the image immediately after download. Otherwise, the OTA update is complete after image download.                                                                                                                                                                                                                                                                                                                                                                                              |
 | -c, --requestorCanConsent \<true \| false\>              | Value for the RequestorCanConsent field in the QueryImage command. If not supplied, the value is determined by the driver.                                                                                                                                                                                                                                                                                                                                                                                        |
+| -d, --disableNotifyUpdateApplied                         | If supplied, disable sending of the NotifyUpdateApplied command. Otherwise, after successfully loading into the updated image, send the NotifyUpdateApplied command.                                                                                                                                                                                                                                                                                                                                              |
 | -f, --otaDownloadPath \<file path\>                      | If supplied, the OTA image is downloaded to the given fully-qualified file-path. Otherwise, the default location for the downloaded image is at /tmp/test.bin                                                                                                                                                                                                                                                                                                                                                     |
 | -p, --periodicQueryTimeout \<time in seconds\>           | The periodic time interval to wait before attempting to query a provider from the default OTA provider list. If none or zero is supplied, the value is determined by the driver.                                                                                                                                                                                                                                                                                                                                  |
 | -u, --userConsentState \<granted \| denied \| deferred\> | Represents the current user consent status when the OTA Requestor is acting as a user consent delegate. This value is only applicable if value of the UserConsentNeeded field in the QueryImageResponse is set to true. This value is used for the first attempt to download. For all subsequent queries, the value of granted will be used.<li> granted: Authorize OTA requestor to download an OTA image <li> denied: Forbid OTA requestor to download an OTA image <li> deferred: Defer obtaining user consent |
@@ -212,7 +214,7 @@ scripts/examples/gn_build_example.sh examples/ota-provider-app/linux/ out chip_c
 **Run the OTA Provider application**
 
 ```
-out/chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin
+out/chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/ota-image.bin
 ```
 
 #### In terminal 2:
@@ -246,12 +248,12 @@ out/chip-tool pairing onnetwork-long 0x1234567890 20202021 18
 **Issue the AnnounceOTAProvider command**
 
 ```
-out/chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+out/chip-tool otasoftwareupdaterequestor announce-otaprovider 0xDEADBEEF 0 0 0 0x1234567890 0
 ```
 
 The OTA Requestor application with node ID 0x1234567890 will process this
 command and send a QueryImage command to the OTA Provider with node ID
-0xDEADBEEF, as specified in the `AnnounceOTAProvider` command.
+`0xDEADBEEF`, as specified in the `AnnounceOTAProvider` command.
 
 ### Trigger using DefaultOTAProviders attribute
 
@@ -270,7 +272,7 @@ scripts/examples/gn_build_example.sh examples/ota-provider-app/linux/ out chip_c
 **Run the OTA Provider application**
 
 ```
-out/chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin
+out/chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/ota-image.bin
 ```
 
 #### In terminal 2:
@@ -304,12 +306,12 @@ out/chip-tool pairing onnetwork-long 0x1234567890 20202021 18
 **Write to the DefaultOTAProviders attribute**
 
 ```
-out/chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 1, "providerNodeID": 3735928559, "endpoint": 0}]' 0x0000001234567890 0
+out/chip-tool otasoftwareupdaterequestor write default-otaproviders '[{"providerNodeID": 3735928559, "endpoint": 0}]' 0x1234567890 0
 ```
 
 Every 60 seconds from when the OTA Requestor application has launched, the OTA
 Requestor application with node ID 0x1234567890 will send a QueryImage command
-to the OTA Provider with node ID 0xDEADBEEF, as specified in the
+to the OTA Provider with node ID `0xDEADBEEF`, as specified in the
 `DefaultOTAProviders` attribute.
 
 ## DefaultOTAProviders attribute
@@ -319,48 +321,108 @@ structs. Each entry in this list is a default OTA Provider per fabric. There can
 not be more than one entry containing the same fabric.
 
 To add more than one entry to the `DefaultOTAProviders` attribute, the OTA
-Requestor app must be commissioned on multiple fabrics. This can be done as
-specified below:
+Requestor app must be commissioned into multiple fabrics. At least one OTA
+Provider app should be commissioned into each corresponding fabric that the OTA
+Requestor app had been commissioned into.
 
-**Build and run the OTA Requestor application**
+The following example has two OTA Provider apps, each commissioned into a
+different fabric (alpha and beta) and one OTA Requestor app commissioned into
+both alpha and beta fabrics.
+
+### In terminal 1:
+
+**Build the OTA Provider application**
+
+```
+scripts/examples/gn_build_example.sh examples/ota-provider-app/linux/ out chip_config_network_layer_ble=false
+```
+
+**Run the first OTA Provider application**
+
+```
+out/chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/ota-image.bin
+```
+
+### In terminal 2:
+
+**Run the second OTA Provider application**
+
+```
+out/chip-ota-provider-app --discriminator 23 --secured-device-port 5566 --KVS /tmp/chip_kvs_provider2 --filepath /tmp/ota-image2.bin
+```
+
+### In terminal 3:
+
+**Build the OTA Requestor application**
 
 ```
 scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux/ out chip_config_network_layer_ble=false
-out/chip-ota-requestor-app --discriminator 18 --secured-device-port 5560 --KVS /tmp/chip_kvs_requestor --otaDownloadPath /tmp/test.bin
 ```
 
-**Commission to the first fabric**
+**Run the OTA Requestor application**
 
 ```
-out/chip-tool pairing onnetwork-long 0x1234567890 20202021 18
+out/chip-ota-requestor-app --discriminator 18 --secured-device-port 5560 --KVS /tmp/chip_kvs_requestor --periodicQueryTimeout 10
 ```
 
-**Open Basic Commissioning Window**
+### In terminal 4:
+
+**Commission the first OTA Provider into the first fabric (alpha)**
 
 ```
-out/chip-tool administratorcommissioning open-basic-commissioning-window 600 0x1234567890 0 --timedInteractionTimeoutMs 600
+out/chip-tool pairing onnetwork-long 0xC0FFEE 20202021 22
 ```
 
-**Commission to the second fabric**
+**Commission the second OTA Provider into the second fabric (beta)**
 
 ```
-out/chip-tool pairing onnetwork-long 0x858 20202021 18 --commissioner-name beta
+out/chip-tool pairing onnetwork-long 0xB0BA 20202021 23 --commissioner-name beta
 ```
 
-For all operations, specify which fabric to use by passing in
+**Commission the OTA Requestor application into the first fabric (alpha)**
+
+```
+out/chip-tool pairing onnetwork-long 0xDEB 20202021 18
+```
+
+**Open Basic Commissioning Window for the OTA Requestor application**
+
+```
+out/chip-tool administratorcommissioning open-basic-commissioning-window 600 0xDEB 0 --timedInteractionTimeoutMs 600
+```
+
+**Commission the OTA Requestor application into the second fabric (beta)**
+
+```
+out/chip-tool pairing onnetwork-long 0xB0B 20202021 18 --commissioner-name beta
+```
+
+**Write/Read DefaultOTAProviders on the first fabric (alpha)**
+
+```
+out/chip-tool otasoftwareupdaterequestor write default-otaproviders '[{"providerNodeID": 12648430, "endpoint": 0}]' 0xDEB 0
+out/chip-tool otasoftwareupdaterequestor read default-otaproviders 0xDEB 0
+```
+
+**Write/Read DefaultOTAProviders on second fabric (beta)**
+
+```
+out/chip-tool otasoftwareupdaterequestor write default-otaproviders '[{"providerNodeID": 45242, "endpoint": 0}]' 0xB0B 0 --commissioner-name beta
+out/chip-tool otasoftwareupdaterequestor read default-otaproviders 0xB0B 0 --commissioner-name beta
+```
+
+**Write ACL for the first OTA Provider application**
+
+```
+out/chip-tool accesscontrol write acl '[{"privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"privilege": 3, "authMode": 2, "subjects": null, "targets": [{"cluster": 41, "endpoint": null, "deviceType": null}]}]' 0xC0FFEE 0
+```
+
+**Write ACL for the second OTA Provider application**
+
+```
+out/chip-tool accesscontrol write acl '[{"privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"privilege": 3, "authMode": 2, "subjects": null, "targets": [{"cluster": 41, "endpoint": null, "deviceType": null}]}]' 0xB0BA 0 --commissioner-name beta
+```
+
+NOTE: For all operations, specify which fabric to use by passing in
 `--commissioner-name`. The supported values are alpha, beta, and gamma. By
 default, if none is supplied, alpha is used.
-
-**Write/Read DefaultOTAProviders on first fabric**
-
-```
-out/chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 1, "providerNodeID": 3735928559, "endpoint": 0}]' 0x0000001234567890 0
-out/chip-tool otasoftwareupdaterequestor read default-ota-providers 0x1234567890 0
-```
-
-**Write/Read DefaultOTAProviders on second fabric**
-
-```
-out/chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 2, "providerNodeID": 1, "endpoint": 0}]' 0x858 0 --commissioner-name beta
-out/chip-tool otasoftwareupdaterequestor read default-ota-providers 0x858 0 --commissioner-name beta
-```

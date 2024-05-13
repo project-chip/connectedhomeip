@@ -1,0 +1,300 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    131.2.4. [TC-G-2.4] Commands - AddGroup Command with same GroupID on
+    Multiple Endpoint [DUT-Server]
+
+PICS:
+    - G.S
+    - MCORE.G.MULTIENDPOINT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Groups"
+    endpoint: 0
+
+    # Users should set endpoint value on the command line to PIXIT.G.ENDPOINT1
+    Groups.Endpoint1: 1
+
+    # Users should set endpoint value on the command line to PIXIT.G.ENDPOINT2
+    Groups.Endpoint2: 2
+
+tests:
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Step 1: Verify that PIXIT.G.ENDPOINT and PIXIT.G.ENDPOINT2 are
+          different."
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: Groups.Endpoint1
+              - name: "Value2"
+                value: Groups.Endpoint2
+      response:
+          - values:
+                - name: "Equals"
+                  value: false
+
+    - label:
+          "Step 2: TH sends KeySetWrite command in the GroupKeyManagement
+          cluster to DUT on EP0 using a key that is pre-installed on the TH.
+          GroupKeySet fields are as follows: 1)GroupKeySetID: 1
+          2)GroupKeySecurityPolicy: TrustFirst (0) 3)EpochKey0:
+          d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1 5)EpochKey1:
+          d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1:
+          18446744073709551613 7)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          8)EpochStartTime2: 18446744073709551614"
+      PICS: GRPKEY.S.C00.Rsp
+      cluster: "Group Key Management"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime0: 1,
+                        EpochKey1: "hex:d1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime1: 18446744073709551613,
+                        EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime2: 18446744073709551614,
+                    }
+
+    - label:
+          "Step 3: TH writes the GroupKeyMap attribute in the GroupKeyManagement
+          cluster on EP0 with one entry binding GroupId(0x0001) with
+          GroupKeySetID 1"
+      PICS: GRPKEY.S.A0000
+      cluster: "Group Key Management"
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value: [{ FabricIndex: 1, GroupId: 0x0001, GroupKeySetID: 1 }]
+
+    - label:
+          "Step 4a: TH cleans up the groups by sending the RemoveAllGroups
+          command to the DUT on PIXIT.G.ENDPOINT1"
+      endpoint: Groups.Endpoint1
+      command: "RemoveAllGroups"
+
+    - label:
+          "Step 4b: TH cleans up the groups by sending the RemoveAllGroups
+          command to the DUT on PIXIT.G.ENDPOINT2"
+      endpoint: Groups.Endpoint2
+      command: "RemoveAllGroups"
+
+    - label:
+          "Step 5a: TH sends AddGroup command to DUT on PIXIT.G.ENDPOINT with
+          the following fields:1) GroupID as 0x0001, 2)GroupName as 'Gp1'"
+      PICS: G.S.C00.Rsp && G.S.C00.Tx
+      endpoint: Groups.Endpoint1
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0001
+              - name: GroupName
+                value: "Gp1"
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "GroupID"
+                value: 0x0001
+
+    - label:
+          "Step 5b: TH sends AddGroup command to DUT on PIXIT.G.ENDPOINT2 with
+          the following fields: GroupID as 0x0001,GroupName as 'Gp2'"
+      PICS: G.S.C00.Rsp && G.S.C00.Tx
+      endpoint: Groups.Endpoint2
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0001
+              - name: GroupName
+                value: "Gp2"
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "GroupID"
+                value: 0x0001
+
+    - label:
+          "Step 6: TH reads GroupTable attribute from the GroupKeyManagement
+          cluster from DUT on EP0"
+      PICS: GRPKEY.S.A0001
+      cluster: "Group Key Management"
+      command: "readAttribute"
+      attribute: "GroupTable"
+      response:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0001,
+                      Endpoints: [Groups.Endpoint1, Groups.Endpoint2],
+                  },
+              ]
+
+    - label:
+          "Step 7: TH reads GroupTable attribute from the GroupKeyManagement
+          cluster from DUT on EP0, Verify that the GroupTable contains an entry
+          with the GroupName as 'Gp2'"
+      PICS: GRPKEY.S.A0001 && G.S.F00
+      cluster: "Group Key Management"
+      command: "readAttribute"
+      attribute: "GroupTable"
+      response:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0001,
+                      Endpoints: [Groups.Endpoint1, Groups.Endpoint2],
+                      GroupName: "Gp2",
+                  },
+              ]
+
+    - label:
+          "Step 8: TH sends ViewGroup command to DUT on PIXIT.G.ENDPOINT with
+          the following fields: GroupID as 0x0001"
+      PICS: G.S.C01.Rsp && G.S.C01.Tx
+      endpoint: Groups.Endpoint1
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0001
+      response:
+          values:
+              - name: Status
+                value: 0x00
+              - name: GroupID
+                value: 0x0001
+
+    - label:
+          "Step 9: TH sends ViewGroup command to DUT on PIXIT.G.ENDPOINT with
+          the following fields: GroupID as 0x0001. Verify that the
+          ViewGroupResponse contains GroupName as 'GP2'"
+      PICS: G.S.C01.Rsp && G.S.C01.Tx && G.S.F00
+      endpoint: Groups.Endpoint1
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0001
+      response:
+          values:
+              - name: Status
+                value: 0x00
+              - name: GroupID
+                value: 0x0001
+              - name: GroupName
+                value: "Gp2"
+
+    - label:
+          "Step 10: TH sends RemoveGroup command to DUT on PIXIT.G.ENDPOINT as
+          unicast with the following field: GroupID as 0x0001"
+      PICS: G.S.C03.Rsp && G.S.C03.Tx
+      endpoint: Groups.Endpoint1
+      command: "RemoveGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0001
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "GroupID"
+                value: 0x0001
+
+    - label:
+          "Step 11: TH reads GroupTable attribute from the GroupKeyManagement
+          cluster from DUT on EP0"
+      PICS: GRPKEY.S.A0001 && !G.S.F00
+      cluster: "Group Key Management"
+      command: "readAttribute"
+      attribute: "GroupTable"
+      response:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0001,
+                      Endpoints: [Groups.Endpoint2],
+                      GroupName: "",
+                  },
+              ]
+
+    - label:
+          "Step 11: TH reads GroupTable attribute from the GroupKeyManagement
+          cluster from DUT on EP0"
+      PICS: GRPKEY.S.A0001 && G.S.F00
+      cluster: "Group Key Management"
+      command: "readAttribute"
+      attribute: "GroupTable"
+      response:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0001,
+                      Endpoints: [Groups.Endpoint2],
+                      GroupName: "Gp2",
+                  },
+              ]
+
+    - label:
+          "Step 12: TH sends RemoveGroup command to DUT on PIXIT.G.ENDPOINT2 as
+          unicast with the following field: GroupID as 0x0001"
+      PICS: G.S.C03.Rsp && G.S.C03.Tx
+      endpoint: Groups.Endpoint2
+      command: "RemoveGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0001
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "GroupID"
+                value: 0x0001
+
+    - label:
+          "Step 13: TH reads GroupTable attribute from the GroupKeyManagement
+          cluster from DUT on EP0"
+      PICS: GRPKEY.S.A0001
+      cluster: "Group Key Management"
+      command: "readAttribute"
+      attribute: "GroupTable"
+      response:
+          value: []

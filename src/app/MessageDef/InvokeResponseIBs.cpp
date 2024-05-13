@@ -22,12 +22,12 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 
 namespace chip {
 namespace app {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR InvokeResponseIBs::Parser::CheckSchemaValidity() const
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+CHIP_ERROR InvokeResponseIBs::Parser::PrettyPrint() const
 {
     CHIP_ERROR err            = CHIP_NO_ERROR;
     size_t numInvokeResponses = 0;
@@ -46,7 +46,7 @@ CHIP_ERROR InvokeResponseIBs::Parser::CheckSchemaValidity() const
             InvokeResponseIB::Parser invokeResponse;
             ReturnErrorOnFailure(invokeResponse.Init(reader));
             PRETTY_PRINT_INCDEPTH();
-            ReturnErrorOnFailure(invokeResponse.CheckSchemaValidity());
+            ReturnErrorOnFailure(invokeResponse.PrettyPrint());
             PRETTY_PRINT_DECDEPTH();
         }
 
@@ -54,22 +54,29 @@ CHIP_ERROR InvokeResponseIBs::Parser::CheckSchemaValidity() const
     }
 
     PRETTY_PRINT("],");
-    PRETTY_PRINT("");
+    PRETTY_PRINT_BLANK_LINE();
 
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
-        // if we have at least one data element
+        // if we have at least one response
         if (numInvokeResponses > 0)
         {
             err = CHIP_NO_ERROR;
         }
     }
     ReturnErrorOnFailure(err);
-    ReturnErrorOnFailure(reader.ExitContainer(mOuterContainerType));
+    return reader.ExitContainer(mOuterContainerType);
+}
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
+
+CHIP_ERROR InvokeResponseIBs::Builder::InitWithEndBufferReserved(TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse)
+{
+    ReturnErrorOnFailure(Init(apWriter, aContextTagToUse));
+    ReturnErrorOnFailure(GetWriter()->ReserveBuffer(GetSizeToEndInvokeResponses()));
+    mIsEndBufferReserved = true;
     return CHIP_NO_ERROR;
 }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
 InvokeResponseIB::Builder & InvokeResponseIBs::Builder::CreateInvokeResponse()
 {
@@ -80,10 +87,24 @@ InvokeResponseIB::Builder & InvokeResponseIBs::Builder::CreateInvokeResponse()
     return mInvokeResponse;
 }
 
-InvokeResponseIBs::Builder & InvokeResponseIBs::Builder::EndOfInvokeResponses()
+CHIP_ERROR InvokeResponseIBs::Builder::EndOfInvokeResponses()
 {
+    // If any changes are made to how we end the invoke responses that involves how many bytes are
+    // needed, a corresponding change to GetSizeToEndInvokeResponses indicating the new size that
+    // will be required.
+    if (mIsEndBufferReserved)
+    {
+        ReturnErrorOnFailure(GetWriter()->UnreserveBuffer(GetSizeToEndInvokeResponses()));
+        mIsEndBufferReserved = false;
+    }
     EndOfContainer();
-    return *this;
+    return GetError();
+}
+
+uint32_t InvokeResponseIBs::Builder::GetSizeToEndInvokeResponses()
+{
+    uint32_t kEndOfContainerSize = 1;
+    return kEndOfContainerSize;
 }
 } // namespace app
 } // namespace chip

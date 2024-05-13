@@ -24,18 +24,6 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <app-common/zap-generated/enums.h>
-#include <app-common/zap-generated/ids/Events.h>
-#include <lib/support/CHIPMem.h>
-#include <lib/support/logging/CHIPLogging.h>
-#include <platform/DeviceControlServer.h>
-#include <platform/Linux/DeviceInfoProviderImpl.h>
-#include <platform/Linux/DiagnosticDataProviderImpl.h>
-#include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_POSIX.ipp>
-
-#include <thread>
-
 #include <arpa/inet.h>
 #include <dirent.h>
 #include <errno.h>
@@ -43,13 +31,19 @@
 #include <linux/rtnetlink.h>
 #include <net/if.h>
 #include <netinet/in.h>
-#include <signal.h>
 #include <unistd.h>
 
-#if __GLIBC__ == 2 && __GLIBC_MINOR__ < 30
-#include <sys/syscall.h>
-#define gettid() syscall(SYS_gettid)
-#endif
+#include <mutex>
+
+#include <app-common/zap-generated/ids/Events.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <platform/DeviceControlServer.h>
+#include <platform/DeviceInstanceInfoProvider.h>
+#include <platform/Linux/DeviceInstanceInfoProviderImpl.h>
+#include <platform/Linux/DiagnosticDataProviderImpl.h>
+#include <platform/PlatformManager.h>
+#include <platform/internal/GenericPlatformManagerImpl_POSIX.ipp>
 
 using namespace ::chip::app::Clusters;
 
@@ -60,67 +54,37 @@ PlatformManagerImpl PlatformManagerImpl::sInstance;
 
 namespace {
 
-void SignalHandler(int signum)
+#if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
+void * GLibMainLoopThread(void * userData)
 {
-    ChipLogDetail(DeviceLayer, "Caught signal %d", signum);
+    GMainLoop * loop       = static_cast<GMainLoop *>(userData);
+    GMainContext * context = g_main_loop_get_context(loop);
 
-    switch (signum)
-    {
-    case SIGUSR1:
-        PlatformMgrImpl().HandleSoftwareFault(SoftwareDiagnostics::Events::SoftwareFault::Id);
-        break;
-    case SIGUSR2:
-        PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::HardwareFaultChange::Id);
-        break;
-    case SIGHUP:
-        PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::RadioFaultChange::Id);
-        break;
-    case SIGTERM:
-        PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::NetworkFaultChange::Id);
-        break;
-    case SIGTSTP:
-        PlatformMgrImpl().HandleSwitchEvent(Switch::Events::SwitchLatched::Id);
-        break;
-    default:
-        break;
-    }
-}
-
-#if CHIP_WITH_GIO
-void GDBus_Thread()
-{
-    GMainLoop * loop = g_main_loop_new(nullptr, false);
-
+    g_main_context_push_thread_default(context);
     g_main_loop_run(loop);
-    g_main_loop_unref(loop);
+
+    return nullptr;
 }
 #endif
-} // namespace
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-void PlatformManagerImpl::WiFIIPChangeListener()
+
+gboolean WiFiIPChangeListener(GIOChannel * ch, GIOCondition /* condition */, void * /* userData */)
 {
-    int sock;
-    if ((sock = socket(PF_NETLINK, SOCK_RAW, NETLINK_ROUTE)) == -1)
-    {
-        ChipLogError(DeviceLayer, "Failed to init netlink socket for ip addresses.");
-        return;
-    }
 
-    struct sockaddr_nl addr;
-    memset(&addr, 0, sizeof(addr));
-    addr.nl_family = AF_NETLINK;
-    addr.nl_groups = RTMGRP_IPV4_IFADDR;
-
-    if (bind(sock, (struct sockaddr *) &addr, sizeof(addr)) == -1)
-    {
-        ChipLogError(DeviceLayer, "Failed to bind netlink socket for ip addresses.");
-        return;
-    }
-
-    ssize_t len;
     char buffer[4096];
-    for (struct nlmsghdr * header = reinterpret_cast<struct nlmsghdr *>(buffer); (len = recv(sock, header, sizeof(buffer), 0)) > 0;)
+    auto * header = reinterpret_cast<struct nlmsghdr *>(buffer);
+    ssize_t len;
+
+    if ((len = recv(g_io_channel_unix_get_fd(ch), buffer, sizeof(buffer), 0)) == -1)
+    {
+        if (errno == EINTR || errno == EAGAIN)
+            return G_SOURCE_CONTINUE;
+        ChipLogError(DeviceLayer, "Error reading from netlink socket: %d", errno);
+        return G_SOURCE_CONTINUE;
+    }
+
+    if (len > 0)
     {
         for (struct nlmsghdr * messageHeader = header;
              (NLMSG_OK(messageHeader, static_cast<uint32_t>(len))) && (messageHeader->nlmsg_type != NLMSG_DONE);
@@ -144,20 +108,30 @@ void PlatformManagerImpl::WiFIIPChangeListener()
                             continue;
                         }
 
-                        if (strcmp(name, ConnectivityManagerImpl::GetWiFiIfName()) != 0)
+                        if (ConnectivityMgrImpl().GetWiFiIfName() == nullptr)
+                        {
+                            ChipLogDetail(DeviceLayer, "No wifi interface name. Ignoring IP update event.");
+                            continue;
+                        }
+
+                        if (strcmp(name, ConnectivityMgrImpl().GetWiFiIfName()) != 0)
                         {
                             continue;
                         }
 
-                        ChipDeviceEvent event;
-                        event.Type                            = DeviceEventType::kInternetConnectivityChange;
-                        event.InternetConnectivityChange.IPv4 = kConnectivity_Established;
-                        event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
-                        inet_ntop(AF_INET, RTA_DATA(routeInfo), event.InternetConnectivityChange.address,
-                                  sizeof(event.InternetConnectivityChange.address));
+                        char ipStrBuf[chip::Inet::IPAddress::kMaxStringLength] = { 0 };
+                        inet_ntop(AF_INET, RTA_DATA(routeInfo), ipStrBuf, sizeof(ipStrBuf));
+                        ChipLogDetail(DeviceLayer, "Got IP address on interface: %s IP: %s", name, ipStrBuf);
 
-                        ChipLogDetail(DeviceLayer, "Got IP address on interface: %s IP: %s", name,
-                                      event.InternetConnectivityChange.address);
+                        ChipDeviceEvent event{ .Type                       = DeviceEventType::kInternetConnectivityChange,
+                                               .InternetConnectivityChange = { .IPv4 = kConnectivity_Established,
+                                                                               .IPv6 = kConnectivity_NoChange } };
+
+                        if (!chip::Inet::IPAddress::FromString(ipStrBuf, event.InternetConnectivityChange.ipAddress))
+                        {
+                            ChipLogDetail(DeviceLayer, "Failed to report IP address - ip address parsing failed");
+                            continue;
+                        }
 
                         CHIP_ERROR status = PlatformMgr().PostEvent(&event);
                         if (status != CHIP_NO_ERROR)
@@ -169,52 +143,113 @@ void PlatformManagerImpl::WiFIIPChangeListener()
             }
         }
     }
+    else
+    {
+        ChipLogError(DeviceLayer, "EOF on netlink socket");
+        return G_SOURCE_REMOVE;
+    }
+
+    return G_SOURCE_CONTINUE;
 }
+
+// The temporary hack for getting IP address change on linux for network provisioning in the rendezvous session.
+// This should be removed or find a better place once we deprecate the rendezvous session.
+CHIP_ERROR RunWiFiIPChangeListener()
+{
+    int sock;
+    if ((sock = socket(PF_NETLINK, SOCK_RAW, NETLINK_ROUTE)) == -1)
+    {
+        ChipLogError(DeviceLayer, "Failed to init netlink socket for IP addresses: %d", errno);
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    struct sockaddr_nl addr;
+    memset(&addr, 0, sizeof(addr));
+    addr.nl_family = AF_NETLINK;
+    addr.nl_groups = RTMGRP_IPV4_IFADDR;
+
+    if (bind(sock, (struct sockaddr *) &addr, sizeof(addr)) == -1)
+    {
+        ChipLogError(DeviceLayer, "Failed to bind netlink socket for IP addresses: %d", errno);
+        close(sock);
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    GIOChannel * ch       = g_io_channel_unix_new(sock);
+    GSource * watchSource = g_io_create_watch(ch, G_IO_IN);
+    g_source_set_callback(watchSource, G_SOURCE_FUNC(WiFiIPChangeListener), nullptr, nullptr);
+    g_io_channel_set_close_on_unref(ch, TRUE);
+    g_io_channel_set_encoding(ch, nullptr, nullptr);
+
+    PlatformMgrImpl().GLibMatterContextAttachSource(watchSource);
+
+    g_source_unref(watchSource);
+    g_io_channel_unref(ch);
+
+    return CHIP_NO_ERROR;
+}
+
 #endif // #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+} // namespace
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {
-    struct sigaction action;
+#if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
 
-    memset(&action, 0, sizeof(action));
-    action.sa_handler = SignalHandler;
-    sigaction(SIGHUP, &action, nullptr);
-    sigaction(SIGTERM, &action, nullptr);
-    sigaction(SIGUSR1, &action, nullptr);
-    sigaction(SIGUSR2, &action, nullptr);
-    sigaction(SIGTSTP, &action, nullptr);
+    auto * context      = g_main_context_new();
+    mGLibMainLoop       = g_main_loop_new(context, FALSE);
+    mGLibMainLoopThread = g_thread_new("gmain-matter", GLibMainLoopThread, mGLibMainLoop);
+    g_main_context_unref(context);
 
-#if CHIP_WITH_GIO
-    GError * error = nullptr;
+    {
+        // Wait for the GLib main loop to start. It is required that the context used
+        // by the main loop is acquired before any other GLib functions are called. Otherwise,
+        // the GLibMatterContextInvokeSync() might run functions on the wrong thread.
 
-    this->mpGDBusConnection = UniqueGDBusConnection(g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &error));
+        std::unique_lock<std::mutex> lock(mGLibMainLoopCallbackIndirectionMutex);
+        GLibMatterContextInvokeData invokeData{};
 
-    std::thread gdbusThread(GDBus_Thread);
-    gdbusThread.detach();
+        auto * idleSource = g_idle_source_new();
+        g_source_set_callback(
+            idleSource,
+            [](void * userData_) {
+                auto * data = reinterpret_cast<GLibMatterContextInvokeData *>(userData_);
+                std::unique_lock<std::mutex> lock_(PlatformMgrImpl().mGLibMainLoopCallbackIndirectionMutex);
+                data->mDone = true;
+                data->mDoneCond.notify_one();
+                return G_SOURCE_REMOVE;
+            },
+            &invokeData, nullptr);
+        GLibMatterContextAttachSource(idleSource);
+        g_source_unref(idleSource);
+
+        invokeData.mDoneCond.wait(lock, [&invokeData]() { return invokeData.mDone; });
+    }
+
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    std::thread wifiIPThread(WiFIIPChangeListener);
-    wifiIPThread.detach();
+    ReturnErrorOnFailure(RunWiFiIPChangeListener());
 #endif
 
     // Initialize the configuration system.
     ReturnErrorOnFailure(Internal::PosixConfig::Init());
-    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
-    SetDeviceInfoProvider(&DeviceInfoProviderImpl::GetDefaultInstance());
-    ReturnErrorOnFailure(DeviceInfoProviderImpl::GetDefaultInstance().Init());
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
     ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack());
+
+    // Now set up our device instance info provider.  We couldn't do that
+    // earlier, because the generic implementation sets a generic one.
+    SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
 
     mStartTime = System::SystemClock().GetMonotonicTimestamp();
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PlatformManagerImpl::_Shutdown()
+void PlatformManagerImpl::_Shutdown()
 {
     uint64_t upTime = 0;
 
@@ -236,183 +271,57 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
         ChipLogError(DeviceLayer, "Failed to get current uptime since the Node’s last reboot");
     }
 
-    return Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_Shutdown();
+    Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_Shutdown();
+
+#if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
+    g_main_loop_quit(mGLibMainLoop);
+    g_thread_join(mGLibMainLoopThread);
+    g_main_loop_unref(mGLibMainLoop);
+#endif
 }
 
-void PlatformManagerImpl::HandleGeneralFault(uint32_t EventId)
+#if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
+CHIP_ERROR PlatformManagerImpl::_GLibMatterContextInvokeSync(CHIP_ERROR (*func)(void *), void * userData)
 {
-    GeneralDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetGeneralDiagnosticsDelegate();
+    // Because of TSAN false positives, we need to use a mutex to synchronize access to all members of
+    // the GLibMatterContextInvokeData object (including constructor and destructor). This is a temporary
+    // workaround until TSAN-enabled GLib will be used in our CI.
+    std::unique_lock<std::mutex> lock(mGLibMainLoopCallbackIndirectionMutex);
 
-    if (delegate == nullptr)
-    {
-        ChipLogError(DeviceLayer, "No delegate registered to handle General Diagnostics event");
-        return;
-    }
+    GLibMatterContextInvokeData invokeData{ func, userData };
 
-    if (EventId == GeneralDiagnostics::Events::HardwareFaultChange::Id)
-    {
-        GeneralFaults<kMaxHardwareFaults> previous;
-        GeneralFaults<kMaxHardwareFaults> current;
+    lock.unlock();
 
-#if CHIP_CONFIG_TEST
-        // On Linux Simulation, set following hardware faults statically.
-        ReturnOnFailure(previous.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_RADIO));
-        ReturnOnFailure(previous.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_POWER_SOURCE));
+    g_main_context_invoke_full(
+        g_main_loop_get_context(mGLibMainLoop), G_PRIORITY_HIGH_IDLE,
+        [](void * userData_) {
+            auto * data = reinterpret_cast<GLibMatterContextInvokeData *>(userData_);
 
-        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_RADIO));
-        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_SENSOR));
-        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_POWER_SOURCE));
-        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_USER_INTERFACE_FAULT));
-#endif
-        delegate->OnHardwareFaultsDetected(previous, current);
-    }
-    else if (EventId == GeneralDiagnostics::Events::RadioFaultChange::Id)
-    {
-        GeneralFaults<kMaxRadioFaults> previous;
-        GeneralFaults<kMaxRadioFaults> current;
+            // XXX: Temporary workaround for TSAN false positives.
+            std::unique_lock<std::mutex> lock_(PlatformMgrImpl().mGLibMainLoopCallbackIndirectionMutex);
 
-#if CHIP_CONFIG_TEST
-        // On Linux Simulation, set following radio faults statically.
-        ReturnOnFailure(previous.add(EMBER_ZCL_RADIO_FAULT_TYPE_WI_FI_FAULT));
-        ReturnOnFailure(previous.add(EMBER_ZCL_RADIO_FAULT_TYPE_THREAD_FAULT));
+            auto mFunc     = data->mFunc;
+            auto mUserData = data->mFuncUserData;
 
-        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_WI_FI_FAULT));
-        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_CELLULAR_FAULT));
-        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_THREAD_FAULT));
-        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_NFC_FAULT));
-#endif
-        delegate->OnRadioFaultsDetected(previous, current);
-    }
-    else if (EventId == GeneralDiagnostics::Events::NetworkFaultChange::Id)
-    {
-        GeneralFaults<kMaxNetworkFaults> previous;
-        GeneralFaults<kMaxNetworkFaults> current;
+            lock_.unlock();
+            auto result = mFunc(mUserData);
+            lock_.lock();
 
-#if CHIP_CONFIG_TEST
-        // On Linux Simulation, set following radio faults statically.
-        ReturnOnFailure(previous.add(EMBER_ZCL_NETWORK_FAULT_TYPE_HARDWARE_FAILURE));
-        ReturnOnFailure(previous.add(EMBER_ZCL_NETWORK_FAULT_TYPE_NETWORK_JAMMED));
+            data->mDone       = true;
+            data->mFuncResult = result;
+            data->mDoneCond.notify_one();
 
-        ReturnOnFailure(current.add(EMBER_ZCL_NETWORK_FAULT_TYPE_HARDWARE_FAILURE));
-        ReturnOnFailure(current.add(EMBER_ZCL_NETWORK_FAULT_TYPE_NETWORK_JAMMED));
-        ReturnOnFailure(current.add(EMBER_ZCL_NETWORK_FAULT_TYPE_CONNECTION_FAILED));
-#endif
-        delegate->OnNetworkFaultsDetected(previous, current);
-    }
-    else
-    {
-        ChipLogError(DeviceLayer, "Unknow event ID:%d", EventId);
-    }
+            return G_SOURCE_REMOVE;
+        },
+        &invokeData, nullptr);
+
+    lock.lock();
+
+    invokeData.mDoneCond.wait(lock, [&invokeData]() { return invokeData.mDone; });
+
+    return invokeData.mFuncResult;
 }
-
-void PlatformManagerImpl::HandleSoftwareFault(uint32_t EventId)
-{
-    SoftwareDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetSoftwareDiagnosticsDelegate();
-
-    if (delegate != nullptr)
-    {
-        SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type softwareFault;
-        char threadName[kMaxThreadNameLength + 1];
-
-        softwareFault.id = gettid();
-        strncpy(threadName, std::to_string(softwareFault.id).c_str(), kMaxThreadNameLength);
-        threadName[kMaxThreadNameLength] = '\0';
-        softwareFault.name               = CharSpan::fromCharString(threadName);
-        softwareFault.faultRecording     = ByteSpan(Uint8::from_const_char("FaultRecording"), strlen("FaultRecording"));
-
-        delegate->OnSoftwareFaultDetected(softwareFault);
-    }
-}
-
-void PlatformManagerImpl::HandleSwitchEvent(uint32_t EventId)
-{
-    SwitchDeviceControlDelegate * delegate = DeviceControlServer::DeviceControlSvr().GetSwitchDelegate();
-
-    if (delegate == nullptr)
-    {
-        ChipLogError(DeviceLayer, "No delegate registered to handle Switch event");
-        return;
-    }
-
-    if (EventId == Switch::Events::SwitchLatched::Id)
-    {
-        uint8_t newPosition = 0;
-
-#if CHIP_CONFIG_TEST
-        newPosition = 100;
-#endif
-        delegate->OnSwitchLatched(newPosition);
-    }
-    else if (EventId == Switch::Events::InitialPress::Id)
-    {
-        uint8_t newPosition = 0;
-
-#if CHIP_CONFIG_TEST
-        newPosition = 100;
-#endif
-        delegate->OnInitialPressed(newPosition);
-    }
-    else if (EventId == Switch::Events::LongPress::Id)
-    {
-        uint8_t newPosition = 0;
-
-#if CHIP_CONFIG_TEST
-        newPosition = 100;
-#endif
-        delegate->OnLongPressed(newPosition);
-    }
-    else if (EventId == Switch::Events::ShortRelease::Id)
-    {
-        uint8_t previousPosition = 0;
-
-#if CHIP_CONFIG_TEST
-        previousPosition = 50;
-#endif
-        delegate->OnShortReleased(previousPosition);
-    }
-    else if (EventId == Switch::Events::LongRelease::Id)
-    {
-        uint8_t previousPosition = 0;
-
-#if CHIP_CONFIG_TEST
-        previousPosition = 50;
-#endif
-        delegate->OnLongReleased(previousPosition);
-    }
-    else if (EventId == Switch::Events::MultiPressOngoing::Id)
-    {
-        uint8_t newPosition                   = 0;
-        uint8_t currentNumberOfPressesCounted = 0;
-
-#if CHIP_CONFIG_TEST
-        newPosition                   = 10;
-        currentNumberOfPressesCounted = 5;
-#endif
-        delegate->OnMultiPressOngoing(newPosition, currentNumberOfPressesCounted);
-    }
-    else if (EventId == Switch::Events::MultiPressComplete::Id)
-    {
-        uint8_t newPosition                 = 0;
-        uint8_t totalNumberOfPressesCounted = 0;
-
-#if CHIP_CONFIG_TEST
-        newPosition                 = 10;
-        totalNumberOfPressesCounted = 5;
-#endif
-        delegate->OnMultiPressComplete(newPosition, totalNumberOfPressesCounted);
-    }
-    else
-    {
-        ChipLogError(DeviceLayer, "Unknow event ID:%d", EventId);
-    }
-}
-
-#if CHIP_WITH_GIO
-GDBusConnection * PlatformManagerImpl::GetGDBusConnection()
-{
-    return this->mpGDBusConnection.get();
-}
-#endif
+#endif // CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
 
 } // namespace DeviceLayer
 } // namespace chip

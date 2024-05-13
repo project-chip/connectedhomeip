@@ -1,0 +1,218 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 219.2.1. [TC-TCCM-2.1] ChangeToMode verification with DUT as Server
+
+PICS:
+    - TCCM.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      verification: |
+
+      disabled: true
+
+    - label: "Step 2: TH reads from the DUT the SupportedModes attribute."
+      PICS: TCCM.S.A0000
+      verification: |
+          ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read supported-modes 1 1
+
+          Verify that the DUT response contains list of ModeOptionsStruct entries
+          - Verify that the list has two or more entries
+          - Verify that PIXIT.TCCM.MODE_CHANGE_FAIL is one of supported_modes_dut
+          - Save the Mode field values as supported_modes_dut on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
+
+          [1690189665.585798][16159:16161] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0052 Attribute 0x0000_0000 DataVersion: 473867547
+          [1690189665.585885][16159:16161] CHIP:TOO:   SupportedModes: 3 entries
+          [1690189665.585924][16159:16161] CHIP:TOO:     [1]: {
+          [1690189665.585936][16159:16161] CHIP:TOO:       Label: Normal
+          [1690189665.585955][16159:16161] CHIP:TOO:       Mode: 0
+          [1690189665.585970][16159:16161] CHIP:TOO:       ModeTags: 1 entries
+          [1690189665.585997][16159:16161] CHIP:TOO:         [1]: {
+          [1690189665.586008][16159:16161] CHIP:TOO:           Value: 0
+          [1690189665.586018][16159:16161] CHIP:TOO:          }
+          [1690189665.586028][16159:16161] CHIP:TOO:      }
+          [1690189665.586050][16159:16161] CHIP:TOO:     [2]: {
+          [1690189665.586060][16159:16161] CHIP:TOO:       Label: Rapid Cool
+          [1690189665.586068][16159:16161] CHIP:TOO:       Mode: 1
+          [1690189665.586081][16159:16161] CHIP:TOO:       ModeTags: 1 entries
+          [1690189665.586094][16159:16161] CHIP:TOO:         [1]: {
+          [1690189665.586105][16159:16161] CHIP:TOO:           Value: 16384
+          [1690189665.586114][16159:16161] CHIP:TOO:          }
+          [1690189665.586124][16159:16161] CHIP:TOO:      }
+          [1690189665.586143][16159:16161] CHIP:TOO:     [3]: {
+          [1690189665.586152][16159:16161] CHIP:TOO:       Label: Rapid Freeze
+          [1690189665.586162][16159:16161] CHIP:TOO:       Mode: 2
+          [1690189665.586175][16159:16161] CHIP:TOO:       ModeTags: 1 entries
+          [1690189665.586189][16159:16161] CHIP:TOO:         [1]: {
+          [1690189665.586198][16159:16161] CHIP:TOO:           Value: 16385
+          [1690189665.586207][16159:16161] CHIP:TOO:          }
+          [1690189665.586217][16159:16161] CHIP:TOO:      }
+      disabled: true
+
+    - label: "Step 3: TH reads from the DUT the CurrentMode attribute."
+      PICS: TCCM.S.A0001
+      verification: |
+          ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read current-mode 1 1
+
+          Verify on TH(chip-tool) logs, CurrentMode attribute value is an integer  value,
+          - Save the value as old_current_mode_dut
+          - Select a value which is NOT in supported_modes_dut and save it as invalid_mode_th,  below is the sample log provided for the raspi platform, Here CurrentMode attribute value is 0
+
+          [1690189753.281932][16180:16182] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0052 Attribute 0x0000_0001 DataVersion: 473867547
+          [1690189753.281979][16180:16182] CHIP:TOO:   CurrentMode: 0
+      disabled: true
+
+    - label:
+          "Step 4: TH sends a ChangeToMode command to the DUT with NewMode set
+          to old_current_mode_dut"
+      PICS: TCCM.S.C00.Rsp
+      verification: |
+          ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode change-to-mode 0 1 1
+
+          Verify on TH(chip-tool) log, DUT responds contains a ChangeToModeResponse command with a SUCCESS (value 0x00) status response and below is the sample log provided for the raspi platform:
+
+          [1689991627.698450][142731:142733] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0052 Command 0x0000_0001
+          [1689991627.698488][142731:142733] CHIP:TOO:   ChangeToModeResponse: {
+          [1689991627.698499][142731:142733] CHIP:TOO:     status: 0
+          [1689991627.698507][142731:142733] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 5: Manually put the device in a state from which it will FAIL to
+          transition to PIXIT.TCCM.MODE_CHANGE_FAIL"
+      PICS: TCCM.S.M.CAN_TEST_MODE_FAILURE && TCCM.S.M.CAN_MANUALLY_CONTROLLED
+      verification: |
+          Manual operation required
+      disabled: true
+
+    - label: "Step 6: TH reads from the DUT the CurrentMode attribute."
+      PICS: TCCM.S.A0001 && TCCM.S.M.CAN_MANUALLY_CONTROLLED
+      verification: |
+          ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read current-mode 1 1
+
+          Verify on TH(chip-tool) logs, CurrentMode attribute value is an integer  value,
+          - Save the value as old_current_mode_dut, below is the sample log provided for the raspi platform, Here CurrentMode attribute value is 0
+
+          [1689991744.646114][142740:142742] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0052 Attribute 0x0000_0001 DataVersion: 2299631070
+          [1689991744.646165][142740:142742] CHIP:TOO:   CurrentMode: 0
+      disabled: true
+
+    - label:
+          "Step 7: TH sends a ChangeToMode command to the DUT with NewMode set
+          to PIXIT.TCCM.MODE_CHANGE_FAIL"
+      PICS: TCCM.S.M.CAN_TEST_MODE_FAILURE && TCCM.S.C00.Rsp
+      verification: |
+          Note : Please skip this step as SDK is not enabled with this failure response
+
+          ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode change-to-mode 2 1 1
+
+          Verify on TH(chip-tool) log, DUT responds contains a ChangeToModeResponse command with a GenericFailure(0x02)  status response and below is the sample log provided for the raspi platform:
+
+          [1690208444.427313][19616:19618] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0052 Command 0x0000_0001
+          [1690208444.427473][19616:19618] CHIP:TOO:   ChangeToModeResponse: {
+          [1690208444.427482][19616:19618] CHIP:TOO:     status: 0
+          [1690208444.427486][19616:19618] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 8: TH reads from the DUT the CurrentMode attribute."
+      PICS: TCCM.S.A0001
+      verification: |
+          ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read current-mode 1 1
+
+          Verify on TH(chip-tool),  CurrentMode attribute value is an integer value and equal to old_current_mode_dut  below is the sample log provided for the raspi platform,Here CurrentMode attribute value is 0
+
+          [1689991744.646114][142740:142742] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0052 Attribute 0x0000_0001 DataVersion: 2299631070
+          [1689991744.646165][142740:142742] CHIP:TOO:   CurrentMode: 0
+      disabled: true
+
+    - label:
+          "Step 9: Manually put the device in a state from which it will
+          SUCCESSFULLY transition to PIXIT.TCCM.MODE_CHANGE_OK"
+      PICS: TCCM.S.M.CAN_MANUALLY_CONTROLLED
+      verification: |
+          Manual operation required
+      disabled: true
+
+    - label: "Step 10: TH reads from the DUT the CurrentMode attribute."
+      PICS: TCCM.S.A0001 && TCCM.S.M.CAN_MANUALLY_CONTROLLED
+      verification: |
+          ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read current-mode 1 1
+
+          Verify on TH(chip-tool) logs, CurrentMode attribute value is an integer  value,
+          - Save the value as old_current_mode_dut, below is the sample log provided for the raspi platform, Here CurrentMode attribute value is 0
+
+          [1689991744.646114][142740:142742] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0052 Attribute 0x0000_0001 DataVersion: 2299631070
+          [1689991744.646165][142740:142742] CHIP:TOO:   CurrentMode: 0
+      disabled: true
+
+    - label:
+          "Step 11: TH sends a ChangeToMode command to the DUT with NewMode set
+          to PIXIT.TCCM.MODE_CHANGE_OK"
+      PICS: TCCM.S.C00.Rsp
+      verification: |
+          ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode change-to-mode 1 1 1
+
+          Verify on TH(chip-tool) log, DUT responds contains a ChangeToModeResponse command with a SUCCESS (value 0x00) status response and below is the sample log provided for the raspi platform:
+
+          [1690189985.803199][16357:16359] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0052 Command 0x0000_0001
+          [1690189985.803213][16357:16359] CHIP:TOO:   ChangeToModeResponse: {
+          [1690189985.803220][16357:16359] CHIP:TOO:     status: 0
+          [1690189985.803224][16357:16359] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 12: TH reads from the DUT the CurrentMode attribute."
+      PICS: TCCM.S.A0001
+      verification: |
+          ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read current-mode 1 1
+
+          Verify on TH(chip-tool) logs, CurrentMode attribute value is an integer  value and same as step 11,  below is the sample log provided for the raspi platform, Here CurrentMode attribute value is 1
+
+          [1690190007.564500][16361:16363] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0052 Attribute 0x0000_0001 DataVersion: 473867552
+          [1690190007.564538][16361:16363] CHIP:TOO:   CurrentMode: 1
+      disabled: true
+
+    - label:
+          "Step 13: TH sends a ChangeToMode command to the DUT with NewMode set
+          to invalid_mode_th"
+      PICS: TCCM.S.C00.Rsp
+      verification: |
+          ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode change-to-mode 3 1 1
+
+          Verify on TH(chip-tool) log, DUT responds contains a ChangeToModeResponse command with a UnsupportedMode(0x01) status response and below is the sample log provided for the raspi platform:
+
+          [1690190041.868458][16365:16367] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0052 Command 0x0000_0001
+          [1690190041.868514][16365:16367] CHIP:TOO:   ChangeToModeResponse: {
+          [1690190041.868518][16365:16367] CHIP:TOO:     status: 1
+          [1690190041.868521][16365:16367] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 14: TH reads from the DUT the CurrentMode attribute."
+      PICS: TCCM.S.A0001
+      verification: |
+          ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read current-mode 1 1
+
+          Verify on TH(chip-tool) logs, CurrentMode attribute value is an integer  value and same as step 12,  below is the sample log provided for the raspi platform, Here CurrentMode attribute value is 1
+
+          [1690190081.598522][16369:16371] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0052 Attribute 0x0000_0001 DataVersion: 473867552
+          [1690190081.598595][16369:16371] CHIP:TOO:   CurrentMode: 1
+      disabled: true

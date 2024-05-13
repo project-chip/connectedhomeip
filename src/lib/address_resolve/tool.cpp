@@ -17,6 +17,7 @@
 
 #include "AddressResolve.h"
 
+#include <TracingCommandLineArgument.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -34,8 +35,10 @@ using chip::Transport::PeerAddress;
 
 // clang-format off
 const char * const sHelp =
-    "Usage: address-resolve-tool <command> [ <args...> ]\n"
+    "Usage: address-resolve-tool [<options...>] <command> [ <args...> ]\n"
     "\n"
+    "Options:\n"
+    "   --trace-to <dest> -- Trace to the given destination (" SUPPORTED_COMMAND_LINE_TRACING_TARGETS ")\n"
     "Commands:\n"
     "\n"
     "    node <nodeid> <compressed_fabricid> -- Find the node for the given node/fabric.\n"
@@ -54,8 +57,11 @@ public:
 
         ChipLogProgress(Discovery, "Resolve completed: %s", addr_string);
         ChipLogProgress(Discovery, "   Supports TCP:                  %s", result.supportsTcp ? "YES" : "NO");
-        ChipLogProgress(Discovery, "   MRP IDLE retransmit timeout:   %u ms", result.mrpConfig.mIdleRetransTimeout.count());
-        ChipLogProgress(Discovery, "   MRP ACTIVE retransmit timeout: %u ms", result.mrpConfig.mActiveRetransTimeout.count());
+        ChipLogProgress(Discovery, "   MRP IDLE retransmit timeout:   %u ms", result.mrpRemoteConfig.mIdleRetransTimeout.count());
+        ChipLogProgress(Discovery, "   MRP ACTIVE retransmit timeout: %u ms", result.mrpRemoteConfig.mActiveRetransTimeout.count());
+        ChipLogProgress(Discovery, "   MRP ACTIVE Threshold time:     %u ms", result.mrpRemoteConfig.mActiveThresholdTime.count());
+        ChipLogProgress(Discovery, "   ICD is operating as a:         %s", result.isICDOperatingAsLIT ? "LIT" : "SIT");
+
         NotifyDone();
     }
 
@@ -85,6 +91,7 @@ CHIP_ERROR Initialize()
 
 void Shutdown()
 {
+    chip::AddressResolve::Resolver::Instance().Shutdown();
     Dnssd::Resolver::Instance().Shutdown();
     DeviceLayer::PlatformMgr().Shutdown();
 }
@@ -112,7 +119,8 @@ bool Cmd_Node(int argc, const char ** argv)
         return false;
     }
 
-    ChipLogProgress(NotSpecified, "Will search for node %" PRIx64 " on fabric %" PRIx64, node, fabric);
+    ChipLogProgress(NotSpecified, "Will search for node 0x" ChipLogFormatX64 " on fabric 0x" ChipLogFormatX64,
+                    ChipLogValueX64(node), ChipLogValueX64(fabric));
 
     AddressResolve::NodeLookupRequest request(PeerId().SetNodeId(node).SetCompressedFabricId(fabric));
 
@@ -130,18 +138,62 @@ bool Cmd_Node(int argc, const char ** argv)
     return true;
 }
 
+extern "C" void StopSignalHandler(int signal)
+{
+    // no lint below because StopEventLoopTask is assumed to be async safe.
+    DeviceLayer::PlatformMgr().StopEventLoopTask(); // NOLINT(bugprone-signal-handler)
+}
+
 } // namespace
 
 extern "C" int main(int argc, const char ** argv)
 {
     Platform::MemoryInit();
 
-    if (argc < 2)
+    signal(SIGTERM, StopSignalHandler);
+    signal(SIGINT, StopSignalHandler);
+
+    // skip binary name
+    argc--;
+    argv++;
+
+    chip::CommandLineApp::TracingSetup tracing_setup;
+
+    while (argc > 0)
+    {
+        if (strcasecmp(argv[0], "--help") == 0 || strcasecmp(argv[0], "-h") == 0)
+        {
+            fputs(sHelp, stdout);
+            return 0;
+        }
+
+        if (strcasecmp(argv[0], "--trace-to") == 0)
+        {
+            if (argc > 1)
+            {
+                tracing_setup.EnableTracingFor(argv[1]);
+                argc -= 2;
+                argv += 2;
+            }
+            else
+            {
+                ChipLogError(NotSpecified, "Missing trace to argument.");
+                return -1;
+            }
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    if (argc < 1)
     {
         ChipLogError(NotSpecified, "Please specify a command, or 'help' for help.");
         return -1;
     }
-    if (strcasecmp(argv[1], "help") == 0 || strcasecmp(argv[1], "--help") == 0 || strcasecmp(argv[1], "-h") == 0)
+
+    if (strcasecmp(argv[0], "help") == 0)
     {
         fputs(sHelp, stdout);
         return 0;
@@ -154,9 +206,9 @@ extern "C" int main(int argc, const char ** argv)
         return 1;
     }
 
-    if (strcasecmp(argv[1], "node") == 0)
+    if (strcasecmp(argv[0], "node") == 0)
     {
-        return Cmd_Node(argc - 2, argv + 2) ? 0 : 1;
+        return Cmd_Node(argc - 1, argv + 1) ? 0 : 1;
     }
 
     ChipLogError(NotSpecified, "Unrecognized command: %s", argv[1]);

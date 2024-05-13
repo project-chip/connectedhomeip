@@ -67,15 +67,23 @@ protected:
     void _ProcessThreadActivity();
     void _OnCHIPoBLEAdvertisingStart();
     void _OnCHIPoBLEAdvertisingStop();
-    void _OnPlatformEvent(const ChipDeviceEvent * event);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    void _WaitOnSrpClearAllComplete();
+    void _NotifySrpClearAllComplete();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    // ===== Methods that override the GenericThreadStackMa
 
 private:
     friend ThreadStackManager & ::chip::DeviceLayer::ThreadStackMgr(void);
     friend ThreadStackManagerImpl & ::chip::DeviceLayer::ThreadStackMgrImpl(void);
     static ThreadStackManagerImpl sInstance;
-    ThreadStackManagerImpl() = default;
 
-    bool mIsAttached = false;
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    TaskHandle_t mSrpClearAllRequester = nullptr;
+#endif
+
+    ThreadStackManagerImpl() = default;
 };
 
 /**

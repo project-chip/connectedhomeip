@@ -15,96 +15,134 @@
 name: Build example - EFR32
 
 on:
-    push:
-    pull_request:
+  push:
+    branches-ignore:
+      - 'dependabot/**'
+  pull_request:
+  merge_group:
 
 concurrency:
-    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
-    cancel-in-progress: true
+  group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+  cancel-in-progress: true
+
+env:
+  CHIP_NO_LOG_TIMESTAMPS: true
 
 jobs:
-    efr32:
-        name: EFR32
-        timeout-minutes: 60
+  efr32:
+    name: EFR32
 
-        env:
-            EFR32_BOARD: BRD4161A
-            BUILD_TYPE: gn_efr32
+    env:
+      SILABS_BOARD: BRD4161A
+      BUILD_TYPE: gn_efr32
 
-        runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+    runs-on: ubuntu-latest
+    if: github.actor != 'restyled-io[bot]'
 
-        container:
-            image: connectedhomeip/chip-build-efr32:0.5.58
-            volumes:
-                - "/tmp/bloat_reports:/tmp/bloat_reports"
-        steps:
-            - uses: Wandalen/wretry.action@v1.0.11
-              name: Checkout
-              with:
-                  action: actions/checkout@v3
-                  with: |
-                      submodules: true
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
+    container:
+      image: ghcr.io/project-chip/chip-build-efr32:50
+      volumes:
+        - "/tmp/bloat_reports:/tmp/bloat_reports"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Checkout submodules & Bootstrap
+        uses: ./.github/actions/checkout-submodules-and-bootstrap
+        with:
+          platform: silabs_docker
 
-            - name: Set up environment for size reports
-              if: ${{ !env.ACT }}
-              env:
-                  GH_CONTEXT: ${{ toJson(github) }}
-              run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
+      - name: Set up environment for size reports
+        uses: ./.github/actions/setup-size-reports
+        if: ${{ !env.ACT }}
+        with:
+          gh-context: ${{ toJson(github) }}
 
-            - name: Bootstrap
-              timeout-minutes: 25
-              run: scripts/build/gn_bootstrap.sh
-            - name: Uploading bootstrap logs
-              uses: actions/upload-artifact@v2
-              if: ${{ always() }} && ${{ !env.ACT }}
-              with:
-                  name: bootstrap-logs
-                  path: |
-                      .environment/gn_out/.ninja_log
-                      .environment/pigweed-venv/*.log
-
-            - name: Build some BRD4161A variants
-              timeout-minutes: 50
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                     "./scripts/build/build_examples.py \
-                        --enable-flashbundle \
-                        --target-glob '*-brd4161a-{lock,light,switch,window-covering,unit-test}' \
-                        build \
-                        --copy-artifacts-to out/artifacts \
-                     "
-            - name: Prepare some bloat report from the previous builds
-              run: |
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                     efr32 BRD4161A lighting-app \
-                     out/efr32-brd4161a-light/chip-efr32-lighting-example.out \
-                     /tmp/bloat_reports/
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py  \
-                     efr32 BRD4161A window-app \
-                     out/efr32-brd4161a-window-covering/chip-efr32-window-example.out \
-                     /tmp/bloat_reports/
-            - name: Build example EFR32 Lighting App for BRD4161A with RPCs
-              timeout-minutes: 10
-              run: |
-                  scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/lighting_app_debug_rpc BRD4161A \
-                    'import("//with_pw_rpc.gni")'
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py efr32 BRD4161A+rpc lighting-app \
-                    out/lighting_app_debug_rpc/BRD4161A/chip-efr32-lighting-example.out /tmp/bloat_reports/
-            # Disabled until Flash usage is reduced        
-            # - name: Build example EFR32+WF200 WiFi Lock app for BRD4161A
-            #   timeout-minutes: 10
-            #   run: |
-            #       scripts/examples/gn_efr32_example.sh examples/lock-app/efr32/ out/lock_app_wifi_wf200 BRD4161A --wifi wf200
-            #       .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py efr32 BRD4161A+wf200 lock-app \
-            #         out/lock_app_wifi_wf200/BRD4161A/chip-efr32-lock-example.out /tmp/bloat_reports/
-            - name: Uploading Size Reports
-              uses: actions/upload-artifact@v2
-              if: ${{ !env.ACT }}
-              with:
-                  name: Size,EFR32-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
-                  path: |
-                      /tmp/bloat_reports/
+      - name: Test SLC gen
+        timeout-minutes: 30
+        run: |
+          scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs ./out/light-app BRD4187C --slc_generate --docker
+          rm -rf ./out/
+      - name: Build some BRD4187C variants (1)
+        run: |
+          ./scripts/run_in_build_env.sh \
+             "./scripts/build/build_examples.py \
+                --enable-flashbundle \
+                --target efr32-brd4187c-thermostat-openthread-mtd \
+                --target efr32-brd4187c-switch-shell-use-ot-coap-lib \
+                --target efr32-brd4187c-unit-test \
+                build \
+                --copy-artifacts-to out/artifacts \
+             "
+      - name: Clean out build output
+        run: rm -rf ./out
+      - name: Build some BRD4187C variants (2)
+        run: |
+          ./scripts/run_in_build_env.sh \
+             "./scripts/build/build_examples.py \
+                --enable-flashbundle \
+                --target efr32-brd4187c-light-use-ot-lib \
+                --target efr32-brd4187c-pump \
+                --target efr32-brd4187c-lock-shell-heap-monitoring \
+                build \
+                --copy-artifacts-to out/artifacts \
+             "
+      - name: Clean out build output
+        run: rm -rf ./out
+      - name: Build BRD4187C variants (3)
+        run: |
+          ./scripts/run_in_build_env.sh \
+             "./scripts/build/build_examples.py \
+                --enable-flashbundle \
+                --target efr32-brd4187c-window-covering-additional-data-advertising \
+                --target efr32-brd4187c-light-rpc \
+                build \
+                --copy-artifacts-to out/artifacts \
+             "
+      - name: Prepare some bloat report from the previous builds
+        run: |
+          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+             efr32 BRD4187C lighting-app \
+             out/efr32-brd4187c-light-rpc/matter-silabs-lighting-example.out \
+             /tmp/bloat_reports/
+          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py  \
+             efr32 BRD4187C window-app \
+             out/efr32-brd4187c-window-covering-additional-data-advertising/matter-silabs-window-example.out \
+             /tmp/bloat_reports/
+      - name: Clean out build output
+        run: rm -rf ./out
+      - name: Build BRD4338A WiFi Soc variants
+        run: |
+          ./scripts/run_in_build_env.sh \
+             "./scripts/build/build_examples.py \
+                --enable-flashbundle \
+                --target efr32-brd4338a-light-skip-rps-generation \
+                --target efr32-brd4338a-lock-skip-rps-generation \
+                build \
+                --copy-artifacts-to out/artifacts \
+             "
+      - name: Prepare bloat report for brd4338a lock app
+        run: |
+          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+            efr32 BRD4338a lock-app \
+            out/efr32-brd4338a-lock-skip-rps-generation/matter-silabs-lock-example.out \
+            /tmp/bloat_reports/
+      - name: Clean out build output
+        run: rm -rf ./out
+      - name: Build EFR32 with WiFi NCP
+        run: |
+          ./scripts/run_in_build_env.sh \
+            "./scripts/build/build_examples.py \
+                --enable-flashbundle \
+                --target efr32-brd4187c-lock-wifi-siwx917 \
+                --target efr32-brd4187c-light-wifi-rs9116 \
+                --target efr32-brd4187c-lock-wifi-wf200 \
+                build \
+                --copy-artifacts-to out/artifacts \
+            "
+      - name: Clean out build output
+        run: rm -rf ./out
+      - name: Uploading Size Reports
+        uses: ./.github/actions/upload-size-reports
+        if: ${{ !env.ACT }}
+        with:
+          platform-name: EFR32

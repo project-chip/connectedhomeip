@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/device_item_margin_horizontal"
+        android:layout_marginTop="@dimen/device_item_margin_top"
+        android:background="@drawable/menu_item_bg"
+        android:gravity="center_vertical"
+        android:paddingStart="@dimen/device_item_padding_start"
+        android:paddingTop="@dimen/device_item_padding_top"
+        android:paddingEnd="@dimen/device_item_padding_end"
+        android:paddingBottom="@dimen/device_item_padding_bottom">
+
+        <TextView
+            android:id="@+id/value_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/device_item_text_no_title_size"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatRadioButton
+            android:id="@+id/radioButton"
+            android:layout_width="@dimen/device_item_button_width"
+            android:layout_height="@dimen/device_item_button_height"
+            android:checked="true"
+            android:contentDescription="@string/description_button"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

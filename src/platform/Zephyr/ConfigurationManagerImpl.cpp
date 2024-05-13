@@ -27,14 +27,22 @@
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 #include <lib/core/CHIPVendorIdentifiers.hpp>
+
 #include <platform/Zephyr/ZephyrConfig.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
-#include <platform/internal/FactoryProvisioning.ipp>
-#endif // CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
+#include "InetUtils.h"
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+
+#ifdef CONFIG_CHIP_FACTORY_RESET_ERASE_NVS
+#include <zephyr/fs/nvs.h>
+#include <zephyr/settings/settings.h>
+#endif
+
+#ifdef CONFIG_NET_L2_OPENTHREAD
+#include <platform/ThreadStackManager.h>
+#endif
 
 namespace chip {
 namespace DeviceLayer {
@@ -55,19 +63,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<ZephyrConfig>::Init();
     SuccessOrExit(err);
-
-    // TODO: Initialize the global GroupKeyStore object here
-#if CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
-    {
-        FactoryProvisioning factoryProv;
-        uint8_t * const kDeviceRAMStart = (uint8_t *) CONFIG_SRAM_BASE_ADDRESS;
-        uint8_t * const kDeviceRAMEnd   = kDeviceRAMStart + CONFIG_SRAM_SIZE * 1024 - 1;
-
-        // Scan device RAM for injected provisioning data and save to persistent storage if found.
-        err = factoryProv.ProvisionDeviceFromRAM(kDeviceRAMStart, kDeviceRAMEnd);
-        SuccessOrExit(err);
-    }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
 
     if (ZephyrConfig::ConfigValueExists(ZephyrConfig::kCounterKey_RebootCount))
     {
@@ -177,24 +172,67 @@ CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(Key key, const uint8_t 
     return ZephyrConfig::WriteConfigValueBin(key, data, dataLen);
 }
 
-void ConfigurationManagerImpl::RunConfigUnitTest(void)
+void ConfigurationManagerImpl::RunConfigUnitTest()
 {
+#if CHIP_CONFIG_TEST
     ZephyrConfig::RunConfigUnitTest();
+#endif
 }
 
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
     ChipLogProgress(DeviceLayer, "Performing factory reset");
+
+// Lock the Thread stack to avoid unwanted interaction with settings NVS during factory reset.
+#ifdef CONFIG_NET_L2_OPENTHREAD
+    ThreadStackMgr().LockThreadStack();
+#endif
+
+#ifdef CONFIG_CHIP_FACTORY_RESET_ERASE_NVS
+    void * storage = nullptr;
+    int status     = settings_storage_get(&storage);
+
+    if (status == 0)
+    {
+        status = nvs_clear(static_cast<nvs_fs *>(storage));
+    }
+
+    if (status)
+    {
+        ChipLogError(DeviceLayer, "Factory reset failed: %d", status);
+    }
+#else
     const CHIP_ERROR err = PersistedStorage::KeyValueStoreMgrImpl().DoFactoryReset();
 
     if (err != CHIP_NO_ERROR)
-        ChipLogError(DeviceLayer, "Factory reset failed: %s", ErrorStr(err));
+    {
+        ChipLogError(DeviceLayer, "Factory reset failed: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    ThreadStackMgr().ErasePersistentInfo();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    ConnectivityMgr().ErasePersistentInfo();
+#endif
 
     PlatformMgr().Shutdown();
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    const net_if * const iface = InetUtils::GetWiFiInterface();
+    VerifyOrReturnError(iface != nullptr, CHIP_ERROR_INTERNAL);
+
+    const auto linkAddrStruct = iface->if_dev->link_addr;
+    memcpy(buf, linkAddrStruct.addr, linkAddrStruct.len);
+
+    return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif
+}
+
+ConfigurationManager & ConfigurationMgrImpl()
+{
+    return ConfigurationManagerImpl::GetDefaultInstance();
 }
 
 } // namespace DeviceLayer

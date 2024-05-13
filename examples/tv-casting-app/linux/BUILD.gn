@@ -14,30 +14,63 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-
 import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/src/lib/lib.gni")
 
 assert(chip_build_tools)
 
+declare_args() {
+  chip_casting_simplified = false
+}
+
 executable("chip-tv-casting-app") {
-  sources = [
-    "${chip_root}/examples/tv-casting-app/tv-casting-common/include/CHIPProjectAppConfig.h",
-    "main.cpp",
-  ]
+  if (chip_casting_simplified) {
+    sources = [
+      "${chip_root}/examples/tv-casting-app/tv-casting-common/include/CHIPProjectAppConfig.h",
+      "simple-app-helper.cpp",
+      "simple-app-helper.h",
+      "simple-app.cpp",
+    ]
+  } else {
+    sources = [
+      "${chip_root}/examples/tv-casting-app/tv-casting-common/include/CHIPProjectAppConfig.h",
+      "CastingUtils.cpp",
+      "CastingUtils.h",
+      "main.cpp",
+    ]
+  }
 
   deps = [
+    "${chip_root}/examples/common/tracing:commandline",
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/examples/tv-casting-app/tv-casting-common",
     "${chip_root}/src/credentials:default_attestation_verifier",
     "${chip_root}/src/lib",
     "${chip_root}/third_party/inipp",
+    "${chip_root}/third_party/jsoncpp",
   ]
 
+  defines = []
+  include_dirs =
+      [ "${chip_root}/examples/tv-casting-app/tv-casting-common/include" ]
+
   cflags = [ "-Wconversion" ]
+
+  if (chip_build_libshell) {
+    defines += [ "ENABLE_CHIP_SHELL" ]
+    sources += [
+      "CastingShellCommands.cpp",
+      "CastingShellCommands.h",
+    ]
+  }
 
   output_dir = root_out_dir
 }
 
 group("linux") {
   deps = [ ":chip-tv-casting-app" ]
+}
+
+group("default") {
+  deps = [ ":linux" ]
 }

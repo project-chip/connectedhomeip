@@ -105,7 +105,6 @@ CHIP_ERROR Engine::ExecCommand(int argc, char * argv[])
 
 void Engine::RegisterDefaultCommands()
 {
-    RegisterBase64Commands();
     RegisterMetaCommands();
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     RegisterBLECommands();
@@ -124,6 +123,9 @@ void Engine::RegisterDefaultCommands()
     RegisterDnsCommands();
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     RegisterOtaCommands();
+#endif
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+    RegisterStatCommands();
 #endif
 }
 

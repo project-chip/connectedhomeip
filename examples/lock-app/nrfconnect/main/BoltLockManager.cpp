@@ -20,170 +20,192 @@
 #include "BoltLockManager.h"
 
 #include "AppConfig.h"
+#include "AppEvent.h"
 #include "AppTask.h"
 
-#include <logging/log.h>
-#include <zephyr.h>
-
-LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
-
-static k_timer sLockTimer;
+using namespace chip;
 
 BoltLockManager BoltLockManager::sLock;
 
-void BoltLockManager::Init()
+void BoltLockManager::Init(StateChangeCallback callback)
 {
-    k_timer_init(&sLockTimer, &BoltLockManager::TimerEventHandler, nullptr);
-    k_timer_user_data_set(&sLockTimer, this);
+    mStateChangeCallback = callback;
 
-    mState              = kState_LockingCompleted;
-    mAutoLockTimerArmed = false;
-    mAutoRelock         = false;
-    mAutoLockDuration   = 0;
+    k_timer_init(&mActuatorTimer, &BoltLockManager::ActuatorTimerEventHandler, nullptr);
+    k_timer_user_data_set(&mActuatorTimer, this);
 }
 
-void BoltLockManager::SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB)
+bool BoltLockManager::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) const
 {
-    mActionInitiated_CB = aActionInitiated_CB;
-    mActionCompleted_CB = aActionCompleted_CB;
+    // userIndex is guaranteed by the caller to be between 1 and CONFIG_LOCK_NUM_USERS
+    user = mUsers[userIndex - 1];
+
+    ChipLogProgress(Zcl, "Getting lock user %u: %s", static_cast<unsigned>(userIndex),
+                    user.userStatus == UserStatusEnum::kAvailable ? "available" : "occupied");
+
+    return true;
 }
 
-bool BoltLockManager::IsActionInProgress()
+bool BoltLockManager::SetUser(uint16_t userIndex, FabricIndex creator, FabricIndex modifier, const CharSpan & userName,
+                              uint32_t uniqueId, UserStatusEnum userStatus, UserTypeEnum userType,
+                              CredentialRuleEnum credentialRule, const CredentialStruct * credentials, size_t totalCredentials)
 {
-    return (mState == kState_LockingInitiated || mState == kState_UnlockingInitiated) ? true : false;
+    // userIndex is guaranteed by the caller to be between 1 and CONFIG_LOCK_NUM_USERS
+    UserData & userData = mUserData[userIndex - 1];
+    auto & user         = mUsers[userIndex - 1];
+
+    VerifyOrReturnError(userName.size() <= DOOR_LOCK_MAX_USER_NAME_SIZE, false);
+    VerifyOrReturnError(totalCredentials <= CONFIG_LOCK_NUM_CREDENTIALS_PER_USER, false);
+
+    Platform::CopyString(userData.mName, userName);
+    memcpy(userData.mCredentials, credentials, totalCredentials * sizeof(CredentialStruct));
+
+    user.userName           = CharSpan(userData.mName, userName.size());
+    user.credentials        = Span<const CredentialStruct>(userData.mCredentials, totalCredentials);
+    user.userUniqueId       = uniqueId;
+    user.userStatus         = userStatus;
+    user.userType           = userType;
+    user.credentialRule     = credentialRule;
+    user.creationSource     = DlAssetSource::kMatterIM;
+    user.createdBy          = creator;
+    user.modificationSource = DlAssetSource::kMatterIM;
+    user.lastModifiedBy     = modifier;
+
+    ChipLogProgress(Zcl, "Setting lock user %u: %s", static_cast<unsigned>(userIndex),
+                    userStatus == UserStatusEnum::kAvailable ? "available" : "occupied");
+
+    return true;
 }
 
-bool BoltLockManager::IsUnlocked()
+bool BoltLockManager::GetCredential(uint16_t credentialIndex, CredentialTypeEnum credentialType,
+                                    EmberAfPluginDoorLockCredentialInfo & credential) const
 {
-    return (mState == kState_UnlockingCompleted) ? true : false;
+    VerifyOrReturnError(credentialIndex > 0 && credentialIndex <= CONFIG_LOCK_NUM_CREDENTIALS, false);
+
+    credential = mCredentials[credentialIndex - 1];
+
+    ChipLogProgress(Zcl, "Getting lock credential %u: %s", static_cast<unsigned>(credentialIndex),
+                    credential.status == DlCredentialStatus::kAvailable ? "available" : "occupied");
+
+    return true;
 }
 
-void BoltLockManager::EnableAutoRelock(bool aOn)
+bool BoltLockManager::SetCredential(uint16_t credentialIndex, FabricIndex creator, FabricIndex modifier,
+                                    DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType, const ByteSpan & secret)
 {
-    mAutoRelock = aOn;
-}
+    VerifyOrReturnError(credentialIndex > 0 && credentialIndex <= CONFIG_LOCK_NUM_CREDENTIALS, false);
+    VerifyOrReturnError(secret.size() <= kMaxCredentialLength, false);
 
-void BoltLockManager::SetAutoLockDuration(uint32_t aDurationInSecs)
-{
-    mAutoLockDuration = aDurationInSecs;
-}
+    CredentialData & credentialData = mCredentialData[credentialIndex - 1];
+    auto & credential               = mCredentials[credentialIndex - 1];
 
-bool BoltLockManager::InitiateAction(int32_t aActor, Action_t aAction)
-{
-    bool action_initiated = false;
-    State_t new_state;
-
-    // Initiate Lock/Unlock Action only when the previous one is complete.
-    if (mState == kState_LockingCompleted && aAction == UNLOCK_ACTION)
+    if (!secret.empty())
     {
-        action_initiated = true;
-        mCurrentActor    = aActor;
-        new_state        = kState_UnlockingInitiated;
+        memcpy(credentialData.mSecret.Alloc(secret.size()).Get(), secret.data(), secret.size());
     }
-    else if (mState == kState_UnlockingCompleted && aAction == LOCK_ACTION)
+
+    credential.status             = credentialStatus;
+    credential.credentialType     = credentialType;
+    credential.credentialData     = ByteSpan(credentialData.mSecret.Get(), secret.size());
+    credential.creationSource     = DlAssetSource::kMatterIM;
+    credential.createdBy          = creator;
+    credential.modificationSource = DlAssetSource::kMatterIM;
+    credential.lastModifiedBy     = modifier;
+
+    ChipLogProgress(Zcl, "Setting lock credential %u: %s", static_cast<unsigned>(credentialIndex),
+                    credential.status == DlCredentialStatus::kAvailable ? "available" : "occupied");
+
+    return true;
+}
+
+bool BoltLockManager::ValidatePIN(const Optional<ByteSpan> & pinCode, OperationErrorEnum & err) const
+{
+    // Optionality of the PIN code is validated by the caller, so assume it is OK not to provide the PIN code.
+    if (!pinCode.HasValue())
     {
-        action_initiated = true;
-        mCurrentActor    = aActor;
-        new_state        = kState_LockingInitiated;
+        return true;
     }
 
-    if (action_initiated)
+    // Check the PIN code
+    for (const auto & credential : mCredentials)
     {
-        if (mAutoLockTimerArmed && new_state == kState_LockingInitiated)
+        if (credential.status == DlCredentialStatus::kAvailable || credential.credentialType != CredentialTypeEnum::kPin)
         {
-            // If auto lock timer has been armed and someone initiates locking,
-            // cancel the timer and continue as normal.
-            mAutoLockTimerArmed = false;
-
-            CancelTimer();
+            continue;
         }
 
-        StartTimer(ACTUATOR_MOVEMENT_PERIOS_MS);
-
-        // Since the timer started successfully, update the state and trigger callback
-        mState = new_state;
-
-        if (mActionInitiated_CB)
+        if (credential.credentialData.data_equal(pinCode.Value()))
         {
-            mActionInitiated_CB(aAction, aActor);
+            ChipLogDetail(Zcl, "Valid lock PIN code provided");
+            return true;
         }
     }
 
-    return action_initiated;
+    ChipLogDetail(Zcl, "Invalid lock PIN code provided");
+    err = OperationErrorEnum::kInvalidCredential;
+
+    return false;
 }
 
-void BoltLockManager::StartTimer(uint32_t aTimeoutMs)
+void BoltLockManager::Lock(OperationSource source)
 {
-    k_timer_start(&sLockTimer, K_MSEC(aTimeoutMs), K_NO_WAIT);
+    VerifyOrReturn(mState != State::kLockingCompleted);
+    SetState(State::kLockingInitiated, source);
+
+    mActuatorOperationSource = source;
+    k_timer_start(&mActuatorTimer, K_MSEC(kActuatorMovementTimeMs), K_NO_WAIT);
 }
 
-void BoltLockManager::CancelTimer(void)
+void BoltLockManager::Unlock(OperationSource source)
 {
-    k_timer_stop(&sLockTimer);
+    VerifyOrReturn(mState != State::kUnlockingCompleted);
+    SetState(State::kUnlockingInitiated, source);
+
+    mActuatorOperationSource = source;
+    k_timer_start(&mActuatorTimer, K_MSEC(kActuatorMovementTimeMs), K_NO_WAIT);
 }
 
-void BoltLockManager::TimerEventHandler(k_timer * timer)
+void BoltLockManager::ActuatorTimerEventHandler(k_timer * timer)
 {
-    BoltLockManager * lock = static_cast<BoltLockManager *>(k_timer_user_data_get(timer));
+    // The timer event handler is called in the context of the system clock ISR.
+    // Post an event to the application task queue to process the event in the
+    // context of the application thread.
 
-    // The timer event handler will be called in the context of the timer task
-    // once sLockTimer expires. Post an event to apptask queue with the actual handler
-    // so that the event can be handled in the context of the apptask.
     AppEvent event;
-    event.Type               = AppEvent::kEventType_Timer;
-    event.TimerEvent.Context = lock;
-    event.Handler            = lock->mAutoLockTimerArmed ? AutoReLockTimerEventHandler : ActuatorMovementTimerEventHandler;
-    GetAppTask().PostEvent(&event);
+    event.Type               = AppEventType::Timer;
+    event.TimerEvent.Context = static_cast<BoltLockManager *>(k_timer_user_data_get(timer));
+    event.Handler            = BoltLockManager::ActuatorAppEventHandler;
+    AppTask::Instance().PostEvent(event);
 }
 
-void BoltLockManager::AutoReLockTimerEventHandler(AppEvent * aEvent)
+void BoltLockManager::ActuatorAppEventHandler(const AppEvent & event)
 {
-    BoltLockManager * lock = static_cast<BoltLockManager *>(aEvent->TimerEvent.Context);
-    int32_t actor          = 0;
+    BoltLockManager * lock = static_cast<BoltLockManager *>(event.TimerEvent.Context);
 
-    // Make sure auto lock timer is still armed.
-    if (!lock->mAutoLockTimerArmed)
+    if (!lock)
+    {
         return;
+    }
 
-    lock->mAutoLockTimerArmed = false;
-
-    LOG_INF("Auto Re-Lock has been triggered!");
-
-    lock->InitiateAction(actor, LOCK_ACTION);
+    switch (lock->mState)
+    {
+    case State::kLockingInitiated:
+        lock->SetState(State::kLockingCompleted, lock->mActuatorOperationSource);
+        break;
+    case State::kUnlockingInitiated:
+        lock->SetState(State::kUnlockingCompleted, lock->mActuatorOperationSource);
+        break;
+    default:
+        break;
+    }
 }
 
-void BoltLockManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
+void BoltLockManager::SetState(State state, OperationSource source)
 {
-    Action_t actionCompleted = INVALID_ACTION;
+    mState = state;
 
-    BoltLockManager * lock = static_cast<BoltLockManager *>(aEvent->TimerEvent.Context);
-
-    if (lock->mState == kState_LockingInitiated)
+    if (mStateChangeCallback != nullptr)
     {
-        lock->mState    = kState_LockingCompleted;
-        actionCompleted = LOCK_ACTION;
-    }
-    else if (lock->mState == kState_UnlockingInitiated)
-    {
-        lock->mState    = kState_UnlockingCompleted;
-        actionCompleted = UNLOCK_ACTION;
-    }
-
-    if (actionCompleted != INVALID_ACTION)
-    {
-        if (lock->mActionCompleted_CB)
-        {
-            lock->mActionCompleted_CB(actionCompleted, lock->mCurrentActor);
-        }
-
-        if (lock->mAutoRelock && actionCompleted == UNLOCK_ACTION)
-        {
-            // Start the timer for auto relock
-            lock->StartTimer(lock->mAutoLockDuration * 1000);
-
-            lock->mAutoLockTimerArmed = true;
-
-            LOG_INF("Auto Re-lock enabled. Will be triggered in %u seconds", lock->mAutoLockDuration);
-        }
+        mStateChangeCallback(state, source);
     }
 }

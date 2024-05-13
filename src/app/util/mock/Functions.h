@@ -23,16 +23,35 @@
 
 #pragma once
 
-#include <app/AttributeAccessInterface.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/MessageDef/AttributeReportIB.h>
+#include <app/util/mock/MockNodeConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
 namespace Test {
+
 CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const app::ConcreteAttributePath & aPath,
                                      app::AttributeReportIBs::Builder & aAttributeReports,
-                                     app::AttributeValueEncoder::AttributeEncodeState * apEncoderState);
+                                     app::AttributeEncodeState * apEncoderState);
+
+/// Increase the current value for `GetVersion`
+void BumpVersion();
+
+/// Sets GetVersion to return 0
+void ResetVersion();
+
+/// Gets the current value for the version that will
+/// be returned by emberAfDataVersionStorage
+DataVersion GetVersion();
+
+/// Configures the singular global mock attribute storage to use the specified configuration.
+void SetMockNodeConfig(const MockNodeConfig & config);
+
+/// Resets the mock attribute storage to the default configuration.
+void ResetMockNodeConfig();
+
 } // namespace Test
 } // namespace chip

@@ -23,7 +23,7 @@
  */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
@@ -40,9 +40,7 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-namespace {
-
-} // namespace
+namespace {} // namespace
 
 BLEManagerImpl BLEManagerImpl::sInstance;
 
@@ -56,8 +54,7 @@ void BLEManagerImpl::InitializeWithObject(jobject manager)
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(DeviceLayer, "Failed to GetEnvForCurrentThread for BLEManager"));
 
-    mBLEManagerObject = env->NewGlobalRef(manager);
-    VerifyOrReturn(mBLEManagerObject != nullptr, ChipLogError(DeviceLayer, "Failed to NewGlobalRef BLEManager"));
+    VerifyOrReturn(mBLEManagerObject.Init(manager) == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to Init BLEManager"));
 
     jclass BLEManagerClass = env->GetObjectClass(manager);
     VerifyOrReturn(BLEManagerClass != nullptr, ChipLogError(DeviceLayer, "Failed to get BLEManager Java class"));
@@ -125,7 +122,7 @@ void BLEManagerImpl::InitializeWithObject(jobject manager)
         env->ExceptionClear();
     }
 
-    mOnNewConnectionMethod = env->GetMethodID(BLEManagerClass, "onNewConnection", "(I)V");
+    mOnNewConnectionMethod = env->GetMethodID(BLEManagerClass, "onNewConnection", "(IZJJ)V");
     if (mOnNewConnectionMethod == nullptr)
     {
         ChipLogError(DeviceLayer, "Failed to access BLEManager 'onNewConnection' method");
@@ -143,13 +140,13 @@ CHIP_ERROR BLEManagerImpl::_Init()
     err = BleLayer::Init(this, this, this, &DeviceLayer::SystemLayer());
     ReturnLogErrorOnFailure(err);
 
-    VerifyOrReturnLogError(mBLEManagerObject != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnLogError(mBLEManagerObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnLogError(mInitMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnLogError(env != nullptr, CHIP_JNI_ERROR_NO_ENV);
 
-    jint ret = env->CallIntMethod(mBLEManagerObject, mInitMethod);
+    jint ret = env->CallIntMethod(mBLEManagerObject.ObjectRef(), mInitMethod);
     if (env->ExceptionCheck())
     {
         ChipLogError(DeviceLayer, "Java exception in BLEManager::init");
@@ -159,24 +156,6 @@ CHIP_ERROR BLEManagerImpl::_Init()
     VerifyOrReturnLogError(ret == 0, CHIP_JNI_ERROR_JAVA_ERROR);
 
     return err;
-}
-
-BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode()
-{
-    bool has       = false;
-    CHIP_ERROR err = HasFlag(Flags::kServiceModeEnabled, has);
-
-    VerifyOrReturnError(err == CHIP_NO_ERROR, ConnectivityManager::kCHIPoBLEServiceMode_NotSupported);
-    return has ? ConnectivityManager::kCHIPoBLEServiceMode_Enabled : ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
-}
-
-CHIP_ERROR BLEManagerImpl::_SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val)
-{
-    ReturnErrorCodeIf(val != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, CHIP_ERROR_INVALID_ARGUMENT);
-
-    bool isSet = (val == ConnectivityManager::kCHIPoBLEServiceMode_Enabled) ? true : false;
-
-    return SetFlag(Flags::kServiceModeEnabled, isSet);
 }
 
 bool BLEManagerImpl::_IsAdvertisingEnabled()
@@ -204,16 +183,19 @@ bool BLEManagerImpl::_IsAdvertising()
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
 {
+    ChipLogDetail(DeviceLayer, "%s, %u", __FUNCTION__, static_cast<uint8_t>(mode));
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
 {
+    ChipLogDetail(DeviceLayer, "%s, %s", __FUNCTION__, buf);
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
 {
+    ChipLogDetail(DeviceLayer, "%s, %s", __FUNCTION__, deviceName);
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
@@ -248,7 +230,7 @@ bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const 
 
     ChipLogProgress(DeviceLayer, "Received SubscribeCharacteristic");
 
-    VerifyOrExit(mBLEManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mBLEManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mOnSubscribeCharacteristicMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -260,8 +242,8 @@ bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const 
 
     env->ExceptionClear();
     tmpConnObj = reinterpret_cast<intptr_t>(conId);
-    rc = (bool) env->CallBooleanMethod(mBLEManagerObject, mOnSubscribeCharacteristicMethod, static_cast<jint>(tmpConnObj), svcIdObj,
-                                       charIdObj);
+    rc         = (bool) env->CallBooleanMethod(mBLEManagerObject.ObjectRef(), mOnSubscribeCharacteristicMethod,
+                                               static_cast<jint>(tmpConnObj), svcIdObj, charIdObj);
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:
@@ -287,7 +269,7 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
 
     ChipLogProgress(DeviceLayer, "Received UnsubscribeCharacteristic");
 
-    VerifyOrExit(mBLEManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mBLEManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mOnUnsubscribeCharacteristicMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -299,8 +281,8 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
 
     env->ExceptionClear();
     tmpConnObj = reinterpret_cast<intptr_t>(conId);
-    rc         = (bool) env->CallBooleanMethod(mBLEManagerObject, mOnUnsubscribeCharacteristicMethod, static_cast<jint>(tmpConnObj),
-                                       svcIdObj, charIdObj);
+    rc         = (bool) env->CallBooleanMethod(mBLEManagerObject.ObjectRef(), mOnUnsubscribeCharacteristicMethod,
+                                               static_cast<jint>(tmpConnObj), svcIdObj, charIdObj);
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:
@@ -324,13 +306,13 @@ bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 
     ChipLogProgress(DeviceLayer, "Received CloseConnection");
 
-    VerifyOrExit(mBLEManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mBLEManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mOnCloseConnectionMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     env->ExceptionClear();
     tmpConnObj = reinterpret_cast<intptr_t>(conId);
-    rc         = (bool) env->CallBooleanMethod(mBLEManagerObject, mOnCloseConnectionMethod, static_cast<jint>(tmpConnObj));
+    rc = (bool) env->CallBooleanMethod(mBLEManagerObject.ObjectRef(), mOnCloseConnectionMethod, static_cast<jint>(tmpConnObj));
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:
@@ -352,14 +334,14 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
     uint16_t mtu = 0;
 
     ChipLogProgress(DeviceLayer, "Received GetMTU");
-    VerifyOrExit(mBLEManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mBLEManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mOnGetMTUMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
     ;
 
     env->ExceptionClear();
     tmpConnObj = reinterpret_cast<intptr_t>(conId);
-    mtu        = (int16_t) env->CallIntMethod(mBLEManagerObject, mOnGetMTUMethod, static_cast<jint>(tmpConnObj));
+    mtu        = (int16_t) env->CallIntMethod(mBLEManagerObject.ObjectRef(), mOnGetMTUMethod, static_cast<jint>(tmpConnObj));
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:
@@ -392,7 +374,7 @@ bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::Ch
     bool rc = false;
 
     ChipLogProgress(DeviceLayer, "Received SendWriteRequest");
-    VerifyOrExit(mBLEManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mBLEManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mOnSendWriteRequestMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -402,13 +384,15 @@ bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::Ch
     err = JniReferences::GetInstance().N2J_ByteArray(env, static_cast<const uint8_t *>(charId->bytes), 16, charIdObj);
     SuccessOrExit(err);
 
-    err = JniReferences::GetInstance().N2J_ByteArray(env, pBuf->Start(), pBuf->DataLength(), characteristicDataObj);
+    VerifyOrExit(CanCastTo<uint16_t>(pBuf->DataLength()), err = CHIP_ERROR_MESSAGE_TOO_LONG);
+    err = JniReferences::GetInstance().N2J_ByteArray(env, pBuf->Start(), static_cast<uint16_t>(pBuf->DataLength()),
+                                                     characteristicDataObj);
     SuccessOrExit(err);
 
     env->ExceptionClear();
     tmpConnObj = reinterpret_cast<intptr_t>(conId);
-    rc = (bool) env->CallBooleanMethod(mBLEManagerObject, mOnSendWriteRequestMethod, static_cast<jint>(tmpConnObj), svcIdObj,
-                                       charIdObj, characteristicDataObj);
+    rc = (bool) env->CallBooleanMethod(mBLEManagerObject.ObjectRef(), mOnSendWriteRequestMethod, static_cast<jint>(tmpConnObj),
+                                       svcIdObj, charIdObj, characteristicDataObj);
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:
@@ -448,13 +432,13 @@ void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
     intptr_t tmpConnObj;
 
     ChipLogProgress(DeviceLayer, "Received NotifyChipConnectionClosed");
-    VerifyOrExit(mBLEManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mBLEManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mOnNotifyChipConnectionClosedMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     env->ExceptionClear();
     tmpConnObj = reinterpret_cast<intptr_t>(conId);
-    env->CallVoidMethod(mBLEManagerObject, mOnNotifyChipConnectionClosedMethod, static_cast<jint>(tmpConnObj));
+    env->CallVoidMethod(mBLEManagerObject.ObjectRef(), mOnNotifyChipConnectionClosedMethod, static_cast<jint>(tmpConnObj));
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:
@@ -467,19 +451,47 @@ exit:
 
 // ===== start implement virtual methods on BleConnectionDelegate.
 
-void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const uint16_t connDiscriminator)
+void BLEManagerImpl::OnConnectSuccess(void * appState, BLE_CONNECTION_OBJECT connObj)
+{
+    chip::DeviceLayer::StackLock lock;
+    BleConnectionDelegate::OnConnectionComplete(appState, connObj);
+}
+
+void BLEManagerImpl::OnConnectFailed(void * appState, CHIP_ERROR err)
+{
+    chip::DeviceLayer::StackLock lock;
+    BleConnectionDelegate::OnConnectionError(appState, err);
+}
+
+void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     ChipLogProgress(Controller, "Received New Connection");
-    VerifyOrExit(mBLEManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mBLEManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mOnNewConnectionMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     env->ExceptionClear();
-    env->CallVoidMethod(mBLEManagerObject, mOnNewConnectionMethod, static_cast<jint>(connDiscriminator));
+    // TODO: The API we have here does not handle short discriminators in any
+    // sane way.  Just do what we used to do, which is pretend that a short
+    // discriminator is actually a long discriminator with the low bits all 0.
+    uint16_t discriminator;
+    if (connDiscriminator.IsShortDiscriminator())
+    {
+        discriminator = static_cast<uint16_t>(connDiscriminator.GetShortValue())
+            << (SetupDiscriminator::kLongBits - SetupDiscriminator::kShortBits);
+    }
+    else
+    {
+        discriminator = connDiscriminator.GetLongValue();
+    }
+
+    env->CallVoidMethod(mBLEManagerObject.ObjectRef(), mOnNewConnectionMethod, static_cast<jint>(discriminator),
+                        static_cast<jboolean>(connDiscriminator.IsShortDiscriminator()), reinterpret_cast<jlong>(this),
+                        reinterpret_cast<jlong>(appState));
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:
@@ -504,13 +516,13 @@ CHIP_ERROR BLEManagerImpl::HasFlag(BLEManagerImpl::Flags flag, bool & has)
     chip::DeviceLayer::StackUnlock unlock;
     jlong f = static_cast<jlong>(flag);
 
-    VerifyOrReturnLogError(mBLEManagerObject != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnLogError(mBLEManagerObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnLogError(mHasFlagMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnLogError(env != nullptr, CHIP_JNI_ERROR_NO_ENV);
 
-    jboolean jret = env->CallBooleanMethod(mBLEManagerObject, mHasFlagMethod, f);
+    jboolean jret = env->CallBooleanMethod(mBLEManagerObject.ObjectRef(), mHasFlagMethod, f);
     if (env->ExceptionCheck())
     {
         ChipLogError(DeviceLayer, "Java exception in BLEManager::hasFlag");
@@ -528,13 +540,13 @@ CHIP_ERROR BLEManagerImpl::SetFlag(BLEManagerImpl::Flags flag, bool isSet)
     jlong jFlag     = static_cast<jlong>(flag);
     jboolean jIsSet = static_cast<jboolean>(isSet);
 
-    VerifyOrReturnLogError(mBLEManagerObject != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnLogError(mBLEManagerObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnLogError(mSetFlagMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnLogError(env != nullptr, CHIP_JNI_ERROR_NO_ENV);
 
-    env->CallLongMethod(mBLEManagerObject, mSetFlagMethod, jFlag, jIsSet);
+    env->CallLongMethod(mBLEManagerObject.ObjectRef(), mSetFlagMethod, jFlag, jIsSet);
     if (env->ExceptionCheck())
     {
         ChipLogError(DeviceLayer, "Java exception in BLEManager::satFlag");

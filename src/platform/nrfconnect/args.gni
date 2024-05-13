@@ -14,4 +14,7 @@
 
 declare_args() {
   chip_malloc_sys_heap = false
+
+  # Enable factory data support
+  chip_enable_factory_data = false
 }

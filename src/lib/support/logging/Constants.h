@@ -41,7 +41,7 @@ enum LogModule
     kLogModule_ServiceDirectory,
     kLogModule_ServiceProvisioning,
     kLogModule_SoftwareUpdate,
-    kLogModule_TokenPairing,
+    kLogModule_FailSafe,
     kLogModule_TimeService,
     kLogModule_Heartbeat,
     kLogModule_chipSystemLayer,
@@ -56,12 +56,180 @@ enum LogModule
     kLogModule_Discovery,
     kLogModule_InteractionModel,
     kLogModule_Test,
-    kLogModule_OperationalDeviceProxy,
+    kLogModule_OperationalSessionSetup,
     kLogModule_Automation,
     kLogModule_CASESessionManager,
+    kLogModule_ICD,
 
     kLogModule_Max
 };
+
+/* Log modules enablers. Those definitions can be overwritten with 0 to disable
+   some log regions. */
+
+#ifndef CHIP_CONFIG_LOG_MODULE_NotSpecified
+#define CHIP_CONFIG_LOG_MODULE_NotSpecified 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_Inet
+#define CHIP_CONFIG_LOG_MODULE_Inet 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_Ble
+#define CHIP_CONFIG_LOG_MODULE_Ble 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_MessageLayer
+#define CHIP_CONFIG_LOG_MODULE_MessageLayer 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_SecurityManager
+#define CHIP_CONFIG_LOG_MODULE_SecurityManager 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_ExchangeManager
+#define CHIP_CONFIG_LOG_MODULE_ExchangeManager 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_TLV
+#define CHIP_CONFIG_LOG_MODULE_TLV 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_ASN1
+#define CHIP_CONFIG_LOG_MODULE_ASN1 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_Crypto
+#define CHIP_CONFIG_LOG_MODULE_Crypto 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_Controller
+#define CHIP_CONFIG_LOG_MODULE_Controller 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_Alarm
+#define CHIP_CONFIG_LOG_MODULE_Alarm 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_SecureChannel
+#define CHIP_CONFIG_LOG_MODULE_SecureChannel 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_BDX
+#define CHIP_CONFIG_LOG_MODULE_BDX 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_DataManagement
+#define CHIP_CONFIG_LOG_MODULE_DataManagement 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_DeviceControl
+#define CHIP_CONFIG_LOG_MODULE_DeviceControl 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_DeviceDescription
+#define CHIP_CONFIG_LOG_MODULE_DeviceDescription 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_Echo
+#define CHIP_CONFIG_LOG_MODULE_Echo 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_FabricProvisioning
+#define CHIP_CONFIG_LOG_MODULE_FabricProvisioning 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_NetworkProvisioning
+#define CHIP_CONFIG_LOG_MODULE_NetworkProvisioning 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_ServiceDiscovery
+#define CHIP_CONFIG_LOG_MODULE_ServiceDiscovery 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_ServiceProvisioning
+#define CHIP_CONFIG_LOG_MODULE_ServiceProvisioning 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_SoftwareUpdate
+#define CHIP_CONFIG_LOG_MODULE_SoftwareUpdate 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_FailSafe
+#define CHIP_CONFIG_LOG_MODULE_FailSafe 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_TimeService
+#define CHIP_CONFIG_LOG_MODULE_TimeService 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_Heartbeat
+#define CHIP_CONFIG_LOG_MODULE_Heartbeat 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_chipSystemLayer
+#define CHIP_CONFIG_LOG_MODULE_chipSystemLayer 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_EventLogging
+#define CHIP_CONFIG_LOG_MODULE_EventLogging 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_Support
+#define CHIP_CONFIG_LOG_MODULE_Support 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_chipTool
+#define CHIP_CONFIG_LOG_MODULE_chipTool 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_Zcl
+#define CHIP_CONFIG_LOG_MODULE_Zcl 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_Shell
+#define CHIP_CONFIG_LOG_MODULE_Shell 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_DeviceLayer
+#define CHIP_CONFIG_LOG_MODULE_DeviceLayer 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_SetupPayload
+#define CHIP_CONFIG_LOG_MODULE_SetupPayload 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_AppServer
+#define CHIP_CONFIG_LOG_MODULE_AppServer 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_Discovery
+#define CHIP_CONFIG_LOG_MODULE_Discovery 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_InteractionModel
+#define CHIP_CONFIG_LOG_MODULE_InteractionModel 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_Test
+#define CHIP_CONFIG_LOG_MODULE_Test 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_OperationalSessionSetup
+#define CHIP_CONFIG_LOG_MODULE_OperationalSessionSetup 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_Automation
+#define CHIP_CONFIG_LOG_MODULE_Automation 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_CASESessionManager
+#define CHIP_CONFIG_LOG_MODULE_CASESessionManager 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_ICD
+#define CHIP_CONFIG_LOG_MODULE_ICD 1
+#endif
 
 /**
  *  @enum LogCategory

@@ -15,15 +15,18 @@
  *    limitations under the License.
  */
 
+#include "software-diagnostics-server.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
+#include <app/CommandHandlerInterface.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
-#include <app/util/af.h>
+#include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/Optional.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -51,7 +54,20 @@ private:
     CHIP_ERROR ReadThreadMetrics(AttributeValueEncoder & aEncoder);
 };
 
+class SoftwareDiagnosticsCommandHandler : public CommandHandlerInterface
+{
+public:
+    // Register for the SoftwareDiagnostics cluster on all endpoints.
+    SoftwareDiagnosticsCommandHandler() : CommandHandlerInterface(Optional<EndpointId>::Missing(), SoftwareDiagnostics::Id) {}
+
+    void InvokeCommand(HandlerContext & handlerContext) override;
+
+    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
+};
+
 SoftwareDiagosticsAttrAccess gAttrAccess;
+
+SoftwareDiagnosticsCommandHandler gCommandHandler;
 
 CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
@@ -63,21 +79,26 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & 
 
     switch (aPath.mAttributeId)
     {
-    case CurrentHeapFree::Id: {
+    case CurrentHeapFree::Id:
         return ReadIfSupported(&DiagnosticDataProvider::GetCurrentHeapFree, aEncoder);
-    }
-    case CurrentHeapUsed::Id: {
+    case CurrentHeapUsed::Id:
         return ReadIfSupported(&DiagnosticDataProvider::GetCurrentHeapUsed, aEncoder);
-    }
-    case CurrentHeapHighWatermark::Id: {
+    case CurrentHeapHighWatermark::Id:
         return ReadIfSupported(&DiagnosticDataProvider::GetCurrentHeapHighWatermark, aEncoder);
-    }
-    case ThreadMetrics::Id: {
+    case ThreadMetrics::Id:
         return ReadThreadMetrics(aEncoder);
+    case Clusters::Globals::Attributes::FeatureMap::Id: {
+        BitFlags<Feature> features;
+
+        if (DeviceLayer::GetDiagnosticDataProvider().SupportsWatermarks())
+        {
+            features.Set(Feature::kWatermarks);
+        }
+
+        return aEncoder.Encode(features);
     }
-    default: {
+    default:
         break;
-    }
     }
     return CHIP_NO_ERROR;
 }
@@ -125,57 +146,90 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::ReadThreadMetrics(AttributeValueEncoder
     return err;
 }
 
-class SoftwareDiagnosticsDelegate : public DeviceLayer::SoftwareDiagnosticsDelegate
+void SoftwareDiagnosticsCommandHandler::InvokeCommand(HandlerContext & handlerContext)
 {
-    // Gets called when a software fault that has taken place on the Node.
-    void OnSoftwareFaultDetected(SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type & softwareFault) override
+    using Protocols::InteractionModel::Status;
+    if (handlerContext.mRequestPath.mCommandId != Commands::ResetWatermarks::Id)
     {
-        ChipLogDetail(Zcl, "SoftwareDiagnosticsDelegate: OnSoftwareFaultDetected");
-
-        for (auto endpoint : EnabledEndpointsWithServerCluster(SoftwareDiagnostics::Id))
-        {
-            // If Software Diagnostics cluster is implemented on this endpoint
-            EventNumber eventNumber;
-            Events::SoftwareFault::Type event{ softwareFault };
-
-            if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
-            {
-                ChipLogError(Zcl, "SoftwareDiagnosticsDelegate: Failed to record SoftwareFault event");
-            }
-        }
+        // Normal error handling
+        return;
     }
-};
 
-SoftwareDiagnosticsDelegate gDiagnosticDelegate;
+    handlerContext.SetCommandHandled();
+    Status status = Status::Success;
+    if (!DeviceLayer::GetDiagnosticDataProvider().SupportsWatermarks())
+    {
+        status = Status::UnsupportedCommand;
+    }
+    else if (DeviceLayer::GetDiagnosticDataProvider().ResetWatermarks() != CHIP_NO_ERROR)
+    {
+        status = Status::Failure;
+    }
+    handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
+}
+
+CHIP_ERROR SoftwareDiagnosticsCommandHandler::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                                                        CommandIdCallback callback, void * context)
+{
+    if (!DeviceLayer::GetDiagnosticDataProvider().SupportsWatermarks())
+    {
+        // No commmands.
+        return CHIP_NO_ERROR;
+    }
+
+    callback(Commands::ResetWatermarks::Id, context);
+
+    return CHIP_NO_ERROR;
+}
 
 } // anonymous namespace
+
+namespace chip {
+namespace app {
+namespace Clusters {
+
+SoftwareDiagnosticsServer SoftwareDiagnosticsServer::instance;
+
+/**********************************************************
+ * SoftwareDiagnosticsServer Implementation
+ *********************************************************/
+
+SoftwareDiagnosticsServer & SoftwareDiagnosticsServer::Instance()
+{
+    return instance;
+}
+
+// Gets called when a software fault that has taken place on the Node.
+void SoftwareDiagnosticsServer::OnSoftwareFaultDetect(const SoftwareDiagnostics::Events::SoftwareFault::Type & softwareFault)
+{
+    ChipLogDetail(Zcl, "SoftwareDiagnosticsDelegate: OnSoftwareFaultDetected");
+
+    for (auto endpoint : EnabledEndpointsWithServerCluster(SoftwareDiagnostics::Id))
+    {
+        // If Software Diagnostics cluster is implemented on this endpoint
+        EventNumber eventNumber;
+
+        if (CHIP_NO_ERROR != LogEvent(softwareFault, endpoint, eventNumber))
+        {
+            ChipLogError(Zcl, "SoftwareDiagnosticsDelegate: Failed to record SoftwareFault event");
+        }
+    }
+}
+
+} // namespace Clusters
+} // namespace app
+} // namespace chip
 
 bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(app::CommandHandler * commandObj,
                                                               const app::ConcreteCommandPath & commandPath,
                                                               const Commands::ResetWatermarks::DecodableType & commandData)
 {
-    EndpointId endpoint = commandPath.mEndpointId;
-
-    uint64_t currentHeapUsed;
-
-    EmberAfStatus status = SoftwareDiagnostics::Attributes::CurrentHeapUsed::Get(endpoint, &currentHeapUsed);
-    VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to get the value of the CurrentHeapUsed attribute"));
-
-    status = SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Set(endpoint, currentHeapUsed);
-    VerifyOrExit(
-        status == EMBER_ZCL_STATUS_SUCCESS,
-        ChipLogError(
-            Zcl,
-            "Failed to reset the value of the CurrentHeapHighWaterMark attribute to the value of the CurrentHeapUsed attribute"));
-
-exit:
-    emberAfSendImmediateDefaultResponse(status);
-
-    return true;
+    // Shouldn't be called at all.
+    return false;
 }
 
 void MatterSoftwareDiagnosticsPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
-    GetDiagnosticDataProvider().SetSoftwareDiagnosticsDelegate(&gDiagnosticDelegate);
+    InteractionModelEngine::GetInstance()->RegisterCommandHandler(&gCommandHandler);
 }

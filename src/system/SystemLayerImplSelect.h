@@ -22,12 +22,27 @@
 
 #pragma once
 
+#include "system/SystemConfig.h"
+
+#if CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS
 #include <sys/select.h>
+#endif
+
+#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS
+#include <zephyr/net/socket.h>
+#endif
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 #include <atomic>
 #include <pthread.h>
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
+
+#if CHIP_SYSTEM_CONFIG_USE_LIBEV
+#include <ev.h>
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+#error "CHIP_SYSTEM_CONFIG_USE_LIBEV and CHIP_SYSTEM_CONFIG_USE_DISPATCH are mutually exclusive"
+#endif
+#endif // CHIP_SYSTEM_CONFIG_USE_LIBEV
 
 #include <lib/support/ObjectLifeCycle.h>
 #include <system/SystemLayer.h>
@@ -45,9 +60,12 @@ public:
 
     // Layer overrides.
     CHIP_ERROR Init() override;
-    CHIP_ERROR Shutdown() override;
+    void Shutdown() override;
     bool IsInitialized() const override { return mLayerState.IsInitialized(); }
     CHIP_ERROR StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState) override;
+    CHIP_ERROR ExtendTimerTo(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState) override;
+    bool IsTimerActive(TimerCompleteCallback onComplete, void * appState) override;
+    Clock::Timeout GetRemainingTime(TimerCompleteCallback onComplete, void * appState) override;
     void CancelTimer(TimerCompleteCallback onComplete, void * appState) override;
     CHIP_ERROR ScheduleWork(TimerCompleteCallback onComplete, void * appState) override;
 
@@ -73,7 +91,12 @@ public:
     void SetDispatchQueue(dispatch_queue_t dispatchQueue) override { mDispatchQueue = dispatchQueue; };
     dispatch_queue_t GetDispatchQueue() override { return mDispatchQueue; };
     void HandleTimerComplete(TimerList::Node * timer);
-#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+#elif CHIP_SYSTEM_CONFIG_USE_LIBEV
+    virtual void SetLibEvLoop(struct ev_loop * aLibEvLoopP) override { mLibEvLoopP = aLibEvLoopP; };
+    virtual struct ev_loop * GetLibEvLoop() override { return mLibEvLoopP; };
+    static void HandleLibEvTimer(EV_P_ struct ev_timer * t, int revents);
+    static void HandleLibEvIoWatcher(EV_P_ struct ev_io * i, int revents);
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH/LIBEV
 
     // Expose the result of WaitForEvents() for non-blocking socket implementations.
     bool IsSelectResultValid() const { return mSelectResult >= 0; }
@@ -90,12 +113,26 @@ protected:
         int mFD;
         SocketEvents mPendingIO;
         SocketWatchCallback mCallback;
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+        dispatch_source_t mRdSource;
+        dispatch_source_t mWrSource;
+        void DisableAndClear();
+#endif
+#if CHIP_SYSTEM_CONFIG_USE_LIBEV
+        struct ev_io mIoWatcher;
+        LayerImplSelect * mLayerImplSelectP;
+        void DisableAndClear();
+#endif
+
         intptr_t mCallbackData;
     };
     SocketWatch mSocketWatchPool[kSocketWatchMax];
 
     TimerPool<TimerList::Node> mTimerPool;
     TimerList mTimerList;
+    // List of expired timers being processed right now.  Stored in a member so
+    // we can cancel them.
+    TimerList mExpiredTimers;
     timeval mNextTimeout;
 
     // Members for select loop
@@ -112,7 +149,9 @@ protected:
     int mSelectResult;
 
     ObjectLifeCycle mLayerState;
+#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
     WakeEvent mWakeEvent;
+#endif
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     std::atomic<pthread_t> mHandleSelectThread;
@@ -120,6 +159,8 @@ protected:
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     dispatch_queue_t mDispatchQueue = nullptr;
+#elif CHIP_SYSTEM_CONFIG_USE_LIBEV
+    struct ev_loop * mLibEvLoopP;
 #endif
 };
 

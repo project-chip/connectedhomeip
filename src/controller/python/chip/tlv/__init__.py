@@ -25,13 +25,14 @@
 #
 
 
-from __future__ import absolute_import
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import struct
 from collections import OrderedDict
 from collections.abc import Mapping, Sequence
 from enum import Enum
+
+from .tlvlist import TLVList
 
 TLV_TYPE_SIGNED_INTEGER = 0x00
 TLV_TYPE_UNSIGNED_INTEGER = 0x04
@@ -115,7 +116,8 @@ TagControls = {
 
 class uint(int):
     '''
-    NewType will not return a class until Python 3.10, as Python 3.10 is not widely used, we still need to construct a class so it can work as a type.
+    NewType will not return a class until Python 3.10, as Python 3.10 is not widely used,
+    we still need to construct a class so it can work as a type.
     '''
 
     def __init__(self, val: int):
@@ -216,12 +218,17 @@ class TLVWriter(object):
             self.putBytes(tag, val)
         elif isinstance(val, Mapping):
             self.startStructure(tag)
-            if type(val) == dict:
+            if type(val) is dict:
                 val = OrderedDict(
                     sorted(val.items(),
                            key=lambda item: tlvTagToSortKey(item[0]))
                 )
             for containedTag, containedVal in val.items():
+                self.put(containedTag, containedVal)
+            self.endContainer()
+        elif isinstance(val, TLVList):
+            self.startPath(tag)
+            for containedTag, containedVal in val:
                 self.put(containedTag, containedVal)
             self.endContainer()
         elif isinstance(val, Sequence):
@@ -380,7 +387,7 @@ class TLVWriter(object):
                 raise ValueError("Invalid object given for TLV tag")
             if tagNum < 0 or tagNum > UINT32_MAX:
                 raise ValueError("TLV tag number out of range")
-            if profile != None:
+            if profile is not None:
                 if not isinstance(profile, int):
                     raise ValueError("Invalid object given for TLV profile id")
                 if profile < 0 or profile > UINT32_MAX:
@@ -577,7 +584,7 @@ class TLVReader(object):
             decoding["Array"] = []
             self._get(tlv, decoding["Array"], decoding["value"])
         elif decoding["type"] == "Path":
-            decoding["value"] = []
+            decoding["value"] = TLVList()
             decoding["Path"] = []
             self._get(tlv, decoding["Path"], decoding["value"])
         elif decoding["type"] == "Null":
@@ -650,7 +657,7 @@ class TLVReader(object):
             )
             try:
                 decoding["value"] = str(val, "utf-8")
-            except Exception as ex:
+            except Exception:
                 decoding["value"] = val
             self._bytesRead += decoding["strDataLen"]
         elif "Byte String" in decoding["type"]:
@@ -667,7 +674,7 @@ class TLVReader(object):
     def _get(self, tlv, decodings, out):
         endOfEncoding = False
 
-        while len(tlv[self._bytesRead:]) > 0 and endOfEncoding == False:
+        while len(tlv[self._bytesRead:]) > 0 and endOfEncoding is False:
             decoding = {}
             self._decodeControlAndTag(tlv, decoding)
             self._decodeStrLength(tlv, decoding)
@@ -680,13 +687,14 @@ class TLVReader(object):
                 if "profileTag" in list(decoding.keys()):
                     out[decoding["profileTag"]] = decoding["value"]
                 elif "tag" in list(decoding.keys()):
-                    if decoding["tag"] is not None:
-                        out[decoding["tag"]] = decoding["value"]
+                    if isinstance(out, Mapping):
+                        tag = decoding["tag"] if decoding["tag"] is not None else "Any"
+                        out[tag] = decoding["value"]
+                    elif isinstance(out, TLVList):
+                        tag = decoding["tag"] if decoding["tag"] is not None else None
+                        out.append(tag, decoding["value"])
                     else:
-                        if isinstance(out, Mapping):
-                            out["Any"] = decoding["value"]
-                        elif isinstance(out, Sequence):
-                            out.append(decoding["value"])
+                        out.append(decoding["value"])
                 else:
                     raise ValueError("Attempt to decode unsupported TLV tag")
 

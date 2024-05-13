@@ -1,0 +1,147 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 3.2.27. [TC-CC-9.4] ColorLoopSet Validation with client as DUT
+
+PICS:
+    - CC.C
+
+config:
+    nodeId: 0x12344321
+    timeout: 500
+    cluster: "Color Control"
+    endpoint: 1
+
+tests:
+    #- label: "Wait for the device to be commissioned"
+    #  cluster: "DelayCommands"
+    #  command: "WaitForCommissioning"
+
+    - label: "PreCondition: Set TH OnOff to On"
+      cluster: "On/Off"
+      wait: "On"
+
+    - label: "DUT sends ColorLoopSet command to TH"
+      PICS: CC.C.C44.Tx && CC.C.F02 && CC.C.F01
+      wait: "ColorLoopSet"
+
+    - label: "DUT reads ColorLoopActive attribute from TH periodically"
+      PICS: CC.C.A4002 && CC.C.F02 && CC.C.F01
+      wait: "readAttribute"
+      attribute: "ColorLoopActive"
+
+    - label: "DUT reads ColorLoopDirection attribute from TH periodically"
+      PICS: CC.C.A4003 && CC.C.F02 && CC.C.F01
+      wait: "readAttribute"
+      attribute: "ColorLoopDirection"
+
+    - label: "DUT reads ColorLoopTime attribute from TH periodically"
+      PICS: CC.C.A4004 && CC.C.F02 && CC.C.F01
+      wait: "readAttribute"
+      attribute: "ColorLoopTime"
+
+    - label:
+          "DUT reads ColorLoopStartEnhancedHue attribute from TH periodically"
+      PICS: CC.C.A4005 && CC.C.F02 && CC.C.F01
+      wait: "readAttribute"
+      attribute: "ColorLoopStartEnhancedHue"
+
+    - label: "DUT reads EnhancedCurrentHue attribute from TH periodically"
+      PICS: CC.C.A4000 && CC.C.F02 && CC.C.F01
+      wait: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+
+    - label: "Wait 5000ms"
+      PICS: CC.C.F02 && CC.C.F01
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "DUT reads EnhancedCurrentHue attribute from TH periodically"
+      PICS: CC.C.A4000 && CC.C.F02 && CC.C.F01
+      wait: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+
+    - label: "Wait 5000ms"
+      PICS: CC.C.F02 && CC.C.F01
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "DUT reads EnhancedCurrentHue attribute from TH periodically"
+      PICS: CC.C.A4000 && CC.C.F02 && CC.C.F01
+      wait: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+
+    - label: "Wait 5000ms"
+      PICS: CC.C.F02 && CC.C.F01
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "DUT reads EnhancedCurrentHue attribute from TH periodically"
+      PICS: CC.C.A4000 && CC.C.F02 && CC.C.F01
+      wait: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+
+    - label: "Wait 5000ms"
+      PICS: CC.C.F02 && CC.C.F01
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "DUT reads EnhancedCurrentHue attribute from TH periodically"
+      PICS: CC.C.A4000 && CC.C.F02 && CC.C.F01
+      wait: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+
+    - label: "Wait 5000ms"
+      PICS: CC.C.F02 && CC.C.F01
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "DUT reads EnhancedCurrentHue attribute from TH periodically"
+      PICS: CC.C.A4000 && CC.C.F02 && CC.C.F01
+      wait: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+
+    - label: "Wait 5000ms"
+      PICS: CC.C.F02 && CC.C.F01
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "DUT reads EnhancedCurrentHue attribute from TH periodically"
+      PICS: CC.C.A4000 && CC.C.F02 && CC.C.F01
+      wait: "readAttribute"
+      attribute: "EnhancedCurrentHue"

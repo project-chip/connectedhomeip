@@ -14,13 +14,16 @@
 
 name: 30.2.1. [TC-OCC-2.1] Attributes with server as DUT
 
+PICS:
+    - OCC.S
+
 config:
     nodeId: 0x12344321
     cluster: "Occupancy Sensing"
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Commission DUT to TH"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -28,47 +31,22 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Reads mandatory attribute: Occupancy"
-      disabled: true
+    - label: "Step 2: TH reads from the DUT the (0x0000) Occupancy attribute"
+      PICS: OCC.S.A0000
       command: "readAttribute"
-      attribute: "occupancy"
-      response:
-          value: 0
-
-    - label: "Reads mandatory attribute constrains: Occupancy"
-      command: "readAttribute"
-      attribute: "occupancy"
+      attribute: "Occupancy"
       response:
           constraints:
-              type: map8
+              type: bitmap8
               minValue: 0
               maxValue: 1
 
     - label:
-          "Writes the respective default value to mandatory attribute: Occupancy"
-      command: "writeAttribute"
-      attribute: "occupancy"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back mandatory attribute: Occupancy"
+          "Step 3: TH reads from the DUT the (0x0001) OccupancySensorType
+          attribute"
+      PICS: OCC.S.A0001
       command: "readAttribute"
-      attribute: "occupancy"
-      response:
-          value: 0
-
-    - label: "Reads mandatory attribute: OccupancySensorType"
-      disabled: true
-      command: "readAttribute"
-      attribute: "occupancy sensor type"
-      response:
-          value: 0
-
-    - label: "Reads mandatory attribute constrains: OccupancySensorType"
-      command: "readAttribute"
-      attribute: "occupancy sensor type"
+      attribute: "OccupancySensorType"
       response:
           constraints:
               type: enum8
@@ -76,257 +54,127 @@ tests:
               maxValue: 3
 
     - label:
-          "Writes the respective default value to mandatory attribute:
-          OccupancySensorType"
-      command: "writeAttribute"
-      attribute: "occupancy sensor type"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back mandatory attribute: OccupancySensorType"
+          "Step 4:TH reads from the DUT the (0x0002) OccupancySensorTypeBitmap
+          attribute"
+      PICS: OCC.S.A0002
       command: "readAttribute"
-      attribute: "occupancy sensor type"
-      response:
-          value: 0
-
-    - label: "Reads mandatory attribute: OccupancySensorTypeBitmap"
-      disabled: true
-      command: "readAttribute"
-      attribute: "occupancy sensor type bitmap"
-      response:
-          value: 0
-
-    - label: "Reads mandatory attribute constrains: OccupancySensorTypeBitmap"
-      command: "readAttribute"
-      attribute: "occupancy sensor type bitmap"
+      attribute: "OccupancySensorTypeBitmap"
       response:
           constraints:
-              type: map8
+              type: bitmap8
               minValue: 1
               maxValue: 7
 
     - label:
-          "Writes the respective default value to mandatory attribute:
-          OccupancySensorTypeBitmap"
-      command: "writeAttribute"
-      attribute: "occupancy sensor type bitmap"
-      arguments:
-          value: 1
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back mandatory attribute: OccupancySensorTypeBitmap"
-      command: "readAttribute"
-      attribute: "occupancy sensor type bitmap"
-      response:
-          value: 1
-
-    #disabled due to issue #15377
-    - label: "Reads optional attribute: PIROccupiedToUnoccupiedDelay"
-      disabled: true
-      command: "readAttribute"
-      attribute: "PIROccupiedToUnoccupiedDelay"
-      response:
-          value: 0
-
-    - label: "Reads optional attribute constrains: PIROccupiedToUnoccupiedDelay"
-      disabled: true
+          "Step 5: TH reads from the DUT the (0x0010)
+          PIROccupiedToUnoccupiedDelay optional attribute, if PIR sensor"
+      PICS: OCC.S.A0010
       command: "readAttribute"
       attribute: "PIROccupiedToUnoccupiedDelay"
       response:
           constraints:
-              type: uint16
+              type: int16u
+              minValue: 0
+              maxValue: 65535
 
     - label:
-          "Writes the respective default value to optional attribute:
-          PIROccupiedToUnoccupiedDelay"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "PIROccupiedToUnoccupiedDelay"
-      arguments:
-          value: 0
-
-    - label: "Reads back optional attribute: PIROccupiedToUnoccupiedDelay"
-      disabled: true
-      command: "readAttribute"
-      attribute: "PIROccupiedToUnoccupiedDelay"
-      response:
-          value: 0
-
-    - label: "Reads optional attribute: PIRUnoccupiedToOccupiedDelay"
-      disabled: true
-      command: "readAttribute"
-      attribute: "PIRUnoccupiedToOccupiedDelay"
-      response:
-          value: 0
-
-    - label: "Reads optional attribute constrains: PIRUnoccupiedToOccupiedDelay"
-      disabled: true
+          "Step 6: TH reads from the DUT the (0x0011)
+          PIRUnoccupiedToOccupiedDelay optional attribute, if PIR sensor"
+      PICS: OCC.S.A0011
       command: "readAttribute"
       attribute: "PIRUnoccupiedToOccupiedDelay"
       response:
           constraints:
-              type: uint16
+              type: int16u
+              minValue: 0
+              maxValue: 65535
 
     - label:
-          "Writes the respective default value to optional attribute:
-          PIRUnoccupiedToOccupiedDelay"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "PIRUnoccupiedToOccupiedDelay"
-      arguments:
-          value: 0
-
-    - label: "Reads back optional attribute: PIRUnoccupiedToOccupiedDelay"
-      disabled: true
-      command: "readAttribute"
-      attribute: "PIRUnoccupiedToOccupiedDelay"
-      response:
-          value: 0
-
-    - label: "Reads optional attribute: PIRUnoccupiedToOccupiedThreshold"
-      disabled: true
-      command: "readAttribute"
-      attribute: "PIRUnoccupiedToOccupiedThreshold"
-      response:
-          value: 1
-
-    - label:
-          "Reads optional attribute constrains: PIRUnoccupiedToOccupiedThreshold"
-      disabled: true
+          "Step 7: TH reads from the DUT the (0x0012)
+          PIRUnoccupiedToOccupiedThreshold optional attribute, if PIR sensor"
+      PICS: OCC.S.A0012
       command: "readAttribute"
       attribute: "PIRUnoccupiedToOccupiedThreshold"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 1
               maxValue: 254
 
     - label:
-          "Writes the respective default value to optional attribute:
-          PIRUnoccupiedToOccupiedThreshold"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "PIRUnoccupiedToOccupiedThreshold"
-      arguments:
-          value: 1
-
-    - label: "Reads back optional attribute: PIRUnoccupiedToOccupiedThreshold"
-      disabled: true
+          "Step 8: TH reads from the DUT the (0x0020)
+          UltrasonicOccupiedToUnoccupiedDelay optional attribute, if ultrasonic
+          sensor"
+      PICS: OCC.S.A0020
       command: "readAttribute"
-      attribute: "PIRUnoccupiedToOccupiedThreshold"
-      response:
-          value: 1
-
-    - label:
-          "Reads optional attribute: PhysicalContactOccupiedToUnoccupiedDelay"
-      disabled: true
-      command: "readAttribute"
-      attribute: "PhysicalContactOccupiedToUnoccupiedDelay"
-      response:
-          value: 0
-
-    - label:
-          "Reads optional attribute constrains:
-          PhysicalContactOccupiedToUnoccupiedDelay"
-      disabled: true
-      command: "readAttribute"
-      attribute: "PhysicalContactOccupiedToUnoccupiedDelay"
+      attribute: "UltrasonicOccupiedToUnoccupiedDelay"
       response:
           constraints:
-              type: uint16
+              type: int16u
+              minValue: 0
+              maxValue: 65535
 
     - label:
-          "Writes the respective default value to optional attribute:
-          PhysicalContactOccupiedToUnoccupiedDelay"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "PhysicalContactOccupiedToUnoccupiedDelay"
-      arguments:
-          value: 0
-
-    - label:
-          "Reads back optional attribute:
-          PhysicalContactOccupiedToUnoccupiedDelay"
-      disabled: true
+          "Step 9: TH reads from the DUT the (0x0021)
+          UltrasonicUnoccupiedToOccupiedDelay optional attribute, if ultrasonic
+          sensor"
+      PICS: OCC.S.A0021
       command: "readAttribute"
-      attribute: "PhysicalContactOccupiedToUnoccupiedDelay"
-      response:
-          value: 0
-
-    - label:
-          "Reads optional attribute: PhysicalContactUnoccupiedToOccupiedDelay"
-      disabled: true
-      command: "readAttribute"
-      attribute: "PhysicalContactUnoccupiedToOccupiedDelay"
-      response:
-          value: 0
-
-    - label:
-          "Reads optional attribute constrains:
-          PhysicalContactUnoccupiedToOccupiedDelay"
-      disabled: true
-      command: "readAttribute"
-      attribute: "PhysicalContactUnoccupiedToOccupiedDelay"
+      attribute: "UltrasonicUnoccupiedToOccupiedDelay"
       response:
           constraints:
-              type: uint16
+              type: int16u
+              minValue: 0
+              maxValue: 65535
 
     - label:
-          "Writes the respective default value to optional attribute:
-          PhysicalContactUnoccupiedToOccupiedDelay"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "PhysicalContactUnoccupiedToOccupiedDelay"
-      arguments:
-          value: 0
-
-    - label:
-          "Reads back optional attribute:
-          PhysicalContactUnoccupiedToOccupiedDelay"
-      disabled: true
+          "Step 10: TH reads from the DUT the (0x0022)
+          UltrasonicUnoccupiedToOccupiedThreshold optional attribute, if
+          ultrasonic sensor"
+      PICS: OCC.S.A0022
       command: "readAttribute"
-      attribute: "PhysicalContactUnoccupiedToOccupiedDelay"
-      response:
-          value: 0
-
-    - label:
-          "Reads optional attribute:
-          PhysicalContactUnoccupiedToOccupiedThreshold"
-      disabled: true
-      command: "readAttribute"
-      attribute: "PhysicalContactUnoccupiedToOccupiedThreshold"
-      response:
-          value: 1
-
-    - label:
-          "Reads optional attribute constrains:
-          PhysicalContactUnoccupiedToOccupiedThreshold"
-      disabled: true
-      command: "readAttribute"
-      attribute: "PhysicalContactUnoccupiedToOccupiedThreshold"
+      attribute: "UltrasonicUnoccupiedToOccupiedThreshold"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 1
               maxValue: 254
 
     - label:
-          "Writes the respective default value to optional attribute:
-          PhysicalContactUnoccupiedToOccupiedThreshold"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "PhysicalContactUnoccupiedToOccupiedThreshold"
-      arguments:
-          value: 1
+          "Step 11:TH reads from the DUT the (0x0030)
+          PhysicalContactOccupiedToUnoccupiedDelay optional attribute, if
+          Physical Contact sensor"
+      PICS: OCC.S.A0030
+      command: "readAttribute"
+      attribute: "PhysicalContactOccupiedToUnoccupiedDelay"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
 
     - label:
-          "Reads back optional attribute:
-          PhysicalContactUnoccupiedToOccupiedThreshold"
-      disabled: true
+          "Step 12: TH reads from the DUT the (0x0031)
+          PhysicalContactUnoccupiedToOccupiedDelay optional attribute, if
+          Physical Contact sensor"
+      PICS: OCC.S.A0031
+      command: "readAttribute"
+      attribute: "PhysicalContactUnoccupiedToOccupiedDelay"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label:
+          "Step 13: TH reads from the DUT the (0x0032)
+          PhysicalContactUnoccupiedToOccupiedThreshold optional attribute, if
+          Physical Contact sensor"
+      PICS: OCC.S.A0032
       command: "readAttribute"
       attribute: "PhysicalContactUnoccupiedToOccupiedThreshold"
       response:
-          value: 1
+          constraints:
+              type: int8u
+              minValue: 1
+              maxValue: 254

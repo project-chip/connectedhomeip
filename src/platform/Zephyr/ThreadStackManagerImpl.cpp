@@ -24,19 +24,16 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
 #include <platform/Zephyr/ThreadStackManagerImpl.h>
 
-#include <inet/UDPEndPointImpl.h>
 #include <lib/support/CodeUtils.h>
-#include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 
 namespace chip {
 namespace DeviceLayer {
 
 using namespace ::chip::DeviceLayer::Internal;
-using namespace ::chip::Inet;
 
 ThreadStackManagerImpl ThreadStackManagerImpl::sInstance;
 
@@ -46,17 +43,9 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 
     ReturnErrorOnFailure(GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(instance));
 
-    UDPEndPointImplSockets::SetJoinMulticastGroupHandler([](InterfaceId, const IPAddress & address) {
-        const otIp6Address otAddress = ToOpenThreadIP6Address(address);
-        const auto otError           = otIp6SubscribeMulticastAddress(openthread_get_default_instance(), &otAddress);
-        return MapOpenThreadError(otError);
-    });
-
-    UDPEndPointImplSockets::SetLeaveMulticastGroupHandler([](InterfaceId, const IPAddress & address) {
-        const otIp6Address otAddress = ToOpenThreadIP6Address(address);
-        const auto otError           = otIp6UnsubscribeMulticastAddress(openthread_get_default_instance(), &otAddress);
-        return MapOpenThreadError(otError);
-    });
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    k_sem_init(&mSrpClearAllSemaphore, 0, 1);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
     return CHIP_NO_ERROR;
 }
@@ -77,26 +66,17 @@ void ThreadStackManagerImpl::_UnlockThreadStack()
     openthread_api_mutex_unlock(openthread_get_default_context());
 }
 
-void ThreadStackManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+void ThreadStackManagerImpl::_WaitOnSrpClearAllComplete()
 {
-    Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::_OnPlatformEvent(event);
-
-    if (event->Type == DeviceEventType::kThreadStateChange && event->ThreadStateChange.RoleChanged)
-    {
-        const bool isAttached = IsThreadAttached();
-        VerifyOrReturn(isAttached != mIsAttached);
-
-        ChipDeviceEvent attachEvent;
-        attachEvent.Type                            = DeviceEventType::kThreadConnectivityChange;
-        attachEvent.ThreadConnectivityChange.Result = isAttached ? kConnectivity_Established : kConnectivity_Lost;
-
-        CHIP_ERROR error = PlatformMgr().PostEvent(&attachEvent);
-        VerifyOrReturn(error == CHIP_NO_ERROR,
-                       ChipLogError(DeviceLayer, "Failed to post Thread connectivity change: %" CHIP_ERROR_FORMAT, error.Format()));
-
-        mIsAttached = isAttached;
-    }
+    k_sem_take(&mSrpClearAllSemaphore, K_SECONDS(2));
 }
+
+void ThreadStackManagerImpl::_NotifySrpClearAllComplete()
+{
+    k_sem_give(&mSrpClearAllSemaphore);
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
 } // namespace DeviceLayer
 } // namespace chip

@@ -27,9 +27,6 @@ clang-apply-replacements out/fixes.yaml
 
 """
 
-import build
-import click
-import coloredlogs
 import glob
 import json
 import logging
@@ -43,6 +40,9 @@ import sys
 import tempfile
 import threading
 import traceback
+
+import click
+import coloredlogs
 import yaml
 
 
@@ -125,10 +125,38 @@ class ClangTidyEntry:
             )
             output, err = proc.communicate()
             if output:
+                # Output generally contains validation data. Print it out as-is
                 logging.info("TIDY %s: %s", self.file, output.decode("utf-8"))
 
             if err:
-                logging.warning("TIDY %s: %s", self.file, err.decode("utf-8"))
+                # Most (all?) of our files do contain errors in system-headers so lines like these
+                # are expected:
+                #
+                # ```
+                # 59 warnings generated.
+                # Suppressed 59 warnings (59 in non-user code).
+                # Use -header-filter=.* to display errors from all non-system headers.
+                # Use -system-headers to display errors from system headers as well.
+                # ```
+                #
+                # The list below ignores those expected output lines.
+                skip_strings = [
+                    "warnings generated",
+                    "in non-user code",
+                    "Use -header-filter=.* to display errors from all non-system headers.",
+                    "Use -system-headers to display errors from system headers as well.",
+                ]
+
+                for line in err.decode('utf-8').split('\n'):
+                    line = line.strip()
+
+                    if any(map(lambda s: s in line, skip_strings)):
+                        continue
+
+                    if not line:
+                        continue  # no empty lines
+
+                    logging.warning('TIDY %s: %s', self.file, line)
 
             if proc.returncode != 0:
                 if proc.returncode < 0:
@@ -140,7 +168,7 @@ class ClangTidyEntry:
                         "Tidy %s ended with code %d", self.file, proc.returncode
                     )
                 return TidyResult(self.full_path, False)
-        except:
+        except Exception:
             traceback.print_exc()
             return TidyResult(self.full_path, False)
 
@@ -170,7 +198,7 @@ def find_darwin_gcc_sysroot():
         if not line.startswith('Path: '):
             continue
         path = line[line.find(': ')+2:]
-        if not '/MacOSX.platform/' in path:
+        if '/MacOSX.platform/' not in path:
             continue
         logging.info("Found %s" % path)
         return path
@@ -307,11 +335,12 @@ class ClangTidyRunner:
             task_queue.put(e)
         task_queue.join()
 
-        logging.info("Successfully processed %d paths", self.state.successes)
-        logging.info("Failed to process %d paths", self.state.failures)
+        logging.info("Successfully processed %d path(s)", self.state.successes)
         if self.state.failures:
+            logging.warning("Failed to process %d path(s)", self.state.failures)
+            logging.warning("The following paths failed clang-tidy checks:")
             for name in self.state.failed_files:
-                logging.warning("Failure reported for %s", name)
+                logging.warning("  - %s", name)
 
         return self.state.failures == 0
 
@@ -454,4 +483,4 @@ def cmd_fix(context):
 
 
 if __name__ == "__main__":
-    main()
+    main(auto_envvar_prefix='CHIP')

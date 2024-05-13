@@ -18,9 +18,10 @@
 
 #pragma once
 
-#include "DiscoverCommand.h"
-#include "DiscoverCommissionablesCommand.h"
-#include "DiscoverCommissionersCommand.h"
+#include "commands/common/Commands.h"
+#include "commands/discover/DiscoverCommand.h"
+#include "commands/discover/DiscoverCommissionablesCommand.h"
+#include "commands/discover/DiscoverCommissionersCommand.h"
 #include <lib/address_resolve/AddressResolve.h>
 
 class Resolve : public DiscoverCommand, public chip::AddressResolve::NodeListener
@@ -48,9 +49,12 @@ public:
         result.address.ToString(addrBuffer);
 
         ChipLogProgress(chipTool, "NodeId Resolution: %" PRIu64 " at %s", peerId.GetNodeId(), addrBuffer);
-        ChipLogProgress(chipTool, "   MRP retry interval (idle): %" PRIu32 "ms", result.mrpConfig.mIdleRetransTimeout.count());
-        ChipLogProgress(chipTool, "   MRP retry interval (active): %" PRIu32 "ms", result.mrpConfig.mActiveRetransTimeout.count());
+        ChipLogProgress(chipTool, "   MRP retry interval (idle): %" PRIu32 "ms",
+                        result.mrpRemoteConfig.mIdleRetransTimeout.count());
+        ChipLogProgress(chipTool, "   MRP retry interval (active): %" PRIu32 "ms",
+                        result.mrpRemoteConfig.mActiveRetransTimeout.count());
         ChipLogProgress(chipTool, "   Supports TCP: %s", result.supportsTcp ? "yes" : "no");
+        ChipLogProgress(chipTool, "   ICD is operating as: %s", result.isICDOperatingAsLIT ? "LIT" : "SIT");
         SetCommandExitStatus(CHIP_NO_ERROR);
     }
 
@@ -70,9 +74,17 @@ void registerCommandsDiscover(Commands & commands, CredentialIssuerCommands * cr
 
     commands_list clusterCommands = {
         make_unique<Resolve>(credsIssuerConfig),
+        make_unique<DiscoverCommissionablesStartCommand>(credsIssuerConfig),
+        make_unique<DiscoverCommissionablesStopCommand>(credsIssuerConfig),
+        make_unique<DiscoverCommissionablesListCommand>(credsIssuerConfig),
         make_unique<DiscoverCommissionablesCommand>(credsIssuerConfig),
+        make_unique<DiscoverCommissionableByShortDiscriminatorCommand>(credsIssuerConfig),
+        make_unique<DiscoverCommissionableByLongDiscriminatorCommand>(credsIssuerConfig),
+        make_unique<DiscoverCommissionableByCommissioningModeCommand>(credsIssuerConfig),
+        make_unique<DiscoverCommissionableByVendorIdCommand>(credsIssuerConfig),
+        make_unique<DiscoverCommissionableByDeviceTypeCommand>(credsIssuerConfig),
         make_unique<DiscoverCommissionersCommand>(credsIssuerConfig),
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for device discovery.");
 }

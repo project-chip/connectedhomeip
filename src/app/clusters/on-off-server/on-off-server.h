@@ -20,20 +20,20 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/clusters/scenes-server/SceneTable.h>
 #include <app/util/af-types.h>
 #include <app/util/basic-types.h>
-
-using chip::app::Clusters::OnOff::OnOffFeature;
+#include <platform/CHIPDeviceConfig.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 /**********************************************************
  * Defines and Macros
  *********************************************************/
 
-static constexpr uint8_t UPDATE_TIME_MS      = 100;
-static constexpr uint16_t TRANSITION_TIME_1S = 10;
+static constexpr chip::System::Clock::Milliseconds32 ON_OFF_UPDATE_TIME_MS = chip::System::Clock::Milliseconds32(100);
 
-static constexpr uint16_t MAX_TIME_VALUE = 0xFFFF;
-static constexpr uint8_t MIN_TIME_VALUE  = 1;
+static constexpr uint16_t MIN_ON_OFF_TIME_VALUE = 1;
+static constexpr uint16_t MAX_ON_OFF_TIME_VALUE = 0xFFFF;
 
 /**
  * @brief
@@ -42,30 +42,35 @@ static constexpr uint8_t MIN_TIME_VALUE  = 1;
 class OnOffServer
 {
 public:
+    using Feature = chip::app::Clusters::OnOff::Feature;
+
     /**********************************************************
      * Functions Definitions
      *********************************************************/
 
     static OnOffServer & Instance();
 
-    bool offCommand(const chip::app::ConcreteCommandPath & commandPath);
-    bool onCommand(const chip::app::ConcreteCommandPath & commandPath);
-    bool toggleCommand(const chip::app::ConcreteCommandPath & commandPath);
+    chip::scenes::SceneHandler * GetSceneHandler();
+
+    bool offCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
+    bool onCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
+    bool toggleCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
     void initOnOffServer(chip::EndpointId endpoint);
     bool offWithEffectCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                               const chip::app::Clusters::OnOff::Commands::OffWithEffect::DecodableType & commandData);
     bool OnWithRecallGlobalSceneCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
-    bool OnWithTimedOffCommand(const chip::app::ConcreteCommandPath & commandPath,
+    bool OnWithTimedOffCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                const chip::app::Clusters::OnOff::Commands::OnWithTimedOff::DecodableType & commandData);
     void updateOnOffTimeCommand(chip::EndpointId endpoint);
-    EmberAfStatus setOnOffValue(chip::EndpointId endpoint, uint8_t command, bool initiatedByLevelChange);
-    EmberAfStatus getOnOffValueForStartUp(chip::EndpointId endpoint, bool & onOffValueForStartUp);
+    chip::Protocols::InteractionModel::Status getOnOffValue(chip::EndpointId endpoint, bool * currentOnOffValue);
+    chip::Protocols::InteractionModel::Status setOnOffValue(chip::EndpointId endpoint, chip::CommandId command,
+                                                            bool initiatedByLevelChange);
+    chip::Protocols::InteractionModel::Status getOnOffValueForStartUp(chip::EndpointId endpoint, bool & onOffValueForStartUp);
 
-    bool HasFeature(chip::EndpointId endpoint, OnOffFeature feature);
-    inline bool SupportsLightingApplications(chip::EndpointId endpointId)
-    {
-        return HasFeature(endpointId, OnOffFeature::kLighting);
-    }
+    bool HasFeature(chip::EndpointId endpoint, Feature feature);
+    inline bool SupportsLightingApplications(chip::EndpointId endpointId) { return HasFeature(endpointId, Feature::kLighting); }
+
+    void cancelEndpointTimerCallback(chip::EndpointId endpoint);
 
 private:
     /**********************************************************
@@ -75,37 +80,53 @@ private:
 #ifndef IGNORE_ON_OFF_CLUSTER_START_UP_ON_OFF
     bool areStartUpOnOffServerAttributesNonVolatile(chip::EndpointId endpoint);
 #endif
-    EmberEventControl * getEventControl(chip::EndpointId endpoint);
+    EmberEventControl * getEventControl(chip::EndpointId endpoint, const chip::Span<EmberEventControl> & eventControlArray);
     EmberEventControl * configureEventControl(chip::EndpointId endpoint);
+
+    uint32_t calculateNextWaitTimeMS(void);
+
+    // Matter timer scheduling glue logic
+    static void timerCallback(chip::System::Layer *, void * callbackContext);
+    void scheduleTimerCallbackMs(EmberEventControl * control, uint32_t delayMs);
+    void cancelEndpointTimerCallback(EmberEventControl * control);
 
     /**********************************************************
      * Attributes Declaration
      *********************************************************/
 
     static OnOffServer instance;
-    EmberEventControl eventControls[EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT];
+    chip::System::Clock::Timestamp nextDesiredOnWithTimedOffTimestamp;
+
+    friend class DefaultOnOffSceneHandler;
 };
 
 struct OnOffEffect
 {
     using OffWithEffectTriggerCommand = void (*)(OnOffEffect *);
+    using EffectVariantType           = std::underlying_type_t<chip::app::Clusters::OnOff::DelayedAllOffEffectVariantEnum>;
+    static_assert(
+        std::is_same<EffectVariantType, std::underlying_type_t<chip::app::Clusters::OnOff::DyingLightEffectVariantEnum>>::value,
+        "chip::app::Clusters::OnOff::DelayedAllOffEffectVariantEnum and "
+        "chip::app::Clusters::OnOff::DyingLightEffectVariantEnum underlying types differ.");
 
     chip::EndpointId mEndpoint;
     OffWithEffectTriggerCommand mOffWithEffectTrigger = nullptr;
-    chip::app::Clusters::OnOff::OnOffEffectIdentifier mEffectIdentifier;
-    uint8_t mEffectVariant;
+    chip::app::Clusters::OnOff::EffectIdentifierEnum mEffectIdentifier;
+    EffectVariantType mEffectVariant;
     OnOffEffect * nextEffect = nullptr;
 
     OnOffEffect(
         chip::EndpointId endpoint, OffWithEffectTriggerCommand offWithEffectTrigger,
-        chip::app::Clusters::OnOff::OnOffEffectIdentifier effectIdentifier = EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DELAYED_ALL_OFF,
+        chip::app::Clusters::OnOff::EffectIdentifierEnum effectIdentifier =
+            chip::app::Clusters::OnOff::EffectIdentifierEnum::kDelayedAllOff,
 
         /*
-         * effectVariant's type depends on the effect effectIdentifier so we don't know the type at compile time.
-         * Casting to uint8_t for more flexibility since the type can be OnOffDelayedAllOffEffectVariant or
-         * OnOffDelayedAllOffEffectVariant
+         * effectVariant's type depends on the effectIdentifier so we don't know the type at compile time.
+         * The assertion at the beginning of this method ensures the effect variants share the same base type.
+         * Casting to the common base type for more flexibility since the type can be DelayedAllOffEffectVariantEnum or
+         * DelayedAllOffEffectVariantEnum
          */
-        uint8_t effectVariant = static_cast<uint8_t>(EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS));
+        EffectVariantType = chip::to_underlying(chip::app::Clusters::OnOff::DelayedAllOffEffectVariantEnum::kDelayedOffFastFade));
     ~OnOffEffect();
 
     bool hasNext() { return this->nextEffect != nullptr; }

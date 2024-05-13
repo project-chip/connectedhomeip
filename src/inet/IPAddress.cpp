@@ -27,10 +27,6 @@
  *
  */
 
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
-
 #include <inet/IPAddress.h>
 
 #include <inet/InetError.h>
@@ -57,20 +53,7 @@ bool IPAddress::operator!=(const IPAddress & other) const
     return Addr[0] != other.Addr[0] || Addr[1] != other.Addr[1] || Addr[2] != other.Addr[2] || Addr[3] != other.Addr[3];
 }
 
-IPAddress & IPAddress::operator=(const IPAddress & other)
-{
-    if (this != &other)
-    {
-        Addr[0] = other.Addr[0];
-        Addr[1] = other.Addr[1];
-        Addr[2] = other.Addr[2];
-        Addr[3] = other.Addr[3];
-    }
-
-    return *this;
-}
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
 IPAddress::IPAddress(const ip6_addr_t & ipv6Addr)
 {
@@ -121,7 +104,7 @@ ip4_addr_t IPAddress::ToIPv4() const
 
 #endif // INET_CONFIG_ENABLE_IPV4
 
-ip_addr_t IPAddress::ToLwIPAddr(void) const
+ip_addr_t IPAddress::ToLwIPAddr() const
 {
     ip_addr_t ret;
 
@@ -207,7 +190,7 @@ lwip_ip_addr_type IPAddress::ToLwIPAddrType(IPAddressType typ)
 
 ip6_addr_t IPAddress::ToIPv6() const
 {
-    ip6_addr_t ipAddr = { 0 };
+    ip6_addr_t ipAddr = {};
     static_assert(sizeof(ipAddr.addr) == sizeof(Addr), "ip6_addr_t size mismatch");
     memcpy(&ipAddr.addr, Addr, sizeof(ipAddr.addr));
     return ipAddr;
@@ -250,7 +233,7 @@ struct in6_addr IPAddress::ToIPv6() const
     return ipAddr;
 }
 
-CHIP_ERROR IPAddress::GetIPAddressFromSockAddr(const SockAddr & sockaddr, IPAddress & outIPAddress)
+CHIP_ERROR IPAddress::GetIPAddressFromSockAddr(const SockAddrWithoutStorage & sockaddr, IPAddress & outIPAddress)
 {
 #if INET_CONFIG_ENABLE_IPV4
     if (sockaddr.any.sa_family == AF_INET)
@@ -268,6 +251,29 @@ CHIP_ERROR IPAddress::GetIPAddressFromSockAddr(const SockAddr & sockaddr, IPAddr
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+IPAddress::IPAddress(const otIp6Address & ipv6Addr)
+{
+    static_assert(sizeof(ipv6Addr.mFields.m32) == sizeof(Addr), "otIp6Address size mismatch");
+    memcpy(Addr, ipv6Addr.mFields.m32, sizeof(Addr));
+}
+otIp6Address IPAddress::ToIPv6() const
+{
+    otIp6Address otAddr;
+    static_assert(sizeof(otAddr.mFields.m32) == sizeof(Addr), "otIp6Address size mismatch");
+    memcpy(otAddr.mFields.m32, Addr, sizeof(otAddr.mFields.m32));
+    return otAddr;
+}
+
+IPAddress IPAddress::FromOtAddr(const otIp6Address & address)
+{
+    IPAddress addr;
+    static_assert(sizeof(address.mFields.m32) == sizeof(addr), "otIp6Address size mismatch");
+    memcpy(addr.Addr, address.mFields.m32, sizeof(addr.Addr));
+    return addr;
+}
+#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
 // Is address an IPv4 address encoded in IPv6 format?
 bool IPAddress::IsIPv4() const
@@ -313,7 +319,7 @@ bool IPAddress::IsIPv6GlobalUnicast() const
 // Is address an IPv6 Unique Local Address?
 bool IPAddress::IsIPv6ULA() const
 {
-    return (ntohl(Addr[0]) & 0xFF000000U) == 0xFD000000U;
+    return (ntohl(Addr[0]) & 0xFE000000U) == 0xFC000000U;
 }
 
 // Is address an IPv6 Link-local Address?
@@ -496,6 +502,29 @@ IPAddress IPAddress::MakeIPv4Broadcast()
     ipAddr.Addr[2] = htonl(0xFFFF);
     ipAddr.Addr[3] = 0xFFFFFFFF;
     return ipAddr;
+}
+
+IPAddress IPAddress::Loopback(IPAddressType type)
+{
+    IPAddress address;
+#if INET_CONFIG_ENABLE_IPV4
+    if (type == IPAddressType::kIPv4)
+    {
+        address.Addr[0] = 0;
+        address.Addr[1] = 0;
+        address.Addr[2] = htonl(0xFFFF);
+        address.Addr[3] = htonl(0x7F000001);
+    }
+    else
+#endif
+    {
+        address.Addr[0] = 0;
+        address.Addr[1] = 0;
+        address.Addr[2] = 0;
+        address.Addr[3] = htonl(1);
+    }
+
+    return address;
 }
 
 } // namespace Inet

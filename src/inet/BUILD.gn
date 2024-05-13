@@ -16,16 +16,18 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlassert.gni")
 import("//build_overrides/nlfaultinjection.gni")
-import("//build_overrides/nlio.gni")
 
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/build/chip/tests.gni")
-import("${chip_root}/src/lwip/lwip.gni")
 import("${chip_root}/src/platform/device.gni")
 import("inet.gni")
 
 if (chip_system_config_use_open_thread_inet_endpoints) {
   import("//build_overrides/openthread.gni")
+}
+
+if (chip_system_config_use_lwip) {
+  import("//build_overrides/lwip.gni")
 }
 
 declare_args() {
@@ -56,6 +58,8 @@ buildconfig_header("inet_buildconfig") {
 
   defines += [ "INET_TCP_END_POINT_IMPL_CONFIG_FILE=<inet/TCPEndPointImpl${chip_system_config_inet}.h>" ]
   defines += [ "INET_UDP_END_POINT_IMPL_CONFIG_FILE=<inet/UDPEndPointImpl${chip_system_config_inet}.h>" ]
+
+  visibility = [ ":inet_config_header" ]
 }
 
 source_set("inet_config_header") {
@@ -63,15 +67,25 @@ source_set("inet_config_header") {
 
   public_configs = [ "${chip_root}/src:includes" ]
 
-  public_deps = [
-    ":inet_buildconfig",
-    "${chip_root}/src/system:system_config_header",
-  ]
+  public_deps = [ "${chip_root}/src/system:system_config_header" ]
+
+  deps = [ ":inet_buildconfig" ]
+}
+
+source_set("impl_header") {
+  sources = [ "InetInterfaceImpl.h" ]
+  public_configs = [ "${chip_root}/src:includes" ]
+  public_deps = [ "${chip_root}/src/system:system_config_header" ]
 }
 
 static_library("inet") {
   output_name = "libInetLayer"
 
+  # EndpointState header is one of:
+  #   - src/inet/EndPointStateLwIP.h
+  #   - src/inet/EndPointStateNetworkFramework.h
+  #   - src/inet/EndPointStateOpenThread.h
+  #   - src/inet/EndPointStateSockets.h
   sources = [
     "EndPointBasis.h",
     "EndPointState${chip_system_config_inet}.h",
@@ -88,7 +102,6 @@ static_library("inet") {
     "InetArgParser.h",
     "InetError.cpp",
     "InetError.h",
-    "InetFaultInjection.h",
     "InetInterface.cpp",
     "InetInterface.h",
     "InetLayer.h",
@@ -96,28 +109,31 @@ static_library("inet") {
   ]
 
   public_deps = [
+    ":impl_header",
     ":inet_config_header",
+    "${chip_root}/src/lib/core:types",
     "${chip_root}/src/lib/support",
-    "${chip_root}/src/platform:platform_buildconfig",
+    "${chip_root}/src/platform:platform_config_header",
     "${chip_root}/src/system",
-    "${nlio_root}:nlio",
   ]
 
   if (chip_system_config_use_lwip) {
-    public_deps += [ "${chip_root}/src/lwip" ]
+    sources += [ "EndPointStateLwIP.cpp" ]
+    public_deps += [ "${lwip_root}:lwip" ]
   }
 
   if (chip_system_config_use_open_thread_inet_endpoints) {
-    if (chip_openthread_ftd) {
-      public_deps +=
-          [ "${chip_root}/third_party/openthread/repo:libopenthread-ftd" ]
-    } else {
-      public_deps +=
-          [ "${chip_root}/third_party/openthread/repo:libopenthread-mtd" ]
-    }
+    public_deps += [ "${chip_root}/third_party/openthread:openthread" ]
   }
 
   if (chip_inet_config_enable_tcp_endpoint) {
+    # Possible TCPEndpointImpl files:
+    #  - TCPEndPointImplLwIP.cpp
+    #  - TCPEndPointImplLwIP.h
+    #  - TCPEndPointImplOpenThread.cpp
+    #  - TCPEndPointImplOpenThread.h
+    #  - TCPEndPointImplSockets.cpp
+    #  - TCPEndPointImplSockets.h
     sources += [
       "TCPEndPoint.cpp",
       "TCPEndPoint.h",
@@ -128,27 +144,48 @@ static_library("inet") {
   }
 
   if (chip_inet_config_enable_udp_endpoint) {
+    # Possible UDPEndpointImpl files:
+    #  - UDPEndPointImplLwIP.cpp
+    #  - UDPEndPointImplLwIP.h
+    #  - UDPEndPointImplNetworkFramework.cpp
+    #  - UDPEndPointImplNetworkFramework.h
+    #  - UDPEndPointImplOpenThread.cpp
+    #  - UDPEndPointImplOpenThread.h
+    #  - UDPEndPointImplSockets.cpp
+    #  - UDPEndPointImplSockets.h
     sources += [
+      "BasicPacketFilters.h",
+      "EndpointQueueFilter.h",
       "UDPEndPoint.cpp",
       "UDPEndPoint.h",
       "UDPEndPointImpl${chip_system_config_inet}.cpp",
       "UDPEndPointImpl${chip_system_config_inet}.h",
       "UDPEndPointImpl.h",
     ]
+
+    if (chip_system_config_inet == "Sockets") {
+      # TODO: dependency on this one is not clear as it is only ever
+      #       enabled through CMakeLists.txt. Added here for completeness
+      sources += [ "ZephyrSocket.h" ]
+    }
   }
 
   if (chip_with_nlfaultinjection) {
-    sources += [ "InetFaultInjection.cpp" ]
+    sources += [
+      "InetFaultInjection.cpp",
+      "InetFaultInjection.h",
+    ]
     public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
   }
 
-  cflags = [ "-Wconversion" ]
-
-  include_dirs = []
   if (current_os == "android") {
-    include_dirs += [
-      "${chip_root}/third_party/android/platform-libcore/android-platform-libcore/luni/src/main/native",
-      "${chip_root}/third_party/android/platform-libcore/android-platform-libcore/include",
-    ]
+    public_deps += [ "${chip_root}/src/platform/android:inet" ]
+  } else {
+    sources += [ "InetInterfaceImplDefault.cpp" ]
+  }
+
+  cflags = [ "-Wconversion" ]
+  if (current_os == "nuttx") {
+    cflags -= [ "-Wconversion" ]
   }
 }

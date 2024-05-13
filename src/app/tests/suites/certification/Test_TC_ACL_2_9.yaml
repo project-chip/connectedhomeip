@@ -1,0 +1,191 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 133.2.3. [TC-ACL-2.9] Cluster Access
+
+PICS:
+    - ACL.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Access Control"
+    endpoint: 0
+    nodeId2:
+        type: node_id
+        defaultValue: 0xCAFE
+    payload:
+        type: char_string
+        defaultValue: "MT:-24J0AFN00KA0648G00" # This value needs to be generated automatically
+
+tests:
+    - label: "Step 1:Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Read the commissioner node ID"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: CommissionerNodeId
+
+    - label:
+          "TH1 reads OperationalCredentials cluster CurrentFabricIndex attribute"
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: CurrentFabricIndexValue
+
+    - label:
+          "Step 2:TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute,
+          value is list of AccessControlEntryStruct containing 1 element
+          1.Struct :  a)Privilege field: Manage (4) b)AuthMode field: CASE (2)
+          c)Subjects field: [N1] d)Targets field: null"
+      PICS: ACL.S.A0000
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      Privilege: AccessControlEntryPrivilegeEnum.Manage,
+                      AuthMode: AccessControlEntryAuthModeEnum.CASE,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+
+    - label:
+          "Step 3:TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute"
+      PICS: ACL.S.A0000
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "Step 4:TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute,
+          value is list of AccessControlEntryStruct containing 1 element
+          1.Struct : a)Privilege field: Administer (5) b)AuthMode field: CASE
+          (2) c)Subjects field: [N1] d)argets field: null"
+      PICS: ACL.S.A0000
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      Privilege: AccessControlEntryPrivilegeEnum.Administer,
+                      AuthMode: AccessControlEntryAuthModeEnum.CASE,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "Step 5:TH1 reads DUT Endpoint 0 AccessControl cluster Extension
+          attribute"
+      PICS: ACL.S.A0001
+      command: "readAttribute"
+      attribute: "Extension"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "Step 6:TH1 writes DUT Endpoint 0 AccessControl cluster Extension
+          attribute, value is an empty list"
+      PICS: ACL.S.A0001
+      command: "writeAttribute"
+      attribute: "Extension"
+      arguments:
+          value: []
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "Step 7:TH1 reads DUT Endpoint 0 AccessControl cluster
+          SubjectsPerAccessControlEntry attribute"
+      PICS: ACL.S.A0002
+      command: "readAttribute"
+      attribute: "SubjectsPerAccessControlEntry"
+      response:
+          constraints:
+              minValue: 4
+
+    - label:
+          "Step 8:TH1 reads DUT Endpoint 0 AccessControl cluster
+          TargetsPerAccessControlEntry attribute"
+      PICS: ACL.S.A0003
+      command: "readAttribute"
+      attribute: "TargetsPerAccessControlEntry"
+      response:
+          constraints:
+              minValue: 3
+
+    - label:
+          "Step 9:TH1 reads DUT Endpoint 0 AccessControl cluster
+          AccessControlEntriesPerFabric attribute"
+      PICS: ACL.S.A0004
+      command: "readAttribute"
+      attribute: "AccessControlEntriesPerFabric"
+      response:
+          constraints:
+              minValue: 4
+
+    - label:
+          "Step 10:TH1 reads DUT Endpoint 0 AccessControl cluster
+          AccessControlEntryChanged event"
+      PICS: ACL.S.E00
+      command: "readEvent"
+      event: "AccessControlEntryChanged"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "Step 11:TH1 reads DUT Endpoint 0 AccessControl cluster
+          AccessControlExtensionChanged event"
+      PICS: ACL.S.E01
+      command: "readEvent"
+      event: "AccessControlExtensionChanged"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label: "Test cleanup: Reset Devices to factory defaults"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "FactoryReset"
+
+    - label: "Test cleanup: Reset Devices to factory defaults"
+      verification: |
+          Reset Devices to factory defaults
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Factory Reset the DUT and enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"

@@ -1,0 +1,316 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    4.1.15. [TC-CADMIN-1.15] Removing Fabrics from DUT and Fabric index
+    enumeration using ECM [DUT - Commissionee]
+
+PICS:
+    - CADMIN.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Precondition"
+      verification: |
+          Reset Devices to factory defaults
+      disabled: true
+
+    - label: "Step 1: TH_CR1 starts a commissioning process with DUT_CE"
+      PICS: CADMIN.S
+      verification: |
+          "1. Provision the device using TH_CR1 (Chip-tool as controller)
+          "
+      disabled: true
+
+    - label:
+          "Step 2: TH_CR1 opens a commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
+      PICS: CADMIN.S.C00.Rsp
+      verification: |
+          On TH_CR1 chip tool, open commissioning window using ECM
+
+          ./chip-tool pairing open-commissioning-window 1 1 180 1000 3840
+
+          Verify Manual pairing code on TH_CR1 (chip-tool) Log
+
+          [1635925713.966786][9695:9700] CHIP:SC: Success status report received. Session was established
+          [1635925713.966839][9695:9700] CHIP:IN: New secure session created for device 0x0000000000000001, key 33!!
+          [1635925713.966938][9695:9700] CHIP:CTL: OpenCommissioningWindow for device ID 1
+          [1635925713.972601][9695:9700] CHIP:DMG: ICR moving to [AddingComm]
+          [1635925713.972705][9695:9700] CHIP:DMG: ICR moving to [AddedComma]
+          [1635925713.972815][9695:9700] CHIP:IN: Prepared encrypted message 0xaaaad9b57d10 to 0x0000000000000001 of type 0x8 and protocolId (0, 1) on exchange 31056i with MessageCounter:0.
+          [1635925713.972876][9695:9700] CHIP:IN: Sending encrypted msg 0xaaaad9b57d10 with MessageCounter:0 to 0x0000000000000001 at monotonic time: 13449459 msec
+          [1635925713.973006][9695:9700] CHIP:DMG: ICR moving to [CommandSen]
+          [1635925713.973061][9695:9700] CHIP:CTL: Manual pairing code: [36217551633]
+          [1635925713.973120][9695:9700] CHIP:CTL: SetupQRCode: [MT:00000CQM00A7F87ZT10]
+          [1635925713.973178][9695:9700] CHIP:EM: Sending Standalone Ack for MessageCounter:1964916542 on exchange 31055i
+      disabled: true
+
+    - label: "Step 3: TH_CR2 starts a commissioning process with DUT_CE"
+      PICS: CADMIN.S
+      verification: |
+          On TH_CR2 using chip tool connect to the accessory
+
+
+          ./chip-tool pairing code 2 36217551633  --commissioner-name beta
+
+          Verify you got below message on TH_CR2 (chip-tool)
+          Device commissioning completed with success
+      disabled: true
+
+    - label:
+          "Step 4: TH_CR1 opens a commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
+      PICS: CADMIN.S.C00.Rsp
+      verification: |
+          On TH_CR1 chip tool, open commissioning window using ECM
+
+          ./chip-tool pairing open-commissioning-window 1 1 300 1000 3840
+
+          Verify Manual pairing code on TH_CR1 (chip-tool) Log
+
+          [1635925713.966786][9695:9700] CHIP:SC: Success status report received. Session was established
+          [1635925713.966839][9695:9700] CHIP:IN: New secure session created for device 0x0000000000000001, key 33!!
+          [1635925713.966938][9695:9700] CHIP:CTL: OpenCommissioningWindow for device ID 1
+          [1635925713.972601][9695:9700] CHIP:DMG: ICR moving to [AddingComm]
+          [1635925713.972705][9695:9700] CHIP:DMG: ICR moving to [AddedComma]
+          [1635925713.972815][9695:9700] CHIP:IN: Prepared encrypted message 0xaaaad9b57d10 to 0x0000000000000001 of type 0x8 and protocolId (0, 1) on exchange 31056i with MessageCounter:0.
+          [1635925713.972876][9695:9700] CHIP:IN: Sending encrypted msg 0xaaaad9b57d10 with MessageCounter:0 to 0x0000000000000001 at monotonic time: 13449459 msec
+          [1635925713.973006][9695:9700] CHIP:DMG: ICR moving to [CommandSen]
+          [1635925713.973061][9695:9700] CHIP:CTL: Manual pairing code: [36217551633]
+          [1635925713.973120][9695:9700] CHIP:CTL: SetupQRCode: [MT:00000CQM00A7F87ZT10]
+          [1635925713.973178][9695:9700] CHIP:EM: Sending Standalone Ack for MessageCounter:1964916542 on exchange 31055i
+      disabled: true
+
+    - label: "Step 5: TH_CR3 starts a commissioning process with DUT_CE"
+      PICS: CADMIN.S
+      verification: |
+          On TH_CR3  using chip tool connect to the accessory
+
+          ./chip-tool pairing code 3 36217551633  --commissioner-name gamma
+
+          Verify you got below message on TH_CR3 (chip-tool) side
+          Device commissioning completed with success
+      disabled: true
+
+    - label: "Step 6: TH_CR2 reads the list of Fabrics on DUT_CE"
+      PICS: OPCREDS.S.A0001
+      verification: |
+          On TH_CR2  using chip tool, read fabrics list
+
+          ./chip-tool operationalcredentials read fabrics 2 0 --fabric-filtered 0  --commissioner-name beta
+
+          Verify the list of Fabrics  consists of FabricIndex 1, FabricIndex 2, FabricIndex 3 on TH_CR2 (chip-tool) log
+
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 2455995193
+          CHIP:TOO:   Fabrics: 3 entries
+          CHIP:TOO:     [1]: {
+          CHIP:TOO:       RootPublicKey: 04656F56DBDB677DC957028DFC0ED76709C72753C9194B117A483BDC07386BFD9529B68EB4448FBBA3964EFF37A56A8F461D348B0DAF3B56A75F3B94BF8209D36F
+          CHIP:TOO:       VendorId: 65521
+          CHIP:TOO:       FabricId: 1
+          CHIP:TOO:       NodeId: 1
+          CHIP:TOO:       Label:
+          CHIP:TOO:       FabricIndex: 1
+          CHIP:TOO:      }
+          CHIP:TOO:     [2]: {
+          CHIP:TOO:       RootPublicKey: 04F8F28D5D70A4510E0F72FBBA31369796C4206FF95D97B77C1BDFD0438A3BE43510631A1B915BE189323F4CC0E015480192654D8170F8F230C7713898962958B7
+          CHIP:TOO:       VendorId: 65521
+          CHIP:TOO:       FabricId: 1
+          CHIP:TOO:       NodeId: 2
+          CHIP:TOO:       Label:
+          CHIP:TOO:       FabricIndex: 2
+          CHIP:TOO:      }
+          CHIP:TOO:     [3]: {
+          CHIP:TOO:       RootPublicKey: 04F8F28D5D70A4510E0F72FBBA31369796C4206FF95D97B77C1BDFD0438A3BE43510631A1B915BE189323F4CC0E015480192654D8170F8F230C7713898962958B7
+          CHIP:TOO:       VendorId: 65521
+          CHIP:TOO:       FabricId: 1
+          CHIP:TOO:       NodeId: 3
+          CHIP:TOO:       Label:
+          CHIP:TOO:       FabricIndex: 3
+          CHIP:TOO:      }
+          CHIP:EM: Sending Standalone Ack for MessageCounter:9143157 on exchange 1147i
+      disabled: true
+
+    - label:
+          "Step 7: TH_CR2 sends RemoveFabric with FabricIndex = 2 command to
+          DUT_CE"
+      PICS: OPCREDS.S.C0a.Rsp
+      verification: |
+          on TH_CR2  using chip tool, remove fabric with FabricIndex=2
+
+          ./chip-tool operationalcredentials remove-fabric 2 2 0  --commissioner-name beta
+
+          Verify DUT_CE responses with NOCResponse with a StatusCode OK on TH_CR2 (chip-tool) log
+
+          CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
+          CHIP:TOO:   NOCResponse: {
+          CHIP:TOO:     statusCode: 0
+          CHIP:TOO:     fabricIndex: 2
+          CHIP:TOO:    }
+          CHIP:DMG: ICR moving to [AwaitingDe]
+      disabled: true
+
+    - label:
+          "Step 8: TH_CR2 writes and reads the Basic Information Clusters
+          NodeLabel mandatory attribute of DUT_CE"
+      PICS: BINFO.S.A0005
+      verification: |
+          Using TH_CR2 , write attribute and read attribute
+
+          Verify read/write commands fail as expected since the DUT_CE is no longer on the network on TH_CR2 (chip-tool) side
+
+          ./chip-tool  basicinformation write node-label te5new 2 0  --commissioner-name beta
+
+          [1678875950.655277][713499:713501] CHIP:SC: Received error (protocol code 1) during pairing process: ../../third_party/connectedhomeip/src/protocols/secure_channel/CASESession.cpp:1727: CHIP Error 0x000000C9: No shared trusted root
+          [1678875950.655290][713499:713501] CHIP:IN: SecureSession[0x7f5760026220]: Released - Type:2 LSID:1179
+          [1678875950.655316][713499:713501] CHIP:-: ../../third_party/connectedhomeip/src/protocols/secure_channel/CASESession.cpp:1727: CHIP Error 0x000000C9: No shared trusted root at ../../commands/clusters/ModelCommand.cpp:62
+
+
+          ./chip-tool  basicinformation read node-label 2 0  --commissioner-name beta
+
+          [1678875950.655277][713499:713501] CHIP:SC: Received error (protocol code 1) during pairing process: ../../third_party/connectedhomeip/src/protocols/secure_channel/CASESession.cpp:1727: CHIP Error 0x000000C9: No shared trusted root
+          [1678875950.655290][713499:713501] CHIP:IN: SecureSession[0x7f5760026220]: Released - Type:2 LSID:1179
+          [1678875950.655316][713499:713501] CHIP:-: ../../third_party/connectedhomeip/src/protocols/secure_channel/CASESession.cpp:1727: CHIP Error 0x000000C9: No shared trusted root at ../../commands/clusters/ModelCommand.cpp:62
+      disabled: true
+
+    - label: "Step 9: TH_CR1 reads the list of Fabrics on DUT_CE"
+      PICS: OPCREDS.S.A0001
+      verification: |
+          On TH_CR1 using chip tool, read fabrics list
+
+          Verify the list of Fabrics  consists of FabricIndex 1, FabricIndex 3 on TH_CR1 (chip-tool) log
+
+          ./chip-tool operationalcredentials read fabrics 1 0 --fabric-filtered 0
+
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 2455995219
+          [1647863260.286772][9294:9299] CHIP:TOO:   Fabrics: 2 entries
+          [1647863260.286908][9294:9299] CHIP:TOO:     [1]: {
+          [1647863260.286947][9294:9299] CHIP:TOO:       RootPublicKey: 04656F56DBDB677DC957028DFC0ED76709C72753C9194B117A483BDC07386BFD9529B68EB4448FBBA3964EFF37A56A8F461D348B0DAF3B56A75F3B94BF8209D36F
+          [1647863260.286995][9294:9299] CHIP:TOO:       VendorId: 65521
+          [1647863260.287026][9294:9299] CHIP:TOO:       FabricId: 1
+          [1647863260.287055][9294:9299] CHIP:TOO:       NodeId: 1
+          [1647863260.287084][9294:9299] CHIP:TOO:       Label:
+          [1647863260.287113][9294:9299] CHIP:TOO:       FabricIndex: 1
+          [1647863260.287144][9294:9299] CHIP:TOO:      }
+          [1647863260.287185][9294:9299] CHIP:TOO:     [2]: {
+          [1647863260.287221][9294:9299] CHIP:TOO:       RootPublicKey: 04F8F28D5D70A4510E0F72FBBA31369796C4206FF95D97B77C1BDFD0438A3BE43510631A1B915BE189323F4CC0E015480192654D8170F8F230C7713898962958B7
+          [1647863260.287253][9294:9299] CHIP:TOO:       VendorId: 65521
+          [1647863260.287282][9294:9299] CHIP:TOO:       FabricId: 1
+          [1647863260.287310][9294:9299] CHIP:TOO:       NodeId: 3
+          [1647863260.287339][9294:9299] CHIP:TOO:       Label:
+          [1647863260.287368][9294:9299] CHIP:TOO:       FabricIndex: 3
+          [1647863260.287396][9294:9299] CHIP:TOO:      }
+          [1647863260.287515][9294:9299] CHIP:EM: Sending Standalone Ack for MessageCounter:11301761 on exchange 13180i"
+      disabled: true
+
+    - label:
+          "Step 10: Verify DUT_CE is now discoverable over DNS-SD with 2
+          Operational service records (_matter._tcp SRV records)."
+      PICS: CADMIN.S.C00.Rsp
+      verification: |
+          Execute the below command in any linux platform or in TH_CR1
+          avahi-browse -rt _matter._tcp
+
+          + wlp5s0 IPv6 8E50A59FAF52A809-0000000000000001             _matter._tcp         local
+          + wlp5s0 IPv6 03E707466A904C7E-0000000000000003             _matter._tcp         local
+          = wlp5s0 IPv6 8E50A59FAF52A809-0000000000000001             _matter._tcp         local
+            hostname = [E45F010F27530000.local]
+            address = [fe80::e65f:1ff:fe0f:2753]
+            port = [5540]
+            txt = ["T=1" "SAI=300" "SII=5000"]
+          = wlp5s0 IPv6 03E707466A904C7E-0000000000000003             _matter._tcp         local
+            hostname = [E45F010F27530000.local]
+            address = [fe80::e65f:1ff:fe0f:2753]
+            port = [5540]
+            txt = ["T=1" "SAI=300" "SII=5000"]
+      disabled: true
+
+    - label:
+          "Step 11: TH_CR1 opens a commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
+      PICS: CADMIN.S.C00.Rsp
+      verification: |
+          On TH_CR1 chip tool, open commissioning window using ECM
+
+          ./chip-tool pairing open-commissioning-window 1 1 180 1000 3840
+
+          Verify Manual pairing code on TH_CR1 (chip-tool) Log
+
+          [1635925713.966786][9695:9700] CHIP:SC: Success status report received. Session was established
+          [1635925713.966839][9695:9700] CHIP:IN: New secure session created for device 0x0000000000000001, key 33!!
+          [1635925713.966938][9695:9700] CHIP:CTL: OpenCommissioningWindow for device ID 1
+          [1635925713.972601][9695:9700] CHIP:DMG: ICR moving to [AddingComm]
+          [1635925713.972705][9695:9700] CHIP:DMG: ICR moving to [AddedComma]
+          [1635925713.972815][9695:9700] CHIP:IN: Prepared encrypted message 0xaaaad9b57d10 to 0x0000000000000001 of type 0x8 and protocolId (0, 1) on exchange 31056i with MessageCounter:0.
+          [1635925713.972876][9695:9700] CHIP:IN: Sending encrypted msg 0xaaaad9b57d10 with MessageCounter:0 to 0x0000000000000001 at monotonic time: 13449459 msec
+          [1635925713.973006][9695:9700] CHIP:DMG: ICR moving to [CommandSen]
+          [1635925713.973061][9695:9700] CHIP:CTL: Manual pairing code: [36217551633]
+          [1635925713.973120][9695:9700] CHIP:CTL: SetupQRCode: [MT:00000CQM00A7F87ZT10]
+          [1635925713.973178][9695:9700] CHIP:EM: Sending Standalone Ack for MessageCounter:1964916542 on exchange 31055i
+      disabled: true
+
+    - label: "Step 12: TH_CR2 starts a commissioning process with DUT_CE"
+      PICS: CADMIN.S
+      verification: |
+          On TH_CR2 using chip tool connect to the accessory
+
+          ./chip-tool pairing code 2 36217551633  --commissioner-name beta
+
+          Verify you got below message on TH_CR2 (chip-tool) side
+          Device commissioning completed with success
+      disabled: true
+
+    - label: "Step 13: TH_CR1 reads the list of Fabrics on DUT_CE"
+      PICS: OPCREDS.S.A0001
+      verification: |
+          On TH_CR1 , read fabrics list
+
+          Verify the list shows FabricIndex=1, FabricIndex=3, FabricIndex=4 on TH_CR1 (chip-tool) side
+
+          ./chip-tool operationalcredentials read fabrics 1 0 --fabric-filtered 0
+
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 2455995246
+          [1647863342.980899][9309:9314] CHIP:TOO:   Fabrics: 3 entries
+          [1647863342.981158][9309:9314] CHIP:TOO:     [1]: {
+          [1647863342.981231][9309:9314] CHIP:TOO:       RootPublicKey: 04656F56DBDB677DC957028DFC0ED76709C72753C9194B117A483BDC07386BFD9529B68EB4448FBBA3964EFF37A56A8F461D348B0DAF3B56A75F3B94BF8209D36F
+          [1647863342.981322][9309:9314] CHIP:TOO:       VendorId: 65521
+          [1647863342.981380][9309:9314] CHIP:TOO:       FabricId: 1
+          [1647863342.981434][9309:9314] CHIP:TOO:       NodeId: 1
+          [1647863342.981486][9309:9314] CHIP:TOO:       Label:
+          [1647863342.981539][9309:9314] CHIP:TOO:       FabricIndex: 1
+          [1647863342.981594][9309:9314] CHIP:TOO:      }
+          [1647863342.981671][9309:9314] CHIP:TOO:     [2]: {
+          [1647863342.981737][9309:9314] CHIP:TOO:       RootPublicKey: 04F8F28D5D70A4510E0F72FBBA31369796C4206FF95D97B77C1BDFD0438A3BE43510631A1B915BE189323F4CC0E015480192654D8170F8F230C7713898962958B7
+          [1647863342.981796][9309:9314] CHIP:TOO:       VendorId: 65521
+          [1647863342.981849][9309:9314] CHIP:TOO:       FabricId: 1
+          [1647863342.981901][9309:9314] CHIP:TOO:       NodeId: 3
+          [1647863342.981952][9309:9314] CHIP:TOO:       Label:
+          [1647863342.982005][9309:9314] CHIP:TOO:       FabricIndex: 3
+          [1647863342.982057][9309:9314] CHIP:TOO:      }
+          [1647863342.982131][9309:9314] CHIP:TOO:     [3]: {
+          [1647863342.982195][9309:9314] CHIP:TOO:       RootPublicKey: 04F8F28D5D70A4510E0F72FBBA31369796C4206FF95D97B77C1BDFD0438A3BE43510631A1B915BE189323F4CC0E015480192654D8170F8F230C7713898962958B7
+          [1647863342.982252][9309:9314] CHIP:TOO:       VendorId: 65521
+          [1647863342.982305][9309:9314] CHIP:TOO:       FabricId: 1
+          [1647863342.982357][9309:9314] CHIP:TOO:       NodeId: 2
+          [1647863342.982409][9309:9314] CHIP:TOO:       Label:
+          [1647863342.982460][9309:9314] CHIP:TOO:       FabricIndex: 4
+          [1647863342.982512][9309:9314] CHIP:TOO:      }
+          [1647863342.982738][9309:9314] CHIP:EM: Sending Standalone Ack for MessageCounter:5772016 on exchange 3310i
+      disabled: true

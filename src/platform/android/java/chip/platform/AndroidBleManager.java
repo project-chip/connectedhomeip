@@ -17,15 +17,30 @@
  */
 package chip.platform;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
+import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
+import android.bluetooth.le.BluetoothLeScanner;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanFilter;
+import android.bluetooth.le.ScanResult;
+import android.bluetooth.le.ScanSettings;
+import android.content.Context;
 import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.os.ParcelUuid;
 import android.util.Log;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -63,112 +78,143 @@ public class AndroidBleManager implements BleManager {
   private BluetoothGattCallback mGattCallback;
   private AndroidChipPlatform mPlatform;
 
+  private Context mContext;
+  private BluetoothAdapter mBluetoothAdapter;
+
+  private BleConnectCallback mBleConnectCallback;
+
+  private BleConnectionHandler mConnectionHandler;
+  private ScanCallback mScanCallback;
+
+  private static final int MSG_BLE_SCAN = 0;
+  private static final int MSG_BLE_CONNECT = 1;
+  private static final int MSG_BLE_CONNECT_SUCCESS = 2;
+  private static final int MSG_BLE_FAIL = 99;
+
+  private static final int BLE_TIMEOUT_MS = 10000;
+  private static final int BLUETOOTH_ENABLE_TIMEOUT_MS = 1000;
+
+  private static final String MSG_BUNDLE_SERVICE_DATA = "serviceData";
+  private static final String MSG_BUNDLE_SERVICE_DATA_MASK = "serviceDataMask";
+
+  public AndroidBleManager(Context context) {
+    this();
+    mContext = context;
+    @SuppressWarnings("unchecked")
+    BluetoothManager manager =
+        (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
+    mBluetoothAdapter = manager.getAdapter();
+    mConnectionHandler = new BleConnectionHandler(Looper.getMainLooper());
+  }
+
   public AndroidBleManager() {
     mConnections = new ArrayList<>(INITIAL_CONNECTIONS);
 
-    mGattCallback =
-        new BluetoothGattCallback() {
-          @Override
-          public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-            int connId = 0;
+    mGattCallback = new AndroidBluetoothGattCallback();
+  }
 
-            if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-              connId = getConnId(gatt);
-              if (connId > 0) {
-                Log.d(TAG, "onConnectionStateChange Disconnected");
-                mPlatform.handleConnectionError(connId);
-              } else {
-                Log.e(TAG, "onConnectionStateChange disconnected: no active connection");
-              }
-            }
-          }
+  class AndroidBluetoothGattCallback extends BluetoothGattCallback {
+    @Override
+    public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+      int connId = 0;
 
-          @Override
-          public void onServicesDiscovered(BluetoothGatt gatt, int status) {}
+      if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+        connId = getConnId(gatt);
+        if (connId > 0) {
+          Log.d(TAG, "onConnectionStateChange Disconnected");
+          mPlatform.handleConnectionError(connId);
+        } else {
+          Log.e(TAG, "onConnectionStateChange disconnected: no active connection");
+        }
+      }
+    }
 
-          @Override
-          public void onCharacteristicRead(
-              BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {}
+    @Override
+    public void onServicesDiscovered(BluetoothGatt gatt, int status) {}
 
-          @Override
-          public void onCharacteristicWrite(
-              BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-            byte[] svcIdBytes = convertUUIDToBytes(characteristic.getService().getUuid());
-            byte[] charIdBytes = convertUUIDToBytes(characteristic.getUuid());
+    @Override
+    public void onCharacteristicRead(
+        BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {}
 
-            if (status != BluetoothGatt.GATT_SUCCESS) {
-              Log.e(
-                  TAG,
-                  "onCharacteristicWrite for "
-                      + characteristic.getUuid().toString()
-                      + " failed with status: "
-                      + status);
-              return;
-            }
+    @Override
+    public void onCharacteristicWrite(
+        BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+      byte[] svcIdBytes = convertUUIDToBytes(characteristic.getService().getUuid());
+      byte[] charIdBytes = convertUUIDToBytes(characteristic.getUuid());
 
-            int connId = getConnId(gatt);
-            if (connId > 0) {
-              mPlatform.handleWriteConfirmation(
-                  connId, svcIdBytes, charIdBytes, status == BluetoothGatt.GATT_SUCCESS);
-            } else {
-              Log.e(TAG, "onCharacteristicWrite no active connection");
-              return;
-            }
-          }
+      if (status != BluetoothGatt.GATT_SUCCESS) {
+        Log.e(
+            TAG,
+            "onCharacteristicWrite for "
+                + characteristic.getUuid().toString()
+                + " failed with status: "
+                + status);
+        return;
+      }
 
-          @Override
-          public void onCharacteristicChanged(
-              BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-            byte[] svcIdBytes = convertUUIDToBytes(characteristic.getService().getUuid());
-            byte[] charIdBytes = convertUUIDToBytes(characteristic.getUuid());
-            int connId = getConnId(gatt);
-            if (connId > 0) {
-              mPlatform.handleIndicationReceived(
-                  connId, svcIdBytes, charIdBytes, characteristic.getValue());
-            } else {
-              Log.e(TAG, "onCharacteristicChanged no active connection");
-              return;
-            }
-          }
+      int connId = getConnId(gatt);
+      if (connId > 0) {
+        mPlatform.handleWriteConfirmation(
+            connId, svcIdBytes, charIdBytes, status == BluetoothGatt.GATT_SUCCESS);
+      } else {
+        Log.e(TAG, "onCharacteristicWrite no active connection");
+        return;
+      }
+    }
 
-          @Override
-          public void onDescriptorWrite(
-              BluetoothGatt gatt, BluetoothGattDescriptor desc, int status) {
-            BluetoothGattCharacteristic characteristic = desc.getCharacteristic();
+    @Override
+    public void onCharacteristicChanged(
+        BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
+      byte[] svcIdBytes = convertUUIDToBytes(characteristic.getService().getUuid());
+      byte[] charIdBytes = convertUUIDToBytes(characteristic.getUuid());
+      int connId = getConnId(gatt);
+      if (connId > 0) {
+        mPlatform.handleIndicationReceived(
+            connId, svcIdBytes, charIdBytes, characteristic.getValue());
+      } else {
+        Log.e(TAG, "onCharacteristicChanged no active connection");
+        return;
+      }
+    }
 
-            byte[] svcIdBytes = convertUUIDToBytes(characteristic.getService().getUuid());
-            byte[] charIdBytes = convertUUIDToBytes(characteristic.getUuid());
+    @Override
+    public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor desc, int status) {
+      BluetoothGattCharacteristic characteristic = desc.getCharacteristic();
 
-            if (status != BluetoothGatt.GATT_SUCCESS) {
-              Log.e(
-                  TAG,
-                  "onDescriptorWrite for "
-                      + desc.getUuid().toString()
-                      + " failed with status: "
-                      + status);
-            }
+      byte[] svcIdBytes = convertUUIDToBytes(characteristic.getService().getUuid());
+      byte[] charIdBytes = convertUUIDToBytes(characteristic.getUuid());
 
-            int connId = getConnId(gatt);
-            if (connId == 0) {
-              Log.e(TAG, "onDescriptorWrite no active connection");
-              return;
-            }
+      if (status != BluetoothGatt.GATT_SUCCESS) {
+        Log.e(
+            TAG,
+            "onDescriptorWrite for "
+                + desc.getUuid().toString()
+                + " failed with status: "
+                + status);
+      }
 
-            if (desc.getValue() == BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE) {
-              mPlatform.handleSubscribeComplete(
-                  connId, svcIdBytes, charIdBytes, status == BluetoothGatt.GATT_SUCCESS);
-            } else if (desc.getValue() == BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE) {
-              mPlatform.handleUnsubscribeComplete(
-                  connId, svcIdBytes, charIdBytes, status == BluetoothGatt.GATT_SUCCESS);
-            } else {
-              Log.d(TAG, "Unexpected onDescriptorWrite().");
-            }
-          }
+      int connId = getConnId(gatt);
+      if (connId == 0) {
+        Log.e(TAG, "onDescriptorWrite no active connection");
+        return;
+      }
 
-          @Override
-          public void onDescriptorRead(
-              BluetoothGatt gatt, BluetoothGattDescriptor desc, int status) {}
-        };
+      if (desc.getValue() == BluetoothGattDescriptor.ENABLE_INDICATION_VALUE) {
+        mPlatform.handleSubscribeComplete(
+            connId, svcIdBytes, charIdBytes, status == BluetoothGatt.GATT_SUCCESS);
+      } else if (desc.getValue() == BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE) {
+        mPlatform.handleSubscribeComplete(
+            connId, svcIdBytes, charIdBytes, status == BluetoothGatt.GATT_SUCCESS);
+      } else if (desc.getValue() == BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE) {
+        mPlatform.handleUnsubscribeComplete(
+            connId, svcIdBytes, charIdBytes, status == BluetoothGatt.GATT_SUCCESS);
+      } else {
+        Log.d(TAG, "Unexpected onDescriptorWrite().");
+      }
+    }
+
+    @Override
+    public void onDescriptorRead(BluetoothGatt gatt, BluetoothGattDescriptor desc, int status) {}
   }
 
   @Override
@@ -283,10 +329,18 @@ public class AndroidBleManager implements BleManager {
 
     BluetoothGattDescriptor descriptor =
         subscribeChar.getDescriptor(UUID.fromString(CLIENT_CHARACTERISTIC_CONFIG));
-    descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-    if (!bluetoothGatt.writeDescriptor(descriptor)) {
-      Log.e(TAG, "writeDescriptor failed");
-      return false;
+    if ((subscribeChar.getProperties() & BluetoothGattCharacteristic.PROPERTY_INDICATE) != 0) {
+      descriptor.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
+      if (!bluetoothGatt.writeDescriptor(descriptor)) {
+        Log.e(TAG, "writeDescriptor failed");
+        return false;
+      }
+    } else if ((subscribeChar.getProperties() & BluetoothGattCharacteristic.PROPERTY_NOTIFY) != 0) {
+      descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+      if (!bluetoothGatt.writeDescriptor(descriptor)) {
+        Log.e(TAG, "writeDescriptor failed");
+        return false;
+      }
     }
     return true;
   }
@@ -406,14 +460,245 @@ public class AndroidBleManager implements BleManager {
   }
 
   @Override
-  public void onNewConnection(int discriminator) {
+  public void onNewConnection(
+      int discriminator, boolean isShortDiscriminator, long implPtr, long appStatePtr) {
+    Log.d(TAG, "onNewConnection : " + discriminator + ", " + isShortDiscriminator);
+    if (mContext == null) {
+      return;
+    }
+    mBleConnectCallback = new BleConnectCallback(implPtr, appStatePtr);
+    mConnectionHandler.sendEmptyMessageDelayed(MSG_BLE_FAIL, BLE_TIMEOUT_MS);
+    Message msg = mConnectionHandler.obtainMessage();
+    msg.what = MSG_BLE_SCAN;
+    Bundle bundle = new Bundle();
+    byte[] serviceData = getServiceData(discriminator);
+    byte[] serviceDataMask = getServiceDataMask(isShortDiscriminator);
+    bundle.putByteArray(MSG_BUNDLE_SERVICE_DATA, serviceData);
+    bundle.putByteArray(MSG_BUNDLE_SERVICE_DATA_MASK, serviceDataMask);
+    msg.setData(bundle);
+    if (!mBluetoothAdapter.isEnabled()) {
+      mBluetoothAdapter.enable();
+      // TODO: Check Bluetooth enable intent
+      mConnectionHandler.sendMessageDelayed(msg, BLUETOOTH_ENABLE_TIMEOUT_MS);
+      return;
+    }
+    mConnectionHandler.sendMessage(msg);
     return;
+  }
+
+  class BleConnectionHandler extends Handler {
+    public BleConnectionHandler(Looper looper) {
+      super(looper);
+    }
+
+    @Override
+    public void handleMessage(Message msg) {
+      super.handleMessage(msg);
+
+      switch (msg.what) {
+        case MSG_BLE_SCAN:
+          startBleScan(msg.getData());
+          break;
+        case MSG_BLE_CONNECT:
+          stopBleScan();
+          connectBLE(msg.obj);
+          break;
+        case MSG_BLE_CONNECT_SUCCESS:
+          bleConnectSuccess(msg.obj);
+          break;
+        case MSG_BLE_FAIL:
+        default:
+          stopBleScan();
+          bleConnectFail();
+          break;
+      }
+    }
+  }
+
+  private void startBleScan(Bundle bundle) {
+    BluetoothLeScanner scanner = mBluetoothAdapter.getBluetoothLeScanner();
+    if (scanner == null) {
+      Log.d(TAG, "No bluetooth scanner found");
+      return;
+    }
+
+    mScanCallback =
+        new ScanCallback() {
+          @Override
+          public void onScanResult(int callbackType, ScanResult result) {
+            BluetoothDevice device = result.getDevice();
+            Log.i(
+                TAG,
+                "Bluetooth Device Scanned Addr: " + device.getAddress() + ", " + device.getName());
+            Message msg = mConnectionHandler.obtainMessage();
+            msg.what = MSG_BLE_CONNECT;
+            msg.obj = (Object) device;
+            mConnectionHandler.sendMessage(msg);
+          }
+
+          @Override
+          public void onScanFailed(int errorCode) {
+            Log.e(TAG, "Scan failed " + errorCode);
+          }
+        };
+
+    byte[] serviceData = bundle.getByteArray(MSG_BUNDLE_SERVICE_DATA);
+    byte[] serviceDataMask = bundle.getByteArray(MSG_BUNDLE_SERVICE_DATA_MASK);
+    ScanFilter scanFilter =
+        new ScanFilter.Builder()
+            .setServiceData(
+                new ParcelUuid(UUID.fromString(CHIP_UUID)), serviceData, serviceDataMask)
+            .build();
+    ScanSettings scanSettings =
+        new ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build();
+    Log.i(TAG, "Starting Bluetooth scan");
+    scanner.startScan(Arrays.asList(scanFilter), scanSettings, mScanCallback);
+  }
+
+  private void stopBleScan() {
+    if (mScanCallback != null) {
+      BluetoothLeScanner scanner = mBluetoothAdapter.getBluetoothLeScanner();
+      if (scanner == null) {
+        Log.d(TAG, "No bluetooth scanner found");
+        return;
+      }
+      scanner.stopScan(mScanCallback);
+      mScanCallback = null;
+    }
+  }
+
+  private void connectBLE(Object bluetoothDeviceObj) {
+    if (bluetoothDeviceObj == null) {
+      return;
+    }
+
+    // Fail Timer reset.
+    mConnectionHandler.removeMessages(MSG_BLE_FAIL);
+    mConnectionHandler.sendEmptyMessageDelayed(MSG_BLE_FAIL, BLE_TIMEOUT_MS);
+
+    @SuppressWarnings("unchecked")
+    BluetoothDevice device = (BluetoothDevice) bluetoothDeviceObj;
+
+    Log.i(TAG, "Connecting");
+    BluetoothGatt gatt = device.connectGatt(mContext, false, new ConnectionGattCallback());
+  }
+
+  class ConnectionGattCallback extends AndroidBluetoothGattCallback {
+    private static final int STATE_INIT = 1;
+    private static final int STATE_DISCOVER_SERVICE = 2;
+    private static final int STATE_REQUEST_MTU = 3;
+
+    private int mState = STATE_INIT;
+
+    @Override
+    public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+      Log.i(TAG, "onConnectionStateChange status = " + status + ", newState= + " + newState);
+      super.onConnectionStateChange(gatt, status, newState);
+      if (newState == BluetoothProfile.STATE_CONNECTED && status == BluetoothGatt.GATT_SUCCESS) {
+        Log.i(TAG, "Discovering Services...");
+        mState = STATE_DISCOVER_SERVICE;
+        gatt.discoverServices();
+        return;
+      } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+        Log.i(TAG, "Services Disconnected");
+      }
+      mConnectionHandler.sendEmptyMessage(MSG_BLE_FAIL);
+    }
+
+    @Override
+    public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+      Log.d(TAG, "onServicesDiscovered status = " + status);
+      super.onServicesDiscovered(gatt, status);
+      if (mState != STATE_DISCOVER_SERVICE) {
+        Log.d(TAG, "Invalid state : " + mState);
+        return;
+      }
+
+      Log.i(TAG, "Services Discovered");
+      mState = STATE_REQUEST_MTU;
+      gatt.requestMtu(247);
+    }
+
+    @Override
+    public void onMtuChanged(BluetoothGatt gatt, int mtu, int status) {
+      super.onMtuChanged(gatt, mtu, status);
+      if (mState != STATE_REQUEST_MTU) {
+        Log.d(TAG, "Invalid state : " + mState);
+        return;
+      }
+      String deviceName = "";
+      if (gatt != null && gatt.getDevice() != null) {
+        deviceName = gatt.getDevice().getName();
+      }
+      Log.d(TAG, deviceName + ".onMtuChanged: connecting to CHIP device : " + status);
+
+      Message msg = mConnectionHandler.obtainMessage();
+      msg.what = MSG_BLE_CONNECT_SUCCESS;
+      msg.obj = (Object) gatt;
+
+      mConnectionHandler.sendMessage(msg);
+    }
+  }
+
+  private void bleConnectSuccess(Object gattObj) {
+    Log.d(TAG, "bleConnectSuccess");
+    mConnectionHandler.removeMessages(MSG_BLE_FAIL);
+    @SuppressWarnings("unchecked")
+    BluetoothGatt gatt = (BluetoothGatt) gattObj;
+    int connId = addConnection(gatt);
+
+    setBleCallback(
+        new BleCallback() {
+          @Override
+          public void onCloseBleComplete(int connId) {
+            Log.d(TAG, "onCloseBleComplete : " + connId);
+          }
+
+          @Override
+          public void onNotifyChipConnectionClosed(int connId) {
+            Log.d(TAG, "onNotifyChipConnectionClosed : " + connId);
+          }
+        });
+
+    if (mBleConnectCallback != null) {
+      mBleConnectCallback.onConnectSuccess(connId);
+    } else {
+      // Already fail returned
+      Log.d(TAG, "Already timeout");
+      gatt.disconnect();
+      removeConnection(connId);
+    }
+    mBleConnectCallback = null;
+  }
+
+  private void bleConnectFail() {
+    Log.d(TAG, "bleConnectFail");
+    if (mBleConnectCallback != null) {
+      mBleConnectCallback.onConnectFailed();
+    }
+    mBleConnectCallback = null;
+  }
+
+  private byte[] getServiceData(int discriminator) {
+    int opcode = 0;
+    int version = 0;
+    int versionDiscriminator = ((version & 0xf) << 12) | (discriminator & 0xfff);
+    return new byte[] {
+      (byte) (opcode & 0xFF),
+      (byte) (versionDiscriminator & 0xFF),
+      (byte) ((versionDiscriminator >> 8) & 0xFF)
+    };
+  }
+
+  private byte[] getServiceDataMask(boolean isShortDiscriminator) {
+    return new byte[] {(byte) 0xFF, (byte) (isShortDiscriminator ? 0x00 : 0xFF), (byte) 0xFF};
   }
 
   // CLIENT_CHARACTERISTIC_CONFIG is the well-known UUID of the client characteristic descriptor
   // that has the flags for enabling and disabling notifications and indications.
   // c.f. https://www.bluetooth.org/en-us/specification/assigned-numbers/generic-attribute-profile
   private static String CLIENT_CHARACTERISTIC_CONFIG = "00002902-0000-1000-8000-00805f9b34fb";
+  private static String CHIP_UUID = "0000FFF6-0000-1000-8000-00805F9B34FB";
 
   private static byte[] convertUUIDToBytes(UUID uuid) {
     byte[] idBytes = new byte[16];

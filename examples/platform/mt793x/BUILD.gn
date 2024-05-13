@@ -1,0 +1,66 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/mt793x_sdk.gni")
+import("${chip_root}/src/lib/lib.gni")
+import("${mt793x_sdk_build_root}/mt793x_sdk.gni")
+
+config("chip_examples_project_config") {
+  include_dirs = [ "project_include" ]
+
+  # Link options that provide a replacement for dynamic memory operations in standard
+  # library with the FreeRTOS malloc in platform code.
+  ldflags = [
+    # memory allocation -- these must be re-entrant and do locking
+    "-Wl,--wrap=malloc",
+    "-Wl,--wrap=free",
+    "-Wl,--wrap=realloc",
+    "-Wl,--wrap=calloc",
+    "-Wl,--wrap=calloc",
+    "-Wl,--wrap=MemoryAlloc",
+
+    # Wrap these in case internal newlib call them (e.g. strdup will)
+    # directly call _malloc_r)
+    "-Wl,--wrap=_malloc_r",
+    "-Wl,--wrap=_realloc_r",
+    "-Wl,--wrap=_free_r",
+    "-Wl,--wrap=_calloc_r",
+    "-Wl,--wrap=_write",
+
+    "-Wl,--wrap=__assert_function",
+    "-Wl,--wrap=wlan_printf",
+    "-Wl,--wrap=_gettimeofday",
+  ]
+}
+
+source_set("genio-matter-shell") {
+  if (chip_build_libshell) {
+    defines = [ "ENABLE_CHIP_SHELL" ]
+
+    sources = [
+      "link_wrapper.c",
+      "matter_shell.cpp",
+    ]
+    include_dirs = [ "." ]
+
+    public_deps = [
+      "${chip_root}/examples/shell/shell_common:shell_common",
+      "${chip_root}/src/lib/shell:shell",
+      "${chip_root}/src/lib/shell:shell_core",
+    ]
+  }
+
+  public_configs = [ ":chip_examples_project_config" ]
+}

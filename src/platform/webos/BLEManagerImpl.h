@@ -23,31 +23,19 @@
 
 #pragma once
 
-#include <ble/BleLayer.h>
+#include <ble/Ble.h>
 #include <platform/internal/BLEManager.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
+#include "ChipDeviceScanner.h"
+#include <luna-service2/lunaservice.h>
+
+#include <string>
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
-
-void HandleIncomingBleConnection(Ble::BLEEndPoint * bleEP);
-
-struct BLEAdvConfig
-{
-    char * mpBleName       = nullptr;
-    uint32_t mAdapterId    = 0;
-    uint8_t mMajor         = 0;
-    uint8_t mMinor         = 0;
-    uint16_t mVendorId     = 0;
-    uint16_t mProductId    = 0;
-    uint64_t mDeviceId     = 0;
-    uint8_t mPairingStatus = 0;
-    ChipAdvType mType;
-    uint16_t mDuration             = 0;
-    const char * mpAdvertisingUUID = nullptr;
-};
 
 enum class BleScanState : uint8_t
 {
@@ -63,7 +51,7 @@ struct BLEScanConfig
     BleScanState mBleScanState = BleScanState::kNotScanning;
 
     // If scanning by discriminator, what are we scanning for
-    uint16_t mDiscriminator = 0;
+    SetupDiscriminator mDiscriminator;
 
     // If scanning by address, what address are we searching for
     std::string mAddress;
@@ -89,14 +77,12 @@ class BLEManagerImpl final : public BLEManager,
 public:
     CHIP_ERROR ConfigureBle(uint32_t aAdapterId, bool aIsCentral);
 
-    // Driven by BlueZ IO
     static void HandleNewConnection(BLE_CONNECTION_OBJECT conId);
     static void HandleConnectFailed(CHIP_ERROR error);
     static void HandleWriteComplete(BLE_CONNECTION_OBJECT conId);
     static void HandleSubscribeOpComplete(BLE_CONNECTION_OBJECT conId, bool subscribed);
     static void HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
     static void HandleRXCharWrite(BLE_CONNECTION_OBJECT user_data, const uint8_t * value, size_t len);
-    static void CHIPoBluez_ConnectionClosed(BLE_CONNECTION_OBJECT user_data);
     static void HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT user_data);
     static void HandleTXComplete(BLE_CONNECTION_OBJECT user_data);
 
@@ -109,9 +95,7 @@ private:
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init();
-    CHIP_ERROR _Shutdown();
-    CHIPoBLEServiceMode _GetCHIPoBLEServiceMode();
-    CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
+    void _Shutdown();
     bool _IsAdvertisingEnabled();
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
     bool _IsAdvertising();
@@ -147,13 +131,14 @@ private:
 
     // ===== Members that implement virtual methods on BleConnectionDelegate.
 
-    void NewConnection(BleLayer * bleLayer, void * appState, uint16_t connDiscriminator) override;
+    void NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) override;
+    void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override{};
     CHIP_ERROR CancelConnection() override;
 
     // ===== Members that implement virtual methods on ChipDeviceScannerDelegate
-    void OnDeviceScanned(BluezDevice1 * device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override;
+    void OnChipDeviceScanned(char * address) override;
     void OnScanComplete() override;
-
+    void OnScanError(CHIP_ERROR err) override;
     // ===== Members for internal use by the following friends.
 
     friend BLEManager & BLEMgr();
@@ -165,9 +150,9 @@ private:
     enum class Flags : uint16_t
     {
         kAsyncInitCompleted       = 0x0001, /**< One-time asynchronous initialization actions have been performed. */
-        kBluezBLELayerInitialized = 0x0002, /**< The Bluez layer has been initialized. */
-        kAppRegistered            = 0x0004, /**< The CHIPoBLE application has been registered with the Bluez layer. */
-        kAdvertisingConfigured    = 0x0008, /**< CHIPoBLE advertising has been configured in the Bluez layer. */
+        kWebOSBLELayerInitialized = 0x0002, /**< The webOS layer has been initialized. */
+        kAppRegistered            = 0x0004, /**< The CHIPoBLE application has been registered with the webOS layer. */
+        kAdvertisingConfigured    = 0x0008, /**< CHIPoBLE advertising has been configured in the webOS layer. */
         kAdvertising              = 0x0010, /**< The system is currently CHIPoBLE advertising. */
         kControlOpInProgress      = 0x0020, /**< An async control operation has been issued to the ESP BLE layer. */
         kAdvertisingEnabled       = 0x0040, /**< The application has enabled CHIPoBLE advertising. */
@@ -178,10 +163,38 @@ private:
 
     enum
     {
-        kMaxConnections             = 1,  // TODO: right max connection
-        kMaxDeviceNameLength        = 20, // TODO: right-size this
-        kMaxAdvertismentDataSetSize = 31  // TODO: verify this
+        kMaxConnections              = 1,  // TODO: right max connection
+        kMaxDeviceNameLength         = 20, // TODO: right-size this
+        kMaxAdvertisementDataSetSize = 31  // TODO: verify this
     };
+
+    struct BLEConnection
+    {
+        char * peerAddr;
+        uint16_t mtu;
+        bool subscribed;
+        void * gattCharC1Handle;
+        void * gattCharC2Handle;
+        bool isChipDevice;
+    };
+
+    bool SendWriteRequestToWebOS(void * bleConnObj, const uint8_t * svcId, const uint8_t * charId, const uint8_t * pBuf,
+                                 uint32_t pBufDataLen);
+    bool SubscribeCharacteristicToWebOS(void * bleConnObj, const uint8_t * svcId, const uint8_t * charId);
+
+    void InitConnectionData(void);
+    void AddConnectionData(const char * remoteAddr);
+
+    void HandleConnectionEvent(bool connected, const char * remoteAddress);
+
+    static gboolean _BleInitialize(void * userData);
+    static bool gattMonitorCharateristicsCb(LSHandle * sh, LSMessage * message, void * userData);
+    static bool gattWriteDescriptorValueCb(LSHandle * sh, LSMessage * message, void * userData);
+    static bool gattWriteValueCb(LSHandle * sh, LSMessage * message, void * ctx);
+    static bool gattGetServiceCb(LSHandle * sh, LSMessage * message, void * ctx);
+    static bool gattConnectCb(LSHandle * sh, LSMessage * message, void * ctx);
+    static gboolean ConnectChipThing(gpointer userData);
+    void ConnectHandler(const char * address);
 
     CHIP_ERROR StartBLEAdvertising();
     CHIP_ERROR StopBLEAdvertising();
@@ -194,13 +207,18 @@ private:
     void CleanScanConfig();
 
     CHIPoBLEServiceMode mServiceMode;
-    BLEAdvConfig mBLEAdvConfig;
     BLEScanConfig mBLEScanConfig;
     BitFlags<Flags> mFlags;
     char mDeviceName[kMaxDeviceNameLength + 1];
-    bool mIsCentral            = false;
-    BluezEndpoint * mpEndpoint = nullptr;
+    bool mIsCentral = false;
     std::unique_ptr<ChipDeviceScanner> mDeviceScanner;
+
+    GMainContext * mMainContext = nullptr;
+    LSHandle * mLSHandle        = nullptr;
+    char * mRemoteAddress       = nullptr;
+    char * mClientId            = nullptr;
+
+    GHashTable * mConnectionMap = nullptr;
 };
 
 /**
@@ -228,11 +246,6 @@ inline BLEManagerImpl & BLEMgrImpl()
 inline Ble::BleLayer * BLEManagerImpl::_GetBleLayer()
 {
     return this;
-}
-
-inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode()
-{
-    return mServiceMode;
 }
 
 inline bool BLEManagerImpl::_IsAdvertisingEnabled()

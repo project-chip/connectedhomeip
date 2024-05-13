@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app/util/basic-types.h>
+#include <lib/core/Optional.h>
 
 namespace chip {
 namespace app {
@@ -33,6 +34,11 @@ struct DataVersionFilter
     bool IsValidDataVersionFilter() const
     {
         return (mEndpointId != kInvalidEndpointId) && (mClusterId != kInvalidClusterId) && (mDataVersion.HasValue());
+    }
+
+    bool operator==(const DataVersionFilter & aOther) const
+    {
+        return mEndpointId == aOther.mEndpointId && mClusterId == aOther.mClusterId && mDataVersion == aOther.mDataVersion;
     }
 
     ClusterId mClusterId = kInvalidClusterId;    // uint32

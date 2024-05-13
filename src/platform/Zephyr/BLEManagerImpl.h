@@ -25,11 +25,11 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-#include <bluetooth/bluetooth.h>
-#include <bluetooth/conn.h>
-#include <bluetooth/gatt.h>
+#include <platform/Zephyr/BLEAdvertisingArbiter.h>
 
-#include <lib/support/logging/CHIPLogging.h>
+#include <zephyr/bluetooth/bluetooth.h>
+#include <zephyr/bluetooth/conn.h>
+#include <zephyr/bluetooth/gatt.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -50,9 +50,7 @@ private:
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init(void);
-    CHIP_ERROR _Shutdown() { return CHIP_NO_ERROR; }
-    CHIPoBLEServiceMode _GetCHIPoBLEServiceMode(void);
-    CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
+    void _Shutdown() {}
     bool _IsAdvertisingEnabled(void);
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
     bool _IsAdvertising(void);
@@ -93,22 +91,26 @@ private:
         kAdvertisingRefreshNeeded =
             0x0010, /**< The advertising state/configuration has changed, but the SoftDevice has yet to be updated. */
         kChipoBleGattServiceRegister = 0x0020, /**< The system has currently CHIPoBLE GATT service registered. */
+        kExtendedAdvertisingEnabled  = 0x0040, /**< The application has enabled extended advertising. */
     };
 
     struct ServiceData;
 
     BitFlags<Flags> mFlags;
-    uint16_t mGAPConns;
+    uint16_t mMatterConnNum;
     CHIPoBLEServiceMode mServiceMode;
     bool mSubscribedConns[CONFIG_BT_MAX_CONN];
-    bt_gatt_notify_params mNotifyParams[CONFIG_BT_MAX_CONN];
+    bt_gatt_indicate_params mIndicateParams[CONFIG_BT_MAX_CONN];
     bt_conn_cb mConnCallbacks;
+    BLEAdvertisingArbiter::Request mAdvertisingRequest = {};
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     PacketBufferHandle c3CharDataBufferHandle;
 #endif
+    // The summarized number of Bluetooth LE connections related to the device (including these not related to Matter service).
+    uint16_t mTotalConnNum;
 
     void DriveBLEState(void);
-    CHIP_ERROR ConfigureAdvertising(void);
+    CHIP_ERROR PrepareAdvertisingRequest();
     CHIP_ERROR StartAdvertising(void);
     CHIP_ERROR StopAdvertising(void);
     CHIP_ERROR HandleGAPConnect(const ChipDeviceEvent * event);
@@ -123,15 +125,17 @@ private:
     bool SetSubscribed(bt_conn * conn);
     bool UnsetSubscribed(bt_conn * conn);
     uint32_t GetAdvertisingInterval();
+    CHIP_ERROR RegisterGattService();
+    CHIP_ERROR UnregisterGattService();
 
     static void DriveBLEState(intptr_t arg);
 
     // Below callbacks run from the system workqueue context and have a limited stack capacity.
-    static void HandleTXCompleted(bt_conn * conn, void * param);
+    static void HandleTXIndicated(bt_conn * conn, bt_gatt_indicate_params * attr, uint8_t err);
     static void HandleConnect(bt_conn * conn, uint8_t err);
     static void HandleDisconnect(bt_conn * conn, uint8_t reason);
-    static void HandleBLEAdvertisementTimeout(System::Layer * layer, void * param);
-    static void HandleBLEAdvertisementIntervalChange(System::Layer * layer, void * param);
+    static void HandleSlowBLEAdvertisementInterval(System::Layer * layer, void * param);
+    static void HandleExtendedBLEAdvertisementInterval(System::Layer * layer, void * param);
 
     // ===== Members for internal use by the following friends.
 
@@ -176,11 +180,6 @@ inline BLEManagerImpl & BLEMgrImpl(void)
 inline BleLayer * BLEManagerImpl::_GetBleLayer()
 {
     return this;
-}
-
-inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(void)
-{
-    return mServiceMode;
 }
 
 inline bool BLEManagerImpl::_IsAdvertisingEnabled(void)

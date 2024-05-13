@@ -39,6 +39,7 @@ static_library("asn1") {
     "ASN1Macros.h",
     "ASN1OID.cpp",
     "ASN1Reader.cpp",
+    "ASN1Time.cpp",
     "ASN1Writer.cpp",
   ]
 

@@ -28,15 +28,14 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 
 namespace chip {
 namespace app {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR EventReportIBs::Parser::CheckSchemaValidity() const
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+CHIP_ERROR EventReportIBs::Parser::PrettyPrint() const
 {
-    CHIP_ERROR err         = CHIP_NO_ERROR;
-    size_t numEventReports = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("EventReportIBs =");
@@ -52,35 +51,23 @@ CHIP_ERROR EventReportIBs::Parser::CheckSchemaValidity() const
             EventReportIB::Parser eventReport;
             ReturnErrorOnFailure(eventReport.Init(reader));
             PRETTY_PRINT_INCDEPTH();
-            ReturnErrorOnFailure(eventReport.CheckSchemaValidity());
+            ReturnErrorOnFailure(eventReport.PrettyPrint());
             PRETTY_PRINT_DECDEPTH();
         }
-
-        ++numEventReports;
     }
 
     PRETTY_PRINT("],");
-    PRETTY_PRINT("");
+    PRETTY_PRINT_BLANK_LINE();
 
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
-        // if we have at least one event report
-        if (numEventReports > 0)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        else
-        {
-            ChipLogError(DataManagement, "PROTOCOL ERROR: Empty event reports");
-            err = CHIP_NO_ERROR;
-        }
+        err = CHIP_NO_ERROR;
     }
     ReturnErrorOnFailure(err);
-    ReturnErrorOnFailure(reader.ExitContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
+    return reader.ExitContainer(mOuterContainerType);
 }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
 EventReportIB::Builder & EventReportIBs::Builder::CreateEventReport()
 {
@@ -91,10 +78,10 @@ EventReportIB::Builder & EventReportIBs::Builder::CreateEventReport()
     return mEventReport;
 }
 
-EventReportIBs::Builder & EventReportIBs::Builder::EndOfEventReports()
+CHIP_ERROR EventReportIBs::Builder::EndOfEventReports()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip

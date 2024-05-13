@@ -35,7 +35,7 @@ public:
     EventLogger(const T & aEventData) : mEventData(aEventData){};
     CHIP_ERROR WriteEvent(chip::TLV::TLVWriter & aWriter) final override
     {
-        return DataModel::Encode(aWriter, TLV::ContextTag(to_underlying(EventDataIB::Tag::kData)), mEventData);
+        return DataModel::Encode(aWriter, TLV::ContextTag(EventDataIB::Tag::kData), mEventData);
     }
 
 private:
@@ -53,6 +53,10 @@ private:
  * directly into the target buffer.  The event data MUST contain
  * context tags to be interpreted within the schema identified by
  * `ClusterID` and `EventId`.
+ *
+ * The consumer has to either lock the Matter stack lock or queue the event to
+ * the Matter event queue when using LogEvent. This function is not safe to call
+ * outside of the main Matter processing context.
  *
  * LogEvent has 2 variant, one for fabric-scoped events and one for non-fabric-scoped events.
  * @param[in] aEventData  The event cluster object
@@ -72,6 +76,8 @@ CHIP_ERROR LogEvent(const T & aEventData, EndpointId aEndpoint, EventNumber & aE
     eventOptions.mPath        = path;
     eventOptions.mPriority    = aEventData.GetPriorityLevel();
     eventOptions.mFabricIndex = aEventData.GetFabricIndex();
+    // this skips logging the event if it's fabric-scoped but no fabric association exists yet.
+    VerifyOrReturnError(eventOptions.mFabricIndex != kUndefinedFabricIndex, CHIP_ERROR_INVALID_FABRIC_INDEX);
 
     //
     // Unlike attributes which have a different 'EncodeForRead' for fabric-scoped structs,

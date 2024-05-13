@@ -1,0 +1,156 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    12.4.3. [TC-CNET-4.3] [Ethernet] Verification for attributes check
+    [DUT-Server]
+
+PICS:
+    - CNET.S.F02
+
+config:
+    nodeId: 0x12344321
+    cluster: "Network Commissioning"
+    # PIXIT.CNET.ENDPOINT_ETHERNET
+    endpoint: 0
+    NetworkID:
+        type: octet_string
+        defaultValue: "hex:6574682D617070"
+    payload:
+        type: char_string
+        defaultValue: "MT:-24J042C00KA0648G00"
+
+tests:
+    - label: "Step 1: Reset Devices to factory defaults"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "FactoryReset"
+
+    - label: "Step 1: Reset Devices to factory defaults"
+      verification: |
+          Reset Devices to factory defaults
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Factory Reset the DUT and enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 2: Commission TH and DUT on Ethernet setup"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: payload
+
+    - label: "Step 2: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Step 3: TH reads Descriptor Cluster from the DUT with EP0 TH reads
+          ServerList from the DUT"
+      cluster: "Descriptor"
+      command: "readAttribute"
+      attribute: "ServerList"
+      response:
+          constraints:
+              type: list
+              contains: [49]
+
+    - label: "Step 4a: TH reads FeatureMap attribute from the DUT"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 4
+          constraints:
+              type: bitmap32
+
+    - label:
+          "Step 5 & 6: TH reads the MaxNetworks attribute from the DUT. TH saves
+          the MaxNetworks attribute value as 'MaxNetworksValue' for future use"
+      PICS: CNET.S.A0000
+      command: "readAttribute"
+      attribute: "MaxNetworks"
+      response:
+          saveAs: MaxNetworksValue
+          constraints:
+              type: int8u
+              minValue: 1
+              maxValue: 255
+
+    - label: "Step 7: TH reads the Networks attribute list from the DUT"
+      PICS: CNET.S.A0001
+      command: "readAttribute"
+      attribute: "Networks"
+      response:
+          constraints:
+              contains: [{ NetworkID: NetworkID, Connected: true }]
+
+    - label: "Step 8: TH reads InterfaceEnabled attribute from the DUT"
+      PICS: CNET.S.A0004
+      command: "readAttribute"
+      attribute: "InterfaceEnabled"
+      response:
+          value: true
+          constraints:
+              type: boolean
+
+    - label: "Step 9: TH reads LastNetworkingStatus attribute from the DUT"
+      PICS: CNET.S.A0005
+      command: "readAttribute"
+      attribute: "LastNetworkingStatus"
+      response:
+          value: null
+
+    - label:
+          "Step 10: TH reads the LastNetworkID attribute from the DUT. TH reads
+          the Networks attribute from the DUT"
+      PICS: CNET.S.A0006
+      command: "readAttribute"
+      attribute: "LastNetworkID"
+      response:
+          value: null
+          constraints:
+              type: octet_string
+              minLength: 1
+              maxLength: 32
+
+    - label: "Step 10: TH reads the Networks attribute list from the DUT"
+      PICS: CNET.S.A0001
+      command: "readAttribute"
+      attribute: "Networks"
+      response:
+          constraints:
+              contains: [{ NetworkID: NetworkID, Connected: true }]
+
+    - label:
+          "Step 11: TH reads the LastConnectErrorValue attribute from the DUT"
+      PICS: CNET.S.A0007
+      command: "readAttribute"
+      attribute: "LastConnectErrorValue"
+      response:
+          value: null
+          constraints:
+              type: int32s

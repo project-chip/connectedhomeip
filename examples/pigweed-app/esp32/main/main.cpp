@@ -33,7 +33,7 @@
 #include "lwip/sockets.h"
 #include "lwip/sys.h"
 
-const char * TAG = "chip-pigweed-app";
+extern const char TAG[] = "chip-pigweed-app";
 
 namespace {
 using std::byte;

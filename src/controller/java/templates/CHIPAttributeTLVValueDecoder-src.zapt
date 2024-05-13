@@ -37,12 +37,12 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
     
     switch (aPath.mClusterId)
     {
-        {{#chip_client_clusters}}
+        {{#zcl_clusters}}
         case app::Clusters::{{asUpperCamelCase name}}::Id: {
             using namespace app::Clusters::{{asUpperCamelCase name}};
             switch (aPath.mAttributeId)
             {
-                {{#chip_server_cluster_attributes}}
+                {{#zcl_attributes_server removeKeys='isOptional'}}
                 case Attributes::{{asUpperCamelCase name}}::Id: {
                     using TypeInfo = Attributes::{{asUpperCamelCase name}}::TypeInfo;
                     TypeInfo::DecodableType cppValue;
@@ -51,19 +51,19 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     {
                         return nullptr;
                     }
-                    {{>decode_value target="value" source="cppValue" cluster=(asUpperCamelCase parent.name) depth=0 earlyReturn="nullptr"}}
+                    {{>decode_value target="value" source="cppValue" cluster=parent.name depth=0 earlyReturn="nullptr"}}
                     return value;
                 }
-                {{/chip_server_cluster_attributes}}
+                {{/zcl_attributes_server}}
                 default:
-                    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+                    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
                     break;
             }
             break;
         }
-        {{/chip_client_clusters}}
+        {{/zcl_clusters}}
         default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;
     } 
     return nullptr;

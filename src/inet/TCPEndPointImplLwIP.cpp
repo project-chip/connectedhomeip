@@ -37,6 +37,11 @@
 #include <lwip/tcp.h>
 #include <lwip/tcpip.h>
 
+static_assert(LWIP_VERSION_MAJOR > 1, "CHIP requires LwIP 2.0 or later");
+
+// TODO: Update to use RunOnTCPIP.
+static_assert(LWIP_TCPIP_CORE_LOCKING, "CHIP requires config LWIP_TCPIP_CORE_LOCKING enabled");
+
 namespace chip {
 namespace Inet {
 
@@ -345,8 +350,8 @@ CHIP_ERROR TCPEndPointImplLwIP::DriveSendingImpl()
             do
             {
                 VerifyOrDie(!startOfUnsent.buffer.IsNull());
-
-                uint16_t bufDataLen = startOfUnsent.buffer->DataLength();
+                VerifyOrDie(CanCastTo<uint16_t>(startOfUnsent.buffer->DataLength()));
+                uint16_t bufDataLen = static_cast<uint16_t>(startOfUnsent.buffer->DataLength());
 
                 // Get a pointer to the start of unsent data within the first buffer on the unsent queue.
                 const uint8_t * sendData = startOfUnsent.buffer->Start() + startOfUnsent.offset;
@@ -498,16 +503,18 @@ void TCPEndPointImplLwIP::DoCloseImpl(CHIP_ERROR err, State oldState)
     }
 }
 
-CHIP_ERROR TCPEndPointImplLwIP::AckReceive(uint16_t len)
+CHIP_ERROR TCPEndPointImplLwIP::AckReceive(size_t len)
 {
     VerifyOrReturnError(IsConnected(), CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR res = CHIP_NO_ERROR;
+
+    VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_INVALID_ARGUMENT);
 
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
 
     if (mTCP != nullptr)
-        tcp_recved(mTCP, len);
+        tcp_recved(mTCP, static_cast<uint16_t>(len));
     else
         res = CHIP_ERROR_CONNECTION_ABORTED;
 
@@ -565,7 +572,8 @@ TCPEndPointImplLwIP::BufferOffset TCPEndPointImplLwIP::FindStartOfUnsent()
     while (leftToSkip > 0)
     {
         VerifyOrDie(!startOfUnsent.buffer.IsNull());
-        uint16_t bufDataLen = startOfUnsent.buffer->DataLength();
+        VerifyOrDie(CanCastTo<uint16_t>(startOfUnsent.buffer->DataLength()));
+        uint16_t bufDataLen = static_cast<uint16_t>(startOfUnsent.buffer->DataLength());
         if (leftToSkip >= bufDataLen)
         {
             // We have more to skip than current packet buffer size.
@@ -991,8 +999,8 @@ void TCPEndPointImplLwIP::LwIPHandleError(void * arg, err_t lwipErr)
 {
     if (arg != NULL)
     {
-        TCPEndPointImplLwIP * ep         = static_cast<TCPEndPointImplLwIP *>(arg);
-        System::LayerLwIP & lSystemLayer = static_cast<System::LayerLwIP &>(ep->GetSystemLayer());
+        TCPEndPointImplLwIP * ep             = static_cast<TCPEndPointImplLwIP *>(arg);
+        System::LayerFreeRTOS & lSystemLayer = static_cast<System::LayerFreeRTOS &>(ep->GetSystemLayer());
 
         // At this point LwIP has already freed the PCB.  Since the thread that owns the TCPEndPoint may
         // try to use the PCB before it receives the TCPError event posted below, we set the PCB to NULL

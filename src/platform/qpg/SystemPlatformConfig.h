@@ -35,9 +35,46 @@ struct ChipDeviceEvent;
 // ==================== Platform Adaptations ====================
 #define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME 1
 #define CHIP_SYSTEM_CONFIG_EVENT_OBJECT_TYPE const struct ::chip::DeviceLayer::ChipDeviceEvent *
-
+#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 8
 // ========== Platform-specific Configuration Overrides =========
+/**
+ * @def CHIP_DEVICE_CONFIG_EVENT_LOGGING_CRIT_BUFFER_SIZE
+ *
+ * @brief
+ *   A size, in bytes, of the buffer reserved for storing CRITICAL events and no
+ *   other events.  CRITICAL events will never be evicted until this buffer is
+ *   full, so its size and the sizes of events determine how many of the last N
+ *   CRITICAL events are guaranteed to be available.
+ *
+ *   Note: this number must be nonzero.
+ */
+#define CHIP_DEVICE_CONFIG_EVENT_LOGGING_CRIT_BUFFER_SIZE (512)
 
-#ifndef CHIP_SYSTEM_CONFIG_NUM_TIMERS
-#define CHIP_SYSTEM_CONFIG_NUM_TIMERS 16
-#endif // CHIP_SYSTEM_CONFIG_NUM_TIMERS
+/**
+ * @def CHIP_DEVICE_CONFIG_EVENT_LOGGING_INFO_BUFFER_SIZE
+ *
+ * @brief
+ *   A size, in bytes, of the buffer reserved for storing events at INFO
+ *   priority and higher.  INFO-priority events will not be evicted until this
+ *   buffer is full (with INFO and CRITICAL events in it) and the oldest event
+ *   in the buffer is an INFO-priority event (which cannot be evicted into the
+ *   CRITICAL event buffer).
+ *
+ *   Note: set to 0 to treat INFO events as effectively equivalent to DEBUG events.
+ */
+#define CHIP_DEVICE_CONFIG_EVENT_LOGGING_INFO_BUFFER_SIZE (384)
+
+/**
+ * @def CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE
+ *
+ * @brief
+ *   A size, in bytes, of the buffer used for storing newly generated events,
+ *   and the only buffer in which DEBUG-priority events are allowed.
+ *   DEBUG-priority events will start getting evicted when this buffer is full
+ *   (with DEBUG, INFO, and CRITICAL events in it) and the oldest event in the
+ *   buffer is a DEBUG-priority event, which cannot be evicted into the INFO
+ *   event buffer.
+ *
+ *   Note: set to 0 to disable storing DEBUG events.
+ */
+#define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (256)

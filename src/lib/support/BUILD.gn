@@ -16,11 +16,34 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlassert.gni")
 import("//build_overrides/nlfaultinjection.gni")
-import("//build_overrides/nlio.gni")
+import("//build_overrides/nlunit_test.gni")
+import("//build_overrides/pigweed.gni")
 
+import("$dir_pw_build/target_types.gni")
 import("${chip_root}/build/chip/chip_version.gni")
+import("${chip_root}/build/chip/java/config.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/lib/core/core.gni")
+
+declare_args() {
+  # Set to true to run the PersistentStorageDelegate API compliance audit
+  chip_support_enable_storage_api_audit = false
+
+  # Set to true to run the PersistentStorageDelegate load test audit
+  chip_support_enable_storage_load_test_audit = false
+}
+
+config("storage_audit_config") {
+  defines = []
+
+  if (chip_support_enable_storage_api_audit) {
+    defines += [ "CHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT" ]
+  }
+
+  if (chip_support_enable_storage_load_test_audit) {
+    defines += [ "CHIP_SUPPORT_ENABLE_STORAGE_LOAD_TEST_AUDIT" ]
+  }
+}
 
 if (chip_pw_tokenizer_logging) {
   import("//build_overrides/pigweed.gni")
@@ -44,14 +67,112 @@ source_set("logging_constants") {
   sources = [ "logging/Constants.h" ]
 }
 
-source_set("enforce_format") {
-  sources = [ "EnforceFormat.h" ]
+source_set("attributes") {
+  sources = [
+    "DLLUtil.h",
+    "EnforceFormat.h",
+  ]
+}
+
+source_set("verifymacros_no_logging") {
+  sources = [ "VerificationMacrosNoLogging.h" ]
+
+  public_deps = [ "${nlassert_root}:nlassert" ]
+}
+
+source_set("safeint") {
+  sources = [ "SafeInt.h" ]
+}
+
+source_set("memory") {
+  sources = [
+    "CHIPMem.cpp",
+    "CHIPMem.h",
+    "CHIPPlatformMemory.cpp",
+    "CHIPPlatformMemory.h",
+  ]
+
+  if (chip_config_memory_management == "simple") {
+    sources += [ "CHIPMem-Simple.cpp" ]
+  }
+  if (chip_config_memory_management == "malloc") {
+    sources += [ "CHIPMem-Malloc.cpp" ]
+  }
+
+  public_deps = [ "${chip_root}/src/lib/core:error" ]
+
+  deps = [
+    ":safeint",
+    ":verifymacros_no_logging",
+    "${chip_root}/src/lib/core:chip_config_header",
+  ]
+}
+
+source_set("text_only_logging") {
+  sources = [
+    "logging/TextOnlyLogging.cpp",
+    "logging/TextOnlyLogging.h",
+  ]
+
+  public_deps = [
+    ":attributes",
+    ":logging_constants",
+    ":verifymacros_no_logging",
+    "${chip_root}/src/lib/core:chip_config_header",
+  ]
+
+  if (chip_pw_tokenizer_logging) {
+    public_deps += [ "${dir_pw_tokenizer}" ]
+  }
+
+  deps = [
+    ":memory",
+    "${chip_root}/src/lib/core:chip_config_header",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+}
+
+source_set("verifymacros") {
+  sources = [ "CodeUtils.h" ]
+
+  public_deps = [
+    ":attributes",
+    ":text_only_logging",
+    ":verifymacros_no_logging",
+    "${chip_root}/src/lib/core:chip_config_header",
+    "${chip_root}/src/lib/core:error",
+    "${nlassert_root}:nlassert",
+  ]
+}
+
+source_set("span") {
+  sources = [ "Span.h" ]
+
+  public_deps = [
+    ":verifymacros",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("chip_version_header") {
   sources = get_target_outputs(":gen_chip_version")
 
   deps = [ ":gen_chip_version" ]
+}
+
+source_set("testing") {
+  sources = [
+    "TestGroupData.h",
+    "TestPersistentStorageDelegate.h",
+  ]
+}
+
+source_set("type-traits") {
+  sources = [ "TypeTraits.h" ]
+}
+
+source_set("static-support") {
+  sources = [ "static_support_smart_ptr.h" ]
 }
 
 static_library("support") {
@@ -61,6 +182,7 @@ static_library("support") {
     "Base64.cpp",
     "Base64.h",
     "BitFlags.h",
+    "BitMask.h",
     "BufferReader.cpp",
     "BufferReader.h",
     "BufferWriter.cpp",
@@ -70,61 +192,72 @@ static_library("support") {
     "BytesToHex.cpp",
     "BytesToHex.h",
     "CHIPArgParser.cpp",
-    "CHIPCounter.cpp",
+    "CHIPArgParser.hpp",
     "CHIPCounter.h",
-    "CHIPMem.cpp",
-    "CHIPMem.h",
     "CHIPMemString.h",
-    "CHIPPlatformMemory.cpp",
-    "CHIPPlatformMemory.h",
-    "CodeUtils.h",
+    "CommonIterator.h",
+    "CommonPersistentData.h",
     "DLLUtil.h",
+    "DefaultStorageKeyAllocator.h",
     "Defer.h",
-    "ErrorStr.cpp",
-    "ErrorStr.h",
     "FibonacciUtils.cpp",
     "FibonacciUtils.h",
     "FixedBufferAllocator.cpp",
     "FixedBufferAllocator.h",
+    "Fold.h",
+    "FunctionTraits.h",
+    "IniEscaping.cpp",
+    "IniEscaping.h",
+    "IntrusiveList.h",
     "Iterators.h",
-    "LifetimePersistedCounter.cpp",
+    "LambdaBridge.h",
     "LifetimePersistedCounter.h",
+    "LinkedList.h",
     "ObjectLifeCycle.h",
-    "PersistedCounter.cpp",
     "PersistedCounter.h",
+    "PersistentData.h",
+    "PersistentStorageAudit.cpp",
+    "PersistentStorageAudit.h",
     "PersistentStorageMacros.h",
     "Pool.cpp",
     "Pool.h",
+    "PoolWrapper.h",
     "PrivateHeap.cpp",
     "PrivateHeap.h",
     "ReferenceCountedHandle.h",
-    "SafeInt.h",
-    "SerializableIntegerSet.cpp",
-    "SerializableIntegerSet.h",
+    "SafePointerCast.h",
+    "SafeString.h",
+    "Scoped.h",
+    "ScopedBuffer.h",
+    "SetupDiscriminator.h",
+    "SortUtils.h",
     "StateMachine.h",
+    "StringBuilder.cpp",
+    "StringBuilder.h",
+    "StringSplitter.h",
     "ThreadOperationalDataset.cpp",
     "ThreadOperationalDataset.h",
     "TimeUtils.cpp",
     "TimeUtils.h",
-    "UnitTestRegistration.cpp",
-    "UnitTestRegistration.h",
-    "UnitTestUtils.cpp",
-    "UnitTestUtils.h",
     "Variant.h",
     "ZclString.cpp",
     "ZclString.h",
-    "logging/CHIPLogging.cpp",
+    "logging/BinaryLogging.cpp",
+    "logging/BinaryLogging.h",
     "logging/CHIPLogging.h",
+    "utf8.cpp",
+    "utf8.h",
     "verhoeff/Verhoeff.cpp",
     "verhoeff/Verhoeff.h",
     "verhoeff/Verhoeff10.cpp",
-    "verhoeff/Verhoeff16.cpp",
-    "verhoeff/Verhoeff32.cpp",
-    "verhoeff/Verhoeff36.cpp",
   ]
 
-  # added JNI helper on android
-  if (current_os == "android") {
+  if (current_os == "android" || matter_enable_java_compilation) {
+    if (matter_enable_java_compilation) {
+      include_dirs = java_matter_controller_dependent_paths
+    }
+
+    # added JNI helper on android
     sources += [
       "CHIPJNIError.h",
       "JniReferences.cpp",
@@ -138,14 +271,23 @@ static_library("support") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    ":attributes",
     ":chip_version_header",
-    ":enforce_format",
     ":logging_constants",
+    ":memory",
+    ":safeint",
+    ":span",
+    ":text_only_logging",
+    ":type-traits",
+    ":verifymacros",
+    ":verifymacros_no_logging",
     "${chip_root}/src/lib/core:chip_config_header",
-    "${chip_root}/src/platform:platform_buildconfig",
-    "${chip_root}/src/platform/logging:headers",
+    "${chip_root}/src/lib/core:encoding",
+    "${chip_root}/src/lib/core:error",
+    "${chip_root}/src/lib/core:types",
+    "${chip_root}/src/platform:platform_config_header",
+    "${chip_root}/src/system:system_config_header",
     "${nlassert_root}:nlassert",
-    "${nlio_root}:nlio",
   ]
 
   # These are needed because we include CHIPCore.h, which uses config
@@ -161,17 +303,16 @@ static_library("support") {
     public_deps += [ "${chip_root}/src/platform/logging:android" ]
   }
 
+  if (current_os == "mac" || current_os == "ios") {
+    public_deps += [ "${chip_root}/src/platform/Darwin:logging" ]
+  }
+
   public_configs = [
     "${chip_root}/src:includes",
     "${chip_root}/src/system:system_config",
+    ":storage_audit_config",
   ]
 
-  if (chip_config_memory_management == "simple") {
-    sources += [ "CHIPMem-Simple.cpp" ]
-  }
-  if (chip_config_memory_management == "malloc") {
-    sources += [ "CHIPMem-Malloc.cpp" ]
-  }
   if (chip_with_nlfaultinjection) {
     sources += [
       "CHIPFaultInjection.cpp",
@@ -181,10 +322,58 @@ static_library("support") {
   }
 
   if (chip_pw_tokenizer_logging) {
-    public_deps += [ "${dir_pw_tokenizer}:global_handler_with_payload" ]
+    public_deps += [ "${dir_pw_tokenizer}" ]
   }
 
   if (chip_config_memory_debug_dmalloc) {
     libs += [ "dmallocthcxx" ]
   }
+}
+
+static_library("test_utils") {
+  output_name = "libTestUtils"
+  output_dir = "${root_out_dir}/lib"
+  deps = [ "${chip_root}/src/platform" ]
+
+  sources = [
+    "UnitTestUtils.cpp",
+    "UnitTestUtils.h",
+  ]
+}
+
+pw_static_library("pw_tests_wrapper") {
+  if (chip_device_platform == "esp32") {
+    complete_static_lib = true
+  }
+  output_name = "libPWTestsWrapper"
+  output_dir = "${root_out_dir}/lib"
+  public_deps = [
+    "$dir_pw_log:impl",
+    "$dir_pw_unit_test",
+    "$dir_pw_unit_test:logging",
+  ]
+  sources = [
+    "UnitTest.cpp",
+    "UnitTest.h",
+  ]
+}
+
+static_library("testing_nlunit") {
+  output_name = "libSupportTesting"
+  output_dir = "${root_out_dir}/lib"
+
+  sources = [
+    "UnitTestContext.h",
+    "UnitTestExtendedAssertions.h",
+    "UnitTestRegistration.cpp",
+    "UnitTestRegistration.h",
+  ]
+
+  public_deps = [
+    ":support",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/platform",
+    "${nlassert_root}:nlassert",
+    "${nlunit_test_root}:nlunit-test",
+  ]
 }

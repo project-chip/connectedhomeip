@@ -28,6 +28,7 @@
 #include <pw_stream/sys_io_stream.h>
 #include <pw_sys_io_mbed/init.h>
 
+#include <assert.h>
 #include <rtos/Mutex.h>
 
 namespace PigweedLogger {
@@ -44,7 +45,7 @@ char sWriteBuffer[kWriteBufferSize];
 
 void send()
 {
-    pw::hdlc::WriteUIFrame(kLogHdlcAddress, std::as_bytes(std::span(sWriteBuffer, sWriteBufferPos)), sWriter);
+    pw::hdlc::WriteUIFrame(kLogHdlcAddress, pw::as_bytes(pw::span(sWriteBuffer, sWriteBufferPos)), sWriter);
     sWriteBufferPos = 0;
 }
 

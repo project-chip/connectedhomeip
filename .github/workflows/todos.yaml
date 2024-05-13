@@ -23,14 +23,8 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.11
-              name: Checkout
-              with:
-                  action: actions/checkout@v3
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
+            - name: Checkout
+              uses: actions/checkout@v4
             - name: Run Issue Bot
               uses: derjuulsn/todo-issue@main
               with:

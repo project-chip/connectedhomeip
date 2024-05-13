@@ -18,14 +18,14 @@
 
 #include <lib/core/PeerId.h>
 #include <lib/dnssd/Discovery_ImplPlatform.h>
-#include <lib/support/UnitTestRegistration.h>
+
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/fake/DnssdImpl.h>
 
-#include <nlunit-test.h>
+#include <gtest/gtest.h>
 
-#if !defined(CHIP_DEVICE_LAYER_TARGET_FAKE) || CHIP_DEVICE_LAYER_TARGET_FAKE != 1
+#if CHIP_DEVICE_LAYER_TARGET_FAKE != 1
 #error "This test is designed for use only with the fake platform"
 #endif
 
@@ -51,17 +51,19 @@ OperationalAdvertisingParameters operationalParams2 = OperationalAdvertisingPara
                                                           .SetMac(ByteSpan(kMac))
                                                           .SetPort(CHIP_PORT)
                                                           .EnableIpV4(true)
-                                                          .SetMRPConfig({ 32_ms32, 33_ms32 })
-                                                          .SetTcpSupported(Optional<bool>(true));
+                                                          .SetLocalMRPConfig(std::make_optional<ReliableMessageProtocolConfig>(
+                                                              32_ms32, 30_ms32, 10_ms16)) // SII and SAI to match below
+                                                          .SetICDModeToAdvertise(ICDModeAdvertise::kSIT);
 test::ExpectedCall operationalCall2 = test::ExpectedCall()
                                           .SetProtocol(DnssdServiceProtocol::kDnssdProtocolTcp)
                                           .SetServiceName("_matter")
                                           .SetInstanceName("5555666677778888-1212343456567878")
                                           .SetHostName(host)
                                           .AddSubtype("_I5555666677778888")
-                                          .AddTxt("CRI", "32")
-                                          .AddTxt("CRA", "33")
-                                          .AddTxt("T", "1");
+                                          .AddTxt("SII", "32")
+                                          .AddTxt("SAI", "30")
+                                          .AddTxt("SAT", "10")
+                                          .AddTxt("ICD", "0");
 
 CommissionAdvertisingParameters commissionableNodeParamsSmall =
     CommissionAdvertisingParameters()
@@ -85,17 +87,17 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeBasic =
         .SetMac(ByteSpan(kMac, sizeof(kMac)))
         .SetLongDiscriminator(22)
         .SetShortDiscriminator(2)
-        .SetVendorId(chip::Optional<uint16_t>(555))
-        .SetDeviceType(chip::Optional<uint32_t>(70000))
+        .SetVendorId(std::make_optional<uint16_t>(555))
+        .SetDeviceType(std::make_optional<uint32_t>(70000))
         .SetCommissioningMode(CommissioningMode::kEnabledBasic)
-        .SetDeviceName(chip::Optional<const char *>("testy-test"))
-        .SetPairingHint(chip::Optional<uint16_t>(3))
-        .SetPairingInstruction(chip::Optional<const char *>("Pair me"))
-        .SetProductId(chip::Optional<uint16_t>(897))
-        .SetRotatingDeviceId(chip::Optional<const char *>("id_that_spins"))
-        .SetTcpSupported(chip::Optional<bool>(true))
+        .SetDeviceName(std::make_optional<const char *>("testy-test"))
+        .SetPairingHint(std::make_optional<uint16_t>(3))
+        .SetPairingInstruction(std::make_optional<const char *>("Pair me"))
+        .SetProductId(std::make_optional<uint16_t>(897))
+        .SetRotatingDeviceId(std::make_optional<const char *>("id_that_spins"))
+        .SetICDModeToAdvertise(ICDModeAdvertise::kSIT)
         // 3600005 is over the max, so this should be adjusted by the platform
-        .SetMRPConfig({ 3600000_ms32, 3600005_ms32 });
+        .SetLocalMRPConfig(std::make_optional<ReliableMessageProtocolConfig>(3600000_ms32, 3600005_ms32, 65535_ms16));
 
 test::ExpectedCall commissionableLargeBasic = test::ExpectedCall()
                                                   .SetProtocol(DnssdServiceProtocol::kDnssdProtocolUdp)
@@ -109,9 +111,10 @@ test::ExpectedCall commissionableLargeBasic = test::ExpectedCall()
                                                   .AddTxt("RI", "id_that_spins")
                                                   .AddTxt("PI", "Pair me")
                                                   .AddTxt("PH", "3")
-                                                  .AddTxt("T", "1")
-                                                  .AddTxt("CRI", "3600000")
-                                                  .AddTxt("CRA", "3600000")
+                                                  .AddTxt("ICD", "0")
+                                                  .AddTxt("SII", "3600000")
+                                                  .AddTxt("SAI", "3600000")
+                                                  .AddTxt("SAT", "65535")
                                                   .AddSubtype("_S2")
                                                   .AddSubtype("_L22")
                                                   .AddSubtype("_V555")
@@ -123,14 +126,14 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeEnhanced =
         .SetMac(ByteSpan(kMac, sizeof(kMac)))
         .SetLongDiscriminator(22)
         .SetShortDiscriminator(2)
-        .SetVendorId(chip::Optional<uint16_t>(555))
-        .SetDeviceType(chip::Optional<uint32_t>(70000))
+        .SetVendorId(std::make_optional<uint16_t>(555))
+        .SetDeviceType(std::make_optional<uint32_t>(70000))
         .SetCommissioningMode(CommissioningMode::kEnabledEnhanced)
-        .SetDeviceName(chip::Optional<const char *>("testy-test"))
-        .SetPairingHint(chip::Optional<uint16_t>(3))
-        .SetPairingInstruction(chip::Optional<const char *>("Pair me"))
-        .SetProductId(chip::Optional<uint16_t>(897))
-        .SetRotatingDeviceId(chip::Optional<const char *>("id_that_spins"));
+        .SetDeviceName(std::make_optional<const char *>("testy-test"))
+        .SetPairingHint(std::make_optional<uint16_t>(3))
+        .SetPairingInstruction(std::make_optional<const char *>("Pair me"))
+        .SetProductId(std::make_optional<uint16_t>(897))
+        .SetRotatingDeviceId(std::make_optional<const char *>("id_that_spins"));
 
 test::ExpectedCall commissionableLargeEnhanced = test::ExpectedCall()
                                                      .SetProtocol(DnssdServiceProtocol::kDnssdProtocolUdp)
@@ -149,101 +152,87 @@ test::ExpectedCall commissionableLargeEnhanced = test::ExpectedCall()
                                                      .AddSubtype("_V555")
                                                      .AddSubtype("_T70000")
                                                      .AddSubtype("_CM");
-void TestStub(nlTestSuite * inSuite, void * inContext)
+
+class TestDnssdPlatform : public ::testing::Test
+{
+public:
+    static void SetUpTestSuite()
+    {
+        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+        DiscoveryImplPlatform & mdnsPlatform = DiscoveryImplPlatform::GetInstance();
+        EXPECT_EQ(mdnsPlatform.Init(DeviceLayer::UDPEndPointManager()), CHIP_NO_ERROR);
+        EXPECT_EQ(mdnsPlatform.RemoveServices(), CHIP_NO_ERROR);
+    }
+
+    static void TearDownTestSuite()
+    {
+        DiscoveryImplPlatform::GetInstance().Shutdown();
+        chip::Platform::MemoryShutdown();
+    }
+
+    void TearDown() override { test::Reset(); }
+};
+
+TEST_F(TestDnssdPlatform, TestStub)
 {
     // This is a test of the fake platform impl. We want
     // We want the platform to return unexpected event if it gets a start
     // without an expected event.
     ChipLogError(Discovery, "Test platform returns error correctly");
     DiscoveryImplPlatform & mdnsPlatform = DiscoveryImplPlatform::GetInstance();
-    NL_TEST_ASSERT(inSuite, mdnsPlatform.Init(DeviceLayer::UDPEndPointManager()) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, mdnsPlatform.RemoveServices() == CHIP_NO_ERROR);
     OperationalAdvertisingParameters params;
-    NL_TEST_ASSERT(inSuite, mdnsPlatform.Advertise(params) == CHIP_ERROR_UNEXPECTED_EVENT);
+    EXPECT_EQ(mdnsPlatform.Advertise(params), CHIP_ERROR_UNEXPECTED_EVENT);
 }
 
-void TestOperational(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestDnssdPlatform, TestOperational)
 {
     ChipLogError(Discovery, "Test operational");
-    test::Reset();
     DiscoveryImplPlatform & mdnsPlatform = DiscoveryImplPlatform::GetInstance();
-    NL_TEST_ASSERT(inSuite, mdnsPlatform.Init(DeviceLayer::UDPEndPointManager()) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, mdnsPlatform.RemoveServices() == CHIP_NO_ERROR);
 
     operationalCall1.callType = test::CallType::kStart;
-    NL_TEST_ASSERT(inSuite, test::AddExpectedCall(operationalCall1) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, mdnsPlatform.Advertise(operationalParams1) == CHIP_NO_ERROR);
+    EXPECT_EQ(test::AddExpectedCall(operationalCall1), CHIP_NO_ERROR);
+    EXPECT_EQ(mdnsPlatform.Advertise(operationalParams1), CHIP_NO_ERROR);
 
     // Next call to advertise should call start again with just the new data.
     test::Reset();
     operationalCall2.callType = test::CallType::kStart;
-    NL_TEST_ASSERT(inSuite, test::AddExpectedCall(operationalCall2) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, mdnsPlatform.Advertise(operationalParams2) == CHIP_NO_ERROR);
+    EXPECT_EQ(test::AddExpectedCall(operationalCall2), CHIP_NO_ERROR);
+    EXPECT_EQ(mdnsPlatform.Advertise(operationalParams2), CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, mdnsPlatform.FinalizeServiceUpdate() == CHIP_NO_ERROR);
+    EXPECT_EQ(mdnsPlatform.FinalizeServiceUpdate(), CHIP_NO_ERROR);
 }
 
-void TestCommissionableNode(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestDnssdPlatform, TestCommissionableNode)
 {
     ChipLogError(Discovery, "Test commissionable");
-    test::Reset();
     DiscoveryImplPlatform & mdnsPlatform = DiscoveryImplPlatform::GetInstance();
-    NL_TEST_ASSERT(inSuite, mdnsPlatform.Init(DeviceLayer::UDPEndPointManager()) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, mdnsPlatform.RemoveServices() == CHIP_NO_ERROR);
 
     commissionableSmall.callType = test::CallType::kStart;
-    NL_TEST_ASSERT(inSuite,
-                   mdnsPlatform.GetCommissionableInstanceName(commissionableSmall.instanceName,
-                                                              sizeof(commissionableSmall.instanceName)) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, test::AddExpectedCall(commissionableSmall) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, mdnsPlatform.Advertise(commissionableNodeParamsSmall) == CHIP_NO_ERROR);
+    EXPECT_EQ(
+        mdnsPlatform.GetCommissionableInstanceName(commissionableSmall.instanceName, sizeof(commissionableSmall.instanceName)),
+        CHIP_NO_ERROR);
+    EXPECT_EQ(test::AddExpectedCall(commissionableSmall), CHIP_NO_ERROR);
+    EXPECT_EQ(mdnsPlatform.Advertise(commissionableNodeParamsSmall), CHIP_NO_ERROR);
 
     // TODO: Right now, platform impl doesn't stop commissionable node before starting a new one. Add stop call here once that is
     // fixed.
     test::Reset();
     commissionableLargeBasic.callType = test::CallType::kStart;
-    NL_TEST_ASSERT(inSuite,
-                   mdnsPlatform.GetCommissionableInstanceName(commissionableLargeBasic.instanceName,
-                                                              sizeof(commissionableLargeBasic.instanceName)) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, test::AddExpectedCall(commissionableLargeBasic) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, mdnsPlatform.Advertise(commissionableNodeParamsLargeBasic) == CHIP_NO_ERROR);
+    EXPECT_EQ(mdnsPlatform.GetCommissionableInstanceName(commissionableLargeBasic.instanceName,
+                                                         sizeof(commissionableLargeBasic.instanceName)),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(test::AddExpectedCall(commissionableLargeBasic), CHIP_NO_ERROR);
+    EXPECT_EQ(mdnsPlatform.Advertise(commissionableNodeParamsLargeBasic), CHIP_NO_ERROR);
 
     test::Reset();
     commissionableLargeEnhanced.callType = test::CallType::kStart;
-    NL_TEST_ASSERT(inSuite,
-                   mdnsPlatform.GetCommissionableInstanceName(commissionableLargeEnhanced.instanceName,
-                                                              sizeof(commissionableLargeEnhanced.instanceName)) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, test::AddExpectedCall(commissionableLargeEnhanced) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, mdnsPlatform.Advertise(commissionableNodeParamsLargeEnhanced) == CHIP_NO_ERROR);
+    EXPECT_EQ(mdnsPlatform.GetCommissionableInstanceName(commissionableLargeEnhanced.instanceName,
+                                                         sizeof(commissionableLargeEnhanced.instanceName)),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(test::AddExpectedCall(commissionableLargeEnhanced), CHIP_NO_ERROR);
+    EXPECT_EQ(mdnsPlatform.Advertise(commissionableNodeParamsLargeEnhanced), CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, mdnsPlatform.FinalizeServiceUpdate() == CHIP_NO_ERROR);
+    EXPECT_EQ(mdnsPlatform.FinalizeServiceUpdate(), CHIP_NO_ERROR);
 }
-
-int TestSetup(void * inContext)
-{
-    return chip::Platform::MemoryInit() == CHIP_NO_ERROR ? SUCCESS : FAILURE;
-}
-
-int TestTeardown(void * inContext)
-{
-    chip::Platform::MemoryShutdown();
-    return SUCCESS;
-}
-
-const nlTest sTests[] = {
-    NL_TEST_DEF("TestStub", TestStub),                             //
-    NL_TEST_DEF("TestOperational", TestOperational),               //
-    NL_TEST_DEF("TestCommissionableNode", TestCommissionableNode), //
-    NL_TEST_SENTINEL()                                             //
-};
 
 } // namespace
-
-int TestDnssdPlatform(void)
-{
-    nlTestSuite theSuite = { "DnssdPlatform", &sTests[0], &TestSetup, &TestTeardown };
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestDnssdPlatform)

@@ -11,246 +11,110 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 78.3.1. [TC-MOD-3.1] OnMode Verification (DUT as Server)
+name: 80.5.1. [TC-MOD-3.1] OnMode verification with DUT as Server
+
+PICS:
+    - MOD.S.A0005
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+    cluster: "Mode Select"
+    endpoint: 1
+    #Configure newmode value
+    NewMode:
+        type: int8u
+        defaultValue: 7
+    WaitTime:
+        type: int16u
+        defaultValue: 5000
 
 tests:
-    - label: "TH reads the OnMode attribute from the DUT"
-      verification: |
-          ./chip-tool modeselect read on-mode 1 1
-          [1645777342.720928][4783:4788] CHIP:DMG: ReportDataMessage =
-          [1645777342.720955][4783:4788] CHIP:DMG: {
-          [1645777342.720976][4783:4788] CHIP:DMG:        AttributeReportIBs =
-          [1645777342.721011][4783:4788] CHIP:DMG:        [
-          [1645777342.721035][4783:4788] CHIP:DMG:                AttributeReportIB =
-          [1645777342.721072][4783:4788] CHIP:DMG:                {
-          [1645777342.721100][4783:4788] CHIP:DMG:                        AttributeDataIB =
-          [1645777342.721134][4783:4788] CHIP:DMG:                        {
-          [1645777342.721167][4783:4788] CHIP:DMG:                                DataVersion = 0xe164a618,
-          [1645777342.721201][4783:4788] CHIP:DMG:                                AttributePathIB =
-          [1645777342.721235][4783:4788] CHIP:DMG:                                {
-          [1645777342.721271][4783:4788] CHIP:DMG:                                        Endpoint = 0x1,
-          [1645777342.721307][4783:4788] CHIP:DMG:                                        Cluster = 0x50,
-          [1645777342.721344][4783:4788] CHIP:DMG:                                        Attribute = 0x0000_0002,
-          [1645777342.721378][4783:4788] CHIP:DMG:                                }
-          [1645777342.721415][4783:4788] CHIP:DMG:
-          [1645777342.721452][4783:4788] CHIP:DMG:                                        Data = 0,
-          [1645777342.721488][4783:4788] CHIP:DMG:                        },
-          [1645777342.721525][4783:4788] CHIP:DMG:
-          [1645777342.721555][4783:4788] CHIP:DMG:                },
-          [1645777342.721590][4783:4788] CHIP:DMG:
-          [1645777342.721615][4783:4788] CHIP:DMG:        ],
-          [1645777342.721648][4783:4788] CHIP:DMG:
-          [1645777342.721672][4783:4788] CHIP:DMG:        SuppressResponse = true,
-          [1645777342.721698][4783:4788] CHIP:DMG:        InteractionModelRevision = 1
-          [1645777342.721723][4783:4788] CHIP:DMG: }
-          [1645777342.721860][4783:4788] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002DataVersion: 3781469720
-          [1645777342.721929][4783:4788] CHIP:TOO:   OnMode: 0
-      disabled: true
+    - label:
+          "Step 0: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-    - label: "TH reads the CurrentMode attribute from the DUT"
-      verification: |
-          ./chip-tool modeselect read current-mode 1 1
-          [1645777371.981905][4789:4794] CHIP:DMG: ReportDataMessage =
-          [1645777371.981941][4789:4794] CHIP:DMG: {
-          [1645777371.981974][4789:4794] CHIP:DMG:        AttributeReportIBs =
-          [1645777371.982015][4789:4794] CHIP:DMG:        [
-          [1645777371.982046][4789:4794] CHIP:DMG:                AttributeReportIB =
-          [1645777371.982092][4789:4794] CHIP:DMG:                {
-          [1645777371.982128][4789:4794] CHIP:DMG:                        AttributeDataIB =
-          [1645777371.982174][4789:4794] CHIP:DMG:                        {
-          [1645777371.982218][4789:4794] CHIP:DMG:                                DataVersion = 0xe164a618,
-          [1645777371.982267][4789:4794] CHIP:DMG:                                AttributePathIB =
-          [1645777371.982310][4789:4794] CHIP:DMG:                                {
-          [1645777371.982363][4789:4794] CHIP:DMG:                                        Endpoint = 0x1,
-          [1645777371.982419][4789:4794] CHIP:DMG:                                        Cluster = 0x50,
-          [1645777371.982468][4789:4794] CHIP:DMG:                                        Attribute = 0x0000_0000,
-          [1645777371.982512][4789:4794] CHIP:DMG:                                }
-          [1645777371.982566][4789:4794] CHIP:DMG:
-          [1645777371.982612][4789:4794] CHIP:DMG:                                        Data = 4,
-          [1645777371.982655][4789:4794] CHIP:DMG:                        },
-          [1645777371.982698][4789:4794] CHIP:DMG:
-          [1645777371.982734][4789:4794] CHIP:DMG:                },
-          [1645777371.982775][4789:4794] CHIP:DMG:
-          [1645777371.982809][4789:4794] CHIP:DMG:        ],
-          [1645777371.982849][4789:4794] CHIP:DMG:
-          [1645777371.982882][4789:4794] CHIP:DMG:        SuppressResponse = true,
-          [1645777371.982914][4789:4794] CHIP:DMG:        InteractionModelRevision = 1
-          [1645777371.982945][4789:4794] CHIP:DMG: }
-          [1645777371.983122][4789:4794] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000DataVersion: 3781469720
-          [1645777371.983204][4789:4794] CHIP:TOO:   CurrentMode: 4
-      disabled: true
+    - label: "Step 1: TH reads from the DUT the OnMode attribute."
+      PICS: MOD.S.A0005 && MOD.S.F00
+      command: "readAttribute"
+      attribute: "OnMode"
+      response:
+          saveAs: on_mode_dut
+
+    - label: "Step 2a: TH reads from the DUT the CurrentMode attribute."
+      PICS: MOD.S.A0003 && MOD.S.F00
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          saveAs: old_current_mode_dut
 
     - label:
-          "If the OnMode and CurrentMode attributes have the same value, proceed
-          to step 2c, Otherwise proceed to step 3a."
-      verification: |
+          "Step 2b: If the OnMode and CurrentMode attributes have the same
+          value, proceed to step 2c, Otherwise proceed to step 3a"
+      PICS: MOD.S.A0003 && MOD.S.A0005 && MOD.S.F00
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: on_mode_dut
+              - name: "Value2"
+                value: old_current_mode_dut
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsExpectedValue
 
-      disabled: true
-
-    - label: "DUT reads the SupportedModes attribute from the TH"
-      verification: |
-          ./chip-tool modeselect read supported-modes 1 1
-          [1645776884.203383][4698:4703] CHIP:TOO:   SupportedModes: 3 entries
-          [1645776884.203448][4698:4703] CHIP:TOO:     [1]: {
-          [1645776884.203473][4698:4703] CHIP:TOO:       Label: Black
-          [1645776884.203497][4698:4703] CHIP:TOO:       Mode: 0
-          [1645776884.203520][4698:4703] CHIP:TOO:       SemanticTag: 0
-          [1645776884.203544][4698:4703] CHIP:TOO:      }
-          [1645776884.203574][4698:4703] CHIP:TOO:     [2]: {
-          [1645776884.203597][4698:4703] CHIP:TOO:       Label: Cappuccino
-          [1645776884.203619][4698:4703] CHIP:TOO:       Mode: 4
-          [1645776884.203641][4698:4703] CHIP:TOO:       SemanticTag: 0
-          [1645776884.203663][4698:4703] CHIP:TOO:      }
-          [1645776884.203691][4698:4703] CHIP:TOO:     [3]: {
-          [1645776884.203714][4698:4703] CHIP:TOO:       Label: Espresso
-          [1645776884.203735][4698:4703] CHIP:TOO:       Mode: 7
-          [1645776884.203757][4698:4703] CHIP:TOO:       SemanticTag: 0
-          [1645776884.203779][4698:4703] CHIP:TOO:      }
-      disabled: true
+    - label: "Step 2c: TH reads the SupportedModes attribute from the DUT"
+      runIf: IsExpectedValue
+      PICS: MOD.S.A0005 && MOD.S.F00
+      command: "readAttribute"
+      attribute: "SupportedModes"
+      response:
+          constraints:
+              type: list
 
     - label:
-          "Select a value from the list in step 2c with a different value than
-          the StartUpMode value read in step 1. TH sends a ChangeToMode command
-          to the TH with the selected value."
-      verification: |
-          ./chip-tool modeselect change-to-mode 7 1 1
-          [1645777419.710445][4798:4803] CHIP:DMG: InvokeResponseMessage =
-          [1645777419.710472][4798:4803] CHIP:DMG: {
-          [1645777419.710504][4798:4803] CHIP:DMG:        suppressResponse = false,
-          [1645777419.710536][4798:4803] CHIP:DMG:        InvokeResponseIBs =
-          [1645777419.710577][4798:4803] CHIP:DMG:        [
-          [1645777419.710607][4798:4803] CHIP:DMG:                InvokeResponseIB =
-          [1645777419.710649][4798:4803] CHIP:DMG:                {
-          [1645777419.710678][4798:4803] CHIP:DMG:                        CommandStatusIB =
-          [1645777419.710714][4798:4803] CHIP:DMG:                        {
-          [1645777419.710751][4798:4803] CHIP:DMG:                                CommandPathIB =
-          [1645777419.710790][4798:4803] CHIP:DMG:                                {
-          [1645777419.710838][4798:4803] CHIP:DMG:                                        EndpointId = 0x1,
-          [1645777419.710881][4798:4803] CHIP:DMG:                                        ClusterId = 0x50,
-          [1645777419.710916][4798:4803] CHIP:DMG:                                        CommandId = 0x0,
-          [1645777419.710963][4798:4803] CHIP:DMG:                                },
-          [1645777419.711009][4798:4803] CHIP:DMG:
-          [1645777419.711046][4798:4803] CHIP:DMG:                                StatusIB =
-          [1645777419.711090][4798:4803] CHIP:DMG:                                {
-          [1645777419.711133][4798:4803] CHIP:DMG:                                        status = 0x0,
-          [1645777419.711172][4798:4803] CHIP:DMG:                                },
-          [1645777419.711218][4798:4803] CHIP:DMG:
-          [1645777419.711260][4798:4803] CHIP:DMG:                        },
-          [1645777419.711307][4798:4803] CHIP:DMG:
-          [1645777419.711340][4798:4803] CHIP:DMG:                },
-          [1645777419.711378][4798:4803] CHIP:DMG:
-          [1645777419.711406][4798:4803] CHIP:DMG:        ],
-          [1645777419.711443][4798:4803] CHIP:DMG:
-          [1645777419.711472][4798:4803] CHIP:DMG:        InteractionModelRevision = 1
-          [1645777419.711499][4798:4803] CHIP:DMG: },
-          [1645777419.711572][4798:4803] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0050 Command=0x0000_0000 Status=0x0
-      disabled: true
+          "Step 2d: Select a value from the list in step 2c with a different
+          value than the onMode value read in step 1. TH sends a ChangeToMode
+          command to the TH with the selected value."
+      runIf: IsExpectedValue
+      PICS: MOD.S.A0002 && MOD.S.C00.Rsp && MOD.S.F00
+      command: "ChangeToMode"
+      arguments:
+          values:
+              - name: "NewMode"
+                value: NewMode
 
-    - label: "TH reads sends an Off command to the DUT"
-      verification: |
-          ./chip-tool onoff off 1 1
-          [1645777463.883758][4807:4812] CHIP:DMG: InvokeResponseMessage =
-          [1645777463.883789][4807:4812] CHIP:DMG: {
-          [1645777463.883818][4807:4812] CHIP:DMG:        suppressResponse = false,
-          [1645777463.883852][4807:4812] CHIP:DMG:        InvokeResponseIBs =
-          [1645777463.883894][4807:4812] CHIP:DMG:        [
-          [1645777463.883924][4807:4812] CHIP:DMG:                InvokeResponseIB =
-          [1645777463.883972][4807:4812] CHIP:DMG:                {
-          [1645777463.884006][4807:4812] CHIP:DMG:                        CommandStatusIB =
-          [1645777463.884042][4807:4812] CHIP:DMG:                        {
-          [1645777463.884113][4807:4812] CHIP:DMG:                                CommandPathIB =
-          [1645777463.884160][4807:4812] CHIP:DMG:                                {
-          [1645777463.884231][4807:4812] CHIP:DMG:                                        EndpointId = 0x1,
-          [1645777463.884300][4807:4812] CHIP:DMG:                                        ClusterId = 0x6,
-          [1645777463.884335][4807:4812] CHIP:DMG:                                        CommandId = 0x0,
-          [1645777463.884411][4807:4812] CHIP:DMG:                                },
-          [1645777463.884460][4807:4812] CHIP:DMG:
-          [1645777463.884490][4807:4812] CHIP:DMG:                                StatusIB =
-          [1645777463.884554][4807:4812] CHIP:DMG:                                {
-          [1645777463.884591][4807:4812] CHIP:DMG:                                        status = 0x0,
-          [1645777463.884658][4807:4812] CHIP:DMG:                                },
-          [1645777463.884692][4807:4812] CHIP:DMG:
-          [1645777463.884745][4807:4812] CHIP:DMG:                        },
-          [1645777463.884788][4807:4812] CHIP:DMG:
-          [1645777463.884816][4807:4812] CHIP:DMG:                },
-          [1645777463.885035][4807:4812] CHIP:DMG:
-          [1645777463.885106][4807:4812] CHIP:DMG:        ],
-          [1645777463.885165][4807:4812] CHIP:DMG:
-          [1645777463.885206][4807:4812] CHIP:DMG:        InteractionModelRevision = 1
-          [1645777463.885239][4807:4812] CHIP:DMG: },
-          [1645777463.885341][4807:4812] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0000 Status=0x0
-      disabled: true
+    - label: "Step 3a: TH sends an Off command to the DUT"
+      PICS: OO.S.C00.Rsp && MOD.S.F00
+      cluster: "On/Off"
+      command: "Off"
 
-    - label: "TH reads sends an On command to the DUT"
-      verification: |
-          ./chip-tool onoff on 1 1
-          [1645777484.676451][4813:4818] CHIP:DMG: InvokeResponseMessage =
-          [1645777484.676481][4813:4818] CHIP:DMG: {
-          [1645777484.676509][4813:4818] CHIP:DMG:        suppressResponse = false,
-          [1645777484.676536][4813:4818] CHIP:DMG:        InvokeResponseIBs =
-          [1645777484.676569][4813:4818] CHIP:DMG:        [
-          [1645777484.676596][4813:4818] CHIP:DMG:                InvokeResponseIB =
-          [1645777484.676640][4813:4818] CHIP:DMG:                {
-          [1645777484.676671][4813:4818] CHIP:DMG:                        CommandStatusIB =
-          [1645777484.676710][4813:4818] CHIP:DMG:                        {
-          [1645777484.676746][4813:4818] CHIP:DMG:                                CommandPathIB =
-          [1645777484.676785][4813:4818] CHIP:DMG:                                {
-          [1645777484.676859][4813:4818] CHIP:DMG:                                        EndpointId = 0x1,
-          [1645777484.676906][4813:4818] CHIP:DMG:                                        ClusterId = 0x6,
-          [1645777484.676947][4813:4818] CHIP:DMG:                                        CommandId = 0x1,
-          [1645777484.676986][4813:4818] CHIP:DMG:                                },
-          [1645777484.677026][4813:4818] CHIP:DMG:
-          [1645777484.677055][4813:4818] CHIP:DMG:                                StatusIB =
-          [1645777484.677084][4813:4818] CHIP:DMG:                                {
-          [1645777484.677111][4813:4818] CHIP:DMG:                                        status = 0x0,
-          [1645777484.677151][4813:4818] CHIP:DMG:                                },
-          [1645777484.677184][4813:4818] CHIP:DMG:
-          [1645777484.677219][4813:4818] CHIP:DMG:                        },
-          [1645777484.677253][4813:4818] CHIP:DMG:
-          [1645777484.677283][4813:4818] CHIP:DMG:                },
-          [1645777484.677319][4813:4818] CHIP:DMG:
-          [1645777484.677344][4813:4818] CHIP:DMG:        ],
-          [1645777484.677377][4813:4818] CHIP:DMG:
-          [1645777484.677403][4813:4818] CHIP:DMG:        InteractionModelRevision = 1
-          [1645777484.677427][4813:4818] CHIP:DMG: },
-          [1645777484.677492][4813:4818] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0001 Status=0x0
-      disabled: true
+    - label: "Step 3b: TH sends an On command to the DUT"
+      PICS: OO.S.C01.Rsp && MOD.S.F00
+      cluster: "On/Off"
+      command: "On"
 
-    - label: "TH reads the CurrentMode attribute from the DUT"
-      verification: |
-          ./chip-tool modeselect read current-mode 1 1
-          [1645777734.855000][4848:4853] CHIP:DMG: ReportDataMessage =
-          [1645777734.855043][4848:4853] CHIP:DMG: {
-          [1645777734.855071][4848:4853] CHIP:DMG:        AttributeReportIBs =
-          [1645777734.855109][4848:4853] CHIP:DMG:        [
-          [1645777734.855138][4848:4853] CHIP:DMG:                AttributeReportIB =
-          [1645777734.855179][4848:4853] CHIP:DMG:                {
-          [1645777734.855209][4848:4853] CHIP:DMG:                        AttributeDataIB =
-          [1645777734.855247][4848:4853] CHIP:DMG:                        {
-          [1645777734.855288][4848:4853] CHIP:DMG:                                DataVersion = 0xe164a619,
-          [1645777734.855326][4848:4853] CHIP:DMG:                                AttributePathIB =
-          [1645777734.855366][4848:4853] CHIP:DMG:                                {
-          [1645777734.855406][4848:4853] CHIP:DMG:                                        Endpoint = 0x1,
-          [1645777734.855449][4848:4853] CHIP:DMG:                                        Cluster = 0x50,
-          [1645777734.855491][4848:4853] CHIP:DMG:                                        Attribute = 0x0000_0000,
-          [1645777734.855569][4848:4853] CHIP:DMG:                                }
-          [1645777734.855606][4848:4853] CHIP:DMG:
-          [1645777734.855639][4848:4853] CHIP:DMG:                                        Data = 0,
-          [1645777734.855696][4848:4853] CHIP:DMG:                        },
-          [1645777734.855744][4848:4853] CHIP:DMG:
-          [1645777734.855775][4848:4853] CHIP:DMG:                },
-          [1645777734.855811][4848:4853] CHIP:DMG:
-          [1645777734.855840][4848:4853] CHIP:DMG:        ],
-          [1645777734.855876][4848:4853] CHIP:DMG:
-          [1645777734.855920][4848:4853] CHIP:DMG:        SuppressResponse = true,
-          [1645777734.855968][4848:4853] CHIP:DMG:        InteractionModelRevision = 1
-          [1645777734.855993][4848:4853] CHIP:DMG: }
-          [1645777734.856233][4848:4853] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000DataVersion: 3781469721
-          [1645777734.856345][4848:4853] CHIP:TOO:   CurrentMode: 0
-      disabled: true
+    - label: "Wait to turn on/Off light"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: WaitTime
+
+    - label: "Step 3c: TH reads the CurrentMode attribute from the DUT"
+      PICS: MOD.S.A0003 && MOD.S.F00
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          constraints:
+              anyOf: [old_current_mode_dut, NewMode]

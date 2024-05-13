@@ -26,8 +26,15 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/internal/GenericPlatformManagerImpl.h>
 
+#if CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS
 #include <sys/select.h>
-#include <zephyr.h>
+#endif
+
+#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS
+#include <zephyr/net/socket.h>
+#endif
+
+#include <zephyr/kernel.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -79,7 +86,7 @@ protected:
     CHIP_ERROR _StartEventLoopTask(void);
     CHIP_ERROR _StopEventLoopTask();
     CHIP_ERROR _StartChipTimer(System::Clock::Timeout duration);
-    CHIP_ERROR _Shutdown(void);
+    void _Shutdown(void);
 
     // ===== Methods available to the implementation subclass.
     explicit GenericPlatformManagerImpl_Zephyr(ThreadStack stack) : mChipThreadStack(stack) {}
@@ -92,6 +99,9 @@ private:
     void ProcessDeviceEvents();
 
     volatile bool mShouldRunEventLoop;
+
+    bool mInitialized = false;
+
     static void EventLoopTaskMain(void * thisPtr, void *, void *);
 };
 

@@ -1,21 +1,19 @@
-# CHIP Linux Bridge Example
+# Matter Linux Bridge Example
 
 An example demonstrating a simple lighting bridge and the use of dynamic
 endpoints. The document will describe the theory of operation and how to build
-and run CHIP Linux Bridge Example on Raspberry Pi. This doc is tested on
+and run Matter Linux Bridge Example on Raspberry Pi. This doc is tested on
 **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu for
 Raspberry Pi Desktop 20.10 (aarch64)**
 
 <hr>
 
--   [CHIP Linux Bridge Example](#chip-linux-bridge-example)
-    -   [Theory of Operation](#operation)
+-   [Matter Linux Bridge Example](#matter-linux-bridge-example)
+    -   [Theory of Operation](#theory-of-operation)
     -   [Building](#building)
-    -   [Running the Complete Example on Raspberry Pi 4](#running-complete-example)
+    -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
 
 <hr>
-
-<a name="operation"></a>
 
 ## Theory of Operation
 
@@ -55,7 +53,7 @@ defined:
     application's `main.cpp` for an example of this implementation.
 
 `DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(clusterListName)`
-`DECLARE_DYNAMIC_CLUSTER(clusterId, clusterAttrs, incomingCommands, outgoingCommands)`
+`DECLARE_DYNAMIC_CLUSTER(clusterId, clusterAttrs, role, incomingCommands, outgoingCommands)`
 `DECLARE_DYNAMIC_CLUSTER_LIST_END`
 
 -   These three macros are used to declare a list of clusters for use within a
@@ -89,7 +87,7 @@ clusters as well as the root descriptor cluster.
 The example demonstrates the use of dynamic endpoints and the concept of adding
 and removing endpoints at runtime. First, the example declares a
 `bridgedLightEndpoint` data structure for a Light endpoint with `OnOff`,
-`Descriptor`, `BridgedDeviceBasic`, and `FixedLabel` clusters.
+`Descriptor`, `BridgedDeviceBasicInformation`, and `FixedLabel` clusters.
 
 Using this declared endpoint structure, three endpoints for three bridged lights
 are dynamically added at endpoint ID's `2`, `3`, and `4`, representing
@@ -101,33 +99,35 @@ A fourth light, `Light 4`, is then added occupying endpoint ID `5`.
 
 Finally, `Light 2` is re-added, and will occupy endpoint ID `6`.
 
-All endpoints populate the `Bridged Device Basic` and `Fixed Label` clusters. In
-the `Bridged Device Basic` cluster, the `reachable` attribute is simulated. In
-the `Fixed Label` cluster, the `LabelList` attribute is simulated with the
-value/label pair `"room"`/`[light name]`.
-
-<a name="building"></a>
+All endpoints populate the `Bridged Device Basic Information` and `Fixed Label`
+clusters. In the `Bridged Device Basic Information` cluster, the `reachable`
+attribute is simulated. In the `Fixed Label` cluster, the `LabelList` attribute
+is simulated with the value/label pair `"room"`/`[light name]`.
 
 ## Building
 
 -   Install tool chain
 
-          $ sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev libglib2.0-dev ninja-build python3-venv python3-dev unzip
+    ```sh
+    sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev libglib2.0-dev ninja-build python3-venv python3-dev unzip
+    ```
 
 -   Build the example application:
 
-          $ cd ~/connectedhomeip/examples/bridge-app/linux
-          $ git submodule update --init
-          $ source third_party/connectedhomeip/scripts/activate.sh
-          $ gn gen out/debug
-          $ ninja -C out/debug
+    ```sh
+    cd ~/connectedhomeip/examples/bridge-app/linux
+    git submodule update --init
+    source third_party/connectedhomeip/scripts/activate.sh
+    gn gen out/debug
+    ninja -C out/debug
+    ```
 
 -   To delete generated executable, libraries and object files use:
 
-          $ cd ~/connectedhomeip/examples/bridge-app/linux
-          $ rm -rf out/
-
-<a name="running-complete-example"></a>
+    ```sh
+    cd ~/connectedhomeip/examples/bridge-app/linux
+    rm -rf out/
+    ```
 
 ## Running the Complete Example on Raspberry Pi 4
 
@@ -151,25 +151,29 @@ value/label pair `"room"`/`[light name]`.
             number after `hci` is the bluetooth device number, `1` in this
             example.
 
-                  $ hciconfig
-                  hci1:	Type: Primary  Bus: USB
-                      BD Address: 00:1A:7D:AA:BB:CC  ACL MTU: 310:10  SCO MTU: 64:8
-                      UP RUNNING PSCAN ISCAN
-                      RX bytes:20942 acl:1023 sco:0 events:1140 errors:0
-                      TX bytes:16559 acl:1011 sco:0 commands:121 errors:0
+            ```sh
+            $ hciconfig
+            hci1:	Type: Primary  Bus: USB
+                BD Address: 00:1A:7D:AA:BB:CC  ACL MTU: 310:10  SCO MTU: 64:8
+                UP RUNNING PSCAN ISCAN
+                RX bytes:20942 acl:1023 sco:0 events:1140 errors:0
+                TX bytes:16559 acl:1011 sco:0 commands:121 errors:0
 
-                  hci0:	Type: Primary  Bus: UART
-                      BD Address: B8:27:EB:AA:BB:CC  ACL MTU: 1021:8  SCO MTU: 64:1
-                      UP RUNNING PSCAN ISCAN
-                      RX bytes:8609495 acl:14 sco:0 events:217484 errors:0
-                      TX bytes:92185 acl:20 sco:0 commands:5259 errors:0
+            hci0:	Type: Primary  Bus: UART
+                BD Address: B8:27:EB:AA:BB:CC  ACL MTU: 1021:8  SCO MTU: 64:1
+                UP RUNNING PSCAN ISCAN
+                RX bytes:8609495 acl:14 sco:0 events:217484 errors:0
+                TX bytes:92185 acl:20 sco:0 commands:5259 errors:0
+            ```
 
         -   Run Linux Bridge Example App
 
-                  $ cd ~/connectedhomeip/examples/bridge-app/linux
-                  $ sudo out/debug/chip-bridge-app --ble-device [bluetooth device number]
-                  # In this example, the device we want to use is hci1
-                  $ sudo out/debug/chip-bridge-app --ble-device 1
+            ```sh
+            cd ~/connectedhomeip/examples/bridge-app/linux
+            sudo out/debug/chip-bridge-app --ble-device [bluetooth device number]
+            # In this example, the device we want to use is hci1
+            sudo out/debug/chip-bridge-app --ble-device 1
+            ```
 
         -   Test the device using ChipDeviceController on your laptop /
             workstation etc.

@@ -31,7 +31,7 @@ if (chip_enable_openthread) {
   import("//build_overrides/ot_br_posix.gni")
 }
 
-if (chip_mdns != "none") {
+if (chip_mdns == "platform") {
   pkg_config("avahi_client_config") {
     packages = [ "avahi-client" ]
   }
@@ -59,24 +59,7 @@ static_library("webos") {
   sources = [
     "../DeviceSafeQueue.cpp",
     "../DeviceSafeQueue.h",
-    "../Linux/CHIPLinuxStorage.cpp",
-    "../Linux/CHIPLinuxStorage.h",
-    "../Linux/CHIPLinuxStorageIni.cpp",
-    "../Linux/CHIPLinuxStorageIni.h",
-    "../Linux/ConfigurationManagerImpl.cpp",
-    "../Linux/ConfigurationManagerImpl.h",
-    "../Linux/ConnectivityUtils.cpp",
-    "../Linux/ConnectivityUtils.h",
-    "../Linux/DiagnosticDataProviderImpl.cpp",
-    "../Linux/DiagnosticDataProviderImpl.h",
-    "../Linux/InetPlatformConfig.h",
-    "../Linux/KeyValueStoreManagerImpl.cpp",
-    "../Linux/KeyValueStoreManagerImpl.h",
-    "../Linux/PlatformManagerImpl.cpp",
-    "../Linux/PlatformManagerImpl.h",
-    "../Linux/PosixConfig.cpp",
-    "../Linux/PosixConfig.h",
-    "../Linux/SystemTimeSupport.cpp",
+    "../GLibTypeDeleter.h",
     "../SingletonConfigurationManager.cpp",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
@@ -84,27 +67,56 @@ static_library("webos") {
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
     "CHIPPlatformConfig.h",
+    "CHIPWebOSStorage.cpp",
+    "CHIPWebOSStorage.h",
+    "CHIPWebOSStorageIni.cpp",
+    "CHIPWebOSStorageIni.h",
+    "ChipDeviceScanner.cpp",
+    "ChipDeviceScanner.h",
+    "ConfigurationManagerImpl.cpp",
+    "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
-    "DeviceNetworkProvisioningDelegateImpl.cpp",
-    "DeviceNetworkProvisioningDelegateImpl.h",
+    "ConnectivityUtils.cpp",
+    "ConnectivityUtils.h",
+    "DeviceInstanceInfoProviderImpl.cpp",
+    "DeviceInstanceInfoProviderImpl.h",
+    "DiagnosticDataProviderImpl.cpp",
+    "DiagnosticDataProviderImpl.h",
+    "InetPlatformConfig.h",
+    "KeyValueStoreManagerImpl.cpp",
+    "KeyValueStoreManagerImpl.h",
     "Logging.cpp",
+    "MainLoop.cpp",
+    "MainLoop.h",
+    "NetworkCommissioningDriver.h",
+    "NetworkCommissioningThreadDriver.cpp",
+    "NetworkCommissioningWiFiDriver.cpp",
+    "PlatformManagerImpl.cpp",
+    "PlatformManagerImpl.h",
+    "PosixConfig.cpp",
+    "PosixConfig.h",
     "SystemPlatformConfig.h",
+    "SystemTimeSupport.cpp",
   ]
 
-  deps = [ "${chip_root}/src/setup_payload" ]
+  deps = [
+    "${chip_root}/src/platform/logging:headers",
+    "${chip_root}/src/setup_payload",
+  ]
 
   public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/platform:platform_base",
     "${chip_root}/third_party/inipp",
   ]
 
   public_configs = []
 
-  if (chip_mdns != "none") {
+  if (chip_mdns == "platform") {
     sources += [
-      "../Linux/DnssdImpl.cpp",
-      "../Linux/DnssdImpl.h",
+      "DnssdImpl.cpp",
+      "DnssdImpl.h",
     ]
 
     deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
@@ -116,6 +128,15 @@ static_library("webos") {
     ]
   }
 
+  if (chip_enable_openthread) {
+    sources += [
+      "ThreadStackManagerImpl.cpp",
+      "ThreadStackManagerImpl.h",
+    ]
+
+    public_deps += [ "dbus/openthread" ]
+  }
+
   if (chip_enable_wifi) {
     # TBD: Use webOS specific Wi-Fi resource
     #public_deps += [ "dbus/wpa" ]
@@ -125,4 +146,10 @@ static_library("webos") {
     # TBD: Use webOS specific Bluetooth resource
     #public_deps += [ "dbus/bluez" ]
   }
+
+  libs = [
+    "luna-service2",
+    "pbnjson_c",
+    "pbnjson_cpp",
+  ]
 }

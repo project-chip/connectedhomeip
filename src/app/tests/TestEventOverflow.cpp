@@ -28,11 +28,14 @@
 #include <app/InteractionModelEngine.h>
 #include <app/tests/AppTestContext.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLV.h>
-#include <lib/core/CHIPTLVDebug.hpp>
-#include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/core/ErrorStr.h>
+#include <lib/core/TLV.h>
+#include <lib/core/TLVDebug.h>
+#include <lib/core/TLVUtilities.h>
+#include <lib/support/CHIPCounter.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/EnforceFormat.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/Constants.h>
 #include <messaging/ExchangeContext.h>
@@ -52,35 +55,34 @@ static chip::app::CircularEventBuffer gCircularEventBuffer[3];
 class TestContext : public chip::Test::AppContext
 {
 public:
-    static int InitializeAsync(void * context)
+    // Performs setup for each individual test in the test suite
+    void SetUp() override
     {
-        if (AppContext::InitializeAsync(context) != SUCCESS)
-            return FAILURE;
-
-        auto * ctx = static_cast<TestContext *>(context);
-
-        chip::app::LogStorageResources logStorageResources[] = {
+        const chip::app::LogStorageResources logStorageResources[] = {
             { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
             { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), chip::app::PriorityLevel::Info },
             { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
         };
 
-        chip::app::EventManagement::CreateEventManagement(&ctx->GetExchangeManager(),
-                                                          sizeof(logStorageResources) / sizeof(logStorageResources[0]),
-                                                          gCircularEventBuffer, logStorageResources, nullptr, 0, nullptr);
+        chip::Test::AppContext::SetUp();
 
-        return SUCCESS;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        // TODO: use ASSERT_EQ, once transition to pw_unit_test is complete
+        VerifyOrDieWithMsg((err = mEventCounter.Init(0)) == CHIP_NO_ERROR, AppServer,
+                           "Init EventCounter failed: %" CHIP_ERROR_FORMAT, err.Format());
+        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), ArraySize(logStorageResources),
+                                                          gCircularEventBuffer, logStorageResources, &mEventCounter);
     }
 
-    static int Finalize(void * context)
+    // Performs teardown for each individual test in the test suite
+    void TearDown() override
     {
         chip::app::EventManagement::DestroyEventManagement();
-
-        if (AppContext::Finalize(context) != SUCCESS)
-            return FAILURE;
-
-        return SUCCESS;
+        chip::Test::AppContext::TearDown();
     }
+
+private:
+    chip::MonotonicallyIncreasingCounter<chip::EventNumber> mEventCounter;
 };
 
 class TestEventGenerator : public chip::app::EventLoggingDelegate
@@ -167,8 +169,10 @@ nlTestSuite sSuite =
 {
     "TestEventOverflow",
     &sTests[0],
-    TestContext::InitializeAsync,
-    TestContext::Finalize
+    TestContext::nlTestSetUpTestSuite,
+    TestContext::nlTestTearDownTestSuite,
+    TestContext::nlTestSetUp,
+    TestContext::nlTestTearDown,
 };
 // clang-format on
 
@@ -176,9 +180,7 @@ nlTestSuite sSuite =
 
 int TestEventOverflow()
 {
-    TestContext gContext;
-    nlTestRunner(&sSuite, &gContext);
-    return (nlTestRunnerStats(&sSuite));
+    return chip::ExecuteTestsWithContext<TestContext>(&sSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestEventOverflow)

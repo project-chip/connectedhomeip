@@ -1,0 +1,95 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/mw320_sdk.gni")
+import("${chip_root}/src/platform/device.gni")
+import("${mw320_sdk_build_root}/mw320_sdk.gni")
+
+assert(chip_device_platform == "mw320")
+
+if (chip_enable_openthread) {
+  import("//build_overrides/openthread.gni")
+}
+
+static_library("mw320") {
+  sources = [
+    "../../FreeRTOS/SystemTimeSupport.cpp",
+    "../../SingletonConfigurationManager.cpp",
+    "BLEManagerImpl.cpp",
+    "BLEManagerImpl.h",
+    "CHIPDevicePlatformConfig.h",
+    "CHIPDevicePlatformEvent.h",
+    "ConfigurationManagerImpl.cpp",
+    "ConfigurationManagerImpl.h",
+    "ConnectivityManagerImpl.cpp",
+    "ConnectivityManagerImpl.h",
+    "ConnectivityUtils.cpp",
+    "ConnectivityUtils.h",
+    "DeviceInfoProviderImpl.cpp",
+    "DeviceInfoProviderImpl.h",
+    "DiagnosticDataProviderImpl.cpp",
+    "DiagnosticDataProviderImpl.h",
+    "KeyValueStoreManagerImpl.cpp",
+    "KeyValueStoreManagerImpl.h",
+    "Logging.cpp",
+    "MW320Config.cpp",
+    "MW320Config.h",
+    "NetworkCommissioningDriver.h",
+    "NetworkCommissioningEthernetDriver.cpp",
+    "NetworkCommissioningWiFiDriver.cpp",
+    "NetworkProvisioningServerImpl.h",
+    "OTAImageProcessorImpl.cpp",
+    "OTAImageProcessorImpl.h",
+    "PlatformManagerImpl.cpp",
+    "PlatformManagerImpl.h",
+    "SoftwareUpdateManagerImpl.h",
+    "mw320_ota.cpp",
+    "mw320_ota.h",
+  ]
+
+  if (chip_with_factory_data == 1) {
+    sources += [
+      "FactoryDataProvider.cpp",
+      "FactoryDataProvider.h",
+    ]
+  }
+
+  defines = [ "MW320_LOG_ENABLED=1" ]
+
+  # Do Sync-connect/scan
+  defines += [ "MW320_CONNECT_SCAN_SYNC=1" ]
+
+  # Use ethernet/wifi interface for network commissioning. Default: WiFi
+  defines += [ "USE_ETHERNET_COMMISSION=0" ]
+
+  deps = [ "${chip_root}/src/platform/logging:headers" ]
+
+  public_deps = [ "${chip_root}/src/platform:platform_base" ]
+
+  if (chip_enable_openthread) {
+    sources += [
+      "../../OpenThread/OpenThreadUtils.cpp",
+      "ThreadStackManagerImpl.cpp",
+      "ThreadStackManagerImpl.h",
+    ]
+
+    if (chip_mdns == "platform") {
+      sources += [ "../../OpenThread/MdnsImpl.cpp" ]
+      deps += [ "${chip_root}/src/lib/mdns:platform_header" ]
+    }
+  }
+
+  public_deps += [ "${chip_root}/src/crypto" ]
+}

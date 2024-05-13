@@ -15,12 +15,14 @@
  *    limitations under the License.
  */
 
+// TODO To prevent config with nl headers has to be included before  nl test headers
+#include <pw_unit_test/unit_test_service.h>
+
 #include <AppConfig.h>
 #include <FreeRTOS.h>
 #include <PigweedLogger.h>
 #include <PigweedLoggerMutex.h>
 #include <cstring>
-#include <init_efrPlatform.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -30,6 +32,8 @@
 #include <pigweed/RpcService.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+#include <sl_system_init.h>
 #include <sl_system_kernel.h>
 #include <task.h>
 
@@ -166,10 +170,11 @@ StaticTask_t sTestTaskBuffer;
 StackType_t sTestTaskStack[TEST_TASK_STACK_SIZE];
 
 chip::rpc::NlTest nl_test_service;
+pw::unit_test::UnitTestService unit_test_service;
 
 void RegisterServices(pw::rpc::Server & server)
 {
-    server.RegisterService(nl_test_service);
+    server.RegisterService(nl_test_service, unit_test_service);
 }
 
 void RunRpcService(void *)
@@ -181,7 +186,8 @@ void RunRpcService(void *)
 
 int main(void)
 {
-    init_efrPlatform();
+    sl_system_init();
+    chip::DeviceLayer::Silabs::GetPlatform().Init();
     PigweedLogger::init();
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 
@@ -189,15 +195,15 @@ int main(void)
 
     chip::DeviceLayer::PlatformMgr().InitChipStack();
 
-    EFR32_LOG("***** CHIP EFR32 device tests *****\r\n");
+    SILABS_LOG("***** CHIP EFR32 device tests *****\r\n");
 
     // Start RPC service which runs the tests.
     sTestTaskHandle = xTaskCreateStatic(RunRpcService, "RPC_TEST_TASK", ArraySize(sTestTaskStack), nullptr, TEST_TASK_PRIORITY,
                                         sTestTaskStack, &sTestTaskBuffer);
-    EFR32_LOG("Starting FreeRTOS scheduler");
+    SILABS_LOG("Starting FreeRTOS scheduler");
     sl_system_kernel_start();
 
     // Should never get here.
-    EFR32_LOG("vTaskStartScheduler() failed");
+    SILABS_LOG("vTaskStartScheduler() failed");
     return -1;
 }

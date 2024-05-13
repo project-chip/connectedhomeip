@@ -1,0 +1,328 @@
+{{> header excludeZapComment=true}}
+
+#import "MTRCommandPayloadsObjc.h"
+#import "MTRCommandPayloads_Internal.h"
+#import "MTRCommandPayloadExtensions_Internal.h"
+#import "MTRBaseDevice_Internal.h"
+#import "MTRError_Internal.h"
+#import "MTRLogging_Internal.h"
+#import "NSStringSpanConversion.h"
+#import "NSDataSpanConversion.h"
+#import "MTRBackwardsCompatShims.h"
+
+#include <app/data-model/Decode.h>
+#include <lib/core/TLV.h>
+#include <app/data-model/ListLargeSystemExtensions.h>
+#include <lib/support/CodeUtils.h>
+#include <system/TLVPacketBufferBackingStore.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
+{{#zcl_clusters}}
+{{#zcl_commands}}
+{{#*inline "completeImpl"}}
+{{#if (isSupported cluster command=command isForCommandPayload=true)}}
+@implementation MTR{{cluster}}Cluster{{command}}Params
+- (instancetype)init
+{
+  if (self = [super init]) {
+{{#zcl_command_arguments}}
+
+    {{>init_struct_member label=label type=type cluster=parent.parent.name}}
+{{/zcl_command_arguments}}
+{{#if (or (isStrEqual source "client")
+          (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) command=(compatCommandNameRemapping parent.name name)))}}
+    _timedInvokeTimeoutMs = nil;
+{{/if}}
+{{#if (isStrEqual source "client")}}
+    _serverSideProcessingTimeout = nil;
+{{/if}}
+  }
+  return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+  auto other = [[MTR{{cluster}}Cluster{{command}}Params alloc] init];
+
+  {{#zcl_command_arguments}}
+  other.{{asStructPropertyName label}} = self.{{asStructPropertyName label}};
+  {{/zcl_command_arguments}}
+{{#if (or (isStrEqual source "client")
+          (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) command=(compatCommandNameRemapping parent.name name)))}}
+  other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+{{/if}}
+{{#if (isStrEqual source "client")}}
+  other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+{{/if}}
+
+  return other;
+}
+
+- (NSString *)description
+{
+  NSString *descriptionString = [NSString stringWithFormat:@"<%@: {{#zcl_command_arguments}}{{asStructPropertyName label}}:%@; {{/zcl_command_arguments}}>", NSStringFromClass([self class]) {{#zcl_command_arguments}},{{#if isArray}}_{{asStructPropertyName label}}{{else if (isOctetString type)}}[_{{asStructPropertyName label}} base64EncodedStringWithOptions:0]{{else}}_{{asStructPropertyName label}}{{/if}}{{/zcl_command_arguments}}];
+  return descriptionString;
+}
+{{#zcl_command_arguments}}
+{{#if (and includeRenamedProperties
+           (hasOldName ../cluster command=../command commandField=(asStructPropertyName label)))}}
+
+{{> renamed_struct_field_impl cluster=parent.parent.name type=type newName=label oldName=(oldName ../cluster command=../command commandField=(asStructPropertyName label))}}
+{{/if}}
+{{/zcl_command_arguments}}
+
+{{#if (isStrEqual source "server")}}
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+  if (!(self = [super init])) {
+    return nil;
+  }
+
+  using DecodableType = chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType;
+  chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                         clusterID:DecodableType::GetClusterId()
+                                                                         commandID:DecodableType::GetCommandId()
+                                                                             error:error];
+  if (buffer.IsNull()) {
+    return nil;
+  }
+
+  chip::TLV::TLVReader reader;
+  reader.Init(buffer->Start(), buffer->DataLength());
+
+  CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+  if (err == CHIP_NO_ERROR) {
+    DecodableType decodedStruct;
+    err = chip::app::DataModel::Decode(reader, decodedStruct);
+    if (err == CHIP_NO_ERROR) {
+      err = [self _setFieldsFromDecodableStruct:decodedStruct];
+      {{#if (and (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) "OperationalCredentials")
+                 (isStrEqual (asUpperCamelCase name preserveAcronyms=true) "AttestationResponse"))}}
+      if (err == CHIP_NO_ERROR) {
+        do {
+          // AttestationResponse has an extra attestationChallenge field.  Once we
+          // have some sort of more direct decoding from the responseValue, we can
+          // probably make this less hardcoded.
+          //
+          // It might be simpler to look for the right profile tag in the TLV, but let's stick to examining
+          // the responseValue we were handed.
+          id data = responseValue[MTRDataKey];
+          if (![data isKindOfClass:NSDictionary.class]) {
+            err = CHIP_ERROR_INVALID_ARGUMENT;
+            break;
+          }
+
+          NSDictionary * dataDictionary = data;
+          if (dataDictionary[MTRTypeKey] == nil ||
+              ![dataDictionary[MTRTypeKey] isKindOfClass:NSString.class] ||
+              ![dataDictionary[MTRTypeKey] isEqualToString:MTRStructureValueType]) {
+            err = CHIP_ERROR_INVALID_ARGUMENT;
+            break;
+          }
+
+          id value = dataDictionary[MTRValueKey];
+          if (value == nil || ![value isKindOfClass:NSArray.class]) {
+            err = CHIP_ERROR_INVALID_ARGUMENT;
+            break;
+          }
+
+          NSArray * valueArray = value;
+          for (id item in valueArray) {
+            if (![item isKindOfClass:NSDictionary.class]) {
+                err = CHIP_ERROR_INVALID_ARGUMENT;
+                break;
+            }
+
+            NSDictionary * itemDictionary = item;
+            id contextTag = itemDictionary[MTRContextTagKey];
+            if (contextTag == nil || ![contextTag isKindOfClass:NSNumber.class]) {
+              err = CHIP_ERROR_INVALID_ARGUMENT;
+              break;
+            }
+
+            NSNumber * contextTagNumber = contextTag;
+            if (![contextTagNumber isEqualToNumber:@(kAttestationChallengeTagValue)]) {
+              // Not the right field; keep going.
+              continue;
+            }
+
+            id data = itemDictionary[MTRDataKey];
+            if (data == nil || ![data isKindOfClass:NSDictionary.class]) {
+              err = CHIP_ERROR_INVALID_ARGUMENT;
+              break;
+            }
+
+            NSDictionary * dataDictionary = data;
+            id dataType = dataDictionary[MTRTypeKey];
+            id dataValue = dataDictionary[MTRValueKey];
+            if (dataType == nil || dataValue == nil ||
+                ![dataType isKindOfClass:NSString.class] ||
+                ![dataValue isKindOfClass:NSData.class]) {
+              err = CHIP_ERROR_INVALID_ARGUMENT;
+              break;
+            }
+
+            NSString * dataTypeString = dataType;
+            if (![dataTypeString isEqualToString:MTROctetStringValueType]) {
+              err = CHIP_ERROR_INVALID_ARGUMENT;
+              break;
+            }
+
+            self.attestationChallenge = dataValue;
+            break;
+          }
+
+          // Do not add code here without first checking whether err is success.
+        } while (0);
+      }
+      {{/if}}
+      if (err == CHIP_NO_ERROR) {
+        return self;
+      }
+    }
+  }
+
+  NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+  MTR_LOG_ERROR("%s", errorStr.UTF8String);
+  if (error != nil) {
+    NSDictionary * userInfo = @ { NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+    *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+  }
+  return nil;
+}
+{{/if}}
+
+@end
+{{/if}}
+{{/inline}}
+{{#*inline "oldNameImpl"}}
+{{#if (isSupported cluster command=command isForCommandPayload=true)}}
+
+@implementation MTR{{cluster}}Cluster{{command}}Params
+{{#zcl_command_arguments}}
+{{#if (isSupported ../cluster command=../command commandField=(asStructPropertyName label))}}
+@dynamic {{asStructPropertyName label}};
+{{/if}}
+{{/zcl_command_arguments}}
+
+{{#if (isStrEqual source "client")}}
+@dynamic timedInvokeTimeoutMs;
+@dynamic serverSideProcessingTimeout;
+{{else if (wasIntroducedBeforeRelease "First major API revamp" cluster command=command)}}
+@dynamic timedInvokeTimeoutMs;
+{{/if}}
+@end
+{{/if}}
+{{/inline}}
+{{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true) isForCommandPayload=true)}}
+{{> completeImpl cluster=(asUpperCamelCase parent.name preserveAcronyms=true)
+                 command=(asUpperCamelCase name preserveAcronyms=true)
+                 includeRenamedProperties=false}}
+
+@implementation MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Params (InternalMethods)
+
+{{#if (isStrEqual source "server")}}
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType &)decodableStruct
+{
+  {{#zcl_command_arguments}}
+  {
+    {{>decode_value target=(concat "self." (asStructPropertyName label)) source=(concat "decodableStruct." (asLowerCamelCase label)) cluster=parent.parent.name errorCode="return err;" depth=0}}
+  }
+  {{/zcl_command_arguments}}
+  return CHIP_NO_ERROR;
+}
+{{/if}}
+
+{{#if (isStrEqual source "client")}}
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+  chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type encodableStruct;
+  ListFreer listFreer;
+  {{#zcl_command_arguments}}
+  {
+    {{>encode_value target=(concat "encodableStruct." (asLowerCamelCase label)) source=(concat "self." (asStructPropertyName label)) cluster=parent.parent.name errorCode="return CHIP_ERROR_INVALID_ARGUMENT;" depth=0}}
+  }
+  {{/zcl_command_arguments}}
+
+  auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+  if (buffer.IsNull()) {
+    return CHIP_ERROR_NO_MEMORY;
+  }
+
+  chip::System::PacketBufferTLVWriter writer;
+  // Commands never need chained buffers, since they cannot be chunked.
+  writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+  ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+  ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+  reader.Init(std::move(buffer));
+  return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+  chip::System::PacketBufferTLVReader reader;
+  CHIP_ERROR err = [self _encodeToTLVReader:reader];
+  if (err != CHIP_NO_ERROR) {
+    if (error) {
+      *error = [MTRError errorForCHIPErrorCode:err];
+    }
+    return nil;
+  }
+
+  auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+  if (decodedObj == nil) {
+    if (error) {
+      *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+    }
+  }
+  return decodedObj;
+}
+{{/if}}
+@end
+
+{{#if (or (not (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) (compatClusterNameRemapping parent.name)))
+          (not (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (compatCommandNameRemapping parent.name name))))}}
+{{> oldNameImpl cluster=(compatClusterNameRemapping parent.name)
+                command=(compatCommandNameRemapping parent.name name)}}
+{{/if}}
+{{#if (hasRenamedFields (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
+{{#*inline "deprecatedImpl"}}
+
+@implementation MTR{{cluster}}Cluster{{command}}Params (Deprecated)
+{{#zcl_command_arguments}}
+{{#if (hasOldName ../cluster command=../command commandField=(asStructPropertyName label))}}
+
+{{> renamed_struct_field_impl cluster=parent.parent.name type=type newName=label oldName=(oldName ../cluster command=../command commandField=(asStructPropertyName label))}}
+{{/if}}
+{{/zcl_command_arguments}}
+@end
+{{/inline}}
+{{> deprecatedImpl cluster=(asUpperCamelCase parent.name preserveAcronyms=true)
+                   command=(asUpperCamelCase name preserveAcronyms=true)}}
+{{/if}}
+{{else}}
+{{> completeImpl cluster=(compatClusterNameRemapping parent.name)
+                 command=(compatCommandNameRemapping parent.name name)
+                 includeRenamedProperties=true}}
+{{/if}}
+{{/zcl_commands}}
+{{/zcl_clusters}}
+
+// MTRBasicClusterMfgSpecificPingParams doesn't need to actually work.
+@implementation MTRBasicClusterMfgSpecificPingParams (InternalMethods)
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    if (error) {
+        *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+    }
+    return nil;
+}
+@end
+
+
+NS_ASSUME_NONNULL_END

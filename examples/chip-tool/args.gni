@@ -22,3 +22,12 @@ chip_system_project_config_include = "<SystemProjectConfig.h>"
 
 chip_project_config_include_dirs = [ "${chip_root}/examples/chip-tool/include" ]
 chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
+
+matter_enable_tracing_support = true
+
+matter_log_json_payload_hex = true
+matter_log_json_payload_decode_full = true
+
+# make chip-tool very strict by default
+chip_tlv_validate_char_string_on_read = true
+chip_tlv_validate_char_string_on_write = true

@@ -31,4 +31,6 @@ static_library("records") {
     "${chip_root}/src/lib/dnssd/minimal_mdns/core",
     "${chip_root}/src/platform",
   ]
+
+  cflags = [ "-Wconversion" ]
 }

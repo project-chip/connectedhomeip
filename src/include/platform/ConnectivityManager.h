@@ -24,14 +24,17 @@
 #pragma once
 #include <memory>
 
-#include <app/AttributeAccessInterface.h>
+#include <app/icd/server/ICDServerConfig.h>
+#include <inet/UDPEndPoint.h>
 #include <lib/support/CodeUtils.h>
-#include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceEvent.h>
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/basic-types.h>
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+#include <inet/TCPEndPoint.h>
+#endif
 
 namespace chip {
 
@@ -98,14 +101,6 @@ public:
         kWiFiAPMode_OnDemand_NoStationProvision = 5,
     };
 
-    enum ThreadMode
-    {
-        kThreadMode_NotSupported          = 0,
-        kThreadMode_ApplicationControlled = 1,
-        kThreadMode_Disabled              = 2,
-        kThreadMode_Enabled               = 3,
-    };
-
     enum WiFiStationState
     {
         kWiFiStationState_NotConnected,
@@ -133,29 +128,37 @@ public:
 
     enum ThreadDeviceType
     {
-        kThreadDeviceType_NotSupported     = 0,
-        kThreadDeviceType_Router           = 1,
-        kThreadDeviceType_FullEndDevice    = 2,
-        kThreadDeviceType_MinimalEndDevice = 3,
-        kThreadDeviceType_SleepyEndDevice  = 4,
+        kThreadDeviceType_NotSupported                = 0,
+        kThreadDeviceType_Router                      = 1,
+        kThreadDeviceType_FullEndDevice               = 2,
+        kThreadDeviceType_MinimalEndDevice            = 3,
+        kThreadDeviceType_SleepyEndDevice             = 4,
+        kThreadDeviceType_SynchronizedSleepyEndDevice = 5,
     };
 
     enum BLEAdvertisingMode
     {
-        kFastAdvertising = 0,
-        kSlowAdvertising = 1,
+        kFastAdvertising     = 0,
+        kSlowAdvertising     = 1,
+        kExtendedAdvertising = 2,
     };
 
-    enum class SEDPollingMode
+    enum class SEDIntervalMode
     {
         Idle   = 0,
         Active = 1,
     };
 
-    struct SEDPollingConfig;
+    struct SEDIntervalsConfig;
 
     void SetDelegate(ConnectivityManagerDelegate * delegate) { mDelegate = delegate; }
     ConnectivityManagerDelegate * GetDelegate() const { return mDelegate; }
+
+    chip::Inet::EndPointManager<Inet::UDPEndPoint> & UDPEndPointManager();
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    chip::Inet::EndPointManager<Inet::TCPEndPoint> & TCPEndPointManager();
+#endif
 
     // WiFi station methods
     WiFiStationMode GetWiFiStationMode();
@@ -179,47 +182,28 @@ public:
     void MaintainOnDemandWiFiAP();
     System::Clock::Timeout GetWiFiAPIdleTimeout();
     void SetWiFiAPIdleTimeout(System::Clock::Timeout val);
+    CHIP_ERROR DisconnectNetwork();
 
     // Thread Methods
-    ThreadMode GetThreadMode();
-    CHIP_ERROR SetThreadMode(ThreadMode val);
     bool IsThreadEnabled();
-    bool IsThreadApplicationControlled();
     ThreadDeviceType GetThreadDeviceType();
     CHIP_ERROR SetThreadDeviceType(ThreadDeviceType deviceType);
     bool IsThreadAttached();
     bool IsThreadProvisioned();
     void ErasePersistentInfo();
     void ResetThreadNetworkDiagnosticsCounts();
-    CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
 
-// Sleepy end device methods
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    CHIP_ERROR GetSEDPollingConfig(SEDPollingConfig & pollingConfig);
-
-    /**
-     * Sets Sleepy End Device polling configuration and posts kSEDPollingIntervalChange event to inform other software
-     * modules about the change.
-     *
-     * @param[in]  pollingConfig  polling intervals configuration to be set
-     */
-    CHIP_ERROR SetSEDPollingConfig(const SEDPollingConfig & pollingConfig);
-
-    /**
-     * Requests setting Sleepy End Device fast polling interval on or off.
-     * Every method call with onOff parameter set to true or false results in incrementing or decrementing the fast polling
-     * consumers counter. Fast polling mode is set if the consumers counter is bigger than 0.
-     *
-     * @param[in]  onOff  true if fast polling should be enabled and false otherwise.
-     */
-    CHIP_ERROR RequestSEDFastPollingMode(bool onOff);
-#endif
+    CHIP_ERROR SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
 
     // CHIPoBLE service methods
     Ble::BleLayer * GetBleLayer();
-    CHIPoBLEServiceMode GetCHIPoBLEServiceMode();
-    CHIP_ERROR SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool IsBLEAdvertisingEnabled();
+    /**
+     * Enable or disable BLE advertising.
+     *
+     * @return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if BLE advertising is not
+     * supported or other error on other failures.
+     */
     CHIP_ERROR SetBLEAdvertisingEnabled(bool val);
     bool IsBLEAdvertising();
     CHIP_ERROR SetBLEAdvertisingMode(BLEAdvertisingMode mode);
@@ -265,23 +249,23 @@ protected:
     ~ConnectivityManager() = default;
 
     // No copy, move or assignment.
-    ConnectivityManager(const ConnectivityManager &)  = delete;
-    ConnectivityManager(const ConnectivityManager &&) = delete;
+    ConnectivityManager(const ConnectivityManager &)             = delete;
+    ConnectivityManager(const ConnectivityManager &&)            = delete;
     ConnectivityManager & operator=(const ConnectivityManager &) = delete;
 };
 
 /**
- * Information describing the desired polling behavior of a sleepy end device (SED).
+ * Information describing the desired intervals for a sleepy end device (SED).
  */
-struct ConnectivityManager::SEDPollingConfig
+struct ConnectivityManager::SEDIntervalsConfig
 {
-    /** Interval at which the device polls its parent when there are active chip exchanges in progress. Only meaningful when the
-     * device is acting as a sleepy end node.  */
-    System::Clock::Milliseconds32 FastPollingIntervalMS;
+    /** Interval at which the device is able to communicate with its parent when there are active chip exchanges in progress. Only
+     * meaningful when the device is acting as a sleepy end node.  */
+    System::Clock::Milliseconds32 ActiveIntervalMS;
 
-    /** Interval at which the device polls its parent when there are NO active chip exchanges in progress. Only meaningful when the
-     * device is acting as a sleepy end node. */
-    System::Clock::Milliseconds32 SlowPollingIntervalMS;
+    /** Interval at which the device is able to communicate with its parent when there are NO active chip exchanges in progress.
+     * Only meaningful when the device is acting as a sleepy end node. */
+    System::Clock::Milliseconds32 IdleIntervalMS;
 };
 
 /**
@@ -315,6 +299,18 @@ extern ConnectivityManagerImpl & ConnectivityMgrImpl();
 
 namespace chip {
 namespace DeviceLayer {
+
+inline chip::Inet::EndPointManager<Inet::UDPEndPoint> & ConnectivityManager::UDPEndPointManager()
+{
+    return static_cast<ImplClass *>(this)->_UDPEndPointManager();
+}
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+inline chip::Inet::EndPointManager<Inet::TCPEndPoint> & ConnectivityManager::TCPEndPointManager()
+{
+    return static_cast<ImplClass *>(this)->_TCPEndPointManager();
+}
+#endif
 
 inline ConnectivityManager::WiFiStationMode ConnectivityManager::GetWiFiStationMode()
 {
@@ -411,24 +407,9 @@ inline CHIP_ERROR ConnectivityManager::GetAndLogWiFiStatsCounters()
     return static_cast<ImplClass *>(this)->_GetAndLogWiFiStatsCounters();
 }
 
-inline ConnectivityManager::ThreadMode ConnectivityManager::GetThreadMode()
-{
-    return static_cast<ImplClass *>(this)->_GetThreadMode();
-}
-
-inline CHIP_ERROR ConnectivityManager::SetThreadMode(ThreadMode val)
-{
-    return static_cast<ImplClass *>(this)->_SetThreadMode(val);
-}
-
 inline bool ConnectivityManager::IsThreadEnabled()
 {
     return static_cast<ImplClass *>(this)->_IsThreadEnabled();
-}
-
-inline bool ConnectivityManager::IsThreadApplicationControlled()
-{
-    return static_cast<ImplClass *>(this)->_IsThreadApplicationControlled();
 }
 
 inline ConnectivityManager::ThreadDeviceType ConnectivityManager::GetThreadDeviceType()
@@ -441,22 +422,14 @@ inline CHIP_ERROR ConnectivityManager::SetThreadDeviceType(ThreadDeviceType devi
     return static_cast<ImplClass *>(this)->_SetThreadDeviceType(deviceType);
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-inline CHIP_ERROR ConnectivityManager::GetSEDPollingConfig(SEDPollingConfig & pollingConfig)
+inline CHIP_ERROR ConnectivityManager::SetPollingInterval(System::Clock::Milliseconds32 pollingInterval)
 {
-    return static_cast<ImplClass *>(this)->_GetSEDPollingConfig(pollingConfig);
-}
-
-inline CHIP_ERROR ConnectivityManager::SetSEDPollingConfig(const SEDPollingConfig & pollingConfig)
-{
-    return static_cast<ImplClass *>(this)->_SetSEDPollingConfig(pollingConfig);
-}
-
-inline CHIP_ERROR ConnectivityManager::RequestSEDFastPollingMode(bool onOff)
-{
-    return static_cast<ImplClass *>(this)->_RequestSEDFastPollingMode(onOff);
-}
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    return static_cast<ImplClass *>(this)->_SetPollingInterval(pollingInterval);
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif
+}
 
 inline bool ConnectivityManager::IsThreadAttached()
 {
@@ -478,38 +451,9 @@ inline void ConnectivityManager::ResetThreadNetworkDiagnosticsCounts()
     static_cast<ImplClass *>(this)->_ResetThreadNetworkDiagnosticsCounts();
 }
 
-/*
- * @brief Get runtime value from the thread network based on the given attribute ID.
- *        The info is encoded via the AttributeValueEncoder.
- *
- * @param attributeId Id of the attribute for the requested info.
- * @param aEncoder Encoder to encode the attribute value.
- *
- * @return CHIP_NO_ERROR = Succes.
- *         CHIP_ERROR_NOT_IMPLEMENTED = Runtime value for this attribute to yet available to send as reply
- *                                      Use standard read.
- *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE = Is not a Runtime readable attribute. Use standard read
- *         All other errors should be treated as a read error and reported as such.
- */
-inline CHIP_ERROR ConnectivityManager::WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
-                                                                                  app::AttributeValueEncoder & encoder)
-{
-    return static_cast<ImplClass *>(this)->_WriteThreadNetworkDiagnosticAttributeToTlv(attributeId, encoder);
-}
-
 inline Ble::BleLayer * ConnectivityManager::GetBleLayer()
 {
     return static_cast<ImplClass *>(this)->_GetBleLayer();
-}
-
-inline ConnectivityManager::CHIPoBLEServiceMode ConnectivityManager::GetCHIPoBLEServiceMode()
-{
-    return static_cast<ImplClass *>(this)->_GetCHIPoBLEServiceMode();
-}
-
-inline CHIP_ERROR ConnectivityManager::SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val)
-{
-    return static_cast<ImplClass *>(this)->_SetCHIPoBLEServiceMode(val);
 }
 
 inline bool ConnectivityManager::IsBLEAdvertisingEnabled()
@@ -615,6 +559,11 @@ inline void ConnectivityManager::OnWiFiScanDone()
 inline void ConnectivityManager::OnWiFiStationProvisionChange()
 {
     static_cast<ImplClass *>(this)->_OnWiFiStationProvisionChange();
+}
+
+inline CHIP_ERROR ConnectivityManager::DisconnectNetwork()
+{
+    return static_cast<ImplClass *>(this)->_DisconnectNetwork();
 }
 
 } // namespace DeviceLayer

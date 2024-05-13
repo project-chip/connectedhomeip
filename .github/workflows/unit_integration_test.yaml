@@ -12,11 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Unit / Interation Tests
+name: Unit / Integration Tests
 
 on:
     push:
+        branches-ignore:
+            - 'dependabot/**'
     pull_request:
+    merge_group:
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
@@ -24,71 +27,56 @@ concurrency:
 
 jobs:
     unit_tests:
-        name: Unit / Interation Tests
-        timeout-minutes: 60
+        name: Unit / Integration Tests
         if: github.actor != 'restyled-io[bot]'
 
         strategy:
             matrix:
-                type: [main, clang, mbedtls, rotating_device_id]
+                type: [main, clang, mbedtls, rotating_device_id, icd]
         env:
             BUILD_TYPE: ${{ matrix.type }}
 
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.5.58
+            image: ghcr.io/project-chip/chip-build:50
             volumes:
+                - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.11
-              name: Checkout
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                  action: actions/checkout@v3
-                  with: |
-                      submodules: true
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-            - name: Bootstrap
-              timeout-minutes: 10
-              run: |
-                  mkdir -p /tmp/log_output ;
-                  scripts/build/gn_bootstrap.sh ;
-            - name: Uploading bootstrap logs
-              uses: actions/upload-artifact@v2
-              if: ${{ always() }} && ${{ !env.ACT }}
-              with:
-                  name: bootstrap-logs
-                  path: |
-                      .environment/gn_out/.ninja_log
-                      .environment/pigweed-venv/*.log
+                platform: linux
+                bootstrap-log-name: bootstrap-logs-unittest-${{ matrix.type }}
             - name: Artifact suffix
               id: outsuffix
-              uses: haya14busa/action-cond@v1.0.0
+              uses: haya14busa/action-cond@v1
               if: ${{ !env.ACT }}
               with:
                   cond: ${{ github.event.pull_request.number == '' }}
                   if_true: "${{ github.sha }}"
                   if_false: "pull-${{ github.event.pull_request.number }}"
             - name: Setup Build
+              # TODO: If rotating_device_id is ever removed/combined, we have to cover boringssl otherwise
               run: |
                   case $BUILD_TYPE in
                      "main") GN_ARGS='';;
                      "clang") GN_ARGS='is_clang=true';;
                      "mbedtls") GN_ARGS='chip_crypto="mbedtls"';;
-                     "rotating_device_id") GN_ARGS='chip_enable_rotating_device_id=true';;
+                     "rotating_device_id") GN_ARGS='chip_crypto="boringssl" chip_enable_rotating_device_id=true';;
+                     "icd") GN_ARGS='chip_enable_icd_server=true chip_enable_icd_lit=true';;
                      *) ;;
                   esac
 
                   scripts/build/gn_gen.sh --args="$GN_ARGS"
             - name: Run Build
-              timeout-minutes: 30
               run: scripts/run_in_build_env.sh "ninja -C out/$BUILD_TYPE"
             - name: Run Tests
-              timeout-minutes: 30
               run: scripts/tests/gn_tests.sh
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512

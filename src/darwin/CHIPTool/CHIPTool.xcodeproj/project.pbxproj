@@ -11,9 +11,8 @@
 		2C21071525D1A8F200DDA4AD /* MultiAdminViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C21071325D1A8F200DDA4AD /* MultiAdminViewController.m */; };
 		2C460C2425D7594B000512D6 /* DeviceSelector.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C460C2325D7594B000512D6 /* DeviceSelector.m */; };
 		2C460C3225D97CB3000512D6 /* UnpairDevicesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C460C3025D97CB3000512D6 /* UnpairDevicesViewController.m */; };
+		51C8E3FB28261DCF00D47D00 /* FabricKeys.m in Sources */ = {isa = PBXBuildFile; fileRef = 51C8E3FA28261DCF00D47D00 /* FabricKeys.m */; };
 		991DC091247747F500C13860 /* EnumerateViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 991DC090247747F500C13860 /* EnumerateViewController.m */; };
-		997A639C253F93F7005C64E6 /* CHIP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 997A639B253F93F7005C64E6 /* CHIP.framework */; };
-		997A639D253F93F7005C64E6 /* CHIP.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 997A639B253F93F7005C64E6 /* CHIP.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B204A621244E1D0600C7C0E1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A620244E1D0600C7C0E1 /* AppDelegate.m */; };
 		B204A624244E1D0600C7C0E1 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A623244E1D0600C7C0E1 /* SceneDelegate.m */; };
 		B204A627244E1D0600C7C0E1 /* QRCodeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A626244E1D0600C7C0E1 /* QRCodeViewController.m */; };
@@ -27,6 +26,8 @@
 		B2C2267526289324009DAB8B /* FabricUIViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B2C2267426289324009DAB8B /* FabricUIViewController.m */; };
 		B2F51E99252DCDC000911FA5 /* TemperatureSensorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B2F51E98252DCDC000911FA5 /* TemperatureSensorViewController.m */; };
 		B2F53AEB245B0D140010745E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B2F53AE9245B0D140010745E /* LaunchScreen.storyboard */; };
+		D437613C285BC0060051FEA2 /* Matter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D437613B285BC0060051FEA2 /* Matter.framework */; };
+		D437613D285BC0060051FEA2 /* Matter.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D437613B285BC0060051FEA2 /* Matter.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,13 +41,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		997A639A253F93E5005C64E6 /* Embed Frameworks */ = {
+		D437613A285BBE3B0051FEA2 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				997A639D253F93F7005C64E6 /* CHIP.framework in Embed Frameworks */,
+				D437613D285BC0060051FEA2 /* Matter.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -62,9 +63,10 @@
 		2C460C2325D7594B000512D6 /* DeviceSelector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceSelector.m; sourceTree = "<group>"; };
 		2C460C3025D97CB3000512D6 /* UnpairDevicesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UnpairDevicesViewController.m; sourceTree = "<group>"; };
 		2C460C3125D97CB3000512D6 /* UnpairDevicesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UnpairDevicesViewController.h; sourceTree = "<group>"; };
+		51C8E3F928261DCF00D47D00 /* FabricKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FabricKeys.h; sourceTree = "<group>"; };
+		51C8E3FA28261DCF00D47D00 /* FabricKeys.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FabricKeys.m; sourceTree = "<group>"; };
 		991DC08F247747F500C13860 /* EnumerateViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EnumerateViewController.h; sourceTree = "<group>"; };
 		991DC090247747F500C13860 /* EnumerateViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EnumerateViewController.m; sourceTree = "<group>"; };
-		997A639B253F93F7005C64E6 /* CHIP.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CHIP.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B204A61C244E1D0600C7C0E1 /* CHIPTool.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CHIPTool.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B204A61F244E1D0600C7C0E1 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		B204A620244E1D0600C7C0E1 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -93,6 +95,7 @@
 		B2F51E97252DCDC000911FA5 /* TemperatureSensorViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TemperatureSensorViewController.h; sourceTree = "<group>"; };
 		B2F51E98252DCDC000911FA5 /* TemperatureSensorViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TemperatureSensorViewController.m; sourceTree = "<group>"; };
 		B2F53AEA245B0D140010745E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = UI/Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		D437613B285BC0060051FEA2 /* Matter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Matter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,7 +103,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				997A639C253F93F7005C64E6 /* CHIP.framework in Frameworks */,
+				D437613C285BC0060051FEA2 /* Matter.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -162,7 +165,7 @@
 		B20252DE2459EC7600F97062 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				997A639B253F93F7005C64E6 /* CHIP.framework */,
+				D437613B285BC0060051FEA2 /* Matter.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -245,6 +248,8 @@
 		B232D8C0251A0EE200792CB4 /* Framework Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				51C8E3F928261DCF00D47D00 /* FabricKeys.h */,
+				51C8E3FA28261DCF00D47D00 /* FabricKeys.m */,
 				B2946A9924C9A7BF005C87D0 /* DefaultsUtils.h */,
 				B2946A9A24C9A7BF005C87D0 /* DefaultsUtils.m */,
 			);
@@ -297,7 +302,7 @@
 				B204A618244E1D0600C7C0E1 /* Sources */,
 				B204A619244E1D0600C7C0E1 /* Frameworks */,
 				B204A61A244E1D0600C7C0E1 /* Resources */,
-				997A639A253F93E5005C64E6 /* Embed Frameworks */,
+				D437613A285BBE3B0051FEA2 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -401,6 +406,7 @@
 				B243A6692513A73600E56FEA /* RootViewController.m in Sources */,
 				B204A632244E1D0700C7C0E1 /* main.m in Sources */,
 				B204A624244E1D0600C7C0E1 /* SceneDelegate.m in Sources */,
+				51C8E3FB28261DCF00D47D00 /* FabricKeys.m in Sources */,
 				B2946A4224C99D53005C87D0 /* WiFiViewController.m in Sources */,
 				0CA0E0CF248599BB009087B9 /* OnOffViewController.m in Sources */,
 			);
@@ -441,7 +447,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -502,7 +508,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -569,10 +575,11 @@
 					"@executable_path/Frameworks",
 				);
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIPTool;
+				PRODUCT_BUNDLE_IDENTIFIER = com.matter.CHIPTool;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -592,10 +599,11 @@
 					"@executable_path/Frameworks",
 				);
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIPTool;
+				PRODUCT_BUNDLE_IDENTIFIER = com.matter.CHIPTool;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -605,6 +613,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = CHIPToolTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -624,6 +633,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = CHIPToolTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = (

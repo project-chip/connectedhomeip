@@ -52,9 +52,8 @@ void DiagnosticDataProviderImpl::InitializeWithObject(jobject manager)
     VerifyOrReturn(env != nullptr,
                    ChipLogError(DeviceLayer, "Failed to GetEnvForCurrentThread for DiagnosticDataProviderManagerImpl"));
 
-    mDiagnosticDataProviderManagerObject = env->NewGlobalRef(manager);
-    VerifyOrReturn(mDiagnosticDataProviderManagerObject != nullptr,
-                   ChipLogError(DeviceLayer, "Failed to NewGlobalRef DiagnosticDataProviderManager"));
+    VerifyOrReturn(mDiagnosticDataProviderManagerObject.Init(manager) == CHIP_NO_ERROR,
+                   ChipLogError(DeviceLayer, "Failed to Init DiagnosticDataProviderManager"));
 
     jclass DiagnosticDataProviderManagerClass = env->GetObjectClass(manager);
     VerifyOrReturn(DiagnosticDataProviderManagerClass != nullptr,
@@ -80,12 +79,12 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetRebootCount(uint16_t & rebootCount)
 {
     chip::DeviceLayer::StackUnlock unlock;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturnLogError(mDiagnosticDataProviderManagerObject != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnLogError(mDiagnosticDataProviderManagerObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnLogError(mGetRebootCountMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnLogError(env != nullptr, CHIP_JNI_ERROR_NO_ENV);
     ChipLogProgress(DeviceLayer, "Received GetRebootCount");
 
-    jint count = env->CallIntMethod(mDiagnosticDataProviderManagerObject, mGetRebootCountMethod);
+    jint count = env->CallIntMethod(mDiagnosticDataProviderManagerObject.ObjectRef(), mGetRebootCountMethod);
     VerifyOrReturnLogError(count < UINT16_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
     rebootCount = static_cast<uint16_t>(count);
 
@@ -97,12 +96,15 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrExit(mDiagnosticDataProviderManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NULL_OBJECT,
+                        ChipLogError(DeviceLayer, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceScope scope(env);
+    VerifyOrExit(mDiagnosticDataProviderManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetNifMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
     {
         ChipLogProgress(DeviceLayer, "Received GetNetworkInterfaces");
-        jobjectArray nifList = (jobjectArray) env->CallObjectMethod(mDiagnosticDataProviderManagerObject, mGetNifMethod);
+        jobjectArray nifList =
+            (jobjectArray) env->CallObjectMethod(mDiagnosticDataProviderManagerObject.ObjectRef(), mGetNifMethod);
         if (env->ExceptionCheck())
         {
             ChipLogError(DeviceLayer, "Java exception in DiagnosticDataProviderImpl::GetNetworkInterfaces");
@@ -163,12 +165,13 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             {
                 size_t len = env->GetArrayLength(jHardwareAddressObj);
                 len        = (len > kMaxHardwareAddrSize) ? kMaxHardwareAddrSize : len;
-                env->GetByteArrayRegion(jHardwareAddressObj, 0, len, reinterpret_cast<jbyte *>(ifp->MacAddress));
+                env->GetByteArrayRegion(jHardwareAddressObj, 0, static_cast<uint32_t>(len),
+                                        reinterpret_cast<jbyte *>(ifp->MacAddress));
                 ifp->hardwareAddress = ByteSpan(ifp->MacAddress, 6);
             }
 
             jfieldID getTypeField = env->GetFieldID(nifClass, "type", "I");
-            ifp->type             = static_cast<InterfaceType>(env->GetIntField(nifObject, getTypeField));
+            ifp->type             = static_cast<InterfaceTypeEnum>(env->GetIntField(nifObject, getTypeField));
 
             jfieldID ipv4AddressField  = env->GetFieldID(nifClass, "ipv4Address", "[B");
             jbyteArray jIpv4AddressObj = static_cast<jbyteArray>(env->GetObjectField(nifObject, ipv4AddressField));
@@ -228,6 +231,11 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
         netifp                 = netifp->Next;
         delete del;
     }
+}
+
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
+{
+    return DiagnosticDataProviderImpl::GetDefaultInstance();
 }
 
 } // namespace DeviceLayer

@@ -1,0 +1,140 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    3.8.5. [TC-MEDIAPLAYBACK-6.5] Mandatory Media Playback Verification (DUT as
+    Client)
+
+PICS:
+    - MEDIAPLAYBACK.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Preconditions"
+      verification: |
+          Commission TH to DUT, if not done so already. In some cases, such as with a Casting Video Player, the TH commissions the DUT.
+      disabled: true
+
+    - label: "Step 1: DUT sends Play command to TH"
+      PICS: MEDIAPLAYBACK.C.C00.Tx
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
+
+          ./chip-tool mediaplayback  play 1 3
+          ./chip-tv-casting-app mediaplayback  play 1 3
+
+          On TH (tv-app), Verify the play command is received successfully.
+
+          [1658530945655] [21924:317544] CHIP: [DMG] InvokeRequestMessage =
+          [1658530945655] [21924:317544] CHIP: [DMG] {
+          [1658530945655] [21924:317544] CHIP: [DMG]         suppressResponse = false,
+          [1658530945655] [21924:317544] CHIP: [DMG]         timedRequest = false,
+          [1658530945655] [21924:317544] CHIP: [DMG]         InvokeRequests =
+          [1658530945655] [21924:317544] CHIP: [DMG]         [
+          [1658530945655] [21924:317544] CHIP: [DMG]                 CommandDataIB =
+          [1658530945655] [21924:317544] CHIP: [DMG]                 {
+          [1658530945655] [21924:317544] CHIP: [DMG]                         CommandPathIB =
+          [1658530945655] [21924:317544] CHIP: [DMG]                         {
+          [1658530945655] [21924:317544] CHIP: [DMG]                                 EndpointId = 0x3,
+          [1658530945655] [21924:317544] CHIP: [DMG]                                 ClusterId = 0x506,
+          [1658530945655] [21924:317544] CHIP: [DMG]                                 CommandId = 0x0,
+          [1658530945655] [21924:317544] CHIP: [DMG]                         },
+          [1658530945655] [21924:317544] CHIP: [DMG]
+          [1658530945655] [21924:317544] CHIP: [DMG]                         CommandFields =
+          [1658530945655] [21924:317544] CHIP: [DMG]                         {
+          [1658530945655] [21924:317544] CHIP: [DMG]                         },
+          [1658530945655] [21924:317544] CHIP: [DMG]                 },
+          [1658530945655] [21924:317544] CHIP: [DMG]
+          [1658530945655] [21924:317544] CHIP: [DMG]         ],
+          [1658530945655] [21924:317544] CHIP: [DMG]
+          [1658530945655] [21924:317544] CHIP: [DMG]         InteractionModelRevision = 1
+          [1658530945655] [21924:317544] CHIP: [DMG] },
+      disabled: true
+
+    - label: "Step 2: DUT sends Pause command to TH"
+      PICS: MEDIAPLAYBACK.C.C01.Tx
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
+
+          ./chip-tool mediaplayback  pause 1 3
+          ./chip-tv-casting-app mediaplayback  pause 1 3
+
+          On TH (tv-app), Verify the pause command is received successfully.
+
+          [1658530975757] [21924:317544] CHIP: [DMG] InvokeRequestMessage =
+          [1658530975757] [21924:317544] CHIP: [DMG] {
+          [1658530975757] [21924:317544] CHIP: [DMG]         suppressResponse = false,
+          [1658530975757] [21924:317544] CHIP: [DMG]         timedRequest = false,
+          [1658530975757] [21924:317544] CHIP: [DMG]         InvokeRequests =
+          [1658530975757] [21924:317544] CHIP: [DMG]         [
+          [1658530975757] [21924:317544] CHIP: [DMG]                 CommandDataIB =
+          [1658530975757] [21924:317544] CHIP: [DMG]                 {
+          [1658530975757] [21924:317544] CHIP: [DMG]                         CommandPathIB =
+          [1658530975757] [21924:317544] CHIP: [DMG]                         {
+          [1658530975757] [21924:317544] CHIP: [DMG]                                 EndpointId = 0x3,
+          [1658530975757] [21924:317544] CHIP: [DMG]                                 ClusterId = 0x506,
+          [1658530975757] [21924:317544] CHIP: [DMG]                                 CommandId = 0x1,
+          [1658530975757] [21924:317544] CHIP: [DMG]                         },
+          [1658530975757] [21924:317544] CHIP: [DMG]
+          [1658530975757] [21924:317544] CHIP: [DMG]                         CommandFields =
+          [1658530975757] [21924:317544] CHIP: [DMG]                         {
+          [1658530975757] [21924:317544] CHIP: [DMG]                         },
+          [1658530975757] [21924:317544] CHIP: [DMG]                 },
+          [1658530975757] [21924:317544] CHIP: [DMG]
+          [1658530975757] [21924:317544] CHIP: [DMG]         ],
+          [1658530975757] [21924:317544] CHIP: [DMG]
+          [1658530975757] [21924:317544] CHIP: [DMG]         InteractionModelRevision = 1
+          [1658530975757] [21924:317544] CHIP: [DMG] },
+      disabled: true
+
+    - label: "Step 3: DUT sends Stop command to TH"
+      PICS: MEDIAPLAYBACK.C.C02.Tx
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
+
+          ./chip-tool mediaplayback  stop 1 3
+          ./chip-tv-casting-app mediaplayback  stop 1 3
+
+          On TH (tv-app), Verify the stop command is received successfully.
+
+          [1658531007495] [21924:317544] CHIP: [DMG] InvokeRequestMessage =
+          [1658531007495] [21924:317544] CHIP: [DMG] {
+          [1658531007495] [21924:317544] CHIP: [DMG]         suppressResponse = false,
+          [1658531007495] [21924:317544] CHIP: [DMG]         timedRequest = false,
+          [1658531007495] [21924:317544] CHIP: [DMG]         InvokeRequests =
+          [1658531007495] [21924:317544] CHIP: [DMG]         [
+          [1658531007495] [21924:317544] CHIP: [DMG]                 CommandDataIB =
+          [1658531007495] [21924:317544] CHIP: [DMG]                 {
+          [1658531007495] [21924:317544] CHIP: [DMG]                         CommandPathIB =
+          [1658531007495] [21924:317544] CHIP: [DMG]                         {
+          [1658531007495] [21924:317544] CHIP: [DMG]                                 EndpointId = 0x3,
+          [1658531007495] [21924:317544] CHIP: [DMG]                                 ClusterId = 0x506,
+          [1658531007495] [21924:317544] CHIP: [DMG]                                 CommandId = 0x2,
+          [1658531007495] [21924:317544] CHIP: [DMG]                         },
+          [1658531007495] [21924:317544] CHIP: [DMG]
+          [1658531007495] [21924:317544] CHIP: [DMG]                         CommandFields =
+          [1658531007495] [21924:317544] CHIP: [DMG]                         {
+          [1658531007495] [21924:317544] CHIP: [DMG]                         },
+          [1658531007495] [21924:317544] CHIP: [DMG]                 },
+          [1658531007495] [21924:317544] CHIP: [DMG]
+          [1658531007495] [21924:317544] CHIP: [DMG]         ],
+          [1658531007495] [21924:317544] CHIP: [DMG]
+          [1658531007495] [21924:317544] CHIP: [DMG]         InteractionModelRevision = 1
+          [1658531007495] [21924:317544] CHIP: [DMG]
+      disabled: true

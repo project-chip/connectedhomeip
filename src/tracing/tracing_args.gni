@@ -1,0 +1,55 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("${build_root}/config/compiler/compiler.gni")
+import("${chip_root}/src/platform/device.gni")
+
+declare_args() {
+  # Tracing can have a non-zero size impact to binaries. We try to make
+  # the impact minimal (the backends themselves add some size), however
+  # for now tracing is opt-in
+  #
+  # Additionally, if tracing is enabled, the main() function has to add
+  # backends explicitly
+  matter_enable_tracing_support =
+      current_os == "android" || chip_device_platform == "darwin"
+
+  # Defines the trace backend. Current matter tracing splits the logic
+  # into two parts:
+  #   - data logging, well defined and using type-safe data
+  #   - trace begin/end/instant states for monitoring execution and
+  #     checking execution time and performance
+  # For tracing specifically, due to performance constraints, several
+  # backends prefer to be the one and only tracing provider (e.g.
+  # pw_tracing uses tokenization to reduce string sizes and allow
+  # for fast tracing even when the communication channels are slow).
+  #
+  # The setting below controls the destination of the tracing macros
+  #
+  # Notable built-in targets:
+  #    "${chip_root}/src/tracing/none" disables the scopes macros
+  #    "${chip_root}/src/tracing/multiplexed" sends begin/end/instant to backends
+  #
+  # since tracing is very noisy, we generally expect it to be explicitly
+  # set up.
+  #
+  if (current_os == "linux" || current_os == "android") {
+    matter_trace_config = "${chip_root}/src/tracing/perfetto:perfetto_tracing"
+  } else if (chip_device_platform == "darwin") {
+    matter_trace_config = "${chip_root}/src/tracing/darwin:darwin_tracing"
+  } else {
+    matter_trace_config = "${chip_root}/src/tracing/none"
+  }
+}

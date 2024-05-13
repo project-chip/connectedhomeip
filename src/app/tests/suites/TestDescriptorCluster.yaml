@@ -30,13 +30,14 @@ tests:
 
     - label: "Read attribute Device list"
       command: "readAttribute"
-      attribute: "Device List"
+      attribute: "DeviceTypeList"
       response:
-          value: [{ type: 22, revision: 1 }]
+          value:
+              [{ DeviceType: 17, Revision: 1 }, { DeviceType: 22, Revision: 1 }]
 
     - label: "Read attribute Server list"
       command: "readAttribute"
-      attribute: "Server List"
+      attribute: "ServerList"
       response:
           value: [
                   0x0003, # Identify
@@ -50,6 +51,7 @@ tests:
                   0x002C, # Time Format Localization
                   0x002D, # Unit Localization
                   0x002E, # Power Source Configuration
+                  0x002F, # Power Source
                   0x0030, # General Commissioning
                   0x0031, # Network Commissioning
                   0x0032, # Diagnostic Logs
@@ -58,17 +60,19 @@ tests:
                   0x0035, # Thread Network Diagnostiscs
                   0x0036, # WiFi Network Diagnostics
                   0x0037, # Ethernet Network Diagnostics
+                  0x0038, # Time Synchronization
                   0x003C, # Administrator Commissioning
                   0x003E, # Operational Credentials
                   0x003F, # Group Key Management
                   0x0040, # Fixed Label
                   0x0041, # User Label
                   0x0405, # Relative Humidity Measurement (why on EP0?)
+                  0xFFF1FC06, # Fault Injection
               ]
 
     - label: "Read attribute Client list"
       command: "readAttribute"
-      attribute: "Client List"
+      attribute: "ClientList"
       response:
           value: [
                   0x0029, # OTA Software Update Provider
@@ -76,6 +80,32 @@ tests:
 
     - label: "Read attribute Parts list"
       command: "readAttribute"
-      attribute: "Parts List"
+      attribute: "PartsList"
       response:
           value: [1, 2]
+
+    - label: "Read attribute ClusterRevision"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 2
+          constraints:
+              type: int16u
+
+    - label: "Read attribute Tag list"
+      command: "readAttribute"
+      attribute: "TagList"
+      response:
+          value:
+              [
+                  { MfgCode: null, NamespaceID: 7, Tag: 0 },
+                  { MfgCode: null, NamespaceID: 8, Tag: 3 },
+              ]
+
+    - label: "Read feature map Attribute"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]

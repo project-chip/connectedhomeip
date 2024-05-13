@@ -28,8 +28,37 @@ The tool uses the generic CHIP Device Controller library, available in the
 ## Building
 
 Please follow the instructions
-[here](./python_chip_controller_building.md#building) to build the Python
-virtual environment.
+[here](./python_chip_controller_building.md#building-and-installing) to build
+the Python virtual environment.
+
+### Building for `arm64` e.g. for Raspberry Pi
+
+Matter code relies on code generation for cluster-specific data types and
+callbacks. A subset of code generation is done at compile time by `zap-cli`. ZAP
+is generally installed as a third-party tool via CIPD during the build
+environment bootstrap. However, zap packages are currently NOT available for
+`arm64` (like when compiling on Raspberry PI.). In this case, you have 2
+choices.
+
+1. You could check out zap from source as described in
+   [Code Generation - Installing zap and environment variables](https://github.com/project-chip/connectedhomeip/blob/master/docs/code_generation.md#Installing-zap-and-environment-variables)
+   and proceed with the
+   [instructions](./python_chip_controller_building.md#building-and-installing)
+   to build the Python virtual environment.
+
+2. When compile-time code generation is not desirable, then pre-generated output
+   code can be used. To understand about code generation and pre-generating
+   matter code see.
+   [Code generation - Pre-generation](https://github.com/project-chip/connectedhomeip/blob/master/docs/code_generation.md#Pre-generation).
+   To build and install the Python CHIP controller with pre-generated files use
+   the -z argument that points to the directory of pre-generated code:
+
+    ```
+    scripts/build_python.sh -m platform -i out/python_env -z "/some/pregen/dir"
+    ```
+
+    > Note: To get more details about available build configurations, run the
+    > following command: `scripts/build_python.sh --help`
 
 ## Launching the REPL
 
@@ -149,20 +178,18 @@ cloud-hosted playground.
 The following icon is present at the top of applicable guides that can be
 launched into the playground:
 
-<a href="https://www.w3schools.com">
-<img src="https://i.ibb.co/hR3yWsC/launch-playground.png" alt="drawing" width="130"/>
-</a>
+![Launch playground icon](https://i.ibb.co/hR3yWsC/launch-playground.png")
 <br></br>
 
 ## Guides
 
-[REPL Basics](https://deepnote.com/viewer/github/project-chip/connectedhomeip/blob/master/docs/guides/repl/Matter%20-%20REPL%20Intro.ipynb)
+[REPL Basics](https://deepnote.com/viewer/github/project-chip/connectedhomeip/blob/master/docs/guides/repl/Matter_REPL_Intro.ipynb)
 
-[Using the IM](https://deepnote.com/viewer/github/project-chip/connectedhomeip/blob/master/docs/guides/repl/Matter%20-%20Basic%20Interactions.ipynb)
+[Using the IM](https://deepnote.com/viewer/github/project-chip/connectedhomeip/blob/master/docs/guides/repl/Matter_Basic_Interactions.ipynb)
 
-[Multi Fabric Commissioning](https://deepnote.com/viewer/github/project-chip/connectedhomeip/blob/master/docs/guides/repl/Matter%20-%20Multi%20Fabric%20Commissioning.ipynb)
+[Multi Fabric Commissioning](https://deepnote.com/viewer/github/project-chip/connectedhomeip/blob/master/docs/guides/repl/Matter_Multi_Fabric_Commissioning.ipynb)
 
-[Access Control](https://deepnote.com/viewer/github/project-chip/connectedhomeip/blob/master/docs/guides/repl/Matter%20-%20Access%20Control.ipynb)
+[Access Control](https://deepnote.com/viewer/github/project-chip/connectedhomeip/blob/master/docs/guides/repl/Matter_Access_Control.ipynb)
 
 ## Testing
 
@@ -187,11 +214,11 @@ mobile-device-test.py provides the following options for running the tests:
   --enable-test TEXT              The tests to be executed. By default, all
                                   tests will be executed, use this option to
                                   run a specific set of tests. Use --print-
-                                  test-list for a list of appliable tests.
+                                  test-list for a list of applicable tests.
 
   --disable-test TEXT             The tests to be excluded from the set of
                                   enabled tests. Use --print-test-list for a
-                                  list of appliable tests.
+                                  list of applicable tests.
 
   --log-level [ERROR|WARN|INFO|DEBUG]
                                   The log level of the test.
@@ -214,7 +241,7 @@ Some tests provides the option to exclude them. For example, you can use
 `--disable-test ClusterObjectTests.TestTimedRequestTimeout` to exclude the
 "TestTimedRequestTimeout" test case.
 
-It is recommanded to use the test wrapper to run mobile-device-test.py, for
+It is recommended to use the test wrapper to run mobile-device-test.py, for
 example, you can run:
 
 ```

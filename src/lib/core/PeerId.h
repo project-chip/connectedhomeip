@@ -17,21 +17,10 @@
 
 #pragma once
 
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/NodeId.h>
 
 namespace chip {
-
-using CompressedFabricId = uint64_t;
-using FabricId           = uint64_t;
-
-constexpr CompressedFabricId kUndefinedCompressedFabricId = 0ULL;
-
-constexpr FabricId kUndefinedFabricId = 0ULL;
-
-constexpr bool IsValidFabricId(FabricId aFabricId)
-{
-    return aFabricId != kUndefinedFabricId;
-}
 
 /* NOTE: PeerId should be only used by mDNS, because it contains a compressed fabric id which is not unique, and the compressed
  * fabric id is only used for mDNS announcement. ScopedNodeId which contains a node id and fabirc index, should be used in prefer of

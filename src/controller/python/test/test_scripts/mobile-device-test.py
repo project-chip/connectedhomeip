@@ -18,20 +18,20 @@
 #
 
 # Commissioning test.
-from logging import disable
+
+import asyncio
 import os
-import sys
+
+import base
+import chip.logging
 import click
 import coloredlogs
-import chip.logging
-import logging
-from base import TestFail, TestTimeout, BaseTestHelper, FailIfNot, logger, TestIsEnabled, SetTestSet
-import base
-from cluster_objects import NODE_ID, ClusterObjectTests
+from base import BaseTestHelper, FailIfNot, SetTestSet, TestFail, TestTimeout, logger
+from chip.tracing import TracingContext
+from cluster_objects import ClusterObjectTests
 from network_commissioning import NetworkCommissioningTests
-import asyncio
 
-# The thread network dataset tlv for testing, splited into T-L-V.
+# The thread network dataset tlv for testing, splitted into T-L-V.
 
 TEST_THREAD_NETWORK_DATASET_TLV = "0e080000000000010000" + \
     "000300000c" + \
@@ -59,32 +59,42 @@ ALL_TESTS = ['network_commissioning', 'datamodel']
 
 def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup_pin: int, address_override: str, device_nodeid: int):
     logger.info("Testing discovery")
-    address = test.TestDiscovery(discriminator=discriminator)
-    FailIfNot(address, "Failed to discover any devices.")
+    device = test.TestDiscovery(discriminator=discriminator)
+    FailIfNot(device, "Failed to discover any devices.")
+
+    address = device.addresses[0]
 
     # FailIfNot(test.SetNetworkCommissioningParameters(dataset=TEST_THREAD_NETWORK_DATASET_TLV),
     #           "Failed to finish network commissioning")
 
     if address_override:
         address = address_override
-    else:
-        address = address.decode("utf-8")
 
-    logger.info("Testing key exchange")
-    FailIfNot(test.TestKeyExchange(ip=address,
-                                   setuppin=setup_pin,
-                                   nodeid=device_nodeid),
+    logger.info("Testing commissioning")
+    FailIfNot(test.TestCommissioning(ip=address,
+                                     setuppin=setup_pin,
+                                     nodeid=device_nodeid),
               "Failed to finish key exchange")
 
-    asyncio.run(test.TestMultiFabric(ip=address,
-                                     setuppin=20202021,
-                                     nodeid=1))
-    #
-    # The server will crash if we are aborting / closing it too fast.
-    # Issue: #15987
-    # logger.info("Testing closing sessions")
-    # FailIfNot(test.TestCloseSession(nodeid=device_nodeid),
-    #           "Failed to close sessions")
+    logger.info("Testing multi-controller setup on the same fabric")
+    FailIfNot(asyncio.run(test.TestMultiControllerFabric(nodeid=device_nodeid)), "Failed the multi-controller test")
+
+    logger.info("Testing CATs used on controllers")
+    FailIfNot(asyncio.run(test.TestControllerCATValues(nodeid=device_nodeid)), "Failed the controller CAT test")
+
+    ok = asyncio.run(test.TestMultiFabric(ip=address,
+                                          setuppin=20202021,
+                                          nodeid=1))
+    FailIfNot(ok, "Failed to commission multi-fabric")
+
+    FailIfNot(asyncio.run(test.TestAddUpdateRemoveFabric(nodeid=device_nodeid)),
+              "Failed AddUpdateRemoveFabric test")
+
+    logger.info("Testing CASE Eviction")
+    FailIfNot(asyncio.run(test.TestCaseEviction(device_nodeid)), "Failed TestCaseEviction")
+
+    logger.info("Testing closing sessions")
+    FailIfNot(test.TestCloseSession(nodeid=device_nodeid), "Failed to close sessions")
 
 
 @base.test_case
@@ -119,9 +129,8 @@ def TestDatamodel(test: BaseTestHelper, device_nodeid: int):
               "Failed to test Read Basic Attributes")
 
     logger.info("Testing attribute writing")
-    FailIfNot(test.TestWriteBasicAttributes(nodeid=device_nodeid,
-                                            endpoint=ENDPOINT_ID,
-                                            group=GROUP_ID),
+    FailIfNot(asyncio.run(test.TestWriteBasicAttributes(nodeid=device_nodeid,
+                                                        endpoint=ENDPOINT_ID)),
               "Failed to test Write Basic Attributes")
 
     logger.info("Testing attribute reading basic again")
@@ -131,12 +140,16 @@ def TestDatamodel(test: BaseTestHelper, device_nodeid: int):
               "Failed to test Read Basic Attributes")
 
     logger.info("Testing subscription")
-    FailIfNot(test.TestSubscription(nodeid=device_nodeid, endpoint=LIGHTING_ENDPOINT_ID),
+    FailIfNot(asyncio.run(test.TestSubscription(nodeid=device_nodeid, endpoint=LIGHTING_ENDPOINT_ID)),
               "Failed to subscribe attributes.")
 
     logger.info("Testing another subscription that kills previous subscriptions")
-    FailIfNot(test.TestSubscription(nodeid=device_nodeid, endpoint=LIGHTING_ENDPOINT_ID),
+    FailIfNot(asyncio.run(test.TestSubscription(nodeid=device_nodeid, endpoint=LIGHTING_ENDPOINT_ID)),
               "Failed to subscribe attributes.")
+
+    logger.info("Testing re-subscription")
+    FailIfNot(asyncio.run(test.TestResubscription(nodeid=device_nodeid)),
+              "Failed to validated re-subscription")
 
     logger.info("Testing on off cluster over resolved connection")
     FailIfNot(test.TestOnOffCluster(nodeid=device_nodeid,
@@ -182,19 +195,67 @@ def do_tests(controller_nodeid, device_nodeid, address, timeout, discriminator, 
 
 
 @click.command()
-@click.option("--controller-nodeid", default=TEST_CONTROLLER_NODE_ID, type=int, help="NodeId of the controller.")
-@click.option("--device-nodeid", default=TEST_DEVICE_NODE_ID, type=int, help="NodeId of the device.")
-@click.option("--address", "-a", default='', type=str, help="Skip commissionee discovery, commission the device with the IP directly.")
-@click.option("--timeout", "-t", default=240, type=int, help="The program will return with timeout after specified seconds.")
-@click.option("--discriminator", default=TEST_DISCRIMINATOR, type=int, help="Discriminator of the device.")
-@click.option("--setup-pin", default=TEST_SETUPPIN, type=int, help="Setup pincode of the device.")
-@click.option('--enable-test', default=['all'], type=str, multiple=True, help='The tests to be executed. By default, all tests will be executed, use this option to run a specific set of tests. Use --print-test-list for a list of appliable tests.')
-@click.option('--disable-test', default=[], type=str, multiple=True, help='The tests to be excluded from the set of enabled tests. Use --print-test-list for a list of appliable tests.')
-@click.option('--log-level', default='WARN', type=click.Choice(['ERROR', 'WARN', 'INFO', 'DEBUG']), help="The log level of the test.")
-@click.option('--log-format', default=None, type=str, help="Override logging format")
-@click.option('--print-test-list', is_flag=True, help="Print a list of test cases and test sets that can be toggled via --enable-test and --disable-test, then exit")
-@click.option('--paa-trust-store-path', default='', type=str, help="Path that contains valid and trusted PAA Root Certificates.")
-def run(controller_nodeid, device_nodeid, address, timeout, discriminator, setup_pin, enable_test, disable_test, log_level, log_format, print_test_list, paa_trust_store_path):
+@click.option("--controller-nodeid",
+              default=TEST_CONTROLLER_NODE_ID,
+              type=int,
+              help="NodeId of the controller.")
+@click.option("--device-nodeid",
+              default=TEST_DEVICE_NODE_ID,
+              type=int,
+              help="NodeId of the device.")
+@click.option("--address", "-a",
+              default='',
+              type=str,
+              help="Skip commissionee discovery, commission the device with the IP directly.")
+@click.option("--timeout", "-t",
+              default=240,
+              type=int,
+              help="The program will return with timeout after specified seconds.")
+@click.option("--discriminator",
+              default=TEST_DISCRIMINATOR,
+              type=int,
+              help="Discriminator of the device.")
+@click.option("--setup-pin",
+              default=TEST_SETUPPIN,
+              type=int,
+              help="Setup pincode of the device.")
+@click.option('--enable-test',
+              default=['all'],
+              type=str,
+              multiple=True,
+              help='The tests to be executed. By default, all tests will be executed, use this option to run a '
+              'specific set of tests. Use --print-test-list for a list of appliable tests.')
+@click.option('--disable-test',
+              default=[],
+              type=str,
+              multiple=True,
+              help='The tests to be excluded from the set of enabled tests. Use --print-test-list for a list of '
+              'appliable tests.')
+@click.option('--log-level',
+              default='WARN',
+              type=click.Choice(['ERROR', 'WARN', 'INFO', 'DEBUG']),
+              help="The log level of the test.")
+@click.option('--log-format',
+              default=None,
+              type=str,
+              help="Override logging format")
+@click.option('--print-test-list',
+              is_flag=True,
+              help="Print a list of test cases and test sets that can be toggled via --enable-test and --disable-test, then exit")
+@click.option('--paa-trust-store-path',
+              default='',
+              type=str,
+              help="Path that contains valid and trusted PAA Root Certificates.")
+@click.option('--trace-to',
+              multiple=True,
+              default=[],
+              help="Trace location")
+@click.option('--app-pid',
+              type=int,
+              default=0,
+              help="The PID of the app against which the test is going to run")
+def run(controller_nodeid, device_nodeid, address, timeout, discriminator, setup_pin, enable_test, disable_test, log_level,
+        log_format, print_test_list, paa_trust_store_path, trace_to, app_pid):
     coloredlogs.install(level=log_level, fmt=log_format, logger=logger)
 
     if print_test_list:
@@ -214,8 +275,12 @@ def run(controller_nodeid, device_nodeid, address, timeout, discriminator, setup
     logger.info(f"\tEnabled Tests:     {enable_test}")
     logger.info(f"\tDisabled Tests:    {disable_test}")
     SetTestSet(enable_test, disable_test)
-    do_tests(controller_nodeid, device_nodeid, address, timeout,
-             discriminator, setup_pin, paa_trust_store_path)
+    with TracingContext() as tracing_ctx:
+        for destination in trace_to:
+            tracing_ctx.StartFromString(destination)
+
+        do_tests(controller_nodeid, device_nodeid, address, timeout,
+                 discriminator, setup_pin, paa_trust_store_path)
 
 
 if __name__ == "__main__":

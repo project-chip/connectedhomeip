@@ -8,10 +8,13 @@ target_compile_options(suppress_zephyr_warnings INTERFACE
     -Wno-undef
 )
 
-pw_add_module_library(pw_sys_io.nrfconnect
+pw_add_library(pw_sys_io.nrfconnect STATIC
     SOURCES
       sys_io_nrfconnect.cc
+    PUBLIC_INCLUDES
+      public
     PRIVATE_DEPS
       pw_sys_io
       suppress_zephyr_warnings
+      pw_sys_io.default_putget_bytes
 )

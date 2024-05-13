@@ -26,28 +26,33 @@
 
 #include "CHIPDeviceManager.h"
 #include <app/util/basic-types.h>
+#include <core/ErrorStr.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <platform/Ameba/FactoryDataProvider.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
 
 #include "Globals.h"
 #include "LEDWidget.h"
 
-#include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-id.h>
-#include <app-common/zap-generated/command-id.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
 
 using namespace ::chip;
+using namespace ::chip::Credentials;
 
 namespace chip {
 
 namespace DeviceManager {
 
 using namespace ::chip::DeviceLayer;
+
+chip::DeviceLayer::FactoryDataProvider mFactoryDataProvider;
 
 void CHIPDeviceManager::CommonDeviceEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 {
@@ -69,10 +74,19 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     err = PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
-    if (CONFIG_NETWORK_LAYER_BLE)
+    err = mFactoryDataProvider.Init();
+    if (err != CHIP_NO_ERROR)
     {
-        ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+        ChipLogError(DeviceLayer, "Error initializing FactoryData!");
+        ChipLogError(DeviceLayer, "Check if you have flashed it correctly!");
     }
+    SetCommissionableDataProvider(&mFactoryDataProvider);
+    SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
+    SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
+
+#if CONFIG_NETWORK_LAYER_BLE
+    ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+#endif
 
     PlatformMgr().AddEventHandler(CHIPDeviceManager::CommonDeviceEventHandler, reinterpret_cast<intptr_t>(cb));
 
@@ -86,8 +100,8 @@ exit:
 } // namespace DeviceManager
 } // namespace chip
 
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type,
-                                       uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
 {
     chip::DeviceManager::CHIPDeviceManagerCallbacks * cb =
         chip::DeviceManager::CHIPDeviceManager::GetInstance().GetCHIPDeviceManagerCallbacks();
@@ -96,9 +110,9 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     ClusterId clusterId     = attributePath.mClusterId;
     AttributeId attributeId = attributePath.mAttributeId;
 
-    if (clusterId == ZCL_ON_OFF_CLUSTER_ID)
+    if (clusterId == app::Clusters::OnOff::Id)
     {
-        if (attributeId != ZCL_ON_OFF_ATTRIBUTE_ID)
+        if (attributeId != app::Clusters::OnOff::Attributes::OnOff::Id)
         {
             ChipLogProgress(Zcl, "Unknown attribute ID: %" PRIx32, attributeId);
             return;
@@ -106,9 +120,9 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
         statusLED1.Set(*value);
     }
-    else if (clusterId == ZCL_LEVEL_CONTROL_CLUSTER_ID)
+    else if (clusterId == app::Clusters::LevelControl::Id)
     {
-        if (attributeId != ZCL_CURRENT_LEVEL_ATTRIBUTE_ID)
+        if (attributeId != app::Clusters::LevelControl::Attributes::CurrentLevel::Id)
         {
             ChipLogProgress(Zcl, "Unknown attribute ID: %" PRIx32, attributeId);
             return;
@@ -122,40 +136,39 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
             ChipLogError(Zcl, "wrong length for level: %d\n", size);
         }
     }
-    else if (clusterId == ZCL_COLOR_CONTROL_CLUSTER_ID)
+    else if (clusterId == app::Clusters::ColorControl::Id)
     {
+        using namespace app::Clusters::ColorControl::Attributes;
+
         uint8_t hue, saturation;
 
-        if ((attributeId != ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID) &&
-            (attributeId != ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID))
+        if ((attributeId != CurrentHue::Id) && (attributeId != CurrentSaturation::Id))
         {
             ChipLogProgress(Zcl, "Unknown attribute ID: %" PRIx32, attributeId);
             return;
         }
 
-        if (attributeId == ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID)
+        if (attributeId == CurrentHue::Id)
         {
             hue = *value;
-            emberAfReadServerAttribute(endpointId, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
-                                       &saturation, sizeof(uint8_t));
+            CurrentSaturation::Get(endpointId, &saturation);
         }
-        if (attributeId == ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID)
+        if (attributeId == CurrentSaturation::Id)
         {
             saturation = *value;
-            emberAfReadServerAttribute(endpointId, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID, &hue,
-                                       sizeof(uint8_t));
+            CurrentHue::Get(endpointId, &hue);
         }
         ChipLogProgress(Zcl, "New hue: %d, New saturation: %d ", hue, saturation);
     }
-    else if (clusterId == ZCL_IDENTIFY_CLUSTER_ID)
+    else if (clusterId == app::Clusters::Identify::Id)
     {
-        if (attributeId == ZCL_IDENTIFY_TIME_ATTRIBUTE_ID)
+        if (attributeId == app::Clusters::Identify::Attributes::IdentifyTime::Id)
         {
             if (cb != nullptr)
             {
-                cb->PostAttributeChangeCallback(endpointId, clusterId, attributeId, mask, type, size, value);
+                cb->PostAttributeChangeCallback(endpointId, clusterId, attributeId, type, size, value);
             }
-            ChipLogProgress(Zcl, "ZCL_IDENTIFY_TIME_ATTRIBUTE_ID value: %u ", *value);
+            ChipLogProgress(Zcl, "IdentifyTime value: %u ", *value);
         }
     }
     else

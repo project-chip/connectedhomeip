@@ -32,7 +32,7 @@ using CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE = const char *;
 
 #define CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY "life-count"
 
-#define CHIP_CONFIG_ERROR_FORMAT_AS_STRING 0
+#define CHIP_CONFIG_ERROR_FORMAT_AS_STRING 1
 #define CHIP_CONFIG_ERROR_SOURCE 1
 
 // ==================== Security Adaptations ====================

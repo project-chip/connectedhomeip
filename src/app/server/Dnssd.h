@@ -17,6 +17,11 @@
 
 #pragma once
 
+#include <app/icd/server/ICDServerConfig.h>
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/server/ICDManager.h> // nogncheck
+#endif
+#include <app/icd/server/ICDStateObserver.h>
 #include <app/server/CommissioningModeProvider.h>
 #include <credentials/FabricTable.h>
 #include <lib/core/CHIPError.h>
@@ -29,7 +34,7 @@
 namespace chip {
 namespace app {
 
-class DLL_EXPORT DnssdServer
+class DLL_EXPORT DnssdServer : public ICDStateObserver
 {
 public:
     static constexpr System::Clock::Timestamp kTimeoutCleared = System::Clock::kZero;
@@ -59,15 +64,10 @@ public:
     /// Gets the interface id used for advertising
     Inet::InterfaceId GetInterfaceId() { return mInterfaceId; }
 
-    /// Sets the factory-new state commissionable node discovery timeout
-    void SetDiscoveryTimeoutSecs(int16_t secs) { mDiscoveryTimeoutSecs = secs; }
-
-    /// Gets the factory-new state commissionable node discovery timeout
-    int16_t GetDiscoveryTimeoutSecs() const { return mDiscoveryTimeoutSecs; }
-
     //
-    // Override the referenced fabric table from the default that is present
-    // in Server::GetInstance().GetFabricTable() to something else.
+    // Set the fabric table the DnssdServer should use for operational
+    // advertising.  This must be set before StartServer() is called for the
+    // first time.
     //
     void SetFabricTable(FabricTable * table)
     {
@@ -78,13 +78,6 @@ public:
     // Set the commissioning mode provider to use.  Null provider will mean we
     // assume the commissioning mode is kDisabled.
     void SetCommissioningModeProvider(CommissioningModeProvider * provider) { mCommissioningModeProvider = provider; }
-
-    /// Callback from Discovery Expiration timer
-    /// Checks if discovery has expired and if so,
-    /// kicks off extend discovery (when enabled)
-    /// otherwise, stops commissionable node advertising
-    /// Discovery Expiration refers here to commissionable node advertising when in commissioning mode
-    void OnDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     /// Sets the extended discovery timeout. Value will be persisted across reboots
@@ -97,6 +90,12 @@ public:
     void OnExtendedDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    template <class AdvertisingParams>
+    void AddICDKeyToAdvertisement(AdvertisingParams & advParams);
+
+    void SetICDManager(ICDManager * manager) { mICDManager = manager; };
+#endif
     /// Start operational advertising
     CHIP_ERROR AdvertiseOperational();
 
@@ -106,6 +105,10 @@ public:
 
     /// (Re-)starts the Dnssd server, using the provided commissioning mode.
     void StartServer(Dnssd::CommissioningMode mode);
+
+    //// Stop the Dnssd server.  After this call, SetFabricTable must be called
+    //// again before calling StartServer().
+    void StopServer();
 
     CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rotatingDeviceIdHexBufferSize);
 
@@ -123,6 +126,26 @@ public:
      */
     CHIP_ERROR SetEphemeralDiscriminator(Optional<uint16_t> discriminator);
 
+    /**
+     * @brief When the ICD changes operating mode, the dnssd server needs to restart its DNS-SD advertising to update the TXT keys.
+     */
+    void OnICDModeChange() override;
+
+    /**
+     * @brief dnssd server has no action to do on this ICD event. Do nothing.
+     */
+    void OnEnterActiveMode() override{};
+
+    /**
+     * @brief dnssd server has no action to do on this ICD event. Do nothing.
+     */
+    void OnTransitionToIdle() override{};
+
+    /**
+     * @brief dnssd server has no action to do on this ICD event. Do nothing.
+     */
+    void OnEnterIdleMode() override{};
+
 private:
     /// Overloaded utility method for commissioner and commissionable advertisement
     /// This method is used for both commissioner discovery and commissionable node discovery since
@@ -137,24 +160,23 @@ private:
     /// Set MDNS commissionable node advertisement
     CHIP_ERROR AdvertiseCommissionableNode(chip::Dnssd::CommissioningMode mode);
 
+    // Our randomly-generated fallback "MAC address", in case we don't have a real one.
+    uint8_t mFallbackMAC[chip::DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength] = { 0 };
+
+    void GetPrimaryOrFallbackMACAddress(chip::MutableByteSpan mac);
+
     //
     // Check if we have any valid operational credentials present in the fabric table and return true
     // if we do.
     //
     bool HaveOperationalCredentials();
 
-    Time::TimeSource<Time::Source::kSystem> mTimeSource;
-
-    void ClearTimeouts()
-    {
-        mDiscoveryExpiration = kTimeoutCleared;
-#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-        mExtendedDiscoveryExpiration = kTimeoutCleared;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-    }
-
     FabricTable * mFabricTable                             = nullptr;
     CommissioningModeProvider * mCommissioningModeProvider = nullptr;
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    ICDManager * mICDManager = nullptr;
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     uint16_t mSecuredPort          = CHIP_PORT;
     uint16_t mUnsecuredPort        = CHIP_UDC_PORT;
@@ -163,22 +185,26 @@ private:
     // Ephemeral discriminator to use instead of the default if set
     Optional<uint16_t> mEphemeralDiscriminator;
 
-    /// schedule next discovery expiration
-    CHIP_ERROR ScheduleDiscoveryExpiration();
-    int16_t mDiscoveryTimeoutSecs                 = CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS;
-    System::Clock::Timestamp mDiscoveryExpiration = kTimeoutCleared;
-
-    /// return true if expirationMs is valid (not cleared and not in the future)
-    bool OnExpiration(System::Clock::Timestamp expiration);
-
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-    /// get the current extended discovery timeout (from persistent storage)
+    Time::TimeSource<Time::Source::kSystem> mTimeSource;
+
+    /// Get the current extended discovery timeout (set by
+    /// SetExtendedDiscoveryTimeoutSecs, or the configuration default if not set).
     int32_t GetExtendedDiscoveryTimeoutSecs();
 
     /// schedule next extended discovery expiration
     CHIP_ERROR ScheduleExtendedDiscoveryExpiration();
 
+    // mExtendedDiscoveryExpiration, if not set to kTimeoutCleared, is used to
+    // indicate that we should be advertising extended discovery right now.
     System::Clock::Timestamp mExtendedDiscoveryExpiration = kTimeoutCleared;
+    Optional<int32_t> mExtendedDiscoveryTimeoutSecs       = NullOptional;
+
+    // The commissioning mode we are advertising right now.  Used to detect when
+    // we need to start extended discovery advertisement.  We start this off as
+    // kEnabledBasic, so that when we first start up we do extended discovery
+    // advertisement if we don't enter commissioning mode.
+    Dnssd::CommissioningMode mCurrentCommissioningMode = Dnssd::CommissioningMode::kEnabledBasic;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
 };
 

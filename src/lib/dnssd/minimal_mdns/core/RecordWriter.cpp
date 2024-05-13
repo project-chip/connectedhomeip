@@ -41,7 +41,7 @@ RecordWriter & RecordWriter::WriteQName(const FullQName & qname)
     size_t qNameWriteStart = mOutput->WritePos();
     bool isFullyCompressed = true;
 
-    for (uint16_t i = 0; i < qname.nameCount; i++)
+    for (size_t i = 0; i < qname.nameCount; i++)
     {
 
         // find out if the record part remaining already is located somewhere
@@ -50,12 +50,12 @@ RecordWriter & RecordWriter::WriteQName(const FullQName & qname)
         remaining.nameCount = qname.nameCount - i;
 
         // Try to find a valid offset
-        chip::Optional<uint16_t> offset = FindPreviousName(remaining);
+        std::optional<uint16_t> offset = FindPreviousName(remaining);
 
-        if (offset.HasValue())
+        if (offset.has_value())
         {
             // Pointer to offset: set the highest 2 bits
-            mOutput->Put16(offset.Value() | 0xC000);
+            mOutput->Put16(*offset | 0xC000);
 
             if (mOutput->Fit() && !isFullyCompressed)
             {
@@ -85,13 +85,13 @@ RecordWriter & RecordWriter::WriteQName(const SerializedQNameIterator & qname)
     SerializedQNameIterator copy = qname;
     while (true)
     {
-        chip::Optional<uint16_t> offset = FindPreviousName(copy);
+        std::optional<uint16_t> offset = FindPreviousName(copy);
 
-        if (offset.HasValue())
+        if (offset.has_value())
         {
             // Pointer to offset: set the highest 2 bits
             // We guarantee that offsets saved are <= kMaxReuseOffset
-            mOutput->Put16(offset.Value() | 0xC000);
+            mOutput->Put16(*offset | 0xC000);
 
             if (mOutput->Fit() && !isFullyCompressed)
             {
@@ -131,11 +131,11 @@ void RecordWriter::RememberWrittenQnameOffset(size_t offset)
         return;
     }
 
-    for (size_t i = 0; i < kMaxCachedReferences; i++)
+    for (unsigned short & previousName : mPreviousQNames)
     {
-        if (mPreviousQNames[i] == kInvalidOffset)
+        if (previousName == kInvalidOffset)
         {
-            mPreviousQNames[i] = offset;
+            previousName = static_cast<unsigned short>(offset);
             return;
         }
     }

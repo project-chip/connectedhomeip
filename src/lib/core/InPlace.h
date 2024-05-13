@@ -14,13 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- *    @file
- *      This file defines the chip::Optional class to handle values which may
- *      or may not be present.
- *
- */
 #pragma once
 
 namespace chip {
@@ -31,7 +24,7 @@ struct InPlaceType
 {
     explicit InPlaceType() = default;
 };
-constexpr InPlaceType InPlace{};
+inline constexpr InPlaceType InPlace{};
 
 template <class T>
 struct InPlaceTemplateType
@@ -39,6 +32,6 @@ struct InPlaceTemplateType
     explicit InPlaceTemplateType() = default;
 };
 template <class T>
-constexpr InPlaceTemplateType<T> InPlaceTemplate{};
+inline constexpr InPlaceTemplateType<T> InPlaceTemplate{};
 
 } // namespace chip

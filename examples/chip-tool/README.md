@@ -5,7 +5,7 @@ An example application that uses Matter to send messages to a Matter server.
 ---
 
 -   [Building the Example Application](#building-the-example-application)
--   [Using the Client to Request an Echo](#using-the-client-to-request-an-echo)
+-   [Using the Client to Commission a Device](#using-the-client-to-commission-a-device)
 
 ---
 
@@ -67,40 +67,52 @@ remote device, as well as the network credentials to use.
 The command below uses the default values hard-coded into the debug versions of
 the ESP32 all-clusters-app to commission it onto a Wi-Fi network:
 
-    $ chip-tool pairing ble-wifi ${NODE_ID_TO_ASSIGN} ${SSID} ${PASSWORD} 20202021 3840
+```
+chip-tool pairing ble-wifi ${NODE_ID_TO_ASSIGN} ${SSID} ${PASSWORD} 20202021 3840
+```
 
 where:
 
--   \${NODE_ID_TO_ASSIGN} (which must be a decimal number or a 0x-prefixed hex
+-   \${NODE_ID_TO_ASSIGN} (which must be a decimal number or a `0x`-prefixed hex
     number) is the node id to assign to the node being commissioned.
--   \${SSID} is the Wi-Fi SSID either as a string, or in the form hex:XXXXXXXX
+-   \${SSID} is the Wi-Fi SSID either as a string, or in the form `hex:XXXXXXXX`
     where the bytes of the SSID are encoded as two-digit hex numbers.
 -   \${PASSWORD} is the Wi-Fi password, again either as a string or as hex data
 
 For example:
 
-    $ chip-tool pairing ble-wifi 0x11 xyz secret 20202021 3840
+```
+chip-tool pairing ble-wifi 0x11 xyz secret 20202021 3840
+```
 
 or equivalently:
 
-    $ chip-tool pairing ble-wifi 17 hex:787980 hex:736563726574 20202021 3840
+```
+chip-tool pairing ble-wifi 17 hex:787980 hex:736563726574 20202021 3840
+```
 
 #### Pair a device over IP
 
 The command below will discover devices and try to pair with the first one it
 discovers using the provided setup code.
 
-    $ chip-tool pairing onnetwork ${NODE_ID_TO_ASSIGN} 20202021
+```
+chip-tool pairing onnetwork ${NODE_ID_TO_ASSIGN} 20202021
+```
 
 The command below will discover devices with long discriminator 3840 and try to
 pair with the first one it discovers using the provided setup code.
 
-    $ chip-tool pairing onnetwork-long ${NODE_ID_TO_ASSIGN} 20202021 3840
+```
+chip-tool pairing onnetwork-long ${NODE_ID_TO_ASSIGN} 20202021 3840
+```
 
 The command below will discover devices based on the given QR code (which
 devices log when they start up) and try to pair with the first one it discovers.
 
-    $ chip-tool pairing qrcode ${NODE_ID_TO_ASSIGN} MT:#######
+```
+chip-tool pairing code ${NODE_ID_TO_ASSIGN} MT:#######
+```
 
 In all these cases, the device will be assigned node id `${NODE_ID_TO_ASSIGN}`
 (which must be a decimal number or a 0x-prefixed hex number).
@@ -117,11 +129,15 @@ Attestation Verification. It will also discover devices with long discriminator
 3840 and try to pair with the first one it discovers using the provided setup
 code.
 
-    $ chip-tool pairing onnetwork-long ${NODE_ID_TO_ASSIGN} 20202021 3840 --paa-trust-store-path path/to/PAAs
+```
+chip-tool pairing onnetwork-long ${NODE_ID_TO_ASSIGN} 20202021 3840 --paa-trust-store-path path/to/PAAs
+```
 
 ### Forget the currently-commissioned device
 
-    $ chip-tool pairing unpair
+```
+chip-tool pairing unpair
+```
 
 ## Using the Client to Send Matter Commands
 
@@ -130,7 +146,9 @@ the target cluster name, the target command name as well as an endpoint id.
 
 The endpoint id must be between 1 and 240.
 
-    $ chip-tool onoff on 1
+```
+chip-tool onoff on 1
+```
 
 The client will send a single command packet and then exit.
 
@@ -138,27 +156,30 @@ The client will send a single command packet and then exit.
 
 1. Commission and pair device with nodeId 1234
 
-2. Add Group to device
+2. Add group Keyset to device
 
-    ```
-    $ chip-tool groups add-group 0x4141 Light 1234 1
-    ```
+```
+chip-tool groupkeymanagement key-set-write GroupKeySet node-id endpoint-id
+chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 42, \
+    "groupKeySecurityPolicy": 0, "epochKey0": \
+    "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1": \
+    "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2": \
+    "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }' 1234 0
+```
 
-3. Add group Keyset to device
+3. Bind Key to group
 
-    ```
-    $ chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 42,
-    "groupKeySecurityPolicy": 0, "epochKey0":
-    "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1":
-    "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":
-    "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002, }' 1234 0
-    ```
+```
+chip-tool groupkeymanagement write group-key-map attr-value node-id endpoint-id
+chip-tool groupkeymanagement write group-key-map '[{"groupId": 16705, "groupKeySetID": 42}]' 1234 0
+```
 
-4. Bind Key to group
-    ```
-    $ chip-tool groupkeymanagement write group-key-map
-    '[{"groupId": 16705, "groupKeySetID": 42, "fabricIndex": 0}]' 1234 0
-    ```
+4. Add Group to device
+
+```
+chip-tool groups add-group GroupId GroupName node-id endpoint-id
+chip-tool groups add-group 0x4141 Light 1234 1
+```
 
 ## Configuring the client for Group Commands
 
@@ -167,35 +188,50 @@ must be configured appropriately.
 
 To configure the client please use the groupsettings option
 
-    $ chip-tool groupsettings
+```
+chip-tool groupsettings
+```
 
 A group with a valid encryption key needs to be set. The groupid and the
 encryption key must match the one configured on the end device.
 
 To add a group
 
-    $ chip-tool groupsettings add-group TestName 0x1010
+```
+chip-tool groupsettings add-group groupName groupId
+chip-tool groupsettings add-group TestName 0x4141
+```
 
 To add a keyset
 
-    $ chip-tool groupsettings add-keyset 0xAAAA 0 0x000000000021dfe0 hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf
+```
+chip-tool groupsettings add-keysets keysetId keyPolicy validityTime EpochKey
+chip-tool groupsettings add-keysets 0xAAAA 0 0x000000000021dfe0 hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf
+```
 
 Take note that the epoch key must be in hex form with the 'hex:' prefix
 
 Finally to bind the keyset to the group
 
-    $ chip-tool groupsettings bind-keyset 0x1010 0xAAAA
+```
+chip-tool groupsettings bind-keyset groupId keysetId
+chip-tool groupsettings bind-keyset 0x4141 0xAAAA
+```
 
 ## Using the Client to Send Group (Multicast) Matter Commands
 
 To use the Client to send Matter commands, run the built executable and pass it
 the target cluster name, the target command name, the Group Id in Node Id form
-(0xffffffffffffXXXX) and an unused endpoint Id. Take note that Only commands and
-attributes write can be send with Group Id.
+(`0xffffffffffffXXXX`) and an used endpoint Id. Take note that Only commands and
+attributes write can be send with Group Id. Also note that a group ACL needs to
+be installed before a command sent to the group will be accepted. See
+[the access control guide](../../docs/guides/access-control-guide.md#installing-a-group-acl)
 
-E.G. sending to group Id 0x0025
+E.G. sending to group Id 0x4141
 
-    $ chip-tool onoff on 0xffffffffffff0025 1
+```
+chip-tool onoff on 0xffffffffffff4141 1
+```
 
 The client will send a single multicast command packet and then exit.
 
@@ -204,7 +240,9 @@ The client will send a single multicast command packet and then exit.
 To get the list of supported clusters, run the built executable without any
 arguments.
 
-    $ chip-tool
+```
+chip-tool
+```
 
 Example output:
 
@@ -236,25 +274,33 @@ Usage:
 To get the list of commands for a specific cluster, run the built executable
 with the target cluster name.
 
-    $ chip-tool onoff
+```
+chip-tool onoff
+```
 
 ### How to get the list of supported attributes for a specific cluster
 
 To the the list of attributes for a specific cluster, run the built executable
 with the target cluster name and the `read` command name.
 
-    $ chip-tool onoff read
+```
+chip-tool onoff read
+```
 
 ### How to get the list of parameters for a command
 
 To get the list of parameters for a specific command, run the built executable
 with the target cluster name and the target command name
 
-    $ chip-tool onoff on
+```
+chip-tool onoff on
+```
 
 ### Run a test suite against a paired peer device
 
-    $ chip-tool tests Test_TC_OO_1_1
+```
+chip-tool tests Test_TC_OO_1_1
+```
 
 ## Using the Client for Setup Payload
 
@@ -263,26 +309,36 @@ with the target cluster name and the target command name
 To parse a setup code, run the built executable with the `payload` cluster name
 and the `parse-setup-payload` command
 
-    $ chip-tool payload parse-setup-payload code
+```
+chip-tool payload parse-setup-payload code
+```
 
 #### QR Code
 
-    $ chip-tool payload parse-setup-payload "MT:#####"
+```
+chip-tool payload parse-setup-payload "MT:#####"
+```
 
 #### QR Code with optional Vendor Info
 
-    $ chip-tool payload parse-setup-payload "MT:#####"
+```
+chip-tool payload parse-setup-payload "MT:#####"
+```
 
 #### Manual Setup Code
 
-    $ chip-tool payload parse-setup-payload "#####"
+```
+chip-tool payload parse-setup-payload "#####"
+```
 
 # Using the Client for Additional Data Payload
 
 To parse an additional data payload, run the built executable with the `payload`
 cluster name and the `parse-additional-data-payload` command
 
-    $ chip-tool payload parse-additional-data-payload "#####"
+```
+chip-tool payload parse-additional-data-payload "#####"
+```
 
 # Command Reference
 

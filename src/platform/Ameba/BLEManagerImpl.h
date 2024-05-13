@@ -20,12 +20,16 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include "FreeRTOS.h"
+#include "event_groups.h"
+#include "timers.h"
+#if defined(CONFIG_MATTER_BLEMGR_ADAPTER) && CONFIG_MATTER_BLEMGR_ADAPTER
+#include "matter_blemgr_common.h"
+#else
 #include "app_msg.h"
 #include "bt_matter_adapter_peripheral_app.h"
 #include "bt_matter_adapter_service.h"
-#include "event_groups.h"
 #include "gap_msg.h"
-#include "timers.h"
+#endif
 
 namespace chip {
 namespace DeviceLayer {
@@ -46,9 +50,7 @@ private:
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init(void);
-    CHIP_ERROR _Shutdown() { return CHIP_NO_ERROR; }
-    CHIPoBLEServiceMode _GetCHIPoBLEServiceMode(void);
-    CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
+    void _Shutdown() {}
     bool _IsAdvertisingEnabled(void);
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
     bool _IsAdvertising(void);
@@ -88,15 +90,6 @@ private:
     static BLEManagerImpl sInstance;
 
     // ===== Private members reserved for use by this class only.
-
-    typedef enum
-    {
-        BC_DEV_DISABLED     = 0x0,
-        BC_DEV_INIT         = 0x1,
-        BC_DEV_IDLE         = 0x2,
-        BC_DEV_BT_CONNECTED = 0x3,
-        BC_DEV_DEINIT       = 0x4,
-    } BC_device_state_t;
 
     enum class Flags : uint8_t
     {
@@ -142,11 +135,11 @@ private:
     CHIP_ERROR StopAdvertising(void);
     CHIP_ERROR ConfigureAdvertisingData(void);
 
+    static void HandleFastAdvertisementTimer(System::Layer * systemLayer, void * context);
+    void HandleFastAdvertisementTimer();
+
     void HandleRXCharWrite(uint8_t *, uint16_t, uint8_t);
     void HandleTXCharRead(void * param);
-#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    void HandleC3CharRead(TBTCONFIG_CALLBACK_DATA * p_data);
-#endif
     void HandleTXCharCCCDRead(void * param);
     void HandleTXCharCCCDWrite(int, int, int);
     CHIP_ERROR HandleTXComplete(int);
@@ -155,15 +148,31 @@ private:
     CHIP_ERROR SetSubscribed(uint16_t conId);
     bool UnsetSubscribed(uint16_t conId);
     bool IsSubscribed(uint16_t conId);
-
+    void InitSubscribed(void);
     bool RemoveConnection(uint8_t connectionHandle);
     void AddConnection(uint8_t connectionHandle);
 
     BLEManagerImpl::CHIPoBLEConState * GetConnectionState(uint8_t connectionHandle, bool allocate);
+#if defined(CONFIG_MATTER_BLEMGR_ADAPTER) && CONFIG_MATTER_BLEMGR_ADAPTER
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    void HandleC3CharRead(uint8_t ** pp_value, uint16_t * p_len);
+#endif
+    static CHIP_ERROR matter_blemgr_gap_connect_cb(uint8_t conn_id);
+    static CHIP_ERROR matter_blemgr_gap_disconnect_cb(uint8_t conn_id, uint16_t disc_cause);
+    static void matter_blemgr_rx_char_write_cb(uint8_t conn_id, uint8_t * p_value, uint16_t len);
+    static void matter_blemgr_tx_char_cccd_write_cb(uint8_t conn_id, uint8_t indicationsEnabled, uint8_t notificationsEnabled);
+    static CHIP_ERROR matter_blemgr_tx_complete_cb(uint8_t conn_id);
+    static void matter_blemgr_c3_char_read_cb(uint8_t ** pp_value, uint16_t * p_len);
+    static int matter_blemgr_callback_dispatcher(void * param, T_MATTER_BLEMGR_CALLBACK_TYPE cb_type, void * p_cb_data);
+#else
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    void HandleC3CharRead(TBTCONFIG_CALLBACK_DATA * p_data);
+#endif
     static CHIP_ERROR ble_svr_gap_msg_event(void * param, T_IO_MSG * p_gap_msg);
     static CHIP_ERROR ble_svr_gap_event(void * param, int cb_type, void * p_cb_data);
     static CHIP_ERROR gatt_svr_chr_access(void * param, T_SERVER_ID service_id, TBTCONFIG_CALLBACK_DATA * p_data);
     static int ble_callback_dispatcher(void * param, void * p_cb_data, int type, T_CHIP_BLEMGR_CALLBACK_TYPE callback_type);
+#endif
     static void DriveBLEState(intptr_t arg);
     static void BleAdvTimeoutHandler(TimerHandle_t xTimer);
     static void CancelBleAdvTimeoutTimer(void);
@@ -195,11 +204,6 @@ inline BLEManagerImpl & BLEMgrImpl(void)
 inline BleLayer * BLEManagerImpl::_GetBleLayer()
 {
     return this;
-}
-
-inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(void)
-{
-    return mServiceMode;
 }
 
 inline bool BLEManagerImpl::_IsAdvertisingEnabled(void)

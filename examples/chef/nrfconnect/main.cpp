@@ -17,13 +17,13 @@
 
 #include <lib/shell/Engine.h>
 
+#include <app/server/Dnssd.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/Base64.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#include <ChipShellCollection.h>
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -33,36 +33,111 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
+#include <zephyr/logging/log.h>
+
+#if CONFIG_ENABLE_CHIP_SHELL || CONFIG_CHIP_LIB_SHELL
+#include <ChipShellCollection.h>
+#endif
+
+#ifdef CONFIG_CHIP_PW_RPC
+#include "Rpc.h"
+#endif
+
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+#include <crypto/PSAOperationalKeystore.h>
+#ifdef CONFIG_CHIP_MIGRATE_OPERATIONAL_KEYS_TO_ITS
+#include "MigrationManager.h"
+#endif
+#endif
+
+LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
+
 using namespace chip;
 using namespace chip::Shell;
+using namespace chip::DeviceLayer;
+
+namespace {
+constexpr int kExtDiscoveryTimeoutSecs = 20;
+
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore{};
+#endif
+} // namespace
 
 int main()
 {
-    chip::Platform::MemoryInit();
-    chip::DeviceLayer::PlatformMgr().InitChipStack();
-    chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+#ifdef CONFIG_CHIP_PW_RPC
+    rpc::Init();
+#endif
+
+    err = chip::Platform::MemoryInit();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Platform::MemoryInit() failed");
+        return 1;
+    }
+
+    err = PlatformMgr().InitChipStack();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "PlatformMgr().InitChipStack() failed");
+        return 1;
+    }
 
     // Network connectivity
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    chip::DeviceLayer::ConnectivityManagerImpl().StartWiFiManagement();
+    ConnectivityManagerImpl().StartWiFiManagement();
 #endif
-#if CHIP_ENABLE_OPENTHREAD
-    chip::DeviceLayer::ThreadStackMgr().InitThreadStack();
-#ifdef CONFIG_OPENTHREAD_MTD_SED
-    chip::DeviceLayer::ConnectivityMgr().SetThreadDeviceType(
-        chip::DeviceLayer::ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
-#else
-    chip::DeviceLayer::ConnectivityMgr().SetThreadDeviceType(
-        chip::DeviceLayer::ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
-#endif /* CONFIG_OPENTHREAD_MTD_SED */
-#endif /* CHIP_ENABLE_OPENTHREAD */
 
-    // Start IM server
-    chip::Server::GetInstance().Init();
+#if defined(CHIP_ENABLE_OPENTHREAD)
+    err = ThreadStackMgr().InitThreadStack();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "ThreadStackMgr().InitThreadStack() failed");
+        return 1;
+    }
+
+#ifdef CONFIG_OPENTHREAD_MTD
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
+#else
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+#endif
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "ConnectivityMgr().SetThreadDeviceType() failed");
+        return 1;
+    }
+#elif !defined(CONFIG_WIFI_NRF700X)
+    return CHIP_ERROR_INTERNAL;
+#endif
 
     // Device Attestation & Onboarding codes
     chip::Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+    chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(kExtDiscoveryTimeoutSecs);
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY */
+
+    // Start IM server
+    static chip::CommonCaseDeviceServerInitParams initParams;
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+    initParams.operationalKeystore = &sPSAOperationalKeystore;
+#endif
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    err = chip::Server::GetInstance().Init(initParams);
+    if (err != CHIP_NO_ERROR)
+    {
+        return 1;
+    }
+
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
+
+    err = chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "PlatformMgr().StartEventLoopTask() failed");
+    }
 
     // When SoftAP support becomes available, it should be added here.
 #if CONFIG_NETWORK_LAYER_BLE
@@ -74,29 +149,26 @@ int main()
     // Starts commissioning window automatically. Starts BLE advertising when BLE enabled
     if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() != CHIP_NO_ERROR)
     {
-        ChipLogError(Shell, "OpenBasicCommissioningWindow() failed");
+        ChipLogError(AppServer, "OpenBasicCommissioningWindow() failed");
     }
 
-    const int rc = Engine::Root().Init();
-
+#if CONFIG_CHIP_LIB_SHELL
+    int rc = Engine::Root().Init();
     if (rc != 0)
     {
-        ChipLogError(Shell, "Streamer initialization failed: %d", rc);
-        return rc;
+        ChipLogError(AppServer, "Streamer initialization failed: %d", rc);
+        return 1;
     }
 
-#if CONFIG_ENABLE_CHIP_SHELL
     cmd_misc_init();
     cmd_otcli_init();
-    cmd_ping_init();
-    cmd_send_init();
 #endif
 
 #if CHIP_SHELL_ENABLE_CMD_SERVER
     cmd_app_server_init();
 #endif
 
-#if CONFIG_ENABLE_CHIP_SHELL
+#if CONFIG_CHIP_LIB_SHELL
     Engine::Root().RunMainLoop();
 #endif
 

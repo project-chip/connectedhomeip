@@ -1,0 +1,142 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    102.2.1. [TC-LCFG-2.1] Localization Configuration Cluster
+    Attributes[DUT-Server]
+
+PICS:
+    - LCFG.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Localization Configuration"
+    endpoint: 0
+    #default value is assigned by the Vendor
+    Default.Vendor.ActiveLocaleValue:
+        type: char_string
+        defaultValue: "en-US"
+    #string not present in SupportedLocales
+    Value.NotPresentInSupportedLocales:
+        type: char_string
+        defaultValue: "fw-GB"
+    #string present in SupportedLocales
+    Value.PresentInSupportedLocales:
+        type: char_string
+        defaultValue: "es-ES"
+
+tests:
+    - label:
+          "Step 0: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 1a: TH reads SupportedLocales attribute from DUT"
+      PICS: LCFG.S.A0001
+      command: "readAttribute"
+      attribute: "SupportedLocales"
+      response:
+          saveAs: SupportedLocalesValues
+          constraints:
+              type: list
+              maxLength: 35
+
+    - label:
+          "Step 1b: Verify that the values in the SupportedLocales attribute are
+          not repeated"
+      verification: |
+          Verify that the values in the SupportedLocales attribute are not repeated
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && LCFG.S.A0001
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 2: TH writes 'xx-XX' to SupportedLocales attribute"
+      command: "writeAttribute"
+      attribute: "SupportedLocales"
+      arguments:
+          value: [xx-XX]
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 3: TH reads SupportedLocales attribute from DUT"
+      PICS: LCFG.S.A0001
+      command: "readAttribute"
+      attribute: "SupportedLocales"
+      response:
+          value: SupportedLocalesValues
+
+    - label: "Step 4a: TH reads ActiveLocale Attribute from the DUT"
+      PICS: LCFG.S.A0000
+      command: "readAttribute"
+      attribute: "ActiveLocale"
+      response:
+          value: Default.Vendor.ActiveLocaleValue
+          constraints:
+              type: char_string
+              maxLength: 35
+
+    - label:
+          "Step 4b: Verify that the ActiveLocale attribute is Language Tag as
+          defined by BCP47. Verify that the ActiveLocale Attribute value is
+          present in the SupportedLocales attribute list"
+      verification: |
+          1. Verify that the ActiveLocale attribute is Language Tag as defined by BCP47
+          2. Verify that the ActiveLocale Attribute value is present in the SupportedLocales attribute list
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && LCFG.S.A0000
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 5: TH writes new string not present in SupportedLocales
+          attribute to ActiveLocale Attribute."
+      PICS: LCFG.S.A0000
+      command: "writeAttribute"
+      attribute: "ActiveLocale"
+      arguments:
+          value: Value.NotPresentInSupportedLocales
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 6: TH writes new string present in SupportedLocales attribute to
+          ActiveLocale Attribute"
+      PICS: LCFG.S.A0000
+      command: "writeAttribute"
+      attribute: "ActiveLocale"
+      arguments:
+          value: Value.PresentInSupportedLocales
+
+    - label: "Step 7: TH Reads ActiveLocale"
+      PICS: LCFG.S.A0000
+      command: "readAttribute"
+      attribute: "ActiveLocale"
+      response:
+          value: Value.PresentInSupportedLocales

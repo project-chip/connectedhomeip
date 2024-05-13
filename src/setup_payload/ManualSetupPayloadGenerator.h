@@ -58,6 +58,8 @@ public:
      * This function is called to encode the binary data of a payload to a
      * decimal null-terminated string.
      *
+     * The resulting size of the outBuffer will be the size of data written and not including the null terminator.
+     *
      * @param[out] outBuffer
      *                  Output buffer to write the decimal string.
      *

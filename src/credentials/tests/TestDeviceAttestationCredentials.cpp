@@ -22,6 +22,7 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/TestPAAStore.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <credentials/examples/ExampleDACs.h>
 #include <credentials/examples/ExamplePAI.h>
@@ -29,9 +30,8 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/Span.h>
-#include <lib/support/UnitTestRegistration.h>
 
-#include <nlunit-test.h>
+#include <gtest/gtest.h>
 
 #include "CHIPAttCert_test_vectors.h"
 
@@ -47,49 +47,55 @@ static const ByteSpan kExpectedPaiPublicKey = DevelopmentCerts::kPaiPublicKey;
 
 } // namespace
 
-static void TestDACProvidersExample_Providers(nlTestSuite * inSuite, void * inContext)
+struct TestDeviceAttestationCredentials : public ::testing::Test
+{
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+};
+
+TEST_F(TestDeviceAttestationCredentials, TestDACProvidersExample_Providers)
 {
     uint8_t der_cert_buf[kMaxDERCertLength];
     MutableByteSpan der_cert_span(der_cert_buf);
 
     // Make sure default provider exists and is not implemented on at least one method
     DeviceAttestationCredentialsProvider * default_provider = GetDeviceAttestationCredentialsProvider();
-    NL_TEST_ASSERT(inSuite, default_provider != nullptr);
+    ASSERT_NE(default_provider, nullptr);
 
     CHIP_ERROR err = default_provider->GetDeviceAttestationCert(der_cert_span);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_EQ(err, CHIP_ERROR_NOT_IMPLEMENTED);
 
     // Replace default provider with example provider
     DeviceAttestationCredentialsProvider * example_dac_provider = Examples::GetExampleDACProvider();
-    NL_TEST_ASSERT(inSuite, example_dac_provider != nullptr);
-    NL_TEST_ASSERT(inSuite, default_provider != example_dac_provider);
+    ASSERT_NE(example_dac_provider, nullptr);
+    EXPECT_NE(default_provider, example_dac_provider);
 
     SetDeviceAttestationCredentialsProvider(example_dac_provider);
     default_provider = GetDeviceAttestationCredentialsProvider();
-    NL_TEST_ASSERT(inSuite, default_provider == example_dac_provider);
+    EXPECT_EQ(default_provider, example_dac_provider);
 
     // Make sure DAC is what we expect, by validating public key
     memset(der_cert_span.data(), 0, der_cert_span.size());
     err = example_dac_provider->GetDeviceAttestationCert(der_cert_span);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     P256PublicKey dac_public_key;
     err = ExtractPubkeyFromX509Cert(der_cert_span, dac_public_key);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, dac_public_key.Length() == kExpectedDacPublicKey.size());
-    NL_TEST_ASSERT(inSuite, 0 == memcmp(dac_public_key.ConstBytes(), kExpectedDacPublicKey.data(), kExpectedDacPublicKey.size()));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(dac_public_key.Length(), kExpectedDacPublicKey.size());
+    EXPECT_EQ(0, memcmp(dac_public_key.ConstBytes(), kExpectedDacPublicKey.data(), kExpectedDacPublicKey.size()));
 
     // Make sure PAI is what we expect, by validating public key
     der_cert_span = MutableByteSpan{ der_cert_span };
     memset(der_cert_span.data(), 0, der_cert_span.size());
     err = example_dac_provider->GetProductAttestationIntermediateCert(der_cert_span);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     P256PublicKey pai_public_key;
     err = ExtractPubkeyFromX509Cert(der_cert_span, pai_public_key);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, pai_public_key.Length() == kExpectedPaiPublicKey.size());
-    NL_TEST_ASSERT(inSuite, 0 == memcmp(pai_public_key.ConstBytes(), kExpectedPaiPublicKey.data(), kExpectedPaiPublicKey.size()));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(pai_public_key.Length(), kExpectedPaiPublicKey.size());
+    EXPECT_EQ(0, memcmp(pai_public_key.ConstBytes(), kExpectedPaiPublicKey.data(), kExpectedPaiPublicKey.size()));
 
     // Check for CD presence
     uint8_t other_data_buf[kMaxCMSSignedCDMessage];
@@ -97,35 +103,35 @@ static void TestDACProvidersExample_Providers(nlTestSuite * inSuite, void * inCo
     memset(other_data_span.data(), 0, other_data_span.size());
 
     err = example_dac_provider->GetCertificationDeclaration(other_data_span);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, other_data_span.size() > 0);
-    NL_TEST_ASSERT(inSuite, other_data_span.data()[0] != 0);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_GT(other_data_span.size(), 0u);
+    EXPECT_NE(other_data_span.data()[0], 0);
 
     // Check for firmware information presence
     other_data_span = MutableByteSpan{ other_data_buf };
     memset(other_data_span.data(), 0, other_data_span.size());
 
     err = example_dac_provider->GetFirmwareInformation(other_data_span);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, other_data_span.size() == 0);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(other_data_span.size(), 0u);
 }
 
-static void TestDACProvidersExample_Signature(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestDeviceAttestationCredentials, TestDACProvidersExample_Signature)
 {
-    constexpr uint8_t kExampleDigest[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x10, 0x11, 0x12,
-                                           0x13, 0x14, 0x15, 0x16, 0x17, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25,
-                                           0x26, 0x27, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37 };
+    constexpr uint8_t kExampleMessage[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x10, 0x11, 0x12,
+                                            0x13, 0x14, 0x15, 0x16, 0x17, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25,
+                                            0x26, 0x27, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37 };
 
     DeviceAttestationCredentialsProvider * example_dac_provider = Examples::GetExampleDACProvider();
-    NL_TEST_ASSERT(inSuite, example_dac_provider != nullptr);
+    ASSERT_NE(example_dac_provider, nullptr);
 
     // Sign using the example attestation private key
     P256ECDSASignature da_signature;
     MutableByteSpan out_sig_span(da_signature.Bytes(), da_signature.Capacity());
-    CHIP_ERROR err = example_dac_provider->SignWithDeviceAttestationKey(ByteSpan{ kExampleDigest }, out_sig_span);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    CHIP_ERROR err = example_dac_provider->SignWithDeviceAttestationKey(ByteSpan{ kExampleMessage }, out_sig_span);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, out_sig_span.size() == kP256_ECDSA_Signature_Length_Raw);
+    EXPECT_EQ(out_sig_span.size(), kP256_ECDSA_Signature_Length_Raw);
     da_signature.SetLength(out_sig_span.size());
 
     // Get DAC from the provider
@@ -134,27 +140,28 @@ static void TestDACProvidersExample_Signature(nlTestSuite * inSuite, void * inCo
 
     memset(dac_cert_span.data(), 0, dac_cert_span.size());
     err = example_dac_provider->GetDeviceAttestationCert(dac_cert_span);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     // Extract public key from DAC, prior to signature verification
     P256PublicKey dac_public_key;
     err = ExtractPubkeyFromX509Cert(dac_cert_span, dac_public_key);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, dac_public_key.Length() == kExpectedDacPublicKey.size());
-    NL_TEST_ASSERT(inSuite, 0 == memcmp(dac_public_key.ConstBytes(), kExpectedDacPublicKey.data(), kExpectedDacPublicKey.size()));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(dac_public_key.Length(), kExpectedDacPublicKey.size());
+    EXPECT_EQ(memcmp(dac_public_key.ConstBytes(), kExpectedDacPublicKey.data(), kExpectedDacPublicKey.size()), 0);
 
     // Verify round trip signature
-    err = dac_public_key.ECDSA_validate_hash_signature(&kExampleDigest[0], sizeof(kExampleDigest), da_signature);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    err = dac_public_key.ECDSA_validate_msg_signature(&kExampleMessage[0], sizeof(kExampleMessage), da_signature);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 }
 
-static void OnAttestationInformationVerificationCallback(void * context, AttestationVerificationResult result)
+static void OnAttestationInformationVerificationCallback(void * context, const DeviceAttestationVerifier::AttestationInfo & info,
+                                                         AttestationVerificationResult result)
 {
     AttestationVerificationResult * pResult = reinterpret_cast<AttestationVerificationResult *>(context);
     *pResult                                = result;
 }
 
-static void TestDACVerifierExample_AttestationInfoVerification(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestDeviceAttestationCredentials, TestDACVerifierExample_AttestationInfoVerification)
 {
     uint8_t attestationElementsTestVector[] = {
         0x15, 0x30, 0x01, 0xeb, 0x30, 0x81, 0xe8, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x07, 0x02, 0xa0, 0x81,
@@ -184,28 +191,28 @@ static void TestDACVerifierExample_AttestationInfoVerification(nlTestSuite * inS
                                                  0xda, 0x53, 0x63, 0x83, 0x74, 0xa0, 0x16, 0x71, 0xcf, 0x3d, 0x7d, 0xb8, 0xcc,
                                                  0x17, 0x0b, 0x38, 0x03, 0x45, 0xe6, 0x0b, 0xc8, 0x6f, 0xdf, 0x45, 0x9e };
     uint8_t attestationNonceTestVector[]     = { 0xe0, 0x42, 0x1b, 0x91, 0xc6, 0xfd, 0xcd, 0xb4, 0x0e, 0x2a, 0x4d,
-                                             0x2c, 0xf3, 0x1d, 0xb2, 0xb4, 0xe1, 0x8b, 0x41, 0x1b, 0x1d, 0x3a,
-                                             0xd4, 0xd1, 0x2a, 0x9d, 0x90, 0xaa, 0x8e, 0x52, 0xfa, 0xe2 };
+                                                 0x2c, 0xf3, 0x1d, 0xb2, 0xb4, 0xe1, 0x8b, 0x41, 0x1b, 0x1d, 0x3a,
+                                                 0xd4, 0xd1, 0x2a, 0x9d, 0x90, 0xaa, 0x8e, 0x52, 0xfa, 0xe2 };
 
     // Make sure default verifier exists and is not implemented on at least one method
     DeviceAttestationVerifier * default_verifier = GetDeviceAttestationVerifier();
-    NL_TEST_ASSERT(inSuite, default_verifier != nullptr);
+    ASSERT_NE(default_verifier, nullptr);
 
     AttestationVerificationResult attestationResult = AttestationVerificationResult::kSuccess;
     ByteSpan emptyByteSpan;
     attestationResult = default_verifier->ValidateCertificationDeclarationSignature(ByteSpan(), emptyByteSpan);
-    NL_TEST_ASSERT(inSuite, attestationResult == AttestationVerificationResult::kNotImplemented);
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kNotImplemented);
 
     DeviceAttestationVerifier * example_dac_verifier = GetDefaultDACVerifier(GetTestAttestationTrustStore());
-    NL_TEST_ASSERT(inSuite, example_dac_verifier != nullptr);
-    NL_TEST_ASSERT(inSuite, default_verifier != example_dac_verifier);
+    ASSERT_NE(example_dac_verifier, nullptr);
+    EXPECT_NE(default_verifier, example_dac_verifier);
 
     SetDeviceAttestationVerifier(example_dac_verifier);
     default_verifier = GetDeviceAttestationVerifier();
-    NL_TEST_ASSERT(inSuite, default_verifier == example_dac_verifier);
+    EXPECT_EQ(default_verifier, example_dac_verifier);
 
     attestationResult = AttestationVerificationResult::kNotImplemented;
-    Callback::Callback<OnAttestationInformationVerification> attestationInformationVerificationCallback(
+    Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> attestationInformationVerificationCallback(
         OnAttestationInformationVerificationCallback, &attestationResult);
 
     Credentials::DeviceAttestationVerifier::AttestationInfo info(
@@ -214,10 +221,10 @@ static void TestDACVerifierExample_AttestationInfoVerification(nlTestSuite * inS
         static_cast<VendorId>(0xFFF1), 0x8000);
     default_verifier->VerifyAttestationInformation(info, &attestationInformationVerificationCallback);
 
-    NL_TEST_ASSERT(inSuite, attestationResult == AttestationVerificationResult::kSuccess);
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
 }
 
-static void TestDACVerifierExample_CertDeclarationVerification(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestDeviceAttestationCredentials, TestDACVerifierExample_CertDeclarationVerification)
 {
     // -> format_version = 1
     // -> vendor_id = 0xFFF1
@@ -256,11 +263,11 @@ static void TestDACVerifierExample_CertDeclarationVerification(nlTestSuite * inS
 
     // Replace default verifier with example verifier
     DeviceAttestationVerifier * example_dac_verifier = GetDefaultDACVerifier(GetTestAttestationTrustStore());
-    NL_TEST_ASSERT(inSuite, example_dac_verifier != nullptr);
+    ASSERT_NE(example_dac_verifier, nullptr);
 
     SetDeviceAttestationVerifier(example_dac_verifier);
     DeviceAttestationVerifier * default_verifier = GetDeviceAttestationVerifier();
-    NL_TEST_ASSERT(inSuite, default_verifier == example_dac_verifier);
+    EXPECT_EQ(default_verifier, example_dac_verifier);
 
     // Check for CD presence
     uint8_t cd_data_buf[kMaxCMSSignedCDMessage] = { 0 };
@@ -269,9 +276,9 @@ static void TestDACVerifierExample_CertDeclarationVerification(nlTestSuite * inS
     ByteSpan cd_payload;
     AttestationVerificationResult attestation_result =
         default_verifier->ValidateCertificationDeclarationSignature(ByteSpan(sTest_CD), cd_payload);
-    NL_TEST_ASSERT(inSuite, attestation_result == AttestationVerificationResult::kSuccess);
+    EXPECT_EQ(attestation_result, AttestationVerificationResult::kSuccess);
 
-    NL_TEST_ASSERT(inSuite, cd_payload.data_equal(ByteSpan(sTestCMS_CDContent)));
+    EXPECT_TRUE(cd_payload.data_equal(ByteSpan(sTestCMS_CDContent)));
 
     DeviceInfoForAttestation deviceInfo{
         .vendorId     = sTestCMS_CertElements.VendorId,
@@ -283,10 +290,10 @@ static void TestDACVerifierExample_CertDeclarationVerification(nlTestSuite * inS
         .paaVendorId  = sTestCMS_CertElements.VendorId,
     };
     attestation_result = default_verifier->ValidateCertificateDeclarationPayload(cd_payload, ByteSpan(), deviceInfo);
-    NL_TEST_ASSERT(inSuite, attestation_result == AttestationVerificationResult::kSuccess);
+    EXPECT_EQ(attestation_result, AttestationVerificationResult::kSuccess);
 }
 
-static void TestDACVerifierExample_NocsrInformationVerification(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestDeviceAttestationCredentials, TestDACVerifierExample_NocsrInformationVerification)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -309,16 +316,16 @@ static void TestDACVerifierExample_NocsrInformationVerification(nlTestSuite * in
         0x72, 0x76, 0x65, 0x64, 0x33, 0x5f, 0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x18,
     };
     constexpr uint8_t attestationChallengeTestVector[]      = { 0x7a, 0x49, 0x53, 0x05, 0xd0, 0x77, 0x79, 0xa4,
-                                                           0x94, 0xdd, 0x39, 0xa0, 0x85, 0x1b, 0x66, 0x0d };
+                                                                0x94, 0xdd, 0x39, 0xa0, 0x85, 0x1b, 0x66, 0x0d };
     constexpr uint8_t csrNonceTestVector[]                  = { 0x81, 0x4a, 0x4d, 0x4c, 0x1c, 0x4a, 0x8e, 0xbb, 0xea, 0xdb, 0x0a,
-                                               0xe2, 0x82, 0xf9, 0x91, 0xeb, 0x13, 0xac, 0x5f, 0x9f, 0xce, 0x94,
-                                               0x30, 0x93, 0x19, 0xaa, 0x94, 0x09, 0x6c, 0x8c, 0xd4, 0xb8 };
+                                                                0xe2, 0x82, 0xf9, 0x91, 0xeb, 0x13, 0xac, 0x5f, 0x9f, 0xce, 0x94,
+                                                                0x30, 0x93, 0x19, 0xaa, 0x94, 0x09, 0x6c, 0x8c, 0xd4, 0xb8 };
     constexpr uint8_t attestationSignatureTestVector[]      = { 0x87, 0x8e, 0x46, 0xcf, 0xfa, 0x83, 0xc8, 0x32, 0x96, 0xeb, 0x27,
-                                                           0x2e, 0xbc, 0x37, 0x1c, 0x1f, 0xef, 0xee, 0x6d, 0x69, 0x54, 0xf3,
-                                                           0x78, 0x9f, 0xd3, 0xd2, 0x27, 0xe1, 0x64, 0x13, 0xd3, 0xd4, 0x75,
-                                                           0xa6, 0x2f, 0xd0, 0x12, 0xb9, 0x19, 0xd9, 0x95, 0x8b, 0xc7, 0x3d,
-                                                           0x7c, 0x63, 0xb3, 0xcc, 0x1e, 0xf2, 0xb6, 0x2c, 0x18, 0xe0, 0xcc,
-                                                           0x10, 0x2e, 0xd1, 0xba, 0x4d, 0xac, 0x85, 0xfe, 0xea };
+                                                                0x2e, 0xbc, 0x37, 0x1c, 0x1f, 0xef, 0xee, 0x6d, 0x69, 0x54, 0xf3,
+                                                                0x78, 0x9f, 0xd3, 0xd2, 0x27, 0xe1, 0x64, 0x13, 0xd3, 0xd4, 0x75,
+                                                                0xa6, 0x2f, 0xd0, 0x12, 0xb9, 0x19, 0xd9, 0x95, 0x8b, 0xc7, 0x3d,
+                                                                0x7c, 0x63, 0xb3, 0xcc, 0x1e, 0xf2, 0xb6, 0x2c, 0x18, 0xe0, 0xcc,
+                                                                0x10, 0x2e, 0xd1, 0xba, 0x4d, 0xac, 0x85, 0xfe, 0xea };
     constexpr uint8_t wrongAttestationSignatureTestVector[] = {
         /* added 1 to first index */
         0x88, 0x8e, 0x46, 0xcf, 0xfa, 0x83, 0xc8, 0x32, 0x96, 0xeb, 0x27, 0x2e, 0xbc, 0x37, 0x1c, 0x1f,
@@ -333,31 +340,31 @@ static void TestDACVerifierExample_NocsrInformationVerification(nlTestSuite * in
                                                  0x8d, 0x85, 0xfb, 0xd7, 0xa0, 0x7c, 0x8e, 0x83, 0x7d, 0xa4, 0xd5, 0xa8, 0xb9 };
 
     DeviceAttestationVerifier * exampleDacVerifier = GetDefaultDACVerifier(GetTestAttestationTrustStore());
-    NL_TEST_ASSERT(inSuite, exampleDacVerifier != nullptr);
+    ASSERT_NE(exampleDacVerifier, nullptr);
 
     P256PublicKey dacPubkey;
-    NL_TEST_ASSERT(inSuite, sizeof(attestationPublicKey) == dacPubkey.Length());
+    EXPECT_EQ(sizeof(attestationPublicKey), dacPubkey.Length());
     memcpy(dacPubkey.Bytes(), attestationPublicKey, dacPubkey.Length());
 
     err = exampleDacVerifier->VerifyNodeOperationalCSRInformation(
         ByteSpan(nocsrElementsTestVector), ByteSpan(attestationChallengeTestVector), ByteSpan(attestationSignatureTestVector),
         dacPubkey, ByteSpan(csrNonceTestVector));
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     // now test with invalid signature
     err = exampleDacVerifier->VerifyNodeOperationalCSRInformation(
         ByteSpan(nocsrElementsTestVector), ByteSpan(attestationChallengeTestVector), ByteSpan(wrongAttestationSignatureTestVector),
         dacPubkey, ByteSpan(csrNonceTestVector));
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_SIGNATURE);
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_SIGNATURE);
 }
 
-static void TestAttestationTrustStore(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestDeviceAttestationCredentials, TestAttestationTrustStore)
 {
     // SKID to trigger CHIP_ERROR_INVALID_ARGUMENT
     ByteSpan kPaaFFF1BadSkidSpan1{ TestCerts::sTestCert_PAA_FFF1_Cert.data(), TestCerts::sTestCert_PAA_FFF1_Cert.size() - 1 };
 
     // SKID to trigger CHIP_ERROR_INVALID_ARGUMENT
-    ByteSpan kPaaFFF1BadSkidSpan2{ nullptr, TestCerts::sTestCert_PAA_FFF1_Cert.size() };
+    ByteSpan kPaaFFF1BadSkidSpan2;
 
     // SKID to trigger CHIP_ERROR_CA_CERT_NOT_FOUND
     uint8_t kPaaGoodSkidNotPresent[] = { 0x6A, 0xFD, 0x22, 0x77, 0x1F, 0x51, 0x71, 0x1F, 0xEC, 0xBF,
@@ -381,7 +388,7 @@ static void TestAttestationTrustStore(nlTestSuite * inSuite, void * inContext)
     };
 
     const AttestationTrustStore * testAttestationTrustStore = GetTestAttestationTrustStore();
-    NL_TEST_ASSERT(inSuite, testAttestationTrustStore != nullptr);
+    ASSERT_NE(testAttestationTrustStore, nullptr);
 
     for (const auto & testCase : kTestCases)
     {
@@ -395,68 +402,12 @@ static void TestAttestationTrustStore(nlTestSuite * inSuite, void * inContext)
 
         // Try to obtain cert
         CHIP_ERROR result = testAttestationTrustStore->GetProductAttestationAuthorityCert(testCase.skidSpan, paaCertSpan);
-        NL_TEST_ASSERT(inSuite, result == testCase.expectedResult);
+        EXPECT_EQ(result, testCase.expectedResult);
 
         // In success cases, make sure the cert matches expectation.
         if (testCase.expectedResult == CHIP_NO_ERROR)
         {
-            NL_TEST_ASSERT(inSuite, paaCertSpan.data_equal(testCase.expectedCertSpan) == true);
+            EXPECT_TRUE(paaCertSpan.data_equal(testCase.expectedCertSpan));
         }
     }
 }
-
-/**
- *  Set up the test suite.
- */
-int TestDeviceAttestation_Setup(void * inContext)
-{
-    CHIP_ERROR error = chip::Platform::MemoryInit();
-
-    if (error != CHIP_NO_ERROR)
-    {
-        return FAILURE;
-    }
-
-    return SUCCESS;
-}
-
-/**
- *  Tear down the test suite.
- */
-int TestDeviceAttestation_Teardown(void * inContext)
-{
-    chip::Platform::MemoryShutdown();
-    return SUCCESS;
-}
-
-/**
- *   Test Suite. It lists all the test functions.
- */
-// clang-format off
-static const nlTest sTests[] = {
-    NL_TEST_DEF("Test Example Device Attestation Credentials Providers", TestDACProvidersExample_Providers),
-    NL_TEST_DEF("Test Example Device Attestation Signature", TestDACProvidersExample_Signature),
-    NL_TEST_DEF("Test the 'for testing' Paa Root Store", TestAttestationTrustStore),
-    NL_TEST_DEF("Test Example Device Attestation Information Verification", TestDACVerifierExample_AttestationInfoVerification),
-    NL_TEST_DEF("Test Example Device Attestation Certification Declaration Verification", TestDACVerifierExample_CertDeclarationVerification),
-    NL_TEST_DEF("Test Example Device Attestation Node Operational CSR Information Verification", TestDACVerifierExample_NocsrInformationVerification),
-    NL_TEST_SENTINEL()
-};
-// clang-format on
-
-int TestDeviceAttestation()
-{
-    // clang-format off
-    nlTestSuite theSuite =
-    {
-        "Device Attestation Credentials",
-        &sTests[0],
-        TestDeviceAttestation_Setup,
-        TestDeviceAttestation_Teardown
-    };
-    // clang-format on
-    nlTestRunner(&theSuite, nullptr);
-    return (nlTestRunnerStats(&theSuite));
-}
-
-CHIP_REGISTER_TEST_SUITE(TestDeviceAttestation);

@@ -21,10 +21,10 @@
 #      This file is utility for Chip
 #
 
-from __future__ import absolute_import
-from __future__ import print_function
+from __future__ import absolute_import, print_function
+
 import binascii
-from ctypes import *
+from ctypes import c_byte, c_void_p, cast, memmove
 
 
 class ChipUtility(object):
@@ -42,7 +42,7 @@ class ChipUtility(object):
 
     @staticmethod
     def ByteArrayToVoidPtr(array):
-        if array != None:
+        if array is not None:
             if not (isinstance(array, bytes) or isinstance(array, bytearray)):
                 raise TypeError("Array must be an str or a bytearray")
             return cast((c_byte * len(array)).from_buffer_copy(array), c_void_p)

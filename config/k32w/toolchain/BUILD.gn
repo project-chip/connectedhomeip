@@ -31,6 +31,13 @@ arm_toolchain("k32w_lock_app") {
   }
 }
 
+arm_toolchain("k32w_contact_sensor_app") {
+  toolchain_args = {
+    current_os = "freertos"
+    import("${chip_root}/examples/contact-sensor-app/nxp/k32w/k32w0/args.gni")
+  }
+}
+
 arm_toolchain("k32w_shell_app") {
   toolchain_args = {
     current_os = "freertos"

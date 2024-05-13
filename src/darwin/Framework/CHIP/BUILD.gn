@@ -15,10 +15,7 @@
 import("//build_overrides/chip.gni")
 
 config("darwin_config") {
-  include_dirs = [
-    ".",
-    "..",
-  ]
+  include_dirs = [ "." ]
 
   cflags = [
     "-Wconversion",
@@ -28,64 +25,25 @@ config("darwin_config") {
 
 static_library("framework") {
   sources = [
-    "CHIP.h",
-    "CHIPAttestationTrustStoreBridge.mm",
-    "CHIPCluster.mm",
-    "CHIPCommissioningParameters.m",
-    "CHIPControllerAccessControl.h",
-    "CHIPControllerAccessControl.mm",
-    "CHIPDevice.h",
-    "CHIPDevice.mm",
-    "CHIPDeviceAttestationDelegateBridge.h",
-    "CHIPDeviceAttestationDelegateBridge.mm",
-    "CHIPDeviceConnectionBridge.mm",
-    "CHIPDeviceController.h",
-    "CHIPDeviceController.mm",
-    "CHIPDevicePairingDelegate.h",
-    "CHIPDevicePairingDelegateBridge.h",
-    "CHIPDevicePairingDelegateBridge.mm",
-    "CHIPDevice_Internal.h",
-    "CHIPError.h",
-    "CHIPError.mm",
-    "CHIPError_Internal.h",
-    "CHIPIMDispatch.mm",
-    "CHIPLogging.h",
-    "CHIPManualSetupPayloadParser.h",
-    "CHIPManualSetupPayloadParser.mm",
-    "CHIPOnboardingPayloadParser.m",
-    "CHIPOperationalCredentialsDelegate.mm",
-    "CHIPP256KeypairBridge.mm",
-    "CHIPPersistentStorageDelegate.h",
-    "CHIPPersistentStorageDelegateBridge.h",
-    "CHIPPersistentStorageDelegateBridge.mm",
-    "CHIPQRCodeSetupPayloadParser.h",
-    "CHIPQRCodeSetupPayloadParser.mm",
-    "CHIPSetupPayload.h",
-    "CHIPSetupPayload.mm",
-    "zap-generated/CHIPAttributeTLVValueDecoder.mm",
-    "zap-generated/CHIPCallbackBridge.mm",
-    "zap-generated/CHIPClustersObjc.h",
-    "zap-generated/CHIPClustersObjc.mm",
-    "zap-generated/CHIPCommandPayloadsObjc.h",
-    "zap-generated/CHIPCommandPayloadsObjc.mm",
-    "zap-generated/CHIPStructsObjc.h",
-    "zap-generated/CHIPStructsObjc.mm",
+    "${chip_root}/src/app/clusters/ota-provider/ota-provider.cpp",
+    "MTRError.mm",
   ]
 
   public_deps = [
     "${chip_root}/src/controller",
-    "${chip_root}/src/controller/data_model",
     "${chip_root}/src/credentials:default_attestation_verifier",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
   ]
 
+  include_dirs = [ "${chip_root}/zzz_generated/controller-clusters" ]
+
   frameworks = [ "Security.framework" ]
 
   public_configs = [ ":darwin_config" ]
 }
 
-group("CHIP") {
+group("static-matter") {
   public_deps = [ ":framework" ]
 }

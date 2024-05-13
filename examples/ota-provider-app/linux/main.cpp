@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,6 +46,7 @@ constexpr chip::EndpointId kOtaProviderEndpoint = 0;
 constexpr uint16_t kOptionUpdateAction              = 'a';
 constexpr uint16_t kOptionUserConsentNeeded         = 'c';
 constexpr uint16_t kOptionFilepath                  = 'f';
+constexpr uint16_t kOptionImageUri                  = 'i';
 constexpr uint16_t kOptionOtaImageList              = 'o';
 constexpr uint16_t kOptionDelayedApplyActionTimeSec = 'p';
 constexpr uint16_t kOptionQueryImageStatus          = 'q';
@@ -53,6 +54,7 @@ constexpr uint16_t kOptionDelayedQueryActionTimeSec = 't';
 constexpr uint16_t kOptionUserConsentState          = 'u';
 constexpr uint16_t kOptionIgnoreQueryImage          = 'x';
 constexpr uint16_t kOptionIgnoreApplyUpdate         = 'y';
+constexpr uint16_t kOptionPollInterval              = 'P';
 
 OTAProviderExample gOtaProvider;
 chip::ota::DefaultOTAProviderUserConsent gUserConsentProvider;
@@ -64,10 +66,12 @@ static uint32_t gDelayedQueryActionTimeSec           = 0;
 static uint32_t gDelayedApplyActionTimeSec           = 0;
 static const char * gOtaFilepath                     = nullptr;
 static const char * gOtaImageListFilepath            = nullptr;
+static const char * gImageUri                        = nullptr;
 static chip::ota::UserConsentState gUserConsentState = chip::ota::UserConsentState::kUnknown;
 static bool gUserConsentNeeded                       = false;
 static uint32_t gIgnoreQueryImageCount               = 0;
 static uint32_t gIgnoreApplyUpdateCount              = 0;
+static uint32_t gPollInterval                        = 0;
 
 // Parses the JSON filepath and extracts DeviceSoftwareVersionModel parameters
 static bool ParseJsonFileAndPopulateCandidates(const char * filepath,
@@ -107,14 +111,13 @@ static bool ParseJsonFileAndPopulateCandidates(const char * filepath,
             candidate.vendorId        = static_cast<chip::VendorId>(iter.get("vendorId", 1).asUInt());
             candidate.productId       = static_cast<uint16_t>(iter.get("productId", 1).asUInt());
             candidate.softwareVersion = static_cast<uint32_t>(iter.get("softwareVersion", 10).asUInt64());
-            strncpy(candidate.softwareVersionString, iter.get("softwareVersionString", "1.0.0").asCString(),
-                    OTAProviderExample::SW_VER_STR_MAX_LEN);
+            chip::Platform::CopyString(candidate.softwareVersionString, iter.get("softwareVersionString", "1.0.0").asCString());
             candidate.cDVersionNumber              = static_cast<uint16_t>(iter.get("cDVersionNumber", 0).asUInt());
             candidate.softwareVersionValid         = iter.get("softwareVersionValid", true).asBool() ? true : false;
             candidate.minApplicableSoftwareVersion = static_cast<uint32_t>(iter.get("minApplicableSoftwareVersion", 0).asUInt64());
             candidate.maxApplicableSoftwareVersion =
                 static_cast<uint32_t>(iter.get("maxApplicableSoftwareVersion", 1000).asUInt64());
-            strncpy(candidate.otaURL, iter.get("otaURL", "https://test.com").asCString(), OTAProviderExample::OTA_URL_MAX_LEN);
+            chip::Platform::CopyString(candidate.otaURL, iter.get("otaURL", "https://test.com").asCString());
             candidates.push_back(candidate);
             ret = true;
         }
@@ -147,6 +150,9 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
             gOtaFilepath = aValue;
         }
         break;
+    case kOptionImageUri:
+        gImageUri = aValue;
+        break;
     case kOptionOtaImageList:
         kOptionOtaImageListSelected = true;
         if (0 != access(aValue, R_OK))
@@ -165,12 +171,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         }
         break;
     case kOptionQueryImageStatus:
-        if (aValue == NULL)
-        {
-            PrintArgError("%s: ERROR: NULL queryImageStatus parameter\n", aProgram);
-            retval = false;
-        }
-        else if (strcmp(aValue, "updateAvailable") == 0)
+        if (strcmp(aValue, "updateAvailable") == 0)
         {
             gQueryImageStatus = OTAQueryStatus::kUpdateAvailable;
         }
@@ -195,12 +196,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         gIgnoreApplyUpdateCount = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
         break;
     case kOptionUpdateAction:
-        if (aValue == NULL)
-        {
-            PrintArgError("%s: ERROR: NULL applyUpdateAction parameter\n", aProgram);
-            retval = false;
-        }
-        else if (strcmp(aValue, "proceed") == 0)
+        if (strcmp(aValue, "proceed") == 0)
         {
             gOptionUpdateAction = OTAApplyUpdateAction::kProceed;
         }
@@ -225,12 +221,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         gDelayedApplyActionTimeSec = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
         break;
     case kOptionUserConsentState:
-        if (aValue == NULL)
-        {
-            PrintArgError("%s: ERROR: NULL UserConsent parameter\n", aProgram);
-            retval = false;
-        }
-        else if (strcmp(aValue, "granted") == 0)
+        if (strcmp(aValue, "granted") == 0)
         {
             gUserConsentState = chip::ota::UserConsentState::kGranted;
         }
@@ -251,6 +242,10 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
     case kOptionUserConsentNeeded:
         gUserConsentNeeded = true;
         break;
+    case kOptionPollInterval:
+        gPollInterval = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
+        break;
+
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;
@@ -264,6 +259,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "applyUpdateAction", chip::ArgParser::kArgumentRequired, kOptionUpdateAction },
     { "userConsentNeeded", chip::ArgParser::kNoArgument, kOptionUserConsentNeeded },
     { "filepath", chip::ArgParser::kArgumentRequired, kOptionFilepath },
+    { "imageUri", chip::ArgParser::kArgumentRequired, kOptionImageUri },
     { "otaImageList", chip::ArgParser::kArgumentRequired, kOptionOtaImageList },
     { "delayedApplyActionTimeSec", chip::ArgParser::kArgumentRequired, kOptionDelayedApplyActionTimeSec },
     { "queryImageStatus", chip::ArgParser::kArgumentRequired, kOptionQueryImageStatus },
@@ -271,6 +267,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "userConsentState", chip::ArgParser::kArgumentRequired, kOptionUserConsentState },
     { "ignoreQueryImage", chip::ArgParser::kArgumentRequired, kOptionIgnoreQueryImage },
     { "ignoreApplyUpdate", chip::ArgParser::kArgumentRequired, kOptionIgnoreApplyUpdate },
+    { "pollInterval", chip::ArgParser::kArgumentRequired, kOptionPollInterval },
     {},
 };
 
@@ -285,6 +282,9 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        Otherwise, value of the UserConsentNeeded field is false.\n"
                              "  -f, --filepath <file path>\n"
                              "        Path to a file containing an OTA image\n"
+                             "  -i, --imageUri <uri>\n"
+                             "        Value for the ImageURI field in the QueryImageResponse.\n"
+                             "        If none is supplied, a valid URI is generated.\n"
                              "  -o, --otaImageList <file path>\n"
                              "        Path to a file containing a list of OTA images\n"
                              "  -p, --delayedApplyActionTimeSec <time in seconds>\n"
@@ -306,7 +306,9 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "  -x, --ignoreQueryImage <ignore count>\n"
                              "        The number of times to ignore the QueryImage Command and not send a response.\n"
                              "  -y, --ignoreApplyUpdate <ignore count>\n"
-                             "        The number of times to ignore the ApplyUpdateRequest Command and not send a response.\n" };
+                             "        The number of times to ignore the ApplyUpdateRequest Command and not send a response.\n"
+                             "  -P, --pollInterval <time in milliseconds>\n"
+                             "        Poll interval for the BDX transfer \n" };
 
 OptionSet * allOptions[] = { &cmdLineOptions, nullptr };
 
@@ -331,6 +333,11 @@ void ApplicationInit()
         gOtaProvider.SetOTAFilePath(gOtaFilepath);
     }
 
+    if (gImageUri != nullptr)
+    {
+        gOtaProvider.SetImageUri(gImageUri);
+    }
+
     gOtaProvider.SetIgnoreQueryImageCount(gIgnoreQueryImageCount);
     gOtaProvider.SetIgnoreApplyUpdateCount(gIgnoreApplyUpdateCount);
     gOtaProvider.SetQueryImageStatus(gQueryImageStatus);
@@ -347,6 +354,11 @@ void ApplicationInit()
     if (gUserConsentNeeded)
     {
         gOtaProvider.SetUserConsentNeeded(true);
+    }
+
+    if (gPollInterval != 0)
+    {
+        gOtaProvider.SetPollInterval(gPollInterval);
     }
 
     ChipLogDetail(SoftwareUpdate, "Using ImageList file: %s", gOtaImageListFilepath ? gOtaImageListFilepath : "(none)");
@@ -367,6 +379,8 @@ void ApplicationInit()
 
     chip::app::Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, &gOtaProvider);
 }
+
+void ApplicationShutdown() {}
 
 int main(int argc, char * argv[])
 {

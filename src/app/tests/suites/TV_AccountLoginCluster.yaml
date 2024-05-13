@@ -29,26 +29,32 @@ tests:
                 value: nodeId
 
     - label: "Get Setup PIN Command"
-      command: "getSetupPIN"
+      command: "GetSetupPIN"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "tempAccountIdentifier"
+              - name: "TempAccountIdentifier"
                 value: "asdf"
       response:
           values:
-              - name: "setupPIN"
+              - name: "SetupPIN"
                 value: "tempPin123"
     - label: "Login Command"
-      command: "login"
+      command: "Login"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "tempAccountIdentifier"
+              - name: "TempAccountIdentifier"
                 value: "asdf"
-              - name: "setupPIN"
+              - name: "SetupPIN"
                 value: "tempPin123"
+              - name: "Node"
+                value: nodeId
 
     - label: "Logout Command"
-      command: "logout"
+      command: "Logout"
       timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "Node"
+                value: nodeId

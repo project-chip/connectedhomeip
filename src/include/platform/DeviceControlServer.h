@@ -23,86 +23,27 @@
 #pragma once
 
 #include <lib/support/Span.h>
-#include <platform/FailSafeContext.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 namespace chip {
 namespace DeviceLayer {
-
-/**
- * Defines the Swtich Device Control Delegate class to notify platform events.
- */
-class SwitchDeviceControlDelegate
-{
-public:
-    virtual ~SwitchDeviceControlDelegate() {}
-
-    /**
-     * @brief
-     *   Called when the latching switch is moved to a new position.
-     */
-    virtual void OnSwitchLatched(uint8_t newPosition) {}
-
-    /**
-     * @brief
-     *   Called when the momentary switch starts to be pressed.
-     */
-    virtual void OnInitialPressed(uint8_t newPosition) {}
-
-    /**
-     * @brief
-     *   Called when the momentary switch has been pressed for a "long" time.
-     */
-    virtual void OnLongPressed(uint8_t newPosition) {}
-
-    /**
-     * @brief
-     *   Called when the momentary switch has been released.
-     */
-    virtual void OnShortReleased(uint8_t previousPosition) {}
-
-    /**
-     * @brief
-     *   Called when the momentary switch has been released (after debouncing)
-     *   and after having been pressed for a long time.
-     */
-    virtual void OnLongReleased(uint8_t previousPosition) {}
-
-    /**
-     * @brief
-     *   Called to indicate how many times the momentary switch has been pressed
-     *   in a multi-press sequence, during that sequence.
-     */
-    virtual void OnMultiPressOngoing(uint8_t newPosition, uint8_t count) {}
-
-    /**
-     * @brief
-     *   Called to indicate how many times the momentary switch has been pressed
-     *   in a multi-press sequence, after it has been detected that the sequence has ended.
-     */
-    virtual void OnMultiPressComplete(uint8_t newPosition, uint8_t count) {}
-};
 
 class DeviceControlServer final
 {
 public:
     // ===== Members for internal use by other Device Layer components.
 
-    CHIP_ERROR CommissioningComplete(NodeId peerNodeId, FabricIndex accessingFabricIndex);
-    CHIP_ERROR SetRegulatoryConfig(uint8_t location, const CharSpan & countryCode, uint64_t breadcrumb);
-    CHIP_ERROR ConnectNetworkForOperational(ByteSpan networkID);
-
-    void SetSwitchDelegate(SwitchDeviceControlDelegate * delegate) { mSwitchDelegate = delegate; }
-    SwitchDeviceControlDelegate * GetSwitchDelegate() const { return mSwitchDelegate; }
-    FailSafeContext & GetFailSafeContext() { return mFailSafeContext; }
-
+    CHIP_ERROR PostCommissioningCompleteEvent(NodeId peerNodeId, FabricIndex accessingFabricIndex);
+    CHIP_ERROR SetRegulatoryConfig(uint8_t location, const CharSpan & countryCode);
+    CHIP_ERROR PostConnectedToOperationalNetworkEvent(ByteSpan networkID);
+    CHIP_ERROR PostCloseAllBLEConnectionsToOperationalNetworkEvent();
+    CHIP_ERROR PostWiFiDeviceAvailableNetworkEvent();
+    CHIP_ERROR PostOperationalNetworkStartedEvent();
     static DeviceControlServer & DeviceControlSvr();
 
 private:
     // ===== Members for internal use by the following friends.
     static DeviceControlServer sInstance;
-    FailSafeContext mFailSafeContext;
-    SwitchDeviceControlDelegate * mSwitchDelegate = nullptr;
 
     // ===== Private members reserved for use by this class only.
 
@@ -110,8 +51,8 @@ private:
     ~DeviceControlServer() = default;
 
     // No copy, move or assignment.
-    DeviceControlServer(const DeviceControlServer &)  = delete;
-    DeviceControlServer(const DeviceControlServer &&) = delete;
+    DeviceControlServer(const DeviceControlServer &)             = delete;
+    DeviceControlServer(const DeviceControlServer &&)            = delete;
     DeviceControlServer & operator=(const DeviceControlServer &) = delete;
 };
 

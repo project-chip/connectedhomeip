@@ -34,8 +34,8 @@ tests:
       response:
           value:
               [
-                  { identifier: 1, name: "exampleName" },
-                  { identifier: 2, name: "exampleName" },
+                  { Identifier: 1, Name: "exampleName" },
+                  { Identifier: 2, Name: "exampleName" },
               ]
 
     - label: "Read attribute current navigator target"
@@ -45,16 +45,16 @@ tests:
           value: 0
 
     - label: "Navigate Target Request Command"
-      command: "navigateTarget"
+      command: "NavigateTarget"
       arguments:
           values:
-              - name: "target"
+              - name: "Target"
                 value: 1
-              - name: "data"
+              - name: "Data"
                 value: "1"
       response:
           values:
-              - name: "data"
+              - name: "Data"
                 value: "data response"
-              - name: "status"
+              - name: "Status"
                 value: 0

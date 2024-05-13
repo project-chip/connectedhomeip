@@ -20,8 +20,8 @@ limitations under the License.
   <struct name="LabelStruct">
     <cluster code="0x0040"/>
     <cluster code="0x0041"/>
-    <item name="label" type="CHAR_STRING" length="16"/>
-    <item name="value" type="CHAR_STRING" length="16"/>
+    <item name="Label" type="char_string" length="16"/>
+    <item name="Value" type="char_string" length="16"/>
   </struct>
 
   <cluster>
@@ -31,6 +31,6 @@ limitations under the License.
     <define>FIXED_LABEL_CLUSTER</define>
     <description>The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read only
 labels.</description>
-    <attribute side="server" code="0x0000" define="LABEL_LIST" type="ARRAY" entryType="LabelStruct" length="254" writable="false" optional="false">label list</attribute>
+    <attribute side="server" code="0x0000" define="LABEL_LIST" type="array" entryType="LabelStruct" writable="false" optional="false">LabelList</attribute>
   </cluster>
 </configurator>

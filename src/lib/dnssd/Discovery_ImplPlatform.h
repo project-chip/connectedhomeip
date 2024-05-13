@@ -20,9 +20,9 @@
 #include <inet/InetInterface.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/Global.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/Resolver.h>
-#include <lib/dnssd/ResolverProxy.h>
 #include <lib/dnssd/platform/Dnssd.h>
 #include <platform/CHIPDeviceConfig.h>
 
@@ -38,6 +38,7 @@ class DiscoveryImplPlatform : public ServiceAdvertiser, public Resolver
 public:
     // Members that implement both ServiceAdveriser and Resolver interfaces.
     CHIP_ERROR Init(Inet::EndPointManager<Inet::UDPEndPoint> *) override { return InitImpl(); }
+    bool IsInitialized() override;
     void Shutdown() override;
 
     // Members that implement ServiceAdvertiser interface.
@@ -45,31 +46,39 @@ public:
     CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) override;
     CHIP_ERROR Advertise(const CommissionAdvertisingParameters & params) override;
     CHIP_ERROR FinalizeServiceUpdate() override;
-    CHIP_ERROR GetCommissionableInstanceName(char * instanceName, size_t maxLength) override;
+    CHIP_ERROR GetCommissionableInstanceName(char * instanceName, size_t maxLength) const override;
+    CHIP_ERROR UpdateCommissionableInstanceName() override;
 
     // Members that implement Resolver interface.
-    void SetOperationalDelegate(OperationalResolveDelegate * delegate) override { mResolverProxy.SetOperationalDelegate(delegate); }
-    void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override
-    {
-        mResolverProxy.SetCommissioningDelegate(delegate);
-    }
-    CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override;
-    CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
-    CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
+    void SetOperationalDelegate(OperationalResolveDelegate * delegate) override { mOperationalDelegate = delegate; }
+    CHIP_ERROR ResolveNodeId(const PeerId & peerId) override;
+    void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) override;
+    CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryContext & context);
+    CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter, DiscoveryContext & context);
+    CHIP_ERROR StartDiscovery(DiscoveryType type, DiscoveryFilter filter, DiscoveryContext & context) override;
+    CHIP_ERROR StopDiscovery(DiscoveryContext & context) override;
+    CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) override;
 
     static DiscoveryImplPlatform & GetInstance();
 
 private:
-    DiscoveryImplPlatform();
+    enum class State : uint8_t
+    {
+        kUninitialized,
+        kInitializing,
+        kInitialized
+    };
 
-    DiscoveryImplPlatform(const DiscoveryImplPlatform &) = delete;
+    DiscoveryImplPlatform() = default;
+
+    DiscoveryImplPlatform(const DiscoveryImplPlatform &)             = delete;
     DiscoveryImplPlatform & operator=(const DiscoveryImplPlatform &) = delete;
 
     CHIP_ERROR InitImpl();
 
     static void HandleDnssdInit(void * context, CHIP_ERROR initError);
     static void HandleDnssdError(void * context, CHIP_ERROR initError);
-    static void HandleDnssdPublish(void * context, const char * type, CHIP_ERROR error);
+    static void HandleDnssdPublish(void * context, const char * type, const char * instanceName, CHIP_ERROR error);
     static CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t & rotatingDeviceIdHexBufferSize);
     CHIP_ERROR PublishService(const char * serviceType, TextEntry * textEntries, size_t textEntrySize, const char ** subTypes,
                               size_t subTypeSize, const OperationalAdvertisingParameters & params);
@@ -79,19 +88,15 @@ private:
                               size_t subTypeSize, uint16_t port, Inet::InterfaceId interfaceId, const chip::ByteSpan & mac,
                               DnssdServiceProtocol procotol, PeerId peerId);
 
-    OperationalAdvertisingParameters mOperationalNodeAdvertisingParams;
-    CommissionAdvertisingParameters mCommissionableNodeAdvertisingParams;
-    CommissionAdvertisingParameters mCommissionerNodeAdvertisingParams;
-    bool mIsOperationalNodePublishing    = false;
-    bool mIsCommissionableNodePublishing = false;
-    bool mIsCommissionerNodePublishing   = false;
+    static void HandleNodeIdResolve(void * context, DnssdService * result, const Span<Inet::IPAddress> & addresses,
+                                    CHIP_ERROR error);
+
+    State mState = State::kUninitialized;
     uint8_t mCommissionableInstanceName[sizeof(uint64_t)];
+    OperationalResolveDelegate * mOperationalDelegate = nullptr;
 
-    bool mDnssdInitialized = false;
-
-    ResolverProxy mResolverProxy;
-
-    static DiscoveryImplPlatform sManager;
+    friend Global<DiscoveryImplPlatform>;
+    static Global<DiscoveryImplPlatform> sManager;
 };
 
 } // namespace Dnssd

@@ -21,12 +21,12 @@ limitations under the License.
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements.</description>
     <code>0x0402</code>
-    <define>TEMP_MEASUREMENT_CLUSTER</define>
+    <define>TEMPERATURE_MEASUREMENT_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <attribute side="server" code="0x0000" define="TEMP_MEASURED_VALUE" type="INT16S" min="0x954d" max="0x7fff" writable="false" isNullable="true" optional="false">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="TEMP_MIN_MEASURED_VALUE" type="INT16S" min="0x954d" max="0x7ffe" writable="false" isNullable="true" default="0x8000" optional="false">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="TEMP_MAX_MEASURED_VALUE" type="INT16S" min="0x954e" max="0x7fff" writable="false" isNullable="true" default="0x8000" optional="false">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="TEMP_TOLERANCE" type="INT16U" min="0" max="0x8000" writable="false" default="0" optional="true">Tolerance</attribute>
+    <attribute side="server" code="0x0000" define="TEMP_MEASURED_VALUE" type="temperature" min="0x954d" max="0x7fff" writable="false" isNullable="true" optional="false">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="TEMP_MIN_MEASURED_VALUE" type="temperature" min="0x954d" max="0x7ffe" writable="false" isNullable="true" default="0x8000" optional="false">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="TEMP_MAX_MEASURED_VALUE" type="temperature" min="0x954e" max="0x7fff" writable="false" isNullable="true" default="0x8000" optional="false">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="TEMP_TOLERANCE" type="int16u" min="0" max="0x0800" writable="false" default="0" optional="true">Tolerance</attribute>
   </cluster>
 </configurator>

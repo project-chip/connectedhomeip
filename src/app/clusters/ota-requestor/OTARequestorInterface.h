@@ -21,7 +21,7 @@
  */
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/util/af-enums.h>
+
 #include <lib/core/ClusterEnums.h>
 
 #pragma once
@@ -145,14 +145,6 @@ public:
     using OTAUpdateStateEnum   = chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
     using ProviderLocationType = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
 
-    // Return value for various trigger-type APIs
-    enum OTATriggerResult
-    {
-        kTriggerSuccessful = 0,
-        kNoProviderKnown   = 1,
-        kWrongState        = 2
-    };
-
     // Reset any relevant states
     virtual void Reset(void) = 0;
 
@@ -162,13 +154,14 @@ public:
      */
     virtual void HandleAnnounceOTAProvider(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-        const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData) = 0;
+        const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType & commandData) = 0;
 
     // Destructor
     virtual ~OTARequestorInterface() = default;
 
-    // Application API to send the QueryImage command and start the image update process with the next available Provider
-    virtual OTATriggerResult TriggerImmediateQuery() = 0;
+    // Application API to send the QueryImage command and start the image update process.
+    // The `fabricIndex` optional argument can be used to explicitly select the OTA provider.
+    virtual CHIP_ERROR TriggerImmediateQuery(FabricIndex fabricIndex = kUndefinedFabricIndex) = 0;
 
     // Internal API meant for use by OTARequestorDriver to send the QueryImage command and start the image update process
     // with the preset provider
@@ -209,6 +202,9 @@ public:
 
     // Set the provider location to be used in the next query and OTA update process
     virtual void SetCurrentProviderLocation(ProviderLocationType providerLocation) = 0;
+
+    // Set the metadata value for the provider to be used in the next query and OTA update process
+    virtual void SetMetadataForProvider(chip::ByteSpan metadataForProvider) = 0;
 
     // If there is an OTA update in progress, returns the provider location for the current OTA update, otherwise, returns the
     // provider location that was last used

@@ -13,50 +13,100 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/platform/python.gni")
 
-config("config") {
-  # TODO: this should be a dependency on src/controller/data_model however this is circular:
-  #    zzz_generated/controller-clusters depend on src/controller
-  #    src/controller neeeds zzz_generated/controller-cluster for includes
-  include_dirs = [ "${chip_root}/zzz_generated/" ]
+source_set("nodatamodel") {
+  sources = [ "EmptyDataModelHandler.cpp" ]
+
+  public_deps = [ "${chip_root}/src/app" ]
+}
+
+CHIP_CONTROLLER_HEADERS = [ "ExampleOperationalCredentialsIssuer.h" ]
+CHIP_READ_CLIENT_HEADERS = [
+  "CommissioningWindowOpener.h",
+  "CurrentFabricRemover.h",
+]
+
+# This source set exists specifically to deny including them without dependencies
+# if "controller" sources do not contain them
+#
+# They are NOT intended to be used directly.
+#
+# The intent for this is to force gn to be aware that these files are known and
+# error out as `include not allowed due to missing dependency` even if
+# controller is built without these sources
+source_set("gen_check_chip_controller_headers") {
+  sources = CHIP_CONTROLLER_HEADERS
+}
+
+source_set("gen_check_chip_read_client_headers") {
+  sources = CHIP_READ_CLIENT_HEADERS
+}
+
+source_set("delegates") {
+  sources = [ "OperationalCredentialsDelegate.h" ]
 }
 
 static_library("controller") {
   output_name = "libChipController"
 
   sources = [
-    "CHIPCluster.cpp",
+    # TODO: these dependencies are broken. Specifically:
+    #       a) ChipDeviceControllerFactory.h includes CHIPDeviceController.h
+    #       b) CHIPDeviceController.cpp is only compiled for read_client
+    # These conditionals are NOT ok and should have been solved with separate
+    # source sets - either include some functionality or do not
+    #
+    # Then CHIPDeviceController.h pulls in AbstractDnssdDiscoveryController and everything
+    # cascades. In the end it looks like basically every header file is pulled in.
+    #
+    # Unfortunately this is hard to fix in one go, hence these odd list of header-only
+    # dependencies
+    "AbstractDnssdDiscoveryController.h",
+    "AutoCommissioner.h",
     "CHIPCluster.h",
+    "CHIPCommissionableNodeController.h",
+    "CHIPDeviceController.h",
+    "CHIPDeviceControllerSystemState.h",
+    "CommandSenderAllocator.h",
+    "CommissioneeDeviceProxy.h",
+    "CommissioningDelegate.h",
+    "DeviceDiscoveryDelegate.h",
+    "DevicePairingDelegate.h",
+    "InvokeInteraction.h",
+    "ReadInteraction.h",
+    "SetUpCodePairer.h",
+    "TypedCommandCallback.h",
+    "TypedReadCallback.h",
+    "WriteInteraction.h",
   ]
 
-  if (chip_controller) {
+  if (chip_controller && chip_build_controller) {
+    sources += CHIP_CONTROLLER_HEADERS
     sources += [
       "AbstractDnssdDiscoveryController.cpp",
       "AutoCommissioner.cpp",
-      "AutoCommissioner.h",
       "CHIPCommissionableNodeController.cpp",
-      "CHIPCommissionableNodeController.h",
-      "CHIPDeviceController.cpp",
-      "CHIPDeviceController.h",
       "CHIPDeviceControllerFactory.cpp",
       "CHIPDeviceControllerFactory.h",
       "CommissioneeDeviceProxy.cpp",
-      "CommissioneeDeviceProxy.h",
       "CommissionerDiscoveryController.cpp",
       "CommissionerDiscoveryController.h",
       "CommissioningDelegate.cpp",
-      "CommissioningWindowOpener.cpp",
-      "CommissioningWindowOpener.h",
-      "DeviceDiscoveryDelegate.h",
-      "DevicePairingDelegate.h",
-      "EmptyDataModelHandler.cpp",
       "ExampleOperationalCredentialsIssuer.cpp",
-      "ExampleOperationalCredentialsIssuer.h",
       "SetUpCodePairer.cpp",
-      "SetUpCodePairer.h",
     ]
+    if (chip_enable_read_client) {
+      sources += CHIP_READ_CLIENT_HEADERS
+      sources += [
+        "CHIPDeviceController.cpp",
+        "CommissioningWindowOpener.cpp",
+        "CurrentFabricRemover.cpp",
+      ]
+    }
   }
 
   cflags = [ "-Wconversion" ]
@@ -71,13 +121,17 @@ static_library("controller") {
     "${chip_root}/src/platform",
     "${chip_root}/src/protocols",
     "${chip_root}/src/setup_payload",
-    "${chip_root}/src/trace",
+    "${chip_root}/src/tracing",
+    "${chip_root}/src/tracing:macros",
     "${chip_root}/src/transport",
   ]
 
   deps = [ "${chip_root}/src/lib/address_resolve" ]
 
-  public_configs = [ ":config" ]
+  if (chip_controller && chip_build_controller) {
+    # ExampleOperationalCredentialsIssuer uses TestGroupData
+    deps += [ "${chip_root}/src/lib/support:testing" ]
+  }
 
-  defines = []
+  public_configs = [ "${chip_root}/src:includes" ]
 }

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -26,7 +26,7 @@
 
 #include <inet/IPAddress.h>
 #include <lib/core/CHIPEncoding.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
@@ -96,14 +96,8 @@ void LogOpenThreadStateChange(otInstance * otInst, uint32_t flags)
 {
 #if CHIP_DETAIL_LOGGING
 
-#if OPENTHREAD_API_VERSION >= 126
     const uint32_t kParamsChanged = (OT_CHANGED_THREAD_NETWORK_NAME | OT_CHANGED_THREAD_PANID | OT_CHANGED_THREAD_EXT_PANID |
                                      OT_CHANGED_THREAD_CHANNEL | OT_CHANGED_NETWORK_KEY | OT_CHANGED_PSKC);
-#else
-    const uint32_t kParamsChanged = (OT_CHANGED_THREAD_NETWORK_NAME | OT_CHANGED_THREAD_PANID | OT_CHANGED_THREAD_EXT_PANID |
-                                     OT_CHANGED_THREAD_CHANNEL | OT_CHANGED_MASTER_KEY | OT_CHANGED_PSKC);
-#endif
-
     static char strBuf[64];
 
     ChipLogDetail(DeviceLayer, "OpenThread State Changed (Flags: 0x%08" PRIx32 ")", flags);
@@ -132,14 +126,10 @@ void LogOpenThreadStateChange(otInstance * otInst, uint32_t flags)
         }
 #if CHIP_CONFIG_SECURITY_TEST_MODE
         {
-#if OPENTHREAD_API_VERSION >= 126
-            const otNetworkKey * otKey = otThreadGetNetworkKey(otInst);
+            otNetworkKey otKey;
+            otThreadGetNetworkKey(otInst, &otKey);
             for (int i = 0; i < OT_NETWORK_KEY_SIZE; i++)
-#else
-            const otMasterKey * otKey = otThreadGetMasterKey(otInst);
-            for (int i = 0; i < OT_MASTER_KEY_SIZE; i++)
-#endif
-                snprintf(&strBuf[i * 2], 3, "%02X", otKey->m8[i]);
+                snprintf(&strBuf[i * 2], 3, "%02X", otKey.m8[i]);
             ChipLogDetail(DeviceLayer, "   Network Key: %s", strBuf);
         }
 #endif // CHIP_CONFIG_SECURITY_TEST_MODE
@@ -233,17 +223,17 @@ void LogOpenThreadPacket(const char * titleStr, otMessage * pkt)
 
         if (IPv6_NextHeader == kIPProto_UDP || IPv6_NextHeader == kIPProto_TCP)
         {
-            snprintf(srcStr + strlen(srcStr), 13, ", port %" PRIu16, Encoding::BigEndian::Get16(IPv6_SrcPort));
-            snprintf(destStr + strlen(destStr), 13, ", port %" PRIu16, Encoding::BigEndian::Get16(IPv6_DestPort));
+            snprintf(srcStr + strlen(srcStr), 13, ", port %u", Encoding::BigEndian::Get16(IPv6_SrcPort));
+            snprintf(destStr + strlen(destStr), 13, ", port %u", Encoding::BigEndian::Get16(IPv6_DestPort));
         }
 
-        ChipLogDetail(DeviceLayer, "%s: %s, len %" PRIu16, titleStr, type, pktLen);
+        ChipLogDetail(DeviceLayer, "%s: %s, len %u", StringOrNullMarker(titleStr), type, pktLen);
         ChipLogDetail(DeviceLayer, "    src  %s", srcStr);
         ChipLogDetail(DeviceLayer, "    dest %s", destStr);
     }
     else
     {
-        ChipLogDetail(DeviceLayer, "%s: %s, len %" PRIu16, titleStr, "(decode error)", pktLen);
+        ChipLogDetail(DeviceLayer, "%s: %s, len %u", StringOrNullMarker(titleStr), "(decode error)", pktLen);
     }
 
 #endif // CHIP_DETAIL_LOGGING

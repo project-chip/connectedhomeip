@@ -21,12 +21,13 @@
 #include "ListBuilder.h"
 #include "ListParser.h"
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/ConcreteEventPath.h>
 #include <app/EventPathParams.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/NodeId.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -45,22 +46,9 @@ enum class Tag : uint8_t
 class Parser : public ListParser
 {
 public:
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    /**
-     *  @brief Roughly verify the message is correctly formed
-     *   1) all mandatory tags are present
-     *   2) all elements have expected data type
-     *   3) any tag can only appear once
-     *   4) At the top level of the structure, unknown tags are ignored for forward compatibility
-     *  @note The main use of this function is to print out what we're
-     *    receiving during protocol development and debugging.
-     *    The encoding rule has changed in IM encoding spec so this
-     *    check is only "roughly" conformant now.
-     *
-     *  @return #CHIP_NO_ERROR on success
-     */
-    CHIP_ERROR CheckSchemaValidity() const;
-#endif
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+    CHIP_ERROR PrettyPrint() const;
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
     /**
      *  @brief Get a TLVReader for the NodeId. Next() must be called before accessing them.
@@ -123,9 +111,17 @@ public:
      *  @param [in] apPath    A pointer to the path to fill in.
      *
      *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_ERROR_IM_MALFORMED_EVENT_PATH if the path from the reader is not a valid concrere event path.
+     *          #CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB if the path from the reader is not a valid concrere event path.
      */
     CHIP_ERROR GetEventPath(ConcreteEventPath * const apPath) const;
+
+    /**
+     * @brief Parse the event path into an EventPathParams object. As part of parsing,
+     * validity checks for each path item will be done as well.
+     *
+     * If any errors are encountered, an IM error of 'InvalidAction' will be returned.
+     */
+    CHIP_ERROR ParsePath(EventPathParams & aEvent) const;
 };
 
 class Builder : public ListBuilder
@@ -179,9 +175,9 @@ public:
     /**
      *  @brief Mark the end of this EventPath
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    EventPathIB::Builder & EndOfEventPathIB();
+    CHIP_ERROR EndOfEventPathIB();
 
     CHIP_ERROR Encode(const EventPathParams & aEventPathParams);
 };

@@ -18,192 +18,126 @@
 # Needed to use types in type hints before they are fully defined.
 from __future__ import annotations
 
-import ctypes
-from dataclasses import dataclass, field
-from typing import *
-from ctypes import *
-from rich.pretty import pprint
-import ipdb
-import json
 import logging
-import builtins
-import base64
-import chip.exceptions
-from chip import ChipDeviceCtrl
-import copy
+from typing import List
+
+from chip import CertificateAuthority, ChipDeviceCtrl
+from chip.crypto import p256keypair
+from chip.native import GetLibraryHandle
 
 
 class FabricAdmin:
-    ''' Administers a given fabric instance. Each admin is associated with
-        a specific RCAC and ICAC as well as Fabric ID and Index.
-
-        There can only be one admin instance for a given fabric in a single
-        Python process instance.
-
-        The admin also persists to storage its detail automatically to permit
-        easy loading of its information later.
-
-        >> C++ Binding Details
-
-        Each instance of the fabric admin is associated with a single instance
-        of the OperationalCredentialsAdapter. This adapter instance implements
-        the OperationalCredentialsDelegate and is meant to provide a Python 
-        adapter to the functions in that delegate so that the fabric admin
-        can in turn, provide users the ability to generate their own NOCs for devices
-        on the network (not implemented yet). For now, it relies on the in-built 
-        ExampleOperationalCredentialsIssuer to do that.
-
-        TODO: Add support for FabricAdmin to permit callers to hook up their own GenerateNOC
-              logic.
-
-        >> Persistence
-
-        Each instance persists its fabric ID and index to storage. This is in addition to the
-        persistence built into the ExampleOperationalCredentialsIssuer that persists details
-        about the RCAC/ICAC as well. This facilitates re-construction of a fabric admin on subsequent
-        boot for a given fabric and ensuring it automatically picks up the right ICAC/RCAC details as well.
+    ''' Administers a fabric associated with a unique FabricID under a given CertificateAuthority
+        instance.
     '''
+    @classmethod
+    def _Handle(cls):
+        return GetLibraryHandle()
 
-    _handle = chip.native.GetLibraryHandle()
-    activeFabricIndexList = set()
-    activeFabricIdList = set()
+    @classmethod
+    def logger(cls):
+        return logging.getLogger('FabricAdmin')
 
-    activeAdmins = set()
+    def __init__(self, certificateAuthority: CertificateAuthority.CertificateAuthority, vendorId: int, fabricId: int = 1):
+        ''' Initializes the object.
 
-    def AllocateNextFabricIndex(self):
-        ''' Allocate the next un-used fabric index.
+            certificateAuthority:       CertificateAuthority instance that will be used to vend NOCs for both
+                                        DeviceControllers and commissionable nodes on this fabric.
+            vendorId:                   Valid operational Vendor ID associated with this fabric.
+            fabricId:                   Fabric ID to be associated with this fabric.
         '''
-        nextFabricIndex = 1
-        while nextFabricIndex in FabricAdmin.activeFabricIndexList:
-            nextFabricIndex = nextFabricIndex + 1
-        return nextFabricIndex
+        self._handle = GetLibraryHandle()
 
-    def AllocateNextFabricId(self):
-        ''' Allocate the next un-used fabric ID.
-        '''
-        nextFabricId = 1
-
-        while nextFabricId in FabricAdmin.activeFabricIdList:
-            nextFabricId = nextFabricId + 1
-        return nextFabricId
-
-    def __init__(self, rcac: bytes = None, icac: bytes = None, fabricIndex: int = None, fabricId: int = None):
-        ''' Creates a valid FabricAdmin object with valid RCAC/ICAC, and registers itself as an OperationalCredentialsDelegate
-            for other parts of the system (notably, DeviceController) to vend NOCs.
-
-            rcac, icac:     Specify the RCAC and ICAC to be used with this fabric (not-supported). If not specified, an RCAC and ICAC will
-                            be automatically generated.
-
-            fabricIndex:    Local fabric index to be associated with this fabric. If omitted, one will be automatically assigned.
-            fabricId:       Local fabric ID to be associated with this fabric. If omitted, one will be automatically assigned.
-        '''
-        if (rcac is not None or icac is not None):
+        if (vendorId is None or vendorId == 0):
             raise ValueError(
-                "Providing valid rcac/icac values is not supported right now!")
+                f"Invalid VendorID ({vendorId}) provided!")
 
-        if (fabricId is None):
-            self._fabricId = self.AllocateNextFabricId()
-        else:
-            if (fabricId in FabricAdmin.activeFabricIdList):
-                raise ValueError(
-                    f"FabricId {fabricId} is already being managed by an existing FabricAdmin object!")
+        if (fabricId is None or fabricId == 0):
+            raise ValueError(
+                f"Invalid FabricId ({fabricId}) provided!")
 
-            self._fabricId = fabricId
+        self._vendorId = vendorId
+        self._fabricId = fabricId
+        self._certificateAuthority = certificateAuthority
 
-        if (fabricIndex is None):
-            self._fabricIndex = self.AllocateNextFabricIndex()
-        else:
-            if (fabricIndex in FabricAdmin.activeFabricIndexList):
-                raise ValueError(
-                    f"FabricIndex {fabricIndex} is already being managed by an existing FabricAdmin object!")
-
-            self._fabricIndex = fabricIndex
-
-        # Add it to the tracker to prevent future FabricAdmins from managing the same fabric.
-        FabricAdmin.activeFabricIdList.add(self._fabricId)
-        FabricAdmin.activeFabricIndexList.add(self._fabricIndex)
-
-        print(
-            f"New FabricAdmin: FabricId: {self._fabricId}({self._fabricIndex})")
-        self._handle.pychip_OpCreds_InitializeDelegate.restype = c_void_p
-
-        self.closure = builtins.chipStack.Call(
-            lambda: self._handle.pychip_OpCreds_InitializeDelegate(
-                ctypes.py_object(self), ctypes.c_uint32(self._fabricIndex))
-        )
-
-        if (self.closure is None):
-            raise ValueError("Encountered error initializing OpCreds adapter")
-
-        #
-        # Persist details to storage (read modify write).
-        #
-        try:
-            adminList = builtins.chipStack.GetStorageManager().GetReplKey('fabricAdmins')
-        except KeyError:
-            adminList = {str(self._fabricIndex): {'fabricId': self._fabricId}}
-            builtins.chipStack.GetStorageManager().SetReplKey('fabricAdmins', adminList)
-
-        adminList[str(self._fabricIndex)] = {'fabricId': self._fabricId}
-        builtins.chipStack.GetStorageManager().SetReplKey('fabricAdmins', adminList)
+        self.logger().warning(f"New FabricAdmin: FabricId: 0x{self._fabricId:016X}, VendorId = 0x{self.vendorId:04X}")
 
         self._isActive = True
-        self.nextControllerId = 1
+        self._activeControllers = []
 
-        FabricAdmin.activeAdmins.add(self)
+    def NewController(self, nodeId: int = None, paaTrustStorePath: str = "",
+                      useTestCommissioner: bool = False, catTags: List[int] = [], keypair: p256keypair.P256Keypair = None):
+        ''' Create a new chip.ChipDeviceCtrl.ChipDeviceController instance on this fabric.
 
-    def NewController(self, nodeId: int = None, paaTrustStorePath: str = "", useTestCommissioner: bool = False):
-        ''' Vend a new controller on this fabric seeded with the right fabric details.
+            When vending ChipDeviceController instances on a given fabric, each controller instance
+            is associated with a unique fabric index local to the running process. In the underlying FabricTable, each FabricInfo
+            instance can be treated as unique identities that can collide on the same logical fabric.
+
+            nodeId:         NodeID to be assigned to the controller. Automatically allocates one starting from 112233 if one
+                            is not provided.
+
+            paaTrustStorePath:      Path to the PAA trust store. If one isn't provided, a suitable default is selected.
+            useTestCommissioner:    If a test commmisioner is to be created.
+            catTags:			    A list of 32-bit CAT tags that will added to the NOC generated for this controller.
         '''
-        if (not(self._isActive)):
+        if (not (self._isActive)):
             raise RuntimeError(
-                f"FabricAdmin object was previously shutdown and is no longer valid!")
+                "FabricAdmin object was previously shutdown and is no longer valid!")
 
+        nodeIdList = [controller.nodeId for controller in self._activeControllers if controller.isActive]
         if (nodeId is None):
-            nodeId = self.nextControllerId
-            self.nextControllerId = self.nextControllerId + 1
+            if (len(nodeIdList) != 0):
+                nodeId = max(nodeIdList) + 1
+            else:
+                nodeId = 112233
+        else:
+            if (nodeId in nodeIdList):
+                raise RuntimeError(f"Provided NodeId {nodeId} collides with an existing controller instance!")
 
-        print(
-            f"Allocating new controller with FabricId: {self._fabricId}({self._fabricIndex}), NodeId: {nodeId}")
+        self.logger().warning(
+            f"Allocating new controller with CaIndex: {self._certificateAuthority.caIndex}, "
+            f"FabricId: 0x{self._fabricId:016X}, NodeId: 0x{nodeId:016X}, CatTags: {catTags}")
+
         controller = ChipDeviceCtrl.ChipDeviceController(
-            self.closure, self._fabricId, self._fabricIndex, nodeId, paaTrustStorePath, useTestCommissioner)
+            opCredsContext=self._certificateAuthority.GetOpCredsContext(),
+            fabricId=self._fabricId,
+            nodeId=nodeId,
+            adminVendorId=self._vendorId,
+            paaTrustStorePath=paaTrustStorePath,
+            useTestCommissioner=useTestCommissioner,
+            fabricAdmin=self,
+            catTags=catTags,
+            keypair=keypair)
+
+        self._activeControllers.append(controller)
         return controller
 
-    def ShutdownAll():
-        ''' Shuts down all active fabrics, but without deleting them from storage.
-        '''
-        activeAdmins = copy.copy(FabricAdmin.activeAdmins)
+    def Shutdown(self):
+        ''' Shutdown all active controllers on the fabric before shutting down the fabric itself.
 
-        for admin in activeAdmins:
-            admin.Shutdown(False)
-
-        FabricAdmin.activeAdmins.clear()
-
-    def Shutdown(self, deleteFromStorage: bool = True):
-        ''' Shutdown this fabric and free up its resources. This is important since relying
-            solely on the destructor will not guarantee relishining of C++-side resources.
-
-            deleteFromStorage:      Whether to delete this fabric's details from persistent storage.
+            You cannot interact with this object there-after.
         '''
         if (self._isActive):
-            builtins.chipStack.Call(
-                lambda: self._handle.pychip_OpCreds_FreeDelegate(
-                    ctypes.c_void_p(self.closure))
-            )
+            for controller in self._activeControllers:
+                controller.Shutdown()
 
-            FabricAdmin.activeFabricIdList.remove(self._fabricId)
-            FabricAdmin.activeFabricIndexList.remove(self._fabricIndex)
-
-            if (deleteFromStorage):
-                adminList = builtins.chipStack.GetStorageManager().GetReplKey('fabricAdmins')
-                del(adminList[str(self._fabricIndex)])
-                if (len(adminList) == 0):
-                    adminList = None
-
-                builtins.chipStack.GetStorageManager().SetReplKey('fabricAdmins', adminList)
-
-            FabricAdmin.activeAdmins.remove(self)
             self._isActive = False
 
     def __del__(self):
-        self.Shutdown(False)
+        self.Shutdown()
+
+    @property
+    def vendorId(self) -> int:
+        return self._vendorId
+
+    @property
+    def fabricId(self) -> int:
+        return self._fabricId
+
+    @property
+    def caIndex(self) -> int:
+        return self._certificateAuthority.caIndex
+
+    @property
+    def certificateAuthority(self) -> CertificateAuthority.CertificateAuthority:
+        return self._certificateAuthority

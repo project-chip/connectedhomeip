@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+  <androidx.fragment.app.FragmentContainerView
+      android:id="@+id/addressUpdateFragment"
+      android:name="com.google.chip.chiptool.clusterclient.AddressUpdateFragment"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent"/>
+
+  <RadioGroup
+      android:id="@+id/selectTypeRadioGroup"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/addressUpdateFragment">
+    <RadioButton
+        android:id="@+id/readRadioBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:textSize="16sp"
+        android:text="@string/wildcard_read_btn_text"/>
+    <RadioButton
+        android:id="@+id/subscribeRadioBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:text="@string/wildcard_subscribe_btn_text"/>
+    <RadioButton
+        android:id="@+id/writeRadioBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:text="@string/wildcard_write_btn_text"/>
+    <RadioButton
+        android:id="@+id/invokeRadioBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:text="@string/wildcard_invoke_btn_text"/>
+  </RadioGroup>
+
+  <androidx.constraintlayout.helper.widget.Flow
+      android:id="@+id/flow"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="8dp"
+      app:constraint_referenced_ids="endpointIdLabel,endpointIdEd,clusterIdLabel,clusterIdEd,attributeIdLabel,attributeIdEd,eventIdLabel,eventIdEd,commandIdLabel,commandIdEd,isUrgentLabel,isUrgentSp,writeValueLabel,writeValueEd,writeValueTypeLabel,writeValueTypeSp,dataVersionLabel,dataVersionEd,invokeValueLabel,invokeValueEd"
+      app:flow_horizontalBias="0.0"
+      app:flow_horizontalGap="8dp"
+      app:flow_horizontalStyle="packed"
+      app:flow_maxElementsWrap="2"
+      app:flow_wrapMode="aligned"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/selectTypeRadioGroup" />
+
+  <TextView
+      android:id="@+id/endpointIdLabel"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:padding="8dp"
+      android:textSize="16sp"
+      android:text="@string/endpoint_id_label" />
+
+  <EditText
+      android:id="@+id/endpointIdEd"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:inputType="text"
+      android:hint="@string/wildcard_help_label" />
+
+  <TextView
+      android:id="@+id/clusterIdLabel"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:padding="8dp"
+      android:textSize="16sp"
+      android:text="@string/cluster_id_label" />
+
+  <EditText
+      android:id="@+id/clusterIdEd"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:inputType="number"
+      android:hint="@string/wildcard_help_label"/>
+
+  <TextView
+      android:id="@+id/attributeIdLabel"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:padding="8dp"
+      android:textSize="16sp"
+      android:text="@string/attribute_id_label" />
+
+  <EditText
+      android:id="@+id/attributeIdEd"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_margin="16dp"
+      android:inputType="number"
+      android:hint="@string/wildcard_help_label"/>
+
+  <TextView
+      android:id="@+id/eventIdLabel"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:padding="8dp"
+      android:textSize="16sp"
+      android:text="@string/event_id_label" />
+
+  <EditText
+      android:id="@+id/eventIdEd"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_margin="16dp"
+      android:inputType="number"
+      android:hint="@string/wildcard_help_label"/>
+
+  <TextView
+      android:id="@+id/commandIdLabel"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:padding="8dp"
+      android:textSize="16sp"
+      android:visibility="gone"
+      android:text="@string/command_id_label" />
+
+  <EditText
+      android:id="@+id/commandIdEd"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_margin="16dp"
+      android:inputType="number"
+      android:visibility="gone"
+      android:hint="@string/wildcard_help_label"/>
+
+  <TextView
+      android:id="@+id/isUrgentLabel"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:padding="8dp"
+      android:textSize="16sp"
+      android:visibility="gone"
+      android:text="@string/isUrgent_label"/>
+
+  <Spinner
+      android:id="@+id/isUrgentSp"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:hint="@string/isUrgent_label"
+      android:entries="@array/chip_select_menu"
+      android:inputType="text"
+      android:spinnerMode="dropdown"
+      android:textSize="16sp"
+      android:visibility="gone"/>
+
+  <TextView
+      android:id="@+id/writeValueLabel"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:padding="8dp"
+      android:textSize="16sp"
+      android:visibility="gone"
+      android:text="@string/wildcard_write_value_text"/>
+
+  <EditText
+      android:id="@+id/writeValueEd"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_margin="16dp"
+      android:visibility="gone"
+      android:inputType="text" />
+
+  <TextView
+      android:id="@+id/writeValueTypeLabel"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:padding="8dp"
+      android:textSize="16sp"
+      android:visibility="gone"
+      android:text="@string/wildcard_write_value_type_text"/>
+
+  <Spinner
+      android:id="@+id/writeValueTypeSp"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:hint="@string/wildcard_write_value_type_text"
+      android:inputType="text"
+      android:spinnerMode="dropdown"
+      android:visibility="gone"
+      android:textSize="16sp" />
+
+  <TextView
+      android:id="@+id/dataVersionLabel"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:padding="8dp"
+      android:textSize="16sp"
+      android:visibility="gone"
+      android:text="@string/wildcard_write_data_version_text"/>
+
+  <EditText
+      android:id="@+id/dataVersionEd"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_margin="16dp"
+      android:inputType="number"
+      android:visibility="gone"
+      android:hint="@string/wildcard_write_data_version_help_label"/>
+
+  <TextView
+      android:id="@+id/invokeValueLabel"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:padding="8dp"
+      android:textSize="16sp"
+      android:visibility="gone"
+      android:text="@string/wildcard_invoke_value_text"/>
+
+  <EditText
+      android:id="@+id/invokeValueEd"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_margin="16dp"
+      android:visibility="gone"
+      android:inputType="text"
+      android:hint="@string/wildcard_invoke_value_help_label"/>
+
+  <androidx.constraintlayout.widget.ConstraintLayout
+      android:id="@+id/addLayout"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/flow">
+
+    <TextView
+        android:id="@+id/sendListView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <Button
+        android:id="@+id/addAttributeBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="@string/wildcard_add_attribute_btn_text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/addEventBtn"
+        app:layout_constraintTop_toBottomOf="@id/sendListView"
+        android:textSize="16sp" />
+    <Button
+        android:id="@+id/addEventBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="@string/wildcard_add_event_btn_text"
+        app:layout_constraintStart_toEndOf="@id/addAttributeBtn"
+        app:layout_constraintEnd_toStartOf="@id/resetBtn"
+        app:layout_constraintTop_toBottomOf="@id/sendListView"
+        android:textSize="16sp" />
+    <Button
+        android:id="@+id/resetBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="@string/wildcard_reset_btn_text"
+        app:layout_constraintStart_toEndOf="@id/addEventBtn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/sendListView"
+        android:textSize="16sp" />
+  </androidx.constraintlayout.widget.ConstraintLayout>
+
+  <Button
+      android:id="@+id/addListBtn"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:padding="16dp"
+      android:layout_marginTop="16dp"
+      android:layout_marginBottom="8dp"
+      android:layout_gravity="center"
+      android:text="@string/wildcard_add_btn_text"
+      android:textSize="16sp"
+      android:visibility="gone"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toStartOf="@id/sendBtn"
+      app:layout_constraintTop_toBottomOf="@id/addLayout"/>
+
+    <Button
+        android:id="@+id/sendBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:layout_gravity="center"
+        android:text="@string/wildcard_send_btn_text"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/shutdownSubscriptionBtn"
+        app:layout_constraintTop_toBottomOf="@id/addLayout"/>
+
+  <Button
+      android:id="@+id/shutdownSubscriptionBtn"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:padding="16dp"
+      android:layout_marginTop="16dp"
+      android:layout_marginBottom="8dp"
+      android:layout_gravity="center"
+      android:text="@string/wildcard_shutdown_subscription_btn_text"
+      android:textSize="16sp"
+      android:visibility="gone"
+      app:layout_constraintStart_toEndOf="@id/sendBtn"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/addLayout"/>
+
+  <Button
+      android:id="@+id/writeInvokeresetBtn"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:padding="16dp"
+      android:layout_marginTop="16dp"
+      android:layout_marginBottom="8dp"
+      android:text="@string/wildcard_reset_btn_text"
+      app:layout_constraintStart_toEndOf="@id/sendBtn"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/addLayout"
+      android:visibility="gone"
+      android:textSize="16sp" />
+
+  <ScrollView
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      android:fadeScrollbars="false"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/sendBtn">
+    <TextView
+        android:id="@+id/outputTv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:minLines="4"
+        android:singleLine="false"
+        android:textSize="20sp" />
+  </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

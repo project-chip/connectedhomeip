@@ -23,12 +23,12 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 
 namespace chip {
 namespace app {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR AttributePathIBs::Parser::CheckSchemaValidity() const
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+CHIP_ERROR AttributePathIBs::Parser::PrettyPrint() const
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     size_t numAttributePath = 0;
@@ -48,7 +48,7 @@ CHIP_ERROR AttributePathIBs::Parser::CheckSchemaValidity() const
             AttributePathIB::Parser path;
             ReturnErrorOnFailure(path.Init(reader));
             PRETTY_PRINT_INCDEPTH();
-            ReturnErrorOnFailure(path.CheckSchemaValidity());
+            ReturnErrorOnFailure(path.PrettyPrint());
             PRETTY_PRINT_DECDEPTH();
         }
 
@@ -68,10 +68,9 @@ CHIP_ERROR AttributePathIBs::Parser::CheckSchemaValidity() const
         }
     }
     ReturnErrorOnFailure(err);
-    ReturnErrorOnFailure(reader.ExitContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
+    return reader.ExitContainer(mOuterContainerType);
 }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
 AttributePathIB::Builder & AttributePathIBs::Builder::CreatePath()
 {
@@ -83,10 +82,10 @@ AttributePathIB::Builder & AttributePathIBs::Builder::CreatePath()
 }
 
 // Mark the end of this array and recover the type for outer container
-AttributePathIBs::Builder & AttributePathIBs::Builder::EndOfAttributePathIBs()
+CHIP_ERROR AttributePathIBs::Builder::EndOfAttributePathIBs()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip

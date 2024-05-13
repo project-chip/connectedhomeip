@@ -1,0 +1,70 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.6.1. [TC-WAKEONLAN-4.1] Wake-On LAN Verification
+
+PICS:
+    - WAKEONLAN.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Wake on LAN"
+    endpoint: 1
+
+tests:
+    - label:
+          "Commission DUT to TH (can be skipped if done in a preceding test)."
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 1: TH reads the MACAddress attribute from the DUT"
+      PICS: WAKEONLAN.S.A0000
+      command: "readAttribute"
+      attribute: "MACAddress"
+      response:
+          constraints:
+              minLength: 12
+
+    - label: "Step 2: TH sends a Sleep command to DUT"
+      PICS: LOWPOWER.S.C00.Rsp
+      cluster: "Low Power"
+      command: "Sleep"
+
+    - label:
+          "Step 3: TH sends a Wake-On LAN magic packet containing the MAC
+          address from step 1"
+      verification: |
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool lowpower read accepted-command-list 1 1
+          ./chip-tv-casting-app lowpower read accepted-command-list 1 1
+
+          On TH Verify that the DUT is no longer in a low-power state by sending above command
+          [1654248854.491911][3652:3657] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0508 Attribute 0x0000_FFF9 DataVersion: 2125568804
+          [1654248854.491994][3652:3657] CHIP:TOO:   AcceptedCommandList: 1 entries
+          [1654248854.492040][3652:3657] CHIP:TOO:     [1]: 0
+          [1654248854.492157][3652:3657] CHIP:EM: Sending Standalone Ack for MessageCounter:15063522 on exchange 51389i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"

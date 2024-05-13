@@ -25,16 +25,23 @@
 namespace chip {
 namespace Controller {
 
-void AbstractDnssdDiscoveryController::OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData)
+void AbstractDnssdDiscoveryController::OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & discNodeData)
 {
+    VerifyOrReturn(discNodeData.Is<chip::Dnssd::CommissionNodeData>());
+
     auto discoveredNodes = GetDiscoveredNodes();
+    auto & nodeData      = discNodeData.Get<chip::Dnssd::CommissionNodeData>();
     for (auto & discoveredNode : discoveredNodes)
     {
+
         if (!discoveredNode.IsValid())
         {
             continue;
         }
-        if (strcmp(discoveredNode.hostName, nodeData.hostName) == 0)
+        // TODO(#32576) Check if IP address are the same. Must account for `numIPs` in the list of `ipAddress`.
+        // Additionally, must NOT assume that the ordering is consistent.
+        if (strcmp(discoveredNode.hostName, nodeData.hostName) == 0 && discoveredNode.port == nodeData.port &&
+            discoveredNode.numIPs == nodeData.numIPs)
         {
             discoveredNode = nodeData;
             if (mDeviceDiscoveryDelegate != nullptr)
@@ -70,7 +77,7 @@ CHIP_ERROR AbstractDnssdDiscoveryController::SetUpNodeDiscovery()
     return CHIP_NO_ERROR;
 }
 
-const Dnssd::DiscoveredNodeData * AbstractDnssdDiscoveryController::GetDiscoveredNode(int idx)
+const Dnssd::CommissionNodeData * AbstractDnssdDiscoveryController::GetDiscoveredNode(int idx)
 {
     // TODO(cecille): Add assertion about main loop.
     auto discoveredNodes = GetDiscoveredNodes();

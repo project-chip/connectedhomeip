@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,15 +18,16 @@
 
 #include "ThreadUtil.h"
 
-#include <lib/support/ThreadOperationalDataset.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <platform/internal/DeviceNetworkInfo.h>
+#if CONFIG_OPENTHREAD
 
-#include <zephyr.h>
+#include <platform/CHIPDeviceLayer.h>
+
+#include <app/server/Dnssd.h>
+#include <lib/support/ThreadOperationalDataset.h>
+
+#include <zephyr/kernel.h>
 
 #include <cstring>
-#include <stdio.h>
-#include <stdlib.h>
 
 void StartDefaultThreadNetwork(void)
 {
@@ -49,4 +50,8 @@ void StartDefaultThreadNetwork(void)
     chip::DeviceLayer::ThreadStackMgr().SetThreadEnabled(false);
     chip::DeviceLayer::ThreadStackMgr().SetThreadProvision(dataset.AsByteSpan());
     chip::DeviceLayer::ThreadStackMgr().SetThreadEnabled(true);
+
+    chip::app::DnssdServer::Instance().StartServer();
 }
+
+#endif

@@ -19,6 +19,10 @@
 
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConnectivityManagerImpl.h>
+#include <platform/internal/GenericConnectivityManagerImpl_UDP.h>
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+#include <platform/internal/GenericConnectivityManagerImpl_TCP.h>
+#endif
 #include <platform/internal/GenericConnectivityManagerImpl_NoBLE.h>
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
 #include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
@@ -28,6 +32,10 @@ namespace DeviceLayer {
 
 class ConnectivityManagerImpl final : public ConnectivityManager,
                                       public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>,
+                                      public Internal::GenericConnectivityManagerImpl_UDP<ConnectivityManagerImpl>,
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+                                      public Internal::GenericConnectivityManagerImpl_TCP<ConnectivityManagerImpl>,
+#endif
                                       public Internal::GenericConnectivityManagerImpl_NoBLE<ConnectivityManagerImpl>,
                                       public Internal::GenericConnectivityManagerImpl_NoThread<ConnectivityManagerImpl>,
                                       public Internal::GenericConnectivityManagerImpl_NoWiFi<ConnectivityManagerImpl>

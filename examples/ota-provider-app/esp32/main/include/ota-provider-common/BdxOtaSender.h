@@ -71,6 +71,8 @@ struct BdxOtaSenderCallbacks
 class BdxOtaSender : public chip::bdx::Responder
 {
 public:
+    BdxOtaSender() { memset(mFileDesignator, 0, sizeof(mFileDesignator)); }
+
     // Initializes BDX transfer-related metadata. Should always be called first.
     CHIP_ERROR InitializeTransfer(chip::FabricIndex fabricIndex, chip::NodeId nodeId);
 
@@ -92,6 +94,14 @@ public:
      */
     uint64_t GetTransferLength(void);
 
+    /**
+     * @brief
+     *  Get the file designator for the transfer
+     *
+     * @return File designator for the transfer
+     */
+    const char * GetFileDesignator() const { return mFileDesignator; }
+
 private:
     // Inherited from bdx::TransferFacilitator
     void HandleTransferSessionOutput(chip::bdx::TransferSession::OutputEvent & event) override;
@@ -109,4 +119,9 @@ private:
     chip::Callback::Callback<OnBdxBlockQuery> * mOnBlockQueryCallback             = nullptr;
     chip::Callback::Callback<OnBdxTransferComplete> * mOnTransferCompleteCallback = nullptr;
     chip::Callback::Callback<OnBdxTransferFailed> * mOnTransferFailedCallback     = nullptr;
+
+    // Maximum file designator length
+    static constexpr uint8_t kMaxFDLen = 30;
+    // Null-terminated string representing file designator
+    char mFileDesignator[kMaxFDLen];
 };

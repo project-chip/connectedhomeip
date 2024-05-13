@@ -22,10 +22,9 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 #include <app/server/Server.h>
-#include <app/util/af.h>
 #include <credentials/FabricTable.h>
 #include <crypto/RandUtils.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CHIPMemString.h>
 #include <protocols/bdx/BdxUri.h>
 
@@ -52,13 +51,12 @@ using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
 constexpr uint8_t kUpdateTokenLen    = 32;                      // must be between 8 and 32
 constexpr uint8_t kUpdateTokenStrLen = kUpdateTokenLen * 2 + 1; // Hex string needs 2 hex chars for every byte
-constexpr size_t kUriMaxLen          = 256;
 constexpr size_t kOtaHeaderMaxSize   = 1024;
 
 // Arbitrary BDX Transfer Params
-constexpr uint32_t kMaxBdxBlockSize                 = 1024;
-constexpr chip::System::Clock::Timeout kBdxTimeout  = chip::System::Clock::Seconds16(5 * 60); // OTA Spec mandates >= 5 minutes
-constexpr chip::System::Clock::Timeout kBdxPollFreq = chip::System::Clock::Milliseconds32(500);
+constexpr uint32_t kMaxBdxBlockSize                = 1024;
+constexpr chip::System::Clock::Timeout kBdxTimeout = chip::System::Clock::Seconds16(5 * 60); // OTA Spec mandates >= 5 minutes
+constexpr uint32_t kBdxServerPollIntervalMillis    = 50;                                     // poll every 50ms by default
 
 void GetUpdateTokenString(const chip::ByteSpan & token, char * buf, size_t bufSize)
 {
@@ -80,7 +78,8 @@ void GenerateUpdateToken(uint8_t * buf, size_t bufSize)
 
 OTAProviderExample::OTAProviderExample()
 {
-    memset(mOTAFilePath, 0, kFilepathBufLen);
+    memset(mOTAFilePath, 0, sizeof(mOTAFilePath));
+    memset(mImageUri, 0, sizeof(mImageUri));
     mIgnoreQueryImageCount     = 0;
     mIgnoreApplyUpdateCount    = 0;
     mQueryImageStatus          = OTAQueryStatus::kNotAvailable;
@@ -89,6 +88,7 @@ OTAProviderExample::OTAProviderExample()
     mDelayedApplyActionTimeSec = 0;
     mUserConsentDelegate       = nullptr;
     mUserConsentNeeded         = false;
+    mPollInterval              = kBdxServerPollIntervalMillis;
     mCandidates.clear();
 }
 
@@ -100,7 +100,19 @@ void OTAProviderExample::SetOTAFilePath(const char * path)
     }
     else
     {
-        memset(mOTAFilePath, 0, kFilepathBufLen);
+        memset(mOTAFilePath, 0, sizeof(mOTAFilePath));
+    }
+}
+
+void OTAProviderExample::SetImageUri(const char * imageUri)
+{
+    if (imageUri != nullptr)
+    {
+        chip::Platform::CopyString(mImageUri, imageUri);
+    }
+    else
+    {
+        memset(mImageUri, 0, sizeof(mImageUri));
     }
 }
 
@@ -111,8 +123,9 @@ void OTAProviderExample::SetOTACandidates(std::vector<OTAProviderExample::Device
     // Validate that each candidate matches the info in the image header
     for (auto candidate : mCandidates)
     {
+        OTAImageHeaderParser parser;
         OTAImageHeader header;
-        ParseOTAHeader(candidate.otaURL, header);
+        ParseOTAHeader(parser, candidate.otaURL, header);
 
         ChipLogDetail(SoftwareUpdate, "Validating image list candidate %s: ", candidate.otaURL);
         VerifyOrDie(candidate.vendorId == header.mVendorId);
@@ -129,6 +142,7 @@ void OTAProviderExample::SetOTACandidates(std::vector<OTAProviderExample::Device
         {
             VerifyOrDie(candidate.maxApplicableSoftwareVersion == header.mMaxApplicableVersion.Value());
         }
+        parser.Clear();
     }
 }
 
@@ -167,8 +181,8 @@ UserConsentSubject OTAProviderExample::GetUserConsentSubject(const app::CommandH
     subject.fabricIndex             = commandObj->GetSubjectDescriptor().fabricIndex;
     subject.requestorNodeId         = commandObj->GetSubjectDescriptor().subject;
     subject.providerEndpointId      = commandPath.mEndpointId;
-    subject.requestorVendorId       = commandData.vendorId;
-    subject.requestorProductId      = commandData.productId;
+    subject.requestorVendorId       = commandData.vendorID;
+    subject.requestorProductId      = commandData.productID;
     subject.requestorCurrentVersion = commandData.softwareVersion;
     subject.requestorTargetVersion  = targetVersion;
     if (commandData.metadataForProvider.HasValue())
@@ -178,9 +192,8 @@ UserConsentSubject OTAProviderExample::GetUserConsentSubject(const app::CommandH
     return subject;
 }
 
-bool OTAProviderExample::ParseOTAHeader(const char * otaFilePath, OTAImageHeader & header)
+bool OTAProviderExample::ParseOTAHeader(OTAImageHeaderParser & parser, const char * otaFilePath, OTAImageHeader & header)
 {
-    OTAImageHeaderParser parser;
     uint8_t otaFileContent[kOtaHeaderMaxSize];
     ByteSpan buffer(otaFileContent);
 
@@ -211,8 +224,6 @@ bool OTAProviderExample::ParseOTAHeader(const char * otaFilePath, OTAImageHeader
         return false;
     }
 
-    parser.Clear();
-
     return true;
 }
 
@@ -225,7 +236,6 @@ void OTAProviderExample::SendQueryImageResponse(app::CommandHandler * commandObj
     bool requestorCanConsent             = commandData.requestorCanConsent.ValueOr(false);
     uint8_t updateToken[kUpdateTokenLen] = { 0 };
     char strBuf[kUpdateTokenStrLen]      = { 0 };
-    char uriBuf[kUriMaxLen]              = { 0 };
 
     // Set fields specific for an available status response
     if (mQueryImageStatus == OTAQueryStatus::kUpdateAvailable)
@@ -236,14 +246,26 @@ void OTAProviderExample::SendQueryImageResponse(app::CommandHandler * commandObj
 
         // TODO: This uses the current node as the provider to supply the OTA image. This can be configurable such that the
         // provider supplying the response is not the provider supplying the OTA image.
-        FabricIndex fabricIndex = commandObj->GetAccessingFabricIndex();
-        FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
-        NodeId nodeId           = fabricInfo->GetPeerId().GetNodeId();
+        FabricIndex fabricIndex       = commandObj->GetAccessingFabricIndex();
+        const FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
+        NodeId nodeId                 = fabricInfo->GetPeerId().GetNodeId();
 
-        // Only supporting BDX protocol for now
-        MutableCharSpan uri(uriBuf, kUriMaxLen);
-        chip::bdx::MakeURI(nodeId, CharSpan::fromCharString(mOTAFilePath), uri);
-        ChipLogDetail(SoftwareUpdate, "Generated URI: %.*s", static_cast<int>(uri.size()), uri.data());
+        // Generate the ImageURI if one is not already preset
+        if (strlen(mImageUri) == 0)
+        {
+            // Only supporting BDX protocol for now
+            MutableCharSpan uri(mImageUri);
+            CHIP_ERROR error = chip::bdx::MakeURI(nodeId, CharSpan::fromCharString(mOTAFilePath), uri);
+            if (error != CHIP_NO_ERROR)
+            {
+                ChipLogError(SoftwareUpdate, "Cannot generate URI");
+                memset(mImageUri, 0, sizeof(mImageUri));
+            }
+            else
+            {
+                ChipLogDetail(SoftwareUpdate, "Generated URI: %s", mImageUri);
+            }
+        }
 
         // Initialize the transfer session in prepartion for a BDX transfer
         BitFlags<TransferControlFlags> bdxFlags;
@@ -251,8 +273,9 @@ void OTAProviderExample::SendQueryImageResponse(app::CommandHandler * commandObj
         if (mBdxOtaSender.InitializeTransfer(commandObj->GetSubjectDescriptor().fabricIndex,
                                              commandObj->GetSubjectDescriptor().subject) == CHIP_NO_ERROR)
         {
-            CHIP_ERROR error = mBdxOtaSender.PrepareForTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kSender,
-                                                                bdxFlags, kMaxBdxBlockSize, kBdxTimeout, kBdxPollFreq);
+            CHIP_ERROR error =
+                mBdxOtaSender.PrepareForTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kSender, bdxFlags,
+                                                 kMaxBdxBlockSize, kBdxTimeout, chip::System::Clock::Milliseconds32(mPollInterval));
             if (error != CHIP_NO_ERROR)
             {
                 ChipLogError(SoftwareUpdate, "Cannot prepare for transfer: %" CHIP_ERROR_FORMAT, error.Format());
@@ -260,7 +283,7 @@ void OTAProviderExample::SendQueryImageResponse(app::CommandHandler * commandObj
                 return;
             }
 
-            response.imageURI.Emplace(chip::CharSpan::fromCharString(uriBuf));
+            response.imageURI.Emplace(chip::CharSpan::fromCharString(mImageUri));
             response.softwareVersion.Emplace(mSoftwareVersion);
             response.softwareVersionString.Emplace(chip::CharSpan::fromCharString(mSoftwareVersionString));
             response.updateToken.Emplace(chip::ByteSpan(updateToken));
@@ -272,9 +295,14 @@ void OTAProviderExample::SendQueryImageResponse(app::CommandHandler * commandObj
         }
     }
 
+    // Delay action time is only applicable when the provider is busy
+    if (mQueryImageStatus == OTAQueryStatus::kBusy)
+    {
+        response.delayedActionTime.Emplace(mDelayedQueryActionTimeSec);
+    }
+
     // Set remaining fields common to all status types
     response.status = mQueryImageStatus;
-    response.delayedActionTime.Emplace(mDelayedQueryActionTimeSec);
     if (mUserConsentNeeded && requestorCanConsent)
     {
         response.userConsentNeeded.Emplace(true);
@@ -307,12 +335,12 @@ void OTAProviderExample::HandleQueryImage(app::CommandHandler * commandObj, cons
 
     if (mQueryImageStatus == OTAQueryStatus::kUpdateAvailable)
     {
-        memset(mSoftwareVersionString, 0, SW_VER_STR_MAX_LEN);
+        memset(mSoftwareVersionString, 0, sizeof(mSoftwareVersionString));
 
         if (!mCandidates.empty()) // If list of OTA candidates is supplied
         {
             OTAProviderExample::DeviceSoftwareVersionModel candidate;
-            if (SelectOTACandidate(commandData.vendorId, commandData.productId, commandData.softwareVersion, candidate))
+            if (SelectOTACandidate(commandData.vendorID, commandData.productID, commandData.softwareVersion, candidate))
             {
                 VerifyOrDie(sizeof(mSoftwareVersionString) > strlen(candidate.softwareVersionString));
 
@@ -325,11 +353,13 @@ void OTAProviderExample::HandleQueryImage(app::CommandHandler * commandObj, cons
         else if (strlen(mOTAFilePath) > 0) // If OTA file is directly provided
         {
             // Parse the header and set version info based on the header
+            OTAImageHeaderParser parser;
             OTAImageHeader header;
-            VerifyOrDie(ParseOTAHeader(mOTAFilePath, header) == true);
+            VerifyOrDie(ParseOTAHeader(parser, mOTAFilePath, header) == true);
             VerifyOrDie(sizeof(mSoftwareVersionString) > header.mSoftwareVersionString.size());
             mSoftwareVersion = header.mSoftwareVersion;
             memcpy(mSoftwareVersionString, header.mSoftwareVersionString.data(), header.mSoftwareVersionString.size());
+            parser.Clear();
         }
 
         // If mUserConsentNeeded (set by the CLI) is true and requestor is capable of taking user consent

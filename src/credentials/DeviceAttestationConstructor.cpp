@@ -17,7 +17,7 @@
 #include "DeviceAttestationConstructor.h"
 #include "DeviceAttestationVendorReserved.h"
 
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -183,6 +183,8 @@ CHIP_ERROR ConstructAttestationElements(const ByteSpan & certificationDeclaratio
     ReturnErrorOnFailure(tlvWriter.Finalize());
     attestationElements = attestationElements.SubSpan(0, tlvWriter.GetLengthWritten());
 
+    VerifyOrReturnError(attestationElements.size() <= Credentials::kMaxRspLen, CHIP_ERROR_MESSAGE_TOO_LONG);
+
     return CHIP_NO_ERROR;
 }
 
@@ -217,6 +219,8 @@ CHIP_ERROR ConstructNOCSRElements(const ByteSpan & csr, const ByteSpan & csrNonc
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize());
     nocsrElements = nocsrElements.SubSpan(0, tlvWriter.GetLengthWritten());
+
+    VerifyOrReturnError(nocsrElements.size() <= Credentials::kMaxRspLen, CHIP_ERROR_MESSAGE_TOO_LONG);
 
     return CHIP_NO_ERROR;
 }

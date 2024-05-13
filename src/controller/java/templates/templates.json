@@ -2,13 +2,13 @@
     "name": "CHIP Android templates",
     "version": "chip-v1",
     "helpers": [
-        "../../../app/zap-templates/common/ChipTypesHelper.js",
-        "../../../app/zap-templates/common/ListHelper.js",
-        "../../../app/zap-templates/common/StringHelper.js",
-        "../../../app/zap-templates/partials/helper.js",
-        "../../../app/zap-templates/templates/app/helper.js",
-        "../../../app/zap-templates/templates/chip/helper.js",
-        "helper.js"
+        "common/ChipTypesHelper.js",
+        "common/ListHelper.js",
+        "common/StringHelper.js",
+        "partials/helper.js",
+        "templates/app/helper.js",
+        "templates/chip/helper.js",
+        "controller/java/templates/helper.js"
     ],
     "override": "../../../app/zap-templates/common/override.js",
     "partials": [
@@ -35,69 +35,14 @@
     ],
     "templates": [
         {
-            "path": "ChipStructs-java.zapt",
-            "name": "CHIP structs for Java",
-            "output": "src/controller/java/zap-generated/chip/devicecontroller/ChipStructs.java"
-        },
-        {
-            "path": "CHIPInvokeCallbacks.zapt",
-            "name": "CHIP cluster invoke callbacks for Java (native code)",
-            "output": "src/controller/java/zap-generated/CHIPInvokeCallbacks.h"
-        },
-        {
-            "path": "CHIPInvokeCallbacks-src.zapt",
-            "name": "CHIP cluster invoke callbacks for Java (native code)",
-            "output": "src/controller/java/zap-generated/CHIPInvokeCallbacks.cpp"
-        },
-        {
-            "path": "CHIPCallbackTypes.zapt",
-            "name": "CHIP cluster callback types",
-            "output": "src/controller/java/zap-generated/CHIPCallbackTypes.h"
-        },
-        {
-            "path": "CHIPClustersWrite-JNI.zapt",
-            "name": "CHIP ZCL API for Java (native code for writes)",
-            "output": "src/controller/java/zap-generated/CHIPClustersWrite-JNI.cpp"
-        },
-        {
-            "path": "CHIPReadCallbacks.zapt",
-            "name": "CHIP cluster attribute read callback for Java (native code)",
-            "output": "src/controller/java/zap-generated/CHIPReadCallbacks.h"
-        },
-        {
-            "path": "CHIPReadCallbacks-src.zapt",
-            "name": "CHIP cluster attribute read callback for Java (native code)",
-            "output": "src/controller/java/zap-generated/CHIPReadCallbacks.cpp"
-        },
-        {
             "path": "CHIPAttributeTLVValueDecoder-src.zapt",
             "name": "CHIP cluster attribute decoder for Java (native code)",
             "output": "src/controller/java/zap-generated/CHIPAttributeTLVValueDecoder.cpp"
         },
         {
-            "path": "ChipClusters-java.zapt",
-            "name": "CHIP ZCL API for Java",
-            "output": "src/controller/java/zap-generated/chip/devicecontroller/ChipClusters.java"
-        },
-        {
-            "path": "ChipIdLookup-java.zapt",
-            "name": "Generate utilities for looking up cluster/attribute IDs",
-            "output": "src/controller/java/zap-generated/chip/devicecontroller/ChipIdLookup.java"
-        },
-        {
-            "path": "ClusterInfo-java.zapt",
-            "name": "Cluster information mapping for Java",
-            "output": "src/controller/java/zap-generated/chip/devicecontroller/ClusterInfoMapping.java"
-        },
-        {
-            "path": "ClusterInfo-read-interaction.zapt",
-            "name": "Generate read interaction for cluster information map",
-            "output": "src/controller/java/zap-generated/chip/devicecontroller/ClusterReadMapping.java"
-        },
-        {
-            "path": "ClusterInfo-write-interaction.zapt",
-            "name": "Generate write interaction for cluster information map",
-            "output": "src/controller/java/zap-generated/chip/devicecontroller/ClusterWriteMapping.java"
+            "path": "CHIPEventTLVValueDecoder-src.zapt",
+            "name": "CHIP cluster event decoder for Java (native code)",
+            "output": "src/controller/java/zap-generated/CHIPEventTLVValueDecoder.cpp"
         }
     ]
 }

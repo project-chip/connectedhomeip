@@ -22,7 +22,7 @@
  *
  */
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/MessageDef/StatusResponseMessage.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
@@ -58,9 +58,8 @@ void ParseStatusResponseMessage(nlTestSuite * apSuite, chip::TLV::TLVReader & aR
 
     err = statusResponse.Init(aReader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    err = statusResponse.CheckSchemaValidity();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+    statusResponse.PrettyPrint();
 #endif
 
     err = statusResponse.GetStatus(status);

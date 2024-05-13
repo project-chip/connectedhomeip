@@ -21,11 +21,11 @@
  *      This file implements a test for  CHIP Callback
  *
  */
+#include <gtest/gtest.h>
+
 #include <lib/core/CHIPCallback.h>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/UnitTestRegistration.h>
-
-#include <nlunit-test.h>
+#include <lib/support/CodeUtils.h>
 
 using namespace chip::Callback;
 
@@ -87,7 +87,14 @@ static void canceler(Cancelable * ca)
     ca->Cancel();
 }
 
-static void ResumerTest(nlTestSuite * inSuite, void * inContext)
+class TestCHIPCallback : public ::testing::Test
+{
+public:
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+};
+
+TEST_F(TestCHIPCallback, ResumerTest)
 {
     int n = 1;
     Callback<> cb(reinterpret_cast<CallFn>(increment), &n);
@@ -99,21 +106,21 @@ static void ResumerTest(nlTestSuite * inSuite, void * inContext)
     resumer.Dispatch();
     resumer.Resume(&cb);
     resumer.Dispatch();
-    NL_TEST_ASSERT(inSuite, n == 3);
+    EXPECT_EQ(n, 3);
 
     n = 1;
     // test cb->Cancel() cancels
     resumer.Resume(&cb);
     cb.Cancel();
     resumer.Dispatch();
-    NL_TEST_ASSERT(inSuite, n == 1);
+    EXPECT_EQ(n, 1);
 
     n = 1;
     // Cancel cb before Dispatch() gets around to us (tests FIFO *and* cancel() from readylist)
     resumer.Resume(&cancelcb);
     resumer.Resume(&cb);
     resumer.Dispatch();
-    NL_TEST_ASSERT(inSuite, n == 1);
+    EXPECT_EQ(n, 1);
 
     n = 1;
     // 2nd Resume() cancels first registration
@@ -121,7 +128,7 @@ static void ResumerTest(nlTestSuite * inSuite, void * inContext)
     resumer.Resume(&cb); // cancels previous registration
     resumer.Dispatch();  // runs the list
     resumer.Dispatch();  // runs an empty list
-    NL_TEST_ASSERT(inSuite, n == 2);
+    EXPECT_EQ(n, 2);
 
     n = 1;
     // Resume() during Dispatch() runs only once, but enqueues for next dispatch
@@ -130,9 +137,9 @@ static void ResumerTest(nlTestSuite * inSuite, void * inContext)
     resumer.Resume(&cb);
     resumer.Resume(&resumecb);
     resumer.Dispatch();
-    NL_TEST_ASSERT(inSuite, n == 2);
+    EXPECT_EQ(n, 2);
     resumer.Dispatch();
-    NL_TEST_ASSERT(inSuite, n == 3);
+    EXPECT_EQ(n, 3);
 
     Callback<> * pcb = chip::Platform::New<Callback<>>(reinterpret_cast<CallFn>(increment), &n);
 
@@ -140,12 +147,12 @@ static void ResumerTest(nlTestSuite * inSuite, void * inContext)
     // cancel on destruct
     resumer.Resume(pcb);
     resumer.Dispatch();
-    NL_TEST_ASSERT(inSuite, n == 2);
+    EXPECT_EQ(n, 2);
 
     resumer.Resume(pcb);
     chip::Platform::Delete(pcb);
     resumer.Dispatch();
-    NL_TEST_ASSERT(inSuite, n == 2);
+    EXPECT_EQ(n, 2);
 }
 
 /**
@@ -190,7 +197,7 @@ static void increment_by(int * n, int by)
     *n += by;
 }
 
-static void NotifierTest(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestCHIPCallback, NotifierTest)
 {
     int n = 1;
     Callback<Notifier::NotifyFn> cb(reinterpret_cast<Notifier::NotifyFn>(increment_by), &n);
@@ -205,68 +212,15 @@ static void NotifierTest(nlTestSuite * inSuite, void * inContext)
     notifier.Register(&cb);
     notifier.Notify(1);
     notifier.Notify(8);
-    NL_TEST_ASSERT(inSuite, n == 10);
+    EXPECT_EQ(n, 10);
 
     n = 1;
     // Cancel cb before Dispatch() gets around to us (tests FIFO *and* cancel() from readylist)
     notifier.Register(&cancelcb);
     notifier.Register(&cb);
     notifier.Notify(8);
-    NL_TEST_ASSERT(inSuite, n == 1);
+    EXPECT_EQ(n, 1);
 
     cb.Cancel();
     cancelcb.Cancel();
 }
-
-/**
- *  Set up the test suite.
- */
-int TestCHIPCallback_Setup(void * inContext)
-{
-    CHIP_ERROR error = chip::Platform::MemoryInit();
-    if (error != CHIP_NO_ERROR)
-        return FAILURE;
-    return SUCCESS;
-}
-
-/**
- *  Tear down the test suite.
- */
-int TestCHIPCallback_Teardown(void * inContext)
-{
-    chip::Platform::MemoryShutdown();
-    return SUCCESS;
-}
-
-/**
- *   Test Suite. It lists all the test functions.
- */
-
-// clang-format off
-static const nlTest sTests[] =
-{
-    NL_TEST_DEF("ResumerTest", ResumerTest),
-    NL_TEST_DEF("NotifierTest", NotifierTest),
-
-    NL_TEST_SENTINEL()
-};
-// clang-format on
-
-int TestCHIPCallback(void)
-{
-    // clang-format off
-    nlTestSuite theSuite =
-	{
-        "CHIPCallback",
-        &sTests[0],
-        TestCHIPCallback_Setup,
-        TestCHIPCallback_Teardown
-    };
-    // clang-format on
-
-    nlTestRunner(&theSuite, nullptr);
-
-    return (nlTestRunnerStats(&theSuite));
-}
-
-CHIP_REGISTER_TEST_SUITE(TestCHIPCallback)

@@ -15,59 +15,67 @@
  *    limitations under the License.
  */
 
-#include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
 #include "esp_netif.h"
-#include "esp_spi_flash.h"
 #include "esp_system.h"
 #include "esp_wifi.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "nvs_flash.h"
+#include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
 #include <app/server/Server.h>
+#include <common/CHIPDeviceManager.h>
+#include <common/Esp32AppServer.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <diagnostic-logs-provider-delegate-impl.h>
+#include <platform/ESP32/ESP32Utils.h>
 
 #include <cmath>
 #include <cstdio>
 #include <string>
 #include <vector>
 
-#include <app/clusters/network-commissioning/network-commissioning.h>
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <platform/ESP32/NetworkCommissioningDriver.h>
-
-#include <lib/support/ErrorStr.h>
-
 #if CONFIG_ENABLE_PW_RPC
 #include "Rpc.h"
 #endif
 
-using namespace ::chip;
-using namespace ::chip::Credentials;
-using namespace ::chip::DeviceManager;
-using namespace ::chip::DeviceLayer;
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+#include <platform/ESP32/ESP32FactoryDataProvider.h>
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
-const char * TAG = "temperature-measurement-app";
-
-static DeviceCallbacks EchoCallbacks;
+#if CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
+#include <platform/ESP32/ESP32DeviceInfoProvider.h>
+#else
+#include <DeviceInfoProviderImpl.h>
+#endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 
 namespace {
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+chip::DeviceLayer::ESP32FactoryDataProvider sFactoryDataProvider;
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
-app::Clusters::NetworkCommissioning::Instance
-    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
+#if CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
+chip::DeviceLayer::ESP32DeviceInfoProvider gExampleDeviceInfoProvider;
+#else
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+#endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
+} // namespace
+
+using namespace ::chip;
+using namespace ::chip::DeviceManager;
+using namespace ::chip::Credentials;
+
+extern const char TAG[] = "temperature-measurement-app";
+
+static AppDeviceCallbacks EchoCallbacks;
 
 static void InitServer(intptr_t context)
 {
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    chip::Server::GetInstance().Init(initParams);
-
-    sWiFiNetworkCommissioningInstance.Init();
+    Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
 }
-
-} // namespace
 
 extern "C" void app_main()
 {
@@ -77,18 +85,6 @@ extern "C" void app_main()
 
     ESP_LOGI(TAG, "Temperature sensor!");
 
-    /* Print chip information */
-    esp_chip_info_t chip_info;
-    esp_chip_info(&chip_info);
-
-    ESP_LOGI(TAG, "This is ESP32 chip with %d CPU cores, WiFi%s%s, ", chip_info.cores,
-             (chip_info.features & CHIP_FEATURE_BT) ? "/BT" : "", (chip_info.features & CHIP_FEATURE_BLE) ? "/BLE" : "");
-
-    ESP_LOGI(TAG, "silicon revision %d, ", chip_info.revision);
-
-    ESP_LOGI(TAG, "%dMB %s flash\n", spi_flash_get_chip_size() / (1024 * 1024),
-             (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
-
     // Initialize the ESP NVS layer.
     esp_err_t err = nvs_flash_init();
     if (err != ESP_OK)
@@ -96,18 +92,47 @@ extern "C" void app_main()
         ESP_LOGE(TAG, "nvs_flash_init() failed: %s", esp_err_to_name(err));
         return;
     }
+    err = esp_event_loop_create_default();
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "esp_event_loop_create_default() failed: %s", esp_err_to_name(err));
+        return;
+    }
+
+    DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    if (DeviceLayer::Internal::ESP32Utils::InitWiFiStack() != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Failed to initialize the Wi-Fi stack");
+        return;
+    }
+#endif
 
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
 
     CHIP_ERROR error = deviceMgr.Init(&EchoCallbacks);
     if (error != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(error));
+        ESP_LOGE(TAG, "device.Init() failed: %" CHIP_ERROR_FORMAT, error.Format());
         return;
     }
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
-
-    // Initialize device attestation config
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+    SetCommissionableDataProvider(&sFactoryDataProvider);
+    SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
+#if CONFIG_ENABLE_ESP32_DEVICE_INSTANCE_INFO_PROVIDER
+    SetDeviceInstanceInfoProvider(&sFactoryDataProvider);
+#endif
+#else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
+}
+
+using namespace chip::app::Clusters::DiagnosticLogs;
+void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
+{
+    auto & logProvider = LogProvider::GetInstance();
+    DiagnosticLogsServer::Instance().SetDiagnosticLogsProviderDelegate(endpoint, &logProvider);
 }

@@ -34,20 +34,18 @@ DeviceControlServer & DeviceControlServer::DeviceControlSvr()
     return sInstance;
 }
 
-CHIP_ERROR DeviceControlServer::CommissioningComplete(NodeId peerNodeId, FabricIndex accessingFabricIndex)
+CHIP_ERROR DeviceControlServer::PostCommissioningCompleteEvent(NodeId peerNodeId, FabricIndex accessingFabricIndex)
 {
-    VerifyOrReturnError(CHIP_NO_ERROR == mFailSafeContext.DisarmFailSafe(), CHIP_ERROR_INTERNAL);
+    ChipDeviceEvent event{
 
-    ChipDeviceEvent event;
-
-    event.Type                                  = DeviceEventType::kCommissioningComplete;
-    event.CommissioningComplete.PeerNodeId      = peerNodeId;
-    event.CommissioningComplete.PeerFabricIndex = accessingFabricIndex;
+        .Type                  = DeviceEventType::kCommissioningComplete,
+        .CommissioningComplete = { .nodeId = peerNodeId, .fabricIndex = accessingFabricIndex }
+    };
 
     return PlatformMgr().PostEvent(&event);
 }
 
-CHIP_ERROR DeviceControlServer::SetRegulatoryConfig(uint8_t location, const CharSpan & countryCode, uint64_t breadcrumb)
+CHIP_ERROR DeviceControlServer::SetRegulatoryConfig(uint8_t location, const CharSpan & countryCode)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -55,9 +53,6 @@ CHIP_ERROR DeviceControlServer::SetRegulatoryConfig(uint8_t location, const Char
     SuccessOrExit(err);
 
     err = ConfigurationMgr().StoreCountryCode(countryCode.data(), countryCode.size());
-    SuccessOrExit(err);
-
-    err = ConfigurationMgr().StoreBreadcrumb(breadcrumb);
     SuccessOrExit(err);
 
 exit:
@@ -69,14 +64,30 @@ exit:
     return err;
 }
 
-CHIP_ERROR DeviceControlServer::ConnectNetworkForOperational(ByteSpan networkID)
+CHIP_ERROR DeviceControlServer::PostConnectedToOperationalNetworkEvent(ByteSpan networkID)
 {
-    ChipDeviceEvent event;
-    event.Type = DeviceEventType::kOperationalNetworkEnabled;
-    // TODO(cecille): This should be some way to specify thread or wifi.
-    event.OperationalNetwork.network = 0;
-    PlatformMgr().DispatchEvent(&event);
-    return CHIP_NO_ERROR;
+    ChipDeviceEvent event{ .Type = DeviceEventType::kOperationalNetworkEnabled,
+                           // TODO(cecille): This should be some way to specify thread or wifi.
+                           .OperationalNetwork = { .network = 0 } };
+    return PlatformMgr().PostEvent(&event);
+}
+
+CHIP_ERROR DeviceControlServer::PostCloseAllBLEConnectionsToOperationalNetworkEvent()
+{
+    ChipDeviceEvent event{ .Type = DeviceEventType::kCloseAllBleConnections };
+    return PlatformMgr().PostEvent(&event);
+}
+
+CHIP_ERROR DeviceControlServer::PostWiFiDeviceAvailableNetworkEvent()
+{
+    ChipDeviceEvent event{ .Type = DeviceEventType::kWiFiDeviceAvailable };
+    return PlatformMgr().PostEvent(&event);
+}
+
+CHIP_ERROR DeviceControlServer::PostOperationalNetworkStartedEvent()
+{
+    ChipDeviceEvent event{ .Type = DeviceEventType::kOperationalNetworkStarted };
+    return PlatformMgr().PostEvent(&event);
 }
 
 } // namespace DeviceLayer

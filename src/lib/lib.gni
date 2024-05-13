@@ -12,7 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
+import("${chip_root}/src/lib/core/core.gni")
+
 declare_args() {
+  # Build controller library.
+  chip_build_controller = chip_target_style != "embedded"
+
   # Enable libshell support.
   chip_build_libshell = false
 
@@ -20,4 +26,7 @@ declare_args() {
   # a Commissioner or Administrator that employs different or more complex
   # logic, this should be set to false.
   chip_build_default_attestation_verifier = true
+
+  # Set to true to enable device-specific attestation credentials
+  chip_build_platform_attestation_credentials_provider = false
 }

@@ -17,6 +17,11 @@
 
 #pragma once
 
+#include <platform/nrfconnect/ExternalFlashManager.h>
+
+#if CONFIG_CHIP_OTA_REQUESTOR
+#include <platform/nrfconnect/OTAImageProcessorImpl.h>
+
 namespace chip {
 namespace DeviceLayer {
 class OTAImageProcessorImpl;
@@ -40,3 +45,23 @@ chip::DeviceLayer::OTAImageProcessorImpl & GetOTAImageProcessor();
  * an update so the confirmation must be done on the OTA provider side.
  */
 void InitBasicOTARequestor();
+
+/**
+ * Check if the current image is the first boot the after OTA update and if so
+ * confirm it in MCUBoot.
+ *
+ * @return CHIP_NO_ERROR if the image has been confirmed, or it is not the first
+ * boot after the OTA update.
+ * Other CHIP_ERROR codes if the image could not be confirmed.
+ */
+void OtaConfirmNewImage();
+
+#endif // CONFIG_CHIP_OTA_REQUESTOR
+
+/**
+ * Get ExternalFlashManager static instance.
+ *
+ * Returned object can be used to control the QSPI external flash,
+ * which can be introduced into sleep mode and woken up on demand.
+ */
+chip::DeviceLayer::ExternalFlashManager & GetFlashHandler();

@@ -61,6 +61,39 @@ ClockBase * gClockBase = &gClockImpl;
 
 } // namespace Internal
 
+Timestamp ClockBase::GetMonotonicTimestamp()
+{
+    // Below implementation uses `__atomic_*` API which has wider support than
+    // <atomic> on embedded platforms, so that embedded platforms can use
+    // it by widening the #ifdefs later.
+#if CHIP_DEVICE_LAYER_USE_ATOMICS_FOR_CLOCK
+    uint64_t prevTimestamp = __atomic_load_n(&mLastTimestamp, __ATOMIC_SEQ_CST);
+    static_assert(sizeof(prevTimestamp) == sizeof(Timestamp), "Must have scalar match between timestamp and uint64_t for atomics.");
+
+    // Force a reorder barrier to prevent GetMonotonicMilliseconds64() from being
+    // optimizer-called before prevTimestamp loading, so that newTimestamp acquisition happens-after
+    // the prevTimestamp load.
+    __atomic_signal_fence(__ATOMIC_SEQ_CST);
+#else
+    uint64_t prevTimestamp = mLastTimestamp;
+#endif // CHIP_DEVICE_LAYER_USE_ATOMICS_FOR_CLOCK
+
+    Timestamp newTimestamp = GetMonotonicMilliseconds64();
+
+    // Need to guarantee the invariant that monotonic clock never goes backwards, which would break multiple system
+    // assumptions which use these clocks.
+    VerifyOrDie(newTimestamp.count() >= prevTimestamp);
+
+#if CHIP_DEVICE_LAYER_USE_ATOMICS_FOR_CLOCK
+    // newTimestamp guaranteed to never be < the last timestamp.
+    __atomic_store_n(&mLastTimestamp, newTimestamp.count(), __ATOMIC_SEQ_CST);
+#else
+    mLastTimestamp         = newTimestamp.count();
+#endif // CHIP_DEVICE_LAYER_USE_ATOMICS_FOR_CLOCK
+
+    return newTimestamp;
+}
+
 #if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
 
 #if CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS
@@ -73,7 +106,7 @@ ClockBase * gClockBase = &gClockImpl;
 
 #if HAVE_CLOCK_GETTIME
 
-#if HAVE_DECL_CLOCK_BOOTTIME
+#if defined(HAVE_DECL_CLOCK_BOOTTIME) && HAVE_DECL_CLOCK_BOOTTIME
 // CLOCK_BOOTTIME is a Linux-specific option to clock_gettime for a clock which compensates for system sleep.
 #define MONOTONIC_CLOCK_ID CLOCK_BOOTTIME
 #define MONOTONIC_RAW_CLOCK_ID CLOCK_MONOTONIC_RAW

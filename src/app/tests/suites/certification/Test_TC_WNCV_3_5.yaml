@@ -13,22 +13,26 @@
 # limitations under the License.
 
 name:
-    Window Covering [TC-WNCV-3.5] DownOrClose Long-Run Verification with server
-    as DUT
+    Window Covering [TC-WNCV-3.5] DownOrClose command Long-Run Verification [DUT
+    as Server]
+
+PICS:
+    - WNCV.S
+    - WNCV.S.F02 | WNCV.S.F04
 
 config:
     nodeId: 0x12344321
     cluster: "Window Covering"
     endpoint: 1
     fastMotionDuration:
-        type: INT16U
-        defaultValue: 3000
+        type: int16u
+        defaultValue: 5000
     fullMotionDuration:
-        type: INT16U
+        type: int16u
         defaultValue: 6000
 
 tests:
-    - label: "0: Wait for the commissioned device to be retrieved"
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -39,15 +43,13 @@ tests:
     ################ Position Init Phase #############
     ### Step 1x -> Initialize the Covering position before any testing
     ### MANDATORY Init Commands
-    - label:
-          "1a: TH sends UpOrOpen command to preposition the DUT in the opposite
-          direction"
+    - label: "Step 1a: TH sends UpOrOpen command to DUT"
       command: "UpOrOpen"
+      PICS: WNCV.S.C00.Rsp
 
     ### DUT adjusts to a non-closed position
     ### Testers should input the fastMotionDuration parameter that match their DUT behavior
-    - label:
-          "1b: TH Waits for fastMotionDuration seconds movement(s) on the device"
+    - label: "Step 1b: TH waits for 5-15 seconds movement(s) on the DUT"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -58,13 +60,13 @@ tests:
     ######## DownOrClose Long-Run Command #######
     ### Step 2x -> Check DownOrClose Long-Run effects
     ### MANDATORY Command
-    - label: "2a: TH sends DownOrClose command to DUT"
+    - label: "Step 2a: TH sends DownOrClose command to DUT"
       command: "DownOrClose"
+      PICS: WNCV.S.C01.Rsp
 
     ### DUT move toward its fully-closed position
     ### Testers should input the fullMotionDuration parameter that match their DUT behavior
-    - label:
-          "2b: TH Waits for fullMotionDuration seconds movement(s) on the device"
+    - label: "Step 2b: TH waits for PIXIT.WNCV.FULLMOTION on the DUT"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -72,44 +74,51 @@ tests:
               - name: "ms"
                 value: fullMotionDuration
 
+    - label: "Step 2c: TH checks OperationalStatus attribute from DUT"
+      command: "readAttribute"
+      attribute: "OperationalStatus"
+      PICS: WNCV.S.A000a
+      response:
+          value: 0
+
     ######## DownOrClose Long-Run: Category only for Position Aware DUT #######
     ### Step 3x -> Verify the DUT has reached its fully-open limits
     ### Mandatory Depends on the FeatureMap
     - label:
-          "3a: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute
-          from DUT"
+          "Step 3a: If (PA & LF) TH reads CurrentPositionLiftPercent100ths
+          attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
-      PICS: WNCV_LF && WNCV_PA_LF
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
       response:
           value: 10000
 
     ### Optional Depends on the FeatureMap
     - label:
-          "3b: If (PA & LF) TH reads CurrentPositionLiftPercentage optional
+          "Step 3b: If (PA & LF) TH reads CurrentPositionLiftPercentage optional
           attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
-      PICS: WNCV_LF && WNCV_PA_LF && A_CURRENTPOSITIONLIFTPERCENTAGE
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A0008
       response:
           value: 100
 
     ### Mandatory Depends on the FeatureMap
     - label:
-          "3c: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute
-          from DUT"
+          "Step 3c: If (PA & TL) TH reads CurrentPositionTiltPercent100ths
+          attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
-      PICS: WNCV_TL && WNCV_PA_TL
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
       response:
           value: 10000
 
     ### Optional Depends on the FeatureMap
     - label:
-          "3d: If (PA & TL) TH reads CurrentPositionTiltPercentage optional
+          "Step 3d: If (PA & TL) TH reads CurrentPositionTiltPercentage optional
           attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"
-      PICS: WNCV_TL && WNCV_PA_TL && A_CURRENTPOSITIONLIFTPERCENTAGE
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A0009
       response:
           value: 100

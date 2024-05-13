@@ -23,10 +23,10 @@
 #include "EventPathIBs.h"
 #include "MessageBuilder.h"
 #include "MessageParser.h"
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -39,31 +39,18 @@ enum class Tag : uint8_t
     kMinIntervalFloorSeconds   = 1,
     kMaxIntervalCeilingSeconds = 2,
     kAttributeRequests         = 3,
-    kDataVersionFilters        = 4,
-    kEventRequests             = 5,
-    kEventFilters              = 6,
-    kIsProxy                   = 7,
-    kIsFabricFiltered          = 8,
+    kEventRequests             = 4,
+    kEventFilters              = 5,
+    kIsFabricFiltered          = 7,
+    kDataVersionFilters        = 8,
 };
 
 class Parser : public MessageParser
 {
 public:
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    /**
-     *  @brief Roughly verify the message is correctly formed
-     *   1) all mandatory tags are present
-     *   2) all elements have expected data type
-     *   3) any tag can only appear once
-     *   4) At the top level of the structure, unknown tags are ignored for forward compatibility
-     *  @note The main use of this function is to print out what we're
-     *    receiving during protocol development and debugging.
-     *    The encoding rule has changed in IM encoding spec so this
-     *    check is only "roughly" conformant now.
-     */
-    CHIP_ERROR CheckSchemaValidity() const;
-#endif
-
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+    CHIP_ERROR PrettyPrint() const;
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
     /**
      *  @brief Check if subscription is kept.
      *  @return #CHIP_NO_ERROR on success
@@ -119,13 +106,6 @@ public:
     CHIP_ERROR GetEventFilters(EventFilterIBs::Parser * const apEventFilters) const;
 
     /**
-     *  @brief Get GetIsProxy boolean .
-     *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_END_OF_TLV if there is no such element
-     */
-    CHIP_ERROR GetIsProxy(bool * const apIsProxy) const;
-
-    /**
      *  @brief Get IsFabricFiltered boolean
      *
      *  @param [in] apIsFabricFiltered    A pointer to apIsFabricFiltered
@@ -152,13 +132,6 @@ public:
     EventFilterIBs::Builder & CreateEventFilters();
 
     /**
-     *  @brief This is set to true by the subscriber if it is a proxy-type device proxying for another client. This
-     *  confers it special privileges on the publisher that might result in evictions of other non-proxy subscriptions
-     *  to make way for the proxy.
-     */
-    SubscribeRequestMessage::Builder & IsProxy(const bool aIsProxy);
-
-    /**
      *  @brief  limits the data written within fabric-scoped lists to the accessing fabric
      *  @return A reference to *this
      */
@@ -167,7 +140,7 @@ public:
     /**
      *  @brief Mark the end of this SubscribeRequestMessage
      */
-    SubscribeRequestMessage::Builder & EndOfSubscribeRequestMessage();
+    CHIP_ERROR EndOfSubscribeRequestMessage();
 
 private:
     AttributePathIBs::Builder mAttributeRequests;

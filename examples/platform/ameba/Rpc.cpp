@@ -23,11 +23,11 @@
 #include "pw_sys_io_ameba/init.h"
 #include "sys_api.h"
 #include "task.h"
-//#include "esp_log.h"
-//#include "freertos/FreeRTOS.h"
-//#include "freertos/event_groups.h"
-//#include "freertos/semphr.h"
-//#include "freertos/task.h"
+// #include "esp_log.h"
+// #include "freertos/FreeRTOS.h"
+// #include "freertos/event_groups.h"
+// #include "freertos/semphr.h"
+// #include "freertos/task.h"
 #include "pw_log/log.h"
 #include "pw_rpc/server.h"
 #include "pw_sys_io/sys_io.h"
@@ -38,9 +38,13 @@
 #endif // defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
 
 #if defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
-//#include "ScreenManager.h"
+// #include "ScreenManager.h"
 #include "pigweed/rpc_services/Button.h"
 #endif // defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
+
+#if defined(PW_RPC_DESCRIPTOR_SERVICE) && PW_RPC_DESCRIPTOR_SERVICE
+#include "pigweed/rpc_services/Descriptor.h"
+#endif // defined(PW_RPC_DESCRIPTOR_SERVICE) && PW_RPC_DESCRIPTOR_SERVICE
 
 #if defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
 #include "pigweed/rpc_services/Device.h"
@@ -72,15 +76,26 @@ public:
 class AmebaDevice final : public Device
 {
 public:
-    pw::Status Reboot(const pw_protobuf_Empty & request, pw_protobuf_Empty & response) override
+    pw::Status Reboot(const chip_rpc_RebootRequest & request, pw_protobuf_Empty & response) override
     {
-        mRebootTimer = xTimerCreateStatic("Reboot", kRebootTimerPeriodTicks, false, nullptr, RebootHandler, &mRebootTimerBuffer);
+        TickType_t delayMs = kRebootTimerPeriodMs;
+        if (request.delay_ms != 0)
+        {
+            delayMs = request.delay_ms;
+        }
+        else
+        {
+            ChipLogProgress(NotSpecified, "Did not receive a reboot delay. Defaulting to %d ms",
+                            static_cast<int>(kRebootTimerPeriodMs));
+        }
+        mRebootTimer =
+            xTimerCreateStatic("Reboot", pdMS_TO_TICKS(kRebootTimerPeriodMs), false, nullptr, RebootHandler, &mRebootTimerBuffer);
         xTimerStart(mRebootTimer, 0);
         return pw::OkStatus();
     }
 
 private:
-    static constexpr TickType_t kRebootTimerPeriodTicks = 1000;
+    static constexpr uint32_t kRebootTimerPeriodMs = 1000;
     TimerHandle_t mRebootTimer;
     StaticTimer_t mRebootTimerBuffer;
 
@@ -104,6 +119,10 @@ Attributes attributes_service;
 AmebaButton button_service;
 #endif // defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
 
+#if defined(PW_RPC_DESCRIPTOR_SERVICE) && PW_RPC_DESCRIPTOR_SERVICE
+Descriptor descriptor_service;
+#endif // defined(PW_RPC_DESCRIPTOR_SERVICE) && PW_RPC_DESCRIPTOR_SERVICE
+
 #if defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
 AmebaDevice device_service;
 #endif // defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
@@ -125,6 +144,10 @@ void RegisterServices(pw::rpc::Server & server)
 #if defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
     server.RegisterService(button_service);
 #endif // defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
+
+#if defined(PW_RPC_DESCRIPTOR_SERVICE) && PW_RPC_DESCRIPTOR_SERVICE
+    server.RegisterService(descriptor_service);
+#endif // defined(PW_RPC_DESCRIPTOR_SERVICE) && PW_RPC_DESCRIPTOR_SERVICE
 
 #if defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
     server.RegisterService(device_service);

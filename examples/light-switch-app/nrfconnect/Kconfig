@@ -23,6 +23,30 @@ config STATE_LEDS
 	  the device into a network or the factory reset initiation. Note that setting this option to
 	  'n' does not disable the LED indicating the state of the simulated bolt.
 
-rsource "../../../config/nrfconnect/chip-module/Kconfig.defaults"
+# Sample configuration used for Thread networking
+if NET_L2_OPENTHREAD
+
+choice OPENTHREAD_NORDIC_LIBRARY_CONFIGURATION
+	default OPENTHREAD_NORDIC_LIBRARY_MTD
+endchoice
+
+choice OPENTHREAD_DEVICE_TYPE
+	default OPENTHREAD_MTD
+endchoice
+
+config CHIP_ENABLE_ICD_SUPPORT
+	bool
+	default y
+
+endif # NET_L2_OPENTHREAD
+
+if CHIP_WIFI
+
+config NRF_WIFI_LOW_POWER
+	default y
+
+endif # CHIP_WIFI
+
 rsource "../../../config/nrfconnect/chip-module/Kconfig.features"
+rsource "../../../config/nrfconnect/chip-module/Kconfig.defaults"
 source "Kconfig.zephyr"

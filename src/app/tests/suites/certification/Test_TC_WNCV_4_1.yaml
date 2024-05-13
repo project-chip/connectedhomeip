@@ -13,19 +13,22 @@
 # limitations under the License.
 
 name:
-    Window Covering [TC-WNCV-4.1] GoToLiftPercentage Long-Run Verification with
-    server as DUT
+    Window Covering [TC-WNCV-4.1] GoToLiftPercentage command Long-Run
+    Verification [DUT as Server]
+
+PICS:
+    - WNCV.S
 
 config:
     nodeId: 0x12344321
     cluster: "Window Covering"
     endpoint: 1
     fullMotionDuration:
-        type: INT16U
+        type: int16u
         defaultValue: 6000
 
 tests:
-    - label: "0: Wait for the commissioned device to be retrieved"
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -36,13 +39,14 @@ tests:
     ### Step 1x -> Initialize the Covering position before any testing
     ### MANDATORY Init Commands
     - label:
-          "1a: TH sends DownOrClose command to preposition the DUT in the
+          "Step 1a: TH sends DownOrClose command to preposition the DUT in the
           opposite direction"
       command: "DownOrClose"
+      PICS: WNCV.S.C01.Rsp
 
     ### Step 5x -> Verify the DUT has moved
     ### DUT moves toward its DownOrClose position
-    - label: "1b: TH waits for x seconds movement(s) on the DUT"
+    - label: "Step 1b: TH waits for x seconds movement(s) on the DUT"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -52,29 +56,28 @@ tests:
 
     ### Depends on the FeatureMap -> Check CurrentPosition attributes
     - label:
-          "1c: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute
-          from DUT"
+          "Step 1c: If (PA & LF) TH reads CurrentPositionLiftPercent100ths
+          attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
-      PICS: "WNCV_PA_LF && WNCV_LF"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
       response:
           constraints:
               notValue: 0
 
     ######## GoToLiftPercentage Long-Run 25 percent #######
     ### Step 2x ->  Check GoToLiftPercentage 25% Long-Run effects
-    - label: "2a: TH sends GoToLiftPercentage command with 25 percent to DUT"
+    - label:
+          "Step 2a: TH sends GoToLiftPercentage command with 25 percent to DUT"
       command: "GoToLiftPercentage"
-      PICS: "WNCV_LF && PICS_CR_GOTOLIFTPERCENTAGE"
+      PICS: "WNCV.S.F00 && WNCV.S.C05.Rsp"
       arguments:
           values:
               - name: "liftPercent100thsValue"
                 value: 2500
-              - name: "liftPercentageValue"
-                value: 25
 
     ### Depends on a sleep/wait command how to do this with a real device for CI keep at 100ms
-    - label: "2b: DUT updates its attributes"
+    - label: "Step 2b: TH waits for 100-1000 ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -84,17 +87,17 @@ tests:
 
     ### Mandatory Depends on the FeatureMap
     - label:
-          "2c: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute
-          from DUT"
+          "Step 2c: If (PA & LF) TH reads TargetPositionLiftPercent100ths
+          attribute from DUT"
       command: "readAttribute"
       attribute: "TargetPositionLiftPercent100ths"
-      PICS: "WNCV_PA_LF && WNCV_LF"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000b
       response:
           value: 2500
 
     ### Step 3x ->  Verify the DUT has reached its 25%
     ### DUT moves toward its 25% position
-    - label: "3a: TH set a timeout of X minutes for failure"
+    - label: "Step 3a: TH waits for PIXIT.WNCV.FULLMOTION on the DUT"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -103,48 +106,47 @@ tests:
                 value: fullMotionDuration
 
     ### Check for END OF MOVEMENTs
-    - label: "3b: TH reads OperationalStatus attribute from DUT"
+    - label: "Step 3b: TH checks OperationalStatus attribute from DUT"
       command: "readAttribute"
       attribute: "OperationalStatus"
+      PICS: WNCV.S.A000a
       response:
           value: 0
 
     ### Mandatory Depends on the FeatureMap
     - label:
-          "3c: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute
-          from DUT"
-      disabled: true
+          "Step 3c: If (PA & LF) TH reads CurrentPositionLiftPercent100ths
+          attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
-      PICS: "WNCV_PA_LF && WNCV_LF"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
       response:
           value: 2500
 
     ### Optional Depends on the FeatureMap
     - label:
-          "3d: If (PA & LF) TH reads CurrentPositionLiftPercentage optional
+          "Step 3d: If (PA & LF) TH reads CurrentPositionLiftPercentage optional
           attribute from DUT"
       command: "readAttribute"
-      disabled: true
       attribute: "CurrentPositionLiftPercentage"
-      PICS: "WNCV_PA_LF && WNCV_LF && A_CURRENTPOSITIONLIFTPERCENTAGE"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A0008
       response:
           value: 25
 
     ######## GoToLiftPercentage Long-Run for 75.2 percent #######
     ### Step 4x ->  Check GoToLiftPercentage 75.20% Long-Run effects
-    - label: "4a: TH sends GoToLiftPercentage command with 75.20 percent to DUT"
+    - label:
+          "Step 4a: TH sends GoToLiftPercentage command with 75.20 percent to
+          DUT"
       command: "GoToLiftPercentage"
-      PICS: "WNCV_LF && PICS_CR_GOTOLIFTPERCENTAGE"
+      PICS: WNCV.S.F00 && WNCV.S.C05.Rsp
       arguments:
           values:
               - name: "liftPercent100thsValue"
                 value: 7520
-              - name: "liftPercentageValue"
-                value: 75
 
     ### Depends on a sleep/wait command how to do this with a real device for CI keep at 100ms
-    - label: "4b: DUT updates its attributes"
+    - label: "Step 4b: TH waits for 100-1000 ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -154,18 +156,17 @@ tests:
 
     ### Mandatory Depends on the FeatureMap
     - label:
-          "4c: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute
-          from DUT"
-      disabled: true
+          "Step 4c: If (PA & LF) TH reads TargetPositionLiftPercent100ths
+          attribute from DUT"
       command: "readAttribute"
       attribute: "TargetPositionLiftPercent100ths"
-      PICS: "WNCV_PA_LF && WNCV_LF"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000b
       response:
           value: 7520
 
     ### Step 5x ->  Verify the DUT has reached its 75.2%
     ### DUT moves toward its 75.2% position
-    - label: "5a: TH waits for x seconds movement(s) on the DUT"
+    - label: "Step 5a: TH waits for PIXIT.WNCV.FULLMOTION on the DUT"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -174,29 +175,28 @@ tests:
                 value: fullMotionDuration
 
     ### Check for END OF MOVEMENTs
-    - label: "5b: TH reads OperationalStatus attribute from DUT"
+    - label: "Step 5b: TH checks OperationalStatus attribute from DUT"
       command: "readAttribute"
       attribute: "OperationalStatus"
+      PICS: WNCV.S.A000a
       response:
           value: 0
 
     ### Mandatory Depends on the FeatureMap
     - label:
-          "5c: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute
-          from DUT"
-      disabled: true
+          "Step 5c: If (PA & LF) TH reads CurrentPositionLiftPercent100ths
+          attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
-      PICS: "WNCV_PA_LF && WNCV_LF"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
       response:
           value: 7520
 
     ### Optional Depends on the FeatureMap
     - label:
-          "5d: If (PA & LF) TH reads CurrentPositionLiftPercentage optional
+          "Step 5d: If (PA & LF) TH reads CurrentPositionLiftPercentage optional
           attribute from DUT"
-      disabled: true
-      PICS: "WNCV_PA_LF && WNCV_LF && A_CURRENTPOSITIONLIFTPERCENTAGE"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A0008
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
       response:

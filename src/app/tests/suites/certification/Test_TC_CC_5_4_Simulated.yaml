@@ -1,0 +1,84 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 25.3.13. [TC-CC-5.4] Color functionality with client as DUT
+
+PICS:
+    - CC.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Color Control"
+    timeout: 500
+    endpoint: 1
+    ConfigTransitionTime:
+        type: int16u
+        defaultValue: 3000
+
+tests:
+    #- label: "Wait for the device to be commissioned"
+    #  cluster: "DelayCommands"
+    #  command: "WaitForCommissioning"
+
+    - label: "PreCondition: Set TH OnOff to On"
+      cluster: "On/Off"
+      wait: "On"
+
+    - label: "DUT sends MoveToColor command to TH"
+      PICS: CC.C.C07.Tx && CC.C.F03
+      wait: "MoveToColor"
+
+    - label: "Wait for ConfigTransitionTime"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: ConfigTransitionTime
+
+    - label: "DUT sends MoveColor command to TH"
+      PICS: CC.C.C08.Tx && CC.C.F03
+      wait: "MoveColor"
+
+    - label: "Wait for ConfigTransitionTime"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: ConfigTransitionTime
+
+    - label: "DUT sends StepColor command to TH"
+      PICS: CC.C.C09.Tx
+      wait: "StepColor"
+
+    - label: "Wait for ConfigTransitionTime"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: ConfigTransitionTime
+
+    - label: "DUT sends StopMoveStep command to TH"
+      PICS: CC.C.C47.Tx
+      wait: "StopMoveStep"
+
+    - label: "Wait for ConfigTransitionTime"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: ConfigTransitionTime

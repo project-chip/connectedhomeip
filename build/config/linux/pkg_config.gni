@@ -125,6 +125,17 @@ template("pkg_config") {
       lib_dirs = pkgresult[3]
     }
 
+    # Link libraries statically for OSS-Fuzz fuzzer build
+    if (oss_fuzz) {
+      libs = []
+      ldflags = [ "-Wl,-Bstatic" ]
+      foreach(lib, pkgresult[2]) {
+        ldflags += [ "-l$lib" ]
+      }
+      ldflags += [ "-Wl,-Bdynamic" ]
+      lib_dirs = pkgresult[3]
+    }
+
     forward_variables_from(invoker,
                            [
                              "defines",

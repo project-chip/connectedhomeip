@@ -19,12 +19,14 @@ get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connect
 get_filename_component(NRFCONNECT_COMMON ${CHIP_ROOT}/examples/platform/nrfconnect REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 get_filename_component(ALL_CLUSTERS_COMMON_DIR ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common REALPATH)
+get_filename_component(ENERGY_MANAGEMENT_COMMON_DIR ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/ REALPATH)
 
 include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
 
 # Set Kconfig root files that will be processed as a first Kconfig for used child images.
 set(mcuboot_KCONFIG_ROOT ${CHIP_ROOT}/config/nrfconnect/chip-module/Kconfig.mcuboot.root)
 set(multiprotocol_rpmsg_KCONFIG_ROOT ${CHIP_ROOT}/config/nrfconnect/chip-module/Kconfig.multiprotocol_rpmsg.root)
+set(hci_rpmsg_KCONFIG_ROOT ${CHIP_ROOT}/config/nrfconnect/chip-module/Kconfig.hci_rpmsg.root)
 
 if(DEFINED CONF_FILE AND NOT CONF_FILE STREQUAL "prj.conf")
     set(PM_STATIC_YML_FILE ${CMAKE_CURRENT_SOURCE_DIR}/configuration/${BOARD}/pm_static_dfu.yml)
@@ -48,6 +50,7 @@ include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 target_include_directories(app PRIVATE
                            main/include
                            ${ALL_CLUSTERS_COMMON_DIR}/include
+                           ${ENERGY_MANAGEMENT_COMMON_DIR}/include                           
                            ${GEN_DIR}/app-common
                            ${GEN_DIR}/all-clusters-app
                            ${NRFCONNECT_COMMON}/util/include)
@@ -55,10 +58,23 @@ target_include_directories(app PRIVATE
 target_sources(app PRIVATE
                main/AppTask.cpp
                main/main.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/smco-stub.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-modes-manager.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-temperature-levels.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
-               ${GEN_DIR}/all-clusters-app/zap-generated/callback-stub.cpp
-               ${GEN_DIR}/all-clusters-app/zap-generated/IMClusterCommandHandler.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/fan-stub.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/oven-modes.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/energy-evse-stub.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/device-energy-management-stub.cpp               
+               ${ALL_CLUSTERS_COMMON_DIR}/src/binding-handler.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/air-quality-instance.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/concentration-measurement-instances.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/DeviceEnergyManagementDelegateImpl.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/DeviceEnergyManagementManager.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/ElectricalPowerMeasurementDelegate.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/EnergyEvseDelegateImpl.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/EnergyEvseManager.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp)
 
 chip_configure_data_model(app
@@ -66,6 +82,10 @@ chip_configure_data_model(app
     ZAP_FILE ${ALL_CLUSTERS_COMMON_DIR}/all-clusters-app.zap
 )
 
-if(CONFIG_CHIP_OTA_REQUESTOR)
+if(CONFIG_CHIP_OTA_REQUESTOR OR CONFIG_MCUMGR_TRANSPORT_BT)
     target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/OTAUtil.cpp)
+endif()
+
+if (CONFIG_SHELL AND BOARD STREQUAL "nrf52840dongle_nrf52840")
+  target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/DFUTrigger.cpp)
 endif()

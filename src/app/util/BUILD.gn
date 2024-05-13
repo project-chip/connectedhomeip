@@ -13,3 +13,52 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/src/app/common_flags.gni")
+
+# These headers/cpp only depend on core/common
+source_set("types") {
+  sources = [
+    "att-storage.h",
+    "attribute-metadata.cpp",
+    "attribute-metadata.h",
+    "attribute-storage-null-handling.h",
+    "basic-types.h",
+    "ember-strings.cpp",
+    "ember-strings.h",
+    "endpoint-config-defines.h",
+    "odd-sized-integers.h",
+    "types_stub.h",
+  ]
+
+  deps = [
+    "${chip_root}/src/app/common:attribute-type",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:encoding",
+    "${chip_root}/src/lib/core:types",
+  ]
+  public_configs = [ "${chip_root}/src:includes" ]
+}
+
+# This source set also depends on data-model
+source_set("af-types") {
+  sources = [ "af-types.h" ]
+  deps = [
+    ":types",
+    "${chip_root}/src/app:paths",
+    "${chip_root}/src/app/data-model",
+    "${chip_root}/src/messaging",
+    "${chip_root}/src/protocols/interaction_model",
+  ]
+}
+
+source_set("callbacks") {
+  sources = [
+    "MatterCallbacks.cpp",
+    "MatterCallbacks.h",
+  ]
+
+  deps = [
+    "${chip_root}/src/access",
+    "${chip_root}/src/app:paths",
+  ]
+}

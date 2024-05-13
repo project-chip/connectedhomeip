@@ -15,14 +15,14 @@
 #    limitations under the License.
 #
 
-import chip.clusters as Clusters
-import logging
-from chip.clusters.Attribute import AttributePath, AttributeReadResult, AttributeStatus, ValueDecodeFailure
-from chip.clusters.Types import NullValue
-import chip.interaction_model
 import asyncio
+import logging
+import random
 
 import base
+import chip.clusters as Clusters
+import chip.interaction_model
+from chip.clusters.Types import NullValue
 
 logger = logging.getLogger('NetworkCommissioning')
 logger.setLevel(logging.INFO)
@@ -55,6 +55,23 @@ class NetworkCommissioningTests:
     def __init__(self, devCtrl, nodeid):
         self._devCtrl = devCtrl
         self._nodeid = nodeid
+        self._last_breadcrumb = random.randint(1, 1 << 48)
+
+    async def must_verify_breadcrumb(self):
+        res = await self._devCtrl.ReadAttribute(
+            nodeid=self._nodeid,
+            attributes=[(0, Clusters.GeneralCommissioning.Attributes.Breadcrumb)],
+            returnClusterObject=True
+        )
+        if self._last_breadcrumb is not None:
+            if self._last_breadcrumb != res[0][Clusters.GeneralCommissioning].breadcrumb:
+                raise AssertionError(
+                    f"Breadcrumb attribute mismatch! Expect {self._last_breadcrumb} "
+                    f"got {res[0][Clusters.GeneralCommissioning].breadcrumb}")
+
+    def with_breadcrumb(self) -> int:
+        self._last_breadcrumb += 1
+        return self._last_breadcrumb
 
     def log_interface_basic_info(self, values):
         logger.info(f"The interface supports {values.maxNetworks} networks.")
@@ -66,9 +83,13 @@ class NetworkCommissioningTests:
             f"The feature map of this endpoint is {values.featureMap}.")
 
     async def readLastNetworkingStateAttributes(self, endpointId):
-        res = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[(endpointId, Clusters.NetworkCommissioning.Attributes.LastConnectErrorValue),
-                                                                                 (endpointId, Clusters.NetworkCommissioning.Attributes.LastNetworkID),
-                                                                                 (endpointId, Clusters.NetworkCommissioning.Attributes.LastNetworkingStatus)], returnClusterObject=True)
+        res = await self._devCtrl.ReadAttribute(
+            nodeid=self._nodeid,
+            attributes=[(endpointId, Clusters.NetworkCommissioning.Attributes.LastConnectErrorValue),
+                        (endpointId, Clusters.NetworkCommissioning.Attributes.LastNetworkID),
+                        (endpointId, Clusters.NetworkCommissioning.Attributes.LastNetworkingStatus)],
+            returnClusterObject=True
+        )
         values = res[endpointId][Clusters.NetworkCommissioning]
         logger.info(f"Got values: {values}")
         return values
@@ -79,7 +100,7 @@ class NetworkCommissioningTests:
 
         try:
             logger.info(
-                f"1. Send ConnectNetwork command with a illegal network id")
+                "1. Send ConnectNetwork command with a illegal network id")
             req = Clusters.NetworkCommissioning.Commands.ConnectNetwork(
                 networkID=b'0' * 254, breadcrumb=0)
             res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
@@ -87,73 +108,106 @@ class NetworkCommissioningTests:
         except chip.interaction_model.InteractionModelError as ex:
             logger.info(f"Received {ex} from server.")
 
-        logger.info(f"Finished negative test cases.")
+        logger.info("Finished negative test cases.")
 
     async def test_wifi(self, endpointId):
-        logger.info(f"Get basic information of the endpoint")
+        logger.info("Get basic information of the endpoint")
         res = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[
             (endpointId,
              Clusters.NetworkCommissioning.Attributes.ConnectMaxTimeSeconds),
             (endpointId,
              Clusters.NetworkCommissioning.Attributes.ScanMaxTimeSeconds),
             (endpointId, Clusters.NetworkCommissioning.Attributes.MaxNetworks),
-            (endpointId, Clusters.NetworkCommissioning.Attributes.FeatureMap)],
+            (endpointId, Clusters.NetworkCommissioning.Attributes.FeatureMap),
+            (endpointId, Clusters.NetworkCommissioning.Attributes.AcceptedCommandList),
+            (endpointId, Clusters.NetworkCommissioning.Attributes.GeneratedCommandList)],
             returnClusterObject=True)
         self.log_interface_basic_info(
             res[endpointId][Clusters.NetworkCommissioning])
-        logger.info(f"Finished getting basic information of the endpoint")
+        logger.info("Finished getting basic information of the endpoint")
+
+        if res[endpointId][Clusters.NetworkCommissioning].acceptedCommandList != [
+                Clusters.NetworkCommissioning.Commands.ScanNetworks.command_id,
+                Clusters.NetworkCommissioning.Commands.AddOrUpdateWiFiNetwork.command_id,
+                Clusters.NetworkCommissioning.Commands.RemoveNetwork.command_id,
+                Clusters.NetworkCommissioning.Commands.ConnectNetwork.command_id,
+                Clusters.NetworkCommissioning.Commands.ReorderNetwork.command_id]:
+            raise AssertionError("Unexpected accepted command list for Thread interface")
+
+        if res[endpointId][Clusters.NetworkCommissioning].generatedCommandList != [
+                Clusters.NetworkCommissioning.Commands.ScanNetworksResponse.command_id,
+                Clusters.NetworkCommissioning.Commands.NetworkConfigResponse.command_id,
+                Clusters.NetworkCommissioning.Commands.ConnectNetworkResponse.command_id]:
+            raise AssertionError("Unexpected generated command list for Thread interface")
 
         # Read Last* attributes
-        logger.info(f"Read Last* attributes")
+        logger.info("Read Last* attributes")
         res = await self.readLastNetworkingStateAttributes(endpointId=endpointId)
         if (res.lastNetworkID != NullValue) or (res.lastNetworkingStatus != NullValue) or (res.lastConnectErrorValue != NullValue):
             raise AssertionError(
-                f"LastNetworkID, LastNetworkingStatus and LastConnectErrorValue should be Null")
+                "LastNetworkID, LastNetworkingStatus and LastConnectErrorValue should be Null")
 
         # Scan networks
-        logger.info(f"Scan networks")
-        req = Clusters.NetworkCommissioning.Commands.ScanNetworks(
-            ssid=b'', breadcrumb=0)
-        res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
+        logger.info("Scan networks")
+        req = Clusters.NetworkCommissioning.Commands.ScanNetworks(breadcrumb=self.with_breadcrumb())
+        interactionTimeoutMs = self._devCtrl.ComputeRoundTripTimeout(self._nodeid, upperLayerProcessingTimeoutMs=30000)
+        logger.info(f"Request: {req}")
+        res = await self._devCtrl.SendCommand(
+            nodeid=self._nodeid,
+            endpoint=endpointId,
+            payload=req,
+            interactionTimeoutMs=interactionTimeoutMs
+        )
         logger.info(f"Received response: {res}")
-        if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
+        if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
+        await self.must_verify_breadcrumb()
 
         # Arm the failsafe before making network config changes
-        logger.info(f"Arming the failsafe")
+        logger.info("Arming the failsafe")
         req = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900)
         res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
         logger.info(f"Received response: {res}")
 
         # Remove existing network
-        logger.info(f"Check network list")
-        res = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[(endpointId, Clusters.NetworkCommissioning.Attributes.Networks)], returnClusterObject=True)
+        logger.info("Check network list")
+        res = await self._devCtrl.ReadAttribute(
+            nodeid=self._nodeid,
+            attributes=[(endpointId, Clusters.NetworkCommissioning.Attributes.Networks)],
+            returnClusterObject=True
+        )
         networkList = res[endpointId][Clusters.NetworkCommissioning].networks
         logger.info(f"Got network list: {networkList}")
         if len(networkList) != 0:
-            logger.info(f"Removing existing network")
+            logger.info("Removing existing network")
             req = Clusters.NetworkCommissioning.Commands.RemoveNetwork(
-                networkID=networkList[0].networkID, breadcrumb=0)
+                networkID=networkList[0].networkID, breadcrumb=self.with_breadcrumb())
             res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
             logger.info(f"Received response: {res}")
-            if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
+            if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
                 raise AssertionError(
                     f"Unexpected result: {res.networkingStatus}")
+            await self.must_verify_breadcrumb()
 
         # Add first network
-        logger.info(f"Adding first test network")
+        logger.info("Adding first test network")
         req = Clusters.NetworkCommissioning.Commands.AddOrUpdateWiFiNetwork(
-            ssid=TEST_WIFI_SSID.encode(), credentials=TEST_WIFI_PASS.encode(), breadcrumb=0)
+            ssid=TEST_WIFI_SSID.encode(), credentials=TEST_WIFI_PASS.encode(), breadcrumb=self.with_breadcrumb())
         res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
         logger.info(f"Received response: {res}")
-        if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
+        if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
         if res.networkIndex != 0:
             raise AssertionError(
                 f"Unexpected result: {res.networkIndex} (should be 0)")
+        await self.must_verify_breadcrumb()
 
-        logger.info(f"Check network list")
-        res = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[(endpointId, Clusters.NetworkCommissioning.Attributes.Networks)], returnClusterObject=True)
+        logger.info("Check network list")
+        res = await self._devCtrl.ReadAttribute(
+            nodeid=self._nodeid,
+            attributes=[(endpointId, Clusters.NetworkCommissioning.Attributes.Networks)],
+            returnClusterObject=True
+        )
         networkList = res[endpointId][Clusters.NetworkCommissioning].networks
         logger.info(f"Got network list: {networkList}")
         if len(networkList) != 1:
@@ -163,26 +217,38 @@ class NetworkCommissioningTests:
             raise AssertionError(
                 f"Unexpected result: first network ID should be 'TestSSID' got {networkList[0].networkID}")
 
-        logger.info(f"Connect to a network")
+        logger.info("Connect to a network")
         req = Clusters.NetworkCommissioning.Commands.ConnectNetwork(
-            networkID=TEST_WIFI_SSID.encode(), breadcrumb=0)
-        res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
+            networkID=TEST_WIFI_SSID.encode(), breadcrumb=self.with_breadcrumb())
+        interactionTimeoutMs = self._devCtrl.ComputeRoundTripTimeout(self._nodeid, upperLayerProcessingTimeoutMs=30000)
+        res = await self._devCtrl.SendCommand(
+            nodeid=self._nodeid,
+            endpoint=endpointId,
+            payload=req,
+            interactionTimeoutMs=interactionTimeoutMs
+        )
         logger.info(f"Got response: {res}")
-        if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
+        if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
-        logger.info(f"Device connected to a network.")
+        logger.info("Device connected to a network.")
+        await self.must_verify_breadcrumb()
 
         # Disarm the failsafe
-        logger.info(f"Disarming the failsafe")
+        logger.info("Disarming the failsafe")
         req = Clusters.GeneralCommissioning.Commands.CommissioningComplete()
         res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
         logger.info(f"Received response: {res}")
 
-        # Note: On Linux, when connecting to a connected network, it will return immediately, however, it will try a reconnect. This will make the below attribute read return false negative values.
+        # Note: On Linux, when connecting to a connected network, it will return immediately, however, it will try a reconnect.
+        # This will make the below attribute read return false negative values.
         await asyncio.sleep(5)
 
-        logger.info(f"Check network is connected")
-        res = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[(endpointId, Clusters.NetworkCommissioning.Attributes.Networks)], returnClusterObject=True)
+        logger.info("Check network is connected")
+        res = await self._devCtrl.ReadAttribute(
+            nodeid=self._nodeid,
+            attributes=[(endpointId, Clusters.NetworkCommissioning.Attributes.Networks)],
+            returnClusterObject=True
+        )
         networkList = res[endpointId][Clusters.NetworkCommissioning].networks
         logger.info(f"Got network list: {networkList}")
         if len(networkList) != 1:
@@ -193,80 +259,113 @@ class NetworkCommissioningTests:
                 f"Unexpected result: first network ID should be 'TestSSID' got {networkList[0].networkID}")
         if not networkList[0].connected:
             raise AssertionError(
-                f"Unexpected result: network is not marked as connected")
+                "Unexpected result: network is not marked as connected")
 
         # Verify Last* attributes
-        logger.info(f"Read Last* attributes")
+        logger.info("Read Last* attributes")
         res = await self.readLastNetworkingStateAttributes(endpointId=endpointId)
         if (res.lastNetworkID == NullValue) or (res.lastNetworkingStatus == NullValue) or (res.lastConnectErrorValue != NullValue):
             raise AssertionError(
-                f"LastNetworkID, LastNetworkingStatus should not be Null, LastConnectErrorValue should be Null for a successful network provision.")
+                "LastNetworkID, LastNetworkingStatus should not be Null, "
+                "LastConnectErrorValue should be Null for a successful network provision.")
 
     async def test_thread(self, endpointId):
-        logger.info(f"Get basic information of the endpoint")
+        logger.info("Get basic information of the endpoint")
         res = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[
             (endpointId,
              Clusters.NetworkCommissioning.Attributes.ConnectMaxTimeSeconds),
             (endpointId,
              Clusters.NetworkCommissioning.Attributes.ScanMaxTimeSeconds),
             (endpointId, Clusters.NetworkCommissioning.Attributes.MaxNetworks),
-            (endpointId, Clusters.NetworkCommissioning.Attributes.FeatureMap)],
+            (endpointId, Clusters.NetworkCommissioning.Attributes.FeatureMap),
+            (endpointId, Clusters.NetworkCommissioning.Attributes.AcceptedCommandList),
+            (endpointId, Clusters.NetworkCommissioning.Attributes.GeneratedCommandList)],
             returnClusterObject=True)
         self.log_interface_basic_info(
             res[endpointId][Clusters.NetworkCommissioning])
-        logger.info(f"Finished getting basic information of the endpoint")
+
+        if res[endpointId][Clusters.NetworkCommissioning].acceptedCommandList != [
+                Clusters.NetworkCommissioning.Commands.ScanNetworks.command_id,
+                Clusters.NetworkCommissioning.Commands.AddOrUpdateThreadNetwork.command_id,
+                Clusters.NetworkCommissioning.Commands.RemoveNetwork.command_id,
+                Clusters.NetworkCommissioning.Commands.ConnectNetwork.command_id,
+                Clusters.NetworkCommissioning.Commands.ReorderNetwork.command_id]:
+            raise AssertionError("Unexpected accepted command list for Thread interface")
+
+        if res[endpointId][Clusters.NetworkCommissioning].generatedCommandList != [
+                Clusters.NetworkCommissioning.Commands.ScanNetworksResponse.command_id,
+                Clusters.NetworkCommissioning.Commands.NetworkConfigResponse.command_id,
+                Clusters.NetworkCommissioning.Commands.ConnectNetworkResponse.command_id]:
+            raise AssertionError("Unexpected generated command list for Thread interface")
+
+        logger.info("Finished getting basic information of the endpoint")
 
         # Read Last* attributes
-        logger.info(f"Read Last* attributes")
+        logger.info("Read Last* attributes")
         res = await self.readLastNetworkingStateAttributes(endpointId=endpointId)
         if (res.lastNetworkID != NullValue) or (res.lastNetworkingStatus != NullValue) or (res.lastConnectErrorValue != NullValue):
             raise AssertionError(
-                f"LastNetworkID, LastNetworkingStatus and LastConnectErrorValue should be Null")
+                "LastNetworkID, LastNetworkingStatus and LastConnectErrorValue should be Null")
 
         # Scan networks
-        logger.info(f"Scan networks")
-        req = Clusters.NetworkCommissioning.Commands.ScanNetworks(
-            ssid=b'', breadcrumb=0)
-        res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
+        logger.info("Scan networks")
+        req = Clusters.NetworkCommissioning.Commands.ScanNetworks(breadcrumb=self.with_breadcrumb())
+        logger.info(f"Request: {req}")
+        interactionTimeoutMs = self._devCtrl.ComputeRoundTripTimeout(self._nodeid, upperLayerProcessingTimeoutMs=30000)
+        res = await self._devCtrl.SendCommand(nodeid=self._nodeid,
+                                              endpoint=endpointId,
+                                              payload=req,
+                                              interactionTimeoutMs=interactionTimeoutMs)
         logger.info(f"Received response: {res}")
-        if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
+        if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
+        await self.must_verify_breadcrumb()
 
         # Arm the failsafe before making network config changes
-        logger.info(f"Arming the failsafe")
+        logger.info("Arming the failsafe")
         req = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900)
         res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
         logger.info(f"Received response: {res}")
 
         # Remove existing network
-        logger.info(f"Check network list")
-        res = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[(endpointId, Clusters.NetworkCommissioning.Attributes.Networks)], returnClusterObject=True)
+        logger.info("Check network list")
+        res = await self._devCtrl.ReadAttribute(
+            nodeid=self._nodeid,
+            attributes=[(endpointId, Clusters.NetworkCommissioning.Attributes.Networks)],
+            returnClusterObject=True
+        )
         networkList = res[endpointId][Clusters.NetworkCommissioning].networks
         logger.info(f"Got network list: {networkList}")
         if len(networkList) != 0:
-            logger.info(f"Removing existing network")
+            logger.info("Removing existing network")
             req = Clusters.NetworkCommissioning.Commands.RemoveNetwork(
-                networkID=networkList[0].networkID, breadcrumb=0)
+                networkID=networkList[0].networkID, breadcrumb=self.with_breadcrumb())
             res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
             logger.info(f"Received response: {res}")
-            if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
+            if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
                 raise AssertionError(
                     f"Unexpected result: {res.networkingStatus}")
+            await self.must_verify_breadcrumb()
 
         # Add first network
-        logger.info(f"Adding first test network")
+        logger.info("Adding first test network")
         req = Clusters.NetworkCommissioning.Commands.AddOrUpdateThreadNetwork(
-            operationalDataset=TEST_THREAD_NETWORK_DATASET_TLVS[0], breadcrumb=0)
+            operationalDataset=TEST_THREAD_NETWORK_DATASET_TLVS[0], breadcrumb=self.with_breadcrumb())
         res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
         logger.info(f"Received response: {res}")
-        if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
+        if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
         if res.networkIndex != 0:
             raise AssertionError(
                 f"Unexpected result: {res.networkIndex} (should be 0)")
+        await self.must_verify_breadcrumb()
 
-        logger.info(f"Check network list")
-        res = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[(endpointId, Clusters.NetworkCommissioning.Attributes.Networks)], returnClusterObject=True)
+        logger.info("Check network list")
+        res = await self._devCtrl.ReadAttribute(
+            nodeid=self._nodeid,
+            attributes=[(endpointId, Clusters.NetworkCommissioning.Attributes.Networks)],
+            returnClusterObject=True
+        )
         networkList = res[endpointId][Clusters.NetworkCommissioning].networks
         logger.info(f"Got network list: {networkList}")
         if len(networkList) != 1:
@@ -276,30 +375,40 @@ class NetworkCommissioningTests:
             raise AssertionError(
                 f"Unexpected result: first network ID should be {TEST_THREAD_NETWORK_IDS[0]} got {networkList[0].networkID}")
 
-        logger.info(f"Connect to a network")
+        logger.info("Connect to a network")
         req = Clusters.NetworkCommissioning.Commands.ConnectNetwork(
-            networkID=TEST_THREAD_NETWORK_IDS[0], breadcrumb=0)
-        res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
+            networkID=TEST_THREAD_NETWORK_IDS[0], breadcrumb=self.with_breadcrumb())
+        interactionTimeoutMs = self._devCtrl.ComputeRoundTripTimeout(self._nodeid, upperLayerProcessingTimeoutMs=30000)
+        res = await self._devCtrl.SendCommand(nodeid=self._nodeid,
+                                              endpoint=endpointId,
+                                              payload=req,
+                                              interactionTimeoutMs=interactionTimeoutMs)
         logger.info(f"Got response: {res}")
-        if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
+        if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
-        logger.info(f"Device connected to a network.")
+        logger.info("Device connected to a network.")
+        await self.must_verify_breadcrumb()
 
         # Disarm the failsafe
-        logger.info(f"Disarming the failsafe")
+        logger.info("Disarming the failsafe")
         req = Clusters.GeneralCommissioning.Commands.CommissioningComplete()
         res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
         logger.info(f"Received response: {res}")
 
         # Verify Last* attributes
-        logger.info(f"Read Last* attributes")
+        logger.info("Read Last* attributes")
         res = await self.readLastNetworkingStateAttributes(endpointId=endpointId)
         if (res.lastNetworkID == NullValue) or (res.lastNetworkingStatus == NullValue) or (res.lastConnectErrorValue != NullValue):
             raise AssertionError(
-                f"LastNetworkID, LastNetworkingStatus should not be Null, LastConnectErrorValue should be Null for a successful network provision.")
+                "LastNetworkID, LastNetworkingStatus should not be Null, "
+                "LastConnectErrorValue should be Null for a successful network provision.")
 
-        logger.info(f"Check network list")
-        res = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[(endpointId, Clusters.NetworkCommissioning.Attributes.Networks)], returnClusterObject=True)
+        logger.info("Check network list")
+        res = await self._devCtrl.ReadAttribute(
+            nodeid=self._nodeid,
+            attributes=[(endpointId, Clusters.NetworkCommissioning.Attributes.Networks)],
+            returnClusterObject=True
+        )
         networkList = res[endpointId][Clusters.NetworkCommissioning].networks
         logger.info(f"Got network list: {networkList}")
         if len(networkList) != 1:
@@ -310,16 +419,24 @@ class NetworkCommissioningTests:
                 f"Unexpected result: first network ID should be {TEST_THREAD_NETWORK_IDS[0]} got {networkList[0].networkID}")
         if not networkList[0].connected:
             raise AssertionError(
-                f"Unexpected result: network is not marked as connected")
+                "Unexpected result: network is not marked as connected")
 
     @base.test_case
     async def Test(self):
-        clusters = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[(Clusters.Descriptor.Attributes.ServerList)], returnClusterObject=True)
+        clusters = await self._devCtrl.ReadAttribute(
+            nodeid=self._nodeid,
+            attributes=[(Clusters.Descriptor.Attributes.ServerList)],
+            returnClusterObject=True
+        )
         if Clusters.NetworkCommissioning.id not in clusters[0][Clusters.Descriptor].serverList:
             logger.info(
-                f"Network commissioning cluster {endpoint} is not enabled on this device.")
+                "Network commissioning cluster is not enabled on this device.")
             return
-        endpoints = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[(Clusters.NetworkCommissioning.Attributes.FeatureMap)], returnClusterObject=True)
+        endpoints = await self._devCtrl.ReadAttribute(
+            nodeid=self._nodeid,
+            attributes=[(Clusters.NetworkCommissioning.Attributes.FeatureMap)],
+            returnClusterObject=True
+        )
         logger.info(endpoints)
         for endpoint, obj in endpoints.items():
             clus = obj[Clusters.NetworkCommissioning]
@@ -341,5 +458,5 @@ class NetworkCommissioningTests:
         try:
             await self.Test()
             return True
-        except Exception as ex:
+        except Exception:
             return False

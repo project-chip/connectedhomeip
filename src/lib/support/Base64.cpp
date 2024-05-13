@@ -22,9 +22,6 @@
  *
  */
 
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
 #include "Base64.h"
 
 #include <ctype.h>
@@ -123,19 +120,19 @@ uint16_t Base64Encode(const uint8_t * in, uint16_t inLen, char * out, Base64ValT
         uint8_t val1, val2, val3, val4;
 
         val1 = static_cast<uint8_t>(*in >> 2);
-        val2 = (*in << 4) & 0x3F;
+        val2 = static_cast<uint8_t>((*in << 4) & 0x3F);
         in++;
         inLen--;
         if (inLen > 0)
         {
             val2 = static_cast<uint8_t>(val2 | *in >> 4);
-            val3 = (*in << 2) & 0x3F;
+            val3 = static_cast<uint8_t>((*in << 2) & 0x3F);
             in++;
             inLen--;
             if (inLen > 0)
             {
                 val3 = static_cast<uint8_t>(val3 | *in >> 6);
-                val4 = *in & 0x3F;
+                val4 = static_cast<uint8_t>(*in & 0x3F);
                 in++;
                 inLen--;
             }

@@ -22,7 +22,7 @@
 
 #include <app/server/EchoHandler.h>
 
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 #include <protocols/echo/Echo.h>
 
 namespace {
@@ -40,7 +40,8 @@ chip::Protocols::Echo::EchoServer gEchoServer;
  */
 void HandleEchoRequestReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle && payload)
 {
-    ChipLogProgress(AppServer, "Echo Request, len=%u ... sending response.\n", payload->DataLength());
+    ChipLogProgress(AppServer, "Echo Request, len=%" PRIu32 "... sending response.\n",
+                    static_cast<uint32_t>(payload->DataLength()));
 }
 
 } // namespace

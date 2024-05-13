@@ -92,9 +92,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     tcpip_init(NULL, NULL);
 #endif
 
-    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
-
     auto err = System::Clock::InitClock_RealTime();
     SuccessOrExit(err);
 
@@ -270,19 +267,15 @@ CHIP_ERROR PlatformManagerImpl::_StartChipTimer(System::Clock::Timeout duration)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PlatformManagerImpl::_Shutdown()
+void PlatformManagerImpl::_Shutdown()
 {
     //
     // Call up to the base class _Shutdown() to perform the actual stack de-initialization
     // and clean-up
     //
-    auto err = GenericPlatformManagerImpl<ImplClass>::_Shutdown();
-    if (err == CHIP_NO_ERROR)
-    {
-        mInitialized = false;
-        mQueue.background(nullptr);
-    }
-    return err;
+    GenericPlatformManagerImpl<ImplClass>::_Shutdown();
+    mInitialized = false;
+    mQueue.background(nullptr);
 }
 
 CHIP_ERROR PlatformManagerImpl::TranslateOsStatus(osStatus error)

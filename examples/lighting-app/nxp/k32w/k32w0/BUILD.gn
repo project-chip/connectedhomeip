@@ -13,16 +13,25 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/k32w0_sdk.gni")
+import("//build_overrides/nxp_sdk.gni")
 import("//build_overrides/openthread.gni")
 
-import("${k32w0_sdk_build_root}/k32w0_executable.gni")
-import("${k32w0_sdk_build_root}/k32w0_sdk.gni")
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/nxp_executable.gni")
 
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/lib/core/core.gni")
-import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
+
+declare_args() {
+  chip_software_version = 0
+  chip_simple_hash_verification = 0
+
+  # Setup discriminator as argument
+  setup_discriminator = 3840
+}
 
 if (chip_pw_tokenizer_logging) {
   import("//build_overrides/pigweed.gni")
@@ -51,11 +60,8 @@ k32w0_sdk("sdk") {
     "${k32w0_platform_dir}/app/project_include",
     "${k32w0_platform_dir}/app/support",
     "${k32w0_platform_dir}/util/include",
+    "${k32w0_platform_dir}/common",
   ]
-
-  if (chip_with_se05x == 1) {
-    include_dirs += [ "${chip_root}/examples/platform/nxp/se05x" ]
-  }
 
   defines = []
   if (is_debug) {
@@ -63,10 +69,20 @@ k32w0_sdk("sdk") {
   } else {
     defines += [ "BUILD_RELEASE=1" ]
   }
+
+  if (chip_software_version != 0) {
+    defines += [
+      "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=${chip_software_version}",
+    ]
+  }
+
+  defines += [
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setup_discriminator}",
+  ]
 }
 
 k32w0_executable("light_app") {
-  output_name = "chip-k32w061-light-example"
+  output_name = "chip-k32w0x-light-example"
 
   sources = [
     "${k32w0_platform_dir}/util/LEDWidget.cpp",
@@ -80,11 +96,25 @@ k32w0_executable("light_app") {
     "main/main.cpp",
   ]
 
+  public = [ "${chip_root}/src/platform/nxp/k32w/k32w0/DefaultTestEventTriggerDelegate.h" ]
+
+  if (chip_with_factory_data == 1 && use_custom_factory_provider == 1) {
+    sources += [
+      "${k32w0_platform_dir}/common/CustomFactoryDataProvider.cpp",
+      "${k32w0_platform_dir}/common/CustomFactoryDataProvider.h",
+    ]
+
+    defines = [ "CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER=1" ]
+  }
+
   deps = [
     ":sdk",
     "${chip_root}/examples/common/QRCode",
-    "${chip_root}/examples/lighting-app/lighting-common/",
+    "${chip_root}/examples/lighting-app/nxp/zap/",
+    "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/src/app:test-event-trigger",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform:syscalls_stub",
     "${chip_root}/third_party/mbedtls:mbedtls",
     "${k32w0_platform_dir}/app/support:freertos_mbedtls_utils",
   ]
@@ -103,18 +133,21 @@ k32w0_executable("light_app") {
 
   cflags = [ "-Wconversion" ]
 
-  ldscript = "${k32w0_platform_dir}/app/ldscripts/chip-k32w061-linker.ld"
+  ldscript = "${k32w0_platform_dir}/app/ldscripts/chip-k32w0x-linker.ld"
 
   inputs = [ ldscript ]
 
-  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+  ldflags = [
+    "-T" + rebase_path(ldscript, root_build_dir),
+    "-Wl,-print-memory-usage",
+  ]
 
   if (chip_enable_ota_requestor) {
     ldflags += [
       "-Wl,--defsym",
       "-Wl,__app_load_address__=0x4000",
       "-Wl,--defsym",
-      "-Wl,__app_stated_size__=0x99A00",
+      "-Wl,__app_stated_size__=0x99200",
     ]
   }
 
@@ -123,17 +156,31 @@ k32w0_executable("light_app") {
 
 if (chip_pw_tokenizer_logging) {
   pw_tokenizer_database("light_app.database") {
-    database = "$root_build_dir/chip-k32w061-light-example-database.bin"
+    database = "$root_build_dir/chip-k32w0x-light-example-database.bin"
     create = "binary"
     deps = [ ":light_app" ]
-    optional_paths = [ "$root_build_dir/chip-k32w061-light-example" ]
+    optional_paths = [ "$root_build_dir/chip-k32w0x-light-example" ]
   }
 }
 
 group("k32w0") {
-  deps = [ ":light_app" ]
+  deps = [
+    ":binsign",
+    ":light_app",
+  ]
   if (chip_pw_tokenizer_logging) {
     deps += [ ":light_app.database" ]
+  }
+}
+
+action("binsign") {
+  deps = [ ":light_app" ]
+  script = "${k32w0_platform_dir}/scripts/sign-outdir.py"
+  output_name = "bignsign.log"
+  outputs = [ "${root_build_dir}/${output_name}" ]
+
+  if (chip_simple_hash_verification == 1) {
+    args = [ "--simple-hash" ]
   }
 }
 

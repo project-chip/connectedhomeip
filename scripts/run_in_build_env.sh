@@ -26,5 +26,5 @@ fi
 
 set -e
 
-echo "Executing in build environment: $@"
+echo "Executing in build environment: $*"
 bash -c -- "$@"

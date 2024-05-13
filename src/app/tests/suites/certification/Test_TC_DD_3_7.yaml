@@ -1,0 +1,517 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    3.3.7. [TC-DD-3.7] Commissioning Flow - Concurrent - Negative Scenario [DUT
+    - Commissioner]
+
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the DUT as commissioner test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Preconditions"
+      verification: |
+          1 - 5.5 - Commissioner is on a network. - The network can either be WiFi or Thread.
+          2 - 5.5 - Commissionee can either be a Matter device which is already on a network or the test harness connected to the network.
+      disabled: true
+
+    - label:
+          "Step 1: Commissioner has regulatory and fabric information available
+          and has accurate date, time and timezone"
+      verification: |
+          Verify in TH as server side
+          sudo ./chip-all-clusters-app --wifi --discriminator 3841
+
+          [1653471956.966855][10713:10713] CHIP:SPT: PASE PBKDF iterations set to 1000
+          [1653471956.966887][10713:10713] CHIP:SPT: LinuxCommissionableDataProvider didn't get a PASE salt, generating one.
+          [1653471956.972152][10713:10713] CHIP:DL: Device Configuration:
+          [1653471956.972270][10713:10713] CHIP:DL:   Serial Number: TEST_SN
+          [1653471956.972315][10713:10713] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
+          [1653471956.972354][10713:10713] CHIP:DL:   Product Id: 32769 (0x8001)
+          [1653471956.972388][10713:10713] CHIP:DL:   Hardware Version: 0
+          [1653471956.972413][10713:10713] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
+          [1653471956.972435][10713:10713] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3841 (0xF01)
+          [1653471956.972464][10713:10713] CHIP:DL:   Manufacturing Date: (not set)
+          [1653471956.972488][10713:10713] CHIP:DL:   Device Type: 65535 (0xFFFF)
+          [1653471956.972509][10713:10713] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
+          [1653471956.972546][10713:10713] CHIP:SVR: SetupQRCode: [MT:-24J0CEK01KA0648G00]
+          [1653471956.972579][10713:10713] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
+          [1653471956.972600][10713:10713] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0CEK01KA0648G00
+          [1653471956.972632][10713:10713] CHIP:SVR: Manual pairing code: [34970112332]
+          [1653471956.972654][10713:10713] CHIP:-: ==== Onboarding payload for Custom Commissioning Flows ====
+          [1653471956.972715][10713:10713] CHIP:SVR: SetupQRCode: [MT:-24J048N01KA0648G00]
+          [1653471956.972748][10713:10713] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
+          [1653471956.972769][10713:10713] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J048N01KA0648G00
+          [1653471956.972803][10713:10713] CHIP:SVR: Manual pairing code: [749701123365521327694]
+
+          Verify in DUT as client side
+          ./chip-tool pairing code 1 MT:-24J0CEK01KA0648G00
+          ...
+          [1657226543861] [30621:16744161] CHIP: [IN] SecureSession[0x6000007cc000]: Activated - Type:1 LSID:47293
+          [1657226543861] [30621:16744161] CHIP: [IN] New secure session activated for device <FFFFFFFB00000000, 0>, LSID:47293 PSID:201!
+          [1657226543861] [30621:16744161] CHIP: [CTL] Remote device completed SPAKE2+ handshake
+          [1657226543861] [30621:16744161] CHIP: [CTL] Stopping commissioning discovery over DNS-SD
+          [1657226543861] [30621:16744161] CHIP: [TOO] Pairing Success
+          [1657226543861] [30621:16744161] CHIP: [TOO] PASE establishment successful
+          [1657226543861] [30621:16744161] CHIP: [CTL] Commissioning stage next step: 'SecurePairing' -> 'ReadCommissioningInfo'
+      disabled: true
+
+    - label:
+          "Step 2: Commissioner and Commissionee discover each other and connect
+          via the discovery mode applicable for the DUT."
+      verification: |
+          Verify in DUT as client side
+          ./chip-tool pairing code 1 MT:-24J0AFN00KA0648G00
+          ...
+          [1657226543861] [30621:16744161] CHIP: [IN] SecureSession[0x6000007cc000]: Activated - Type:1 LSID:47293
+          [1657226543861] [30621:16744161] CHIP: [IN] New secure session activated for device <FFFFFFFB00000000, 0>, LSID:47293 PSID:201!
+          [1657226543861] [30621:16744161] CHIP: [CTL] Remote device completed SPAKE2+ handshake
+          [1657226543861] [30621:16744161] CHIP: [CTL] Stopping commissioning discovery over DNS-SD
+          [1657226543861] [30621:16744161] CHIP: [TOO] Pairing Success
+          [1657226543861] [30621:16744161] CHIP: [TOO] PASE establishment successful
+          [1657226543861] [30621:16744161] CHIP: [CTL] Commissioning stage next step: 'SecurePairing' -> 'ReadCommissioningInfo'
+
+
+          Verify in TH as server side
+          ./chip-all-clusters-app
+          ...
+          [1657226543.948995][369114:369114] CHIP:IN: SecureSession[0xaaaab60788e0]: Activated - Type:1 LSID:201
+          [1657226543.949023][369114:369114] CHIP:IN: New secure session created for device <FFFFFFFB00000000, 0>, LSID:201 PSID:47293!
+          [1657226543.949048][369114:369114] CHIP:SVR: Commissioning completed session establishment step
+      disabled: true
+
+    - label:
+          "Step 3: Establish encryption keys with Password Authenticated Session
+          Establishment on the commissioning channel"
+      verification: |
+          Verify in DUT as client side
+
+          CHIP:SC: Sent PBKDF param request
+          CHIP:CTL: Setting attestation nonce to random value
+          CHIP:CTL: Setting CSR nonce to random value
+          CHIP:CTL: Commission called for node ID 0x000000000001B669
+          CHIP:EM: Received message of type 0x21 with protocolId (0, 0) and MessageCounter:1341084110 on exchange 63762i
+          CHIP:EM: Found matching exchange: 63762i, Delegate: 0xffff8c000bc0
+          CHIP:EM: Rxd Ack; Removing MessageCounter:850320430 from Retrans Table on exchange 63762i
+          CHIP:EM: Removed CHIP MessageCounter:850320430 from RetransTable on exchange 63762i
+          CHIP:SC: Received PBKDF param response
+      disabled: true
+
+    - label:
+          "Step 4: Commissioner SHALL re-arm Fail-safe timer on Commissionee
+          within 60s (the autonomously Fail-safe timer length set by
+          Commissionee)"
+      verification: |
+          Verify in DUT as client side
+
+          CHIP:CTL: Commissioning stage next step: 'ReadCommissioningInfo' -> 'ArmFailSafe'
+          CHIP:CTL: Performing next commissioning step 'ArmFailSafe'
+          CHIP:CTL: Arming failsafe (60 seconds)
+      disabled: true
+
+    - label: "Step 5: Reboot TH and prepare for commissioning"
+      verification: |
+          1. Using TH=all-clusters-app, exit the app, re-launch app
+      disabled: true
+
+    - label: "Step 6: Commissioner should return to step 2"
+      verification: |
+          Verify in DUT as client side
+
+          ./chip-tool discover commissionables
+          Waiting for device responses...
+          CHIP:CTL: Generating ICAC
+          CHIP:DL: AUDIT: ===== RANDOM NUMBER GENERATOR AUDIT START ====
+          CHIP:DL: AUDIT: * Validate buf1 and buf2 are <<<different every run/boot!>>>
+          CHIP:DL: AUDIT: * Validate r1 and r2 are <<<different every run/boot!>>>
+          CHIP:DL: AUDIT: * buf1: 3BE3E264C0A0A053248E93609D22044A
+          CHIP:DL: AUDIT: * buf2: E69C8767AD6B60907AD3633E774F38EB
+          CHIP:DL: AUDIT: * r1: 0x2A0E6454 r2: 0x16315893
+          CHIP:DL: AUDIT: ===== RANDOM NUMBER GENERATOR AUDIT END ====
+          CHIP:DL: writing settings to file (/tmp/chip_counters.ini-9yXPat)
+          CHIP:DL: renamed tmp file to file (/tmp/chip_counters.ini)
+          CHIP:DL: NVS set: chip-counters/reboot-count = 23 (0x17)
+          CHIP:DL: Got Ethernet interface: eth0
+          CHIP:DL: Found the primary Ethernet interface:eth0
+          CHIP:DL: Got WiFi interface: wlan0
+          CHIP:DL: Failed to reset WiFi statistic counts
+          CHIP:IN: UDP::Init bind&listen port=5541
+          CHIP:IN: UDP::Init bound to port=5541
+          CHIP:IN: UDP::Init bind&listen port=5541
+          CHIP:IN: UDP::Init bound to port=5541
+          CHIP:IN: TransportMgr initialized
+          CHIP:DIS: Init fabric pairing table with server storage
+          CHIP:DL: writing settings to file (/tmp/chip_counters.ini-zgCtZd)
+          CHIP:DL: renamed tmp file to file (/tmp/chip_counters.ini)
+          CHIP:DL: NVS set: chip-counters/GlobalMCTR = 25000 (0x61A8)
+          CHIP:CTL: System State Initialized...
+          CHIP:DL: MDNS failed to join multicast group on veth5731933 for address type IPv4: ../th
+          CHIP:DL: MDNS failed to join multicast group on vethbf7bfa6 for address type IPv4: ../th
+          CHIP:DL: MDNS failed to join multicast group on vethcf434e5 for address type IPv4: ../th
+          CHIP:ZCL: Using ZAP configuration...
+          CHIP:DIS: Verifying the received credentials
+          CHIP:IN: Generating compressed fabric ID using uncompressed fabric ID 0x0000000000000000
+          CHIP:IN: 0x04, 0x66, 0xd6, 0xcf, 0x4c, 0x1e, 0x11, 0xc3,
+          CHIP:IN: 0x52, 0x4f, 0xa6, 0x8c, 0x6e, 0x65, 0x46, 0xdc,
+          CHIP:IN: 0x90, 0x1b, 0x5f, 0x42, 0x9f, 0x69, 0xd1, 0xb7,
+          CHIP:IN: 0x7d, 0xf3, 0x6b, 0x54, 0x12, 0x6c, 0x12, 0x59,
+          CHIP:IN: 0x5b, 0xc3, 0x07, 0x1c, 0x5c, 0xf4, 0x4e, 0x5f,
+          CHIP:IN: 0x71, 0x06, 0x9a, 0xbb, 0x2f, 0xef, 0x20, 0x0d,
+          CHIP:IN: 0x0e, 0x9b, 0x26, 0x3e, 0x8d, 0x46, 0x09, 0xd8,
+          CHIP:IN: 0xfd, 0xa1, 0xc0, 0x10, 0x4f, 0x05, 0x14, 0x99,
+          CHIP:IN: 0x22,
+          CHIP:IN: Generated compressed fabric ID
+          CHIP:IN: 0x4a, 0x53, 0x1e, 0x52, 0x06, 0xed, 0x06, 0xda,
+          CHIP:DIS: Added new fabric at index: 1, Initialized: 1
+          CHIP:DIS: Assigned compressed fabric ID: 0x4A531E5206ED06DA, node ID: 0x000000000001B669
+          CHIP:CTL: Joined the fabric at index 1. Compressed fabric ID is: 0x4A531E5206ED06DA
+          CHIP:DL: CHIP task running
+          CHIP:DIS: Attempt to mDNS broadcast failed:  ../third_party/connectedhomeip/src/inet/UDP
+          CHIP:DIS: Attempt to mDNS broadcast failed:  ../third_party/connectedhomeip/src/inet/UDP
+          CHIP:DIS: Attempt to mDNS broadcast failed:  ../third_party/connectedhomeip/src/inet/UDP
+          CHIP:DIS: Attempt to mDNS broadcast failed:  ../third_party/connectedhomeip/src/inet/UDP
+          CHIP:DIS: Discovered Node:
+          CHIP:DIS:      Host name:              EEAABADABAD0DDCA
+          CHIP:DIS:      Port:                   5540
+          CHIP:DIS:      Long discriminator:     3840
+          CHIP:DIS:      Vendor ID:              9050
+          CHIP:DIS:      Product ID:             65279
+          CHIP:DIS:      Commissioning Mode      1
+          CHIP:DIS:      Device Type             0
+          CHIP:DIS:      Device Name
+          CHIP:DIS:      Rotating Id             00007C5F6E176CD40F68685D100A1CF8A98B
+          CHIP:DIS:      Pairing Instruction
+          CHIP:DIS:      Pairing Hint            0x21
+          CHIP:DIS:      Address 0:              2402:e280:2108:181:dea6:32ff:fef9:f0a1
+          CHIP:DIS:      Address 1:              fe80::dea6:32ff:fef9:f0a1
+          CHIP:DIS:      Address 2:              192.168.1.12
+          CHIP:DIS: Discovered Node:
+          CHIP:DIS:      Host name:              EEAABADABAD0DDCA
+          CHIP:DIS:      Port:                   5540
+          CHIP:DIS:      Long discriminator:     3840
+          CHIP:DIS:      Vendor ID:              9050
+          CHIP:DIS:      Product ID:             65279
+          CHIP:DIS:      Commissioning Mode      1
+          CHIP:DIS:      Device Type             0
+          CHIP:DIS:      Device Name
+          CHIP:DIS:      Rotating Id             00007C5F6E176CD40F68685D100A1CF8A98B
+          CHIP:DIS:      Pairing Instruction
+          CHIP:DIS:      Pairing Hint            0x21
+          CHIP:DIS:      Address 0:              2402:e280:2108:181:dea6:32ff:fef9:f0a1
+          CHIP:DIS:      Address 1:              fe80::dea6:32ff:fef9:f0a1
+          CHIP:DIS:      Address 2:              192.168.1.12
+          CHIP:DIS: Discovered Node:
+          CHIP:DIS:      Host name:              EEAABADABAD0DDCA
+          CHIP:DIS:      Port:                   5540
+          CHIP:DIS:      Long discriminator:     3840
+          CHIP:DIS:      Vendor ID:              9050
+          CHIP:DIS:      Product ID:             65279
+          CHIP:DIS:      Commissioning Mode      1
+          CHIP:DIS:      Device Type             0
+          CHIP:DIS:      Device Name
+          CHIP:DIS:      Rotating Id             00007C5F6E176CD40F68685D100A1CF8A98B
+          CHIP:DIS:      Pairing Instruction
+          CHIP:DIS:      Pairing Hint            0x21
+          CHIP:DIS:      Address 0:              2402:e280:2108:181:dea6:32ff:fef9:f0a1
+          CHIP:DIS:      Address 1:              fe80::dea6:32ff:fef9:f0a1
+          CHIP:DIS:      Address 2:              192.168.1.12
+          CHIP:DIS: Discovered Node:
+          CHIP:DIS:      Host name:              EEAABADABAD0DDCA
+          CHIP:DIS:      Port:                   5540
+          CHIP:DIS:      Long discriminator:     3840
+          CHIP:DIS:      Vendor ID:              9050
+          CHIP:DIS:      Product ID:             65279
+          CHIP:DIS:      Commissioning Mode      1
+          CHIP:DIS:      Device Type             0
+          CHIP:DIS:      Device Name
+          CHIP:DIS:      Rotating Id             00007C5F6E176CD40F68685D100A1CF8A98B
+          CHIP:DIS:      Pairing Instruction
+          CHIP:DIS:      Pairing Hint            0x21
+          CHIP:DIS:      Address 0:              2402:e280:2108:181:dea6:32ff:fef9:f0a1
+          CHIP:DIS:      Address 1:              fe80::dea6:32ff:fef9:f0a1
+          CHIP:DIS:      Address 2:              192.168.1.12
+          CHIP:DIS: Discovered Node:
+          CHIP:DIS:      Host name:              EEAABADABAD0DDCA
+          CHIP:DIS:      Port:                   5540
+          CHIP:DIS:      Long discriminator:     3840
+          CHIP:DIS:      Vendor ID:              9050
+          CHIP:DIS:      Product ID:             65279
+          CHIP:DIS:      Commissioning Mode      1
+          CHIP:DIS:      Device Type             0
+          CHIP:DIS:      Device Name
+          CHIP:DIS:      Rotating Id             00007C5F6E176CD40F68685D100A1CF8A98B
+          CHIP:DIS:      Pairing Instruction
+          CHIP:DIS:      Pairing Hint            0x21
+          CHIP:DIS:      Address 0:              2402:e280:2108:181:dea6:32ff:fef9:f0a1
+          CHIP:DIS:      Address 1:              fe80::dea6:32ff:fef9:f0a1
+          CHIP:DIS:      Address 2:              192.168.1.12
+          CHIP:DIS: Discovered Node:
+          CHIP:DIS:      Host name:              EEAABADABAD0DDCA
+          CHIP:DIS:      Port:                   5540
+          CHIP:DIS:      Long discriminator:     3840
+          CHIP:DIS:      Vendor ID:              9050
+          CHIP:DIS:      Product ID:             65279
+          CHIP:DIS:      Commissioning Mode      1
+          CHIP:DIS:      Device Type             0
+          CHIP:DIS:      Device Name
+          CHIP:DIS:      Rotating Id             00007C5F6E176CD40F68685D100A1CF8A98B
+          CHIP:DIS:      Pairing Instruction
+          CHIP:DIS:      Pairing Hint            0x21
+          CHIP:DIS:      Address 0:              2402:e280:2108:181:dea6:32ff:fef9:f0a1
+          CHIP:DIS:      Address 1:              fe80::dea6:32ff:fef9:f0a1
+          CHIP:DIS:      Address 2:              192.168.1.12
+      disabled: true
+
+    - label:
+          "Step 7: Establish encryption keys with Password Authenticated Session
+          Establishment on the commissioning channel"
+      verification: |
+          Verify in DUT as client side
+
+          CHIP:SC: Sent PBKDF param request
+          CHIP:CTL: Setting attestation nonce to random value
+          CHIP:CTL: Setting CSR nonce to random value
+          CHIP:CTL: Commission called for node ID 0x000000000001B669
+          CHIP:EM: Received message of type 0x21 with protocolId (0, 0) and MessageCounter:1341084110 on exchange 63762i
+          CHIP:EM: Found matching exchange: 63762i, Delegate: 0xffff8c000bc0
+          CHIP:EM: Rxd Ack; Removing MessageCounter:850320430 from Retrans Table on exchange 63762i
+          CHIP:EM: Removed CHIP MessageCounter:850320430 from RetransTable on exchange 63762i
+          CHIP:SC: Received PBKDF param response
+      disabled: true
+
+    - label:
+          "Step 8: Commissioner SHALL re-arm Fail-safe timer on Commissionee
+          within 60s (the autonomously Fail-safe timer length set by
+          Commissionee)"
+      verification: |
+          Verify in DUT as client side
+
+          CHIP:CTL: Commissioning stage next step: 'ReadCommissioningInfo' -> 'ArmFailSafe'
+          CHIP:CTL: Performing next commissioning step 'ArmFailSafe'
+          CHIP:CTL: Arming failsafe (60 seconds)
+      disabled: true
+
+    - label:
+          "Step 9: Commissioner SHALL configure regulatory information in the
+          Commissionee."
+      PICS: MCORE.COM.WIRELESS
+      verification: |
+          Verify in DUT as client side
+
+          Performing next commissioning step 'ConfigRegulatory'
+          [1653471968.202645][30157:30162] CHIP:CTL: Setting Regulatory Config
+          [1653471968.202666][30157:30162] CHIP:CTL: No regulatory config supplied by controller, leaving as device default (0)
+
+          Verify in TH as server side
+           NVS set: chip-config/regulatory-location = 0 (0x0)
+      disabled: true
+
+    - label:
+          "Step 10: Commissioner requests operational CSR from Commissionee with
+          OperationalCSRRequest command"
+      verification: |
+          Verify in DUT as client side
+
+          CHIP:ZCL: OpCreds: commissioner has requested a CSR
+          CHIP:ZCL: OpCreds: NewCertificateSigningRequest returned ../../third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1114: Success
+      disabled: true
+
+    - label:
+          "Step 11: Commissioner configures operational credentials on DUT if
+          not previously installed"
+      verification: |
+          Verify in DUT as client side
+
+          CHIP:CTL: Performing next commissioning step 'SendTrustedRootCert'
+          CHIP:CTL: Sending root certificate to the device
+          CHIP:DMG: ICR moving to [AddingComm]
+          CHIP:DMG: ICR moving to [AddedComma]
+          CHIP:IN: Prepared secure message 0xaaaafc0d5be8 to 0x000000000001B669 (1)  of type 0x8 and protocolId (0, 1) on exchange 63770i with MessageCounter:695615.
+          CHIP:IN: Sending encrypted msg 0xaaaafc0d5be8 with MessageCounter:695615 to 0x000000000001B669 (1) at monotonic time: 0000000000FBA3DE msec
+          CHIP:DMG: ICR moving to [CommandSen]
+          CHIP:CTL: Sent root certificate to the device
+      disabled: true
+
+    - label:
+          "Step 12: Commissioner configures itself as administrator in ACL on TH
+          if needed"
+      verification: |
+          Verify in DUT as client side after commissioning
+
+
+
+          [1646909537.115328][3145:3150] CHIP:CTL: Sending CSR request to 0xffffac001730 device
+          [1646909537.115512][3145:3150] CHIP:DMG: ICR moving to [AddingComm]
+          [1646909537.115589][3145:3150] CHIP:DMG: ICR moving to [AddedComma]
+          [1646909537.115861][3145:3150] CHIP:IN: Prepared secure message 0xffffb67cbd98 to 0x0000000000000001 (1)  of type 0x8 and protocolId (0, 1) on exchange 7731i with MessageCounter:8191681.
+          [1646909537.115959][3145:3150] CHIP:IN: Sending encrypted msg 0xffffb67cbd98 with MessageCounter:8191681 to 0x0000000000000001 (1) at monotonic time: 10877964 msec
+          [1646909537.116173][3145:3150] CHIP:DMG: ICR moving to [CommandSen]
+          [1646909537.116242][3145:3150] CHIP:CTL: Sent CSR request, waiting for the CSR
+          [1646909537.116356][3145:3150] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1646909537.193355][3145:3150] CHIP:DL: HandlePlatformSpecificBLEEvent 16387
+          [1646909537.241579][3145:3148] CHIP:DL: Indication received, conn = 0xffffa803b310
+          [1646909537.241838][3145:3150] CHIP:DL: HandlePlatformSpecificBLEEvent 16389
+          [1646909537.341266][3145:3148] CHIP:DL: Indication received, conn = 0xffffa803b310
+          [1646909537.341523][3145:3150] CHIP:DL: HandlePlatformSpecificBLEEvent 16389
+          [1646909537.341903][3145:3150] CHIP:EM: Received message of type 0x9 with protocolId (0, 1) and MessageCounter:2304337 on exchange 7731i
+          [1646909537.341988][3145:3150] CHIP:EM: Found matching exchange: 7731i, Delegate: 0xffffa8026ab0
+          [1646909537.342086][3145:3150] CHIP:DMG: ICR moving to [ResponseRe]
+          [1646909537.342191][3145:3150] CHIP:DMG: InvokeResponseMessage =
+          [1646909537.342251][3145:3150] CHIP:DMG: {
+          [1646909537.342310][3145:3150] CHIP:DMG:         suppressResponse = false,
+          [1646909537.342370][3145:3150] CHIP:DMG:         InvokeResponseIBs =
+          [1646909537.342450][3145:3150] CHIP:DMG:         [
+          [1646909537.342511][3145:3150] CHIP:DMG:                 InvokeResponseIB =
+          [1646909537.342598][3145:3150] CHIP:DMG:                 {
+          [1646909537.342662][3145:3150] CHIP:DMG:                         CommandDataIB =
+          [1646909537.342749][3145:3150] CHIP:DMG:                         {
+          [1646909537.342832][3145:3150] CHIP:DMG:                                 CommandPathIB =
+          [1646909537.342915][3145:3150] CHIP:DMG:                                 {
+          [1646909537.342998][3145:3150] CHIP:DMG:                                         EndpointId = 0x0,
+          [1646909537.343091][3145:3150] CHIP:DMG:                                         ClusterId = 0x3e,
+          [1646909537.343177][3145:3150] CHIP:DMG:                                         CommandId = 0x5,
+          [1646909537.343262][3145:3150] CHIP:DMG:                                 },
+          [1646909537.343346][3145:3150] CHIP:DMG:
+          [1646909537.343420][3145:3150] CHIP:DMG:                                 CommandData =
+          [1646909537.343548][3145:3150] CHIP:DMG:                                 {
+          [1646909537.343632][3145:3150] CHIP:DMG:                                         0x0 = [
+          [1646909537.343772][3145:3150] CHIP:DMG:                                                 0x15, 0x30, 0x1, 0xcb, 0x30, 0x81, 0xc8, 0x30, 0x70, 0x2, 0x1, 0x0, 0x30, 0xe, 0x31, 0xc, 0x30, 0xa, 0x6, 0x3, 0x55, 0x4, 0xa, 0xc, 0x3, 0x43, 0x53, 0x52, 0x30, 0x59, 0x30, 0x13, 0x6, 0x7, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x2, 0x1, 0x6, 0x8, 0x2a, 0x86
+          [1646909537.343880][3145:3150] CHIP:DMG:                                 ]
+          [1646909537.343968][3145:3150] CHIP:DMG:                                         0x1 = [
+          [1646909537.344094][3145:3150] CHIP:DMG:                                                 0xbd, 0xef, 0xb7, 0x8c, 0x5, 0x95, 0x9b, 0x60, 0xf4, 0xb1, 0xf7, 0x9c, 0x24, 0x50, 0x51, 0x9c, 0x59, 0x46, 0x97, 0x5e, 0x89, 0xe8, 0x7d, 0x29, 0x88, 0xac, 0x45, 0xed, 0xa6, 0xca, 0xac, 0x55, 0x2a, 0x7e, 0x11, 0x71, 0xe9, 0x68, 0x0, 0x91, 0xe, 0x23,
+          [1646909537.344193][3145:3150] CHIP:DMG:                                 ]
+          [1646909537.344274][3145:3150] CHIP:DMG:                                 },
+          [1646909537.344349][3145:3150] CHIP:DMG:                         },
+          [1646909537.344442][3145:3150] CHIP:DMG:
+          [1646909537.344508][3145:3150] CHIP:DMG:                 },
+          [1646909537.344588][3145:3150] CHIP:DMG:
+          [1646909537.344646][3145:3150] CHIP:DMG:         ],
+          [1646909537.344721][3145:3150] CHIP:DMG:
+          [1646909537.344779][3145:3150] CHIP:DMG:         InteractionModelRevision = 1
+          [1646909537.344837][3145:3150] CHIP:DMG: },
+          [1646909537.344985][3145:3150] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0005
+          [1646909537.345068][3145:3150] CHIP:CTL: Received certificate signing request from the device
+          [1646909537.345139][3145:3150] CHIP:CTL: Getting certificate chain for the device from the issuer
+          [1646909537.347800][3145:3150] CHIP:CTL: Verifying Certificate Signing Request
+          [1646909537.349300][3145:3150] CHIP:CTL: Generating NOC
+          [1646909537.350268][3145:3150] CHIP:CTL: Providing certificate chain to the commissioner
+          [1646909537.350347][3145:3150] CHIP:CTL: Received callback from the CA for NOC Chain generation. Status ../../third_party/connectedhomeip/src/controller/ExampleOperationalCredentialsIssuer.cpp:225: Success
+      disabled: true
+
+    - label:
+          "Step 13: Commissioner configures operational network on TH if TH both
+          supports and requires"
+      verification: |
+          Verify in DUT as client side
+
+          CHIP:CTL: Operational credentials provisioned on device 0xffff8c000b60
+          CHIP:TOO: Secure Pairing Success
+      disabled: true
+
+    - label:
+          "Step 14: Commissioner instructs Commissionee to connect to
+          operational network if not already connected"
+      verification: |
+          Verify in DUT as client side
+
+          CHIP:CTL: Performing next commissioning step 'FindOperational'
+          CHIP:CSM: FindOrEstablishSession: PeerId = BFCBED670D527591:000000000001B669
+          CHIP:CSM: FindOrEstablishSession: No existing OperationalDeviceProxy instance found
+      disabled: true
+
+    - label: "Step 15: Reboot TH"
+      verification: |
+          1. Using TH=all-clusters-app, exit the app, re-launch app
+      disabled: true
+
+    - label:
+          "Step 16: Commissioner should return to the same state as step 13 to
+          continue commissioning (i.e. Commissioner configure operational
+          network on TH if TH both supports and requires)"
+      verification: |
+          Verify in DUT as client side
+
+          CHIP:CTL: Operational credentials provisioned on device 0xffff8c000b60
+          CHIP:TOO: Secure Pairing Success
+      disabled: true
+
+    - label:
+          "Step 17: Commissioner instructs Commissionee to connect to
+          operational network if not already connected"
+      verification: |
+          Verify in DUT as client side
+
+          CHIP:CTL: Performing next commissioning step 'FindOperational'
+          CHIP:CSM: FindOrEstablishSession: PeerId = BFCBED670D527591:000000000001B669
+          CHIP:CSM: FindOrEstablishSession: No existing OperationalDeviceProxy instance found
+      disabled: true
+
+    - label:
+          "Step 18: Commissioner starts discovery of TH using Operational
+          Discovery"
+      verification: |
+          Verify in DUT as client side
+
+          CHIP:DIS: Resolving BFCBED670D527591:000000000001B669 ...
+          CHIP:DIS: Operational node lookup already in progress. Will NOT start a new one.
+          CHIP:DMG: ICR moving to [AwaitingDe]
+          CHIP:EM: Sending Standalone Ack for MessageCounter:9439913 on exchange 63771i
+          CHIP:IN: Prepared secure message 0xffffa1c07938 to 0x000000000001B669 (1)  of type 0x10 and protocolId (0, 0) on exchange 63771i with MessageCounter:695619.
+          CHIP:IN: Sending encrypted msg 0xffffa1c07938 with MessageCounter:695619 to 0x000000000001B669 (1) at monotonic time: 0000000000FBA446 msec
+          CHIP:EM: Flushed pending ack for MessageCounter:9439913 on exchange 63771i
+          CHIP:DL: Avahi resolve found
+          CHIP:DIS: Node ID resolved for BFCBED670D527591:000000000001B669
+          CHIP:DIS:     Addr 0: [fe80::dea6:32ff:feba:b3f7]:5540
+      disabled: true
+
+    - label:
+          "Step 19: Commissioner opens a CASE session with TH over operational
+          network"
+      verification: |
+          Verify in DUT as client side
+
+          CHIP:SC: Establishing CASE session
+      disabled: true
+
+    - label: "Step 20: Commissioner sends CommissioningComplete command"
+      verification: |
+          Verify in DUT as client side
+
+          CHIP:CTL: Received CommissioningComplete response
+          CHIP:CTL: Successfully finished commissioning step 'SendComplete'
+      disabled: true
+
+    - label:
+          "Step 21: Commissioning channel between the Commissioner and
+          Commissionee is terminated."
+      verification: |
+          Verify in DUT as client side
+
+          CHIP:CTL: Successfully finished commissioning step 'SendComplete'
+          CHIP:CTL: Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          CHIP:CTL: Performing next commissioning step 'Cleanup'
+          CHIP:CTL: Successfully finished commissioning step 'Cleanup'
+          CHIP:TOO: Device commissioning completed with success
+      disabled: true

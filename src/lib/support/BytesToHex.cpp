@@ -98,10 +98,16 @@ size_t HexToBytes(const char * src_hex, const size_t src_size, uint8_t * dest_by
 
 CHIP_ERROR BytesToHex(const uint8_t * src_bytes, size_t src_size, char * dest_hex, size_t dest_size_max, BitFlags<HexFlags> flags)
 {
-    if ((src_bytes == nullptr) || (dest_hex == nullptr))
+    if ((src_bytes == nullptr) && (src_size != 0))
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
+
+    if ((dest_hex == nullptr) && (dest_size_max != 0))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     if (src_size > ((SIZE_MAX - 1) / 2u))
     {
         // Output would overflow a size_t, let's bail out to avoid computation wraparounds below.
@@ -193,6 +199,37 @@ size_t UppercaseHexToUint16(const char * src_hex, const size_t src_size, uint16_
     }
     dest = Encoding::BigEndian::Get16(buf);
     return decoded_size;
+}
+
+void LogBufferAsHex(const char * label, const ByteSpan & span)
+{
+    constexpr size_t kBytesPerLine = 32u;
+
+    size_t remaining = span.size();
+    if (remaining == 0)
+    {
+        ChipLogProgress(Support, "%s>>>", ((label != nullptr) ? label : ""));
+        return;
+    }
+
+    const uint8_t * cursor = span.data();
+    while (remaining > 0u)
+    {
+        size_t chunk_size = (remaining < kBytesPerLine) ? remaining : kBytesPerLine;
+        char hex_buf[(kBytesPerLine * 2) + 1];
+
+        CHIP_ERROR err = BytesToUppercaseHexString(cursor, chunk_size, &hex_buf[0], sizeof(hex_buf));
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(Support, "Failed to dump hex %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+
+        ChipLogProgress(Support, "%s>>>%s", ((label != nullptr) ? label : ""), hex_buf);
+
+        cursor += chunk_size;
+        remaining -= chunk_size;
+    }
 }
 
 } // namespace Encoding

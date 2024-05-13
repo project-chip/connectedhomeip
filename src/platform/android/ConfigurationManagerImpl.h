@@ -28,6 +28,7 @@
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 
 #include <jni.h>
+#include <lib/support/JniReferences.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -40,19 +41,11 @@ class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImp
 public:
     void InitializeWithObject(jobject managerObject);
     static ConfigurationManagerImpl & GetDefaultInstance();
-    CHIP_ERROR GetProductId(uint16_t & productId) override;
-    CHIP_ERROR GetProductName(char * buf, size_t bufSize) override;
-    CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override;
     CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override;
     CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer) override;
-    CHIP_ERROR GetNodeLabel(char * buf, size_t bufSize) override;
-    CHIP_ERROR StoreNodeLabel(const char * buf, size_t bufSize) override;
-    CHIP_ERROR GetPartNumber(char * buf, size_t bufSize) override;
-    CHIP_ERROR GetProductURL(char * buf, size_t bufSize) override;
-    CHIP_ERROR GetProductLabel(char * buf, size_t bufSize) override;
-    CHIP_ERROR GetLocalConfigDisabled(bool & disabled) override;
-    CHIP_ERROR GetReachable(bool & reachable) override;
     CHIP_ERROR GetUniqueId(char * buf, size_t bufSize) override;
+    CHIP_ERROR GetDeviceTypeId(uint32_t & deviceType) override;
+    CHIP_ERROR GetCommissionableDeviceName(char * buf, size_t bufSize) override;
 
 private:
     // ===== Members that implement the ConfigurationManager public interface.
@@ -61,11 +54,6 @@ private:
     void InitiateFactoryReset() override;
     CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override;
     CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value) override;
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-    CHIP_ERROR GetWiFiStationSecurityType(Internal::WiFiAuthSecurityType & secType);
-    CHIP_ERROR UpdateWiFiStationSecurityType(Internal::WiFiAuthSecurityType secType);
-#endif
 
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
 
@@ -87,8 +75,16 @@ private:
 
     static void DoFactoryReset(intptr_t arg);
 
-    jobject mConfigurationManagerObject = nullptr;
+    chip::JniGlobalReference mConfigurationManagerObject;
 };
+
+/**
+ * Returns the platform-specific implementation of the ConfigurationManager object.
+ *
+ * Applications can use this to gain access to features of the ConfigurationManager
+ * that are specific to the selected platform.
+ */
+ConfigurationManager & ConfigurationMgrImpl();
 
 } // namespace DeviceLayer
 } // namespace chip

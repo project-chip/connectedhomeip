@@ -58,9 +58,10 @@ CHIP_ERROR WiFiDriverImpl::Init(NetworkStatusChangeCallback * networkStatusChang
         mWiFiInterface->set_blocking(false);
     }
 
-    mScanCallback    = nullptr;
-    mConnectCallback = nullptr;
-    mScanSpecific    = false;
+    mScanCallback         = nullptr;
+    mConnectCallback      = nullptr;
+    mScanSpecific         = false;
+    mStatusChangeCallback = networkStatusChangeCallback;
 
     mIp4Address = IPAddress::Any;
     mIp6Address = IPAddress::Any;
@@ -68,14 +69,16 @@ CHIP_ERROR WiFiDriverImpl::Init(NetworkStatusChangeCallback * networkStatusChang
     auto err = PersistedStorage::KeyValueStoreMgr().Get(kWiFiSSIDKeyName, mSavedNetwork.ssid, sizeof(mSavedNetwork.ssid), &ssidLen);
     if (err == CHIP_NO_ERROR)
     {
-        mSavedNetwork.ssidLen = ssidLen;
+        static_assert(sizeof(mSavedNetwork.ssid) <= UINT8_MAX, "Our length might not fit in mSavedNetwork.ssidLen");
+        mSavedNetwork.ssidLen = static_cast<uint8_t>(ssidLen);
     }
 
     err = PersistedStorage::KeyValueStoreMgr().Get(kWiFiCredentialsKeyName, mSavedNetwork.credentials,
                                                    sizeof(mSavedNetwork.credentials), &credentialsLen);
     if (err == CHIP_NO_ERROR)
     {
-        mSavedNetwork.credentialsLen = credentialsLen;
+        static_assert(sizeof(mSavedNetwork.credentials) <= UINT8_MAX, "Our length might not fit in mSavedNetwork.credentialsLen");
+        mSavedNetwork.credentialsLen = static_cast<uint8_t>(credentialsLen);
     }
 
     if (mSavedNetwork.ssidLen != 0 && mSavedNetwork.credentialsLen != 0)
@@ -86,7 +89,7 @@ CHIP_ERROR WiFiDriverImpl::Init(NetworkStatusChangeCallback * networkStatusChang
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WiFiDriverImpl::Shutdown()
+void WiFiDriverImpl::Shutdown()
 {
     Network network;
     auto networks = GetNetworks();
@@ -101,20 +104,19 @@ CHIP_ERROR WiFiDriverImpl::Shutdown()
     {
         networks->Release();
     }
-    mScanCallback    = nullptr;
-    mConnectCallback = nullptr;
-    mScanSpecific    = false;
-    mWiFiInterface   = nullptr;
-    mIp4Address      = IPAddress::Any;
-    mIp6Address      = IPAddress::Any;
-    mSecurityType    = NSAPI_SECURITY_NONE;
+    mScanCallback         = nullptr;
+    mConnectCallback      = nullptr;
+    mStatusChangeCallback = nullptr;
+    mScanSpecific         = false;
+    mWiFiInterface        = nullptr;
+    mIp4Address           = IPAddress::Any;
+    mIp6Address           = IPAddress::Any;
+    mSecurityType         = NSAPI_SECURITY_NONE;
     memset(mScanSSID, 0, sizeof(mScanSSID));
     mStagingNetwork.ssidLen        = 0;
     mStagingNetwork.credentialsLen = 0;
     mSavedNetwork.ssidLen          = 0;
     mSavedNetwork.credentialsLen   = 0;
-
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR WiFiDriverImpl::CommitConfiguration()
@@ -261,7 +263,7 @@ void WiFiDriverImpl::ConnectNetwork(ByteSpan networkId, ConnectCallback * callba
 exit:
     if (status != Status::kSuccess)
     {
-        ChipLogError(DeviceLayer, "Connect WiFi network failed: 0x%" PRIx16, int(status));
+        ChipLogError(DeviceLayer, "Connect WiFi network failed: 0x%x", int(status));
         if (callback)
         {
             callback->OnResult(status, CharSpan(), 0);
@@ -291,16 +293,25 @@ void WiFiDriverImpl::ExecuteScanNetwork()
     MbedScanResponseIterator * scan_resp_iter;
 
     // Get APs number
-    ap_number = mWiFiInterface->scan(nullptr, 0);
-    if (!ap_number)
+    auto scan_result = mWiFiInterface->scan(nullptr, 0);
+    if (scan_result <= 0)
     {
-        ChipLogProgress(DeviceLayer, "No AP found");
+        if (scan_result == 0)
+        {
+            ChipLogProgress(DeviceLayer, "No AP found");
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "Error scanning for APs: %d", scan_result);
+        }
         if (mScanCallback)
         {
             mScanCallback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
         }
         goto exit;
     }
+
+    ap_number = static_cast<uint16_t>(scan_result);
 
     ap_buffer = new WiFiAccessPoint[ap_number];
     if (ap_buffer == nullptr)
@@ -386,12 +397,24 @@ void WiFiDriverImpl::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * call
 exit:
     if (status != Status::kSuccess)
     {
-        ChipLogError(DeviceLayer, "Scan WiFi networks failed: 0x%" PRIx16, int(status));
+        ChipLogError(DeviceLayer, "Scan WiFi networks failed: 0x%x", int(status));
         if (callback)
         {
             callback->OnFinished(status, CharSpan(), nullptr);
         }
     }
+}
+
+CHIP_ERROR WiFiDriverImpl::SetLastDisconnectReason(const ChipDeviceEvent * event)
+{
+    (void) event;
+    mLastDisconnectedReason = 0;
+    return CHIP_NO_ERROR;
+}
+
+int32_t WiFiDriverImpl::GetLastDisconnectReason()
+{
+    return mLastDisconnectedReason;
 }
 
 size_t WiFiDriverImpl::WiFiNetworkIterator::Count()
@@ -439,9 +462,10 @@ void WiFiDriverImpl::OnNetworkConnected()
             // Unexpected change, forward to the application
             mIp4Address = IPAddress::Any;
             ChipDeviceEvent event;
-            event.Type                            = DeviceEventType::kInternetConnectivityChange;
-            event.InternetConnectivityChange.IPv4 = kConnectivity_Lost;
-            event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
+            event.Type                                 = DeviceEventType::kInternetConnectivityChange;
+            event.InternetConnectivityChange.IPv4      = kConnectivity_Lost;
+            event.InternetConnectivityChange.IPv6      = kConnectivity_NoChange;
+            event.InternetConnectivityChange.ipAddress = mIp4Address;
             ConnectivityMgrImpl().PostEvent(&event, true);
             ChipLogError(DeviceLayer, "Unexpected loss of Ip4 address");
         }
@@ -451,9 +475,10 @@ void WiFiDriverImpl::OnNetworkConnected()
             // Unexpected change, forward to the application
             mIp6Address = IPAddress::Any;
             ChipDeviceEvent event;
-            event.Type                            = DeviceEventType::kInternetConnectivityChange;
-            event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
-            event.InternetConnectivityChange.IPv6 = kConnectivity_Lost;
+            event.Type                                 = DeviceEventType::kInternetConnectivityChange;
+            event.InternetConnectivityChange.IPv4      = kConnectivity_NoChange;
+            event.InternetConnectivityChange.IPv6      = kConnectivity_Lost;
+            event.InternetConnectivityChange.ipAddress = mIp6Address;
             ConnectivityMgrImpl().PostEvent(&event, true);
             ChipLogError(DeviceLayer, "Unexpected loss of Ip6 address");
         }
@@ -467,9 +492,10 @@ void WiFiDriverImpl::OnNetworkConnected()
             {
                 mIp4Address = addr;
                 ChipDeviceEvent event;
-                event.Type                            = DeviceEventType::kInternetConnectivityChange;
-                event.InternetConnectivityChange.IPv4 = kConnectivity_Established;
-                event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
+                event.Type                                 = DeviceEventType::kInternetConnectivityChange;
+                event.InternetConnectivityChange.IPv4      = kConnectivity_Established;
+                event.InternetConnectivityChange.IPv6      = kConnectivity_NoChange;
+                event.InternetConnectivityChange.ipAddress = mIp4Address;
                 ConnectivityMgrImpl().PostEvent(&event, true);
                 ChipLogProgress(DeviceLayer, "New Ip4 address set: %s", address.get_ip_address());
             }
@@ -482,9 +508,10 @@ void WiFiDriverImpl::OnNetworkConnected()
                     // Unexpected change, forward to the application
                     mIp6Address = IPAddress::Any;
                     ChipDeviceEvent event;
-                    event.Type                            = DeviceEventType::kInternetConnectivityChange;
-                    event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
-                    event.InternetConnectivityChange.IPv6 = kConnectivity_Lost;
+                    event.Type                                 = DeviceEventType::kInternetConnectivityChange;
+                    event.InternetConnectivityChange.IPv4      = kConnectivity_NoChange;
+                    event.InternetConnectivityChange.IPv6      = kConnectivity_Lost;
+                    event.InternetConnectivityChange.ipAddress = mIp6Address;
                     ConnectivityMgrImpl().PostEvent(&event, true);
                     ChipLogError(DeviceLayer, "Unexpected loss of Ip6 address");
                 }
@@ -495,9 +522,10 @@ void WiFiDriverImpl::OnNetworkConnected()
                 {
                     mIp6Address = addr;
                     ChipDeviceEvent event;
-                    event.Type                            = DeviceEventType::kInternetConnectivityChange;
-                    event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
-                    event.InternetConnectivityChange.IPv6 = kConnectivity_Established;
+                    event.Type                                 = DeviceEventType::kInternetConnectivityChange;
+                    event.InternetConnectivityChange.IPv4      = kConnectivity_NoChange;
+                    event.InternetConnectivityChange.IPv6      = kConnectivity_Established;
+                    event.InternetConnectivityChange.ipAddress = mIp6Address;
                     ConnectivityMgrImpl().PostEvent(&event, true);
                     ChipLogProgress(DeviceLayer, "New Ip6 address set %s", address.get_ip_address());
                 }
@@ -509,9 +537,10 @@ void WiFiDriverImpl::OnNetworkConnected()
             {
                 mIp6Address = addr;
                 ChipDeviceEvent event;
-                event.Type                            = DeviceEventType::kInternetConnectivityChange;
-                event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
-                event.InternetConnectivityChange.IPv6 = kConnectivity_Established;
+                event.Type                                 = DeviceEventType::kInternetConnectivityChange;
+                event.InternetConnectivityChange.IPv4      = kConnectivity_NoChange;
+                event.InternetConnectivityChange.IPv6      = kConnectivity_Established;
+                event.InternetConnectivityChange.ipAddress = mIp6Address;
                 ConnectivityMgrImpl().PostEvent(&event, true);
                 ChipLogProgress(DeviceLayer, "New Ip6 address set %s", address.get_ip_address());
             }
@@ -534,9 +563,10 @@ void WiFiDriverImpl::OnNetworkDisconnected()
         // Unexpected change, forward to the application
         mIp4Address = IPAddress::Any;
         ChipDeviceEvent event;
-        event.Type                            = DeviceEventType::kInternetConnectivityChange;
-        event.InternetConnectivityChange.IPv4 = kConnectivity_Lost;
-        event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
+        event.Type                                 = DeviceEventType::kInternetConnectivityChange;
+        event.InternetConnectivityChange.IPv4      = kConnectivity_Lost;
+        event.InternetConnectivityChange.IPv6      = kConnectivity_NoChange;
+        event.InternetConnectivityChange.ipAddress = mIp4Address;
         ConnectivityMgrImpl().PostEvent(&event, true);
         ChipLogError(DeviceLayer, "Loss of Ip4 address");
     }
@@ -546,9 +576,10 @@ void WiFiDriverImpl::OnNetworkDisconnected()
         // Unexpected change, forward to the application
         mIp6Address = IPAddress::Any;
         ChipDeviceEvent event;
-        event.Type                            = DeviceEventType::kInternetConnectivityChange;
-        event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
-        event.InternetConnectivityChange.IPv6 = kConnectivity_Lost;
+        event.Type                                 = DeviceEventType::kInternetConnectivityChange;
+        event.InternetConnectivityChange.IPv4      = kConnectivity_NoChange;
+        event.InternetConnectivityChange.IPv6      = kConnectivity_Lost;
+        event.InternetConnectivityChange.ipAddress = mIp6Address;
         ConnectivityMgrImpl().PostEvent(&event, true);
         ChipLogError(DeviceLayer, "Loss of Ip6 address");
     }
@@ -592,6 +623,25 @@ WiFiAuthSecurityType WiFiDriverImpl::NsapiToNetworkSecurity(nsapi_security_t nsa
     default:
         return kWiFiSecurityType_NotSpecified;
     }
+}
+
+void WiFiDriverImpl::OnNetworkStatusChange()
+{
+    // Network configuredNetwork;
+    bool staEnabled   = ConnectivityMgrImpl().IsWiFiStationEnabled();
+    bool staConnected = ConnectivityMgrImpl().IsWiFiStationConnected();
+    VerifyOrReturn(staEnabled && mStatusChangeCallback != nullptr);
+
+    if (staConnected)
+    {
+        mStatusChangeCallback->OnNetworkingStatusChange(
+            Status::kSuccess, MakeOptional(ByteSpan((const uint8_t *) mStagingNetwork.ssid, mStagingNetwork.ssidLen)),
+            NullOptional);
+        return;
+    }
+    mStatusChangeCallback->OnNetworkingStatusChange(
+        Status::kUnknownError, MakeOptional(ByteSpan((const uint8_t *) mStagingNetwork.ssid, mStagingNetwork.ssidLen)),
+        MakeOptional(GetLastDisconnectReason()));
 }
 
 } // namespace NetworkCommissioning

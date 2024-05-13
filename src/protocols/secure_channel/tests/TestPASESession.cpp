@@ -24,16 +24,21 @@
 #include <errno.h>
 #include <nlunit-test.h>
 
+#include <app/icd/server/ICDServerConfig.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/UnitTestUtils.h>
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <stdarg.h>
-#include <transport/raw/tests/NetworkTestHelpers.h>
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/server/ICDConfigurationData.h> // nogncheck
+#endif
 
 // This test suite pushes multiple PASESession objects onto the stack for the
 // purposes of testing device-to-device communication.  However, in the real
@@ -46,14 +51,21 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::Messaging;
 using namespace chip::Protocols;
+using namespace chip::Crypto;
 
 namespace {
+
+#if CHIP_CONFIG_SLOW_CRYPTO
+constexpr uint32_t sTestPaseMessageCount = 8;
+#else  // CHIP_CONFIG_SLOW_CRYPTO
+constexpr uint32_t sTestPaseMessageCount = 5;
+#endif // CHIP_CONFIG_SLOW_CRYPTO
 
 // Test Set #01 of Spake2p Parameters (PIN Code, Iteration Count, Salt, and matching Verifier):
 constexpr uint32_t sTestSpake2p01_PinCode        = 20202021;
 constexpr uint32_t sTestSpake2p01_IterationCount = 1000;
 constexpr uint8_t sTestSpake2p01_Salt[]          = { 0x53, 0x50, 0x41, 0x4B, 0x45, 0x32, 0x50, 0x20,
-                                            0x4B, 0x65, 0x79, 0x20, 0x53, 0x61, 0x6C, 0x74 };
+                                                     0x4B, 0x65, 0x79, 0x20, 0x53, 0x61, 0x6C, 0x74 };
 constexpr Spake2pVerifier sTestSpake2p01_PASEVerifier = { .mW0 = {
     0xB9, 0x61, 0x70, 0xAA, 0xE8, 0x03, 0x34, 0x68, 0x84, 0x72, 0x4F, 0xE9, 0xA3, 0xB2, 0x87, 0xC3,
     0x03, 0x30, 0xC2, 0xA6, 0x60, 0x37, 0x5D, 0x17, 0xBB, 0x20, 0x5A, 0x8C, 0xF1, 0xAE, 0xCB, 0x35,
@@ -73,27 +85,30 @@ constexpr Spake2pVerifierSerialized sTestSpake2p01_SerializedVerifier = {
     0xB7, 0xC0, 0x7F, 0xCC, 0x06, 0x27, 0xA1, 0xB8, 0x57, 0x3A, 0x14, 0x9F, 0xCD, 0x1F, 0xA4, 0x66, 0xCF
 };
 
-class PASETestLoopbackTransport : public Test::LoopbackTransport
+class TestContext : public chip::Test::LoopbackMessagingContext
 {
-    void MessageDropped() override { mMessageDropped = true; }
-
 public:
-    bool CanSendToPeer(const PeerAddress & address) override { return true; }
-
-    bool mMessageDropped = false;
+    // Performs shared setup for all tests in the test suite
+    void SetUpTestSuite() override
+    {
+        ConfigInitializeNodes(false);
+        chip::Test::LoopbackMessagingContext::SetUpTestSuite();
+    }
 };
 
-using TestContext = chip::Test::LoopbackMessagingContext<PASETestLoopbackTransport>;
-
-TestContext sContext;
-auto & gLoopback = sContext.GetLoopback();
+class PASETestLoopbackTransportDelegate : public Test::LoopbackTransportDelegate
+{
+public:
+    void OnMessageDropped() override { mMessageDropped = true; }
+    bool mMessageDropped = false;
+};
 
 class TestSecurePairingDelegate : public SessionEstablishmentDelegate
 {
 public:
     void OnSessionEstablishmentError(CHIP_ERROR error) override { mNumPairingErrors++; }
 
-    void OnSessionEstablished() override { mNumPairingComplete++; }
+    void OnSessionEstablished(const SessionHandle & session) override { mNumPairingComplete++; }
 
     uint32_t mNumPairingErrors   = 0;
     uint32_t mNumPairingComplete = 0;
@@ -111,24 +126,58 @@ public:
     void OnResponseTimeout(ExchangeContext * ec) override {}
 };
 
+class TemporarySessionManager
+{
+public:
+    TemporarySessionManager(nlTestSuite * suite, TestContext & ctx) : mCtx(ctx)
+    {
+        NL_TEST_ASSERT(suite,
+                       CHIP_NO_ERROR ==
+                           mSessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &ctx.GetMessageCounterManager(),
+                                                &mStorage, &ctx.GetFabricTable(), ctx.GetSessionKeystore()));
+        // The setup here is really weird: we are using one session manager for
+        // the actual messages we send (the PASE handshake, so the
+        // unauthenticated sessions) and a different one for allocating the PASE
+        // sessions.  Since our Init() set us up as the thing to handle messages
+        // on the transport manager, undo that.
+        mCtx.GetTransportMgr().SetSessionManager(&mCtx.GetSecureSessionManager());
+    }
+
+    ~TemporarySessionManager()
+    {
+        mSessionManager.Shutdown();
+        // Reset the session manager on the transport again, just in case
+        // shutdown messed with it.
+        mCtx.GetTransportMgr().SetSessionManager(&mCtx.GetSecureSessionManager());
+    }
+
+    operator SessionManager &() { return mSessionManager; }
+
+private:
+    TestContext & mCtx;
+    TestPersistentStorageDelegate mStorage;
+    SessionManager mSessionManager;
+};
+
 using namespace System::Clock::Literals;
 
 void SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    TemporarySessionManager sessionManager(inSuite, ctx);
 
     // Test all combinations of invalid parameters
     TestSecurePairingDelegate delegate;
     PASESession pairing;
-    SessionManager sessionManager;
 
     NL_TEST_ASSERT(inSuite, pairing.GetSecureSessionType() == SecureSession::Type::kPASE);
 
-    gLoopback.Reset();
+    auto & loopback = ctx.GetLoopback();
+    loopback.Reset();
 
     NL_TEST_ASSERT(inSuite,
-                   pairing.WaitForPairing(sessionManager, sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount,
-                                          ByteSpan(nullptr, 0), Optional<ReliableMessageProtocolConfig>::Missing(),
+                   pairing.WaitForPairing(sessionManager, sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount, ByteSpan(),
+                                          Optional<ReliableMessageProtocolConfig>::Missing(),
                                           &delegate) == CHIP_ERROR_INVALID_ARGUMENT);
     ctx.DrainAndServiceIO();
 
@@ -156,49 +205,49 @@ void SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
 void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    TemporarySessionManager sessionManager(inSuite, ctx);
 
     // Test all combinations of invalid parameters
     TestSecurePairingDelegate delegate;
     PASESession pairing;
-    SessionManager sessionManager;
 
-    gLoopback.Reset();
+    auto & loopback = ctx.GetLoopback();
+    loopback.Reset();
 
     ExchangeContext * context = ctx.NewUnauthenticatedExchangeToBob(&pairing);
 
     NL_TEST_ASSERT(inSuite,
-                   pairing.Pair(sessionManager, Transport::PeerAddress(Transport::Type::kBle), sTestSpake2p01_PinCode,
-                                Optional<ReliableMessageProtocolConfig>::Missing(), nullptr, nullptr) != CHIP_NO_ERROR);
+                   pairing.Pair(sessionManager, sTestSpake2p01_PinCode, Optional<ReliableMessageProtocolConfig>::Missing(), nullptr,
+                                nullptr) != CHIP_NO_ERROR);
 
-    gLoopback.Reset();
+    loopback.Reset();
     NL_TEST_ASSERT(inSuite,
-                   pairing.Pair(sessionManager, Transport::PeerAddress(Transport::Type::kBle), sTestSpake2p01_PinCode,
-                                Optional<ReliableMessageProtocolConfig>::Missing(), context, &delegate) == CHIP_NO_ERROR);
+                   pairing.Pair(sessionManager, sTestSpake2p01_PinCode, Optional<ReliableMessageProtocolConfig>::Missing(), context,
+                                &delegate) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
-    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
+    // There should have been two messages sent: PBKDFParamRequest and an ack.
+    NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == 2);
 
-    // Clear pending packet in CRMP
-    ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
-    ReliableMessageContext * rc = context->GetReliableMessageContext();
-    rm->ClearRetransTable(rc);
+    ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 
-    gLoopback.Reset();
-    gLoopback.mSentMessageCount = 0;
-    gLoopback.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
+    loopback.Reset();
+    loopback.mSentMessageCount = 0;
+    loopback.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
 
     PASESession pairing1;
     ExchangeContext * context1 = ctx.NewUnauthenticatedExchangeToBob(&pairing1);
     NL_TEST_ASSERT(inSuite,
-                   pairing1.Pair(sessionManager, Transport::PeerAddress(Transport::Type::kBle), sTestSpake2p01_PinCode,
-                                 Optional<ReliableMessageProtocolConfig>::Missing(), context1,
-                                 &delegate) == CHIP_ERROR_BAD_REQUEST);
+                   pairing1.Pair(sessionManager, sTestSpake2p01_PinCode, Optional<ReliableMessageProtocolConfig>::Missing(),
+                                 context1, &delegate) == CHIP_ERROR_BAD_REQUEST);
     ctx.DrainAndServiceIO();
 
-    gLoopback.mMessageSendError = CHIP_NO_ERROR;
+    loopback.mMessageSendError = CHIP_NO_ERROR;
 }
 
-void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, PASESession & pairingCommissioner,
+void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, SessionManager & sessionManager,
+                                      PASESession & pairingCommissioner,
                                       Optional<ReliableMessageProtocolConfig> mrpCommissionerConfig,
                                       Optional<ReliableMessageProtocolConfig> mrpAccessoryConfig,
                                       TestSecurePairingDelegate & delegateCommissioner)
@@ -207,23 +256,36 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, P
 
     TestSecurePairingDelegate delegateAccessory;
     PASESession pairingAccessory;
-    SessionManager sessionManager;
 
-    gLoopback.mSentMessageCount = 0;
+    PASETestLoopbackTransportDelegate delegate;
+    auto & loopback = ctx.GetLoopback();
+    loopback.SetLoopbackTransportDelegate(&delegate);
+    loopback.mSentMessageCount = 0;
 
     ExchangeContext * contextCommissioner = ctx.NewUnauthenticatedExchangeToBob(&pairingCommissioner);
 
-    if (gLoopback.mNumMessagesToDrop != 0)
+    if (loopback.mNumMessagesToDrop != 0)
     {
         ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
         ReliableMessageContext * rc = contextCommissioner->GetReliableMessageContext();
         NL_TEST_ASSERT(inSuite, rm != nullptr);
         NL_TEST_ASSERT(inSuite, rc != nullptr);
 
-        contextCommissioner->GetSessionHandle()->AsUnauthenticatedSession()->SetMRPConfig({
-            64_ms32, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
-            64_ms32, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
-        });
+        // Adding an if-else to avoid affecting non-ICD tests
+#if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
+        // Increase local MRP retry intervals to take into account the increase response delay from an ICD
+        contextCommissioner->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
+            ReliableMessageProtocolConfig({
+                1000_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+                1000_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+            }));
+#else  // CHIP_CONFIG_ENABLE_ICD_SERVER != 1
+        contextCommissioner->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
+            ReliableMessageProtocolConfig({
+                64_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+                64_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+            }));
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     }
 
     NL_TEST_ASSERT(inSuite,
@@ -237,14 +299,25 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, P
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner.Pair(sessionManager, Transport::PeerAddress(Transport::Type::kBle), sTestSpake2p01_PinCode,
-                                            mrpCommissionerConfig, contextCommissioner, &delegateCommissioner) == CHIP_NO_ERROR);
+                   pairingCommissioner.Pair(sessionManager, sTestSpake2p01_PinCode, mrpCommissionerConfig, contextCommissioner,
+                                            &delegateCommissioner) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
-    while (gLoopback.mMessageDropped)
+    while (delegate.mMessageDropped)
     {
-        chip::test_utils::SleepMillis(85);
-        gLoopback.mMessageDropped = false;
+        auto waitTimeout = 100_ms;
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+        // If running as an ICD, increase waitTimeout to account for:
+        // - longer MRP intervals, configured above to 1s/1s,
+        // - the fast-polling interval that is added to the MRP backoff time.
+        waitTimeout += 2000_ms32;
+        waitTimeout += ICDConfigurationData::GetInstance().GetFastPollingInterval();
+#endif
+
+        // Wait some time so the dropped message will be retransmitted when we drain the IO.
+        chip::test_utils::SleepMillis(waitTimeout.count());
+        delegate.mMessageDropped = false;
         ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), ctx.GetExchangeManager().GetReliableMessageMgr());
         ctx.DrainAndServiceIO();
     };
@@ -253,84 +326,137 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, P
     // via piggybacked acks. So we cannot check for a specific value of mSentMessageCount.
     // Let's make sure atleast number is >= than the minimum messages required to complete the
     // handshake.
-    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount >= 5);
+    NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount >= sTestPaseMessageCount);
+    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingErrors == 0);
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
+    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingErrors == 0);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
 
     if (mrpCommissionerConfig.HasValue())
     {
         NL_TEST_ASSERT(inSuite,
-                       pairingAccessory.GetMRPConfig().mIdleRetransTimeout == mrpCommissionerConfig.Value().mIdleRetransTimeout);
-        NL_TEST_ASSERT(
-            inSuite, pairingAccessory.GetMRPConfig().mActiveRetransTimeout == mrpCommissionerConfig.Value().mActiveRetransTimeout);
+                       pairingAccessory.GetRemoteMRPConfig().mIdleRetransTimeout ==
+                           mrpCommissionerConfig.Value().mIdleRetransTimeout);
+        NL_TEST_ASSERT(inSuite,
+                       pairingAccessory.GetRemoteMRPConfig().mActiveRetransTimeout ==
+                           mrpCommissionerConfig.Value().mActiveRetransTimeout);
     }
 
     if (mrpAccessoryConfig.HasValue())
     {
         NL_TEST_ASSERT(inSuite,
-                       pairingCommissioner.GetMRPConfig().mIdleRetransTimeout == mrpAccessoryConfig.Value().mIdleRetransTimeout);
-        NL_TEST_ASSERT(
-            inSuite, pairingCommissioner.GetMRPConfig().mActiveRetransTimeout == mrpAccessoryConfig.Value().mActiveRetransTimeout);
+                       pairingCommissioner.GetRemoteMRPConfig().mIdleRetransTimeout ==
+                           mrpAccessoryConfig.Value().mIdleRetransTimeout);
+        NL_TEST_ASSERT(inSuite,
+                       pairingCommissioner.GetRemoteMRPConfig().mActiveRetransTimeout ==
+                           mrpAccessoryConfig.Value().mActiveRetransTimeout);
     }
+
+    // Now evict the PASE sessions.
+    auto session = pairingCommissioner.CopySecureSession();
+    NL_TEST_ASSERT(inSuite, session.HasValue());
+    session.Value()->AsSecureSession()->MarkForEviction();
+
+    session = pairingAccessory.CopySecureSession();
+    NL_TEST_ASSERT(inSuite, session.HasValue());
+    session.Value()->AsSecureSession()->MarkForEviction();
+
+    // Evicting a session async notifies the PASESession's delegate.  Normally
+    // that notification is what would delete the PASESession, but in our case
+    // that will happen as soon as things come off the stack.  So make sure to
+    // process the async bits before that happens.
+    ctx.DrainAndServiceIO();
+
+    // And check that this did not result in any new notifications.
+    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingErrors == 0);
+    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
+    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingErrors == 0);
+    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
+
+    loopback.SetLoopbackTransportDelegate(nullptr);
 }
 
 void SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
 {
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    TemporarySessionManager sessionManager(inSuite, ctx);
+
     TestSecurePairingDelegate delegateCommissioner;
     PASESession pairingCommissioner;
-    gLoopback.Reset();
-    SecurePairingHandshakeTestCommon(inSuite, inContext, pairingCommissioner, Optional<ReliableMessageProtocolConfig>::Missing(),
+    auto & loopback = ctx.GetLoopback();
+    loopback.Reset();
+    SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner,
+                                     Optional<ReliableMessageProtocolConfig>::Missing(),
                                      Optional<ReliableMessageProtocolConfig>::Missing(), delegateCommissioner);
 }
 
 void SecurePairingHandshakeWithCommissionerMRPTest(nlTestSuite * inSuite, void * inContext)
 {
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    TemporarySessionManager sessionManager(inSuite, ctx);
+
     TestSecurePairingDelegate delegateCommissioner;
     PASESession pairingCommissioner;
-    gLoopback.Reset();
-    ReliableMessageProtocolConfig config(1000_ms32, 10000_ms32);
-    SecurePairingHandshakeTestCommon(inSuite, inContext, pairingCommissioner,
+    auto & loopback = ctx.GetLoopback();
+    loopback.Reset();
+    ReliableMessageProtocolConfig config(1000_ms32, 10000_ms32, 4000_ms16);
+    SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner,
                                      Optional<ReliableMessageProtocolConfig>::Value(config),
                                      Optional<ReliableMessageProtocolConfig>::Missing(), delegateCommissioner);
 }
 
 void SecurePairingHandshakeWithDeviceMRPTest(nlTestSuite * inSuite, void * inContext)
 {
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    TemporarySessionManager sessionManager(inSuite, ctx);
+
     TestSecurePairingDelegate delegateCommissioner;
     PASESession pairingCommissioner;
-    gLoopback.Reset();
-    ReliableMessageProtocolConfig config(1000_ms32, 10000_ms32);
-    SecurePairingHandshakeTestCommon(inSuite, inContext, pairingCommissioner, Optional<ReliableMessageProtocolConfig>::Missing(),
+    auto & loopback = ctx.GetLoopback();
+    loopback.Reset();
+    ReliableMessageProtocolConfig config(1000_ms32, 10000_ms32, 4000_ms16);
+    SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner,
+                                     Optional<ReliableMessageProtocolConfig>::Missing(),
                                      Optional<ReliableMessageProtocolConfig>::Value(config), delegateCommissioner);
 }
 
 void SecurePairingHandshakeWithAllMRPTest(nlTestSuite * inSuite, void * inContext)
 {
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    TemporarySessionManager sessionManager(inSuite, ctx);
+
     TestSecurePairingDelegate delegateCommissioner;
     PASESession pairingCommissioner;
-    gLoopback.Reset();
-    ReliableMessageProtocolConfig commissionerConfig(1000_ms32, 10000_ms32);
-    ReliableMessageProtocolConfig deviceConfig(2000_ms32, 7000_ms32);
-    SecurePairingHandshakeTestCommon(inSuite, inContext, pairingCommissioner,
+    auto & loopback = ctx.GetLoopback();
+    loopback.Reset();
+    ReliableMessageProtocolConfig commissionerConfig(1000_ms32, 10000_ms32, 4000_ms16);
+    ReliableMessageProtocolConfig deviceConfig(2000_ms32, 7000_ms32, 4000_ms16);
+    SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner,
                                      Optional<ReliableMessageProtocolConfig>::Value(commissionerConfig),
                                      Optional<ReliableMessageProtocolConfig>::Value(deviceConfig), delegateCommissioner);
 }
 
 void SecurePairingHandshakeWithPacketLossTest(nlTestSuite * inSuite, void * inContext)
 {
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    TemporarySessionManager sessionManager(inSuite, ctx);
+
     TestSecurePairingDelegate delegateCommissioner;
     PASESession pairingCommissioner;
-    gLoopback.Reset();
-    gLoopback.mNumMessagesToDrop = 2;
-    SecurePairingHandshakeTestCommon(inSuite, inContext, pairingCommissioner, Optional<ReliableMessageProtocolConfig>::Missing(),
+    auto & loopback = ctx.GetLoopback();
+    loopback.Reset();
+    loopback.mNumMessagesToDrop = 2;
+    SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner,
+                                     Optional<ReliableMessageProtocolConfig>::Missing(),
                                      Optional<ReliableMessageProtocolConfig>::Missing(), delegateCommissioner);
-    NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 2);
-    NL_TEST_ASSERT(inSuite, gLoopback.mNumMessagesToDrop == 0);
+    NL_TEST_ASSERT(inSuite, loopback.mDroppedMessageCount == 2);
+    NL_TEST_ASSERT(inSuite, loopback.mNumMessagesToDrop == 0);
 }
 
 void SecurePairingFailedHandshake(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    TemporarySessionManager sessionManager(inSuite, ctx);
 
     TestSecurePairingDelegate delegateCommissioner;
     PASESession pairingCommissioner;
@@ -338,10 +464,9 @@ void SecurePairingFailedHandshake(nlTestSuite * inSuite, void * inContext)
     TestSecurePairingDelegate delegateAccessory;
     PASESession pairingAccessory;
 
-    SessionManager sessionManager;
-
-    gLoopback.Reset();
-    gLoopback.mSentMessageCount = 0;
+    auto & loopback = ctx.GetLoopback();
+    loopback.Reset();
+    loopback.mSentMessageCount = 0;
 
     ExchangeContext * contextCommissioner = ctx.NewUnauthenticatedExchangeToBob(&pairingCommissioner);
 
@@ -350,10 +475,10 @@ void SecurePairingFailedHandshake(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rm != nullptr);
     NL_TEST_ASSERT(inSuite, rc != nullptr);
 
-    contextCommissioner->GetSessionHandle()->AsUnauthenticatedSession()->SetMRPConfig({
-        64_ms32, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
-        64_ms32, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
-    });
+    contextCommissioner->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
+        64_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+        64_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+    }));
 
     NL_TEST_ASSERT(inSuite,
                    ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
@@ -366,9 +491,8 @@ void SecurePairingFailedHandshake(nlTestSuite * inSuite, void * inContext)
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner.Pair(sessionManager, Transport::PeerAddress(Transport::Type::kBle), 4321,
-                                            Optional<ReliableMessageProtocolConfig>::Missing(), contextCommissioner,
-                                            &delegateCommissioner) == CHIP_NO_ERROR);
+                   pairingCommissioner.Pair(sessionManager, 4321, Optional<ReliableMessageProtocolConfig>::Missing(),
+                                            contextCommissioner, &delegateCommissioner) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 0);
@@ -399,61 +523,30 @@ void PASEVerifierSerializeTest(nlTestSuite * inSuite, void * inContext)
 
 // Test Suite
 
-/**
- *  Test Suite that lists all the test functions.
- */
-// clang-format off
-static const nlTest sTests[] =
-{
-    NL_TEST_DEF("WaitInit",    SecurePairingWaitTest),
-    NL_TEST_DEF("Start",       SecurePairingStartTest),
-    NL_TEST_DEF("Handshake",   SecurePairingHandshakeTest),
+static const nlTest sTests[] = {
+    NL_TEST_DEF("WaitInit", SecurePairingWaitTest),
+    NL_TEST_DEF("Start", SecurePairingStartTest),
+    NL_TEST_DEF("Handshake", SecurePairingHandshakeTest),
     NL_TEST_DEF("Handshake with Commissioner MRP Parameters", SecurePairingHandshakeWithCommissionerMRPTest),
     NL_TEST_DEF("Handshake with Device MRP Parameters", SecurePairingHandshakeWithDeviceMRPTest),
     NL_TEST_DEF("Handshake with Both MRP Parameters", SecurePairingHandshakeWithAllMRPTest),
     NL_TEST_DEF("Handshake with packet loss", SecurePairingHandshakeWithPacketLossTest),
     NL_TEST_DEF("Failed Handshake", SecurePairingFailedHandshake),
     NL_TEST_DEF("PASE Verifier Serialize", PASEVerifierSerializeTest),
-
-    NL_TEST_SENTINEL()
+    NL_TEST_SENTINEL(),
 };
-
-int TestSecurePairing_Setup(void * inContext);
-int TestSecurePairing_Teardown(void * inContext);
 
 // clang-format off
 static nlTestSuite sSuite =
 {
     "Test-CHIP-SecurePairing-PASE",
     &sTests[0],
-    TestSecurePairing_Setup,
-    TestSecurePairing_Teardown,
+    TestContext::nlTestSetUpTestSuite,
+    TestContext::nlTestTearDownTestSuite,
+    TestContext::nlTestSetUp,
+    TestContext::nlTestTearDown,
 };
 // clang-format on
-
-// clang-format on
-//
-/**
- *  Set up the test suite.
- */
-int TestSecurePairing_Setup(void * inContext)
-{
-    auto & ctx = *static_cast<TestContext *>(inContext);
-
-    // Initialize System memory and resources
-    ctx.ConfigInitializeNodes(false);
-    VerifyOrReturnError(TestContext::InitializeAsync(inContext) == SUCCESS, FAILURE);
-
-    return SUCCESS;
-}
-
-/**
- *  Tear down the test suite.
- */
-int TestSecurePairing_Teardown(void * inContext)
-{
-    return TestContext::Finalize(inContext);
-}
 
 } // anonymous namespace
 
@@ -462,10 +555,7 @@ int TestSecurePairing_Teardown(void * inContext)
  */
 int TestPASESession()
 {
-    // Run test suit against one context
-    nlTestRunner(&sSuite, &sContext);
-
-    return (nlTestRunnerStats(&sSuite));
+    return chip::ExecuteTestsWithContext<TestContext>(&sSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestPASESession)

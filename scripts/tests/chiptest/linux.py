@@ -127,6 +127,35 @@ def CreateNamespacesForAppTest():
         logging.warn("Some addresses look to still be tentative")
 
 
+def RemoveNamespaceForAppTest():
+    """
+    Removes namespaces for a tool and app binaries previously created to simulate an
+    isolated network. This tears down what was created in CreateNamespacesForAppTest.
+    """
+    COMMANDS = [
+        "ip link set dev eth-ci down",
+        "ip link set dev eth-ci-switch down",
+        "ip addr del 10.10.10.5/24 dev eth-ci",
+
+        "ip link set br1 down",
+        "ip link delete br1",
+
+        "ip link delete eth-ci-switch",
+        "ip link delete eth-tool-switch",
+        "ip link delete eth-app-switch",
+
+        "ip netns del tool",
+        "ip netns del app",
+    ]
+
+    for command in COMMANDS:
+        logging.debug("Executing '%s'" % command)
+        if os.system(command) != 0:
+            breakpoint()
+            logging.error("Failed to execute '%s'" % command)
+            sys.exit(1)
+
+
 def PrepareNamespacesForTestExecution(in_unshare: bool):
     if not in_unshare:
         EnsureNetworkNamespaceAvailability()
@@ -134,6 +163,10 @@ def PrepareNamespacesForTestExecution(in_unshare: bool):
         EnsurePrivateState()
 
     CreateNamespacesForAppTest()
+
+
+def ShutdownNamespaceForTestExecution():
+    RemoveNamespaceForAppTest()
 
 
 def PathsWithNetworkNamespaces(paths: ApplicationPaths) -> ApplicationPaths:
@@ -144,6 +177,14 @@ def PathsWithNetworkNamespaces(paths: ApplicationPaths) -> ApplicationPaths:
     return ApplicationPaths(
         chip_tool='ip netns exec tool'.split() + paths.chip_tool,
         all_clusters_app='ip netns exec app'.split() + paths.all_clusters_app,
-        door_lock_app='ip netns exec app'.split() + paths.door_lock_app,
+        lock_app='ip netns exec app'.split() + paths.lock_app,
+        ota_provider_app='ip netns exec app'.split() + paths.ota_provider_app,
+        ota_requestor_app='ip netns exec app'.split() + paths.ota_requestor_app,
         tv_app='ip netns exec app'.split() + paths.tv_app,
+        lit_icd_app='ip netns exec app'.split() + paths.lit_icd_app,
+        microwave_oven_app='ip netns exec app'.split() + paths.microwave_oven_app,
+        rvc_app='ip netns exec app'.split() + paths.rvc_app,
+        bridge_app='ip netns exec app'.split() + paths.bridge_app,
+        chip_repl_yaml_tester_cmd='ip netns exec tool'.split() + paths.chip_repl_yaml_tester_cmd,
+        chip_tool_with_python_cmd='ip netns exec tool'.split() + paths.chip_tool_with_python_cmd,
     )

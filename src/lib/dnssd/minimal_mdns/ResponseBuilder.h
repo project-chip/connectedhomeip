@@ -19,6 +19,7 @@
 
 #include <system/SystemPacketBuffer.h>
 
+#include <lib/dnssd/minimal_mdns/Parser.h>
 #include <lib/dnssd/minimal_mdns/core/DnsHeader.h>
 #include <lib/dnssd/minimal_mdns/records/ResourceRecord.h>
 
@@ -52,7 +53,7 @@ public:
             mBuildOk = false;
         }
 
-        mHeader.SetFlags(mHeader.GetFlags().SetResponse());
+        mHeader.SetFlags(mHeader.GetFlags().SetResponse().SetAuthoritative());
 
         mEndianOutput =
             chip::Encoding::BigEndian::BufferWriter(mPacket->Start(), mPacket->DataLength() + mPacket->AvailableDataLength());

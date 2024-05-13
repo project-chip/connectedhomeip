@@ -19,8 +19,6 @@
 
 #pragma once
 
-#include "Display.h"
-
 #include "driver/gpio.h"
 
 #include "freertos/FreeRTOS.h"
@@ -47,7 +45,7 @@ public:
     void BlinkOnError();
 
     void Animate();
-#if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
+#if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM || CONFIG_DEVICE_TYPE_ESP32_C6_DEVKITC
     void SetColor(uint8_t Hue, uint8_t Saturation);
 
     void HSB2rgb(uint16_t Hue, uint8_t Saturation, uint8_t brightness, uint8_t & red, uint8_t & green, uint8_t & blue);
@@ -61,7 +59,7 @@ private:
     uint32_t mBlinkOnTimeMS;
     uint32_t mBlinkOffTimeMS;
     uint8_t mDefaultOnBrightness;
-#if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
+#if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM || CONFIG_DEVICE_TYPE_ESP32_C6_DEVKITC
     uint16_t mHue;       // mHue [0, 360]
     uint8_t mSaturation; // mSaturation [0, 100]
 #endif

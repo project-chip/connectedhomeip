@@ -14,13 +14,16 @@
 
 name: 12.2.1. [TC-TSUIC-2.1] Attributes with server as DUT
 
+PICS:
+    - TSUIC.S
+
 config:
     nodeId: 0x12344321
     cluster: "Thermostat User Interface Configuration"
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Commission DUT to TH"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -28,45 +31,33 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "read the mandatory attribute: TemperatureDisplayMode"
+    - label:
+          "Step 2: TH reads the TemperatureDisplayMode attribute from the DUT"
+      PICS: TSUIC.S.A0000
       command: "readAttribute"
-      attribute: "temperature display mode"
-      response:
-          value: 0
-
-    - label: "read the mandatory attribute: TemperatureDisplayMode"
-      command: "readAttribute"
-      attribute: "temperature display mode"
+      attribute: "TemperatureDisplayMode"
       response:
           constraints:
               type: enum8
               minValue: 0
               maxValue: 1
 
-    - label: "read the mandatory attribute: KeypadLockout"
+    - label: "Step 3: TH reads the KeypadLockout attribute from the DUT"
+      PICS: TSUIC.S.A0001
       command: "readAttribute"
-      attribute: "keypad lockout"
-      response:
-          value: 0
-
-    - label: "read the mandatory attribute: KeypadLockout"
-      command: "readAttribute"
-      attribute: "keypad lockout"
+      attribute: "KeypadLockout"
       response:
           constraints:
               type: enum8
               minValue: 0
               maxValue: 5
 
-    - label: "read the optional attribute: ScheduleProgrammingVisibility"
+    - label:
+          "Step 4: TH reads the ScheduleProgrammingVisibility attribute from the
+          DUT"
+      PICS: TSUIC.S.A0002
       command: "readAttribute"
-      attribute: "schedule programming visibility"
-      response:
-          value: 0
-
-    - label: "read the optional attribute: ScheduleProgrammingVisibility"
-      command: "readAttribute"
-      attribute: "schedule programming visibility"
+      attribute: "ScheduleProgrammingVisibility"
       response:
           constraints:
               type: enum8

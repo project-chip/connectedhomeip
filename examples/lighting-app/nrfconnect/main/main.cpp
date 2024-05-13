@@ -20,19 +20,44 @@
 
 #include <system/SystemError.h>
 
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 
 #ifdef CONFIG_CHIP_PW_RPC
 #include "Rpc.h"
 #endif
 
-#ifdef CONFIG_USB_DEVICE_STACK
-#include <usb/usb_device.h>
+#if DT_NODE_HAS_COMPAT(DT_CHOSEN(zephyr_console), zephyr_cdc_acm_uart)
+#include <zephyr/drivers/uart.h>
+#include <zephyr/usb/usb_device.h>
 #endif
 
-LOG_MODULE_REGISTER(app, CONFIG_MATTER_LOG_LEVEL);
+LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace ::chip;
+
+#if DT_NODE_HAS_COMPAT(DT_CHOSEN(zephyr_console), zephyr_cdc_acm_uart)
+static int InitUSB()
+{
+    int err = usb_enable(nullptr);
+
+    if (err)
+    {
+        LOG_ERR("Failed to initialize USB device");
+        return err;
+    }
+
+    const struct device * dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_console));
+    uint32_t dtr              = 0;
+
+    while (!dtr)
+    {
+        uart_line_ctrl_get(dev, UART_LINE_CTRL_DTR, &dtr);
+        k_sleep(K_MSEC(100));
+    }
+
+    return 0;
+}
+#endif
 
 int main()
 {
@@ -42,17 +67,13 @@ int main()
     rpc::Init();
 #endif
 
-#ifdef CONFIG_USB_DEVICE_STACK
-    err = System::MapErrorZephyr(usb_enable(nullptr));
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("Failed to initialize USB device");
-    }
+#if DT_NODE_HAS_COMPAT(DT_CHOSEN(zephyr_console), zephyr_cdc_acm_uart)
+    err = System::MapErrorZephyr(InitUSB());
 #endif
 
     if (err == CHIP_NO_ERROR)
     {
-        err = GetAppTask().StartApp();
+        err = AppTask::Instance().StartApp();
     }
 
     LOG_ERR("Exited with code %" CHIP_ERROR_FORMAT, err.Format());

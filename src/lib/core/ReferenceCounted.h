@@ -39,21 +39,26 @@ public:
     static void Release(T * obj) { chip::Platform::Delete(obj); }
 };
 
+template <class T>
+class NoopDeletor
+{
+public:
+    static void Release(T * obj) {}
+};
+
 /**
  * A reference counted object maintains a count of usages and when the usage
  * count drops to 0, it deletes itself.
  */
-template <class Subclass, class Deletor = DeleteDeletor<Subclass>, int kInitRefCount = 1>
+template <class Subclass, class Deletor = DeleteDeletor<Subclass>, int kInitRefCount = 1, typename CounterType = uint32_t>
 class ReferenceCounted
 {
 public:
-    using count_type = uint32_t;
-
     /** Adds one to the usage count of this class */
     Subclass * Retain()
     {
         VerifyOrDie(!kInitRefCount || mRefCount > 0);
-        VerifyOrDie(mRefCount < std::numeric_limits<count_type>::max());
+        VerifyOrDie(mRefCount < std::numeric_limits<CounterType>::max());
         ++mRefCount;
 
         return static_cast<Subclass *>(this);
@@ -71,10 +76,10 @@ public:
     }
 
     /** Get the current reference counter value */
-    count_type GetReferenceCount() const { return mRefCount; }
+    CounterType GetReferenceCount() const { return mRefCount; }
 
 private:
-    count_type mRefCount = kInitRefCount;
+    CounterType mRefCount = kInitRefCount;
 };
 
 } // namespace chip

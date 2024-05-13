@@ -28,8 +28,9 @@
 
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
-#include <lib/support/ErrorStr.h>
-#include <lib/support/logging/CHIPLogging.h>
+#include <lib/core/ErrorStr.h>
+#include <lib/support/VerificationMacrosNoLogging.h>
+#include <lib/support/logging/TextOnlyLogging.h>
 
 /**
  * Base-level abnormal termination.
@@ -154,23 +155,6 @@ constexpr inline const _T & max(const _T & a, const _T & b)
 } // namespace chip
 
 /**
- *  @def IgnoreUnusedVariable(aVariable)
- *
- *  @brief
- *    This casts the specified @a aVariable to void to quell any
- *    compiler-issued unused variable warnings or errors.
- *
- *  @code
- *  void foo (int err)
- *  {
- *      IgnoreUnusedVariable(err)
- *  }
- *  @endcode
- *
- */
-#define IgnoreUnusedVariable(aVariable) ((void) (aVariable))
-
-/**
  *  @def ReturnErrorOnFailure(expr)
  *
  *  @brief
@@ -254,11 +238,12 @@ constexpr inline const _T & max(const _T & a, const _T & b)
  *
  *  Example usage:
  *
- * @code
+ *  @code
  *    VerifyOrReturn(param != nullptr, LogError("param is nullptr"));
  *  @endcode
  *
  *  @param[in]  expr        A Boolean expression to be evaluated.
+ *  @param[in]  ...         Statements to execute before returning. Optional.
  */
 #define VerifyOrReturn(expr, ...)                                                                                                  \
     do                                                                                                                             \
@@ -271,7 +256,7 @@ constexpr inline const _T & max(const _T & a, const _T & b)
     } while (false)
 
 /**
- *  @def VerifyOrReturnError(expr, code)
+ *  @def VerifyOrReturnError(expr, code, ...)
  *
  *  @brief
  *    Returns a specified error code if expression evaluates to false
@@ -284,13 +269,33 @@ constexpr inline const _T & max(const _T & a, const _T & b)
  *
  *  @param[in]  expr        A Boolean expression to be evaluated.
  *  @param[in]  code        A value to return if @a expr is false.
+ *  @param[in]  ...         Statements to execute before returning. Optional.
  */
-#define VerifyOrReturnError(expr, code)                                                                                            \
+#define VerifyOrReturnError(expr, code, ...) VerifyOrReturnValue(expr, code, ##__VA_ARGS__)
+
+/**
+ *  @def VerifyOrReturnValue(expr, value, ...)
+ *
+ *  @brief
+ *    Returns a specified value if expression evaluates to false
+ *
+ *  Example usage:
+ *
+ *  @code
+ *    VerifyOrReturnError(param != nullptr, Foo());
+ *  @endcode
+ *
+ *  @param[in]  expr        A Boolean expression to be evaluated.
+ *  @param[in]  value       A value to return if @a expr is false.
+ *  @param[in]  ...         Statements to execute before returning. Optional.
+ */
+#define VerifyOrReturnValue(expr, value, ...)                                                                                      \
     do                                                                                                                             \
     {                                                                                                                              \
         if (!(expr))                                                                                                               \
         {                                                                                                                          \
-            return code;                                                                                                           \
+            __VA_ARGS__;                                                                                                           \
+            return (value);                                                                                                        \
         }                                                                                                                          \
     } while (false)
 
@@ -357,10 +362,10 @@ constexpr inline const _T & max(const _T & a, const _T & b)
     } while (false)
 
 /**
- *  @def SuccessOrExit(aStatus)
+ *  @def SuccessOrExit(error)
  *
  *  @brief
- *    This checks for the specified status, which is expected to
+ *    This checks for the specified error, which is expected to
  *    commonly be successful (CHIP_NO_ERROR), and branches to
  *    the local label 'exit' if the status is unsuccessful.
  *
@@ -382,10 +387,10 @@ constexpr inline const _T & max(const _T & a, const _T & b)
  *  }
  *  @endcode
  *
- *  @param[in]  aStatus     A scalar status to be evaluated against zero (0).
+ *  @param[in]  error  A ChipError object to be evaluated against success (CHIP_NO_ERROR).
  *
  */
-#define SuccessOrExit(aStatus) nlEXPECT(::chip::ChipError::IsSuccess((aStatus)), exit)
+#define SuccessOrExit(error) nlEXPECT(::chip::ChipError::IsSuccess((error)), exit)
 
 /**
  *  @def VerifyOrExit(aCondition, anAction)
@@ -451,9 +456,7 @@ constexpr inline const _T & max(const _T & a, const _T & b)
  *  }
  *  @endcode
  *
- *  @param[in]  ...         An optional expression or block to execute
- *                          when the assertion fails.
- *
+ *  @param[in]  ...         Statements to execute. Optional.
  */
 // clang-format off
 #define ExitNow(...)                                                   \
@@ -526,9 +529,9 @@ inline void chipDie(void)
  */
 #if CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define VerifyOrDie(aCondition)                                                                                                    \
-    nlABORT_ACTION(aCondition, ChipLogDetail(Support, "VerifyOrDie failure at %s:%d: %s", __FILE__, __LINE__, #aCondition))
+    nlABORT_ACTION(aCondition, ChipLogError(Support, "VerifyOrDie failure at %s:%d: %s", __FILE__, __LINE__, #aCondition))
 #else // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
-#define VerifyOrDie(aCondition) nlABORT(aCondition)
+#define VerifyOrDie(aCondition) VerifyOrDieWithoutLogging(aCondition)
 #endif // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 
 /**
@@ -566,7 +569,7 @@ inline void chipDie(void)
  *
  */
 #define VerifyOrDieWithMsg(aCondition, aModule, aMessage, ...)                                                                     \
-    nlABORT_ACTION(aCondition, ChipLogDetail(aModule, aMessage, ##__VA_ARGS__))
+    nlABORT_ACTION(aCondition, ChipLogError(aModule, aMessage, ##__VA_ARGS__))
 
 /**
  *  @def LogErrorOnFailure(expr)
@@ -593,7 +596,7 @@ inline void chipDie(void)
     } while (false)
 
 /**
- *  @def VerifyOrdo(expr, ...)
+ *  @def VerifyOrDo(expr, ...)
  *
  *  @brief
  *    do something if expression evaluates to false
@@ -601,12 +604,13 @@ inline void chipDie(void)
  *  Example usage:
  *
  * @code
- *    VerifyOrdo(param != nullptr, LogError("param is nullptr"));
+ *    VerifyOrDo(param != nullptr, LogError("param is nullptr"));
  *  @endcode
  *
  *  @param[in]  expr        A Boolean expression to be evaluated.
+ *  @param[in]  ...         Statements to execute.
  */
-#define VerifyOrdo(expr, ...)                                                                                                      \
+#define VerifyOrDo(expr, ...)                                                                                                      \
     do                                                                                                                             \
     {                                                                                                                              \
         if (!(expr))                                                                                                               \
@@ -657,6 +661,8 @@ inline void chipDie(void)
 
 #if defined(__clang__)
 #define FALLTHROUGH [[clang::fallthrough]]
+#elif defined(__GNUC__)
+#define FALLTHROUGH __attribute__((fallthrough))
 #else
 #define FALLTHROUGH (void) 0
 #endif
@@ -681,6 +687,29 @@ inline void chipDie(void)
  *       thing in C++ as well.
  */
 #define ArraySize(a) (sizeof(a) / sizeof((a)[0]))
+
+/**
+ * @brief Ensures that if `str` is NULL, a non-null `default_str_value` is provided
+ *
+ * @param str - null-terminated string pointer or nullptr
+ * @param default_str_value - replacement value if `str` is nullptr
+ * @return `str` if not null, otherwise `default_str_value`
+ */
+inline const char * DefaultStringWhenNull(const char * str, const char * default_str_value)
+{
+    return (str != nullptr) ? str : default_str_value;
+}
+
+/**
+ * @brief Ensure that a string for a %s specifier is shown as "(null)" if null
+ *
+ * @param str - null-terminated string pointer or nullptr
+ * @return `str` if not null, otherwise literal "(null)"
+ */
+inline const char * StringOrNullMarker(const char * str)
+{
+    return DefaultStringWhenNull(str, "(null)");
+}
 
 namespace chip {
 

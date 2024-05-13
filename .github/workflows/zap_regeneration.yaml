@@ -21,53 +21,34 @@ concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+    
 jobs:
     zap_regeneration:
         name: ZAP Regeneration
-        timeout-minutes: 60
 
         runs-on: ubuntu-20.04
         container:
-            image: connectedhomeip/chip-build-zap:0.5.58
+            image: ghcr.io/project-chip/chip-build:50
         defaults:
             run:
                 shell: sh
         if: github.actor != 'restyled-io[bot]'
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.11
-              name: Checkout
+            - name: Checkout
+              uses: actions/checkout@v4
               with:
-                  action: actions/checkout@v3
-                  with: |
-                      submodules: true
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-            - name: Setup ZAP
-              timeout-minutes: 5
-              run: |
-                  cd third_party/zap/repo/
-                  npm ci
-                  npm run version-stamp
-                  npm rebuild canvas --update-binary
-                  npm run build-spa
+                submodules: true
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                platform: linux
+
             - name: Generate all
-              timeout-minutes: 5
-              run: scripts/tools/zap_regen_all.py
-            - name: Add uncommitted changes
-              run: git add .
-            - name: Fix upstream
-              run: |
-                  git remote set-url origin https://x-access-token:$COMMITTER_TOKEN@github.com/$GITHUB_REPOSITORY.git
-                  git config --global user.email "$USER_EMAIL"
-                  git config --global user.name "$USER_NAME"
-              env:
-                  COMMITTER_TOKEN: ${{ secrets.MATTER_PAT }}
-                  USER_EMAIL: ${{ secrets.MATTER_PAT_EMAIL }}
-                  USER_NAME: ${{ secrets.MATTER_PAT_NAME }}
-                  GITHUB_REPOSITORY: ${{ github.GITHUB_REPOSITORY }}
-            - name: Commit
-              run: git commit -a -m "Regenerating ZAP"
-            - name: Push
-              run: git push
+              run: ./scripts/run_in_build_env.sh scripts/tools/zap_regen_all.py
+            - uses: EndBug/add-and-commit@v9
+              with:
+                default_author: github_actions
+                message: Regenerating ZAP

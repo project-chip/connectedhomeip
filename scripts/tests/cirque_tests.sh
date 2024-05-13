@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+# Don't warn about unreachable commands in this file:
+# shellcheck disable=SC2317
 
 SOURCE=${BASH_SOURCE[0]}
 SOURCE_DIR=$(cd "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)
@@ -28,6 +30,7 @@ GITHUB_ACTION_RUN=${GITHUB_ACTION_RUN:-"0"}
 # Using the same ot-br-posix version as chip
 OPENTHREAD=$REPO_DIR/third_party/openthread/repo
 OPENTHREAD_CHECKOUT=$(cd "$REPO_DIR" && git rev-parse :third_party/openthread/repo)
+OT_BR_POSIX_CHECKOUT=$(cd "$REPO_DIR" && git rev-parse :third_party/ot-br-posix/repo)
 
 CIRQUE_CACHE_PATH=${GITHUB_CACHE_PATH:-"/tmp/cirque-cache/"}
 OT_SIMULATION_CACHE="$CIRQUE_CACHE_PATH/ot-simulation-cmake.tgz"
@@ -44,6 +47,11 @@ CIRQUE_TESTS=(
     "SplitCommissioningTest"
     "CommissioningFailureTest"
     "CommissioningFailureOnReportTest"
+    "PythonCommissioningTest"
+    "CommissioningWindowTest"
+    "SubscriptionResumptionTest"
+    "SubscriptionResumptionCapacityTest"
+    "SubscriptionResumptionTimeoutTest"
 )
 
 BOLD_GREEN_TEXT="\033[1;32m"
@@ -73,7 +81,8 @@ function __cirquetest_clean_flask() {
 
 function __cirquetest_build_ot() {
     echo -e "[$BOLD_YELLOW_TEXT""INFO""$RESET_COLOR] Cache miss, build openthread simulation."
-    script/cmake-build simulation -DOT_THREAD_VERSION=1.2 -DOT_MTD=OFF -DOT_FTD=OFF
+    script/cmake-build simulation -DOT_THREAD_VERSION=1.2 -DOT_MTD=OFF -DOT_FTD=OFF -DWEB_GUI=0 -DNETWORK_MANAGER=0 -DREST_API=0 -DNAT64=0 -DOT_LOG_OUTPUT=PLATFORM_DEFINED -DOT_LOG_LEVEL=DEBG
+    mkdir -p "$(dirname "$OT_SIMULATION_CACHE")"
     tar czf "$OT_SIMULATION_CACHE" build
     echo "$OPENTHREAD_CHECKOUT" >"$OT_SIMULATION_CACHE_STAMP_FILE"
 }
@@ -94,7 +103,7 @@ function __cirquetest_self_hash() {
 }
 
 function cirquetest_cachekey() {
-    echo "$("$REPO_DIR"/integrations/docker/ci-only-images/chip-cirque-device-base/cachekey.sh).openthread.$OPENTHREAD_CHECKOUT.cirque_test.$(__cirquetest_self_hash)"
+    echo "$("$REPO_DIR"/integrations/docker/images/stage-2/chip-cirque-device-base/cachekey.sh).openthread.$OPENTHREAD_CHECKOUT.cirque_test.$(__cirquetest_self_hash)"
 }
 
 function cirquetest_cachekeyhash() {
@@ -105,13 +114,21 @@ function cirquetest_bootstrap() {
     set -ex
 
     cd "$REPO_DIR"/third_party/cirque/repo
+    pip3 uninstall -y setuptools
+    pip3 install setuptools==65.7.0
     pip3 install pycodestyle==2.5.0 wheel
+
     make NO_GRPC=1 install -j
 
-    "$REPO_DIR"/integrations/docker/ci-only-images/chip-cirque-device-base/build.sh
+    git config --global --add safe.directory /home/runner/work/connectedhomeip/connectedhomeip
+
+    "$REPO_DIR"/integrations/docker/images/stage-2/chip-cirque-device-base/build.sh --build-arg OT_BR_POSIX_CHECKOUT="$OT_BR_POSIX_CHECKOUT"
 
     __cirquetest_build_ot_lazy
     pip3 install -r requirements_nogrpc.txt
+
+    echo "OpenThread Version: $OPENTHREAD_CHECKOUT"
+    echo "ot-br-posix Version: $OT_BR_POSIX_CHECKOUT"
 }
 
 function cirquetest_run_test() {
@@ -122,7 +139,7 @@ function cirquetest_run_test() {
     mkdir -p "$DEVICE_LOG_DIR"
     __cirquetest_start_flask
     sleep 5
-    "$TEST_DIR/$CURRENT_TEST.py" "$@"
+    CHIP_CIRQUE_BASE_IMAGE="ghcr.io/project-chip/chip-cirque-device-base" "$TEST_DIR/$CURRENT_TEST.py" "$@"
     exitcode=$?
     __cirquetest_clean_flask
     # TODO: Do docker system prune, we cannot filter which container
@@ -130,7 +147,7 @@ function cirquetest_run_test() {
 
     # After test finished, the container is perserved and networks will not be deleted
     # This is useful when running tests on local workstation, but not for CI.
-    if [[ "x$CLEANUP_DOCKER_FOR_CI" = "x1" ]]; then
+    if [[ "$CLEANUP_DOCKER_FOR_CI" = "1" ]]; then
         echo "Do docker container and network prune"
         # TODO: Filter cirque containers ?
         if ! grep docker.sock /proc/1/mountinfo; then
@@ -159,7 +176,7 @@ function cirquetest_run_all_tests() {
         fi
     done
 
-    if [[ "x$GITHUB_ACTION_RUN" = "x1" ]]; then
+    if [[ "$GITHUB_ACTION_RUN" = "1" ]]; then
         echo -e "[$BOLD_YELLOW_TEXT""INFO""$RESET_COLOR] Logs will be uploaded to artifacts."
     fi
 

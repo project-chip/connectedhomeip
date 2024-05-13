@@ -39,10 +39,12 @@ public:
 
     // ===== Methods that implement the DiagnosticDataProvider abstract interface.
 
+    bool SupportsWatermarks() override { return true; }
     CHIP_ERROR GetCurrentHeapFree(uint64_t & currentHeapFree) override;
     CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed) override;
     CHIP_ERROR GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark) override;
     CHIP_ERROR GetThreadMetrics(ThreadMetrics ** threadMetricsOut) override;
+    CHIP_ERROR ResetWatermarks() override;
     void ReleaseThreadMetrics(ThreadMetrics * threadMetrics) override;
 
     CHIP_ERROR GetRebootCount(uint16_t & rebootCount) override;
@@ -57,7 +59,7 @@ public:
     CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifpp) override;
     void ReleaseNetworkInterfaces(NetworkInterface * netifp) override;
 
-    CHIP_ERROR GetEthPHYRate(app::Clusters::EthernetNetworkDiagnostics::PHYRateType & pHYRate) override;
+    CHIP_ERROR GetEthPHYRate(app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum & pHYRate) override;
     CHIP_ERROR GetEthFullDuplex(bool & fullDuplex) override;
     CHIP_ERROR GetEthTimeSinceReset(uint64_t & timeSinceReset) override;
     CHIP_ERROR GetEthPacketRxCount(uint64_t & packetRxCount) override;
@@ -71,6 +73,7 @@ public:
     CHIP_ERROR GetWiFiChannelNumber(uint16_t & channelNumber) override;
     CHIP_ERROR GetWiFiRssi(int8_t & rssi) override;
     CHIP_ERROR GetWiFiBeaconLostCount(uint32_t & beaconLostCount) override;
+    CHIP_ERROR GetWiFiBeaconRxCount(uint32_t & beaconRxCount) override;
     CHIP_ERROR GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount) override;
     CHIP_ERROR GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount) override;
     CHIP_ERROR GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount) override;
@@ -81,9 +84,9 @@ public:
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    CHIP_ERROR GetWiFiVersion(uint8_t & wiFiVersion) override;
-    CHIP_ERROR GetWiFiBssId(ByteSpan & value) override;
-    CHIP_ERROR GetWiFiSecurityType(uint8_t & securityType) override;
+    CHIP_ERROR GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wiFiVersion) override;
+    CHIP_ERROR GetWiFiBssId(MutableByteSpan & value) override;
+    CHIP_ERROR GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType) override;
 #endif
 
 private:
@@ -95,6 +98,7 @@ private:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     uint32_t mBeaconLostCount        = 0;
+    uint32_t mBeaconRxCount          = 0;
     uint32_t mPacketMulticastRxCount = 0;
     uint32_t mPacketMulticastTxCount = 0;
     uint32_t mPacketUnicastRxCount   = 0;
@@ -102,6 +106,14 @@ private:
     uint64_t mOverrunCount           = 0;
 #endif
 };
+
+/**
+ * Returns the platform-specific implementation of the DiagnosticDataProvider singleton object.
+ *
+ * Applications can use this to gain access to features of the DiagnosticDataProvider
+ * that are specific to the selected platform.
+ */
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl();
 
 } // namespace DeviceLayer
 } // namespace chip

@@ -14,14 +14,19 @@
 
 import("//build_overrides/chip.gni")
 
+import("${chip_root}/src/crypto/crypto.gni")
+
 chip_device_platform = "telink"
 
 chip_build_tests = false
 
-chip_project_config_include = ""
-chip_system_project_config_include = ""
+chip_project_config_include = "<CHIPProjectConfig.h>"
+chip_system_project_config_include = "<CHIPProjectConfig.h>"
 chip_ble_project_config_include = ""
+
+chip_crypto = "mbedtls"
+chip_external_mbedtls = true
 
 custom_toolchain = "${chip_root}/config/telink/chip-gn/toolchain:zephyr"
 
-pw_build_PIP_CONSTRAINTS = [ "${chip_root}/scripts/constraints.txt" ]
+pw_build_PIP_CONSTRAINTS = [ "${chip_root}/scripts/setup/constraints.txt" ]

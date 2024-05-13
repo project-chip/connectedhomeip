@@ -50,6 +50,7 @@ public:
     typedef void (*Callback_fn_initiated)(Action_t, int32_t aActor);
     typedef void (*Callback_fn_completed)(Action_t);
     void SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB);
+    void SetState(bool state);
 
 private:
     friend LightingManager & LightingMgr(void);

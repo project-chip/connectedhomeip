@@ -33,7 +33,7 @@ def generateJar(source_file, output_name):
         'python3',
         chip_root + '/build/chip/java/jar_runner.py',
         'cf',
-        tmp_dir + '/' + output_name,
+        test_dir + '/' + output_name,
         '-C',
         tmp_classes_dir,
         '.',

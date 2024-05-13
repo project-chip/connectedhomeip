@@ -22,10 +22,10 @@
 #include "StructBuilder.h"
 #include "StructParser.h"
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -42,23 +42,9 @@ enum class Tag : uint8_t
 class Parser : public StructParser
 {
 public:
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    /**
-     *  @brief Roughly verify the message is correctly formed
-     *   1) all mandatory tags are present
-     *   2) all elements have expected data type
-     *   3) any tag can only appear once
-     *   4) At the top level of the structure, unknown tags are ignored for forward compatibility
-     *  @note The main use of this function is to print out what we're
-     *    receiving during protocol development and debugging.
-     *    The encoding rule has changed in IM encoding spec so this
-     *    check is only "roughly" conformant now.
-     *
-     *  @return #CHIP_NO_ERROR on success
-     */
-    CHIP_ERROR CheckSchemaValidity() const;
-#endif
-
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+    CHIP_ERROR PrettyPrint() const;
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
     /**
      *  @brief Get the DataVersion.
      *
@@ -90,10 +76,6 @@ public:
      *          #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetData(TLV::TLVReader * const apReader) const;
-
-protected:
-    // A recursively callable function to parse a data element and pretty-print it.
-    CHIP_ERROR ParseData(TLV::TLVReader & aReader, int aDepth) const;
 };
 
 class Builder : public StructBuilder
@@ -119,9 +101,9 @@ public:
     /**
      *  @brief Mark the end of this AttributeDataIB
      *
-     *  @return A reference to *this
+     *  @return Our The builder's final status.
      */
-    AttributeDataIB::Builder & EndOfAttributeDataIB();
+    CHIP_ERROR EndOfAttributeDataIB();
 
 private:
     AttributePathIB::Builder mPath;

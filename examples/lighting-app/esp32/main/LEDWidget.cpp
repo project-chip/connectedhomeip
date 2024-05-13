@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,13 @@
  */
 
 #include "LEDWidget.h"
-#include "color_format.h"
+#include "ColorFormat.h"
+#if CONFIG_HAVE_DISPLAY
+#include "ScreenManager.h"
+#endif
+#include "led_strip.h"
+
+static const char TAG[] = "LEDWidget";
 
 void LEDWidget::Init(void)
 {
@@ -59,6 +65,7 @@ void LEDWidget::Init(void)
 
 void LEDWidget::Set(bool state)
 {
+    ESP_LOGI(TAG, "Setting state to %d", state ? 1 : 0);
     if (state == mState)
         return;
 
@@ -67,14 +74,33 @@ void LEDWidget::Set(bool state)
     DoSet();
 }
 
+void LEDWidget::Toggle()
+{
+    ESP_LOGI(TAG, "Toggling state to %d", !mState);
+    mState = !mState;
+
+    DoSet();
+}
+
 void LEDWidget::SetBrightness(uint8_t brightness)
 {
+    ESP_LOGI(TAG, "Setting brightness to %d", brightness);
     if (brightness == mBrightness)
         return;
 
     mBrightness = brightness;
 
     DoSet();
+}
+
+uint8_t LEDWidget::GetLevel()
+{
+    return this->mBrightness;
+}
+
+bool LEDWidget::IsTurnedOn()
+{
+    return this->mState;
 }
 
 #if CONFIG_LED_TYPE_RMT
@@ -99,7 +125,6 @@ void LEDWidget::DoSet(void)
     {
         HsvColor_t hsv = { mHue, mSaturation, brightness };
         RgbColor_t rgb = HsvToRgb(hsv);
-
         mStrip->set_pixel(mStrip, 0, rgb.r, rgb.g, rgb.b);
         mStrip->refresh(mStrip, 100);
     }
@@ -110,4 +135,21 @@ void LEDWidget::DoSet(void)
         ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
     }
 #endif // CONFIG_LED_TYPE_RMT
+#if CONFIG_HAVE_DISPLAY
+    if (mVirtualLEDIndex != -1)
+    {
+        ScreenManager::SetVLED(mVirtualLEDIndex, mState);
+    }
+#endif // CONFIG_HAVE_DISPLAY
 }
+
+#if CONFIG_DEVICE_TYPE_M5STACK
+void LEDWidget::SetVLED(int id1)
+{
+    mVirtualLEDIndex = id1;
+    if (mVirtualLEDIndex != -1)
+    {
+        ScreenManager::SetVLED(mVirtualLEDIndex, mState);
+    }
+}
+#endif

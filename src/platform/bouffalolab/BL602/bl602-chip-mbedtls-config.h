@@ -36,7 +36,7 @@
  * Enable FreeRTOS threading support
  */
 #define MBEDTLS_FREERTOS
-//#define MBEDTLS_THREADING_C
+// #define MBEDTLS_THREADING_C
 
 #define SL_CATALOG_FREERTOS_KERNEL_PRESENT
 
@@ -96,7 +96,7 @@ typedef void mbedtls_ecp_restart_ctx;
 #define MBEDTLS_PK_WRITE_C
 #define MBEDTLS_PKCS5_C
 #define MBEDTLS_PLATFORM_C
-//#define MBEDTLS_PLATFORM_MEMORY
+// #define MBEDTLS_PLATFORM_MEMORY
 #define MBEDTLS_PLATFORM_NO_STD_FUNCTIONS
 #define MBEDTLS_PSA_CRYPTO_C
 #define MBEDTLS_PSA_CRYPTO_CONFIG
@@ -130,13 +130,16 @@ typedef void mbedtls_ecp_restart_ctx;
 #define MBEDTLS_ECP_FIXED_POINT_OPTIM 0 /**< Enable fixed-point speed-up */
 #define MBEDTLS_ENTROPY_MAX_SOURCES 2   /**< Maximum number of sources supported */
 
-#if OPENTHREAD_CONFIG_COAP_SECURE_API_ENABLE
-#define MBEDTLS_SSL_MAX_CONTENT_LEN 900 /**< Maxium fragment length in bytes */
-#else
 #define MBEDTLS_SSL_MAX_CONTENT_LEN 768 /**< Maxium fragment length in bytes */
-#endif
 
 #define MBEDTLS_SSL_CIPHERSUITES MBEDTLS_TLS_ECJPAKE_WITH_AES_128_CCM_8
 
-//#include "config-device-acceleration.h"
+#define MBEDTLS_ENTROPY_HARDWARE_ALT
+
+#define MBEDTLS_SHA1_ALT
+#define MBEDTLS_SHA256_ALT
+#define MBEDTLS_AES_ALT
+#define MBEDTLS_ECP_ALT
+
+// #include "config-device-acceleration.h"
 #include "mbedtls/check_config.h"

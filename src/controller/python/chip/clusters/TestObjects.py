@@ -16,26 +16,28 @@
 #
 
 
-from dataclasses import dataclass
 import typing
-from .ClusterObjects import ClusterObjectDescriptor, ClusterCommand
-from chip import ChipUtility
+from dataclasses import dataclass
 from enum import IntEnum
+
+from chip import ChipUtility
+
+from .ClusterObjects import ClusterCommand, ClusterObjectDescriptor
 
 
 @dataclass
 class OnOff:
     id: typing.ClassVar[int] = 0x0006
 
-    class OnOffDelayedAllOffEffectVariant(IntEnum):
-        kFadeToOffIn0p8Seconds = 0x00
+    class DelayedAllOffEffectVariantEnum(IntEnum):
+        kDelayedOffFastFade = 0x00
         kNoFade = 0x01
-        k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 0x02
+        kDelayedOffSlowFade = 0x02
 
-    class OnOffDyingLightEffectVariant(IntEnum):
-        k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0x00
+    class DyingLightEffectVariantEnum(IntEnum):
+        kDyingLightFadeOff = 0x00
 
-    class OnOffEffectIdentifier(IntEnum):
+    class EffectIdentifierEnum(IntEnum):
         kDelayedAllOff = 0x00
         kDyingLight = 0x01
 

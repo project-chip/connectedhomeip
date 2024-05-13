@@ -1,6 +1,4 @@
-<p align="center">
-<img src="https://raw.githubusercontent.com/ARMmbed/mbed-os/master/logo.png" alt="ARM Mbed-OS logo"/>
-</p>
+![ARM Mbed-OS logo](https://raw.githubusercontent.com/ARMmbed/mbed-os/master/logo.png)
 
 # Mbed-OS platform overview
 
@@ -11,11 +9,9 @@ Mbed-OS 6.
 The following diagram shows a simplified structure of a Matter application which
 runs on the top of the Mbed-OS.
 
-<p align="center">
-    <img src="images/matter_mbedos_overview_simplified.png" alt="matter_mbedos_overview_simplified">
-</p>
+![matter_mbedos_overview_simplified](images/matter_mbedos_overview_simplified.png)
 
-# ARM Mbed-OS
+## ARM Mbed-OS
 
 Arm Mbed OS is an open source embedded operating system designed specifically
 for the "things" in the Internet of Things. It includes all the features you
@@ -51,7 +47,7 @@ Finally, Mbed OS implements the retargeting layer and boot process integration
 of each supported toolchain, so application development feels similar to C or
 C++ development for any other operating system.
 
-# Bluetooth and IP stacks
+## Bluetooth and IP stacks
 
 In the Mbed-oS platform applications, the Bluetooth LE interface is used to
 perform pairing and Wi-Fi network provisioning operations between the Matter
@@ -74,7 +70,7 @@ network layer, special glue socket layer has been introduced to take care of
 adapting the Mbed socket to BSD interface which is used inside the Matter
 endpoints implementation.
 
-## Matter integration
+### Matter integration
 
 The Bluetooth LE and Wi-Fi used stacks provided by the Mbed-OS have been
 integrated with the Matter stack using a special intermediate layer.
@@ -84,30 +80,30 @@ interfaces defined in the Matter stack. The application is able to use Matter's
 platform agnostic interfaces and no additional platform-related actions are
 needed to perform communication through the Matter stack.
 
-# Matter example applications
+## Matter example applications
 
 Sample Matter applications are provided for the Mbed OS platform. They can be
 used to speed up development:
 
--   [shell](../../examples/shell/mbed)
--   [all-clusters-app](../../examples/all-clusters-app/mbed)
+-   [shell](../../examples/shell/mbed/README.md)
+-   [all-clusters-app](../../examples/all-clusters-app/mbed/README.md)
 -   [lock-app](../../examples/lock-app/mbed/README.md)
 -   [lighting-app](../../examples/lighting-app/mbed/README.md)
 -   [pigweed-app](../../examples/pigweed-app/mbed/README.md)
 
-## Example configuration
+### Example configuration
 
 Each of the supporting examples contains the `config.in` file which allows you
 to configure the application in a proper way. You can define/disable/enable
 application settings. Then they are propagated through Mbed-OS and Matter stack
 build systems.
 
-## Matter stack configuration
+### Matter stack configuration
 
 In each of supported examples, the Matter stack can be configured by modifying
 `CHIPProjectConfig.h` file which is placed inside the project directory.
 
-## Mbed-OS configuration
+### Mbed-OS configuration
 
 Mbed-OS gives possibility to tweak its parameters by using the
 [Mbed-OS configuration system](https://os.mbed.com/docs/mbed-os/latest/program-setup/advanced-configuration.html).
@@ -117,7 +113,7 @@ support of the new hardware target support into the application. Mbed-OS
 configuration system can be accessed by modifying the `mbed_app.json` file which
 exists in each sample project directory.
 
-## Build system
+### Build system
 
 The Mbed-OS platform makes use of the following build systems to generate ninja
 build scripts:
@@ -130,7 +126,7 @@ Matter's stack and platform modules are built with GN and output a library file.
 The application, Mbed-OS and target specific libraries are built with CMake and
 the Matter library file is imported during the compilation process.
 
-## Build profiles
+### Build profiles
 
 Arm Mbed OS defines three collections of toolchain flags used during the build:
 

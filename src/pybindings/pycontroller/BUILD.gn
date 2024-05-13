@@ -46,11 +46,11 @@ shared_library("CHIPController") {
   include_dirs = [ "${chip_root}/third_party/pybind11/repo/include" ]
   if (current_os == "mac") {
     include_dirs +=
-        [ "${chip_root}/.environment/cipd/packages/python/include/python3.8" ]
+        [ "${chip_root}/.environment/cipd/packages/python/include/python3.9" ]
   } else if (current_os == "linux") {
     include_dirs += [ "/usr/include/python3.9" ]
   } else {
-    assert(false, "OS not supprted.")
+    assert(false, "OS not supported.")
   }
 
   sources = [
@@ -68,7 +68,15 @@ shared_library("CHIPController") {
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
     "${chip_root}/src/setup_payload",
+    "${chip_root}/src/tracing/json",
+    "${chip_root}/src/tracing/perfetto",
+    "${chip_root}/src/tracing/perfetto:file_output",
     "${chip_root}/src/transport",
+    "${chip_root}/third_party/jsoncpp",
+  ]
+  deps = [
+    "${chip_root}/src/tracing/perfetto:event_storage",
+    "${chip_root}/src/tracing/perfetto:simple_initialization",
   ]
   configs += [ ":controller_wno_deprecate" ]
   if (current_os == "mac") {
@@ -132,7 +140,10 @@ pw_python_action("pycontroller") {
   }
 
   if (current_os == "mac") {
-    platform_tag = "macosx_" + string_replace(mac_deployment_target, ".", "_")
+    platform_tag = string_replace(
+            string_replace(mac_deployment_target, "macos", "macosx."),
+            ".",
+            "_")
   } else {
     platform_tag = current_os
   }

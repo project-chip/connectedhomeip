@@ -14,18 +14,8 @@
 
 import("//build_overrides/build.gni")
 import("${build_root}/config/compiler/compiler.gni")
+import("${build_root}/toolchain/custom/custom.gni")
 import("${build_root}/toolchain/gcc_toolchain.gni")
-
-declare_args() {
-  # C compiler to use for target build.
-  target_cc = ""
-
-  # C++ compiler to use for target build.
-  target_cxx = ""
-
-  # Archive tool to use for target build.
-  target_ar = ""
-}
 
 gcc_toolchain("custom") {
   if (target_cc == "" || target_cxx == "" || target_ar == "") {

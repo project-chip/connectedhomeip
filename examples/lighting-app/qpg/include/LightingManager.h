@@ -25,8 +25,8 @@
 
 #include "AppEvent.h"
 
+#include "ColorFormat.h"
 #include "FreeRTOS.h"
-#include "color_format.h"
 #include "timers.h" // provides FreeRTOS timer support
 
 #include <lib/core/CHIPError.h>
@@ -41,6 +41,7 @@ public:
         LEVEL_ACTION,
         COLOR_ACTION_XY,
         COLOR_ACTION_HSV,
+        COLOR_ACTION_CT,
         INVALID_ACTION
     } Action;
 
@@ -55,7 +56,7 @@ public:
     uint8_t GetLevel();
     bool InitiateAction(Action_t aAction, int32_t aActor, uint16_t size, uint8_t * value);
 
-    using LightingCallback_fn = std::function<void(Action_t)>;
+    using LightingCallback_fn = void (*)(Action_t);
 
     void SetCallbacks(LightingCallback_fn aActionInitiated_CB, LightingCallback_fn aActionCompleted_CB);
 
@@ -66,6 +67,7 @@ private:
     XyColor_t mXY;
     HsvColor_t mHSV;
     RgbColor_t mRGB;
+    CtColor_t mCT;
 
     LightingCallback_fn mActionInitiated_CB;
     LightingCallback_fn mActionCompleted_CB;
@@ -74,6 +76,7 @@ private:
     void SetLevel(uint8_t aLevel);
     void SetColor(uint16_t x, uint16_t y);
     void SetColor(uint8_t hue, uint8_t saturation);
+    void SetColorTemperature(CtColor_t ct);
 
     void UpdateLight();
 

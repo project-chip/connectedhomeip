@@ -19,7 +19,7 @@
 #include <lib/core/OTAImageHeader.h>
 #include <lib/support/Span.h>
 #include <platform/OTAImageProcessor.h>
-#include <platform/nrfconnect/OTAImageContentHeader.h>
+#include <platform/nrfconnect/ExternalFlashManager.h>
 
 namespace chip {
 
@@ -32,48 +32,31 @@ class OTAImageProcessorImpl : public OTAImageProcessorInterface
 public:
     static constexpr size_t kBufferSize = CONFIG_CHIP_OTA_REQUESTOR_BUFFER_SIZE;
 
+    explicit OTAImageProcessorImpl(ExternalFlashManager * flashHandler = nullptr) : mFlashHandler(flashHandler) {}
+
     void SetOTADownloader(OTADownloader * downloader) { mDownloader = downloader; };
+    void TriggerFlashAction(ExternalFlashManager::Action action);
 
     CHIP_ERROR PrepareDownload() override;
     CHIP_ERROR Finalize() override;
     CHIP_ERROR Abort() override;
     CHIP_ERROR Apply() override;
-    CHIP_ERROR ProcessBlock(ByteSpan & block) override;
+    CHIP_ERROR ProcessBlock(ByteSpan & aBlock) override;
     bool IsFirstImageRun() override;
     CHIP_ERROR ConfirmCurrentImage() override;
+    void SetImageConfirmed() { mImageConfirmed = true; }
 
-private:
+protected:
     CHIP_ERROR PrepareDownloadImpl();
-    CHIP_ERROR ProcessHeader(ByteSpan & block);
+    CHIP_ERROR ProcessHeader(ByteSpan & aBlock);
 
     OTADownloader * mDownloader = nullptr;
     OTAImageHeaderParser mHeaderParser;
-    OTAImageContentHeaderParser mContentHeaderParser;
     uint8_t mBuffer[kBufferSize];
-};
-
-class ExtFlashHandler
-{
-public:
-    enum class Action : uint8_t
-    {
-        WAKE_UP,
-        SLEEP
-    };
-    virtual ~ExtFlashHandler() {}
-    virtual void DoAction(Action action);
-};
-
-class OTAImageProcessorImplPMDevice : public OTAImageProcessorImpl
-{
-public:
-    explicit OTAImageProcessorImplPMDevice(ExtFlashHandler & aHandler);
-    CHIP_ERROR PrepareDownload() override;
-    CHIP_ERROR Abort() override;
-    CHIP_ERROR Apply() override;
+    ExternalFlashManager * mFlashHandler;
 
 private:
-    ExtFlashHandler & mHandler;
+    bool mImageConfirmed = false;
 };
 
 } // namespace DeviceLayer

@@ -14,15 +14,24 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
+
+source_set("support") {
+  sources = [ "QNameStrings.h" ]
+
+  public_deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/dnssd/minimal_mdns/core",
+  ]
+}
 
 chip_test_suite("tests") {
   output_name = "libMinimalMdnsCoreTests"
 
   test_sources = [
     "TestFlatAllocatedQName.cpp",
+    "TestHeapQName.cpp",
     "TestQName.cpp",
     "TestRecordWriter.cpp",
   ]
@@ -30,8 +39,8 @@ chip_test_suite("tests") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    ":support",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/dnssd/minimal_mdns/core",
-    "${nlunit_test_root}:nlunit-test",
   ]
 }

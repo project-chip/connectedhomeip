@@ -23,9 +23,13 @@
  */
 
 #pragma once
+
+#if CHIP_HAVE_CONFIG_H
+#include <setup_payload/CHIPAdditionalDataPayloadBuildConfig.h>
+#endif
+
 #include <lib/core/CHIPError.h>
 #include <lib/support/BitFlags.h>
-#include <setup_payload/CHIPAdditionalDataPayloadBuildConfig.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
 namespace chip {

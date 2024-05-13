@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-#    Copyright (c) 2020 Project CHIP Authors
+#    Copyright (c) 2020-2022 Project CHIP Authors
 #    Copyright (c) 2019 Google LLC.
 #    Copyright (c) 2013-2017 Nest Labs, Inc.
 #    All rights reserved.
@@ -22,12 +22,12 @@
 #
 #    @file
 #      This file implements a Python script to generate a C/C++ header
-#      for individual ASN1 Object IDs (OIDs) that are used in CHIP
-#      TLV encodings (notably the CHIP Certificate object).
+#      for individual ASN1 Object IDs (OIDs) that are used in Matter
+#      TLV encodings (notably the Matter Certificate object).
 #
 
-from __future__ import absolute_import
-from __future__ import print_function
+from __future__ import absolute_import, print_function
+
 import optparse
 import sys
 
@@ -40,7 +40,7 @@ def identity(n):
 ansi_X9_62 = identity
 certicom = identity
 characteristicTwo = identity
-chip = identity
+matter = identity
 curve = identity
 curves = identity
 digest_algorithm = identity
@@ -83,7 +83,7 @@ oids = [
 
     # !!! WARNING !!!
     #
-    # The enumerated values associated with individual object IDs are used in CHIP TLV encodings (notably the CHIP Certificate object).
+    # The enumerated values associated with individual object IDs are used in Matter TLV encodings (notably the Matter Certificate object).
     # Because of this, the Enum Values assigned to object IDs in this table MUST NOT BE CHANGED once in use.
 
 
@@ -134,18 +134,18 @@ oids = [
      [joint_iso_ccitt(2), ds(5), 4, 65]),
     ("AttributeType",  "DomainComponent",         16,
      [itu_t(0), 9, 2342, 19200300, 100, 1, 25]),
-    ("AttributeType",  "ChipNodeId",              17,      [iso(1), organization(
-        3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), chip(1), 1]),
-    ("AttributeType",  "ChipFirmwareSigningId",   18,      [iso(1), organization(
-        3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), chip(1), 2]),
-    ("AttributeType",  "ChipICAId",               19,      [iso(1), organization(
-        3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), chip(1), 3]),
-    ("AttributeType",  "ChipRootId",              20,      [iso(1), organization(
-        3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), chip(1), 4]),
-    ("AttributeType",  "ChipFabricId",            21,      [iso(1), organization(
-        3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), chip(1), 5]),
-    ("AttributeType",  "ChipCASEAuthenticatedTag", 22,      [iso(1), organization(
-        3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), chip(1), 6]),
+    ("AttributeType",  "MatterNodeId",              17,      [iso(1), organization(
+        3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), matter(1), 1]),
+    ("AttributeType",  "MatterFirmwareSigningId",   18,      [iso(1), organization(
+        3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), matter(1), 2]),
+    ("AttributeType",  "MatterICACId",              19,      [iso(1), organization(
+        3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), matter(1), 3]),
+    ("AttributeType",  "MatterRCACId",              20,      [iso(1), organization(
+        3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), matter(1), 4]),
+    ("AttributeType",  "MatterFabricId",            21,      [iso(1), organization(
+        3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), matter(1), 5]),
+    ("AttributeType",  "MatterCASEAuthTag",         22,      [iso(1), organization(
+        3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), matter(1), 6]),
 
     # Elliptic Curves
     ("EllipticCurve",  "prime256v1",              1,       [
@@ -162,6 +162,8 @@ oids = [
      4,       [joint_iso_ccitt(2), ds(5), 29, 14]),
     ("Extension",      "AuthorityKeyIdentifier",
      5,       [joint_iso_ccitt(2), ds(5), 29, 35]),
+    ("Extension",      "CSRRequest",
+     6,       [iso(1), member_body(2), us(840), rsadsi(113549), pkcs(1), 9, 14]),
 
     # Key Purposes
     ("KeyPurpose",     "ServerAuth",              1,       [iso(1), organization(
@@ -199,7 +201,7 @@ def encodeOID(oid):
 
 TEMPLATE = '''/*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
@@ -235,6 +237,7 @@ TEMPLATE = '''/*
 #pragma once
 
 #include <cstdint>
+#include <cstddef>
 
 namespace chip {
 namespace ASN1 {

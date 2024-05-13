@@ -27,14 +27,19 @@
 
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/util/af.h>
+#include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 #include <platform/CHIPDeviceConfig.h>
+#include <protocols/interaction_model/StatusCode.h>
+#include <tracing/macros.h>
 
 using namespace chip;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::LowPower;
 
 static constexpr size_t kLowPowerDelegateTableSize =
-    EMBER_AF_LOW_POWER_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_LOW_POWER_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+static_assert(kLowPowerDelegateTableSize <= kEmberInvalidEndpointIndex, "LowPower Delegate table size error");
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -47,15 +52,16 @@ Delegate * gDelegateTable[kLowPowerDelegateTableSize] = { nullptr };
 
 Delegate * GetDelegate(EndpointId endpoint)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::LowPower::Id);
-    return (ep == 0xFFFF ? nullptr : gDelegateTable[ep]);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, chip::app::Clusters::LowPower::Id,
+                                                       MATTER_DM_LOW_POWER_CLUSTER_SERVER_ENDPOINT_COUNT);
+    return (ep >= kLowPowerDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
 {
     if (delegate == nullptr)
     {
-        ChipLogError(Zcl, "LowPower has no delegate set for endpoint:%" PRIu16, endpoint);
+        ChipLogProgress(Zcl, "LowPower has no delegate set for endpoint:%u", endpoint);
         return true;
     }
     return false;
@@ -69,8 +75,9 @@ namespace LowPower {
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::LowPower::Id);
-    if (ep != 0xFFFF)
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, chip::app::Clusters::LowPower::Id,
+                                                       MATTER_DM_LOW_POWER_CLUSTER_SERVER_ENDPOINT_COUNT);
+    if (ep < kLowPowerDelegateTableSize)
     {
         gDelegateTable[ep] = delegate;
     }
@@ -87,22 +94,24 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 bool emberAfLowPowerClusterSleepCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                          const Commands::Sleep::DecodableType & commandData)
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
+    MATTER_TRACE_SCOPE("Sleep", "LowPower");
+    using Protocols::InteractionModel::Status;
+
     EndpointId endpoint = commandPath.mEndpointId;
 
     Delegate * delegate = GetDelegate(endpoint);
-    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
-
-exit:
-    if (err != CHIP_NO_ERROR)
+    Status status;
+    if (isDelegateNull(delegate, endpoint))
     {
-        ChipLogError(Zcl, "emberAfLowPowerClusterSleepCallback error: %s", err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        ChipLogError(Zcl, "emberAfLowPowerClusterSleepCallback: no delegate");
+        status = Status::Failure;
     }
-
-    bool success         = delegate->HandleSleep();
-    EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
-    emberAfSendImmediateDefaultResponse(status);
+    else
+    {
+        bool success = delegate->HandleSleep();
+        status       = success ? Status::Success : Status::Failure;
+    }
+    command->AddStatus(commandPath, status);
     return true;
 }
 

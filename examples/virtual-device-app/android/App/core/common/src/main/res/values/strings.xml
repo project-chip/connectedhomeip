@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="matter_on_off_switch" translatable="false">Matter OnOff Switch</string>
+    <string name="matter_door_lock" translatable="false">Matter Door Lock</string>
+    <string name="matter_device" translatable="false">Matter Device</string>
+    <string name="description_icon" translatable="false">icon</string>
+</resources>

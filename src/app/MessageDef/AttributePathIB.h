@@ -21,13 +21,14 @@
 #include "ListBuilder.h"
 #include "ListParser.h"
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model/Nullable.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/NodeId.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -44,25 +45,19 @@ enum class Tag : uint8_t
     kListIndex            = 5,
 };
 
+enum class ValidateIdRanges : uint8_t
+{
+    kYes,
+    kNo,
+};
+
 class Parser : public ListParser
 {
 public:
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    /**
-     *  @brief Roughly verify the message is correctly formed
-     *   1) all mandatory tags are present
-     *   2) all elements have expected data type
-     *   3) any tag can only appear once
-     *   4) At the top level of the structure, unknown tags are ignored for forward compatibility
-     *  @note The main use of this function is to print out what we're
-     *    receiving during protocol development and debugging.
-     *    The encoding rule has changed in IM encoding spec so this
-     *    check is only "roughly" conformant now.
-     *
-     *  @return #CHIP_NO_ERROR on success
-     */
-    CHIP_ERROR CheckSchemaValidity() const;
-#endif
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+    CHIP_ERROR PrettyPrint() const;
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
+
     /**
      *  @brief Get the EnableTagCompression
      *
@@ -142,16 +137,43 @@ public:
     CHIP_ERROR GetListIndex(DataModel::Nullable<ListIndex> * const apListIndex) const;
 
     /**
-     * @brief Get the ListIndex, and set the mListIndex and mListOp fields in the ConcreteDataAttributePath accordingly. It will set
-     * ListOp to NotList when the list index is missing, users should interpret it as ReplaceAll according to the context.
+     * @brief Get the concrete attribute path.  This will set the ListOp to
+     *        NotList when there is no ListIndex.  Consumers should interpret NotList
+     *        as ReplaceAll if that's appropriate to their context.
      *
-     *  @param [in] aAttributePath    The attribute path object for setting list index and list op.
+     *  @param [in] aAttributePath    The attribute path object to write to.
+     *  @param [in] aValidateRanges   Whether to validate that the cluster/attribute
+     *                                IDs in the path are in the right ranges.
      *
      *  @return #CHIP_NO_ERROR on success
      */
-    CHIP_ERROR GetListIndex(ConcreteDataAttributePath & aAttributePath) const;
+    CHIP_ERROR GetConcreteAttributePath(ConcreteDataAttributePath & aAttributePath,
+                                        ValidateIdRanges aValidateRanges = ValidateIdRanges::kYes) const;
+
+    /**
+     * @brief Get a group attribute path.  This will set the ListOp to
+     *        NotList when there is no ListIndex.  Consumers should interpret NotList
+     *        as ReplaceAll if that's appropriate to their context.  The
+     *        endpoint id of the resulting path might have any value.
+     *
+     *  @param [in] aAttributePath    The attribute path object to write to.
+     *  @param [in] aValidateRanges   Whether to validate that the cluster/attribute
+     *                                IDs in the path are in the right ranges.
+     *
+     *  @return #CHIP_NO_ERROR on success
+     */
+    CHIP_ERROR GetGroupAttributePath(ConcreteDataAttributePath & aAttributePath,
+                                     ValidateIdRanges aValidateRanges = ValidateIdRanges::kYes) const;
 
     // TODO(#14934) Add a function to get ConcreteDataAttributePath from AttributePathIB::Parser directly.
+
+    /**
+     * @brief Parse the attribute path into an AttributePathParams object. As part of parsing,
+     * validity checks for each path item will be done as well.
+     *
+     * If any errors are encountered, an IM error of 'InvalidAction' will be returned.
+     */
+    CHIP_ERROR ParsePath(AttributePathParams & attribute) const;
 };
 
 class Builder : public ListBuilder
@@ -217,9 +239,9 @@ public:
     /**
      *  @brief Mark the end of this AttributePathIB
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    AttributePathIB::Builder & EndOfAttributePathIB();
+    CHIP_ERROR EndOfAttributePathIB();
 
     CHIP_ERROR Encode(const AttributePathParams & aAttributePathParams);
     CHIP_ERROR Encode(const ConcreteDataAttributePath & aAttributePathParams);

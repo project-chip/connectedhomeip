@@ -26,7 +26,7 @@
 
 #include <system/SystemError.h>
 
-#include <zephyr.h>
+#include <zephyr/kernel.h>
 
 #if !CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS
 
@@ -35,32 +35,56 @@ namespace System {
 namespace Clock {
 
 namespace Internal {
+
 ClockImpl gClockImpl;
+
 } // namespace Internal
 
-Microseconds64 ClockImpl::GetMonotonicMicroseconds64(void)
+namespace {
+
+constexpr Microseconds64 kUnknownRealTime = Seconds64::zero();
+
+// Unix epoch time of boot event
+Microseconds64 gBootRealTime = kUnknownRealTime;
+
+} // namespace
+
+Microseconds64 ClockImpl::GetMonotonicMicroseconds64()
 {
     return Microseconds64(k_ticks_to_us_floor64(k_uptime_ticks()));
 }
 
-Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
+Milliseconds64 ClockImpl::GetMonotonicMilliseconds64()
 {
     return Milliseconds64(k_uptime_get());
 }
 
-CHIP_ERROR ClockImpl::GetClock_RealTime(Clock::Microseconds64 & aCurTime)
+CHIP_ERROR ClockImpl::GetClock_RealTime(Microseconds64 & aCurTime)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    // The real time can be configured by an application if it has access to a reliable time source.
+    // Otherwise, just return an error so that Matter stack can fallback to Last Known UTC Time.
+    ReturnErrorCodeIf(gBootRealTime == kUnknownRealTime, CHIP_ERROR_INCORRECT_STATE);
+
+    aCurTime = gBootRealTime + GetMonotonicMicroseconds64();
+
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Clock::Milliseconds64 & aCurTime)
+CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Milliseconds64 & aCurTime)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    Microseconds64 curTimeUs;
+
+    ReturnErrorOnFailure(GetClock_RealTime(curTimeUs));
+    aCurTime = std::chrono::duration_cast<Milliseconds64>(curTimeUs);
+
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClockImpl::SetClock_RealTime(Clock::Microseconds64 aNewCurTime)
+CHIP_ERROR ClockImpl::SetClock_RealTime(Microseconds64 aNewCurTime)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    gBootRealTime = aNewCurTime - GetMonotonicMicroseconds64();
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Clock

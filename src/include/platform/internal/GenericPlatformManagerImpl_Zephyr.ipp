@@ -34,8 +34,13 @@
 
 #include <system/SystemError.h>
 #include <system/SystemLayer.h>
+#include <system/SystemStats.h>
 
-#include <sys/reboot.h>
+#include <zephyr/sys/reboot.h>
+
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+#include <psa/crypto.h>
+#endif
 
 #define DEFAULT_MIN_SLEEP_PERIOD (60 * 60 * 24 * 30) // Month [sec]
 
@@ -44,20 +49,23 @@ namespace DeviceLayer {
 namespace Internal {
 
 namespace {
+
 System::LayerSocketsLoop & SystemLayerSocketsLoop()
 {
     return static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer());
 }
 
-} // anonymous namespace
+K_WORK_DEFINE(sSignalWork, [](k_work *) { SystemLayerSocketsLoop().Signal(); });
 
-// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
-template class GenericPlatformManagerImpl_Zephyr<PlatformManagerImpl>;
+} // anonymous namespace
 
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_InitChipStack(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    if (mInitialized)
+        return err;
 
     k_mutex_init(&mChipStackLock);
 
@@ -66,9 +74,15 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_InitChipStack(void)
 
     mShouldRunEventLoop = false;
 
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+    VerifyOrReturnError(psa_crypto_init() == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+#endif
+
     // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
     err = GenericPlatformManagerImpl<ImplClass>::_InitChipStack();
     SuccessOrExit(err);
+
+    mInitialized = true;
 
 exit:
     return err;
@@ -107,29 +121,38 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StopEventLoopTask(void
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_Shutdown(void)
+void GenericPlatformManagerImpl_Zephyr<ImplClass>::_Shutdown(void)
 {
-#if CONFIG_REBOOT
+#ifdef CONFIG_REBOOT
     sys_reboot(SYS_REBOOT_WARM);
-    return CHIP_NO_ERROR;
 #else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    // NB: When this is implemented, |mInitialized| can be removed.
 #endif
 }
 
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_PostEvent(const ChipDeviceEvent * event)
 {
-    // For some reasons mentioned in https://github.com/zephyrproject-rtos/zephyr/issues/22301
-    // k_msgq_put takes `void*` instead of `const void*`. Nonetheless, it should be safe to
-    // const_cast here and there are components in Zephyr itself which do the same.
-    int status = k_msgq_put(&mChipEventQueue, const_cast<ChipDeviceEvent *>(event), K_NO_WAIT);
+    int status = k_msgq_put(&mChipEventQueue, event, K_NO_WAIT);
     if (status != 0)
     {
         ChipLogError(DeviceLayer, "Failed to post event to CHIP Platform event queue");
         return System::MapErrorZephyr(status);
     }
-    SystemLayerSocketsLoop().Signal(); // Trigger wake on CHIP thread
+
+    SYSTEM_STATS_INCREMENT(System::Stats::kPlatformMgr_NumEvents);
+
+    // Wake CHIP thread to process the event. If the function is called from ISR, such as a Zephyr
+    // timer handler, do not signal the thread directly because that involves taking a mutex, which
+    // is forbidden in ISRs. Instead, submit a task to the system work queue to do the singalling.
+    if (k_is_in_isr())
+    {
+        (void) k_work_submit(&sSignalWork);
+    }
+    else
+    {
+        SystemLayerSocketsLoop().Signal();
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -139,7 +162,10 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::ProcessDeviceEvents()
     ChipDeviceEvent event;
 
     while (k_msgq_get(&mChipEventQueue, &event, K_NO_WAIT) == 0)
+    {
+        SYSTEM_STATS_DECREMENT(System::Stats::kPlatformMgr_NumEvents);
         Impl()->DispatchEvent(&event);
+    }
 }
 
 template <class ImplClass>
@@ -183,7 +209,7 @@ template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StartEventLoopTask(void)
 {
     if (!mChipThreadStack)
-        return CHIP_ERROR_WELL_UNINITIALIZED;
+        return CHIP_ERROR_UNINITIALIZED;
 
     const auto tid = k_thread_create(&mChipThread, mChipThreadStack, CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE, EventLoopTaskMain,
                                      this, nullptr, nullptr, CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY, 0, K_NO_WAIT);
@@ -196,6 +222,10 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StartEventLoopTask(voi
 
     return CHIP_NO_ERROR;
 }
+
+// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
+// NB: This must come after all templated class members are defined.
+template class GenericPlatformManagerImpl_Zephyr<PlatformManagerImpl>;
 
 } // namespace Internal
 } // namespace DeviceLayer

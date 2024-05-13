@@ -24,9 +24,15 @@
 
 #pragma once
 
-#include <platform/internal/GenericConfigurationManagerImpl.h>
+#include <cstdint>
+#include <cstdlib>
 
-#include <platform/Tizen/PosixConfig.h>
+#include <lib/core/CHIPError.h>
+#include <platform/DeviceInstanceInfoProvider.h>
+#include <platform/PersistedStorage.h>
+
+#include "PosixConfig.h"
+#include "platform/internal/GenericConfigurationManagerImpl.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -40,8 +46,10 @@ public:
     CHIP_ERROR StoreVendorId(uint16_t vendorId);
     CHIP_ERROR StoreProductId(uint16_t productId);
 
-    CHIP_ERROR GetVendorId(uint16_t & vendorId) override;
-    CHIP_ERROR GetProductId(uint16_t & productId) override;
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
+    CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours) override;
+    CHIP_ERROR GetBootReason(uint32_t & bootReason) override;
+    CHIP_ERROR StoreBootReason(uint32_t bootReason) override;
 
     // This returns an instance of this class.
     static ConfigurationManagerImpl & GetDefaultInstance();
@@ -53,8 +61,8 @@ private:
     CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override;
     bool CanFactoryReset(void) override;
     void InitiateFactoryReset(void) override;
-    CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override;
-    CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value) override;
+    CHIP_ERROR ReadPersistedStorageValue(Platform::PersistedStorage::Key key, uint32_t & value) override;
+    CHIP_ERROR WritePersistedStorageValue(Platform::PersistedStorage::Key key, uint32_t value) override;
 
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
     CHIP_ERROR WriteConfigValue(Key key, uint16_t val);
@@ -74,6 +82,14 @@ private:
     CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen) override;
     void RunConfigUnitTest(void) override;
 };
+
+/**
+ * Returns the platform-specific implementation of the ConfigurationManager object.
+ *
+ * Applications can use this to gain access to features of the ConfigurationManager
+ * that are specific to the selected platform.
+ */
+ConfigurationManager & ConfigurationMgrImpl();
 
 } // namespace DeviceLayer
 } // namespace chip

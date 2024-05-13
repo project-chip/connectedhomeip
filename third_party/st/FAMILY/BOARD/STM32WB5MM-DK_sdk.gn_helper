@@ -1,0 +1,77 @@
+# STM32WB5MM-DK_sdk.gn_helper
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+declare_args() {
+  ## PATHS FOR STM32WB BOARD ##
+  stm32_board_src = "${chip_root}/examples/platform/stm32/common/STM32WB5MM-DK"
+  bsp_stm32wb5mm_dk = "${chip_root}/third_party/st/STM32CubeWB/Drivers/BSP/STM32WB5MM-DK" 
+  components_common = "${chip_root}/third_party/st/STM32CubeWB/Drivers/BSP/Components/Common"
+  components_ssd1315 = "${chip_root}/third_party/st/STM32CubeWB/Drivers/BSP/Components/ssd1315"
+  components_s25fl128s = "${chip_root}/third_party/st/STM32CubeWB/Drivers/BSP/Components/s25fl128s"
+  
+  ## PATHS FOR ST UTILITIES ##
+  stm32_fonts_util = "${chip_root}/third_party/st/STM32CubeWB/Utilities/Fonts"
+  stm32_lcd_util = "${chip_root}/third_party/st/STM32CubeWB/Utilities/LCD"
+  stm32_lpm_util = "${chip_root}/third_party/st/STM32CubeWB/Utilities/lpm/tiny_lpm"
+}
+
+SOURCES = [ 
+  # BOARD APPLICATION SRC(in examples/platform/stm32/common/STM32WB5MM-DK/)
+  "${stm32_board_src}/Src/entropy_hardware_poll.c",
+  "${stm32_board_src}/Src/flash_driver.c",
+  "${stm32_board_src}/Src/flash_wb.c",
+  "${stm32_board_src}/Src/freertos_port.c",
+  "${stm32_board_src}/Src/hw_timerserver.c",
+  "${stm32_board_src}/Src/hw_uart.c",
+  "${stm32_board_src}/Src/stm32_lpm_if.c",
+  "${stm32_board_src}/Src/stm32wbxx_hal_msp.c",
+  "${stm32_board_src}/Src/stm32wbxx_hal_timebase_tim.c",
+  "${stm32_board_src}/Src/stm32wbxx_it.c",
+  "${stm32_board_src}/Src/stm_logging.c",
+  "${stm32_board_src}/Src/syscalls.c",
+  "${stm32_board_src}/Src/system_stm32wbxx.c",
+  "${stm32_board_src}/Src/otp.c", 
+  "${stm32_board_src}/STM32_WPAN/Target/hw_ipcc.c",
+
+  "${chip_root}/examples/platform/stm32/config_files/STM32WB5/matter_config.h",
+  "${chip_root}/examples/platform/stm32/config_files/STM32WB5/FreeRTOSConfig.h",
+  
+  #BSP DRIVERS
+  "${bsp_stm32wb5mm_dk}/stm32wb5mm_dk_bus.c",
+  "${bsp_stm32wb5mm_dk}/stm32wb5mm_dk_lcd.c", 
+  "${bsp_stm32wb5mm_dk}/stm32wb5mm_dk.c",    
+
+  #BSP COMPONENTS
+  "${components_ssd1315}/ssd1315_reg.c",
+  "${components_ssd1315}/ssd1315.c",
+  
+  # BOARD UTILITIES
+  "${stm32_lpm_util}/stm32_lpm.c",
+  "${stm32_lcd_util}/stm32_lcd.c",
+  ]
+  
+INCLUDE_DIRS = [
+  "${components_common}",
+  "${components_s25fl128s}",
+  "${components_ssd1315}",
+  
+  "${bsp_stm32wb5mm_dk}",   
+
+  "${stm32_lpm_util}",
+  "${stm32_fonts_util}",
+  "${stm32_lcd_util}",
+
+  "${stm32_board_src}/Inc",
+  "${stm32_board_src}/STM32_WPAN/App",
+  ]
+
+DEFINES = [ 
+  ]
+
+LIBS = [
+  ]
+  
+FLAGS = [ 
+  ]

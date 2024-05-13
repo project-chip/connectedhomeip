@@ -18,10 +18,11 @@
 
 #pragma once
 
-#include "../common/CHIPCommand.h"
-#include "../common/Command.h"
-
 #include <lib/support/Span.h>
+
+#include "commands/common/CHIPCommand.h"
+#include "commands/common/Command.h"
+#include "commands/common/Commands.h"
 
 class ShowControllerGroups : public CHIPCommand
 {
@@ -54,8 +55,7 @@ public:
         fprintf(stderr, "  | Available Groups :                                                                  |\n");
         fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
         fprintf(stderr, "  | Group Id   |  KeySet Id     |   Group Name                                          |\n");
-        chip::FabricIndex fabricIndex;
-        CurrentCommissioner().GetFabricIndex(&fabricIndex);
+        chip::FabricIndex fabricIndex                            = CurrentCommissioner().GetFabricIndex();
         chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
         auto it                                                  = groupDataProvider->IterateGroupInfo(fabricIndex);
         chip::Credentials::GroupDataProvider::GroupInfo group;
@@ -98,8 +98,7 @@ public:
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        chip::FabricIndex fabricIndex;
-        CurrentCommissioner().GetFabricIndex(&fabricIndex);
+        chip::FabricIndex fabricIndex                            = CurrentCommissioner().GetFabricIndex();
         chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
         chip::Credentials::GroupDataProvider::GroupInfo group;
 
@@ -133,8 +132,7 @@ public:
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        chip::FabricIndex fabricIndex;
-        CurrentCommissioner().GetFabricIndex(&fabricIndex);
+        chip::FabricIndex fabricIndex                            = CurrentCommissioner().GetFabricIndex();
         chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
         ReturnErrorOnFailure(groupDataProvider->RemoveGroupInfo(fabricIndex, groupId));
         SetCommandExitStatus(CHIP_NO_ERROR);
@@ -153,8 +151,7 @@ public:
 
     CHIP_ERROR RunCommand() override
     {
-        chip::FabricIndex fabricIndex;
-        CurrentCommissioner().GetFabricIndex(&fabricIndex);
+        chip::FabricIndex fabricIndex                            = CurrentCommissioner().GetFabricIndex();
         chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
         chip::Credentials::GroupDataProvider::KeySet keySet;
 
@@ -193,9 +190,8 @@ public:
 
     CHIP_ERROR RunCommand() override
     {
-        size_t current_count = 0;
-        chip::FabricIndex fabricIndex;
-        CurrentCommissioner().GetFabricIndex(&fabricIndex);
+        size_t current_count                                     = 0;
+        chip::FabricIndex fabricIndex                            = CurrentCommissioner().GetFabricIndex();
         chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
 
         auto iter     = groupDataProvider->IterateGroupKeys(fabricIndex);
@@ -226,9 +222,8 @@ public:
 
     CHIP_ERROR RunCommand() override
     {
-        size_t index = 0;
-        chip::FabricIndex fabricIndex;
-        CurrentCommissioner().GetFabricIndex(&fabricIndex);
+        size_t index                                             = 0;
+        chip::FabricIndex fabricIndex                            = CurrentCommissioner().GetFabricIndex();
         chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
         auto iter                                                = groupDataProvider->IterateGroupKeys(fabricIndex);
         size_t maxCount                                          = iter->Count();
@@ -272,12 +267,11 @@ public:
 
     CHIP_ERROR RunCommand() override
     {
-        chip::FabricIndex fabricIndex;
-        CurrentCommissioner().GetFabricIndex(&fabricIndex);
+        chip::FabricIndex fabricIndex                            = CurrentCommissioner().GetFabricIndex();
         chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
         uint8_t compressed_fabric_id[sizeof(uint64_t)];
         chip::MutableByteSpan compressed_fabric_id_span(compressed_fabric_id);
-        ReturnLogErrorOnFailure(CurrentCommissioner().GetFabricInfo()->GetCompressedId(compressed_fabric_id_span));
+        ReturnLogErrorOnFailure(CurrentCommissioner().GetCompressedFabricIdBytes(compressed_fabric_id_span));
 
         if ((keyPolicy != chip::Credentials::GroupDataProvider::SecurityPolicy::kCacheAndSync &&
              keyPolicy != chip::Credentials::GroupDataProvider::SecurityPolicy::kTrustFirst) ||
@@ -316,9 +310,8 @@ public:
 
     CHIP_ERROR RunCommand() override
     {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        chip::FabricIndex fabricIndex;
-        CurrentCommissioner().GetFabricIndex(&fabricIndex);
+        CHIP_ERROR err                                           = CHIP_NO_ERROR;
+        chip::FabricIndex fabricIndex                            = CurrentCommissioner().GetFabricIndex();
         chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
 
         // Unbind all group
@@ -339,10 +332,7 @@ public:
         }
         iter->Release();
 
-        if (err == CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        ReturnErrorOnFailure(err);
         ReturnErrorOnFailure(groupDataProvider->RemoveKeySet(fabricIndex, keysetId));
 
         SetCommandExitStatus(CHIP_NO_ERROR);
@@ -368,5 +358,6 @@ void registerCommandsGroup(Commands & commands, CredentialIssuerCommands * creds
         make_unique<RemoveKeySet>(credsIssuerConfig),
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCommandSet(clusterName, clusterCommands,
+                                "Commands for manipulating group keys and memberships for chip-tool itself.");
 }

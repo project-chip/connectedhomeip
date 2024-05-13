@@ -16,50 +16,117 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/nlunit_test.gni")
 import("${chip_root}/src/platform/device.gni")
 
+source_set("constants") {
+  sources = [ "Constants.h" ]
+
+  public_deps = [ "${chip_root}/src/lib/support" ]
+}
+
+source_set("types") {
+  sources = [ "Types.h" ]
+}
+
+source_set("naming") {
+  sources = [
+    "ServiceNaming.cpp",
+    "ServiceNaming.h",
+  ]
+
+  public_deps = [
+    ":constants",
+    ":types",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:error",
+    "${chip_root}/src/lib/support:span",
+  ]
+}
+
 source_set("platform_header") {
-  sources = [ "platform/Dnssd.h" ]
+  sources = [
+    "platform/Dnssd.h",
+    "platform/DnssdBrowseDelegate.h",
+  ]
+  public_deps = [
+    ":constants",
+    ":naming",
+    "${chip_root}/src/inet",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/system",
+  ]
 }
 
 static_library("dnssd") {
   public_deps = [
+    ":constants",
     ":platform_header",
+    ":types",
+    "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/crypto",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
-    "${chip_root}/src/messaging:messaging_mrp_config",
+    "${chip_root}/src/messaging:configurations",
   ]
 
   sources = [
+    "Advertiser.cpp",
     "Advertiser.h",
+    "IPAddressSorter.cpp",
+    "IPAddressSorter.h",
+    "Resolver.cpp",
     "Resolver.h",
-    "ServiceNaming.cpp",
-    "ServiceNaming.h",
+    "ResolverProxy.cpp",
+    "ResolverProxy.h",
     "TxtFields.cpp",
     "TxtFields.h",
   ]
+
+  assert(
+      chip_mdns == "none" || chip_mdns == "minimal" || chip_mdns == "platform",
+      "Please select a valid value for chip_mdns")
 
   if (chip_mdns == "none") {
     sources += [
       "Advertiser_ImplNone.cpp",
       "Resolver_ImplNone.cpp",
     ]
-  } else if (chip_mdns == "minimal") {
+  }
+
+  if (chip_mdns_minimal) {
     sources += [
       "ActiveResolveAttempts.cpp",
       "ActiveResolveAttempts.h",
       "Advertiser_ImplMinimalMdns.cpp",
+      "Advertiser_ImplMinimalMdnsAllocator.h",
+      "IncrementalResolve.cpp",
+      "IncrementalResolve.h",
       "MinimalMdnsServer.cpp",
       "MinimalMdnsServer.h",
       "Resolver_ImplMinimalMdns.cpp",
     ]
-    public_deps += [ "${chip_root}/src/lib/dnssd/minimal_mdns" ]
-  } else if (chip_mdns == "platform") {
+    public_deps += [
+      "${chip_root}/src/lib/dnssd/minimal_mdns",
+      "${chip_root}/src/tracing",
+      "${chip_root}/src/tracing:macros",
+    ]
+  }
+
+  if (chip_mdns_platform) {
     sources += [
       "Discovery_ImplPlatform.cpp",
       "Discovery_ImplPlatform.h",
     ]
     public_deps += [ "${chip_root}/src/platform" ]
-  } else {
-    assert(false, "Unknown Dnssd advertiser implementation.")
   }
+
+  _chip_dnssd_default_none = chip_mdns == "none"
+  _chip_dnssd_default_minimal = chip_mdns == "minimal"
+  _chip_dnssd_default_platform = chip_mdns == "platform"
+
+  defines = [
+    "CHIP_DNSSD_DEFAULT_NONE=${_chip_dnssd_default_none}",
+    "CHIP_DNSSD_DEFAULT_MINIMAL=${_chip_dnssd_default_minimal}",
+    "CHIP_DNSSD_DEFAULT_PLATFORM=${_chip_dnssd_default_platform}",
+  ]
+
+  cflags = [ "-Wconversion" ]
 }

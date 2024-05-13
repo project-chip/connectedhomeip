@@ -29,6 +29,7 @@ class AppTask
 {
 
 public:
+    CHIP_ERROR Init();
     CHIP_ERROR StartAppTask();
 
 private:

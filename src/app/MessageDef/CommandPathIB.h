@@ -21,44 +21,31 @@
 #include "ListBuilder.h"
 #include "ListParser.h"
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/CommandPathParams.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace app {
 namespace CommandPathIB {
-enum
+enum class Tag : uint8_t
 {
-    kCsTag_EndpointId = 0,
-    kCsTag_ClusterId  = 1,
-    kCsTag_CommandId  = 2,
+    kEndpointId = 0,
+    kClusterId  = 1,
+    kCommandId  = 2,
 };
 
 class Parser : public ListParser
 {
 public:
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    /**
-     *  @brief Roughly verify the message is correctly formed
-     *   1) all mandatory tags are present
-     *   2) all elements have expected data type
-     *   3) any tag can only appear once
-     *   4) At the top level of the structure, unknown tags are ignored for forward compatibility
-     *  @note The main use of this function is to print out what we're
-     *    receiving during protocol development and debugging.
-     *    The encoding rule has changed in IM encoding spec so this
-     *    check is only "roughly" conformant now.
-     *
-     *  @return #CHIP_NO_ERROR on success
-     */
-    CHIP_ERROR CheckSchemaValidity() const;
-#endif
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+    CHIP_ERROR PrettyPrint() const;
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
     /**
      *  @brief Get a TLVReader for the EndpointId. Next() must be called before accessing them.
@@ -92,6 +79,30 @@ public:
      *          #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetCommandId(chip::CommandId * const apCommandId) const;
+
+    /**
+     * @brief Get the concrete command path, if this command path is a concrete
+     *        path.
+     *
+     * This will validate that the cluster id and command id are actually valid for a
+     * concrete path.
+     *
+     *  @param [in] aCommandPath    The command path object to write to.
+     */
+    CHIP_ERROR GetConcreteCommandPath(ConcreteCommandPath & aCommandPath) const;
+
+    /**
+     * @brief Get a group command path.
+     *
+     * This will validate that the cluster id and command id are actually valid for a
+     * group path.
+     *
+     *  @param [out] apClusterId    The cluster id in the path.
+     *  @param [out] apCommandId    The command id in the path.
+     *
+     *  @return #CHIP_NO_ERROR on success
+     */
+    CHIP_ERROR GetGroupCommandPath(ClusterId * apClusterId, CommandId * apCommandId) const;
 };
 
 class Builder : public ListBuilder
@@ -127,9 +138,9 @@ public:
     /**
      *  @brief Mark the end of this CommandPathIB
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    CommandPathIB::Builder & EndOfCommandPathIB();
+    CHIP_ERROR EndOfCommandPathIB();
 
     CHIP_ERROR Encode(const CommandPathParams & aCommandPathParams);
     CHIP_ERROR Encode(const ConcreteCommandPath & aConcreteCommandPath);

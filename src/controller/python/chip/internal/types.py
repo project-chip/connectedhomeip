@@ -14,7 +14,7 @@
 #    limitations under the License.
 #
 
-from ctypes import CFUNCTYPE, c_void_p, c_size_t, c_uint32
+from ctypes import CFUNCTYPE, c_size_t, c_uint32, c_void_p
 
 # General callback of 'network credentials requested. No python-data
 # is available as the underlying callback is used internally

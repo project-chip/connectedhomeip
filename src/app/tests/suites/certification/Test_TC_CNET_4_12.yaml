@@ -1,0 +1,399 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    12.4.10. [TC-CNET-4.12] [Thread]Verification for ConnectNetwork Command
+    [DUT-Server]
+
+PICS:
+    - CNET.S.F01
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Preconditions"
+      verification: |
+          1. DUT supports CNET.S.F01(TH)
+          2. DUT has a Network Commissioning cluster on endpoint PIXIT.CNET.ENDPOINT_THREAD with FeatureMap attribute of 2
+          3. TH has can communicate to two valid thread PANs: PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET and PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET
+          4. TH can connect to two valid Wi-Fi access points: PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
+          5. XPANID of PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET is saved as th_xpan and the XPANID of PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET is saved as th_xpan1
+      disabled: true
+
+    - label: "Commission TH and DUT on Thread setup"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Step 1: TH sends ArmFailSafe command to the DUT with
+          ExpiryLengthSeconds set to 900"
+      verification: |
+          ./chip-tool generalcommissioning arm-fail-safe 900 1 22 0
+
+          Via the TH (chip-tool),  Verify the DUT sends ArmFailSafe with timeout as 900 secs to the TH.
+
+          [1657808518.577084][5979:5984] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1657808518.577181][5979:5984] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
+          [1657808518.577311][5979:5984] CHIP:TOO:   ArmFailSafeResponse: {
+          [1657808518.577409][5979:5984] CHIP:TOO:     errorCode: 0
+          [1657808518.577466][5979:5984] CHIP:TOO:     debugText:
+          [1657808518.577518][5979:5984] CHIP:TOO:    }
+          [1657808518.577604][5979:5984] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1657808518.577705][5979:5984] CHIP:EM: Sending Standalone Ack for MessageCounter:240383707 on exchange 56756i
+      disabled: true
+
+    - label:
+          "Step 2: TH reads Networks attribute from the DUT and saves the number
+          of entries as 'NumNetworks'"
+      PICS: CNET.S.A0001
+      verification: |
+          ./chip-tool networkcommissioning read networks 22 0
+
+          Via the TH (chip-tool), Verify:
+          -the Networks attribute has NetworkID that should be as th_xpan(first network id).
+          -that the connected status should be the type of bool value as TRUE.
+
+          [1659623217.387917][9816:9821] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 4196844346
+          [1659623217.388007][9816:9821] CHIP:TOO:   Networks: 1 entries
+          [1659623217.388058][9816:9821] CHIP:TOO:     [1]: {
+          [1659623217.388089][9816:9821] CHIP:TOO:       NetworkID: 1111111122222221
+          [1659623217.388110][9816:9821] CHIP:TOO:       Connected: TRUE
+          [1659623217.388129][9816:9821] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Step 3: TH saves the index of the Networks list entry from step 2 as
+          Userth_netidx"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Step 4: TH sends RemoveNetwork Command to the DUT with NetworkID
+          field set to th_xpan and Breadcrumb field set to 1"
+      PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
+      verification: |
+          ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0 --Breadcrumb 1
+
+          Below is an example:
+
+          ./chip-tool networkcommissioning  remove-network hex:1111111122222221 22 0 --Breadcrumb 1
+
+          Via the TH (chip-tool), Verify the NetworkConfigResponse that contains Networking Status value as 0 (success).
+
+          [1659623277.664477][9824:9831] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
+          [1659623277.664556][9824:9831] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
+          [1659623277.664667][9824:9831] CHIP:TOO:   NetworkConfigResponse: {
+          [1659623277.664758][9824:9831] CHIP:TOO:     networkingStatus: 0
+          [1659623277.664810][9824:9831] CHIP:TOO:     networkIndex: 0
+          [1659623277.664843][9824:9831] CHIP:TOO:    }
+          [1659623277.664907][9824:9831] CHIP:DMG: ICR moving to [AwaitingDe]
+      disabled: true
+
+    - label:
+          "Step 5: TH sends AddOrUpdateThreadNetwork command to the DUT with
+          operational dataset field set to
+          PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET and Breadcrumb field set to 1"
+      PICS: CNET.S.C03.Rsp && CNET.S.C05.Tx
+      verification: |
+          ./chip-tool networkcommissioning add-or-update-thread-network-network hex:<your network id in hex> 1 0 --Breadcrumb 1
+
+          Below is an example:
+
+          ./chip-tool networkcommissioning add-or-update-thread-network hex:0e08000000000001000035060004001fffe00708fdd235604ef7ccb50c0402a0f7f8051000112233445566778899aabbccddeeff030f4f70656e54687265616444656d6f3104101dfb97da1e39dc596e886f52cb870a84000300000f0208111111112222222201021234 22 0 --Breadcrumb 1(second network dataset value)
+
+          Via the TH (chip-tool), Verify the NetworkConfigResponse that contains Networking Status value as 0 (success).
+
+          [1659623353.963125][9870:9875] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
+          [1659623353.963312][9870:9875] CHIP:TOO:   NetworkConfigResponse: {
+          [1659623353.963406][9870:9875] CHIP:TOO:     networkingStatus: 0
+          [1659623353.963473][9870:9875] CHIP:TOO:     networkIndex: 0
+          [1659623353.963530][9870:9875] CHIP:TOO:    }
+          [1659623353.963623][9870:9875] CHIP:DMG: ICR moving to [AwaitingDe]
+      disabled: true
+
+    - label: "Step 6: TH reads Networks attribute from the DUT"
+      PICS: CNET.S.A0001
+      verification: |
+          ./chip-tool networkcommissioning read networks 22 0
+
+          Via the TH (chip-tool), Verify:
+          -the Networks attribute has NetworkID that should be as th_xpan(second network id).
+          -that the connected status should be the type of bool value as FALSE.
+
+          [1659623451.276073][9891:9896] CHIP:TOO:   Networks: 1 entries
+          [1659623451.276194][9891:9896] CHIP:TOO:     [1]: {
+          [1659623451.276268][9891:9896] CHIP:TOO:       NetworkID: 1111111122222222
+          [1659623451.276326][9891:9896] CHIP:TOO:       Connected: FALSE
+          [1659623451.276381][9891:9896] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Step 7: TH sends ConnectNetwork command to the DUT with NetworkID
+          field set to PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET and Breadcrumb
+          field set to 2"
+      PICS: CNET.S.C06.Rsp
+      verification: |
+          ./chip-tool networkcommissioning connect-network hex:<your network id in hex> 1 0 --Breadcrumb 2
+
+          Below is an example:
+
+          ./chip-tool networkcommissioning connect-network hex:1111111122222222 22 0 --Breadcrumb 2
+
+          Via the TH (chip-tool), Verify the ConnectNetworkResponse that contains Networking Status value as 0 (success).
+
+          1 Command=0x0000_0007
+          [1659623520.296630][9903:9908] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0007
+          [1659623520.296853][9903:9908] CHIP:TOO:   ConnectNetworkResponse: {
+          [1659623520.296935][9903:9908] CHIP:TOO:     networkingStatus: 0
+          [1659623520.296987][9903:9908] CHIP:TOO:     errorValue: null
+          [1659623520.297037][9903:9908] CHIP:TOO:    }
+          [1659623520.297124][9903:9908] CHIP:DMG: ICR moving to [AwaitingDe]
+      disabled: true
+
+    - label:
+          "Step 8: TH discovers and connects to DUT on the
+          PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET operational network"
+      verification: |
+          ./chip-tool networkcommissioning read networks 22 0
+
+           Via the TH (chip-tool), Verify:
+           -the Networks attribute has NetworkID that should be as th_xpan(second network id).
+           -that the connected status should be the type of bool value as TRUE.
+
+           [1659623451.276073][9891:9896] CHIP:TOO:   Networks: 1 entries
+           [1659623451.276194][9891:9896] CHIP:TOO:     [1]: {
+           [1659623451.276268][9891:9896] CHIP:TOO:       NetworkID: 1111111122222222
+           [1659623451.276326][9891:9896] CHIP:TOO:       Connected: TRUE
+           [1659623451.276381][9891:9896] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Step 9: TH reads Breadcrumb attribute from the General Commissioning
+          cluster of the DUT"
+      PICS: CNET.S.C06.Rsp
+      verification: |
+          ./chip-tool generalcommissioning read breadcrumb 22 0
+
+          Verify "breadcrumb value is set to 2" on the TH(Chip-tool) Log:
+
+          [1659623558.934419][9911:9917] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0000 DataVersion: 808037534
+          [1659623558.934529][9911:9917] CHIP:TOO:   Breadcrumb: 2
+          [1659623558.934681][9911:9917] CHIP:EM: Sending Standalone Ack for MessageCounter:244248455 on exchange 8477i
+      disabled: true
+
+    - label:
+          "Step 10: TH sends ArmFailSafe command to the DUT with
+          ExpiryLengthSeconds set to 0"
+      verification: |
+          ./chip-tool generalcommissioning arm-fail-safe 0 1 22 0
+
+          Verify "ArmFailSafeResponse" on the TH(Chip-tool) Log:
+
+          [1659623653.222898][9932:9937] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1659623653.223029][9932:9937] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
+          [1659623653.223198][9932:9937] CHIP:TOO:   ArmFailSafeResponse: {
+          [1659623653.223283][9932:9937] CHIP:TOO:     errorCode: 0
+          [1659623653.223347][9932:9937] CHIP:TOO:     debugText:
+          [1659623653.223403][9932:9937] CHIP:TOO:    }
+          [1659623653.223492][9932:9937] CHIP:DMG: ICR moving to [AwaitingDe]
+      disabled: true
+
+    - label:
+          "Step 11: TH ensures it can communicate on
+          PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET"
+      verification: |
+          ./chip-tool networkcommissioning read networks 22 0
+
+          Via the TH (chip-tool), Verify:
+          -the Networks attribute has NetworkID that should be as th_xpan(first network id).
+          -that the connected status should be the type of bool value as TRUE.
+
+          [1659623217.387917][9816:9821] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 4196844346
+          [1659623217.388007][9816:9821] CHIP:TOO:   Networks: 1 entries
+          [1659623217.388058][9816:9821] CHIP:TOO:     [1]: {
+          [1659623217.388089][9816:9821] CHIP:TOO:       NetworkID: 1111111122222221
+          [1659623217.388110][9816:9821] CHIP:TOO:       Connected: TRUE
+          [1659623217.388129][9816:9821] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Step 12: TH discovers and connects to DUT on the
+          PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET operational network"
+      verification: |
+          ./chip-tool networkcommissioning read networks 22 0
+
+          Via the TH (chip-tool), Verify:
+          -the Networks attribute has NetworkID that should be as th_xpan(first network id).
+          -that the connected status should be the type of bool value as TRUE.
+
+          [1659623217.387917][9816:9821] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 4196844346
+          [1659623217.388007][9816:9821] CHIP:TOO:   Networks: 1 entries
+          [1659623217.388058][9816:9821] CHIP:TOO:     [1]: {
+          [1659623217.388089][9816:9821] CHIP:TOO:       NetworkID: 1111111122222221
+          [1659623217.388110][9816:9821] CHIP:TOO:       Connected: TRUE
+          [1659623217.388129][9816:9821] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Step 13: TH sends ArmFailSafe command to the DUT with
+          ExpiryLengthSeconds set to 900"
+      verification: |
+          ./chip-tool generalcommissioning arm-fail-safe 900 1 22 0
+
+          Via the TH (chip-tool),  Verify the DUT sends ArmFailSafe with timeout as 900 secs to the TH.
+
+          [1657808518.577084][5979:5984] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1657808518.577181][5979:5984] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
+          [1657808518.577311][5979:5984] CHIP:TOO:   ArmFailSafeResponse: {
+          [1657808518.577409][5979:5984] CHIP:TOO:     errorCode: 0
+          [1657808518.577466][5979:5984] CHIP:TOO:     debugText:
+          [1657808518.577518][5979:5984] CHIP:TOO:    }
+          [1657808518.577604][5979:5984] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1657808518.577705][5979:5984] CHIP:EM: Sending Standalone Ack for MessageCounter:240383707 on exchange 56756i
+      disabled: true
+
+    - label:
+          "Step 14: TH sends RemoveNetwork Command to the DUT with NetworkID
+          field set to th_xpan and Breadcrumb field set to 1"
+      PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
+      verification: |
+          ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0 --Breadcrumb 1
+
+          Below is an example:
+
+          ./chip-tool networkcommissioning  remove-network hex:1111111122222221 22 0 --Breadcrumb 1
+
+          Via the TH (chip-tool), Verify the NetworkConfigResponse that contains Networking Status value as 0 (success).
+
+          [1659623277.664477][9824:9831] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
+          [1659623277.664556][9824:9831] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
+          [1659623277.664667][9824:9831] CHIP:TOO:   NetworkConfigResponse: {
+          [1659623277.664758][9824:9831] CHIP:TOO:     networkingStatus: 0
+          [1659623277.664810][9824:9831] CHIP:TOO:     networkIndex: 0
+          [1659623277.664843][9824:9831] CHIP:TOO:    }
+          [1659623277.664907][9824:9831] CHIP:DMG: ICR moving to [AwaitingDe]
+      disabled: true
+
+    - label:
+          "Step 15: TH sends AddOrUpdateThreadNetwork command to the DUT with
+          the OperationalDataset field set to
+          PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET and Breadcrumb field set to 1"
+      PICS: CNET.S.C03.Rsp && CNET.S.C05.Tx
+      verification: |
+          ./chip-tool networkcommissioning add-or-update-thread-network-network hex:<your network id in hex> 1 0 --Breadcrumb 1
+
+          Below is an example:
+
+          ./chip-tool networkcommissioning add-or-update-thread-network hex:0e08000000000001000035060004001fffe00708fdd235604ef7ccb50c0402a0f7f8051000112233445566778899aabbccddeeff030f4f70656e54687265616444656d6f3104101dfb97da1e39dc596e886f52cb870a84000300000f0208111111112222222201021234 22 0 --Breadcrumb 1(second network dataset value)
+
+          Via the TH (chip-tool), Verify the NetworkConfigResponse that contains Networking Status value as 0 (success).
+
+          [1659623353.963125][9870:9875] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
+          [1659623353.963312][9870:9875] CHIP:TOO:   NetworkConfigResponse: {
+          [1659623353.963406][9870:9875] CHIP:TOO:     networkingStatus: 0
+          [1659623353.963473][9870:9875] CHIP:TOO:     networkIndex: 0
+          [1659623353.963530][9870:9875] CHIP:TOO:    }
+          [1659623353.963623][9870:9875] CHIP:DMG: ICR moving to [AwaitingDe]
+      disabled: true
+
+    - label:
+          "Step 16: TH sends ConnectNetwork command to the DUT with NetworkID
+          field set to the extended PAN ID of
+          PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET and Breadcrumb field set to 3"
+      PICS: CNET.S.C06.Rsp && CNET.S.C07.Tx
+      verification: |
+          ./chip-tool networkcommissioning connect-network hex:<your network id in hex> 1 0 --Breadcrumb 3
+
+          Below is an example:
+
+          ./chip-tool networkcommissioning connect-network hex:1111111122222222 22 0 --Breadcrumb 3
+
+          Via the TH (chip-tool), Verify the ConnectNetworkResponse that contains Networking Status value as 0 (success).
+
+          1 Command=0x0000_0007
+          [1659623520.296630][9903:9908] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0007
+          [1659623520.296853][9903:9908] CHIP:TOO:   ConnectNetworkResponse: {
+          [1659623520.296935][9903:9908] CHIP:TOO:     networkingStatus: 0
+          [1659623520.296987][9903:9908] CHIP:TOO:     errorValue: null
+          [1659623520.297037][9903:9908] CHIP:TOO:    }
+          [1659623520.297124][9903:9908] CHIP:DMG: ICR moving to [AwaitingDe]
+      disabled: true
+
+    - label:
+          "Step 17: TH discovers and connects to DUT on the
+          PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET operational network"
+      verification: |
+          ./chip-tool networkcommissioning read networks 22 0
+
+          Via the TH (chip-tool), Verify:
+          -the Networks attribute has NetworkID that should be as th_xpan(Second network id).
+          -that the connected status should be the type of bool value as TRUE.
+
+          [1659623217.387917][9816:9821] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 4196844346
+          [1659623217.388007][9816:9821] CHIP:TOO:   Networks: 1 entries
+          [1659623217.388058][9816:9821] CHIP:TOO:     [1]: {
+          [1659623217.388089][9816:9821] CHIP:TOO:       NetworkID: 1111111122222222
+          [1659623217.388110][9816:9821] CHIP:TOO:       Connected: TRUE
+          [1659623217.388129][9816:9821] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Step 18: TH reads Breadcrumb attribute from the General Commissioning
+          cluster of the DUT"
+      PICS: CNET.S.C06.Rsp
+      verification: |
+          ./chip-tool generalcommissioning read breadcrumb 22 0
+
+          Verify "breadcrumb value is set to 3" on the TH(Chip-tool) Log:
+
+          [1659623558.934419][9911:9917] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0000 DataVersion: 808037534
+          [1659623558.934529][9911:9917] CHIP:TOO:   Breadcrumb: 3
+          [1659623558.934681][9911:9917] CHIP:EM: Sending Standalone Ack for MessageCounter:244248455 on exchange 8477i
+      disabled: true
+
+    - label: "Step 19: TH sends the CommissioningComplete command to the DUT"
+      verification: |
+          ./chip-tool generalcommissioning commissioning-complete 22 0
+
+          Via the TH (chip-tool), Verify the DUT sends CommissioningComplete command and the errorCode field is 0(OK).
+
+          [1657734803.411199][7802:7808] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0005
+          [1657734803.411256][7802:7808] CHIP:TOO:   CommissioningCompleteResponse: {
+          [1657734803.411306][7802:7808] CHIP:TOO:     errorCode: 0
+          [1657734803.411333][7802:7808] CHIP:TOO:     debugText:
+          [1657734803.411356][7802:7808] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 20: TH reads Networks attribute from the DUT"
+      PICS: CNET.S.A0001
+      verification: |
+          ./chip-tool networkcommissioning read networks 22 0
+
+          Via the TH (chip-tool), Verify:
+          -the Networks attribute has NetworkID that should be as th_xpan(Second network id).
+          -that the connected status should be the type of bool value as TRUE.
+
+          [1659623217.387917][9816:9821] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 4196844346
+          [1659623217.388007][9816:9821] CHIP:TOO:   Networks: 1 entries
+          [1659623217.388058][9816:9821] CHIP:TOO:     [1]: {
+          [1659623217.388089][9816:9821] CHIP:TOO:       NetworkID: 1111111122222222
+          [1659623217.388110][9816:9821] CHIP:TOO:       Connected: TRUE
+          [1659623217.388129][9816:9821] CHIP:TOO:      }
+      disabled: true

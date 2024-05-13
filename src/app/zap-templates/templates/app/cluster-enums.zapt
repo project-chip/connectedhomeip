@@ -1,42 +1,66 @@
 {{> header}}
 
+#pragma once
+
 #include <stdint.h>
 
-#pragma once
 
 namespace chip {
 namespace app {
 namespace Clusters {
 
-{{#zcl_clusters}}
-namespace {{asUpperCamelCase name}} {
+namespace detail {
+// Enums shared across multiple clusters.
 {{#zcl_enums}}
 
-{{#if (isWeaklyTypedEnum label)}}
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-{{/if}}
-// Enum for {{label}}
-enum class {{asType label}} : {{asUnderlyingZclType type}} {
-{{#zcl_enum_items}}
-k{{asUpperCamelCase label}} = {{asHex value 2}},
-{{/zcl_enum_items}}
-};
-{{#if (isWeaklyTypedEnum label)}}
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using {{asType label}} = EmberAf{{asType label}};
-#endif
+{{#if has_more_than_one_cluster}}
+
+{{> cluster_enums_enum ns=""}}
+
 {{/if}}
 {{/zcl_enums}}
+
+// Bitmaps shared across multiple clusters.
 {{#zcl_bitmaps}}
 
+{{#if has_more_than_one_cluster}}
+
 // Bitmap for {{label}}
-enum class {{asType label}} : {{asUnderlyingZclType type}} {
+enum class {{asType label}} : {{asUnderlyingZclType name}} {
 {{#zcl_bitmap_items}}
 k{{asUpperCamelCase label}} = {{asHex mask}},
 {{/zcl_bitmap_items}}
 };
+
+{{/if}}
+{{/zcl_bitmaps}}
+
+} // namespace detail
+
+
+{{#zcl_clusters}}
+namespace {{asUpperCamelCase name}} {
+{{#zcl_enums}}
+
+{{#if has_more_than_one_cluster}}
+using {{asUpperCamelCase name}} = Clusters::detail::{{asUpperCamelCase name}};
+{{else}}
+{{> cluster_enums_enum ns=(asUpperCamelCase ../name)}}
+
+{{/if}}
+{{/zcl_enums}}
+{{#zcl_bitmaps}}
+
+{{#if has_more_than_one_cluster}}
+using {{asUpperCamelCase name}} = Clusters::detail::{{asUpperCamelCase name}};
+{{else}}
+// Bitmap for {{label}}
+enum class {{asType label}} : {{asUnderlyingZclType name}} {
+{{#zcl_bitmap_items}}
+k{{asUpperCamelCase label}} = {{asHex mask}},
+{{/zcl_bitmap_items}}
+};
+{{/if}}
 {{/zcl_bitmaps}}
 } // namespace {{asUpperCamelCase name}}
 
@@ -44,3 +68,6 @@ k{{asUpperCamelCase label}} = {{asHex mask}},
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+// Included at the end, so all our definitions above are available.
+#include <app/common/CompatEnumNames.h>

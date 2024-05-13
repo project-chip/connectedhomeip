@@ -19,9 +19,9 @@
 
 #include <inet/tests/TestInetCommon.h>
 
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <platform/CHIPDeviceLayer.h>
 
 namespace chip {
@@ -30,29 +30,27 @@ namespace Test {
 CHIP_ERROR IOContext::Init()
 {
     CHIP_ERROR err = Platform::MemoryInit();
-    chip::DeviceLayer::SetConfigurationMgr(&chip::DeviceLayer::ConfigurationManagerImpl::GetDefaultInstance());
+    chip::DeviceLayer::SetConfigurationMgr(&chip::DeviceLayer::ConfigurationMgrImpl());
 
-    gSystemLayer.Init();
-
+    InitSystemLayer();
     InitNetwork();
 
-    mSystemLayer        = &gSystemLayer;
+    mSystemLayer = &gSystemLayer;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     mTCPEndPointManager = &gTCP;
+#endif
+#if INET_CONFIG_ENABLE_UDP_ENDPOINT
     mUDPEndPointManager = &gUDP;
-
+#endif
     return err;
 }
 
 // Shutdown all layers, finalize operations
-CHIP_ERROR IOContext::Shutdown()
+void IOContext::Shutdown()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     ShutdownNetwork();
     ShutdownSystemLayer();
     Platform::MemoryShutdown();
-
-    return err;
 }
 
 void IOContext::DriveIO()

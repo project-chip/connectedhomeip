@@ -13,16 +13,51 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlio.gni")
-
 import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/src/lib/core/core.gni")
+import("${chip_root}/src/platform/device.gni")
 import("common_flags.gni")
+import("icd/icd.gni")
 
 declare_args() {
   # Enable strict schema checks.
-  chip_enable_schema_check =
-      is_debug && (current_os == "linux" || current_os == "mac")
+  enable_im_pretty_print =
+      is_debug && (current_os == "linux" || current_os == "mac" ||
+                   current_os == "ios" || current_os == "android")
+
+  # Logging verbosity control for Access Control implementation
+  #
+  # If set to > 0, it is desired to get additional logging on all
+  # access control checks for better debugging ability.
+  #
+  # If set to > 1, it is desired to log every single check
+  chip_access_control_policy_logging_verbosity = 0
+  if (is_debug && (current_os == "linux" || current_os == "mac")) {
+    chip_access_control_policy_logging_verbosity = 2
+  }
+
   chip_enable_session_resumption = true
+
+  # By default, the resources used by each fabric is unlimited if they are allocated on heap. This flag is for checking the resource usage even when they are allocated on heap to increase code coverage in integration tests.
+  chip_im_force_fabric_quota_check = false
+
+  enable_eventlist_attribute = false
+
+  # Allow building ota-requestor-app with a non-spec-compliant floor
+  # (i.e. smaller than 2 minutes) for action delays.
+  non_spec_compliant_ota_action_delay_floor = -1
+
+  # enable time sync client for use in `time-synchronization-server` (if linked)
+  # TODO: this should probably be migrated to be time-synchronization-server specific
+  #       if the cluster build targets are decoupled as stand-alone units.
+  time_sync_enable_tsc_feature = 1
+
+  # Systems that can spare a bit of RAM for InteractionModelEngine/delegate
+  # pointers should do so (allows InteractionModelEngine decoupling and less usage
+  # of global pointers)
+  chip_im_static_global_interaction_model_engine =
+      current_os != "linux" && current_os != "mac" && current_os != "ios" &&
+      current_os != "android"
 }
 
 buildconfig_header("app_buildconfig") {
@@ -30,144 +65,313 @@ buildconfig_header("app_buildconfig") {
   header_dir = "app"
 
   defines = [
-    "CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK=${chip_enable_schema_check}",
+    "CHIP_CONFIG_IM_PRETTY_PRINT=${enable_im_pretty_print}",
+    "CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK=${chip_im_force_fabric_quota_check}",
     "CHIP_CONFIG_ENABLE_SESSION_RESUMPTION=${chip_enable_session_resumption}",
+    "CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY=${chip_access_control_policy_logging_verbosity}",
+    "CHIP_CONFIG_PERSIST_SUBSCRIPTIONS=${chip_persist_subscriptions}",
+    "CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION=${chip_subscription_timeout_resumption}",
+    "CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE=${enable_eventlist_attribute}",
+    "CHIP_CONFIG_ENABLE_READ_CLIENT=${chip_enable_read_client}",
+    "CHIP_CONFIG_STATIC_GLOBAL_INTERACTION_MODEL_ENGINE=${chip_im_static_global_interaction_model_engine}",
+    "TIME_SYNC_ENABLE_TSC_FEATURE=${time_sync_enable_tsc_feature}",
+    "NON_SPEC_COMPLIANT_OTA_ACTION_DELAY_FLOOR=${non_spec_compliant_ota_action_delay_floor}",
+    "CHIP_DEVICE_CONFIG_DYNAMIC_SERVER=${chip_build_controller_dynamic_server}",
+    "CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP=${chip_enable_busy_handling_for_operational_session_setup}",
+  ]
+
+  visibility = [ ":app_config" ]
+}
+
+source_set("app_config") {
+  sources = [ "AppConfig.h" ]
+
+  deps = [ ":app_buildconfig" ]
+}
+
+source_set("paths") {
+  sources = [
+    "AttributePathParams.h",
+    "CommandPathParams.h",
+    "CommandPathRegistry.h",
+    "ConcreteAttributePath.h",
+    "ConcreteClusterPath.h",
+    "ConcreteCommandPath.h",
+    "ConcreteEventPath.h",
+    "DataVersionFilter.h",
+    "EventPathParams.h",
+  ]
+
+  # This source sets also depends on basic-types.h that is not in any dependency we can use
+  public_deps = [
+    ":app_config",
+    "${chip_root}/src/app/util:types",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:types",
   ]
 }
 
-static_library("app") {
-  output_name = "libCHIPDataModel"
+source_set("global-attributes") {
+  sources = [ "GlobalAttributes.h" ]
 
+  # This also depends on zap-generated code which is currently impossible to split out
+  # as a dependency
+  public_deps = [
+    ":app_config",
+    "${chip_root}/src/app/common:ids",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
+source_set("subscription-info-provider") {
+  sources = [ "SubscriptionsInfoProvider.h" ]
+
+  public_deps = [ "${chip_root}/src/lib/core" ]
+}
+
+config("config-controller-dynamic-server") {
+  defines = [
+    "CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
+    "CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT=1",
+  ]
+}
+
+source_set("constants") {
   sources = [
-    "AttributeAccessInterface.cpp",
-    "AttributeCache.cpp",
-    "AttributeCache.h",
-    "AttributePathExpandIterator.cpp",
-    "AttributePathExpandIterator.h",
-    "AttributePathParams.h",
-    "AttributePersistenceProvider.h",
-    "BufferedReadCallback.cpp",
+    "InteractionModelTimeout.h",
+    "SpecificationDefinedRevisions.h",
+  ]
+  public_deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/system",
+  ]
+}
+
+source_set("test-event-trigger") {
+  sources = [ "TestEventTriggerDelegate.h" ]
+}
+
+# interaction-model is a static-library because it currently requires global functions (app/util/...) that are stubbed in different test files that depend on the app static_library
+# which in tern depens on the interaction-model.
+# Using source_set prevents the unit test to build correctly.
+static_library("interaction-model") {
+  sources = [
     "CASEClient.cpp",
     "CASEClient.h",
     "CASEClientPool.h",
     "CASESessionManager.cpp",
     "CASESessionManager.h",
-    "ChunkedWriteCallback.cpp",
-    "ChunkedWriteCallback.h",
-    "CommandHandler.cpp",
-    "CommandResponseHelper.h",
     "CommandSender.cpp",
-    "DefaultAttributePersistenceProvider.cpp",
+    "CommandSender.h",
     "DeviceProxy.cpp",
     "DeviceProxy.h",
-    "EventManagement.cpp",
-    "EventPathParams.h",
-    "GlobalAttributes.h",
+    "InteractionModelDelegatePointers.cpp",
+    "InteractionModelDelegatePointers.h",
     "InteractionModelEngine.cpp",
-    "InteractionModelRevision.h",
-    "InteractionModelTimeout.h",
-    "MessageDef/ArrayBuilder.cpp",
-    "MessageDef/ArrayParser.cpp",
-    "MessageDef/AttributeDataIB.cpp",
-    "MessageDef/AttributeDataIB.h",
-    "MessageDef/AttributeDataIBs.cpp",
-    "MessageDef/AttributeDataIBs.h",
-    "MessageDef/AttributePathIB.cpp",
-    "MessageDef/AttributePathIB.h",
-    "MessageDef/AttributePathIBs.cpp",
-    "MessageDef/AttributePathIBs.h",
-    "MessageDef/AttributeReportIB.cpp",
-    "MessageDef/AttributeReportIB.h",
-    "MessageDef/AttributeReportIBs.cpp",
-    "MessageDef/AttributeReportIBs.h",
-    "MessageDef/AttributeStatusIB.cpp",
-    "MessageDef/AttributeStatusIB.h",
-    "MessageDef/AttributeStatusIBs.cpp",
-    "MessageDef/AttributeStatusIBs.h",
-    "MessageDef/Builder.cpp",
-    "MessageDef/Builder.h",
-    "MessageDef/ClusterPathIB.cpp",
-    "MessageDef/ClusterPathIB.h",
-    "MessageDef/CommandDataIB.cpp",
-    "MessageDef/CommandPathIB.cpp",
-    "MessageDef/CommandStatusIB.cpp",
-    "MessageDef/DataVersionFilterIB.cpp",
-    "MessageDef/DataVersionFilterIB.h",
-    "MessageDef/DataVersionFilterIBs.cpp",
-    "MessageDef/DataVersionFilterIBs.h",
-    "MessageDef/EventDataIB.cpp",
-    "MessageDef/EventDataIB.h",
-    "MessageDef/EventFilterIB.cpp",
-    "MessageDef/EventFilterIBs.cpp",
-    "MessageDef/EventPathIB.cpp",
-    "MessageDef/EventPathIB.h",
-    "MessageDef/EventPathIBs.cpp",
-    "MessageDef/EventPathIBs.h",
-    "MessageDef/EventReportIB.cpp",
-    "MessageDef/EventReportIB.h",
-    "MessageDef/EventReportIBs.cpp",
-    "MessageDef/EventReportIBs.h",
-    "MessageDef/EventStatusIB.cpp",
-    "MessageDef/EventStatusIB.h",
-    "MessageDef/InvokeRequestMessage.cpp",
-    "MessageDef/InvokeRequests.cpp",
-    "MessageDef/InvokeResponseIB.cpp",
-    "MessageDef/InvokeResponseIBs.cpp",
-    "MessageDef/InvokeResponseMessage.cpp",
-    "MessageDef/ListBuilder.cpp",
-    "MessageDef/ListParser.cpp",
-    "MessageDef/MessageBuilder.cpp",
-    "MessageDef/MessageBuilder.h",
-    "MessageDef/MessageDefHelper.cpp",
-    "MessageDef/MessageDefHelper.h",
-    "MessageDef/MessageParser.cpp",
-    "MessageDef/MessageParser.h",
-    "MessageDef/Parser.cpp",
-    "MessageDef/Parser.h",
-    "MessageDef/ReadRequestMessage.cpp",
-    "MessageDef/ReadRequestMessage.h",
-    "MessageDef/ReportDataMessage.cpp",
-    "MessageDef/ReportDataMessage.h",
-    "MessageDef/StatusIB.cpp",
-    "MessageDef/StatusIB.h",
-    "MessageDef/StatusResponseMessage.cpp",
-    "MessageDef/StructBuilder.cpp",
-    "MessageDef/StructParser.cpp",
-    "MessageDef/SubscribeRequestMessage.cpp",
-    "MessageDef/SubscribeResponseMessage.cpp",
-    "MessageDef/TimedRequestMessage.cpp",
-    "MessageDef/WriteRequestMessage.cpp",
-    "MessageDef/WriteResponseMessage.cpp",
-    "OTAUserConsentCommon.h",
-    "OperationalDeviceProxy.cpp",
-    "OperationalDeviceProxy.h",
-    "OperationalDeviceProxyPool.h",
-    "ReadClient.cpp",
-    "ReadHandler.cpp",
-    "RequiredPrivilege.cpp",
+    "InteractionModelEngine.h",
+    "InteractionModelHelper.h",
+    "OperationalSessionSetup.cpp",
+    "OperationalSessionSetup.h",
+    "OperationalSessionSetupPool.h",
+    "PendingResponseTracker.h",
+    "PendingResponseTrackerImpl.cpp",
+    "PendingResponseTrackerImpl.h",
+    "ReadClient.h",  # TODO: cpp is only included conditionally. Needs logic
+                     # fixing
+    "ReadPrepareParams.h",
     "RequiredPrivilege.h",
     "StatusResponse.cpp",
     "StatusResponse.h",
+    "SubscriptionResumptionStorage.h",
     "TimedHandler.cpp",
     "TimedHandler.h",
     "TimedRequest.cpp",
     "TimedRequest.h",
     "WriteClient.cpp",
-    "WriteHandler.cpp",
+    "WriteClient.h",
     "reporting/Engine.cpp",
     "reporting/Engine.h",
+    "reporting/ReportScheduler.h",
+    "reporting/ReportSchedulerImpl.cpp",
+    "reporting/ReportSchedulerImpl.h",
+    "reporting/SynchronizedReportSchedulerImpl.cpp",
+    "reporting/SynchronizedReportSchedulerImpl.h",
+
+    # TODO: reporting header is part of interaction-model, however actual implementation depends
+    #       on generated code as subscriptions depend on attribute data versioning to determine
+    #       when "data changed" reports should be sent.
+    #
+    #       This breaks having `.h` and `.cpp` based off the same compilation unit and
+    #       should ideally be cleaned up.
+    "reporting/reporting.h",
+  ]
+
+  deps = [ "${chip_root}/src/app:events" ]
+
+  public_deps = [
+    ":app_config",
+    ":constants",
+    ":paths",
+    ":subscription-info-provider",
+    "${chip_root}/src/app/MessageDef",
+    "${chip_root}/src/app/icd/server:icd-server-config",
+    "${chip_root}/src/app/icd/server:manager",
+    "${chip_root}/src/app/icd/server:observer",
+    "${chip_root}/src/app/util:af-types",
+    "${chip_root}/src/app/util:callbacks",
+    "${chip_root}/src/lib/address_resolve",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:static-support",
+    "${chip_root}/src/protocols/interaction_model",
+    "${chip_root}/src/protocols/secure_channel",
+    "${chip_root}/src/system",
+  ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
+
+  if (chip_enable_read_client) {
+    sources += [ "ReadClient.cpp" ]
+  }
+
+  if (chip_persist_subscriptions) {
+    sources += [
+      "SimpleSubscriptionResumptionStorage.cpp",
+      "SimpleSubscriptionResumptionStorage.h",
+      "SubscriptionResumptionSessionEstablisher.cpp",
+      "SubscriptionResumptionSessionEstablisher.h",
+    ]
+  }
+
+  if (chip_build_controller_dynamic_server) {
+    sources += [
+      "clusters/ota-provider/ota-provider.cpp",
+      "dynamic_server/AccessControl.cpp",
+      "dynamic_server/AccessControl.h",
+      "dynamic_server/DynamicDispatcher.cpp",
+      "util/privilege-storage.cpp",
+      "util/privilege-storage.h",
+    ]
+
+    public_deps += [
+      ":global-attributes",
+      "${chip_root}/src/access",
+      "${chip_root}/src/app/dynamic_server:mock-codegen-includes",
+    ]
+
+    public_configs += [ ":config-controller-dynamic-server" ]
+  }
+}
+
+source_set("events") {
+  sources = [
+    "EventHeader.h",
+    "EventLoggingDelegate.h",
+    "EventLoggingTypes.h",
+  ]
+
+  deps = [
+    ":paths",
+    "${chip_root}/src/access:types",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
+static_library("attribute-access") {
+  sources = [
+    "AttributeAccessInterface.h",
+    "AttributeAccessInterfaceCache.h",
+    "AttributeAccessInterfaceRegistry.cpp",
+    "AttributeAccessInterfaceRegistry.h",
+    "AttributeEncodeState.h",
+    "AttributeReportBuilder.cpp",
+    "AttributeReportBuilder.h",
+    "AttributeValueDecoder.h",
+    "AttributeValueEncoder.cpp",
+    "AttributeValueEncoder.h",
+  ]
+
+  deps = [
+    ":paths",
+    "${chip_root}/src/access:types",
+    "${chip_root}/src/app/MessageDef",
+    "${chip_root}/src/app/data-model",
+    "${chip_root}/src/app/util:af-types",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
+# Note to developpers, instead of continuously adding files in the app librabry, it is recommand to create smaller source_sets that app can depend on.
+# This way, we can have a better understanding of dependencies and other componenets can depend on the different source_sets without needing to depend on the entire app library.
+static_library("app") {
+  output_name = "libCHIPDataModel"
+
+  sources = [
+    "AttributePathExpandIterator.cpp",
+    "AttributePathExpandIterator.h",
+    "AttributePersistenceProvider.h",
+    "ChunkedWriteCallback.cpp",
+    "ChunkedWriteCallback.h",
+    "CommandHandler.cpp",
+    "CommandHandlerExchangeInterface.h",
+    "CommandResponseHelper.h",
+    "CommandResponseSender.cpp",
+    "DefaultAttributePersistenceProvider.cpp",
+    "DefaultAttributePersistenceProvider.h",
+    "DeferredAttributePersistenceProvider.cpp",
+    "DeferredAttributePersistenceProvider.h",
+    "EventLogging.h",
+    "EventManagement.cpp",
+    "EventManagement.h",
+    "FailSafeContext.cpp",
+    "FailSafeContext.h",
+    "OTAUserConsentCommon.h",
+    "ReadHandler.cpp",
+    "SafeAttributePersistenceProvider.h",
+    "TimerDelegates.cpp",
+    "TimerDelegates.h",
+    "WriteHandler.cpp",
+
+    # TODO: the following items cannot be included due to interaction-model circularity
+    #       (app depending on im and im including these headers):
+    #       Name with _ so that linter does not recognize it
+    # "CommandResponseSender._h"
+    # "CommandHandler._h"
+    # "ReadHandler._h",
+    # "WriteHandler._h"
   ]
 
   public_deps = [
-    ":app_buildconfig",
-    "${chip_root}/src/access",
+    ":app_config",
+    ":attribute-access",
+    ":constants",
+    ":global-attributes",
+    ":interaction-model",
+    "${chip_root}/src/app/data-model",
+    "${chip_root}/src/app/icd/server:icd-server-config",
+    "${chip_root}/src/app/util:callbacks",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
-    "${chip_root}/src/protocols/secure_channel",
+    "${chip_root}/src/protocols/interaction_model",
     "${chip_root}/src/system",
-    "${nlio_root}:nlio",
   ]
+
+  if (chip_enable_read_client) {
+    sources += [
+      "BufferedReadCallback.cpp",
+      "BufferedReadCallback.h",
+      "ClusterStateCache.cpp",
+      "ClusterStateCache.h",
+    ]
+  }
+
+  if (chip_enable_icd_server) {
+    public_deps += [
+      "${chip_root}/src/app/icd/server:manager",
+      "${chip_root}/src/app/icd/server:notifier",
+    ]
+  }
 
   cflags = [ "-Wconversion" ]
 

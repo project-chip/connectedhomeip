@@ -1,0 +1,77 @@
+name: Bootstrap
+description: Bootstrap
+inputs:
+  platform:
+    description: "Platform name"
+    required: false
+    default: none
+  bootstrap-log-name:
+    description: "Bootstrap log name"
+    required: false
+    default: bootstrap-logs-${{ github.job }}
+outputs:
+  cache-hit:
+    description: "Bootstrap environment was restored from cache"
+    value: ${{ fromJSON(steps.restore.outputs.outputs).cache-hit }} # dynamic action returns all outputs in `outputs`
+
+runs:
+  using: "composite"
+  steps:
+    - name: Determine bootstrap cache configuration
+      id: prepare
+      shell: bash
+      run: |
+        # Determine bootstrap cache configuration
+        # In addition to the various setup files, the work directory matters as well,
+        # because the bootstrapped Pigweed environment contains absolute paths.
+        echo "Calculating bootstrap cache key for '$PWD'"
+        FILES_HASH="${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}"
+        FINAL_HASH="$(echo "$PWD:$FILES_HASH" | shasum -a 256 | cut -d' ' -f1)"
+        echo key="${RUNNER_OS}-${RUNNER_ARCH}-${{ inputs.platform }}-${FINAL_HASH}" | tee -a "$GITHUB_OUTPUT"
+
+        # Split caches across backends
+        case "$RUNNER_OS" in
+          macOS) echo backend=actions;;
+          *)     echo backend=buildjet;;
+        esac | tee -a "$GITHUB_OUTPUT"
+
+    - name: Bootstrap from cache
+      id: restore
+      uses: ./.github/actions/dynamic
+      continue-on-error: true
+      with:
+        action: ${{ steps.prepare.outputs.backend }}/cache/restore@v4
+        with: |
+          key: ${{ steps.prepare.outputs.key }}
+          path: |
+            .environment
+            build_overrides/pigweed_environment.gni
+
+    - name: Run bootstrap
+      if: ${{ fromJSON(steps.restore.outputs.outputs).cache-hit != 'true' }}
+      env:
+        PW_NO_CIPD_CACHE_DIR: 1
+        PW_ENVSETUP_NO_BANNER: 1
+      shell: bash
+      run: source scripts/bootstrap.sh -p all,${{ inputs.platform }}
+
+    - name: Save bootstrap cache
+      uses: ./.github/actions/dynamic
+      if: ${{ fromJSON(steps.restore.outputs.outputs).cache-hit != 'true' }}
+      continue-on-error: true
+      with:
+        action: ${{ steps.prepare.outputs.backend }}/cache/save@v4
+        with: |
+          key: ${{ steps.prepare.outputs.key }}
+          path: |
+            .environment
+            build_overrides/pigweed_environment.gni
+
+    - name: Upload bootstrap logs
+      uses: actions/upload-artifact@v4
+      if: ${{ always() && !env.ACT && fromJSON(steps.restore.outputs.outputs).cache-hit != 'true' }}
+      with:
+        name: ${{ inputs.bootstrap-log-name }}
+        path: |
+            .environment/gn_out/.ninja_log
+            .environment/pigweed-venv/*.log

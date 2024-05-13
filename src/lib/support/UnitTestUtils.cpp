@@ -18,7 +18,7 @@
 #include <lib/support/UnitTestUtils.h>
 
 // Platform specific includes for test_utils
-#include <platform/CHIPDeviceBuildConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 #if CHIP_DEVICE_LAYER_TARGET_EFR32 || CHIP_DEVICE_LAYER_TARGET_AMEBA
 #include <FreeRTOS.h>
 #include <task.h>

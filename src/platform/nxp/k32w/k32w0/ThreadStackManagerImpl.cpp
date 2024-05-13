@@ -31,10 +31,14 @@
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 
-#include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.cpp>
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.cpp>
+#include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.hpp>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
 
 #include <lib/support/CHIPPlatformMemory.h>
+
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
+extern "C" bool isThreadInitialized();
+#endif
 
 namespace chip {
 namespace DeviceLayer {
@@ -55,11 +59,29 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
     // Initialize the generic implementation base classes.
     err = GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit();
     SuccessOrExit(err);
-    err = GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>::DoInit(otInst);
+    err = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(otInst);
     SuccessOrExit(err);
 
 exit:
     return err;
+}
+
+void ThreadStackManagerImpl::ProcessThreadActivity()
+{
+    /* reuse thread task for ble processing.
+     * by doing this, we avoid allocating a new stack for short-lived
+     * BLE processing (e.g.: only during Matter commissioning)
+     */
+    auto * bleManager = &chip::DeviceLayer::Internal::BLEMgrImpl();
+    bleManager->DoBleProcessing();
+
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
+    if (isThreadInitialized())
+#endif
+    {
+        otTaskletsProcess(OTInstance());
+        otSysProcessDrivers(OTInstance());
+    }
 }
 
 bool ThreadStackManagerImpl::IsInitialized()
@@ -83,7 +105,7 @@ extern "C" void otTaskletsSignalPending(otInstance * p_instance)
 
 extern "C" void * pvPortCallocRtos(size_t num, size_t size)
 {
-    size_t totalAllocSize = (size_t)(num * size);
+    size_t totalAllocSize = (size_t) (num * size);
 
     if (size && totalAllocSize / size != num)
         return nullptr;
@@ -106,4 +128,9 @@ extern "C" void * otPlatCAlloc(size_t aNum, size_t aSize)
 extern "C" void otPlatFree(void * aPtr)
 {
     return CHIPPlatformMemoryFree(aPtr);
+}
+
+extern "C" void * otPlatRealloc(void * p, size_t aSize)
+{
+    return CHIPPlatformMemoryRealloc(p, aSize);
 }

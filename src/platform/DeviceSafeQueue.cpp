@@ -40,7 +40,7 @@ bool DeviceSafeQueue::Empty()
     return mEventQueue.empty();
 }
 
-const ChipDeviceEvent DeviceSafeQueue::PopFront()
+ChipDeviceEvent DeviceSafeQueue::PopFront()
 {
     std::unique_lock<std::mutex> lock(mEventQueueLock);
 

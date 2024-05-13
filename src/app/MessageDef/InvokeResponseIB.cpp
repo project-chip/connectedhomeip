@@ -21,15 +21,14 @@
 #include "InvokeResponseIB.h"
 #include "MessageDefHelper.h"
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 
 namespace chip {
 namespace app {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR InvokeResponseIB::Parser::CheckSchemaValidity() const
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+CHIP_ERROR InvokeResponseIB::Parser::PrettyPrint() const
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    int TagPresenceMask = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("InvokeResponseIB =");
@@ -40,36 +39,31 @@ CHIP_ERROR InvokeResponseIB::Parser::CheckSchemaValidity() const
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         uint32_t tagNum = TLV::TagNumFromTag(reader.GetTag());
         switch (tagNum)
         {
-        case to_underlying(Tag::kCommand):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kCommand))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kCommand));
-            {
-                CommandDataIB::Parser command;
-                ReturnErrorOnFailure(command.Init(reader));
+        case to_underlying(Tag::kCommand): {
+            CommandDataIB::Parser command;
+            ReturnErrorOnFailure(command.Init(reader));
 
-                PRETTY_PRINT_INCDEPTH();
-                ReturnErrorOnFailure(command.CheckSchemaValidity());
-                PRETTY_PRINT_DECDEPTH();
-            }
-            break;
-        case to_underlying(Tag::kStatus):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kStatus))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kStatus));
-            {
-                CommandStatusIB::Parser status;
-                ReturnErrorOnFailure(status.Init(reader));
+            PRETTY_PRINT_INCDEPTH();
+            ReturnErrorOnFailure(command.PrettyPrint());
+            PRETTY_PRINT_DECDEPTH();
+        }
+        break;
+        case to_underlying(Tag::kStatus): {
+            CommandStatusIB::Parser status;
+            ReturnErrorOnFailure(status.Init(reader));
 
-                PRETTY_PRINT_INCDEPTH();
-                ReturnErrorOnFailure(status.CheckSchemaValidity());
-                PRETTY_PRINT_DECDEPTH();
-            }
-            break;
+            PRETTY_PRINT_INCDEPTH();
+            ReturnErrorOnFailure(status.PrettyPrint());
+            PRETTY_PRINT_DECDEPTH();
+        }
+        break;
         default:
             PRETTY_PRINT("Unknown tag num %" PRIu32, tagNum);
             break;
@@ -77,51 +71,30 @@ CHIP_ERROR InvokeResponseIB::Parser::CheckSchemaValidity() const
     }
 
     PRETTY_PRINT("},");
-    PRETTY_PRINT("");
+    PRETTY_PRINT_BLANK_LINE();
 
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
-        // check for at most field:
-        const int CheckCommandField = 1 << to_underlying(Tag::kCommand);
-        const int CheckStatusField  = (1 << to_underlying(Tag::kStatus));
-
-        if ((TagPresenceMask & CheckCommandField) == CheckCommandField && (TagPresenceMask & CheckStatusField) == CheckStatusField)
-        {
-            // kPath and kErrorStatus both exist
-            err = CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_IB;
-        }
-        else if ((TagPresenceMask & CheckCommandField) != CheckCommandField &&
-                 (TagPresenceMask & CheckStatusField) != CheckStatusField)
-        {
-            // kPath and kErrorStatus not exist
-            err = CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_IB;
-        }
-        else
-        {
-            err = CHIP_NO_ERROR;
-        }
+        err = CHIP_NO_ERROR;
     }
     ReturnErrorOnFailure(err);
-    ReturnErrorOnFailure(reader.ExitContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
+    return reader.ExitContainer(mOuterContainerType);
 }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
 CHIP_ERROR InvokeResponseIB::Parser::GetCommand(CommandDataIB::Parser * const apCommand) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kCommand)), reader));
-    ReturnErrorOnFailure(apCommand->Init(reader));
-    return CHIP_NO_ERROR;
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kCommand), reader));
+    return apCommand->Init(reader);
 }
 
 CHIP_ERROR InvokeResponseIB::Parser::GetStatus(CommandStatusIB::Parser * const apStatus) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kStatus)), reader));
-    ReturnErrorOnFailure(apStatus->Init(reader));
-    return CHIP_NO_ERROR;
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kStatus), reader));
+    return apStatus->Init(reader);
 }
 
 CommandDataIB::Builder & InvokeResponseIB::Builder::CreateCommand()
@@ -142,10 +115,10 @@ CommandStatusIB::Builder & InvokeResponseIB::Builder::CreateStatus()
     return mStatus;
 }
 
-InvokeResponseIB::Builder & InvokeResponseIB::Builder::EndOfInvokeResponseIB()
+CHIP_ERROR InvokeResponseIB::Builder::EndOfInvokeResponseIB()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip

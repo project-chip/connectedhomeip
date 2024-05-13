@@ -16,9 +16,10 @@
  *    limitations under the License.
  */
 
+#include <gtest/gtest.h>
+
 #include <lib/support/StateMachine.h>
-#include <lib/support/UnitTestRegistration.h>
-#include <nlunit-test.h>
+#include <lib/support/Variant.h>
 
 namespace {
 
@@ -64,28 +65,31 @@ struct BaseState
     void LogTransition(const char * previous) { mMock.LogTransition(previous); }
     const char * GetName() { return mName; }
 
-    chip::StateMachine::Context<Event> & mCtx;
+    Context * mCtx;
     const char * mName;
     MockState & mMock;
 };
 
 struct State1 : public BaseState
 {
-    State1(Context & ctx, MockState & mock) : BaseState{ ctx, "State1", mock } {}
+    State1(Context * ctx, MockState & mock) : BaseState{ ctx, "State1", mock } {}
 };
 
 struct State2 : public BaseState
 {
-    State2(Context & ctx, MockState & mock) : BaseState{ ctx, "State2", mock } {}
+    State2(Context * ctx, MockState & mock) : BaseState{ ctx, "State2", mock } {}
 };
 
 struct State3 : public BaseState
 {
-    State3(Context & ctx, MockState & mock) : BaseState{ ctx, "State3", mock } {}
+    State3(Context * ctx, MockState & mock) : BaseState{ ctx, "State3", mock } {}
     void Enter()
     {
         BaseState::Enter();
-        this->mCtx.Dispatch(Event::Create<Event5>());
+        if (this->mCtx)
+        {
+            this->mCtx->Dispatch(Event::Create<Event5>());
+        }
     }
 };
 
@@ -95,12 +99,12 @@ using State = chip::StateMachine::VariantState<State3, State2, State1>;
 
 struct StateFactory
 {
-    Context & mCtx;
+    Context * mCtx;
     MockState ms1{ 0, 0, 0, nullptr };
     MockState ms2{ 0, 0, 0, nullptr };
     MockState ms3{ 0, 0, 0, nullptr };
 
-    StateFactory(Context & ctx) : mCtx(ctx) {}
+    StateFactory(Context * ctx) : mCtx(ctx) {}
 
     auto CreateState1() { return State::Create<State1>(mCtx, ms1); }
     auto CreateState2() { return State::Create<State2>(mCtx, ms2); }
@@ -109,9 +113,9 @@ struct StateFactory
 
 struct Transitions
 {
-    Context & mCtx;
+    Context * mCtx;
     StateFactory mFactory;
-    Transitions(Context & ctx) : mCtx(ctx), mFactory(ctx) {}
+    Transitions(Context * ctx) : mCtx(ctx), mFactory(ctx) {}
 
     using OptState = chip::StateMachine::Optional<State>;
     State GetInitState() { return mFactory.CreateState1(); }
@@ -128,7 +132,10 @@ struct Transitions
         if (state.Is<State1>() && event.Is<Event4>())
         {
             // legal - Dispatches event without transition
-            mCtx.Dispatch(Event::Create<Event2>());
+            if (mCtx)
+            {
+                mCtx->Dispatch(Event::Create<Event2>());
+            }
             return {};
         }
         if (state.Is<State2>() && event.Is<Event4>())
@@ -155,71 +162,71 @@ public:
     Transitions mTransitions;
     chip::StateMachine::StateMachine<State, Event, Transitions> mStateMachine;
 
-    SimpleStateMachine() : mTransitions(mStateMachine), mStateMachine(mTransitions) {}
+    SimpleStateMachine() : mTransitions(&mStateMachine), mStateMachine(mTransitions) {}
     ~SimpleStateMachine() {}
 };
 
-void TestInit(nlTestSuite * inSuite, void * inContext)
+TEST(TestStateMachine, TestInit)
 {
     // state machine initializes to State1
     SimpleStateMachine fsm;
-    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.GetState().Is<State1>());
+    EXPECT_TRUE(fsm.mStateMachine.GetState().Is<State1>());
 }
 
-void TestIgnoredEvents(nlTestSuite * inSuite, void * inContext)
+TEST(TestStateMachine, TestIgnoredEvents)
 {
     // in State1 - ignore Event1 and Event3
     SimpleStateMachine fsm;
     fsm.mStateMachine.Dispatch(Event::Create<Event1>());
-    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.GetState().Is<State1>());
+    EXPECT_TRUE(fsm.mStateMachine.GetState().Is<State1>());
     fsm.mStateMachine.Dispatch(Event::Create<Event3>());
-    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.GetState().Is<State1>());
+    EXPECT_TRUE(fsm.mStateMachine.GetState().Is<State1>());
     // transition to State2
     fsm.mStateMachine.Dispatch(Event::Create<Event2>());
-    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.GetState().Is<State2>());
+    EXPECT_TRUE(fsm.mStateMachine.GetState().Is<State2>());
     // in State2 - ignore Event2 and Event3
     fsm.mStateMachine.Dispatch(Event::Create<Event2>());
-    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.GetState().Is<State2>());
+    EXPECT_TRUE(fsm.mStateMachine.GetState().Is<State2>());
     fsm.mStateMachine.Dispatch(Event::Create<Event3>());
-    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.GetState().Is<State2>());
+    EXPECT_TRUE(fsm.mStateMachine.GetState().Is<State2>());
 }
 
-void TestTransitions(nlTestSuite * inSuite, void * inContext)
+TEST(TestStateMachine, TestTransitions)
 {
     // in State1
     SimpleStateMachine fsm;
     // dispatch Event2 to transition to State2
     fsm.mStateMachine.Dispatch(Event::Create<Event2>());
-    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.GetState().Is<State2>());
+    EXPECT_TRUE(fsm.mStateMachine.GetState().Is<State2>());
     // dispatch Event1 to transition back to State1
     fsm.mStateMachine.Dispatch(Event::Create<Event1>());
-    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.GetState().Is<State1>());
+    EXPECT_TRUE(fsm.mStateMachine.GetState().Is<State1>());
     // dispatch Event2 to transition to State2
     fsm.mStateMachine.Dispatch(Event::Create<Event2>());
-    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.GetState().Is<State2>());
+    EXPECT_TRUE(fsm.mStateMachine.GetState().Is<State2>());
     // dispatch Event4 to transitions to State1.
     fsm.mStateMachine.Dispatch(Event::Create<Event4>());
-    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.GetState().Is<State1>());
+    EXPECT_TRUE(fsm.mStateMachine.GetState().Is<State1>());
 }
 
-void TestTransitionsDispatch(nlTestSuite * inSuite, void * inContext)
+TEST(TestStateMachine, TestTransitionsDispatch)
 {
     // in State1
     SimpleStateMachine fsm;
     // Dispatch Event4, which in turn dispatches Event2 from the transitions
     // table and ultimately places us in State2.
     fsm.mStateMachine.Dispatch(Event::Create<Event4>());
-    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.GetState().Is<State2>());
+    EXPECT_TRUE(fsm.mStateMachine.GetState().Is<State2>());
 }
 
-void TestNestedDispatch(nlTestSuite * inSuite, void * inContext)
+TEST(TestStateMachine, TestNestedDispatch)
 {
     // in State1
     SimpleStateMachine fsm;
     // Dispatch Event5, which places us into State3, which will dispatch
     // Event5 again from its Enter method to place us into State2.
     fsm.mStateMachine.Dispatch(Event::Create<Event5>());
-    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.GetState().Is<State2>());
+    EXPECT_TRUE(fsm.mStateMachine.GetState().Is<State2>());
     // Make sure that Enter methods execute the correct number of times.
     // This helps verify that pattern matching is working correctly.
     // Specifically, we need to verify this case: State3 creates State2
@@ -231,74 +238,45 @@ void TestNestedDispatch(nlTestSuite * inSuite, void * inContext)
     // been constructed when the State3 Enter method executes a second
     // time.  The state machine pattern matching has code to explicitly
     // prevent this double-execution.  This is testing that.
-    NL_TEST_ASSERT(inSuite, fsm.mTransitions.mFactory.ms1.mEntered == 0);
-    NL_TEST_ASSERT(inSuite, fsm.mTransitions.mFactory.ms1.mExited == 1);
-    NL_TEST_ASSERT(inSuite, fsm.mTransitions.mFactory.ms1.mLogged == 0);
-    NL_TEST_ASSERT(inSuite, fsm.mTransitions.mFactory.ms2.mEntered == 1);
-    NL_TEST_ASSERT(inSuite, fsm.mTransitions.mFactory.ms2.mExited == 0);
-    NL_TEST_ASSERT(inSuite, fsm.mTransitions.mFactory.ms2.mLogged == 1);
-    NL_TEST_ASSERT(inSuite, fsm.mTransitions.mFactory.ms3.mEntered == 1);
-    NL_TEST_ASSERT(inSuite, fsm.mTransitions.mFactory.ms3.mExited == 1);
-    NL_TEST_ASSERT(inSuite, fsm.mTransitions.mFactory.ms3.mLogged == 1);
+    EXPECT_EQ(fsm.mTransitions.mFactory.ms1.mEntered, 0u);
+    EXPECT_EQ(fsm.mTransitions.mFactory.ms1.mExited, 1u);
+    EXPECT_EQ(fsm.mTransitions.mFactory.ms1.mLogged, 0u);
+    EXPECT_EQ(fsm.mTransitions.mFactory.ms2.mEntered, 1u);
+    EXPECT_EQ(fsm.mTransitions.mFactory.ms2.mExited, 0u);
+    EXPECT_EQ(fsm.mTransitions.mFactory.ms2.mLogged, 1u);
+    EXPECT_EQ(fsm.mTransitions.mFactory.ms3.mEntered, 1u);
+    EXPECT_EQ(fsm.mTransitions.mFactory.ms3.mExited, 1u);
+    EXPECT_EQ(fsm.mTransitions.mFactory.ms3.mLogged, 1u);
 }
 
-void TestMethodExec(nlTestSuite * inSuite, void * inContext)
+TEST(TestStateMachine, TestMethodExec)
 {
     // in State1
     SimpleStateMachine fsm;
     // transition to State2
     fsm.mStateMachine.Dispatch(Event::Create<Event2>());
-    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.GetState().Is<State2>());
+    EXPECT_TRUE(fsm.mStateMachine.GetState().Is<State2>());
     // verify expected method calls
-    NL_TEST_ASSERT(inSuite, fsm.mTransitions.mFactory.ms1.mEntered == 0);
-    NL_TEST_ASSERT(inSuite, fsm.mTransitions.mFactory.ms1.mExited == 1);
-    NL_TEST_ASSERT(inSuite, fsm.mTransitions.mFactory.ms1.mLogged == 0);
-    NL_TEST_ASSERT(inSuite, fsm.mTransitions.mFactory.ms1.mPrevious == nullptr);
-    NL_TEST_ASSERT(inSuite, fsm.mTransitions.mFactory.ms2.mEntered == 1);
-    NL_TEST_ASSERT(inSuite, fsm.mTransitions.mFactory.ms2.mExited == 0);
-    NL_TEST_ASSERT(inSuite, fsm.mTransitions.mFactory.ms2.mLogged == 1);
-    NL_TEST_ASSERT(inSuite, strcmp(fsm.mTransitions.mFactory.ms2.mPrevious, "State1") == 0);
+    EXPECT_EQ(fsm.mTransitions.mFactory.ms1.mEntered, 0u);
+    EXPECT_EQ(fsm.mTransitions.mFactory.ms1.mExited, 1u);
+    EXPECT_EQ(fsm.mTransitions.mFactory.ms1.mLogged, 0u);
+    EXPECT_EQ(fsm.mTransitions.mFactory.ms1.mPrevious, nullptr);
+    EXPECT_EQ(fsm.mTransitions.mFactory.ms2.mEntered, 1u);
+    EXPECT_EQ(fsm.mTransitions.mFactory.ms2.mExited, 0u);
+    EXPECT_EQ(fsm.mTransitions.mFactory.ms2.mLogged, 1u);
+    EXPECT_STREQ(fsm.mTransitions.mFactory.ms2.mPrevious, "State1");
     // transition back to State1
     fsm.mStateMachine.Dispatch(Event::Create<Event1>());
-    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.GetState().Is<State1>());
+    EXPECT_TRUE(fsm.mStateMachine.GetState().Is<State1>());
     // verify expected method calls
-    NL_TEST_ASSERT(inSuite, fsm.mTransitions.mFactory.ms1.mEntered == 1);
-    NL_TEST_ASSERT(inSuite, fsm.mTransitions.mFactory.ms1.mExited == 1);
-    NL_TEST_ASSERT(inSuite, fsm.mTransitions.mFactory.ms1.mLogged == 1);
-    NL_TEST_ASSERT(inSuite, strcmp(fsm.mTransitions.mFactory.ms1.mPrevious, "State2") == 0);
-    NL_TEST_ASSERT(inSuite, fsm.mTransitions.mFactory.ms2.mEntered == 1);
-    NL_TEST_ASSERT(inSuite, fsm.mTransitions.mFactory.ms2.mExited == 1);
-    NL_TEST_ASSERT(inSuite, fsm.mTransitions.mFactory.ms2.mLogged == 1);
-    NL_TEST_ASSERT(inSuite, strcmp(fsm.mTransitions.mFactory.ms2.mPrevious, "State1") == 0);
-}
-
-int Setup(void * inContext)
-{
-    return SUCCESS;
-}
-
-int Teardown(void * inContext)
-{
-    return SUCCESS;
+    EXPECT_EQ(fsm.mTransitions.mFactory.ms1.mEntered, 1u);
+    EXPECT_EQ(fsm.mTransitions.mFactory.ms1.mExited, 1u);
+    EXPECT_EQ(fsm.mTransitions.mFactory.ms1.mLogged, 1u);
+    EXPECT_STREQ(fsm.mTransitions.mFactory.ms1.mPrevious, "State2");
+    EXPECT_EQ(fsm.mTransitions.mFactory.ms2.mEntered, 1u);
+    EXPECT_EQ(fsm.mTransitions.mFactory.ms2.mExited, 1u);
+    EXPECT_EQ(fsm.mTransitions.mFactory.ms2.mLogged, 1u);
+    EXPECT_STREQ(fsm.mTransitions.mFactory.ms2.mPrevious, "State1");
 }
 
 } // namespace
-
-static const nlTest sTests[] = {
-    NL_TEST_DEF("TestInit", TestInit),
-    NL_TEST_DEF("TestIgnoredEvents", TestIgnoredEvents),
-    NL_TEST_DEF("TestTransitions", TestTransitions),
-    NL_TEST_DEF("TestTransitionsDispatch", TestTransitionsDispatch),
-    NL_TEST_DEF("TestNestedDispatch", TestNestedDispatch),
-    NL_TEST_DEF("TestMethodExec", TestMethodExec),
-    NL_TEST_SENTINEL(),
-};
-
-int StateMachineTestSuite()
-{
-    nlTestSuite suite = { "CHIP State Machine tests", &sTests[0], Setup, Teardown };
-    nlTestRunner(&suite, nullptr);
-    return nlTestRunnerStats(&suite);
-}
-
-CHIP_REGISTER_TEST_SUITE(StateMachineTestSuite);

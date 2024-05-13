@@ -18,18 +18,6 @@
 
 #pragma once
 
+#include "silabs_utils.h"
+
 // ---- Device Test App Config ----
-
-// EFR Logging
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void efr32LogInit(void);
-void efr32Log(const char * aFormat, ...);
-#define EFR32_LOG(...) efr32Log(__VA_ARGS__);
-void appError(int err);
-
-#ifdef __cplusplus
-}
-#endif

@@ -18,8 +18,8 @@ import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/pigweed.gni")
 
 import("${build_root}/config/defaults.gni")
-import("${efr32_sdk_build_root}/efr32_executable.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
+import("${efr32_sdk_build_root}/silabs_executable.gni")
 
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/platform/device.gni")
@@ -31,7 +31,8 @@ import("//build_overrides/nlunit_test.gni")
 assert(current_os == "freertos")
 
 efr32_project_dir = "${chip_root}/src/test_driver/efr32"
-examples_plat_dir = "${chip_root}/examples/platform/efr32"
+examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
+examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
 pw_proto_library("nl_test_service") {
   sources = [ "${efr32_project_dir}/proto/nl_test.proto" ]
@@ -44,18 +45,17 @@ pw_proto_library("nl_test_service") {
 efr32_sdk("sdk") {
   sources = [
     "${efr32_project_dir}/include/CHIPProjectConfig.h",
-    "${efr32_project_dir}/include/FreeRTOSConfig.h",
+    "${examples_common_plat_dir}/FreeRTOSConfig.h",
   ]
 
   include_dirs = [
-    "${chip_root}/src/platform/EFR32",
+    "${chip_root}/src/platform/silabs/efr32",
     "${efr32_project_dir}/include",
     "${examples_plat_dir}",
+    "${examples_common_plat_dir}",
   ]
 
   defines = [
-    "BOARD_ID=${efr32_board}",
-    "EFR32_LOG_ENABLED=1",
     "PW_RPC_ENABLED",
 
     # Thread is built but test driver do not have the NETWORK_COMMISSIONING cluster or zap config.
@@ -63,57 +63,63 @@ efr32_sdk("sdk") {
   ]
 }
 
-efr32_executable("efr32_device_tests") {
-  output_name = "chip-efr32-device_tests.out"
+silabs_executable("efr32_device_tests") {
+  output_name = "matter-silabs-device_tests.out"
 
   defines = [ "PW_RPC_ENABLED" ]
   sources = [
     "${chip_root}/examples/common/pigweed/RpcService.cpp",
     "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
-    "${examples_plat_dir}/PigweedLogger.cpp",
-    "${examples_plat_dir}/heap_4_silabs.c",
-    "${examples_plat_dir}/init_efrPlatform.cpp",
+    "${examples_common_plat_dir}/PigweedLogger.cpp",
+    "${examples_common_plat_dir}/heap_4_silabs.c",
+    "${examples_common_plat_dir}/syscalls_stubs.cpp",
+    "${examples_plat_dir}/uart.cpp",
     "src/main.cpp",
   ]
-
-  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli) {
-    sources += [ "${examples_plat_dir}/uart.cpp" ]
-  }
 
   deps = [
     ":nl_test_service.nanopb_rpc",
     ":sdk",
+    "$dir_pw_unit_test:rpc_service",
     "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
     "${chip_root}/examples/common/pigweed:system_rpc_server",
     "${chip_root}/src:tests",
     "${chip_root}/src/lib",
-    "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
-    "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
-    "${examples_plat_dir}/pw_sys_io:pw_sys_io_efr32",
+    "${chip_root}/src/lib/support:pw_tests_wrapper",
+    "${chip_root}/src/lib/support:testing_nlunit",
+    "${examples_common_plat_dir}/pw_sys_io:pw_sys_io_silabs",
     "${nlunit_test_root}:nlunit-test",
   ]
 
-  if (chip_openthread_ftd) {
+  # OpenThread Settings
+  if (chip_enable_openthread) {
     deps += [
-      "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
-      "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+      "${chip_root}/third_party/openthread:openthread",
+      "${chip_root}/third_party/openthread:openthread-platform",
+      "${examples_plat_dir}:efr-matter-shell",
     ]
-  } else {
-    deps += [
-      "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
-      "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
-    ]
+  }
+
+  # Attestation Credentials
+  deps += [ "${examples_plat_dir}:efr32-attestation-credentials" ]
+
+  # Factory Data Provider
+  if (use_efr32_factory_data_provider) {
+    deps += [ "${examples_plat_dir}:silabs-factory-data-provider" ]
   }
 
   deps += pw_build_LINK_DEPS
 
   include_dirs = [ "${chip_root}/examples/common/pigweed/efr32" ]
 
-  ldscript = "${examples_plat_dir}/ldscripts/${efr32_family}.ld"
+  ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
 
   inputs = [ ldscript ]
 
-  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+  ldflags = [
+    "-T" + rebase_path(ldscript, root_build_dir),
+    "-Wl,--no-warn-rwx-segment",
+  ]
 
   output_dir = root_out_dir
 }

@@ -18,6 +18,7 @@
 
 #include "DiscoverCommissionersCommand.h"
 #include <arpa/inet.h>
+#include <controller/CHIPDeviceController.h>
 
 using namespace ::chip;
 
@@ -28,10 +29,10 @@ CHIP_ERROR DiscoverCommissionersCommand::RunCommand()
 
 void DiscoverCommissionersCommand::Shutdown()
 {
-    int commissionerCount = 0;
+    [[maybe_unused]] int commissionerCount = 0;
     for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES; i++)
     {
-        const Dnssd::DiscoveredNodeData * commissioner = mCommissionableNodeController.GetDiscoveredCommissioner(i);
+        const Dnssd::CommissionNodeData * commissioner = mCommissionableNodeController.GetDiscoveredCommissioner(i);
         if (commissioner != nullptr)
         {
             ChipLogProgress(chipTool, "Discovered Commissioner #%d", commissionerCount);
@@ -40,6 +41,8 @@ void DiscoverCommissionersCommand::Shutdown()
         }
     }
 
-    ChipLogProgress(chipTool, "Total of %d commissioner(s) discovered in %" PRIu16 " sec", commissionerCount,
+    ChipLogProgress(chipTool, "Total of %d commissioner(s) discovered in %u sec", commissionerCount,
                     std::chrono::duration_cast<System::Clock::Seconds16>(GetWaitDuration()).count());
+
+    CHIPCommand::Shutdown();
 }

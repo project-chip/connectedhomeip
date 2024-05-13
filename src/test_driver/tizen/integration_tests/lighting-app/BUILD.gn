@@ -1,0 +1,51 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/tizen.gni")
+
+import("${tizen_sdk_build_root}/tizen_sdk.gni")
+
+tizen_qemu_mkisofs("lighting-app-runner") {
+  runner = "runner.sh"
+
+  # Build applications used in the test.
+  deps = [
+    "${chip_root}/examples/chip-tool:chip-tool",
+    "${chip_root}/examples/lighting-app/tizen:chip-lighting-app:tpk",
+  ]
+
+  # Use artifacts created by the dependencies.
+  assets = [
+    rebase_path("${root_out_dir}/chip-tool"),
+    rebase_path(
+        "${root_out_dir}/org.tizen.matter.example.lighting/out/org.tizen.matter.example.lighting-1.0.0.tpk"),
+  ]
+}
+
+tizen_qemu_run("lighting-app") {
+  # Enable network support, so Tizen can obtain current date/time from the
+  # network. Correct date/time is required for the commissioning process -
+  # attestation will fail otherwise.
+  virtio_net = true
+
+  deps = [ ":lighting-app-runner" ]
+  mkisofs_outputs = get_target_outputs(":lighting-app-runner")
+  iso_image = rebase_path(mkisofs_outputs[0])
+}
+
+group("check") {
+  deps = [ ":lighting-app" ]
+  testonly = true
+}

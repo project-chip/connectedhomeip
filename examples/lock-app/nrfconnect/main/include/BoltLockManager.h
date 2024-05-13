@@ -19,65 +19,87 @@
 
 #pragma once
 
+#include <app/clusters/door-lock-server/door-lock-server.h>
+#include <lib/core/ClusterEnums.h>
+#include <lib/support/ScopedBuffer.h>
+
+#include <zephyr/kernel.h>
+
 #include <cstdint>
 
-#include "AppEvent.h"
-
-struct k_timer;
+class AppEvent;
 
 class BoltLockManager
 {
 public:
-    enum Action_t
-    {
-        LOCK_ACTION = 0,
-        UNLOCK_ACTION,
+    static constexpr size_t kMaxCredentialLength = 128;
 
-        INVALID_ACTION
+    enum class State : uint8_t
+    {
+        kLockingInitiated = 0,
+        kLockingCompleted,
+        kUnlockingInitiated,
+        kUnlockingCompleted,
     };
 
-    enum State_t
+    struct UserData
     {
-        kState_LockingInitiated = 0,
-        kState_LockingCompleted,
-        kState_UnlockingInitiated,
-        kState_UnlockingCompleted,
+        char mName[DOOR_LOCK_USER_NAME_BUFFER_SIZE];
+        CredentialStruct mCredentials[CONFIG_LOCK_NUM_CREDENTIALS_PER_USER];
     };
 
-    void Init();
-    bool IsUnlocked();
-    void EnableAutoRelock(bool aOn);
-    void SetAutoLockDuration(uint32_t aDurationInSecs);
-    bool IsActionInProgress();
-    bool InitiateAction(int32_t aActor, Action_t aAction);
+    struct CredentialData
+    {
+        chip::Platform::ScopedMemoryBuffer<uint8_t> mSecret;
+    };
 
-    typedef void (*Callback_fn_initiated)(Action_t, int32_t aActor);
-    typedef void (*Callback_fn_completed)(Action_t, int32_t aActor);
-    void SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB);
+    using OperationSource     = chip::app::Clusters::DoorLock::OperationSourceEnum;
+    using StateChangeCallback = void (*)(State, OperationSource);
+
+    static constexpr uint32_t kActuatorMovementTimeMs = 2000;
+
+    void Init(StateChangeCallback callback);
+
+    State GetState() const { return mState; }
+    bool IsLocked() const { return mState == State::kLockingCompleted; }
+
+    bool GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) const;
+    bool SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier, const chip::CharSpan & userName,
+                 uint32_t uniqueId, UserStatusEnum userStatus, UserTypeEnum userType, CredentialRuleEnum credentialRule,
+                 const CredentialStruct * credentials, size_t totalCredentials);
+
+    bool GetCredential(uint16_t credentialIndex, CredentialTypeEnum credentialType,
+                       EmberAfPluginDoorLockCredentialInfo & credential) const;
+    bool SetCredential(uint16_t credentialIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
+                       DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType, const chip::ByteSpan & secret);
+
+    bool ValidatePIN(const Optional<chip::ByteSpan> & pinCode, OperationErrorEnum & err) const;
+
+    void Lock(OperationSource source);
+    void Unlock(OperationSource source);
 
 private:
-    friend BoltLockManager & BoltLockMgr(void);
-    State_t mState;
+    void SetState(State state, OperationSource source);
 
-    Callback_fn_initiated mActionInitiated_CB;
-    Callback_fn_completed mActionCompleted_CB;
+    static void ActuatorTimerEventHandler(k_timer * timer);
+    static void ActuatorAppEventHandler(const AppEvent & aEvent);
+    friend BoltLockManager & BoltLockMgr();
 
-    bool mAutoRelock;
-    uint32_t mAutoLockDuration;
-    bool mAutoLockTimerArmed;
-    int32_t mCurrentActor;
+    State mState                             = State::kLockingCompleted;
+    StateChangeCallback mStateChangeCallback = nullptr;
+    OperationSource mActuatorOperationSource = OperationSource::kButton;
+    k_timer mActuatorTimer                   = {};
 
-    void CancelTimer(void);
-    void StartTimer(uint32_t aTimeoutMs);
+    UserData mUserData[CONFIG_LOCK_NUM_USERS];
+    EmberAfPluginDoorLockUserInfo mUsers[CONFIG_LOCK_NUM_USERS] = {};
 
-    static void TimerEventHandler(k_timer * timer);
-    static void AutoReLockTimerEventHandler(AppEvent * aEvent);
-    static void ActuatorMovementTimerEventHandler(AppEvent * aEvent);
+    CredentialData mCredentialData[CONFIG_LOCK_NUM_CREDENTIALS];
+    EmberAfPluginDoorLockCredentialInfo mCredentials[CONFIG_LOCK_NUM_CREDENTIALS] = {};
 
     static BoltLockManager sLock;
 };
 
-inline BoltLockManager & BoltLockMgr(void)
+inline BoltLockManager & BoltLockMgr()
 {
     return BoltLockManager::sLock;
 }

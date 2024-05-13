@@ -20,6 +20,11 @@
 
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConnectivityManagerImpl.h>
+#include <platform/internal/GenericConnectivityManagerImpl_UDP.h>
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+#include <platform/internal/GenericConnectivityManagerImpl_TCP.h>
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.h>
@@ -55,6 +60,10 @@ class PlatformManagerImpl;
 
 class ConnectivityManagerImpl final : public ConnectivityManager,
                                       public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>,
+                                      public Internal::GenericConnectivityManagerImpl_UDP<ConnectivityManagerImpl>,
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+                                      public Internal::GenericConnectivityManagerImpl_TCP<ConnectivityManagerImpl>,
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
                                       public Internal::GenericConnectivityManagerImpl_WiFi<ConnectivityManagerImpl>,
 #else
@@ -74,6 +83,9 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
     // Allow the ConnectivityManager interface class to delegate method calls to
     // the implementation methods provided by this class.
     friend class ConnectivityManager;
+
+public:
+    void ChangeWiFiStationState(WiFiStationState newState);
 
 private:
     CHIP_ERROR _Init(void);
@@ -121,7 +133,6 @@ private:
     void DriveStationState(void);
     void OnStationConnected(void);
     void OnStationDisconnected(void);
-    void ChangeWiFiStationState(WiFiStationState newState);
     static void DriveStationState(::chip::System::Layer * aLayer, void * aAppState);
 
     void DriveAPState(void);
@@ -130,9 +141,8 @@ private:
     static void DriveAPState(::chip::System::Layer * aLayer, void * aAppState);
 
     void UpdateInternetConnectivityState(void);
-    void OnStationIPv4AddressAvailable(void);
-    void OnStationIPv4AddressLost(void);
-    void OnIPv6AddressAvailable(void);
+    void OnStationIPv4v6AddressAvailable(void);
+    void OnStationIPv4v6AddressLost(void);
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
@@ -144,7 +154,9 @@ private:
     static ConnectivityManagerImpl sInstance;
     static void RefreshMessageLayer(void);
     static void RtkWiFiStationConnectedHandler(char * buf, int buf_len, int flags, void * userdata);
+    static void RtkWiFiStationDisconnectedHandler(char * buf, int buf_len, int flags, void * userdata);
     static void RtkWiFiScanCompletedHandler(void);
+    static void RtkWiFiDHCPCompletedHandler(char * buf, int buf_len, int flags, void * userdata);
     void DHCPProcess(void);
     static void DHCPProcessThread(void * param);
     static int conn_callback_dispatcher(void * object);

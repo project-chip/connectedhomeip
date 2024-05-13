@@ -14,10 +14,10 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlio.gni")
 import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
+import("${chip_root}/src/app/icd/icd.gni")
 
 static_library("helpers") {
   output_name = "libMessagingTestHelpers"
@@ -32,25 +32,44 @@ static_library("helpers") {
 
   deps = [
     "${chip_root}/src/credentials/tests:cert_test_vectors",
+    "${chip_root}/src/lib/support:testing",
     "${chip_root}/src/messaging",
     "${chip_root}/src/protocols",
     "${chip_root}/src/transport",
-    "${chip_root}/src/transport/raw/tests:helpers",
-    "${nlio_root}:nlio",
+    "${chip_root}/src/transport/tests:helpers",
   ]
+
+  # MessagingContext exposes nl-test compatible setup/teardown functions, specifically
+  # they return nltest specific SUCCESS/FAILURE constants hence this dependency.
+  #
+  # Once all tests are moved to pw_unittest/gtest, this dependency should be removed
+  public_deps = [ "${nlunit_test_root}:nlunit-test" ]
 }
 
-chip_test_suite("tests") {
+chip_test_suite_using_nltest("tests") {
   output_name = "libMessagingLayerTests"
 
-  sources = [ "TestMessagingLayer.h" ]
+  test_sources = []
 
   if (chip_device_platform != "efr32") {
     # TODO(#10447): ReliableMessage Test has HF, and ExchangeMgr hangs on EFR32.
-    sources += [
+    # And TestAbortExchangesForFabric does not link on EFR32 for some reason.
+    # TODO #33372: TestExchange.cpp asserts in ExchangeContext::SendMessage
+    test_sources += [
+      "TestAbortExchangesForFabric.cpp",
+      "TestExchange.cpp",
       "TestExchangeMgr.cpp",
       "TestReliableMessageProtocol.cpp",
     ]
+
+    if (chip_device_platform != "esp32" && chip_device_platform != "mbed" &&
+        chip_device_platform != "nrfconnect" && chip_device_platform != "nxp") {
+      test_sources += [ "TestExchangeHolder.cpp" ]
+    }
+
+    if (chip_device_platform == "linux") {
+      test_sources += [ "TestMessagingLayer.cpp" ]
+    }
   }
 
   cflags = [ "-Wconversion" ]
@@ -60,16 +79,16 @@ chip_test_suite("tests") {
     "${chip_root}/src/inet/tests:helpers",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:test_utils",
+    "${chip_root}/src/lib/support:testing_nlunit",
     "${chip_root}/src/messaging",
     "${chip_root}/src/protocols",
     "${chip_root}/src/transport",
     "${chip_root}/src/transport/raw/tests:helpers",
-    "${nlio_root}:nlio",
     "${nlunit_test_root}:nlunit-test",
   ]
 
-  tests = [
-    "TestExchangeMgr",
-    "TestReliableMessageProtocol",
-  ]
+  if (chip_enable_icd_server) {
+    public_deps += [ "${chip_root}/src/app/icd/server:configuration-data" ]
+  }
 }

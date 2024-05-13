@@ -24,111 +24,42 @@
  **/
 
 #include "DeviceCallbacks.h"
-#include "AppConfig.h"
-#include "BoltLockManager.h"
+#include <lock/AppConfig.h>
+#include <lock/BoltLockManager.h>
 
-#include "esp_check.h"
-#include "esp_err.h"
-#include "esp_heap_caps.h"
-#include "esp_log.h"
-#include "route_hook/esp_route_hook.h"
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/cluster-id.h>
-#include <app/server/Dnssd.h>
-#include <lib/support/CodeUtils.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 
-static const char * TAG = "lock-devicecallbacks";
+static const char TAG[] = "lock-devicecallbacks";
 
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
 using namespace ::chip::DeviceLayer;
 
-void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
+void AppDeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
+                                                     uint8_t type, uint16_t size, uint8_t * value)
 {
-    switch (event->Type)
-    {
-    case DeviceEventType::kInternetConnectivityChange:
-        OnInternetConnectivityChange(event);
-        break;
-
-    case DeviceEventType::kSessionEstablished:
-        OnSessionEstablished(event);
-        break;
-
-    case DeviceEventType::kInterfaceIpAddressChanged:
-        if ((event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV4_Assigned) ||
-            (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned))
-        {
-            // MDNS server restart on any ip assignment: if link local ipv6 is configured, that
-            // will not trigger a 'internet connectivity change' as there is no internet
-            // connectivity. MDNS still wants to refresh its listening interfaces to include the
-            // newly selected address.
-            chip::app::DnssdServer::Instance().StartServer();
-        }
-        if (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned)
-        {
-            ESP_ERROR_CHECK(esp_route_hook_init(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF")));
-        }
-        break;
-    }
-
-    ESP_LOGI(TAG, "Current free heap: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
-}
-
-void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                                  uint8_t type, uint16_t size, uint8_t * value)
-{
-    ESP_LOGI(TAG, "PostAttributeChangeCallback - Cluster ID: '0x%04x', EndPoint ID: '0x%02x', Attribute ID: '0x%04x'", clusterId,
-             endpointId, attributeId);
+    ESP_LOGI(TAG, "PostAttributeChangeCallback - Cluster ID: '0x%" PRIx32 "', EndPoint ID: '0x%x', Attribute ID: '0x%" PRIx32 "'",
+             clusterId, endpointId, attributeId);
 
     switch (clusterId)
     {
-    case ZCL_ON_OFF_CLUSTER_ID:
+    case app::Clusters::OnOff::Id:
         OnOnOffPostAttributeChangeCallback(endpointId, attributeId, value);
         break;
 
     default:
-        ESP_LOGI(TAG, "Unhandled cluster ID: %d", clusterId);
+        ESP_LOGI(TAG, "Unhandled cluster ID: %" PRIu32, clusterId);
         break;
     }
 
     ESP_LOGI(TAG, "Current free heap: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
 }
 
-void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event)
+void AppDeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
-    if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
-    {
-        ESP_LOGI(TAG, "Server ready at: %s:%d", event->InternetConnectivityChange.address, CHIP_PORT);
-        chip::app::DnssdServer::Instance().StartServer();
-    }
-    else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
-    {
-        ESP_LOGE(TAG, "Lost IPv4 connectivity...");
-    }
-    if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
-    {
-        ESP_LOGI(TAG, "IPv6 Server ready...");
-        chip::app::DnssdServer::Instance().StartServer();
-    }
-    else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
-    {
-        ESP_LOGE(TAG, "Lost IPv6 connectivity...");
-    }
-}
-
-void DeviceCallbacks::OnSessionEstablished(const ChipDeviceEvent * event)
-{
-    if (event->SessionEstablished.IsCommissioner)
-    {
-        ESP_LOGI(TAG, "Commissioner detected!");
-    }
-}
-
-void DeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
-{
-    VerifyOrExit(attributeId == ZCL_ON_OFF_ATTRIBUTE_ID, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
+    VerifyOrExit(attributeId == app::Clusters::OnOff::Attributes::OnOff::Id,
+                 ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%" PRIx32, attributeId));
     VerifyOrExit(endpointId == 1 || endpointId == 2, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
     if (*value)
     {

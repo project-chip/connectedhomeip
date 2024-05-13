@@ -1,0 +1,452 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    111.2.11. [TC-DRLK-2.11] Verification for multiple credential types
+    [DUT-Server]
+
+PICS:
+    - DRLK.S
+    - DRLK.S.F00
+    - DRLK.S.F01
+    - DRLK.S.F02
+
+config:
+    nodeId: 0x12344321
+    cluster: "Door Lock"
+    endpoint: 1
+    PINCredentialData:
+        type: octet_string
+        defaultValue: "123456"
+    RFIDCredentialData:
+        type: octet_string
+        defaultValue: "123456789A"
+    FingerVeinCredentialData:
+        type: octet_string
+        defaultValue: "123456789A"
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Precondition: Create new user with default parameters"
+      command: "SetUser"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "OperationType"
+                value: 0
+              - name: "UserIndex"
+                value: 1
+              - name: "UserName"
+                value: "xxx"
+              - name: "UserUniqueID"
+                value: 6452
+              - name: "UserStatus"
+                value: 1
+              - name: "UserType"
+                value: 0
+              - name: "CredentialRule"
+                value: 0
+
+    - label: "Precondition: Read the user back and verify its fields"
+      command: "GetUser"
+      arguments:
+          values:
+              - name: "UserIndex"
+                value: 1
+      response:
+          values:
+              - name: "UserIndex"
+                value: 1
+              - name: "UserName"
+                value: "xxx"
+              - name: "UserUniqueID"
+                value: 6452
+              - name: "UserStatus"
+                value: 1
+              - name: "UserType"
+                value: 0
+              - name: "CredentialRule"
+                value: 0
+              - name: "Credentials"
+                value: []
+              - name: "CreatorFabricIndex"
+                value: 1
+              - name: "LastModifiedFabricIndex"
+                value: 1
+              - name: "NextUserIndex"
+                value: null
+
+    - label:
+          "Step 1a: TH reads NumberOfTotalUsersSupported and saves for future
+          use."
+      PICS: DRLK.S.F08 && DRLK.S.A0011
+      command: "readAttribute"
+      attribute: "NumberOfTotalUsersSupported"
+      response:
+          constraints:
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Step 1b: TH reads MinPINCodeLength and saves for future use."
+      PICS: DRLK.S.F08 && DRLK.S.F00
+      command: "readAttribute"
+      attribute: "MinPINCodeLength"
+      response:
+          constraints:
+              minValue: 0
+              maxValue: 255
+
+    - label: "Step 1c: TH reads MaxPINCodeLength and saves for future use."
+      PICS: DRLK.S.F08 && DRLK.S.F00
+      command: "readAttribute"
+      attribute: "MaxPINCodeLength"
+      response:
+          constraints:
+              minValue: 0
+              maxValue: 255
+
+    - label: "Step 1d: TH reads MinRFIDCodeLength and saves for future use."
+      PICS: DRLK.S.F08 && DRLK.S.F01 && DRLK.S.A001a
+      command: "readAttribute"
+      attribute: "MinRFIDCodeLength"
+      response:
+          constraints:
+              minValue: 0
+              maxValue: 255
+
+    - label: "Step 1e: TH reads MaxRFIDCodeLength and saves for future use."
+      PICS: DRLK.S.F08 && DRLK.S.F01 && DRLK.S.A0019
+      command: "readAttribute"
+      attribute: "MaxRFIDCodeLength"
+      response:
+          constraints:
+              minValue: 0
+              maxValue: 255
+
+    - label: "Step 2a: TH sends Set Credential Command to DUT with type PIN"
+      PICS: DRLK.S.F00 && DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
+      command: "SetCredential"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "OperationType"
+                value: 0
+              - name: "Credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+              - name: "CredentialData"
+                value: PINCredentialData
+              - name: "UserIndex"
+                value: 1
+              - name: "UserStatus"
+                value: null
+              - name: "UserType"
+                value: null
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "UserIndex"
+                value: null
+              - name: "NextCredentialIndex"
+                value: 2
+
+    - label: "Step 2b: TH sends Set Credential Command to DUT with type RFID"
+      PICS: DRLK.S.F01 && DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
+      command: "SetCredential"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "OperationType"
+                value: 0
+              - name: "Credential"
+                value: { CredentialType: 2, CredentialIndex: 1 }
+              - name: "CredentialData"
+                value: RFIDCredentialData
+              - name: "UserIndex"
+                value: 1
+              - name: "UserStatus"
+                value: null
+              - name: "UserType"
+                value: null
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "UserIndex"
+                value: null
+              - name: "NextCredentialIndex"
+                value: 2
+
+    - label:
+          "Step 2c: TH sends Set Credential Command to DUT with type FingerVein"
+      PICS: DRLK.S.F02 && DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
+      command: "SetCredential"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "OperationType"
+                value: 0
+              - name: "Credential"
+                value: { CredentialType: 4, CredentialIndex: 1 }
+              - name: "CredentialData"
+                value: FingerVeinCredentialData
+              - name: "UserIndex"
+                value: 1
+              - name: "UserStatus"
+                value: null
+              - name: "UserType"
+                value: null
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "UserIndex"
+                value: null
+              - name: "NextCredentialIndex"
+                value: 2
+
+    - label: "Step 3a: TH sends Get Credential Status Command with type PIN"
+      PICS: DRLK.S.F00 && DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
+      command: "GetCredentialStatus"
+      arguments:
+          values:
+              - name: "Credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+      response:
+          values:
+              - name: "CredentialExists"
+                value: true
+                constraints:
+                    type: boolean
+              - name: "UserIndex"
+                value: 1
+              - name: "CreatorFabricIndex"
+                value: 1
+              - name: "LastModifiedFabricIndex"
+                value: 1
+              - name: "NextCredentialIndex"
+                value: null
+
+    - label: "Step 3b: TH sends Get Credential Status Command with type RFID"
+      PICS: DRLK.S.F08 && DRLK.S.F01 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
+      command: "GetCredentialStatus"
+      arguments:
+          values:
+              - name: "Credential"
+                value: { CredentialType: 2, CredentialIndex: 1 }
+      response:
+          values:
+              - name: "CredentialExists"
+                value: true
+                constraints:
+                    type: boolean
+              - name: "UserIndex"
+                value: 1
+              - name: "CreatorFabricIndex"
+                value: 1
+              - name: "LastModifiedFabricIndex"
+                value: 1
+              - name: "NextCredentialIndex"
+                value: null
+
+    - label:
+          "Step 3c: TH sends Get Credential Status Command with type FingerVein"
+      PICS: DRLK.S.F08 && DRLK.S.F02 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
+      command: "GetCredentialStatus"
+      arguments:
+          values:
+              - name: "Credential"
+                value: { CredentialType: 4, CredentialIndex: 1 }
+      response:
+          values:
+              - name: "CredentialExists"
+                value: true
+                constraints:
+                    type: boolean
+              - name: "UserIndex"
+                value: 1
+              - name: "CreatorFabricIndex"
+                value: 1
+              - name: "LastModifiedFabricIndex"
+                value: 1
+              - name: "NextCredentialIndex"
+                value: null
+
+    - label: "Step 4a: TH sends Clear Credential Command to DUT with type PIN"
+      PICS: DRLK.S.F00 && DRLK.S.F08 && DRLK.S.C26.Rsp
+      command: "ClearCredential"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "Credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+
+    - label: "Step 4b: TH sends Get Credential Status Command with type RFID"
+      PICS: DRLK.S.F08 && DRLK.S.F01 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
+      command: "GetCredentialStatus"
+      arguments:
+          values:
+              - name: "Credential"
+                value: { CredentialType: 2, CredentialIndex: 1 }
+      response:
+          values:
+              - name: "CredentialExists"
+                value: true
+                constraints:
+                    type: boolean
+              - name: "UserIndex"
+                value: 1
+              - name: "CreatorFabricIndex"
+                value: 1
+              - name: "LastModifiedFabricIndex"
+                value: 1
+              - name: "NextCredentialIndex"
+                value: null
+
+    - label:
+          "Step 4c: TH sends Get Credential Status Command with type FingerVein"
+      PICS: DRLK.S.F08 && DRLK.S.F02 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
+      command: "GetCredentialStatus"
+      arguments:
+          values:
+              - name: "Credential"
+                value: { CredentialType: 4, CredentialIndex: 1 }
+      response:
+          values:
+              - name: "CredentialExists"
+                value: true
+                constraints:
+                    type: boolean
+              - name: "UserIndex"
+                value: 1
+              - name: "CreatorFabricIndex"
+                value: 1
+              - name: "LastModifiedFabricIndex"
+                value: 1
+              - name: "NextCredentialIndex"
+                value: null
+
+    - label: "Step 4d: TH sends Clear Credential Command to DUT with type RFID"
+      PICS: DRLK.S.F01 && DRLK.S.F08 && DRLK.S.C26.Rsp
+      command: "ClearCredential"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "Credential"
+                value: { CredentialType: 2, CredentialIndex: 1 }
+
+    - label:
+          "Step 4e: TH sends Get Credential Status Command with type FingerVein"
+      PICS: DRLK.S.F08 && DRLK.S.F02 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
+      command: "GetCredentialStatus"
+      arguments:
+          values:
+              - name: "Credential"
+                value: { CredentialType: 4, CredentialIndex: 1 }
+      response:
+          values:
+              - name: "CredentialExists"
+                value: true
+                constraints:
+                    type: boolean
+              - name: "UserIndex"
+                value: 1
+              - name: "CreatorFabricIndex"
+                value: 1
+              - name: "LastModifiedFabricIndex"
+                value: 1
+              - name: "NextCredentialIndex"
+                value: null
+
+    - label:
+          "Step 4f: TH sends Clear Credential Command to DUT with type
+          FingerVein"
+      PICS: DRLK.S.F02 && DRLK.S.F08 && DRLK.S.C26.Rsp
+      command: "ClearCredential"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "Credential"
+                value: { CredentialType: 4, CredentialIndex: 1 }
+
+    - label:
+          "Step 5a: TH sends Get Credential Status Command to DUT with type PIN"
+      PICS: DRLK.S.F00 && DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
+      command: "GetCredentialStatus"
+      arguments:
+          values:
+              - name: "Credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+      response:
+          values:
+              - name: "CredentialExists"
+                value: false
+              - name: "UserIndex"
+                value: null
+              - name: "CreatorFabricIndex"
+                value: null
+              - name: "LastModifiedFabricIndex"
+                value: null
+              - name: "NextCredentialIndex"
+                value: null
+
+    - label:
+          "Step 5b: TH sends Get Credential Status Command to DUT with type RFID"
+      PICS: DRLK.S.F01 && DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
+      command: "GetCredentialStatus"
+      arguments:
+          values:
+              - name: "Credential"
+                value: { CredentialType: 2, CredentialIndex: 1 }
+      response:
+          values:
+              - name: "CredentialExists"
+                value: false
+              - name: "UserIndex"
+                value: null
+              - name: "CreatorFabricIndex"
+                value: null
+              - name: "LastModifiedFabricIndex"
+                value: null
+              - name: "NextCredentialIndex"
+                value: null
+
+    - label:
+          "Step 5c: TH sends Get Credential Status Command to DUT with type
+          FingerVein"
+      PICS: DRLK.S.F02 && DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
+      command: "GetCredentialStatus"
+      arguments:
+          values:
+              - name: "Credential"
+                value: { CredentialType: 4, CredentialIndex: 1 }
+      response:
+          values:
+              - name: "CredentialExists"
+                value: false
+              - name: "UserIndex"
+                value: null
+              - name: "CreatorFabricIndex"
+                value: null
+              - name: "LastModifiedFabricIndex"
+                value: null
+              - name: "NextCredentialIndex"
+                value: null

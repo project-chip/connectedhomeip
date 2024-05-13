@@ -14,15 +14,18 @@
 
 import("//build_overrides/chip.gni")
 
+source_set("type_definitions") {
+  sources = [ "Protocols.h" ]
+}
+
 static_library("protocols") {
   output_name = "libChipProtocols"
 
   sources = [
+    "Protocols.cpp",
     "echo/Echo.h",
     "echo/EchoClient.cpp",
     "echo/EchoServer.cpp",
-    "interaction_model/StatusCode.cpp",
-    "interaction_model/StatusCode.h",
     "secure_channel/MessageCounterManager.cpp",
     "secure_channel/MessageCounterManager.h",
     "user_directed_commissioning/UDCClientState.h",
@@ -35,10 +38,12 @@ static_library("protocols") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    ":type_definitions",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
     "${chip_root}/src/protocols/bdx",
+    "${chip_root}/src/protocols/interaction_model",
     "${chip_root}/src/protocols/secure_channel",
   ]
 }

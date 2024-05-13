@@ -1,0 +1,66 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 19.4.5. [TC-APPLAUNCHER-3.8] Stop Application Verification
+
+PICS:
+    - APPLAUNCHER.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Application Launcher"
+    endpoint: 1
+    catalogVendorId:
+        type: int16u
+        defaultValue: 123
+    applicationId:
+        type: char_string
+        defaultValue: "exampleid"
+    #ApplicationBasic cluster endpoint
+    ApplicationBasic.Endpoint: 3
+
+tests:
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Step 1a: TH sends a StopApp command to DUT to stop a running
+          application"
+      PICS: APPLAUNCHER.S.C01.Rsp
+      command: "StopApp"
+      arguments:
+          values:
+              - name: "Application"
+                value:
+                    {
+                        CatalogVendorID: catalogVendorId,
+                        ApplicationID: applicationId,
+                    }
+      response:
+          values:
+              - name: "Status"
+                value: 0
+
+    - label: "Step 1b: TH reads the Status attribute"
+      endpoint: ApplicationBasic.Endpoint
+      cluster: "Application Basic"
+      command: "readAttribute"
+      attribute: "Status"
+      response:
+          value: 0

@@ -1,0 +1,145 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    4.1.1. [TC-DA-1.1] The NOC SHALL be wiped on Factory Reset [DUT -
+    Commissionee]
+
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Step 1: Commission DUT to TH1s Fabric"
+      verification: |
+          Execute the below mentioned command to put DUT into a commissionable state, Pls use equivalent command on the respective DUT
+           ./chip-all-clusters-app
+
+          Once DUT reach the  commissionable state pls send below mentioned command on TH2. Pls use equivalent command on the respective DUT
+
+           ./chip-tool pairing onnetwork 1 20202021
+          Verify the commissioning completed with success on TH1(chip-tool) from DUT
+          [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success
+      disabled: true
+
+    - label:
+          "Step 2a: TH1 does a non-fabric filtered read of the NOCs attribute
+          from the Node Operational Credentials cluster and saves the returned
+          list as noc_th1"
+      verification: |
+          TH1(Chip-tool) does a non-fabric filtered read of the NOCs attribute from the Node Operational Credentials cluster and saves the returned list as noc_th1 AND Verify that there is a single entry in the list
+          ./chip-tool operationalcredentials read nocs 1  0 --fabric-filtered 0
+          [1662389708.822977][17489:17494] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 4085201480
+          [1662389708.823012][17489:17494] CHIP:TOO:   NOCs: 1 entries
+          [1662389708.823044][17489:17494] CHIP:TOO:     [1]: {
+          [1662389708.823063][17489:17494] CHIP:TOO:       Noc: 1530010101240201370324130218260480228127260580254D3A370624150124110118240701240801300941048CC01B0EB2EEA552BDC8228991495A660370D9277C576331DDAE833D8D000715089DFD029D007479F57ABAE8B4B5C8A7F274BBD5D6B4267373C31E3557DB8C74370A3501280118240201360304020401183004143F84722733340A0CB94617B29C43DA6C819AE64C300514BAA52DBC890552A4481A4F745C9DF5AF7601E8E618300B4072AB61952DEEC3F1739804427836A373D04427EE7949A72196F19E1C18E17E092D374504E46952E706765152C7E54DCAD6154BD76E616A2B43B47854585F764118
+          [1662389708.823085][17489:17494] CHIP:TOO:       Icac: 1530010101240201370324140118260480228127260580254D3A370624130218240701240801300941044325A17033FD51861CFEBB729726700328EDE828DF629F87D44E53CB7E468AB4B068B46D63BB64E1EAE4835B6802FFCBB5623F077D804C20CE49DEBCFABEFD6E370A3501290118240260300414BAA52DBC890552A4481A4F745C9DF5AF7601E8E6300514CED34BC18F366962FA942D22B53D7343EAA925EE18300B40B1C285C7B7488A246913F09C1103A3BBEE5EB3EBEE3F6D95CE6487820CDE2428FA0D2B2F14D9D2D8235DD370B19726C0842907D3018F1130E5AD3B3C88F7E64A18
+          [1662389708.823097][17489:17494] CHIP:TOO:       FabricIndex: 1
+          [1662389708.823105][17489:17494] CHIP:TOO:      }
+          [1662389708.823154][17489:17494] CHIP:EM: Sending Standalone Ack for MessageCounter:21612502 on exchange 46583i
+      disabled: true
+
+    - label:
+          "Step 2b: TH1 does a non-fabric-filtered read of the Fabrics attribute
+          from the Node Operational Credentials cluster"
+      verification: |
+          ./chip-tool operationalcredentials read fabrics 1 0 --fabric-filtered 0
+
+          On TH1(chip-tool), Verify that there is a single entry in the list and the FabricID for that entry matches the FabricID for TH1
+          [1662387410.014702][16876:16881] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 4085201476
+          [1662387410.014732][16876:16881] CHIP:TOO:   Fabrics: 1 entries
+          [1662387410.014758][16876:16881] CHIP:TOO:     [1]: {
+          [1662387410.014773][16876:16881] CHIP:TOO:       RootPublicKey: 04FA78EE3C3FF4D5B4F100C395FDE8C4FB44A2CD7F831FB286BC0DA3B00804CC4AF477696B4C2ED482368A5E7ECEA3081184EAE5715531A71DD7D4DC157AECB1FB
+          [1662387410.014782][16876:16881] CHIP:TOO:       VendorId: 65521
+          [1662387410.014790][16876:16881] CHIP:TOO:       FabricId: 1
+          [1662387410.014796][16876:16881] CHIP:TOO:       NodeId: 1
+          [1662387410.014803][16876:16881] CHIP:TOO:       Label:
+          [1662387410.014810][16876:16881] CHIP:TOO:       FabricIndex: 1
+          [1662387410.014817][16876:16881] CHIP:TOO:      }
+          [1662387410.014869][16876:16881] CHIP:EM: Sending Standalone Ack for MessageCounter:194332495 on exchange 18746i
+      disabled: true
+
+    - label:
+          "Step 3: Factory reset DUT and perform the necessary actions to put
+          the DUT into a commissionable state"
+      PICS: MCORE.UI.FACTORYRESET
+      verification: |
+          To perform Factory reset on DUT  follow the below commands in RPI, And use equivalent command on the respective DUT
+          sudo rm -rf /tmp/chip_*
+
+          After factory reset put the DUT into commissionable state and verify commissionable state.
+          This step is same in couple of other cases (like DD) so use the same verification method here too i.e. if your DUT is discoverable over mDNS then use 'chiptool discover commissionables'  to discover mDNS adv and provision the device using 'chip-tool pairing code node-id payload'.
+          otherwise if your DUT is advertising over BLE , pls use the '/chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1' command to discover and provision the device (BTW the SSID , passwd, descriminator ..etc are configurable parameters for your DUT)
+
+          Using RPI, executed the below command to verify this step, Pls use equivalent command on the respective DUT
+          ./chip-all-clusters-app
+      disabled: true
+
+    - label: "Step 4: Commission DUT to TH2s Fabric"
+      verification: |
+          Once DUT reach the  commissionable state as explaiend in step 3, send below mentioned command on TH2 to commission the DUT.  And use equivalent command on the respective DUT (Refer step 3)
+
+           ./chip-tool pairing onnetwork 2 20202021 --commissioner-name beta
+          Verify the commissioning completed with success on TH2(chip-tool) from DUT
+          [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success
+      disabled: true
+
+    - label:
+          "Step 5: TH2 does a non-fabric-filtered read of Fabrics attribute list
+          from DUT"
+      verification: |
+          ./chip-tool operationalcredentials read fabrics 2 0   --commissioner-name beta  --fabric-filtered 0
+
+          On TH2(chip-tool) Verify that there is only one entry in the 'Fabrics' List and Verify that the FabricID is the same as the TH2’s Fabric ID and Verify that the entry saved in Step 2 for TH1' Fabric does not appear in the list
+
+
+          [1662390246.660954][17644:17649] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 2805160061
+          [1662390246.660984][17644:17649] CHIP:TOO:   Fabrics: 1 entries
+          [1662390246.661011][17644:17649] CHIP:TOO:     [1]: {
+          [1662390246.661026][17644:17649] CHIP:TOO:       RootPublicKey: 043F15634C9278EFB024A094A2F1108C9FF29FB0AB9A67F1707D0E2FDAD1BF30A133B0443FA5BEBE28252E82BF88ABB914136C0624F2A175FBE320DE376F12DF8A
+          [1662390246.661036][17644:17649] CHIP:TOO:       VendorId: 65521
+          [1662390246.661044][17644:17649] CHIP:TOO:       FabricId: 2
+          [1662390246.661051][17644:17649] CHIP:TOO:       NodeId: 2
+          [1662390246.661058][17644:17649] CHIP:TOO:       Label:
+          [1662390246.661066][17644:17649] CHIP:TOO:       FabricIndex: 2
+          [1662390246.661074][17644:17649] CHIP:TOO:      }
+          [1662390246.661123][17644:17649] CHIP:EM: Sending Standalone Ack for MessageCounter:28113052 on exchange 4807i
+      disabled: true
+
+    - label:
+          "Step 6: TH2 does a non-fabric-filtered read of NOCs attribute list
+          from DUT"
+      verification: |
+          ./chip-tool operationalcredentials read nocs 2  0  --commissioner-name beta --fabric-filtered 0
+
+          On TH2(chip-tool) Verify that there is only one entry in the 'NOCs' List and the NOC for that entry is different than the NOC entry in noc_th1
+
+          [1662390133.555554][17626:17631] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 2805160061
+          [1662390133.555588][17626:17631] CHIP:TOO:   NOCs: 1 entries
+          [1662390133.555611][17626:17631] CHIP:TOO:     [1]: {
+          [1662390133.555628][17626:17631] CHIP:TOO:       Noc: 1530010101240201370324130218260480228127260580254D3A370624150124110118240701240801300941044D425C2D460D0FE0320BF89A23A986625C328AB31E0A9777B8757766D7695206A1CAA25A190399B5DB4ABE7279B92F2511876835828E04E182433909C31DADD2370A350128011824020136030402040118300414BE030B50E064E6EEBD870149816A89D411A62871300514CFD5CCEC2628AB8F23C8548A67B94A8ED970189218300B403F2FD3CE0512D3ADBF2CEAE862C3C279A10817CE935838247F19BA9CF38E25A8F28E6700312B4FA7BFF3E7179F5EC6E5829B940EDEB4AED9AC0B98CD9875006318
+          [1662390133.555656][17626:17631] CHIP:TOO:       Icac: 1530010101240201370324140118260480228127260580254D3A370624130218240701240801300941044D2A729D4AE36878D1944A3DE7ED797E4107B01BBBB4E05F525E5A8C3FC20D404B15F4121A12E867206CC5404735EA4768B891C2F6DDF99D3464812CC1B70243370A3501290118240260300414CFD5CCEC2628AB8F23C8548A67B94A8ED9701892300514862C638AD0F2DC03D5B19F66B75ABC8BA7FD5FA618300B40B6E857E49C1AE43BFCCA1F322D20299DC25391DE17C05CA5AB68B50D29E7F2C17F9BBB6A1E273A6B5791A333B31A5203395E9A7EE1D633D191B51B72B6DB0E3118
+          [1662390133.555667][17626:17631] CHIP:TOO:       FabricIndex: 1
+          [1662390133.555674][17626:17631] CHIP:TOO:      }
+          [1662390133.555714][17626:17631] CHIP:EM: Sending Standalone Ack for MessageCounter:45776480 on exchange 57400i
+
+
+          Note
+          Verify the NOC entry of TH1 and NOC entry of TH2 are different in TH
+      disabled: true

@@ -16,15 +16,63 @@ limitations under the License.
 -->
 <configurator>
   <domain name="CHIP"/>
+
+  <struct name="CapabilityMinimaStruct">
+    <cluster code="0x0028"/>
+    <item fieldId="0" name="CaseSessionsPerFabric" type="int16u" isNullable="false" writable="false"/>
+    <item fieldId="1" name="SubscriptionsPerFabric" type="int16u" isNullable="false" writable="false"/>
+  </struct>
+
+  <enum name="ProductFinishEnum" type="enum8">
+    <cluster code="0x0028"/>
+    <item name="Other" value="0"/>
+    <item name="Matte" value="1"/>
+    <item name="Satin" value="2"/>
+    <item name="Polished" value="3"/>
+    <item name="Rugged" value="4"/>
+    <item name="Fabric" value="5"/>
+  </enum>
+
+  <enum name="ColorEnum" type="enum8">
+    <cluster code="0x0028"/>
+    <item name="Black" value="0"/>
+    <item name="Navy" value="1"/>
+    <item name="Green" value="2"/>
+    <item name="Teal" value="3"/>
+    <item name="Maroon" value="4"/>
+    <item name="Purple" value="5"/>
+    <item name="Olive" value="6"/>
+    <item name="Gray" value="7"/>
+    <item name="Blue" value="8"/>
+    <item name="Lime" value="9"/>
+    <item name="Aqua" value="10"/>
+    <item name="Red" value="11"/>
+    <item name="Fuchsia" value="12"/>
+    <item name="Yellow" value="13"/>
+    <item name="White" value="14"/>
+    <item name="Nickel" value="15"/>
+    <item name="Chrome" value="16"/>
+    <item name="Brass" value="17"/>
+    <item name="Copper" value="18"/>
+    <item name="Silver" value="19"/>
+    <item name="Gold" value="20"/>
+  </enum>
+
+  <struct name="ProductAppearanceStruct">
+    <cluster code="0x0028"/>
+    <item fieldId="0" name="Finish"       type="ProductFinishEnum" isNullable="false"/>
+    <item fieldId="1" name="PrimaryColor" type="ColorEnum"         isNullable="true" />
+  </struct>
+
   <cluster singleton="true">
-    <name>Basic</name>
+    <name>Basic Information</name>
     <domain>CHIP</domain>
     <code>0x0028</code>
-    <define>BASIC_CLUSTER</define>
+    <define>BASIC_INFORMATION_CLUSTER</define>
     <description>This cluster provides attributes and events for determining basic information about Nodes, which supports both
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location.</description>
-    <globalAttribute side="either" code="0xFFFD" value="1"/>
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
 
     <attribute side="server" code="0"  define="DATA_MODEL_REVISION"       type="int16u"                                                                             >DataModelRevision</attribute>
     <attribute side="server" code="1"  define="VENDOR_NAME"               type="char_string"               length="32"                                              >VendorName</attribute>
@@ -57,21 +105,26 @@ limitations under the License.
     </attribute>
     <attribute side="server" code="17" define="REACHABLE"                 type="boolean"                                default="1"                  optional="true">Reachable</attribute>
     <attribute side="server" code="18" define="UNIQUE_ID"                 type="char_string"               length="32"                               optional="true">UniqueID</attribute>
+    <attribute side="server" code="19" define="CAPABILITY_MINIMA"         type="CapabilityMinimaStruct"                              writable="false"               >CapabilityMinima</attribute>
+    <attribute side="server" code="20" define="PRODUCT_APPEARANCE"        type="ProductAppearanceStruct"                                             optional="true">ProductAppearance</attribute>
+    <attribute side="server" code="21" define="SPECIFICATION_VERSION"     type="int32u"                                                                             >SpecificationVersion</attribute>
+    <attribute side="server" code="22" define="MAX_PATHS_PER_INVOKE"      type="int16u"                                                                             >MaxPathsPerInvoke</attribute>
 
     <event side="server" code="0x00" name="StartUp" priority="critical" optional="false">
       <description>The StartUp event SHALL be emitted by a Node as soon as reasonable after completing a boot or reboot process.</description>
-      <field id="0" name="SoftwareVersion" type="INT32U"/>
+      <field id="0" name="SoftwareVersion" type="int32u"/>
     </event>
-    <event side="server" code="0x01" name="ShutDown" priority="critical" optional="false">
+    <event side="server" code="0x01" name="ShutDown" priority="critical" optional="true">
       <description>The ShutDown event SHOULD be emitted by a Node prior to any orderly shutdown sequence on a best-effort basis.</description>
     </event>
-    <event side="server" code="0x02" name="Leave" priority="info" optional="false">
+    <event side="server" code="0x02" name="Leave" priority="info" optional="true">
       <description>The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.</description>
+      <field id="0" name="FabricIndex" type="fabric_idx"/>
     </event>
     <event side="server" code="0x03" name="ReachableChanged" priority="info" optional="true">
       <description>This event (when supported) SHALL be generated when there is a change in the Reachable attribute.</description>
-      <field id="0" name="ReachableNewValue" type="boolean"/>      
-    </event>    
+      <field id="0" name="ReachableNewValue" type="boolean"/>
+    </event>
 
   </cluster>
 </configurator>

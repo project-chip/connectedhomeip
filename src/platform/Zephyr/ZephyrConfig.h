@@ -23,7 +23,8 @@
 
 #pragma once
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <lib/core/CHIPError.h>
+#include <platform/PersistedStorage.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -53,20 +54,17 @@ public:
     static const Key kConfigKey_ManufacturingDate;
     static const Key kConfigKey_SetupPinCode;
     static const Key kConfigKey_SetupDiscriminator;
-    static const Key kConfigKey_FabricId;
     static const Key kConfigKey_ServiceConfig;
     static const Key kConfigKey_PairedAccountId;
     static const Key kConfigKey_ServiceId;
-    static const Key kConfigKey_FabricSecret;
-    static const Key kConfigKey_GroupKeyIndex;
     static const Key kConfigKey_LastUsedEpochKeyId;
     static const Key kConfigKey_FailSafeArmed;
     static const Key kConfigKey_RegulatoryLocation;
     static const Key kConfigKey_CountryCode;
-    static const Key kConfigKey_Breadcrumb;
     static const Key kConfigKey_Spake2pIterationCount;
     static const Key kConfigKey_Spake2pSalt;
     static const Key kConfigKey_Spake2pVerifier;
+    static const Key kConfigKey_CertificationDeclaration;
 
     static const Key kCounterKey_RebootCount;
     static const Key kCounterKey_BootReason;

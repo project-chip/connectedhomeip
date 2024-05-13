@@ -20,8 +20,11 @@ declare_args() {
   optimize_for_size = true
 
   # Optimize debug builds with -Og.
-  optimize_debug =
-      current_os == "freertos" || current_os == "zephyr" || current_os == "mbed"
+  optimize_debug = current_os == "freertos" || current_os == "zephyr" ||
+                   current_os == "mbed" || current_os == "cmsis-rtos"
+
+  # Optimization level for debug. Only has an effect if optimize_debug is true.
+  optimize_debug_level = "g"
 
   # Symbol level for debugging.
   symbol_level = 2
@@ -40,8 +43,20 @@ declare_args() {
   c_standard = "gnu11"
 
   # C++ standard level (value for -std flag).
-  cpp_standard = "gnu++14"
+  cpp_standard = "gnu++17"
 
   # enable libfuzzer
   is_libfuzzer = false
+
+  # Generate code coverage analysis artifacts when enabled.
+  use_coverage = false
+
+  # Enable address sanitizer
+  is_asan = false
+
+  # Debug prefix mapping (values for -fdebug-prefix-map=).
+  prefix_mappings = []
+
+  # Enable fuzzer build for OSS-Fuzz
+  oss_fuzz = false
 }

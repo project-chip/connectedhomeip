@@ -29,6 +29,7 @@
 
 #pragma once
 
+#include <controller/AutoCommissioner.h>
 #include <controller/OperationalCredentialsDelegate.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CASEAuthTag.h>
@@ -51,6 +52,14 @@ public:
                                 const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
                                 Callback::Callback<OnNOCChainGeneration> * onCompletion) override;
 
+    CHIP_ERROR NOCChainGenerated(CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac,
+                                 Optional<Crypto::IdentityProtectionKeySpan> ipk, Optional<NodeId> adminSubject);
+
+    void SetUseJavaCallbackForNOCRequest(bool useJavaCallbackForNOCRequest)
+    {
+        mUseJavaCallbackForNOCRequest = useJavaCallbackForNOCRequest;
+    }
+
     void SetNodeIdForNextNOCRequest(NodeId nodeId) override
     {
         mNextRequestedNodeId = nodeId;
@@ -69,7 +78,7 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Initialize(PersistentStorageDelegate & storage, jobject javaObjectRef);
+    CHIP_ERROR Initialize(PersistentStorageDelegate & storage, AutoCommissioner * autoCommissioner, jobject javaObjectRef);
 
     void SetIssuerId(uint32_t id) { mIssuerId = id; }
 
@@ -86,7 +95,49 @@ public:
                                                const Crypto::P256PublicKey & pubkey, MutableByteSpan & rcac, MutableByteSpan & icac,
                                                MutableByteSpan & noc);
 
+    /**
+     * Create a root (self-signed) X.509 DER encoded certificate that has the
+     * right fields to be a valid Matter root certificate.
+     */
+    static CHIP_ERROR GenerateRootCertificate(Crypto::P256Keypair & keypair, uint64_t issuerId, Optional<FabricId> fabricId,
+                                              uint32_t validityStart, uint32_t validityEnd, MutableByteSpan & rcac);
+
+    /**
+     * Create an intermediate X.509 DER encoded certificate that has the
+     * right fields to be a valid Matter intermediate certificate.
+     */
+    static CHIP_ERROR GenerateIntermediateCertificate(Crypto::P256Keypair & rootKeypair, const ByteSpan & rcac,
+                                                      const Crypto::P256PublicKey & intermediatePublicKey, uint64_t issuerId,
+                                                      Optional<FabricId> fabricId, uint32_t validityStart, uint32_t validityEnd,
+                                                      MutableByteSpan & icac);
+
+    /**
+     * Create an X.509 DER encoded certificate that has the
+     * right fields to be a valid Matter operational certificate.
+     *
+     * signingKeypair and signingCertificate are the root or intermediate that is
+     * signing the operational certificate.
+     *
+     * cats may be null to indicate no CASE Authenticated Tags
+     * should be used. If cats is not null, it must contain at most
+     * 3 numbers, which are expected to be 32-bit unsigned Case Authenticated Tag
+     * values.
+     */
+    static CHIP_ERROR GenerateOperationalCertificate(Crypto::P256Keypair & signingKeypair, const ByteSpan & signingCertificate,
+                                                     const Crypto::P256PublicKey & operationalPublicKey, FabricId fabricId,
+                                                     NodeId nodeId, const chip::CATValues & cats, uint32_t validityStart,
+                                                     uint32_t validityEnd, MutableByteSpan & noc);
+
 private:
+    CHIP_ERROR CallbackGenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce,
+                                        const ByteSpan & attestationSignature, const ByteSpan & attestationChallenge,
+                                        const ByteSpan & DAC, const ByteSpan & PAI,
+                                        Callback::Callback<OnNOCChainGeneration> * onCompletion);
+
+    CHIP_ERROR LocalGenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce, const ByteSpan & attestationSignature,
+                                     const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
+                                     Callback::Callback<OnNOCChainGeneration> * onCompletion);
+
     Crypto::P256Keypair mIssuer;
     bool mInitialized  = false;
     uint32_t mIssuerId = 0;
@@ -97,12 +148,16 @@ private:
 
     NodeId mNextAvailableNodeId          = 1;
     PersistentStorageDelegate * mStorage = nullptr;
+    AutoCommissioner * mAutoCommissioner = nullptr;
 
     NodeId mNextRequestedNodeId = 1;
     FabricId mNextFabricId      = 1;
     bool mNodeIdRequested       = false;
 
     jobject mJavaObjectRef = nullptr;
+
+    bool mUseJavaCallbackForNOCRequest                                  = false;
+    Callback::Callback<OnNOCChainGeneration> * mOnNOCCompletionCallback = nullptr;
 };
 
 } // namespace Controller

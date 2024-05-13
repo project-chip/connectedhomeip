@@ -14,22 +14,41 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlio.gni")
-import("//build_overrides/nlunit_test.gni")
+import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
+
+source_set("helpers") {
+  sources = [
+    "LoopbackTransportManager.h",
+    "UDPTransportManager.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/transport:transport",
+    "${chip_root}/src/transport/raw",
+    "${chip_root}/src/transport/raw/tests:helpers",
+  ]
+}
 
 chip_test_suite("tests") {
   output_name = "libTransportLayerTests"
 
   test_sources = [
+    "TestCryptoContext.cpp",
     "TestGroupMessageCounter.cpp",
-    "TestPairingSession.cpp",
     "TestPeerConnections.cpp",
     "TestPeerMessageCounter.cpp",
     "TestSecureSession.cpp",
     "TestSessionManager.cpp",
+    "TestSessionManagerDispatch.cpp",
   ]
+
+  if (chip_device_platform != "mbed" && chip_device_platform != "efr32" &&
+      chip_device_platform != "esp32" && chip_device_platform != "nrfconnect" &&
+      chip_device_platform != "nxp") {
+    test_sources += [ "TestSecureSessionTable.cpp" ]
+  }
 
   cflags = [ "-Wconversion" ]
 
@@ -39,10 +58,9 @@ chip_test_suite("tests") {
     "${chip_root}/src/inet/tests:helpers",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:testing",
     "${chip_root}/src/protocols",
     "${chip_root}/src/transport",
-    "${chip_root}/src/transport/raw/tests:helpers",
-    "${nlio_root}:nlio",
-    "${nlunit_test_root}:nlunit-test",
+    "${chip_root}/src/transport/tests:helpers",
   ]
 }

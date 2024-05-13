@@ -17,7 +17,6 @@
 
 #include "Resolver.h"
 
-#include <lib/dnssd/ResolverProxy.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
@@ -28,42 +27,42 @@ class NoneResolver : public Resolver
 {
 public:
     CHIP_ERROR Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> *) override { return CHIP_NO_ERROR; }
+    bool IsInitialized() override { return true; }
     void Shutdown() override {}
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) override {}
-    void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override {}
 
-    CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override
+    CHIP_ERROR ResolveNodeId(const PeerId & peerId) override
     {
         ChipLogError(Discovery, "Failed to resolve node ID: dnssd resolving not available");
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
-    CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) override
+    {
+        ChipLogError(Discovery, "Failed to stop resolving node ID: dnssd resolving not available");
+    }
+    CHIP_ERROR StartDiscovery(DiscoveryType type, DiscoveryFilter filter, DiscoveryContext & context) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    CHIP_ERROR StopDiscovery(DiscoveryContext & context) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 };
 
 NoneResolver gResolver;
 
 } // namespace
 
-Resolver & chip::Dnssd::Resolver::Instance()
+#if CHIP_DNSSD_DEFAULT_NONE
+
+Resolver & GetDefaultResolver()
 {
     return gResolver;
 }
 
-CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR ResolverProxy::FindCommissionableNodes(DiscoveryFilter filter)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR ResolverProxy::FindCommissioners(DiscoveryFilter filter)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
+#endif // CHIP_DNSSD_DEFAULT_NONE
 
 } // namespace Dnssd
 } // namespace chip

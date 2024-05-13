@@ -21,18 +21,18 @@ on:
             - "**.c[cs]?"
             - "**.cxx"
             - "**.cpp"
-            - "**.c++"
+            - "**.c\\+\\+"
             - "**.ii"
             - "**.ixx"
             - "**.ipp"
-            - "**.i++"
+            - "**.i\\+\\+"
             - "**.inl"
             - "**.[hH]"
             - "**.hh"
             - "**.HH"
             - "**.hxx"
             - "**.hpp"
-            - "**.h++"
+            - "**.h\\+\\+"
             - "**.mm"
             - "**.txt"
             - "**.[ido]dl"
@@ -48,18 +48,18 @@ on:
             - "**.c[cs]?"
             - "**.cxx"
             - "**.cpp"
-            - "**.c++"
+            - "**.c\\+\\+"
             - "**.ii"
             - "**.ixx"
             - "**.ipp"
-            - "**.i++"
+            - "**.i\\+\\+"
             - "**.inl"
             - "**.[hH]"
             - "**.hh"
             - "**.HH"
             - "**.hxx"
             - "**.hpp"
-            - "**.h++"
+            - "**.h\\+\\+"
             - "**.mm"
             - "**.txt"
             - "**.[ido]dl"
@@ -78,26 +78,18 @@ concurrency:
 jobs:
     doxygen:
         name: Build Doxygen
-        timeout-minutes: 5
 
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-latest
         container:
-            image: connectedhomeip/chip-build-doxygen:0.5.58
+            image: ghcr.io/project-chip/chip-build-doxygen:50
 
         if: github.actor != 'restyled-io[bot]'
 
         steps:
             - name: "Print Actor"
               run: echo ${{github.actor}}
-            - uses: Wandalen/wretry.action@v1.0.11
-              name: Checkout
-              with:
-                  action: actions/checkout@v3
-                  with: |
-                      submodules: true
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
+            - name: Checkout
+              uses: actions/checkout@v4
             - name: Generate
               run: scripts/helpers/doxygen.sh
             - name: Extract branch name

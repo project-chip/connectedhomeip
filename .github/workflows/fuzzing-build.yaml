@@ -22,56 +22,43 @@ concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+    
 jobs:
     build_linux_fuzzing:
         name: Build on Linux
-        timeout-minutes: 90
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.58
+            image: ghcr.io/project-chip/chip-build:50
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.11
-              name: Checkout
-              with:
-                  action: actions/checkout@v3
-                  with: |
-                      submodules: true
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
+            - name: Checkout
+              uses: actions/checkout@v4
             - run: apt-get update
             - run: apt-get install --fix-missing llvm-10 clang-10
             - name: Try to ensure the objdir-clone dir exists
               run: |
                   mkdir objdir-clone || true
+
             - name: Bootstrap
-              timeout-minutes: 10
-              run: scripts/build/gn_bootstrap.sh
-            - name: Uploading bootstrap logs
-              uses: actions/upload-artifact@v2
-              if: ${{ always() }} && ${{ !env.ACT }}
-              with:
-                  name: bootstrap-logs
-                  path: |
-                      .environment/gn_out/.ninja_log
-                      .environment/pigweed-venv/*.log
+              uses: ./.github/actions/bootstrap
+
             - name: Build all-clusters-app
-              timeout-minutes: 20
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
-                        --target linux-x64-all-clusters-no-ble-libfuzzer-test-group \
+                        --target linux-x64-all-clusters-no-ble-libfuzzer \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
             - name: Uploading binaries
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v4
               if: ${{ !env.ACT }}
               with:
                   name: objdir-linux
@@ -81,46 +68,22 @@ jobs:
 
     build_darwin_fuzzing:
         name: Build on Darwin
-        timeout-minutes: 90
-        runs-on: macos-latest
+        runs-on: macos-13
         if: github.actor != 'restyled-io[bot]'
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.11
-              name: Checkout
-              with:
-                  action: actions/checkout@v3
-                  with: |
-                      submodules: true
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
+            - name: Checkout
+              uses: actions/checkout@v4
             - name: Setup Environment
-              run: brew install openssl pkg-config llvm
+              run: brew install llvm
             - name: Try to ensure the objdir-clone dir exists
               run: |
                   mkdir objdir-clone || true
-            - name: Fix pkgconfig link
-              working-directory: /usr/local/lib/pkgconfig
-              run: |
-                  pwd
-                  ls -la /usr/local/Cellar/
-                  ls -la /usr/local/Cellar/openssl@1.1
-                  OPEN_SSL_VERSION=`ls -la /usr/local/Cellar/openssl@1.1 | cat | tail -n1 | awk '{print $NF}'`
-                  ln -s /usr/local/Cellar/openssl@1.1/$OPEN_SSL_VERSION/lib/pkgconfig/* .
+
             - name: Bootstrap
-              timeout-minutes: 25
-              run: scripts/build/gn_bootstrap.sh
-            - name: Uploading bootstrap logs
-              uses: actions/upload-artifact@v2
-              if: ${{ always() }} && ${{ !env.ACT }}
-              with:
-                  name: bootstrap-logs
-                  path: |
-                      .environment/gn_out/.ninja_log
-                      .environment/pigweed-venv/*.log
+              uses: ./.github/actions/bootstrap
+
             - name: Build all-clusters-app
-              timeout-minutes: 20
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -129,7 +92,7 @@ jobs:
                         --copy-artifacts-to objdir-clone \
                      "
             - name: Uploading binaries
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v4
               if: ${{ !env.ACT }}
               with:
                   name: crash-darwin

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns="http://tizen.org/ns/packages" api-version="6.0" package="org.tizen.matter.example.allclusters" version="1.0.0">
+    <profile name="mobile" />
+    <service-application appid="org.tizen.matter.example.allclusters" exec="chip-all-clusters-app" type="capp" multiple="false" taskmanage="false" nodisplay="true">
+        <label>Matter All Clusters Example</label>
+    </service-application>
+    <privileges>
+        <privilege>http://tizen.org/privilege/bluetooth</privilege>
+        <privilege>http://tizen.org/privilege/internet</privilege>
+        <privilege>http://tizen.org/privilege/network.get</privilege>
+        <privilege>http://tizen.org/privilege/network.set</privilege>
+        <privilege>http://tizen.org/privilege/network.profile</privilege>
+    </privileges>
+    <feature name="http://tizen.org/feature/network.bluetooth">true</feature>
+    <feature name="http://tizen.org/feature/network.bluetooth.le">true</feature>
+    <feature name="http://tizen.org/feature/network.bluetooth.le.gatt.server">true</feature>
+    <feature name="http://tizen.org/feature/network.service_discovery.dnssd">true</feature>
+    <feature name="http://tizen.org/feature/network.wifi">true</feature>
+</manifest>

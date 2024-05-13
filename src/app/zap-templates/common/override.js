@@ -59,7 +59,9 @@ function atomicType(arg)
   case 'fabric_idx':
     return 'chip::FabricIndex';
   case 'status':
-    return 'chip::Protocols::InteractionModel::Status';
+    // We can't make this into InteractionModel::Status, since it might be a
+    // cluster-specific status.
+    return 'uint8_t';
   case 'octet_string':
   case 'long_octet_string':
     return 'chip::ByteSpan';
@@ -72,10 +74,22 @@ function atomicType(arg)
     return 'chip::Percent';
   case 'percent100ths':
     return 'chip::Percent100ths';
+  case 'power_mw':
+  case 'amperage_ma':
+  case 'voltage_mv':
+  case 'energy_mwh':
+    return 'int64_t';
   case 'epoch_us':
+  case 'systime_us':
+  case 'posix_ms':
+  case 'systime_ms':
     return 'uint64_t';
   case 'epoch_s':
+  case 'utc':
+  case 'elapsed_s':
     return 'uint32_t';
+  case 'temperature':
+    return 'int16_t';
   default:
     throw 'not overriding';
   }

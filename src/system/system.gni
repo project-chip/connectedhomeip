@@ -37,15 +37,19 @@ declare_args() {
 }
 
 declare_args() {
-  # use the dispatch library
+  # do not use libev by default
+  chip_system_config_use_libev = false
+
+  # use the dispatch library on darwin targets
   chip_system_config_use_dispatch = chip_system_config_use_sockets &&
                                     (current_os == "mac" || current_os == "ios")
 }
 
 declare_args() {
   # Event loop type.
-  if (chip_system_config_use_lwip) {
-    chip_system_config_event_loop = "LwIP"
+  if (chip_system_config_use_lwip ||
+      chip_system_config_use_open_thread_inet_endpoints) {
+    chip_system_config_event_loop = "FreeRTOS"
   } else {
     chip_system_config_event_loop = "Select"
   }
@@ -56,6 +60,10 @@ if (chip_system_config_locking == "") {
     chip_system_config_locking = "freertos"
   } else if (current_os == "mbed") {
     chip_system_config_locking = "mbed"
+  } else if (current_os == "cmsis-rtos") {
+    chip_system_config_locking = "cmsis-rtos"
+  } else if (current_os == "zephyr") {
+    chip_system_config_locking = "zephyr"
   } else if (chip_system_config_use_dispatch == false) {
     chip_system_config_locking = "posix"
   } else {
@@ -67,8 +75,10 @@ assert(
     chip_system_config_locking == "posix" ||
         chip_system_config_locking == "freertos" ||
         chip_system_config_locking == "none" ||
-        chip_system_config_locking == "mbed",
-    "Please select a valid mutex implementation: posix, freertos, mbed, none")
+        chip_system_config_locking == "mbed" ||
+        chip_system_config_locking == "cmsis-rtos" ||
+        chip_system_config_locking == "zephyr",
+    "Please select a valid mutex implementation: posix, freertos, mbed, cmsis-rtos, zephyr, none")
 
 assert(
     chip_system_config_clock == "clock_gettime" ||

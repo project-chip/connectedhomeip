@@ -27,6 +27,7 @@
 
 #include <type_traits>
 
+#include <array>
 #include <protocols/Protocols.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -44,13 +45,15 @@ namespace chip {
 namespace Protocols {
 namespace InteractionModel {
 
+inline constexpr char kProtocolName[] = "IM";
+
 /**
  * Version of the Interaction Model used by the node.
  */
-constexpr uint16_t kVersion = 0;
+inline constexpr uint16_t kVersion = 0;
 
 /**
- * SecureChannel Protocol Message Types
+ * Interaction Model Protocol Message Types
  */
 enum class MsgType : uint8_t
 {
@@ -72,6 +75,26 @@ template <>
 struct MessageTypeTraits<InteractionModel::MsgType>
 {
     static constexpr const Protocols::Id & ProtocolId() { return InteractionModel::Id; }
+
+    static auto GetTypeToNameTable()
+    {
+        static const std::array<MessageTypeNameLookup, 10> typeToNameTable = {
+            {
+                { InteractionModel::MsgType::StatusResponse, "StatusResponse" },
+                { InteractionModel::MsgType::ReadRequest, "ReadRequest" },
+                { InteractionModel::MsgType::SubscribeRequest, "SubscribeRequest" },
+                { InteractionModel::MsgType::SubscribeResponse, "SubscribeResponse" },
+                { InteractionModel::MsgType::ReportData, "ReportData" },
+                { InteractionModel::MsgType::WriteRequest, "WriteRequest" },
+                { InteractionModel::MsgType::WriteResponse, "WriteResponse" },
+                { InteractionModel::MsgType::InvokeCommandRequest, "InvokeCommandRequest" },
+                { InteractionModel::MsgType::InvokeCommandResponse, "InvokeCommandResponse" },
+                { InteractionModel::MsgType::TimedRequest, "TimedRequest" },
+            },
+        };
+
+        return &typeToNameTable;
+    }
 };
 
 } // namespace Protocols

@@ -36,6 +36,9 @@
 
 namespace chip {
 
+template <class T>
+class BitmapActiveObjectIterator;
+
 namespace internal {
 
 class Statistics
@@ -91,6 +94,16 @@ protected:
     void * At(size_t index) { return static_cast<uint8_t *>(mElements) + mElementSize * index; }
     size_t IndexOf(void * element);
 
+    /// Returns the first index that is active (i.e. allocated data).
+    ///
+    /// If nothing is active, this will return mCapacity
+    size_t FirstActiveIndex();
+
+    /// Returns the next active index after `start`.
+    ///
+    /// If nothing else active/allocated, returns mCapacity
+    size_t NextActiveIndexAfter(size_t start);
+
     using Lambda = Loop (*)(void * context, void * object);
     Loop ForEachActiveObjectInner(void * context, Lambda lambda);
     Loop ForEachActiveObjectInner(void * context, Loop lambda(void * context, const void * object)) const
@@ -102,18 +115,10 @@ private:
     void * mElements;
     const size_t mElementSize;
     std::atomic<tBitChunkType> * mUsage;
-};
 
-template <class T>
-class PoolCommon
-{
-public:
-    template <typename... Args>
-    void ResetObject(T * element, Args &&... args)
-    {
-        element->~T();
-        new (element) T(std::forward<Args>(args)...);
-    }
+    /// allow accessing direct At() calls
+    template <class T>
+    friend class ::chip::BitmapActiveObjectIterator;
 };
 
 template <typename T, typename Function>
@@ -144,14 +149,14 @@ struct HeapObjectListNode
         mPrev->mNext = mNext;
     }
 
-    void * mObject;
-    HeapObjectListNode * mNext;
-    HeapObjectListNode * mPrev;
+    void * mObject             = nullptr;
+    HeapObjectListNode * mNext = nullptr;
+    HeapObjectListNode * mPrev = nullptr;
 };
 
 struct HeapObjectList : HeapObjectListNode
 {
-    HeapObjectList() : mIterationDepth(0) { mNext = mPrev = this; }
+    HeapObjectList() { mNext = mPrev = this; }
 
     void Append(HeapObjectListNode * node)
     {
@@ -170,12 +175,56 @@ struct HeapObjectList : HeapObjectListNode
         return const_cast<HeapObjectList *>(this)->ForEachNode(context, reinterpret_cast<Lambda>(lambda));
     }
 
-    size_t mIterationDepth;
+    /// Cleans up any deferred releases IFF iteration depth is 0
+    void CleanupDeferredReleases();
+
+    size_t mIterationDepth         = 0;
+    bool mHaveDeferredNodeRemovals = false;
 };
 
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
 } // namespace internal
+
+/// Provides iteration over active objects in a Bitmap pool.
+///
+/// Creating and releasing items within a pool does not invalidate
+/// an iterator, however there are no guarantees which objects the
+/// iterator will return (i.e. newly created objects while iterating
+/// may be visible or not to the iterator depending where they are
+/// allocated).
+///
+/// You are not prevented from releasing the object the iterator
+/// currently points at. In that case, iterator should be advanced.
+template <class T>
+class BitmapActiveObjectIterator
+{
+public:
+    using value_type = T;
+    using pointer    = T *;
+    using reference  = T &;
+
+    explicit BitmapActiveObjectIterator(internal::StaticAllocatorBitmap * pool, size_t idx) : mPool(pool), mIndex(idx) {}
+    BitmapActiveObjectIterator() {}
+
+    bool operator==(const BitmapActiveObjectIterator & other) const
+    {
+        return (AtEnd() && other.AtEnd()) || ((mPool == other.mPool) && (mIndex == other.mIndex));
+    }
+    bool operator!=(const BitmapActiveObjectIterator & other) const { return !(*this == other); }
+    BitmapActiveObjectIterator & operator++()
+    {
+        mIndex = mPool->NextActiveIndexAfter(mIndex);
+        return *this;
+    }
+    T * operator*() const { return static_cast<T *>(mPool->At(mIndex)); }
+
+private:
+    bool AtEnd() const { return (mPool == nullptr) || (mIndex >= mPool->Capacity()); }
+
+    internal::StaticAllocatorBitmap * mPool = nullptr; // pool that this belongs to
+    size_t mIndex                           = std::numeric_limits<size_t>::max();
+};
 
 /**
  * @class ObjectPool
@@ -210,11 +259,14 @@ struct HeapObjectList : HeapObjectListNode
  *  @tparam     N   a positive integer max number of elements the pool provides.
  */
 template <class T, size_t N>
-class BitMapObjectPool : public internal::StaticAllocatorBitmap, public internal::PoolCommon<T>
+class BitMapObjectPool : public internal::StaticAllocatorBitmap
 {
 public:
     BitMapObjectPool() : StaticAllocatorBitmap(mData.mMemory, mUsage, N, sizeof(T)) {}
     ~BitMapObjectPool() { VerifyOrDie(Allocated() == 0); }
+
+    BitmapActiveObjectIterator<T> begin() { return BitmapActiveObjectIterator<T>(this, FirstActiveIndex()); }
+    BitmapActiveObjectIterator<T> end() { return BitmapActiveObjectIterator<T>(this, N); }
 
     template <typename... Args>
     T * CreateObject(Args &&... args)
@@ -240,8 +292,15 @@ public:
      * @brief
      *   Run a functor for each active object in the pool
      *
-     *  @param     function The functor of type `Loop (*)(T*)`, return Loop::Break to break the iteration
-     *  @return    Loop     Returns Break or Finish according to the iteration
+     *  @param     function A functor of type `Loop (*)(T*)`.
+     *                      Return Loop::Break to break the iteration.
+     *                      The only modification the functor is allowed to make
+     *                      to the pool before returning is releasing the
+     *                      object that was passed to the functor.  Any other
+     *                      desired changes need to be made after iteration
+     *                      completes.
+     *  @return    Loop     Returns Break if some call to the functor returned
+     *                      Break.  Otherwise returns Finish.
      *
      * caution
      *   this function is not thread-safe, make sure all usage of the
@@ -283,13 +342,30 @@ private:
 
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
+class HeapObjectPoolExitHandling
+{
+public:
+    // If IgnoreLeaksOnExit is called, some time after all static initializers have
+    // run, HeapObjectPool will not assert that everything in it has been
+    // released if its destructor runs under exit() (i.e. when the application
+    // is quitting anyway).
+    static void IgnoreLeaksOnExit();
+
+protected:
+    static bool sIgnoringLeaksOnExit;
+
+private:
+    static void ExitHandler();
+    static bool sExitHandlerRegistered;
+};
+
 /**
  * A class template used for allocating objects from the heap.
  *
  *  @tparam     T   type to be allocated.
  */
 template <class T>
-class HeapObjectPool : public internal::Statistics, public internal::PoolCommon<T>
+class HeapObjectPool : public internal::Statistics, public HeapObjectPoolExitHandling
 {
 public:
     HeapObjectPool() {}
@@ -299,17 +375,109 @@ public:
 #ifdef __clang__
 #if __has_feature(address_sanitizer)
 #define __SANITIZE_ADDRESS__ 1
-#endif
-#endif
-#endif
+#else
+#define __SANITIZE_ADDRESS__ 0
+#endif // __has_feature(address_sanitizer)
+#else
+#define __SANITIZE_ADDRESS__ 0
+#endif // __clang__
+#endif // __SANITIZE_ADDRESS__
 #if __SANITIZE_ADDRESS__
         // Free all remaining objects so that ASAN can catch specific use-after-free cases.
         ReleaseAll();
 #else  // __SANITIZE_ADDRESS__
-       // Verify that no live objects remain, to prevent potential use-after-free.
-        VerifyOrDie(Allocated() == 0);
+        if (!sIgnoringLeaksOnExit)
+        {
+            // Verify that no live objects remain, to prevent potential use-after-free.
+            VerifyOrDie(Allocated() == 0);
+        }
 #endif // __SANITIZE_ADDRESS__
     }
+
+    /// Provides iteration over active objects in the pool.
+    ///
+    /// NOTE: There is extra logic to allow objects release WHILE the iterator is
+    ///       active while still allowing to advance the iterator.
+    ///       This is done by flagging an iteration depth whenever an active
+    ///       iterator exists. This also means that while a pool iterator exists, releasing
+    ///       of tracking memory objects may be deferred until the last active iterator is
+    ///       released.
+    class ActiveObjectIterator
+    {
+    public:
+        using value_type = T;
+        using pointer    = T *;
+        using reference  = T &;
+
+        ActiveObjectIterator() {}
+        ActiveObjectIterator(const ActiveObjectIterator & other) : mCurrent(other.mCurrent), mEnd(other.mEnd)
+        {
+            if (mEnd != nullptr)
+            {
+                // Iteration depth is used to support `Release` while an iterator is active.
+                //
+                // Code was historically using this functionality, so we support it here
+                // as well: while iteration is active, iteration depth is > 0. When it
+                // goes to 0, then any deferred `Release()` calls are executed.
+                mEnd->mIterationDepth++;
+            }
+        }
+
+        ActiveObjectIterator & operator=(const ActiveObjectIterator & other)
+        {
+            if (mEnd != nullptr)
+            {
+                mEnd->mIterationDepth--;
+                mEnd->CleanupDeferredReleases();
+            }
+            mCurrent = other.mCurrent;
+            mEnd     = other.mEnd;
+            mEnd->mIterationDepth++;
+        }
+
+        ~ActiveObjectIterator()
+        {
+            if (mEnd != nullptr)
+            {
+                mEnd->mIterationDepth--;
+                mEnd->CleanupDeferredReleases();
+            }
+        }
+
+        bool operator==(const ActiveObjectIterator & other) const
+        {
+            // extra current/end compare is to have all "end iterators"
+            // compare as equal (in particular default active object iterator is the end
+            // of an iterator)
+            return (mCurrent == other.mCurrent) || ((mCurrent == mEnd) && (other.mCurrent == other.mEnd));
+        }
+        bool operator!=(const ActiveObjectIterator & other) const { return !(*this == other); }
+        ActiveObjectIterator & operator++()
+        {
+            do
+            {
+                mCurrent = mCurrent->mNext;
+            } while ((mCurrent != mEnd) && (mCurrent->mObject == nullptr));
+            return *this;
+        }
+        T * operator*() const { return static_cast<T *>(mCurrent->mObject); }
+
+    protected:
+        friend class HeapObjectPool<T>;
+
+        explicit ActiveObjectIterator(internal::HeapObjectListNode * current, internal::HeapObjectList * end) :
+            mCurrent(current), mEnd(end)
+        {
+            mEnd->mIterationDepth++;
+        }
+
+    private:
+        internal::HeapObjectListNode * mCurrent = nullptr;
+        internal::HeapObjectList * mEnd         = nullptr;
+    };
+
+    ActiveObjectIterator begin() { return ActiveObjectIterator(mObjects.mNext, &mObjects); }
+    ActiveObjectIterator end() { return ActiveObjectIterator(&mObjects, &mObjects); }
 
     template <typename... Args>
     T * CreateObject(Args &&... args)
@@ -336,18 +504,36 @@ public:
      */
     size_t Capacity() const { return SIZE_MAX; }
 
+    /*
+     * This method exists purely to line up with the static allocator version. Heap based object pool will never be exhausted.
+     */
+    bool Exhausted() const { return false; }
+
     void ReleaseObject(T * object)
     {
         if (object != nullptr)
         {
             internal::HeapObjectListNode * node = mObjects.FindNode(object);
-            if (node != nullptr)
+            // Releasing an object that is not allocated indicates likely memory
+            // corruption; better to safe-crash than proceed at this point.
+            VerifyOrDie(node != nullptr);
+
+            node->mObject = nullptr;
+            Platform::Delete(object);
+
+            // The node needs to be released immediately if we are not in the middle of iteration.
+            // Otherwise cleanup is deferred until all iteration on this pool completes and it's safe to release nodes.
+            if (mObjects.mIterationDepth == 0)
             {
-                // Note that the node is not removed here; that is deferred until the end of the next pool iteration.
-                node->mObject = nullptr;
-                Platform::Delete(object);
-                DecreaseUsage();
+                node->Remove();
+                Platform::Delete(node);
             }
+            else
+            {
+                mObjects.mHaveDeferredNodeRemovals = true;
+            }
+
+            DecreaseUsage();
         }
     }
 
@@ -357,8 +543,15 @@ public:
      * @brief
      *   Run a functor for each active object in the pool
      *
-     *  @param     function The functor of type `Loop (*)(T*)`, return Loop::Break to break the iteration
-     *  @return    Loop     Returns Break or Finish according to the iteration
+     *  @param     function A functor of type `Loop (*)(T*)`.
+     *                      Return Loop::Break to break the iteration.
+     *                      The only modification the functor is allowed to make
+     *                      to the pool before returning is releasing the
+     *                      object that was passed to the functor.  Any other
+     *                      desired changes need to be made after iteration
+     *                      completes.
+     *  @return    Loop     Returns Break if some call to the functor returned
+     *                      Break.  Otherwise returns Finish.
      */
     template <typename Function>
     Loop ForEachActiveObject(Function && function)
@@ -411,6 +604,15 @@ enum class ObjectPoolMem
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 };
 
+template <typename T, ObjectPoolMem P = ObjectPoolMem::kDefault>
+struct ObjectPoolIterator;
+
+template <typename T>
+struct ObjectPoolIterator<T, ObjectPoolMem::kInline>
+{
+    using Type = BitmapActiveObjectIterator<T>;
+};
+
 template <typename T, size_t N, ObjectPoolMem P = ObjectPoolMem::kDefault>
 class ObjectPool;
 
@@ -420,6 +622,13 @@ class ObjectPool<T, N, ObjectPoolMem::kInline> : public BitMapObjectPool<T, N>
 };
 
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+
+template <typename T>
+struct ObjectPoolIterator<T, ObjectPoolMem::kHeap>
+{
+    using Type = typename HeapObjectPool<T>::ActiveObjectIterator;
+};
+
 template <typename T, size_t N>
 class ObjectPool<T, N, ObjectPoolMem::kHeap> : public HeapObjectPool<T>
 {

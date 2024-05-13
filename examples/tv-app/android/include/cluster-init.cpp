@@ -21,12 +21,9 @@
 #include "audio-output/AudioOutputManager.h"
 #include "target-navigator/TargetNavigatorManager.h"
 
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/AttributeAccessInterface.h>
 #include <app/util/attribute-storage.h>
 
 using namespace chip;
@@ -49,7 +46,7 @@ static TargetNavigatorManager targetNavigatorManager;
  */
 void emberAfApplicationBasicClusterInitCallback(chip::EndpointId endpoint)
 {
-    ChipLogProgress(Zcl, "TV Linux App: ApplicationBasic::SetDefaultDelegate");
+    ChipLogProgress(Zcl, "TV Android App: ApplicationBasic::SetDefaultDelegate");
     chip::app::Clusters::ApplicationBasic::SetDefaultDelegate(endpoint, &applicationBasicManager);
 }
 
@@ -64,7 +61,7 @@ void emberAfApplicationBasicClusterInitCallback(chip::EndpointId endpoint)
  */
 void emberAfApplicationLauncherClusterInitCallback(EndpointId endpoint)
 {
-    ChipLogProgress(Zcl, "TV Linux App: ApplicationLauncher::SetDefaultDelegate");
+    ChipLogProgress(Zcl, "TV Android App: ApplicationLauncher::SetDefaultDelegate");
     chip::app::Clusters::ApplicationLauncher::SetDefaultDelegate(endpoint, &applicationLauncherManager);
 }
 
@@ -79,7 +76,7 @@ void emberAfApplicationLauncherClusterInitCallback(EndpointId endpoint)
  */
 void emberAfAudioOutputClusterInitCallback(EndpointId endpoint)
 {
-    ChipLogProgress(Zcl, "TV Linux App: AudioOutput::SetDefaultDelegate");
+    ChipLogProgress(Zcl, "TV Android App: AudioOutput::SetDefaultDelegate");
     chip::app::Clusters::AudioOutput::SetDefaultDelegate(endpoint, &audioOutputManager);
 }
 
@@ -94,6 +91,6 @@ void emberAfAudioOutputClusterInitCallback(EndpointId endpoint)
  */
 void emberAfTargetNavigatorClusterInitCallback(EndpointId endpoint)
 {
-    ChipLogProgress(Zcl, "TV Linux App: TargetNavigator::SetDefaultDelegate");
+    ChipLogProgress(Zcl, "TV Android App: TargetNavigator::SetDefaultDelegate");
     chip::app::Clusters::TargetNavigator::SetDefaultDelegate(endpoint, &targetNavigatorManager);
 }

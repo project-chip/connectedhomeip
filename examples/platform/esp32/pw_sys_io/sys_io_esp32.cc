@@ -29,6 +29,7 @@
 #include <cinttypes>
 #include <stdio.h>
 #include <string.h>
+#include <string>
 
 #define ECHO_TEST_TXD (CONFIG_EXAMPLE_UART_TXD)
 #define ECHO_TEST_RXD (CONFIG_EXAMPLE_UART_RXD)
@@ -95,13 +96,13 @@ Status WriteByte(std::byte b)
 StatusWithSize WriteLine(const std::string_view & s)
 {
     size_t chars_written  = 0;
-    StatusWithSize result = WriteBytes(std::as_bytes(std::span(s)));
+    StatusWithSize result = WriteBytes(pw::as_bytes(pw::span(s)));
     if (!result.ok())
     {
         return result;
     }
     chars_written += result.size();
-    result = WriteBytes(std::as_bytes(std::span("\r\n", 2)));
+    result = WriteBytes(pw::as_bytes(pw::span("\r\n", 2)));
     chars_written += result.size();
 
     return StatusWithSize(result.status(), chars_written);

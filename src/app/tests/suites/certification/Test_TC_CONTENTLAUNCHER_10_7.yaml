@@ -1,0 +1,659 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 19.12.6. [TC-CONTENTLAUNCHER-10.7] Content Search Verification
+
+PICS:
+    - CONTENTLAUNCHER.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Content Launcher"
+    endpoint: 1
+    PopularityName:
+        type: char_string
+        defaultValue: "popular content"
+
+tests:
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Step 1: TH sends a LaunchContent command to the DUT with search
+          parameter consisting of Type As Actor and Value as An Actor’s name,
+          for example, Gaby sHoffman"
+      PICS: CONTENTLAUNCHER.S.C00.Rsp
+      command: "LaunchContent"
+      arguments:
+          values:
+              - name: "AutoPlay"
+                value: true
+              - name: "Search"
+                value: { ParameterList: [{ Type: 0, Value: "Gaby sHoffman" }] }
+              - name: "PlaybackPreferences"
+                value:
+                    {
+                        PlaybackPosition: 0,
+                        TextTrack:
+                            {
+                                LanguageCode: "exampleLanguageCode",
+                                Characteristics: [0],
+                                AudioOutputIndex: 0,
+                            },
+                        AudioTracks:
+                            [
+                                {
+                                    LanguageCode: "exampleLanguageCode",
+                                    Characteristics: [0],
+                                    AudioOutputIndex: 0,
+                                },
+                            ],
+                    }
+      response:
+          values:
+              - name: "Status"
+                value: 0
+
+    - label: "Verify that DUT should play or display the search result."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CONTENTLAUNCHER.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please enter 'y' if DUT play or display the search result."
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 2: TH sends a LaunchContent command to the DUT with search
+          parameter consisting of Type As Channel and Value as Channel Name
+          name, for example, PBS"
+      PICS: CONTENTLAUNCHER.S.C00.Rsp
+      command: "LaunchContent"
+      arguments:
+          values:
+              - name: "AutoPlay"
+                value: true
+              - name: "Search"
+                value: { ParameterList: [{ Type: 1, Value: "PBS" }] }
+              - name: "PlaybackPreferences"
+                value:
+                    {
+                        PlaybackPosition: 0,
+                        TextTrack:
+                            {
+                                LanguageCode: "exampleLanguageCode",
+                                Characteristics: [0],
+                                AudioOutputIndex: 0,
+                            },
+                        AudioTracks:
+                            [
+                                {
+                                    LanguageCode: "exampleLanguageCode",
+                                    Characteristics: [0],
+                                    AudioOutputIndex: 0,
+                                },
+                            ],
+                    }
+      response:
+          values:
+              - name: "Status"
+                value: 0
+
+    - label: "Verify that DUT should play or display the search result."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CONTENTLAUNCHER.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please enter 'y' if DUT play or display the search result."
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 3: TH sends a LaunchContent command to the DUT with search
+          parameter consisting of Type As Character and Value as Character’s
+          name,for example,Snow White"
+      PICS: CONTENTLAUNCHER.S.C00.Rsp
+      command: "LaunchContent"
+      arguments:
+          values:
+              - name: "AutoPlay"
+                value: false
+              - name: "Search"
+                value: { ParameterList: [{ Type: 2, Value: "Snow White" }] }
+              - name: "PlaybackPreferences"
+                value:
+                    {
+                        PlaybackPosition: 0,
+                        TextTrack:
+                            {
+                                LanguageCode: "exampleLanguageCode",
+                                Characteristics: [0],
+                                AudioOutputIndex: 0,
+                            },
+                        AudioTracks:
+                            [
+                                {
+                                    LanguageCode: "exampleLanguageCode",
+                                    Characteristics: [0],
+                                    AudioOutputIndex: 0,
+                                },
+                            ],
+                    }
+      response:
+          values:
+              - name: "Status"
+                value: 0
+
+    - label: "Verify that DUT should play or display the search result."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CONTENTLAUNCHER.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please enter 'y' if DUT play or display the search result."
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 4: TH sends a LaunchContent command to the DUT with search
+          parameter consisting of Type As Director and Value as Director’s name,
+          for example, Spike Lee"
+      PICS: CONTENTLAUNCHER.S.C00.Rsp
+      command: "LaunchContent"
+      arguments:
+          values:
+              - name: "AutoPlay"
+                value: true
+              - name: "Search"
+                value: { ParameterList: [{ Type: 3, Value: "Spike Lee" }] }
+              - name: "PlaybackPreferences"
+                value:
+                    {
+                        PlaybackPosition: 0,
+                        TextTrack:
+                            {
+                                LanguageCode: "exampleLanguageCode",
+                                Characteristics: [0],
+                                AudioOutputIndex: 0,
+                            },
+                        AudioTracks:
+                            [
+                                {
+                                    LanguageCode: "exampleLanguageCode",
+                                    Characteristics: [0],
+                                    AudioOutputIndex: 0,
+                                },
+                            ],
+                    }
+      response:
+          values:
+              - name: "Status"
+                value: 0
+
+    - label: "Verify that DUT should play or display the search result."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CONTENTLAUNCHER.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please enter 'y' if DUT play or display the search result."
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 5: TH sends a LaunchContent command to the DUT with search
+          parameter consisting of Type As Event and Value as An Event’s name ,
+          for example Football games"
+      PICS: CONTENTLAUNCHER.S.C00.Rsp
+      command: "LaunchContent"
+      arguments:
+          values:
+              - name: "AutoPlay"
+                value: true
+              - name: "Search"
+                value: { ParameterList: [{ Type: 4, Value: "Football games" }] }
+              - name: "PlaybackPreferences"
+                value:
+                    {
+                        PlaybackPosition: 0,
+                        TextTrack:
+                            {
+                                LanguageCode: "exampleLanguageCode",
+                                Characteristics: [0],
+                                AudioOutputIndex: 0,
+                            },
+                        AudioTracks:
+                            [
+                                {
+                                    LanguageCode: "exampleLanguageCode",
+                                    Characteristics: [0],
+                                    AudioOutputIndex: 0,
+                                },
+                            ],
+                    }
+      response:
+          values:
+              - name: "Status"
+                value: 0
+
+    - label: "Verify that DUT should play or display the search result."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CONTENTLAUNCHER.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please enter 'y' if DUT play or display the search result."
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 6: TH sends a LaunchContent command to the DUT with search
+          parameter consisting of Type As Franchise and Value as Franchise’s
+          name,for example Star Wars"
+      PICS: CONTENTLAUNCHER.S.C00.Rsp
+      command: "LaunchContent"
+      arguments:
+          values:
+              - name: "AutoPlay"
+                value: true
+              - name: "Search"
+                value: { ParameterList: [{ Type: 5, Value: "Star Wars" }] }
+              - name: "PlaybackPreferences"
+                value:
+                    {
+                        PlaybackPosition: 0,
+                        TextTrack:
+                            {
+                                LanguageCode: "exampleLanguageCode",
+                                Characteristics: [0],
+                                AudioOutputIndex: 0,
+                            },
+                        AudioTracks:
+                            [
+                                {
+                                    LanguageCode: "exampleLanguageCode",
+                                    Characteristics: [0],
+                                    AudioOutputIndex: 0,
+                                },
+                            ],
+                    }
+      response:
+          values:
+              - name: "Status"
+                value: 0
+
+    - label: "Verify that DUT should play or display the search result."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CONTENTLAUNCHER.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please enter 'y' if DUT play or display the search result."
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 7: TH sends a LaunchContent command to the DUT with search
+          parameter consisting of Type As Genre and Value as Genre’s name, for
+          example Horror"
+      PICS: CONTENTLAUNCHER.S.C00.Rsp
+      command: "LaunchContent"
+      arguments:
+          values:
+              - name: "AutoPlay"
+                value: true
+              - name: "Search"
+                value: { ParameterList: [{ Type: 6, Value: "Horror" }] }
+              - name: "PlaybackPreferences"
+                value:
+                    {
+                        PlaybackPosition: 0,
+                        TextTrack:
+                            {
+                                LanguageCode: "exampleLanguageCode",
+                                Characteristics: [0],
+                                AudioOutputIndex: 0,
+                            },
+                        AudioTracks:
+                            [
+                                {
+                                    LanguageCode: "exampleLanguageCode",
+                                    Characteristics: [0],
+                                    AudioOutputIndex: 0,
+                                },
+                            ],
+                    }
+      response:
+          values:
+              - name: "Status"
+                value: 0
+
+    - label: "Verify that DUT should play or display the search result."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CONTENTLAUNCHER.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please enter 'y' if DUT play or display the search result."
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 8: TH sends a LaunchContent command to the DUT with search
+          parameter consisting of Type As League and Value as League’s name, for
+          example NCAA"
+      PICS: CONTENTLAUNCHER.S.C00.Rsp
+      command: "LaunchContent"
+      arguments:
+          values:
+              - name: "AutoPlay"
+                value: true
+              - name: "Search"
+                value: { ParameterList: [{ Type: 7, Value: "NCAA" }] }
+              - name: "PlaybackPreferences"
+                value:
+                    {
+                        PlaybackPosition: 0,
+                        TextTrack:
+                            {
+                                LanguageCode: "exampleLanguageCode",
+                                Characteristics: [0],
+                                AudioOutputIndex: 0,
+                            },
+                        AudioTracks:
+                            [
+                                {
+                                    LanguageCode: "exampleLanguageCode",
+                                    Characteristics: [0],
+                                    AudioOutputIndex: 0,
+                                },
+                            ],
+                    }
+      response:
+          values:
+              - name: "Status"
+                value: 0
+
+    - label: "Verify that DUT should play or display the search result."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CONTENTLAUNCHER.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please enter 'y' if DUT play or display the search result."
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 9: TH sends a LaunchContent command to the DUT with search
+          parameter consisting of Type As Popularity and Value as Popularity’s
+          name"
+      PICS: CONTENTLAUNCHER.S.C00.Rsp
+      command: "LaunchContent"
+      arguments:
+          values:
+              - name: "AutoPlay"
+                value: true
+              - name: "Search"
+                value: { ParameterList: [{ Type: 8, Value: PopularityName }] }
+              - name: "PlaybackPreferences"
+                value:
+                    {
+                        PlaybackPosition: 0,
+                        TextTrack:
+                            {
+                                LanguageCode: "exampleLanguageCode",
+                                Characteristics: [0],
+                                AudioOutputIndex: 0,
+                            },
+                        AudioTracks:
+                            [
+                                {
+                                    LanguageCode: "exampleLanguageCode",
+                                    Characteristics: [0],
+                                    AudioOutputIndex: 0,
+                                },
+                            ],
+                    }
+      response:
+          values:
+              - name: "Status"
+                value: 0
+
+    - label: "Verify that DUT should play or display the search result."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CONTENTLAUNCHER.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please enter 'y' if DUT play or display the search result."
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 10: TH sends a LaunchContent command to the DUT with search
+          parameter consisting of Type As Provider and Value as Provider’s name,
+          for example Netflix"
+      PICS: CONTENTLAUNCHER.S.C00.Rsp
+      command: "LaunchContent"
+      arguments:
+          values:
+              - name: "AutoPlay"
+                value: true
+              - name: "Search"
+                value: { ParameterList: [{ Type: 9, Value: "Netflix" }] }
+              - name: "PlaybackPreferences"
+                value:
+                    {
+                        PlaybackPosition: 0,
+                        TextTrack:
+                            {
+                                LanguageCode: "exampleLanguageCode",
+                                Characteristics: [0],
+                                AudioOutputIndex: 0,
+                            },
+                        AudioTracks:
+                            [
+                                {
+                                    LanguageCode: "exampleLanguageCode",
+                                    Characteristics: [0],
+                                    AudioOutputIndex: 0,
+                                },
+                            ],
+                    }
+      response:
+          values:
+              - name: "Status"
+                value: 0
+
+    - label: "Verify that DUT should play or display the search result."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CONTENTLAUNCHER.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please enter 'y' if DUT play or display the search result."
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 11: TH sends a LaunchContent command to the DUT with search
+          parameter consisting of Type As Sport and Value as Sport’s name, for
+          example, football"
+      PICS: CONTENTLAUNCHER.S.C00.Rsp
+      command: "LaunchContent"
+      arguments:
+          values:
+              - name: "AutoPlay"
+                value: true
+              - name: "Search"
+                value: { ParameterList: [{ Type: 10, Value: "football" }] }
+              - name: "PlaybackPreferences"
+                value:
+                    {
+                        PlaybackPosition: 0,
+                        TextTrack:
+                            {
+                                LanguageCode: "exampleLanguageCode",
+                                Characteristics: [0],
+                                AudioOutputIndex: 0,
+                            },
+                        AudioTracks:
+                            [
+                                {
+                                    LanguageCode: "exampleLanguageCode",
+                                    Characteristics: [0],
+                                    AudioOutputIndex: 0,
+                                },
+                            ],
+                    }
+      response:
+          values:
+              - name: "Status"
+                value: 0
+
+    - label: "Verify that DUT should play or display the search result."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CONTENTLAUNCHER.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please enter 'y' if DUT play or display the search result."
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 12: TH sends a LaunchContent command to the DUT with search
+          parameter consisting of Type As SportsTeam and Value as SportTeam’s
+          name , for example Arsenel"
+      PICS: CONTENTLAUNCHER.S.C00.Rsp
+      command: "LaunchContent"
+      arguments:
+          values:
+              - name: "AutoPlay"
+                value: true
+              - name: "Search"
+                value: { ParameterList: [{ Type: 11, Value: "Arsenel" }] }
+              - name: "PlaybackPreferences"
+                value:
+                    {
+                        PlaybackPosition: 0,
+                        TextTrack:
+                            {
+                                LanguageCode: "exampleLanguageCode",
+                                Characteristics: [0],
+                                AudioOutputIndex: 0,
+                            },
+                        AudioTracks:
+                            [
+                                {
+                                    LanguageCode: "exampleLanguageCode",
+                                    Characteristics: [0],
+                                    AudioOutputIndex: 0,
+                                },
+                            ],
+                    }
+      response:
+          values:
+              - name: "Status"
+                value: 0
+
+    - label: "Verify that DUT should play or display the search result."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CONTENTLAUNCHER.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please enter 'y' if DUT play or display the search result."
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 13: TH sends a LaunchContent command to the DUT with search
+          parameter consisting of Type As Type and Value as Type’s name, for
+          example TVSeries"
+      PICS: CONTENTLAUNCHER.S.C00.Rsp
+      command: "LaunchContent"
+      arguments:
+          values:
+              - name: "AutoPlay"
+                value: true
+              - name: "Search"
+                value: { ParameterList: [{ Type: 12, Value: "TVSeries" }] }
+              - name: "PlaybackPreferences"
+                value:
+                    {
+                        PlaybackPosition: 0,
+                        TextTrack:
+                            {
+                                LanguageCode: "exampleLanguageCode",
+                                Characteristics: [0],
+                                AudioOutputIndex: 0,
+                            },
+                        AudioTracks:
+                            [
+                                {
+                                    LanguageCode: "exampleLanguageCode",
+                                    Characteristics: [0],
+                                    AudioOutputIndex: 0,
+                                },
+                            ],
+                    }
+      response:
+          values:
+              - name: "Status"
+                value: 0
+
+    - label: "Verify that DUT should play or display the search result."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CONTENTLAUNCHER.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please enter 'y' if DUT play or display the search result."
+              - name: "expectedValue"
+                value: "y"

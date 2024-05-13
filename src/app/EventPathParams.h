@@ -35,7 +35,7 @@ struct EventPathParams
         return other.mEndpointId == mEndpointId && other.mClusterId == mClusterId && other.mEventId == mEventId;
     }
 
-    bool HasEventWildcard() const { return HasWildcardEndpointId() || HasWildcardClusterId() || HasWildcardEventId(); }
+    bool IsWildcardPath() const { return HasWildcardEndpointId() || HasWildcardClusterId() || HasWildcardEventId(); }
 
     // For event, an event id can only be interpreted if the cluster id is known.
     bool IsValidEventPath() const { return !(HasWildcardClusterId() && !HasWildcardEventId()); }
@@ -43,6 +43,9 @@ struct EventPathParams
     inline bool HasWildcardEndpointId() const { return mEndpointId == kInvalidEndpointId; }
     inline bool HasWildcardClusterId() const { return mClusterId == kInvalidClusterId; }
     inline bool HasWildcardEventId() const { return mEventId == kInvalidEventId; }
+    inline void SetWildcardEndpointId() { mEndpointId = kInvalidEndpointId; }
+    inline void SetWildcardClusterId() { mClusterId = kInvalidClusterId; }
+    inline void SetWildcardEventId() { mEventId = kInvalidEventId; }
 
     bool IsEventPathSupersetOf(const ConcreteEventPath & other) const
     {

@@ -18,5 +18,5 @@
 package chip.devicecontroller;
 
 public interface SubscriptionEstablishedCallback {
-  void onSubscriptionEstablished();
+  void onSubscriptionEstablished(long subscriptionId);
 }

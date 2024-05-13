@@ -20,14 +20,6 @@
  *      This file provides implementation of ExchangeMessageDispatch class.
  */
 
-#ifndef __STDC_FORMAT_MACROS
-#define __STDC_FORMAT_MACROS
-#endif
-
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
-
 #include <errno.h>
 #include <inttypes.h>
 #include <memory>
@@ -46,95 +38,63 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SessionManager * sessionManager,
                                                 bool isReliableTransmission, Protocols::Id protocol, uint8_t type,
                                                 System::PacketBufferHandle && message)
 {
-    ReturnErrorCodeIf(!MessagePermitted(protocol.GetProtocolId(), type), CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(!MessagePermitted(protocol, type), CHIP_ERROR_INVALID_ARGUMENT);
 
     PayloadHeader payloadHeader;
     payloadHeader.SetExchangeID(exchangeId).SetMessageType(protocol, type).SetInitiator(isInitiator);
 
-    // If there is a pending acknowledgment piggyback it on this message.
-    if (reliableMessageContext->HasPiggybackAckPending())
+    if (session->AllowsMRP())
     {
-        payloadHeader.SetAckMessageCounter(reliableMessageContext->TakePendingPeerAckMessageCounter());
-
-#if !defined(NDEBUG)
-        if (!payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
+        // If there is a pending acknowledgment piggyback it on this message.
+        if (reliableMessageContext->HasPiggybackAckPending())
         {
-            ChipLogDetail(ExchangeManager,
-                          "Piggybacking Ack for MessageCounter:" ChipLogFormatMessageCounter
-                          " on exchange: " ChipLogFormatExchangeId,
-                          payloadHeader.GetAckMessageCounter().Value(), ChipLogValueExchangeId(exchangeId, isInitiator));
+            payloadHeader.SetAckMessageCounter(reliableMessageContext->TakePendingPeerAckMessageCounter());
         }
-#endif
-    }
 
-    if (IsReliableTransmissionAllowed() && reliableMessageContext->AutoRequestAck() &&
-        reliableMessageContext->GetReliableMessageMgr() != nullptr && isReliableTransmission)
-    {
-        auto * reliableMessageMgr = reliableMessageContext->GetReliableMessageMgr();
-
-        payloadHeader.SetNeedsAck(true);
-
-        ReliableMessageMgr::RetransTableEntry * entry = nullptr;
-
-        // Add to Table for subsequent sending
-        ReturnErrorOnFailure(reliableMessageMgr->AddToRetransTable(reliableMessageContext, &entry));
-        auto deleter = [reliableMessageMgr](ReliableMessageMgr::RetransTableEntry * e) {
-            reliableMessageMgr->ClearRetransTable(*e);
-        };
-        std::unique_ptr<ReliableMessageMgr::RetransTableEntry, decltype(deleter)> entryOwner(entry, deleter);
-
-        ReturnErrorOnFailure(sessionManager->PrepareMessage(session, payloadHeader, std::move(message), entryOwner->retainedBuf));
-        CHIP_ERROR err = sessionManager->SendPreparedMessage(session, entryOwner->retainedBuf);
-        if (err == CHIP_ERROR_POSIX(ENOBUFS))
+        if (IsReliableTransmissionAllowed() && reliableMessageContext->AutoRequestAck() &&
+            reliableMessageContext->GetReliableMessageMgr() != nullptr && isReliableTransmission)
         {
-            // sendmsg on BSD-based systems never blocks, no matter how the
-            // socket is configured, and will return ENOBUFS in situation in
-            // which Linux, for example, blocks.
-            //
-            // This is typically a transient situation, so we pretend like this
-            // packet drop happened somewhere on the network instead of inside
-            // sendmsg and will just resend it in the normal MRP way later.
-            ChipLogError(ExchangeManager, "Ignoring ENOBUFS: %" CHIP_ERROR_FORMAT " on exchange " ChipLogFormatExchangeId,
-                         err.Format(), ChipLogValueExchangeId(exchangeId, isInitiator));
-            err = CHIP_NO_ERROR;
+            auto * reliableMessageMgr = reliableMessageContext->GetReliableMessageMgr();
+
+            payloadHeader.SetNeedsAck(true);
+
+            ReliableMessageMgr::RetransTableEntry * entry = nullptr;
+
+            // Add to Table for subsequent sending
+            ReturnErrorOnFailure(reliableMessageMgr->AddToRetransTable(reliableMessageContext, &entry));
+            auto deleter = [reliableMessageMgr](ReliableMessageMgr::RetransTableEntry * e) {
+                reliableMessageMgr->ClearRetransTable(*e);
+            };
+            std::unique_ptr<ReliableMessageMgr::RetransTableEntry, decltype(deleter)> entryOwner(entry, deleter);
+
+            ReturnErrorOnFailure(
+                sessionManager->PrepareMessage(session, payloadHeader, std::move(message), entryOwner->retainedBuf));
+            CHIP_ERROR err = sessionManager->SendPreparedMessage(session, entryOwner->retainedBuf);
+            err            = ReliableMessageMgr::MapSendError(err, exchangeId, isInitiator);
+            ReturnErrorOnFailure(err);
+            reliableMessageMgr->StartRetransmision(entryOwner.release());
         }
-        ReturnErrorOnFailure(err);
-        reliableMessageMgr->StartRetransmision(entryOwner.release());
+        else
+        {
+            ReturnErrorOnFailure(PrepareAndSendNonMRPMessage(sessionManager, session, payloadHeader, std::move(message)));
+        }
     }
     else
     {
-        // If the channel itself is providing reliability, let's not request MRP acks
-        payloadHeader.SetNeedsAck(false);
-        EncryptedPacketBufferHandle preparedMessage;
-        ReturnErrorOnFailure(sessionManager->PrepareMessage(session, payloadHeader, std::move(message), preparedMessage));
-        ReturnErrorOnFailure(sessionManager->SendPreparedMessage(session, preparedMessage));
+        ReturnErrorOnFailure(PrepareAndSendNonMRPMessage(sessionManager, session, payloadHeader, std::move(message)));
     }
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ExchangeMessageDispatch::OnMessageReceived(uint32_t messageCounter, const PayloadHeader & payloadHeader,
-                                                      const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,
-                                                      ReliableMessageContext * reliableMessageContext)
+CHIP_ERROR ExchangeMessageDispatch::PrepareAndSendNonMRPMessage(SessionManager * sessionManager, const SessionHandle & session,
+                                                                PayloadHeader & payloadHeader,
+                                                                System::PacketBufferHandle && message)
 {
-    ReturnErrorCodeIf(!MessagePermitted(payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType()),
-                      CHIP_ERROR_INVALID_ARGUMENT);
-
-    if (IsReliableTransmissionAllowed() && !reliableMessageContext->GetExchangeContext()->IsGroupExchangeContext())
-    {
-        if (!msgFlags.Has(MessageFlagValues::kDuplicateMessage) && payloadHeader.IsAckMsg() &&
-            payloadHeader.GetAckMessageCounter().HasValue())
-        {
-            reliableMessageContext->HandleRcvdAck(payloadHeader.GetAckMessageCounter().Value());
-        }
-
-        if (payloadHeader.NeedsAck())
-        {
-            // An acknowledgment needs to be sent back to the peer for this message on this exchange,
-
-            ReturnErrorOnFailure(reliableMessageContext->HandleNeedsAck(messageCounter, msgFlags));
-        }
-    }
+    payloadHeader.SetNeedsAck(false);
+    EncryptedPacketBufferHandle preparedMessage;
+    ReturnErrorOnFailure(sessionManager->PrepareMessage(session, payloadHeader, std::move(message), preparedMessage));
+    ReturnErrorOnFailure(sessionManager->SendPreparedMessage(session, preparedMessage));
 
     return CHIP_NO_ERROR;
 }

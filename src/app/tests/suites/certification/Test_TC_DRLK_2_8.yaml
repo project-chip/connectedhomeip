@@ -1,0 +1,344 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    121.2.8. [TC-DRLK-2.8] Verification for the following Commands - Set User,
+    Get User, Get User Response, Clear User [DUT-Server]
+
+PICS:
+    - DRLK.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Door Lock"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Step 1: TH reads NumberOfTotalUsers Supported attribute and saves for
+          future use."
+      PICS: DRLK.S.F08 && DRLK.S.A0011
+      command: "readAttribute"
+      attribute: "NumberOfTotalUsersSupported"
+      response:
+          saveAs: Current_NumberOfTotalUsersSupported
+          constraints:
+              minValue: 0
+              maxValue: 65534
+
+    - label:
+          "Step 2: TH sends Set User Command to DUT with the following values:
+          OperationType as 0 UserIndex as 1 UserName as xxx UserUniqueID as 6452
+          UserStatus as 1 UserType as 0 CredentialRule as 0"
+      PICS: DRLK.S.F08 && DRLK.S.C1a.Rsp
+      command: "SetUser"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "OperationType"
+                value: 0
+              - name: "UserIndex"
+                value: 1
+              - name: "UserName"
+                value: "xxx"
+              - name: "UserUniqueID"
+                value: 6452
+              - name: "UserStatus"
+                value: 1
+              - name: "UserType"
+                value: 0
+              - name: "CredentialRule"
+                value: 0
+
+    - label: "Step 3: TH sends Get User Command to DUT with UserIndex as 1"
+      PICS: DRLK.S.F08 && DRLK.S.C1b.Rsp && DRLK.S.C1c.Tx
+      command: "GetUser"
+      arguments:
+          values:
+              - name: "UserIndex"
+                value: 1
+      response:
+          values:
+              - name: "UserIndex"
+                value: 1
+              - name: "UserName"
+                value: "xxx"
+              - name: "UserUniqueID"
+                value: 6452
+              - name: "UserStatus"
+                value: 1
+              - name: "UserType"
+                value: 0
+              - name: "CredentialRule"
+                value: 0
+              - name: "Credentials"
+                value: []
+              - name: "CreatorFabricIndex"
+                value: 1
+              - name: "LastModifiedFabricIndex"
+                value: 1
+              - name: "NextUserIndex"
+                value: null
+
+    - label:
+          "Step 4: TH sends Set User Command to DUT with the following values:
+          OperationType as 0 UserIndex as 2 UserName as xxx UserUniqueID as 6452
+          UserStatus as 1 UserType as 10 (Invalid value) CredentialRule as 3"
+      PICS: DRLK.S.F08 && DRLK.S.C1a.Rsp
+      command: "SetUser"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "OperationType"
+                value: 0
+              - name: "UserIndex"
+                value: 2
+              - name: "UserName"
+                value: "xxx"
+              - name: "UserUniqueID"
+                value: 6452
+              - name: "UserStatus"
+                value: 1
+              - name: "UserType"
+                value: 10
+              - name: "CredentialRule"
+                value: 3
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "Step 5: TH sends Set User Command to DUT with the following values:
+          OperationType as 0 UserIndex as 1 (Same as step 2) UserName as xxx
+          UserUniqueID as 8965 UserStatus as 1 UserType as 0 CredentialRule as 0"
+      PICS: DRLK.S.F08 && DRLK.S.C1a.Rsp
+      command: "SetUser"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "OperationType"
+                value: 0
+              - name: "UserIndex"
+                value: 1
+              - name: "UserName"
+                value: "xxx"
+              - name: "UserUniqueID"
+                value: 8965
+              - name: "UserStatus"
+                value: 1
+              - name: "UserType"
+                value: 0
+              - name: "CredentialRule"
+                value: 0
+      response:
+          error: FAILURE
+          clusterError: 0x3
+
+    - label:
+          "Step 6a: TH sends Set User Command to DUT with the following values:
+          OperationType as 0 UserIndex as 2 UserName as NULL UserUniqueID as
+          NULL UserStatus as NULL UserType as NULL CredentialRule as NULL"
+      PICS: DRLK.S.F08 && DRLK.S.C1a.Rsp
+      command: "SetUser"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "OperationType"
+                value: 0
+              - name: "UserIndex"
+                value: 2
+              - name: "UserName"
+                value: null
+              - name: "UserUniqueID"
+                value: null
+              - name: "UserStatus"
+                value: null
+              - name: "UserType"
+                value: null
+              - name: "CredentialRule"
+                value: null
+
+    - label: "Step 6b: TH sends Get User Command to DUT with UserIndex as 2"
+      PICS: DRLK.S.C1a.Rsp && DRLK.S.C1b.Rsp && DRLK.S.C1c.Tx
+      command: "GetUser"
+      arguments:
+          values:
+              - name: "UserIndex"
+                value: 2
+      response:
+          values:
+              - name: "UserIndex"
+                value: 2
+              - name: "UserName"
+                value: ""
+              - name: "UserUniqueID"
+                value: null
+              - name: "UserStatus"
+                value: 1
+              - name: "UserType"
+                value: 0
+              - name: "CredentialRule"
+                value: 0
+              - name: "Credentials"
+                value: []
+              - name: "CreatorFabricIndex"
+                value: 1
+              - name: "LastModifiedFabricIndex"
+                value: 1
+              - name: "NextUserIndex"
+                value: null
+
+    - label:
+          "Step 7: TH sends Set User Command to DUT with the following values:
+          OperationType as 2 UserIndex as 2 UserName as NULL UserUniqueID as
+          NULL UserStatus as NULL UserType as NULL CredentialRule as NULL"
+      PICS: DRLK.S.F08 && DRLK.S.C1a.Rsp
+      command: "SetUser"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "OperationType"
+                value: 2
+              - name: "UserIndex"
+                value: 2
+              - name: "UserName"
+                value: null
+              - name: "UserUniqueID"
+                value: null
+              - name: "UserStatus"
+                value: null
+              - name: "UserType"
+                value: null
+              - name: "CredentialRule"
+                value: null
+
+    - label: "Step 8: TH sends Get User Command to DUT with the UserIndex as 2"
+      PICS: DRLK.S.F08 && DRLK.S.C1b.Rsp && DRLK.S.C1c.Tx
+      command: "GetUser"
+      arguments:
+          values:
+              - name: "UserIndex"
+                value: 2
+      response:
+          values:
+              - name: "UserIndex"
+                value: 2
+              - name: "UserName"
+                value: ""
+              - name: "UserUniqueID"
+                value: null
+              - name: "UserStatus"
+                value: 1
+              - name: "UserType"
+                value: 0
+              - name: "CredentialRule"
+                value: 0
+              - name: "Credentials"
+                value: []
+              - name: "CreatorFabricIndex"
+                value: 1
+              - name: "LastModifiedFabricIndex"
+                value: 1
+              - name: "NextUserIndex"
+                value: null
+
+    - label:
+          "Step 9: TH sends Clear User Command to DUT with the UserIndex as 1"
+      PICS: DRLK.S.F08 && DRLK.S.C1d.Rsp
+      command: "ClearUser"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "UserIndex"
+                value: 1
+
+    - label: "Step 10: TH sends Get User Command to DUT with the UserIndex as 1"
+      PICS: DRLK.S.F08 && DRLK.S.C1b.Rsp && DRLK.S.C1c.Tx
+      command: "GetUser"
+      arguments:
+          values:
+              - name: "UserIndex"
+                value: 1
+      response:
+          values:
+              - name: "UserIndex"
+                value: 1
+              - name: "UserName"
+                value: null
+              - name: "UserUniqueID"
+                value: null
+              - name: "UserStatus"
+                value: null
+              - name: "UserType"
+                value: null
+              - name: "CredentialRule"
+                value: null
+              - name: "Credentials"
+                value: null
+              - name: "CreatorFabricIndex"
+                value: null
+              - name: "LastModifiedFabricIndex"
+                value: null
+              - name: "NextUserIndex"
+                value: 2
+
+    - label:
+          "Test cleanup: TH sends Clear User Command to DUT with the UserIndex
+          as 2"
+      PICS: DRLK.S.F08 && DRLK.S.C1d.Rsp
+      command: "ClearUser"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "UserIndex"
+                value: 2
+
+    - label:
+          "Test cleanup: TH sends Get User Command to DUT with the UserIndex as
+          2"
+      PICS: DRLK.S.F08 && DRLK.S.C1b.Rsp && DRLK.S.C1c.Tx
+      command: "GetUser"
+      arguments:
+          values:
+              - name: "UserIndex"
+                value: 2
+      response:
+          values:
+              - name: "UserIndex"
+                value: 2
+              - name: "UserName"
+                value: null
+              - name: "UserUniqueID"
+                value: null
+              - name: "UserStatus"
+                value: null
+              - name: "UserType"
+                value: null
+              - name: "CredentialRule"
+                value: null
+              - name: "Credentials"
+                value: null
+              - name: "CreatorFabricIndex"
+                value: null
+              - name: "LastModifiedFabricIndex"
+                value: null
+              - name: "NextUserIndex"
+                value: null

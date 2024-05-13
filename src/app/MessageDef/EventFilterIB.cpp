@@ -27,15 +27,14 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 
 namespace chip {
 namespace app {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR EventFilterIB::Parser::CheckSchemaValidity() const
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+CHIP_ERROR EventFilterIB::Parser::PrettyPrint() const
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    int TagPresenceMask = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("EventFilterIB =");
@@ -46,34 +45,31 @@ CHIP_ERROR EventFilterIB::Parser::CheckSchemaValidity() const
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         uint32_t tagNum = TLV::TagNumFromTag(reader.GetTag());
         switch (tagNum)
         {
         case to_underlying(Tag::kNode):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kNode))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kNode));
 #if CHIP_DETAIL_LOGGING
-            {
-                NodeId node;
-                ReturnErrorOnFailure(reader.Get(node));
-                PRETTY_PRINT("\tNode = 0x%" PRIx64 ",", node);
-            }
+        {
+            NodeId node;
+            ReturnErrorOnFailure(reader.Get(node));
+            PRETTY_PRINT("\tNode = 0x" ChipLogFormatX64 ",", ChipLogValueX64(node));
+        }
 #endif // CHIP_DETAIL_LOGGING
-            break;
+        break;
         case to_underlying(Tag::kEventMin):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kEventMin))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kEventMin));
 #if CHIP_DETAIL_LOGGING
-            {
-                uint64_t eventMin;
-                ReturnErrorOnFailure(reader.Get(eventMin));
-                PRETTY_PRINT("\tEventMin = 0x%" PRIx64 ",", eventMin);
-            }
+        {
+            uint64_t eventMin;
+            ReturnErrorOnFailure(reader.Get(eventMin));
+            PRETTY_PRINT("\tEventMin = 0x" ChipLogFormatX64 ",", ChipLogValueX64(eventMin));
+        }
 #endif // CHIP_DETAIL_LOGGING
-            break;
+        break;
         default:
             PRETTY_PRINT("Unknown tag num %" PRIu32, tagNum);
             break;
@@ -81,23 +77,17 @@ CHIP_ERROR EventFilterIB::Parser::CheckSchemaValidity() const
     }
 
     PRETTY_PRINT("},");
-    PRETTY_PRINT("");
+    PRETTY_PRINT_BLANK_LINE();
 
     if (CHIP_END_OF_TLV == err)
     {
-        const int RequiredFields = (1 << to_underlying(Tag::kEventMin));
-
-        if ((TagPresenceMask & RequiredFields) == RequiredFields)
-        {
-            err = CHIP_NO_ERROR;
-        }
+        err = CHIP_NO_ERROR;
     }
 
     ReturnErrorOnFailure(err);
-    ReturnErrorOnFailure(reader.ExitContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
+    return reader.ExitContainer(mOuterContainerType);
 }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
 CHIP_ERROR EventFilterIB::Parser::GetNode(NodeId * const apNode) const
 {
@@ -114,7 +104,7 @@ EventFilterIB::Builder & EventFilterIB::Builder::Node(const NodeId aNode)
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kNode)), aNode);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kNode), aNode);
     }
     return *this;
 }
@@ -124,15 +114,15 @@ EventFilterIB::Builder & EventFilterIB::Builder::EventMin(const uint64_t aEventM
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kEventMin)), aEventMin);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kEventMin), aEventMin);
     }
     return *this;
 }
 
-EventFilterIB::Builder & EventFilterIB::Builder::EndOfEventFilterIB()
+CHIP_ERROR EventFilterIB::Builder::EndOfEventFilterIB()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 }; // namespace app
 }; // namespace chip

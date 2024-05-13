@@ -25,15 +25,15 @@ limitations under the License.
       <define>ILLUMINANCE_MEASUREMENT_CLUSTER</define>
       <client tick="false" init="false">true</client>
       <server tick="false" init="false">true</server>
-      <globalAttribute side="either" code="0xFFFD" value="2"/>
-      <attribute side="server" code="0x0000" define="ILLUM_MEASURED_VALUE"     type="INT16U" min="0x0000" max="0xFFFF" writable="false" reportable="true" isNullable="true" default="0x0000" optional="false">MeasuredValue</attribute>
-      <attribute side="server" code="0x0001" define="ILLUM_MIN_MEASURED_VALUE" type="INT16U" min="0x0001" max="0xFFFD" writable="false"                   isNullable="true"                  optional="false">MinMeasuredValue</attribute>
-      <attribute side="server" code="0x0002" define="ILLUM_MAX_MEASURED_VALUE" type="INT16U" min="0x0002" max="0xFFFE" writable="false"                   isNullable="true"                  optional="false">MaxMeasuredValue</attribute>
-      <attribute side="server" code="0x0003" define="ILLUM_TOLERANCE"          type="INT16U" min="0x0000" max="0x0800" writable="false"                                                      optional="true" >Tolerance</attribute>
-      <attribute side="server" code="0x0004" define="ILLUM_LIGHT_SENSOR_TYPE"  type="ENUM8"  min="0x00"   max="0xFF"   writable="false"                   isNullable="true" default="0xFF"   optional="true" >LightSensorType</attribute>
+      <globalAttribute side="either" code="0xFFFD" value="3"/>
+      <attribute side="server" code="0x0000" define="ILLUM_MEASURED_VALUE"     type="int16u" min="0x0000" max="0xFFFF" writable="false" reportable="true" isNullable="true" default="0x0000" optional="false">MeasuredValue</attribute>
+      <attribute side="server" code="0x0001" define="ILLUM_MIN_MEASURED_VALUE" type="int16u" min="0x0001" max="0xFFFD" writable="false"                   isNullable="true"                  optional="false">MinMeasuredValue</attribute>
+      <attribute side="server" code="0x0002" define="ILLUM_MAX_MEASURED_VALUE" type="int16u" min="0x0002" max="0xFFFE" writable="false"                   isNullable="true"                  optional="false">MaxMeasuredValue</attribute>
+      <attribute side="server" code="0x0003" define="ILLUM_TOLERANCE"          type="int16u" min="0x0000" max="0x0800" writable="false"                                                      optional="true" >Tolerance</attribute>
+      <attribute side="server" code="0x0004" define="ILLUM_LIGHT_SENSOR_TYPE"  type="LightSensorTypeEnum"  min="0x00"   max="0xFF"   writable="false"                   isNullable="true" default="0xFF"   optional="true" >LightSensorType</attribute>
   </cluster>
 
-  <enum name="LightSensorType" type="ENUM8">
+  <enum name="LightSensorTypeEnum" type="enum8">
     <cluster code="0x0400"/>
     <item name="Photodiode" value="0x00"/>
     <item name="CMOS" value="0x01"/>

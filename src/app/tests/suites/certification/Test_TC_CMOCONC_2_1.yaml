@@ -1,0 +1,144 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 145.1.2. [TC-CMOCONC-2.1] Attributes with server as DUT
+
+PICS:
+    - CMOCONC.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Carbon Monoxide Concentration Measurement"
+    endpoint: 1
+
+tests:
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH reads from the DUT the MinMeasuredValue attribute."
+      PICS: CMOCONC.S.A0001
+      command: "readAttribute"
+      attribute: "MinMeasuredValue"
+      response:
+          saveAs: MinMeasuredValueValue
+          constraints:
+              type: single
+              minValue: 0
+
+    - label: "Step 3: TH reads from the DUT the MaxMeasuredValue attribute."
+      PICS: CMOCONC.S.A0002
+      command: "readAttribute"
+      attribute: "MaxMeasuredValue"
+      response:
+          saveAs: MaxMeasuredValueValue
+          constraints:
+              type: single
+              minValue: MinMeasuredValueValue
+
+    - label: "Step 4: TH reads from the DUT the MeasuredValue attribute."
+      PICS: CMOCONC.S.A0000
+      command: "readAttribute"
+      attribute: "MeasuredValue"
+      response:
+          constraints:
+              type: single
+              minValue: MinMeasuredValueValue
+              maxValue: MaxMeasuredValueValue
+
+    - label: "Step 5: TH reads from the DUT the PeakMeasuredValue attribute."
+      PICS: CMOCONC.S.A0003
+      command: "readAttribute"
+      attribute: "PeakMeasuredValue"
+      response:
+          constraints:
+              type: single
+              minValue: MinMeasuredValueValue
+              maxValue: MaxMeasuredValueValue
+
+    - label:
+          "Step 6: TH reads from the DUT the PeakMeasuredValueWindow attribute."
+      PICS: CMOCONC.S.A0004
+      command: "readAttribute"
+      attribute: "PeakMeasuredValueWindow"
+      response:
+          constraints:
+              type: elapsed_s
+              minValue: 0
+              maxValue: 604800
+
+    - label: "Step 7: TH reads from the DUT the AverageMeasuredValue attribute."
+      PICS: CMOCONC.S.A0005
+      command: "readAttribute"
+      attribute: "AverageMeasuredValue"
+      response:
+          constraints:
+              type: single
+              minValue: MinMeasuredValueValue
+              maxValue: MaxMeasuredValueValue
+
+    - label:
+          "Step 8: TH reads from the DUT the AverageMeasuredValueWindow
+          attribute."
+      PICS: CMOCONC.S.A0006
+      command: "readAttribute"
+      attribute: "AverageMeasuredValueWindow"
+      response:
+          constraints:
+              type: elapsed_s
+              minValue: 0
+              maxValue: 604800
+
+    - label: "Step 9: TH reads from the DUT the MeasurementUnit attribute."
+      PICS: CMOCONC.S.A0008
+      command: "readAttribute"
+      attribute: "MeasurementUnit"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 7
+
+    - label: "Step 10: TH reads from the DUT the MeasurementMedium attribute."
+      PICS: CMOCONC.S.A0009
+      command: "readAttribute"
+      attribute: "MeasurementMedium"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 2
+
+    - label: "Step 11: TH reads from the DUT the LevelValue attribute."
+      PICS: CMOCONC.S.A000a
+      command: "readAttribute"
+      attribute: "LevelValue"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 4
+
+    - label: "Step 12: TH reads from the DUT the Uncertainty attribute."
+      PICS: CMOCONC.S.A0007
+      command: "readAttribute"
+      attribute: "Uncertainty"
+      response:
+          constraints:
+              type: single
+              minValue: 0

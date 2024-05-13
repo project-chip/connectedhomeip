@@ -36,15 +36,15 @@ struct RawIntegerToDerVector
 };
 
 // MSB set, no leading zeros
-const uint8_t kRawToDerMsbSetNoLeadingZeroes_Candidate[5] = {
+const uint8_t kRawToDerMsbSetNoLeadingZeroes_Candidate[] = {
     0x80, 0x01, 0x02, 0x03, 0x04,
 };
 
-const uint8_t kRawToDerMsbSetNoLeadingZeroes_Expected[8] = {
+const uint8_t kRawToDerMsbSetNoLeadingZeroes_Expected[] = {
     0x02, 0x06, 0x00, 0x80, 0x01, 0x02, 0x03, 0x04,
 };
 
-const uint8_t kRawToDerMsbSetNoLeadingZeroes_Expected_WithoutTag[6] = {
+const uint8_t kRawToDerMsbSetNoLeadingZeroes_Expected_WithoutTag[] = {
     0x00, 0x80, 0x01, 0x02, 0x03, 0x04,
 };
 
@@ -58,15 +58,15 @@ const RawIntegerToDerVector kRawIntegerToDerVector1 = {
 };
 
 // MSB clear, no leading zeros
-const uint8_t kRawToDerMsbClearNoLeadingZeroes_Candidate[5] = {
+const uint8_t kRawToDerMsbClearNoLeadingZeroes_Candidate[] = {
     0x40, 0x01, 0x02, 0x03, 0x04,
 };
 
-const uint8_t kRawToDerMsbClearNoLeadingZeroes_Expected[7] = {
+const uint8_t kRawToDerMsbClearNoLeadingZeroes_Expected[] = {
     0x02, 0x05, 0x40, 0x01, 0x02, 0x03, 0x04,
 };
 
-const uint8_t kRawToDerMsbClearNoLeadingZeroes_Expected_WithoutTag[5] = {
+const uint8_t kRawToDerMsbClearNoLeadingZeroes_Expected_WithoutTag[] = {
     0x40, 0x01, 0x02, 0x03, 0x04,
 };
 
@@ -80,15 +80,15 @@ const RawIntegerToDerVector kRawIntegerToDerVector2 = {
 };
 
 // Three leading zeroes
-const uint8_t kRawToDerThreeLeadingZeroes_Candidate[7] = {
+const uint8_t kRawToDerThreeLeadingZeroes_Candidate[] = {
     0x00, 0x00, 0x00, 0x01, 0x02, 0x03, 0x04,
 };
 
-const uint8_t kRawToDerThreeLeadingZeroes_Expected[6] = {
+const uint8_t kRawToDerThreeLeadingZeroes_Expected[] = {
     0x02, 0x04, 0x01, 0x02, 0x03, 0x04,
 };
 
-const uint8_t kRawToDerThreeLeadingZeroes_Expected_WithoutTag[4] = {
+const uint8_t kRawToDerThreeLeadingZeroes_Expected_WithoutTag[] = {
     0x01,
     0x02,
     0x03,
@@ -105,17 +105,17 @@ const RawIntegerToDerVector kRawIntegerToDerVector3 = {
 };
 
 // Literal zero
-const uint8_t kRawToDerLiteralZero_Candidate[1] = {
+const uint8_t kRawToDerLiteralZero_Candidate[] = {
     0x00,
 };
 
-const uint8_t kRawToDerLiteralZero_Expected[3] = {
+const uint8_t kRawToDerLiteralZero_Expected[] = {
     0x02,
     0x01,
     0x00,
 };
 
-const uint8_t kRawToDerLiteralZero_Expected_WithoutTag[1] = {
+const uint8_t kRawToDerLiteralZero_Expected_WithoutTag[] = {
     0x00,
 };
 
@@ -129,20 +129,20 @@ const RawIntegerToDerVector kRawIntegerToDerVector4 = {
 };
 
 // Only leading zeroes
-const uint8_t kRawToDerOnlyLeadingZeroes_Candidate[4] = {
+const uint8_t kRawToDerOnlyLeadingZeroes_Candidate[] = {
     0x00,
     0x00,
     0x00,
     0x00,
 };
 
-const uint8_t kRawToDerOnlyLeadingZeroes_Expected[3] = {
+const uint8_t kRawToDerOnlyLeadingZeroes_Expected[] = {
     0x02,
     0x01,
     0x00,
 };
 
-const uint8_t kRawToDerOnlyLeadingZeroes_Expected_WithoutTag[1] = {
+const uint8_t kRawToDerOnlyLeadingZeroes_Expected_WithoutTag[] = {
     0x00,
 };
 
@@ -156,18 +156,18 @@ const RawIntegerToDerVector kRawIntegerToDerVector5 = {
 };
 
 // Only one byte, non-zero, MSB set
-const uint8_t kRawToDerMsbSetOneByte_Candidate[1] = {
+const uint8_t kRawToDerMsbSetOneByte_Candidate[] = {
     0xff,
 };
 
-const uint8_t kRawToDerMsbSetOneByte_Expected[4] = {
+const uint8_t kRawToDerMsbSetOneByte_Expected[] = {
     0x02,
     0x02,
     0x00,
     0xff,
 };
 
-const uint8_t kRawToDerMsbSetOneByte_Expected_WithoutTag[2] = {
+const uint8_t kRawToDerMsbSetOneByte_Expected_WithoutTag[] = {
     0x00,
     0xff,
 };
@@ -182,17 +182,17 @@ const RawIntegerToDerVector kRawIntegerToDerVector6 = {
 };
 
 // Only one byte, non-zero, MSB clear
-const uint8_t kRawToDerMsbClearOneByte_Candidate[1] = {
+const uint8_t kRawToDerMsbClearOneByte_Candidate[] = {
     0x7f,
 };
 
-const uint8_t kRawToDerMsbClearOneByte_Expected[3] = {
+const uint8_t kRawToDerMsbClearOneByte_Expected[] = {
     0x02,
     0x01,
     0x7f,
 };
 
-const uint8_t kRawToDerMsbClearOneByte_Expected_WithoutTag[1] = {
+const uint8_t kRawToDerMsbClearOneByte_Expected_WithoutTag[] = {
     0x7f,
 };
 

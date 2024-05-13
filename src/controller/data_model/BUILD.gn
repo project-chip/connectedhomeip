@@ -17,65 +17,30 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 
 import("$dir_pw_build/python.gni")
+import("${chip_root}/build/chip/chip_codegen.gni")
+import("${chip_root}/build/chip/java/config.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
+
+chip_codegen("cluster-tlv-metadata") {
+  input = "controller-clusters.matter"
+  generator = "cpp-tlvmeta"
+
+  options = [ "table_name:clusters_meta" ]
+
+  outputs = [
+    "tlv/meta/clusters_meta.cpp",
+    "tlv/meta/clusters_meta.h",
+  ]
+
+  deps = [
+    "${chip_root}/src/lib/format:flat-tree",
+    "${chip_root}/src/lib/format:tlv-metadata-headers",
+  ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
+}
 
 chip_data_model("data_model") {
   zap_file = "controller-clusters.zap"
-
-  zap_pregenerated_dir =
-      "${chip_root}/zzz_generated/controller-clusters/zap-generated"
-
-  use_tests_apis = true
   allow_circular_includes_from = [ "${chip_root}/src/controller" ]
-}
-
-if (current_os == "android") {
-  pw_python_action("java-jni-generate") {
-    script = "${chip_root}/scripts/codegen.py"
-
-    _idl_file = "controller-clusters.matter"
-    _output_files = exec_script("${chip_root}/scripts/codegen.py",
-                                [
-                                  "--generator",
-                                  "java",
-                                  "--log-level",
-                                  "fatal",
-                                  "--name-only",
-                                  rebase_path("controller-clusters.matter"),
-                                ],
-                                "list lines",
-                                [ "controller-clusters.matter" ])
-
-    args = [
-      "--generator",
-      "java",
-      "--output-dir",
-      rebase_path(target_gen_dir),
-      rebase_path(_idl_file),
-    ]
-
-    deps = [ "${chip_root}/scripts/idl" ]
-
-    inputs = [ _idl_file ]
-    sources = [ _idl_file ]
-    outputs = []
-
-    foreach(name, _output_files) {
-      outputs += [ "$target_gen_dir/${name}" ]
-    }
-  }
-
-  source_set("java-jni-sources") {
-    sources = get_target_outputs(":java-jni-generate")
-    public_configs = [ "${chip_root}/src:includes" ]
-
-    deps = [
-      ":data_model",
-      ":java-jni-generate",
-      "${chip_root}/src/inet",
-      "${chip_root}/src/lib",
-      "${chip_root}/src/platform",
-      "${chip_root}/src/platform/android",
-    ]
-  }
 }

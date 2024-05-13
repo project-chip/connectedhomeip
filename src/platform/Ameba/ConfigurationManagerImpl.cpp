@@ -25,11 +25,13 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/Ameba/AmebaConfig.h>
+#include <platform/Ameba/AmebaUtils.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
+#include <sys_api.h>
 #include <wifi_conf.h>
 
 namespace chip {
@@ -49,11 +51,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     uint32_t rebootCount;
 
     // Force initialization of NVS namespaces if they doesn't already exist.
-    err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipFactory);
-    SuccessOrExit(err);
-    err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipConfig);
-    SuccessOrExit(err);
-    err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipCounters);
+    err = AmebaConfig::InitNamespace();
     SuccessOrExit(err);
 
     if (AmebaConfig::ConfigValueExists(AmebaConfig::kCounterKey_RebootCount))
@@ -80,6 +78,21 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     if (!AmebaConfig::ConfigValueExists(AmebaConfig::kCounterKey_BootReason))
     {
         err = StoreBootReason(to_underlying(BootReasonType::kUnspecified));
+        SuccessOrExit(err);
+    }
+
+    if (!AmebaConfig::ConfigValueExists(AmebaConfig::kConfigKey_RegulatoryLocation))
+    {
+        uint32_t regulatoryLocation = to_underlying(app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kIndoor);
+        err                         = WriteConfigValue(AmebaConfig::kConfigKey_RegulatoryLocation, regulatoryLocation);
+        SuccessOrExit(err);
+    }
+
+    if (!AmebaConfig::ConfigValueExists(AmebaConfig::kConfigKey_LocationCapability))
+    {
+        uint32_t locationCapability =
+            to_underlying(app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kIndoorOutdoor);
+        err = WriteConfigValue(AmebaConfig::kConfigKey_LocationCapability, locationCapability);
         SuccessOrExit(err);
     }
 
@@ -123,15 +136,40 @@ CHIP_ERROR ConfigurationManagerImpl::StoreBootReason(uint32_t bootReason)
     return WriteConfigValue(AmebaConfig::kCounterKey_BootReason, bootReason);
 }
 
+CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
+{
+    uint32_t value = 0;
+
+    CHIP_ERROR err = ReadConfigValue(AmebaConfig::kConfigKey_LocationCapability, value);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(value <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        location = static_cast<uint8_t>(value);
+    }
+
+    return err;
+}
+
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
+    CHIP_ERROR err;
+    int32_t error;
+
     char temp[32];
     uint32_t mac[ETH_ALEN];
+    char * token;
     int i = 0;
 
-    wifi_get_mac_address(temp);
+    error = matter_wifi_get_mac_address(temp);
+    err   = AmebaUtils::MapError(error, AmebaErrorType::kWiFiError);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to get mac address");
+        goto exit;
+    }
 
-    char * token = strtok(temp, ":");
+    token = strtok(temp, ":");
     while (token != NULL)
     {
         mac[i] = (uint32_t) strtol(token, NULL, 16);
@@ -142,31 +180,8 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
     for (i = 0; i < ETH_ALEN; i++)
         buf[i] = mac[i] & 0xFF;
 
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConfigurationManagerImpl::GetUniqueId(char * buf, size_t bufSize)
-{
-#ifdef CHIP_DEVICE_CONFIG_UNIQUE_ID
-    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_UNIQUE_ID), CHIP_ERROR_BUFFER_TOO_SMALL);
-    strcpy(buf, CHIP_DEVICE_CONFIG_UNIQUE_ID);
-    return CHIP_NO_ERROR;
-#else
-    ReturnErrorCodeIf(bufSize != 32, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
-    char temp[32];
-    int i = 0, j = 0;
-
-    memset(&temp[0], 0, 32);
-    ReturnErrorCodeIf(wifi_get_mac_address(temp) != 0, CHIP_ERROR_INVALID_ARGUMENT);
-
-    for (i = 0; i < bufSize; i++)
-    {
-        if (temp[i] != ':')
-            buf[j++] = temp[i];
-    }
-
-    return CHIP_NO_ERROR;
-#endif
+exit:
+    return err;
 }
 
 bool ConfigurationManagerImpl::CanFactoryReset()
@@ -185,10 +200,6 @@ CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform:
     AmebaConfig::Key configKey{ AmebaConfig::kConfigNamespace_ChipCounters, key };
 
     CHIP_ERROR err = ReadConfigValue(configKey, value);
-    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
-    {
-        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-    }
     return err;
 }
 
@@ -265,15 +276,20 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     ChipLogProgress(DeviceLayer, "Performing factory reset");
 
     // Erase all values in the chip-config NVS namespace.
-    err = AmebaConfig::ClearNamespace(AmebaConfig::kConfigNamespace_ChipConfig);
+    err = AmebaConfig::ClearNamespace();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "ClearNamespace(ChipConfig) failed: %s", chip::ErrorStr(err));
+        ChipLogError(DeviceLayer, "ClearNamespace() failed: %s", chip::ErrorStr(err));
     }
 
     // Restart the system.
     ChipLogProgress(DeviceLayer, "System restarting");
-    // sys_reset();
+    sys_reset();
+}
+
+ConfigurationManager & ConfigurationMgrImpl()
+{
+    return ConfigurationManagerImpl::GetDefaultInstance();
 }
 
 } // namespace DeviceLayer

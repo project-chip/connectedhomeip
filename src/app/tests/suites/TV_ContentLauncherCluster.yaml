@@ -41,79 +41,100 @@ tests:
           value: 0
 
     - label: "Launch Content Command"
-      command: "launchContent"
+      command: "LaunchContent"
       arguments:
           values:
-              - name: "autoPlay"
+              - name: "AutoPlay"
                 value: true
-              - name: "data"
+              - name: "Data"
                 value: "exampleData"
-              - name: "search"
+              - name: "Search"
                 value:
                     {
-                        parameterList:
+                        ParameterList:
                             [
                                 {
-                                    type: 1,
-                                    value: "exampleValue",
-                                    externalIDList:
-                                        [{ name: "name", value: "value" }],
+                                    Type: 1,
+                                    Value: "exampleValue",
+                                    ExternalIDList:
+                                        [{ Name: "name", Value: "value" }],
                                 },
                             ],
                     }
+              - name: "PlaybackPreferences"
+                value:
+                    {
+                        PlaybackPosition: 0,
+                        TextTrack:
+                            {
+                                LanguageCode: "exampleLanguageCode",
+                                Characteristics: [0],
+                                AudioOutputIndex: 0,
+                            },
+                        AudioTracks:
+                            [
+                                {
+                                    LanguageCode: "exampleLanguageCode",
+                                    Characteristics: [0],
+                                    AudioOutputIndex: 0,
+                                },
+                            ],
+                    }
+              - name: "UseCurrentContext"
+                value: true
       response:
           values:
-              - name: "data"
+              - name: "Data"
                 value: "exampleData"
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Launch URL Command"
-      command: "launchURL"
+      command: "LaunchURL"
       arguments:
           values:
-              - name: "contentURL"
+              - name: "ContentURL"
                 value: "exampleUrl"
-              - name: "displayString"
+              - name: "DisplayString"
                 value: "exampleDisplayString"
-              - name: "brandingInformation"
+              - name: "BrandingInformation"
                 value:
                     {
-                        providerName: "exampleName",
-                        background:
+                        ProviderName: "exampleName",
+                        Background:
                             {
-                                imageUrl: "exampleUrl",
-                                color: "exampleColor",
-                                size: { width: 0, height: 0, metric: 0 },
+                                ImageURL: "exampleUrl",
+                                Color: "exampleColor",
+                                Size: { Width: 0, Height: 0, Metric: 0 },
                             },
-                        logo:
+                        Logo:
                             {
-                                imageUrl: "exampleUrl",
-                                color: "exampleColor",
-                                size: { width: 0, height: 0, metric: 0 },
+                                ImageURL: "exampleUrl",
+                                Color: "exampleColor",
+                                Size: { Width: 0, Height: 0, Metric: 0 },
                             },
-                        progressBar:
+                        ProgressBar:
                             {
-                                imageUrl: "exampleUrl",
-                                color: "exampleColor",
-                                size: { width: 0, height: 0, metric: 0 },
+                                ImageURL: "exampleUrl",
+                                Color: "exampleColor",
+                                Size: { Width: 0, Height: 0, Metric: 0 },
                             },
-                        splash:
+                        Splash:
                             {
-                                imageUrl: "exampleUrl",
-                                color: "exampleColor",
-                                size: { width: 0, height: 0, metric: 0 },
+                                ImageURL: "exampleUrl",
+                                Color: "exampleColor",
+                                Size: { Width: 0, Height: 0, Metric: 0 },
                             },
-                        waterMark:
+                        WaterMark:
                             {
-                                imageUrl: "exampleUrl",
-                                color: "exampleColor",
-                                size: { width: 0, height: 0, metric: 0 },
+                                ImageURL: "exampleUrl",
+                                Color: "exampleColor",
+                                Size: { Width: 0, Height: 0, Metric: 0 },
                             },
                     }
       response:
           values:
-              - name: "data"
+              - name: "Data"
                 value: "exampleData"
-              - name: "status"
+              - name: "Status"
                 value: 0

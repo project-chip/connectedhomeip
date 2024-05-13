@@ -17,19 +17,17 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <struct name="SemanticTag">
+  <struct name="SemanticTagStruct">
     <cluster code="0x0050"/>
-    <item name="MfgCode" type="ENUM16"/>
-    <item name="Value" type="ENUM16" optional="false"/>
+    <item name="MfgCode" type="vendor_id" optional="false"/>
+    <item name="Value"   type="enum16"    optional="false"/>
   </struct>
 
   <struct name="ModeOptionStruct">
     <cluster code="0x0050"/>
-    <item name="Label" type="CHAR_STRING" optional="false" length="32"/>
-    <item name="Mode" type="INT8U" optional="false"/>
-    <!-- TODO: A list of list is not supported yet. Otherwise this should be a list of SemanticTags -->
-    <!-- <item name="SemanticTags" type="SemanticTag" array="true" optional="false"/> -->
-    <item name="SemanticTag" type="INT32U" optional="false"/>
+    <item name="Label"        type="char_string"                     length="64" optional="false"/>
+    <item name="Mode"         type="int8u"                                       optional="false"/>
+    <item name="SemanticTags" type="SemanticTagStruct" array="true"  length="64" optional="false"/>
   </struct>
 
   <cluster>
@@ -39,27 +37,33 @@ limitations under the License.
     <define>MODE_SELECT_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="2"/>
+
+    <features>
+      <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the OnOff cluster">
+        <optionalConform/>
+      </feature>
+    </features>
+
     <description>Attributes and commands for selecting a mode from a list of supported options.</description>
     <!-- Base data types -->
-    <attribute side="server" code="0x0000" define="MODE_DESCRIPTION" type="CHAR_STRING"                                     writable="false" optional="false" isNullable="false" length="32">Description</attribute>
-    <attribute side="server" code="0x0001" define="STANDARD_NAMESPACE" type="ENUM16"                                        writable="false" optional="false"  isNullable="true">StandardNamespace</attribute>
-    <attribute side="server" code="0x0002" define="SUPPORTED_MODES" type="ARRAY" entryType="ModeOptionStruct"               writable="false" optional="false" isNullable="false">SupportedModes</attribute>
-    <attribute side="server" code="0x0003" define="CURRENT_MODE"    type="INT8U"                                            writable="false" optional="false" isNullable="false" reportable="true">CurrentMode</attribute>
-    <attribute side="server" code="0x0004" define="START_UP_MODE"   type="INT8U"                                            writable="true" optional="true"  isNullable="true">StartUpMode</attribute>
-    <attribute side="server" code="0x0005" define="ON_MODE"         type="INT8U"                                            writable="true"  optional="true" isNullable="true">OnMode</attribute>
+    <attribute side="server" code="0x0000" define="MODE_DESCRIPTION"   type="char_string"                        length="64"  writable="false" optional="false" isNullable="false">Description</attribute>
+    <attribute side="server" code="0x0001" define="STANDARD_NAMESPACE" type="enum16"                                          writable="false" optional="false" isNullable="true">StandardNamespace</attribute>
+    <attribute side="server" code="0x0002" define="SUPPORTED_MODES"    type="array" entryType="ModeOptionStruct" length="255" writable="false" optional="false" isNullable="false">SupportedModes</attribute>
+    <attribute side="server" code="0x0003" define="CURRENT_MODE"       type="int8u"                                           writable="false" optional="false" isNullable="false" reportable="true">CurrentMode</attribute>
+    <attribute side="server" code="0x0004" define="START_UP_MODE"      type="int8u"                                           writable="true"  optional="true"  isNullable="true">StartUpMode</attribute>
+    <attribute side="server" code="0x0005" define="ON_MODE"            type="int8u"                                           writable="true"  optional="true"  isNullable="true">OnMode</attribute>
 
     <!-- Test Commands -->
     <command source="client" code="0x00" name="ChangeToMode" optional="false">
       <description>
         On receipt of this command, if the NewMode field matches the Mode field in an entry of the SupportedModes list, the server SHALL set the CurrentMode attribute to the NewMode value, otherwise, the server SHALL respond with an INVALID_COMMAND status response.
       </description>
-      <arg name="NewMode" type="INT8U" />
+      <arg name="NewMode" type="int8u" />
     </command>
 
   </cluster>
 
-  <bitmap name="ModeSelectFeature" type="BITMAP32">
-    <cluster code="0x0050"/>
-    <field name="DEPONOFF" mask="0x1"/>
-  </bitmap>
+
 </configurator>

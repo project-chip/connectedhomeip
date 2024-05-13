@@ -14,13 +14,18 @@
 
 name: 74.2.1. [TC-SWTCH-2.1] Attributes with server as DUT
 
+PICS:
+    - SWTCH.S
+
 config:
     nodeId: 0x12344321
     cluster: "Switch"
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -28,44 +33,31 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Read NumberOfPositions attribute"
+    - label: "Step 2a: Read NumberOfPositions attribute"
       command: "readAttribute"
-      attribute: "number of positions"
+      attribute: "NumberOfPositions"
       response:
-          value: 2
-
-    - label: "Read NumberOfPositions attribute"
-      command: "readAttribute"
-      attribute: "number of positions"
-      response:
+          saveAs: NumberOfPositionsValue
           constraints:
-              type: uint8
+              type: int8u
               minValue: 2
+              maxValue: 255
 
-    - label: "Read CurrentPosition attribute"
+    - label: "Step 2b: Read CurrentPosition attribute"
       command: "readAttribute"
-      attribute: "current position"
-      response:
-          value: 0
-
-    - label: "Read CurrentPosition attribute"
-      command: "readAttribute"
-      attribute: "current position"
+      attribute: "CurrentPosition"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
+              maxValue: NumberOfPositionsValue - 1
 
-    - label: "Read MultiPressMax attribute"
+    - label: "Step 2c: Read MultiPressMax attribute"
+      PICS: SWTCH.S.F04
       command: "readAttribute"
-      attribute: "multi press max"
-      response:
-          value: 2
-
-    - label: "Read MultiPressMax attribute"
-      command: "readAttribute"
-      attribute: "multi press max"
+      attribute: "MultiPressMax"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 2
+              maxValue: 255

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -27,19 +27,29 @@
 
 #include <platform/Zephyr/BLEManagerImpl.h>
 
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/internal/BLEManager.h>
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
 
-#include <bluetooth/addr.h>
-#include <bluetooth/gatt.h>
-#include <random/rand32.h>
-#include <sys/byteorder.h>
-#include <sys/util.h>
+#include <zephyr/bluetooth/addr.h>
+#include <zephyr/bluetooth/gatt.h>
+#include <zephyr/bluetooth/hci.h>
+#include <zephyr/random/random.h>
+#include <zephyr/sys/byteorder.h>
+#include <zephyr/sys/util.h>
+
+#ifdef CONFIG_BT_BONDABLE
+#include <zephyr/settings/settings.h>
+#endif // CONFIG_BT_BONDABLE
+
+#include <array>
 
 using namespace ::chip;
 using namespace ::chip::Ble;
@@ -50,6 +60,9 @@ namespace DeviceLayer {
 namespace Internal {
 
 namespace {
+
+constexpr uint32_t kAdvertisingOptions = BT_LE_ADV_OPT_CONNECTABLE | BT_LE_ADV_OPT_ONE_TIME;
+constexpr uint8_t kAdvertisingFlags    = BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR;
 
 const bt_uuid_128 UUID128_CHIPoBLEChar_RX =
     BT_UUID_INIT_128(0x11, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18);
@@ -72,14 +85,14 @@ _bt_gatt_ccc CHIPoBLEChar_TX_CCC = BT_GATT_CCC_INITIALIZER(nullptr, BLEManagerIm
 
 // clang-format off
 
-struct bt_gatt_attr sChipoBleAttributes[] = {
+bt_gatt_attr sChipoBleAttributes[] = {
     BT_GATT_PRIMARY_SERVICE(&UUID16_CHIPoBLEService.uuid),
         BT_GATT_CHARACTERISTIC(&UUID128_CHIPoBLEChar_RX.uuid,
                                BT_GATT_CHRC_WRITE | BT_GATT_CHRC_WRITE_WITHOUT_RESP,
                                BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,
                                nullptr, BLEManagerImpl::HandleRXWrite, nullptr),
         BT_GATT_CHARACTERISTIC(&UUID128_CHIPoBLEChar_TX.uuid,
-                               BT_GATT_CHRC_NOTIFY,
+                               BT_GATT_CHRC_INDICATE,
                                BT_GATT_PERM_NONE,
                                nullptr, nullptr, nullptr),
         BT_GATT_CCC_MANAGED(&CHIPoBLEChar_TX_CCC, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
@@ -91,7 +104,7 @@ struct bt_gatt_attr sChipoBleAttributes[] = {
 #endif
 };
 
-struct bt_gatt_service sChipoBleService = BT_GATT_SERVICE(sChipoBleAttributes);
+bt_gatt_service sChipoBleService = BT_GATT_SERVICE(sChipoBleAttributes);
 
 // clang-format on
 
@@ -99,40 +112,50 @@ struct bt_gatt_service sChipoBleService = BT_GATT_SERVICE(sChipoBleAttributes);
 // This value should be adjusted accordingly if the service declaration changes.
 constexpr int kCHIPoBLE_CCC_AttributeIndex = 3;
 
-CHIP_ERROR InitRandomStaticAddress()
+#ifdef CONFIG_BT_BONDABLE
+constexpr uint8_t kMatterBleIdentity = 1;
+#else
+constexpr uint8_t kMatterBleIdentity = 0;
+#endif // CONFIG_BT_BONDABLE
+
+int InitRandomStaticAddress(bool idPresent, int & id)
 {
     // Generate a random static address for the default identity.
     // This must be done before bt_enable() as after that updating the default identity is not possible.
     int error = 0;
     bt_addr_le_t addr;
 
-#if CONFIG_BT_HOST_CRYPTO
-    // When CONFIG_BT_HOST_CRYPTO is enabled, bt_addr_le_create_static() depends on HCI transport
-    // which is not yet started at this point, so use a different method for generating the address
+    // generating the address
     addr.type = BT_ADDR_LE_RANDOM;
     error     = sys_csrand_get(addr.a.val, sizeof(addr.a.val));
     BT_ADDR_SET_STATIC(&addr.a);
-#else
-    error = bt_addr_le_create_static(&addr);
-#endif
 
     if (error)
     {
         ChipLogError(DeviceLayer, "Failed to create BLE address: %d", error);
-        return System::MapErrorZephyr(error);
+        return error;
     }
 
-    error = bt_id_create(&addr, nullptr);
+    if (!idPresent)
+    {
+        id = bt_id_create(&addr, nullptr);
+    }
+#if CONFIG_BT_ID_MAX == 2
+    else
+    {
+        id = bt_id_reset(1, &addr, nullptr);
+    }
+#endif // CONFIG_BT_BONDABLE
 
-    if (error)
+    if (id < 0)
     {
         ChipLogError(DeviceLayer, "Failed to create BLE identity: %d", error);
-        return System::MapErrorZephyr(error);
+        return id;
     }
 
     ChipLogProgress(DeviceLayer, "BLE address: %02X:%02X:%02X:%02X:%02X:%02X", addr.a.val[5], addr.a.val[4], addr.a.val[3],
                     addr.a.val[2], addr.a.val[1], addr.a.val[0]);
-    return CHIP_NO_ERROR;
+    return 0;
 }
 
 } // unnamed namespace
@@ -141,16 +164,41 @@ BLEManagerImpl BLEManagerImpl::sInstance;
 
 CHIP_ERROR BLEManagerImpl::_Init()
 {
+    int err = 0;
+    int id  = 0;
+
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
-    mGAPConns = 0;
+    mMatterConnNum = 0;
+    mTotalConnNum  = 0;
 
     memset(mSubscribedConns, 0, sizeof(mSubscribedConns));
 
-    ReturnErrorOnFailure(InitRandomStaticAddress());
-    int err = bt_enable(NULL);
+#ifdef CONFIG_BT_BONDABLE
+    bt_addr_le_t idsAddr[CONFIG_BT_ID_MAX];
+    size_t idsCount = CONFIG_BT_ID_MAX;
+
+    err = bt_enable(nullptr);
+
     VerifyOrReturnError(err == 0, MapErrorZephyr(err));
+
+    settings_load();
+
+    bt_id_get(idsAddr, &idsCount);
+
+    err = InitRandomStaticAddress(idsCount > 1, id);
+
+    VerifyOrReturnError(err == 0 && id == kMatterBleIdentity, MapErrorZephyr(err));
+
+#else
+    err = InitRandomStaticAddress(false, id);
+    VerifyOrReturnError(err == 0 && id == kMatterBleIdentity, MapErrorZephyr(err));
+    err = bt_enable(nullptr);
+    VerifyOrReturnError(err == 0, MapErrorZephyr(err));
+#endif // CONFIG_BT_BONDABLE
+
+    BLEAdvertisingArbiter::Init(static_cast<uint8_t>(id));
 
     memset(&mConnCallbacks, 0, sizeof(mConnCallbacks));
     mConnCallbacks.connected    = HandleConnect;
@@ -179,16 +227,6 @@ void BLEManagerImpl::DriveBLEState()
     if (!mFlags.Has(Flags::kAsyncInitCompleted))
     {
         mFlags.Set(Flags::kAsyncInitCompleted);
-
-        // If CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED is enabled,
-        // disable CHIPoBLE advertising if the device is fully provisioned.
-#if CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
-        if (ConfigurationMgr().IsFullyProvisioned())
-        {
-            mFlags.Clear(Flags::kAdvertisingEnabled);
-            ChipLogProgress(DeviceLayer, "CHIPoBLE advertising disabled because device is fully provisioned");
-        }
-#endif // CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
     }
 
     // If the application has enabled CHIPoBLE and BLE advertising...
@@ -206,7 +244,13 @@ void BLEManagerImpl::DriveBLEState()
         {
             mFlags.Clear(Flags::kAdvertisingRefreshNeeded);
             err = StartAdvertising();
-            SuccessOrExit(err);
+            if (err != CHIP_NO_ERROR)
+            {
+                // Return prematurely but keep the CHIPoBLE service mode enabled to allow advertising retries
+                mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
+                ChipLogError(DeviceLayer, "Could not start CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
+                return;
+            }
         }
     }
     else
@@ -214,7 +258,12 @@ void BLEManagerImpl::DriveBLEState()
         if (mFlags.Has(Flags::kAdvertising))
         {
             err = StopAdvertising();
-            SuccessOrExit(err);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
+                mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
+                return;
+            }
         }
 
         // If no connections are active unregister also CHIPoBLE GATT service
@@ -231,13 +280,6 @@ void BLEManagerImpl::DriveBLEState()
             }
         }
     }
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
-        mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
-    }
 }
 
 struct BLEManagerImpl::ServiceData
@@ -246,66 +288,128 @@ struct BLEManagerImpl::ServiceData
     ChipBLEDeviceIdentificationInfo deviceIdInfo;
 } __attribute__((packed));
 
-CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
+inline CHIP_ERROR BLEManagerImpl::PrepareAdvertisingRequest()
 {
-    int err                       = 0;
-    const bool isAdvertisingRerun = mFlags.Has(Flags::kAdvertising);
+    static ServiceData serviceData;
+    static std::array<bt_data, 2> advertisingData;
+    static std::array<bt_data, 1> scanResponseData;
+    static_assert(sizeof(serviceData) == 10, "Unexpected size of BLE advertising data!");
 
-    // At first run always select fast advertising, on the next attempt slow down interval.
-    const uint32_t intervalMin = mFlags.Has(Flags::kFastAdvertisingEnabled) ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN
-                                                                            : CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
-    const uint32_t intervalMax = mFlags.Has(Flags::kFastAdvertisingEnabled) ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX
-                                                                            : CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
+    const char * name      = bt_get_name();
+    const uint8_t nameSize = static_cast<uint8_t>(strlen(name));
 
-    bt_le_adv_param advParams =
-        BT_LE_ADV_PARAM_INIT(BT_LE_ADV_OPT_CONNECTABLE | BT_LE_ADV_OPT_ONE_TIME, intervalMin, intervalMax, nullptr);
-
-    // Define advertising and, if BLE device name is set, scan response data
-    ServiceData serviceData;
-    const uint8_t advFlags          = BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR;
-    const bt_data advertisingData[] = { BT_DATA(BT_DATA_FLAGS, &advFlags, sizeof(advFlags)),
-                                        BT_DATA(BT_DATA_SVC_DATA16, &serviceData, sizeof(serviceData)) };
-
-    const char * deviceName             = bt_get_name();
-    const uint8_t deviceNameSize        = static_cast<uint8_t>(strlen(deviceName));
-    const bt_data scanResponseData[]    = { BT_DATA(BT_DATA_NAME_COMPLETE, deviceName, deviceNameSize) };
-    const bt_data * scanResponseDataPtr = deviceNameSize > 0 ? scanResponseData : nullptr;
-    const size_t scanResponseDataLen    = deviceNameSize > 0 ? ARRAY_SIZE(scanResponseData) : 0u;
-
-    // Register dynamically CHIPoBLE GATT service
-    if (!mFlags.Has(Flags::kChipoBleGattServiceRegister))
-    {
-        err = bt_gatt_service_register(&sChipoBleService);
-
-        if (err != 0)
-            ChipLogError(DeviceLayer, "Failed to register CHIPoBLE GATT service");
-
-        VerifyOrReturnError(err == 0, MapErrorZephyr(err));
-
-        mFlags.Set(Flags::kChipoBleGattServiceRegister);
-    }
-
-    // Initialize service data
-    static_assert(sizeof(serviceData) == 10, "Size of BLE advertisement data changed! Was that intentional?");
-    chip::Encoding::LittleEndian::Put16(serviceData.uuid, UUID16_CHIPoBLEService.val);
+    Encoding::LittleEndian::Put16(serviceData.uuid, UUID16_CHIPoBLEService.val);
     ReturnErrorOnFailure(ConfigurationMgr().GetBLEDeviceIdentificationInfo(serviceData.deviceIdInfo));
 
+#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+    if (mFlags.Has(Flags::kExtendedAdvertisingEnabled))
+    {
+        serviceData.deviceIdInfo.SetVendorId(DEVICE_HANDLE_NULL);
+        serviceData.deviceIdInfo.SetProductId(DEVICE_HANDLE_NULL);
+        serviceData.deviceIdInfo.SetExtendedAnnouncementFlag(true);
+    }
+#endif
+
+    advertisingData[0]  = BT_DATA(BT_DATA_FLAGS, &kAdvertisingFlags, sizeof(kAdvertisingFlags));
+    advertisingData[1]  = BT_DATA(BT_DATA_SVC_DATA16, &serviceData, sizeof(serviceData));
+    scanResponseData[0] = BT_DATA(BT_DATA_NAME_COMPLETE, name, nameSize);
+
+    mAdvertisingRequest.priority = CHIP_DEVICE_BLE_ADVERTISING_PRIORITY;
+    mAdvertisingRequest.options  = kAdvertisingOptions;
+
+    if (mFlags.Has(Flags::kFastAdvertisingEnabled))
+    {
+        mAdvertisingRequest.minInterval = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN;
+        mAdvertisingRequest.maxInterval = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX;
+    }
+#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+    else if (mFlags.Has(Flags::kExtendedAdvertisingEnabled))
+    {
+        mAdvertisingRequest.minInterval = CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN;
+        mAdvertisingRequest.maxInterval = CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX;
+    }
+#endif
+    else
+    {
+        mAdvertisingRequest.minInterval = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
+        mAdvertisingRequest.maxInterval = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
+    }
+    mAdvertisingRequest.advertisingData  = Span<bt_data>(advertisingData);
+    mAdvertisingRequest.scanResponseData = nameSize ? Span<bt_data>(scanResponseData) : Span<bt_data>{};
+
+    mAdvertisingRequest.onStarted = [](int rc) {
+        if (rc == 0)
+        {
+            ChipLogProgress(DeviceLayer, "CHIPoBLE advertising started");
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "Failed to start CHIPoBLE advertising: %d", rc);
+            BLEManagerImpl().StopAdvertising();
+        }
+    };
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BLEManagerImpl::RegisterGattService()
+{
+    // Register CHIPoBLE GATT service
+    if (!mFlags.Has(Flags::kChipoBleGattServiceRegister))
+    {
+        int err = bt_gatt_service_register(&sChipoBleService);
+        if (err != 0)
+        {
+            ChipLogError(DeviceLayer, "Failed to register CHIPoBLE GATT service: %d", err);
+        }
+
+        VerifyOrReturnError(err == 0, MapErrorZephyr(err));
+        mFlags.Set(Flags::kChipoBleGattServiceRegister);
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BLEManagerImpl::UnregisterGattService()
+{
+    // Unregister CHIPoBLE GATT service
+    if (mFlags.Has(Flags::kChipoBleGattServiceRegister))
+    {
+        int err = bt_gatt_service_unregister(&sChipoBleService);
+        if (err != 0)
+        {
+            ChipLogError(DeviceLayer, "Failed to unregister CHIPoBLE GATT service: %d", err);
+        }
+
+        VerifyOrReturnError(err == 0, MapErrorZephyr(err));
+        mFlags.Clear(Flags::kChipoBleGattServiceRegister);
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BLEManagerImpl::StartAdvertising()
+{
+    // Prepare advertising request
+    ReturnErrorOnFailure(PrepareAdvertisingRequest());
+    // We need to register GATT service before issuing the advertising to start
+    ReturnErrorOnFailure(RegisterGattService());
+
+    // Initialize C3 characteristic data
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     ReturnErrorOnFailure(PrepareC3CharData());
 #endif
 
-    // Restart advertising
-    err = bt_le_adv_stop();
-    VerifyOrReturnError(err == 0, MapErrorZephyr(err));
-
-    err = bt_le_adv_start(&advParams, advertisingData, ARRAY_SIZE(advertisingData), scanResponseDataPtr, scanResponseDataLen);
-    VerifyOrReturnError(err == 0, MapErrorZephyr(err));
+    // Request advertising
+    CHIP_ERROR err = BLEAdvertisingArbiter::InsertRequest(mAdvertisingRequest);
+    if (CHIP_NO_ERROR != err)
+    {
+        // It makes not sense to keep GATT services registered after the advertising request failed
+        (void) UnregisterGattService();
+        return err;
+    }
 
     // Transition to the Advertising state...
     if (!mFlags.Has(Flags::kAdvertising))
     {
-        ChipLogProgress(DeviceLayer, "CHIPoBLE advertising started");
-
         mFlags.Set(Flags::kAdvertising);
 
         // Post a CHIPoBLEAdvertisingChange(Started) event.
@@ -318,34 +422,36 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 
         if (mFlags.Has(Flags::kFastAdvertisingEnabled))
         {
-            // Start timer to change advertising interval.
+            // Start timer to change advertising interval from fast to slow.
             DeviceLayer::SystemLayer().StartTimer(
                 System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME),
-                HandleBLEAdvertisementIntervalChange, this);
-        }
+                HandleSlowBLEAdvertisementInterval, this);
 
-        // Start timer to disable CHIPoBLE advertisement after timeout expiration only if it isn't advertising rerun (in that case
-        // timer is already running).
-        if (!isAdvertisingRerun)
-        {
-            DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT),
-                                                  HandleBLEAdvertisementTimeout, this);
+#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+            // Start timer to schedule start of the extended advertising
+            DeviceLayer::SystemLayer().StartTimer(
+                System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME_MS),
+                HandleExtendedBLEAdvertisementInterval, this);
+#endif
         }
     }
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
+CHIP_ERROR BLEManagerImpl::StopAdvertising()
 {
-    int err = bt_le_adv_stop();
-    VerifyOrReturnError(err == 0, MapErrorZephyr(err));
+    BLEAdvertisingArbiter::CancelRequest(mAdvertisingRequest);
 
     // Transition to the not Advertising state...
     if (mFlags.Has(Flags::kAdvertising))
     {
         mFlags.Clear(Flags::kAdvertising);
         mFlags.Set(Flags::kFastAdvertisingEnabled, true);
+
+#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+        mFlags.Clear(Flags::kExtendedAdvertisingEnabled);
+#endif
 
         ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
 
@@ -357,26 +463,13 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
             ReturnErrorOnFailure(PlatformMgr().PostEvent(&advChange));
         }
 
-        // Cancel timer event disabling CHIPoBLE advertisement after timeout expiration
-        DeviceLayer::SystemLayer().CancelTimer(HandleBLEAdvertisementTimeout, this);
-
         // Cancel timer event changing CHIPoBLE advertisement interval
-        DeviceLayer::SystemLayer().CancelTimer(HandleBLEAdvertisementIntervalChange, this);
+        DeviceLayer::SystemLayer().CancelTimer(HandleSlowBLEAdvertisementInterval, this);
+        DeviceLayer::SystemLayer().CancelTimer(HandleExtendedBLEAdvertisementInterval, this);
     }
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR BLEManagerImpl::_SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val)
-{
-    VerifyOrReturnError(val != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported,
-                        CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-    if (val != mServiceMode)
+    else
     {
-        mServiceMode = val;
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+        ChipLogProgress(DeviceLayer, "CHIPoBLE advertising already stopped");
     }
 
     return CHIP_NO_ERROR;
@@ -384,16 +477,13 @@ CHIP_ERROR BLEManagerImpl::_SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val)
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 {
-    VerifyOrReturnError(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported,
-                        CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    ChipLogDetail(DeviceLayer, "CHIPoBLE advertising set to %s", val ? "on" : "off");
 
-    if (mFlags.Has(Flags::kAdvertisingEnabled) != val)
-    {
-        ChipLogDetail(DeviceLayer, "CHIPoBLE advertising set to %s", val ? "on" : "off");
-
-        mFlags.Set(Flags::kAdvertisingEnabled, val);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
-    }
+    mFlags.Set(Flags::kAdvertisingEnabled, val);
+    // Ensure that each enabling/disabling of the general advertising clears
+    // the extended mode, to make sure we always start fresh in the regular mode
+    mFlags.Set(Flags::kExtendedAdvertisingEnabled, false);
+    PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
     return CHIP_NO_ERROR;
 }
@@ -404,8 +494,14 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
     {
     case BLEAdvertisingMode::kFastAdvertising:
         mFlags.Set(Flags::kFastAdvertisingEnabled, true);
+        mFlags.Set(Flags::kExtendedAdvertisingEnabled, false);
         break;
     case BLEAdvertisingMode::kSlowAdvertising:
+        mFlags.Set(Flags::kFastAdvertisingEnabled, false);
+        mFlags.Set(Flags::kExtendedAdvertisingEnabled, false);
+        break;
+    case BLEAdvertisingMode::kExtendedAdvertising:
+        mFlags.Set(Flags::kExtendedAdvertisingEnabled, true);
         mFlags.Set(Flags::kFastAdvertisingEnabled, false);
         break;
     default:
@@ -418,21 +514,13 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
 
 CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
 {
-    size_t len = bufSize - 1;
-
-    strncpy(buf, bt_get_name(), len);
-    buf[len] = 0;
+    Platform::CopyString(buf, bufSize, bt_get_name());
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
 {
-    if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_NotSupported)
-    {
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-    }
-
     ChipLogDetail(DeviceLayer, "Device name set to: %s", deviceName);
     return MapErrorZephyr(bt_set_name(deviceName));
 }
@@ -443,15 +531,13 @@ CHIP_ERROR BLEManagerImpl::HandleGAPConnect(const ChipDeviceEvent * event)
 
     if (connEvent->HciResult == BT_HCI_ERR_SUCCESS)
     {
-        ChipLogProgress(DeviceLayer, "BLE connection established (ConnId: 0x%02" PRIx16 ")", bt_conn_index(connEvent->BtConn));
-        mGAPConns++;
+        ChipLogProgress(DeviceLayer, "BLE connection established (ConnId: 0x%02x)", bt_conn_index(connEvent->BtConn));
+        mMatterConnNum++;
     }
     else
     {
-        ChipLogError(DeviceLayer, "BLE connection failed (reason: 0x%02" PRIx16 ")", connEvent->HciResult);
+        ChipLogError(DeviceLayer, "BLE connection failed (reason: 0x%02x)", connEvent->HciResult);
     }
-
-    ChipLogProgress(DeviceLayer, "Current number of connections: %" PRIu16 "/%" PRIu16, NumConnections(), CONFIG_BT_MAX_CONN);
 
     mFlags.Set(Flags::kAdvertisingRefreshNeeded);
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
@@ -465,11 +551,14 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(const ChipDeviceEvent * event)
 {
     const BleConnEventType * connEvent = &event->Platform.BleConnEvent;
 
-    ChipLogProgress(DeviceLayer, "BLE GAP connection terminated (reason 0x%02" PRIx16 ")", connEvent->HciResult);
+    ChipLogProgress(DeviceLayer, "BLE GAP connection terminated (reason 0x%02x)", connEvent->HciResult);
 
-    mGAPConns--;
+    if (mMatterConnNum > 0)
+    {
+        mMatterConnNum--;
+    }
 
-    // If notifications were enabled for this connection, record that they are now disabled and
+    // If indications were enabled for this connection, record that they are now disabled and
     // notify the BLE Layer of a disconnect.
     if (UnsetSubscribed(connEvent->BtConn))
     {
@@ -495,8 +584,6 @@ exit:
     // Unref bt_conn before scheduling DriveBLEState.
     bt_conn_unref(connEvent->BtConn);
 
-    ChipLogProgress(DeviceLayer, "Current number of connections: %" PRIu16 "/%" PRIu16, NumConnections(), CONFIG_BT_MAX_CONN);
-
     ChipDeviceEvent disconnectEvent;
     disconnectEvent.Type = DeviceEventType::kCHIPoBLEConnectionClosed;
     ReturnErrorOnFailure(PlatformMgr().PostEvent(&disconnectEvent));
@@ -513,16 +600,15 @@ CHIP_ERROR BLEManagerImpl::HandleTXCharCCCDWrite(const ChipDeviceEvent * event)
 {
     const BleCCCWriteEventType * writeEvent = &event->Platform.BleCCCWriteEvent;
 
-    ChipLogDetail(DeviceLayer, "ConnId: 0x%02" PRIx16 ", New CCCD value: 0x%04" PRIx16, bt_conn_index(writeEvent->BtConn),
-                  writeEvent->Value);
+    ChipLogDetail(DeviceLayer, "ConnId: 0x%02x, New CCCD value: 0x%04x", bt_conn_index(writeEvent->BtConn), writeEvent->Value);
 
-    // If the client has requested to enable notifications and if it is not yet subscribed
-    if (writeEvent->Value != 0 && SetSubscribed(writeEvent->BtConn))
+    // If the client has requested to enable indications and if it is not yet subscribed
+    if (writeEvent->Value == BT_GATT_CCC_INDICATE && SetSubscribed(writeEvent->BtConn))
     {
         // Alert the BLE layer that CHIPoBLE "subscribe" has been received and increment the bt_conn reference counter.
         HandleSubscribeReceived(writeEvent->BtConn, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
 
-        ChipLogProgress(DeviceLayer, "CHIPoBLE connection established (ConnId: 0x%02" PRIx16 ", GATT MTU: %" PRIu16 ")",
+        ChipLogProgress(DeviceLayer, "CHIPoBLE connection established (ConnId: 0x%02x, GATT MTU: %u)",
                         bt_conn_index(writeEvent->BtConn), GetMTU(writeEvent->BtConn));
 
         // Post a CHIPoBLEConnectionEstablished event to the DeviceLayer and the application.
@@ -547,27 +633,28 @@ CHIP_ERROR BLEManagerImpl::HandleTXCharCCCDWrite(const ChipDeviceEvent * event)
 
 CHIP_ERROR BLEManagerImpl::HandleRXCharWrite(const ChipDeviceEvent * event)
 {
-    const BleRXWriteEventType * writeEvent = &event->Platform.BleRXWriteEvent;
+    const BleC1WriteEventType * c1WriteEvent = &event->Platform.BleC1WriteEvent;
 
-    ChipLogDetail(DeviceLayer, "Write request received for CHIPoBLE RX (ConnId 0x%02" PRIx16 ")",
-                  bt_conn_index(writeEvent->BtConn));
+    ChipLogDetail(DeviceLayer, "Write request received for CHIPoBLE RX characteristic (ConnId 0x%02x)",
+                  bt_conn_index(c1WriteEvent->BtConn));
 
-    HandleWriteReceived(writeEvent->BtConn, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_RX,
-                        PacketBufferHandle::Adopt(writeEvent->Data));
-    bt_conn_unref(writeEvent->BtConn);
+    HandleWriteReceived(c1WriteEvent->BtConn, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_RX,
+                        PacketBufferHandle::Adopt(c1WriteEvent->Data));
+    bt_conn_unref(c1WriteEvent->BtConn);
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEManagerImpl::HandleTXCharComplete(const ChipDeviceEvent * event)
 {
-    const BleTXCompleteEventType * completeEvent = &event->Platform.BleTXCompleteEvent;
+    const BleC2IndDoneEventType * c2IndDoneEvent = &event->Platform.BleC2IndDoneEvent;
 
-    ChipLogDetail(DeviceLayer, "Notification for CHIPoBLE TX done (ConnId 0x%02" PRIx16 ")", bt_conn_index(completeEvent->BtConn));
+    ChipLogDetail(DeviceLayer, "Indication for CHIPoBLE TX characteristic done (ConnId 0x%02x, result 0x%02x)",
+                  bt_conn_index(c2IndDoneEvent->BtConn), c2IndDoneEvent->Result);
 
-    // Signal the BLE Layer that the outstanding notification is complete.
-    HandleIndicationConfirmation(completeEvent->BtConn, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
-    bt_conn_unref(completeEvent->BtConn);
+    // Signal the BLE Layer that the outstanding indication is complete.
+    HandleIndicationConfirmation(c2IndDoneEvent->BtConn, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
+    bt_conn_unref(c2IndDoneEvent->BtConn);
 
     return CHIP_NO_ERROR;
 }
@@ -583,7 +670,7 @@ CHIP_ERROR BLEManagerImpl::PrepareC3CharData()
     uint8_t rotatingDeviceIdUniqueId[ConfigurationManager::kRotatingDeviceIDUniqueIDLength] = {};
     MutableByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
 
-    err = ConfigurationMgr().GetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan);
+    err = DeviceLayer::GetDeviceInstanceInfoProvider()->GetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan);
     SuccessOrExit(err);
     err = ConfigurationMgr().GetLifetimeCounter(additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter);
     SuccessOrExit(err);
@@ -604,16 +691,16 @@ exit:
 }
 #endif
 
-void BLEManagerImpl::HandleBLEAdvertisementTimeout(System::Layer * layer, void * param)
-{
-    BLEMgr().SetAdvertisingEnabled(false);
-    ChipLogProgress(DeviceLayer, "CHIPoBLE advertising disabled because of timeout expired");
-}
-
-void BLEManagerImpl::HandleBLEAdvertisementIntervalChange(System::Layer * layer, void * param)
+void BLEManagerImpl::HandleSlowBLEAdvertisementInterval(System::Layer * layer, void * param)
 {
     BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
     ChipLogProgress(DeviceLayer, "CHIPoBLE advertising mode changed to slow");
+}
+
+void BLEManagerImpl::HandleExtendedBLEAdvertisementInterval(System::Layer * layer, void * param)
+{
+    BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kExtendedAdvertising);
+    ChipLogProgress(DeviceLayer, "CHIPoBLE advertising mode changed to extended");
 }
 
 void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
@@ -634,34 +721,12 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         err = HandleTXCharCCCDWrite(event);
         break;
 
-    case DeviceEventType::kPlatformZephyrBleRXWrite:
+    case DeviceEventType::kPlatformZephyrBleC1WriteEvent:
         err = HandleRXCharWrite(event);
         break;
 
-    case DeviceEventType::kPlatformZephyrBleTXComplete:
+    case DeviceEventType::kPlatformZephyrBleC2IndDoneEvent:
         err = HandleTXCharComplete(event);
-        break;
-
-    case DeviceEventType::kFabricMembershipChange:
-    case DeviceEventType::kServiceProvisioningChange:
-    case DeviceEventType::kAccountPairingChange:
-
-        // If CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED is enabled, and there is a change to the
-        // device's provisioning state, then automatically disable CHIPoBLE advertising if the device
-        // is now fully provisioned.
-#if CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
-        if (ConfigurationMgr().IsFullyProvisioned())
-        {
-            mFlags.Clear(Flags::kAdvertisingEnabled);
-            ChipLogProgress(DeviceLayer, "CHIPoBLE advertising disabled because device is fully provisioned");
-        }
-#endif // CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
-
-        // Force the advertising state to be refreshed to reflect new provisioning state.
-        mFlags.Set(Flags::kAdvertisingRefreshNeeded);
-
-        DriveBLEState();
-
         break;
 
     default:
@@ -670,7 +735,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
         mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
         PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
@@ -678,12 +743,12 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
 uint16_t BLEManagerImpl::_NumConnections(void)
 {
-    return mGAPConns;
+    return mMatterConnNum;
 }
 
 bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 {
-    ChipLogProgress(DeviceLayer, "Closing BLE GATT connection (ConnId %02" PRIx16 ")", bt_conn_index(conId));
+    ChipLogProgress(DeviceLayer, "Closing BLE GATT connection (ConnId %02x)", bt_conn_index(conId));
     return bt_conn_disconnect(conId, BT_HCI_ERR_REMOTE_USER_TERM_CONN) == 0;
 }
 
@@ -694,42 +759,43 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 
 bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
-    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-    return true;
+    ChipLogDetail(DeviceLayer, "BLE central not implemented");
+    return false;
 }
 
 bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
-    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-    return true;
+    ChipLogDetail(DeviceLayer, "BLE central not implemented");
+    return false;
 }
 
 bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
                                     PacketBufferHandle pBuf)
 {
-    CHIP_ERROR err                 = CHIP_NO_ERROR;
-    int status                     = 0;
-    uint8_t index                  = bt_conn_index(conId);
-    bt_gatt_notify_params * params = &mNotifyParams[index];
+    CHIP_ERROR err                   = CHIP_NO_ERROR;
+    int status                       = 0;
+    uint8_t index                    = bt_conn_index(conId);
+    bt_gatt_indicate_params * params = &mIndicateParams[index];
 
     VerifyOrExit(IsSubscribed(conId) == true, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    ChipLogDetail(DeviceLayer, "Sending notification for CHIPoBLE TX (ConnId %02" PRIx16 ", len %u)", index, pBuf->DataLength());
+    ChipLogDetail(DeviceLayer, "Sending indication for CHIPoBLE TX characteristic (ConnId %02x, len %u)", index,
+                  pBuf->DataLength());
 
-    params->uuid      = nullptr;
-    params->attr      = &sChipoBleAttributes[kCHIPoBLE_CCC_AttributeIndex];
-    params->data      = pBuf->Start();
-    params->len       = pBuf->DataLength();
-    params->func      = HandleTXCompleted;
-    params->user_data = nullptr;
+    params->uuid = nullptr;
+    params->attr = &sChipoBleAttributes[kCHIPoBLE_CCC_AttributeIndex];
+    params->func = HandleTXIndicated;
+    params->data = pBuf->Start();
+    VerifyOrExit(CanCastTo<uint16_t>(pBuf->DataLength()), err = CHIP_ERROR_MESSAGE_TOO_LONG);
+    params->len = static_cast<uint16_t>(pBuf->DataLength());
 
-    status = bt_gatt_notify_cb(conId, params);
+    status = bt_gatt_indicate(conId, params);
     VerifyOrExit(status == 0, err = MapErrorZephyr(status));
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Sending notification for CHIPoBLE TX failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "BLEManagerImpl::SendIndication() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     return err == CHIP_NO_ERROR;
@@ -738,22 +804,22 @@ exit:
 bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
                                       PacketBufferHandle pBuf)
 {
-    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-    return true;
+    ChipLogDetail(DeviceLayer, "BLE central not implemented");
+    return false;
 }
 
 bool BLEManagerImpl::SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
                                      PacketBufferHandle pBuf)
 {
-    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-    return true;
+    ChipLogDetail(DeviceLayer, "BLE central not implemented");
+    return false;
 }
 
 bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext,
                                       const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
-    ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
-    return true;
+    ChipLogDetail(DeviceLayer, "BLE central not implemented");
+    return false;
 }
 
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
@@ -805,9 +871,9 @@ ssize_t BLEManagerImpl::HandleRXWrite(struct bt_conn * conId, const struct bt_ga
     if (!packetBuf.IsNull())
     {
         // Arrange to post a CHIPoBLERXWriteEvent event to the CHIP queue.
-        event.Type                            = DeviceEventType::kPlatformZephyrBleRXWrite;
-        event.Platform.BleRXWriteEvent.BtConn = bt_conn_ref(conId);
-        event.Platform.BleRXWriteEvent.Data   = std::move(packetBuf).UnsafeRelease();
+        event.Type                            = DeviceEventType::kPlatformZephyrBleC1WriteEvent;
+        event.Platform.BleC1WriteEvent.BtConn = bt_conn_ref(conId);
+        event.Platform.BleC1WriteEvent.Data   = std::move(packetBuf).UnsafeRelease();
     }
 
     // If we failed to allocate a buffer, post a kPlatformZephyrBleOutOfBuffersEvent event.
@@ -825,7 +891,7 @@ ssize_t BLEManagerImpl::HandleTXCCCWrite(struct bt_conn * conId, const struct bt
 {
     ChipDeviceEvent event;
 
-    if (value != BT_GATT_CCC_NOTIFY && value != 0)
+    if (value != BT_GATT_CCC_INDICATE && value != 0)
     {
         return BT_GATT_ERR(BT_ATT_ERR_VALUE_NOT_ALLOWED);
     }
@@ -839,12 +905,13 @@ ssize_t BLEManagerImpl::HandleTXCCCWrite(struct bt_conn * conId, const struct bt
     return sizeof(value);
 }
 
-void BLEManagerImpl::HandleTXCompleted(struct bt_conn * conId, void * /* param */)
+void BLEManagerImpl::HandleTXIndicated(struct bt_conn * conId, bt_gatt_indicate_params *, uint8_t err)
 {
     ChipDeviceEvent event;
 
-    event.Type                               = DeviceEventType::kPlatformZephyrBleTXComplete;
-    event.Platform.BleTXCompleteEvent.BtConn = bt_conn_ref(conId);
+    event.Type                              = DeviceEventType::kPlatformZephyrBleC2IndDoneEvent;
+    event.Platform.BleC2IndDoneEvent.BtConn = bt_conn_ref(conId);
+    event.Platform.BleC2IndDoneEvent.Result = err;
 
     PlatformMgr().PostEventOrDie(&event);
 }
@@ -852,9 +919,16 @@ void BLEManagerImpl::HandleTXCompleted(struct bt_conn * conId, void * /* param *
 void BLEManagerImpl::HandleConnect(struct bt_conn * conId, uint8_t err)
 {
     ChipDeviceEvent event;
+    bt_conn_info bt_info;
 
     PlatformMgr().LockChipStack();
 
+    sInstance.mTotalConnNum++;
+    ChipLogProgress(DeviceLayer, "Current number of connections: %u/%u", sInstance.mTotalConnNum, CONFIG_BT_MAX_CONN);
+
+    VerifyOrExit(bt_conn_get_info(conId, &bt_info) == 0, );
+    // Drop all callbacks incoming for the role other than peripheral, required by the Matter accessory
+    VerifyOrExit(bt_info.role == BT_CONN_ROLE_PERIPHERAL, );
     // Don't handle BLE connecting events when it is not related to CHIPoBLE
     VerifyOrExit(sInstance.mFlags.Has(Flags::kChipoBleGattServiceRegister), );
 
@@ -871,9 +945,20 @@ exit:
 void BLEManagerImpl::HandleDisconnect(struct bt_conn * conId, uint8_t reason)
 {
     ChipDeviceEvent event;
+    bt_conn_info bt_info;
 
     PlatformMgr().LockChipStack();
 
+    if (sInstance.mTotalConnNum > 0)
+    {
+        sInstance.mTotalConnNum--;
+    }
+
+    ChipLogProgress(DeviceLayer, "Current number of connections: %u/%u", sInstance.mTotalConnNum, CONFIG_BT_MAX_CONN);
+
+    VerifyOrExit(bt_conn_get_info(conId, &bt_info) == 0, );
+    // Drop all callbacks incoming for the role other than peripheral, required by the Matter accessory
+    VerifyOrExit(bt_info.role == BT_CONN_ROLE_PERIPHERAL, );
     // Don't handle BLE disconnecting events when it is not related to CHIPoBLE
     VerifyOrExit(sInstance.mFlags.Has(Flags::kChipoBleGattServiceRegister), );
 
@@ -891,15 +976,17 @@ exit:
 ssize_t BLEManagerImpl::HandleC3Read(struct bt_conn * conId, const struct bt_gatt_attr * attr, void * buf, uint16_t len,
                                      uint16_t offset)
 {
-    ChipLogDetail(DeviceLayer, "Read request received for CHIPoBLE C3 (ConnId 0x%02" PRIx16 ")", bt_conn_index(conId));
+    ChipLogDetail(DeviceLayer, "Read request received for CHIPoBLE C3 (ConnId 0x%02x)", bt_conn_index(conId));
 
     if (sInstance.c3CharDataBufferHandle.IsNull())
     {
         return 0;
     }
 
+    // For BLE, the max payload size is limited to UINT16_MAX since the length
+    // field is 2 bytes long. So, the cast to uint16_t should be fine.
     return bt_gatt_attr_read(conId, attr, buf, len, offset, sInstance.c3CharDataBufferHandle->Start(),
-                             sInstance.c3CharDataBufferHandle->DataLength());
+                             static_cast<uint16_t>(sInstance.c3CharDataBufferHandle->DataLength()));
 }
 #endif
 

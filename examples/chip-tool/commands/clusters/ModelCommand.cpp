@@ -19,6 +19,7 @@
 #include "ModelCommand.h"
 
 #include <app/InteractionModelEngine.h>
+#include <app/icd/client/DefaultICDClientStorage.h>
 #include <inttypes.h>
 
 using namespace ::chip;
@@ -26,29 +27,39 @@ using namespace ::chip;
 CHIP_ERROR ModelCommand::RunCommand()
 {
 
-    if (IsGroupId(mNodeId))
+    if (IsGroupId(mDestinationId))
     {
-        FabricIndex fabricIndex;
-        ReturnErrorOnFailure(CurrentCommissioner().GetFabricIndex(&fabricIndex));
-        ChipLogProgress(chipTool, "Sending command to group 0x%" PRIx16, GroupIdFromNodeId(mNodeId));
+        FabricIndex fabricIndex = CurrentCommissioner().GetFabricIndex();
+        ChipLogProgress(chipTool, "Sending command to group 0x%x", GroupIdFromNodeId(mDestinationId));
 
-        return SendGroupCommand(GroupIdFromNodeId(mNodeId), fabricIndex);
+        return SendGroupCommand(GroupIdFromNodeId(mDestinationId), fabricIndex);
     }
 
-    ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, mNodeId);
-    return CurrentCommissioner().GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, mDestinationId);
+    CheckPeerICDType();
+
+    CommissioneeDeviceProxy * commissioneeDeviceProxy = nullptr;
+    if (CHIP_NO_ERROR == CurrentCommissioner().GetDeviceBeingCommissioned(mDestinationId, &commissioneeDeviceProxy))
+    {
+        return SendCommand(commissioneeDeviceProxy, mEndPointId);
+    }
+
+    return CurrentCommissioner().GetConnectedDevice(mDestinationId, &mOnDeviceConnectedCallback,
+                                                    &mOnDeviceConnectionFailureCallback);
 }
 
-void ModelCommand::OnDeviceConnectedFn(void * context, ChipDevice * device)
+void ModelCommand::OnDeviceConnectedFn(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
+                                       const chip::SessionHandle & sessionHandle)
 {
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "OnDeviceConnectedFn: context is null"));
 
-    CHIP_ERROR err = command->SendCommand(device, command->mEndPointId);
+    chip::OperationalDeviceProxy device(&exchangeMgr, sessionHandle);
+    CHIP_ERROR err = command->SendCommand(&device, command->mEndPointId);
     VerifyOrReturn(CHIP_NO_ERROR == err, command->SetCommandExitStatus(err));
 }
 
-void ModelCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR err)
+void ModelCommand::OnDeviceConnectionFailureFn(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR err)
 {
     LogErrorOnFailure(err);
 
@@ -59,7 +70,36 @@ void ModelCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CH
 
 void ModelCommand::Shutdown()
 {
-    ResetArguments();
     mOnDeviceConnectedCallback.Cancel();
     mOnDeviceConnectionFailureCallback.Cancel();
+
+    CHIPCommand::Shutdown();
+}
+
+void ModelCommand::CheckPeerICDType()
+{
+    if (mIsPeerLIT.HasValue())
+    {
+        ChipLogProgress(chipTool, "Peer ICD type is set to %s", mIsPeerLIT.Value() == 1 ? "LIT-ICD" : "non LIT-ICD");
+        return;
+    }
+
+    app::ICDClientInfo info;
+    auto destinationPeerId = chip::ScopedNodeId(mDestinationId, CurrentCommissioner().GetFabricIndex());
+    auto iter              = CHIPCommand::sICDClientStorage.IterateICDClientInfo();
+    if (iter == nullptr)
+    {
+        return;
+    }
+    app::DefaultICDClientStorage::ICDClientInfoIteratorWrapper clientInfoIteratorWrapper(iter);
+
+    while (iter->Next(info))
+    {
+        if (ScopedNodeId(info.peer_node.GetNodeId(), info.peer_node.GetFabricIndex()) == destinationPeerId)
+        {
+            ChipLogProgress(chipTool, "Peer is a registered LIT ICD.");
+            mIsPeerLIT.SetValue(true);
+            return;
+        }
+    }
 }

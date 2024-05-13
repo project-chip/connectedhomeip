@@ -23,6 +23,10 @@
 
 #pragma once
 
+#include <cstddef>
+
+#include <lib/core/CHIPError.h>
+
 namespace chip {
 namespace DeviceLayer {
 namespace PersistedStorage {

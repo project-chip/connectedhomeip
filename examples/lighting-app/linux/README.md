@@ -7,20 +7,19 @@ Raspberry Pi Desktop 20.10 (aarch64)**
 
 To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
 **EVK**, see the associated
-[README document](../../../docs/guides/nxp_imx8m_linux_examples.md) for details.
+[README document](../../../docs/guides/nxp/nxp_imx8m_linux_examples.md) for
+details.
 
 <hr>
 
 -   [CHIP Linux Lighting Example](#chip-linux-lighting-example)
     -   [Building](#building)
-    -   [Commandline Arguments](#command-line-args)
-    -   [Running the Complete Example on Raspberry Pi 4](#running-complete-example)
+    -   [Commandline Arguments](#commandline-arguments)
+    -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
     -   [Running RPC console](#running-rpc-console)
     -   [Device Tracing](#device-tracing)
 
 <hr>
-
-<a name="building"></a>
 
 ## Building
 
@@ -49,8 +48,6 @@ To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
           $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
           $ ninja -C out/debug
 
-<a name="command-line-args"></a>
-
 ## Commandline arguments
 
 -   `--wifi`
@@ -69,8 +66,6 @@ To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
     `interface id`: the number after `hci` when listing BLE interfaces by
     `hciconfig` command, for example, `--ble-device 1` means using `hci1`
     interface. Default: `0`.
-
-<a name="running-complete-example"></a>
 
 ## Running the Complete Example on Raspberry Pi 4
 
@@ -148,4 +143,116 @@ Obtain tracing json file.
 ```
     $ ./{PIGWEED_REPO}/pw_trace_tokenized/py/pw_trace_tokenized/get_trace.py -s localhost:33000 \
      -o {OUTPUT_FILE} -t {ELF_FILE} {PIGWEED_REPO}/pw_trace_tokenized/pw_trace_protos/trace_rpc.proto
+```
+
+## Trigger event using lighting-app event named pipe
+
+You can send a command to lighting-app to trigger specific event via
+lighting-app event named pipe /tmp/chip_lighting_fifo-<PID>.
+
+### Trigger `SoftwareFault` events
+
+1. Generate event `SoftwareFault` when a software fault takes place on the Node.
+
+```
+$ echo '{"Name":"SoftwareFault"}' > /tmp/chip_lighting_fifo-<PID>
+```
+
+### Trigger `HardwareFault` events
+
+1. Generate event `HardwareFaultChange` to indicate a change in the set of
+   hardware faults currently detected by the Node.
+
+```
+$ echo '{"Name":"HardwareFaultChange"}' > /tmp/chip_lighting_fifo-<PID>
+```
+
+2. Generate event `RadioFaultChange` to indicate a change in the set of radio
+   faults currently detected by the Node.
+
+```
+$ echo '{"Name":"RadioFaultChange"}' > /tmp/chip_lighting_fifo-<PID>
+```
+
+3. Generate event `NetworkFaultChange` to indicate a change in the set of
+   network faults currently detected by the Node.
+
+```
+$ echo '{"Name":"NetworkFaultChange"}' > /tmp/chip_lighting_fifo-<PID>
+```
+
+4. Generate event `BootReason` to indicate the reason that caused the device to
+   start-up, from the following set of `BootReasons`.
+
+-   `PowerOnReboot` The Node has booted as the result of physical interaction
+    with the device resulting in a reboot.
+
+-   `BrownOutReset` The Node has rebooted as the result of a brown-out of the
+    Node’s power supply.
+
+-   `SoftwareWatchdogReset` The Node has rebooted as the result of a software
+    watchdog timer.
+
+-   `HardwareWatchdogReset` The Node has rebooted as the result of a hardware
+    watchdog timer.
+
+-   `SoftwareUpdateCompleted` The Node has rebooted as the result of a completed
+    software update.
+
+-   `SoftwareReset` The Node has rebooted as the result of a software initiated
+    reboot.
+
+```
+$ echo '{"Name":"<BootReason>"}' > /tmp/chip_lighting_fifo-<PID>
+```
+
+### Trigger Switch events
+
+1. Generate event `SwitchLatched`, when the latching switch is moved to a new
+   position.
+
+```
+$ echo '{"Name":"SwitchLatched","NewPosition":3}' > /tmp/chip_lighting_fifo-<PID>
+```
+
+2. Generate event `InitialPress`, when the momentary switch starts to be
+   pressed.
+
+```
+$ echo '{"Name":"InitialPress","NewPosition":3}' > /tmp/chip_lighting_fifo-<PID>
+```
+
+3. Generate event `LongPress`, when the momentary switch has been pressed for a
+   "long" time.
+
+```
+$ echo '{"Name":"LongPress","NewPosition":3}' > /tmp/chip_lighting_fifo-<PID>
+```
+
+4. Generate event `ShortRelease`, when the momentary switch has been released.
+
+```
+$ echo '{"Name":"ShortRelease","PreviousPosition":3}' > /tmp/chip_lighting_fifo-<PID>
+```
+
+5. Generate event `LongRelease` when the momentary switch has been released and
+   after having been pressed for a long time.
+
+```
+$ echo '{"Name":"LongRelease","PreviousPosition":3}' > /tmp/chip_lighting_fifo-<PID>
+```
+
+6. Generate event `MultiPressOngoing` to indicate how many times the momentary
+   switch has been pressed in a multi-press sequence, during that sequence.
+
+```
+$ echo '{"Name":"MultiPressOngoing","NewPosition":3,"CurrentNumberOfPressesCounted":4}' > /tmp/chip_lighting_fifo-<PID>
+```
+
+7. Generate event `MultiPressComplete` to indicate how many times the momentary
+   switch has been pressed in a multi-press sequence, after it has been detected
+   that the sequence has ended.
+
+```
+$ echo '{"Name":"MultiPressComplete","PreviousPosition":3,"TotalNumberOfPressesCounted":2}' > /tmp/chip_lighting_fifo-<PID>
 ```

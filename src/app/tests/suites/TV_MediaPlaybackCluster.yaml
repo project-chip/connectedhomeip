@@ -50,7 +50,7 @@ tests:
       command: "readAttribute"
       attribute: "SampledPosition"
       response:
-          value: { updatedAt: 0, position: 0 }
+          value: { UpdatedAt: 0, Position: 0 }
 
     - label: "Read attribute playback speed"
       command: "readAttribute"
@@ -71,130 +71,130 @@ tests:
           value: 0
 
     - label: "Media Playback Play Command"
-      command: "play"
+      command: "Play"
       response:
           values:
-              - name: "data"
+              - name: "Data"
                 value: "data response"
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Media Playback Pause Command"
-      command: "pause"
+      command: "Pause"
       response:
           values:
-              - name: "data"
+              - name: "Data"
                 value: "data response"
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Media Playback Stop Command"
-      command: "stopPlayback"
+      command: "Stop"
       response:
           values:
-              - name: "data"
+              - name: "Data"
                 value: "data response"
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Media Playback Start Over Command"
-      command: "startOver"
+      command: "StartOver"
       response:
           values:
-              - name: "data"
+              - name: "Data"
                 value: "data response"
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Media Playback Previous Command"
-      command: "previous"
+      command: "Previous"
       response:
           values:
-              - name: "data"
+              - name: "Data"
                 value: "data response"
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Media Playback Next Command"
-      command: "next"
+      command: "Next"
       response:
           values:
-              - name: "data"
+              - name: "Data"
                 value: "data response"
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Media Playback Rewind Command"
-      command: "rewind"
+      command: "Rewind"
       response:
           values:
-              - name: "data"
+              - name: "Data"
                 value: "data response"
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Media Playback Fast Forward Command"
-      command: "fastForward"
+      command: "FastForward"
       response:
           values:
-              - name: "data"
+              - name: "Data"
                 value: "data response"
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Media Playback Skip Forward Command"
-      command: "skipForward"
+      command: "SkipForward"
       arguments:
           values:
-              - name: "deltaPositionMilliseconds"
+              - name: "DeltaPositionMilliseconds"
                 value: 500
       response:
           values:
-              - name: "data"
+              - name: "Data"
                 value: "data response"
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Read attribute position after skip forward"
       command: "readAttribute"
       attribute: "SampledPosition"
       response:
-          value: { updatedAt: 0, position: 500 }
+          value: { UpdatedAt: 0, Position: 500 }
 
     - label: "Media Playback Skip Backward Command"
-      command: "skipBackward"
+      command: "SkipBackward"
       arguments:
           values:
-              - name: "deltaPositionMilliseconds"
+              - name: "DeltaPositionMilliseconds"
                 value: 100
       response:
           values:
-              - name: "data"
+              - name: "Data"
                 value: "data response"
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Read attribute position after skip backward"
       command: "readAttribute"
       attribute: "SampledPosition"
       response:
-          value: { updatedAt: 0, position: 400 }
+          value: { UpdatedAt: 0, Position: 400 }
 
     - label: "Media Playback Seek Command"
-      command: "seek"
+      command: "Seek"
       arguments:
           values:
               - name: "position"
                 value: 1000
       response:
           values:
-              - name: "data"
+              - name: "Data"
                 value: "data response"
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Read attribute position after seek"
       command: "readAttribute"
       attribute: "SampledPosition"
       response:
-          value: { updatedAt: 0, position: 1000 }
+          value: { UpdatedAt: 0, Position: 1000 }

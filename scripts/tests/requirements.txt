@@ -1,0 +1,5 @@
+# Python requirements for scripts in this location
+click
+colorama
+diskcache
+websockets

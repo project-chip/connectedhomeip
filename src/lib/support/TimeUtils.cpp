@@ -23,9 +23,6 @@
  *
  */
 
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
 #include <limits>
 #include <stdint.h>
 #include <type_traits>
@@ -563,11 +560,30 @@ void ChipEpochToCalendarTime(uint32_t chipEpochTime, uint16_t & year, uint8_t & 
                                         dayOfMonth, hour, minute, second);
 }
 
-bool UnixEpochToChipEpochTime(uint32_t unixEpochTime, uint32_t & chipEpochTime)
+bool ChipEpochToUnixEpochMicros(uint64_t chipEpochTimeMicros, uint64_t & outUnixEpochTimeMicros)
 {
-    VerifyOrReturnError(unixEpochTime >= kChipEpochSecondsSinceUnixEpoch, false);
+    if ((chipEpochTimeMicros + kChipEpochUsSinceUnixEpoch) < kChipEpochUsSinceUnixEpoch)
+    {
+        return false;
+    }
 
-    chipEpochTime = unixEpochTime - kChipEpochSecondsSinceUnixEpoch;
+    outUnixEpochTimeMicros = chipEpochTimeMicros + kChipEpochUsSinceUnixEpoch;
+    return true;
+}
+
+bool UnixEpochToChipEpochMicros(uint64_t unixEpochTimeMicros, uint64_t & outChipEpochTimeMicros)
+{
+    VerifyOrReturnValue(unixEpochTimeMicros >= kChipEpochUsSinceUnixEpoch, false);
+    outChipEpochTimeMicros = unixEpochTimeMicros - kChipEpochUsSinceUnixEpoch;
+
+    return true;
+}
+
+bool UnixEpochToChipEpochTime(uint32_t unixEpochTimeSeconds, uint32_t & outChipEpochTimeSeconds)
+{
+    VerifyOrReturnError(unixEpochTimeSeconds >= kChipEpochSecondsSinceUnixEpoch, false);
+
+    outChipEpochTimeSeconds = unixEpochTimeSeconds - kChipEpochSecondsSinceUnixEpoch;
 
     return true;
 }

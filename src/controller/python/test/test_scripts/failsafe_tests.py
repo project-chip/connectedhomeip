@@ -18,15 +18,14 @@
 #
 
 # Commissioning test.
+
 import os
 import sys
 from optparse import OptionParser
-from base import TestFail, TestTimeout, BaseTestHelper, FailIfNot, logger
-from cluster_objects import NODE_ID, ClusterObjectTests
-from network_commissioning import NetworkCommissioningTests
-import asyncio
 
-# The thread network dataset tlv for testing, splited into T-L-V.
+from base import BaseTestHelper, FailIfNot, TestFail, TestTimeout, logger
+
+# The thread network dataset tlv for testing, splitted into T-L-V.
 
 TEST_THREAD_NETWORK_DATASET_TLV = "0e080000000000010000" + \
     "000300000c" + \
@@ -94,10 +93,10 @@ def main():
     FailIfNot(test.SetNetworkCommissioningParameters(dataset=TEST_THREAD_NETWORK_DATASET_TLV),
               "Failed to finish network commissioning")
 
-    logger.info("Testing key exchange")
-    FailIfNot(test.TestKeyExchange(ip=options.deviceAddress,
-                                   setuppin=20202021,
-                                   nodeid=1),
+    logger.info("Testing commissioning")
+    FailIfNot(test.TestCommissioning(ip=options.deviceAddress,
+                                     setuppin=20202021,
+                                     nodeid=1),
               "Failed to finish key exchange")
 
     FailIfNot(test.TestFailsafe(nodeid=1), "Failed failsafe test")

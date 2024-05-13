@@ -32,9 +32,6 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
-template class GenericConnectivityManagerImpl_WiFi<ConnectivityManagerImpl>;
-
 template <class ImplClass>
 const char * GenericConnectivityManagerImpl_WiFi<ImplClass>::_WiFiStationModeToStr(ConnectivityManager::WiFiStationMode mode)
 {
@@ -120,6 +117,16 @@ bool GenericConnectivityManagerImpl_WiFi<ImplClass>::_IsWiFiStationEnabled()
 {
     return Impl()->GetWiFiStationMode() == ConnectivityManager::kWiFiStationMode_Enabled;
 }
+
+template <class ImplClass>
+bool GenericConnectivityManagerImpl_WiFi<ImplClass>::_IsWiFiStationApplicationControlled()
+{
+    return Impl()->GetWiFiStationMode() == ConnectivityManager::kWiFiStationMode_ApplicationControlled;
+}
+
+// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
+// NB: This must come after all templated class members are defined.
+template class GenericConnectivityManagerImpl_WiFi<ConnectivityManagerImpl>;
 
 } // namespace Internal
 } // namespace DeviceLayer

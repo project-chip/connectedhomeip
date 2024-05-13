@@ -1,0 +1,70 @@
+# Copyright (c) 2020 Project CHIP Authors
+# Copyright 2023 NXP
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/nxp_sdk.gni")
+
+rt_platform = "rw61x"
+rt_fwk_platform = "rw61x"
+nxp_platform = "rt/${rt_platform}"
+nxp_sdk_name = "rt_sdk"
+chip_device_platform = "nxp"
+lwip_platform = "nxp"
+
+# ARM architecture flags will be set based on NXP board.
+arm_platform_config = "${nxp_sdk_build_root}/${nxp_sdk_name}/nxp_arm.gni"
+
+chip_device_project_config_include = "<CHIPProjectConfig.h>"
+chip_project_config_include = "<CHIPProjectConfig.h>"
+chip_inet_project_config_include = "<CHIPProjectConfig.h>"
+chip_system_project_config_include = "<CHIPProjectConfig.h>"
+chip_ble_project_config_include = "<CHIPProjectConfig.h>"
+
+chip_build_tests = false
+
+#This enables the EventList global attribute
+enable_eventlist_attribute = true
+
+declare_args() {
+  spinel_interface_rpmsg = true
+
+  # if rw610_mbedtls_port_els_pkc is set to false software mbedtls is used instead
+  rw610_mbedtls_port_els_pkc = true
+
+  # Enable DAC private key secure usage, chip_with_factory_data must be set to 1
+  chip_enable_secure_dac_private_key_storage = 0
+
+  # Generate DAC private key blob for factory data, chip_enable_secure_dac_private_key_storage must be set to 1
+  chip_convert_dac_private_key = 0
+}
+
+# TODO : Enable the OTA Requestor by default.
+# This requires the mcuboot bootloader to be used, which reserves the first 128 kB of the flash.
+# If mcuboot is not used, "no_mcuboot" must be set to true in the gn gen build command
+# in order for the application to be linked at the base of the flash.
+#chip_enable_ota_requestor = true
+declare_args() {
+  # TODO : set no_mcuboot to false by default when enabling ota requestor by default
+  no_mcuboot = true
+}
+
+mbedtls_target = "${nxp_sdk_build_root}:nxp_mbedtls"
+
+openthread_external_mbedtls = mbedtls_target
+openthread_project_core_config_file = "OpenThreadConfig.h"
+openthread_core_config_deps = [ "${chip_root}/third_party/openthread/platforms/nxp/${nxp_platform}:openthread_core_config_rw61x" ]
+openthread_core_config_platform_check_file =
+    "openthread-core-rw612-config-check.h"
+openthread_external_platform = "${chip_root}/third_party/openthread/platforms/nxp/${nxp_platform}:libopenthread-rw61x"

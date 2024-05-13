@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Provides an implementation of the DiagnosticDataProvider object
- *          for Zephy platform.
+ *          for Zephyr platform.
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -28,11 +28,13 @@
 #include <platform/Zephyr/DiagnosticDataProviderImpl.h>
 #include <platform/Zephyr/SysHeapMalloc.h>
 
-#include <drivers/hwinfo.h>
-#include <sys/util.h>
+#include <zephyr/drivers/hwinfo.h>
+#include <zephyr/sys/util.h>
 
-#ifdef CONFIG_MCUBOOT_IMG_MANAGER
-#include <dfu/mcuboot.h>
+#if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+#include <platform/nrfconnect/Reboot.h>
+#elif defined(CONFIG_MCUBOOT_IMG_MANAGER)
+#include <zephyr/dfu/mcuboot.h>
 #endif
 
 #include <malloc.h>
@@ -88,7 +90,12 @@ BootReasonType DetermineBootReason()
 
     if (reason & RESET_SOFTWARE)
     {
-#ifdef CONFIG_MCUBOOT_IMG_MANAGER
+#if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+        if (GetSoftwareRebootReason() == SoftwareRebootReason::kSoftwareUpdate)
+        {
+            return BootReasonType::kSoftwareUpdateCompleted;
+        }
+#elif defined(CONFIG_MCUBOOT_IMG_MANAGER)
         if (mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT)
         {
             return BootReasonType::kSoftwareUpdateCompleted;
@@ -109,9 +116,18 @@ DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
     return sInstance;
 }
 
-inline DiagnosticDataProviderImpl::DiagnosticDataProviderImpl() : mBootReason(DetermineBootReason())
+DiagnosticDataProviderImpl::DiagnosticDataProviderImpl() : mBootReason(DetermineBootReason())
 {
-    ChipLogDetail(DeviceLayer, "Boot reason: %" PRIu16, static_cast<uint16_t>(mBootReason));
+    ChipLogDetail(DeviceLayer, "Boot reason: %u", static_cast<uint16_t>(mBootReason));
+}
+
+bool DiagnosticDataProviderImpl::SupportsWatermarks()
+{
+#if defined(CONFIG_CHIP_MALLOC_SYS_HEAP) && defined(CONFIG_CHIP_MALLOC_SYS_HEAP_WATERMARKS_SUPPORT)
+    return true;
+#else
+    return false;
+#endif
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeapFree)
@@ -149,18 +165,21 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeap
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
-#ifdef CONFIG_CHIP_MALLOC_SYS_HEAP
+#if defined(CONFIG_CHIP_MALLOC_SYS_HEAP) && defined(CONFIG_CHIP_MALLOC_SYS_HEAP_WATERMARKS_SUPPORT)
     Malloc::Stats stats;
     ReturnErrorOnFailure(Malloc::GetStats(stats));
 
-    // TODO: use the maximum usage once that is implemented in Zephyr
-    currentHeapHighWatermark = stats.used;
+    currentHeapHighWatermark = stats.maxUsed;
     return CHIP_NO_ERROR;
-#elif CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO
-    // ARM newlib does not provide a way to obtain the peak heap usage, so for now just return
-    // the amount of memory allocated from the system which should be an upper bound of the peak
-    // usage provided that the heap is not very fragmented.
-    currentHeapHighWatermark = mallinfo().arena;
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
+{
+#if defined(CONFIG_CHIP_MALLOC_SYS_HEAP) && defined(CONFIG_CHIP_MALLOC_SYS_HEAP_WATERMARKS_SUPPORT)
+    Malloc::ResetMaxStats();
     return CHIP_NO_ERROR;
 #else
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
@@ -207,7 +226,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & total
 
     ReturnErrorOnFailure(ConfigurationMgr().GetTotalOperationalHours(reinterpret_cast<uint32_t &>(totalHours)));
 
-    totalOperationalHours = totalHours + deltaTime < UINT32_MAX ? totalHours + deltaTime : UINT32_MAX;
+    totalOperationalHours = static_cast<uint32_t>(totalHours + deltaTime < UINT32_MAX ? totalHours + deltaTime : UINT32_MAX);
 
     return CHIP_NO_ERROR;
 }
@@ -239,19 +258,19 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             switch (interfaceType)
             {
             case Inet::InterfaceType::Unknown:
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_UNSPECIFIED;
+                ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kUnspecified;
                 break;
             case Inet::InterfaceType::WiFi:
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+                ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kWiFi;
                 break;
             case Inet::InterfaceType::Ethernet:
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ETHERNET;
+                ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kEthernet;
                 break;
             case Inet::InterfaceType::Thread:
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_THREAD;
+                ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kThread;
                 break;
             case Inet::InterfaceType::Cellular:
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_CELLULAR;
+                ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kCellular;
                 break;
             }
         }
@@ -263,8 +282,23 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         ifp->offPremiseServicesReachableIPv4.SetNull();
         ifp->offPremiseServicesReachableIPv6.SetNull();
 
+        CHIP_ERROR error;
         uint8_t addressSize;
-        if (interfaceIterator.GetHardwareAddress(ifp->MacAddress, addressSize, sizeof(ifp->MacAddress)) != CHIP_NO_ERROR)
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        if (interfaceType == Inet::InterfaceType::Thread)
+        {
+            static_assert(OT_EXT_ADDRESS_SIZE <= sizeof(ifp->MacAddress), "Unexpected extended address size");
+            error       = ThreadStackMgr().GetPrimary802154MACAddress(ifp->MacAddress);
+            addressSize = OT_EXT_ADDRESS_SIZE;
+        }
+        else
+#endif
+        {
+            error = interfaceIterator.GetHardwareAddress(ifp->MacAddress, addressSize, sizeof(ifp->MacAddress));
+        }
+
+        if (error != CHIP_NO_ERROR)
         {
             ChipLogError(DeviceLayer, "Failed to get network hardware address");
         }

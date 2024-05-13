@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -27,6 +27,7 @@
  */
 #include <controller/CommissionerDiscoveryController.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <setup_payload/AdditionalDataPayloadGenerator.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
@@ -42,21 +43,135 @@ void CommissionerDiscoveryController::ResetState()
     mReady              = true;
 }
 
-void CommissionerDiscoveryController::OnUserDirectedCommissioningRequest(UDCClientState state)
+void CommissionerDiscoveryController::ValidateSession()
 {
-    if (!mReady)
+    if (mReady)
     {
-        ChipLogDetail(Controller, "CommissionerDiscoveryController not read. Current instance=%s", mCurrentInstance);
         return;
     }
-    mReady = false;
-    strncpy(mCurrentInstance, state.GetInstanceName(), sizeof(mCurrentInstance));
-    mPendingConsent = true;
-    ChipLogDetail(Controller,
-                  "------PROMPT USER: %s is requesting permission to cast to this TV, approve? [" ChipLogFormatMEI
-                  "," ChipLogFormatMEI ",%s]",
+    if (mUdcServer != nullptr)
+    {
+        UDCClientState * client = mUdcServer->GetUDCClients().FindUDCClientState(mCurrentInstance);
+        if (client != nullptr)
+        {
+            // everything looks good
+            return;
+        }
+    }
+    ResetState();
+}
+
+void CommissionerDiscoveryController::OnCancel(UDCClientState state)
+{
+    if (mReady)
+    {
+        // if state was ready for a new session,
+        // then we have lost our discovery controller context and can't perform the commissioning request
+        ChipLogDetail(Controller, "CommissionerDiscoveryController::OnCancel received when no current instance.");
+        return;
+    }
+
+    if (strncmp(mCurrentInstance, state.GetInstanceName(), sizeof(mCurrentInstance)) != 0)
+    {
+        // if the instance doesn't match the one in our discovery controller context,
+        // then we can't perform the commissioning request
+        ChipLogDetail(Controller, "CommissionerDiscoveryController::OnCancel received mismatched instance. Current instance=%s",
+                      mCurrentInstance);
+        return;
+    }
+
+    ChipLogDetail(Controller, "------PROMPT USER: %s cancelled commissioning [" ChipLogFormatMEI "," ChipLogFormatMEI ",%s]",
                   state.GetDeviceName(), ChipLogValueMEI(state.GetVendorId()), ChipLogValueMEI(state.GetProductId()),
                   state.GetInstanceName());
+    if (mUserPrompter != nullptr)
+    {
+        mUserPrompter->HidePromptsOnCancel(state.GetVendorId(), state.GetProductId(), state.GetDeviceName());
+    }
+    return;
+}
+
+void CommissionerDiscoveryController::OnCommissionerPasscodeReady(UDCClientState state)
+{
+    if (mReady)
+    {
+        // if state was ready for a new session,
+        // then we have lost our discovery controller context and can't perform the commissioning request
+        ChipLogDetail(Controller,
+                      "CommissionerDiscoveryController::OnCommissionerPasscodeReady received when no current instance.");
+        return;
+    }
+
+    if (strncmp(mCurrentInstance, state.GetInstanceName(), sizeof(mCurrentInstance)) != 0)
+    {
+        // if the instance doesn't match the one in our discovery controller context,
+        // then we can't perform the commissioning request
+        ChipLogDetail(
+            Controller,
+            "CommissionerDiscoveryController::OnCommissionerPasscodeReady received mismatched instance. Current instance=%s",
+            mCurrentInstance);
+        return;
+    }
+
+    if (state.GetCdPort() == 0)
+    {
+        ChipLogDetail(Controller, "CommissionerDiscoveryController::OnCommissionerPasscodeReady no port");
+        return;
+    }
+
+    uint32_t passcode = state.GetCachedCommissionerPasscode();
+    if (passcode == 0)
+    {
+        ChipLogError(AppServer, "On UDC: commissioner passcode ready but no passcode");
+        CommissionerDeclaration cd;
+        cd.SetErrorCode(CommissionerDeclaration::CdError::kUnexpectedCommissionerPasscodeReady);
+
+        if (mUdcServer == nullptr)
+        {
+            ChipLogError(AppServer, "On UDC: no udc server");
+            return;
+        }
+        mUdcServer->SendCDCMessage(cd, Transport::PeerAddress::UDP(state.GetPeerAddress().GetIPAddress(), state.GetCdPort()));
+        return;
+    }
+    else
+    {
+        // can only get here is ok() has already been called
+        ChipLogDetail(AppServer, "On UDC: commissioner passcode ready with passcode - commissioning");
+
+        // start commissioning using the cached passcode
+        CommissionWithPasscode(passcode);
+        return;
+    }
+}
+
+void CommissionerDiscoveryController::OnUserDirectedCommissioningRequest(UDCClientState state)
+{
+    ValidateSession();
+
+    if (!mReady)
+    {
+        // we must currently have discovery controller context (a UDC prompt under way)
+        ChipLogDetail(Controller, "CommissionerDiscoveryController not ready. Current instance=%s", mCurrentInstance);
+        return;
+    }
+
+    mReady = false;
+    Platform::CopyString(mCurrentInstance, state.GetInstanceName());
+    mPendingConsent = true;
+    char rotatingIdString[Dnssd::kMaxRotatingIdLen * 2 + 1];
+    CHIP_ERROR err = Encoding::BytesToUppercaseHexString(state.GetRotatingId(), state.GetRotatingIdLength(), rotatingIdString,
+                                                         sizeof(rotatingIdString));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "On UDC: could not convert rotating id to hex");
+        rotatingIdString[0] = '\0';
+    }
+
+    ChipLogDetail(Controller,
+                  "------PROMPT USER: %s is requesting permission to cast to this TV, approve? [" ChipLogFormatMEI
+                  "," ChipLogFormatMEI ",%s,%s]",
+                  state.GetDeviceName(), ChipLogValueMEI(state.GetVendorId()), ChipLogValueMEI(state.GetProductId()),
+                  state.GetInstanceName(), rotatingIdString);
     if (mUserPrompter != nullptr)
     {
         mUserPrompter->PromptForCommissionOKPermission(state.GetVendorId(), state.GetProductId(), state.GetDeviceName());
@@ -64,93 +179,392 @@ void CommissionerDiscoveryController::OnUserDirectedCommissioningRequest(UDCClie
     ChipLogDetail(Controller, "------Via Shell Enter: controller ux ok|cancel");
 }
 
+/// Callback for getting execution into the main chip thread
+void CallbackOk(System::Layer * aSystemLayer, void * aAppState)
+{
+    ChipLogDetail(AppServer, "UX Ok: now on main thread");
+    CommissionerDiscoveryController * cdc = static_cast<CommissionerDiscoveryController *>(aAppState);
+    cdc->InternalOk();
+}
+
 void CommissionerDiscoveryController::Ok()
 {
+    ChipLogDetail(AppServer, "UX Ok: moving to main thread");
+    assertChipStackLockedByCurrentThread();
+    if (CHIP_NO_ERROR != DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(0), CallbackOk, this))
+    {
+        ChipLogError(AppServer, "UX Ok: StartTimer returned error");
+    }
+}
+
+void CommissionerDiscoveryController::InternalOk()
+{
+    ChipLogDetail(AppServer, "UX InternalOk");
+    assertChipStackLockedByCurrentThread();
+    ValidateSession();
+
     if (!mPendingConsent)
     {
-        ChipLogError(AppServer, "UX Cancel: no current instance");
+        ChipLogError(AppServer, "UX InternalOk: no current instance");
         return;
     }
     if (mUdcServer == nullptr)
     {
-        ChipLogError(AppServer, "UX Ok: no udc server");
+        ChipLogError(AppServer, "UX InternalOk: no udc server");
         return;
     }
     UDCClientState * client = mUdcServer->GetUDCClients().FindUDCClientState(mCurrentInstance);
     if (client == nullptr)
     {
-        ChipLogError(AppServer, "UX Ok: could not find instance=%s", mCurrentInstance);
+        ChipLogError(AppServer, "UX InternalOk: could not find instance=%s", mCurrentInstance);
         return;
     }
     if (client->GetUDCClientProcessingState() != UDCClientProcessingState::kPromptingUser)
     {
-        ChipLogError(AppServer, "UX Ok: invalid state for ok");
+        ChipLogError(AppServer, "UX InternalOk: invalid state for ok");
         return;
     }
     client->SetUDCClientProcessingState(UDCClientProcessingState::kObtainingOnboardingPayload);
 
-    if (mPincodeService != nullptr)
+    if (mPasscodeService == nullptr)
     {
-        char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-        Encoding::BytesToUppercaseHexString(client->GetRotatingId(), client->GetRotatingIdLength(), rotatingIdString,
-                                            sizeof(rotatingIdString));
-        // Encoding::BytesToUppercaseHexString(client->GetRotatingId(), chip::Dnssd::kMaxRotatingIdLen, rotatingIdString,
-        //                                     sizeof(rotatingIdString));
-
-        CharSpan rotatingIdSpan = chip::CharSpan(rotatingIdString, sizeof(rotatingIdString));
-        uint32_t pincode =
-            mPincodeService->FetchCommissionPincodeFromContentApp(client->GetVendorId(), client->GetProductId(), rotatingIdSpan);
-        if (pincode != 0)
-        {
-            CommissionWithPincode(pincode);
-            return;
-        }
-    }
-
-    ChipLogDetail(Controller, "------PROMPT USER: please enter pin displayed in casting app ");
-    if (mUserPrompter != nullptr)
-    {
-        mUserPrompter->PromptForCommissionPincode(client->GetVendorId(), client->GetProductId(), client->GetDeviceName());
-    }
-    ChipLogDetail(Controller, "------Via Shell Enter: controller ux ok [pincode]");
-    return;
-}
-
-void CommissionerDiscoveryController::CommissionWithPincode(uint32_t pincode)
-{
-    if (!mPendingConsent)
-    {
-        ChipLogError(AppServer, "UX Cancel: no current instance");
+        HandleContentAppPasscodeResponse(0);
         return;
     }
+
+    char rotatingIdBuffer[Dnssd::kMaxRotatingIdLen * 2];
+    size_t rotatingIdLength = client->GetRotatingIdLength();
+    CHIP_ERROR err =
+        Encoding::BytesToUppercaseHexBuffer(client->GetRotatingId(), rotatingIdLength, rotatingIdBuffer, sizeof(rotatingIdBuffer));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "UX InternalOk: could not convert rotating id to hex");
+        return;
+    }
+    CharSpan rotatingIdSpan(rotatingIdBuffer, 2 * rotatingIdLength);
+
+    uint8_t targetAppCount = client->GetNumTargetAppInfos();
+    if (targetAppCount > 0)
+    {
+        ChipLogDetail(AppServer, "UX InternalOk: checking for each target app specified");
+
+        for (uint8_t i = 0; i < targetAppCount; i++)
+        {
+            TargetAppInfo info;
+            if (client->GetTargetAppInfo(i, info))
+            {
+                if (mPasscodeService != nullptr)
+                {
+                    mPasscodeService->LookupTargetContentApp(client->GetVendorId(), client->GetProductId(), rotatingIdSpan, info);
+                }
+            }
+        }
+        return;
+    }
+    ChipLogDetail(AppServer, "UX InternalOk: checking target app associated with client");
+
+    if (mPasscodeService != nullptr)
+    {
+        mPasscodeService->FetchCommissionPasscodeFromContentApp(client->GetVendorId(), client->GetProductId(), rotatingIdSpan);
+    }
+
+    ChipLogDetail(AppServer, "UX Ok: done moving out of main thread");
+}
+
+void CommissionerDiscoveryController::HandleTargetContentAppCheck(TargetAppInfo target, uint32_t passcode)
+{
+    assertChipStackLockedByCurrentThread();
+    ValidateSession();
+
+    bool foundTargetApp      = false;
+    bool foundPendingTargets = false;
+
+    /**
+     * Update our target app list with the status from this target.
+     *
+     * If we are the first callback to receive a passcode,
+     *  then complete commissioning with it.
+     * If we are the last expected callback and none has completed commissioning,
+     *  then advance to the next step for trying to obtain a passcode.
+     * When iterating through the list of targets, keep track of whether any apps have been found,
+     *  so that if we advance we can do so with that information (may need to send a CDC).
+     */
+
     if (mUdcServer == nullptr)
     {
-        ChipLogError(AppServer, "UX CommissionWithPincode: no udc server");
+        ChipLogError(AppServer, "UX Ok - HandleContentAppCheck: no udc server");
         return;
     }
     UDCClientState * client = mUdcServer->GetUDCClients().FindUDCClientState(mCurrentInstance);
     if (client == nullptr)
     {
-        ChipLogError(AppServer, "UX Ok: could not find instance=%s", mCurrentInstance);
+        ChipLogError(AppServer, "UX Ok - HandleContentAppCheck: could not find instance=%s", mCurrentInstance);
+        return;
+    }
+    if (client->GetUDCClientProcessingState() != UDCClientProcessingState::kObtainingOnboardingPayload)
+    {
+        ChipLogError(AppServer, "UX Ok - HandleContentAppCheck: invalid state for HandleContentAppPasscodeResponse");
+        return;
+    }
+
+    uint8_t targetAppCount = client->GetNumTargetAppInfos();
+    for (uint8_t i = 0; i < targetAppCount; i++)
+    {
+        TargetAppInfo info;
+        if (client->GetTargetAppInfo(i, info))
+        {
+            if (info.checkState == TargetAppCheckState::kAppFoundPasscodeReturned)
+            {
+                // nothing else to do, complete commissioning has been called
+                return;
+            }
+            else if (info.checkState == TargetAppCheckState::kAppFoundNoPasscode)
+            {
+                foundTargetApp = true;
+            }
+            else if (info.checkState == TargetAppCheckState::kNotInitialized)
+            {
+                if (target.vendorId == info.vendorId && target.productId == info.productId)
+                {
+                    client->SetTargetAppInfoState(i, target.checkState);
+                    if (target.checkState != TargetAppCheckState::kAppNotFound)
+                    {
+                        foundTargetApp = true;
+                    }
+                }
+                else
+                {
+                    foundPendingTargets = true;
+                }
+            }
+        }
+    }
+    if (passcode != 0)
+    {
+        ChipLogDetail(AppServer, "UX Ok - HandleContentAppCheck: found a passcode");
+        // we found a passcode and complete commissioning has not been called
+        CommissionWithPasscode(passcode);
+        return;
+    }
+    if (foundPendingTargets)
+    {
+        ChipLogDetail(AppServer, "UX Ok - HandleContentAppCheck: have not heard from all apps");
+        // have not heard from all targets so don't do anything
+        return;
+    }
+    if (!foundTargetApp && client->GetNoPasscode())
+    {
+        // finished iterating through all apps and found none, send CDC
+        ChipLogDetail(AppServer, "UX Ok - HandleContentAppCheck: target apps specified but none found, sending CDC");
+        CommissionerDeclaration cd;
+        cd.SetNoAppsFound(true);
+        mUdcServer->SendCDCMessage(cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
+    }
+    ChipLogDetail(AppServer, "UX Ok - HandleContentAppCheck: advancing");
+    // otherwise, advance to the next step for trying to obtain a passcode.
+    HandleContentAppPasscodeResponse(0);
+    return;
+}
+
+/// Callback for getting execution into the main chip thread
+void CallbackHandleContentAppPasscodeResponse(System::Layer * aSystemLayer, void * aAppState)
+{
+    ChipLogDetail(AppServer, "HandleContentAppPasscodeResponse: now on main thread");
+    CommissionerDiscoveryController * cdc = static_cast<CommissionerDiscoveryController *>(aAppState);
+    cdc->InternalHandleContentAppPasscodeResponse();
+}
+
+void CommissionerDiscoveryController::HandleContentAppPasscodeResponse(uint32_t passcode)
+{
+    assertChipStackLockedByCurrentThread();
+
+    SetPasscode(passcode);
+    if (CHIP_NO_ERROR !=
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(0), CallbackHandleContentAppPasscodeResponse, this))
+    {
+        ChipLogError(AppServer, "HandleContentAppPasscodeResponse: StartTimer returned error");
+    }
+}
+
+void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse()
+{
+    assertChipStackLockedByCurrentThread();
+    ValidateSession();
+    uint32_t passcode = mPasscode;
+
+    if (mUdcServer == nullptr)
+    {
+        ChipLogError(AppServer, "UX Ok - HandleContentAppPasscodeResponse: no udc server");
+        return;
+    }
+    UDCClientState * client = mUdcServer->GetUDCClients().FindUDCClientState(mCurrentInstance);
+    if (client == nullptr)
+    {
+        ChipLogError(AppServer, "UX Ok - HandleContentAppPasscodeResponse: could not find instance=%s", mCurrentInstance);
+        return;
+    }
+    if (client->GetUDCClientProcessingState() != UDCClientProcessingState::kObtainingOnboardingPayload)
+    {
+        ChipLogError(AppServer, "UX Ok - HandleContentAppPasscodeResponse: invalid state for HandleContentAppPasscodeResponse");
+        return;
+    }
+
+    if (mPasscodeService != nullptr)
+    {
+        // if CommissionerPasscode
+        //    - if CommissionerPasscodeReady, then start commissioning
+        //    - if CommissionerPasscode, then call new UX method to show passcode, send CDC
+        if (passcode == 0 && client->GetCommissionerPasscode() && client->GetCdPort() != 0)
+        {
+            char rotatingIdBuffer[Dnssd::kMaxRotatingIdLen * 2];
+            size_t rotatingIdLength = client->GetRotatingIdLength();
+            CHIP_ERROR err = Encoding::BytesToUppercaseHexBuffer(client->GetRotatingId(), rotatingIdLength, rotatingIdBuffer,
+                                                                 sizeof(rotatingIdBuffer));
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer, "UX Ok - HandleContentAppPasscodeResponse: could not convert rotating id to hex");
+                return;
+            }
+            CharSpan rotatingIdSpan(rotatingIdBuffer, 2 * rotatingIdLength);
+
+            // first step of commissioner passcode
+            ChipLogError(AppServer, "UX Ok: commissioner passcode, sending CDC");
+            // generate a passcode
+            passcode = mPasscodeService->GetCommissionerPasscode(client->GetVendorId(), client->GetProductId(), rotatingIdSpan);
+            if (passcode == 0)
+            {
+                // passcode feature disabled
+                ChipLogError(AppServer, "UX Ok: commissioner passcode disabled, sending CDC with error");
+                CommissionerDeclaration cd;
+                cd.SetErrorCode(CommissionerDeclaration::CdError::kCommissionerPasscodeDisabled);
+                cd.SetNeedsPasscode(true);
+                mUdcServer->SendCDCMessage(
+                    cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
+                return;
+            }
+            client->SetCachedCommissionerPasscode(passcode);
+            client->SetUDCClientProcessingState(UDCClientProcessingState::kWaitingForCommissionerPasscodeReady);
+
+            CommissionerDeclaration cd;
+            cd.SetCommissionerPasscode(true);
+            if (mUserPrompter->DisplaysPasscodeAndQRCode())
+            {
+                cd.SetQRCodeDisplayed(true);
+            }
+            mUdcServer->SendCDCMessage(cd,
+                                       Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
+
+            // dialog
+            ChipLogDetail(Controller,
+                          "------PROMPT USER: %s is requesting permission to cast to this TV. Casting passcode: [" ChipLogFormatMEI
+                          "]. Additional instructions [" ChipLogFormatMEI "] [%s]. [" ChipLogFormatMEI "," ChipLogFormatMEI ",%s]",
+                          client->GetDeviceName(), ChipLogValueMEI(passcode), ChipLogValueMEI(client->GetPairingHint()),
+                          client->GetPairingInst(), ChipLogValueMEI(client->GetVendorId()), ChipLogValueMEI(client->GetProductId()),
+                          client->GetInstanceName());
+            mUserPrompter->PromptWithCommissionerPasscode(client->GetVendorId(), client->GetProductId(), client->GetDeviceName(),
+                                                          passcode, client->GetPairingHint(), client->GetPairingInst());
+            return;
+        }
+        if (passcode != 0)
+        {
+            CommissionWithPasscode(passcode);
+            return;
+        }
+    }
+
+    // if NoPasscode, send CDC
+    if (client->GetNoPasscode() && client->GetCdPort() != 0)
+    {
+        ChipLogDetail(AppServer, "UX Ok: no app passcode and NoPasscode in UDC, sending CDC");
+        CommissionerDeclaration cd;
+        cd.SetNeedsPasscode(true);
+        mUdcServer->SendCDCMessage(cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
+        return;
+    }
+
+    // if CdUponPasscodeDialog, send CDC
+    if (client->GetCdUponPasscodeDialog() && client->GetCdPort() != 0)
+    {
+        ChipLogDetail(AppServer, "UX Ok: no app passcode and GetCdUponPasscodeDialog in UDC, sending CDC");
+        CommissionerDeclaration cd;
+        cd.SetNeedsPasscode(true); // TODO: should this be set?
+        cd.SetPasscodeDialogDisplayed(true);
+        mUdcServer->SendCDCMessage(cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
+    }
+
+    ChipLogDetail(Controller, "------PROMPT USER: please enter passcode displayed in casting app ");
+    if (mUserPrompter != nullptr)
+    {
+        mUserPrompter->PromptForCommissionPasscode(client->GetVendorId(), client->GetProductId(), client->GetDeviceName(),
+                                                   client->GetPairingHint(), client->GetPairingInst());
+    }
+    ChipLogDetail(Controller, "------Via Shell Enter: controller ux ok [passcode]");
+}
+
+/// Callback for getting execution into the main chip thread
+void CallbackCommissionWithPasscode(System::Layer * aSystemLayer, void * aAppState)
+{
+    ChipLogDetail(AppServer, "CallbackCommissionWithPasscode: now on main thread");
+    CommissionerDiscoveryController * cdc = static_cast<CommissionerDiscoveryController *>(aAppState);
+    cdc->InternalCommissionWithPasscode();
+}
+
+void CommissionerDiscoveryController::CommissionWithPasscode(uint32_t passcode)
+{
+    assertChipStackLockedByCurrentThread();
+
+    SetPasscode(passcode);
+    if (CHIP_NO_ERROR != DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(0), CallbackCommissionWithPasscode, this))
+    {
+        ChipLogError(AppServer, "CommissionWithPasscode: StartTimer returned error");
+    }
+}
+
+void CommissionerDiscoveryController::InternalCommissionWithPasscode()
+{
+    assertChipStackLockedByCurrentThread();
+    ValidateSession();
+    uint32_t passcode = mPasscode;
+
+    if (!mPendingConsent)
+    {
+        ChipLogError(AppServer, "UX CommissionWithPasscode: no current instance");
+        return;
+    }
+    if (mUdcServer == nullptr)
+    {
+        ChipLogError(AppServer, "UX CommissionWithPasscode: no udc server");
+        return;
+    }
+    UDCClientState * client = mUdcServer->GetUDCClients().FindUDCClientState(mCurrentInstance);
+    if (client == nullptr)
+    {
+        ChipLogError(AppServer, "UX CommissionWithPasscode: could not find instance=%s", mCurrentInstance);
         return;
     }
     // state needs to be either kPromptingUser or kObtainingOnboardingPayload
     if (!(client->GetUDCClientProcessingState() == UDCClientProcessingState::kPromptingUser ||
           client->GetUDCClientProcessingState() == UDCClientProcessingState::kObtainingOnboardingPayload))
     {
-        ChipLogError(AppServer, "UX CommissionWithPincode: invalid state for CommissionWithPincode");
+        ChipLogError(AppServer, "UX CommissionWithPasscode: invalid state for CommissionWithPasscode");
         return;
     }
     Transport::PeerAddress peerAddress = client->GetPeerAddress();
     client->SetUDCClientProcessingState(UDCClientProcessingState::kCommissioningNode);
     if (mCommissionerCallback != nullptr)
     {
-        mCommissionerCallback->ReadyForCommissioning(pincode, client->GetLongDiscriminator(), peerAddress);
+        if (mUserPrompter != nullptr)
+        {
+            mUserPrompter->PromptCommissioningStarted(client->GetVendorId(), client->GetProductId(), client->GetDeviceName());
+        }
+        mCommissionerCallback->ReadyForCommissioning(passcode, client->GetLongDiscriminator(), peerAddress);
     }
 }
 
 void CommissionerDiscoveryController::Cancel()
 {
+    ValidateSession();
+
     if (!mPendingConsent)
     {
         ChipLogError(AppServer, "UX Cancel: no current instance");
@@ -169,11 +583,11 @@ void CommissionerDiscoveryController::Cancel()
     }
     client->SetUDCClientProcessingState(UDCClientProcessingState::kUserDeclined);
     mPendingConsent = false;
-    return;
 }
 
 void CommissionerDiscoveryController::CommissioningSucceeded(uint16_t vendorId, uint16_t productId, NodeId nodeId,
-                                                             OperationalDeviceProxy * device)
+                                                             Messaging::ExchangeManager & exchangeMgr,
+                                                             const SessionHandle & sessionHandle)
 {
     mVendorId  = vendorId;
     mProductId = productId;
@@ -181,7 +595,7 @@ void CommissionerDiscoveryController::CommissioningSucceeded(uint16_t vendorId, 
     if (mPostCommissioningListener != nullptr)
     {
         ChipLogDetail(Controller, "CommissionerDiscoveryController calling listener");
-        mPostCommissioningListener->CommissioningCompleted(vendorId, productId, nodeId, device);
+        mPostCommissioningListener->CommissioningCompleted(vendorId, productId, nodeId, exchangeMgr, sessionHandle);
     }
     else
     {
@@ -196,6 +610,25 @@ void CommissionerDiscoveryController::CommissioningFailed(CHIP_ERROR error)
         ChipLogDetail(Controller, "------PROMPT USER: commissioning failed ");
         mUserPrompter->PromptCommissioningFailed(GetCommissioneeName(), error);
     }
+    if (mUdcServer == nullptr)
+    {
+        ChipLogError(AppServer, "UX CommissioningFailed: no udc server");
+        return;
+    }
+    UDCClientState * client = mUdcServer->GetUDCClients().FindUDCClientState(mCurrentInstance);
+    if (client == nullptr)
+    {
+        ChipLogError(AppServer, "UX CommissioningFailed: no client");
+        return;
+    }
+    if (client->GetUDCClientProcessingState() != UDCClientProcessingState::kCommissioningNode)
+    {
+        ChipLogError(AppServer, "UX CommissioningFailed: invalid state");
+        return;
+    }
+    client->SetUDCClientProcessingState(UDCClientProcessingState::kCommissioningFailed);
+    client->Reset();
+
     ResetState();
 }
 

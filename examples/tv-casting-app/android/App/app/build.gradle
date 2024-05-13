@@ -44,6 +44,10 @@ android {
     sourceSets {
         main {
             jniLibs.srcDirs = ['libs/jniLibs']
+            java.srcDirs = [
+                    'src/main/java',
+                    'src/main/jni',
+            ]
 
             // uncomment this code to debug
 //            java.srcDirs = [
@@ -62,6 +66,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.3.1'
     implementation 'com.google.android.material:material:1.4.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.1'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.+'
     testImplementation 'org.mockito:mockito-core:3.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

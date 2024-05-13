@@ -11,32 +11,61 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.2.2. [TC-PRS-2.2] Primary functionality with server as DUT
+name: 34.2.2. [TC-PRS-2.2] Primary Functionality with Server as DUT
+
+PICS:
+    - PRS.S
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+    cluster: "Pressure Measurement"
+    endpoint: 1
 
 tests:
-    - label: "Commission DUT to TH"
-      verification: |
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-      disabled: true
+    - label: "Step 2: TH reads from the DUT the MeasuredValue attribute"
+      PICS: PRS.S.A0000
+      command: "readAttribute"
+      attribute: "MeasuredValue"
+      response:
+          saveAs: ValueBeforeChange
 
-    - label: "TH reads MeasuredValue attribute from DUT"
-      verification: |
-          ./chip-tool pressuremeasurement read measured-value 1 1
-          Verify response: cluster id: 0x0403 Attribute: 0
-      disabled: true
+    - label: "Step 3: Operate on device to change the pressure significantly"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && PRS.M.PressureChange
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Operate on device to change the pressure significantly"
-      verification: |
+    - label: "Wait 2s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 2000
 
-      disabled: true
-
-    - label: "after a few seconds, TH reads MeasuredValue attribute from DUT"
-      verification: |
-
-      disabled: true
+    - label:
+          "Step 4: After a few seconds, TH reads from the DUT the MeasuredValue
+          attribute"
+      PICS: PRS.S.A0000 && PRS.M.PressureChange
+      command: "readAttribute"
+      attribute: "MeasuredValue"
+      response:
+          constraints:
+              notValue: ValueBeforeChange

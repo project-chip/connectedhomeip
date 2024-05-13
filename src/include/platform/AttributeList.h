@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {

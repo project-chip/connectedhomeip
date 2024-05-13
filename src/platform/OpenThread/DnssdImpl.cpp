@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,108 +15,53 @@
  *    limitations under the License.
  */
 
-#include "lib/dnssd/platform/Dnssd.h"
-
-#include <lib/support/CodeUtils.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <platform/OpenThread/OpenThreadUtils.h>
-
-using namespace ::chip::DeviceLayer;
+#include <platform/OpenThread/OpenThreadDnssdImpl.h>
 
 namespace chip {
 namespace Dnssd {
 
 CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
 {
-    ReturnErrorOnFailure(ThreadStackMgr().SetSrpDnsCallbacks(initCallback, errorCallback, context));
-
-    uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
-    MutableByteSpan mac(macBuffer);
-    char hostname[kHostNameMaxLength + 1] = "";
-    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac));
-    MakeHostName(hostname, sizeof(hostname), mac);
-
-    return ThreadStackMgr().ClearSrpHost(hostname);
+    return OpenThreadDnssdInit(initCallback, errorCallback, context);
 }
 
-CHIP_ERROR ChipDnssdShutdown()
-{
-    return CHIP_NO_ERROR;
-}
-
-const char * GetProtocolString(DnssdServiceProtocol protocol)
-{
-    return protocol == DnssdServiceProtocol::kDnssdProtocolUdp ? "_udp" : "_tcp";
-}
+void ChipDnssdShutdown() {}
 
 CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    ReturnErrorCodeIf(service == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    if (strcmp(service->mHostName, "") != 0)
-    {
-        ReturnErrorOnFailure(ThreadStackMgr().SetupSrpHost(service->mHostName));
-    }
-
-    char serviceType[chip::Dnssd::kDnssdTypeAndProtocolMaxSize + 1];
-    snprintf(serviceType, sizeof(serviceType), "%s.%s", service->mType, GetProtocolString(service->mProtocol));
-
-    Span<const char * const> subTypes(service->mSubTypes, service->mSubTypeSize);
-    Span<const TextEntry> textEntries(service->mTextEntries, service->mTextEntrySize);
-    return ThreadStackMgr().AddSrpService(service->mName, serviceType, service->mPort, subTypes, textEntries);
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    return OpenThreadDnssdPublishService(service, callback, context);
 }
 
 CHIP_ERROR ChipDnssdRemoveServices()
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    ThreadStackMgr().InvalidateAllSrpServices();
-    return CHIP_NO_ERROR;
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    return OpenThreadDnssdRemoveServices();
 }
 
 CHIP_ERROR ChipDnssdFinalizeServiceUpdate()
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    return ThreadStackMgr().RemoveInvalidSrpServices();
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    return OpenThreadDnssdFinalizeServiceUpdate();
 }
 
 CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, Inet::IPAddressType addressType,
-                           Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context)
+                           Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context, intptr_t * browseIdentifier)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT && CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
-    if (type == nullptr || callback == nullptr)
-        return CHIP_ERROR_INVALID_ARGUMENT;
+    return OpenThreadDnssdBrowse(type, protocol, addressType, interface, callback, context, browseIdentifier);
+}
 
-    char serviceType[Dnssd::kDnssdFullTypeAndProtocolMaxSize + 1]; // +1 for null-terminator
-    snprintf(serviceType, sizeof(serviceType), "%s.%s", type, GetProtocolString(protocol));
-
-    return ThreadStackMgr().DnsBrowse(serviceType, callback, context);
-#else
+CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
+{
     return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT && CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 }
 
 CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, Inet::InterfaceId interface, DnssdResolveCallback callback, void * context)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT && CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
-    if (browseResult == nullptr || callback == nullptr)
-        return CHIP_ERROR_INVALID_ARGUMENT;
+    return OpenThreadDnssdResolve(browseResult, interface, callback, context);
+}
 
-    char serviceType[chip::Dnssd::kDnssdTypeAndProtocolMaxSize + 1];
-    snprintf(serviceType, sizeof(serviceType), "%s.%s", browseResult->mType, GetProtocolString(browseResult->mProtocol));
-
-    return ThreadStackMgr().DnsResolve(serviceType, browseResult->mName, callback, context);
-#else
+void ChipDnssdResolveNoLongerNeeded(const char * instanceName) {}
+CHIP_ERROR ChipDnssdReconfirmRecord(const char * hostname, chip::Inet::IPAddress address, chip::Inet::InterfaceId interface)
+{
     return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT && CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 }
 
 } // namespace Dnssd

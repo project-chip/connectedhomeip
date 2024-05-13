@@ -1,0 +1,805 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 11.2.1. [TC-BINFO-2.1] Attributes [DUT-Server]
+
+PICS:
+    - BINFO.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    #Saving the CountryCode during commissioning not supported in YAML
+    - label:
+          "Step 1: During Commissioning, TH Saves the CountryCode Information
+          from SetRegulatoryConfig command"
+      verification: |
+          execute the below mentioned command to put DUT(all-clusters-app) into a commissionable state, Pls use equivalent command on the respective DUT
+          ./chip-all-clusters-app  --trace_decode 1
+
+          Once DUT reach the  commissionable state pls send below mentioned command on TH(chip-tool) Pls use equivalent command on the respective DUT.
+          ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          While provisioning TH(chip-tool) Saves the CountryCode Information from SetRegulatoryConfig command.
+
+          [1664530365.393968][20927:20932] CHIP:DMG:
+          [1664530365.393981][20927:20932] CHIP:DMG: InvokeRequestMessage =
+          [1664530365.393984][20927:20932] CHIP:DMG: {
+          [1664530365.393986][20927:20932] CHIP:DMG:         suppressResponse = false,
+          [1664530365.393989][20927:20932] CHIP:DMG:         timedRequest = false,
+          [1664530365.393992][20927:20932] CHIP:DMG:         InvokeRequests =
+          [1664530365.393997][20927:20932] CHIP:DMG:         [
+          [1664530365.394000][20927:20932] CHIP:DMG:                 CommandDataIB =
+          [1664530365.394004][20927:20932] CHIP:DMG:                 {
+          [1664530365.394006][20927:20932] CHIP:DMG:                         CommandPathIB =
+          [1664530365.394010][20927:20932] CHIP:DMG:                         {
+          [1664530365.394013][20927:20932] CHIP:DMG:                                 EndpointId = 0x0,
+          [1664530365.394017][20927:20932] CHIP:DMG:                                 ClusterId = 0x30,
+          [1664530365.394020][20927:20932] CHIP:DMG:                                 CommandId = 0x2,
+          [1664530365.394024][20927:20932] CHIP:DMG:                         },
+          [1664530365.394028][20927:20932] CHIP:DMG:
+          [1664530365.394031][20927:20932] CHIP:DMG:                         CommandFields =
+          [1664530365.394035][20927:20932] CHIP:DMG:                         {
+          [1664530365.394039][20927:20932] CHIP:DMG:                                 0x0 = 0,
+          [1664530365.394043][20927:20932] CHIP:DMG:                                 0x1 = "XX" (2 chars),
+          [1664530365.394047][20927:20932] CHIP:DMG:                                 0x2 = 4,
+          [1664530365.394050][20927:20932] CHIP:DMG:                         },
+          [1664530365.394053][20927:20932] CHIP:DMG:                 },
+          [1664530365.394058][20927:20932] CHIP:DMG:
+          [1664530365.394061][20927:20932] CHIP:DMG:         ],
+          [1664530365.394066][20927:20932] CHIP:DMG:
+          [1664530365.394069][20927:20932] CHIP:DMG:         InteractionModelRevision = 1
+          [1664530365.394072][20927:20932] CHIP:DMG: },
+          [1664530365.394075][20927:20932] CHIP:DMG:
+          [1664530365.394096][20927:20932] CHIP:DMG: ICR moving to [CommandSen]
+          [1664530365.394107][20927:20932] CHIP:DMG: ICR moving to [AwaitingDe]
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 2: TH reads DataModelRevision from the DUT."
+      PICS: BINFO.S.A0000
+      command: "readAttribute"
+      attribute: "DataModelRevision"
+      response:
+          value: 17
+          saveAs: DataModelRevisionValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65534
+
+    - label: "Step 3: TH writes DataModelRevision as '0x1124' "
+      PICS: BINFO.S.A0000
+      command: "writeAttribute"
+      attribute: "DataModelRevision"
+      arguments:
+          value: 4388
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 4: TH reads DataModelRevision from the DUT."
+      PICS: BINFO.S.A0000
+      command: "readAttribute"
+      attribute: "DataModelRevision"
+      response:
+          value: DataModelRevisionValue
+
+    - label: "Step 5: TH reads VendorName from the DUT."
+      PICS: BINFO.S.A0001
+      command: "readAttribute"
+      attribute: "VendorName"
+      response:
+          saveAs: VendorNameValue
+          constraints:
+              type: char_string
+              maxLength: 32
+
+    - label: "Step 6: TH writes VendorName from the DUT."
+      PICS: BINFO.S.A0001
+      command: "writeAttribute"
+      attribute: "VendorName"
+      arguments:
+          value: "sample"
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 7: TH reads VendorName from the DUT."
+      PICS: BINFO.S.A0001
+      command: "readAttribute"
+      attribute: "VendorName"
+      response:
+          value: VendorNameValue
+
+    - label: "Step 8: TH reads VendorID from the DUT."
+      PICS: BINFO.S.A0002
+      command: "readAttribute"
+      attribute: "VendorID"
+      response:
+          saveAs: VendorIDValue
+          constraints:
+              type: vendor_id
+              minValue: 1
+              maxValue: 65521
+
+    - label:
+          "Verify that VendorID matches the value assigned to this manufacturer"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && BINFO.S.A0002
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 9: TH writes VendorID as '0x0011' "
+      PICS: BINFO.S.A0002
+      command: "writeAttribute"
+      attribute: "VendorID"
+      arguments:
+          value: 17
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 10: TH reads VendorID from the DUT."
+      PICS: BINFO.S.A0002
+      command: "readAttribute"
+      attribute: "VendorID"
+      response:
+          value: VendorIDValue
+
+    - label: "Step 11: TH reads ProductName from the DUT"
+      PICS: BINFO.S.A0003
+      command: "readAttribute"
+      attribute: "ProductName"
+      response:
+          saveAs: ProductNameValue
+          constraints:
+              type: char_string
+              maxLength: 32
+
+    - label: "Step 12: TH writes ProductName from the DUT."
+      PICS: BINFO.S.A0003
+      command: "writeAttribute"
+      attribute: "ProductName"
+      arguments:
+          value: "newproduct"
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 13: TH reads ProductName from the DUT"
+      PICS: BINFO.S.A0003
+      command: "readAttribute"
+      attribute: "ProductName"
+      response:
+          value: ProductNameValue
+
+    - label: "Step 14: TH reads ProductID from the DUT."
+      PICS: BINFO.S.A0004
+      command: "readAttribute"
+      attribute: "ProductID"
+      response:
+          saveAs: ProductIDValue
+          constraints:
+              type: int16u
+              minValue: 1
+              maxValue: 65534
+
+    - label: "Step 15: TH writes ProductID as '0x4521' "
+      PICS: BINFO.S.A0004
+      command: "writeAttribute"
+      attribute: "ProductID"
+      arguments:
+          value: 17697
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 16: TH reads ProductID from the DUT."
+      PICS: BINFO.S.A0004
+      command: "readAttribute"
+      attribute: "ProductID"
+      response:
+          value: ProductIDValue
+
+    - label: "Step 17: TH reads NodeLabel from the DUT"
+      PICS: BINFO.S.A0005
+      command: "readAttribute"
+      attribute: "NodeLabel"
+      response:
+          saveAs: NodeLabelValue
+          constraints:
+              type: char_string
+              maxLength: 32
+
+    - label: "Step 18: TH writes NodeLabel from the DUT."
+      PICS: BINFO.S.A0005
+      command: "writeAttribute"
+      attribute: "NodeLabel"
+      arguments:
+          value: "newnode"
+
+    - label: "Step 19: TH reads NodeLabel from the DUT"
+      PICS: BINFO.S.A0005
+      command: "readAttribute"
+      attribute: "NodeLabel"
+      response:
+          value: "newnode"
+
+    - label: "Step 20a: TH reads Location from the DUT."
+      PICS: BINFO.S.A0006
+      command: "readAttribute"
+      attribute: "Location"
+      response:
+          constraints:
+              type: char_string
+              maxLength: 16
+
+    - label:
+          "Verify that the Location is same as CountryCode value saved from
+          step1"
+      verification: |
+          ./chip-tool  basicinformation read location 1 0
+
+          On TH,  Verify that TH reads Location from the DUT successfully,  the name should be string and length is less than or equal to 2 bytes.
+          [1656495999.760797][2249:2254] CHIP:DMG: }
+          [1656495999.761084][2249:2254] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0006 DataVersion: 941124320
+          [1656495999.761187][2249:2254] CHIP:TOO:   Location: XX
+          [1656495999.761371][2249:2254] CHIP:EM: Sending Standalone Ack for MessageCounter:7663506 on exchange 28126i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && BINFO.S.A0006
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 20b: TH selects a country code value that is different from the
+          CountryCode saved from step1 and known to be supported on the DUT. TH
+          writes this value to Location"
+      PICS: BINFO.S.A0006
+      command: "writeAttribute"
+      attribute: "Location"
+      arguments:
+          value: "in"
+
+    - label: "Step 20c: TH reads Location from the DUT."
+      PICS: BINFO.S.A0006
+      command: "readAttribute"
+      attribute: "Location"
+      response:
+          value: "in"
+
+    - label: "Step 21: TH reads HardwareVersion from the DUT"
+      PICS: BINFO.S.A0007
+      command: "readAttribute"
+      attribute: "HardwareVersion"
+      response:
+          saveAs: HardwareVersionValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65534
+
+    - label: "Step 22: TH writes HardwareVersion as '0x4531'"
+      PICS: BINFO.S.A0007
+      command: "writeAttribute"
+      attribute: "HardwareVersion"
+      arguments:
+          value: 17713
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 23: TH reads HardwareVersion from the DUT"
+      PICS: BINFO.S.A0007
+      command: "readAttribute"
+      attribute: "HardwareVersion"
+      response:
+          value: HardwareVersionValue
+
+    - label: "Step 24: TH reads HardwareVersionString from the DUT."
+      PICS: BINFO.S.A0008
+      command: "readAttribute"
+      attribute: "HardwareVersionString"
+      response:
+          saveAs: HardwareVersionStringValue
+          constraints:
+              type: char_string
+              minLength: 1
+              maxLength: 64
+
+    - label: "Step 25: TH writes HardwareVersionString from the DUT."
+      PICS: BINFO.S.A0008
+      command: "writeAttribute"
+      attribute: "HardwareVersionString"
+      arguments:
+          value: "newhardwareversion"
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 26: TH reads HardwareVersionString from the DUT."
+      PICS: BINFO.S.A0008
+      command: "readAttribute"
+      attribute: "HardwareVersionString"
+      response:
+          value: HardwareVersionStringValue
+
+    - label: "Step 27: TH reads SoftwareVersion from the DUT"
+      PICS: BINFO.S.A0009
+      command: "readAttribute"
+      attribute: "SoftwareVersion"
+      response:
+          saveAs: SoftwareVersionValue
+          constraints:
+              minValue: 0
+              maxValue: 4294967294
+
+    - label:
+          "Verify that the SoftwareVersion is not displayed to the end-user
+          through any device specific means (ex: screen, audio)"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && BINFO.S.A0009
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 28: TH writes SoftwareVersion as '0x8213'"
+      PICS: BINFO.S.A0009
+      command: "writeAttribute"
+      attribute: "SoftwareVersion"
+      arguments:
+          value: 33299
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 29: TH reads SoftwareVersion from the DUT"
+      PICS: BINFO.S.A0009
+      command: "readAttribute"
+      attribute: "SoftwareVersion"
+      response:
+          value: SoftwareVersionValue
+
+    - label: "Step 30: TH reads SoftwareVersionString from the DUT"
+      PICS: BINFO.S.A000a
+      command: "readAttribute"
+      attribute: "SoftwareVersionString"
+      response:
+          saveAs: SoftwareVersionStringValue
+          constraints:
+              minLength: 1
+              maxLength: 64
+
+    - label: "Step 31: TH writes SoftwareVersionString as '1.0'"
+      PICS: BINFO.S.A000a
+      command: "writeAttribute"
+      attribute: "SoftwareVersionString"
+      arguments:
+          value: "1.0"
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 32: TH reads SoftwareVersionString from the DUT"
+      PICS: BINFO.S.A000a
+      command: "readAttribute"
+      attribute: "SoftwareVersionString"
+      response:
+          value: SoftwareVersionStringValue
+
+    - label: "Step 33: TH reads ManufacturingDate from the DUT."
+      PICS: BINFO.S.A000b
+      command: "readAttribute"
+      attribute: "ManufacturingDate"
+      response:
+          saveAs: ManufacturingDateValue
+          constraints:
+              type: char_string
+              minLength: 8
+              maxLength: 16
+
+    - label:
+          "Verify if the first 8 characters specify date according to ISO 8601,
+          i.e, YYYYMMDD"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && BINFO.S.A000b
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 34: TH writes ManufacturingDate as '20210814789452IN'"
+      PICS: BINFO.S.A000b
+      command: "writeAttribute"
+      attribute: "ManufacturingDate"
+      arguments:
+          value: "20210814789452IN"
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 35: TH reads ManufacturingDate from the DUT."
+      PICS: BINFO.S.A000b
+      command: "readAttribute"
+      attribute: "ManufacturingDate"
+      response:
+          value: ManufacturingDateValue
+
+    - label: "Step 36: TH reads PartNumber from the DUT"
+      PICS: BINFO.S.A000c
+      command: "readAttribute"
+      attribute: "PartNumber"
+      response:
+          saveAs: PartNumberValue
+          constraints:
+              type: char_string
+              maxLength: 32
+
+    - label: "Step 37: TH writes PartNumber from the DUT."
+      PICS: BINFO.S.A000c
+      command: "writeAttribute"
+      attribute: "PartNumber"
+      arguments:
+          value: "newpart"
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 38: TH reads PartNumber from the DUT"
+      PICS: BINFO.S.A000c
+      command: "readAttribute"
+      attribute: "PartNumber"
+      response:
+          value: PartNumberValue
+
+    - label: "Step 39: TH reads ProductURL from the DUT"
+      PICS: BINFO.S.A000d
+      command: "readAttribute"
+      attribute: "ProductURL"
+      response:
+          saveAs: ProductURLValue
+          constraints:
+              type: long_char_string
+              maxLength: 256
+
+    - label:
+          "Verify that it specifies a link to a specific web page, Verify that
+          it follows the syntax rules specified in RFC 3986."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && BINFO.S.A000d
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 40: TH writes ProductURL as 'https://www.example.com'"
+      PICS: BINFO.S.A000d
+      command: "writeAttribute"
+      attribute: "ProductURL"
+      arguments:
+          value: "https://www.example.com"
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 41: TH reads ProductURL from the DUT"
+      PICS: BINFO.S.A000d
+      command: "readAttribute"
+      attribute: "ProductURL"
+      response:
+          value: ProductURLValue
+
+    - label: "Step 42: TH reads ProductLabel from the DUT."
+      PICS: BINFO.S.A000e
+      command: "readAttribute"
+      attribute: "ProductLabel"
+      response:
+          saveAs: ProductLabelValue
+          constraints:
+              type: char_string
+              maxLength: 64
+
+    - label:
+          "Verify that it does not include the name of the vendor as defined
+          within the VendorName attribute"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && BINFO.S.A000e
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 43: TH writes ProductLabel from the DUT."
+      PICS: BINFO.S.A000e
+      command: "writeAttribute"
+      attribute: "ProductLabel"
+      arguments:
+          value: "newproductlabel"
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 44: TH reads ProductLabel from the DUT."
+      PICS: BINFO.S.A000e
+      command: "readAttribute"
+      attribute: "ProductLabel"
+      response:
+          value: ProductLabelValue
+
+    - label: "Step 45: TH reads SerialNumber from the DUT."
+      PICS: BINFO.S.A000f
+      command: "readAttribute"
+      attribute: "SerialNumber"
+      response:
+          saveAs: SerialNumberValue
+          constraints:
+              type: char_string
+              maxLength: 32
+
+    - label: "Step 46: TH writes SerialNumber from the DUT."
+      PICS: BINFO.S.A000f
+      command: "writeAttribute"
+      attribute: "SerialNumber"
+      arguments:
+          value: "newserialnumber"
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 47: TH reads SerialNumber from the DUT."
+      PICS: BINFO.S.A000f
+      command: "readAttribute"
+      attribute: "SerialNumber"
+      response:
+          value: SerialNumberValue
+
+    - label: "Step 48: TH reads LocalConfigDisabled from the DUT."
+      PICS: BINFO.S.A0010
+      command: "readAttribute"
+      attribute: "LocalConfigDisabled"
+      response:
+          value: false
+          constraints:
+              type: boolean
+
+    - label: "Step 49: TH sets LocalConfigDisabled to True"
+      PICS: BINFO.S.A0010
+      command: "writeAttribute"
+      attribute: "LocalConfigDisabled"
+      arguments:
+          value: true
+
+    - label: "Step 50: TH reads LocalConfigDisabled from the DUT."
+      PICS: BINFO.S.A0010
+      command: "readAttribute"
+      attribute: "LocalConfigDisabled"
+      response:
+          value: true
+
+    - label: "Step 51: TH reads Reachable from the DUT."
+      PICS: BINFO.S.A0011
+      command: "readAttribute"
+      attribute: "Reachable"
+      response:
+          value: true
+          constraints:
+              type: boolean
+
+    - label:
+          "Step 52a: TH sends Write request message to DUT to change value of
+          Reachable to false"
+      PICS: BINFO.S.A0011
+      command: "writeAttribute"
+      attribute: "Reachable"
+      arguments:
+          value: false
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 52b: TH reads Reachable from the DUT."
+      PICS: BINFO.S.A0011
+      command: "readAttribute"
+      attribute: "Reachable"
+      response:
+          value: true
+          constraints:
+              type: boolean
+
+    - label: "Step 53: TH reads UniqueID from the DUT."
+      PICS: BINFO.S.A0012
+      command: "readAttribute"
+      attribute: "UniqueID"
+      response:
+          saveAs: UniqueIDValue
+          constraints:
+              type: char_string
+              maxLength: 32
+
+    - label: "Step 54: TH writes UniqueID from the DUT."
+      PICS: BINFO.S.A0012
+      command: "writeAttribute"
+      attribute: "UniqueID"
+      arguments:
+          value: "newid"
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 55: TH reads UniqueID from the DUT."
+      PICS: BINFO.S.A0012
+      command: "readAttribute"
+      attribute: "UniqueID"
+      response:
+          value: UniqueIDValue
+
+    #This step implicitly validating the attribute(CapabilityMinima)constraints, as long as the payload is being parsed successfully
+    - label: "Step 56: TH reads CapabilityMinima attribute from the DUT."
+      PICS: BINFO.S.A0013
+      command: "readAttribute"
+      attribute: "CapabilityMinima"
+      response:
+          saveAs: CapabilityMinimaValue
+
+    - label:
+          "Step 57: TH writes the CapabilityMinima value with
+          CaseSessionsPerFabric set to 4 and SubscriptionsPerFabric set to 4"
+      PICS: BINFO.S.A0013
+      command: "writeAttribute"
+      attribute: "CapabilityMinima"
+      arguments:
+          value: { "CaseSessionsPerFabric": 4, "SubscriptionsPerFabric": 4 }
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 58: TH reads CapabilityMinima attribute from the DUT."
+      PICS: BINFO.S.A0013
+      command: "readAttribute"
+      attribute: "CapabilityMinima"
+      response:
+          value: CapabilityMinimaValue
+
+    - label: "Step 59: TH reads ProductAppearance from the DUT."
+      PICS: BINFO.S.A0014
+      command: "readAttribute"
+      attribute: "ProductAppearance"
+      response:
+          saveAs: ProductAppearancevalue
+          constraints:
+              type: ProductAppearanceStruct
+
+    - label: "Step 60: TH writes ProductAppearance to the DUT."
+      PICS: BINFO.S.A0014
+      command: "writeAttribute"
+      attribute: "ProductAppearance"
+      arguments:
+          value: { "Finish": 3, "PrimaryColor": 4 }
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 61: TH reads ProductAppearance attribute from the DUT."
+      PICS: BINFO.S.A0014
+      command: "readAttribute"
+      attribute: "ProductAppearance"
+      response:
+          value: ProductAppearancevalue
+
+    - label: "Step 62: TH reads SpecificationVersion from the DUT."
+      PICS: BINFO.S.A0015
+      command: "readAttribute"
+      attribute: "SpecificationVersion"
+      response:
+          saveAs: SpecificationVersionValue
+
+    - label:
+          "Step 62: If the SpecificationVersion value is absent or zero this
+          step cannot be verified, move on to the next step"
+      PICS: BINFO.S.A0015
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: SpecificationVersionValue
+              - name: "Value2"
+                value: null
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsExpectedValue
+
+    - label:
+          "Step 62: SpecificationVersion value should in the inclusive range of
+          (0 to 4294967295) and the initial 7 bits are set to zero."
+      runIf: "!IsExpectedValue"
+      PICS: BINFO.S.A0015
+      command: "readAttribute"
+      attribute: "SpecificationVersion"
+      response:
+          value: SpecificationVersionValue
+          constraints:
+              minValue: 0
+              maxValue: 4294967295
+              hasMasksClear: [0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40]
+
+    - label:
+          "Step 63: TH sends Write request message to DUT to change the value of
+          SpecificationVersion to '0x0103AAF1'."
+      PICS: BINFO.S.A0015
+      command: "writeAttribute"
+      attribute: "SpecificationVersion"
+      arguments:
+          value: "0x0103AAF1"
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 64: TH reads SpecificationVersion attribute from DUT"
+      PICS: BINFO.S.A0015
+      command: "readAttribute"
+      attribute: "SpecificationVersion"
+      response:
+          value: SpecificationVersionValue
+
+    - label: "Step 65: TH reads MaxPathsPerInvoke from the DUT."
+      PICS: BINFO.S.A0016
+      command: "readAttribute"
+      attribute: "MaxPathsPerInvoke"
+      response:
+          saveAs: MaxPathsPerInvokeValue
+          constraints:
+              minValue: 1
+              maxValue: 65535
+
+    - label:
+          "Step 66: TH sends Write request message to DUT to change
+          MaxPathsPerInvoke to a different value."
+      PICS: BINFO.S.A0016
+      command: "writeAttribute"
+      attribute: "MaxPathsPerInvoke"
+      arguments:
+          value: 12345
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 67: TH reads MaxPathsPerInvoke attribute from DUT"
+      PICS: BINFO.S.A0016
+      command: "readAttribute"
+      attribute: "MaxPathsPerInvoke"
+      response:
+          value: MaxPathsPerInvokeValue

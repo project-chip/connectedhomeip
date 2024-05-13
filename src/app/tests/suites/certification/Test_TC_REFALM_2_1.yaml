@@ -1,0 +1,76 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 222.2.1. [TC-REFALM-2.1] Attributes with DUT as Server
+
+PICS:
+    - REFALM.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Refrigerator Alarm"
+    endpoint: 1
+
+tests:
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Step 2: Ensure that the door alarm is not locally suppressed and the
+          door is closed"
+      verification: |
+          Ensure that the door alarm is not locally suppressed and the door is closed
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 3:TH reads from the DUT the Mask attribute"
+      PICS: REFALM.S.A0000
+      command: "readAttribute"
+      attribute: "Mask"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
+
+    - label: "Step 4:TH reads from the DUT the State attribute"
+      PICS: REFALM.S.A0002
+      command: "readAttribute"
+      attribute: "State"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x1]
+
+    - label: "Step 5:TH reads from the DUT the Supportedask attribute"
+      PICS: REFALM.S.A0003
+      command: "readAttribute"
+      attribute: "Supported"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]

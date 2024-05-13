@@ -1,0 +1,99 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 51.2.3. [TC-DGWIFI-2.3] Command received functionality with server as DUT
+
+PICS:
+    - DGWIFI.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "WiFi Network Diagnostics"
+    endpoint: 0
+
+tests:
+    - label: "Step 1: TWait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    #issue #13645
+    # Also, ResetCounts may not work on some platforms yet?
+    # And on Linux since we don't have actual Wi-Fi these error out.
+    - label: "Step 2: TH sends ResetCounts command to DUT"
+      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp
+      command: "ResetCounts"
+
+    - label: "Step 2a: TH reads BeaconLostCount attribute from DUT"
+      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp && DGWIFI.S.A0005
+      command: "readAttribute"
+      attribute: "BeaconLostCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0
+              maxValue: 4294967295
+
+    - label: "Step 2b: TH reads BeaconRxCount attribute from DUT"
+      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp && DGWIFI.S.A0006
+      command: "readAttribute"
+      attribute: "BeaconRxCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0
+              maxValue: 4294967295
+
+    - label: "Step 2c: TH reads PacketMulticastRxCount attribute from DUT"
+      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp && DGWIFI.S.A0007
+      command: "readAttribute"
+      attribute: "PacketMulticastRxCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0
+              maxValue: 4294967295
+
+    - label: "Step 2d: TH reads PacketMulticastTxCount attribute from DUT"
+      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp && DGWIFI.S.A0008
+      command: "readAttribute"
+      attribute: "PacketMulticastTxCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0
+              maxValue: 4294967295
+
+    - label: "Step 2e: TH reads PacketUnicastRxCount attribute from DUT"
+      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp && DGWIFI.S.A0009
+      command: "readAttribute"
+      attribute: "PacketUnicastRxCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0
+              maxValue: 4294967295
+
+    - label: "Step 2f: TH reads PacketUnicastTxCount attribute from DUT"
+      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp && DGWIFI.S.A000a
+      command: "readAttribute"
+      attribute: "PacketUnicastTxCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0
+              maxValue: 4294967295

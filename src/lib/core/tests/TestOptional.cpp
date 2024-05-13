@@ -23,14 +23,15 @@
  *
  */
 
-#include <inttypes.h>
-#include <stdint.h>
-#include <string.h>
+#include <array>
+#include <cinttypes>
+#include <cstdint>
+#include <cstring>
 
 #include <lib/core/Optional.h>
-#include <lib/support/UnitTestRegistration.h>
+#include <lib/support/Span.h>
 
-#include <nlunit-test.h>
+#include <gtest/gtest.h>
 
 using namespace chip;
 
@@ -44,6 +45,8 @@ struct Count
 
     Count(Count && o) : m(o.m) { ++created; }
     Count & operator=(Count &&) = default;
+
+    bool operator==(const Count & o) const { return m == o.m; }
 
     int m;
 
@@ -62,150 +65,155 @@ struct CountMovable : public Count
 public:
     CountMovable(int i) : Count(i) {}
 
-    CountMovable(const CountMovable & o) = delete;
+    CountMovable(const CountMovable & o)           = delete;
     CountMovable & operator=(const CountMovable &) = delete;
 
-    CountMovable(CountMovable && o) = default;
+    CountMovable(CountMovable && o)           = default;
     CountMovable & operator=(CountMovable &&) = default;
 };
 
 int Count::created;
 int Count::destroyed;
 
-static void TestBasic(nlTestSuite * inSuite, void * inContext)
+TEST(TestOptional, TestBasic)
 {
+    // Set up our test Count objects, which will mess with counts, before we reset the
+    // counts.
+    Count c100(100), c101(101), c102(102);
+
     Count::ResetCounter();
 
     {
         auto testOptional = Optional<Count>::Value(100);
-        NL_TEST_ASSERT(inSuite, Count::created == 1 && Count::destroyed == 0);
-        NL_TEST_ASSERT(inSuite, testOptional.HasValue() && testOptional.Value().m == 100);
+        EXPECT_TRUE(Count::created == 1 && Count::destroyed == 0);
+        EXPECT_TRUE(testOptional.HasValue() && testOptional.Value().m == 100);
+        EXPECT_EQ(testOptional, c100);
+        EXPECT_NE(testOptional, c101);
+        EXPECT_NE(testOptional, c102);
 
         testOptional.ClearValue();
-        NL_TEST_ASSERT(inSuite, Count::created == 1 && Count::destroyed == 1);
-        NL_TEST_ASSERT(inSuite, !testOptional.HasValue());
+        EXPECT_TRUE(Count::created == 1 && Count::destroyed == 1);
+        EXPECT_FALSE(testOptional.HasValue());
+        EXPECT_NE(testOptional, c100);
+        EXPECT_NE(testOptional, c101);
+        EXPECT_NE(testOptional, c102);
 
         testOptional.SetValue(Count(101));
-        NL_TEST_ASSERT(inSuite, Count::created == 3 && Count::destroyed == 2);
-        NL_TEST_ASSERT(inSuite, testOptional.HasValue() && testOptional.Value().m == 101);
+        EXPECT_TRUE(Count::created == 3 && Count::destroyed == 2);
+        EXPECT_TRUE(testOptional.HasValue() && testOptional.Value().m == 101);
+        EXPECT_NE(testOptional, c100);
+        EXPECT_EQ(testOptional, c101);
+        EXPECT_NE(testOptional, c102);
 
         testOptional.Emplace(102);
-        NL_TEST_ASSERT(inSuite, Count::created == 4 && Count::destroyed == 3);
-        NL_TEST_ASSERT(inSuite, testOptional.HasValue() && testOptional.Value().m == 102);
+        EXPECT_TRUE(Count::created == 4 && Count::destroyed == 3);
+        EXPECT_TRUE(testOptional.HasValue() && testOptional.Value().m == 102);
+        EXPECT_NE(testOptional, c100);
+        EXPECT_NE(testOptional, c101);
+        EXPECT_EQ(testOptional, c102);
     }
 
-    NL_TEST_ASSERT(inSuite, Count::created == 4 && Count::destroyed == 4);
+    // Our test Count objects are still in scope here.
+    EXPECT_TRUE(Count::created == 4 && Count::destroyed == 4);
 }
 
-static void TestMake(nlTestSuite * inSuite, void * inContext)
+TEST(TestOptional, TestMake)
 {
     Count::ResetCounter();
 
     {
         auto testOptional = MakeOptional<Count>(200);
-        NL_TEST_ASSERT(inSuite, Count::created == 1 && Count::destroyed == 0);
-        NL_TEST_ASSERT(inSuite, testOptional.HasValue() && testOptional.Value().m == 200);
+        EXPECT_TRUE(Count::created == 1 && Count::destroyed == 0);
+        EXPECT_TRUE(testOptional.HasValue() && testOptional.Value().m == 200);
     }
 
-    NL_TEST_ASSERT(inSuite, Count::created == 1 && Count::destroyed == 1);
+    EXPECT_TRUE(Count::created == 1 && Count::destroyed == 1);
 }
 
-static void TestCopy(nlTestSuite * inSuite, void * inContext)
+TEST(TestOptional, TestCopy)
 {
     Count::ResetCounter();
 
     {
         auto testSrc = Optional<Count>::Value(300);
-        NL_TEST_ASSERT(inSuite, Count::created == 1 && Count::destroyed == 0);
-        NL_TEST_ASSERT(inSuite, testSrc.HasValue() && testSrc.Value().m == 300);
+        EXPECT_TRUE(Count::created == 1 && Count::destroyed == 0);
+        EXPECT_TRUE(testSrc.HasValue() && testSrc.Value().m == 300);
 
         {
             Optional<Count> testDst(testSrc);
-            NL_TEST_ASSERT(inSuite, Count::created == 2 && Count::destroyed == 0);
-            NL_TEST_ASSERT(inSuite, testDst.HasValue() && testDst.Value().m == 300);
+            EXPECT_TRUE(Count::created == 2 && Count::destroyed == 0);
+            EXPECT_TRUE(testDst.HasValue() && testDst.Value().m == 300);
         }
-        NL_TEST_ASSERT(inSuite, Count::created == 2 && Count::destroyed == 1);
+        EXPECT_TRUE(Count::created == 2 && Count::destroyed == 1);
 
         {
             Optional<Count> testDst;
-            NL_TEST_ASSERT(inSuite, Count::created == 2 && Count::destroyed == 1);
-            NL_TEST_ASSERT(inSuite, !testDst.HasValue());
+            EXPECT_TRUE(Count::created == 2 && Count::destroyed == 1);
+            EXPECT_FALSE(testDst.HasValue());
 
             testDst = testSrc;
-            NL_TEST_ASSERT(inSuite, Count::created == 3 && Count::destroyed == 1);
-            NL_TEST_ASSERT(inSuite, testDst.HasValue() && testDst.Value().m == 300);
+            EXPECT_TRUE(Count::created == 3 && Count::destroyed == 1);
+            EXPECT_TRUE(testDst.HasValue() && testDst.Value().m == 300);
         }
-        NL_TEST_ASSERT(inSuite, Count::created == 3 && Count::destroyed == 2);
+        EXPECT_TRUE(Count::created == 3 && Count::destroyed == 2);
     }
-    NL_TEST_ASSERT(inSuite, Count::created == 3 && Count::destroyed == 3);
+    EXPECT_TRUE(Count::created == 3 && Count::destroyed == 3);
 }
 
-static void TestMove(nlTestSuite * inSuite, void * inContext)
+TEST(TestOptional, TestMove)
 {
     Count::ResetCounter();
 
     {
         auto testSrc = MakeOptional<CountMovable>(400);
         Optional<CountMovable> testDst(std::move(testSrc));
-        NL_TEST_ASSERT(inSuite, Count::created == 2 && Count::destroyed == 1);
-        NL_TEST_ASSERT(inSuite, testDst.HasValue() && testDst.Value().m == 400);
+        EXPECT_TRUE(Count::created == 2 && Count::destroyed == 1);
+        EXPECT_TRUE(testDst.HasValue() && testDst.Value().m == 400);
     }
-    NL_TEST_ASSERT(inSuite, Count::created == 2 && Count::destroyed == 2);
+    EXPECT_TRUE(Count::created == 2 && Count::destroyed == 2);
 
     {
         Optional<CountMovable> testDst;
-        NL_TEST_ASSERT(inSuite, Count::created == 2 && Count::destroyed == 2);
-        NL_TEST_ASSERT(inSuite, !testDst.HasValue());
+        EXPECT_TRUE(Count::created == 2 && Count::destroyed == 2);
+        EXPECT_FALSE(testDst.HasValue());
 
         auto testSrc = MakeOptional<CountMovable>(401);
         testDst      = std::move(testSrc);
-        NL_TEST_ASSERT(inSuite, Count::created == 4 && Count::destroyed == 3);
-        NL_TEST_ASSERT(inSuite, testDst.HasValue() && testDst.Value().m == 401);
+        EXPECT_TRUE(Count::created == 4 && Count::destroyed == 3);
+        EXPECT_TRUE(testDst.HasValue() && testDst.Value().m == 401);
     }
-    NL_TEST_ASSERT(inSuite, Count::created == 4 && Count::destroyed == 4);
+    EXPECT_TRUE(Count::created == 4 && Count::destroyed == 4);
 }
 
-/**
- *   Test Suite. It lists all the test functions.
- */
-
-// clang-format off
-static const nlTest sTests[] =
+TEST(TestOptional, TestConversion)
 {
-    NL_TEST_DEF("OptionalBasic", TestBasic),
-    NL_TEST_DEF("OptionalMake", TestMake),
-    NL_TEST_DEF("OptionalCopy", TestCopy),
-    NL_TEST_DEF("OptionalMove", TestMove),
+    // FixedSpan is implicitly convertible from std::array
+    using WidgetView    = FixedSpan<const bool, 10>;
+    using WidgetStorage = std::array<bool, 10>;
 
-    NL_TEST_SENTINEL()
-};
-// clang-format on
+    auto optStorage                   = MakeOptional<WidgetStorage>();
+    auto const & constOptStorage      = optStorage;
+    auto optOtherStorage              = MakeOptional<WidgetStorage>();
+    auto const & constOptOtherStorage = optOtherStorage;
 
-int TestOptional_Setup(void * inContext)
-{
-    return SUCCESS;
-}
+    EXPECT_TRUE(optStorage.HasValue());
+    EXPECT_TRUE(optOtherStorage.HasValue());
 
-int TestOptional_Teardown(void * inContext)
-{
-    return SUCCESS;
-}
+    Optional<WidgetView> optView(constOptStorage);
+    EXPECT_TRUE(optView.HasValue());
+    EXPECT_EQ(&optView.Value()[0], &optStorage.Value()[0]);
 
-int TestOptional(void)
-{
-    // clang-format off
-    nlTestSuite theSuite =
+    optView = optOtherStorage;
+    optView = constOptOtherStorage;
+    EXPECT_TRUE(optView.HasValue());
+    EXPECT_EQ(&optView.Value()[0], &optOtherStorage.Value()[0]);
+
+    struct ExplicitBool
     {
-        "Optional",
-        &sTests[0],
-        TestOptional_Setup,
-        TestOptional_Teardown
+        explicit ExplicitBool(bool) {}
     };
-    // clang-format on
+    Optional<ExplicitBool> e(Optional<bool>(true)); // OK, explicitly constructing the optional
 
-    nlTestRunner(&theSuite, nullptr);
-
-    return (nlTestRunnerStats(&theSuite));
+    // The following should not compile
+    // e = Optional<bool>(false); // relies on implicit conversion
 }
-
-CHIP_REGISTER_TEST_SUITE(TestOptional)

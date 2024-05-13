@@ -1,4 +1,4 @@
-# Python based lighting example (bridge) device to DALI.
+# Python-based lighting example (bridge) device to DALI
 
 ## Installation
 

@@ -49,7 +49,9 @@ enum InternalPlatformSpecificEventTypes
     kCHIPoBLERXCharWriteEvent,
     kCHIPoBLETXCharWriteEvent,
     kRtkWiFiStationConnectedEvent,
+    kRtkWiFiStationDisconnectedEvent,
     kRtkWiFiScanCompletedEvent,
+    kRtkWiFiDHCPCompletedEvent,
 };
 
 } // namespace DeviceEventType

@@ -76,22 +76,23 @@ public:
     static constexpr Key kConfigKey_Spake2pSalt           = QorvoConfigKey(kFileId_ChipFactory, 0x09);
     static constexpr Key kConfigKey_Spake2pVerifier       = QorvoConfigKey(kFileId_ChipFactory, 0x0A);
 
-    static constexpr Key kConfigKey_FabricId           = QorvoConfigKey(kFileId_ChipConfig, 0x00);
     static constexpr Key kConfigKey_ServiceConfig      = QorvoConfigKey(kFileId_ChipConfig, 0x01);
     static constexpr Key kConfigKey_PairedAccountId    = QorvoConfigKey(kFileId_ChipConfig, 0x02);
     static constexpr Key kConfigKey_ServiceId          = QorvoConfigKey(kFileId_ChipConfig, 0x03);
-    static constexpr Key kConfigKey_FabricSecret       = QorvoConfigKey(kFileId_ChipConfig, 0x04);
     static constexpr Key kConfigKey_LastUsedEpochKeyId = QorvoConfigKey(kFileId_ChipConfig, 0x05);
     static constexpr Key kConfigKey_FailSafeArmed      = QorvoConfigKey(kFileId_ChipConfig, 0x06);
     static constexpr Key kConfigKey_GroupKey           = QorvoConfigKey(kFileId_ChipConfig, 0x07);
     static constexpr Key kConfigKey_HardwareVersion    = QorvoConfigKey(kFileId_ChipConfig, 0x08);
     static constexpr Key kConfigKey_RegulatoryLocation = QorvoConfigKey(kFileId_ChipConfig, 0x09);
     static constexpr Key kConfigKey_CountryCode        = QorvoConfigKey(kFileId_ChipConfig, 0x0A);
-    static constexpr Key kConfigKey_Breadcrumb         = QorvoConfigKey(kFileId_ChipConfig, 0x0B);
     static constexpr Key kConfigKey_UniqueId           = QorvoConfigKey(kFileId_ChipConfig, 0x0C);
 
     static constexpr Key kConfigKey_GroupKeyBase = QorvoConfigKey(kFileId_ChipConfig, 0x0F);
     static constexpr Key kConfigKey_GroupKeyMax  = QorvoConfigKey(kFileId_ChipConfig, 0x1E); // Allows 16 Group Keys to be created.
+
+    static constexpr Key kCounterKey_RebootCount           = QorvoConfigKey(kFileId_ChipCounter, 0x01);
+    static constexpr Key kCounterKey_BootReason            = QorvoConfigKey(kFileId_ChipCounter, 0x02);
+    static constexpr Key kCounterKey_TotalOperationalHours = QorvoConfigKey(kFileId_ChipCounter, 0x03);
 
     static constexpr Key kConfigKey_CounterKeyBase = QorvoConfigKey(kFileId_ChipCounter, 0x00);
     static constexpr Key kConfigKey_CounterKeyMax =
@@ -100,7 +101,7 @@ public:
     // Set key id limits for each group.
     static constexpr Key kMinConfigKey_ChipFactory = kConfigKey_SerialNum;
     static constexpr Key kMaxConfigKey_ChipFactory = kConfigKey_Spake2pVerifier;
-    static constexpr Key kMinConfigKey_ChipConfig  = kConfigKey_FabricId;
+    static constexpr Key kMinConfigKey_ChipConfig  = kConfigKey_ServiceConfig;
     static constexpr Key kMaxConfigKey_ChipConfig  = kConfigKey_GroupKeyMax;
     static constexpr Key kMinConfigKey_ChipCounter = kConfigKey_CounterKeyBase;
     static constexpr Key kMaxConfigKey_ChipCounter = kConfigKey_CounterKeyMax; // Allows 32 Counters to be created.

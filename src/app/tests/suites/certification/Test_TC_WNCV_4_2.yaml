@@ -13,19 +13,22 @@
 # limitations under the License.
 
 name:
-    Window Covering [TC-WNCV-4.2] GoToTiltPercentage Long-Run Verification with
-    server as DUT
+    Window Covering [TC-WNCV-4.2] GoToTiltPercentage command Long-Run
+    Verification [DUT as Server]
+
+PICS:
+    - WNCV.S
 
 config:
     nodeId: 0x12344321
     cluster: "Window Covering"
     endpoint: 1
     fullMotionDuration:
-        type: INT16U
+        type: int16u
         defaultValue: 6000
 
 tests:
-    - label: "0: Wait for the commissioned device to be retrieved"
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -36,13 +39,14 @@ tests:
     ### Step 1x -> Initialize the Covering position before any testing
     ### MANDATORY Init Commands
     - label:
-          "1a: TH sends DownOrClose command to preposition the DUT in the
+          "Step 1a: TH sends DownOrClose command to preposition the DUT in the
           opposite direction"
       command: "DownOrClose"
+      PICS: WNCV.S.C01.Rsp
 
     ### Step 5x -> Verify the DUT has moved
     ### DUT moves toward its DownOrClose position
-    - label: "1b: TH waits for x seconds movement(s) on the DUT"
+    - label: "Step 1b: TH waits for x seconds movement(s) on the DUT"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -52,29 +56,28 @@ tests:
 
     ### Depends on the FeatureMap -> Check CurrentPosition attributes
     - label:
-          "1c: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute
-          from DUT"
+          "Step 1c: If (PA & TL) TH reads CurrentPositionTiltPercent100ths
+          attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
-      PICS: "WNCV_PA_TL && WNCV_TL"
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
       response:
           constraints:
               notValue: 0
 
     ######## GoToTiltPercentage Long-Run 30 percent #######
     ### Step 2x ->  Check GoToTiltPercentage 30% Long-Run effects
-    - label: "2a: TH sends GoToTiltPercentage command with 30 percent to DUT"
+    - label:
+          "Step 2a: TH sends GoToTiltPercentage command with 30 percent to DUT"
       command: "GoToTiltPercentage"
-      PICS: "WNCV_TL && PICS_CR_GOTOTILTPERCENTAGE"
+      PICS: WNCV.S.F01 && WNCV.S.C08.Rsp
       arguments:
           values:
               - name: "tiltPercent100thsValue"
                 value: 3000
-              - name: "tiltPercentageValue"
-                value: 30
 
     ### Depends on a sleep/wait command how to do this with a real device for CI keep at 100ms
-    - label: "2b: DUT updates its attributes"
+    - label: "Step 2b: TH waits for 100-1000 ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -84,17 +87,17 @@ tests:
 
     ### Mandatory Depends on the FeatureMap
     - label:
-          "2c: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute
-          from DUT"
+          "Step 2c: If (PA & TL) TH reads TargetPositionTiltPercent100ths
+          attribute from DUT"
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
-      PICS: "WNCV_PA_TL && WNCV_TL"
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000c
       response:
           value: 3000
 
     ### Step 3x ->  Verify the DUT has reached its 30%
     ### DUT moves toward its 30% position
-    - label: "3a: TH set a timeout of X minutes for failure"
+    - label: "Step 3a: TH waits for PIXIT.WNCV.FULLMOTION on the DUT"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -103,48 +106,47 @@ tests:
                 value: fullMotionDuration
 
     ### Check for END OF MOVEMENTs
-    - label: "3b: TH reads OperationalStatus attribute from DUT"
+    - label: "Step 3b: TH checks OperationalStatus attribute from DUT"
       command: "readAttribute"
       attribute: "OperationalStatus"
+      PICS: WNCV.S.A000a
       response:
           value: 0
 
     ### Mandatory Depends on the FeatureMap
     - label:
-          "3c: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute
-          from DUT"
-      disabled: true
+          "Step 3c: If (PA & TL) TH reads CurrentPositionTiltPercent100ths
+          attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
-      PICS: "WNCV_PA_TL && WNCV_TL"
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
       response:
           value: 3000
 
     ### Optional Depends on the FeatureMap
     - label:
-          "3d: If (PA & TL) TH reads CurrentPositionTiltPercentage optional
+          "Step 3d: If (PA & TL) TH reads CurrentPositionTiltPercentage optional
           attribute from DUT"
       command: "readAttribute"
-      disabled: true
       attribute: "CurrentPositionTiltPercentage"
-      PICS: "WNCV_PA_TL && WNCV_TL && A_CURRENTPOSITIONTILTPERCENTAGE"
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A0009
       response:
           value: 30
 
     ######## GoToTiltPercentage Long-Run for 60.2 percent #######
     ### Step 4x ->  Check GoToTiltPercentage 60.20% Long-Run effects
-    - label: "4a: TH sends GoToTiltPercentage command with 60.20 percent to DUT"
+    - label:
+          "Step 4a: TH sends GoToTiltPercentage command with 60.05 percent to
+          DUT"
       command: "GoToTiltPercentage"
-      PICS: "WNCV_TL && PICS_CR_GOTOTILTPERCENTAGE"
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.C08.Rsp
       arguments:
           values:
               - name: "tiltPercent100thsValue"
                 value: 6005
-              - name: "tiltPercentageValue"
-                value: 60
 
     ### Depends on a sleep/wait command how to do this with a real device for CI keep at 100ms
-    - label: "4b: DUT updates its attributes"
+    - label: "Step 4b: TH waits for 100-1000 ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -154,18 +156,17 @@ tests:
 
     ### Mandatory Depends on the FeatureMap
     - label:
-          "4c: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute
-          from DUT"
-      disabled: true
+          "Step 4c: If (PA & TL) TH reads TargetPositionTiltPercent100ths
+          attribute from DUT"
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
-      PICS: "WNCV_PA_TL && WNCV_TL"
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000c
       response:
           value: 6005
 
     ### Step 5x ->  Verify the DUT has reached its 60.2%
     ### DUT moves toward its 60.2% position
-    - label: "5a: TH waits for x seconds movement(s) on the DUT"
+    - label: "Step 5a: TH waits for PIXIT.WNCV.FULLMOTION on the DUT"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -174,29 +175,28 @@ tests:
                 value: fullMotionDuration
 
     ### Check for END OF MOVEMENTs
-    - label: "5b: TH reads OperationalStatus attribute from DUT"
+    - label: "Step 5b: TH reads OperationalStatus attribute from DUT"
       command: "readAttribute"
       attribute: "OperationalStatus"
+      PICS: WNCV.S.A000a
       response:
           value: 0
 
     ### Mandatory Depends on the FeatureMap
     - label:
-          "5c: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute
-          from DUT"
-      disabled: true
+          "Step 5c: If (PA & TL) TH reads CurrentPositionTiltPercent100ths
+          attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
-      PICS: "WNCV_PA_TL && WNCV_TL"
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
       response:
           value: 6005
 
     ### Optional Depends on the FeatureMap
     - label:
-          "5d: If (PA & TL) TH reads CurrentPositionTiltPercentage optional
+          "Step 5d: If (PA & TL) TH reads CurrentPositionTiltPercentage optional
           attribute from DUT"
-      disabled: true
-      PICS: "WNCV_PA_TL && WNCV_TL && A_CURRENTPOSITIONTILTPERCENTAGE"
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A0009
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"
       response:

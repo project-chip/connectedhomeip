@@ -16,7 +16,9 @@
  */
 #include "DeviceAttestationVerifier.h"
 
+#include <credentials/DeviceAttestationConstructor.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/support/CHIPMem.h>
 
 using namespace chip::Crypto;
 
@@ -67,6 +69,14 @@ public:
         (void) csrNonce;
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
+
+    void CheckForRevokedDACChain(const AttestationInfo & info,
+                                 Callback::Callback<OnAttestationInformationVerification> * onCompletion) override
+    {
+        (void) info;
+        (void) onCompletion;
+        VerifyOrDie(false);
+    }
 };
 
 // Default to avoid nullptr on getter and cleanly handle new products/clients before
@@ -109,6 +119,35 @@ void SetDeviceAttestationVerifier(DeviceAttestationVerifier * verifier)
     }
 
     gDacVerifier = verifier;
+}
+
+static inline Platform::ScopedMemoryBufferWithSize<uint8_t> CopyByteSpanHelper(const ByteSpan & span_to_copy)
+{
+    Platform::ScopedMemoryBufferWithSize<uint8_t> bufferCopy;
+    if (bufferCopy.Alloc(span_to_copy.size()))
+    {
+        memcpy(bufferCopy.Get(), span_to_copy.data(), span_to_copy.size());
+    }
+    return bufferCopy;
+}
+
+DeviceAttestationVerifier::AttestationDeviceInfo::AttestationDeviceInfo(const AttestationInfo & attestationInfo) :
+    mPaiDerBuffer(CopyByteSpanHelper(attestationInfo.paiDerBuffer)),
+    mDacDerBuffer(CopyByteSpanHelper(attestationInfo.dacDerBuffer)), mBasicInformationVendorId(attestationInfo.vendorId),
+    mBasicInformationProductId(attestationInfo.productId)
+{
+    ByteSpan certificationDeclarationSpan;
+    ByteSpan attestationNonceSpan;
+    uint32_t timestampDeconstructed;
+    ByteSpan firmwareInfoSpan;
+    DeviceAttestationVendorReservedDeconstructor vendorReserved;
+
+    if (DeconstructAttestationElements(attestationInfo.attestationElementsBuffer, certificationDeclarationSpan,
+                                       attestationNonceSpan, timestampDeconstructed, firmwareInfoSpan,
+                                       vendorReserved) == CHIP_NO_ERROR)
+    {
+        mCdBuffer = CopyByteSpanHelper(certificationDeclarationSpan);
+    }
 }
 
 } // namespace Credentials

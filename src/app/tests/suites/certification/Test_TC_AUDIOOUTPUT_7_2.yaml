@@ -1,0 +1,93 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 19.9.2. [TC-AUDIOOUTPUT-7.2] Rename Output Verification
+
+PICS:
+    - AUDIOOUTPUT.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Audio Output"
+    endpoint: 1
+    Index:
+        type: int8u
+        defaultValue: 1
+
+tests:
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 1: TH reads the OutputList attribute from the DUT"
+      PICS: AUDIOOUTPUT.S.A0000
+      command: "readAttribute"
+      attribute: "OutputList"
+      response:
+          saveAs: audioOutputListValues
+          constraints:
+              type: list
+
+    - label:
+          "Step 2: TH sends a RenameOutput command to the DUT with an index from
+          the list in step 1 and the name 'CertTest'"
+      PICS: AUDIOOUTPUT.S.C01.Rsp
+      command: "RenameOutput"
+      arguments:
+          values:
+              - name: "Index"
+                value: Index
+              - name: "Name"
+                value: "CertTest"
+
+    #Disabled due to issue- #13029
+    - label:
+          "Step 3: TH reads the OutputList attribute from the DUT. Verify that
+          the output at the index provided in step 2 has the name CertTest"
+      verification: |
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool audiooutput read output-list 1 1
+          ./chip-tv-casting-app audiooutput read output-list 1 1
+
+          On TH(chip-tool),  Verify that the output at the index provided in step 2 has the name "CertTest".
+          [1651061821.366426][156898:156903] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_050B Attribute 0x0000_0000 DataVersion: 372822880
+          [1651061821.366510][156898:156903] CHIP:TOO:   OutputList: 3 entries
+          [1651061821.366575][156898:156903] CHIP:TOO:     [1]: {
+          [1651061821.366603][156898:156903] CHIP:TOO:       Index: 1
+          [1651061821.366619][156898:156903] CHIP:TOO:       OutputType: 0
+          [1651061821.366635][156898:156903] CHIP:TOO:       Name: CertTest
+          [1651061821.366651][156898:156903] CHIP:TOO:      }
+          [1651061821.366675][156898:156903] CHIP:TOO:     [2]: {
+          [1651061821.366690][156898:156903] CHIP:TOO:       Index: 2
+          [1651061821.366705][156898:156903] CHIP:TOO:       OutputType: 0
+          [1651061821.366719][156898:156903] CHIP:TOO:       Name: HDMI
+          [1651061821.366734][156898:156903] CHIP:TOO:      }
+          [1651061821.366755][156898:156903] CHIP:TOO:     [3]: {
+          [1651061821.366770][156898:156903] CHIP:TOO:       Index: 3
+          [1651061821.366785][156898:156903] CHIP:TOO:       OutputType: 0
+          [1651061821.366799][156898:156903] CHIP:TOO:       Name: HDMI
+          [1651061821.366814][156898:156903] CHIP:TOO:      }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && AUDIOOUTPUT.S.A0001 && AUDIOOUTPUT.S.C01.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"

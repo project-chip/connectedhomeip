@@ -13,8 +13,11 @@
 # limitations under the License.
 
 name:
-    Window Covering [TC-WNCV-4.4] GoToTiltPercentage Limits Verification with
-    server as DUT
+    Window Covering [TC-WNCV-4.4] GoToTiltPercentage command Limits Verification
+    [DUT as Server]
+
+PICS:
+    - WNCV.S
 
 config:
     nodeId: 0x12344321
@@ -22,7 +25,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "0: Wait for the commissioned device to be retrieved"
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -35,11 +38,11 @@ tests:
     ### Step 1x -> Verify the Tilt Percent100ths and Percent attributes
     ### Shall be tested as equals CurrentPositionTiltPercent100ths
     - label:
-          "1a: If (PA_TL & TL) TH reads CurrentPositionTiltPercent100ths from
-          DUT"
+          "Step 1a: If (PA_TL & TL) TH reads CurrentPositionTiltPercent100ths
+          from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
-      PICS: WNCV_TL && WNCV_PA_TL
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
       response:
           saveAs: attrCurrentPositionTiltPercent100ths
           constraints:
@@ -47,63 +50,55 @@ tests:
               maxValue: 10000
 
     - label:
-          "1b: If (PA_TL & TL) TH reads CurrentPositionTiltPercentage from DUT"
+          "Step 1b 1c: If (PA_LF & LF) TH reads CurrentPositionTiltPercentage
+          from DUT + assert CurrentPositionTiltPercent100ths/100 equals
+          CurrentPositionTiltPercentage"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"
-      PICS: WNCV_TL && WNCV_PA_TL && A_CURRENTPOSITIONTILTPERCENTAGE
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f && WNCV.S.A0009
       response:
-          saveAs: attrCurrentPositionTiltPercentage
+          value: attrCurrentPositionTiltPercent100ths / 100
           constraints:
               minValue: 0
               maxValue: 100
 
-    ##- label: "1c: If (PA_TL & TL) TH assert CurrentPositionTiltPercent100ths/100 equals CurrentPositionTiltPercentage"
-    ##  PICS: WNCV_TL && WNCV_PA_TL && A_CURRENTPOSITIONTILTPERCENTAGE
-    # TODO [TC_WNCV_4_4] WindowCovering Fix this arithmetic operation issue #15190
-
     ######## Command BadParams 1 #######
     ### Step 2x -> Verify the GoToTiltPercentage with a BadParam
 
-    # - label: "2a: TH Generate a random badParam"
+    # - label: "Step 2a: TH Generate a random badParam"
     # since we don't know how to generate a random bad param
     # we use a default badParam for this test
 
-    - label: "2b: TH sends GoToTiltPercentage command with BadParam to DUT"
+    - label: "Step 2b: TH sends GoToTiltPercentage command with BadParam to DUT"
       command: "GoToTiltPercentage"
-      PICS: WNCV_TL && WNCV_PA_TL || WNCV_TL && PICS_CR_GOTOTILTPERCENTAGE
+      PICS: WNCV.S.F01 && WNCV.S.F04 || WNCV.S.F01 && WNCV.S.C08.Rsp
       arguments:
           values:
-              - name: "TiltPercent100thsValue"
+              - name: "tiltPercent100thsValue"
                 value: 0x3000
-              - name: "TiltPercentageValue"
-                value: 0x3F
       response:
           error: CONSTRAINT_ERROR
 
     ######## Command BadParams 2 ######
     ### Step 3x -> Verify the GoToTiltPercentage with 10001 as param
-    - label: "3a: TH sends GoToTiltPercentage command with 10001 to DUT"
+    - label: "Step 3a: TH sends GoToTiltPercentage command with 10001 to DUT"
       command: "GoToTiltPercentage"
-      PICS: WNCV_TL && WNCV_PA_TL || WNCV_TL && PICS_CR_GOTOTILTPERCENTAGE
+      PICS: WNCV.S.F01 && WNCV.S.F04 || WNCV.S.F01 && WNCV.S.C08.Rsp
       arguments:
           values:
-              - name: "TiltPercent100thsValue"
+              - name: "tiltPercent100thsValue"
                 value: 10001
-              - name: "TiltPercentageValue"
-                value: 100
       response:
           error: CONSTRAINT_ERROR
 
     ######## Command BadParams 3 ######
     ### Step 4x -> Verify the GoToTiltPercentage with 0xFFFF as param
-    - label: "4a: TH sends GoToTiltPercentage command with 0xFFFF to DUT"
+    - label: "Step 4a: TH sends GoToTiltPercentage command with 0xFFFF to DUT"
       command: "GoToTiltPercentage"
-      PICS: WNCV_TL && WNCV_PA_TL || WNCV_TL && PICS_CR_GOTOTILTPERCENTAGE
+      PICS: WNCV.S.F01 && WNCV.S.F04 || WNCV.S.F01 && WNCV.S.C08.Rsp
       arguments:
           values:
-              - name: "TiltPercent100thsValue"
+              - name: "tiltPercent100thsValue"
                 value: 0xFFFF
-              - name: "TiltPercentageValue"
-                value: 0xFF
       response:
           error: CONSTRAINT_ERROR

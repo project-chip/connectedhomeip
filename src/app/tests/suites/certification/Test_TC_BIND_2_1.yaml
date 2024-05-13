@@ -1,0 +1,388 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 119.2.1. [TC-BIND-2.1] Binding Cluster Attributes-Node [DUT-Controller]
+
+PICS:
+    - BIND.C
+    - MCORE.ROLE.CONTROLLER
+    - "!MCORE.DT_SW_COMP"
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the DUT as controller test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+
+          1.This test case requires 4 raspi to execute.  1 raspi as Commissioner. and 1 raspi as dut[Controller]  2 raspi as controllee
+
+          2. In this example, RASP is used as DUT & it requires additional shell access to execute the controller commands. To support the shell, use the following command to build the all-clusters-app . On the DUT device  Use - [scripts/examples/gn_build_example.sh examples/all-clusters-app/linux/ out/all-clusters-app chip_inet_config_enable_ipv4=false chip_build_libshell=true ]  - (Vendor DUT must have this provision to execute the controller commands. )
+
+          3.Pair TH2 , TH3 with ble-wifi with different discriminator as mentioned below test steps , using the chip-tool running as commissioner in one RPI.
+
+          4.using the commissioner  write the ACL entries on both TH2 and TH3 for allowing to receive commands for onoff cluster from DUT(Controller)
+
+          5.Hit the Enter button on raspi , you will see a shell prompt (>) , enter help,  this would list the command for switch . At the prompt enter switch on ,the "on" command is sent to both TH2 and TH3. and the command and corresponding response can be verified in the log.  to test if the TH2/TH3 are turned on or not, you can read the on-off attribute status. Read the status before sending the switch on command and read after sending the command. you should see the value changing.
+      disabled: true
+
+    - label: "Pre-Conditions"
+      verification: |
+          1 TH2 supports On/Off server on Endpoint 1.
+
+          2 TH3 supports On/Off server on Endpoint 2.
+
+          3 DUT supports On/Off client.
+
+          1. TH1 - Test Harness1 as Commissioner
+
+          2. TH2 - Test Harness2 as Controlee
+
+          3. TH3 - Test Harness3 as Controlee
+
+          4. DUT - Controller
+      disabled: true
+
+    - label: "Step 1: Factory Reset DUT"
+      verification: |
+          Vendor specific action, for chip-tool run
+          rm -rf /tmp/chip*
+      disabled: true
+
+    - label: "Step 2: Commission DUT to TH1s fabric"
+      verification: |
+          ./chip-tool pairing onnetwork 1 20202021
+      disabled: true
+
+    - label: "Step 3: Commission TH2 to TH1s fabric (Node ID = 2)"
+      verification: |
+          ./chip-tool pairing ble-wifi 2 chipsetup4 matter123 20202021 3840
+      disabled: true
+
+    - label: "Step 4: Commission TH3 to TH1s fabric (Node ID = 3)"
+      verification: |
+          ./chip-tool pairing ble-wifi 3 chipsetup4 matter123 20202021 3841
+      disabled: true
+
+    - label:
+          "Step 5: TH1 writes Binding entries into DUT on the endpoint with the
+          On/Off client with Entry 1: Node = 2 Cluster = 0x0006(onoff) Endpoint
+          = 1 Entry 2: Node = 3 Cluster = 0x0006(onoff) Endpoint = 2 Note: Node
+          2 corresponds to TH2s Node ID Node 3 corresponds to TH3s Node ID"
+      verification: |
+          ./chip-tool binding write binding '[{"node" : 2 , "cluster" : "0x0006" , "endpoint" : 1 }, { "node" : 3 , "cluster" : "0x0006" , "endpoint" : 2  }]' 1 1
+
+          Verify the SUCCESS status response On TH1(Chip-tool) log and below is the sample log provided for the raspi platform
+
+          [1686231481.225889][13509:13511] CHIP:DMG: WriteResponseMessage =
+          [1686231481.225946][13509:13511] CHIP:DMG: {
+          [1686231481.225995][13509:13511] CHIP:DMG:         AttributeStatusIBs =
+          [1686231481.226068][13509:13511] CHIP:DMG:         [
+          [1686231481.226124][13509:13511] CHIP:DMG:                 AttributeStatusIB =
+          [1686231481.226187][13509:13511] CHIP:DMG:                 {
+          [1686231481.226247][13509:13511] CHIP:DMG:                         AttributePathIB =
+          [1686231481.226322][13509:13511] CHIP:DMG:                         {
+          [1686231481.226391][13509:13511] CHIP:DMG:                                 Endpoint = 0x1,
+          [1686231481.226467][13509:13511] CHIP:DMG:                                 Cluster = 0x1e,
+          [1686231481.226542][13509:13511] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1686231481.226613][13509:13511] CHIP:DMG:                         }
+          [1686231481.226692][13509:13511] CHIP:DMG:
+          [1686231481.226758][13509:13511] CHIP:DMG:                         StatusIB =
+          [1686231481.226828][13509:13511] CHIP:DMG:                         {
+          [1686231481.226900][13509:13511] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1686231481.226970][13509:13511] CHIP:DMG:                         },
+          [1686231481.227120][13509:13511] CHIP:DMG:
+          [1686231481.227186][13509:13511] CHIP:DMG:                 },
+          [1686231481.227270][13509:13511] CHIP:DMG:
+          [1686231481.227326][13509:13511] CHIP:DMG:                 AttributeStatusIB =
+          [1686231481.227387][13509:13511] CHIP:DMG:                 {
+          [1686231481.227446][13509:13511] CHIP:DMG:                         AttributePathIB =
+          [1686231481.227514][13509:13511] CHIP:DMG:                         {
+          [1686231481.227584][13509:13511] CHIP:DMG:                                 Endpoint = 0x1,
+          [1686231481.227658][13509:13511] CHIP:DMG:                                 Cluster = 0x1e,
+          [1686231481.227733][13509:13511] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1686231481.227806][13509:13511] CHIP:DMG:                                 ListIndex = Null,
+          [1686231481.227875][13509:13511] CHIP:DMG:                         }
+          [1686231481.228035][13509:13511] CHIP:DMG:
+          [1686231481.228103][13509:13511] CHIP:DMG:                         StatusIB =
+          [1686231481.228171][13509:13511] CHIP:DMG:                         {
+          [1686231481.228242][13509:13511] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1686231481.228312][13509:13511] CHIP:DMG:                         },
+          [1686231481.228381][13509:13511] CHIP:DMG:
+          [1686231481.228439][13509:13511] CHIP:DMG:                 },
+          [1686231481.228524][13509:13511] CHIP:DMG:
+          [1686231481.228580][13509:13511] CHIP:DMG:                 AttributeStatusIB =
+          [1686231481.228641][13509:13511] CHIP:DMG:                 {
+          [1686231481.228701][13509:13511] CHIP:DMG:                         AttributePathIB =
+          [1686231481.228768][13509:13511] CHIP:DMG:                         {
+          [1686231481.228917][13509:13511] CHIP:DMG:                                 Endpoint = 0x1,
+          [1686231481.229041][13509:13511] CHIP:DMG:                                 Cluster = 0x1e,
+          [1686231481.229119][13509:13511] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1686231481.229192][13509:13511] CHIP:DMG:                                 ListIndex = Null,
+          [1686231481.229262][13509:13511] CHIP:DMG:                         }
+          [1686231481.229340][13509:13511] CHIP:DMG:
+          [1686231481.229470][13509:13511] CHIP:DMG:                         StatusIB =
+          [1686231481.229545][13509:13511] CHIP:DMG:                         {
+          [1686231481.229616][13509:13511] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1686231481.229686][13509:13511] CHIP:DMG:                         },
+          [1686231481.229755][13509:13511] CHIP:DMG:
+          [1686231481.229814][13509:13511] CHIP:DMG:                 },
+          [1686231481.229882][13509:13511] CHIP:DMG:
+          [1686231481.229936][13509:13511] CHIP:DMG:         ],
+          [1686231481.230023][13509:13511] CHIP:DMG:
+          [1686231481.230125][13509:13511] CHIP:DMG:         InteractionModelRevision = 1
+          [1686231481.230180][13509:13511] CHIP:DMG: }
+      disabled: true
+
+    - label: "Step 6: TH1 enables DUT as Controller"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Step 7: DUT is triggered to send On command to its binding node
+          entries"
+      PICS: OO.C.C01.Tx
+      verification: |
+          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [1], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}]}]' 2 0
+
+          Verify the SUCCESS status response On TH1(Chip-tool) log and below is the sample log provided for the raspi platform
+
+          [1652330385.328196][3240:3245] CHIP:DMG:                        StatusIB =
+          [1652330385.328229][3240:3245] CHIP:DMG:                        {
+          [1652330385.328264][3240:3245] CHIP:DMG:                                status = 0x00 (SUCCESS),
+          [1652330385.328298][3240:3245] CHIP:DMG:                        },
+
+
+          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [1], "targets": [{"cluster": 6, "endpoint": 2, "deviceType": null}]}]' 3 0
+
+          Verify the SUCCESS status response On TH1(Chip-tool) log and below is the sample log provided for the raspi platform
+
+          [1650610345.847274][2626:2631] CHIP:DMG:                                StatusIB =
+          [1650610345.847317][2626:2631] CHIP:DMG:                                {
+          [1650610345.847383][2626:2631] CHIP:DMG:                                        status = 0x00 (SUCCESS),
+          [1650610345.847429][2626:2631] CHIP:DMG:                                },
+
+          NOTE:
+          Every DUT should have their own mechanism to trigger on/off mechanism.
+
+          DUT sends On command in the shell
+          >switch on
+
+          On TH2(all-cluster-app) log, Verify that TH2 receives On command and below is the sample log provided for the raspi platform
+
+          [1686569607.687455][68496:68496] CHIP:DMG: InvokeRequestMessage =
+          [1686569607.687516][68496:68496] CHIP:DMG: {
+          [1686569607.687570][68496:68496] CHIP:DMG:         suppressResponse = false,
+          [1686569607.687632][68496:68496] CHIP:DMG:         timedRequest = false,
+          [1686569607.687689][68496:68496] CHIP:DMG:         InvokeRequests =
+          [1686569607.687759][68496:68496] CHIP:DMG:         [
+          [1686569607.687815][68496:68496] CHIP:DMG:                 CommandDataIB =
+          [1686569607.687891][68496:68496] CHIP:DMG:                 {
+          [1686569607.687954][68496:68496] CHIP:DMG:                         CommandPathIB =
+          [1686569607.688024][68496:68496] CHIP:DMG:                         {
+          [1686569607.688097][68496:68496] CHIP:DMG:                                 EndpointId = 0x1,
+          [1686569607.688172][68496:68496] CHIP:DMG:                                 ClusterId = 0x6,
+          [1686569607.688245][68496:68496] CHIP:DMG:                                 CommandId = 0x1,
+          [1686569607.688316][68496:68496] CHIP:DMG:                         },
+          [1686569607.688385][68496:68496] CHIP:DMG:
+          [1686569607.688450][68496:68496] CHIP:DMG:                         CommandFields =
+          [1686569607.688629][68496:68496] CHIP:DMG:                         {
+          [1686569607.688706][68496:68496] CHIP:DMG:                         },
+          [1686569607.688772][68496:68496] CHIP:DMG:                 },
+          [1686569607.688842][68496:68496] CHIP:DMG:
+          [1686569607.688897][68496:68496] CHIP:DMG:         ],
+          [1686569607.688966][68496:68496] CHIP:DMG:
+          [1686569607.689085][68496:68496] CHIP:DMG:         InteractionModelRevision = 1
+          [1686569607.689141][68496:68496] CHIP:DMG: },
+
+
+          On TH3(all-cluster-app) log, Verify that TH3 receives On command  and below is the sample log provided for the raspi platform
+
+          [1686569607.660350][46545:46545] CHIP:DMG: InvokeRequestMessage =
+          [1686569607.660410][46545:46545] CHIP:DMG: {
+          [1686569607.660462][46545:46545] CHIP:DMG:         suppressResponse = false,
+          [1686569607.660522][46545:46545] CHIP:DMG:         timedRequest = false,
+          [1686569607.660578][46545:46545] CHIP:DMG:         InvokeRequests =
+          [1686569607.660648][46545:46545] CHIP:DMG:         [
+          [1686569607.660739][46545:46545] CHIP:DMG:                 CommandDataIB =
+          [1686569607.660802][46545:46545] CHIP:DMG:                 {
+          [1686569607.660884][46545:46545] CHIP:DMG:                         CommandPathIB =
+          [1686569607.660956][46545:46545] CHIP:DMG:                         {
+          [1686569607.661026][46545:46545] CHIP:DMG:                                 EndpointId = 0x2,
+          [1686569607.661126][46545:46545] CHIP:DMG:                                 ClusterId = 0x6,
+          [1686569607.661201][46545:46545] CHIP:DMG:                                 CommandId = 0x1,
+          [1686569607.661293][46545:46545] CHIP:DMG:                         },
+          [1686569607.661367][46545:46545] CHIP:DMG:
+          [1686569607.661449][46545:46545] CHIP:DMG:                         CommandFields =
+          [1686569607.661517][46545:46545] CHIP:DMG:                         {
+          [1686569607.661606][46545:46545] CHIP:DMG:                         },
+          [1686569607.661672][46545:46545] CHIP:DMG:                 },
+          [1686569607.661741][46545:46545] CHIP:DMG:
+          [1686569607.661817][46545:46545] CHIP:DMG:         ],
+          [1686569607.661887][46545:46545] CHIP:DMG:
+          [1686569607.661963][46545:46545] CHIP:DMG:         InteractionModelRevision = 1
+          [1686569607.662019][46545:46545] CHIP:DMG: },
+
+
+          Verify DUT receives SUCCESS response from TH2(all-cluster-app)
+
+          [1686569607.703553][48796:48796] CHIP:DMG:                                 StatusIB =
+          [1686569607.703635][48796:48796] CHIP:DMG:                                 {
+          [1686569607.703711][48796:48796] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1686569607.703785][48796:48796] CHIP:DMG:                                 },
+
+          Verify DUT receives SUCCESS response from TH3(all-cluster-app)
+
+          [1686569607.703553][48796:48796] CHIP:DMG:                                 StatusIB =
+          [1686569607.703635][48796:48796] CHIP:DMG:                                 {
+          [1686569607.703711][48796:48796] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1686569607.703785][48796:48796] CHIP:DMG:                                 },
+      disabled: true
+
+    - label: "Step 8: TH1 reads OnOff attribute from TH2 (Endpoint 1)"
+      PICS: OO.C.C01.Tx
+      verification: |
+          ./chip-tool onoff read on-off 2 1
+
+          On TH1 (Chip-tool) log, Verify that OnOff value is set to On(TRUE) and below is the sample log provided for the raspi platform
+
+          [1657798291.396477][3835:3841] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 4260513117
+          [1657798291.396514][3835:3841] CHIP:TOO:   OnOff: TRUE
+      disabled: true
+
+    - label:
+          "Step 9: TH1 removes second binding entry corresponding to TH3 from
+          DUT"
+      verification: |
+          ./chip-tool binding write binding '[{"node" : 2 , "cluster" : "0x0006" , "endpoint" : 1 }]' 1 1
+
+          Verify the SUCCESS status response On TH1(Chip-tool) log and below is the sample log provided for the raspi platform
+
+          [1657800844.739922][4000:4006] CHIP:DMG: WriteResponseMessage =
+          [1657800844.739949][4000:4006] CHIP:DMG: {
+          [1657800844.739990][4000:4006] CHIP:DMG:         AttributeStatusIBs =
+          [1657800844.740021][4000:4006] CHIP:DMG:         [
+          [1657800844.740057][4000:4006] CHIP:DMG:                 AttributeStatusIB =
+          [1657800844.740111][4000:4006] CHIP:DMG:                 {
+          [1657800844.740150][4000:4006] CHIP:DMG:                         AttributePathIB =
+          [1657800844.740195][4000:4006] CHIP:DMG:                         {
+          [1657800844.740230][4000:4006] CHIP:DMG:                                 Endpoint = 0x0,
+          [1657800844.740275][4000:4006] CHIP:DMG:                                 Cluster = 0x1e,
+          [1657800844.740322][4000:4006] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1657800844.740359][4000:4006] CHIP:DMG:                         }
+          [1657800844.740405][4000:4006] CHIP:DMG:
+          [1657800844.740444][4000:4006] CHIP:DMG:                         StatusIB =
+          [1657800844.740477][4000:4006] CHIP:DMG:                         {
+          [1657800844.740516][4000:4006] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1657800844.740548][4000:4006] CHIP:DMG:                         },
+          [1657800844.740584][4000:4006] CHIP:DMG:
+          [1657800844.740607][4000:4006] CHIP:DMG:                 },
+          [1657800844.740653][4000:4006] CHIP:DMG:
+          [1657800844.740687][4000:4006] CHIP:DMG:                 AttributeStatusIB =
+          [1657800844.740714][4000:4006] CHIP:DMG:                 {
+          [1657800844.740748][4000:4006] CHIP:DMG:                         AttributePathIB =
+          [1657800844.740781][4000:4006] CHIP:DMG:                         {
+          [1657800844.740820][4000:4006] CHIP:DMG:                                 Endpoint = 0x0,
+          [1657800844.740858][4000:4006] CHIP:DMG:                                 Cluster = 0x1e,
+          [1657800844.740905][4000:4006] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1657800844.740946][4000:4006] CHIP:DMG:                                 ListIndex = Null,
+          [1657800844.740981][4000:4006] CHIP:DMG:                         }
+          [1657800844.741025][4000:4006] CHIP:DMG:
+          [1657800844.741063][4000:4006] CHIP:DMG:                         StatusIB =
+          [1657800844.741094][4000:4006] CHIP:DMG:                         {
+          [1657800844.741133][4000:4006] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1657800844.741168][4000:4006] CHIP:DMG:                         },
+          [1657800844.741208][4000:4006] CHIP:DMG:
+          [1657800844.741241][4000:4006] CHIP:DMG:                 },
+          [1657800844.741272][4000:4006] CHIP:DMG:
+          [1657800844.741295][4000:4006] CHIP:DMG:         ],
+          [1657800844.741336][4000:4006] CHIP:DMG:
+          [1657800844.741369][4000:4006] CHIP:DMG:         InteractionModelRevision = 1
+          [1657800844.741392][4000:4006] CHIP:DMG: }
+          [1657800844.741511][4000:4006] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1657800844.741591][4000:4006] CHIP:EM: Sending Standalone Ack for MessageCounter:142199059 on exchange 12653i
+      disabled: true
+
+    - label:
+          "Step 10: DUT is triggered to send off command to its binding entries"
+      PICS: OO.C.C00.Tx
+      verification: |
+          DUT sends off command in the shell
+
+          >switch off
+
+          On TH2(all-cluster-app) log, Verify that TH2 receives Off command and below is the sample log provided for the raspi platform
+
+          [1686570217.594079][68496:68496] CHIP:DMG: InvokeRequestMessage =
+          [1686570217.594141][68496:68496] CHIP:DMG: {
+          [1686570217.594194][68496:68496] CHIP:DMG:         suppressResponse = false,
+          [1686570217.594256][68496:68496] CHIP:DMG:         timedRequest = false,
+          [1686570217.594314][68496:68496] CHIP:DMG:         InvokeRequests =
+          [1686570217.594385][68496:68496] CHIP:DMG:         [
+          [1686570217.594481][68496:68496] CHIP:DMG:                 CommandDataIB =
+          [1686570217.594545][68496:68496] CHIP:DMG:                 {
+          [1686570217.594626][68496:68496] CHIP:DMG:                         CommandPathIB =
+          [1686570217.594706][68496:68496] CHIP:DMG:                         {
+          [1686570217.594776][68496:68496] CHIP:DMG:                                 EndpointId = 0x1,
+          [1686570217.594873][68496:68496] CHIP:DMG:                                 ClusterId = 0x6,
+          [1686570217.594947][68496:68496] CHIP:DMG:                                 CommandId = 0x0,
+          [1686570217.595037][68496:68496] CHIP:DMG:                         },
+          [1686570217.595111][68496:68496] CHIP:DMG:
+          [1686570217.595202][68496:68496] CHIP:DMG:                         CommandFields =
+          [1686570217.595271][68496:68496] CHIP:DMG:                         {
+          [1686570217.595360][68496:68496] CHIP:DMG:                         },
+          [1686570217.595426][68496:68496] CHIP:DMG:                 },
+          [1686570217.595494][68496:68496] CHIP:DMG:
+          [1686570217.595571][68496:68496] CHIP:DMG:         ],
+          [1686570217.595640][68496:68496] CHIP:DMG:
+          [1686570217.595715][68496:68496] CHIP:DMG:         InteractionModelRevision = 1
+          [1686570217.595772][68496:68496] CHIP:DMG: },
+
+          Verify DUT receives SUCCESS response from TH2(all-cluster-app)
+
+          [1686570217.617563][48796:48796] CHIP:DMG:                                 StatusIB =
+          [1686570217.617622][48796:48796] CHIP:DMG:                                 {
+          [1686570217.617679][48796:48796] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1686570217.617735][48796:48796] CHIP:DMG:                                 },
+
+          Note:
+          TH3 does not receive off command .
+      disabled: true
+
+    - label: "Step 11: TH1 reads OnOff attribute from TH2 (Endpoint 1)"
+      PICS: OO.C.C00.Tx
+      verification: |
+          ./chip-tool onoff read on-off  2 1
+
+          On TH1 (Chip-tool) log, Verify that OnOff value is set to Off(FALSE) and below is the sample log provided for the raspi platform
+
+          [1657803168.769564][4272:4277] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 1968648540
+          [1657803168.769598][4272:4277] CHIP:TOO:   OnOff: FALSE
+      disabled: true
+
+    - label: "Step 12: TH1 reads OnOff attribute from TH3 (Endpoint 2)"
+      PICS: OO.C.C01.Tx
+      verification: |
+          ./chip-tool onoff read on-off 3 2
+
+          On TH1 (Chip-tool) log, Verify that OnOff value is set to On(TRUE) and below is the sample log provided for the raspi platform
+
+          [1657803609.731464][4333:4339] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 3914456390
+          [1657803609.731521][4333:4339] CHIP:TOO:   OnOff: TRUE
+      disabled: true

@@ -18,8 +18,16 @@
 #include "AppMain.h"
 #include <app/server/Server.h>
 
+#include <CommissionableInit.h>
+
 using namespace chip;
 using namespace chip::DeviceLayer;
+
+namespace {
+
+LinuxCommissionableDataProvider gCommissionableDataProvider;
+
+}
 
 void CleanShutdown()
 {
@@ -39,6 +47,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t * aData, size_t aSize)
         // just a fake executable name?
         VerifyOrDie(Platform::MemoryInit() == CHIP_NO_ERROR);
         VerifyOrDie(PlatformMgr().InitChipStack() == CHIP_NO_ERROR);
+
+        VerifyOrDie(chip::examples::InitCommissionableDataProvider(gCommissionableDataProvider,
+                                                                   LinuxDeviceOptions::GetInstance()) == CHIP_NO_ERROR);
+        SetCommissionableDataProvider(&gCommissionableDataProvider);
 
         // ChipLinuxAppMainLoop blocks, and we don't want that here.
         static chip::CommonCaseDeviceServerInitParams initParams;

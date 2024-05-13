@@ -17,32 +17,18 @@
 #    limitations under the License.
 #
 
-import IPython
-import chip
-import chip.logging
-import coloredlogs
-import logging
-from traitlets.config import Config
-from rich import print
-from rich import pretty
-from rich import inspect
-import builtins
-import argparse
 import sys
+
+import IPython
+from traitlets.config import Config
 
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-p", "--storagepath", help="Path to persistent storage configuration file (default: /tmp/repl-storage.json)",
-                        action="store", default="/tmp/repl-storage.json")
-
-    args = parser.parse_args()
-
     c = Config()
     c.InteractiveShellApp.exec_lines = [
         "import pkgutil",
         "module = pkgutil.get_loader('chip.ChipReplStartup')",
-        "%run {module.path} --storagepath " + f"{args.storagepath}"
+        "%run {module.path} " + " ".join(sys.argv[1:])
     ]
 
     sys.argv = [sys.argv[0]]

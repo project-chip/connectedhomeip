@@ -15,11 +15,11 @@
 #    limitations under the License.
 #
 
-from os import listdir
-from os import path
-from enum import Enum
 import argparse
 import sys
+from enum import Enum
+from os import listdir, path
+
 import yaml
 
 # Test status description:
@@ -55,7 +55,6 @@ def checkPythonVersion():
 def parseTestPlans(filepath):
     tests_names = []
     tests_statuses = []
-    rv = []
 
     for name, test_plan in parseYaml(filepath)['Test Plans'].items():
         for section, tests in test_plan['tests'].items():
@@ -81,12 +80,12 @@ def parseTestPlan(filepath):
 
     for test_definition in parseYaml(filepath)['tests']:
         if 'disabled' in test_definition:
-            if is_pending_test == False:
+            if is_pending_test is False:
                 return TestStatus.partial
         else:
             is_pending_test = False
 
-    if is_pending_test == True:
+    if is_pending_test is True:
         return TestStatus.pending
 
     return TestStatus.complete

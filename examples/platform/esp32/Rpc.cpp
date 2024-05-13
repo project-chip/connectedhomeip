@@ -33,6 +33,10 @@
 #include "pigweed/rpc_services/Attributes.h"
 #endif // defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
 
+#if defined(PW_RPC_BOOLEAN_STATE_SERVICE) && PW_RPC_BOOLEAN_STATE_SERVICE
+#include "pigweed/rpc_services/BooleanState.h"
+#endif // defined(PW_RPC_BOOLEAN_STATE_SERVICE) && PW_RPC_BOOLEAN_STATE_SERVICE
+
 #if defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
 #if CONFIG_DEVICE_TYPE_M5STACK
 #include "ScreenManager.h"
@@ -112,15 +116,26 @@ public:
 class Esp32Device final : public Device
 {
 public:
-    pw::Status Reboot(const pw_protobuf_Empty & request, pw_protobuf_Empty & response) override
+    pw::Status Reboot(const chip_rpc_RebootRequest & request, pw_protobuf_Empty & response) override
     {
-        mRebootTimer = xTimerCreateStatic("Reboot", kRebootTimerPeriodTicks, false, nullptr, RebootHandler, &mRebootTimerBuffer);
+        TickType_t delayMs = kRebootTimerPeriodMs;
+        if (request.delay_ms != 0)
+        {
+            delayMs = request.delay_ms;
+        }
+        else
+        {
+            ChipLogProgress(NotSpecified, "Did not receive a reboot delay. Defaulting to %d ms",
+                            static_cast<int>(kRebootTimerPeriodMs));
+        }
+        mRebootTimer = xTimerCreateStatic("Reboot", pdMS_TO_TICKS(delayMs), false, nullptr, RebootHandler, &mRebootTimerBuffer);
+
         xTimerStart(mRebootTimer, 0);
         return pw::OkStatus();
     }
 
 private:
-    static constexpr TickType_t kRebootTimerPeriodTicks = 1000;
+    static constexpr uint32_t kRebootTimerPeriodMs = 1000;
     TimerHandle_t mRebootTimer;
     StaticTimer_t mRebootTimerBuffer;
 
@@ -204,8 +219,11 @@ public:
         size_t password_size = std::min(sizeof(password) - 1, static_cast<size_t>(request.secret.size));
         memcpy(password, request.secret.bytes, password_size);
         password[password_size] = '\0';
-        if (chip::DeviceLayer::NetworkCommissioning::ESPWiFiDriver::GetInstance().ConnectWiFiNetwork(
-                ssid, strlen(ssid), password, strlen(password)) != CHIP_NO_ERROR)
+        chip::DeviceLayer::PlatformMgr().LockChipStack();
+        CHIP_ERROR error = chip::DeviceLayer::NetworkCommissioning::ESPWiFiDriver::GetInstance().ConnectWiFiNetwork(
+            ssid, strlen(ssid), password, strlen(password));
+        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+        if (error != CHIP_NO_ERROR)
         {
             return pw::Status::Internal();
         }
@@ -214,8 +232,9 @@ public:
 
     pw::Status Disconnect(const pw_protobuf_Empty & request, pw_protobuf_Empty & response) override
     {
+        chip::DeviceLayer::PlatformMgr().LockChipStack();
         chip::DeviceLayer::ConnectivityMgr().ClearWiFiStationProvision();
-        chip::DeviceLayer::ConnectivityMgr().SetWiFiStationMode(chip::DeviceLayer::ConnectivityManager::kWiFiStationMode_Disabled);
+        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
         return pw::OkStatus();
     }
 
@@ -260,6 +279,10 @@ StackType_t sRpcTaskStack[RPC_TASK_STACK_SIZE];
 Attributes attributes_service;
 #endif // defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
 
+#if defined(PW_RPC_BOOLEAN_STATE_SERVICE) && PW_RPC_BOOLEAN_STATE_SERVICE
+BooleanState boolean_state_service;
+#endif // defined(PW_RPC_BOOLEAN_STATE_SERVICE) && PW_RPC_BOOLEAN_STATE_SERVICE
+
 #if defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
 Esp32Button button_service;
 #endif // defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
@@ -281,7 +304,7 @@ Locking locking;
 #endif // defined(PW_RPC_LOCKING_SERVICE) && PW_RPC_LOCKING_SERVICE
 
 #if defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
-pw::trace::TraceService trace_service;
+pw::trace::TraceService trace_service(pw::trace::GetTokenizedTracer());
 #endif // defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
 
 #if defined(PW_RPC_WIFI_SERVICE) && PW_RPC_WIFI_SERVICE
@@ -293,6 +316,10 @@ void RegisterServices(pw::rpc::Server & server)
 #if defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
     server.RegisterService(attributes_service);
 #endif // defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
+
+#if defined(PW_RPC_BOOLEAN_STATE_SERVICE) && PW_RPC_BOOLEAN_STATE_SERVICE
+    server.RegisterService(boolean_state_service);
+#endif // defined(PW_RPC_BOOLEAN_STATE_SERVICE) && PW_RPC_BOOLEAN_STATE_SERVICE
 
 #if defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
     server.RegisterService(button_service);

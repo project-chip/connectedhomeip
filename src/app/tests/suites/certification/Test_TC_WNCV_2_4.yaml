@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 39.2.4. [TC-WNCV-2.4] Type Attribute with server as DUT
+name: 39.2.4. [TC-WNCV-2.4] Type attribute [DUT as Server]
+
+PICS:
+    - WNCV.S
 
 config:
     nodeId: 0x12344321
@@ -28,20 +31,36 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #Issue #10811 if condition is required, need YAML support for this
-    - label: "Reads Type attribute from DUT"
+    - label:
+          "Step 1a: TH reads Type attribute from DUT, If (WNCV.S.F00(LF) &
+          !WNCV.S.F01(TL)) value must be between [min=0, max=5] or equals to 9"
       command: "readAttribute"
       attribute: "Type"
-      PICS: A_TYPE
-      response:
-          value: 0
-
-    - label: "Reads Type attribute constraints"
-      command: "readAttribute"
-      attribute: "Type"
-      PICS: A_TYPE
+      PICS: WNCV.S.A0000 && WNCV.S.F00 && !WNCV.S.F01
       response:
           constraints:
               type: enum8
               minValue: 0
               maxValue: 9
+
+    - label:
+          "Step 1b: TH reads Type attribute from DUT, If (!WNCV.S.F00(LF) &
+          WNCV.S.F01(TL)) value must be only equal to 7"
+      command: "readAttribute"
+      attribute: "Type"
+      PICS: WNCV.S.A0000 && !WNCV.S.F00 && WNCV.S.F01
+      response:
+          value: 7
+          constraints:
+              type: enum8
+
+    - label:
+          "Step 1c: TH reads Type attribute from DUT, If (WNCV.S.F00(LF) &
+          WNCV.S.F01(TL)) value is either 6 or 8"
+      command: "readAttribute"
+      attribute: "Type"
+      PICS: WNCV.S.A0000 && WNCV.S.F00 && WNCV.S.F01
+      response:
+          constraints:
+              type: enum8
+              anyOf: [6, 8]

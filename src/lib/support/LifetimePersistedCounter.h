@@ -27,6 +27,7 @@
 #pragma once
 
 #include <lib/support/CHIPCounter.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/PersistedStorage.h>
 
 namespace chip {
@@ -49,11 +50,13 @@ namespace chip {
  *   - Output: 0, 1, 2, 3, 4
  *
  */
-class LifetimePersistedCounter : public MonotonicallyIncreasingCounter
+
+template <typename T>
+class LifetimePersistedCounter : public MonotonicallyIncreasingCounter<T>
 {
 public:
-    LifetimePersistedCounter();
-    ~LifetimePersistedCounter() override;
+    LifetimePersistedCounter() : mId(chip::Platform::PersistedStorage::kEmptyKey) {}
+    ~LifetimePersistedCounter() override = default;
 
     /**
      *  @brief
@@ -67,7 +70,17 @@ public:
      *          CHIP_ERROR_INVALID_INTEGER_VALUE if aEpoch is 0.
      *          CHIP_NO_ERROR otherwise
      */
-    CHIP_ERROR Init(chip::Platform::PersistedStorage::Key aId);
+    CHIP_ERROR Init(const chip::Platform::PersistedStorage::Key aId)
+    {
+        mId = aId;
+        T startValue;
+
+        // Read our previously-stored starting value.
+        ReturnErrorOnFailure(ReadStartValue(startValue));
+
+        // This will set the starting value, after which we're ready.
+        return MonotonicallyIncreasingCounter<T>::Init(startValue);
+    }
 
     /**
      *  @brief
@@ -76,19 +89,16 @@ public:
      *
      *  @return Any error returned by a write to persisted storage.
      */
-    CHIP_ERROR Advance() override;
+    CHIP_ERROR Advance() override
+    {
+        VerifyOrReturnError(mId != chip::Platform::PersistedStorage::kEmptyKey, CHIP_ERROR_INCORRECT_STATE);
+
+        ReturnErrorOnFailure(MonotonicallyIncreasingCounter<T>::Advance());
+
+        return chip::Platform::PersistedStorage::Write(mId, MonotonicallyIncreasingCounter<T>::GetValue());
+    }
 
 private:
-    /**
-     *  @brief
-     *    Write out the counter value to persistent storage.
-     *
-     *  @param[in] aStartValue  The counter value to write out.
-     *
-     *  @return Any error returned by a write to persistent storage.
-     */
-    CHIP_ERROR PersistNextEpochStart(uint32_t aStartValue);
-
     /**
      *  @brief
      *    Read our starting counter value (if we have one) in from persistent storage.
@@ -97,7 +107,19 @@ private:
      *
      *  @return Any error returned by a read from persistent storage.
      */
-    CHIP_ERROR ReadStartValue(uint32_t & aStartValue);
+    CHIP_ERROR ReadStartValue(T & aStartValue)
+    {
+        aStartValue = 0;
+
+        CHIP_ERROR err = chip::Platform::PersistedStorage::Read(mId, aStartValue);
+        if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        {
+            // No previously-stored value, no worries, the counter is initialized to zero.
+            // Suppress the error.
+            err = CHIP_NO_ERROR;
+        }
+        return err;
+    }
 
     chip::Platform::PersistedStorage::Key mId; // start value is stored here
 };

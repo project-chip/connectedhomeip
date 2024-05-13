@@ -13,12 +13,30 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
+
+config("config") {
+  include_dirs = [ "include" ]
+}
 
 chip_data_model("lighting-common") {
   zap_file = "lighting-app.zap"
-
-  zap_pregenerated_dir = "${chip_root}/zzz_generated/lighting-app/zap-generated"
   is_server = true
+}
+
+source_set("color-format") {
+  public_configs = [ ":config" ]
+  sources = [
+    "include/ColorFormat.h",
+    "src/ColorFormat.cpp",
+  ]
+}
+
+source_set("lighting-manager") {
+  deps = [ "${chip_root}/src/lib" ]
+  public_configs = [ ":config" ]
+  sources = [
+    "include/LightingManager.h",
+    "src/LightingManager.cpp",
+  ]
 }

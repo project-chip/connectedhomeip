@@ -50,23 +50,19 @@ public:
     static const Key kConfigKey_HardwareVersion;
     static const Key kConfigKey_ManufacturingDate;
     static const Key kConfigKey_SetupPinCode;
-    static const Key kConfigKey_FabricId;
     static const Key kConfigKey_ServiceConfig;
     static const Key kConfigKey_PairedAccountId;
     static const Key kConfigKey_ServiceId;
-    static const Key kConfigKey_FabricSecret;
-    static const Key kConfigKey_GroupKeyIndex;
     static const Key kConfigKey_LastUsedEpochKeyId;
     static const Key kConfigKey_FailSafeArmed;
-    static const Key kConfigKey_WiFiStationSecType;
     static const Key kConfigKey_OperationalDeviceId;
     static const Key kConfigKey_OperationalDeviceCert;
     static const Key kConfigKey_OperationalDeviceICACerts;
     static const Key kConfigKey_OperationalDevicePrivateKey;
     static const Key kConfigKey_SetupDiscriminator;
     static const Key kConfigKey_RegulatoryLocation;
+    static const Key kConfigKey_LocationCapability;
     static const Key kConfigKey_CountryCode;
-    static const Key kConfigKey_Breadcrumb;
     static const Key kConfigKey_Spake2pIterationCount;
     static const Key kConfigKey_Spake2pSalt;
     static const Key kConfigKey_Spake2pVerifier;
@@ -77,8 +73,6 @@ public:
     static const Key kCounterKey_UpTime;
     static const Key kCounterKey_TotalOperationalHours;
     static const Key kCounterKey_BootReason;
-
-    static const char kGroupKeyNamePrefix[];
 
     // Config value accessors.
     static CHIP_ERROR ReadConfigValue(Key key, bool & val);
@@ -95,8 +89,8 @@ public:
     static CHIP_ERROR ClearConfigValue(Key key);
     static bool ConfigValueExists(Key key);
 
-    static CHIP_ERROR EnsureNamespace(const char * ns);
-    static CHIP_ERROR ClearNamespace(const char * ns);
+    static CHIP_ERROR InitNamespace(void);
+    static CHIP_ERROR ClearNamespace(void);
 
     static void RunConfigUnitTest(void);
 };

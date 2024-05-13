@@ -23,6 +23,10 @@
 #include <pw_hdlc/encoder.h>
 #include <pw_stream/sys_io_stream.h>
 
+#if CONFIG_ENABLE_ESP_INSIGHTS_TRACE && CONFIG_DIAG_USE_EXTERNAL_LOG_WRAP
+#include <esp_diagnostics.h>
+#endif
+
 namespace PigweedLogger {
 namespace {
 
@@ -39,7 +43,7 @@ bool uartInitialised;
 
 void send()
 {
-    pw::hdlc::WriteUIFrame(kLogHdlcAddress, std::as_bytes(std::span(sWriteBuffer, sWriteBufferPos)), sWriter);
+    pw::hdlc::WriteUIFrame(kLogHdlcAddress, pw::as_bytes(pw::span(sWriteBuffer, sWriteBufferPos)), sWriter);
     sWriteBufferPos = 0;
 }
 
@@ -86,12 +90,35 @@ SemaphoreHandle_t * getSemaphore()
     return &esp_log_mutex;
 }
 
+static const char * getLogColorForLevel(esp_log_level_t level)
+{
+    switch (level)
+    {
+    case ESP_LOG_ERROR:
+        return LOG_COLOR_E "E";
+
+    case ESP_LOG_INFO:
+        return LOG_COLOR_I "I";
+
+    default:
+        // default is kept as ESP_LOG_DEBUG
+        return LOG_COLOR_D "D";
+    }
+}
+
+// ESP_LOGx(...) logs are funneled to esp_log_write() and it has the specific format. It contains color codes,
+// log level character, timestamp, tag, and actual log message. Everything here is part of format and variadic argument.
+//
+// ChipLogx(...) logs are funneled to esp_log_writev() will only have actual log message without color codes, log level
+// character, timestamp, and tag. So, to match up __wrap_esp_log_writev() adds those details when sending log to pigweed
+// logger.
 extern "C" void __wrap_esp_log_write(esp_log_level_t level, const char * tag, const char * format, ...)
 {
     va_list v;
     va_start(v, format);
+
 #ifndef CONFIG_LOG_DEFAULT_LEVEL_NONE
-    if (uartInitialised)
+    if (uartInitialised && level <= CONFIG_LOG_MAXIMUM_LEVEL)
     {
         char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
         size_t len = vsnprintf(formattedMsg, sizeof formattedMsg, format, v);
@@ -102,7 +129,42 @@ extern "C" void __wrap_esp_log_write(esp_log_level_t level, const char * tag, co
         PigweedLogger::putString(formattedMsg, len);
     }
 #endif
+
+#if CONFIG_ENABLE_ESP_INSIGHTS_TRACE && CONFIG_DIAG_USE_EXTERNAL_LOG_WRAP
+    esp_diag_log_writev(level, tag, format, v);
+#endif
+
     va_end(v);
+}
+
+extern "C" void __wrap_esp_log_writev(esp_log_level_t level, const char * tag, const char * format, va_list v)
+{
+#ifndef CONFIG_LOG_DEFAULT_LEVEL_NONE
+    if (uartInitialised && level <= CONFIG_LOG_MAXIMUM_LEVEL)
+    {
+        const char * logColor = getLogColorForLevel(level);
+        PigweedLogger::putString(logColor, strlen(logColor));
+
+        char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
+        size_t len = snprintf(formattedMsg, sizeof formattedMsg, " (%" PRIu32 ") %s: ", esp_log_timestamp(), tag);
+        PigweedLogger::putString(formattedMsg, len);
+
+        memset(formattedMsg, 0, sizeof formattedMsg);
+        len = vsnprintf(formattedMsg, sizeof formattedMsg, format, v);
+        if (len >= sizeof formattedMsg)
+        {
+            len = sizeof formattedMsg - 1;
+        }
+        PigweedLogger::putString(formattedMsg, len);
+
+        const char * logResetColor = LOG_RESET_COLOR "\n";
+        PigweedLogger::putString(logResetColor, strlen(logResetColor));
+    }
+#endif
+
+#if CONFIG_ENABLE_ESP_INSIGHTS_TRACE && CONFIG_DIAG_USE_EXTERNAL_LOG_WRAP
+    esp_diag_log_write(level, tag, format, v);
+#endif
 }
 
 } // namespace PigweedLogger

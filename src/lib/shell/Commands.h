@@ -21,12 +21,6 @@ namespace chip {
 namespace Shell {
 
 /**
- * This function registers the base64 encode/decode commands.
- *
- */
-void RegisterBase64Commands();
-
-/**
  * This function registers the BLE commands.
  *
  */
@@ -55,6 +49,12 @@ void RegisterDeviceCommands();
  *
  */
 void RegisterOtaCommands();
+
+/**
+ * This function registers the resource usage statistics commands.
+ *
+ */
+void RegisterStatCommands();
 
 /**
  * This function registers the device onboarding codes commands.

@@ -1,0 +1,185 @@
+# Copyright (c) 2021-2023 Project CHIP Authors
+# Copyright (c) 2023 NXP
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/nxp_sdk.gni")
+import("//build_overrides/openthread.gni")
+
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/nxp_executable.gni")
+
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
+
+import("${chip_root}/src/app/icd/icd.gni")
+import("${chip_root}/src/crypto/crypto.gni")
+import("${chip_root}/src/lib/core/core.gni")
+import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
+
+declare_args() {
+  chip_software_version = 0
+
+  # Setup discriminator as argument
+  setup_discriminator = 3840
+  chip_with_diag_logs_demo = true
+}
+
+assert(current_os == "freertos")
+
+common_example_dir = "${chip_root}/examples/platform/nxp/common"
+k32w1_platform_dir = "${chip_root}/examples/platform/nxp/k32w/k32w1"
+k32w1_sdk_root = getenv("NXP_K32W1_SDK_ROOT")
+
+k32w1_sdk("sdk") {
+  sources = [
+    "${k32w1_platform_dir}/app/project_include/OpenThreadConfig.h",
+    "include/CHIPProjectConfig.h",
+    "include/FreeRTOSConfig.h",
+    "main/include/app_config.h",
+  ]
+
+  public_deps =
+      [ "${chip_root}/third_party/openthread/platforms:libopenthread-platform" ]
+
+  include_dirs = [
+    "main/include",
+    "main",
+    "include",
+    "${k32w1_platform_dir}/app/project_include",
+    "${k32w1_platform_dir}/app/support",
+    "${k32w1_platform_dir}/util/include",
+  ]
+
+  defines = []
+  if (is_debug) {
+    defines += [ "BUILD_RELEASE=0" ]
+  } else {
+    defines += [ "BUILD_RELEASE=1" ]
+  }
+
+  if (chip_software_version != 0) {
+    defines += [
+      "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=${chip_software_version}",
+    ]
+  }
+
+  defines += [
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setup_discriminator}",
+  ]
+
+  if (chip_with_diag_logs_demo) {
+    defines += [ "CONFIG_DIAG_LOGS_DEMO=1" ]
+  }
+}
+
+k32w1_executable("contact_sensor_app") {
+  output_name = "chip-k32w1-contact-example"
+
+  defines = []
+
+  sources = [
+    "${k32w1_platform_dir}/util/LEDWidget.cpp",
+    "${k32w1_platform_dir}/util/include/LEDWidget.h",
+    "main/AppTask.cpp",
+    "main/ContactSensorManager.cpp",
+    "main/ZclCallbacks.cpp",
+    "main/include/AppEvent.h",
+    "main/include/AppTask.h",
+    "main/include/ContactSensorManager.h",
+    "main/main.cpp",
+  ]
+
+  include_dirs = [ "${common_example_dir}/diagnostic_logs" ]
+
+  deps = [
+    ":sdk",
+    "${chip_root}/examples/common/QRCode",
+    "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/platform:syscalls_stub",
+    "${chip_root}/third_party/mbedtls:mbedtls",
+    "${k32w1_platform_dir}/app/support:freertos_mbedtls_utils",
+  ]
+
+  #lit and sit are using different zap files
+  if (chip_enable_icd_lit) {
+    deps += [ "${chip_root}/examples/contact-sensor-app/nxp/zap-lit/" ]
+
+    defines += [ "CHIP_ENABLE_LIT=1" ]
+  } else {
+    deps += [ "${chip_root}/examples/contact-sensor-app/nxp/zap-sit/" ]
+  }
+
+  if (chip_openthread_ftd) {
+    deps += [
+      "${openthread_root}:libopenthread-cli-ftd",
+      "${openthread_root}:libopenthread-ftd",
+    ]
+  } else {
+    deps += [
+      "${openthread_root}:libopenthread-cli-mtd",
+      "${openthread_root}:libopenthread-mtd",
+    ]
+  }
+
+  #lit and sit are using different zap files
+  if (chip_enable_icd_lit) {
+    deps += [ "${chip_root}/examples/contact-sensor-app/nxp/zap-lit/" ]
+
+    defines += [ "CHIP_ENABLE_LIT=1" ]
+  } else {
+    deps += [ "${chip_root}/examples/contact-sensor-app/nxp/zap-sit/" ]
+  }
+
+  cflags = [ "-Wconversion" ]
+
+  output_dir = root_out_dir
+
+  ldscript = "${k32w1_sdk_root}/middleware/wireless/framework/Common/devices/kw45_k32w1/gcc/connectivity.ld"
+
+  inputs = [ ldscript ]
+
+  ldflags = [
+    "-Wl,--defsym=__heap_size__=0",
+    "-Wl,--defsym=__stack_size__=0x480",
+    "-Wl,--defsym=lp_ram_lower_limit=0x04000000",
+    "-Wl,--defsym=lp_ram_upper_limit=0x2001C000",
+    "-Wl,-print-memory-usage",
+    "-Wl,--no-warn-rwx-segments",
+    "-T" + rebase_path(ldscript, root_build_dir),
+  ]
+
+  if (chip_with_factory_data == 1) {
+    ldflags += [ "-Wl,--defsym=gUseFactoryData_d=1" ]
+  }
+
+  if (chip_with_diag_logs_demo) {
+    sources += [
+      "${common_example_dir}/diagnostic_logs/DiagnosticLogsProviderDelegateImpl.cpp",
+      "${common_example_dir}/diagnostic_logs/DiagnosticLogsProviderDelegateImpl.h",
+    ]
+  }
+
+  output_dir = root_out_dir
+}
+
+group("k32w1") {
+  deps = [ ":contact_sensor_app" ]
+}
+
+group("default") {
+  deps = [ ":k32w1" ]
+}

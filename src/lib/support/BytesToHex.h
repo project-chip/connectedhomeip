@@ -19,6 +19,7 @@
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/BitFlags.h>
+#include <lib/support/Span.h>
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -59,7 +60,8 @@ enum class HexFlags : int
  * On success, number of bytes written to destination is always:
  *   output_size = (src_size * 2) + ((flags & HexFlags::kNullTerminate) ? 1 : 0);
  *
- * @param src_bytes Pointer to non-null buffer to convert
+ * @param src_bytes Pointer to buffer to convert.  Only allowed to be null if
+ *                  src_size is 0.
  * @param src_size Number of bytes to convert from src_bytes
  * @param [out] dest_hex Destination buffer to receive hex encoding
  * @param dest_size_max Maximum buffer size for the hex encoded `dest_hex` buffer
@@ -67,7 +69,9 @@ enum class HexFlags : int
  * @param flags Flags from `HexFlags` for formatting options
  *
  * @return CHIP_ERROR_BUFFER_TOO_SMALL on dest_max_size too small to fit output
- * @return CHIP_ERROR_INVALID_ARGUMENT if either src_bytes or dest_hex is nullptr
+ * @return CHIP_ERROR_INVALID_ARGUMENT if either src_bytes or dest_hex is
+ *                                     nullptr without the corresponding size
+ *                                     being 0.
  * @return CHIP_NO_ERROR on success
  */
 
@@ -133,6 +137,33 @@ inline CHIP_ERROR BytesToLowercaseHexString(const uint8_t * src_bytes, size_t sr
 }
 
 /**
+ * @brief Dumps a binary buffer to log as hexadecimal
+ *
+ * Output is 32 bytes per line of uppercase hex, prepended with a given label.
+ *
+ * This function is useful to dump binary buffers such as certificates
+ * which may need to be extracted from logs during debugging.
+ *
+ * Format is organized to allow easy extraction by searching the regex
+ * `LABEL>>>[0-9A-F]+$` where LABEL is the `label` argument passed.
+ *
+ * Format looks like:
+ *
+ * ```
+ * label>>>A54A39294B28886E8BFC15B44105A3FD22745225983A753E6BB82DA7C62493BF
+ * label>>>02C3ED03D41B6F7874E7E887321DE7B4872CEB9F080B6ECE14A8ABFA260573A3
+ * label>>>8D759C
+ * ```
+ *
+ * If buffer is empty, at least one line with the `LABEL>>>` will be logged,
+ * with no data.
+ *
+ * @param label - label to prepend. If nullptr, no label will be prepended
+ * @param span - Span over buffer that needs to be dumped.
+ */
+void LogBufferAsHex(const char * label, const ByteSpan & span);
+
+/**
  * Convert a buffer of hexadecimal characters to bytes. Supports both lowercase
  * and uppercase (or a mix of cases) hexadecimal characters. Supported input is
  * [0-9a-fA-F]. The input is assumed to be in a big-endian order. The output is
@@ -174,6 +205,18 @@ size_t UppercaseHexToUint32(const char * src_hex, const size_t src_size, uint32_
 
 /** Same as UppercaseHexToUint64() but for uint16_t. */
 size_t UppercaseHexToUint16(const char * src_hex, const size_t src_size, uint16_t & dest);
+
+/**
+ * Computes the hex encoded length for a given input length.
+ * Left shift to generate optimized equivalent of LEN*2.
+ */
+#define HEX_ENCODED_LENGTH(LEN) ((LEN) << 1)
+
+/**
+ * Computes the maximum possible decoded length for a given hex string input length.
+ * Right shift to generate optimized equivalent of LEN/2.
+ */
+#define HEX_MAX_DECODED_LENGTH(LEN) ((LEN) >> 1)
 
 } // namespace Encoding
 } // namespace chip

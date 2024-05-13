@@ -1,0 +1,65 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Activated Carbon Filter Monitoring Cluster Tests
+
+config:
+    nodeId: 0x12344321
+    cluster: "Activated Carbon Filter Monitoring"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Validate the feature map"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x7]
+
+    - label: "Read Replacement Product List"
+      command: "readAttribute"
+      attribute: "ReplacementProductList"
+      response:
+          value:
+              [
+                  {
+                      ProductIdentifierType: 0,
+                      ProductIdentifierValue: "111112222233",
+                  },
+                  {
+                      ProductIdentifierType: 1,
+                      ProductIdentifierValue: "gtin8xxx",
+                  },
+                  {
+                      ProductIdentifierType: 2,
+                      ProductIdentifierValue: "4444455555666",
+                  },
+                  {
+                      ProductIdentifierType: 3,
+                      ProductIdentifierValue: "gtin14xxxxxxxx",
+                  },
+                  {
+                      ProductIdentifierType: 4,
+                      ProductIdentifierValue: "oem20xxxxxxxxxxxxxxx",
+                  },
+              ]

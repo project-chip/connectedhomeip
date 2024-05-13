@@ -1,0 +1,100 @@
+# Copyright (c) 2022 Project CHIP Authors
+# Copyright 2023 NXP
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/nxp_sdk.gni")
+
+#allows to get common NXP SDK gn options
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+
+# Allows to get various RT gn options
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
+
+import(
+    "${nxp_sdk_build_root}/${nxp_sdk_name}/${rt_platform}/${rt_platform}.gni")
+
+#allows to get common NXP SDK gn options
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/mbedtls/mbedtls.gni")
+rt_mbedtls_root = "${rt_sdk_root}/middleware/mbedtls"
+
+config("mbedtls_els_pkc_config") {
+  include_dirs = [
+    "${rt_mbedtls_root}/port/els",
+    "${rt_mbedtls_root}/port/pkc",
+  ]
+  defines = [ "MBEDTLS_PORT_INCLUDE=<els_pkc_mbedtls.h>" ]
+
+  if (chip_enable_openthread) {
+    defines += [ "MBEDTLS_CONFIG_FILE=<rw612-mbedtls-config.h>" ]
+  } else {
+    defines += [ "MBEDTLS_CONFIG_FILE=<els_pkc_mbedtls_config.h>" ]
+  }
+}
+
+mbedtls_target("nxp_els_pkc_mbedtls") {
+  sources = []
+  public_configs = [ ":mbedtls_els_pkc_config" ]
+  public_deps = [ nxp_sdk_driver_target ]
+  sources += [
+    # els port
+    "${rt_mbedtls_root}/port/els/aes_alt.c",
+    "${rt_mbedtls_root}/port/els/cbc_mac_alt.c",
+    "${rt_mbedtls_root}/port/els/cmac_alt.c",
+    "${rt_mbedtls_root}/port/els/ctr_drbg_alt.c",
+    "${rt_mbedtls_root}/port/els/els_mbedtls.c",
+    "${rt_mbedtls_root}/port/els/entropy_poll_alt.c",
+    "${rt_mbedtls_root}/port/els/gcm_alt.c",
+    "${rt_mbedtls_root}/port/els/sha256_alt.c",
+    "${rt_mbedtls_root}/port/els/sha512_alt.c",
+
+    # pkc port
+    "${rt_mbedtls_root}/port/pkc/ecc_alt.c",
+    "${rt_mbedtls_root}/port/pkc/ecdh_alt.c",
+    "${rt_mbedtls_root}/port/pkc/ecdsa_alt.c",
+    "${rt_mbedtls_root}/port/pkc/els_pkc_mbedtls.c",
+    "${rt_mbedtls_root}/port/pkc/rsa_alt.c",
+  ]
+  if (chip_enable_openthread) {
+    public_deps += [ "${openthread_root}/src/core:libopenthread_core_headers" ]
+  }
+}
+
+group("nxp_sdk_mbedtls_config") {
+  public_configs = [ ":mbedtls_els_pkc_config" ]
+}
+
+group("nxp_mbedtls") {
+  public_deps = [ ":nxp_els_pkc_mbedtls" ]
+}
+
+source_set("nxp_sdk_mbedtls_dep") {
+  # Add here SDK source files which have a dependency on mbedtls
+  # this approach helps avoid circular dependencies between mbedtls and rw61x_sdk_drivers targets
+  if (chip_enable_secure_dac_private_key_storage == 0) {
+    sources = [ "${rt_sdk_root}/middleware/wireless/framework/FactoryDataProvider/fwk_factory_data_provider.c" ]
+  }
+
+  deps = [
+    "${nxp_sdk_build_root}/${nxp_sdk_name}/${rt_platform}:nxp_mbedtls",
+    "${nxp_sdk_build_root}/${nxp_sdk_name}/${rt_platform}:nxp_sdk_mbedtls_config",
+    nxp_sdk_driver_target,
+  ]
+}
+
+group("nxp_sdk") {
+  # Add SDK's source set which depends on mbedtls
+  public_deps = [ ":nxp_sdk_mbedtls_dep" ]
+}

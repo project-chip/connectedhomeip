@@ -207,7 +207,7 @@ int TestDefaultOTARequestorStorage()
 {
     nlTestSuite theSuite = { "OTA Storage tests", &sTests[0], TestSetup, TestTearDown };
 
-    // Run test suit againt one context.
+    // Run test suite against one context.
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }

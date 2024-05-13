@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_qrcode" translatable="false">QR Code</string>
+    <string name="qrcode_qr_text" translatable="false">QR Code : %1$s</string>
+    <string name="qrcode_manual_code_text" translatable="false">Manual Pairing Code : %1$s</string>
+    <string name="qrcode_version_text" translatable="false">Version : %1$s</string>
+    <string name="qrcode_vendor_id_text" translatable="false">Vendor ID : %1$s (%2$#x)</string>
+    <string name="qrcode_product_id_text" translatable="false">Product ID : %1$s (%2$#x)</string>
+    <string name="qrcode_commissioning_flow_text" translatable="false">Commissioning Flow : %1$s</string>
+    <string name="qrcode_onboarding_type_text" translatable="false">Onboarding Type : %1$s</string>
+    <string name="qrcode_setup_pin_code_text" translatable="false">Setup PinCode : %1$s</string>\
+    <string name="qrcode_discriminator_text" translatable="false">Discriminator : %1$s (%2$#x)</string>
+</resources>

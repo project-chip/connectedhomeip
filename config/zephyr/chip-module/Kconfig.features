@@ -1,0 +1,68 @@
+#
+#   Copyright (c) 2022 Project CHIP Authors
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+
+# The purpose of this file is to define Kconfig options enabling specific features.
+# Feature options will define defaults for settings that are related to the specific feature.
+
+if CHIP
+
+# MCU Manager and SMP configuration
+config MCUMGR
+	bool
+	default y
+
+config MCUMGR_GRP_IMG
+	bool
+	default y
+
+config MCUMGR_GRP_OS
+	bool
+	default y
+
+config MCUMGR_TRANSPORT_BT
+	bool
+	default y
+
+config MCUMGR_TRANSPORT_BT_AUTHEN
+	bool
+	default n
+
+config MCUMGR_TRANSPORT_NETBUF_COUNT
+	int
+	default 6
+
+# Increase BT MTU and RX buffer for big size DFU messages
+config BT_L2CAP_TX_MTU
+	int
+	default 498
+
+config BT_BUF_ACL_RX_SIZE
+	int
+	default 502
+
+# Increase MCUMGR_TRANSPORT_NETBUF_SIZE, as it must be big enough to fit MAX MTU + overhead and for single-image DFU default is 384 B
+config MCUMGR_TRANSPORT_NETBUF_SIZE
+	int
+	default 1024
+
+# Increase system workqueue size, as SMP is processed within it
+config SYSTEM_WORKQUEUE_STACK_SIZE
+	int
+	default 2800
+
+endif # CHIP_DFU_OVER_BT_SMP
+
+endif # CHIP

@@ -18,15 +18,14 @@
 #
 
 # Commissioning test.
+
 import os
 import sys
 from optparse import OptionParser
-from base import TestFail, TestTimeout, BaseTestHelper, FailIfNot, logger
-from cluster_objects import NODE_ID, ClusterObjectTests
-from network_commissioning import NetworkCommissioningTests
-import asyncio
 
-# The thread network dataset tlv for testing, splited into T-L-V.
+from base import BaseTestHelper, FailIfNot, TestFail, TestTimeout, logger
+
+# The thread network dataset tlv for testing, splitted into T-L-V.
 
 TEST_THREAD_NETWORK_DATASET_TLV = "0e080000000000010000" + \
     "000300000c" + \
@@ -40,6 +39,7 @@ TEST_THREAD_NETWORK_DATASET_TLV = "0e080000000000010000" + \
 # Network id, for the thread network, current a const value, will be changed to XPANID of the thread network.
 TEST_THREAD_NETWORK_ID = "fedcba9876543210"
 TEST_DISCRIMINATOR = 3840
+TEST_DISCOVERY_TYPE = 2
 
 ENDPOINT_ID = 0
 LIGHTING_ENDPOINT_ID = 1
@@ -69,6 +69,33 @@ def main():
         metavar="<device-addr>",
     )
     optParser.add_option(
+        "--setup-payload",
+        action="store",
+        dest="setupPayload",
+        default='',
+        type='str',
+        help="Setup Payload (manual pairing code or QR code content)",
+        metavar="<setup-payload>"
+    )
+    optParser.add_option(
+        "--nodeid",
+        action="store",
+        dest="nodeid",
+        default=1,
+        type=int,
+        help="The Node ID issued to the device",
+        metavar="<nodeid>"
+    )
+    optParser.add_option(
+        "--discriminator",
+        action="store",
+        dest="discriminator",
+        default=TEST_DISCRIMINATOR,
+        type=int,
+        help="Discriminator of the device",
+        metavar="<nodeid>"
+    )
+    optParser.add_option(
         "-p",
         "--paa-trust-store-path",
         action="store",
@@ -77,6 +104,15 @@ def main():
         type='str',
         help="Path that contains valid and trusted PAA Root Certificates.",
         metavar="<paa-trust-store-path>"
+    )
+    optParser.add_option(
+        "--discovery-type",
+        action="store",
+        dest="discoveryType",
+        default=TEST_DISCOVERY_TYPE,
+        type=int,
+        help="Discovery type of commissioning. (0: networkOnly 1: networkOnlyWithoutPASEAutoRetry 2: All<Ble & Network>)",
+        metavar="<discovery-type>"
     )
 
     (options, remainingArgs) = optParser.parse_args(sys.argv[1:])
@@ -88,20 +124,29 @@ def main():
         nodeid=112233, paaTrustStorePath=options.paaTrustStorePath, testCommissioner=True)
 
     logger.info("Testing discovery")
-    FailIfNot(test.TestDiscovery(discriminator=TEST_DISCRIMINATOR),
+    FailIfNot(test.TestDiscovery(discriminator=options.discriminator),
               "Failed to discover any devices.")
 
     FailIfNot(test.SetNetworkCommissioningParameters(dataset=TEST_THREAD_NETWORK_DATASET_TLV),
               "Failed to finish network commissioning")
 
-    logger.info("Testing key exchange")
-    FailIfNot(test.TestKeyExchange(ip=options.deviceAddress,
-                                   setuppin=20202021,
-                                   nodeid=1),
-              "Failed to finish key exchange")
+    if options.deviceAddress:
+        logger.info("Testing commissioning (IP)")
+        FailIfNot(test.TestCommissioning(ip=options.deviceAddress,
+                                         setuppin=20202021,
+                                         nodeid=options.nodeid),
+                  "Failed to finish commissioning")
+    elif options.setupPayload:
+        logger.info("Testing commissioning (w/ Setup Payload)")
+        FailIfNot(test.TestCommissioningWithSetupPayload(setupPayload=options.setupPayload,
+                                                         nodeid=options.nodeid,
+                                                         discoveryType=options.discoveryType),
+                  "Failed to finish commissioning")
+    else:
+        TestFail("Must provide device address or setup payload to commissioning the device")
 
     logger.info("Testing on off cluster")
-    FailIfNot(test.TestOnOffCluster(nodeid=1,
+    FailIfNot(test.TestOnOffCluster(nodeid=options.nodeid,
                                     endpoint=LIGHTING_ENDPOINT_ID,
                                     group=GROUP_ID), "Failed to test on off cluster")
 

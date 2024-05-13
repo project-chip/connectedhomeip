@@ -1,18 +1,18 @@
-{{#chip_tests tests}}
+{{#chip_tests tests includeAllClusters=true}}
 class {{filename}}Suite: public TestCommand
 {
-  public:
+public:
     {{#if ../credsIssuerConfigArg}}
-    {{filename}}Suite(CredentialIssuerCommands * credsIssuerConfig): TestCommand("{{filename}}", credsIssuerConfig), mTestIndex(0)
+    {{filename}}Suite(CredentialIssuerCommands * credsIssuerConfig): TestCommand("{{filename}}", {{totalTests}}, credsIssuerConfig)
     {{else}}
-    {{filename}}Suite(): TestCommand("{{filename}}"), mTestIndex(0)
+    {{filename}}Suite(): TestCommand("{{filename}}", {{totalTests}})
     {{/if}}
     {
         {{#chip_tests_config}}
           {{#if (isString type)}}
           AddArgument("{{name}}", &m{{asUpperCamelCase name}});
           {{else}}
-          AddArgument("{{name}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &m{{asUpperCamelCase name}});
+          AddArgument("{{name}}",{{as_type_min_value type language='c++'}}, {{as_type_max_value type language='c++'}}, &m{{asUpperCamelCase name}});
           {{/if}}
         {{/chip_tests_config}}
     }
@@ -22,66 +22,29 @@ class {{filename}}Suite: public TestCommand
         {{>teardownSaveAs}}
     }
 
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-      CHIP_ERROR err = CHIP_NO_ERROR;
-
-      if (0 == mTestIndex)
-      {
-          ChipLogProgress(chipTool, " **** Test Start: {{filename}}\n");
-      }
-
-      if (mTestCount == mTestIndex)
-      {
-          ChipLogProgress(chipTool, " **** Test Complete: {{filename}}\n");
-          SetCommandExitStatus(CHIP_NO_ERROR);
-          return;
-      }
-
-      Wait();
-
-      // Ensure we increment mTestIndex before we start running the relevant
-      // command.  That way if we lose the timeslice after we send the message
-      // but before our function call returns, we won't end up with an
-      // incorrect mTestIndex value observed when we get the response.
-      switch (mTestIndex++)
-      {
-        {{#chip_tests_items}}
-        case {{index}}:
-          ChipLogProgress(chipTool, " ***** Test Step {{index}} : {{label}}\n");
-          {{#if PICS}}
-          if (ShouldSkip("{{PICS}}"))
-          {
-              NextTest();
-              return;
-          }
-          {{/if}}
-          err = Test{{asUpperCamelCase label}}_{{index}}();
-          break;
-        {{/chip_tests_items}}
-      }
-
-      if (CHIP_NO_ERROR != err)
-      {
-          ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-          SetCommandExitStatus(err);
-      }
-    }
-
   {{#if ../needsWaitDuration}}
   chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr({{chip_tests_config_get_default_value "timeout"}})); }
   {{/if}}
 
-  private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = {{totalTests}};
-
+private:
     {{#chip_tests_config}}
     chip::Optional<{{chipType}}> m{{asUpperCamelCase name}};
     {{/chip_tests_config}}
 
     {{>setupSaveAs}}
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint)
+    {
+        {{#if (chip_tests_config_has "endpoint")}}
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+        {{else}}
+        return endpoint;
+        {{/if}}
+    }
+
+    //
+    // Tests methods
+    //
 
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
     {
@@ -90,15 +53,11 @@ class {{filename}}Suite: public TestCommand
         switch (mTestIndex - 1)
         {
         {{#chip_tests_items}}
-        {{!
-            This check can be removed once the cluster APIs have been converted from Invoke to
-            ReadClient/WriteClient/CommandSender
-        }}
-        {{~#if (isTestOnlyCluster cluster)~}}
+        {{#unless isWait}}
         case {{index}}:
             {{>test_step_response}}
             break;
-        {{/if~}}
+        {{/unless}}
         {{/chip_tests_items}}
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
@@ -110,294 +69,19 @@ class {{filename}}Suite: public TestCommand
         }
     }
 
-    {{! Helper around zapTypeToDecodableClusterObjectType that lets us set the
-        array/nullable/etc context appropriately.}}
-    {{~#*inline "subscribeResponseDataArgument"~}}
-      {{zapTypeToDecodableClusterObjectType type ns=cluster isArgument=true}} value
-    {{~/inline~}}
-    {{~#*inline "subscribeResponseArguments"~}}
-    {{> subscribeResponseDataArgument type=attr.type isArray=attr.isArray isNullable=attr.isNullable}}
-    {{~/inline~}}
-
-    {{~#*inline "subscribeDataCallback"}}
-    mTest_{{parent.filename}}_{{attribute}}_Reported
-    {{/inline}}
-    {{#*inline "subscribeDataCallbackType"}}
-    Test_{{parent.filename}}_{{attribute}}_ReportCallback
-    {{/inline}}
-    {{#chip_tests_items}}
-    {{#if allocateSubscribeDataCallback}}
-    typedef void (*{{> subscribeDataCallbackType}})(void * context, {{> subscribeResponseArguments attr=attributeObject}});
-    {{> subscribeDataCallbackType}} {{> subscribeDataCallback}} = nullptr;
-    {{/if}}
-    {{/chip_tests_items}}
-
-    {{#*inline "failureResponse"}}OnFailureResponse_{{index}}{{/inline}}
-    {{#*inline "successResponse"}}OnSuccessResponse_{{index}}{{/inline}}
-    {{#*inline "subscriptionEstablished"}}OnSubscriptionEstablishedResponse_{{index}}{{/inline}}
-    {{#*inline "doneResponse"}}OnDoneResponse_{{index}}{{/inline}}
-
-    {{#*inline "staticFailureResponse"}}OnFailureCallback_{{index}}{{/inline}}
-    {{#*inline "staticSuccessResponse"}}OnSuccessCallback_{{index}}{{/inline}}
-    {{#*inline "staticSubscriptionEstablished"}}OnSubscriptionEstablished_{{index}}{{/inline}}
-    {{#*inline "staticDoneResponse"}}OnDoneCallback_{{index}}{{/inline}}
-
-    {{#*inline "successArguments"}}{{#chip_tests_item_response_parameters}}{{#first}}{{#if ../leadingComma}}, {{/if}}{{/first}} {{zapTypeToDecodableClusterObjectType type ns=parent.cluster isArgument=true}} {{asLowerCamelCase name}}{{#not_last}}, {{/not_last}}{{/chip_tests_item_response_parameters}}{{/inline}}
-    {{! TODO: Temporary if cascade until everything is converted to the new status setup }}
-    {{#*inline "failureArguments"}}{{#if leadingComma}}, {{/if}}CHIP_ERROR error{{/inline}}
-    {{#*inline "staticSuccessArguments"}}void * context{{> successArguments leadingComma=true}}{{/inline}}
-    {{#*inline "staticFailureArguments"}}void * context{{> failureArguments leadingComma=true}}{{/inline}}
-    {{#*inline "staticDoneArguments"}}void * context{{/inline}}
-    {{#*inline "doneArguments"}}{{/inline}}
-
-    {{#*inline "staticSubscriptionEstablishedArguments"}}void * context{{/inline}}
-    {{#*inline "subscriptionEstablishedArguments"}}{{/inline}}
-
-    {{#chip_tests_items}}
-    {{#unless (isTestOnlyCluster cluster)}}
-    {{#unless isWait}}
-    {{#unless isCommand}}
-    {{#if isWriteAttribute}}
-      {{#if isGroupCommand}}
-      static void {{>staticDoneResponse}}({{>staticDoneArguments}})
-      {
-          (static_cast<{{filename}}Suite *>(context))->{{> doneResponse }}();
-      }
-      {{/if}}
-    {{/if}}
-
-    static void {{>staticFailureResponse}}({{>staticFailureArguments}})
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
-        (static_cast<{{filename}}Suite *>(context))->{{>failureResponse}}(error);
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        {{#chip_tests_items}}
+        case {{index}}: {
+            {{>test_step}}
+        }
+        {{/chip_tests_items}}
+        }
+        return CHIP_NO_ERROR;
     }
-
-    static void {{>staticSuccessResponse}}({{> staticSuccessArguments}})
-    {
-        (static_cast<{{filename}}Suite *>(context))->{{>successResponse}}({{#chip_tests_item_response_parameters}}{{#not_first}}, {{/not_first}}{{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}});
-    }
-
-    {{#if isSubscribe}}
-    static void {{> staticSubscriptionEstablished}}({{> staticSubscriptionEstablishedArguments}})
-    {
-        (static_cast<{{filename}}Suite *>(context))->{{> subscriptionEstablished}}();
-    }
-    {{/if}}
-
-    {{#if isWaitForReport}}
-    bool mReceivedReport_{{index}} = false;
-    {{/if}}
-
-    {{/unless}}
-    {{/unless}}
-    {{/unless}}
-    {{/chip_tests_items}}
-
-    //
-    // Tests methods
-    //
-
-    {{#chip_tests_items}}
-    {{#*inline "testCommand"}}Test{{asUpperCamelCase label}}_{{index}}{{/inline}}
-    {{#if (isTestOnlyCluster cluster)}}
-    CHIP_ERROR {{>testCommand}}()
-    {
-        SetIdentity(kIdentity{{asUpperCamelCase identity}});
-        return {{command}}({{#chip_tests_item_parameters}}{{#not_first}},{{/not_first}}
-          {{#*inline "defaultValue"}}{{asTypedLiteral (chip_tests_config_get_default_value definedValue) (chip_tests_config_get_type definedValue)}}{{/inline}}
-          {{~#if (chip_tests_config_has definedValue)~}}
-          m{{asUpperCamelCase definedValue}}.HasValue() ? m{{asUpperCamelCase definedValue}}.Value() : {{~#if (isString type)}}chip::CharSpan::fromCharString("{{>defaultValue}}"){{else}}{{>defaultValue}}{{/if~}}
-          {{~else if (isString type)}}"{{definedValue}}"
-          {{else}}{{definedValue}}
-          {{~/if~}}
-          {{/chip_tests_item_parameters}});
-    }
-    {{else if isWait}}
-    CHIP_ERROR {{>testCommand}}()
-    {
-      const chip::EndpointId endpoint = {{#if (chip_tests_config_has "endpoint")}}mEndpoint.HasValue() ? mEndpoint.Value() : {{/if}}{{endpoint}};
-      ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: {{cluster}} {{#if isAttribute}}Attribute: {{attribute}}{{else}}Command: {{wait}}{{/if}}] {{label}}", endpoint);
-      {{#*inline "waitForTypeName"}}{{#if isAttribute}}Attribute{{else}}Command{{/if}}{{/inline}}
-      {{#*inline "waitForTypeId"}}chip::app::Clusters::{{asUpperCamelCase cluster}}::{{#if isAttribute}}Attributes::{{asUpperCamelCase attribute}}{{else}}Commands::{{asUpperCamelCase wait}}{{/if}}::Id{{/inline}}
-      ClearAttributeAndCommandPaths();
-      m{{>waitForTypeName}}Path = chip::app::Concrete{{>waitForTypeName}}Path(endpoint, chip::app::Clusters::{{asUpperCamelCase cluster}}::Id, {{>waitForTypeId}});
-      return CHIP_NO_ERROR;
-    }
-    {{else}}
-
-    {{#*inline "device"}}mDevices[kIdentity{{asUpperCamelCase identity}}]{{/inline}}
-    CHIP_ERROR {{>testCommand}}()
-    {
-        {{#if isGroupCommand}}
-        const chip::GroupId groupId = {{groupId}};
-        {{else}}
-        const chip::EndpointId endpoint = {{#if (chip_tests_config_has "endpoint")}}mEndpoint.HasValue() ? mEndpoint.Value() : {{/if}}{{endpoint}};
-        {{/if}}
-
-        {{~#*inline "maybeTimedInteractionTimeout"}}
-          {{#if timedInteractionTimeoutMs}}
-          , {{timedInteractionTimeoutMs}}
-          {{else if commandObject.mustUseTimedInvoke}}
-          , chip::NullOptional
-          {{else if attributeObject.mustUseTimedWrite}}
-          , chip::NullOptional
-          {{/if}}
-        {{/inline~}}
-
-        {{~#*inline "maybeWait"}}
-          {{#if busyWaitMs}}
-          using namespace chip::System::Clock::Literals;
-          BusyWaitFor({{busyWaitMs}}_ms);
-          {{/if}}
-        {{/inline~}}
-
-        {{#if isCommand}}
-        using RequestType = chip::app::Clusters::{{asUpperCamelCase cluster}}::Commands::{{asUpperCamelCase command}}::Type;
-
-        {{#if (chip_tests_item_has_list)}} ListFreer listFreer;{{/if}}
-        RequestType request;
-        {{#chip_tests_item_parameters}}
-        {{>commandValue ns=parent.cluster container=(concat "request." (asLowerCamelCase label)) definedValue=definedValue depth=0}}
-        {{/chip_tests_item_parameters}}
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<{{filename}}Suite *>(context))->{{>successResponse}}({{#chip_tests_item_response_parameters}}{{#not_first}}, {{/not_first}}data.{{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}});
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<{{filename}}Suite *>(context))->{{>failureResponse}}(error);
-        };
-
-        {{#if isGroupCommand}}
-        auto done = [](void * context) {
-            (static_cast<{{filename}}Suite *>(context))->OnDoneResponse_{{index}}();
-        };
-        {{/if}}
-
-        ReturnErrorOnFailure(chip::Controller::{{#if isGroupCommand}}InvokeGroupCommand{{else}}InvokeCommand{{/if}}({{>device}}, this, success, failure, {{#if isGroupCommand}}done,{{/if}}
-          {{#if isGroupCommand}}groupId{{else}}endpoint{{/if}},
-          request
-          {{> maybeTimedInteractionTimeout }}
-          ));
-        {{> maybeWait }}
-        {{else}}
-        chip::Controller::{{asUpperCamelCase cluster}}ClusterTest cluster;
-        {{#unless isGroupCommand}}
-        cluster.Associate({{>device}}, endpoint);
-        {{/unless}}
-
-        {{#if (chip_tests_item_has_list)}} ListFreer listFreer;{{/if}}
-        {{#chip_tests_item_parameters}}
-        {{zapTypeToEncodableClusterObjectType type ns=parent.cluster}} {{asLowerCamelCase name}}Argument;
-        {{>commandValue ns=parent.cluster container=(concat (asLowerCamelCase name) "Argument") definedValue=definedValue depth=0}}
-        {{/chip_tests_item_parameters}}
-
-        {{#if isWriteAttribute}}
-        {{#if isGroupCommand}}
-          ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>(groupId, {{>device}}->GetSecureSession().Value()->GetFabricIndex(), {{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument, {{/chip_tests_item_parameters}}this, {{>staticSuccessResponse}}, {{>staticFailureResponse}}
-            {{~> maybeTimedInteractionTimeout ~}}
-            , {{>staticDoneResponse}}
-            ));
-          {{> maybeWait }}
-        {{else}}
-          ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>({{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument, {{/chip_tests_item_parameters}}this, {{>staticSuccessResponse}}, {{>staticFailureResponse}}
-            {{~> maybeTimedInteractionTimeout ~}}
-            ));
-          {{> maybeWait }}
-        {{/if}}
-        {{else if isReadEvent}}
-          ReturnErrorOnFailure(cluster.ReadEvent<{{zapTypeToDecodableClusterObjectType event ns=cluster isArgument=true}}>(this, {{>staticSuccessResponse}}, {{>staticFailureResponse}}));
-        {{else if isSubscribeEvent}}
-          ReturnErrorOnFailure(cluster.SubscribeEvent<{{zapTypeToDecodableClusterObjectType event ns=cluster isArgument=true}}>(this, {{>staticSuccessResponse}}, {{>staticFailureResponse}}, minIntervalArgument, maxIntervalArgument, {{>staticSubscriptionEstablished}}));
-        {{else if isReadAttribute}}
-          ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>({{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument, {{/chip_tests_item_parameters}}this, {{>staticSuccessResponse}}, {{>staticFailureResponse}}, {{fabricFiltered}}));
-        {{else if isSubscribeAttribute}}
-          ReturnErrorOnFailure(cluster.SubscribeAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>(this, {{>staticSuccessResponse}}, {{>staticFailureResponse}}, minIntervalArgument, maxIntervalArgument, {{>staticSubscriptionEstablished}}, {{fabricFiltered}}));
-        {{else if isWaitForReport}}
-          {{> subscribeDataCallback}} = {{> staticSuccessResponse}};
-        {{else}}
-          UNEXPECTED COMMAND: {{>commandName}}
-        {{/if}}
-        {{/if}}
-        {{#if async}}
-          return WaitForMs(0);
-        {{else}}
-          return CHIP_NO_ERROR;
-        {{/if}}
-    }
-
-    void {{>failureResponse}}({{>failureArguments}})
-    {
-        chip::app::StatusIB status(error);
-        {{#if response.error}}
-          {{#if optional}}
-          if (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute){
-            {{#unless async}}NextTest();{{/unless}}
-          } else {
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), {{response.error}}));
-            {{#unless async}}NextTest();{{/unless}}
-          }
-          {{else}}
-          VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), {{response.error}}));
-          {{#unless async}}NextTest();{{/unless}}
-          {{/if}}
-        {{else}}
-          {{#if optional}}(status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : {{/if}}ThrowFailureResponse();
-        {{/if}}
-    }
-
-    {{#if isSubscribe}}
-    void {{>successResponse}}({{> subscribeResponseArguments attr=attributeObject}})
-    {
-        {{#if response.error}}
-          ThrowSuccessResponse();
-        {{else if response.errorWrongValue}}
-          ThrowSuccessResponse();
-        {{else}}
-          if ({{> subscribeDataCallback}}) {
-              auto callback = {{> subscribeDataCallback}};
-              {{> subscribeDataCallback}} = nullptr;
-              callback(this, value);
-          }
-       {{/if}}
-    }
-
-    void {{>subscriptionEstablished}}({{> subscriptionEstablishedArguments}})
-    {
-        {{#if hasWaitForReport}}
-          VerifyOrReturn(mReceivedReport_{{waitForReport.index}}, Exit("Initial report not received!"));
-        {{/if}}
-        {{#unless async}}NextTest();{{/unless}}
-    }
-    {{else}}
-    void {{>successResponse}}({{>successArguments}})
-    {
-        {{~#if response.error}}
-          ThrowSuccessResponse();
-        {{else if response.errorWrongValue}}
-          ThrowSuccessResponse();
-        {{else}}
-          {{#if isWaitForReport}}
-          mReceivedReport_{{index}} = true;
-          {{/if}}
-          {{#chip_tests_item_response_parameters}}
-            {{>maybeCheckExpectedValue}}
-            {{>maybeCheckExpectedConstraints}}
-            {{>maybeSaveAs}}
-          {{/chip_tests_item_response_parameters}}
-        {{#unless async}}NextTest();{{/unless}}
-        {{/if}}
-    }
-    {{/if}}
-
-    {{#if isGroupCommand}}
-    void {{>doneResponse}}({{>doneArguments}})
-    {
-      NextTest();
-    }
-    {{/if}}
-
-    {{/if}}
-    {{/chip_tests_items}}
 };
 
 {{/chip_tests}}

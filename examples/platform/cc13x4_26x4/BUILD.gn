@@ -1,0 +1,44 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+config("chip_examples_project_config") {
+  include_dirs = [ "project_include" ]
+}
+
+source_set("openthread_core_config_cc13x4_26x4_chip_examples") {
+  sources = [ "project_include/OpenThreadConfig.h" ]
+  public_configs = [ ":chip_examples_project_config" ]
+}
+
+config("attestation-credentials-config") {
+  include_dirs = [ "${chip_root}" ]
+
+  defines = [ "CC13X4_26X4_ATTESTATION_CREDENTIALS" ]
+}
+
+source_set("cc13x4_26x4-attestation-credentials") {
+  sources = [
+    "CC13X4_26X4DeviceAttestationCreds.cpp",
+    "CC13X4_26X4DeviceAttestationCreds.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/credentials",
+    "${chip_root}/src/platform:platform_base",
+  ]
+
+  public_configs = [ ":attestation-credentials-config" ]
+}

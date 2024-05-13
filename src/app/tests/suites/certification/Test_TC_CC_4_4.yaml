@@ -13,7 +13,10 @@
 # limitations under the License.
 
 name:
-    27.2.8. [TC-CC-4.4] MoveToHueAndSaturation functionality with server as DUT
+    25.3.8. [TC-CC-4.4] MoveToHueAndSaturation functionality with server as DUT
+
+PICS:
+    - CC.S
 
 config:
     nodeId: 0x12344321
@@ -21,7 +24,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -29,72 +32,192 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Turn on light for color control tests"
-      cluster: "On/Off"
-      command: "on"
+    - label: "Step 1a: TH writes 0 to the Options attribute"
+      PICS: CC.S.F00 && CC.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
 
-    - label: "Check on/off attribute value is true after on command"
+    - label: "Step 1b: TH sends On command to DUT"
+      PICS: OO.S.C01.Rsp
       cluster: "On/Off"
-      command: "readAttribute"
-      attribute: "OnOff"
-      response:
-          value: 1
+      command: "On"
 
     - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      disabled: true
-      command: "readAttribute"
-      attribute: "current hue"
-      response:
-          value: 250
-
-    - label: "Check Saturation attribute value matched before any change"
-      disabled: true
-      command: "readAttribute"
-      attribute: "current saturation"
-      response:
-          value: 90
-
-    - label: "Move To current hue and saturation command"
+          "Step 2a: TH sends MoveToHueAndSaturation command to DUT with Hue=200,
+          Saturation=50 and TransitionTime=0 (immediately)"
+      PICS: CC.S.F00 && CC.S.C06.Rsp
       command: "MoveToHueAndSaturation"
       arguments:
           values:
-              - name: "hue"
-                value: 40
-              - name: "saturation"
-                value: 160
-              - name: "transitionTime"
-                value: 10
-              - name: "optionsMask"
+              - name: "Hue"
+                value: 200
+              - name: "Saturation"
+                value: 50
+              - name: "TransitionTime"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsMask"
                 value: 0
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      disabled: true
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 100ms"
+      PICS: CC.S.F00
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    - label: "Step 2b: TH reads CurrentHue attribute from DUT."
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C06.Rsp
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
-          value: 40
+          constraints:
+              minValue: 170
+              maxValue: 230
+
+    - label: "Step 2b1: TH reads CurrentSaturation attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0001
+      command: "readAttribute"
+      attribute: "CurrentSaturation"
+      response:
+          constraints:
+              minValue: 42
+              maxValue: 58
 
     - label:
-          "Check Saturation attribute value matched the value sent by the last
-          command"
-      disabled: true
+          "Step 3a: TH sends MoveToHueAndSaturation command to DUT with Hue=160,
+          Saturation=80 and TransitionTime=200 (20s)"
+      PICS: CC.S.F00 && CC.S.C06.Rsp
+      command: "MoveToHueAndSaturation"
+      arguments:
+          values:
+              - name: "Hue"
+                value: 160
+              - name: "Saturation"
+                value: 80
+              - name: "TransitionTime"
+                value: 200
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 10s"
+      PICS: CC.S.F00
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "Step 3b: TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "CurrentHue"
       response:
-          value: 160
+          constraints:
+              minValue: 160
+              maxValue: 200
+
+    - label: "Step 3b1: TH reads CurrentSaturation attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0001
+      command: "readAttribute"
+      attribute: "CurrentSaturation"
+      response:
+          constraints:
+              minValue: 50
+              maxValue: 80
+
+    - label: "Wait 10s"
+      PICS: CC.S.F00
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "Step 3c: TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          constraints:
+              minValue: 135
+              maxValue: 185
+
+    - label: "Step 3c1: TH reads CurrentSaturation attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0001
+      command: "readAttribute"
+      attribute: "CurrentSaturation"
+      response:
+          constraints:
+              type: int8u
+              minValue: 68
+              maxValue: 92
+
+    - label: "Wait 5s"
+      PICS: CC.S.F00
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "Step 3d: TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          constraints:
+              minValue: 135
+              maxValue: 185
+
+    - label: "Step 3d1: TH reads CurrentSaturation attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0001
+      command: "readAttribute"
+      attribute: "CurrentSaturation"
+      response:
+          constraints:
+              minValue: 68
+              maxValue: 92
+
+    - label: "Step 4a: TH reads ColorMode attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0008
+      command: "readAttribute"
+      attribute: "ColorMode"
+      response:
+          value: 0
+          constraints:
+              minValue: 0
+              maxValue: 2
+
+    - label: "Step 4b: TH reads EnhancedColorMode attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A4001
+      command: "readAttribute"
+      attribute: "EnhancedColorMode"
+      response:
+          value: 0
+          constraints:
+              minValue: 0
+              maxValue: 3
 
     - label: "Turn off light that we turned on"
+      PICS: OO.S.C00.Rsp
       cluster: "On/Off"
-      command: "off"
+      command: "Off"
 
     - label: "Check on/off attribute value is false after off command"
       cluster: "On/Off"
       command: "readAttribute"
       attribute: "OnOff"
+      PICS: OO.S.A0000
       response:
           value: 0

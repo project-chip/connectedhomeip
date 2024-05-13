@@ -17,17 +17,48 @@
 
 #pragma once
 
+#include <lib/support/Span.h>
 #include <setup_payload/SetupPayload.h>
 
 void PrintOnboardingCodes(chip::RendezvousInformationFlags aRendezvousFlags);
-void PrintOnboardingCodes(const chip::SetupPayload & payload);
+void PrintOnboardingCodes(const chip::PayloadContents & payload);
+void PrintQrCodeURL(const chip::MutableCharSpan qrCode);
 void ShareQRCodeOverNFC(chip::RendezvousInformationFlags aRendezvousFlags);
-CHIP_ERROR GetQRCode(std::string & aQRCode, chip::RendezvousInformationFlags aRendezvousFlags);
-CHIP_ERROR GetQRCode(std::string & aQRCode, const chip::SetupPayload & payload);
-CHIP_ERROR GetQRCodeUrl(char * aQRCodeUrl, size_t aUrlMaxSize, const std::string & aQRCode);
-CHIP_ERROR GetManualPairingCode(std::string & aManualPairingCode, chip::RendezvousInformationFlags aRendezvousFlags);
-CHIP_ERROR GetManualPairingCode(std::string & aManualPairingCode, const chip::SetupPayload & payload);
-CHIP_ERROR GetSetupPayload(chip::SetupPayload & aSetupPayload, chip::RendezvousInformationFlags aRendezvousFlags);
+
+/**
+ * Creates a null-terminated QR code from the payload created based on rendezvous flag information.
+ *
+ * The resulting size of the QR code span will be the size of data written and not including the null terminator.
+ */
+CHIP_ERROR GetQRCode(chip::MutableCharSpan & aQRCode, chip::RendezvousInformationFlags aRendezvousFlags);
+
+/**
+ * Creates a null-terminated QR code based on the provided payload.
+ *
+ * The resulting size of the QR code span will be the size of data written and not including the null terminator.
+ */
+CHIP_ERROR GetQRCode(chip::MutableCharSpan & aQRCode, const chip::PayloadContents & payload);
+
+/**
+ * Creates a null-terminated QR code url.
+ */
+CHIP_ERROR GetQRCodeUrl(char * aQRCodeUrl, size_t aUrlMaxSize, const chip::CharSpan & aQRCode);
+
+/**
+ * Creates a null-terminated manual pairing code from the payload created based on rendezvous flag information.
+ *
+ * The resulting size of the manual pairing code span will be the size of data written and not including the null terminator.
+ */
+CHIP_ERROR GetManualPairingCode(chip::MutableCharSpan & aManualPairingCode, chip::RendezvousInformationFlags aRendezvousFlags);
+
+/**
+ * Creates a null-terminated manual pairing code based on the provided payload.
+ *
+ * The resulting size of the manual pairing code span will be the size of data written and not including the null terminator.
+ */
+CHIP_ERROR GetManualPairingCode(chip::MutableCharSpan & aManualPairingCode, const chip::PayloadContents & payload);
+
+CHIP_ERROR GetPayloadContents(chip::PayloadContents & aPayload, chip::RendezvousInformationFlags aRendezvousFlags);
 
 /**
  * Initialize DataModelHandler and start CHIP datamodel server, the server

@@ -18,21 +18,19 @@
 
 #pragma once
 
-#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
 
-#include <app/AttributeAccessInterface.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/CommandResponseHelper.h>
-#include <app/util/af.h>
-#include <list>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ContentLauncher {
 
-using BrandingInformation = chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type;
-using Parameter           = chip::app::Clusters::ContentLauncher::Structs::Parameter::DecodableType;
+using BrandingInformation = chip::app::Clusters::ContentLauncher::Structs::BrandingInformationStruct::Type;
+using PlaybackPreferences = chip::app::Clusters::ContentLauncher::Structs::PlaybackPreferencesStruct::DecodableType;
+using Parameter           = chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::DecodableType;
 
 /** @brief
  *    Defines methods for implementing application-specific logic for the Content Launcher Cluster.
@@ -40,16 +38,21 @@ using Parameter           = chip::app::Clusters::ContentLauncher::Structs::Param
 class Delegate
 {
 public:
-    virtual void HandleLaunchContent(CommandResponseHelper<Commands::LaunchResponse::Type> & helper,
+    virtual void HandleLaunchContent(CommandResponseHelper<Commands::LauncherResponse::Type> & helper,
                                      const DataModel::DecodableList<Parameter> & parameterList, bool autoplay,
-                                     const CharSpan & data) = 0;
+                                     const CharSpan & data, const Optional<PlaybackPreferences> playbackPreferences,
+                                     bool useCurrentContext) = 0;
 
-    virtual void HandleLaunchUrl(CommandResponseHelper<Commands::LaunchResponse::Type> & helper, const CharSpan & contentUrl,
+    virtual void HandleLaunchUrl(CommandResponseHelper<Commands::LauncherResponse::Type> & helper, const CharSpan & contentUrl,
                                  const CharSpan & displayString, const BrandingInformation & brandingInformation) = 0;
 
     virtual CHIP_ERROR HandleGetAcceptHeaderList(app::AttributeValueEncoder & aEncoder) = 0;
 
     virtual uint32_t HandleGetSupportedStreamingProtocols() = 0;
+
+    bool HasFeature(chip::EndpointId endpoint, Feature feature);
+    virtual uint32_t GetFeatureMap(chip::EndpointId endpoint)      = 0;
+    virtual uint16_t GetClusterRevision(chip::EndpointId endpoint) = 0;
 
     virtual ~Delegate() = default;
 };

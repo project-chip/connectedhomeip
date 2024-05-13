@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
 import("//build_overrides/jlink.gni")
 import("//build_overrides/openthread.gni")
+import("${chip_root}/src/platform/device.gni")
 
 config("libopenthread-platform_config") {
   include_dirs = [ "${openthread_root}/examples/platforms" ]
@@ -45,8 +47,6 @@ static_library("libopenthread-platform-utils") {
     "${openthread_root}/examples/platforms/utils/code_utils.h",
     "${openthread_root}/examples/platforms/utils/debug_uart.c",
     "${openthread_root}/examples/platforms/utils/encoding.h",
-    "${openthread_root}/examples/platforms/utils/logging_rtt.c",
-    "${openthread_root}/examples/platforms/utils/logging_rtt.h",
     "${openthread_root}/examples/platforms/utils/mac_frame.cpp",
     "${openthread_root}/examples/platforms/utils/mac_frame.h",
     "${openthread_root}/examples/platforms/utils/settings.h",
@@ -54,10 +54,17 @@ static_library("libopenthread-platform-utils") {
     "${openthread_root}/examples/platforms/utils/soft_source_match_table.c",
     "${openthread_root}/examples/platforms/utils/soft_source_match_table.h",
   ]
-  public_deps = [
-    "${openthread_root}/src/core:libopenthread_core_headers",
-    "${segger_rtt_root}:segger_rtt",
-  ]
+
+  public_deps = [ "${openthread_root}/src/core:libopenthread_core_headers" ]
+
+  if (chip_enable_segger_rtt) {
+    sources += [
+      "${openthread_root}/examples/platforms/utils/logging_rtt.c",
+      "${openthread_root}/examples/platforms/utils/logging_rtt.h",
+    ]
+
+    public_deps += [ "${segger_rtt_root}:segger_rtt" ]
+  }
 
   public_configs = [ ":libopenthread-platform_config" ]
 }

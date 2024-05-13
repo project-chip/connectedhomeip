@@ -13,18 +13,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Optional, Any, Mapping
+import logging
+from time import sleep
+from typing import Any, List, Mapping
 
 import mbed_lstools
 import pytest
-from time import sleep
 
 from .device import Device
-
 from .serial_connection import SerialConnection
 from .serial_device import SerialDevice
 
-import logging
 log = logging.getLogger(__name__)
 
 

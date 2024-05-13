@@ -17,42 +17,53 @@
 
 #include <platform_stdlib.h>
 
+#include "AmebaObserver.h"
+#include "BindingHandler.h"
 #include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
 #include "Globals.h"
 #include "LEDWidget.h"
+#include "ManualOperationCommand.h"
 #include "chip_porting.h"
+#include <DeviceInfoProviderImpl.h>
 #include <lwip_netconf.h>
 
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/laundry-dryer-controls-server/laundry-dryer-controls-server.h>
+#include <app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
-#include <app/util/af.h>
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <lib/support/ErrorStr.h>
+#include <app/util/endpoint-config-api.h>
+#include <laundry-dryer-controls-delegate-impl.h>
+#include <laundry-washer-controls-delegate-impl.h>
+#include <lib/core/ErrorStr.h>
+#include <microwave-oven-device.h>
 #include <platform/Ameba/AmebaConfig.h>
 #include <platform/Ameba/NetworkCommissioningDriver.h>
+#if CONFIG_ENABLE_AMEBA_CRYPTO
+#include <platform/Ameba/crypto/AmebaPersistentStorageOperationalKeystore.h>
+#endif
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
+#include <static-supported-temperature-levels.h>
 #include <support/CHIPMem.h>
-
-#if CONFIG_ENABLE_OTA_REQUESTOR
-#include "app/clusters/ota-requestor/DefaultOTARequestorStorage.h"
-#include <app/clusters/ota-requestor/BDXDownloader.h>
-#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
-#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
-#include <platform/Ameba/AmebaOTAImageProcessor.h>
+#if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
+#include <app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerHandler.h>
+#include <test_event_trigger/AmebaTestEventTriggerDelegate.h>
 #endif
 
 #if CONFIG_ENABLE_PW_RPC
-#include "Rpc.h"
+#include <Rpc.h>
+#endif
+
+#if CONFIG_ENABLE_CHIP_SHELL
+#include <shell/launch_shell.h>
 #endif
 
 using namespace ::chip;
-using namespace ::chip::Credentials;
+using namespace ::chip::app;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::System;
@@ -64,6 +75,8 @@ constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointMain /* Endpoint Id */,
                                       &(NetworkCommissioning::AmebaWiFiDriver::GetInstance()));
+
+app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 } // namespace
 
 void NetWorkCommissioningInstInit()
@@ -74,18 +87,43 @@ void NetWorkCommissioningInstInit()
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 }
 
+void OnIdentifyTriggerEffect(Identify * identify)
+{
+    switch (identify->mCurrentEffectIdentifier)
+    {
+    case Clusters::Identify::EffectIdentifierEnum::kBlink:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBlink");
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kBreathe:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBreathe");
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kOkay:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kOkay");
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kChannelChange");
+        break;
+    default:
+        ChipLogProgress(Zcl, "No identifier effect");
+        break;
+    }
+    return;
+}
+
 Identify gIdentify0 = {
     chip::EndpointId{ 0 },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
-    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
+    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
+    OnIdentifyTriggerEffect,
 };
 
 Identify gIdentify1 = {
     chip::EndpointId{ 1 },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
-    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
+    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
+    OnIdentifyTriggerEffect,
 };
 
 #ifdef CONFIG_PLATFORM_8721D
@@ -97,61 +135,39 @@ Identify gIdentify1 = {
 #endif
 
 static DeviceCallbacks EchoCallbacks;
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
-#if CONFIG_ENABLE_OTA_REQUESTOR
-DefaultOTARequestor gRequestorCore;
-DefaultOTARequestorStorage gRequestorStorage;
-DefaultOTARequestorDriver gRequestorUser;
-BDXDownloader gDownloader;
-AmebaOTAImageProcessor gImageProcessor;
+#if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
+uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+                                                                                   0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
 #endif
-
-#if CONFIG_ENABLE_OTA_REQUESTOR
-extern "C" void amebaQueryImageCmdHandler()
-{
-    ChipLogProgress(DeviceLayer, "Calling amebaQueryImageCmdHandler");
-    PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->TriggerImmediateQuery(); });
-}
-
-extern "C" void amebaApplyUpdateCmdHandler()
-{
-    ChipLogProgress(DeviceLayer, "Calling amebaApplyUpdateCmdHandler");
-    PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->ApplyUpdate(); });
-}
-
-static void InitOTARequestor(void)
-{
-    // Initialize and interconnect the Requestor and Image Processor objects -- START
-    SetRequestorInstance(&gRequestorCore);
-
-    gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
-
-    // Set server instance used for session establishment
-    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
-
-    gImageProcessor.SetOTADownloader(&gDownloader);
-
-    // Connect the Downloader and Image Processor objects
-    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
-    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
-
-    // Initialize and interconnect the Requestor and Image Processor objects -- END
-}
-#endif // CONFIG_ENABLE_OTA_REQUESTOR
 
 static void InitServer(intptr_t context)
 {
-#if CONFIG_ENABLE_OTA_REQUESTOR
-    InitOTARequestor();
-#endif
-
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
-    initParams.InitializeStaticResourcesBeforeServerInit();
-    chip::Server::GetInstance().Init(initParams);
 
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
+    static AmebaTestEventTriggerDelegate sTestEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
+    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
+#endif
+    static AmebaObserver sAmebaObserver;
+    initParams.appDelegate = &sAmebaObserver;
+
+    initParams.InitializeStaticResourcesBeforeServerInit();
+
+#if CONFIG_ENABLE_AMEBA_CRYPTO
+    ChipLogProgress(DeviceLayer, "platform crypto enabled!");
+    static chip::AmebaPersistentStorageOperationalKeystore sAmebaPersistentStorageOpKeystore;
+    VerifyOrDie((sAmebaPersistentStorageOpKeystore.Init(initParams.persistentStorageDelegate)) == CHIP_NO_ERROR);
+    initParams.operationalKeystore = &sAmebaPersistentStorageOpKeystore;
+#endif
+
+    chip::Server::GetInstance().Init(initParams);
+    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
+    // TODO: Use our own DeviceInfoProvider
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
     NetWorkCommissioningInstInit();
 
     if (RTW_SUCCESS != wifi_is_connected_to_ap())
@@ -159,6 +175,18 @@ static void InitServer(intptr_t context)
         // QR code will be used with CHIP Tool
         PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
     }
+
+#if CONFIG_ENABLE_CHIP_SHELL
+    InitBindingHandler();
+    InitManualOperation();
+#endif
+    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    MatterMicrowaveOvenServerInit();
+#if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
+    static SmokeCOTestEventTriggerHandler sSmokeCOTestEventTriggerHandler;
+    Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(&sSmokeCOTestEventTriggerHandler);
+#endif
+    chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sAmebaObserver);
 }
 
 extern "C" void ChipTest(void)
@@ -179,17 +207,36 @@ extern "C" void ChipTest(void)
     {
         ChipLogError(DeviceLayer, "DeviceManagerInit() - ERROR!\r\n");
     }
-    else
-    {
-        ChipLogProgress(DeviceLayer, "DeviceManagerInit() - OK\r\n");
-    }
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, 0);
 
     statusLED1.Init(STATUS_LED_GPIO_NUM);
+
+#if CONFIG_ENABLE_CHIP_SHELL
+    chip::LaunchShell();
+#endif
+}
+
+extern "C" void ChipTestShutdown(void)
+{
+    ChipLogProgress(DeviceLayer, "All Clusters Demo! Shutdown Now!");
+    CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
+    deviceMgr.Shutdown();
 }
 
 bool lowPowerClusterSleep()
 {
     return true;
+}
+
+using namespace chip::app::Clusters::LaundryWasherControls;
+void emberAfLaundryWasherControlsClusterInitCallback(EndpointId endpoint)
+{
+    LaundryWasherControlsServer::SetDefaultDelegate(endpoint, &LaundryWasherControlDelegate::getLaundryWasherControlDelegate());
+}
+
+using namespace chip::app::Clusters::LaundryDryerControls;
+void emberAfLaundryDryerControlsClusterInitCallback(EndpointId endpoint)
+{
+    LaundryDryerControlsServer::SetDefaultDelegate(endpoint, &LaundryDryerControlDelegate::getLaundryDryerControlDelegate());
 }

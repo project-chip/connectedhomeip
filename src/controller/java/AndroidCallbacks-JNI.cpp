@@ -28,28 +28,55 @@ using namespace chip::Controller;
 
 JNI_METHOD(jlong, GetConnectedDeviceCallbackJni, newCallback)(JNIEnv * env, jobject self, jobject callback)
 {
-    GetConnectedDeviceCallback * connectedDeviceCallback = chip::Platform::New<GetConnectedDeviceCallback>(self, callback);
-    return reinterpret_cast<jlong>(connectedDeviceCallback);
+    return newConnectedDeviceCallback(env, self, callback);
 }
 
 JNI_METHOD(void, GetConnectedDeviceCallbackJni, deleteCallback)(JNIEnv * env, jobject self, jlong callbackHandle)
 {
-    GetConnectedDeviceCallback * connectedDeviceCallback = reinterpret_cast<GetConnectedDeviceCallback *>(callbackHandle);
-    VerifyOrReturn(connectedDeviceCallback != nullptr, ChipLogError(Controller, "GetConnectedDeviceCallback handle is nullptr"));
-    delete connectedDeviceCallback;
+    deleteConnectedDeviceCallback(env, self, callbackHandle);
 }
 
 JNI_METHOD(jlong, ReportCallbackJni, newCallback)
-(JNIEnv * env, jobject self, jobject subscriptionEstablishedCallbackJava, jobject reportCallbackJava)
+(JNIEnv * env, jobject self, jobject subscriptionEstablishedCallbackJava, jobject resubscriptionAttemptCallbackJava)
 {
-    ReportCallback * reportCallback =
-        chip::Platform::New<ReportCallback>(self, subscriptionEstablishedCallbackJava, reportCallbackJava);
-    return reinterpret_cast<jlong>(reportCallback);
+    return newReportCallback(env, self, subscriptionEstablishedCallbackJava, resubscriptionAttemptCallbackJava,
+                             "()Lchip/devicecontroller/model/NodeState;");
 }
 
 JNI_METHOD(void, ReportCallbackJni, deleteCallback)(JNIEnv * env, jobject self, jlong callbackHandle)
 {
-    ReportCallback * reportCallback = reinterpret_cast<ReportCallback *>(callbackHandle);
-    VerifyOrReturn(reportCallback != nullptr, ChipLogError(Controller, "ReportCallback handle is nullptr"));
-    delete reportCallback;
+    deleteReportCallback(env, self, callbackHandle);
+}
+
+JNI_METHOD(jlong, WriteAttributesCallbackJni, newCallback)
+(JNIEnv * env, jobject self)
+{
+    return newWriteAttributesCallback(env, self);
+}
+
+JNI_METHOD(void, WriteAttributesCallbackJni, deleteCallback)(JNIEnv * env, jobject self, jlong callbackHandle)
+{
+    deleteWriteAttributesCallback(env, self, callbackHandle);
+}
+
+JNI_METHOD(jlong, InvokeCallbackJni, newCallback)
+(JNIEnv * env, jobject self)
+{
+    return newInvokeCallback(env, self);
+}
+
+JNI_METHOD(void, InvokeCallbackJni, deleteCallback)(JNIEnv * env, jobject self, jlong callbackHandle)
+{
+    deleteInvokeCallback(env, self, callbackHandle);
+}
+
+JNI_METHOD(jlong, ExtendableInvokeCallbackJni, newCallback)
+(JNIEnv * env, jobject self)
+{
+    return newExtendableInvokeCallback(env, self);
+}
+
+JNI_METHOD(void, ExtendableInvokeCallbackJni, deleteCallback)(JNIEnv * env, jobject self, jlong callbackHandle)
+{
+    deleteExtendableInvokeCallback(env, self, callbackHandle);
 }

@@ -21,19 +21,18 @@
  ***************************************************************************/
 
 #include <access/AccessControl.h>
-#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/enums.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
+#include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
-#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/CertificationDeclaration.h>
@@ -41,48 +40,59 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/PeerId.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/DeviceControlServer.h>
 #include <string.h>
-#include <trace/trace.h>
+#include <tracing/macros.h>
 
 using namespace chip;
-using namespace ::chip::DeviceLayer;
 using namespace ::chip::Transport;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OperationalCredentials;
+using namespace chip::Credentials;
+using namespace chip::Crypto;
 using namespace chip::Protocols::InteractionModel;
 
 namespace {
 
-void SendNOCResponse(app::CommandHandler * commandObj, const ConcreteCommandPath & path, OperationalCertStatus status,
+void SendNOCResponse(app::CommandHandler * commandObj, const ConcreteCommandPath & path, NodeOperationalCertStatusEnum status,
                      uint8_t index, const CharSpan & debug_text);
-OperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err);
+NodeOperationalCertStatusEnum ConvertToNOCResponseStatus(CHIP_ERROR err);
 
-constexpr uint8_t kDACCertificate = 1;
-constexpr uint8_t kPAICertificate = 2;
+constexpr auto kDACCertificate = CertificateChainTypeEnum::kDACCertificate;
+constexpr auto kPAICertificate = CertificateChainTypeEnum::kPAICertificate;
 
-CHIP_ERROR CreateAccessControlEntryForNewFabricAdministrator(FabricIndex fabricIndex, NodeId subject)
+CHIP_ERROR CreateAccessControlEntryForNewFabricAdministrator(const Access::SubjectDescriptor & subjectDescriptor,
+                                                             FabricIndex fabricIndex, uint64_t subject)
 {
+    NodeId subjectAsNodeID = static_cast<NodeId>(subject);
+
+    if (!IsOperationalNodeId(subjectAsNodeID) && !IsCASEAuthTag(subjectAsNodeID))
+    {
+        return CHIP_ERROR_INVALID_ADMIN_SUBJECT;
+    }
+
     Access::AccessControl::Entry entry;
     ReturnErrorOnFailure(Access::GetAccessControl().PrepareEntry(entry));
     ReturnErrorOnFailure(entry.SetFabricIndex(fabricIndex));
     ReturnErrorOnFailure(entry.SetPrivilege(Access::Privilege::kAdminister));
     ReturnErrorOnFailure(entry.SetAuthMode(Access::AuthMode::kCase));
     ReturnErrorOnFailure(entry.AddSubject(nullptr, subject));
-    ReturnErrorOnFailure(Access::GetAccessControl().CreateEntry(nullptr, entry));
+    CHIP_ERROR err = Access::GetAccessControl().CreateEntry(&subjectDescriptor, fabricIndex, nullptr, entry);
 
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: ACL entry created for Fabric %X CASE Admin NodeId 0x" ChipLogFormatX64,
-                   fabricIndex, ChipLogValueX64(subject));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "OpCreds: Failed to add administrative node ACL entry: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
 
-    // TODO: event notification for newly created ACL entry
+    ChipLogProgress(Zcl, "OpCreds: ACL entry created for Fabric index 0x%x CASE Admin Subject 0x" ChipLogFormatX64,
+                    static_cast<unsigned>(fabricIndex), ChipLogValueX64(subject));
 
     return CHIP_NO_ERROR;
 }
@@ -110,25 +120,28 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadNOCs(EndpointId endpoint, Attri
     auto accessingFabricIndex = aEncoder.AccessingFabricIndex();
 
     return aEncoder.EncodeList([accessingFabricIndex](const auto & encoder) -> CHIP_ERROR {
-        for (auto & fabricInfo : Server::GetInstance().GetFabricTable())
+        const auto & fabricTable = Server::GetInstance().GetFabricTable();
+        for (const auto & fabricInfo : fabricTable)
         {
             Clusters::OperationalCredentials::Structs::NOCStruct::Type noc;
+            uint8_t nocBuf[kMaxCHIPCertLength];
+            uint8_t icacBuf[kMaxCHIPCertLength];
+            MutableByteSpan nocSpan{ nocBuf };
+            MutableByteSpan icacSpan{ icacBuf };
+            FabricIndex fabricIndex = fabricInfo.GetFabricIndex();
 
-            if (!fabricInfo.IsInitialized())
-                continue;
+            noc.fabricIndex = fabricIndex;
 
-            noc.fabricIndex = fabricInfo.GetFabricIndex();
-
-            if (accessingFabricIndex == fabricInfo.GetFabricIndex())
+            if (accessingFabricIndex == fabricIndex)
             {
-                ByteSpan icac;
 
-                ReturnErrorOnFailure(fabricInfo.GetNOCCert(noc.noc));
-                ReturnErrorOnFailure(fabricInfo.GetICACert(icac));
+                ReturnErrorOnFailure(fabricTable.FetchNOCCert(fabricIndex, nocSpan));
+                ReturnErrorOnFailure(fabricTable.FetchICACert(fabricIndex, icacSpan));
 
-                if (!icac.empty())
+                noc.noc = nocSpan;
+                if (!icacSpan.empty())
                 {
-                    noc.icac.SetNonNull(icac);
+                    noc.icac.SetNonNull(icacSpan);
                 }
             }
 
@@ -154,23 +167,23 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadCommissionedFabrics(EndpointId 
 CHIP_ERROR OperationalCredentialsAttrAccess::ReadFabricsList(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        for (auto & fabricInfo : Server::GetInstance().GetFabricTable())
+        const auto & fabricTable = Server::GetInstance().GetFabricTable();
+
+        for (const auto & fabricInfo : fabricTable)
         {
-            if (!fabricInfo.IsInitialized())
-                continue;
+            Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Type fabricDescriptor;
+            FabricIndex fabricIndex = fabricInfo.GetFabricIndex();
 
-            Clusters::OperationalCredentials::Structs::FabricDescriptor::Type fabricDescriptor;
-
-            fabricDescriptor.fabricIndex = fabricInfo.GetFabricIndex();
-            fabricDescriptor.nodeId      = fabricInfo.GetPeerId().GetNodeId();
-            fabricDescriptor.vendorId    = fabricInfo.GetVendorId();
-            fabricDescriptor.fabricId    = fabricInfo.GetFabricId();
+            fabricDescriptor.fabricIndex = fabricIndex;
+            fabricDescriptor.nodeID      = fabricInfo.GetPeerId().GetNodeId();
+            fabricDescriptor.vendorID    = fabricInfo.GetVendorId();
+            fabricDescriptor.fabricID    = fabricInfo.GetFabricId();
 
             fabricDescriptor.label = fabricInfo.GetFabricLabel();
 
-            Credentials::P256PublicKeySpan pubKey;
-            ReturnErrorOnFailure(fabricInfo.GetRootPubkey(pubKey));
-            fabricDescriptor.rootPublicKey = pubKey;
+            Crypto::P256PublicKey pubKey;
+            ReturnErrorOnFailure(fabricTable.FetchRootPubkey(fabricIndex, pubKey));
+            fabricDescriptor.rootPublicKey = ByteSpan{ pubKey.ConstBytes(), pubKey.Length() };
 
             ReturnErrorOnFailure(encoder.Encode(fabricDescriptor));
         }
@@ -181,16 +194,34 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadFabricsList(EndpointId endpoint
 
 CHIP_ERROR OperationalCredentialsAttrAccess::ReadRootCertificates(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
+    // It is OK to have duplicates.
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        for (auto & fabricInfo : Server::GetInstance().GetFabricTable())
+        const auto & fabricTable = Server::GetInstance().GetFabricTable();
+
+        for (const auto & fabricInfo : fabricTable)
         {
-            ByteSpan cert;
+            uint8_t certBuf[kMaxCHIPCertLength];
+            MutableByteSpan cert{ certBuf };
+            ReturnErrorOnFailure(fabricTable.FetchRootCert(fabricInfo.GetFabricIndex(), cert));
+            ReturnErrorOnFailure(encoder.Encode(ByteSpan{ cert }));
+        }
 
-            if (!fabricInfo.IsInitialized())
-                continue;
-
-            ReturnErrorOnFailure(fabricInfo.GetRootCert(cert));
-            ReturnErrorOnFailure(encoder.Encode(cert));
+        {
+            uint8_t certBuf[kMaxCHIPCertLength];
+            MutableByteSpan cert{ certBuf };
+            CHIP_ERROR err = fabricTable.FetchPendingNonFabricAssociatedRootCert(cert);
+            if (err == CHIP_ERROR_NOT_FOUND)
+            {
+                // No pending root cert, do nothing
+            }
+            else if (err != CHIP_NO_ERROR)
+            {
+                return err;
+            }
+            else
+            {
+                ReturnErrorOnFailure(encoder.Encode(ByteSpan{ cert }));
+            }
         }
 
         return CHIP_NO_ERROR;
@@ -230,77 +261,53 @@ CHIP_ERROR OperationalCredentialsAttrAccess::Read(const ConcreteReadAttributePat
     return CHIP_NO_ERROR;
 }
 
-// Utility to compute Attestation signature for NOCSRResponse and AttestationResponse
-CHIP_ERROR ComputeAttestationSignature(app::CommandHandler * commandObj,
-                                       Credentials::DeviceAttestationCredentialsProvider * dacProvider, const ByteSpan & payload,
-                                       MutableByteSpan & signatureSpan)
+const FabricInfo * RetrieveCurrentFabric(CommandHandler * aCommandHandler)
 {
-    uint8_t md[Crypto::kSHA256_Hash_Length];
-    MutableByteSpan messageDigestSpan(md);
+    FabricIndex index = aCommandHandler->GetAccessingFabricIndex();
+    ChipLogDetail(Zcl, "OpCreds: Finding fabric with fabricIndex 0x%x", static_cast<unsigned>(index));
+    return Server::GetInstance().GetFabricTable().FindFabricWithIndex(index);
+}
 
-    VerifyOrReturnError(signatureSpan.size() >= Crypto::P256ECDSASignature::Capacity(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // TODO: Create an alternative way to retrieve the Attestation Challenge without this huge amount of calls.
-    // Retrieve attestation challenge
-    ByteSpan attestationChallenge =
-        commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
-
-    Hash_SHA256_stream hashStream;
-    ReturnErrorOnFailure(hashStream.Begin());
-    ReturnErrorOnFailure(hashStream.AddData(payload));
-    ReturnErrorOnFailure(hashStream.AddData(attestationChallenge));
-    ReturnErrorOnFailure(hashStream.Finish(messageDigestSpan));
-
-    ReturnErrorOnFailure(dacProvider->SignWithDeviceAttestationKey(messageDigestSpan, signatureSpan));
-    VerifyOrReturnError(signatureSpan.size() == Crypto::P256ECDSASignature::Capacity(), CHIP_ERROR_INTERNAL);
-
+CHIP_ERROR DeleteFabricFromTable(FabricIndex fabricIndex)
+{
+    ReturnErrorOnFailure(Server::GetInstance().GetFabricTable().Delete(fabricIndex));
     return CHIP_NO_ERROR;
 }
 
-FabricInfo * RetrieveCurrentFabric(CommandHandler * aCommandHandler)
+void CleanupSessionsForFabric(SessionManager & sessionMgr, FabricIndex fabricIndex)
 {
-    FabricIndex index = aCommandHandler->GetAccessingFabricIndex();
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Finding fabric with fabricIndex %d", index);
-    return Server::GetInstance().GetFabricTable().FindFabricWithIndex(index);
+    sessionMgr.ExpireAllSessionsForFabric(fabricIndex);
 }
 
 void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
 {
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Call to FailSafeCleanup");
+    ChipLogError(Zcl, "OpCreds: Proceeding to FailSafeCleanup on fail-safe expiry!");
 
-    FabricIndex fabricIndex = event->FailSafeTimerExpired.PeerFabricIndex;
+    FabricIndex fabricIndex = event->FailSafeTimerExpired.fabricIndex;
 
     // If an AddNOC or UpdateNOC command has been successfully invoked, terminate all CASE sessions associated with the Fabric
     // whose Fabric Index is recorded in the Fail-Safe context (see ArmFailSafe Command) by clearing any associated Secure
     // Session Context at the Server.
-    if (event->FailSafeTimerExpired.AddNocCommandHasBeenInvoked || event->FailSafeTimerExpired.UpdateNocCommandHasBeenInvoked)
+    if (event->FailSafeTimerExpired.addNocCommandHasBeenInvoked || event->FailSafeTimerExpired.updateNocCommandHasBeenInvoked)
     {
-        CASESessionManager * caseSessionManager = Server::GetInstance().GetCASESessionManager();
-        if (caseSessionManager)
-        {
-            FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
-            VerifyOrReturn(fabricInfo != nullptr);
-
-            caseSessionManager->ReleaseSessionsForFabric(fabricInfo->GetCompressedId());
-        }
-
-        Server::GetInstance().GetSecureSessionManager().ExpireAllPairingsForFabric(fabricIndex);
+        SessionManager & sessionMgr = Server::GetInstance().GetSecureSessionManager();
+        CleanupSessionsForFabric(sessionMgr, fabricIndex);
     }
+
+    auto & fabricTable = Server::GetInstance().GetFabricTable();
+    fabricTable.RevertPendingFabricData();
 
     // If an AddNOC command had been successfully invoked, achieve the equivalent effect of invoking the RemoveFabric command
     // against the Fabric Index stored in the Fail-Safe Context for the Fabric Index that was the subject of the AddNOC
     // command.
-    if (event->FailSafeTimerExpired.AddNocCommandHasBeenInvoked)
+    if (event->FailSafeTimerExpired.addNocCommandHasBeenInvoked)
     {
-        Server::GetInstance().GetFabricTable().Delete(fabricIndex);
-    }
-
-    // If an UpdateNOC command had been successfully invoked, revert the state of operational key pair, NOC and ICAC for that
-    // Fabric to the state prior to the Fail-Safe timer being armed, for the Fabric Index that was the subject of the UpdateNOC
-    // command.
-    if (event->FailSafeTimerExpired.UpdateNocCommandHasBeenInvoked)
-    {
-        // TODO: Revert the state of operational key pair, NOC and ICAC
+        CHIP_ERROR err;
+        err = DeleteFabricFromTable(fabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "OpCreds: failed to delete fabric at index %u: %" CHIP_ERROR_FORMAT, fabricIndex, err.Format());
+        }
     }
 }
 
@@ -308,47 +315,25 @@ void OnPlatformEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, in
 {
     if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
+        ChipLogError(Zcl, "OpCreds: Got FailSafeTimerExpired");
         FailSafeCleanup(event);
     }
 }
 
 } // anonymous namespace
 
-// As per specifications section 11.22.5.1. Constant RESP_MAX
-constexpr size_t kMaxRspLen = 900;
-
-void fabricListChanged()
+class OpCredsFabricTableDelegate : public chip::FabricTable::Delegate
 {
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Call to fabricListChanged");
-
-    // Currently, we only manage FabricsList attribute in endpoint 0, OperationalCredentials cluster is always required to be on
-    // EP0.
-    MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id, OperationalCredentials::Attributes::Fabrics::Id);
-    MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id,
-                                           OperationalCredentials::Attributes::CommissionedFabrics::Id);
-}
-
-// TODO: The code currently has two sources of truths for fabrics, the fabricInfo table + the attributes. There should only be one,
-// the attributes list. Currently the attributes are not persisted so we are keeping the fabric table to have the
-// fabrics/admrins be persisted. Once attributes are persisted, there should only be one sorce of truth, the attributes list and
-// only that should be modifed to perosst/read/write fabrics.
-// TODO: Once attributes are persisted, implement reading/writing/manipulation fabrics around that and remove fabricTable
-// logic.
-class OpCredsFabricTableDelegate : public FabricTableDelegate
-{
-
-    // Gets called when a fabric is deleted from KVS store
-    void OnFabricDeletedFromStorage(CompressedFabricId compressedFabricId, FabricIndex fabricId) override
+public:
+    // Gets called when a fabric is about to be deleted
+    void FabricWillBeRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Fabric 0x%u was deleted from fabric storage.", fabricId);
-        fabricListChanged();
-
-        // The Leave event SHOULD be emitted by a Node prior to permanently
-        // leaving the Fabric.
-        for (auto endpoint : EnabledEndpointsWithServerCluster(Basic::Id))
+        // The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.
+        for (auto endpoint : EnabledEndpointsWithServerCluster(BasicInformation::Id))
         {
             // If Basic cluster is implemented on this endpoint
-            Basic::Events::Leave::Type event;
+            BasicInformation::Events::Leave::Type event;
+            event.fabricIndex = fabricIndex;
             EventNumber eventNumber;
 
             if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
@@ -356,37 +341,61 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
                 ChipLogError(Zcl, "OpCredsFabricTableDelegate: Failed to record Leave event");
             }
         }
+
+        // Try to send the queued events as soon as possible for this fabric. If the just emitted leave event won't
+        // be sent this time, it will likely not be delivered at all for the following reasons:
+        // - removing the fabric expires all associated ReadHandlers, so all subscriptions to
+        //   the leave event will be cancelled.
+        // - removing the fabric removes all associated access control entries, so generating
+        //   subsequent reports containing the leave event will fail the access control check.
+        InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleUrgentEventDeliverySync(MakeOptional(fabricIndex));
     }
 
-    // Gets called when a fabric is loaded into the FabricTable from KVS store.
-    void OnFabricRetrievedFromStorage(FabricInfo * fabric) override
+    // Gets called when a fabric is deleted
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                       "OpCreds: Fabric 0x%u was retrieved from storage. FabricId 0x" ChipLogFormatX64
-                       ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
-                       fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetFabricId()),
-                       ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
-        fabricListChanged();
+        ChipLogProgress(Zcl, "OpCreds: Fabric index 0x%x was removed", static_cast<unsigned>(fabricIndex));
+
+        // We need to withdraw the advertisement for the now-removed fabric, so need
+        // to restart advertising altogether.
+        app::DnssdServer::Instance().StartServer();
+
+        EventManagement::GetInstance().FabricRemoved(fabricIndex);
+
+        NotifyFabricTableChanged();
     }
 
-    // Gets called when a fabric in FabricTable is persisted to KVS store.
-    void OnFabricPersistedToStorage(FabricInfo * fabric) override
+    // Gets called when a fabric is added/updated, but not necessarily committed to storage
+    void OnFabricUpdated(const FabricTable & fabricTable, FabricIndex fabricIndex) override { NotifyFabricTableChanged(); }
+
+    // Gets called when a fabric in FabricTable is persisted to storage
+    void OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                       "OpCreds: Fabric %X was persisted to storage. FabricId " ChipLogFormatX64 ", NodeId " ChipLogFormatX64
-                       ", VendorId 0x%04" PRIX16,
-                       fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetFabricId()),
-                       ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
-        fabricListChanged();
+        const FabricInfo * fabric = fabricTable.FindFabricWithIndex(fabricIndex);
+        // Safety check, but should not happen by the code paths involved
+        VerifyOrReturn(fabric != nullptr);
+
+        ChipLogProgress(Zcl,
+                        "OpCreds: Fabric index 0x%x was committed to storage. Compressed Fabric Id 0x" ChipLogFormatX64
+                        ", FabricId " ChipLogFormatX64 ", NodeId " ChipLogFormatX64 ", VendorId 0x%04X",
+                        static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetCompressedFabricId()),
+                        ChipLogValueX64(fabric->GetFabricId()), ChipLogValueX64(fabric->GetNodeId()), fabric->GetVendorId());
+    }
+
+private:
+    void NotifyFabricTableChanged()
+    {
+        // Opcreds cluster is always on Endpoint 0
+        MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id,
+                                               OperationalCredentials::Attributes::CommissionedFabrics::Id);
+        MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id, OperationalCredentials::Attributes::Fabrics::Id);
     }
 };
 
 OpCredsFabricTableDelegate gFabricDelegate;
 
-void MatterOperationalCredentialsPluginServerInitCallback(void)
+void MatterOperationalCredentialsPluginServerInitCallback()
 {
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Initiating OpCreds cluster by writing fabrics list from fabric table.");
-
     registerAttributeAccessOverride(&gAttrAccess);
 
     Server::GetInstance().GetFabricTable().AddFabricDelegate(&gFabricDelegate);
@@ -394,81 +403,61 @@ void MatterOperationalCredentialsPluginServerInitCallback(void)
     DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler);
 }
 
-namespace {
-class FabricCleanupExchangeDelegate : public chip::Messaging::ExchangeDelegate
-{
-public:
-    CHIP_ERROR OnMessageReceived(chip::Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
-                                 System::PacketBufferHandle && payload) override
-    {
-        return CHIP_NO_ERROR;
-    }
-    void OnResponseTimeout(chip::Messaging::ExchangeContext * ec) override {}
-    void OnExchangeClosing(chip::Messaging::ExchangeContext * ec) override
-    {
-        FabricIndex currentFabricIndex = ec->GetSessionHandle()->GetFabricIndex();
-        InteractionModelEngine::GetInstance()->CloseTransactionsFromFabricIndex(currentFabricIndex);
-        ec->GetExchangeMgr()->GetSessionManager()->ExpireAllPairingsForFabric(currentFabricIndex);
-    }
-};
-
-FabricCleanupExchangeDelegate gFabricCleanupExchangeDelegate;
-
-} // namespace
-
 bool emberAfOperationalCredentialsClusterRemoveFabricCallback(app::CommandHandler * commandObj,
                                                               const app::ConcreteCommandPath & commandPath,
                                                               const Commands::RemoveFabric::DecodableType & commandData)
 {
-    MATTER_TRACE_EVENT_SCOPE("RemoveFabric", "OperationalCredentials");
+    MATTER_TRACE_SCOPE("RemoveFabric", "OperationalCredentials");
     auto & fabricBeingRemoved = commandData.fabricIndex;
 
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: RemoveFabric"); // TODO: Generate emberAfFabricClusterPrintln
+    ChipLogProgress(Zcl, "OpCreds: Received a RemoveFabric Command for FabricIndex 0x%x",
+                    static_cast<unsigned>(fabricBeingRemoved));
 
-    CHIP_ERROR err = Server::GetInstance().GetFabricTable().Delete(fabricBeingRemoved);
+    if (!IsValidFabricIndex(fabricBeingRemoved))
+    {
+        ChipLogError(Zcl, "OpCreds: Failed RemoveFabric due to invalid FabricIndex");
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
+        return true;
+    }
+
+    commandObj->FlushAcksRightAwayOnSlowCommand();
+
+    CHIP_ERROR err = DeleteFabricFromTable(fabricBeingRemoved);
     SuccessOrExit(err);
 
-    // We need to withdraw the advertisement for the now-removed fabric, so need
-    // to restart advertising altogether.
-    app::DnssdServer::Instance().StartServer();
+    // Notification was already done by FabricTable delegate
 
 exit:
-    fabricListChanged();
     // Not using ConvertToNOCResponseStatus here because it's pretty
     // AddNOC/UpdateNOC specific.
     if (err == CHIP_ERROR_NOT_FOUND)
     {
-        SendNOCResponse(commandObj, commandPath, OperationalCertStatus::kInvalidFabricIndex, fabricBeingRemoved, CharSpan());
+        ChipLogError(Zcl, "OpCreds: Failed RemoveFabric due to FabricIndex not found locally");
+        SendNOCResponse(commandObj, commandPath, NodeOperationalCertStatusEnum::kInvalidFabricIndex, fabricBeingRemoved,
+                        CharSpan());
     }
     else if (err != CHIP_NO_ERROR)
     {
         // We have no idea what happened; just report failure.
+        ChipLogError(Zcl, "OpCreds: Failed RemoveFabric due to internal error (err = %" CHIP_ERROR_FORMAT ")", err.Format());
         StatusIB status(err);
         commandObj->AddStatus(commandPath, status.mStatus);
     }
     else
     {
-        SendNOCResponse(commandObj, commandPath, OperationalCertStatus::kSuccess, fabricBeingRemoved, CharSpan());
+        ChipLogProgress(Zcl, "OpCreds: RemoveFabric successful");
+        SendNOCResponse(commandObj, commandPath, NodeOperationalCertStatusEnum::kOk, fabricBeingRemoved, CharSpan());
 
-        // Use a more direct getter for FabricIndex from commandObj
         chip::Messaging::ExchangeContext * ec = commandObj->GetExchangeContext();
         FabricIndex currentFabricIndex        = commandObj->GetAccessingFabricIndex();
         if (currentFabricIndex == fabricBeingRemoved)
         {
-            // If the current fabric is being removed, don't expire the secure sessions immediately as they are
-            // still needed to send a pending message generated by emberAfSendImmediateDefaultResponse().
-            // Hijack the exchange delegate here (as no more messages should be received on this exchange),
-            // and wait for it to close, before expiring the secure sessions for the fabric. Also, suppress MRP
-            // usage since the MRP engine still holds an exchange even after it's closed, and the engine references
-            // the associated session object.
-            // TODO: https://github.com/project-chip/connectedhomeip/issues/9642
-            ec->SetAutoRequestAck(false);
-            ec->SetDelegate(&gFabricCleanupExchangeDelegate);
+            ec->AbortAllOtherCommunicationOnFabric();
         }
         else
         {
-            InteractionModelEngine::GetInstance()->CloseTransactionsFromFabricIndex(fabricBeingRemoved);
-            ec->GetExchangeMgr()->GetSessionManager()->ExpireAllPairingsForFabric(fabricBeingRemoved);
+            SessionManager * sessionManager = ec->GetExchangeMgr()->GetSessionManager();
+            CleanupSessionsForFabric(*sessionManager, fabricBeingRemoved);
         }
     }
     return true;
@@ -478,54 +467,63 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(app::CommandH
                                                                    const app::ConcreteCommandPath & commandPath,
                                                                    const Commands::UpdateFabricLabel::DecodableType & commandData)
 {
-    MATTER_TRACE_EVENT_SCOPE("UpdateFabricLabel", "OperationalCredentials");
-    auto & Label        = commandData.label;
+    MATTER_TRACE_SCOPE("UpdateFabricLabel", "OperationalCredentials");
+    auto & label        = commandData.label;
     auto ourFabricIndex = commandObj->GetAccessingFabricIndex();
+    auto finalStatus    = Status::Failure;
+    auto & fabricTable  = Server::GetInstance().GetFabricTable();
 
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: UpdateFabricLabel");
+    ChipLogProgress(Zcl, "OpCreds: Received an UpdateFabricLabel command");
 
-    for (auto & fabricInfo : Server::GetInstance().GetFabricTable())
+    if (label.size() > 32)
     {
-        if (fabricInfo.GetFabricLabel().data_equal(Label) && fabricInfo.GetFabricIndex() != ourFabricIndex)
+        ChipLogError(Zcl, "OpCreds: Failed UpdateFabricLabel due to invalid label size %u", static_cast<unsigned>(label.size()));
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
+        return true;
+    }
+
+    for (const auto & fabricInfo : fabricTable)
+    {
+        if (fabricInfo.GetFabricLabel().data_equal(label) && fabricInfo.GetFabricIndex() != ourFabricIndex)
         {
             ChipLogError(Zcl, "Fabric label already in use");
-            SendNOCResponse(commandObj, commandPath, OperationalCertStatus::kLabelConflict, ourFabricIndex, CharSpan());
+            SendNOCResponse(commandObj, commandPath, NodeOperationalCertStatusEnum::kLabelConflict, ourFabricIndex, CharSpan());
             return true;
         }
     }
 
-    CHIP_ERROR err;
+    // Set Label on fabric. Any error on this is basically an internal error...
+    // NOTE: if an UpdateNOC had caused a pending fabric, that pending fabric is
+    //       the one updated thereafter. Otherwise, the data is committed to storage
+    //       as soon as the update is done.
+    CHIP_ERROR err = fabricTable.SetFabricLabel(ourFabricIndex, label);
+    VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::Failure);
 
-    // Fetch current fabric
-    FabricInfo * fabric = RetrieveCurrentFabric(commandObj);
-    VerifyOrExit(fabric != nullptr, err = CHIP_ERROR_INVALID_FABRIC_ID);
+    finalStatus = Status::Success;
 
-    // Set Label on fabric
-    err = fabric->SetFabricLabel(Label);
-    SuccessOrExit(err);
-
-    // Persist updated fabric
-    err = Server::GetInstance().GetFabricTable().Store(fabric->GetFabricIndex());
-    SuccessOrExit(err);
-
+    // Succeeded at updating the label, mark Fabrics table changed.
+    MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
+                                           OperationalCredentials::Attributes::Fabrics::Id);
 exit:
-    fabricListChanged();
-
-    SendNOCResponse(commandObj, commandPath, ConvertToNOCResponseStatus(err), ourFabricIndex, CharSpan());
+    if (finalStatus == Status::Success)
+    {
+        SendNOCResponse(commandObj, commandPath, NodeOperationalCertStatusEnum::kOk, ourFabricIndex, CharSpan());
+    }
+    else
+    {
+        commandObj->AddStatus(commandPath, finalStatus);
+    }
     return true;
 }
 
 namespace {
 
-// TODO: Manage ephemeral RCAC/ICAC/NOC storage to avoid a full FabricInfo being needed here.
-FabricInfo gFabricBeingCommissioned;
-
-void SendNOCResponse(app::CommandHandler * commandObj, const ConcreteCommandPath & path, OperationalCertStatus status,
+void SendNOCResponse(app::CommandHandler * commandObj, const ConcreteCommandPath & path, NodeOperationalCertStatusEnum status,
                      uint8_t index, const CharSpan & debug_text)
 {
     Commands::NOCResponse::Type payload;
     payload.statusCode = status;
-    if (status == OperationalCertStatus::kSuccess)
+    if (status == NodeOperationalCertStatusEnum::kOk)
     {
         payload.fabricIndex.Emplace(index);
     }
@@ -539,38 +537,50 @@ void SendNOCResponse(app::CommandHandler * commandObj, const ConcreteCommandPath
     commandObj->AddResponse(path, payload);
 }
 
-OperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err)
+NodeOperationalCertStatusEnum ConvertToNOCResponseStatus(CHIP_ERROR err)
 {
     if (err == CHIP_NO_ERROR)
     {
-        return OperationalCertStatus::kSuccess;
+        return NodeOperationalCertStatusEnum::kOk;
     }
     if (err == CHIP_ERROR_INVALID_PUBLIC_KEY)
     {
-        return OperationalCertStatus::kInvalidPublicKey;
+        return NodeOperationalCertStatusEnum::kInvalidPublicKey;
     }
-    if (err == CHIP_ERROR_INVALID_FABRIC_ID || err == CHIP_ERROR_WRONG_NODE_ID)
+    if (err == CHIP_ERROR_WRONG_NODE_ID)
     {
-        return OperationalCertStatus::kInvalidNodeOpId;
+        return NodeOperationalCertStatusEnum::kInvalidNodeOpId;
     }
-    if (err == CHIP_ERROR_CA_CERT_NOT_FOUND || err == CHIP_ERROR_CERT_PATH_LEN_CONSTRAINT_EXCEEDED ||
-        err == CHIP_ERROR_CERT_PATH_TOO_LONG || err == CHIP_ERROR_CERT_USAGE_NOT_ALLOWED || err == CHIP_ERROR_CERT_EXPIRED ||
-        err == CHIP_ERROR_CERT_NOT_VALID_YET || err == CHIP_ERROR_UNSUPPORTED_CERT_FORMAT ||
-        err == CHIP_ERROR_UNSUPPORTED_ELLIPTIC_CURVE || err == CHIP_ERROR_CERT_LOAD_FAILED || err == CHIP_ERROR_CERT_NOT_TRUSTED ||
-        err == CHIP_ERROR_WRONG_CERT_DN)
+    if (err == CHIP_ERROR_UNSUPPORTED_CERT_FORMAT)
     {
-        return OperationalCertStatus::kInvalidNOC;
+        return NodeOperationalCertStatusEnum::kInvalidNOC;
+    }
+    if (err == CHIP_ERROR_WRONG_CERT_DN)
+    {
+        return NodeOperationalCertStatusEnum::kInvalidNOC;
+    }
+    if (err == CHIP_ERROR_INCORRECT_STATE)
+    {
+        return NodeOperationalCertStatusEnum::kMissingCsr;
     }
     if (err == CHIP_ERROR_NO_MEMORY)
     {
-        return OperationalCertStatus::kTableFull;
+        return NodeOperationalCertStatusEnum::kTableFull;
     }
     if (err == CHIP_ERROR_FABRIC_EXISTS)
     {
-        return OperationalCertStatus::kFabricConflict;
+        return NodeOperationalCertStatusEnum::kFabricConflict;
+    }
+    if (err == CHIP_ERROR_INVALID_FABRIC_INDEX)
+    {
+        return NodeOperationalCertStatusEnum::kInvalidFabricIndex;
+    }
+    if (err == CHIP_ERROR_INVALID_ADMIN_SUBJECT)
+    {
+        return NodeOperationalCertStatusEnum::kInvalidAdminSubject;
     }
 
-    return OperationalCertStatus::kInvalidNOC;
+    return NodeOperationalCertStatusEnum::kInvalidNOC;
 }
 
 } // namespace
@@ -579,105 +589,175 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
                                                         const app::ConcreteCommandPath & commandPath,
                                                         const Commands::AddNOC::DecodableType & commandData)
 {
-    MATTER_TRACE_EVENT_SCOPE("AddNOC", "OperationalCredentials");
-    auto & NOCValue      = commandData.NOCValue;
-    auto & ICACValue     = commandData.ICACValue;
-    auto & adminVendorId = commandData.adminVendorId;
-    auto & ipkValue      = commandData.IPKValue;
-    auto * groups        = Credentials::GetGroupDataProvider();
-    auto nocResponse     = OperationalCertStatus::kSuccess;
+    MATTER_TRACE_SCOPE("AddNOC", "OperationalCredentials");
+    auto & NOCValue          = commandData.NOCValue;
+    auto & ICACValue         = commandData.ICACValue;
+    auto & adminVendorId     = commandData.adminVendorId;
+    auto & ipkValue          = commandData.IPKValue;
+    auto * groupDataProvider = Credentials::GetGroupDataProvider();
+    auto nocResponse         = NodeOperationalCertStatusEnum::kOk;
+    auto nonDefaultStatus    = Status::Success;
+    bool needRevert          = false;
 
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    FabricIndex fabricIndex = 0;
+    CHIP_ERROR err             = CHIP_NO_ERROR;
+    FabricIndex newFabricIndex = kUndefinedFabricIndex;
     Credentials::GroupDataProvider::KeySet keyset;
-    FabricInfo * newFabricInfo = nullptr;
+    const FabricInfo * newFabricInfo = nullptr;
+    auto & fabricTable               = Server::GetInstance().GetFabricTable();
+
+    auto * secureSession   = commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession();
+    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
 
     uint8_t compressed_fabric_id_buffer[sizeof(uint64_t)];
     MutableByteSpan compressed_fabric_id(compressed_fabric_id_buffer);
 
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added a NOC");
+    bool csrWasForUpdateNoc = false; //< Output param of HasPendingOperationalKey
+    bool hasPendingKey      = fabricTable.HasPendingOperationalKey(csrWasForUpdateNoc);
 
-    if (nullptr == groups)
-    {
-        LogErrorOnFailure(commandObj->AddStatus(commandPath, Status::Failure));
-        return true;
-    }
+    ChipLogProgress(Zcl, "OpCreds: Received an AddNOC command");
 
-    FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+    VerifyOrExit(NOCValue.size() <= Credentials::kMaxCHIPCertLength, nonDefaultStatus = Status::InvalidCommand);
+    VerifyOrExit(!ICACValue.HasValue() || ICACValue.Value().size() <= Credentials::kMaxCHIPCertLength,
+                 nonDefaultStatus = Status::InvalidCommand);
+    VerifyOrExit(ipkValue.size() == Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, nonDefaultStatus = Status::InvalidCommand);
+    VerifyOrExit(IsVendorIdValidOperationally(adminVendorId), nonDefaultStatus = Status::InvalidCommand);
 
-    if (!failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()))
-    {
-        LogErrorOnFailure(commandObj->AddStatus(commandPath, Status::UnsupportedAccess));
-        return true;
-    }
+    VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()),
+                 nonDefaultStatus = Status::FailsafeRequired);
 
-    if (failSafeContext.NocCommandHasBeenInvoked())
-    {
-        LogErrorOnFailure(commandObj->AddStatus(commandPath, Status::ConstraintError));
-        return true;
-    }
+    VerifyOrExit(!failSafeContext.NocCommandHasBeenInvoked(), nonDefaultStatus = Status::ConstraintError);
 
-    err = gFabricBeingCommissioned.SetNOCCert(NOCValue);
+    // Must have had a previous CSR request, not tagged for UpdateNOC
+    VerifyOrExit(hasPendingKey, nocResponse = NodeOperationalCertStatusEnum::kMissingCsr);
+    VerifyOrExit(!csrWasForUpdateNoc, nonDefaultStatus = Status::ConstraintError);
+
+    // Internal error that would prevent IPK from being added
+    VerifyOrExit(groupDataProvider != nullptr, nonDefaultStatus = Status::Failure);
+
+    // Flush acks before really slow work
+    commandObj->FlushAcksRightAwayOnSlowCommand();
+
+    // We can't possibly have a matching root based on the fact that we don't have
+    // a shared root store. Therefore we would later fail path validation due to
+    // missing root. Let's early-bail with InvalidNOC.
+    VerifyOrExit(failSafeContext.AddTrustedRootCertHasBeenInvoked(), nocResponse = NodeOperationalCertStatusEnum::kInvalidNOC);
+
+    // Check this explicitly before adding the fabric so we don't need to back out changes if this is an error.
+    VerifyOrExit(IsOperationalNodeId(commandData.caseAdminSubject) || IsCASEAuthTag(commandData.caseAdminSubject),
+                 nocResponse = NodeOperationalCertStatusEnum::kInvalidAdminSubject);
+
+    err = fabricTable.AddNewPendingFabricWithOperationalKeystore(NOCValue, ICACValue.ValueOr(ByteSpan{}), adminVendorId,
+                                                                 &newFabricIndex);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
-    err = gFabricBeingCommissioned.SetICACert(ICACValue);
+    // From here if we error-out, we should revert the fabric table pending updates
+    needRevert = true;
+
+    newFabricInfo = fabricTable.FindFabricWithIndex(newFabricIndex);
+    VerifyOrExit(newFabricInfo != nullptr, nonDefaultStatus = Status::Failure);
+
+    // Set the Identity Protection Key (IPK)
+    // The IPK SHALL be the operational group key under GroupKeySetID of 0
+    keyset.keyset_id                = Credentials::GroupDataProvider::kIdentityProtectionKeySetId;
+    keyset.policy                   = GroupKeyManagement::GroupKeySecurityPolicyEnum::kTrustFirst;
+    keyset.num_keys_used            = 1;
+    keyset.epoch_keys[0].start_time = 0;
+    memcpy(keyset.epoch_keys[0].key, ipkValue.data(), Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
+
+    err = newFabricInfo->GetCompressedFabricIdBytes(compressed_fabric_id);
+    VerifyOrExit(err == CHIP_NO_ERROR, nonDefaultStatus = Status::Failure);
+
+    err = groupDataProvider->SetKeySet(newFabricIndex, compressed_fabric_id, keyset);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
-    gFabricBeingCommissioned.SetVendorId(adminVendorId);
+    /**
+     * . If the current secure session was established with PASE,
+     *   the receiver SHALL:
+     *     .. Augment the secure session context with the `FabricIndex` generated above
+     *        such that subsequent interactions have the proper accessing fabric.
+     *
+     * . If the current secure session was established with CASE, subsequent configuration
+     *   of the newly installed Fabric requires the opening of a new CASE session from the
+     *   Administrator from the Fabric just installed. This Administrator is the one listed
+     *   in the `caseAdminSubject` argument.
+     *
+     */
+    if (secureSession->GetSecureSessionType() == SecureSession::Type::kPASE)
+    {
+        err = secureSession->AdoptFabricIndex(newFabricIndex);
+        VerifyOrExit(err == CHIP_NO_ERROR, nonDefaultStatus = Status::Failure);
+    }
 
-    err = Server::GetInstance().GetFabricTable().AddNewFabric(gFabricBeingCommissioned, &fabricIndex);
+    // Creating the initial ACL must occur after the PASE session has adopted the fabric index
+    // (see above) so that the concomitant event, which is fabric scoped, is properly handled.
+    err = CreateAccessControlEntryForNewFabricAdministrator(commandObj->GetSubjectDescriptor(), newFabricIndex,
+                                                            commandData.caseAdminSubject);
+    VerifyOrExit(err != CHIP_ERROR_INTERNAL, nonDefaultStatus = Status::Failure);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     // The Fabric Index associated with the armed fail-safe context SHALL be updated to match the Fabric
     // Index just allocated.
-    err = failSafeContext.SetAddNocCommandInvoked(fabricIndex);
-    if (err != CHIP_NO_ERROR)
-    {
-        Server::GetInstance().GetFabricTable().Delete(fabricIndex);
-        nocResponse = ConvertToNOCResponseStatus(err);
-        SuccessOrExit(err);
-    }
+    failSafeContext.SetAddNocCommandInvoked(newFabricIndex);
 
-    // Keep this after other possible failures, so it doesn't need to be rolled back in case of
-    // subsequent failures. This should only typically fail if there is no space for the new entry.
-    err = CreateAccessControlEntryForNewFabricAdministrator(fabricIndex, commandData.caseAdminNode);
-    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
-
-    // Notify the secure session of the new fabric.
-    commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->NewFabric(fabricIndex);
-
-    // Set the Identity Protection Key (IPK)
-    VerifyOrExit(ipkValue.size() == Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES,
-                 nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INVALID_ARGUMENT));
-    // The IPK SHALL be the operational group key under GroupKeySetID of 0
-    keyset.keyset_id     = Credentials::GroupDataProvider::kIdentityProtectionKeySetId;
-    keyset.policy        = GroupKeyManagement::GroupKeySecurityPolicy::kTrustFirst;
-    keyset.num_keys_used = 1;
-    memcpy(keyset.epoch_keys[0].key, ipkValue.data(), Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
-
-    newFabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
-    VerifyOrExit(newFabricInfo != nullptr, nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INTERNAL));
-    err = newFabricInfo->GetCompressedId(compressed_fabric_id);
-    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
-
-    err = groups->SetKeySet(fabricIndex, compressed_fabric_id, keyset);
-    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
+    // Done all intermediate steps, we are now successful
+    needRevert = false;
 
     // We might have a new operational identity, so we should start advertising it right away.
     app::DnssdServer::Instance().AdvertiseOperational();
 
+    // Notify the attributes containing fabric metadata can be read with new data
+    MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
+                                           OperationalCredentials::Attributes::Fabrics::Id);
+
+    // Notify we have one more fabric
+    MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
+                                           OperationalCredentials::Attributes::CommissionedFabrics::Id);
+
 exit:
-
-    gFabricBeingCommissioned.Reset();
-    SendNOCResponse(commandObj, commandPath, nocResponse, fabricIndex, CharSpan());
-
-    if (nocResponse != OperationalCertStatus::kSuccess)
+    if (needRevert)
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed AddNOC request. Status %d", to_underlying(nocResponse));
+        // Here, on revert, we DO NOT call FabricTable::Delete as this would also remove the existing
+        // trusted root previously added. It possibly got reverted in case of the worst kinds of errors,
+        // but a better impl of the innards of FabricTable::CommitPendingFabricData would make it work.
+        fabricTable.RevertPendingOpCertsExceptRoot();
+
+        // Revert IPK and ACL entries added, ignoring errors, since some steps may have been skipped
+        // and error handling does not assist.
+        if (groupDataProvider != nullptr)
+        {
+            (void) groupDataProvider->RemoveFabric(newFabricIndex);
+        }
+
+        (void) Access::GetAccessControl().DeleteAllEntriesForFabric(newFabricIndex);
+
+        MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
+                                               OperationalCredentials::Attributes::CommissionedFabrics::Id);
+        MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
+                                               OperationalCredentials::Attributes::Fabrics::Id);
     }
+
+    // We have an NOC response
+    if (nonDefaultStatus == Status::Success)
+    {
+        SendNOCResponse(commandObj, commandPath, nocResponse, newFabricIndex, CharSpan());
+        // Failed to add NOC
+        if (nocResponse != NodeOperationalCertStatusEnum::kOk)
+        {
+            ChipLogError(Zcl, "OpCreds: Failed AddNOC request (err=%" CHIP_ERROR_FORMAT ") with OperationalCert error %d",
+                         err.Format(), to_underlying(nocResponse));
+        }
+        // Success
+        else
+        {
+            ChipLogProgress(Zcl, "OpCreds: successfully created fabric index 0x%x via AddNOC",
+                            static_cast<unsigned>(newFabricIndex));
+        }
+    }
+    // No NOC response - Failed constraints
     else
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: successfully added a NOC");
+        commandObj->AddStatus(commandPath, nonDefaultStatus);
+        ChipLogError(Zcl, "OpCreds: Failed AddNOC request with IM error 0x%02x", to_underlying(nonDefaultStatus));
     }
 
     return true;
@@ -687,63 +767,89 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
                                                            const app::ConcreteCommandPath & commandPath,
                                                            const Commands::UpdateNOC::DecodableType & commandData)
 {
-    MATTER_TRACE_EVENT_SCOPE("UpdateNOC", "OperationalCredentials");
+    MATTER_TRACE_SCOPE("UpdateNOC", "OperationalCredentials");
     auto & NOCValue  = commandData.NOCValue;
     auto & ICACValue = commandData.ICACValue;
 
-    auto nocResponse = OperationalCertStatus::kSuccess;
+    auto nocResponse      = NodeOperationalCertStatusEnum::kOk;
+    auto nonDefaultStatus = Status::Success;
 
     CHIP_ERROR err          = CHIP_NO_ERROR;
     FabricIndex fabricIndex = 0;
 
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: an administrator requested an update to the NOC");
+    ChipLogProgress(Zcl, "OpCreds: Received an UpdateNOC command");
 
-    FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+    auto & fabricTable            = Server::GetInstance().GetFabricTable();
+    auto & failSafeContext        = Server::GetInstance().GetFailSafeContext();
+    const FabricInfo * fabricInfo = RetrieveCurrentFabric(commandObj);
 
-    if (!failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()))
-    {
-        LogErrorOnFailure(commandObj->AddStatus(commandPath, Status::UnsupportedAccess));
-        return true;
-    }
+    bool csrWasForUpdateNoc = false; //< Output param of HasPendingOperationalKey
+    bool hasPendingKey      = fabricTable.HasPendingOperationalKey(csrWasForUpdateNoc);
 
-    if (failSafeContext.NocCommandHasBeenInvoked())
-    {
-        LogErrorOnFailure(commandObj->AddStatus(commandPath, Status::ConstraintError));
-        return true;
-    }
+    VerifyOrExit(NOCValue.size() <= Credentials::kMaxCHIPCertLength, nonDefaultStatus = Status::InvalidCommand);
+    VerifyOrExit(!ICACValue.HasValue() || ICACValue.Value().size() <= Credentials::kMaxCHIPCertLength,
+                 nonDefaultStatus = Status::InvalidCommand);
+    VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()),
+                 nonDefaultStatus = Status::FailsafeRequired);
 
-    // Fetch current fabric
-    FabricInfo * fabric = RetrieveCurrentFabric(commandObj);
-    VerifyOrExit(fabric != nullptr, nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INVALID_FABRIC_ID));
+    VerifyOrExit(!failSafeContext.NocCommandHasBeenInvoked(), nonDefaultStatus = Status::ConstraintError);
+
+    // Must have had a previous CSR request, tagged for UpdateNOC
+    VerifyOrExit(hasPendingKey, nocResponse = NodeOperationalCertStatusEnum::kMissingCsr);
+    VerifyOrExit(csrWasForUpdateNoc, nonDefaultStatus = Status::ConstraintError);
+
+    // If current fabric is not available, command was invoked over PASE which is not legal
+    VerifyOrExit(fabricInfo != nullptr, nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INSUFFICIENT_PRIVILEGE));
+    fabricIndex = fabricInfo->GetFabricIndex();
+
+    // Flush acks before really slow work
+    commandObj->FlushAcksRightAwayOnSlowCommand();
+
+    err = fabricTable.UpdatePendingFabricWithOperationalKeystore(fabricIndex, NOCValue, ICACValue.ValueOr(ByteSpan{}));
+    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     // Flag on the fail-safe context that the UpdateNOC command was invoked.
-    err = failSafeContext.SetUpdateNocCommandInvoked();
-    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
-
-    err = fabric->SetNOCCert(NOCValue);
-    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
-
-    err = fabric->SetICACert(ICACValue);
-    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
-
-    fabricIndex = fabric->GetFabricIndex();
+    failSafeContext.SetUpdateNocCommandInvoked();
 
     // We might have a new operational identity, so we should start advertising
     // it right away.  Also, we need to withdraw our old operational identity.
     // So we need to StartServer() here.
     app::DnssdServer::Instance().StartServer();
 
+    // Attribute notification was already done by fabric table
 exit:
-
-    SendNOCResponse(commandObj, commandPath, nocResponse, fabricIndex, CharSpan());
-
-    if (nocResponse != OperationalCertStatus::kSuccess)
+    // We have an NOC response
+    if (nonDefaultStatus == Status::Success)
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed UpdateNOC request. Status %d", to_underlying(nocResponse));
+        SendNOCResponse(commandObj, commandPath, nocResponse, fabricIndex, CharSpan());
+        // Failed to update NOC
+        if (nocResponse != NodeOperationalCertStatusEnum::kOk)
+        {
+            ChipLogError(Zcl, "OpCreds: Failed UpdateNOC request (err=%" CHIP_ERROR_FORMAT ") with OperationalCert error %d",
+                         err.Format(), to_underlying(nocResponse));
+        }
+        // Success
+        else
+        {
+            ChipLogProgress(Zcl, "OpCreds: UpdateNOC successful.");
+
+            // On success, revoke all CASE sessions on the fabric hosting the exchange.
+            // From spec:
+            //
+            //    All internal data reflecting the prior operational identifier of the Node within the Fabric
+            //    SHALL be revoked and removed, to an outcome equivalent to the disappearance of the prior Node,
+            //    except for the ongoing CASE session context, which SHALL temporarily remain valid until the
+            //    `NOCResponse` has been successfully delivered or until the next transport-layer error, so
+            //    that the response can be received by the Administrator invoking the command.
+
+            commandObj->GetExchangeContext()->AbortAllOtherCommunicationOnFabric();
+        }
     }
+    // No NOC response - Failed constraints
     else
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: UpdateNOC successful.");
+        commandObj->AddStatus(commandPath, nonDefaultStatus);
+        ChipLogError(Zcl, "OpCreds: Failed UpdateNOC request with IM error 0x%02x", to_underlying(nonDefaultStatus));
     }
 
     return true;
@@ -753,7 +859,7 @@ bool emberAfOperationalCredentialsClusterCertificateChainRequestCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::CertificateChainRequest::DecodableType & commandData)
 {
-    MATTER_TRACE_EVENT_SCOPE("CertificateChainRequest", "OperationalCredentials");
+    MATTER_TRACE_SCOPE("CertificateChainRequest", "OperationalCredentials");
     auto & certificateType = commandData.certificateType;
 
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -769,19 +875,19 @@ bool emberAfOperationalCredentialsClusterCertificateChainRequestCallback(
 
     if (certificateType == kDACCertificate)
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Certificate Chain request received for DAC");
+        ChipLogProgress(Zcl, "OpCreds: Certificate Chain request received for DAC");
         SuccessOrExit(err = dacProvider->GetDeviceAttestationCert(derBufSpan));
     }
     else if (certificateType == kPAICertificate)
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Certificate Chain request received for PAI");
+        ChipLogProgress(Zcl, "OpCreds: Certificate Chain request received for PAI");
         SuccessOrExit(err = dacProvider->GetProductAttestationIntermediateCert(derBufSpan));
     }
     else
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Certificate Chain request received for unknown type: %d",
-                       static_cast<int>(certificateType));
-        SuccessOrExit(err = CHIP_ERROR_INVALID_ARGUMENT);
+        ChipLogError(Zcl, "OpCreds: Certificate Chain request received for unknown type: %d", static_cast<int>(certificateType));
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
+        return true;
     }
 
     response.certificate = derBufSpan;
@@ -790,8 +896,8 @@ bool emberAfOperationalCredentialsClusterCertificateChainRequestCallback(
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed CertificateChainRequest: %s", ErrorStr(err));
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        ChipLogError(Zcl, "OpCreds: Failed CertificateChainRequest: %" CHIP_ERROR_FORMAT, err.Format());
+        commandObj->AddStatus(commandPath, Status::Failure);
     }
 
     return true;
@@ -801,58 +907,93 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
                                                                     const app::ConcreteCommandPath & commandPath,
                                                                     const Commands::AttestationRequest::DecodableType & commandData)
 {
-    MATTER_TRACE_EVENT_SCOPE("AttestationRequest", "OperationalCredentials");
+    MATTER_TRACE_SCOPE("AttestationRequest", "OperationalCredentials");
     auto & attestationNonce = commandData.attestationNonce;
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    auto finalStatus = Status::Failure;
+    CHIP_ERROR err   = CHIP_ERROR_INVALID_ARGUMENT;
+    ByteSpan tbsSpan;
+
     Platform::ScopedMemoryBuffer<uint8_t> attestationElements;
     size_t attestationElementsLen = 0;
     MutableByteSpan attestationElementsSpan;
     uint8_t certDeclBuf[Credentials::kMaxCMSSignedCDMessage]; // Sized to hold the example certificate declaration with 100 PIDs.
                                                               // See DeviceAttestationCredsExample
     MutableByteSpan certDeclSpan(certDeclBuf);
-    Credentials::DeviceAttestationCredentialsProvider * dacProvider = Credentials::GetDeviceAttestationCredentialsProvider();
 
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: received an AttestationRequest");
+    // TODO: Create an alternative way to retrieve the Attestation Challenge without this huge amount of calls.
+    // Retrieve attestation challenge
+    ByteSpan attestationChallenge =
+        commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
 
-    // TODO: retrieve vendor information to populate the fields below.
+    // TODO: in future versions, retrieve vendor information to populate the fields below.
     uint32_t timestamp = 0;
-    // TODO: Also retrieve and use firmware Information
-    const ByteSpan kEmptyFirmwareInfo;
     Credentials::DeviceAttestationVendorReservedConstructor emptyVendorReserved(nullptr, 0);
 
-    VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(attestationNonce.size() == Credentials::kExpectedAttestationNonceSize, err = CHIP_ERROR_INVALID_ARGUMENT);
+    // TODO: in future versions, also retrieve and use firmware Information
+    const ByteSpan kEmptyFirmwareInfo;
 
-    SuccessOrExit(err = dacProvider->GetCertificationDeclaration(certDeclSpan));
+    ChipLogProgress(Zcl, "OpCreds: Received an AttestationRequest command");
+
+    // Flush acks before really slow work
+    commandObj->FlushAcksRightAwayOnSlowCommand();
+
+    Credentials::DeviceAttestationCredentialsProvider * dacProvider = Credentials::GetDeviceAttestationCredentialsProvider();
+
+    VerifyOrExit(attestationNonce.size() == Credentials::kExpectedAttestationNonceSize, finalStatus = Status::InvalidCommand);
+
+    if (dacProvider == nullptr)
+    {
+        err = CHIP_ERROR_INTERNAL;
+        VerifyOrExit(dacProvider != nullptr, finalStatus = Status::Failure);
+    }
+
+    err = dacProvider->GetCertificationDeclaration(certDeclSpan);
+    VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::Failure);
 
     attestationElementsLen = TLV::EstimateStructOverhead(certDeclSpan.size(), attestationNonce.size(), sizeof(uint64_t) * 8);
 
-    VerifyOrExit(attestationElements.Alloc(attestationElementsLen), err = CHIP_ERROR_NO_MEMORY);
-    attestationElementsSpan = MutableByteSpan{ attestationElements.Get(), attestationElementsLen };
-    SuccessOrExit(err = Credentials::ConstructAttestationElements(certDeclSpan, attestationNonce, timestamp, kEmptyFirmwareInfo,
-                                                                  emptyVendorReserved, attestationElementsSpan));
-
-    VerifyOrExit(attestationElementsSpan.size() <= kMaxRspLen, err = CHIP_ERROR_INTERNAL);
-
-    // Prepare response payload with signature
+    if (!attestationElements.Alloc(attestationElementsLen + attestationChallenge.size()))
     {
-        Commands::AttestationResponse::Type response;
+        err = CHIP_ERROR_NO_MEMORY;
+        VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::ResourceExhausted);
+    }
 
+    attestationElementsSpan = MutableByteSpan{ attestationElements.Get(), attestationElementsLen };
+    err = Credentials::ConstructAttestationElements(certDeclSpan, attestationNonce, timestamp, kEmptyFirmwareInfo,
+                                                    emptyVendorReserved, attestationElementsSpan);
+    VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::Failure);
+
+    // Append attestation challenge in the back of the reserved space for the signature
+    memcpy(attestationElements.Get() + attestationElementsSpan.size(), attestationChallenge.data(), attestationChallenge.size());
+    tbsSpan = ByteSpan{ attestationElements.Get(), attestationElementsSpan.size() + attestationChallenge.size() };
+
+    {
         Crypto::P256ECDSASignature signature;
         MutableByteSpan signatureSpan{ signature.Bytes(), signature.Capacity() };
-        SuccessOrExit(err = ComputeAttestationSignature(commandObj, dacProvider, attestationElementsSpan, signatureSpan));
 
-        response.attestationElements = attestationElementsSpan;
-        response.signature           = signatureSpan;
+        // Generate attestation signature
+        err = dacProvider->SignWithDeviceAttestationKey(tbsSpan, signatureSpan);
+        ClearSecretData(attestationElements.Get() + attestationElementsSpan.size(), attestationChallenge.size());
+        VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::Failure);
+        VerifyOrExit(signatureSpan.size() == Crypto::P256ECDSASignature::Capacity(), finalStatus = Status::Failure);
+
+        Commands::AttestationResponse::Type response;
+
+        response.attestationElements  = attestationElementsSpan;
+        response.attestationSignature = signatureSpan;
+
+        ChipLogProgress(Zcl, "OpCreds: AttestationRequest successful.");
+        finalStatus = Status::Success;
         commandObj->AddResponse(commandPath, response);
     }
 
 exit:
-    if (err != CHIP_NO_ERROR)
+    if (finalStatus != Status::Success)
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed AttestationRequest: %s", ErrorStr(err));
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, finalStatus);
+        ChipLogError(Zcl, "OpCreds: Failed AttestationRequest request with IM error 0x%02x (err = %" CHIP_ERROR_FORMAT ")",
+                     to_underlying(finalStatus), err.Format());
     }
 
     return true;
@@ -862,87 +1003,132 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
                                                             const app::ConcreteCommandPath & commandPath,
                                                             const Commands::CSRRequest::DecodableType & commandData)
 {
-    MATTER_TRACE_EVENT_SCOPE("CSRRequest", "OperationalCredentials");
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has requested a CSR");
+    MATTER_TRACE_SCOPE("CSRRequest", "OperationalCredentials");
+    ChipLogProgress(Zcl, "OpCreds: Received a CSRRequest command");
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    Platform::ScopedMemoryBuffer<uint8_t> csr;
     chip::Platform::ScopedMemoryBuffer<uint8_t> nocsrElements;
     MutableByteSpan nocsrElementsSpan;
+    auto finalStatus = Status::Failure;
+    ByteSpan tbsSpan;
 
-    FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+    // Start with CHIP_ERROR_INVALID_ARGUMENT so that cascading errors yield correct
+    // logs by the end. We use finalStatus as our overall success marker, not error
+    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
 
-    if (!failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()))
-    {
-        LogErrorOnFailure(commandObj->AddStatus(commandPath, Status::UnsupportedAccess));
-        return true;
-    }
+    auto & fabricTable     = Server::GetInstance().GetFabricTable();
+    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
 
-    auto & CSRNonce = commandData.CSRNonce;
+    auto & CSRNonce     = commandData.CSRNonce;
+    bool isForUpdateNoc = commandData.isForUpdateNOC.ValueOr(false);
 
-    VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(CSRNonce.size() == Credentials::kExpectedAttestationNonceSize, err = CHIP_ERROR_INVALID_ARGUMENT);
+    // TODO: Create an alternative way to retrieve the Attestation Challenge without this huge amount of calls.
+    // Retrieve attestation challenge
+    ByteSpan attestationChallenge =
+        commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
+
+    failSafeContext.SetCsrRequestForUpdateNoc(isForUpdateNoc);
+    const FabricInfo * fabricInfo = RetrieveCurrentFabric(commandObj);
+
+    VerifyOrExit(CSRNonce.size() == Credentials::kExpectedAttestationNonceSize, finalStatus = Status::InvalidCommand);
+
+    // If current fabric is not available, command was invoked over PASE which is not legal if IsForUpdateNOC is true.
+    VerifyOrExit(!isForUpdateNoc || (fabricInfo != nullptr), finalStatus = Status::InvalidCommand);
+
+    VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()), finalStatus = Status::FailsafeRequired);
+    VerifyOrExit(!failSafeContext.NocCommandHasBeenInvoked(), finalStatus = Status::ConstraintError);
+
+    // Flush acks before really slow work
+    commandObj->FlushAcksRightAwayOnSlowCommand();
 
     // Prepare NOCSRElements structure
     {
-        Crypto::P256Keypair keypair;
-        size_t csrLength           = Crypto::kMAX_CSR_Length;
+        constexpr size_t csrLength = Crypto::kMIN_CSR_Buffer_Size;
         size_t nocsrLengthEstimate = 0;
         ByteSpan kNoVendorReserved;
-
-        // Always generate a new operational keypair for any new CSRRequest
-        if (gFabricBeingCommissioned.GetOperationalKey() != nullptr)
-        {
-            gFabricBeingCommissioned.GetOperationalKey()->Clear();
-        }
-
-        keypair.Initialize();
-        SuccessOrExit(err = gFabricBeingCommissioned.SetOperationalKeypair(&keypair));
+        Platform::ScopedMemoryBuffer<uint8_t> csr;
+        MutableByteSpan csrSpan;
 
         // Generate the actual CSR from the ephemeral key
-        VerifyOrExit(csr.Alloc(csrLength), err = CHIP_ERROR_NO_MEMORY);
+        if (!csr.Alloc(csrLength))
+        {
+            err = CHIP_ERROR_NO_MEMORY;
+            VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::ResourceExhausted);
+        }
+        csrSpan = MutableByteSpan{ csr.Get(), csrLength };
 
-        err = gFabricBeingCommissioned.GetOperationalKey()->NewCertificateSigningRequest(csr.Get(), csrLength);
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: NewCertificateSigningRequest returned %" CHIP_ERROR_FORMAT, err.Format());
-        SuccessOrExit(err);
-        VerifyOrExit(csrLength <= Crypto::kMAX_CSR_Length, err = CHIP_ERROR_INTERNAL);
+        Optional<FabricIndex> fabricIndexForCsr;
+        if (isForUpdateNoc)
+        {
+            fabricIndexForCsr.SetValue(commandObj->GetAccessingFabricIndex());
+        }
+
+        err = fabricTable.AllocatePendingOperationalKey(fabricIndexForCsr, csrSpan);
+
+        if (csrSpan.size() > csrLength)
+        {
+            err = CHIP_ERROR_INTERNAL;
+        }
+
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "OpCreds: AllocatePendingOperationalKey returned %" CHIP_ERROR_FORMAT, err.Format());
+            VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::Failure);
+        }
+
+        ChipLogProgress(Zcl, "OpCreds: AllocatePendingOperationalKey succeeded");
 
         // Encode the NOCSR elements with the CSR and Nonce
-        nocsrLengthEstimate = TLV::EstimateStructOverhead(csrLength,       // CSR buffer
+        nocsrLengthEstimate = TLV::EstimateStructOverhead(csrSpan.size(),  // CSR buffer
                                                           CSRNonce.size(), // CSR Nonce
                                                           0u               // no vendor reserved data
         );
 
-        VerifyOrExit(nocsrElements.Alloc(nocsrLengthEstimate), err = CHIP_ERROR_NO_MEMORY);
+        if (!nocsrElements.Alloc(nocsrLengthEstimate + attestationChallenge.size()))
+        {
+            err = CHIP_ERROR_NO_MEMORY;
+            VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::ResourceExhausted);
+        }
 
         nocsrElementsSpan = MutableByteSpan{ nocsrElements.Get(), nocsrLengthEstimate };
-        SuccessOrExit(err = Credentials::ConstructNOCSRElements(ByteSpan{ csr.Get(), csrLength }, CSRNonce, kNoVendorReserved,
-                                                                kNoVendorReserved, kNoVendorReserved, nocsrElementsSpan));
-        VerifyOrExit(nocsrElementsSpan.size() <= kMaxRspLen, err = CHIP_ERROR_INTERNAL);
-    }
 
-    // Prepare response payload with signature
-    {
-        Commands::CSRResponse::Type response;
+        err = Credentials::ConstructNOCSRElements(ByteSpan{ csrSpan.data(), csrSpan.size() }, CSRNonce, kNoVendorReserved,
+                                                  kNoVendorReserved, kNoVendorReserved, nocsrElementsSpan);
+        VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::Failure);
 
-        Credentials::DeviceAttestationCredentialsProvider * dacProvider = Credentials::GetDeviceAttestationCredentialsProvider();
+        // Append attestation challenge in the back of the reserved space for the signature
+        memcpy(nocsrElements.Get() + nocsrElementsSpan.size(), attestationChallenge.data(), attestationChallenge.size());
+        tbsSpan = ByteSpan{ nocsrElements.Get(), nocsrElementsSpan.size() + attestationChallenge.size() };
 
-        Crypto::P256ECDSASignature signature;
-        MutableByteSpan signatureSpan{ signature.Bytes(), signature.Capacity() };
-        SuccessOrExit(err = ComputeAttestationSignature(commandObj, dacProvider, nocsrElementsSpan, signatureSpan));
+        {
+            Credentials::DeviceAttestationCredentialsProvider * dacProvider =
+                Credentials::GetDeviceAttestationCredentialsProvider();
+            Crypto::P256ECDSASignature signature;
+            MutableByteSpan signatureSpan{ signature.Bytes(), signature.Capacity() };
 
-        response.NOCSRElements        = nocsrElementsSpan;
-        response.attestationSignature = signatureSpan;
-        commandObj->AddResponse(commandPath, response);
+            // Generate attestation signature
+            err = dacProvider->SignWithDeviceAttestationKey(tbsSpan, signatureSpan);
+            ClearSecretData(nocsrElements.Get() + nocsrElementsSpan.size(), attestationChallenge.size());
+            VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::Failure);
+            VerifyOrExit(signatureSpan.size() == Crypto::P256ECDSASignature::Capacity(), finalStatus = Status::Failure);
+
+            Commands::CSRResponse::Type response;
+
+            response.NOCSRElements        = nocsrElementsSpan;
+            response.attestationSignature = signatureSpan;
+
+            ChipLogProgress(Zcl, "OpCreds: CSRRequest successful.");
+            finalStatus = Status::Success;
+            commandObj->AddResponse(commandPath, response);
+        }
     }
 
 exit:
-    if (err != CHIP_NO_ERROR)
+    // If failed constraints or internal errors, send a status report instead of the response sent above
+    if (finalStatus != Status::Success)
     {
-        // TODO: Replace this error handling with fail-safe since it's not transactional against root certs
-        gFabricBeingCommissioned.Reset();
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed CSRRequest: %s", ErrorStr(err));
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, finalStatus);
+        ChipLogError(Zcl, "OpCreds: Failed CSRRequest request with IM error 0x%02x (err = %" CHIP_ERROR_FORMAT ")",
+                     to_underlying(finalStatus), err.Format());
     }
 
     return true;
@@ -952,52 +1138,56 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::AddTrustedRootCertificate::DecodableType & commandData)
 {
-    MATTER_TRACE_EVENT_SCOPE("AddTrustedRootCertificate", "OperationalCredentials");
-    auto & RootCertificate = commandData.rootCertificate;
+    MATTER_TRACE_SCOPE("AddTrustedRootCertificate", "OperationalCredentials");
 
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    auto & fabricTable = Server::GetInstance().GetFabricTable();
+    auto finalStatus   = Status::Failure;
 
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added a trusted root Cert");
+    // Start with CHIP_ERROR_INVALID_ARGUMENT so that cascading errors yield correct
+    // logs by the end. We use finalStatus as our overall success marker, not error
+    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
 
-    FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+    auto & rootCertificate = commandData.rootCACertificate;
+    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
 
-    if (!failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()))
-    {
-        LogErrorOnFailure(commandObj->AddStatus(commandPath, Status::UnsupportedAccess));
-        return true;
-    }
+    ChipLogProgress(Zcl, "OpCreds: Received an AddTrustedRootCertificate command");
 
-    // TODO: Ensure we do not duplicate roots in storage, and detect "same key, different cert" errors
-    // TODO: Validate cert signature prior to setting.
-    VerifyOrExit(gFabricBeingCommissioned.SetRootCert(RootCertificate) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_INVALID_FIELD);
+    VerifyOrExit(rootCertificate.size() <= Credentials::kMaxCHIPCertLength, finalStatus = Status::InvalidCommand);
+
+    VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()), finalStatus = Status::FailsafeRequired);
+
+    // Can only add a single trusted root cert per fail-safe
+    VerifyOrExit(!failSafeContext.AddTrustedRootCertHasBeenInvoked(), finalStatus = Status::ConstraintError);
+
+    // If we successfully invoked AddNOC/UpdateNOC, this command cannot possibly
+    // be useful in the context.
+    VerifyOrExit(!failSafeContext.NocCommandHasBeenInvoked(), finalStatus = Status::ConstraintError);
+
+    // Flush acks before really slow work
+    commandObj->FlushAcksRightAwayOnSlowCommand();
+
+    err = ValidateChipRCAC(rootCertificate);
+    VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::InvalidCommand);
+
+    err = fabricTable.AddNewPendingTrustedRootCert(rootCertificate);
+    VerifyOrExit(err != CHIP_ERROR_NO_MEMORY, finalStatus = Status::ResourceExhausted);
+
+    // CHIP_ERROR_INVALID_ARGUMENT by the time we reach here means bad format
+    VerifyOrExit(err != CHIP_ERROR_INVALID_ARGUMENT, finalStatus = Status::InvalidCommand);
+    VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::Failure);
+
+    // Got here, so we succeeded, mark AddTrustedRootCert has having been invoked.
+    ChipLogProgress(Zcl, "OpCreds: AddTrustedRootCertificate successful.");
+    finalStatus = Status::Success;
+    failSafeContext.SetAddTrustedRootCertInvoked();
 
 exit:
-    emberAfSendImmediateDefaultResponse(status);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (finalStatus != Status::Success)
     {
-        gFabricBeingCommissioned.Reset();
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed AddTrustedRootCert request.");
-    }
-    else
-    {
-        MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
-                                               OperationalCredentials::Attributes::TrustedRootCertificates::Id);
+        ChipLogError(Zcl, "OpCreds: Failed AddTrustedRootCertificate request with IM error 0x%02x (err = %" CHIP_ERROR_FORMAT ")",
+                     to_underlying(finalStatus), err.Format());
     }
 
-    return true;
-}
-
-bool emberAfOperationalCredentialsClusterRemoveTrustedRootCertificateCallback(
-    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-    const Commands::RemoveTrustedRootCertificate::DecodableType & commandData)
-{
-    MATTER_TRACE_EVENT_SCOPE("RemoveTrustedRootCertificate", "OperationalCredentials");
-    // TODO: Implement the logic for RemoveTrustedRootCertificate
-    EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
-    emberAfSendImmediateDefaultResponse(status);
-
-    MatterReportingAttributeChangeCallback(commandPath.mEndpointId, OperationalCredentials::Id,
-                                           OperationalCredentials::Attributes::TrustedRootCertificates::Id);
-
+    commandObj->AddStatus(commandPath, finalStatus);
     return true;
 }

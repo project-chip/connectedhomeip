@@ -27,6 +27,12 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <platform/internal/GenericConnectivityManagerImpl_UDP.ipp>
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+#include <platform/internal/GenericConnectivityManagerImpl_TCP.ipp>
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.ipp>
 #endif
@@ -40,7 +46,6 @@
 #endif
 
 using namespace ::chip;
-using namespace ::chip::TLV;
 using namespace ::chip::DeviceLayer::Internal;
 
 namespace chip {
@@ -207,15 +212,6 @@ void ConnectivityManagerImpl::DriveAPState(::chip::System::Layer * aLayer, void 
     sInstance.DriveAPState();
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
-
-CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, const char * key)
-{
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    return CHIP_NO_ERROR;
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif
-}
 
 } // namespace DeviceLayer
 } // namespace chip

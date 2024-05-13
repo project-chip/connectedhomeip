@@ -22,6 +22,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <platform/KeyValueStoreManager.h>
 
 namespace chip {
@@ -34,8 +35,8 @@ public:
     virtual ~KvsPersistentStorageDelegate() = default;
 
     // No copy, move or assignment.
-    KvsPersistentStorageDelegate(const KvsPersistentStorageDelegate &)  = delete;
-    KvsPersistentStorageDelegate(const KvsPersistentStorageDelegate &&) = delete;
+    KvsPersistentStorageDelegate(const KvsPersistentStorageDelegate &)             = delete;
+    KvsPersistentStorageDelegate(const KvsPersistentStorageDelegate &&)            = delete;
     KvsPersistentStorageDelegate & operator=(const KvsPersistentStorageDelegate &) = delete;
 
     CHIP_ERROR Init(DeviceLayer::PersistedStorage::KeyValueStoreManager * kvsManager)

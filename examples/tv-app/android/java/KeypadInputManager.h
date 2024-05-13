@@ -20,6 +20,7 @@
 
 #include <app/clusters/keypad-input-server/keypad-input-server.h>
 #include <jni.h>
+#include <lib/support/JniReferences.h>
 
 using chip::app::CommandResponseHelper;
 using KeypadInputDelegate = chip::app::Clusters::KeypadInput::Delegate;
@@ -32,9 +33,14 @@ public:
     void InitializeWithObjects(jobject managerObject);
 
     void HandleSendKey(CommandResponseHelper<SendKeyResponseType> & helper,
-                       const chip::app::Clusters::KeypadInput::CecKeyCode & keyCode) override;
+                       const chip::app::Clusters::KeypadInput::CECKeyCodeEnum & keyCode) override;
+
+    uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
 
 private:
-    jobject mKeypadInputManagerObject = nullptr;
-    jmethodID mSendKeyMethod          = nullptr;
+    chip::JniGlobalReference mKeypadInputManagerObject;
+    jmethodID mSendKeyMethod = nullptr;
+
+    // TODO: set this based upon meta data from app
+    static constexpr uint32_t kEndpointFeatureMap = 7;
 };

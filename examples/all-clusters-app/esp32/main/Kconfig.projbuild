@@ -24,6 +24,8 @@ menu "Demo"
         prompt "Device Type"
         default DEVICE_TYPE_ESP32_DEVKITC if IDF_TARGET_ESP32
         default DEVICE_TYPE_ESP32_C3_DEVKITM if IDF_TARGET_ESP32C3
+        default DEVICE_TYPE_ESP32_C2_DEVKITM if IDF_TARGET_ESP32C2
+        default DEVICE_TYPE_ESP32_C6_DEVKITC if IDF_TARGET_ESP32C6
         help
             Specifies the type of ESP32 device.
 
@@ -42,6 +44,19 @@ menu "Demo"
         config DEVICE_TYPE_ESP32_C3_DEVKITM
             bool "ESP32C3-DevKitM"
             depends on IDF_TARGET_ESP32C3
+        config DEVICE_TYPE_ESP32_ETHERNET_KIT
+            bool "ESP32-Ethernet-Kit_A_V1.0"
+            select ENABLE_ETHERNET_TELEMETRY
+            depends on IDF_TARGET_ESP32
+        config DEVICE_TYPE_ESP32_C2_DEVKITM
+            bool "ESP32C2-DevKitM"
+            depends on IDF_TARGET_ESP32C2
+        config DEVICE_TYPE_ESP32_C6_DEVKITC
+            bool "ESP32C6-DevKitC"
+            depends on IDF_TARGET_ESP32C6
+        config DEVICE_TYPE_ESP32_H2_DEVKITM
+            bool "ESP32H2-DevKitM"
+            depends on IDF_TARGET_ESP32H2
     endchoice
 
     choice
@@ -53,6 +68,7 @@ menu "Demo"
 
       config RENDEZVOUS_MODE_SOFTAP
           bool "Soft-AP"
+          select ESP_WIFI_SOFTAP_SUPPORT
       config RENDEZVOUS_MODE_BLE
           bool "BLE"
           depends on BT_ENABLED
@@ -60,16 +76,10 @@ menu "Demo"
           bool "On-Network"
       config RENDEZVOUS_MODE_SOFTAP_ON_NETWORK
           bool "Soft-AP / On-Network"
+          select ESP_WIFI_SOFTAP_SUPPORT
       config RENDEZVOUS_MODE_BLE_ON_NETWORK
           bool "BLE / On-Network"
     endchoice
-
-    config ECHO_HOST_IP
-        string "IPV4 address"
-        default "127.0.0.1"
-        depends on USE_ECHO_CLIENT
-        help
-            The IPV4 Address of the ECHO Server.
 
     # NOTE: This config is not displayed as a input in the Kconfig menu, as its value is
     # entirely derived from the Device Type choice.  However the CONFIG_EXAMPLE_DISPLAY_TYPE
@@ -77,10 +87,15 @@ menu "Demo"
     config TFT_PREDEFINED_DISPLAY_TYPE
         int
         range 0 5
-        default 0 if DEVICE_TYPE_ESP32_DEVKITC
-        default 0 if DEVICE_TYPE_ESP32_C3_DEVKITM
+        default 0 if DEVICE_TYPE_ESP32_DEVKITC || DEVICE_TYPE_ESP32_H2_DEVKITM
+        default 0 if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32_C2_DEVKITM || DEVICE_TYPE_ESP32_C6_DEVKITC
         default 3 if DEVICE_TYPE_M5STACK
         default 4 if DEVICE_TYPE_ESP32_WROVER_KIT
+
+    config HAVE_DISPLAY
+        bool
+        default y if DEVICE_TYPE_M5STACK || DEVICE_TYPE_ESP32_WROVER_KIT
+        default n if !(DEVICE_TYPE_M5STACK || DEVICE_TYPE_ESP32_WROVER_KIT)
 
     config RENDEZVOUS_MODE
        int
@@ -99,20 +114,16 @@ menu "Demo"
             To reduce wear and heat the M5Stack's Display is automatically switched off after a few seconds
 
     config STATUS_LED_GPIO_NUM
-        int 
+        int
         range 0 40
-        default 2 if DEVICE_TYPE_ESP32_DEVKITC         #Use LED1 (blue LED) as status LED on DevKitC      
-        default 8 if DEVICE_TYPE_ESP32_C3_DEVKITM
-        default 26 if DEVICE_TYPE_ESP32_WROVER_KIT     
+        default 2 if DEVICE_TYPE_ESP32_DEVKITC         #Use LED1 (blue LED) as status LED on DevKitC
+        default 2 if DEVICE_TYPE_ESP32_ETHERNET_KIT
+        default 8 if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32_C2_DEVKITM || DEVICE_TYPE_ESP32_C6_DEVKITC || DEVICE_TYPE_ESP32_H2_DEVKITM
+        default 26 if DEVICE_TYPE_ESP32_WROVER_KIT
         default 40 if DEVICE_TYPE_M5STACK
         help
             Each board has a status led, define its pin number.
 
-    config DEINIT_BLE_ON_COMMISSIONING_COMPLETE
-	bool "Disable and DeInit BLE on commissioning complete"
-	default y
-	help 
-             Disable and deinit BLE and reclaim all its memory, once the commissioning is successful and Commissioning complete event is received in the application.	
 endmenu
 
 menu "PW RPC Debug channel"

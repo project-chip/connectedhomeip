@@ -1,0 +1,104 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Commands Tests
+
+config:
+    nodeId: 0x12344321
+    endpoint: 1
+    cluster: "Unit Testing"
+
+    UnsupportedCluster: 0xFFF1FC00
+    UnsupportedCommand: 0xFFF100FF
+    UnsupportedEndPoint: 254
+
+    InvokeRequestMessage.Cluster: 0x00000006
+    InvokeRequestMessage.Command: 0x00000000
+    InvokeRequestMessage.EndPoint: 1
+    InvokeRequestMessage.Payload: {}
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Invoke Request Message with a path that indicates a specific endpoint
+          that is unsupported"
+      cluster: "AnyCommands"
+      command: "CommandById"
+      endpoint: UnsupportedEndPoint
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: InvokeRequestMessage.Cluster
+              - name: "CommandId"
+                value: InvokeRequestMessage.Command
+              - name: "Payload"
+                value: InvokeRequestMessage.Payload
+      response:
+          error: UNSUPPORTED_ENDPOINT
+
+    - label:
+          "Invoke Request Message with a path that indicates a specific cluster
+          that is unsupported"
+      cluster: "AnyCommands"
+      command: "CommandById"
+      endpoint: InvokeRequestMessage.EndPoint
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: UnsupportedCluster
+              - name: "CommandId"
+                value: InvokeRequestMessage.Command
+              - name: "Payload"
+                value: InvokeRequestMessage.Payload
+      response:
+          error: UNSUPPORTED_CLUSTER
+
+    - label:
+          "Invoke Request Message with a path that indicates a specific command
+          that is unsupported"
+      cluster: "AnyCommands"
+      command: "CommandById"
+      endpoint: InvokeRequestMessage.EndPoint
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: InvokeRequestMessage.Cluster
+              - name: "CommandId"
+                value: UnsupportedCommand
+              - name: "Payload"
+                value: InvokeRequestMessage.Payload
+      response:
+          error: UNSUPPORTED_COMMAND
+
+    - label:
+          "Invoke Request Message with a valid path that indicates a specific
+          endpoint/cluster/command"
+      cluster: "AnyCommands"
+      command: "CommandById"
+      endpoint: InvokeRequestMessage.EndPoint
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: InvokeRequestMessage.Cluster
+              - name: "CommandId"
+                value: InvokeRequestMessage.Command
+              - name: "Payload"
+                value: InvokeRequestMessage.Payload

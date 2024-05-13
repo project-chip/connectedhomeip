@@ -15,22 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *
- *    Copyright (c) 2020 Silicon Labs
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
 #pragma once
 
 #include <app/util/basic-types.h>
@@ -100,19 +84,20 @@ typedef struct
 union EmberAfDefaultOrMinMaxAttributeValue
 {
     constexpr EmberAfDefaultOrMinMaxAttributeValue(const uint8_t * ptr) : ptrToDefaultValue(ptr) {}
-    constexpr EmberAfDefaultOrMinMaxAttributeValue(uint16_t val) : defaultValue(val) {}
+    constexpr EmberAfDefaultOrMinMaxAttributeValue(uint32_t val) : defaultValue(val) {}
     constexpr EmberAfDefaultOrMinMaxAttributeValue(const EmberAfAttributeMinMaxValue * ptr) : ptrToMinMaxValue(ptr) {}
 
     /**
-     * Points to data if size is more than 2 bytes.
-     * If size is more than 2 bytes, and this value is NULL,
+     * Points to data if the attribute type is a string or the size of the data is more than 4 bytes.
+     * If the attribute type is a string or the data size is more than 4 bytes, and this value is NULL,
      * then the default value is all zeroes.
      */
     const uint8_t * ptrToDefaultValue;
     /**
-     * Actual default value if the attribute size is 2 bytes or less.
+     * Actual default value if the attribute is non string and size
+     * is 4 bytes or less.
      */
-    uint16_t defaultValue;
+    uint32_t defaultValue;
     /**
      * Points to the min max attribute value structure, if min/max is
      * supported for this attribute.
@@ -136,10 +121,8 @@ union EmberAfDefaultOrMinMaxAttributeValue
 #define ATTRIBUTE_MASK_EXTERNAL_STORAGE (0x10)
 // Attribute is singleton
 #define ATTRIBUTE_MASK_SINGLETON (0x20)
-// Attribute is a client attribute
-#define ATTRIBUTE_MASK_CLIENT (0x40)
 // Attribute is nullable
-#define ATTRIBUTE_MASK_NULLABLE (0x80)
+#define ATTRIBUTE_MASK_NULLABLE (0x40)
 
 /**
  * @brief Each attribute has it's metadata stored in such struct.
@@ -149,27 +132,31 @@ union EmberAfDefaultOrMinMaxAttributeValue
 struct EmberAfAttributeMetadata
 {
     /**
+     * Pointer to the default value union. Actual value stored
+     * depends on the mask.
+     */
+    EmberAfDefaultOrMinMaxAttributeValue defaultValue;
+
+    /**
      * Attribute ID, according to ZCL specs.
      */
     chip::AttributeId attributeId;
-    /**
-     * Attribute type, according to ZCL specs.
-     */
-    EmberAfAttributeType attributeType;
+
     /**
      * Size of this attribute in bytes.
      */
     uint16_t size;
+
+    /**
+     * Attribute type, according to ZCL specs.
+     */
+    EmberAfAttributeType attributeType;
+
     /**
      * Attribute mask, tagging attribute with specific
      * functionality.
      */
     EmberAfAttributeMask mask;
-    /**
-     * Pointer to the default value union. Actual value stored
-     * depends on the mask.
-     */
-    EmberAfDefaultOrMinMaxAttributeValue defaultValue;
 
     /**
      * Check whether this attribute is nullable.
@@ -193,10 +180,17 @@ struct EmberAfAttributeMetadata
     bool IsExternal() const { return mask & ATTRIBUTE_MASK_EXTERNAL_STORAGE; }
 
     /**
+     * Check whether this is a "singleton" attribute, in the sense that it has a
+     * single value across multiple instances of the cluster.  This is not
+     * mutually exclusive with the attribute being external.
+     */
+    bool IsSingleton() const { return mask & ATTRIBUTE_MASK_SINGLETON; }
+
+    /**
      * Check whether this attribute is automatically stored in non-volatile
      * memory.
      */
-    bool IsNonVolatile() const { return (mask & ATTRIBUTE_MASK_NONVOLATILE) && !IsExternal(); }
+    bool IsAutomaticallyPersisted() const { return (mask & ATTRIBUTE_MASK_NONVOLATILE) && !IsExternal(); }
 };
 
 /** @brief Returns true if the given attribute type is a string. */
@@ -204,14 +198,3 @@ bool emberAfIsStringAttributeType(EmberAfAttributeType attributeType);
 
 /** @brief Returns true if the given attribute type is a long string. */
 bool emberAfIsLongStringAttributeType(EmberAfAttributeType attributeType);
-
-/*
- * @brief Function that determines the length of a zigbee Cluster Library string
- *   (where the first byte is assumed to be the length).
- */
-uint8_t emberAfStringLength(const uint8_t * buffer);
-/*
- * @brief Function that determines the length of a zigbee Cluster Library long string.
- *   (where the first two bytes are assumed to be the length).
- */
-uint16_t emberAfLongStringLength(const uint8_t * buffer);

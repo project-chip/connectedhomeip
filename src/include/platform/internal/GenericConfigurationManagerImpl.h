@@ -40,6 +40,9 @@ class ProvisioningDataSet;
 
 namespace Internal {
 
+template <class ConfigClass>
+class GenericDeviceInstanceInfoProvider;
+
 #if CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER
 template <class ConfigClass>
 class LegacyTemporaryCommissionableDataProvider;
@@ -59,28 +62,21 @@ public:
     // ===== Methods that implement the ConfigurationManager abstract interface.
 
     CHIP_ERROR Init() override;
-    CHIP_ERROR GetVendorName(char * buf, size_t bufSize) override;
-    CHIP_ERROR GetVendorId(uint16_t & vendorId) override;
-    CHIP_ERROR GetProductName(char * buf, size_t bufSize) override;
-    CHIP_ERROR GetProductId(uint16_t & productId) override;
-    CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override;
-    CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVer) override;
     CHIP_ERROR StoreHardwareVersion(uint16_t hardwareVer) override;
     CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override;
     CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer) override;
     CHIP_ERROR StoreSoftwareVersion(uint32_t softwareVer) override;
-    CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override;
+    CHIP_ERROR GetFirmwareBuildChipEpochTime(System::Clock::Seconds32 & buildTime) override;
+    CHIP_ERROR SetFirmwareBuildChipEpochTime(System::Clock::Seconds32 buildTime) override;
     CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen) override;
     CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf) override;
     CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override;
-    CHIP_ERROR StorePrimaryWiFiMACAddress(const uint8_t * buf) override;
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf) override;
-    CHIP_ERROR StorePrimary802154MACAddress(const uint8_t * buf) override;
-    CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth) override;
     CHIP_ERROR StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen) override;
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter) override;
     CHIP_ERROR IncrementLifetimeCounter() override;
+    CHIP_ERROR SetRotatingDeviceIdUniqueId(const ByteSpan & uniqueIdSpan) override;
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override;
 #endif
     CHIP_ERROR GetFailSafeArmed(bool & val) override;
@@ -98,25 +94,18 @@ public:
     CHIP_ERROR StoreRegulatoryLocation(uint8_t location) override;
     CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen) override;
     CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen) override;
-    CHIP_ERROR GetBreadcrumb(uint64_t & breadcrumb) override;
-    CHIP_ERROR StoreBreadcrumb(uint64_t breadcrumb) override;
     CHIP_ERROR GetRebootCount(uint32_t & rebootCount) override;
     CHIP_ERROR StoreRebootCount(uint32_t rebootCount) override;
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
     CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours) override;
     CHIP_ERROR GetBootReason(uint32_t & bootReason) override;
     CHIP_ERROR StoreBootReason(uint32_t bootReason) override;
-    CHIP_ERROR GetNodeLabel(char * buf, size_t bufSize) override;
-    CHIP_ERROR StoreNodeLabel(const char * buf, size_t bufSize) override;
-    CHIP_ERROR GetPartNumber(char * buf, size_t bufSize) override;
-    CHIP_ERROR GetProductURL(char * buf, size_t bufSize) override;
-    CHIP_ERROR GetProductLabel(char * buf, size_t bufSize) override;
-    CHIP_ERROR GetLocalConfigDisabled(bool & disabled) override;
-    CHIP_ERROR GetReachable(bool & reachable) override;
     CHIP_ERROR GetUniqueId(char * buf, size_t bufSize) override;
     CHIP_ERROR StoreUniqueId(const char * uniqueId, size_t uniqueIdLen) override;
     CHIP_ERROR GenerateUniqueId(char * buf, size_t bufSize) override;
-    CHIP_ERROR RunUnitTests(void) override;
+#if CHIP_CONFIG_TEST
+    void RunUnitTests() override;
+#endif
     bool IsFullyProvisioned() override;
     void InitiateFactoryReset() override;
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
@@ -130,8 +119,13 @@ public:
 
 protected:
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
-    chip::LifetimePersistedCounter mLifetimePersistedCounter;
+    chip::LifetimePersistedCounter<uint32_t> mLifetimePersistedCounter;
+    uint8_t mRotatingDeviceIdUniqueId[CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH] =
+        CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;
+    size_t mRotatingDeviceIdUniqueIdLength = kRotatingDeviceIDUniqueIDLength;
 #endif
+
+    friend GenericDeviceInstanceInfoProvider<ConfigClass>;
 
 #if CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER
     friend LegacyTemporaryCommissionableDataProvider<ConfigClass>;

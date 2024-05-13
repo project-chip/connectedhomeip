@@ -20,6 +20,7 @@
 
 #include <app/clusters/wake-on-lan-server/wake-on-lan-server.h>
 #include <jni.h>
+#include <lib/support/JniReferences.h>
 
 class WakeOnLanManager : public chip::app::Clusters::WakeOnLan::Delegate
 {
@@ -30,6 +31,6 @@ public:
     CHIP_ERROR HandleGetMacAddress(chip::app::AttributeValueEncoder & aEncoder) override;
 
 private:
-    jobject mWakeOnLanManagerObject = nullptr;
-    jmethodID mGetMacMethod         = nullptr;
+    chip::JniGlobalReference mWakeOnLanManagerObject;
+    jmethodID mGetMacMethod = nullptr;
 };

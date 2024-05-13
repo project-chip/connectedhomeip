@@ -26,10 +26,8 @@
 
 #define CHIP_CONFIG_EVENT_LOGGING_NUM_EXTERNAL_CALLBACKS 2
 
-#define CHIP_CONFIG_EVENT_LOGGING_EXTERNAL_EVENT_SUPPORT 1
-
 // Uncomment this for a large Tunnel MTU.
-//#define CHIP_CONFIG_TUNNEL_INTERFACE_MTU                           (9000)
+// #define CHIP_CONFIG_TUNNEL_INTERFACE_MTU                           (9000)
 
 // Enable support functions for parsing command-line arguments
 #define CHIP_CONFIG_ENABLE_ARG_PARSER 1
@@ -39,7 +37,9 @@
 //    WARNING: This option makes it possible to circumvent basic chip security functionality.
 //    Because of this it SHOULD NEVER BE ENABLED IN PRODUCTION BUILDS.
 //
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS
 #define CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS 1
+#endif
 
 // Enable reading DRBG seed data from /dev/(u)random.
 // This is needed for test applications and the CHIP device manager to function
@@ -77,11 +77,15 @@
 //
 // Default of 8 ECs is not sufficient for some of the unit tests
 // that try to validate multiple simultaneous interactions.
+// In tests like TestReadHandler_MultipleSubscriptions, we are trying to issue as many read / subscription requests as possible in
+// parallel. Since the default config says we support 16 fabrics, and we will have 4 read handlers for each fabric (3 subscriptions
+// + 1 reserved for read) that is read transactions in parallel. Since the report handlers are allocated on the heap, we will issue
+// 65 requests (the TestReadHandler_MultipleSubscriptions will issue CHIP_IM_MAX_NUM_READ_HANDLER + 1 subscriptions to verify heap
+// allocation logic) in total and that is 130 ECs. Round this up to 150 ECs
 //
-#define CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS 24
+#define CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS 150
 
-#define CHIP_IM_MAX_NUM_READ_HANDLER 8
-
-#define CONFIG_IM_BUILD_FOR_UNIT_TEST 1
+// Safe to enable this flag since standalone is associated with host and not a device.
+#define CONFIG_BUILD_FOR_HOST_UNIT_TEST 1
 
 #endif /* CHIPPROJECTCONFIG_H */

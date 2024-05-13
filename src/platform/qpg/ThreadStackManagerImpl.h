@@ -25,7 +25,9 @@
 #pragma once
 
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.h>
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.h>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/internal/DeviceNetworkInfo.h>
 
 #include <openthread/tasklet.h>
 #include <openthread/thread.h>
@@ -46,7 +48,7 @@ extern int GetEntropy(uint8_t * buf, size_t bufSize);
  * using the OpenThread stack.
  */
 class ThreadStackManagerImpl final : public ThreadStackManager,
-                                     public Internal::GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>,
+                                     public Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>,
                                      public Internal::GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>
 {
     // Allow the ThreadStackManager interface class to delegate method calls to
@@ -57,7 +59,7 @@ class ThreadStackManagerImpl final : public ThreadStackManager,
     // this class.
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
     friend Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>;
-    friend Internal::GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>;
+    friend Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>;
     friend Internal::GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>;
 #endif
 

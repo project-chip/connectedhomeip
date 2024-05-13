@@ -24,7 +24,7 @@
 #pragma once
 
 #include <platform/AttributeList.h>
-#include <platform/CHIPDeviceBuildConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceEvent.h>
 #include <system/PlatformEventSupport.h>
 #include <system/SystemLayer.h>
@@ -45,7 +45,6 @@ class ConfigurationManagerImpl;
 class DeviceControlServer;
 class TraitManager;
 class ThreadStackManagerImpl;
-class TimeSyncManager;
 
 namespace Internal {
 class BLEManagerImpl;
@@ -109,6 +108,7 @@ public:
      * other.
      */
     CHIP_ERROR InitChipStack();
+
     CHIP_ERROR AddEventHandler(EventHandlerFunct handler, intptr_t arg = 0);
     void RemoveEventHandler(EventHandlerFunct handler, intptr_t arg = 0);
     void SetDelegate(PlatformManagerDelegate * delegate) { mDelegate = delegate; }
@@ -137,7 +137,7 @@ public:
      * processing, the callback function may be called (on the work item
      * processing thread) before ScheduleWork returns.
      */
-    void ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg = 0);
+    CHIP_ERROR ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg = 0);
 
     /**
      * Process work items until StopEventLoopTask is called.  RunEventLoop will
@@ -183,10 +183,11 @@ public:
      * returns.
      */
     CHIP_ERROR StopEventLoopTask();
+
     void LockChipStack();
     bool TryLockChipStack();
     void UnlockChipStack();
-    CHIP_ERROR Shutdown();
+    void Shutdown();
 
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
     bool IsChipStackLockedByCurrentThread() const;
@@ -200,6 +201,47 @@ public:
      */
     [[nodiscard]] CHIP_ERROR PostEvent(const ChipDeviceEvent * event);
     void PostEventOrDie(const ChipDeviceEvent * event);
+
+    /**
+     * Generally this function has the same semantics as ScheduleWork
+     * except it applies to background processing.
+     *
+     * Delegates to PostBackgroundEvent (which will delegate to PostEvent if
+     * CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING is not true).
+     */
+    CHIP_ERROR ScheduleBackgroundWork(AsyncWorkFunct workFunct, intptr_t arg = 0);
+
+    /**
+     * Generally this function has the same semantics as PostEvent
+     * except it applies to background processing.
+     *
+     * If CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING is not true, will delegate
+     * to PostEvent.
+     *
+     * Only accepts events of type kCallWorkFunct or kNoOp.
+     *
+     * Returns CHIP_ERROR_INVALID_ARGUMENT if the event type is not acceptable.
+     * Returns CHIP_ERROR_NO_MEMORY if resources are exhausted.
+     */
+    CHIP_ERROR PostBackgroundEvent(const ChipDeviceEvent * event);
+
+    /**
+     * Generally this function has the same semantics as RunEventLoop
+     * except it applies to background processing.
+     */
+    void RunBackgroundEventLoop();
+
+    /**
+     * Generally this function has the same semantics as StartEventLoopTask
+     * except it applies to background processing.
+     */
+    CHIP_ERROR StartBackgroundEventLoopTask();
+
+    /**
+     * Generally this function has the same semantics as StopEventLoopTask
+     * except it applies to background processing.
+     */
+    CHIP_ERROR StopBackgroundEventLoopTask();
 
 private:
     bool mInitialized                   = false;
@@ -215,7 +257,6 @@ private:
     friend class FailSafeContext;
     friend class TraitManager;
     friend class ThreadStackManagerImpl;
-    friend class TimeSyncManager;
     friend class Internal::BLEManagerImpl;
     template <class>
     friend class Internal::GenericPlatformManagerImpl;
@@ -244,8 +285,8 @@ protected:
     ~PlatformManager() = default;
 
     // No copy, move or assignment.
-    PlatformManager(const PlatformManager &)  = delete;
-    PlatformManager(const PlatformManager &&) = delete;
+    PlatformManager(const PlatformManager &)             = delete;
+    PlatformManager(const PlatformManager &&)            = delete;
     PlatformManager & operator=(const PlatformManager &) = delete;
 };
 
@@ -352,9 +393,9 @@ inline void PlatformManager::HandleServerShuttingDown()
     static_cast<ImplClass *>(this)->_HandleServerShuttingDown();
 }
 
-inline void PlatformManager::ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg)
+inline CHIP_ERROR PlatformManager::ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg)
 {
-    static_cast<ImplClass *>(this)->_ScheduleWork(workFunct, arg);
+    return static_cast<ImplClass *>(this)->_ScheduleWork(workFunct, arg);
 }
 
 inline void PlatformManager::RunEventLoop()
@@ -399,12 +440,10 @@ inline CHIP_ERROR PlatformManager::StopEventLoopTask()
  *   This DOES NOT stop the chip thread or event queue from running.
  *
  */
-inline CHIP_ERROR PlatformManager::Shutdown()
+inline void PlatformManager::Shutdown()
 {
-    CHIP_ERROR err = static_cast<ImplClass *>(this)->_Shutdown();
-    if (err == CHIP_NO_ERROR)
-        mInitialized = false;
-    return err;
+    static_cast<ImplClass *>(this)->_Shutdown();
+    mInitialized = false;
 }
 
 inline void PlatformManager::LockChipStack()
@@ -432,6 +471,31 @@ inline void PlatformManager::PostEventOrDie(const ChipDeviceEvent * event)
     CHIP_ERROR status = static_cast<ImplClass *>(this)->_PostEvent(event);
     VerifyOrDieWithMsg(status == CHIP_NO_ERROR, DeviceLayer, "Failed to post event %d: %" CHIP_ERROR_FORMAT,
                        static_cast<int>(event->Type), status.Format());
+}
+
+inline CHIP_ERROR PlatformManager::ScheduleBackgroundWork(AsyncWorkFunct workFunct, intptr_t arg)
+{
+    return static_cast<ImplClass *>(this)->_ScheduleBackgroundWork(workFunct, arg);
+}
+
+inline CHIP_ERROR PlatformManager::PostBackgroundEvent(const ChipDeviceEvent * event)
+{
+    return static_cast<ImplClass *>(this)->_PostBackgroundEvent(event);
+}
+
+inline void PlatformManager::RunBackgroundEventLoop()
+{
+    static_cast<ImplClass *>(this)->_RunBackgroundEventLoop();
+}
+
+inline CHIP_ERROR PlatformManager::StartBackgroundEventLoopTask()
+{
+    return static_cast<ImplClass *>(this)->_StartBackgroundEventLoopTask();
+}
+
+inline CHIP_ERROR PlatformManager::StopBackgroundEventLoopTask()
+{
+    return static_cast<ImplClass *>(this)->_StopBackgroundEventLoopTask();
 }
 
 inline void PlatformManager::DispatchEvent(const ChipDeviceEvent * event)

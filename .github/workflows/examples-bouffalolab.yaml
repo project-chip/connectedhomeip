@@ -1,0 +1,147 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Build example - BouffaloLab
+
+on:
+  push:
+    branches-ignore:
+      - 'dependabot/**'
+  pull_request:
+  merge_group:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+  cancel-in-progress: true
+
+env:
+  CHIP_NO_LOG_TIMESTAMPS: true
+
+jobs:
+  bouffalolab:
+    name: Bouffalo Lab
+
+    runs-on: ubuntu-latest
+    if: github.actor != 'restyled-io[bot]'
+
+    container:
+      image: ghcr.io/project-chip/chip-build-bouffalolab:50
+      volumes:
+        - "/tmp/bloat_reports:/tmp/bloat_reports"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Checkout submodules & Bootstrap
+        uses: ./.github/actions/checkout-submodules-and-bootstrap
+        with:
+          platform: bouffalolab
+          extra-submodule-parameters: " --recursive"
+      - name: Set up environment for size reports
+        uses: ./.github/actions/setup-size-reports
+        if: ${{ !env.ACT }}
+        with:
+          gh-context: ${{ toJson(github) }}
+      - name: Build example BL602 Lighting App
+        run: |
+          ./scripts/run_in_build_env.sh \
+            "./scripts/build/build_examples.py \
+              --target bouffalolab-bl602-night-light-light \
+              --target bouffalolab-bl602-night-light-light-mfd \
+              --target bouffalolab-bl602-iot-matter-v1-light-115200-rpc \
+              build \
+              --copy-artifacts-to out/artifacts \
+            "
+      - name: Prepare some bloat report from the previous builds
+        run: |
+          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+              bl602 bl602 lighting-app \
+              out/artifacts/bouffalolab-bl602-night-light-light/chip-bl602-lighting-example.out \
+              /tmp/bloat_reports/
+          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+              bl602 bl602+mfd lighting-app \
+              out/artifacts/bouffalolab-bl602-night-light-light-mfd/chip-bl602-lighting-example.out \
+              /tmp/bloat_reports/
+          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+              bl602 bl602+rpc lighting-app \
+              out/artifacts/bouffalolab-bl602-iot-matter-v1-light-115200-rpc/chip-bl602-lighting-example.out \
+              /tmp/bloat_reports/
+      - name: Clean out build output
+        run: rm -rf ./out
+
+      - name: Build example BL702 Lighting App
+        run: |
+          ./scripts/run_in_build_env.sh \
+            "./scripts/build/build_examples.py \
+              --target bouffalolab-bl706-night-light-light \
+              --target bouffalolab-bl706-night-light-light-mfd \
+              --target bouffalolab-bl706dk-light-ethernet \
+              --target bouffalolab-bl706dk-light-wifi-fp \
+              --target bouffalolab-xt-zb6-devkit-light-115200-rpc \
+              build \
+              --copy-artifacts-to out/artifacts \
+            "
+      - name: Prepare some bloat report from the previous builds
+        run: |
+          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+              bl702 bl702 lighting-app \
+              out/artifacts/bouffalolab-bl706-night-light-light/chip-bl702-lighting-example.out \
+              /tmp/bloat_reports/
+          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+              bl702 bl702+mfd lighting-app \
+              out/artifacts/bouffalolab-bl706-night-light-light-mfd/chip-bl702-lighting-example.out \
+              /tmp/bloat_reports/
+          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+              bl702 bl706-eth lighting-app \
+              out/artifacts/bouffalolab-bl706dk-light-ethernet/chip-bl702-lighting-example.out \
+              /tmp/bloat_reports/
+          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+              bl702 bl706-wifi lighting-app \
+              out/artifacts/bouffalolab-bl706dk-light-wifi-fp/chip-bl702-lighting-example.out \
+              /tmp/bloat_reports/
+          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+              bl702 bl702+rpc lighting-app \
+              out/artifacts/bouffalolab-xt-zb6-devkit-light-115200-rpc/chip-bl702-lighting-example.out \
+              /tmp/bloat_reports/
+      - name: Clean out build output
+        run: rm -rf ./out
+
+      - name: Build example BL702L Lighting App
+        timeout-minutes: 30
+        run: |
+          ./scripts/run_in_build_env.sh \
+            "./scripts/build/build_examples.py \
+              --target bouffalolab-bl704ldk-light \
+              --target bouffalolab-bl704ldk-light-mfd \
+              build \
+              --copy-artifacts-to out/artifacts \
+            "
+      - name: Prepare some bloat report from the previous builds
+        run: |
+          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+              bl702l bl702l lighting-app \
+              out/artifacts/bouffalolab-bl704ldk-light/chip-bl702l-lighting-example.out \
+              /tmp/bloat_reports/
+          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+              bl702l bl702l+mfd lighting-app \
+              out/artifacts/bouffalolab-bl704ldk-light-mfd/chip-bl702l-lighting-example.out \
+              /tmp/bloat_reports/
+      - name: Clean out build output
+        run: rm -rf ./out
+
+      - name: Uploading Size Reports
+        uses: ./.github/actions/upload-size-reports
+        if: ${{ !env.ACT }}
+        with:
+          platform-name: BouffaloLab

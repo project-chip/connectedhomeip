@@ -22,20 +22,20 @@
  *
  */
 
+#include <gtest/gtest.h>
+
 #include "app/data-model/NullObject.h"
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/tests/AppTestContext.h>
 #include <controller/InvokeInteraction.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLV.h>
-#include <lib/core/CHIPTLVUtilities.hpp>
-#include <lib/support/ErrorStr.h>
-#include <lib/support/UnitTestRegistration.h>
+#include <lib/core/ErrorStr.h>
+#include <lib/core/TLV.h>
+#include <lib/core/TLVUtilities.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/tests/MessagingContext.h>
-#include <nlunit-test.h>
 #include <protocols/interaction_model/Constants.h>
 
 using TestContext = chip::Test::AppContext;
@@ -55,7 +55,9 @@ enum ResponseDirective
 {
     kSendDataResponse,
     kSendSuccessStatusCode,
+    kSendMultipleSuccessStatusCodes,
     kSendError,
+    kSendMultipleErrors,
     kSendSuccessStatusCodeWithClusterStatus,
     kSendErrorWithClusterStatus,
     kAsync,
@@ -72,26 +74,24 @@ namespace app {
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
                                   CommandHandler * apCommandObj)
 {
-    ChipLogDetail(Controller,
-                  "Received Cluster Command: Endpoint=%" PRIx16 " Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
+    ChipLogDetail(Controller, "Received Cluster Command: Endpoint=%x Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
                   aCommandPath.mEndpointId, ChipLogValueMEI(aCommandPath.mClusterId), ChipLogValueMEI(aCommandPath.mCommandId));
 
-    if (aCommandPath.mClusterId == TestCluster::Id &&
-        aCommandPath.mCommandId == TestCluster::Commands::TestSimpleArgumentRequest::Type::GetCommandId())
+    if (aCommandPath.mClusterId == Clusters::UnitTesting::Id &&
+        aCommandPath.mCommandId == Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Type::GetCommandId())
     {
-        TestCluster::Commands::TestSimpleArgumentRequest::DecodableType dataRequest;
+        Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::DecodableType dataRequest;
 
         if (DataModel::Decode(aReader, dataRequest) != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Unable to decode the request");
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure);
+            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure, "Unable to decode the request");
             return;
         }
 
         if (responseDirective == kSendDataResponse)
         {
-            TestCluster::Commands::TestStructArrayArgumentResponse::Type dataResponse;
-            TestCluster::Structs::NestedStructList::Type nestedStructList[4];
+            Clusters::UnitTesting::Commands::TestStructArrayArgumentResponse::Type dataResponse;
+            Clusters::UnitTesting::Structs::NestedStructList::Type nestedStructList[4];
 
             uint8_t i = 0;
             for (auto & item : nestedStructList)
@@ -112,9 +112,35 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
         {
             apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Success);
         }
+        else if (responseDirective == kSendMultipleSuccessStatusCodes)
+        {
+            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Success,
+                                    "No error but testing status success case");
+
+            // TODO: Right now all but the first AddStatus call fail, so this
+            // test is not really testing what it should.
+            for (size_t i = 0; i < 3; ++i)
+            {
+                (void) apCommandObj->FallibleAddStatus(aCommandPath, Protocols::InteractionModel::Status::Success,
+                                                       "No error but testing status success case");
+            }
+            // And one failure on the end.
+            (void) apCommandObj->FallibleAddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure);
+        }
         else if (responseDirective == kSendError)
         {
             apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure);
+        }
+        else if (responseDirective == kSendMultipleErrors)
+        {
+            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure);
+
+            // TODO: Right now all but the first AddStatus call fail, so this
+            // test is not really testing what it should.
+            for (size_t i = 0; i < 3; ++i)
+            {
+                (void) apCommandObj->FallibleAddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure);
+            }
         }
         else if (responseDirective == kSendSuccessStatusCodeWithClusterStatus)
         {
@@ -141,7 +167,7 @@ InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & 
         return Status::UnsupportedEndpoint;
     }
 
-    if (aCommandPath.mClusterId != TestCluster::Id)
+    if (aCommandPath.mClusterId != Clusters::UnitTesting::Id)
     {
         return Status::UnsupportedCluster;
     }
@@ -153,33 +179,47 @@ InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & 
 
 namespace {
 
-class TestCommandInteraction
+class TestCommands : public ::testing::Test
 {
 public:
-    TestCommandInteraction() {}
-    static void TestDataResponse(nlTestSuite * apSuite, void * apContext);
-    static void TestSuccessNoDataResponse(nlTestSuite * apSuite, void * apContext);
-    static void TestAsyncResponse(nlTestSuite * apSuite, void * apContext);
-    static void TestFailure(nlTestSuite * apSuite, void * apContext);
-    static void TestSuccessNoDataResponseWithClusterStatus(nlTestSuite * apSuite, void * apContext);
-    static void TestFailureWithClusterStatus(nlTestSuite * apSuite, void * apContext);
+    // Performs shared setup for all tests in the test suite
+    static void SetUpTestSuite()
+    {
+        mpContext = new TestContext();
+        ASSERT_NE(mpContext, nullptr);
+        mpContext->SetUpTestSuite();
+    }
 
-private:
+    // Performs shared teardown for all tests in the test suite
+    static void TearDownTestSuite()
+    {
+        mpContext->TearDownTestSuite();
+        delete mpContext;
+    }
+
+protected:
+    // Performs setup for each individual test in the test suite
+    void SetUp() { mpContext->SetUp(); }
+
+    // Performs teardown for each individual test in the test suite
+    void TearDown() { mpContext->TearDown(); }
+
+    static TestContext * mpContext;
 };
+TestContext * TestCommands::mpContext = nullptr;
 
-void TestCommandInteraction::TestDataResponse(nlTestSuite * apSuite, void * apContext)
+TEST_F(TestCommands, TestDataResponse)
 {
-    TestContext & ctx = *static_cast<TestContext *>(apContext);
     // We want to send a TestSimpleArgumentRequest::Type, but get a
     // TestStructArrayArgumentResponse in return, so need to shadow the actual
     // ResponseType that TestSimpleArgumentRequest has.
-    struct FakeRequest : public TestCluster::Commands::TestSimpleArgumentRequest::Type
+    struct FakeRequest : public Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Type
     {
-        using ResponseType = TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType;
+        using ResponseType = Clusters::UnitTesting::Commands::TestStructArrayArgumentResponse::DecodableType;
     };
 
     FakeRequest request;
-    auto sessionHandle = ctx.GetSessionBobToAlice();
+    auto sessionHandle = mpContext->GetSessionBobToAlice();
 
     bool onSuccessWasCalled = false;
     bool onFailureWasCalled = false;
@@ -188,23 +228,23 @@ void TestCommandInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCo
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [apSuite, &onSuccessWasCalled](const app::ConcreteCommandPath & commandPath, const app::StatusIB & aStatus,
-                                                      const auto & dataResponse) {
+    auto onSuccessCb = [&onSuccessWasCalled](const app::ConcreteCommandPath & commandPath, const app::StatusIB & aStatus,
+                                             const auto & dataResponse) {
         uint8_t i = 0;
         auto iter = dataResponse.arg1.begin();
         while (iter.Next())
         {
             auto & item = iter.GetValue();
 
-            NL_TEST_ASSERT(apSuite, item.a == i);
-            NL_TEST_ASSERT(apSuite, item.b == false);
-            NL_TEST_ASSERT(apSuite, item.c.a == i);
-            NL_TEST_ASSERT(apSuite, item.c.b == true);
+            EXPECT_EQ(item.a, i);
+            EXPECT_FALSE(item.b);
+            EXPECT_EQ(item.c.a, i);
+            EXPECT_TRUE(item.c.b);
             i++;
         }
 
-        NL_TEST_ASSERT(apSuite, iter.GetStatus() == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(apSuite, dataResponse.arg6 == true);
+        EXPECT_EQ(iter.GetStatus(), CHIP_NO_ERROR);
+        EXPECT_TRUE(dataResponse.arg6);
 
         onSuccessWasCalled = true;
     };
@@ -215,25 +255,24 @@ void TestCommandInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCo
 
     responseDirective = kSendDataResponse;
 
-    chip::Controller::InvokeCommandRequest(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
+    chip::Controller::InvokeCommandRequest(&mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
                                            onFailureCb);
 
-    ctx.DrainAndServiceIO();
+    mpContext->DrainAndServiceIO();
 
-    NL_TEST_ASSERT(apSuite, onSuccessWasCalled && !onFailureWasCalled);
-    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+    EXPECT_TRUE(onSuccessWasCalled && !onFailureWasCalled);
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-void TestCommandInteraction::TestSuccessNoDataResponse(nlTestSuite * apSuite, void * apContext)
+TEST_F(TestCommands, TestSuccessNoDataResponse)
 {
-    struct FakeRequest : public TestCluster::Commands::TestSimpleArgumentRequest::Type
+    struct FakeRequest : public Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Type
     {
         using ResponseType = DataModel::NullObjectType;
     };
 
-    TestContext & ctx = *static_cast<TestContext *>(apContext);
     FakeRequest request;
-    auto sessionHandle = ctx.GetSessionBobToAlice();
+    auto sessionHandle = mpContext->GetSessionBobToAlice();
 
     bool onSuccessWasCalled = false;
     bool onFailureWasCalled = false;
@@ -254,25 +293,63 @@ void TestCommandInteraction::TestSuccessNoDataResponse(nlTestSuite * apSuite, vo
 
     responseDirective = kSendSuccessStatusCode;
 
-    chip::Controller::InvokeCommandRequest(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
+    chip::Controller::InvokeCommandRequest(&mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
                                            onFailureCb);
 
-    ctx.DrainAndServiceIO();
+    mpContext->DrainAndServiceIO();
 
-    NL_TEST_ASSERT(apSuite, onSuccessWasCalled && !onFailureWasCalled && statusCheck);
-    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+    EXPECT_TRUE(onSuccessWasCalled && !onFailureWasCalled && statusCheck);
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-void TestCommandInteraction::TestAsyncResponse(nlTestSuite * apSuite, void * apContext)
+TEST_F(TestCommands, TestMultipleSuccessNoDataResponses)
 {
-    struct FakeRequest : public TestCluster::Commands::TestSimpleArgumentRequest::Type
+    struct FakeRequest : public Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Type
     {
         using ResponseType = DataModel::NullObjectType;
     };
 
-    TestContext & ctx = *static_cast<TestContext *>(apContext);
     FakeRequest request;
-    auto sessionHandle = ctx.GetSessionBobToAlice();
+    auto sessionHandle = mpContext->GetSessionBobToAlice();
+
+    size_t successCalls = 0;
+    size_t failureCalls = 0;
+    bool statusCheck    = false;
+    request.arg1        = true;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&successCalls, &statusCheck](const ConcreteCommandPath & commandPath, const StatusIB & aStatus,
+                                                     const auto & dataResponse) {
+        statusCheck = (aStatus.mStatus == InteractionModel::Status::Success);
+        ++successCalls;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&failureCalls](CHIP_ERROR aError) { ++failureCalls; };
+
+    responseDirective = kSendMultipleSuccessStatusCodes;
+
+    Controller::InvokeCommandRequest(&mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
+                                     onFailureCb);
+
+    mpContext->DrainAndServiceIO();
+
+    EXPECT_TRUE(successCalls == 1 && statusCheck);
+    EXPECT_EQ(failureCalls, 0u);
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F(TestCommands, TestAsyncResponse)
+{
+    struct FakeRequest : public Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Type
+    {
+        using ResponseType = DataModel::NullObjectType;
+    };
+
+    FakeRequest request;
+    auto sessionHandle = mpContext->GetSessionBobToAlice();
 
     bool onSuccessWasCalled = false;
     bool onFailureWasCalled = false;
@@ -293,37 +370,31 @@ void TestCommandInteraction::TestAsyncResponse(nlTestSuite * apSuite, void * apC
 
     responseDirective = kAsync;
 
-    chip::Controller::InvokeCommandRequest(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
+    chip::Controller::InvokeCommandRequest(&mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
                                            onFailureCb);
 
-    ctx.DrainAndServiceIO();
+    mpContext->DrainAndServiceIO();
 
-    NL_TEST_ASSERT(apSuite, !onSuccessWasCalled && !onFailureWasCalled && !statusCheck);
-    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 2);
+    EXPECT_TRUE(!onSuccessWasCalled && !onFailureWasCalled && !statusCheck);
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 2u);
 
     CommandHandler * commandHandle = asyncHandle.Get();
-    NL_TEST_ASSERT(apSuite, commandHandle != nullptr);
-
-    if (commandHandle == nullptr)
-    {
-        return;
-    }
+    ASSERT_NE(commandHandle, nullptr);
 
     commandHandle->AddStatus(ConcreteCommandPath(kTestEndpointId, request.GetClusterId(), request.GetCommandId()),
                              Protocols::InteractionModel::Status::Success);
     asyncHandle.Release();
 
-    ctx.DrainAndServiceIO();
+    mpContext->DrainAndServiceIO();
 
-    NL_TEST_ASSERT(apSuite, onSuccessWasCalled && !onFailureWasCalled && statusCheck);
-    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+    EXPECT_TRUE(onSuccessWasCalled && !onFailureWasCalled && statusCheck);
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-void TestCommandInteraction::TestFailure(nlTestSuite * apSuite, void * apContext)
+TEST_F(TestCommands, TestFailure)
 {
-    TestContext & ctx = *static_cast<TestContext *>(apContext);
-    TestCluster::Commands::TestSimpleArgumentRequest::Type request;
-    auto sessionHandle = ctx.GetSessionBobToAlice();
+    Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Type request;
+    auto sessionHandle = mpContext->GetSessionBobToAlice();
 
     bool onSuccessWasCalled = false;
     bool onFailureWasCalled = false;
@@ -344,25 +415,63 @@ void TestCommandInteraction::TestFailure(nlTestSuite * apSuite, void * apContext
 
     responseDirective = kSendError;
 
-    chip::Controller::InvokeCommandRequest(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
+    chip::Controller::InvokeCommandRequest(&mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
                                            onFailureCb);
 
-    ctx.DrainAndServiceIO();
+    mpContext->DrainAndServiceIO();
 
-    NL_TEST_ASSERT(apSuite, !onSuccessWasCalled && onFailureWasCalled && statusCheck);
-    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+    EXPECT_TRUE(!onSuccessWasCalled && onFailureWasCalled && statusCheck);
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-void TestCommandInteraction::TestSuccessNoDataResponseWithClusterStatus(nlTestSuite * apSuite, void * apContext)
+TEST_F(TestCommands, TestMultipleFailures)
 {
-    struct FakeRequest : public TestCluster::Commands::TestSimpleArgumentRequest::Type
+    struct FakeRequest : public Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Type
     {
         using ResponseType = DataModel::NullObjectType;
     };
 
-    TestContext & ctx = *static_cast<TestContext *>(apContext);
     FakeRequest request;
-    auto sessionHandle = ctx.GetSessionBobToAlice();
+    auto sessionHandle = mpContext->GetSessionBobToAlice();
+
+    size_t successCalls = 0;
+    size_t failureCalls = 0;
+    bool statusCheck    = false;
+    request.arg1        = true;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&successCalls](const ConcreteCommandPath & commandPath, const StatusIB & aStatus,
+                                       const auto & dataResponse) { ++successCalls; };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&failureCalls, &statusCheck](CHIP_ERROR aError) {
+        statusCheck = aError.IsIMStatus() && StatusIB(aError).mStatus == InteractionModel::Status::Failure;
+        ++failureCalls;
+    };
+
+    responseDirective = kSendMultipleErrors;
+
+    Controller::InvokeCommandRequest(&mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
+                                     onFailureCb);
+
+    mpContext->DrainAndServiceIO();
+
+    EXPECT_EQ(successCalls, 0u);
+    EXPECT_TRUE(failureCalls == 1 && statusCheck);
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F(TestCommands, TestSuccessNoDataResponseWithClusterStatus)
+{
+    struct FakeRequest : public Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Type
+    {
+        using ResponseType = DataModel::NullObjectType;
+    };
+
+    FakeRequest request;
+    auto sessionHandle = mpContext->GetSessionBobToAlice();
 
     bool onSuccessWasCalled = false;
     bool onFailureWasCalled = false;
@@ -384,20 +493,19 @@ void TestCommandInteraction::TestSuccessNoDataResponseWithClusterStatus(nlTestSu
 
     responseDirective = kSendSuccessStatusCodeWithClusterStatus;
 
-    chip::Controller::InvokeCommandRequest(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
+    chip::Controller::InvokeCommandRequest(&mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
                                            onFailureCb);
 
-    ctx.DrainAndServiceIO();
+    mpContext->DrainAndServiceIO();
 
-    NL_TEST_ASSERT(apSuite, onSuccessWasCalled && !onFailureWasCalled && statusCheck);
-    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+    EXPECT_TRUE(onSuccessWasCalled && !onFailureWasCalled && statusCheck);
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-void TestCommandInteraction::TestFailureWithClusterStatus(nlTestSuite * apSuite, void * apContext)
+TEST_F(TestCommands, TestFailureWithClusterStatus)
 {
-    TestContext & ctx = *static_cast<TestContext *>(apContext);
-    TestCluster::Commands::TestSimpleArgumentRequest::Type request;
-    auto sessionHandle = ctx.GetSessionBobToAlice();
+    Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Type request;
+    auto sessionHandle = mpContext->GetSessionBobToAlice();
 
     bool onSuccessWasCalled = false;
     bool onFailureWasCalled = false;
@@ -424,45 +532,13 @@ void TestCommandInteraction::TestFailureWithClusterStatus(nlTestSuite * apSuite,
 
     responseDirective = kSendErrorWithClusterStatus;
 
-    chip::Controller::InvokeCommandRequest(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
+    chip::Controller::InvokeCommandRequest(&mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
                                            onFailureCb);
 
-    ctx.DrainAndServiceIO();
+    mpContext->DrainAndServiceIO();
 
-    NL_TEST_ASSERT(apSuite, !onSuccessWasCalled && onFailureWasCalled && statusCheck);
-    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+    EXPECT_TRUE(!onSuccessWasCalled && onFailureWasCalled && statusCheck);
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
-
-// clang-format off
-const nlTest sTests[] =
-{
-    NL_TEST_DEF("TestDataResponse", TestCommandInteraction::TestDataResponse),
-    NL_TEST_DEF("TestSuccessNoDataResponse", TestCommandInteraction::TestSuccessNoDataResponse),
-    NL_TEST_DEF("TestAsyncResponse", TestCommandInteraction::TestAsyncResponse),
-    NL_TEST_DEF("TestFailure", TestCommandInteraction::TestFailure),
-    NL_TEST_DEF("TestSuccessNoDataResponseWithClusterStatus", TestCommandInteraction::TestSuccessNoDataResponseWithClusterStatus),
-    NL_TEST_DEF("TestFailureWithClusterStatus", TestCommandInteraction::TestFailureWithClusterStatus),
-    NL_TEST_SENTINEL()
-};
-// clang-format on
-
-// clang-format off
-nlTestSuite sSuite =
-{
-    "TestCommands",
-    &sTests[0],
-    TestContext::InitializeAsync,
-    TestContext::Finalize
-};
-// clang-format on
 
 } // namespace
-
-int TestCommandInteractionTest()
-{
-    TestContext gContext;
-    nlTestRunner(&sSuite, &gContext);
-    return (nlTestRunnerStats(&sSuite));
-}
-
-CHIP_REGISTER_TEST_SUITE(TestCommandInteractionTest)

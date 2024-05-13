@@ -1,10 +1,8 @@
-<p align="center">
-  <img src="https://raw.githubusercontent.com/ARMmbed/mbed-os/master/logo.png" alt="ARM Mbed-OS logo"/>
-</p>
+![ARM Mbed-OS logo](https://raw.githubusercontent.com/ARMmbed/mbed-os/master/logo.png)
 
-<h1> Mbed-OS add new hardware target </h1>
+# Mbed-OS add new hardware target
 
-# Overview
+## Overview
 
 This document shows how to add the new Mbed OS hardware target to Matter
 project.
@@ -25,7 +23,7 @@ remember about the following requirements:
 Additional target component requirements are different for each of example
 application. Check the **Device UI** paragraph in example description.
 
-# Example Application
+## Example Application
 
 The first step to add the new target to each of example application is to modify
 the `examples/example_name/mbed/mbed_app.json` file. It contains the common
@@ -35,7 +33,7 @@ should add the necessary components and parameters for the target there.
 If the new target uses the external libraries, it will be required to link it in
 the CMakeLists.txt file.
 
-# Building
+## Building
 
 To add the new hardware target to the build system the
 `scripts/examples/mbed_example.sh` script should be modify. Extend
@@ -58,7 +56,7 @@ Example:
         "default": "CY8CPROTO_062_4343W"
     }
 
-# Flashing
+## Flashing
 
 Mbed OS example application flashing process uses the
 [Open On-Chip Debugger](http://openocd.org/). The first step is to create the
@@ -85,7 +83,7 @@ Example:
         "default": "CY8CPROTO_062_4343W"
     }
 
-# Debugging
+## Debugging
 
 Debugging process of Mbed OS applications is also based on VSCode launch task.
 Adding the new target to it required `.vscode/launch.json` modification. Extend
@@ -101,7 +99,7 @@ Example:
         "default": "CY8CPROTO_062_4343W"
     }
 
-# CI
+## CI
 
 The Matter project continue integration process is based on Github Actions tool.
 It uses workflow configuration files to execute actions on CI server.

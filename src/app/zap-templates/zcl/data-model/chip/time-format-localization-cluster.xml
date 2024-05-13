@@ -16,12 +16,14 @@ limitations under the License.
 -->
 <configurator>
   <domain name="CHIP" />
-  <enum name="HourFormat" type="ENUM8">
+  <enum name="HourFormatEnum" type="enum8">
     <cluster code="0x002c"/>
     <item name="12hr" value="0x00"/>
     <item name="24hr" value="0x01"/>
+    <item name="UseActiveLocale" value="0xFF"/>                   
   </enum>
-  <enum name="CalendarType" type="ENUM8">
+
+  <enum name="CalendarTypeEnum" type="enum8">
     <cluster code="0x002c"/>
     <item name="Buddhist" value="0x00"/>
     <item name="Chinese" value="0x01"/>
@@ -35,6 +37,7 @@ limitations under the License.
     <item name="Korean" value="0x09"/>  
     <item name="Persian" value="0x0A"/>
     <item name="Taiwanese" value="0x0B"/>                   
+    <item name="UseActiveLocale" value="0xFF"/>                   
   </enum>
   <cluster>
     <domain>General</domain>
@@ -47,9 +50,22 @@ limitations under the License.
       may have differing preferences for how dates and times are conveyed. As such, Nodes that visually
       or audibly convey time information need a mechanism by which they can be configured to use a
       user’s preferred format.</description>
+
+      <features>
+        <feature bit="0" code="CALFMT" name="CalendarFormat" summary="The Node can be configured to use different calendar formats when conveying values to a user.">
+          <optionalConform/>
+        </feature>
+      </features>
+
     <!-- Base data types -->
-    <attribute side="server" code="0x00" define="HOUR_FORMAT" type="HourFormat" min="0x00" max="0x01" writable="true" optional="false">HourFormat</attribute>
-    <attribute side="server" code="0x01" define="CALENDAR_TYPE" type="CalendarType" writable="true" optional="true">ActiveCalendarType</attribute>
-    <attribute side="server" code="0x02" define="SUPPORTED_CALENDAR_TYPES" type="ARRAY" entryType="CalendarType" writable="false" optional="true">SupportedCalendarTypes</attribute>  
+    <attribute side="server" code="0x00" define="HOUR_FORMAT" type="HourFormatEnum" writable="true" optional="false">
+        <description>HourFormat</description>
+        <access op="write" role="manage" />
+    </attribute>
+    <attribute side="server" code="0x01" define="ACTIVE_CALENDAR_TYPE" type="CalendarTypeEnum" writable="true" optional="true">
+        <description>ActiveCalendarType</description>
+        <access op="write" role="manage" />
+    </attribute>
+    <attribute side="server" code="0x02" define="SUPPORTED_CALENDAR_TYPES" type="array" entryType="CalendarTypeEnum" writable="false" optional="true">SupportedCalendarTypes</attribute>  
   </cluster>
 </configurator>

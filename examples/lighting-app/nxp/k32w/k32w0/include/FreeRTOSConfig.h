@@ -56,7 +56,10 @@
 #define configUSE_ALTERNATIVE_API 0 /* Deprecated! */
 #define configQUEUE_REGISTRY_SIZE 8
 #define configUSE_QUEUE_SETS 0
-#define configUSE_TIME_SLICING 0
+/* make sure that Thread task can interrupt lengthy Matter
+ * processing in case priority inversion occurs
+ */
+#define configUSE_TIME_SLICING 1
 #define configUSE_NEWLIB_REENTRANT 0
 #define configENABLE_BACKWARD_COMPATIBILITY 1
 #define configNUM_THREAD_LOCAL_STORAGE_POINTERS 5
@@ -70,7 +73,7 @@
 /* Memory allocation related definitions. */
 #define configSUPPORT_STATIC_ALLOCATION 0
 #define configSUPPORT_DYNAMIC_ALLOCATION 1
-#define configTOTAL_HEAP_SIZE ((size_t)(gTotalHeapSize_c))
+#define configTOTAL_HEAP_SIZE ((size_t) (gTotalHeapSize_c))
 #define configAPPLICATION_ALLOCATED_HEAP 1
 
 /* Hook function related definitions. */

@@ -25,6 +25,6 @@ namespace chip {
 // methods.
 using PasscodeId = uint16_t;
 
-constexpr PasscodeId kDefaultCommissioningPasscodeId = 0;
+inline constexpr PasscodeId kDefaultCommissioningPasscodeId = 0;
 
 } // namespace chip

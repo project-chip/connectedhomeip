@@ -20,8 +20,8 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/util/af.h>
-#include <app/util/error-mapping.h>
+#include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/interaction_model/Constants.h>
 
@@ -36,16 +36,17 @@ using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
 using chip::app::Clusters::OTAProviderDelegate;
 using Protocols::InteractionModel::Status;
 
-// EMBER_AF_OTA_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT is only defined if the
+// MATTER_DM_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT is only defined if the
 // cluster is actually enabled in the ZAP config.  To allow operation in setups
 // where that's not the case (and custom dispatch is used), define it here as
 // needed.
-#ifndef EMBER_AF_OTA_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT
-#define EMBER_AF_OTA_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT 0
-#endif // EMBER_AF_OTA_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT
+#ifndef MATTER_DM_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT
+#define MATTER_DM_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT 0
+#endif // MATTER_DM_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT
 
 static constexpr size_t kOtaProviderDelegateTableSize =
-    EMBER_AF_OTA_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+static_assert(kOtaProviderDelegateTableSize <= kEmberInvalidEndpointIndex, "OtaProvider Delegate table size error");
 
 namespace {
 constexpr size_t kLocationLen          = 2;   // The expected length of the location parameter in QueryImage
@@ -57,15 +58,16 @@ OTAProviderDelegate * gDelegateTable[kOtaProviderDelegateTableSize] = { nullptr 
 
 OTAProviderDelegate * GetDelegate(EndpointId endpoint)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, OtaSoftwareUpdateProvider::Id);
-    return (ep == 0xFFFF ? nullptr : gDelegateTable[ep]);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, OtaSoftwareUpdateProvider::Id,
+                                                       MATTER_DM_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT);
+    return (ep >= kOtaProviderDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
 bool SendStatusIfDelegateNull(app::CommandHandler * commandObj, const app::ConcreteCommandPath & path)
 {
     if (GetDelegate(path.mEndpointId) == nullptr)
     {
-        ChipLogError(Zcl, "No OTAProviderDelegate set for ep:%" PRIu16, path.mEndpointId);
+        ChipLogError(Zcl, "No OTAProviderDelegate set for ep:%u", path.mEndpointId);
         commandObj->AddStatus(path, Status::UnsupportedCommand);
         return true;
     }
@@ -87,7 +89,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
     OTAProviderDelegate * delegate = GetDelegate(endpoint);
 
     ChipLogProgress(Zcl, "OTA Provider received ApplyUpdateRequest");
-    ChipLogDetail(Zcl, "  Update Token: %zu", commandData.updateToken.size());
+    ChipLogDetail(Zcl, "  Update Token: %u", static_cast<unsigned int>(commandData.updateToken.size()));
     ChipLogDetail(Zcl, "  New Version: %" PRIu32, commandData.newVersion);
 
     if (SendStatusIfDelegateNull(commandObj, commandPath))
@@ -97,7 +99,8 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
 
     if (updateToken.size() > kUpdateTokenMaxLength || updateToken.size() < kUpdateTokenMinLength)
     {
-        ChipLogError(Zcl, "expected size %zu for UpdateToken, got %zu", kUpdateTokenMaxLength, updateToken.size());
+        ChipLogError(Zcl, "expected size %u for UpdateToken, got %u", static_cast<unsigned int>(kUpdateTokenMaxLength),
+                     static_cast<unsigned int>(updateToken.size()));
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
     }
@@ -119,7 +122,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
     OTAProviderDelegate * delegate = GetDelegate(endpoint);
 
     ChipLogProgress(Zcl, "OTA Provider received NotifyUpdateApplied");
-    ChipLogDetail(Zcl, "  Update Token: %zu", commandData.updateToken.size());
+    ChipLogDetail(Zcl, "  Update Token: %u", static_cast<unsigned int>(commandData.updateToken.size()));
     ChipLogDetail(Zcl, "  Software Version: %" PRIu32, commandData.softwareVersion);
 
     if (SendStatusIfDelegateNull(commandObj, commandPath))
@@ -129,7 +132,8 @@ bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
 
     if (updateToken.size() > kUpdateTokenMaxLength || updateToken.size() < kUpdateTokenMinLength)
     {
-        ChipLogError(Zcl, "expected size %zu for UpdateToken, got %zu", kUpdateTokenMaxLength, updateToken.size());
+        ChipLogError(Zcl, "expected size %u for UpdateToken, got %u", static_cast<unsigned int>(kUpdateTokenMaxLength),
+                     static_cast<unsigned int>(updateToken.size()));
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
     }
@@ -146,8 +150,8 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
                                                                const app::ConcreteCommandPath & commandPath,
                                                                const Commands::QueryImage::DecodableType & commandData)
 {
-    auto & vendorId            = commandData.vendorId;
-    auto & productId           = commandData.productId;
+    auto & vendorId            = commandData.vendorID;
+    auto & productId           = commandData.productID;
     auto & hardwareVersion     = commandData.hardwareVersion;
     auto & softwareVersion     = commandData.softwareVersion;
     auto & protocolsSupported  = commandData.protocolsSupported;
@@ -168,8 +172,8 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
     };
 
     ChipLogProgress(Zcl, "OTA Provider received QueryImage");
-    ChipLogDetail(Zcl, "  VendorID: 0x%" PRIx16, vendorId);
-    ChipLogDetail(Zcl, "  ProductID: %" PRIu16, productId);
+    ChipLogDetail(Zcl, "  VendorID: 0x%x", vendorId);
+    ChipLogDetail(Zcl, "  ProductID: %u", productId);
     ChipLogDetail(Zcl, "  SoftwareVersion: %" PRIu32, softwareVersion);
     ChipLogDetail(Zcl, "  ProtocolsSupported: [");
     auto protocolIter = protocolsSupported.begin();
@@ -180,7 +184,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
     ChipLogDetail(Zcl, "  ]");
     if (hardwareVersion.HasValue())
     {
-        ChipLogDetail(Zcl, "  HardwareVersion: %" PRIu16, hardwareVersion.Value());
+        ChipLogDetail(Zcl, "  HardwareVersion: %u", hardwareVersion.Value());
     }
     if (location.HasValue())
     {
@@ -192,19 +196,21 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
     }
     if (metadataForProvider.HasValue())
     {
-        ChipLogDetail(Zcl, "  MetadataForProvider: %zu", metadataForProvider.Value().size());
+        ChipLogDetail(Zcl, "  MetadataForProvider: %u", static_cast<unsigned int>(metadataForProvider.Value().size()));
     }
 
     if (location.HasValue() && location.Value().size() != kLocationLen)
     {
-        ChipLogError(Zcl, "location param length %zu != expected length %zu", location.Value().size(), kLocationLen);
+        ChipLogError(Zcl, "location param length %u != expected length %u", static_cast<unsigned int>(location.Value().size()),
+                     static_cast<unsigned int>(kLocationLen));
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
     }
 
     if (metadataForProvider.HasValue() && metadataForProvider.Value().size() > kMaxMetadataLen)
     {
-        ChipLogError(Zcl, "metadata size %zu exceeds max %zu", metadataForProvider.Value().size(), kMaxMetadataLen);
+        ChipLogError(Zcl, "metadata size %u exceeds max %u", static_cast<unsigned int>(metadataForProvider.Value().size()),
+                     static_cast<unsigned int>(kMaxMetadataLen));
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
     }
@@ -221,8 +227,9 @@ namespace OTAProvider {
 
 void SetDelegate(EndpointId endpoint, OTAProviderDelegate * delegate)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, OtaSoftwareUpdateProvider::Id);
-    if (ep != 0xFFFF)
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, OtaSoftwareUpdateProvider::Id,
+                                                       MATTER_DM_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT);
+    if (ep < kOtaProviderDelegateTableSize)
     {
         gDelegateTable[ep] = delegate;
     }

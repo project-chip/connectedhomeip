@@ -19,11 +19,9 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/enums.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/DecodableList.h>
-#include <app/util/af.h>
 #include <lib/core/Optional.h>
 
 namespace chip {
@@ -34,7 +32,7 @@ namespace Clusters {
 /** @brief
  *    Defines methods for implementing application-specific logic for the OTA Provider Cluster.
  */
-class OTAProviderDelegate
+class DLL_EXPORT OTAProviderDelegate
 {
 public:
     /**

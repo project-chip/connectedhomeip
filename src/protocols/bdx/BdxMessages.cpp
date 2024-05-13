@@ -94,13 +94,13 @@ BufferWriter & TransferInit::WriteToBuffer(BufferWriter & aBuffer) const
 
 CHIP_ERROR TransferInit::Parse(System::PacketBufferHandle aBuffer)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t proposedTransferCtl;
     uint32_t tmpUint32Value = 0; // Used for reading non-wide length and offset fields
     uint8_t * bufStart      = aBuffer->Start();
     Reader bufReader(bufStart, aBuffer->DataLength());
 
-    SuccessOrExit(bufReader.Read8(&proposedTransferCtl).Read8(mRangeCtlFlags.RawStorage()).Read16(&MaxBlockSize).StatusCode());
+    ReturnErrorOnFailure(
+        bufReader.Read8(&proposedTransferCtl).Read8(mRangeCtlFlags.RawStorage()).Read16(&MaxBlockSize).StatusCode());
 
     Version = proposedTransferCtl & kVersionMask;
     TransferCtlOptions.SetRaw(static_cast<uint8_t>(proposedTransferCtl & ~kVersionMask));
@@ -110,11 +110,11 @@ CHIP_ERROR TransferInit::Parse(System::PacketBufferHandle aBuffer)
     {
         if (mRangeCtlFlags.Has(RangeControlFlags::kWiderange))
         {
-            SuccessOrExit(bufReader.Read64(&StartOffset).StatusCode());
+            ReturnErrorOnFailure(bufReader.Read64(&StartOffset).StatusCode());
         }
         else
         {
-            SuccessOrExit(bufReader.Read32(&tmpUint32Value).StatusCode());
+            ReturnErrorOnFailure(bufReader.Read32(&tmpUint32Value).StatusCode());
             StartOffset = tmpUint32Value;
         }
     }
@@ -124,18 +124,18 @@ CHIP_ERROR TransferInit::Parse(System::PacketBufferHandle aBuffer)
     {
         if (mRangeCtlFlags.Has(RangeControlFlags::kWiderange))
         {
-            SuccessOrExit(bufReader.Read64(&MaxLength).StatusCode());
+            ReturnErrorOnFailure(bufReader.Read64(&MaxLength).StatusCode());
         }
         else
         {
-            SuccessOrExit(bufReader.Read32(&tmpUint32Value).StatusCode());
+            ReturnErrorOnFailure(bufReader.Read32(&tmpUint32Value).StatusCode());
             MaxLength = tmpUint32Value;
         }
     }
 
-    SuccessOrExit(bufReader.Read16(&FileDesLength).StatusCode());
+    ReturnErrorOnFailure(bufReader.Read16(&FileDesLength).StatusCode());
 
-    VerifyOrExit(bufReader.HasAtLeast(FileDesLength), err = CHIP_ERROR_MESSAGE_INCOMPLETE);
+    VerifyOrReturnError(bufReader.HasAtLeast(FileDesLength), CHIP_ERROR_MESSAGE_INCOMPLETE);
     FileDesignator = &bufStart[bufReader.OctetsRead()];
 
     // Rest of message is metadata (could be empty)
@@ -151,12 +151,7 @@ CHIP_ERROR TransferInit::Parse(System::PacketBufferHandle aBuffer)
     // Retain ownership of the packet buffer so that the FileDesignator and Metadata pointers remain valid.
     Buffer = std::move(aBuffer);
 
-exit:
-    if (bufReader.StatusCode() != CHIP_NO_ERROR)
-    {
-        err = bufReader.StatusCode();
-    }
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 size_t TransferInit::MessageSize() const
@@ -185,10 +180,10 @@ void TransferInit::LogMessage(bdx::MessageType messageType) const
 
     ChipLogAutomation("  Proposed Transfer Control: 0x%X", static_cast<unsigned>(TransferCtlOptions.Raw() | Version));
     ChipLogAutomation("  Range Control: 0x%X", static_cast<unsigned>(mRangeCtlFlags.Raw()));
-    ChipLogAutomation("  Proposed Max Block Size: %" PRIu16, MaxBlockSize);
+    ChipLogAutomation("  Proposed Max Block Size: %u", MaxBlockSize);
     ChipLogAutomation("  Start Offset: 0x" ChipLogFormatX64, ChipLogValueX64(StartOffset));
     ChipLogAutomation("  Proposed Max Length: 0x" ChipLogFormatX64, ChipLogValueX64(MaxLength));
-    ChipLogAutomation("  File Designator Length: %" PRIu16, FileDesLength);
+    ChipLogAutomation("  File Designator Length: %u", FileDesLength);
     ChipLogAutomation("  File Designator: %s", fd);
 }
 #endif // CHIP_AUTOMATION_LOGGING
@@ -235,12 +230,11 @@ Encoding::LittleEndian::BufferWriter & SendAccept::WriteToBuffer(Encoding::Littl
 
 CHIP_ERROR SendAccept::Parse(System::PacketBufferHandle aBuffer)
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
     uint8_t transferCtl = 0;
     uint8_t * bufStart  = aBuffer->Start();
     Reader bufReader(bufStart, aBuffer->DataLength());
 
-    SuccessOrExit(bufReader.Read8(&transferCtl).Read16(&MaxBlockSize).StatusCode());
+    ReturnErrorOnFailure(bufReader.Read8(&transferCtl).Read16(&MaxBlockSize).StatusCode());
 
     Version = transferCtl & kVersionMask;
 
@@ -259,12 +253,7 @@ CHIP_ERROR SendAccept::Parse(System::PacketBufferHandle aBuffer)
     // Retain ownership of the packet buffer so that the Metadata pointer remains valid.
     Buffer = std::move(aBuffer);
 
-exit:
-    if (bufReader.StatusCode() != CHIP_NO_ERROR)
-    {
-        err = bufReader.StatusCode();
-    }
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 size_t SendAccept::MessageSize() const
@@ -279,7 +268,7 @@ void SendAccept::LogMessage(bdx::MessageType messageType) const
     (void) messageType;
     ChipLogAutomation("SendAccept");
     ChipLogAutomation("  Transfer Control: 0x%X", static_cast<unsigned>(TransferCtlFlags.Raw() | Version));
-    ChipLogAutomation("  Max Block Size: %" PRIu16, MaxBlockSize);
+    ChipLogAutomation("  Max Block Size: %u", MaxBlockSize);
 }
 #endif // CHIP_AUTOMATION_LOGGING
 
@@ -349,13 +338,12 @@ Encoding::LittleEndian::BufferWriter & ReceiveAccept::WriteToBuffer(Encoding::Li
 
 CHIP_ERROR ReceiveAccept::Parse(System::PacketBufferHandle aBuffer)
 {
-    CHIP_ERROR err          = CHIP_NO_ERROR;
     uint8_t transferCtl     = 0;
     uint32_t tmpUint32Value = 0; // Used for reading non-wide length and offset fields
     uint8_t * bufStart      = aBuffer->Start();
     Reader bufReader(bufStart, aBuffer->DataLength());
 
-    SuccessOrExit(bufReader.Read8(&transferCtl).Read8(mRangeCtlFlags.RawStorage()).Read16(&MaxBlockSize).StatusCode());
+    ReturnErrorOnFailure(bufReader.Read8(&transferCtl).Read8(mRangeCtlFlags.RawStorage()).Read16(&MaxBlockSize).StatusCode());
 
     Version = transferCtl & kVersionMask;
 
@@ -367,11 +355,11 @@ CHIP_ERROR ReceiveAccept::Parse(System::PacketBufferHandle aBuffer)
     {
         if (mRangeCtlFlags.Has(RangeControlFlags::kWiderange))
         {
-            SuccessOrExit(bufReader.Read64(&StartOffset).StatusCode());
+            ReturnErrorOnFailure(bufReader.Read64(&StartOffset).StatusCode());
         }
         else
         {
-            SuccessOrExit(bufReader.Read32(&tmpUint32Value).StatusCode());
+            ReturnErrorOnFailure(bufReader.Read32(&tmpUint32Value).StatusCode());
             StartOffset = tmpUint32Value;
         }
     }
@@ -381,11 +369,11 @@ CHIP_ERROR ReceiveAccept::Parse(System::PacketBufferHandle aBuffer)
     {
         if (mRangeCtlFlags.Has(RangeControlFlags::kWiderange))
         {
-            SuccessOrExit(bufReader.Read64(&Length).StatusCode());
+            ReturnErrorOnFailure(bufReader.Read64(&Length).StatusCode());
         }
         else
         {
-            SuccessOrExit(bufReader.Read32(&tmpUint32Value).StatusCode());
+            ReturnErrorOnFailure(bufReader.Read32(&tmpUint32Value).StatusCode());
             Length = tmpUint32Value;
         }
     }
@@ -402,12 +390,7 @@ CHIP_ERROR ReceiveAccept::Parse(System::PacketBufferHandle aBuffer)
     // Retain ownership of the packet buffer so that the Metadata pointer remains valid.
     Buffer = std::move(aBuffer);
 
-exit:
-    if (bufReader.StatusCode() != CHIP_NO_ERROR)
-    {
-        err = bufReader.StatusCode();
-    }
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 size_t ReceiveAccept::MessageSize() const
@@ -423,7 +406,7 @@ void ReceiveAccept::LogMessage(bdx::MessageType messageType) const
     ChipLogAutomation("ReceiveAccept");
     ChipLogAutomation("  Transfer Control: 0x%X", TransferCtlFlags.Raw() | Version);
     ChipLogAutomation("  Range Control: 0x%X", mRangeCtlFlags.Raw());
-    ChipLogAutomation("  Max Block Size: %" PRIu16, MaxBlockSize);
+    ChipLogAutomation("  Max Block Size: %u", MaxBlockSize);
     ChipLogAutomation("  Length: 0x" ChipLogFormatX64, ChipLogValueX64(Length));
 }
 #endif // CHIP_AUTOMATION_LOGGING
@@ -507,11 +490,10 @@ Encoding::LittleEndian::BufferWriter & DataBlock::WriteToBuffer(Encoding::Little
 
 CHIP_ERROR DataBlock::Parse(System::PacketBufferHandle aBuffer)
 {
-    CHIP_ERROR err     = CHIP_NO_ERROR;
     uint8_t * bufStart = aBuffer->Start();
     Reader bufReader(bufStart, aBuffer->DataLength());
 
-    SuccessOrExit(bufReader.Read32(&BlockCounter).StatusCode());
+    ReturnErrorOnFailure(bufReader.Read32(&BlockCounter).StatusCode());
 
     // Rest of message is data
     Data       = nullptr;
@@ -525,12 +507,7 @@ CHIP_ERROR DataBlock::Parse(System::PacketBufferHandle aBuffer)
     // Retain ownership of the packet buffer so that the Data pointer remains valid.
     Buffer = std::move(aBuffer);
 
-exit:
-    if (bufReader.StatusCode() != CHIP_NO_ERROR)
-    {
-        err = bufReader.StatusCode();
-    }
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 size_t DataBlock::MessageSize() const
@@ -555,7 +532,7 @@ void DataBlock::LogMessage(bdx::MessageType messageType) const
     }
 
     ChipLogAutomation("  Block Counter: %" PRIu32, BlockCounter);
-    ChipLogAutomation("  Data Length: %zu", DataLength);
+    ChipLogAutomation("  Data Length: %u", static_cast<unsigned int>(DataLength));
 }
 #endif // CHIP_AUTOMATION_LOGGING
 
@@ -586,18 +563,10 @@ Encoding::LittleEndian::BufferWriter & BlockQueryWithSkip::WriteToBuffer(Encodin
 
 CHIP_ERROR BlockQueryWithSkip::Parse(System::PacketBufferHandle aBuffer)
 {
-    CHIP_ERROR err     = CHIP_NO_ERROR;
     uint8_t * bufStart = aBuffer->Start();
     Reader bufReader(bufStart, aBuffer->DataLength());
-    SuccessOrExit(bufReader.Read32(&BlockCounter).StatusCode());
-    SuccessOrExit(bufReader.Read64(&BytesToSkip).StatusCode());
 
-exit:
-    if (bufReader.StatusCode() != CHIP_NO_ERROR)
-    {
-        err = bufReader.StatusCode();
-    }
-    return err;
+    return bufReader.Read32(&BlockCounter).Read64(&BytesToSkip).StatusCode();
 }
 
 size_t BlockQueryWithSkip::MessageSize() const
@@ -616,6 +585,6 @@ void BlockQueryWithSkip::LogMessage(bdx::MessageType messageType) const
 {
     ChipLogAutomation("BlockQueryWithSkip");
     ChipLogAutomation("  Block Counter: %" PRIu32, BlockCounter);
-    ChipLogAutomation("  Bytes To Skip: %" PRIu64, BytesToSkip);
+    ChipLogAutomation("  Bytes To Skip: 0x" ChipLogFormatX64, ChipLogValueX64(BytesToSkip));
 }
 #endif // CHIP_AUTOMATION_LOGGING

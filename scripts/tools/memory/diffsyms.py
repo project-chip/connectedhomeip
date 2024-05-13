@@ -18,12 +18,10 @@
 
 import sys
 
-import pandas as pd
-
 import memdf.collect
 import memdf.report
 import memdf.select
-
+import pandas as pd
 from memdf import Config, ConfigDescription, SymbolDF
 
 CONFIG: ConfigDescription = {

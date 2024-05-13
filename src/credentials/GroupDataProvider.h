@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,14 +16,16 @@
  */
 #pragma once
 
-#include <algorithm>
+#include <optional>
 #include <stdint.h>
 #include <sys/types.h>
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/basic-types.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/ClusterEnums.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/CommonIterator.h>
 
 namespace chip {
 namespace Credentials {
@@ -31,7 +33,7 @@ namespace Credentials {
 class GroupDataProvider
 {
 public:
-    using SecurityPolicy                                  = app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy;
+    using SecurityPolicy                                  = app::Clusters::GroupKeyManagement::GroupKeySecurityPolicyEnum;
     static constexpr KeysetId kIdentityProtectionKeySetId = 0;
 
     struct GroupInfo
@@ -56,9 +58,7 @@ public:
             }
             else
             {
-                size_t size = strnlen(groupName, kGroupNameMax);
-                strncpy(name, groupName, size);
-                name[size] = 0;
+                Platform::CopyString(name, groupName);
             }
         }
         void SetName(const CharSpan & groupName)
@@ -69,12 +69,10 @@ public:
             }
             else
             {
-                size_t size = std::min(groupName.size(), kGroupNameMax);
-                strncpy(name, groupName.data(), size);
-                name[size] = 0;
+                Platform::CopyString(name, groupName);
             }
         }
-        bool operator==(const GroupInfo & other)
+        bool operator==(const GroupInfo & other) const
         {
             return (this->group_id == other.group_id) && !strncmp(this->name, other.name, kGroupNameMax);
         }
@@ -115,7 +113,7 @@ public:
         GroupId group_id = kUndefinedGroupId;
         FabricIndex fabric_index;
         SecurityPolicy security_policy;
-        Crypto::SymmetricKeyContext * key = nullptr;
+        Crypto::SymmetricKeyContext * keyContext = nullptr;
     };
 
     // An EpochKey is a single key usable to determine an operational group key
@@ -153,7 +151,7 @@ public:
         // Number of keys present
         uint8_t num_keys_used = 0;
 
-        bool operator==(const KeySet & other)
+        bool operator==(const KeySet & other) const
         {
             VerifyOrReturnError(this->policy == other.policy && this->num_keys_used == other.num_keys_used, false);
             return !memcmp(this->epoch_keys, other.epoch_keys, this->num_keys_used * sizeof(EpochKey));
@@ -189,39 +187,11 @@ public:
         virtual void OnGroupRemoved(FabricIndex fabric_index, const GroupInfo & old_group) = 0;
     };
 
-    /**
-     * Template used to iterate the stored group data
-     */
-    template <typename T>
-    class Iterator
-    {
-    public:
-        virtual ~Iterator() = default;
-        /**
-         *  @retval The number of entries in total that will be iterated.
-         */
-        virtual size_t Count() = 0;
-        /**
-         *   @param[out] item  Value associated with the next element in the iteration.
-         *  @retval true if the next entry is successfully retrieved.
-         *  @retval false if no more entries can be found.
-         */
-        virtual bool Next(T & item) = 0;
-        /**
-         * Release the memory allocated by this iterator.
-         * Must be called before the pointer goes out of scope.
-         */
-        virtual void Release() = 0;
-
-    protected:
-        Iterator() = default;
-    };
-
-    using GroupInfoIterator    = Iterator<GroupInfo>;
-    using GroupKeyIterator     = Iterator<GroupKey>;
-    using EndpointIterator     = Iterator<GroupEndpoint>;
-    using KeySetIterator       = Iterator<KeySet>;
-    using GroupSessionIterator = Iterator<GroupSession>;
+    using GroupInfoIterator    = CommonIterator<GroupInfo>;
+    using GroupKeyIterator     = CommonIterator<GroupKey>;
+    using EndpointIterator     = CommonIterator<GroupEndpoint>;
+    using KeySetIterator       = CommonIterator<KeySet>;
+    using GroupSessionIterator = CommonIterator<GroupSession>;
 
     GroupDataProvider(uint16_t maxGroupsPerFabric    = CHIP_CONFIG_MAX_GROUPS_PER_FABRIC,
                       uint16_t maxGroupKeysPerFabric = CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC) :
@@ -232,7 +202,7 @@ public:
     virtual ~GroupDataProvider() = default;
 
     // Not copyable
-    GroupDataProvider(const GroupDataProvider &) = delete;
+    GroupDataProvider(const GroupDataProvider &)             = delete;
     GroupDataProvider & operator=(const GroupDataProvider &) = delete;
 
     uint16_t GetMaxGroupsPerFabric() const { return mMaxGroupsPerFabric; }
@@ -279,10 +249,11 @@ public:
      *  Creates an iterator that may be used to obtain the list of (group, endpoint) pairs associated with the given fabric.
      *  In order to release the allocated memory, the Release() method must be called after the iteration is finished.
      *  Modifying the group table during the iteration is currently not supported, and may yield unexpected behaviour.
+     *  If you wish to iterate only the endpoints of a particular group id you can provide the optional `group_id` to do so.
      *  @retval An instance of EndpointIterator on success
      *  @retval nullptr if no iterator instances are available.
      */
-    virtual EndpointIterator * IterateEndpoints(FabricIndex fabric_index) = 0;
+    virtual EndpointIterator * IterateEndpoints(FabricIndex fabric_index, std::optional<GroupId> group_id = std::nullopt) = 0;
 
     //
     // Group-Key map
@@ -400,7 +371,7 @@ inline CHIP_ERROR SetSingleIpkEpochKey(GroupDataProvider * provider, FabricIndex
  *
  * Callers have to externally synchronize usage of this function.
  *
- * @return The global Group Data Provider. Assume never null.
+ * @return The global Group Data Provider
  */
 GroupDataProvider * GetGroupDataProvider();
 
@@ -409,9 +380,9 @@ GroupDataProvider * GetGroupDataProvider();
  *
  * Callers have to externally synchronize usage of this function.
  *
- * If the `provider` is nullptr, no change is done.
+ * The `provider` can be set to nullptr if the owner is done with it fully.
  *
- * @param[in] provider the Group Data Provider
+ * @param[in] provider pointer to the Group Data Provider global isntance to use
  */
 void SetGroupDataProvider(GroupDataProvider * provider);
 

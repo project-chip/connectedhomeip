@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +27,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemError.h>
 
-#include <settings/settings.h>
+#include <zephyr/settings/settings.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -44,14 +44,46 @@ struct ReadEntry
 
 struct DeleteSubtreeEntry
 {
-    CHIP_ERROR result;
+    int result;
 };
+
+// Random magic bytes to represent an empty value.
+// It is needed because Zephyr settings subsystem does not distinguish an empty value from no value.
+constexpr uint8_t kEmptyValue[]  = { 0x22, 0xa6, 0x54, 0xd1, 0x39 };
+constexpr size_t kEmptyValueSize = sizeof(kEmptyValue);
 
 // Prefix the input key with CHIP_DEVICE_CONFIG_SETTINGS_KEY "/"
 CHIP_ERROR MakeFullKey(char (&fullKey)[SETTINGS_MAX_NAME_LEN + 1], const char * key)
 {
-    const int result = snprintf(fullKey, sizeof(fullKey), CHIP_DEVICE_CONFIG_SETTINGS_KEY "/%s", key);
-    VerifyOrReturnError(result > 0 && static_cast<size_t>(result) < sizeof(fullKey), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(key != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    strcpy(fullKey, CHIP_DEVICE_CONFIG_SETTINGS_KEY "/");
+
+    char * dest    = fullKey + strlen(CHIP_DEVICE_CONFIG_SETTINGS_KEY "/");
+    char * destEnd = fullKey + SETTINGS_MAX_NAME_LEN;
+
+    while (*key != '\0')
+    {
+        char keyChar = *key++;
+        bool escape  = keyChar == '\\' || keyChar == '=';
+
+        if (keyChar == '=')
+        {
+            // '=' character is forbidden in a Zephyr setting key, so it must be escaped with "\e".
+            keyChar = 'e';
+        }
+
+        if (escape)
+        {
+            VerifyOrReturnError(dest < destEnd, CHIP_ERROR_INVALID_ARGUMENT);
+            *dest++ = '\\';
+        }
+
+        VerifyOrReturnError(dest < destEnd, CHIP_ERROR_INVALID_ARGUMENT);
+        *dest++ = keyChar;
+    }
+
+    *dest = 0;
+
     return CHIP_NO_ERROR;
 }
 
@@ -59,11 +91,23 @@ int LoadEntryCallback(const char * name, size_t entrySize, settings_read_cb read
 {
     ReadEntry & entry = *static_cast<ReadEntry *>(param);
 
-    // If requested a key X, process just node X and ignore all its descendants: X/*
-    if (settings_name_next(name, nullptr) > 0)
+    // If requested key X, process just node X and ignore all its descendants: X/*
+    if (name != nullptr && *name != '\0')
         return 0;
 
-    // Found requested key
+    // Found requested key.
+    uint8_t emptyValue[kEmptyValueSize];
+
+    if (entrySize == kEmptyValueSize && readCb(cbArg, emptyValue, kEmptyValueSize) == kEmptyValueSize &&
+        memcmp(emptyValue, kEmptyValue, kEmptyValueSize) == 0)
+    {
+        // Special case - an empty value represented by known magic bytes.
+        entry.result = CHIP_NO_ERROR;
+
+        // Return 1 to stop processing further keys
+        return 1;
+    }
+
     const ssize_t bytesRead = readCb(cbArg, entry.destination, entry.destinationBufferSize);
     entry.readSize          = bytesRead > 0 ? bytesRead : 0;
 
@@ -76,18 +120,24 @@ int LoadEntryCallback(const char * name, size_t entrySize, settings_read_cb read
         entry.result = bytesRead > 0 ? CHIP_NO_ERROR : CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
 
-    return 0;
+    // Return 1 to stop processing further keys
+    return 1;
 }
 
 int DeleteSubtreeCallback(const char * name, size_t /* entrySize */, settings_read_cb /* readCb */, void * /* cbArg */,
                           void * param)
 {
     DeleteSubtreeEntry & entry = *static_cast<DeleteSubtreeEntry *>(param);
-    const CHIP_ERROR error     = KeyValueStoreMgr().Delete(name);
+    char fullKey[SETTINGS_MAX_NAME_LEN + 1];
 
-    if (entry.result == CHIP_NO_ERROR)
+    // name comes from Zephyr settings subsystem so it is guaranteed to fit in the buffer.
+    (void) snprintf(fullKey, sizeof(fullKey), CHIP_DEVICE_CONFIG_SETTINGS_KEY "/%s", StringOrNullMarker(name));
+    const int result = settings_delete(fullKey);
+
+    // Return the first error, but continue removing remaining keys anyway.
+    if (entry.result == 0)
     {
-        entry.result = error;
+        entry.result = result;
     }
 
     return 0;
@@ -105,8 +155,6 @@ void KeyValueStoreManagerImpl::Init()
 CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size,
                                           size_t offset_bytes) const
 {
-    VerifyOrReturnError(key, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(value, CHIP_ERROR_INVALID_ARGUMENT);
     // Offset and partial reads are not supported, for now just return NOT_IMPLEMENTED.
     // Support can be added in the future if this is needed.
     VerifyOrReturnError(offset_bytes == 0, CHIP_ERROR_NOT_IMPLEMENTED);
@@ -119,19 +167,23 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 
     // Assign readSize only in case read_bytes_size is not nullptr, as it is optional argument
     if (read_bytes_size)
+    {
         *read_bytes_size = entry.readSize;
+    }
 
     return entry.result;
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
 {
-    VerifyOrReturnError(key, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(value, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(value_size > 0, CHIP_ERROR_INVALID_ARGUMENT);
-
     char fullKey[SETTINGS_MAX_NAME_LEN + 1];
     ReturnErrorOnFailure(MakeFullKey(fullKey, key));
+
+    if (value_size == 0)
+    {
+        value      = kEmptyValue;
+        value_size = kEmptyValueSize;
+    }
 
     VerifyOrReturnError(settings_save_one(fullKey, value, value_size) == 0, CHIP_ERROR_PERSISTED_STORAGE_FAILED);
 
@@ -143,19 +195,24 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
     char fullKey[SETTINGS_MAX_NAME_LEN + 1];
     ReturnErrorOnFailure(MakeFullKey(fullKey, key));
 
-    if (settings_delete(fullKey) != 0)
-        return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+    ReturnErrorCodeIf(Get(key, nullptr, 0) == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND,
+                      CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    ReturnErrorCodeIf(settings_delete(fullKey) != 0, CHIP_ERROR_PERSISTED_STORAGE_FAILED);
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::DoFactoryReset()
 {
-    DeleteSubtreeEntry entry{ CHIP_NO_ERROR };
-    const int result = settings_load_subtree_direct(CHIP_DEVICE_CONFIG_SETTINGS_KEY, DeleteSubtreeCallback, &entry);
+    DeleteSubtreeEntry entry{ /* success */ 0 };
+    int result = settings_load_subtree_direct(CHIP_DEVICE_CONFIG_SETTINGS_KEY, DeleteSubtreeCallback, &entry);
 
-    VerifyOrReturnError(result == 0, System::MapErrorZephyr(result));
-    return entry.result;
+    if (result == 0)
+    {
+        result = entry.result;
+    }
+
+    return System::MapErrorZephyr(result);
 }
 
 } // namespace PersistedStorage

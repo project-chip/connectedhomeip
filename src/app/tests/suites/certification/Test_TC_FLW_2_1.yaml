@@ -14,13 +14,18 @@
 
 name: 33.2.1. [TC-FLW-2.1] Attributes with server as DUT
 
+PICS:
+    - FLW.S
+
 config:
     nodeId: 0x12344321
     cluster: "Flow Measurement"
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -28,101 +33,44 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "read the mandatory attribute: MeasuredValue"
+    - label: "Step 2: TH reads from the DUT the MinMeasuredValue attribute."
+      PICS: FLW.S.A0001
+      command: "readAttribute"
+      attribute: "MinMeasuredValue"
+      response:
+          saveAs: MinMeasuredVariable
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65533
+
+    - label: "Step 3: TH reads from the DUT the MaxMeasuredValue attribute."
+      PICS: FLW.S.A0002
+      command: "readAttribute"
+      attribute: "MaxMeasuredValue"
+      response:
+          saveAs: MaxMeasuredVariable
+          constraints:
+              type: int16u
+              minValue: MinMeasuredVariable + 1
+              maxValue: 65534
+
+    - label: "Step 4: TH reads from the DUT the MeasuredValue attribute."
+      PICS: FLW.S.A0000
       command: "readAttribute"
       attribute: "MeasuredValue"
       response:
           constraints:
-              type: uint16
+              type: int16u
+              minValue: MinMeasuredVariable
+              maxValue: MaxMeasuredVariable
 
-    - label: "read the mandatory attribute: MinMeasuredValue"
-      command: "readAttribute"
-      attribute: "MinMeasuredValue"
-      response:
-          constraints:
-              type: uint16
-
-    - label: "read the mandatory attribute: MaxMeasuredValue"
-      command: "readAttribute"
-      attribute: "MaxMeasuredValue"
-      response:
-          constraints:
-              type: uint16
-
-    - label: "write the default value to optional attribute: MeasuredValue"
-      command: "writeAttribute"
-      attribute: "MeasuredValue"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "write the default value to optional attribute: MinMeasuredValue"
-      command: "writeAttribute"
-      attribute: "MinMeasuredValue"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "write the default value to optional attribute: MaxMeasuredValue"
-      command: "writeAttribute"
-      attribute: "MaxMeasuredValue"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "read the mandatory attribute: MeasuredValue"
-      command: "readAttribute"
-      attribute: "MeasuredValue"
-      response:
-          constraints:
-              type: uint16
-
-    - label: "read the mandatory attribute: MinMeasuredValue"
-      command: "readAttribute"
-      attribute: "MinMeasuredValue"
-      response:
-          constraints:
-              type: uint16
-
-    - label: "read the mandatory attribute: MaxMeasuredValue"
-      command: "readAttribute"
-      attribute: "MaxMeasuredValue"
-      response:
-          constraints:
-              type: uint16
-
-    - label: "read the optional attribute: Tolerance"
-      optional: true
-      command: "readAttribute"
-      attribute: "Tolerance"
-      response:
-          value: 0
-
-    - label: "read the optional attribute: Tolerance"
-      optional: true
+    - label: "Step 5: TH reads from the DUT the Tolerance attribute."
+      PICS: FLW.S.A0003
       command: "readAttribute"
       attribute: "Tolerance"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 2048
-
-    - label: "write the default value to optional attribute: Tolerance"
-      optional: true
-      command: "writeAttribute"
-      attribute: "Tolerance"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "read the optional attribute: Tolerance"
-      optional: true
-      command: "readAttribute"
-      attribute: "Tolerance"
-      response:
-          value: 0

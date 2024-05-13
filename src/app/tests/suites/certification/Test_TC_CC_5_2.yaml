@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 27.2.10. [TC-CC-5.2] Color Move functionality with server as DUT
+name: 25.3.11. [TC-CC-5.2] Color Move functionality with server as DUT
+
+PICS:
+    - CC.S
 
 config:
     nodeId: 0x12344321
@@ -28,100 +31,201 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Turn on light for color control tests"
-      cluster: "On/Off"
-      command: "on"
+    - label: "Step 0a: TH writes 0 to the Options attribute"
+      PICS: CC.S.F03 && CC.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
 
-    - label: "Check on/off attribute value is true after on command"
+    - label: "Step 0b: TH sends On command to DUT"
+      PICS: OO.S.C01.Rsp
       cluster: "On/Off"
-      command: "readAttribute"
-      attribute: "OnOff"
-      response:
-          value: 1
+      command: "On"
 
     - label:
-          "Check current x attribute value matched the value sent by the last
-          command"
-      disabled: true
-      command: "readAttribute"
-      attribute: "current x"
-      response:
-          value: 200
-
-    - label:
-          "Check current y attribute value matched the value sent by the last
-          command"
-      disabled: true
-      command: "readAttribute"
-      attribute: "current y"
-      response:
-          value: 300
-
-    - label: "Move Color command"
-      command: "MoveColor"
+          "Step 1a: TH sends MoveToColor command to DUT, with ColorX = 33000
+          ColorY = 26000 TransitionTime = 0 (immediate)"
+      PICS: CC.S.F03 && CC.S.C07.Rsp
+      command: "MoveToColor"
       arguments:
           values:
-              - name: "rateX"
-                value: 15
-              - name: "rateY"
-                value: 20
-              - name: "optionsMask"
+              - name: "ColorX"
+                value: 33000
+              - name: "ColorY"
+                value: 26000
+              - name: "TransitionTime"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
                 value: 0
 
-    - label:
-          "Check current x attribute value matched the value sent by the last
-          command"
-      disabled: true
-      command: "readAttribute"
-      attribute: "current x"
-      response:
-          value: -1
+    - label: "Wait 100ms"
+      PICS: CC.S.F03
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
 
-    - label:
-          "Check current y attribute value matched the value sent by the last
-          command"
-      disabled: true
-      command: "readAttribute"
-      attribute: "current y"
-      response:
-          value: -1
+    - label: "Step 2a: TH sends MoveColor command to DUT"
+      command: "MoveColor"
+      PICS: CC.S.F03 && CC.S.C08.Rsp
+      arguments:
+          values:
+              - name: "RateX"
+                value: -100
+              - name: "RateY"
+                value: 100
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
 
-    - label: "Stop Move Step command"
+    - label: "Wait 10s"
+      PICS: CC.S.F03
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "Step 2b: TH reads CurrentX attribute from DUT"
+      command: "readAttribute"
+      PICS: CC.S.F03 && CC.S.A0003 && CC.S.C08.Rsp
+      attribute: "CurrentX"
+      response:
+          constraints:
+              minValue: 27200
+              maxValue: 36800
+
+    - label: "Step 2b: TH reads CurrentY attribute from DUT"
+      command: "readAttribute"
+      PICS: CC.S.F03 && CC.S.A0004 && CC.S.C08.Rsp
+      attribute: "CurrentY"
+      response:
+          constraints:
+              minValue: 22900
+              maxValue: 31100
+
+    - label: "Wait 10s"
+      PICS: CC.S.F03
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "Step 2c: TH reads CurrentX attribute from DUT"
+      command: "readAttribute"
+      PICS: CC.S.F03 && CC.S.A0003 && CC.S.C08.Rsp
+      attribute: "CurrentX"
+      response:
+          constraints:
+              minValue: 26350
+              maxValue: 35650
+
+    - label: "Step 2c: TH reads CurrentY attribute from DUT"
+      command: "readAttribute"
+      PICS: CC.S.F03 && CC.S.A0004 && CC.S.C08.Rsp
+      attribute: "CurrentY"
+      response:
+          constraints:
+              minValue: 23800
+              maxValue: 32200
+
+    - label: "Wait 10s"
+      PICS: CC.S.F03
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "Step 2d: TH reads CurrentX attribute from DUT"
+      command: "readAttribute"
+      PICS: CC.S.F03 && CC.S.A0003 && CC.S.C08.Rsp
+      attribute: "CurrentX"
+      response:
+          saveAs: CurrentXValue
+          constraints:
+              minValue: 25500
+              maxValue: 34500
+
+    - label: "Step 2d: TH reads CurrentY attribute from DUT"
+      command: "readAttribute"
+      PICS: CC.S.F03 && CC.S.A0004 && CC.S.C08.Rsp
+      attribute: "CurrentY"
+      response:
+          saveAs: CurrentYValue
+          constraints:
+              minValue: 24650
+              maxValue: 33350
+
+    - label: "Step 3a: TH sends StopMoveStep command to DUT"
+      PICS: CC.S.F03 && CC.S.C47.Rsp
       command: "StopMoveStep"
       arguments:
           values:
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
-    - label:
-          "Check current x attribute value matched the value sent by the last
-          command"
-      disabled: true
+    #Checking range as exactly delay might not be achieved due to attribute reads
+    - label: "Step 3b: TH reads CurrentX attribute from DUT"
       command: "readAttribute"
-      attribute: "current x"
+      PICS: CC.S.F03 && CC.S.A0003 && CC.S.C08.Rsp
+      attribute: "CurrentX"
       response:
-          value: -1
+          constraints:
+              minValue: 25500
+              maxValue: 34500
 
-    - label:
-          "Check current y attribute value matched the value sent by the last
-          command"
-      disabled: true
+    #Checking range as exactly delay might not be achieved due to attribute reads
+    - label: "Step 3b: TH reads CurrentY attribute from DUT"
       command: "readAttribute"
-      attribute: "current y"
+      PICS: CC.S.F03 && CC.S.A0004 && CC.S.C08.Rsp
+      attribute: "CurrentY"
       response:
-          value: -1
+          constraints:
+              minValue: 24650
+              maxValue: 33350
+
+    - label: "Step 4a: TH reads ColorMode attribute from DUT"
+      PICS: CC.S.F03 && CC.S.A0008
+      command: "readAttribute"
+      attribute: "ColorMode"
+      response:
+          value: 1
+          constraints:
+              minValue: 0
+              maxValue: 2
+
+    - label: "Step 4b: TH reads EnhancedColorMode attribute from DUT"
+      PICS: CC.S.F03 && CC.S.A4001
+      command: "readAttribute"
+      attribute: "EnhancedColorMode"
+      response:
+          value: 1
+          constraints:
+              minValue: 0
+              maxValue: 3
 
     - label: "Turn off light that we turned on"
+      PICS: OO.S.C00.Rsp
       cluster: "On/Off"
-      command: "off"
+      command: "Off"
 
     - label: "Check on/off attribute value is false after off command"
       cluster: "On/Off"
       command: "readAttribute"
       attribute: "OnOff"
+      PICS: OO.S.A0000
       response:
           value: 0

@@ -18,12 +18,18 @@
 
 #pragma once
 
-#include <controller/CommandSenderAllocator.h>
 #include <controller/TypedCommandCallback.h>
 #include <lib/core/Optional.h>
 
+#include <functional>
+
 namespace chip {
 namespace Controller {
+
+namespace Internal {
+// Cancellation functions on InvokeCommandRequest() are for internal use only.
+typedef std::function<void()> InvokeCancelFn;
+} // namespace Internal
 
 /*
  * A typed command invocation function that takes as input a cluster-object representation of a command request and
@@ -49,8 +55,12 @@ InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, const SessionHan
                      typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnSuccessCallbackType onSuccessCb,
                      typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnErrorCallbackType onErrorCb,
                      const Optional<uint16_t> & timedInvokeTimeoutMs,
-                     const Optional<System::Clock::Timeout> & responseTimeout = NullOptional)
+                     const Optional<System::Clock::Timeout> & responseTimeout = NullOptional,
+                     Internal::InvokeCancelFn * outCancelFn                   = nullptr)
 {
+    // InvokeCommandRequest expects responses, so cannot happen over a group session.
+    VerifyOrReturnError(!sessionHandle->IsGroupSession(), CHIP_ERROR_INVALID_ARGUMENT);
+
     app::CommandPathParams commandPath = { endpointId, 0, RequestObjectT::GetClusterId(), RequestObjectT::GetCommandId(),
                                            (app::CommandPathFlags::kEndpointIdValid) };
 
@@ -78,6 +88,15 @@ InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, const SessionHan
     ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, requestCommandData, timedInvokeTimeoutMs));
     ReturnErrorOnFailure(commandSender->SendCommandRequest(sessionHandle, responseTimeout));
 
+    // If requested by the caller, provide a way to cancel the invoke interaction.
+    if (outCancelFn != nullptr)
+    {
+        *outCancelFn = [rawDecoderPtr = decoder.get(), rawCommandSender = commandSender.get()]() {
+            chip::Platform::Delete(rawCommandSender);
+            chip::Platform::Delete(rawDecoderPtr);
+        };
+    }
+
     //
     // We've effectively transferred ownership of the above allocated objects to CommandSender, and we need to wait for it to call
     // us back when processing is completed (through OnDone) to eventually free up resources.
@@ -91,21 +110,19 @@ InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, const SessionHan
 }
 
 /*
- * A typed group command invocation function that takes as input a cluster-object representation of a command request and
- * callbacks when completed trought the done callback
+ * A typed group command invocation function that takes as input a cluster-object representation of a command request.
  *
  * The RequestObjectT is generally expected to be a ClusterName::Commands::CommandName::Type struct, but any object
  * that can be encoded using the DataModel::Encode machinery and exposes the GetClusterId() and GetCommandId() functions
  * and a ResponseType type is expected to work.
  *
- * Since this sends a group command, no response will be received and all allocated rescources will be cleared before exing this
+ * Since this sends a group command, no response will be received and all allocated resources will be cleared before exiting this
  * function
  */
 template <typename RequestObjectT>
 CHIP_ERROR InvokeGroupCommandRequest(Messaging::ExchangeManager * exchangeMgr, chip::FabricIndex fabric, chip::GroupId groupId,
                                      const RequestObjectT & requestCommandData)
 {
-    CHIP_ERROR error                   = CHIP_NO_ERROR;
     app::CommandPathParams commandPath = { groupId, RequestObjectT::GetClusterId(), RequestObjectT::GetCommandId(),
                                            app::CommandPathFlags::kGroupIdValid };
     Transport::OutgoingGroupSession session(groupId, fabric);
@@ -113,15 +130,8 @@ CHIP_ERROR InvokeGroupCommandRequest(Messaging::ExchangeManager * exchangeMgr, c
     auto commandSender = chip::Platform::MakeUnique<app::CommandSender>(nullptr, exchangeMgr);
     VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    error = commandSender->AddRequestData(commandPath, requestCommandData);
-    SuccessOrExit(error);
-
-    error = commandSender->SendGroupCommandRequest(SessionHandle(session));
-    SuccessOrExit(error);
-
-exit:
-    chip::Platform::Delete(commandSender.release());
-    return error;
+    ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, requestCommandData));
+    return commandSender->SendGroupCommandRequest(SessionHandle(session));
 }
 
 template <typename RequestObjectT>

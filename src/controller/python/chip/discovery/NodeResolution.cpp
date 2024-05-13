@@ -16,6 +16,7 @@
  */
 
 #include <chip/internal/ChipThreadWork.h>
+#include <controller/python/chip/native/PyChipError.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -25,31 +26,30 @@
 using namespace chip;
 using namespace chip::Dnssd;
 
-static_assert(std::is_same<uint32_t, ChipError::StorageType>::value, "python assumes CHIP_ERROR maps to c_uint32");
-
 namespace {
 
 // callback types shared with python code (see ptyhon code in chip.discovery.types)
 using DiscoverSuccessCallback = void (*)(uint64_t fabricId, uint64_t nodeId, uint32_t interfaceId, const char * ip, uint16_t port);
-using DiscoverFailureCallback = void (*)(uint64_t fabricId, uint64_t nodeId, ChipError::StorageType error_code);
+using DiscoverFailureCallback = void (*)(uint64_t fabricId, uint64_t nodeId, PyChipError error_code);
 
 class PythonResolverDelegate : public OperationalResolveDelegate
 {
 public:
     void OnOperationalNodeResolved(const ResolvedNodeData & nodeData) override
     {
+        Resolver::Instance().NodeIdResolutionNoLongerNeeded(nodeData.operationalData.peerId);
         if (mSuccessCallback != nullptr)
         {
             char ipAddressBuffer[128];
 
             // TODO: For now, just provide addr 0, but this should really provide all and
             // allow the caller to choose.
-            mSuccessCallback(                                                            //
-                nodeData.mPeerId.GetCompressedFabricId(),                                //
-                nodeData.mPeerId.GetNodeId(),                                            //
-                nodeData.mInterfaceId.GetPlatformInterface(),                            //
-                nodeData.mAddress[0].ToString(ipAddressBuffer, sizeof(ipAddressBuffer)), //
-                nodeData.mPort                                                           //
+            mSuccessCallback(                                                                            //
+                nodeData.operationalData.peerId.GetCompressedFabricId(),                                 //
+                nodeData.operationalData.peerId.GetNodeId(),                                             //
+                nodeData.resolutionData.interfaceId.GetPlatformInterface(),                              //
+                nodeData.resolutionData.ipAddress[0].ToString(ipAddressBuffer, sizeof(ipAddressBuffer)), //
+                nodeData.resolutionData.port                                                             //
             );
         }
         else
@@ -60,9 +60,10 @@ public:
 
     void OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override
     {
+        Resolver::Instance().NodeIdResolutionNoLongerNeeded(peerId);
         if (mFailureCallback != nullptr)
         {
-            mFailureCallback(peerId.GetCompressedFabricId(), peerId.GetNodeId(), error.AsInteger());
+            mFailureCallback(peerId.GetCompressedFabricId(), peerId.GetNodeId(), ToPyChipError(error));
         }
         else
         {
@@ -88,7 +89,7 @@ extern "C" void pychip_discovery_set_callbacks(DiscoverSuccessCallback success, 
     gPythonResolverDelegate.SetFailureCallback(failure);
 }
 
-extern "C" ChipError::StorageType pychip_discovery_resolve(uint64_t fabricId, uint64_t nodeId)
+extern "C" PyChipError pychip_discovery_resolve(uint64_t fabricId, uint64_t nodeId)
 {
     CHIP_ERROR result = CHIP_NO_ERROR;
 
@@ -97,9 +98,8 @@ extern "C" ChipError::StorageType pychip_discovery_resolve(uint64_t fabricId, ui
         ReturnOnFailure(result);
         Resolver::Instance().SetOperationalDelegate(&gPythonResolverDelegate);
 
-        result = Resolver::Instance().ResolveNodeId(chip::PeerId().SetCompressedFabricId(fabricId).SetNodeId(nodeId),
-                                                    chip::Inet::IPAddressType::kAny);
+        result = Resolver::Instance().ResolveNodeId(chip::PeerId().SetCompressedFabricId(fabricId).SetNodeId(nodeId));
     });
 
-    return result.AsInteger();
+    return ToPyChipError(result);
 }

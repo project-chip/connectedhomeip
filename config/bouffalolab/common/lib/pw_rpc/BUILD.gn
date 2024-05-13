@@ -1,0 +1,46 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
+import("$dir_pw_build/target_types.gni")
+
+config("pw_string_config") {
+  defines = [
+    "_GLIBCXX_USE_C99_MATH_TR1",
+    "_LDBL_EQ_DBL",
+  ]
+}
+
+pw_source_set("pw_string_dep") {
+  public_configs = [ ":pw_string_config" ]
+}
+
+static_library("pw_rpc") {
+  output_name = "libPwRpc"
+
+  public_configs = [ "${dir_pigweed}/pw_hdlc:default_config" ]
+
+  public_deps = [
+    "$dir_pw_rpc:server",
+    "$dir_pw_rpc/nanopb:echo_service",
+    "${chip_root}/examples/platform/bouffalolab/common/rpc/pw_sys_io:pw_sys_io",
+    dir_pw_assert,
+    dir_pw_checksum,
+    dir_pw_hdlc,
+    dir_pw_log,
+  ]
+
+  output_dir = "${root_out_dir}/lib"
+}

@@ -26,6 +26,8 @@ namespace Minimal {
 
 namespace {
 
+using namespace mdns::Minimal::Internal;
+
 constexpr uint16_t kMdnsStandardPort = 5353;
 
 // Restriction for UDP packets:  https://tools.ietf.org/html/rfc1035#section-4.2.1
@@ -55,11 +57,11 @@ CHIP_ERROR ResponseSender::AddQueryResponder(QueryResponderBase * queryResponder
     // If already existing or we find a free slot, just use it
     // Note that dynamic memory implementations are never expected to be nullptr
     //
-    for (auto it = mResponders.begin(); it != mResponders.end(); it++)
+    for (auto & responder : mResponders)
     {
-        if (*it == nullptr || *it == queryResponder)
+        if (responder == nullptr || responder == queryResponder)
         {
-            *it = queryResponder;
+            responder = queryResponder;
             return CHIP_NO_ERROR;
         }
     }
@@ -90,9 +92,9 @@ CHIP_ERROR ResponseSender::RemoveQueryResponder(QueryResponderBase * queryRespon
 
 bool ResponseSender::HasQueryResponders() const
 {
-    for (auto it = mResponders.begin(); it != mResponders.end(); it++)
+    for (auto responder : mResponders)
     {
-        if (*it != nullptr)
+        if (responder != nullptr)
         {
             return true;
         }
@@ -100,19 +102,26 @@ bool ResponseSender::HasQueryResponders() const
     return false;
 }
 
-CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, const chip::Inet::IPPacketInfo * querySource)
+CHIP_ERROR ResponseSender::Respond(uint16_t messageId, const QueryData & query, const chip::Inet::IPPacketInfo * querySource,
+                                   const ResponseConfiguration & configuration)
 {
     mSendState.Reset(messageId, query, querySource);
+
+    if (query.IsAnnounceBroadcast())
+    {
+        // Deny listing large amount of data
+        mSendState.MarkWasSent(ResponseItemsSent::kServiceListingData);
+    }
 
     // Responder has a stateful 'additional replies required' that is used within the response
     // loop. 'no additionals required' is set at the start and additionals are marked as the query
     // reply is built.
-    for (auto it = mResponders.begin(); it != mResponders.end(); it++)
+    for (auto & responder : mResponders)
     {
         {
-            if (*it != nullptr)
+            if (responder != nullptr)
             {
-                (*it)->ResetAdditionals();
+                responder->ResetAdditionals();
             }
         }
     }
@@ -134,18 +143,18 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
             //       broadcasts on one interface to throttle broadcasts on another interface.
             responseFilter.SetIncludeOnlyMulticastBeforeMS(kTimeNow - chip::System::Clock::Seconds32(1));
         }
-        for (auto responder = mResponders.begin(); responder != mResponders.end(); responder++)
+        for (auto & responder : mResponders)
         {
-            if (*responder == nullptr)
+            if (responder == nullptr)
             {
                 continue;
             }
-            for (auto it = (*responder)->begin(&responseFilter); it != (*responder)->end(); it++)
+            for (auto it = responder->begin(&responseFilter); it != responder->end(); it++)
             {
-                it->responder->AddAllResponses(querySource, this);
+                it->responder->AddAllResponses(querySource, this, configuration);
                 ReturnErrorOnFailure(mSendState.GetError());
 
-                (*responder)->MarkAdditionalRepliesFor(it);
+                responder->MarkAdditionalRepliesFor(it);
 
                 if (!mSendState.SendUnicast())
                 {
@@ -157,7 +166,12 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
 
     // send all 'Additional' replies
     {
-        mSendState.SetResourceType(ResourceType::kAdditional);
+        if (!query.IsAnnounceBroadcast())
+        {
+            // Initial service broadcast should keep adding data as 'Answers' rather
+            // than addtional data (https://datatracker.ietf.org/doc/html/rfc6762#section-8.3)
+            mSendState.SetResourceType(ResourceType::kAdditional);
+        }
 
         QueryReplyFilter queryReplyFilter(query);
 
@@ -167,15 +181,15 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
         responseFilter
             .SetReplyFilter(&queryReplyFilter) //
             .SetIncludeAdditionalRepliesOnly(true);
-        for (auto responder = mResponders.begin(); responder != mResponders.end(); responder++)
+        for (auto & responder : mResponders)
         {
-            if (*responder == nullptr)
+            if (responder == nullptr)
             {
                 continue;
             }
-            for (auto it = (*responder)->begin(&responseFilter); it != (*responder)->end(); it++)
+            for (auto it = responder->begin(&responseFilter); it != responder->end(); it++)
             {
-                it->responder->AddAllResponses(querySource, this);
+                it->responder->AddAllResponses(querySource, this, configuration);
                 ReturnErrorOnFailure(mSendState.GetError());
             }
         }
@@ -195,14 +209,18 @@ CHIP_ERROR ResponseSender::FlushReply()
 
         if (mSendState.SendUnicast())
         {
+#if CHIP_MINMDNS_HIGH_VERBOSITY
             ChipLogDetail(Discovery, "Directly sending mDns reply to peer %s on port %d", srcAddressString,
                           mSendState.GetSourcePort());
+#endif
             ReturnErrorOnFailure(mServer->DirectSend(mResponseBuilder.ReleasePacket(), mSendState.GetSourceAddress(),
                                                      mSendState.GetSourcePort(), mSendState.GetSourceInterfaceId()));
         }
         else
         {
+#if CHIP_MINMDNS_HIGH_VERBOSITY
             ChipLogDetail(Discovery, "Broadcasting mDns reply for query from %s", srcAddressString);
+#endif
             ReturnErrorOnFailure(mServer->BroadcastSend(mResponseBuilder.ReleasePacket(), kMdnsStandardPort,
                                                         mSendState.GetSourceInterfaceId(), mSendState.GetSourceAddress().Type()));
         }
@@ -225,6 +243,45 @@ CHIP_ERROR ResponseSender::PrepareNewReplyPacket()
     }
 
     return CHIP_NO_ERROR;
+}
+
+bool ResponseSender::ShouldSend(const Responder & responder) const
+{
+    switch (responder.GetQType())
+    {
+    case QType::A:
+        return !mSendState.GetWasSent(ResponseItemsSent::kIPv4Addresses);
+    case QType::AAAA:
+        return !mSendState.GetWasSent(ResponseItemsSent::kIPv6Addresses);
+    case QType::PTR: {
+        static const QNamePart kDnsSdQueryPath[] = { "_services", "_dns-sd", "_udp", "local" };
+
+        if (responder.GetQName() == FullQName(kDnsSdQueryPath))
+        {
+            return !mSendState.GetWasSent(ResponseItemsSent::kServiceListingData);
+        }
+        break;
+    }
+    default:
+        break;
+    }
+
+    return true;
+}
+
+void ResponseSender::ResponsesAdded(const Responder & responder)
+{
+    switch (responder.GetQType())
+    {
+    case QType::A:
+        mSendState.MarkWasSent(ResponseItemsSent::kIPv4Addresses);
+        break;
+    case QType::AAAA:
+        mSendState.MarkWasSent(ResponseItemsSent::kIPv6Addresses);
+        break;
+    default:
+        break;
+    }
 }
 
 void ResponseSender::AddResponse(const ResourceRecord & record)

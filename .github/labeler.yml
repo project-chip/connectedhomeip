@@ -16,144 +16,309 @@
 #  Top Level Labels
 ############################################################
 repo:
-    - ./*
+  - changed-files:
+    - any-glob-to-any-file:
+      - './*'
 
 ############################################################
 #  Examples
 ############################################################
 examples:
-    - examples/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - examples/*
+      - examples/**/*
 
 ############################################################
 #  Documentation
 ############################################################
 documentation:
-    - docs/*
-    - "*.md"
+  - changed-files:
+    - any-glob-to-any-file:
+      - docs/*
+      - docs/**/*
+      - "*.md"
 
 ############################################################
 #  Tools + Development Items
 ############################################################
 scripts:
-    - scripts/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - scripts/*
+      - scripts/**/*
 
 integrations:
-    - integrations/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - integrations/*
+      - integrations/**/*
+
+docker:
+  - changed-files:
+    - any-glob-to-any-file:
+      - integrations/docker/*
+      - integrations/docker/**/*
 
 vscode:
-    - .vscode
-    - .devcontainer
+  - changed-files:
+    - any-glob-to-any-file:
+      - .vscode/*
+      - .vscode/**/*
+      - .devcontainer/*
+      - .devcontainer/**/*
 
 gn:
-    - build/*
-    - build_overrides/*
-    - .gn
-    - "*.gn"
-    - "*.gni"
+  - changed-files:
+    - any-glob-to-any-file:
+      - build/*
+      - build/**/*
+      - build_overrides/*
+      - build_overrides/**/*
+      - .gn
+      - "*.gn"
+      - "*.gni"
 
 github:
-    - .github
+  - changed-files:
+    - any-glob-to-any-file:
+      - .github
+      - .github/*
+      - .github/**/*
 
 workflows:
-    - .github/workflows/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - .github/workflows/*
+      - .github/workflows/**/*
 
 tools:
-    - tools/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/tools/*
+      - src/tools/**/*
+      - tools/*
+      - tools/**/*
+      - examples/chip-tool/*
+      - examples/chip-tool/**/*
 
 ############################################################
 #  Tests
 ############################################################
+tests:
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/python_testing/*
+      - src/python_testing/**/*
+      - src/app/tests/*
+      - src/app/tests/**/*
+
 test driver:
-    - src/test_driver/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/test_driver/*
+      - src/test_driver/**/*
 
 ############################################################
 #  Source Code
 ############################################################
 qr code:
-    - src/qrcode/*
-    - src/qrcodetool/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/qrcode/*
+      - src/qrcode/**/*
+      - src/qrcodetool/*
+      - src/qrcodetool/**/*
 
 lwip:
-    - src/lwip/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/lwip/*
+      - src/lwip/**/*
 
 inet:
-    - src/inet/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/inet/*
+      - src/inet/**/*
 
 config:
-    - config/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - config/*
+      - config/**/*
 
 lib:
-    - src/lib/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/lib/*
+      - src/lib/**/*
 
 core:
-    - src/lib/core/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/lib/core/*
+      - src/lib/core/**/*
 
 protocols:
-    - src/lib/protocols/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/lib/protocols/*
+      - src/lib/protocols/**/*
+      - src/protocols/*
+      - src/protocols/**/*
+
+messaging:
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/messaging/*
+      - src/messaging/**/*
 
 shell:
-    - src/lib/shell/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/lib/shell/*
+      - src/lib/shell/**/*
 
 support:
-    - src/lib/support/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/lib/support/*
+      - src/lib/support/**/*
 
 crypto:
-    - src/crypto/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/crypto/*
+      - src/crypto/**/*
 
 controller:
-    - src/controller/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/controller/*
+      - src/controller/**/*
 
 ble:
-    - src/ble/*
-
-android:
-    - src/android/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/ble/*
+      - src/ble/**/*
 
 app:
-    - src/app/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/app/*
+      - src/app/**/*
+
+icd:
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/app/icd/*
+      - src/app/icd/**/*
 
 transport:
-    - src/transport/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/transport/*
+      - src/transport/**/*
 
 system:
-    - src/system/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/system/*
+      - src/system/**/*
 
 setup payload:
-    - src/setup_payload/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/setup_payload/*
+      - src/setup_payload/**/*
 
 ############################################################
 #  Platforms
 ############################################################
 platform:
-    - src/platform/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/platform/*
+      - src/platform/**/*
+      - config/tizen/chip-gn/platform/*
+      - config/tizen/chip-gn/platform/**/*
+      - examples/platform/*
+      - examples/platform/**/*
+      - scripts/tools/memory/platform/*
+      - scripts/tools/memory/platform/**/*
+      - src/include/platform/*
+      - src/include/platform/**/*
+      - src/lib/dnssd/platform/*
+      - src/lib/dnssd/platform/**/*
 
 darwin:
-    - src/platform/Darwin/*
-    - src/darwin/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/platform/Darwin/*
+      - src/platform/Darwin/**/*
+      - src/darwin/*
+      - src/darwin/**/*
+      - examples/darwin-framework-tool/*
+      - examples/darwin-framework-tool/**/*
 
-efr32:
-    - src/platform/EFR32/*
+silabs:
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/platform/silabs/*
+      - src/platform/silabs/**/*
 
 esp32:
-    - src/platform/ESP32/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/platform/ESP32/*
+      - src/platform/ESP32/**/*
 
 freeRTOS:
-    - src/platform/FreeRTOS/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/platform/FreeRTOS/*
+      - src/platform/FreeRTOS/**/*
 
 k32w:
-    - src/platform/K32W/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/platform/K32W/*
+      - src/platform/K32W/**/*
 
 linux:
-    - src/platform/Linux/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/platform/Linux/*
+      - src/platform/Linux/**/*
 
 nrf connect:
-    - src/platform/nrfconnect/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/platform/nrfconnect/*
+      - src/platform/nrfconnect/**/*
 
 openthread:
-    - src/platform/openthread/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/platform/openthread/*
+      - src/platform/openthread/**/*
 
 zephyr:
-    - src/platform/Zephyr/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/platform/Zephyr/*
+      - src/platform/Zephyr/**/*
 
 telink:
-    - src/platform/telink/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/platform/telink/*
+      - src/platform/telink/**/*
+
+tizen:
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/platform/Tizen/*
+      - src/platform/Tizen/**/*

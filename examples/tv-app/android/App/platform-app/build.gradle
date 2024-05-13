@@ -1,0 +1,72 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    compileSdk 30
+
+    defaultConfig {
+        applicationId "com.matter.tv.server"
+        minSdk 24
+        targetSdk 30
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        externalNativeBuild {
+            cmake {
+                targets "default"
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+
+        debug {
+            packagingOptions{
+                doNotStrip "**/*.so"
+            }
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['../app/libs/jniLibs']
+            java.srcDirs = [
+                    'src/main/java',
+                    '../common-api/src/main/java',
+            ]
+            aidl.srcDirs = ['../common-api/src/main/aidl']
+
+            // uncomment this code to debug
+//            java.srcDirs = [
+//                    'src/main/java',
+//                    '../common-api/src/main/java',
+//                    '../../third_party/connectedhomeip/src/setup_payload/java/src',
+//                    '../../third_party/connectedhomeip/src/platform/android/java',
+//                    '../../third_party/connectedhomeip/src/app/server/java/src/',
+//                    '../../java/src',
+//            ]
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: "../app/libs", include: ["*.jar","*.so"])
+    implementation 'androidx.appcompat:appcompat:1.3.1'
+    implementation 'com.google.android.material:material:1.4.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.1'
+    testImplementation 'junit:junit:4.+'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    implementation 'com.google.zxing:core:3.3.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+}

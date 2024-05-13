@@ -1,6 +1,6 @@
 {{#if header}}
 namespace {{asUpperCamelCase name}} {
-    enum class Fields {
+    enum class Fields : uint8_t {
     {{#zcl_struct_items}}
     k{{asUpperCamelCase label}} = {{fieldIdentifier}},
     {{/zcl_struct_items}}
@@ -16,24 +16,24 @@ namespace {{asUpperCamelCase name}} {
         CHIP_ERROR Decode(TLV::TLVReader &reader);
         {{/unless}}
 
-        static constexpr bool kIsFabricScoped = {{struct_is_fabric_scoped}};
+        static constexpr bool kIsFabricScoped = {{isFabricScoped}};
 
-        {{#if struct_is_fabric_scoped}}
+        {{#if isFabricScoped}}
         auto GetFabricIndex() const {
-            return {{ asLowerCamelCase struct_fabric_idx_field }};
+            return fabricIndex;
         }
 
         void SetFabricIndex(chip::FabricIndex fabricIndex_) {
-            {{ asLowerCamelCase struct_fabric_idx_field }} = fabricIndex_;
+            fabricIndex = fabricIndex_;
         }
 
-        CHIP_ERROR EncodeForWrite(TLV::TLVWriter &writer, TLV::Tag tag) const;
-        CHIP_ERROR EncodeForRead(TLV::TLVWriter &writer, TLV::Tag tag, FabricIndex accessingFabricIndex) const;
+        CHIP_ERROR EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+        CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
 
     private:
-        CHIP_ERROR DoEncode(TLV::TLVWriter &writer, TLV::Tag tag, const Optional<FabricIndex> &accessingFabricIndex) const;
+        CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
         {{else}}
-        CHIP_ERROR Encode(TLV::TLVWriter &writer, TLV::Tag tag) const;
+        CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
         {{/if}}
     };
 
@@ -46,15 +46,15 @@ namespace {{asUpperCamelCase name}} {
 
         CHIP_ERROR Decode(TLV::TLVReader &reader);
 
-        static constexpr bool kIsFabricScoped = {{struct_is_fabric_scoped}};
+        static constexpr bool kIsFabricScoped = {{isFabricScoped}};
 
-        {{#if struct_is_fabric_scoped}}
+        {{#if isFabricScoped}}
         auto GetFabricIndex() const {
-            return {{ asLowerCamelCase struct_fabric_idx_field }};
+            return fabricIndex;
         }
 
         void SetFabricIndex(chip::FabricIndex fabricIndex_) {
-            {{ asLowerCamelCase struct_fabric_idx_field }} = fabricIndex_;
+            fabricIndex = fabricIndex_;
         }
         {{/if}}
     };
@@ -64,78 +64,82 @@ namespace {{asUpperCamelCase name}} {
 
 } // namespace {{asUpperCamelCase name}}
 {{else}}
+
 namespace {{asUpperCamelCase name}} {
-{{#if struct_is_fabric_scoped}}
-CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter &writer, TLV::Tag tag) const
+{{#if isFabricScoped}}
+CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
-    return DoEncode(writer, tag, NullOptional);
+    return DoEncode(aWriter, aTag, NullOptional);
 }
 
-CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter &writer, TLV::Tag tag, FabricIndex accessingFabricIndex) const
+CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
 {
-    return DoEncode(writer, tag, MakeOptional(accessingFabricIndex));
+    return DoEncode(aWriter, aTag, MakeOptional(aAccessingFabricIndex));
 }
 
-CHIP_ERROR Type::DoEncode(TLV::TLVWriter &writer, TLV::Tag tag, const Optional<FabricIndex> & accessingFabricIndex) const
+CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
 {
     {{#if struct_has_fabric_sensitive_fields}}
-    bool includeSensitive = !accessingFabricIndex.HasValue() || (accessingFabricIndex.Value() == {{ asLowerCamelCase struct_fabric_idx_field }});
+    bool includeSensitive = !aAccessingFabricIndex.HasValue() || (aAccessingFabricIndex.Value() == fabricIndex);
     {{/if}}
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+
+    DataModel::WrappedStructEncoder encoder{aWriter, aTag};
+
     {{#zcl_struct_items}}
-    {{#if (isStrEqual label ../struct_fabric_idx_field)}}
-    if (accessingFabricIndex.HasValue()) {
-      ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase label}})), {{asLowerCamelCase label}}));
+    {{#if (is_num_equal fieldIdentifier 254)}}
+    if (aAccessingFabricIndex.HasValue()) {
+      encoder.Encode(to_underlying(Fields::k{{asUpperCamelCase label}}), {{asLowerCamelCase label}});
     }
     {{else if isFabricSensitive}}
     if (includeSensitive) {
-       ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase label}})), {{asLowerCamelCase label}}));
+      encoder.Encode(to_underlying(Fields::k{{asUpperCamelCase label}}), {{asLowerCamelCase label}});
     }
     {{else}}
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase label}})), {{asLowerCamelCase label}}));
+    encoder.Encode(to_underlying(Fields::k{{asUpperCamelCase label}}), {{asLowerCamelCase label}});
     {{/if}}
     {{/zcl_struct_items}}
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
+
+    return encoder.Finalize();
 }
 {{else}}
-CHIP_ERROR Type::Encode(TLV::TLVWriter &writer, TLV::Tag tag) const
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    DataModel::WrappedStructEncoder encoder{aWriter, aTag};
     {{#zcl_struct_items}}
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase label}})), {{asLowerCamelCase label}}));
+    encoder.Encode(to_underlying(Fields::k{{asUpperCamelCase label}}), {{asLowerCamelCase label}});
     {{/zcl_struct_items}}
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
+    return encoder.Finalize();
 }
 {{/if}}
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
-    while ((err = reader.Next()) == CHIP_NO_ERROR) {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-            {{#zcl_struct_items}}
-            case to_underlying(Fields::k{{asUpperCamelCase label}}):
-                ReturnErrorOnFailure(DataModel::Decode(reader, {{asLowerCamelCase label}}));
-                break;
-            {{/zcl_struct_items}}
-            default:
-                break;
+    detail::StructDecodeIterator __iterator(reader);
+    while (true) {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element)) {
+           return std::get<CHIP_ERROR>(__element);
         }
+
+        {{#zcl_struct_items}}
+        {{#first}}
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        {{/first~}}
+        {{! NOTE: using if/else instead of switch because it seems to generate smaller code. ~}}
+        if (__context_tag == to_underlying(Fields::k{{asUpperCamelCase label}}))
+        {
+           err = DataModel::Decode(reader, {{asLowerCamelCase label}});
+        }
+        else
+        {{#last}}
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+        {{/last}}
+        {{/zcl_struct_items}}
     }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
-    return CHIP_NO_ERROR;
 }
 
 } // namespace {{asUpperCamelCase name}}

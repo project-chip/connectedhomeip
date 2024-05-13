@@ -163,13 +163,13 @@ struct ExpectedCall
             ChipLogProgress(Discovery, "\t%s", subtype[i].name);
         }
         ChipLogProgress(Discovery, "num txt = %lu", static_cast<unsigned long>(numTxt));
-        for (size_t i = 0; i < numSubtypes; ++i)
+        for (size_t i = 0; i < numTxt; ++i)
         {
             ChipLogProgress(Discovery, "\t%s = %s", txt[i].key, txt[i].value);
         }
     }
 
-    static constexpr size_t kMaxTxtRecords                = 11;
+    static constexpr size_t kMaxTxtRecords                = 13;
     static constexpr size_t kMaxSubtypes                  = 10;
     CallType callType                                     = CallType::kUnknown;
     DnssdServiceProtocol protocol                         = DnssdServiceProtocol::kDnssdProtocolUnknown;

@@ -18,9 +18,12 @@
 
 #pragma once
 
-#include "CommissionedListCommand.h"
-#include "OpenCommissioningWindowCommand.h"
-#include "PairingCommand.h"
+#include "commands/common/Commands.h"
+#include "commands/pairing/GetCommissionerNodeIdCommand.h"
+#include "commands/pairing/GetCommissionerRootCertificateCommand.h"
+#include "commands/pairing/IssueNOCChainCommand.h"
+#include "commands/pairing/OpenCommissioningWindowCommand.h"
+#include "commands/pairing/PairingCommand.h"
 
 #include <app/server/Dnssd.h>
 #include <commands/common/CredentialIssuerCommands.h>
@@ -34,67 +37,35 @@ public:
     {}
 };
 
-class PairQRCode : public PairingCommand
+class PairCode : public PairingCommand
 {
 public:
-    PairQRCode(CredentialIssuerCommands * credsIssuerConfig) :
-        PairingCommand("qrcode", PairingMode::QRCode, PairingNetworkType::None, credsIssuerConfig)
+    PairCode(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("code", PairingMode::Code, PairingNetworkType::None, credsIssuerConfig)
     {}
 };
 
-class PairQRCodePase : public PairingCommand
+class PairCodePase : public PairingCommand
 {
 public:
-    PairQRCodePase(CredentialIssuerCommands * credsIssuerConfig) :
-        PairingCommand("qrcode-paseonly", PairingMode::QRCodePaseOnly, PairingNetworkType::None, credsIssuerConfig)
+    PairCodePase(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("code-paseonly", PairingMode::CodePaseOnly, PairingNetworkType::None, credsIssuerConfig)
     {}
 };
 
-class PairQRCodeWifi : public PairingCommand
+class PairCodeWifi : public PairingCommand
 {
 public:
-    PairQRCodeWifi(CredentialIssuerCommands * credsIssuerConfig) :
-        PairingCommand("qrcode-wifi", PairingMode::QRCode, PairingNetworkType::WiFi, credsIssuerConfig)
+    PairCodeWifi(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("code-wifi", PairingMode::Code, PairingNetworkType::WiFi, credsIssuerConfig)
     {}
 };
 
-class PairQRCodeThread : public PairingCommand
+class PairCodeThread : public PairingCommand
 {
 public:
-    PairQRCodeThread(CredentialIssuerCommands * credsIssuerConfig) :
-        PairingCommand("qrcode-thread", PairingMode::QRCode, PairingNetworkType::Thread, credsIssuerConfig)
-    {}
-};
-
-class PairManualCode : public PairingCommand
-{
-public:
-    PairManualCode(CredentialIssuerCommands * credsIssuerConfig) :
-        PairingCommand("manualcode", PairingMode::ManualCode, PairingNetworkType::None, credsIssuerConfig)
-    {}
-};
-
-class PairManualCodePase : public PairingCommand
-{
-public:
-    PairManualCodePase(CredentialIssuerCommands * credsIssuerConfig) :
-        PairingCommand("manualcode-paseonly", PairingMode::ManualCodePaseOnly, PairingNetworkType::None, credsIssuerConfig)
-    {}
-};
-
-class PairManualCodeWifi : public PairingCommand
-{
-public:
-    PairManualCodeWifi(CredentialIssuerCommands * credsIssuerConfig) :
-        PairingCommand("manualcode-wifi", PairingMode::ManualCode, PairingNetworkType::WiFi, credsIssuerConfig)
-    {}
-};
-
-class PairManualCodeThread : public PairingCommand
-{
-public:
-    PairManualCodeThread(CredentialIssuerCommands * credsIssuerConfig) :
-        PairingCommand("manualcode-thread", PairingMode::ManualCode, PairingNetworkType::Thread, credsIssuerConfig)
+    PairCodeThread(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("code-thread", PairingMode::Code, PairingNetworkType::Thread, credsIssuerConfig)
     {}
 };
 
@@ -202,11 +173,38 @@ public:
     {}
 };
 
-class Ethernet : public PairingCommand
+class PairAlreadyDiscovered : public PairingCommand
 {
 public:
-    Ethernet(CredentialIssuerCommands * credsIssuerConfig) :
-        PairingCommand("ethernet", PairingMode::Ethernet, PairingNetworkType::Ethernet, credsIssuerConfig)
+    PairAlreadyDiscovered(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("already-discovered", PairingMode::AlreadyDiscovered, PairingNetworkType::None, credsIssuerConfig)
+    {}
+};
+
+class PairAlreadyDiscoveredByIndex : public PairingCommand
+{
+public:
+    PairAlreadyDiscoveredByIndex(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("already-discovered-by-index", PairingMode::AlreadyDiscoveredByIndex, PairingNetworkType::None,
+                       credsIssuerConfig)
+    {}
+};
+
+class PairAlreadyDiscoveredByIndexWithWiFi : public PairingCommand
+{
+public:
+    PairAlreadyDiscoveredByIndexWithWiFi(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("already-discovered-by-index-with-wifi", PairingMode::AlreadyDiscoveredByIndex, PairingNetworkType::WiFi,
+                       credsIssuerConfig)
+    {}
+};
+
+class PairAlreadyDiscoveredByIndexWithCode : public PairingCommand
+{
+public:
+    PairAlreadyDiscoveredByIndexWithCode(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("already-discovered-by-index-with-code", PairingMode::AlreadyDiscoveredByIndexWithCode,
+                       PairingNetworkType::None, credsIssuerConfig)
     {}
 };
 
@@ -229,18 +227,17 @@ void registerCommandsPairing(Commands & commands, CredentialIssuerCommands * cre
 
     commands_list clusterCommands = {
         make_unique<Unpair>(credsIssuerConfig),
-        make_unique<PairQRCode>(credsIssuerConfig),
-        make_unique<PairQRCodePase>(credsIssuerConfig),
-        make_unique<PairQRCodeWifi>(credsIssuerConfig),
-        make_unique<PairQRCodeThread>(credsIssuerConfig),
-        make_unique<PairManualCode>(credsIssuerConfig),
-        make_unique<PairManualCodePase>(credsIssuerConfig),
-        make_unique<PairManualCodeWifi>(credsIssuerConfig),
-        make_unique<PairManualCodeThread>(credsIssuerConfig),
+        make_unique<PairCode>(credsIssuerConfig),
+        make_unique<PairCodePase>(credsIssuerConfig),
+        make_unique<PairCodeWifi>(credsIssuerConfig),
+        make_unique<PairCodeThread>(credsIssuerConfig),
         make_unique<PairBleWiFi>(credsIssuerConfig),
         make_unique<PairBleThread>(credsIssuerConfig),
         make_unique<PairSoftAP>(credsIssuerConfig),
-        make_unique<Ethernet>(credsIssuerConfig),
+        make_unique<PairAlreadyDiscovered>(credsIssuerConfig),
+        make_unique<PairAlreadyDiscoveredByIndex>(credsIssuerConfig),
+        make_unique<PairAlreadyDiscoveredByIndexWithWiFi>(credsIssuerConfig),
+        make_unique<PairAlreadyDiscoveredByIndexWithCode>(credsIssuerConfig),
         make_unique<PairOnNetwork>(credsIssuerConfig),
         make_unique<PairOnNetworkShort>(credsIssuerConfig),
         make_unique<PairOnNetworkLong>(credsIssuerConfig),
@@ -248,13 +245,15 @@ void registerCommandsPairing(Commands & commands, CredentialIssuerCommands * cre
         make_unique<PairOnNetworkCommissioningMode>(credsIssuerConfig),
         make_unique<PairOnNetworkCommissioner>(credsIssuerConfig),
         make_unique<PairOnNetworkDeviceType>(credsIssuerConfig),
-        make_unique<PairOnNetworkDeviceType>(credsIssuerConfig),
         make_unique<PairOnNetworkInstanceName>(credsIssuerConfig),
         // TODO(#13973) - enable CommissionedListCommand once DNS Cache is implemented
         //        make_unique<CommissionedListCommand>(),
         make_unique<StartUdcServerCommand>(credsIssuerConfig),
         make_unique<OpenCommissioningWindowCommand>(credsIssuerConfig),
+        make_unique<GetCommissionerNodeIdCommand>(credsIssuerConfig),
+        make_unique<GetCommissionerRootCertificateCommand>(credsIssuerConfig),
+        make_unique<IssueNOCChainCommand>(credsIssuerConfig),
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for commissioning devices.");
 }

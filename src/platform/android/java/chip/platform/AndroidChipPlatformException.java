@@ -21,11 +21,11 @@ package chip.platform;
 public class AndroidChipPlatformException extends Exception {
   private static final long serialVersionUID = 1L;
 
-  public int errorCode;
+  public long errorCode;
 
   public AndroidChipPlatformException() {}
 
-  public AndroidChipPlatformException(int errorCode, String message) {
+  public AndroidChipPlatformException(long errorCode, String message) {
     super(message != null ? message : String.format("Error Code %d", errorCode));
     this.errorCode = errorCode;
   }

@@ -1,0 +1,65 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 14.1.2. [TC-SC-1.2] MRP Message Flows
+
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "TH sends a reliable (R flag set) MRP message to DUT that requires a
+          data response."
+      verification: |
+          Verify that the DUT receives the message.
+      disabled: true
+
+    - label:
+          "DUT must respond to the message with a MRP reply packet that
+          piggybacks the ACK(A flag set)."
+      verification: |
+          DUT should piggyback the ACKs of the message in the reply to TH.
+      disabled: true
+
+    - label:
+          "TH sends a reliable (R flag set) MRP message to DUT that doesnt
+          require a data response."
+      verification: |
+          DUT must receive the message.
+      disabled: true
+
+    - label: "DUT must respond to the message with an ACK message."
+      verification: |
+          DUT must sent only the ACK packet to TH.
+      disabled: true
+
+    - label:
+          "TH sends 5 unreliable (R flag not set) MRP messages to DUT that
+          requires a data response."
+      verification: |
+          DUT may receive the messages.
+      disabled: true
+
+    - label:
+          "DUT must respond to the message with a MRP reply packet that doesnt
+          piggyback the ACK (A flag not set)."
+      verification: |
+          DUT should send only a MRP reply packet to TH with no ACK piggybacked or sent in a separate message.
+      disabled: true

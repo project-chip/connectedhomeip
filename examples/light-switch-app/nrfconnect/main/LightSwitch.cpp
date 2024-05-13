@@ -24,13 +24,19 @@
 #include <app/util/binding-table.h>
 #include <controller/InvokeInteraction.h>
 
+#include <app/clusters/switch-server/switch-server.h>
+
+#include <app-common/zap-generated/attributes/Accessors.h>
+
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters;
 
-void LightSwitch::Init(chip::EndpointId aLightSwitchEndpoint)
+void LightSwitch::Init(chip::EndpointId aLightDimmerSwitchEndpoint, chip::EndpointId aLightGenericSwitchEndpointId)
 {
-    BindingHandler::Init();
-    mLightSwitchEndpoint = aLightSwitchEndpoint;
+    BindingHandler::GetInstance().Init();
+    mLightSwitchEndpoint          = aLightDimmerSwitchEndpoint;
+    mLightGenericSwitchEndpointId = aLightGenericSwitchEndpointId;
 }
 
 void LightSwitch::InitiateActionSwitch(Action mAction)
@@ -55,9 +61,8 @@ void LightSwitch::InitiateActionSwitch(Action mAction)
             Platform::Delete(data);
             return;
         }
-        data->IsGroup = BindingHandler::IsGroupBound();
+        data->IsGroup = BindingHandler::GetInstance().IsGroupBound();
         DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerHandler, reinterpret_cast<intptr_t>(data));
-        Platform::Delete(data);
     }
 }
 
@@ -77,8 +82,32 @@ void LightSwitch::DimmerChangeBrightness()
             sBrightness = 0;
         }
         data->Value   = (uint8_t) sBrightness;
-        data->IsGroup = BindingHandler::IsGroupBound();
+        data->IsGroup = BindingHandler::GetInstance().IsGroupBound();
         DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerHandler, reinterpret_cast<intptr_t>(data));
-        Platform::Delete(data);
     }
+}
+
+void LightSwitch::GenericSwitchInitialPress()
+{
+    DeviceLayer::SystemLayer().ScheduleLambda([this] {
+        // Press moves Position from 0 (idle) to 1 (press)
+        uint8_t newPosition = 1;
+
+        Clusters::Switch::Attributes::CurrentPosition::Set(mLightGenericSwitchEndpointId, newPosition);
+        // InitialPress event takes newPosition as event data
+        Clusters::SwitchServer::Instance().OnInitialPress(mLightGenericSwitchEndpointId, newPosition);
+    });
+}
+
+void LightSwitch::GenericSwitchReleasePress()
+{
+    DeviceLayer::SystemLayer().ScheduleLambda([this] {
+        // Release moves Position from 1 (press) to 0 (idle)
+        uint8_t previousPosition = 1;
+        uint8_t newPosition      = 0;
+
+        Clusters::Switch::Attributes::CurrentPosition::Set(mLightGenericSwitchEndpointId, newPosition);
+        // ShortRelease event takes previousPosition as event data
+        Clusters::SwitchServer::Instance().OnShortRelease(mLightGenericSwitchEndpointId, previousPosition);
+    });
 }

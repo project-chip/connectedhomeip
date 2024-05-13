@@ -1,0 +1,94 @@
+/*
+ *    Copyright (c) 2022 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+/ {
+	chosen {
+		nordic,pm-ext-flash = &mx25r64;
+	};
+};
+
+
+/ {
+	/*
+	* In some default configurations within the nRF Connect SDK,
+	* e.g. on nRF52840, the chosen zephyr,entropy node is &cryptocell.
+	* This devicetree overlay ensures that default is overridden wherever it
+	* is set, as this application uses the RNG node for entropy exclusively.
+	*/
+	chosen {
+		zephyr,entropy = &rng;
+	};
+
+	/*
+	* Configure LED2 and LED3 to show the state of the
+	* window cover,by using the LED's brightness level.
+	*/
+	aliases {
+		pwm-led1 = &pwm_led1;
+		pwm-led2 = &pwm_led2;
+	};
+
+	pwmleds {
+		pwm_led1: pwm_led_1 {
+			pwms = <&pwm0 1 PWM_MSEC(20) PWM_POLARITY_INVERTED>;
+		};
+		pwm_led2: pwm_led_2 {
+			pwms = <&pwm0 2 PWM_MSEC(20) PWM_POLARITY_INVERTED>;
+		};
+	};
+};
+
+/* Disable unused peripherals to reduce power consumption */
+&adc {
+	status = "disabled";
+};
+&uart1 {
+	status = "disabled";
+};
+&i2c0 {
+	status = "disabled";
+};
+&spi1 {
+	status = "disabled";
+};
+&spi3 {
+	status = "disabled";
+};
+&usbd {
+	status = "disabled";
+};
+
+&pwm0 {
+	pinctrl-0 = <&pwm0_default_alt>;
+	pinctrl-1 = <&pwm0_sleep_alt>;
+	pinctrl-names = "default", "sleep";
+};
+
+&pinctrl {
+	pwm0_default_alt: pwm0_default_alt {
+		group1 {
+			psels = <NRF_PSEL(PWM_OUT1, 0, 14)>, <NRF_PSEL(PWM_OUT2, 0, 15)>;
+			nordic,invert;
+		};
+	};
+
+	pwm0_sleep_alt: pwm0_sleep_alt {
+		group1 {
+			psels = <NRF_PSEL(PWM_OUT1, 0, 14)>, <NRF_PSEL(PWM_OUT2, 0, 15)>;
+			low-power-enable;
+		};
+	};
+};

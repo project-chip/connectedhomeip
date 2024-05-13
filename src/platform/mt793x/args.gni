@@ -1,0 +1,48 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/mt793x_sdk.gni")
+import("//build_overrides/pigweed.gni")
+
+import("${chip_root}/examples/platform/mt793x/args.gni")
+
+# ARM architecture flags will be set based on mt793x_family.
+arm_platform_config = "${mt793x_sdk_build_root}/mt793x_arm.gni"
+
+mbedtls_target = "${mt793x_sdk_build_root}:mt793x_sdk"
+
+chip_device_platform = "mt793x"
+
+# Network configuration
+
+lwip_platform = "mt793x"
+
+# Use our porting instad of //third_party/lwip
+
+lwip_root = "${mt793x_sdk_build_root}/mt793x_lwip"
+
+chip_mdns = "platform"
+chip_inet_config_enable_ipv4 = true
+
+chip_build_libshell = true
+
+chip_build_tests = false
+
+chip_config_memory_management = "platform"
+
+pw_build_LINK_DEPS = [
+  "$dir_pw_assert:impl",
+  "$dir_pw_log:impl",
+]

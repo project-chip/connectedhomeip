@@ -17,7 +17,7 @@ name: Audio Output Cluster Tests
 config:
     nodeId: 0x12344321
     cluster: "Audio Output"
-    endpoint: 2
+    endpoint: 1
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -34,9 +34,9 @@ tests:
       response:
           value:
               [
-                  { index: 1, outputType: 0, name: "HDMI" },
-                  { index: 2, outputType: 0, name: "HDMI" },
-                  { index: 3, outputType: 0, name: "HDMI" },
+                  { Index: 1, OutputType: 0, Name: "HDMI" },
+                  { Index: 2, OutputType: 0, Name: "HDMI" },
+                  { Index: 3, OutputType: 0, Name: "HDMI" },
               ]
 
     - label: "Read attribute current audio output"
@@ -46,19 +46,19 @@ tests:
           value: 1
 
     - label: "Select Output Command"
-      command: "selectOutput"
+      command: "SelectOutput"
       arguments:
           values:
-              - name: "index"
+              - name: "Index"
                 value: 1
 
     - label: "Rename Output Command"
-      command: "renameOutput"
+      command: "RenameOutput"
       arguments:
           values:
-              - name: "index"
+              - name: "Index"
                 value: 1
-              - name: "name"
+              - name: "Name"
                 value: "HDMI Test"
 
     - label: "Read attribute Audio Output list"
@@ -67,7 +67,7 @@ tests:
       response:
           value:
               [
-                  { index: 1, outputType: 0, name: "HDMI Test" },
-                  { index: 2, outputType: 0, name: "HDMI" },
-                  { index: 3, outputType: 0, name: "HDMI" },
+                  { Index: 1, OutputType: 0, Name: "HDMI Test" },
+                  { Index: 2, OutputType: 0, Name: "HDMI" },
+                  { Index: 3, OutputType: 0, Name: "HDMI" },
               ]

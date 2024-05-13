@@ -19,6 +19,7 @@
 #pragma once
 
 #include <lib/support/BitFlags.h>
+#include <lib/support/BitMask.h>
 #include <lib/support/Span.h>
 
 #include <type_traits>
@@ -43,6 +44,12 @@ struct IsBasicType<BitFlags<X>>
     static constexpr bool value = true;
 };
 
+template <typename X>
+struct IsBasicType<BitMask<X>>
+{
+    static constexpr bool value = true;
+};
+
 template <>
 struct IsBasicType<ByteSpan>
 {
@@ -50,7 +57,19 @@ struct IsBasicType<ByteSpan>
 };
 
 template <>
+struct IsBasicType<MutableByteSpan>
+{
+    static constexpr bool value = true;
+};
+
+template <>
 struct IsBasicType<CharSpan>
+{
+    static constexpr bool value = true;
+};
+
+template <>
+struct IsBasicType<MutableCharSpan>
 {
     static constexpr bool value = true;
 };

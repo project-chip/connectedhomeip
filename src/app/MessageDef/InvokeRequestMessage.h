@@ -17,10 +17,10 @@
 
 #pragma once
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -41,22 +41,9 @@ enum class Tag : uint8_t
 class Parser : public MessageParser
 {
 public:
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    /**
-     *  @brief Roughly verify the message is correctly formed
-     *   1) all mandatory tags are present
-     *   2) all elements have expected data type
-     *   3) any tag can only appear once
-     *   4) At the top level of the structure, unknown tags are ignored for forward compatibility
-     *  @note The main use of this function is to print out what we're
-     *    receiving during protocol development and debugging.
-     *    The encoding rule has changed in IM encoding spec so this
-     *    check is only "roughly" conformant now.
-     *
-     *  @return #CHIP_NO_ERROR on success
-     */
-    CHIP_ERROR CheckSchemaValidity() const;
-#endif
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+    CHIP_ERROR PrettyPrint() const;
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
     /**
      *  @brief Get SuppressResponse. Next() must be called before accessing them.
@@ -89,6 +76,12 @@ class Builder : public MessageBuilder
 {
 public:
     /**
+     *  @brief Performs underlying StructBuilder::Init, but reserves memory need in
+     *  EndOfInvokeRequestMessage() with underlying TLVWriter.
+     */
+    CHIP_ERROR InitWithEndBufferReserved(TLV::TLVWriter * const apWriter);
+
+    /**
      *  @brief when sets to true, it means do not send a response to this action
      */
     InvokeRequestMessage::Builder & SuppressResponse(const bool aSuppressResponse);
@@ -103,7 +96,7 @@ public:
      *
      *  @return A reference to InvokeRequests::Builder
      */
-    InvokeRequests::Builder & CreateInvokeRequests();
+    InvokeRequests::Builder & CreateInvokeRequests(const bool aReserveEndBuffer = false);
 
     /**
      *  @brief Get reference to InvokeRequests::Builder
@@ -115,12 +108,20 @@ public:
     /**
      *  @brief Mark the end of this InvokeRequestMessage
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    InvokeRequestMessage::Builder & EndOfInvokeRequestMessage();
+    CHIP_ERROR EndOfInvokeRequestMessage();
+
+    /**
+     *  @brief Get number of bytes required in the buffer by EndOfInvokeRequestMessage()
+     *
+     *  @return Expected number of bytes required in the buffer by EndOfInvokeRequestMessage()
+     */
+    uint32_t GetSizeToEndInvokeRequestMessage();
 
 private:
     InvokeRequests::Builder mInvokeRequests;
+    bool mIsEndBufferReserved = false;
 };
 } // namespace InvokeRequestMessage
 } // namespace app

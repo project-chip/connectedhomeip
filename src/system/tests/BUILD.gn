@@ -14,7 +14,6 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
@@ -31,12 +30,23 @@ chip_test_suite("tests") {
     "TestTimeSource.cpp",
   ]
 
+  if (chip_device_platform != "fake") {
+    test_sources += [ "TestSystemScheduleWork.cpp" ]
+  }
+
+  # SystemPacketBuffer on nrfconnect and openiotsdk uses LwIP buffers, which ignore the
+  #  requested allocation size and always allocate at max-size.  So our test,
+  #  which tries to size-limit the buffers, does not work correctly there.
+  if (chip_device_platform != "nrfconnect" &&
+      chip_device_platform != "openiotsdk") {
+    test_sources += [ "TestTLVPacketBufferBackingStore.cpp" ]
+  }
+
   cflags = [ "-Wconversion" ]
 
   public_deps = [
     "${chip_root}/src/inet",
     "${chip_root}/src/platform",
     "${chip_root}/src/system",
-    "${nlunit_test_root}:nlunit-test",
   ]
 }

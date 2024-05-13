@@ -3,7 +3,6 @@
 #include <cstdint>
 #include <cinttypes>
 
-#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -14,9 +13,6 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/TypeTraits.h>
 
-// Currently we need some work to keep compatible with ember lib.
-#include <app/util/ember-compatibility-functions.h>
-
 namespace chip {
 namespace app {
 
@@ -25,6 +21,7 @@ namespace app {
 namespace Clusters {
 
 {{#all_user_clusters_with_incoming_commands}}
+{{#unless (isInConfigList clusterName "CommandHandlerInterfaceOnlyClusters")}}
 {{#if (isServer clusterSide)}}
 namespace {{asUpperCamelCase clusterName}} {
 
@@ -39,7 +36,12 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         {
     {{/first}}
         case Commands::{{asUpperCamelCase commandName}}::Id: {
-        {{> im_command_handler_cluster_commands}}
+            Commands::{{asUpperCamelCase commandName}}::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAf{{asUpperCamelCase parent.clusterName}}Cluster{{asUpperCamelCase commandName}}Callback(apCommandObj, aCommandPath, commandData);
+            }
             break;
         }
     {{#last}}
@@ -64,23 +66,24 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 }
 
 {{/if}}
+{{/unless}}
 {{/all_user_clusters_with_incoming_commands}}
 
 } // namespace Clusters
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aReader, CommandHandler * apCommandObj)
 {
-    Compatibility::SetupEmberAfCommandHandler(apCommandObj, aCommandPath);
-
     switch (aCommandPath.mClusterId)
     {
-    {{#chip_server_clusters}}
-    {{#if (user_cluster_has_enabled_command name side)}}
-    case Clusters::{{asUpperCamelCase name}}::Id:
-        Clusters::{{asUpperCamelCase name}}::Dispatch{{asUpperCamelCase side}}Command(apCommandObj, aCommandPath, aReader);
+    {{#all_user_clusters_with_incoming_commands}}
+    {{#unless (isInConfigList clusterName "CommandHandlerInterfaceOnlyClusters")}}
+    {{#if (isServer clusterSide)}}
+    case Clusters::{{asUpperCamelCase clusterName}}::Id:
+        Clusters::{{asUpperCamelCase clusterName}}::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     {{/if}}
-    {{/chip_server_clusters}}
+    {{/unless}}
+    {{/all_user_clusters_with_incoming_commands}}
     default:
         ChipLogError(Zcl, "Unknown cluster " ChipLogFormatMEI, ChipLogValueMEI(aCommandPath.mClusterId));
         apCommandObj->AddStatus(
@@ -89,8 +92,6 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV:
         );
         break;
     }
-
-    Compatibility::ResetEmberAfObjects();
 }
 
 } // namespace app

@@ -36,241 +36,82 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
+RamStorage K32WConfig::sFactoryStorage{ kNvmId_Factory, "Factory" };
+RamStorage K32WConfig::sConfigStorage{ kNvmId_Config, "Config" };
+RamStorage K32WConfig::sCounterStorage{ kNvmId_Counter, "Counter" };
+
+const K32WConfig::Key K32WConfig::kConfigKey_SerialNum{ &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x00 };
+const K32WConfig::Key K32WConfig::kConfigKey_MfrDeviceId{ &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x01 };
+const K32WConfig::Key K32WConfig::kConfigKey_MfrDeviceCert{ &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x02 };
+const K32WConfig::Key K32WConfig::kConfigKey_MfrDevicePrivateKey{ &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x03 };
+const K32WConfig::Key K32WConfig::kConfigKey_ManufacturingDate{ &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x04 };
+const K32WConfig::Key K32WConfig::kConfigKey_SetupPinCode{ &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x05 };
+const K32WConfig::Key K32WConfig::kConfigKey_MfrDeviceICACerts{ &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x06 };
+const K32WConfig::Key K32WConfig::kConfigKey_HardwareVersion{ &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x07 };
+const K32WConfig::Key K32WConfig::kConfigKey_SetupDiscriminator{ &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x08 };
+const K32WConfig::Key K32WConfig::kConfigKey_Spake2pIterationCount{ &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x09 };
+const K32WConfig::Key K32WConfig::kConfigKey_Spake2pSalt{ &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x0A };
+const K32WConfig::Key K32WConfig::kConfigKey_Spake2pVerifier{ &K32WConfig::sFactoryStorage, kKeyId_Factory, 0x0B };
+
+const K32WConfig::Key K32WConfig::kConfigKey_ServiceConfig{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x01 };
+const K32WConfig::Key K32WConfig::kConfigKey_PairedAccountId{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x02 };
+const K32WConfig::Key K32WConfig::kConfigKey_ServiceId{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x03 };
+const K32WConfig::Key K32WConfig::kConfigKey_LastUsedEpochKeyId{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x05 };
+const K32WConfig::Key K32WConfig::kConfigKey_FailSafeArmed{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x06 };
+const K32WConfig::Key K32WConfig::kConfigKey_RegulatoryLocation{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x07 };
+const K32WConfig::Key K32WConfig::kConfigKey_CountryCode{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x08 };
+const K32WConfig::Key K32WConfig::kConfigKey_UniqueId{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x0A };
+const K32WConfig::Key K32WConfig::kConfigKey_SoftwareVersion{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x0B };
+const K32WConfig::Key K32WConfig::kConfigKey_SoftwareUpdateCompleted{ &K32WConfig::sConfigStorage, kKeyId_Config, 0x0C };
+
+const K32WConfig::Key K32WConfig::kCounterKey_RebootCount{ &K32WConfig::sCounterStorage, kKeyId_Counter, 0x00 };
+const K32WConfig::Key K32WConfig::kCounterKey_UpTime{ &K32WConfig::sCounterStorage, kKeyId_Counter, 0x01 };
+const K32WConfig::Key K32WConfig::kCounterKey_TotalOperationalHours{ &K32WConfig::sCounterStorage, kKeyId_Counter, 0x02 };
+const K32WConfig::Key K32WConfig::kCounterKey_BootReason{ &K32WConfig::sCounterStorage, kKeyId_Counter, 0x03 };
+
 CHIP_ERROR K32WConfig::Init()
 {
-    CHIP_ERROR err;
-    int pdmStatus;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    /* Initialise the Persistent Data Manager */
-    pdmStatus = PDM_Init();
-    SuccessOrExit(err = MapPdmInitStatus(pdmStatus));
-
-exit:
-    return err;
-}
-
-CHIP_ERROR K32WConfig::ReadConfigValue(Key key, bool & val)
-{
-    CHIP_ERROR err;
-    bool tempVal;
-    uint16_t bytesRead;
-    PDM_teStatus pdmStatus;
-
-    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-    pdmStatus = PDM_eReadDataFromRecord((uint16_t) key, &tempVal, sizeof(bool), &bytesRead);
-    SuccessOrExit(err = MapPdmStatus(pdmStatus));
-    val = tempVal;
+    err = sFactoryStorage.Init(RamStorage::kRamBufferInitialSize);
+    SuccessOrExit(err);
+    err = sConfigStorage.Init(RamStorage::kRamBufferInitialSize);
+    SuccessOrExit(err);
+    err = sCounterStorage.Init(RamStorage::kRamBufferInitialSize);
+    SuccessOrExit(err);
 
 exit:
-    return err;
-}
-
-CHIP_ERROR K32WConfig::ReadConfigValue(Key key, uint32_t & val)
-{
-    CHIP_ERROR err;
-    uint32_t tempVal;
-    uint16_t bytesRead;
-    uint16_t recordSize;
-    PDM_teStatus pdmStatus;
-
-    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-    if (PDM_bDoesDataExist((uint16_t) key, &recordSize))
+    if (err != CHIP_NO_ERROR)
     {
-        pdmStatus = PDM_eReadDataFromRecord((uint16_t) key, &tempVal, sizeof(uint32_t), &bytesRead);
-        SuccessOrExit(err = MapPdmStatus(pdmStatus));
-        val = tempVal;
+        sFactoryStorage.FreeBuffer();
+        sConfigStorage.FreeBuffer();
+        sCounterStorage.FreeBuffer();
     }
-    else
-    {
-        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-        goto exit;
-    }
-
-exit:
-    return err;
-}
-
-CHIP_ERROR K32WConfig::ReadConfigValue(Key key, uint64_t & val)
-{
-    CHIP_ERROR err;
-    uint64_t tempVal;
-    uint16_t bytesRead;
-    uint16_t recordSize;
-    PDM_teStatus pdmStatus;
-
-    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-
-    if (PDM_bDoesDataExist((uint16_t) key, &recordSize))
-    {
-        pdmStatus = PDM_eReadDataFromRecord((uint16_t) key, &tempVal, sizeof(uint64_t), &bytesRead);
-        SuccessOrExit(err = MapPdmStatus(pdmStatus));
-        val = tempVal;
-    }
-    else
-    {
-        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-        goto exit;
-    }
-
-exit:
     return err;
 }
 
 CHIP_ERROR K32WConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
     CHIP_ERROR err;
-    const uint8_t * strEnd;
-    char * pData = NULL;
-    uint16_t bytesRead;
-    uint16_t recordSize;
-    PDM_teStatus pdmStatus;
+    uint16_t sizeToRead = bufSize;
 
-    outLen = 0;
+    err = key.Read((uint8_t *) buf, sizeToRead);
+    SuccessOrExit(err);
 
-    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-
-    if (PDM_bDoesDataExist((uint16_t) key, &recordSize))
-    {
-        pData = (char *) pvPortMalloc(recordSize);
-        VerifyOrExit((pData != NULL), err = CHIP_ERROR_NO_MEMORY);
-
-        pdmStatus = PDM_eReadDataFromRecord((uint16_t) key, pData, recordSize, &bytesRead);
-        SuccessOrExit(err = MapPdmStatus(pdmStatus));
-
-        strEnd = (const uint8_t *) memchr(pData, 0, bytesRead);
-        VerifyOrExit(strEnd != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-        outLen = strEnd - (const uint8_t *) pData;
-
-        // NOTE: the caller is allowed to pass NULL for buf to query the length of the stored value.
-
-        if (buf != NULL)
-        {
-            VerifyOrExit(bufSize > outLen, err = CHIP_ERROR_BUFFER_TOO_SMALL);
-
-            memcpy(buf, pData, outLen + 1);
-        }
-    }
-    else
-    {
-        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-        goto exit;
-    }
-
+    outLen = sizeToRead;
 exit:
-    if (pData != NULL)
-    {
-        vPortFree((void *) pData);
-    }
     return err;
 }
 
 CHIP_ERROR K32WConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
-    CHIP_ERROR err;
-    uint8_t * pData = NULL;
-    uint16_t bytesRead;
-    uint16_t recordSize;
-    PDM_teStatus pdmStatus;
-
-    outLen = 0;
-
-    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-
-    if (PDM_bDoesDataExist((uint16_t) key, &recordSize))
-    {
-        pData = (uint8_t *) pvPortMalloc(recordSize);
-        VerifyOrExit((pData != NULL), err = CHIP_ERROR_NO_MEMORY);
-
-        pdmStatus = PDM_eReadDataFromRecord((uint16_t) key, pData, recordSize, &bytesRead);
-        SuccessOrExit(err = MapPdmStatus(pdmStatus));
-
-        if (buf != NULL)
-        {
-            VerifyOrExit((bufSize >= bytesRead), err = CHIP_ERROR_BUFFER_TOO_SMALL);
-            memcpy(buf, pData, bytesRead);
-        }
-        outLen = bytesRead;
-    }
-    else
-    {
-        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-        goto exit;
-    }
-
-exit:
-    if (pData != NULL)
-    {
-        vPortFree((void *) pData);
-    }
-
-    return err;
+    return ReadConfigValueStr(key, (char *) buf, bufSize, outLen);
 }
 
 CHIP_ERROR K32WConfig::ReadConfigValueCounter(uint8_t counterIdx, uint32_t & val)
 {
-    CHIP_ERROR err;
-    uint32_t tempVal;
-    uint16_t bytesRead;
-    uint16_t recordSize;
-    PDM_teStatus pdmStatus;
-
-    Key key = kMinConfigKey_ChipCounter + counterIdx;
-    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-
-    if (PDM_bDoesDataExist((uint16_t) key, &recordSize))
-    {
-        pdmStatus = PDM_eReadDataFromRecord((uint16_t) key, &tempVal, sizeof(uint32_t), &bytesRead);
-        SuccessOrExit(err = MapPdmStatus(pdmStatus));
-        val = tempVal;
-    }
-    else
-    {
-        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-        goto exit;
-    }
-
-exit:
-    return err;
-}
-
-CHIP_ERROR K32WConfig::WriteConfigValue(Key key, bool val)
-{
-    CHIP_ERROR err;
-    PDM_teStatus pdmStatus;
-
-    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-    pdmStatus = PDM_eSaveRecordData((uint16_t) key, &val, sizeof(bool));
-    SuccessOrExit(err = MapPdmStatus(pdmStatus));
-
-exit:
-    return err;
-}
-
-CHIP_ERROR K32WConfig::WriteConfigValue(Key key, uint32_t val)
-{
-    CHIP_ERROR err;
-    PDM_teStatus pdmStatus;
-
-    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-    pdmStatus = PDM_eSaveRecordData((uint16_t) key, &val, sizeof(uint32_t));
-    SuccessOrExit(err = MapPdmStatus(pdmStatus));
-
-exit:
-    return err;
-}
-
-CHIP_ERROR K32WConfig::WriteConfigValue(Key key, uint64_t val)
-{
-    CHIP_ERROR err;
-    PDM_teStatus pdmStatus;
-
-    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-    pdmStatus = PDM_eSaveRecordData((uint16_t) key, &val, sizeof(uint64_t));
-    SuccessOrExit(err = MapPdmStatus(pdmStatus));
-
-exit:
-    return err;
+    Key key{ &sCounterStorage, kKeyId_Counter, counterIdx };
+    return ReadConfigValue(key, val);
 }
 
 CHIP_ERROR K32WConfig::WriteConfigValueStr(Key key, const char * str)
@@ -280,207 +121,41 @@ CHIP_ERROR K32WConfig::WriteConfigValueStr(Key key, const char * str)
 
 CHIP_ERROR K32WConfig::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
-    CHIP_ERROR err;
-    PDM_teStatus pdmStatus;
-
-    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-
-    if (str != NULL)
-    {
-        uint8_t * pData = (uint8_t *) pvPortMalloc(strLen + 1);
-
-        if (pData != NULL)
-        {
-            memcpy(pData, str, strLen);
-            pData[strLen] = '\0';
-            pdmStatus     = PDM_eSaveRecordData((uint16_t) key, (void *) pData, strLen + 1);
-            vPortFree((void *) pData);
-            SuccessOrExit(err = MapPdmStatus(pdmStatus));
-        }
-        else
-        {
-            err = CHIP_ERROR_NO_MEMORY;
-        }
-    }
-    else
-    {
-        err = ClearConfigValue(key);
-        SuccessOrExit(err);
-    }
-
-exit:
-    return err;
+    return key.Write((uint8_t *) str, strLen);
 }
 
 CHIP_ERROR K32WConfig::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
-    CHIP_ERROR err;
-    PDM_teStatus pdmStatus;
-
-    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-
-    if ((data != NULL) && (dataLen > 0))
-    {
-        pdmStatus = PDM_eSaveRecordData((uint16_t) key, (void *) data, dataLen);
-        SuccessOrExit(err = MapPdmStatus(pdmStatus));
-    }
-    else
-    {
-        err = ClearConfigValue(key);
-        SuccessOrExit(err);
-    }
-
-exit:
-    return err;
+    return WriteConfigValueStr(key, (char *) data, dataLen);
 }
 
 CHIP_ERROR K32WConfig::WriteConfigValueCounter(uint8_t counterIdx, uint32_t val)
 {
-    CHIP_ERROR err;
-    PDM_teStatus pdmStatus;
-
-    Key key = kMinConfigKey_ChipCounter + counterIdx;
-    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-    pdmStatus = PDM_eSaveRecordData((uint16_t) key, &val, sizeof(uint32_t));
-    SuccessOrExit(err = MapPdmStatus(pdmStatus));
-
-exit:
-    return err;
+    Key key{ &sCounterStorage, kKeyId_Counter, counterIdx };
+    return WriteConfigValue(key, val);
 }
 
 CHIP_ERROR K32WConfig::ClearConfigValue(Key key)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-    PDM_vDeleteDataRecord((uint16_t) key);
-
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    return key.Delete();
 }
 
 bool K32WConfig::ConfigValueExists(Key key)
 {
     CHIP_ERROR err;
-    uint16_t size = 0;
+    uint16_t sizeToRead;
+    err = key.Read(NULL, sizeToRead);
 
-    VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
-    VerifyOrExit(PDM_bDoesDataExist((uint16_t) key, &size), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
-
-exit:
-    // Return true if the record was found.
-    return (err == CHIP_NO_ERROR);
+    return (err == CHIP_NO_ERROR && sizeToRead != 0);
 }
 
 CHIP_ERROR K32WConfig::FactoryResetConfig(void)
 {
-    CHIP_ERROR err;
+    sConfigStorage.OnFactoryReset();
+    sCounterStorage.OnFactoryReset();
 
-    err = FactoryResetConfigInternal(kMinConfigKey_ChipConfig, kMaxConfigKey_ChipConfig);
-
-    if (err == CHIP_NO_ERROR)
-    {
-        err = FactoryResetConfigInternal(kMinConfigKey_KVS, kMaxConfigKey_KVS);
-    }
-
-    return err;
+    return CHIP_NO_ERROR;
 }
-
-CHIP_ERROR K32WConfig::FactoryResetConfigInternal(Key firstKey, Key lastKey)
-{
-    CHIP_ERROR err;
-
-    // Iterate over all the CHIP Config PDM ID records and delete each one
-    err = ForEachRecord(firstKey, lastKey, false, [](const Key & pdmKey, const size_t & length) -> CHIP_ERROR {
-        CHIP_ERROR err2;
-
-        err2 = ClearConfigValue(pdmKey);
-        SuccessOrExit(err2);
-
-    exit:
-        return err2;
-    });
-
-    // Return success at end of iterations.
-    if (err == CHIP_END_OF_INPUT)
-    {
-        err = CHIP_NO_ERROR;
-    }
-
-    return err;
-}
-
-CHIP_ERROR K32WConfig::MapPdmStatus(PDM_teStatus pdmStatus)
-{
-    CHIP_ERROR err;
-
-    switch (pdmStatus)
-    {
-    case PDM_E_STATUS_OK:
-        err = CHIP_NO_ERROR;
-        break;
-    default:
-        err = CHIP_ERROR(ChipError::Range::kPlatform, pdmStatus);
-        break;
-    }
-
-    return err;
-}
-
-CHIP_ERROR K32WConfig::MapPdmInitStatus(int pdmStatus)
-{
-    return (pdmStatus == 0) ? CHIP_NO_ERROR : CHIP_ERROR(ChipError::Range::kPlatform, pdmStatus);
-}
-
-bool K32WConfig::ValidConfigKey(Key key)
-{
-    // Returns true if the key is in the valid CHIP Config PDM key range.
-
-    if ((key >= kMinConfigKey_ChipFactory) && (key <= kMaxConfigKey_KVS))
-    {
-        return true;
-    }
-
-    return false;
-}
-
-CHIP_ERROR K32WConfig::ForEachRecord(Key firstKey, Key lastKey, bool addNewRecord, ForEachRecordFunct funct)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    for (Key pdmKey = firstKey; pdmKey <= lastKey; pdmKey++)
-    {
-        uint16_t dataLen;
-
-        if (PDM_bDoesDataExist((uint16_t) pdmKey, &dataLen))
-        {
-            if (!addNewRecord)
-            {
-                // Invoke the caller's function
-                // (for retrieve,store,delete,enumerate GroupKey operations).
-                err = funct(pdmKey, dataLen);
-            }
-        }
-        else
-        {
-            if (addNewRecord)
-            {
-                // Invoke caller's function
-                // (for add GroupKey operation).
-                err = funct(pdmKey, dataLen);
-            }
-        }
-
-        SuccessOrExit(err);
-    }
-
-exit:
-    return err;
-}
-
-void K32WConfig::RunConfigUnitTest() {}
 
 } // namespace Internal
 } // namespace DeviceLayer

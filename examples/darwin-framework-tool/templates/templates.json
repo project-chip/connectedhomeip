@@ -1,0 +1,53 @@
+{
+    "name": "CHIP Tool Darwin templates",
+    "version": "chip-v1",
+    "helpers": [
+        "chip-tool/templates/helper.js",
+        "common/StringHelper.js",
+        "partials/helper.js",
+        "templates/app/helper.js",
+        "templates/chip/helper.js",
+        "common/ClusterTestGeneration.js",
+        "darwin/Framework/CHIP/templates/helper.js"
+    ],
+    "resources": {
+        "pics-metafile": "../../../src/app/tests/suites/certification/PICS.yaml",
+        "certification-metadir": "../../../src/app/tests/suites/certification",
+        "test-metadir": "../../../src/app/tests/suites",
+        "availability-data": "../../../src/darwin/Framework/CHIP/templates/availability.yaml"
+    },
+    "override": "../../../src/app/zap-templates/common/override.js",
+    "partials": [
+        {
+            "name": "header",
+            "path": "../../../src/app/zap-templates/partials/header.zapt"
+        },
+        {
+            "name": "clusters_header",
+            "path": "../../../src/app/zap-templates/partials/clusters_header.zapt"
+        },
+        {
+            "name": "cluster_header",
+            "path": "../../../src/app/zap-templates/partials/cluster_header.zapt"
+        },
+        {
+            "name": "encode_value",
+            "path": "../../../src/darwin/Framework/CHIP/templates/partials/encode_value.zapt"
+        },
+        {
+            "name": "decodable_value",
+            "path": "partials/decodable_value.zapt"
+        },
+        {
+            "name": "decode_value",
+            "path": "../../../src/darwin/Framework/CHIP/templates/partials/decode_value.zapt"
+        }
+    ],
+    "templates": [
+        {
+            "path": "commands.zapt",
+            "name": "Cluster Commands header",
+            "output": "cluster/Commands.h"
+        }
+    ]
+}

@@ -17,6 +17,14 @@
  */
 
 #include "DeviceWithDisplay.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-enums.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <setup_payload/QRCodeSetupPayloadGenerator.h>
+
+#include <string>
+#include <tuple>
+#include <vector>
 
 #if CONFIG_HAVE_DISPLAY
 using namespace ::chip;
@@ -24,7 +32,7 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
-static const char * TAG = "DeviceWithDisplay";
+static const char TAG[] = "DeviceWithDisplay";
 
 #if CONFIG_DEVICE_TYPE_M5STACK
 
@@ -133,6 +141,39 @@ public:
         return i == 0 ? "+" : "-";
     }
 
+    // We support system modes - Off, Auto, Heat and Cool currently. This API returns true for all these modes,
+    // false otherwise.
+    bool isValidThermostatSystemMode(uint8_t systemMode)
+    {
+        chip::app::Clusters::Thermostat::SystemModeEnum mode =
+            static_cast<chip::app::Clusters::Thermostat::SystemModeEnum>(systemMode);
+        switch (mode)
+        {
+        case chip::app::Clusters::Thermostat::SystemModeEnum::kOff:
+        case chip::app::Clusters::Thermostat::SystemModeEnum::kAuto:
+        case chip::app::Clusters::Thermostat::SystemModeEnum::kCool:
+        case chip::app::Clusters::Thermostat::SystemModeEnum::kHeat:
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    bool isValidThermostatRunningMode(uint8_t runningMode)
+    {
+        chip::app::Clusters::Thermostat::ThermostatRunningModeEnum mode =
+            static_cast<chip::app::Clusters::Thermostat::ThermostatRunningModeEnum>(runningMode);
+        switch (mode)
+        {
+        case chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kOff:
+        case chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kCool:
+        case chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kHeat:
+            return true;
+        default:
+            return false;
+        }
+    }
+
     void DoAction(int i) override
     {
         auto & attribute = this->attribute();
@@ -181,20 +222,171 @@ public:
                 ESP_LOGI(TAG, "Humidity changed to : %d", n);
                 app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(n * 100));
             }
-            else if (name == "OccupiedCoolingSetpoint")
+            else if (name == "CoolSetpoint")
             {
-                ESP_LOGI(TAG, "OccupiedCoolingSetpoint changed to : %d", n);
+                // update the occupied cooling setpoint for hardcoded endpoint 1
+                ESP_LOGI(TAG, "Occupied Cooling Setpoint changed to : %d", n);
                 app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::Set(1, static_cast<int16_t>(n * 100));
             }
-            else if (name == "OccupiedHeatingSetpoint")
+            else if (name == "HeatSetpoint")
             {
-                ESP_LOGI(TAG, "OccupiedHeatingSetpoint changed to : %d", n);
+                // update the occupied heating setpoint for hardcoded endpoint 1
+                ESP_LOGI(TAG, "Occupied Heating Setpoint changed to : %d", n);
                 app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::Set(1, static_cast<int16_t>(n * 100));
             }
             else if (name == "SystemMode")
             {
-                ESP_LOGI(TAG, "SystemMode changed to : %d", n);
-                app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::Set(1, n);
+                // System modes - Off, Auto, Cool and Heat are currently supported.
+                chip::app::Clusters::Thermostat::SystemModeEnum modeEnum =
+                    chip::app::Clusters::Thermostat::SystemModeEnum::kUnknownEnumValue;
+                uint8_t mode = n;
+
+                switch (n)
+                {
+                case 0:
+                    modeEnum = chip::app::Clusters::Thermostat::SystemModeEnum::kOff;
+                    break;
+                case 1:
+                    modeEnum = chip::app::Clusters::Thermostat::SystemModeEnum::kAuto;
+                    break;
+                case 3:
+                    modeEnum = chip::app::Clusters::Thermostat::SystemModeEnum::kCool;
+                    break;
+                case 4:
+                    modeEnum = chip::app::Clusters::Thermostat::SystemModeEnum::kHeat;
+                    break;
+                case 5:
+                    modeEnum = chip::app::Clusters::Thermostat::SystemModeEnum::kEmergencyHeat;
+                    break;
+                case 6:
+                    modeEnum = chip::app::Clusters::Thermostat::SystemModeEnum::kPrecooling;
+                    break;
+                case 7:
+                    modeEnum = chip::app::Clusters::Thermostat::SystemModeEnum::kFanOnly;
+                    break;
+                case 8:
+                    modeEnum = chip::app::Clusters::Thermostat::SystemModeEnum::kDry;
+                    break;
+                case 9:
+                    modeEnum = chip::app::Clusters::Thermostat::SystemModeEnum::kSleep;
+                    break;
+                default:
+                    modeEnum = chip::app::Clusters::Thermostat::SystemModeEnum::kUnknownEnumValue;
+                    break;
+                }
+
+                // Update the system mode here for hardcoded endpoint 1
+                if (isValidThermostatSystemMode(mode))
+                {
+                    ESP_LOGI(TAG, "System Mode changed to : %d", mode);
+                    app::Clusters::Thermostat::Attributes::SystemMode::Set(1, modeEnum);
+                    // If system mode is auto set running mode to off otherwise set it to what the system mode is set to
+                    if (modeEnum == chip::app::Clusters::Thermostat::SystemModeEnum::kAuto)
+                    {
+                        app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Set(
+                            1, chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kOff);
+                    }
+                    else
+                    {
+                        if (isValidThermostatRunningMode(mode))
+                        {
+                            ESP_LOGI(TAG, "Running Mode changed to : %d", mode);
+                            chip::app::Clusters::Thermostat::ThermostatRunningModeEnum runningModeEnum;
+                            switch (mode)
+                            {
+                            case 0:
+                                runningModeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kOff;
+                                break;
+                            case 3:
+                                runningModeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kCool;
+                                break;
+                            case 4:
+                                runningModeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kHeat;
+                                break;
+                            default:
+                                runningModeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kUnknownEnumValue;
+                                break;
+                            }
+                            app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Set(1, runningModeEnum);
+                        }
+                        else
+                        {
+                            ESP_LOGI(TAG, "Running Mode %d is not valid", mode);
+                        }
+                    }
+                }
+                else
+                {
+                    ESP_LOGI(TAG, "System Mode %d is not valid", mode);
+                }
+            }
+            else if (name == "RunningMode")
+            {
+                // Get the system mode
+                chip::app::Clusters::Thermostat::SystemModeEnum systemMode = chip::app::Clusters::Thermostat::SystemModeEnum::kOff;
+                app::Clusters::Thermostat::Attributes::SystemMode::Get(1, &systemMode);
+                if (systemMode != chip::app::Clusters::Thermostat::SystemModeEnum::kAuto)
+                {
+                    ESP_LOGI(TAG, "Running mode can be changed only for system mode auto. Current system mode %d",
+                             static_cast<int>(systemMode));
+                }
+                else
+                {
+                    uint8_t mode = n;
+                    chip::app::Clusters::Thermostat::ThermostatRunningModeEnum modeEnum =
+                        chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kUnknownEnumValue;
+                    // update the running mode here for hardcoded endpoint 1
+                    if (isValidThermostatRunningMode(mode))
+                    {
+                        ESP_LOGI(TAG, "Running Mode changed to : %d", mode);
+                        switch (n)
+                        {
+                        case 0:
+                            modeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kOff;
+                            break;
+                        case 3:
+                            modeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kCool;
+                            break;
+                        case 4:
+                            modeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kHeat;
+                            break;
+                        default:
+                            modeEnum = chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kUnknownEnumValue;
+                            break;
+                        }
+                        app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Set(1, modeEnum);
+                    }
+                    else
+                    {
+                        ESP_LOGI(TAG, "Running Mode %d is not valid", mode);
+                    }
+                }
+            }
+            else if (name == "Current Lift")
+            {
+                // update the current lift here for hardcoded endpoint 1
+                ESP_LOGI(TAG, "Current position lift percent 100ths changed to : %d", n * 100);
+                app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::Set(1, static_cast<uint16_t>(n * 100));
+            }
+            else if (name == "Current Tilt")
+            {
+                // update the current tilt here for hardcoded endpoint 1
+                ESP_LOGI(TAG, "Current position tilt percent 100ths changed to : %d", n * 100);
+                app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::Set(1, static_cast<uint16_t>(n * 100));
+            }
+            else if (name == "Opr Status")
+            {
+                // update the operational status here for hardcoded endpoint 1
+                ESP_LOGI(TAG, "Operational status changed to : %d", n);
+                chip::BitFlags<app::Clusters::WindowCovering::OperationalStatus> opStatus =
+                    static_cast<chip::BitFlags<app::Clusters::WindowCovering::OperationalStatus>>(n);
+                app::Clusters::WindowCovering::Attributes::OperationalStatus::Set(1, opStatus);
+            }
+            else if (name == "Bat remaining")
+            {
+                // update the battery percent remaining here for hardcoded endpoint 1
+                ESP_LOGI(TAG, "Battery percent remaining changed to : %d", n);
+                app::Clusters::PowerSource::Attributes::BatPercentRemaining::Set(1, static_cast<uint8_t>(n * 2));
             }
             value = buffer;
         }
@@ -205,16 +397,15 @@ public:
 
             if (name == "OnOff" && cluster == "OnOff")
             {
-                value                  = (value == "On") ? "Off" : "On";
-                uint8_t attributeValue = (value == "On") ? 1 : 0;
-                emberAfWriteServerAttribute(endpointIndex + 1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID,
-                                            (uint8_t *) &attributeValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+                value               = (value == "On") ? "Off" : "On";
+                bool attributeValue = (value == "On");
+                app::Clusters::OnOff::Attributes::OnOff::Set(endpointIndex + 1, attributeValue);
             }
 
             if (name == "Occupancy" && cluster == "Occupancy Sensor")
             {
-                value                  = (value == "Yes") ? "No" : "Yes";
-                uint8_t attributeValue = (value == "Yes") ? 1 : 0;
+                value               = (value == "Yes") ? "No" : "Yes";
+                bool attributeValue = (value == "Yes");
                 ESP_LOGI(TAG, "Occupancy changed to : %s", value.c_str());
                 // update the current occupancy here for hardcoded endpoint 1
                 app::Clusters::OccupancySensing::Attributes::Occupancy::Set(1, attributeValue);
@@ -223,17 +414,38 @@ public:
         else
         {
             auto & name    = std::get<0>(attribute);
-            auto & cluster = std::get<0>(std::get<1>(std::get<1>(devices[deviceIndex])[endpointIndex])[i]);
+            auto & cluster = std::get<0>(std::get<1>(std::get<1>(devices[deviceIndex])[endpointIndex])[0]);
 
             ESP_LOGI(TAG, "editing attribute as string: '%s' (%s)", value.c_str(), i == 0 ? "+" : "-");
-            value = (value == "Closed") ? "Open" : "Closed";
             ESP_LOGI(TAG, "name and cluster: '%s' (%s)", name.c_str(), cluster.c_str());
-            if (name == "State" && cluster == "Lock")
+            if (name == "Charge level" && cluster == "Power Source")
             {
-                using namespace chip::app::Clusters;
-                // update the doorlock attribute here
-                auto attributeValue = value == "Closed" ? DoorLock::DlLockState::kLocked : DoorLock::DlLockState::kUnlocked;
-                DoorLock::Attributes::LockState::Set(DOOR_LOCK_SERVER_ENDPOINT, attributeValue);
+                using namespace chip::app::Clusters::PowerSource;
+                auto attributeValue = BatChargeLevelEnum::kOk;
+
+                if (value == "OK")
+                {
+                    value          = "Warning";
+                    attributeValue = BatChargeLevelEnum::kWarning;
+                }
+                else if (value == "Warning")
+                {
+                    value          = "Critical";
+                    attributeValue = BatChargeLevelEnum::kCritical;
+                }
+                else
+                {
+                    value          = "OK";
+                    attributeValue = BatChargeLevelEnum::kOk;
+                }
+
+                // update the battery charge level here for hardcoded endpoint 1
+                ESP_LOGI(TAG, "Battery charge level changed to : %u", static_cast<uint8_t>(attributeValue));
+                app::Clusters::PowerSource::Attributes::BatChargeLevel::Set(1, attributeValue);
+            }
+            else
+            {
+                value = (value == "Closed") ? "Open" : "Closed";
             }
         }
     }
@@ -391,25 +603,14 @@ public:
         else if (i == 2)
         {
             chip::Server::GetInstance().GetFabricTable().DeleteAllFabrics();
-            chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(
-                CommissioningWindowManager::MaxCommissioningTimeout(), CommissioningWindowAdvertisement::kDnssdOnly);
+            auto & commissionMgr = chip::Server::GetInstance().GetCommissioningWindowManager();
+            commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(),
+                                                       CommissioningWindowAdvertisement::kDnssdOnly);
         }
     }
 
 private:
     std::vector<std::string> options;
-};
-class CustomScreen : public Screen
-{
-public:
-    virtual void Display()
-    {
-        TFT_drawCircle(0.3 * DisplayWidth, 0.3 * DisplayHeight, 8, TFT_BLUE);
-        TFT_drawCircle(0.7 * DisplayWidth, 0.3 * DisplayHeight, 8, TFT_BLUE);
-        TFT_drawLine(0.2 * DisplayWidth, 0.6 * DisplayHeight, 0.3 * DisplayWidth, 0.7 * DisplayHeight, TFT_BLUE);
-        TFT_drawLine(0.3 * DisplayWidth, 0.7 * DisplayHeight, 0.7 * DisplayWidth, 0.7 * DisplayHeight, TFT_BLUE);
-        TFT_drawLine(0.7 * DisplayWidth, 0.7 * DisplayHeight, 0.8 * DisplayWidth, 0.6 * DisplayHeight, TFT_BLUE);
-    }
 };
 
 void SetupPretendDevices()
@@ -444,13 +645,6 @@ void SetupPretendDevices()
     // write the temp attribute
     chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(21 * 100));
 
-    AddDevice("Door Lock");
-    AddEndpoint("Default");
-    AddCluster("Lock");
-    AddAttribute("State", "Open");
-    // write the door lock state
-    chip::app::Clusters::DoorLock::Attributes::LockState::Set(DOOR_LOCK_SERVER_ENDPOINT,
-                                                              chip::app::Clusters::DoorLock::DlLockState::kUnlocked);
     AddDevice("Garage 1");
     AddEndpoint("Door 1");
     AddCluster("Door");
@@ -488,11 +682,15 @@ void SetupPretendDevices()
     app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(21 * 100));
     app::Clusters::Thermostat::Attributes::LocalTemperature::Set(1, static_cast<int16_t>(21 * 100));
     AddAttribute("SystemMode", "4");
-    app::Clusters::Thermostat::Attributes::SystemMode::Set(1, 4);
-    AddAttribute("OccupiedCoolingSetpoint", "19");
+    app::Clusters::Thermostat::Attributes::SystemMode::Set(1, chip::app::Clusters::Thermostat::SystemModeEnum::kHeat);
+
+    AddAttribute("CoolSetpoint", "19");
     app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::Set(1, static_cast<int16_t>(19 * 100));
-    AddAttribute("OccupiedHeatingSetpoint", "25");
+    AddAttribute("HeatSetpoint", "25");
     app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::Set(1, static_cast<int16_t>(25 * 100));
+    AddAttribute("RunningMode", "4");
+    app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Set(
+        1, chip::app::Clusters::Thermostat::ThermostatRunningModeEnum::kHeat);
 
     AddDevice("Humidity Sensor");
     AddEndpoint("External");
@@ -520,6 +718,26 @@ void SetupPretendDevices()
     app::Clusters::ColorControl::Attributes::CurrentHue::Set(1, 200);
     AddAttribute("Current Saturation\n", "150");
     app::Clusters::ColorControl::Attributes::CurrentSaturation::Set(1, 150);
+
+    AddDevice("Window Covering");
+    AddEndpoint("1");
+    AddCluster("Window Covering");
+    AddAttribute("Current Lift", "5");
+    app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::Set(1, static_cast<uint16_t>(5 * 100));
+    AddAttribute("Current Tilt", "5");
+    app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::Set(1, static_cast<uint16_t>(5 * 100));
+    AddAttribute("Opr Status", "0");
+    chip::BitFlags<app::Clusters::WindowCovering::OperationalStatus> opStatus =
+        static_cast<chip::BitFlags<app::Clusters::WindowCovering::OperationalStatus>>(0);
+    app::Clusters::WindowCovering::Attributes::OperationalStatus::Set(1, opStatus);
+
+    AddDevice("Battery");
+    AddEndpoint("1");
+    AddCluster("Power Source");
+    AddAttribute("Bat remaining", "70");
+    app::Clusters::PowerSource::Attributes::BatPercentRemaining::Set(1, static_cast<uint8_t>(70 * 2));
+    AddAttribute("Charge level", "0");
+    app::Clusters::PowerSource::Attributes::BatChargeLevel::Set(1, app::Clusters::PowerSource::BatChargeLevelEnum::kOk);
 }
 
 esp_err_t InitM5Stack(std::string qrCodeText)
@@ -559,28 +777,21 @@ esp_err_t InitM5Stack(std::string qrCodeText)
                        ESP_LOGI(TAG, "Opening Setup list");
                        ScreenManager::PushScreen(chip::Platform::New<ListScreen>(chip::Platform::New<SetupListModel>()));
                    })
-            ->Item("Status",
-                   [=]() {
-                       ESP_LOGI(TAG, "Opening Status screen");
-                       ScreenManager::PushScreen(chip::Platform::New<StatusScreen>());
-                   })
-            ->Item("Custom",
-                   []() {
-                       ESP_LOGI(TAG, "Opening custom screen");
-                       ScreenManager::PushScreen(chip::Platform::New<CustomScreen>());
-                   })
-            ->Item("More")
-            ->Item("Items")
-            ->Item("For")
-            ->Item("Demo")));
+            ->Item("Status", [=]() {
+                ESP_LOGI(TAG, "Opening Status screen");
+                ScreenManager::PushScreen(chip::Platform::New<StatusScreen>());
+            })));
     return ESP_OK;
 }
 #endif
 
 void InitDeviceDisplay()
 {
-    std::string qrCodeText;
+    // Create buffer for QR code that can fit max size and null terminator.
+    char qrCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
+    chip::MutableCharSpan qrCodeText(qrCodeBuffer);
 
+    // Get QR Code and emulate its content using NFC tag
     GetQRCode(qrCodeText, chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
 
     // Initialize the display device.
@@ -609,12 +820,12 @@ void InitDeviceDisplay()
 
 #if CONFIG_DEVICE_TYPE_M5STACK
 
-    InitM5Stack(qrCodeText);
+    InitM5Stack(qrCodeText.data());
 
 #elif CONFIG_DEVICE_TYPE_ESP32_WROVER_KIT
 
     // Display the QR Code
-    QRCodeScreen qrCodeScreen(qrCodeText);
+    QRCodeScreen qrCodeScreen(qrCodeText.data());
     qrCodeScreen.Display();
 
 #endif

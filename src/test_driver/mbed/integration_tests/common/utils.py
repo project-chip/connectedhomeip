@@ -14,22 +14,21 @@
 # limitations under the License.
 
 
-import sys
-import os
+import logging
 import platform
 import random
-import shlex
 import re
+import shlex
+import sys
 
-from chip.setup_payload import SetupPayload
 from chip import exceptions
+from chip.setup_payload import SetupPayload
 
 if platform.system() == 'Darwin':
     from chip.ChipCoreBluetoothMgr import CoreBluetoothManager as BleManager
 elif sys.platform.startswith('linux'):
     from chip.ChipBluezMgr import BluezManager as BleManager
 
-import logging
 log = logging.getLogger(__name__)
 
 
@@ -48,7 +47,7 @@ def get_device_details(device):
     :return: device details dictionary or None
     """
     ret = device.wait_for_output("SetupQRCode")
-    if ret == None or len(ret) < 2:
+    if ret is None or len(ret) < 2:
         return None
 
     qr_code = re.sub(
@@ -119,13 +118,13 @@ def send_zcl_command(devCtrl, line):
             raise exceptions.UnknownCluster(args[0])
         command = all_commands.get(args[0]).get(args[1], None)
         # When command takes no arguments, (not command) is True
-        if command == None:
+        if command is None:
             raise exceptions.UnknownCommand(args[0], args[1])
         err, res = devCtrl.ZCLSend(args[0], args[1], int(
             args[2]), int(args[3]), int(args[4]), FormatZCLArguments(args[5:], command), blocking=True)
         if err != 0:
             log.error("Failed to send ZCL command [{}] {}.".format(err, res))
-        elif res != None:
+        elif res is not None:
             log.info("Success, received command response:")
             log.info(res)
         else:
@@ -145,7 +144,7 @@ def send_zcl_command(devCtrl, line):
 def scan_chip_ble_devices(devCtrl):
     """
     BLE scan CHIP device
-    BLE scanning for 10 seconds and collect the results 
+    BLE scanning for 10 seconds and collect the results
     :param devCtrl: device controller instance
     :return: List of visible BLE devices
     """
@@ -173,14 +172,14 @@ def check_chip_ble_devices_advertising(devCtrl, name, deviceDetails=None):
     :return: True if device advertise else False
     """
     ble_chip_device = scan_chip_ble_devices(devCtrl)
-    if ble_chip_device == None or len(ble_chip_device) == 0:
+    if ble_chip_device is None or len(ble_chip_device) == 0:
         log.info("No BLE CHIP device found")
         return False
 
     chip_device_found = False
 
     for ble_device in ble_chip_device:
-        if deviceDetails != None:
+        if deviceDetails is not None:
             if (ble_device["name"] == name and
                 int(ble_device["discriminator"]) == int(deviceDetails["Discriminator"]) and
                 int(ble_device["vendorId"]) == int(deviceDetails["VendorID"]) and
@@ -197,14 +196,14 @@ def check_chip_ble_devices_advertising(devCtrl, name, deviceDetails=None):
 
 def connect_device_over_ble(devCtrl, discriminator, pinCode, nodeId=None):
     """
-    Connect to Matter accessory device over BLE 
+    Connect to Matter accessory device over BLE
     :param devCtrl: device controller instance
     :param discriminator: CHIP device discriminator
     :param pinCode: CHIP device pin code
     :param nodeId: default value of node ID
     :return: node ID is provisioning successful, otherwise None
     """
-    if nodeId == None:
+    if nodeId is None:
         nodeId = random.randint(1, 1000000)
 
     try:
@@ -248,7 +247,7 @@ def close_ble(devCtrl):
 
 def commissioning_wifi(devCtrl, ssid, password, nodeId):
     """
-    Commissioning a Wi-Fi device 
+    Commissioning a Wi-Fi device
     :param devCtrl: device controller instance
     :param ssid: network ssid
     :param password: network password
@@ -257,8 +256,14 @@ def commissioning_wifi(devCtrl, ssid, password, nodeId):
     """
 
     # Inject the credentials to the device
-    err, res = send_zcl_command(
-        devCtrl, "NetworkCommissioning AddOrUpdateWiFiNetwork {} 0 0 ssid=str:{} credentials=str:{} breadcrumb=0 timeoutMs=1000".format(nodeId, ssid, password))
+    err, res = send_zcl_command(devCtrl,
+                                "NetworkCommissioning "
+                                "AddOrUpdateWiFiNetwork {} 0 0 "
+                                "ssid=str:{} credentials=str:{} breadcrumb=0 timeoutMs=1000".format(
+                                    nodeId,
+                                    ssid,
+                                    password
+                                ))
     if err != 0 and res["Status"] != 0:
         log.error("Set Wi-Fi credentials failed [{}]".format(err))
         return err
@@ -282,13 +287,10 @@ def resolve_device(devCtrl, nodeId):
     """
     ret = None
     try:
-        err = devCtrl.ResolveNode(int(nodeId))
-        if err == 0:
-            ret = devCtrl.GetAddressAndPort(int(nodeId))
-            if ret == None:
-                log.error("Get address and port failed")
-        else:
-            log.error("Resolve node failed [{}]".format(err))
+        devCtrl.ResolveNode(int(nodeId))
+        ret = devCtrl.GetAddressAndPort(int(nodeId))
+        if ret is None:
+            log.error("Get address and port failed")
     except exceptions.ChipStackException as ex:
         log.error("Resolve node failed {}".format(str(ex)))
 

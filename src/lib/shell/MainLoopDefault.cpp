@@ -69,6 +69,7 @@ size_t ReadLine(char * buffer, size_t max)
                 done = true;
             }
             break;
+        case 0x08:
         case 0x7F:
             // Do not accept backspace character (i.e. don't increment line_sz) and remove 1 additional character if it exists.
             if (line_sz >= 1u)
@@ -141,6 +142,11 @@ int TokenizeLine(char * buffer, char ** tokens, int max_tokens)
                 tokens[cursor++] = &buffer[i + 1];
             }
         }
+    }
+    // If for too many arguments, overwrite last entry with guard.
+    if (cursor >= max_tokens)
+    {
+        cursor = max_tokens - 1;
     }
 
     tokens[cursor] = nullptr;

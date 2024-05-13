@@ -36,7 +36,7 @@
 
 #include <credentials/GroupDataProvider.h>
 
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
 
 #include <transport/raw/PeerAddress.h>
 
@@ -47,9 +47,6 @@
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
-
-// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
-template class GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>;
 
 template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::_OnPlatformEvent(const ChipDeviceEvent * event)
@@ -137,7 +134,7 @@ void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::UpdateThreadInter
     LOCK_TCPIP_CORE();
     Impl()->LockThreadStack();
 
-    // Determine whether the device is attached to a Thread network.
+    // Determine whether the device Thread interface is up..
     isInterfaceUp = GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadInterfaceUpNoLock();
 
     // If needed, adjust the link state of the LwIP netif to reflect the state of the OpenThread stack.
@@ -153,19 +150,6 @@ void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::UpdateThreadInter
         else
         {
             netif_set_link_down(mNetIf);
-        }
-
-        // Post an event signaling the change in Thread interface connectivity state.
-        {
-            ChipDeviceEvent event;
-            event.Clear();
-            event.Type                            = DeviceEventType::kThreadConnectivityChange;
-            event.ThreadConnectivityChange.Result = (isInterfaceUp) ? kConnectivity_Established : kConnectivity_Lost;
-            CHIP_ERROR status                     = PlatformMgr().PostEvent(&event);
-            if (status != CHIP_NO_ERROR)
-            {
-                ChipLogError(DeviceLayer, "Failed to post Thread connectivity change: %" CHIP_ERROR_FORMAT, status.Format());
-            }
         }
 
         // Presume the interface addresses are also changing.
@@ -421,6 +405,10 @@ exit:
         // TODO: deliver CHIP platform event signaling loss of inbound packet.
     }
 }
+
+// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
+// NB: This must come after all templated class members are defined.
+template class GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>;
 
 } // namespace Internal
 } // namespace DeviceLayer

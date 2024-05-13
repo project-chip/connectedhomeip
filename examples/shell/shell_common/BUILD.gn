@@ -40,8 +40,6 @@ static_library("shell_common") {
   sources = [
     "cmd_misc.cpp",
     "cmd_otcli.cpp",
-    "cmd_ping.cpp",
-    "cmd_send.cpp",
     "globals.cpp",
   ]
 
@@ -54,17 +52,10 @@ static_library("shell_common") {
 
   if (chip_enable_openthread &&
       (current_os == "freertos" || current_os == "zephyr")) {
-    if (chip_openthread_ftd) {
-      public_deps += [
-        "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
-        "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
-      ]
-    } else {
-      public_deps += [
-        "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
-        "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
-      ]
-    }
+    public_deps += [
+      "${chip_root}/third_party/openthread:openthread",
+      "${chip_root}/third_party/openthread:openthread_cli",
+    ]
   }
 
   if (chip_shell_cmd_server) {
@@ -74,15 +65,28 @@ static_library("shell_common") {
 
     sources += [
       "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
+      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/device-energy-management-stub.cpp",
+      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/energy-evse-stub.cpp",
+      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp",
       "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
+      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
+      "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementDelegateImpl.cpp",
+      "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementManager.cpp",
+      "${chip_root}/examples/energy-management-app/energy-management-common/src/ElectricalPowerMeasurementDelegate.cpp",
+      "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp",
+      "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
     ]
 
-    include_dirs =
-        [ "${chip_root}/examples/all-clusters-app/all-clusters-common/include" ]
+    include_dirs = [
+      "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
+      "${chip_root}/examples/energy-management-app/energy-management-common/include",
+    ]
 
     public_deps +=
         [ "${chip_root}/examples/all-clusters-app/all-clusters-common" ]
   }
 
   public_configs = [ ":shell_common_config" ]
+
+  cflags = [ "-Wconversion" ]
 }

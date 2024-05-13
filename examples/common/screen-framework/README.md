@@ -1,3 +1,7 @@
+---
+orphan: true
+---
+
 # Simple Screen UI Framework
 
 ## Overview

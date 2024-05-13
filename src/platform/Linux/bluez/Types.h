@@ -46,35 +46,58 @@
 #pragma once
 
 #include <platform/CHIPDeviceConfig.h>
+#include <platform/GLibTypeDeleter.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-#include <ble/CHIPBleServiceData.h>
 #include <platform/Linux/dbus/bluez/DbusBluez.h>
 
-#include <cstdint>
-#include <string>
-
 namespace chip {
+
+template <>
+struct GAutoPtrDeleter<BluezAdapter1>
+{
+    using deleter = GObjectDeleter;
+};
+
+template <>
+struct GAutoPtrDeleter<BluezDevice1>
+{
+    using deleter = GObjectDeleter;
+};
+
+template <>
+struct GAutoPtrDeleter<BluezGattCharacteristic1>
+{
+    using deleter = GObjectDeleter;
+};
+
+template <>
+struct GAutoPtrDeleter<BluezGattManager1>
+{
+    using deleter = GObjectDeleter;
+};
+
+template <>
+struct GAutoPtrDeleter<BluezGattService1>
+{
+    using deleter = GObjectDeleter;
+};
+
+template <>
+struct GAutoPtrDeleter<BluezLEAdvertisement1>
+{
+    using deleter = GObjectDeleter;
+};
+
+template <>
+struct GAutoPtrDeleter<BluezLEAdvertisingManager1>
+{
+    using deleter = GObjectDeleter;
+};
+
 namespace DeviceLayer {
 namespace Internal {
-
-enum ChipAdvType
-{
-    BLUEZ_ADV_TYPE_CONNECTABLE = 0x01,
-    BLUEZ_ADV_TYPE_SCANNABLE   = 0x02,
-    BLUEZ_ADV_TYPE_DIRECTED    = 0x04,
-
-    BLUEZ_ADV_TYPE_UNDIRECTED_NONCONNECTABLE_NONSCANNABLE = 0,
-    BLUEZ_ADV_TYPE_UNDIRECTED_CONNECTABLE_NONSCANNABLE    = BLUEZ_ADV_TYPE_CONNECTABLE,
-    BLUEZ_ADV_TYPE_UNDIRECTED_NONCONNECTABLE_SCANNABLE    = BLUEZ_ADV_TYPE_SCANNABLE,
-    BLUEZ_ADV_TYPE_UNDIRECTED_CONNECTABLE_SCANNABLE       = BLUEZ_ADV_TYPE_CONNECTABLE | BLUEZ_ADV_TYPE_SCANNABLE,
-
-    BLUEZ_ADV_TYPE_DIRECTED_NONCONNECTABLE_NONSCANNABLE = BLUEZ_ADV_TYPE_DIRECTED,
-    BLUEZ_ADV_TYPE_DIRECTED_CONNECTABLE_NONSCANNABLE    = BLUEZ_ADV_TYPE_DIRECTED | BLUEZ_ADV_TYPE_CONNECTABLE,
-    BLUEZ_ADV_TYPE_DIRECTED_NONCONNECTABLE_SCANNABLE    = BLUEZ_ADV_TYPE_DIRECTED | BLUEZ_ADV_TYPE_SCANNABLE,
-    BLUEZ_ADV_TYPE_DIRECTED_CONNECTABLE_SCANNABLE = BLUEZ_ADV_TYPE_DIRECTED | BLUEZ_ADV_TYPE_CONNECTABLE | BLUEZ_ADV_TYPE_SCANNABLE,
-};
 
 #define BLUEZ_ADDRESS_SIZE 6 ///< BLE address size (in bytes)
 #define BLUEZ_PATH "/org/bluez"
@@ -107,88 +130,6 @@ enum ChipAdvType
 #define BLUEZ_ADV_FLAGS_EDR_UNSUPPORTED (1 << 2)
 #define BLUEZ_ADV_FLAGS_LE_EDR_CONTROLLER (1 << 3)
 #define BLUEZ_ADV_FLAGS_LE_EDR_HOST (1 << 4)
-
-enum BluezAddressType
-{
-    BLUEZ_ADDRESS_TYPE_PUBLIC                        = 0, ///< Bluetooth public device address.
-    BLUEZ_ADDRESS_TYPE_RANDOM_STATIC                 = 1, ///< Bluetooth random static address.
-    BLUEZ_ADDRESS_TYPE_RANDOM_PRIVATE_RESOLVABLE     = 2, ///< Bluetooth random private resolvable address.
-    BLUEZ_ADDRESS_TYPE_RANDOM_PRIVATE_NON_RESOLVABLE = 3, ///< Bluetooth random private non-resolvable address.
-};
-
-struct BluezAddress
-{
-    BluezAddressType mType;               ///< Bluetooth device address type.
-    uint8_t mAddress[BLUEZ_ADDRESS_SIZE]; ///< A 48-bit address of Bluetooth device in LSB format.
-};
-
-struct IOChannel
-{
-    GIOChannel * mpChannel;
-    guint mWatch;
-};
-
-struct BluezEndpoint
-{
-    char * mpOwningName; // Bus owning name
-
-    // Adapter properties
-    char * mpAdapterName;
-    char * mpAdapterAddr;
-
-    // Paths for objects published by this service
-    char * mpRootPath;
-    char * mpAdvPath;
-    char * mpServicePath;
-
-    // Objects (interfaces) subscibed to by this service
-    GDBusObjectManager * mpObjMgr = nullptr;
-    BluezAdapter1 * mpAdapter     = nullptr;
-    BluezDevice1 * mpDevice       = nullptr;
-
-    // Objects (interfaces) published by this service
-    GDBusObjectManagerServer * mpRoot;
-    BluezGattService1 * mpService;
-    BluezGattCharacteristic1 * mpC1;
-    BluezGattCharacteristic1 * mpC2;
-    // additional data characteristics
-    BluezGattCharacteristic1 * mpC3;
-
-    // map device path to the connection
-    GHashTable * mpConnMap;
-    uint32_t mAdapterId;
-    bool mIsCentral;
-    char * mpAdvertisingUUID;
-    chip::Ble::ChipBLEDeviceIdentificationInfo mDeviceIdInfo;
-    ChipAdvType mType;  ///< Advertisement type.
-    uint16_t mDuration; ///< Advertisement interval (in ms).
-    bool mIsAdvertising;
-    char * mpPeerDevicePath;
-    GCancellable * mpConnectCancellable = nullptr;
-};
-
-struct BluezConnection
-{
-    char * mpPeerAddress;
-    BluezDevice1 * mpDevice;
-    BluezGattService1 * mpService;
-    BluezGattCharacteristic1 * mpC1;
-    BluezGattCharacteristic1 * mpC2;
-    // additional data characteristics
-    BluezGattCharacteristic1 * mpC3;
-
-    bool mIsNotify;
-    uint16_t mMtu;
-    struct IOChannel mC1Channel;
-    struct IOChannel mC2Channel;
-    BluezEndpoint * mpEndpoint;
-};
-
-struct ConnectionDataBundle
-{
-    BluezConnection * mpConn;
-    GVariant * mpVal;
-};
 
 } // namespace Internal
 } // namespace DeviceLayer

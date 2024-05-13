@@ -26,10 +26,12 @@ list(
     -DCONFIG_PLATFORM_8721D
     -DCONFIG_USE_MBEDTLS_ROM_ALG
     -DCONFIG_FUNCION_O0_OPTIMIZE
+    -DCONFIG_ENABLE_AMEBA_FACTORY_DATA=0
     -DDM_ODM_SUPPORT_TYPE=32
     -DCHIP_DEVICE_LAYER_TARGET=Ameba
     -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
     -D_POSIX_REALTIME_SIGNALS
+    -DCHIP_SHELL_MAX_TOKENS=11
 )
 
 list(
@@ -42,6 +44,7 @@ list(
     -Wno-unused-variable
     -Wno-deprecated-declarations
     -Wno-unused-parameter
+    -Wno-unused-label
     -Wno-format
     -Wno-stringop-truncation
     -Wno-format-nonliteral
@@ -104,30 +107,44 @@ string(APPEND CHIP_GN_ARGS "ameba_cc = \"arm-none-eabi-gcc\"\n")
 string(APPEND CHIP_GN_ARGS "ameba_cxx = \"arm-none-eabi-c++\"\n")
 string(APPEND CHIP_GN_ARGS "ameba_cpu = \"ameba\"\n")
 string(APPEND CHIP_GN_ARGS "chip_inet_config_enable_ipv4 = false\n")
+string(APPEND CHIP_GN_ARGS "chip_use_transitional_commissionable_data_provider = true\n")
+
+# Enable persistent storage audit
+if (matter_enable_persistentstorage_audit)
+string(APPEND CHIP_GN_ARGS "chip_support_enable_storage_api_audit = true\n")
+endif (matter_enable_persistentstorage_audit)
+#endif
 
 # Build RPC
 if (matter_enable_rpc)
 #string(APPEND CHIP_GN_ARGS "remove_default_configs = [\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_build:cpp17\"]\n")
 string(APPEND CHIP_GN_ARGS "chip_build_pw_rpc_lib = true\n")
 string(APPEND CHIP_GN_ARGS "pw_log_BACKEND = \"//third_party/connectedhomeip/third_party/pigweed/repo/pw_log_basic\"\n")
-string(APPEND CHIP_GN_ARGS "pw_assert_BACKEND = \"//third_party/connectedhomeip/third_party/pigweed/repo/pw_assert_log\"\n")
+string(APPEND CHIP_GN_ARGS "pw_assert_BACKEND = \"//third_party/connectedhomeip/third_party/pigweed/repo/pw_assert_log:check_backend\"\n")
 string(APPEND CHIP_GN_ARGS "pw_sys_io_BACKEND = \"//third_party/connectedhomeip/examples/platform/ameba/pw_sys_io:pw_sys_io_ameba\"\n")
 string(APPEND CHIP_GN_ARGS "dir_pw_third_party_nanopb = \"//third_party/connectedhomeip/third_party/nanopb/repo\"\n")
 string(APPEND CHIP_GN_ARGS "pw_build_LINK_DEPS = [\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_assert:impl\", \"//third_party/connectedhomeip/third_party/pigweed/repo/pw_log:impl\"]\n")
+string(APPEND CHIP_GN_ARGS "pw_rpc_CONFIG = \"//third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc:disable_global_mutex\"")
 endif (matter_enable_rpc)
+
+# Build Matter Shell
+if (matter_enable_shell)
+string(APPEND CHIP_GN_ARGS "chip_build_libshell = true\n")
+endif (matter_enable_shell)
 
 # Build ota-requestor
 if (matter_enable_ota_requestor)
 string(APPEND CHIP_GN_ARGS "chip_enable_ota_requestor = true\n")
 endif (matter_enable_ota_requestor)
 
+# Rotating ID
 if (matter_enable_rotating_id)
     string(APPEND CHIP_GN_ARGS "chip_enable_additional_data_advertising = true\n")
     string(APPEND CHIP_GN_ARGS "chip_enable_rotating_device_id = true\n")
-else(matter_enable_rotating_id)
+else (matter_enable_rotating_id)
     string(APPEND CHIP_GN_ARGS "chip_enable_additional_data_advertising = false\n")
     string(APPEND CHIP_GN_ARGS "chip_enable_rotating_device_id = false\n")
-endif(matter_enable_rotating_id)
+endif (matter_enable_rotating_id)
 
 file(GENERATE OUTPUT ${CHIP_OUTPUT}/args.gn CONTENT ${CHIP_GN_ARGS})
 

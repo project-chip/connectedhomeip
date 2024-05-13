@@ -29,16 +29,15 @@
 #include <lib/dnssd/minimal_mdns/records/Srv.h>
 #include <lib/dnssd/minimal_mdns/records/Txt.h>
 #include <lib/support/CHIPMemString.h>
-#include <lib/support/UnitTestRegistration.h>
 #include <system/SystemMutex.h>
 
-#include <nlunit-test.h>
+#include <gtest/gtest.h>
 
 namespace mdns {
 namespace Minimal {
 namespace test {
 
-constexpr QNamePart kIgnoreQNameParts[] = { "IGNORE", "THIS" };
+inline constexpr QNamePart kIgnoreQNameParts[] = { "IGNORE", "THIS" };
 namespace {
 bool StringMatches(const BytesRange & br, const char * str)
 {
@@ -78,23 +77,19 @@ class CheckOnlyServer : private chip::PoolImpl<ServerBase::EndpointInfo, 0, chip
                         public TxtRecordDelegate
 {
 public:
-    CheckOnlyServer(nlTestSuite * inSuite) : ServerBase(*static_cast<ServerBase::EndpointInfoPoolType *>(this)), mInSuite(inSuite)
-    {
-        Reset();
-    }
-    CheckOnlyServer() : ServerBase(*static_cast<ServerBase::EndpointInfoPoolType *>(this)), mInSuite(nullptr) { Reset(); }
+    CheckOnlyServer() : ServerBase(*static_cast<ServerBase::EndpointInfoPoolType *>(this)) { Reset(); }
     ~CheckOnlyServer() {}
 
     // Parser delegates
     void OnHeader(ConstHeaderRef & header) override
     {
-        NL_TEST_ASSERT(mInSuite, header.GetFlags().IsResponse());
-        NL_TEST_ASSERT(mInSuite, header.GetFlags().IsValidMdns());
+        EXPECT_TRUE(header.GetFlags().IsResponse());
+        EXPECT_TRUE(header.GetFlags().IsValidMdns());
         mTotalRecords += header.GetAnswerCount() + header.GetAdditionalCount();
 
         if (!header.GetFlags().IsTruncated())
         {
-            NL_TEST_ASSERT(mInSuite, mTotalRecords == GetNumExpectedRecords());
+            EXPECT_EQ(mTotalRecords, GetNumExpectedRecords());
             if (mTotalRecords != GetNumExpectedRecords())
             {
                 ChipLogError(Discovery, "Received %d records, expected %d", mTotalRecords, GetNumExpectedRecords());
@@ -114,7 +109,7 @@ public:
         case QType::SRV: {
             SrvRecord srv;
             bool srvParseOk = srv.Parse(data.GetData(), mPacketData);
-            NL_TEST_ASSERT(mInSuite, srvParseOk);
+            EXPECT_TRUE(srvParseOk);
             if (!srvParseOk)
             {
                 return;
@@ -146,7 +141,7 @@ public:
                     for (size_t t = 0; t < expectedTxt->GetNumEntries(); ++t)
                     {
                         bool ok = AddExpectedTxtRecord(expectedTxt->GetEntries()[t]);
-                        NL_TEST_ASSERT(mInSuite, ok);
+                        EXPECT_TRUE(ok);
                     }
                     ParseTxtRecord(data.GetData(), this);
                     if (CheckTxtRecordMatches())
@@ -164,7 +159,7 @@ public:
                 }
             }
         }
-        NL_TEST_ASSERT(mInSuite, recordIsExpected);
+        EXPECT_TRUE(recordIsExpected);
         if (!recordIsExpected)
         {
             char nameStr[64];
@@ -253,7 +248,7 @@ public:
     void AddExpectedRecord(SrvResourceRecord * srv)
     {
         RecordInfo * info = AddExpectedRecordBase(srv);
-        NL_TEST_ASSERT(mInSuite, info != nullptr);
+        ASSERT_NE(info, nullptr);
         if (info == nullptr)
         {
             return;
@@ -263,7 +258,7 @@ public:
     void AddExpectedRecord(TxtResourceRecord * txt)
     {
         RecordInfo * info = AddExpectedRecordBase(txt);
-        NL_TEST_ASSERT(mInSuite, info != nullptr);
+        ASSERT_NE(info, nullptr);
         if (info == nullptr)
         {
             return;
@@ -272,7 +267,6 @@ public:
     }
     bool GetSendCalled() { return mSendCalled; }
     bool GetHeaderFound() { return mHeaderFound; }
-    void SetTestSuite(nlTestSuite * suite) { mInSuite = suite; }
     void Reset()
     {
         for (auto & info : mExpectedRecordInfo)
@@ -287,7 +281,6 @@ public:
     }
 
 private:
-    nlTestSuite * mInSuite;
     static constexpr size_t kMaxExpectedRecords = 10;
     struct RecordInfo
     {
@@ -311,7 +304,7 @@ private:
             found = false;
         }
     };
-    static constexpr size_t kMaxExpectedTxt = 11;
+    static constexpr size_t kMaxExpectedTxt = 13;
     KV mExpectedTxt[kMaxExpectedTxt];
     size_t mNumExpectedTxtRecords = 0;
     size_t mNumReceivedTxtRecords = 0;
@@ -335,17 +328,13 @@ private:
     }
     void TestGotAllExpectedPackets()
     {
-        if (mInSuite == nullptr)
-        {
-            return;
-        }
         for (auto & info : mExpectedRecordInfo)
         {
             if (info.record == nullptr)
             {
                 continue;
             }
-            NL_TEST_ASSERT(mInSuite, info.found == true);
+            EXPECT_TRUE(info.found);
             if (!info.found)
             {
                 char name[64];

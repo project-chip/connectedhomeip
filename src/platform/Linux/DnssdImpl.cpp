@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <sstream>
 #include <string.h>
+#include <string>
 #include <time.h>
 #include <vector>
 
@@ -328,9 +329,11 @@ CHIP_ERROR MdnsAvahi::Init(DnssdAsyncReturnCallback initCallback, DnssdAsyncRetu
     CHIP_ERROR error = CHIP_NO_ERROR;
     int avahiError   = 0;
 
+    Shutdown();
+
     VerifyOrExit(initCallback != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(errorCallback != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(mClient == nullptr && mGroup == nullptr, error = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mClient == nullptr && mPublishedGroups.empty(), error = CHIP_ERROR_INCORRECT_STATE);
     mInitCallback       = initCallback;
     mErrorCallback      = errorCallback;
     mAsyncReturnContext = context;
@@ -342,37 +345,24 @@ exit:
     return error;
 }
 
-CHIP_ERROR MdnsAvahi::Shutdown()
+void MdnsAvahi::Shutdown()
 {
-    if (mGroup)
-    {
-        avahi_entry_group_free(mGroup);
-        mGroup = nullptr;
-    }
+    StopPublish();
     if (mClient)
     {
         avahi_client_free(mClient);
         mClient = nullptr;
     }
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MdnsAvahi::SetHostname(const char * hostname)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    int avahiRet;
 
     VerifyOrExit(mClient != nullptr, error = CHIP_ERROR_INCORRECT_STATE);
-    avahiRet = avahi_client_set_host_name(mClient, hostname);
-    if (avahiRet == AVAHI_ERR_ACCESS_DENIED)
-    {
-        ChipLogError(DeviceLayer, "Cannot set hostname on this system, continue anyway...");
-    }
-    else if (avahiRet != AVAHI_OK && avahiRet != AVAHI_ERR_NO_CHANGE)
-    {
-        error = CHIP_ERROR_INTERNAL;
-    }
-
+    // Note: we do no longer set the primary hostname here, as other services
+    // on the platform might not be happy with the matter mandated hostname.
+    // Instead, we'll establish our own hostname when needed (see PublishService())
 exit:
     return error;
 }
@@ -389,16 +379,8 @@ void MdnsAvahi::HandleClientState(AvahiClient * client, AvahiClientState state)
     case AVAHI_CLIENT_S_RUNNING:
         ChipLogProgress(DeviceLayer, "Avahi client registered");
         mClient = client;
-        mGroup  = avahi_entry_group_new(client, HandleGroupState, this);
-        if (mGroup == nullptr)
-        {
-            ChipLogError(DeviceLayer, "Failed to create avahi group: %s", avahi_strerror(avahi_client_errno(client)));
-            mInitCallback(mAsyncReturnContext, CHIP_ERROR_OPEN_FAILED);
-        }
-        else
-        {
-            mInitCallback(mAsyncReturnContext, CHIP_NO_ERROR);
-        }
+        // no longer create groups here, but on a by-service basis in PublishService()
+        mInitCallback(mAsyncReturnContext, CHIP_NO_ERROR);
         break;
     case AVAHI_CLIENT_FAILURE:
         ChipLogError(DeviceLayer, "Avahi client failure");
@@ -407,22 +389,8 @@ void MdnsAvahi::HandleClientState(AvahiClient * client, AvahiClientState state)
     case AVAHI_CLIENT_S_COLLISION:
     case AVAHI_CLIENT_S_REGISTERING:
         ChipLogProgress(DeviceLayer, "Avahi re-register required");
-        if (mGroup != nullptr)
-        {
-            avahi_entry_group_reset(mGroup);
-            avahi_entry_group_free(mGroup);
-        }
-        mGroup = avahi_entry_group_new(client, HandleGroupState, this);
-        mPublishedServices.clear();
-        if (mGroup == nullptr)
-        {
-            ChipLogError(DeviceLayer, "Failed to create avahi group: %s", avahi_strerror(avahi_client_errno(client)));
-            mErrorCallback(mAsyncReturnContext, CHIP_ERROR_OPEN_FAILED);
-        }
-        else
-        {
-            mErrorCallback(mAsyncReturnContext, CHIP_ERROR_FORCED_RESET);
-        }
+        StopPublish();
+        mErrorCallback(mAsyncReturnContext, CHIP_ERROR_FORCED_RESET);
         break;
     case AVAHI_CLIENT_CONNECTING:
         ChipLogProgress(DeviceLayer, "Avahi connecting");
@@ -448,7 +416,7 @@ void MdnsAvahi::HandleGroupState(AvahiEntryGroup * group, AvahiEntryGroupState s
         break;
     case AVAHI_ENTRY_GROUP_FAILURE:
         ChipLogError(DeviceLayer, "Avahi group internal failure %s",
-                     avahi_strerror(avahi_client_errno(avahi_entry_group_get_client(mGroup))));
+                     avahi_strerror(avahi_client_errno(avahi_entry_group_get_client(group))));
         mErrorCallback(mAsyncReturnContext, CHIP_ERROR_INTERNAL);
         break;
     case AVAHI_ENTRY_GROUP_UNCOMMITED:
@@ -461,50 +429,130 @@ CHIP_ERROR MdnsAvahi::PublishService(const DnssdService & service, DnssdPublishC
 {
     std::ostringstream keyBuilder;
     std::string key;
-    std::string type       = GetFullType(service.mType, service.mProtocol);
-    CHIP_ERROR error       = CHIP_NO_ERROR;
-    AvahiStringList * text = nullptr;
+    std::string type = GetFullType(service.mType, service.mProtocol);
+    std::string matterHostname;
+    CHIP_ERROR error          = CHIP_NO_ERROR;
+    AvahiStringList * text    = nullptr;
+    AvahiEntryGroup * group   = nullptr;
+    const char * mainHostname = nullptr;
     AvahiIfIndex interface =
         service.mInterface.IsPresent() ? static_cast<AvahiIfIndex>(service.mInterface.GetPlatformInterface()) : AVAHI_IF_UNSPEC;
+    AvahiProtocol protocol = ToAvahiProtocol(service.mAddressType);
 
     keyBuilder << service.mName << "." << type << service.mPort << "." << interface;
     key = keyBuilder.str();
     ChipLogProgress(DeviceLayer, "PublishService %s", key.c_str());
-
-    if (mPublishedServices.find(key) == mPublishedServices.end())
+    auto publishedgroups_it = mPublishedGroups.find(key);
+    if (publishedgroups_it != mPublishedGroups.end())
     {
-        SuccessOrExit(error = MakeAvahiStringListFromTextEntries(service.mTextEntries, service.mTextEntrySize, &text));
-
-        mPublishedServices.emplace(key);
-        VerifyOrExit(avahi_entry_group_add_service_strlst(mGroup, interface, ToAvahiProtocol(service.mAddressType),
-                                                          static_cast<AvahiPublishFlags>(0), service.mName, type.c_str(), nullptr,
-                                                          nullptr, service.mPort, text) == 0,
-                     error = CHIP_ERROR_INTERNAL);
-        for (size_t i = 0; i < service.mSubTypeSize; i++)
+        // same service was already published, we need to de-publish it first
+        int avahiRet = avahi_entry_group_free(publishedgroups_it->second);
+        if (avahiRet != AVAHI_OK)
         {
-            std::ostringstream sstream;
-
-            sstream << service.mSubTypes[i] << "._sub." << type;
-
-            VerifyOrExit(avahi_entry_group_add_service_subtype(mGroup, interface, ToAvahiProtocol(service.mAddressType),
-                                                               static_cast<AvahiPublishFlags>(0), service.mName, type.c_str(),
-                                                               nullptr, sstream.str().c_str()) == 0,
-                         error = CHIP_ERROR_INTERNAL);
+            ChipLogError(DeviceLayer, "Cannot remove avahi group: %s", avahi_strerror(avahiRet));
+            ExitNow(error = CHIP_ERROR_INTERNAL);
         }
+        mPublishedGroups.erase(publishedgroups_it);
+    }
+
+    // create fresh group
+    group = avahi_entry_group_new(mClient, HandleGroupState, this);
+    VerifyOrExit(group != nullptr, error = CHIP_ERROR_INTERNAL);
+
+    // establish the host name (separately from avahi's default host name that the platform might have,
+    // unless it matches the matter hostname)
+    mainHostname = avahi_client_get_host_name(mClient);
+    if (strcmp(mainHostname, service.mHostName) == 0)
+    {
+        // main host name is correct, we can use it
+        matterHostname = std::string(mainHostname) + ".local";
     }
     else
     {
-        SuccessOrExit(error = MakeAvahiStringListFromTextEntries(service.mTextEntries, service.mTextEntrySize, &text));
-
-        VerifyOrExit(avahi_entry_group_update_service_txt_strlst(mGroup, interface, ToAvahiProtocol(service.mAddressType),
-                                                                 static_cast<AvahiPublishFlags>(0), service.mName, type.c_str(),
-                                                                 nullptr, text) == 0,
-                     error = CHIP_ERROR_INTERNAL);
+        // we need to establish a matter hostname separately from the platform's default hostname
+        char b[chip::Inet::IPAddress::kMaxStringLength];
+        SuccessOrExit(error = service.mInterface.GetInterfaceName(b, chip::Inet::IPAddress::kMaxStringLength));
+        ChipLogDetail(DeviceLayer, "Using addresses from interface id=%d name=%s", service.mInterface.GetPlatformInterface(), b);
+        matterHostname = std::string(service.mHostName) + ".local";
+        // find addresses to publish
+        for (chip::Inet::InterfaceAddressIterator addr_it; addr_it.HasCurrent(); addr_it.Next())
+        {
+            // only specific interface?
+            if (service.mInterface.IsPresent() && addr_it.GetInterfaceId() != service.mInterface)
+            {
+                continue;
+            }
+            if (addr_it.IsUp())
+            {
+                if (addr_it.IsLoopback())
+                {
+                    // do not advertise loopback interface addresses
+                    continue;
+                }
+                chip::Inet::IPAddress addr;
+                if ((addr_it.GetAddress(addr) == CHIP_NO_ERROR) &&
+                    ((service.mAddressType == chip::Inet::IPAddressType::kAny) ||
+                     (addr.IsIPv6() && service.mAddressType == chip::Inet::IPAddressType::kIPv6)
+#if INET_CONFIG_ENABLE_IPV4
+                     || (addr.IsIPv4() && service.mAddressType == chip::Inet::IPAddressType::kIPv4)
+#endif
+                         ))
+                {
+                    VerifyOrExit(addr.ToString(b) != nullptr, error = CHIP_ERROR_INTERNAL);
+                    AvahiAddress a;
+                    VerifyOrExit(avahi_address_parse(b, AVAHI_PROTO_UNSPEC, &a) != nullptr, error = CHIP_ERROR_INTERNAL);
+                    AvahiIfIndex thisinterface = static_cast<AvahiIfIndex>(addr_it.GetInterfaceId().GetPlatformInterface());
+                    // Note: NO_REVERSE publish flag is needed because otherwise we can't have more than one hostname
+                    //   for reverse resolving IP addresses back to hostnames
+                    VerifyOrExit(avahi_entry_group_add_address(group,                        // group
+                                                               thisinterface,                // interface
+                                                               ToAvahiProtocol(addr.Type()), // protocol
+                                                               AVAHI_PUBLISH_NO_REVERSE,     // publish flags
+                                                               matterHostname.c_str(),       // hostname
+                                                               &a                            // address
+                                                               ) == 0,
+                                 error = CHIP_ERROR_INTERNAL);
+                }
+            }
+        }
     }
 
-    VerifyOrExit(avahi_entry_group_commit(mGroup) == 0, error = CHIP_ERROR_INTERNAL);
+    // create the service
+    SuccessOrExit(error = MakeAvahiStringListFromTextEntries(service.mTextEntries, service.mTextEntrySize, &text));
+
+    VerifyOrExit(avahi_entry_group_add_service_strlst(group, interface, protocol,        // group, interface, protocol
+                                                      static_cast<AvahiPublishFlags>(0), // publish flags
+                                                      service.mName,                     // service name
+                                                      type.c_str(),                      // type
+                                                      nullptr,                           // domain
+                                                      matterHostname.c_str(),            // host
+                                                      service.mPort,                     // port
+                                                      text) == 0,                        // TXT records StringList
+                 error = CHIP_ERROR_INTERNAL);
+
+    // add the subtypes
+    for (size_t i = 0; i < service.mSubTypeSize; i++)
+    {
+        std::ostringstream sstream;
+
+        sstream << service.mSubTypes[i] << "._sub." << type;
+
+        VerifyOrExit(avahi_entry_group_add_service_subtype(group, interface, protocol, static_cast<AvahiPublishFlags>(0),
+                                                           service.mName, type.c_str(), nullptr, sstream.str().c_str()) == 0,
+                     error = CHIP_ERROR_INTERNAL);
+    }
+    VerifyOrExit(avahi_entry_group_commit(group) == 0, error = CHIP_ERROR_INTERNAL);
+
+    // group is now published, pass it to the service map
+    mPublishedGroups[key] = group;
+    group                 = nullptr;
 
 exit:
+    if (group != nullptr)
+    {
+        avahi_entry_group_free(group);
+    }
+
     if (text != nullptr)
     {
         avahi_string_list_free(text);
@@ -516,11 +564,13 @@ exit:
     // The code needs to be updated to support that callback properly.
     if (CHIP_NO_ERROR == error)
     {
-        callback(context, type.c_str(), CHIP_NO_ERROR);
+        callback(context, type.c_str(), service.mName, CHIP_NO_ERROR);
     }
     else
     {
-        callback(context, nullptr, error);
+        ChipLogError(DeviceLayer, "PublishService failed: %s",
+                     mClient ? avahi_strerror(avahi_client_errno(mClient)) : "no mClient");
+        callback(context, nullptr, nullptr, error);
     }
 
     return error;
@@ -529,17 +579,25 @@ exit:
 CHIP_ERROR MdnsAvahi::StopPublish()
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    mPublishedServices.clear();
-    if (mGroup)
+    for (const auto & group : mPublishedGroups)
     {
-        VerifyOrExit(avahi_entry_group_reset(mGroup) == 0, error = CHIP_ERROR_INTERNAL);
+        if (group.second)
+        {
+            int avahiRet = avahi_entry_group_free(group.second);
+            if (avahiRet != AVAHI_OK)
+            {
+                ChipLogError(DeviceLayer, "Error freeing avahi group: %s", avahi_strerror(avahiRet));
+                error = CHIP_ERROR_INTERNAL;
+            }
+        }
     }
-exit:
+    mPublishedGroups.clear();
     return error;
 }
 
 CHIP_ERROR MdnsAvahi::Browse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
-                             chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context)
+                             chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context,
+                             intptr_t * browseIdentifier)
 {
     AvahiServiceBrowser * browser;
     BrowseContext * browseContext = chip::Platform::New<BrowseContext>();
@@ -553,16 +611,38 @@ CHIP_ERROR MdnsAvahi::Browse(const char * type, DnssdServiceProtocol protocol, c
     {
         avahiInterface = AVAHI_IF_UNSPEC;
     }
+    browseContext->mInterface     = avahiInterface;
+    browseContext->mProtocol      = GetFullType(type, protocol);
+    browseContext->mBrowseRetries = 0;
+    browseContext->mStopped.store(false);
 
-    browser = avahi_service_browser_new(mClient, avahiInterface, AVAHI_PROTO_UNSPEC, GetFullType(type, protocol).c_str(), nullptr,
+    browser = avahi_service_browser_new(mClient, avahiInterface, AVAHI_PROTO_UNSPEC, browseContext->mProtocol.c_str(), nullptr,
                                         static_cast<AvahiLookupFlags>(0), HandleBrowse, browseContext);
     // Otherwise the browser will be freed in the callback
     if (browser == nullptr)
     {
         chip::Platform::Delete(browseContext);
+        *browseIdentifier = reinterpret_cast<intptr_t>(nullptr);
+    }
+    else
+    {
+        *browseIdentifier = reinterpret_cast<intptr_t>(browseContext);
     }
 
     return browser == nullptr ? CHIP_ERROR_INTERNAL : CHIP_NO_ERROR;
+}
+
+CHIP_ERROR MdnsAvahi::StopBrowse(intptr_t browseIdentifier)
+{
+    BrowseContext * browseContext = reinterpret_cast<BrowseContext *>(browseIdentifier);
+    if (browseContext == nullptr)
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+    // Any running timers here will check mStopped before rescheduling. Leave the timer running
+    // so we don't race on deletion of the browse context.
+    browseContext->mStopped.store(true);
+    return CHIP_NO_ERROR;
 }
 
 DnssdServiceProtocol GetProtocolInType(const char * type)
@@ -571,7 +651,7 @@ DnssdServiceProtocol GetProtocolInType(const char * type)
 
     if (deliminator == nullptr)
     {
-        ChipLogError(Discovery, "Failed to find protocol in type: %s", type);
+        ChipLogError(Discovery, "Failed to find protocol in type: %s", StringOrNullMarker(type));
         return DnssdServiceProtocol::kDnssdProtocolUnknown;
     }
 
@@ -584,7 +664,7 @@ DnssdServiceProtocol GetProtocolInType(const char * type)
         return DnssdServiceProtocol::kDnssdProtocolUdp;
     }
 
-    ChipLogError(Discovery, "Unknown protocol in type: %s", type);
+    ChipLogError(Discovery, "Unknown protocol in type: %s", StringOrNullMarker(type));
     return DnssdServiceProtocol::kDnssdProtocolUnknown;
 }
 
@@ -606,6 +686,27 @@ void CopyTypeWithoutProtocol(char (&dest)[N], const char * typeAndProtocol)
     }
 }
 
+void MdnsAvahi::BrowseRetryCallback(chip::System::Layer * aLayer, void * appState)
+{
+    BrowseContext * context = static_cast<BrowseContext *>(appState);
+    // Don't schedule anything new if we've stopped.
+    if (context->mStopped.load())
+    {
+        chip::Platform::Delete(context);
+        return;
+    }
+    AvahiServiceBrowser * newBrowser =
+        avahi_service_browser_new(context->mInstance->mClient, context->mInterface, AVAHI_PROTO_UNSPEC, context->mProtocol.c_str(),
+                                  nullptr, static_cast<AvahiLookupFlags>(0), HandleBrowse, context);
+    if (newBrowser == nullptr)
+    {
+        // If we failed to create the browser, this browse context is effectively done. We need to call the final callback and
+        // delete the context.
+        context->mCallback(context->mContext, context->mServices.data(), context->mServices.size(), true, CHIP_NO_ERROR);
+        chip::Platform::Delete(context);
+    }
+}
+
 void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interface, AvahiProtocol protocol, AvahiBrowserEvent event,
                              const char * name, const char * type, const char * domain, AvahiLookupResultFlags /*flags*/,
                              void * userdata)
@@ -615,7 +716,7 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
     switch (event)
     {
     case AVAHI_BROWSER_FAILURE:
-        context->mCallback(context->mContext, nullptr, 0, CHIP_ERROR_INTERNAL);
+        context->mCallback(context->mContext, nullptr, 0, true, CHIP_ERROR_INTERNAL);
         avahi_service_browser_free(browser);
         chip::Platform::Delete(context);
         break;
@@ -639,19 +740,38 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
             context->mServices.push_back(service);
         }
         break;
-    case AVAHI_BROWSER_ALL_FOR_NOW:
+    case AVAHI_BROWSER_ALL_FOR_NOW: {
         ChipLogProgress(DeviceLayer, "Avahi browse: all for now");
-        context->mCallback(context->mContext, context->mServices.data(), context->mServices.size(), CHIP_NO_ERROR);
+        bool needRetries = context->mBrowseRetries++ < kMaxBrowseRetries && !context->mStopped.load();
+        // If we were already asked to stop, no need to send a callback - no one is listening.
+        if (!context->mStopped.load())
+        {
+            context->mCallback(context->mContext, context->mServices.data(), context->mServices.size(), !needRetries,
+                               CHIP_NO_ERROR);
+        }
         avahi_service_browser_free(browser);
-        chip::Platform::Delete(context);
+        if (needRetries)
+        {
+            context->mNextRetryDelay *= 2;
+            // Hand the ownership of the context over to the timer. It will either schedule a new browse on the context,
+            // triggering this function, or it will delete and not reschedule (if stopped).
+            DeviceLayer::SystemLayer().StartTimer(context->mNextRetryDelay / 2, BrowseRetryCallback, context);
+        }
+        else
+        {
+            // We didn't schedule a timer, so we're responsible for deleting the context
+            chip::Platform::Delete(context);
+        }
         break;
+    }
     case AVAHI_BROWSER_REMOVE:
         ChipLogProgress(DeviceLayer, "Avahi browse: remove");
         if (strcmp("local", domain) == 0)
         {
-            std::remove_if(context->mServices.begin(), context->mServices.end(), [name, type](const DnssdService & service) {
-                return strcmp(name, service.mName) == 0 && type == GetFullType(service.mType, service.mProtocol);
-            });
+            context->mServices.erase(
+                std::remove_if(context->mServices.begin(), context->mServices.end(), [name, type](const DnssdService & service) {
+                    return strcmp(name, service.mName) == 0 && type == GetFullType(service.mType, service.mProtocol);
+                }));
         }
         break;
     case AVAHI_BROWSER_CACHE_EXHAUSTED:
@@ -660,18 +780,69 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
     }
 }
 
+MdnsAvahi::ResolveContext * MdnsAvahi::AllocateResolveContext()
+{
+    ResolveContext * context = chip::Platform::New<ResolveContext>();
+    if (context == nullptr)
+    {
+        return nullptr;
+    }
+
+    context->mNumber = mResolveCount++;
+    mAllocatedResolves.push_back(context);
+
+    return context;
+}
+
+MdnsAvahi::ResolveContext * MdnsAvahi::ResolveContextForHandle(size_t handle)
+{
+    for (auto it : mAllocatedResolves)
+    {
+        if (it->mNumber == handle)
+        {
+            return it;
+        }
+    }
+    return nullptr;
+}
+
+void MdnsAvahi::FreeResolveContext(size_t handle)
+{
+    for (auto it = mAllocatedResolves.begin(); it != mAllocatedResolves.end(); it++)
+    {
+        if ((*it)->mNumber == handle)
+        {
+            chip::Platform::Delete(*it);
+            mAllocatedResolves.erase(it);
+            return;
+        }
+    }
+}
+
+void MdnsAvahi::StopResolve(const char * name)
+{
+    auto truncate_end = std::remove_if(mAllocatedResolves.begin(), mAllocatedResolves.end(),
+                                       [name](ResolveContext * ctx) { return strcmp(ctx->mName, name) == 0; });
+
+    for (auto it = truncate_end; it != mAllocatedResolves.end(); it++)
+    {
+        (*it)->mCallback((*it)->mContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_CANCELLED);
+        chip::Platform::Delete(*it);
+    }
+
+    mAllocatedResolves.erase(truncate_end, mAllocatedResolves.end());
+}
+
 CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, DnssdServiceProtocol protocol, Inet::IPAddressType addressType,
                               Inet::IPAddressType transportType, Inet::InterfaceId interface, DnssdResolveCallback callback,
                               void * context)
 {
-    AvahiServiceResolver * resolver;
     AvahiIfIndex avahiInterface     = static_cast<AvahiIfIndex>(interface.GetPlatformInterface());
-    ResolveContext * resolveContext = chip::Platform::New<ResolveContext>();
+    ResolveContext * resolveContext = AllocateResolveContext();
     CHIP_ERROR error                = CHIP_NO_ERROR;
-
-    resolveContext->mInstance = this;
-    resolveContext->mCallback = callback;
-    resolveContext->mContext  = context;
+    resolveContext->mInstance       = this;
+    resolveContext->mCallback       = callback;
+    resolveContext->mContext        = context;
 
     if (!interface.IsPresent())
     {
@@ -684,15 +855,17 @@ CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, DnssdService
     resolveContext->mAddressType = ToAvahiProtocol(addressType);
     resolveContext->mFullType    = GetFullType(type, protocol);
 
-    resolver = avahi_service_resolver_new(mClient, avahiInterface, resolveContext->mTransport, name,
-                                          resolveContext->mFullType.c_str(), nullptr, resolveContext->mAddressType,
-                                          static_cast<AvahiLookupFlags>(0), HandleResolve, resolveContext);
+    AvahiServiceResolver * resolver =
+        avahi_service_resolver_new(mClient, avahiInterface, resolveContext->mTransport, name, resolveContext->mFullType.c_str(),
+                                   nullptr, resolveContext->mAddressType, static_cast<AvahiLookupFlags>(0), HandleResolve,
+                                   reinterpret_cast<void *>(resolveContext->mNumber));
     // Otherwise the resolver will be freed in the callback
     if (resolver == nullptr)
     {
         error = CHIP_ERROR_INTERNAL;
         chip::Platform::Delete(resolveContext);
     }
+    resolveContext->mResolver = resolver;
 
     return error;
 }
@@ -702,8 +875,15 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
                               const char * host_name, const AvahiAddress * address, uint16_t port, AvahiStringList * txt,
                               AvahiLookupResultFlags flags, void * userdata)
 {
-    ResolveContext * context = reinterpret_cast<ResolveContext *>(userdata);
+    size_t handle            = reinterpret_cast<size_t>(userdata);
+    ResolveContext * context = sInstance.ResolveContextForHandle(handle);
     std::vector<TextEntry> textEntries;
+
+    if (context == nullptr)
+    {
+        ChipLogError(Discovery, "Invalid context for handling resolves: %ld", static_cast<long>(handle));
+        return;
+    }
 
     switch (event)
     {
@@ -712,14 +892,14 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
         {
             ChipLogProgress(DeviceLayer, "Re-trying resolve");
             avahi_service_resolver_free(resolver);
-            resolver = avahi_service_resolver_new(context->mInstance->mClient, context->mInterface, context->mTransport,
-                                                  context->mName, context->mFullType.c_str(), nullptr, context->mAddressType,
-                                                  static_cast<AvahiLookupFlags>(0), HandleResolve, context);
-            if (resolver == nullptr)
+            context->mResolver = avahi_service_resolver_new(
+                context->mInstance->mClient, context->mInterface, context->mTransport, context->mName, context->mFullType.c_str(),
+                nullptr, context->mAddressType, static_cast<AvahiLookupFlags>(0), HandleResolve, userdata);
+            if (context->mResolver == nullptr)
             {
                 ChipLogError(DeviceLayer, "Avahi resolve failed on retry");
                 context->mCallback(context->mContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
-                chip::Platform::Delete(context);
+                sInstance.FreeResolveContext(handle);
             }
             return;
         }
@@ -729,8 +909,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
     case AVAHI_RESOLVER_FOUND:
         DnssdService result = {};
 
-        result.mAddress.SetValue(chip::Inet::IPAddress());
-        ChipLogError(DeviceLayer, "Avahi resolve found");
+        ChipLogProgress(DeviceLayer, "Avahi resolve found");
 
         Platform::CopyString(result.mName, name);
         CopyTypeWithoutProtocol(result.mType, type);
@@ -753,6 +932,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
         }
 
         CHIP_ERROR result_err = CHIP_ERROR_INVALID_ADDRESS;
+        chip::Inet::IPAddress ipAddress; // Will be set of result_err is set to CHIP_NO_ERROR
         if (address)
         {
             switch (address->proto)
@@ -762,7 +942,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
                 struct in_addr addr4;
 
                 memcpy(&addr4, &(address->data.ipv4), sizeof(addr4));
-                result.mAddress.SetValue(chip::Inet::IPAddress(addr4));
+                ipAddress  = chip::Inet::IPAddress(addr4);
                 result_err = CHIP_NO_ERROR;
 #else
                 ChipLogError(Discovery, "Ignoring IPv4 mDNS address.");
@@ -772,7 +952,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
                 struct in6_addr addr6;
 
                 memcpy(&addr6, &(address->data.ipv6), sizeof(addr6));
-                result.mAddress.SetValue(chip::Inet::IPAddress(addr6));
+                ipAddress  = chip::Inet::IPAddress(addr6);
                 result_err = CHIP_NO_ERROR;
                 break;
             default:
@@ -802,7 +982,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
 
         if (result_err == CHIP_NO_ERROR)
         {
-            context->mCallback(context->mContext, &result, Span<Inet::IPAddress>(), CHIP_NO_ERROR);
+            context->mCallback(context->mContext, &result, Span<Inet::IPAddress>(&ipAddress, 1), CHIP_NO_ERROR);
         }
         else
         {
@@ -811,8 +991,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
         break;
     }
 
-    avahi_service_resolver_free(resolver);
-    chip::Platform::Delete(context);
+    sInstance.FreeResolveContext(handle);
 }
 
 CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
@@ -820,9 +999,9 @@ CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturn
     return MdnsAvahi::GetInstance().Init(initCallback, errorCallback, context);
 }
 
-CHIP_ERROR ChipDnssdShutdown()
+void ChipDnssdShutdown()
 {
-    return MdnsAvahi::GetInstance().Shutdown();
+    MdnsAvahi::GetInstance().Shutdown();
 }
 
 CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
@@ -848,9 +1027,15 @@ CHIP_ERROR ChipDnssdFinalizeServiceUpdate()
 }
 
 CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
-                           chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context)
+                           chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context,
+                           intptr_t * browseIdentifier)
 {
-    return MdnsAvahi::GetInstance().Browse(type, protocol, addressType, interface, callback, context);
+    return MdnsAvahi::GetInstance().Browse(type, protocol, addressType, interface, callback, context, browseIdentifier);
+}
+
+CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
+{
+    return MdnsAvahi::GetInstance().StopBrowse(browseIdentifier);
 }
 
 CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
@@ -861,6 +1046,16 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, chip::Inet::InterfaceId
 
     return MdnsAvahi::GetInstance().Resolve(browseResult->mName, browseResult->mType, browseResult->mProtocol,
                                             browseResult->mAddressType, Inet::IPAddressType::kAny, interface, callback, context);
+}
+
+void ChipDnssdResolveNoLongerNeeded(const char * instanceName)
+{
+    MdnsAvahi::GetInstance().StopResolve(instanceName);
+}
+
+CHIP_ERROR ChipDnssdReconfirmRecord(const char * hostname, chip::Inet::IPAddress address, chip::Inet::InterfaceId interface)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 } // namespace Dnssd

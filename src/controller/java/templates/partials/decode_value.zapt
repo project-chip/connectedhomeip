@@ -27,49 +27,56 @@ if ({{source}}.IsNull()) {
   }
 {{else}}
   {{#if_is_struct type}}
-    {{#zcl_struct_items_by_struct_name type}}
-      {{>decode_value target=(concat ../target "_" (asLowerCamelCase label)) source=(concat ../source "." (asLowerCamelCase label)) cluster=../cluster depth=(incrementDepth depth) omitDeclaration=false earlyReturn=../earlyReturn}}
-    {{/zcl_struct_items_by_struct_name}}
+    {{#zcl_struct_items_by_struct_and_cluster_name type cluster}}
+      {{>decode_value target=(concat ../target "_" (asLowerCamelCase label)) source=(concat ../source "." (asLowerCamelCase label)) cluster=../cluster depth=(incrementDepth ../depth) omitDeclaration=false earlyReturn=../earlyReturn}}
+    {{/zcl_struct_items_by_struct_and_cluster_name}}
 
-    jclass {{asLowerCamelCase type}}StructClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs${{cluster}}Cluster{{asUpperCamelCase type}}", {{asLowerCamelCase type}}StructClass);
+    jclass {{asLowerCamelCase type}}StructClass_{{depth}};
+    err = chip::JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/ChipStructs${{asUpperCamelCase cluster}}Cluster{{asUpperCamelCase type}}", {{asLowerCamelCase type}}StructClass_{{depth}});
     if (err != CHIP_NO_ERROR) {
-      ChipLogError(Zcl, "Could not find class ChipStructs${{cluster}}Cluster{{asUpperCamelCase type}}");
-      return {{earlyReturn}};
-    }
-    jmethodID {{asLowerCamelCase type}}StructCtor = env->GetMethodID({{asLowerCamelCase type}}StructClass, "<init>"
-        , "({{#zcl_struct_items_by_struct_name type}}{{asJniSignature type null ../cluster true}}{{/zcl_struct_items_by_struct_name}})V");
-    if ({{asLowerCamelCase type}}StructCtor == nullptr) {
-      ChipLogError(Zcl, "Could not find ChipStructs${{cluster}}Cluster{{asUpperCamelCase type}} constructor");
+      ChipLogError(Zcl, "Could not find class ChipStructs${{asUpperCamelCase cluster}}Cluster{{asUpperCamelCase type}}");
       return {{earlyReturn}};
     }
 
-    {{target}} = env->NewObject({{asLowerCamelCase type}}StructClass, {{asLowerCamelCase type}}StructCtor
-      {{#zcl_struct_items_by_struct_name type}}
+    jmethodID {{asLowerCamelCase type}}StructCtor_{{depth}};
+    err = chip::JniReferences::GetInstance().FindMethod(
+        env, {{asLowerCamelCase type}}StructClass_{{depth}}, "<init>",
+        "({{#zcl_struct_items_by_struct_and_cluster_name type cluster}}{{asJniSignature type null (asUpperCamelCase ../cluster) true}}{{/zcl_struct_items_by_struct_and_cluster_name}})V",
+        &{{asLowerCamelCase type}}StructCtor_{{depth}});
+    if (err != CHIP_NO_ERROR || {{asLowerCamelCase type}}StructCtor_{{depth}} == nullptr) {
+      ChipLogError(Zcl, "Could not find ChipStructs${{asUpperCamelCase cluster}}Cluster{{asUpperCamelCase type}} constructor");
+      return {{earlyReturn}};
+    }
+
+    {{target}} = env->NewObject({{asLowerCamelCase type}}StructClass_{{depth}}, {{asLowerCamelCase type}}StructCtor_{{depth}}
+      {{#zcl_struct_items_by_struct_and_cluster_name type cluster}}
       , {{../target}}_{{asLowerCamelCase label}}
-      {{/zcl_struct_items_by_struct_name}}
+      {{/zcl_struct_items_by_struct_and_cluster_name}}
     );
   {{else}}
-    {{#if_chip_enum type}}
-      std::string {{target}}ClassName = "{{asJniClassName type null cluster}}";
-      std::string {{target}}CtorSignature = "({{asJniSignature type null cluster false}})V";
-      chip::JniReferences::GetInstance().CreateBoxedObject<{{asUnderlyingBasicType type}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), static_cast<{{asUnderlyingBasicType type}}>({{source}}), {{target}});
+    {{#if_is_strongly_typed_chip_enum type}}
+      std::string {{target}}ClassName = "{{asJniClassName type null (asUpperCamelCase cluster)}}";
+      std::string {{target}}CtorSignature = "({{asJniSignature type null (asUpperCamelCase cluster) false}})V";
+      {{asJniBasicType type false}} jni{{target}} = static_cast<{{asJniBasicType type false}}>({{source}});
+      chip::JniReferences::GetInstance().CreateBoxedObject<{{asJniBasicType type false}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), jni{{target}}, {{target}});
     {{else}}
       {{#if (isOctetString type)}}
         jbyteArray {{target}}ByteArray = env->NewByteArray(static_cast<jsize>({{source}}.size()));
         env->SetByteArrayRegion({{target}}ByteArray, 0, static_cast<jsize>({{source}}.size()), reinterpret_cast<const jbyte *>({{source}}.data()));
         {{target}} = {{target}}ByteArray;
       {{else if (isCharString type)}}
-        {{target}} = env->NewStringUTF(std::string({{source}}.data(), {{source}}.size()).c_str());
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF({{source}}, {{target}}));
       {{else}}
-        std::string {{target}}ClassName = "{{asJniClassName type null cluster}}";
-        std::string {{target}}CtorSignature = "({{asJniSignature type null cluster false}})V";
-        {{#if_is_bitmap type}}
-          chip::JniReferences::GetInstance().CreateBoxedObject<{{asUnderlyingBasicType type}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), {{source}}.Raw(), {{target}});
+        std::string {{target}}ClassName = "{{asJniClassName type null (asUpperCamelCase cluster)}}";
+        std::string {{target}}CtorSignature = "({{asJniSignature type null (asUpperCamelCase cluster) false}})V";
+        {{#if_is_strongly_typed_bitmap type}}
+          {{asJniBasicType type false}} jni{{target}} = static_cast<{{asJniBasicType type false}}>({{source}}.Raw());
+          chip::JniReferences::GetInstance().CreateBoxedObject<{{asJniBasicType type false}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), jni{{target}}, {{target}});
         {{else}}
-          chip::JniReferences::GetInstance().CreateBoxedObject<{{asUnderlyingBasicType type}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), {{source}}, {{target}});
-        {{/if_is_bitmap}}
+          {{asJniBasicType type false}} jni{{target}} = static_cast<{{asJniBasicType type false}}>({{source}});
+          chip::JniReferences::GetInstance().CreateBoxedObject<{{asJniBasicType type false}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), jni{{target}}, {{target}});
+        {{/if_is_strongly_typed_bitmap}}
       {{/if}}
-    {{/if_chip_enum}}
+    {{/if_is_strongly_typed_chip_enum}}
   {{/if_is_struct}}
 {{/if}}

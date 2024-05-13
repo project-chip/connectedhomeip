@@ -14,10 +14,10 @@
 #    limitations under the License.
 #
 
-from chip.logging.library_handle import _GetLoggingLibraryHandle
-from chip.logging.types import LogRedirectCallback_t
 import logging
 
+from chip.logging.library_handle import _GetLoggingLibraryHandle
+from chip.logging.types import LogRedirectCallback_t
 
 # Defines match support/logging/Constants.h (LogCategory enum)
 ERROR_CATEGORY_NONE = 0
@@ -32,7 +32,7 @@ def _RedirectToPythonLogging(category, module, message):
     module = module.decode('utf-8')
     message = message.decode('utf-8')
 
-    logger = logging.getLogger('chip.%s' % module)
+    logger = logging.getLogger('chip.native.%s' % module)
 
     if category == ERROR_CATEGORY_ERROR:
         logger.error("%s", message)
@@ -51,3 +51,16 @@ def RedirectToPythonLogging():
 
     handle = _GetLoggingLibraryHandle()
     handle.pychip_logging_set_callback(_RedirectToPythonLogging)
+
+
+def SetLogFilter(category):
+    if category < 0 or category > pow(2, 8):
+        raise ValueError("category must be an unsigned 8-bit integer")
+
+    handle = _GetLoggingLibraryHandle()
+    handle.pychip_logging_SetLogFilter(category)
+
+
+def GetLogFilter():
+    handle = _GetLoggingLibraryHandle()
+    return handle.pychip_logging_GetLogFilter()

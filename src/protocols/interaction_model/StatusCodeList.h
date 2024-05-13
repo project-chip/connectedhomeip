@@ -22,6 +22,11 @@
  * include this file, then undefine the macro.
  */
 
+/// WARNING: If you touch this list,
+///          please update src/controller/python/chip/interaction_model/__init__.py
+///          please update src/controller/java/src/chip/devicecontroller/model/Status.java
+///          please update src/controller/java/src/matter/controller/model/Status.kt
+
 // clang-format off
 CHIP_IM_STATUS_CODE(Success               , SUCCESS                 , 0x0)
 CHIP_IM_STATUS_CODE(Failure               , FAILURE                 , 0x01)
@@ -64,4 +69,10 @@ CHIP_IM_STATUS_CODE(Deprecatedc4          , Deprecatedc4            , 0xc4)
 CHIP_IM_STATUS_CODE(NoUpstreamSubscription, NO_UPSTREAM_SUBSCRIPTION, 0xc5)
 CHIP_IM_STATUS_CODE(NeedsTimedInteraction , NEEDS_TIMED_INTERACTION , 0xc6)
 CHIP_IM_STATUS_CODE(UnsupportedEvent      , UNSUPPORTED_EVENT       , 0xc7)
+CHIP_IM_STATUS_CODE(PathsExhausted        , PATHS_EXHAUSTED         , 0xc8)
+CHIP_IM_STATUS_CODE(TimedRequestMismatch  , TIMED_REQUEST_MISMATCH  , 0xc9)
+CHIP_IM_STATUS_CODE(FailsafeRequired      , FAILSAFE_REQUIRED       , 0xca)
+CHIP_IM_STATUS_CODE(InvalidInState        , INVALID_IN_STATE        , 0xcb)
+CHIP_IM_STATUS_CODE(NoCommandResponse     , NO_COMMAND_RESPONSE     , 0xcc)
+CHIP_IM_STATUS_CODE(WriteIgnored          , WRITE_IGNORED           , 0xF0) // non-spec error code and use only internally
 // clang-format on

@@ -33,3 +33,7 @@ executable("chip-ota-requestor-app") {
 group("linux") {
   deps = [ ":chip-ota-requestor-app" ]
 }
+
+group("default") {
+  deps = [ ":linux" ]
+}

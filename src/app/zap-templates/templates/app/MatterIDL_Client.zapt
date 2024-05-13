@@ -1,0 +1,6 @@
+// This IDL was generated automatically by ZAP.
+// It is for view/code review purposes only.
+
+{{#zcl_clusters~}}
+{{>idl_cluster_definition}}
+{{/zcl_clusters}}

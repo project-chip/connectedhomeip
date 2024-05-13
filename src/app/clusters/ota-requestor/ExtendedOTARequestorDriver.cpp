@@ -18,6 +18,7 @@
 #include "ExtendedOTARequestorDriver.h"
 #include "OTARequestorInterface.h"
 #include <app/server/Server.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -30,12 +31,7 @@ constexpr System::Clock::Seconds32 kUserConsentPollInterval = System::Clock::Sec
 
 bool ExtendedOTARequestorDriver::CanConsent()
 {
-    bool localConfigDisabled = false;
-    VerifyOrdo(DeviceLayer::ConfigurationMgr().GetLocalConfigDisabled(localConfigDisabled) == CHIP_NO_ERROR,
-               ChipLogProgress(SoftwareUpdate, "Failed to get local config disabled, assuming not disabled"));
-
-    // User consent delegation SHALL NOT be used if a Node is configured with the LocalConfigDisabled attribute set to True
-    return localConfigDisabled == false;
+    return mUserConsentDelegate != nullptr;
 }
 
 void ExtendedOTARequestorDriver::UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay)
@@ -49,7 +45,6 @@ void ExtendedOTARequestorDriver::UpdateAvailable(const UpdateDescription & updat
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(SoftwareUpdate, "Failed to get user consent subject");
-            HandleError(UpdateFailureState::kDelayedOnUserConsent, err);
             return;
         }
 
@@ -82,7 +77,7 @@ CHIP_ERROR ExtendedOTARequestorDriver::GetUserConsentSubject(chip::ota::UserCons
         return CHIP_ERROR_INTERNAL;
     }
 
-    FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(subject.fabricIndex);
+    const FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(subject.fabricIndex);
     if (fabricInfo == nullptr)
     {
         ChipLogError(SoftwareUpdate, "Cannot find fabric");
@@ -90,8 +85,8 @@ CHIP_ERROR ExtendedOTARequestorDriver::GetUserConsentSubject(chip::ota::UserCons
     }
     subject.requestorNodeId = fabricInfo->GetPeerId().GetNodeId();
 
-    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetVendorId(subject.requestorVendorId));
-    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetProductId(subject.requestorProductId));
+    ReturnErrorOnFailure(DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(subject.requestorVendorId));
+    ReturnErrorOnFailure(DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(subject.requestorProductId));
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(subject.requestorCurrentVersion));
     subject.requestorTargetVersion = update.softwareVersion;
     subject.metadata               = update.metadataForRequestor;
@@ -106,12 +101,7 @@ void ExtendedOTARequestorDriver::HandleUserConsentState(chip::ota::UserConsentSt
     switch (userConsentState)
     {
     case chip::ota::UserConsentState::kGranted:
-        ScheduleDelayedAction(
-            mDelayedActionTime,
-            [](System::Layer *, void * context) {
-                static_cast<ExtendedOTARequestorDriver *>(context)->mRequestor->DownloadUpdate();
-            },
-            this);
+        ScheduleDelayedAction(mDelayedActionTime, DownloadUpdateTimerHandler, this);
         break;
 
     case chip::ota::UserConsentState::kDenied:

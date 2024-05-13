@@ -20,7 +20,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/PeerId.h>
 #include <lib/dnssd/Constants.h>
-#include <lib/dnssd/Resolver.h>
+#include <lib/dnssd/Types.h>
 #include <lib/support/Span.h>
 
 #include <cstddef>
@@ -28,13 +28,13 @@
 
 namespace chip {
 namespace Dnssd {
-constexpr char kSubtypeServiceNamePart[]    = "_sub";
-constexpr char kCommissionableServiceName[] = "_matterc";
-constexpr char kOperationalServiceName[]    = "_matter";
-constexpr char kCommissionerServiceName[]   = "_matterd";
-constexpr char kOperationalProtocol[]       = "_tcp";
-constexpr char kCommissionProtocol[]        = "_udp";
-constexpr char kLocalDomain[]               = "local";
+inline constexpr char kSubtypeServiceNamePart[]    = "_sub";
+inline constexpr char kCommissionableServiceName[] = "_matterc";
+inline constexpr char kOperationalServiceName[]    = "_matter";
+inline constexpr char kCommissionerServiceName[]   = "_matterd";
+inline constexpr char kOperationalProtocol[]       = "_tcp";
+inline constexpr char kCommissionProtocol[]        = "_udp";
+inline constexpr char kLocalDomain[]               = "local";
 
 // each includes space for a null terminator, which becomes a . when the names are appended.
 constexpr size_t kMaxCommissionableServiceNameSize =

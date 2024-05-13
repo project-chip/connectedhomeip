@@ -11,169 +11,124 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 78.1.2. [TC-MOD-1.2] Cluster attributes with server as DUT
+name: 80.2.1. [TC-MOD-1.2] Cluster attributes with DUT as Server
+
+PICS:
+    - MOD.S
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:
-    - label: "TH reads the SupportedModes attribute from DUT"
+    - label: "Precondition"
       verification: |
-          ./chip-tool modeselect read supported-modes 1 1
-          [1645776742.667057][4661:4666] CHIP:TOO:   SupportedModes: 3 entries
-          [1645776742.669546][4661:4666] CHIP:TOO:     [1]: {
-          [1645776742.669588][4661:4666] CHIP:TOO:       Label: Black
-          [1645776742.669613][4661:4666] CHIP:TOO:       Mode: 0
-          [1645776742.669636][4661:4666] CHIP:TOO:       SemanticTag: 0
-          [1645776742.669661][4661:4666] CHIP:TOO:      }
-          [1645776742.669692][4661:4666] CHIP:TOO:     [2]: {
-          [1645776742.669715][4661:4666] CHIP:TOO:       Label: Cappuccino
-          [1645776742.669737][4661:4666] CHIP:TOO:       Mode: 4
-          [1645776742.669757][4661:4666] CHIP:TOO:       SemanticTag: 0
-          [1645776742.669779][4661:4666] CHIP:TOO:      }
-          [1645776742.669808][4661:4666] CHIP:TOO:     [3]: {
-          [1645776742.669831][4661:4666] CHIP:TOO:       Label: Espresso
-          [1645776742.669853][4661:4666] CHIP:TOO:       Mode: 7
-          [1645776742.669874][4661:4666] CHIP:TOO:       SemanticTag: 0
-          [1645776742.669896][4661:4666] CHIP:TOO:      }
+          This test case is verified after the device is provisioned. Pls provision device first, Pass appropriate nodeID in the below command
       disabled: true
 
-    - label: "TH reads the CurrentMode attribute from the DUT"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      verification: |
+
+      disabled: true
+
+    - label: "Step 1: TH reads the SupportedModes attribute from DUT"
+      PICS: MOD.S.A0002
+      verification: |
+          ./chip-tool modeselect read supported-modes 1 1
+
+          Verify that the DUT response contains list of supported modes.
+          - Each mode should be a struct containing a label (user understandable string describing the mode), mode number (integer that identifies the mode and is unique within this SupportedMode list) and  list of semantic tags
+          - Record the mode numbers for use in steps 2, 3, and 4.
+          - MfgCode and Value fields present in the SemanticTags structs should be no larger than 16 bits on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
+
+          [1654595167.600241][14362:14367] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 366231602
+          [1654595167.600345][14362:14367] CHIP:TOO:   SupportedModes: 3 entries
+          [1654595167.600403][14362:14367] CHIP:TOO:     [1]: {
+          [1654595167.600430][14362:14367] CHIP:TOO:       Label: Black
+          [1654595167.600466][14362:14367] CHIP:TOO:       Mode: 0
+          [1654595167.600495][14362:14367] CHIP:TOO:       SemanticTags: 1 entries
+          [1654595167.600564][14362:14367] CHIP:TOO:         [1]: {
+          [1654595167.600589][14362:14367] CHIP:TOO:           MfgCode: 0
+          [1654595167.600612][14362:14367] CHIP:TOO:           Value: 0
+          [1654595167.600637][14362:14367] CHIP:TOO:          }
+          [1654595167.600662][14362:14367] CHIP:TOO:      }
+          [1654595167.600695][14362:14367] CHIP:TOO:     [2]: {
+          [1654595167.600719][14362:14367] CHIP:TOO:       Label: Cappuccino
+          [1654595167.600742][14362:14367] CHIP:TOO:       Mode: 4
+          [1654595167.600768][14362:14367] CHIP:TOO:       SemanticTags: 1 entries
+          [1654595167.600796][14362:14367] CHIP:TOO:         [1]: {
+          [1654595167.600820][14362:14367] CHIP:TOO:           MfgCode: 0
+          [1654595167.600842][14362:14367] CHIP:TOO:           Value: 0
+          [1654595167.600865][14362:14367] CHIP:TOO:          }
+          [1654595167.600889][14362:14367] CHIP:TOO:      }
+          [1654595167.600921][14362:14367] CHIP:TOO:     [3]: {
+          [1654595167.600945][14362:14367] CHIP:TOO:       Label: Espresso
+          [1654595167.600968][14362:14367] CHIP:TOO:       Mode: 7
+          [1654595167.600993][14362:14367] CHIP:TOO:       SemanticTags: 1 entries
+          [1654595167.601022][14362:14367] CHIP:TOO:         [1]: {
+          [1654595167.601046][14362:14367] CHIP:TOO:           MfgCode: 0
+          [1654595167.601068][14362:14367] CHIP:TOO:           Value: 0
+          [1654595167.601091][14362:14367] CHIP:TOO:          }
+          [1654595167.601115][14362:14367] CHIP:TOO:      }
+      disabled: true
+
+    - label: "Step 2: TH reads the CurrentMode attribute from the DUT"
+      PICS: MOD.S.A0003
       verification: |
           ./chip-tool modeselect read current-mode 1 1
-          [1645776767.610097][4667:4672] CHIP:DMG: ReportDataMessage =
-          [1645776767.610129][4667:4672] CHIP:DMG: {
-          [1645776767.610155][4667:4672] CHIP:DMG:        AttributeReportIBs =
-          [1645776767.610190][4667:4672] CHIP:DMG:        [
-          [1645776767.610217][4667:4672] CHIP:DMG:                AttributeReportIB =
-          [1645776767.610258][4667:4672] CHIP:DMG:                {
-          [1645776767.610289][4667:4672] CHIP:DMG:                        AttributeDataIB =
-          [1645776767.610331][4667:4672] CHIP:DMG:                        {
-          [1645776767.610367][4667:4672] CHIP:DMG:                                DataVersion = 0xe164a616,
-          [1645776767.610404][4667:4672] CHIP:DMG:                                AttributePathIB =
-          [1645776767.610442][4667:4672] CHIP:DMG:                                {
-          [1645776767.610481][4667:4672] CHIP:DMG:                                        Endpoint = 0x1,
-          [1645776767.610526][4667:4672] CHIP:DMG:                                        Cluster = 0x50,
-          [1645776767.610577][4667:4672] CHIP:DMG:                                        Attribute = 0x0000_0000,
-          [1645776767.610611][4667:4672] CHIP:DMG:                                }
-          [1645776767.610654][4667:4672] CHIP:DMG:
-          [1645776767.610697][4667:4672] CHIP:DMG:                                        Data = 0,
-          [1645776767.610734][4667:4672] CHIP:DMG:                        },
-          [1645776767.610773][4667:4672] CHIP:DMG:
-          [1645776767.610803][4667:4672] CHIP:DMG:                },
-          [1645776767.610840][4667:4672] CHIP:DMG:
-          [1645776767.610866][4667:4672] CHIP:DMG:        ],
-          [1645776767.610901][4667:4672] CHIP:DMG:
-          [1645776767.610929][4667:4672] CHIP:DMG:        SuppressResponse = true,
-          [1645776767.610958][4667:4672] CHIP:DMG:        InteractionModelRevision = 1
-          [1645776767.610983][4667:4672] CHIP:DMG: }
+
+          Verify on TH(chip-tool) logs, CurrentMode attribute value is an integer that is in the list of modes returned in step 1, below is the sample log provided for the raspi platform:
+
           [1645776767.611140][4667:4672] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000DataVersion: 3781469718
           [1645776767.611214][4667:4672] CHIP:TOO:   CurrentMode: 0
       disabled: true
 
-    - label: "TH reads the OnMode attribute from the DUT"
+    - label: "Step 3: TH reads the OnMode attribute from the DUT"
+      PICS: MOD.S.A0005
       verification: |
           ./chip-tool modeselect read on-mode 1 1
-          [1645776797.703167][4674:4679] CHIP:DMG: ReportDataMessage =
-          [1645776797.703202][4674:4679] CHIP:DMG: {
-          [1645776797.703230][4674:4679] CHIP:DMG:        AttributeReportIBs =
-          [1645776797.703270][4674:4679] CHIP:DMG:        [
-          [1645776797.703297][4674:4679] CHIP:DMG:                AttributeReportIB =
-          [1645776797.703336][4674:4679] CHIP:DMG:                {
-          [1645776797.703368][4674:4679] CHIP:DMG:                        AttributeDataIB =
-          [1645776797.703415][4674:4679] CHIP:DMG:                        {
-          [1645776797.703453][4674:4679] CHIP:DMG:                                DataVersion = 0xe164a616,
-          [1645776797.703494][4674:4679] CHIP:DMG:                                AttributePathIB =
-          [1645776797.703531][4674:4679] CHIP:DMG:                                {
-          [1645776797.703576][4674:4679] CHIP:DMG:                                        Endpoint = 0x1,
-          [1645776797.703625][4674:4679] CHIP:DMG:                                        Cluster = 0x50,
-          [1645776797.703675][4674:4679] CHIP:DMG:                                        Attribute = 0x0000_0002,
-          [1645776797.703719][4674:4679] CHIP:DMG:                                }
-          [1645776797.703758][4674:4679] CHIP:DMG:
-          [1645776797.703794][4674:4679] CHIP:DMG:                                        Data = 0,
-          [1645776797.703834][4674:4679] CHIP:DMG:                        },
-          [1645776797.703878][4674:4679] CHIP:DMG:
-          [1645776797.703911][4674:4679] CHIP:DMG:                },
-          [1645776797.703952][4674:4679] CHIP:DMG:
-          [1645776797.703981][4674:4679] CHIP:DMG:        ],
-          [1645776797.704018][4674:4679] CHIP:DMG:
-          [1645776797.704049][4674:4679] CHIP:DMG:        SuppressResponse = true,
-          [1645776797.704080][4674:4679] CHIP:DMG:        InteractionModelRevision = 1
-          [1645776797.704108][4674:4679] CHIP:DMG: }
-          [1645776797.704270][4674:4679] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002DataVersion: 3781469718
-          [1645776797.704349][4674:4679] CHIP:TOO:   OnMode: 0
+
+          Verify on TH(chip-tool) logs, OnMode attribute value is an integer that is in the list of modes returned in step 1(As per spec default value is null) , below is the sample log provided for the raspi platform:
+
+          [1649676072.465968][10754:10759] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0005 DataVersion: 4277065072
+          [1649676072.466094][10754:10759] CHIP:TOO:   OnMode: null
       disabled: true
 
-    - label: "TH reads the StartUpMode attribute from the DUT"
+    - label: "Step 4: TH reads the StartUpMode attribute from the DUT"
+      PICS: MOD.S.A0004
       verification: |
           ./chip-tool modeselect read start-up-mode 1 1
-          [1645776818.699192][4682:4687] CHIP:DMG: ReportDataMessage =
-          [1645776818.699226][4682:4687] CHIP:DMG: {
-          [1645776818.699255][4682:4687] CHIP:DMG:        AttributeReportIBs =
-          [1645776818.699292][4682:4687] CHIP:DMG:        [
-          [1645776818.699322][4682:4687] CHIP:DMG:                AttributeReportIB =
-          [1645776818.699369][4682:4687] CHIP:DMG:                {
-          [1645776818.699404][4682:4687] CHIP:DMG:                        AttributeDataIB =
-          [1645776818.699451][4682:4687] CHIP:DMG:                        {
-          [1645776818.699496][4682:4687] CHIP:DMG:                                DataVersion = 0xe164a616,
-          [1645776818.699536][4682:4687] CHIP:DMG:                                AttributePathIB =
-          [1645776818.699574][4682:4687] CHIP:DMG:                                {
-          [1645776818.699623][4682:4687] CHIP:DMG:                                        Endpoint = 0x1,
-          [1645776818.699667][4682:4687] CHIP:DMG:                                        Cluster = 0x50,
-          [1645776818.699712][4682:4687] CHIP:DMG:                                        Attribute = 0x0000_0003,
-          [1645776818.699748][4682:4687] CHIP:DMG:                                }
-          [1645776818.699787][4682:4687] CHIP:DMG:
-          [1645776818.699825][4682:4687] CHIP:DMG:                                        Data = 0,
-          [1645776818.699860][4682:4687] CHIP:DMG:                        },
-          [1645776818.699898][4682:4687] CHIP:DMG:
-          [1645776818.699932][4682:4687] CHIP:DMG:                },
-          [1645776818.699970][4682:4687] CHIP:DMG:
-          [1645776818.699999][4682:4687] CHIP:DMG:        ],
-          [1645776818.700035][4682:4687] CHIP:DMG:
-          [1645776818.700065][4682:4687] CHIP:DMG:        SuppressResponse = true,
-          [1645776818.700095][4682:4687] CHIP:DMG:        InteractionModelRevision = 1
-          [1645776818.700127][4682:4687] CHIP:DMG: }
-          [1645776818.700294][4682:4687] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003DataVersion: 3781469718
-          [1645776818.700374][4682:4687] CHIP:TOO:   StartUpMode: 0
+
+          Verify on TH(chip-tool) logs, StartUpMode attribute value is an integer that is in the list of modes returned in step 1,  below is the sample log provided for the raspi platform:
+
+          [1649677014.496348][10778:10784] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0004 DataVersion: 4277065072
+          [1649677014.496469][10778:10784] CHIP:TOO:   StartUpMode: 0
       disabled: true
 
-    - label: "TH reads the Description attribute from the DUT"
+    - label: "Step 5: TH reads the Description attribute from the DUT"
+      PICS: MOD.S.A0000
       verification: |
           ./chip-tool modeselect read description 1 1
-          [1645776853.154340][4691:4696] CHIP:DMG: ReportDataMessage =
-          [1645776853.154374][4691:4696] CHIP:DMG: {
-          [1645776853.154402][4691:4696] CHIP:DMG:        AttributeReportIBs =
-          [1645776853.154440][4691:4696] CHIP:DMG:        [
-          [1645776853.154470][4691:4696] CHIP:DMG:                AttributeReportIB =
-          [1645776853.154514][4691:4696] CHIP:DMG:                {
-          [1645776853.154569][4691:4696] CHIP:DMG:                        AttributeDataIB =
-          [1645776853.154633][4691:4696] CHIP:DMG:                        {
-          [1645776853.154678][4691:4696] CHIP:DMG:                                DataVersion = 0xe164a616,
-          [1645776853.154750][4691:4696] CHIP:DMG:                                AttributePathIB =
-          [1645776853.154813][4691:4696] CHIP:DMG:                                {
-          [1645776853.154875][4691:4696] CHIP:DMG:                                        Endpoint = 0x1,
-          [1645776853.154950][4691:4696] CHIP:DMG:                                        Cluster = 0x50,
-          [1645776853.155011][4691:4696] CHIP:DMG:                                        Attribute = 0x0000_0004,
-          [1645776853.155068][4691:4696] CHIP:DMG:                                }
-          [1645776853.155139][4691:4696] CHIP:DMG:
-          [1645776853.155182][4691:4696] CHIP:DMG:                                        Data = "Coffee",
-          [1645776853.155250][4691:4696] CHIP:DMG:                        },
-          [1645776853.155318][4691:4696] CHIP:DMG:
-          [1645776853.155351][4691:4696] CHIP:DMG:                },
-          [1645776853.155411][4691:4696] CHIP:DMG:
-          [1645776853.155441][4691:4696] CHIP:DMG:        ],
-          [1645776853.155478][4691:4696] CHIP:DMG:
-          [1645776853.155531][4691:4696] CHIP:DMG:        SuppressResponse = true,
-          [1645776853.155563][4691:4696] CHIP:DMG:        InteractionModelRevision = 1
-          [1645776853.155591][4691:4696] CHIP:DMG: }
-          [1645776853.155757][4691:4696] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0004DataVersion: 3781469718
-          [1645776853.155812][4691:4696] CHIP:TOO:   Description: Coffee
+
+          Verify on TH(chip-tool) logs , Description value is human readable text string and below is the sample log provided for the raspi platform:
+
+          [1649677114.614974][10787:10792] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000 DataVersion: 4277065072
+          [1649677114.615110][10787:10792] CHIP:TOO:   Description: Coffee
       disabled: true
 
-    - label: "TH reads the StandardNamespace attribute from the DUT"
+    - label: "Step 6: TH reads the StandardNamespace attribute from the DUT"
+      PICS: MOD.S.A0001
       verification: |
-          Not supported by chip-tool
+          ./chip-tool modeselect read standard-namespace 1 1
+
+          Verify on TH(chip-tool) logs, StandardNamespace attribute value is an enum16,  below is the sample log provided for the raspi platform:
+
+          [1689750113.807806][3472:3474] CHIP:DMG: }
+          [1689750113.807960][3472:3474] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0001 DataVersion: 628878473
+          [1689750113.808031][3472:3474] CHIP:TOO:   StandardNamespace: 0
       disabled: true

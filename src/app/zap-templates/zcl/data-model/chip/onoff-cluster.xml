@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (c) 2021 Project CHIP Authors
+Copyright (c) 2023 Project CHIP Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,32 +17,32 @@ limitations under the License.
 <configurator>
   <domain name="General"/>
 
-  <enum name="OnOffStartUpOnOff" type="ENUM8">
+  <enum name="StartUpOnOffEnum" type="enum8">
     <cluster code="0x0006"/>
     <item name="Off" value="0x00"/>
     <item name="On" value="0x01"/>
-    <item name="TogglePreviousOnOff" value="0x02"/>
+    <item name="Toggle" value="0x02"/>
   </enum>
 
-  <enum name="OnOffEffectIdentifier" type="enum8">
+  <enum name="EffectIdentifierEnum" type="enum8">
     <cluster code="0x0006"/>
     <item name="DelayedAllOff" value="0x00"/>
     <item name="DyingLight" value="0x01"/>
   </enum>
 
-  <enum name="OnOffDelayedAllOffEffectVariant" type="enum8">
+  <enum name="DelayedAllOffEffectVariantEnum" type="enum8">
     <cluster code="0x0006"/>
-    <item name="FadeToOffIn_0p8Seconds" value="0x00"/>
+    <item name="DelayedOffFastFade" value="0x00"/>
     <item name="NoFade" value="0x01"/>
-    <item name="50PercentDimDownIn_0p8SecondsThenFadeToOffIn_12Seconds" value="0x02"/>
+    <item name="DelayedOffSlowFade" value="0x02"/>
   </enum>
 
-  <enum name="OnOffDyingLightEffectVariant" type="enum8">
+  <enum name="DyingLightEffectVariantEnum" type="enum8">
     <cluster code="0x0006"/>
-    <item name="20PercenterDimUpIn_0p5SecondsThenFadeToOffIn_1Second" value="0x00"/>
+    <item name="DyingLightFadeOff" value="0x00"/>
   </enum>
 
-  <bitmap name="OnOffControl" type="BITMAP8">
+  <bitmap name="OnOffControlBitmap" type="bitmap8">
     <cluster code="0x0006"/>
     <field name="AcceptOnlyWhenOn" mask="0x01"/>
   </bitmap>
@@ -53,13 +53,40 @@ limitations under the License.
     <code>0x0006</code>
     <define>ON_OFF_CLUSTER</define>
     <description>Attributes and commands for switching devices between 'On' and 'Off' states.</description>
-    <globalAttribute side="either" code="0xFFFD" value="4"/>
+    <globalAttribute side="either" code="0xFFFD" value="6"/>
+
+    <features>
+      <feature bit="0" code="LT" name="Lighting" summary="Behavior that supports lighting applications.">
+        <optionalConform>
+          <notTerm>
+            <feature name="OFFONLY"/>
+          </notTerm>
+        </optionalConform>
+      </feature>
+      <feature bit="1" code="DF" name="DeadFrontBehavior" summary="Device has DeadFrontBehavior Feature">
+        <optionalConform>
+          <notTerm>
+            <feature name="OFFONLY"/>
+          </notTerm>
+        </optionalConform>
+      </feature>
+      <feature bit="2" code="OFFONLY" name="OffOnly" summary="Device supports the OffOnly Feature feature">
+        <optionalConform>
+          <notTerm>
+            <orTerm>
+              <feature name="LT"/>
+              <feature name="DF"/>
+            </orTerm>
+          </notTerm>
+        </optionalConform>
+      </feature>
+    </features>
 
     <attribute side="server" code="0x0000" define="ON_OFF"               type="boolean" default="0" reportable="true"              >OnOff</attribute>
     <attribute side="server" code="0x4000" define="GLOBAL_SCENE_CONTROL" type="boolean" default="1"                 optional="true">GlobalSceneControl</attribute>
     <attribute side="server" code="0x4001" define="ON_TIME"              type="int16u"  default="0" writable="true" optional="true">OnTime</attribute>
     <attribute side="server" code="0x4002" define="OFF_WAIT_TIME"        type="int16u"  default="0" writable="true" optional="true">OffWaitTime</attribute>
-    <attribute side="server" code="0x4003" define="START_UP_ON_OFF"      type="OnOffStartUpOnOff" min="0" max="2" isNullable="true" writable="true" optional="true">
+    <attribute side="server" code="0x4003" define="START_UP_ON_OFF"      type="StartUpOnOffEnum" min="0" max="2" isNullable="true" writable="true" optional="true">
       <description>StartUpOnOff</description>
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
@@ -79,8 +106,8 @@ limitations under the License.
 
     <command source="client" code="0x40" name="OffWithEffect" optional="true">
       <description>The OffWithEffect command allows devices to be turned off using enhanced ways of fading.</description>
-      <arg name="EffectId" type="OnOffEffectIdentifier"/>
-      <arg name="EffectVariant" type="OnOffDelayedAllOffEffectVariant"/>
+      <arg name="EffectIdentifier" type="EffectIdentifierEnum"/>
+      <arg name="EffectVariant" type="enum8"/>
     </command>
 
     <command source="client" code="0x41" name="OnWithRecallGlobalScene" optional="true">
@@ -89,14 +116,10 @@ limitations under the License.
 
     <command source="client" code="0x42" name="OnWithTimedOff" optional="true">
       <description>The OnWithTimedOff command allows devices to be turned on for a specific duration with a guarded off duration so that SHOULD the device be subsequently switched off, further OnWithTimedOff commands, received during this time, are prevented from turning the devices back on.</description>
-      <arg name="OnOffControl" type="OnOffControl"/>
-      <arg name="OnTime" type="int16u"/><!-- min:0 max:0xfe -->
-      <arg name="OffWaitTime" type="int16u"/><!-- min:0 max:0xfe -->
+      <arg name="OnOffControl" type="OnOffControlBitmap"/>
+      <arg name="OnTime" type="int16u"/>
+      <arg name="OffWaitTime" type="int16u"/>
     </command>
   </cluster>
 
-  <bitmap name="OnOffFeature" type="BITMAP32">
-    <cluster code="0x0006" />
-    <field name="Lighting" mask="0x01" />
-  </bitmap>
 </configurator>

@@ -18,8 +18,9 @@
 
 #pragma once
 
-#include "ConcreteEventPath.h"
 #include "EventLoggingTypes.h"
+
+#include <app/ConcreteEventPath.h>
 #include <app/util/basic-types.h>
 
 namespace chip {
@@ -30,6 +31,12 @@ struct EventHeader
     EventNumber mEventNumber     = 0;
     PriorityLevel mPriorityLevel = PriorityLevel::Invalid;
     Timestamp mTimestamp;
+
+    void LogPath() const
+    {
+        ChipLogProgress(DataManagement, "Concrete Event Path: (%d, " ChipLogFormatMEI ", " ChipLogFormatMEI ") ", mPath.mEndpointId,
+                        ChipLogValueMEI(mPath.mClusterId), ChipLogValueMEI(mPath.mEventId));
+    }
 };
 } // namespace app
 } // namespace chip

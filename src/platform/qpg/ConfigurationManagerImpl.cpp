@@ -24,14 +24,11 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/ConfigurationManager.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <platform/qpg/qpgConfig.h>
-
-#if CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
-#include <platform/internal/FactoryProvisioning.ipp>
-#endif // CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -50,11 +47,102 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
+    uint32_t rebootCount;
+    qvResetReason_t qvRebootReason;
+    BootReasonType bootReason;
 
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<QPGConfig>::Init();
+    SuccessOrExit(err);
 
+    if (QPGConfig::ConfigValueExists(QPGConfig::kCounterKey_RebootCount))
+    {
+        err = GetRebootCount(rebootCount);
+        SuccessOrExit(err);
+
+        // Do not increment reboot count if the value is going to overflow UINT16.
+        err = StoreRebootCount(rebootCount < UINT16_MAX ? rebootCount + 1 : rebootCount);
+        SuccessOrExit(err);
+    }
+    else
+    {
+        // The first boot after factory reset of the Node.
+        err = StoreRebootCount(1);
+        SuccessOrExit(err);
+    }
+
+    qvRebootReason = qvCHIP_GetResetReason();
+
+    switch (qvRebootReason)
+    {
+    case qvResetReason_HW_BrownOutDetected: {
+        bootReason = BootReasonType::kBrownOutReset;
+        break;
+    }
+
+    case qvResetReason_HW_Watchdog: {
+        bootReason = BootReasonType::kHardwareWatchdogReset;
+        break;
+    }
+
+    case qvResetReason_HW_Por: {
+        bootReason = BootReasonType::kPowerOnReboot;
+        break;
+    }
+
+    case qvResetReason_SW_Por: {
+        bootReason = BootReasonType::kSoftwareReset;
+        break;
+    }
+
+    default:
+        bootReason = BootReasonType::kUnspecified;
+        break;
+    }
+
+    err = StoreBootReason(to_underlying(bootReason));
+    SuccessOrExit(err);
+
+    err = CHIP_NO_ERROR;
+
+exit:
     return err;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
+{
+    return ReadConfigValue(QPGConfig::kCounterKey_RebootCount, rebootCount);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreRebootCount(uint32_t rebootCount)
+{
+    return WriteConfigValue(QPGConfig::kCounterKey_RebootCount, rebootCount);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
+{
+    if (!QPGConfig::ConfigValueExists(QPGConfig::kCounterKey_TotalOperationalHours))
+    {
+        totalOperationalHours = 0;
+        return CHIP_NO_ERROR;
+    }
+
+    return QPGConfig::ReadConfigValue(QPGConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOperationalHours)
+{
+    return QPGConfig::WriteConfigValue(QPGConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
+{
+    return ReadConfigValue(QPGConfig::kCounterKey_BootReason, bootReason);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreBootReason(uint32_t bootReason)
+{
+    return WriteConfigValue(QPGConfig::kCounterKey_BootReason, bootReason);
 }
 
 bool ConfigurationManagerImpl::CanFactoryReset()
@@ -192,6 +280,11 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     // Restart the system.
     ChipLogProgress(DeviceLayer, "System restarting");
     qvCHIP_ResetSystem();
+}
+
+ConfigurationManager & ConfigurationMgrImpl()
+{
+    return ConfigurationManagerImpl::GetDefaultInstance();
 }
 
 } // namespace DeviceLayer

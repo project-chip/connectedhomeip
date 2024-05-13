@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,50 +17,125 @@
 
 #pragma once
 
-#include <device.h>
-#include <vector>
+#include <cstddef>
+#include <set>
 
-#define STATE_HIGH 1
-#define STATE_LOW 0
-
-class Button
+class ButtonBackend
 {
 public:
-    void Configure(const struct device * port, gpio_pin_t outPin, gpio_pin_t inPin, void (*callback)(void));
-    void Poll(Button * previous);
-    void SetCallback(void (*callback)(void));
-
-private:
-    int Init(void);
-    int Deinit(void);
-
-    const struct device * mPort;
-    gpio_pin_t mOutPin;
-    gpio_pin_t mInPin;
-    int mPreviousState      = STATE_LOW;
-    void (*mCallback)(void) = NULL;
+    virtual bool linkHW(void (*on_button_change)(size_t button, bool pressed, void * context), void * context) = 0;
 };
 
 class ButtonManager
 {
 public:
-    void Init(void);
-    void Poll(void);
-    void AddButton(Button & button);
-    void SetCallback(unsigned int index, void (*callback)(void));
+    static ButtonManager & getInstance();
+    void addCallback(void (*callback)(void), size_t button, bool pressed);
+    void rmCallback(void (*callback)(void));
+    void rmCallback(size_t button, bool pressed);
+    void linkBackend(ButtonBackend & backend);
+
+    ButtonManager(ButtonManager const &)  = delete;
+    void operator=(ButtonManager const &) = delete;
 
 private:
-    std::vector<Button> mButtons;
+    struct Event
+    {
+        size_t button;
+        bool pressed;
+        void (*callback)(void);
 
-    friend ButtonManager & ButtonManagerInst(void);
+        friend bool operator<(const Event & lhs, const Event & rhs)
+        {
+            if (lhs.button < rhs.button)
+            {
+                return true;
+            }
+            else if (lhs.button > rhs.button)
+            {
+                return false;
+            }
+            else if (lhs.pressed < rhs.pressed)
+            {
+                return true;
+            }
+            else if (lhs.pressed > rhs.pressed)
+            {
+                return false;
+            }
+            else if (lhs.callback < rhs.callback)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        friend bool operator>(const Event & lhs, const Event & rhs)
+        {
+            if (lhs.button > rhs.button)
+            {
+                return true;
+            }
+            else if (lhs.button < rhs.button)
+            {
+                return false;
+            }
+            else if (lhs.pressed > rhs.pressed)
+            {
+                return true;
+            }
+            else if (lhs.pressed < rhs.pressed)
+            {
+                return false;
+            }
+            else if (lhs.callback > rhs.callback)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    };
 
-    static ButtonManager sInstance;
+    ButtonManager();
+
+    static void onButton(size_t button, bool pressed, void * buttonMgr);
+
+    std::set<Event> m_events;
 };
 
-/**
- * Returns the KeyManager singleton object.
- */
-inline ButtonManager & ButtonManagerInst(void)
+#if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
+
+class ButtonPool : public ButtonBackend
 {
-    return ButtonManager::sInstance;
-}
+public:
+    static ButtonPool & getInstance();
+    bool linkHW(void (*on_button_change)(size_t button, bool pressed, void * context), void * context);
+
+    ButtonPool(ButtonPool const &)     = delete;
+    void operator=(ButtonPool const &) = delete;
+
+private:
+    ButtonPool(){};
+};
+
+#else
+
+class ButtonMatrix : public ButtonBackend
+{
+public:
+    static ButtonMatrix & getInstance();
+    bool linkHW(void (*on_button_change)(size_t button, bool pressed, void * context), void * context);
+
+    ButtonMatrix(ButtonMatrix const &)   = delete;
+    void operator=(ButtonMatrix const &) = delete;
+
+private:
+    ButtonMatrix(){};
+};
+
+#endif // CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE

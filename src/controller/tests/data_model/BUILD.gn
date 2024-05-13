@@ -14,7 +14,7 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlunit_test.gni")
+import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
 import("${chip_root}/src/platform/device.gni")
@@ -25,8 +25,8 @@ chip_test_suite("data_model") {
   if (chip_device_platform != "mbed" && chip_device_platform != "efr32" &&
       chip_device_platform != "esp32" && chip_device_platform != "fake") {
     test_sources = [ "TestCommands.cpp" ]
-    test_sources += [ "TestRead.cpp" ]
     test_sources += [ "TestWrite.cpp" ]
+    test_sources += [ "TestRead.cpp" ]
   }
 
   public_deps = [
@@ -34,8 +34,8 @@ chip_test_suite("data_model") {
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/controller",
     "${chip_root}/src/messaging/tests:helpers",
     "${chip_root}/src/transport/raw/tests:helpers",
-    "${nlunit_test_root}:nlunit-test",
   ]
 }

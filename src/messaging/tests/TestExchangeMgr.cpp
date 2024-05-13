@@ -21,11 +21,10 @@
  *      This file implements unit tests for the ExchangeManager implementation.
  */
 
-#include "TestMessagingLayer.h"
-
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
@@ -34,13 +33,16 @@
 #include <protocols/Protocols.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
-#include <transport/raw/tests/NetworkTestHelpers.h>
 
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
 
 #include <errno.h>
 #include <utility>
+
+#if CHIP_CRYPTO_PSA
+#include "psa/crypto.h"
+#endif
 
 namespace {
 
@@ -49,7 +51,19 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::Messaging;
 
-using TestContext = Test::LoopbackMessagingContext<>;
+struct TestContext : Test::LoopbackMessagingContext
+{
+    // TODO Add TearDown function during changing test framework to Pigweed to make it more clear how does it work.
+    // Currently, the TearDown function is from LoopbackMessagingContext
+    void SetUp() override
+    {
+#if CHIP_CRYPTO_PSA
+        // TODO: use ASSERT_EQ, once transition to pw_unit_test is complete
+        VerifyOrDie(psa_crypto_init() == PSA_SUCCESS);
+#endif
+        chip::Test::LoopbackMessagingContext::SetUp();
+    }
+};
 
 enum : uint8_t
 {
@@ -57,11 +71,15 @@ enum : uint8_t
     kMsgType_TEST2 = 2,
 };
 
-TestContext sContext;
-
-class MockAppDelegate : public ExchangeDelegate
+class MockAppDelegate : public UnsolicitedMessageHandler, public ExchangeDelegate
 {
 public:
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override
+    {
+        newDelegate = this;
+        return CHIP_NO_ERROR;
+    }
+
     CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && buffer) override
     {
@@ -88,20 +106,28 @@ public:
     bool IsOnResponseTimeoutCalled = false;
 };
 
+class ExpireSessionFromTimeoutDelegate : public WaitForTimeoutDelegate
+{
+    void OnResponseTimeout(ExchangeContext * ec) override
+    {
+        ec->GetSessionHandle()->AsSecureSession()->MarkForEviction();
+        WaitForTimeoutDelegate::OnResponseTimeout(ec);
+    }
+};
+
 void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
     MockAppDelegate mockAppDelegate;
     ExchangeContext * ec1 = ctx.NewExchangeToBob(&mockAppDelegate);
-    NL_TEST_ASSERT(inSuite, ec1 != nullptr);
+    NL_TEST_EXIT_ON_FAILED_ASSERT(inSuite, ec1 != nullptr);
     NL_TEST_ASSERT(inSuite, ec1->IsInitiator() == true);
-    NL_TEST_ASSERT(inSuite, ec1->GetExchangeId() != 0);
     NL_TEST_ASSERT(inSuite, ec1->GetSessionHandle() == ctx.GetSessionAliceToBob());
     NL_TEST_ASSERT(inSuite, ec1->GetDelegate() == &mockAppDelegate);
 
     ExchangeContext * ec2 = ctx.NewExchangeToAlice(&mockAppDelegate);
-    NL_TEST_ASSERT(inSuite, ec2 != nullptr);
+    NL_TEST_EXIT_ON_FAILED_ASSERT(inSuite, ec2 != nullptr);
     NL_TEST_ASSERT(inSuite, ec2->GetExchangeId() > ec1->GetExchangeId());
     NL_TEST_ASSERT(inSuite, ec2->GetSessionHandle() == ctx.GetSessionBobToAlice());
 
@@ -117,7 +143,7 @@ void CheckSessionExpirationBasics(nlTestSuite * inSuite, void * inContext)
     ExchangeContext * ec1 = ctx.NewExchangeToBob(&sendDelegate);
 
     // Expire the session this exchange is supposedly on.
-    ctx.GetSecureSessionManager().ExpirePairing(ec1->GetSessionHandle());
+    ec1->GetSessionHandle()->AsSecureSession()->MarkForEviction();
 
     MockAppDelegate receiveDelegate;
     CHIP_ERROR err =
@@ -153,7 +179,36 @@ void CheckSessionExpirationTimeout(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !sendDelegate.IsOnResponseTimeoutCalled);
 
     // Expire the session this exchange is supposedly on.  This should close the exchange.
-    ctx.GetSecureSessionManager().ExpirePairing(ec1->GetSessionHandle());
+    ec1->GetSessionHandle()->AsSecureSession()->MarkForEviction();
+    NL_TEST_ASSERT(inSuite, sendDelegate.IsOnResponseTimeoutCalled);
+
+    // recreate closed session.
+    NL_TEST_ASSERT(inSuite, ctx.CreateSessionAliceToBob() == CHIP_NO_ERROR);
+}
+
+void CheckSessionExpirationDuringTimeout(nlTestSuite * inSuite, void * inContext)
+{
+    using namespace chip::System::Clock::Literals;
+
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    ExpireSessionFromTimeoutDelegate sendDelegate;
+    ExchangeContext * ec1 = ctx.NewExchangeToBob(&sendDelegate);
+
+    auto timeout = System::Clock::Timeout(100);
+    ec1->SetResponseTimeout(timeout);
+
+    NL_TEST_ASSERT(inSuite, !sendDelegate.IsOnResponseTimeoutCalled);
+
+    ec1->SendMessage(Protocols::BDX::Id, kMsgType_TEST1, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
+                     SendFlags(Messaging::SendMessageFlags::kExpectResponse).Set(Messaging::SendMessageFlags::kNoAutoRequestAck));
+    ctx.DrainAndServiceIO();
+
+    // Wait for our timeout to elapse. Give it an extra 1000ms of slack,
+    // because if we lose the timeslice for longer than the slack we could end
+    // up breaking out of the loop before the timeout timer has actually fired.
+    ctx.GetIOContext().DriveIOUntil(timeout + 1000_ms32, [&sendDelegate] { return sendDelegate.IsOnResponseTimeoutCalled; });
+
     NL_TEST_ASSERT(inSuite, sendDelegate.IsOnResponseTimeoutCalled);
 
     // recreate closed session.
@@ -235,6 +290,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("Test ExchangeMgr::CheckExchangeMessages",    CheckExchangeMessages),
     NL_TEST_DEF("Test OnConnectionExpired basics",            CheckSessionExpirationBasics),
     NL_TEST_DEF("Test OnConnectionExpired timeout handling",  CheckSessionExpirationTimeout),
+    NL_TEST_DEF("Test session eviction in timeout handling",  CheckSessionExpirationDuringTimeout),
 
     NL_TEST_SENTINEL()
 };
@@ -245,8 +301,10 @@ nlTestSuite sSuite =
 {
     "Test-CHIP-ExchangeManager",
     &sTests[0],
-    TestContext::InitializeAsync,
-    TestContext::Finalize
+    TestContext::nlTestSetUpTestSuite,
+    TestContext::nlTestTearDownTestSuite,
+    TestContext::nlTestSetUp,
+    TestContext::nlTestTearDown,
 };
 // clang-format on
 
@@ -257,10 +315,7 @@ nlTestSuite sSuite =
  */
 int TestExchangeMgr()
 {
-    // Run test suit against one context
-    nlTestRunner(&sSuite, &sContext);
-
-    return (nlTestRunnerStats(&sSuite));
+    return chip::ExecuteTestsWithContext<TestContext>(&sSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestExchangeMgr);

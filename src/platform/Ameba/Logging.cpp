@@ -25,17 +25,29 @@
 #include <platform/logging/LogV.h>
 
 #include <core/CHIPConfig.h>
+#include <support/TypeTraits.h>
 #include <support/logging/Constants.h>
 
+#include "Logging.h"
 #include <stdio.h>
-
-#ifdef LOG_LOCAL_LEVEL
-#undef LOG_LOCAL_LEVEL
-#endif
 
 namespace chip {
 namespace Logging {
 namespace Platform {
+
+namespace {
+LogLevel log_level = LogLevel::kDetail;
+}
+
+void LogSetLevel(LogLevel level)
+{
+    log_level = level;
+}
+
+LogLevel LogGetLevel()
+{
+    return log_level;
+}
 
 void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
@@ -50,14 +62,17 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
     switch (category)
     {
     case kLogCategory_Error:
-        printf("%s %s\r\n", tag, formattedMsg);
+        if (to_underlying(log_level) >= to_underlying(LogLevel::kError))
+            printf("%s %s\r\n", tag, formattedMsg);
         break;
     case kLogCategory_Progress:
     default:
-        printf("%s %s\r\n", tag, formattedMsg);
+        if (to_underlying(log_level) >= to_underlying(LogLevel::kProgress))
+            printf("%s %s\r\n", tag, formattedMsg);
         break;
     case kLogCategory_Detail:
-        printf("%s %s\r\n", tag, formattedMsg);
+        if (to_underlying(log_level) >= to_underlying(LogLevel::kDetail))
+            printf("%s %s\r\n", tag, formattedMsg);
         break;
     }
 }

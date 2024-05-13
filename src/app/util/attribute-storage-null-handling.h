@@ -17,7 +17,10 @@
 
 #pragma once
 
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/CHIPConfig.h>
+#include <lib/core/TLV.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/BitMask.h>
 #include <lib/support/TypeTraits.h>
 
 #include <limits>
@@ -28,13 +31,13 @@ namespace app {
 
 template <typename T,
           bool IsBigEndian =
-// BIGENDIAN_CPU to match how the attribute store works, because that's
+// CHIP_CONFIG_BIG_ENDIAN_TARGET to match how the attribute store works, because that's
 // what where our data buffer is eventually ending up or coming from.
-#if BIGENDIAN_CPU
+#if CHIP_CONFIG_BIG_ENDIAN_TARGET
               true
-#else  // BIGENDIAN_CPU
+#else  // CHIP_CONFIG_BIG_ENDIAN_TARGET
               false
-#endif // BIGENDIAN_CPU
+#endif // CHIP_CONFIG_BIG_ENDIAN_TARGET
           >
 struct NumericAttributeTraits
 {
@@ -169,6 +172,15 @@ struct NumericAttributeTraits<BitFlags<T>>
     }
 
     static uint8_t * ToAttributeStoreRepresentation(StorageType & value) { return reinterpret_cast<uint8_t *>(&value); }
+};
+
+template <typename T>
+struct NumericAttributeTraits<BitMask<T>> : public NumericAttributeTraits<BitFlags<T>>
+{
+    using StorageType = T;
+    using WorkingType = BitMask<T>;
+
+    static constexpr WorkingType StorageToWorking(StorageType storageValue) { return WorkingType(storageValue); }
 };
 
 template <>

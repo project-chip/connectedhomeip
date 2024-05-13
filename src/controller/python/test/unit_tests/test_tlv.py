@@ -15,11 +15,10 @@
 #    limitations under the License.
 #
 
-
-from chip.tlv import TLVWriter, TLVReader
-from chip.tlv import uint as tlvUint
-
 import unittest
+
+from chip.tlv import TLVList, TLVReader, TLVWriter
+from chip.tlv import uint as tlvUint
 
 
 class TestTLVWriter(unittest.TestCase):
@@ -113,6 +112,24 @@ class TestTLVWriter(unittest.TestCase):
         except Exception:
             pass
 
+    def test_list(self):
+        encodeVal = self._getEncoded(TLVList([(None, 1), (None, 2), (1, 3)]))
+        self.assertEqual(encodeVal, bytearray([0b00010111,  # List, anonymous tag
+                                               0x00, 0x01,  # Anonymous tag, 1 octet signed int `1``
+                                               0x00, 0x02,  # Anonymous tag, 1 octet signed int `2``
+                                               0b00100000, 0x01, 0x03,  # Context specific tag `1`, 1 octet signed int `3`
+                                               0x18  # End of container
+                                               ]))
+        encodeVal = self._getEncoded(TLVList([(None, 1), (None, TLVList([(None, 2), (3, 4)]))]))
+        self.assertEqual(encodeVal, bytearray([0b00010111,  # List, anonymous tag
+                                               0x00, 0x01,  # Anonymous tag, 1 octet signed int `1``
+                                               0b00010111,  # List anonymous tag
+                                               0x00, 0x02,  # Anonymous tag, 1 octet signed int `2``
+                                               0b00100000, 0x03, 0x04,  # Context specific tag `1`, 1 octet signed int `3`
+                                               0x18,  # End of inner list
+                                               0x18   # End of container
+                                               ]))
+
 
 class TestTLVReader(unittest.TestCase):
     def _read_case(self, input, answer):
@@ -147,6 +164,56 @@ class TestTLVReader(unittest.TestCase):
                         tlvUint(0xaaaaaaab))
         self._read_case([0b00000101, 0xab, 0xaa], tlvUint(0xaaab))
         self._read_case([0b00000100, 0xab], tlvUint(0xab))
+
+    def test_structure(self):
+        test_cases = [
+            (b'\x15\x36\x01\x15\x35\x01\x26\x00\xBF\xA2\x55\x16\x37\x01\x24'
+             b'\x02\x00\x24\x03\x28\x24\x04\x00\x18\x24\x02\x01\x18\x18\x18\x18',
+             {1: [{1: {0: 374710975, 1: TLVList([(2, 0), (3, 40), (4, 0)]), 2: 1}}]}),
+            (b'\x156\x01\x155\x01&\x00\xBF\xA2U\x167\x01$\x02\x00$\x03($\x04\x01'
+             b'\x18,\x02\x18Nordic Semiconductor ASA\x18\x18\x18\x18',
+             {1: [{1: {0: 374710975, 1: TLVList([(2, 0), (3, 40), (4, 1)]), 2: 'Nordic Semiconductor ASA'}}]}),
+            (b"\0256\001\0255\001&\000\031\346x\2077\001$\002\001$\003\006$\004\000\030(\002\030\030\030\030",
+             {1: [{1: {0: 2272847385, 1: TLVList([(2, 1), (3, 6), (4, 0)]), 2: False}}]})
+        ]
+        for tlv_bytes, answer in test_cases:
+            self._read_case(tlv_bytes, answer)
+
+    def test_list(self):
+        self._read_case([0b00010111,  # List, anonymous tag
+                         0x00, 0x01,  # Anonymous tag, 1 octet signed int `1``
+                         0x00, 0x02,  # Anonymous tag, 1 octet signed int `2``
+                         0b00100000, 0x01, 0x03,  # Context specific tag `1`, 1 octet signed int `3`
+                         0x18  # End of container
+                         ], TLVList([(None, 1), (None, 2), (1, 3)]))
+        self._read_case([0b00010111,  # List, anonymous tag
+                         0x00, 0x01,  # Anonymous tag, 1 octet signed int `1``
+                         0b00010111,  # List anonymous tag
+                         0x00, 0x02,  # Anonymous tag, 1 octet signed int `2``
+                         0b00100000, 0x03, 0x04,  # Context specific tag `1`, 1 octet signed int `3`
+                         0x18,  # End of inner list
+                         0x18   # End of container
+                         ], TLVList([(None, 1), (None, TLVList([(None, 2), (3, 4)]))]))
+
+
+class TestTLVTypes(unittest.TestCase):
+    def test_list(self):
+        var = TLVList([(None, 1), (None, 2), (1, 3)])
+        self.assertEqual(var[1], 3)
+        self.assertEqual(var[TLVList.IndexMethod.Index:0], (None, 1))
+        self.assertEqual(var[TLVList.IndexMethod.Tag:1], 3)
+
+        var.append(None, 4)
+        self.assertEqual(var, TLVList([(None, 1), (None, 2), (1, 3), (None, 4)]))
+
+        var.append(5, 6)
+        self.assertEqual(var, TLVList([(None, 1), (None, 2), (1, 3), (None, 4), (5, 6)]))
+
+        expectIterateContent = [(None, 1), (None, 2), (1, 3), (None, 4), (5, 6)]
+        iteratedContent = []
+        for tag, value in var:
+            iteratedContent.append((tag, value))
+        self.assertEqual(expectIterateContent, iteratedContent)
 
 
 if __name__ == '__main__':

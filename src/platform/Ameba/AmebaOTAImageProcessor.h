@@ -25,14 +25,6 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OTAImageProcessor.h>
 
-#if defined(CONFIG_PLATFORM_8710C)
-#include "ota_8710c.h"
-#include "sys.h"
-#include "sys_api.h"
-#elif defined(CONFIG_PLATFORM_8721D)
-#include "rtl8721d_ota.h"
-#endif
-
 namespace chip {
 
 class AmebaOTAImageProcessor : public OTAImageProcessorInterface
@@ -44,8 +36,8 @@ public:
     CHIP_ERROR Apply() override;
     CHIP_ERROR Abort() override;
     CHIP_ERROR ProcessBlock(ByteSpan & block) override;
-    bool IsFirstImageRun() override { return false; }
-    CHIP_ERROR ConfirmCurrentImage() override { return CHIP_NO_ERROR; }
+    bool IsFirstImageRun() override;
+    CHIP_ERROR ConfirmCurrentImage() override;
     void SetOTADownloader(OTADownloader * downloader) { mDownloader = downloader; }
 
 private:
@@ -55,6 +47,7 @@ private:
     static void HandleAbort(intptr_t context);
     static void HandleProcessBlock(intptr_t context);
     static void HandleApply(intptr_t context);
+    static void HandleRestart(chip::System::Layer * systemLayer, void * appState);
 
     CHIP_ERROR ProcessHeader(ByteSpan & block);
 
@@ -68,23 +61,8 @@ private:
      */
     CHIP_ERROR ReleaseBlock();
 
-#if defined(CONFIG_PLATFORM_8721D)
-    uint32_t ota_target_index = OTA_INDEX_2;
-    update_ota_target_hdr * pOtaTgtHdr;
-    uint32_t RemainBytes;
-    uint8_t * signature;
-#elif defined(CONFIG_PLATFORM_8710C)
-    uint32_t ota_target_index;
-    uint32_t NewFWBlkSize = 0;
-    uint32_t block_len    = 0;
-    uint8_t signature[32];
-#endif
     MutableByteSpan mBlock;
     OTADownloader * mDownloader;
-    uint32_t size           = 0;
-    uint8_t RemainHeader    = 32;
-    uint8_t AmebaHeader[32] = { 0 };
-    uint32_t flash_addr;
     OTAImageHeaderParser mHeaderParser;
     uint32_t mSoftwareVersion;
 };

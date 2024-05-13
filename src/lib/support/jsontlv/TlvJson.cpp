@@ -67,6 +67,9 @@ struct KeyContext
 //
 static constexpr uint16_t kMaxStringLen = 1280;
 
+constexpr char kBase64Header[]    = "base64:";
+constexpr size_t kBase64HeaderLen = ArraySize(kBase64Header) - 1;
+
 namespace chip {
 
 /*
@@ -95,7 +98,7 @@ void InsertKeyValue(Json::Value & json, const KeyContext & keyContext, T val)
     }
     else if (keyContext.keyType == KeyContext::kStructField)
     {
-        snprintf(keyBuf, sizeof(keyBuf), "%" PRIu32, keyContext.key);
+        snprintf(keyBuf, sizeof(keyBuf), "%u", keyContext.key);
         json[keyBuf] = val;
     }
     else
@@ -106,14 +109,13 @@ void InsertKeyValue(Json::Value & json, const KeyContext & keyContext, T val)
 
 std::string JsonToString(Json::Value & json)
 {
-    Json::StyledWriter writer;
+    Json::FastWriter writer;
+    writer.omitEndingLineFeed();
     return writer.write(json);
 }
 
 CHIP_ERROR TlvToJson(TLV::TLVReader & reader, KeyContext context, Json::Value & parent)
 {
-    bool isStruct = false;
-
     switch (reader.GetType())
     {
     case TLV::kTLVType_UnsignedInteger: {
@@ -151,10 +153,15 @@ CHIP_ERROR TlvToJson(TLV::TLVReader & reader, KeyContext context, Json::Value & 
         VerifyOrReturnError(span.size() < kMaxStringLen, CHIP_ERROR_INVALID_TLV_ELEMENT);
 
         Platform::ScopedMemoryBuffer<char> byteString;
-        byteString.Alloc(BASE64_ENCODED_LEN(span.size()) + 1);
+        byteString.Alloc(kBase64HeaderLen + BASE64_ENCODED_LEN(span.size()) + 1);
         VerifyOrReturnError(byteString.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
 
-        auto encodedLen              = Base64Encode(span.data(), span.size(), byteString.Get());
+        auto encodedLen = Base64Encode(span.data(), static_cast<uint16_t>(span.size()), byteString.Get() + kBase64HeaderLen);
+        if (encodedLen)
+        {
+            memcpy(byteString.Get(), kBase64Header, kBase64HeaderLen);
+            encodedLen = static_cast<uint16_t>(encodedLen + kBase64HeaderLen);
+        }
         byteString.Get()[encodedLen] = '\0';
 
         InsertKeyValue(parent, context, byteString.Get());
@@ -177,46 +184,46 @@ CHIP_ERROR TlvToJson(TLV::TLVReader & reader, KeyContext context, Json::Value & 
         break;
     }
 
-    case TLV::kTLVType_Structure:
-        isStruct = true;
-
-        //
-        // Fall-through to the case below since
-        // arrays and structs are handled similarly with
-        // just a small difference in terms of handling of field IDs vs.
-        // list indices of the elements in the respective collections.
-        //
-
-    case TLV::kTLVType_Array: {
+    case TLV::kTLVType_Structure: {
         TLV::TLVType containerType;
-
         ReturnErrorOnFailure(reader.EnterContainer(containerType));
 
         CHIP_ERROR err;
         Json::Value value;
-        size_t listIndex = 0;
 
         while ((err = reader.Next()) == CHIP_NO_ERROR)
         {
-            if (isStruct)
-            {
-                VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-                KeyContext context2(static_cast<chip::FieldId>(TLV::TagNumFromTag(reader.GetTag())));
+            VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+            KeyContext context2(static_cast<chip::FieldId>(TLV::TagNumFromTag(reader.GetTag())));
 
-                //
-                // Recursively convert to JSON the encompassing item within the struct.
-                //
-                ReturnErrorOnFailure(TlvToJson(reader, context2, value));
-            }
-            else
-            {
-                KeyContext context2(static_cast<chip::ListIndex>(listIndex++));
+            //
+            // Recursively convert to JSON the encompassing item within the struct.
+            //
+            ReturnErrorOnFailure(TlvToJson(reader, context2, value));
+        }
 
-                //
-                // Recursively convert to JSON the encompassing item within the array.
-                //
-                ReturnErrorOnFailure(TlvToJson(reader, context2, value));
-            }
+        VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+        ReturnErrorOnFailure(reader.ExitContainer(containerType));
+        InsertKeyValue(parent, context, value);
+        break;
+    }
+
+    case TLV::kTLVType_Array: {
+        TLV::TLVType containerType;
+        ReturnErrorOnFailure(reader.EnterContainer(containerType));
+
+        CHIP_ERROR err;
+        Json::Value value = Json::Value(Json::arrayValue);
+        size_t listIndex  = 0;
+
+        while ((err = reader.Next()) == CHIP_NO_ERROR)
+        {
+            KeyContext context2(static_cast<chip::ListIndex>(listIndex++));
+
+            //
+            // Recursively convert to JSON the encompassing item within the array.
+            //
+            ReturnErrorOnFailure(TlvToJson(reader, context2, value));
         }
 
         VerifyOrReturnError(err == CHIP_END_OF_TLV, err);

@@ -12,326 +12,181 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 57.2.2. [TC-I-2.2] Primary functionality with server as DUT
+name: 58.2.2. [TC-I-2.2] Primary functionality with server as DUT
+
+PICS:
+    - I.S
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+    cluster: "Identify"
+    endpoint: 1
 
 tests:
-    - label: "Commission DUT to TH"
-      verification: |
+    - label:
+          "Step 1a: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-      disabled: true
+    - label: "Step 1b: TH reads the IdentifyType attribute from the DUT."
+      PICS: I.S.A0001
+      command: "readAttribute"
+      attribute: "IdentifyType"
+      response:
+          saveAs: IdentifyTypeValue
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 5
 
     - label:
-          "TH sends Identify command to DUT, with the identify time field set to
-          0x003c (60s)."
-      verification: |
-          ./chip-tool identify identify 60 1 1
+          "Step 2a: TH sends Identify command to DUT, with the IdentifyTime
+          field set to 0x003c (60s)."
+      PICS: I.S.C00.Rsp
+      command: "Identify"
+      arguments:
+          values:
+              - name: "IdentifyTime"
+                value: 60
 
-          CHIP:EM: Flushed pending ack for MessageCounter:1080338627 on exchange 34601i
-          [1635607335.469159][3437:3442] CHIP:EM: Received message of type 0x9 with protocolId (0, 1) and MessageCounter:1 on exchange 34602i
-          [1635607335.469222][3437:3442] CHIP:EM: Rxd Ack; Removing MessageCounter:0 from Retrans Table on exchange 34602i
-          [1635607335.469259][3437:3442] CHIP:EM: Removed CHIP MessageCounter:0 from RetransTable on exchange 34602i
-          [1635607335.469311][3437:3442] CHIP:DMG: InvokeCommand =
-          [1635607335.469349][3437:3442] CHIP:DMG: {
-          [1635607335.469381][3437:3442] CHIP:DMG:         CommandList =
-          [1635607335.469420][3437:3442] CHIP:DMG:         [
-          [1635607335.469456][3437:3442] CHIP:DMG:                 CommandDataIB =
-          [1635607335.469496][3437:3442] CHIP:DMG:                 {
-          [1635607335.469529][3437:3442] CHIP:DMG:                         CommandPathIB =
-          [1635607335.469576][3437:3442] CHIP:DMG:                         {
-          [1635607335.469622][3437:3442] CHIP:DMG:                                 EndpointId = 0x1,
-          [1635607335.469671][3437:3442] CHIP:DMG:                                 ClusterId = 0x0,
-          [1635607335.469727][3437:3442] CHIP:DMG:                                 CommandId = 0x0,
-          [1635607335.469774][3437:3442] CHIP:DMG:                         },
-          [1635607335.469826][3437:3442] CHIP:DMG:
-          [1635607335.469868][3437:3442] CHIP:DMG:                         StatusIB =
-          [1635607335.469911][3437:3442] CHIP:DMG:                         {
-          [1635607335.469953][3437:3442] CHIP:DMG:                                 status = 0x85,
-          [1635607335.469999][3437:3442] CHIP:DMG:                         },
-          [1635607335.470045][3437:3442] CHIP:DMG:
-          [1635607335.470092][3437:3442] CHIP:DMG:                 },
-          [1635607335.470137][3437:3442] CHIP:DMG:
-          [1635607335.470172][3437:3442] CHIP:DMG:         ],
-          [1635607335.470215][3437:3442] CHIP:DMG:
-          [1635607335.470248][3437:3442] CHIP:DMG: }
-          [1635607335.470309][3437:3442] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0000 Command=0x0000_0000 Status=0x85
-          [1635607335.470349][3437:3442] CHIP:TOO: Default Failure Response: 0x85
-          [1635607335.470424][3437:3442] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1635607335.470469][3437:3442] CHIP:EM: Sending Standalone Ack for MessageCounter:1 on exchange 34602i
-      disabled: true
+    - label: "Step 2b: TH reads immediately IdentifyTime attribute from DUT"
+      PICS: I.S.A0000
+      command: "readAttribute"
+      attribute: "IdentifyTime"
+      response:
+          constraints:
+              minValue: 51
+              maxValue: 69
 
-    - label: "TH reads immediately IdentifyTime attribute from DUT"
-      verification: |
-          ./chip-tool identify read identify-time 1 1
-      disabled: true
-
-    - label: "After 10 seconds, the TH reads IdentifyTime attribute from DUT"
-      verification: |
-          ./chip-tool identify read identify-time 1 1
-
-          CHIP:EM: Flushed pending ack for MessageCounter:1227491739 on exchange 44726i
-          [1635609851.059963][3612:3617] CHIP:EM: Received message of type 0x5 with protocolId (0, 1) and MessageCounter:1 on exchange 44727i
-          [1635609851.060032][3612:3617] CHIP:EM: Rxd Ack; Removing MessageCounter:0 from Retrans Table on exchange 44727i
-          [1635609851.060073][3612:3617] CHIP:EM: Removed CHIP MessageCounter:0 from RetransTable on exchange 44727i
-          [1635609851.060161][3612:3617] CHIP:DMG: ReportData =
-          [1635609851.060205][3612:3617] CHIP:DMG: {
-          [1635609851.060235][3612:3617] CHIP:DMG:         AttributeDataList =
-          [1635609851.060270][3612:3617] CHIP:DMG:         [
-          [1635609851.060304][3612:3617] CHIP:DMG:                 AttributeDataElement =
-          [1635609851.060342][3612:3617] CHIP:DMG:                 {
-          [1635609851.060377][3612:3617] CHIP:DMG:                         AttributePath =
-          [1635609851.060416][3612:3617] CHIP:DMG:                         {
-          [1635609851.060457][3612:3617] CHIP:DMG:                                 NodeId = 0x1,
-          [1635609851.060500][3612:3617] CHIP:DMG:                                 EndpointId = 0x1,
-          [1635609851.060544][3612:3617] CHIP:DMG:                                 ClusterId = 0x3,
-          [1635609851.060586][3612:3617] CHIP:DMG:                                 FieldTag = 0x0000_0000,
-          [1635609851.060626][3612:3617] CHIP:DMG:                         }
-          [1635609851.060679][3612:3617] CHIP:DMG:
-          [1635609851.060731][3612:3617] CHIP:DMG:                         Data = 0,
-          [1635609851.060783][3612:3617] CHIP:DMG:                         DataElementVersion = 0x0,
-          [1635609851.060830][3612:3617] CHIP:DMG:                 },
-          [1635609851.060881][3612:3617] CHIP:DMG:
-          [1635609851.060920][3612:3617] CHIP:DMG:         ],
-          [1635609851.060967][3612:3617] CHIP:DMG:
-          [1635609851.061004][3612:3617] CHIP:DMG: }
-          [1635609851.061115][3612:3617] CHIP:ZCL: ReadAttributesResponse:
-          [1635609851.061152][3612:3617] CHIP:ZCL:   ClusterId: 0x0000_0003
-          [1635609851.061189][3612:3617] CHIP:ZCL:   attributeId: 0x0000_0000
-          [1635609851.061223][3612:3617] CHIP:ZCL:   status: Success                (0x0000)
-          [1635609851.061258][3612:3617] CHIP:ZCL:   attribute TLV Type: 0x04
-          [1635609851.061293][3612:3617] CHIP:TOO: Int16u attribute Response: 0
-          [1635609851.061388][3612:3617] CHIP:EM: Piggybacking Ack for MessageCounter:1 on exchange: 44727i
-      disabled: true
-
-    - label: "TH sends IdentifyQuery command to DUT"
-      verification: |
-          ./chip-tool identify identify-query 1 0
-
-          CHIP:EM: Flushed pending ack for MessageCounter:1227491741 on exchange 37715i
-          [1635610089.026755][3630:3635] CHIP:EM: Received message of type 0x9 with protocolId (0, 1) and MessageCounter:1 on exchange 37716i
-          [1635610089.026818][3630:3635] CHIP:EM: Rxd Ack; Removing MessageCounter:0 from Retrans Table on exchange 37716i
-          [1635610089.026856][3630:3635] CHIP:EM: Removed CHIP MessageCounter:0 from RetransTable on exchange 37716i
-          [1635610089.026907][3630:3635] CHIP:DMG: InvokeCommand =
-          [1635610089.026945][3630:3635] CHIP:DMG: {
-          [1635610089.026977][3630:3635] CHIP:DMG:         CommandList =
-          [1635610089.027015][3630:3635] CHIP:DMG:         [
-          [1635610089.027051][3630:3635] CHIP:DMG:                 CommandDataIB =
-          [1635610089.027271][3630:3635] CHIP:DMG:                 {
-          [1635610089.027382][3630:3635] CHIP:DMG:                         CommandPathIB =
-          [1635610089.027433][3630:3635] CHIP:DMG:                         {
-          [1635610089.027480][3630:3635] CHIP:DMG:                                 EndpointId = 0x1,
-          [1635610089.027534][3630:3635] CHIP:DMG:                                 ClusterId = 0x0,
-          [1635610089.027616][3630:3635] CHIP:DMG:                                 CommandId = 0x1,
-          [1635610089.027666][3630:3635] CHIP:DMG:                         },
-          [1635610089.027756][3630:3635] CHIP:DMG:
-          [1635610089.027836][3630:3635] CHIP:DMG:                         StatusIB =
-          [1635610089.027917][3630:3635] CHIP:DMG:                         {
-          [1635610089.027964][3630:3635] CHIP:DMG:                                 status = 0x85,
-          [1635610089.028045][3630:3635] CHIP:DMG:                         },
-          [1635610089.028148][3630:3635] CHIP:DMG:
-          [1635610089.028190][3630:3635] CHIP:DMG:                 },
-          [1635610089.028267][3630:3635] CHIP:DMG:
-          [1635610089.028342][3630:3635] CHIP:DMG:         ],
-          [1635610089.028387][3630:3635] CHIP:DMG:
-          [1635610089.028420][3630:3635] CHIP:DMG: }
-          [1635610089.028482][3630:3635] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0000 Command=0x0000_0001 Status=0x85
-          [1635610089.028560][3630:3635] CHIP:TOO: Default Failure Response: 0x85
-          [1635610089.028676][3630:3635] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1635610089.028771][3630:3635] CHIP:EM: Sending Standalone Ack for MessageCounter:1 on exchange 37716i
-      disabled: true
+    - label: "Wait 10000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
 
     - label:
-          "TH sends Identify command to DUT, with the identify time field set to
-          0x0000 (stop identifying)."
-      verification: |
-          ./chip-tool identify identify 0 1 1
+          "Step 2c: After 10 seconds, the TH reads IdentifyTime attribute from
+          DUT"
+      PICS: I.S.A0000
+      command: "readAttribute"
+      attribute: "IdentifyTime"
+      response:
+          constraints:
+              minValue: 42
+              maxValue: 58
 
-          CHIP:EM: Flushed pending ack for MessageCounter:1227491743 on exchange 35105i
-          [1635610133.027930][3638:3643] CHIP:EM: Received message of type 0x9 with protocolId (0, 1) and MessageCounter:1 on exchange 35106i
-          [1635610133.027998][3638:3643] CHIP:EM: Rxd Ack; Removing MessageCounter:0 from Retrans Table on exchange 35106i
-          [1635610133.028038][3638:3643] CHIP:EM: Removed CHIP MessageCounter:0 from RetransTable on exchange 35106i
-          [1635610133.028094][3638:3643] CHIP:DMG: InvokeCommand =
-          [1635610133.028170][3638:3643] CHIP:DMG: {
-          [1635610133.028223][3638:3643] CHIP:DMG:         CommandList =
-          [1635610133.028266][3638:3643] CHIP:DMG:         [
-          [1635610133.028322][3638:3643] CHIP:DMG:                 CommandDataIB =
-          [1635610133.028378][3638:3643] CHIP:DMG:                 {
-          [1635610133.028424][3638:3643] CHIP:DMG:                         CommandPathIB =
-          [1635610133.028488][3638:3643] CHIP:DMG:                         {
-          [1635610133.028540][3638:3643] CHIP:DMG:                                 EndpointId = 0x1,
-          [1635610133.028606][3638:3643] CHIP:DMG:                                 ClusterId = 0x0,
-          [1635610133.028667][3638:3643] CHIP:DMG:                                 CommandId = 0x0,
-          [1635610133.028722][3638:3643] CHIP:DMG:                         },
-          [1635610133.028797][3638:3643] CHIP:DMG:
-          [1635610133.028844][3638:3643] CHIP:DMG:                         StatusIB =
-          [1635610133.028913][3638:3643] CHIP:DMG:                         {
-          [1635610133.028964][3638:3643] CHIP:DMG:                                 status = 0x85,
-          [1635610133.029018][3638:3643] CHIP:DMG:                         },
-          [1635610133.029083][3638:3643] CHIP:DMG:
-          [1635610133.029141][3638:3643] CHIP:DMG:                 },
-          [1635610133.029195][3638:3643] CHIP:DMG:
-          [1635610133.029233][3638:3643] CHIP:DMG:         ],
-          [1635610133.029279][3638:3643] CHIP:DMG:
-          [1635610133.029331][3638:3643] CHIP:DMG: }
-          [1635610133.029399][3638:3643] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0000 Command=0x0000_0000 Status=0x85
-          [1635610133.029457][3638:3643] CHIP:TOO: Default Failure Response: 0x85
-          [1635610133.029531][3638:3643] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1635610133.029595][3638:3643] CHIP:EM: Sending Standalone Ack for MessageCounter:1 on exchange 35106i
-      disabled: true
-
-    - label: "TH reads immediately IdentifyTime attribute from DUT"
-      verification: |
-          ./chip-tool identify read identify-time 1 1
-
-          CHIP:EM: Flushed pending ack for MessageCounter:1227491745 on exchange 43955i
-          [1635610358.362798][3651:3656] CHIP:EM: Received message of type 0x5 with protocolId (0, 1) and MessageCounter:1 on exchange 43956i
-          [1635610358.362866][3651:3656] CHIP:EM: Rxd Ack; Removing MessageCounter:0 from Retrans Table on exchange 43956i
-          [1635610358.362908][3651:3656] CHIP:EM: Removed CHIP MessageCounter:0 from RetransTable on exchange 43956i
-          [1635610358.362964][3651:3656] CHIP:DMG: ReportData =
-          [1635610358.363006][3651:3656] CHIP:DMG: {
-          [1635610358.363042][3651:3656] CHIP:DMG:         AttributeDataList =
-          [1635610358.363085][3651:3656] CHIP:DMG:         [
-          [1635610358.363124][3651:3656] CHIP:DMG:                 AttributeDataElement =
-          [1635610358.363179][3651:3656] CHIP:DMG:                 {
-          [1635610358.363225][3651:3656] CHIP:DMG:                         AttributePath =
-          [1635610358.363282][3651:3656] CHIP:DMG:                         {
-          [1635610358.363335][3651:3656] CHIP:DMG:                                 NodeId = 0x1,
-          [1635610358.363391][3651:3656] CHIP:DMG:                                 EndpointId = 0x1,
-          [1635610358.363450][3651:3656] CHIP:DMG:                                 ClusterId = 0x3,
-          [1635610358.363510][3651:3656] CHIP:DMG:                                 FieldTag = 0x0000_0000,
-          [1635610358.363562][3651:3656] CHIP:DMG:                         }
-          [1635610358.363617][3651:3656] CHIP:DMG:
-          [1635610358.363672][3651:3656] CHIP:DMG:                         Data = 0,
-          [1635610358.363727][3651:3656] CHIP:DMG:                         DataElementVersion = 0x0,
-          [1635610358.363780][3651:3656] CHIP:DMG:                 },
-          [1635610358.363833][3651:3656] CHIP:DMG:
-          [1635610358.363872][3651:3656] CHIP:DMG:         ],
-          [1635610358.363920][3651:3656] CHIP:DMG:
-          [1635610358.363957][3651:3656] CHIP:DMG: }
-          [1635610358.364068][3651:3656] CHIP:ZCL: ReadAttributesResponse:
-          [1635610358.364106][3651:3656] CHIP:ZCL:   ClusterId: 0x0000_0003
-          [1635610358.364180][3651:3656] CHIP:ZCL:   attributeId: 0x0000_0000
-          [1635610358.364212][3651:3656] CHIP:ZCL:   status: Success                (0x0000)
-          [1635610358.364247][3651:3656] CHIP:ZCL:   attribute TLV Type: 0x04
-          [1635610358.364283][3651:3656] CHIP:TOO: Int16u attribute Response: 0
-          [1635610358.364380][3651:3656] CHIP:EM: Piggybacking Ack for MessageCounter:1 on exchange: 43956i
-      disabled: true
-
-    - label: "TH sends IdentifyQuery command to DUT"
-      verification: |
-          ./chip-tool identify identify-query 1 0
-
-          CHIP:EM: Flushed pending ack for MessageCounter:1227491747 on exchange 13705i
-          [1635610396.344537][3658:3663] CHIP:EM: Received message of type 0x9 with protocolId (0, 1) and MessageCounter:1 on exchange 13706i
-          [1635610396.344592][3658:3663] CHIP:EM: Rxd Ack; Removing MessageCounter:0 from Retrans Table on exchange 13706i
-          [1635610396.344626][3658:3663] CHIP:EM: Removed CHIP MessageCounter:0 from RetransTable on exchange 13706i
-          [1635610396.344673][3658:3663] CHIP:DMG: InvokeCommand =
-          [1635610396.344707][3658:3663] CHIP:DMG: {
-          [1635610396.344751][3658:3663] CHIP:DMG:         CommandList =
-          [1635610396.344786][3658:3663] CHIP:DMG:         [
-          [1635610396.344831][3658:3663] CHIP:DMG:                 CommandDataIB =
-          [1635610396.344872][3658:3663] CHIP:DMG:                 {
-          [1635610396.344919][3658:3663] CHIP:DMG:                         CommandPathIB =
-          [1635610396.344966][3658:3663] CHIP:DMG:                         {
-          [1635610396.345023][3658:3663] CHIP:DMG:                                 EndpointId = 0x0,
-          [1635610396.345075][3658:3663] CHIP:DMG:                                 ClusterId = 0x0,
-          [1635610396.345118][3658:3663] CHIP:DMG:                                 CommandId = 0x1,
-          [1635610396.345172][3658:3663] CHIP:DMG:                         },
-          [1635610396.345219][3658:3663] CHIP:DMG:
-          [1635610396.345268][3658:3663] CHIP:DMG:                         StatusIB =
-          [1635610396.345310][3658:3663] CHIP:DMG:                         {
-          [1635610396.345363][3658:3663] CHIP:DMG:                                 status = 0x85,
-          [1635610396.345416][3658:3663] CHIP:DMG:                         },
-          [1635610396.345463][3658:3663] CHIP:DMG:
-          [1635610396.345511][3658:3663] CHIP:DMG:                 },
-          [1635610396.345552][3658:3663] CHIP:DMG:
-          [1635610396.345595][3658:3663] CHIP:DMG:         ],
-          [1635610396.345634][3658:3663] CHIP:DMG:
-          [1635610396.345676][3658:3663] CHIP:DMG: }
-          [1635610396.345732][3658:3663] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0000 Command=0x0000_0001 Status=0x85
-          [1635610396.345783][3658:3663] CHIP:TOO: Default Failure Response: 0x85
-          [1635610396.345857][3658:3663] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1635610396.345897][3658:3663] CHIP:EM: Sending Standalone Ack for MessageCounter:1 on exchange 13706i
-      disabled: true
+    # - label:
+    #       "Step 3: TH sends IdentifyQuery command to DUT and Verify
+    #       IdentifyQueryResponse command to TH,with the Timeout field set to a
+    #       value in the range 0x0000 to 0x0032"
+    #   verification: |
+    #       IdentifyQuery is not supported by Matter
+    #   cluster: "LogCommands"
+    #   command: "UserPrompt"
+    #   PICS: PICS_USER_PROMPT && I.S.C01.Rsp && I.S.C00.Tx
+    #   arguments:
+    #       values:
+    #           - name: "message"
+    #             value: "Please enter 'y' for success"
+    #           - name: "expectedValue"
+    #             value: "y"
 
     - label:
-          "TH writes a value of 0x000f (15s) to IdentifyTime attribute of DUT"
+          "Step 4a: Before 60 seconds expire, TH sends Identify command to DUT,
+          with the identify time field set to 0x0000 (stop identifying)."
+      PICS: I.S.C00.Rsp
+      command: "Identify"
+      arguments:
+          values:
+              - name: "IdentifyTime"
+                value: 0
+
+    - label: "Step 4b: TH reads immediately IdentifyTime attribute from DUT"
+      PICS: I.S.A0000
+      command: "readAttribute"
+      attribute: "IdentifyTime"
+      response:
+          value: 0
+
+    # disabled due to IdentifyQuery not supported for matter V1.0
+    #- label: "Step 5: TH sends IdentifyQuery command to DUT "
+    #  verification: |
+    #      IdentifyQuery is not supported by Matter
+    #  cluster: "LogCommands"
+    #  command: "UserPrompt"
+    #  PICS: PICS_USER_PROMPT && I.S.C01.Rsp && I.S.C00.Tx
+    #  arguments:
+    #      values:
+    #          - name: "message"
+    #            value: "Please enter 'y' for success"
+    #          - name: "expectedValue"
+    #            value: "y"
+
+    - label:
+          "Step 6a: Verify that the device enters its identification state using
+          the IdentifyType from Step 1b, in order to indicate to an observer
+          which of several nodes and/or endpoints it is."
       verification: |
-          ./chip-tool identify write identify-time 15 1 0
+          Verify that the device enters its identification state using the IdentifyType from step1b,
+          Here the Identifytype is 2(VisibleIndicator) which can be a small led that indicates the device is in identification state.
+          This IdentifyType can vary to device ref: 1.2.5.1 in spec for the IdentifyTypeEnum of the particular DUT
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && I.S.A0001
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-          CHIP:EM: Flushed pending ack for MessageCounter:1227491749 on exchange 15428i
-          [1635610454.188449][3668:3673] CHIP:EM: Received message of type 0x7 with protocolId (0, 1) and MessageCounter:1 on exchange 15429i
-          [1635610454.188517][3668:3673] CHIP:EM: Rxd Ack; Removing MessageCounter:0 from Retrans Table on exchange 15429i
-          [1635610454.188558][3668:3673] CHIP:EM: Removed CHIP MessageCounter:0 from RetransTable on exchange 15429i
-          [1635610454.188615][3668:3673] CHIP:DMG: WriteResponse =
-          [1635610454.188657][3668:3673] CHIP:DMG: {
-          [1635610454.188692][3668:3673] CHIP:DMG:         AttributeStatusList =
-          [1635610454.188734][3668:3673] CHIP:DMG:         [
-          [1635610454.188774][3668:3673] CHIP:DMG:                 AttributeStatusIB =
-          [1635610454.188823][3668:3673] CHIP:DMG:                 {
-          [1635610454.188868][3668:3673] CHIP:DMG:                         AttributePath =
-          [1635610454.188919][3668:3673] CHIP:DMG:                         {
-          [1635610454.188973][3668:3673] CHIP:DMG:                                 FieldTag = 0x0000_0000,
-          [1635610454.189030][3668:3673] CHIP:DMG:                                 NodeId = 0x0,
-          [1635610454.189091][3668:3673] CHIP:DMG:                                 ClusterId = 0x3,
-          [1635610454.189145][3668:3673] CHIP:DMG:                                 EndpointId = 0x0,
-          [1635610454.189201][3668:3673] CHIP:DMG:                         }
-          [1635610454.189258][3668:3673] CHIP:DMG:
-          [1635610454.189303][3668:3673] CHIP:DMG:                         StatusIB =
-          [1635610454.189358][3668:3673] CHIP:DMG:                         {
-          [1635610454.189407][3668:3673] CHIP:DMG:                                 status = 0x0,
-          [1635610454.189458][3668:3673] CHIP:DMG:                         },
-          [1635610454.189510][3668:3673] CHIP:DMG:
-          [1635610454.189552][3668:3673] CHIP:DMG:                 },
-          [1635610454.189601][3668:3673] CHIP:DMG:
-          [1635610454.189640][3668:3673] CHIP:DMG:         ],
-          [1635610454.189696][3668:3673] CHIP:DMG:
-          [1635610454.189732][3668:3673] CHIP:DMG: }
-          [1635610454.189813][3668:3673] CHIP:ZCL: WriteResponse:
-          [1635610454.189849][3668:3673] CHIP:ZCL:   status: Success                (0x0000)
-          [1635610454.189889][3668:3673] CHIP:TOO: Default Success Response
-          [1635610454.189964][3668:3673] CHIP:DMG: WriteClient moving to [Uninitiali]
-          [1635610454.190006][3668:3673] CHIP:EM: Sending Standalone Ack for MessageCounter:1 on exchange 15429i
-      disabled: true
+    - label:
+          "Step 6a: TH writes a value of 0x000f (15s) to IdentifyTime attribute
+          of DUT"
+      PICS: I.S.A0000
+      command: "writeAttribute"
+      attribute: "IdentifyTime"
+      arguments:
+          value: 15
 
-    - label: "After 5 seconds, the TH reads IdentifyTime attribute from DUT"
+    - label: "Wait 15000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 15000
+
+    - label:
+          "Step 6b: After 15 seconds, the TH reads IdentifyTime attribute from
+          DUT"
+      PICS: I.S.A0000
+      command: "readAttribute"
+      attribute: "IdentifyTime"
+      response:
+          constraints:
+              minValue: 0
+              maxValue: 5
+
+    - label:
+          "Step 6b: Verify that the device terminates its identification state"
       verification: |
-          ./chip-tool identify read identify-time 1 1
-
-          CHIP:EM: Flushed pending ack for MessageCounter:1227491751 on exchange 51588i
-          [1635610554.173050][3677:3682] CHIP:EM: Received message of type 0x5 with protocolId (0, 1) and MessageCounter:1 on exchange 51589i
-          [1635610554.173120][3677:3682] CHIP:EM: Rxd Ack; Removing MessageCounter:0 from Retrans Table on exchange 51589i
-          [1635610554.173157][3677:3682] CHIP:EM: Removed CHIP MessageCounter:0 from RetransTable on exchange 51589i
-          [1635610554.173209][3677:3682] CHIP:DMG: ReportData =
-          [1635610554.173249][3677:3682] CHIP:DMG: {
-          [1635610554.173281][3677:3682] CHIP:DMG:         AttributeDataList =
-          [1635610554.173320][3677:3682] CHIP:DMG:         [
-          [1635610554.173355][3677:3682] CHIP:DMG:                 AttributeDataElement =
-          [1635610554.173399][3677:3682] CHIP:DMG:                 {
-          [1635610554.173440][3677:3682] CHIP:DMG:                         AttributePath =
-          [1635610554.173530][3677:3682] CHIP:DMG:                         {
-          [1635610554.173613][3677:3682] CHIP:DMG:                                 NodeId = 0x1,
-          [1635610554.173664][3677:3682] CHIP:DMG:                                 EndpointId = 0x1,
-          [1635610554.173754][3677:3682] CHIP:DMG:                                 ClusterId = 0x3,
-          [1635610554.173843][3677:3682] CHIP:DMG:                                 FieldTag = 0x0000_0000,
-          [1635610554.173887][3677:3682] CHIP:DMG:                         }
-          [1635610554.173971][3677:3682] CHIP:DMG:
-          [1635610554.174054][3677:3682] CHIP:DMG:                         Data = 0,
-          [1635610554.174128][3677:3682] CHIP:DMG:                         DataElementVersion = 0x0,
-          [1635610554.174208][3677:3682] CHIP:DMG:                 },
-          [1635610554.174291][3677:3682] CHIP:DMG:
-          [1635610554.174530][3677:3682] CHIP:DMG:         ],
-          [1635610554.174612][3677:3682] CHIP:DMG:
-          [1635610554.174680][3677:3682] CHIP:DMG: }
-          [1635610554.174846][3677:3682] CHIP:ZCL: ReadAttributesResponse:
-          [1635610554.174917][3677:3682] CHIP:ZCL:   ClusterId: 0x0000_0003
-          [1635610554.174956][3677:3682] CHIP:ZCL:   attributeId: 0x0000_0000
-          [1635610554.175022][3677:3682] CHIP:ZCL:   status: Success                (0x0000)
-          [1635610554.175055][3677:3682] CHIP:ZCL:   attribute TLV Type: 0x04
-          [1635610554.175088][3677:3682] CHIP:TOO: Int16u attribute Response: 0
-          [1635610554.175215][3677:3682] CHIP:EM: Piggybacking Ack for MessageCounter:1 on exchange: 51589i
-      disabled: true
+          Verify that the identification state is terminated in the DUT.
+          Here the Identifytype is 2(VisibleIndicator) which can be a small led that indicates the device is in identification state.
+          This IdentifyType can vary to device ref: 1.2.5.1 in spec for the IdentifyTypeEnum of the particular DUT
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && I.S.A0001
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"

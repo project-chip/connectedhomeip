@@ -20,6 +20,7 @@ import("$dir_pw_build/python.gni")
 
 import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/src/platform/python.gni")
+import("${chip_root}/src/system/system.gni")
 import("${dir_pw_unit_test}/test.gni")
 
 if (current_os == "mac") {
@@ -28,6 +29,12 @@ if (current_os == "mac") {
 
 config("controller_wno_deprecate") {
   cflags = [ "-Wno-deprecated-declarations" ]
+}
+
+declare_args() {
+  chip_python_version = "0.0"
+  chip_python_package_prefix = "chip"
+  chip_python_supports_stack_locking = chip_system_config_locking != "none"
 }
 
 shared_library("ChipDeviceCtrl") {
@@ -44,29 +51,56 @@ shared_library("ChipDeviceCtrl") {
     "chip/setup_payload/Parser.cpp",
   ]
 
+  sources += [ "chip/native/CommonStackInit.cpp" ]
+
+  defines = []
+
   if (chip_controller) {
     sources += [
       "ChipCommissionableNodeController-ScriptBinding.cpp",
+      "ChipDeviceController-Discovery.cpp",
+      "ChipDeviceController-IssueNocChain.cpp",
       "ChipDeviceController-ScriptBinding.cpp",
       "ChipDeviceController-ScriptDevicePairingDelegate.cpp",
       "ChipDeviceController-ScriptDevicePairingDelegate.h",
+      "ChipDeviceController-ScriptPairingDeviceDiscoveryDelegate.cpp",
+      "ChipDeviceController-ScriptPairingDeviceDiscoveryDelegate.h",
       "ChipDeviceController-StorageDelegate.cpp",
       "ChipDeviceController-StorageDelegate.h",
       "OpCredsBinding.cpp",
       "chip/clusters/attribute.cpp",
       "chip/clusters/command.cpp",
+      "chip/commissioning/PlaceholderOperationalCredentialsIssuer.h",
+      "chip/credentials/cert.cpp",
+      "chip/credentials/cert.h",
+      "chip/crypto/p256keypair.cpp",
+      "chip/crypto/p256keypair.h",
       "chip/discovery/NodeResolution.cpp",
       "chip/interaction_model/Delegate.cpp",
       "chip/interaction_model/Delegate.h",
       "chip/internal/ChipThreadWork.cpp",
       "chip/internal/ChipThreadWork.h",
       "chip/internal/CommissionerImpl.cpp",
+      "chip/logging/LoggingFilter.cpp",
       "chip/logging/LoggingRedirect.cpp",
-      "chip/native/StackInit.cpp",
+      "chip/native/ChipMainLoopWork.h",
+      "chip/native/PyChipError.cpp",
+      "chip/native/PyChipError.h",
+      "chip/tracing/TracingSetup.cpp",
+      "chip/utils/DeviceProxyUtils.cpp",
     ]
+    defines += [ "CHIP_CONFIG_MAX_GROUPS_PER_FABRIC=50" ]
+    defines += [ "CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC=50" ]
+
+    if (chip_python_supports_stack_locking) {
+      sources += [ "chip/native/ChipMainLoopWork_StackLock.cpp" ]
+    } else {
+      sources += [ "chip/native/ChipMainLoopWork_WorkSchedule.cpp" ]
+    }
   } else {
     sources += [
       "chip/server/Options.cpp",
+      "chip/server/Options.h",
       "chip/server/ServerInit.cpp",
     ]
   }
@@ -102,6 +136,16 @@ shared_library("ChipDeviceCtrl") {
     public_deps += [
       "${chip_root}/src/controller/data_model",
       "${chip_root}/src/credentials:file_attestation_trust_store",
+      "${chip_root}/src/lib/support:testing",
+      "${chip_root}/src/tracing/json",
+      "${chip_root}/src/tracing/perfetto",
+      "${chip_root}/src/tracing/perfetto:file_output",
+      "${chip_root}/third_party/jsoncpp",
+    ]
+
+    deps = [
+      "${chip_root}/src/tracing/perfetto:event_storage",
+      "${chip_root}/src/tracing/perfetto:simple_initialization",
     ]
   } else {
     public_deps += [ "$chip_data_model" ]
@@ -110,23 +154,80 @@ shared_library("ChipDeviceCtrl") {
   configs += [ ":controller_wno_deprecate" ]
 }
 
-pw_python_action("python") {
-  script = "build-chip-wheel.py"
+template("chip_python_wheel_action") {
+  _dist_dir = "${root_out_dir}/controller/python"
 
-  _py_manifest_files = [
+  _py_manifest_file = "${target_gen_dir}/${target_name}.py_manifest.json"
+
+  pw_python_action(target_name) {
+    script = "build-chip-wheel.py"
+    forward_variables_from(invoker, "*")
+
+    _py_manifest_files_rebased = []
+    foreach(_manifest_entry, py_manifest_files) {
+      inputs += _manifest_entry.sources
+      _py_manifest_files_rebased += [
+        {
+          src_dir = rebase_path(_manifest_entry.src_dir,
+                                get_path_info(_py_manifest_file, "dir"))
+          sources =
+              rebase_path(_manifest_entry.sources, _manifest_entry.src_dir)
+        },
+      ]
+    }
+
+    if (defined(invoker.py_scripts)) {
+      _py_scripts = invoker.py_scripts
+    } else {
+      _py_scripts = []
+    }
+
+    _py_manifest = {
+      files = _py_manifest_files_rebased
+      packages = py_packages
+      scripts = _py_scripts
+      package_reqs = py_package_reqs
+    }
+
+    write_file(_py_manifest_file, _py_manifest, "json")
+
+    args = [
+      "--package_name",
+      py_package_name,
+      "--build_number",
+      chip_python_version,
+      "--build_dir",
+      rebase_path("${target_gen_dir}/${target_name}.py_build", root_build_dir),
+      "--dist_dir",
+      rebase_path(_dist_dir, root_build_dir),
+      "--manifest",
+      rebase_path(_py_manifest_file, root_build_dir),
+      "--plat-name",
+      py_platform_tag,
+    ]
+
+    if (defined(invoker.lib_name)) {
+      args += [
+        "--lib-name",
+        lib_name,
+      ]
+    }
+
+    outputs = [ "${_dist_dir}/$output_name" ]
+  }
+}
+
+chip_python_wheel_action("chip-core") {
+  py_manifest_files = [
     {
       src_dir = "."
       sources = [
-        "chip-device-ctrl.py",
-        "chip-repl.py",
+        "chip/CertificateAuthority.py",
         "chip/ChipBleBase.py",
         "chip/ChipBleUtility.py",
         "chip/ChipBluezMgr.py",
         "chip/ChipCommissionableNodeCtrl.py",
-        "chip/ChipCoreBluetoothMgr.py",
-        "chip/ChipReplStartup.py",
         "chip/ChipStack.py",
-        "chip/ChipUtility.py",
         "chip/FabricAdmin.py",
         "chip/__init__.py",
         "chip/ble/__init__.py",
@@ -136,14 +237,15 @@ pw_python_action("python") {
         "chip/ble/scan_devices.py",
         "chip/ble/types.py",
         "chip/clusters/Attribute.py",
-        "chip/clusters/CHIPClusters.py",
-        "chip/clusters/ClusterObjects.py",
         "chip/clusters/Command.py",
-        "chip/clusters/Objects.py",
-        "chip/clusters/TestObjects.py",
-        "chip/clusters/Types.py",
         "chip/clusters/__init__.py",
+        "chip/commissioning/__init__.py",
+        "chip/commissioning/commissioning_flow_blocks.py",
+        "chip/commissioning/pase.py",
         "chip/configuration/__init__.py",
+        "chip/credentials/cert.py",
+        "chip/crypto/fabric.py",
+        "chip/crypto/p256keypair.py",
         "chip/discovery/__init__.py",
         "chip/discovery/library_handle.py",
         "chip/discovery/types.py",
@@ -161,16 +263,20 @@ pw_python_action("python") {
         "chip/setup_payload/__init__.py",
         "chip/setup_payload/setup_payload.py",
         "chip/storage/__init__.py",
-        "chip/tlv/__init__.py",
+        "chip/tracing/__init__.py",
+        "chip/utils/CommissioningBuildingBlocks.py",
+        "chip/utils/__init__.py",
+        "chip/yaml/__init__.py",
+        "chip/yaml/data_model_lookup.py",
+        "chip/yaml/errors.py",
+        "chip/yaml/format_converter.py",
+        "chip/yaml/runner.py",
       ]
 
       if (chip_controller) {
         sources += [ "chip/ChipDeviceCtrl.py" ]
       } else {
-        sources += [
-          "chip/server/__init__.py",
-          "chip/server/types.py",
-        ]
+        sources += [ "chip/server/__init__.py" ]
       }
     },
     {
@@ -187,28 +293,46 @@ pw_python_action("python") {
     },
   ]
 
-  _py_manifest_file = "${target_gen_dir}/${target_name}.py_manifest.json"
-
   inputs = []
-  _py_manifest_files_rebased = []
-  foreach(_manifest_entry, _py_manifest_files) {
-    inputs += _manifest_entry.sources
-    _py_manifest_files_rebased += [
-      {
-        src_dir = rebase_path(_manifest_entry.src_dir,
-                              get_path_info(_py_manifest_file, "dir"))
-        sources = rebase_path(_manifest_entry.sources, _manifest_entry.src_dir)
-      },
-    ]
+
+  py_packages = [
+    "chip",
+    "chip.ble",
+    "chip.ble.commissioning",
+    "chip.configuration",
+    "chip.commissioning",
+    "chip.clusters",
+    "chip.credentials",
+    "chip.crypto",
+    "chip.utils",
+    "chip.discovery",
+    "chip.exceptions",
+    "chip.internal",
+    "chip.interaction_model",
+    "chip.logging",
+    "chip.yaml",
+    "chip.native",
+    "chip.clusters",
+    "chip.setup_payload",
+    "chip.storage",
+    "chip.tracing",
+  ]
+
+  if (!chip_controller) {
+    py_packages += [ "chip.server" ]
   }
 
-  _py_manifest = {
-    files = _py_manifest_files_rebased
-  }
-
-  write_file(_py_manifest_file, _py_manifest, "json")
-
-  _dist_dir = "${root_out_dir}/controller/python"
+  py_package_reqs = [
+    "coloredlogs",
+    "construct",
+    "dacite",
+    "rich",
+    "pyyaml",
+    "ipdb",
+    "deprecation",
+    "cryptography",
+    "ecdsa",
+  ]
 
   if (current_cpu == "x64") {
     cpu_tag = "x86_64"
@@ -221,40 +345,132 @@ pw_python_action("python") {
   }
 
   if (current_os == "mac") {
-    platform_tag = "macosx_" + string_replace(mac_deployment_target, ".", "_")
+    py_platform_tag = string_replace(
+            string_replace(mac_deployment_target, "macos", "macosx."),
+            ".",
+            "_")
   } else {
-    platform_tag = current_os
+    py_platform_tag = current_os
   }
 
-  platform_tag = platform_tag + "_" + cpu_tag
+  py_platform_tag = py_platform_tag + "_" + cpu_tag
 
-  tags = "cp37-abi3-" + platform_tag
-
-  args = [
-    "--package_name",
-    "chip",
-    "--build_number",
-    "0.0",
-    "--build_dir",
-    rebase_path("${target_gen_dir}/${target_name}.py_build", root_build_dir),
-    "--dist_dir",
-    rebase_path(_dist_dir, root_build_dir),
-    "--manifest",
-    rebase_path(_py_manifest_file, root_build_dir),
-    "--plat-name",
-    platform_tag,
-  ]
+  tags = "cp37-abi3-" + py_platform_tag
 
   if (chip_controller) {
+    lib_name = "_ChipDeviceCtrl.so"
   } else {
-    args += [
-      "--server",
-      "True",
-    ]
+    lib_name = "_ChipServer.so"
   }
+
+  py_package_name = "${chip_python_package_prefix}-core"
+  py_package_output = string_replace(py_package_name, "-", "_")
 
   public_deps = [ ":ChipDeviceCtrl" ]
 
-  output_name = "chip-0.0-${tags}.whl"
-  outputs = [ "${_dist_dir}/$output_name" ]
+  output_name = "${py_package_output}-${chip_python_version}-${tags}.whl"
+}
+
+chip_python_wheel_action("chip-clusters") {
+  py_manifest_files = [
+    {
+      src_dir = "."
+      sources = [
+        "chip/ChipUtility.py",
+        "chip/clusters/CHIPClusters.py",
+        "chip/clusters/ClusterObjects.py",
+        "chip/clusters/Objects.py",
+        "chip/clusters/TestObjects.py",
+        "chip/clusters/Types.py",
+        "chip/clusters/enum.py",
+        "chip/tlv/__init__.py",
+        "chip/tlv/tlvlist.py",
+      ]
+    },
+    {
+      src_dir = "//"
+      sources = [ "//LICENSE" ]
+    },
+  ]
+
+  inputs = []
+
+  py_packages = [
+    "chip",
+    "chip.clusters",
+    "chip.tlv",
+  ]
+
+  py_package_reqs = [
+    "dacite",
+    "aenum",
+  ]
+
+  py_package_name = "${chip_python_package_prefix}-clusters"
+  py_package_output = string_replace(py_package_name, "-", "_")
+  py_platform_tag = "any"
+
+  output_name = "${py_package_output}-${chip_python_version}-py3-none-any.whl"
+}
+
+chip_python_wheel_action("chip-repl") {
+  py_scripts = [
+    "chip-device-ctrl.py",
+    "chip-repl.py",
+  ]
+
+  py_manifest_files = [
+    {
+      src_dir = "."
+      sources = [
+        "chip/ChipBluezMgr.py",
+        "chip/ChipCoreBluetoothMgr.py",
+        "chip/ChipReplStartup.py",
+      ]
+      sources += py_scripts
+    },
+    {
+      src_dir = "//"
+      sources = [ "//LICENSE" ]
+    },
+  ]
+
+  inputs = []
+
+  py_packages = [ "chip" ]
+
+  py_package_reqs = [
+    "coloredlogs",
+
+    #
+    # IPython 7.30.0 has a bug which results in the use of await ... failing on some platforms (see https://github.com/ipython/ipython/pull/13269)
+    # For now, let's just avoid that version.
+    #
+    # IPython 8.1.0 has a bug which causes issues: https://github.com/ipython/ipython/issues/13554
+    #
+    #
+    "ipython!=8.1.0",
+    "rich",
+    "ipykernel",
+  ]
+
+  if (current_os == "mac") {
+    py_package_reqs += [ "pyobjc-framework-corebluetooth" ]
+  } else if (current_os == "linux") {
+    py_package_reqs += [
+      "dbus-python==1.2.18",
+      "pygobject",
+    ]
+  }
+
+  py_package_name = "${chip_python_package_prefix}-repl"
+  py_package_output = string_replace(py_package_name, "-", "_")
+  py_platform_tag = "any"
+
+  data_deps = [
+    ":chip-clusters",
+    ":chip-core",
+  ]
+
+  output_name = "${py_package_output}-${chip_python_version}-py3-none-any.whl"
 }

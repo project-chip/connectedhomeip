@@ -11,365 +11,225 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    7.3.14. [TC-DD-3.14] Commissioning Flow - Manual Pairing Code - Negative
-    scenario [DUT - Commissioner]
+    3.3.14. [TC-DD-3.14] Commissioning Flow - QR Code - Negative Scenario [DUT -
+    Commissioner]
+
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+    - MCORE.DD.QR_COMMISSIONING
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:
-    - label:
-          "If (PICS_11_MANUAL_PC), Provide the 11 digit manual pairing code from
-          the Commissionee to the DUT in any format supported by DUT"
-      verification:
-          "Device TH: ./out/all-clusters-app/chip-all-clusters-app ...
-          [1645845935.798806][8925:8925] CHIP:DL: Device Configuration:
-          [1645845935.798853][8925:8925] CHIP:DL: Serial Number: TEST_SN
-          [1645845935.798875][8925:8925] CHIP:DL: Vendor Id: 65521 (0xFFF1)
-          [1645845935.798904][8925:8925] CHIP:DL: Product Id: 32769 (0x8001)
-          [1645845935.798929][8925:8925] CHIP:DL: Hardware Version: 0
-          [1645845935.798960][8925:8925] CHIP:DL: Setup Pin Code: 20202021
-          [1645845935.798984][8925:8925] CHIP:DL: Setup Discriminator: 3840
-          (0xF00) [1645845935.799008][8925:8925] CHIP:DL: Manufacturing Date:
-          (not set) [1645845935.799038][8925:8925] CHIP:DL: Device Type: 65535
-          (0xFFFF) [1645845935.799106][8925:8925] CHIP:SVR: SetupQRCode:
-          [MT:-24J042C00KA0648G00] [1645845935.799135][8925:8925] CHIP:SVR:
-          Copy/paste the below URL in a browser to see the QR Code:
-          [1645845935.799164][8925:8925] CHIP:SVR:
-          https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
-          [1645845935.799195][8925:8925] CHIP:SVR: Manual pairing code:
-          [34970112332] [1645845935.799236][8925:8925] CHIP:SVR: Long manual
-          pairing code: [749701123365521327694]"
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the DUT as commissioner test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Preconditions"
+      verification: |
+          1 - DUT is on an operational network and has accurate date, time, timezone, regulatory, and fabric information available.
+
+          2 - 5.1.3 - QR Code is printed on the Commissionee device or in additional provided materials (ex: manual, companion app, web service).
+
+          An example onboarding QR code could be "MT:-24J029Q00KA0648G00" (following 5.1.3 "QR Code", Table 34 "Packed Binary Data Structure for Onboarding Payload") which includes:
+
+          - 3-bit Version String=000
+
+          - 16-bit Vendor ID=0xFFF1 (as defined in section 2.5.2. "Vendor Identifier")
+
+          - 16-bit Product ID=0x8001 (as defined in section 2.5.3. "Product Identifier")
+
+          - 2-bit Custom Flow=10 (Custom Commissioning Flow = 2)
+
+          - 8-bit Discovery Capabilities Bitmask=00000100 (OnNetwork)
+
+          - 12-bit Discriminator=0xF00
+
+          - 27-bit Passcode=20202021
+
+          - 4-bit Padding=0000
+
+          - no variable-length TLV Data included (as defined in section 5.1.3.1. "Payload", subsection "TLV Data")
+      disabled: true
+
+    - label: "Step 1: Locate and scan/read the Commissionees QR code using DUT"
+      verification: |
+          Verify on the TH (All-cluster-app)
+          ./chip-all-clusters-app --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --custom-flow 2 --capabilities 4 --discriminator 3840 --passcode 20202021
+
+          [1657235470.970680][371041:371041] CHIP:DL: Device Configuration:
+          [1657235470.970772][371041:371041] CHIP:DL:   Serial Number: (not set)
+          [1657235470.970811][371041:371041] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
+          [1657235470.970845][371041:371041] CHIP:DL:   Product Id: 32769 (0x8001)
+          [1657235470.970892][371041:371041] CHIP:DL:   Hardware Version: 0
+          [1657235470.970929][371041:371041] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
+          [1657235470.970984][371041:371041] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3840 (0xF00)
+          [1657235470.971031][371041:371041] CHIP:DL:   Manufacturing Date: (not set)
+          [1657235470.971095][371041:371041] CHIP:DL:   Device Type: 65535 (0xFFFF)
+          [1657235470.971147][371041:371041] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
+          [1657235470.971199][371041:371041] CHIP:SVR: SetupQRCode: [MT:-24J029Q00KA0648G00]
+          [1657235470.971258][371041:371041] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
+          [1657235470.971293][371041:371041] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J029Q00KA0648G00
       disabled: true
 
     - label:
-          "If (PICS_21_MANUAL_PC), Provide the 21 digit manual pairing code from
-          the Commissionee to the DUT in any format supported by DUT"
-      verification:
-          "Device TH: ./out/all-clusters-app/chip-all-clusters-app ...
-          [1645845935.798806][8925:8925] CHIP:DL: Device Configuration:
-          [1645845935.798853][8925:8925] CHIP:DL: Serial Number: TEST_SN
-          [1645845935.798875][8925:8925] CHIP:DL: Vendor Id: 65521 (0xFFF1)
-          [1645845935.798904][8925:8925] CHIP:DL: Product Id: 32769 (0x8001)
-          [1645845935.798929][8925:8925] CHIP:DL: Hardware Version: 0
-          [1645845935.798960][8925:8925] CHIP:DL: Setup Pin Code: 20202021
-          [1645845935.798984][8925:8925] CHIP:DL: Setup Discriminator: 3840
-          (0xF00) [1645845935.799008][8925:8925] CHIP:DL: Manufacturing Date:
-          (not set) [1645845935.799038][8925:8925] CHIP:DL: Device Type: 65535
-          (0xFFFF) [1645845935.799106][8925:8925] CHIP:SVR: SetupQRCode:
-          [MT:-24J042C00KA0648G00] [1645845935.799135][8925:8925] CHIP:SVR:
-          Copy/paste the below URL in a browser to see the QR Code:
-          [1645845935.799164][8925:8925] CHIP:SVR:
-          https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
-          [1645845935.799195][8925:8925] CHIP:SVR: Manual pairing code:
-          [34970112332] [1645845935.799236][8925:8925] CHIP:SVR: Long manual
-          pairing code: [749701123365521327694]"
+          "Step 2a: Version String: Using the QR code from Step 1, generate a
+          new QR code but substituting out the current Version String with an
+          invalid Version String (i.e. '010' or any non-zero 3-bit value)"
+      verification: |
+          1. Use chip-tool's "payload generate-qrcode" command to help generate the new, invalid QR code
+          Verify on the TH (All-cluster-app)
+           ./chip-tool payload generate-qrcode --existing-payload MT:-24J029Q00KA0648G00 --allow-invalid-payload 1  --version 2
+          [1657235626568] [31698:16839018] CHIP: [TOO] QR Code: MT:034J029Q00KA0648G00
       disabled: true
 
     - label:
-          "If (PICS_11_MANUAL_PC), VERSION: Using the manual code from Step 1.a,
-          generate a new manual code but substituting out the current VERSION
-          with an invalid VERSION: 1"
-      verification:
-          "BLOCKED chip-device-ctrl BUG: Generated pairing code does not change
-          when Version String is changed from 0 to, assuming it should
-          chip-device-ctrl > setup-payload generate -vr 1 -vi 65521 -pi 32769
-          -cf 0 -dc 2 -dv 3840 -ps 20202021 2022-03-03 01:09:59 matter-te-6
-          chip.SPL[333678] INFO Manual pairing code: [34970112332] 2022-03-03
-          01:09:59 matter-te-6 chip.SPL[333678] INFO SetupQRCode:
-          [MT:.24J042C00KA0648G00]"
-      disabled: true
-
-    - label:
-          "If (PICS_11_MANUAL_PC), Provide the manual pairing code, generated in
-          the previous step, to the DUT in any format supported by the DUT"
-      verification:
-          "BLOCKED chip-device-ctrl BUG: Generated pairing code does not change
-          when Version String is changed from 0 to, assuming it should"
-      disabled: true
-
-    - label:
-          "If (PICS_21_MANUAL_PC), VERSION: Using the manual code from Step 1.b,
-          generate a new manual code but substituting out the current VERSION
-          with an invalid VERSION: 1"
-      verification: ""
-      disabled: true
-
-    - label:
-          "If (PICS_21_MANUAL_PC), Provide the manual pairing code, generated in
-          the previous step, to the DUT in any format supported by the DUT"
-      verification:
-          "DUT Commissioner: sudo ./examples/chip-tool/out/debug/chip-tool
-          pairing manualcode 1234 10054912339 ... Device TH:
-          ./out/all-clusters-app/chip-all-clusters-app ..."
-      disabled: true
-
-    - label:
-          "If (PICS_11_MANUAL_PC), VID_PID_PRESENT: Using the manual code from
-          Step 1.a, generate a new manual code but substituting out the current
-          VID_PID_PRESENT with an invalid VID_PID_PRESENT set to 1"
-      verification:
-          "NEED SUPPORT: Unable to generate this manual code with
-          chip-device-ctrl: does not allow the option"
-      disabled: true
-
-    - label:
-          "If (PICS_11_MANUAL_PC), Provide the manual pairing code, generated in
-          the previous step, to the DUT in any format supported by the DUT"
-      verification:
-          "NEED SUPPORT: Unable to generate manual code in previous step"
-      disabled: true
-
-    - label:
-          "If (PICS_21_MANUAL_PC), VID_PID_PRESENT: Using the manual code from
-          Step 1.b, generate a new manual code but substituting out the current
-          VID_PID_PRESENT with an invalid VID_PID_PRESENT set to 0"
-      verification:
-          "NEED SUPPORT: Unable to generate this manual code with
-          chip-device-ctrl: does not allow the option"
-      disabled: true
-
-    - label:
-          "If (PICS_21_MANUAL_PC), Provide the manual pairing code, generated in
-          the previous step, to the DUT in any format supported by the DUT"
-      verification:
-          "NEED SUPPORT: Unable to generate manual code in previous step"
-      disabled: true
-
-    - label:
-          "If (PICS_11_MANUAL_PC), SHORT DISCRIMINATOR: Using the manual code
-          from Step 1.a, generate a new manual code but substituting out the
-          current SHORT DISCRIMINATOR string with one set to an invalid one
-          (i.e. Any different SHORT DISCRIMINATOR than the commissionees SHORT
-          DISCRIMINATOR while following section 5.1.1.5. 'Discriminator value')"
-      verification:
-          "chip-device-ctrl > setup-payload generate -vr 0 -vi 65521 -pi 32769
-          -cf 0 -dc 2 -dv 1111 -ps 20202021 2022-03-03 01:56:46 matter-te-6
-          chip.SPL[381013] INFO Manual pairing code: [10054912339] 2022-03-03
-          01:56:46 matter-te-6 chip.SPL[381013] INFO SetupQRCode:
-          [MT:-24J0MBW17K10648G00]"
-      disabled: true
-
-    - label:
-          "If (PICS_11_MANUAL_PC), Provide the manual pairing code, generated in
-          the previous step, to the DUT in any format supported by the DUT"
-      verification:
-          "DUT Commissioner: sudo ./examples/chip-tool/out/debug/chip-tool
-          pairing manualcode 1234 10054912339 ... [1646273075122]
-          [54299:29491292] CHIP: [BLE] NewConnection [1646273075150]
-          [54299:29491292] CHIP: [BLE] CBManagerState: ON [1646273075152]
-          [54299:29491293] CHIP: [BLE] CBManagerState: RESETTING [1646273076351]
-          [54299:29491293] CHIP: [BLE] CBManagerState: ON Illegal instruction: 4
-          Device TH: ./out/all-clusters-app/chip-all-clusters-app ... DUT does
-          not commission the TH to the Matter network"
-      disabled: true
-
-    - label:
-          "If (PICS_21_MANUAL_PC), SHORT DISCRIMINATOR: Using the manual code
-          from Step 1.b, generate a new manual code but substituting out the
-          current SHORT DISCRIMINATOR string with one set to an invalid one
-          (i.e. Any different SHORT DISCRIMINATOR than the commissionees SHORT
-          DISCRIMINATOR while following section 5.1.1.5. Discriminator value)"
-      verification:
-          "NEED SUPPORT: Unable to generate this manual code with
-          chip-device-ctrl: does not generate 21-digit codes for every input"
-      disabled: true
-
-    - label:
-          "If (PICS_21_MANUAL_PC), Provide the manual pairing code, generated in
-          the previous step, to the DUT in any format supported by the DUT"
-      verification:
-          "NEED SUPPORT: Unable to generate manual code in previous step"
-      disabled: true
-
-    - label:
-          "If (PICS_11_MANUAL_PC), Passcode: Using the manual code from Step
-          1.a, generate a new manual code using all the same Onboarding Payload
-          components except for the Passcode. For each Passcode in the following
-          list, set the Passcode component to one of the invalid Passcode and
-          generate a new manual code using all the same Onboarding Payload
-          components and one Passcode from the list: 00000000, 11111111,
-          22222222, 33333333, 44444444, 55555555, 66666666, 77777777, 88888888,
-          99999999, 12345678, 87654321"
-      verification:
-          "NEED SUPPORT: Unable to generate false manual codes with
-          chip-device-ctrl chip-device-ctrl > setup-payload generate -vr 0 -vi
-          65521 -pi 32769 -cf 1 -dc 4 -dv 3840 -ps 00000000 2022-03-03 00:11:58
-          matter-te-6 chip.SPL[22108] ERROR Failed encoding invalid payload Chip
-          Stack Error 47 00000000: 11111111: 22222222: 33333333: 44444444:
-          55555555: 66666666: 77777777: 88888888: 99999999: 12345678: 87654321"
-      disabled: true
-
-    - label:
-          "If (PICS_11_MANUAL_PC), Provide each of the manual pairing codes,
-          generated in the previous step, to the DUT in any format supported by
+          "Step 2b: Scan/read the QR code, generated in the previous step, using
           the DUT"
-      verification:
-          "NEED SUPPORT: Unable to generate manual code in previous step"
+      verification: |
+          Verify on the DUT (Chip-tool):
+
+          ./chip-tool pairing code 1 MT:-034J029Q00KA0648G00
+
+          Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:50: CHIP Error 0x0000002F: Invalid argument
+
+          No applicable TH Logs
       disabled: true
 
     - label:
-          "If (PICS_21_MANUAL_PC), Passcode: Using the manual code from Step
-          1.b, generate a new manual code using all the same Onboarding Payload
-          components except for the Passcode. For each Passcode in the following
-          list, set the Passcode component to one of the invalid Passcode and
-          generate a new manual code using all the same Onboarding Payload
-          components and one Passcode from the list: 00000000, 11111111,
-          22222222, 33333333, 44444444, 55555555, 66666666, 77777777, 88888888,
-          99999999, 12345678, 87654321"
-      verification:
-          "NEED SUPPORT: Unable to generate false manual codes with
-          chip-device-ctrl chip-device-ctrl > setup-payload generate -vr 0 -vi
-          65521 -pi 32769 -cf 1 -dc 4 -dv 3840 -ps 00000000 2022-03-03 00:11:58
-          matter-te-6 chip.SPL[22108] ERROR Failed encoding invalid payload Chip
-          Stack Error 47 00000000: 11111111: 22222222: 33333333: 44444444:
-          55555555: 66666666: 77777777: 88888888: 99999999: 12345678: 87654321"
+          "Step 3a: Using the QR code from Step 1, ensure the THs Discovery
+          Capability bit string is NOT set to BLE for discovery (i.e. set to
+          OnNetwork discovery capability)"
+      PICS: MCORE.DD.DISCOVERY_BLE
+      verification: |
+          1. Use chip-tool's "payload generate-qrcode" command to help generate the new, invalid QR code
+          Verify on the TH (All-cluster-app)
+           ./chip-tool payload generate-qrcode --existing-payload MT:-24J029Q00KA0648G00 --allow-invalid-payload 1  --rendezvous 4
+          [1657235754393] [31702:16840391] CHIP: [TOO] QR Code: MT:-24J029Q00KA0648G00
+
+          Verify on the DUT (Chip-tool):
+          No applicable logs on the DUT side
+      disabled: true
+
+    - label: "Step 3b: Scan/read the QR code of the TH device using the DUT"
+      PICS: MCORE.DD.DISCOVERY_BLE
+      verification: |
+          Verify on the DUT (Chip-tool):
+          ./chip-tool pairing code 1 MT:-24J029Q00KA0648G00
+          [1657235905214] [31706:16841970] CHIP: [CTL] Discovered device to be commissioned over DNS-SD
+          ...
+          [1657235906071] [31706:16841969] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
     - label:
-          "If (PICS_21_MANUAL_PC), Provide each of the manual pairing codes,
-          generated in the previous step, to the DUT in any format supported by
+          "Step 4a: Passcode: Using the QR code from Step 1, generate a new QR
+          code using all the same Onboarding Payload components except for the
+          Passcode. For each passcode in the following list, set the Passcode
+          component to one of the invalid Passcodes and generate a new QR code
+          using all the same Onboarding Payload components and one Passcode from
+          the list: 00000000, 11111111, 22222222, 33333333, 44444444, 55555555,
+          66666666, 77777777, 88888888, 99999999, 12345678, 87654321"
+      verification: |
+          No applicable TH or DUT Logs
+          "MT:-24J029Q00OC0000000" (00000000),
+          "MT:-24J029Q00KMSP0Z800" (11111111),
+          "MT:-24J029Q00GWID1WH00" (22222222),
+          "MT:-24J029Q00C4912TQ00" (33333333),
+          "MT:-24J029Q008E.Q2QZ00" (44444444),
+          "MT:-24J029Q004ORE3N610" (55555555),
+          "MT:-24J029Q000YH24KF10" (66666666),
+          "MT:-24J029Q00Y58S4HO10" (77777777),
+          "MT:-24J029Q00UF-F5EX10" (88888888),
+          "MT:-24J029Q00QPQ36B420" (99999999),
+          "MT:-24J029Q004QG46Y900" (12345678),
+          "MT:-24J029Q00YX018EW10" (87654321)
+      disabled: true
+
+    - label:
+          "Step 4b: Scan each of the generated QR codes from the previous step
+          using DUT"
+      verification: |
+          Verify on the DUT (Chip-tool):
+          No applicable TH Logs
+
+          ./chip-tool pairing code 1 MT:-24J029Q00OC0000000
+
+          Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:50: CHIP Error 0x0000002F: Invalid argument
+
+
+           ./chip-tool pairing code 1 MT:-24J029Q00OC0000000
+          Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:50: CHIP Error 0x0000002F: Invalid argument
+
+
+           ./chip-tool pairing code 1 MT:-24J029Q00KMSP0Z800
+          Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:50: CHIP Error 0x0000002F: Invalid argument
+
+
+           ./chip-tool pairing code 1 MT:-24J029Q00GWID1WH00
+          Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:50: CHIP Error 0x0000002F: Invalid argument
+
+
+           ./chip-tool pairing code 1 MT:-24J029Q00C4912TQ00
+          Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:50: CHIP Error 0x0000002F: Invalid argument
+
+
+           ./chip-tool pairing code 1 MT:-24J029Q008E.Q2QZ00
+          Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:50: CHIP Error 0x0000002F: Invalid argument
+
+
+           ./chip-tool pairing code 1 MT:-24J029Q004ORE3N610
+          Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:50: CHIP Error 0x0000002F: Invalid argument
+
+
+           ./chip-tool pairing code 1 MT:-24J029Q000YH24KF10
+          Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:50: CHIP Error 0x0000002F: Invalid argument
+
+
+           ./chip-tool pairing code 1 MT:-24J029Q00Y58S4HO10
+          Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:50: CHIP Error 0x0000002F: Invalid argument
+
+
+           ./chip-tool pairing code 1 MT:-24J029Q00UF-F5EX10
+          Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:50: CHIP Error 0x0000002F: Invalid argument
+
+
+           ./chip-tool pairing code 1 MT:-24J029Q00QPQ36B420
+          Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:50: CHIP Error 0x0000002F: Invalid argument
+
+
+           ./chip-tool pairing code 1 MT:-24J029Q004QG46Y900
+          Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:50: CHIP Error 0x0000002F: Invalid argument
+
+
+           ./chip-tool pairing code 1 MT:-24J029Q00YX018EW10
+          Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:50: CHIP Error 0x0000002F: Invalid argument
+      disabled: true
+
+    - label:
+          "Step 5a: Prefix: Using the QR code from Step 1, generate a new QR
+          code but substituting out the current Prefix with an invalid Prefix
+          that is not 'MT:' (i.e. Prefix='AB:')"
+      verification: |
+          AB:-24J029Q00KA0648G00
+
+          No applicable TH or DUT Logs
+      disabled: true
+
+    - label:
+          "Step 5b: Scan/read the QR code, generated in the previous step, using
           the DUT"
-      verification:
-          "NEED SUPPORT: Unable to generate manual code in previous step"
-      disabled: true
+      verification: |
+          Verify on the DUT (Chip-tool):
 
-    - label:
-          "If (PICS_21_MANUAL_PC), VENDOR_ID: Using the manual code from Step
-          1.b, generate a new manual code using all the same Onboarding Payload
-          components except for the VENDOR_ID. For each VENDOR_ID in the
-          following list, set the VENDOR_ID component to one of the invalid Test
-          VENDOR_IDs and generate a new manual code using all the same
-          Onboarding Payload components and one Test VENDOR_ID from the list:
-          0xFFF1, 0xFFF2, 0xFFF3, 0xFFF4"
-      verification:
-          "16-MacBook-Pro:connectedhomeip liam$ sudo
-          ./examples/chip-tool/out/debug/chip-tool payload verhoeff-generate
-          74970112336552132769 [1646274552600] [54458:29507435] CHIP: [SPL]
-          Generating Character for: 74970112336552132769 [1646274552601]
-          [54458:29507435] CHIP: [SPL] Generated Char: 4 0xFFF1:
-          749701123365521327694 0xFFF2: 749701123365522327692 0xFFF3:
-          749701123365523327697 0xFFF4: 749701123365524327693"
-      disabled: true
+           ./chip-tool pairing code 1 AB:-24J029Q00KA0648G00
+          [1657236169984] [31732:16844455] CHIP: [TOO] Run command failure: ../../examples/chip-tool/third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:50: CHIP Error 0x00000013: Integrity check failed
 
-    - label:
-          "If (PICS_21_MANUAL_PC), Provide each of the manual pairing codes,
-          generated in the previous step, to the DUT in any format supported by
-          the DUT"
-      verification:
-          "NOTE: chip-tool as a commissioner is meant to support these invalid
-          manual pairing codes but other commissioners SHALL NOT support them
-          without understanding the risks. chip-tool cannot be used as a
-          'negative' case example for invalid Version ID manual codes. Run each
-          of the invalid manual codes in the previous step with the command
-          listed below 'DUT Commissioner' DUT Commissioner: sudo
-          ./examples/chip-tool/out/debug/chip-tool pairing manualcode 1234
-          749701123365521327694 ... Device TH:
-          ./out/all-clusters-app/chip-all-clusters-app ..."
-      disabled: true
-
-    - label:
-          "If (PICS_21_MANUAL_PC), PRODUCT_ID: Using the manual code from Step
-          1.b, generate a new manual code but substituting out the current
-          PRODUCT_ID with an invalid PRODUCT_ID of 0x0000(i.e. While following
-          section 2.5.3. Product Identifier)"
-      verification:
-          "16-MacBook-Pro:connectedhomeip liam$ sudo
-          ./examples/chip-tool/out/debug/chip-tool payload verhoeff-generate
-          74970112336552100000 Password: [1646274432948] [54452:29506141] CHIP:
-          [SPL] Generating Character for: 74970112336552100000 [1646274432949]
-          [54452:29506141] CHIP: [SPL] Generated Char: 6 Manual Pairing code:
-          749701123365521000006"
-      disabled: true
-
-    - label:
-          "If (PICS_21_MANUAL_PC), Provide the manual pairing code, generated in
-          the previous step, to the DUT in any format supported by the DUT"
-      verification:
-          "BLOCKED chip-tool BUG: chip-tool is allowing the Product ID to be
-          '00000' when this should not be allowed. However, this check may not
-          be handled during the commissionning process. DUT Commissioner: sudo
-          ./examples/chip-tool/out/debug/chip-tool pairing manualcode 1234
-          749701123365521000006 ... [1646275242410] [54535:29515978] CHIP: [CTL]
-          Received CommissioningComplete response [1646275242410]
-          [54535:29515978] CHIP: [CTL] Rendezvous cleanup [1646275242410]
-          [54535:29515978] CHIP: [TOO] Device commissioning completed with
-          success Device TH: ./out/all-clusters-app/chip-all-clusters-app ...
-          [1646275242.549708][29139:29139] CHIP:SVR: Commissioning completed
-          successfully"
-      disabled: true
-
-    - label:
-          "If (PICS_11_MANUAL_PC), CHECK_DIGIT: Using the manual code from Step
-          1.a, generate a new manual code but substituting out the current
-          CHECK_DIGIT with an invalid CHECK_DIGIT (i.e. Any different
-          CHECK_DIGIT than the commissionees CHECK_DIGIT while following Table
-          38. Encoding Method without Vendor and Product IDs (VID_PID_Present ==
-          0))"
-      verification:
-          "16-MacBook-Pro:connectedhomeip liam$ sudo
-          ./examples/chip-tool/out/debug/chip-tool payload verhoeff-verify
-          34970112331 10 [1646275789088] [54629:29523682] CHIP: [SPL] Verifying
-          Manual Code: 3497011233 [1646275789088] [54629:29523682] CHIP: [SPL]
-          34970112331 is INVALID at position 10 Manual Pairing code: 3497011233"
-      disabled: true
-
-    - label:
-          "If (PICS_11_MANUAL_PC), Provide the manual pairing code, generated in
-          the previous step, to the DUT in any format supported by the DUT"
-      verification:
-          "DUT Commissioner: sudo ./examples/chip-tool/out/debug/chip-tool
-          pairing manualcode 1234 749701123365521327693 ... [1646275837642]
-          [54631:29524424] CHIP: [-]
-          ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:49:
-          CHIP Error 0x00000013: Integrity check failed at
-          ../../commands/common/CHIPCommand.cpp:62 [1646275837642]
-          [54631:29524424] CHIP: [TOO] Run command failure:
-          ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:49:
-          CHIP Error 0x00000013: Integrity check failed [1646275837649]
-          [54631:29524424] CHIP: [SPT] VerifyOrDie failure at
-          ../../third_party/connectedhomeip/src/lib/support/Pool.h:311:
-          Allocated() == 0 Abort trap: 6 Device TH:
-          ./out/all-clusters-app/chip-all-clusters-app ... DUT has not
-          commissioned the TH to the Matter network"
-      disabled: true
-
-    - label:
-          "If (PICS_21_MANUAL_PC), Check Digit: Using the manual code from Step
-          1.b, generate a new manual code but substituting out the current
-          CHECK_DIGIT with an invalid CHECK_DIGIT (i.e. Any different
-          CHECK_DIGIT than the commissionees CHECK_DIGIT while following Table
-          39. Encoding Method with Vendor and Product IDs included
-          (VID_PID_Present == 1))"
-      verification:
-          "16-MacBook-Pro:connectedhomeip liam$ sudo
-          ./examples/chip-tool/out/debug/chip-tool payload verhoeff-verify
-          749701123365521327693 20 [1646275504257] [54540:29518920] CHIP: [SPL]
-          Verifying Manual Code: 74970112336552132769 [1646275504258]
-          [54540:29518920] CHIP: [SPL] 749701123365521327693 is INVALID at
-          position 20 Manual Pairing code: 749701123365521327693"
-      disabled: true
-
-    - label:
-          "If (PICS_11_MANUAL_PC), Provide the manual pairing code, generated in
-          the previous step, to the DUT in any format supported by the DUT"
-      verification:
-          "DUT Commissioner: sudo ./examples/chip-tool/out/debug/chip-tool
-          pairing manualcode 1234 749701123365521327693 ... [1646275557755]
-          [54545:29519511] CHIP: [-]
-          ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:49:
-          CHIP Error 0x00000013: Integrity check failed at
-          ../../commands/common/CHIPCommand.cpp:62 [1646275557755]
-          [54545:29519511] CHIP: [TOO] Run command failure:
-          ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:49:
-          CHIP Error 0x00000013: Integrity check failed [1646275557761]
-          [54545:29519511] CHIP: [SPT] VerifyOrDie failure at
-          ../../third_party/connectedhomeip/src/lib/support/Pool.h:311:
-          Allocated() == 0 Abort trap: 6 Device TH:
-          ./out/all-clusters-app/chip-all-clusters-app ... DUT has not
-          commissioned the TH to the Matter network"
+          No applicable TH Logs
       disabled: true

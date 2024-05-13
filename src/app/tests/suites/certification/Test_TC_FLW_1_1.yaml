@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 33.1.1. [TC-FLW-1.1] Global attributes with server as DUT
+name: 33.1.1. [TC-FLW-1.1] Global Attributes with DUT as Server
+
+PICS:
+    - FLW.S
 
 config:
     nodeId: 0x12344321
@@ -20,7 +23,9 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1:Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -28,75 +33,71 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #issue #12190 as per spec default value is 3 but expecting 1
-    - label: "read the global attribute: ClusterRevision"
-      command: "readAttribute"
-      disabled: true
-      attribute: "ClusterRevision"
-      response:
-          value: 2
-
-    - label: "Read the global attribute constraints: ClusterRevision"
+    - label: "Step 2: TH reads from the DUT the ClusterRevision attribute."
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
+          value: 3
           constraints:
-              type: uint16
+              type: int16u
 
-    - label:
-          "write the default values to mandatory global attribute:
-          ClusterRevision"
-      command: "writeAttribute"
-      attribute: "ClusterRevision"
-      arguments:
-          value: 2
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "reads back global attribute: ClusterRevision"
-      disabled: true
+    - label: "Step 3: TH reads from the DUT the FeatureMap attribute."
       command: "readAttribute"
-      attribute: "ClusterRevision"
+      attribute: "FeatureMap"
       response:
-          value: 2
+          value: 0
+          constraints:
+              type: bitmap32
 
-    - label: "Read the global attribute: AttributeList"
+    - label: "Step 4a: TH reads from the DUT the AttributeList attribute."
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
+              contains: [0, 1, 2, 65528, 65529, 65530, 65531, 65532, 65533]
 
-    #issue #11053 disabled steps below Global attributes missing from YAML framework
-    - label: "Read the global attribute: EventList"
-      disabled: true
+    - label: "Step 4a: TH reads from the DUT the AttributeList attribute."
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 2, 65528, 65529, 65531, 65532, 65533]
+
+    - label:
+          "Step 4b: TH reads the optional attribute(Tolerance) in AttributeList"
+      PICS: FLW.S.A0003
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [3]
+
+    - label: "Step 5: TH reads from the DUT the EventList attribute."
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:
+          value: []
           constraints:
               type: list
 
-    - label: "Read the global attribute: AcceptedCommandList"
-      disabled: true
+    - label: "Step 6: TH reads from the DUT the AcceptedCommandList attribute."
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
+          value: []
           constraints:
               type: list
 
-    - label: "Read the global attribute: GeneratedCommandList"
-      disabled: true
+    - label: "Step 7: TH reads from the DUT the GeneratedCommandList attribute."
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
+          value: []
           constraints:
               type: list
-
-    #Disabled due to issue #13442
-    - label: "Read the optional global attribute : FeatureMap"
-      disabled: true
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          constraints:
-              type: map32

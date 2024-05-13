@@ -5,7 +5,7 @@
             "compileCommands": "${workspaceFolder}/out/debug/compile_commands.gcc.json",
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c11",
-            "cppStandard": "gnu++14",
+            "cppStandard": "gnu++17",
             "intelliSenseMode": "gcc-x64",
             "browse": {
                 "path": ["${workspaceFolder}/out/debug/"],
@@ -17,7 +17,7 @@
             "compileCommands": "${workspaceFolder}/out/debug/compile_commands.clang.json",
             "compilerPath": "/usr/bin/clang",
             "cStandard": "c11",
-            "cppStandard": "gnu++14",
+            "cppStandard": "gnu++17",
             "intelliSenseMode": "clang-x64",
             "browse": {
                 "path": ["${workspaceFolder}/out/debug/"],
@@ -29,7 +29,7 @@
             "compileCommands": "${workspaceFolder}/out/debug/compile_commands.mbedtls.json",
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c11",
-            "cppStandard": "gnu++14",
+            "cppStandard": "gnu++17",
             "intelliSenseMode": "gcc-x64",
             "browse": {
                 "path": ["${workspaceFolder}/out/debug/"],
@@ -39,7 +39,7 @@
         {
             "name": "Android x64 debug (GN)",
             "cStandard": "c11",
-            "cppStandard": "c++11",
+            "cppStandard": "gnu++17",
             "intelliSenseMode": "clang-x64",
             "compileCommands": "${workspaceFolder}/out/debug/compile_commands.android_x64.json",
             "compilerPath": "/opt/android/android-ndk-r21b/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android24-clang",
@@ -51,7 +51,7 @@
         {
             "name": "Android arm64 debug (GN)",
             "cStandard": "c11",
-            "cppStandard": "c++11",
+            "cppStandard": "gnu++17",
             "intelliSenseMode": "clang-arm64",
             "compileCommands": "${workspaceFolder}/out/debug/compile_commands.android_arm64.json",
             "compilerPath": "/opt/android/android-ndk-r21b/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang",
@@ -63,7 +63,7 @@
         {
             "name": "EFR32 examples debug (GN)",
             "cStandard": "c11",
-            "cppStandard": "c++11",
+            "cppStandard": "gnu++17",
             "intelliSenseMode": "gcc-arm",
             "compileCommands": "${workspaceFolder}/out/debug/compile_commands.efr32.json",
             "compilerPath": "/opt/ARM-software/gcc-arm-none-eabi-9-2019-q4-major/bin/arm-none-eabi-gcc",
@@ -75,9 +75,21 @@
         {
             "name": "nRF Connect examples debug (GN)",
             "cStandard": "c11",
-            "cppStandard": "gnu++14",
+            "cppStandard": "gnu++17",
             "intelliSenseMode": "gcc-arm",
             "compilerPath": "/opt/ARM-software/gcc-arm-none-eabi-9-2019-q4-major/bin/arm-none-eabi-gcc",
+            "browse": {
+                "path": ["${workspaceFolder}/out/debug/"],
+                "limitSymbolsToIncludedHeaders": true
+            }
+        },
+        {
+            "name": "Tizen examples debug (GN)",
+            "cStandard": "c11",
+            "cppStandard": "gnu++17",
+            "intelliSenseMode": "gcc-arm",
+            "compilerPath": "/opt/tizen-sdk/tools/arm-linux-gnueabi-gcc-9.2/bin/arm-linux-gnueabi-gcc",
+            "compileCommands": "${workspaceFolder}/out/debug/compile_commands.tizen_arm.json",
             "browse": {
                 "path": ["${workspaceFolder}/out/debug/"],
                 "limitSymbolsToIncludedHeaders": true

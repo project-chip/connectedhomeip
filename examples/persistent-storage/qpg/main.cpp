@@ -34,19 +34,30 @@
 
 #define LOG_MODULE_ID 1
 
-static TaskHandle_t sTestTaskHandle;
-
+namespace {
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
+} // namespace
 
 void TestTask(void * pvParameter)
 {
-    while (1)
+    while (true)
     {
         qvCHIP_Printf(LOG_MODULE_ID, "Running Tests:");
         chip::RunKvsTest();
         vTaskDelay(60000); // Run every minute
     }
+}
+
+void Application_Init(void)
+{
+    /* Launch application task */
+    qvCHIP_Printf(LOG_MODULE_ID, "============================");
+    qvCHIP_Printf(LOG_MODULE_ID, "Qorvo " APP_NAME " Launching");
+    qvCHIP_Printf(LOG_MODULE_ID, "============================");
+
+    // Run tests
+    xTaskCreateStatic(TestTask, APP_NAME, 2048, NULL, 1, appStack, &appTaskStruct);
 }
 
 int main(void)
@@ -55,19 +66,12 @@ int main(void)
     int result;
 
     /* Initialize Qorvo stack */
-    result = qvCHIP_init();
+    result = qvCHIP_init(Application_Init);
     if (result < 0)
     {
         goto exit;
     }
 
-    /* Launch application task */
-    qvCHIP_Printf(LOG_MODULE_ID, "============================");
-    qvCHIP_Printf(LOG_MODULE_ID, "Qorvo " APP_NAME " Launching");
-    qvCHIP_Printf(LOG_MODULE_ID, "============================");
-
-    // Run tests
-    xTaskCreateStatic(TestTask, APP_NAME, 2048, NULL, 1, appStack, &appTaskStruct);
     qvCHIP_Printf(LOG_MODULE_ID, "Starting FreeRTOS scheduler");
     vTaskStartScheduler();
 

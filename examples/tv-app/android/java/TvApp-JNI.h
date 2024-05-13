@@ -18,19 +18,22 @@
 
 #pragma once
 
+#include "MyUserPrompter-JNI.h"
 #include <jni.h>
+#include <lib/support/JniReferences.h>
 
 class TvAppJNI
 {
 public:
     void InitializeWithObjects(jobject app);
     void PostClusterInit(int clusterId, int endpoint);
+    void InitializeCommissioner(JNIMyUserPrompter * userPrompter);
 
 private:
     friend TvAppJNI & TvAppJNIMgr();
 
     static TvAppJNI sInstance;
-    jobject mTvAppObject             = nullptr;
+    chip::JniGlobalReference mTvAppObject;
     jmethodID mPostClusterInitMethod = nullptr;
 };
 

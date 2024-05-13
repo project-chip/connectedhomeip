@@ -30,8 +30,17 @@
 // TVs need to be commissioners and likely want to be discoverable
 #define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY 1
 
+// TVs can handle the memory impact of supporting a larger list
+#define CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS 10
+
+// TVs will often enable this feature
+#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_PASSCODE 1
+
 // TVs need to be both commissioners and commissionees
 #define CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE 1
+
+// See issue 23625.
+#define CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE 1
 
 // TVs that are not commissionees,
 // or that don't automatically enter commissioning mode should set this to 0
@@ -64,5 +73,8 @@
 #define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY 20
 #define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC 20
 
-// include the CHIPProjectConfig from config/standalone
+// Change port to make it easy to run against tv-casting-app
+#define CHIP_PORT 5640
+
+// Include the CHIPProjectConfig from platform implementation config
 #include <CHIPProjectConfig.h>

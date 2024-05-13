@@ -14,13 +14,18 @@
 
 name: 36.2.1. [TC-PRS-2.1] Attributes with server as DUT
 
+PICS:
+    - PRS.S
+
 config:
     nodeId: 0x12344321
     cluster: "Pressure Measurement"
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -28,205 +33,96 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Read the mandatory attribute constraints: MeasuredValue"
+    - label: "Step 2: TH reads from the DUT the MinMeasuredValue attribute."
+      PICS: PRS.S.A0001
+      command: "readAttribute"
+      attribute: "MinMeasuredValue"
+      response:
+          saveAs: MinMeasuredValueValue
+          constraints:
+              type: int16s
+              minValue: -32767
+              maxValue: 32766
+
+    - label: "Step 3: TH reads from the DUT the MaxMeasuredValue attribute."
+      PICS: PRS.S.A0002
+      command: "readAttribute"
+      attribute: "MaxMeasuredValue"
+      response:
+          saveAs: MaxMeasuredValueValue
+          constraints:
+              type: int16s
+              minValue: MinMeasuredValueValue
+              maxValue: 32767
+
+    - label: "Step 4: TH reads from the DUT the MeasuredValue attribute."
+      PICS: PRS.S.A0000
       command: "readAttribute"
       attribute: "MeasuredValue"
       response:
           constraints:
-              type: int16
+              type: int16s
+              minValue: MinMeasuredValueValue
+              maxValue: MaxMeasuredValueValue
 
-    - label: "Write the default values to mandatory attribute: MeasuredValue"
-      command: "writeAttribute"
-      attribute: "MeasuredValue"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back mandatory attribute: MeasuredValue"
+    - label: "Step 5: TH reads from the DUT the Tolerance attribute."
+      PICS: PRS.S.A0003
       command: "readAttribute"
-      attribute: "MeasuredValue"
-      response:
-          value: 0
-
-    - label: "Read the mandatory attribute constraints: MinMeasuredValue"
-      command: "readAttribute"
-      attribute: "MinMeasuredValue"
+      attribute: "Tolerance"
       response:
           constraints:
-              type: int16
+              type: int16u
+              minValue: 0
+              maxValue: 2048
 
-    - label: "Write the default values to mandatory attribute: MinMeasuredValue"
-      command: "writeAttribute"
-      attribute: "MinMeasuredValue"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back mandatory attribute: MinMeasuredValue"
+    - label: "Step 6: TH reads from the DUT the MinScaledValue attribute."
+      PICS: PRS.S.A0011
       command: "readAttribute"
-      attribute: "MinMeasuredValue"
+      attribute: "MinScaledValue"
       response:
-          value: 0
+          saveAs: MinScaledValueValue
+          constraints:
+              type: int16s
+              minValue: -32767
+              maxValue: 32766
 
-    - label: "Read the mandatory attribute constraints: MaxMeasuredValue"
+    - label: "Step 7: TH reads from the DUT the MaxScaledValue attribute."
+      PICS: PRS.S.A0012
       command: "readAttribute"
-      attribute: "MaxMeasuredValue"
+      attribute: "MaxScaledValue"
+      response:
+          saveAs: MaxScaledValueValue
+          constraints:
+              type: int16s
+              minValue: MinScaledValueValue
+              maxValue: 32767
+
+    - label: "Step 8: TH reads from the DUT the ScaledValue attribute."
+      PICS: PRS.S.A0010
+      command: "readAttribute"
+      attribute: "ScaledValue"
       response:
           constraints:
-              type: int16
+              type: int16s
+              minValue: MinScaledValueValue
+              maxValue: MaxScaledValueValue
 
-    - label: "Write the default values to mandatory attribute: MaxMeasuredValue"
-      command: "writeAttribute"
-      attribute: "MaxMeasuredValue"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back mandatory attribute: MaxMeasuredValue"
-      command: "readAttribute"
-      attribute: "MaxMeasuredValue"
-      response:
-          value: 0
-
-    #disabled due to issue #13442
-    - label: "Read the optional attribute: Tolerance"
-      disabled: true
-      command: "readAttribute"
-      attribute: "Tolerance"
-      response:
-          value: 0
-
-    - label: "Write the default values to optional attribute: Tolerance"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "Tolerance"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back optional attribute: Tolerance"
-      disabled: true
-      command: "readAttribute"
-      attribute: "Tolerance"
-      response:
-          value: 0
-
-    #Following attributes are based on the value of the extended feature in the cluster feature map
-    - label: "Read the optional attribute: ScaledValue"
-      disabled: true
-      command: "readAttribute"
-      attribute: "ScaledValue"
-      response:
-          value: 0
-
-    - label: "Write the default values to optional attribute: ScaledValue"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "ScaledValue"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back optional attribute: ScaledValue"
-      disabled: true
-      command: "readAttribute"
-      attribute: "ScaledValue"
-      response:
-          value: 0
-
-    - label: "Read the optional attribute: MinScaledValue"
-      disabled: true
-      command: "readAttribute"
-      attribute: "MinScaledValue"
-      response:
-          value: 0
-
-    - label: "Write the default values to optional attribute: MinScaledValue"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "MinScaledValue"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back optional attribute: MinScaledValue"
-      disabled: true
-      command: "readAttribute"
-      attribute: "MinScaledValue"
-      response:
-          value: 0
-
-    - label: "Read the optional attribute: MaxScaledValue"
-      disabled: true
-      command: "readAttribute"
-      attribute: "MaxScaledValue"
-      response:
-          value: 0
-
-    - label: "Write the default values to optional attribute: MaxScaledValue"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "MaxScaledValue"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back optional attribute: MaxScaledValue"
-      disabled: true
-      command: "readAttribute"
-      attribute: "MaxScaledValue"
-      response:
-          value: 0
-
-    - label: "Read the optional attribute: ScaledTolerance"
-      disabled: true
+    - label: "Step 9: TH reads from the DUT the ScaledTolerance attribute."
+      PICS: PRS.S.A0013
       command: "readAttribute"
       attribute: "ScaledTolerance"
       response:
-          value: 0
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 2048
 
-    - label: "Write the default values to optional attribute: ScaledTolerance"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "ScaledTolerance"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back optional attribute: ScaledTolerance"
-      disabled: true
-      command: "readAttribute"
-      attribute: "ScaledTolerance"
-      response:
-          value: 0
-
-    - label: "Read the optional attribute: Scale"
-      disabled: true
+    - label: "Step 10: TH reads from the DUT the Scale attribute."
+      PICS: PRS.S.A0014
       command: "readAttribute"
       attribute: "Scale"
       response:
-          value: 0
-
-    - label: "Write the default values to optional attribute: Scale"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "Scale"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back optional attribute: Scale"
-      disabled: true
-      command: "readAttribute"
-      attribute: "Scale"
-      response:
-          value: 0
+          constraints:
+              type: int8s
+              minValue: -127
+              maxValue: 127

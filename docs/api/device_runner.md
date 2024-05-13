@@ -99,5 +99,5 @@ enable reusing tests between different devices.
 The TSG is targeting the following platforms/boards for early bringup:
 
 -   Nordic nRF52 board <TODO: REF>
--   SiLabs XXXX board <TODO:REF>
--   Espressif ESP32 XXXX board <TODO:REF>
+-   SiLabs `XXXX` board <TODO:REF>
+-   Espressif ESP32 `XXXX` board <TODO:REF>

@@ -82,13 +82,24 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
             // end of the transfer.
             sendFlags.Set(chip::Messaging::SendMessageFlags::kExpectResponse);
         }
-        VerifyOrReturn(mExchangeCtx != nullptr, ChipLogError(BDX, "%s: mExchangeCtx is null", __FUNCTION__));
+        VerifyOrReturn(mExchangeCtx != nullptr);
         err = mExchangeCtx->SendMessage(event.msgTypeData.ProtocolId, event.msgTypeData.MessageType, std::move(event.MsgData),
                                         sendFlags);
-        if (err != CHIP_NO_ERROR)
+
+        if (err == CHIP_NO_ERROR)
         {
-            ChipLogError(BDX, "SendMessage failed: %s", chip::ErrorStr(err));
+            if (!sendFlags.Has(chip::Messaging::SendMessageFlags::kExpectResponse))
+            {
+                // After sending the StatusReport, exchange context gets closed so, set mExchangeCtx to null
+                mExchangeCtx = nullptr;
+            }
         }
+        else
+        {
+            ChipLogError(BDX, "SendMessage failed: %" CHIP_ERROR_FORMAT, err.Format());
+            Reset();
+        }
+
         break;
     }
     case TransferSession::OutputEventType::kInitReceived: {
@@ -101,7 +112,7 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         acceptData.StartOffset  = mTransfer.GetStartOffset();
         acceptData.Length       = mTransfer.GetTransferLength();
         VerifyOrReturn(mTransfer.AcceptTransfer(acceptData) == CHIP_NO_ERROR,
-                       ChipLogError(BDX, "%s: %s", __FUNCTION__, chip::ErrorStr(err)));
+                       ChipLogError(BDX, "AcceptTransfer failed: %" CHIP_ERROR_FORMAT, err.Format()));
 
         // Store the file designator used during block query
         uint16_t fdl       = 0;
@@ -134,10 +145,21 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         }
 
         std::ifstream otaFile(mFileDesignator, std::ifstream::in);
-        VerifyOrReturn(otaFile.good(), ChipLogError(BDX, "%s: file read failed", __FUNCTION__));
+        if (!otaFile.good())
+        {
+            ChipLogError(BDX, "OTA file open failed");
+            mTransfer.AbortTransfer(StatusCode::kFileDesignatorUnknown);
+            return;
+        }
+
         otaFile.seekg(mNumBytesSent);
         otaFile.read(reinterpret_cast<char *>(blockBuf->Start()), bytesToRead);
-        VerifyOrReturn(otaFile.good() || otaFile.eof(), ChipLogError(BDX, "%s: file read failed", __FUNCTION__));
+        if (!(otaFile.good() || otaFile.eof()))
+        {
+            ChipLogError(BDX, "OTA file read failed");
+            mTransfer.AbortTransfer(StatusCode::kFileDesignatorUnknown);
+            return;
+        }
 
         blockData.Data   = blockBuf->Start();
         blockData.Length = static_cast<size_t>(otaFile.gcount());
@@ -146,14 +168,19 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         mNumBytesSent = static_cast<uint32_t>(mNumBytesSent + blockData.Length);
         otaFile.close();
 
-        VerifyOrReturn(CHIP_NO_ERROR == mTransfer.PrepareBlock(blockData),
-                       ChipLogError(BDX, "%s: PrepareBlock failed: %s", __FUNCTION__, chip::ErrorStr(err)));
+        err = mTransfer.PrepareBlock(blockData);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(BDX, "PrepareBlock failed: %" CHIP_ERROR_FORMAT, err.Format());
+            mTransfer.AbortTransfer(StatusCode::kUnknown);
+        }
         break;
     }
     case TransferSession::OutputEventType::kAckReceived:
         break;
     case TransferSession::OutputEventType::kAckEOFReceived:
         ChipLogDetail(BDX, "Transfer completed, got AckEOF");
+        mStopPolling = true; // Stop polling the TransferSession only after receiving BlockAckEOF
         Reset();
         break;
     case TransferSession::OutputEventType::kStatusReceived:
@@ -172,15 +199,20 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
     case TransferSession::OutputEventType::kBlockReceived:
     default:
         // TransferSession should prevent this case from happening.
-        ChipLogError(BDX, "%s: unsupported event type", __FUNCTION__);
+        ChipLogError(BDX, "Unsupported event type");
     }
 }
 
+/* Reset() calls bdx::TransferSession::Reset() which sets the output event type to
+ * TransferSession::OutputEventType::kNone. So, bdx::TransferFacilitator::PollForOutput()
+ * will call HandleTransferSessionOutput() with event TransferSession::OutputEventType::kNone.
+ * Since we are ignoring kNone events so, it is okay HandleTransferSessionOutput() being called with event kNone
+ */
 void BdxOtaSender::Reset()
 {
     mFabricIndex.ClearValue();
     mNodeId.ClearValue();
-    mTransfer.Reset();
+    Responder::ResetTransfer();
     if (mExchangeCtx != nullptr)
     {
         mExchangeCtx->Close();

@@ -21,7 +21,8 @@
 #include <app/StatusResponse.h>
 #include <app/tests/AppTestContext.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/UnitTestUtils.h>
 #include <protocols/interaction_model/Constants.h>
@@ -67,7 +68,12 @@ class TestExchangeDelegate : public Messaging::ExchangeDelegate
         mLastMessageWasStatus = aPayloadHeader.HasMessageType(MsgType::StatusResponse);
         if (mLastMessageWasStatus)
         {
-            mError = StatusResponse::ProcessStatusResponse(std::move(aPayload));
+            CHIP_ERROR statusError = CHIP_NO_ERROR;
+            mError                 = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError);
+            if (mError == CHIP_NO_ERROR)
+            {
+                mError = statusError;
+            }
         }
         if (mKeepExchangeOpen)
         {
@@ -258,8 +264,10 @@ nlTestSuite sSuite =
 {
     "TestTimedHandler",
     &sTests[0],
-    TestContext::InitializeAsync,
-    TestContext::Finalize
+    TestContext::nlTestSetUpTestSuite,
+    TestContext::nlTestTearDownTestSuite,
+    TestContext::nlTestSetUp,
+    TestContext::nlTestTearDown,
 };
 // clang-format on
 
@@ -267,9 +275,7 @@ nlTestSuite sSuite =
 
 int TestTimedHandler()
 {
-    TestContext gContext;
-    nlTestRunner(&sSuite, &gContext);
-    return (nlTestRunnerStats(&sSuite));
+    return chip::ExecuteTestsWithContext<TestContext>(&sSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestTimedHandler)

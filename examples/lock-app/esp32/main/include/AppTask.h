@@ -20,11 +20,11 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "AppEvent.h"
-#include "BoltLockManager.h"
+#include <lock/AppEvent.h>
+#include <lock/BoltLockManager.h>
 
 #include "freertos/FreeRTOS.h"
-#include <ble/BLEEndPoint.h>
+#include <ble/Ble.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -35,6 +35,7 @@
 #define APP_ERROR_CREATE_TIMER_FAILED CHIP_APPLICATION_ERROR(0x04)
 #define APP_ERROR_START_TIMER_FAILED CHIP_APPLICATION_ERROR(0x05)
 #define APP_ERROR_STOP_TIMER_FAILED CHIP_APPLICATION_ERROR(0x06)
+#define APP_ERROR_ALLOCATION_FAILED CHIP_APPLICATION_ERROR(0x07)
 
 class AppTask
 {
@@ -65,7 +66,7 @@ private:
     static void LockActionEventHandler(AppEvent * aEvent);
     static void TimerEventHandler(TimerHandle_t xTimer);
 
-    static void UpdateClusterState(chip::System::Layer *, void * context);
+    static void UpdateClusterState(intptr_t context);
 
     void StartTimer(uint32_t aTimeoutMs);
 

@@ -27,6 +27,7 @@
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
+struct BluezConnection;
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip

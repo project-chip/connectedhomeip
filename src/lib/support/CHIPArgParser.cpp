@@ -23,13 +23,6 @@
  *
  */
 
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
-#ifndef __STDC_FORMAT_MACROS
-#define __STDC_FORMAT_MACROS
-#endif
-
 #include "CHIPArgParser.hpp"
 
 #if CHIP_CONFIG_ENABLE_ARG_PARSER
@@ -45,6 +38,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <strings.h>
+#include <unistd.h>
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
@@ -77,8 +71,6 @@ static void PutStringWithNewLine(FILE * s, const char * str);
 static void PutStringWithBlankLine(FILE * s, const char * str);
 #if CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
 static bool SanityCheckOptions(OptionSet * optSets[]);
-static bool HelpTextContainsLongOption(const char * optName, const char * helpText);
-static bool HelpTextContainsShortOption(char optChar, const char * helpText);
 #endif // CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
 
 static inline bool IsShortOptionChar(int ch)
@@ -109,8 +101,8 @@ OptionSet ** gActiveOptionSets = nullptr;
 void (*PrintArgError)(const char * msg, ...) = DefaultPrintArgError;
 
 /**
- * @fn bool ParseArgs(const char *progName, int argc, char *argv[], OptionSet *optSets[], NonOptionArgHandlerFunct nonOptArgHandler,
- * bool ignoreUnknown)
+ * @fn bool ParseArgs(const char *progName, int argc, char * const argv[], OptionSet *optSets[],
+ * NonOptionArgHandlerFunct nonOptArgHandler, bool ignoreUnknown)
  *
  * @brief
  * Parse a set of command line-style arguments, calling handling functions to process each
@@ -121,8 +113,9 @@ void (*PrintArgError)(const char * msg, ...) = DefaultPrintArgError;
  *                                  messages and warnings.
  * @param[in]  argc                 The number of arguments to be parsed, plus 1.
  * @param[in]  argv                 An array of argument strings to be parsed.  The array length must
- * 									be 1 greater than the value specified for argc, and
- * argv[argc] must be set to NULL.  Argument parsing begins with the *second* array element (argv[1]); element 0 is ignored.
+ *                                  be 1 greater than the value specified for argc, and
+ *                                  argv[argc] must be set to NULL.  Argument parsing begins with the
+ *                                  *second* array element (argv[1]); element 0 is ignored.
  * @param[in]  optSets              A list of pointers to `OptionSet` structures that define the legal
  *                                  options.  The supplied list must be terminated with a NULL.
  * @param[in]  nonOptArgHandler     A pointer to a function that will be called once option parsing
@@ -282,8 +275,8 @@ void (*PrintArgError)(const char * msg, ...) = DefaultPrintArgError;
  * a common section title.
  *
  */
-bool ParseArgs(const char * progName, int argc, char * argv[], OptionSet * optSets[], NonOptionArgHandlerFunct nonOptArgHandler,
-               bool ignoreUnknown)
+bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet * optSets[],
+               NonOptionArgHandlerFunct nonOptArgHandler, bool ignoreUnknown)
 {
     bool res = false;
     char optName[64];
@@ -293,6 +286,11 @@ bool ParseArgs(const char * progName, int argc, char * argv[], OptionSet * optSe
     OptionSet * curOptSet;
     OptionDef * curOpt;
     bool handlerRes;
+#if CHIP_CONFIG_NON_POSIX_LONG_OPT
+    int lastOptIndex    = 0;
+    int subOptIndex     = 0;
+    int currentOptIndex = 0;
+#endif // CHIP_CONFIG_NON_POSIX_LONG_OPT
 
     // The getopt() functions do not support recursion, so exit immediately with an
     // error if called recursively.
@@ -346,7 +344,36 @@ bool ParseArgs(const char * progName, int argc, char * argv[], OptionSet * optSe
         // Attempt to match the current option argument (argv[optind]) against the defined long and short options.
         optarg = nullptr;
         optopt = 0;
-        id     = getopt_long(argc, argv, shortOpts, longOpts, &optIndex);
+#if CHIP_CONFIG_NON_POSIX_LONG_OPT
+        // to check if index has changed
+        lastOptIndex = currentOptIndex;
+        // optind will not increment on error, this is why we need to keep track of the current option
+        // this is for use when getopt_long fails to find the option and we need to print the error
+        currentOptIndex = optind;
+        // if it's the first run, optind is not set and we need to find the first option ourselves
+        if (!currentOptIndex)
+        {
+            while (currentOptIndex < argc)
+            {
+                currentOptIndex++;
+                if (*argv[currentOptIndex] == '-')
+                {
+                    break;
+                }
+            }
+        }
+        // similarly we need to keep track of short opts index for groups like "-fba"
+        // if the index has not changed that means we are still analysing the same group
+        if (lastOptIndex != currentOptIndex)
+        {
+            subOptIndex = 0;
+        }
+        else
+        {
+            subOptIndex++;
+        }
+#endif // CHIP_CONFIG_NON_POSIX_LONG_OPT
+        id = getopt_long(argc, argv, shortOpts, longOpts, &optIndex);
 
         // Stop if there are no more options.
         if (id == -1)
@@ -357,10 +384,35 @@ bool ParseArgs(const char * progName, int argc, char * argv[], OptionSet * optSe
         {
             if (ignoreUnknown)
                 continue;
+#if CHIP_CONFIG_NON_POSIX_LONG_OPT
+            // getopt_long doesn't tell us if the option which failed to match is long or short so check
+            bool isLongOption = false;
+            if (strlen(argv[currentOptIndex]) > 2 && argv[currentOptIndex][1] == '-')
+            {
+                isLongOption = true;
+            }
+            if (optopt == 0 || isLongOption)
+            {
+                // getopt_long function incorrectly treats unknown long option as short opt group
+                if (subOptIndex == 0)
+                {
+                    PrintArgError("%s: Unknown option: %s\n", progName, argv[currentOptIndex]);
+                }
+            }
+            else if (optopt == '?')
+            {
+                PrintArgError("%s: Unknown option: -%c\n", progName, argv[currentOptIndex][subOptIndex + 1]);
+            }
+            else
+            {
+                PrintArgError("%s: Unknown option: -%c\n", progName, optopt);
+            }
+#else
             if (optopt != 0)
                 PrintArgError("%s: Unknown option: -%c\n", progName, optopt);
             else
                 PrintArgError("%s: Unknown option: %s\n", progName, argv[optind - 1]);
+#endif // CHIP_CONFIG_NON_POSIX_LONG_OPT
             goto done;
         }
 
@@ -370,7 +422,11 @@ bool ParseArgs(const char * progName, int argc, char * argv[], OptionSet * optSe
         {
             // NOTE: with the way getopt_long() works, it is impossible to tell whether the option that
             // was missing an argument was a long option or a short option.
+#if CHIP_CONFIG_NON_POSIX_LONG_OPT
+            PrintArgError("%s: Missing argument for %s option\n", progName, argv[currentOptIndex]);
+#else
             PrintArgError("%s: Missing argument for %s option\n", progName, argv[optind - 1]);
+#endif // CHIP_CONFIG_NON_POSIX_LONG_OPT
             goto done;
         }
 
@@ -435,12 +491,13 @@ done:
     return res;
 }
 
-bool ParseArgs(const char * progName, int argc, char * argv[], OptionSet * optSets[], NonOptionArgHandlerFunct nonOptArgHandler)
+bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet * optSets[],
+               NonOptionArgHandlerFunct nonOptArgHandler)
 {
     return ParseArgs(progName, argc, argv, optSets, nonOptArgHandler, false);
 }
 
-bool ParseArgs(const char * progName, int argc, char * argv[], OptionSet * optSets[])
+bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet * optSets[])
 {
     return ParseArgs(progName, argc, argv, optSets, nullptr, false);
 }
@@ -1511,51 +1568,7 @@ static bool SanityCheckOptions(OptionSet * optSets[])
                     }
             }
 
-    // Fail if the option help texts do not contain a description for each option, including both
-    // the option's long and short forms.
-    for (OptionSet ** optSetP = optSets; *optSetP != nullptr; optSetP++)
-        for (OptionDef * optionDef = (*optSetP)->OptionDefs; optionDef->Name != nullptr; optionDef++)
-        {
-            if (!HelpTextContainsLongOption(optionDef->Name, (*optSetP)->OptionHelp))
-            {
-                PrintArgError("INTERNAL ERROR: No help text defined for option: --%s\n", optionDef->Name);
-                res = false;
-            }
-
-            if (IsShortOptionChar(optionDef->Id) &&
-                !HelpTextContainsShortOption(static_cast<char>(optionDef->Id), (*optSetP)->OptionHelp))
-            {
-                PrintArgError("INTERNAL ERROR: No help text defined for option: -%c\n", optionDef->Id);
-                res = false;
-            }
-        }
-
     return res;
-}
-
-static bool HelpTextContainsLongOption(const char * optName, const char * helpText)
-{
-    size_t nameLen = strlen(optName);
-
-    for (const char * p = helpText; (p = strstr(p, optName)) != nullptr; p += nameLen)
-        if ((p - helpText) >= 2 && p[-1] == '-' && p[-2] == '-' && !isalnum(p[nameLen]) && p[nameLen] != '-')
-            return true;
-
-    return false;
-}
-
-static bool HelpTextContainsShortOption(char optChar, const char * helpText)
-{
-    char optStr[3];
-    optStr[0] = '-';
-    optStr[1] = optChar;
-    optStr[2] = 0;
-
-    for (const char * p = helpText; (p = strstr(p, optStr)) != nullptr; p += 2)
-        if ((p == helpText || (!isalnum(p[-1]) && p[-1] != '-')) && !isalnum(p[2]) && p[2] != '-')
-            return true;
-
-    return false;
 }
 
 #endif // CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS

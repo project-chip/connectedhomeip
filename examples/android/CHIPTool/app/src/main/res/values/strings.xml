@@ -1,0 +1,289 @@
+<resources>
+    <string name="app_name">CHIPTool</string>
+    <string name="barcode_scanner_activity_toolbar_title">QR Scan</string>
+    <string name="text_ok">Ok</string>
+    <string name="location_permission_denied_title">Location permission required</string>
+    <string name="location_permission_denied_message">Since location permission was denied, some functions of the app may be unavailable. </string>
+    <string name="chip_device_info_title">CHIP Device Info:</string>
+    <string name="chip_device_info_version_label">Version:</string>
+    <string name="chip_device_info_vendor_id_label">Vendor ID:</string>
+    <string name="chip_device_info_product_id_label">Product ID:</string>
+    <string name="chip_device_info_discriminator_label">Discriminator:</string>
+    <string name="chip_device_info_setup_code_label">Setup PIN Code:</string>
+    <string name="chip_device_info_serial_number_label">Serial Number:</string>
+    <string name="chip_device_info_discovery_capabilities_label">Discovery capabilities:</string>
+    <string name="chip_device_info_optional_vendor_tags_label">Optional Vendor tags:</string>
+    <string name="camera_permission_missing_alert_title">Camera permission missing</string>
+    <string name="camera_permission_missing_alert_subtitle">Camera permission required to be able to scan the QR code.</string>
+    <string name="camera_permission_missing_alert_try_again">Try again</string>
+    <string name="camera_unavailable_alert_title">Camera unavailable</string>
+    <string name="camera_unavailable_alert_subtitle">Error launching camera to scan the QR code.</string>
+    <string name="camera_unavailable_alert_exit">Exit</string>
+    <string name="input_address_btn_text">Input device address</string>
+
+    <string name="scan_qr_code_btn_text">Scan QR Code</string>
+    <string name="provision_wifi_credentials_btn_text">Provision CHIP device with Wi-Fi</string>
+    <string name="provision_thread_credentials_btn_text">Provision CHIP device with Thread</string>
+    <string name="on_off_level_btn_text">Light On/Off &amp; Level Cluster</string>
+    <string name="enter_ip_address_hint_text">Enter IP Address (eg. 192.168.10.2)</string>
+    <string name="enter_fabric_id_hint_text">Enter Fabric ID</string>
+    <string name="enter_device_id_hint_text">Enter Device ID</string>
+    <string name="enter_endpoint_id_hint_text">Enter Endpoint ID</string>
+    <string name="update_device_address_btn_text">Update address</string>
+    <string name="update_device_address_failure">Device address update failed: %1$s</string>
+    <string name="commissioned_device_id_text">Commissioned Device ID :</string>
+    <string name="icd_interaction_text">ICD Stay Active : </string>
+    <string name="icd_active_duration_hint_text">Duration</string>
+
+    <string name="address_commissioning_title_text">Commission with IP address</string>
+    <string name="default_discriminator">3840</string>
+    <string name="default_pincode">20202021</string>
+    <string name="default_port">5540</string>
+    <string name="enter_device_address_label_text">Device address</string>
+    <string name="enter_discriminator_label_text">Discriminator</string>
+    <string name="enter_pincode_label_text">Pincode</string>
+    <string name="enter_port_label_text">Port</string>
+    <string name="commission_btn_text">Commission</string>
+    <string name="dns_discover_btn_text">Discover</string>
+    <string name="wifi_scan_btn_text">Wi-Fi Scan</string>
+
+    <string name="send_command_on_btn_text">On</string>
+    <string name="send_command_off_btn_text">Off</string>
+    <string name="send_command_toggle_btn_text">Toggle</string>
+    <string name="read_on_off_attribute_btn_text">Read</string>
+    <string name="show_subscribe_dialog_btn_text">Subscribe</string>
+    <string name="send_command_type_label_text">%s/%d command sent!</string>
+    <string name="rendezvous_over_ble_btn_text">Rendezvous over BLE</string>
+    <string name="rendezvous_over_soft_ap_btn_text">Rendezvous over Soft AP</string>
+
+    <string name="rendezvous_over_ble_scanning_text">Scanning for BLE device %1$s</string>
+    <string name="rendezvous_over_ble_scanning_failed_text">Device not found</string>
+    <string name="rendezvous_over_ble_connecting_text">Connecting to %1$s</string>
+    <string name="rendezvous_over_ble_pairing_text">Pairing</string>
+    <string name="rendezvous_over_ble_pairing_failure_text">Pairing failed</string>
+    <string name="rendezvous_over_ble_commissioning_success_text">Network commissioning completed</string>
+    <string name="rendezvous_over_ble_commissioning_failure_text">Network commissioning failed</string>
+    <string name="commissioning_completed">Commissioning completed with result: %1$d</string>
+
+    <string name="attestation_test_btn_text">Attestation Test</string>
+    <string name="attestation_fetching_status">Fetching…</string>
+    <string name="attestation_app_not_found">No attestation app found</string>
+
+    <string name="enter_wifi_credentials_title">Enter your Wi-Fi network and password below that you want to put your CHIP device on.</string>
+    <string name="enter_wifi_ssid_hint">Enter Wi-Fi SSID</string>
+    <string name="enter_wifi_password_hint">Enter Wi-Fi password</string>
+    <string name="enter_wifi_save_network_btn">Save network</string>
+
+    <string name="enter_thread_credentials_title">Enter credentials of the Thread network that you want to put your CHIP device on.</string>
+    <string name="enter_thread_channel_hint">Channel:</string>
+    <string name="enter_thread_panid_hint">PAN ID:</string>
+    <string name="enter_thread_xpanid_hint">Extended PAN ID:</string>
+    <string name="enter_thread_master_key_hint">Master Key:</string>
+    <string name="enter_thread_channel_text">15</string>
+    <string name="enter_thread_panid_text">1234</string>
+    <string name="enter_thread_xpanid_text">11:11:11:11:22:22:22:22</string>
+    <string name="enter_thread_master_key_text">00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF</string>
+    <string name="enter_thread_save_network_btn">Save network</string>
+
+    <string name="nfc_tag_action_title">CHIP NFC Tag read. Choose an action:</string>
+    <string name="nfc_tag_action_show">Show device information</string>
+    <string name="nfc_tag_action_wifi">Provision into Wi-Fi network</string>
+    <string name="nfc_tag_action_thread">Provision into Thread network</string>
+
+    <string name="sensor_client_btn_text">Sensor clusters</string>
+    <string name="sensor_client_read_btn_text">Read</string>
+    <string name="sensor_client_watch_btn_text">Watch</string>
+    <string name="sensor_client_last_value_text">Last value: %1$.2f %2$s</string>
+    <string name="sensor_client_read_error_text">Failed to read the sensor: %1$s</string>
+    <string name="sensor_client_subscribe_error_text">Failed to subscribe to the sensor: %1$s</string>
+    <string name="sensor_client_unsubscribe_error_text">Failed to unsubscribe from the sensor: %1$s</string>
+    <string name="cluster_interaction_tool">Cluster Interaction Tool</string>
+
+    <string name="wildcard_btn_text">Wildcard</string>
+
+    <string name="multi_admin_client_btn_text">Multi-admin cluster</string>
+    <string name="enter_commissioning_timeout_hint_text">Enter Commissioning timeout</string>
+    <string name="basic_commissioning_method_btn_text">Basic Commissioning Method</string>
+    <string name="enter_discriminator_hint_text">Enter Discriminator</string>
+    <string name="enter_setup_pin_code_hint_text">Enter Setup PIN Code</string>
+    <string name="enhanced_commissioning_method_btn_text">Enhanced Commissioning Method</string>
+    <string name="revoke_btn_text">Revoke</string>
+    <string name="read_window_status_btn_text">Read Window Status</string>
+    <string name="read_admin_fabric_index_btn_text">Read Admin FabricIndex</string>
+    <string name="read_admin_vendor_id_btn_text">Read Admin VID</string>
+
+    <string name="op_cred_client_btn_text">Operational Credentials cluster</string>
+    <string name="op_cred_client_read_supported_fabric_btn_text">Read Supported Fabric count</string>
+    <string name="op_cred_client_read_commissioned_fabric_btn_text">Read Commissioned Fabric count</string>
+    <string name="op_cred_client_read_fabrics_btn_text">Read Fabrics</string>
+    <string name="op_cred_client_remove_fabrics_btn_text">Remove Fabrics</string>
+    <string name="op_cred_client_fabric_index_hint_text">FabricIndex</string>
+
+    <string name="basic_cluster_btn_text">Basic cluster</string>
+    <string name="basic_cluster_write_btn_text">Write</string>
+    <string name="basic_cluster_write_user_label_hint_text">Enter User Label</string>
+    <string name="basic_cluster_write_location_hint_text">Enter Location</string>
+    <string name="basic_cluster_local_config_disabled_btn_text">Set LocalConfigDisabled</string>
+    <string name="basic_cluster_read_attribute_btn_text">Read Attribute</string>
+    <string name="basic_cluster_data_model_revision_text">DataModelRevision</string>
+    <string name="basic_cluster_vendor_name_text">VendorName</string>
+    <string name="basic_cluster_vendor_id_text">VendorID</string>
+    <string name="basic_cluster_product_name_text">ProductName</string>
+    <string name="basic_cluster_product_id_text">ProductID</string>
+    <string name="basic_cluster_node_label_text">NodeLabel</string>
+    <string name="basic_cluster_location_text">Location</string>
+    <string name="basic_cluster_hardware_version_text">HardwareVersion</string>
+    <string name="basic_cluster_hardware_version_string_text">HardwareVersionString</string>
+    <string name="basic_cluster_software_version_text">SoftwareVersion</string>
+    <string name="basic_cluster_software_version_string_text">SoftwareVersionString</string>
+    <string name="basic_cluster_manufacturing_date_text">ManufacturingDate</string>
+    <string name="basic_cluster_part_number_text">PartNumber</string>
+    <string name="basic_cluster_product_url_text">ProductURL</string>
+    <string name="basic_cluster_product_label_text">ProductLabel</string>
+    <string name="basic_cluster_serial_number_text">SerialNumber</string>
+    <string name="basic_cluster_local_config_disabled_text">LocalConfigDisabled</string>
+    <string name="basic_cluster_reachable_text">Reachable</string>
+    <string name="basic_cluster_unique_id_text">UniqueID</string>
+    <string name="basic_cluster_cluster_revision_text">ClusterRevision</string>
+
+    <string name="read_dialog_title_text">Read</string>
+    <string name="read_dialog_read_btn_text">Read</string>
+    <string name="read_dialog_is_fabric_filtered_hint">is Fabric Filtered (bool)</string>
+    <string name="read_dialog_event_min_hint">Minimum Event Number</string>
+
+    <string name="subscribe_dialog_title_text">Subscribe</string>
+    <string name="subscribe_dialog_subscribe_btn_text">Subscribe</string>
+    <string name="subscribe_dialog_min_interval_hint">Minimum interval (seconds)</string>
+    <string name="subscribe_dialog_max_interval_hint">Maximum interval (seconds)</string>
+    <string name="subscribe_dialog_keep_subscriptions_hint">keep subscriptions (bool)</string>
+    <string name="subscribe_dialog_is_fabric_filtered_hint">is Fabric Filtered (bool)</string>
+    <string name="subscribe_dialog_event_min_hint">Minimum Event Number</string>
+
+    <string name="write_dialog_title_text">Write</string>
+    <string name="write_dialog_write_btn_text">Write</string>
+    <string name="write_dialog_timed_request_timeout_hint">Timed Request Timeout</string>
+    <string name="write_dialog_im_timeout_hint">Timeout</string>
+    <string name="write_dialog_user_guide_hint">Example:\nIdentifyCluster, IdentifyTime - Type : UInt\nBasicInformationCluster, UserLabel - Type : String\nIf you want to enter an array, separate the value by \',\'.(abc,def)</string>
+
+    <string name="invoke_dialog_title_text">Invoke</string>
+    <string name="invoke_dialog_invoke_btn_text">Invoke</string>
+    <string name="invoke_dialog_timed_request_timeout_hint">Timed Request Timeout</string>
+    <string name="invoke_dialog_im_timeout_hint">Timeout</string>
+
+    <string name="shutdown_dialog_title_text">Shutdown Subscription</string>
+    <string name="shutdown_dialog_fabric_index_hint">Fabric Index</string>
+    <string name="shutdown_dialog_subscription_id_hint">Subscription Id</string>
+    <string name="shutdown_dialog_shutdown_btn_text">Shutdown</string>
+    <string name="shutdown_dialog_shutdown_all_btn_text">Shutdown All</string>
+
+    <string name="endpoint_id_label">Endpoint ID</string>
+    <string name="cluster_id_label">Cluster ID</string>
+    <string name="attribute_id_label">Attribute ID</string>
+    <string name="event_id_label">Event ID</string>
+    <string name="command_id_label">Command ID</string>
+    <string name="isUrgent_label">isUrgent</string>
+    <string name="wildcard_help_label">Leave blank for wildcard</string>
+    <string name="wildcard_subscribe_btn_text">Subscribe</string>
+    <string name="wildcard_read_btn_text">Read</string>
+    <string name="wildcard_invoke_btn_text">Invoke</string>
+    <string name="wildcard_write_btn_text">Write</string>
+    <string name="wildcard_add_attribute_btn_text">Add Attribute</string>
+    <string name="wildcard_add_event_btn_text">Add Event</string>
+    <string name="wildcard_add_btn_text">Add</string>
+    <string name="wildcard_reset_btn_text">Reset</string>
+    <string name="wildcard_send_btn_text">Send</string>
+    <string name="wildcard_shutdown_subscription_btn_text">Shutdown Subscription</string>
+    <string name="wildcard_subscribe_event_btn_text">Subscribe Event</string>
+    <string name="wildcard_read_event_btn_text">Read Event</string>
+    <string name="wildcard_write_value_type_text">Write Value Type</string>
+    <string name="wildcard_write_value_text">Write Value</string>
+    <string name="wildcard_write_data_version_text">Data Version</string>
+    <string name="wildcard_write_data_version_help_label">optional</string>
+    <string name="wildcard_invoke_value_text">Invoke Value(Json)</string>
+    <string name="wildcard_invoke_value_help_label">Example: {"0:UINT":1}</string>
+    <string name="wildcard_empty_error_toast_message">Please add it to the list using Add Button.</string>
+    <string name="wildcard_subscribe_established_toast_message">Subscription established</string>
+
+    <string name="provision_custom_flow_btn_text">Provision CHIP device with Custom Flow</string>
+    <string name="chip_device_info_commissioning_flow_label">Commissioning Flow:</string>
+    <string name="chip_device_info_custom_flow_btn_text">Read from Ledger</string>
+    <string name="chip_device_info_show_qr_code_btn_text">Show QR Code Value</string>
+    <string name="chip_device_info_show_qr_code_uri_btn_text">Show QR Code</string>
+    <string name="chip_device_info_qrcode_uri">https://project-chip.github.io/connectedhomeip/qrcode.html?data=%1$s</string>
+    <string name="chip_ledger_info_title">Device Model Info</string>
+    <string name="chip_ledger_info_commissioning_flow_url_label">Commissioning Url:</string>
+    <string name="chip_ledger_info_commissioning_flow_url_text">Loading...</string>
+    <string name="chip_ledge_info_redirect_btn_text">Redirect</string>
+    <string name="chip_ledger_info_commissioning_flow_url_not_available">Not available</string>
+    <string name="provision_custom_flow_alert_title">Commissioning flow Completed.</string>
+
+    <string name="dcl_api_root_url">https://dcl.dev.dsr-corporation.com/api/modelinfo/models</string>
+    <string name="dcl_response_key">result</string>
+    <string name="dcl_custom_flow_url_key">custom</string>
+    <string name="custom_flow_return_url">mt://modelinfo</string>
+    <string name="retrieve_endpoint_list">Retrieve Endpoint List</string>
+    <string name="invoke">Invoke</string>
+    <string name="select_a_command">Select a command</string>
+    <string name="select_a_cluster">Select a cluster</string>
+    <string name="endpoint_name">Endpoint: </string>
+    <string name="wifi_connect_btn_text">Connect</string>
+
+    <string name="unpair_device_btn_text">Unpair</string>
+
+    <string name="group_setting_btn_text">Group Setting</string>
+    <string name="group_setting_group_text">Group :</string>
+    <string name="group_setting_key_text">Key :</string>
+    <string name="group_setting_send_key_set_write_text">Send KeySetWrite</string>
+    <string name="group_setting_write_group_key_map_text">Write GroupKey</string>
+    <string name="group_setting_group_key_set_id_text">GroupKeySetID</string>
+    <string name="group_setting_key_set_text">Key Set</string>
+    <string name="group_setting_group_key_text">GroupKey</string>
+    <string name="group_setting_send_add_group_text">Send AddGroup</string>
+    <string name="group_setting_add_access_control_text">Add Acl</string>
+    <string name="group_setting_add_group_text">Add Group</string>
+    <string name="group_setting_remove_group_text">Remove Group</string>
+    <string name="group_setting_add_key_set_text">Add KeySet</string>
+    <string name="group_setting_remove_key_set_text">remove KeySet</string>
+    <string name="group_setting_bind_key_set_text">Bind KeySet</string>
+    <string name="group_setting_unbind_key_set_text">Unbind KeySet</string>
+    <string name="group_setting_group_id_text">Group ID</string>
+    <string name="group_setting_group_name_text">Group Name</string>
+    <string name="group_setting_key_set_id_text">Key Set ID</string>
+    <string name="group_setting_key_policy_text">Key Policy</string>
+    <string name="group_setting_validity_time_text">Validity Time</string>
+    <string name="group_setting_validity_time_default_text">2220000</string>
+    <string name="group_setting_validity_time_default1_text">2220001</string>
+    <string name="group_setting_validity_time_default2_text">2220002</string>
+    <string name="group_setting_epoch_key_text">Epoch Key</string>
+    <string name="group_setting_epoch_key_default_text">d0d1d2d3d4d5d6d7d8d9dadbdcdddedf</string>
+    <string name="group_setting_access_control_entry_text">Access Control Entry :</string>
+    <string name="group_setting_add_btn_text">Add</string>
+    <string name="group_setting_remove_btn_text">Remove</string>
+    <string name="group_setting_bind_btn_text">Bind</string>
+    <string name="group_setting_unbind_btn_text">Unbind</string>
+    <string name="group_setting_send_btn_text">Send</string>
+    <string name="group_setting_write_btn_text">Write</string>
+
+    <string name="ota_provider_btn_text">OTA Provider</string>
+    <string name="ota_provider_query_image_response_status_text">Query Image Response Status</string>
+    <string name="ota_provider_delayed_action_time_text">DelayTime</string>
+    <string name="ota_provider_user_consent_needed_text">User Consent Needed (bool)</string>
+    <string name="ota_provider_read_write_attribute_text">R/W Attribute</string>
+    <string name="ota_provider_write_acl_btn_text">Write Acl</string>
+    <string name="ota_provider_read_attribute_btn_text">Read</string>
+    <string name="ota_provider_write_attribute_btn_text">Write</string>
+    <string name="ota_provider_vendorId_text">Vendor ID</string>
+    <string name="ota_provider_select_firmware_file_text">Select Firmware</string>
+    <string name="ota_provider_update_ota_status_text">Update OTA Status</string>
+    <string name="ota_provider_start_firmware_update_text">Start Firmware Update</string>
+    <string name="ota_provider_invalid_attribute">Invalid Attribute</string>
+    <string name="ota_provider_write_default_ota_providers_text">Write Default OTA Providers</string>
+    <string name="ota_provider_fabric_index_text">Fabric Index</string>
+    <string name="ota_provider_provider_node_id_text">Provider Node ID</string>
+    <string name="ota_provider_endpoint_id_text">Endpoint ID</string>
+    <string name="ota_provider_write_text">Write</string>
+    <string name="ota_provider_node_id_text">Node ID</string>
+
+    <string name="icd_btn_text">Intermittently Connected Device</string>
+    <string name="icd_registration_completed">ICD device registration completed, How to trigger to switch to Active Mode : %1$s</string>
+</resources>

@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 15.2.2. [TC-PCC-2.2] Primary functionality with server as DUT
+name: 16.2.2. [TC-PCC-2.2] Operation Mode with Server as DUT
+
+PICS:
+    - PCC.S
 
 config:
     nodeId: 0x12344321
@@ -20,7 +23,9 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -28,47 +33,66 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Write 1 to the OperationMode attribute to DUT: OperationMode"
+    - label:
+          "Step 2a: TH write 0 (Normal) to the OperationMode attribute to DUT"
       command: "writeAttribute"
       attribute: "OperationMode"
-      PICS: A_OPERATIONMODE
+      PICS: PCC.S.A0020
+      arguments:
+          value: 0
+
+    - label:
+          "Step 2b: TH reads from the DUT the EffectiveOperationMode attribute"
+      command: "readAttribute"
+      attribute: "EffectiveOperationMode"
+      PICS: PCC.S.A0011
+      response:
+          value: 0
+
+    - label:
+          "Step 3a: TH write 1 (Minimum) to the OperationMode attribute to DUT"
+      command: "writeAttribute"
+      attribute: "OperationMode"
+      PICS: PCC.S.F03 && PCC.S.A0020
       arguments:
           value: 1
 
-    - label: "Reads the attribute: EffectiveOperationMode"
-      disabled: true
+    - label:
+          "Step 3b: TH reads from the DUT the EffectiveOperationMode attribute"
       command: "readAttribute"
       attribute: "EffectiveOperationMode"
-      PICS: A_EFFECTIVEOPERATIONMODE
+      PICS: PCC.S.F03 && PCC.S.A0011
       response:
           value: 1
 
-    - label: "Write 2 to the OperationMode attribute to DUT: OperationMode"
+    - label:
+          "Step 4a: TH write 2 (Maximum) to the OperationMode attribute to DUT
+          one at a time."
       command: "writeAttribute"
       attribute: "OperationMode"
-      PICS: A_OPERATIONMODE
+      PICS: PCC.S.F03 && PCC.S.A0020
       arguments:
           value: 2
 
-    - label: "Reads the attribute: EffectiveOperationMode"
-      disabled: true
+    - label:
+          "Step 4b: TH reads from the DUT the EffectiveOperationMode attribute"
       command: "readAttribute"
       attribute: "EffectiveOperationMode"
-      PICS: A_EFFECTIVEOPERATIONMODE
+      PICS: PCC.S.F03 && PCC.S.A0011
       response:
           value: 2
 
-    - label: "Write 3 to the OperationMode attribute to DUT: OperationMode"
+    - label: "Step 5a: TH write 3 (Local) to the OperationMode attribute to DUT"
       command: "writeAttribute"
       attribute: "OperationMode"
-      PICS: A_OPERATIONMODE
+      PICS: PCC.S.F06 && PCC.S.A0020
       arguments:
           value: 3
 
-    - label: "Reads the attribute: EffectiveOperationMode"
-      disabled: true
+    - label:
+          "Step 5b: TH reads from the DUT the EffectiveOperationMode attribute"
       command: "readAttribute"
       attribute: "EffectiveOperationMode"
-      PICS: A_EFFECTIVEOPERATIONMODE
+      PICS: PCC.S.F06 && PCC.S.A0011
       response:
           value: 3

@@ -18,9 +18,6 @@ config:
     nodeId: 0x12344321
     cluster: "User Label"
     endpoint: 0
-    discriminator:
-        type: INT16U
-        defaultValue: 3840
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -31,37 +28,57 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "Commit User Label List"
+      command: "writeAttribute"
+      attribute: "LabelList"
+      arguments:
+          value:
+              [
+                  { Label: "room", Value: "bedroom 1" },
+                  { Label: "orientation", Value: "South" },
+                  { Label: "floor", Value: "2" },
+                  { Label: "direction", Value: "down" },
+              ]
+
+    - label: "Verify committed User Label List"
+      command: "readAttribute"
+      attribute: "LabelList"
+      response:
+          value:
+              [
+                  { Label: "room", Value: "bedroom 1" },
+                  { Label: "orientation", Value: "South" },
+                  { Label: "floor", Value: "2" },
+                  { Label: "direction", Value: "down" },
+              ]
+
     - label: "Clear User Label List"
       command: "writeAttribute"
-      attribute: "label list"
+      attribute: "LabelList"
       arguments:
           value: []
 
     - label: "Read User Label List"
       command: "readAttribute"
-      attribute: "label list"
+      attribute: "LabelList"
       response:
           value: []
 
     - label: "Write User Label List"
       command: "writeAttribute"
-      attribute: "label list"
+      attribute: "LabelList"
       arguments:
           value:
               [
-                  { label: "room", value: "bedroom 2" },
-                  { label: "orientation", value: "North" },
-                  { label: "floor", value: "5" },
-                  { label: "direction", value: "up" },
+                  { Label: "room", Value: "bedroom 2" },
+                  { Label: "orientation", Value: "North" },
+                  { Label: "floor", Value: "5" },
+                  { Label: "direction", Value: "up" },
               ]
 
     - label: "Reboot target device"
       cluster: "SystemCommands"
       command: "Reboot"
-      arguments:
-          values:
-              - name: "discriminator"
-                value: discriminator
 
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -71,14 +88,14 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Verify"
+    - label: "Verify User Label List after reboot"
       command: "readAttribute"
-      attribute: "label list"
+      attribute: "LabelList"
       response:
           value:
               [
-                  { label: "room", value: "bedroom 2" },
-                  { label: "orientation", value: "North" },
-                  { label: "floor", value: "5" },
-                  { label: "direction", value: "up" },
+                  { Label: "room", Value: "bedroom 2" },
+                  { Label: "orientation", Value: "North" },
+                  { Label: "floor", Value: "5" },
+                  { Label: "direction", Value: "up" },
               ]

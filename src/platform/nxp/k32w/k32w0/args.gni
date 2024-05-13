@@ -13,12 +13,36 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/k32w0_sdk.gni")
+import("//build_overrides/nxp_sdk.gni")
 import("//build_overrides/openthread.gni")
 
-chip_device_platform = "k32w0"
+nxp_platform = "k32w/k32w0"
+nxp_sdk_name = "k32w0_sdk"
+nxp_device_layer = "nxp/${nxp_platform}"
+nxp_use_lwip = false
+nxp_use_mbedtls_port = false
 
-lwip_platform = "k32w0"
+if (getenv("NXP_K32W0_SDK_ROOT") == "") {
+  k32w0_sdk_root = "${chip_root}/third_party/nxp/k32w0_sdk/repo/core"
+} else {
+  k32w0_sdk_root = getenv("NXP_K32W0_SDK_ROOT")
+}
+
+# ARM architecture flags will be set based on NXP board.
+arm_platform_config = "${nxp_sdk_build_root}/${nxp_sdk_name}/nxp_arm.gni"
+
+chip_device_platform = "nxp"
+
+chip_device_project_config_include = "<CHIPProjectConfig.h>"
+chip_project_config_include = "<CHIPProjectConfig.h>"
+chip_inet_project_config_include = "<CHIPProjectConfig.h>"
+chip_system_project_config_include = "<CHIPProjectConfig.h>"
+chip_ble_project_config_include = "<CHIPProjectConfig.h>"
+chip_project_config_include_dirs =
+    [ "${chip_root}/examples/platform/${nxp_platform}/app/project_include" ]
+
+chip_enable_openthread = true
+chip_openthread_ftd = false
 
 chip_inet_config_enable_ipv4 = false
 
@@ -28,11 +52,20 @@ chip_build_tests = false
 
 chip_mdns = "platform"
 
-# Trying to fit into the available flash by disabling optional logging for now
-chip_detail_logging = false
-chip_progress_logging = true
+# Logs are enabled by default, but can be disabled by setting
+# chip_logging=false in the build command.
+# Alternatively, a user can overwrite the value for different logging levels
+# by uncommenting the lines below and setting the corresponding value.
+# A user can disable some logging levels to decrease flash usage.
+#chip_detail_logging = true
+#chip_progress_logging = true
+#chip_automation_logging = true
+#chip_error_logging = true
 
-mbedtls_target = "${chip_root}/third_party/nxp/k32w0_sdk:mbedtls"
+chip_system_config_use_open_thread_inet_endpoints = true
+chip_with_lwip = false
+
+mbedtls_target = "${nxp_sdk_build_root}/${nxp_sdk_name}:mbedtls"
 openthread_external_mbedtls = mbedtls_target
 
 openthread_project_core_config_file = "OpenThreadConfig.h"

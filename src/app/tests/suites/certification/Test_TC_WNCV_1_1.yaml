@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Window Covering [TC-WNCV-1.1] Global attributes with server as DUT
+name: Window Covering [TC-WNCV-1.1] Global attributes [DUT as Server]
+
+PICS:
+    - WNCV.S
 
 config:
     nodeId: 0x12344321
@@ -20,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Commission DUT to TH"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -30,90 +33,216 @@ tests:
 
     ### MANDATORY GLOBAL Attributes
     ### Attribute[0xFFFD]: ClusterRevision =======================================
-    - label: "2: read the global attribute: ClusterRevision"
+    - label:
+          "Step 2: TH reads from the DUT the (0xFFFD) ClusterRevision attribute"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
+          value: 5
           constraints:
-              type: uint16
+              type: int16u
               minValue: 5
               maxValue: 200
 
-    - label:
-          "3a: write a value into the RO mandatory global attribute:
-          ClusterRevision"
-      command: "writeAttribute"
-      attribute: "ClusterRevision"
-      arguments:
-          value: 201
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "3b: reads back global attribute: ClusterRevision"
+    - label: "Step 3a: TH reads from the DUT the (0xFFFC) FeatureMap attribute"
+      PICS:
+          "!WNCV.S.F00 && !WNCV.S.F01 && !WNCV.S.F02 && !WNCV.S.F03 &&
+          !WNCV.S.F04 "
       command: "readAttribute"
-      attribute: "ClusterRevision"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
+
+    - label:
+          "Step 3b: Given WNCV.S.F00(LF) ensure featuremap has the correct bit
+          set"
+      PICS: WNCV.S.F00
+      command: "readAttribute"
+      attribute: "FeatureMap"
       response:
           constraints:
-              type: uint16
-              notValue: 201
+              type: bitmap32
+              hasMasksSet: [0x1]
 
-    - label: "Read the global attribute: AttributeList"
+    - label:
+          "Step 3c: Given  WNCV.S.F01(TL) ensure featuremap has the correct bit
+          set"
+      PICS: WNCV.S.F01
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2]
+
+    - label:
+          "Step 3d: Given WNCV.S.F02(PA_LF) ensure featuremap has the correct
+          bit set"
+      PICS: WNCV.S.F02
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x4]
+
+    - label:
+          "Step 3e: Given WNCV.S.F03(ABS) ensure featuremap has the correct bit
+          set"
+      PICS: WNCV.S.F03
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x8]
+
+    - label:
+          "Step 3f: Given WNCV.S.F04(PA_TL) ensure featuremap has the correct
+          bit set"
+      PICS: WNCV.S.F04
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x10]
+
+    - label:
+          "Step 4a: TH reads from the DUT the (0xFFFB) AttributeList attribute"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
+              contains:
+                  [0, 7, 10, 13, 23, 65528, 65529, 65530, 65531, 65532, 65533]
 
-    #issue #11053 disabled steps below Global attributes missing from YAML framework
-    - label: "Read the global attribute: EventList"
-      disabled: true
+    - label:
+          "Step 4a: TH reads from the DUT the (0xFFFB) AttributeList attribute"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
-      attribute: "EventList"
+      attribute: "AttributeList"
       response:
           constraints:
               type: list
+              contains: [0, 7, 10, 13, 23, 65528, 65529, 65531, 65532, 65533]
 
-    - label: "Read the global attribute: AcceptedCommandList"
-      disabled: true
+    - label:
+          "Step 4b: TH reads optional attribute(SafetyStatus) in AttributeList"
+      PICS: WNCV.S.A001a
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [26]
+
+    - label:
+          "Step 4c: TH reads the Feature dependent(WNCV.S.F00 & WNCV.S.F02 &
+          WNCV.S.F03) attribute in AttributeList"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.F03
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [16, 17]
+
+    - label:
+          "Step 4d: TH reads the Feature dependent(WNCV.S.F00 & WNCV.S.F02 )
+          attribute in AttributeList"
+      PICS: WNCV.S.F00 && WNCV.S.F02
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [11, 14]
+
+    - label:
+          "Step 4e: TH reads the Feature dependent(WNCV.S.F01 & WNCV.S.F04 &
+          WNCV.S.F03) attribute in AttributeList"
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.F03
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [18, 19]
+
+    - label:
+          "Step 4f: TH reads the Feature dependent(WNCV.S.F01 & WNCV.S.F04 )
+          attribute in AttributeList"
+      PICS: WNCV.S.F01 && WNCV.S.F04
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [12, 15]
+
+    - label: "Step 5: TH reads from the DUT the (0xFFFA) EventList attribute"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label:
+          "Step 6a: TH reads from the DUT the (0xFFF9) AcceptedCommandList
+          attribute"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
           constraints:
               type: list
+              contains: [0, 1, 2]
 
-    - label: "Read the global attribute: GeneratedCommandList"
-      disabled: true
+    - label:
+          "Step 6b: TH reads Feature dependent(WNCV.S.F00 & WNCV.S.F02) command
+          in AcceptedCommandList"
+      PICS: WNCV.S.F00 && WNCV.S.F02
       command: "readAttribute"
-      attribute: "GeneratedCommandList"
+      attribute: "AcceptedCommandList"
       response:
           constraints:
               type: list
-
-    ### Attribute[0xFFFC]: FeatureMap =======================================
-    - label: "2: read the global attribute: FeatureMap"
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          constraints:
-              type: uint32
-              minValue: 0
-              maxValue: 32768
+              contains: [5]
 
     - label:
-          "3a: write the default value to optional global attribute: FeatureMap"
-      command: "writeAttribute"
-      attribute: "FeatureMap"
-      arguments:
-          value: 32769
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "3b: reads back global attribute: FeatureMap"
+          "Step 6c: TH reads Feature dependent(WNCV.S.F01 & WNCV.S.F03) command
+          in AcceptedCommandList"
+      PICS: WNCV.S.F01 && WNCV.S.F03
       command: "readAttribute"
-      attribute: "FeatureMap"
+      attribute: "AcceptedCommandList"
       response:
           constraints:
-              type: uint32
-              notValue: 32769
-    ### OPTIONAL GLOBAL Attributes
-    ### None =======================================
+              type: list
+              contains: [7]
+
+    - label:
+          "Step 6d: TH reads Feature dependent(WNCV.S.F01 & WNCV.S.F04) command
+          in AcceptedCommandList"
+      PICS: WNCV.S.F01 && WNCV.S.F04
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [8]
+
+    - label:
+          "Step 7: TH reads from the DUT the (0xFFF8) GeneratedCommandList
+          attribute"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list

@@ -37,12 +37,33 @@ class DiagnosticDataProviderImpl : public DiagnosticDataProvider
 public:
     static DiagnosticDataProviderImpl & GetDefaultInstance();
 
-    // ===== Methods that implement the PlatformManager abstract interface.
+    // ===== Methods that implement the DiagnosticDataProvider abstract interface.
 
+    bool SupportsWatermarks() override { return true; }
+    // Heap diag
     CHIP_ERROR GetCurrentHeapFree(uint64_t & currentHeapFree) override;
     CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed) override;
     CHIP_ERROR GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark) override;
+    CHIP_ERROR ResetWatermarks() override;
+    // Uptime diag
+    CHIP_ERROR GetRebootCount(uint16_t & rebootCount) override;
+    CHIP_ERROR GetBootReason(BootReasonType & bootReason) override;
+    CHIP_ERROR GetUpTime(uint64_t & upTime) override;
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
+    // Fault diag
+    CHIP_ERROR GetActiveHardwareFaults(GeneralFaults<kMaxHardwareFaults> & hardwareFaults) override;
+    CHIP_ERROR GetActiveRadioFaults(GeneralFaults<kMaxRadioFaults> & radioFaults) override;
+    CHIP_ERROR GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults) override;
+    CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifpp) override;
 };
+
+/**
+ * Returns the platform-specific implementation of the DiagnosticDataProvider singleton object.
+ *
+ * Applications can use this to gain access to features of the DiagnosticDataProvider
+ * that are specific to the selected platform.
+ */
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl();
 
 } // namespace DeviceLayer
 } // namespace chip

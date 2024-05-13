@@ -1,0 +1,13 @@
+#pragma once
+
+{%- for cluster in clusters | sort(attribute='name') %}
+void Matter{{ cluster.name }}PluginServerInitCallback();
+{%- endfor %}
+
+#define MATTER_PLUGINS_INIT \
+{%- for cluster in clusters | sort(attribute='name') %}
+    Matter{{ cluster.name }}PluginServerInitCallback();{{ " \\" if not loop.last else ""}}
+{%- else %}
+    (void)0; /* No server side clusters */
+{%- endfor %}
+

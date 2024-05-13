@@ -1,0 +1,178 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 47.2.1. [TC-DGETH-2.1] Attributes [DUT as Server]
+
+PICS:
+    - DGETH.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Ethernet Network Diagnostics"
+    endpoint: 0
+
+tests:
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH reads PHYRate attribute constraints"
+      PICS: DGETH.S.A0000
+      command: "readAttribute"
+      attribute: "PHYRate"
+      response:
+          constraints:
+              type: enum8
+              anyOf: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, null]
+
+    - label: "Step 3: TH reads FullDuplex attribute constraints"
+      PICS: DGETH.S.A0001
+      command: "readAttribute"
+      attribute: "FullDuplex"
+      response:
+          constraints:
+              type: boolean
+              anyOf: [0, 1, null]
+
+    - label: "Step 4a: TH reads PacketRxCount attribute constraints"
+      PICS: DGETH.S.A0002
+      command: "readAttribute"
+      attribute: "PacketRxCount"
+      response:
+          constraints:
+              type: int64u
+              minValue: 0
+              maxValue: "18446744073709551615"
+
+    - label: "Step 4b: Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "Reboot"
+
+    - label: "Step 4c: Reboot target device(DUT)"
+      verification: |
+          Did the DUT successfully reboot?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    #Test-plan issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/3413
+    - label:
+          "Step 4d: Upon a node reboot, PacketRxCount attribute value will be
+          reset to 0"
+      verification: |
+          Upon a node reboot, the value will be reset to 0.
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && DGETH.S.A0002
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 5a: TH reads PacketTxCount attribute constraints"
+      PICS: DGETH.S.A0003
+      command: "readAttribute"
+      attribute: "PacketTxCount"
+      response:
+          constraints:
+              type: int64u
+              minValue: 0
+              maxValue: "18446744073709551615"
+
+    #Test-plan issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/3413
+    - label:
+          "Step 5b: TH reads PacketTxCount attribute constraints, Upon a node
+          reboot, the value will be reset to 0"
+      verification: |
+          Upon a node reboot, the value will be reset to 0.
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && DGETH.S.A0003
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 6: TH reads TxErrCount attribute constraints, Upon a node
+          reboot, the value will be reset to 0"
+      PICS: DGETH.S.A0004
+      command: "readAttribute"
+      attribute: "TxErrCount"
+      response:
+          value: 0
+          constraints:
+              type: int64u
+
+    - label:
+          "Step 7: TH reads CollisionCount attribute , Upon a node reboot, the
+          value will be reset to 0"
+      PICS: DGETH.S.A0005
+      command: "readAttribute"
+      attribute: "CollisionCount"
+      response:
+          value: 0
+          constraints:
+              type: int64u
+
+    - label: "Step 8: TH reads OverrunCount attribute constraints"
+      PICS: DGETH.S.A0006
+      command: "readAttribute"
+      attribute: "OverrunCount"
+      response:
+          value: 0
+          constraints:
+              type: int64u
+
+    - label: "Step 9: TH reads CarrierDetect attribute constraints"
+      PICS: DGETH.S.A0007
+      command: "readAttribute"
+      attribute: "CarrierDetect"
+      response:
+          constraints:
+              type: boolean
+              anyOf: [0, 1, null]
+
+    - label: "Step 10: TH reads TimeSinceReset attribute constraints"
+      PICS: DGETH.S.A0008
+      command: "readAttribute"
+      attribute: "TimeSinceReset"
+      response:
+          constraints:
+              type: int64u
+              minValue: 0
+              maxValue: "18446744073709551615"

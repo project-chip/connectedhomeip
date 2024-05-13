@@ -27,9 +27,6 @@
 
 namespace chip {
 
-constexpr const char kPairedDeviceListKeyPrefix[] = "ListPairedDevices";
-constexpr const char kPairedDeviceKeyPrefix[]     = "PairedDevice";
-
 // This macro generates a key for storage using a node ID and a key prefix, and performs the given action
 // on that key.
 #define PERSISTENT_KEY_OP(node, keyPrefix, key, action)                                                                            \
@@ -40,6 +37,7 @@ constexpr const char kPairedDeviceKeyPrefix[]     = "PairedDevice";
         /* 2 * sizeof(chip::NodeId) to accommodate 2 character for each byte in Node Id */                                         \
         char key[len + 2 * sizeof(chip::NodeId) + 1];                                                                              \
         nlSTATIC_ASSERT_PRINT(sizeof(node) <= sizeof(uint64_t), "Node ID size is greater than expected");                          \
+        /* Be careful about switching to ChipLogFormatX64: it would change the storage keys! */                                    \
         snprintf(key, sizeof(key), "%s%" PRIx64, keyPrefix, node);                                                                 \
         action;                                                                                                                    \
     } while (0)

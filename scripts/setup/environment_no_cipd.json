@@ -1,0 +1,12 @@
+{
+    "virtualenv": {
+        "gn_root": ".",
+        "gn_targets": [":python_packages.install"],
+        "requirements": ["scripts/setup/requirements.build.txt"],
+        "constraints": ["scripts/setup/constraints.txt"],
+        "gn_args": ["chip_crypto=\"boringssl\""]
+    },
+    "required_submodules": ["third_party/pigweed/repo"],
+    "rosetta": "never",
+    "gni_file": "build_overrides/pigweed_environment.gni"
+}

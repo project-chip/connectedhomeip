@@ -1,0 +1,341 @@
+{{> header excludeZapComment=true}}
+
+#import <Foundation/Foundation.h>
+
+#import "MTRBaseClusters_Internal.h"
+#import "MTRBaseDevice_Internal.h"
+#import "MTRCallbackBridgeBase.h"
+#import "MTRCluster_Internal.h"
+#import "MTRClusterStateCacheContainer_Internal.h"
+#import "MTRCommandPayloadsObjc.h"
+#import "MTRDevice_Internal.h"
+#import "MTRStructsObjc.h"
+#import "NSStringSpanConversion.h"
+#import "NSDataSpanConversion.h"
+#import "MTRDefines_Internal.h"
+
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/util/im-client-callbacks.h>
+#include <controller/CHIPCluster.h>
+#include <app/data-model/ListLargeSystemExtensions.h>
+#include <platform/CHIPDeviceLayer.h>
+
+#include <type_traits>
+
+using chip::Callback::Callback;
+using chip::Callback::Cancelable;
+using namespace chip::app::Clusters;
+using chip::Messaging::ExchangeManager;
+using chip::SessionHandle;
+using chip::Optional;
+using chip::System::Clock::Timeout;
+using chip::System::Clock::Seconds16;
+
+typedef void (*DefaultSuccessCallbackType)(void *);
+
+class MTRDefaultSuccessCallbackBridge : public MTRCallbackBridge<DefaultSuccessCallback>
+{
+public:
+    MTRDefaultSuccessCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<DefaultSuccessCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context) {
+        DispatchSuccess(context, nil);
+    }
+};
+
+// NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
+{{#zcl_clusters}}
+{{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+@implementation MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}}
+
+{{#zcl_commands}}
+{{#if (is_str_equal source 'client')}}
+{{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
+{{#*inline "commandImpl"}}
+{{! This is used as the implementation for both the new-name and old-name bits, so check for both here. }}
+{{#if (or (isSupported cluster command=command)
+          (isSupported (compatClusterNameRemapping parent.name) command=(compatCommandNameRemapping parent.name name)))}}
+{{#*inline "paramsType"}}
+{{#unless (isSupported cluster command=command)}}
+MTR{{compatClusterNameRemapping parent.name}}Cluster{{compatCommandNameRemapping parent.name name}}Params
+{{else}}
+MTR{{cluster}}Cluster{{command}}Params
+{{/unless}}
+{{/inline}}
+{{#unless commandHasRequiredField}}
+- (void){{asLowerCamelCase name}}WithCompletion:({{>command_completion_type command=.}})completion
+{
+  [self {{asLowerCamelCase name}}WithParams:nil completion:completion];
+}
+{{/unless}}
+- (void){{asLowerCamelCase name}}WithParams: ({{> paramsType}} * {{#unless commandHasRequiredField}}_Nullable{{/unless}})params completion:({{>command_completion_type command=.}})completion
+{
+    if (params == nil) {
+        params = [[{{> paramsType}} alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        {{#if hasSpecificResponse}}
+        completion(response, error);
+        {{else}}
+        completion(error);
+        {{/if}}
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    {{#if mustUseTimedInvoke}}
+    if (timedInvokeTimeoutMs == nil) {
+      timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
+    }
+    {{/if}}
+
+    using RequestType = {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+{{#if hasSpecificResponse}}
+                                     responseClass:MTR{{cluster}}Cluster{{asUpperCamelCase responseName preserveAcronyms=true}}Params.class
+{{else}}
+                                     responseClass:nil
+{{/if}}
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+{{/if}}
+{{/inline}}
+{{> commandImpl cluster=(asUpperCamelCase parent.name preserveAcronyms=true)
+                command=(asUpperCamelCase name preserveAcronyms=true)}}
+{{/if}}
+{{/zcl_commands}}
+
+{{#zcl_attributes_server removeKeys='isOptional'}}
+{{! This is used as the implementation for both the new-name and old-name bits, so check for both here. }}
+{{#if (or (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))
+          (and (isSupported (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))
+               (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))))}}
+{{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
+- (void)read{{>attribute}}With
+{{~#if_is_fabric_scoped_struct type~}}
+  Params:(MTRReadParams * _Nullable)params completion:
+{{~else~}}
+  Completion:
+{{~/if_is_fabric_scoped_struct~}}
+(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+    {{#if_is_fabric_scoped_struct type}}
+                                            params:params
+    {{else}}
+                                            params:nil
+    {{/if_is_fabric_scoped_struct}}
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+{{#if (or isWritableAttribute
+      (isInConfigList (concat (asUpperCamelCase parent.name) "::" label) "DarwinForceWritable"))}}
+- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value completion:(MTRStatusCompletion)completion
+{
+  [self write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value params:nil completion:completion];
+}
+- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
+{
+    // Make a copy of params before we go async.
+    params = [params copy];
+    value = [value copy];
+
+    auto * bridge = new MTRDefaultSuccessCallbackBridge(self.callbackQueue,
+      {{! For now, don't change the bridge API; instead just use an adapter
+          to invoke our completion handler. This is not great from a
+          type-safety perspective, of course. }}
+      ^(id _Nullable ignored, NSError * _Nullable error) {
+        completion(error);
+      },
+      ^(ExchangeManager & exchangeManager, const SessionHandle & session, DefaultSuccessCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
+        chip::Optional<uint16_t> timedWriteTimeout;
+        if (params != nil) {
+          if (params.timedWriteTimeout != nil){
+            timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
+          }
+        }
+        {{#if mustUseTimedWrite}}
+        if (!timedWriteTimeout.HasValue()) {
+          timedWriteTimeout.SetValue(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
+        }
+        {{/if}}
+
+        ListFreer listFreer;
+        using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
+        TypeInfo::Type cppValue;
+        {{>encode_value target="cppValue" source="value" cluster=parent.name errorCode="return CHIP_ERROR_INVALID_ARGUMENT;" depth=0}}
+
+        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
+        return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout);
+    });
+    std::move(*bridge).DispatchAction(self.device);
+}
+
+{{/if}}
+{{#if isReportableAttribute}}
+- (void) subscribe{{>attribute}}WithParams:(MTRSubscribeParams * _Nonnull)params
+subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void) read{{>attribute}}WithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint  queue:(dispatch_queue_t)queue completion:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+{{/if}}
+{{/if}}
+{{/zcl_attributes_server}}
+
+@end
+{{/if}}
+{{#unless (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (compatClusterNameRemapping name))}}
+{{#if (isSupported (compatClusterNameRemapping name))}}
+
+@implementation MTRBaseCluster{{compatClusterNameRemapping name}}
+@end
+{{/if}}
+{{/unless}}
+
+{{#if (and (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping name))
+           (isSupported (compatClusterNameRemapping name)))}}
+@implementation MTRBaseCluster{{compatClusterNameRemapping name}} (Deprecated)
+
+{{#zcl_commands}}
+{{#if (is_str_equal source 'client')}}
+{{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
+{{#*inline "commandImpl"}}
+{{#if (and (wasIntroducedBeforeRelease "First major API revamp" cluster command=command)
+           (isSupported cluster command=command))}}
+- (void){{asLowerCamelCase command}}WithParams:(MTR{{cluster}}Cluster{{command}}Params * {{#unless commandHasRequiredField}}_Nullable{{/unless}})params completionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler
+{
+  [self {{asLowerCamelCase name}}WithParams:params completion:
+    {{#if hasSpecificResponse}}
+    ^(MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase responseName preserveAcronyms=true}}Params * _Nullable data, NSError * _Nullable error) {
+      // Cast is safe because subclass does not add any selectors.
+      completionHandler(static_cast<MTR{{cluster}}Cluster{{compatCommandNameRemapping parent.name responseName}}Params *>(data), error);
+    }
+    {{else}}
+    completionHandler
+    {{/if}}
+    ];
+}
+{{#unless commandHasRequiredField}}
+{{#unless (isInConfigList
+           (concat (asUpperCamelCase cluster preserveAcronyms=true) "::" (asUpperCamelCase command preserveAcronyms=true))
+           "LegacyCommandsWithOnlyOptionalArguments")}}
+{{! KeySetReadAllIndices grew this params-less API later _after_ it had already been shipped, so it needs to be special-cased here }}
+{{#unless (and (isStrEqual cluster "GroupKeyManagement")
+               (isStrEqual command "KeySetReadAllIndices"))}}
+- (void){{asLowerCamelCase command}}WithCompletionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler
+{
+  [self {{asLowerCamelCase command}}WithParams:nil completionHandler:completionHandler];
+}
+{{/unless}}
+{{/unless}}
+{{/unless}}
+{{/if}}
+{{/inline}}
+{{> commandImpl cluster=(compatClusterNameRemapping parent.name)
+                command=(compatCommandNameRemapping parent.name name)}}
+{{/if}}
+{{/zcl_commands}}
+
+{{#zcl_attributes_server removeKeys='isOptional'}}
+{{#if (and (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))
+           (isSupported (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name)))}}
+{{#*inline "attribute"}}Attribute{{compatAttributeNameRemapping parent.name name}}{{/inline}}
+- (void)read{{>attribute}}With
+{{~#if_is_fabric_scoped_struct type~}}
+  Params:(MTRReadParams * _Nullable)params completionHandler:
+{{~else~}}
+  CompletionHandler:
+{{~/if_is_fabric_scoped_struct~}}
+(void (^)({{asObjectiveCClass type parent.name compatRemapClusterName=true}} * _Nullable value, NSError * _Nullable error))completionHandler
+{
+  [self readAttribute{{asUpperCamelCase name preserveAcronyms=true}}With{{#if_is_fabric_scoped_struct type}}Params:params completion:{{else}}Completion:{{/if_is_fabric_scoped_struct}}
+      ^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {
+        // Cast is safe because subclass does not add any selectors.
+        completionHandler(static_cast<{{asObjectiveCClass type parent.name compatRemapClusterName=true}} *>(value), error);
+      }];
+}
+{{#if (or isWritableAttribute
+      (isInConfigList (concat (asUpperCamelCase parent.name) "::" label) "DarwinForceWritable"))}}
+- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name compatRemapClusterName=true}})value completionHandler:(MTRStatusCompletion)completionHandler
+{
+  [self writeAttribute{{asUpperCamelCase name preserveAcronyms=true}}WithValue:value params:nil completion:completionHandler];
+}
+- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name compatRemapClusterName=true}})value params:(MTRWriteParams * _Nullable)params completionHandler:(MTRStatusCompletion)completionHandler
+{
+  [self writeAttribute{{asUpperCamelCase name preserveAcronyms=true}}WithValue:value params:params completion:completionHandler];
+}
+{{/if}}
+{{#if isReportableAttribute}}
+- (void) subscribe{{>attribute}}WithMinInterval:(NSNumber * _Nonnull)minInterval  maxInterval:(NSNumber * _Nonnull)maxInterval
+       params:(MTRSubscribeParams * _Nullable)params
+subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler reportHandler:(void (^)({{asObjectiveCClass type parent.name compatRemapClusterName=true}} * _Nullable value, NSError * _Nullable error))reportHandler
+{
+  MTRSubscribeParams * _Nullable subscribeParams = [params copy];
+  if (subscribeParams == nil) {
+      subscribeParams = [[MTRSubscribeParams alloc] initWithMinInterval:minInterval maxInterval:maxInterval];
+  } else {
+      subscribeParams.minInterval = minInterval;
+      subscribeParams.maxInterval = maxInterval;
+  }
+  [self subscribeAttribute{{asUpperCamelCase name preserveAcronyms=true}}WithParams:subscribeParams subscriptionEstablished:subscriptionEstablishedHandler reportHandler:
+     ^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {
+       // Cast is safe because subclass does not add any selectors.
+       reportHandler(static_cast<{{asObjectiveCClass type parent.name compatRemapClusterName=true}} *>(value), error)     ;
+     }];
+}
++ (void) read{{>attribute}}WithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completionHandler:(void (^)({{asObjectiveCClass type parent.name compatRemapClusterName=true}} * _Nullable value, NSError * _Nullable error))completionHandler
+{
+  [self readAttribute{{asUpperCamelCase name preserveAcronyms=true}}WithClusterStateCache:attributeCacheContainer.realContainer endpoint:endpoint queue:queue completion:
+      ^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {
+        // Cast is safe because subclass does not add any selectors.
+        completionHandler(static_cast<{{asObjectiveCClass type parent.name compatRemapClusterName=true}} *>(value), error);
+      }];
+}
+{{/if}}
+{{/if}}
+{{/zcl_attributes_server}}
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue
+{
+    return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
+}
+
+@end
+{{/if}}
+
+{{/zcl_clusters}}
+
+// NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)

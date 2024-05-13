@@ -1,0 +1,218 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    12.4.2. [TC-CNET-4.2] [Thread] Verification for attributes check
+    [DUT-Server]
+
+PICS:
+    - CNET.S.F01
+
+config:
+    nodeId: 0x12344321
+    cluster: "Network Commissioning"
+    #PIXIT.CNET.ENDPOINT_THREAD
+    endpoint: 0
+    PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET:
+        type: octet_string
+        defaultValue: "hex:1111111122222222"
+
+tests:
+    - label: "Step 1: Factory reset the DUT"
+      verification: |
+          Reset Devices to factory defaults
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Factory Reset the DUT and enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    #Issue: https://github.com/project-chip/connectedhomeip/issues/30196
+    - label: "Step 2: Commission TH and DUT on Thread network"
+      verification: |
+          ./chip-tool pairing ble-thread 0x12344321 <operationalDataset> <setup-pin-code> <discriminator>
+
+          [1698660637.937566][6429:6431] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
+          [1698660637.937644][6429:6431] CHIP:CTL: Received CommissioningComplete response, errorCode=0
+          [1698660637.937705][6429:6431] CHIP:CTL: Successfully finished commissioning step 'SendComplete'
+          [1698660637.937750][6429:6431] CHIP:CTL: Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1698660637.937812][6429:6431] CHIP:CTL: Performing next commissioning step 'Cleanup'
+          [1698660637.937863][6429:6431] CHIP:DIS: Closing all BLE connections
+          [1698660637.937911][6429:6431] CHIP:IN: Clearing BLE pending packets.
+          [1698660637.938582][6429:6431] CHIP:BLE: Auto-closing end point's BLE connection.
+          [1698660637.938645][6429:6431] CHIP:DL: Closing BLE GATT connection (con 0xffff9c034bb0)
+          [1698660637.938805][6429:6430] CHIP:DL: BluezDisconnect peer=F7:D4:24:D2:4A:1F
+          [1698660638.365208][6429:6431] CHIP:IN: SecureSession[0xffff9400f900]: MarkForEviction Type:1 LSID:62220
+          [1698660638.365311][6429:6431] CHIP:SC: SecureSession[0xffff9400f900, LSID:62220]: State change 'kActive' --> 'kPendingEviction'
+          [1698660638.365440][6429:6431] CHIP:IN: SecureSession[0xffff9400f900]: Released - Type:1 LSID:62220
+          [1698660638.365529][6429:6431] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
+          [1698660638.365598][6429:6431] CHIP:TOO: Device commissioning completed with success
+          [1698660638.365873][6429:6431] CHIP:DMG: ICR moving to [AwaitingDe]
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: enter 'y' after successfull Commission"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 3: TH reads Descriptor Cluster from the DUT with EP0 TH reads
+          ServerList from the DUT"
+      cluster: "Descriptor"
+      command: "readAttribute"
+      attribute: "ServerList"
+      response:
+          constraints:
+              type: list
+              contains: [49]
+
+    - label: "Step 4: TH reads FeatureMap attribute from the DUT"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 2
+          constraints:
+              type: bitmap32
+
+    - label:
+          "Step 5 & 6: TH reads the MaxNetworks attribute from the DUT. TH saves
+          the MaxNetworks attribute value as 'MaxNetworksValue' for future use"
+      PICS: CNET.S.A0000
+      command: "readAttribute"
+      attribute: "MaxNetworks"
+      response:
+          saveAs: MaxNetworksValue
+          constraints:
+              type: int8u
+              minValue: 1
+              maxValue: 255
+
+    - label: "Step 7: TH reads the Networks attribute list from the DUT"
+      PICS: CNET.S.A0001
+      command: "readAttribute"
+      attribute: "Networks"
+      response:
+          constraints:
+              contains:
+                  [
+                      {
+                          NetworkID: PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET,
+                          Connected: true,
+                      },
+                  ]
+
+    - label: "Step 8: TH reads ScanMaxTimeSeconds attribute from the DUT"
+      PICS: CNET.S.A0002
+      command: "readAttribute"
+      attribute: "ScanMaxTimeSeconds"
+      response:
+          constraints:
+              type: int8u
+              minValue: 1
+              maxValue: 255
+
+    - label: "Step 9: TH reads ConnectMaxTimeSeconds attribute from the DUT"
+      PICS: CNET.S.A0003
+      command: "readAttribute"
+      attribute: "ConnectMaxTimeSeconds"
+      response:
+          constraints:
+              type: int8u
+              minValue: 1
+              maxValue: 255
+
+    - label: "Step 10: TH reads InterfaceEnabled attribute from the DUT"
+      PICS: CNET.S.A0004
+      command: "readAttribute"
+      attribute: "InterfaceEnabled"
+      response:
+          value: true
+          constraints:
+              type: boolean
+
+    - label: "Step 11: TH reads LastNetworkingStatus attribute from the DUT"
+      PICS: CNET.S.A0005
+      command: "readAttribute"
+      attribute: "LastNetworkingStatus"
+      response:
+          value: 0
+          constraints:
+              type: NetworkCommissioningStatusEnum
+
+    - label:
+          "Step 12a: TH reads the LastNetworkID attribute from the DUT. TH reads
+          the Networks attribute from the DUT"
+      PICS: CNET.S.A0006
+      command: "readAttribute"
+      attribute: "LastNetworkID"
+      response:
+          value: PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET
+          constraints:
+              type: octet_string
+              minLength: 1
+              maxLength: 32
+
+    - label: "Step 12b: TH reads the Networks attribute list from the DUT"
+      PICS: CNET.S.A0001
+      command: "readAttribute"
+      attribute: "Networks"
+      response:
+          constraints:
+              contains:
+                  [
+                      {
+                          NetworkID: PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET,
+                          Connected: true,
+                      },
+                  ]
+
+    - label:
+          "Step 13: TH reads the LastConnectErrorValue attribute from the DUT"
+      PICS: CNET.S.A0007
+      command: "readAttribute"
+      attribute: "LastConnectErrorValue"
+      response:
+          value: null
+          constraints:
+              type: int32s
+
+    #Possibilites if Bit 4 (IsSynchronizedSleepyEndDeviceCapable) is only set if bit 2 (IsSleepyEndDeviceCapable) is also set expects value 20
+    #Verify that Bit 0 (IsBorderRouterCapable) is only set if bit 3 (IsFullThreadDevice) is also set expected value 9
+    #Verify that Bit 1 (IsRouterCapable) is only set if bit 3 (IsFullThreadDevice) is also set expected value 10
+    #So the possibilites of value here are in the range of 0-20 expected value as per test-plan [0, 4, 8, 9, 10, 16, 20]
+    - label:
+          "Step 14: TH reads the SupportedThreadFeatures attribute from the DUT"
+      PICS: CNET.S.A0009
+      command: "readAttribute"
+      attribute: "SupportedThreadFeatures"
+      response:
+          constraints:
+              type: bitmap16
+              anyOf: [0, 4, 8, 9, 10, 16, 20]
+
+    - label: "Step 15:TH reads the ThreadVersion attribute from the DUT"
+      PICS: CNET.S.A000A
+      command: "readAttribute"
+      attribute: "ThreadVersion"
+      response:
+          constraints:
+              type: int16u
+              minValue: 4

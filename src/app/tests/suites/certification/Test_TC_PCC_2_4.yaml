@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 15.2.4. [TC-PCC-2.4] Primary functionality with server as DUT
+name: 16.2.4. [TC-PCC-2.4] Life Time Counters with Server as DUT
+
+PICS:
+    - PCC.S
 
 config:
     nodeId: 0x12344321
@@ -20,7 +23,9 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -28,74 +33,94 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Write 1 to the LifetimeRunningHours attribute to DUT"
+    - label: "Step 2a: TH Write 1 to the LifetimeRunningHours attribute to DUT"
+      PICS: PCC.S.A0015
       command: "writeAttribute"
       attribute: "LifetimeRunningHours"
       arguments:
           value: 1
 
-    - label: "Reads the attribute: LifetimeRunningHours"
+    - label:
+          "Step 2b: TH reads from the DUT the LifetimeRunningHours attribute."
+      PICS: PCC.S.A0015
       command: "readAttribute"
       attribute: "LifetimeRunningHours"
       response:
           value: 1
 
-    - label: "Write 2 to the LifetimeRunningHours attribute to DUT"
+    - label: "Step 3a: TH write 2 to the LifetimeRunningHours attribute of DUT."
+      PICS: PCC.S.A0015
       command: "writeAttribute"
       attribute: "LifetimeRunningHours"
       arguments:
           value: 2
 
-    - label: "Reads the attribute: LifetimeRunningHours"
+    - label:
+          "Step 3b: TH reads from the DUT the LifetimeRunningHours attribute."
+      PICS: PCC.S.A0015
       command: "readAttribute"
       attribute: "LifetimeRunningHours"
       response:
           value: 2
 
-    - label: "Write 3 to the LifetimeRunningHours attribute to DUT"
+    - label: "Step 4a: TH Write 3 to the LifetimeRunningHours attribute to DUT"
+      PICS: PCC.S.A0015
       command: "writeAttribute"
       attribute: "LifetimeRunningHours"
       arguments:
           value: 3
 
-    - label: "Reads the attribute: LifetimeRunningHours"
+    - label:
+          "Step 4b: TH reads from the DUT the LifetimeRunningHours attribute."
+      PICS: PCC.S.A0015
       command: "readAttribute"
       attribute: "LifetimeRunningHours"
       response:
           value: 3
 
-    - label: "Write 1 to the LifetimeEnergyConsumed attribute to DUT"
+    - label:
+          "Step 5a: TH write 1 to the LifetimeEnergyConsumed attribute of DUT."
+      PICS: PCC.S.A0017
       command: "writeAttribute"
       attribute: "LifetimeEnergyConsumed"
       arguments:
           value: 1
 
-    - label: "Reads the attribute: LifetimeEnergyConsumed"
-      disabled: true
+    - label:
+          "Step 5b: TH reads from the DUT the LifetimeEnergyConsumed attribute."
+      PICS: PCC.S.A0017
       command: "readAttribute"
       attribute: "LifetimeEnergyConsumed"
       response:
           value: 1
 
-    - label: "Write 2 to the LifetimeEnergyConsumed attribute to DUT"
+    - label:
+          "Step 6a: TH write 2 to the LifetimeEnergyConsumed attribute of DUT."
+      PICS: PCC.S.A0017
       command: "writeAttribute"
       attribute: "LifetimeEnergyConsumed"
       arguments:
           value: 2
 
-    - label: "Reads the attribute: LifetimeEnergyConsumed"
+    - label:
+          "Step 6b: TH reads from the DUT the LifetimeEnergyConsumed attribute."
+      PICS: PCC.S.A0017
       command: "readAttribute"
       attribute: "LifetimeEnergyConsumed"
       response:
           value: 2
 
-    - label: "Write 3 to the LifetimeEnergyConsumed attribute to DUT"
+    - label:
+          "Step 7a: TH write 3 to the LifetimeEnergyConsumed attribute of DUT."
+      PICS: PCC.S.A0017
       command: "writeAttribute"
       attribute: "LifetimeEnergyConsumed"
       arguments:
           value: 3
 
-    - label: "Reads the attribute: LifetimeEnergyConsumed"
+    - label:
+          "Step 7b: TH reads from the DUT the LifetimeEnergyConsumed attribute."
+      PICS: PCC.S.A0017
       command: "readAttribute"
       attribute: "LifetimeEnergyConsumed"
       response:

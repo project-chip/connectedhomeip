@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <stdio.h>
@@ -43,7 +44,7 @@ static int usage(const char * prog_name)
     ChipLogDetail(chipTool,
                   "Usage: %s [-h] [command] [opt ...]\n"
                   "%s commands are:\n",
-                  prog_name, prog_name);
+                  StringOrNullMarker(prog_name), StringOrNullMarker(prog_name));
     help(0, nullptr);
     return 2;
 }

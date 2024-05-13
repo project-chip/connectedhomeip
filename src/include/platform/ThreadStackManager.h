@@ -23,9 +23,10 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributeAccessInterface.h>
+#include <app/icd/server/ICDServerConfig.h>
+
 #include <app/util/basic-types.h>
+#include <inet/IPAddress.h>
 #include <lib/support/Span.h>
 #include <platform/NetworkCommissioning.h>
 
@@ -67,9 +68,10 @@ class GenericThreadStackManagerImpl_FreeRTOS;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 // Declaration of callback types corresponding to DnssdResolveCallback and DnssdBrowseCallback to avoid circular including.
-using DnsResolveCallback = void (*)(void * context, chip::Dnssd::DnssdService * result, const Span<Inet::IPAddress> & extraIPs,
+using DnsResolveCallback = void (*)(void * context, chip::Dnssd::DnssdService * result, const Span<Inet::IPAddress> & addresses,
                                     CHIP_ERROR error);
-using DnsBrowseCallback  = void (*)(void * context, chip::Dnssd::DnssdService * services, size_t servicesSize, CHIP_ERROR error);
+using DnsBrowseCallback  = void (*)(void * context, chip::Dnssd::DnssdService * services, size_t servicesSize, bool finalBrowse,
+                                   CHIP_ERROR error);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
@@ -105,7 +107,6 @@ public:
     CHIP_ERROR GetExternalIPv6Address(chip::Inet::IPAddress & addr);
     CHIP_ERROR GetPollPeriod(uint32_t & buf);
 
-    CHIP_ERROR JoinerStart();
     CHIP_ERROR SetThreadProvision(ByteSpan aDataset);
     CHIP_ERROR SetThreadEnabled(bool val);
     CHIP_ERROR AttachToThreadNetwork(const Thread::OperationalDataset & dataset,
@@ -120,6 +121,26 @@ public:
     CHIP_ERROR RemoveSrpService(const char * aInstanceName, const char * aName);
     CHIP_ERROR InvalidateAllSrpServices(); ///< Mark all SRP services as invalid
     CHIP_ERROR RemoveInvalidSrpServices(); ///< Remove SRP services marked as invalid
+
+    /*
+     * @brief Utility function to clear all thread SRP host and services established between the SRP server and client.
+     * It is expected that a transaction is done between the SRP server and client so the clear request is applied on both ends
+     *
+     * A generic implementation is provided in `GenericThreadStackManagerImpl_OpenThread` with the SoC OT stack
+     */
+    CHIP_ERROR ClearAllSrpHostAndServices();
+
+    /*
+     * @brief Used to synchronize on the SRP server response confirming the clearing of the host and service entries
+     * Should be called in ClearAllSrpHostAndServices once the request is sent.
+     */
+    void WaitOnSrpClearAllComplete();
+
+    /*
+     * @brief Notify that the SRP server confirmed the clearing of the host and service entries
+     * Should be called in the SRP Client set callback in the removal confirmation.
+     */
+    void NotifySrpClearAllComplete();
     CHIP_ERROR SetupSrpHost(const char * aHostName);
     CHIP_ERROR ClearSrpHost(const char * aHostName);
     CHIP_ERROR SetSrpDnsCallbacks(DnsAsyncReturnCallback aInitCallback, DnsAsyncReturnCallback aErrorCallback, void * aContext);
@@ -131,7 +152,6 @@ public:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
     void ResetThreadNetworkDiagnosticsCounts(void);
-    CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
 
 private:
     // ===== Members for internal use by the following friends.
@@ -162,25 +182,8 @@ private:
     ConnectivityManager::ThreadDeviceType GetThreadDeviceType();
     CHIP_ERROR SetThreadDeviceType(ConnectivityManager::ThreadDeviceType threadRole);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    CHIP_ERROR GetSEDPollingConfig(ConnectivityManager::SEDPollingConfig & pollingConfig);
-
-    /**
-     * Sets Sleepy End Device polling configuration and posts kSEDPollingIntervalChange event to inform other software
-     * modules about the change.
-     *
-     * @param[in]  pollingConfig  polling intervals configuration to be set
-     */
-    CHIP_ERROR SetSEDPollingConfig(const ConnectivityManager::SEDPollingConfig & pollingConfig);
-
-    /**
-     * Requests setting Sleepy End Device fast polling interval on or off.
-     * Every method call with onOff parameter set to true or false results in incrementing or decrementing the fast polling
-     * consumers counter. Fast polling mode is set if the consumers counter is bigger than 0.
-     *
-     * @param[in]  onOff  true if fast polling should be enabled and false otherwise.
-     */
-    CHIP_ERROR RequestSEDFastPollingMode(bool onOff);
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    CHIP_ERROR SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
 #endif
 
     bool HaveMeshConnectivity();
@@ -191,8 +194,8 @@ protected:
     ~ThreadStackManager() = default;
 
     // No copy, move or assignment.
-    ThreadStackManager(const ThreadStackManager &)  = delete;
-    ThreadStackManager(const ThreadStackManager &&) = delete;
+    ThreadStackManager(const ThreadStackManager &)             = delete;
+    ThreadStackManager(const ThreadStackManager &&)            = delete;
     ThreadStackManager & operator=(const ThreadStackManager &) = delete;
 };
 
@@ -306,6 +309,21 @@ inline CHIP_ERROR ThreadStackManager::RemoveInvalidSrpServices()
     return static_cast<ImplClass *>(this)->_RemoveInvalidSrpServices();
 }
 
+inline CHIP_ERROR ThreadStackManager::ClearAllSrpHostAndServices()
+{
+    return static_cast<ImplClass *>(this)->_ClearAllSrpHostAndServices();
+}
+
+inline void ThreadStackManager::WaitOnSrpClearAllComplete()
+{
+    return static_cast<ImplClass *>(this)->_WaitOnSrpClearAllComplete();
+}
+
+inline void ThreadStackManager::NotifySrpClearAllComplete()
+{
+    return static_cast<ImplClass *>(this)->_NotifySrpClearAllComplete();
+}
+
 inline CHIP_ERROR ThreadStackManager::SetupSrpHost(const char * aHostName)
 {
     return static_cast<ImplClass *>(this)->_SetupSrpHost(aHostName);
@@ -389,22 +407,12 @@ inline CHIP_ERROR ThreadStackManager::SetThreadDeviceType(ConnectivityManager::T
     return static_cast<ImplClass *>(this)->_SetThreadDeviceType(deviceType);
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-inline CHIP_ERROR ThreadStackManager::GetSEDPollingConfig(ConnectivityManager::SEDPollingConfig & pollingConfig)
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+inline CHIP_ERROR ThreadStackManager::SetPollingInterval(System::Clock::Milliseconds32 pollingInterval)
 {
-    return static_cast<ImplClass *>(this)->_GetSEDPollingConfig(pollingConfig);
+    return static_cast<ImplClass *>(this)->_SetPollingInterval(pollingInterval);
 }
-
-inline CHIP_ERROR ThreadStackManager::SetSEDPollingConfig(const ConnectivityManager::SEDPollingConfig & pollingConfig)
-{
-    return static_cast<ImplClass *>(this)->_SetSEDPollingConfig(pollingConfig);
-}
-
-inline CHIP_ERROR ThreadStackManager::RequestSEDFastPollingMode(bool onOff)
-{
-    return static_cast<ImplClass *>(this)->_RequestSEDFastPollingMode(onOff);
-}
-#endif
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 inline bool ThreadStackManager::HaveMeshConnectivity()
 {
@@ -441,33 +449,9 @@ inline CHIP_ERROR ThreadStackManager::GetPollPeriod(uint32_t & buf)
     return static_cast<ImplClass *>(this)->_GetPollPeriod(buf);
 }
 
-inline CHIP_ERROR ThreadStackManager::JoinerStart()
-{
-    return static_cast<ImplClass *>(this)->_JoinerStart();
-}
-
 inline void ThreadStackManager::ResetThreadNetworkDiagnosticsCounts()
 {
     static_cast<ImplClass *>(this)->_ResetThreadNetworkDiagnosticsCounts();
-}
-
-/*
- * @brief Get runtime value from the thread network based on the given attribute ID.
- *        The info is encoded via the AttributeValueEncoder.
- *
- * @param attributeId Id of the attribute for the requested info.
- * @param aEncoder Encoder to encode the attribute value.
- *
- * @return CHIP_NO_ERROR = Succes.
- *         CHIP_ERROR_NOT_IMPLEMENTED = Runtime value for this attribute to yet available to send as reply
- *                                      Use standard read.
- *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE = Is not a Runtime readable attribute. Use standard read
- *         All other errors should be treated as a read error and reported as such.
- */
-inline CHIP_ERROR ThreadStackManager::WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
-                                                                                 app::AttributeValueEncoder & encoder)
-{
-    return static_cast<ImplClass *>(this)->_WriteThreadNetworkDiagnosticAttributeToTlv(attributeId, encoder);
 }
 
 } // namespace DeviceLayer

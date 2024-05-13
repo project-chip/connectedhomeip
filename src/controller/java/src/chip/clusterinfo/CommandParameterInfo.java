@@ -4,11 +4,17 @@ package chip.clusterinfo;
 public class CommandParameterInfo {
   public CommandParameterInfo() {}
 
-  public CommandParameterInfo(String name, Class<?> type) {
+  /*
+   * If 'type' is a complex type, such as ArrayList or Optional, 'underlyingType'
+   * stores information about the wrapped or element type.
+   */
+  public CommandParameterInfo(String name, Class<?> type, Class<?> underlyingType) {
     this.name = name;
     this.type = type;
+    this.underlyingType = underlyingType;
   }
 
   public String name;
   public Class<?> type;
+  public Class<?> underlyingType;
 }

@@ -19,36 +19,16 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <inet/TCPEndPointImpl.h>
-#include <inet/UDPEndPointImpl.h>
 #include <system/SystemLayerImpl.h>
 
 namespace chip {
 namespace DeviceLayer {
 
-chip::Inet::EndPointManager<Inet::UDPEndPoint> * UDPEndPointManager()
-{
-    static chip::Inet::UDPEndPointManagerImpl gUDPEndPointManager;
-    return &gUDPEndPointManager;
-}
-
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-chip::Inet::EndPointManager<Inet::TCPEndPoint> * TCPEndPointManager()
-{
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    static chip::Inet::TCPEndPointManagerImpl gTCPEndPointManager;
-    return &gTCPEndPointManager;
-#else  // INET_CONFIG_ENABLE_TCP_ENDPOINT
-    return nullptr;
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
-}
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
-
 chip::System::LayerImpl * gMockedSystemLayer = nullptr;
 
-void SetSystemLayerForTesting(System::LayerImpl * layer)
+void SetSystemLayerForTesting(System::Layer * layer)
 {
-    gMockedSystemLayer = layer;
+    gMockedSystemLayer = static_cast<System::LayerImpl *>(layer);
 }
 
 chip::System::LayerImpl & SystemLayerImpl()
@@ -73,7 +53,7 @@ chip::System::LayerSockets & SystemLayerSockets()
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 namespace Internal {
-const char * const TAG = "CHIP[DL]";
+extern const char TAG[] = "CHIP[DL]";
 } // namespace Internal
 
 } // namespace DeviceLayer

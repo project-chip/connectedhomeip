@@ -1,0 +1,65 @@
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("//build_overrides/pigweed.gni")
+import("$dir_pw_build/python.gni")
+
+pw_python_package("matter_yamltests") {
+  setup = [
+    "setup.py",
+    "setup.cfg",
+    "pyproject.toml",
+  ]
+
+  sources = [
+    "matter_yamltests/__init__.py",
+    "matter_yamltests/adapter.py",
+    "matter_yamltests/constraints.py",
+    "matter_yamltests/definitions.py",
+    "matter_yamltests/errors.py",
+    "matter_yamltests/fixes.py",
+    "matter_yamltests/hooks.py",
+    "matter_yamltests/parser.py",
+    "matter_yamltests/parser_builder.py",
+    "matter_yamltests/parser_config.py",
+    "matter_yamltests/pics_checker.py",
+    "matter_yamltests/pseudo_clusters/__init__.py",
+    "matter_yamltests/pseudo_clusters/clusters/delay_commands.py",
+    "matter_yamltests/pseudo_clusters/clusters/log_commands.py",
+    "matter_yamltests/pseudo_clusters/clusters/system_commands.py",
+    "matter_yamltests/pseudo_clusters/pseudo_cluster.py",
+    "matter_yamltests/pseudo_clusters/pseudo_clusters.py",
+    "matter_yamltests/runner.py",
+    "matter_yamltests/websocket_runner.py",
+    "matter_yamltests/yaml_loader.py",
+  ]
+
+  python_deps = [ "${chip_root}/scripts/py_matter_idl:matter_idl" ]
+
+  tests = [
+    "test_spec_definitions.py",
+    "test_pics_checker.py",
+    "test_parser_builder.py",
+    "test_pseudo_clusters.py",
+    "test_yaml_parser.py",
+    "test_yaml_loader.py",
+  ]
+
+  # TODO: at a future time consider enabling all (* or missing) here to get
+  #       pylint checking these files
+  static_analysis = []
+}

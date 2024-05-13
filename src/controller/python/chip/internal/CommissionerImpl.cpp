@@ -19,10 +19,13 @@
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <controller/python/chip/native/PyChipError.h>
 #include <credentials/GroupDataProviderImpl.h>
+#include <credentials/PersistentStorageOpCertStore.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
+#include <crypto/RawKeySessionKeystore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TestGroupData.h>
@@ -94,7 +97,9 @@ private:
 ServerStorageDelegate gServerStorage;
 ScriptDevicePairingDelegate gPairingDelegate;
 chip::Credentials::GroupDataProviderImpl gGroupDataProvider;
+chip::Credentials::PersistentStorageOpCertStore gPersistentStorageOpCertStore;
 chip::Controller::ExampleOperationalCredentialsIssuer gOperationalCredentialsIssuer;
+chip::Crypto::RawKeySessionKeystore gSessionKeystore;
 
 } // namespace
 
@@ -129,17 +134,22 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(testingRootStore));
 
         factoryParams.fabricIndependentStorage = &gServerStorage;
+        factoryParams.sessionKeystore          = &gSessionKeystore;
 
         // Initialize group data provider for local group key state and IPKs
         gGroupDataProvider.SetStorageDelegate(&gServerStorage);
+        gGroupDataProvider.SetSessionKeystore(factoryParams.sessionKeystore);
         err = gGroupDataProvider.Init();
         SuccessOrExit(err);
         factoryParams.groupDataProvider = &gGroupDataProvider;
 
-        commissionerParams.pairingDelegate = &gPairingDelegate;
-        commissionerParams.storageDelegate = &gServerStorage;
+        err = gPersistentStorageOpCertStore.Init(&gServerStorage);
+        SuccessOrExit(err);
+        factoryParams.opCertStore = &gPersistentStorageOpCertStore;
 
-        err = ephemeralKey.Initialize();
+        commissionerParams.pairingDelegate = &gPairingDelegate;
+
+        err = ephemeralKey.Initialize(chip::Crypto::ECPKeyTarget::ECDSA);
         SuccessOrExit(err);
 
         err = gOperationalCredentialsIssuer.Initialize(gServerStorage);
@@ -154,7 +164,6 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         VerifyOrExit(rcac.Alloc(chip::Controller::kMaxCHIPDERCertLength), err = CHIP_ERROR_NO_MEMORY);
 
         {
-            chip::FabricInfo * fabricInfo                = nullptr;
             uint8_t compressedFabricId[sizeof(uint64_t)] = { 0 };
             chip::MutableByteSpan compressedFabricIdSpan(compressedFabricId);
             chip::ByteSpan defaultIpk;
@@ -174,20 +183,17 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
             commissionerParams.controllerICAC                 = icacSpan;
             commissionerParams.controllerNOC                  = nocSpan;
 
-            SuccessOrExit(DeviceControllerFactory::GetInstance().Init(factoryParams));
-            err = DeviceControllerFactory::GetInstance().SetupCommissioner(commissionerParams, *result);
+            SuccessOrExit(err = DeviceControllerFactory::GetInstance().Init(factoryParams));
+            SuccessOrExit(err = DeviceControllerFactory::GetInstance().SetupCommissioner(commissionerParams, *result));
 
-            fabricInfo = result->GetFabricInfo();
-            VerifyOrExit(fabricInfo != nullptr, err = CHIP_ERROR_INTERNAL);
-
-            SuccessOrExit(fabricInfo->GetCompressedId(compressedFabricIdSpan));
+            SuccessOrExit(err = result->GetCompressedFabricIdBytes(compressedFabricIdSpan));
             ChipLogProgress(Support, "Setting up group data for Fabric Index %u with Compressed Fabric ID:",
-                            static_cast<unsigned>(fabricInfo->GetFabricIndex()));
+                            static_cast<unsigned>(result->GetFabricIndex()));
             ChipLogByteSpan(Support, compressedFabricIdSpan);
 
             defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
-            SuccessOrExit(chip::Credentials::SetSingleIpkEpochKey(&gGroupDataProvider, fabricInfo->GetFabricIndex(), defaultIpk,
-                                                                  compressedFabricIdSpan));
+            SuccessOrExit(err = chip::Credentials::SetSingleIpkEpochKey(&gGroupDataProvider, result->GetFabricIndex(), defaultIpk,
+                                                                        compressedFabricIdSpan));
         }
     exit:
         ChipLogProgress(Controller, "Commissioner initialization status: %s", chip::ErrorStr(err));
@@ -202,22 +208,20 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
     return result.release();
 }
 
-static_assert(std::is_same<uint32_t, chip::ChipError::StorageType>::value, "python assumes CHIP_ERROR maps to c_uint32");
-
 /// Returns CHIP_ERROR corresponding to an UnpairDevice call
-extern "C" chip::ChipError::StorageType pychip_internal_Commissioner_Unpair(chip::Controller::DeviceCommissioner * commissioner,
-                                                                            uint64_t remoteDeviceId)
+extern "C" PyChipError pychip_internal_Commissioner_Unpair(chip::Controller::DeviceCommissioner * commissioner,
+                                                           uint64_t remoteDeviceId)
 {
     CHIP_ERROR err;
 
     chip::python::ChipMainThreadScheduleAndWait([&]() { err = commissioner->UnpairDevice(remoteDeviceId); });
 
-    return err.AsInteger();
+    return ToPyChipError(err);
 }
 
-extern "C" chip::ChipError::StorageType
-pychip_internal_Commissioner_BleConnectForPairing(chip::Controller::DeviceCommissioner * commissioner, uint64_t remoteNodeId,
-                                                  uint32_t pinCode, uint16_t discriminator)
+extern "C" PyChipError pychip_internal_Commissioner_BleConnectForPairing(chip::Controller::DeviceCommissioner * commissioner,
+                                                                         uint64_t remoteNodeId, uint32_t pinCode,
+                                                                         uint16_t discriminator)
 {
 
     CHIP_ERROR err;
@@ -233,5 +237,5 @@ pychip_internal_Commissioner_BleConnectForPairing(chip::Controller::DeviceCommis
         err = commissioner->PairDevice(remoteNodeId, params);
     });
 
-    return err.AsInteger();
+    return ToPyChipError(err);
 }

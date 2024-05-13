@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,12 +18,20 @@
 /**
  *    @file
  *          Provides an implementation of the BLEManager object
- *          for Telink platform.
+ *          for Telink platforms, by including Zephyr platform
+ *          implementation.
  */
 
 #pragma once
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+
+#include <platform/NetworkCommissioning.h>
+#include <platform/Zephyr/BLEAdvertisingArbiter.h>
+
+#include <zephyr/bluetooth/bluetooth.h>
+#include <zephyr/bluetooth/conn.h>
+#include <zephyr/bluetooth/gatt.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -31,8 +39,10 @@ namespace Internal {
 
 using namespace chip::Ble;
 
+class InternalScanCallback;
+
 /**
- * Concrete implementation of the BLEManager singleton object for the platform.
+ * Concrete implementation of the BLEManager singleton object for the Zephyr platforms.
  */
 class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePlatformDelegate, private BleApplicationDelegate
 {
@@ -41,12 +51,10 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
     friend BLEManager;
 
 private:
-    // Members that implement the BLEManager internal interface.
+    // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init(void);
-    CHIP_ERROR _Shutdown();
-    CHIPoBLEServiceMode _GetCHIPoBLEServiceMode(void);
-    CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
+    void _Shutdown();
     bool _IsAdvertisingEnabled(void);
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
     bool _IsAdvertising(void);
@@ -57,7 +65,7 @@ private:
     void _OnPlatformEvent(const ChipDeviceEvent * event);
     BleLayer * _GetBleLayer(void);
 
-    // Members that implement virtual methods on BlePlatformDelegate.
+    // ===== Members that implement virtual methods on BlePlatformDelegate.
 
     bool SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId) override;
     bool UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId) override;
@@ -72,61 +80,44 @@ private:
     bool SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext, const ChipBleUUID * svcId,
                           const ChipBleUUID * charId) override;
 
-    // Members that implement virtual methods on BleApplicationDelegate.
+    // ===== Members that implement virtual methods on BleApplicationDelegate.
 
     void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) override;
 
-    // Members for internal use by the following friends.
+    // ===== Private members reserved for use by this class only.
 
-    friend BLEManager & BLEMgr(void);
-    friend BLEManagerImpl & BLEMgrImpl(void);
-
-    static BLEManagerImpl sInstance;
-
-    // Private members reserved for use by this class only.
-
-    enum class Flags : uint16_t
+    enum class Flags : uint8_t
     {
-        kAsyncInitCompleted       = 0x0001, /**< One-time asynchronous initialization actions have been performed. */
-        kAdvertisingEnabled       = 0x0002, /**< The application has enabled CHIPoBLE advertising. */
-        kFastAdvertisingEnabled   = 0x0004, /**< The application has enabled fast advertising. */
-        kAdvertising              = 0x0008, /**< The system is currently CHIPoBLE advertising. */
-        kAdvertisingRefreshNeeded = 0x0010, /**< The advertising state/configuration state in the BLE layer needs to be updated. */
-        kDeviceNameSet            = 0x0020, /**< The device name has been set. */
-        kRestartAdvertising = 0x0040, /**< The advertising will be restarted when stop advertising confirmation is received and this
-                                      flag is set*/
+        kAsyncInitCompleted     = 0x0001, /**< One-time asynchronous initialization actions have been performed. */
+        kAdvertisingEnabled     = 0x0002, /**< The application has enabled CHIPoBLE advertising. */
+        kFastAdvertisingEnabled = 0x0004, /**< The application has enabled fast advertising. */
+        kAdvertising            = 0x0008, /**< The system is currently CHIPoBLE advertising. */
+        kAdvertisingRefreshNeeded =
+            0x0010, /**< The advertising state/configuration has changed, but the SoftDevice has yet to be updated. */
+        kChipoBleGattServiceRegister = 0x0020, /**< The system has currently CHIPoBLE GATT service registered. */
     };
 
-    enum
-    {
-        kMaxConnections              = BLE_LAYER_NUM_BLE_ENDPOINTS,
-        kMaxDeviceNameLength         = 16,
-        kMaxAdvertisementDataSetSize = 31,
-        kMaxRxDataBuffSize           = 20,
-        kMaxTxDataBuffSize           = 20
-    };
+    struct ServiceData;
 
-    CHIPoBLEServiceMode mServiceMode;
     BitFlags<Flags> mFlags;
-    char mDeviceName[kMaxDeviceNameLength + 1];
-    uint16_t mNumConnections;
-    bool mSubscribedConns[kMaxConnections];
-    uint8_t mAdvDataBuf[kMaxAdvertisementDataSetSize];
-    uint8_t mScanRespDataBuf[kMaxAdvertisementDataSetSize];
-    uint8_t mRxDataBuff[kMaxRxDataBuffSize];
-    uint8_t mTxDataBuff[kMaxRxDataBuffSize];
+    uint16_t mGAPConns;
+    CHIPoBLEServiceMode mServiceMode;
+    bool mSubscribedConns[CONFIG_BT_MAX_CONN];
+    bt_gatt_indicate_params mIndicateParams[CONFIG_BT_MAX_CONN];
+    bt_conn_cb mConnCallbacks;
+    bt_conn * mconId;
+    BLEAdvertisingArbiter::Request mAdvertisingRequest = {};
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    PacketBufferHandle c3CharDataBufferHandle;
+#endif
+    bool mBLERadioInitialized;
 
     void DriveBLEState(void);
-    CHIP_ERROR ConfigureAdvertisingData(void);
+    CHIP_ERROR PrepareAdvertisingRequest(void);
     CHIP_ERROR StartAdvertising(void);
     CHIP_ERROR StopAdvertising(void);
-    CHIP_ERROR SetSubscribed(uint16_t conId);
-    bool UnsetSubscribed(uint16_t conId);
-    bool IsSubscribed(uint16_t conId);
-
     CHIP_ERROR HandleGAPConnect(const ChipDeviceEvent * event);
     CHIP_ERROR HandleGAPDisconnect(const ChipDeviceEvent * event);
-    CHIP_ERROR HandleDisconnectRequest(const ChipDeviceEvent * event);
     CHIP_ERROR HandleRXCharWrite(const ChipDeviceEvent * event);
     CHIP_ERROR HandleTXCharCCCDWrite(const ChipDeviceEvent * event);
     CHIP_ERROR HandleTXCharComplete(const ChipDeviceEvent * event);
@@ -142,30 +133,59 @@ private:
     CHIP_ERROR HandleThreadStateChange(const ChipDeviceEvent * event);
     CHIP_ERROR HandleOperationalNetworkEnabled(const ChipDeviceEvent * event);
 
-    /* Callbacks from BLE stack*/
+    InternalScanCallback * mInternalScanCallback;
+
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    CHIP_ERROR PrepareC3CharData(void);
+#endif
+    bool IsSubscribed(bt_conn * conn);
+    bool SetSubscribed(bt_conn * conn);
+    bool UnsetSubscribed(bt_conn * conn);
+    uint32_t GetAdvertisingInterval();
+
     static void DriveBLEState(intptr_t arg);
 
-    /* Handlers for stack events */
-    static void CancelBleAdvTimeoutTimer(void);
-    static void StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs);
+    // Below callbacks run from the system workqueue context and have a limited stack capacity.
+    static void HandleTXIndicated(bt_conn * conn, bt_gatt_indicate_params * attr, uint8_t err);
+    static void HandleConnect(bt_conn * conn, uint8_t err);
+    static void HandleDisconnect(bt_conn * conn, uint8_t reason);
+    static void HandleBLEAdvertisementIntervalChange(System::Layer * layer, void * param);
 
-    /* Other init functions */
-    CHIP_ERROR _InitStack(void);
-    void _InitGatt(void);
-    CHIP_ERROR _InitGap(void);
+    // ===== Members for internal use by the following friends.
+
+    friend BLEManager & BLEMgr(void);
+    friend BLEManagerImpl & BLEMgrImpl(void);
+
+    static BLEManagerImpl sInstance;
 
 public:
-    static int RxWriteCallback(uint16_t connHandle, void * p);
-    static int TxCccWriteCallback(uint16_t connHandle, void * p);
-    static void ConnectCallback(uint8_t event, uint8_t * data, int len);
-    static void DisconnectCallback(uint8_t event, uint8_t * data, int len);
-    static int GapEventHandler(uint32_t event, uint8_t * data, int size);
+    // Below callbacks are public in order to be visible from the global scope.
+    static ssize_t HandleRXWrite(bt_conn * conn, const bt_gatt_attr * attr, const void * buf, uint16_t len, uint16_t offset,
+                                 uint8_t flags);
+    static ssize_t HandleTXCCCWrite(bt_conn * conn, const bt_gatt_attr * attr, uint16_t value);
+
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    static ssize_t HandleC3Read(struct bt_conn * conn, const struct bt_gatt_attr * attr, void * buf, uint16_t len, uint16_t offset);
+#endif
 
     /* Switch to IEEE802154 interface. @todo: remove to other module? */
     void SwitchToIeee802154(void);
 
-    /* BLE thread entry */
-    static void BleEntry(void *, void *, void *);
+    CHIP_ERROR StartAdvertisingProcess(void);
+};
+
+class InternalScanCallback : public DeviceLayer::NetworkCommissioning::ThreadDriver::ScanCallback
+{
+public:
+    explicit InternalScanCallback(BLEManagerImpl * aBLEManagerImpl) { mBLEManagerImpl = aBLEManagerImpl; }
+    void OnFinished(NetworkCommissioning::Status err, CharSpan debugText,
+                    NetworkCommissioning::ThreadScanResponseIterator * networks)
+    {
+        mBLEManagerImpl->StartAdvertisingProcess();
+    };
+
+private:
+    BLEManagerImpl * mBLEManagerImpl;
 };
 
 /**
@@ -183,7 +203,7 @@ inline BLEManager & BLEMgr(void)
  * Returns the platform-specific implementation of the BLEManager singleton object.
  *
  * Internal components can use this to gain access to features of the BLEManager
- * that are specific to the platform.
+ * that are specific to the Zephyr platforms.
  */
 inline BLEManagerImpl & BLEMgrImpl(void)
 {
@@ -193,11 +213,6 @@ inline BLEManagerImpl & BLEMgrImpl(void)
 inline BleLayer * BLEManagerImpl::_GetBleLayer()
 {
     return this;
-}
-
-inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(void)
-{
-    return mServiceMode;
 }
 
 inline bool BLEManagerImpl::_IsAdvertisingEnabled(void)

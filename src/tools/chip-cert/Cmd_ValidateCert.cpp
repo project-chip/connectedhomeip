@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -25,6 +25,7 @@
  */
 
 #include "chip-cert.h"
+#include <credentials/CHIPCertificateSet.h>
 
 #include "vector"
 
@@ -38,7 +39,7 @@ using namespace chip::ASN1;
 #define CMD_NAME "chip-cert validate-cert"
 
 bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg);
-bool HandleNonOptionArgs(const char * progName, int argc, char * argv[]);
+bool HandleNonOptionArgs(const char * progName, int argc, char * const argv[]);
 
 // clang-format off
 OptionDef gCmdOptionDefs[] =
@@ -49,15 +50,15 @@ OptionDef gCmdOptionDefs[] =
 };
 
 const char * const gCmdOptionHelp =
-    "  -c, --cert <cert-file>\n"
+    "  -c, --cert <file/str>\n"
     "\n"
-    "       A file containing an untrusted CHIP certificate to be used during\n"
-    "       validation. Usually, it is Intermediate CA certificate.\n"
+    "       File or string containing an untrusted CHIP certificate to be used during\n"
+    "       validation. Usually, it is Intermediate CA certificate (ICAC).\n"
     "\n"
-    "  -t, --trusted-cert <cert-file>\n"
+    "  -t, --trusted-cert <file/str>\n"
     "\n"
-    "       A file containing a trusted CHIP certificate to be used during\n"
-    "       validation. Usually, it is trust anchor root certificate.\n"
+    "       File or string containing a trusted CHIP certificate to be used during\n"
+    "       validation. Usually, it is trust anchor root certificate (RCAC).\n"
     "\n"
     ;
 
@@ -71,15 +72,17 @@ OptionSet gCmdOptions =
 
 HelpOptions gHelpOptions(
     CMD_NAME,
-    "Usage: " CMD_NAME " [ <options...> ] <target-cert-file>\n",
+    "Usage: " CMD_NAME " [ <options...> ] <file/str>\n",
     CHIP_VERSION_STRING "\n" COPYRIGHT_STRING,
     "Validate a chain of CHIP certificates.\n"
     "\n"
     "ARGUMENTS\n"
     "\n"
-    "  <target-cert-file>\n"
+    "  <file/str>\n"
     "\n"
-    "      A file containing the certificate to be validated.\n"
+    "      File or string containing the certificate to be validated.\n"
+    "      The formats of all input certificates are auto-detected and can be any of:\n"
+    "      X.509 PEM, X.509 DER, X.509 HEX, CHIP base-64, CHIP raw TLV or CHIP HEX.\n"
     "\n"
 );
 
@@ -96,10 +99,10 @@ enum
     kMaxCerts = 16,
 };
 
-const char * gTargetCertFileName = nullptr;
-const char * gCACertFileNames[kMaxCerts - 1];
-bool gCACertIsTrusted[kMaxCerts - 1];
-size_t gNumCertFileNames = 0;
+const char * gTargetCertFileName         = nullptr;
+const char * gCACertFileNames[kMaxCerts] = { nullptr };
+bool gCACertIsTrusted[kMaxCerts]         = { false };
+size_t gNumCertFileNames                 = 0;
 
 bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg)
 {
@@ -107,6 +110,11 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
     {
     case 'c':
     case 't':
+        if (gNumCertFileNames >= kMaxCerts)
+        {
+            PrintArgError("%s: Too many certificate files\n", progName);
+            return false;
+        }
         gCACertFileNames[gNumCertFileNames]   = arg;
         gCACertIsTrusted[gNumCertFileNames++] = (id == 't');
         break;
@@ -118,7 +126,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
     return true;
 }
 
-bool HandleNonOptionArgs(const char * progName, int argc, char * argv[])
+bool HandleNonOptionArgs(const char * progName, int argc, char * const argv[])
 {
     if (argc == 0)
     {
@@ -182,7 +190,10 @@ bool Cmd_ValidateCert(int argc, char * argv[])
     certToBeValidated = certSet.GetLastCert();
 
     context.Reset();
-    res = chip::UnixEpochToChipEpochTime(static_cast<uint32_t>(time(nullptr)), context.mEffectiveTime);
+    uint32_t currentTime;
+    res = chip::UnixEpochToChipEpochTime(static_cast<uint32_t>(time(nullptr)), currentTime);
+    context.mEffectiveTime.Set<CurrentChipEpochTime>(currentTime);
+    context.mRequiredKeyUsages.Set(KeyUsageFlags::kDigitalSignature);
     VerifyTrueOrExit(res);
 
     err = certSet.FindValidCert(certToBeValidated->mSubjectDN, certToBeValidated->mSubjectKeyId, context, &validatedCert);

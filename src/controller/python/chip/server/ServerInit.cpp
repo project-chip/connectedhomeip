@@ -14,11 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <errno.h>
-#include <pthread.h>
-
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
+#include <platform/TestOnlyCommissionableDataProvider.h>
 
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
@@ -29,8 +27,11 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
+#include <controller/python/chip/native/PyChipError.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+
 // #include <support/CHIPMem.h>
-// #include <support/ErrorStr.h>
+// #include <core/ErrorStr.h>
 
 // #include <examples/platform/linux/AppMain.h>
 
@@ -52,19 +53,9 @@ void EventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg
     }
 }
 
-pthread_t sPlatformMainThread;
-
 #if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 // uint32_t sBluetoothAdapterId = 0;
 #endif
-
-void * PlatformMainLoop(void *)
-{
-    ChipLogProgress(DeviceLayer, "Platform main loop started.");
-    chip::DeviceLayer::PlatformMgr().RunEventLoop();
-    ChipLogProgress(DeviceLayer, "Platform main loop completed.");
-    return nullptr;
-}
 
 } // namespace
 
@@ -98,8 +89,16 @@ static bool EnsureWiFiIsStarted()
 }
 #endif
 
-using PostAttributeChangeCallback = void (*)(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                             uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value);
+void CleanShutdown()
+{
+    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+
+    chip::Server::GetInstance().Shutdown();
+    chip::DeviceLayer::PlatformMgr().Shutdown();
+}
+
+using PostAttributeChangeCallback = void (*)(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t type,
+                                             uint16_t size, uint8_t * value);
 
 class PythonServerDelegate // : public ServerDelegate
 {
@@ -120,23 +119,14 @@ void pychip_server_set_callbacks(PostAttributeChangeCallback cb)
     gPythonServerDelegate.SetPostAttributeChangeCallback(cb);
 }
 
-void pychip_server_native_init()
+PyChipError pychip_server_native_init()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    int result;
-    int tmpErrno;
 
-    err = chip::Platform::MemoryInit();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Failed to initialize CHIP stack: memory init failed: %s", chip::ErrorStr(err));
-    }
+    PyReturnErrorOnFailure(ToPyChipError(Platform::MemoryInit()));
+    PyReturnErrorOnFailure(ToPyChipError(DeviceLayer::PlatformMgr().InitChipStack()));
 
-    err = chip::DeviceLayer::PlatformMgr().InitChipStack();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Failed to initialize CHIP stack: platform init failed: %s", chip::ErrorStr(err));
-    }
+    static chip::DeviceLayer::TestOnlyCommissionableDataProvider TestOnlyCommissionableDataProvider;
+    chip::DeviceLayer::SetCommissionableDataProvider(&TestOnlyCommissionableDataProvider);
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -168,41 +158,34 @@ void pychip_server_native_init()
 
     // parts from ChipLinuxAppMainLoop
 
-    uint16_t securePort   = CHIP_PORT;
-    uint16_t unsecurePort = CHIP_UDC_PORT;
-
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    PyReturnErrorOnFailure(ToPyChipError(initParams.InitializeStaticResourcesBeforeServerInit()));
     initParams.operationalServicePort        = CHIP_PORT;
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
 
-    chip::Server::GetInstance().Init(initParams);
+    PyReturnErrorOnFailure(ToPyChipError(chip::Server::GetInstance().Init(initParams)));
 
     // Initialize device attestation config
-    // SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
 
-    result   = pthread_create(&sPlatformMainThread, nullptr, PlatformMainLoop, nullptr);
-    tmpErrno = errno;
+    PyReturnErrorOnFailure(ToPyChipError(chip::DeviceLayer::PlatformMgr().StartEventLoopTask()));
 
-    if (result != 0)
-    {
-        ChipLogError(DeviceLayer, "Failed to initialize CHIP stack: pthread_create failed: %s", strerror(tmpErrno));
-    }
+    atexit(CleanShutdown);
 
-    return /*err*/;
+    return ToPyChipError(CHIP_NO_ERROR);
 }
 }
 
-void emberAfPostAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                        uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
 {
     // ChipLogProgress(NotSpecified, "emberAfPostAttributeChangeCallback()");
     if (gPythonServerDelegate.mPostAttributeChangeCallback != nullptr)
     {
         // ChipLogProgress(NotSpecified, "callback %p", gPythonServerDelegate.mPostAttributeChangeCallback);
-        gPythonServerDelegate.mPostAttributeChangeCallback(endpoint, clusterId, attributeId, mask, manufacturerCode, type, size,
-                                                           value);
+        gPythonServerDelegate.mPostAttributeChangeCallback(attributePath.mEndpointId, attributePath.mClusterId,
+                                                           attributePath.mAttributeId, type, size, value);
     }
     else
     {

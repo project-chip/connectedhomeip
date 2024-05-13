@@ -7,10 +7,12 @@
 #include <type_traits>
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Commands.h>
+#include <commands/common/Commands.h>
 #include <commands/clusters/ComplexArgument.h>
 #include <commands/clusters/ClusterCommand.h>
 #include <commands/clusters/ReportCommand.h>
-#include <commands/clusters/SubscriptionsCommands.h>
 #include <commands/clusters/WriteAttributeCommand.h>
 
 {{> clusters_header}}
@@ -25,32 +27,37 @@
 class {{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public ClusterCommand
 {
 public:
-    {{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(CredentialIssuerCommands * credsIssuerConfig): ClusterCommand("{{asDelimitedCommand name}}", credsIssuerConfig){{#zcl_command_arguments}}{{#if_chip_complex}}, mComplex_{{asUpperCamelCase label}}(&mRequest.{{asLowerCamelCase label}}){{/if_chip_complex}}{{/zcl_command_arguments}}
+    {{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(CredentialIssuerCommands * credsIssuerConfig): ClusterCommand("{{cleanse_label_as_kebab_case name}}", credsIssuerConfig){{#zcl_command_arguments}}{{#if_chip_complex}}, mComplex_{{asUpperCamelCase label}}(&mRequest.{{asLowerCamelCase label}}){{/if_chip_complex}}{{/zcl_command_arguments}}
     {
         {{#zcl_command_arguments}}
         {{#if_chip_complex}}
-        AddArgument("{{asUpperCamelCase label}}", &mComplex_{{asUpperCamelCase label}});
+        AddArgument("{{asUpperCamelCase label}}", &mComplex_{{asUpperCamelCase label}}{{#if isOptional}}, "", Argument::kOptional{{/if}});
         {{else if (isString type)}}
         AddArgument("{{asUpperCamelCase label}}", &mRequest.{{asLowerCamelCase label}});
         {{else}}
-        AddArgument("{{asUpperCamelCase label}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &mRequest.{{asLowerCamelCase label}});
+        AddArgument("{{asUpperCamelCase label}}", {{as_type_min_value type language='c++'}}, {{as_type_max_value type language='c++'}}, &mRequest.{{asLowerCamelCase label}});
         {{/if_chip_complex}}
         {{/zcl_command_arguments}}
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) command ({{asHex code 8}}) on endpoint %" PRIu16, endpointIds.at(0));
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::{{asUpperCamelCase parent.name}}::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Id;
 
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), {{asHex parent.code 8}}, {{asHex code 8}}, mRequest);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId, commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) command ({{asHex code 8}}) on Group %" PRIu16, groupId);
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::{{asUpperCamelCase parent.name}}::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Id;
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, {{asHex parent.code 8}}, {{asHex code 8}}, mRequest);
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId, groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
     }
 
 private:
@@ -64,45 +71,6 @@ private:
 
 {{/zcl_commands_source_client}}
 
-{{#zcl_attributes_server}}
-{{#if isWritable}}
-class Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public WriteAttribute
-{
-public:
-    Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(CredentialIssuerCommands * credsIssuerConfig): WriteAttribute("{{asUpperCamelCase name}}", credsIssuerConfig){{#if_chip_complex}}, mComplex(&mValue){{/if_chip_complex}}
-    {
-        AddArgument("attr-name", "{{asDelimitedCommand (asUpperCamelCase name)}}");
-        {{#if_chip_complex}}
-        AddArgument("attr-value", &mComplex);
-        {{else if (isString type)}}
-        AddArgument("attr-value", &mValue);
-        {{else}}
-        AddArgument("attr-value", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &mValue);
-        {{/if_chip_complex}}
-        WriteAttribute::AddArguments();
-    }
-
-    ~Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), {{asHex parent.code 8}}, {{asHex code 8}}, mValue);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, {{asHex parent.code 8}}, {{asHex code 8}}, mValue);
-    }
-
-private:
-    {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}} mValue;
-{{#if_chip_complex}}
-    TypedComplexArgument<{{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}}> mComplex;
-{{/if_chip_complex}}
-};
-
-{{/if}}
-{{/zcl_attributes_server}}
 {{/zcl_clusters}}
 
 /*----------------------------------------------------------------------------*\
@@ -128,34 +96,36 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands, CredentialIss
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig), //
         {{#zcl_attributes_server}}
-        make_unique<ReadAttribute>(Id, "{{asDelimitedCommand (asUpperCamelCase name)}}", Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}", Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
         {{/zcl_attributes_server}}
-        make_unique<WriteAttribute>(Id, credsIssuerConfig), //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig), //
         {{#zcl_attributes_server}}
-        {{#if isWritable}}
-        make_unique<Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(credsIssuerConfig), //
-        {{/if}}
+        {{#if_chip_complex}}
+        make_unique<WriteAttributeAsComplex<{{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}}>>(Id, "{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}", Attributes::{{asUpperCamelCase name}}::Id, WriteCommandType::k{{#unless isWritable}}Force{{/unless}}Write, credsIssuerConfig), //
+        {{else if (isString type)}}
+        make_unique<WriteAttribute<{{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}}>>(Id, "{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}", Attributes::{{asUpperCamelCase name}}::Id, WriteCommandType::k{{#unless isWritable}}Force{{/unless}}Write, credsIssuerConfig), //
+        {{else}}
+        make_unique<WriteAttribute<{{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}}>>(Id, "{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}", {{as_type_min_value type language='c++'}}, {{as_type_max_value type language='c++'}}, Attributes::{{asUpperCamelCase name}}::Id, WriteCommandType::k{{#unless isWritable}}Force{{/unless}}Write, credsIssuerConfig), //
+        {{/if_chip_complex}}
         {{/zcl_attributes_server}}
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig), //
         {{#zcl_attributes_server}}
-        {{#if isReportable}}
-        make_unique<SubscribeAttribute>(Id, "{{asDelimitedCommand (asUpperCamelCase name)}}", Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
-        {{/if}}
+        make_unique<SubscribeAttribute>(Id, "{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}", Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
         {{/zcl_attributes_server}}
         //
         // Events
         //
         make_unique<ReadEvent>(Id, credsIssuerConfig), //
         {{#zcl_events}}
-        make_unique<ReadEvent>(Id, "{{asDelimitedCommand (asUpperCamelCase name)}}", Events::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
+        make_unique<ReadEvent>(Id, "{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}", Events::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
         {{/zcl_events}}
         make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
         {{#zcl_events}}
-        make_unique<SubscribeEvent>(Id, "{{asDelimitedCommand (asUpperCamelCase name)}}", Events::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
+        make_unique<SubscribeEvent>(Id, "{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}", Events::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
         {{/zcl_events}}
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCluster(clusterName, clusterCommands);
 }
 {{/zcl_clusters}}
 
@@ -166,13 +136,17 @@ void registerClusterAny(Commands & commands, CredentialIssuerCommands * credsIss
     commands_list clusterCommands = {
         make_unique<ClusterCommand>(credsIssuerConfig),  //
         make_unique<ReadAttribute>(credsIssuerConfig),   //
-        make_unique<WriteAttribute>(credsIssuerConfig),  //
+        make_unique<WriteAttribute<>>(credsIssuerConfig),  //
         make_unique<SubscribeAttribute>(credsIssuerConfig), //
         make_unique<ReadEvent>(credsIssuerConfig),       //
         make_unique<SubscribeEvent>(credsIssuerConfig),     //
+        make_unique<ReadNone>(credsIssuerConfig),         //
+        make_unique<ReadAll>(credsIssuerConfig),         //
+        make_unique<SubscribeNone>(credsIssuerConfig),         //
+        make_unique<SubscribeAll>(credsIssuerConfig),         //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for sending IM messages based on cluster id, not cluster name.");
 }
 
 void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
@@ -181,5 +155,4 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
 {{#zcl_clusters}}
     registerCluster{{asUpperCamelCase name}}(commands, credsIssuerConfig);
 {{/zcl_clusters}}
-    registerClusterSubscriptions(commands, credsIssuerConfig);
 }

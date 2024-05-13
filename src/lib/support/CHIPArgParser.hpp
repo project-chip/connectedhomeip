@@ -32,6 +32,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifndef CHIP_CONFIG_NON_POSIX_LONG_OPT
+#define CHIP_CONFIG_NON_POSIX_LONG_OPT 0
+#endif
+
 namespace chip {
 namespace ArgParser {
 
@@ -45,7 +49,7 @@ typedef bool (*OptionHandlerFunct)(const char * progName, OptionSet * optSet, in
 /**
  * A function that can be called to handle any remaining, non-option command line arguments.
  */
-typedef bool (*NonOptionArgHandlerFunct)(const char * progName, int argc, char * argv[]);
+typedef bool (*NonOptionArgHandlerFunct)(const char * progName, int argc, char * const argv[]);
 
 /**
  * Defines the argument requirements for a command line option.
@@ -94,10 +98,11 @@ private:
     static bool CallHandleFunct(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg);
 };
 
-bool ParseArgs(const char * progName, int argc, char * argv[], OptionSet * optSets[]);
-bool ParseArgs(const char * progName, int argc, char * argv[], OptionSet * optSets[], NonOptionArgHandlerFunct nonOptArgHandler);
-bool ParseArgs(const char * progName, int argc, char * argv[], OptionSet * optSets[], NonOptionArgHandlerFunct nonOptArgHandler,
-               bool ignoreUnknown);
+bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet * optSets[]);
+bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet * optSets[],
+               NonOptionArgHandlerFunct nonOptArgHandler);
+bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet * optSets[],
+               NonOptionArgHandlerFunct nonOptArgHandler, bool ignoreUnknown);
 
 bool ParseArgsFromString(const char * progName, const char * argStr, OptionSet * optSets[]);
 bool ParseArgsFromString(const char * progName, const char * argStr, OptionSet * optSets[],

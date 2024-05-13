@@ -1,8 +1,6 @@
-<p align="center">
-  <img src="https://raw.githubusercontent.com/ARMmbed/mbed-os/master/logo.png" alt="ARM Mbed-OS logo"/>
-</p>
+![ARM Mbed-OS logo](https://raw.githubusercontent.com/ARMmbed/mbed-os/master/logo.png)
 
-<h1> Matter Arm Mbed OS Pigweed Example Application </h1>
+# Matter Arm Mbed OS Pigweed Example Application
 
 The Arm Mbed OS Pigweed Example demonstrates the usage of Pigweed module
 functionalities in an application.
@@ -37,7 +35,7 @@ serial port to the device. The following RPC protocols services are available:
 
 <hr>
 
-# Overview
+## Overview
 
 Pigweed libraries are built and organized in a way that enables faster and more
 reliable development. In the Matter project, the Pigweed module is planned to be
@@ -45,9 +43,9 @@ used to create system infrastructures, for example for performing on-device
 tests, but considering its general functionalities, it can be useful also in
 other cases.
 
-# Run application
+## Run application
 
-## Environment setup
+### Environment setup
 
 Before building the example, check out the Matter repository and sync submodules
 using the following command:
@@ -93,7 +91,7 @@ environment:
 $ source ./scripts/activate.sh
 ```
 
-## Building
+### Building
 
 The Pigweed application can be built in the same way as any other Matter example
 ported to the mbed-os platform.
@@ -111,7 +109,7 @@ ${MATTER_ROOT}/scripts/examples/mbed_example.sh -c=build -a=pigweed-app -b=<boar
 ```
 
 Both approaches are limited to supported evaluation boards which are listed in
-[Supported devices](#supported_devices) paragraph.
+[Supported devices](#supported-devices) paragraph.
 
 Mbed OS defines three building profiles: _develop, debug_ and _release_. For
 more details please visit
@@ -130,7 +128,7 @@ There are also three types of built application: _simple, boot_ and _upgrade_:
 When using the building script, it is possible expand the list of acceptable
 targets; this may be useful for rapid testing of a new mbed-targets.
 
-## Flashing
+### Flashing
 
 The Pigweed application can be flashed in the same way as any other Matter
 example ported to mbed-os platform.
@@ -163,7 +161,7 @@ device.
 It is possible to connect to an external gdb-server session by using specific
 **'Flash Mbed examples [remote]'** task.
 
-## Debugging
+### Debugging
 
 Debugging can be performed in the same was as with any other Matter example
 ported to mbed-os platform.
@@ -179,9 +177,9 @@ Run and Debug (Ctrl+Shift+D) => Debug Mbed examples => Start Debugging (F5) => (
 It is possible to connect to an external gdb-server session by using specific
 **'Debug Mbed examples [remote]'** task.
 
-## Testing
+### Testing
 
-### Serial port terminal
+#### Serial port terminal
 
 The application traces are streaming to serial output. To start communication
 open a terminal session and connect to the serial port of the device. You can
@@ -199,7 +197,7 @@ After device reset these lines should be visible:
 The pigweed-app application launched correctly and you can follow traces in the
 terminal.
 
-### RPC console
+#### RPC console
 
 The RPC console is an interactive Python shell console, where the different RPC
 command can be invoked. It is a complete solution for interacting with hardware
@@ -239,26 +237,25 @@ The response from the device should be:
 For more details about RPC console and supported services visit
 [CHIP RPC console](../../common/pigweed/rpc_console/README.md).
 
-## Supported devices
+### Supported devices
 
 The example supports building and running on the following mbed-enabled devices:
 
-| Manufacturer                                          | Hardware platform                                                         | Build target          | Platform image                                                                                                                                                                 |       Status       | Platform components                                                                                                                                                                                                                                                                |
-| ----------------------------------------------------- | ------------------------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :----------------: | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Cypress<br> Semiconductor](https://www.cypress.com/) | [CY8CPROTO-062-4343W](https://os.mbed.com/platforms/CY8CPROTO-062-4343W/) | `CY8CPROTO_062_4343W` | <details><summary>CY8CPROTO-062-4343W</summary><img src="https://os.mbed.com/media/cache/platforms/p6_wifi-bt_proto.png.250x250_q85.jpg" alt="CY8CPROTO-062-4343W"/></details> | :heavy_check_mark: | <details><summary>LEDs</summary><ul><li>Board has only one usable LED (LED4) which corresponds to USER LED from UI.</li></ul></details> <details><summary>Buttons</summary><ul><li>Unused</li></ul></details> <details><summary>Slider</summary><ul><li>Unused</li></ul></details> |
+| Manufacturer                                          | Hardware platform                                                         | Build target          | Platform image                                                                                                                                                                 | Status | Platform components                                                                                                                                                                                                                                                                |
+| ----------------------------------------------------- | ------------------------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :----: | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Cypress<br> Semiconductor](https://www.cypress.com/) | [CY8CPROTO-062-4343W](https://os.mbed.com/platforms/CY8CPROTO-062-4343W/) | `CY8CPROTO_062_4343W` | <details><summary>CY8CPROTO-062-4343W</summary><img src="https://os.mbed.com/media/cache/platforms/p6_wifi-bt_proto.png.250x250_q85.jpg" alt="CY8CPROTO-062-4343W"/></details> |   ✔    | <details><summary>LEDs</summary><ul><li>Board has only one usable LED (LED4) which corresponds to USER LED from UI.</li></ul></details> <details><summary>Buttons</summary><ul><li>Unused</li></ul></details> <details><summary>Slider</summary><ul><li>Unused</li></ul></details> |
 
-#### Notes
+##### Notes
 
 -   More details and guidelines about porting new hardware into the Matter
     project with Mbed OS can be found in
     [MbedNewTarget](../../../docs/guides/mbedos_add_new_target.md)
 -   Some useful information about HW platform specific settings can be found in
-    `pigweed-app/mbed/mbed_app.json`.  
-    Information about this file syntax and its meaning in mbed-os project can be
-    found here:
+    `pigweed-app/mbed/mbed_app.json`. Information about this file syntax and its
+    meaning in mbed-os project can be found here:
     [Mbed-Os configuration system](https://os.mbed.com/docs/mbed-os/latest/program-setup/advanced-configuration.html))
 
-# Device UI
+## Device UI
 
 This section lists the User Interface elements that you can use to control and
 monitor the state of the device. These correspond to PCB components on the
@@ -269,9 +266,9 @@ possible:
 
 -   _Solid On_ &mdash; The application was flashed and run successfully.
 
-### Notes
+#### Notes
 
 Some of the supported boards may not have sufficient number PCB components to
 follow above description. In that case please refer to
-[Supported devices](#Supported-devices) section and check board's 'Platform
+[Supported devices](#supported-devices) section and check board's 'Platform
 components' column for additional information about the limitation.

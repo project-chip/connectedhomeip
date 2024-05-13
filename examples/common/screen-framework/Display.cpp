@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -16,14 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- * @file Display.cpp
- *
- * This file implements helper APIs for the M5Stack's display
- *
- */
-
 #include <string.h>
 
 #include "driver/ledc.h"
@@ -54,7 +46,7 @@
 // The M5Stack's backlight is on Channel 7
 #define BACKLIGHT_CHANNEL LEDC_CHANNEL_7
 
-extern const char * TAG;
+static const char TAG[] = "Display";
 
 uint16_t DisplayHeight = 0;
 uint16_t DisplayWidth  = 0;
@@ -126,8 +118,8 @@ esp_err_t InitDisplay()
     TFT_setRotation(LANDSCAPE);
     TFT_resetclipwin();
 
-    DisplayWidth  = (uint16_t)(1 + tft_dispWin.x2 - tft_dispWin.x1);
-    DisplayHeight = (uint16_t)(1 + tft_dispWin.y2 - tft_dispWin.y1);
+    DisplayWidth  = (uint16_t) (1 + tft_dispWin.x2 - tft_dispWin.x1);
+    DisplayHeight = (uint16_t) (1 + tft_dispWin.y2 - tft_dispWin.y1);
 
     ESP_LOGI(TAG, "Display initialized (height %u, width %u)", DisplayHeight, DisplayWidth);
 

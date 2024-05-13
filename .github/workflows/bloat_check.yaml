@@ -14,6 +14,7 @@
 
 name: Bloat Check
 on:
+    workflow_dispatch:
     schedule:
         - cron: "*/5 * * * *"
 
@@ -27,22 +28,17 @@ jobs:
     pull_request_update:
         name: Report on pull requests
 
+        # Don't run on forked repos
+        if: github.repository_owner == 'project-chip'
+
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.5.58
+            image: ghcr.io/project-chip/chip-build:50
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.11
-              name: Checkout
-              with:
-                  action: actions/checkout@v3
-                  with: |
-                      submodules: true
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-
+            - name: Checkout
+              uses: actions/checkout@v4
             - name: Report
               run: |
                   scripts/tools/memory/gh_report.py \

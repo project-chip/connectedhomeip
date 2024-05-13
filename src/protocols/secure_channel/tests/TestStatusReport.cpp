@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <lib/support/BufferReader.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -33,7 +34,7 @@ using namespace chip::Protocols::SecureChannel;
 void TestStatusReport_NoData(nlTestSuite * inSuite, void * inContext)
 {
     GeneralStatusCode generalCode = GeneralStatusCode::kSuccess;
-    uint32_t protocolId           = SecureChannel::Id.ToFullyQualifiedSpecForm();
+    auto protocolId               = SecureChannel::Id;
     uint16_t protocolCode         = kProtocolCodeSuccess;
 
     StatusReport testReport(generalCode, protocolId, protocolCode);
@@ -59,7 +60,7 @@ void TestStatusReport_NoData(nlTestSuite * inSuite, void * inContext)
 void TestStatusReport_WithData(nlTestSuite * inSuite, void * inContext)
 {
     GeneralStatusCode generalCode      = GeneralStatusCode::kFailure;
-    uint32_t protocolId                = SecureChannel::Id.ToFullyQualifiedSpecForm();
+    auto protocolId                    = SecureChannel::Id;
     uint16_t protocolCode              = static_cast<uint16_t>(StatusCode::InvalidFabricConfig);
     uint8_t data[6]                    = { 42, 19, 3, 1, 3, 0 };
     const uint16_t dataLen             = 6;
@@ -104,6 +105,33 @@ void TestBadStatusReport(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
 }
 
+void TestMakeBusyStatusReport(nlTestSuite * inSuite, void * inContext)
+{
+    GeneralStatusCode generalCode                 = GeneralStatusCode::kBusy;
+    auto protocolId                               = SecureChannel::Id;
+    uint16_t protocolCode                         = kProtocolCodeBusy;
+    System::Clock::Milliseconds16 minimumWaitTime = System::Clock::Milliseconds16(5000);
+
+    System::PacketBufferHandle handle = StatusReport::MakeBusyStatusReportMessage(minimumWaitTime);
+    NL_TEST_ASSERT(inSuite, !handle.IsNull());
+
+    StatusReport reportToParse;
+    CHIP_ERROR err = reportToParse.Parse(std::move(handle));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == err);
+    NL_TEST_ASSERT(inSuite, reportToParse.GetGeneralCode() == generalCode);
+    NL_TEST_ASSERT(inSuite, reportToParse.GetProtocolId() == protocolId);
+    NL_TEST_ASSERT(inSuite, reportToParse.GetProtocolCode() == protocolCode);
+
+    const System::PacketBufferHandle & rcvData = reportToParse.GetProtocolData();
+    NL_TEST_ASSERT(inSuite, !rcvData.IsNull());
+    NL_TEST_ASSERT(inSuite, rcvData->DataLength() == sizeof(minimumWaitTime));
+
+    uint16_t readMinimumWaitTime = 0;
+    Encoding::LittleEndian::Reader reader(rcvData->Start(), rcvData->DataLength());
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == reader.Read16(&readMinimumWaitTime).StatusCode());
+    NL_TEST_ASSERT(inSuite, System::Clock::Milliseconds16(readMinimumWaitTime) == minimumWaitTime);
+}
+
 // Test Suite
 
 /**
@@ -115,6 +143,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("TestStatusReport_NoData", TestStatusReport_NoData),
     NL_TEST_DEF("TestStatusReport_WithData", TestStatusReport_WithData),
     NL_TEST_DEF("TestBadStatusReport", TestBadStatusReport),
+    NL_TEST_DEF("TestMakeBusyStatusReport", TestMakeBusyStatusReport),
 
     NL_TEST_SENTINEL()
 };

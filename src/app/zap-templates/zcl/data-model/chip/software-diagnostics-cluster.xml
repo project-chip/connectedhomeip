@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (c) 2021 Project CHIP Authors
+Copyright (c) 2021-2023 Project CHIP Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,39 +16,41 @@ limitations under the License.
 -->
 <configurator>
   <domain name="CHIP"/>
-  <struct name="ThreadMetrics">
+  <struct name="ThreadMetricsStruct">
     <cluster code="0x0034"/>
-    <item name="Id" type="INT64U"/>
-    <item name="Name" type="CHAR_STRING" length="8"/>
-    <item name="StackFreeCurrent" type="INT32U"/>
-    <item name="StackFreeMinimum" type="INT32U"/>
-    <item name="StackSize" type="INT32U"/>
+    <item name="ID" type="int64u"/>
+    <item name="Name" type="char_string" length="8" optional="true"/>
+    <item name="StackFreeCurrent" type="int32u" optional="true"/>
+    <item name="StackFreeMinimum" type="int32u" optional="true"/>
+    <item name="StackSize" type="int32u" optional="true"/>
   </struct>
-  <struct name="SoftwareFaultStruct">
-    <cluster code="0x0034"/>
-    <item name="Id" type="INT64U"/>
-    <item name="Name" type="CHAR_STRING" length="8"/>
-    <item name="FaultRecording" type="OCTET_STRING" length="1024"/>
-  </struct>  
   <cluster>
     <domain>General</domain>
     <name>Software Diagnostics</name>
     <code>0x0034</code>
     <define>SOFTWARE_DIAGNOSTICS_CLUSTER</define>
     <description>The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems.</description>
-    <attribute side="server" code="0x00" define="THREAD_METRICS" type="ARRAY" entryType="ThreadMetrics" length="254" writable="false" optional="true">ThreadMetrics</attribute>
-    <attribute side="server" code="0x01" define="CURRENT_HEAP_FREE" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">CurrentHeapFree</attribute>
-    <attribute side="server" code="0x02" define="CURRENT_HEAP_USED" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">CurrentHeapUsed</attribute>
-    <attribute side="server" code="0x03" define="CURRENT_HEAP_HIGH_WATERMARK" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">CurrentHeapHighWatermark</attribute>
-    <command source="client" code="0x00" name="ResetWatermarks" optional="false" cli="chip software_diagnostics resetwatermarks">
+
+    <features>
+      <feature bit="0" code="WTRMRK" name="Watermarks" summary="Node makes available the metrics for high watermark related to memory consumption.">
+        <optionalConform/>
+      </feature>
+    </features>
+
+    <attribute side="server" code="0x00" define="THREAD_METRICS" type="array" entryType="ThreadMetricsStruct" length="254" writable="false" optional="true">ThreadMetrics</attribute>
+    <attribute side="server" code="0x01" define="CURRENT_HEAP_FREE" type="int64u" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">CurrentHeapFree</attribute>
+    <attribute side="server" code="0x02" define="CURRENT_HEAP_USED" type="int64u" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">CurrentHeapUsed</attribute>
+    <attribute side="server" code="0x03" define="CURRENT_HEAP_HIGH_WATERMARK" type="int64u" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">CurrentHeapHighWatermark</attribute>
+    <command source="client" code="0x00" name="ResetWatermarks" optional="true" cli="chip software_diagnostics resetwatermarks">
       <description>Reception of this command SHALL reset the values: The StackFreeMinimum field of the ThreadMetrics attribute, CurrentHeapHighWaterMark attribute.</description>
+      <access op="invoke" privilege="manage"/>
     </command>
     <event side="server" code="0x00" name="SoftwareFault" priority="info" optional="true">
       <description>Indicate the last software fault that has taken place on the Node.</description>
-      <field id="0" name="SoftwareFault" type="SoftwareFaultStruct"/>
+      <field id="0" name="ID" type="int64u"/>
+      <field id="1" name="Name" type="char_string" length="8" optional="true"/>
+      <field id="2" name="FaultRecording" type="octet_string" length="1024" optional="true"/>
     </event>    
   </cluster>
-  <bitmap name="SoftwareDiagnosticsFeature" type="BITMAP32">
-    <field name="WaterMarks" mask="0x1"/>
-  </bitmap>   
+
 </configurator>

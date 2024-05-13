@@ -19,19 +19,26 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/tests.gni")
+import("${chip_root}/src/tracing/tracing_args.gni")
 
 declare_args() {
   chip_build_pw_rpc_lib = false
 }
 
 group("esp32") {
-  deps = [ "${chip_root}/src/lib" ]
+  deps = [
+    "${chip_root}/src/lib",
+    matter_trace_config,
+  ]
 
   if (chip_build_pw_rpc_lib) {
     deps += [ "//lib/pw_rpc" ]
   }
 
   if (chip_build_tests) {
-    deps += [ "${chip_root}/src:tests" ]
+    deps += [
+      "${chip_root}/src:tests",
+      "${chip_root}/src/lib/support:pw_tests_wrapper",
+    ]
   }
 }

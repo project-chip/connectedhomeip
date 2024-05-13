@@ -1,0 +1,177 @@
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Test OTA Software Update Successful Transfer
+
+config:
+    endpoint: 0
+    requestorNodeId:
+        type: node_id
+        defaultValue: 0x12344321
+    providerNodeId:
+        type: node_id
+        defaultValue: 0xC0FFEE
+    providerPayload:
+        type: char_string
+        defaultValue: "MT:-24J0IX4122-.548G00" # This value needs to be generated
+    providerDiscriminator:
+        type: int16u
+        defaultValue: 50
+    providerPort:
+        type: int16u
+        defaultValue: 5560
+    providerKvs:
+        type: char_string
+        defaultValue: "/tmp/chip_kvs_provider"
+    otaImageFilePath:
+        type: char_string
+        defaultValue: "/tmp/otaImage"
+    rawImageFilePath:
+        type: char_string
+        defaultValue: "/tmp/rawImage"
+    rawImageContent:
+        type: char_string
+        defaultValue: "Have a hootenanny!"
+    downloadImageFilePath:
+        type: char_string
+        defaultValue: "/tmp/downloadedImage"
+
+tests:
+    - label: "Create OTA image"
+      cluster: "SystemCommands"
+      command: "CreateOtaImage"
+      arguments:
+          values:
+              - name: "otaImageFilePath"
+                value: otaImageFilePath
+              - name: "rawImageFilePath"
+                value: rawImageFilePath
+              - name: "rawImageContent"
+                value: rawImageContent
+
+    - label: "Start the provider with an image"
+      cluster: "SystemCommands"
+      command: "Start"
+      arguments:
+          values:
+              - name: "registerKey"
+                value: "chip-ota-provider-app"
+              - name: "discriminator"
+                value: providerDiscriminator
+              - name: "port"
+                value: providerPort
+              - name: "kvs"
+                value: providerKvs
+              - name: "filepath"
+                value: otaImageFilePath
+
+    - label: "Commission the provider from alpha"
+      identity: "alpha"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: providerNodeId
+              - name: "payload"
+                value: providerPayload
+
+    - label: "Wait for the commissioned provider to be retrieved for alpha"
+      identity: "alpha"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: providerNodeId
+
+    - label: "Install ACL for QueryImage"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  # Grant administer privilege to the default controller node ID 112233
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [112233],
+                      Targets: null,
+                  },
+                  # Grant operate privileges to all nodes for the OTA Provider cluster on every endpoint
+                  {
+                      FabricIndex: 1,
+                      Privilege: 3,
+                      AuthMode: 2,
+                      Subjects: null,
+                      Targets:
+                          [{ Cluster: 41, Endpoint: null, DeviceType: null }],
+                  },
+              ]
+
+    - label: "Stop the requestor"
+      cluster: "SystemCommands"
+      command: "Stop"
+
+    - label: "Start the requestor with an OTA download path"
+      cluster: "SystemCommands"
+      command: "Start"
+      arguments:
+          values:
+              - name: "otaDownloadPath"
+                value: downloadImageFilePath
+
+    - label: "Wait for the commissioned requestor to be retrieved for alpha"
+      identity: "alpha"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: requestorNodeId
+
+    - label: "Send an announce OTA provider command to the requestor"
+      cluster: "OTA Software Update Requestor"
+      command: "AnnounceOTAProvider"
+      arguments:
+          values:
+              - name: "ProviderNodeID"
+                value: providerNodeId
+              - name: "VendorID"
+                value: 0
+              - name: "AnnouncementReason"
+                value: 0
+              - name: "Endpoint"
+                value: endpoint
+
+    - label: "Wait for transfer complete message"
+      cluster: "DelayCommands"
+      command: "WaitForMessage"
+      arguments:
+          values:
+              - name: "registerKey"
+                value: "default"
+              - name: "message"
+                value: "OTA image downloaded"
+
+    - label: "Compare original file to downloaded file"
+      cluster: "SystemCommands"
+      command: "CompareFiles"
+      arguments:
+          values:
+              - name: "file1"
+                value: rawImageFilePath
+              - name: "file2"
+                value: downloadImageFilePath

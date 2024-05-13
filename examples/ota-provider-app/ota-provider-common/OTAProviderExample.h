@@ -40,6 +40,7 @@ public:
     static constexpr uint16_t SW_VER_STR_MAX_LEN = 64;
     static constexpr uint16_t OTA_URL_MAX_LEN    = 512;
     static constexpr size_t kFilepathBufLen      = 256;
+    static constexpr size_t kUriMaxLen           = 256;
 
     typedef struct DeviceSoftwareVersionModel
     {
@@ -67,6 +68,7 @@ public:
 
     //////////// OTAProviderExample public APIs ///////////////
     void SetOTAFilePath(const char * path);
+    void SetImageUri(const char * imageUri);
     BdxOtaSender * GetBdxOtaSender() { return &mBdxOtaSender; }
 
     void SetOTACandidates(std::vector<OTAProviderExample::DeviceSoftwareVersionModel> candidates);
@@ -81,6 +83,11 @@ public:
     void SetDelayedApplyActionTimeSec(uint32_t time) { mDelayedApplyActionTimeSec = time; }
     void SetUserConsentDelegate(chip::ota::OTAProviderUserConsentDelegate * delegate) { mUserConsentDelegate = delegate; }
     void SetUserConsentNeeded(bool needed) { mUserConsentNeeded = needed; }
+    void SetPollInterval(uint32_t interval)
+    {
+        if (interval != 0)
+            mPollInterval = interval;
+    }
 
 private:
     bool SelectOTACandidate(const uint16_t requestorVendorID, const uint16_t requestorProductID,
@@ -92,7 +99,7 @@ private:
                           const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData,
                           uint32_t targetVersion);
 
-    bool ParseOTAHeader(const char * otaFilePath, chip::OTAImageHeader & header);
+    bool ParseOTAHeader(chip::OTAImageHeaderParser & parser, const char * otaFilePath, chip::OTAImageHeader & header);
 
     /**
      * Called to send the response for a QueryImage command. If an error is encountered, an error status will be sent.
@@ -104,6 +111,7 @@ private:
     BdxOtaSender mBdxOtaSender;
     std::vector<DeviceSoftwareVersionModel> mCandidates;
     char mOTAFilePath[kFilepathBufLen]; // null-terminated
+    char mImageUri[kUriMaxLen];
     OTAQueryStatus mQueryImageStatus;
     OTAApplyUpdateAction mUpdateAction;
     uint32_t mIgnoreQueryImageCount;
@@ -114,4 +122,5 @@ private:
     bool mUserConsentNeeded;
     uint32_t mSoftwareVersion;
     char mSoftwareVersionString[SW_VER_STR_MAX_LEN];
+    uint32_t mPollInterval;
 };

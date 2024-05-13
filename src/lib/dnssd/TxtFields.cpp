@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <lib/core/CHIPSafeCasts.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/support/BytesToHex.h>
@@ -49,9 +50,11 @@ bool IsKey(const ByteSpan & key, const char * desired)
     {
         return false;
     }
+
+    auto desired_bytes = Uint8::from_const_char(desired);
     for (size_t i = 0; i < key.size(); ++i)
     {
-        if (SafeToLower(key.data()[i]) != SafeToLower(desired[i]))
+        if (SafeToLower(key.data()[i]) != SafeToLower(desired_bytes[i]))
         {
             return false;
         }
@@ -102,10 +105,20 @@ bool MakeBoolFromAsciiDecimal(const ByteSpan & val)
     return val.size() == 1 && static_cast<char>(*val.data()) == '1';
 }
 
+std::optional<bool> MakeOptionalBoolFromAsciiDecimal(const ByteSpan & val)
+{
+    char character = static_cast<char>(*val.data());
+    if (val.size() == 1 && ((character == '1') || (character == '0')))
+    {
+        return std::make_optional(character == '1');
+    }
+    return std::nullopt;
+}
+
 size_t GetPlusSignIdx(const ByteSpan & value)
 {
-    // Fist value is the vendor id, second (after the +) is the product.
-    for (int i = 0; i < static_cast<int>(value.size()); ++i)
+    // First value is the vendor id, second (after the +) is the product.
+    for (size_t i = 0; i < value.size(); ++i)
     {
         if (static_cast<char>(value.data()[i]) == '+')
         {
@@ -170,15 +183,32 @@ void GetPairingInstruction(const ByteSpan & value, char * pairingInstruction)
     Platform::CopyString(pairingInstruction, kMaxPairingInstructionLen + 1, value);
 }
 
-Optional<System::Clock::Milliseconds32> GetRetryInterval(const ByteSpan & value)
+uint8_t GetCommissionerPasscode(const ByteSpan & value)
+{
+    return MakeBoolFromAsciiDecimal(value);
+}
+
+std::optional<System::Clock::Milliseconds32> GetRetryInterval(const ByteSpan & value)
 {
     const auto undefined     = std::numeric_limits<uint32_t>::max();
     const auto retryInterval = MakeU32FromAsciiDecimal(value, undefined);
 
     if (retryInterval != undefined && retryInterval <= kMaxRetryInterval.count())
-        return MakeOptional(System::Clock::Milliseconds32(retryInterval));
+        return std::make_optional(System::Clock::Milliseconds32(retryInterval));
 
-    return NullOptional;
+    return std::nullopt;
+}
+
+std::optional<System::Clock::Milliseconds16> GetRetryActiveThreshold(const ByteSpan & value)
+{
+    const auto retryInterval = MakeU16FromAsciiDecimal(value);
+
+    if (retryInterval == 0)
+    {
+        return std::nullopt;
+    }
+
+    return std::make_optional(System::Clock::Milliseconds16(retryInterval));
 }
 
 TxtFieldKey GetTxtFieldKey(const ByteSpan & key)
@@ -195,7 +225,7 @@ TxtFieldKey GetTxtFieldKey(const ByteSpan & key)
 
 } // namespace Internal
 
-void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & val, DiscoveredNodeData & nodeData)
+void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & val, CommissionNodeData & nodeData)
 {
     TxtFieldKey keyType = Internal::GetTxtFieldKey(key);
     switch (keyType)
@@ -225,32 +255,32 @@ void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & val, DiscoveredN
     case TxtFieldKey::kPairingHint:
         nodeData.pairingHint = Internal::GetPairingHint(val);
         break;
-    case TxtFieldKey::kMrpRetryIntervalIdle:
-        nodeData.mrpRetryIntervalIdle = Internal::GetRetryInterval(val);
-        break;
-    case TxtFieldKey::kMrpRetryIntervalActive:
-        nodeData.mrpRetryIntervalActive = Internal::GetRetryInterval(val);
-        break;
-    case TxtFieldKey::kTcpSupported:
-        nodeData.supportsTcp = Internal::MakeBoolFromAsciiDecimal(val);
+    case TxtFieldKey::kCommissionerPasscode:
+        nodeData.supportsCommissionerGeneratedPasscode = Internal::GetCommissionerPasscode(val);
         break;
     default:
         break;
     }
 }
 
-void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, ResolvedNodeData & nodeData)
+void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, CommonResolutionData & nodeData)
 {
     switch (Internal::GetTxtFieldKey(key))
     {
-    case TxtFieldKey::kMrpRetryIntervalIdle:
-        nodeData.mMrpRetryIntervalIdle = Internal::GetRetryInterval(value);
+    case TxtFieldKey::kSessionIdleInterval:
+        nodeData.mrpRetryIntervalIdle = Internal::GetRetryInterval(value);
         break;
-    case TxtFieldKey::kMrpRetryIntervalActive:
-        nodeData.mMrpRetryIntervalActive = Internal::GetRetryInterval(value);
+    case TxtFieldKey::kSessionActiveInterval:
+        nodeData.mrpRetryIntervalActive = Internal::GetRetryInterval(value);
+        break;
+    case TxtFieldKey::kSessionActiveThreshold:
+        nodeData.mrpRetryActiveThreshold = Internal::GetRetryActiveThreshold(value);
         break;
     case TxtFieldKey::kTcpSupported:
-        nodeData.mSupportsTcp = Internal::MakeBoolFromAsciiDecimal(value);
+        nodeData.supportsTcp = Internal::MakeBoolFromAsciiDecimal(value);
+        break;
+    case TxtFieldKey::kLongIdleTimeICD:
+        nodeData.isICDOperatingAsLIT = Internal::MakeOptionalBoolFromAsciiDecimal(value);
         break;
     default:
         break;

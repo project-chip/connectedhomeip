@@ -18,9 +18,6 @@ config:
     nodeId: 0x12344321
     cluster: "Mode Select"
     endpoint: 1
-    discriminator:
-        type: INT16U
-        defaultValue: 3840
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -48,14 +45,22 @@ tests:
       response:
           value:
               [
-                  { Label: "Black", Mode: 0, SemanticTag: 0 },
-                  { Label: "Cappuccino", Mode: 4, SemanticTag: 0 },
-                  { Label: "Espresso", Mode: 7, SemanticTag: 0 },
+                  { Label: "Black", Mode: 0, SemanticTags: [{ "Value": 0 }] },
+                  {
+                      Label: "Cappuccino",
+                      Mode: 4,
+                      SemanticTags: [{ "Value": 0 }],
+                  },
+                  {
+                      Label: "Espresso",
+                      Mode: 7,
+                      SemanticTags: [{ "Value": 0 }],
+                  },
               ]
           constraints:
-              - type: list
-              - minLength: 3
-              - maxLength: 3
+              type: list
+              minLength: 3
+              maxLength: 3
 
     - label: "Read CurrentMode"
       command: "readAttribute"
@@ -76,7 +81,7 @@ tests:
           value: null
 
     - label: "Change to Supported Mode"
-      command: "changeToMode"
+      command: "ChangeToMode"
       arguments:
           values:
               - name: "NewMode"
@@ -90,21 +95,21 @@ tests:
           saveAs: currentModeBeforeToggle
 
     - label: "Change to Unsupported Mode"
-      command: "changeToMode"
+      command: "ChangeToMode"
       arguments:
           values:
               - name: "NewMode"
                 value: 2
       response:
-          error: CONSTRAINT_ERROR
+          error: INVALID_COMMAND
 
     - label: "Toggle OnOff"
       cluster: "On/Off"
-      command: "off"
+      command: "Off"
 
     - label: "Toggle OnOff"
       cluster: "On/Off"
-      command: "on"
+      command: "On"
 
     - label: "Verify Current Mode does not change when OnMode is null"
       command: "readAttribute"
@@ -118,7 +123,7 @@ tests:
       arguments:
           value: 2
       response:
-          error: CONSTRAINT_ERROR
+          error: INVALID_COMMAND
 
     - label: "Change OnMode"
       command: "writeAttribute"
@@ -135,11 +140,11 @@ tests:
 
     - label: "Toggle OnOff"
       cluster: "On/Off"
-      command: "off"
+      command: "Off"
 
     - label: "Toggle OnOff"
       cluster: "On/Off"
-      command: "on"
+      command: "On"
 
     - label: "Verify Current Mode Changes if OnMode is not null"
       command: "readAttribute"
@@ -153,7 +158,7 @@ tests:
       arguments:
           value: 2
       response:
-          error: CONSTRAINT_ERROR
+          error: INVALID_COMMAND
 
     - label: "Change to Supported StartUp Mode"
       command: "writeAttribute"
@@ -168,7 +173,7 @@ tests:
           value: 7
 
     - label: "Change CurrentMode to another value"
-      command: "changeToMode"
+      command: "ChangeToMode"
       arguments:
           values:
               - name: "NewMode"
@@ -190,10 +195,6 @@ tests:
     - label: "Reboot target device"
       cluster: "SystemCommands"
       command: "Reboot"
-      arguments:
-          values:
-              - name: "discriminator"
-                value: discriminator
 
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -220,10 +221,6 @@ tests:
     - label: "Reboot target device"
       cluster: "SystemCommands"
       command: "Reboot"
-      arguments:
-          values:
-              - name: "discriminator"
-                value: discriminator
 
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"

@@ -31,12 +31,11 @@
 #include "AppTask.h"
 #include "Button.h"
 #include "Globals.h"
-#include "ScreenManager.h"
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <vector>
 
-static const char * TAG = "Button.cpp";
+static const char TAG[] = "Button.cpp";
 
 extern Button gButtons[BUTTON_NUMBER];
 

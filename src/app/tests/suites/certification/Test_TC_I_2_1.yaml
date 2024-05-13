@@ -14,13 +14,18 @@
 
 name: 57.2.1. [TC-I-2.1] Attributes with server as DUT
 
+PICS:
+    - I.S
+
 config:
     nodeId: 0x12344321
     cluster: "Identify"
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -28,16 +33,20 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads the IdentifyTime attribute from the DUT"
+    - label: "Step 2: TH reads the IdentifyTime attribute from the DUT"
+      PICS: I.S.A0000
       command: "readAttribute"
-      attribute: "identify time"
+      attribute: "IdentifyTime"
       response:
           constraints:
-              type: uint16
+              type: int16u
+              minValue: 0
+              maxValue: 65535
 
-    - label: "TH reads the IdentifyType attribute from the DUT"
+    - label: "Step 3: TH reads the IdentifyType attribute from the DUT"
+      PICS: I.S.A0001
       command: "readAttribute"
-      attribute: "identify type"
+      attribute: "IdentifyType"
       response:
           constraints:
               type: enum8

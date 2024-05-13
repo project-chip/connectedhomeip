@@ -35,10 +35,12 @@ source_set("openthread_core_config_qpg_chip_examples") {
 }
 
 source_set("qpg-matter-shell") {
+  defines = []
   if (chip_build_libshell) {
-    defines = [
+    defines += [
       "OPENTHREAD_CONFIG_CLI_TRANSPORT=OT_CLI_TRANSPORT_CONSOLE",
       "ENABLE_CHIP_SHELL",
+      "CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI=1",
     ]
 
     sources = [

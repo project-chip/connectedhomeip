@@ -56,10 +56,6 @@ enum InternalPlatformSpecificEventTypes
 
 struct ChipDevicePlatformEvent final
 {
-    union
-    {
-        /* None currently defined */
-    };
 };
 
 } // namespace DeviceLayer

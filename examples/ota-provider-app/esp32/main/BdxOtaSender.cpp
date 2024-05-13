@@ -82,12 +82,21 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
             // end of the transfer.
             sendFlags.Set(chip::Messaging::SendMessageFlags::kExpectResponse);
         }
-        VerifyOrReturn(mExchangeCtx != nullptr, ChipLogError(BDX, "%s: mExchangeCtx is null", __FUNCTION__));
+        VerifyOrReturn(mExchangeCtx != nullptr);
         err = mExchangeCtx->SendMessage(event.msgTypeData.ProtocolId, event.msgTypeData.MessageType, std::move(event.MsgData),
                                         sendFlags);
-        if (err != CHIP_NO_ERROR)
+        if (err == CHIP_NO_ERROR)
         {
-            ChipLogError(BDX, "SendMessage failed: %s", chip::ErrorStr(err));
+            if (!sendFlags.Has(chip::Messaging::SendMessageFlags::kExpectResponse))
+            {
+                // After sending the StatusReport, exchange context gets closed so, set mExchangeCtx to null
+                mExchangeCtx = nullptr;
+            }
+        }
+        else
+        {
+            ChipLogError(BDX, "SendMessage failed: %" CHIP_ERROR_FORMAT, err.Format());
+            Reset();
         }
         break;
     }
@@ -101,7 +110,15 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         acceptData.StartOffset  = mTransfer.GetStartOffset();
         acceptData.Length       = mTransfer.GetTransferLength();
         VerifyOrReturn(mTransfer.AcceptTransfer(acceptData) == CHIP_NO_ERROR,
-                       ChipLogError(BDX, "%s: %s", __FUNCTION__, chip::ErrorStr(err)));
+                       ChipLogError(BDX, "AcceptTransfter failed error:%" CHIP_ERROR_FORMAT, err.Format()));
+
+        // Store the file designator, used during block query
+        uint16_t fdl       = 0;
+        const uint8_t * fd = mTransfer.GetFileDesignator(fdl);
+        VerifyOrReturn(fdl < sizeof(mFileDesignator), ChipLogError(BDX, "Cannot store file designator with length = %u", fdl));
+        memcpy(mFileDesignator, fd, fdl);
+        mFileDesignator[fdl] = 0;
+
         break;
     }
     case TransferSession::OutputEventType::kQueryReceived: {
@@ -138,8 +155,11 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         blockData.Data = blockBuf->Start();
         mNumBytesSent  = static_cast<uint32_t>(mNumBytesSent + blockData.Length);
 
-        VerifyOrReturn(CHIP_NO_ERROR == mTransfer.PrepareBlock(blockData),
-                       ChipLogError(BDX, "%s: PrepareBlock failed: %s", __FUNCTION__, chip::ErrorStr(err)));
+        if (CHIP_NO_ERROR != mTransfer.PrepareBlock(blockData))
+        {
+            ChipLogError(BDX, "PrepareBlock failed: %" CHIP_ERROR_FORMAT, err.Format());
+            mTransfer.AbortTransfer(StatusCode::kUnknown);
+        }
         break;
     }
     case TransferSession::OutputEventType::kAckReceived:
@@ -154,6 +174,7 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         {
             ChipLogError(BDX, "onTransferComplete Callback not set");
         }
+        mStopPolling = true; // Stop polling the TransferSession only after receiving BlockAckEOF
         Reset();
         break;
     case TransferSession::OutputEventType::kStatusReceived:
@@ -194,10 +215,15 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
     case TransferSession::OutputEventType::kBlockReceived:
     default:
         // TransferSession should prevent this case from happening.
-        ChipLogError(BDX, "%s: unsupported event type", __FUNCTION__);
+        ChipLogError(BDX, "unsupported event type");
     }
 }
 
+/* Reset() calls bdx::TransferSession::Reset() which sets the output event type to
+ * TransferSession::OutputEventType::kNone. So, bdx::TransferFacilitator::PollForOutput()
+ * will call HandleTransferSessionOutput() with event TransferSession::OutputEventType::kNone.
+ * Since we are ignoring kNone events so, it is okay HandleTransferSessionOutput() being called with event kNone
+ */
 void BdxOtaSender::Reset()
 {
     mFabricIndex.ClearValue();
@@ -211,6 +237,8 @@ void BdxOtaSender::Reset()
 
     mInitialized  = false;
     mNumBytesSent = 0;
+
+    memset(mFileDesignator, 0, sizeof(mFileDesignator));
 }
 
 uint16_t BdxOtaSender::GetTransferBlockSize(void)

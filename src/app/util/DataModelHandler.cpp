@@ -14,40 +14,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- * @file
- *   This file implements the handler for data model messages.
- */
-
 #include <app/util/DataModelHandler.h>
 
-#if __has_include(<zap-generated/endpoint_config.h>)
-#define USE_ZAP_CONFIG 1
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
-#endif
 #include <lib/support/logging/CHIPLogging.h>
-
-#ifdef EMBER_AF_PLUGIN_IAS_ZONE_SERVER
-void emberAfPluginIasZoneServerStackStatusCallback(EmberStatus status);
-#endif
 
 using namespace ::chip;
 
-void InitDataModelHandler(chip::Messaging::ExchangeManager * exchangeManager)
+void InitDataModelHandler()
 {
-#ifdef USE_ZAP_CONFIG
     ChipLogProgress(Zcl, "Using ZAP configuration...");
     emberAfEndpointConfigure();
-    emberAfInit(exchangeManager);
-
-#if defined(EMBER_AF_PLUGIN_IAS_ZONE_SERVER)
-    EmberStatus status = EMBER_NETWORK_UP;
-#endif
-
-#ifdef EMBER_AF_PLUGIN_IAS_ZONE_SERVER
-    emberAfPluginIasZoneServerStackStatusCallback(status);
-#endif
-#endif
+    emberAfInit();
 }

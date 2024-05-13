@@ -12,21 +12,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-_mac_deployment_target = "10.15"
+target_arch = current_cpu
+if (current_cpu == "x86") {
+  target_arch = "i386"
+} else if (current_cpu == "x64") {
+  target_arch = "x86_64"
+} else if (current_cpu == "arm") {
+  target_arch = "armv7"
+} else if (current_cpu == "arm64") {
+  target_arch = "arm64"
+}
 
-if (current_cpu == "arm64") {
-  _mac_deployment_target = "11.0"
+target_sdk = "macos"
+if (current_os != "mac") {
+  target_sdk = current_os
+}
+
+deployment_target = "11.0"
+if (current_os == "mac") {
+  if (current_cpu == "arm64") {
+    deployment_target = "11.0"
+  }
+} else {
+  deployment_target = "14.0"
 }
 
 declare_args() {
-  # OS X version to target when compiling.
-  mac_deployment_target = _mac_deployment_target
+  # SDK version to target when compiling.
+  mac_deployment_target = target_sdk + deployment_target
+  mac_target_arch = target_arch
 }
 
-if (current_cpu == "x64") {
-  mac_target_arch = "x86_64"
-} else {
-  mac_target_arch = current_cpu
-}
-
-mac_target_triple = "${mac_target_arch}-apple-macos${mac_deployment_target}"
+mac_target_triple = "${mac_target_arch}-apple-${mac_deployment_target}"

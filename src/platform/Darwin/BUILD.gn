@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/nlassert.gni")
 
 import("${chip_root}/src/platform/device.gni")
 
@@ -24,10 +25,21 @@ config("darwin_config") {
     "CoreFoundation.framework",
     "CoreBluetooth.framework",
     "Foundation.framework",
-    "IOKit.framework",
+    "Network.framework",
   ]
 
-  cflags = [ "-fobjc-arc" ]
+  if (current_os == "mac") {
+    frameworks += [
+      "SystemConfiguration.framework",
+      "CoreWLAN.framework",
+      "IOKit.framework",
+    ]
+  }
+
+  cflags = [
+    "-fobjc-arc",
+    "-Wconversion",
+  ]
 }
 
 static_library("Darwin") {
@@ -40,8 +52,6 @@ static_library("Darwin") {
     "BlePlatformConfig.h",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
-    "CHIPP256KeypairNativeBridge.cpp",
-    "CHIPP256KeypairNativeBridge.h",
     "CHIPPlatformConfig.h",
     "ConfigurationManagerImpl.cpp",
     "ConfigurationManagerImpl.h",
@@ -49,28 +59,56 @@ static_library("Darwin") {
     "ConnectivityManagerImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
+    "DnssdContexts.cpp",
+    "DnssdHostNameRegistrar.cpp",
     "DnssdImpl.cpp",
     "DnssdImpl.h",
+    "DnssdType.cpp",
     "InetPlatformConfig.h",
-    "KeyValueStoreManagerImpl.h",
-    "KeyValueStoreManagerImpl.mm",
-    "Logging.cpp",
+    "LoggingImpl.cpp",
     "MdnsError.cpp",
     "MdnsError.h",
+    "NetworkCommissioningDriver.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
+    "PlatformMetricKeys.h",
     "PosixConfig.cpp",
     "PosixConfig.h",
     "SystemPlatformConfig.h",
+    "SystemTimeSupport.cpp",
+    "UserDefaults.h",
+    "UserDefaults.mm",
   ]
 
+  if (chip_enable_wifi) {
+    sources += [
+      "WiFi/ConfigurationManagerImplWiFi.cpp",
+      "WiFi/ConnectivityManagerImplWiFi.mm",
+      "WiFi/NetworkCommissioningWiFiDriver.h",
+      "WiFi/NetworkCommissioningWiFiDriver.mm",
+    ]
+  }
+
+  if (!chip_disable_platform_kvs) {
+    sources += [
+      "DeviceInstanceInfoProviderImpl.cpp",
+      "DeviceInstanceInfoProviderImpl.h",
+      "KeyValueStoreManagerImpl.h",
+      "KeyValueStoreManagerImpl.mm",
+    ]
+  }
+
   deps = [
+    ":logging",
+    ":tracing",
     "${chip_root}/src/lib/dnssd:platform_header",
+    "${chip_root}/src/platform/logging:headers",
     "${chip_root}/src/setup_payload",
+    "${chip_root}/src/tracing",
   ]
 
   public_deps = [
-    "${chip_root}/src/app:app_buildconfig",
+    "${chip_root}/src/app:app_config",
     "${chip_root}/src/platform:platform_base",
   ]
 
@@ -96,4 +134,36 @@ static_library("Darwin") {
       "UUIDHelperImpl.mm",
     ]
   }
+}
+
+source_set("tracing") {
+  sources = [
+    "Tracing.h",
+    "Tracing.mm",
+  ]
+
+  deps = [
+    ":logging",
+    "${chip_root}/src/tracing",
+  ]
+}
+
+static_library("logging") {
+  sources = [
+    "Logging.h",
+    "Logging.mm",
+  ]
+
+  deps = [
+    "${chip_root}/src/lib/support:attributes",
+    "${chip_root}/src/lib/support:logging_constants",
+    "${chip_root}/src/lib/support:span",
+  ]
+
+  configs += [ "${chip_root}/src:includes" ]
+  cflags = [
+    "-fobjc-arc",
+    "-Wconversion",
+  ]
+  frameworks = [ "Foundation.framework" ]
 }

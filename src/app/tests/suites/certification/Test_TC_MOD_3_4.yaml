@@ -1,0 +1,136 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 80.3.4. [TC-MOD-3.4] OnMode Overwriting StartUpMode (DUT as Server)
+
+PICS:
+    - MOD.S.A0004
+    - MOD.S.A0005
+    - OO.S.A4003
+
+config:
+    nodeId: 0x12344321
+    cluster: "Mode Select"
+    endpoint: 1
+    #Configure newmode value
+    Step2dOnModeValue:
+        type: int8u
+        defaultValue: 4
+
+tests:
+    - label:
+          "Step 0: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 1: TH reads from the DUT the StartUpMode attribute."
+      PICS: MOD.S.A0004
+      command: "readAttribute"
+      attribute: "StartUpMode"
+      response:
+          saveAs: startup_mode_dut
+
+    - label: "Step 2a: TH reads from the DUT the OnMode attribute."
+      PICS: MOD.S.A0005
+      command: "readAttribute"
+      attribute: "OnMode"
+      response:
+          saveAs: on_mode_dut
+
+    - label:
+          "Step 2b: If the StartUpMode and OnMode attributes have the same
+          value, proceed to step 2c, Otherwise proceed to step 3."
+      PICS: MOD.S.A0004 && MOD.S.A0005
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: startup_mode_dut
+              - name: "Value2"
+                value: on_mode_dut
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsExpectedValue
+
+    - label: "Step 2c: TH reads the SupportedModes attribute from the DUT"
+      runIf: IsExpectedValue
+      PICS: MOD.S.A0002
+      command: "readAttribute"
+      attribute: "SupportedModes"
+      response:
+          constraints:
+              type: list
+
+    - label:
+          "Step 2d: Select a value from the list in step 2c with a different
+          value than the StartUpMode value read in step 1. TH sends a write
+          command for OnMode to the DUT with the selected value."
+      runIf: IsExpectedValue
+      PICS: MOD.S.A0002 && MOD.S.C00.Rsp
+      command: "writeAttribute"
+      attribute: "OnMode"
+      arguments:
+          value: Step2dOnModeValue
+
+    - label: "Step 3: TH reads from the DUT the OnMode attribute."
+      PICS: MOD.S.A0005 && MOD.S.F00
+      command: "readAttribute"
+      attribute: "OnMode"
+      response:
+          saveAs: Step3OnModeValue
+
+    - label:
+          "Step 4: TH writes 1 to StartUpOnOff attribute of the OnOff Cluster of
+          the DUT"
+      PICS: OO.S.A4003
+      cluster: "On/Off"
+      command: "writeAttribute"
+      attribute: "StartUpOnOff"
+      arguments:
+          value: 1
+
+    - label: "Step 5: Physically power cycle the device"
+      verification: |
+          Physically power cycle the device.
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 6: TH reads from the DUT the CurrentMode attribute."
+      PICS: MOD.S.A0003 && PICS_USER_PROMPT
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          value: Step3OnModeValue

@@ -7,12 +7,10 @@ tool or Matter accessories on Linux.
 
 <hr>
 
--   [Bluetooth LE virtualization on Linux](#virtualization)
--   [Debugging with gdb](#gdb)
+-   [Bluetooth LE virtualization on Linux](#bluetooth-le-virtualization-on-linux)
+-   [Debugging with gdb](#debugging-with-gdb)
 
 <hr>
-
-<a name="virtualization"></a>
 
 ## Bluetooth LE virtualization on Linux
 
@@ -26,22 +24,24 @@ interfaces working as Bluetooth LE central and peripheral, respectively.
     sudo apt-get update
     sudo apt-get install libtool m4 automake autotools-dev libudev-dev libical-dev libreadline-dev
 
-    cd third_party/bluez/repo
+    git clone https://github.com/bluez/bluez.git
+
+    cd bluez
     ./bootstrap
-    third_party/bluez/repo/configure --prefix=/usr --mandir=/usr/share/man --sysconfdir=/etc --localstatedir=/var --enable-experimental --with-systemdsystemunitdir=/lib/systemd/system --with-systemduserunitdir=/usr/lib/systemd --enable-deprecated --enable-testing --enable-tools
+    ./configure --prefix=/usr --mandir=/usr/share/man --sysconfdir=/etc --localstatedir=/var --enable-experimental --with-systemdsystemunitdir=/lib/systemd/system --with-systemduserunitdir=/usr/lib/systemd --enable-deprecated --enable-testing --enable-tools
     make
     ```
 
 2. Run bluetoothd:
 
     ```
-    sudo third_party/bluez/repo/src/bluetoothd --experimental --debug &
+    sudo ./src/bluetoothd --experimental --debug &
     ```
 
 3. Bring up two virtual Bluetooth LE interfaces:
 
     ```
-    sudo third_party/bluez/repo/emulator/btvirt -L -l2
+    sudo ./emulator/btvirt -L -l2
     ```
 
     You can find the virtual interface by running `hciconfig` command:
@@ -73,8 +73,6 @@ interfaces working as Bluetooth LE central and peripheral, respectively.
     ```
 
 <hr>
-
-<a name="gdb"></a>
 
 ## Debugging with gdb
 

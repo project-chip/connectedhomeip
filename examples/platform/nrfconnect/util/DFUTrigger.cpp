@@ -20,12 +20,12 @@
 #error "The command for triggerring the DFU is available for nRF52840 Dongle only"
 #endif
 
-#include <drivers/gpio.h>
-#include <shell/shell.h>
+#include <zephyr/drivers/gpio.h>
+#include <zephyr/shell/shell.h>
 
 namespace {
-constexpr const char * kGPIOController = "GPIO_0";
-constexpr gpio_pin_t kGPIOResetPin     = 19;
+constexpr char kGPIOController[]   = "GPIO_0";
+constexpr gpio_pin_t kGPIOResetPin = 19;
 
 int cmd_dfu(const struct shell * shell, size_t argc, char ** argv)
 {

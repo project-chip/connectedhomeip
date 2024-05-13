@@ -53,6 +53,23 @@ public:
     /// did all the values fit?
     bool Fit() const { return mWriter.Fit(); }
 
+    /// Was nothing written yet?
+    bool Empty() const { return mWriter.Needed() == 0; }
+
+    /// Write a formatted string to the stringbuilder
+    StringBuilderBase & AddFormat(const char * format, ...) ENFORCE_FORMAT(2, 3);
+
+    /// For strings we often want to know when they were truncated. If the underlying writer did
+    /// not fit, this replaces the last 3 characters with "."
+    StringBuilderBase & AddMarkerIfOverflow();
+
+    StringBuilderBase & Reset()
+    {
+        mWriter.Reset();
+        NullTerminate();
+        return *this;
+    }
+
     /// access the underlying value
     const char * c_str() const { return reinterpret_cast<const char *>(mWriter.Buffer()); }
 

@@ -26,14 +26,18 @@
 #include <app/clusters/application-basic-server/application-basic-server.h>
 
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/data-model/Encode.h>
+#include <app/util/attribute-storage.h>
+#include <app/util/config.h>
+#include <platform/CHIPDeviceConfig.h>
+
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #include <app/app-platform/ContentAppPlatform.h>
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-#include <app/data-model/Encode.h>
-#include <app/util/attribute-storage.h>
-#include <platform/CHIPDeviceConfig.h>
 
 #include <list>
+#include <string>
 
 using namespace chip;
 using namespace chip::app::Clusters;
@@ -43,7 +47,8 @@ using namespace chip::AppPlatform;
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 static constexpr size_t kApplicationBasicDelegateTableSize =
-    EMBER_AF_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+static_assert(kApplicationBasicDelegateTableSize <= kEmberInvalidEndpointIndex, "ApplicationBasic Delegate table size error");
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -60,21 +65,22 @@ Delegate * GetDelegate(EndpointId endpoint)
     ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(endpoint);
     if (app != nullptr)
     {
-        ChipLogError(Zcl, "ApplicationBasic returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
+        ChipLogProgress(Zcl, "ApplicationBasic returning ContentApp delegate for endpoint:%u", endpoint);
         return app->GetApplicationBasicDelegate();
     }
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    ChipLogError(Zcl, "ApplicationBasic NOT returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
+    ChipLogProgress(Zcl, "ApplicationBasic NOT returning ContentApp delegate for endpoint:%u", endpoint);
 
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::ApplicationBasic::Id);
-    return ((ep == 0xFFFF || ep >= EMBER_AF_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT) ? nullptr : gDelegateTable[ep]);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, chip::app::Clusters::ApplicationBasic::Id,
+                                                       MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT);
+    return (ep >= kApplicationBasicDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
 {
     if (delegate == nullptr)
     {
-        ChipLogError(Zcl, "Application Basic has no delegate set for endpoint:%" PRIu16, endpoint);
+        ChipLogProgress(Zcl, "Application Basic has no delegate set for endpoint:%u", endpoint);
         return true;
     }
     return false;
@@ -88,9 +94,10 @@ namespace ApplicationBasic {
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ApplicationBasic::Id);
-    // if endpoint is found and is not a dynamic endpoint
-    if (ep != 0xFFFF && ep < EMBER_AF_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT)
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, ApplicationBasic::Id,
+                                                       MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT);
+    // if endpoint is found
+    if (ep < kApplicationBasicDelegateTableSize)
     {
         gDelegateTable[ep] = delegate;
     }
@@ -107,15 +114,15 @@ Delegate * GetDefaultDelegate(EndpointId endpoint)
 CHIP_ERROR Delegate::HandleGetApplication(app::AttributeValueEncoder & aEncoder)
 {
     ApplicationBasicApplicationType application;
-    application.catalogVendorId = mCatalogVendorApp.catalogVendorId;
-    application.applicationId   = CharSpan(mCatalogVendorApp.applicationId, strlen(mCatalogVendorApp.applicationId));
+    application.catalogVendorID = mCatalogVendorApp.catalogVendorId;
+    application.applicationID   = CharSpan(mCatalogVendorApp.applicationId, strlen(mCatalogVendorApp.applicationId));
     return aEncoder.Encode(application);
 }
 
-bool Delegate::Matches(ApplicationBasicApplication match)
+bool Delegate::Matches(const ApplicationBasicApplicationType & match)
 {
-    std::string appId(match.applicationId.data(), match.applicationId.size());
-    CatalogVendorApp matchApp(match.catalogVendorId, appId.c_str());
+    std::string appId(match.applicationID.data(), match.applicationID.size());
+    CatalogVendorApp matchApp(match.catalogVendorID, appId.c_str());
     return mCatalogVendorApp.Matches(&matchApp);
 }
 
@@ -165,30 +172,22 @@ CHIP_ERROR ApplicationBasicAttrAccess::Read(const app::ConcreteReadAttributePath
 
     switch (aPath.mAttributeId)
     {
-    case chip::app::Clusters::ApplicationBasic::Attributes::VendorName::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::VendorName::Id:
         return ReadVendorNameAttribute(aEncoder, delegate);
-    }
-    case chip::app::Clusters::ApplicationBasic::Attributes::VendorID::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::VendorID::Id:
         return ReadVendorIdAttribute(aEncoder, delegate);
-    }
-    case chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::Id:
         return ReadApplicationNameAttribute(aEncoder, delegate);
-    }
-    case chip::app::Clusters::ApplicationBasic::Attributes::ProductID::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::ProductID::Id:
         return ReadProductIdAttribute(aEncoder, delegate);
-    }
-    case chip::app::Clusters::ApplicationBasic::Attributes::Application::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::Application::Id:
         return ReadApplicationAttribute(aEncoder, delegate);
-    }
-    case chip::app::Clusters::ApplicationBasic::Attributes::Status::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::Status::Id:
         return ReadStatusAttribute(aEncoder, delegate);
-    }
-    case chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::Id:
         return ReadApplicationVersionAttribute(aEncoder, delegate);
-    }
-    case chip::app::Clusters::ApplicationBasic::Attributes::AllowedVendorList::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::AllowedVendorList::Id:
         return ReadAllowedVendorListAttribute(aEncoder, delegate);
-    }
     default: {
         break;
     }

@@ -16,7 +16,7 @@ name: Test Cluster Tests
 
 config:
     nodeId: 0x12344321
-    cluster: "Test Cluster"
+    cluster: "Unit Testing"
     endpoint: 1
 
 tests:
@@ -29,22 +29,22 @@ tests:
                 value: nodeId
 
     - label: "Send Test Command"
-      command: "test"
+      command: "Test"
 
     - label: "Send Test Not Handled Command"
-      command: "testNotHandled"
+      command: "TestNotHandled"
       response:
           error: INVALID_COMMAND
 
     - label: "Send Test Specific Command"
-      command: "testSpecific"
+      command: "TestSpecific"
       response:
           values:
               - name: "returnValue"
                 value: 7
 
     - label: "Send Test Add Arguments Command"
-      command: "testAddArguments"
+      command: "TestAddArguments"
       arguments:
           values:
               - name: "arg1"
@@ -57,7 +57,7 @@ tests:
                 value: 20
 
     - label: "Send failing Test Add Arguments Command"
-      command: "testAddArguments"
+      command: "TestAddArguments"
       arguments:
           values:
               - name: "arg1"
@@ -727,6 +727,18 @@ tests:
       response:
           value: "Tes\x00ti\x00ng"
 
+    - label: "Write attribute OCTET_STRING with hex: format"
+      command: "writeAttribute"
+      attribute: "octet_string"
+      arguments:
+          value: "hex:000102030405"
+
+    - label: "Read attribute OCTET_STRING with hex: format"
+      command: "readAttribute"
+      attribute: "octet_string"
+      response:
+          value: "hex:000102030405"
+
     - label: "Write attribute OCTET_STRING with weird chars"
       command: "writeAttribute"
       attribute: "octet_string"
@@ -737,7 +749,8 @@ tests:
       command: "readAttribute"
       attribute: "octet_string"
       response:
-          value: "\r\n\xff\"\xa0"
+          # This is the properly 'hex:...' version of "\r\n\xff\"\xa0"
+          value: "hex:0d0aff22a0"
 
     - label: "Write attribute OCTET_STRING"
       command: "writeAttribute"
@@ -901,6 +914,18 @@ tests:
                   "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
               ]
 
+    - label: "Write attribute LIST_LONG_OCTET_STRING (for chunked write)"
+      command: "writeAttribute"
+      attribute: "list_long_octet_string"
+      arguments:
+          value:
+              [
+                  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+              ]
+
     # Tests for Epoch Microseconds
 
     - label: "Read attribute EPOCH_US Default Value"
@@ -970,25 +995,25 @@ tests:
     - label: "Read attribute UNSUPPORTED"
       command: "readAttribute"
       attribute: "unsupported"
-      optional: true
       response:
-          value: 0
+          error: UNSUPPORTED_ATTRIBUTE
 
     - label: "Writeattribute UNSUPPORTED"
       command: "writeAttribute"
       attribute: "unsupported"
-      optional: true
       arguments:
           value: 0
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
 
     - label: "Send Test Command to unsupported endpoint"
-      command: "test"
+      command: "Test"
       endpoint: 200
       response:
           error: UNSUPPORTED_ENDPOINT
 
     - label: "Send Test Command to unsupported cluster"
-      command: "test"
+      command: "Test"
       endpoint: 0
       response:
           error: UNSUPPORTED_CLUSTER
@@ -1020,24 +1045,36 @@ tests:
           value: 0
 
     - label: "Send a command with a vendor_id and enum"
-      command: "testEnumsRequest"
+      command: "TestEnumsRequest"
       arguments:
           values:
               - name: "arg1"
                 value: 20003
               - name: "arg2"
-                value: 101
+                value: 1
       response:
           values:
               - name: "arg1"
                 value: 20003
               - name: "arg2"
-                value: 101
+                value: 1
+
+    - label: "Send a command with a vendor_id and invalid enum"
+      command: "TestEnumsRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: 20003
+              - name: "arg2"
+                value: SimpleEnum.UnknownEnumValue
+      response:
+          # Attempting to echo back the invalid enum value should fail.
+          error: FAILURE
 
     # Tests for Struct
 
     - label: "Send Test Command With Struct Argument and arg1.b is true"
-      command: "testStructArgumentRequest"
+      command: "TestStructArgumentRequest"
       arguments:
           values:
               - name: "arg1"
@@ -1058,7 +1095,7 @@ tests:
                 value: true
 
     - label: "Send Test Command With Struct Argument and arg1.b is false"
-      command: "testStructArgumentRequest"
+      command: "TestStructArgumentRequest"
       arguments:
           values:
               - name: "arg1"
@@ -1080,7 +1117,7 @@ tests:
 
     - label:
           "Send Test Command With Nested Struct Argument and arg1.c.b is true"
-      command: "testNestedStructArgumentRequest"
+      command: "TestNestedStructArgumentRequest"
       arguments:
           values:
               - name: "arg1"
@@ -1106,7 +1143,7 @@ tests:
                 value: true
 
     - label: "Send Test Command With Nested Struct Argument arg1.c.b is false"
-      command: "testNestedStructArgumentRequest"
+      command: "TestNestedStructArgumentRequest"
       arguments:
           values:
               - name: "arg1"
@@ -1134,7 +1171,7 @@ tests:
     - label:
           "Send Test Command With Nested Struct List Argument and all fields b
           of arg1.d are true"
-      command: "testNestedStructListArgumentRequest"
+      command: "TestNestedStructListArgumentRequest"
       arguments:
           values:
               - name: "arg1"
@@ -1193,7 +1230,7 @@ tests:
     - label:
           "Send Test Command With Nested Struct List Argument and some fields b
           of arg1.d are false"
-      command: "testNestedStructListArgumentRequest"
+      command: "TestNestedStructListArgumentRequest"
       arguments:
           values:
               - name: "arg1"
@@ -1280,10 +1317,21 @@ tests:
                         h: 0.1,
                     }
 
+    - label: "Send MEI command in cluster"
+      command: "TestDifferentVendorMeiRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: 76
+      response:
+          values:
+              - name: "arg1"
+                value: 76
+
     # Tests for List
 
     - label: "Send Test Command With List of INT8U and none of them is set to 0"
-      command: "testListInt8UArgumentRequest"
+      command: "TestListInt8UArgumentRequest"
       arguments:
           values:
               - name: "arg1"
@@ -1294,7 +1342,7 @@ tests:
                 value: true
 
     - label: "Send Test Command With List of INT8U and one of them is set to 0"
-      command: "testListInt8UArgumentRequest"
+      command: "TestListInt8UArgumentRequest"
       arguments:
           values:
               - name: "arg1"
@@ -1305,7 +1353,7 @@ tests:
                 value: false
 
     - label: "Send Test Command With List of INT8U and get it reversed"
-      command: "testListInt8UReverseRequest"
+      command: "TestListInt8UReverseRequest"
       arguments:
           values:
               - name: "arg1"
@@ -1317,7 +1365,7 @@ tests:
 
     - label:
           "Send Test Command With empty List of INT8U and get an empty list back"
-      command: "testListInt8UReverseRequest"
+      command: "TestListInt8UReverseRequest"
       arguments:
           values:
               - name: "arg1"
@@ -1330,7 +1378,7 @@ tests:
     - label:
           "Send Test Command With List of Struct Argument and arg1.b of first
           item is true"
-      command: "testListStructArgumentRequest"
+      command: "TestListStructArgumentRequest"
       arguments:
           values:
               - name: "arg1"
@@ -1365,7 +1413,7 @@ tests:
     - label:
           "Send Test Command With List of Struct Argument and arg1.b of first
           item is false"
-      command: "testListStructArgumentRequest"
+      command: "TestListStructArgumentRequest"
       arguments:
           values:
               - name: "arg1"
@@ -1400,7 +1448,7 @@ tests:
     - label:
           "Send Test Command With List of Nested Struct List Argument and all
           fields b of elements of arg1.d are true"
-      command: "testListNestedStructListArgumentRequest"
+      command: "TestListNestedStructListArgumentRequest"
       arguments:
           values:
               - name: "arg1"
@@ -1461,7 +1509,7 @@ tests:
     - label:
           "Send Test Command With Nested Struct List Argument and some fields b
           of elements of arg1.d are false"
-      command: "testListNestedStructListArgumentRequest"
+      command: "TestListNestedStructListArgumentRequest"
       arguments:
           values:
               - name: "arg1"
@@ -1550,10 +1598,10 @@ tests:
       arguments:
           value:
               [
-                  { fabricIndex: 0, operationalCert: "Test0" },
-                  { fabricIndex: 1, operationalCert: "Test1" },
-                  { fabricIndex: 2, operationalCert: "Test2" },
-                  { fabricIndex: 3, operationalCert: "Test3" },
+                  { member1: 0, member2: "Test0" },
+                  { member1: 1, member2: "Test1" },
+                  { member1: 2, member2: "Test2" },
+                  { member1: 3, member2: "Test3" },
               ]
 
     - label: "Read attribute LIST With List of LIST_STRUCT_OCTET_STRING"
@@ -1562,16 +1610,16 @@ tests:
       response:
           value:
               [
-                  { fabricIndex: 0, operationalCert: "Test0" },
-                  { fabricIndex: 1, operationalCert: "Test1" },
-                  { fabricIndex: 2, operationalCert: "Test2" },
-                  { fabricIndex: 3, operationalCert: "Test3" },
+                  { member1: 0, member2: "Test0" },
+                  { member1: 1, member2: "Test1" },
+                  { member1: 2, member2: "Test2" },
+                  { member1: 3, member2: "Test3" },
               ]
 
     # Tests for Nullables and Optionals
 
     - label: "Send Test Command with optional arg set."
-      command: "testNullableOptionalRequest"
+      command: "TestNullableOptionalRequest"
       arguments:
           values:
               - name: "arg1"
@@ -1588,7 +1636,7 @@ tests:
                 value: 5
 
     - label: "Send Test Command without its optional arg."
-      command: "testNullableOptionalRequest"
+      command: "TestNullableOptionalRequest"
       response:
           values:
               - name: "wasPresent"
@@ -1652,6 +1700,7 @@ tests:
       command: "readAttribute"
       attribute: "nullable_boolean"
       response:
+          saveAs: booValueNull
           value: null
 
     - label: "Write attribute NULLABLE_BOOLEAN True"
@@ -1665,6 +1714,13 @@ tests:
       attribute: "nullable_boolean"
       response:
           value: true
+
+    - label: "Read attribute NULLABLE_BOOLEAN not null"
+      command: "readAttribute"
+      attribute: "nullable_boolean"
+      response:
+          constraints:
+              notValue: booValueNull
 
     # Tests for nullable Bitmap8 attribute
 
@@ -1692,6 +1748,7 @@ tests:
       command: "readAttribute"
       attribute: "nullable_bitmap8"
       response:
+          saveAs: nullableValue254
           value: 254
 
     - label: "Write attribute NULLABLE_BITMAP8 null Value"
@@ -1705,6 +1762,13 @@ tests:
       attribute: "nullable_bitmap8"
       response:
           value: null
+
+    - label: "Read attribute NULLABLE_BITMAP8 not 254 Value"
+      command: "readAttribute"
+      attribute: "nullable_bitmap8"
+      response:
+          constraints:
+              notValue: nullableValue254
 
     # Tests for nullable Bitmap16 attribute
 
@@ -2738,19 +2802,19 @@ tests:
       command: "writeAttribute"
       attribute: "nullable_enum_attr"
       arguments:
-          value: 254
+          value: 3
 
     - label: "Read attribute NULLABLE_SIMPLE_ENUM Max Value"
       command: "readAttribute"
       attribute: "nullable_enum_attr"
       response:
-          value: 254
+          value: 3
 
     - label: "Write attribute NULLABLE_SIMPLE_ENUM Invalid Value"
       command: "writeAttribute"
       attribute: "nullable_enum_attr"
       arguments:
-          value: 255
+          value: SimpleEnum.UnknownEnumValue(255)
       response:
           error: CONSTRAINT_ERROR
 
@@ -2758,7 +2822,8 @@ tests:
       command: "readAttribute"
       attribute: "nullable_enum_attr"
       response:
-          value: 254
+          saveAs: nullableEnumAttr3
+          value: 3
 
     - label: "Write attribute NULLABLE_SIMPLE_ENUM null Value"
       command: "writeAttribute"
@@ -2771,6 +2836,13 @@ tests:
       attribute: "nullable_enum_attr"
       response:
           value: null
+
+    - label: "Read attribute NULLABLE_SIMPLE_ENUM not 3 Value"
+      command: "readAttribute"
+      attribute: "nullable_enum_attr"
+      response:
+          constraints:
+              notValue: nullableEnumAttr3
 
     # Tests for Octet String attribute
 
@@ -2790,6 +2862,7 @@ tests:
       command: "readAttribute"
       attribute: "nullable_octet_string"
       response:
+          saveAs: nullableOctetStrTestValue
           value: "TestValue"
 
     - label: "Write attribute NULLABLE_OCTET_STRING"
@@ -2816,6 +2889,13 @@ tests:
       response:
           value: ""
 
+    - label: "Read attribute NULLABLE_OCTET_STRING not TestValue"
+      command: "readAttribute"
+      attribute: "nullable_octet_string"
+      response:
+          constraints:
+              notValue: nullableOctetStrTestValue
+
     # Tests for Char String attribute
 
     - label: "Read attribute NULLABLE_CHAR_STRING Default Value"
@@ -2834,7 +2914,14 @@ tests:
       command: "readAttribute"
       attribute: "nullable_char_string"
       response:
+          saveAs: nullableCharStringSave
           value: "☉T☉"
+
+    - label: "Read attribute NULLABLE_CHAR_STRING"
+      command: "readAttribute"
+      attribute: "nullable_char_string"
+      response:
+          value: nullableCharStringSave
 
     - label: "Write attribute NULLABLE_CHAR_STRING - Value too long"
       command: "writeAttribute"
@@ -2860,6 +2947,13 @@ tests:
       response:
           value: ""
 
+    - label: "Read attribute NULLABLE_CHAR_STRING not ☉T☉"
+      command: "readAttribute"
+      attribute: "nullable_char_string"
+      response:
+          constraints:
+              notValue: nullableCharStringSave
+
     - label: "Read attribute from nonexistent endpoint."
       endpoint: 200
       command: "readAttribute"
@@ -2879,7 +2973,7 @@ tests:
           "Send a command that takes an optional parameter but do not set it."
       command: "TestSimpleOptionalArgumentRequest"
       response:
-          error: INVALID_VALUE
+          error: CONSTRAINT_ERROR
 
     - label:
           "Send a command that takes an optional parameter but do not set it."
@@ -3767,18 +3861,59 @@ tests:
           # here yet.
           error: FAILURE
 
-    - label: "read AcceptedCommandList attribute"
+    - label: "Write different vendor MEI attribute"
+      command: "writeAttribute"
+      attribute: "mei_int8u"
+      arguments:
+          value: 201
+
+    - label: "Verify different vendor MEI attribute"
+      command: "readAttribute"
+      attribute: "mei_int8u"
+      response:
+          value: 201
+
+    - label: "Validate AcceptedCommandList attribute"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
           value:
-              [0, 1, 2, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 18, 19, 20, 21]
+              [
+                  0,
+                  1,
+                  2,
+                  4,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  4294049962,
+              ]
 
-    - label: "read GeneratedCommandList attribute"
+    - label: "Validate GeneratedCommandList attribute"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
-          value: [0, 1, 4, 5, 6, 9, 10, 11]
+          value: [0, 1, 4, 5, 6, 8, 9, 10, 11, 12, 4294049979]
+
+    - label: "Validate presence of MEI attribute"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              contains: [4294070017]
 
     # Struct-typed attribute
     - label: "Write struct-typed attribute"

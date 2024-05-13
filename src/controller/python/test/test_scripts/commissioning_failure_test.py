@@ -18,15 +18,14 @@
 #
 
 # Commissioning test.
+
 import os
 import sys
 from optparse import OptionParser
-from base import TestFail, TestTimeout, BaseTestHelper, FailIfNot, logger
-from cluster_objects import NODE_ID, ClusterObjectTests
-from network_commissioning import NetworkCommissioningTests
-import asyncio
 
-# The thread network dataset tlv for testing, splited into T-L-V.
+from base import BaseTestHelper, FailIfNot, TestFail, TestTimeout, logger
+
+# The thread network dataset tlv for testing, splitted into T-L-V.
 
 TEST_THREAD_NETWORK_DATASET_TLV = "0e080000000000010000" + \
     "000300000c" + \
@@ -97,7 +96,7 @@ def main():
 
     # TODO: Start at stage 2 once handling for arming failsafe on pase is done.
     if options.report:
-        for testFailureStage in range(3, 17):
+        for testFailureStage in range(3, 21):
             FailIfNot(test.TestPaseOnly(ip=options.deviceAddress1,
                                         setuppin=20202021,
                                         nodeid=1),
@@ -106,7 +105,7 @@ def main():
                       "Commissioning failure tests failed for simulated report failure on stage {}".format(testFailureStage))
 
     else:
-        for testFailureStage in range(3, 17):
+        for testFailureStage in range(3, 21):
             FailIfNot(test.TestPaseOnly(ip=options.deviceAddress1,
                                         setuppin=20202021,
                                         nodeid=1),

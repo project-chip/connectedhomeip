@@ -24,89 +24,99 @@ limitations under the License.
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <description>This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node.</description>
-    <!-- TODO: Add feature map once it is supported 
-    <tag name="WIRED" description="A wired power source"/>
-    <tag name="BAT" description="A battery powered source"/>
-    <tag name="RECHG" description="A rechargeable battery power source"/>
-    <tag name="REPLC" description="A replaceable battery power source"/>
-    -->
+
+    <features>
+      <feature bit="0" code="WIRED" name="Wired" summary="A wired power source">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="BAT" name="Battery" summary="A battery power source">
+        <optionalConform/>
+      </feature>
+      <feature bit="2" code="RECHG" name="Rechargeable" summary="A rechargeable battery power source">
+        <optionalConform>
+          <feature name="BAT"/>
+        </optionalConform>
+      </feature>
+      <feature bit="3" code="REPLC" name="Replaceable" summary="A replaceable battery power source">
+        <optionalConform>
+          <feature name="BAT"/>
+        </optionalConform>
+      </feature>
+    </features>
     
-    <attribute side="server" code="0x0000" define="POWER_SOURCE_STATUS" type="ENUM8"  min="0x00" max="0x03" writable="false">Status</attribute>
-    <attribute side="server" code="0x0001" define="POWER_SOURCE_ORDER" type="INT8U" min="0x00" max="0xFF" writable="false">Order</attribute>
-    <attribute side="server" code="0x0002" define="POWER_SOURCE_DESCRIPTION" type="CHAR_STRING" length="60" writable="false">Description</attribute>
-    <attribute side="server" code="0x0003" define="POWER_SOURCE_WIRED_ASSESSED_INPUT_VOLTAGE" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">WiredAssessedInputVoltage</attribute>
-    <attribute side="server" code="0x0004" define="POWER_SOURCE_WIRED_ASSESSED_INPUT_FREQUENCY" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="true">WiredAssessedInputFrequency</attribute>
-    <attribute side="server" code="0x0005" define="POWER_SOURCE_WIRED_CURRENT_TYPE" type="ENUM8" min="0x00" max="0x01" writable="false" optional="true">WiredCurrentType</attribute>
-    <attribute side="server" code="0x0006" define="POWER_SOURCE_WIRED_ASSESSED_CURRENT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">WiredAssessedCurrent</attribute>
-    <attribute side="server" code="0x0007" define="POWER_SOURCE_WIRED_NOMINAL_VOLTAGE" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">WiredNominalVoltage</attribute>
-    <attribute side="server" code="0x0008" define="POWER_SOURCE_WIRED_MAXIMUM_CURRENT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">WiredMaximumCurrent</attribute>
-    <attribute side="server" code="0x0009" define="POWER_SOURCE_WIRED_PRESENT" type="BOOLEAN" writable="false" optional="true">WiredPresent</attribute>
-    <attribute side="server" code="0x000A" define="POWER_SOURCE_ACTIVE_WIRED_FAULTS" type="ARRAY" entryType="ENUM8" length="8" writable="false" optional="true">ActiveWiredFaults</attribute>
-    <attribute side="server" code="0x000B" define="POWER_SOURCE_BAT_VOLTAGE" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">BatteryVoltage</attribute>
-    <attribute side="server" code="0x000C" define="POWER_SOURCE_BAT_PERCENT_REMAINING" type="INT8U" min="0x00" max="0xC8" writable="false" optional="true">BatteryPercentRemaining</attribute>
-    <attribute side="server" code="0x000D" define="POWER_SOURCE_BAT_TIME_REMAINING" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">BatteryTimeRemaining</attribute>
-    <attribute side="server" code="0x000E" define="POWER_SOURCE_BAT_CHARGE_LEVEL" type="ENUM8" min="0x00" max="0x02" writable="false" optional="true">BatteryChargeLevel</attribute>
-    <attribute side="server" code="0x000F" define="POWER_SOURCE_BAT_REPLACEMENT_NEEDED" type="BOOLEAN" writable="false" optional="true">BatteryReplacementNeeded</attribute>
-    <attribute side="server" code="0x0010" define="POWER_SOURCE_BAT_REPLACEABILITY" type="ENUM8" min="0x00" max="0x03" writable="false" optional="true">BatteryReplaceability</attribute>
-    <attribute side="server" code="0x0011" define="POWER_SOURCE_BAT_PRESENT" type="BOOLEAN" writable="false" optional="true">BatteryPresent</attribute>
-    <attribute side="server" code="0x0012" define="POWER_SOURCE_ACTIVE_BAT_FAULTS" type="ARRAY" entryType="ENUM8" length="8" writable="false" optional="true">ActiveBatteryFaults</attribute>
-    <attribute side="server" code="0x0013" define="POWER_SOURCE_BAT_REPLACEMENT_DESCRIPTION" type="CHAR_STRING" length="60" writable="false" optional="true">BatteryReplacementDescription</attribute>
-    <attribute side="server" code="0x0014" define="POWER_SOURCE_BAT_COMMON_DESIGNATION" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">BatteryCommonDesignation</attribute>
-    <attribute side="server" code="0x0015" define="POWER_SOURCE_BAT_ANSI_DESIGNATION" type="CHAR_STRING" length="20" writable="false" optional="true">BatteryANSIDesignation</attribute>
-    <attribute side="server" code="0x0016" define="POWER_SOURCE_BAT_IEC_DESIGNATION" type="CHAR_STRING" length="20" writable="false" optional="true">BatteryIECDesignation</attribute>
-    <attribute side="server" code="0x0017" define="POWER_SOURCE_BAT_APPROVED_CHEMISTRY" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">BatteryApprovedChemistry</attribute>
-    <attribute side="server" code="0x0018" define="POWER_SOURCE_BAT_CAPACITY" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">BatteryCapacity</attribute>
-    <attribute side="server" code="0x0019" define="POWER_SOURCE_BAT_QUANTITY" type="INT8U" min="0x00" max="0xC8" writable="false" optional="true">BatteryQuantity</attribute>
-    <attribute side="server" code="0x001A" define="POWER_SOURCE_BAT_CHARGE_STATE" type="ENUM8" min="0x00" max="0x03" writable="false" optional="true">BatteryChargeState</attribute>
-    <attribute side="server" code="0x001B" define="POWER_SOURCE_BAT_TIME_TO_FULL_CHARGE" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">BatteryTimeToFullCharge</attribute>
-    <attribute side="server" code="0x001C" define="POWER_SOURCE_BAT_FUNCTIONAL_WHILE_CHARGING" type="BOOLEAN" writable="false" optional="true">BatteryFunctionalWhileCharging</attribute>
-    <attribute side="server" code="0x001D" define="POWER_SOURCE_BAT_CHARGING_CURRENT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">BatteryChargingCurrent</attribute>
-    <attribute side="server" code="0x001E" define="POWER_SOURCE_ACTIVE_BAT_CHARGE_FAULTS" type="ARRAY" entryType="ENUM8" length="16" writable="false" optional="true">ActiveBatteryChargeFaults</attribute>
+    <attribute side="server" code="0x0000" define="POWER_SOURCE_STATUS" type="PowerSourceStatusEnum" writable="false">Status</attribute>
+    <attribute side="server" code="0x0001" define="POWER_SOURCE_ORDER" type="int8u" min="0x00" max="0xFF" writable="false">Order</attribute>
+    <attribute side="server" code="0x0002" define="POWER_SOURCE_DESCRIPTION" type="char_string" length="60" writable="false">Description</attribute>
 
-    <!-- TODO: Do events work?
-    <event code="0x0000" name="WiredFaultChange" priority="info" side="server">
+    <attribute side="server" code="0x0003" define="POWER_SOURCE_WIRED_ASSESSED_INPUT_VOLTAGE" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true" isNullable="true">WiredAssessedInputVoltage</attribute>
+    <attribute side="server" code="0x0004" define="POWER_SOURCE_WIRED_ASSESSED_INPUT_FREQUENCY" type="int16u" min="0x0000" max="0xFFFF" writable="false" optional="true" isNullable="true">WiredAssessedInputFrequency</attribute>
+    <attribute side="server" code="0x0005" define="POWER_SOURCE_WIRED_CURRENT_TYPE" type="WiredCurrentTypeEnum" writable="false" optional="true">WiredCurrentType</attribute>
+    <attribute side="server" code="0x0006" define="POWER_SOURCE_WIRED_ASSESSED_CURRENT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true" isNullable="true">WiredAssessedCurrent</attribute>
+    <attribute side="server" code="0x0007" define="POWER_SOURCE_WIRED_NOMINAL_VOLTAGE" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">WiredNominalVoltage</attribute>
+    <attribute side="server" code="0x0008" define="POWER_SOURCE_WIRED_MAXIMUM_CURRENT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">WiredMaximumCurrent</attribute>
+    <attribute side="server" code="0x0009" define="POWER_SOURCE_WIRED_PRESENT" type="boolean" writable="false" optional="true">WiredPresent</attribute>
+    <attribute side="server" code="0x000A" define="POWER_SOURCE_ACTIVE_WIRED_FAULTS" type="array" entryType="WiredFaultEnum" length="8" writable="false" optional="true">ActiveWiredFaults</attribute>
+
+    <attribute side="server" code="0x000B" define="POWER_SOURCE_BAT_VOLTAGE" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true" isNullable="true">BatVoltage</attribute>
+    <attribute side="server" code="0x000C" define="POWER_SOURCE_BAT_PERCENT_REMAINING" type="int8u" min="0x00" max="0xC8" writable="false" optional="true" isNullable="true">BatPercentRemaining</attribute>
+    <attribute side="server" code="0x000D" define="POWER_SOURCE_BAT_TIME_REMAINING" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true" isNullable="true">BatTimeRemaining</attribute>
+    <attribute side="server" code="0x000E" define="POWER_SOURCE_BAT_CHARGE_LEVEL" type="BatChargeLevelEnum" writable="false" optional="true">BatChargeLevel</attribute>
+    <attribute side="server" code="0x000F" define="POWER_SOURCE_BAT_REPLACEMENT_NEEDED" type="boolean" writable="false" optional="true">BatReplacementNeeded</attribute>
+    <attribute side="server" code="0x0010" define="POWER_SOURCE_BAT_REPLACEABILITY" type="BatReplaceabilityEnum" writable="false" optional="true">BatReplaceability</attribute>
+    <attribute side="server" code="0x0011" define="POWER_SOURCE_BAT_PRESENT" type="boolean" writable="false" optional="true">BatPresent</attribute>
+    <attribute side="server" code="0x0012" define="POWER_SOURCE_ACTIVE_BAT_FAULTS" type="array" entryType="BatFaultEnum" length="8" writable="false" optional="true">ActiveBatFaults</attribute>
+    <attribute side="server" code="0x0013" define="POWER_SOURCE_BAT_REPLACEMENT_DESCRIPTION" type="char_string" length="60" writable="false" optional="true">BatReplacementDescription</attribute>
+    <attribute side="server" code="0x0014" define="POWER_SOURCE_BAT_COMMON_DESIGNATION" type="BatCommonDesignationEnum" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">BatCommonDesignation</attribute>
+    <attribute side="server" code="0x0015" define="POWER_SOURCE_BAT_ANSI_DESIGNATION" type="char_string" length="20" writable="false" optional="true">BatANSIDesignation</attribute>
+    <attribute side="server" code="0x0016" define="POWER_SOURCE_BAT_IEC_DESIGNATION" type="char_string" length="20" writable="false" optional="true">BatIECDesignation</attribute>
+    <attribute side="server" code="0x0017" define="POWER_SOURCE_BAT_APPROVED_CHEMISTRY" type="BatApprovedChemistryEnum" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">BatApprovedChemistry</attribute>
+    <attribute side="server" code="0x0018" define="POWER_SOURCE_BAT_CAPACITY" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">BatCapacity</attribute>
+    <attribute side="server" code="0x0019" define="POWER_SOURCE_BAT_QUANTITY" type="int8u" min="0x00" max="0xFF" writable="false" optional="true">BatQuantity</attribute>
+    <attribute side="server" code="0x001A" define="POWER_SOURCE_BAT_CHARGE_STATE" type="BatChargeStateEnum" writable="false" optional="true">BatChargeState</attribute>
+    <attribute side="server" code="0x001B" define="POWER_SOURCE_BAT_TIME_TO_FULL_CHARGE" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true" isNullable="true">BatTimeToFullCharge</attribute>
+    <attribute side="server" code="0x001C" define="POWER_SOURCE_BAT_FUNCTIONAL_WHILE_CHARGING" type="boolean" writable="false" optional="true">BatFunctionalWhileCharging</attribute>
+    <attribute side="server" code="0x001D" define="POWER_SOURCE_BAT_CHARGING_CURRENT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true" isNullable="true">BatChargingCurrent</attribute>
+    <attribute side="server" code="0x001E" define="POWER_SOURCE_ACTIVE_BAT_CHARGE_FAULTS" type="array" entryType="BatChargeFaultEnum" length="16" writable="false" optional="true">ActiveBatChargeFaults</attribute>
+    <attribute side="server" code="0x001F" define="POWER_SOURCE_ENDPOINT_LIST" type="array" entryType="endpoint_no" writable="false">EndpointList</attribute>
+
+    <event code="0x0000" name="WiredFaultChange" priority="info" side="server" optional="true">
       <description>The WiredFaultChange Event SHALL indicate a change in the set of wired faults currently detected by the Node on this wired power source.</description>
-      <field id="1" name="WiredFaultChangeType" type="WiredFaultChangeType"/>
+      <field id="0" name="Current" type="WiredFaultEnum" array="true" length="8"/>
+      <field id="1" name="Previous" type="WiredFaultEnum" array="true" length="8"/>
     </event>
 
-    <event code="0x0001" name="BatFaultChange" priority="info" side="server">
+    <event code="0x0001" name="BatFaultChange" priority="info" side="server" optional="true">
       <description>The BatFaultChange Event SHALL indicate a change in the set of battery faults currently detected by the Node on this battery power source.</description>
-      <field id="1" name="BatFaultChangeType" type="BatFaultChangeType"/>
+      <field id="0" name="Current" type="BatFaultEnum" array="true" length="8"/>
+      <field id="1" name="Previous" type="BatFaultEnum" array="true" length="8"/>
     </event>
 
-    <event code="0x0002" name="BatChargeFaultChange" priority="info" side="server">
+    <event code="0x0002" name="BatChargeFaultChange" priority="info" side="server" optional="true">
       <description>The BatChargeFaultChange Event SHALL indicate a change in the set of charge faults currently detected by the Node on this battery power source.</description>
-      <field id="1" name="BatChargeFaultChangeType" type="BatChargeFaultChangeType"/>
+      <field id="0" name="Current" type="BatChargeFaultEnum" array="true" length="16"/>
+      <field id="1" name="Previous" type="BatChargeFaultEnum" array="true" length="16"/>
     </event>
-    -->
 
   </cluster>
 
-  <bitmap name="PowerSourceFeature" type="BITMAP32">
-    <cluster code="0x002F"/>
-    <field name="Wired" mask="0x1"/>
-    <field name="Battery" mask="0x2"/>
-    <field name="Rechargeable" mask="0x4"/>
-    <field name="Replaceable" mask="0x8"/>
-  </bitmap>
 
-  <enum name="WiredFaultType" type="ENUM8">
+  <enum name="WiredFaultEnum" type="enum8">
     <cluster code="0x002F"/>
-    <item name="Unspecfied" value="0x00"/>
+    <item name="Unspecified" value="0x00"/>
     <item name="OverVoltage" value="0x01"/>
     <item name="UnderVoltage" value="0x02"/>
   </enum>
 
-  <enum name="BatFaultType" type="ENUM8">
+  <enum name="BatFaultEnum" type="enum8">
     <cluster code="0x002F"/>
-    <item name="Unspecfied" value="0x00"/>
+    <item name="Unspecified" value="0x00"/>
     <item name="OverTemp" value="0x01"/>
     <item name="UnderTemp" value="0x02"/>
   </enum>
 
-  <enum name="BatChargeFaultType" type="ENUM8">
+  <enum name="BatChargeFaultEnum" type="enum8">
     <cluster code="0x002F"/>
-    <item name="Unspecfied" value="0x00"/>
+    <item name="Unspecified" value="0x00"/>
     <item name="AmbientTooHot" value="0x01"/>
     <item name="AmbientTooCold" value="0x02"/>
     <item name="BatteryTooHot" value="0x03"/>
@@ -119,28 +129,28 @@ limitations under the License.
     <item name="SafetyTimeout" value="0x0A"/>
   </enum>
 
-  <enum name="PowerSourceStatus" type="ENUM8">
+  <enum name="PowerSourceStatusEnum" type="enum8">
     <cluster code="0x002F"/>
-    <item name="Unspecfied" value="0x00"/>
+    <item name="Unspecified" value="0x00"/>
     <item name="Active" value="0x01"/>
     <item name="Standby" value="0x02"/>
     <item name="Unavailable" value="0x03"/>
   </enum>
 
-  <enum name="WiredCurrentType" type="ENUM8">
+  <enum name="WiredCurrentTypeEnum" type="enum8">
     <cluster code="0x002F"/>
     <item name="AC" value="0x00"/>
     <item name="DC" value="0x01"/>
   </enum>
 
-  <enum name="BatChargeLevel" type="ENUM8">
+  <enum name="BatChargeLevelEnum" type="enum8">
     <cluster code="0x002F"/>
-    <item name="Ok" value="0x00"/>
+    <item name="OK" value="0x00"/>
     <item name="Warning" value="0x01"/>
     <item name="Critical" value="0x02"/>
   </enum>
 
-  <enum name="BatReplaceability" type="ENUM8">
+  <enum name="BatReplaceabilityEnum" type="enum8">
     <cluster code="0x002F"/>
     <item name="Unspecified" value="0x00"/>
     <item name="NotReplaceable" value="0x01"/>
@@ -148,7 +158,7 @@ limitations under the License.
     <item name="FactoryReplaceable" value="0x03"/>
   </enum>
 
-  <enum name="BatChargeState" type="ENUM8">
+  <enum name="BatChargeStateEnum" type="enum8">
     <cluster code="0x002F"/>
     <item name="Unknown" value="0x00"/>
     <item name="IsCharging" value="0x01"/>
@@ -156,22 +166,146 @@ limitations under the License.
     <item name="IsNotCharging" value="0x03"/>
   </enum>
 
+  <enum name="BatCommonDesignationEnum" type="enum16">
+    <cluster code="0x002F"/>
+    <item name="Unspecified" value="0"/>
+    <item name="AAA" value="1"/>
+    <item name="AA" value="2"/>
+    <item name="C" value="3"/>
+    <item name="D" value="4"/>
+    <item name="4v5" value="5"/>
+    <item name="6v0" value="6"/>
+    <item name="9v0" value="7"/>
+    <item name="1_2AA" value="8"/>
+    <item name="AAAA" value="9"/>
+    <item name="A" value="10"/>
+    <item name="B" value="11"/>
+    <item name="F" value="12"/>
+    <item name="N" value="13"/>
+    <item name="No6" value="14"/>
+    <item name="SubC" value="15"/>
+    <item name="A23" value="16"/>
+    <item name="A27" value="17"/>
+    <item name="BA5800" value="18"/>
+    <item name="Duplex" value="19"/>
+    <item name="4SR44" value="20"/>
+    <item name="523" value="21"/>
+    <item name="531" value="22"/>
+    <item name="15v0" value="23"/>
+    <item name="22v5" value="24"/>
+    <item name="30v0" value="25"/>
+    <item name="45v0" value="26"/>
+    <item name="67v5" value="27"/>
+    <item name="J" value="28"/>
+    <item name="CR123A" value="29"/>
+    <item name="CR2" value="30"/>
+    <item name="2CR5" value="31"/>
+    <item name="CR_P2" value="32"/>
+    <item name="CR_V3" value="33"/>
+    <item name="SR41" value="34"/>
+    <item name="SR43" value="35"/>
+    <item name="SR44" value="36"/>
+    <item name="SR45" value="37"/>
+    <item name="SR48" value="38"/>
+    <item name="SR54" value="39"/>
+    <item name="SR55" value="40"/>
+    <item name="SR57" value="41"/>
+    <item name="SR58" value="42"/>
+    <item name="SR59" value="43"/>
+    <item name="SR60" value="44"/>
+    <item name="SR63" value="45"/>
+    <item name="SR64" value="46"/>
+    <item name="SR65" value="47"/>
+    <item name="SR66" value="48"/>
+    <item name="SR67" value="49"/>
+    <item name="SR68" value="50"/>
+    <item name="SR69" value="51"/>
+    <item name="SR516" value="52"/>
+    <item name="SR731" value="53"/>
+    <item name="SR712" value="54"/>
+    <item name="LR932" value="55"/>
+    <item name="A5" value="56"/>
+    <item name="A10" value="57"/>
+    <item name="A13" value="58"/>
+    <item name="A312" value="59"/>
+    <item name="A675" value="60"/>
+    <item name="AC41E" value="61"/>
+    <item name="10180" value="62"/>
+    <item name="10280" value="63"/>
+    <item name="10440" value="64"/>
+    <item name="14250" value="65"/>
+    <item name="14430" value="66"/>
+    <item name="14500" value="67"/>
+    <item name="14650" value="68"/>
+    <item name="15270" value="69"/>
+    <item name="16340" value="70"/>
+    <item name="RCR123A" value="71"/>
+    <item name="17500" value="72"/>
+    <item name="17670" value="73"/>
+    <item name="18350" value="74"/>
+    <item name="18500" value="75"/>
+    <item name="18650" value="76"/>
+    <item name="19670" value="77"/>
+    <item name="25500" value="78"/>
+    <item name="26650" value="79"/>
+    <item name="32600" value="80"/>
+  </enum>
+
+  <enum name="BatApprovedChemistryEnum" type="enum16">
+    <cluster code="0x002F"/>
+    <item name="Unspecified" value="0"/>
+    <item name="Alkaline" value="1"/>
+    <item name="LithiumCarbonFluoride" value="2"/>
+    <item name="LithiumChromiumOxide" value="3"/>
+    <item name="LithiumCopperOxide" value="4"/>
+    <item name="LithiumIronDisulfide" value="5"/>
+    <item name="LithiumManganeseDioxide" value="6"/>
+    <item name="LithiumThionylChloride" value="7"/>
+    <item name="Magnesium" value="8"/>
+    <item name="MercuryOxide" value="9"/>
+    <item name="NickelOxyhydride" value="10"/>
+    <item name="SilverOxide" value="11"/>
+    <item name="ZincAir" value="12"/>
+    <item name="ZincCarbon" value="13"/>
+    <item name="ZincChloride" value="14"/>
+    <item name="ZincManganeseDioxide" value="15"/>
+    <item name="LeadAcid" value="16"/>
+    <item name="LithiumCobaltOxide" value="17"/>
+    <item name="LithiumIon" value="18"/>
+    <item name="LithiumIonPolymer" value="19"/>
+    <item name="LithiumIronPhosphate" value="20"/>
+    <item name="LithiumSulfur" value="21"/>
+    <item name="LithiumTitanate" value="22"/>
+    <item name="NickelCadmium" value="23"/>
+    <item name="NickelHydrogen" value="24"/>
+    <item name="NickelIron" value="25"/>
+    <item name="NickelMetalHydride" value="26"/>
+    <item name="NickelZinc" value="27"/>
+    <item name="SilverZinc" value="28"/>
+    <item name="SodiumIon" value="29"/>
+    <item name="SodiumSulfur" value="30"/>
+    <item name="ZincBromide" value="31"/>
+    <item name="ZincCerium" value="32"/>
+  </enum>
+
+  <!-- TODO: These *ChangeType structs should just be removed, after a
+       brief deprecation period. -->
   <struct name="WiredFaultChangeType">
     <cluster code="0x002F"/>
-    <item name="current" type="WiredFaultType" array="true" length="8"/>
-    <item name="previous" type="WiredFaultType" array="true" length="8"/>
+    <item name="current" type="WiredFaultEnum" array="true" length="8"/>
+    <item name="previous" type="WiredFaultEnum" array="true" length="8"/>
   </struct>
 
   <struct name="BatFaultChangeType">
     <cluster code="0x002F"/>
-    <item name="current" type="BatFaultType" array="true" length="8"/>
-    <item name="previous" type="BatFaultType" array="true" length="8"/>
+    <item name="current" type="BatFaultEnum" array="true" length="8"/>
+    <item name="previous" type="BatFaultEnum" array="true" length="8"/>
   </struct>
 
   <struct name="BatChargeFaultChangeType">
     <cluster code="0x002F"/>
-    <item name="current" type="BatChargeFaultType" array="true" length="16"/>
-    <item name="previous" type="BatChargeFaultType" array="true" length="16"/>
+    <item name="current" type="BatChargeFaultEnum" array="true" length="16"/>
+    <item name="previous" type="BatChargeFaultEnum" array="true" length="16"/>
   </struct>
 
 </configurator>

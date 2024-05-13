@@ -1,8 +1,6 @@
-<p align="center">
-  <img src="https://raw.githubusercontent.com/ARMmbed/mbed-os/master/logo.png" alt="ARM Mbed-OS logo"/>
-</p>
+![ARM Mbed-OS logo](https://raw.githubusercontent.com/ARMmbed/mbed-os/master/logo.png)
 
-<h1> Matter Arm Mbed OS All Clusters Example Application </h1>
+# Matter Arm Mbed OS All Clusters Example Application
 
 The Arm Mbed OS All Clusters Example demonstrates device commissioning process
 and all available clusters control.
@@ -37,7 +35,7 @@ paired into an existing Matter network and can be controlled by this network.
 
 <hr>
 
-# Overview
+## Overview
 
 The Matter device that runs the All Clusters application is controlled by the
 Matter controller device over WiFi. By default, the Matter device is
@@ -45,12 +43,12 @@ disconnected, and it should be paired with Matter controller and get
 configuration from it. Actions required before establishing full communication
 are described below.
 
-## Bluetooth Low Energy advertising
+### Bluetooth Low Energy advertising
 
 To commission the device onto a Matter network, the device must be discoverable
 over BLE. The BLE advertising starts automatically after device boot-up.
 
-## Bluetooth Low Energy rendezvous
+### Bluetooth Low Energy rendezvous
 
 In Matter, the commissioning procedure (called rendezvous) is done over BLE
 between a Matter device and the Matter controller, where the controller has the
@@ -60,16 +58,16 @@ To start the rendezvous, the controller must get the commissioning information
 from the Matter device. The data payload is encoded within a QR code, printed to
 the UART console.
 
-## WiFi provisioning
+### WiFi provisioning
 
 The last part of the rendezvous procedure, provisioning involves sending the
 network credentials from the Matter controller to the Matter device. As a
 result, device is able to join the network and communicate with other devices in
 the network.
 
-# Run application
+## Run application
 
-## Environment setup
+### Environment setup
 
 Before building the example, check out the Matter repository and sync submodules
 using the following command:
@@ -97,7 +95,7 @@ its requirements.
 > devcontainer is the recommended way to interact with Arm Mbed-OS port of the
 > Matter Project.**
 >
-> **Please read this [README.md](../../..//docs/VSCODE_DEVELOPMENT.md) for more
+> **Please read this [README.md](../../../docs/VSCODE_DEVELOPMENT.md) for more
 > information about using VSCode in container.**
 
 To initialize the development environment, download all registered sub-modules
@@ -115,7 +113,7 @@ environment:
 $ source ./scripts/activate.sh
 ```
 
-## Building
+### Building
 
 The All Clusters application can be built in the same way as any other Matter
 example ported to the mbed-os platform.
@@ -133,7 +131,7 @@ ${MATTER_ROOT}/scripts/examples/mbed_example.sh -c=build -a=all-clusters-app -b=
 ```
 
 Both approaches are limited to supported evaluation boards which are listed in
-[Supported devices](#supported_devices) paragraph.
+[Supported devices](#supported-devices) paragraph.
 
 Mbed OS defines three building profiles: _develop, debug_ and _release_. For
 more details please visit
@@ -152,7 +150,7 @@ There are also three types of built application: _simple, boot_ and _upgrade_:
 When using the building script, it is possible expand the list of acceptable
 targets; this may be useful for rapid testing of a new mbed-targets.
 
-## Flashing
+### Flashing
 
 The All Clusters application can be flashed in the same way as any other Matter
 example ported to mbed-os platform.
@@ -185,7 +183,7 @@ device.
 It is possible to connect to an external gdb-server session by using a specific
 **'Flash Mbed examples [remote]'** task.
 
-## Debugging
+### Debugging
 
 Debugging can be performed in the same was as with any other Matter example
 ported to mbed-os platform.
@@ -201,50 +199,53 @@ Run and Debug (Ctrl+Shift+D) => Debug Mbed examples => Start Debugging (F5) => (
 It is possible to connect to an external gdb-server session by using specific
 **'Debug Mbed examples [remote]'** task.
 
-## Testing
+### Testing
 
-### Serial port terminal
+#### Serial port terminal
 
 The application traces are streaming to serial output. To start communication
 open a terminal session and connect to the serial port of the device. You can
 use **mbed-tools** for this purpose
 ([mbed-tools](https://github.com/ARMmbed/mbed-tools)):
 
+    ```
     mbed-tools sterm -p /dev/ttyACM0 -b 115200 -e off
+    ```
 
 After device reset these lines should be visible:
 
+    ```
     [INFO][CHIP]: [-]Mbed all-clusters-app example application start
     ...
     [INFO][CHIP]: [-]Mbed all-clusters-app example application run
+    ```
 
 The all-clusters-app application launched correctly and you can follow traces in
 the terminal.
 
-### CHIP Tools
+#### CHIP Tools
 
 Read the [MbedCommissioning](../../../docs/guides/mbedos_commissioning.md) to
 see how to use different CHIP tools to commission and control the application
 within a WiFi network.
 
-## Supported devices
+### Supported devices
 
-| Manufacturer                                          | Hardware platform                                                         | Build target          | Platform image                                                                                                                                                                 |       Status       | Platform components                                                                                                                                                                                                                                                           |
-| ----------------------------------------------------- | ------------------------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :----------------: | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Cypress<br> Semiconductor](https://www.cypress.com/) | [CY8CPROTO-062-4343W](https://os.mbed.com/platforms/CY8CPROTO-062-4343W/) | `CY8CPROTO_062_4343W` | <details><summary>CY8CPROTO-062-4343W</summary><img src="https://os.mbed.com/media/cache/platforms/p6_wifi-bt_proto.png.250x250_q85.jpg" alt="CY8CPROTO-062-4343W"/></details> | :heavy_check_mark: | <details><summary>LEDs</summary><ul><li>Board has only one usable LED (LED4) which corresponds to USER LED from UI.</li></ul></details> <details><summary>Buttons</summary><ul><li>Unused</li></ul></details> <details><summary>Slider</summary><ul><li>Unused</ul></details> |
+| Manufacturer                                          | Hardware platform                                                         | Build target          | Platform image                                                                                         | Status | Platform components                                                                                                                                                                                                                                                           |
+| ----------------------------------------------------- | ------------------------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------ | :----: | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Cypress<br> Semiconductor](https://www.cypress.com/) | [CY8CPROTO-062-4343W](https://os.mbed.com/platforms/CY8CPROTO-062-4343W/) | `CY8CPROTO_062_4343W` | ![CY8CPROTO-062-4343W](https://os.mbed.com/media/cache/platforms/p6_wifi-bt_proto.png.250x250_q85.jpg) |   ✔    | <details><summary>LEDs</summary><ul><li>Board has only one usable LED (LED4) which corresponds to USER LED from UI.</li></ul></details> <details><summary>Buttons</summary><ul><li>Unused</li></ul></details> <details><summary>Slider</summary><ul><li>Unused</ul></details> |
 
-#### Notes
+##### Notes
 
 -   More details and guidelines about porting new hardware into the Matter
     project with Mbed OS can be found in
     [MbedNewTarget](../../../docs/guides/mbedos_add_new_target.md)
 -   Some useful information about HW platform specific settings can be found in
-    `all-clusters-app/mbed/mbed_app.json`.  
-    Information about this file syntax and its meaning in mbed-os project can be
-    found here:
+    `all-clusters-app/mbed/mbed_app.json`. Information about this file syntax
+    and its meaning in mbed-os project can be found here:
     [Mbed-Os configuration system](https://os.mbed.com/docs/mbed-os/latest/program-setup/advanced-configuration.html))
 
-# Device UI
+## Device UI
 
 This section lists the User Interface elements that you can use to control and
 monitor the state of the device. These correspond to PCB components on the
@@ -267,9 +268,9 @@ following states are possible:
 -   _Solid On_ &mdash; The device is fully provisioned and has full network and
     service connectivity.
 
-### Notes
+#### Notes
 
 Some of the supported boards may not have sufficient number PCB components to
 follow above description. In that case please refer to
-[Supported devices](#Supported-devices) section and check board's 'Platform
-components' column for additional information about the limitation.
+[Supported devices](#supported-devices) section and check board's 'Platform
+components' column f-r additional information about the limitation.

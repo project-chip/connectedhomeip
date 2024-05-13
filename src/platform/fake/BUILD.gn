@@ -20,11 +20,13 @@ assert(chip_device_platform == "fake")
 
 static_library("fake") {
   sources = [
+    "../SingletonConfigurationManager.cpp",
     "CHIPDevicePlatformEvent.h",
     "ConfigurationManagerImpl.cpp",
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
+    "DeviceInstanceInfoProviderImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "DnssdImpl.cpp",

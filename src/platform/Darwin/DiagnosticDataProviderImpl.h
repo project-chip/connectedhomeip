@@ -38,7 +38,21 @@ public:
     // ===== Methods that implement the PlatformManager abstract interface.
     CHIP_ERROR GetUpTime(uint64_t & upTime) override;
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
+    CHIP_ERROR GetBootReason(BootReasonType & bootReason) override;
+
+    // ===== Methods that implement the DiagnosticDataProvider abstract interface.
+    bool SupportsWatermarks() override { return true; }
+    CHIP_ERROR ResetWatermarks() override;
+    CHIP_ERROR GetRebootCount(uint16_t & rebootCount) override;
 };
+
+/**
+ * Returns the platform-specific implementation of the DiagnosticDataProvider singleton object.
+ *
+ * Applications can use this to gain access to features of the DiagnosticDataProvider
+ * that are specific to the selected platform.
+ */
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl();
 
 } // namespace DeviceLayer
 } // namespace chip

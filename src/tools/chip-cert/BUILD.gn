@@ -26,6 +26,7 @@ executable("chip-cert") {
     "Cmd_GenAttCert.cpp",
     "Cmd_GenCD.cpp",
     "Cmd_GenCert.cpp",
+    "Cmd_PrintCD.cpp",
     "Cmd_PrintCert.cpp",
     "Cmd_ResignCert.cpp",
     "Cmd_ValidateAttCert.cpp",
@@ -36,7 +37,9 @@ executable("chip-cert") {
     "chip-cert.h",
   ]
 
-  public_configs = [ "${chip_root}/src/crypto:openssl_config" ]
+  if (chip_crypto == "openssl") {
+    public_configs = [ "${chip_root}/src/crypto:openssl_config" ]
+  }
 
   cflags = [ "-Wconversion" ]
 

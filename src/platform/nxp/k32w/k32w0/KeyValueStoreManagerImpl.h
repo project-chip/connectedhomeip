@@ -1,3 +1,4 @@
+
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
@@ -23,29 +24,44 @@
 
 #pragma once
 
+#include <platform/nxp/k32w/k32w0/RamStorage.h>
+
 namespace chip {
 namespace DeviceLayer {
 namespace PersistedStorage {
 
 class KeyValueStoreManagerImpl final : public KeyValueStoreManager
 {
+public:
+    /* Storage for KVS keys. Cleared during factory reset. */
+    static Internal::RamStorage sKeysStorage;
+    /* Storage for KVS values. Cleared during factory reset. */
+    static Internal::RamStorage sValuesStorage;
+    /* Storage for KVS subscription keys and values. Cleared during factory reset. */
+    static Internal::RamStorage sSubscriptionStorage;
+    /* Storage for KVS groups keys and values. Cleared during factory reset. */
+    static Internal::RamStorage sGroupsStorage;
+
     // Allow the KeyValueStoreManager interface class to delegate method calls to
     // the implementation methods provided by this class.
     friend class KeyValueStoreManager;
 
-public:
-    // NOTE: Currently this platform does not support partial and offset reads
-    //       these will return CHIP_ERROR_NOT_IMPLEMENTED.
+    static CHIP_ERROR Init();
+    static void FactoryResetStorage();
+
     CHIP_ERROR _Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size, size_t offset);
-
     CHIP_ERROR _Delete(const char * key);
-
     CHIP_ERROR _Put(const char * key, const void * value, size_t value_size);
 
 private:
     // ===== Members for internal use by the following friends.
     friend KeyValueStoreManager & KeyValueStoreMgr();
     friend KeyValueStoreManagerImpl & KeyValueStoreMgrImpl();
+
+    // Reading config values uses the K32WConfig API, which returns CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND
+    // error if a key was not found. Convert this error to the correct error KeyValueStoreManagerImpl
+    // should return: CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND
+    void ConvertError(CHIP_ERROR & err);
 
     static KeyValueStoreManagerImpl sInstance;
 };

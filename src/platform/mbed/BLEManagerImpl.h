@@ -23,7 +23,11 @@
 
 #pragma once
 
+#include <platform/CHIPDeviceConfig.h>
+
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+
+#include <ble/Ble.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -46,9 +50,7 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init(void);
-    CHIP_ERROR _Shutdown() { return CHIP_NO_ERROR; }
-    CHIPoBLEServiceMode _GetCHIPoBLEServiceMode(void);
-    CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
+    void _Shutdown() {}
     bool _IsAdvertisingEnabled(void);
     CHIP_ERROR _SetAdvertisingMode(BLEAdvertisingMode mode);
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
@@ -149,11 +151,6 @@ inline BLEManagerImpl & BLEMgrImpl(void)
 inline BleLayer * BLEManagerImpl::_GetBleLayer()
 {
     return this;
-}
-
-inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(void)
-{
-    return mServiceMode;
 }
 
 inline bool BLEManagerImpl::_IsAdvertisingEnabled(void)

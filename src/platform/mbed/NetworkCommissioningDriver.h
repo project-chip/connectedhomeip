@@ -29,9 +29,9 @@ namespace NetworkCommissioning {
 #include <netsocket/WiFiInterface.h>
 
 namespace {
-constexpr uint8_t kMaxWiFiNetworks                  = 1;
-constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
-constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
+inline constexpr uint8_t kMaxWiFiNetworks                  = 1;
+inline constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
+inline constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
 } // namespace
 
 class MbedScanResponseIterator : public Iterator<WiFiScanResponse>
@@ -47,8 +47,9 @@ public:
         }
 
         item.security.SetRaw(mScanResults[mIternum].get_security());
-        item.ssidLen  = strnlen(reinterpret_cast<const char *>(mScanResults[mIternum].get_ssid()),
-                               chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
+        static_assert(chip::DeviceLayer::Internal::kMaxWiFiSSIDLength <= UINT8_MAX, "Our length won't fit in ssidLen");
+        item.ssidLen  = static_cast<uint8_t>(strnlen(reinterpret_cast<const char *>(mScanResults[mIternum].get_ssid()),
+                                                     chip::DeviceLayer::Internal::kMaxWiFiSSIDLength));
         item.channel  = mScanResults[mIternum].get_channel();
         item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
         item.rssi     = mScanResults[mIternum].get_rssi();
@@ -94,7 +95,7 @@ public:
     // BaseDriver
     NetworkIterator * GetNetworks() override { return new WiFiNetworkIterator(this); }
     CHIP_ERROR Init(NetworkStatusChangeCallback * networkStatusChangeCallback) override;
-    CHIP_ERROR Shutdown() override;
+    void Shutdown() override;
 
     // WirelessDriver
     uint8_t GetMaxNetworks() override { return kMaxWiFiNetworks; }
@@ -113,6 +114,11 @@ public:
     Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
                               uint8_t & outNetworkIndex) override;
     void ScanNetworks(ByteSpan ssid, ScanCallback * callback) override;
+
+    CHIP_ERROR SetLastDisconnectReason(const ChipDeviceEvent * event);
+    int32_t GetLastDisconnectReason();
+
+    void OnNetworkStatusChange();
 
     static WiFiDriverImpl & GetInstance()
     {
@@ -138,7 +144,6 @@ private:
 
     chip::DeviceLayer::Internal::WiFiAuthSecurityType NsapiToNetworkSecurity(nsapi_security_t nsapi_security);
 
-    WiFiNetworkIterator mWiFiIterator = WiFiNetworkIterator(this);
     WiFiNetwork mSavedNetwork;
     WiFiNetwork mStagingNetwork;
     ScanCallback * mScanCallback;
@@ -150,6 +155,9 @@ private:
     nsapi_security_t mSecurityType = NSAPI_SECURITY_NONE;
     Inet::IPAddress mIp4Address    = Inet::IPAddress::Any;
     Inet::IPAddress mIp6Address    = Inet::IPAddress::Any;
+
+    NetworkStatusChangeCallback * mStatusChangeCallback = nullptr;
+    int32_t mLastDisconnectedReason;
 };
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 } // namespace NetworkCommissioning

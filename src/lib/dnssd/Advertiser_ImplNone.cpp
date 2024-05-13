@@ -32,6 +32,8 @@ public:
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
+    bool IsInitialized() override { return false; }
+
     void Shutdown() override {}
 
     CHIP_ERROR RemoveServices() override
@@ -58,9 +60,15 @@ public:
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
-    CHIP_ERROR GetCommissionableInstanceName(char * instanceName, size_t maxLength) override
+    CHIP_ERROR GetCommissionableInstanceName(char * instanceName, size_t maxLength) const override
     {
         ChipLogError(Discovery, "DNS-SD advertising not available. DNS-SD GetCommissionableInstanceName not available.");
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    CHIP_ERROR UpdateCommissionableInstanceName() override
+    {
+        ChipLogError(Discovery, "DNS-SD advertising not available. Can't update DNS-SD commissionable instance name.");
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 };
@@ -69,10 +77,14 @@ NoneAdvertiser gAdvertiser;
 
 } // namespace
 
-ServiceAdvertiser & ServiceAdvertiser::Instance()
+#if CHIP_DNSSD_DEFAULT_NONE
+
+ServiceAdvertiser & GetDefaultAdvertiser()
 {
     return gAdvertiser;
 }
+
+#endif // CHIP_DNSSD_DEFAULT_NONE
 
 } // namespace Dnssd
 } // namespace chip

@@ -37,9 +37,13 @@ public:
 
     // ===== Methods that implement the PlatformManager abstract interface.
 
+    bool SupportsWatermarks() override { return true; }
     CHIP_ERROR GetCurrentHeapFree(uint64_t & currentHeapFree) override;
     CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed) override;
     CHIP_ERROR GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark) override;
+    CHIP_ERROR ResetWatermarks() override;
+    CHIP_ERROR GetThreadMetrics(ThreadMetrics ** threadMetricsOut) override;
+    void ReleaseThreadMetrics(ThreadMetrics * threadMetrics) override;
 
     CHIP_ERROR GetRebootCount(uint16_t & rebootCount) override;
     CHIP_ERROR GetUpTime(uint64_t & upTime) override;
@@ -50,9 +54,9 @@ public:
     void ReleaseNetworkInterfaces(NetworkInterface * netifp) override;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    CHIP_ERROR GetWiFiBssId(ByteSpan & BssId) override;
-    CHIP_ERROR GetWiFiSecurityType(uint8_t & securityType) override;
-    CHIP_ERROR GetWiFiVersion(uint8_t & wifiVersion) override;
+    CHIP_ERROR GetWiFiBssId(MutableByteSpan & BssId) override;
+    CHIP_ERROR GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType) override;
+    CHIP_ERROR GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wifiVersion) override;
     CHIP_ERROR GetWiFiChannelNumber(uint16_t & channelNumber) override;
     CHIP_ERROR GetWiFiRssi(int8_t & rssi) override;
     CHIP_ERROR GetWiFiBeaconLostCount(uint32_t & beaconLostCount) override;
@@ -65,6 +69,14 @@ public:
     CHIP_ERROR ResetWiFiNetworkDiagnosticsCounts() override;
 #endif
 };
+
+/**
+ * Returns the platform-specific implementation of the DiagnosticDataProvider singleton object.
+ *
+ * Applications can use this to gain access to features of the DiagnosticDataProvider
+ * that are specific to the selected platform.
+ */
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl();
 
 } // namespace DeviceLayer
 } // namespace chip

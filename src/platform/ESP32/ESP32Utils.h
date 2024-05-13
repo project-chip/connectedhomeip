@@ -46,10 +46,15 @@ public:
     static CHIP_ERROR GetWiFiStationProvision(Internal::DeviceNetworkInfo & netInfo, bool includeCredentials);
     static CHIP_ERROR SetWiFiStationProvision(const Internal::DeviceNetworkInfo & netInfo);
     static CHIP_ERROR ClearWiFiStationProvision(void);
+    static CHIP_ERROR InitWiFiStack(void);
 
     static CHIP_ERROR MapError(esp_err_t error);
     static void RegisterESP32ErrorFormatter();
     static bool FormatError(char * buf, uint16_t bufSize, CHIP_ERROR err);
+
+    static constexpr char kDefaultWiFiStationNetifKey[] = "WIFI_STA_DEF";
+    static constexpr char kDefaultWiFiAPNetifKey[]      = "WIFI_AP_DEF";
+    static constexpr char kDefaultEthernetNetifKey[]    = "ETH_DEF";
 };
 
 #define ReturnMappedErrorOnFailure(expr)                                                                                           \

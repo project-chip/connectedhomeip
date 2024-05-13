@@ -25,8 +25,8 @@ import org.json.JSONObject;
 public final class AttributeState {
   private static final String TAG = "AttributeState";
 
-  private Object valueObject;
-  private byte[] tlv;
+  private final Object valueObject;
+  private final byte[] tlv;
   private JSONObject json;
 
   public AttributeState(Object valueObject, byte[] tlv, String jsonString) {

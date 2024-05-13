@@ -29,25 +29,25 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include <gtest/gtest.h>
+
 #include <lib/support/TimeUtils.h>
-#include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 
-static void Abort()
-{
-    abort();
-}
-
-void TestAssert(bool assert, const char * msg)
-{
-    if (!assert)
-    {
-        printf("%s\n", msg);
-        Abort();
-    }
-}
+#define TestAssert(cond, message)                                                                                                  \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (!(cond))                                                                                                               \
+        {                                                                                                                          \
+            ChipLogError(NotSpecified, "%s", (message));                                                                           \
+        }                                                                                                                          \
+        EXPECT_TRUE((cond));                                                                                                       \
+                                                                                                                                   \
+        if (!(cond))                                                                                                               \
+            return;                                                                                                                \
+    } while (0)
 
 struct OrdinalDateTestValue
 {
@@ -799,7 +799,7 @@ OrdinalDateTestValue LeapYearOrdinalDates[] =
 };
 // clang-format on
 
-void TestOrdinalDateConversion()
+TEST(TestTimeUtils, TestOrdinalDateConversion)
 {
     for (uint16_t year = 0; year <= 10000; year++)
     {
@@ -822,7 +822,7 @@ void TestOrdinalDateConversion()
     }
 }
 
-void TestDaysSinceEpochConversion()
+TEST(TestTimeUtils, TestDaysSinceEpochConversion)
 {
     uint32_t daysSinceEpoch = 0;
 
@@ -869,7 +869,7 @@ void TestDaysSinceEpochConversion()
     }
 }
 
-void TestSecondsSinceEpochConversion()
+TEST(TestTimeUtils, TestSecondsSinceEpochConversion)
 {
     uint32_t daysSinceEpoch = 0;
     uint32_t timeOfDay      = 0; // in seconds
@@ -948,7 +948,7 @@ void TestSecondsSinceEpochConversion()
     }
 }
 
-void TestChipEpochTimeConversion()
+TEST(TestTimeUtils, TestChipEpochTimeConversion)
 {
     uint32_t daysSinceEpoch = 0;
     uint32_t timeOfDay      = 0; // in seconds
@@ -1021,16 +1021,22 @@ void TestChipEpochTimeConversion()
     }
 }
 
-int TestTimeUtils(void)
+TEST(TestTimeUtils, TestChipEpochTimeEdgeConditions)
 {
-    TestOrdinalDateConversion();
-    TestDaysSinceEpochConversion();
-    TestSecondsSinceEpochConversion();
-    TestChipEpochTimeConversion();
+    uint32_t chip_epoch_time_sec = 0;
 
-    printf("All tests passed\n");
+    EXPECT_TRUE(UnixEpochToChipEpochTime(UINT32_MAX, chip_epoch_time_sec));
+    EXPECT_LT(chip_epoch_time_sec, UINT32_MAX);
 
-    return (0);
+    // TODO(#30990): Bring back tests when implementation fixed.
+#if 0
+    constexpr uint32_t kUnix2000Jan1 = 946702800; // Start of CHIP epoch.
+
+    chip_epoch_time_sec = UINT32_MAX;
+    EXPECT_EQ(UnixEpochToChipEpochTime(kUnix2000Jan1, chip_epoch_time_sec), true);
+    EXPECT_EQ(chip_epoch_time_sec, 0u);
+
+    chip_epoch_time_sec = 0;
+    EXPECT_EQ(UnixEpochToChipEpochTime(kUnix2000Jan1 - 1, chip_epoch_time_sec), false);
+#endif
 }
-
-CHIP_REGISTER_TEST_SUITE(TestTimeUtils);

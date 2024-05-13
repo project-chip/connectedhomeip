@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,32 +16,31 @@
  *    limitations under the License.
  */
 
-#include <lib/shell/Engine.h>
-
-#include <lib/core/CHIPCore.h>
-#include <lib/support/Base64.h>
-#include <lib/support/CHIPArgParser.hpp>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
+#include <AppMain.h>
 
 #include <ChipShellCollection.h>
-#include <lib/support/CHIPMem.h>
-#include <platform/CHIPDeviceLayer.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app/ConcreteAttributePath.h>
+#include <lib/shell/Engine.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 using namespace chip::Shell;
+using namespace chip::app;
+using namespace chip::app::Clusters;
 
-int main()
+void ApplicationInit() {}
+
+void ApplicationShutdown() {}
+
+int main(int argc, char * argv[])
 {
-    chip::Platform::MemoryInit();
-    chip::DeviceLayer::PlatformMgr().InitChipStack();
-    chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    chip::DeviceLayer::ConnectivityManagerImpl().StartWiFiManagement();
-#endif
+    if (ChipLinuxAppInit(argc, argv) != 0)
+    {
+        return -1;
+    }
 
     const int rc = Engine::Root().Init();
-
     if (rc != 0)
     {
         ChipLogError(Shell, "Streamer initialization failed: %d", rc);
@@ -49,12 +49,11 @@ int main()
 
     cmd_misc_init();
     cmd_otcli_init();
-    cmd_ping_init();
-    cmd_send_init();
 #if CHIP_SHELL_ENABLE_CMD_SERVER
     cmd_app_server_init();
 #endif
 
-    Engine::Root().RunMainLoop();
+    ChipLinuxAppMainLoop();
+
     return 0;
 }

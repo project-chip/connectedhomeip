@@ -11,27 +11,36 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 31.1.1. [TC-SU-1.1] Invoke AnnounceOTAProvider from an admin(DUT) to OTA-R
+name: 3.1.1.  [TC-SU-1.1] Invoke AnnounceOTAProvider from Admin(DUT) to OTA-R
+
+PICS:
+    - MCORE.ACL.Administrator
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:
-    - label: "Commission OTA-P/TH2 to DUT/same fabric as in test setup."
+    - label: "Step 1: Commission OTA-P/TH2 to DUT/same fabric as in test setup."
+      PICS: OTAR.C.M.AnnounceOTAProvider
       verification: |
-          chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
 
-          where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
 
-          Verify on the OTA Requestor logs:
+          Verify OTA Requestor receives AnnounceOTAProvider command with following mandatory fields
+             - ProviderNodeID of the OTA-P/TH2 on the accessing fabric.
+             - Vendor Id of the node invoking this command. Should be same as it appears in the Node’s Basic Information Cluster.
+             - AnnouncementReason - Should be SimpleAnnouncement.
+             - Endpoint number of the OTA-P/TH2 on the ProviderNodeID.
 
-          [1645743053311] [97809:20280821] CHIP: [SWU] OTA Requestor received AnnounceOTAProvider
-          [1645743053311] [97809:20280821] CHIP: [SWU]   FabricIndex: 1
-          [1645743053311] [97809:20280821] CHIP: [SWU]   ProviderNodeID: 0x0000000000000001
-          [1645743053311] [97809:20280821] CHIP: [SWU]   VendorID: 0x0
-          [1645743053311] [97809:20280821] CHIP: [SWU]   AnnouncementReason: 0
-          [1645743053311] [97809:20280821] CHIP: [SWU]   Endpoint: 0
+          [1673952476.703960][30227:30227] CHIP:SWU: OTA Requestor received AnnounceOTAProvider
+          [1673952476.703992][30227:30227] CHIP:SWU:   FabricIndex: 1
+          [1673952476.704021][30227:30227] CHIP:SWU:   ProviderNodeID: 0x000000000000007B
+          [1673952476.704050][30227:30227] CHIP:SWU:   VendorID: 0x0
+          [1673952476.704078][30227:30227] CHIP:SWU:   AnnouncementReason: 0
+          [1673952476.704106][30227:30227] CHIP:SWU:   Endpoint: 0
       disabled: true

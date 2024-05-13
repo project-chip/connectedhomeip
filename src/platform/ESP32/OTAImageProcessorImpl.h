@@ -23,6 +23,10 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OTAImageProcessor.h>
 
+#if CONFIG_ENABLE_ENCRYPTED_OTA
+#include <esp_encrypted_img.h>
+#endif // CONFIG_ENABLE_ENCRYPTED_OTA
+
 namespace chip {
 
 class OTAImageProcessorImpl : public OTAImageProcessorInterface
@@ -35,8 +39,15 @@ public:
     CHIP_ERROR Abort() override;
     CHIP_ERROR ProcessBlock(ByteSpan & block) override;
     void SetOTADownloader(OTADownloader * downloader) { mDownloader = downloader; };
-    bool IsFirstImageRun() override { return false; }
-    CHIP_ERROR ConfirmCurrentImage() override { return CHIP_NO_ERROR; }
+    bool IsFirstImageRun() override;
+    CHIP_ERROR ConfirmCurrentImage() override;
+
+#if CONFIG_ENABLE_ENCRYPTED_OTA
+    // @brief This API initializes the handling of encrypted OTA image
+    // @param key null terminated RSA-3072 key in PEM format
+    // @return CHIP_NO_ERROR on success, appropriate error code otherwise
+    CHIP_ERROR InitEncryptedOTA(const CharSpan & key);
+#endif // CONFIG_ENABLE_ENCRYPTED_OTA
 
 private:
     static void HandlePrepareDownload(intptr_t context);
@@ -54,6 +65,21 @@ private:
     const esp_partition_t * mOTAUpdatePartition = nullptr;
     esp_ota_handle_t mOTAUpdateHandle;
     OTAImageHeaderParser mHeaderParser;
+
+#if CONFIG_ENABLE_ENCRYPTED_OTA
+    CHIP_ERROR DecryptStart();
+    CHIP_ERROR DecryptEnd();
+    void DecryptAbort();
+
+    // This API decrypts the blockToDecrypt, dynamically allocates the memory for storing the
+    // plain text, and return that in decryptedBlock.
+    // Caller shall free the memory after use by calling free() on decryptedBlock.data()
+    CHIP_ERROR DecryptBlock(const ByteSpan & blockToDecrypt, ByteSpan & decryptedBlock);
+
+    CharSpan mKey;
+    bool mEncryptedOTAEnabled                 = false;
+    esp_decrypt_handle_t mOTADecryptionHandle = nullptr;
+#endif // CONFIG_ENABLE_ENCRYPTED_OTA
 };
 
 } // namespace chip

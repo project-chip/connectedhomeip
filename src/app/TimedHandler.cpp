@@ -17,10 +17,10 @@
  */
 
 #include "TimedHandler.h"
-#include <app/InteractionModelEngine.h>
+#include <app/InteractionModelTimeout.h>
 #include <app/MessageDef/TimedRequestMessage.h>
 #include <app/StatusResponse.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemClock.h>
 #include <system/TLVPacketBufferBackingStore.h>
@@ -74,19 +74,17 @@ CHIP_ERROR TimedHandler::OnMessageReceived(Messaging::ExchangeContext * aExchang
 
         if (aPayloadHeader.HasMessageType(MsgType::InvokeCommandRequest))
         {
-            auto * imEngine = InteractionModelEngine::GetInstance();
             ChipLogDetail(DataManagement, "Handing timed invoke to IM engine: handler %p exchange " ChipLogFormatExchange, this,
                           ChipLogValueExchange(aExchangeContext));
-            imEngine->OnTimedInvoke(this, aExchangeContext, aPayloadHeader, std::move(aPayload));
+            mDelegate->OnTimedInvoke(this, aExchangeContext, aPayloadHeader, std::move(aPayload));
             return CHIP_NO_ERROR;
         }
 
         if (aPayloadHeader.HasMessageType(MsgType::WriteRequest))
         {
-            auto * imEngine = InteractionModelEngine::GetInstance();
             ChipLogDetail(DataManagement, "Handing timed write to IM engine: handler %p exchange " ChipLogFormatExchange, this,
                           ChipLogValueExchange(aExchangeContext));
-            imEngine->OnTimedWrite(this, aExchangeContext, aPayloadHeader, std::move(aPayload));
+            mDelegate->OnTimedWrite(this, aExchangeContext, aPayloadHeader, std::move(aPayload));
             return CHIP_NO_ERROR;
         }
     }
@@ -101,7 +99,7 @@ CHIP_ERROR TimedHandler::OnMessageReceived(Messaging::ExchangeContext * aExchang
 
 void TimedHandler::OnExchangeClosing(Messaging::ExchangeContext *)
 {
-    InteractionModelEngine::GetInstance()->OnTimedInteractionFailed(this);
+    mDelegate->OnTimedInteractionFailed(this);
 }
 
 CHIP_ERROR TimedHandler::HandleTimedRequestAction(Messaging::ExchangeContext * aExchangeContext,
@@ -114,23 +112,24 @@ CHIP_ERROR TimedHandler::HandleTimedRequestAction(Messaging::ExchangeContext * a
     TimedRequestMessage::Parser parser;
     ReturnErrorOnFailure(parser.Init(reader));
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    ReturnErrorOnFailure(parser.CheckSchemaValidity());
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+    parser.PrettyPrint();
 #endif
 
     uint16_t timeoutMs;
     ReturnErrorOnFailure(parser.GetTimeoutMs(&timeoutMs));
     ReturnErrorOnFailure(parser.ExitContainer());
 
-    ChipLogDetail(DataManagement, "Got Timed Request with timeout %" PRIu16 ": handler %p exchange " ChipLogFormatExchange,
-                  timeoutMs, this, ChipLogValueExchange(aExchangeContext));
+    ChipLogDetail(DataManagement, "Got Timed Request with timeout %u: handler %p exchange " ChipLogFormatExchange, timeoutMs, this,
+                  ChipLogValueExchange(aExchangeContext));
     // Use at least our default IM timeout, because if we close our exchange as
     // soon as we know the delay has passed we won't be able to send the
     // UNSUPPORTED_ACCESS status code the spec tells us to send (and in fact
     // will send nothing and the other side will have to time out to realize
     // it's missed its window).
     auto delay = System::Clock::Milliseconds32(timeoutMs);
-    aExchangeContext->SetResponseTimeout(std::max(delay, kImMessageTimeout));
+    aExchangeContext->SetResponseTimeout(
+        std::max(delay, aExchangeContext->GetSessionHandle()->ComputeRoundTripTimeout(app::kExpectedIMProcessingTime)));
     ReturnErrorOnFailure(StatusResponse::Send(Status::Success, aExchangeContext, /* aExpectResponse = */ true));
 
     // Now just wait for the client.

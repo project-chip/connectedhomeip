@@ -1,38 +1,35 @@
-{{~#*inline "maybeCheckClusterError"}}
-{{#if response.clusterError}}
-    VerifyOrReturn(CheckValue("clusterStatus", status.mClusterStatus.HasValue(), true));
-    VerifyOrReturn(CheckValue("clusterStatus", status.mClusterStatus.Value(), {{response.clusterError}}));
+{{#if expectMultipleResponses}}
+switch(mTestSubStepIndex)
+{
 {{/if}}
-{{/inline~}}
-
+{{#chip_tests_item_responses}}
 {{~#*inline "maybeContinueWithoutWaitingOnDone"}}
     {{~#if isWaitForReport}}shouldContinue = true;{{/if~}}
     {{~#if (isTestOnlyCluster cluster)}}shouldContinue = true;{{/if~}}
 {{/inline~}}
 
-{{~#*inline "maybeReturnOnUnsupported"}}
-{{~#if optional}}
-    if (IsUnsupported(status.mStatus))
-    {
-        {{>maybeContinueWithoutWaitingOnDone}}
-        return;
-    }
-{{/if~}}
+{{~#*inline "maybeCheckClusterError"}}
+{{#if clusterError}}
+    VerifyOrReturn(CheckValue("clusterStatus", status.mClusterStatus.HasValue(), true));
+    VerifyOrReturn(CheckValue("clusterStatus", status.mClusterStatus.Value(), {{clusterError}}));
+{{/if}}
 {{/inline~}}
 
 {{! --- Test Step Response Content --}}
-{{#if response.error}}
-    VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), {{response.error}}));
+{{#if ../expectMultipleResponses}}
+  case {{index}}:
+{{/if}}
+{{#if error}}
+    VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), {{error}}));
     {{>maybeCheckClusterError}}
 {{else}}
-    {{>maybeReturnOnUnsupported}}
-    VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), {{response.error}}));
+    VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), {{error}}));
     {{#if hasSpecificResponse}}
     {
         {{asDecodableType}} value;
         VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
         {{#chip_tests_item_response_parameters}}
-            {{>maybeCheckExpectedValue}}
+            {{>maybeCheckExpectedValue cluster=../cluster}}
             {{>maybeCheckExpectedConstraints}}
             {{>maybeSaveAs}}
         {{/chip_tests_item_response_parameters}}
@@ -40,3 +37,14 @@
     {{/if}}
 {{/if}}
 {{>maybeContinueWithoutWaitingOnDone}}
+{{#if ../expectMultipleResponses}}
+  mTestSubStepIndex++;
+  break;
+{{/if}}
+{{/chip_tests_item_responses}}
+{{#if expectMultipleResponses}}
+  default:
+    LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+    break;
+}
+{{/if}}

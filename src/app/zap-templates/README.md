@@ -8,6 +8,10 @@ This directory contains generation templates for ZAP, ZCL Advanced Platform.
 
 ### How to configure an application
 
+Before running ZAP, you need to have [npm](https://www.npmjs.com/) installed.
+The best way is to simply download latest install of
+[node](https://nodejs.org/en/download/) and you will get npm.
+
 Run ZAP with UI to configure endpoints and clusters
 
 ```
@@ -19,6 +23,8 @@ or
 ```
 ./scripts/tools/zap/run_zaptool.sh <path to *.zap file>
 ```
+
+## Generating Files
 
 ### How to generate files for all applications
 
@@ -49,6 +55,16 @@ the command is:
 
 ```
 ./scripts/tools/zap/generate.py examples/lighting-app/lighting-common/lighting-app.zap -o zzz_generated/lighting-app/zap-generated
+```
+
+### Note
+
+If you are encountering issues while generating zap files, try running the
+following commands
+
+```
+source ./scripts/activate.sh
+./scripts/tools/zap/run_zaptool.sh
 ```
 
 ### How to generate files for a single application using custom templates

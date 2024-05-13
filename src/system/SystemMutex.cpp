@@ -25,6 +25,8 @@
 // Include module header
 #include <system/SystemMutex.h>
 
+#include <lib/support/logging/CHIPLogging.h>
+
 #if !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
 // Include system headers
@@ -107,6 +109,35 @@ DLL_EXPORT void Mutex::Lock(void)
     xSemaphoreTake(this->mFreeRTOSSemaphore, portMAX_DELAY);
 }
 #endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
+
+#if CHIP_SYSTEM_CONFIG_CMSIS_RTOS_LOCKING
+DLL_EXPORT CHIP_ERROR Mutex::Init(Mutex & aThis)
+{
+    aThis.mCmsisRTOSMutex = osMutexNew(NULL);
+    if (aThis.mCmsisRTOSMutex == NULL)
+    {
+        ChipLogError(chipSystemLayer, "osMutexNew failed");
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    return CHIP_NO_ERROR;
+}
+
+DLL_EXPORT void Mutex::Lock(void)
+{
+    if (mCmsisRTOSMutex && osMutexAcquire(mCmsisRTOSMutex, osWaitForever) != osOK)
+    {
+        ChipLogError(chipSystemLayer, "osMutexAcquire failed");
+    }
+}
+
+DLL_EXPORT void Mutex::Unlock(void)
+{
+    if (mCmsisRTOSMutex && osMutexRelease(mCmsisRTOSMutex) != osOK)
+    {
+        ChipLogError(chipSystemLayer, "osMutexRelease failed");
+    }
+}
+#endif // CHIP_SYSTEM_CONFIG_CMSIS_RTOS_LOCKING
 
 } // namespace System
 } // namespace chip

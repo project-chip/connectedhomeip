@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 36.1.1. [TC-PRS-1.1] Global attributes with server as DUT
+name: 36.1.1. [TC-PRS-1.1] Global Attributes with DUT as Server
+
+PICS:
+    - PRS.S
 
 config:
     nodeId: 0x12344321
@@ -20,7 +23,9 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -28,144 +33,137 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #issue #12190 as per spec default value is 3 but expecting 2
-    - label: "Read the global attribute: ClusterRevision"
-      disabled: true
+    - label: "Step 2: TH reads from the DUT the ClusterRevision attribute."
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
           value: 3
-
-    - label: "Read the global attribute constraints: ClusterRevision"
-      command: "readAttribute"
-      attribute: "ClusterRevision"
-      response:
           constraints:
-              type: uint16
+              type: int16u
 
-    - label:
-          "Write the default values to mandatory global attribute:
-          ClusterRevision"
-      command: "writeAttribute"
-      attribute: "ClusterRevision"
-      arguments:
-          value: 3
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back global attribute: ClusterRevision"
-      disabled: true
+    - label: "Step 3: TH reads from the DUT the FeatureMap attribute."
+      PICS: " !PRS.S.F00 "
       command: "readAttribute"
-      attribute: "ClusterRevision"
-      response:
-          value: 3
-
-    - label: "Read the mandatory global attribute: AttributeList"
-      disabled: true
-      command: "readAttribute"
-      attribute: "AttributeList"
+      attribute: "FeatureMap"
       response:
           value: 0
+          constraints:
+              type: bitmap32
 
-    - label: "Read the global attribute constraints: AttributeList"
+    - label:
+          "Step 3: Given PRS.S.F00(EXT) ensure featuremap has the correct bit
+          set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: PRS.S.F00
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
+
+    - label: "Step 4a: TH reads from the DUT the AttributeList attribute."
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
+              contains: [0, 1, 2, 65528, 65529, 65530, 65531, 65532, 65533]
 
-    - label:
-          "Write the default values to mandatory global attribute: AttributeList"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "AttributeList"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back mandatory global attribute: AttributeList"
-      disabled: true
+    - label: "Step 4a: TH reads from the DUT the AttributeList attribute."
+      PICS: "!PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
       attribute: "AttributeList"
-      response:
-          value: 0
-
-    #issue #11053 disabled steps below Global attributes missing from YAML framework
-    - label: "Read the mandatory global attribute: EventList"
-      disabled: true
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          value: 0
-
-    - label: "Read the global attribute constraints: EventList"
-      disabled: true
-      command: "readAttribute"
-      attribute: "EventList"
       response:
           constraints:
               type: list
+              contains: [0, 1, 2, 65528, 65529, 65531, 65532, 65533]
 
-    - label: "Write the default values to mandatory global attribute: EventList"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "EventList"
-      arguments:
-          value: 0
+    - label:
+          "Step 4b: TH reads the optional attribute(ScaledValue) in
+          AttributeList"
+      PICS: PRS.S.A0010
+      command: "readAttribute"
+      attribute: "AttributeList"
       response:
-          error: UNSUPPORTED_WRITE
+          constraints:
+              type: list
+              contains: [16]
 
-    - label: "Reads back mandatory global attribute: EventList"
-      disabled: true
+    - label:
+          "Step 4c: TH reads the optional attribute(MinScaledValue) in
+          AttributeList"
+      PICS: PRS.S.A0011
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [17]
+
+    - label:
+          "Step 4d: TH reads the optional attribute(MaxScaledValue) in
+          AttributeList"
+      PICS: PRS.S.A0012
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [18]
+
+    - label: "Step 4e: TH reads the optional attribute(Scale) in AttributeList"
+      PICS: PRS.S.A0014
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [20]
+
+    - label:
+          "Step 4f: TH reads the optional attribute(Tolerance) in AttributeList"
+      PICS: PRS.S.A0003
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [3]
+
+    - label:
+          "Step 4g: TH reads the optional attribute(ScaledTolerance) in
+          AttributeList"
+      PICS: PRS.S.A0013
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [19]
+
+    - label: "Step 5: TH reads from the DUT the EventList attribute."
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:
-          value: 0
+          value: []
+          constraints:
+              type: list
 
-    - label: "Read the global attribute: AcceptedCommandList"
-      disabled: true
+    - label: "Step 6: TH reads from the DUT the AcceptedCommandList attribute."
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
+          value: []
           constraints:
               type: list
 
-    - label: "Read the global attribute: GeneratedCommandList"
-      disabled: true
+    - label:
+          "Step 7:  TH reads from the DUT the GeneratedCommandList attribute."
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
+          value: []
           constraints:
               type: list
-
-    - label: "Read the optional global attribute: FeatureMap"
-      disabled: true
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          value: 0
-
-    - label: "Read the optional global attribute constraints: FeatureMap"
-      disabled: true
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          constraints:
-              type: map32
-
-    - label: "Write the default values to optional global attribute: FeatureMap"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "FeatureMap"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back optional global attribute: FeatureMap"
-      disabled: true
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          value: 0

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,11 +15,13 @@
  *    limitations under the License.
  */
 
+#include <cstring>
 #include <jni.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
+#include <string>
 
 namespace chip {
 
@@ -32,20 +34,35 @@ void JniReferences::SetJavaVm(JavaVM * jvm, const char * clsType)
     // thread, meaning it won't find our Chip classes.
     // https://developer.android.com/training/articles/perf-jni#faq_FindClass
     JNIEnv * env = GetEnvForCurrentThread();
+    VerifyOrReturn(env != nullptr, ChipLogError(Support, "env can not be nullptr"));
     // Any chip.devicecontroller.* class will work here - just need something to call getClassLoader() on.
     jclass chipClass = env->FindClass(clsType);
-    VerifyOrReturn(chipClass != nullptr, ChipLogError(Support, "clsType can not found"));
+    VerifyOrReturn(chipClass != nullptr, ChipLogError(Support, "clsType can not be found"));
 
     jclass classClass              = env->FindClass("java/lang/Class");
     jclass classLoaderClass        = env->FindClass("java/lang/ClassLoader");
     jmethodID getClassLoaderMethod = env->GetMethodID(classClass, "getClassLoader", "()Ljava/lang/ClassLoader;");
 
-    mClassLoader     = env->NewGlobalRef(env->CallObjectMethod(chipClass, getClassLoaderMethod));
+    CHIP_ERROR err = mClassLoader.Init(env->CallObjectMethod(chipClass, getClassLoaderMethod));
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Support, "fail to init mClassLoader"));
     mFindClassMethod = env->GetMethodID(classLoaderClass, "findClass", "(Ljava/lang/String;)Ljava/lang/Class;");
 
-    chip::JniReferences::GetInstance().GetClassRef(env, "java/util/List", mListClass);
-    chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", mArrayListClass);
-    chip::JniReferences::GetInstance().GetClassRef(env, "java/util/HashMap", mHashMapClass);
+    jclass listClass      = nullptr;
+    jclass arrayListClass = nullptr;
+    jclass hashMapClass   = nullptr;
+
+    err = chip::JniReferences::GetInstance().GetLocalClassRef(env, "java/util/List", listClass);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Support, "fail to get local class ref for List"));
+    err = mListClass.Init(static_cast<jobject>(listClass));
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Support, "fail to init mListClass"));
+    err = chip::JniReferences::GetInstance().GetLocalClassRef(env, "java/util/ArrayList", arrayListClass);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Support, "fail to get local class ref for ArrayList"));
+    err = mArrayListClass.Init(static_cast<jobject>(arrayListClass));
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Support, "fail to init mArrayListClass"));
+    err = chip::JniReferences::GetInstance().GetLocalClassRef(env, "java/util/HashMap", hashMapClass);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Support, "fail to get local class ref for HashMap"));
+    mHashMapClass.Init(static_cast<jobject>(hashMapClass));
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Support, "fail to init mHashMapClass"));
 }
 
 JNIEnv * JniReferences::GetEnvForCurrentThread()
@@ -74,46 +91,64 @@ JNIEnv * JniReferences::GetEnvForCurrentThread()
     return env;
 }
 
-CHIP_ERROR JniReferences::GetClassRef(JNIEnv * env, const char * clsType, jclass & outCls)
+CHIP_ERROR JniReferences::GetLocalClassRef(JNIEnv * env, const char * clsType, jclass & outCls)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    jclass cls     = nullptr;
+    jclass cls = nullptr;
 
-    cls = env->FindClass(clsType);
-    env->ExceptionClear();
+    VerifyOrReturnError(mClassLoader.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
+
+    // Try `j$/util/Optional` when enabling Java8.
+    if (strcmp(clsType, "java/util/Optional") == 0)
+    {
+        cls = env->FindClass("j$/util/Optional");
+        env->ExceptionClear();
+    }
+
+    if (cls == nullptr)
+    {
+        cls = env->FindClass(clsType);
+        env->ExceptionClear();
+    }
 
     if (cls == nullptr)
     {
         // Try the cached classloader if FindClass() didn't work.
-        cls = static_cast<jclass>(env->CallObjectMethod(mClassLoader, mFindClassMethod, env->NewStringUTF(clsType)));
+        cls = static_cast<jclass>(env->CallObjectMethod(mClassLoader.ObjectRef(), mFindClassMethod, env->NewStringUTF(clsType)));
         VerifyOrReturnError(cls != nullptr && env->ExceptionCheck() != JNI_TRUE, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
     }
 
-    outCls = (jclass) env->NewGlobalRef((jobject) cls);
-    VerifyOrReturnError(outCls != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
-
-    return err;
+    outCls = cls;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR JniReferences::N2J_ByteArray(JNIEnv * env, const uint8_t * inArray, jsize inArrayLen, jbyteArray & outArray)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     outArray = env->NewByteArray(inArrayLen);
-    VerifyOrReturnError(outArray != NULL, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(outArray != nullptr, CHIP_ERROR_NO_MEMORY);
 
     env->ExceptionClear();
     env->SetByteArrayRegion(outArray, 0, inArrayLen, (jbyte *) inArray);
-    VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+    VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
+}
+
+static std::string StrReplaceAll(const std::string & source, const std::string & from, const std::string & to)
+{
+    std::string newString = source;
+    size_t pos            = 0;
+    while ((pos = newString.find(from, pos)) != std::string::npos)
+    {
+        newString.replace(pos, from.length(), to);
+        pos += to.length();
+    }
+
+    return newString;
 }
 
 CHIP_ERROR JniReferences::FindMethod(JNIEnv * env, jobject object, const char * methodName, const char * methodSignature,
                                      jmethodID * methodId)
 {
-    CHIP_ERROR err   = CHIP_NO_ERROR;
     jclass javaClass = nullptr;
     VerifyOrReturnError(env != nullptr && object != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
 
@@ -121,9 +156,48 @@ CHIP_ERROR JniReferences::FindMethod(JNIEnv * env, jobject object, const char * 
     VerifyOrReturnError(javaClass != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
 
     *methodId = env->GetMethodID(javaClass, methodName, methodSignature);
-    VerifyOrReturnError(*methodId != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
+    env->ExceptionClear();
 
-    return err;
+    if (*methodId != nullptr)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    std::string method_signature = methodSignature;
+    method_signature             = StrReplaceAll(method_signature, "java/util/Optional", "j$/util/Optional");
+    *methodId                    = env->GetMethodID(javaClass, methodName, method_signature.data());
+    env->ExceptionClear();
+
+    if (*methodId == nullptr)
+    {
+        ChipLogError(Support, "methodId is null : %s, %s", methodName, methodSignature);
+        return CHIP_JNI_ERROR_METHOD_NOT_FOUND;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR JniReferences::FindMethod(JNIEnv * env, jclass javaClass, const char * methodName, const char * methodSignature,
+                                     jmethodID * methodId)
+{
+    VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
+    VerifyOrReturnError(javaClass != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
+
+    *methodId = env->GetMethodID(javaClass, methodName, methodSignature);
+    env->ExceptionClear();
+
+    if (*methodId != nullptr)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    std::string method_signature = methodSignature;
+    method_signature             = StrReplaceAll(method_signature, "java/util/Optional", "j$/util/Optional");
+    *methodId                    = env->GetMethodID(javaClass, methodName, method_signature.data());
+    env->ExceptionClear();
+
+    VerifyOrReturnError(*methodId != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
+    return CHIP_NO_ERROR;
 }
 
 void JniReferences::CallVoidInt(JNIEnv * env, jobject object, const char * methodName, jint argument)
@@ -139,13 +213,30 @@ void JniReferences::CallVoidInt(JNIEnv * env, jobject object, const char * metho
 
     env->ExceptionClear();
     env->CallVoidMethod(object, method, argument);
+    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
+}
+
+void JniReferences::CallVoidLong(JNIEnv * env, jobject object, const char * methodName, jlong argument)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    jmethodID method;
+
+    err = JniReferences::FindMethod(env, object, methodName, "(J)V", &method);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Support, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+
+    env->ExceptionClear();
+    env->CallVoidMethod(object, method, argument);
+    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
 void JniReferences::ReportError(JNIEnv * env, CHIP_ERROR cbErr, const char * functName)
 {
     if (cbErr == CHIP_JNI_ERROR_EXCEPTION_THROWN)
     {
-        ChipLogError(Support, "Java exception thrown in %s", functName);
+        ChipLogError(Support, "Java exception thrown in %s", StringOrNullMarker(functName));
         env->ExceptionDescribe();
     }
     else
@@ -166,32 +257,47 @@ void JniReferences::ReportError(JNIEnv * env, CHIP_ERROR cbErr, const char * fun
             errStr = ErrorStr(cbErr);
             break;
         }
-        ChipLogError(Support, "Error in %s : %s", functName, errStr);
+        ChipLogError(Support, "Error in %s : %s", StringOrNullMarker(functName), errStr);
     }
 }
 
 void JniReferences::ThrowError(JNIEnv * env, jclass exceptionCls, CHIP_ERROR errToThrow)
 {
     env->ExceptionClear();
-    jmethodID constructor = env->GetMethodID(exceptionCls, "<init>", "(ILjava/lang/String;)V");
-    VerifyOrReturn(constructor != NULL);
+    jmethodID constructor = env->GetMethodID(exceptionCls, "<init>", "(JLjava/lang/String;)V");
+    VerifyOrReturn(constructor != nullptr);
 
     jstring jerrStr = env->NewStringUTF(ErrorStr(errToThrow));
 
-    jthrowable outEx = (jthrowable) env->NewObject(exceptionCls, constructor, static_cast<jint>(errToThrow.AsInteger()), jerrStr);
+    jthrowable outEx =
+        static_cast<jthrowable>(env->NewObject(exceptionCls, constructor, static_cast<jlong>(errToThrow.AsInteger()), jerrStr));
     VerifyOrReturn(!env->ExceptionCheck());
     env->Throw(outEx);
+}
+
+void JniReferences::ThrowError(JNIEnv * env, JniGlobalReference & exceptionCls, CHIP_ERROR errToThrow)
+{
+    VerifyOrReturn(exceptionCls.HasValidObjectRef(), ChipLogError(Support, "exceptionCls is invalid, failed to throw error"));
+    ThrowError(env, static_cast<jclass>(exceptionCls.ObjectRef()), errToThrow);
 }
 
 CHIP_ERROR JniReferences::CreateOptional(jobject objectToWrap, jobject & outOptional)
 {
     JNIEnv * env = GetEnvForCurrentThread();
-    jclass optionalCls;
-    chip::JniReferences::GetInstance().GetClassRef(env, "java/util/Optional", optionalCls);
-    VerifyOrReturnError(optionalCls != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
-    chip::JniClass jniClass(optionalCls);
+    VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
+    jclass optionalCls = nullptr;
+    ReturnErrorOnFailure(chip::JniReferences::GetInstance().GetLocalClassRef(env, "java/util/Optional", optionalCls));
 
     jmethodID ofMethod = env->GetStaticMethodID(optionalCls, "ofNullable", "(Ljava/lang/Object;)Ljava/util/Optional;");
+    env->ExceptionClear();
+
+    // Try `Lj$/util/Optional;` when enabling Java8.
+    if (ofMethod == nullptr)
+    {
+        ofMethod = env->GetStaticMethodID(optionalCls, "ofNullable", "(Ljava/lang/Object;)Lj$/util/Optional;");
+        env->ExceptionClear();
+    }
+
     VerifyOrReturnError(ofMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
     outOptional = env->CallStaticObjectMethod(optionalCls, ofMethod, objectToWrap);
 
@@ -203,14 +309,12 @@ CHIP_ERROR JniReferences::CreateOptional(jobject objectToWrap, jobject & outOpti
 CHIP_ERROR JniReferences::GetOptionalValue(jobject optionalObj, jobject & optionalValue)
 {
     JNIEnv * env = GetEnvForCurrentThread();
-    jclass optionalCls;
-    chip::JniReferences::GetInstance().GetClassRef(env, "java/util/Optional", optionalCls);
-    VerifyOrReturnError(optionalCls != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
-    chip::JniClass jniClass(optionalCls);
-
+    VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
+    jclass optionalCls = nullptr;
+    ReturnErrorOnFailure(chip::JniReferences::GetInstance().GetLocalClassRef(env, "java/util/Optional", optionalCls));
     jmethodID isPresentMethod = env->GetMethodID(optionalCls, "isPresent", "()Z");
     VerifyOrReturnError(isPresentMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
-    jboolean isPresent = env->CallBooleanMethod(optionalObj, isPresentMethod);
+    jboolean isPresent = optionalObj && env->CallBooleanMethod(optionalObj, isPresentMethod);
 
     if (!isPresent)
     {
@@ -227,9 +331,11 @@ CHIP_ERROR JniReferences::GetOptionalValue(jobject optionalObj, jobject & option
 jint JniReferences::IntegerToPrimitive(jobject boxedInteger)
 {
     JNIEnv * env = GetEnvForCurrentThread();
-    jclass boxedTypeCls;
-    chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", boxedTypeCls);
-    chip::JniClass jniClass(boxedTypeCls);
+    VerifyOrReturnValue(env != nullptr, 0, ChipLogError(Support, "env cannot be nullptr"));
+    jclass boxedTypeCls = nullptr;
+    CHIP_ERROR err      = chip::JniReferences::GetInstance().GetLocalClassRef(env, "java/lang/Integer", boxedTypeCls);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, 0,
+                        ChipLogError(Support, "IntegerToPrimitive failed due to %" CHIP_ERROR_FORMAT, err.Format()));
 
     jmethodID valueMethod = env->GetMethodID(boxedTypeCls, "intValue", "()I");
     return env->CallIntMethod(boxedInteger, valueMethod);
@@ -238,10 +344,11 @@ jint JniReferences::IntegerToPrimitive(jobject boxedInteger)
 jlong JniReferences::LongToPrimitive(jobject boxedLong)
 {
     JNIEnv * env = GetEnvForCurrentThread();
-    jclass boxedTypeCls;
-    chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", boxedTypeCls);
-    chip::JniClass jniClass(boxedTypeCls);
-
+    VerifyOrReturnValue(env != nullptr, 0, ChipLogError(Support, "env cannot be nullptr"));
+    jclass boxedTypeCls = nullptr;
+    CHIP_ERROR err      = chip::JniReferences::GetInstance().GetLocalClassRef(env, "java/lang/Long", boxedTypeCls);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, 0,
+                        ChipLogError(Support, "LongToPrimitive failed due to %" CHIP_ERROR_FORMAT, err.Format()));
     jmethodID valueMethod = env->GetMethodID(boxedTypeCls, "longValue", "()J");
     return env->CallLongMethod(boxedLong, valueMethod);
 }
@@ -249,9 +356,11 @@ jlong JniReferences::LongToPrimitive(jobject boxedLong)
 jboolean JniReferences::BooleanToPrimitive(jobject boxedBoolean)
 {
     JNIEnv * env = GetEnvForCurrentThread();
-    jclass boxedTypeCls;
-    chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Boolean", boxedTypeCls);
-    chip::JniClass jniClass(boxedTypeCls);
+    VerifyOrReturnValue(env != nullptr, false, ChipLogError(Support, "env cannot be nullptr"));
+    jclass boxedTypeCls = nullptr;
+    CHIP_ERROR err      = chip::JniReferences::GetInstance().GetLocalClassRef(env, "java/lang/Boolean", boxedTypeCls);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, false,
+                        ChipLogError(Support, "BooleanToPrimitive failed due to %" CHIP_ERROR_FORMAT, err.Format()));
 
     jmethodID valueMethod = env->GetMethodID(boxedTypeCls, "booleanValue", "()Z");
     return env->CallBooleanMethod(boxedBoolean, valueMethod);
@@ -260,9 +369,11 @@ jboolean JniReferences::BooleanToPrimitive(jobject boxedBoolean)
 jfloat JniReferences::FloatToPrimitive(jobject boxedFloat)
 {
     JNIEnv * env = GetEnvForCurrentThread();
-    jclass boxedTypeCls;
-    chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Float", boxedTypeCls);
-    chip::JniClass jniClass(boxedTypeCls);
+    VerifyOrReturnValue(env != nullptr, 0, ChipLogError(Support, "env cannot be nullptr"));
+    jclass boxedTypeCls = nullptr;
+    CHIP_ERROR err      = chip::JniReferences::GetInstance().GetLocalClassRef(env, "java/lang/Float", boxedTypeCls);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, 0,
+                        ChipLogError(Support, "FloatToPrimitive failed due to %" CHIP_ERROR_FORMAT, err.Format()));
 
     jmethodID valueMethod = env->GetMethodID(boxedTypeCls, "floatValue", "()F");
     return env->CallFloatMethod(boxedFloat, valueMethod);
@@ -271,25 +382,27 @@ jfloat JniReferences::FloatToPrimitive(jobject boxedFloat)
 jdouble JniReferences::DoubleToPrimitive(jobject boxedDouble)
 {
     JNIEnv * env = GetEnvForCurrentThread();
-    jclass boxedTypeCls;
-    chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Double", boxedTypeCls);
-    chip::JniClass jniClass(boxedTypeCls);
+    VerifyOrReturnValue(env != nullptr, 0, ChipLogError(Support, "env cannot be nullptr"));
+    jclass boxedTypeCls = nullptr;
+    CHIP_ERROR err      = chip::JniReferences::GetInstance().GetLocalClassRef(env, "java/lang/Double", boxedTypeCls);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, 0,
+                        ChipLogError(Support, "DoubleToPrimitive failed due to %" CHIP_ERROR_FORMAT, err.Format()));
 
     jmethodID valueMethod = env->GetMethodID(boxedTypeCls, "doubleValue", "()D");
     return env->CallDoubleMethod(boxedDouble, valueMethod);
 }
 
-CHIP_ERROR JniReferences::CallSubscriptionEstablished(jobject javaCallback)
+CHIP_ERROR JniReferences::CallSubscriptionEstablished(jobject javaCallback, long subscriptionId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-
+    VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
     jmethodID subscriptionEstablishedMethod;
-    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallback, "onSubscriptionEstablished", "()V",
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallback, "onSubscriptionEstablished", "(J)V",
                                                         &subscriptionEstablishedMethod);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
-    env->CallVoidMethod(javaCallback, subscriptionEstablishedMethod);
+    env->CallVoidMethod(javaCallback, subscriptionEstablishedMethod, static_cast<jlong>(subscriptionId));
     VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
     return err;
@@ -297,94 +410,185 @@ CHIP_ERROR JniReferences::CallSubscriptionEstablished(jobject javaCallback)
 
 CHIP_ERROR JniReferences::CreateArrayList(jobject & outList)
 {
-    JNIEnv * env   = GetEnvForCurrentThread();
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    jmethodID arrayListCtor = env->GetMethodID(mArrayListClass, "<init>", "()V");
+    JNIEnv * env = GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mArrayListClass.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
+    jclass ref              = static_cast<jclass>(mArrayListClass.ObjectRef());
+    jmethodID arrayListCtor = env->GetMethodID(ref, "<init>", "()V");
     VerifyOrReturnError(arrayListCtor != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
-    outList = env->NewObject(mArrayListClass, arrayListCtor);
+    outList = env->NewObject(ref, arrayListCtor);
     VerifyOrReturnError(outList != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
 
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR JniReferences::AddToList(jobject list, jobject objectToAdd)
 {
-    JNIEnv * env   = GetEnvForCurrentThread();
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    jmethodID addMethod = env->GetMethodID(mListClass, "add", "(Ljava/lang/Object;)Z");
+    JNIEnv * env = GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mArrayListClass.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
+    jclass ref          = static_cast<jclass>(mListClass.ObjectRef());
+    jmethodID addMethod = env->GetMethodID(ref, "add", "(Ljava/lang/Object;)Z");
     VerifyOrReturnError(addMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
     env->CallBooleanMethod(list, addMethod, objectToAdd);
     VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR JniReferences::CreateHashMap(jobject & outMap)
 {
-    JNIEnv * env   = GetEnvForCurrentThread();
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    jmethodID hashMapCtor = env->GetMethodID(mHashMapClass, "<init>", "()V");
+    JNIEnv * env = GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mHashMapClass.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
+    jclass ref            = static_cast<jclass>(mHashMapClass.ObjectRef());
+    jmethodID hashMapCtor = env->GetMethodID(ref, "<init>", "()V");
     VerifyOrReturnError(hashMapCtor != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
-    outMap = env->NewObject(mHashMapClass, hashMapCtor);
+    outMap = env->NewObject(ref, hashMapCtor);
     VerifyOrReturnError(outMap != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
 
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR JniReferences::PutInMap(jobject map, jobject key, jobject value)
 {
-    JNIEnv * env   = GetEnvForCurrentThread();
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    jmethodID putMethod = env->GetMethodID(mHashMapClass, "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+    JNIEnv * env = GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mHashMapClass.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
+    jclass ref          = static_cast<jclass>(mHashMapClass.ObjectRef());
+    jmethodID putMethod = env->GetMethodID(ref, "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
     VerifyOrReturnError(putMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
     env->CallObjectMethod(map, putMethod, key, value);
     VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR JniReferences::GetListSize(jobject list, jint & size)
 {
-    JNIEnv * env   = GetEnvForCurrentThread();
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env = GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mListClass.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
+    jclass ref = static_cast<jclass>(mListClass.ObjectRef());
 
-    jmethodID sizeMethod = env->GetMethodID(mListClass, "size", "()I");
+    jmethodID sizeMethod = env->GetMethodID(ref, "size", "()I");
     VerifyOrReturnError(sizeMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
     size = env->CallIntMethod(list, sizeMethod);
     VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR JniReferences::GetListItem(jobject list, jint index, jobject & outItem)
 {
-    JNIEnv * env   = GetEnvForCurrentThread();
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env = GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mListClass.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
+    jclass ref = static_cast<jclass>(mListClass.ObjectRef());
 
-    jmethodID getMethod = env->GetMethodID(mListClass, "get", "(I)Ljava/lang/Object;");
+    jmethodID getMethod = env->GetMethodID(ref, "get", "(I)Ljava/lang/Object;");
     VerifyOrReturnError(getMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
     outItem = env->CallObjectMethod(list, getMethod, index);
     VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR JniReferences::GetObjectField(jobject objectToRead, const char * name, const char * signature, jobject & outObject)
 {
-    JNIEnv * env   = GetEnvForCurrentThread();
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrReturnError(objectToRead != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
+    JNIEnv * env = GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(objectToRead != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     jclass objClass = env->GetObjectClass(objectToRead);
     jfieldID field  = env->GetFieldID(objClass, name, signature);
 
     outObject = env->GetObjectField(objectToRead, field);
-    return err;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR JniReferences::CharToStringUTF(const chip::CharSpan & charSpan, jobject & outStr)
+{
+    JNIEnv * env = GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    jobject jbyteBuffer = env->NewDirectByteBuffer((void *) charSpan.data(), static_cast<jlong>(charSpan.size()));
+
+    jclass charSetClass = env->FindClass("java/nio/charset/Charset");
+    jmethodID charsetForNameMethod =
+        env->GetStaticMethodID(charSetClass, "forName", "(Ljava/lang/String;)Ljava/nio/charset/Charset;");
+    jobject charsetObject = env->CallStaticObjectMethod(charSetClass, charsetForNameMethod, env->NewStringUTF("UTF-8"));
+
+    jclass charSetDocoderClass = env->FindClass("java/nio/charset/CharsetDecoder");
+    jmethodID newDocoderMethod = env->GetMethodID(charSetClass, "newDecoder", "()Ljava/nio/charset/CharsetDecoder;");
+    jobject decoderObject      = env->CallObjectMethod(charsetObject, newDocoderMethod);
+
+    // Even though spec requires UTF-8 strings, we have seen instances in the field of certified devices sending
+    // invalid strings like "startup?" (0x73 0x74 0x61 0x72 0x74 0x75 0x70 <0x91>) and we want to actually
+    // be lenient on those rather than failing an entire decode (which may fail an entire report for one invalid string,
+    // like in a very common 'subscribe *')
+    //
+    // As a result call:
+    //   onMalformedInput(CodingErrorAction.REPLACE)
+    //   onUnmappableCharacter(CodingErrorAction.REPLACE)
+    jclass codingErrorActionClass = env->FindClass("java/nio/charset/CodingErrorAction");
+    jobject replaceAction         = env->GetStaticObjectField(
+        codingErrorActionClass, env->GetStaticFieldID(codingErrorActionClass, "REPLACE", "Ljava/nio/charset/CodingErrorAction;"));
+    {
+        jmethodID onMalformedInput = env->GetMethodID(charSetDocoderClass, "onMalformedInput",
+                                                      "(Ljava/nio/charset/CodingErrorAction;)Ljava/nio/charset/CharsetDecoder;");
+        decoderObject              = env->CallObjectMethod(decoderObject, onMalformedInput, replaceAction);
+    }
+    {
+        jmethodID onUnmappableCharacter =
+            env->GetMethodID(charSetDocoderClass, "onUnmappableCharacter",
+                             "(Ljava/nio/charset/CodingErrorAction;)Ljava/nio/charset/CharsetDecoder;");
+        decoderObject = env->CallObjectMethod(decoderObject, onUnmappableCharacter, replaceAction);
+    }
+
+    jmethodID charSetDecodeMethod = env->GetMethodID(charSetDocoderClass, "decode", "(Ljava/nio/ByteBuffer;)Ljava/nio/CharBuffer;");
+    jobject decodeObject          = env->CallObjectMethod(decoderObject, charSetDecodeMethod, jbyteBuffer);
+    env->DeleteLocalRef(jbyteBuffer);
+
+    // If decode exception occur, outStr will be set null.
+    outStr = nullptr;
+
+    if (env->ExceptionCheck())
+    {
+        // If there is an exception, decode will not fail. Instead just
+        // an error will be reported.
+        ChipLogError(Support, "Exception encountered trying to decode a UTF string.");
+        env->ExceptionDescribe();
+        env->ExceptionClear();
+        return CHIP_JNI_ERROR_EXCEPTION_THROWN;
+    }
+
+    jclass charBufferClass       = env->FindClass("java/nio/CharBuffer");
+    jmethodID charBufferToString = env->GetMethodID(charBufferClass, "toString", "()Ljava/lang/String;");
+    outStr                       = static_cast<jstring>(env->CallObjectMethod(decodeObject, charBufferToString));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR JniGlobalReference::Init(jobject aObjectRef)
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
+    VerifyOrReturnError(aObjectRef != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
+    VerifyOrReturnError(mObjectRef == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mObjectRef = env->NewGlobalRef(aObjectRef);
+    VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
+    VerifyOrReturnError(mObjectRef != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
+    return CHIP_NO_ERROR;
+}
+
+void JniGlobalReference::Reset()
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env != nullptr && mObjectRef != nullptr)
+    {
+        env->DeleteGlobalRef(mObjectRef);
+        mObjectRef = nullptr;
+    }
 }
 
 } // namespace chip

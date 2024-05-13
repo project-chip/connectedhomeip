@@ -1,4 +1,5 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2022 Project CHIP Authors
+# All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,62 +14,62 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/src/platform/device.gni")
+
+import("${chip_root}/src/platform/bouffalolab/common/args.gni")
 
 assert(chip_device_platform == "bl602")
 
 static_library("BL602") {
   sources = [
-    "../../FreeRTOS/SystemTimeSupport.cpp",
-    "../../SingletonConfigurationManager.cpp",
-    "BL602Config.cpp",
-    "BL602Config.h",
-    "BLEManagerImpl.cpp",
-    "BLEManagerImpl.h",
-    "BlePlatformConfig.h",
-    "CHIPDevicePlatformConfig.h",
-    "CHIPDevicePlatformEvent.h",
-    "CHIPMem-Platform.cpp",
-    "CHIPPlatformConfig.h",
     "ConfigurationManagerImpl.cpp",
-    "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
-    "ConnectivityManagerImpl.h",
-    "DeviceNetworkProvisioningDelegateImpl.cpp",
-    "DeviceNetworkProvisioningDelegateImpl.h",
     "DiagnosticDataProviderImpl.cpp",
-    "DiagnosticDataProviderImpl.h",
-    "DnssdImpl.cpp",
-    "InetPlatformConfig.h",
-    "Logging.cpp",
     "NetworkCommissioningDriver.cpp",
     "PlatformManagerImpl.cpp",
-    "PlatformManagerImpl.h",
-    "SystemPlatformConfig.h",
+    "wifi_mgmr_portable.c",
   ]
 
-  deps = [ "${chip_root}/src/lib/dnssd:platform_header" ]
-
-  public_deps = [ "${chip_root}/src/platform:platform_base" ]
-
-  # defines = [
-  #   "CHIP_KVS_SECTOR_COUNT=1",
-  #   "CHIP_KVS_BASE_SECTOR_INDEX=0"
-  # ]
-
-  # Add pigweed KVS
-  deps += [
-    "$dir_pw_kvs:crc16",
-    "$dir_pw_log",
-  ]
-  public_deps += [
-    "$dir_pw_checksum",
-    "$dir_pw_kvs",
-  ]
   sources += [
-    "KeyValueStoreManagerImpl.cpp",
-    "KeyValueStoreManagerImpl.h",
+    "../../FreeRTOS/SystemTimeSupport.cpp",
+    "../../SingletonConfigurationManager.cpp",
+    "../common/BLConfig.cpp",
+    "../common/ConfigurationManagerImpl.cpp",
+    "../common/ConnectivityManagerImpl.cpp",
+    "../common/DiagnosticDataProviderImpl.cpp",
+    "../common/KeyValueStoreManagerImpl.cpp",
+    "../common/Logging.cpp",
+    "../common/PlatformManagerImpl.cpp",
   ]
+
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "../common/OTAImageProcessorImpl.cpp",
+      "../common/OTAImageProcessorImpl.h",
+    ]
+  }
+
+  if (chip_enable_ble) {
+    sources += [
+      "../common/BLEManagerImpl.cpp",
+      "../common/BLEManagerImpl.h",
+    ]
+  }
+
+  defines =
+      [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE=${chip_enable_factory_data}" ]
+  if (chip_enable_factory_data || chip_enable_factory_data_test) {
+    sources += [
+      "../common/FactoryDataProvider.cpp",
+      "../common/FactoryDataProvider.h",
+    ]
+  }
+
+  deps = [
+    "${chip_root}/src/credentials:credentials_header",
+    "${chip_root}/src/lib/dnssd:platform_header",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+  public_deps = [ "${chip_root}/src/platform:platform_base" ]
 }

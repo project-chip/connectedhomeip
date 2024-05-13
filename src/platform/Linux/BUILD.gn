@@ -17,16 +17,21 @@ import("//build_overrides/chip.gni")
 
 import("${build_root}/config/linux/pkg_config.gni")
 
+import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
 
 assert(chip_device_platform == "linux")
+
+if (chip_use_pw_logging) {
+  import("//build_overrides/pigweed.gni")
+}
 
 if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
   import("//build_overrides/ot_br_posix.gni")
 }
 
-if (chip_mdns != "none") {
+if (chip_mdns == "platform") {
   pkg_config("avahi_client_config") {
     packages = [ "avahi-client" ]
   }
@@ -36,10 +41,8 @@ static_library("Linux") {
   sources = [
     "../DeviceSafeQueue.cpp",
     "../DeviceSafeQueue.h",
+    "../GLibTypeDeleter.h",
     "../SingletonConfigurationManager.cpp",
-    "BLEManagerImpl.cpp",
-    "BLEManagerImpl.h",
-    "BlePlatformConfig.h",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
     "CHIPLinuxStorage.cpp",
@@ -53,37 +56,60 @@ static_library("Linux") {
     "ConnectivityManagerImpl.h",
     "ConnectivityUtils.cpp",
     "ConnectivityUtils.h",
-    "DeviceInfoProviderImpl.cpp",
-    "DeviceInfoProviderImpl.h",
-    "DeviceNetworkProvisioningDelegateImpl.cpp",
-    "DeviceNetworkProvisioningDelegateImpl.h",
+    "DeviceInstanceInfoProviderImpl.cpp",
+    "DeviceInstanceInfoProviderImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-    "Logging.cpp",
     "NetworkCommissioningDriver.h",
-    "NetworkCommissioningThreadDriver.cpp",
-    "NetworkCommissioningWiFiDriver.cpp",
+    "NetworkCommissioningEthernetDriver.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "PosixConfig.cpp",
     "PosixConfig.h",
     "SystemPlatformConfig.h",
     "SystemTimeSupport.cpp",
-    "bluez/AdapterIterator.cpp",
-    "bluez/AdapterIterator.h",
-    "bluez/ChipDeviceScanner.cpp",
-    "bluez/ChipDeviceScanner.h",
-    "bluez/Helper.cpp",
-    "bluez/Helper.h",
-    "bluez/MainLoop.cpp",
-    "bluez/MainLoop.h",
-    "bluez/Types.h",
   ]
 
-  deps = [ "${chip_root}/src/setup_payload" ]
+  deps = [
+    "${chip_root}/src/app/icd/server:icd-server-config",
+    "${chip_root}/src/credentials:credentials_header",
+    "${chip_root}/src/setup_payload",
+  ]
+
+  if (!chip_use_external_logging) {
+    sources += [ "Logging.cpp" ]
+    deps += [ "${chip_root}/src/platform/logging:headers" ]
+  }
+
+  if (chip_enable_openthread) {
+    sources += [ "NetworkCommissioningThreadDriver.cpp" ]
+  }
+
+  if (chip_enable_ble) {
+    sources += [
+      "BLEManagerImpl.cpp",
+      "BLEManagerImpl.h",
+      "BlePlatformConfig.h",
+      "bluez/AdapterIterator.cpp",
+      "bluez/AdapterIterator.h",
+      "bluez/BluezAdvertisement.cpp",
+      "bluez/BluezAdvertisement.h",
+      "bluez/BluezConnection.cpp",
+      "bluez/BluezConnection.h",
+      "bluez/BluezEndpoint.cpp",
+      "bluez/BluezEndpoint.h",
+      "bluez/BluezObjectIterator.h",
+      "bluez/BluezObjectList.h",
+      "bluez/BluezObjectManager.cpp",
+      "bluez/BluezObjectManager.h",
+      "bluez/ChipDeviceScanner.cpp",
+      "bluez/ChipDeviceScanner.h",
+      "bluez/Types.h",
+    ]
+  }
 
   public_deps = [
     "${chip_root}/src/app/common:cluster-objects",
@@ -93,7 +119,7 @@ static_library("Linux") {
 
   public_configs = []
 
-  if (chip_mdns != "none") {
+  if (chip_mdns == "platform") {
     sources += [
       "DnssdImpl.cpp",
       "DnssdImpl.h",
@@ -113,7 +139,6 @@ static_library("Linux") {
 
   if (chip_enable_openthread) {
     sources += [
-      "GlibTypeDeleter.h",
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
@@ -121,7 +146,13 @@ static_library("Linux") {
     public_deps += [ "dbus/openthread" ]
   }
 
+  if (chip_use_pw_logging) {
+    deps += [ "$dir_pw_log" ]
+  }
+
   if (chip_enable_wifi) {
+    sources += [ "NetworkCommissioningWiFiDriver.cpp" ]
+
     public_deps += [ "dbus/wpa" ]
   }
 

@@ -13,8 +13,21 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-mainmenu "Matter nRF Connect Lighting Example Application"
+mainmenu "Matter nRF Connect Pump Application"
 
-rsource "../../../config/nrfconnect/chip-module/Kconfig.defaults"
+# Sample configuration used for Thread networking
+if NET_L2_OPENTHREAD
+
+choice OPENTHREAD_NORDIC_LIBRARY_CONFIGURATION
+	default OPENTHREAD_NORDIC_LIBRARY_MTD
+endchoice
+
+choice OPENTHREAD_DEVICE_TYPE
+	default OPENTHREAD_MTD
+endchoice
+
+endif # NET_L2_OPENTHREAD
+
 rsource "../../../config/nrfconnect/chip-module/Kconfig.features"
+rsource "../../../config/nrfconnect/chip-module/Kconfig.defaults"
 source "Kconfig.zephyr"

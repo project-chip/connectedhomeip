@@ -1,0 +1,114 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 69.2.2. [TC-BOOL-2.2] Primary Functionality with Server as DUT
+
+PICS:
+    - BOOL.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Pre-Conditions"
+      verification: |
+          This test case is verified after the device is provisioned. Pls provision device first, Pass appropriate nodeID in the below command
+      disabled: true
+
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      verification: |
+
+      disabled: true
+
+    - label: "Step 2a: Bring the DUT into a state so StateValue is FALSE."
+      PICS: BOOL.S.M.ManuallyControlled && BOOL.S.A0000
+      verification: |
+          Manual operation
+      disabled: true
+
+    - label: "Step 2b: TH reads the StateValue attribute from the DUT."
+      PICS: BOOL.S.M.ManuallyControlled && BOOL.S.A0000
+      verification: |
+          ./chip-tool booleanstate read state-value 1 1
+
+          Verify the StateValue value is FALSE On TH(chip-tool), below is the sample log provided for the raspi platform
+
+          [1646118838.087500][3279:3284] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
+          [1646118838.087536][3279:3284] CHIP:TOO:   StateValue: FALSE
+      disabled: true
+
+    - label: "Step 3a: Bring the DUT into a state so StateValue is TRUE."
+      PICS: BOOL.S.M.ManuallyControlled && BOOL.S.A0000
+      verification: |
+          Manual operation
+      disabled: true
+
+    - label: "Step 3b: TH reads the StateValue attribute from the DUT."
+      PICS: BOOL.S.M.ManuallyControlled && BOOL.S.A0000
+      verification: |
+          ./chip-tool booleanstate read state-value 1 1
+
+          Verify the StateValue value is TRUE On TH(chip-tool), below is the sample log provided for the raspi platform
+
+          [1646118838.087500][3279:3284] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
+          [1646118838.087536][3279:3284] CHIP:TOO:   StateValue: TRUE
+      disabled: true
+
+    - label: "Step 4a: Set up subscription to StateChange event."
+      PICS: BOOL.S.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
+      verification: |
+          This event is not supported in all clusters app, so there are no reference logs.
+
+          Run the below command to start interactive mode
+          ./chip-tool interactive start
+
+          Subscribe the event using below command in Interactive mode. Once the event occurs, TH(chip-tool) get the subscription message.
+
+          booleanstate subscribe-event state-change 1 100 1 1 --is-urgent true
+      disabled: true
+
+    - label: "Step 4b: Bring the DUT into a state so StateValue is FALSE."
+      PICS: BOOL.S.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
+      verification: |
+          Verify the StateValue value is FALSE On TH(chip-tool), if the state-change event is generated
+      disabled: true
+
+    - label: "Step 4c: TH reads the StateValue attribute from the DUT."
+      PICS: BOOL.S.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
+      verification: |
+          This event is not supported in all clusters app, so there are no reference logs.
+
+          booleanstate read state-value 1 1
+
+          Verify the StateValue value is FALSE On TH(chip-tool)
+      disabled: true
+
+    - label: "Step 4d: Bring the DUT into a state so StateValue is TRUE."
+      PICS: BOOL.S.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
+      verification: |
+          Verify the StateValue value is TRUE On TH(chip-tool),  if the state-change event is generated
+      disabled: true
+
+    - label: "Step 4e: TH reads the StateValue attribute from the DUT."
+      PICS: BOOL.S.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
+      verification: |
+          booleanstate read state-value 1 1
+
+          Verify the StateValue value is TRUE On TH(chip-tool)
+      disabled: true

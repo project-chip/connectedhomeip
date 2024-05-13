@@ -1,0 +1,267 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 19.8.4. [TC-MEDIAPLAYBACK-6.4] Variable Speed Media Playback Verification
+
+PICS:
+    - MEDIAPLAYBACK.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Media Playback"
+    endpoint: 1
+
+tests:
+    - label:
+          "Commission DUT to TH (can be skipped if done in a preceding test)."
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Precondition: Media content in a paused state at the beginning of the
+          content"
+      command: "Pause"
+      PICS: MEDIAPLAYBACK.S.C01.Rsp
+      response:
+          values:
+              - name: "Status"
+                value: 0
+
+    - label: "Step 1: TH reads the CurrentState attribute from the DUT"
+      PICS: MEDIAPLAYBACK.S.A0000 && MEDIAPLAYBACK.S.C01.Rsp
+      command: "readAttribute"
+      attribute: "CurrentState"
+      response:
+          value: 1
+
+    - label: "Step 2: TH reads the PlaybackSpeed attribute from the DUT"
+      PICS: MEDIAPLAYBACK.S.A0004 && MEDIAPLAYBACK.S.C01.Rsp
+      command: "readAttribute"
+      attribute: "PlaybackSpeed"
+      response:
+          value: 0
+
+    - label: "Step 3: TH sends a FastForward command to the DUT"
+      PICS: MEDIAPLAYBACK.S.C07.Rsp
+      command: "FastForward"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+
+    - label: "verify that the media state is playing"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C07.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' if media state is playing"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 4: TH reads the CurrentState attribute from the DUT"
+      PICS: MEDIAPLAYBACK.S.A0000 && MEDIAPLAYBACK.S.C07.Rsp
+      command: "readAttribute"
+      attribute: "CurrentState"
+      response:
+          value: 0
+
+    - label: "Step 5: TH reads the PlaybackSpeed attribute from the DUT"
+      PICS: MEDIAPLAYBACK.S.A0004 && MEDIAPLAYBACK.S.C07.Rsp
+      command: "readAttribute"
+      attribute: "PlaybackSpeed"
+      response:
+          value: 1
+
+    - label: "Step 6: TH sends a FastForward command to the DUT"
+      PICS: MEDIAPLAYBACK.S.C07.Rsp
+      command: "FastForward"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+
+    - label: "verify that the media play speed has increased."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C07.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' if media play speed has increased."
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 7: TH reads the PlaybackSpeed attribute from the DUT"
+      PICS: MEDIAPLAYBACK.S.A0004 && MEDIAPLAYBACK.S.C07.Rsp
+      command: "readAttribute"
+      attribute: "PlaybackSpeed"
+      response:
+          value: 2
+
+    - label: "Step 8: TH sends a Rewind command to the DUT"
+      PICS: MEDIAPLAYBACK.S.C06.Rsp
+      command: "Rewind"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+
+    - label: "verify that the media play has reversed direction."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C06.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' if media play has reversed direction"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 9: TH reads the CurrentState attribute from the DUT"
+      PICS: MEDIAPLAYBACK.S.A0000 && MEDIAPLAYBACK.S.C06.Rsp
+      command: "readAttribute"
+      attribute: "CurrentState"
+      response:
+          value: 0
+
+    - label: "Step 10: TH reads the PlaybackSpeed attribute from the DUT"
+      PICS: MEDIAPLAYBACK.S.A0004 && MEDIAPLAYBACK.S.C06.Rsp
+      command: "readAttribute"
+      attribute: "PlaybackSpeed"
+      response:
+          value: -1
+
+    - label: "Step 11: TH sends a Rewind command to the DUT"
+      PICS: MEDIAPLAYBACK.S.C06.Rsp
+      command: "Rewind"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+
+    - label:
+          "verify that the media play speed has increased in the reverse
+          direction."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C06.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please enter 'y' if media play speed has increased in the
+                    reverse direction"
+              - name: "expectedValue"
+                value: "y"
+
+    #Issue 19800
+    - label: "Step 12: TH reads the PlaybackSpeed attribute from the DUT"
+      PICS: MEDIAPLAYBACK.S.A0004 && MEDIAPLAYBACK.S.C06.Rsp
+      command: "readAttribute"
+      attribute: "PlaybackSpeed"
+      response:
+          value: -2
+
+    - label: "Step 13: TH sends a Play command to the DUT"
+      PICS: MEDIAPLAYBACK.S.C00.Rsp
+      command: "Play"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+
+    - label:
+          "verify that the media is has resumed playing forward at the default
+          speed."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please enter 'y' if media is has resumed playing forward at
+                    the default speed"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 14: TH reads the PlaybackSpeed attribute from the DUT"
+      command: "readAttribute"
+      attribute: "PlaybackSpeed"
+      PICS: MEDIAPLAYBACK.S.A0004 && MEDIAPLAYBACK.S.C00.Rsp
+      response:
+          value: 1
+
+    #Issue 10988
+    - label:
+          "Step 15: STH sends consecutive FastForward commands up to the
+          manufacturer defined max speed"
+      verification: |
+          Send below command consecutively multiple times to get error code as 4
+
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool mediaplayback fast-forward 1 3
+          ./chip-tv-casting-app mediaplayback fast-forward 1 3
+
+          On TH(chip-tool),  Verify that a SPEED_OUT_OF_RANGE (status 4) response is received.
+          [1655460522.133486][12273:12278] CHIP:DMG: },
+          [1655460522.133550][12273:12278] CHIP:DMG: Received Command Response Data, Endpoint=3 Cluster=0x0000_0506 Command=0x0000_000A
+          [1655460522.133603][12273:12278] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0506 Command 0x0000_000A
+          [1655460522.133667][12273:12278] CHIP:TOO:   PlaybackResponse: {
+          [1655460522.133704][12273:12278] CHIP:TOO:     status: 4
+          [1655460522.133729][12273:12278] CHIP:TOO:     data: data response
+          [1655460522.133751][12273:12278] CHIP:TOO:    }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C07.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 16: TH sends consecutive Rewind commands up to the manufacturer
+          defined max speed"
+      verification: |
+          Send below command consecutively multiple times to get error code as 4
+
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool mediaplayback rewind 1 3
+          ./chip-tv-casting-app mediaplayback rewind 1 3
+
+          On TH(chip-tool),  Verify that a SPEED_OUT_OF_RANGE (status 4) response is received.
+
+          [1655460483.177033][12225:12230] CHIP:DMG: Received Command Response Data, Endpoint=3 Cluster=0x0000_0506 Command=0x0000_000A
+          [1655460483.177083][12225:12230] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0506 Command 0x0000_000A
+          [1655460483.177146][12225:12230] CHIP:TOO:   PlaybackResponse: {
+          [1655460483.177182][12225:12230] CHIP:TOO:     status: 4
+          [1655460483.177206][12225:12230] CHIP:TOO:     data: data response
+          [1655460483.177228][12225:12230] CHIP:TOO:    }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C06.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"

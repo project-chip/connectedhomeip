@@ -14,15 +14,35 @@
 #    limitations under the License.
 #
 
+import enum
 import logging
-import time
 import threading
-
+import time
 from dataclasses import dataclass
-from typing import List, Dict, Set, Callable
+from typing import Callable, List, Optional, Set
 
 from chip.discovery.library_handle import _GetDiscoveryLibraryHandle
-from chip.discovery.types import DiscoverSuccessCallback_t, DiscoverFailureCallback_t
+from chip.discovery.types import DiscoverFailureCallback_t, DiscoverSuccessCallback_t
+from chip.native import PyChipError
+
+
+class DiscoveryType(enum.IntEnum):
+    DISCOVERY_NETWORK_ONLY = 0
+    DISCOVERY_NETWORK_ONLY_WITHOUT_PASE_AUTO_RETRY = 1
+    DISCOVERY_ALL = 2
+
+
+class FilterType(enum.IntEnum):
+    # These must match chip::Dnssd::DiscoveryFilterType values (barring the naming convention)
+    NONE = 0
+    SHORT_DISCRIMINATOR = 1
+    LONG_DISCRIMINATOR = 2
+    VENDOR_ID = 3
+    DEVICE_TYPE = 4
+    COMMISSIONING_MODE = 5
+    INSTANCE_NAME = 6
+    COMMISSIONER = 7
+    COMPRESSED_FABRIC_ID = 8
 
 
 @dataclass(unsafe_hash=True)
@@ -54,6 +74,28 @@ class PendingDiscovery:
     callback: Callable[[AggregatedDiscoveryResults], None]
     expireTime: int
     firstResultTime: int
+
+
+@dataclass
+class CommissionableNode():
+    instanceName: str = None
+    hostName: str = None
+    port: int = None
+    longDiscriminator: int = None
+    vendorId: int = None
+    productId: int = None
+    commissioningMode: int = None
+    deviceType: int = None
+    deviceName: str = None
+    pairingInstruction: str = None
+    pairingHint: int = None
+    mrpRetryIntervalIdle: int = None
+    mrpRetryIntervalActive: int = None
+    mrpRetryActiveThreshold: int = None
+    supportsTcp: bool = None
+    isICDOperatingAsLIT: bool = None
+    addresses: List[str] = None
+    rotatingId: Optional[str] = None
 
 
 # Milliseconds to wait for additional results onece a single result has
@@ -108,7 +150,7 @@ class _PendingDiscoveries:
                     if self.NeedsCallback(item):
                         try:
                             item.callback(item.result)
-                        except:
+                        except Exception:
                             logging.exception("Node discovery callback failed")
                     else:
                         updatedDiscoveries.append(item)
@@ -168,10 +210,10 @@ def _DiscoverSuccess(fabric: int, node: int, interface: int, ip: str,  port: int
 
 
 @DiscoverFailureCallback_t
-def _DiscoverFailure(fabric: int, node: int, errorCode: int):
+def _DiscoverFailure(fabric: int, node: int, errorCode: PyChipError):
     # Many discovery errors currently do not include a useful node/fabric id
     # hence we just log and rely on discovery timeouts to return 'no data'
-    logging.error("Discovery failure, error %d", errorCode)
+    logging.error("Discovery failure, error %d", errorCode.code)
 
 
 def FindAddressAsync(fabricid: int, nodeid: int, callback, timeout_ms=1000):

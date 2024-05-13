@@ -1,0 +1,621 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    4.2.6. [TC-SMOKECO-2.6] ExpressedState Attribute - Multiple Alarms with DUT
+    as Server
+
+PICS:
+    - SMOKECO.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Smoke CO Alarm"
+    endpoint: 1
+    timeout: 3090
+    TEST_EVENT_TRIGGER_KEY:
+        type: octet_string
+        defaultValue: "hex:00112233445566778899aabbccddeeff"
+    TEST_EVENT_TRIGGER_WARNING_SMOKE_ALARM:
+        type: int64u
+        defaultValue: "0x005c000000000090"
+    TEST_EVENT_TRIGGER_SMOKE_ALARM_CLEAR:
+        type: int64u
+        defaultValue: "0x005c0000000000a0"
+    TEST_EVENT_TRIGGER_WARNING_CO_ALARM:
+        type: int64u
+        defaultValue: "0x005c000000000091"
+    TEST_EVENT_TRIGGER_CO_ALARM_CLEAR:
+        type: int64u
+        defaultValue: "0x005c0000000000a1"
+    TEST_EVENT_TRIGGER_WARNING_BATTERY_ALERT:
+        type: int64u
+        defaultValue: "0x005c000000000095"
+    TEST_EVENT_TRIGGER_BATTERY_ALERT_CLEAR:
+        type: int64u
+        defaultValue: "0x005c0000000000a5"
+    TEST_EVENT_TRIGGER_INTERCONNECT_SMOKE_ALARM:
+        type: int64u
+        defaultValue: "0x005c000000000092"
+    TEST_EVENT_TRIGGER_INTERCONNECT_SMOKE_ALARM_CLEAR:
+        type: int64u
+        defaultValue: "0x005c0000000000a2"
+    TEST_EVENT_TRIGGER_INTERCONNECT_CO_ALARM:
+        type: int64u
+        defaultValue: "0x005c000000000094"
+    TEST_EVENT_TRIGGER_INTERCONNECT_CO_ALARM_CLEAR:
+        type: int64u
+        defaultValue: "0x005c0000000000a4"
+    HIEST_PRI_ALARM:
+        type: int8u
+        defaultValue: 1
+    HIEST_PRI_ALARM_2:
+        type: int8u
+        defaultValue: 7
+    HIEST_PRI_ALARM_3:
+        type: int8u
+        defaultValue: 7
+    HIEST_PRI_ALARM_4:
+        type: int8u
+        defaultValue: 7
+    HIEST_PRI_ALARM_5:
+        type: int8u
+        defaultValue: 3
+
+tests:
+    - label: "Step 1: Commission DUT to TH"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH reads ExpressedState attribute from DUT"
+      PICS: SMOKECO.S.A0000
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "Step 3: TH subscribes to BatteryAlert attribute from DUT"
+      PICS: SMOKECO.S.A0003
+      command: "subscribeAttribute"
+      attribute: "BatteryAlert"
+      minInterval: 1
+      maxInterval: 900
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label:
+          "Step 4: TH subscribes to InterconnectSmokeAlarm attribute from DUT"
+      PICS: SMOKECO.S.A0008
+      command: "subscribeAttribute"
+      attribute: "InterconnectSmokeAlarm"
+      minInterval: 1
+      maxInterval: 900
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "Step 5: TH subscribes to InterconnectCOAlarm attribute from DUT"
+      PICS: SMOKECO.S.A0009
+      command: "subscribeAttribute"
+      attribute: "InterconnectCOAlarm"
+      minInterval: 1
+      maxInterval: 900
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "Step 6: TH subscribes to COState attribute from DUT"
+      PICS: SMOKECO.S.A0002
+      command: "subscribeAttribute"
+      attribute: "COState"
+      minInterval: 1
+      maxInterval: 900
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "Step 7: TH subscribes to SmokeState attribute from DUT"
+      PICS: SMOKECO.S.A0001
+      command: "subscribeAttribute"
+      attribute: "SmokeState"
+      minInterval: 1
+      maxInterval: 900
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label:
+          "Step 8: TH reads TestEventTriggersEnabled attribute from General
+          Diagnostics Cluster"
+      PICS: DGGEN.S.A0008
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "readAttribute"
+      attribute: "TestEventTriggersEnabled"
+      response:
+          value: 1
+
+    - label: "Step 9a: TH subscribes to BatteryAlert attribute from DUT"
+      PICS: SMOKECO.S.A0003
+      command: "subscribeAttribute"
+      attribute: "BatteryAlert"
+      minInterval: 1
+      maxInterval: 900
+
+    - label:
+          "Step 9b: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Warning Battery Alert Test Event"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_WARNING_BATTERY_ALERT
+
+    - label:
+          "Step 10: TH waits for a report of BatteryAlert attribute from DUT
+          with a timeout of 300 seconds"
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0003
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read battery-alert 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0003 DataVersion: 1795725838
+          [TOO]   BatteryAlert: 1
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 11a: TH subscribes to InterconnectSmokeAlarm attribute from DUT"
+      PICS: SMOKECO.S.A0008
+      command: "subscribeAttribute"
+      attribute: "InterconnectSmokeAlarm"
+      minInterval: 1
+      maxInterval: 900
+
+    - label:
+          "Step 11b: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Interconnect Smoke Alarm Test
+          Event"
+      PICS: SMOKECO.S.A0008 && DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_INTERCONNECT_SMOKE_ALARM
+
+    - label:
+          "Step 12: TH waits for a report of InterconnectSmokeAlarm attribute
+          from DUT with a timeout of 300 seconds"
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0008
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read interconnect-smoke-alarm 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0008 DataVersion: 1795725838
+          [TOO]   InterconnectSmokeAlarm: 1
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 13a: TH subscribes to InterconnectCOAlarm attribute from DUT"
+      PICS: SMOKECO.S.A0009
+      command: "subscribeAttribute"
+      attribute: "InterconnectCOAlarm"
+      minInterval: 1
+      maxInterval: 900
+
+    - label:
+          "Step 13b: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Interconnect CO Alarm Test Event"
+      PICS: SMOKECO.S.A0009 && DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_INTERCONNECT_CO_ALARM
+
+    - label:
+          "Step 14: TH waits for a report of InterconnectCOAlarm attribute from
+          DUT with a timeout of 300 seconds"
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0009
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read interconnect-coalarm 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0009 DataVersion: 1795725838
+          [TOO]   InterconnectCOAlarm: 1
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 15a: TH subscribes to COState attribute from DUT"
+      PICS: SMOKECO.S.A0002
+      command: "subscribeAttribute"
+      attribute: "COState"
+      minInterval: 1
+      maxInterval: 900
+
+    - label:
+          "Step 15b: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Warning CO Alarm Test Event"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_WARNING_CO_ALARM
+
+    - label:
+          "Step 16: TH waits for a report of COState attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0002
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read costate 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0002 DataVersion: 1795725838
+          [TOO]   COState: 1
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 17a: TH subscribes to SmokeState attribute from DUT"
+      PICS: SMOKECO.S.A0001
+      command: "subscribeAttribute"
+      attribute: "SmokeState"
+      minInterval: 1
+      maxInterval: 900
+
+    - label:
+          "Step 17b: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Warning Smoke Alarm Test Event"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_WARNING_SMOKE_ALARM
+
+    - label:
+          "Step 18: TH waits for a report of SmokeState attribute from DUT with
+          a timeout of 300 seconds"
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0001
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read smoke-state 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0001 DataVersion: 1795725838
+          [TOO]   SmokeState: 1
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 19: TH reads ExpressedState attribute from DUT"
+      PICS: SMOKECO.S.A0000
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: HIEST_PRI_ALARM
+          constraints:
+              type: enum8
+
+    - label:
+          "Step 20: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Smoke Alarm Test Event Clear"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_SMOKE_ALARM_CLEAR
+
+    - label:
+          "Step 21: TH waits for a report of SmokeState attribute from DUT with
+          a timeout of 300 seconds"
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0001
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read smoke-state 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0001 DataVersion: 1795725838
+          [TOO]   SmokeState: 0
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 22: TH reads ExpressedState attribute from DUT"
+      PICS: SMOKECO.S.A0000
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: HIEST_PRI_ALARM_2
+          constraints:
+              type: enum8
+
+    - label: "Step 23a: TH subscribes to COState attribute from DUT"
+      PICS: SMOKECO.S.A0002
+      command: "subscribeAttribute"
+      attribute: "COState"
+      minInterval: 1
+      maxInterval: 900
+
+    - label:
+          "Step 23b: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for CO Alarm Test Event clear"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_CO_ALARM_CLEAR
+
+    - label:
+          "Step 24: TH waits for a report of COState attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0002
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read costate 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0002 DataVersion: 1795725838
+          [TOO]   COState: 0
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 25: TH reads ExpressedState attribute from DUT"
+      PICS: SMOKECO.S.A0000
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: HIEST_PRI_ALARM_3
+          constraints:
+              type: enum8
+
+    - label: "Step 26a: TH subscribes to InterconnectCOAlarm attribute from DUT"
+      PICS: SMOKECO.S.A0009
+      command: "subscribeAttribute"
+      attribute: "InterconnectCOAlarm"
+      minInterval: 1
+      maxInterval: 900
+
+    - label:
+          "Step 26b: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Interconnect CO Alarm Test Event
+          Clear"
+      PICS: SMOKECO.S.A0009 && DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_INTERCONNECT_CO_ALARM_CLEAR
+
+    - label:
+          "Step 27: TH waits for a report of InterconnectCOAlarm attribute from
+          DUT with a timeout of 300 seconds"
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0009
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read interconnect-coalarm 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0009 DataVersion: 1795725838
+          [TOO]   InterconnectCOAlarm: 0
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 28: TH reads ExpressedState attribute from DUT"
+      PICS: SMOKECO.S.A0000
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: HIEST_PRI_ALARM_4
+          constraints:
+              type: enum8
+
+    - label:
+          "Step 29a: TH subscribes to InterconnectSmokeAlarm attribute from DUT"
+      PICS: SMOKECO.S.A0008
+      command: "subscribeAttribute"
+      attribute: "InterconnectSmokeAlarm"
+      minInterval: 1
+      maxInterval: 900
+
+    - label:
+          "Step 29b: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Interconnect Smoke Alarm Test
+          Event Clear"
+      PICS: SMOKECO.S.A0008 && DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_INTERCONNECT_SMOKE_ALARM_CLEAR
+
+    - label:
+          "Step 30: TH waits for a report of InterconnectSmokeAlarm attribute
+          from DUT with a timeout of 300 seconds"
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0008
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read interconnect-smoke-alarm 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0008 DataVersion: 1795725838
+          [TOO]   InterconnectSmokeAlarm: 0
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 31: TH reads ExpressedState attribute from DUT"
+      PICS: SMOKECO.S.A0000
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: HIEST_PRI_ALARM_5
+          constraints:
+              type: enum8
+
+    - label: "Step 32a: TH subscribes to BatteryAlert attribute from DUT"
+      PICS: SMOKECO.S.A0003
+      command: "subscribeAttribute"
+      attribute: "BatteryAlert"
+      minInterval: 1
+      maxInterval: 900
+
+    - label:
+          "Step 32b: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Battery Alert Test Event Clear"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_BATTERY_ALERT_CLEAR
+
+    - label:
+          "Step 33: TH waits for a report of BatteryAlert attribute from DUT
+          with a timeout of 300 seconds"
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0003
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read battery-alert 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0003 DataVersion: 1795725838
+          [TOO]   BatteryAlert: 0
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 34: TH reads ExpressedState attribute from DUT"
+      PICS: SMOKECO.S.A0000
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 0
+          constraints:
+              type: enum8

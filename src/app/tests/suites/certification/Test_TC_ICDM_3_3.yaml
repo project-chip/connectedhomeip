@@ -1,0 +1,267 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 217.2.4. [TC-ICDM-3.3] Verify UnregisterClient command with DUT as Server
+
+PICS:
+    - ICDM.S
+    - ICDM.S.C00.Rsp
+    - ICDM.S.C02.Rsp
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Preconditions"
+      verification: |
+          1.Commission DUT to TH (can be skipped if done in a preceding test).
+          2a.TH reads from the DUT the RegisteredClients attribute.
+          2b.If list of registered clients is not empty, unregister existing client(s)
+          2c.TH reads from the DUT the RegisteredClients attribute. Verify that the DUT response contains empty list of registered clients.
+      disabled: true
+
+    - label:
+          "Step 1: TH sends UnregisterClient command with the CheckInNodeID
+          (CheckInNodeID1)."
+      PICS: ICDM.S.C02.Rsp
+      verification: |
+          ./chip-tool icdmanagement unregister-client 1 1 0
+
+          [1702437560.584692][2341:2343] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0046 Command=0x0000_0002 Status=0x8b
+          [1702437560.584811][2341:2343] CHIP:TOO: Error: IM Error 0x0000058B: General error: 0x8b (NOT_FOUND)
+      disabled: true
+
+    - label:
+          "Step 2a: TH sends RegisterClient command. - CheckInNodeID:
+          registering clients node ID (CheckInNodeID2) - MonitoredSubject:
+          monitored subject ID (MonitorSubID2) - Key: shared secret between the
+          client and the ICD (Key2)"
+      PICS: ICDM.S.C00.Rsp
+      verification: |
+          ./chip-tool icdmanagement register-client 2 2 hex:1234567890abcdef1234567890abcdef 1 0
+          On TH(chip-tool) verify that DUT responds with status code as success
+
+          [1702437824.926527][2361:2363] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0046 Command=0x0000_0001
+          [1702437824.926625][2361:2363] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Command 0x0000_0001
+          [1702437824.926835][2361:2363] CHIP:TOO:   RegisterClientResponse: {
+          [1702437824.926901][2361:2363] CHIP:TOO:     ICDCounter: 2124479668
+          [1702437824.926955][2361:2363] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 2b: TH reads from the DUT the RegisteredClients attribute."
+      PICS: ICDM.S.A0003
+      verification: |
+          ./chip-tool icdmanagement read registered-clients 1 0
+
+          On TH(Chip-tool), Verify that the DUT response contains a list of 1 registered client of given CheckInNodeID, MonitoredSubject, and Key
+
+          [1702437846.906320][2364:2366] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_0003 DataVersion: 2633987690
+          [1702437846.906504][2364:2366] CHIP:TOO:   RegisteredClients: 2 entries
+          [1702437846.906687][2364:2366] CHIP:TOO:     [1]: {
+          [1702437846.906746][2364:2366] CHIP:TOO:       CheckInNodeID: 112233
+          [1702437846.906800][2364:2366] CHIP:TOO:       MonitoredSubject: 112233
+          [1702437846.906880][2364:2366] CHIP:TOO:       FabricIndex: 1
+          [1702437846.906934][2364:2366] CHIP:TOO:      }
+          [1702437846.907003][2364:2366] CHIP:TOO:     [2]: {
+          [1702437846.907059][2364:2366] CHIP:TOO:       CheckInNodeID: 2
+          [1702437846.907108][2364:2366] CHIP:TOO:       MonitoredSubject: 2
+          [1702437846.907160][2364:2366] CHIP:TOO:       FabricIndex: 1
+          [1702437846.907211][2364:2366] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Step 3: TH sends UnregisterClient command with the CheckInNodeID
+          (CheckInNodeID3)."
+      PICS: ICDM.S.C02.Rsp
+      verification: |
+          ./chip-tool icdmanagement unregister-client 3 1 0
+
+          [1702437560.584692][2341:2343] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0046 Command=0x0000_0002 Status=0x8b
+          [1702437560.584811][2341:2343] CHIP:TOO: Error: IM Error 0x0000058B: General error: 0x8b (NOT_FOUND)
+      disabled: true
+
+    - label:
+          "Step 4a: Setup the TH such that is has administrator privileges for
+          the ICDM cluster."
+      verification: |
+          chip-tool default has admin privilege
+      disabled: true
+
+    - label:
+          "Step 4b: TH sends UnregisterClient command with the CheckInNodeID
+          (CheckInNodeID2)."
+      PICS: ICDM.S.C02.Rsp
+      verification: |
+          ./chip-tool icdmanagement unregister-client 2 1 0
+
+          [1702438116.143490][2387:2389] CHIP:DMG: InvokeResponseMessage =
+          [1702438116.143590][2387:2389] CHIP:DMG: {
+          [1702438116.143648][2387:2389] CHIP:DMG:         suppressResponse = false,
+          [1702438116.143877][2387:2389] CHIP:DMG:         InvokeResponseIBs =
+          [1702438116.144238][2387:2389] CHIP:DMG:         [
+          [1702438116.144308][2387:2389] CHIP:DMG:                 InvokeResponseIB =
+          [1702438116.144414][2387:2389] CHIP:DMG:                 {
+          [1702438116.144476][2387:2389] CHIP:DMG:                         CommandStatusIB =
+          [1702438116.144575][2387:2389] CHIP:DMG:                         {
+          [1702438116.144646][2387:2389] CHIP:DMG:                                 CommandPathIB =
+          [1702438116.144723][2387:2389] CHIP:DMG:                                 {
+          [1702438116.144825][2387:2389] CHIP:DMG:                                         EndpointId = 0x0,
+          [1702438116.144911][2387:2389] CHIP:DMG:                                         ClusterId = 0x46,
+          [1702438116.144993][2387:2389] CHIP:DMG:                                         CommandId = 0x2,
+          [1702438116.145097][2387:2389] CHIP:DMG:                                 },
+          [1702438116.145186][2387:2389] CHIP:DMG:
+          [1702438116.145278][2387:2389] CHIP:DMG:                                 StatusIB =
+          [1702438116.145357][2387:2389] CHIP:DMG:                                 {
+          [1702438116.145457][2387:2389] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1702438116.145538][2387:2389] CHIP:DMG:                                 },
+          [1702438116.145616][2387:2389] CHIP:DMG:
+          [1702438116.145683][2387:2389] CHIP:DMG:                         },
+          [1702438116.145782][2387:2389] CHIP:DMG:
+          [1702438116.145846][2387:2389] CHIP:DMG:                 },
+          [1702438116.145917][2387:2389] CHIP:DMG:
+          [1702438116.146004][2387:2389] CHIP:DMG:         ],
+          [1702438116.146078][2387:2389] CHIP:DMG:
+          [1702438116.146155][2387:2389] CHIP:DMG:         InteractionModelRevision = 11
+          [1702438116.146213][2387:2389] CHIP:DMG: },
+          [1702438116.146382][2387:2389] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0046 Command=0x0000_0002 Status=0x0
+      disabled: true
+
+    - label: "Step 4c: TH reads from the DUT the RegisteredClients attribute."
+      PICS: ICDM.S.A0003
+      verification: |
+          ./chip-tool icdmanagement read registered-clients 1 0
+
+          [1702438139.915311][2390:2392] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_0003 DataVersion: 2633987690
+          [1702438139.915462][2390:2392] CHIP:TOO:   RegisteredClients: 1 entries
+          [1702438139.915616][2390:2392] CHIP:TOO:     [1]: {
+          [1702438139.915667][2390:2392] CHIP:TOO:       CheckInNodeID: 112233
+          [1702438139.915708][2390:2392] CHIP:TOO:       MonitoredSubject: 112233
+          [1702438139.915774][2390:2392] CHIP:TOO:       FabricIndex: 1
+          [1702438139.915818][2390:2392] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Step 4d: Clear the THs administrator privileges for the ICDM cluster."
+      verification: |
+          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 4, "authMode": 2, "subjects": [112233], "targets": null } ]' 1 0
+      disabled: true
+
+    - label:
+          "Step 5a: TH sends RegisterClient command. - CheckInNodeID:
+          registering clients node ID (CheckInNodeID5) - MonitoredSubject:
+          monitored subject ID (MonitorSubID5) - Key: shared secret between the
+          client and the ICD (Key5) - VerificationKey: verification key
+          (VerificationKey5)"
+      PICS: ICDM.S.C00.Rsp
+      verification: |
+          ./chip-tool icdmanagement register-client 5 5 hex:5555567890abcdef5555567890abcdef 1 0 --VerificationKey hex:abcdef1234567890abcdef1234567890
+          On TH(chip-tool) verify that DUT responds with status code as success
+
+          [1702437824.926527][2361:2363] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0046 Command=0x0000_0001
+          [1702437824.926625][2361:2363] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Command 0x0000_0001
+          [1702437824.926835][2361:2363] CHIP:TOO:   RegisterClientResponse: {
+          [1702437824.926901][2361:2363] CHIP:TOO:     ICDCounter: 2124479668
+          [1702437824.926955][2361:2363] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 5b: TH reads from the DUT the RegisteredClients attribute."
+      PICS: ICDM.S.A0003
+      verification: |
+          ./chip-tool icdmanagement read registered-clients 1 0
+
+          On TH(Chip-tool), Verify that the DUT response contains a list of 1 registered client of given CheckInNodeID, MonitoredSubject, and Key
+
+          [1702438233.117193][2401:2403] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_0003 DataVersion: 2633987690
+          [1702438233.117356][2401:2403] CHIP:TOO:   RegisteredClients: 2 entries
+          [1702438233.117510][2401:2403] CHIP:TOO:     [1]: {
+          [1702438233.117559][2401:2403] CHIP:TOO:       CheckInNodeID: 112233
+          [1702438233.117603][2401:2403] CHIP:TOO:       MonitoredSubject: 112233
+          [1702438233.117669][2401:2403] CHIP:TOO:       FabricIndex: 1
+          [1702438233.117713][2401:2403] CHIP:TOO:      }
+          [1702438233.117772][2401:2403] CHIP:TOO:     [2]: {
+          [1702438233.117816][2401:2403] CHIP:TOO:       CheckInNodeID: 5
+          [1702438233.117859][2401:2403] CHIP:TOO:       MonitoredSubject: 5
+          [1702438233.117902][2401:2403] CHIP:TOO:       FabricIndex: 1
+          [1702438233.117944][2401:2403] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Step 6: TH sends UnregisterClient command with the CheckInNodeID from
+          Step 5a and an invalid VerificationKey. - CheckInNodeID: registering
+          clients node ID (CheckInNodeID5) - VerificationKey: invalid
+          verification key (VerificationKey6)"
+      PICS: ICDM.S.C02.Rsp
+      verification: |
+          ./chip-tool icdmanagement unregister-client 5 1 0 --VerificationKey hex:abcdef1234567890
+
+          [1703268222.346310][2758:2760] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0046 Command=0x0000_0002 Status=0x1
+          [1703268222.346412][2758:2760] CHIP:TOO: Error: IM Error 0x00000501: General error: 0x01 (FAILURE)
+      disabled: true
+
+    - label:
+          "Step 7: TH sends UnregisterClient command with the CheckInNodeID from
+          Step 5a and different VerificationKey. - CheckInNodeID: registering
+          clients node ID (CheckInNodeID5) - VerificationKey: valid verification
+          key (VerificationKey7)"
+      PICS: ICDM.S.C02.Rsp
+      verification: |
+          ./chip-tool icdmanagement unregister-client 5 1 0 --VerificationKey hex:abcdef1234567890abcdef1234500000
+
+          [1703268200.542869][2755:2757] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0046 Command=0x0000_0002 Status=0x1
+          [1703268200.543007][2755:2757] CHIP:TOO: Error: IM Error 0x00000501: General error: 0x01 (FAILURE)
+      disabled: true
+
+    - label:
+          "Step 8: TH sends UnregisterClient command with the CheckInNodeID and
+          VerificationKey from Step 5a. - CheckInNodeID: registering clients
+          node ID (CheckInNodeID5) - VerificationKey: verification key
+          (VerificationKey5)"
+      PICS: ICDM.S.C02.Rsp
+      verification: |
+          ./chip-tool icdmanagement unregister-client 5 1 0 --VerificationKey hex:abcdef1234567890abcdef1234567890
+
+          [1702438116.143490][2387:2389] CHIP:DMG: InvokeResponseMessage =
+          [1702438116.143590][2387:2389] CHIP:DMG: {
+          [1702438116.143648][2387:2389] CHIP:DMG:         suppressResponse = false,
+          [1702438116.143877][2387:2389] CHIP:DMG:         InvokeResponseIBs =
+          [1702438116.144238][2387:2389] CHIP:DMG:         [
+          [1702438116.144308][2387:2389] CHIP:DMG:                 InvokeResponseIB =
+          [1702438116.144414][2387:2389] CHIP:DMG:                 {
+          [1702438116.144476][2387:2389] CHIP:DMG:                         CommandStatusIB =
+          [1702438116.144575][2387:2389] CHIP:DMG:                         {
+          [1702438116.144646][2387:2389] CHIP:DMG:                                 CommandPathIB =
+          [1702438116.144723][2387:2389] CHIP:DMG:                                 {
+          [1702438116.144825][2387:2389] CHIP:DMG:                                         EndpointId = 0x0,
+          [1702438116.144911][2387:2389] CHIP:DMG:                                         ClusterId = 0x46,
+          [1702438116.144993][2387:2389] CHIP:DMG:                                         CommandId = 0x2,
+          [1702438116.145097][2387:2389] CHIP:DMG:                                 },
+          [1702438116.145186][2387:2389] CHIP:DMG:
+          [1702438116.145278][2387:2389] CHIP:DMG:                                 StatusIB =
+          [1702438116.145357][2387:2389] CHIP:DMG:                                 {
+          [1702438116.145457][2387:2389] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1702438116.145538][2387:2389] CHIP:DMG:                                 },
+          [1702438116.145616][2387:2389] CHIP:DMG:
+          [1702438116.145683][2387:2389] CHIP:DMG:                         },
+          [1702438116.145782][2387:2389] CHIP:DMG:
+          [1702438116.145846][2387:2389] CHIP:DMG:                 },
+          [1702438116.145917][2387:2389] CHIP:DMG:
+          [1702438116.146004][2387:2389] CHIP:DMG:         ],
+          [1702438116.146078][2387:2389] CHIP:DMG:
+          [1702438116.146155][2387:2389] CHIP:DMG:         InteractionModelRevision = 11
+          [1702438116.146213][2387:2389] CHIP:DMG: },
+          [1702438116.146382][2387:2389] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0046 Command=0x0000_0002 Status=0x0
+      disabled: true

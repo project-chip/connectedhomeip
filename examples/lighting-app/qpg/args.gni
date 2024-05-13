@@ -14,18 +14,21 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
+import("${chip_root}/config/standalone/args.gni")
 import("${chip_root}/examples/platform/qpg/args.gni")
 
 qpg_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
-declare_args() {
-  chip_enable_ota_requestor = true
-  chip_openthread_ftd = true
+chip_enable_ota_requestor = true
+chip_openthread_ftd = true
+enable_sleepy_device = false
 
-  # Disable lock tracking, since our FreeRTOS configuration does not set
-  # INCLUDE_xSemaphoreGetMutexHolder
-  chip_stack_lock_tracking = "none"
-}
+# Disable lock tracking, since our FreeRTOS configuration does not set
+# INCLUDE_xSemaphoreGetMutexHolder
+chip_stack_lock_tracking = "none"
+
+matter_device_vid = "0xFFF1"
+matter_device_pid = "0x8005"
 
 pw_log_BACKEND = "${chip_root}/src/lib/support/pw_log_chip"
-pw_assert_BACKEND = "$dir_pw_assert_log"
+pw_assert_BACKEND = "$dir_pw_assert_log:check_backend"

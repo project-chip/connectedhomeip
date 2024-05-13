@@ -23,7 +23,7 @@
 
 #include <system/SystemConfig.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && !CHIP_SYSTEM_CONFIG_USE_LIBEV
 
 #include <system/WakeEvent.h>
 
@@ -38,8 +38,12 @@
 #include <unistd.h>
 
 #if !CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
+#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_EVENTFD
+#include <zephyr/posix/sys/eventfd.h>
+#else
 #include <sys/eventfd.h>
 #endif
+#endif // !CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
 
 namespace chip {
 namespace System {
@@ -101,7 +105,8 @@ void WakeEvent::Confirm() const
         res = ::read(mReadFD, buffer, sizeof(buffer));
         if (res < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
         {
-            ChipLogError(chipSystemLayer, "System wake event confirm failed: %s", ErrorStr(CHIP_ERROR_POSIX(errno)));
+            ChipLogError(chipSystemLayer, "System wake event confirm failed: %" CHIP_ERROR_FORMAT,
+                         CHIP_ERROR_POSIX(errno).Format());
             return;
         }
     } while (res == sizeof(buffer));
@@ -120,6 +125,42 @@ CHIP_ERROR WakeEvent::Notify() const
 }
 
 #else // CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
+
+namespace {
+
+#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_EVENTFD
+
+int ReadEvent(int eventFd)
+{
+    eventfd_t value;
+
+    return eventfd_read(eventFd, &value);
+}
+
+int WriteEvent(int eventFd)
+{
+    return eventfd_write(eventFd, 1);
+}
+
+#else
+
+ssize_t ReadEvent(int eventFd)
+{
+    uint64_t value;
+
+    return ::read(eventFd, &value, sizeof(value));
+}
+
+ssize_t WriteEvent(int eventFd)
+{
+    uint64_t value = 1;
+
+    return ::write(eventFd, &value, sizeof(value));
+}
+
+#endif
+
+} // namespace
 
 CHIP_ERROR WakeEvent::Open(LayerSockets & systemLayer)
 {
@@ -145,19 +186,15 @@ void WakeEvent::Close(LayerSockets & systemLayer)
 
 void WakeEvent::Confirm() const
 {
-    uint64_t value;
-
-    if (::read(mReadFD, &value, sizeof(value)) < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
+    if (ReadEvent(mReadFD) < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
     {
-        ChipLogError(chipSystemLayer, "System wake event confirm failed: %s", ErrorStr(CHIP_ERROR_POSIX(errno)));
+        ChipLogError(chipSystemLayer, "System wake event confirm failed: %" CHIP_ERROR_FORMAT, CHIP_ERROR_POSIX(errno).Format());
     }
 }
 
 CHIP_ERROR WakeEvent::Notify() const
 {
-    uint64_t value = 1;
-
-    if (::write(mReadFD, &value, sizeof(value)) < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
+    if (WriteEvent(mReadFD) < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
     {
         return CHIP_ERROR_POSIX(errno);
     }
@@ -170,4 +207,4 @@ CHIP_ERROR WakeEvent::Notify() const
 } // namespace System
 } // namespace chip
 
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && !CHIP_SYSTEM_CONFIG_USE_LIBEV

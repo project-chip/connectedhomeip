@@ -18,32 +18,51 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandlerInterface.h>
-#include <lib/support/BytesCircularBuffer.h>
+#include <app/clusters/diagnostic-logs-server/DiagnosticLogsProviderDelegate.h>
 
-#include <array>
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace DiagnosticLogs {
 
 /// A reference implementation for DiagnosticLogs source.
-class DiagnosticLogsCommandHandler : public chip::app::CommandHandlerInterface
+class DiagnosticLogsServer
 {
 public:
-    static constexpr const uint16_t kDiagnosticLogsEndpoint   = 0;
-    static constexpr const uint16_t kDiagnosticLogsBufferSize = 4 * 1024; // 4K internal memory to store text logs
+    static DiagnosticLogsServer & Instance();
 
-    DiagnosticLogsCommandHandler() :
-        CommandHandlerInterface(chip::MakeOptional<chip::EndpointId>(chip::EndpointId(kDiagnosticLogsEndpoint)),
-                                chip::app::Clusters::DiagnosticLogs::Id),
-        mBuffer(mStorage.data(), mStorage.size())
-    {}
+    /**
+     * Set the default delegate of the diagnostic logs cluster for the specified endpoint
+     *
+     * @param endpoint ID of the endpoint
+     *
+     * @param delegate The log provider delegate at the endpoint
+     */
+    void SetDiagnosticLogsProviderDelegate(EndpointId endpoint, DiagnosticLogsProviderDelegate * delegate);
 
-    // Inherited from CommandHandlerInterface
-    void InvokeCommand(HandlerContext & handlerContext) override;
+    /**
+     * Handles the request to download diagnostic logs of type specified in the intent argument for protocol type ResponsePayload
+     * This should return whatever fits in the logContent field of the RetrieveLogsResponse command
+     *
+     * @param commandObj  The command handler object from the RetrieveLogsRequest command
+     * @param path        The command path from the RetrieveLogsRequest command
+     * @param intent      The log type requested in the RetrieveLogsRequest command
+     * @param status      The status to be returned on success
+     *
+     */
+    void HandleLogRequestForResponsePayload(CommandHandler * commandObj, const ConcreteCommandPath & path, IntentEnum intent,
+                                            StatusEnum status = StatusEnum::kSuccess);
 
-    CHIP_ERROR PushLog(const chip::ByteSpan & payload);
+    void HandleLogRequestForBdx(CommandHandler * commandObj, const ConcreteCommandPath & path, IntentEnum intent,
+                                Optional<CharSpan> transferFileDesignator);
 
 private:
-    std::array<uint8_t, kDiagnosticLogsBufferSize> mStorage;
-    chip::BytesCircularBuffer mBuffer;
+    static DiagnosticLogsServer sInstance;
 };
+
+} // namespace DiagnosticLogs
+} // namespace Clusters
+} // namespace app
+} // namespace chip

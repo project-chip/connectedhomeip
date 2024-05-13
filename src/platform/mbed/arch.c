@@ -73,7 +73,7 @@ void usleep(unsigned int usec)
         thread_sleep_for(ms);
         uint64_t end = get_clock_monotonic();
 
-        uint64_t delta = (uint64_t)(end - start);
+        uint64_t delta = (uint64_t) (end - start);
         if (delta >= usec)
         {
             return;

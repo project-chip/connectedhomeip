@@ -23,13 +23,17 @@
 
 #pragma once
 
-#include <dispatch/dispatch.h>
+#include <lib/core/Global.h>
+#include <platform/Darwin/BleScannerDelegate.h>
 #include <platform/internal/GenericPlatformManagerImpl.h>
 
-static constexpr const char * const CHIP_CONTROLLER_QUEUE = "com.zigbee.chip.framework.controller.workqueue";
+#include <atomic>
+#include <dispatch/dispatch.h>
 
 namespace chip {
 namespace DeviceLayer {
+
+class BleScannerDelegate;
 
 /**
  * Concrete implementation of the PlatformManager singleton object for Darwin platforms.
@@ -43,22 +47,18 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
 
-    dispatch_queue_t GetWorkQueue()
-    {
-        if (mWorkQueue == nullptr)
-        {
-            mWorkQueue = dispatch_queue_create(CHIP_CONTROLLER_QUEUE, DISPATCH_QUEUE_SERIAL);
-            dispatch_suspend(mWorkQueue);
-        }
-        return mWorkQueue;
-    }
+    dispatch_queue_t GetWorkQueue() { return mWorkQueue; }
+    bool IsWorkQueueCurrentQueue() const;
+
+    CHIP_ERROR StartBleScan(BleScannerDelegate * delegate, BleScanMode mode = BleScanMode::kDefault);
+    CHIP_ERROR StopBleScan();
 
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
 
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
     CHIP_ERROR _InitChipStack();
-    CHIP_ERROR _Shutdown();
+    void _Shutdown();
 
     CHIP_ERROR _StartChipTimer(System::Clock::Timeout delay) { return CHIP_ERROR_NOT_IMPLEMENTED; };
     CHIP_ERROR _StartEventLoopTask();
@@ -71,26 +71,34 @@ private:
     CHIP_ERROR _PostEvent(const ChipDeviceEvent * event);
 
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
-    bool _IsChipStackLockedByCurrentThread() const { return false; };
+    bool _IsChipStackLockedByCurrentThread() const;
 #endif
 
     // ===== Members for internal use by the following friends.
 
     friend PlatformManager & PlatformMgr(void);
     friend PlatformManagerImpl & PlatformMgrImpl(void);
-    friend class Internal::BLEManagerImpl;
 
-    static PlatformManagerImpl sInstance;
+    friend AtomicGlobal<PlatformManagerImpl>;
+    static AtomicGlobal<PlatformManagerImpl> sInstance;
+
+    PlatformManagerImpl();
 
     System::Clock::Timestamp mStartTime = System::Clock::kZero;
 
-    dispatch_queue_t mWorkQueue = nullptr;
+    dispatch_queue_t mWorkQueue;
+
+    enum class WorkQueueState
+    {
+        kSuspended,
+        kRunning,
+        kSuspensionPending,
+    };
+
+    std::atomic<WorkQueueState> mWorkQueueState = WorkQueueState::kSuspended;
+
     // Semaphore used to implement blocking behavior in _RunEventLoop.
     dispatch_semaphore_t mRunLoopSem;
-
-    bool mIsWorkQueueRunning = false;
-
-    inline ImplClass * Impl() { return static_cast<PlatformManagerImpl *>(this); }
 };
 
 /**
@@ -101,18 +109,18 @@ private:
  */
 inline PlatformManager & PlatformMgr(void)
 {
-    return PlatformManagerImpl::sInstance;
+    return PlatformManagerImpl::sInstance.get();
 }
 
 /**
  * Returns the platform-specific implementation of the PlatformManager singleton object.
  *
  * chip applications can use this to gain access to features of the PlatformManager
- * that are specific to the ESP32 platform.
+ * that are specific to the platform.
  */
 inline PlatformManagerImpl & PlatformMgrImpl(void)
 {
-    return PlatformManagerImpl::sInstance;
+    return PlatformManagerImpl::sInstance.get();
 }
 
 } // namespace DeviceLayer

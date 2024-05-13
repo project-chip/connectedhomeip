@@ -18,15 +18,19 @@
 
 /**
  *    @file
- *      Header file for the fault-injection utilities for Inet.
+ *      Header file for the fault-injection utilities for CHIP.
  */
 
 #pragma once
 
 #include <lib/core/CHIPConfig.h>
-#include <lib/core/CHIPEventLoggingConfig.h>
 
-#if CHIP_CONFIG_TEST && CHIP_WITH_NLFAULTINJECTION
+#if CHIP_WITH_NLFAULTINJECTION
+#ifdef NDEBUG
+// TODO(#30453): After fixing the issue where CHIP_WITH_NLFAULTINJECTION is seemingly enabled on release builds,
+// uncomment the line below.
+// static_assert(false, "CHIP_WITH_NLFAULTINJECTION should NOT be enabled on release build");
+#endif
 
 #include <nlfaultinjection.hpp>
 
@@ -58,11 +62,25 @@ typedef enum
     kFault_BDXBadBlockCounter,   /**< Corrupt the BDX Block Counter in the BDX BlockSend or BlockEOF message about to be sent */
     kFault_BDXAllocTransfer,     /**< Fail the allocation of a BDXTransfer object */
     kFault_SecMgrBusy,           /**< Trigger a WEAVE_ERROR_SECURITY_MANAGER_BUSY when starting an authentication session */
+    kFault_IMInvoke_SeparateResponses, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid commands and respond
+                                        with 2 InvokeResponseMessages */
+    kFault_IMInvoke_SeparateResponsesInvertResponseOrder, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid
+                                        commands and respond with 2 InvokeResponseMessages where the response order is inverted
+                                        compared to the request order */
+    kFault_IMInvoke_SkipSecondResponse, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid commands and respond
+                                        with 1 InvokeResponseMessage, dropping the response to the second request */
 #if CONFIG_NETWORK_LAYER_BLE
     kFault_CHIPOBLESend, /**< Inject a GATT error when sending the first fragment of a chip message over BLE */
-#endif                   // CONFIG_NETWORK_LAYER_BLE
+#endif
+    kFault_CASEServerBusy, /**< Respond to CASE_Sigma1 with a BUSY status */
     kFault_NumItems,
 } Id;
+
+static_assert(kFault_IMInvoke_SeparateResponses == 12, "Test plan specification and automation code relies on this value being 12");
+static_assert(kFault_IMInvoke_SeparateResponsesInvertResponseOrder == 13,
+              "Test plan specification and automation code relies on this value being 13");
+static_assert(kFault_IMInvoke_SkipSecondResponse == 14,
+              "Test plan specification and automation code relies on this value being 14");
 
 DLL_EXPORT nl::FaultInjection::Manager & GetManager();
 
@@ -128,10 +146,10 @@ DLL_EXPORT void FuzzExchangeHeader(uint8_t * p, int32_t arg);
 #define CHIP_FAULT_INJECTION_EXCH_HEADER_NUM_FIELDS 4
 #define CHIP_FAULT_INJECTION_EXCH_HEADER_NUM_FIELDS_RMP 5
 
-#else // CHIP_CONFIG_TEST
+#else // CHIP_WITH_NLFAULTINJECTION
 
 #define CHIP_FAULT_INJECT(aFaultID, aStatements)
 #define CHIP_FAULT_INJECT_WITH_ARGS(aFaultID, aProtectedStatements, aUnprotectedStatements)
 #define CHIP_FAULT_INJECT_MAX_ARG(aFaultID, aMaxArg, aProtectedStatements, aUnprotectedStatements)
 
-#endif // CHIP_CONFIG_TEST
+#endif // CHIP_WITH_NLFAULTINJECTION

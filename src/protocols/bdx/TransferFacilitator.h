@@ -41,16 +41,23 @@ namespace bdx {
  * This class contains a repeating timer which regurlaly polls the TransferSession state machine.
  * A CHIP node may have many TransferFacilitator instances but only one TransferFacilitator should be used for each BDX transfer.
  */
-class TransferFacilitator : public Messaging::ExchangeDelegate
+class TransferFacilitator : public Messaging::ExchangeDelegate, public Messaging::UnsolicitedMessageHandler
 {
 public:
     TransferFacilitator() : mExchangeCtx(nullptr), mSystemLayer(nullptr), mPollFreq(kDefaultPollFreq) {}
     ~TransferFacilitator() override = default;
 
 private:
+    //// UnsolicitedMessageHandler Implementation ////
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override
+    {
+        // TODO: Implement a bdx manager, which dispatch bdx messages to bdx transections.
+        // directly.
+        newDelegate = this;
+        return CHIP_NO_ERROR;
+    }
+
     // Inherited from ExchangeContext
-    CHIP_ERROR OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PayloadHeader & payloadHeader,
-                                 chip::System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
     /**
@@ -64,6 +71,10 @@ private:
     virtual void HandleTransferSessionOutput(TransferSession::OutputEvent & event) = 0;
 
 protected:
+    // Inherited from ExchangeContext
+    CHIP_ERROR OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PayloadHeader & payloadHeader,
+                                 chip::System::PacketBufferHandle && payload) override;
+
     /**
      * The callback for when the poll timer expires. The poll timer regulates how often the TransferSession is polled.
      */
@@ -85,6 +96,7 @@ protected:
     System::Clock::Timeout mPollFreq;
     static constexpr System::Clock::Timeout kDefaultPollFreq    = System::Clock::Milliseconds32(500);
     static constexpr System::Clock::Timeout kImmediatePollDelay = System::Clock::Milliseconds32(1);
+    bool mStopPolling                                           = false;
 };
 
 /**
@@ -109,6 +121,11 @@ public:
     CHIP_ERROR PrepareForTransfer(System::Layer * layer, TransferRole role, BitFlags<TransferControlFlags> xferControlOpts,
                                   uint16_t maxBlockSize, System::Clock::Timeout timeout,
                                   System::Clock::Timeout pollFreq = TransferFacilitator::kDefaultPollFreq);
+
+    /**
+     * Calls reset on the TransferSession object and stops the poll timer.
+     */
+    void ResetTransfer();
 };
 
 /**
@@ -127,12 +144,16 @@ public:
      * @param[in] layer      A System::Layer pointer to use to start the polling timer
      * @param[in] role       The role of the Initiator: Sender or Receiver of BDX data
      * @param[in] initData   Data needed for preparing a transfer request BDX message
-     * @param[in] timeoutMs  The chosen timeout delay for the BDX transfer in milliseconds
-     * @param[in] pollFreqMs The period for the TransferSession poll timer in milliseconds
+     * @param[in] timeout    The chosen timeout delay for the BDX transfer in milliseconds
+     * @param[in] pollFreq   The period for the TransferSession poll timer in milliseconds
      */
     CHIP_ERROR InitiateTransfer(System::Layer * layer, TransferRole role, const TransferSession::TransferInitData & initData,
                                 System::Clock::Timeout timeout,
                                 System::Clock::Timeout pollFreq = TransferFacilitator::kDefaultPollFreq);
+    /**
+     * Calls reset on the TransferSession object and stops the poll timer.
+     */
+    void ResetTransfer();
 };
 
 } // namespace bdx

@@ -1,0 +1,382 @@
+#!/bin/bash -e
+
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Usage: configure [OPTIONS] [--project=... [PROJECT OPTIONS]]
+#
+# Configures a stand-alone build for a CHIP application in the current
+# directory and creates a `ninja-build` wrapper script to build it. Should
+# generally be run from an empty build directory (i.e. out-of-tree).
+#
+# This is intended to be used in the context of an external build system and
+# represents a light-weight alternative to bootstrapping the full Pigweed build
+# environment (via scripts/activate.sh). The pigweed git sub-module must still
+# be present though.
+#
+# External tool dependencies: bash, python3, gn, ninja
+#
+# The zap-cli code generator and a small number of Python modules are
+# downloaded if necessary (see scripts/setup/requirements.build.txt) and
+# installed in a build environment directory. By default this is local to
+# the build directory, but an external directory can be specified using the
+# --build-env-dir option. The build environment directory can be shared by any
+# number of build directories, independently of target / tool chain.
+
+set -o pipefail
+shopt -s extglob
+
+function usage() { # status
+    info "Usage: $0 [OPTIONS] [--project=... [PROJECT OPTIONS]]"
+    info "Options:"
+    info "  --build-env-dir=DIR   Directory to create (host) build environment in"
+    info "  --project=DIR         directory to build, absolute or relative to chip root,"
+    info "                        eg examples/lighting-app/linux or /my/dir/my/app"
+    info ""
+    info "Project options (mapped to GN build args):"
+    info "  --enable-<ARG>[=no]   Enables (or disables with '=no') a bool build arg"
+    info "  --<ARG>=<VALUE>       Sets a (non-bool) build arg to the given value"
+    info "  GN argument names can be specified with '-' instead of '_' and prefixes"
+    info "  like 'chip_' can be ommitted from names. For the full list of available"
+    info "  build arguments, see the generated args.configured file."
+    info ""
+    info "  By default, the toolchain for the GN build will be configured from the usual"
+    info "  environment variables (CC, CXX, AR, CFLAGS, CXXFLAGS, ...), falling back to"
+    info "  default tool names (CC=cc, ...). When using this script within an external"
+    info "  build system, toolchain environment variables should be populated."
+    info ""
+    info "Code generation:"
+    info "  By default, some code generation will happen at build time using zap-cli."
+    info "  If zap-cli is not available on PATH, configure will attempt to download it."
+    info "  Alternatively, if a directory called 'zzz_pregenerated' exists at the root"
+    info "  of the project or the root of the SDK, pre-generated code from this directory"
+    info "  will be used. In this case, build time code generation will be disabled and"
+    info "  zap-cli is not required."
+    exit "$1"
+}
+
+function main() { # ...
+    CHIP_ROOT=$(cd "$(dirname "$0")/.." && pwd)
+    BUILD_ENV_DEPS=(
+        "${CHIP_ROOT}/scripts/setup/requirements.build.txt"
+        "${CHIP_ROOT}/scripts/setup/constraints.txt"
+    )
+    BUILD_ENV_DEPS_CODEGEN=(
+        "${CHIP_ROOT}/scripts/setup/zap.version"
+    )
+
+    # Parse global options, process VAR=VALUE style arguments, and collect project options
+    BUILD_ENV_DIR=
+    PROJECT=
+    PROJECT_PATH=
+    PROJECT_ARGS=()
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+        --help) usage 0 ;;
+        --build-env-dir=*) BUILD_ENV_DIR="${1#*=}" ;;
+        --project=*) PROJECT="${1#*=}" ;;
+        +([A-Z_])=*) export "$1" ;;
+        *)
+            [[ -n "$PROJECT" ]] || fail "Invalid argument: '$1'"
+            PROJECT_ARGS+=("$1")
+            ;;
+        esac
+        shift
+    done
+
+    # Ensure we have something to do
+    [[ -n "$PROJECT" || -n "$BUILD_ENV_DIR" ]] || usage 1
+
+    if [[ -n "$PROJECT" ]]; then
+        PROJECT_PATH="$(cd "${CHIP_ROOT}" 2>/dev/null && cd "${PROJECT}" 2>/dev/null && pwd)"
+        [[ -n "$PROJECT_PATH" && -r "${PROJECT_PATH}/.gn" ]] || fail "Invalid project '${PROJECT}' - missing .gn at '${PROJECT_PATH}'"
+    fi
+
+    if [[ -n "$PW_ROOT" ]]; then
+        info "WARNING: A Pigweed environment appears to be active, this is usually a misconfiguration."
+    fi
+
+    # Check for pre-generated code. CHIP_PREGEN_DIR will be picked up by process_project_args.
+    local pregen_dir="zzz_pregenerated"
+    if [[ -n "$PROJECT_PATH" && -d "${PROJECT_PATH}/${pregen_dir}" ]]; then
+        info "Will use pre-generated code from ${PROJECT}/${pregen_dir}, no zap-cli required."
+        export CHIP_PREGEN_DIR="//${pregen_dir}"
+    elif [[ -d "${CHIP_ROOT}/${pregen_dir}" ]]; then
+        info "Will use pre-generated code from ${pregen_dir}, no zap-cli required."
+        export CHIP_PREGEN_DIR="\${chip_root}/${pregen_dir}"
+    else
+        BUILD_ENV_DEPS+=("${BUILD_ENV_DEPS_CODEGEN[@]}")
+        unset CHIP_PREGEN_DIR
+    fi
+
+    # Work out build and environment directories
+    if [[ "$PWD" == "$CHIP_ROOT" ]]; then
+        BUILD_DIR="out/configured"
+        NINJA_HINT="ninja -C ${BUILD_DIR}"
+    else
+        BUILD_DIR="."
+        NINJA_HINT="ninja"
+    fi
+
+    if [[ -n "$BUILD_ENV_DIR" ]]; then
+        mkdir -p "$BUILD_ENV_DIR"
+        BUILD_ENV_PATH="$(cd "$BUILD_ENV_DIR" && pwd)"
+        [[ -n "$BUILD_ENV_PATH" ]] || fail "Invalid build-env-dir '${BUILD_ENV_DIR}'"
+        BUILD_ENV_DIR="$BUILD_ENV_PATH" # absolute
+    else
+        BUILD_ENV_DIR="build-env" # relative to BUILD_DIR
+        BUILD_ENV_PATH="${BUILD_DIR}/${BUILD_ENV_DIR}"
+    fi
+
+    # Check required tools are present
+    check_binary gn GN
+    check_binary ninja NINJA
+
+    # Create the build environment if necessary
+    if ! check_build_env; then
+        check_python
+        configure_python_env
+        if [[ -z "$CHIP_PREGEN_DIR" ]] && ! check_binary zap-cli; then
+            download_zap
+        fi
+        finalize_build_env
+    fi
+
+    # Configure the project (if requested)
+    if [[ -z "$PROJECT" ]]; then
+        info "Build environment created. (Specify --project=DIR to configure a build.)"
+        return
+    fi
+
+    [[ "$BUILD_DIR" != "." ]] && info "Configuring in-tree, will build in ${BUILD_DIR}"
+
+    create_empty_pw_env
+    guess_toolchain
+    gn_generate "${PROJECT_ARGS[@]}"
+    create_ninja_wrapper
+    info "You can now run ./ninja-build (or $NINJA_HINT)"
+}
+
+function create_empty_pw_env() {
+    # The Pigweed environment ("//build_overrides/pigweed_environment.gni") is
+    # imported unconditionally in various build files, so ensure it exists.
+    local gni="build_overrides/pigweed_environment.gni"
+    if [[ -d "${CHIP_ROOT}/$(dirname "$gni")" ]]; then
+        if safe_to_clobber "$gni"; then
+            info "Creating empty $gni in source tree"
+            echo "# ${CONFIGURE_MARKER}" >"${CHIP_ROOT}/${gni}"
+        else
+            info "WARNING: Leaving existing $gni in place, this might affect the build configuration."
+        fi
+    fi
+}
+
+function guess_toolchain() {
+    # There is no widely used standard command for the C++ compiler (analogous to
+    # `cc` for the C compiler), so if neither CC nor CXX are defined try to guess.
+    if [[ -z "$CC" && -z "$CXX" ]] && have_binary cc; then
+        local probe="$(cc -E - <<<'gnu=__GNUC__ clang=__clang__' 2>/dev/null)"
+        # Check for clang first because it also defines __GNUC__
+        if [[ "$probe" =~ clang=[1-9] ]] && have_binary clang && have_binary clang++; then
+            info "Guessing CC=clang CXX=clang++ because cc appears to be clang"
+            export CC=clang CXX=clang++
+        elif [[ "$probe" =~ gnu=[1-9] ]] && have_binary gcc && have_binary g++; then
+            info "Guessing CC=gcc CXX=g++ because cc appears to be gcc"
+            export CC=gcc CXX=g++
+        else
+            info "Unable to guess c++ compiler: $probe"
+        fi
+    fi
+}
+
+function gn_generate() { # [project options]
+    mkdir -p "${BUILD_DIR}"
+    ensure_no_clobber "${BUILD_DIR}/args.gn"
+
+    # Pass --script-executable to all `gn` calls so scripts run in our venv
+    local gn=(gn --script-executable="${BUILD_ENV_DIR}/bin/python" --root="${PROJECT_PATH}")
+
+    # Run gn gen with an empty args.gn first so we can list all arguments
+    info "Configuring gn build arguments (see $BUILD_DIR/args.configured for full list)"
+    {
+        echo "# ${CONFIGURE_MARKER}"
+        echo "# project root: ${PROJECT_PATH}"
+        echo "import(\"//build_overrides/chip.gni\")"
+    } >"${BUILD_DIR}/args.gn"
+    "${gn[@]}" -q gen "$BUILD_DIR"
+
+    # Use the argument list to drive the mapping of our command line options to GN args
+    call_impl process_project_args <("${gn[@]}" args "$BUILD_DIR" --list --json) "$@" >>"${BUILD_DIR}/args.gn"
+    "${gn[@]}" args "$BUILD_DIR" --list >"${BUILD_DIR}/args.configured"
+
+    # Now gn gen with the arguments we have configured.
+    info "Running gn gen to generate ninja files"
+    "${gn[@]}" -q gen "$BUILD_DIR"
+}
+
+function create_ninja_wrapper() {
+    local wrapper="ninja-build"
+    ensure_no_clobber "$wrapper"
+    {
+        echo "#!/bin/bash -e"
+        echo "# ${CONFIGURE_MARKER}"
+        if [[ "$BUILD_DIR" != "." ]]; then
+            echo 'args=(-C "$(dirname "$0")/'"${BUILD_DIR}"'")'
+        else
+            echo 'args=() dir="$(dirname "$0")"'
+            echo '[[ "$dir" != "." ]] && args=(-C "$dir")'
+        fi
+        echo 'exec ninja "${args[@]}" "$@"'
+    } >"$wrapper"
+    chmod a+x "$wrapper"
+}
+
+function check_build_env() {
+    generate_build_env_cksum # re-used by finalize_build_env
+    [[ -r "${BUILD_ENV_PATH}/.cksum" ]] || return 1
+    read -r <"${BUILD_ENV_PATH}/.cksum" || true
+    [[ "$REPLY" == "$CURRENT_ENV_CKSUM" ]] || return 1
+
+    [[ -r "${BUILD_ENV_PATH}/bin/activate" ]] || return 1
+    info "Using existing build environment: ${BUILD_ENV_PATH}"
+    PYTHON="${BUILD_ENV_PATH}/bin/python"
+}
+
+function configure_python_env() {
+    progress "Setting up Python venv"
+    # Debian and Ubuntu ship python3 with a broken venv module unless the
+    # python3-venv package is installed (https://bugs.launchpad.net/bugs/1290847)
+    local withoutpip=() pip="${BUILD_ENV_PATH}/bin/pip"
+    if ! "$PYTHON" -m ensurepip --version >/dev/null 2>&1; then
+        withoutpip=(--without-pip) pip="${pip}.pyz" # bootstrapped below
+    fi
+    "$PYTHON" -m venv --clear "${withoutpip[@]}" "$BUILD_ENV_PATH"
+    info "$BUILD_ENV_PATH"
+
+    # Download a standalone pip.pyz from pypa.io if necessary
+    if [[ -n "$withoutpip" ]]; then
+        progress "Bootstrapping pip via pypa.io (venv module is missing ensurepip dependency)"
+        call_impl download https://bootstrap.pypa.io/pip/pip.pyz "$pip"
+        info "ok"
+    fi
+
+    # Install our auto-loading venvactivate module so that running scripts via
+    # the venv python has the side-effect of fully activating the environment.
+    local sitepkgs=("${BUILD_ENV_PATH}/lib/python"*"/site-packages")
+    [[ -d "$sitepkgs" ]] || fail "Failed to locate venv site-packages"
+    cp "${CHIP_ROOT}/scripts/configure.venv/venvactivate".{pth,py} "${sitepkgs}/"
+
+    progress "Installing Python build dependencies"
+    # Ensure pip and wheel are up to date first (using pip.pyz if necessary)
+    "${BUILD_ENV_PATH}/bin/python3" "$pip" install --require-virtualenv --quiet --upgrade pip wheel
+
+    "${BUILD_ENV_PATH}/bin/pip" install --require-virtualenv --quiet \
+        -r "${CHIP_ROOT}/scripts/setup/requirements.build.txt" \
+        -c "${CHIP_ROOT}/scripts/setup/constraints.txt"
+    info "ok"
+}
+
+function generate_build_env_cksum() {
+    # Conservatively assume that any change to this script or BUILD_ENV_DEPS invalidates the environment
+    CURRENT_ENV_CKSUM="$(cat "$0" "${BUILD_ENV_DEPS[@]}" | cksum)"
+    [[ -n "$CURRENT_ENV_CKSUM" ]] || fail "Failed to generate build environment checksum"
+}
+
+function finalize_build_env() {
+    echo "$CURRENT_ENV_CKSUM" >"${BUILD_ENV_PATH}/.cksum"
+}
+
+function download_zap() {
+    local version
+    read -r version <"${CHIP_ROOT}/scripts/setup/zap.version"
+    local platform="$(uname -sm)" flavor
+    case "$platform" in
+    Linux\ x86_64) flavor=linux-x64 ;;
+    Linux\ arm64) flavor=linux-arm64 ;;
+    Linux\ aarch64) flavor=linux-arm64 ;;
+    Darwin\ x86_64) flavor=mac-x64 ;;
+    Darwin\ arm64) flavor=mac-arm64 ;;
+    *) fail "Unable to determine zap flavor for $platform" ;;
+    esac
+    local url="https://github.com/project-chip/zap/releases/download/${version}/zap-${flavor}.zip"
+
+    progress "Installing zap-cli from $url"
+    call_impl download_and_extract_zip "$url" "${BUILD_ENV_PATH}/bin" zap-cli
+    chmod a+x "${BUILD_ENV_PATH}/bin/zap-cli" # ZipFile.extract() does not handle permissions
+    info "ok"
+}
+
+function call_impl() { # func ...
+    "$PYTHON" "${CHIP_ROOT}/scripts/configure.impl.py" "$@"
+}
+
+function check_python() {
+    progress "Checking for Python 3"
+    if have_binary python3; then
+        PYTHON="$(hash -t python3)"
+    elif have_binary python; then
+        PYTHON="$(hash -t python)"
+        local ver="$("$PYTHON" --version)"
+        if [[ "$ver" != "Python 3."* ]]; then
+            info "need Python 3 but found $ver"
+            return 1
+        fi
+    else
+        info "not found"
+        return 1
+    fi
+    info "$PYTHON"
+}
+
+function check_binary() { # binary [VAR]
+    progress "Checking for $1"
+    if ! have_binary "$1"; then
+        info "not found"
+        return 1
+    fi
+    local path="$(hash -t "$1")"
+    [[ -n "$2" ]] && eval "$2=\$path"
+    info "$path"
+}
+
+function have_binary() { # binary
+    hash "$1" 2>/dev/null
+}
+
+function ensure_no_clobber() { # file
+    safe_to_clobber "$1" || fail "Won't overwrite file not generated by configure: $1"
+}
+
+function safe_to_clobber() { # file
+    CONFIGURE_MARKER="Auto-generated by configure, do not edit"
+    [[ -s "$1" ]] || return 0
+    read -r -n 512 -d '' <"$1" || true
+    [[ "${REPLY/$CONFIGURE_MARKER/}" != "$REPLY" ]] && return 0
+    return 1
+}
+
+function info() { # message
+    echo "$*" >&2
+}
+
+function progress() { # message
+    echo -n "$*... " >&2
+}
+
+function fail() { # message
+    echo "Error: $*" >&2
+    exit 1
+}
+
+main "$@"

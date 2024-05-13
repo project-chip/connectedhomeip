@@ -18,22 +18,31 @@ config:
     nodeId: 0x12344321
     endpoint: 0
     discriminator:
-        type: INT16U
+        type: int16u
         defaultValue: 3840
+    shortDiscriminator:
+        type: int16u
+        defaultValue: 15
     vendorId:
-        type: INT16U
+        type: int16u
         defaultValue: 65521
     productId:
-        type: INT16U
+        type: int16u
         defaultValue: 32769
     deviceType:
-        type: INT16U
-        defaultValue: 5
+        type: int16u
+        defaultValue: 65535
 
 tests:
-    - label: "Reboot target device"
+    - label: "Stop target device"
       cluster: "SystemCommands"
-      command: "Reboot"
+      command: "Stop"
+
+    - label:
+          "Start target device with the provided discriminator for basic
+          commissioning advertisement"
+      cluster: "SystemCommands"
+      command: "Start"
       arguments:
           values:
               - name: "discriminator"
@@ -48,7 +57,7 @@ tests:
                 value: nodeId
 
     - label: "Open Commissioning Window with too-short timeout"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -59,7 +68,7 @@ tests:
           error: INVALID_COMMAND
 
     - label: "Open Commissioning Window with too-long timeout"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -70,7 +79,7 @@ tests:
           error: INVALID_COMMAND
 
     - label: "Open Commissioning Window"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -95,9 +104,7 @@ tests:
     #  Find a way to validate the service type and the service domain
 
     - label: "Check Hostname"
-      PICS: "(WIFI || ETH) && !THREAD"
-      # On macOS the hostname is the device name and because of it this test is disabled for now.
-      disabled: true
+      PICS: "(MCORE.COM.WIFI || MCORE.COM.ETH) && !MCORE.COM.THR"
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -105,14 +112,12 @@ tests:
               - name: "hostName"
                 constraints:
                     minLength: 12
-                    maxLength: 12
+                    maxLength: 16
                     isUpperCase: true
                     isHexString: true
 
     - label: "Check Hostname"
-      PICS: "(!WIFI && !ETH) && THREAD"
-      # On macOS the hostname is the device name and because of it this test is disabled for now.
-      disabled: true
+      PICS: "(!MCORE.COM.WIFI && !MCORE.COM.ETH) && MCORE.COM.THR"
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -140,14 +145,14 @@ tests:
       arguments:
           values:
               - name: "value"
-                value: discriminator
+                value: shortDiscriminator
 
     - label: "Check Commissioning Mode (_CM)"
       cluster: "DiscoveryCommands"
       command: "FindCommissionableByCommissioningMode"
 
     - label: "Check Vendor ID (_V)"
-      PICS: VENDOR_SUBTYPE
+      PICS: MCORE.SC.VENDOR_SUBTYPE
       cluster: "DiscoveryCommands"
       command: "FindCommissionableByVendorId"
       arguments:
@@ -156,9 +161,7 @@ tests:
                 value: vendorId
 
     - label: "Check Device Type ID (_T)"
-      # The device type is not broadcasted by the accessory under CI.
-      disabled: true
-      PICS: DEVTYPE_SUBTYPE
+      PICS: MCORE.SC.DEVTYPE_SUBTYPE
       cluster: "DiscoveryCommands"
       command: "FindCommissionableByDeviceType"
       arguments:
@@ -180,7 +183,7 @@ tests:
                     maxValue: 4096
 
     - label: "TXT key for Vendor ID and Product ID (VP)"
-      PICS: VP_KEY
+      PICS: MCORE.SC.VP_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -191,8 +194,8 @@ tests:
     # Maybe it should be a PICS code to differentiate between manufacturer that wants to broadcast the
     # product id ?
     - label: "TXT key for Vendor ID and Product ID (VP)"
-      PICS: VP_KEY
-      optional: true
+      PICS: MCORE.SC.VP_KEY
+      disabled: true # [TestDiscovery] Enable back TXT key for Vendor ID and Product ID (VP) #25017
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -200,24 +203,26 @@ tests:
               - name: "productId"
                 value: productId
 
-    - label: "Optional TXT key for MRP Retry Interval Idle (CRI)"
-      PICS: CRI_COMM_DISCOVERY_KEY
+    - label: "Optional TXT key for MRP Session Idle Interval (SII)"
+      PICS: MCORE.SC.SII_COMM_DISCOVERY_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
           values:
               - name: "mrpRetryIntervalIdle"
                 constraints:
+                    minValue: 0
                     maxValue: 3600000
 
-    - label: "Optional TXT key for MRP Retry Interval Active (CRA)"
-      PICS: CRA_COMM_DISCOVERY_KEY
+    - label: "Optional TXT key for MRP Session Active Interval (SAI)"
+      PICS: MCORE.SC.SAI_COMM_DISCOVERY_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
           values:
               - name: "mrpRetryIntervalActive"
                 constraints:
+                    minValue: 0
                     maxValue: 3600000
 
     - label: "TXT key for commissioning mode (CM)"
@@ -229,21 +234,16 @@ tests:
                 value: 1
 
     - label: "Optional TXT key for device type (DT)"
-      disabled: true
-      PICS: DT_KEY
+      PICS: MCORE.SC.DT_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
           values:
               - name: "deviceType"
                 value: deviceType
-                constraints:
-                    # The specification says this is a number expressed as <ddd>, but it seems like it can goes
-                    # up to 0xBFFF (49151).
-                    maxValue: 999
 
     - label: "Optional TXT key for device name (DN)"
-      PICS: DN_KEY
+      PICS: MCORE.SC.DN_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -253,7 +253,7 @@ tests:
                     maxLength: 32
 
     - label: "Optional TXT key for rotating device identifier (RI)"
-      PICS: RI_KEY
+      PICS: MCORE.SC.RI_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -263,16 +263,17 @@ tests:
                     maxValue: 100
 
     - label: "Optional TXT key for pairing hint (PH)"
-      PICS: PH_KEY
+      PICS: MCORE.SC.PH_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
           values:
               - name: "pairingHint"
-                notValue: 0
+                constraints:
+                    notValue: 0
 
     - label: "Optional TXT key for pairing instructions (PI)"
-      PICS: PI_KEY
+      PICS: MCORE.SC.PI_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -290,9 +291,15 @@ tests:
                 constraints:
                     minValue: 1
 
-    - label: "Reboot target device"
+    - label: "Stop target device"
       cluster: "SystemCommands"
-      command: "Reboot"
+      command: "Stop"
+
+    - label:
+          "Start target device with the provided discriminator for basic
+          commissioning advertisement"
+      cluster: "SystemCommands"
+      command: "Start"
       arguments:
           values:
               - name: "discriminator"
@@ -307,7 +314,7 @@ tests:
                 value: nodeId
 
     - label: "Open Commissioning Window"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:

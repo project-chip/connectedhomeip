@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_setup" translatable="false">Setup</string>
+    <string name="menu_device_name" translatable="false">Device Name</string>
+    <string name="menu_discriminator" translatable="false">Discriminator (Max:4095)</string>
+    <string name="hint_discriminator" translatable="false">Discriminator</string>
+    <string name="wifi" translatable="false">Wi-Fi</string>
+    <string name="ble" translatable="false">BLE</string>
+    <string name="wifi_ble" translatable="false">Wi-Fi/BLE</string>
+    <string name="setup_network_notification_title">Connect to the same Wi-Fi network</string>
+    <string name="setup_network_notification_message">Make sure your Mobile/Hub/Device App are connected to the same Wi-Fi network.</string>
+    <string name="save">Save</string>
+    <string name="toast_discriminator" translatable="false">Invalid input value</string>
+    <string name="start">Start</string>
+    <string name="setup_ssid_text" translatable="false">Wi-Fi : %1$s</string>
+    <string name="setup_discriminator_text" translatable="false">%1$s : %2$s</string>
+</resources>

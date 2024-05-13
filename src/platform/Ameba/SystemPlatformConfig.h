@@ -34,7 +34,6 @@ struct ChipDeviceEvent;
 } // namespace chip
 
 // ==================== Platform Adaptations ====================
-#define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS 1
 #define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME 1
 #define CHIP_SYSTEM_CONFIG_EVENT_OBJECT_TYPE const struct ::chip::DeviceLayer::ChipDeviceEvent *
 
@@ -49,10 +48,6 @@ struct ChipDeviceEvent;
 // ==================== General Configuration Overrides ====================
 
 // NOTE: Values that are mapped to CONFIG_ #defines are settable via the Kconfig mechanism.
-
-#ifndef CHIP_SYSTEM_CONFIG_NUM_TIMERS
-#define CHIP_SYSTEM_CONFIG_NUM_TIMERS 16
-#endif // CHIP_SYSTEM_CONFIG_NUM_TIMERS
 
 #define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF 0
 #define CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS 0

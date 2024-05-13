@@ -1,0 +1,84 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 219.1.2. [TC-TCCM-1.2] Cluster attributes with DUT as Server
+
+PICS:
+    - TCCM.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      verification: |
+
+      disabled: true
+
+    - label: "Step 2: TH reads from the DUT the SupportedModes attribute."
+      PICS: TCCM.S.A0000
+      verification: |
+          ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read supported-modes 1 1
+
+          Verify that the DUT response contains list of ModeOptionsStruct entries.
+          - Verify that the list has at least 2 and at most 255 entries
+          - Verify that each ModeOptionsStruct entry has a unique Mode field value and Label field value
+          - If ModeOptionsStruct entry’s ModeTags field is not empty,  then Verify the values of the Value fields that are not larger than 16 bits, for each Value field: Is the semantic tag value a defined common tag value (Auto(0x0000), Quick(0x0001), Quiet(0x0002), LowNoise(0x0003), LowEnergy(0x0004), Vacation(0x0005), Min(0x0006), Max(0x0007), Night(0x0008), Day(0x0009)) or a defined cluster alias tag value (RapidCool, RapidFreeze) or in the MfgTags (0x8000 to 0xBFFF) range
+          - If the Value field is in the MfgTags (0x8000 to 0xBFFF) range, the TagName field is a string with a length between 1 and 64
+          - Verify that at least one ModeOptionsStruct entry includes either the RapidCool semantic tag or the RapidFreeze semantic tag in the SemanticTags field
+          - Save the Mode field values as supported_modes_dut on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
+
+          [1690189665.585798][16159:16161] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0052 Attribute 0x0000_0000 DataVersion: 473867547
+          [1690189665.585885][16159:16161] CHIP:TOO:   SupportedModes: 3 entries
+          [1690189665.585924][16159:16161] CHIP:TOO:     [1]: {
+          [1690189665.585936][16159:16161] CHIP:TOO:       Label: Normal
+          [1690189665.585955][16159:16161] CHIP:TOO:       Mode: 0
+          [1690189665.585970][16159:16161] CHIP:TOO:       ModeTags: 1 entries
+          [1690189665.585997][16159:16161] CHIP:TOO:         [1]: {
+          [1690189665.586008][16159:16161] CHIP:TOO:           Value: 0
+          [1690189665.586018][16159:16161] CHIP:TOO:          }
+          [1690189665.586028][16159:16161] CHIP:TOO:      }
+          [1690189665.586050][16159:16161] CHIP:TOO:     [2]: {
+          [1690189665.586060][16159:16161] CHIP:TOO:       Label: Rapid Cool
+          [1690189665.586068][16159:16161] CHIP:TOO:       Mode: 1
+          [1690189665.586081][16159:16161] CHIP:TOO:       ModeTags: 1 entries
+          [1690189665.586094][16159:16161] CHIP:TOO:         [1]: {
+          [1690189665.586105][16159:16161] CHIP:TOO:           Value: 16384
+          [1690189665.586114][16159:16161] CHIP:TOO:          }
+          [1690189665.586124][16159:16161] CHIP:TOO:      }
+          [1690189665.586143][16159:16161] CHIP:TOO:     [3]: {
+          [1690189665.586152][16159:16161] CHIP:TOO:       Label: Rapid Freeze
+          [1690189665.586162][16159:16161] CHIP:TOO:       Mode: 2
+          [1690189665.586175][16159:16161] CHIP:TOO:       ModeTags: 1 entries
+          [1690189665.586189][16159:16161] CHIP:TOO:         [1]: {
+          [1690189665.586198][16159:16161] CHIP:TOO:           Value: 16385
+          [1690189665.586207][16159:16161] CHIP:TOO:          }
+          [1690189665.586217][16159:16161] CHIP:TOO:      }
+      disabled: true
+
+    - label: "Step 3: TH reads from the DUT the CurrentMode attribute."
+      PICS: TCCM.S.A0001
+      verification: |
+          ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read current-mode 1 1
+
+          Verify on TH(chip-tool) logs, CurrentMode attribute value is an integer from supported_modes_dut, below is the sample log provided for the raspi platform, Here CurrentMode attribute value is 0
+
+          [1690189682.782276][16162:16164] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0052 Attribute 0x0000_0001 DataVersion: 473867547
+          [1690189682.782314][16162:16164] CHIP:TOO:   CurrentMode: 0
+      disabled: true

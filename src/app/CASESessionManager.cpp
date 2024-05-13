@@ -25,79 +25,169 @@ CHIP_ERROR CASESessionManager::Init(chip::System::Layer * systemLayer, const CAS
 {
     ReturnErrorOnFailure(params.sessionInitParams.Validate());
     mConfig = params;
+    params.sessionInitParams.exchangeMgr->GetReliableMessageMgr()->RegisterSessionUpdateDelegate(this);
     return AddressResolve::Resolver::Instance().Init(systemLayer);
 }
 
-CHIP_ERROR CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                                      Callback::Callback<OnDeviceConnectionFailure> * onFailure)
+void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
+                                                Callback::Callback<OnDeviceConnectionFailure> * onFailure,
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                                uint8_t attemptCount, Callback::Callback<OnDeviceConnectionRetry> * onRetry,
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                                TransportPayloadCapability transportPayloadCapability)
 {
-    Dnssd::ResolvedNodeData resolutionData;
+    FindOrEstablishSessionHelper(peerId, onConnection, onFailure, nullptr,
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                 attemptCount, onRetry,
+#endif
+                                 transportPayloadCapability);
+}
 
-    ChipLogDetail(CASESessionManager, "FindOrEstablishSession: PeerId = " ChipLogFormatX64 ":" ChipLogFormatX64,
-                  ChipLogValueX64(peerId.GetCompressedFabricId()), ChipLogValueX64(peerId.GetNodeId()));
+void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
+                                                Callback::Callback<OperationalSessionSetup::OnSetupFailure> * onSetupFailure,
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                                uint8_t attemptCount, Callback::Callback<OnDeviceConnectionRetry> * onRetry,
+#endif
+                                                TransportPayloadCapability transportPayloadCapability)
+{
+    FindOrEstablishSessionHelper(peerId, onConnection, nullptr, onSetupFailure,
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                 attemptCount, onRetry,
+#endif
+                                 transportPayloadCapability);
+}
 
-    OperationalDeviceProxy * session = FindExistingSession(peerId);
+void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
+                                                std::nullptr_t,
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                                uint8_t attemptCount, Callback::Callback<OnDeviceConnectionRetry> * onRetry,
+#endif
+                                                TransportPayloadCapability transportPayloadCapability)
+{
+    FindOrEstablishSessionHelper(peerId, onConnection, nullptr, nullptr,
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                 attemptCount, onRetry,
+#endif
+                                 transportPayloadCapability);
+}
+
+void CASESessionManager::FindOrEstablishSessionHelper(const ScopedNodeId & peerId,
+                                                      Callback::Callback<OnDeviceConnected> * onConnection,
+                                                      Callback::Callback<OnDeviceConnectionFailure> * onFailure,
+                                                      Callback::Callback<OperationalSessionSetup::OnSetupFailure> * onSetupFailure,
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                                      uint8_t attemptCount, Callback::Callback<OnDeviceConnectionRetry> * onRetry,
+#endif
+                                                      TransportPayloadCapability transportPayloadCapability)
+{
+    ChipLogDetail(CASESessionManager, "FindOrEstablishSession: PeerId = [%d:" ChipLogFormatX64 "]", peerId.GetFabricIndex(),
+                  ChipLogValueX64(peerId.GetNodeId()));
+
+    bool forAddressUpdate             = false;
+    OperationalSessionSetup * session = FindExistingSessionSetup(peerId, forAddressUpdate);
     if (session == nullptr)
     {
-        ChipLogDetail(CASESessionManager, "FindOrEstablishSession: No existing session found");
-
-        session = mConfig.devicePool->Allocate(mConfig.sessionInitParams, peerId);
+        ChipLogDetail(CASESessionManager, "FindOrEstablishSession: No existing OperationalSessionSetup instance found");
+        session = mConfig.sessionSetupPool->Allocate(mConfig.sessionInitParams, mConfig.clientPool, peerId, this);
 
         if (session == nullptr)
         {
-            onFailure->mCall(onFailure->mContext, peerId, CHIP_ERROR_NO_MEMORY);
-            return CHIP_ERROR_NO_MEMORY;
+            if (onFailure != nullptr)
+            {
+                onFailure->mCall(onFailure->mContext, peerId, CHIP_ERROR_NO_MEMORY);
+            }
+
+            if (onSetupFailure != nullptr)
+            {
+                OperationalSessionSetup::ConnnectionFailureInfo failureInfo(peerId, CHIP_ERROR_NO_MEMORY,
+                                                                            SessionEstablishmentStage::kUnknown);
+                onSetupFailure->mCall(onSetupFailure->mContext, failureInfo);
+            }
+            return;
         }
     }
 
-    CHIP_ERROR err = session->Connect(onConnection, onFailure);
-    if (err != CHIP_NO_ERROR)
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+    session->UpdateAttemptCount(attemptCount);
+    if (onRetry)
     {
-        // Release the peer rather than the pointer in case the failure handler has already released the session.
-        ReleaseSession(peerId);
+        session->AddRetryHandler(onRetry);
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+
+    if (onFailure != nullptr)
+    {
+        session->Connect(onConnection, onFailure, transportPayloadCapability);
     }
 
-    return err;
+    if (onSetupFailure != nullptr)
+    {
+        session->Connect(onConnection, onSetupFailure, transportPayloadCapability);
+    }
 }
 
-void CASESessionManager::ReleaseSession(PeerId peerId)
+void CASESessionManager::ReleaseSessionsForFabric(FabricIndex fabricIndex)
 {
-    ReleaseSession(FindExistingSession(peerId));
-}
-
-void CASESessionManager::ReleaseSessionsForFabric(CompressedFabricId compressedFabricId)
-{
-    mConfig.devicePool->ReleaseDevicesForFabric(compressedFabricId);
+    mConfig.sessionSetupPool->ReleaseAllSessionSetupsForFabric(fabricIndex);
 }
 
 void CASESessionManager::ReleaseAllSessions()
 {
-    mConfig.devicePool->ReleaseAllDevices();
+    mConfig.sessionSetupPool->ReleaseAllSessionSetup();
 }
 
-CHIP_ERROR CASESessionManager::GetPeerAddress(PeerId peerId, Transport::PeerAddress & addr)
+CHIP_ERROR CASESessionManager::GetPeerAddress(const ScopedNodeId & peerId, Transport::PeerAddress & addr,
+                                              TransportPayloadCapability transportPayloadCapability)
 {
-    OperationalDeviceProxy * session = FindExistingSession(peerId);
-    VerifyOrReturnError(session != nullptr, CHIP_ERROR_NOT_CONNECTED);
-    addr = session->GetPeerAddress();
+    ReturnErrorOnFailure(mConfig.sessionInitParams.Validate());
+    auto optionalSessionHandle = FindExistingSession(peerId, transportPayloadCapability);
+    ReturnErrorCodeIf(!optionalSessionHandle.HasValue(), CHIP_ERROR_NOT_CONNECTED);
+    addr = optionalSessionHandle.Value()->AsSecureSession()->GetPeerAddress();
     return CHIP_NO_ERROR;
 }
 
-OperationalDeviceProxy * CASESessionManager::FindSession(const SessionHandle & session) const
+void CASESessionManager::UpdatePeerAddress(ScopedNodeId peerId)
 {
-    return mConfig.devicePool->FindDevice(session);
+    bool forAddressUpdate             = true;
+    OperationalSessionSetup * session = FindExistingSessionSetup(peerId, forAddressUpdate);
+    if (session == nullptr)
+    {
+        ChipLogDetail(CASESessionManager, "UpdatePeerAddress: No existing OperationalSessionSetup instance found");
+
+        session = mConfig.sessionSetupPool->Allocate(mConfig.sessionInitParams, mConfig.clientPool, peerId, this);
+        if (session == nullptr)
+        {
+            ChipLogDetail(CASESessionManager, "UpdatePeerAddress: Failed to allocate OperationalSessionSetup instance");
+            return;
+        }
+    }
+    else
+    {
+        ChipLogDetail(CASESessionManager,
+                      "UpdatePeerAddress: Found existing OperationalSessionSetup instance for peerId[" ChipLogFormatX64 "]",
+                      ChipLogValueX64(peerId.GetNodeId()));
+    }
+
+    session->PerformAddressUpdate();
 }
 
-OperationalDeviceProxy * CASESessionManager::FindExistingSession(PeerId peerId) const
+OperationalSessionSetup * CASESessionManager::FindExistingSessionSetup(const ScopedNodeId & peerId, bool forAddressUpdate) const
 {
-    return mConfig.devicePool->FindDevice(peerId);
+    return mConfig.sessionSetupPool->FindSessionSetup(peerId, forAddressUpdate);
 }
 
-void CASESessionManager::ReleaseSession(OperationalDeviceProxy * session) const
+Optional<SessionHandle> CASESessionManager::FindExistingSession(const ScopedNodeId & peerId,
+                                                                const TransportPayloadCapability transportPayloadCapability) const
+{
+    return mConfig.sessionInitParams.sessionManager->FindSecureSessionForNode(
+        peerId, MakeOptional(Transport::SecureSession::Type::kCASE), transportPayloadCapability);
+}
+
+void CASESessionManager::ReleaseSession(OperationalSessionSetup * session)
 {
     if (session != nullptr)
     {
-        mConfig.devicePool->Release(session);
+        mConfig.sessionSetupPool->Release(session);
     }
 }
 

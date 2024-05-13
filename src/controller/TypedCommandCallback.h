@@ -61,13 +61,37 @@ private:
     void OnResponse(app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aCommandPath,
                     const app::StatusIB & aStatus, TLV::TLVReader * aReader) override;
 
-    void OnError(const app::CommandSender * apCommandSender, CHIP_ERROR aError) override { mOnError(aError); }
+    void OnError(const app::CommandSender * apCommandSender, CHIP_ERROR aError) override
+    {
+        if (mCalledCallback)
+        {
+            return;
+        }
+        mCalledCallback = true;
 
-    void OnDone(app::CommandSender * apCommandSender) override { mOnDone(apCommandSender); }
+        mOnError(aError);
+    }
+
+    void OnDone(app::CommandSender * apCommandSender) override
+    {
+        if (!mCalledCallback)
+        {
+            // This can happen if the server sends a response with an empty
+            // InvokeResponses list.  Since we are not sending wildcard command
+            // paths, that's not a valid response and we should treat it as an
+            // error.  Use the error we would have gotten if we in fact expected
+            // a nonempty list.
+            OnError(apCommandSender, CHIP_END_OF_TLV);
+        }
+
+        mOnDone(apCommandSender);
+    }
 
     OnSuccessCallbackType mOnSuccess;
     OnErrorCallbackType mOnError;
     OnDoneCallbackType mOnDone;
+
+    bool mCalledCallback = false;
 };
 
 /*
@@ -80,6 +104,12 @@ void TypedCommandCallback<CommandResponseObjectT>::OnResponse(app::CommandSender
                                                               const app::ConcreteCommandPath & aCommandPath,
                                                               const app::StatusIB & aStatus, TLV::TLVReader * aReader)
 {
+    if (mCalledCallback)
+    {
+        return;
+    }
+    mCalledCallback = true;
+
     CommandResponseObjectT response;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -120,6 +150,12 @@ inline void TypedCommandCallback<app::DataModel::NullObjectType>::OnResponse(app
                                                                              const app::StatusIB & aStatus,
                                                                              TLV::TLVReader * aReader)
 {
+    if (mCalledCallback)
+    {
+        return;
+    }
+    mCalledCallback = true;
+
     //
     // If we got a valid reader, it means we received response data that we were not expecting to receive.
     //

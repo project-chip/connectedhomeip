@@ -17,49 +17,47 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <enum name="Privilege" type="ENUM8">
+  <enum name="AccessControlEntryPrivilegeEnum" type="enum8">
     <cluster code="0x001F"/>
     <item name="View" value="0x01"/>
-    <item name="ProxyView" value="0x02"/>
+    <item name="Proxy View" value="0x02"/>
     <item name="Operate" value="0x03"/>
     <item name="Manage" value="0x04"/>
     <item name="Administer" value="0x05"/>
   </enum>
 
-  <enum name="AuthMode" type="ENUM8">
+  <enum name="AccessControlEntryAuthModeEnum" type="enum8">
     <cluster code="0x001F"/>
     <item name="PASE" value="0x01"/>
     <item name="CASE" value="0x02"/>
     <item name="Group" value="0x03"/>
   </enum>
 
-  <enum name="ChangeTypeEnum" type="ENUM8">
+  <enum name="ChangeTypeEnum" type="enum8">
     <cluster code="0x001F"/>
     <item name="Changed" value="0x00"/>
     <item name="Added" value="0x01"/>
     <item name="Removed" value="0x02"/>
-  </enum>  
+  </enum>
 
-  <struct name="Target">
+  <struct name="AccessControlTargetStruct">
     <cluster code="0x001F"/>
     <item fieldId="0" name="Cluster" type="cluster_id" isNullable="true"/>
     <item fieldId="1" name="Endpoint" type="endpoint_no" isNullable="true"/>
     <item fieldId="2" name="DeviceType" type="devtype_id" isNullable="true"/>
   </struct>
 
-  <struct name="AccessControlEntry">
+  <struct name="AccessControlEntryStruct" isFabricScoped="true">
     <cluster code="0x001F"/>
-    <item fieldId="1" name="Privilege" type="Privilege" isFabricSensitive="true"/>
-    <item fieldId="2" name="AuthMode" type="AuthMode" isFabricSensitive="true"/>
-    <item fieldId="3" name="Subjects" type="INT64U" isNullable="true" array="true" isFabricSensitive="true"/>
-    <item fieldId="4" name="Targets" type="Target" isNullable="true" array="true" isFabricSensitive="true"/>
-    <item fieldId="0xFE" name="FabricIndex" type="fabric_idx" isFabricSensitive="true"/>
+    <item fieldId="1" name="Privilege" type="AccessControlEntryPrivilegeEnum" isFabricSensitive="true"/>
+    <item fieldId="2" name="AuthMode" type="AccessControlEntryAuthModeEnum" isFabricSensitive="true"/>
+    <item fieldId="3" name="Subjects" type="int64u" isNullable="true" array="true" isFabricSensitive="true"/>
+    <item fieldId="4" name="Targets" type="AccessControlTargetStruct" isNullable="true" array="true" isFabricSensitive="true"/>
   </struct>
 
-  <struct name="ExtensionEntry">
+  <struct name="AccessControlExtensionStruct" isFabricScoped="true">
     <cluster code="0x001F"/>
-    <item fieldId="1" name="Data" type="OCTET_STRING" length="128" isFabricSensitive="true"/>
-    <item fieldId="0xFE" name="FabricIndex" type="fabric_idx" isFabricSensitive="true"/>
+    <item fieldId="1" name="Data" type="octet_string" length="128" isFabricSensitive="true"/>
   </struct>
 
   <cluster>
@@ -70,39 +68,52 @@ limitations under the License.
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <description>The Access Control Cluster exposes a data model view of a
-      Node’s Access Control List (ACL), which codifies the rules used to manage
-      and enforce Access Control for the Node’s endpoints and their associated
+      Node's Access Control List (ACL), which codifies the rules used to manage
+      and enforce Access Control for the Node's endpoints and their associated
       cluster instances.</description>
-    <!-- Base data types -->
-    <attribute side="server" code="0x0000" define="ACL" type="ARRAY" entryType="AccessControlEntry" writable="true">
+
+    <attribute side="server" code="0x0000" define="ACL" type="array" entryType="AccessControlEntryStruct" writable="true">
       <description>ACL</description>
       <access op="read" privilege="administer"/>
       <access op="write" privilege="administer"/>
-      <access modifier="fabric-scoped"/>
     </attribute>
-    <attribute side="server" code="0x0001" define="EXTENSION" type="ARRAY" entryType="ExtensionEntry" writable="true">
+
+    <attribute side="server" code="0x0001" define="EXTENSION" type="array" entryType="AccessControlExtensionStruct" writable="true" optional="true">
       <description>Extension</description>
       <access op="read" privilege="administer"/>
       <access op="write" privilege="administer"/>
-      <access modifier="fabric-scoped"/>
     </attribute>
-    <event side="server" code="0x0000" name="AccessControlEntryChanged" priority="info" optional="false">
+
+    <attribute side="server" code="0x0002" define="SUBJECTS_PER_ACCESS_CONTROL_ENTRY" type="int16u" writable="false">
+      <description>SubjectsPerAccessControlEntry</description>
+      <access op="read" privilege="view"/>
+    </attribute>
+
+    <attribute side="server" code="0x0003" define="TARGETS_PER_ACCESS_CONTROL_ENTRY" type="int16u" writable="false">
+      <description>TargetsPerAccessControlEntry</description>
+      <access op="read" privilege="view"/>
+    </attribute>
+
+    <attribute side="server" code="0x0004" define="ACCESS_CONTROL_ENTRIES_PER_FABRIC" type="int16u" writable="false">
+      <description>AccessControlEntriesPerFabric</description>
+      <access op="read" privilege="view"/>
+    </attribute>
+
+    <event side="server" code="0x0000" name="AccessControlEntryChanged" priority="info" isFabricSensitive="true" optional="false">
       <description>The cluster SHALL send AccessControlEntryChanged events whenever its ACL attribute data is changed by an Administrator.</description>
       <field id="1" name="AdminNodeID" type="node_id" isNullable="true"/>
-      <field id="2" name="AdminPasscodeID" type="INT16U" isNullable="true"/>
+      <field id="2" name="AdminPasscodeID" type="int16u" isNullable="true"/>
       <field id="3" name="ChangeType" type="ChangeTypeEnum"/>
-      <field id="4" name="LatestValue" type="AccessControlEntry" isNullable="true"/>
-      <field id="0xFE" name="AdminFabricIndex" type="fabric_idx"/>
+      <field id="4" name="LatestValue" type="AccessControlEntryStruct" isNullable="true"/>
       <access op="read" privilege="administer"/>
     </event>
-    <event side="server" code="0x0001" name="AccessControlExtensionChanged" priority="info" optional="false">
+    <event side="server" code="0x0001" name="AccessControlExtensionChanged" priority="info" isFabricSensitive="true" optional="false">
       <description>The cluster SHALL send AccessControlExtensionChanged events whenever its extension attribute data is changed by an Administrator.</description>
       <field id="1" name="AdminNodeID" type="node_id" isNullable="true"/>
-      <field id="2" name="AdminPasscodeID" type="INT16U" isNullable="true"/>
+      <field id="2" name="AdminPasscodeID" type="int16u" isNullable="true"/>
       <field id="3" name="ChangeType" type="ChangeTypeEnum"/>
-      <field id="4" name="LatestValue" type="ExtensionEntry" isNullable="true"/>
-      <field id="0xFE" name="AdminFabricIndex" type="fabric_idx"/>
+      <field id="4" name="LatestValue" type="AccessControlExtensionStruct" isNullable="true"/>
       <access op="read" privilege="administer"/>
-    </event>    
+    </event>
   </cluster>
 </configurator>

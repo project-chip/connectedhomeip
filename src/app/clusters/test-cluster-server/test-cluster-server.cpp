@@ -24,13 +24,14 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Commands.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPSafeCasts.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -38,9 +39,10 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::TestCluster;
-using namespace chip::app::Clusters::TestCluster::Commands;
-using namespace chip::app::Clusters::TestCluster::Attributes;
+using namespace chip::app::Clusters::UnitTesting;
+using namespace chip::app::Clusters::UnitTesting::Commands;
+using namespace chip::app::Clusters::UnitTesting::Attributes;
+using chip::Protocols::InteractionModel::Status;
 
 // The number of elements in the test attribute list
 constexpr uint8_t kAttributeListLength = 4;
@@ -53,6 +55,9 @@ constexpr uint8_t kFabricSensitiveCharLength = 128;
 
 // The maximum length of the fabric sensitive integer list within the TestFabricScoped struct.
 constexpr uint8_t kFabricSensitiveIntListLength = 8;
+
+// The maximum buffer size allowed in TestBatchHelperResponse
+constexpr uint16_t kTestBatchHelperResponseBufferMax = 800;
 
 namespace {
 
@@ -75,7 +80,7 @@ class TestAttrAccess : public AttributeAccessInterface
 {
 public:
     // Register for the Test Cluster cluster on all endpoints.
-    TestAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), TestCluster::Id) {}
+    TestAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), Clusters::UnitTesting::Id) {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
@@ -102,6 +107,14 @@ private:
     CHIP_ERROR WriteListFabricScopedAttribute(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
 };
 
+struct AsyncBatchCommandsWorkData
+{
+    CommandHandler::Handle asyncCommandHandle;
+    ConcreteCommandPath commandPath = ConcreteCommandPath(0, 0, 0);
+    uint16_t sizeOfResponseBuffer;
+    uint8_t fillCharacter;
+};
+
 TestAttrAccess gAttrAccess;
 uint8_t gListUint8Data[kAttributeListLength];
 size_t gListUint8DataLen = kAttributeListLength;
@@ -115,7 +128,7 @@ OctetStringData gStructAttributeByteSpanData;
 Structs::SimpleStruct::Type gStructAttributeValue;
 NullableStruct::TypeInfo::Type gNullableStructAttributeValue;
 
-TestCluster::Structs::TestFabricScoped::Type gListFabricScopedAttributeValue[kAttributeListLength];
+chip::app::Clusters::UnitTesting::Structs::TestFabricScoped::Type gListFabricScopedAttributeValue[kAttributeListLength];
 uint8_t gListFabricScoped_fabricSensitiveInt8uList[kAttributeListLength][kFabricSensitiveIntListLength];
 size_t gListFabricScopedAttributeLen = 0;
 char gListFabricScoped_fabricSensitiveCharBuf[kAttributeListLength][kFabricSensitiveCharLength];
@@ -135,6 +148,36 @@ const char sLongOctetStringBuf[513] = "0123456789abcdef0123456789abcdef012345678
 SimpleEnum gSimpleEnums[kAttributeListLength];
 size_t gSimpleEnumCount = 0;
 Structs::NullablesAndOptionalsStruct::Type gNullablesAndOptionalsStruct;
+
+void AsyncBatchCommandWork(AsyncBatchCommandsWorkData * asyncWorkData)
+{
+    auto commandHandleRef = std::move(asyncWorkData->asyncCommandHandle);
+    auto commandHandle    = commandHandleRef.Get();
+    if (commandHandle == nullptr)
+    {
+        // Very weird that we are even in here, what set this to nullptr?
+        Platform::Delete(asyncWorkData);
+        return;
+    }
+
+    uint8_t buffer[kTestBatchHelperResponseBufferMax];
+    memset(buffer, asyncWorkData->fillCharacter, asyncWorkData->sizeOfResponseBuffer);
+    Commands::TestBatchHelperResponse::Type response;
+    response.buffer = ByteSpan(buffer, asyncWorkData->sizeOfResponseBuffer);
+    commandHandle->AddResponse(asyncWorkData->commandPath, response);
+    Platform::Delete(asyncWorkData);
+}
+
+static void timerCallback(System::Layer *, void * callbackContext)
+{
+    AsyncBatchCommandWork(reinterpret_cast<AsyncBatchCommandsWorkData *>(callbackContext));
+}
+
+static void scheduleTimerCallbackMs(AsyncBatchCommandsWorkData * asyncWorkData, uint32_t delayMs)
+{
+    DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayMs), timerCallback,
+                                          reinterpret_cast<void *>(asyncWorkData));
+}
 
 CHIP_ERROR TestAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
@@ -169,6 +212,9 @@ CHIP_ERROR TestAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
     }
     case ClusterErrorBoolean::Id: {
         return StatusIB(Protocols::InteractionModel::Status::Failure, 17).ToChipError();
+    }
+    case WriteOnlyInt8u::Id: {
+        return StatusIB(Protocols::InteractionModel::Status::UnsupportedRead).ToChipError();
     }
     default: {
         break;
@@ -233,7 +279,7 @@ CHIP_ERROR TestAttrAccess::WriteNullableStruct(AttributeValueDecoder & aDecoder)
 CHIP_ERROR TestAttrAccess::ReadListInt8uAttribute(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        for (uint8_t index = 0; index < gListUint8DataLen; index++)
+        for (size_t index = 0; index < gListUint8DataLen; index++)
         {
             ReturnErrorOnFailure(encoder.Encode(gListUint8Data[index]));
         }
@@ -281,7 +327,7 @@ CHIP_ERROR TestAttrAccess::WriteListInt8uAttribute(const ConcreteDataAttributePa
 CHIP_ERROR TestAttrAccess::ReadListOctetStringAttribute(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        for (uint8_t index = 0; index < gListOctetStringDataLen; index++)
+        for (size_t index = 0; index < gListOctetStringDataLen; index++)
         {
             ReturnErrorOnFailure(encoder.Encode(gListOctetStringData[index].AsSpan()));
         }
@@ -335,7 +381,7 @@ CHIP_ERROR TestAttrAccess::ReadListLongOctetStringAttribute(AttributeValueEncode
     // The ListOctetStringAttribute takes 512 bytes, and the whole attribute will exceed the IPv6 MTU, so we can test list chunking
     // feature with this attribute.
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        for (uint8_t index = 0; index < gListLongOctetStringLen; index++)
+        for (size_t index = 0; index < gListLongOctetStringLen; index++)
         {
             ReturnErrorOnFailure(encoder.Encode(ByteSpan(chip::Uint8::from_const_char(sLongOctetStringBuf), 512)));
         }
@@ -381,11 +427,11 @@ CHIP_ERROR TestAttrAccess::WriteListLongOctetStringAttribute(const ConcreteDataA
 CHIP_ERROR TestAttrAccess::ReadListStructOctetStringAttribute(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        for (uint8_t index = 0; index < gListOperationalCertLen; index++)
+        for (size_t index = 0; index < gListOperationalCertLen; index++)
         {
             Structs::TestListStructOctet::Type structOctet;
-            structOctet.fabricIndex     = listStructOctetStringData[index].fabricIndex;
-            structOctet.operationalCert = listStructOctetStringData[index].operationalCert;
+            structOctet.member1 = listStructOctetStringData[index].member1;
+            structOctet.member2 = listStructOctetStringData[index].member2;
             ReturnErrorOnFailure(encoder.Encode(structOctet));
         }
 
@@ -409,12 +455,12 @@ CHIP_ERROR TestAttrAccess::WriteListStructOctetStringAttribute(const ConcreteDat
             const auto & entry = iter.GetValue();
 
             VerifyOrReturnError(index < kAttributeListLength, CHIP_ERROR_BUFFER_TOO_SMALL);
-            VerifyOrReturnError(entry.operationalCert.size() <= kAttributeEntryLength, CHIP_ERROR_BUFFER_TOO_SMALL);
-            memcpy(gListOperationalCert[index].Data(), entry.operationalCert.data(), entry.operationalCert.size());
-            gListOperationalCert[index].SetLength(entry.operationalCert.size());
+            VerifyOrReturnError(entry.member2.size() <= kAttributeEntryLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+            memcpy(gListOperationalCert[index].Data(), entry.member2.data(), entry.member2.size());
+            gListOperationalCert[index].SetLength(entry.member2.size());
 
-            listStructOctetStringData[index].fabricIndex     = entry.fabricIndex;
-            listStructOctetStringData[index].operationalCert = gListOperationalCert[index].AsSpan();
+            listStructOctetStringData[index].member1 = entry.member1;
+            listStructOctetStringData[index].member2 = gListOperationalCert[index].AsSpan();
 
             index++;
         }
@@ -430,17 +476,17 @@ CHIP_ERROR TestAttrAccess::WriteListStructOctetStringAttribute(const ConcreteDat
     }
     if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
-        chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType entry;
+        chip::app::Clusters::UnitTesting::Structs::TestListStructOctet::DecodableType entry;
         ReturnErrorOnFailure(aDecoder.Decode(entry));
         size_t index = gListOperationalCertLen;
 
         VerifyOrReturnError(index < kAttributeListLength, CHIP_ERROR_BUFFER_TOO_SMALL);
-        VerifyOrReturnError(entry.operationalCert.size() <= kAttributeEntryLength, CHIP_ERROR_BUFFER_TOO_SMALL);
-        memcpy(gListOperationalCert[index].Data(), entry.operationalCert.data(), entry.operationalCert.size());
-        gListOperationalCert[index].SetLength(entry.operationalCert.size());
+        VerifyOrReturnError(entry.member2.size() <= kAttributeEntryLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(gListOperationalCert[index].Data(), entry.member2.data(), entry.member2.size());
+        gListOperationalCert[index].SetLength(entry.member2.size());
 
-        listStructOctetStringData[index].fabricIndex     = entry.fabricIndex;
-        listStructOctetStringData[index].operationalCert = gListOperationalCert[index].AsSpan();
+        listStructOctetStringData[index].member1 = entry.member1;
+        listStructOctetStringData[index].member2 = gListOperationalCert[index].AsSpan();
 
         gListOperationalCertLen++;
         return CHIP_NO_ERROR;
@@ -671,19 +717,19 @@ CHIP_ERROR TestAttrAccess::WriteListFabricScopedAttribute(const ConcreteDataAttr
 
 } // namespace
 
-bool emberAfTestClusterClusterTestCallback(app::CommandHandler *, const app::ConcreteCommandPath & commandPath,
-                                           const Test::DecodableType & commandData)
+bool emberAfUnitTestingClusterTestCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                           const Clusters::UnitTesting::Commands::Test::DecodableType & commandData)
 {
     // Setup the test variables
-    emAfLoadAttributeDefaults(commandPath.mEndpointId, true, MakeOptional(commandPath.mClusterId));
+    emberAfInitializeAttributes(commandPath.mEndpointId);
     for (int i = 0; i < kAttributeListLength; ++i)
     {
         gListUint8Data[i] = 0;
         gListOctetStringData[i].SetLength(0);
         gListOperationalCert[i].SetLength(0);
-        listStructOctetStringData[i].fabricIndex     = 0;
-        listStructOctetStringData[i].operationalCert = ByteSpan();
-        gSimpleEnums[i]                              = SimpleEnum::kUnspecified;
+        listStructOctetStringData[i].member1 = 0;
+        listStructOctetStringData[i].member2 = ByteSpan();
+        gSimpleEnums[i]                      = SimpleEnum::kUnspecified;
     }
     gSimpleEnumCount = 0;
 
@@ -693,11 +739,11 @@ bool emberAfTestClusterClusterTestCallback(app::CommandHandler *, const app::Con
 
     gNullablesAndOptionalsStruct = Structs::NullablesAndOptionalsStruct::Type();
 
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    commandObj->AddStatus(commandPath, Status::Success);
     return true;
 }
 
-bool emberAfTestClusterClusterTestSpecificCallback(CommandHandler * apCommandObj, const ConcreteCommandPath & commandPath,
+bool emberAfUnitTestingClusterTestSpecificCallback(CommandHandler * apCommandObj, const ConcreteCommandPath & commandPath,
                                                    const TestSpecific::DecodableType & commandData)
 {
     TestSpecificResponse::Type responseData;
@@ -706,18 +752,19 @@ bool emberAfTestClusterClusterTestSpecificCallback(CommandHandler * apCommandObj
     return true;
 }
 
-bool emberAfTestClusterClusterTestNotHandledCallback(CommandHandler *, const ConcreteCommandPath & commandPath,
+bool emberAfUnitTestingClusterTestNotHandledCallback(CommandHandler *, const ConcreteCommandPath & commandPath,
                                                      const TestNotHandled::DecodableType & commandData)
 {
     return false;
 }
 
-bool emberAfTestClusterClusterTestAddArgumentsCallback(CommandHandler * apCommandObj, const ConcreteCommandPath & commandPath,
+bool emberAfUnitTestingClusterTestAddArgumentsCallback(CommandHandler * apCommandObj, const ConcreteCommandPath & commandPath,
                                                        const TestAddArguments::DecodableType & commandData)
 {
     if (commandData.arg1 > UINT8_MAX - commandData.arg2)
     {
-        return emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        apCommandObj->AddStatus(commandPath, Status::InvalidCommand);
+        return true;
     }
 
     TestAddArgumentsResponse::Type responseData;
@@ -734,21 +781,42 @@ static bool SendBooleanResponse(CommandHandler * commandObj, const ConcreteComma
     return true;
 }
 
-bool emberAfTestClusterClusterTestStructArgumentRequestCallback(
+bool emberAfUnitTestingClusterTestDifferentVendorMeiRequestCallback(
+    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+    const Commands::TestDifferentVendorMeiRequest::DecodableType & commandData)
+{
+    Commands::TestDifferentVendorMeiResponse::Type response;
+
+    {
+        Events::TestDifferentVendorMeiEvent::Type event{ commandData.arg1 };
+
+        if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, response.eventNumber))
+        {
+            commandObj->AddStatus(commandPath, Status::Failure);
+            return true;
+        }
+    }
+
+    response.arg1 = commandData.arg1;
+    commandObj->AddResponse(commandPath, response);
+    return true;
+}
+
+bool emberAfUnitTestingClusterTestStructArgumentRequestCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::TestStructArgumentRequest::DecodableType & commandData)
 {
     return SendBooleanResponse(commandObj, commandPath, commandData.arg1.b);
 }
 
-bool emberAfTestClusterClusterTestNestedStructArgumentRequestCallback(
+bool emberAfUnitTestingClusterTestNestedStructArgumentRequestCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::TestNestedStructArgumentRequest::DecodableType & commandData)
 {
     return SendBooleanResponse(commandObj, commandPath, commandData.arg1.c.b);
 }
 
-bool emberAfTestClusterClusterTestListStructArgumentRequestCallback(
+bool emberAfUnitTestingClusterTestListStructArgumentRequestCallback(
     app::CommandHandler * commandObj, app::ConcreteCommandPath const & commandPath,
     Commands::TestListStructArgumentRequest::DecodableType const & commandData)
 {
@@ -763,14 +831,14 @@ bool emberAfTestClusterClusterTestListStructArgumentRequestCallback(
 
     if (CHIP_NO_ERROR != structIterator.GetStatus())
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return true;
     }
 
     return SendBooleanResponse(commandObj, commandPath, shouldReturnTrue);
 }
 
-bool emberAfTestClusterClusterTestEmitTestEventRequestCallback(
+bool emberAfUnitTestingClusterTestEmitTestEventRequestCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const Commands::TestEmitTestEventRequest::DecodableType & commandData)
 {
@@ -784,30 +852,31 @@ bool emberAfTestClusterClusterTestEmitTestEventRequestCallback(
 
     if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, responseData.value))
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return true;
     }
+
     commandObj->AddResponse(commandPath, responseData);
     return true;
 }
 
-bool emberAfTestClusterClusterTestEmitTestFabricScopedEventRequestCallback(
+bool emberAfUnitTestingClusterTestEmitTestFabricScopedEventRequestCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const Commands::TestEmitTestFabricScopedEventRequest::DecodableType & commandData)
 {
     Commands::TestEmitTestFabricScopedEventResponse::Type responseData;
     Events::TestFabricScopedEvent::Type event{ commandData.arg1 };
-
+    event.fabricIndex = commandData.arg1;
     if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, responseData.value))
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return true;
     }
     commandObj->AddResponse(commandPath, responseData);
     return true;
 }
 
-bool emberAfTestClusterClusterTestListInt8UArgumentRequestCallback(
+bool emberAfUnitTestingClusterTestListInt8UArgumentRequestCallback(
     CommandHandler * commandObj, ConcreteCommandPath const & commandPath,
     Commands::TestListInt8UArgumentRequest::DecodableType const & commandData)
 {
@@ -822,14 +891,14 @@ bool emberAfTestClusterClusterTestListInt8UArgumentRequestCallback(
 
     if (CHIP_NO_ERROR != uint8Iterator.GetStatus())
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return true;
     }
 
     return SendBooleanResponse(commandObj, commandPath, shouldReturnTrue);
 }
 
-bool emberAfTestClusterClusterTestNestedStructListArgumentRequestCallback(
+bool emberAfUnitTestingClusterTestNestedStructListArgumentRequestCallback(
     app::CommandHandler * commandObj, app::ConcreteCommandPath const & commandPath,
     Commands::TestNestedStructListArgumentRequest::DecodableType const & commandData)
 {
@@ -844,14 +913,14 @@ bool emberAfTestClusterClusterTestNestedStructListArgumentRequestCallback(
 
     if (CHIP_NO_ERROR != structIterator.GetStatus())
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return true;
     }
 
     return SendBooleanResponse(commandObj, commandPath, shouldReturnTrue);
 }
 
-bool emberAfTestClusterClusterTestListNestedStructListArgumentRequestCallback(
+bool emberAfUnitTestingClusterTestListNestedStructListArgumentRequestCallback(
     app::CommandHandler * commandObj, app::ConcreteCommandPath const & commandPath,
     Commands::TestListNestedStructListArgumentRequest::DecodableType const & commandData)
 {
@@ -872,21 +941,21 @@ bool emberAfTestClusterClusterTestListNestedStructListArgumentRequestCallback(
 
         if (CHIP_NO_ERROR != subStructIterator.GetStatus())
         {
-            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+            commandObj->AddStatus(commandPath, Status::Failure);
             return true;
         }
     }
 
     if (CHIP_NO_ERROR != structIterator.GetStatus())
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return true;
     }
 
     return SendBooleanResponse(commandObj, commandPath, shouldReturnTrue);
 }
 
-bool emberAfTestClusterClusterTestListInt8UReverseRequestCallback(
+bool emberAfUnitTestingClusterTestListInt8UReverseRequestCallback(
     CommandHandler * commandObj, ConcreteCommandPath const & commandPath,
     Commands::TestListInt8UReverseRequest::DecodableType const & commandData)
 {
@@ -918,11 +987,11 @@ bool emberAfTestClusterClusterTestListInt8UReverseRequestCallback(
     }
 
 exit:
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    commandObj->AddStatus(commandPath, Status::Failure);
     return true;
 }
 
-bool emberAfTestClusterClusterTestEnumsRequestCallback(CommandHandler * commandObj, ConcreteCommandPath const & commandPath,
+bool emberAfUnitTestingClusterTestEnumsRequestCallback(CommandHandler * commandObj, ConcreteCommandPath const & commandPath,
                                                        TestEnumsRequest::DecodableType const & commandData)
 {
     TestEnumsResponse::Type response;
@@ -933,7 +1002,7 @@ bool emberAfTestClusterClusterTestEnumsRequestCallback(CommandHandler * commandO
     return true;
 }
 
-bool emberAfTestClusterClusterTestNullableOptionalRequestCallback(
+bool emberAfUnitTestingClusterTestNullableOptionalRequestCallback(
     CommandHandler * commandObj, ConcreteCommandPath const & commandPath,
     Commands::TestNullableOptionalRequest::DecodableType const & commandData)
 {
@@ -955,7 +1024,7 @@ bool emberAfTestClusterClusterTestNullableOptionalRequestCallback(
     return true;
 }
 
-bool emberAfTestClusterClusterSimpleStructEchoRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+bool emberAfUnitTestingClusterSimpleStructEchoRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                               const Commands::SimpleStructEchoRequest::DecodableType & commandData)
 {
     Commands::SimpleStructResponse::Type response;
@@ -972,14 +1041,14 @@ bool emberAfTestClusterClusterSimpleStructEchoRequestCallback(CommandHandler * c
     return true;
 }
 
-bool emberAfTestClusterClusterTimedInvokeRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+bool emberAfUnitTestingClusterTimedInvokeRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                          const Commands::TimedInvokeRequest::DecodableType & commandData)
 {
     commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
     return true;
 }
 
-bool emberAfTestClusterClusterTestSimpleOptionalArgumentRequestCallback(
+bool emberAfUnitTestingClusterTestSimpleOptionalArgumentRequestCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const Commands::TestSimpleOptionalArgumentRequest::DecodableType & commandData)
 {
@@ -989,10 +1058,56 @@ bool emberAfTestClusterClusterTestSimpleOptionalArgumentRequestCallback(
     return true;
 }
 
+// TestBatchHelperRequest and TestSecondBatchHelperRequest do the same thing.
+// The reason there are two identical commands is because batch command requires
+// command paths in the same batch to be unique. These command allow for
+// client to control order of the response and control size of CommandDataIB
+// being sent back to help test some corner cases.
+bool TestBatchHelperCommon(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, const uint16_t sleepTimeMs,
+                           const uint16_t sizeOfResponseBuffer, const uint8_t fillCharacter)
+{
+    if (sizeOfResponseBuffer > kTestBatchHelperResponseBufferMax)
+    {
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::ConstraintError);
+        return true;
+    }
+
+    AsyncBatchCommandsWorkData * asyncWorkData = Platform::New<AsyncBatchCommandsWorkData>();
+    if (asyncWorkData == nullptr)
+    {
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Busy);
+        return true;
+    }
+
+    asyncWorkData->asyncCommandHandle   = commandObj;
+    asyncWorkData->commandPath          = commandPath;
+    asyncWorkData->sizeOfResponseBuffer = sizeOfResponseBuffer;
+    asyncWorkData->fillCharacter        = fillCharacter;
+
+    scheduleTimerCallbackMs(asyncWorkData, sleepTimeMs);
+
+    return true;
+}
+
+bool emberAfUnitTestingClusterTestBatchHelperRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                             const Commands::TestBatchHelperRequest::DecodableType & commandData)
+{
+    return TestBatchHelperCommon(commandObj, commandPath, commandData.sleepBeforeResponseTimeMs, commandData.sizeOfResponseBuffer,
+                                 commandData.fillCharacter);
+}
+
+bool emberAfUnitTestingClusterTestSecondBatchHelperRequestCallback(
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const Commands::TestSecondBatchHelperRequest::DecodableType & commandData)
+{
+    return TestBatchHelperCommon(commandObj, commandPath, commandData.sleepBeforeResponseTimeMs, commandData.sizeOfResponseBuffer,
+                                 commandData.fillCharacter);
+}
+
 // -----------------------------------------------------------------------------
 // Plugin initialization
 
-void MatterTestClusterPluginServerInitCallback(void)
+void MatterUnitTestingPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
 }

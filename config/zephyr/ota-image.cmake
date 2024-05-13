@@ -18,9 +18,10 @@ find_package(Python3 REQUIRED)
 
 #
 # Create CMake target for building Matter OTA (Over-the-air update) image.
+#
 # Required arguments:
-#   INPUT_FILES file1, [file2...] - binary files which Matter OTA image will be composed of
-#   OUTPUT_FILE file - where to store newly created Matter OTA image
+#   INPUT_FILES file1[, file2...]  Binary files to be included in Matter OTA image
+#   OUTPUT_FILE file               Location of generated Matter OTA image
 #
 function(chip_ota_image TARGET_NAME)
     cmake_parse_arguments(ARG "" "OUTPUT_FILE" "INPUT_FILES" ${ARGN})
@@ -30,18 +31,33 @@ function(chip_ota_image TARGET_NAME)
     endif()
 
     # Prepare ota_image_tool.py argument list
-    set(OTA_ARGS
-        "--vendor-id"
-        ${CONFIG_CHIP_DEVICE_VENDOR_ID}
-        "--product-id"
-        ${CONFIG_CHIP_DEVICE_PRODUCT_ID}
-        "--version"
-        ${CONFIG_CHIP_DEVICE_SOFTWARE_VERSION}
-        "--version-str"
-        ${CONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING}
-        "--digest-algorithm"
-        "sha256"
-    )
+    if(DEFINED APPVERSION)
+        set(OTA_ARGS
+            "--vendor-id"
+            ${CONFIG_CHIP_DEVICE_VENDOR_ID}
+            "--product-id"
+            ${CONFIG_CHIP_DEVICE_PRODUCT_ID}
+            "--version"
+            ${APPVERSION}
+            "--version-str"
+            ${APP_VERSION_TWEAK_STRING}
+            "--digest-algorithm"
+            "sha256"
+        )
+    else()
+        set(OTA_ARGS
+            "--vendor-id"
+            ${CONFIG_CHIP_DEVICE_VENDOR_ID}
+            "--product-id"
+            ${CONFIG_CHIP_DEVICE_PRODUCT_ID}
+            "--version"
+            ${CONFIG_CHIP_DEVICE_SOFTWARE_VERSION}
+            "--version-str"
+            ${CONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING}
+            "--digest-algorithm"
+            "sha256"
+        )
+    endif()
 
     separate_arguments(OTA_EXTRA_ARGS NATIVE_COMMAND "${CHIP_OTA_IMAGE_EXTRA_ARGS}")
 
@@ -58,7 +74,12 @@ function(chip_ota_image TARGET_NAME)
         CONTENT ${OTA_ARGS}
     )
 
-    add_custom_target(${TARGET_NAME} ALL
+    add_custom_command(OUTPUT ${ARG_OUTPUT_FILE}
         COMMAND ${Python3_EXECUTABLE} ${CHIP_ROOT}/src/app/ota_image_tool.py create @${ARG_OUTPUT_FILE}.args
+        DEPENDS ${ARG_INPUT_FILES} ${CHIP_ROOT}/src/app/ota_image_tool.py
+    )
+
+    add_custom_target(${TARGET_NAME} ALL
+        DEPENDS ${ARG_OUTPUT_FILE}
     )
 endfunction()

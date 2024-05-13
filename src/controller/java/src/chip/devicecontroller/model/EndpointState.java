@@ -17,8 +17,8 @@
  */
 package chip.devicecontroller.model;
 
-import androidx.annotation.Nullable;
 import java.util.Map;
+import javax.annotation.Nullable;
 
 /** Class for tracking CHIP endpoint state in a hierarchical manner. */
 public final class EndpointState {

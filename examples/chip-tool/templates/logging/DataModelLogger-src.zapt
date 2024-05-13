@@ -4,25 +4,19 @@
 
 using namespace chip::app::Clusters;
 
-{{#structs_with_cluster_name}}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, {{zapTypeToDecodableClusterObjectType name ns=clusterName isArgument=true}} value)
-{
-  DataModelLogger::LogString(label, indent, "{");
-{{#zcl_struct_items}}
-  {
-      CHIP_ERROR err = LogValue("{{asUpperCamelCase label}}", indent + 1, value.{{asLowerCamelCase label}});
-      if (err != CHIP_NO_ERROR)
-      {
-          DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for '{{asUpperCamelCase label}}'");
-          return err;
-      }
-  }
-{{/zcl_struct_items}}
-  DataModelLogger::LogString(indent, "}");
+{{#zcl_structs}}
+{{#if has_more_than_one_cluster}}
+{{> struct_logger_impl namespace="detail"}}
+{{/if}}
+{{/zcl_structs}}
 
-  return CHIP_NO_ERROR;
-}
-{{/structs_with_cluster_name}}
+{{#zcl_clusters}}
+{{#zcl_structs}}
+{{#unless has_more_than_one_cluster}}
+{{> struct_logger_impl namespace=(as_camel_cased ../name false)}}
+{{/unless}}
+{{/zcl_structs}}
+{{/zcl_clusters}}
 
 {{#zcl_clusters}}
 {{#zcl_events}}
@@ -46,7 +40,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const {{
 {{/zcl_events}}
 {{/zcl_clusters}}
 
-{{#chip_client_clusters}}
+{{#zcl_clusters}}
 {{#zcl_commands_source_server}}
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType & value)
 {
@@ -58,16 +52,16 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const {{
   return CHIP_NO_ERROR;
 }
 {{/zcl_commands_source_server}}
-{{/chip_client_clusters}}
+{{/zcl_clusters}}
 
 CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data)
 {
-    ChipLogProgress(chipTool, "Endpoint: %" PRIu16 " Cluster: " ChipLogFormatMEI " Attribute " ChipLogFormatMEI " DataVersion: %" PRIu32, path.mEndpointId,
+    ChipLogProgress(chipTool, "Endpoint: %u Cluster: " ChipLogFormatMEI " Attribute " ChipLogFormatMEI " DataVersion: %" PRIu32, path.mEndpointId,
                     ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId), path.mDataVersion.ValueOr(0));
 
     switch (path.mClusterId)
     {
-{{#chip_client_clusters}}
+{{#zcl_clusters}}
 {{#zcl_attributes_server}}
 {{#first}}
         case {{asUpperCamelCase parent.name}}::Id:
@@ -87,7 +81,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
 {{/last}}
 {{/zcl_attributes_server}}
-{{/chip_client_clusters}}
+{{/zcl_clusters}}
         default:
           break;
     }
@@ -97,12 +91,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
 
 CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & path, chip::TLV::TLVReader * data)
 {
-    ChipLogProgress(chipTool, "Endpoint: %" PRIu16 " Cluster: " ChipLogFormatMEI " Command " ChipLogFormatMEI, path.mEndpointId,
+    ChipLogProgress(chipTool, "Endpoint: %u Cluster: " ChipLogFormatMEI " Command " ChipLogFormatMEI, path.mEndpointId,
                     ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mCommandId));
 
     switch (path.mClusterId)
     {
-{{#chip_client_clusters}}
+{{#zcl_clusters}}
 {{#zcl_commands_source_server}}
 {{#first}}
         case {{asUpperCamelCase parent.name}}::Id:
@@ -122,7 +116,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         }
 {{/last}}
 {{/zcl_commands_source_server}}
-{{/chip_client_clusters}}
+{{/zcl_clusters}}
         default:
           break;
     }
@@ -132,34 +126,34 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
 
 CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip::TLV::TLVReader * data)
 {
-    ChipLogProgress(chipTool, "Endpoint: %" PRIu16 " Cluster: " ChipLogFormatMEI " Event " ChipLogFormatMEI, header.mPath.mEndpointId,
+    ChipLogProgress(chipTool, "Endpoint: %u Cluster: " ChipLogFormatMEI " Event " ChipLogFormatMEI, header.mPath.mEndpointId,
                     ChipLogValueMEI(header.mPath.mClusterId), ChipLogValueMEI(header.mPath.mEventId));
 
-    ChipLogProgress(chipTool, "\t Event number: %" PRIu64, header.mEventNumber);
+    ChipLogProgress(chipTool, "  Event number: %" PRIu64, header.mEventNumber);
 
     if (header.mPriorityLevel == chip::app::PriorityLevel::Info)
     {
-        ChipLogProgress(chipTool, "\t Priority: Info");
+        ChipLogProgress(chipTool, "  Priority: Info");
     }
     else if (header.mPriorityLevel == chip::app::PriorityLevel::Critical)
     {
-        ChipLogProgress(chipTool, "\t Priority: Critical");
+        ChipLogProgress(chipTool, "  Priority: Critical");
     }
     else if (header.mPriorityLevel == chip::app::PriorityLevel::Debug)
     {
-        ChipLogProgress(chipTool, "\t Priority: Debug");
+        ChipLogProgress(chipTool, "  Priority: Debug");
     }
     else
     {
-        ChipLogProgress(chipTool, "\t Priority: Unknown");
+        ChipLogProgress(chipTool, "  Priority: Unknown");
     }
 
-    ChipLogProgress(chipTool, "\t Timestamp: %" PRIu64, header.mTimestamp.mValue);
+    ChipLogProgress(chipTool, "  Timestamp: %" PRIu64, header.mTimestamp.mValue);
 
     switch (header.mPath.mClusterId)
     {
-{{#chip_client_clusters}}
-{{#chip_server_cluster_events}}
+{{#zcl_clusters}}
+{{#zcl_events}}
 {{#first}}
         case {{asUpperCamelCase parent.name}}::Id:
         {
@@ -168,7 +162,7 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
 {{/first}}
             case {{asUpperCamelCase parent.name}}::Events::{{asUpperCamelCase name}}::Id:
             {
-                {{zapTypeToDecodableClusterObjectType name ns=parent.name}} value;
+                {{zapTypeToDecodableClusterObjectType name ns=parent.name forceNotOptional=true}} value;
                 ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
                 return DataModelLogger::LogValue("{{name}}", 1, value);
             }
@@ -177,8 +171,8 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
           break;
         }
 {{/last}}
-{{/chip_server_cluster_events}}
-{{/chip_client_clusters}}
+{{/zcl_events}}
+{{/zcl_clusters}}
         default:
           break;
     }

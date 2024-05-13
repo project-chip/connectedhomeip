@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2021-2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,17 +29,25 @@ class Esp32Board(Enum):
 
 class Esp32App(Enum):
     ALL_CLUSTERS = auto()
+    ALL_CLUSTERS_MINIMAL = auto()
+    ENERGY_MANAGEMENT = auto()
     LIGHT = auto()
     LOCK = auto()
     SHELL = auto()
     BRIDGE = auto()
     TEMPERATURE_MEASUREMENT = auto()
     TESTS = auto()
+    OTA_REQUESTOR = auto()
+    OTA_PROVIDER = auto()
 
     @property
     def ExamplePath(self):
         if self == Esp32App.ALL_CLUSTERS:
             return 'examples/all-clusters-app'
+        elif self == Esp32App.ALL_CLUSTERS_MINIMAL:
+            return 'examples/all-clusters-minimal-app'
+        elif self == Esp32App.ENERGY_MANAGEMENT:
+            return 'examples/energy-management-app'
         elif self == Esp32App.LIGHT:
             return 'examples/lighting-app'
         elif self == Esp32App.LOCK:
@@ -50,6 +58,10 @@ class Esp32App(Enum):
             return 'examples/bridge-app'
         elif self == Esp32App.TEMPERATURE_MEASUREMENT:
             return 'examples/temperature-measurement-app'
+        elif self == Esp32App.OTA_REQUESTOR:
+            return 'examples/ota-requestor-app'
+        elif self == Esp32App.OTA_PROVIDER:
+            return 'examples/ota-provider-app'
         elif self == Esp32App.TESTS:
             return 'src/test_driver'
         else:
@@ -59,6 +71,10 @@ class Esp32App(Enum):
     def AppNamePrefix(self):
         if self == Esp32App.ALL_CLUSTERS:
             return 'chip-all-clusters-app'
+        elif self == Esp32App.ALL_CLUSTERS_MINIMAL:
+            return 'chip-all-clusters-minimal-app'
+        elif self == Esp32App.ENERGY_MANAGEMENT:
+            return 'chip-energy-management-app'
         elif self == Esp32App.LIGHT:
             return 'chip-lighting-app'
         elif self == Esp32App.LOCK:
@@ -69,6 +85,10 @@ class Esp32App(Enum):
             return 'chip-bridge-app'
         elif self == Esp32App.TEMPERATURE_MEASUREMENT:
             return 'chip-temperature-measurement-app'
+        elif self == Esp32App.OTA_REQUESTOR:
+            return 'chip-ota-requestor-app'
+        elif self == Esp32App.OTA_PROVIDER:
+            return 'chip-ota-provider-app'
         elif self == Esp32App.TESTS:
             return None
         else:
@@ -84,27 +104,42 @@ class Esp32App(Enum):
     def IsCompatible(self, board: Esp32Board):
         if board == Esp32Board.QEMU:
             return self == Esp32App.TESTS
-        elif board == Esp32Board.M5Stack:
-            return self == Esp32App.ALL_CLUSTERS
         elif board == Esp32Board.C3DevKit:
-            return self == Esp32App.ALL_CLUSTERS
+            return self == Esp32App.ALL_CLUSTERS or self == Esp32App.ALL_CLUSTERS_MINIMAL
         else:
-            return (board == Esp32Board.DevKitC) and (self != Esp32App.TESTS)
+            return (board in {Esp32Board.M5Stack, Esp32Board.DevKitC}) and (self != Esp32App.TESTS)
 
 
 def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
+    rpc_enabled_apps = {Esp32App.ALL_CLUSTERS,
+                        Esp32App.ALL_CLUSTERS_MINIMAL,
+                        Esp32App.LIGHT,
+                        Esp32App.OTA_REQUESTOR,
+                        Esp32App.OTA_PROVIDER,
+                        Esp32App.TEMPERATURE_MEASUREMENT}
     if app == Esp32App.TESTS:
         return 'sdkconfig_qemu.defaults'
-    elif app != Esp32App.ALL_CLUSTERS and app != Esp32App.TEMPERATURE_MEASUREMENT:
+    elif app not in rpc_enabled_apps:
         return 'sdkconfig.defaults'
 
     rpc = "_rpc" if enable_rpcs else ""
     if board == Esp32Board.DevKitC:
         return 'sdkconfig{}.defaults'.format(rpc)
     elif board == Esp32Board.M5Stack:
-        return 'sdkconfig_m5stack{}.defaults'.format(rpc)
+        # a subset of apps have m5stack specific configurations. However others
+        # just compile for the same devices as aDevKitC
+        specific_apps = {
+            Esp32App.ALL_CLUSTERS,
+            Esp32App.ALL_CLUSTERS_MINIMAL,
+            Esp32App.LIGHT,
+            Esp32App.OTA_REQUESTOR,
+        }
+        if app in specific_apps:
+            return 'sdkconfig_m5stack{}.defaults'.format(rpc)
+        else:
+            return 'sdkconfig{}.defaults'.format(rpc)
     elif board == Esp32Board.C3DevKit:
-        return 'sdkconfig_c3devkit{}.defaults'.format(rpc)
+        return 'sdkconfig{}.defaults.esp32c3'.format(rpc)
     else:
         raise Exception('Unknown board type')
 
@@ -117,13 +152,15 @@ class Esp32Builder(Builder):
                  board: Esp32Board = Esp32Board.M5Stack,
                  app: Esp32App = Esp32App.ALL_CLUSTERS,
                  enable_rpcs: bool = False,
-                 enable_ipv4: bool = True
+                 enable_ipv4: bool = True,
+                 enable_insights_trace: bool = False
                  ):
         super(Esp32Builder, self).__init__(root, runner)
         self.board = board
         self.app = app
         self.enable_rpcs = enable_rpcs
         self.enable_ipv4 = enable_ipv4
+        self.enable_insights_trace = enable_insights_trace
 
         if not app.IsCompatible(board):
             raise Exception(
@@ -161,11 +198,28 @@ class Esp32Builder(Builder):
             self._Execute(
                 ['bash', '-c', 'echo -e "\\nCONFIG_DISABLE_IPV4=y\\n" >>%s' % shlex.quote(defaults_out)])
 
-        cmd = "\nexport SDKCONFIG_DEFAULTS={defaults}\nidf.py -C {example_path} -B {out} reconfigure".format(
-            defaults=shlex.quote(defaults_out),
-            example_path=self.ExamplePath,
-            out=shlex.quote(self.output_dir)
-        )
+        if self.enable_insights_trace:
+            insights_flag = 'y'
+        else:
+            insights_flag = 'n'
+
+        # pre-requisite
+        self._Execute(
+            ['bash', '-c', 'echo -e "\\nCONFIG_ESP_INSIGHTS_ENABLED=%s\\nCONFIG_ENABLE_ESP_INSIGHTS_TRACE=%s\\n" >>%s' % (insights_flag, insights_flag, shlex.quote(defaults_out))])
+
+        cmake_flags = []
+
+        if self.options.pregen_dir:
+            cmake_flags.append(
+                f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
+
+        cmake_args = ['-C', self.ExamplePath, '-B',
+                      shlex.quote(self.output_dir)] + cmake_flags
+
+        cmake_args = " ".join(cmake_args)
+        defaults = shlex.quote(defaults_out)
+
+        cmd = f"\nexport SDKCONFIG_DEFAULTS={defaults}\nidf.py {cmake_args} reconfigure"
 
         # This will do a 'cmake reconfigure' which will create ninja files without rebuilding
         self._IdfEnvExecute(cmd)
@@ -215,5 +269,5 @@ class Esp32Builder(Builder):
 
         with open(os.path.join(self.output_dir, self.app.FlashBundleName), 'r') as fp:
             return {
-                l.strip(): os.path.join(self.output_dir, l.strip()) for l in fp.readlines() if l.strip()
+                line.strip(): os.path.join(self.output_dir, line.strip()) for line in fp.readlines() if line.strip()
             }

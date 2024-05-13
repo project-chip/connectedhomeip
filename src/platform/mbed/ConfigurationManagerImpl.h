@@ -39,6 +39,11 @@ public:
     // This returns an instance of this class.
     static ConfigurationManagerImpl & GetDefaultInstance();
 
+    CHIP_ERROR GetRebootCount(uint32_t & rebootCount) override;
+    CHIP_ERROR StoreRebootCount(uint32_t rebootCount) override;
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
+    CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours) override;
+
 private:
     // ===== Members that implement the ConfigurationManager public interface.
 
@@ -69,6 +74,14 @@ private:
 
     static void DoFactoryReset(intptr_t arg);
 };
+
+/**
+ * Returns the platform-specific implementation of the ConfigurationManager object.
+ *
+ * Applications can use this to gain access to features of the ConfigurationManager
+ * that are specific to the selected platform.
+ */
+ConfigurationManager & ConfigurationMgrImpl();
 
 } // namespace DeviceLayer
 } // namespace chip

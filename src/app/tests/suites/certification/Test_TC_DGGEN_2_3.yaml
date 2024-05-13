@@ -1,0 +1,157 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 88.2.3. [TC-DGGEN-2.3] Command Received [DUT as Server]
+
+PICS:
+    - DGGEN.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "General Diagnostics"
+    endpoint: 0
+
+    PIXIT.DGGEN.ENABLEKEY:
+        type: octet_string
+        defaultValue: "hex:00112233445566778899aabbccddeeff"
+
+tests:
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Step 2: TH reads TestEventTriggersEnabled attribute from General
+          Diagnostics Cluster"
+      command: "readAttribute"
+      attribute: "TestEventTriggersEnabled"
+      response:
+          saveAs: TestEventTriggersEnabledvalue
+          constraints:
+              type: boolean
+
+    - label:
+          "If this value is set to True, then proceed with step 3, otherwise
+          skip step 3."
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: true
+              - name: "Value2"
+                value: TestEventTriggersEnabledvalue
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsExpectedValue
+
+    - label:
+          "Step 3: Invoke the TestEventTrigger command with EnableKey field set
+          to PIXIT.DGGEN.ENABLEKEY and EventTrigger field set to 0."
+      runIf: IsExpectedValue
+      PICS: DGGEN.S.C00.Rsp
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: PIXIT.DGGEN.ENABLEKEY
+              - name: "EventTrigger"
+                value: 0
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "Step 4: Invoke the TestEventTrigger command with EnableKey field set
+          to all zeros and EventTrigger field set to 0."
+      PICS: DGGEN.S.C00.Rsp
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: "hex:00000000000000000000000000000000"
+              - name: "EventTrigger"
+                value: 0
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 5: Invoke the TestEventTrigger command with EnableKey field set
+          to 8-bytes to zeros and EventTrigger field set to 0."
+      PICS: DGGEN.S.C00.Rsp
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: "hex:0000000000000000"
+              - name: "EventTrigger"
+                value: 0
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 6: Invoke the PayloadTestRequest command with EnableKey field
+          set to PIXIT.DGGEN.ENABLEKEY, Value field set to 0x1 and Count set to
+          1."
+      runIf: IsExpectedValue
+      PICS: DGGEN.S.C03.Rsp
+      command: "PayloadTestRequest"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: PIXIT.DGGEN.ENABLEKEY
+              - name: "Value"
+                value: 0x1
+              - name: "Count"
+                value: 1
+      response:
+          - values:
+                - name: "Payload"
+                  value: "hex:01"
+
+    - label:
+          "Step 7: Invoke the PayloadTestRequest command with EnableKey field
+          set to all zeros, Value field set to 0x1 and Count set to 1."
+      PICS: DGGEN.S.C03.Rsp
+      command: "PayloadTestRequest"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: "hex:00000000000000000000000000000000"
+              - name: "Value"
+                value: 0x1
+              - name: "Count"
+                value: 1
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 8: Invoke the PayloadTestRequest command with EnableKey field
+          set to 8-bytes to zeros, Value field set to 0x1 and Count set to 1."
+      PICS: DGGEN.S.C03.Rsp
+      command: "PayloadTestRequest"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: "hex:00000000000000000000000000000000"
+              - name: "Value"
+                value: 0x1
+              - name: "Count"
+                value: 1
+      response:
+          error: CONSTRAINT_ERROR

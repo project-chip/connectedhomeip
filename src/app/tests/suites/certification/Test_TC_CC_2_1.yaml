@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 27.2.1. [TC-CC-2.1] Attributes with server as DUT
+name: 25.2.1. [TC-CC-2.1] Attributes with server as DUT
+
+PICS:
+    - CC.S
 
 config:
     nodeId: 0x12344321
@@ -20,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -28,1307 +31,794 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Validate constraints of attribute: current hue"
+    - label: "Step 2: TH reads from the DUT the (0x0000) CurrentHue attribute"
+      PICS: CC.S.A0000
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
-    - label: "Write the default value to mandatory attribute: CurrentHue"
-      command: "writeAttribute"
-      attribute: "current hue"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back mandatory attribute: CurrentHue"
+    - label:
+          "Step 3: TH reads from the DUT the (0x0001) CurrentSaturation
+          attribute"
+      PICS: CC.S.A0001
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentSaturation"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 254
 
-    - label: "Validate constraints of attribute: CurrentSaturation"
+    - label:
+          "Step 4: TH reads from the DUT the (0x0002) RemainingTime attribute"
+      PICS: CC.S.A0002
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "RemainingTime"
       response:
           constraints:
-              type: uint8
+              type: int16u
               minValue: 0
-              maxValue: 254
+              maxValue: 65534
 
-    - label: "Write the default value to mandatory attribute: CurrentSaturation"
-      command: "writeAttribute"
-      attribute: "current saturation"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back mandatory attribute: CurrentSaturation"
+    - label: "Step 5: TH reads from the DUT the (0x0003) CurrentX attribute"
+      PICS: CC.S.A0003
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "CurrentX"
       response:
           constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 254
-
-    - label: "Validate constraints of attribute: CurrentX"
-      command: "readAttribute"
-      attribute: "current x"
-      response:
-          constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
-    - label: "Write the default value to mandatory attribute: CurrentX"
-      command: "writeAttribute"
-      attribute: "current x"
-      arguments:
-          value: 24939
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back mandatory attribute: CurrentX"
+    - label: "Step 6: TH reads from the DUT the (0x0004) CurrentY attribute"
+      PICS: CC.S.A0004
       command: "readAttribute"
-      attribute: "current x"
+      attribute: "CurrentY"
       response:
           constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
-
-    - label: "Validate constraints of attribute: CurrentY"
-      command: "readAttribute"
-      attribute: "current y"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
-
-    - label: "Write the default values to mandatory attribute: CurrentY"
-      command: "writeAttribute"
-      attribute: "current y"
-      arguments:
-          value: 24701
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back mandatory attribute: CurrentY"
-      command: "readAttribute"
-      attribute: "current y"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
-
-    - label: "Validate constraints of attribute: ColorTemperatureMireds"
-      command: "readAttribute"
-      attribute: "color temperature"
-      response:
-          constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
     - label:
-          "Write the default values to mandatory attribute:
-          ColorTemperatureMireds"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "color temperature"
-      arguments:
-          value: 250
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back mandatory attribute: ColorTemperatureMireds"
-      disabled: true
+          "Step 7: TH reads from the DUT the (0x0005) DriftCompensation
+          attribute"
+      PICS: CC.S.A0005
       command: "readAttribute"
-      attribute: "color temperature"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
-
-    - label: "Validate constraints of attribute: ColorMode"
-      command: "readAttribute"
-      attribute: "color mode"
-      response:
-          constraints:
-              type: enum8
-              minValue: 0
-              maxValue: 2
-
-    - label: "Write the default values to mandatory attribute: ColorMode"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "color mode"
-      arguments:
-          value: 1
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back mandatory attribute: ColorMode"
-      disabled: true
-      command: "readAttribute"
-      attribute: "color mode"
-      response:
-          constraints:
-              type: enum8
-              minValue: 0
-              maxValue: 2
-
-    - label: "Validate constraints of attribute: Options"
-      command: "readAttribute"
-      attribute: "color control options"
-      response:
-          constraints:
-              type: map8
-
-    - label: "Write the default values to mandatory attribute: Options"
-      command: "writeAttribute"
-      attribute: "color control options"
-      arguments:
-          value: 0
-
-    - label: "Reads back mandatory attribute: Options"
-      command: "readAttribute"
-      attribute: "color control options"
-      response:
-          value: 0
-
-    - label: "Validate constraints of attribute: EnhancedCurrentHue"
-      command: "readAttribute"
-      attribute: "enhanced current hue"
-      response:
-          constraints:
-              type: uint16
-
-    - label:
-          "Write the default values to mandatory attribute: EnhancedCurrentHue"
-      command: "writeAttribute"
-      attribute: "enhanced current hue"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back mandatory attribute: EnhancedCurrentHue"
-      command: "readAttribute"
-      attribute: "enhanced current hue"
-      response:
-          constraints:
-              type: uint16
-
-    - label: "Validate constraints of attribute: EnhancedColorMode"
-      command: "readAttribute"
-      attribute: "enhanced color mode"
-      response:
-          constraints:
-              type: enum8
-
-    - label:
-          "Write the default values to mandatory attribute: EnhancedColorMode"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "enhanced color mode"
-      arguments:
-          value: 1
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back mandatory attribute: EnhancedColorMode"
-      disabled: true
-      command: "readAttribute"
-      attribute: "enhanced color mode"
-      response:
-          constraints:
-              type: enum8
-
-    - label: "Validate constraints of attribute: ColorLoopActive"
-      command: "readAttribute"
-      attribute: "color loop active"
-      response:
-          constraints:
-              type: uint8
-
-    - label: "Write the default values to mandatory attribute: ColorLoopActive"
-      command: "writeAttribute"
-      attribute: "color loop active"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back mandatory attribute: ColorLoopActive"
-      command: "readAttribute"
-      attribute: "color loop active"
-      response:
-          constraints:
-              type: uint8
-
-    - label: "Validate constraints of attribute: ColorLoopDirection"
-      command: "readAttribute"
-      attribute: "color loop direction"
-      response:
-          constraints:
-              type: uint8
-
-    - label:
-          "Write the default values to mandatory attribute: ColorLoopDirection"
-      command: "writeAttribute"
-      attribute: "color loop direction"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back mandatory attribute: ColorLoopDirection"
-      command: "readAttribute"
-      attribute: "color loop direction"
-      response:
-          constraints:
-              type: uint8
-
-    - label: "Validate constraints of attribute: ColorLoopTime"
-      command: "readAttribute"
-      attribute: "color loop time"
-      response:
-          constraints:
-              type: uint16
-
-    - label: "Write the default values to mandatory attribute: ColorLoopTime"
-      command: "writeAttribute"
-      attribute: "color loop time"
-      arguments:
-          value: 25
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back mandatory attribute: ColorLoopTime"
-      command: "readAttribute"
-      attribute: "color loop time"
-      response:
-          constraints:
-              type: uint16
-
-    - label: "Validate constraints of attribute: ColorLoopStartEnhancedHue"
-      command: "readAttribute"
-      attribute: "color loop start enhanced hue"
-      response:
-          constraints:
-              type: uint16
-
-    - label:
-          "Write the default values to mandatory attribute:
-          ColorLoopStartEnhancedHue"
-      command: "writeAttribute"
-      attribute: "color loop start enhanced hue"
-      arguments:
-          value: 8960
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back mandatory attribute: ColorLoopStartEnhancedHue"
-      command: "readAttribute"
-      attribute: "color loop start enhanced hue"
-      response:
-          constraints:
-              type: uint16
-
-    - label: "Validate constraints of attribute: ColorLoopStoredEnhancedHue"
-      command: "readAttribute"
-      attribute: "color loop stored enhanced hue"
-      response:
-          constraints:
-              type: uint16
-
-    - label:
-          "Write the default values to mandatory attribute:
-          ColorLoopStoredEnhancedHue"
-      command: "writeAttribute"
-      attribute: "color loop stored enhanced hue"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back mandatory attribute: ColorLoopStoredEnhancedHue"
-      command: "readAttribute"
-      attribute: "color loop stored enhanced hue"
-      response:
-          constraints:
-              type: uint16
-
-    - label: "Validate constraints of attribute: ColorCapabilities"
-      command: "readAttribute"
-      attribute: "color capabilities"
-      response:
-          constraints:
-              type: map16
-              minValue: 0
-              maxValue: 31
-
-    - label:
-          "Write the default values to mandatory attribute: ColorCapabilities"
-      command: "writeAttribute"
-      attribute: "color capabilities"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back mandatory attribute: ColorCapabilities"
-      command: "readAttribute"
-      attribute: "color capabilities"
-      response:
-          constraints:
-              type: map16
-              minValue: 0
-              maxValue: 31
-
-    - label: "Validate constraints of attribute: ColorTempPhysicalMinMireds"
-      command: "readAttribute"
-      attribute: "color temp physical min"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
-
-    - label:
-          "Write the default values to mandatory  attribute:
-          ColorTempPhysicalMinMireds"
-      command: "writeAttribute"
-      attribute: "color temp physical min"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back mandatory attribute: ColorTempPhysicalMinMireds"
-      command: "readAttribute"
-      attribute: "color temp physical min"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
-
-    - label: "Validate constraints of attribute: ColorTempPhysicalMaxMireds"
-      command: "readAttribute"
-      attribute: "color temp physical max"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
-
-    - label:
-          "Write the default values to mandatory attribute:
-          ColorTempPhysicalMaxMireds"
-      command: "writeAttribute"
-      attribute: "color temp physical max"
-      arguments:
-          value: 65279
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back mandatory attribute: ColorTempPhysicalMaxMireds"
-      command: "readAttribute"
-      attribute: "color temp physical max"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
-
-    - label: "Read the optional attribute: CoupleColorTempToLevelMinMireds"
-      optional: true
-      command: "readAttribute"
-      attribute: "couple color temp to level min-mireds"
-      response:
-          constraints:
-              type: uint16
-
-    - label:
-          "Write the default values to optional attribute:
-          CoupleColorTempToLevelMinMireds"
-      optional: true
-      command: "writeAttribute"
-      attribute: "couple color temp to level min-mireds"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back optional attribute: CoupleColorTempToLevelMinMireds"
-      optional: true
-      command: "readAttribute"
-      attribute: "couple color temp to level min-mireds"
-      response:
-          constraints:
-              type: uint16
-
-    - label: "Read the optional attribute: StartUpColorTemperatureMireds"
-      optional: true
-      command: "readAttribute"
-      attribute: "start up color temperature mireds"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
-
-    - label:
-          "Write the default values to optional attribute:
-          StartUpColorTemperatureMireds"
-      optional: true
-      command: "writeAttribute"
-      attribute: "start up color temperature mireds"
-      arguments:
-          value: 0
-
-    - label: "Reads back optional attribute: StartUpColorTemperatureMireds"
-      optional: true
-      command: "readAttribute"
-      attribute: "start up color temperature mireds"
-      response:
-          value: 0
-
-    - label: "Validate constraints of attribute: RemainingTime"
-      optional: true
-      command: "readAttribute"
-      attribute: "remaining time"
-      response:
-          constraints:
-              type: uint16
-
-    - label: "Write the default values to optional attribute: RemainingTime"
-      optional: true
-      command: "writeAttribute"
-      attribute: "remaining time"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back optional attribute: RemainingTime"
-      optional: true
-      command: "readAttribute"
-      attribute: "remaining time"
-      response:
-          constraints:
-              type: uint16
-
-    - label: "Read the optional attribute: DriftCompensation"
-      optional: true
-      command: "readAttribute"
-      attribute: "drift compensation"
+      attribute: "DriftCompensation"
       response:
           constraints:
               type: enum8
               minValue: 0
               maxValue: 4
 
-    - label: "Write the default values to optional attribute: DriftCompensation"
-      optional: true
-      command: "writeAttribute"
-      attribute: "drift compensation"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back optional attribute: DriftCompensation"
-      optional: true
+    - label:
+          "Step 8: TH reads from the DUT the (0x0006) CompensationText attribute"
+      PICS: CC.S.A0006
       command: "readAttribute"
-      attribute: "drift compensation"
+      attribute: "CompensationText"
+      response:
+          constraints:
+              type: char_string
+              maxLength: 254
+
+    - label:
+          "Step 9: TH reads from the DUT the (0x0007) ColorTemperatureMireds
+          attribute"
+      PICS: CC.S.A0007
+      command: "readAttribute"
+      attribute: "ColorTemperatureMireds"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Step 10: TH reads from the DUT the (0x0008) ColorMode attribute"
+      PICS: CC.S.A0008
+      command: "readAttribute"
+      attribute: "ColorMode"
       response:
           constraints:
               type: enum8
               minValue: 0
+              maxValue: 2
+
+    - label: "Step 11: TH reads from the DUT the (0x000f) Options attribute"
+      PICS: CC.S.A000f
+      command: "readAttribute"
+      attribute: "Options"
+      response:
+          constraints:
+              type: bitmap8
+              minValue: 0
               maxValue: 4
 
-    - label: "Read the optional attribute: CompensationText"
-      optional: true
+    - label:
+          "Step 12: TH reads from the DUT the (0x4000) EnhancedCurrentHue
+          attribute"
+      PICS: CC.S.A4000
       command: "readAttribute"
-      attribute: "compensation text"
+      attribute: "EnhancedCurrentHue"
       response:
           constraints:
-              type: string
-              maxLength: 254
+              type: int16u
+              minValue: 0
+              maxValue: 65535
 
-    - label: "Write the default values to optional attribute: CompensationText"
-      optional: true
-      command: "writeAttribute"
-      attribute: "compensation text"
-      arguments:
-          value: ""
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back optional attribute: CompensationText"
-      optional: true
+    - label:
+          "Step 13: TH reads from the DUT the (0x4001) EnhancedColorMode
+          attribute"
+      PICS: CC.S.A4001
       command: "readAttribute"
-      attribute: "compensation text"
+      attribute: "EnhancedColorMode"
       response:
           constraints:
-              type: string
-              maxLength: 254
+              type: enum8
+              minValue: 0
+              maxValue: 3
+
+    - label:
+          "Step 14:TH reads from the DUT the (0x4002) ColorLoopActive attribute"
+      PICS: CC.S.A4002
+      command: "readAttribute"
+      attribute: "ColorLoopActive"
+      response:
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 254
+
+    - label:
+          "Step 15: TH reads from the DUT the (0x4003) ColorLoopDirection
+          attribute"
+      PICS: CC.S.A4003
+      command: "readAttribute"
+      attribute: "ColorLoopDirection"
+      response:
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 254
+
+    - label:
+          "Step 16: TH reads from the DUT the (0x4004) ColorLoopTime attribute"
+      PICS: CC.S.A4004
+      command: "readAttribute"
+      attribute: "ColorLoopTime"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label:
+          "Step 17: TH reads from the DUT the (0x4005) ColorLoopStartEnhancedHue
+          attribute"
+      PICS: CC.S.A4005
+      command: "readAttribute"
+      attribute: "ColorLoopStartEnhancedHue"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label:
+          "Step 18: TH reads from the DUT the (0x4006)
+          ColorLoopStoredEnhancedHue attributeT"
+      PICS: CC.S.A4006
+      command: "readAttribute"
+      attribute: "ColorLoopStoredEnhancedHue"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label:
+          "Step 18a: Saving for comparision in step 19 reads FeatureMap
+          attribute from DUT"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          saveAs: FeatureMapValue
+
+    - label:
+          "Step 19: TH reads from the DUT the (0x400a) ColorCapabilities
+          attribute"
+      PICS: CC.S.A400a
+      command: "readAttribute"
+      attribute: "ColorCapabilities"
+      response:
+          value: FeatureMapValue
+          constraints:
+              type: bitmap16
+              minValue: 0
+              maxValue: 31
+
+    - label:
+          "Step 20: TH reads from the DUT the (0x400b)
+          ColorTempPhysicalMinMireds attribute"
+      PICS: CC.S.A400b
+      command: "readAttribute"
+      attribute: "ColorTempPhysicalMinMireds"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65279
+
+    - label:
+          "Step 21: TH reads from the DUT the (0x400c)
+          ColorTempPhysicalMaxMireds attribute"
+      PICS: CC.S.A400c
+      command: "readAttribute"
+      attribute: "ColorTempPhysicalMaxMireds"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65279
+
+    - label:
+          "Step 22: TH reads from the DUT the (0x400d)
+          CoupleColorTempToLevelMinMireds attribute"
+      PICS: CC.S.A400d
+      command: "readAttribute"
+      attribute: "CoupleColorTempToLevelMinMireds"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65279
+
+    - label:
+          "Step 23: TH reads from the DUT the (0x4010)
+          StartUpColorTemperatureMireds attribute"
+      PICS: CC.S.A4010
+      command: "readAttribute"
+      attribute: "StartUpColorTemperatureMireds"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65279
 
     #Defined Primaries Information Attribute Set
-
-    - label: "Read the mandatory attribute: NumberOfPrimaries"
+    - label:
+          "Step 24: TH reads from the DUT the (0x0010) NumberOfPrimaries
+          attribute"
+      PICS: CC.S.A0010
       command: "readAttribute"
-      attribute: "number of primaries"
+      attribute: "NumberOfPrimaries"
       response:
           constraints:
-              type: uint8
+              type: int8u
               minValue: 0
               maxValue: 6
 
-    - label: "Write the default mandatory attribute: NumberOfPrimaries"
-      command: "writeAttribute"
-      attribute: "number of primaries"
+    - label:
+          "Step 25: TH reads Primary1X attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 1 or more"
+      verification: |
+          ./chip-tool colorcontrol read  primary1x 1 1
+
+          On TH(chip-tool)  Logs, Verify that "Primary1X" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary1X" value is 0.
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0011 DataVersion: 540305990
+          [1651483665.109697][3245:3250] CHIP:TOO:    Primary1X: 0
+          [1651483665.109797][3245:3250] CHIP:EM: Sending Standalone Ack for MessageCounter:12731123 on exchange 55053i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0011
       arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Read back the mandatory attribute: NumberOfPrimaries"
-      command: "readAttribute"
-      attribute: "number of primaries"
-      response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 6
+    - label:
+          "Step 26: TH reads Primary1Y attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 1 or more"
+      verification: |
+          ./chip-tool colorcontrol read  primary1y 1 1
 
-    - label: "Read the mandatory attribute: Primary1X"
-      command: "readAttribute"
-      attribute: "primary 1 x"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
 
-    - label: "Write the default mandatory attribute: Primary1X"
-      command: "writeAttribute"
-      attribute: "primary 1 x"
+          On TH(chip-tool)  Logs, Verify  that "Primary1Y" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary1Y" value is 0.
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0012 DataVersion: 540305990
+          [1651483698.733322][3253:3259] CHIP:TOO:    Primary1Y: 0
+          [1651483698.733420][3253:3259] CHIP:EM: Sending Standalone Ack for MessageCounter:7863787 on exchange 13103i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0012
       arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Read back the mandatory attribute: Primary1X"
-      command: "readAttribute"
-      attribute: "primary 1 x"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+    - label:
+          "Step 27: TH reads Primary1Intensity attribute from DUT and Verify
+          that the DUT response contains an uint8 if NumberOfPrimaries is 1 or
+          more"
+      verification: |
+          ./chip-tool colorcontrol read primary1intensity 1 1
 
-    - label: "Read the mandatory attribute: Primary1Y"
-      command: "readAttribute"
-      attribute: "primary 1 y"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+          On TH(chip-tool)  Logs, Verify that "Primary1Intensity" attribute value is an uint8 and below is the sample log provided for the raspi platform, In RPI "Primary1Intensity" value is 0.
 
-    - label: "Write the default mandatory attribute: Primary1Y"
-      command: "writeAttribute"
-      attribute: "primary 1 y"
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0013 DataVersion: 540305990
+          [1651483742.297459][3263:3268] CHIP:TOO:   Primary1Intensity: 0
+          [1651483742.297558][3263:3268] CHIP:EM: Sending Standalone Ack for MessageCounter:10210809 on exchange 7007i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0013
       arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Read back the mandatory attribute: Primary1Y"
-      command: "readAttribute"
-      attribute: "primary 1 y"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+    - label:
+          "Step 28: TH reads Primary2X attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 2 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary2x 1 1
 
-    - label: "Read the mandatory attribute: Primary1Intensity"
-      command: "readAttribute"
-      attribute: "primary 1 intensity"
-      response:
-          constraints:
-              type: uint8
+          On TH(chip-tool)  Logs, Verify that "Primary2X" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary2X" value is 0.
 
-    - label: "Write the default mandatory attribute: Primary1Intensity"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "primary 1 intensity"
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0015 DataVersion: 540305990
+          [1651483777.233498][3270:3275] CHIP:TOO:   Primary2X: 0
+          [1651483777.233614][3270:3275] CHIP:EM: Sending Standalone Ack for MessageCounter:1684573 on exchange 21377i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0015
       arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Read back the mandatory attribute: Primary1Intensity"
-      disabled: true
-      command: "readAttribute"
-      attribute: "primary 1 intensity"
-      response:
-          constraints:
-              type: uint8
+    - label:
+          "Step 29: TH reads Primary2Y attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 2 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary2y 1 1
 
-    - label: "Read the mandatory attribute: Primary2X"
-      command: "readAttribute"
-      attribute: "primary 2 x"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+          On TH(chip-tool)  Logs, Verify  that "Primary2Y" value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary2Y" value is 0.
 
-    - label: "Write the default mandatory attribute: Primary2X"
-      command: "writeAttribute"
-      attribute: "primary 2 x"
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0016 DataVersion: 540305990
+          [1651483805.650796][3279:3284] CHIP:TOO:  Primary2Y: 0
+          [1651483805.650942][3279:3284] CHIP:EM: Sending Standalone Ack for MessageCounter:16277541 on exchange 10435i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0016
       arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Read back the mandatory attribute: Primary2X"
-      command: "readAttribute"
-      attribute: "primary 2 x"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+    - label:
+          "Step 30: TH reads Primary2Intensity attribute from DUT and Verify
+          that the DUT response contains an uint8 if NumberOfPrimaries is 2 or
+          more"
+      verification: |
+          ./chip-tool colorcontrol read primary2intensity 1 1
 
-    - label: "Read the mandatory attribute: Primary2Y"
-      command: "readAttribute"
-      attribute: "primary 2 y"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+          On TH(chip-tool)  Logs, Verify  that "Primary2Intensity" attribute value is an uint8 and below is the sample log provided for the raspi platform, In RPI "Primary2Intensity" value is 0.
 
-    - label: "Write the default mandatory attribute: Primary2Y"
-      command: "writeAttribute"
-      attribute: "primary 2 y"
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0017 DataVersion: 540305990
+          [1651483834.596380][3285:3290] CHIP:TOO:  Primary2Intensity: 0
+          [1651483834.596470][3285:3290] CHIP:EM: Sending Standalone Ack for MessageCounter:5986355 on exchange 855i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0017
       arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Read back the mandatory attribute: Primary2Y"
-      command: "readAttribute"
-      attribute: "primary 2 y"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+    - label:
+          "Step 31: TH reads Primary3X attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 3 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary3x 1 1
 
-    - label: "Validate constraints of attribute: Primary2Intensity"
-      command: "readAttribute"
-      attribute: "primary 2 intensity"
-      response:
-          constraints:
-              type: uint8
+          On TH(chip-tool)  Logs, Verify  that "Primary3X" value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary3X" value is 0.
 
-    - label: "Write the default mandatory attribute: Primary2Intensity"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "primary 2 intensity"
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0019 DataVersion: 540305990
+          [1651483937.072323][3298:3303] CHIP:TOO:   Primary3X: 0
+          [1651483937.072405][3298:3303] CHIP:EM: Sending Standalone Ack for MessageCounter:6092298 on exchange 12519i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0019
       arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Read back the mandatory attribute: Primary2Intensity"
-      disabled: true
-      command: "readAttribute"
-      attribute: "primary 2 intensity"
-      response:
-          constraints:
-              type: uint8
+    - label:
+          "Step 32: TH reads Primary3Y attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 3 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary3y 1 1
 
-    - label: "Read the mandatory attribute: Primary3X"
-      command: "readAttribute"
-      attribute: "primary 3 x"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+          On TH(chip-tool)  Logs, Verify  that "Primary3Y" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary3Y" value is 0.
 
-    - label: "Write the default mandatory attribute: Primary3X"
-      command: "writeAttribute"
-      attribute: "primary 3 x"
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_001A DataVersion: 540305990
+          [1651483967.386334][3305:3310] CHIP:TOO:   Primary3Y: 0
+          [1651483967.386427][3305:3310] CHIP:EM: Sending Standalone Ack for MessageCounter:3329418 on exchange 11657i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A001a
       arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Read back the mandatory attribute: Primary3X"
-      command: "readAttribute"
-      attribute: "primary 3 x"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+    - label:
+          "Step 33: TH reads Primary3Intensity attribute from DUT and Verify
+          that the DUT response contains an uint8 if NumberOfPrimaries is 3 or
+          more"
+      verification: |
+          ./chip-tool colorcontrol read primary3intensity 1 1
 
-    - label: "Read the mandatory attribute: Primary3Y"
-      command: "readAttribute"
-      attribute: "primary 3 y"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+          On TH(chip-tool)  Logs, Verify  that "Primary3Intensity" attribute value is an uint8  and below is the sample log provided for the raspi platform, In RPI "Primary3Intensity" value is 0.
 
-    - label: "Write the default mandatory attribute: Primary3Y"
-      command: "writeAttribute"
-      attribute: "primary 3 y"
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_001B DataVersion: 540305990
+          [1651484113.812178][3316:3321] CHIP:TOO:   Primary3Intensity: 0
+          [1651484113.812270][3316:3321] CHIP:EM: Sending Standalone Ack for MessageCounter:41658 on exchange 9618i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A001b
       arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Read back the mandatory attribute: Primary3Y"
-      command: "readAttribute"
-      attribute: "primary 3 y"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
-
-    - label: "Read the mandatory attribute: Primary3Intensity"
-      command: "readAttribute"
-      attribute: "primary 3 intensity"
-      response:
-          constraints:
-              type: uint8
-
-    - label: "Write the default mandatory attribute: Primary3Intensity"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "primary 3 intensity"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Read back the mandatory attribute: Primary3Intensity"
-      disabled: true
-      command: "readAttribute"
-      attribute: "primary 3 intensity"
-      response:
-          constraints:
-              type: uint8
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     #Additional Defined Primaries Information Attribute Set
-    - label: "Read the mandatory attribute: Primary4X"
-      command: "readAttribute"
-      attribute: "primary 4 x"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+    - label:
+          "Step 34: TH reads Primary4X attribute from DUT Verify that the DUT
+          response contains an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is
+          4 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary4x 1 1
 
-    - label: "Write the default mandatory attribute: Primary4X"
-      command: "writeAttribute"
-      attribute: "primary 4 x"
+          On TH(chip-tool)  Logs, Verify  that "Primary4X" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary4X" value is 0.
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0020 DataVersion: 540305990
+          [1651484143.778301][3324:3329] CHIP:TOO:   Primary4X: 0
+          [1651484143.778392][3324:3329] CHIP:EM: Sending Standalone Ack for MessageCounter:2094184 on exchange 50270i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0020
       arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Read back the mandatory attribute: Primary4X"
-      command: "readAttribute"
-      attribute: "primary 4 x"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+    - label:
+          "Step 35: TH reads Primary4Y attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 4 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary4y 1 1
 
-    - label: "Read the mandatory attribute: Primary4Y"
-      command: "readAttribute"
-      attribute: "primary 4 y"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+          On TH(chip-tool)  Logs, Verify  that "Primary4Y" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary4Y" value is 0.
 
-    - label: "Write the default mandatory attribute: Primary4Y"
-      command: "writeAttribute"
-      attribute: "primary 4 y"
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0021 DataVersion: 540305990
+          [1651484171.921901][3334:3339] CHIP:TOO:   Primary4Y: 0
+          [1651484171.921984][3334:3339] CHIP:EM: Sending Standalone Ack for MessageCounter:3701827 on exchange 16726i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0021
       arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Read back the mandatory attribute: Primary4Y"
-      command: "readAttribute"
-      attribute: "primary 4 y"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+    - label:
+          "Step 36: TH reads Primary4Intensity attribute from DUT and Verify
+          that the DUT response contains an uint8 if NumberOfPrimaries is 4 or
+          more"
+      verification: |
+          ./chip-tool colorcontrol read primary4intensity 1 1
 
-    - label: "Read the mandatory attribute: Primary4Intensity"
-      command: "readAttribute"
-      attribute: "primary 4 intensity"
-      response:
-          constraints:
-              type: uint8
+          On TH(chip-tool)  Logs, Verify that "Primary4Intensity" attribute value is an uint8 and below is the sample log provided for the raspi platform, In RPI "Primary4Intensity" value is 0.
 
-    - label: "Write the default mandatory attribute: Primary4Intensity"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "primary 4 intensity"
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0022 DataVersion: 540305990
+          [1651484198.443415][3341:3346] CHIP:TOO:   Primary4Intensity: 0
+          [1651484198.443528][3341:3346] CHIP:EM: Sending Standalone Ack for MessageCounter:1740063 on exchange 36245i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0022
       arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Read back the mandatory attribute: Primary4Intensity"
-      disabled: true
-      command: "readAttribute"
-      attribute: "primary 4 intensity"
-      response:
-          constraints:
-              type: uint8
+    - label:
+          "Step 37: TH reads Primary5X attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 5 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary5x 1 1
 
-    - label: "Read the mandatory attribute: Primary5X"
-      command: "readAttribute"
-      attribute: "primary 5 x"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+          On TH(chip-tool)  Logs, Verify that "Primary5X" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary5X" value is 0.
 
-    - label: "Write the default mandatory attribute: Primary5X"
-      command: "writeAttribute"
-      attribute: "primary 5 x"
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0024 DataVersion: 540305990
+          [1651484241.467661][3350:3355] CHIP:TOO:   Primary5X: 0
+          [1651484241.467788][3350:3355] CHIP:EM: Sending Standalone Ack for MessageCounter:5350139 on exchange 63040i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0024
       arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Read back the mandatory attribute: Primary5X"
-      command: "readAttribute"
-      attribute: "primary 5 x"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+    - label:
+          "Step 38: TH reads Primary5Y attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 5 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary5y 1 1
 
-    - label: "Read the mandatory attribute: Primary5Y"
-      command: "readAttribute"
-      attribute: "primary 5 y"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+          On TH(chip-tool)  Logs, Verify that "Primary5Y" attribute value is an uint16 and below is the sample log provided for the raspi platform, In RPI "Primary5Y" value is 0.
 
-    - label: "Write the default mandatory attribute: Primary5Y"
-      command: "writeAttribute"
-      attribute: "primary 5 y"
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0025 DataVersion: 540305990
+          [1651484286.709863][3358:3363] CHIP:TOO:  Primary5Y: 0
+          [1651484286.709964][3358:3363] CHIP:EM: Sending Standalone Ack for MessageCounter:7199124 on exchange 47604i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0025
       arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Read back the mandatory attribute: Primary5Y"
-      command: "readAttribute"
-      attribute: "primary 5 y"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+    - label:
+          "Step 39: TH reads Primary5Intensity attribute from DUT and Verify
+          that the DUT response contains an uint8 if NumberOfPrimaries is 5 or
+          more"
+      verification: |
+          ./chip-tool colorcontrol read primary5intensity 1 1
 
-    - label: "Read the mandatory attribute: Primary5Intensity"
-      command: "readAttribute"
-      attribute: "primary 5 intensity"
-      response:
-          constraints:
-              type: uint8
+          On TH(chip-tool)  Logs, Verify that "Primary5Intensity" attribute value is an uint8 and below is the sample log provided for the raspi platform, In RPI "Primary5Intensity" value is 0.
 
-    - label: "Write the default mandatory attribute: Primary5Intensity"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "primary 5 intensity"
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0026 DataVersion: 540305990
+          [1651484304.715731][3365:3370] CHIP:TOO:  Primary5Intensity: 0
+          [1651484304.715829][3365:3370] CHIP:EM: Sending Standalone Ack for MessageCounter:8654922 on exchange 29272i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0026
       arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Read back the mandatory attribute: Primary5Intensity"
-      disabled: true
-      command: "readAttribute"
-      attribute: "primary 5 intensity"
-      response:
-          constraints:
-              type: uint8
+    - label:
+          "Step 40: TH reads Primary6X attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 6 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary6x 1 1
 
-    - label: "Read the mandatory attribute: Primary6X"
-      command: "readAttribute"
-      attribute: "primary 6 x"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+          On TH(chip-tool)  Logs, Verify  that "Primary6X" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary6X" value is 0.
 
-    - label: "Write the default mandatory attribute: Primary6X"
-      command: "writeAttribute"
-      attribute: "primary 6 x"
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0028 DataVersion: 540305990
+          [1651484349.601181][3372:3377] CHIP:TOO:  Primary6X: 0
+          [1651484349.601269][3372:3377] CHIP:EM: Sending Standalone Ack for MessageCounter:13704291 on exchange 30507i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0028
       arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Read back the mandatory attribute: Primary6X"
-      command: "readAttribute"
-      attribute: "primary 6 x"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+    - label:
+          "Step 41: TH reads Primary6Y attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 6 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary6y 1 1
 
-    - label: "Read the mandatory attribute: Primary6Y"
-      command: "readAttribute"
-      attribute: "primary 6 y"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+          On TH(chip-tool)  Logs, Verify  that "Primary6Y" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary6Y" value is 0.
 
-    - label: "Write the default mandatory attribute: Primary6Y"
-      command: "writeAttribute"
-      attribute: "primary 6 y"
+          [1663318323.234522][132277:132282] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0029 DataVersion: 3053940635
+          [1663318323.234951][132277:132282] CHIP:TOO:   Primary6Y: 0
+          [1663318323.235117][132277:132282] CHIP:EM: Sending Standalone Ack for MessageCounter:208977845 on exchange 35151i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0029
       arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Read back the mandatory attribute: Primary6Y"
-      command: "readAttribute"
-      attribute: "primary 6 y"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+    - label:
+          "Step 42: TH reads Primary6Intensity attribute from DUT and Verify
+          that the DUT response contains an uint8 if NumberOfPrimaries is 6 or
+          more"
+      verification: |
+          ./chip-tool colorcontrol read primary6intensity 1 1
 
-    - label: "Read the mandatory attribute: Primary6Intensity"
-      command: "readAttribute"
-      attribute: "primary 6 intensity"
-      response:
-          constraints:
-              type: uint8
+          On TH(chip-tool)  Logs, Verify  that "Primary6Intensity" value is an uint8 and below is the sample log provided for the raspi platform, In RPI "Primary6Intensity" value is 0.
 
-    - label: "Write the default mandatory attribute: Primary6Intensity"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "primary 6 intensity"
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_002A DataVersion: 540305990
+          [1651484392.490974][3378:3383] CHIP:TOO:  Primary6Intensity: 0
+          [1651484392.491074][3378:3383] CHIP:EM: Sending Standalone Ack for MessageCounter:2427165 on exchange 17769i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A002a
       arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Read back the mandatory attribute: Primary6Intensity"
-      disabled: true
-      command: "readAttribute"
-      attribute: "primary 6 intensity"
-      response:
-          constraints:
-              type: uint8
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     #Defined Color Points Settings Attribute Set
-    - label: "Read the optional attribute: WhitePointX"
-      optional: true
+    - label: "Step 43: TH reads from the DUT the (0x0030) WhitePointX attribute"
+      PICS: CC.S.A0030
       command: "readAttribute"
-      attribute: "white point x"
+      attribute: "WhitePointX"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
-    - label: "Write the default optional attribute: WhitePointX"
-      optional: true
-      command: "writeAttribute"
-      attribute: "white point x"
-      arguments:
-          value: 0
-
-    - label: "Read back the optional attribute: WhitePointX"
-      optional: true
+    - label: "Step 44: TH reads from the DUT the (0x0031) WhitePointY attribute"
+      PICS: CC.S.A0031
       command: "readAttribute"
-      attribute: "white point x"
-      response:
-          value: 0
-
-    - label: "Read the optional attribute: WhitePointY"
-      optional: true
-      command: "readAttribute"
-      attribute: "white point y"
+      attribute: "WhitePointY"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
-    - label: "Write the default optional attribute: WhitePointY"
-      optional: true
-      command: "writeAttribute"
-      attribute: "white point y"
-      arguments:
-          value: 0
-
-    - label: "Read back the optional attribute: WhitePointY"
-      optional: true
+    - label:
+          "Step 45: TH reads from the DUT the (0x0032) ColorPointRX attribute"
+      PICS: CC.S.A0032
       command: "readAttribute"
-      attribute: "white point y"
-      response:
-          value: 0
-
-    - label: "Read the optional attribute: ColorPointRX"
-      optional: true
-      command: "readAttribute"
-      attribute: "color point r x"
+      attribute: "ColorPointRX"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
-    - label: "Write the default optional attribute: ColorPointRX"
-      optional: true
-      command: "writeAttribute"
-      attribute: "color point r x"
-      arguments:
-          value: 0
-
-    - label: "Read back the optional attribute: ColorPointRX"
-      optional: true
+    - label:
+          "Step 46: TH reads from the DUT the (0x0033) ColorPointRY attribute"
+      PICS: CC.S.A0033
       command: "readAttribute"
-      attribute: "color point r x"
-      response:
-          value: 0
-
-    - label: "Read the optional attribute: ColorPointRY"
-      optional: true
-      command: "readAttribute"
-      attribute: "color point r y"
+      attribute: "ColorPointRY"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
-    - label: "Write the default optional attribute: ColorPointRY"
-      optional: true
-      command: "writeAttribute"
-      attribute: "color point r y"
-      arguments:
-          value: 0
-
-    - label: "Read back the optional attribute: ColorPointRY"
-      optional: true
+    - label:
+          "Step 47: TH reads from the DUT the (0x0034) ColorPointRIntensity
+          attribute"
+      PICS: CC.S.A0034
       command: "readAttribute"
-      attribute: "color point r y"
-      response:
-          value: 0
-
-    - label: "Read the optional attribute: ColorPointRIntensity"
-      optional: true
-      command: "readAttribute"
-      attribute: "color point r intensity"
+      attribute: "ColorPointRIntensity"
       response:
           constraints:
-              type: uint8
+              type: int8u
+              minValue: 0
+              maxValue: 255
 
-    - label: "Write the default optional attribute: ColorPointRIntensity"
-      optional: true
-      command: "writeAttribute"
-      attribute: "color point r intensity"
-      arguments:
-          value: 0
-
-    - label: "Read back the optional attribute: ColorPointRIntensity"
-      optional: true
+    - label:
+          "Step 48: TH reads from the DUT the (0x0036) ColorPointGX attribute"
+      PICS: CC.S.A0036
       command: "readAttribute"
-      attribute: "color point r intensity"
-      response:
-          value: 0
-
-    - label: "Read the optional attribute: ColorPointGX"
-      optional: true
-      command: "readAttribute"
-      attribute: "color point g x"
+      attribute: "ColorPointGX"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
-    - label: "Write the default optional attribute: ColorPointGX"
-      optional: true
-      command: "writeAttribute"
-      attribute: "color point g x"
-      arguments:
-          value: 0
-
-    - label: "Read back the optional attribute: ColorPointGX"
-      optional: true
+    - label:
+          "Step 49: TH reads from the DUT the (0x0037) ColorPointGY attribute"
+      PICS: CC.S.A0037
       command: "readAttribute"
-      attribute: "color point g x"
-      response:
-          value: 0
-
-    - label: "Read the optional attribute: ColorPointGY"
-      optional: true
-      command: "readAttribute"
-      attribute: "color point g y"
+      attribute: "ColorPointGY"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
-    - label: "Write the default optional attribute: ColorPointGY"
-      optional: true
-      command: "writeAttribute"
-      attribute: "color point g y"
-      arguments:
-          value: 0
-
-    - label: "Read back the optional attribute: ColorPointGY"
-      optional: true
+    - label:
+          "Step 50: TH reads from the DUT the (0x0038) ColorPointGIntensity
+          attribute"
+      PICS: CC.S.A0038
       command: "readAttribute"
-      attribute: "color point g y"
-      response:
-          value: 0
-
-    - label: "Read the optional attribute: ColorPointGIntensity"
-      optional: true
-      command: "readAttribute"
-      attribute: "color point g intensity"
+      attribute: "ColorPointGIntensity"
       response:
           constraints:
-              type: uint8
+              type: int8u
+              minValue: 0
+              maxValue: 255
 
-    - label: "Write the default optional attribute: ColorPointGIntensity"
-      optional: true
-      command: "writeAttribute"
-      attribute: "color point g intensity"
-      arguments:
-          value: 0
-
-    - label: "Read back the optional attribute: ColorPointGIntensity"
-      optional: true
+    - label:
+          "Step 51: TH reads from the DUT the (0x003a) ColorPointBX attribute"
+      PICS: CC.S.A003a
       command: "readAttribute"
-      attribute: "color point g intensity"
-      response:
-          value: 0
-
-    - label: "Read the optional attribute: ColorPointBX"
-      optional: true
-      command: "readAttribute"
-      attribute: "color point b x"
+      attribute: "ColorPointBX"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
-    - label: "Write the default optional attribute: ColorPointBX"
-      optional: true
-      command: "writeAttribute"
-      attribute: "color point b x"
-      arguments:
-          value: 0
-
-    - label: "Read back the optional attribute: ColorPointBX"
-      optional: true
+    - label:
+          "Step 52: TH reads from the DUT the (0x003b) ColorPointBY attribute"
+      PICS: CC.S.A003b
       command: "readAttribute"
-      attribute: "color point b x"
-      response:
-          value: 0
-
-    - label: "Read the optional attribute: ColorPointBY"
-      optional: true
-      command: "readAttribute"
-      attribute: "color point b y"
+      attribute: "ColorPointBY"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 65279
 
-    - label: "Write the default optional attribute: ColorPointBY"
-      optional: true
-      command: "writeAttribute"
-      attribute: "color point b y"
-      arguments:
-          value: 0
-
-    - label: "Read back the optional attribute: ColorPointBY"
-      optional: true
+    - label:
+          "Step 53: TH reads from the DUT the (0x003c) ColorPointBIntensity
+          attribute"
+      PICS: CC.S.A003c
       command: "readAttribute"
-      attribute: "color point b y"
-      response:
-          value: 0
-
-    - label: "Read the optional attribute: ColorPointBIntensity"
-      optional: true
-      command: "readAttribute"
-      attribute: "color point b intensity"
+      attribute: "ColorPointBIntensity"
       response:
           constraints:
-              type: uint8
-
-    - label: "Write the default optional attribute: ColorPointBIntensity"
-      optional: true
-      command: "writeAttribute"
-      attribute: "color point b intensity"
-      arguments:
-          value: 0
-
-    - label: "Read back the optional attribute: ColorPointBIntensity"
-      optional: true
-      command: "readAttribute"
-      attribute: "color point b intensity"
-      response:
-          value: 0
+              type: int8u
+              minValue: 0
+              maxValue: 255

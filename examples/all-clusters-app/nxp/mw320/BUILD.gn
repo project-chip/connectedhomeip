@@ -1,0 +1,122 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/lwip.gni")
+import("//build_overrides/mw320_sdk.gni")
+
+import("${mw320_sdk_build_root}/mw320_executable.gni")
+import("${mw320_sdk_build_root}/mw320_sdk.gni")
+
+assert(current_os == "freertos")
+
+examples_plat_dir = "${chip_root}/examples/platform/nxp/mw320"
+
+mw320_sdk("sdk") {
+  include_dirs = [
+    "${chip_root}/src/platform/nxp/mw320",
+    "${examples_plat_dir}/app/project_include",
+    "${chip_root}/src/app/util",
+    "${chip_root}/examples/all-clusters-app/nxp/mw320/include",
+  ]
+
+  sources = [
+    "include/CHIPProjectConfig.h",
+    "include/FreeRTOSConfig.h",
+  ]
+
+  defines = [ "CHIP_CONFIG_MAX_FABRICS=5" ]
+
+  if (is_debug) {
+    defines += [ "BUILD_RELEASE=0" ]
+  } else {
+    defines += [ "BUILD_RELEASE=1" ]
+  }
+  if (wifi_conn_abort_support == true) {
+    defines += [ "WIFI_CONN_ABORT_SUPPORT" ]
+  }
+}
+
+mw320_executable("shell_mw320") {
+  include_dirs = []
+  defines = []
+  output_name = "chip-mw320-all-clusters-app.out"
+
+  public_deps = [
+    ":sdk",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common",
+    "${chip_root}/examples/shell/shell_common:shell_common",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/lib/shell",
+    "${chip_root}/src/setup_payload",
+  ]
+
+  deps = [ "${chip_root}/src/platform:syscalls_stub" ]
+
+  include_dirs = [
+    "${chip_root}/src/platform/nxp/mw320",
+    "${examples_plat_dir}/app/project_include",
+    "${chip_root}/src",
+    "${chip_root}/src/app/util",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
+    "${chip_root}/examples/energy-management-app/energy-management-common/include",
+    "${chip_root}/examples/all-clusters-app/nxp/mw320/include",
+  ]
+  sources = [
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/air-quality-instance.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/concentration-measurement-instances.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/device-energy-management-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/energy-evse-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/fan-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/oven-modes.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/resource-monitoring-delegates.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementDelegateImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementManager.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/ElectricalPowerMeasurementDelegate.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
+    "${chip_root}/src/lib/shell/streamer_mw320.cpp",
+    "binding-handler.cpp",
+    "include/CHIPProjectConfig.h",
+    "include/FreeRTOSConfig.h",
+    "main.cpp",
+  ]
+
+  output_dir = root_out_dir
+
+  ldscript = "${examples_plat_dir}/app/ldscripts/88MW320_xx_xxxx_flash.ld"
+
+  ldflags = [
+    "-T" + rebase_path(ldscript, root_build_dir),
+    "-Wl,-print-memory-usage",
+    "-Wl,--no-warn-rwx-segment",
+  ]
+  defines = [
+    "MW320_SHELL_STREAMER",
+    "SHELL_STREAMER_APP_SPECIFIC",
+  ]
+}
+
+group("mw320") {
+  deps = [ ":shell_mw320" ]
+}
+
+group("default") {
+  deps = [ ":mw320" ]
+}

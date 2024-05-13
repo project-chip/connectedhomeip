@@ -15,14 +15,24 @@
  *    limitations under the License.
  */
 
+#include "general-diagnostics-server.h"
+
+#include <stdint.h>
+#include <string.h>
+
+#include <app/util/config.h>
+
+#include "app/server/Server.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/EventLogging.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
+#include <lib/support/ScopedBuffer.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/DiagnosticDataProvider.h>
 
@@ -35,8 +45,46 @@ using namespace chip::DeviceLayer;
 using chip::DeviceLayer::ConnectivityMgr;
 using chip::DeviceLayer::DiagnosticDataProvider;
 using chip::DeviceLayer::GetDiagnosticDataProvider;
+using chip::Protocols::InteractionModel::Status;
 
 namespace {
+
+constexpr uint8_t kCurrentClusterRevision = 2;
+
+bool IsTestEventTriggerEnabled()
+{
+    auto * triggerDelegate = chip::Server::GetInstance().GetTestEventTriggerDelegate();
+    if (triggerDelegate == nullptr)
+    {
+        return false;
+    }
+    uint8_t zeroByteSpanData[TestEventTriggerDelegate::kEnableKeyLength] = { 0 };
+    if (triggerDelegate->DoesEnableKeyMatch(ByteSpan(zeroByteSpanData)))
+    {
+        return false;
+    }
+    return true;
+}
+
+bool IsByteSpanAllZeros(const ByteSpan & byteSpan)
+{
+    for (unsigned char it : byteSpan)
+    {
+        if (it != 0)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+void ReportAttributeOnAllEndpoints(AttributeId attribute)
+{
+    for (auto endpoint : EnabledEndpointsWithServerCluster(GeneralDiagnostics::Id))
+    {
+        MatterReportingAttributeChangeCallback(endpoint, GeneralDiagnostics::Id, attribute);
+    }
+}
 
 class GeneralDiagosticsAttrAccess : public AttributeAccessInterface
 {
@@ -154,31 +202,44 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & a
         return ReadIfSupported(&DiagnosticDataProvider::GetRebootCount, aEncoder);
     }
     case UpTime::Id: {
-        return ReadIfSupported(&DiagnosticDataProvider::GetUpTime, aEncoder);
+        System::Clock::Seconds64 system_time_seconds =
+            std::chrono::duration_cast<System::Clock::Seconds64>(Server::GetInstance().TimeSinceInit());
+        return aEncoder.Encode(static_cast<uint64_t>(system_time_seconds.count()));
     }
     case TotalOperationalHours::Id: {
         return ReadIfSupported(&DiagnosticDataProvider::GetTotalOperationalHours, aEncoder);
     }
-    case BootReasons::Id: {
+    case BootReason::Id: {
         return ReadIfSupported(&DiagnosticDataProvider::GetBootReason, aEncoder);
     }
-    default: {
-        break;
+    case TestEventTriggersEnabled::Id: {
+        bool isTestEventTriggersEnabled = IsTestEventTriggerEnabled();
+        return aEncoder.Encode(isTestEventTriggersEnabled);
     }
+        // Note: Attribute ID 0x0009 was removed (#30002).
+
+    case FeatureMap::Id: {
+        uint32_t features = 0;
+
+#if CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
+        features |= to_underlying(Clusters::GeneralDiagnostics::Feature::kDataModelTest);
+#endif // CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
+
+        return aEncoder.Encode(features);
+    }
+
+    case ClusterRevision::Id: {
+        return aEncoder.Encode(kCurrentClusterRevision);
+    }
+
+    default:
+        break;
     }
     return CHIP_NO_ERROR;
 }
 
-class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelegate, public DeviceLayer::GeneralDiagnosticsDelegate
+class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelegate
 {
-    static void ReportAttributeOnAllEndpoints(AttributeId attribute)
-    {
-        for (auto endpoint : EnabledEndpointsWithServerCluster(GeneralDiagnostics::Id))
-        {
-            MatterReportingAttributeChangeCallback(endpoint, GeneralDiagnostics::Id, attribute);
-        }
-    }
-
     // Gets called when any network interface on the Node is updated.
     void OnNetworkInfoChanged() override
     {
@@ -186,114 +247,255 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
 
         ReportAttributeOnAllEndpoints(GeneralDiagnostics::Attributes::NetworkInterfaces::Id);
     }
-
-    // Gets called when the device has been rebooted.
-    void OnDeviceRebooted(BootReasonType bootReason) override
-    {
-        ChipLogDetail(Zcl, "GeneralDiagnosticsDelegate: OnDeviceRebooted");
-
-        ReportAttributeOnAllEndpoints(GeneralDiagnostics::Attributes::BootReasons::Id);
-
-        // GeneralDiagnostics cluster should exist only for endpoint 0.
-
-        Events::BootReason::Type event{ bootReason };
-        EventNumber eventNumber;
-
-        CHIP_ERROR err = LogEvent(event, 0, eventNumber);
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(Zcl, "GeneralDiagnosticsDelegate: Failed to record BootReason event: %" CHIP_ERROR_FORMAT, err.Format());
-        }
-    }
-
-    // Get called when the Node detects a hardware fault has been raised.
-    void OnHardwareFaultsDetected(GeneralFaults<kMaxHardwareFaults> & previous,
-                                  GeneralFaults<kMaxHardwareFaults> & current) override
-    {
-        ChipLogDetail(Zcl, "GeneralDiagnosticsDelegate: OnHardwareFaultsDetected");
-
-        for (auto endpointId : EnabledEndpointsWithServerCluster(GeneralDiagnostics::Id))
-        {
-            // If General Diagnostics cluster is implemented on this endpoint
-            MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
-                                                   GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id);
-
-            // Record HardwareFault event
-            EventNumber eventNumber;
-            DataModel::List<const HardwareFaultType> currentList = DataModel::List<const HardwareFaultType>(
-                reinterpret_cast<const HardwareFaultType *>(current.data()), current.size());
-            DataModel::List<const HardwareFaultType> previousList = DataModel::List<const HardwareFaultType>(
-                reinterpret_cast<const HardwareFaultType *>(previous.data()), previous.size());
-            Events::HardwareFaultChange::Type event{ currentList, previousList };
-
-            if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
-            {
-                ChipLogError(Zcl, "GeneralDiagnosticsDelegate: Failed to record HardwareFault event");
-            }
-        }
-    }
-
-    // Get called when the Node detects a radio fault has been raised.
-    void OnRadioFaultsDetected(GeneralFaults<kMaxRadioFaults> & previous, GeneralFaults<kMaxRadioFaults> & current) override
-    {
-        ChipLogDetail(Zcl, "GeneralDiagnosticsDelegate: OnRadioFaultsDetected");
-
-        for (auto endpointId : EnabledEndpointsWithServerCluster(GeneralDiagnostics::Id))
-        {
-            // If General Diagnostics cluster is implemented on this endpoint
-            MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
-                                                   GeneralDiagnostics::Attributes::ActiveRadioFaults::Id);
-
-            // Record RadioFault event
-            EventNumber eventNumber;
-            DataModel::List<const RadioFaultType> currentList =
-                DataModel::List<const RadioFaultType>(reinterpret_cast<const RadioFaultType *>(current.data()), current.size());
-            DataModel::List<const RadioFaultType> previousList =
-                DataModel::List<const RadioFaultType>(reinterpret_cast<const RadioFaultType *>(previous.data()), previous.size());
-            Events::RadioFaultChange::Type event{ currentList, previousList };
-
-            if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
-            {
-                ChipLogError(Zcl, "GeneralDiagnosticsDelegate: Failed to record RadioFault event");
-            }
-        }
-    }
-
-    // Get called when the Node detects a network fault has been raised.
-    void OnNetworkFaultsDetected(GeneralFaults<kMaxNetworkFaults> & previous, GeneralFaults<kMaxNetworkFaults> & current) override
-    {
-        ChipLogDetail(Zcl, "GeneralDiagnosticsDelegate: OnNetworkFaultsDetected");
-
-        for (auto endpointId : EnabledEndpointsWithServerCluster(GeneralDiagnostics::Id))
-        {
-            // If General Diagnostics cluster is implemented on this endpoint
-            MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
-                                                   GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id);
-
-            // Record NetworkFault event
-            EventNumber eventNumber;
-            DataModel::List<const NetworkFaultType> currentList =
-                DataModel::List<const NetworkFaultType>(reinterpret_cast<const NetworkFaultType *>(current.data()), current.size());
-            DataModel::List<const NetworkFaultType> previousList = DataModel::List<const NetworkFaultType>(
-                reinterpret_cast<const NetworkFaultType *>(previous.data()), previous.size());
-            Events::NetworkFaultChange::Type event{ currentList, previousList };
-
-            if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
-            {
-                ChipLogError(Zcl, "GeneralDiagnosticsDelegate: Failed to record NetworkFault event");
-            }
-        }
-    }
 };
 
 GeneralDiagnosticsDelegate gDiagnosticDelegate;
 
 } // anonymous namespace
 
+namespace chip {
+namespace app {
+namespace Clusters {
+
+GeneralDiagnosticsServer GeneralDiagnosticsServer::instance;
+
+/**********************************************************
+ * GeneralDiagnosticsServer Implementation
+ *********************************************************/
+
+GeneralDiagnosticsServer & GeneralDiagnosticsServer::Instance()
+{
+    return instance;
+}
+
+// Gets called when the device has been rebooted.
+void GeneralDiagnosticsServer::OnDeviceReboot(BootReasonEnum bootReason)
+{
+    ChipLogDetail(Zcl, "GeneralDiagnostics: OnDeviceReboot");
+
+    ReportAttributeOnAllEndpoints(GeneralDiagnostics::Attributes::BootReason::Id);
+
+    // GeneralDiagnostics cluster should exist only for endpoint 0.
+    if (emberAfContainsServer(0, GeneralDiagnostics::Id))
+    {
+        Events::BootReason::Type event{ bootReason };
+        EventNumber eventNumber;
+
+        CHIP_ERROR err = LogEvent(event, 0, eventNumber);
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(Zcl, "GeneralDiagnostics: Failed to record BootReason event: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
+}
+
+// Get called when the Node detects a hardware fault has been raised.
+void GeneralDiagnosticsServer::OnHardwareFaultsDetect(const GeneralFaults<kMaxHardwareFaults> & previous,
+                                                      const GeneralFaults<kMaxHardwareFaults> & current)
+{
+    ChipLogDetail(Zcl, "GeneralDiagnostics: OnHardwareFaultsDetect");
+
+    for (auto endpointId : EnabledEndpointsWithServerCluster(GeneralDiagnostics::Id))
+    {
+        // If General Diagnostics cluster is implemented on this endpoint
+        MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
+                                               GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id);
+
+        // Record HardwareFault event
+        EventNumber eventNumber;
+        DataModel::List<const HardwareFaultEnum> currentList(reinterpret_cast<const HardwareFaultEnum *>(current.data()),
+                                                             current.size());
+        DataModel::List<const HardwareFaultEnum> previousList(reinterpret_cast<const HardwareFaultEnum *>(previous.data()),
+                                                              previous.size());
+        Events::HardwareFaultChange::Type event{ currentList, previousList };
+
+        if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
+        {
+            ChipLogError(Zcl, "GeneralDiagnostics: Failed to record HardwareFault event");
+        }
+    }
+}
+
+// Get called when the Node detects a radio fault has been raised.
+void GeneralDiagnosticsServer::OnRadioFaultsDetect(const GeneralFaults<kMaxRadioFaults> & previous,
+                                                   const GeneralFaults<kMaxRadioFaults> & current)
+{
+    ChipLogDetail(Zcl, "GeneralDiagnostics: OnRadioFaultsDetect");
+
+    for (auto endpointId : EnabledEndpointsWithServerCluster(GeneralDiagnostics::Id))
+    {
+        // If General Diagnostics cluster is implemented on this endpoint
+        MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
+                                               GeneralDiagnostics::Attributes::ActiveRadioFaults::Id);
+
+        // Record RadioFault event
+        EventNumber eventNumber;
+        DataModel::List<const RadioFaultEnum> currentList(reinterpret_cast<const RadioFaultEnum *>(current.data()), current.size());
+        DataModel::List<const RadioFaultEnum> previousList(reinterpret_cast<const RadioFaultEnum *>(previous.data()),
+                                                           previous.size());
+        Events::RadioFaultChange::Type event{ currentList, previousList };
+
+        if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
+        {
+            ChipLogError(Zcl, "GeneralDiagnostics: Failed to record RadioFault event");
+        }
+    }
+}
+
+// Get called when the Node detects a network fault has been raised.
+void GeneralDiagnosticsServer::OnNetworkFaultsDetect(const GeneralFaults<kMaxNetworkFaults> & previous,
+                                                     const GeneralFaults<kMaxNetworkFaults> & current)
+{
+    ChipLogDetail(Zcl, "GeneralDiagnostics: OnNetworkFaultsDetect");
+
+    for (auto endpointId : EnabledEndpointsWithServerCluster(GeneralDiagnostics::Id))
+    {
+        // If General Diagnostics cluster is implemented on this endpoint
+        MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
+                                               GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id);
+
+        // Record NetworkFault event
+        EventNumber eventNumber;
+        DataModel::List<const NetworkFaultEnum> currentList(reinterpret_cast<const NetworkFaultEnum *>(current.data()),
+                                                            current.size());
+        DataModel::List<const NetworkFaultEnum> previousList(reinterpret_cast<const NetworkFaultEnum *>(previous.data()),
+                                                             previous.size());
+        Events::NetworkFaultChange::Type event{ currentList, previousList };
+
+        if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
+        {
+            ChipLogError(Zcl, "GeneralDiagnostics: Failed to record NetworkFault event");
+        }
+    }
+}
+
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
+namespace {
+
+TestEventTriggerDelegate * GetTriggerDelegateOnMatchingKey(ByteSpan enableKey)
+{
+    if (enableKey.size() != TestEventTriggerDelegate::kEnableKeyLength)
+    {
+        return nullptr;
+    }
+
+    if (IsByteSpanAllZeros(enableKey))
+    {
+        return nullptr;
+    }
+
+    auto * triggerDelegate = chip::Server::GetInstance().GetTestEventTriggerDelegate();
+
+    if (triggerDelegate == nullptr || !triggerDelegate->DoesEnableKeyMatch(enableKey))
+    {
+        return nullptr;
+    }
+
+    return triggerDelegate;
+}
+
+} // namespace
+
+bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                              const Commands::TestEventTrigger::DecodableType & commandData)
+{
+    auto * triggerDelegate = GetTriggerDelegateOnMatchingKey(commandData.enableKey);
+    if (triggerDelegate == nullptr)
+    {
+        commandObj->AddStatus(commandPath, Status::ConstraintError);
+        return true;
+    }
+
+    CHIP_ERROR handleEventTriggerResult = triggerDelegate->HandleEventTriggers(commandData.eventTrigger);
+
+    // When HandleEventTrigger fails, we simply convert any error to INVALID_COMMAND
+    commandObj->AddStatus(commandPath, (handleEventTriggerResult != CHIP_NO_ERROR) ? Status::InvalidCommand : Status::Success);
+    return true;
+}
+
+bool emberAfGeneralDiagnosticsClusterTimeSnapshotCallback(CommandHandler * commandObj, ConcreteCommandPath const & commandPath,
+                                                          Commands::TimeSnapshot::DecodableType const & commandData)
+{
+    ChipLogError(Zcl, "Received TimeSnapshot command!");
+
+    Commands::TimeSnapshotResponse::Type response;
+
+    System::Clock::Microseconds64 posix_time_us{ 0 };
+
+    // Only consider real time if time sync cluster is actually enabled. Avoids
+    // likelihood of frequently reporting unsynced time.
+#ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
+    CHIP_ERROR posix_time_err = System::SystemClock().GetClock_RealTime(posix_time_us);
+    if (posix_time_err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to get POSIX real time: %" CHIP_ERROR_FORMAT, posix_time_err.Format());
+        posix_time_us = System::Clock::Microseconds64{ 0 };
+    }
+#endif // ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
+
+    System::Clock::Milliseconds64 system_time_ms =
+        std::chrono::duration_cast<System::Clock::Milliseconds64>(Server::GetInstance().TimeSinceInit());
+
+    response.systemTimeMs = static_cast<uint64_t>(system_time_ms.count());
+    if (posix_time_us.count() != 0)
+    {
+        response.posixTimeMs.SetNonNull(
+            static_cast<uint64_t>(std::chrono::duration_cast<System::Clock::Milliseconds64>(posix_time_us).count()));
+    }
+    commandObj->AddResponse(commandPath, response);
+    return true;
+}
+
+bool emberAfGeneralDiagnosticsClusterPayloadTestRequestCallback(CommandHandler * commandObj,
+                                                                const ConcreteCommandPath & commandPath,
+                                                                const Commands::PayloadTestRequest::DecodableType & commandData)
+{
+    // Max allowed is 2048.
+    if (commandData.count > 2048)
+    {
+        commandObj->AddStatus(commandPath, Status::ConstraintError);
+        return true;
+    }
+
+    // Ensure Test Event triggers are enabled and key matches.
+    auto * triggerDelegate = GetTriggerDelegateOnMatchingKey(commandData.enableKey);
+    if (triggerDelegate == nullptr)
+    {
+        commandObj->AddStatus(commandPath, Status::ConstraintError);
+        return true;
+    }
+
+    Commands::PayloadTestResponse::Type response;
+    Platform::ScopedMemoryBufferWithSize<uint8_t> payload;
+    if (!payload.Calloc(commandData.count))
+    {
+        commandObj->AddStatus(commandPath, Status::ResourceExhausted);
+        return true;
+    }
+
+    memset(payload.Get(), commandData.value, payload.AllocatedSize());
+    response.payload = ByteSpan{ payload.Get(), payload.AllocatedSize() };
+
+    if (commandObj->AddResponseData(commandPath, response) != CHIP_NO_ERROR)
+    {
+        commandObj->AddStatus(commandPath, Status::ResourceExhausted);
+    }
+
+    return true;
+}
+
 void MatterGeneralDiagnosticsPluginServerInitCallback()
 {
-    registerAttributeAccessOverride(&gAttrAccess);
+    BootReasonEnum bootReason;
 
+    registerAttributeAccessOverride(&gAttrAccess);
     ConnectivityMgr().SetDelegate(&gDiagnosticDelegate);
-    GetDiagnosticDataProvider().SetGeneralDiagnosticsDelegate(&gDiagnosticDelegate);
+
+    if (GetDiagnosticDataProvider().GetBootReason(bootReason) == CHIP_NO_ERROR)
+    {
+        GeneralDiagnosticsServer::Instance().OnDeviceReboot(bootReason);
+    }
 }

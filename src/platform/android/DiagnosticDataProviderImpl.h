@@ -26,9 +26,9 @@
 #include <platform/DiagnosticDataProvider.h>
 
 namespace {
-constexpr int offPremiseServicesReachableUnknown = 0;
-constexpr int offPremiseServicesReachableYes     = 1;
-constexpr int offPremiseServicesReachableNo      = 2;
+inline constexpr int offPremiseServicesReachableUnknown = 0;
+inline constexpr int offPremiseServicesReachableYes     = 1;
+inline constexpr int offPremiseServicesReachableNo      = 2;
 } // namespace
 
 namespace chip {
@@ -48,10 +48,18 @@ public:
     CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifpp) override;
     void ReleaseNetworkInterfaces(NetworkInterface * netifp) override;
 
-    jobject mDiagnosticDataProviderManagerObject = nullptr;
-    jmethodID mGetRebootCountMethod              = nullptr;
-    jmethodID mGetNifMethod                      = nullptr;
+    JniGlobalReference mDiagnosticDataProviderManagerObject;
+    jmethodID mGetRebootCountMethod = nullptr;
+    jmethodID mGetNifMethod         = nullptr;
 };
+
+/**
+ * Returns the platform-specific implementation of the DiagnosticDataProvider singleton object.
+ *
+ * Applications can use this to gain access to features of the DiagnosticDataProvider
+ * that are specific to the selected platform.
+ */
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl();
 
 } // namespace DeviceLayer
 } // namespace chip

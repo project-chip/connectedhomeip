@@ -21,8 +21,17 @@
  *          Platform-specific key value storage implementation for Tizen.
  */
 
-#include "AppPreference.h"
+/**
+ * Note: Use public include for KeyValueStoreManager which includes our local
+ *       platform/<PLATFORM>/KeyValueStoreManagerImpl.h after defining interface
+ *       class. */
 #include <platform/KeyValueStoreManager.h>
+
+#include <cstddef>
+
+#include <lib/core/CHIPError.h>
+
+#include "AppPreference.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -43,7 +52,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
 {
-    return Internal::AppPreference::SaveData(key, reinterpret_cast<const uint8_t *>(value), value_size);
+    return Internal::AppPreference::SaveData(key, value, value_size);
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)

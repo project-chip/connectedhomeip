@@ -16,28 +16,15 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Utilities for accessing persisted device configuration on
- *          platforms based on the NXP K32W SDK.
- */
-
 #pragma once
 
 #include <functional>
-
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-
-#include "PDM.h"
+#include <platform/nxp/k32w/k32w0/RamStorage.h>
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
-
-constexpr inline uint16_t K32WConfigKey(uint8_t chipId, uint8_t pdmId)
-{
-    return static_cast<uint16_t>(chipId) << 8 | pdmId;
-}
 
 /**
  *
@@ -52,76 +39,61 @@ constexpr inline uint16_t K32WConfigKey(uint8_t chipId, uint8_t pdmId)
 class K32WConfig
 {
 public:
-    // PDM ids used by the CHIP Device Layer
-    static constexpr uint8_t kPDMId_ChipFactory = 0x01; /**< PDM id for settings containing persistent config values set at
-                                                         * manufacturing time. Retained during factory reset. */
-    static constexpr uint8_t kPDMId_ChipConfig = 0x02;  /**< PDM id for settings containing dynamic config values set at runtime.
-                                                         *   Cleared during factory reset. */
-    static constexpr uint8_t kPDMId_ChipCounter = 0x03; /**< PDM id for settings containing dynamic counter values set at runtime.
-                                                         *   Retained during factory reset. */
-    static constexpr uint8_t kPDMId_KVS = 0x04;         /**< PDM id for settings containing KVS set at runtime.
-                                                         *   Cleared during factory reset. */
+    using Key = RamStorageKey;
 
-    using Key = uint32_t;
+    /* Storage for factory data settings. Retained during factory reset. */
+    static RamStorage sFactoryStorage;
+    /* Storage for dynamic runtime config values. Cleared during factory reset. */
+    static RamStorage sConfigStorage;
+    /* Storage for dynamic counter values. Cleared during factory reset. */
+    static RamStorage sCounterStorage;
 
     // Key definitions for well-known configuration values.
     // Factory Config Keys
-    static constexpr Key kConfigKey_SerialNum             = K32WConfigKey(kPDMId_ChipFactory, 0x00);
-    static constexpr Key kConfigKey_MfrDeviceId           = K32WConfigKey(kPDMId_ChipFactory, 0x01);
-    static constexpr Key kConfigKey_MfrDeviceCert         = K32WConfigKey(kPDMId_ChipFactory, 0x02);
-    static constexpr Key kConfigKey_MfrDevicePrivateKey   = K32WConfigKey(kPDMId_ChipFactory, 0x03);
-    static constexpr Key kConfigKey_ManufacturingDate     = K32WConfigKey(kPDMId_ChipFactory, 0x04);
-    static constexpr Key kConfigKey_SetupPinCode          = K32WConfigKey(kPDMId_ChipFactory, 0x05);
-    static constexpr Key kConfigKey_MfrDeviceICACerts     = K32WConfigKey(kPDMId_ChipFactory, 0x06);
-    static constexpr Key kConfigKey_HardwareVersion       = K32WConfigKey(kPDMId_ChipFactory, 0x07);
-    static constexpr Key kConfigKey_SetupDiscriminator    = K32WConfigKey(kPDMId_ChipFactory, 0x08);
-    static constexpr Key kConfigKey_Spake2pIterationCount = K32WConfigKey(kPDMId_ChipFactory, 0x09);
-    static constexpr Key kConfigKey_Spake2pSalt           = K32WConfigKey(kPDMId_ChipFactory, 0x0A);
-    static constexpr Key kConfigKey_Spake2pVerifier       = K32WConfigKey(kPDMId_ChipFactory, 0x0B);
+    static const Key kConfigKey_SerialNum;
+    static const Key kConfigKey_MfrDeviceId;
+    static const Key kConfigKey_MfrDeviceCert;
+    static const Key kConfigKey_MfrDevicePrivateKey;
+    static const Key kConfigKey_ManufacturingDate;
+    static const Key kConfigKey_SetupPinCode;
+    static const Key kConfigKey_MfrDeviceICACerts;
+    static const Key kConfigKey_HardwareVersion;
+    static const Key kConfigKey_SetupDiscriminator;
+    static const Key kConfigKey_Spake2pIterationCount;
+    static const Key kConfigKey_Spake2pSalt;
+    static const Key kConfigKey_Spake2pVerifier;
 
     // CHIP Config Keys
-    static constexpr Key kConfigKey_FabricId           = K32WConfigKey(kPDMId_ChipConfig, 0x00);
-    static constexpr Key kConfigKey_ServiceConfig      = K32WConfigKey(kPDMId_ChipConfig, 0x01);
-    static constexpr Key kConfigKey_PairedAccountId    = K32WConfigKey(kPDMId_ChipConfig, 0x02);
-    static constexpr Key kConfigKey_ServiceId          = K32WConfigKey(kPDMId_ChipConfig, 0x03);
-    static constexpr Key kConfigKey_FabricSecret       = K32WConfigKey(kPDMId_ChipConfig, 0x04);
-    static constexpr Key kConfigKey_LastUsedEpochKeyId = K32WConfigKey(kPDMId_ChipConfig, 0x05);
-    static constexpr Key kConfigKey_FailSafeArmed      = K32WConfigKey(kPDMId_ChipConfig, 0x06);
-    static constexpr Key kConfigKey_RegulatoryLocation = K32WConfigKey(kPDMId_ChipConfig, 0x07);
-    static constexpr Key kConfigKey_CountryCode        = K32WConfigKey(kPDMId_ChipConfig, 0x08);
-    static constexpr Key kConfigKey_Breadcrumb         = K32WConfigKey(kPDMId_ChipConfig, 0x09);
-    static constexpr Key kConfigKey_UniqueId           = K32WConfigKey(kPDMId_ChipConfig, 0x0A);
-    static constexpr Key kConfigKey_SoftwareVersion    = K32WConfigKey(kPDMId_ChipConfig, 0x0B);
-    static constexpr Key kConfigKey_FirstRunOfOTAImage = K32WConfigKey(kPDMId_ChipConfig, 0x0C);
+    static const Key kConfigKey_ServiceConfig;
+    static const Key kConfigKey_PairedAccountId;
+    static const Key kConfigKey_ServiceId;
+    static const Key kConfigKey_LastUsedEpochKeyId;
+    static const Key kConfigKey_FailSafeArmed;
+    static const Key kConfigKey_RegulatoryLocation;
+    static const Key kConfigKey_CountryCode;
+    static const Key kConfigKey_UniqueId;
+    static const Key kConfigKey_SoftwareVersion;
+    static const Key kConfigKey_SoftwareUpdateCompleted;
 
     // CHIP Counter Keys
-    static constexpr Key kCounterKey_RebootCount           = K32WConfigKey(kPDMId_ChipCounter, 0x00);
-    static constexpr Key kCounterKey_UpTime                = K32WConfigKey(kPDMId_ChipCounter, 0x01);
-    static constexpr Key kCounterKey_TotalOperationalHours = K32WConfigKey(kPDMId_ChipCounter, 0x02);
-    static constexpr Key kCounterKey_BootReason            = K32WConfigKey(kPDMId_ChipCounter, 0x03);
-
-    // Set key id limits for each group.
-    static constexpr Key kMinConfigKey_ChipFactory = K32WConfigKey(kPDMId_ChipFactory, 0x00);
-    static constexpr Key kMaxConfigKey_ChipFactory = K32WConfigKey(kPDMId_ChipFactory, 0xFF);
-    static constexpr Key kMinConfigKey_ChipConfig  = K32WConfigKey(kPDMId_ChipConfig, 0x00);
-    static constexpr Key kMaxConfigKey_ChipConfig  = K32WConfigKey(kPDMId_ChipConfig, 0xFF);
-    static constexpr Key kMinConfigKey_ChipCounter = K32WConfigKey(kPDMId_ChipCounter, 0x00);
-    static constexpr Key kMaxConfigKey_ChipCounter = K32WConfigKey(kPDMId_ChipCounter, 0xFF); // Allows 32 Counters to be created.
-    static constexpr Key kMinConfigKey_KVS         = K32WConfigKey(kPDMId_KVS, 0x00);
-    static constexpr Key kMaxConfigKey_KVS         = K32WConfigKey(kPDMId_KVS, 0xFF);
+    static const Key kCounterKey_RebootCount;
+    static const Key kCounterKey_UpTime;
+    static const Key kCounterKey_TotalOperationalHours;
+    static const Key kCounterKey_BootReason;
 
     static CHIP_ERROR Init(void);
 
     // Configuration methods used by the GenericConfigurationManagerImpl<> template.
-    static CHIP_ERROR ReadConfigValue(Key key, bool & val);
-    static CHIP_ERROR ReadConfigValue(Key key, uint32_t & val);
-    static CHIP_ERROR ReadConfigValue(Key key, uint64_t & val);
+    template <typename TValue>
+    static CHIP_ERROR ReadConfigValue(Key key, TValue & val);
+    template <typename TValue>
+    static CHIP_ERROR WriteConfigValue(Key key, TValue val);
+    template <typename TValue>
+    static CHIP_ERROR WriteConfigValueSync(Key key, TValue val);
+
     static CHIP_ERROR ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen);
     static CHIP_ERROR ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen);
     static CHIP_ERROR ReadConfigValueCounter(uint8_t counterIdx, uint32_t & val);
-    static CHIP_ERROR WriteConfigValue(Key key, bool val);
-    static CHIP_ERROR WriteConfigValue(Key key, uint32_t val);
-    static CHIP_ERROR WriteConfigValue(Key key, uint64_t val);
     static CHIP_ERROR WriteConfigValueStr(Key key, const char * str);
     static CHIP_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen);
     static CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen);
@@ -129,36 +101,25 @@ public:
     static CHIP_ERROR ClearConfigValue(Key key);
     static bool ConfigValueExists(Key key);
     static CHIP_ERROR FactoryResetConfig(void);
-    static bool ValidConfigKey(Key key);
-
-    static void RunConfigUnitTest(void);
-
-protected:
-    using ForEachRecordFunct = std::function<CHIP_ERROR(const Key & PDMIdKey, const size_t & length)>;
-    static CHIP_ERROR ForEachRecord(Key firstKey, Key lastKey, bool addNewRecord, ForEachRecordFunct funct);
-    static constexpr uint8_t GetPDMId(uint32_t key);
-    static constexpr uint8_t GetRecordKey(uint32_t key);
-
-private:
-    static CHIP_ERROR MapPdmStatus(PDM_teStatus pdmStatus);
-    static CHIP_ERROR MapPdmInitStatus(int pdmStatus);
-    static CHIP_ERROR FactoryResetConfigInternal(Key firstKey, Key lastKey);
 };
 
-/**
- * Extract a PDM id from a Key value.
- */
-inline constexpr uint8_t K32WConfig::GetPDMId(Key key)
+template <typename TValue>
+CHIP_ERROR K32WConfig::ReadConfigValue(Key key, TValue & val)
 {
-    return static_cast<uint8_t>(key >> 8);
+    CHIP_ERROR err;
+    uint16_t valLen = sizeof(val);
+
+    err = key.Read((uint8_t *) &val, valLen);
+    SuccessOrExit(err);
+
+exit:
+    return err;
 }
 
-/**
- * Extract an NVM record key from a Key value.
- */
-inline constexpr uint8_t K32WConfig::GetRecordKey(Key key)
+template <typename TValue>
+CHIP_ERROR K32WConfig::WriteConfigValue(Key key, TValue val)
 {
-    return static_cast<uint8_t>(key);
+    return key.Write((uint8_t *) &val, sizeof(TValue));
 }
 
 } // namespace Internal

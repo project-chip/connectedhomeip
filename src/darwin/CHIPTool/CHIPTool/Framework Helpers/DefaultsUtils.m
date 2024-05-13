@@ -16,15 +16,16 @@
  */
 
 #import "DefaultsUtils.h"
+#import "FabricKeys.h"
 
-NSString * const kCHIPToolDefaultsDomain = @"com.apple.chiptool";
+NSString * const MTRToolDefaultsDomain = @"com.matter.CHIPTool";
 NSString * const kNetworkSSIDDefaultsKey = @"networkSSID";
 NSString * const kNetworkPasswordDefaultsKey = @"networkPassword";
-NSString * const kCHIPNextAvailableDeviceIDKey = @"nextDeviceID";
+NSString * const MTRNextAvailableDeviceIDKey = @"nextDeviceID";
 NSString * const kFabricIdKey = @"fabricId";
 NSString * const kDevicePairedKey = @"Paired";
 
-id CHIPGetDomainValueForKey(NSString * domain, NSString * key)
+id MTRGetDomainValueForKey(NSString * domain, NSString * key)
 {
     id value = (id) CFBridgingRelease(CFPreferencesCopyAppValue((CFStringRef) key, (CFStringRef) domain));
     if (value) {
@@ -33,24 +34,24 @@ id CHIPGetDomainValueForKey(NSString * domain, NSString * key)
     return nil;
 }
 
-void CHIPSetDomainValueForKey(NSString * domain, NSString * key, id value)
+BOOL MTRSetDomainValueForKey(NSString * domain, NSString * key, id value)
 {
     CFPreferencesSetAppValue((CFStringRef) key, (__bridge CFPropertyListRef _Nullable)(value), (CFStringRef) domain);
-    CFPreferencesAppSynchronize((CFStringRef) domain);
+    return CFPreferencesAppSynchronize((CFStringRef) domain) == true;
 }
 
-void CHIPRemoveDomainValueForKey(NSString * domain, NSString * key)
+void MTRRemoveDomainValueForKey(NSString * domain, NSString * key)
 {
     CFPreferencesSetAppValue((CFStringRef) key, NULL, (CFStringRef) domain);
     CFPreferencesAppSynchronize((CFStringRef) domain);
 }
 
-uint64_t CHIPGetNextAvailableDeviceID(void)
+uint64_t MTRGetNextAvailableDeviceID(void)
 {
     uint64_t nextAvailableDeviceIdentifier = 1;
-    NSNumber * value = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kCHIPNextAvailableDeviceIDKey);
+    NSNumber * value = MTRGetDomainValueForKey(MTRToolDefaultsDomain, MTRNextAvailableDeviceIDKey);
     if (!value) {
-        CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kCHIPNextAvailableDeviceIDKey,
+        MTRSetDomainValueForKey(MTRToolDefaultsDomain, MTRNextAvailableDeviceIDKey,
             [NSNumber numberWithUnsignedLongLong:nextAvailableDeviceIdentifier]);
     } else {
         nextAvailableDeviceIdentifier = [value unsignedLongLongValue];
@@ -59,108 +60,138 @@ uint64_t CHIPGetNextAvailableDeviceID(void)
     return nextAvailableDeviceIdentifier;
 }
 
-void CHIPSetNextAvailableDeviceID(uint64_t id)
+void MTRSetNextAvailableDeviceID(uint64_t id)
 {
-    CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kCHIPNextAvailableDeviceIDKey, [NSNumber numberWithUnsignedLongLong:id]);
+    MTRSetDomainValueForKey(MTRToolDefaultsDomain, MTRNextAvailableDeviceIDKey, [NSNumber numberWithUnsignedLongLong:id]);
 }
 
 static CHIPToolPersistentStorageDelegate * storage = nil;
 
 static uint16_t kTestVendorId = 0xFFF1u;
 
-CHIPDeviceController * InitializeCHIP(void)
+static MTRDeviceController * sController = nil;
+
+MTRDeviceController * InitializeMTR(void)
 {
     static dispatch_once_t onceToken;
-    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
     dispatch_once(&onceToken, ^{
-        storage = [[CHIPToolPersistentStorageDelegate alloc] init];
-        [controller startup:storage vendorId:kTestVendorId nocSigner:nil];
+        CHIPToolPersistentStorageDelegate * storage = [[CHIPToolPersistentStorageDelegate alloc] init];
+        __auto_type * factory = [MTRControllerFactory sharedInstance];
+        __auto_type * factoryParams = [[MTRControllerFactoryParams alloc] initWithStorage:storage];
+        if (![factory startup:factoryParams]) {
+            return;
+        }
+
+        __auto_type * keys = [[FabricKeys alloc] init];
+        if (keys == nil) {
+            return;
+        }
+
+        __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:keys fabricId:1 ipk:keys.ipk];
+        params.vendorId = @(kTestVendorId);
+
+        // We're not sure whether we have a fabric configured already; try as if
+        // we did, and if not fall back to creating a new one.
+        sController = [factory startControllerOnExistingFabric:params];
+        if (sController == nil) {
+            sController = [factory startControllerOnNewFabric:params];
+        }
     });
 
-    return controller;
+    return sController;
 }
 
-void CHIPRestartController(CHIPDeviceController * controller)
+MTRDeviceController * MTRRestartController(MTRDeviceController * controller)
 {
+    __auto_type * keys = [[FabricKeys alloc] init];
+    if (keys == nil) {
+        NSLog(@"No keys, can't restart controller");
+        return controller;
+    }
+
     NSLog(@"Shutting down the stack");
     [controller shutdown];
+
     NSLog(@"Starting up the stack");
-    [controller startup:storage vendorId:kTestVendorId nocSigner:nil];
+    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:keys fabricId:1 ipk:keys.ipk];
+
+    sController = [[MTRControllerFactory sharedInstance] startControllerOnExistingFabric:params];
+
+    return sController;
 }
 
-uint64_t CHIPGetLastPairedDeviceId(void)
+uint64_t MTRGetLastPairedDeviceId(void)
 {
-    uint64_t deviceId = CHIPGetNextAvailableDeviceID();
+    uint64_t deviceId = MTRGetNextAvailableDeviceID();
     if (deviceId > 1) {
         deviceId--;
     }
     return deviceId;
 }
 
-BOOL CHIPGetConnectedDevice(CHIPDeviceConnectionCallback completionHandler)
+BOOL MTRGetConnectedDevice(MTRDeviceConnectionCallback completionHandler)
 {
-    CHIPDeviceController * controller = InitializeCHIP();
+    MTRDeviceController * controller = InitializeMTR();
 
     // Let's use the last device that was paired
-    uint64_t deviceId = CHIPGetLastPairedDeviceId();
-    return [controller getConnectedDevice:deviceId queue:dispatch_get_main_queue() completionHandler:completionHandler];
+    uint64_t deviceId = MTRGetLastPairedDeviceId();
+    return [controller getBaseDevice:deviceId queue:dispatch_get_main_queue() completionHandler:completionHandler];
 }
 
-CHIPDevice * CHIPGetDeviceBeingCommissioned(void)
+MTRBaseDevice * MTRGetDeviceBeingCommissioned(void)
 {
     NSError * error;
-    CHIPDeviceController * controller = InitializeCHIP();
-    CHIPDevice * device = [controller getDeviceBeingCommissioned:CHIPGetLastPairedDeviceId() error:&error];
+    MTRDeviceController * controller = InitializeMTR();
+    MTRBaseDevice * device = [controller getDeviceBeingCommissioned:MTRGetLastPairedDeviceId() error:&error];
     if (error) {
-        NSLog(@"Error retrieving device being commissioned for deviceId %llu", CHIPGetLastPairedDeviceId());
+        NSLog(@"Error retrieving device being commissioned for deviceId %llu", MTRGetLastPairedDeviceId());
         return nil;
     }
     return device;
 }
 
-BOOL CHIPGetConnectedDeviceWithID(uint64_t deviceId, CHIPDeviceConnectionCallback completionHandler)
+BOOL MTRGetConnectedDeviceWithID(uint64_t deviceId, MTRDeviceConnectionCallback completionHandler)
 {
-    CHIPDeviceController * controller = InitializeCHIP();
+    MTRDeviceController * controller = InitializeMTR();
 
-    return [controller getConnectedDevice:deviceId queue:dispatch_get_main_queue() completionHandler:completionHandler];
+    return [controller getBaseDevice:deviceId queue:dispatch_get_main_queue() completionHandler:completionHandler];
 }
 
-BOOL CHIPIsDevicePaired(uint64_t deviceId)
+BOOL MTRIsDevicePaired(uint64_t deviceId)
 {
-    NSString * PairedString = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, KeyForPairedDevice(deviceId));
+    NSString * PairedString = MTRGetDomainValueForKey(MTRToolDefaultsDomain, KeyForPairedDevice(deviceId));
     return [PairedString boolValue];
 }
 
-void CHIPSetDevicePaired(uint64_t deviceId, BOOL paired)
+void MTRSetDevicePaired(uint64_t deviceId, BOOL paired)
 {
-    CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, KeyForPairedDevice(deviceId), paired ? @"YES" : @"NO");
+    MTRSetDomainValueForKey(MTRToolDefaultsDomain, KeyForPairedDevice(deviceId), paired ? @"YES" : @"NO");
 }
 
 NSString * KeyForPairedDevice(uint64_t deviceId) { return [NSString stringWithFormat:@"%@%llu", kDevicePairedKey, deviceId]; }
 
-void CHIPUnpairDeviceWithID(uint64_t deviceId)
+void MTRUnpairDeviceWithID(uint64_t deviceId)
 {
-    CHIPSetDevicePaired(deviceId, NO);
-    CHIPGetConnectedDeviceWithID(deviceId, ^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
+    MTRSetDevicePaired(deviceId, NO);
+    MTRGetConnectedDeviceWithID(deviceId, ^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
         if (error) {
             NSLog(@"Failed to unpair device %llu still removing from CHIPTool. %@", deviceId, error);
             return;
         }
         NSLog(@"Attempting to unpair device %llu", deviceId);
-        CHIPOperationalCredentials * opCredsCluster = [[CHIPOperationalCredentials alloc] initWithDevice:device
-                                                                                                endpoint:0
-                                                                                                   queue:dispatch_get_main_queue()];
+        MTRBaseClusterOperationalCredentials * opCredsCluster =
+            [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:device endpoint:0 queue:dispatch_get_main_queue()];
         [opCredsCluster
             readAttributeCurrentFabricIndexWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                 if (error) {
                     NSLog(@"Failed to get current fabric index for device %llu still removing from CHIPTool. %@", deviceId, error);
                     return;
                 }
-                CHIPOperationalCredentialsClusterRemoveFabricParams * params =
-                    [[CHIPOperationalCredentialsClusterRemoveFabricParams alloc] init];
+                MTROperationalCredentialsClusterRemoveFabricParams * params =
+                    [[MTROperationalCredentialsClusterRemoveFabricParams alloc] init];
                 params.fabricIndex = value;
                 [opCredsCluster removeFabricWithParams:params
-                                     completionHandler:^(CHIPOperationalCredentialsClusterNOCResponseParams * _Nullable data,
+                                     completionHandler:^(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
                                          NSError * _Nullable error) {
                                          if (error) {
                                              NSLog(@"Failed to remove current fabric index %@ for device %llu. %@",
@@ -175,23 +206,27 @@ void CHIPUnpairDeviceWithID(uint64_t deviceId)
 
 @implementation CHIPToolPersistentStorageDelegate
 
-// MARK: CHIPPersistentStorageDelegate
+// MARK: MTRPersistentStorageDelegate
 
-- (NSString *)CHIPGetKeyValue:(NSString *)key
+- (nullable NSData *)storageDataForKey:(NSString *)key
 {
-    NSString * value = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, key);
-    NSLog(@"CHIPPersistentStorageDelegate Get Value for Key: %@, value %@", key, value);
+    NSData * value = MTRGetDomainValueForKey(MTRToolDefaultsDomain, key);
+    NSLog(@"MTRPersistentStorageDelegate Get Value for Key: %@, value %@", key, value);
     return value;
 }
 
-- (void)CHIPSetKeyValue:(NSString *)key value:(NSString *)value
+- (BOOL)setStorageData:(NSData *)value forKey:(NSString *)key
 {
-    CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, key, value);
+    return MTRSetDomainValueForKey(MTRToolDefaultsDomain, key, value);
 }
 
-- (void)CHIPDeleteKeyValue:(NSString *)key
+- (BOOL)removeStorageDataForKey:(NSString *)key
 {
-    CHIPRemoveDomainValueForKey(kCHIPToolDefaultsDomain, key);
+    if (MTRGetDomainValueForKey(MTRToolDefaultsDomain, key) == nil) {
+        return NO;
+    }
+    MTRRemoveDomainValueForKey(MTRToolDefaultsDomain, key);
+    return YES;
 }
 
 @end

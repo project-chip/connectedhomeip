@@ -22,16 +22,13 @@
 #
 
 from __future__ import absolute_import
-from datetime import datetime
-from setuptools import setup
-from wheel.bdist_wheel import bdist_wheel
 
 import argparse
 import json
 import os
-import platform
 import shutil
 
+from setuptools import Distribution, setup
 
 parser = argparse.ArgumentParser(
     description='build the pip package for chip using chip components generated during the build and python source code')
@@ -45,7 +42,7 @@ parser.add_argument('--manifest', help='list of files to package')
 parser.add_argument(
     '--plat-name', help='platform name to embed in generated filenames')
 parser.add_argument(
-    '--server', help='build the server variant', default=False, type=bool)
+    '--lib-name', help='the native library to include (if any)', default=None)
 
 args = parser.parse_args()
 
@@ -57,21 +54,18 @@ class InstalledScriptInfo:
         self.name = name
         self.installName = os.path.splitext(name)[0]
 
+# Make sure wheel is not considered pure and avoid shared libraries in purelib
+# folder.
 
-if args.server:
-    chipDLLName = "_ChipServer.so"
-else:
-    chipDLLName = "_ChipDeviceCtrl.so"
+
+class BinaryDistribution(Distribution):
+    def has_ext_modules(foo):
+        return True
+
+
 packageName = args.package_name
+libName = args.lib_name
 chipPackageVer = args.build_number
-
-if args.server:
-    installScripts = []
-else:
-    installScripts = [
-        InstalledScriptInfo("chip-device-ctrl.py"),
-        InstalledScriptInfo("chip-repl.py"),
-    ]
 
 # Record the current directory at the start of execution.
 curDir = os.curdir
@@ -110,73 +104,20 @@ try:
             os.makedirs(os.path.dirname(dstFile), exist_ok=True)
             shutil.copyfile(srcFile, dstFile)
 
+    installScripts = [InstalledScriptInfo(script) for script in manifest['scripts']]
     for script in installScripts:
         os.rename(os.path.join(tmpDir, script.name),
                   os.path.join(tmpDir, script.installName))
 
-    # Define a custom version of the bdist_wheel command that configures the
-    # resultant wheel as platform-specific (i.e. not "pure").
-    class bdist_wheel_override(bdist_wheel):
-        def finalize_options(self):
-            bdist_wheel.finalize_options(self)
-            self.root_is_pure = False
-
-    requiredPackages = [
-        "coloredlogs",
-        'construct',
-
-        #
-        # IPython 7.30.0 has a bug which results in the use of await ... failing on some platforms (see https://github.com/ipython/ipython/pull/13269)
-        # For now, let's just avoid that version.
-        #
-        # IPython 8.1.0 has a bug which causes issues: https://github.com/ipython/ipython/issues/13554
-        #
-        #
-        'ipython!=8.1.0',
-        'dacite',
-        'rich',
-        'stringcase',
-        'pyyaml',
-        'ipdb',
-        'ipykernel',
-        'deprecation'
-    ]
-
-    if platform.system() == "Darwin":
-        requiredPackages.append("pyobjc-framework-corebluetooth")
-
-    if platform.system() == "Linux":
-        requiredPackages.append("dbus-python")
-        requiredPackages.append("pygobject")
+    requiredPackages = manifest['package_reqs']
 
     #
     # Build the chip package...
     #
-    packages = [
-        'chip',
-        'chip.ble',
-        'chip.ble.commissioning',
-        'chip.configuration',
-        'chip.clusters',
-        'chip.discovery',
-        'chip.exceptions',
-        'chip.internal',
-        'chip.interaction_model',
-        'chip.logging',
-        'chip.native',
-        'chip.clusters',
-        'chip.tlv',
-        'chip.setup_payload',
-        'chip.storage',
-    ]
-    #print ("Server: {}".format(args.server))
-    if args.server:
-        packages.append('chip.server')
-
-    #print("packages: {}".format(packages))
+    packages = manifest['packages']
 
     print("packageName: {}".format(packageName))
-    print("chipDLLName: {}".format(chipDLLName))
+    print("libName: {}".format(libName))
 
     # Invoke the setuptools 'bdist_wheel' command to generate a wheel containing
     # the CHIP python packages, shared libraries and scripts.
@@ -189,22 +130,21 @@ try:
         classifiers=[
             "Intended Audience :: Developers",
             "License :: OSI Approved :: Apache Software License",
-            "Programming Language :: Python :: 2",
-            "Programming Language :: Python :: 2.7",
-            "Programming Language :: Python :: 3",
+            "Programming Language :: Python :: 3.7",
+            "Programming Language :: Python :: 3.8",
+            "Programming Language :: Python :: 3.9",
         ],
-        python_requires=">=2.7",
+        python_requires=">=3.7",
         packages=packages,
         package_dir={
             # By default, look in the tmp directory for packages/modules to be included.
             '': tmpDir,
         },
         package_data={
-            packageName: [
-                # Include the wrapper DLL as package data in the "chip" package.
-                chipDLLName
+            packages[0]: [
+                libName
             ]
-        },
+        } if libName else {},
         scripts=[name for name in map(
             lambda script: os.path.join(tmpDir, script.installName),
             installScripts
@@ -223,9 +163,7 @@ try:
                 'egg_base': tmpDir
             }
         },
-        cmdclass={
-            'bdist_wheel': bdist_wheel_override
-        },
+        distclass=BinaryDistribution if libName else None,
         script_args=['clean', '--all', 'bdist_wheel']
     )
 

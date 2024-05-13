@@ -1,15 +1,15 @@
 config:
     exampleVariable:
-        type: INT16U
+        type: int16u
         defaultValue: 110
     coolVariables:
-        type: CHAR_STRING
+        type: char_string
         defaultValue: "I am a super cool variable"
     aBigNumber:
-        type: INT64U
+        type: int64u
         defaultValue: 1.8446744e+19
     aBool:
-        type: BOOLEAN
+        type: boolean
         defaultValue: false
 
 tests:

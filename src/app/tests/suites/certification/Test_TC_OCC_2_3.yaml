@@ -11,34 +11,45 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
     3.2.3. [TC-OCC-2.3] OccupancySensorTypeBitmap and OccupancySensorType
-    interdependency with server as DUT
+    interdependency with server  as DUT
+
+PICS:
+    - OCC.S
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+    cluster: "Occupancy Sensing"
+    endpoint: 1
 
 tests:
-    - label: "Commission DUT to TH"
-      verification: |
+    - label: "Step 1: Commission DUT to TH"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-      disabled: true
+    - label: "Step 2: TH reads OccupancySensorType attribute from DUT"
+      PICS: OCC.S.A0001
+      command: "readAttribute"
+      attribute: "OccupancySensorType"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 3
 
-    - label: "TH reads OccupancySensorType attribute from DUT"
-      verification: |
-          ./chip-tool occupancysensing read occupancy-sensor-type 1 1
-
-          Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0001DataVersion: 289401399
-          [1646129490.492433][2997:3002] CHIP:TOO:   occupancy sensor type: 0
-      disabled: true
-
-    - label: "TH reads OccupancySensorTypeBitmap attribute from DUT"
-      verification: |
-          ./chip-tool occupancysensing read occupancy-sensor-type-bitmap 1 1
-
-          Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0002DataVersion: 289401399
-          [1646129577.158531][3007:3013] CHIP:TOO:   occupancy sensor type bitmap: 1
-      disabled: true
+    - label: "Step 3: TH reads OccupancySensorTypeBitmap attribute from DUT"
+      PICS: OCC.S.A0002
+      command: "readAttribute"
+      attribute: "OccupancySensorTypeBitmap"
+      response:
+          constraints:
+              type: bitmap8
+              minValue: 1
+              maxValue: 7

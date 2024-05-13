@@ -1,0 +1,52 @@
+{{> header}}
+
+#pragma once
+
+#include <app-common/zap-generated/cluster-enums.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+{{#zcl_enums}}
+{{#if has_more_than_one_cluster}}
+{{#unless (isInConfigList (concat "::" label) "EnumsNotUsedAsTypeInXML")}}
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::{{asType label}} val)
+{
+    using EnumType = detail::{{asType label}};
+    switch (val) {
+    {{#zcl_enum_items}}
+    case EnumType::k{{asUpperCamelCase label}}:
+    {{/zcl_enum_items}}
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+{{/unless}}
+{{/if}}
+{{/zcl_enums}}
+
+{{#zcl_clusters}}
+{{#zcl_enums}}
+{{#unless has_more_than_one_cluster}}
+{{#unless (isInConfigList (concat (asUpperCamelCase ../name) "::" label) "EnumsNotUsedAsTypeInXML")}}
+static auto __attribute__((unused)) EnsureKnownEnumValue({{asUpperCamelCase ../name}}::{{asType label}} val)
+{
+    using EnumType = {{asUpperCamelCase ../name}}::{{asType label}};
+    switch (val) {
+    {{#zcl_enum_items}}
+    case EnumType::k{{asUpperCamelCase label}}:
+    {{/zcl_enum_items}}
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+{{/unless}}
+{{/unless}}
+{{/zcl_enums}}
+
+{{/zcl_clusters}}
+} // namespace Clusters
+} // namespace app
+} // namespace chip

@@ -13,9 +13,6 @@ include(${prj_root}/GCC-RELEASE/project_hp/asdk/includepath.cmake)
 list(
     APPEND ${list_chip_main_sources}
 
-    ${chip_dir}/zzz_generated/ota-requestor-app/zap-generated/callback-stub.cpp
-    ${chip_dir}/zzz_generated/ota-requestor-app/zap-generated/IMClusterCommandHandler.cpp
-
     ${chip_dir}/examples/ota-requestor-app/ameba/main/chipinterface.cpp
     ${chip_dir}/examples/ota-requestor-app/ameba/main/Globals.cpp
     ${chip_dir}/examples/ota-requestor-app/ameba/main/LEDWidget.cpp
@@ -27,6 +24,12 @@ list(
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
+    ${chip_dir}/examples/platform/ameba/ota/OTAInitializer.cpp
+
+    ${chip_dir}/examples/platform/ameba/route_hook/ameba_route_hook.c
+    ${chip_dir}/examples/platform/ameba/route_hook/ameba_route_table.c
+
+    ${chip_dir}/examples/providers/DeviceInfoProviderImpl.cpp
 )
 
 add_library(
@@ -58,10 +61,10 @@ target_include_directories(
     ${chip_dir}/src/controller/data_model
     ${chip_dir}/third_party/nlio/repo/include/
     ${chip_dir}/third_party/nlunit-test/repo/src
-
     ${chip_dir}/src/app/clusters/ota-requestor
     ${chip_dir}/examples/ota-requestor-app/ameba/main/include
-
+    ${chip_dir}/examples/platform/ameba
+    ${chip_dir}/examples/providers
     ${sdk_root}/component/soc/realtek/amebad/fwlib/include
 )
 
@@ -71,18 +74,23 @@ list(
     -DINET_CONFIG_ENABLE_IPV4=0
     -DCHIP_PROJECT=1
     -DCHIP_DEVICE_LAYER_TARGET=Ameba
-    -DUSE_ZAP_CONFIG
     -DCHIP_HAVE_CONFIG_H
     -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
-    -DMATTER_OTA_REQUESTOR_APP=1
 )
+
+if (matter_enable_persistentstorage_audit)
+list(
+    APPEND chip_main_flags
+
+    -DCHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT
+)
+endif (matter_enable_persistentstorage_audit)
 
 list(
     APPEND chip_main_cpp_flags
 
 	-Wno-unused-parameter
-	-std=gnu++11
-	-std=c++14
+	-std=c++17
 	-fno-rtti
 )
 target_compile_definitions(${chip_main} PRIVATE ${chip_main_flags} )

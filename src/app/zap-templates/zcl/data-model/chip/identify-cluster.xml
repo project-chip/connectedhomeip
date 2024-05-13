@@ -17,17 +17,17 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <enum name="IdentifyIdentifyType" type="ENUM8">
+  <enum name="IdentifyTypeEnum" type="enum8">
     <cluster code="0x0003"/>
     <item name="None" value="0x00"/>
-    <item name="VisibleLight" value="0x01"/>
-    <item name="VisibleLED" value="0x02"/>
+    <item name="LightOutput" value="0x01"/>
+    <item name="VisibleIndicator" value="0x02"/>
     <item name="AudibleBeep" value="0x03"/>
     <item name="Display" value="0x04"/>
     <item name="Actuator" value="0x05"/>
   </enum>
 
-  <enum name="IdentifyEffectIdentifier" type="ENUM8">
+  <enum name="EffectIdentifierEnum" type="enum8">
     <cluster code="0x0003"/>
     <item name="Blink" value="0x00"/>
     <item name="Breathe" value="0x01"/>
@@ -37,48 +37,38 @@ limitations under the License.
     <item name="StopEffect" value="0xFF"/>
   </enum>
 
-  <enum name="IdentifyEffectVariant" type="ENUM8">
+  <enum name="EffectVariantEnum" type="enum8">
     <cluster code="0x0003"/>
     <item name="Default" value="0x00"/>
   </enum>
 
   <cluster>
-    <name>Identify</name>
     <domain>General</domain>
-    <description>Attributes and commands for putting a device into Identification mode (e.g. flashing a light).</description>
+    <name>Identify</name>
     <code>0x0003</code>
     <define>IDENTIFY_CLUSTER</define>
+    <description>Attributes and commands for putting a device into Identification mode (e.g. flashing a light).</description>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="IDENTIFY_TIME" type="INT16U" writable="true"  default="0x0" optional="false">identify time</attribute>
-    <attribute side="server" code="0x0001" define="IDENTIFY_TYPE" type="ENUM8"                        writable="false" default="0x0" optional="false">identify type</attribute>
+    <globalAttribute side="either" code="0xFFFD" value="4"/>
+
+    <attribute side="server" code="0x0000" define="IDENTIFY_TIME" type="int16u" writable="true"  default="0x0" optional="false">IdentifyTime</attribute>
+    <attribute side="server" code="0x0001" define="IDENTIFY_TYPE" type="IdentifyTypeEnum" writable="false" default="0x00" optional="false">IdentifyType</attribute>
+
     <command source="client" code="0x00" name="Identify" optional="false">
       <description>
         Command description for Identify
       </description>
-      <arg name="identifyTime" type="INT16U"/>
-      <access op="invoke" privilege="manage"/>
-    </command>
-    <command source="client" code="0x01" name="IdentifyQuery" response="IdentifyQueryResponse" optional="false">
-      <description>
-        Command description for IdentifyQuery
-      </description>
+      <arg name="IdentifyTime" type="int16u"/>
       <access op="invoke" privilege="manage"/>
     </command>
     <command source="client" code="0x40" name="TriggerEffect" optional="true">
       <description>
         Command description for TriggerEffect
       </description>
-      <arg name="effectIdentifier" type="IdentifyEffectIdentifier"/>
-      <arg name="effectVariant" type="IdentifyEffectVariant"/>
+      <arg name="EffectIdentifier" type="EffectIdentifierEnum"/>
+      <arg name="EffectVariant" type="EffectVariantEnum"/>
       <access op="invoke" privilege="manage"/>
-    </command>
-    <command source="server" code="0x00" name="IdentifyQueryResponse" optional="false" disableDefaultResponse="true">
-      <description>
-        Command description for IdentifyQueryResponse
-      </description>
-      <arg name="timeout" type="INT16U"/>
     </command>
   </cluster>
 </configurator>

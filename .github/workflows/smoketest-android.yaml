@@ -16,16 +16,19 @@ name: Smoke test - Android
 
 on:
     pull_request:
+    merge_group:
     workflow_dispatch:
 
 concurrency:
     group: smoke-${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+    
 jobs:
     android:
         name: Smoke Run - Android
-        timeout-minutes: 60
 
         env:
             JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64/
@@ -34,36 +37,46 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-android:0.5.58
+            image: ghcr.io/project-chip/chip-build-android:50
             volumes:
+                - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.11
-              name: Checkout
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                  action: actions/checkout@v3
-                  with: |
-                      submodules: true
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-            - name: Bootstrap
-              timeout-minutes: 10
-              run: scripts/build/gn_bootstrap.sh
-            - name: Uploading bootstrap logs
-              uses: actions/upload-artifact@v2
-              if: ${{ always() }} && ${{ !env.ACT }}
-              with:
-                  name: bootstrap-logs
-                  path: |
-                      .environment/gn_out/.ninja_log
-                      .environment/pigweed-venv/*.log
+                platform: android
+            - name: Cleanup pigweed CIPD packages
+              # This should not generally be needed, however android CI runs out of space
+              # We do not need pigweed cross compile here because we use android NDK
+              # compilers. Removing this package save significant amount of space.
+              continue-on-error: true
+              run: |
+                du -sh .environment/cipd/packages/arm
+                rm -rf .environment/cipd/packages/arm
+
             - name: Build Android CHIPTool and CHIPTest (ARM64)
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --no-log-timestamps --target android-arm64-chip-tool build"
+                    "./scripts/build/build_examples.py --target android-arm64-chip-tool build"
             - name: Run Android build rule tests
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "ninja -C out/android-arm64-chip-tool build/chip/java/tests:java_build_test.tests"
+                    "ninja -C out/android-arm64-chip-tool build/chip/java/tests:java_build_test"
+            - name: Clean out build output
+              run: rm -rf ./out examples/android/CHIPTool/app/libs/jniLibs/* examples/android/CHIPTool/app/libs/*.jar
+            - name: Build Android arm64-tv-casting-app
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target android-arm64-tv-casting-app build"
+            - name: Clean out build output
+              run: rm -rf ./out examples/tv-casting-app/android/App/app/libs/jniLibs/* examples/tv-casting-app/android/App/app/libs/*.jar                   
+            - name: Build Android arm64-tv-server
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target android-arm64-tv-server build"
+            - name: Clean out build output
+              run: rm -rf ./out examples/tv-app/android/App/app/libs/jniLibs/* examples/tv-app/android/App/app/libs/*.jar

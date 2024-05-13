@@ -13,14 +13,14 @@ limitations under the License.
 -->
 <configurator>
   <domain name="CHIP"/>
-  <enum name="NetworkFault" type="ENUM8">
+  <enum name="NetworkFaultEnum" type="enum8">
     <cluster code="0x0035"/>
     <item name="Unspecified" value="0x00"/>
     <item name="LinkDown" value="0x01"/>
     <item name="HardwareFailure" value="0x02"/>
     <item name="NetworkJammed" value="0x03"/>
   </enum>
-  <enum name="RoutingRole" type="ENUM8">
+  <enum name="RoutingRoleEnum" type="enum8">
     <cluster code="0x0035"/>
     <item name="Unspecified" value="0x00"/>
     <item name="Unassigned" value="0x01"/>
@@ -30,60 +30,60 @@ limitations under the License.
     <item name="Router" value="0x05"/>
     <item name="Leader" value="0x06"/>
   </enum>
-  <enum name="ThreadConnectionStatus" type="ENUM8">
+  <enum name="ConnectionStatusEnum" type="enum8">
     <cluster code="0x0035"/>
     <item name="Connected" value="0x00"/>
     <item name="NotConnected" value="0x01"/>
   </enum>  
-  <struct name="NeighborTable">
+  <struct name="NeighborTableStruct">
     <cluster code="0x0035"/>
-    <item name="ExtAddress" type="INT64U"/>
-    <item name="Age" type="INT32U"/>
-    <item name="Rloc16" type="INT16U"/>
-    <item name="LinkFrameCounter" type="INT32U"/>
-    <item name="MleFrameCounter" type="INT32U"/>
-    <item name="LQI" type="INT8U"/>
-    <item name="AverageRssi" type="INT8S"/>
-    <item name="LastRssi" type="INT8S"/>
-    <item name="FrameErrorRate" type="INT8U"/>
-    <item name="MessageErrorRate" type="INT8U"/>
-    <item name="RxOnWhenIdle" type="BOOLEAN"/>
-    <item name="FullThreadDevice" type="BOOLEAN"/>
-    <item name="FullNetworkData" type="BOOLEAN"/>
-    <item name="IsChild" type="BOOLEAN"/>
+    <item name="ExtAddress" type="int64u"/>
+    <item name="Age" type="int32u"/>
+    <item name="Rloc16" type="int16u"/>
+    <item name="LinkFrameCounter" type="int32u"/>
+    <item name="MleFrameCounter" type="int32u"/>
+    <item name="LQI" type="int8u"/>
+    <item name="AverageRssi" type="int8s" isNullable="true"/>
+    <item name="LastRssi" type="int8s" isNullable="true"/>
+    <item name="FrameErrorRate" type="int8u"/>
+    <item name="MessageErrorRate" type="int8u"/>
+    <item name="RxOnWhenIdle" type="boolean"/>
+    <item name="FullThreadDevice" type="boolean"/>
+    <item name="FullNetworkData" type="boolean"/>
+    <item name="IsChild" type="boolean"/>
   </struct>
-  <struct name="RouteTable">
+  <struct name="RouteTableStruct">
     <cluster code="0x0035"/>
-    <item name="ExtAddress" type="INT64U"/>
-    <item name="Rloc16" type="INT16U"/>
-    <item name="RouterId" type="INT8U"/>
-    <item name="NextHop" type="INT8U"/>
-    <item name="PathCost" type="INT8U"/>
-    <item name="LQIIn" type="INT8U"/>
-    <item name="LQIOut" type="INT8U"/>
-    <item name="Age" type="INT8U"/>
-    <item name="Allocated" type="BOOLEAN"/>
-    <item name="LinkEstablished" type="BOOLEAN"/>
+    <item name="ExtAddress" type="int64u"/>
+    <item name="Rloc16" type="int16u"/>
+    <item name="RouterId" type="int8u"/>
+    <item name="NextHop" type="int8u"/>
+    <item name="PathCost" type="int8u"/>
+    <item name="LQIIn" type="int8u"/>
+    <item name="LQIOut" type="int8u"/>
+    <item name="Age" type="int8u"/>
+    <item name="Allocated" type="boolean"/>
+    <item name="LinkEstablished" type="boolean"/>
   </struct>
   <struct name="SecurityPolicy">
     <cluster code="0x0035"/>
-    <item name="RotationTime" type="INT16U"/>
-    <item name="Flags" type="BITMAP16"/>
+    <item name="RotationTime" type="int16u"/>
+    <item name="Flags" type="int16u"/>
   </struct>
   <struct name="OperationalDatasetComponents">
     <cluster code="0x0035"/>
-    <item name="ActiveTimestampPresent" type="BOOLEAN"/>
-    <item name="PendingTimestampPresent" type="BOOLEAN"/>
-    <item name="MasterKeyPresent" type="BOOLEAN"/>
-    <item name="NetworkNamePresent" type="BOOLEAN"/>
-    <item name="ExtendedPanIdPresent" type="BOOLEAN"/>
-    <item name="MeshLocalPrefixPresent" type="BOOLEAN"/>
-    <item name="DelayPresent" type="BOOLEAN"/>
-    <item name="PanIdPresent" type="BOOLEAN"/>
-    <item name="ChannelPresent" type="BOOLEAN"/>
-    <item name="PskcPresent" type="BOOLEAN"/>
-    <item name="SecurityPolicyPresent" type="BOOLEAN"/>
-    <item name="ChannelMaskPresent" type="BOOLEAN"/>
+    <item name="ActiveTimestampPresent" type="boolean"/>
+    <item name="PendingTimestampPresent" type="boolean"/>
+    <item name="MasterKeyPresent" type="boolean"/>
+    <item name="NetworkNamePresent" type="boolean"/>
+    <item name="ExtendedPanIdPresent" type="boolean"/>
+    <item name="MeshLocalPrefixPresent" type="boolean"/>
+    <item name="DelayPresent" type="boolean"/>
+    <item name="PanIdPresent" type="boolean"/>
+    <item name="ChannelPresent" type="boolean"/>
+    <item name="PskcPresent" type="boolean"/>
+    <item name="SecurityPolicyPresent" type="boolean"/>
+    <item name="ChannelMaskPresent" type="boolean"/>
   </struct>
   <cluster>
     <domain>General</domain>
@@ -91,87 +91,99 @@ limitations under the License.
     <code>0x0035</code>
     <define>THREAD_NETWORK_DIAGNOSTICS_CLUSTER</define>
     <description>The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems</description>
-    <attribute side="server" code="0x00" define="CHANNEL" type="INT16U" min="0x00" max="0xFFFF" writable="false" optional="false">channel</attribute>
-    <attribute side="server" code="0x01" define="ROUTING_ROLE" type="ENUM8" writable="false" optional="false">RoutingRole</attribute>
-    <attribute side="server" code="0x02" define="NETWORK_NAME" type="CHAR_STRING" length="16" writable="false" default="" optional="false">NetworkName</attribute>
-    <attribute side="server" code="0x03" define="DIAG_PAN_ID" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="false">PanId</attribute>
-    <attribute side="server" code="0x04" define="DIAG_EXTENDED_PAN_ID" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="false">ExtendedPanId</attribute>
-    <attribute side="server" code="0x05" define="MESH_LOCAL_PREFIX" type="OCTET_STRING" length="17" writable="false" optional="false">MeshLocalPrefix</attribute>
-    <!-- OVERRUN_COUNT Conformance feature [ERRCNT] - for now mandatory -->
-    <attribute side="server" code="0x06" define="DIAG_OVERRUN_COUNT" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">OverrunCount</attribute>
-    <attribute side="server" code="0x07" define="NEIGHBOR_TABLE" type="ARRAY" entryType="NeighborTable" length="254" writable="false" optional="false">NeighborTableList</attribute>
-    <attribute side="server" code="0x08" define="ROUTE_TABLE" type="ARRAY" entryType="RouteTable" length="254" writable="false" optional="false">RouteTableList</attribute>
-    <attribute side="server" code="0x09" define="PARTITION_ID" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="false">PartitionId</attribute>
-    <attribute side="server" code="0x0A" define="WEIGHTING" type="INT8U" min="0x00" max="0xFF" writable="false" optional="false">weighting</attribute>
-    <attribute side="server" code="0x0B" define="DATA_VERSION" type="INT8U" min="0x00" max="0xFF" writable="false" optional="false">DataVersion</attribute>
-    <attribute side="server" code="0x0C" define="STABLE_DATA_VERSION" type="INT8U" min="0x00" max="0xFF" writable="false" optional="false">StableDataVersion</attribute>
-    <attribute side="server" code="0x0D" define="LEADER_ROUTER_ID" type="INT8U" min="0x00" max="0xFF" writable="false" optional="false">LeaderRouterId</attribute>
-    <!-- From 0x0E to 0x15 Conformance feature[MLECNT] - for now mandatory -->
-    <attribute side="server" code="0x0E" define="DETACHED_ROLE_COUNT" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">DetachedRoleCount</attribute>
-    <attribute side="server" code="0x0F" define="CHILD_ROLE_COUNT" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">ChildRoleCount</attribute>
-    <attribute side="server" code="0x10" define="ROUTER_ROLE_COUNT" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">RouterRoleCount</attribute>
-    <attribute side="server" code="0x11" define="LEADER_ROLE_COUNT" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">LeaderRoleCount</attribute>
-    <attribute side="server" code="0x12" define="ATTACH_ATTEMPT_COUNT" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">AttachAttemptCount</attribute>
-    <attribute side="server" code="0x13" define="PARTITION_ID_CHANGE_COUNT" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">PartitionIdChangeCount</attribute>
-    <attribute side="server" code="0x14" define="BETTER_PARTITION_ATTACH_ATTEMPT_COUNT" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">BetterPartitionAttachAttemptCount</attribute>
-    <attribute side="server" code="0x15" define="PARENT_CHANGE_COUNT" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">ParentChangeCount</attribute>
-    <!-- From 0x16 to 0x37 Conformance [MACCNT] - for now mandatory -->
-    <attribute side="server" code="0x16" define="TX_TOTAL_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxTotalCount</attribute>
-    <attribute side="server" code="0x17" define="TX_UNICAST_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxUnicastCount</attribute>
-    <attribute side="server" code="0x18" define="TX_BROADCAST_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxBroadcastCount</attribute>
-    <attribute side="server" code="0x19" define="TX_ACK_REQUESTED_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxAckRequestedCount</attribute>
-    <attribute side="server" code="0x1A" define="TX_ACKED_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxAckedCount</attribute>
-    <attribute side="server" code="0x1B" define="TX_NO_ACK_REQUESTED_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxNoAckRequestedCount</attribute>
-    <attribute side="server" code="0x1C" define="TX_DATA_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxDataCount</attribute>
-    <attribute side="server" code="0x1D" define="TX_DATA_POLL_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxDataPollCount</attribute>
-    <attribute side="server" code="0x1E" define="TX_BEACON_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxBeaconCount</attribute>
-    <attribute side="server" code="0x1F" define="TX_BEACON_REQUEST_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxBeaconRequestCount</attribute>
-    <attribute side="server" code="0x20" define="TX_OTHER_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxOtherCount</attribute>
-    <attribute side="server" code="0x21" define="TX_RETRY_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxRetryCount</attribute>
-    <attribute side="server" code="0x22" define="TX_DIRECT_MAX_RETRY_EXPIRY_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxDirectMaxRetryExpiryCount</attribute>
-    <attribute side="server" code="0x23" define="TX_INDIRECT_MAX_RETRY_EXPIRY_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxIndirectMaxRetryExpiryCount</attribute>
-    <attribute side="server" code="0x24" define="TX_ERR_CCA_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxErrCcaCount</attribute>
-    <attribute side="server" code="0x25" define="TX_ERR_ABORT_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxErrAbortCount</attribute>
-    <attribute side="server" code="0x26" define="TX_ERR_BUSY_CHANNEL_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxErrBusyChannelCount</attribute>
-    <attribute side="server" code="0x27" define="RX_TOTAL_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxTotalCount</attribute>
-    <attribute side="server" code="0x28" define="RX_UNICAST_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxUnicastCount</attribute>
-    <attribute side="server" code="0x29" define="RX_BROADCAST_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxBroadcastCount</attribute>
-    <attribute side="server" code="0x2A" define="RX_DATA_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxDataCount</attribute>
-    <attribute side="server" code="0x2B" define="RX_DATA_POLL_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxDataPollCount</attribute>
-    <attribute side="server" code="0x2C" define="RX_BEACON_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxBeaconCount</attribute>
-    <attribute side="server" code="0x2D" define="RX_BEACON_REQUEST_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxBeaconRequestCount</attribute>
-    <attribute side="server" code="0x2E" define="RX_OTHER_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxOtherCount</attribute>
-    <attribute side="server" code="0x2F" define="RX_ADDRESS_FILTERED_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxAddressFilteredCount</attribute>
-    <attribute side="server" code="0x30" define="RX_DESTADDR_FILTERED_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxDestAddrFilteredCount</attribute>
-    <attribute side="server" code="0x31" define="RX_DUPLICATED_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxDuplicatedCount</attribute>
-    <attribute side="server" code="0x32" define="RX_ERR_NO_FRAME_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxErrNoFrameCount</attribute>
-    <attribute side="server" code="0x33" define="RX_ERR_UNKNOWN_NEIGHBOR_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxErrUnknownNeighborCount</attribute>
-    <attribute side="server" code="0x34" define="RX_ERR_INVALID_SRC_ADDR_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxErrInvalidSrcAddrCount</attribute>
-    <attribute side="server" code="0x35" define="RX_ERR_SEC_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxErrSecCount</attribute>
-    <attribute side="server" code="0x36" define="RX_ERR_FCS_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxErrFcsCount</attribute>
-    <attribute side="server" code="0x37" define="RX_ERR_OTHER_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxErrOtherCount</attribute>
-    <attribute side="server" code="0x38" define="ACTIVE_TIMESTAMP" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">ActiveTimestamp</attribute>
-    <attribute side="server" code="0x39" define="PENDING_TIMESTAMP" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">PendingTimestamp</attribute>
-    <attribute side="server" code="0x3A" define="DELAY" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">delay</attribute>
-    <!-- SECURITY_POLICY Length = 2 + (arraysize(1) * Size of Struct (4b))-->
-    <attribute side="server" code="0x3B" define="SECURITY_POLICY" type="ARRAY" entryType="SecurityPolicy" length="6" writable="false" optional="false">SecurityPolicy</attribute>
-    <attribute side="server" code="0x3C" define="DIAG_CHANNEL_MASK" type="OCTET_STRING" length="4" writable="false" optional="false">ChannelMask</attribute>
-    <!-- OPERATIONAL_DATASET_COMPONENTS Length = 2 + (arraysize(1) * Size of Struct (12b))-->
-    <attribute side="server" code="0x3D" define="OPERATIONAL_DATASET_COMPONENTS" type="ARRAY" entryType="OperationalDatasetComponents" length="14" writable="false" optional="false">OperationalDatasetComponents</attribute>
-    <attribute side="server" code="0x3E" define="ACTIVE_THREAD_NETWORK_FAULTS" type="ARRAY" entryType="NetworkFault" length="4" writable="false" optional="false">ActiveNetworkFaultsList</attribute>
+    <globalAttribute side="either" code="0xFFFD" value="2"/>
+
+    <features>
+      <feature bit="0" code="PKTCNT" name="PacketCounts" summary="Server supports the counts for the number of received and transmitted packets on the Thread interface.">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="ERRCNT" name="ErrorCounts" summary="Server supports the counts for the number of errors that have occurred during the reception and transmission of packets on the Thread interface.">
+        <optionalConform/>
+      </feature>
+      <feature bit="2" code="MLECNT" name="MLECounts" summary="Server supports the counts for various MLE layer happenings.">
+        <optionalConform/>
+      </feature>
+      <feature bit="3" code="MACCNT" name="MACCounts" summary="Server supports the counts for various MAC layer happenings.">
+        <optionalConform/>
+      </feature>
+    </features>
+
+    <attribute side="server" code="0x00" define="CHANNEL" type="int16u" min="0x00" max="0xFFFF" writable="false" isNullable="true" optional="false">Channel</attribute>
+    <attribute side="server" code="0x01" define="ROUTING_ROLE" type="RoutingRoleEnum" writable="false" isNullable="true" optional="false">RoutingRole</attribute>
+    <attribute side="server" code="0x02" define="NETWORK_NAME" type="char_string" length="16" writable="false" default="" isNullable="true" optional="false">NetworkName</attribute>
+    <attribute side="server" code="0x03" define="DIAG_PAN_ID" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0000" isNullable="true" optional="false">PanId</attribute>
+    <attribute side="server" code="0x04" define="DIAG_EXTENDED_PAN_ID" type="int64u" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" isNullable="true" optional="false">ExtendedPanId</attribute>
+    <attribute side="server" code="0x05" define="MESH_LOCAL_PREFIX" type="octet_string" length="17" writable="false" isNullable="true" optional="false">MeshLocalPrefix</attribute>
+    <attribute side="server" code="0x06" define="DIAG_OVERRUN_COUNT" type="int64u" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">OverrunCount</attribute>
+    <attribute side="server" code="0x07" define="NEIGHBOR_TABLE" type="array" entryType="NeighborTableStruct" length="254" writable="false" optional="false">NeighborTable</attribute>
+    <attribute side="server" code="0x08" define="ROUTE_TABLE" type="array" entryType="RouteTableStruct" length="254" writable="false" optional="false">RouteTable</attribute>
+    <attribute side="server" code="0x09" define="PARTITION_ID" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" isNullable="true" optional="false">PartitionId</attribute>
+    <attribute side="server" code="0x0A" define="WEIGHTING" type="int16u" max="0xFF" writable="false"  isNullable="true" optional="false">Weighting</attribute>
+    <attribute side="server" code="0x0B" define="DATA_VERSION" type="int16u" max="0xFF" writable="false"  isNullable="true" optional="false">DataVersion</attribute>
+    <attribute side="server" code="0x0C" define="STABLE_DATA_VERSION" type="int16u" max="0xFF" writable="false"  isNullable="true" optional="false">StableDataVersion</attribute>
+    <attribute side="server" code="0x0D" define="LEADER_ROUTER_ID" type="int8u" min="0x00" max="62" writable="false"  isNullable="true" optional="false">LeaderRouterId</attribute>
+    <attribute side="server" code="0x0E" define="DETACHED_ROLE_COUNT" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">DetachedRoleCount</attribute>
+    <attribute side="server" code="0x0F" define="CHILD_ROLE_COUNT" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">ChildRoleCount</attribute>
+    <attribute side="server" code="0x10" define="ROUTER_ROLE_COUNT" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">RouterRoleCount</attribute>
+    <attribute side="server" code="0x11" define="LEADER_ROLE_COUNT" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">LeaderRoleCount</attribute>
+    <attribute side="server" code="0x12" define="ATTACH_ATTEMPT_COUNT" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">AttachAttemptCount</attribute>
+    <attribute side="server" code="0x13" define="PARTITION_ID_CHANGE_COUNT" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">PartitionIdChangeCount</attribute>
+    <attribute side="server" code="0x14" define="BETTER_PARTITION_ATTACH_ATTEMPT_COUNT" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">BetterPartitionAttachAttemptCount</attribute>
+    <attribute side="server" code="0x15" define="PARENT_CHANGE_COUNT" type="int16u" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">ParentChangeCount</attribute>
+    <attribute side="server" code="0x16" define="TX_TOTAL_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxTotalCount</attribute>
+    <attribute side="server" code="0x17" define="TX_UNICAST_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxUnicastCount</attribute>
+    <attribute side="server" code="0x18" define="TX_BROADCAST_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxBroadcastCount</attribute>
+    <attribute side="server" code="0x19" define="TX_ACK_REQUESTED_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxAckRequestedCount</attribute>
+    <attribute side="server" code="0x1A" define="TX_ACKED_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxAckedCount</attribute>
+    <attribute side="server" code="0x1B" define="TX_NO_ACK_REQUESTED_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxNoAckRequestedCount</attribute>
+    <attribute side="server" code="0x1C" define="TX_DATA_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxDataCount</attribute>
+    <attribute side="server" code="0x1D" define="TX_DATA_POLL_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxDataPollCount</attribute>
+    <attribute side="server" code="0x1E" define="TX_BEACON_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxBeaconCount</attribute>
+    <attribute side="server" code="0x1F" define="TX_BEACON_REQUEST_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxBeaconRequestCount</attribute>
+    <attribute side="server" code="0x20" define="TX_OTHER_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxOtherCount</attribute>
+    <attribute side="server" code="0x21" define="TX_RETRY_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxRetryCount</attribute>
+    <attribute side="server" code="0x22" define="TX_DIRECT_MAX_RETRY_EXPIRY_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxDirectMaxRetryExpiryCount</attribute>
+    <attribute side="server" code="0x23" define="TX_INDIRECT_MAX_RETRY_EXPIRY_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxIndirectMaxRetryExpiryCount</attribute>
+    <attribute side="server" code="0x24" define="TX_ERR_CCA_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxErrCcaCount</attribute>
+    <attribute side="server" code="0x25" define="TX_ERR_ABORT_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxErrAbortCount</attribute>
+    <attribute side="server" code="0x26" define="TX_ERR_BUSY_CHANNEL_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">TxErrBusyChannelCount</attribute>
+    <attribute side="server" code="0x27" define="RX_TOTAL_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxTotalCount</attribute>
+    <attribute side="server" code="0x28" define="RX_UNICAST_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxUnicastCount</attribute>
+    <attribute side="server" code="0x29" define="RX_BROADCAST_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxBroadcastCount</attribute>
+    <attribute side="server" code="0x2A" define="RX_DATA_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxDataCount</attribute>
+    <attribute side="server" code="0x2B" define="RX_DATA_POLL_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxDataPollCount</attribute>
+    <attribute side="server" code="0x2C" define="RX_BEACON_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxBeaconCount</attribute>
+    <attribute side="server" code="0x2D" define="RX_BEACON_REQUEST_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxBeaconRequestCount</attribute>
+    <attribute side="server" code="0x2E" define="RX_OTHER_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxOtherCount</attribute>
+    <attribute side="server" code="0x2F" define="RX_ADDRESS_FILTERED_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxAddressFilteredCount</attribute>
+    <attribute side="server" code="0x30" define="RX_DESTADDR_FILTERED_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxDestAddrFilteredCount</attribute>
+    <attribute side="server" code="0x31" define="RX_DUPLICATED_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxDuplicatedCount</attribute>
+    <attribute side="server" code="0x32" define="RX_ERR_NO_FRAME_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxErrNoFrameCount</attribute>
+    <attribute side="server" code="0x33" define="RX_ERR_UNKNOWN_NEIGHBOR_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxErrUnknownNeighborCount</attribute>
+    <attribute side="server" code="0x34" define="RX_ERR_INVALID_SRC_ADDR_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxErrInvalidSrcAddrCount</attribute>
+    <attribute side="server" code="0x35" define="RX_ERR_SEC_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxErrSecCount</attribute>
+    <attribute side="server" code="0x36" define="RX_ERR_FCS_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxErrFcsCount</attribute>
+    <attribute side="server" code="0x37" define="RX_ERR_OTHER_COUNT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" optional="true">RxErrOtherCount</attribute>
+    <attribute side="server" code="0x38" define="ACTIVE_TIMESTAMP" type="int64u" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" isNullable="true" optional="true">ActiveTimestamp</attribute>
+    <attribute side="server" code="0x39" define="PENDING_TIMESTAMP" type="int64u" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" isNullable="true" optional="true">PendingTimestamp</attribute>
+    <attribute side="server" code="0x3A" define="DELAY" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x0000" isNullable="true" optional="true">Delay</attribute>
+    <attribute side="server" code="0x3B" define="SECURITY_POLICY" type="SecurityPolicy" writable="false" isNullable="true" optional="false">SecurityPolicy</attribute>
+    <attribute side="server" code="0x3C" define="DIAG_CHANNEL_MASK" type="octet_string" length="4" writable="false" isNullable="true" optional="false">ChannelPage0Mask</attribute>
+    <attribute side="server" code="0x3D" define="OPERATIONAL_DATASET_COMPONENTS" type="OperationalDatasetComponents" writable="false" isNullable="true" optional="false">OperationalDatasetComponents</attribute>
+    <attribute side="server" code="0x3E" define="ACTIVE_THREAD_NETWORK_FAULTS" type="array" entryType="NetworkFaultEnum" length="4" writable="false" optional="false">ActiveNetworkFaultsList</attribute>
     <command source="client" code="0x00" name="ResetCounts" optional="true" cli="chip thread_network_diagnostics resetcounts">
       <description>Reception of this command SHALL reset the OverrunCount attributes to 0</description>
+      <access op="invoke" privilege="manage"/>
     </command>
     <event side="server" code="0x00" name="ConnectionStatus" priority="info" optional="true">
       <description>Indicate that a Node’s connection status to a Thread network has changed</description>
-      <field id="0" name="ConnectionStatus" type="ThreadConnectionStatus"/>
+      <field id="0" name="ConnectionStatus" type="ConnectionStatusEnum"/>
     </event>
+    <event side="server" code="0x01" name="NetworkFaultChange" priority="info" optional="true">
+      <description>Indicate a change in the set of network faults currently detected by the Node</description>
+      <field id="0" name="Current" type="NetworkFaultEnum" array="true"/>
+      <field id="1" name="Previous" type="NetworkFaultEnum" array="true"/>
+    </event>    
   </cluster>
-  <bitmap name="ThreadNetworkDiagnosticsFeature" type="BITMAP32">
-    <cluster code="0x0035"/>
-    <field name="PacketCounts" mask="0x1"/>
-    <field name="ErrorCounts" mask="0x2"/>
-    <field name="MLECounts" mask="0x4"/>
-    <field name="MACCounts" mask="0x8"/>
-  </bitmap>  
+
 </configurator>

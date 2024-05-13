@@ -15,6 +15,6 @@
 #
 mainmenu "Matter nRF Connect Lighting Example Application"
 
-rsource "../../../config/nrfconnect/chip-module/Kconfig.defaults"
 rsource "../../../config/nrfconnect/chip-module/Kconfig.features"
+rsource "../../../config/nrfconnect/chip-module/Kconfig.defaults"
 source "Kconfig.zephyr"

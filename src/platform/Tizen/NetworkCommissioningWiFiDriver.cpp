@@ -15,18 +15,21 @@
  *    limitations under the License.
  */
 
-#include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <platform/Tizen/NetworkCommissioningDriver.h>
-
+#include <cstdint>
+#include <cstring>
 #include <limits>
-#include <string>
-#include <vector>
 
-using namespace chip;
-using namespace chip::Thread;
-using namespace chip::DeviceLayer::Internal;
+#include <lib/core/CHIPError.h>
+#include <lib/core/ErrorStr.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceConfig.h>
+#include <platform/KeyValueStoreManager.h>
+#include <platform/NetworkCommissioning.h>
+
+#include "NetworkCommissioningDriver.h"
+#include "WiFiManager.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -56,8 +59,11 @@ CHIP_ERROR TizenWiFiDriver::Init(BaseDriver::NetworkStatusChangeCallback * netwo
     {
         return CHIP_NO_ERROR;
     }
-    mSavedNetwork.credentialsLen = credentialsLen;
-    mSavedNetwork.ssidLen        = ssidLen;
+    static_assert(sizeof(mSavedNetwork.credentials) <= UINT8_MAX, "credentialsLen might not fit");
+    mSavedNetwork.credentialsLen = static_cast<uint8_t>(credentialsLen);
+
+    static_assert(sizeof(mSavedNetwork.ssid) <= UINT8_MAX, "ssidLen might not fit");
+    mSavedNetwork.ssidLen = static_cast<uint8_t>(ssidLen);
 
     mStagingNetwork = mSavedNetwork;
     return err;
@@ -80,20 +86,7 @@ CHIP_ERROR TizenWiFiDriver::RevertConfiguration()
 
 bool TizenWiFiDriver::NetworkMatch(const WiFiNetwork & network, ByteSpan networkId)
 {
-    if (networkId.size() != network.ssidLen)
-    {
-        ChipLogProgress(NetworkProvisioning, "ssidLen is mismatched. network.ssidLen: %u, networkId.size(): %u", network.ssidLen,
-                        networkId.size());
-        return false;
-    }
-    else if (memcmp(networkId.data(), network.ssid, network.ssidLen) != 0)
-    {
-        ChipLogProgress(NetworkProvisioning, "ssid is mismatched. network.ssid: %s, networkId.data(): %s", network.ssid,
-                        networkId.data());
-        return false;
-    }
-
-    return true;
+    return networkId.size() == network.ssidLen && memcmp(networkId.data(), network.ssid, network.ssidLen) == 0;
 }
 
 Status TizenWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
@@ -102,6 +95,12 @@ Status TizenWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, 
     outDebugText.reduce_size(0);
     outNetworkIndex = 0;
     VerifyOrReturnError(mStagingNetwork.ssidLen == 0 || NetworkMatch(mStagingNetwork, ssid), Status::kBoundsExceeded);
+
+    static_assert(sizeof(WiFiNetwork::ssid) <= std::numeric_limits<decltype(WiFiNetwork::ssidLen)>::max(),
+                  "Max length of WiFi ssid exceeds the limit of ssidLen field");
+    static_assert(sizeof(WiFiNetwork::credentials) <= std::numeric_limits<decltype(WiFiNetwork::credentialsLen)>::max(),
+                  "Max length of WiFi credentials exceeds the limit of credentialsLen field");
+
     VerifyOrReturnError(credentials.size() <= sizeof(mStagingNetwork.credentials), Status::kOutOfRange);
     VerifyOrReturnError(ssid.size() <= sizeof(mStagingNetwork.ssid), Status::kOutOfRange);
 
@@ -141,9 +140,11 @@ void TizenWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callb
 
     VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
 
-    ChipLogProgress(NetworkProvisioning, "TizenNetworkCommissioningDelegate: SSID: %s", (char *) mStagingNetwork.ssid);
+    ChipLogProgress(NetworkProvisioning, "TizenNetworkCommissioningDelegate: SSID: %.*s",
+                    static_cast<int>(sizeof(mStagingNetwork.ssid)), reinterpret_cast<char *>(mStagingNetwork.ssid));
 
-    err = WiFiMgr().Connect((const char *) mStagingNetwork.ssid, (const char *) mStagingNetwork.credentials, callback);
+    err = DeviceLayer::Internal::WiFiMgr().Connect(reinterpret_cast<char *>(mStagingNetwork.ssid),
+                                                   reinterpret_cast<char *>(mStagingNetwork.credentials), callback);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -160,19 +161,47 @@ exit:
 
 void TizenWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callback)
 {
-    ChipLogError(NetworkProvisioning, "Not implemented");
+    CHIP_ERROR err = DeviceLayer::Internal::WiFiMgr().StartWiFiScan(ssid, callback);
+    if (err != CHIP_NO_ERROR)
+    {
+        callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
+    }
+}
+
+uint32_t TizenWiFiDriver::GetSupportedWiFiBandsMask() const
+{
+    return static_cast<uint32_t>((1UL << chip::to_underlying(WiFiBandEnum::k2g4)) |
+                                 (1UL << chip::to_underlying(WiFiBandEnum::k5g)));
 }
 
 size_t TizenWiFiDriver::WiFiNetworkIterator::Count()
 {
-    ChipLogError(NetworkProvisioning, "Not implemented");
-    return 0;
+    return driver->mStagingNetwork.ssidLen == 0 ? 0 : 1;
 }
 
 bool TizenWiFiDriver::WiFiNetworkIterator::Next(Network & item)
 {
-    ChipLogError(NetworkProvisioning, "Not implemented");
-    return false;
+    if (exhausted || driver->mStagingNetwork.ssidLen == 0)
+    {
+        return false;
+    }
+    memcpy(item.networkID, driver->mStagingNetwork.ssid, driver->mStagingNetwork.ssidLen);
+    item.networkIDLen = driver->mStagingNetwork.ssidLen;
+    item.connected    = false;
+    exhausted         = true;
+
+    Network configuredNetwork;
+    CHIP_ERROR err = DeviceLayer::Internal::WiFiMgr().GetConfiguredNetwork(configuredNetwork);
+    if (err == CHIP_NO_ERROR)
+    {
+        if (DeviceLayer::Internal::WiFiMgr().IsWiFiStationConnected() && configuredNetwork.networkIDLen == item.networkIDLen &&
+            memcmp(configuredNetwork.networkID, item.networkID, item.networkIDLen) == 0)
+        {
+            item.connected = true;
+        }
+    }
+
+    return true;
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI

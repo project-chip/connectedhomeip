@@ -23,18 +23,14 @@
 
 #pragma once
 
-#include <platform/CHIPDeviceConfig.h>
-
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-
-#include <glib.h>
 #include <memory>
 
-#include <ble/CHIPBleServiceData.h>
-#include <lib/core/CHIPError.h>
-#include <system/SystemLayer.h>
-
 #include <bluetooth.h>
+#include <glib.h>
+
+#include <ble/Ble.h>
+#include <lib/core/CHIPError.h>
+#include <system/SystemClock.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -57,7 +53,7 @@ struct ScanFilterData
     char address[CHIP_TIZEN_BLE_ADDRESS_STRING_LEN];
     char service_uuid[CHIP_TIZEN_BLE_SERVICE_UUID_STRING_LEN];
     char service_data[CHIP_TIZEN_BLE_SERVICE_DATA_MAX_LEN];
-    int service_data_len;
+    unsigned int service_data_len;
 };
 
 // Receives callbacks when chip devices are being scanned
@@ -70,7 +66,10 @@ public:
     virtual void OnChipDeviceScanned(void * device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) = 0;
 
     // Called when a scan was completed (stopped or timed out)
-    virtual void OnChipScanComplete(void) = 0;
+    virtual void OnScanComplete(void) = 0;
+
+    // Called on scan error
+    virtual void OnScanError(CHIP_ERROR err) = 0;
 };
 
 /// Allows scanning for CHIP devices
@@ -87,7 +86,7 @@ public:
     ~ChipDeviceScanner(void);
 
     /// Initiate a scan for devices, with the given timeout & scan filter data
-    CHIP_ERROR StartChipScan(unsigned timeoutMs, ScanFilterType filterType, ScanFilterData & filterData);
+    CHIP_ERROR StartChipScan(System::Clock::Timeout timeout, ScanFilterType filterType, const ScanFilterData & filterData);
 
     /// Stop any currently running scan
     CHIP_ERROR StopChipScan(void);
@@ -97,23 +96,22 @@ public:
     static std::unique_ptr<ChipDeviceScanner> Create(ChipDeviceScannerDelegate * delegate);
 
 private:
-    static gboolean TriggerScan(GMainLoop * mainLoop, gpointer userData);
     static void LeScanResultCb(int result, bt_adapter_le_device_scan_result_info_s * info, void * userData);
-    void CheckScanFilter(ScanFilterType filterType, ScanFilterData & filterData);
-    int RegisterScanFilter(ScanFilterType filterType, ScanFilterData & filterData);
-    void UnRegisterScanFilter(void);
-    int CreateLEScanFilter(ScanFilterType filterType, ScanFilterData & filterData);
     static gboolean TimerExpiredCb(gpointer user_data);
+    static CHIP_ERROR TriggerScan(ChipDeviceScanner * userData);
+
+    int CreateLEScanFilter(ScanFilterType filterType);
+    int RegisterScanFilter(ScanFilterType filterType, const ScanFilterData & filterData);
+    int SetupScanFilter(ScanFilterType filterType, const ScanFilterData & filterData);
+    void UnRegisterScanFilter();
 
     ChipDeviceScannerDelegate * mDelegate = nullptr;
     bool mIsScanning                      = false;
     bool mIsStopping                      = false;
-    GMainLoop * mAsyncLoop                = nullptr;
+    unsigned int mScanTimeoutMs           = 10000;
     bt_scan_filter_h mScanFilter          = nullptr;
 };
 
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

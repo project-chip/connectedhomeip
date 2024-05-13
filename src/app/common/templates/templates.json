@@ -2,12 +2,15 @@
     "name": "CHIP Application Common templates",
     "version": "chip-v1",
     "helpers": [
-        "../../zap-templates/partials/helper.js",
-        "../../zap-templates/common/StringHelper.js",
-        "../../zap-templates/common/attributes/Accessors.js",
-        "../../zap-templates/templates/app/helper.js",
-        "../../zap-templates/templates/chip/helper.js"
+        "partials/helper.js",
+        "common/StringHelper.js",
+        "common/attributes/Accessors.js",
+        "templates/app/helper.js",
+        "templates/chip/helper.js"
     ],
+    "resources": {
+        "config-data": "config-data.yaml"
+    },
     "override": "../../zap-templates/common/override.js",
     "partials": [
         {
@@ -19,31 +22,19 @@
             "path": "../../zap-templates/partials/cluster-objects-struct.zapt"
         },
         {
+            "name": "cluster_enums_enum",
+            "path": "../../zap-templates/partials/cluster-enums-enum.zapt"
+        },
+        {
             "name": "cluster_objects_field_init",
             "path": "../../zap-templates/partials/cluster-objects-field-init.zapt"
+        },
+        {
+            "name": "cluster_objects_attribute_typeinfo",
+            "path": "../../zap-templates/partials/cluster-objects-attribute-typeinfo.zapt"
         }
     ],
     "templates": [
-        {
-            "path": "../../zap-templates/templates/app/af-structs.zapt",
-            "name": "ZCL af-structs header",
-            "output": "af-structs.h"
-        },
-        {
-            "path": "../../zap-templates/templates/app/att-storage.zapt",
-            "name": "ZCL att-storage header",
-            "output": "att-storage.h"
-        },
-        {
-            "path": "../../zap-templates/templates/app/attribute-id.zapt",
-            "name": "ZCL attribute-id header",
-            "output": "attribute-id.h"
-        },
-        {
-            "path": "../../zap-templates/templates/app/attribute-size.zapt",
-            "name": "ZCL attribute-size header",
-            "output": "attribute-size.h"
-        },
         {
             "path": "../../zap-templates/templates/app/attribute-type.zapt",
             "name": "ZCL attribute-type header",
@@ -53,31 +44,6 @@
             "path": "../../zap-templates/templates/app/callback.zapt",
             "name": "ZCL callback header",
             "output": "callback.h"
-        },
-        {
-            "path": "../../zap-templates/templates/app/cluster-id.zapt",
-            "name": "ZCL cluster-id header",
-            "output": "cluster-id.h"
-        },
-        {
-            "path": "../../zap-templates/templates/app/command-id.zapt",
-            "name": "ZCL command-id header",
-            "output": "command-id.h"
-        },
-        {
-            "path": "../../zap-templates/templates/app/enums.zapt",
-            "name": "ZCL enums header",
-            "output": "enums.h"
-        },
-        {
-            "path": "../../zap-templates/templates/app/print-cluster.zapt",
-            "name": "ZCL print-cluster header",
-            "output": "print-cluster.h"
-        },
-        {
-            "path": "../../zap-templates/templates/app/callbacks/PluginCallbacks.zapt",
-            "name": "Matter Callbacks header",
-            "output": "callbacks/PluginCallbacks.h"
         },
         {
             "path": "../../zap-templates/templates/app/attributes/Accessors.zapt",
@@ -116,13 +82,18 @@
         },
         {
             "path": "../../zap-templates/templates/app/cluster-objects-src.zapt",
-            "name": "Cluster objects header for Interaction Model",
+            "name": "Cluster objects source for Interaction Model",
             "output": "cluster-objects.cpp"
         },
         {
             "path": "../../zap-templates/templates/app/cluster-enums.zapt",
-            "name": "Enum and bitmap definitions for clusters",
+            "name": "Enum and bitmap header for clusters",
             "output": "cluster-enums.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/cluster-enums-check.zapt",
+            "name": "Enum and bitmap method check header for clusters",
+            "output": "cluster-enums-check.h"
         }
     ]
 }

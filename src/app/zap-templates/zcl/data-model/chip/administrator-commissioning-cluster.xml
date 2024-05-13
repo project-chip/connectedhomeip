@@ -17,14 +17,14 @@ limitations under the License.
 <configurator>
   <domain name="General"/>
 
-  <enum name="StatusCode" type="ENUM8">
+  <enum name="StatusCode" type="enum8">
     <cluster code="0x003c"/>
-     <item name="Busy" value="0x01"/>
-     <item name="PAKEParameterError" value="0x02"/>
-     <item name="WindowNotOpen" value="0x03"/>
+     <item name="Busy" value="0x02"/>
+     <item name="PAKEParameterError" value="0x03"/>
+     <item name="WindowNotOpen" value="0x04"/>
   </enum>
 
-  <enum name="CommissioningWindowStatus" type="ENUM8">
+  <enum name="CommissioningWindowStatusEnum" type="enum8">
     <cluster code="0x003c"/>
      <item name="WindowNotOpen" value="0x00"/>
      <item name="EnhancedWindowOpen" value="0x01"/>
@@ -32,29 +32,34 @@ limitations under the License.
   </enum>
 
   <cluster>
-    <name>AdministratorCommissioning</name>
+    <name>Administrator Commissioning</name>
     <domain>General</domain>
     <code>0x003c</code>
     <define>ADMINISTRATOR_COMMISSIONING_CLUSTER</define>
     <description>Commands to trigger a Node to allow a new Administrator to commission it.</description>
 
-    <attribute side="server" code="0x0000" define="WINDOW_STATUS" type="INT8U" writable="false" optional="false">WindowStatus</attribute>
-    <attribute side="server" code="0x0001" define="ADMIN_FABRIC_INDEX" type="fabric_idx" writable="false" optional="false">AdminFabricIndex</attribute>
-    <attribute side="server" code="0x0002" define="ADMIN_VENDOR_ID" type="INT16U" writable="false" optional="false">AdminVendorId</attribute>
+    <features>
+      <feature bit="0" code="BC" name="Basic" summary="Node supports Basic Commissioning Method.">
+        <optionalConform/>
+      </feature>
+    </features>
+    <attribute side="server" code="0x0000" define="WINDOW_STATUS" type="CommissioningWindowStatusEnum" writable="false" optional="false">WindowStatus</attribute>
+    <attribute side="server" code="0x0001" define="ADMIN_FABRIC_INDEX" type="fabric_idx" writable="false" isNullable="true" optional="false">AdminFabricIndex</attribute>
+    <attribute side="server" code="0x0002" define="ADMIN_VENDOR_ID" type="vendor_id" writable="false" isNullable="true" optional="false">AdminVendorId</attribute>
 
     <command source="client" code="0x00" name="OpenCommissioningWindow" mustUseTimedInvoke="true" optional="false">
       <description>This command is used by a current Administrator to instruct a Node to go into commissioning mode using enhanced commissioning method.</description>
-      <arg name="CommissioningTimeout" type="INT16U"/>
-      <arg name="PAKEVerifier" type="OCTET_STRING"/>
-      <arg name="Discriminator" type="INT16U"/>
-      <arg name="Iterations" type="INT32U"/>
-      <arg name="Salt" type="OCTET_STRING"/>
+      <arg name="CommissioningTimeout" type="int16u"/>
+      <arg name="PAKEPasscodeVerifier" type="octet_string"/>
+      <arg name="Discriminator" type="int16u"/>
+      <arg name="Iterations" type="int32u"/>
+      <arg name="Salt" type="octet_string" length="32"/>
       <access op="invoke" privilege="administer"/>
     </command>
 
-    <command source="client" code="0x01" name="OpenBasicCommissioningWindow" mustUseTimedInvoke="true" optional="false">
+    <command source="client" code="0x01" name="OpenBasicCommissioningWindow" mustUseTimedInvoke="true" optional="true">
       <description>This command is used by a current Administrator to instruct a Node to go into commissioning mode using basic commissioning method, if the node supports it.</description>
-      <arg name="CommissioningTimeout" type="INT16U"/>
+      <arg name="CommissioningTimeout" type="int16u"/>
       <access op="invoke" privilege="administer"/>
     </command>
 

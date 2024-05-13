@@ -16,10 +16,10 @@ import("//build_overrides/chip.gni")
 
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/system/system.gni")
 
 source_set("commands") {
   sources = [
-    "Base64.cpp",
     "Help.cpp",
     "Help.h",
     "Meta.cpp",
@@ -36,7 +36,10 @@ source_set("commands") {
   }
 
   if (chip_enable_wifi) {
-    sources += [ "WiFi.cpp" ]
+    sources += [
+      "WiFi.cpp",
+      "WiFi.h",
+    ]
   }
 
   if (chip_enable_ble && chip_device_platform != "none") {
@@ -49,16 +52,21 @@ source_set("commands") {
 
   if (chip_device_platform != "none") {
     sources += [ "Dns.cpp" ]
+    public_deps += [ "${chip_root}/src/lib/address_resolve" ]
   }
 
   if (chip_enable_ota_requestor && chip_device_platform != "none" &&
       chip_device_platform != "linux" && chip_device_platform != "darwin") {
-    #TODO: the ota commands in shell should use the interfaces in /src/app/clusters/ota-requestor
     sources += [ "Ota.cpp" ]
-    configs += [ "${chip_root}/src/controller:config" ]
+  }
+
+  if (chip_system_config_provide_statistics) {
+    sources += [ "Stat.cpp" ]
   }
 
   if (chip_device_platform != "none") {
     public_deps += [ "${chip_root}/src/app/server" ]
   }
+
+  cflags = [ "-Wconversion" ]
 }

@@ -19,14 +19,14 @@
 
 #include <access/SubjectDescriptor.h>
 #include <app/EventPathParams.h>
-#include <app/ObjectList.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLV.h>
 #include <lib/core/Optional.h>
+#include <lib/core/TLV.h>
+#include <lib/support/LinkedList.h>
 #include <system/SystemPacketBuffer.h>
 
-constexpr size_t kNumPriorityLevel = 3;
+inline constexpr size_t kNumPriorityLevel = 3;
 namespace chip {
 namespace app {
 
@@ -95,13 +95,12 @@ static_assert(sizeof(std::underlying_type_t<PriorityLevel>) <= sizeof(unsigned),
  */
 struct Timestamp
 {
-    enum class Type
+    enum class Type : uint8_t
     {
         kSystem = 0,
         kEpoch
     };
     Timestamp() {}
-    Timestamp(Type aType) : mType(aType) { mValue = 0; }
     Timestamp(Type aType, uint64_t aValue) : mType(aType), mValue(aValue) {}
     Timestamp(System::Clock::Timestamp aValue) : mType(Type::kSystem), mValue(aValue.count()) {}
     static Timestamp Epoch(System::Clock::Timestamp aValue)
@@ -152,10 +151,10 @@ struct EventLoadOutContext
     EventNumber mStartingEventNumber = 0;
     Timestamp mPreviousTime;
     Timestamp mCurrentTime;
-    EventNumber mCurrentEventNumber                            = 0;
-    size_t mEventCount                                         = 0;
-    const ObjectList<EventPathParams> * mpInterestedEventPaths = nullptr;
-    bool mFirst                                                = true;
+    EventNumber mCurrentEventNumber                                      = 0;
+    size_t mEventCount                                                   = 0;
+    const SingleLinkedListNode<EventPathParams> * mpInterestedEventPaths = nullptr;
+    bool mFirst                                                          = true;
     Access::SubjectDescriptor mSubjectDescriptor;
 };
 } // namespace app

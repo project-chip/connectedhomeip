@@ -23,8 +23,10 @@
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 
 using chip::DeviceLayer::ConfigurationMgr;
 
@@ -44,12 +46,12 @@ static CHIP_ERROR ConfigGetVendorId(bool printHeader)
     streamer_t * sout = streamer_get();
     uint16_t value16;
 
-    ReturnErrorOnFailure(ConfigurationMgr().GetVendorId(value16));
+    ReturnErrorOnFailure(DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(value16));
     if (printHeader)
     {
         streamer_printf(sout, "VendorId:        ");
     }
-    streamer_printf(sout, "%" PRIu16 " (0x%" PRIX16 ")\r\n", value16, value16);
+    streamer_printf(sout, "%u (0x%X)\r\n", value16, value16);
     return CHIP_NO_ERROR;
 }
 
@@ -63,12 +65,12 @@ static CHIP_ERROR ConfigGetProductId(bool printHeader)
     streamer_t * sout = streamer_get();
     uint16_t value16;
 
-    ReturnErrorOnFailure(ConfigurationMgr().GetProductId(value16));
+    ReturnErrorOnFailure(DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(value16));
     if (printHeader)
     {
         streamer_printf(sout, "ProductId:       ");
     }
-    streamer_printf(sout, "%" PRIu16 " (0x%" PRIX16 ")\r\n", value16, value16);
+    streamer_printf(sout, "%u (0x%X)\r\n", value16, value16);
     return CHIP_NO_ERROR;
 }
 
@@ -82,12 +84,12 @@ static CHIP_ERROR ConfigGetHardwareVersion(bool printHeader)
     streamer_t * sout = streamer_get();
     uint16_t value16;
 
-    ReturnErrorOnFailure(ConfigurationMgr().GetHardwareVersion(value16));
+    ReturnErrorOnFailure(DeviceLayer::GetDeviceInstanceInfoProvider()->GetHardwareVersion(value16));
     if (printHeader)
     {
         streamer_printf(sout, "HardwareVersion: ");
     }
-    streamer_printf(sout, "%" PRIu16 " (0x%" PRIX16 ")\r\n", value16, value16);
+    streamer_printf(sout, "%u (0x%X)\r\n", value16, value16);
     return CHIP_NO_ERROR;
 }
 
@@ -132,8 +134,13 @@ static CHIP_ERROR ConfigGetSetupDiscriminator(bool printHeader)
 static CHIP_ERROR ConfigSetSetupDiscriminator(char * argv)
 {
     CHIP_ERROR error;
-    streamer_t * sout           = streamer_get();
-    uint16_t setupDiscriminator = strtoull(argv, nullptr, 10);
+    streamer_t * sout      = streamer_get();
+    unsigned long long arg = strtoull(argv, nullptr, 10);
+    if (!CanCastTo<uint16_t>(arg))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    uint16_t setupDiscriminator = static_cast<uint16_t>(arg);
 
     VerifyOrReturnError(setupDiscriminator != 0 && setupDiscriminator < chip::kMaxDiscriminatorValue, CHIP_ERROR_INVALID_ARGUMENT);
 

@@ -40,18 +40,8 @@ namespace Internal {
 
 CHIP_ERROR QPGConfig::Init()
 {
-    const qvStatus_t status = qvCHIP_KvsInit();
-
-    if (QV_STATUS_NO_ERROR == status)
-    {
-        return CHIP_NO_ERROR;
-    }
-    else if (QV_STATUS_BUFFER_TOO_SMALL == status)
-    {
-        return CHIP_ERROR_BUFFER_TOO_SMALL;
-    }
-
-    return CHIP_ERROR_INTERNAL;
+    // KVS will already be initialized in qvCHIP_Init before this is called from CHIP stack
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR QPGConfig::ReadConfigValue(Key key, bool & val)
@@ -211,7 +201,8 @@ CHIP_ERROR QPGConfig::ClearConfigValue(Key key)
 
 bool QPGConfig::ConfigValueExists(Key key)
 {
-    return qvCHIP_Nvm_ValueExists(key, NULL);
+    uint16_t dummy = 0;
+    return qvCHIP_Nvm_ValueExists(key, &dummy);
 }
 
 CHIP_ERROR QPGConfig::FactoryResetConfig(void)

@@ -13,16 +13,19 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
+import("${chip_root}/config/standalone/args.gni")
 import("${chip_root}/src/platform/bouffalolab/BL602/args.gni")
 
-bl602_sdk_target = get_label_info(":sdk", "label_no_toolchain")
+bl_iot_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
 pw_log_BACKEND = "${chip_root}/src/lib/support/pw_log_chip"
 pw_assert_BACKEND = "$dir_pw_assert_log"
+pw_rpc_CONFIG = "$dir_pw_rpc:disable_global_mutex"
 
-chip_enable_openthread = false
-declare_args() {
-  # Disable lock tracking, since our FreeRTOS configuration does not set
-  # INCLUDE_xSemaphoreGetMutexHolder
-  chip_stack_lock_tracking = "none"
-}
+chip_detail_logging = false
+
+pw_build_LINK_DEPS = [
+  "$dir_pw_assert:impl",
+  "$dir_pw_log:impl",
+]

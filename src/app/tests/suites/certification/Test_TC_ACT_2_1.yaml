@@ -1,0 +1,460 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.2.1. [TC-ACT-2.1] Attributes with server as DUT
+
+PICS:
+    - ACT.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)"
+      verification: |
+          DUT and TH are on same fabric
+      disabled: true
+
+    - label:
+          "Step 2a: Use manufacturer provided means (e.g. app) to define groups
+          of endpoints that can be exposed using the Actions server cluster
+          (NOTE if this is not provided, it is assumed the DUT automagically
+          creates these)"
+      PICS: ACT.S.M.FillEndpointLists
+      verification: |
+          no Matter messages, result will be used in steps 4a and beyond
+      disabled: true
+
+    - label:
+          "Step 2b: Use manufacturer provided means (e.g. app) to define
+          available actions that can be exposed using the Actions server cluster"
+      PICS: ACT.S.M.FillActionList
+      verification: |
+          no Matter messages, result will be used in steps 5a and beyond
+      disabled: true
+
+    - label:
+          "Step 3: Read PartsList attribute of Descriptor cluster on endpoint 0
+          of the DUT"
+      verification: |
+          ./chip-tool descriptor read parts-list 1 0
+
+          Via the TH (chip-tool), verify the PartsList value has 11 entries (number may vary by DUT capabilities).
+
+          [1661775581.434024][11909:11914] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 2309949467
+          [1692261442.387782][3599:3601] CHIP:TOO:   PartsList: 11 entries
+          [1692261442.387823][3599:3601] CHIP:TOO:     [1]: 1
+          [1692261442.387849][3599:3601] CHIP:TOO:     [2]: 3
+          [1692261442.387885][3599:3601] CHIP:TOO:     [3]: 4
+          [1692261442.387910][3599:3601] CHIP:TOO:     [4]: 5
+          [1692261442.387943][3599:3601] CHIP:TOO:     [5]: 6
+          [1692261442.387967][3599:3601] CHIP:TOO:     [6]: 7
+          [1692261442.387990][3599:3601] CHIP:TOO:     [7]: 8
+          [1692261442.388022][3599:3601] CHIP:TOO:     [8]: 9
+          [1692261442.388086][3599:3601] CHIP:TOO:     [9]: 10
+          [1692261442.388112][3599:3601] CHIP:TOO:     [10]: 11
+          [1692261442.388135][3599:3601] CHIP:TOO:     [11]: 12
+      disabled: true
+
+    - label: "Step 4a: Read EndpointLists attribute of Actions server"
+      PICS: ACT.S.A0001
+      verification: |
+          ./chip-tool actions read endpoint-lists 1 1
+
+          Via the TH (chip-tool), verify the EndpointLists attribute that contains EndpointListStructs.
+
+          [1658474608.888833][20775:20780] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 2082192894
+          [1692261467.505888][3603:3605] CHIP:TOO:   EndpointLists: 2 entries
+          [1692261467.505968][3603:3605] CHIP:TOO:     [1]: {
+          [1692261467.505993][3603:3605] CHIP:TOO:       EndpointListID: 57345
+          [1692261467.506015][3603:3605] CHIP:TOO:       Name: Room 1
+          [1692261467.506062][3603:3605] CHIP:TOO:       Type: 1
+          [1692261467.506089][3603:3605] CHIP:TOO:       Endpoints: 2 entries
+          [1692261467.506115][3603:3605] CHIP:TOO:         [1]: 9
+          [1692261467.506171][3603:3605] CHIP:TOO:         [2]: 10
+          [1692261467.506204][3603:3605] CHIP:TOO:      }
+          [1692261467.506254][3603:3605] CHIP:TOO:     [2]: {
+          [1692261467.506287][3603:3605] CHIP:TOO:       EndpointListID: 57346
+          [1692261467.506340][3603:3605] CHIP:TOO:       Name: Room 2
+          [1692261467.506381][3603:3605] CHIP:TOO:       Type: 1
+          [1692261467.506415][3603:3605] CHIP:TOO:       Endpoints: 2 entries
+          [1692261467.506461][3603:3605] CHIP:TOO:         [1]: 11
+          [1692261467.506519][3603:3605] CHIP:TOO:         [2]: 12
+          [1692261467.506542][3603:3605] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Step 4b: For each EndpointListStruct, verify that the endpoints in
+          the Endpoints field are in the list of endpoints of the DUT"
+      verification: |
+          Via the TH (chip-tool), Verify all referenced endpoints present in list from step 3
+
+
+          [1692261467.505798][3603:3605] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 2563467668
+          [1692261467.505888][3603:3605] CHIP:TOO:   EndpointLists: 2 entries
+          [1692261467.505968][3603:3605] CHIP:TOO:     [1]: {
+          [1692261467.505993][3603:3605] CHIP:TOO:       EndpointListID: 57345
+          [1692261467.506015][3603:3605] CHIP:TOO:       Name: Room 1
+          [1692261467.506062][3603:3605] CHIP:TOO:       Type: 1
+          [1692261467.506089][3603:3605] CHIP:TOO:       Endpoints: 2 entries
+          [1692261467.506115][3603:3605] CHIP:TOO:         [1]: 9
+          [1692261467.506171][3603:3605] CHIP:TOO:         [2]: 10
+          [1692261467.506204][3603:3605] CHIP:TOO:      }
+          [1692261467.506254][3603:3605] CHIP:TOO:     [2]: {
+          [1692261467.506287][3603:3605] CHIP:TOO:       EndpointListID: 57346
+          [1692261467.506340][3603:3605] CHIP:TOO:       Name: Room 2
+          [1692261467.506381][3603:3605] CHIP:TOO:       Type: 1
+          [1692261467.506415][3603:3605] CHIP:TOO:       Endpoints: 2 entries
+          [1692261467.506461][3603:3605] CHIP:TOO:         [1]: 11
+          [1692261467.506519][3603:3605] CHIP:TOO:         [2]: 12
+          [1692261467.506542][3603:3605] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Step 4c: For each EndpointListStruct, verify that the Name is present"
+      verification: |
+          Via the TH (chip-tool), Verify each EndpointListStruct has Name in following log.
+
+          [1692261467.505798][3603:3605] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 2563467668
+          [1692261467.505888][3603:3605] CHIP:TOO:   EndpointLists: 2 entries
+          [1692261467.505968][3603:3605] CHIP:TOO:     [1]: {
+          [1692261467.505993][3603:3605] CHIP:TOO:       EndpointListID: 57345
+          [1692261467.506015][3603:3605] CHIP:TOO:       Name: Room 1
+          [1692261467.506062][3603:3605] CHIP:TOO:       Type: 1
+          [1692261467.506089][3603:3605] CHIP:TOO:       Endpoints: 2 entries
+          [1692261467.506115][3603:3605] CHIP:TOO:         [1]: 9
+          [1692261467.506171][3603:3605] CHIP:TOO:         [2]: 10
+          [1692261467.506204][3603:3605] CHIP:TOO:      }
+          [1692261467.506254][3603:3605] CHIP:TOO:     [2]: {
+          [1692261467.506287][3603:3605] CHIP:TOO:       EndpointListID: 57346
+          [1692261467.506340][3603:3605] CHIP:TOO:       Name: Room 2
+          [1692261467.506381][3603:3605] CHIP:TOO:       Type: 1
+          [1692261467.506415][3603:3605] CHIP:TOO:       Endpoints: 2 entries
+          [1692261467.506461][3603:3605] CHIP:TOO:         [1]: 11
+          [1692261467.506519][3603:3605] CHIP:TOO:         [2]: 12
+          [1692261467.506542][3603:3605] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Step 4d: For each EndpointListStruct, verify that the Type is present
+          and valid"
+      verification: |
+          Via the TH (chip-tool), Verify the type is present and valid for each EndpointListStruct in the following log.
+
+          [1658474608.888833][20775:20780] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 2082192894
+          [1658474608.888887][20775:20780] CHIP:TOO: EndpointLists: 2 entries
+          [1658474608.888949][20775:20780] CHIP:TOO: [1]: {
+          [1658474608.888968][20775:20780] CHIP:TOO: EndpointListID: 57345
+          [1658474608.888985][20775:20780] CHIP:TOO: Name: Room 1
+          [1658474608.889001][20775:20780] CHIP:TOO: Type: 1
+          [1658474608.889020][20775:20780] CHIP:TOO: Endpoints: 2 entries
+          [1658474608.889040][20775:20780] CHIP:TOO: [1]: 9
+          [1658474608.889056][20775:20780] CHIP:TOO: [2]: 10
+          [1658474608.889072][20775:20780] CHIP:TOO: }
+          [1658474608.889099][20775:20780] CHIP:TOO: [2]: {
+          [1658474608.889114][20775:20780] CHIP:TOO: EndpointListID: 57346
+          [1658474608.889128][20775:20780] CHIP:TOO: Name: Room 2
+          [1658474608.889142][20775:20780] CHIP:TOO: Type: 1
+          [1658474608.889159][20775:20780] CHIP:TOO: Endpoints: 2 entries
+          [1658474608.889175][20775:20780] CHIP:TOO: [1]: 11
+          [1658474608.889191][20775:20780] CHIP:TOO: [2]: 12
+          [1658474608.889205][20775:20780] CHIP:TOO: }
+      disabled: true
+
+    - label:
+          "Step 4e: Verify that the EndPointListIDs of all EndpointListStruct
+          are unique (no duplicates)"
+      verification: |
+          Via the TH (chip-tool), Verify the EndPointListIDs of all EndpointListStruct  are unique and  no duplicates in the following log
+
+          [1658474608.888833][20775:20780] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 2082192894
+          [1658474608.888887][20775:20780] CHIP:TOO: EndpointLists: 2 entries
+          [1658474608.888949][20775:20780] CHIP:TOO: [1]: {
+          [1658474608.888968][20775:20780] CHIP:TOO: EndpointListID: 57345
+          [1658474608.888985][20775:20780] CHIP:TOO: Name: Room 1
+          [1658474608.889001][20775:20780] CHIP:TOO: Type: 1
+          [1658474608.889020][20775:20780] CHIP:TOO: Endpoints: 2 entries
+          [1658474608.889040][20775:20780] CHIP:TOO: [1]: 9
+          [1658474608.889056][20775:20780] CHIP:TOO: [2]: 10
+          [1658474608.889072][20775:20780] CHIP:TOO: }
+          [1658474608.889099][20775:20780] CHIP:TOO: [2]: {
+          [1658474608.889114][20775:20780] CHIP:TOO: EndpointListID: 57346
+          [1658474608.889128][20775:20780] CHIP:TOO: Name: Room 2
+          [1658474608.889142][20775:20780] CHIP:TOO: Type: 1
+          [1658474608.889159][20775:20780] CHIP:TOO: Endpoints: 2 entries
+          [1658474608.889175][20775:20780] CHIP:TOO: [1]: 11
+          [1658474608.889191][20775:20780] CHIP:TOO: [2]: 12
+          [1658474608.889205][20775:20780] CHIP:TOO: }
+      disabled: true
+
+    - label:
+          "Step 4f: For each EndpointListStruct, verify Name and Type against
+          the name/type of each group of endpoints provided by the manufacturers
+          means"
+      PICS: ACT.S.A0001 && ACT.S.M.FillEndpointLists
+      verification: |
+          Via the TH (chip-tool), Verify the information matches, Name and Type against the name/type of each group of endpoints provided
+
+          [1658474608.888833][20775:20780] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 2082192894
+          [1658474608.888887][20775:20780] CHIP:TOO: EndpointLists: 2 entries
+          [1658474608.888949][20775:20780] CHIP:TOO: [1]: {
+          [1658474608.888968][20775:20780] CHIP:TOO: EndpointListID: 57345
+          [1658474608.888985][20775:20780] CHIP:TOO: Name: Room 1
+          [1658474608.889001][20775:20780] CHIP:TOO: Type: 1
+          [1658474608.889020][20775:20780] CHIP:TOO: Endpoints: 2 entries
+          [1658474608.889040][20775:20780] CHIP:TOO: [1]: 9
+          [1658474608.889056][20775:20780] CHIP:TOO: [2]: 10
+          [1658474608.889072][20775:20780] CHIP:TOO: }
+          [1658474608.889099][20775:20780] CHIP:TOO: [2]: {
+          [1658474608.889114][20775:20780] CHIP:TOO: EndpointListID: 57346
+          [1658474608.889128][20775:20780] CHIP:TOO: Name: Room 2
+          [1658474608.889142][20775:20780] CHIP:TOO: Type: 1
+          [1658474608.889159][20775:20780] CHIP:TOO: Endpoints: 2 entries
+          [1658474608.889175][20775:20780] CHIP:TOO: [1]: 11
+          [1658474608.889191][20775:20780] CHIP:TOO: [2]: 12
+          [1658474608.889205][20775:20780] CHIP:TOO: }
+      disabled: true
+
+    - label: "Step 5a: Read ActionList attribute of Actions server"
+      PICS: ACT.S.A0000
+      verification: |
+          ./chip-tool actions read action-list 1 1
+
+          Via the TH (chip-tool), verify the ActionList attribute contains ActionStructs has 2 entries.
+
+          [1658473018.104129][16539:16544] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 3292516604
+          [1658473018.104215][16539:16544] CHIP:TOO:   ActionList: 2 entries
+          [1658473018.104263][16539:16544] CHIP:TOO:     [1]: {
+          [1658473018.104728][16539:16544] CHIP:TOO:       ActionID: 4097
+          [1658473018.104753][16539:16544] CHIP:TOO:       Name: Room 1 On
+          [1658473018.104770][16539:16544] CHIP:TOO:       Type: 3
+          [1658473018.104786][16539:16544] CHIP:TOO:       EndpointListID: 57345
+          [1658473018.104803][16539:16544] CHIP:TOO:       SupportedCommands: 1
+          [1658473018.104819][16539:16544] CHIP:TOO:       State: 0
+          [1658473018.104834][16539:16544] CHIP:TOO:      }
+          [1658473018.104864][16539:16544] CHIP:TOO:     [2]: {
+          [1658473018.104879][16539:16544] CHIP:TOO:       ActionID: 4098
+          [1658473018.104894][16539:16544] CHIP:TOO:       Name: Turn On Room 2
+          [1658473018.104908][16539:16544] CHIP:TOO:       Type: 3
+          [1658473018.104923][16539:16544] CHIP:TOO:       EndpointListID: 57346
+          [1658473018.104938][16539:16544] CHIP:TOO:       SupportedCommands: 1
+          [1658473018.104953][16539:16544] CHIP:TOO:       State: 0
+          [1658473018.104967][16539:16544] CHIP:TOO:      }
+      disabled: true
+
+    - label: "Step 5b: For each ActionStruct, verify the Name is present"
+      verification: |
+          Via the TH (chip-tool), Verify the name is present in each of the ActionStruct in the below log.
+
+          [1658473018.104129][16539:16544] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 3292516604
+          [1658473018.104215][16539:16544] CHIP:TOO:   ActionList: 2 entries
+          [1658473018.104263][16539:16544] CHIP:TOO:     [1]: {
+          [1658473018.104728][16539:16544] CHIP:TOO:       ActionID: 4097
+          [1658473018.104753][16539:16544] CHIP:TOO:       Name: Room 1 On
+          [1658473018.104770][16539:16544] CHIP:TOO:       Type: 3
+          [1658473018.104786][16539:16544] CHIP:TOO:       EndpointListID: 57345
+          [1658473018.104803][16539:16544] CHIP:TOO:       SupportedCommands: 1
+          [1658473018.104819][16539:16544] CHIP:TOO:       State: 0
+          [1658473018.104834][16539:16544] CHIP:TOO:      }
+          [1658473018.104864][16539:16544] CHIP:TOO:     [2]: {
+          [1658473018.104879][16539:16544] CHIP:TOO:       ActionID: 4098
+          [1658473018.104894][16539:16544] CHIP:TOO:       Name: Turn On Room 2
+          [1658473018.104908][16539:16544] CHIP:TOO:       Type: 3
+          [1658473018.104923][16539:16544] CHIP:TOO:       EndpointListID: 57346
+          [1658473018.104938][16539:16544] CHIP:TOO:       SupportedCommands: 1
+          [1658473018.104953][16539:16544] CHIP:TOO:       State: 0
+          [1658473018.104967][16539:16544] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Step 5c: For each ActionStruct, verify the Type is present and valid"
+      verification: |
+          Via the TH (chip-tool), Verify  the type is present and valid for each of the ActionStruct in the below log.
+
+          [1658473018.104129][16539:16544] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 3292516604
+          [1658473018.104215][16539:16544] CHIP:TOO:   ActionList: 2 entries
+          [1658473018.104263][16539:16544] CHIP:TOO:     [1]: {
+          [1658473018.104728][16539:16544] CHIP:TOO:       ActionID: 4097
+          [1658473018.104753][16539:16544] CHIP:TOO:       Name: Room 1 On
+          [1658473018.104770][16539:16544] CHIP:TOO:       Type: 3
+          [1658473018.104786][16539:16544] CHIP:TOO:       EndpointListID: 57345
+          [1658473018.104803][16539:16544] CHIP:TOO:       SupportedCommands: 1
+          [1658473018.104819][16539:16544] CHIP:TOO:       State: 0
+          [1658473018.104834][16539:16544] CHIP:TOO:      }
+          [1658473018.104864][16539:16544] CHIP:TOO:     [2]: {
+          [1658473018.104879][16539:16544] CHIP:TOO:       ActionID: 4098
+          [1658473018.104894][16539:16544] CHIP:TOO:       Name: Turn On Room 2
+          [1658473018.104908][16539:16544] CHIP:TOO:       Type: 3
+          [1658473018.104923][16539:16544] CHIP:TOO:       EndpointListID: 57346
+          [1658473018.104938][16539:16544] CHIP:TOO:       SupportedCommands: 1
+          [1658473018.104953][16539:16544] CHIP:TOO:       State: 0
+          [1658473018.104967][16539:16544] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Step 5d: For each ActionStruct, verify the EndpointListID is present
+          in one of the EndpointListStructs (see step 4a)"
+      verification: |
+          Compare step 5d and 4a, verify the EndpointListID is present in one of the EndpointListStructs
+      disabled: true
+
+    - label:
+          "Step 5e: For each ActionStruct, verify the SupportedCommands field is
+          present and valid (at least one bit is set)"
+      verification: |
+          Via the TH (chip-tool), verify the SupportedCommands field is present and valid for each ActionStruct  in the below log.
+
+          [1658473018.104129][16539:16544] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 3292516604
+          [1658473018.104215][16539:16544] CHIP:TOO:   action list: 2 entries
+          [1658473018.104263][16539:16544] CHIP:TOO:     [1]: {
+          [1658473018.104728][16539:16544] CHIP:TOO:       ActionID: 4097
+          [1658473018.104753][16539:16544] CHIP:TOO:       Name: Room 1 On
+          [1658473018.104770][16539:16544] CHIP:TOO:       Type: 3
+          [1658473018.104786][16539:16544] CHIP:TOO:       EndpointListID: 57345
+          [1658473018.104803][16539:16544] CHIP:TOO:       SupportedCommands: 1
+          [1658473018.104819][16539:16544] CHIP:TOO:       State: 0
+          [1658473018.104834][16539:16544] CHIP:TOO:      }
+          [1658473018.104864][16539:16544] CHIP:TOO:     [2]: {
+          [1658473018.104879][16539:16544] CHIP:TOO:       ActionID: 4098
+          [1658473018.104894][16539:16544] CHIP:TOO:       Name: Turn On Room 2
+          [1658473018.104908][16539:16544] CHIP:TOO:       Type: 3
+          [1658473018.104923][16539:16544] CHIP:TOO:       EndpointListID: 57346
+          [1658473018.104938][16539:16544] CHIP:TOO:       SupportedCommands: 1
+          [1658473018.104953][16539:16544] CHIP:TOO:       State: 0
+      disabled: true
+
+    - label:
+          "Step 5f: For each ActionStruct, verify the State field is present and
+          valid"
+      verification: |
+          Via the TH (chip-tool), verify the State field is present and valid for each ActionStruct in the below log.
+
+          [1658473018.104129][16539:16544] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 3292516604
+          [1658473018.104215][16539:16544] CHIP:TOO:   ActionList: 2 entries
+          [1658473018.104263][16539:16544] CHIP:TOO:     [1]: {
+          [1658473018.104728][16539:16544] CHIP:TOO:       ActionID: 4097
+          [1658473018.104753][16539:16544] CHIP:TOO:       Name: Room 1 On
+          [1658473018.104770][16539:16544] CHIP:TOO:       Type: 3
+          [1658473018.104786][16539:16544] CHIP:TOO:       EndpointListID: 57345
+          [1658473018.104803][16539:16544] CHIP:TOO:       SupportedCommands: 1
+          [1658473018.104819][16539:16544] CHIP:TOO:       State: 0
+          [1658473018.104834][16539:16544] CHIP:TOO:      }
+          [1658473018.104864][16539:16544] CHIP:TOO:     [2]: {
+          [1658473018.104879][16539:16544] CHIP:TOO:       ActionID: 4098
+          [1658473018.104894][16539:16544] CHIP:TOO:       Name: Turn On Room 2
+          [1658473018.104908][16539:16544] CHIP:TOO:       Type: 3
+          [1658473018.104923][16539:16544] CHIP:TOO:       EndpointListID: 57346
+          [1658473018.104938][16539:16544] CHIP:TOO:       SupportedCommands: 1
+          [1658473018.104953][16539:16544] CHIP:TOO:       State: 0
+          [1658473018.104967][16539:16544] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Step 5g: Verify that the ActionIDs of all ActionStructs are unique
+          (no duplicates)"
+      verification: |
+          Via the TH (chip-tool), Verify the ActionIDs of all ActionStructs are unique and no duplicates are found in the below log.
+
+          [1658473018.104129][16539:16544] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 3292516604
+          [1658473018.104215][16539:16544] CHIP:TOO:   ActionList 2 entries
+          [1658473018.104263][16539:16544] CHIP:TOO:     [1]: {
+          [1658473018.104728][16539:16544] CHIP:TOO:       ActionID: 4097
+          [1658473018.104753][16539:16544] CHIP:TOO:       Name: Room 1 On
+          [1658473018.104770][16539:16544] CHIP:TOO:       Type: 3
+          [1658473018.104786][16539:16544] CHIP:TOO:       EndpointListID: 57345
+          [1658473018.104803][16539:16544] CHIP:TOO:       SupportedCommands: 1
+          [1658473018.104819][16539:16544] CHIP:TOO:       State: 0
+          [1658473018.104834][16539:16544] CHIP:TOO:      }
+          [1658473018.104864][16539:16544] CHIP:TOO:     [2]: {
+          [1658473018.104879][16539:16544] CHIP:TOO:       ActionID: 4098
+          [1658473018.104894][16539:16544] CHIP:TOO:       Name: Turn On Room 2
+          [1658473018.104908][16539:16544] CHIP:TOO:       Type: 3
+          [1658473018.104923][16539:16544] CHIP:TOO:       EndpointListID: 57346
+          [1658473018.104938][16539:16544] CHIP:TOO:       SupportedCommands: 1
+          [1658473018.104953][16539:16544] CHIP:TOO:       State: 0
+          [1658473018.104967][16539:16544] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Step 5h: For each ActionStruct, verify Name, Type and State against
+          the name/type/state info for the action provided by the manufacturers
+          means"
+      PICS: ACT.S.A0000 && ACT.S.M.FillActionList
+      verification: |
+          Via the TH (chip-tool), verify the information matches Name, Type and State against the name/type/state info for the action provided in below log.
+
+          [1658473018.104129][16539:16544] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 3292516604
+          [1658473018.104215][16539:16544] CHIP:TOO:   ActionList: 2 entries
+          [1658473018.104263][16539:16544] CHIP:TOO:     [1]: {
+          [1658473018.104728][16539:16544] CHIP:TOO:       ActionID: 4097
+          [1658473018.104753][16539:16544] CHIP:TOO:       Name: Room 1 On
+          [1658473018.104770][16539:16544] CHIP:TOO:       Type: 3
+          [1658473018.104786][16539:16544] CHIP:TOO:       EndpointListID: 57345
+          [1658473018.104803][16539:16544] CHIP:TOO:       SupportedCommands: 1
+          [1658473018.104819][16539:16544] CHIP:TOO:       State: 0
+          [1658473018.104834][16539:16544] CHIP:TOO:      }
+          [1658473018.104864][16539:16544] CHIP:TOO:     [2]: {
+          [1658473018.104879][16539:16544] CHIP:TOO:       ActionID: 4098
+          [1658473018.104894][16539:16544] CHIP:TOO:       Name: Turn On Room 2
+          [1658473018.104908][16539:16544] CHIP:TOO:       Type: 3
+          [1658473018.104923][16539:16544] CHIP:TOO:       EndpointListID: 57346
+          [1658473018.104938][16539:16544] CHIP:TOO:       SupportedCommands: 1
+          [1658473018.104953][16539:16544] CHIP:TOO:       State: 0
+          [1658473018.104967][16539:16544] CHIP:TOO:      }
+      disabled: true
+
+    - label: "Step 6a: Read SetupURL attribute"
+      PICS: ACT.S.A0002
+      verification: |
+          ./chip-tool actions read setup-url 1 1
+
+          Via the TH (chip-tool), Verify SetupURL attribute that contains string value.
+
+          this is an optional attribute and it is implemented in RPI, it may vary based on DUT implementation.
+
+          [1658473627.759830][18059:18064] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0002 DataVersion: 3292516604
+          [1658473627.759880][18059:18064] CHIP:TOO:   SetupURL: https://example.com
+      disabled: true
+
+    - label: "Step 6b: Verify that its syntax"
+      verification: |
+          Via the TH (chip-tool), Verify the syntax as specified in RFC 3986, max. 512 ASCII characters in below log
+
+          [1658473627.759830][18059:18064] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0002 DataVersion: 3292516604
+          [1658473627.759880][18059:18064] CHIP:TOO:   SetupURL: https://example.com
+      disabled: true
+
+    - label:
+          "Step 6c: Verify SetupURL points to a site providing information about
+          the actions"
+      verification: |
+          Via the TH (chip-tool), Verify SetupURL points to a site providing information about the actions in below log
+
+          [1658473627.759830][18059:18064] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0002 DataVersion: 3292516604
+          [1658473627.759880][18059:18064] CHIP:TOO:   SetupURL: https://example.com
+      disabled: true
+
+    - label:
+          "Step 6d: Verify SetupURL appended by '?/a=' and the decimal numeric
+          value of one of the exposed ActionIDs (see step 5a) points to a site
+          providing information about the action"
+      PICS: ACT.S.A0002 && ACT.S.M.SetupURLWithSuffix
+      verification: |
+          Compare 5a and 6a, Verify SetupURL appended by "?/a=" and the decimal numeric value of one of the exposed ActionIDs
+      disabled: true

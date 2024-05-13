@@ -23,36 +23,30 @@
 #      This file implements the Python-based Chip Device Controller Shell.
 #
 
-from __future__ import absolute_import
-from __future__ import print_function
-from chip import ChipDeviceCtrl
-from chip import FabricAdmin
-from chip import ChipStack
-from chip import ChipCommissionableNodeCtrl
-from chip import exceptions
+from __future__ import absolute_import, print_function
+
 import argparse
+import base64
 import ctypes
-import sys
+import logging
 import os
 import platform
 import random
-from optparse import OptionParser, OptionValueError
 import shlex
-import base64
+import string
+import sys
 import textwrap
 import time
-import string
 import traceback
-from cmd import Cmd
-from chip.setup_payload import SetupPayload
-import deprecation
 import warnings
-import logging
-from rich import print
-from rich.pretty import pprint
-from rich import pretty
-import coloredlogs
+from cmd import Cmd
+from optparse import OptionParser, OptionValueError
+
 import chip.logging
+import coloredlogs
+from chip import ChipCommissionableNodeCtrl, ChipStack, exceptions, native
+from chip.setup_payload import SetupPayload
+from rich import pretty, print
 
 # Extend sys.path with one or more directories, relative to the location of the
 # running script, in which the chip package might be found .  This makes it
@@ -156,6 +150,7 @@ def ShowColoredWarnings(message, category, filename, lineno, file=None, line=Non
 class DeviceMgrCmd(Cmd):
     def __init__(self, rendezvousAddr=None, controllerNodeId=1, bluetoothAdapter=None):
         self.lastNetworkId = None
+        self.replHint = None
 
         pretty.install(indent_guides=True, expand_all=True)
 
@@ -181,7 +176,9 @@ class DeviceMgrCmd(Cmd):
 
         self.chipStack = ChipStack.ChipStack(
             bluetoothAdapter=bluetoothAdapter, persistentStoragePath='/tmp/chip-device-ctrl-storage.json')
-        self.fabricAdmin = FabricAdmin.FabricAdmin()
+        self.certificateAuthorityManager = chip.CertificateAuthority.CertificateAuthorityManager(chipStack=self.chipStack)
+        self.certificateAuthority = self.certificateAuthorityManager.NewCertificateAuthority()
+        self.fabricAdmin = self.certificateAuthority.NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
         self.devCtrl = self.fabricAdmin.NewController(
             nodeId=controllerNodeId, useTestCommissioner=True)
 
@@ -267,6 +264,11 @@ class DeviceMgrCmd(Cmd):
         return line
 
     def postcmd(self, stop, line):
+        if self.replHint is not None:
+            print("Try the following command in repl: ")
+            print(self.replHint)
+            print("")
+        self.replHint = None
         if not stop and self.use_rawinput:
             self.prompt = "chip-device-ctrl > "
         return stop
@@ -309,7 +311,8 @@ class DeviceMgrCmd(Cmd):
         """
 
         warnings.warn(
-            "This method is being deprecated. Please use the DeviceController.CloseBLEConnection method directly in the REPL", DeprecationWarning)
+            "This method is being deprecated. "
+            "Please use the DeviceController.CloseBLEConnection method directly in the REPL", DeprecationWarning)
 
         args = shlex.split(line)
 
@@ -331,7 +334,8 @@ class DeviceMgrCmd(Cmd):
         """
 
         warnings.warn(
-            "This method is being deprecated. Please use the DeviceController.SetLogFilter method directly in the REPL", DeprecationWarning)
+            "This method is being deprecated. "
+            "Please use the DeviceController.SetLogFilter method directly in the REPL", DeprecationWarning)
 
         args = shlex.split(line)
 
@@ -367,7 +371,7 @@ class DeviceMgrCmd(Cmd):
         setup-payload generate [options]
 
         Options:
-          -vr  Version        
+          -vr  Version
           -vi  Vendor ID
           -pi  Product ID
           -cf  Custom Flow [Standard = 0, UserActionRequired = 1, Custom = 2]
@@ -380,7 +384,8 @@ class DeviceMgrCmd(Cmd):
         """
 
         warnings.warn(
-            "This method is being deprecated. Please use the SetupPayload function in the chip.setup_payload package directly", DeprecationWarning)
+            "This method is being deprecated. "
+            "Please use the SetupPayload function in the chip.setup_payload package directly", DeprecationWarning)
 
         try:
             arglist = shlex.split(line)
@@ -545,15 +550,13 @@ class DeviceMgrCmd(Cmd):
                 print("Usage:")
                 self.do_help("paseonly")
                 return
-
             nodeid = random.randint(1, 1000000)  # Just a random number
             if len(args) == 4:
                 nodeid = int(args[3])
             print("Device is assigned with nodeid = {}".format(nodeid))
-
+            self.replHint = f"devCtrl.EstablishPASESessionIP({repr(args[1])}, {int(args[2])}, {nodeid})"
             if args[0] == "-ip" and len(args) >= 3:
-                self.devCtrl.EstablishPASESessionIP(args[1].encode(
-                    "utf-8"), int(args[2]), nodeid)
+                self.devCtrl.EstablishPASESessionIP(args[1], int(args[2]), nodeid)
             else:
                 print("Usage:")
                 self.do_help("paseonly")
@@ -576,8 +579,8 @@ class DeviceMgrCmd(Cmd):
                 print("Usage:")
                 self.do_help("commission")
                 return
-
             nodeid = int(args[0])
+            self.replHint = f"devCtrl.Commission({nodeid})"
             self.devCtrl.Commission(nodeid)
         except Exception as ex:
             print(str(ex))
@@ -599,7 +602,8 @@ class DeviceMgrCmd(Cmd):
         """
 
         warnings.warn(
-            "This method is being deprecated. Please use the DeviceController.[ConnectBLE|CommissionIP] methods directly in the REPL", DeprecationWarning)
+            "This method is being deprecated. "
+            "Please use the DeviceController.[ConnectBLE|CommissionIP] methods directly in the REPL", DeprecationWarning)
 
         try:
             args = shlex.split(line)
@@ -614,9 +618,10 @@ class DeviceMgrCmd(Cmd):
             print("Device is assigned with nodeid = {}".format(nodeid))
 
             if args[0] == "-ip" and len(args) >= 3:
-                self.devCtrl.CommissionIP(args[1].encode(
-                    "utf-8"), int(args[2]), nodeid)
+                self.replHint = f"devCtrl.CommissionIP({repr(args[1])}, {int(args[2])}, {nodeid})"
+                self.devCtrl.CommissionIP(args[1], int(args[2]), nodeid)
             elif args[0] == "-ble" and len(args) >= 3:
+                self.replHint = f"devCtrl.ConnectBLE({int(args[1])}, {int(args[2])}, {nodeid})"
                 self.devCtrl.ConnectBLE(int(args[1]), int(args[2]), nodeid)
             elif args[0] in ['-qr', '-code'] and len(args) >= 2:
                 if len(args) == 3:
@@ -634,6 +639,7 @@ class DeviceMgrCmd(Cmd):
                     print("No rendezvous information provided, default to all.")
                     setupPayload.attributes["RendezvousInformation"] = 0b111
                 setupPayload.Print()
+                self.replHint = f"devCtrl.CommissionWithCode(setupPayload={repr(setupPayload)}, nodeid={nodeid})"
                 self.ConnectFromSetupPayload(setupPayload, nodeid)
             else:
                 print("Usage:")
@@ -655,11 +661,11 @@ class DeviceMgrCmd(Cmd):
             parser = argparse.ArgumentParser()
             parser.add_argument('nodeid', type=int, help='Peer node ID')
             args = parser.parse_args(shlex.split(line))
-
+            self.replHint = f"devCtrl.CloseSession({args.nodeid})"
             self.devCtrl.CloseSession(args.nodeid)
         except exceptions.ChipStackException as ex:
             print(str(ex))
-        except:
+        except Exception:
             self.do_help("close-session")
 
     def do_resolve(self, line):
@@ -672,12 +678,15 @@ class DeviceMgrCmd(Cmd):
         try:
             args = shlex.split(line)
             if len(args) == 1:
-                err = self.devCtrl.ResolveNode(int(args[0]))
-                if err == 0:
+                try:
+                    self.replHint = f"devCtrl.ResolveNode({int(args[0])});devCtrl.GetAddressAndPort({int(args[0])})"
+                    self.devCtrl.ResolveNode(int(args[0]))
                     address = self.devCtrl.GetAddressAndPort(int(args[0]))
                     address = "{}:{}".format(
                         *address) if address else "unknown"
                     print("Current address: " + address)
+                except exceptions.ChipStackException as ex:
+                    print(str(ex))
             else:
                 self.do_help("resolve")
         except exceptions.ChipStackException as ex:
@@ -777,7 +786,7 @@ class DeviceMgrCmd(Cmd):
             print('exception')
             print(str(ex))
             return
-        except:
+        except Exception:
             self.do_help("discover")
             return
 
@@ -815,11 +824,13 @@ class DeviceMgrCmd(Cmd):
                 # When command takes no arguments, (not command) is True
                 if command is None:
                     raise exceptions.UnknownCommand(args[0], args[1])
+                req = eval(f"Clusters.{args[0]}.Commands.{args[1]}")(**FormatZCLArguments(args[5:], command))
+                self.replHint = f"await devCtrl.SendCommand({int(args[2])}, {int(args[3])}, Clusters.{repr(req)})"
                 err, res = self.devCtrl.ZCLSend(args[0], args[1], int(
                     args[2]), int(args[3]), int(args[4]), FormatZCLArguments(args[5:], command), blocking=True)
                 if err != 0:
                     print("Failed to receive command response: {}".format(res))
-                elif res != None:
+                elif res is not None:
                     print("Received command status response:")
                     print(res)
                 else:
@@ -851,9 +862,11 @@ class DeviceMgrCmd(Cmd):
             elif len(args) == 5:
                 if args[0] not in all_attrs:
                     raise exceptions.UnknownCluster(args[0])
+                self.replHint = (f"await devCtrl.ReadAttribute({int(args[2])}, [({int(args[3])}, "
+                                 f"Clusters.{args[0]}.Attributes.{args[1]})])")
                 res = self.devCtrl.ZCLReadAttribute(args[0], args[1], int(
                     args[2]), int(args[3]), int(args[4]))
-                if res != None:
+                if res is not None:
                     print(repr(res))
             else:
                 self.do_help("zclread")
@@ -879,12 +892,15 @@ class DeviceMgrCmd(Cmd):
                     raise exceptions.UnknownCluster(args[1])
                 cluster_attrs = all_attrs.get(args[1], {})
                 print('\n'.join(["{}: {}".format(key, cluster_attrs[key]["type"])
-                      for key in cluster_attrs.keys() if cluster_attrs[key].get("writable", False)]))
+                                 for key in cluster_attrs.keys() if cluster_attrs[key].get("writable", False)]))
             elif len(args) == 6:
                 if args[0] not in all_attrs:
                     raise exceptions.UnknownCluster(args[0])
                 attribute_type = all_attrs.get(args[0], {}).get(
                     args[1], {}).get("type", None)
+                self.replHint = (
+                    f"await devCtrl.WriteAttribute({int(args[2])}, [({int(args[3])}, "
+                    f"Clusters.{args[0]}.Attributes.{args[1]}(value={repr(ParseValueWithType(args[5], attribute_type))}))])")
                 res = self.devCtrl.ZCLWriteAttribute(args[0], args[1], int(
                     args[2]), int(args[3]), int(args[4]), ParseValueWithType(args[5], attribute_type))
                 print(repr(res))
@@ -921,10 +937,13 @@ class DeviceMgrCmd(Cmd):
                     raise exceptions.UnknownCluster(args[0])
                 res = self.devCtrl.ZCLSubscribeAttribute(args[0], args[1], int(
                     args[2]), int(args[3]), int(args[4]), int(args[5]))
+                self.replHint = (f"sub = await devCtrl.ReadAttribute({int(args[2])}, [({int(args[3])}, "
+                                 f"Clusters.{args[0]}.Attributes.{args[1]})], reportInterval=({int(args[4])}, {int(args[5])}))")
                 print(res.GetAllValues())
                 print(f"Subscription Established: {res}")
             elif len(args) == 2 and args[0] == '-shutdown':
                 subscriptionId = int(args[1], base=0)
+                self.replHint = "You can call sub.Shutdown() (sub is the return value of ReadAttribute() called before)"
                 self.devCtrl.ZCLShutdownSubscription(subscriptionId)
             else:
                 self.do_help("zclsubscribe")
@@ -946,7 +965,8 @@ class DeviceMgrCmd(Cmd):
                 self.do_help("set-pairing-wifi-credential")
                 return
             self.devCtrl.SetWiFiCredentials(
-                args[0].encode("utf-8"), args[1].encode("utf-8"))
+                args[0], args[1])
+            self.replHint = f"devCtrl.SetWiFiCredentials({repr(args[0])}, {repr(args[1])})"
         except Exception as ex:
             print(str(ex))
             return
@@ -961,6 +981,7 @@ class DeviceMgrCmd(Cmd):
                 print("Usage:")
                 self.do_help("set-pairing-thread-credential")
                 return
+            self.replHint = f"devCtrl.SetThreadOperationalDataset(bytes.fromhex({repr(args[0])}))"
             self.devCtrl.SetThreadOperationalDataset(bytes.fromhex(args[0]))
         except Exception as ex:
             print(str(ex))
@@ -971,7 +992,7 @@ class DeviceMgrCmd(Cmd):
         open-commissioning-window <nodeid> [options]
 
         Options:
-          -t  Timeout (in seconds)     
+          -t  Timeout (in seconds)
           -o  Option  [TokenWithRandomPIN = 1, TokenWithProvidedPIN = 2]
           -d  Discriminator Value
           -i  Iteration
@@ -1000,13 +1021,16 @@ class DeviceMgrCmd(Cmd):
                 print("Invalid option specified!")
                 raise ValueError("Invalid option specified")
 
+            self.replHint = (f"devCtrl.OpenCommissioningWindow(nodeid={int(arglist[0])}, timeout={args.timeout}, "
+                             f"iteration={args.iteration}, discriminator={args.discriminator}, option={args.option})")
+
             self.devCtrl.OpenCommissioningWindow(
                 int(arglist[0]), args.timeout, args.iteration, args.discriminator, args.option)
 
         except exceptions.ChipStackException as ex:
             print(str(ex))
             return
-        except:
+        except Exception:
             self.do_help("open-commissioning-window")
             return
 
@@ -1024,7 +1048,9 @@ class DeviceMgrCmd(Cmd):
                 return
 
             compressed_fabricid = self.devCtrl.GetCompressedFabricId()
-            raw_fabricid = self.devCtrl.GetFabricId()
+            raw_fabricid = self.devCtrl.fabricId
+
+            self.replHint = "devCtrl.GetCompressedFabricId(), devCtrl.fabricId"
         except exceptions.ChipStackException as ex:
             print("An exception occurred during reading FabricID:")
             print(str(ex))
@@ -1129,11 +1155,11 @@ def main():
         else:
             try:
                 adapterId = int(options.bluetoothAdapter[3:])
-            except:
+            except ValueError:
                 print(
                     "Invalid bluetooth adapter: {}, adapter name looks like hci0, hci1 etc.")
                 sys.exit(-1)
-
+    native.Init(bluetoothAdapter=adapterId)
     try:
         devMgrCmd = DeviceMgrCmd(rendezvousAddr=options.rendezvousAddr,
                                  controllerNodeId=options.controllerNodeId, bluetoothAdapter=adapterId)
@@ -1160,4 +1186,17 @@ def main():
 
 
 if __name__ == "__main__":
+    print("""
+    chip-device-ctrl will be deprecated and will be removed in the future. Please try chip-repl, which provides a lot of features.
+
+    - Multi-fabric support,
+    - Better complex type support for sending commands,
+    - Native command highlight,
+    - Parallel commands with asyncio,
+    - Writing complex logic inline.
+
+    You can still use chip-device-ctrl as usual for now, and you will learn how to do the same thing in chip-repl.
+
+    Feel free to file an issue if some features are not supported by chip-repl yet.
+    """)
     main()

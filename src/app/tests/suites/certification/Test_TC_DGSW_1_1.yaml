@@ -1,0 +1,166 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 44.1.1. [TC-DGSW-1.1] Global Attributes with DUT as Server
+
+PICS:
+    - DGSW.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Software Diagnostics"
+    endpoint: 0
+
+tests:
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH reads the ClusterRevision from DUT"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 1
+          constraints:
+              type: int16u
+
+    - label: "Step 3a: TH reads the FeatureMap from DUT"
+      PICS: " !DGSW.S.F00 "
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
+
+    - label:
+          "Step 3b: Given DGSW.S.F00(Watermarks) ensure featuremap has the
+          correct bit set"
+      PICS: DGSW.S.F00
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
+
+    - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [65528, 65529, 65531, 65532, 65533]
+
+    - label:
+          "Step 4b: TH reads optional attribute(ThreadMetrics) in AttributeList"
+      PICS: DGSW.S.A0000
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
+
+    - label:
+          "Step 4c: TH reads optional attribute(CurrentHeapFree) in
+          AttributeList"
+      PICS: DGSW.S.A0001
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [1]
+
+    - label:
+          "Step 4d: TH reads optional attribute(CurrentHeapUsed) in
+          AttributeList"
+      PICS: DGSW.S.A0002
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [2]
+
+    - label:
+          "Step 4e: TH reads Feature dependent
+          attribute(CurrentHeapHighWatermark) in AttributeList"
+      PICS: ( DGSW.S.F00 || DGSW.S.A0003 )
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [3]
+
+    - label: "Step 5a: TH reads EventList from DUT"
+      PICS: DGSW.S.E00 && PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
+
+    - label: "Step 5b: TH reads EventList from DUT"
+      PICS: " !DGSW.S.E00 && PICS_EVENT_LIST_ENABLED "
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Step 6: TH reads AcceptedCommandList from DUT"
+      PICS: DGSW.S.F00
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
+
+    - label: "Step 6: TH reads AcceptedCommandList from DUT"
+      PICS: " !DGSW.S.F00 "
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Step 7: TH reads GeneratedCommandList from DUT"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list

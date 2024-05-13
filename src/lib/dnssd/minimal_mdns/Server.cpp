@@ -21,6 +21,7 @@
 #include <utility>
 
 #include <lib/dnssd/minimal_mdns/core/DnsHeader.h>
+#include <platform/CHIPDeviceLayer.h>
 
 namespace mdns {
 namespace Minimal {
@@ -120,50 +121,25 @@ private:
 namespace BroadcastIpAddresses {
 
 // Get standard mDNS Broadcast addresses
-
-void GetIpv6Into(chip::Inet::IPAddress & dest)
+chip::Inet::IPAddress Get(chip::Inet::IPAddressType addressType)
 {
-    if (!chip::Inet::IPAddress::FromString("FF02::FB", dest))
+    chip::Inet::IPAddress address;
+#if INET_CONFIG_ENABLE_IPV4
+    if (addressType == chip::Inet::IPAddressType::kIPv4)
     {
-        ChipLogError(Discovery, "Failed to parse standard IPv6 broadcast address");
+        VerifyOrDie(chip::Inet::IPAddress::FromString("224.0.0.251", address));
     }
-}
-
-void GetIpv4Into(chip::Inet::IPAddress & dest)
-{
-    if (!chip::Inet::IPAddress::FromString("224.0.0.251", dest))
+    else
+#endif
     {
-        ChipLogError(Discovery, "Failed to parse standard IPv4 broadcast address");
+        VerifyOrDie(chip::Inet::IPAddress::FromString("FF02::FB", address));
     }
+    return address;
 }
 
 } // namespace BroadcastIpAddresses
 
 namespace {
-
-CHIP_ERROR JoinMulticastGroup(chip::Inet::InterfaceId interfaceId, chip::Inet::UDPEndPoint * endpoint,
-                              chip::Inet::IPAddressType addressType)
-{
-
-    chip::Inet::IPAddress address;
-
-    if (addressType == chip::Inet::IPAddressType::kIPv6)
-    {
-        BroadcastIpAddresses::GetIpv6Into(address);
-#if INET_CONFIG_ENABLE_IPV4
-    }
-    else if (addressType == chip::Inet::IPAddressType::kIPv4)
-    {
-        BroadcastIpAddresses::GetIpv4Into(address);
-#endif // INET_CONFIG_ENABLE_IPV4
-    }
-    else
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    return endpoint->JoinMulticastGroup(interfaceId, address);
-}
 
 #if CHIP_ERROR_LOGGING
 const char * AddressTypeStr(chip::Inet::IPAddressType addressType)
@@ -191,6 +167,12 @@ ServerBase::~ServerBase()
 
 void ServerBase::Shutdown()
 {
+    ShutdownEndpoints();
+    mIsInitialized = false;
+}
+
+void ServerBase::ShutdownEndpoints()
+{
     mEndpoints.ReleaseAll();
 }
 
@@ -216,7 +198,7 @@ bool ServerBase::IsListening() const
 CHIP_ERROR ServerBase::Listen(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager, ListenIterator * it,
                               uint16_t port)
 {
-    Shutdown(); // ensure everything starts fresh
+    ShutdownEndpoints(); // ensure everything starts fresh
 
     chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::Null();
     chip::Inet::IPAddressType addressType;
@@ -233,15 +215,16 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::EndPointManager<chip::Inet::UDPEndPoin
 
         ReturnErrorOnFailure(listenUdp->Listen(OnUdpPacketReceived, nullptr /*OnReceiveError*/, this));
 
-        CHIP_ERROR err = JoinMulticastGroup(interfaceId, listenUdp, addressType);
+        CHIP_ERROR err = listenUdp->JoinMulticastGroup(interfaceId, BroadcastIpAddresses::Get(addressType));
+
         if (err != CHIP_NO_ERROR)
         {
             char interfaceName[chip::Inet::InterfaceId::kMaxIfNameLength];
             interfaceId.GetInterfaceName(interfaceName, sizeof(interfaceName));
 
             // Log only as non-fatal error. Failure to join will mean we reply to unicast queries only.
-            ChipLogError(DeviceLayer, "MDNS failed to join multicast group on %s for address type %s: %s", interfaceName,
-                         AddressTypeStr(addressType), chip::ErrorStr(err));
+            ChipLogError(DeviceLayer, "MDNS failed to join multicast group on %s for address type %s: %" CHIP_ERROR_FORMAT,
+                         interfaceName, AddressTypeStr(addressType), err.Format());
 
             endPointHolder.reset();
         }
@@ -271,6 +254,17 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::EndPointManager<chip::Inet::UDPEndPoin
             mEndpoints.CreateObject(interfaceId, addressType, std::move(endPointHolder));
         }
 #endif
+
+        // If at least one IPv6 interface is used by the mDNS server, notify the application that DNS-SD is ready.
+        if (!mIsInitialized && addressType == chip::Inet::IPAddressType::kIPv6)
+        {
+#if !CHIP_DEVICE_LAYER_NONE
+            chip::DeviceLayer::ChipDeviceEvent event{};
+            event.Type = chip::DeviceLayer::DeviceEventType::kDnssdInitialized;
+            chip::DeviceLayer::PlatformMgr().PostEventOrDie(&event);
+#endif
+            mIsInitialized = true;
+        }
     }
 
     return autoShutdown.ReturnSuccess();
@@ -345,8 +339,9 @@ CHIP_ERROR ServerBase::BroadcastImpl(chip::System::PacketBufferHandle && data, u
     //   - if at least one broadcast succeeds, assume success overall
     //   + some internal consistency validations for state error.
 
-    bool hadSuccesfulSend = false;
-    CHIP_ERROR lastError  = CHIP_ERROR_NO_ENDPOINT;
+    unsigned successes   = 0;
+    unsigned failures    = 0;
+    CHIP_ERROR lastError = CHIP_ERROR_NO_ENDPOINT;
 
     if (chip::Loop::Break == mEndpoints.ForEachActiveObject([&](auto * info) {
             chip::Inet::UDPEndPoint * udp = delegate->Accept(info);
@@ -363,14 +358,20 @@ CHIP_ERROR ServerBase::BroadcastImpl(chip::System::PacketBufferHandle && data, u
             /// for sending via `CloneData`
             ///
             /// TODO: this wastes one copy of the data and that could be optimized away
-            if (info->mAddressType == chip::Inet::IPAddressType::kIPv6)
+            chip::System::PacketBufferHandle tempBuf = data.CloneData();
+            if (tempBuf.IsNull())
             {
-                err = udp->SendTo(mIpv6BroadcastAddress, port, data.CloneData(), udp->GetBoundInterface());
+                // Not enough memory available to clone pbuf
+                err = CHIP_ERROR_NO_MEMORY;
+            }
+            else if (info->mAddressType == chip::Inet::IPAddressType::kIPv6)
+            {
+                err = udp->SendTo(mIpv6BroadcastAddress, port, std::move(tempBuf), udp->GetBoundInterface());
             }
 #if INET_CONFIG_ENABLE_IPV4
             else if (info->mAddressType == chip::Inet::IPAddressType::kIPv4)
             {
-                err = udp->SendTo(mIpv4BroadcastAddress, port, data.CloneData(), udp->GetBoundInterface());
+                err = udp->SendTo(mIpv4BroadcastAddress, port, std::move(tempBuf), udp->GetBoundInterface());
             }
 #endif
             else
@@ -382,10 +383,11 @@ CHIP_ERROR ServerBase::BroadcastImpl(chip::System::PacketBufferHandle && data, u
 
             if (err == CHIP_NO_ERROR)
             {
-                hadSuccesfulSend = true;
+                successes++;
             }
             else
             {
+                failures++;
                 lastError = err;
 #if CHIP_DETAIL_LOGGING
                 char ifaceName[chip::Inet::InterfaceId::kMaxIfNameLength];
@@ -401,7 +403,21 @@ CHIP_ERROR ServerBase::BroadcastImpl(chip::System::PacketBufferHandle && data, u
         return lastError;
     }
 
-    if (!hadSuccesfulSend)
+    if (failures != 0)
+    {
+        // if we had failures, log if the final status was success or failure, to make log reading
+        // easier. Some mDNS failures may be expected (e.g. for interfaces unavailable)
+        if (successes != 0)
+        {
+            ChipLogDetail(Discovery, "mDNS broadcast had only partial success: %u successes and %u failures.", successes, failures);
+        }
+        else
+        {
+            ChipLogProgress(Discovery, "mDNS broadcast full failed in %u separate send attempts.", failures);
+        }
+    }
+
+    if (!successes)
     {
         return lastError;
     }
@@ -427,7 +443,13 @@ void ServerBase::OnUdpPacketReceived(chip::Inet::UDPEndPoint * endPoint, chip::S
 
     if (HeaderRef(const_cast<uint8_t *>(data.Start())).GetFlags().IsQuery())
     {
-        srv->mDelegate->OnQuery(data, info);
+        // Only consider queries that are received on the same interface we are listening on.
+        // Without this, queries show up on all addresses on all interfaces, resulting
+        // in more replies than one would expect.
+        if (endPoint->GetBoundInterface() == info->Interface)
+        {
+            srv->mDelegate->OnQuery(data, info);
+        }
     }
     else
     {

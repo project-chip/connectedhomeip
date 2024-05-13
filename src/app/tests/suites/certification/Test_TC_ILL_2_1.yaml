@@ -14,13 +14,18 @@
 
 name: 69.2.1. [TC-ILL-2.1] Attributes with server as DUT
 
+PICS:
+    - ILL.S
+
 config:
     nodeId: 0x12344321
     cluster: "Illuminance Measurement"
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -28,36 +33,57 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads MinMeasuredValue attribute from DUT"
+    - label:
+          "Step 2: Test Harness Client reads MinMeasuredValue attribute from
+          DUT."
+      PICS: ILL.S.A0001
       command: "readAttribute"
       attribute: "MinMeasuredValue"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 1
               maxValue: 65533
 
-    - label: "TH reads MaxMeasuredValue attribute from DUT"
+    - label:
+          "Step 3: Test Harness Client reads MaxMeasuredValue attribute from
+          DUT."
+      PICS: ILL.S.A0002
       command: "readAttribute"
       attribute: "MaxMeasuredValue"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 2
               maxValue: 65534
 
-    - label: "TH reads Tolerance attribute from DUT"
+    - label:
+          "Step 4: Test Harness Client reads MeasuredValue attribute from DUT."
+      PICS: ILL.S.A0000
+      command: "readAttribute"
+      attribute: "MeasuredValue"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65534
+
+    - label: "Step 5: TH reads the Tolerance attribute from the DUT."
+      PICS: ILL.S.A0003
       command: "readAttribute"
       attribute: "Tolerance"
       response:
           constraints:
-              type: uint16
+              type: int16u
               minValue: 0
               maxValue: 2048
 
-    - label: "TH reads LightSensorType attribute from DUT"
+    - label: "Step 6: TH reads the LightSensorType attribute from the DUT"
+      PICS: ILL.S.A0004
       command: "readAttribute"
       attribute: "LightSensorType"
       response:
           constraints:
               type: enum8
+              minValue: 0
+              maxValue: LightSensorTypeEnum.UnknownEnumValue(254)

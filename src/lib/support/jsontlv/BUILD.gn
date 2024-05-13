@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,12 +13,33 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/jsoncpp.gni")
+
+config("jsontlv_config") {
+}
 
 static_library("jsontlv") {
-  public_deps = [
-    "${chip_root}/src/lib/core",
-    "${chip_root}/third_party/jsoncpp",
+  sources = [
+    "ElementTypes.h",
+    "JsonToTlv.cpp",
+    "TextFormat.cpp",
+    "TlvJson.cpp",
+    "TlvToJson.cpp",
   ]
 
-  sources = [ "TlvJson.cpp" ]
+  public = [
+    "JsonToTlv.h",
+    "TextFormat.h",
+    "TlvJson.h",
+    "TlvToJson.h",
+  ]
+
+  public_configs = [ ":jsontlv_config" ]
+
+  public_deps = [
+    "${chip_root}/src/lib/core",
+    jsoncpp_root,
+  ]
+
+  cflags = [ "-Wconversion" ]
 }

@@ -25,7 +25,7 @@ This application does not have any LED output.
 
 ## Logging Output
 
--   See [View Logging Output](../../platform/qpg/README.md#view-logging-output)
+-   See [View Logging Output](../../platform/qpg/README.md)
 -   At startup you will see:
 
 ```

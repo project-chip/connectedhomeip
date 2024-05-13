@@ -21,11 +21,13 @@
  */
 
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/EventLogging.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/clusters/ota-requestor/ota-requestor-server.h>
 #include <app/util/attribute-storage.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -62,7 +64,7 @@ CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::Read(const ConcreteReadAttribut
 {
     switch (aPath.mAttributeId)
     {
-    case Attributes::DefaultOtaProviders::Id:
+    case Attributes::DefaultOTAProviders::Id:
         return ReadDefaultOtaProviders(aEncoder);
     default:
         break;
@@ -75,7 +77,7 @@ CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::Write(const ConcreteDataAttribu
 {
     switch (aPath.mAttributeId)
     {
-    case Attributes::DefaultOtaProviders::Id: {
+    case Attributes::DefaultOTAProviders::Id: {
         return WriteDefaultOtaProviders(aPath, aDecoder);
     }
     default:
@@ -113,20 +115,24 @@ CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::WriteDefaultOtaProviders(const 
         return CHIP_ERROR_NOT_FOUND;
     }
 
-    switch (aPath.mListOp)
+    if (!aPath.IsListOperation() || aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
     {
-    case ConcreteDataAttributePath::ListOperation::ReplaceAll: {
         DataModel::DecodableList<OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> list;
         ReturnErrorOnFailure(aDecoder.Decode(list));
 
-        // With chunking, a single large list is converted to a list of AttributeDataIBs. The first AttributeDataIB contains an
-        // empty list (to signal this is a replace so clear out contents) followed by a succession of single AttributeDataIBs for
-        // each entry to be added.
-        size_t count = 0;
-        ReturnErrorOnFailure(list.ComputeSize(&count));
-        VerifyOrReturnError(count == 0, CHIP_ERROR_INVALID_ARGUMENT);
-        return requestor->ClearDefaultOtaProviderList(aDecoder.AccessingFabricIndex());
+        ReturnErrorOnFailure(requestor->ClearDefaultOtaProviderList(aDecoder.AccessingFabricIndex()));
+
+        auto iter = list.begin();
+        while (iter.Next())
+        {
+            ReturnErrorOnFailure(requestor->AddDefaultOtaProvider(iter.GetValue()));
+        }
+
+        return iter.GetStatus();
     }
+
+    switch (aPath.mListOp)
+    {
     case ConcreteDataAttributePath::ListOperation::ReplaceItem:
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     case ConcreteDataAttributePath::ListOperation::DeleteItem:
@@ -147,54 +153,54 @@ CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::WriteDefaultOtaProviders(const 
 
 // -----------------------------------------------------------------------------
 // Global functions
-EmberAfStatus OtaRequestorServerSetUpdateState(OTAUpdateStateEnum value)
+Status OtaRequestorServerSetUpdateState(OTAUpdateStateEnum value)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    Status status = Status::Success;
 
     // Find all endpoints that have OtaSoftwareUpdateRequestor implemented
     for (auto endpoint : EnabledEndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id))
     {
         OTAUpdateStateEnum currentValue;
         status = Attributes::UpdateState::Get(endpoint, &currentValue);
-        VerifyOrDie(EMBER_ZCL_STATUS_SUCCESS == status);
+        VerifyOrDie(Status::Success == status);
 
         if (currentValue != value)
         {
             status = Attributes::UpdateState::Set(endpoint, value);
-            VerifyOrDie(EMBER_ZCL_STATUS_SUCCESS == status);
+            VerifyOrDie(Status::Success == status);
         }
     }
 
     return status;
 }
 
-EmberAfStatus OtaRequestorServerGetUpdateState(chip::EndpointId endpointId, OTAUpdateStateEnum & value)
+Status OtaRequestorServerGetUpdateState(chip::EndpointId endpointId, OTAUpdateStateEnum & value)
 {
     return Attributes::UpdateState::Get(endpointId, &value);
 }
 
-EmberAfStatus OtaRequestorServerSetUpdateStateProgress(app::DataModel::Nullable<uint8_t> value)
+Status OtaRequestorServerSetUpdateStateProgress(app::DataModel::Nullable<uint8_t> value)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    Status status = Status::Success;
 
     // Find all endpoints that have OtaSoftwareUpdateRequestor implemented
     for (auto endpoint : EnabledEndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id))
     {
         app::DataModel::Nullable<uint8_t> currentValue;
         status = Attributes::UpdateStateProgress::Get(endpoint, currentValue);
-        VerifyOrDie(EMBER_ZCL_STATUS_SUCCESS == status);
+        VerifyOrDie(Status::Success == status);
 
         if (currentValue != value)
         {
             status = Attributes::UpdateStateProgress::Set(endpoint, value);
-            VerifyOrDie(EMBER_ZCL_STATUS_SUCCESS == status);
+            VerifyOrDie(Status::Success == status);
         }
     }
 
     return status;
 }
 
-EmberAfStatus OtaRequestorServerGetUpdateStateProgress(chip::EndpointId endpointId, DataModel::Nullable<uint8_t> & value)
+Status OtaRequestorServerGetUpdateStateProgress(chip::EndpointId endpointId, DataModel::Nullable<uint8_t> & value)
 {
     return Attributes::UpdateStateProgress::Get(endpointId, value);
 }
@@ -258,9 +264,9 @@ void OtaRequestorServerOnDownloadError(uint32_t softwareVersion, uint64_t bytesD
 // -----------------------------------------------------------------------------
 // Callbacks implementation
 
-bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderCallback(
+bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOTAProviderCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData)
+    const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType & commandData)
 {
     auto & metadataForNode = commandData.metadataForNode;
 
@@ -287,7 +293,7 @@ bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderCallback(
 // -----------------------------------------------------------------------------
 // Plugin initialization
 
-void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback(void)
+void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
 }

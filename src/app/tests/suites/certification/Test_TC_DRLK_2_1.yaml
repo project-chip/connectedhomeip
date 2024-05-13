@@ -1,0 +1,1570 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 116.2.1. [TC-DRLK-2.1] Attributes check [DUT - Server]
+
+PICS:
+    - DRLK.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Door Lock"
+    endpoint: 1
+
+    WaitAfterLockAandUnlockDoor:
+        type: int16u
+        defaultValue: 5000
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Precondition: Create new user"
+      PICS: DRLK.S.F00 && DRLK.S.F07
+      command: "SetUser"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "OperationType"
+                value: 0
+              - name: "UserIndex"
+                value: 1
+              - name: "UserName"
+                value: "xxx"
+              - name: "UserUniqueID"
+                value: 6452
+              - name: "UserStatus"
+                value: 1
+              - name: "UserType"
+                value: 0
+              - name: "CredentialRule"
+                value: 0
+
+    - label: "Precondition: Read the user back and verify its fields"
+      PICS: DRLK.S.F00 && DRLK.S.F07
+      command: "GetUser"
+      arguments:
+          values:
+              - name: "UserIndex"
+                value: 1
+      response:
+          values:
+              - name: "UserIndex"
+                value: 1
+              - name: "UserName"
+                value: "xxx"
+              - name: "UserUniqueID"
+                value: 6452
+              - name: "UserStatus"
+                value: 1
+              - name: "UserType"
+                value: 0
+              - name: "CredentialRule"
+                value: 0
+              - name: "Credentials"
+                value: []
+              - name: "CreatorFabricIndex"
+                value: 1
+              - name: "LastModifiedFabricIndex"
+                value: 1
+              - name: "NextUserIndex"
+                value: null
+
+    - label: "Precondition: Create new PIN credential and lock/unlock user"
+      PICS: DRLK.S.F00 && DRLK.S.F07
+      command: "SetCredential"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "OperationType"
+                value: 0
+              - name: "Credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+              - name: "CredentialData"
+                value: "123456"
+              - name: "UserIndex"
+                value: 1
+              - name: "UserStatus"
+                value: null
+              - name: "UserType"
+                value: null
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "UserIndex"
+                value: null
+              - name: "NextCredentialIndex"
+                value: 2
+
+    - label: "Precondition: Verify created PIN credential"
+      PICS: DRLK.S.F00 && DRLK.S.F07
+      command: "GetCredentialStatus"
+      arguments:
+          values:
+              - name: "Credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+      response:
+          values:
+              - name: "CredentialExists"
+                value: true
+              - name: "UserIndex"
+                value: 1
+              - name: "CreatorFabricIndex"
+                value: 1
+              - name: "LastModifiedFabricIndex"
+                value: 1
+              - name: "NextCredentialIndex"
+                value: null
+
+    - label: "Step 1a: TH reads LockState attribute from DUT"
+      PICS: DRLK.S.A0000
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          saveAs: LockStateValue
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 3
+
+    - label: "Step 1b: TH writes LockState attribute as 1"
+      PICS: DRLK.S.A0000
+      command: "writeAttribute"
+      attribute: "LockState"
+      arguments:
+          value: 1
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 1c: TH reads LockState attribute from DUT"
+      PICS: DRLK.S.A0000
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: LockStateValue
+
+    - label:
+          "Step 1d: TH sends a Lock Door command to the DUT. If DRLK.S.F00(PIN)
+          & DRLK.S.F07(COTA), include a Valid PINCode in the Lock Door command."
+      PICS: DRLK.S.C00.Rsp && DRLK.S.F00 && DRLK.S.F07 && DRLK.S.A0000
+      command: "LockDoor"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "PINCode"
+                value: "123456"
+
+    - label: "Step 1d: TH sends a Lock Door command to the DUT."
+      PICS: DRLK.S.C00.Rsp && !DRLK.S.F00 && !DRLK.S.F07 && DRLK.S.A0000
+      command: "LockDoor"
+      timedInteractionTimeoutMs: 1000
+
+    - label: "Wait after Lock Door"
+      PICS: DRLK.S.C00.Rsp
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: WaitAfterLockAandUnlockDoor
+
+    - label: "Step 1d: TH reads LockState attribute from DUT"
+      PICS: DRLK.S.A0000
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: 1
+
+    - label:
+          "Step 1e: TH sends a Unlock Door command to the DUT. If
+          DRLK.S.F00(PIN) & DRLK.S.F07(COTA), include a Valid PINCode in the
+          Unlock Door command"
+      PICS: DRLK.S.C01.Rsp && !DRLK.S.F00 && !DRLK.S.F07 && DRLK.S.A0000
+      command: "UnlockDoor"
+      timedInteractionTimeoutMs: 1000
+
+    - label: "Step 1e: TH sends a Unlock Door command to the DUT."
+      PICS: DRLK.S.C01.Rsp && DRLK.S.F00 && DRLK.S.F07 && DRLK.S.A0000
+      command: "UnlockDoor"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "PINCode"
+                value: "123456"
+
+    - label: "Wait after Unlock Door"
+      PICS: DRLK.S.C00.Rsp
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: WaitAfterLockAandUnlockDoor
+
+    - label: "Step 1e: TH reads LockState attribute from DUT"
+      PICS: DRLK.S.A0000
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: 2
+
+    - label: "Step 1f: Simulate a not fully locked scenario on the DUT."
+      PICS:
+          DRLK.S.A0000 && DRLK.S.M.SimulateNotFullyLocked &&
+          PICS_SKIP_SAMPLE_APP
+      verification: |
+          vendor will give instructions on how to simulate if applicable and if that is possible, then send the below command to read the lock state attribute.
+
+          ./chip-tool doorlock read lock-state 1 1
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 2a: TH reads LockType attribute from DUT"
+      PICS: DRLK.S.A0001
+      command: "readAttribute"
+      attribute: "LockType"
+      response:
+          saveAs: LockTypeValue
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 11
+
+    - label: "Step 2b: TH writes LockType attribute as 10"
+      PICS: DRLK.S.A0001
+      command: "writeAttribute"
+      attribute: "LockType"
+      arguments:
+          value: 10
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 2c: TH reads LockType attribute from DUT"
+      PICS: DRLK.S.A0001
+      command: "readAttribute"
+      attribute: "LockType"
+      response:
+          value: LockTypeValue
+
+    - label: "Step 3a: TH reads ActuatorEnabled attribute from DUT"
+      PICS: DRLK.S.A0002
+      command: "readAttribute"
+      attribute: "ActuatorEnabled"
+      response:
+          saveAs: ActuatorEnabledValue
+          constraints:
+              type: boolean
+              minValue: 0
+              maxValue: 1
+
+    - label: "Step 3b: TH writes ActuatorEnabled attribute as 0"
+      PICS: DRLK.S.A0002
+      command: "writeAttribute"
+      attribute: "ActuatorEnabled"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 3c: TH reads ActuatorEnabled attribute from DUT"
+      PICS: DRLK.S.A0002
+      command: "readAttribute"
+      attribute: "ActuatorEnabled"
+      response:
+          value: ActuatorEnabledValue
+
+    - label: "Step 4a: TH reads DoorState attribute from DUT"
+      PICS: DRLK.S.F05 && DRLK.S.A0003
+      command: "readAttribute"
+      attribute: "DoorState"
+      response:
+          saveAs: DoorStateValue
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 5
+
+    - label: "Step 4b: TH writes DoorState attribute as 1"
+      PICS: DRLK.S.F05 && DRLK.S.A0003
+      command: "writeAttribute"
+      attribute: "DoorState"
+      arguments:
+          value: 1
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 4c: TH reads DoorState attribute from DUT"
+      PICS: DRLK.S.F05 && DRLK.S.A0003
+      command: "readAttribute"
+      attribute: "DoorState"
+      response:
+          value: DoorStateValue
+
+    - label: "Step 5a: TH reads DoorOpenEvents attribute from DUT"
+      PICS: DRLK.S.F05 && DRLK.S.A0004
+      command: "readAttribute"
+      attribute: "DoorOpenEvents"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0
+              maxValue: 4294967294
+
+    - label: "Step 5b: TH writes DoorOpenEvents attribute as 0"
+      PICS: DRLK.S.A0004
+      command: "writeAttribute"
+      attribute: "DoorOpenEvents"
+      arguments:
+          value: 0
+
+    #- label: "Step 5c: TH reads DoorOpenEvents attribute from DUT"
+    #  PICS: DRLK.S.A0004.Write
+    #  command: "readAttribute"
+    #  attribute: "DoorOpenEvents"
+    #  response:
+    #      value: 10
+
+    #Test plan issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/2863
+    - label: "Step 5c: TH reads DoorOpenEvents attribute from DUT"
+      PICS: DRLK.S.A0004 && PICS_SKIP_SAMPLE_APP
+      verification: |
+          This is an Optional attribute, so its not compulsory to get the expected outcome
+
+          ./chip-tool doorlock read door-open-events 1 1
+
+          Via the TH (chip-tool), verify that the DoorOpenEvents attribute value as 10.
+
+          [1654675019.286903][3337:3342] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1654675019.286939][3337:3342] CHIP:DMG:                                },
+          [1654675019.286974][3337:3342] CHIP:DMG:
+          [1654675019.287003][3337:3342] CHIP:DMG:                        },
+          [1654675019.287039][3337:3342] CHIP:DMG:
+          [1654675019.287067][3337:3342] CHIP:DMG:                },
+          [1654675019.287100][3337:3342] CHIP:DMG:
+          [1654675019.287125][3337:3342] CHIP:DMG:        ],
+          [1654675019.287156][3337:3342] CHIP:DMG:
+          [1654675019.287182][3337:3342] CHIP:DMG:        SuppressResponse = true,
+          [1654675019.287209][3337:3342] CHIP:DMG:        InteractionModelRevision = 1
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 6a: TH reads DoorClosedEvents attribute from DUT"
+      PICS: DRLK.S.F05 && DRLK.S.A0005
+      command: "readAttribute"
+      attribute: "DoorClosedEvents"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0
+              maxValue: 4294967294
+
+    - label: "Step 6b: TH writes DoorClosedEvents attribute as 0"
+      PICS: DRLK.S.A0005
+      command: "writeAttribute"
+      attribute: "DoorClosedEvents"
+      arguments:
+          value: 0
+
+    #- label: "Step 6c: TH reads DoorClosedEvents attribute from DUT"
+    #  PICS: DRLK.S.A0005.Write
+    #  command: "readAttribute"
+    #  attribute: "DoorClosedEvents"
+    #  response:
+    #      value: 11
+
+    #Test plan issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/2863
+    - label: "Step 6c: TH reads DoorOpenEvents attribute from DUT"
+      PICS: DRLK.S.A0005 && PICS_SKIP_SAMPLE_APP
+      verification: |
+          This is an Optional attribute, so its not compulsory to get the expected outcome
+
+          ./chip-tool doorlock read door-closed-events 1 1
+
+          Via the TH (chip-tool), verify that the DoorClosedEvents attribute value as 11.
+
+          [1654675103.637778][3346:3351] CHIP:DMG:                                StatusIB =
+          [1654675103.637816][3346:3351] CHIP:DMG:                                {
+          [1654675103.637853][3346:3351] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1654675103.637886][3346:3351] CHIP:DMG:                                },
+          [1654675103.637923][3346:3351] CHIP:DMG:
+          [1654675103.637956][3346:3351] CHIP:DMG:                        },
+          [1654675103.637994][3346:3351] CHIP:DMG:
+          [1654675103.638021][3346:3351] CHIP:DMG:                },
+          [1654675103.638054][3346:3351] CHIP:DMG:
+          [1654675103.638078][3346:3351] CHIP:DMG:        ],
+          [1654675103.638109][3346:3351] CHIP:DMG:
+          [1654675103.638133][3346:3351] CHIP:DMG:        SuppressResponse = true,
+          [1654675103.638159][3346:3351] CHIP:DMG:        InteractionModelRevision = 1
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 7a: TH reads OpenPeriod attribute from DUT"
+      PICS: DRLK.S.F05 && DRLK.S.A0006
+      command: "readAttribute"
+      attribute: "OpenPeriod"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65534
+
+    - label: "Step 7b: TH writes OpenPeriod attribute as 2 minutes"
+      PICS: DRLK.S.A0006
+      command: "writeAttribute"
+      attribute: "OpenPeriod"
+      arguments:
+          value: 2
+
+    - label: "Step 7c: TH reads OpenPeriod attribute from DUT"
+      PICS: DRLK.S.A0006
+      command: "readAttribute"
+      attribute: "OpenPeriod"
+      response:
+          value: 2
+
+    - label: "Step 8a: TH reads NumberOfTotal UsersSupported attribute from DUT"
+      PICS: DRLK.S.F08 && DRLK.S.A0011
+      command: "readAttribute"
+      attribute: "NumberOfTotalUsersSupported"
+      response:
+          saveAs: NumberOfTotalUsersSupportedValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65534
+
+    - label: "Step 8b: TH writes NumberOfTotal UsersSupported attribute as 20"
+      PICS: DRLK.S.F08 && DRLK.S.A0011
+      command: "writeAttribute"
+      attribute: "NumberOfTotalUsersSupported"
+      arguments:
+          value: 20
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 8c: TH reads NumberOfTotal UsersSupported attribute from DUT"
+      PICS: DRLK.S.F08 && DRLK.S.A0011
+      command: "readAttribute"
+      attribute: "NumberOfTotalUsersSupported"
+      response:
+          value: NumberOfTotalUsersSupportedValue
+
+    - label: "Step 9a: TH reads NumberOfPINUsersSupported attribute from DUT"
+      PICS: DRLK.S.F00 && DRLK.S.A0012
+      command: "readAttribute"
+      attribute: "NumberOfPINUsersSupported"
+      response:
+          saveAs: NumberOfPINUsersSupportedValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65534
+
+    - label: "Step 9b: TH writes NumberOfPINUsersSupported attribute as 25"
+      PICS: DRLK.S.F00 && DRLK.S.A0012
+      command: "writeAttribute"
+      attribute: "NumberOfPINUsersSupported"
+      arguments:
+          value: 25
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 9c: TH reads NumberOfPINUsersSupported attribute from DUT"
+      PICS: DRLK.S.F00 && DRLK.S.A0012
+      command: "readAttribute"
+      attribute: "NumberOfPINUsersSupported"
+      response:
+          value: NumberOfPINUsersSupportedValue
+
+    - label: "Step 10a: TH reads NumberOfRFID UsersSupported attribute from DUT"
+      PICS: DRLK.S.F01 && DRLK.S.A0013
+      command: "readAttribute"
+      attribute: "NumberOfRFIDUsersSupported"
+      response:
+          saveAs: NumberOfRFIDUsersSupportedValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65534
+
+    - label: "Step 10b: TH writes NumberOfRFID UsersSupported attribute as 30"
+      PICS: DRLK.S.F01 && DRLK.S.A0013
+      command: "writeAttribute"
+      attribute: "NumberOfRFIDUsersSupported"
+      arguments:
+          value: 30
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 10c: TH reads NumberOfRFID UsersSupported attribute from DUT"
+      PICS: DRLK.S.F01 && DRLK.S.A0013
+      command: "readAttribute"
+      attribute: "NumberOfRFIDUsersSupported"
+      response:
+          value: NumberOfRFIDUsersSupportedValue
+
+    - label:
+          "Step 11a: TH reads NumberOfWeekDays SchedulesSupporterUser attribute
+          from DUT"
+      PICS: DRLK.S.F04 && DRLK.S.A0014
+      command: "readAttribute"
+      attribute: "NumberOfWeekDaySchedulesSupportedPerUser"
+      response:
+          saveAs: NumberOfWeekDaysSchedulesSupporterUserValue
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 255
+
+    - label:
+          "Step 11b: TH writes NumberOfWeekDaySchedules SupportedPerUser
+          attribute as 31"
+      PICS: DRLK.S.F04 && DRLK.S.A0014
+      command: "writeAttribute"
+      attribute: "NumberOfWeekDaySchedulesSupportedPerUser"
+      arguments:
+          value: 31
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label:
+          "Step 11c: TH reads NumberOfWeekDaySchedules SupportedPerUser
+          attribute from DUT"
+      PICS: DRLK.S.F04 && DRLK.S.A0014
+      command: "readAttribute"
+      attribute: "NumberOfWeekDaySchedulesSupportedPerUser"
+      response:
+          value: NumberOfWeekDaysSchedulesSupporterUserValue
+
+    - label:
+          "Step 12a: TH reads NumberOfYearDay SchedulesSupportedPeruser
+          attribute from DUT"
+      PICS: DRLK.S.F0a && DRLK.S.A0015
+      command: "readAttribute"
+      attribute: "NumberOfYearDaySchedulesSupportedPerUser"
+      response:
+          saveAs: NumberOfYearDaySchedulesSupportedPeruserValue
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 255
+
+    - label:
+          "Step 12b: TH writes NumberOfYearDay SchedulesSupportedPerUser
+          attribute as 35"
+      PICS: DRLK.S.F0a && DRLK.S.A0015
+      command: "writeAttribute"
+      attribute: "NumberOfYearDaySchedulesSupportedPerUser"
+      arguments:
+          value: 35
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label:
+          "Step 12c: TH reads NumberOfYearDay SchedulesSupportedPerUser
+          attribute from DUT"
+      PICS: DRLK.S.F0a && DRLK.S.A0015
+      command: "readAttribute"
+      attribute: "NumberOfYearDaySchedulesSupportedPerUser"
+      response:
+          value: NumberOfYearDaySchedulesSupportedPeruserValue
+
+    - label:
+          "Step 13a: TH reads NumberOfHoliDay SchedulesSupported attribute from
+          DUT"
+      PICS: DRLK.S.F0b && DRLK.S.A0016
+      command: "readAttribute"
+      attribute: "NumberOfHolidaySchedulesSupported"
+      response:
+          saveAs: NumberOfHoliDaySchedulesSupportedValue
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 255
+
+    - label:
+          "Step 13b: TH writes NumberOfHoliday SchedulesSupported attribute as
+          36"
+      PICS: DRLK.S.F0b && DRLK.S.A0016
+      command: "writeAttribute"
+      attribute: "NumberOfHolidaySchedulesSupported"
+      arguments:
+          value: 36
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label:
+          "Step 13c: TH reads NumberOfHoliday SchedulesSupported attribute from
+          DUT"
+      PICS: DRLK.S.F0b && DRLK.S.A0016
+      command: "readAttribute"
+      attribute: "NumberOfHolidaySchedulesSupported"
+      response:
+          value: NumberOfHoliDaySchedulesSupportedValue
+
+    - label: "Step 14a: TH reads MaxPINCodeLength attribute from DUT"
+      PICS: DRLK.S.F00 && DRLK.S.A0017
+      command: "readAttribute"
+      attribute: "MaxPINCodeLength"
+      response:
+          saveAs: MaxPINCodeLengthValue
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 255
+
+    - label: "Step 14b: TH writes MaxPINCodeLength attribute as 85"
+      PICS: DRLK.S.F00 && DRLK.S.A0017
+      command: "writeAttribute"
+      attribute: "MaxPINCodeLength"
+      arguments:
+          value: 85
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 14c: TH reads MaxPINCodeLength attribute from DUT"
+      PICS: DRLK.S.F00 && DRLK.S.A0017
+      command: "readAttribute"
+      attribute: "MaxPINCodeLength"
+      response:
+          value: MaxPINCodeLengthValue
+
+    - label: "Step 15a: TH reads MinPINCodeLength attribute from DUT"
+      PICS: DRLK.S.F00 && DRLK.S.A0018
+      command: "readAttribute"
+      attribute: "MinPINCodeLength"
+      response:
+          saveAs: MinPINCodeLengthValue
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 255
+
+    - label: "Step 15b: TH writes MinPINCodeLength attribute as 63"
+      PICS: DRLK.S.F00 && DRLK.S.A0018
+      command: "writeAttribute"
+      attribute: "MinPINCodeLength"
+      arguments:
+          value: 63
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 15c: TH reads MinPINCodeLength attribute from DUT"
+      PICS: DRLK.S.F00 && DRLK.S.A0018
+      command: "readAttribute"
+      attribute: "MinPINCodeLength"
+      response:
+          value: MinPINCodeLengthValue
+
+    - label: "Step 16a: TH reads MaxRFIDCodeLength attribute from DUT"
+      PICS: DRLK.S.F01 && DRLK.S.A0019
+      command: "readAttribute"
+      attribute: "MaxRFIDCodeLength"
+      response:
+          saveAs: MaxRFIDCodeLengthValue
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 255
+
+    - label: "Step 16b: TH writes MaxRFIDCodeLength attribute as 46"
+      PICS: DRLK.S.F01 && DRLK.S.A0019
+      command: "writeAttribute"
+      attribute: "MaxRFIDCodeLength"
+      arguments:
+          value: 46
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 16c: TH reads MaxRFIDCodeLength attribute from DUT"
+      PICS: DRLK.S.F01 && DRLK.S.A0019
+      command: "readAttribute"
+      attribute: "MaxRFIDCodeLength"
+      response:
+          value: MaxRFIDCodeLengthValue
+
+    - label: "Step 17a: TH reads MinRFIDCodeLength attribute from DUT"
+      PICS: DRLK.S.F01 && DRLK.S.A001a
+      command: "readAttribute"
+      attribute: "MinRFIDCodeLength"
+      response:
+          saveAs: MinRFIDCodeLengthValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 255
+
+    - label: "Step 17b: TH writes MinRFIDCodeLength attribute as 17"
+      PICS: DRLK.S.F01 && DRLK.S.A001a
+      command: "writeAttribute"
+      attribute: "MinRFIDCodeLength"
+      arguments:
+          value: 17
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 17c: TH reads MinRFIDCodeLength attribute from DUT"
+      PICS: DRLK.S.F01 && DRLK.S.A001a
+      command: "readAttribute"
+      attribute: "MinRFIDCodeLength"
+      response:
+          value: MinRFIDCodeLengthValue
+
+    - label: "Step 18a: TH reads Credential RulesSupport attribute from DUT"
+      PICS: DRLK.S.F08 && DRLK.S.A001b
+      command: "readAttribute"
+      attribute: "CredentialRulesSupport"
+      response:
+          saveAs: CredentialRulesSupportValue
+          constraints:
+              type: bitmap8
+              minValue: 0
+              maxValue: 2
+
+    - label:
+          "Step 18b: TH writes Credential RulesSupport attribute as bit 0 is set
+          to 1"
+      PICS: DRLK.S.F08 && DRLK.S.A001b
+      command: "writeAttribute"
+      attribute: "CredentialRulesSupport"
+      arguments:
+          value: 1
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 18c: TH reads Credential RulesSupport attribute from DUT"
+      PICS: DRLK.S.F08 && DRLK.S.A001b
+      command: "readAttribute"
+      attribute: "CredentialRulesSupport"
+      response:
+          value: CredentialRulesSupportValue
+
+    - label:
+          "Step 19a: TH reads Language attribute from DUT TH saves the values as
+          Current_Language Code"
+      PICS: DRLK.S.A0021
+      command: "readAttribute"
+      attribute: "Language"
+      response:
+          saveAs: Current_Language_Code
+          constraints:
+              type: char_string
+              maxLength: 3
+
+    - label: "Step 19b: TH writes Language attribute as fr"
+      PICS: DRLK.S.A0021 && DRLK.S.M.LanguageAttributeWritable
+      command: "writeAttribute"
+      attribute: "Language"
+      arguments:
+          value: "fr"
+
+    - label: "Step 19b: TH writes Language attribute as fr"
+      PICS: DRLK.S.A0021 && !DRLK.S.M.LanguageAttributeWritable
+      command: "writeAttribute"
+      attribute: "Language"
+      arguments:
+          value: "fr"
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 19c: TH reads Language attribute from DUT"
+      PICS: DRLK.S.A0021 && DRLK.S.M.LanguageAttributeWritable
+      command: "readAttribute"
+      attribute: "Language"
+      response:
+          value: "fr"
+
+    - label: "Step 19c: TH reads Language attribute from DUT"
+      PICS: DRLK.S.A0021 && !DRLK.S.M.LanguageAttributeWritable
+      command: "readAttribute"
+      attribute: "Language"
+      response:
+          value: Current_Language_Code
+
+    - label:
+          "Step 20a: TH reads LEDSettings attribute from DUT TH saves the values
+          as Current_LEDSettings value"
+      PICS: DRLK.S.A0022
+      command: "readAttribute"
+      attribute: "LEDSettings"
+      response:
+          saveAs: Current_LEDSettings
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 2
+
+    - label: "Step 20b: TH writes LEDSettings attribute as 2"
+      PICS: DRLK.S.M.LEDSettingsAttributeWritable && DRLK.S.A0022
+      command: "writeAttribute"
+      attribute: "LEDSettings"
+      arguments:
+          value: 2
+
+    - label: "Step 20b: TH writes LEDSettings attribute as 2"
+      PICS: " !DRLK.S.M.LEDSettingsAttributeWritable && DRLK.S.A0022 "
+      command: "writeAttribute"
+      attribute: "LEDSettings"
+      arguments:
+          value: 2
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 20c: TH reads LEDSettings attribute from DUT"
+      PICS: DRLK.S.M.LEDSettingsAttributeWritable && DRLK.S.A0022
+      command: "readAttribute"
+      attribute: "LEDSettings"
+      response:
+          value: 2
+
+    - label: "Step 20c: TH reads LEDSettings attribute from DUT"
+      PICS: " !DRLK.S.M.LEDSettingsAttributeWritable && DRLK.S.A0022 "
+      command: "readAttribute"
+      attribute: "LEDSettings"
+      response:
+          value: Current_LEDSettings
+
+    - label:
+          "Step 21a: TH reads AutoRelockTime attribute from DUT TH saves the
+          values as Current_AutoRelockTime"
+      PICS: DRLK.S.A0023
+      command: "readAttribute"
+      attribute: "AutoRelockTime"
+      response:
+          saveAs: Current_AutoRelockTime
+          constraints:
+              type: int32u
+              minValue: 0
+              maxValue: 4294967294
+
+    - label: "Step 21b: TH writes AutoRelockTime attribute as 180 seconds"
+      PICS: DRLK.S.M.AutoRelockTimeAttributeWritable && DRLK.S.A0023
+      command: "writeAttribute"
+      attribute: "AutoRelockTime"
+      arguments:
+          value: 180
+
+    - label: "Step 21b: TH writes AutoRelockTime attribute as 180 seconds"
+      PICS: " !DRLK.S.M.AutoRelockTimeAttributeWritable && DRLK.S.A0023 "
+      command: "writeAttribute"
+      attribute: "AutoRelockTime"
+      arguments:
+          value: 180
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 21c: TH reads AutoRelockTime attribute from DUT"
+      PICS: DRLK.S.M.AutoRelockTimeAttributeWritable && DRLK.S.A0023
+      command: "readAttribute"
+      attribute: "AutoRelockTime"
+      response:
+          value: 180
+
+    - label: "Step 21c: TH reads AutoRelockTime attribute from DUT"
+      PICS: " !DRLK.S.M.AutoRelockTimeAttributeWritable && DRLK.S.A0023 "
+      command: "readAttribute"
+      attribute: "AutoRelockTime"
+      response:
+          value: Current_AutoRelockTime
+
+    - label:
+          "Step 22a: TH reads SoundVolume attribute from DUT TH saves the values
+          as Current_SoundVolume value"
+      PICS: DRLK.S.A0024
+      command: "readAttribute"
+      attribute: "SoundVolume"
+      response:
+          saveAs: Current_SoundVolume
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 3
+
+    - label: "Step 22b: TH writes SoundVolume attribute as 3"
+      PICS: DRLK.S.M.SoundVolumeAttributeWritable && DRLK.S.A0024
+      command: "writeAttribute"
+      attribute: "SoundVolume"
+      arguments:
+          value: 3
+
+    - label: "Step 22b: TH writes SoundVolume attribute as 3"
+      PICS: " !DRLK.S.M.SoundVolumeAttributeWritable && DRLK.S.A0024 "
+      command: "writeAttribute"
+      attribute: "SoundVolume"
+      arguments:
+          value: 3
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 22c: TH reads SoundVolume attribute from DUT"
+      PICS: DRLK.S.M.SoundVolumeAttributeWritable && DRLK.S.A0024
+      command: "readAttribute"
+      attribute: "SoundVolume"
+      response:
+          value: 3
+
+    - label: "Step 22c: TH reads SoundVolume attribute from DUT"
+      PICS: " !DRLK.S.M.SoundVolumeAttributeWritable && DRLK.S.A0024 "
+      command: "readAttribute"
+      attribute: "SoundVolume"
+      response:
+          value: Current_SoundVolume
+
+    - label: "Step 23a: TH reads Supported OperatingModes attribute from DUT"
+      PICS: DRLK.S.A0026
+      command: "readAttribute"
+      attribute: "SupportedOperatingModes"
+      response:
+          saveAs: Current_Supported
+          constraints:
+              type: enum16
+              anyOf:
+                  [
+                      0xFFF6,
+                      0xFFF4,
+                      0xFFF2,
+                      0xFFF0,
+                      0xFFE6,
+                      0xFFE4,
+                      0xFFE2,
+                      0xFFE0,
+                  ]
+
+    - label:
+          "Step 23b: TH writes Supported OperatingModes attribute as bit 0 is
+          set to 0"
+      PICS: DRLK.S.A0026
+      command: "writeAttribute"
+      attribute: "SupportedOperatingModes"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 23c: TH reads Supported OperatingModes attribute from DUT"
+      PICS: DRLK.S.A0026
+      command: "readAttribute"
+      attribute: "SupportedOperatingModes"
+      response:
+          value: Current_Supported
+
+    - label:
+          "Step 24a: TH reads OperatingMode attribute from DUT TH saves the
+          values as Current_OperatingMode value"
+      PICS: DRLK.S.A0025
+      command: "readAttribute"
+      attribute: "OperatingMode"
+      response:
+          saveAs: Current_OperatingMode
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 4
+
+    - label:
+          "Step 24b: TH writes OperatingMode attribute to a value as Normal and
+          the new value is present in SupportedOperatingModes"
+      PICS: DRLK.S.M.OperatingModeAttributeWritable && DRLK.S.A0025
+      command: "writeAttribute"
+      attribute: "OperatingMode"
+      arguments:
+          value: 0
+
+    - label:
+          "Step 24b: TH writes OperatingMode attribute to a value as Normal and
+          the new value is present in SupportedOperatingModes"
+      PICS: " !DRLK.S.M.OperatingModeAttributeWritable && DRLK.S.A0025 "
+      command: "writeAttribute"
+      attribute: "OperatingMode"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label:
+          "Step 24c: TH writes OperatingMode attribute to a value as
+          NoRemoteLockUnlock and the new value is present in Supported
+          OperatingModes"
+      PICS: DRLK.S.M.OperatingModeAttributeWritable && DRLK.S.A0025
+      command: "writeAttribute"
+      attribute: "OperatingMode"
+      arguments:
+          value: 3
+
+    - label:
+          "Step 24c: TH writes OperatingMode attribute to a value as
+          NoRemoteLockUnlock and the new value is present in Supported
+          OperatingModes"
+      PICS: " !DRLK.S.M.OperatingModeAttributeWritable && DRLK.S.A0025 "
+      command: "writeAttribute"
+      attribute: "OperatingMode"
+      arguments:
+          value: 3
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 24d: TH reads OperatingMode attribute from DUT"
+      PICS: DRLK.S.M.OperatingModeAttributeWritable && DRLK.S.A0025
+      command: "readAttribute"
+      attribute: "OperatingMode"
+      response:
+          constraints:
+              anyOf: [0, 3]
+
+    - label: "Step 24d: TH reads OperatingMode attribute from DUT"
+      PICS: " !DRLK.S.M.OperatingModeAttributeWritable && DRLK.S.A0025 "
+      command: "readAttribute"
+      attribute: "OperatingMode"
+      response:
+          value: Current_OperatingMode
+
+    - label:
+          "Step 25a: TH reads Default ConfigurationRegister attribute from DUT"
+      PICS: DRLK.S.A0027
+      command: "readAttribute"
+      attribute: "DefaultConfigurationRegister"
+      response:
+          saveAs: ConfigurationRegisterValue
+          constraints:
+              type: bitmap16
+              minValue: 0
+              maxValue: 7
+
+    - label:
+          "Step 25b: TH writes Default ConfigurationRegister attribute as bit 0
+          is set to 1"
+      PICS: DRLK.S.A0027
+      command: "writeAttribute"
+      attribute: "DefaultConfigurationRegister"
+      arguments:
+          value: 1
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label:
+          "Step 25c: TH reads Default ConfigurationRegister attribute from DUT"
+      PICS: DRLK.S.A0027
+      command: "readAttribute"
+      attribute: "DefaultConfigurationRegister"
+      response:
+          value: ConfigurationRegisterValue
+
+    - label:
+          "Step 26a: TH reads EnableLocalProgramming attribute from DUT TH saves
+          the values as Current_EnableLocal Programming value"
+      PICS: DRLK.S.A0028
+      command: "readAttribute"
+      attribute: "EnableLocalProgramming"
+      response:
+          saveAs: Current_EnableLocal_Programming
+          constraints:
+              type: boolean
+
+    - label: "Step 26b: TH writes EnableLocalProgramming attribute as false"
+      PICS: DRLK.S.M.EnableLocalProgrammingAttributeWritable && DRLK.S.A0028
+      command: "writeAttribute"
+      attribute: "EnableLocalProgramming"
+      arguments:
+          value: 0
+
+    - label: "Step 26b: TH writes EnableLocalProgramming attribute as false"
+      PICS:
+          " !DRLK.S.M.EnableLocalProgrammingAttributeWritable && DRLK.S.A0028 "
+      command: "writeAttribute"
+      attribute: "EnableLocalProgramming"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 26c: TH reads EnableLocalProgramming attribute from DUT"
+      PICS: DRLK.S.M.EnableLocalProgrammingAttributeWritable && DRLK.S.A0028
+      command: "readAttribute"
+      attribute: "EnableLocalProgramming"
+      response:
+          value: 0
+
+    - label: "Step 26c: TH reads EnableLocalProgramming attribute from DUT"
+      PICS:
+          " !DRLK.S.M.EnableLocalProgrammingAttributeWritable && DRLK.S.A0028 "
+      command: "readAttribute"
+      attribute: "EnableLocalProgramming"
+      response:
+          value: Current_EnableLocal_Programming
+
+    - label: "Step 27a: TH reads EnableOneTouchLocking attribute from DUT"
+      PICS: DRLK.S.A0029
+      command: "readAttribute"
+      attribute: "EnableOneTouchLocking"
+      response:
+          constraints:
+              type: boolean
+
+    - label: "Step 27b: TH writes EnableOneTouchLocking attribute as true"
+      PICS: DRLK.S.A0029
+      command: "writeAttribute"
+      attribute: "EnableOneTouchLocking"
+      arguments:
+          value: 1
+
+    - label: "Step 27c: TH reads EnableOneTouchLocking attribute from DUT"
+      PICS: DRLK.S.A0029
+      command: "readAttribute"
+      attribute: "EnableOneTouchLocking"
+      response:
+          value: 1
+
+    - label: "Step 28a: TH reads EnableInside StatusLED attribute from DUT"
+      PICS: DRLK.S.A002a
+      command: "readAttribute"
+      attribute: "EnableInsideStatusLED"
+      response:
+          constraints:
+              type: boolean
+
+    - label: "Step 28b: TH writes EnableInsideStatusLED attribute as true"
+      PICS: DRLK.S.A002a
+      command: "writeAttribute"
+      attribute: "EnableInsideStatusLED"
+      arguments:
+          value: 1
+
+    - label: "Step 28c: TH reads EnableInsideStatusLED attribute from DUT"
+      PICS: DRLK.S.A002a
+      command: "readAttribute"
+      attribute: "EnableInsideStatusLED"
+      response:
+          value: 1
+
+    - label: "Step 29a: TH reads EnablePrivacyModeButton attribute from DUT"
+      PICS: DRLK.S.A002b
+      command: "readAttribute"
+      attribute: "EnablePrivacyModeButton"
+      response:
+          constraints:
+              type: boolean
+
+    - label: "Step 29b: TH writes EnablePrivacy ModeButton attribute as true"
+      PICS: DRLK.S.A002b
+      command: "writeAttribute"
+      attribute: "EnablePrivacyModeButton"
+      arguments:
+          value: 1
+
+    - label: "Step 29c: TH reads EnablePrivacyModeButton attribute from DUT"
+      PICS: DRLK.S.A002b
+      command: "readAttribute"
+      attribute: "EnablePrivacyModeButton"
+      response:
+          value: 1
+
+    - label:
+          "Step 30a: TH reads LocalProgrammingFeatures attribute from DUT TH
+          saves the values as Current_LocalProgramming Features value"
+      PICS: DRLK.S.A002c
+      command: "readAttribute"
+      attribute: "LocalProgrammingFeatures"
+      response:
+          saveAs: Current_LocalProgramming_Features
+          constraints:
+              type: bitmap8
+              minValue: 0
+              maxValue: 3
+
+    - label:
+          "Step 30b: TH reads LocalProgrammingFeatures attribute from DUT.
+          DRLK.S.A0028(EnableLocalProgramming) is True."
+      PICS: DRLK.S.A002c && DRLK.S.A0028
+      command: "readAttribute"
+      attribute: "LocalProgrammingFeatures"
+      response:
+          constraints:
+              type: bitmap8
+              hasMasksSet: [0x1, 0x2, 0x4, 0x8]
+
+    - label:
+          "Step 30b: TH reads LocalProgrammingFeatures attribute from DUT.
+          DRLK.S.A0028(EnableLocalProgramming) is False."
+      PICS: DRLK.S.A002c && !DRLK.S.A0028
+      command: "readAttribute"
+      attribute: "LocalProgrammingFeatures"
+      response:
+          constraints:
+              type: bitmap8
+              hasMasksClear: [0x1, 0x2, 0x4, 0x8]
+
+    - label:
+          "Step 30c: TH writes to LocalProgrammingFeatures to disable all the
+          features (Change all bits to 0)"
+      PICS: DRLK.S.M.LocalProgrammingFeaturesAttributeWritable && DRLK.S.A0028
+      command: "writeAttribute"
+      attribute: "LocalProgrammingFeatures"
+      arguments:
+          value: 0
+
+    - label:
+          "Step 30c: TH reads LocalProgrammingFeatures attribute from DUT.
+          DRLK.S.A0028(EnableLocalProgramming) is False."
+      PICS: DRLK.S.M.EnableLocalProgrammingAttributeWritable && DRLK.S.A0028
+      command: "readAttribute"
+      attribute: "LocalProgrammingFeatures"
+      response:
+          constraints:
+              type: bitmap8
+              hasMasksClear: [0x1, 0x2, 0x4, 0x8]
+
+    - label: "Step 30d: TH sets the EnableLocalProgramming attribute to False"
+      PICS: DRLK.S.M.EnableLocalProgrammingAttributeWritable && DRLK.S.A002c
+      command: "writeAttribute"
+      attribute: "EnableLocalProgramming"
+      arguments:
+          value: false
+
+    - label:
+          "Step 30d: Verify that all the 4 bits in the LocalProgrammingFeatures
+          is set to 0."
+      PICS: DRLK.S.M.EnableLocalProgrammingAttributeWritable && DRLK.S.A002c
+      command: "readAttribute"
+      attribute: "LocalProgrammingFeatures"
+      response:
+          constraints:
+              type: bitmap8
+              hasMasksClear: [0x1, 0x2, 0x4, 0x8]
+
+    - label: "Step 30e: TH sets the EnableLocalProgramming attribute to True"
+      PICS: DRLK.S.M.EnableLocalProgrammingAttributeWritable && DRLK.S.A002c
+      command: "writeAttribute"
+      attribute: "EnableLocalProgramming"
+      arguments:
+          value: true
+
+    - label:
+          "Step 30e: Verify that all the 4 bits in the LocalProgrammingFeatures
+          is set to 1."
+      PICS: DRLK.S.M.EnableLocalProgrammingAttributeWritable && DRLK.S.A002c
+      command: "readAttribute"
+      attribute: "LocalProgrammingFeatures"
+      response:
+          constraints:
+              type: bitmap8
+              hasMasksSet: [0x1, 0x2, 0x4, 0x8]
+
+    - label:
+          "Step 30f: TH sends a write message to change any one of the bits of
+          the LocalProgrammingFeatures."
+      PICS: DRLK.S.A002c && DRLK.S.M.LocalProgrammingFeaturesAttributeWritable
+      command: "writeAttribute"
+      attribute: "LocalProgrammingFeatures"
+      arguments:
+          value: 2
+
+    - label:
+          "Step 30f: Verify that the correct bit has been changed by doing a
+          Read on LocalProgrammingFeatures attribute.."
+      PICS: DRLK.S.M.LocalProgrammingFeaturesAttributeWritable
+      command: "readAttribute"
+      attribute: "LocalProgrammingFeatures"
+      response:
+          constraints:
+              type: bitmap8
+              hasMasksSet: [0x2]
+
+    - label:
+          "Step 30g: TH sends a write message to change any one of the bits of
+          the LocalProgrammingFeatures."
+      PICS: DRLK.S.A002c
+      command: "writeAttribute"
+      attribute: "LocalProgrammingFeatures"
+      arguments:
+          value: 2
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label:
+          "Step 31a: TH reads WrongCodeEntry Limit attribute from DUT TH saves
+          the values as Current_WrongCode EntryLimit value"
+      PICS: ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0030
+      command: "readAttribute"
+      attribute: "WrongCodeEntryLimit"
+      response:
+          saveAs: Current_WrongCode_EntryLimit
+          constraints:
+              type: int8u
+              minValue: 1
+              maxValue: 255
+
+    - label: "Step 31b: TH writes WrongCodeEntryLimit attribute as 8"
+      PICS:
+          " ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0030 &&
+          DRLK.S.M.WrongCodeEntryLimitAttributeWritable "
+      command: "writeAttribute"
+      attribute: "WrongCodeEntryLimit"
+      arguments:
+          value: 8
+
+    - label: "Step 31b: TH writes WrongCodeEntryLimit attribute as 8"
+      PICS:
+          " ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0030 &&
+          !DRLK.S.M.WrongCodeEntryLimitAttributeWritable "
+      command: "writeAttribute"
+      attribute: "WrongCodeEntryLimit"
+      arguments:
+          value: 8
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 31c: TH reads WrongCode EntryLimit attribute"
+      PICS:
+          " ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0030 &&
+          DRLK.S.M.WrongCodeEntryLimitAttributeWritable "
+      command: "readAttribute"
+      attribute: "WrongCodeEntryLimit"
+      response:
+          value: 8
+
+    - label: "Step 31c: TH reads WrongCode EntryLimit attribute"
+      PICS:
+          " ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0030 &&
+          !DRLK.S.M.WrongCodeEntryLimitAttributeWritable "
+      command: "readAttribute"
+      attribute: "WrongCodeEntryLimit"
+      response:
+          value: Current_WrongCode_EntryLimit
+
+    - label:
+          "Step 32a: TH reads UserCodeTemporary DisableTime attribute from DUT
+          TH saves the values as Current_UserCode TemporaryDisableTime"
+      PICS: ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0031
+      command: "readAttribute"
+      attribute: "UserCodeTemporaryDisableTime"
+      response:
+          saveAs: Current_UserCode_TemporaryDisableTime
+          constraints:
+              type: int8u
+              minValue: 1
+              maxValue: 255
+
+    - label: "Step 32b: TH writes UserCodeTemporaryDisableTime attribute as 120"
+      PICS:
+          " ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0031 &&
+          DRLK.S.M.UserCodedTemporaryDisableTimeAttributeWritable "
+      command: "writeAttribute"
+      attribute: "UserCodeTemporaryDisableTime"
+      arguments:
+          value: 120
+
+    - label: "Step 32b: TH writes UserCodeTemporaryDisableTime attribute as 120"
+      PICS:
+          " ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0031 &&
+          !DRLK.S.M.UserCodedTemporaryDisableTimeAttributeWritable "
+      command: "writeAttribute"
+      attribute: "UserCodeTemporaryDisableTime"
+      arguments:
+          value: 120
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 32c: TH reads UserCodeTemporary DisableTime attribute"
+      PICS:
+          " ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0031 &&
+          DRLK.S.M.UserCodedTemporaryDisableTimeAttributeWritable "
+      command: "readAttribute"
+      attribute: "UserCodeTemporaryDisableTime"
+      response:
+          value: 120
+
+    - label: "Step 32c: TH reads UserCodeTemporary DisableTime attribute"
+      PICS:
+          " ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0031 &&
+          !DRLK.S.M.UserCodedTemporaryDisableTimeAttributeWritable "
+      command: "readAttribute"
+      attribute: "UserCodeTemporaryDisableTime"
+      response:
+          value: Current_UserCode_TemporaryDisableTime
+
+    - label:
+          "Step 33a: TH reads RequirePINfor RemoteOperation attribute from DUT"
+      PICS: DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033
+      command: "readAttribute"
+      attribute: "RequirePINforRemoteOperation"
+      response:
+          saveAs: Current_RequirePINFor_RemoteOperation
+          constraints:
+              type: boolean
+
+    - label:
+          "Step 33b: TH writes RequirePINfor RemoteOperation attribute as true"
+      PICS:
+          DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033 &&
+          DRLK.S.M.RequirePINForRemoteOperationAttributeWritable
+      command: "writeAttribute"
+      attribute: "RequirePINforRemoteOperation"
+      arguments:
+          value: 1
+
+    - label:
+          "Step 33b: TH writes RequirePINfor RemoteOperation attribute as true"
+      PICS:
+          " DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033 &&
+          !DRLK.S.M.RequirePINForRemoteOperationAttributeWritable "
+      command: "writeAttribute"
+      attribute: "RequirePINforRemoteOperation"
+      arguments:
+          value: 1
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 33c: TH reads RequirePINfor RemoteOperation attribute"
+      PICS:
+          DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033 &&
+          DRLK.S.M.RequirePINForRemoteOperationAttributeWritable
+      command: "readAttribute"
+      attribute: "RequirePINforRemoteOperation"
+      response:
+          value: 1
+
+    - label: "Step 33c: TH reads RequirePINfor RemoteOperation attribute"
+      PICS:
+          " DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033 &&
+          !DRLK.S.M.RequirePINForRemoteOperationAttributeWritable "
+      command: "readAttribute"
+      attribute: "RequirePINforRemoteOperation"
+      response:
+          value: Current_RequirePINFor_RemoteOperation
+
+    - label:
+          "Step 34a: TH reads ExpiringUserTimeOut attribute from DUT TH saves
+          the values as Current_ExpiringUserTimeOut"
+      PICS: DRLK.S.F08 && DRLK.S.A0035
+      command: "readAttribute"
+      attribute: "ExpiringUserTimeout"
+      response:
+          saveAs: Current_ExpiringUserTimeOut
+          constraints:
+              type: int16u
+              minValue: 1
+              maxValue: 2880
+
+    - label: "Step 34b: TH writes ExpiringUserTimeout attribute as 10 minutes"
+      PICS:
+          DRLK.S.F08 && DRLK.S.A0035 &&
+          DRLK.S.M.ExpiringUserTimeOutAttributeWritable
+      command: "writeAttribute"
+      attribute: "ExpiringUserTimeout"
+      arguments:
+          value: 10
+
+    - label: "Step 34b: TH writes ExpiringUserTimeout attribute as 10 minutes"
+      PICS:
+          DRLK.S.F08 && !DRLK.S.M.ExpiringUserTimeOutAttributeWritable &&
+          DRLK.S.A0035
+      command: "writeAttribute"
+      attribute: "ExpiringUserTimeout"
+      arguments:
+          value: 10
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 34c: TH reads ExpiringUserTimeout attribute"
+      PICS:
+          DRLK.S.F08 && DRLK.S.A0035 &&
+          DRLK.S.M.ExpiringUserTimeOutAttributeWritable
+      command: "readAttribute"
+      attribute: "ExpiringUserTimeout"
+      response:
+          value: 10
+
+    - label: "Step 34c: TH reads ExpiringUserTimeout attribute"
+      PICS:
+          " DRLK.S.F08 && DRLK.S.A0035 &&
+          !DRLK.S.M.ExpiringUserTimeOutAttributeWritable "
+      command: "readAttribute"
+      attribute: "ExpiringUserTimeout"
+      response:
+          value: Current_ExpiringUserTimeOut
+
+    - label:
+          "Step 35a: TH reads NumberOfCredentials SupportedPerUser attribute
+          from DUT"
+      PICS: DRLK.S.F08 && DRLK.S.A001c
+      command: "readAttribute"
+      attribute: "NumberOfCredentialsSupportedPerUser"
+      response:
+          saveAs: NumberOfCredentialsSupportedPerUserValue
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 255
+
+    - label:
+          "Step 35b: TH writes NumberOfCredentials SupportedPerUser attribute as
+          85"
+      PICS: DRLK.S.F08 && DRLK.S.A001c
+      command: "writeAttribute"
+      attribute: "NumberOfCredentialsSupportedPerUser"
+      arguments:
+          value: 85
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label:
+          "Step 35c: TH reads NumberOfCredentials SupportedPerUser attribute
+          from DUT"
+      PICS: DRLK.S.F08 && DRLK.S.A001c
+      command: "readAttribute"
+      attribute: "NumberOfCredentialsSupportedPerUser"
+      response:
+          value: NumberOfCredentialsSupportedPerUserValue
+
+    - label: "Cleanup the created user"
+      PICS: DRLK.S.F00 && DRLK.S.F07
+      command: "ClearUser"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "UserIndex"
+                value: 1
+
+    - label: "Clean the created credential"
+      PICS: DRLK.S.F00 && DRLK.S.F07 && DRLK.S.C26.Rsp
+      command: "ClearCredential"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "Credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }

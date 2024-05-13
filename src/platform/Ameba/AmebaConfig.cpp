@@ -21,6 +21,8 @@
 
 #include <core/CHIPEncoding.h>
 #include <platform/Ameba/AmebaConfig.h>
+#include <platform/Ameba/AmebaUtils.h>
+#include <platform/Ameba/KeyValueStoreManagerImpl.h>
 #include <support/CHIPMem.h>
 #include <support/CHIPMemString.h>
 #include <support/CodeUtils.h>
@@ -34,6 +36,8 @@ enum
     kPrefsTypeBuffer  = 4,
     kPrefsTypeBinary  = 5
 };
+
+using namespace chip::DeviceLayer::PersistedStorage;
 
 namespace chip {
 namespace DeviceLayer {
@@ -62,21 +66,18 @@ const AmebaConfig::Key AmebaConfig::kConfigKey_Spake2pVerifier       = { kConfig
 const AmebaConfig::Key AmebaConfig::kConfigKey_UniqueId              = { kConfigNamespace_ChipFactory, "uniqueId" };
 
 // Keys stored in the chip-config namespace
-const AmebaConfig::Key AmebaConfig::kConfigKey_FabricId                    = { kConfigNamespace_ChipConfig, "fabric-id" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_ServiceConfig               = { kConfigNamespace_ChipConfig, "service-config" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_PairedAccountId             = { kConfigNamespace_ChipConfig, "account-id" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_ServiceId                   = { kConfigNamespace_ChipConfig, "service-id" };
-const AmebaConfig::Key AmebaConfig::kConfigKey_GroupKeyIndex               = { kConfigNamespace_ChipConfig, "group-key-index" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_LastUsedEpochKeyId          = { kConfigNamespace_ChipConfig, "last-ek-id" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_FailSafeArmed               = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
-const AmebaConfig::Key AmebaConfig::kConfigKey_WiFiStationSecType          = { kConfigNamespace_ChipConfig, "sta-sec-type" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_OperationalDeviceId         = { kConfigNamespace_ChipConfig, "op-device-id" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_OperationalDeviceCert       = { kConfigNamespace_ChipConfig, "op-device-cert" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_OperationalDeviceICACerts   = { kConfigNamespace_ChipConfig, "op-device-ca-certs" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_OperationalDevicePrivateKey = { kConfigNamespace_ChipConfig, "op-device-key" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_RegulatoryLocation          = { kConfigNamespace_ChipConfig, "regulatory-location" };
+const AmebaConfig::Key AmebaConfig::kConfigKey_LocationCapability          = { kConfigNamespace_ChipConfig, "location-capability" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_CountryCode                 = { kConfigNamespace_ChipConfig, "country-code" };
-const AmebaConfig::Key AmebaConfig::kConfigKey_Breadcrumb                  = { kConfigNamespace_ChipConfig, "breadcrumb" };
 
 // Keys stored in the Chip-counters namespace
 const AmebaConfig::Key AmebaConfig::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };
@@ -86,133 +87,213 @@ const AmebaConfig::Key AmebaConfig::kCounterKey_BootReason            = { kConfi
 
 CHIP_ERROR AmebaConfig::ReadConfigValue(Key key, bool & val)
 {
-    uint32_t intVal;
-    int32_t success = 0;
+    CHIP_ERROR err;
+    int32_t error;
+    uint8_t intVal;
 
-    success = getPref_bool_new(key.Namespace, key.Name, &intVal);
-    if (!success)
-        ChipLogProgress(DeviceLayer, "getPref_u32_new: %s/%s failed\n", key.Namespace, key.Name);
+    error = getPref_bool_new(key.Namespace, key.Name, &intVal);
+    err   = AmebaUtils::MapError(error, AmebaErrorType::kDctError);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogProgress(DeviceLayer, "getPref_bool_new: %s/%s failed\n", StringOrNullMarker(key.Namespace),
+                        StringOrNullMarker(key.Name));
+    }
 
     val = (intVal != 0);
-
-    if (success == 1)
-        return CHIP_NO_ERROR;
-    else
-        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    return err;
 }
 
 CHIP_ERROR AmebaConfig::ReadConfigValue(Key key, uint32_t & val)
 {
-    int32_t success = 0;
+    CHIP_ERROR err;
+    int32_t error;
 
-    success = getPref_u32_new(key.Namespace, key.Name, &val);
-    if (!success)
-        ChipLogProgress(DeviceLayer, "getPref_u32_new: %s/%s failed\n", key.Namespace, key.Name);
+    error = getPref_u32_new(key.Namespace, key.Name, &val);
+    err   = AmebaUtils::MapError(error, AmebaErrorType::kDctError);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogProgress(DeviceLayer, "getPref_u32_new: %s/%s failed\n", StringOrNullMarker(key.Namespace),
+                        StringOrNullMarker(key.Name));
+    }
 
-    if (success == 1)
-        return CHIP_NO_ERROR;
-    else
-        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    return err;
 }
 
 CHIP_ERROR AmebaConfig::ReadConfigValue(Key key, uint64_t & val)
 {
-    int32_t success = 0;
+    CHIP_ERROR err;
+    int32_t error;
 
-    success = getPref_u64_new(key.Namespace, key.Name, &val);
-    if (!success)
-        ChipLogProgress(DeviceLayer, "getPref_u32_new: %s/%s failed\n", key.Namespace, key.Name);
+    error = getPref_u64_new(key.Namespace, key.Name, &val);
+    err   = AmebaUtils::MapError(error, AmebaErrorType::kDctError);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogProgress(DeviceLayer, "getPref_u64: %s/%s failed\n", StringOrNullMarker(key.Namespace),
+                        StringOrNullMarker(key.Name));
+    }
 
-    if (success == 1)
-        return CHIP_NO_ERROR;
-    else
-        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    return err;
 }
 
 CHIP_ERROR AmebaConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
-    int32_t success = 0;
+    CHIP_ERROR err;
+    int32_t error;
 
-    success = getPref_str_new(key.Namespace, key.Name, buf, bufSize, &outLen);
-    if (!success)
-        ChipLogProgress(DeviceLayer, "getPref_str_new: %s/%s failed\n", key.Namespace, key.Name);
-
-    if (success == 1)
+    error = getPref_str_new(key.Namespace, key.Name, buf, bufSize, &outLen);
+    err   = AmebaUtils::MapError(error, AmebaErrorType::kDctError);
+    outLen -= 1; // Don't count trailing null
+    if (err != CHIP_NO_ERROR)
     {
-        return CHIP_NO_ERROR;
-    }
-    else
-    {
+        ChipLogProgress(DeviceLayer, "getPref_str_new: %s/%s failed\n", StringOrNullMarker(key.Namespace),
+                        StringOrNullMarker(key.Name));
         outLen = 0;
-        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
+
+    return err;
 }
 
 CHIP_ERROR AmebaConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
-    int32_t success = 0;
+    CHIP_ERROR err;
+    int32_t error;
 
-    success = getPref_bin_new(key.Namespace, key.Name, buf, bufSize, &outLen);
-    if (!success)
-        ChipLogProgress(DeviceLayer, "getPref_bin_new: %s/%s failed\n", key.Namespace, key.Name);
-
-    if (success == 1)
+    error = getPref_bin_new(key.Namespace, key.Name, buf, bufSize, &outLen);
+    err   = AmebaUtils::MapError(error, AmebaErrorType::kDctError);
+    if (err != CHIP_NO_ERROR)
     {
-        return CHIP_NO_ERROR;
-    }
-    else
-    {
+        ChipLogProgress(DeviceLayer, "getPref_bin_new: %s/%s failed\n", StringOrNullMarker(key.Namespace),
+                        StringOrNullMarker(key.Name));
         outLen = 0;
-        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
+
+    return err;
 }
 
 CHIP_ERROR AmebaConfig::WriteConfigValue(Key key, bool val)
 {
-    int32_t success;
+    CHIP_ERROR err;
+    int32_t error;
     uint8_t value;
 
     if (val == 1)
         value = 1;
     else
         value = 0;
-    success = setPref_new(key.Namespace, key.Name, &value, 1);
-    if (!success)
-        ChipLogError(DeviceLayer, "setPref: %s/%s = %s failed\n", key.Namespace, key.Name, value ? "true" : "false");
 
-    return CHIP_NO_ERROR;
+    if (checkExist(key.Name, key.Name))
+    {
+        err = ClearConfigValue(key);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Warning, KVS leakage, failed to remove old KVS value");
+        }
+    }
+
+    error = setPref_new(key.Namespace, key.Name, &value, 1);
+    err   = AmebaUtils::MapError(error, AmebaErrorType::kDctError);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "setPref: %s/%s = %s failed\n", StringOrNullMarker(key.Namespace), StringOrNullMarker(key.Name),
+                     value ? "true" : "false");
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %s", StringOrNullMarker(key.Namespace), StringOrNullMarker(key.Name),
+                        val ? "true" : "false");
+    }
+
+    return err;
 }
 
 CHIP_ERROR AmebaConfig::WriteConfigValue(Key key, uint32_t val)
 {
-    int32_t success;
+    CHIP_ERROR err;
+    int32_t error;
 
-    success = setPref_new(key.Namespace, key.Name, (uint8_t *) &val, sizeof(uint32_t));
-    if (!success)
-        ChipLogError(DeviceLayer, "setPref: %s/%s = %d(0x%x) failed\n", key.Namespace, key.Name, val, val);
+    if (checkExist(key.Name, key.Name))
+    {
+        err = ClearConfigValue(key);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Warning, KVS leakage, failed to remove old KVS value");
+        }
+    }
 
-    return CHIP_NO_ERROR;
+    error = setPref_new(key.Namespace, key.Name, (uint8_t *) &val, sizeof(uint32_t));
+    err   = AmebaUtils::MapError(error, AmebaErrorType::kDctError);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "setPref: %s/%s = %d(0x%x) failed\n", StringOrNullMarker(key.Namespace),
+                     StringOrNullMarker(key.Name), val, val);
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %" PRIu32 " (0x%" PRIX32 ")", StringOrNullMarker(key.Namespace),
+                        StringOrNullMarker(key.Name), val, val);
+    }
+
+    return err;
 }
 
 CHIP_ERROR AmebaConfig::WriteConfigValue(Key key, uint64_t val)
 {
-    int32_t success;
+    CHIP_ERROR err;
+    int32_t error;
 
-    success = setPref_new(key.Namespace, key.Name, (uint8_t *) &val, sizeof(uint64_t));
-    if (!success)
-        ChipLogError(DeviceLayer, "setPref: %s/%s = %d(0x%x) failed\n", key.Namespace, key.Name, val, val);
+    if (checkExist(key.Name, key.Name))
+    {
+        err = ClearConfigValue(key);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Warning, KVS leakage, failed to remove old KVS value");
+        }
+    }
 
-    return CHIP_NO_ERROR;
+    error = setPref_new(key.Namespace, key.Name, (uint8_t *) &val, sizeof(uint64_t));
+    err   = AmebaUtils::MapError(error, AmebaErrorType::kDctError);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "setPref: %s/%s = %d(0x%x) failed\n", StringOrNullMarker(key.Namespace),
+                     StringOrNullMarker(key.Name), val, val);
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %" PRIu64 " (0x%" PRIX64 ")", StringOrNullMarker(key.Namespace),
+                        StringOrNullMarker(key.Name), val, val);
+    }
+
+    return err;
 }
 
 CHIP_ERROR AmebaConfig::WriteConfigValueStr(Key key, const char * str)
 {
-    int32_t success;
+    CHIP_ERROR err;
+    int32_t error;
 
-    success = setPref_new(key.Namespace, key.Name, (uint8_t *) str, strlen(str) + 1);
-    if (!success)
-        ChipLogError(DeviceLayer, "setPref: %s/%s = %s failed\n", key.Namespace, key.Name, str);
-    return CHIP_NO_ERROR;
+    if (checkExist(key.Name, key.Name))
+    {
+        err = ClearConfigValue(key);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Warning, KVS leakage, failed to remove old KVS value");
+        }
+    }
+
+    error = setPref_new(key.Namespace, key.Name, (uint8_t *) str, strlen(str) + 1);
+    err   = AmebaUtils::MapError(error, AmebaErrorType::kDctError);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "setPref: %s/%s = %s failed\n", StringOrNullMarker(key.Namespace), StringOrNullMarker(key.Name),
+                     StringOrNullMarker(str));
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "NVS set: %s/%s = \"%s\"", StringOrNullMarker(key.Namespace), StringOrNullMarker(key.Name),
+                        StringOrNullMarker(str));
+    }
+
+    return err;
 }
 
 CHIP_ERROR AmebaConfig::WriteConfigValueStr(Key key, const char * str, size_t strLen)
@@ -224,7 +305,7 @@ CHIP_ERROR AmebaConfig::WriteConfigValueStr(Key key, const char * str, size_t st
     {
         strCopy.Calloc(strLen + 1);
         VerifyOrExit(strCopy, err = CHIP_ERROR_NO_MEMORY);
-        strncpy(strCopy.Get(), str, strLen);
+        Platform::CopyString(strCopy.Get(), strLen + 1, str);
     }
     err = AmebaConfig::WriteConfigValueStr(key, strCopy.Get());
 exit:
@@ -233,24 +314,51 @@ exit:
 
 CHIP_ERROR AmebaConfig::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
-    int32_t success;
+    CHIP_ERROR err;
+    int32_t error;
 
-    success = setPref_new(key.Namespace, key.Name, (uint8_t *) data, dataLen);
-    if (!success)
-        ChipLogError(DeviceLayer, "setPref: %s/%s failed\n", key.Namespace, key.Name);
+    if (checkExist(key.Name, key.Name))
+    {
+        err = ClearConfigValue(key);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Warning, KVS leakage, failed to remove old KVS value");
+        }
+    }
 
-    return CHIP_NO_ERROR;
+    error = setPref_new(key.Namespace, key.Name, (uint8_t *) data, dataLen);
+    err   = AmebaUtils::MapError(error, AmebaErrorType::kDctError);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "setPref: %s/%s failed\n", StringOrNullMarker(key.Namespace), StringOrNullMarker(key.Name));
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "NVS set: %s/%s = (blob length %" PRId32 ")", StringOrNullMarker(key.Namespace),
+                        StringOrNullMarker(key.Name), dataLen);
+    }
+
+    return err;
 }
 
 CHIP_ERROR AmebaConfig::ClearConfigValue(Key key)
 {
-    int32_t success;
+    CHIP_ERROR err;
+    int32_t error;
 
-    success = deleteKey(key.Namespace, key.Name);
-    if (!success)
-        ChipLogProgress(DeviceLayer, "%s : %s/%s failed\n", __FUNCTION__, key.Namespace, key.Name);
+    error = deleteKey(key.Namespace, key.Name);
+    err   = AmebaUtils::MapError(error, AmebaErrorType::kDctError);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogProgress(DeviceLayer, "%s : %s/%s failed\n", __FUNCTION__, StringOrNullMarker(key.Namespace),
+                        StringOrNullMarker(key.Name));
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "NVS erase: %s/%s", StringOrNullMarker(key.Namespace), StringOrNullMarker(key.Name));
+    }
 
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 bool AmebaConfig::ConfigValueExists(Key key)
@@ -258,30 +366,52 @@ bool AmebaConfig::ConfigValueExists(Key key)
     return checkExist(key.Namespace, key.Name);
 }
 
-CHIP_ERROR AmebaConfig::EnsureNamespace(const char * ns)
+CHIP_ERROR AmebaConfig::InitNamespace()
 {
-    int32_t success = -1;
+    CHIP_ERROR err;
+    int32_t error;
 
-    success = registerPref(ns);
-    if (success != 0)
+    error = registerPref();
+    err   = AmebaUtils::MapError(error, AmebaErrorType::kDctError);
+    if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "dct_register_module failed\n");
+        ChipLogError(DeviceLayer, "DCT modules registration failed");
+        goto exit;
     }
 
-    return CHIP_NO_ERROR;
+    error = registerPref2();
+    err   = AmebaUtils::MapError(error, AmebaErrorType::kDctError);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "DCT2 modules registration failed");
+    }
+
+exit:
+    return err;
 }
 
-CHIP_ERROR AmebaConfig::ClearNamespace(const char * ns)
+CHIP_ERROR AmebaConfig::ClearNamespace()
 {
-    int32_t success = -1;
+    CHIP_ERROR err;
+    int32_t error;
 
-    success = clearPref(ns);
-    if (success != 0)
+    error = clearPref();
+    err   = AmebaUtils::MapError(error, AmebaErrorType::kDctError);
+    if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "ClearNamespace failed\n");
+        ChipLogError(DeviceLayer, "DCT modules unregistration failed\n");
+        goto exit;
     }
 
-    return CHIP_NO_ERROR;
+    error = clearPref2();
+    err   = AmebaUtils::MapError(error, AmebaErrorType::kDctError);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "DCT2 modules unregistration failed\n");
+    }
+
+exit:
+    return err;
 }
 
 void AmebaConfig::RunConfigUnitTest() {}

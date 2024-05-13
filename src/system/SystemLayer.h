@@ -43,7 +43,9 @@
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
 #include <dispatch/dispatch.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+#elif CHIP_SYSTEM_CONFIG_USE_LIBEV
+#include <ev.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH/LIBEV
 
 #include <utility>
 
@@ -58,7 +60,7 @@ using TimerCompleteCallback = void (*)(Layer * aLayer, void * appState);
  *
  * The abstract class hierarchy is:
  * - Layer: Core timer methods.
- *   - LayerLwIP: Adds methods specific to CHIP_SYSTEM_CONFIG_USING_LWIP.
+ *   - LayerFreeRTOS: Adds methods specific to CHIP_SYSTEM_CONFIG_USING_LWIP and CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT.
  *   - LayerSockets: Adds I/O event methods specific to CHIP_SYSTEM_CONFIG_USING_SOCKETS.
  *     - LayerSocketsLoop: Adds methods for event-loop-based implementations.
  *
@@ -86,7 +88,7 @@ public:
      * Some other layers hold pointers to System::Layer, so care must be taken
      * to ensure that they are not used after calling Shutdown().
      */
-    virtual CHIP_ERROR Shutdown() = 0;
+    virtual void Shutdown() = 0;
 
     /**
      * True if this Layer is initialized. No method on Layer or its abstract descendants, other than this and `Init()`,
@@ -96,7 +98,8 @@ public:
 
     /**
      * @brief
-     *   This method starts a one-shot timer.
+     *   This method starts a one-shot timer.  This method must be called while in the Matter context (from
+     *   the Matter event loop, or while holding the Matter stack lock).
      *
      *   @note
      *       Only a single timer is allowed to be started with the same @a aComplete and @a aAppState
@@ -115,12 +118,60 @@ public:
 
     /**
      * @brief
-     *   This method cancels a one-shot timer, started earlier through @p StartTimer().
+     *   This method extends the timer expiry to the provided aDelay. This method must be called while in the Matter context
+     *   (from the Matter event loop, or while holding the Matter stack lock).
+     *   aDelay is not added to the Remaining time of the timer. The finish line is pushed back to aDelay.
+     *
+     *   @note The goal of this method is that the timer remaining time cannot be shrunk and only extended to a new time
+     *         If the provided new Delay is smaller than the timer's remaining time, the timer is left untouched.
+     *         In the other case the method acts like StartTimer
+     *
+     *   @param[in]  aDelay             Time before this timer fires.
+     *   @param[in]  aComplete          A pointer to the function called when timer expires.
+     *   @param[in]  aAppState          A pointer to the application state object used when timer expires.
+     *
+     *   @return CHIP_NO_ERROR On success.
+     *   @return CHIP_ERROR_INVALID_ARGUMENT If the provided aDelay value is 0
+     *   @return CHIP_ERROR_NO_MEMORY If a timer cannot be allocated.
+     *   @return Other Value indicating timer failed to start.
+     */
+    virtual CHIP_ERROR ExtendTimerTo(Clock::Timeout aDelay, TimerCompleteCallback aComplete, void * aAppState) = 0;
+
+    /**
+     * @brief
+     *   This method searches for the timer matching the provided parameters.
+     *   and returns whether it is still "running" and waiting to trigger or not.
+     *
+     *   @note This is used to verify by how long the ExtendTimer method extends the timer, as it may ignore an extension request
+     *        if it is shorter than the current timer's remaining time.
+     *
+     *   @param[in]  onComplete         A pointer to the function called when timer expires.
+     *   @param[in]  appState           A pointer to the application state object used when timer expires.
+     *
+     *   @return True if there is a current timer set to call, at some point in the future, the provided onComplete callback
+     *           with the corresponding appState context. False otherwise.
+     */
+    virtual bool IsTimerActive(TimerCompleteCallback onComplete, void * appState) = 0;
+
+    /**
+     * @brief
+     *   This method searches for the timer matching the provided parameters
+     *   and returns the remaining time left before it expires.
+     *   @param[in]  onComplete         A pointer to the function called when timer expires.
+     *   @param[in]  appState           A pointer to the application state object used when timer expires.
+     *
+     *  @return The remaining time left before the timer expires.
+     */
+    virtual Clock::Timeout GetRemainingTime(TimerCompleteCallback onComplete, void * appState) = 0;
+
+    /**
+     * @brief This method cancels a one-shot timer, started earlier through @p StartTimer().  This method must
+     *        be called while in the Matter context (from the Matter event loop, or while holding the Matter
+     *        stack lock).
      *
      *   @note
-     *       The cancellation could fail silently in two different ways. If the timer specified by the combination of the callback
-     *       function and application state object couldn't be found, cancellation could fail. If the timer has fired, but not yet
-     *       removed from memory, cancellation could also fail.
+     *       The cancellation could fail silently if the timer specified by the combination of the callback
+     *       function and application state object couldn't be found.
      *
      *   @param[in]  aOnComplete   A pointer to the callback function used in calling @p StartTimer().
      *   @param[in]  aAppState     A pointer to the application state object used in calling @p StartTimer().
@@ -130,7 +181,9 @@ public:
 
     /**
      * @brief
-     *   Schedules a function with a signature identical to `OnCompleteFunct` to be run as soon as possible in the CHIP context.
+     *   Schedules a function with a signature identical to `OnCompleteFunct` to be run as soon as possible in the Matter context.
+     *   This must only be called when already in the Matter context (from the Matter event loop, or while holding the Matter
+     *   stack lock).
      *
      * @param[in] aComplete     A pointer to a callback function to be called when this timer fires.
      * @param[in] aAppState     A pointer to an application state object to be passed to the callback function as argument.
@@ -168,13 +221,13 @@ public:
 
 private:
     // Copy and assignment NOT DEFINED
-    Layer(const Layer &) = delete;
+    Layer(const Layer &)             = delete;
     Layer & operator=(const Layer &) = delete;
 };
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
-class LayerLwIP : public Layer
+class LayerFreeRTOS : public Layer
 {
 };
 
@@ -247,7 +300,10 @@ public:
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     virtual void SetDispatchQueue(dispatch_queue_t dispatchQueue) = 0;
     virtual dispatch_queue_t GetDispatchQueue()                   = 0;
-#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+#elif CHIP_SYSTEM_CONFIG_USE_LIBEV
+    virtual void SetLibEvLoop(struct ev_loop * aLibEvLoopP) = 0;
+    virtual struct ev_loop * GetLibEvLoop()                 = 0;
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH/LIBEV
 };
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS

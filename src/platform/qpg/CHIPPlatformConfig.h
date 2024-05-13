@@ -36,7 +36,6 @@
 #define CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH 2
 
 #define CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY 0x01
-#define CHIP_CONFIG_PERSISTED_STORAGE_KEY_GLOBAL_MESSAGE_COUNTER 0x2
 
 // ==================== Security Adaptations ====================
 
@@ -61,6 +60,10 @@
 #ifndef CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS
 #define CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS 1
 #endif // CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS
+
+#ifndef CHIP_CONFIG_MAX_FABRICS
+#define CHIP_CONFIG_MAX_FABRICS 5
+#endif // CHIP_CONFIG_MAX_FABRICS
 
 // ==================== Security Configuration Overrides ====================
 

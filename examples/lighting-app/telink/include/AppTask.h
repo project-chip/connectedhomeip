@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,47 +18,45 @@
 
 #pragma once
 
-#include "AppEvent.h"
-#include "LightingManager.h"
+#include "AppTaskCommon.h"
 
-#include <platform/CHIPDeviceLayer.h>
-
-#include <cstdint>
-
-struct k_timer;
-
-class AppTask
+class AppTask : public AppTaskCommon
 {
 public:
-    CHIP_ERROR StartApp();
+    enum Fixture_Action : uint8_t
+    {
+        ON_ACTION = 0,
+        OFF_ACTION,
+        LEVEL_ACTION,
+        COLOR_ACTION_XY,
+        COLOR_ACTION_HSV,
+        COLOR_ACTION_CT,
 
-    void PostLightingActionRequest(LightingManager::Action_t aAction);
-    void PostEvent(AppEvent * event);
-    void UpdateClusterState();
+        INVALID_ACTION
+    };
+
+#ifdef CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET
+    void PowerOnFactoryReset(void);
+#endif /* CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET */
+
+    bool IsTurnedOn() const;
+    void SetInitiateAction(Fixture_Action aAction, int32_t aActor, uint8_t * value);
+    void UpdateClusterState(void);
 
 private:
     friend AppTask & GetAppTask(void);
+    friend class AppTaskCommon;
 
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(void);
 
-    static void ActionInitiated(LightingManager::Action_t aAction, int32_t aActor);
-    static void ActionCompleted(LightingManager::Action_t aAction, int32_t aActor);
-
-    void DispatchEvent(AppEvent * event);
-
-    static void LightingActionButtonEventHandler(void);
-    static void FactoryResetButtonEventHandler(void);
-    static void StartThreadButtonEventHandler(void);
-    static void StartBleAdvButtonEventHandler(void);
-
-    static void FactoryResetHandler(AppEvent * aEvent);
-    static void StartThreadHandler(AppEvent * aEvent);
     static void LightingActionEventHandler(AppEvent * aEvent);
-    static void StartBleAdvHandler(AppEvent * aEvent);
+#ifdef CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET
+    static void PowerOnFactoryResetEventHandler(AppEvent * aEvent);
+    static void PowerOnFactoryResetTimerEvent(struct k_timer * dummy);
 
-    static void InitButtons(void);
-
-    static void ThreadProvisioningHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+    static unsigned int sPowerOnFactoryResetTimerCnt;
+    static k_timer sPowerOnFactoryResetTimer;
+#endif /* CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET */
 
     static AppTask sAppTask;
 };

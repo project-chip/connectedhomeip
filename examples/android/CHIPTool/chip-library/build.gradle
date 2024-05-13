@@ -1,0 +1,50 @@
+plugins {
+    id 'com.android.library'
+}
+
+apply from: "../../../../third_party/android_deps/android_deps.gradle"
+
+android {
+    compileSdkVersion 31
+
+    defaultConfig {
+        minSdkVersion 24
+        targetSdkVersion 30
+        versionCode 1
+        versionName "1.0"
+
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    sourceSets {
+        main {
+            java.srcDirs = [
+                    '../../../setup_payload/java/src',
+                    '../../../controller/java/zap-generated',
+                    '../../../controller/java/src',
+                    '../../../platform/android/java',
+                    '../app/src/main/java/com/google/chip/chiptool'
+            ]
+        }
+    }
+}
+
+dependencies {
+    // Dependencies for CHIP Java code are defined centrally in
+    // android_deps.gradle. Copy deps from that file into our implementation
+    // config, instead of maintaining two separate lists of dependencies.
+    configurations.chipDeps.dependencies.each {
+        project.dependencies.add("implementation", "${it.group}:${it.name}:${it.version}")
+    }
+}

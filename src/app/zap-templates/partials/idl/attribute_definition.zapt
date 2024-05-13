@@ -1,0 +1,37 @@
+{{#if mustUseTimedWrite~}}
+    timedwrite {{!marker to place a space even with whitespace removal~}}
+{{~/if~}}
+{{~#unless isWritableAttribute~}}
+  readonly {{!marker to place a space even with whitespace removal~}}
+{{~/unless~}}
+{{~!TODO: write only attributes should also be supported~}}
+{{~#unless isReportableAttribute~}}
+  nosubscribe {{!marker to place a space even with whitespace removal~}}
+{{~/unless~}}
+{{~!Removes spaces~}} attribute {{!ensure space}}
+  {{~#chip_access_elements entity="attribute"~}}
+    {{~#first~}}access({{~/first~}}
+    {{~#not_first~}}, {{/not_first~}}
+      {{operation}}: {{role}}
+    {{~#last}}) {{/last~}}
+  {{~/chip_access_elements~}}
+  {{#if isOptional~}}
+    optional {{!marker to place a space even with whitespace removal~}}
+  {{~/if~}}
+  {{~#if isNullable~}}
+    nullable {{!marker to place a space even with whitespace removal~}}
+  {{~/if~}} {{type}}
+  {{~#unless isArray~}}
+    {{~#if (isString type)~}}
+      {{~#if maxLength~}}
+        <{{maxLength}}>
+      {{~/if~}}
+    {{~/if~}}
+  {{/unless}} {{asLowerCamelCase name~}}
+  {{~#if isArray~}} [] {{~/if}} = {{!}}
+     {{~#if manufacturerCode}}
+        {{~asMEI manufacturerCode code~}}
+     {{else}}
+        {{~code~}}
+     {{/if~}}
+  ;

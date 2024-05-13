@@ -13,9 +13,16 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import filecmp
+import logging
+import os
+import subprocess
 import sys
 import threading
 from xmlrpc.server import SimpleXMLRPCServer
+
+_DEFAULT_CHIP_ROOT = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 
 IP = '127.0.0.1'
 PORT = 9000
@@ -48,6 +55,9 @@ class AppsRegister:
     def removeAll(self):
         self.__accessories = {}
 
+    def get(self, name):
+        return self.__accessories[name]
+
     def kill(self, name):
         accessory = self.__accessories[name]
         if accessory:
@@ -57,10 +67,13 @@ class AppsRegister:
         for accessory in self.__accessories.values():
             accessory.kill()
 
-    def start(self, name, discriminator):
+    def start(self, name, args):
         accessory = self.__accessories[name]
         if accessory:
-            return accessory.start(discriminator)
+            # The args param comes directly from the sys.argv[2:] of Start.py and should contain a list of strings in
+            # key-value pair, e.g. [option1, value1, option2, value2, ...]
+            options = self.__createCommandLineOptions(args)
+            return accessory.start(options)
         return False
 
     def stop(self, name):
@@ -69,10 +82,10 @@ class AppsRegister:
             return accessory.stop()
         return False
 
-    def reboot(self, name, discriminator):
+    def reboot(self, name):
         accessory = self.__accessories[name]
         if accessory:
-            return accessory.stop() and accessory.start(discriminator)
+            return accessory.stop() and accessory.start()
         return False
 
     def factoryResetAll(self):
@@ -85,17 +98,43 @@ class AppsRegister:
             return accessory.factoryReset()
         return False
 
-    def waitForCommissionableAdvertisement(self, name):
+    def waitForMessage(self, name, message, timeoutInSeconds=10):
         accessory = self.__accessories[name]
         if accessory:
-            return accessory.waitForCommissionableAdvertisement()
+            # The message param comes directly from the sys.argv[2:] of WaitForMessage.py and should contain a list of strings that
+            # comprise the entire message to wait for
+            return accessory.waitForMessage(' '.join(message), timeoutInSeconds)
         return False
 
-    def waitForOperationalAdvertisement(self, name):
-        accessory = self.__accessories[name]
-        if accessory:
-            return accessory.waitForOperationalAdvertisement()
-        return False
+    def createOtaImage(self, otaImageFilePath, rawImageFilePath, rawImageContent, vid='0xDEAD', pid='0xBEEF'):
+        # Write the raw image content
+        with open(rawImageFilePath, 'w') as rawFile:
+            rawFile.write(rawImageContent)
+
+        # Add an OTA header to the raw file
+        otaImageTool = _DEFAULT_CHIP_ROOT + '/src/app/ota_image_tool.py'
+        cmd = [otaImageTool, 'create', '-v', vid, '-p', pid, '-vn', '2',
+               '-vs', "2.0", '-da', 'sha256', rawImageFilePath, otaImageFilePath]
+        s = subprocess.Popen(cmd)
+        s.wait()
+        if s.returncode != 0:
+            raise Exception('Cannot create OTA image file')
+        return True
+
+    def compareFiles(self, file1, file2):
+        if filecmp.cmp(file1, file2, shallow=False) is False:
+            raise Exception('Files %s and %s do not match' % (file1, file2))
+        return True
+
+    def createFile(self, filePath, fileContent):
+        with open(filePath, 'w') as rawFile:
+            rawFile.write(fileContent)
+        return True
+
+    def deleteFile(self, filePath):
+        if os.path.exists(filePath):
+            os.remove(filePath)
+        return True
 
     def __startXMLRPCServer(self):
         self.server = SimpleXMLRPCServer((IP, PORT))
@@ -104,15 +143,27 @@ class AppsRegister:
         self.server.register_function(self.stop, 'stop')
         self.server.register_function(self.reboot, 'reboot')
         self.server.register_function(self.factoryReset, 'factoryReset')
-        self.server.register_function(
-            self.waitForCommissionableAdvertisement,
-            'waitForCommissionableAdvertisement')
-        self.server.register_function(
-            self.waitForOperationalAdvertisement,
-            'waitForOperationalAdvertisement')
+        self.server.register_function(self.waitForMessage, 'waitForMessage')
+        self.server.register_function(self.compareFiles, 'compareFiles')
+        self.server.register_function(self.createOtaImage, 'createOtaImage')
+        self.server.register_function(self.createFile, 'createFile')
+        self.server.register_function(self.deleteFile, 'deleteFile')
 
         self.server_thread = threading.Thread(target=self.server.serve_forever)
         self.server_thread.start()
 
     def __stopXMLRPCServer(self):
         self.server.shutdown()
+
+    def __createCommandLineOptions(self, args):
+        if not args:
+            return {}
+
+        # args should contain a list of strings in key-value pair, e.g. [option1, value1, option2, value2, ...]
+        if (len(args) % 2) != 0:
+            logging.warning("Unexpected command line options %r - not key/value pairs (odd length)" % (args,))
+            return {}
+
+        # Create a dictionary from the key-value pair list
+        options = {args[i]: args[i+1] for i in range(0, len(args), 2)}
+        return options

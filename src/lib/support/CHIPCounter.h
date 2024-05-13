@@ -37,6 +37,7 @@ namespace chip {
  *   An interface for managing a counter as an integer value.
  */
 
+template <typename T>
 class Counter
 {
 public:
@@ -44,20 +45,27 @@ public:
     virtual ~Counter() {}
 
     /**
-     *  @brief
-     *  Advance the value of the counter.
+     *  @brief Advance the value of the counter.
      *
      *  @return A CHIP error code if anything failed, CHIP_NO_ERROR otherwise.
      */
     virtual CHIP_ERROR Advance() = 0;
 
     /**
-     *  @brief
-     *  Get the current value of the counter.
+     * @brief Advances the current counter value by N
+     *
+     * @param value value of N
+     *
+     * @return A CHIP error code if anything failed, CHIP_NO_ERROR otherwise.
+     */
+    virtual CHIP_ERROR AdvanceBy(T value) = 0;
+
+    /**
+     *  @brief Get the current value of the counter.
      *
      *  @return The current value of the counter.
      */
-    virtual uint32_t GetValue() = 0;
+    virtual T GetValue() = 0;
 };
 
 /**
@@ -67,40 +75,65 @@ public:
  *   A class for managing a monotonically-increasing counter as an integer value.
  */
 
-class MonotonicallyIncreasingCounter : public Counter
+template <typename T>
+class MonotonicallyIncreasingCounter : public Counter<T>
 {
 public:
-    MonotonicallyIncreasingCounter();
-    ~MonotonicallyIncreasingCounter() override;
+    MonotonicallyIncreasingCounter() : mCounterValue(0) {}
+    ~MonotonicallyIncreasingCounter() override{};
 
     /**
-     *  @brief
-     *    Initialize a MonotonicallyIncreasingCounter object.
+     *  @brief Initialize a MonotonicallyIncreasingCounter object.
      *
      *  @param[in] aStartValue  The starting value of the counter.
      *
      *  @return A CHIP error code if something fails, CHIP_NO_ERROR otherwise
      */
-    CHIP_ERROR Init(uint32_t aStartValue);
+    CHIP_ERROR Init(T aStartValue)
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        mCounterValue = aStartValue;
+
+        return err;
+    }
 
     /**
-     *  @brief
-     *  Advance the value of the counter.
+     *  @brief Advance the value of the counter.
      *
      *  @return A CHIP error code if something fails, CHIP_NO_ERROR otherwise
      */
-    CHIP_ERROR Advance() override;
+    CHIP_ERROR Advance() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        mCounterValue++;
+
+        return err;
+    }
 
     /**
-     *  @brief
-     *  Get the current value of the counter.
+     * @brief Advances the current counter value by N
+     *
+     * @param value value of N
+     *
+     * @return A CHIP error code if something fails, CHIP_NO_ERROR otherwise
+     */
+    CHIP_ERROR AdvanceBy(T value) override
+    {
+        mCounterValue = static_cast<T>(mCounterValue + value);
+        return CHIP_NO_ERROR;
+    }
+
+    /**
+     *  @brief Get the current value of the counter.
      *
      *  @return The current value of the counter.
      */
-    uint32_t GetValue() override;
+    T GetValue() override { return mCounterValue; }
 
 protected:
-    uint32_t mCounterValue;
+    T mCounterValue;
 };
 
 } // namespace chip

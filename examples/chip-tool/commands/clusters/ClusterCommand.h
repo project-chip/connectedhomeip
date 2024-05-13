@@ -18,58 +18,69 @@
 
 #pragma once
 
-#include <app/CommandSender.h>
-#include <lib/support/UnitTestUtils.h>
+#include <app/tests/suites/commands/interaction_model/InteractionModel.h>
 
 #include "DataModelLogger.h"
 #include "ModelCommand.h"
 
-class ClusterCommand : public ModelCommand, public chip::app::CommandSender::Callback
+class ClusterCommand : public InteractionModelCommands, public ModelCommand, public chip::app::CommandSender::Callback
 {
 public:
-    ClusterCommand(CredentialIssuerCommands * credsIssuerConfig) : ModelCommand("command-by-id", credsIssuerConfig)
+    ClusterCommand(CredentialIssuerCommands * credsIssuerConfig) :
+        InteractionModelCommands(this), ModelCommand("command-by-id", credsIssuerConfig)
     {
         AddArgument("cluster-id", 0, UINT32_MAX, &mClusterId);
-        AddArgument("command-id", 0, UINT32_MAX, &mCommandId);
-        AddArgument("payload", &mPayload);
-        AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
-        AddArgument("suppressResponse", 0, 1, &mSuppressResponse);
-        AddArgument("repeat-count", 1, UINT16_MAX, &mRepeatCount);
-        AddArgument("repeat-delay-ms", 0, UINT16_MAX, &mRepeatDelayInMs);
-        ModelCommand::AddArguments();
+        AddByIdArguments();
+        AddArguments();
     }
 
     ClusterCommand(chip::ClusterId clusterId, CredentialIssuerCommands * credsIssuerConfig) :
-        ModelCommand("command-by-id", credsIssuerConfig), mClusterId(clusterId)
+        InteractionModelCommands(this), ModelCommand("command-by-id", credsIssuerConfig), mClusterId(clusterId)
     {
-        AddArgument("command-id", 0, UINT32_MAX, &mCommandId);
-        AddArgument("payload", &mPayload);
-        AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
-        AddArgument("suppressResponse", 0, 1, &mSuppressResponse);
-        AddArgument("repeat-count", 1, UINT16_MAX, &mRepeatCount);
-        AddArgument("repeat-delay-ms", 0, UINT16_MAX, &mRepeatDelayInMs);
-        ModelCommand::AddArguments();
-    }
-
-    ClusterCommand(const char * commandName, CredentialIssuerCommands * credsIssuerConfig) :
-        ModelCommand(commandName, credsIssuerConfig)
-    {
-        AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
-        AddArgument("suppressResponse", 0, 1, &mSuppressResponse);
-        AddArgument("repeat-count", 1, UINT16_MAX, &mRepeatCount);
-        AddArgument("repeat-delay-ms", 0, UINT16_MAX, &mRepeatDelayInMs);
+        AddByIdArguments();
+        AddArguments();
     }
 
     ~ClusterCommand() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), mClusterId, mCommandId, mPayload);
+        return InteractionModelCommands::SendCommand(device, endpointIds.at(0), mClusterId, mCommandId, mPayload);
+    }
+
+    template <class T>
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, chip::EndpointId endpointId, chip::ClusterId clusterId,
+                           chip::CommandId commandId, const T & value)
+    {
+        return InteractionModelCommands::SendCommand(device, endpointId, clusterId, commandId, value);
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, chip::EndpointId endpointId, chip::ClusterId clusterId,
+                           chip::CommandId commandId,
+                           const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::Type & value)
+    {
+        ReturnErrorOnFailure(InteractionModelCommands::SendCommand(device, endpointId, clusterId, commandId, value));
+
+        if (value.transferFileDesignator.HasValue() &&
+            value.requestedProtocol == chip::app::Clusters::DiagnosticLogs::TransferProtocolEnum::kBdx)
+        {
+            auto sender         = mCommandSender.back().get();
+            auto fileDesignator = value.transferFileDesignator.Value();
+            BDXDiagnosticLogsServerDelegate::GetInstance().AddFileDesignator(sender, fileDesignator);
+        }
+        return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, mClusterId, mCommandId, mPayload);
+        return InteractionModelCommands::SendGroupCommand(groupId, fabricIndex, mClusterId, mCommandId, mPayload);
+    }
+
+    template <class T>
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::ClusterId clusterId,
+                                chip::CommandId commandId, const T & value)
+    {
+        return InteractionModelCommands::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, value);
     }
 
     /////////// CommandSender Callback Interface /////////
@@ -79,6 +90,8 @@ public:
         CHIP_ERROR error = status.ToChipError();
         if (CHIP_NO_ERROR != error)
         {
+            LogErrorOnFailure(RemoteDataModelLogger::LogErrorAsJSON(path, status));
+
             ChipLogError(chipTool, "Response Failure: %s", chip::ErrorStr(error));
             mError = error;
             return;
@@ -86,6 +99,8 @@ public:
 
         if (data != nullptr)
         {
+            LogErrorOnFailure(RemoteDataModelLogger::LogCommandAsJSON(path, data));
+
             error = DataModelLogger::LogCommand(path, data);
             if (CHIP_NO_ERROR != error)
             {
@@ -98,14 +113,19 @@ public:
 
     virtual void OnError(const chip::app::CommandSender * client, CHIP_ERROR error) override
     {
+        LogErrorOnFailure(RemoteDataModelLogger::LogErrorAsJSON(error));
+
         ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(error));
         mError = error;
     }
 
     virtual void OnDone(chip::app::CommandSender * client) override
     {
-        mCommandSender.front().reset();
-        mCommandSender.erase(mCommandSender.begin());
+        if (mCommandSender.size())
+        {
+            mCommandSender.front().reset();
+            mCommandSender.erase(mCommandSender.begin());
+        }
 
         // If the command is repeated N times, wait for all the responses to comes in
         // before exiting.
@@ -116,69 +136,79 @@ public:
             shouldStop = mRepeatCount.Value() == 0;
         }
 
+        BDXDiagnosticLogsServerDelegate::GetInstance().RemoveFileDesignator(client);
+
         if (shouldStop)
         {
             SetCommandExitStatus(mError);
         }
     }
 
-    template <class T>
-    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId, chip::ClusterId clusterId, chip::CommandId commandId,
-                           const T & value)
+    void Shutdown() override
     {
-        uint16_t repeatCount = mRepeatCount.ValueOr(1);
-        while (repeatCount--)
-        {
-            chip::app::CommandPathParams commandPath = { endpointId, 0 /* groupId */, clusterId, commandId,
-                                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
-
-            auto commandSender = std::make_unique<chip::app::CommandSender>(this, device->GetExchangeManager(),
-                                                                            mTimedInteractionTimeoutMs.HasValue());
-            VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
-            ReturnErrorOnFailure(commandSender->AddRequestDataNoTimedCheck(commandPath, value, mTimedInteractionTimeoutMs,
-                                                                           mSuppressResponse.ValueOr(false)));
-
-            ReturnErrorOnFailure(commandSender->SendCommandRequest(device->GetSecureSession().Value()));
-            mCommandSender.push_back(std::move(commandSender));
-
-            if (mRepeatDelayInMs.HasValue())
-            {
-                chip::test_utils::SleepMillis(mRepeatDelayInMs.Value());
-            }
-        }
-        return CHIP_NO_ERROR;
+        mError = CHIP_NO_ERROR;
+        ModelCommand::Shutdown();
     }
 
-    template <class T>
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::ClusterId clusterId,
-                                chip::CommandId commandId, const T & value)
+protected:
+    ClusterCommand(const char * commandName, CredentialIssuerCommands * credsIssuerConfig) :
+        InteractionModelCommands(this), ModelCommand(commandName, credsIssuerConfig)
     {
-        chip::app::CommandPathParams commandPath = { 0 /* endpoint */, groupId, clusterId, commandId,
-                                                     (chip::app::CommandPathFlags::kGroupIdValid) };
+        // Subclasses are responsible for calling AddArguments.
+    }
 
-        chip::Messaging::ExchangeManager * exchangeManager = chip::app::InteractionModelEngine::GetInstance()->GetExchangeManager();
+    void AddByIdArguments()
+    {
+        AddArgument("command-id", 0, UINT32_MAX, &mCommandId);
+        AddArgument("payload", &mPayload,
+                    "The command payload.  This should be a JSON-encoded object, with string representations of field ids as keys. "
+                    " The values for the keys are represented as follows, depending on the type:\n"
+                    "  * struct: a JSON-encoded object, with field ids as keys.\n"
+                    "  * list: a JSON-encoded array of values.\n"
+                    "  * null: A literal null.\n"
+                    "  * boolean: A literal true or false.\n"
+                    "  * unsigned integer: One of:\n"
+                    "      a) The number directly, as decimal.\n"
+                    "      b) A string starting with \"u:\" followed by decimal digits\n"
+                    "  * signed integer: One of:\n"
+                    "      a) The number directly, if it's negative.\n"
+                    "      b) A string starting with \"s:\" followed by decimal digits\n"
+                    "  * single-precision float: A string starting with \"f:\" followed by the number.\n"
+                    "  * double-precision float: One of:\n"
+                    "      a) The number directly, if it's not an integer.\n"
+                    "      b) A string starting with \"d:\" followed by the number.\n"
+                    "  * octet string: A string starting with \"hex:\" followed by the hex encoding of the bytes.\n"
+                    "  * string: A string with the characters.\n"
+                    "\n"
+                    "  An example payload may look like this: '{ \"0x0\": { \"0\": null, \"1\": false }, \"1\": [17, \"u:17\"], "
+                    "\"0x2\": [ -17, \"s:17\", \"s:-17\" ], \"0x3\": \"f:2\", \"0x4\": [ \"d:3\", 4.5 ], \"0x5\": \"hex:ab12\", "
+                    "\"0x6\": \"ab12\" }' and represents:\n"
+                    "    Field 0: a struct with two fields, one with value null and one with value false.\n"
+                    "    Field 1: A list of unsigned integers.\n"
+                    "    Field 2: A list of signed integers.\n"
+                    "    Field 3: A single-precision float.\n"
+                    "    Field 4: A list of double-precision floats.\n"
+                    "    Field 5: A 2-byte octet string.\n"
+                    "    Field 6: A 4-char character string.");
+    }
 
-        auto commandSender =
-            chip::Platform::MakeUnique<chip::app::CommandSender>(this, exchangeManager, mTimedInteractionTimeoutMs.HasValue());
-        VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
-        ReturnErrorOnFailure(commandSender->AddRequestDataNoTimedCheck(commandPath, value, mTimedInteractionTimeoutMs));
-
-        chip::Transport::OutgoingGroupSession session(groupId, fabricIndex);
-        ReturnErrorOnFailure(commandSender->SendGroupCommandRequest(chip::SessionHandle(session)));
-        commandSender.release();
-
-        return CHIP_NO_ERROR;
+    void AddArguments()
+    {
+        AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs,
+                    "If provided, do a timed invoke with the given timed interaction timeout. See \"7.6.10. Timed Interaction\" in "
+                    "the Matter specification.");
+        AddArgument("busyWaitForMs", 0, UINT16_MAX, &mBusyWaitForMs,
+                    "If provided, block the main thread processing for the given time right after sending a command.");
+        AddArgument("suppressResponse", 0, 1, &mSuppressResponse);
+        AddArgument("repeat-count", 1, UINT16_MAX, &mRepeatCount);
+        AddArgument("repeat-delay-ms", 0, UINT16_MAX, &mRepeatDelayInMs);
+        ModelCommand::AddArguments();
     }
 
 private:
     chip::ClusterId mClusterId;
     chip::CommandId mCommandId;
-    chip::Optional<uint16_t> mTimedInteractionTimeoutMs;
-    chip::Optional<bool> mSuppressResponse;
-    chip::Optional<uint16_t> mRepeatCount;
-    chip::Optional<uint16_t> mRepeatDelayInMs;
 
     CHIP_ERROR mError = CHIP_NO_ERROR;
     CustomArgument mPayload;
-    std::vector<std::unique_ptr<chip::app::CommandSender>> mCommandSender;
 };

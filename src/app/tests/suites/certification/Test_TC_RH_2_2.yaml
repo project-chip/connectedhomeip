@@ -14,13 +14,18 @@
 
 name: 9.2.2. [TC-RH-2.2] Primary functionality with server as DUT
 
+PICS:
+    - RH.S
+
 config:
     nodeId: 0x12344321
     cluster: "Relative Humidity Measurement"
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -28,44 +33,57 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Reads constraints of attribute: MinMeasuredValue"
+    - label: "Step 2: TH reads MinMeasuredValue attribute from DUT."
+      PICS: RH.S.A0001
       command: "readAttribute"
-      attribute: "min measured value"
+      attribute: "MinMeasuredValue"
       response:
           constraints:
-              type: int16
+              type: int16u
               minValue: 0
               maxValue: 9999
 
-    - label: "Reads constraints of attribute: MaxMeasuredValue"
-      disabled: true
+    - label: "Step 3: TH reads MaxMeasuredValue attribute from DUT."
+      PICS: RH.S.A0002
       command: "readAttribute"
-      attribute: "max measured value"
+      attribute: "MaxMeasuredValue"
       response:
           constraints:
-              type: int16
+              type: int16u
               minValue: 1
               maxValue: 10000
 
-    - label: "Reads MeasuredValue attribute from DUT"
+    - label: "Step 4: TH reads MeasuredValue attribute from DUT."
       command: "readAttribute"
-      attribute: "measured value"
-      PICS: A_RELATIVEHUMIDITY
+      attribute: "MeasuredValue"
+      PICS: RH.S.A0000
       response:
+          saveAs: ValueBeforeChange
           constraints:
-              type: int16
+              type: int16u
               minValue: 0
               maxValue: 10000
 
-    #Disabled as UI prompts required for user action
-    - label: "Operate on device to change the relative humidity significantly"
-      disabled: true
-      PICS: MANUAL_RELATIVEHUMIDITY_CHANGE
+    - label:
+          "Step 5: Operate on device to change the relative humidity
+          significantly"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && RH.M.ManuallyControlled
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Read the mandatory attribute: MeasuredValue"
+    - label:
+          "Step 6: after a few seconds, TH reads MeasuredValue attribute from
+          DUT."
       command: "readAttribute"
-      attribute: "measured value"
-      PICS: A_RELATIVEHUMIDITY
+      attribute: "MeasuredValue"
+      PICS: RH.S.A0000 && RH.M.ManuallyControlled
       response:
           constraints:
-              type: uint16
+              type: int16u
+              notValue: ValueBeforeChange

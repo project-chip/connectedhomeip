@@ -1,0 +1,121 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.4.4.[TC-SC-4.4] Discovery [DUT as Controller]
+
+PICS:
+    - MCORE.ROLE.CONTROLLER
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as controller test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Precondition"
+      verification: |
+          1. Nodes are joined in the same Fabric
+      disabled: true
+
+    - label: "Step 1: TH starts commissioning process with DUT"
+      verification: |
+          1. Provision the DUT by TH (Chip-tool)
+      disabled: true
+
+    - label: "Step 2: DUT reads Vendor Id attribute from TH"
+      PICS: BINFO.C.A0002
+      verification: |
+          ./chip-tool  basicinformation read vendor-id  1 0
+
+          On TH,  Verify that TH read and shows Vendor Id value
+
+          [1660776352.802689][3357:3357] CHIP:DMG:
+          [1660776352.802776][3357:3357] CHIP:DMG: ReportDataMessage =
+          [1660776352.802807][3357:3357] CHIP:DMG: {
+          [1660776352.802832][3357:3357] CHIP:DMG:         AttributeReportIBs =
+          [1660776352.802868][3357:3357] CHIP:DMG:         [
+          [1660776352.802896][3357:3357] CHIP:DMG:                 AttributeReportIB =
+          [1660776352.802933][3357:3357] CHIP:DMG:                 {
+          [1660776352.802963][3357:3357] CHIP:DMG:                         AttributeDataIB =
+          [1660776352.802999][3357:3357] CHIP:DMG:                         {
+          [1660776352.803040][3357:3357] CHIP:DMG:                                 DataVersion = 0x5c6f4557,
+          [1660776352.803080][3357:3357] CHIP:DMG:                                 AttributePathIB =
+          [1660776352.803118][3357:3357] CHIP:DMG:                                 {
+          [1660776352.803157][3357:3357] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660776352.803198][3357:3357] CHIP:DMG:                                         Cluster = 0x28,
+          [1660776352.803241][3357:3357] CHIP:DMG:                                         Attribute = 0x0000_0002,
+          [1660776352.803279][3357:3357] CHIP:DMG:                                 }
+          [1660776352.803319][3357:3357] CHIP:DMG:
+          [1660776352.803360][3357:3357] CHIP:DMG:                                 Data = 65521,
+          [1660776352.803396][3357:3357] CHIP:DMG:                         },
+          [1660776352.803434][3357:3357] CHIP:DMG:
+          [1660776352.803468][3357:3357] CHIP:DMG:                 },
+          [1660776352.803503][3357:3357] CHIP:DMG:
+          [1660776352.803530][3357:3357] CHIP:DMG:         ],
+          [1660776352.803571][3357:3357] CHIP:DMG:
+          [1660776352.803600][3357:3357] CHIP:DMG:         SuppressResponse = true,
+          [1660776352.803628][3357:3357] CHIP:DMG:         InteractionModelRevision = 1
+          [1660776352.803655][3357:3357] CHIP:DMG: }
+          [1660776352.803699][3357:3357] CHIP:DMG:
+      disabled: true
+
+    - label:
+          "Step 3: Change the IP address of TH by any means within the same
+          network"
+      verification: |
+          Connect the raspi running the TH to another router which is on the same network. Make sure that the DUT and TH are on the same network and can ping to each other. Observe that the TH gets a new IP address. Perform Step 4
+      disabled: true
+
+    - label: "Step 4: DUT reads Vendor Id attribute from TH"
+      PICS: BINFO.C.A0002
+      verification: |
+          ./chip-tool  basicinformation read vendor-id  1 0
+
+          On TH,  Verify that TH read and shows Vendor Id value
+
+          [1660776352.802689][3357:3357] CHIP:DMG:
+          [1660776352.802776][3357:3357] CHIP:DMG: ReportDataMessage =
+          [1660776352.802807][3357:3357] CHIP:DMG: {
+          [1660776352.802832][3357:3357] CHIP:DMG:         AttributeReportIBs =
+          [1660776352.802868][3357:3357] CHIP:DMG:         [
+          [1660776352.802896][3357:3357] CHIP:DMG:                 AttributeReportIB =
+          [1660776352.802933][3357:3357] CHIP:DMG:                 {
+          [1660776352.802963][3357:3357] CHIP:DMG:                         AttributeDataIB =
+          [1660776352.802999][3357:3357] CHIP:DMG:                         {
+          [1660776352.803040][3357:3357] CHIP:DMG:                                 DataVersion = 0x5c6f4557,
+          [1660776352.803080][3357:3357] CHIP:DMG:                                 AttributePathIB =
+          [1660776352.803118][3357:3357] CHIP:DMG:                                 {
+          [1660776352.803157][3357:3357] CHIP:DMG:                                         Endpoint = 0x0,
+          [1660776352.803198][3357:3357] CHIP:DMG:                                         Cluster = 0x28,
+          [1660776352.803241][3357:3357] CHIP:DMG:                                         Attribute = 0x0000_0002,
+          [1660776352.803279][3357:3357] CHIP:DMG:                                 }
+          [1660776352.803319][3357:3357] CHIP:DMG:
+          [1660776352.803360][3357:3357] CHIP:DMG:                                 Data = 65521,
+          [1660776352.803396][3357:3357] CHIP:DMG:                         },
+          [1660776352.803434][3357:3357] CHIP:DMG:
+          [1660776352.803468][3357:3357] CHIP:DMG:                 },
+          [1660776352.803503][3357:3357] CHIP:DMG:
+          [1660776352.803530][3357:3357] CHIP:DMG:         ],
+          [1660776352.803571][3357:3357] CHIP:DMG:
+          [1660776352.803600][3357:3357] CHIP:DMG:         SuppressResponse = true,
+          [1660776352.803628][3357:3357] CHIP:DMG:         InteractionModelRevision = 1
+          [1660776352.803655][3357:3357] CHIP:DMG: }
+          [1660776352.803699][3357:3357] CHIP:DMG:
+      disabled: true

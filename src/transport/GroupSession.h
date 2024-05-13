@@ -18,27 +18,35 @@
 
 #include <app/util/basic-types.h>
 #include <lib/core/GroupId.h>
+#include <lib/core/ReferenceCounted.h>
 #include <lib/support/Pool.h>
 #include <transport/Session.h>
 
 namespace chip {
 namespace Transport {
 
-class IncomingGroupSession : public Session
+class IncomingGroupSession : public Session, public ReferenceCounted<IncomingGroupSession, NoopDeletor<IncomingGroupSession>, 0>
 {
 public:
-    IncomingGroupSession(GroupId group, FabricIndex fabricIndex, NodeId sourceNodeId) : mGroupId(group), mSourceNodeId(sourceNodeId)
+    IncomingGroupSession(GroupId group, FabricIndex fabricIndex, NodeId peerNodeId) : mGroupId(group), mPeerNodeId(peerNodeId)
     {
         SetFabricIndex(fabricIndex);
     }
-    ~IncomingGroupSession() override { NotifySessionReleased(); }
+    ~IncomingGroupSession() override
+    {
+        NotifySessionReleased();
+        VerifyOrDie(GetReferenceCount() == 0);
+    }
+
+    void Retain() override { ReferenceCounted<IncomingGroupSession, NoopDeletor<IncomingGroupSession>, 0>::Retain(); }
+    void Release() override { ReferenceCounted<IncomingGroupSession, NoopDeletor<IncomingGroupSession>, 0>::Release(); }
+
+    bool IsActiveSession() const override { return true; }
 
     Session::SessionType GetSessionType() const override { return Session::SessionType::kGroupIncoming; }
-#if CHIP_PROGRESS_LOGGING
-    const char * GetSessionTypeString() const override { return "incoming group"; };
-#endif
 
-    ScopedNodeId GetPeer() const override { return ScopedNodeId(mSourceNodeId, GetFabricIndex()); }
+    ScopedNodeId GetPeer() const override { return ScopedNodeId(mPeerNodeId, GetFabricIndex()); }
+    ScopedNodeId GetLocalScopedNodeId() const override { return ScopedNodeId(kUndefinedNodeId, GetFabricIndex()); }
 
     Access::SubjectDescriptor GetSubjectDescriptor() const override
     {
@@ -49,14 +57,17 @@ public:
         return subjectDescriptor;
     }
 
-    bool RequireMRP() const override { return false; }
+    bool AllowsMRP() const override { return false; }
+    bool AllowsLargePayload() const override { return false; }
 
-    const ReliableMessageProtocolConfig & GetMRPConfig() const override
+    const SessionParameters & GetRemoteSessionParameters() const override
     {
-        static const ReliableMessageProtocolConfig cfg(GetLocalMRPConfig());
+        static const SessionParameters cfg(GetDefaultMRPConfig());
         VerifyOrDie(false);
         return cfg;
     }
+
+    System::Clock::Timestamp GetMRPBaseTimeout() const override { return System::Clock::kZero; }
 
     System::Clock::Milliseconds32 GetAckTimeout() const override
     {
@@ -66,39 +77,49 @@ public:
 
     GroupId GetGroupId() const { return mGroupId; }
 
-    NodeId GetSourceNodeId() const { return mSourceNodeId; }
-
 private:
     const GroupId mGroupId;
-    const NodeId mSourceNodeId;
+    const NodeId mPeerNodeId;
 };
 
-class OutgoingGroupSession : public Session
+class OutgoingGroupSession : public Session, public ReferenceCounted<OutgoingGroupSession, NoopDeletor<OutgoingGroupSession>, 0>
 {
 public:
     OutgoingGroupSession(GroupId group, FabricIndex fabricIndex) : mGroupId(group) { SetFabricIndex(fabricIndex); }
-    ~OutgoingGroupSession() override { NotifySessionReleased(); }
+    ~OutgoingGroupSession() override
+    {
+        NotifySessionReleased();
+        VerifyOrDie(GetReferenceCount() == 0);
+    }
+
+    void Retain() override { ReferenceCounted<OutgoingGroupSession, NoopDeletor<OutgoingGroupSession>, 0>::Retain(); }
+    void Release() override { ReferenceCounted<OutgoingGroupSession, NoopDeletor<OutgoingGroupSession>, 0>::Release(); }
+
+    bool IsActiveSession() const override { return true; }
 
     Session::SessionType GetSessionType() const override { return Session::SessionType::kGroupOutgoing; }
-#if CHIP_PROGRESS_LOGGING
-    const char * GetSessionTypeString() const override { return "outgoing group"; };
-#endif
 
+    // Peer node ID is unused: users care about the group, not the node
     ScopedNodeId GetPeer() const override { return ScopedNodeId(); }
+    // Local node ID is unused: users care about the group, not the node
+    ScopedNodeId GetLocalScopedNodeId() const override { return ScopedNodeId(); }
 
     Access::SubjectDescriptor GetSubjectDescriptor() const override
     {
         return Access::SubjectDescriptor(); // no subject exists for outgoing group session.
     }
 
-    bool RequireMRP() const override { return false; }
+    bool AllowsMRP() const override { return false; }
+    bool AllowsLargePayload() const override { return false; }
 
-    const ReliableMessageProtocolConfig & GetMRPConfig() const override
+    const SessionParameters & GetRemoteSessionParameters() const override
     {
-        static const ReliableMessageProtocolConfig cfg(GetLocalMRPConfig());
+        static const SessionParameters cfg(GetDefaultMRPConfig());
         VerifyOrDie(false);
         return cfg;
     }
+
+    System::Clock::Timestamp GetMRPBaseTimeout() const override { return System::Clock::kZero; }
 
     System::Clock::Milliseconds32 GetAckTimeout() const override
     {

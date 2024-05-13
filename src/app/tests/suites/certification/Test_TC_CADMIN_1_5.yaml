@@ -1,0 +1,614 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    24.1.5. [TC-CADMIN-1.5] Commissioning window handling timeout and revocation
+    using ECM [DUT_CE - Commissionee]
+
+PICS:
+    - CADMIN.S
+
+config:
+    nodeId: 0x12344321
+    timeout: 300
+    nodeIdForDuplicateCommissioning:
+        type: node_id
+        defaultValue: 0x11
+    nodeId2:
+        type: node_id
+        defaultValue: 0xCAFE
+    nodeId3:
+        type: node_id
+        defaultValue: 0xC00FEE
+    endpoint: 0
+    waitAfterCommissioning:
+        type: int16u
+        defaultValue: 5000
+    discriminator:
+        type: int16u
+        defaultValue: 3840
+    payload:
+        type: char_string
+        defaultValue: "MT:-24J0AFN00KA0648G00" # This value needs to be generated automatically
+    PakeVerifier:
+        type: octet_string
+        defaultValue: "hex:b96170aae803346884724fe9a3b287c30330c2a660375d17bb205a8cf1aecb350457f8ab79ee253ab6a8e46bb09e543ae422736de501e3db37d441fe344920d09548e4c18240630c4ff4913c53513839b7c07fcc0627a1b8573a149fcd1fa466cf"
+    IncorrectPakeVerifier:
+        type: octet_string
+        defaultValue: "hex:06c756dffcd722653452a12dcd945d8c54da2b0f3cbd1b4dc3f1adb223aeb26b047cd24c96866f979b1d83ec50e2b4ae30cdf2fdb32bd8a211b837dc94edcd56f4d14377191076bfc59d99b7dd3053efd6f02c4434f2bdd27a"
+    PIXIT.CADMIN.CwDuration:
+        type: int16u
+        defaultValue: 180
+
+tests:
+    - label: "Precondition: Reset Devices to factory defaults"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "FactoryReset"
+
+    - label: "Precondition: Reset Devices to factory defaults"
+      verification: |
+          Reset Devices to factory defaults
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Factory Reset the DUT and enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 1a: TH_CR1 starts a commissioning process with DUT_CE"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: payload
+
+    - label: "Step 1b: TH_CR1 commissioned with DUT_CE"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Step 2: TH_CR1 opens a new commissioning window on DUT_CE using ECM"
+      cluster: "Administrator Commissioning"
+      command: "OpenCommissioningWindow"
+      PICS: CADMIN.S.C00.Rsp && PICS_SDK_CI_ONLY
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: PIXIT.CADMIN.CwDuration
+              - name: "PAKEPasscodeVerifier"
+                value: PakeVerifier
+              - name: "Discriminator"
+                value: discriminator
+              - name: "Iterations"
+                value: 1000
+              - name: "Salt"
+                value: "SPAKE2P Key Salt"
+
+    #Issue https://github.com/project-chip/connectedhomeip/issues/26127
+    - label:
+          "Step 2: TH_CR1 opens a commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
+      verification: |
+          On TH_CR1 send the below command
+
+          ./chip-tool pairing open-commissioning-window 1 1 PIXIT.CADMIN.CwDuration 1000 3841
+
+          Verify the Open commisioning window on the DUT_CE(all-cluster-app) Log:
+
+          [1660904553.796857][3537:3537] CHIP:DMG: Received command for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0000
+          [1660904553.796951][3537:3537] CHIP:ZCL: Received command to open commissioning window
+          [1660904553.797255][3537:3537] CHIP:IN: SecureSession[0xaaab142ef7f0]: Allocated Type:1 LSID:34523
+
+          Verify the Manual pairing code on the TH_CR1(chip-tool) Log:
+
+          [1635864513.699433][3850:3855] CHIP:DMG: ICR moving to [CommandSen]
+          [1635864513.699489][3850:3855] CHIP:CTL: Manual pairing code: [36177160937]
+          [1635864513.699566][3850:3855] CHIP:CTL: SetupQRCode: [MT:00000CQM00YZN476420]
+          [1635864513.699636][3850:3855] CHIP:EM: Sending Standalone Ack for MessageCounter:2599714227 on exchange 60688i
+          [1635864513.699685][3850:3855] CHIP:IN: Prepared plaintext message 0xffff8a7cd960 to 0x0000000000000000 of type
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && CADMIN.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 3: DNS-SD records shows DUT_CE advertising. Verify that the
+          DNS-SD advertisement shows CM=2"
+      PICS: CADMIN.S.C00.Rsp
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "commissioningMode"
+                value: 2
+
+    - label: "Step 4a: Wait for PIXIT.CADMIN.CwDuration + 10 seconds"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: ( PIXIT.CADMIN.CwDuration + 10 ) * 1000
+
+    - label: "Step 4b: TH_CR2 starts a commissioning process with DUT_CE"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      PICS: CADMIN.S.C00.Rsp && PICS_SDK_CI_ONLY
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: payload
+      response:
+          error: FAILURE
+
+    #Issue https://github.com/project-chip/connectedhomeip/issues/26127
+    - label: "Step 4b: TH_CR2 starts a commissioning process with DUT_CE"
+      verification: |
+          On TH_CR2 send the below command
+          Below is the example when using chip tool as controller (considering 36177160937 as the manual code generated by 1st controller)
+
+          ./chip-tool pairing code 0xCAFE 36177160937 --commissioner-name beta
+
+          Verify the below message in the TH_CR2(chip-tool) Log:
+
+          [1663841939.843550][13897:13897] CHIP:DL: NVS set: chip-counters/total-operational-hours = 0 (0x0)
+          [1663841939.843617][13897:13897] CHIP:DL: Inet Layer shutdown
+          [1663841939.843673][13897:13897] CHIP:DL: BLE shutdown
+          [1663841939.843727][13897:13897] CHIP:DL: System Layer shutdown
+          [1663841939.844009][13897:13897] CHIP:TOO: Run command failure: ../../examples/chip-tool/commands/pairing/PairingCommand.cpp:151: CHIP Error 0x00000003: Incorrect state
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && CADMIN.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Ste 5: TH_CR1 opens a new commissioning window on DUT_CE using ECM"
+      cluster: "Administrator Commissioning"
+      command: "OpenCommissioningWindow"
+      PICS: CADMIN.S.C00.Rsp && PICS_SDK_CI_ONLY
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: PIXIT.CADMIN.CwDuration
+              - name: "PAKEPasscodeVerifier"
+                value: PakeVerifier
+              - name: "Discriminator"
+                value: discriminator
+              - name: "Iterations"
+                value: 1000
+              - name: "Salt"
+                value: "SPAKE2P Key Salt"
+
+    #Issue https://github.com/project-chip/connectedhomeip/issues/26127
+    - label:
+          "Step 5: TH_CR1 opens a new commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
+      verification: |
+          On TH_CR1 send the below command
+
+          ./chip-tool pairing open-commissioning-window 1 1 PIXIT.CADMIN.CwDuration 2000 3840
+
+          Verify the Open commisioning window on the DUT_CE(all-cluster-app) Log:
+
+          [1660904553.796857][3537:3537] CHIP:DMG: Received command for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0000
+          [1660904553.796951][3537:3537] CHIP:ZCL: Received command to open commissioning window
+          [1660904553.797255][3537:3537] CHIP:IN: SecureSession[0xaaab142ef7f0]: Allocated Type:1 LSID:34523
+
+          Verify the Manual pairing code on the TH_CR1(chip-tool) Log:
+
+          [1635864513.699433][3850:3855] CHIP:DMG: ICR moving to [CommandSen]
+          [1635864513.699489][3850:3855] CHIP:CTL: Manual pairing code: [36177160937]
+          [1635864513.699566][3850:3855] CHIP:CTL: SetupQRCode: [MT:00000CQM00YZN476420]
+          [1635864513.699636][3850:3855] CHIP:EM: Sending Standalone Ack for MessageCounter:2599714227 on exchange 60688i
+          [1635864513.699685][3850:3855] CHIP:IN: Prepared plaintext message 0xffff8a7cd960 to 0x0000000000000000 of type 0x10
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && CADMIN.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Waiting after opening commissioning window"
+      PICS: PICS_SDK_CI_ONLY && CADMIN.S.C00.Rsp
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
+
+    - label: "Step 6: TH_CR1 revokes the commissioning window on DUT_CE"
+      cluster: "Administrator Commissioning"
+      command: "RevokeCommissioning"
+      PICS: CADMIN.S.C02.Rsp
+      timedInteractionTimeoutMs: 10000
+
+    - label: "Step 7: TH_CR2 starts a commissioning process with DUT_CE"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S && PICS_SDK_CI_ONLY
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: payload
+      response:
+          error: FAILURE
+
+    #Issue https://github.com/project-chip/connectedhomeip/issues/26127
+    - label: "Step 7: TH_CR2 starts a commissioning process with DUT_CE"
+      verification: |
+          On TH_CR2 send the below command
+          Below is the example when using chip tool as controller (considering 36177160937 as the manual code generated by 1st controller)
+
+          ./chip-tool pairing code 0xCAFE 36177160937 --commissioner-name beta
+
+          Verify the below message in the TH_CR2(chip-tool) Log:
+
+          Device commissioning completed with successoning step 'Cleanup'
+          [1657186359.584743][3509:3514] CHIP:TOO: Device commissioning completed with success
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && CADMIN.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 8: TH_CR1 revokes the commissioning window on DUT_CE"
+      cluster: "Administrator Commissioning"
+      command: "RevokeCommissioning"
+      PICS: CADMIN.S.C02.Rsp
+      timedInteractionTimeoutMs: 10000
+      response:
+          error: FAILURE
+
+    - label:
+          "Step 9a: TH_CR1 writes the mandatory attribute NodeLabel of DUT_CE"
+      cluster: "Basic Information"
+      command: "writeAttribute"
+      attribute: "NodeLabel"
+      PICS: BINFO.S.A0005
+      arguments:
+          value: "chiptest"
+
+    - label: "Step 9b: TH_CR1 read the mandatory attribute NodeLabel of DUT_CE"
+      cluster: "Basic Information"
+      command: "readAttribute"
+      attribute: "NodeLabel"
+      PICS: BINFO.S.A0005
+      response:
+          value: "chiptest"
+
+    - label:
+          "Step 10: TH_CR1 opens a new commissioning window on DUT_CE using
+          wrong PakeVerifier value using ECM"
+      cluster: "Administrator Commissioning"
+      command: "OpenCommissioningWindow"
+      PICS: CADMIN.S.C00.Rsp && PICS_SDK_CI_ONLY
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: PIXIT.CADMIN.CwDuration
+              - name: "PAKEPasscodeVerifier"
+                value: IncorrectPakeVerifier
+              - name: "Discriminator"
+                value: discriminator
+              - name: "Iterations"
+                value: 1000
+              - name: "Salt"
+                value: "SPAKE2P Key Salt"
+      response:
+          error: FAILURE
+          clusterError: 3
+
+    #Issue https://github.com/project-chip/connectedhomeip/issues/26127
+    - label:
+          "Step 10: TH_CR1 opens a commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
+      verification: |
+          On TH_CR1 send the below command
+          Below is example command by considering the "\x06\xc7\x56\xdf\xfc\xd7\x22\x65\x34\x52\xa1\x2d\xcd\x94\x5d\x8c\x54\xda\x2b\x0f\x3c\xbd\x1b\x4d\xc3\xf1\xad\xb2\x23\xae\xb2\x6b\x04\x7c\xd2\x4c\x96\x86\x6f\x97\x9b\x1d\x83\xec\x50\xe2\xb4\xae\x30\xcd\xf2\xfd\xb3\x2b\xd8\xa2\x11\xb8\x37\xdc\x94\xed\xcd\x56\xf4\xd1\x43\x77\x19\x10\x76\xbf\xc5\x9d\x99\xb7\xdd\x30\x53\xef\xd6\xf0\x2c\x44\x34\xf2\xbd " as a wrong PakeVerifier value
+
+
+          ./chip-tool administratorcommissioning open-commissioning-window PIXIT.CADMIN.CwDuration \x06\xc7\x56\xdf\xfc\xd7\x22\x65\x34\x52\xa1\x2d\xcd\x94\x5d\x8c\x54\xda\x2b\x0f\x3c\xbd\x1b\x4d\xc3\xf1\xad\xb2\x23\xae\xb2\x6b\x04\x7c\xd2\x4c\x96\x86\x6f\x97\x9b\x1d\x83\xec\x50\xe2\xb4\xae\x30\xcd\xf2\xfd\xb3\x2b\xd8\xa2\x11\xb8\x37\xdc\x94\xed\xcd\x56\xf4\xd1\x43\x77\x19\x10\x76\xbf\xc5\x9d\x99\xb7\xdd\x30\x53\xef\xd6\xf0\x2c\x44\x34\xf2\xbd 3841 1000 16 0x12344321 0 --timedInteractionTimeoutMs 1000
+
+          Verify the status on the TH_CR1(chip-tool) Log:
+
+          [1656434435.691038][3836:3842] CHIP:DMG:                                 {
+          [1656434435.691119][3836:3842] CHIP:DMG:                                         EndpointId = 0x0,
+          [1656434435.691287][3836:3842] CHIP:DMG:                                         ClusterId = 0x3c,
+          [1656434435.691377][3836:3842] CHIP:DMG:                                         CommandId = 0x0,
+          [1656434435.691456][3836:3842] CHIP:DMG:                                 },
+          [1656434435.691548][3836:3842] CHIP:DMG:
+          [1656434435.691620][3836:3842] CHIP:DMG:                                 StatusIB =
+          [1656434435.691707][3836:3842] CHIP:DMG:                                 {
+          [1656434435.691788][3836:3842] CHIP:DMG:                                         status = 0x01 (FAILURE),
+          [1656434435.691874][3836:3842] CHIP:DMG:                                         cluster-status = 0x3,
+          [1656434435.691954][3836:3842] CHIP:DMG:                                 },
+          [1656434435.692041][3836:3842] CHIP:DMG:
+          [1656434435.692112][3836:3842] CHIP:DMG:                         },
+          [1656434435.692191][3836:3842] CHIP:DMG:
+          [1656434435.692257][3836:3842] CHIP:DMG:                 },
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && CADMIN.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 11: TH_CR1 opens a new commissioning window on DUT_CE using ECM"
+      cluster: "Administrator Commissioning"
+      command: "OpenCommissioningWindow"
+      PICS: CADMIN.S.C00.Rsp && PICS_SDK_CI_ONLY
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: PIXIT.CADMIN.CwDuration
+              - name: "PAKEPasscodeVerifier"
+                value: PakeVerifier
+              - name: "Discriminator"
+                value: discriminator
+              - name: "Iterations"
+                value: 1000
+              - name: "Salt"
+                value: "SPAKE2P Key Salt"
+
+    - label: "Waiting after opening commissioning window"
+      PICS: CADMIN.S.C00.Rsp && PICS_SDK_CI_ONLY
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
+
+    #Issue https://github.com/project-chip/connectedhomeip/issues/26127
+    - label:
+          "Step 11: TH_CR1 opens a commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
+      verification: |
+          On TH_CR1 send the below command
+
+          ./chip-tool pairing open-commissioning-window 1 1 PIXIT.CADMIN.CwDuration 1000 3841
+
+          Verify the Open commisioning window on the DUT_CE(all-cluster-app) Log:
+
+          [1660904553.796857][3537:3537] CHIP:DMG: Received command for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0000
+          [1660904553.796951][3537:3537] CHIP:ZCL: Received command to open commissioning window
+          [1660904553.797255][3537:3537] CHIP:IN: SecureSession[0xaaab142ef7f0]: Allocated Type:1 LSID:34523
+
+          Verify the Manual pairing code on the TH_CR1(chip-tool) Log:
+
+          [1635864513.699433][3850:3855] CHIP:DMG: ICR moving to [CommandSen]
+          [1635864513.699489][3850:3855] CHIP:CTL: Manual pairing code: [36177160937]
+          [1635864513.699566][3850:3855] CHIP:CTL: SetupQRCode: [MT:00000CQM00YZN476420]
+          [1635864513.699636][3850:3855] CHIP:EM: Sending Standalone Ack for MessageCounter:2599714227 on exchange 60688i
+          [1635864513.699685][3850:3855] CHIP:IN: Prepared plaintext message 0xffff8a7cd960 to 0x0000000000000000 of type
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && CADMIN.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 12: TH_CR1 opens another commissioning window on DUT_CE using
+          ECM"
+      cluster: "Administrator Commissioning"
+      command: "OpenCommissioningWindow"
+      PICS: CADMIN.S.C00.Rsp && PICS_SDK_CI_ONLY
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: PIXIT.CADMIN.CwDuration
+              - name: "PAKEPasscodeVerifier"
+                value: PakeVerifier
+              - name: "Discriminator"
+                value: discriminator
+              - name: "Iterations"
+                value: 1000
+              - name: "Salt"
+                value: "SPAKE2P Key Salt"
+      response:
+          error: FAILURE
+          clusterError: 2
+
+    #Issue https://github.com/project-chip/connectedhomeip/issues/26127
+    - label:
+          "Step 13: TH_CR1 opens a commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
+      verification: |
+          On TH_CR1 send the below command
+
+          ./chip-tool pairing open-commissioning-window 1 1 200 1000 3840
+
+          Verify that the DUT_CE is rejecting the opening of second commissioning session  with  the response status 0x01 failure
+
+          [1656405166.756822][5933:5938] CHIP:DMG:                                 {
+          [1656405166.756927][5933:5938] CHIP:DMG:                                         EndpointId = 0x0,
+          [1656405166.757033][5933:5938] CHIP:DMG:                                         ClusterId = 0x3c,
+          [1656405166.757120][5933:5938] CHIP:DMG:                                         CommandId = 0x0,
+          [1656405166.757222][5933:5938] CHIP:DMG:                                 },
+          [1656405166.757333][5933:5938] CHIP:DMG:
+          [1656405166.757452][5933:5938] CHIP:DMG:                                 StatusIB =
+          [1656405166.757557][5933:5938] CHIP:DMG:                                 {
+          [1656405166.757641][5933:5938] CHIP:DMG:                                         status = 0x01 (FAILURE),
+          [1656405166.757745][5933:5938] CHIP:DMG:                                         cluster-status = 0x2,
+          [1656405166.757846][5933:5938] CHIP:DMG:                                 },
+          [1656405166.757929][5933:5938] CHIP:DMG:
+          [1656405166.758014][5933:5938] CHIP:DMG:                         },
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && CADMIN.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 13a: TH_CR2 starts a commissioning process with DUT_CE"
+      PICS: CADMIN.S && PICS_SDK_CI_ONLY
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: payload
+
+    - label: "Step 13b: DUT_CE is commissioned by TH_CR2"
+      identity: "beta"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      PICS: CADMIN.S && PICS_SDK_CI_ONLY
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+
+    #Issue https://github.com/project-chip/connectedhomeip/issues/26127
+    - label: "Step 13: TH_CR2 starts a commissioning process with DUT_CE"
+      verification: |
+          On TH_CR2 send the below command
+          Below is the example when using chip tool as controller (considering 36177160937 as the manual code generated by 1st controller)
+
+          ./chip-tool pairing code 0xCAFE 36177160937 --commissioner-name beta
+
+          Verify the below message in the TH_CR2(chip-tool) Log:
+          Device commissioning completed with success
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && CADMIN.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "TH2 reads CurrentFabricIndex attribute and save it for future use."
+      identity: "beta"
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: TH2FabricIndex
+
+    - label:
+          "Step 14: TH_CR1 tries to revoke the commissioning window on DUT_CE
+          using RevokeCommissioning command"
+      cluster: "Administrator Commissioning"
+      command: "RevokeCommissioning"
+      PICS: CADMIN.S.C02.Rsp
+      timedInteractionTimeoutMs: 10000
+      response:
+          error: FAILURE
+          clusterError: 4
+
+    - label: "Step 15: TH_CR3 starts a commissioning process with DUT_CE"
+      identity: "gamma"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S && PICS_SDK_CI_ONLY
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId3
+              - name: "payload"
+                value: payload
+      response:
+          error: FAILURE
+
+    #Issue https://github.com/project-chip/connectedhomeip/issues/26127
+    - label: "Step 15: TH_CR2 starts a commissioning process with DUT_CE"
+      verification: |
+          On TH_CR2 send the below command
+          Below is the example when using chip tool as controller (considering 36177160937 as the manual code generated by 1st controller)
+
+          ./chip-tool pairing code 0xCAFE 36177160937 --commissioner-name beta
+
+          verify you got the following message in the TH_CR3(chip-tool) log
+          CHIP:SC: PASESession timed out while waiting for a response from the peer. Expected message type was 33
+          CHIP:TOO: Secure Pairing Failed
+          CHIP:TOO: Pairing Failure: ../../third_party/connectedhomeip/src/protocols/secure_channel/PASESession.cpp:324: CHIP Error 0x00000032: Timeout
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && CADMIN.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Remove TH2 FabricIndex"
+      PICS: OPCREDS.S.C0a.Rsp && CADMIN.S
+      identity: "beta"
+      cluster: "Operational Credentials"
+      command: "RemoveFabric"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "FabricIndex"
+                value: TH2FabricIndex

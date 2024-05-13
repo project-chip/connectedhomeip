@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 63.1.1. [TC-PSCFG-1.1] Global attributes with server as DUT
+name: 63.1.1. [TC-PSCFG-1.1] Global Attributes with DUT as Server
+
+PICS:
+    - PSCFG.S
 
 config:
     nodeId: 0x12344321
@@ -20,7 +23,9 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -28,38 +33,61 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads the ClusterRevision attribute from the DUT"
+    - label: "Step 2: TH reads from the DUT the ClusterRevision attribute."
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
           value: 1
+          constraints:
+              type: int16u
 
-    - label: "TH reads the AttributeList attribute from the DUT"
+    - label: "Step 3: TH reads from the DUT the FeatureMap attribute."
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
+
+    - label: "Step 4: TH reads from the DUT the AttributeList attribute."
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
+              contains: [0, 65528, 65529, 65530, 65531, 65532, 65533]
 
-    - label: "TH reads the AcceptedCommandList attribute from the DUT"
+    - label: "Step 4: TH reads from the DUT the AttributeList attribute."
+      PICS: "!PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
-      attribute: "AcceptedCommandList"
+      attribute: "AttributeList"
       response:
           constraints:
               type: list
+              contains: [0, 65528, 65529, 65531, 65532, 65533]
 
-    - label: "TH reads the GeneratedCommandList attribute from the DUT"
-      command: "readAttribute"
-      attribute: "GeneratedCommandList"
-      response:
-          constraints:
-              type: list
-
-    #issue #11053 disabled steps below Global attributes missing from YAML framework
-    - label: "TH reads the EventList attribute from the DUT"
-      disabled: true
+    - label: "Step 5: TH reads from the DUT the EventList attribute."
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Step 6: TH reads from the DUT the AcceptedCommandList attribute."
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Step 7: TH reads from the DUT the GeneratedCommandList attribute."
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
           constraints:
               type: list

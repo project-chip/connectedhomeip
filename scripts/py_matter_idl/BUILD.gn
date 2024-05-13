@@ -1,0 +1,64 @@
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("//build_overrides/pigweed.gni")
+import("$dir_pw_build/python.gni")
+
+import("${chip_root}/scripts/py_matter_idl/files.gni")
+
+pw_python_package("matter_idl") {
+  setup = [
+    "setup.py",
+    "setup.cfg",
+    "pyproject.toml",
+  ]
+  inputs = matter_idl_generator_templates
+  inputs += [
+    # Dependency grammar
+    "matter_idl/matter_grammar.lark",
+
+    # Unit test data
+    "matter_idl/tests/available_tests.yaml",
+    "matter_idl/tests/inputs/cluster_struct_attribute.matter",
+    "matter_idl/tests/inputs/global_struct_attribute.matter",
+    "matter_idl/tests/inputs/optional_argument.matter",
+    "matter_idl/tests/inputs/several_clusters.matter",
+    "matter_idl/tests/inputs/simple_attribute.matter",
+    "matter_idl/tests/outputs/several_clusters/java/ChipClusters.java",
+    "matter_idl/tests/outputs/several_clusters/java/ChipEventStructs.java",
+    "matter_idl/tests/outputs/several_clusters/java/ChipStructs.java",
+    "matter_idl/tests/outputs/several_clusters/java/ClusterInfoMapping.java",
+    "matter_idl/tests/outputs/several_clusters/java/ClusterIDMapping.java",
+    "matter_idl/tests/outputs/several_clusters/java/ClusterWriteMapping.java",
+  ]
+
+  sources = matter_idl_generator_sources
+
+  tests = [
+    "matter_idl/test_backwards_compatibility.py",
+    "matter_idl/test_data_model_xml.py",
+    "matter_idl/test_matter_idl_parser.py",
+    "matter_idl/test_generators.py",
+    "matter_idl/test_idl_generator.py",
+    "matter_idl/test_supported_types.py",
+    "matter_idl/test_zapxml.py",
+  ]
+
+  # TODO: at a future time consider enabling all (* or missing) here to get
+  #       pylint checking these files
+  static_analysis = []
+}

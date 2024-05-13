@@ -33,9 +33,8 @@
 #include "events/EventQueue.h"
 
 // ZAP -- ZCL Advanced Platform
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/attribute-storage.h>
 
 #ifdef CAPSENSE_ENABLED
@@ -462,10 +461,9 @@ void AppTask::UpdateClusterState()
     uint8_t newValue = !BoltLockMgr().IsUnlocked();
 
     // write the new on/off value
-    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &newValue,
-                                                 ZCL_BOOLEAN_ATTRIBUTE_TYPE);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    Protocols::InteractionModel::Status status = app::Clusters::OnOff::Attributes::OnOff::Set(1, newValue);
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ZCL update failed: %lx", status);
+        ChipLogError(NotSpecified, "ZCL update failed: %lx", to_underlying(status));
     }
 }

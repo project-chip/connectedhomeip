@@ -14,22 +14,13 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/pigweed.gni")
-
+import("${build_root}/chip/java/config.gni")
 import("${build_root}/config/compiler/compiler.gni")
 import("${build_root}/config/sysroot.gni")
 import("${build_root}/config/target.gni")
 
-if (current_os == "mac") {
+if (current_os == "mac" || current_os == "ios") {
   import("${build_root}/config/mac/mac_sdk.gni")
-}
-
-if (current_os == "webos") {
-  import("${build_root}/config/webos/webos_sdk.gni")
-  target_defines += []
-  target_cflags += [ "--sysroot=" + sysroot_webos ]
-  target_cflags_cc += []
-  target_cflags_c += []
-  target_ldflags += [ "--sysroot=" + sysroot_webos ]
 }
 
 declare_args() {
@@ -58,13 +49,11 @@ config("debug_default") {
 
 config("abi_default") {
   cflags = []
-  if (current_os == "mac") {
+  if (current_os == "mac" || current_os == "ios") {
     cflags += [
       "-target",
       mac_target_triple,
     ]
-  } else if (current_os == "ios") {
-    # iOS ABI currently set by chip_xcode_build_connector.sh
   }
 
   if (current_os != "mac" && current_os != "ios") {
@@ -150,6 +139,15 @@ config("abi_default") {
   ldflags = cflags
 }
 
+config("dead_code_elimination_default") {
+  # Delete unreferenced sections. Helpful with -ffunction-sections.
+  if (current_os == "mac" || current_os == "ios") {
+    ldflags = [ "-Wl,-dead_strip" ]
+  } else {
+    ldflags = [ "-Wl,--gc-sections" ]
+  }
+}
+
 config("target_default") {
   if (current_toolchain == default_toolchain) {
     defines = target_defines
@@ -165,10 +163,15 @@ config("optimize_zero") {
   ldflags = cflags
 }
 
+config("optimize_debug") {
+  cflags = [ "-O${optimize_debug_level}" ]
+  ldflags = cflags
+}
+
 config("optimize_default") {
   if (is_debug) {
     if (optimize_debug) {
-      configs = [ "$dir_pw_build:optimize_debugging" ]
+      configs = [ ":optimize_debug" ]
     } else {
       configs = [ ":optimize_zero" ]
     }
@@ -191,9 +194,8 @@ config("optimize_default") {
 config("disabled_warnings") {
   cflags = [
     "-Wno-deprecated-declarations",
-    "-Wno-unknown-warning-option",
-    "-Wno-maybe-uninitialized",
     "-Wno-missing-field-initializers",
+    "-Wno-unknown-warning-option",
     "-Wno-unused-parameter",
   ]
   if (!is_debug) {
@@ -202,8 +204,9 @@ config("disabled_warnings") {
   }
   if (!is_clang) {
     cflags += [
-      "-Wno-psabi",
       "-Wno-cast-function-type",
+      "-Wno-psabi",
+      "-Wno-maybe-uninitialized",
     ]
   }
 }
@@ -222,7 +225,8 @@ config("warnings_common") {
   }
 
   if (current_os != "mac" && current_os != "ios" && current_os != "linux" &&
-      current_os != "win" && current_os != "tizen" && current_os != "webos") {
+      current_os != "win" && current_os != "tizen" && current_os != "webos" &&
+      current_os != "cmsis-rtos") {
     cflags += [ "-Wstack-usage=8192" ]
   }
 }
@@ -245,19 +249,57 @@ config("strict_warnings") {
     ]
   }
 
+  if (current_os == "mac" || current_os == "ios") {
+    cflags += [ "-Wconversion" ]
+  }
+
+  # For now we can't enable -Wundef across the board.  Enable it where
+  # we can.  Ideally this would be checking chip_device_platform or so
+  # to be more fine-grained than current_os, but it's not clear that
+  # we can access that here.
+  if (current_os != "freertos" && current_os != "mbed" &&
+      # cmsis-rtos is OpenIOT
+      current_os != "cmsis-rtos" &&
+      # cyw30739 is one of the Infineon builds
+      current_os != "cyw30739") {
+    cflags += [ "-Wundef" ]
+  }
+
+  if (matter_enable_java_compilation) {
+    cflags -= [ "-Wshadow" ]
+  }
+
   cflags_cc = [ "-Wnon-virtual-dtor" ]
 
+  if (current_os == "nuttx") {
+    cflags -= [ "-Wshadow" ]
+    cflags_cc -= [ "-Wnon-virtual-dtor" ]
+  }
+
+  configs = []
   ldflags = []
 
   if (is_clang) {
     cflags += [
       "-Wimplicit-fallthrough",
       "-Wheader-hygiene",
+      "-Wshorten-64-to-32",
       "-Wformat-type-confusion",
     ]
+
+    configs += [ "$dir_pw_build:clang_thread_safety_warnings" ]
+
+    # TODO: can make this back fatal in once pigweed updates can be taken again.
+    #       See https://github.com/project-chip/connectedhomeip/pull/22079
+    #
+    # Currently `./scripts/build/build_examples.py --target linux-arm64-light-rpc-ipv6only-clang build`
+    # fails in third_party/pigweed/repo/pw_protobuf
+    if (current_cpu == "arm64" && current_os == "linux") {
+      cflags += [ "-Wno-error=shorten-64-to-32" ]
+    }
   }
 
-  if (current_os == "linux" || current_os == "android") {
+  if (!is_asan && (current_os == "linux" || current_os == "android")) {
     ldflags += [ "-Wl,-z,defs" ]
   }
 }
@@ -274,9 +316,12 @@ config("disabled_warnings_third_party") {
   cflags = [
     "-Wno-unused",
     "-Wno-format",
-    "-Wno-maybe-uninitialized",
     "-Wno-address",
   ]
+
+  if (!is_clang) {
+    cflags += [ "-Wno-maybe-uninitialized" ]
+  }
 }
 
 config("warnings_third_party") {
@@ -303,7 +348,7 @@ config("cosmetic_default") {
 }
 
 config("runtime_default") {
-  if (is_clang) {
+  if (is_clang) {  # Using Pigweed clang instead of Darwin host clang
     configs = [
       "$dir_pw_toolchain/host_clang:no_system_libcpp",
       "$dir_pw_toolchain/host_clang:xcode_sysroot",
@@ -316,10 +361,17 @@ config("runtime_default") {
       "rt",
     ]
   }
+
+  cflags = []
+  ldflags = []
+
   if (sysroot != "") {
-    cflags = [ "--sysroot=${sysroot}" ]
-    ldflags = [ "--sysroot=${sysroot}" ]
+    cflags += [ "--sysroot=${sysroot}" ]
+    ldflags += [ "--sysroot=${sysroot}" ]
   }
+
+  cflags += runtime_library_cflags
+  ldflags += runtime_library_ldflags
 }
 
 # To use different sanitizer options, use `gn args .` in the out folder and
@@ -336,9 +388,6 @@ declare_args() {
   # Enable Thread sanitizer
   is_tsan = false
 
-  # Enable address sanitizer
-  is_asan = false
-
   # Enable memory sanitizer
   is_msan = false
 
@@ -351,16 +400,20 @@ declare_args() {
 }
 
 config("sanitize_address") {
+  defines = []
   cflags = [
     "-fsanitize=address",
     "-fno-omit-frame-pointer",
   ]
   ldflags = cflags
+
+  if ((target_os == "mac" || target_os == "ios") && !is_clang) {
+    defines += [ "_LIBCPP_HAS_NO_ASAN" ]
+  }
 }
 
 config("sanitize_thread") {
   cflags = [ "-fsanitize=thread" ]
-
   ldflags = cflags
 }
 
@@ -378,11 +431,16 @@ config("sanitize_undefined_behavior") {
     "-fvisibility=hidden",
     "-fsanitize=undefined",
     "-fsanitize=float-divide-by-zero",
-    "-fsanitize=unsigned-integer-overflow",
-    "-fsanitize=implicit-conversion",
-    "-fsanitize=nullability",
-    "-fno-sanitize=vptr,function",
   ]
+  if (is_clang) {
+    cflags += [
+      "-fsanitize=unsigned-integer-overflow",
+      "-fsanitize=implicit-conversion",
+      "-fsanitize=nullability",
+      "-fno-sanitize=vptr,function",
+    ]
+  }
+
   ldflags = cflags
 }
 
@@ -420,16 +478,41 @@ config("libfuzzer_fuzzing") {
   ldflags = cflags
 }
 
+config("oss_fuzz") {
+  cflags = string_split(getenv("CFLAGS"))
+  ldflags = string_split(getenv("CXXFLAGS"))
+  ldflags += [ getenv("LIB_FUZZING_ENGINE") ]
+}
+
 config("fuzzing_default") {
   configs = []
   if (is_libfuzzer) {
     configs += [ ":libfuzzer_fuzzing" ]
   }
+  if (oss_fuzz) {
+    configs += [ ":oss_fuzz" ]
+  }
+}
+
+config("coverage") {
+  cflags = [ "--coverage" ]
+  ldflags = cflags
+}
+
+config("coverage_default") {
+  configs = []
+  if (use_coverage) {
+    configs += [ ":coverage" ]
+  }
 }
 
 declare_args() {
-  # Enable Runtime Type Information (RTTI)
-  enable_rtti = false
+  # Enable or disable Runtime Type Information (RTTI).
+  # Defaults true on darwin because Darwin.framework uses it.
+  enable_rtti = current_os == "mac" || current_os == "ios"
+
+  # Enable or disable support for C++ exceptions.
+  enable_exceptions = false
 }
 
 config("no_rtti") {
@@ -457,7 +540,11 @@ config("exceptions") {
 }
 
 config("exceptions_default") {
-  configs = [ ":no_exceptions" ]
+  if (enable_exceptions) {
+    configs = [ ":exceptions" ]
+  } else {
+    configs = [ ":no_exceptions" ]
+  }
 }
 
 config("unwind_tables") {
@@ -496,6 +583,13 @@ config("stack_protector_default") {
   cflags = [ "-fno-stack-protector" ]
 }
 
+config("prefix_mappings_default") {
+  cflags = []
+  foreach(prefix_mapping, prefix_mappings) {
+    cflags += [ "-fdebug-prefix-map=${prefix_mapping}" ]
+  }
+}
+
 config("pic_default") {
   if (enable_pic) {
     cflags = [ "-fPIC" ]
@@ -514,7 +608,7 @@ config("aliasing_default") {
 }
 
 config("specs_default") {
-  if (current_cpu == "arm" && current_os == "freertos") {
+  if (current_cpu == "arm" && current_os == "freertos" && !is_clang) {
     cflags = [
       "--specs=nosys.specs",
       "--specs=nano.specs",

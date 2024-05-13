@@ -22,10 +22,10 @@
 #include "AppConfig.h"
 #include "AppTask.h"
 
-#include <logging/log.h>
-#include <zephyr.h>
+#include <zephyr/kernel.h>
+#include <zephyr/logging/log.h>
 
-LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
+LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 static k_timer sStartTimer;
 
@@ -50,12 +50,12 @@ void PumpManager::SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callba
 
 bool PumpManager::IsActionInProgress()
 {
-    return (mState == kState_StartInitiated || mState == kState_StartInitiated) ? true : false;
+    return (mState == kState_StartInitiated);
 }
 
 bool PumpManager::IsStopped()
 {
-    return (mState == kState_StopCompleted) ? true : false;
+    return (mState == kState_StopCompleted);
 }
 
 void PumpManager::EnableAutoRestart(bool aOn)
@@ -130,15 +130,15 @@ void PumpManager::TimerEventHandler(k_timer * timer)
     // once sStartTimer expires. Post an event to apptask queue with the actual handler
     // so that the event can be handled in the context of the apptask.
     AppEvent event;
-    event.Type               = AppEvent::kEventType_Timer;
+    event.Type               = AppEventType::Timer;
     event.TimerEvent.Context = pump;
     event.Handler            = pump->mAutoStartTimerArmed ? AutoRestartTimerEventHandler : PumpStartTimerEventHandler;
-    GetAppTask().PostEvent(&event);
+    AppTask::Instance().PostEvent(event);
 }
 
-void PumpManager::AutoRestartTimerEventHandler(AppEvent * aEvent)
+void PumpManager::AutoRestartTimerEventHandler(const AppEvent & aEvent)
 {
-    PumpManager * pump = static_cast<PumpManager *>(aEvent->TimerEvent.Context);
+    PumpManager * pump = static_cast<PumpManager *>(aEvent.TimerEvent.Context);
     int32_t actor      = 0;
 
     // Make sure auto start timer is still armed.
@@ -152,11 +152,11 @@ void PumpManager::AutoRestartTimerEventHandler(AppEvent * aEvent)
     pump->InitiateAction(actor, START_ACTION);
 }
 
-void PumpManager::PumpStartTimerEventHandler(AppEvent * aEvent)
+void PumpManager::PumpStartTimerEventHandler(const AppEvent & aEvent)
 {
     Action_t actionCompleted = INVALID_ACTION;
 
-    PumpManager * pump = static_cast<PumpManager *>(aEvent->TimerEvent.Context);
+    PumpManager * pump = static_cast<PumpManager *>(aEvent.TimerEvent.Context);
 
     if (pump->mState == kState_StartInitiated)
     {

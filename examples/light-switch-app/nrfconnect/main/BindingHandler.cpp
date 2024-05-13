@@ -21,8 +21,8 @@
 #include "ShellCommands.h"
 #endif
 
-#include <logging/log.h>
-LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
+#include <zephyr/logging/log.h>
+LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace chip;
 using namespace chip::app;
@@ -35,18 +35,58 @@ void BindingHandler::Init()
     DeviceLayer::PlatformMgr().ScheduleWork(InitInternal);
 }
 
-void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const EmberBindingTableEntry & aBinding, DeviceProxy * aDevice,
-                                         void * aContext)
+void BindingHandler::OnInvokeCommandFailure(BindingData & aBindingData, CHIP_ERROR aError)
 {
-    CHIP_ERROR ret = CHIP_NO_ERROR;
+    CHIP_ERROR error;
+
+    if (aError == CHIP_ERROR_TIMEOUT && !BindingHandler::GetInstance().mCaseSessionRecovered)
+    {
+        LOG_INF("Response timeout for invoked command, trying to recover CASE session.");
+
+        // Set flag to not try recover session multiple times.
+        BindingHandler::GetInstance().mCaseSessionRecovered = true;
+
+        // Allocate new object to make sure its life time will be appropriate.
+        BindingHandler::BindingData * data = Platform::New<BindingHandler::BindingData>();
+        *data                              = aBindingData;
+
+        // Establish new CASE session and retrasmit command that was not applied.
+        error = BindingManager::GetInstance().NotifyBoundClusterChanged(aBindingData.EndpointId, aBindingData.ClusterId,
+                                                                        static_cast<void *>(data));
+
+        if (CHIP_NO_ERROR != error)
+        {
+            LOG_ERR("NotifyBoundClusterChanged failed due to: %" CHIP_ERROR_FORMAT, error.Format());
+            return;
+        }
+    }
+    else
+    {
+        LOG_ERR("Binding command was not applied! Reason: %" CHIP_ERROR_FORMAT, aError.Format());
+    }
+}
+
+void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const EmberBindingTableEntry & aBinding,
+                                         OperationalDeviceProxy * aDevice, void * aContext)
+{
+    CHIP_ERROR ret     = CHIP_NO_ERROR;
+    BindingData * data = reinterpret_cast<BindingData *>(aContext);
 
     auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
         LOG_DBG("Binding command applied successfully!");
+
+        // If session was recovered and communication works, reset flag to the initial state.
+        if (BindingHandler::GetInstance().mCaseSessionRecovered)
+            BindingHandler::GetInstance().mCaseSessionRecovered = false;
     };
 
-    auto onFailure = [](CHIP_ERROR error) {
-        LOG_INF("Binding command was not applied! Reason: %" CHIP_ERROR_FORMAT, error.Format());
-    };
+    auto onFailure = [dataRef = *data](CHIP_ERROR aError) mutable { BindingHandler::OnInvokeCommandFailure(dataRef, aError); };
+
+    if (aDevice)
+    {
+        // We are validating connection is ready once here instead of multiple times in each case statement below.
+        VerifyOrDie(aDevice->ConnectionReady());
+    }
 
     switch (aCommandId)
     {
@@ -103,23 +143,32 @@ void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const EmberBindin
 }
 
 void BindingHandler::LevelControlProcessCommand(CommandId aCommandId, const EmberBindingTableEntry & aBinding,
-                                                DeviceProxy * aDevice, void * aContext)
+                                                OperationalDeviceProxy * aDevice, void * aContext)
 {
+    BindingData * data = reinterpret_cast<BindingData *>(aContext);
+
     auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
         LOG_DBG("Binding command applied successfully!");
+
+        // If session was recovered and communication works, reset flag to the initial state.
+        if (BindingHandler::GetInstance().mCaseSessionRecovered)
+            BindingHandler::GetInstance().mCaseSessionRecovered = false;
     };
 
-    auto onFailure = [](CHIP_ERROR error) {
-        LOG_INF("Binding command was not applied! Reason: %" CHIP_ERROR_FORMAT, error.Format());
-    };
+    auto onFailure = [dataRef = *data](CHIP_ERROR aError) mutable { BindingHandler::OnInvokeCommandFailure(dataRef, aError); };
 
     CHIP_ERROR ret = CHIP_NO_ERROR;
+
+    if (aDevice)
+    {
+        // We are validating connection is ready once here instead of multiple times in each case statement below.
+        VerifyOrDie(aDevice->ConnectionReady());
+    }
 
     switch (aCommandId)
     {
     case Clusters::LevelControl::Commands::MoveToLevel::Id: {
         Clusters::LevelControl::Commands::MoveToLevel::Type moveToLevelCommand;
-        BindingData * data       = reinterpret_cast<BindingData *>(aContext);
         moveToLevelCommand.level = data->Value;
         if (aDevice)
         {
@@ -143,12 +192,13 @@ void BindingHandler::LevelControlProcessCommand(CommandId aCommandId, const Embe
     }
 }
 
-void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & binding, DeviceProxy * deviceProxy, void * context)
+void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & binding, OperationalDeviceProxy * deviceProxy,
+                                               void * context)
 {
     VerifyOrReturn(context != nullptr, LOG_ERR("Invalid context for Light switch handler"););
     BindingData * data = static_cast<BindingData *>(context);
 
-    if (binding.type == EMBER_MULTICAST_BINDING && data->IsGroup)
+    if (binding.type == MATTER_MULTICAST_BINDING && data->IsGroup)
     {
         switch (data->ClusterId)
         {
@@ -159,11 +209,11 @@ void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & bi
             LevelControlProcessCommand(data->CommandId, binding, nullptr, context);
             break;
         default:
-            ChipLogError(NotSpecified, "Invalid binding group command data");
+            LOG_ERR("Invalid binding group command data");
             break;
         }
     }
-    else if (binding.type == EMBER_UNICAST_BINDING && !data->IsGroup)
+    else if (binding.type == MATTER_UNICAST_BINDING && !data->IsGroup)
     {
         switch (data->ClusterId)
         {
@@ -174,10 +224,17 @@ void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & bi
             LevelControlProcessCommand(data->CommandId, binding, deviceProxy, context);
             break;
         default:
-            ChipLogError(NotSpecified, "Invalid binding unicast command data");
+            LOG_ERR("Invalid binding unicast command data");
             break;
         }
     }
+}
+
+void BindingHandler::LightSwitchContextReleaseHandler(void * context)
+{
+    VerifyOrReturn(context != nullptr, LOG_ERR("Invalid context for Light switch context release handler"););
+
+    Platform::Delete(static_cast<BindingData *>(context));
 }
 
 void BindingHandler::InitInternal(intptr_t aArg)
@@ -192,7 +249,8 @@ void BindingHandler::InitInternal(intptr_t aArg)
     }
 
     BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
-    PrintBindingTable();
+    BindingManager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchContextReleaseHandler);
+    BindingHandler::GetInstance().PrintBindingTable();
 }
 
 bool BindingHandler::IsGroupBound()
@@ -201,7 +259,7 @@ bool BindingHandler::IsGroupBound()
 
     for (auto & entry : bindingTable)
     {
-        if (EMBER_MULTICAST_BINDING == entry.type)
+        if (MATTER_MULTICAST_BINDING == entry.type)
         {
             return true;
         }
@@ -219,17 +277,17 @@ void BindingHandler::PrintBindingTable()
     {
         switch (entry.type)
         {
-        case EMBER_UNICAST_BINDING:
+        case MATTER_UNICAST_BINDING:
             LOG_INF("[%d] UNICAST:", i++);
             LOG_INF("\t\t+ Fabric: %d\n \
             \t+ LocalEndpoint %d \n \
             \t+ ClusterId %d \n \
             \t+ RemoteEndpointId %d \n \
             \t+ NodeId %d",
-                    (int) entry.fabricIndex, (int) entry.local, (int) entry.clusterId.Value(), (int) entry.remote,
-                    (int) entry.nodeId);
+                    (int) entry.fabricIndex, (int) entry.local, (int) entry.clusterId.value_or(kInvalidClusterId),
+                    (int) entry.remote, (int) entry.nodeId);
             break;
-        case EMBER_MULTICAST_BINDING:
+        case MATTER_MULTICAST_BINDING:
             LOG_INF("[%d] GROUP:", i++);
             LOG_INF("\t\t+ Fabric: %d\n \
             \t+ LocalEndpoint %d \n \
@@ -237,11 +295,8 @@ void BindingHandler::PrintBindingTable()
             \t+ GroupId %d",
                     (int) entry.fabricIndex, (int) entry.local, (int) entry.remote, (int) entry.groupId);
             break;
-        case EMBER_UNUSED_BINDING:
+        case MATTER_UNUSED_BINDING:
             LOG_INF("[%d] UNUSED", i++);
-            break;
-        case EMBER_MANY_TO_ONE_BINDING:
-            LOG_INF("[%d] MANY TO ONE", i++);
             break;
         default:
             break;
@@ -256,6 +311,4 @@ void BindingHandler::SwitchWorkerHandler(intptr_t aContext)
     BindingData * data = reinterpret_cast<BindingData *>(aContext);
     LOG_INF("Notify Bounded Cluster | endpoint: %d cluster: %d", data->EndpointId, data->ClusterId);
     BindingManager::GetInstance().NotifyBoundClusterChanged(data->EndpointId, data->ClusterId, static_cast<void *>(data));
-
-    Platform::Delete(data);
 }

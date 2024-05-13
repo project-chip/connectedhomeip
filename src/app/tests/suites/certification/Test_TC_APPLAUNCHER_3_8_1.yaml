@@ -1,0 +1,74 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    19.4.6. [TC-APPLAUNCHER-3.8.1] Stop Application Verification (DUT as Client)
+
+PICS:
+    - APPLAUNCHER.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Preconditions"
+      verification: |
+          Commission TH to DUT, if not done so already. In some cases, such as with a Casting Video Player, the TH commissions the DUT.
+      disabled: true
+
+    - label: "Step 1: DUT sends StopApp command to TH"
+      PICS: APPLAUNCHER.C.C01.Tx
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
+
+          ./chip-tool applicationlauncher stop-app 1 1 --Application  '{"catalogVendorID": 123, "applicationID": "exampleid"}'
+
+          ./chip-tv-casting-app applicationlauncher stop-app 1 1 --Application  '{"catalogVendorID": 123, "applicationID": "exampleid"}'
+
+          On TH (tv-app), Verify the stop app command is received successfully.
+
+          74562683.652082][12550:12550] CHIP:DMG: InvokeRequestMessage =
+          [1674562683.652085][12550:12550] CHIP:DMG: {
+          [1674562683.652088][12550:12550] CHIP:DMG:         suppressResponse = false,
+          [1674562683.652092][12550:12550] CHIP:DMG:         timedRequest = false,
+          [1674562683.652095][12550:12550] CHIP:DMG:         InvokeRequests =
+          [1674562683.652101][12550:12550] CHIP:DMG:         [
+          [1674562683.652104][12550:12550] CHIP:DMG:                 CommandDataIB =
+          [1674562683.652108][12550:12550] CHIP:DMG:                 {
+          [1674562683.652111][12550:12550] CHIP:DMG:                         CommandPathIB =
+          [1674562683.652114][12550:12550] CHIP:DMG:                         {
+          [1674562683.652117][12550:12550] CHIP:DMG:                                 EndpointId = 0x1,
+          [1674562683.652121][12550:12550] CHIP:DMG:                                 ClusterId = 0x50c,
+          [1674562683.652125][12550:12550] CHIP:DMG:                                 CommandId = 0x1,
+          [1674562683.652128][12550:12550] CHIP:DMG:                         },
+          [1674562683.652131][12550:12550] CHIP:DMG:
+          [1674562683.652134][12550:12550] CHIP:DMG:                         CommandFields =
+          [1674562683.652137][12550:12550] CHIP:DMG:                         {
+          [1674562683.652140][12550:12550] CHIP:DMG:                                 0x0 =
+          [1674562683.652143][12550:12550] CHIP:DMG:                                 {
+          [1674562683.652147][12550:12550] CHIP:DMG:                                         0x0 = 123,
+          [1674562683.652152][12550:12550] CHIP:DMG:                                         0x1 = "exampleid" (9 chars),
+          [1674562683.652156][12550:12550] CHIP:DMG:                                 },
+          [1674562683.652159][12550:12550] CHIP:DMG:                         },
+          [1674562683.652162][12550:12550] CHIP:DMG:                 },
+          [1674562683.652167][12550:12550] CHIP:DMG:
+          [1674562683.652169][12550:12550] CHIP:DMG:         ],
+          [1674562683.652173][12550:12550] CHIP:DMG:
+          [1674562683.652175][12550:12550] CHIP:DMG:         InteractionModelRevision = 1
+          [1674562683.652177][12550:12550] CHIP:DMG: },
+          [1674562683.652193][12550:12550] CHIP:DMG: AccessControl: checking f=2 a=c s=0x000000000001B669 t= c=0x0000_050C e=1 p=o
+      disabled: true

@@ -28,9 +28,16 @@
 // FreeRTOS
 #include "FreeRTOS.h"
 #include "task.h"
+#if defined(GP_APP_DIVERSITY_POWERCYCLECOUNTING)
+#include "powercycle_counting.h"
+#endif
+#if defined(GP_APP_DIVERSITY_CLEARBOX_TESTING_HOOK_APPLICATION_INIT)
+#include "clearbox_testing_hooks.h"
+#endif
 
 // Qorvo CHIP library
 #include "qvCHIP.h"
+#include "qvIO.h"
 
 // CHIP includes
 #include <lib/support/CHIPMem.h>
@@ -38,16 +45,17 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#if PW_RPC_ENABLED
+#if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
 #include "Rpc.h"
 #endif // PW_RPC_ENABLED
 
-#if ENABLE_CHIP_SHELL
+#if defined(ENABLE_CHIP_SHELL) && ENABLE_CHIP_SHELL
 #include "shell_common/shell.h"
 #endif // ENABLE_CHIP_SHELL
 
 // Application level logic
 #include "AppTask.h"
+#include "ota.h"
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -55,8 +63,9 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
 
 namespace {
-constexpr int extDiscTimeoutSecs = 20;
-}
+constexpr uint32_t kInitOTARequestorDelaySec = 3;
+constexpr int extDiscTimeoutSecs             = 20;
+} // namespace
 
 /*****************************************************************************
  *                    Macro Definitions
@@ -70,28 +79,70 @@ constexpr int extDiscTimeoutSecs = 20;
  *                    Application Function Definitions
  *****************************************************************************/
 
-int Application_Init(void)
+CHIP_ERROR CHIP_Init(void);
+
+void Application_Init(void)
 {
+    CHIP_ERROR error;
+
+#if defined(GP_APP_DIVERSITY_CLEARBOX_TESTING_HOOK_APPLICATION_INIT)
+    GP_CLEARBOX_TESTING_APPLICATION_INIT_HOOK;
+#endif
+
+#if defined(GP_APP_DIVERSITY_POWERCYCLECOUNTING)
+    gpAppFramework_Reset_Init();
+#endif
+
+    /* Initialize IO */
+    qvIO_Init();
+
+    /* Initialize CHIP stack */
+    error = CHIP_Init();
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "CHIP_Init failed");
+        return;
+    }
+
     /* Launch application task */
     ChipLogProgress(NotSpecified, "============================");
     ChipLogProgress(NotSpecified, "Qorvo " APP_NAME " Launching");
     ChipLogProgress(NotSpecified, "============================");
 
-    CHIP_ERROR ret = GetAppTask().StartAppTask();
-    if (ret != CHIP_NO_ERROR)
+    error = GetAppTask().Init();
+    if (error != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "GetAppTask().Init() failed");
-        return -1;
+        return;
     }
 
-    return 0;
+    error = GetAppTask().StartAppTask();
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "GetAppTask().StartAppTask() failed");
+        return;
+    }
+}
+
+void ChipEventHandler(const ChipDeviceEvent * aEvent, intptr_t /* arg */)
+{
+    switch (aEvent->Type)
+    {
+    case DeviceEventType::kDnssdInitialized:
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+        InitializeOTARequestor();
+#endif
+        break;
+    default:
+        break;
+    }
 }
 
 CHIP_ERROR CHIP_Init(void)
 {
     CHIP_ERROR ret = CHIP_NO_ERROR;
 
-#if PW_RPC_ENABLED
+#if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
     ret = (CHIP_ERROR) chip::rpc::Init();
     if (ret != CHIP_NO_ERROR)
     {
@@ -107,7 +158,7 @@ CHIP_ERROR CHIP_Init(void)
         goto exit;
     }
 
-#if ENABLE_CHIP_SHELL
+#if defined(ENABLE_CHIP_SHELL) && ENABLE_CHIP_SHELL
     ret = (CHIP_ERROR) ShellTask::Start();
     if (ret != CHIP_NO_ERROR)
     {
@@ -133,10 +184,18 @@ CHIP_ERROR CHIP_Init(void)
         goto exit;
     }
 
-#if CHIP_DEVICE_CONFIG_THREAD_FTD
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_SSED) && CHIP_DEVICE_CONFIG_ENABLE_SSED
+    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SynchronizedSleepyEndDevice);
+    qvIO_EnableSleep(true);
+#elif CHIP_DEVICE_CONFIG_ENABLE_SED
+    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
+    qvIO_EnableSleep(true);
+#elif CHIP_DEVICE_CONFIG_THREAD_FTD
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+    qvIO_EnableSleep(true);
 #else
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
+    qvIO_EnableSleep(false);
 #endif
     if (ret != CHIP_NO_ERROR)
     {
@@ -154,6 +213,7 @@ CHIP_ERROR CHIP_Init(void)
 #endif // CHIP_ENABLE_OPENTHREAD
 
     ChipLogProgress(NotSpecified, "Starting Platform Manager Event Loop");
+    PlatformMgr().AddEventHandler(ChipEventHandler, 0);
     ret = PlatformMgr().StartEventLoopTask();
     if (ret != CHIP_NO_ERROR)
     {
@@ -168,36 +228,18 @@ exit:
 /*****************************************************************************
  * --- Main
  *****************************************************************************/
-
 int main(void)
 {
     int result;
-    CHIP_ERROR error;
 
     /* Initialize Qorvo stack */
-    result = qvCHIP_init();
+    result = qvCHIP_init(Application_Init);
     if (result < 0)
     {
-        goto exit;
-    }
-
-    /* Initialize CHIP stack */
-    error = CHIP_Init();
-    if (error != CHIP_NO_ERROR)
-    {
-        goto exit;
-    }
-
-    /* Application task */
-    result = Application_Init();
-    if (result < 0)
-    {
-        goto exit;
+        return 0;
     }
 
     /* Start FreeRTOS */
     vTaskStartScheduler();
-
-exit:
     return 0;
 }

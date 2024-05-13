@@ -1,0 +1,57 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 123.2.1. [TC-S-2.1] Attributes with DUT as Server
+
+PICS:
+    - S.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Scenes Management"
+    endpoint: 1
+
+tests:
+    - label: "Step 1: Commission DUT to TH"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH reads from the DUT the LastConfiguredBy attribute"
+      PICS: S.S.A0000
+      command: "readAttribute"
+      attribute: "LastConfiguredBy"
+      response:
+          constraints:
+              type: node_id
+
+    - label: "Step 3: TH reads from the DUT the SceneTableSize attribute"
+      PICS: S.S.A0001
+      command: "readAttribute"
+      attribute: "SceneTableSize"
+      response:
+          constraints:
+              type: int16u
+
+    - label: "Step 4: TH reads from the DUT the FabricSceneInfo attribute"
+      PICS: S.S.A0002
+      command: "readAttribute"
+      attribute: "FabricSceneInfo"
+      response:
+          constraints:
+              type: list

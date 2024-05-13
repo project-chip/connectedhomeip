@@ -22,11 +22,11 @@
 #      This file is utility for Chip BLE
 #
 
-from __future__ import absolute_import
-from __future__ import print_function
-from ctypes import *
-from .ChipUtility import ChipUtility
+from __future__ import absolute_import, print_function
 
+from ctypes import Structure, c_bool, c_int32, c_uint16, c_void_p
+
+from .ChipUtility import ChipUtility
 
 # Duplicates of BLE definitions in ChipDeviceController-ScriptBinding.cpp
 BLE_EVENT_TYPE_RX = 1
@@ -41,6 +41,9 @@ BLE_SUBSCRIBE_OPERATION_UNSUBSCRIBE = 2
 BLE_ERROR_REMOTE_DEVICE_DISCONNECTED = 12
 
 FAKE_CONN_OBJ_VALUE = 12121212
+
+# Number of bytes in service data payload
+SERVICE_DATA_LEN = 8
 
 
 def VoidPtrToUUIDString(ptr, len):
@@ -59,7 +62,7 @@ def VoidPtrToUUIDString(ptr, len):
             + ptr[20:]
         )
         ptr = str(ptr)
-    except Exception as ex:
+    except Exception:
         print("ERROR: failed to convert void * to UUID")
         ptr = None
 
@@ -316,7 +319,7 @@ class BleRxEventStruct(Structure):
         bleRxEventStruct.Buffer = ChipUtility.ByteArrayToVoidPtr(
             bleRxEvent.Buffer)
         bleRxEventStruct.Length = (
-            len(bleRxEvent.Buffer) if (bleRxEvent.Buffer != None) else 0
+            len(bleRxEvent.Buffer) if (bleRxEvent.Buffer is not None) else 0
         )
         return bleRxEventStruct
 
@@ -365,7 +368,7 @@ class BleDeviceIdentificationInfo:
 
 
 def ParseServiceData(data):
-    if len(data) != 7:
+    if len(data) != SERVICE_DATA_LEN:
         return None
     return BleDeviceIdentificationInfo(
         int(data[0]),

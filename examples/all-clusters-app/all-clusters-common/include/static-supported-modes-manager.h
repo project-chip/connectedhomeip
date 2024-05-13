@@ -19,7 +19,7 @@
 #pragma once
 
 #include <app/clusters/mode-select-server/supported-modes-manager.h>
-#include <app/util/af.h>
+#include <app/util/config.h>
 #include <cstring>
 
 namespace chip {
@@ -49,14 +49,15 @@ class StaticSupportedModesManager : public chip::app::Clusters::ModeSelect::Supp
     };
 
     static storage_value_type coffeeOptions[];
-    static const EndpointSpanPair supportedOptionsByEndpoints[EMBER_AF_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT];
+    static const EndpointSpanPair supportedOptionsByEndpoints[MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT];
 
 public:
     static const StaticSupportedModesManager instance;
 
-    const SupportedModesManager::ModeOptionsProvider getModeOptionsProvider(EndpointId endpointId) const override;
+    SupportedModesManager::ModeOptionsProvider getModeOptionsProvider(EndpointId endpointId) const override;
 
-    EmberAfStatus getModeOptionByMode(EndpointId endpointId, uint8_t mode, const ModeOptionStructType ** dataPtr) const override;
+    Protocols::InteractionModel::Status getModeOptionByMode(EndpointId endpointId, uint8_t mode,
+                                                            const ModeOptionStructType ** dataPtr) const override;
 
     ~StaticSupportedModesManager(){};
 

@@ -11,26 +11,30 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    31.11.1. [TC-SU-3.3] Tests the transfer of Images between the DUT and OTA-R
+    3.8.1. [TC-SU-3.3] Transfer of Software Update Images between DUT and OTA-R
+
+PICS:
+    - MCORE.OTA.Provider
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:
     - label:
-          "OTA-R/TH sends a QueryImage Command to the DUT. Protocol supported
-          should only list 'BDX' DUT responds with the QueryImageResponse to the
-          OTA-R/TH."
+          "Step 1: OTA-R/TH sends a QueryImage Command to the DUT. Protocol
+          supported should only list 'BDX'. DUT responds with the
+          QueryImageResponse to the OTA-R/TH."
       verification: |
-          chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
 
-          where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
 
-          Verify on the OTA Requestor logs
+          Verify on the OTA Requestor logs receives QueryImageResponse
 
           [1645743053319] [97809:20280821] CHIP: [SWU] QueryImageResponse:
           [1645743053319] [97809:20280821] CHIP: [SWU]   status: 0
@@ -43,46 +47,77 @@ tests:
           [1645743053319] [97809:20280821] CHIP: [SWU]   metadataForRequestor: 0
           [1645743053319] [97809:20280821] CHIP: [SWU] Update available from 0 to 1 version
 
-          Verifyon the OTA Requestor logs after image downloaded
+          Verify on the OTA Requestor logs after image downloaded
 
           [1645743059327] [97809:20280957] CHIP: [SWU] OTA image downloaded to test.txt
       disabled: true
 
     - label:
-          "DUT has a cached copy of the software image requested. OTA-R/TH sends
-          a QueryImage Command to the DUT. Protocol supported should only list
-          'BDX' DUT responds with the QueryImageResponse to the OTA-R/TH"
-      verification: |
-          Same as #1
-      disabled: true
-
-    - label:
-          "TH sends a QueryImage command to the DUT. RequestorCanConsent is set
-          to True by TH. DUT responds with a QueryImageResponse with
+          "Step 2: TH sends a QueryImage command to the DUT. RequestorCanConsent
+          is set to True by TH. DUT responds with a QueryImageResponse with
           UserConsentNeeded field set to True."
+      PICS: OTAP.S.M.UserConsentNeeded
       verification: |
           Run the OTA Requestor App using command
+          chip-ota-requestor-app --discriminator ${REQUESTOR_LONG_DISCRIMINATOR} --secured-device-port ${REQUESTOR_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --periodicQueryTimeout ${TIME_IN_SECONDS} -c
 
-          chip-ota-requestor-app --discriminator ${REQUESTOR_LONG_DISCRIMINATOR} --secured-device-port ${REQUESTOR_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --delayQuery ${TIME_IN_SECONDS} -c
+          out/chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin -c
+
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
 
           Verify that the DUT does not try to obtain User Consent from the user prior to transfer of software update image.
       disabled: true
 
     - label:
-          "TH sends a QueryImage command to the DUT. RequestorCanConsent is set
-          to True by TH. DUT responds with a QueryImageResponse with
+          "Step 3: TH sends a QueryImage command to the DUT. RequestorCanConsent
+          is set to True by TH. DUT responds with a QueryImageResponse with
           UserConsentNeeded field set to False."
+      PICS: OTAP.S.M.UserConsentNeeded
       verification: |
           Run the OTA Requestor App using command
 
-          chip-ota-requestor-app --discriminator ${REQUESTOR_LONG_DISCRIMINATOR} --secured-device-port ${REQUESTOR_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --delayQuery ${TIME_IN_SECONDS} -c
+          chip-ota-requestor-app --discriminator ${REQUESTOR_LONG_DISCRIMINATOR} --secured-device-port ${REQUESTOR_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --periodicQueryTimeout ${TIME_IN_SECONDS} -c
+
+          out/chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin
+
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
 
           Verify that the DUT tries to obtain User Consent from the user prior to transfer of software update image.
       disabled: true
 
     - label:
-          "IF (PICS_DT_Vendor_Specific) Perform the OTA Update from DUT using
-          vendor specific mechanism."
+          "Step 4: During the transfer of the image from the DUT, force fail the
+          transfer before it completely transfers the image. Wait for the Idle
+          timeout. Initiate another QueryImage Command from OTA-R/TH to the DUT."
       verification: |
-          Use vendor specific steps to initiate OTA Update and verify that the software image is transferred from the DUT
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
+
+          Kill the OTA Requestor App during the transfer of the image to the DUT before it completely transfers the image.
+
+          Verify that the BDX Idle timeout on DUT should be no less than 5 minutes.
+          [1651269360125] [23256:35291938] CHIP: [BDX] Transfer timed out
+
+          Relaunch the OTA Requestor App and initiate another query
+
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
+
+          Verify that a new transfer of software image is started from DUT when sending another QueryImage request
+      disabled: true
+
+    - label:
+          "Step 5: During the transfer of the image from the DUT, force fail the
+          transfer before it completely transfers the image. Initiate another
+          QueryImage Command from OTA-R/TH to the DUT. Set the RC[STARTOFS] bit
+          and associated STARTOFS field in the ReceiveInit Message sent from the
+          TH to indicate the resumption of a transfer previously aborted."
+      verification: |
+          Out of scope
       disabled: true

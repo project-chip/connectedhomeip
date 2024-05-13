@@ -1,0 +1,62 @@
+import("//build_overrides/chip.gni")
+import("//build_overrides/efr32_sdk.gni")
+import("${efr32_sdk_build_root}/efr32_sdk.gni")
+
+rs911x_src_plat = [
+  "${examples_plat_dir}/rs911x/rsi_if.c",
+  "${examples_plat_dir}/rs911x/wfx_rsi_host.cpp",
+  "${examples_plat_dir}/rs911x/hal/rsi_hal_mcu_interrupt.c",
+  "${examples_plat_dir}/rs911x/hal/rsi_hal_mcu_ioports.c",
+  "${examples_plat_dir}/rs911x/hal/rsi_hal_mcu_timer.c",
+  "${examples_plat_dir}/rs911x/hal/efx_spi.c",
+  "${silabs_plat_efr32_wifi_dir}/wfx_notify.cpp",
+]
+
+#
+# All the stuff from wiseconnect
+#
+rs911x_src_sapi = [
+  "${wiseconnect_sdk_root}/sapi/wlan/rsi_wlan_apis.c",
+  "${wiseconnect_sdk_root}/sapi/common/rsi_apis_non_rom.c",
+  "${wiseconnect_sdk_root}/sapi/common/rsi_apis_rom.c",
+  "${wiseconnect_sdk_root}/sapi/common/rsi_common_apis.c",
+  "${wiseconnect_sdk_root}/sapi/common/rsi_device_init_apis.c",
+  "${wiseconnect_sdk_root}/sapi/driver/device_interface/spi/rsi_spi_frame_rd_wr.c",
+  "${wiseconnect_sdk_root}/sapi/driver/device_interface/spi/rsi_spi_functs.c",
+  "${wiseconnect_sdk_root}/sapi/driver/device_interface/spi/rsi_spi_iface_init.c",
+  "${wiseconnect_sdk_root}/sapi/driver/device_interface/spi/rsi_spi_mem_rd_wr.c",
+  "${wiseconnect_sdk_root}/sapi/driver/device_interface/spi/rsi_spi_reg_rd_wr.c",
+  "${wiseconnect_sdk_root}/sapi/driver/rsi_common.c",
+  "${wiseconnect_sdk_root}/sapi/driver/rsi_device_init.c",
+  "${wiseconnect_sdk_root}/sapi/driver/rsi_driver_event_handlers.c",
+  "${wiseconnect_sdk_root}/sapi/driver/rsi_driver.c",
+  "${wiseconnect_sdk_root}/sapi/driver/rsi_events_rom.c",
+  "${wiseconnect_sdk_root}/sapi/driver/rsi_events.c",
+  "${wiseconnect_sdk_root}/sapi/driver/rsi_iap.c",
+  "${wiseconnect_sdk_root}/sapi/driver/rsi_nwk_rom.c",
+  "${wiseconnect_sdk_root}/sapi/driver/rsi_nwk.c",
+  "${wiseconnect_sdk_root}/sapi/driver/rsi_pkt_mgmt_rom.c",
+  "${wiseconnect_sdk_root}/sapi/driver/rsi_pkt_mgmt.c",
+  "${wiseconnect_sdk_root}/sapi/driver/rsi_queue_rom.c",
+  "${wiseconnect_sdk_root}/sapi/driver/rsi_queue.c",
+  "${wiseconnect_sdk_root}/sapi/driver/rsi_scheduler_rom.c",
+  "${wiseconnect_sdk_root}/sapi/driver/rsi_scheduler.c",
+  "${wiseconnect_sdk_root}/sapi/driver/rsi_setregion_countryinfo.c",
+  "${wiseconnect_sdk_root}/sapi/driver/rsi_timer.c",
+  "${wiseconnect_sdk_root}/sapi/driver/rsi_utils_rom.c",
+  "${wiseconnect_sdk_root}/sapi/driver/rsi_utils.c",
+  "${wiseconnect_sdk_root}/sapi/driver/rsi_wlan.c",
+  "${wiseconnect_sdk_root}/sapi/rtos/freertos_wrapper/rsi_os_wrapper.c",
+
+  # Apparently - the rsi library needs this (though we may not use use it)
+  "${wiseconnect_sdk_root}/sapi/network/socket/rsi_socket.c",
+  "${wiseconnect_sdk_root}/sapi/network/socket/rsi_socket_rom.c",
+]
+
+rs911x_cflags = [ "-Wno-empty-body" ]
+
+rs911x_inc_plat = [
+  "${examples_plat_dir}/rs911x",
+  "${examples_plat_dir}/rs911x/hal",
+  "${wiseconnect_sdk_root}/sapi/include",
+]

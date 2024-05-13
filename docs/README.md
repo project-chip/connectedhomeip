@@ -11,6 +11,11 @@
     [Visual Studio Code](https://code.visualstudio.com/) can be found in
     [the development guide](./VSCODE_DEVELOPMENT.md)
 
+## Platform Guides
+
+-   Various guides are available [here](./guides/README.md) that cover platform
+    bring up, testing, and various troubleshooting things.
+
 ## Project Flow
 
 -   Documentation about general project usage of GitHub, and project tools is
@@ -19,7 +24,7 @@
 ## Style Guide
 
 -   Documentation about style is documented in
-    [the style guide](./STYLE_GUIDE.md)
+    [the style guide](./style/style_guide.md)
 -   Additional documentation about more specific files are in the
     [style folder](./style/)
 

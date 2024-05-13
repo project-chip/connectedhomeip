@@ -24,6 +24,5 @@ chip_project_config_include_dirs =
     [ "${chip_root}/examples/ota-requestor-app/linux/include" ]
 chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 
-declare_args() {
-  chip_enable_ota_requestor = true
-}
+chip_enable_ota_requestor = true
+matter_enable_tracing_support = true

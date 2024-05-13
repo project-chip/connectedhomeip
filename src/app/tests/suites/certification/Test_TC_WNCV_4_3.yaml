@@ -13,8 +13,11 @@
 # limitations under the License.
 
 name:
-    Window Covering [TC-WNCV-4.3] GoToLiftPercentage Limits Verification with
-    server as DUT
+    Window Covering [TC-WNCV-4.3] GoToLiftPercentage command Limits Verification
+    [DUT as Server]
+
+PICS:
+    - WNCV.S
 
 config:
     nodeId: 0x12344321
@@ -22,7 +25,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "0: Wait for the commissioned device to be retrieved"
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -35,11 +38,11 @@ tests:
     ### Step 1x -> Verify the Lift Percent100ths and Percent attributes
     ### Shall be tested as equals CurrentPositionLiftPercent100ths
     - label:
-          "1a: If (PA_LF & LF) TH reads CurrentPositionLiftPercent100ths from
-          DUT"
+          "Step 1a: If (PA_LF & LF) TH reads CurrentPositionLiftPercent100ths
+          from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
-      PICS: WNCV_LF && WNCV_PA_LF
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
       response:
           saveAs: attrCurrentPositionLiftPercent100ths
           constraints:
@@ -47,63 +50,55 @@ tests:
               maxValue: 10000
 
     - label:
-          "1b: If (PA_LF & LF) TH reads CurrentPositionLiftPercentage from DUT"
+          "Step 1b 1c: If (PA_LF & LF) TH reads CurrentPositionLiftPercentage
+          from DUT + assert CurrentPositionLiftPercent100ths/100 equals
+          CurrentPositionLiftPercentage"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
-      PICS: WNCV_LF && WNCV_PA_LF && A_CURRENTPOSITIONLIFTPERCENTAGE
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A0008 && WNCV.S.A000e
       response:
-          saveAs: attrCurrentPositionLiftPercentage
+          value: attrCurrentPositionLiftPercent100ths / 100
           constraints:
               minValue: 0
               maxValue: 100
 
-    ##- label: "1c: If (PA_LF & LF) TH assert CurrentPositionLiftPercent100ths/100 equals CurrentPositionLiftPercentage"
-    ##  PICS: WNCV_LF && WNCV_PA_LF && A_CURRENTPOSITIONLIFTPERCENTAGE
-    # TODO [TC_WNCV_4_3] WindowCovering Fix this arithmetic operation issue #15190
-
     ######## Command BadParams 1 #######
     ### Step 2x -> Verify the GoToLiftPercentage with a BadParam
 
-    # - label: "2a: TH Generate a random badParam"
+    # - label: "Step 2a: TH Generate a random badParam"
     # since we don't know how to generate a random bad param
     # we use a default badParam for this test
 
-    - label: "2b: TH sends GoToLiftPercentage command with BadParam to DUT"
+    - label: "Step 2b: TH sends GoToLiftPercentage command with BadParam to DUT"
       command: "GoToLiftPercentage"
-      PICS: WNCV_LF && WNCV_PA_LF || WNCV_LF && PICS_CR_GOTOLIFTPERCENTAGE
+      PICS: WNCV.S.F00 && WNCV.S.F02 || WNCV.S.F00 && WNCV.S.C05.Rsp
       arguments:
           values:
-              - name: "LiftPercent100thsValue"
+              - name: "liftPercent100thsValue"
                 value: 0x3000
-              - name: "LiftPercentageValue"
-                value: 0x3F
       response:
           error: CONSTRAINT_ERROR
 
     ######## Command BadParams 2 ######
     ### Step 3x -> Verify the GoToLiftPercentage with 10001 as param
-    - label: "3a: TH sends GoToLiftPercentage command with 10001 to DUT"
+    - label: "Step 3a: TH sends GoToLiftPercentage command with 10001 to DUT"
       command: "GoToLiftPercentage"
-      PICS: WNCV_LF && WNCV_PA_LF || WNCV_LF && PICS_CR_GOTOLIFTPERCENTAGE
+      PICS: WNCV.S.F00 && WNCV.S.F02 || WNCV.S.F00 && WNCV.S.C05.Rsp
       arguments:
           values:
-              - name: "LiftPercent100thsValue"
+              - name: "liftPercent100thsValue"
                 value: 10001
-              - name: "LiftPercentageValue"
-                value: 100
       response:
           error: CONSTRAINT_ERROR
 
     ######## Command BadParams 3 ######
     ### Step 4x -> Verify the GoToLiftPercentage with 0xFFFF as param
-    - label: "4a: TH sends GoToLiftPercentage command with 0xFFFF to DUT"
+    - label: "Step 4a: TH sends GoToLiftPercentage command with 0xFFFF to DUT"
       command: "GoToLiftPercentage"
-      PICS: WNCV_LF && WNCV_PA_LF || WNCV_LF && PICS_CR_GOTOLIFTPERCENTAGE
+      PICS: WNCV.S.F00 && WNCV.S.F02 || WNCV.S.F00 && WNCV.S.C05.Rsp
       arguments:
           values:
-              - name: "LiftPercent100thsValue"
+              - name: "liftPercent100thsValue"
                 value: 0xFFFF
-              - name: "LiftPercentageValue"
-                value: 0xFF
       response:
           error: CONSTRAINT_ERROR

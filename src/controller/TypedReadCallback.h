@@ -18,12 +18,14 @@
 
 #pragma once
 
+#include <app/AppConfig.h>
 #include <app/BufferedReadCallback.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model/Decode.h>
 #include <functional>
 #include <lib/support/CHIPMem.h>
 
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
 namespace chip {
 namespace Controller {
 
@@ -52,15 +54,26 @@ public:
         std::function<void(const app::ConcreteDataAttributePath & aPath, const DecodableAttributeType & aData)>;
     using OnErrorCallbackType = std::function<void(const app::ConcreteDataAttributePath * aPath, CHIP_ERROR aError)>;
     using OnDoneCallbackType  = std::function<void(TypedReadAttributeCallback * callback)>;
-    using OnSubscriptionEstablishedCallbackType = std::function<void(const app::ReadClient & readClient)>;
-
+    using OnSubscriptionEstablishedCallbackType =
+        std::function<void(const app::ReadClient & readClient, SubscriptionId aSubscriptionId)>;
+    using OnResubscriptionAttemptCallbackType =
+        std::function<void(const app::ReadClient & readClient, CHIP_ERROR aError, uint32_t aNextResubscribeIntervalMsec)>;
     TypedReadAttributeCallback(ClusterId aClusterId, AttributeId aAttributeId, OnSuccessCallbackType aOnSuccess,
                                OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone,
-                               OnSubscriptionEstablishedCallbackType aOnSubscriptionEstablished = nullptr) :
+                               OnSubscriptionEstablishedCallbackType aOnSubscriptionEstablished = nullptr,
+                               OnResubscriptionAttemptCallbackType aOnResubscriptionAttempt     = nullptr) :
         mClusterId(aClusterId),
         mAttributeId(aAttributeId), mOnSuccess(aOnSuccess), mOnError(aOnError), mOnDone(aOnDone),
-        mOnSubscriptionEstablished(aOnSubscriptionEstablished), mBufferedReadAdapter(*this)
+        mOnSubscriptionEstablished(aOnSubscriptionEstablished), mOnResubscriptionAttempt(aOnResubscriptionAttempt),
+        mBufferedReadAdapter(*this)
     {}
+
+    ~TypedReadAttributeCallback()
+    {
+        // Ensure we release the ReadClient before we tear down anything else,
+        // so it can call our OnDeallocatePaths properly.
+        mReadClient = nullptr;
+    }
 
     app::BufferedReadCallback & GetBufferedCallback() { return mBufferedReadAdapter; }
 
@@ -70,6 +83,12 @@ private:
     void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                          const app::StatusIB & aStatus) override
     {
+        if (mCalledCallback && mReadClient->IsReadType())
+        {
+            return;
+        }
+        mCalledCallback = true;
+
         CHIP_ERROR err = CHIP_NO_ERROR;
         DecodableAttributeType value;
 
@@ -94,16 +113,37 @@ private:
         }
     }
 
-    void OnError(CHIP_ERROR aError) override { mOnError(nullptr, aError); }
+    void OnError(CHIP_ERROR aError) override
+    {
+        if (mCalledCallback && mReadClient->IsReadType())
+        {
+            return;
+        }
+        mCalledCallback = true;
 
-    void OnDone() override { mOnDone(this); }
+        mOnError(nullptr, aError);
+    }
 
-    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override
+    void OnDone(app::ReadClient *) override { mOnDone(this); }
+
+    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override
     {
         if (mOnSubscriptionEstablished)
         {
-            mOnSubscriptionEstablished(*mReadClient.get());
+            mOnSubscriptionEstablished(*mReadClient.get(), aSubscriptionId);
         }
+    }
+
+    CHIP_ERROR OnResubscriptionNeeded(chip::app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override
+    {
+        ReturnErrorOnFailure(app::ReadClient::Callback::OnResubscriptionNeeded(apReadClient, aTerminationCause));
+
+        if (mOnResubscriptionAttempt)
+        {
+            mOnResubscriptionAttempt(*mReadClient.get(), aTerminationCause, apReadClient->ComputeTimeTillNextSubscription());
+        }
+
+        return CHIP_NO_ERROR;
     }
 
     void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
@@ -124,8 +164,11 @@ private:
     OnErrorCallbackType mOnError;
     OnDoneCallbackType mOnDone;
     OnSubscriptionEstablishedCallbackType mOnSubscriptionEstablished;
+    OnResubscriptionAttemptCallbackType mOnResubscriptionAttempt;
     app::BufferedReadCallback mBufferedReadAdapter;
     Platform::UniquePtr<app::ReadClient> mReadClient;
+    // For reads, we ensure that we make only one data/error callback to our consumer.
+    bool mCalledCallback = false;
 };
 
 template <typename DecodableEventType>
@@ -134,20 +177,38 @@ class TypedReadEventCallback final : public app::ReadClient::Callback
 public:
     using OnSuccessCallbackType = std::function<void(const app::EventHeader & aEventHeader, const DecodableEventType & aData)>;
     using OnErrorCallbackType   = std::function<void(const app::EventHeader * apEventHeader, CHIP_ERROR aError)>;
-    using OnDoneCallbackType    = std::function<void(TypedReadEventCallback * callback)>;
-    using OnSubscriptionEstablishedCallbackType = std::function<void()>;
+    using OnDoneCallbackType    = std::function<void(app::ReadClient * apReadClient)>;
+    using OnSubscriptionEstablishedCallbackType =
+        std::function<void(const app::ReadClient & aReadClient, SubscriptionId aSubscriptionId)>;
+    using OnResubscriptionAttemptCallbackType =
+        std::function<void(const app::ReadClient & aReadClient, CHIP_ERROR aError, uint32_t aNextResubscribeIntervalMsec)>;
 
     TypedReadEventCallback(OnSuccessCallbackType aOnSuccess, OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone,
-                           OnSubscriptionEstablishedCallbackType aOnSubscriptionEstablished = nullptr) :
+                           OnSubscriptionEstablishedCallbackType aOnSubscriptionEstablished = nullptr,
+                           OnResubscriptionAttemptCallbackType aOnResubscriptionAttempt     = nullptr) :
         mOnSuccess(aOnSuccess),
-        mOnError(aOnError), mOnDone(aOnDone), mOnSubscriptionEstablished(aOnSubscriptionEstablished)
+        mOnError(aOnError), mOnDone(aOnDone), mOnSubscriptionEstablished(aOnSubscriptionEstablished),
+        mOnResubscriptionAttempt(aOnResubscriptionAttempt)
     {}
+
+    ~TypedReadEventCallback()
+    {
+        // Ensure we release the ReadClient before we tear down anything else,
+        // so it can call our OnDeallocatePaths properly.
+        mReadClient = nullptr;
+    }
 
     void AdoptReadClient(Platform::UniquePtr<app::ReadClient> aReadClient) { mReadClient = std::move(aReadClient); }
 
 private:
     void OnEventData(const app::EventHeader & aEventHeader, TLV::TLVReader * apData, const app::StatusIB * apStatus) override
     {
+        if (mCalledCallback && mReadClient->IsReadType())
+        {
+            return;
+        }
+        mCalledCallback = true;
+
         CHIP_ERROR err = CHIP_NO_ERROR;
         DecodableEventType value;
 
@@ -171,9 +232,27 @@ private:
         }
     }
 
-    void OnError(CHIP_ERROR aError) override { mOnError(nullptr, aError); }
+    void OnError(CHIP_ERROR aError) override
+    {
+        if (mCalledCallback && mReadClient->IsReadType())
+        {
+            return;
+        }
+        mCalledCallback = true;
 
-    void OnDone() override { mOnDone(this); }
+        mOnError(nullptr, aError);
+    }
+
+    void OnDone(app::ReadClient * apReadClient) override
+    {
+        if (mOnDone != nullptr)
+        {
+            mOnDone(apReadClient);
+        }
+
+        // Always needs to be the last call
+        chip::Platform::Delete(this);
+    }
 
     void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
     {
@@ -181,20 +260,36 @@ private:
         chip::Platform::Delete<app::EventPathParams>(aReadPrepareParams.mpEventPathParamsList);
     }
 
-    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override
+    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override
     {
         if (mOnSubscriptionEstablished)
         {
-            mOnSubscriptionEstablished();
+            mOnSubscriptionEstablished(*mReadClient.get(), aSubscriptionId);
         }
+    }
+
+    CHIP_ERROR OnResubscriptionNeeded(chip::app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override
+    {
+        ReturnErrorOnFailure(app::ReadClient::Callback::OnResubscriptionNeeded(apReadClient, aTerminationCause));
+
+        if (mOnResubscriptionAttempt)
+        {
+            mOnResubscriptionAttempt(*mReadClient.get(), aTerminationCause, apReadClient->ComputeTimeTillNextSubscription());
+        }
+
+        return CHIP_NO_ERROR;
     }
 
     OnSuccessCallbackType mOnSuccess;
     OnErrorCallbackType mOnError;
     OnDoneCallbackType mOnDone;
     OnSubscriptionEstablishedCallbackType mOnSubscriptionEstablished;
+    OnResubscriptionAttemptCallbackType mOnResubscriptionAttempt;
     Platform::UniquePtr<app::ReadClient> mReadClient;
+    // For reads, we ensure that we make only one data/error callback to our consumer.
+    bool mCalledCallback = false;
 };
 
 } // namespace Controller
 } // namespace chip
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT

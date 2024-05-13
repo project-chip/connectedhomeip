@@ -18,10 +18,10 @@ config:
     nodeId: 0x12344321
     endpoint: 1
     discriminator:
-        type: INT16U
+        type: int16u
         defaultValue: 3840
     payload:
-        type: CHAR_STRING
+        type: char_string
         defaultValue: "MT:-24J0AFN00KA0648G00" # This value needs to be generated automatically
 
 tests:
@@ -35,7 +35,7 @@ tests:
 
     - label: "Open Commissioning Window from alpha"
       endpoint: 0
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -46,7 +46,7 @@ tests:
     - label: "Commission from beta"
       identity: "beta"
       cluster: "CommissionerCommands"
-      command: "PairWithQRCode"
+      command: "PairWithCode"
       arguments:
           values:
               - name: "nodeId"
@@ -65,7 +65,7 @@ tests:
 
     - label: "Write TestFabricScoped list from alpha"
       identity: "alpha"
-      cluster: "Test Cluster"
+      cluster: "Unit Testing"
       command: "writeAttribute"
       attribute: "list_fabric_scoped"
       arguments:
@@ -75,7 +75,7 @@ tests:
                       # Write in a bogus value for the fabric index. This should never actually make it across the wire,
                       # nor be meaningfully ingested by a correct receiver.
                       #
-                      fabricIndex: 100,
+                      FabricIndex: 100,
                       fabricSensitiveInt8u: 33,
                       optionalFabricSensitiveInt8u: 34,
                       nullableFabricSensitiveInt8u: null,
@@ -95,7 +95,7 @@ tests:
                       fabricSensitiveInt8uList: [1, 2, 3, 4],
                   },
                   {
-                      fabricIndex: 100,
+                      FabricIndex: 100,
                       fabricSensitiveInt8u: 43,
                       optionalFabricSensitiveInt8u: 44,
                       nullableFabricSensitiveInt8u: null,
@@ -118,14 +118,14 @@ tests:
 
     - label: "Write TestFabricScoped list from beta"
       identity: "beta"
-      cluster: "Test Cluster"
+      cluster: "Unit Testing"
       command: "writeAttribute"
       attribute: "list_fabric_scoped"
       arguments:
           value:
               [
                   {
-                      fabricIndex: 100,
+                      FabricIndex: 100,
                       fabricSensitiveInt8u: 133,
                       optionalFabricSensitiveInt8u: 134,
                       nullableFabricSensitiveInt8u: null,
@@ -135,7 +135,7 @@ tests:
                           {
                               a: 0,
                               b: true,
-                              c: 12,
+                              c: 2,
                               d: "",
                               e: "",
                               f: 11,
@@ -145,7 +145,7 @@ tests:
                       fabricSensitiveInt8uList: [11, 12, 13, 14],
                   },
                   {
-                      fabricIndex: 100,
+                      FabricIndex: 100,
                       fabricSensitiveInt8u: 143,
                       optionalFabricSensitiveInt8u: 144,
                       nullableFabricSensitiveInt8u: null,
@@ -155,7 +155,7 @@ tests:
                           {
                               a: 0,
                               b: true,
-                              c: 13,
+                              c: 1,
                               d: "",
                               e: "",
                               f: 12,
@@ -168,14 +168,14 @@ tests:
 
     - label: "Read back TestFabricScoped list from alpha"
       identity: "alpha"
-      cluster: "Test Cluster"
+      cluster: "Unit Testing"
       command: "readAttribute"
       attribute: "list_fabric_scoped"
       response:
           value:
               [
                   {
-                      fabricIndex: 1,
+                      FabricIndex: 1,
                       fabricSensitiveInt8u: 33,
                       optionalFabricSensitiveInt8u: 34,
                       nullableFabricSensitiveInt8u: null,
@@ -195,7 +195,7 @@ tests:
                       fabricSensitiveInt8uList: [1, 2, 3, 4],
                   },
                   {
-                      fabricIndex: 1,
+                      FabricIndex: 1,
                       fabricSensitiveInt8u: 43,
                       optionalFabricSensitiveInt8u: 44,
                       nullableFabricSensitiveInt8u: null,
@@ -218,14 +218,14 @@ tests:
 
     - label: "Read back TestFabricScoped list from beta"
       identity: "beta"
-      cluster: "Test Cluster"
+      cluster: "Unit Testing"
       command: "readAttribute"
       attribute: "list_fabric_scoped"
       response:
           value:
               [
                   {
-                      fabricIndex: 2,
+                      FabricIndex: 2,
                       fabricSensitiveInt8u: 133,
                       optionalFabricSensitiveInt8u: 134,
                       nullableFabricSensitiveInt8u: null,
@@ -235,7 +235,7 @@ tests:
                           {
                               a: 0,
                               b: true,
-                              c: 12,
+                              c: 2,
                               d: "",
                               e: "",
                               f: 11,
@@ -245,7 +245,7 @@ tests:
                       fabricSensitiveInt8uList: [11, 12, 13, 14],
                   },
                   {
-                      fabricIndex: 2,
+                      FabricIndex: 2,
                       fabricSensitiveInt8u: 143,
                       optionalFabricSensitiveInt8u: 144,
                       nullableFabricSensitiveInt8u: null,
@@ -255,7 +255,7 @@ tests:
                           {
                               a: 0,
                               b: true,
-                              c: 13,
+                              c: 1,
                               d: "",
                               e: "",
                               f: 12,
@@ -268,7 +268,7 @@ tests:
 
     - label: "Read back TestFabricScoped list from alpha (fabricFiltered false)"
       identity: "alpha"
-      cluster: "Test Cluster"
+      cluster: "Unit Testing"
       command: "readAttribute"
       fabricFiltered: false
       attribute: "list_fabric_scoped"
@@ -284,10 +284,9 @@ tests:
           #
           #      TODO: This can be fixed using the `saveAs` function.
           #
-          value:
-              [
+          value: [
                   {
-                      fabricIndex: 1,
+                      FabricIndex: 1,
                       fabricSensitiveInt8u: 33,
                       optionalFabricSensitiveInt8u: 34,
                       nullableFabricSensitiveInt8u: null,
@@ -307,7 +306,7 @@ tests:
                       fabricSensitiveInt8uList: [1, 2, 3, 4],
                   },
                   {
-                      fabricIndex: 1,
+                      FabricIndex: 1,
                       fabricSensitiveInt8u: 43,
                       optionalFabricSensitiveInt8u: 44,
                       nullableFabricSensitiveInt8u: null,
@@ -327,90 +326,69 @@ tests:
                       fabricSensitiveInt8uList: [2, 3, 4, 5],
                   },
                   {
-                      fabricIndex: 2,
-                      fabricSensitiveInt8u: 0,
+                      FabricIndex: 2,
+                      # These should actually be missing, not null, but right
+                      # now our harness treats those the same, and we have no
+                      # way to indicate "missing" in the YAML.
+                      # https://github.com/project-chip/connectedhomeip/issues/29110
+                      fabricSensitiveInt8u: null,
+                      optionalFabricSensitiveInt8u: null,
                       nullableFabricSensitiveInt8u: null,
-                      fabricSensitiveCharString: "",
-                      fabricSensitiveStruct:
-                          {
-                              a: 0,
-                              b: false,
-                              c: 0,
-                              d: "",
-                              e: "",
-                              f: 0,
-                              g: 0,
-                              h: 0,
-                          },
-                      fabricSensitiveInt8uList: [],
+                      fabricSensitiveCharString: null,
+                      fabricSensitiveStruct: null,
+                      fabricSensitiveInt8uList: null,
                   },
                   {
-                      fabricIndex: 2,
-                      fabricSensitiveInt8u: 0,
+                      FabricIndex: 2,
+                      # These should actually be missing, not null, but right
+                      # now our harness treats those the same, and we have no
+                      # way to indicate "missing" in the YAML.
+                      # https://github.com/project-chip/connectedhomeip/issues/29110
+                      fabricSensitiveInt8u: null,
+                      optionalFabricSensitiveInt8u: null,
                       nullableFabricSensitiveInt8u: null,
-                      fabricSensitiveCharString: "",
-                      fabricSensitiveStruct:
-                          {
-                              a: 0,
-                              b: false,
-                              c: 0,
-                              d: "",
-                              e: "",
-                              f: 0,
-                              g: 0,
-                              h: 0,
-                          },
-                      fabricSensitiveInt8uList: [],
+                      fabricSensitiveCharString: null,
+                      fabricSensitiveStruct: null,
+                      fabricSensitiveInt8uList: null,
                   },
               ]
 
     - label: "Read back TestFabricScoped list from beta (fabricFiltered false)"
       identity: "beta"
-      cluster: "Test Cluster"
+      cluster: "Unit Testing"
       command: "readAttribute"
       fabricFiltered: false
       attribute: "list_fabric_scoped"
       response:
-          value:
-              [
+          value: [
                   {
-                      fabricIndex: 1,
-                      fabricSensitiveInt8u: 0,
+                      FabricIndex: 1,
+                      # These should actually be missing, not null, but right
+                      # now our harness treats those the same, and we have no
+                      # way to indicate "missing" in the YAML.
+                      # https://github.com/project-chip/connectedhomeip/issues/29110
+                      fabricSensitiveInt8u: null,
+                      optionalFabricSensitiveInt8u: null,
                       nullableFabricSensitiveInt8u: null,
-                      fabricSensitiveCharString: "",
-                      fabricSensitiveStruct:
-                          {
-                              a: 0,
-                              b: false,
-                              c: 0,
-                              d: "",
-                              e: "",
-                              f: 0,
-                              g: 0,
-                              h: 0,
-                          },
-                      fabricSensitiveInt8uList: [],
+                      fabricSensitiveCharString: null,
+                      fabricSensitiveStruct: null,
+                      fabricSensitiveInt8uList: null,
                   },
                   {
-                      fabricIndex: 1,
-                      fabricSensitiveInt8u: 0,
+                      FabricIndex: 1,
+                      # These should actually be missing, not null, but right
+                      # now our harness treats those the same, and we have no
+                      # way to indicate "missing" in the YAML.
+                      # https://github.com/project-chip/connectedhomeip/issues/29110
+                      fabricSensitiveInt8u: null,
+                      optionalFabricSensitiveInt8u: null,
                       nullableFabricSensitiveInt8u: null,
-                      fabricSensitiveCharString: "",
-                      fabricSensitiveStruct:
-                          {
-                              a: 0,
-                              b: false,
-                              c: 0,
-                              d: "",
-                              e: "",
-                              f: 0,
-                              g: 0,
-                              h: 0,
-                          },
-                      fabricSensitiveInt8uList: [],
+                      fabricSensitiveCharString: null,
+                      fabricSensitiveStruct: null,
+                      fabricSensitiveInt8uList: null,
                   },
                   {
-                      fabricIndex: 2,
+                      FabricIndex: 2,
                       fabricSensitiveInt8u: 133,
                       optionalFabricSensitiveInt8u: 134,
                       nullableFabricSensitiveInt8u: null,
@@ -420,7 +398,7 @@ tests:
                           {
                               a: 0,
                               b: true,
-                              c: 12,
+                              c: 2,
                               d: "",
                               e: "",
                               f: 11,
@@ -430,7 +408,7 @@ tests:
                       fabricSensitiveInt8uList: [11, 12, 13, 14],
                   },
                   {
-                      fabricIndex: 2,
+                      FabricIndex: 2,
                       fabricSensitiveInt8u: 143,
                       optionalFabricSensitiveInt8u: 144,
                       nullableFabricSensitiveInt8u: null,
@@ -440,7 +418,7 @@ tests:
                           {
                               a: 0,
                               b: true,
-                              c: 13,
+                              c: 1,
                               d: "",
                               e: "",
                               f: 12,
@@ -453,14 +431,14 @@ tests:
 
     - label: "Write smaller TestFabricScoped list from alpha (again)"
       identity: "alpha"
-      cluster: "Test Cluster"
+      cluster: "Unit Testing"
       command: "writeAttribute"
       attribute: "list_fabric_scoped"
       arguments:
           value:
               [
                   {
-                      fabricIndex: 100,
+                      FabricIndex: 100,
                       fabricSensitiveInt8u: 53,
                       optionalFabricSensitiveInt8u: 54,
                       nullableFabricSensitiveInt8u: null,
@@ -470,7 +448,7 @@ tests:
                           {
                               a: 0,
                               b: true,
-                              c: 52,
+                              c: 2,
                               d: "",
                               e: "",
                               f: 51,
@@ -483,14 +461,14 @@ tests:
 
     - label: "Read back unchanged TestFabricScoped list from beta (again)"
       identity: "beta"
-      cluster: "Test Cluster"
+      cluster: "Unit Testing"
       command: "readAttribute"
       attribute: "list_fabric_scoped"
       response:
           value:
               [
                   {
-                      fabricIndex: 2,
+                      FabricIndex: 2,
                       fabricSensitiveInt8u: 133,
                       optionalFabricSensitiveInt8u: 134,
                       nullableFabricSensitiveInt8u: null,
@@ -500,7 +478,7 @@ tests:
                           {
                               a: 0,
                               b: true,
-                              c: 12,
+                              c: 2,
                               d: "",
                               e: "",
                               f: 11,
@@ -510,7 +488,7 @@ tests:
                       fabricSensitiveInt8uList: [11, 12, 13, 14],
                   },
                   {
-                      fabricIndex: 2,
+                      FabricIndex: 2,
                       fabricSensitiveInt8u: 143,
                       optionalFabricSensitiveInt8u: 144,
                       nullableFabricSensitiveInt8u: null,
@@ -520,7 +498,7 @@ tests:
                           {
                               a: 0,
                               b: true,
-                              c: 13,
+                              c: 1,
                               d: "",
                               e: "",
                               f: 12,
@@ -533,14 +511,14 @@ tests:
 
     - label: "Read back TestFabricScoped list from alpha (again)"
       identity: "alpha"
-      cluster: "Test Cluster"
+      cluster: "Unit Testing"
       command: "readAttribute"
       attribute: "list_fabric_scoped"
       response:
           value:
               [
                   {
-                      fabricIndex: 1,
+                      FabricIndex: 1,
                       fabricSensitiveInt8u: 53,
                       optionalFabricSensitiveInt8u: 54,
                       nullableFabricSensitiveInt8u: null,
@@ -550,7 +528,7 @@ tests:
                           {
                               a: 0,
                               b: true,
-                              c: 52,
+                              c: 2,
                               d: "",
                               e: "",
                               f: 51,

@@ -26,48 +26,46 @@ namespace chip {
 
 class CASEClient;
 
-typedef void (*OnCASEConnected)(void * context, CASEClient * client);
-typedef void (*OnCASEConnectionFailure)(void * context, CASEClient * client, CHIP_ERROR error);
-
 struct CASEClientInitParams
 {
-    SessionManager * sessionManager                     = nullptr;
-    SessionResumptionStorage * sessionResumptionStorage = nullptr;
-    Messaging::ExchangeManager * exchangeMgr            = nullptr;
-    FabricInfo * fabricInfo                             = nullptr;
-    Credentials::GroupDataProvider * groupDataProvider  = nullptr;
+    SessionManager * sessionManager                                    = nullptr;
+    SessionResumptionStorage * sessionResumptionStorage                = nullptr;
+    Credentials::CertificateValidityPolicy * certificateValidityPolicy = nullptr;
+    Messaging::ExchangeManager * exchangeMgr                           = nullptr;
+    FabricTable * fabricTable                                          = nullptr;
+    Credentials::GroupDataProvider * groupDataProvider                 = nullptr;
 
-    Optional<ReliableMessageProtocolConfig> mrpLocalConfig = Optional<ReliableMessageProtocolConfig>::Missing();
+    // mrpLocalConfig should not generally be set to anything other than
+    // NullOptional.  Doing that can lead to different parts of the system
+    // claiming different MRP parameters for the same node.
+    Optional<ReliableMessageProtocolConfig> mrpLocalConfig = NullOptional;
+
+    CHIP_ERROR Validate() const
+    {
+        // sessionResumptionStorage can be nullptr when resumption is disabled.
+        // certificateValidityPolicy is optional, too.
+        ReturnErrorCodeIf(sessionManager == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorCodeIf(exchangeMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorCodeIf(fabricTable == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorCodeIf(groupDataProvider == nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+        return CHIP_NO_ERROR;
+    }
 };
 
-class DLL_EXPORT CASEClient : public SessionEstablishmentDelegate
+class DLL_EXPORT CASEClient
 {
 public:
-    CASEClient(const CASEClientInitParams & params);
+    void SetRemoteMRPIntervals(const ReliableMessageProtocolConfig & remoteMRPConfig);
 
-    void SetMRPIntervals(const ReliableMessageProtocolConfig & mrpConfig);
+    const ReliableMessageProtocolConfig & GetRemoteMRPIntervals();
 
-    CHIP_ERROR EstablishSession(PeerId peer, const Transport::PeerAddress & peerAddress,
-                                const ReliableMessageProtocolConfig & mrpConfig, OnCASEConnected onConnection,
-                                OnCASEConnectionFailure onFailure, void * context);
-
-    // Implementation of SessionEstablishmentDelegate
-    void OnSessionEstablishmentError(CHIP_ERROR error) override;
-
-    void OnSessionEstablished() override;
-
-    CHIP_ERROR DeriveSecureSessionHandle(SessionHolder & handle);
+    CHIP_ERROR EstablishSession(const CASEClientInitParams & params, const ScopedNodeId & peer,
+                                const Transport::PeerAddress & peerAddress, const ReliableMessageProtocolConfig & remoteMRPConfig,
+                                SessionEstablishmentDelegate * delegate);
 
 private:
-    CASEClientInitParams mInitParams;
-
     CASESession mCASESession;
-    PeerId mPeerId;
-    Transport::PeerAddress mPeerAddress;
-
-    OnCASEConnected mConnectionSuccessCallback         = nullptr;
-    OnCASEConnectionFailure mConnectionFailureCallback = nullptr;
-    void * mConectionContext                           = nullptr;
 };
 
 } // namespace chip

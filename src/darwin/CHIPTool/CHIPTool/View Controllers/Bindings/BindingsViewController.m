@@ -118,8 +118,8 @@
 
 - (void)_clearTextFields
 {
-    CHIPDeviceController * chipController = InitializeCHIP();
-    _nodeIDTextField.text = [NSString stringWithFormat:@"%@", chipController.getControllerNodeId];
+    MTRDeviceController * chipController = InitializeMTR();
+    _nodeIDTextField.text = [NSString stringWithFormat:@"%@", chipController.controllerNodeId];
     _endpointIDTextField.text = @"1";
     _groupIDTextField.text = @"0";
     _clusterIDTextField.text = @"";
@@ -134,7 +134,7 @@
     [scanner scanUnsignedLongLong:&nodeId];
 
     // TODO Binding Support was removed from ObjC Clusters.h
-    if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
+    if (MTRGetConnectedDevice(^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
                 NSString * resultString = [NSString stringWithFormat:@"Not Supported"];
                 NSLog(resultString, nil);
@@ -150,7 +150,7 @@
 
 - (IBAction)unbind:(id)sender
 {
-    if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
+    if (MTRGetConnectedDevice(^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
                 NSString * resultString = [NSString stringWithFormat:@"Not Supported"];
                 NSLog(resultString, nil);

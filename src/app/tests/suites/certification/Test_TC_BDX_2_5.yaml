@@ -11,21 +11,29 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 28.2.5. [TC-BDX-2.5] Asynchronous file receiving
+name: 29.2.5. [TC-BDX-2.5] Asynchronous file receiving
+
+PICS:
+    - MCORE.BDX.AsynchronousReceiver
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:
     - label:
           "DUT sends a ReceiveInit message to TH + TH sends a ReceiveAccept
           message back to DUT + TH sends a Block message to DUT"
+      verification: |
+          Verify that the ReceiveInit message has the following fields Proposed Transfer Control - PTC[ASYNC] field bit shall be set.
       disabled: true
 
     - label:
           "TH sends a BlockEOF message to DUT + DUT sends a BlockAckEOF message
           back to TH"
+      verification: |
+          Verify that the BlockAckEOF message has the following mandatory fields Block Counter - Must correspond to the Block Counter which was embedded in the BlockEOF being acknowledged.
       disabled: true

@@ -15,6 +15,20 @@
 #
 mainmenu "Matter nRF Connect Lighting Example Application"
 
-rsource "../../../config/nrfconnect/chip-module/Kconfig.defaults"
+# Sample configuration used for Thread networking
+if NET_L2_OPENTHREAD
+
+choice OPENTHREAD_NORDIC_LIBRARY_CONFIGURATION
+	default OPENTHREAD_NORDIC_LIBRARY_FTD
+endchoice
+
+choice OPENTHREAD_DEVICE_TYPE
+	default OPENTHREAD_FTD
+endchoice
+
+endif # NET_L2_OPENTHREAD
+
+
 rsource "../../../config/nrfconnect/chip-module/Kconfig.features"
+rsource "../../../config/nrfconnect/chip-module/Kconfig.defaults"
 source "Kconfig.zephyr"

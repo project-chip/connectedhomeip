@@ -14,13 +14,18 @@
 
 name: 9.2.1. [TC-RH-2.1] Attributes with server as DUT
 
+PICS:
+    - RH.S
+
 config:
     nodeId: 0x12344321
     cluster: "Relative Humidity Measurement"
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -28,40 +33,44 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Reads constraints of attribute: MeasuredValue"
+    - label: "Step 2: TH reads the MinMeasuredValue attribute from the DUT"
+      PICS: RH.S.A0001
       command: "readAttribute"
-      attribute: "measured value"
+      attribute: "MinMeasuredValue"
       response:
+          saveAs: CurrentMinMeasured
           constraints:
-              type: int16
-              minValue: 0
-              maxValue: 10000
-
-    - label: "Reads constraints of attribute: MinMeasuredValue"
-      command: "readAttribute"
-      attribute: "min measured value"
-      response:
-          constraints:
-              type: int16
+              type: int16u
               minValue: 0
               maxValue: 9999
 
-    - label: "Reads constraints of attribute: MaxMeasuredValue"
-      disabled: true
+    - label: "Step 3: TH reads the MaxMeasuredValue attribute from the DUT"
+      PICS: RH.S.A0002
       command: "readAttribute"
-      attribute: "max measured value"
+      attribute: "MaxMeasuredValue"
       response:
+          saveAs: CurrentMaxMeasured
           constraints:
-              type: int16
-              minValue: 1
+              type: int16u
+              minValue: CurrentMinMeasured + 1
               maxValue: 10000
 
-    - label: "Reads constraints of attribute: Tolerance"
-      optional: true
+    - label: "Step 4: TH reads the MeasuredValue attribute from the DUT"
+      PICS: RH.S.A0000
       command: "readAttribute"
-      attribute: "tolerance"
+      attribute: "MeasuredValue"
       response:
           constraints:
-              type: uint16
+              type: int16u
+              minValue: CurrentMinMeasured
+              maxValue: CurrentMaxMeasured
+
+    - label: "Step 5: TH reads the Tolerance attribute from the DUT"
+      PICS: RH.S.A0003
+      command: "readAttribute"
+      attribute: "Tolerance"
+      response:
+          constraints:
+              type: int16u
               minValue: 0
               maxValue: 2048

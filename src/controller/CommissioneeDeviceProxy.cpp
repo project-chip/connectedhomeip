@@ -26,16 +26,14 @@
 
 #include <controller/CommissioneeDeviceProxy.h>
 
-#include <controller-clusters/zap-generated/CHIPClusters.h>
-
 #include <app/CommandSender.h>
 #include <app/ReadPrepareParams.h>
 #include <app/util/DataModelHandler.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -47,7 +45,8 @@ CHIP_ERROR CommissioneeDeviceProxy::SendCommands(app::CommandSender * commandObj
 {
     VerifyOrReturnError(mSecureSession, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(commandObj != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    return commandObj->SendCommandRequest(mSecureSession.Get(), timeout);
+    VerifyOrReturnError(mSecureSession, CHIP_ERROR_MISSING_SECURE_SESSION);
+    return commandObj->SendCommandRequest(mSecureSession.Get().Value(), timeout);
 }
 
 void CommissioneeDeviceProxy::OnSessionReleased()
@@ -55,16 +54,25 @@ void CommissioneeDeviceProxy::OnSessionReleased()
     mState = ConnectionState::NotConnected;
 }
 
-CHIP_ERROR CommissioneeDeviceProxy::CloseSession()
+void CommissioneeDeviceProxy::CloseSession()
 {
-    ReturnErrorCodeIf(mState != ConnectionState::SecureConnected, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturn(mState == ConnectionState::SecureConnected);
     if (mSecureSession)
     {
-        mSessionManager->ExpirePairing(mSecureSession.Get());
+        mSecureSession->AsSecureSession()->MarkForEviction();
     }
+
     mState = ConnectionState::NotConnected;
     mPairing.Clear();
-    return CHIP_NO_ERROR;
+}
+
+chip::Optional<SessionHandle> CommissioneeDeviceProxy::DetachSecureSession()
+{
+    auto session = mSecureSession.Get();
+    mSecureSession.Release();
+    mState = ConnectionState::NotConnected;
+    mPairing.Clear();
+    return session;
 }
 
 CHIP_ERROR CommissioneeDeviceProxy::UpdateDeviceData(const Transport::PeerAddress & addr,
@@ -72,11 +80,9 @@ CHIP_ERROR CommissioneeDeviceProxy::UpdateDeviceData(const Transport::PeerAddres
 {
     mDeviceAddress = addr;
 
-    mMRPConfig = config;
-
     // Initialize PASE session state with any MRP parameters that DNS-SD has provided.
     // It can be overridden by PASE session protocol messages that include MRP parameters.
-    mPairing.SetMRPConfig(mMRPConfig);
+    mPairing.SetRemoteMRPConfig(config);
 
     if (!mSecureSession)
     {
@@ -87,58 +93,35 @@ CHIP_ERROR CommissioneeDeviceProxy::UpdateDeviceData(const Transport::PeerAddres
         return CHIP_NO_ERROR;
     }
 
-    Transport::SecureSession * secureSession = mSecureSession.Get()->AsSecureSession();
+    Transport::SecureSession * secureSession = mSecureSession.Get().Value()->AsSecureSession();
     secureSession->SetPeerAddress(addr);
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommissioneeDeviceProxy::SetConnected()
+CHIP_ERROR CommissioneeDeviceProxy::SetConnected(const SessionHandle & session)
 {
-    if (mState != ConnectionState::Connecting)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(mState == ConnectionState::Connecting, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(session->AsSecureSession()->IsPASESession(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    CHIP_ERROR err = mSessionManager->NewPairing(mSecureSession, Optional<Transport::PeerAddress>::Value(mDeviceAddress),
-                                                 GetDeviceId(), &mPairing, CryptoContext::SessionRole::kInitiator, mFabricIndex);
-
-    if (err == CHIP_NO_ERROR)
+    if (!mSecureSession.Grab(session))
     {
-        mState = ConnectionState::SecureConnected;
-    }
-    else
-    {
-        ChipLogError(Controller, "NewPairing returning error %" CHIP_ERROR_FORMAT, err.Format());
         mState = ConnectionState::NotConnected;
+        return CHIP_ERROR_INTERNAL;
     }
-    return err;
+
+    mState = ConnectionState::SecureConnected;
+    return CHIP_NO_ERROR;
 }
 
-void CommissioneeDeviceProxy::Reset()
+CommissioneeDeviceProxy::~CommissioneeDeviceProxy()
 {
-    SetActive(false);
-
-    mState              = ConnectionState::NotConnected;
-    mSessionManager     = nullptr;
-    mUDPEndPointManager = nullptr;
-#if CONFIG_NETWORK_LAYER_BLE
-    mBleLayer = nullptr;
-#endif
-    mExchangeMgr = nullptr;
+    auto session = GetSecureSession();
+    if (session.HasValue())
+    {
+        session.Value()->AsSecureSession()->MarkForEviction();
+    }
 }
-
-bool CommissioneeDeviceProxy::GetAddress(Inet::IPAddress & addr, uint16_t & port) const
-{
-    if (mState == ConnectionState::NotConnected)
-        return false;
-
-    addr = mDeviceAddress.GetIPAddress();
-    port = mDeviceAddress.GetPort();
-    return true;
-}
-
-CommissioneeDeviceProxy::~CommissioneeDeviceProxy() {}
 
 CHIP_ERROR CommissioneeDeviceProxy::SetPeerId(ByteSpan rcac, ByteSpan noc)
 {

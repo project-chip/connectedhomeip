@@ -46,7 +46,7 @@ struct FullQName
     size_t nameCount;
 
     FullQName() : names(nullptr), nameCount(0) {}
-    FullQName(const FullQName &) = default;
+    FullQName(const FullQName &)             = default;
     FullQName & operator=(const FullQName &) = default;
 
     template <size_t N>
@@ -68,7 +68,7 @@ class SerializedQNameIterator
 {
 public:
     SerializedQNameIterator() : mLookBehindMax(0), mCurrentPosition(nullptr), mIsValid(false) {}
-    SerializedQNameIterator(const SerializedQNameIterator &) = default;
+    SerializedQNameIterator(const SerializedQNameIterator &)             = default;
     SerializedQNameIterator & operator=(const SerializedQNameIterator &) = default;
 
     SerializedQNameIterator(const BytesRange validData, const uint8_t * position) :

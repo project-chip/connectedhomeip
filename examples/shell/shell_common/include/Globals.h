@@ -24,14 +24,16 @@
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <transport/SessionHolder.h>
 #include <transport/SessionManager.h>
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <transport/raw/TCP.h>
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <transport/raw/UDP.h>
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-constexpr size_t kMaxTcpActiveConnectionCount = 4;
-constexpr size_t kMaxTcpPendingPackets        = 4;
+inline constexpr size_t kMaxTcpActiveConnectionCount = 4;
+inline constexpr size_t kMaxTcpPendingPackets        = 4;
 #endif
-constexpr chip::System::Clock::Timeout kResponseTimeOut = chip::System::Clock::Seconds16(1);
+inline constexpr chip::System::Clock::Timeout kResponseTimeOut = chip::System::Clock::Seconds16(1);
 
 extern chip::FabricTable gFabricTable;
 extern chip::secure_channel::MessageCounterManager gMessageCounterManager;

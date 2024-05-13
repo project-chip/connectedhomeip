@@ -15,7 +15,7 @@
 #   limitations under the License.
 #
 
-from generic_node_image
+FROM generic_node_image
 RUN apt-get install -y libglib2.0
 COPY out/debug/chip-all-clusters-app /usr/bin/
 COPY entrypoint.sh /

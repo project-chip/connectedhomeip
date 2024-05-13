@@ -14,7 +14,6 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
@@ -22,9 +21,7 @@ chip_test_suite("tests") {
   output_name = "libMdnsFakePlatformTests"
   if (chip_device_platform == "fake") {
     test_sources = [ "TestPlatform.cpp" ]
-    public_deps = [
-      "${chip_root}/src/lib/dnssd",
-      "${nlunit_test_root}:nlunit-test",
-    ]
+
+    public_deps = [ "${chip_root}/src/lib/dnssd" ]
   }
 }

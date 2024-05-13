@@ -14,11 +14,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+#include <gtest/gtest.h>
+
 #include <lib/dnssd/minimal_mdns/records/Ptr.h>
-
-#include <lib/support/UnitTestRegistration.h>
-
-#include <nlunit-test.h>
 
 namespace {
 
@@ -26,7 +25,7 @@ using namespace chip;
 using namespace mdns::Minimal;
 using namespace chip::Encoding;
 
-void TestPtrResourceRecord(nlTestSuite * inSuite, void * inContext)
+TEST(TestResourceRecordPtr, TestPtrResourceRecord)
 {
     uint8_t headerBuffer[HeaderRef::kSizeBytes];
     uint8_t dataBuffer[128];
@@ -59,26 +58,11 @@ void TestPtrResourceRecord(nlTestSuite * inSuite, void * inContext)
         0                           // QNAME ends
     };
 
-    NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAnswer, writer));
-    NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == 1);
-    NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == 0);
-    NL_TEST_ASSERT(inSuite, header.GetAdditionalCount() == 0);
-    NL_TEST_ASSERT(inSuite, output.Needed() == sizeof(expectedOutput));
-    NL_TEST_ASSERT(inSuite, memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)) == 0);
+    EXPECT_TRUE(record.Append(header, ResourceType::kAnswer, writer));
+    EXPECT_EQ(header.GetAnswerCount(), 1);
+    EXPECT_EQ(header.GetAuthorityCount(), 0);
+    EXPECT_EQ(header.GetAdditionalCount(), 0);
+    EXPECT_EQ(output.Needed(), sizeof(expectedOutput));
+    EXPECT_EQ(memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)), 0);
 }
-
-const nlTest sTests[] = {
-    NL_TEST_DEF("TestPtrResourceRecord", TestPtrResourceRecord), //
-    NL_TEST_SENTINEL()                                           //
-};
-
 } // namespace
-
-int TestPtrResourceRecord(void)
-{
-    nlTestSuite theSuite = { "PtrResourceRecord", sTests, nullptr, nullptr };
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestPtrResourceRecord)

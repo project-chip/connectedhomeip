@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -23,10 +23,6 @@
  *      that re-signs a CHIP certificate.
  *
  */
-
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
 
 #include "chip-cert.h"
 
@@ -52,21 +48,22 @@ OptionDef gCmdOptionDefs[] =
 };
 
 const char * const gCmdOptionHelp =
-    "  -c, --cert <file>\n"
+    "  -c, --cert <file/str>\n"
     "\n"
-    "       File containing the certificate to be re-signed.\n"
+    "       File or string containing the certificate to be re-signed.\n"
     "\n"
-    "  -o, --out <file>\n"
+    "  -o, --out <file/stdout>\n"
     "\n"
     "       File to contain the re-signed certificate.\n"
+    "       If specified '-' then output is written to stdout.\n"
     "\n"
-    "  -C, --ca-cert <file>\n"
+    "  -C, --ca-cert <file/str>\n"
     "\n"
-    "       File containing CA certificate to be used to re-sign the certificate.\n"
+    "       File or string containing CA certificate to be used to re-sign the certificate.\n"
     "\n"
-    "  -K, --ca-key <file>\n"
+    "  -K, --ca-key <file/str>\n"
     "\n"
-    "       File containing CA private key to be used to re-sign the certificate.\n"
+    "       File or string containing CA private key to be used to re-sign the certificate.\n"
     "\n"
     "  -s, --self\n"
     "\n"
@@ -97,27 +94,27 @@ OptionSet * gCmdOptionSets[] =
 };
 // clang-format on
 
-const char * gInCertFileName  = nullptr;
-const char * gOutCertFileName = nullptr;
-const char * gCACertFileName  = nullptr;
-const char * gCAKeyFileName   = nullptr;
-bool gSelfSign                = false;
+const char * gInCertFileNameOrStr = nullptr;
+const char * gOutCertFileName     = nullptr;
+const char * gCACertFileNameOrStr = nullptr;
+const char * gCAKeyFileNameOrStr  = nullptr;
+bool gSelfSign                    = false;
 
 bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg)
 {
     switch (id)
     {
     case 'c':
-        gInCertFileName = arg;
+        gInCertFileNameOrStr = arg;
         break;
     case 'o':
         gOutCertFileName = arg;
         break;
     case 'C':
-        gCACertFileName = arg;
+        gCACertFileNameOrStr = arg;
         break;
     case 'K':
-        gCAKeyFileName = arg;
+        gCAKeyFileNameOrStr = arg;
         break;
     case 's':
         gSelfSign = true;
@@ -136,7 +133,7 @@ bool Cmd_ResignCert(int argc, char * argv[])
 {
     bool res = true;
     CertFormat inCertFmt;
-    std::unique_ptr<X509, void (*)(X509 *)> cert(X509_new(), &X509_free);
+    std::unique_ptr<X509, void (*)(X509 *)> cert(nullptr, &X509_free);
     std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> caKey(EVP_PKEY_new(), &EVP_PKEY_free);
 
     if (argc == 1)
@@ -148,7 +145,7 @@ bool Cmd_ResignCert(int argc, char * argv[])
     res = ParseArgs(CMD_NAME, argc, argv, gCmdOptionSets);
     VerifyTrueOrExit(res);
 
-    if (gInCertFileName == nullptr)
+    if (gInCertFileNameOrStr == nullptr)
     {
         fprintf(stderr, "Please specify certificate to be resigned using --cert option.\n");
         ExitNow(res = false);
@@ -160,22 +157,22 @@ bool Cmd_ResignCert(int argc, char * argv[])
         ExitNow(res = false);
     }
 
-    if (gCACertFileName == nullptr && !gSelfSign)
+    if (gCACertFileNameOrStr == nullptr && !gSelfSign)
     {
         fprintf(stderr,
                 "Please specify a CA certificate to be used to sign the new certificate (using\n"
                 "the --ca-cert option) or --self to generate a self-signed certificate.\n");
         ExitNow(res = false);
     }
-    else if (gCACertFileName != nullptr && gSelfSign)
+    else if (gCACertFileNameOrStr != nullptr && gSelfSign)
     {
         fprintf(stderr, "Please specify only one of --ca-cert and --self.\n");
         ExitNow(res = false);
     }
 
-    if (gCAKeyFileName == nullptr)
+    if (gCAKeyFileNameOrStr == nullptr)
     {
-        fprintf(stderr, "Please specify the CA key file name using the --ca-key option.\n");
+        fprintf(stderr, "Please specify the CA key using the --ca-key option.\n");
         ExitNow(res = false);
     }
 
@@ -191,17 +188,17 @@ bool Cmd_ResignCert(int argc, char * argv[])
     res = InitOpenSSL();
     VerifyTrueOrExit(res);
 
-    res = ReadCert(gInCertFileName, cert.get(), inCertFmt);
+    res = ReadCert(gInCertFileNameOrStr, cert, inCertFmt);
     VerifyTrueOrExit(res);
 
-    res = ReadKey(gCAKeyFileName, caKey.get());
+    res = ReadKey(gCAKeyFileNameOrStr, caKey);
     VerifyTrueOrExit(res);
 
     if (!gSelfSign)
     {
-        std::unique_ptr<X509, void (*)(X509 *)> caCert(X509_new(), &X509_free);
+        std::unique_ptr<X509, void (*)(X509 *)> caCert(nullptr, &X509_free);
 
-        res = ReadCert(gCACertFileName, caCert.get());
+        res = ReadCert(gCACertFileNameOrStr, caCert);
         VerifyTrueOrExit(res);
 
         res = ResignCert(cert.get(), caCert.get(), caKey.get());

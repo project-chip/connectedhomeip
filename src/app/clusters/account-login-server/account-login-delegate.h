@@ -21,7 +21,6 @@
 #include <app-common/zap-generated/cluster-objects.h>
 
 #include <app/CommandResponseHelper.h>
-#include <app/util/af.h>
 
 namespace chip {
 namespace app {
@@ -37,11 +36,14 @@ public:
     // helper method to allow the platform to facilitate providing the pin
     virtual void SetSetupPin(char * setupPin) = 0;
 
-    virtual bool HandleLogin(const chip::CharSpan & tempAccountIdentifierString, const chip::CharSpan & setupPinString) = 0;
-    virtual bool HandleLogout()                                                                                         = 0;
+    virtual bool HandleLogin(const chip::CharSpan & tempAccountIdentifierString, const chip::CharSpan & setupPinString,
+                             const chip::Optional<NodeId> & nodeId)                                                    = 0;
+    virtual bool HandleLogout(const chip::Optional<NodeId> & nodeId)                                                   = 0;
     virtual void HandleGetSetupPin(CommandResponseHelper<Commands::GetSetupPINResponse::Type> & helper,
-                                   const chip::CharSpan & tempAccountIdentifierString)                                  = 0;
-    virtual void GetSetupPin(char * setupPin, size_t setupPinSize, const chip::CharSpan & tempAccountIdentifierString)  = 0;
+                                   const chip::CharSpan & tempAccountIdentifierString)                                 = 0;
+    virtual void GetSetupPin(char * setupPin, size_t setupPinSize, const chip::CharSpan & tempAccountIdentifierString) = 0;
+
+    virtual uint16_t GetClusterRevision(chip::EndpointId endpoint) = 0;
 
     virtual ~Delegate() = default;
 };

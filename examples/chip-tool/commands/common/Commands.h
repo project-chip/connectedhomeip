@@ -18,35 +18,73 @@
 
 #pragma once
 
-#include "../../config/PersistentStorage.h"
+#ifdef CONFIG_USE_LOCAL_STORAGE
+#include <controller/ExamplePersistentStorage.h>
+#endif // CONFIG_USE_LOCAL_STORAGE
+
 #include "Command.h"
 #include <map>
+#include <string>
 
 class Commands
 {
 public:
     using CommandsVector = ::std::vector<std::unique_ptr<Command>>;
 
-    void Register(const char * clusterName, commands_list commandsList);
+    void RegisterCluster(const char * clusterName, commands_list commandsList)
+    {
+        Register(clusterName, commandsList, nullptr, true);
+    }
+    // Command sets represent chip-tool functionality that is not actually
+    // XML-defined clusters.  All command sets should have help text explaining
+    // what sort of commands one should expect to find in the set.
+    void RegisterCommandSet(const char * commandSetName, commands_list commandsList, const char * helpText)
+    {
+        Register(commandSetName, commandsList, helpText, false);
+    }
     int Run(int argc, char ** argv);
-    int RunInteractive(int argc, char ** argv);
+    int RunInteractive(const char * command, const chip::Optional<char *> & storageDirectory, bool advertiseOperational);
 
 private:
-    CHIP_ERROR RunCommand(int argc, char ** argv, bool interactive = false);
+    struct CommandSet
+    {
+        CommandsVector commands;
+        bool isCluster        = false;
+        const char * helpText = nullptr;
+    };
+    // The tuple contains the commands, whether it's a synthetic cluster, and
+    // the help text for the cluster (which may be null).
+    using CommandSetMap = std::map<std::string, CommandSet>;
 
-    std::map<std::string, CommandsVector>::iterator GetCluster(std::string clusterName);
+    CHIP_ERROR RunCommand(int argc, char ** argv, bool interactive = false,
+                          const chip::Optional<char *> & interactiveStorageDirectory = chip::NullOptional,
+                          bool interactiveAdvertiseOperational                       = false);
+
+    CommandSetMap::iterator GetCommandSet(std::string commandSetName);
     Command * GetCommand(CommandsVector & commands, std::string commandName);
     Command * GetGlobalCommand(CommandsVector & commands, std::string commandName, std::string attributeName);
     bool IsAttributeCommand(std::string commandName) const;
     bool IsEventCommand(std::string commandName) const;
     bool IsGlobalCommand(std::string commandName) const;
 
-    void ShowClusters(std::string executable);
-    void ShowCluster(std::string executable, std::string clusterName, CommandsVector & commands);
+    void ShowCommandSets(std::string executable);
+    static void ShowCommandSetOverview(std::string commandSetName, const CommandSet & commandSet);
+    void ShowCommandSet(std::string executable, std::string commandSetName, CommandsVector & commands, const char * helpText);
     void ShowClusterAttributes(std::string executable, std::string clusterName, std::string commandName, CommandsVector & commands);
     void ShowClusterEvents(std::string executable, std::string clusterName, std::string commandName, CommandsVector & commands);
     void ShowCommand(std::string executable, std::string clusterName, Command * command);
 
-    std::map<std::string, CommandsVector> mClusters;
+    bool DecodeArgumentsFromInteractiveMode(const char * command, std::vector<std::string> & args);
+    bool DecodeArgumentsFromBase64EncodedJson(const char * encodedData, std::vector<std::string> & args);
+    bool DecodeArgumentsFromStringStream(const char * command, std::vector<std::string> & args);
+
+    // helpText may be null, in which case it's not shown.
+    static void ShowHelpText(const char * helpText);
+
+    void Register(const char * commandSetName, commands_list commandsList, const char * helpText, bool isCluster);
+
+    CommandSetMap mCommandSets;
+#ifdef CONFIG_USE_LOCAL_STORAGE
     PersistentStorage mStorage;
+#endif // CONFIG_USE_LOCAL_STORAGE
 };

@@ -31,9 +31,6 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-// Fully instantiate the template class in whatever compilation unit includes this file.
-template class GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>;
-
 template <class ImplClass>
 const char * GenericConnectivityManagerImpl_BLE<ImplClass>::_CHIPoBLEServiceModeToStr(ConnectivityManager::CHIPoBLEServiceMode mode)
 {
@@ -49,6 +46,10 @@ const char * GenericConnectivityManagerImpl_BLE<ImplClass>::_CHIPoBLEServiceMode
         return "(unknown)";
     }
 }
+
+// Fully instantiate the template class in whatever compilation unit includes this file.
+// NB: This must come after all templated class members are defined.
+template class GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>;
 
 } // namespace Internal
 } // namespace DeviceLayer

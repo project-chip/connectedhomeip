@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (c) 2021 Project CHIP Authors
+Copyright (c) 2021-2023 Project CHIP Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,6 +24,11 @@ limitations under the License.
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <description>This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol.</description>
-    <attribute side="server" code="0x0000" define="WAKE_ON_LAN_MAC_ADDRESS" type="CHAR_STRING" length="32" writable="false" optional="true">MACAddress</attribute>
+
+    <!-- Current cluster version -->
+    <globalAttribute side="either" code="0xFFFD" value="1"/>
+
+    <attribute side="server" code="0x0000" define="WAKE_ON_LAN_MAC_ADDRESS" type="char_string" length="12" writable="false" optional="true">MACAddress</attribute>
+    <attribute apiMaturity="provisional" side="server" code="0x0001" define="LINK_LOCAL_ADDRESS" type="octet_string" length="16" writable="false" optional="true">LinkLocalAddress</attribute>
   </cluster>
 </configurator>

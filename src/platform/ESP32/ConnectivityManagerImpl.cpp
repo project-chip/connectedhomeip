@@ -21,6 +21,12 @@
 
 #include <platform/ConnectivityManager.h>
 
+#include <platform/internal/GenericConnectivityManagerImpl_UDP.ipp>
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+#include <platform/internal/GenericConnectivityManagerImpl_TCP.ipp>
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.ipp>
 #endif
@@ -41,7 +47,6 @@
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
-using namespace ::chip::TLV;
 using namespace ::chip::app::Clusters::GeneralDiagnostics;
 
 namespace chip {
@@ -58,6 +63,9 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     InitWiFi();
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+    InitEthernet();
+#endif
     return CHIP_NO_ERROR;
 }
 
@@ -68,6 +76,9 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     OnWiFiPlatformEvent(event);
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+    OnEthernetPlatformEvent(event);
 #endif
 }
 

@@ -79,8 +79,20 @@ declare_args() {
   # Defaults fuzzing configs.
   default_configs_fuzzing = [ "${build_root}/config/compiler:fuzzing_default" ]
 
+  # Defaults coverage configs.
+  default_configs_coverage =
+      [ "${build_root}/config/compiler:coverage_default" ]
+
   # Defaults target-specific configs.
   default_configs_target = [ "${build_root}/config/compiler:target_default" ]
+
+  # Default configs for dead code elimination.
+  default_configs_dead_code =
+      [ "${build_root}/config/compiler:dead_code_elimination_default" ]
+
+  # Default configs for prefix mappings.
+  default_configs_prefix_mappings =
+      [ "${build_root}/config/compiler:prefix_mappings_default" ]
 
   # Extra default configs.
   default_configs_extra = []
@@ -104,7 +116,10 @@ default_configs += default_configs_runtime
 default_configs += default_configs_aliasing
 default_configs += default_configs_sanitize
 default_configs += default_configs_fuzzing
+default_configs += default_configs_coverage
 default_configs += default_configs_target
+default_configs += default_configs_dead_code
+default_configs += default_configs_prefix_mappings
 default_configs += default_configs_extra
 
 executable_default_configs = []

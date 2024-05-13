@@ -23,8 +23,7 @@ CHIP_ERROR StructParser::Init(const TLV::TLVReader & aReader)
     mReader.Init(aReader);
     VerifyOrReturnError(TLV::kTLVType_Structure == mReader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
     ReturnErrorOnFailure(mReader.EnterContainer(mOuterContainerType));
-    ReturnErrorOnFailure(CheckSchemaOrdering());
-    return CHIP_NO_ERROR;
+    return CheckSchemaOrdering();
 }
 
 CHIP_ERROR StructParser::CheckSchemaOrdering() const
@@ -36,7 +35,11 @@ CHIP_ERROR StructParser::CheckSchemaOrdering() const
     bool first         = true;
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            // Just skip over non-context tags, for forward compat.
+            continue;
+        }
         uint32_t tagNum = TLV::TagNumFromTag(reader.GetTag());
         if (first || (preTagNum < tagNum))
         {

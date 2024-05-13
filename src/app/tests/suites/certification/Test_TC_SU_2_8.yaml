@@ -1,0 +1,91 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.6.1. [TC-SU-2.8] OTA functionality in Multi Fabric scenario
+
+PICS:
+    - MCORE.OTA.Requestor
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Step 1: DUT sends a QueryImage command to TH1/OTA-P."
+      verification: |
+          ./chip-tool otasoftwareupdaterequestor write default-otaproviders '[{"fabricIndex": 1, "providerNodeID": 123, "endpoint": 0}]' 321 0
+
+          where 321  is OTA Requestor node ID and 123 is OTA Provider node ID
+
+          Verify on the OTA Provider logs receives QueryImage with following fields:
+           - VendorId - Should match the value reported by the Basic Information Cluster VendorID attribute of the DUT.
+            - ProductId - Should match the value reported by the Basic Information Cluster ProductID attribute of the DUT.
+           - HardwareVersion - If present, verify that it matches the value reported by the Basic Information Cluster HardwareVersion attribute of the DUT.
+           - SoftwareVersion - Should match the value reported by the Basic Information Cluster SoftwareVersion attribute of the DUT.
+           - Verify the field ProtocolsSupported lists the BDX Synchronous protocol.
+           - Verify the default value of RequestorCanConsent is set to False unless DUT sets it to True.
+           - If the Location field is present, verify that the value is same as Basic Information Cluster Location Attribute of the DUT.
+
+          [1645743053317] [97806:20280749] CHIP: [ZCL] OTA Provider received QueryImage
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   VendorID: 0xfff1
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   ProductID: 32769
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   SoftwareVersion: 0
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   ProtocolsSupported: [
+          [1645743053317] [97806:20280749] CHIP: [ZCL]     0
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   ]
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   HardwareVersion: 0
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   Location: XX
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   RequestorCanConsent: 0
+      disabled: true
+
+    - label:
+          "Step 2: DUT sends a QueryImage command to TH1/OTA-P. TH1/OTA-P does
+          not respond with QueryImageResponse."
+      PICS: MCORE.OTA.Retry
+      verification: |
+          ./chip-tool otasoftwareupdaterequestor write default-otaproviders '[{"fabricIndex": 1, "providerNodeID": 123, "endpoint": 0}]' 321 0
+
+          Verify SUCCESS status response On TH(chip-tool) log:
+
+          [1686302244.664128][30278:30280] CHIP:DMG:                         StatusIB =
+          [1686302244.664157][30278:30280] CHIP:DMG:                         {
+          [1686302244.664198][30278:30280] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1686302244.664228][30278:30280] CHIP:DMG:                         },
+
+
+           ./chip-tool otasoftwareupdaterequestor write default-otaproviders '[{"fabricIndex": 2, "providerNodeID": 222, "endpoint": 0}]' 321 0 --commissioner-name beta
+
+          Verify SUCCESS status response On TH(chip-tool) log:
+
+          [1686302244.664128][30278:30280] CHIP:DMG:                         StatusIB =
+          [1686302244.664157][30278:30280] CHIP:DMG:                         {
+          [1686302244.664198][30278:30280] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1686302244.664228][30278:30280] CHIP:DMG:                         },
+
+          Kill Default OTA Provider for fabric index 1 before DUT sends a query
+
+          Verify that the DUT sends a QueryImage command to TH2/OTA-P when failing to reach out to TH1/OTA-P after a finite number of unsuccessful attempts.
+      disabled: true
+
+    - label:
+          "Step 3: DUT sends a QueryImage command to TH2/OTA-P. TH2/OTA-P sends
+          a QueryImageResponse back to the DUT. Status is set to
+          UpdateAvailable."
+      verification: |
+          ./chip-tool otasoftwareupdaterequestor write default-otaproviders '[{"fabricIndex": 2, "providerNodeID": 1, "endpoint": 0}]' 0x858 0 --commissioner-name beta
+
+          Verify there is a transfer of the software image from TH2/OTA-P to the DUT
+      disabled: true

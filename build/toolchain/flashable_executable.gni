@@ -147,6 +147,12 @@ template("flashable_executable") {
       } else {
         flashing_options = []
       }
+
+      # Allows to set a different image name in the flasher script
+      if (defined(invoker.flashing_image_name)) {
+        image_name = invoker.flashing_image_name
+      }
+
       flashing_options += [
         "--application",
         rebase_path(image_name, root_out_dir, root_out_dir),

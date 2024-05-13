@@ -17,17 +17,16 @@ limitations under the License.
 
 import ipaddress
 import json
-import logging
 import os
 import re
-from typing import Union, List
-
-import requests
 import sys
 import time
 import traceback
 from enum import IntEnum
+from typing import List, Mapping, Union
 from urllib.parse import urljoin
+
+import requests
 
 
 class TestResult(IntEnum):
@@ -46,7 +45,7 @@ child classes should implement:
 
 
 class CHIPVirtualHome:
-    def __init__(self, cirque_url, device_config):
+    def __init__(self, cirque_url, device_config: Mapping[str, dict]):
         self.home_id = None
         self.logger = None
         self.cirque_url = cirque_url
@@ -56,6 +55,10 @@ class CHIPVirtualHome:
         self.non_ap_devices = []
         self.thread_devices = []
         self.ap_devices = []
+
+        for device in device_config.values():
+            if device.get("base_image", "@default") == "@default":
+                device["base_image"] = self.default_base_image
 
     # The entrance of the whole test
     def run_test(self, save_logs=True):
@@ -74,12 +77,12 @@ class CHIPVirtualHome:
         if save_logs:
             try:
                 self.save_device_logs()
-            except:
+            except Exception:
                 test_ret = TestResult.SYSTEM_FAILURE
                 traceback.print_exc(file=sys.stderr)
         try:
             self.destroy_home()
-        except:
+        except requests.exceptions.RequestException:
             test_ret = TestResult.SYSTEM_FAILURE
             traceback.print_exc(file=sys.stderr)
         return test_ret
@@ -101,7 +104,7 @@ class CHIPVirtualHome:
 
         ret_struct = ret.json()
         command_ret_code = ret_struct.get('return_code', None)
-        if command_ret_code == None:
+        if command_ret_code is None:
             # could be 0
             self.logger.error("cannot get command return code")
             raise Exception("cannot get command return code")
@@ -110,7 +113,7 @@ class CHIPVirtualHome:
                 ret_struct.get('return_code', 'Unknown'))
         )
         command_output = ret_struct.get('output', None)
-        if command_output == None:
+        if command_output is None:
             # could be empty string
             self.logger.error("cannot get command output")
             raise Exception("cannot get command output")
@@ -140,7 +143,7 @@ class CHIPVirtualHome:
         for device_id in devices:
             # Wait for otbr-agent and CHIP server start
             self.assertTrue(self.wait_for_device_output(
-                device_id, "Border router agent started.", 10))
+                device_id, "Thread Border Router started on AIL", 10))
             self.assertTrue(self.wait_for_device_output(
                 device_id, "CHIP:SVR: Server Listening...", 15))
             # Clear default Thread network commissioning data
@@ -213,7 +216,9 @@ class CHIPVirtualHome:
         otInitCommands = [
             "ot-ctl thread stop",
             "ot-ctl ifconfig down",
-            "ot-ctl dataset set active 0e080000000000010000000300000d35060004001fffe00208dead00beef00cafe0708fd01234567890abc051000112233445566778899aabbccddeeff030a4f70656e546872656164010212340410ad463152f9622c7297ec6c6c543a63e70c0302a0ff",
+            ("ot-ctl dataset set active 0e080000000000010000000300000d35060004001fffe00208d"
+             "ead00beef00cafe0708fd01234567890abc051000112233445566778899aabbccddeeff030a4f"
+             "70656e546872656164010212340410ad463152f9622c7297ec6c6c543a63e70c0302a0ff"),
             "ot-ctl ifconfig up",
             "ot-ctl thread start",
             "ot-ctl dataset active",  # Emit
@@ -264,7 +269,8 @@ class CHIPVirtualHome:
                     continue
                 if not ipaddr.is_private:
                     continue
-                if re.match("fd[0-9a-f]{2}:[0-9a-f]{4}:[0-9a-f]{4}:[0-9a-f]{4}:0000:00ff:fe00:[0-9a-f]{4}", ipaddr.exploded) != None:
+                if re.match(("fd[0-9a-f]{2}:[0-9a-f]{4}:[0-9a-f]"
+                             "{4}:[0-9a-f]{4}:0000:00ff:fe00:[0-9a-f]{4}"), ipaddr.exploded) is not None:
                     continue
                 self.logger.info("Get Mesh-Local EID: {}".format(ipstr))
                 return str(ipaddr)
@@ -293,19 +299,19 @@ class CHIPVirtualHome:
         assert(Not)Equal
         python unittest style functions that raise exceptions when condition not met
         '''
-        if not exp == True:
+        if exp is not True:
             if note:
                 self.logger.error(note)
             raise AssertionError
 
     def assertFalse(self, exp, note=None):
-        if not exp == False:
+        if exp is not False:
             if note:
                 self.logger.error(note)
             raise AssertionError
 
     def assertEqual(self, val1, val2, note=None):
-        if not val1 == val2:
+        if not (val1 == val2):
             if note:
                 self.logger.error(note)
             raise AssertionError
@@ -366,7 +372,7 @@ class CHIPVirtualHome:
     def save_device_logs(self):
         timestamp = int(time.time())
         log_dir = os.environ.get("DEVICE_LOG_DIR", None)
-        if log_dir != None and not os.path.exists(log_dir):
+        if log_dir is not None and not os.path.exists(log_dir):
             os.makedirs("logs")
 
         for device in self.non_ap_devices:
@@ -409,9 +415,13 @@ class CHIPVirtualHome:
 
     def get_device_pretty_name(self, device_id):
         device_obj = self.device_config.get(device_id, None)
-        if device_obj != None:
+        if device_obj is not None:
             return device_obj['type']
         return "<unknown>"
 
     def get_device_pretty_id(self, device_id):
         return "{}({}...)".format(self.get_device_pretty_name(device_id), device_id[:8])
+
+    @property
+    def default_base_image(cls):
+        return os.environ.get("CHIP_CIRQUE_BASE_IMAGE", "project-chip/chip-cirque-device-base")

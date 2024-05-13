@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,10 +27,11 @@
 
 #include <credentials/CHIPCert.h>
 #include <credentials/CertificationDeclaration.h>
+#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/Span.h>
-#include <lib/support/UnitTestRegistration.h>
 
-#include <nlunit-test.h>
+#include <gtest/gtest.h>
 
 using namespace chip;
 using namespace chip::ASN1;
@@ -150,6 +151,100 @@ static constexpr uint8_t sTestCMS_SignedMessage02[] = {
     0x36, 0x5c, 0x6e, 0xd5, 0x44, 0x08, 0x6d, 0x10, 0x1a, 0xfd, 0xaf, 0x07, 0x9a, 0x2c, 0x23, 0xe0, 0xde
 };
 
+// Generated an untrusted CD key, and then a CD
+//
+// openssl ecparam -name prime256v1 -genkey -noout -out UntrustedCDKey.pem
+// openssl req -x509 -key UntrustedCDKey.pem -keyform PEM -out UntrustedCDCert.pem -sha256 -days 3650
+// out/host/chip-cert gen-cd -C UntrustedCDCert.pem -K UntrustedCDKey.pem --out UntrustedCD.bin -f 1 -V FFF1 -p 8000 -p 8001 -p 8002
+// -p 8003 -p 8004 -p 8005 -p 8006 -p 8007 -p 8008 -p 8009 -p 800a -p 800b -p 800c -p 800d -p 800e -p 800f -p 8010 -p 8011 -p 8012
+// -p 8013 -p 8014 -p 8015 -p 8016 -p 8017 -p 8018 -p 8019 -p 801a -p 801b -p 801c -p 801d -p 801e -p 801f -d 0016 -c
+// "ZIG0000000000000000" -l 0 -i 0 -n 0001 -t 0
+//
+static constexpr uint8_t gUntrustedCd[] = {
+    0x30, 0x82, 0x01, 0x49, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x07, 0x02, 0xa0, 0x82, 0x01, 0x3a, 0x30, 0x82,
+    0x01, 0x36, 0x02, 0x01, 0x03, 0x31, 0x0d, 0x30, 0x0b, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x01, 0x30,
+    0x81, 0xa2, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x07, 0x01, 0xa0, 0x81, 0x94, 0x04, 0x81, 0x91, 0x15, 0x24,
+    0x00, 0x01, 0x25, 0x01, 0xf1, 0xff, 0x36, 0x02, 0x05, 0x00, 0x80, 0x05, 0x01, 0x80, 0x05, 0x02, 0x80, 0x05, 0x03, 0x80, 0x05,
+    0x04, 0x80, 0x05, 0x05, 0x80, 0x05, 0x06, 0x80, 0x05, 0x07, 0x80, 0x05, 0x08, 0x80, 0x05, 0x09, 0x80, 0x05, 0x0a, 0x80, 0x05,
+    0x0b, 0x80, 0x05, 0x0c, 0x80, 0x05, 0x0d, 0x80, 0x05, 0x0e, 0x80, 0x05, 0x0f, 0x80, 0x05, 0x10, 0x80, 0x05, 0x11, 0x80, 0x05,
+    0x12, 0x80, 0x05, 0x13, 0x80, 0x05, 0x14, 0x80, 0x05, 0x15, 0x80, 0x05, 0x16, 0x80, 0x05, 0x17, 0x80, 0x05, 0x18, 0x80, 0x05,
+    0x19, 0x80, 0x05, 0x1a, 0x80, 0x05, 0x1b, 0x80, 0x05, 0x1c, 0x80, 0x05, 0x1d, 0x80, 0x05, 0x1e, 0x80, 0x05, 0x1f, 0x80, 0x18,
+    0x24, 0x03, 0x16, 0x2c, 0x04, 0x13, 0x5a, 0x49, 0x47, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
+    0x30, 0x30, 0x30, 0x30, 0x24, 0x05, 0x00, 0x24, 0x06, 0x00, 0x24, 0x07, 0x01, 0x24, 0x08, 0x00, 0x18, 0x31, 0x7d, 0x30, 0x7b,
+    0x02, 0x01, 0x03, 0x80, 0x14, 0x75, 0xe3, 0x06, 0x0e, 0x0f, 0xce, 0x28, 0x69, 0x5d, 0x19, 0x75, 0x43, 0x32, 0xbb, 0xc7, 0x9b,
+    0xeb, 0x3d, 0x60, 0x6c, 0x30, 0x0b, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x01, 0x30, 0x0a, 0x06, 0x08,
+    0x2a, 0x86, 0x48, 0xce, 0x3d, 0x04, 0x03, 0x02, 0x04, 0x47, 0x30, 0x45, 0x02, 0x21, 0x00, 0xf9, 0xd5, 0x91, 0x66, 0xca, 0xab,
+    0x43, 0x82, 0xa7, 0x47, 0x24, 0xe6, 0x06, 0xbf, 0x1e, 0x2b, 0x4e, 0x7a, 0xb4, 0xf3, 0x04, 0x29, 0x21, 0x2b, 0x60, 0xfd, 0xa0,
+    0x16, 0xea, 0xdc, 0x7d, 0x25, 0x02, 0x20, 0x62, 0xf1, 0x89, 0xfe, 0x4e, 0x60, 0x28, 0xd5, 0xc8, 0x42, 0x6a, 0xb7, 0x7e, 0xe5,
+    0x1e, 0xf5, 0x68, 0x00, 0x23, 0x86, 0xba, 0x39, 0xe7, 0xab, 0x2d, 0xe5, 0x71, 0xe5, 0x36, 0x4e, 0xd0, 0x38,
+};
+
+static constexpr uint8_t gUntrustedCdCert[] = {
+    0x30, 0x82, 0x01, 0xdd, 0x30, 0x82, 0x01, 0x83, 0xa0, 0x03, 0x02, 0x01, 0x02, 0x02, 0x14, 0x4e, 0x84, 0xea, 0x0a, 0x68, 0x5b,
+    0xbe, 0xe2, 0xfb, 0x2d, 0xed, 0x76, 0xaf, 0xa1, 0x92, 0xc4, 0x3a, 0xce, 0x9b, 0x03, 0x30, 0x0a, 0x06, 0x08, 0x2a, 0x86, 0x48,
+    0xce, 0x3d, 0x04, 0x03, 0x02, 0x30, 0x44, 0x31, 0x0b, 0x30, 0x09, 0x06, 0x03, 0x55, 0x04, 0x06, 0x13, 0x02, 0x55, 0x53, 0x31,
+    0x0b, 0x30, 0x09, 0x06, 0x03, 0x55, 0x04, 0x08, 0x0c, 0x02, 0x43, 0x41, 0x31, 0x0d, 0x30, 0x0b, 0x06, 0x03, 0x55, 0x04, 0x0a,
+    0x0c, 0x04, 0x54, 0x65, 0x73, 0x74, 0x31, 0x19, 0x30, 0x17, 0x06, 0x03, 0x55, 0x04, 0x03, 0x0c, 0x10, 0x55, 0x6e, 0x74, 0x72,
+    0x75, 0x73, 0x65, 0x64, 0x20, 0x43, 0x44, 0x20, 0x63, 0x65, 0x72, 0x74, 0x30, 0x1e, 0x17, 0x0d, 0x32, 0x32, 0x30, 0x39, 0x30,
+    0x36, 0x31, 0x33, 0x34, 0x39, 0x31, 0x35, 0x5a, 0x17, 0x0d, 0x33, 0x32, 0x30, 0x39, 0x30, 0x33, 0x31, 0x33, 0x34, 0x39, 0x31,
+    0x35, 0x5a, 0x30, 0x44, 0x31, 0x0b, 0x30, 0x09, 0x06, 0x03, 0x55, 0x04, 0x06, 0x13, 0x02, 0x55, 0x53, 0x31, 0x0b, 0x30, 0x09,
+    0x06, 0x03, 0x55, 0x04, 0x08, 0x0c, 0x02, 0x43, 0x41, 0x31, 0x0d, 0x30, 0x0b, 0x06, 0x03, 0x55, 0x04, 0x0a, 0x0c, 0x04, 0x54,
+    0x65, 0x73, 0x74, 0x31, 0x19, 0x30, 0x17, 0x06, 0x03, 0x55, 0x04, 0x03, 0x0c, 0x10, 0x55, 0x6e, 0x74, 0x72, 0x75, 0x73, 0x65,
+    0x64, 0x20, 0x43, 0x44, 0x20, 0x63, 0x65, 0x72, 0x74, 0x30, 0x59, 0x30, 0x13, 0x06, 0x07, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x02,
+    0x01, 0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03, 0x01, 0x07, 0x03, 0x42, 0x00, 0x04, 0xbc, 0x87, 0x13, 0x3a, 0x19, 0x16,
+    0x87, 0x04, 0x34, 0x1b, 0x78, 0xc5, 0x70, 0x41, 0x21, 0x14, 0xbb, 0xe5, 0x3f, 0x62, 0x45, 0x70, 0xe8, 0xf2, 0x37, 0x78, 0x77,
+    0x1a, 0xf3, 0x5c, 0xd8, 0x04, 0x21, 0xc8, 0x2d, 0x40, 0x7f, 0xee, 0x37, 0xf5, 0xa5, 0x9f, 0x17, 0x26, 0x33, 0x00, 0x4d, 0xf7,
+    0x66, 0xa3, 0x3a, 0x50, 0x75, 0x9f, 0xcf, 0xd2, 0xb2, 0x1b, 0x5e, 0x58, 0x75, 0x08, 0x82, 0x3e, 0xa3, 0x53, 0x30, 0x51, 0x30,
+    0x1d, 0x06, 0x03, 0x55, 0x1d, 0x0e, 0x04, 0x16, 0x04, 0x14, 0x75, 0xe3, 0x06, 0x0e, 0x0f, 0xce, 0x28, 0x69, 0x5d, 0x19, 0x75,
+    0x43, 0x32, 0xbb, 0xc7, 0x9b, 0xeb, 0x3d, 0x60, 0x6c, 0x30, 0x1f, 0x06, 0x03, 0x55, 0x1d, 0x23, 0x04, 0x18, 0x30, 0x16, 0x80,
+    0x14, 0x75, 0xe3, 0x06, 0x0e, 0x0f, 0xce, 0x28, 0x69, 0x5d, 0x19, 0x75, 0x43, 0x32, 0xbb, 0xc7, 0x9b, 0xeb, 0x3d, 0x60, 0x6c,
+    0x30, 0x0f, 0x06, 0x03, 0x55, 0x1d, 0x13, 0x01, 0x01, 0xff, 0x04, 0x05, 0x30, 0x03, 0x01, 0x01, 0xff, 0x30, 0x0a, 0x06, 0x08,
+    0x2a, 0x86, 0x48, 0xce, 0x3d, 0x04, 0x03, 0x02, 0x03, 0x48, 0x00, 0x30, 0x45, 0x02, 0x21, 0x00, 0x83, 0xdd, 0x0c, 0x66, 0xa2,
+    0xe3, 0x10, 0x63, 0xa1, 0x17, 0x35, 0x30, 0x13, 0x21, 0xc6, 0x9b, 0x6f, 0x4d, 0x29, 0x94, 0x06, 0xd4, 0xd7, 0xc1, 0x14, 0x01,
+    0x6d, 0x05, 0x59, 0xbc, 0x40, 0xb2, 0x02, 0x20, 0x76, 0x7f, 0x58, 0x71, 0x12, 0xb4, 0x2e, 0x33, 0x07, 0xed, 0x84, 0x87, 0x06,
+    0xd4, 0x77, 0xb2, 0xf2, 0xae, 0x65, 0xbd, 0x9d, 0xfe, 0x2f, 0xf8, 0x38, 0xfc, 0x47, 0x45, 0x4f, 0x0c, 0x30, 0xfd
+};
+
+static constexpr uint8_t gUntrustedCdVerifyingKeyBytes[] = {
+    0x04, 0xbc, 0x87, 0x13, 0x3a, 0x19, 0x16, 0x87, 0x04, 0x34, 0x1b, 0x78, 0xc5, 0x70, 0x41, 0x21, 0x14,
+    0xbb, 0xe5, 0x3f, 0x62, 0x45, 0x70, 0xe8, 0xf2, 0x37, 0x78, 0x77, 0x1a, 0xf3, 0x5c, 0xd8, 0x04, 0x21,
+    0xc8, 0x2d, 0x40, 0x7f, 0xee, 0x37, 0xf5, 0xa5, 0x9f, 0x17, 0x26, 0x33, 0x00, 0x4d, 0xf7, 0x66, 0xa3,
+    0x3a, 0x50, 0x75, 0x9f, 0xcf, 0xd2, 0xb2, 0x1b, 0x5e, 0x58, 0x75, 0x08, 0x82, 0x3e,
+};
+static const P256PublicKey gUntrustedCdVerifyingKey(gUntrustedCdVerifyingKeyBytes);
+
+static constexpr uint8_t gUntrustedCdKid[] = {
+    0x75, 0xE3, 0x06, 0x0E, 0x0F, 0xCE, 0x28, 0x69, 0x5D, 0x19, 0x75, 0x43, 0x32, 0xBB, 0xC7, 0x9B, 0xEB, 0x3D, 0x60, 0x6C,
+};
+
+static constexpr uint8_t gCdSigningCert001[] = {
+    0x30, 0x82, 0x02, 0x08, 0x30, 0x82, 0x01, 0xad, 0xa0, 0x03, 0x02, 0x01, 0x02, 0x02, 0x07, 0x63, 0x73, 0x61, 0x63, 0x64, 0x73,
+    0x31, 0x30, 0x0a, 0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x04, 0x03, 0x02, 0x30, 0x52, 0x31, 0x0c, 0x30, 0x0a, 0x06, 0x03,
+    0x55, 0x04, 0x0a, 0x0c, 0x03, 0x43, 0x53, 0x41, 0x31, 0x2c, 0x30, 0x2a, 0x06, 0x03, 0x55, 0x04, 0x03, 0x0c, 0x23, 0x4d, 0x61,
+    0x74, 0x74, 0x65, 0x72, 0x20, 0x43, 0x65, 0x72, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x20, 0x61, 0x6e,
+    0x64, 0x20, 0x54, 0x65, 0x73, 0x74, 0x69, 0x6e, 0x67, 0x20, 0x43, 0x41, 0x31, 0x14, 0x30, 0x12, 0x06, 0x0a, 0x2b, 0x06, 0x01,
+    0x04, 0x01, 0x82, 0xa2, 0x7c, 0x02, 0x01, 0x0c, 0x04, 0x43, 0x35, 0x41, 0x30, 0x30, 0x20, 0x17, 0x0d, 0x32, 0x32, 0x30, 0x38,
+    0x31, 0x31, 0x31, 0x39, 0x33, 0x31, 0x31, 0x35, 0x5a, 0x18, 0x0f, 0x32, 0x30, 0x37, 0x32, 0x30, 0x37, 0x32, 0x39, 0x31, 0x39,
+    0x33, 0x31, 0x31, 0x35, 0x5a, 0x30, 0x58, 0x31, 0x0c, 0x30, 0x0a, 0x06, 0x03, 0x55, 0x04, 0x0a, 0x0c, 0x03, 0x43, 0x53, 0x41,
+    0x31, 0x32, 0x30, 0x30, 0x06, 0x03, 0x55, 0x04, 0x03, 0x0c, 0x29, 0x43, 0x65, 0x72, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74,
+    0x69, 0x6f, 0x6e, 0x20, 0x44, 0x65, 0x63, 0x6c, 0x61, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x20, 0x53, 0x69, 0x67, 0x6e, 0x69,
+    0x6e, 0x67, 0x20, 0x4b, 0x65, 0x79, 0x20, 0x30, 0x30, 0x31, 0x31, 0x14, 0x30, 0x12, 0x06, 0x0a, 0x2b, 0x06, 0x01, 0x04, 0x01,
+    0x82, 0xa2, 0x7c, 0x02, 0x01, 0x0c, 0x04, 0x43, 0x35, 0x41, 0x30, 0x30, 0x59, 0x30, 0x13, 0x06, 0x07, 0x2a, 0x86, 0x48, 0xce,
+    0x3d, 0x02, 0x01, 0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03, 0x01, 0x07, 0x03, 0x42, 0x00, 0x04, 0x5b, 0x5b, 0xc3, 0xae,
+    0xd6, 0xba, 0xa3, 0x83, 0xfd, 0xcf, 0x9b, 0x9d, 0x5a, 0x73, 0xfa, 0xea, 0x7e, 0x65, 0xeb, 0x59, 0x27, 0xc1, 0xc5, 0xc0, 0x2b,
+    0x1c, 0xfa, 0x4b, 0x8b, 0xdb, 0x6b, 0x9b, 0x7e, 0xb2, 0x52, 0x51, 0x3f, 0x23, 0xf2, 0x2a, 0x58, 0x33, 0x9d, 0xc8, 0xad, 0xb8,
+    0x80, 0x46, 0x0a, 0xc9, 0x21, 0xd3, 0x76, 0xd7, 0xb9, 0x70, 0xc5, 0x0c, 0x3b, 0xe6, 0xe6, 0xd2, 0x36, 0xf0, 0xa3, 0x66, 0x30,
+    0x64, 0x30, 0x12, 0x06, 0x03, 0x55, 0x1d, 0x13, 0x01, 0x01, 0xff, 0x04, 0x08, 0x30, 0x06, 0x01, 0x01, 0xff, 0x02, 0x01, 0x00,
+    0x30, 0x0e, 0x06, 0x03, 0x55, 0x1d, 0x0f, 0x01, 0x01, 0xff, 0x04, 0x04, 0x03, 0x02, 0x01, 0x86, 0x30, 0x1d, 0x06, 0x03, 0x55,
+    0x1d, 0x0e, 0x04, 0x16, 0x04, 0x14, 0x83, 0xfa, 0xd7, 0x81, 0xe8, 0x2d, 0x01, 0x8b, 0x4f, 0x14, 0xf0, 0xa1, 0xc7, 0xf6, 0x84,
+    0x01, 0x8c, 0xc5, 0xd1, 0x9f, 0x30, 0x1f, 0x06, 0x03, 0x55, 0x1d, 0x23, 0x04, 0x18, 0x30, 0x16, 0x80, 0x14, 0x97, 0xe4, 0x69,
+    0xd0, 0xc5, 0x04, 0x14, 0xc2, 0x6f, 0xc7, 0x01, 0xf7, 0x7e, 0x94, 0x77, 0x39, 0x09, 0x8d, 0xf6, 0xa5, 0x30, 0x0a, 0x06, 0x08,
+    0x2a, 0x86, 0x48, 0xce, 0x3d, 0x04, 0x03, 0x02, 0x03, 0x49, 0x00, 0x30, 0x46, 0x02, 0x21, 0x00, 0x86, 0xd2, 0xbb, 0xc2, 0xa8,
+    0x59, 0x38, 0xf9, 0xef, 0xdd, 0x94, 0xc6, 0xd2, 0x7f, 0xb9, 0x28, 0x10, 0x5d, 0x54, 0xcb, 0x45, 0x1b, 0x26, 0xd3, 0xdc, 0xac,
+    0xda, 0x6d, 0xfb, 0x27, 0x10, 0xef, 0x02, 0x21, 0x00, 0xf1, 0x63, 0x0a, 0x0d, 0xb4, 0x5b, 0xc0, 0xeb, 0x64, 0x69, 0xb2, 0x32,
+    0xab, 0x00, 0xe0, 0x9a, 0x24, 0x77, 0x2b, 0x09, 0x32, 0x63, 0x06, 0xaa, 0x37, 0x81, 0x8f, 0xb1, 0x12, 0x9f, 0xc7, 0x04
+};
+
 struct TestCase
 {
     ByteSpan signerCert;
@@ -166,56 +261,57 @@ static constexpr TestCase sTestCases[] = {
       ByteSpan(sTestCMS_CDContent02), ByteSpan(sTestCMS_SignedMessage02) },
 };
 
-static constexpr size_t sNumTestCases = ArraySize(sTestCases);
-
-static void TestCD_EncodeDecode(nlTestSuite * inSuite, void * inContext)
+TEST(TestCertificationDeclaration, TestCD_EncodeDecode)
 {
-    for (size_t i = 0; i < sNumTestCases; i++)
+    for (const auto & testCase : sTestCases)
     {
-        const TestCase & testCase = sTestCases[i];
-
         uint8_t encodedCertElemBuf[kCertificationElements_TLVEncodedMaxLength];
         MutableByteSpan encodedCDPayload(encodedCertElemBuf);
 
-        NL_TEST_ASSERT(inSuite, EncodeCertificationElements(testCase.cdElements, encodedCDPayload) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, testCase.cdContent.data_equal(encodedCDPayload));
+        EXPECT_EQ(EncodeCertificationElements(testCase.cdElements, encodedCDPayload), CHIP_NO_ERROR);
+        EXPECT_TRUE(testCase.cdContent.data_equal(encodedCDPayload));
 
         CertificationElements decodedElements;
-        NL_TEST_ASSERT(inSuite, DecodeCertificationElements(encodedCDPayload, decodedElements) == CHIP_NO_ERROR);
+        EXPECT_EQ(DecodeCertificationElements(encodedCDPayload, decodedElements), CHIP_NO_ERROR);
 
-        NL_TEST_ASSERT(inSuite, decodedElements.FormatVersion == testCase.cdElements.FormatVersion);
-        NL_TEST_ASSERT(inSuite, decodedElements.VendorId == testCase.cdElements.VendorId);
-        NL_TEST_ASSERT(inSuite, decodedElements.ProductIdsCount == testCase.cdElements.ProductIdsCount);
+        EXPECT_EQ(decodedElements.FormatVersion, testCase.cdElements.FormatVersion);
+        EXPECT_EQ(decodedElements.VendorId, testCase.cdElements.VendorId);
+        EXPECT_EQ(decodedElements.ProductIdsCount, testCase.cdElements.ProductIdsCount);
         for (uint8_t j = 0; j < decodedElements.ProductIdsCount; j++)
         {
-            NL_TEST_ASSERT(inSuite, decodedElements.ProductIds[j] == testCase.cdElements.ProductIds[j]);
+            EXPECT_EQ(decodedElements.ProductIds[j], testCase.cdElements.ProductIds[j]);
         }
-        NL_TEST_ASSERT(inSuite, decodedElements.DeviceTypeId == testCase.cdElements.DeviceTypeId);
-        NL_TEST_ASSERT(inSuite,
-                       memcmp(decodedElements.CertificateId, testCase.cdElements.CertificateId, kCertificateIdLength) == 0);
-        NL_TEST_ASSERT(inSuite, decodedElements.SecurityLevel == testCase.cdElements.SecurityLevel);
-        NL_TEST_ASSERT(inSuite, decodedElements.SecurityInformation == testCase.cdElements.SecurityInformation);
-        NL_TEST_ASSERT(inSuite, decodedElements.VersionNumber == testCase.cdElements.VersionNumber);
-        NL_TEST_ASSERT(inSuite, decodedElements.CertificationType == testCase.cdElements.CertificationType);
-        NL_TEST_ASSERT(inSuite, decodedElements.DACOriginVIDandPIDPresent == testCase.cdElements.DACOriginVIDandPIDPresent);
+        EXPECT_EQ(decodedElements.DeviceTypeId, testCase.cdElements.DeviceTypeId);
+        EXPECT_EQ(memcmp(decodedElements.CertificateId, testCase.cdElements.CertificateId, kCertificateIdLength), 0);
+        EXPECT_EQ(decodedElements.SecurityLevel, testCase.cdElements.SecurityLevel);
+        EXPECT_EQ(decodedElements.SecurityInformation, testCase.cdElements.SecurityInformation);
+        EXPECT_EQ(decodedElements.VersionNumber, testCase.cdElements.VersionNumber);
+        EXPECT_EQ(decodedElements.CertificationType, testCase.cdElements.CertificationType);
+        EXPECT_EQ(decodedElements.DACOriginVIDandPIDPresent, testCase.cdElements.DACOriginVIDandPIDPresent);
         if (decodedElements.DACOriginVIDandPIDPresent)
         {
-            NL_TEST_ASSERT(inSuite, decodedElements.DACOriginVendorId == testCase.cdElements.DACOriginVendorId);
-            NL_TEST_ASSERT(inSuite, decodedElements.DACOriginProductId == testCase.cdElements.DACOriginProductId);
+            EXPECT_EQ(decodedElements.DACOriginVendorId, testCase.cdElements.DACOriginVendorId);
+            EXPECT_EQ(decodedElements.DACOriginProductId, testCase.cdElements.DACOriginProductId);
+        }
+        EXPECT_EQ(decodedElements.AuthorizedPAAListCount, testCase.cdElements.AuthorizedPAAListCount);
+        for (uint8_t j = 0; j < decodedElements.AuthorizedPAAListCount; j++)
+        {
+            EXPECT_EQ(memcmp(decodedElements.AuthorizedPAAList[j], testCase.cdElements.AuthorizedPAAList[j], kKeyIdentifierLength),
+                      0);
         }
     }
 }
 
-static void TestCD_EncodeDecode_Errors(nlTestSuite * inSuite, void * inContext)
+TEST(TestCertificationDeclaration, TestCD_EncodeDecode_Errors)
 {
     uint8_t encodedCertElemBuf[kCertificationElements_TLVEncodedMaxLength];
     MutableByteSpan encodedCDPayload(encodedCertElemBuf);
-    NL_TEST_ASSERT(inSuite, EncodeCertificationElements(sTestCMS_CertElements01, encodedCDPayload) == CHIP_NO_ERROR);
+    EXPECT_EQ(EncodeCertificationElements(sTestCMS_CertElements01, encodedCDPayload), CHIP_NO_ERROR);
 
     // Test Encode Error: CHIP_ERROR_BUFFER_TOO_SMALL
     // Provide a smaller buffer as an input.
     encodedCDPayload.reduce_size(encodedCDPayload.size() - 4);
-    NL_TEST_ASSERT(inSuite, EncodeCertificationElements(sTestCMS_CertElements01, encodedCDPayload) == CHIP_ERROR_BUFFER_TOO_SMALL);
+    EXPECT_EQ(EncodeCertificationElements(sTestCMS_CertElements01, encodedCDPayload), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // Test Decode Error: CHIP_ERROR_INVALID_INTEGER_VALUE
     // Manually modified sTestCMS_CDContent01[]: updated VendorId element to 4-octet
@@ -227,9 +323,7 @@ static void TestCD_EncodeDecode_Errors(nlTestSuite * inSuite, void * inContext)
     };
 
     CertificationElements certElementsOut;
-    NL_TEST_ASSERT(inSuite,
-                   DecodeCertificationElements(ByteSpan(sTestCMS_CDContent01_Err01), certElementsOut) ==
-                       CHIP_ERROR_INVALID_INTEGER_VALUE);
+    EXPECT_EQ(DecodeCertificationElements(ByteSpan(sTestCMS_CDContent01_Err01), certElementsOut), CHIP_ERROR_INVALID_INTEGER_VALUE);
 
     // Test Decode Error: CHIP_ERROR_UNEXPECTED_TLV_ELEMENT
     // Manually modified sTestCMS_CDContent01[]: switched ProductIds and DeviceTypeId elements tag (0x02 <--> 0x03)
@@ -238,12 +332,11 @@ static void TestCD_EncodeDecode_Errors(nlTestSuite * inSuite, void * inContext)
                                                               0x49, 0x47, 0x32, 0x30, 0x31, 0x34, 0x31, 0x5a, 0x42, 0x33, 0x33,
                                                               0x30, 0x30, 0x30, 0x31, 0x2d, 0x32, 0x34, 0x24, 0x05, 0x00, 0x24,
                                                               0x06, 0x00, 0x25, 0x07, 0x94, 0x26, 0x24, 0x08, 0x00, 0x18 };
-    NL_TEST_ASSERT(inSuite,
-                   DecodeCertificationElements(ByteSpan(sTestCMS_CDContent01_Err02), certElementsOut) ==
-                       CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    EXPECT_EQ(DecodeCertificationElements(ByteSpan(sTestCMS_CDContent01_Err02), certElementsOut),
+              CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
 }
 
-static void TestCD_CMSSignAndVerify(nlTestSuite * inSuite, void * inContext)
+TEST(TestCertificationDeclaration, TestCD_CMSSignAndVerify)
 {
     ByteSpan cdContentIn(sTestCMS_CDContent01);
     ByteSpan cdContentOut;
@@ -252,122 +345,254 @@ static void TestCD_CMSSignAndVerify(nlTestSuite * inSuite, void * inContext)
     uint8_t signedMessageBuf[kMaxCMSSignedCDMessage];
     MutableByteSpan signedMessage(signedMessageBuf);
 
-    NL_TEST_ASSERT(inSuite, ExtractSKIDFromX509Cert(ByteSpan(sTestCMS_SignerCert), signerKeyId) == CHIP_NO_ERROR);
+    EXPECT_EQ(ExtractSKIDFromX509Cert(ByteSpan(sTestCMS_SignerCert), signerKeyId), CHIP_NO_ERROR);
 
     // Test with random key
     P256Keypair keypair;
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, CMS_Sign(cdContentIn, signerKeyId, keypair, signedMessage) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, CMS_Verify(signedMessage, keypair.Pubkey(), cdContentOut) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, cdContentIn.data_equal(cdContentOut));
+    EXPECT_EQ(keypair.Initialize(ECPKeyTarget::ECDSA), CHIP_NO_ERROR);
+    EXPECT_EQ(CMS_Sign(cdContentIn, signerKeyId, keypair, signedMessage), CHIP_NO_ERROR);
+    EXPECT_EQ(CMS_Verify(signedMessage, keypair.Pubkey(), cdContentOut), CHIP_NO_ERROR);
+    EXPECT_TRUE(cdContentIn.data_equal(cdContentOut));
 
     // Test with known key
     P256Keypair keypair2;
     P256SerializedKeypair serializedKeypair;
-    memcpy(serializedKeypair, sTestCMS_SignerSerializedKeypair, sizeof(sTestCMS_SignerSerializedKeypair));
+    memcpy(serializedKeypair.Bytes(), sTestCMS_SignerSerializedKeypair, sizeof(sTestCMS_SignerSerializedKeypair));
     serializedKeypair.SetLength(sizeof(sTestCMS_SignerSerializedKeypair));
     cdContentIn   = ByteSpan(sTestCMS_CDContent02);
     signedMessage = MutableByteSpan(signedMessageBuf);
-    NL_TEST_ASSERT(inSuite, keypair2.Deserialize(serializedKeypair) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, CMS_Sign(cdContentIn, signerKeyId, keypair2, signedMessage) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, CMS_Verify(signedMessage, keypair2.Pubkey(), cdContentOut) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, cdContentIn.data_equal(cdContentOut));
+    EXPECT_EQ(keypair2.Deserialize(serializedKeypair), CHIP_NO_ERROR);
+    EXPECT_EQ(CMS_Sign(cdContentIn, signerKeyId, keypair2, signedMessage), CHIP_NO_ERROR);
+    EXPECT_EQ(CMS_Verify(signedMessage, keypair2.Pubkey(), cdContentOut), CHIP_NO_ERROR);
+    EXPECT_TRUE(cdContentIn.data_equal(cdContentOut));
 }
 
-static void TestCD_CMSVerifyAndExtract(nlTestSuite * inSuite, void * inContext)
+TEST(TestCertificationDeclaration, TestCD_CMSVerifyAndExtract)
 {
-    for (size_t i = 0; i < sNumTestCases; i++)
+    for (const auto & testCase : sTestCases)
     {
-        const TestCase & testCase = sTestCases[i];
-
         // Verify using signer P256PublicKey
         ByteSpan cdContentOut;
-        NL_TEST_ASSERT(inSuite,
-                       CMS_Verify(testCase.cdCMSSigned, P256PublicKey(testCase.signerPubkey), cdContentOut) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, testCase.cdContent.data_equal(cdContentOut));
+        EXPECT_EQ(CMS_Verify(testCase.cdCMSSigned, P256PublicKey(testCase.signerPubkey), cdContentOut), CHIP_NO_ERROR);
+        EXPECT_TRUE(testCase.cdContent.data_equal(cdContentOut));
 
         // Verify using signer X509 Certificate
         cdContentOut = ByteSpan();
-        NL_TEST_ASSERT(inSuite, CMS_Verify(testCase.cdCMSSigned, testCase.signerCert, cdContentOut) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, testCase.cdContent.data_equal(cdContentOut));
+        EXPECT_EQ(CMS_Verify(testCase.cdCMSSigned, testCase.signerCert, cdContentOut), CHIP_NO_ERROR);
+        EXPECT_TRUE(testCase.cdContent.data_equal(cdContentOut));
 
         // Test CMS_ExtractCDContent()
         cdContentOut = ByteSpan();
-        NL_TEST_ASSERT(inSuite, CMS_ExtractCDContent(testCase.cdCMSSigned, cdContentOut) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, testCase.cdContent.data_equal(cdContentOut));
+        EXPECT_EQ(CMS_ExtractCDContent(testCase.cdCMSSigned, cdContentOut), CHIP_NO_ERROR);
+        EXPECT_TRUE(testCase.cdContent.data_equal(cdContentOut));
 
         // Test CMS_ExtractKeyId()
         uint8_t signerKeyIdBuf[Crypto::kSubjectKeyIdentifierLength];
         MutableByteSpan signerKeyId(signerKeyIdBuf);
-        NL_TEST_ASSERT(inSuite, ExtractSKIDFromX509Cert(testCase.signerCert, signerKeyId) == CHIP_NO_ERROR);
+        EXPECT_EQ(ExtractSKIDFromX509Cert(testCase.signerCert, signerKeyId), CHIP_NO_ERROR);
 
         ByteSpan signerKeyIdOut;
-        NL_TEST_ASSERT(inSuite, CMS_ExtractKeyId(testCase.cdCMSSigned, signerKeyIdOut) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, signerKeyId.data_equal(signerKeyIdOut));
+        EXPECT_EQ(CMS_ExtractKeyId(testCase.cdCMSSigned, signerKeyIdOut), CHIP_NO_ERROR);
+        EXPECT_TRUE(signerKeyId.data_equal(signerKeyIdOut));
     }
 }
 
-static void TestCD_CertificationElementsDecoder(nlTestSuite * inSuite, void * inContext)
+TEST(TestCertificationDeclaration, TestCD_CertificationElementsDecoder)
 {
-    for (size_t i = 0; i < sNumTestCases; i++)
+    for (const auto & testCase : sTestCases)
     {
-        const TestCase & testCase = sTestCases[i];
-
         uint8_t encodedCertElemBuf[kCertificationElements_TLVEncodedMaxLength];
         MutableByteSpan encodedCDPayload(encodedCertElemBuf);
 
-        NL_TEST_ASSERT(inSuite, EncodeCertificationElements(testCase.cdElements, encodedCDPayload) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, testCase.cdContent.data_equal(encodedCDPayload));
+        EXPECT_EQ(EncodeCertificationElements(testCase.cdElements, encodedCDPayload), CHIP_NO_ERROR);
+        EXPECT_TRUE(testCase.cdContent.data_equal(encodedCDPayload));
 
         CertificationElementsWithoutPIDs certificationDeclarationContent;
         CertificationElementsDecoder certificationElementsDecoder;
-        NL_TEST_ASSERT(inSuite, DecodeCertificationElements(encodedCDPayload, certificationDeclarationContent) == CHIP_NO_ERROR);
+        EXPECT_EQ(DecodeCertificationElements(encodedCDPayload, certificationDeclarationContent), CHIP_NO_ERROR);
 
-        NL_TEST_ASSERT(inSuite, certificationDeclarationContent.formatVersion == testCase.cdElements.FormatVersion);
-        NL_TEST_ASSERT(inSuite, certificationDeclarationContent.vendorId == testCase.cdElements.VendorId);
+        EXPECT_EQ(certificationDeclarationContent.formatVersion, testCase.cdElements.FormatVersion);
+        EXPECT_EQ(certificationDeclarationContent.vendorId, testCase.cdElements.VendorId);
         for (uint8_t j = 0; j < testCase.cdElements.ProductIdsCount; j++)
         {
-            NL_TEST_ASSERT(inSuite,
-                           certificationElementsDecoder.IsProductIdIn(encodedCDPayload, testCase.cdElements.ProductIds[j]));
+            EXPECT_TRUE(certificationElementsDecoder.IsProductIdIn(encodedCDPayload, testCase.cdElements.ProductIds[j]));
             // now test for an unexistent ProductId
-            NL_TEST_ASSERT(inSuite, certificationElementsDecoder.IsProductIdIn(encodedCDPayload, 0x9000) == false);
+            EXPECT_FALSE(certificationElementsDecoder.IsProductIdIn(encodedCDPayload, 0x9000));
         }
-        NL_TEST_ASSERT(inSuite, certificationDeclarationContent.deviceTypeId == testCase.cdElements.DeviceTypeId);
-        NL_TEST_ASSERT(
-            inSuite,
-            memcmp(certificationDeclarationContent.certificateId, testCase.cdElements.CertificateId, kCertificateIdLength) == 0);
-        NL_TEST_ASSERT(inSuite, certificationDeclarationContent.securityLevel == testCase.cdElements.SecurityLevel);
-        NL_TEST_ASSERT(inSuite, certificationDeclarationContent.securityInformation == testCase.cdElements.SecurityInformation);
-        NL_TEST_ASSERT(inSuite, certificationDeclarationContent.versionNumber == testCase.cdElements.VersionNumber);
-        NL_TEST_ASSERT(inSuite, certificationDeclarationContent.certificationType == testCase.cdElements.CertificationType);
-        NL_TEST_ASSERT(inSuite,
-                       certificationDeclarationContent.dacOriginVIDandPIDPresent == testCase.cdElements.DACOriginVIDandPIDPresent);
+        EXPECT_EQ(certificationDeclarationContent.deviceTypeId, testCase.cdElements.DeviceTypeId);
+        EXPECT_EQ(memcmp(certificationDeclarationContent.certificateId, testCase.cdElements.CertificateId, kCertificateIdLength),
+                  0);
+        EXPECT_EQ(certificationDeclarationContent.securityLevel, testCase.cdElements.SecurityLevel);
+        EXPECT_EQ(certificationDeclarationContent.securityInformation, testCase.cdElements.SecurityInformation);
+        EXPECT_EQ(certificationDeclarationContent.versionNumber, testCase.cdElements.VersionNumber);
+        EXPECT_EQ(certificationDeclarationContent.certificationType, testCase.cdElements.CertificationType);
+        EXPECT_EQ(certificationDeclarationContent.dacOriginVIDandPIDPresent, testCase.cdElements.DACOriginVIDandPIDPresent);
         if (certificationDeclarationContent.dacOriginVIDandPIDPresent)
         {
-            NL_TEST_ASSERT(inSuite, certificationDeclarationContent.dacOriginVendorId == testCase.cdElements.DACOriginVendorId);
-            NL_TEST_ASSERT(inSuite, certificationDeclarationContent.dacOriginProductId == testCase.cdElements.DACOriginProductId);
+            EXPECT_EQ(certificationDeclarationContent.dacOriginVendorId, testCase.cdElements.DACOriginVendorId);
+            EXPECT_EQ(certificationDeclarationContent.dacOriginProductId, testCase.cdElements.DACOriginProductId);
+        }
+        if (testCase.cdElements.AuthorizedPAAListCount > 0)
+        {
+            EXPECT_TRUE(certificationDeclarationContent.authorizedPAAListPresent);
+        }
+        else
+        {
+            EXPECT_FALSE(certificationDeclarationContent.authorizedPAAListPresent);
         }
     }
 }
 
-#define NL_TEST_DEF_FN(fn) NL_TEST_DEF("Test " #fn, fn)
-/**
- *   Test Suite. It lists all the test functions.
- */
-static const nlTest sTests[] = { NL_TEST_DEF_FN(TestCD_EncodeDecode),
-                                 NL_TEST_DEF_FN(TestCD_EncodeDecode_Errors),
-                                 NL_TEST_DEF_FN(TestCD_CMSSignAndVerify),
-                                 NL_TEST_DEF_FN(TestCD_CMSVerifyAndExtract),
-                                 NL_TEST_DEF_FN(TestCD_CertificationElementsDecoder),
-                                 NL_TEST_SENTINEL() };
-
-int TestCertificationDeclaration(void)
+TEST(TestCertificationDeclaration, TestCD_EncodeDecode_Random)
 {
-    nlTestSuite theSuite = { "CHIP Certification Declaration tests", &sTests[0], nullptr, nullptr };
+    CertificationElements randomElements = { .FormatVersion             = 0x6F,
+                                             .VendorId                  = 0x88EA,
+                                             .ProductIds                = { 0 },
+                                             .ProductIdsCount           = kMaxProductIdsCount,
+                                             .DeviceTypeId              = 0x1234,
+                                             .CertificateId             = "ZIG20141ZB330001-24",
+                                             .SecurityLevel             = 10,
+                                             .SecurityInformation       = 0xFA,
+                                             .VersionNumber             = 0x28CA,
+                                             .CertificationType         = 1,
+                                             .DACOriginVendorId         = 0x01DC,
+                                             .DACOriginProductId        = 0x10EE,
+                                             .DACOriginVIDandPIDPresent = false,
+                                             .AuthorizedPAAList         = { { 0 } },
+                                             .AuthorizedPAAListCount    = kMaxAuthorizedPAAListCount };
 
-    // Run test suit againt one context.
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
+    uint16_t pid = 0x8000;
+    for (uint8_t j = 0; j < randomElements.ProductIdsCount; j++, pid++)
+    {
+        randomElements.ProductIds[j] = pid;
+    }
+    uint8_t kid[kKeyIdentifierLength] = { 0xF4, 0x44, 0xCA, 0xBB, 0xC5, 0x01, 0x65, 0x77, 0xAA, 0x8B,
+                                          0x44, 0xFF, 0xB9, 0x0F, 0xCC, 0xA1, 0x40, 0xFE, 0x66, 0x20 };
+    for (uint8_t j = 0; j < randomElements.AuthorizedPAAListCount; j++)
+    {
+        kid[(j % kKeyIdentifierLength)] ^= 0xFF;
+        memcpy(randomElements.AuthorizedPAAList[j], kid, kKeyIdentifierLength);
+    }
+
+    uint8_t encodedCertElemBuf[kCertificationElements_TLVEncodedMaxLength];
+    MutableByteSpan encodedCDPayload(encodedCertElemBuf);
+    CertificationElements decodedElements;
+
+    EXPECT_EQ(EncodeCertificationElements(randomElements, encodedCDPayload), CHIP_NO_ERROR);
+
+    EXPECT_EQ(DecodeCertificationElements(encodedCDPayload, decodedElements), CHIP_NO_ERROR);
+    EXPECT_EQ(decodedElements.FormatVersion, randomElements.FormatVersion);
+    EXPECT_EQ(decodedElements.VendorId, randomElements.VendorId);
+    EXPECT_EQ(decodedElements.ProductIdsCount, randomElements.ProductIdsCount);
+    for (uint8_t j = 0; j < decodedElements.ProductIdsCount; j++)
+    {
+        EXPECT_EQ(decodedElements.ProductIds[j], randomElements.ProductIds[j]);
+    }
+    EXPECT_EQ(decodedElements.DeviceTypeId, randomElements.DeviceTypeId);
+    EXPECT_EQ(memcmp(decodedElements.CertificateId, randomElements.CertificateId, kCertificateIdLength), 0);
+    EXPECT_EQ(decodedElements.SecurityLevel, randomElements.SecurityLevel);
+    EXPECT_EQ(decodedElements.SecurityInformation, randomElements.SecurityInformation);
+    EXPECT_EQ(decodedElements.VersionNumber, randomElements.VersionNumber);
+    EXPECT_EQ(decodedElements.CertificationType, randomElements.CertificationType);
+    EXPECT_EQ(decodedElements.DACOriginVIDandPIDPresent, randomElements.DACOriginVIDandPIDPresent);
+    if (decodedElements.DACOriginVIDandPIDPresent)
+    {
+        EXPECT_EQ(decodedElements.DACOriginVendorId, randomElements.DACOriginVendorId);
+        EXPECT_EQ(decodedElements.DACOriginProductId, randomElements.DACOriginProductId);
+    }
+    EXPECT_EQ(decodedElements.AuthorizedPAAListCount, randomElements.AuthorizedPAAListCount);
+    for (uint8_t j = 0; j < decodedElements.AuthorizedPAAListCount; j++)
+    {
+        EXPECT_EQ(memcmp(decodedElements.AuthorizedPAAList[j], randomElements.AuthorizedPAAList[j], kKeyIdentifierLength), 0);
+    }
+
+    CertificationElementsWithoutPIDs decodedElements2;
+    CertificationElementsDecoder cdElementsDecoder;
+    EXPECT_EQ(DecodeCertificationElements(encodedCDPayload, decodedElements2), CHIP_NO_ERROR);
+
+    EXPECT_EQ(decodedElements2.formatVersion, randomElements.FormatVersion);
+    EXPECT_EQ(decodedElements2.vendorId, randomElements.VendorId);
+    for (uint8_t j = 0; j < randomElements.ProductIdsCount; j++)
+    {
+        EXPECT_TRUE(cdElementsDecoder.IsProductIdIn(encodedCDPayload, randomElements.ProductIds[j]));
+        // now test for an unexistent ProductId
+        EXPECT_FALSE(cdElementsDecoder.IsProductIdIn(encodedCDPayload, pid++));
+    }
+    EXPECT_EQ(decodedElements2.deviceTypeId, randomElements.DeviceTypeId);
+    EXPECT_EQ(memcmp(decodedElements2.certificateId, randomElements.CertificateId, kCertificateIdLength), 0);
+    EXPECT_EQ(decodedElements2.securityLevel, randomElements.SecurityLevel);
+    EXPECT_EQ(decodedElements2.securityInformation, randomElements.SecurityInformation);
+    EXPECT_EQ(decodedElements2.versionNumber, randomElements.VersionNumber);
+    EXPECT_EQ(decodedElements2.certificationType, randomElements.CertificationType);
+    EXPECT_EQ(decodedElements2.dacOriginVIDandPIDPresent, randomElements.DACOriginVIDandPIDPresent);
+    if (decodedElements2.dacOriginVIDandPIDPresent)
+    {
+        EXPECT_EQ(decodedElements2.dacOriginVendorId, randomElements.DACOriginVendorId);
+        EXPECT_EQ(decodedElements2.dacOriginProductId, randomElements.DACOriginProductId);
+    }
+    EXPECT_TRUE(decodedElements2.authorizedPAAListPresent);
+    for (uint8_t j = 0; j < randomElements.AuthorizedPAAListCount; j++)
+    {
+        EXPECT_TRUE(cdElementsDecoder.HasAuthorizedPAA(encodedCDPayload, ByteSpan(randomElements.AuthorizedPAAList[j])));
+        // now test for an unexistent PAA
+        kid[(kKeyIdentifierLength - 1 - j) % kKeyIdentifierLength] ^= 0x5A;
+        EXPECT_FALSE(cdElementsDecoder.HasAuthorizedPAA(encodedCDPayload, ByteSpan(kid)));
+    }
 }
 
-CHIP_REGISTER_TEST_SUITE(TestCertificationDeclaration);
+TEST(TestCertificationDeclaration, TestCD_DefaultCdTrustStore)
+{
+    chip::Credentials::CsaCdKeysTrustStore trustStore;
+
+    // Make sure that for an untrusted CD, whose key is not in truststore, we cannot find the key.
+    {
+        ByteSpan signerKeyIdOut;
+        EXPECT_EQ(CMS_ExtractKeyId(ByteSpan(gUntrustedCd), signerKeyIdOut), CHIP_NO_ERROR);
+        EXPECT_FALSE(trustStore.IsCdTestKey(signerKeyIdOut));
+
+        P256PublicKey pubKey;
+        EXPECT_EQ(CHIP_ERROR_KEY_NOT_FOUND, trustStore.LookupVerifyingKey(signerKeyIdOut, pubKey));
+    }
+
+    // Verify that a payload known to use the test key passes verification w/ default truststore
+    {
+        const auto & testCase = sTestCases[0];
+        ByteSpan signerKeyIdOut;
+        EXPECT_EQ(CMS_ExtractKeyId(testCase.cdCMSSigned, signerKeyIdOut), CHIP_NO_ERROR);
+        EXPECT_TRUE(trustStore.IsCdTestKey(signerKeyIdOut));
+
+        P256PublicKey pubKey;
+        ByteSpan cdContentOut;
+        EXPECT_EQ(trustStore.LookupVerifyingKey(signerKeyIdOut, pubKey), CHIP_NO_ERROR);
+
+        EXPECT_EQ(CMS_Verify(testCase.cdCMSSigned, pubKey, cdContentOut), CHIP_NO_ERROR);
+        EXPECT_TRUE(testCase.cdContent.data_equal(cdContentOut));
+    }
+
+    // Verify that after adding the verifying key to the trust store, it is now possible to
+    // verify the CD signature.
+    {
+        P256PublicKey pubKey;
+        ByteSpan cdContentOut;
+        EXPECT_EQ(trustStore.AddTrustedKey(ByteSpan(gUntrustedCdKid), gUntrustedCdVerifyingKey), CHIP_NO_ERROR);
+
+        ByteSpan signerKeyIdOut;
+        EXPECT_EQ(CMS_ExtractKeyId(ByteSpan(gUntrustedCd), signerKeyIdOut), CHIP_NO_ERROR);
+        EXPECT_TRUE(signerKeyIdOut.data_equal(ByteSpan(gUntrustedCdKid)));
+
+        EXPECT_EQ(trustStore.LookupVerifyingKey(signerKeyIdOut, pubKey), CHIP_NO_ERROR);
+        EXPECT_TRUE(pubKey.Matches(gUntrustedCdVerifyingKey));
+
+        EXPECT_EQ(CMS_Verify(ByteSpan(gUntrustedCd), pubKey, cdContentOut), CHIP_NO_ERROR);
+    }
+
+    // Verify that untrusted certificate key cannot be added to the trust store.
+    {
+        EXPECT_EQ(CHIP_ERROR_INVALID_ARGUMENT, trustStore.AddTrustedKey(ByteSpan(gUntrustedCdCert)));
+    }
+
+    // Verify that trusted certificate key can be added to the trust store.
+    {
+        EXPECT_EQ(trustStore.AddTrustedKey(ByteSpan(gCdSigningCert001)), CHIP_NO_ERROR);
+    }
+}

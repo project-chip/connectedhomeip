@@ -16,7 +16,7 @@ name: Test Cluster Complex Types Tests
 
 config:
     nodeId: 0x12344321
-    cluster: "Test Cluster"
+    cluster: "Unit Testing"
     endpoint: 1
 
 tests:
@@ -34,7 +34,7 @@ tests:
       # field and some of the TestCluster consumers don't do
       # that... and it's not clear that it's ever needed outside of
       # tests.
-      command: "testNullableOptionalRequest"
+      command: "TestNullableOptionalRequest"
       arguments:
           values:
               - name: "arg1"
@@ -52,19 +52,19 @@ tests:
     # SDK APIs have not been updated to do timed invoke properly yet.
 
     - label: "Send command that needs timed invoke without a timeout value"
-      command: "timedInvokeRequest"
+      command: "TimedInvokeRequest"
       response:
           # No timed interaction timeout provided, so not doing a timed interaction.
           error: NEEDS_TIMED_INTERACTION
 
     - label: "Send command that needs timed invoke with a long timeout value"
       # Expecting a success response here.
-      command: "timedInvokeRequest"
+      command: "TimedInvokeRequest"
       timedInteractionTimeoutMs: 10000
 
     - label:
           "Send command that needs timed invoke with a too-short timeout value"
-      command: "timedInvokeRequest"
+      command: "TimedInvokeRequest"
       timedInteractionTimeoutMs: 1
       # Try to ensure that we are unresponsive for long enough that the timeout
       # expires.
@@ -76,13 +76,13 @@ tests:
           "Send command that does not need timed invoke with a long timeout
           value"
       # Expecting a success response here.
-      command: "test"
+      command: "Test"
       timedInteractionTimeoutMs: 10000
 
     - label:
           "Send command that does not need timed invoke with a too-short timeout
           value"
-      command: "test"
+      command: "Test"
       timedInteractionTimeoutMs: 1
       # Try to ensure that we are unresponsive for long enough that the timeout
       # expires.

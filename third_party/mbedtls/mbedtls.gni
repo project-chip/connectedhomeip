@@ -14,10 +14,13 @@
 
 import("//build_overrides/mbedtls.gni")
 
+import("//build_overrides/build.gni")
+import("${build_root}/config/compiler/compiler.gni")
+
 template("mbedtls_target") {
   mbedtls_target_name = target_name
 
-  _mbedtls_root = "${mbedtls_root}/repo"
+  _mbedtls_root = "${mbedtls_repo}/repo"
 
   config("${mbedtls_target_name}_warnings") {
     cflags = [
@@ -25,7 +28,18 @@ template("mbedtls_target") {
       "-Wno-string-concatenation",
       "-Wno-unused-but-set-parameter",
       "-Wno-format-nonliteral",  # Because of mbedtls_debug_print_msg
+      "-Wno-conversion",  # Lots of -Wconversion warnings, sadly.
+      "-Wno-undef",  # At least MBEDTLS_AESNI_HAVE_CODE is used without being
+                     # defined.
     ]
+
+    if (is_clang) {
+      cflags += [
+        "-Wno-shorten-64-to-32",
+        "-Wno-unused-but-set-variable",  # bignum.c: variable 't' set but not
+                                         # used
+      ]
+    }
   }
 
   config("${mbedtls_target_name}_config") {
@@ -57,6 +71,7 @@ template("mbedtls_target") {
       "${_mbedtls_root}/library/cipher.c",
       "${_mbedtls_root}/library/cipher_wrap.c",
       "${_mbedtls_root}/library/cmac.c",
+      "${_mbedtls_root}/library/constant_time.c",
       "${_mbedtls_root}/library/ctr_drbg.c",
       "${_mbedtls_root}/library/debug.c",
       "${_mbedtls_root}/library/des.c",

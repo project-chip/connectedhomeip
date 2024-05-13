@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -35,14 +35,16 @@ using namespace chip::Credentials;
 #define CMD_NAME "chip-cert convert-cert"
 
 bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg);
-bool HandleNonOptionArgs(const char * progName, int argc, char * argv[]);
+bool HandleNonOptionArgs(const char * progName, int argc, char * const argv[]);
 
 // clang-format off
 OptionDef gCmdOptionDefs[] =
 {
     { "x509-pem",   kNoArgument, 'p' },
-    { "x509-der",   kNoArgument, 'x' },
+    { "x509-der",   kNoArgument, 'd' },
+    { "x509-hex",   kNoArgument, 'X' },
     { "chip",       kNoArgument, 'c' },
+    { "chip-hex",   kNoArgument, 'x' },
     { "chip-b64",   kNoArgument, 'b' },
     { }
 };
@@ -52,13 +54,21 @@ const char * const gCmdOptionHelp =
     "\n"
     "       Output certificate in X.509 PEM format.\n"
     "\n"
-    "  -x, --x509-der\n"
+    "  -d, --x509-der\n"
     "\n"
     "       Output certificate in X.509 DER format.\n"
+    "\n"
+    "  -X, --x509-hex\n"
+    "\n"
+    "       Output certificate in X.509 DER hex encoded format.\n"
     "\n"
     "  -c, --chip\n"
     "\n"
     "       Output certificate in raw CHIP TLV format.\n"
+    "\n"
+    "  -x, --chip-hex\n"
+    "\n"
+    "       Output certificate in CHIP TLV hexadecimal format.\n"
     "\n"
     "  -b --chip-b64\n"
     "\n"
@@ -77,21 +87,21 @@ OptionSet gCmdOptions =
 
 HelpOptions gHelpOptions(
     CMD_NAME,
-    "Usage: " CMD_NAME " [ <options...> ] <in-file> <out-file>\n",
+    "Usage: " CMD_NAME " [ <options...> ] <in-file/str> <out-file/stdout>\n",
     CHIP_VERSION_STRING "\n" COPYRIGHT_STRING,
-    "Convert a certificate between CHIP and X509 forms.\n"
+    "Convert operational certificate between CHIP and X.509 formats.\n"
     "\n"
     "ARGUMENTS\n"
     "\n"
-    "  <in-file>\n"
+    "  <in-file/str>\n"
     "\n"
-    "       The input certificate file name, or - to read from stdin. The\n"
-    "       format of the input certificate is auto-detected and can be any\n"
-    "       of: X.509 PEM, X.509 DER, CHIP base-64 or CHIP raw TLV.\n"
+    "       File or string containing certificate to be converted.\n"
+    "       The format of the input certificate is auto-detected and can be any of:\n"
+    "       X.509 PEM, X.509 DER, X.509 HEX, CHIP base-64, CHIP raw TLV or CHIP HEX.\n"
     "\n"
-    "  <out-file>\n"
+    "  <out-file/stdout>\n"
     "\n"
-    "       The output certificate file name, or - to write to stdout.\n"
+    "       The output certificate file name, or '-' to write to stdout.\n"
     "\n"
 );
 
@@ -103,9 +113,9 @@ OptionSet * gCmdOptionSets[] =
 };
 // clang-format on
 
-const char * gInFileName  = nullptr;
-const char * gOutFileName = nullptr;
-CertFormat gOutCertFormat = kCertFormat_Chip_Base64;
+const char * gInFileNameOrStr = nullptr;
+const char * gOutFileName     = nullptr;
+CertFormat gOutCertFormat     = kCertFormat_Default;
 
 bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg)
 {
@@ -114,8 +124,14 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
     case 'p':
         gOutCertFormat = kCertFormat_X509_PEM;
         break;
-    case 'x':
+    case 'd':
         gOutCertFormat = kCertFormat_X509_DER;
+        break;
+    case 'X':
+        gOutCertFormat = kCertFormat_X509_Hex;
+        break;
+    case 'x':
+        gOutCertFormat = kCertFormat_Chip_Hex;
         break;
     case 'b':
         gOutCertFormat = kCertFormat_Chip_Base64;
@@ -131,11 +147,11 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
     return true;
 }
 
-bool HandleNonOptionArgs(const char * progName, int argc, char * argv[])
+bool HandleNonOptionArgs(const char * progName, int argc, char * const argv[])
 {
     if (argc == 0)
     {
-        PrintArgError("%s: Please specify the name of the input certificate file, or - for stdin.\n", progName);
+        PrintArgError("%s: Please specify the name of the input certificate file or the certificate string.\n", progName);
         return false;
     }
 
@@ -151,8 +167,8 @@ bool HandleNonOptionArgs(const char * progName, int argc, char * argv[])
         return false;
     }
 
-    gInFileName  = argv[0];
-    gOutFileName = argv[1];
+    gInFileNameOrStr = argv[0];
+    gOutFileName     = argv[1];
 
     return true;
 }
@@ -162,7 +178,7 @@ bool HandleNonOptionArgs(const char * progName, int argc, char * argv[])
 bool Cmd_ConvertCert(int argc, char * argv[])
 {
     bool res = true;
-    std::unique_ptr<X509, void (*)(X509 *)> cert(X509_new(), &X509_free);
+    std::unique_ptr<X509, void (*)(X509 *)> cert(nullptr, &X509_free);
 
     if (argc == 1)
     {
@@ -176,7 +192,7 @@ bool Cmd_ConvertCert(int argc, char * argv[])
     res = InitOpenSSL();
     VerifyTrueOrExit(res);
 
-    res = ReadCert(gInFileName, cert.get());
+    res = ReadCert(gInFileNameOrStr, cert);
     VerifyTrueOrExit(res);
 
     res = WriteCert(gOutFileName, cert.get(), gOutCertFormat);

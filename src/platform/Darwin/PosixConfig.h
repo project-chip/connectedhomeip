@@ -26,7 +26,7 @@
 #include <functional>
 #include <inttypes.h>
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <lib/core/CHIPError.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -54,26 +54,13 @@ public:
     // Key definitions for well-known keys.
     static const Key kConfigKey_SerialNum;
     static const Key kConfigKey_UniqueId;
-    static const Key kConfigKey_MfrDeviceId;
-    static const Key kConfigKey_MfrDeviceCert;
-    static const Key kConfigKey_MfrDeviceICACerts;
-    static const Key kConfigKey_MfrDevicePrivateKey;
     static const Key kConfigKey_HardwareVersion;
     static const Key kConfigKey_ManufacturingDate;
     static const Key kConfigKey_SetupPinCode;
-    static const Key kConfigKey_FabricId;
-    static const Key kConfigKey_ServiceConfig;
-    static const Key kConfigKey_PairedAccountId;
-    static const Key kConfigKey_ServiceId;
-    static const Key kConfigKey_FabricSecret;
-    static const Key kConfigKey_GroupKeyIndex;
-    static const Key kConfigKey_LastUsedEpochKeyId;
     static const Key kConfigKey_FailSafeArmed;
-    static const Key kConfigKey_WiFiStationSecType;
     static const Key kConfigKey_SetupDiscriminator;
     static const Key kConfigKey_RegulatoryLocation;
     static const Key kConfigKey_CountryCode;
-    static const Key kConfigKey_Breadcrumb;
     static const Key kConfigKey_Spake2pIterationCount;
     static const Key kConfigKey_Spake2pSalt;
     static const Key kConfigKey_Spake2pVerifier;
@@ -84,10 +71,8 @@ public:
     static const Key kCounterKey_TotalOperationalHours;
     static const Key kCounterKey_RebootCount;
     static const Key kCounterKey_BootReason;
-    static const Key kCounterKey_UpTime;
 
-    static const char kGroupKeyNamePrefix[];
-
+#if !CHIP_DISABLE_PLATFORM_KVS
     static CHIP_ERROR Init(void);
 
     // Config value accessors.
@@ -114,11 +99,7 @@ protected:
     // NVS Namespace helper functions.
     static CHIP_ERROR EnsureNamespace(const char * ns);
     static CHIP_ERROR ClearNamespace(const char * ns);
-
-private:
-    // TODO: This is temporary until Darwin implements a proper ReadConfigValue
-    static uint16_t mPosixSetupDiscriminator;
-    static char mPosixCountryCode[2 + 1];
+#endif // CHIP_DISABLE_PLATFORM_KVS
 };
 
 struct PosixConfig::Key

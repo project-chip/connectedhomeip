@@ -28,11 +28,10 @@ namespace chip {
 
 using namespace Messaging;
 
-bool SessionEstablishmentExchangeDispatch::MessagePermitted(uint16_t protocol, uint8_t type)
+bool SessionEstablishmentExchangeDispatch::MessagePermitted(Protocols::Id protocol, uint8_t type)
 {
-    switch (protocol)
+    if (protocol == Protocols::SecureChannel::Id)
     {
-    case Protocols::SecureChannel::Id.GetProtocolId():
         switch (type)
         {
         case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::StandaloneAck):
@@ -41,7 +40,6 @@ bool SessionEstablishmentExchangeDispatch::MessagePermitted(uint16_t protocol, u
         case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::PASE_Pake1):
         case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::PASE_Pake2):
         case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::PASE_Pake3):
-        case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::PASE_PakeError):
         case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::CASE_Sigma1):
         case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::CASE_Sigma2):
         case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::CASE_Sigma3):
@@ -52,11 +50,8 @@ bool SessionEstablishmentExchangeDispatch::MessagePermitted(uint16_t protocol, u
         default:
             break;
         }
-        break;
-
-    default:
-        break;
     }
+
     return false;
 }
 

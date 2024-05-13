@@ -14,12 +14,7 @@
 
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/common_flags.gni")
-
-# Move this inside the GroupDataProvider once implemented Issue #11075
-declare_args() {
-  #Enable Multicast listenening on HardCoded IPV6 address for Test suite
-  chip_enable_group_messaging_tests = false
-}
+import("${chip_root}/src/app/icd/icd.gni")
 
 config("server_config") {
   defines = []
@@ -27,19 +22,20 @@ config("server_config") {
   if (chip_app_use_echo) {
     defines += [ "CHIP_APP_USE_ECHO" ]
   }
-
-  if (chip_enable_group_messaging_tests) {
-    defines += [ "CHIP_ENABLE_GROUP_MESSAGING_TESTS" ]
-  }
 }
 
 static_library("server") {
   output_name = "libCHIPAppServer"
 
   sources = [
+    "AclStorage.cpp",
+    "AclStorage.h",
+    "AppDelegate.h",
     "CommissioningModeProvider.h",
     "CommissioningWindowManager.cpp",
     "CommissioningWindowManager.h",
+    "DefaultAclStorage.cpp",
+    "DefaultAclStorage.h",
     "Dnssd.cpp",
     "Dnssd.h",
     "EchoHandler.cpp",
@@ -56,12 +52,25 @@ static_library("server") {
 
   public_deps = [
     "${chip_root}/src/app",
+    "${chip_root}/src/app:test-event-trigger",
+    "${chip_root}/src/app/icd/server:icd-server-config",
+    "${chip_root}/src/app/icd/server:observer",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/dnssd",
+    "${chip_root}/src/lib/dnssd:naming",
     "${chip_root}/src/messaging",
     "${chip_root}/src/platform",
     "${chip_root}/src/protocols",
     "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport",
   ]
+
+  # TODO: Server.cpp uses TestGroupData.h. Unsure why test code would be in such a central place
+  #       This dependency is split since it should probably be removed (or naming should
+  #       be updated if this is not really "testing" even though headers are Test*.h)
+  public_deps += [ "${chip_root}/src/lib/support:testing" ]
+
+  if (chip_enable_icd_server) {
+    public_deps += [ "${chip_root}/src/app/icd/server:notifier" ]
+  }
 }

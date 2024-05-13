@@ -18,13 +18,15 @@
 
 #pragma once
 
-#include "lib/core/CHIPTLV.h"
+#include "lib/core/TLV.h"
 #include "system/SystemPacketBuffer.h"
 #include "system/TLVPacketBufferBackingStore.h"
+#include <app/AppConfig.h>
 #include <app/AttributePathParams.h>
 #include <app/ReadClient.h>
 #include <vector>
 
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
 namespace chip {
 namespace app {
 
@@ -69,18 +71,53 @@ private:
     void OnReportBegin() override;
     void OnReportEnd() override;
     void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
-    void OnError(CHIP_ERROR aError) override { return mCallback.OnError(aError); }
+    void OnError(CHIP_ERROR aError) override
+    {
+        mBufferedList.clear();
+        return mCallback.OnError(aError);
+    }
+
     void OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) override
     {
         return mCallback.OnEventData(aEventHeader, apData, apStatus);
     }
 
-    void OnDone() override { return mCallback.OnDone(); }
-    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override { mCallback.OnSubscriptionEstablished(aSubscriptionId); }
+    void OnDone(ReadClient * apReadClient) override { return mCallback.OnDone(apReadClient); }
+    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override
+    {
+        mCallback.OnSubscriptionEstablished(aSubscriptionId);
+    }
+
+    CHIP_ERROR OnResubscriptionNeeded(ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override
+    {
+        return mCallback.OnResubscriptionNeeded(apReadClient, aTerminationCause);
+    }
 
     void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
     {
         return mCallback.OnDeallocatePaths(std::move(aReadPrepareParams));
+    }
+
+    virtual CHIP_ERROR OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                                     const Span<AttributePathParams> & aAttributePaths,
+                                                     bool & aEncodedDataVersionList) override
+    {
+        return mCallback.OnUpdateDataVersionFilterList(aDataVersionFilterIBsBuilder, aAttributePaths, aEncodedDataVersionList);
+    }
+
+    virtual CHIP_ERROR GetHighestReceivedEventNumber(Optional<EventNumber> & aEventNumber) override
+    {
+        return mCallback.GetHighestReceivedEventNumber(aEventNumber);
+    }
+
+    void OnUnsolicitedMessageFromPublisher(ReadClient * apReadClient) override
+    {
+        return mCallback.OnUnsolicitedMessageFromPublisher(apReadClient);
+    }
+
+    void OnCASESessionEstablished(const SessionHandle & aSession, ReadPrepareParams & aSubscriptionParams) override
+    {
+        return mCallback.OnCASESessionEstablished(aSession, aSubscriptionParams);
     }
 
     /*
@@ -98,3 +135,4 @@ private:
 
 } // namespace app
 } // namespace chip
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT

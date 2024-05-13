@@ -18,11 +18,16 @@
 
 #pragma once
 
+#include <app/AppConfig.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/DataVersionFilter.h>
 #include <app/util/basic-types.h>
 
 namespace chip {
 namespace app {
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
+class ReadClient;
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 struct AttributePathParams
 {
     //
@@ -47,7 +52,13 @@ struct AttributePathParams
 
     AttributePathParams() {}
 
-    bool HasAttributeWildcard() const { return HasWildcardEndpointId() || HasWildcardClusterId() || HasWildcardAttributeId(); }
+    bool IsWildcardPath() const { return HasWildcardEndpointId() || HasWildcardClusterId() || HasWildcardAttributeId(); }
+
+    bool operator==(const AttributePathParams & aOther) const
+    {
+        return mEndpointId == aOther.mEndpointId && mClusterId == aOther.mClusterId && mAttributeId == aOther.mAttributeId &&
+            mListIndex == aOther.mListIndex;
+    }
 
     /**
      * SPEC 8.9.2.2
@@ -61,6 +72,13 @@ struct AttributePathParams
     inline bool HasWildcardClusterId() const { return mClusterId == kInvalidClusterId; }
     inline bool HasWildcardAttributeId() const { return mAttributeId == kInvalidAttributeId; }
     inline bool HasWildcardListIndex() const { return mListIndex == kInvalidListIndex; }
+    inline void SetWildcardEndpointId() { mEndpointId = kInvalidEndpointId; }
+    inline void SetWildcardClusterId() { mClusterId = kInvalidClusterId; }
+    inline void SetWildcardAttributeId()
+    {
+        mAttributeId = kInvalidAttributeId;
+        mListIndex   = kInvalidListIndex;
+    }
 
     bool IsAttributePathSupersetOf(const AttributePathParams & other) const
     {
@@ -79,6 +97,31 @@ struct AttributePathParams
         VerifyOrReturnError(HasWildcardAttributeId() || mAttributeId == other.mAttributeId, false);
 
         return true;
+    }
+
+    bool Intersects(const AttributePathParams & other) const
+    {
+        VerifyOrReturnError(HasWildcardEndpointId() || other.HasWildcardEndpointId() || mEndpointId == other.mEndpointId, false);
+        VerifyOrReturnError(HasWildcardClusterId() || other.HasWildcardClusterId() || mClusterId == other.mClusterId, false);
+        VerifyOrReturnError(HasWildcardAttributeId() || other.HasWildcardAttributeId() || mAttributeId == other.mAttributeId,
+                            false);
+        return true;
+    }
+
+    bool IncludesAttributesInCluster(const DataVersionFilter & other) const
+    {
+        VerifyOrReturnError(HasWildcardEndpointId() || mEndpointId == other.mEndpointId, false);
+        VerifyOrReturnError(HasWildcardClusterId() || mClusterId == other.mClusterId, false);
+
+        return true;
+    }
+
+    // check if input concrete cluster path is subset of current wildcard attribute
+    bool IncludesAllAttributesInCluster(const ConcreteClusterPath & aOther) const
+    {
+        VerifyOrReturnError(HasWildcardEndpointId() || mEndpointId == aOther.mEndpointId, false);
+        VerifyOrReturnError(HasWildcardClusterId() || mClusterId == aOther.mClusterId, false);
+        return HasWildcardAttributeId();
     }
 
     ClusterId mClusterId     = kInvalidClusterId;   // uint32

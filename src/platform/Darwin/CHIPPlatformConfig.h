@@ -27,6 +27,12 @@
 
 #define CHIP_CONFIG_ABORT() abort()
 
+#include <os/trace_base.h> // for __dso_handle
+extern "C" int __cxa_atexit(void (*f)(void *), void * p, void * d);
+#define CHIP_CXA_ATEXIT(f, p) __cxa_atexit((f), (p), &__dso_handle)
+
+#define CHIP_CONFIG_GLOBALS_LAZY_INIT 1
+
 #define CHIP_CONFIG_ERROR_FORMAT_AS_STRING 1
 #define CHIP_CONFIG_ERROR_SOURCE 1
 
@@ -35,6 +41,11 @@
 #define CHIP_CONFIG_IM_STATUS_CODE_VERBOSE_FORMAT 1
 
 // ==================== Security Adaptations ====================
+
+// If unspecified, assume crypto is fast on Darwin
+#ifndef CHIP_CONFIG_SLOW_CRYPTO
+#define CHIP_CONFIG_SLOW_CRYPTO 0
+#endif // CHIP_CONFIG_SLOW_CRYPTO
 
 // ==================== General Configuration Overrides ====================
 
@@ -53,10 +64,6 @@
 #ifndef CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS
 #define CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS 1
 #endif // CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS
-
-// TODO - Fine tune MRP default parameters for Darwin platform
-#define CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL (15000)
-#define CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL (2000_ms32)
 
 #ifndef CHIP_CONFIG_KVS_PATH
 #define CHIP_CONFIG_KVS_PATH "/tmp/chip_kvs"

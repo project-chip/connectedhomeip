@@ -21,16 +21,10 @@
  *      This file contains functions for working with BLE Layer errors.
  */
 
-#include <stddef.h>
+#define _CHIP_BLE_BLE_H
+#include "BleError.h"
 
-#include <ble/BleConfig.h>
-
-#if CONFIG_NETWORK_LAYER_BLE
-
-#include <ble/BleError.h>
-#include <ble/BleLayer.h>
-
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 
 namespace chip {
 namespace Ble {
@@ -57,6 +51,9 @@ bool FormatLayerError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 #if !CHIP_CONFIG_SHORT_ERROR_STR
     switch (err.AsInteger())
     {
+    case BLE_ERROR_ADAPTER_UNAVAILABLE.AsInteger():
+        desc = "BLE adapter unavailable";
+        break;
     case BLE_ERROR_NO_CONNECTION_RECEIVED_CALLBACK.AsInteger():
         desc = "No chip over BLE connection received callback set";
         break;
@@ -139,5 +136,3 @@ bool FormatLayerError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 
 } /* namespace Ble */
 } /* namespace chip */
-
-#endif // CONFIG_NETWORK_LAYER_BLE

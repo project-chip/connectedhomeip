@@ -1,0 +1,79 @@
+/ {
+	chosen {
+		zephyr,console = &cdc_acm_uart0;
+		zephyr,shell-uart = &cdc_acm_uart0;
+	};
+
+	key_pool {
+		compatible = "gpio-keys";
+
+		inp {
+			gpios = <&gpiob 2 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>,
+					<&gpiob 3 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+		};
+	};
+
+	led_pool {
+		compatible = "gpio-leds";
+
+		out {
+			gpios = <&gpiob 1 GPIO_ACTIVE_HIGH>,
+					<&gpioe 3 GPIO_ACTIVE_HIGH>;
+		};
+	};
+
+	pwm_pool {
+		compatible = "pwm-leds";
+		out {
+			pwms = <&pwm0 1 PWM_MSEC(20) PWM_POLARITY_NORMAL>,
+					<&pwm0 0 PWM_MSEC(20) PWM_POLARITY_NORMAL>,
+					<&pwm0 5 PWM_MSEC(20) PWM_POLARITY_NORMAL>,
+					<&pwm0 2 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
+		};
+	};
+};
+
+&pwm0 {
+	pinctrl-ch1 = <&pwm_ch1_pb5_default>;
+	/* On board RGB LEDs */
+	pinctrl-ch0 = <&pwm_ch0_pb4_default>;
+	pinctrl-ch5 = <&pwm_ch5_pb0_default>;
+	pinctrl-ch2 = <&pwm_ch2_pb7_default>;
+};
+
+&pinctrl {
+	pwm_ch1_pb5_default: pwm_ch1_pb5_default {
+		pinmux = <B9x_PINMUX_SET(B9x_PORT_B, B9x_PIN_5, B91_FUNC_C)>;
+	};
+	pwm_ch0_pb4_default: pwm_ch0_pb4_default {
+		pinmux = <B9x_PINMUX_SET(B9x_PORT_B, B9x_PIN_4, B91_FUNC_B)>;
+	};
+	pwm_ch5_pb0_default: pwm_ch5_pb0_default {
+		pinmux = <B9x_PINMUX_SET(B9x_PORT_B, B9x_PIN_0, B91_FUNC_C)>;
+	};
+	pwm_ch2_pb7_default: pwm_ch2_pb7_default {
+		pinmux = <B9x_PINMUX_SET(B9x_PORT_B, B9x_PIN_7, B91_FUNC_A)>;
+	};
+};
+
+&zephyr_udc0 {
+	cdc_acm_uart0: cdc_acm_uart0 {
+		compatible = "zephyr,cdc-acm-uart";
+	};
+};
+
+&uart0 {
+	pinctrl-0 = <&uart0_tx_pa3_default &uart0_rx_pa4_default>;
+};
+
+&gpiob {
+	interrupts = <37 1>;
+};
+
+&gpioc {
+	interrupts = <38 1>;
+};
+
+&gpioe {
+	status = "okay";
+};

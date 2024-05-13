@@ -23,17 +23,16 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/Nullable.h>
 
 namespace chip {
 namespace app {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR AttributePathIB::Parser::CheckSchemaValidity() const
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+CHIP_ERROR AttributePathIB::Parser::PrettyPrint() const
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    int TagPresenceMask = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("AttributePathIB =");
@@ -44,54 +43,44 @@ CHIP_ERROR AttributePathIB::Parser::CheckSchemaValidity() const
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         uint32_t tagNum = TLV::TagNumFromTag(reader.GetTag());
         switch (tagNum)
         {
         case to_underlying(Tag::kEnableTagCompression):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kEnableTagCompression))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kEnableTagCompression));
 #if CHIP_DETAIL_LOGGING
-            {
-                bool enableTagCompression;
-                ReturnErrorOnFailure(reader.Get(enableTagCompression));
-                PRETTY_PRINT("\tenableTagCompression = %s, ", enableTagCompression ? "true" : "false");
-            }
+        {
+            bool enableTagCompression;
+            ReturnErrorOnFailure(reader.Get(enableTagCompression));
+            PRETTY_PRINT("\tenableTagCompression = %s, ", enableTagCompression ? "true" : "false");
+        }
 #endif // CHIP_DETAIL_LOGGING
-            break;
+        break;
         case to_underlying(Tag::kNode):
-            // check if this tag has appeared before
-
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kNode))), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kNode));
             VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
 #if CHIP_DETAIL_LOGGING
             {
                 NodeId node;
                 reader.Get(node);
-                PRETTY_PRINT("\tNode = 0x%" PRIx64 ",", node);
+                PRETTY_PRINT("\tNode = 0x" ChipLogFormatX64 ",", ChipLogValueX64(node));
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
         case to_underlying(Tag::kEndpoint):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kEndpoint))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kEndpoint));
             VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
                 EndpointId endpoint;
                 reader.Get(endpoint);
-                PRETTY_PRINT("\tEndpoint = 0x%" PRIx16 ",", endpoint);
+                PRETTY_PRINT("\tEndpoint = 0x%x,", endpoint);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
         case to_underlying(Tag::kCluster):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kCluster))), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kCluster));
             VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
 #if CHIP_DETAIL_LOGGING
@@ -103,9 +92,6 @@ CHIP_ERROR AttributePathIB::Parser::CheckSchemaValidity() const
 #endif // CHIP_DETAIL_LOGGING
             break;
         case to_underlying(Tag::kAttribute):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kAttribute))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kAttribute));
             VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
@@ -116,9 +102,6 @@ CHIP_ERROR AttributePathIB::Parser::CheckSchemaValidity() const
 #endif // CHIP_DETAIL_LOGGING
             break;
         case to_underlying(Tag::kListIndex):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kListIndex))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kListIndex));
             VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType() || TLV::kTLVType_Null == reader.GetType(),
                                 CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
@@ -127,7 +110,7 @@ CHIP_ERROR AttributePathIB::Parser::CheckSchemaValidity() const
             {
                 uint16_t listIndex;
                 ReturnErrorOnFailure(reader.Get(listIndex));
-                PRETTY_PRINT("\tListIndex = 0x%" PRIx16 ",", listIndex);
+                PRETTY_PRINT("\tListIndex = 0x%x,", listIndex);
             }
             else
             {
@@ -146,22 +129,12 @@ CHIP_ERROR AttributePathIB::Parser::CheckSchemaValidity() const
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
-        if ((TagPresenceMask & (1 << to_underlying(Tag::kAttribute))) == 0 &&
-            (TagPresenceMask & (1 << to_underlying(Tag::kListIndex))) != 0)
-        {
-            err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
-        }
-        else
-        {
-            err = CHIP_NO_ERROR;
-        }
+        err = CHIP_NO_ERROR;
     }
-
     ReturnErrorOnFailure(err);
-    ReturnErrorOnFailure(reader.ExitContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
+    return reader.ExitContainer(mOuterContainerType);
 }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
 CHIP_ERROR AttributePathIB::Parser::GetEnableTagCompression(bool * const apEnableTagCompression) const
 {
@@ -198,8 +171,18 @@ CHIP_ERROR AttributePathIB::Parser::GetListIndex(DataModel::Nullable<ListIndex> 
     return GetNullableUnsignedInteger(to_underlying(Tag::kListIndex), apListIndex);
 }
 
-CHIP_ERROR AttributePathIB::Parser::GetListIndex(ConcreteDataAttributePath & aAttributePath) const
+CHIP_ERROR AttributePathIB::Parser::GetGroupAttributePath(ConcreteDataAttributePath & aAttributePath,
+                                                          ValidateIdRanges aValidateRanges) const
 {
+    ReturnErrorOnFailure(GetCluster(&aAttributePath.mClusterId));
+    ReturnErrorOnFailure(GetAttribute(&aAttributePath.mAttributeId));
+
+    if (aValidateRanges == ValidateIdRanges::kYes)
+    {
+        VerifyOrReturnError(IsValidClusterId(aAttributePath.mClusterId), CHIP_IM_GLOBAL_STATUS(InvalidAction));
+        VerifyOrReturnError(IsValidAttributeId(aAttributePath.mAttributeId), CHIP_IM_GLOBAL_STATUS(InvalidAction));
+    }
+
     CHIP_ERROR err = CHIP_NO_ERROR;
     DataModel::Nullable<ListIndex> listIndex;
     err = GetListIndex(&(listIndex));
@@ -212,7 +195,7 @@ CHIP_ERROR AttributePathIB::Parser::GetListIndex(ConcreteDataAttributePath & aAt
         else
         {
             // TODO: Add ListOperation::ReplaceItem support. (Attribute path with valid list index)
-            err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
         }
     }
     else if (CHIP_END_OF_TLV == err)
@@ -225,12 +208,78 @@ CHIP_ERROR AttributePathIB::Parser::GetListIndex(ConcreteDataAttributePath & aAt
     return err;
 }
 
+CHIP_ERROR AttributePathIB::Parser::GetConcreteAttributePath(ConcreteDataAttributePath & aAttributePath,
+                                                             ValidateIdRanges aValidateRanges) const
+{
+    ReturnErrorOnFailure(GetGroupAttributePath(aAttributePath, aValidateRanges));
+
+    // And now read our endpoint.
+    return GetEndpoint(&aAttributePath.mEndpointId);
+}
+
+CHIP_ERROR AttributePathIB::Parser::ParsePath(AttributePathParams & aAttribute) const
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    err = GetEndpoint(&(aAttribute.mEndpointId));
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(!aAttribute.HasWildcardEndpointId(), CHIP_IM_GLOBAL_STATUS(InvalidAction));
+    }
+    else if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_IM_GLOBAL_STATUS(InvalidAction));
+
+    err = GetCluster(&aAttribute.mClusterId);
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(IsValidClusterId(aAttribute.mClusterId), CHIP_IM_GLOBAL_STATUS(InvalidAction));
+    }
+    else if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_IM_GLOBAL_STATUS(InvalidAction));
+
+    err = GetAttribute(&aAttribute.mAttributeId);
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(IsValidAttributeId(aAttribute.mAttributeId), CHIP_IM_GLOBAL_STATUS(InvalidAction));
+    }
+    else if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_IM_GLOBAL_STATUS(InvalidAction));
+
+    // A wildcard cluster requires that the attribute path either be
+    // wildcard or a global attribute.
+    VerifyOrReturnError(!aAttribute.HasWildcardClusterId() || aAttribute.HasWildcardAttributeId() ||
+                            IsGlobalAttribute(aAttribute.mAttributeId),
+                        CHIP_IM_GLOBAL_STATUS(InvalidAction));
+
+    err = GetListIndex(&aAttribute.mListIndex);
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(!aAttribute.HasWildcardAttributeId() && !aAttribute.HasWildcardListIndex(),
+                            CHIP_IM_GLOBAL_STATUS(InvalidAction));
+    }
+    else if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_IM_GLOBAL_STATUS(InvalidAction));
+    return CHIP_NO_ERROR;
+}
+
 AttributePathIB::Builder & AttributePathIB::Builder::EnableTagCompression(const bool aEnableTagCompression)
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->PutBoolean(TLV::ContextTag(to_underlying(Tag::kEnableTagCompression)), aEnableTagCompression);
+        mError = mpWriter->PutBoolean(TLV::ContextTag(Tag::kEnableTagCompression), aEnableTagCompression);
     }
     return *this;
 }
@@ -240,7 +289,7 @@ AttributePathIB::Builder & AttributePathIB::Builder::Node(const NodeId aNode)
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kNode)), aNode);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kNode), aNode);
     }
     return *this;
 }
@@ -250,7 +299,7 @@ AttributePathIB::Builder & AttributePathIB::Builder::Endpoint(const EndpointId a
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kEndpoint)), aEndpoint);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kEndpoint), aEndpoint);
     }
     return *this;
 }
@@ -260,7 +309,7 @@ AttributePathIB::Builder & AttributePathIB::Builder::Cluster(const ClusterId aCl
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kCluster)), aCluster);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kCluster), aCluster);
     }
     return *this;
 }
@@ -270,7 +319,7 @@ AttributePathIB::Builder & AttributePathIB::Builder::Attribute(const AttributeId
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kAttribute)), aAttribute);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kAttribute), aAttribute);
     }
     return *this;
 }
@@ -280,7 +329,7 @@ AttributePathIB::Builder & AttributePathIB::Builder::ListIndex(const DataModel::
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = DataModel::Encode(*mpWriter, TLV::ContextTag(to_underlying(Tag::kListIndex)), aListIndex);
+        mError = DataModel::Encode(*mpWriter, TLV::ContextTag(Tag::kListIndex), aListIndex);
     }
     return *this;
 }
@@ -290,15 +339,15 @@ AttributePathIB::Builder & AttributePathIB::Builder::ListIndex(const chip::ListI
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kListIndex)), aListIndex);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kListIndex), aListIndex);
     }
     return *this;
 }
 
-AttributePathIB::Builder & AttributePathIB::Builder::EndOfAttributePathIB()
+CHIP_ERROR AttributePathIB::Builder::EndOfAttributePathIB()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 
 CHIP_ERROR AttributePathIB::Builder::Encode(const AttributePathParams & aAttributePathParams)
@@ -323,8 +372,7 @@ CHIP_ERROR AttributePathIB::Builder::Encode(const AttributePathParams & aAttribu
         ListIndex(aAttributePathParams.mListIndex);
     }
 
-    EndOfAttributePathIB();
-    return GetError();
+    return EndOfAttributePathIB();
 }
 
 CHIP_ERROR AttributePathIB::Builder::Encode(const ConcreteDataAttributePath & aAttributePath)
@@ -347,8 +395,7 @@ CHIP_ERROR AttributePathIB::Builder::Encode(const ConcreteDataAttributePath & aA
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    EndOfAttributePathIB();
-    return GetError();
+    return EndOfAttributePathIB();
 }
 
 } // namespace app

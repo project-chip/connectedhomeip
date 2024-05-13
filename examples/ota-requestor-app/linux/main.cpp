@@ -43,7 +43,9 @@ using chip::Callback::Callback;
 using chip::System::Layer;
 using chip::Transport::PeerAddress;
 using namespace chip;
+using namespace chip::app;
 using namespace chip::ArgParser;
+using namespace chip::DeviceLayer;
 using namespace chip::Messaging;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
@@ -52,6 +54,9 @@ class CustomOTARequestorDriver : public DeviceLayer::ExtendedOTARequestorDriver
 public:
     bool CanConsent() override;
     void UpdateDownloaded() override;
+    void UpdateConfirmed(System::Clock::Seconds32 delay) override;
+    static void AppliedNotifyUpdateTimer(System::Layer * systemLayer, void * appState);
+    void SendNotifyUpdateApplied();
 };
 
 DefaultOTARequestor gRequestorCore;
@@ -66,10 +71,12 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 
 constexpr uint16_t kOptionAutoApplyImage       = 'a';
 constexpr uint16_t kOptionRequestorCanConsent  = 'c';
+constexpr uint16_t kOptionDisableNotify        = 'd';
 constexpr uint16_t kOptionOtaDownloadPath      = 'f';
 constexpr uint16_t kOptionPeriodicQueryTimeout = 'p';
 constexpr uint16_t kOptionUserConsentState     = 'u';
 constexpr uint16_t kOptionWatchdogTimeout      = 'w';
+constexpr uint16_t kSkipExecImageFile          = 's';
 constexpr size_t kMaxFilePathSize              = 256;
 
 uint32_t gPeriodicQueryTimeoutSec = 0;
@@ -77,17 +84,22 @@ uint32_t gWatchdogTimeoutSec      = 0;
 chip::Optional<bool> gRequestorCanConsent;
 static char gOtaDownloadPath[kMaxFilePathSize] = "/tmp/test.bin";
 bool gAutoApplyImage                           = false;
+bool gSendNotifyUpdateApplied                  = true;
+bool gSkipExecImageFile                        = false;
 
 OptionDef cmdLineOptionsDef[] = {
     { "autoApplyImage", chip::ArgParser::kNoArgument, kOptionAutoApplyImage },
     { "requestorCanConsent", chip::ArgParser::kArgumentRequired, kOptionRequestorCanConsent },
+    { "disableNotifyUpdateApplied", chip::ArgParser::kNoArgument, kOptionDisableNotify },
     { "otaDownloadPath", chip::ArgParser::kArgumentRequired, kOptionOtaDownloadPath },
     { "periodicQueryTimeout", chip::ArgParser::kArgumentRequired, kOptionPeriodicQueryTimeout },
     { "userConsentState", chip::ArgParser::kArgumentRequired, kOptionUserConsentState },
     { "watchdogTimeout", chip::ArgParser::kArgumentRequired, kOptionWatchdogTimeout },
+    { "skipExecImageFile", chip::ArgParser::kNoArgument, kSkipExecImageFile },
     {},
 };
 
+// Options for various test scenarios
 OptionSet cmdLineOptions = {
     HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
     "  -a, --autoApplyImage\n"
@@ -96,6 +108,9 @@ OptionSet cmdLineOptions = {
     "  -c, --requestorCanConsent <true | false>\n"
     "       Value for the RequestorCanConsent field in the QueryImage command.\n"
     "       If not supplied, the value is determined by the driver.\n"
+    "  -d, --disableNotifyUpdateApplied\n"
+    "       If supplied, disable sending of the NotifyUpdateApplied command.\n"
+    "       Otherwise, after successfully loading into the updated image, send the NotifyUpdateApplied command.\n"
     "  -f, --otaDownloadPath <file path>\n"
     "       If supplied, the OTA image is downloaded to the given fully-qualified file-path.\n"
     "       Otherwise, the default location for the downloaded image is at /tmp/test.bin\n"
@@ -113,9 +128,16 @@ OptionSet cmdLineOptions = {
     "  -w, --watchdogTimeout <time in seconds>\n"
     "       Maximum amount of time allowed for an OTA download before the process is cancelled and state reset to idle.\n"
     "       If none or zero is supplied, the timeout is determined by the driver.\n"
+    "  -s, --skipExecImageFile\n"
+    "       To only check Notify Update Applied Command, skip the Image File execution.\n"
 };
 
 OptionSet * allOptions[] = { &cmdLineOptions, nullptr };
+
+// Network commissioning
+namespace {
+constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
+} // namespace
 
 bool CustomOTARequestorDriver::CanConsent()
 {
@@ -124,16 +146,53 @@ bool CustomOTARequestorDriver::CanConsent()
 
 void CustomOTARequestorDriver::UpdateDownloaded()
 {
-    if (gAutoApplyImage)
+    if (gAutoApplyImage || gSkipExecImageFile)
     {
-        // Let the default driver take further action to apply the image
+        // Let the default driver take further action to apply the image.
+        // All member variables will be implicitly reset upon loading into the new image.
         DefaultOTARequestorDriver::UpdateDownloaded();
     }
     else
     {
+        // Download complete but we're not going to apply image, so reset provider retry counter.
+        mProviderRetryCount = 0;
+
         // Reset to put the state back to idle to allow the next OTA update to occur
         gRequestorCore.Reset();
     }
+}
+
+void CustomOTARequestorDriver::UpdateConfirmed(System::Clock::Seconds32 delay)
+{
+    if (gSkipExecImageFile)
+    {
+        // Just waiting delay time
+        VerifyOrDie(SystemLayer().StartTimer(std::chrono::duration_cast<System::Clock::Timeout>(delay), AppliedNotifyUpdateTimer,
+                                             this) == CHIP_NO_ERROR);
+    }
+    else
+    {
+        // Let the default driver take further action to apply the image.
+        // All member variables will be implicitly reset upon loading into the new image.
+        DefaultOTARequestorDriver::UpdateConfirmed(delay);
+    }
+}
+
+void CustomOTARequestorDriver::AppliedNotifyUpdateTimer(System::Layer * systemLayer, void * appState)
+{
+    CustomOTARequestorDriver * driver = reinterpret_cast<CustomOTARequestorDriver *>(appState);
+    driver->SendNotifyUpdateApplied();
+}
+
+void CustomOTARequestorDriver::SendNotifyUpdateApplied()
+{
+    VerifyOrDie(mRequestor != nullptr);
+    mRequestor->NotifyUpdateApplied();
+    // After sending Noficy Update Applied command, so reset provider retry counter.
+    mProviderRetryCount = 0;
+
+    // Reset to put the state back to idle to allow the next OTA update to occur
+    gRequestorCore.Reset();
 }
 
 static void InitOTARequestor(void)
@@ -146,6 +205,7 @@ static void InitOTARequestor(void)
 
     // Watchdog timeout can be set any time before a query image is sent
     gRequestorUser.SetWatchdogTimeout(gWatchdogTimeoutSec);
+    gRequestorUser.SetSendNotifyUpdateApplied(gSendNotifyUpdateApplied);
 
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
     gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
@@ -216,6 +276,13 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
     case kOptionWatchdogTimeout:
         gWatchdogTimeoutSec = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
         break;
+    case kOptionDisableNotify:
+        // By default, NotifyUpdateApplied should always be sent. In the presence of this option, disable sending of the command.
+        gSendNotifyUpdateApplied = false;
+        break;
+    case kSkipExecImageFile:
+        gSkipExecImageFile = true;
+        break;
     default:
         ChipLogError(SoftwareUpdate, "%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;
@@ -231,9 +298,11 @@ void ApplicationInit()
     InitOTARequestor();
 }
 
+void ApplicationShutdown() {}
+
 int main(int argc, char * argv[])
 {
-    VerifyOrDie(ChipLinuxAppInit(argc, argv, &cmdLineOptions) == 0);
+    VerifyOrDie(ChipLinuxAppInit(argc, argv, &cmdLineOptions, MakeOptional(kNetworkCommissioningEndpointSecondary)) == 0);
     ChipLinuxAppMainLoop();
 
     // If the event loop had been stopped due to an update being applied, boot into the new image
@@ -248,7 +317,7 @@ int main(int argc, char * argv[])
         argv[0] = kImageExecPath;
         execv(argv[0], argv);
 
-        // If successfully executing the new iamge, execv should not return
+        // If successfully executing the new image, execv should not return
         ChipLogError(SoftwareUpdate, "The OTA image is invalid");
     }
     return 0;

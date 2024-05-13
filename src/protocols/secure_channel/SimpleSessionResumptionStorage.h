@@ -24,16 +24,16 @@
 
 #pragma once
 
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
-#include <protocols/secure_channel/SessionResumptionStorage.h>
+#include <protocols/secure_channel/DefaultSessionResumptionStorage.h>
 
 namespace chip {
 
 /**
  * An example SessionResumptionStorage using PersistentStorageDelegate as it backend.
  */
-class SimpleSessionResumptionStorage : public SessionResumptionStorage
+class SimpleSessionResumptionStorage : public DefaultSessionResumptionStorage
 {
 public:
     CHIP_ERROR Init(PersistentStorageDelegate * storage)
@@ -56,17 +56,16 @@ public:
                          Crypto::P256ECDHDerivedSecret & sharedSecret, CATValues & peerCATs) override;
     CHIP_ERROR DeleteState(const ScopedNodeId & node) override;
 
-private:
-    static const char * StorageKey(DefaultStorageKeyAllocator & keyAlloc, const ScopedNodeId & node);
-    static const char * StorageKey(DefaultStorageKeyAllocator & keyAlloc, ConstResumptionIdView resumptionId);
+    static StorageKeyName GetStorageKey(const ScopedNodeId & node);
+    static StorageKeyName GetStorageKey(ConstResumptionIdView resumptionId);
 
+private:
     static constexpr size_t MaxScopedNodeIdSize() { return TLV::EstimateStructOverhead(sizeof(NodeId), sizeof(FabricIndex)); }
 
     static constexpr size_t MaxIndexSize()
     {
-        // The max size of the list is (1 byte control + bytes for actual value) times max number of list items, plus one byte for
-        // the list terminator.
-        return TLV::EstimateStructOverhead((1 + MaxScopedNodeIdSize()) * CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE + 1);
+        // The max size of the list is (1 byte control + bytes for actual value) times max number of list items
+        return TLV::EstimateStructOverhead((1 + MaxScopedNodeIdSize()) * CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE);
     }
 
     static constexpr size_t MaxStateSize()
@@ -75,12 +74,11 @@ private:
                                            CATValues::kSerializedLength);
     }
 
-    static constexpr TLV::Tag kIndexContentTag = TLV::ContextTag(1);
-    static constexpr TLV::Tag kFabricIndexTag  = TLV::ContextTag(2);
-    static constexpr TLV::Tag kPeerNodeIdTag   = TLV::ContextTag(3);
-    static constexpr TLV::Tag kResumptionIdTag = TLV::ContextTag(4);
-    static constexpr TLV::Tag kSharedSecretTag = TLV::ContextTag(5);
-    static constexpr TLV::Tag kCATTag          = TLV::ContextTag(6);
+    static constexpr TLV::Tag kFabricIndexTag  = TLV::ContextTag(1);
+    static constexpr TLV::Tag kPeerNodeIdTag   = TLV::ContextTag(2);
+    static constexpr TLV::Tag kResumptionIdTag = TLV::ContextTag(3);
+    static constexpr TLV::Tag kSharedSecretTag = TLV::ContextTag(4);
+    static constexpr TLV::Tag kCATTag          = TLV::ContextTag(5);
 
     PersistentStorageDelegate * mStorage;
 };

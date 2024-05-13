@@ -28,7 +28,10 @@ limitations under the License.
       standards. As such, Nodes that visually or audibly convey information need a mechanism by which
       they can be configured to use a user’s preferred language, units, etc</description>
     <!-- Base data types -->
-    <attribute side="server" code="0x01" define="ACTIVE_LOCALE" type="CHAR_STRING" length="35" writable="true" optional="false">ActiveLocale</attribute>
-    <attribute side="server" code="0x02" define="SUPPORTED_LOCALES" type="ARRAY" entryType="CHAR_STRING" length="254" writable="false" optional="false">SupportedLocales</attribute>
+    <attribute side="server" code="0x00" define="ACTIVE_LOCALE" type="char_string" length="35" writable="true" optional="false">
+      <description>ActiveLocale</description>
+      <access op="write" privilege="manage"/>
+    </attribute>
+    <attribute side="server" code="0x01" define="SUPPORTED_LOCALES" type="array" entryType="char_string" length="254" writable="false" optional="false">SupportedLocales</attribute>
   </cluster>
 </configurator>

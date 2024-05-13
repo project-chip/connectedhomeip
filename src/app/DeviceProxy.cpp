@@ -32,7 +32,6 @@
 #include <lib/core/CHIPEncoding.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::Callback;
@@ -44,6 +43,17 @@ CHIP_ERROR DeviceProxy::SendCommands(app::CommandSender * commandObj, Optional<S
     VerifyOrReturnLogError(IsSecureConnected(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(commandObj != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     return commandObj->SendCommandRequest(GetSecureSession().Value(), timeout);
+}
+
+CHIP_ERROR DeviceProxy::GetAttestationChallenge(ByteSpan & attestationChallenge)
+{
+    Optional<SessionHandle> secureSessionHandle;
+
+    secureSessionHandle = GetSecureSession();
+    VerifyOrReturnError(secureSessionHandle.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+
+    attestationChallenge = secureSessionHandle.Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
+    return CHIP_NO_ERROR;
 }
 
 } // namespace chip

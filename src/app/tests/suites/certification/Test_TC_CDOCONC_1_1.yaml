@@ -1,0 +1,336 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 145.1.1. [TC-CDOCONC-1.1] Global Attributes with DUT as Server
+
+PICS:
+    - CDOCONC.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Carbon Dioxide Concentration Measurement"
+    endpoint: 1
+
+tests:
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: Read the global attribute: ClusterRevision"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 3
+          constraints:
+              type: int16u
+
+    - label:
+          "Step 3a: Read the global attribute: FeatureMap and check for either
+          bit 0 or 1 set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x03]
+
+    - label:
+          "Step 3b: Given CDOCONC.S.F00(MEA) ensure featuremap has the correct
+          bit set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: CDOCONC.S.F00
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
+
+    - label:
+          "Step 3c: Given CDOCONC.S.F00(MEA) is not set, ensure featuremap has
+          the correct bit clear"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: " !CDOCONC.S.F00 "
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x1]
+
+    - label:
+          "Step 3d: Given CDOCONC.S.F01(LEV) ensure featuremap has the correct
+          bit set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: CDOCONC.S.F01
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2]
+
+    - label:
+          "Step 3e: Given CDOCONC.S.F01(LEV) is not set, ensure featuremap has
+          the correct bit clear"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: " !CDOCONC.S.F01 "
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x2]
+
+    - label:
+          "Step 3f: Given CDOCONC.S.F02(MED) ensure featuremap has the correct
+          bit set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: CDOCONC.S.F02 && CDOCONC.S.F01
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x4, 0x2]
+
+    - label:
+          "Step 3g: Given CDOCONC.S.F02(MED) is not set, ensure featuremap has
+          the correct bit clear"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: " !CDOCONC.S.F02 && !CDOCONC.S.F01"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x4, 0x2]
+
+    - label:
+          "Step 3h: Given CDOCONC.S.F03(CRI) ensure featuremap has the correct
+          bits set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: CDOCONC.S.F03 && CDOCONC.S.F01
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x8, 0x2]
+
+    - label:
+          "Step 3i: Given CDOCONC.S.F03(CRI) is not set, ensure featuremap has
+          the correct bit clear"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: " !CDOCONC.S.F03 && !CDOCONC.S.F01"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x8, 0x2]
+
+    - label:
+          "Step 3j: Given CDOCONC.S.F04(PEA) ensure featuremap has the correct
+          bits set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: CDOCONC.S.F04 && CDOCONC.S.F00
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x10, 0x1]
+
+    - label:
+          "Step 3k: Given CDOCONC.S.F04(PEA) is not set, ensure featuremap has
+          the correct bit clear"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: " !CDOCONC.S.F04 && !CDOCONC.S.F00"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x10, 0x1]
+
+    - label:
+          "Step 3l: Given CDOCONC.S.F05(AVG) ensure featuremap has the correct
+          bits set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: CDOCONC.S.F05 && CDOCONC.S.F00
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x20, 0x1]
+
+    - label:
+          "Step 3m: Given CDOCONC.S.F05(AVG) is not set, ensure featuremap has
+          the correct bit clear"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: " !CDOCONC.S.F05 && !CDOCONC.S.F00"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x20, 0x1]
+
+    - label: "Step 4a: Read the global attribute: AttributeList"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [9, 65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "Step 4a: Read the global attribute: AttributeList"
+      PICS: " !PICS_EVENT_LIST_ENABLED "
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [9, 65528, 65529, 65531, 65532, 65533]
+
+    - label: "Step 4b: Read the optional attribute Uncertainty in AttributeList"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      PICS: CDOCONC.S.A0007 && CDOCONC.S.F00
+      response:
+          constraints:
+              type: list
+              contains: [7]
+
+    - label:
+          "Step 4c: Check the optional attribute Uncertainty is excluded from
+          AttributeList when CDOCONC.S.A0007 is not set"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      PICS: " !CDOCONC.S.A0007 "
+      response:
+          constraints:
+              type: list
+              excludes: [7]
+
+    - label:
+          "Step 4d: Read the optional, feature dependent attributes
+          MeasuredValue, MinMeasuredValue, MaxMeasuredValue and Measurement Unit
+          in AttributeList"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      PICS: CDOCONC.S.F00
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 2, 8]
+
+    - label:
+          "Step 4e: Check that MeasuredValue, MinMeasuredValue,
+          MaxMeasuredValue, Measurement Unit and Uncertainty are excluded from
+          AttributeList when CDOCONC.S.F00 (MEA) is not set"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      PICS: " !CDOCONC.S.F00 "
+      response:
+          constraints:
+              type: list
+              excludes: [0, 1, 2, 7, 8]
+
+    - label:
+          "Step 4f: Read the optional, feature dependent attributes
+          PeakMeasuredValue & PeakMeasuredValueWindow in AttributeList"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      PICS: CDOCONC.S.F04
+      response:
+          constraints:
+              type: list
+              contains: [3, 4]
+
+    - label:
+          "Step 4g: Check that PeakMeasuredValue & PeakMeasuredValueWindow are
+          excluded from AttributeList when CDOCONC.S.F04 (PEA) is not set"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      PICS: " !CDOCONC.S.F04 "
+      response:
+          constraints:
+              type: list
+              excludes: [3, 4]
+
+    - label:
+          "Step 4h: Read the optional, feature dependent attributes
+          AverageMeasuredValue AverageMeasuredValueWindow in AttributeList"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      PICS: CDOCONC.S.F05
+      response:
+          constraints:
+              type: list
+              contains: [5, 6]
+
+    - label:
+          "Step 4i: Check that AverageMeasuredValue and
+          AverageMeasuredValueWindow are excluded from AttributeList when
+          CDOCONC.S.F05 (AVG) is not set"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      PICS: " !CDOCONC.S.F05 "
+      response:
+          constraints:
+              type: list
+              excludes: [5, 6]
+
+    - label:
+          "Step 4j: Read the optional, feature dependent attribute LevelValue in
+          AttributeList"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      PICS: CDOCONC.S.F01
+      response:
+          constraints:
+              type: list
+              contains: [10]
+
+    - label:
+          "Step 4k: Check that LevelValue is excluded from AttributeList when
+          CDOCONC.S.F01 (LEV) is not set"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      PICS: " !CDOCONC.S.F01 "
+      response:
+          constraints:
+              type: list
+              excludes: [10]
+
+    - label: "Step 5: Read the global attribute: EventList"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Step 6: Read the global attribute: AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Step 7: Read the global attribute: GeneratedCommandList"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list

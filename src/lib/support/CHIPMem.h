@@ -160,6 +160,11 @@ inline T * New(Args &&... args)
 template <typename T>
 inline void Delete(T * p)
 {
+    if (p == nullptr)
+    {
+        return;
+    }
+
     p->~T();
     MemoryFree(p);
 }
@@ -187,6 +192,9 @@ inline SharedPtr<T> MakeShared(Args &&... args)
 {
     return SharedPtr<T>(New<T>(std::forward<Args>(args)...), Deleter<T>());
 }
+
+template <typename T>
+using WeakPtr = std::weak_ptr<T>;
 
 // See MemoryDebugCheckPointer().
 extern bool MemoryInternalCheckPointer(const void * p, size_t min_size);

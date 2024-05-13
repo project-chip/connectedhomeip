@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -67,7 +67,7 @@ private:
     CHIP_ERROR WriteConfigValueStr(Key key, const char * str) override;
     CHIP_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen) override;
     CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen) override;
-    void RunConfigUnitTest(void) override;
+    void RunConfigUnitTest() override;
 
     // ===== Private members reserved for use by this class only.
 
@@ -94,10 +94,13 @@ inline CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::P
     return Internal::ZephyrConfig::WriteConfigValueCounter(key, value);
 }
 
-inline CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * /* buf */)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
+/**
+ * Returns the platform-specific implementation of the ConfigurationManager object.
+ *
+ * Applications can use this to gain access to features of the ConfigurationManager
+ * that are specific to the selected platform.
+ */
+ConfigurationManager & ConfigurationMgrImpl();
 
 } // namespace DeviceLayer
 } // namespace chip

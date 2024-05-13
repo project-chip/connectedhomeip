@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2021-2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,18 +13,21 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/telink.gni")
 
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/telink/args.gni")
 
 assert(chip_device_platform == "telink")
 
 static_library("telink") {
   sources = [
     "../SingletonConfigurationManager.cpp",
+    "../Zephyr/BLEAdvertisingArbiter.cpp",
+    "../Zephyr/BLEAdvertisingArbiter.h",
     "../Zephyr/ConfigurationManagerImpl.cpp",
     "../Zephyr/DiagnosticDataProviderImpl.cpp",
     "../Zephyr/DiagnosticDataProviderImpl.h",
+    "../Zephyr/DiagnosticDataProviderImplGetter.cpp",
     "../Zephyr/KeyValueStoreManagerImpl.cpp",
     "../Zephyr/Logging.cpp",
     "../Zephyr/PlatformManagerImpl.cpp",
@@ -40,52 +43,53 @@ static_library("telink") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
-    "DeviceNetworkProvisioningDelegateImpl.cpp",
-    "DeviceNetworkProvisioningDelegateImpl.h",
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.h",
+    "NFCManagerImpl.cpp",
+    "NFCManagerImpl.h",
     "PlatformManagerImpl.h",
     "SystemPlatformConfig.h",
-
-    # B91 HW crypto unit
-    "crypto/internal/common.h",
-    "crypto/internal/compatibility/aes_alt.c",
-    "crypto/internal/compatibility/aesni.h",
-    "crypto/internal/compatibility/bn_mul.h",
-    "crypto/internal/compatibility/ecp_alt.c",
-    "crypto/internal/compatibility/ecp_curves_alt.c",
-    "crypto/internal/compatibility/ecp_internal_alt.h",
-    "crypto/internal/compatibility/ecp_invasive.h",
-    "crypto/internal/compatibility/padlock.h",
-    "crypto/internal/ecp_alt_b91_backend.c",
-    "crypto/internal/ecp_alt_b91_backend_test.c",
-    "crypto/internal/entropy_poll_alt.c",
-    "crypto/internal/multithread.c",
-    "crypto/internal/multithread.h",
-    "crypto/internal/test_utils.c",
-    "crypto/internal/test_utils.h",
   ]
 
-  deps = []
-
-  public_deps = [
-    "${chip_root}/src/crypto",
-    "${chip_root}/src/platform:platform_base",
-    "${telink_sdk_build_root}",
+  public = [
+    "${chip_root}/src/credentials/CHIPCert.h",
+    "${chip_root}/src/credentials/CertificationDeclaration.h",
+    "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
   ]
+
+  public_deps = [ "${chip_root}/src/platform:platform_base" ]
+  deps = [ "${chip_root}/src/platform/logging:headers" ]
+
+  if (chip_enable_factory_data) {
+    sources += [
+      "FactoryDataParser.c",
+      "FactoryDataParser.h",
+      "FactoryDataProvider.cpp",
+      "FactoryDataProvider.h",
+    ]
+  }
 
   if (chip_enable_openthread) {
     sources += [
       "../OpenThread/OpenThreadUtils.cpp",
-      "../Zephyr/ThreadStackManagerImpl.cpp",
+      "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
 
     if (chip_mdns == "platform") {
-      sources += [ "../OpenThread/DnssdImpl.cpp" ]
-      deps = [ "${chip_root}/src/lib/dnssd:platform_header" ]
+      sources += [
+        "../OpenThread/DnssdImpl.cpp",
+        "../OpenThread/OpenThreadDnssdImpl.cpp",
+        "../OpenThread/OpenThreadDnssdImpl.h",
+      ]
+      deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
   }
 
-  public_deps += [ "${chip_root}/src/crypto" ]
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "OTAImageProcessorImpl.cpp",
+      "OTAImageProcessorImpl.h",
+    ]
+  }
 }

@@ -11,35 +11,36 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name:
-    31.10.1. [TC-SU-3.1] Tests the behavior of the DUT once it receives a
-    Software Update QueryImage request from the OTA-R.
+name: 33.7.1. [TC-SU-3.1] QueryImageResponse from DUT to OTA-R
+
+PICS:
+    - MCORE.OTA.Provider
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:
     - label:
-          "OTA-R/TH sends a QueryImage Command to the DUT. UserConsentNeeded
-          field is set to False."
+          "Step 1: OTA-R/TH sends a QueryImage Command to the DUT.
+          UserConsentNeeded field is set to False."
       verification: |
-          chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
 
-          where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
 
-          Verify on the OTA Requestor logs
+          On OTA Requestor logs,
+          Verify that the DUT is able to query the server where the software update image is located. DUT should obtain the User Consent from the user. DUT should respond with the QueryImageResponse to the OTA-R/TH
 
-          [1645743053319] [97809:20280821] CHIP: [SWU] QueryImageResponse:
-          [1645743053319] [97809:20280821] CHIP: [SWU]   status: 0
-          [1645743053319] [97809:20280821] CHIP: [SWU]   delayedActionTime: 0 seconds
-          [1645743053319] [97809:20280821] CHIP: [SWU]   imageURI: bdx://0000000000000001/test.ota
-          [1645743053319] [97809:20280821] CHIP: [SWU]   softwareVersion: 1
-          [1645743053319] [97809:20280821] CHIP: [SWU]   softwareVersionString: Example-Image-V0.1
-          [1645743053319] [97809:20280821] CHIP: [SWU]   updateToken: 32
-          [1645743053319] [97809:20280821] CHIP: [SWU]   userConsentNeeded: 0
-          [1645743053319] [97809:20280821] CHIP: [SWU]   metadataForRequestor: 0
-          [1645743053319] [97809:20280821] CHIP: [SWU] Update available from 0 to 1 version
+          [1673337981.104652][28428:28428] CHIP:SWU: QueryImageResponse:
+          [1673337981.104695][28428:28428] CHIP:SWU:   status: 0
+          [1673337981.104735][28428:28428] CHIP:SWU:   imageURI: bdx://000000000000007B/ota-requestor-app.ota
+          [1673337981.104776][28428:28428] CHIP:SWU:   softwareVersion: 2
+          [1673337981.104816][28428:28428] CHIP:SWU:   softwareVersionString: 2.0
+          [1673337981.104856][28428:28428] CHIP:SWU:   updateToken: 32
+          [1673337981.104896][28428:28428] CHIP:SWU:   userConsentNeeded: 0
+          [1673337981.104948][28428:28428] CHIP:SWU: Update available from version 1 to 2
       disabled: true

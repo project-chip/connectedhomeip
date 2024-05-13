@@ -1,0 +1,29 @@
+
+/// AUTO-GENERATED with matter_idl.
+
+syntax = "proto3";
+
+package com.matter.example.proto;
+
+option java_multiple_files = true;
+
+message FirstCluster {
+  // option (message_type) = MATTER_TRAIT;
+
+  enum ClusterId {
+    CLUSTER_ID_UNSUPPORTED = 0;
+    CLUSTER_ID = 1;
+  }
+
+  // Attributes
+  /** int16u Type: 6 IsList: 0 FieldId: 1 */
+  int16u some_integer = 3145729;
+    /*
+    [(attribute) = {
+      is_writable : true,
+      is_subscribable: true,
+    }];
+    */
+
+
+} // FirstCluster

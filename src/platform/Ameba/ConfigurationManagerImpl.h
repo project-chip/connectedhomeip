@@ -39,6 +39,13 @@ class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImp
 public:
     // This returns an instance of this class.
     static ConfigurationManagerImpl & GetDefaultInstance();
+    CHIP_ERROR GetRebootCount(uint32_t & rebootCount) override;
+    CHIP_ERROR StoreRebootCount(uint32_t rebootCount) override;
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
+    CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours) override;
+    CHIP_ERROR GetBootReason(uint32_t & bootReason) override;
+    CHIP_ERROR StoreBootReason(uint32_t bootReason) override;
+    CHIP_ERROR GetLocationCapability(uint8_t & locationCapability) override;
 
 private:
     // ===== Members that implement the ConfigurationManager public interface.
@@ -49,13 +56,6 @@ private:
     void InitiateFactoryReset(void) override;
     CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override;
     CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value) override;
-    CHIP_ERROR GetRebootCount(uint32_t & rebootCount) override;
-    CHIP_ERROR StoreRebootCount(uint32_t rebootCount) override;
-    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
-    CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours) override;
-    CHIP_ERROR GetBootReason(uint32_t & bootReason) override;
-    CHIP_ERROR StoreBootReason(uint32_t bootReason) override;
-    CHIP_ERROR GetUniqueId(char * buf, size_t bufSize) override;
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
 
     // ===== Members that implement the GenericConfigurationManagerImpl protected interface.
@@ -76,6 +76,14 @@ private:
 
     static void DoFactoryReset(intptr_t arg);
 };
+
+/**
+ * Returns the platform-specific implementation of the ConfigurationManager object.
+ *
+ * Applications can use this to gain access to features of the ConfigurationManager
+ * that are specific to the selected platform.
+ */
+ConfigurationManager & ConfigurationMgrImpl();
 
 } // namespace DeviceLayer
 } // namespace chip

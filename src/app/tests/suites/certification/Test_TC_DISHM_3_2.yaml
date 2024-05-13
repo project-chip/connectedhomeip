@@ -1,0 +1,237 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 263.4.2. [TC-DISHM-3.2] Startup Mode functionality with DUT as Server
+
+PICS:
+    - DISHM.S.A0002
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Preconditions"
+      verification: |
+          !DISHM.S.F00 | OnOff cluster’s StartUpOnOff attribute is NULL | StartUpOnOff is 0 | OnMode is NULL
+      disabled: true
+
+    - label: "Note"
+      verification: |
+          To Execute the TC-DISHM-3.2 test case using reboot in raspi device we followed the below suggested way:
+
+          To run a reboot test case on raspi, run the app with --KVS flag with a file in local directory and pass that file to the command to launch the app. Steps
+
+            step-1:  create a file using touch command , something like touch mytest.txt
+            step-2:  chmod 777 mytest.txt
+            step-3:  launch the app ./chip-all-clusters-app --KVS ./mytest.txt
+
+          if you launch the app with the above commands and provision the app, even when you reboot the app with 'sudo reboot' , next time you launch the app with 'sudo ./out/all-clusters-app/chip-all-clusters-app --KVS ./mytest.txt' , you can run read/write attribs and commands without reprovisioning the device.
+      disabled: true
+
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      verification: |
+
+      disabled: true
+
+    - label: "Step 2: TH reads from the DUT the StartUpMode attribute."
+      PICS: DISHM.S.A0002
+      verification: |
+          ./chip-tool dishwashermode read start-up-mode 1 1
+
+          On TH(chip-tool), Verify StartUpMode attribute value is an integer or null
+          - Save the value as startup_mode_dut and below is the sample log provided for the raspi platform, Here StartUpMode value is null
+
+          NOTE: if startup_mode_dut is null proceed to step 3. Else save startup_mode_dut as new_start_up_mode_th and proceed to step 5.
+
+          [1690188941.380388][16015:16017] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0002 DataVersion: 74242738
+          [1690188941.380430][16015:16017] CHIP:TOO:   StartUpMode: null
+      disabled: true
+
+    - label: "Step 3: TH reads from the DUT the SupportedModes attribute."
+      PICS: DISHM.S.A0000
+      verification: |
+          ./chip-tool dishwashermode read supported-modes 1 1
+
+          On TH(chip-tool) log, Verify DUT response contains a list of ModeOptionsStruct entries
+          - Verify that the list has two or more entries
+          - Save the Mode field values as supported_modes_dut
+          - Select a value from supported_modes_dut and save the value as new_start_up_mode_th, below is the sample log provided for the raspi platform:
+
+          [1690188996.754102][16022:16024] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0000 DataVersion: 74242738
+          [1690188996.754208][16022:16024] CHIP:TOO:   SupportedModes: 3 entries
+          [1690188996.754248][16022:16024] CHIP:TOO:     [1]: {
+          [1690188996.754258][16022:16024] CHIP:TOO:       Label: Normal
+          [1690188996.754270][16022:16024] CHIP:TOO:       Mode: 0
+          [1690188996.754285][16022:16024] CHIP:TOO:       ModeTags: 1 entries
+          [1690188996.754302][16022:16024] CHIP:TOO:         [1]: {
+          [1690188996.754314][16022:16024] CHIP:TOO:           Value: 16384
+          [1690188996.754325][16022:16024] CHIP:TOO:          }
+          [1690188996.754336][16022:16024] CHIP:TOO:      }
+          [1690188996.754360][16022:16024] CHIP:TOO:     [2]: {
+          [1690188996.754369][16022:16024] CHIP:TOO:       Label: Heavy
+          [1690188996.754378][16022:16024] CHIP:TOO:       Mode: 1
+          [1690188996.754393][16022:16024] CHIP:TOO:       ModeTags: 2 entries
+          [1690188996.754407][16022:16024] CHIP:TOO:         [1]: {
+          [1690188996.754416][16022:16024] CHIP:TOO:           Value: 7
+          [1690188996.754425][16022:16024] CHIP:TOO:          }
+          [1690188996.754439][16022:16024] CHIP:TOO:         [2]: {
+          [1690188996.754450][16022:16024] CHIP:TOO:           Value: 16385
+          [1690188996.754459][16022:16024] CHIP:TOO:          }
+          [1690188996.754469][16022:16024] CHIP:TOO:      }
+          [1690188996.754493][16022:16024] CHIP:TOO:     [3]: {
+          [1690188996.754501][16022:16024] CHIP:TOO:       Label: Light
+          [1690188996.754511][16022:16024] CHIP:TOO:       Mode: 2
+          [1690188996.754548][16022:16024] CHIP:TOO:       ModeTags: 3 entries
+          [1690188996.754564][16022:16024] CHIP:TOO:         [1]: {
+          [1690188996.754574][16022:16024] CHIP:TOO:           Value: 16386
+          [1690188996.754583][16022:16024] CHIP:TOO:          }
+          [1690188996.754597][16022:16024] CHIP:TOO:         [2]: {
+          [1690188996.754606][16022:16024] CHIP:TOO:           Value: 8
+          [1690188996.754615][16022:16024] CHIP:TOO:          }
+          [1690188996.754629][16022:16024] CHIP:TOO:         [3]: {
+          [1690188996.754638][16022:16024] CHIP:TOO:           Value: 2
+          [1690188996.754646][16022:16024] CHIP:TOO:          }
+          [1690188996.754654][16022:16024] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Step 4: TH writes to the DUT the StartUpMode attribute with the
+          new_start_up_mode_th value"
+      PICS: DISHM.S.A0002
+      verification: |
+          ./chip-tool dishwashermode write start-up-mode 0 1 1
+
+          On TH(chip-tool) log, Verify that DUT responds with a successful (value 0x00) status response and below is the sample log provided for the raspi platform:
+
+          [1690188912.259778][16011:16013] CHIP:DMG:                         {
+          [1690188912.259790][16011:16013] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1690188912.259800][16011:16013] CHIP:DMG:                         },
+          [1690188912.259813][16011:16013] CHIP:DMG:
+
+          ./chip-tool dishwashermode read start-up-mode 1 1
+
+          On TH(chip-tool), Verify that StartUpMode attribute value is 0 and below is the sample log provided for the raspi platform .
+
+          [1692171314.157274][3112:3114] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0002 DataVersion: 2502960195
+          [1692171314.157331][3112:3114] CHIP:TOO:   StartUpMode: 0
+      disabled: true
+
+    - label: "Step 5: TH reads from the DUT the CurrentMode attribute."
+      PICS: DISHM.S.A0001
+      verification: |
+          ./chip-tool dishwashermode read current-mode 1 1
+
+          On TH(chip-tool), Verify that CurrentMode attribute value is an integer value
+          - Save the value as old_current_mode_dut, below is the sample log provided for the raspi platform, Here CurrentMode attribute value is 0
+
+          NOTE: If startup_mode_dut is equal to old_current_mode_dut proceed to step 6. Else proceed to step 8.
+
+          [1690189040.789208][16040:16042] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0001 DataVersion: 1012425326
+          [1690189040.789223][16040:16042] CHIP:TOO:   CurrentMode: 0
+      disabled: true
+
+    - label: "Step 6: TH reads from the DUT the SupportedModes attribute."
+      PICS: DISHM.S.A0000
+      verification: |
+          ./chip-tool dishwashermode read supported-modes 1 1
+
+          On TH(chip-tool) log, Verify DUT response contains a list of ModeOptionsStruct entries
+          - Verify that the list has two or more entries
+          - Save the Mode field values as supported_modes_dut
+          - Select a value from supported_modes_dut different from startup_mode_dut. Save the value as new_mode_th, below is the sample log provided for the raspi platform:
+
+          [1690188996.754102][16022:16024] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0000 DataVersion: 74242738
+          [1690188996.754208][16022:16024] CHIP:TOO:   SupportedModes: 3 entries
+          [1690188996.754248][16022:16024] CHIP:TOO:     [1]: {
+          [1690188996.754258][16022:16024] CHIP:TOO:       Label: Normal
+          [1690188996.754270][16022:16024] CHIP:TOO:       Mode: 0
+          [1690188996.754285][16022:16024] CHIP:TOO:       ModeTags: 1 entries
+          [1690188996.754302][16022:16024] CHIP:TOO:         [1]: {
+          [1690188996.754314][16022:16024] CHIP:TOO:           Value: 16384
+          [1690188996.754325][16022:16024] CHIP:TOO:          }
+          [1690188996.754336][16022:16024] CHIP:TOO:      }
+          [1690188996.754360][16022:16024] CHIP:TOO:     [2]: {
+          [1690188996.754369][16022:16024] CHIP:TOO:       Label: Heavy
+          [1690188996.754378][16022:16024] CHIP:TOO:       Mode: 1
+          [1690188996.754393][16022:16024] CHIP:TOO:       ModeTags: 2 entries
+          [1690188996.754407][16022:16024] CHIP:TOO:         [1]: {
+          [1690188996.754416][16022:16024] CHIP:TOO:           Value: 7
+          [1690188996.754425][16022:16024] CHIP:TOO:          }
+          [1690188996.754439][16022:16024] CHIP:TOO:         [2]: {
+          [1690188996.754450][16022:16024] CHIP:TOO:           Value: 16385
+          [1690188996.754459][16022:16024] CHIP:TOO:          }
+          [1690188996.754469][16022:16024] CHIP:TOO:      }
+          [1690188996.754493][16022:16024] CHIP:TOO:     [3]: {
+          [1690188996.754501][16022:16024] CHIP:TOO:       Label: Light
+          [1690188996.754511][16022:16024] CHIP:TOO:       Mode: 2
+          [1690188996.754548][16022:16024] CHIP:TOO:       ModeTags: 3 entries
+          [1690188996.754564][16022:16024] CHIP:TOO:         [1]: {
+          [1690188996.754574][16022:16024] CHIP:TOO:           Value: 16386
+          [1690188996.754583][16022:16024] CHIP:TOO:          }
+          [1690188996.754597][16022:16024] CHIP:TOO:         [2]: {
+          [1690188996.754606][16022:16024] CHIP:TOO:           Value: 8
+          [1690188996.754615][16022:16024] CHIP:TOO:          }
+          [1690188996.754629][16022:16024] CHIP:TOO:         [3]: {
+          [1690188996.754638][16022:16024] CHIP:TOO:           Value: 2
+          [1690188996.754646][16022:16024] CHIP:TOO:          }
+          [1690188996.754654][16022:16024] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Step 7: TH sends a ChangeToMode command to the DUT with NewMode set
+          to new_mode_th"
+      PICS: DISHM.S.C00.Rsp
+      verification: |
+          ./chip-tool dishwashermode change-to-mode 2 1 1
+
+          Verify on TH(chip-tool) log, DUT responds contains a ChangeToModeResponse command with a SUCCESS (value 0x00) status response and below is the sample log provided for the raspi platform:
+
+          [1690265961.529808][30174:30176] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Command 0x0000_0001
+          [1690265961.529857][30174:30176] CHIP:TOO:   ChangeToModeResponse: {
+          [1690265961.529880][30174:30176] CHIP:TOO:     status: 0
+          [1690265961.529891][30174:30176] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 8: Physically power cycle the device"
+      verification: |
+          Physically power cycle the device.
+      disabled: true
+
+    - label: "Step 9: TH reads from the DUT the StartUpMode attribute."
+      PICS: DISHM.S.A0002
+      verification: |
+          ./chip-tool dishwashermode read start-up-mode 1 1
+
+          On TH(chip-tool), Verify StartUpMode attribute value is an integer.
+          - Save the value as new_start_up_mode_dut and is equal to new_start_up_mode_th, below is the sample log provided for the raspi platform, Here  StartUpMode value is 0
+
+          [1690188941.380388][16015:16017] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0002 DataVersion: 74242738
+          [1690188941.380430][16015:16017] CHIP:TOO:   StartUpMode: 0
+      disabled: true
+
+    - label: "Step 10: TH reads from the DUT the CurrentMode attribute."
+      PICS: DISHM.S.A0001
+      verification: |
+          ./chip-tool dishwashermode read current-mode 1 1
+
+          On TH(chip-tool), Verify that CurrentMode attribute value is an integer value and is equal to new_start_up_mode_dut,  below is the sample log provided for the raspi platform, Here CurrentMode attribute value is 0
+
+          [1690189040.789208][16040:16042] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0001 DataVersion: 1012425326
+          [1690189040.789223][16040:16042] CHIP:TOO:   CurrentMode: 0
+      disabled: true

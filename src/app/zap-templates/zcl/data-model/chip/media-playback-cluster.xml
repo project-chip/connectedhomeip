@@ -23,15 +23,40 @@ limitations under the License.
     <define>MEDIA_PLAYBACK_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
+    <globalAttribute side="either" code="0xFFFD" value="2"/> <!-- Revision   -->
     <description>This cluster provides an interface for controlling Media Playback (PLAY, PAUSE, etc) on a media device such as a TV or Speaker.</description>
 
-    <attribute side="server" code="0x0000" define="MEDIA_PLAYBACK_STATE"                     type="PlaybackStateEnum" min="0x00" max="0x02" default="0x00" writable="false"                    optional="false">CurrentState</attribute>
-    <attribute side="server" code="0x0001" define="MEDIA_PLAYBACK_START_TIME"                type="EPOCH_US"          min="0x00"            default="0x00" writable="false" isNullable="true"  optional="true">StartTime</attribute>
-    <attribute side="server" code="0x0002" define="MEDIA_PLAYBACK_DURATION"                  type="INT64U"            min="0x00"            default="0"    writable="false" isNullable="true"  optional="true">Duration</attribute>
-    <attribute side="server" code="0x0003" define="MEDIA_PLAYBACK_PLAYBACK_POSITION"         type="PlaybackPosition"                                       writable="false" isNullable="true"  optional="true">SampledPosition</attribute>
+    <globalAttribute side="server" code="0xFFFC" value="0" />
+
+    <features>
+      <feature bit="0" code="AS" name="AdvancedSeek" summary="Advanced media seeking">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="VS" name="VariableSpeed" summary="Variable speed playback">
+        <optionalConform/>
+      </feature>
+      <feature bit="2" code="TT" name="TextTracks" summary="Text Tracks">
+        <optionalConform/>
+      </feature>
+      <feature bit="3" code="AT" name="AudioTracks" summary="Audio Tracks">
+        <optionalConform/>
+      </feature>
+      <feature bit="4" code="AA" name="AudioAdvance" summary="Can play audio during fast and slow playback speeds">
+        <optionalConform/>
+      </feature>
+    </features>
+
+    <attribute side="server" code="0x0000" define="MEDIA_PLAYBACK_STATE"                     type="PlaybackStateEnum" min="0x00" max="0x03" default="0x00" writable="false"                    optional="false">CurrentState</attribute>
+    <attribute side="server" code="0x0001" define="MEDIA_PLAYBACK_START_TIME"                type="epoch_us"          min="0x00"            default="0x00" writable="false" isNullable="true"  optional="true">StartTime</attribute>
+    <attribute side="server" code="0x0002" define="MEDIA_PLAYBACK_DURATION"                  type="int64u"            min="0x00"            default="0"    writable="false" isNullable="true"  optional="true">Duration</attribute>
+    <attribute side="server" code="0x0003" define="MEDIA_PLAYBACK_PLAYBACK_POSITION"         type="PlaybackPositionStruct"                                 writable="false" isNullable="true"  optional="true">SampledPosition</attribute>
     <attribute side="server" code="0x0004" define="MEDIA_PLAYBACK_PLAYBACK_SPEED"            type="single"            min="0x00"            default="0"    writable="false"                    optional="true">PlaybackSpeed</attribute>
-    <attribute side="server" code="0x0005" define="MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_END"   type="INT64U"            min="0x00"                           writable="false" isNullable="true"  optional="true">SeekRangeEnd</attribute>
-    <attribute side="server" code="0x0006" define="MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_START" type="INT64U"            min="0x00"                           writable="false" isNullable="true"  optional="true">SeekRangeStart</attribute>
+    <attribute side="server" code="0x0005" define="MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_END"   type="int64u"            min="0x00"                           writable="false" isNullable="true"  optional="true">SeekRangeEnd</attribute>
+    <attribute side="server" code="0x0006" define="MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_START" type="int64u"            min="0x00"                           writable="false" isNullable="true"  optional="true">SeekRangeStart</attribute>
+    <attribute side="server" code="0x0007" define="MEDIA_PLAYBACK_PLAYBACK_ACTIVE_AUDIO_TRACK" optional="true"      type="TrackStruct"     writable="false" isNullable="true">ActiveAudioTrack</attribute>
+    <attribute side="server" code="0x0008" define="MEDIA_PLAYBACK_PLAYBACK_AVAILABLE_AUDIO_TRACKS" optional="true"  type="array" entryType="TrackStruct"     writable="false" isNullable="true">AvailableAudioTracks</attribute>
+    <attribute side="server" code="0x0009" define="MEDIA_PLAYBACK_PLAYBACK_ACTIVE_TEXT_TRACK" optional="true"      type="TrackStruct"     writable="false" isNullable="true">ActiveTextTrack</attribute>
+    <attribute side="server" code="0x000A" define="MEDIA_PLAYBACK_PLAYBACK_AVAILABLE_TEXT_TRACKS" optional="true"  type="array" entryType="TrackStruct"     writable="false" isNullable="true">AvailableTextTracks</attribute>
 
 
     <command source="client" code="0x00" name="Play" response="PlaybackResponse" optional="false">
@@ -42,7 +67,7 @@ limitations under the License.
       <description>Upon receipt, this SHALL pause media.</description>
     </command>
 
-    <command source="client" code="0x02" name="StopPlayback" response="PlaybackResponse" optional="false">
+    <command source="client" code="0x02" name="Stop" response="PlaybackResponse" optional="false">
       <description>Upon receipt, this SHALL stop media. User experience is context-specific. This will often navigate the user back to the location where media was originally launched.</description>
     </command>
 
@@ -60,42 +85,84 @@ limitations under the License.
 
     <command source="client" code="0x06" name="Rewind" response="PlaybackResponse" optional="true">
       <description>Upon receipt, this SHALL Rewind through media. Different Rewind speeds can be used on the TV based upon the number of sequential calls to this function. This is to avoid needing to define every speed now (multiple fast, slow motion, etc).</description>
+      <arg name="AudioAdvanceUnmuted" type="boolean" optional="true"/>
     </command>
 
     <command source="client" code="0x07" name="FastForward" response="PlaybackResponse" optional="true">
       <description>Upon receipt, this SHALL Advance through media. Different FF speeds can be used on the TV based upon the number of sequential calls to this function. This is to avoid needing to define every speed now (multiple fast, slow motion, etc).</description>
+      <arg name="AudioAdvanceUnmuted" type="boolean" optional="true"/>
     </command>
 
     <command source="client" code="0x08" name="SkipForward" response="PlaybackResponse" optional="true">
       <description>Upon receipt, this SHALL Skip forward in the media by the given number of seconds, using the data as follows:</description>
-      <arg name="deltaPositionMilliseconds" type="INT64U"/>
+      <arg name="DeltaPositionMilliseconds" type="int64u"/>
     </command>
 
     <command source="client" code="0x09" name="SkipBackward" response="PlaybackResponse" optional="true">
       <description>Upon receipt, this SHALL Skip backward in the media by the given number of seconds, using the data as follows:</description>
-      <arg name="deltaPositionMilliseconds" type="INT64U"/>
+      <arg name="DeltaPositionMilliseconds" type="int64u"/>
     </command>
 
     <command source="client" code="0x0B" name="Seek" response="PlaybackResponse" optional="true">
       <description>Upon receipt, this SHALL Skip backward in the media by the given number of seconds, using the data as follows:</description>
-      <arg name="position" type="INT64U"/>
+      <arg name="position" type="int64u"/>
     </command>
 
     <command source="server" code="0x0A" name="PlaybackResponse" optional="false">
       <description>This command SHALL be generated in response to various Playback Request commands.</description>
-      <arg name="status" type="StatusEnum"/>
-      <arg name="data"   type="CHAR_STRING" optional="true"/>
+      <arg name="Status" type="StatusEnum"/>
+      <arg name="Data"   type="char_string" optional="true"/>
     </command>
 
+    <command source="client" code="0x0C" name="ActivateAudioTrack" optional="true">
+      <description>Upon receipt, the server SHALL set the active Audio Track to the one identified by the TrackID in the Track catalog for the streaming media. If the TrackID does not exist in the Track catalog, OR does not correspond to the streaming media OR no media is being streamed at the time of receipt of this command, the server will return an error status of INVALID_ARGUMENT.</description>
+      <arg name="TrackID" type="CHAR_STRING"/>
+      <arg name="AudioOutputIndex"   type="INT8U"/>
+    </command>
+
+    <command source="client" code="0x0D" name="ActivateTextTrack" optional="true">
+      <description>Upon receipt, the server SHALL set the active Text Track to the one identified by the TrackID in the Track catalog for the streaming media. If the TrackID does not exist in the Track catalog, OR does not correspond to the streaming media OR no media is being streamed at the time of receipt of this command, the server SHALL return an error status of INVALID_ARGUMENT.</description>
+      <arg name="TrackID" type="CHAR_STRING"/>
+    </command>
+
+    <command source="client" code="0x0E" name="DeactivateTextTrack" optional="true">
+      <description>If a Text Track is active (i.e. being displayed), upon receipt of this command, the server SHALL stop displaying it.</description>
+    </command>
+
+    <event side="server" code="0x00" priority="info" name="StateChanged" optional="true">
+      <description>If supported, this event SHALL be generated when there is a change in any of the supported attributes of the Media Playback cluster.</description>
+      <field id="0" name="CurrentState" type="PlaybackStateEnum"/>
+      <field id="1" name="StartTime" type="EPOCH_US"/>
+      <field id="2" name="Duration" type="INT64U"/>
+      <field id="3" name="SampledPosition" type="PlaybackPositionStruct"/>
+      <field id="4" name="PlaybackSpeed" type="single"/>
+      <field id="5" name="SeekRangeEnd" type="INT64U"/>
+      <field id="6" name="SeekRangeStart" type="INT64U"/>
+      <field id="7" name="Data" type="OCTET_STRING" optional="true" length="900" />
+      <field id="8" name="AudioAdvanceUnmuted" type="boolean" default="true"/>
+    </event>
   </cluster>
 
-  <struct name="PlaybackPosition">
+  <struct name="TrackStruct">
     <cluster code="0x0506"/>
-    <item name="updatedAt" type="INT64U"/>
-    <item name="position"  type="INT64U" isNullable="true"/>    
+    <item name="ID" type="CHAR_STRING" optional="false" length="32"/>
+    <item name="TrackAttributes" type="TrackAttributesStruct" isNullable="true" optional="false"/>
   </struct>
 
-  <enum name="PlaybackStateEnum" type="ENUM8">
+  <struct name="TrackAttributesStruct">
+    <cluster code="0x0506"/>
+    <item name="LanguageCode" type="CHAR_STRING" optional="false" length="32"/>
+    <item name="DisplayName"  type="CHAR_STRING" isNullable="true" optional="true"/>
+    <!-- <item name="Characteristics" type="CharacteristicEnum" optional="true" array="true"/> -->
+  </struct>
+
+  <struct name="PlaybackPositionStruct">
+    <cluster code="0x0506"/>
+    <item name="UpdatedAt" type="epoch_us"/>
+    <item name="Position"  type="int64u" isNullable="true"/>
+  </struct>
+
+  <enum name="PlaybackStateEnum" type="enum8">
     <cluster code="0x0506"/>
     <item name="Playing"    value="0x00"/>
     <item name="Paused"     value="0x01"/>
@@ -103,7 +170,7 @@ limitations under the License.
     <item name="Buffering"  value="0x03"/>
   </enum>
 
-  <enum name="StatusEnum" type="ENUM8">
+  <enum name="StatusEnum" type="enum8">
     <cluster code="0x0506"/>
     <item name="Success"                value="0x00"/>
     <item name="InvalidStateForCommand" value="0x01"/>
@@ -112,4 +179,28 @@ limitations under the License.
     <item name="SpeedOutOfRange"        value="0x04"/>
     <item name="SeekOutOfRange"         value="0x05"/>
   </enum>
+
+
+  <enum name="CharacteristicEnum" type="enum8">
+    <cluster code="0x0506"/>
+    <item value="0x00" name="ForcedSubtitles"/>
+    <item value="0x01" name="DescribesVideo" />
+    <item value="0x02" name="EasyToRead"/>
+    <item value="0x03" name="FrameBased"/>
+    <item value="0x04" name="MainProgram"/>
+    <item value="0x05" name="OriginalContent"/>
+    <item value="0x06" name="VoiceOverTranslation"/>
+    <item value="0x07" name="Caption"/>
+    <item value="0x08" name="Subtitle"/>
+    <item value="0x09" name="Alternate"/>
+    <item value="0x0A" name="Supplementary"/>
+    <item value="0x0B" name="Commentary"/>
+    <item value="0x0C" name="DubbedTranslation"/>
+    <item value="0x0D" name="Description"/>
+    <item value="0x0E" name="Metadata"/>
+    <item value="0x0F" name="EnhancedAudioIntelligibility"/>
+    <item value="0x10" name="Emergency"/>
+    <item value="0x11" name="Karaoke"/>
+  </enum>
+
 </configurator>

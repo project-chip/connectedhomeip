@@ -1,7 +1,7 @@
 {
     "deps_info": {
         "name": "child_library.json",
-        "jar_path": "python/lib/build/chip/java/tests/child_library.jar",
+        "jar_path": "lib/build/chip/java/tests/child_library.jar",
         "deps_configs": [],
         "deps_jars": []
     }

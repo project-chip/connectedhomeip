@@ -16,17 +16,37 @@
  *
  */
 
+/**
+ * This file allocate/free memory using the chip platform abstractions
+ * (Platform::MemoryCalloc and Platform::MemoryFree) for hosting a subset of the
+ * data model internal types until they are consumed by the DataModel::Encode machinery:
+ *   - chip::app:DataModel::List<T>
+ *   - chip::ByteSpan
+ *   - chip::CharSpan
+ *
+ * Memory allocation happens during the 'Setup' phase, while memory deallocation happens
+ * during the 'Finalize' phase.
+ *
+ * The 'Finalize' phase during the destructor phase, and if needed, 'Finalize' will call
+ * the 'Finalize' phase of its descendant.
+ */
+
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/List.h>
 #include <app/data-model/Nullable.h>
+#include <commands/common/HexConversion.h>
 #include <json/json.h>
 #include <lib/core/Optional.h>
 #include <lib/support/BytesToHex.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/SafeInt.h>
 
-constexpr uint8_t kMaxLabelLength = 100;
+#include "JsonParser.h"
+
+inline constexpr uint8_t kMaxLabelLength = UINT8_MAX;
+inline constexpr char kNullString[]      = "null";
 
 class ComplexArgumentParser
 {
@@ -103,6 +123,16 @@ public:
     }
 
     template <typename T>
+    static CHIP_ERROR Setup(const char * label, chip::BitMask<T> & request, Json::Value & value)
+    {
+        T requestValue;
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(label, requestValue, value));
+
+        request = chip::BitMask<T>(requestValue);
+        return CHIP_NO_ERROR;
+    }
+
+    template <typename T>
     static CHIP_ERROR Setup(const char * label, chip::Optional<T> & request, Json::Value & value)
     {
         T requestValue;
@@ -138,12 +168,19 @@ public:
         }
 
         auto content = static_cast<typename std::remove_const<T>::type *>(chip::Platform::MemoryCalloc(value.size(), sizeof(T)));
+        VerifyOrReturnError(content != nullptr, CHIP_ERROR_NO_MEMORY);
 
         Json::ArrayIndex size = value.size();
         for (Json::ArrayIndex i = 0; i < size; i++)
         {
             char labelWithIndex[kMaxLabelLength];
-            snprintf(labelWithIndex, sizeof(labelWithIndex), "%s[%d]", label, i);
+            // GCC 7.0.1 has introduced some new warnings for snprintf (-Werror=format-truncation) by default.
+            // This is not particularly useful when using snprintf and especially in this context, so in order
+            // to disable the warning the %s is constrained to be of max length: (254 - 11 - 2) where:
+            //  - 254 is kMaxLabelLength - 1 (for null)
+            //  - 11 is the maximum length of a %d (-2147483648, 2147483647)
+            //  - 2 is the length for the "[" and "]" characters.
+            snprintf(labelWithIndex, sizeof(labelWithIndex), "%.241s[%d]", label, i);
             ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithIndex, content[i], value[i]));
         }
 
@@ -159,17 +196,50 @@ public:
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        if (strlen(value.asCString()) % 2 != 0)
+        auto str         = value.asString();
+        auto size        = str.size();
+        uint8_t * buffer = nullptr;
+
+        if (IsStrString(str.c_str()))
         {
-            ChipLogError(chipTool, "Error while encoding %s as an octet string: Odd number of characters.", label);
-            return CHIP_ERROR_INVALID_STRING_LENGTH;
+            // Skip the prefix
+            str.erase(0, kStrStringPrefixLen);
+            size = str.size();
+
+            buffer = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(size, sizeof(uint8_t)));
+            VerifyOrReturnError(buffer != nullptr, CHIP_ERROR_NO_MEMORY);
+
+            memcpy(buffer, str.c_str(), size);
+        }
+        else
+        {
+            if (IsHexString(str.c_str()))
+            {
+                // Skip the prefix
+                str.erase(0, kHexStringPrefixLen);
+                size = str.size();
+            }
+
+            CHIP_ERROR err = HexToBytes(
+                chip::CharSpan(str.c_str(), size),
+                [&buffer](size_t allocSize) {
+                    buffer = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(allocSize, sizeof(uint8_t)));
+                    return buffer;
+                },
+                &size);
+
+            if (err != CHIP_NO_ERROR)
+            {
+                if (buffer != nullptr)
+                {
+                    chip::Platform::MemoryFree(buffer);
+                }
+
+                return err;
+            }
         }
 
-        size_t size       = strlen(value.asCString());
-        auto buffer       = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(size / 2, sizeof(uint8_t)));
-        size_t octetCount = chip::Encoding::HexToBytes(value.asCString(), size, buffer, size / 2);
-
-        request = chip::ByteSpan(buffer, octetCount);
+        request = chip::ByteSpan(buffer, size);
         return CHIP_NO_ERROR;
     }
 
@@ -183,7 +253,9 @@ public:
 
         size_t size = strlen(value.asCString());
         auto buffer = static_cast<char *>(chip::Platform::MemoryCalloc(size, sizeof(char)));
-        strncpy(buffer, value.asCString(), size);
+        VerifyOrReturnError(buffer != nullptr, CHIP_ERROR_NO_MEMORY);
+
+        memcpy(buffer, value.asCString(), size);
 
         request = chip::CharSpan(buffer, size);
         return CHIP_NO_ERROR;
@@ -233,6 +305,22 @@ public:
         }
 
         ChipLogError(chipTool, "%s is required.  Should be provided as {\"%s\": value}", label, memberName);
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    static CHIP_ERROR EnsureNoMembersRemaining(const char * label, const Json::Value & value)
+    {
+        auto remainingFields = value.getMemberNames();
+        if (remainingFields.size() == 0)
+        {
+            return CHIP_NO_ERROR;
+        }
+#if CHIP_ERROR_LOGGING
+        for (auto & field : remainingFields)
+        {
+            ChipLogError(chipTool, "Unexpected field name: '%s.%s'", label, field.c_str());
+        }
+#endif // CHIP_ERROR_LOGGING
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
@@ -292,74 +380,42 @@ public:
     virtual ~ComplexArgument() {}
 
     virtual CHIP_ERROR Parse(const char * label, const char * json) = 0;
+
+    virtual void Reset() = 0;
 };
 
 template <typename T>
 class TypedComplexArgument : public ComplexArgument
 {
 public:
+    TypedComplexArgument() {}
     TypedComplexArgument(T * request) : mRequest(request) {}
-    ~TypedComplexArgument() { ComplexArgumentParser::Finalize(*mRequest); }
+    ~TypedComplexArgument()
+    {
+        if (mRequest != nullptr)
+        {
+            ComplexArgumentParser::Finalize(*mRequest);
+        }
+    }
+
+    void SetArgument(T * request) { mRequest = request; };
 
     CHIP_ERROR Parse(const char * label, const char * json)
     {
         Json::Value value;
-        Json::Reader reader;
-        if (!reader.parse(json, value))
+        if (strcmp(kNullString, json) == 0)
         {
-            std::vector<Json::Reader::StructuredError> errors = reader.getStructuredErrors();
-            ChipLogError(chipTool, "Error parsing JSON for %s:", label);
-            for (auto & error : errors)
-            {
-                ChipLogError(chipTool, "  %s", error.message.c_str());
-                ptrdiff_t error_start   = error.offset_start;
-                ptrdiff_t error_end     = error.offset_limit;
-                const char * sourceText = json;
-                // The whole JSON string might be too long to fit in our log
-                // messages.  Just include 30 chars before the error.
-                constexpr ptrdiff_t kMaxContext = 30;
-                std::string errorMsg;
-                if (error_start > kMaxContext)
-                {
-                    sourceText += (error_start - kMaxContext);
-                    error_end   = kMaxContext + (error_end - error_start);
-                    error_start = kMaxContext;
-                    ChipLogError(chipTool, "... %s", sourceText);
-                    // Add markers corresponding to the "... " above.
-                    errorMsg += "----";
-                }
-                else
-                {
-                    ChipLogError(chipTool, "%s", sourceText);
-                }
-                for (ptrdiff_t i = 0; i < error_start; ++i)
-                {
-                    errorMsg += "-";
-                }
-                errorMsg += "^";
-                if (error_start + 1 < error_end)
-                {
-                    for (ptrdiff_t i = error_start + 1; i < error_end; ++i)
-                    {
-                        errorMsg += "-";
-                    }
-                    errorMsg += "^";
-                }
-                ChipLogError(chipTool, "%s", errorMsg.c_str());
-
-                if (error.message == "Missing ',' or '}' in object declaration" && error.offset_start > 0 &&
-                    json[error.offset_start - 1] == '0' && (json[error.offset_start] == 'x' || json[error.offset_start] == 'X'))
-                {
-                    ChipLogError(chipTool,
-                                 "NOTE: JSON does not allow hex syntax beginning with 0x for numbers.  Try putting the hex number "
-                                 "in quotes (like {\"name\": \"0x100\"}).");
-                }
-            }
+            value = Json::nullValue;
+        }
+        else if (!JsonParser::ParseComplexArgument(label, json, value))
+        {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
         return ComplexArgumentParser::Setup(label, *mRequest, value);
     }
+
+    void Reset() { *mRequest = T(); }
 
 private:
     T * mRequest;

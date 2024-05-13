@@ -17,20 +17,64 @@
  */
 
 #include "AppMain.h"
-#include "MatterCallbacks.h"
+#include "AppOptions.h"
+#include "InteractiveServer.h"
+
+#include <app/util/MatterCallbacks.h>
+
+namespace {
+class InteractiveServerRedirectCallbacks : public chip::DataModelCallbacks
+{
+public:
+    void AttributeOperation(OperationType operation, OperationOrder order, const chip::app::ConcreteAttributePath & path) override
+    {
+        if (order != OperationOrder::Post)
+        {
+            return;
+        }
+
+        // TODO: is there any value in checking the return of read/write attributes?
+        //       they seem to only return true/false based on isRead (i.e. commissioning complete)
+        switch (operation)
+        {
+        case OperationType::Read:
+            (void) InteractiveServer::GetInstance().ReadAttribute(path);
+            break;
+        case OperationType::Write:
+            (void) InteractiveServer::GetInstance().WriteAttribute(path);
+            break;
+        }
+    }
+
+    void PostCommandReceived(const chip::app::ConcreteCommandPath & commandPath,
+                             const chip::Access::SubjectDescriptor & subjectDescriptor) override
+    {
+        (void) InteractiveServer::GetInstance().Command(commandPath);
+    }
+};
+
+InteractiveServerRedirectCallbacks gDmCallbacks;
+
+} // namespace
 
 void ApplicationInit() {}
 
+void ApplicationShutdown() {}
+
 int main(int argc, char * argv[])
 {
-    VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
+    VerifyOrDie(ChipLinuxAppInit(argc, argv, AppOptions::GetOptions()) == 0);
 
-    auto test = GetTargetTest();
-    if (test != nullptr)
+    LinuxDeviceOptions::GetInstance().dacProvider = AppOptions::GetDACProvider();
+
+    auto & server = InteractiveServer::GetInstance();
+    if (AppOptions::GetInteractiveMode())
     {
-        test->NextTest();
+        server.Run(AppOptions::GetInteractiveModePort());
     }
 
+    chip::DataModelCallbacks::SetInstance(&gDmCallbacks);
     ChipLinuxAppMainLoop();
+
     return 0;
 }

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ void AssertChipStackLockedByCurrentThread(const char * file, int line)
 {
     if (!chip::DeviceLayer::PlatformMgr().IsChipStackLockedByCurrentThread())
     {
-        ChipLogError(DeviceLayer, "Chip stack locking error at '%s:%d'. Code is unsafe/racy", file, line);
+        ChipLogError(DeviceLayer, "Chip stack locking error at '%s:%d'. Code is unsafe/racy", StringOrNullMarker(file), line);
 #if CHIP_STACK_LOCK_TRACKING_ERROR_FATAL
         chipDie();
 #endif

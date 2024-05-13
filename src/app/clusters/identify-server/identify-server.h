@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <app-common/zap-generated/enums.h>
+#include <app-common/zap-generated/cluster-enums.h>
 #include <app/util/basic-types.h>
 
 struct Identify
@@ -45,19 +45,21 @@ struct Identify
      * @param effectVariant if supported by the app, initial effect variant
      */
     Identify(chip::EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIdentifyStopCb onIdentifyStop,
-             EmberAfIdentifyIdentifyType identifyType, onEffectIdentifierCb onEffectIdentifier = nullptr,
-             EmberAfIdentifyEffectIdentifier effectIdentifier = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK,
-             EmberAfIdentifyEffectVariant effectVariant       = EMBER_ZCL_IDENTIFY_EFFECT_VARIANT_DEFAULT);
+             chip::app::Clusters::Identify::IdentifyTypeEnum identifyType, onEffectIdentifierCb onEffectIdentifier = nullptr,
+             chip::app::Clusters::Identify::EffectIdentifierEnum effectIdentifier =
+                 chip::app::Clusters::Identify::EffectIdentifierEnum::kBlink,
+             chip::app::Clusters::Identify::EffectVariantEnum effectVariant =
+                 chip::app::Clusters::Identify::EffectVariantEnum::kDefault);
     ~Identify();
 
     chip::EndpointId mEndpoint;
     onIdentifyStartCb mOnIdentifyStart = nullptr;
     onIdentifyStopCb mOnIdentifyStop   = nullptr;
-    EmberAfIdentifyIdentifyType mIdentifyType;
+    chip::app::Clusters::Identify::IdentifyTypeEnum mIdentifyType;
     onEffectIdentifierCb mOnEffectIdentifier;
-    EmberAfIdentifyEffectIdentifier mCurrentEffectIdentifier;
-    EmberAfIdentifyEffectIdentifier mTargetEffectIdentifier;
-    uint8_t mEffectVariant;
+    chip::app::Clusters::Identify::EffectIdentifierEnum mCurrentEffectIdentifier;
+    chip::app::Clusters::Identify::EffectIdentifierEnum mTargetEffectIdentifier;
+    chip::app::Clusters::Identify::EffectVariantEnum mEffectVariant;
     bool mActive            = false;
     Identify * nextIdentify = nullptr;
 

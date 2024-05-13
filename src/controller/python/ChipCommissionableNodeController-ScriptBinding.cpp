@@ -24,6 +24,7 @@
  */
 
 #include <controller/CHIPCommissionableNodeController.h>
+#include <controller/python/chip/native/PyChipError.h>
 #include <inet/IPAddress.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -33,29 +34,27 @@
 using namespace chip;
 using namespace chip::Controller;
 
-static_assert(std::is_same<uint32_t, ChipError::StorageType>::value, "python assumes CHIP_ERROR maps to c_uint32");
-
 extern "C" {
-ChipError::StorageType
+PyChipError
 pychip_CommissionableNodeController_NewController(chip::Controller::CommissionableNodeController ** outCommissionableNodeCtrl);
-ChipError::StorageType
+PyChipError
 pychip_CommissionableNodeController_DeleteController(chip::Controller::CommissionableNodeController * commissionableNodeCtrl);
 
-ChipError::StorageType
+PyChipError
 pychip_CommissionableNodeController_DiscoverCommissioners(chip::Controller::CommissionableNodeController * commissionableNodeCtrl);
 void pychip_CommissionableNodeController_PrintDiscoveredCommissioners(
     chip::Controller::CommissionableNodeController * commissionableNodeCtrl);
 }
 
-ChipError::StorageType
+PyChipError
 pychip_CommissionableNodeController_NewController(chip::Controller::CommissionableNodeController ** outCommissionableNodeCtrl)
 {
-    *outCommissionableNodeCtrl = new chip::Controller::CommissionableNodeController();
-    VerifyOrReturnError(*outCommissionableNodeCtrl != nullptr, CHIP_ERROR_NO_MEMORY.AsInteger());
-    return CHIP_NO_ERROR.AsInteger();
+    *outCommissionableNodeCtrl = new (std::nothrow) chip::Controller::CommissionableNodeController();
+    VerifyOrReturnError(*outCommissionableNodeCtrl != nullptr, ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    return ToPyChipError(CHIP_NO_ERROR);
 }
 
-ChipError::StorageType
+PyChipError
 pychip_CommissionableNodeController_DeleteController(chip::Controller::CommissionableNodeController * commissionableNodeCtrl)
 {
     if (commissionableNodeCtrl != nullptr)
@@ -63,13 +62,13 @@ pychip_CommissionableNodeController_DeleteController(chip::Controller::Commissio
         delete commissionableNodeCtrl;
     }
 
-    return CHIP_NO_ERROR.AsInteger();
+    return ToPyChipError(CHIP_NO_ERROR);
 }
 
-ChipError::StorageType
+PyChipError
 pychip_CommissionableNodeController_DiscoverCommissioners(chip::Controller::CommissionableNodeController * commissionableNodeCtrl)
 {
-    return commissionableNodeCtrl->DiscoverCommissioners().AsInteger();
+    return ToPyChipError(commissionableNodeCtrl->DiscoverCommissioners());
 }
 
 void pychip_CommissionableNodeController_PrintDiscoveredCommissioners(
@@ -77,7 +76,7 @@ void pychip_CommissionableNodeController_PrintDiscoveredCommissioners(
 {
     for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES; ++i)
     {
-        const chip::Dnssd::DiscoveredNodeData * dnsSdInfo = commissionableNodeCtrl->GetDiscoveredCommissioner(i);
+        const chip::Dnssd::CommissionNodeData * dnsSdInfo = commissionableNodeCtrl->GetDiscoveredCommissioner(i);
         if (dnsSdInfo == nullptr)
         {
             continue;
@@ -98,23 +97,33 @@ void pychip_CommissionableNodeController_PrintDiscoveredCommissioners(
         ChipLogProgress(Discovery, "\tRotating Id\t\t%s", rotatingId);
         ChipLogProgress(Discovery, "\tPairing Instruction\t%s", dnsSdInfo->pairingInstruction);
         ChipLogProgress(Discovery, "\tPairing Hint\t\t%u", dnsSdInfo->pairingHint);
-        if (dnsSdInfo->GetMrpRetryIntervalIdle().HasValue())
+
+        auto idleInterval = dnsSdInfo->GetMrpRetryIntervalIdle();
+        if (idleInterval.has_value())
         {
-            ChipLogProgress(Discovery, "\tMrp Interval idle\t%u", dnsSdInfo->GetMrpRetryIntervalIdle().Value().count());
+            ChipLogProgress(Discovery, "\tMrp Interval idle\t%u", idleInterval->count());
         }
         else
         {
             ChipLogProgress(Discovery, "\tMrp Interval idle\tNot present");
         }
-        if (dnsSdInfo->GetMrpRetryIntervalActive().HasValue())
+
+        auto activeInterval = dnsSdInfo->GetMrpRetryIntervalIdle();
+        if (activeInterval.has_value())
         {
-            ChipLogProgress(Discovery, "\tMrp Interval active\t%u", dnsSdInfo->GetMrpRetryIntervalActive().Value().count());
+            ChipLogProgress(Discovery, "\tMrp Interval active\t%u", activeInterval->count());
         }
         else
         {
             ChipLogProgress(Discovery, "\tMrp Interval active\tNot present");
         }
         ChipLogProgress(Discovery, "\tSupports TCP\t\t%d", dnsSdInfo->supportsTcp);
+
+        if (dnsSdInfo->isICDOperatingAsLIT.has_value())
+        {
+            ChipLogProgress(Discovery, "\tICD is operating as a\t%s", *(dnsSdInfo->isICDOperatingAsLIT) ? "LIT" : "SIT");
+        }
+
         for (unsigned j = 0; j < dnsSdInfo->numIPs; ++j)
         {
             char buf[chip::Inet::IPAddress::kMaxStringLength];

@@ -1,0 +1,93 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/tizen.gni")
+
+import("${build_root}/config/linux/pkg_config.gni")
+import("${chip_root}/build/chip/linux/gdbus_library.gni")
+import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/src/app/common_flags.gni")
+import("${tizen_sdk_build_root}/tizen_sdk.gni")
+
+assert(chip_build_tools)
+
+declare_args() {
+  # Enable D-Bus based UI functionality for example app
+  chip_examples_enable_ui = false
+}
+
+pkg_config("capi-system-peripheral-io") {
+  packages = [ "capi-system-peripheral-io" ]
+}
+
+gdbus_library("chip-lighting-app-manager") {
+  sources = [ "xml/DBusLightApp.xml" ]
+  interface_prefix = "org.tizen.matter.example.lighting"
+  c_namespace = "LightApp"
+  c_generate_object_manager = true
+  dbus_out_dir = "dbus"
+}
+
+executable("chip-lighting-app") {
+  sources = [
+    "include/CHIPProjectAppConfig.h",
+    "include/LedManager.h",
+    "src/LedManager.cpp",
+    "src/main.cpp",
+  ]
+
+  deps = [
+    "${chip_root}/examples/lighting-app/lighting-common",
+    "${chip_root}/examples/lighting-app/lighting-common:lighting-manager",
+    "${chip_root}/examples/platform/tizen:app-main",
+    "${chip_root}/src/lib",
+  ]
+
+  configs += [ ":capi-system-peripheral-io" ]
+
+  if (chip_examples_enable_ui) {
+    sources += [ "src/DBusInterface.cpp" ]
+    deps += [ ":chip-lighting-app-manager" ]
+    defines = [ "ENABLE_DBUS_UI=1" ]
+  } else {
+    defines = [ "ENABLE_DBUS_UI=0" ]
+  }
+
+  include_dirs = [ "include" ]
+
+  output_dir = root_out_dir
+}
+
+tizen_sdk_package("chip-lighting-app:tpk") {
+  deps = [
+    ":chip-lighting-app",
+    "${chip_root}/examples/platform/tizen:author-certificate-CHIP",
+  ]
+  manifest = "tizen-manifest.xml"
+  sign_security_profile = "CHIP"
+}
+
+group("tizen") {
+  deps = [ ":chip-lighting-app" ]
+}
+
+group("tizen:tpk") {
+  deps = [ ":chip-lighting-app:tpk" ]
+}
+
+group("default") {
+  deps = [ ":tizen" ]
+}

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +17,7 @@
  */
 
 #include "OTAImageProcessorImpl.h"
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -154,7 +155,7 @@ int OTAImageProcessorImpl::MemoryTest()
     // Clear the buffer so we don't get old data
     memset(buffer, 0x0, buffer_size);
     // Update buffer with our string we want to store
-    strncpy(buffer, "Hello Storage!", buffer_size);
+    Platform::CopyString(buffer, buffer_size, "Hello Storage!");
 
     ret = mBlockDevice->program(buffer, 0, buffer_size);
     if (ret)
@@ -391,7 +392,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
 
 CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
 {
-    if (!IsSpanUsable(block))
+    if (block.empty())
     {
         ReleaseBlock();
         return CHIP_NO_ERROR;
@@ -542,8 +543,8 @@ int OTAImageProcessorImpl::ProgramMemory()
     }
     ChipLogProgress(SoftwareUpdate,
                     "Secondary slot program with offset: "
-                    "0x%" PRIx64,
-                    mParams.downloadedBytes);
+                    "0x" ChipLogFormatX64,
+                    ChipLogValueX64(mParams.downloadedBytes));
     mParams.downloadedBytes += mBlock.size();
 
     return ret;

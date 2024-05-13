@@ -16,6 +16,10 @@
  */
 #pragma once
 
+#include <credentials/PersistentStorageOpCertStore.h>
+#include <crypto/DefaultSessionKeystore.h>
+#include <crypto/PersistentStorageOperationalKeystore.h>
+#include <lib/core/CASEAuthTag.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
@@ -24,9 +28,12 @@
 #include <system/SystemClock.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
-#include <transport/raw/tests/NetworkTestHelpers.h>
+#include <transport/tests/LoopbackTransportManager.h>
+#include <transport/tests/UDPTransportManager.h>
 
 #include <nlunit-test.h>
+
+#include <vector>
 
 namespace chip {
 namespace Test {
@@ -63,17 +70,32 @@ private:
 };
 
 /**
- * @brief The context of test cases for messaging layer. It wil initialize network layer and system layer, and create
+ * @brief The context of test cases for messaging layer. It will initialize network layer and system layer, and create
  *        two secure sessions, connected with each other. Exchanges can be created for each secure session.
  */
 class MessagingContext : public PlatformMemoryUser
 {
 public:
+    enum MRPMode
+    {
+        kDefault = 1, // This adopts the default MRP values for idle/active as per the spec.
+                      //      i.e IDLE = 500ms, ACTIVE = 300ms
+
+        kResponsive = 2, // This adopts values that are better suited for loopback tests that
+                         // don't actually go over a network interface, and are tuned much lower
+                         // to permit more responsive tests.
+                         //      i.e IDLE = 10ms, ACTIVE = 10ms
+    };
+
+    //
+    // See above for a description of the values used.
+    //
+    static constexpr System::Clock::Timeout kResponsiveIdleRetransTimeout   = System::Clock::Milliseconds32(10);
+    static constexpr System::Clock::Timeout kResponsiveActiveRetransTimeout = System::Clock::Milliseconds32(10);
+
     MessagingContext() :
         mInitialized(false), mAliceAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT + 1)),
-        mBobAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT)),
-        mPairingAliceToBob(kBobKeyId, kAliceKeyId, GetSecureSessionManager()),
-        mPairingBobToAlice(kAliceKeyId, kBobKeyId, GetSecureSessionManager())
+        mBobAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT))
     {}
     ~MessagingContext() { VerifyOrDie(mInitialized == false); }
 
@@ -84,7 +106,7 @@ public:
     CHIP_ERROR Init(TransportMgrBase * transport, IOContext * io);
 
     // Shutdown all layers, finalize operations
-    CHIP_ERROR Shutdown();
+    void Shutdown();
 
     // Initialize from an existing messaging context.  Useful if we want to
     // share some state (like the transport).
@@ -92,7 +114,7 @@ public:
 
     // The shutdown method to use if using InitFromExisting.  Must pass in the
     // same existing context as was passed to InitFromExisting.
-    CHIP_ERROR ShutdownAndRestoreExisting(MessagingContext & existing);
+    void ShutdownAndRestoreExisting(MessagingContext & existing);
 
     static Inet::IPAddress GetAddress()
     {
@@ -101,38 +123,56 @@ public:
         return addr;
     }
 
-    static const uint16_t kBobKeyId   = 1;
-    static const uint16_t kAliceKeyId = 2;
-    NodeId GetBobNodeId() const;
-    NodeId GetAliceNodeId() const;
+    static const uint16_t kBobKeyId     = 1;
+    static const uint16_t kAliceKeyId   = 2;
+    static const uint16_t kCharlieKeyId = 3;
+    static const uint16_t kDavidKeyId   = 4;
     GroupId GetFriendsGroupId() const { return mFriendsGroupId; }
 
     SessionManager & GetSecureSessionManager() { return mSessionManager; }
     Messaging::ExchangeManager & GetExchangeManager() { return mExchangeManager; }
     secure_channel::MessageCounterManager & GetMessageCounterManager() { return mMessageCounterManager; }
+    FabricTable & GetFabricTable() { return mFabricTable; }
+    Crypto::DefaultSessionKeystore & GetSessionKeystore() { return mSessionKeystore; }
 
     FabricIndex GetAliceFabricIndex() { return mAliceFabricIndex; }
     FabricIndex GetBobFabricIndex() { return mBobFabricIndex; }
-    FabricInfo * GetAliceFabric() { return mFabricTable.FindFabricWithIndex(mAliceFabricIndex); }
-    FabricInfo * GetBobFabric() { return mFabricTable.FindFabricWithIndex(mBobFabricIndex); }
+    const FabricInfo * GetAliceFabric() { return mFabricTable.FindFabricWithIndex(mAliceFabricIndex); }
+    const FabricInfo * GetBobFabric() { return mFabricTable.FindFabricWithIndex(mBobFabricIndex); }
 
-    CHIP_ERROR CreateSessionBobToAlice();
-    CHIP_ERROR CreateSessionAliceToBob();
-    CHIP_ERROR CreateSessionBobToFriends();
+    CHIP_ERROR CreateSessionBobToAlice(); // Creates PASE session
+    CHIP_ERROR CreateCASESessionBobToAlice();
+    CHIP_ERROR CreateCASESessionBobToAlice(const CATValues & cats);
+    CHIP_ERROR CreateSessionAliceToBob(); // Creates PASE session
+    CHIP_ERROR CreateCASESessionAliceToBob();
+    CHIP_ERROR CreateCASESessionAliceToBob(const CATValues & cats);
+    CHIP_ERROR CreateSessionBobToFriends(); // Creates PASE session
+    CHIP_ERROR CreatePASESessionCharlieToDavid();
+    CHIP_ERROR CreatePASESessionDavidToCharlie();
 
     void ExpireSessionBobToAlice();
     void ExpireSessionAliceToBob();
     void ExpireSessionBobToFriends();
 
+    void SetMRPMode(MRPMode mode);
+
     SessionHandle GetSessionBobToAlice();
     SessionHandle GetSessionAliceToBob();
+    SessionHandle GetSessionCharlieToDavid();
+    SessionHandle GetSessionDavidToCharlie();
     SessionHandle GetSessionBobToFriends();
+
+    CHIP_ERROR CreateAliceFabric();
+    CHIP_ERROR CreateBobFabric();
+
+    const Transport::PeerAddress & GetAliceAddress() { return mAliceAddress; }
+    const Transport::PeerAddress & GetBobAddress() { return mBobAddress; }
 
     Messaging::ExchangeContext * NewUnauthenticatedExchangeToAlice(Messaging::ExchangeDelegate * delegate);
     Messaging::ExchangeContext * NewUnauthenticatedExchangeToBob(Messaging::ExchangeDelegate * delegate);
 
-    Messaging::ExchangeContext * NewExchangeToAlice(Messaging::ExchangeDelegate * delegate);
-    Messaging::ExchangeContext * NewExchangeToBob(Messaging::ExchangeDelegate * delegate);
+    Messaging::ExchangeContext * NewExchangeToAlice(Messaging::ExchangeDelegate * delegate, bool isInitiator = true);
+    Messaging::ExchangeContext * NewExchangeToBob(Messaging::ExchangeDelegate * delegate, bool isInitiator = true);
 
     System::Layer & GetSystemLayer() { return mIOContext->GetSystemLayer(); }
 
@@ -140,163 +180,208 @@ private:
     bool mInitializeNodes = true;
     bool mInitialized;
     FabricTable mFabricTable;
+
     SessionManager mSessionManager;
     Messaging::ExchangeManager mExchangeManager;
     secure_channel::MessageCounterManager mMessageCounterManager;
     IOContext * mIOContext;
     TransportMgrBase * mTransport;                // Only needed for InitFromExisting.
     chip::TestPersistentStorageDelegate mStorage; // for SessionManagerInit
+    chip::PersistentStorageOperationalKeystore mOpKeyStore;
+    chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
+    chip::Crypto::DefaultSessionKeystore mSessionKeystore;
 
     FabricIndex mAliceFabricIndex = kUndefinedFabricIndex;
     FabricIndex mBobFabricIndex   = kUndefinedFabricIndex;
     GroupId mFriendsGroupId       = 0x0101;
     Transport::PeerAddress mAliceAddress;
     Transport::PeerAddress mBobAddress;
-    SecurePairingUsingTestSecret mPairingAliceToBob;
-    SecurePairingUsingTestSecret mPairingBobToAlice;
+    Transport::PeerAddress mCharlieAddress;
+    Transport::PeerAddress mDavidAddress;
     SessionHolder mSessionAliceToBob;
     SessionHolder mSessionBobToAlice;
+    SessionHolder mSessionCharlieToDavid;
+    SessionHolder mSessionDavidToCharlie;
     Optional<Transport::OutgoingGroupSession> mSessionBobToFriends;
 };
 
-template <typename Transport = LoopbackTransport>
-class LoopbackMessagingContext : public MessagingContext
+// LoopbackMessagingContext enriches MessagingContext with an async loopback transport
+class LoopbackMessagingContext : public LoopbackTransportManager, public MessagingContext
 {
 public:
     virtual ~LoopbackMessagingContext() {}
 
-    /// Initialize the underlying layers.
-    virtual CHIP_ERROR Init()
+    // Performs shared setup for all tests in the test suite
+    virtual void SetUpTestSuite()
     {
-        ReturnErrorOnFailure(chip::Platform::MemoryInit());
-        ReturnErrorOnFailure(mIOContext.Init());
-        ReturnErrorOnFailure(mTransportManager.Init("LOOPBACK"));
-        ReturnErrorOnFailure(MessagingContext::Init(&mTransportManager, &mIOContext));
-        return CHIP_NO_ERROR;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        // TODO: use ASSERT_EQ, once transition to pw_unit_test is complete
+        VerifyOrDieWithMsg((err = chip::Platform::MemoryInit()) == CHIP_NO_ERROR, AppServer,
+                           "Init CHIP memory failed: %" CHIP_ERROR_FORMAT, err.Format());
+        VerifyOrDieWithMsg((err = LoopbackTransportManager::Init()) == CHIP_NO_ERROR, AppServer,
+                           "Init LoopbackTransportManager failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
-    // Shutdown all layers, finalize operations
-    virtual CHIP_ERROR Shutdown()
+    // Performs shared teardown for all tests in the test suite
+    virtual void TearDownTestSuite()
     {
-        ReturnErrorOnFailure(MessagingContext::Shutdown());
-        ReturnErrorOnFailure(mIOContext.Shutdown());
+        LoopbackTransportManager::Shutdown();
         chip::Platform::MemoryShutdown();
-        return CHIP_NO_ERROR;
     }
 
-    // Init/Shutdown Helpers that can be used directly as the nlTestSuite
-    // initialize/finalize function.
-    static int Initialize(void * context)
+    // Performs setup for each individual test in the test suite
+    virtual void SetUp()
     {
-        auto * ctx = static_cast<LoopbackMessagingContext *>(context);
-        return ctx->Init() == CHIP_NO_ERROR ? SUCCESS : FAILURE;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        VerifyOrDieWithMsg((err = MessagingContext::Init(&GetTransportMgr(), &GetIOContext())) == CHIP_NO_ERROR, AppServer,
+                           "Init MessagingContext failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
-    static int InitializeAsync(void * context)
+    // Performs teardown for each individual test in the test suite
+    virtual void TearDown() { MessagingContext::Shutdown(); }
+
+    // Helpers that can be used directly by the nlTestSuite
+
+    static int nlTestSetUpTestSuite(void * context)
     {
-        auto * ctx = static_cast<LoopbackMessagingContext *>(context);
-
-        VerifyOrReturnError(ctx->Init() == CHIP_NO_ERROR, FAILURE);
-        ctx->EnableAsyncDispatch();
-
+        static_cast<LoopbackMessagingContext *>(context)->SetUpTestSuite();
         return SUCCESS;
     }
 
-    static int Finalize(void * context)
+    static int nlTestTearDownTestSuite(void * context)
     {
-        auto * ctx = static_cast<LoopbackMessagingContext *>(context);
-        return ctx->Shutdown() == CHIP_NO_ERROR ? SUCCESS : FAILURE;
+        static_cast<LoopbackMessagingContext *>(context)->TearDownTestSuite();
+        return SUCCESS;
     }
 
-    Transport & GetLoopback() { return mTransportManager.GetTransport().template GetImplAtIndex<0>(); }
-
-    TransportMgrBase & GetTransportMgr() { return mTransportManager; }
-
-    IOContext & GetIOContext() { return mIOContext; }
-
-    /*
-     * For unit-tests that simulate end-to-end transmission and reception of messages in loopback mode,
-     * this mode better replicates a real-functioning stack that correctly handles the processing
-     * of a transmitted message as an asynchronous, bottom half handler dispatched after the current execution context has
-     completed.
-     * This is achieved using SystemLayer::ScheduleWork.
-
-     * This should be used in conjunction with the DrainAndServiceIO function below to correctly service and drain the event queue.
-     *
-     */
-    void EnableAsyncDispatch()
+    static int nlTestSetUp(void * context)
     {
-        auto & impl = GetLoopback();
-        impl.EnableAsyncDispatch(&mIOContext.GetSystemLayer());
+        static_cast<LoopbackMessagingContext *>(context)->SetUp();
+        return SUCCESS;
     }
 
-    /*
-     * Reset the dispatch back to a model that synchronously dispatches received messages up the stack.
-     *
-     * NOTE: This results in highly atypical/complex call stacks that are not representative of what happens on real
-     * devices and can cause subtle and complex bugs to either appear or get masked in the system. Where possible, please
-     * use this sparingly!
-     *
-     */
-    void DisableAsyncDispatch()
+    static int nlTestTearDown(void * context)
     {
-        auto & impl = GetLoopback();
-        impl.DisableAsyncDispatch();
+        static_cast<LoopbackMessagingContext *>(context)->TearDown();
+        return SUCCESS;
     }
 
-    /*
-     * This drives the servicing of events using the embedded IOContext while there are pending
-     * messages in the loopback transport's pending message queue. This should run to completion
-     * in well-behaved logic (i.e there isn't an indefinite ping-pong of messages transmitted back
-     * and forth).
-     *
-     * Consequently, this is guarded with a user-provided timeout to ensure we don't have unit-tests that stall
-     * in CI due to bugs in the code that is being tested.
-     *
-     * This DOES NOT ensure that all pending events are serviced to completion
-     * (i.e timers, any ScheduleWork calls), but does:
-     *
-     * 1) Guarantee that every call will make some progress on ready-to-run
-     *    things, by calling DriveIO at least once.
-     * 2) Try to ensure that any ScheduleWork calls that happend directly as a
-     *    result of message reception, and any messages those async tasks send,
-     *    get handled before DrainAndServiceIO returns.
-     */
-    void DrainAndServiceIO(System::Clock::Timeout maxWait = chip::System::Clock::Seconds16(5))
-    {
-        auto & impl                        = GetLoopback();
-        System::Clock::Timestamp startTime = System::SystemClock().GetMonotonicTimestamp();
+    using LoopbackTransportManager::GetSystemLayer;
+};
 
-        while (true)
-        {
-            bool hadPendingMessages = impl.HasPendingMessages();
-            while (impl.HasPendingMessages())
-            {
-                mIOContext.DriveIO();
-                if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >= maxWait)
-                {
-                    return;
-                }
-            }
-            // Processing those messages might have queued some run-ASAP async
-            // work.  Make sure to process that too, in case it generates
-            // response messages.
-            mIOContext.DriveIO();
-            if (!hadPendingMessages && !impl.HasPendingMessages())
-            {
-                // We're not making any progress on messages.  Just stop.
-                break;
-            }
-            // No need to check our timer here: either impl.HasPendingMessages()
-            // is true and we will check it next iteration, or it's false and we
-            // will either stop on the next iteration or it will become true and
-            // we will check the timer then.
-        }
+// UDPMessagingContext enriches MessagingContext with an UDP transport
+class UDPMessagingContext : public UDPTransportManager, public MessagingContext
+{
+public:
+    virtual ~UDPMessagingContext() {}
+
+    // Performs shared setup for all tests in the test suite
+    virtual CHIP_ERROR SetUpTestSuite()
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        VerifyOrExit((err = chip::Platform::MemoryInit()) == CHIP_NO_ERROR,
+                     ChipLogError(AppServer, "Init CHIP memory failed: %" CHIP_ERROR_FORMAT, err.Format()));
+        VerifyOrExit((err = UDPTransportManager::Init()) == CHIP_NO_ERROR,
+                     ChipLogError(AppServer, "Init UDPTransportManager failed: %" CHIP_ERROR_FORMAT, err.Format()));
+    exit:
+        return err;
     }
+
+    // Performs shared teardown for all tests in the test suite
+    virtual void TearDownTestSuite()
+    {
+        UDPTransportManager::Shutdown();
+        chip::Platform::MemoryShutdown();
+    }
+
+    // Performs setup for each individual test in the test suite
+    virtual CHIP_ERROR SetUp()
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        VerifyOrExit((err = MessagingContext::Init(&GetTransportMgr(), &GetIOContext())) == CHIP_NO_ERROR,
+                     ChipLogError(AppServer, "Init MessagingContext failed: %" CHIP_ERROR_FORMAT, err.Format()));
+    exit:
+        return err;
+    }
+
+    // Performs teardown for each individual test in the test suite
+    virtual void TearDown() { MessagingContext::Shutdown(); }
+
+    // Helpers that can be used directly by the nlTestSuite
+
+    static int nlTestSetUpTestSuite(void * context)
+    {
+        auto err = static_cast<UDPMessagingContext *>(context)->SetUpTestSuite();
+        return err == CHIP_NO_ERROR ? SUCCESS : FAILURE;
+    }
+
+    static int nlTestTearDownTestSuite(void * context)
+    {
+        static_cast<UDPMessagingContext *>(context)->TearDownTestSuite();
+        return SUCCESS;
+    }
+
+    static int nlTestSetUp(void * context)
+    {
+        auto err = static_cast<UDPMessagingContext *>(context)->SetUp();
+        return err == CHIP_NO_ERROR ? SUCCESS : FAILURE;
+    }
+
+    static int nlTestTearDown(void * context)
+    {
+        static_cast<UDPMessagingContext *>(context)->TearDown();
+        return SUCCESS;
+    }
+
+    using UDPTransportManager::GetSystemLayer;
+};
+
+// Class that can be used to capture decrypted message traffic in tests using
+// MessagingContext.
+class MessageCapturer : public SessionMessageDelegate
+{
+public:
+    MessageCapturer(MessagingContext & aContext) :
+        mSessionManager(aContext.GetSecureSessionManager()), mOriginalDelegate(aContext.GetExchangeManager())
+    {
+        // Interpose ourselves into the message flow.
+        mSessionManager.SetMessageDelegate(this);
+    }
+
+    ~MessageCapturer()
+    {
+        // Restore the normal message flow.
+        mSessionManager.SetMessageDelegate(&mOriginalDelegate);
+    }
+
+    struct Message
+    {
+        PacketHeader mPacketHeader;
+        PayloadHeader mPayloadHeader;
+        DuplicateMessage mIsDuplicate;
+        System::PacketBufferHandle mPayload;
+    };
+
+    size_t MessageCount() const { return mCapturedMessages.size(); }
+
+    template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
+    bool IsMessageType(size_t index, MessageType type)
+    {
+        return mCapturedMessages[index].mPayloadHeader.HasMessageType(type);
+    }
+
+    System::PacketBufferHandle & MessagePayload(size_t index) { return mCapturedMessages[index].mPayload; }
+
+    bool mCaptureStandaloneAcks = true;
 
 private:
-    TransportMgr<Transport> mTransportManager;
-    Test::IOContext mIOContext;
+    // SessionMessageDelegate implementation.
+    void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, const SessionHandle & session,
+                           DuplicateMessage isDuplicate, System::PacketBufferHandle && msgBuf) override;
+
+    SessionManager & mSessionManager;
+    SessionMessageDelegate & mOriginalDelegate;
+    std::vector<Message> mCapturedMessages;
 };
 
 } // namespace Test

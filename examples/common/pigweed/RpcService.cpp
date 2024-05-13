@@ -18,19 +18,20 @@
 
 #include "RpcService.h"
 
+#include "pw_span/span.h"
 #include <array>
-#include <span>
 #include <string_view>
 
+#include "pw_hdlc/decoder.h"
+#include "pw_hdlc/default_addresses.h"
 #include "pw_hdlc/rpc_channel.h"
-#include "pw_hdlc/rpc_packets.h"
 #include "pw_log/log.h"
 #include "pw_rpc/channel.h"
 #include "pw_status/status.h"
 #include "pw_stream/sys_io_stream.h"
 #include "pw_sys_io/sys_io.h"
 
-#include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/logging/TextOnlyLogging.h>
 
 #include <array>
 
@@ -56,7 +57,7 @@ public:
         pw::rpc::ChannelOutput(channel_name), mWriter(writer), mAddress(address)
     {}
 
-    pw::Status Send(std::span<const std::byte> buffer) override
+    pw::Status Send(pw::span<const std::byte> buffer) override
     {
         if (buffer.empty())
         {
@@ -102,7 +103,7 @@ void Start(void (*RegisterServices)(pw::rpc::Server &), ::chip::rpc::Mutex * uar
         {
             uart_mutex->Lock();
         }
-        pw::hdlc::WriteUIFrame(1, std::as_bytes(std::span(log)), sysIoWriter);
+        pw::hdlc::WriteUIFrame(1, pw::as_bytes(pw::span(log)), sysIoWriter);
         if (uart_mutex)
         {
             uart_mutex->Unlock();
@@ -116,7 +117,25 @@ void Start(void (*RegisterServices)(pw::rpc::Server &), ::chip::rpc::Mutex * uar
     std::array<std::byte, kMaxTransmissionUnit> input_buffer;
 
     Logging::Log(Logging::kLogModule_NotSpecified, Logging::kLogCategory_Detail, "Starting pw_rpc server");
-    pw::hdlc::ReadAndProcessPackets(server, hdlc_channel_output, input_buffer);
+
+    pw::hdlc::Decoder decoder(input_buffer);
+    while (true)
+    {
+        std::byte data;
+        if (!pw::sys_io::ReadByte(&data).ok())
+        {
+            // TODO: should we log?
+            return;
+        }
+        if (auto result = decoder.Process(data); result.ok())
+        {
+            pw::hdlc::Frame & frame = result.value();
+            if (frame.address() == pw::hdlc::kDefaultRpcAddress)
+            {
+                server.ProcessPacket(frame.data()).IgnoreError();
+            }
+        }
+    }
 }
 
 } // namespace rpc

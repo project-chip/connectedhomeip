@@ -18,13 +18,14 @@
 
 #include <app/AttributePathExpandIterator.h>
 
-#include <app-common/zap-generated/att-storage.h>
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventManagement.h>
 #include <app/GlobalAttributes.h>
+#include <app/util/att-storage.h>
+#include <app/util/endpoint-config-api.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -36,7 +37,7 @@ using namespace chip;
 // Note: Some of the generated files that depended by af.h are gen_config.h and gen_tokens.h
 typedef uint8_t EmberAfClusterMask;
 
-extern uint16_t emberAfEndpointCount(void);
+extern uint16_t emberAfEndpointCount();
 extern uint16_t emberAfIndexFromEndpoint(EndpointId endpoint);
 extern uint8_t emberAfClusterCount(EndpointId endpoint, bool server);
 extern uint16_t emberAfGetServerAttributeCount(chip::EndpointId endpoint, chip::ClusterId cluster);
@@ -52,7 +53,7 @@ extern bool emberAfEndpointIndexIsEnabled(uint16_t index);
 namespace chip {
 namespace app {
 
-AttributePathExpandIterator::AttributePathExpandIterator(ObjectList<AttributePathParams> * aAttributePath)
+AttributePathExpandIterator::AttributePathExpandIterator(SingleLinkedListNode<AttributePathParams> * aAttributePath)
 {
     mpAttributePath = aAttributePath;
 
@@ -127,7 +128,11 @@ void AttributePathExpandIterator::PrepareAttributeIndexRange(const AttributePath
             // and overflow to 0 for the max index) to us not going through
             // non-metadata global attributes for this attribute.
             mGlobalAttributeIndex = UINT8_MAX;
-            for (uint8_t idx = 0; idx < ArraySize(GlobalAttributesNotInMetadata); ++idx)
+
+            static_assert(ArraySize(GlobalAttributesNotInMetadata) <= UINT8_MAX, "Iterating over at most 256 array entries");
+
+            const uint8_t arraySize = static_cast<uint8_t>(ArraySize(GlobalAttributesNotInMetadata));
+            for (uint8_t idx = 0; idx < arraySize; ++idx)
             {
                 if (GlobalAttributesNotInMetadata[idx] == aAttributePath.mAttributeId)
                 {
@@ -136,6 +141,11 @@ void AttributePathExpandIterator::PrepareAttributeIndexRange(const AttributePath
                 }
             }
             mGlobalAttributeEndIndex = static_cast<uint8_t>(mGlobalAttributeIndex + 1);
+        }
+        else
+        {
+            mGlobalAttributeIndex    = UINT8_MAX;
+            mGlobalAttributeEndIndex = 0;
         }
     }
 }
@@ -165,12 +175,12 @@ bool AttributePathExpandIterator::Next()
 {
     for (; mpAttributePath != nullptr; (mpAttributePath = mpAttributePath->mpNext, mEndpointIndex = UINT16_MAX))
     {
-        mOutputPath.mExpanded = mpAttributePath->mValue.HasAttributeWildcard();
+        mOutputPath.mExpanded = mpAttributePath->mValue.IsWildcardPath();
 
         if (mEndpointIndex == UINT16_MAX)
         {
             // Special case: If this is a concrete path, we just return its value as-is.
-            if (!mpAttributePath->mValue.HasAttributeWildcard())
+            if (!mpAttributePath->mValue.IsWildcardPath())
             {
                 mOutputPath.mEndpointId  = mpAttributePath->mValue.mEndpointId;
                 mOutputPath.mClusterId   = mpAttributePath->mValue.mClusterId;

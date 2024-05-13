@@ -18,7 +18,7 @@
 #include "Button.h"
 #include "AppTask.h"
 
-#include "AppConfig.h"
+// #include <lock/AppConfig.h>
 
 esp_err_t Button::Init(gpio_num_t gpioNum, uint16_t debouncePeriod)
 {
@@ -26,6 +26,14 @@ esp_err_t Button::Init(gpio_num_t gpioNum, uint16_t debouncePeriod)
     mDebouncePeriod  = debouncePeriod / portTICK_PERIOD_MS;
     mState           = false;
     mLastPolledState = false;
+
+    gpio_config_t io_conf = {};
+    io_conf.intr_type     = GPIO_INTR_NEGEDGE;
+    io_conf.pin_bit_mask  = 1ULL << gpioNum;
+    io_conf.mode          = GPIO_MODE_INPUT;
+    io_conf.pull_down_en  = GPIO_PULLDOWN_ENABLE;
+
+    gpio_config(&io_conf);
 
     return gpio_set_direction(gpioNum, GPIO_MODE_INPUT);
 }

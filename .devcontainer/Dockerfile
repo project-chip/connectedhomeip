@@ -15,7 +15,8 @@
 ARG BUILD_VERSION
 
 # All tools required for compilation belong in chip-build, forms "truth" for CHIP build tooling
-FROM connectedhomeip/chip-build-vscode:${BUILD_VERSION}
+FROM ghcr.io/project-chip/chip-build-vscode:${BUILD_VERSION}
+LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 
 # This Dockerfile contains things useful for an interactive development environment
 ARG USERNAME=vscode
@@ -25,9 +26,10 @@ ENV LANG en_US.utf8
 
 # these are installed for terminal/dev convenience.  If more tooling for build is required, please
 #  add them to chip-build (in integrations/docker/images/chip-build)
-RUN apt-get update
-RUN apt-get install -y locales && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
-RUN apt-get -fy install git vim emacs sudo \
+RUN apt-get update \
+    && apt-get install -y locales \
+    && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 \
+    && apt-get -fy install git vim emacs sudo \
     apt-utils dialog zsh \
     iproute2 procps lsb-release \
     bash-completion \
@@ -35,42 +37,40 @@ RUN apt-get -fy install git vim emacs sudo \
     wget curl telnet \
     docker.io \
     iputils-ping net-tools \
-    libncurses5
+    libncurses5 \
+    libncursesw5 \
+    libpython2.7 \
+    && :
 
-RUN groupadd -g $USER_GID $USERNAME
-RUN useradd -s /bin/bash -u $USER_UID -g $USER_GID -G docker -m $USERNAME
-RUN echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME
-RUN chmod 0440 /etc/sudoers.d/$USERNAME
+RUN groupadd -g $USER_GID $USERNAME \
+    && useradd -s /bin/bash -u $USER_UID -g $USER_GID -G docker,sudo -m $USERNAME \
+    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME \
+    && :
 
-RUN mkdir -p /var/downloads
-RUN cd /var/downloads
-RUN curl -JL https://github.com/microsoft/vscode-cpptools/releases/download/0.27.0/cpptools-linux.vsix > extension.zip
-RUN unzip extension.zip
-RUN mkdir -p /home/$USERNAME/.vscode-server/extensions
-RUN mv extension /home/$USERNAME/.vscode-server/extensions/ms-vscode.cpptools-0.27.0
-RUN mkdir -p /home/$USERNAME/bin
-RUN curl https://raw.githubusercontent.com/restyled-io/restyler/master/bin/restyle-path -o /home/$USERNAME/bin/restyle-path
-RUN chmod +x /home/$USERNAME/bin/restyle-path
-RUN chown -R $USERNAME:$USERNAME /home/$USERNAME
-RUN echo "PATH=/home/$USERNAME/bin:${PATH}" >> /home/$USERNAME/.bashrc
+RUN curl https://raw.githubusercontent.com/restyled-io/restyler/master/bin/restyle-path -o /usr/local/bin/restyle-path \
+    && chmod +x /usr/local/bin/restyle-path \
+    && :
 
-# $USERNAME needs to own the esp-idf and tools for the examples to build
-RUN chown -R $USERNAME:$USERNAME /opt/espressif/esp-idf
-RUN chown -R $USERNAME:$USERNAME /opt/espressif/tools
+RUN mkdir -p /opt/sdk/sdks/ \
+    && chown -R $USERNAME:$USERNAME \
+    /opt/sdk/sdks/ `# NXP uses a patch_sdk script to change SDK files` \
+    /opt/NordicSemiconductor/nrfconnect/ `# $USERNAME needs to own west configuration to build nRF Connect examples` \
+    $IDF_PATH `# $USERNAME needs to own the esp-idf and tools for the examples to build` \
+    $IDF_TOOLS_PATH \
+    $SYSROOT_AARCH64 `# allow read/write access to header and libraries` \
+    $ANDROID_HOME `# allow licenses to be accepted` \
+    $AMEBA_PATH `# AmebaD requires access to change build_info.h` \
+    $IMX_SDK_ROOT \
+    && :
 
-# $USERNAME needs to own west configuration to build nRF Connect examples
-RUN chown -R $USERNAME:$USERNAME /opt/NordicSemiconductor/nrfconnect/
+# Fix Tizen SDK paths for new user
+RUN sed -i '/^TIZEN_SDK_DATA_PATH/d' $TIZEN_SDK_ROOT/sdk.info \
+    && echo TIZEN_SDK_DATA_PATH=/home/$USERNAME/tizen-sdk-data >> $TIZEN_SDK_ROOT/sdk.info \
+    && ln -sf /home/$USERNAME/.tizen-cli-config $TIZEN_SDK_ROOT/tools/.tizen-cli-config \
+    && : # last line
 
-# allow read/write access to header and libraries
-RUN chown -R $USERNAME:$USERNAME /opt/ubuntu-21.04-aarch64-sysroot/usr/
+ENV TIZEN_ROOTFS /tizen_rootfs
 
-# allow licenses to be accepted
-RUN chown -R $USERNAME:$USERNAME /opt/android/sdk
-
-# AmebaD requires access to change build_info.h
-RUN chown -R $USERNAME:$USERNAME /opt/ameba/ambd_sdk_with_chip_non_NDA/
-
-# NXP uses a patch_sdk script to change SDK files
-RUN chown -R $USERNAME:$USERNAME /opt/sdk/sdks/
-
-RUN chown -R $USERNAME:$USERNAME /opt/fsl-imx-xwayland/5.10-hardknott/
+# Fast Model GDB plugins path for debugging support
+ENV FAST_MODEL_PLUGINS_PATH /opt/FastModelsPortfolio_11.16/plugins/Linux64_GCC-9.3

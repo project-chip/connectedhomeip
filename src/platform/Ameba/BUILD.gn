@@ -23,6 +23,8 @@ static_library("Ameba") {
     "../SingletonConfigurationManager.cpp",
     "AmebaConfig.cpp",
     "AmebaConfig.h",
+    "AmebaUtils.cpp",
+    "AmebaUtils.h",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
     "CHIPDevicePlatformConfig.h",
@@ -31,10 +33,12 @@ static_library("Ameba") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
-    "DeviceNetworkProvisioningDelegateImpl.cpp",
-    "DeviceNetworkProvisioningDelegateImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
+    "FactoryDataDecoder.cpp",
+    "FactoryDataDecoder.h",
+    "FactoryDataProvider.cpp",
+    "FactoryDataProvider.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
     "Logging.cpp",
@@ -46,12 +50,17 @@ static_library("Ameba") {
     "SoftwareUpdateManagerImpl.h",
     "SystemTimeSupport.cpp",
     "SystemTimeSupport.h",
+    "crypto/AmebaPersistentStorageOperationalKeystore.cpp",
+    "crypto/AmebaPersistentStorageOperationalKeystore.h",
   ]
 
   deps = [
     "${chip_root}/src/lib/dnssd:platform_header",
+    "${chip_root}/src/platform/logging:headers",
     "${chip_root}/src/setup_payload",
   ]
+
+  public = [ "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h" ]
 
   public_deps = [
     "${chip_root}/src/crypto",

@@ -23,6 +23,7 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -54,7 +55,7 @@ public:
 
     CHIP_ERROR add(const uint8_t value);
 
-    uint8_t * data() { return mData; }
+    const uint8_t * data() const { return mData; }
     size_t size() const;
     uint8_t operator[](int index) const;
 

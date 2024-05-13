@@ -25,7 +25,7 @@
 // Include configuration headers
 #include <system/SystemConfig.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && !CHIP_SYSTEM_CONFIG_USE_LIBEV
 
 #include <lib/core/CHIPError.h>
 #include <system/SocketEvents.h>
@@ -67,4 +67,4 @@ private:
 } // namespace System
 } // namespace chip
 
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && !CHIP_SYSTEM_CONFIG_USE_LIBEV

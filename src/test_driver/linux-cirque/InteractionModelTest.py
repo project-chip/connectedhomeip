@@ -17,7 +17,6 @@ limitations under the License.
 
 import logging
 import os
-import time
 import sys
 
 from helper.CHIPTestBase import CHIPVirtualHome
@@ -37,7 +36,7 @@ CHIP_REPO = os.path.join(os.path.abspath(
 DEVICE_CONFIG = {
     'device0': {
         'type': 'CHIP-IM-Initiator',
-        'base_image': 'connectedhomeip/chip-cirque-device-base',
+        'base_image': '@default',
         'capability': ['Thread', 'Interactive', 'TrafficControl', 'Mount'],
         'rcp_mode': True,
         'docker_network': 'Ipv6',
@@ -46,7 +45,7 @@ DEVICE_CONFIG = {
     },
     'device1': {
         'type': 'CHIP-IM-Responder',
-        'base_image': 'connectedhomeip/chip-cirque-device-base',
+        'base_image': '@default',
         'capability': ['Thread', 'Interactive', 'TrafficControl', 'Mount'],
         'rcp_mode': True,
         'docker_network': 'Ipv6',

@@ -1,0 +1,15 @@
+# Commands will be run in CHIP project root.
+cd "{root}"
+
+# Generating linux-arm64-chip-tool-ipv6only-clang
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '"'"'--args=chip_inet_config_enable_ipv4=false is_clang=true target_cpu="arm64" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-chip-tool-ipv6only-clang'
+
+# Setting up Java deps
+third_party/java_deps/set_up_java_deps.sh
+
+# Building linux-arm64-chip-tool-ipv6only-clang
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ ninja -C {out}/linux-arm64-chip-tool-ipv6only-clang'

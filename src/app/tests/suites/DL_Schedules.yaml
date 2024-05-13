@@ -33,32 +33,32 @@ tests:
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "operationType"
+              - name: "OperationType"
                 value: 0
-              - name: "credential"
+              - name: "Credential"
                 value: { CredentialType: 1, CredentialIndex: 1 }
-              - name: "credentialData"
+              - name: "CredentialData"
                 value: "123456"
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: null
-              - name: "userStatus"
+              - name: "UserStatus"
                 value: null
-              - name: "userType"
+              - name: "UserType"
                 value: null
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0x00
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "nextCredentialIndex"
+              - name: "NextCredentialIndex"
                 value: 2
 
     - label: "Get number of supported users"
       command: "readAttribute"
       attribute: "NumberOfTotalUsersSupported"
       response:
-          saveAs: NumberOfTotalUsersSupported
+          saveAs: NumberOfTotalUsersSupportedValue
           value: 10
 
     - label:
@@ -67,7 +67,7 @@ tests:
       command: "readAttribute"
       attribute: "NumberOfWeekDaySchedulesSupportedPerUser"
       response:
-          saveAs: NumberOfWeekDaySchedulesSupportedPerUser
+          saveAs: NumberOfWeekDaySchedulesSupportedPerUserValue
           value: 10
 
     - label:
@@ -76,7 +76,14 @@ tests:
       command: "readAttribute"
       attribute: "NumberOfYearDaySchedulesSupportedPerUser"
       response:
-          saveAs: NumberOfYearDaySchedulesSupportedPerUser
+          saveAs: NumberOfYearDaySchedulesSupportedPerUserValue
+          value: 10
+
+    - label: "Get Max number of Holiday schedules and verify default value"
+      command: "readAttribute"
+      attribute: "NumberOfHolidaySchedulesSupported"
+      response:
+          saveAs: NumberOfHolidaySchedulesSupportedValue
           value: 10
 
     #
@@ -86,276 +93,253 @@ tests:
       command: "SetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "daysMask"
+              - name: "DaysMask"
                 value: 0x01
-              - name: "startHour"
+              - name: "StartHour"
                 value: 15
-              - name: "startMinute"
+              - name: "StartMinute"
                 value: 16
-              - name: "endHour"
+              - name: "EndHour"
                 value: 18
-              - name: "endMinute"
+              - name: "EndMinute"
                 value: 00
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Create Week Day schedule with out-of-bounds index"
       command: "SetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
-                value:
-                    static_cast<uint8_t>(NumberOfWeekDaySchedulesSupportedPerUser
-                    + 1)
-              - name: "userIndex"
+              - name: "WeekDayIndex"
+                value: NumberOfWeekDaySchedulesSupportedPerUserValue + 1
+              - name: "UserIndex"
                 value: 1
-              - name: "daysMask"
+              - name: "DaysMask"
                 value: 0x01
-              - name: "startHour"
+              - name: "StartHour"
                 value: 15
-              - name: "startMinute"
+              - name: "StartMinute"
                 value: 16
-              - name: "endHour"
+              - name: "EndHour"
                 value: 18
-              - name: "endMinute"
+              - name: "EndMinute"
                 value: 00
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Create Week Day schedule with 0 user index"
       command: "SetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 0
-              - name: "daysMask"
+              - name: "DaysMask"
                 value: 0x01
-              - name: "startHour"
+              - name: "StartHour"
                 value: 15
-              - name: "startMinute"
+              - name: "StartMinute"
                 value: 16
-              - name: "endHour"
+              - name: "EndHour"
                 value: 18
-              - name: "endMinute"
+              - name: "EndMinute"
                 value: 00
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Create Week Day schedule with out-of-bounds user index"
       command: "SetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
-                value: static_cast<uint8_t>(NumberOfTotalUsersSupported + 1)
-              - name: "daysMask"
+              - name: "UserIndex"
+                value: NumberOfTotalUsersSupportedValue + 1
+              - name: "DaysMask"
                 value: 0x01
-              - name: "startHour"
+              - name: "StartHour"
                 value: 15
-              - name: "startMinute"
+              - name: "StartMinute"
                 value: 16
-              - name: "endHour"
+              - name: "EndHour"
                 value: 18
-              - name: "endMinute"
+              - name: "EndMinute"
                 value: 00
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Create Week Day schedule for non-existing user"
       command: "SetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 2
-              - name: "daysMask"
+              - name: "DaysMask"
                 value: 0x01
-              - name: "startHour"
+              - name: "StartHour"
                 value: 15
-              - name: "startMinute"
+              - name: "StartMinute"
                 value: 16
-              - name: "endHour"
+              - name: "EndHour"
                 value: 18
-              - name: "endMinute"
+              - name: "EndMinute"
                 value: 00
       response:
-          error: NOT_FOUND
+          error: FAILURE
 
     - label: "Create Week Day schedule with 0 days mask"
       command: "SetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "daysMask"
+              - name: "DaysMask"
                 value: 0
-              - name: "startHour"
+              - name: "StartHour"
                 value: 15
-              - name: "startMinute"
+              - name: "StartMinute"
                 value: 16
-              - name: "endHour"
+              - name: "EndHour"
                 value: 18
-              - name: "endMinute"
+              - name: "EndMinute"
                 value: 00
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
-    - label: "Create Week Day schedule for Sunday and Monday"
+    - label: "Create Week Day schedule with Invalid day"
       command: "SetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "daysMask"
-                value: 0x3 # (Sunday and Monday)
-              - name: "startHour"
+              - name: "DaysMask"
+                value: 0x80 # (Not a valid day between Sunday thru Saturday)
+              - name: "StartHour"
                 value: 15
-              - name: "startMinute"
+              - name: "StartMinute"
                 value: 16
-              - name: "endHour"
+              - name: "EndHour"
                 value: 18
-              - name: "endMinute"
+              - name: "EndMinute"
                 value: 00
       response:
-          error: INVALID_FIELD
-
-    - label: "Create Week Day schedule for Sunday Wednesday and Saturday"
-      command: "SetWeekDaySchedule"
-      arguments:
-          values:
-              - name: "weekDayIndex"
-                value: 1
-              - name: "userIndex"
-                value: 1
-              - name: "daysMask"
-                value: 0x49 # (Sunday, Wednesday and Saturday)
-              - name: "startHour"
-                value: 15
-              - name: "startMinute"
-                value: 16
-              - name: "endHour"
-                value: 18
-              - name: "endMinute"
-                value: 00
-      response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Create Week Day schedule with invalid start hour"
       command: "SetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "daysMask"
+              - name: "DaysMask"
                 value: 1
-              - name: "startHour"
+              - name: "StartHour"
                 value: 24
-              - name: "startMinute"
+              - name: "StartMinute"
                 value: 16
-              - name: "endHour"
+              - name: "EndHour"
                 value: 18
-              - name: "endMinute"
+              - name: "EndMinute"
                 value: 00
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Create Week Day schedule with invalid start minute"
       command: "SetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "daysMask"
+              - name: "DaysMask"
                 value: 1
-              - name: "startHour"
+              - name: "StartHour"
                 value: 15
-              - name: "startMinute"
+              - name: "StartMinute"
                 value: 60
-              - name: "endHour"
+              - name: "EndHour"
                 value: 18
-              - name: "endMinute"
+              - name: "EndMinute"
                 value: 00
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Create Week Day schedule with invalid end hour"
       command: "SetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "daysMask"
+              - name: "DaysMask"
                 value: 1
-              - name: "startHour"
+              - name: "StartHour"
                 value: 15
-              - name: "startMinute"
+              - name: "StartMinute"
                 value: 16
-              - name: "endHour"
+              - name: "EndHour"
                 value: 24
-              - name: "endMinute"
+              - name: "EndMinute"
                 value: 00
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Create Week Day schedule with invalid end minute"
       command: "SetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "daysMask"
+              - name: "DaysMask"
                 value: 1
-              - name: "startHour"
+              - name: "StartHour"
                 value: 15
-              - name: "startMinute"
+              - name: "StartMinute"
                 value: 16
-              - name: "endHour"
+              - name: "EndHour"
                 value: 18
-              - name: "endMinute"
+              - name: "EndMinute"
                 value: 60
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Create Week Day schedule with start hour later that end hour"
       command: "SetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "daysMask"
+              - name: "DaysMask"
                 value: 1
-              - name: "startHour"
+              - name: "StartHour"
                 value: 19
-              - name: "startMinute"
+              - name: "StartMinute"
                 value: 16
-              - name: "endHour"
+              - name: "EndHour"
                 value: 18
-              - name: "endMinute"
+              - name: "EndMinute"
                 value: 00
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label:
           "Create Week Day schedule with start minute later that end minute when
@@ -363,38 +347,38 @@ tests:
       command: "SetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "daysMask"
+              - name: "DaysMask"
                 value: 1
-              - name: "startHour"
+              - name: "StartHour"
                 value: 15
-              - name: "startMinute"
+              - name: "StartMinute"
                 value: 50
-              - name: "endHour"
+              - name: "EndHour"
                 value: 15
-              - name: "endMinute"
+              - name: "EndMinute"
                 value: 49
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Make sure that previous operations did not create a schedule"
       command: "GetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x8B
 
     #
@@ -404,89 +388,85 @@ tests:
       command: "GetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x85
 
     - label: "Get Week Day schedule with out-of-bounds index"
       command: "GetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
-                value:
-                    static_cast<uint8_t>(NumberOfWeekDaySchedulesSupportedPerUser
-                    + 1)
-              - name: "userIndex"
+              - name: "WeekDayIndex"
+                value: NumberOfWeekDaySchedulesSupportedPerUserValue + 1
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "weekDayIndex"
-                value:
-                    static_cast<uint8_t>(NumberOfWeekDaySchedulesSupportedPerUser
-                    + 1)
-              - name: "userIndex"
+              - name: "WeekDayIndex"
+                value: NumberOfWeekDaySchedulesSupportedPerUserValue + 1
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x85
 
     - label: "Get Week Day schedule with 0 user index"
       command: "GetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 0
       response:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 0
-              - name: "status"
+              - name: "Status"
                 value: 0x85
 
     - label: "Get Week Day schedule with out-of-bounds user index"
       command: "GetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
-                value: static_cast<uint8_t>(NumberOfTotalUsersSupported + 1)
+              - name: "UserIndex"
+                value: NumberOfTotalUsersSupportedValue + 1
       response:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
-                value: static_cast<uint8_t>(NumberOfTotalUsersSupported + 1)
-              - name: "status"
+              - name: "UserIndex"
+                value: NumberOfTotalUsersSupportedValue + 1
+              - name: "Status"
                 value: 0x85
 
     - label: "Get Week Day schedule with non-existing user index"
       command: "GetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 2
       response:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 2
-              - name: "status"
+              - name: "Status"
                 value: 0x8B
 
     #
@@ -496,280 +476,413 @@ tests:
       command: "SetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "localStartTime"
+              - name: "LocalStartTime"
                 value: 12345
-              - name: "localEndTime"
+              - name: "LocalEndTime"
                 value: 12345689
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Create Year Day schedule with out-of-bounds index"
       command: "SetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
-                value:
-                    static_cast<uint8_t>(NumberOfYearDaySchedulesSupportedPerUser
-                    + 1)
-              - name: "userIndex"
+              - name: "YearDayIndex"
+                value: NumberOfYearDaySchedulesSupportedPerUserValue + 1
+              - name: "UserIndex"
                 value: 1
-              - name: "localStartTime"
+              - name: "LocalStartTime"
                 value: 12345
-              - name: "localEndTime"
+              - name: "LocalEndTime"
                 value: 12345689
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Create Year Day schedule with 0 user index"
       command: "SetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 0
-              - name: "localStartTime"
+              - name: "LocalStartTime"
                 value: 12345
-              - name: "localEndTime"
+              - name: "LocalEndTime"
                 value: 12345689
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Create Year Day schedule with out-of-bounds user index"
       command: "SetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
-                value: static_cast<uint8_t>(NumberOfTotalUsersSupported + 1)
-              - name: "localStartTime"
+              - name: "UserIndex"
+                value: NumberOfTotalUsersSupportedValue + 1
+              - name: "LocalStartTime"
                 value: 12345
-              - name: "localEndTime"
+              - name: "LocalEndTime"
                 value: 12345689
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Create Year Day schedule for non-existing user"
       command: "SetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 2
-              - name: "localStartTime"
+              - name: "LocalStartTime"
                 value: 12345
-              - name: "localEndTime"
+              - name: "LocalEndTime"
                 value: 12345689
       response:
-          error: NOT_FOUND
+          error: FAILURE
 
     - label: "Create Year Day schedule with start hour later that end hour"
       command: "SetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "localStartTime"
+              - name: "LocalStartTime"
                 value: 12345689
-              - name: "localEndTime"
+              - name: "LocalEndTime"
                 value: 12345688
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Make sure that previous operations did not create a schedule"
       command: "GetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x8B
+
     #
-    # Excercise GetWeekDay schedules with invalid parameters
+    # Excercise GetYearDay schedules with invalid parameters
     #
     - label: "Get Year Day schedule with 0 index"
       command: "GetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x85
 
     - label: "Get Year Day schedule with out-of-bounds index"
       command: "GetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
-                value:
-                    static_cast<uint8_t>(NumberOfYearDaySchedulesSupportedPerUser
-                    + 1)
-              - name: "userIndex"
+              - name: "YearDayIndex"
+                value: NumberOfYearDaySchedulesSupportedPerUserValue + 1
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "yearDayIndex"
-                value:
-                    static_cast<uint8_t>(NumberOfYearDaySchedulesSupportedPerUser
-                    + 1)
-              - name: "userIndex"
+              - name: "YearDayIndex"
+                value: NumberOfYearDaySchedulesSupportedPerUserValue + 1
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x85
 
     - label: "Get Year Day schedule with 0 user index"
       command: "GetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 0
       response:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 0
-              - name: "status"
+              - name: "Status"
                 value: 0x85
 
     - label: "Get Year Day schedule with out-of-bounds user index"
       command: "GetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
-                value: static_cast<uint8_t>(NumberOfTotalUsersSupported + 1)
+              - name: "UserIndex"
+                value: NumberOfTotalUsersSupportedValue + 1
       response:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
-                value: static_cast<uint8_t>(NumberOfTotalUsersSupported + 1)
-              - name: "status"
+              - name: "UserIndex"
+                value: NumberOfTotalUsersSupportedValue + 1
+              - name: "Status"
                 value: 0x85
 
     - label: "Get Year Day schedule with non-existing user index"
       command: "GetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 2
       response:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 2
-              - name: "status"
+              - name: "Status"
                 value: 0x8B
+
+    #
+    # Excercise Set Holiday schedules with invalid parameters
+    #
+    - label: "Create Holiday schedule with 0 index"
+      command: "SetHolidaySchedule"
+      arguments:
+          values:
+              - name: "HolidayIndex"
+                value: 0
+              - name: "LocalStartTime"
+                value: 12345
+              - name: "LocalEndTime"
+                value: 12345689
+              - name: "OperatingMode"
+                value: 0
+      response:
+          error: INVALID_COMMAND
+
+    - label: "Create Holiday schedule with out-of-bounds index"
+      command: "SetHolidaySchedule"
+      arguments:
+          values:
+              - name: "HolidayIndex"
+                value: NumberOfHolidaySchedulesSupportedValue + 1
+              - name: "LocalStartTime"
+                value: 12345
+              - name: "LocalEndTime"
+                value: 12345689
+              - name: "OperatingMode"
+                value: 0
+      response:
+          error: INVALID_COMMAND
+
+    - label: "Create Holiday schedule with start hour later that end hour"
+      command: "SetHolidaySchedule"
+      arguments:
+          values:
+              - name: "HolidayIndex"
+                value: 1
+              - name: "LocalStartTime"
+                value: 12345689
+              - name: "LocalEndTime"
+                value: 12345688
+              - name: "OperatingMode"
+                value: 0
+      response:
+          error: INVALID_COMMAND
+
+    - label: "Create Holiday schedule with invalid operating mode"
+      command: "SetHolidaySchedule"
+      arguments:
+          values:
+              - name: "HolidayIndex"
+                value: 1
+              - name: "LocalStartTime"
+                value: 12345
+              - name: "LocalEndTime"
+                value: 12345689
+              - name: "OperatingMode"
+                value: 5
+      response:
+          error: INVALID_COMMAND
+
+    - label: "Make sure that previous operations did not create a schedule"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "HolidayIndex"
+                value: 1
+      response:
+          values:
+              - name: "HolidayIndex"
+                value: 1
+              - name: "Status"
+                value: 0x8B
+
+    #
+    # Excercise Get Holiday schedules with invalid parameters
+    #
+    - label: "Get Holiday schedule with 0 index"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "HolidayIndex"
+                value: 0
+      response:
+          values:
+              - name: "HolidayIndex"
+                value: 0
+              - name: "Status"
+                value: 0x85
+
+    - label: "Get Holiday schedule with out-of-bounds index"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "HolidayIndex"
+                value: NumberOfHolidaySchedulesSupportedValue + 1
+      response:
+          values:
+              - name: "HolidayIndex"
+                value: NumberOfHolidaySchedulesSupportedValue + 1
+              - name: "Status"
+                value: 0x85
+
+    # Verify that schedule creation works
+    - label: "Create Holiday schedule with valid parameters"
+      command: "SetHolidaySchedule"
+      arguments:
+          values:
+              - name: "HolidayIndex"
+                value: 1
+              - name: "LocalStartTime"
+                value: 12345
+              - name: "LocalEndTime"
+                value: 12345689
+              - name: "OperatingMode"
+                value: 0
+
+    - label: "Verify created schedule"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "HolidayIndex"
+                value: 1
+      response:
+          values:
+              - name: "HolidayIndex"
+                value: 1
+              - name: "Status"
+                value: 0x0
+              - name: "LocalStartTime"
+                value: 12345
+              - name: "LocalEndTime"
+                value: 12345689
+              - name: "OperatingMode"
+                value: 0
 
     - label: "Create Week Day schedule with valid parameters"
       command: "SetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "daysMask"
+              - name: "DaysMask"
                 value: 0x01
-              - name: "startHour"
+              - name: "StartHour"
                 value: 15
-              - name: "startMinute"
+              - name: "StartMinute"
                 value: 16
-              - name: "endHour"
+              - name: "EndHour"
                 value: 18
-              - name: "endMinute"
+              - name: "EndMinute"
                 value: 00
 
     - label: "Verify created schedule"
       command: "GetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x0
-              - name: "daysMask"
+              - name: "DaysMask"
                 value: 0x01
-              - name: "startHour"
+              - name: "StartHour"
                 value: 15
-              - name: "startMinute"
+              - name: "StartMinute"
                 value: 16
-              - name: "endHour"
+              - name: "EndHour"
                 value: 18
-              - name: "endMinute"
+              - name: "EndMinute"
                 value: 00
 
     - label: "Create Year Day schedule with valid parameters"
       command: "SetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "localStartTime"
+              - name: "LocalStartTime"
                 value: 12345
-              - name: "localEndTime"
+              - name: "LocalEndTime"
                 value: 12345689
 
     - label: "Verify created schedule"
       command: "GetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x0
-              - name: "localStartTime"
+              - name: "LocalStartTime"
                 value: 12345
-              - name: "localEndTime"
+              - name: "LocalEndTime"
                 value: 12345689
 
     #
@@ -779,58 +892,123 @@ tests:
       command: "ClearWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Clear Week Day schedule with out-of-bounds index"
       command: "ClearWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
-                value:
-                    static_cast<uint8_t>(NumberOfWeekDaySchedulesSupportedPerUser
-                    + 1)
-              - name: "userIndex"
+              - name: "WeekDayIndex"
+                value: NumberOfWeekDaySchedulesSupportedPerUserValue + 1
+              - name: "UserIndex"
                 value: 1
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Clear Week Day schedule with 0 user index"
       command: "ClearWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 0
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Clear Week Day schedule with out-of-bounds user index"
       command: "ClearWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
-                value: static_cast<uint8_t>(NumberOfTotalUsersSupported + 1)
+              - name: "UserIndex"
+                value: NumberOfTotalUsersSupportedValue + 1
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Clear Week Day schedule with non-existing user"
       command: "ClearWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 2
       response:
-          error: NOT_FOUND
+          error: FAILURE
+
+    - label: "Make sure that week day schedule was not deleted"
+      command: "GetWeekDaySchedule"
+      arguments:
+          values:
+              - name: "WeekDayIndex"
+                value: 1
+              - name: "UserIndex"
+                value: 1
+      response:
+          values:
+              - name: "WeekDayIndex"
+                value: 1
+              - name: "UserIndex"
+                value: 1
+              - name: "Status"
+                value: 0x0
+              - name: "DaysMask"
+                value: 0x01
+              - name: "StartHour"
+                value: 15
+              - name: "StartMinute"
+                value: 16
+              - name: "EndHour"
+                value: 18
+              - name: "EndMinute"
+                value: 00
+
+    - label: "Make sure that year day schedule was not deleted"
+      command: "GetYearDaySchedule"
+      arguments:
+          values:
+              - name: "YearDayIndex"
+                value: 1
+              - name: "UserIndex"
+                value: 1
+      response:
+          values:
+              - name: "YearDayIndex"
+                value: 1
+              - name: "UserIndex"
+                value: 1
+              - name: "Status"
+                value: 0x0
+              - name: "LocalStartTime"
+                value: 12345
+              - name: "LocalEndTime"
+                value: 12345689
+
+    - label: "Make sure that holiday schedule was not deleted"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "HolidayIndex"
+                value: 1
+      response:
+          values:
+              - name: "HolidayIndex"
+                value: 1
+              - name: "Status"
+                value: 0x0
+              - name: "LocalStartTime"
+                value: 12345
+              - name: "LocalEndTime"
+                value: 12345689
+              - name: "OperatingMode"
+                value: 0
 
     #
     # Excercise ClearYearDay schedules with invalid parameters
@@ -839,387 +1017,561 @@ tests:
       command: "ClearYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Clear Year Day schedule with out-of-bounds index"
       command: "ClearYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
-                value:
-                    static_cast<uint8_t>(NumberOfYearDaySchedulesSupportedPerUser
-                    + 1)
-              - name: "userIndex"
+              - name: "YearDayIndex"
+                value: NumberOfYearDaySchedulesSupportedPerUserValue + 1
+              - name: "UserIndex"
                 value: 1
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Clear Year Day schedule with 0 user index"
       command: "ClearYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 0
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Clear Year Day schedule with out-of-bounds user index"
       command: "ClearYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
-                value: static_cast<uint8_t>(NumberOfTotalUsersSupported + 1)
+              - name: "UserIndex"
+                value: NumberOfTotalUsersSupportedValue + 1
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Clear Year Day schedule with non-existing user"
       command: "ClearYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 2
       response:
-          error: NOT_FOUND
+          error: FAILURE
 
     - label: "Make sure that week day schedule was not deleted"
       command: "GetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x0
-              - name: "daysMask"
+              - name: "DaysMask"
                 value: 0x01
-              - name: "startHour"
+              - name: "StartHour"
                 value: 15
-              - name: "startMinute"
+              - name: "StartMinute"
                 value: 16
-              - name: "endHour"
+              - name: "EndHour"
                 value: 18
-              - name: "endMinute"
+              - name: "EndMinute"
                 value: 00
 
     - label: "Make sure that year day schedule was not deleted"
       command: "GetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x0
-              - name: "localStartTime"
+              - name: "LocalStartTime"
                 value: 12345
-              - name: "localEndTime"
+              - name: "LocalEndTime"
                 value: 12345689
 
+    - label: "Make sure that holiday schedule was not deleted"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "HolidayIndex"
+                value: 1
+      response:
+          values:
+              - name: "HolidayIndex"
+                value: 1
+              - name: "Status"
+                value: 0x0
+              - name: "LocalStartTime"
+                value: 12345
+              - name: "LocalEndTime"
+                value: 12345689
+              - name: "OperatingMode"
+                value: 0
+
+    # Excercise ClearHolidaySchedule with invalid parameters
+    - label: "Clear Holiday schedule with 0 index"
+      command: "ClearHolidaySchedule"
+      arguments:
+          values:
+              - name: "HolidayIndex"
+                value: 0
+      response:
+          error: INVALID_COMMAND
+
+    - label: "Clear Holiday schedule with out-of-bounds index"
+      command: "ClearHolidaySchedule"
+      arguments:
+          values:
+              - name: "HolidayIndex"
+                value: NumberOfYearDaySchedulesSupportedPerUserValue + 1
+      response:
+          error: INVALID_COMMAND
+
+    - label: "Make sure that week day schedule was not deleted"
+      command: "GetWeekDaySchedule"
+      arguments:
+          values:
+              - name: "WeekDayIndex"
+                value: 1
+              - name: "UserIndex"
+                value: 1
+      response:
+          values:
+              - name: "WeekDayIndex"
+                value: 1
+              - name: "UserIndex"
+                value: 1
+              - name: "Status"
+                value: 0x0
+              - name: "DaysMask"
+                value: 0x01
+              - name: "StartHour"
+                value: 15
+              - name: "StartMinute"
+                value: 16
+              - name: "EndHour"
+                value: 18
+              - name: "EndMinute"
+                value: 00
+
+    - label: "Make sure that year day schedule was not deleted"
+      command: "GetYearDaySchedule"
+      arguments:
+          values:
+              - name: "YearDayIndex"
+                value: 1
+              - name: "UserIndex"
+                value: 1
+      response:
+          values:
+              - name: "YearDayIndex"
+                value: 1
+              - name: "UserIndex"
+                value: 1
+              - name: "Status"
+                value: 0x0
+              - name: "LocalStartTime"
+                value: 12345
+              - name: "LocalEndTime"
+                value: 12345689
+
+    - label: "Make sure that holiday schedule was not deleted"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "HolidayIndex"
+                value: 1
+      response:
+          values:
+              - name: "HolidayIndex"
+                value: 1
+              - name: "Status"
+                value: 0x0
+              - name: "LocalStartTime"
+                value: 12345
+              - name: "LocalEndTime"
+                value: 12345689
+              - name: "OperatingMode"
+                value: 0
+
+    # Verify that clearing schedules works
     - label: "Create another Week Day schedule with valid parameters"
       command: "SetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 2
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "daysMask"
+              - name: "DaysMask"
                 value: 0x02
-              - name: "startHour"
+              - name: "StartHour"
                 value: 0
-              - name: "startMinute"
+              - name: "StartMinute"
                 value: 0
-              - name: "endHour"
+              - name: "EndHour"
                 value: 23
-              - name: "endMinute"
+              - name: "EndMinute"
                 value: 59
 
     - label: "Verify created week day schedule"
       command: "GetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 2
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 2
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x0
-              - name: "daysMask"
+              - name: "DaysMask"
                 value: 0x02
-              - name: "startHour"
+              - name: "StartHour"
                 value: 0
-              - name: "startMinute"
+              - name: "StartMinute"
                 value: 0
-              - name: "endHour"
+              - name: "EndHour"
                 value: 23
-              - name: "endMinute"
+              - name: "EndMinute"
                 value: 59
 
     - label: "Create another Year Day schedule with valid parameters"
       command: "SetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 2
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "localStartTime"
+              - name: "LocalStartTime"
                 value: 9000
-              - name: "localEndTime"
+              - name: "LocalEndTime"
                 value: 888888888
 
     - label: "Verify created year day schedule"
       command: "GetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 2
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 2
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x0
-              - name: "localStartTime"
+              - name: "LocalStartTime"
                 value: 9000
-              - name: "localEndTime"
+              - name: "LocalEndTime"
                 value: 888888888
+
+    - label: "Create another Holiday schedule with valid parameters"
+      command: "SetHolidaySchedule"
+      arguments:
+          values:
+              - name: "HolidayIndex"
+                value: 2
+              - name: "LocalStartTime"
+                value: 123456
+              - name: "LocalEndTime"
+                value: 1234567
+              - name: "OperatingMode"
+                value: 1
+
+    - label: "Verify created holiday schedule"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "HolidayIndex"
+                value: 2
+      response:
+          values:
+              - name: "HolidayIndex"
+                value: 2
+              - name: "Status"
+                value: 0x0
+              - name: "LocalStartTime"
+                value: 123456
+              - name: "LocalEndTime"
+                value: 1234567
+              - name: "OperatingMode"
+                value: 1
 
     - label: "Clear a single week day schedule for the first user"
       command: "ClearWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
 
     - label: "Verify cleared week day schedule"
       command: "GetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x8B
 
     - label: "Clear all remaining week day schedules for the first user"
       command: "ClearWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 0xFE
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
 
     - label: "Verify cleared week schedule"
       command: "GetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 2
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 2
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x8B
 
     - label: "Make sure that first year day schedule was not deleted"
       command: "GetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x0
-              - name: "localStartTime"
+              - name: "LocalStartTime"
                 value: 12345
-              - name: "localEndTime"
+              - name: "LocalEndTime"
                 value: 12345689
 
     - label: "Make sure that second year day schedule was not deleted"
       command: "GetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 2
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 2
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x0
-              - name: "localStartTime"
+              - name: "LocalStartTime"
                 value: 9000
-              - name: "localEndTime"
+              - name: "LocalEndTime"
                 value: 888888888
+
+    - label: "Make sure that first holiday schedule was not deleted"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "HolidayIndex"
+                value: 1
+      response:
+          values:
+              - name: "HolidayIndex"
+                value: 1
+              - name: "Status"
+                value: 0x0
+              - name: "LocalStartTime"
+                value: 12345
+              - name: "LocalEndTime"
+                value: 12345689
+              - name: "OperatingMode"
+                value: 0
+
+    - label: "Make sure that second holiday schedule was not deleted"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "HolidayIndex"
+                value: 2
+      response:
+          values:
+              - name: "HolidayIndex"
+                value: 2
+              - name: "Status"
+                value: 0x0
+              - name: "LocalStartTime"
+                value: 123456
+              - name: "LocalEndTime"
+                value: 1234567
+              - name: "OperatingMode"
+                value: 1
 
     # We create it to test that clearing year day schedules does not delete week day schedules
     - label: "Create another Week Day schedule with valid parameters"
       command: "SetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "daysMask"
+              - name: "DaysMask"
                 value: 0x02
-              - name: "startHour"
+              - name: "StartHour"
                 value: 0
-              - name: "startMinute"
+              - name: "StartMinute"
                 value: 0
-              - name: "endHour"
+              - name: "EndHour"
                 value: 23
-              - name: "endMinute"
+              - name: "EndMinute"
                 value: 59
 
     - label: "Clear a single year day schedule for the first user"
       command: "ClearYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
 
     - label: "Verify cleared year day schedule"
       command: "GetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x8B
 
     - label: "Clear all remaining year schedules for the first user"
       command: "ClearYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 0xFE
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
 
     - label: "Verify that second year day schedule was cleared"
       command: "GetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 2
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 2
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x8B
 
     - label: "Verify created week day schedule"
       command: "GetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x0
-              - name: "daysMask"
+              - name: "DaysMask"
                 value: 0x02
-              - name: "startHour"
+              - name: "StartHour"
                 value: 0
-              - name: "startMinute"
+              - name: "StartMinute"
                 value: 0
-              - name: "endHour"
+              - name: "EndHour"
                 value: 23
-              - name: "endMinute"
+              - name: "EndMinute"
                 value: 59
 
     - label: "Clear all remaining week day schedules for the first user"
       command: "ClearWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 0xFE
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
 
     - label:
@@ -1228,253 +1580,596 @@ tests:
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "operationType"
+              - name: "OperationType"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 2
-              - name: "userName"
+              - name: "UserName"
                 value: null
-              - name: "userUniqueId"
+              - name: "UserUniqueID"
                 value: null
-              - name: "userStatus"
+              - name: "UserStatus"
                 value: null
-              - name: "userType"
+              - name: "UserType"
                 value: null
-              - name: "credentialRule"
+              - name: "CredentialRule"
                 value: null
 
     - label: "Create Week Day schedule with valid parameters for first user"
       command: "SetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "daysMask"
+              - name: "DaysMask"
                 value: 0x01
-              - name: "startHour"
+              - name: "StartHour"
                 value: 0
-              - name: "startMinute"
+              - name: "StartMinute"
                 value: 0
-              - name: "endHour"
+              - name: "EndHour"
                 value: 23
-              - name: "endMinute"
+              - name: "EndMinute"
                 value: 59
 
     - label: "Verify created week day schedule for first user"
       command: "GetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x0
-              - name: "daysMask"
+              - name: "DaysMask"
                 value: 0x01
-              - name: "startHour"
+              - name: "StartHour"
                 value: 0
-              - name: "startMinute"
+              - name: "StartMinute"
                 value: 0
-              - name: "endHour"
+              - name: "EndHour"
                 value: 23
-              - name: "endMinute"
+              - name: "EndMinute"
                 value: 59
 
     - label: "Create Year Day schedule for first user"
       command: "SetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 4
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "localStartTime"
+              - name: "LocalStartTime"
                 value: 9000
-              - name: "localEndTime"
+              - name: "LocalEndTime"
                 value: 888888888
 
     - label: "Verify created year day schedule for first"
       command: "GetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 4
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 4
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x0
-              - name: "localStartTime"
+              - name: "LocalStartTime"
                 value: 9000
-              - name: "localEndTime"
+              - name: "LocalEndTime"
                 value: 888888888
 
     - label: "Create Week Day schedule with valid parameters for second user"
       command: "SetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 4
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 2
-              - name: "daysMask"
-                value: 0x40
-              - name: "startHour"
+              - name: "DaysMask"
+                value: 0x49 # (Sunday, Wednesday and Saturday)
+              - name: "StartHour"
                 value: 23
-              - name: "startMinute"
+              - name: "StartMinute"
                 value: 0
-              - name: "endHour"
+              - name: "EndHour"
                 value: 23
-              - name: "endMinute"
+              - name: "EndMinute"
                 value: 59
 
     - label: "Verify created week day schedule for first user"
       command: "GetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 4
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 2
       response:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 4
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 2
-              - name: "status"
+              - name: "Status"
                 value: 0x0
-              - name: "daysMask"
-                value: 0x40
-              - name: "startHour"
+              - name: "DaysMask"
+                value: 0x49
+              - name: "StartHour"
                 value: 23
-              - name: "startMinute"
+              - name: "StartMinute"
                 value: 0
-              - name: "endHour"
+              - name: "EndHour"
                 value: 23
-              - name: "endMinute"
+              - name: "EndMinute"
                 value: 59
 
     - label: "Create Year Day schedule for second user"
       command: "SetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "localStartTime"
+              - name: "LocalStartTime"
                 value: 55555
-              - name: "localEndTime"
+              - name: "LocalEndTime"
                 value: 7777777
 
     - label: "Verify created year day schedule for first"
       command: "GetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x0
-              - name: "localStartTime"
+              - name: "LocalStartTime"
                 value: 55555
-              - name: "localEndTime"
+              - name: "LocalEndTime"
                 value: 7777777
 
-    - label: "Cleanup"
+    - label: "Cleanup the user"
       command: "ClearUser"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 0xFFFE
 
     - label: "Make sure clearing first user also cleared week day schedules"
       command: "GetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x8B
 
     - label: "Make sure clearing first user also cleared year day schedules"
       command: "GetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 4
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 4
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "status"
+              - name: "Status"
                 value: 0x8B
 
     - label: "Make sure clearing second user also cleared week day schedules"
       command: "GetWeekDaySchedule"
       arguments:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 4
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 2
       response:
           values:
-              - name: "weekDayIndex"
+              - name: "WeekDayIndex"
                 value: 4
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 2
-              - name: "status"
+              - name: "Status"
                 value: 0x8B
 
     - label: "Make sure clearing second user also cleared year day schedules"
       command: "GetYearDaySchedule"
       arguments:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 2
       response:
           values:
-              - name: "yearDayIndex"
+              - name: "YearDayIndex"
                 value: 1
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 2
-              - name: "status"
+              - name: "Status"
                 value: 0x8B
+
+    # Make sure that all the manipulations did not affect the holiday schedules
+    - label: "Make sure that first holiday schedule was not deleted"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "HolidayIndex"
+                value: 1
+      response:
+          values:
+              - name: "HolidayIndex"
+                value: 1
+              - name: "Status"
+                value: 0x0
+              - name: "LocalStartTime"
+                value: 12345
+              - name: "LocalEndTime"
+                value: 12345689
+              - name: "OperatingMode"
+                value: 0
+
+    - label: "Make sure that second holiday schedule was not deleted"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "HolidayIndex"
+                value: 2
+      response:
+          values:
+              - name: "HolidayIndex"
+                value: 2
+              - name: "Status"
+                value: 0x0
+              - name: "LocalStartTime"
+                value: 123456
+              - name: "LocalEndTime"
+                value: 1234567
+              - name: "OperatingMode"
+                value: 1
+
+    - label: "Create another Holiday schedule at the last slot"
+      command: "SetHolidaySchedule"
+      arguments:
+          values:
+              - name: "HolidayIndex"
+                value: NumberOfHolidaySchedulesSupportedValue
+              - name: "LocalStartTime"
+                value: 1
+              - name: "LocalEndTime"
+                value: 100
+              - name: "OperatingMode"
+                value: 4
+
+    - label: "Verify Created Holiday Schedule"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "HolidayIndex"
+                value: NumberOfHolidaySchedulesSupportedValue
+      response:
+          values:
+              - name: "HolidayIndex"
+                value: NumberOfHolidaySchedulesSupportedValue
+              - name: "Status"
+                value: 0x0
+              - name: "LocalStartTime"
+                value: 1
+              - name: "LocalEndTime"
+                value: 100
+              - name: "OperatingMode"
+                value: 4
+
+    # Those steps are required to validate that clearing holiday schedules does not delete weekday and year day schedules
+    - label: "Create new PIN credential and schedule user"
+      command: "SetCredential"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "OperationType"
+                value: 0
+              - name: "Credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+              - name: "CredentialData"
+                value: "123456"
+              - name: "UserIndex"
+                value: null
+              - name: "UserStatus"
+                value: null
+              - name: "UserType"
+                value: null
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "UserIndex"
+                value: 1
+              - name: "NextCredentialIndex"
+                value: 2
+
+    - label: "Create Week Day schedule for first user"
+      command: "SetWeekDaySchedule"
+      arguments:
+          values:
+              - name: "WeekDayIndex"
+                value: 1
+              - name: "UserIndex"
+                value: 1
+              - name: "DaysMask"
+                value: 0x01
+              - name: "StartHour"
+                value: 0
+              - name: "StartMinute"
+                value: 0
+              - name: "EndHour"
+                value: 23
+              - name: "EndMinute"
+                value: 59
+
+    - label: "Create Year Day schedule for first user"
+      command: "SetYearDaySchedule"
+      arguments:
+          values:
+              - name: "YearDayIndex"
+                value: 1
+              - name: "UserIndex"
+                value: 1
+              - name: "LocalStartTime"
+                value: 9000
+              - name: "LocalEndTime"
+                value: 888888888
+
+    # Start clearing holiday schedules
+    - label: "Clear a single holiday schedule"
+      command: "ClearHolidaySchedule"
+      arguments:
+          values:
+              - name: "HolidayIndex"
+                value: 2
+
+    - label: "Make sure that first holiday schedule was not deleted"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "HolidayIndex"
+                value: 1
+      response:
+          values:
+              - name: "HolidayIndex"
+                value: 1
+              - name: "Status"
+                value: 0x0
+              - name: "LocalStartTime"
+                value: 12345
+              - name: "LocalEndTime"
+                value: 12345689
+              - name: "OperatingMode"
+                value: 0
+
+    - label: "Make sure that second holiday schedule was deleted"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "HolidayIndex"
+                value: 2
+      response:
+          values:
+              - name: "HolidayIndex"
+                value: 2
+              - name: "Status"
+                value: 0x8B
+
+    - label: "Make sure that third holiday schedule was not deleted"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "HolidayIndex"
+                value: NumberOfHolidaySchedulesSupportedValue
+      response:
+          values:
+              - name: "HolidayIndex"
+                value: NumberOfHolidaySchedulesSupportedValue
+              - name: "Status"
+                value: 0x0
+              - name: "LocalStartTime"
+                value: 1
+              - name: "LocalEndTime"
+                value: 100
+              - name: "OperatingMode"
+                value: 4
+
+    - label:
+          "Make sure clearing holiday schedule did not clear week day schedule"
+      command: "GetWeekDaySchedule"
+      arguments:
+          values:
+              - name: "WeekDayIndex"
+                value: 1
+              - name: "UserIndex"
+                value: 1
+      response:
+          values:
+              - name: "WeekDayIndex"
+                value: 1
+              - name: "UserIndex"
+                value: 1
+              - name: "Status"
+                value: 0x0
+              - name: "DaysMask"
+                value: 0x01
+              - name: "StartHour"
+                value: 0
+              - name: "StartMinute"
+                value: 0
+              - name: "EndHour"
+                value: 23
+              - name: "EndMinute"
+                value: 59
+
+    - label:
+          "Make sure clearing holiday schedule did not clear year day schedule"
+      command: "GetYearDaySchedule"
+      arguments:
+          values:
+              - name: "YearDayIndex"
+                value: 1
+              - name: "UserIndex"
+                value: 1
+      response:
+          values:
+              - name: "YearDayIndex"
+                value: 1
+              - name: "UserIndex"
+                value: 1
+              - name: "Status"
+                value: 0x0
+              - name: "LocalStartTime"
+                value: 9000
+              - name: "LocalEndTime"
+                value: 888888888
+
+    - label: "Clear all remaining holiday schedules"
+      command: "ClearHolidaySchedule"
+      arguments:
+          values:
+              - name: "HolidayIndex"
+                value: 0xFE
+
+    - label: "Make sure that first holiday is still deleted"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "HolidayIndex"
+                value: 1
+      response:
+          values:
+              - name: "HolidayIndex"
+                value: 1
+              - name: "Status"
+                value: 0x8B
+
+    - label: "Make sure that second holiday schedule was deleted"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "HolidayIndex"
+                value: 2
+      response:
+          values:
+              - name: "HolidayIndex"
+                value: 2
+              - name: "Status"
+                value: 0x8B
+
+    - label: "Make sure that third holiday schedule was not deleted"
+      command: "GetHolidaySchedule"
+      arguments:
+          values:
+              - name: "HolidayIndex"
+                value: NumberOfHolidaySchedulesSupportedValue
+      response:
+          values:
+              - name: "HolidayIndex"
+                value: NumberOfHolidaySchedulesSupportedValue
+              - name: "Status"
+                value: 0x8B
+
+    - label:
+          "Make sure clearing holiday schedule did not clear week day schedule"
+      command: "GetWeekDaySchedule"
+      arguments:
+          values:
+              - name: "WeekDayIndex"
+                value: 1
+              - name: "UserIndex"
+                value: 1
+      response:
+          values:
+              - name: "WeekDayIndex"
+                value: 1
+              - name: "UserIndex"
+                value: 1
+              - name: "Status"
+                value: 0x0
+              - name: "DaysMask"
+                value: 0x01
+              - name: "StartHour"
+                value: 0
+              - name: "StartMinute"
+                value: 0
+              - name: "EndHour"
+                value: 23
+              - name: "EndMinute"
+                value: 59
+
+    - label:
+          "Make sure clearing holiday schedule did not clear year day schedule"
+      command: "GetYearDaySchedule"
+      arguments:
+          values:
+              - name: "YearDayIndex"
+                value: 1
+              - name: "UserIndex"
+                value: 1
+      response:
+          values:
+              - name: "YearDayIndex"
+                value: 1
+              - name: "UserIndex"
+                value: 1
+              - name: "Status"
+                value: 0x0
+              - name: "LocalStartTime"
+                value: 9000
+              - name: "LocalEndTime"
+                value: 888888888
+
+    - label: "Final Cleanup"
+      command: "ClearUser"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "UserIndex"
+                value: 0xFFFE

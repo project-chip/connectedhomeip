@@ -7,6 +7,7 @@ get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../.. REALPATH)
 get_filename_component(MBED_COMMON ${CHIP_ROOT}/examples/platform/mbed REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 get_filename_component(ALL_CLUSTERS_COMMON ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common REALPATH)
+get_filename_component(ENERGY_MANAGEMENT_COMMON ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/ REALPATH)
 get_filename_component(NLIO_ROOT ${CHIP_ROOT}/third_party/nlio/repo/include REALPATH)
 
 configure_file(
@@ -49,6 +50,7 @@ target_include_directories(${APP_TARGET} PRIVATE
                            main/include/
                            ${MBED_COMMON}/util/include
                            ${ALL_CLUSTERS_COMMON}/include
+                           ${ENERGY_MANAGEMENT_COMMON}/include
                            ${GEN_DIR}/app-common
                            ${GEN_DIR}/all-clusters-app
                            ${NLIO_ROOT}
@@ -57,12 +59,25 @@ target_include_directories(${APP_TARGET} PRIVATE
 target_sources(${APP_TARGET} PRIVATE
                main/main.cpp
                main/AppTask.cpp
-               ${GEN_DIR}/all-clusters-app/zap-generated/callback-stub.cpp
-               ${GEN_DIR}/all-clusters-app/zap-generated/IMClusterCommandHandler.cpp
                ${MBED_COMMON}/util/LEDWidget.cpp
                ${MBED_COMMON}/util/DFUManager.cpp
                ${ALL_CLUSTERS_COMMON}/src/bridged-actions-stub.cpp
+               ${ALL_CLUSTERS_COMMON}/src/air-quality-instance.cpp
+               ${ALL_CLUSTERS_COMMON}/src/concentration-measurement-instances.cpp
+               ${ALL_CLUSTERS_COMMON}/src/fan-stub.cpp
+               ${ALL_CLUSTERS_COMMON}/src/device-energy-management-stub.cpp
+               ${ALL_CLUSTERS_COMMON}/src/energy-evse-stub.cpp
+               ${ALL_CLUSTERS_COMMON}/src/oven-modes.cpp
+               ${ALL_CLUSTERS_COMMON}/src/resource-monitoring-delegates.cpp
+               ${ALL_CLUSTERS_COMMON}/src/smco-stub.cpp
                ${ALL_CLUSTERS_COMMON}/src/static-supported-modes-manager.cpp
+               ${ALL_CLUSTERS_COMMON}/src/static-supported-temperature-levels.cpp
+               ${ENERGY_MANAGEMENT_COMMON}/src/ElectricalPowerMeasurementDelegate.cpp
+               ${ENERGY_MANAGEMENT_COMMON}/src/EnergyEvseDelegateImpl.cpp
+               ${ENERGY_MANAGEMENT_COMMON}/src/EnergyEvseManager.cpp
+               ${ENERGY_MANAGEMENT_COMMON}/src/DeviceEnergyManagementDelegateImpl.cpp
+               ${ENERGY_MANAGEMENT_COMMON}/src/DeviceEnergyManagementManager.cpp
+
 )
 
 chip_configure_data_model(${APP_TARGET}

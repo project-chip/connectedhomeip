@@ -14,9 +14,11 @@
 #    limitations under the License.
 #
 
-import chip.native
 import ctypes
-from chip.discovery.types import DiscoverSuccessCallback_t, DiscoverFailureCallback_t
+
+import chip.native
+from chip.discovery.types import DiscoverFailureCallback_t, DiscoverSuccessCallback_t
+from chip.native import PyChipError
 
 
 def _GetDiscoveryLibraryHandle() -> ctypes.CDLL:
@@ -33,7 +35,7 @@ def _GetDiscoveryLibraryHandle() -> ctypes.CDLL:
     if not handle.pychip_discovery_resolve.argtypes:
         setter = chip.native.NativeLibraryHandleMethodArguments(handle)
 
-        setter.Set('pychip_discovery_resolve', ctypes.c_uint32,
+        setter.Set('pychip_discovery_resolve', PyChipError,
                    [ctypes.c_uint64, ctypes.c_uint64])
         setter.Set('pychip_discovery_set_callbacks', None, [
                    DiscoverSuccessCallback_t, DiscoverFailureCallback_t])

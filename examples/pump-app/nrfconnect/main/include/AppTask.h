@@ -25,7 +25,13 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#ifdef CONFIG_MCUMGR_SMP_BT
+#if CONFIG_CHIP_FACTORY_DATA
+#include <platform/nrfconnect/FactoryDataProvider.h>
+#else
+#include <platform/nrfconnect/DeviceInstanceInfoProviderImpl.h>
+#endif
+
+#ifdef CONFIG_MCUMGR_TRANSPORT_BT
 #include "DFUOverSMP.h"
 #endif
 
@@ -34,59 +40,43 @@ struct k_timer;
 class AppTask
 {
 public:
+    static AppTask & Instance(void)
+    {
+        static AppTask sAppTask;
+        return sAppTask;
+    };
     CHIP_ERROR StartApp();
 
-    void PostStartActionRequest(int32_t aActor, PumpManager::Action_t aAction);
-    void PostEvent(AppEvent * event);
-    void UpdateClusterState();
+    static void PostStartActionRequest(int32_t actor, PumpManager::Action_t action);
+    static void UpdateClusterState();
+    static void PostEvent(const AppEvent & event);
 
 private:
-    friend AppTask & GetAppTask(void);
-
     CHIP_ERROR Init();
 
-    static void ActionInitiated(PumpManager::Action_t aAction, int32_t aActor);
-    static void ActionCompleted(PumpManager::Action_t aAction, int32_t aActor);
+    static void CancelTimer();
+    static void StartTimer(uint32_t timeoutInMs);
 
-    void CancelTimer(void);
+    static void ActionInitiated(PumpManager::Action_t action, int32_t actor);
+    static void ActionCompleted(PumpManager::Action_t action, int32_t actor);
 
-    void DispatchEvent(AppEvent * event);
-
-    static void UpdateStatusLED();
-    static void LEDStateUpdateHandler(LEDWidget & ledWidget);
-    static void UpdateLedStateEventHandler(AppEvent * aEvent);
-    static void FunctionTimerEventHandler(AppEvent * aEvent);
-    static void FunctionHandler(AppEvent * aEvent);
-    static void StartThreadHandler(AppEvent * aEvent);
-    static void StartActionEventHandler(AppEvent * aEvent);
-    static void StartBLEAdvertisementHandler(AppEvent * aEvent);
+    static void DispatchEvent(const AppEvent & event);
+    static void FunctionTimerEventHandler(const AppEvent & event);
+    static void FunctionHandler(const AppEvent & event);
+    static void StartBLEAdvertisementHandler(const AppEvent & event);
+    static void UpdateLedStateEventHandler(const AppEvent & event);
+    static void StartActionEventHandler(const AppEvent & event);
 
     static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+    static void ButtonEventHandler(uint32_t buttonState, uint32_t hasChanged);
+    static void LEDStateUpdateHandler(LEDWidget & ledWidget);
+    static void FunctionTimerTimeoutCallback(k_timer * timer);
+    static void UpdateStatusLED();
 
-    static void ButtonEventHandler(uint32_t buttons_state, uint32_t has_changed);
-    static void TimerEventHandler(k_timer * timer);
-
-#ifdef CONFIG_MCUMGR_SMP_BT
-    static void RequestSMPAdvertisingStart(void);
-#endif
-
-    void StartTimer(uint32_t aTimeoutInMs);
-
-    enum Function_t
-    {
-        kFunction_NoneSelected   = 0,
-        kFunction_SoftwareUpdate = 0,
-        kFunction_FactoryReset,
-
-        kFunction_Invalid
-    };
-
-    Function_t mFunction      = kFunction_NoneSelected;
+    FunctionEvent mFunction   = FunctionEvent::NoneSelected;
     bool mFunctionTimerActive = false;
-    static AppTask sAppTask;
-};
 
-inline AppTask & GetAppTask(void)
-{
-    return AppTask::sAppTask;
-}
+#if CONFIG_CHIP_FACTORY_DATA
+    chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::InternalFlashFactoryData> mFactoryDataProvider;
+#endif
+};

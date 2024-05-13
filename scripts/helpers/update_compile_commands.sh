@@ -40,3 +40,6 @@ mv "$CHIP_ROOT/out/debug/compile_commands.json" "$CHIP_ROOT/out/debug/compile_co
 
 gn --root="$CHIP_ROOT" gen "$CHIP_ROOT/out/debug" --export-compile-commands=efr32_lock_app
 mv "$CHIP_ROOT/out/debug/compile_commands.json" "$CHIP_ROOT/out/debug/compile_commands.efr32.json"
+
+gn --root="$CHIP_ROOT" gen "$CHIP_ROOT/out/debug" --export-compile-commands=tizen_lighting_app
+mv "$CHIP_ROOT/out/debug/compile_commands.json" "$CHIP_ROOT/out/debug/compile_commands.tizen_arm.json"

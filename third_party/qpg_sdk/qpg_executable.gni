@@ -66,6 +66,11 @@ template("qpg_executable") {
   objcopy_image_format = "ihex"
   objcopy = "arm-none-eabi-objcopy"
 
+  defines = []
+  if (defined(invoker.defines)) {
+    defines += invoker.defines
+  }
+
   # Copy flashing dependencies to the output directory so that the output
   # is collectively self-contained; this allows flashing to work reliably
   # even if the build and flashing steps take place on different machines
@@ -97,7 +102,7 @@ template("qpg_executable") {
     gen_ota_header("$executable_target_name.ota") {
       ota_header_script_name = "${root_out_dir}/${executable_target_name}.ota"
       out_dir = rebase_path(root_out_dir, root_build_dir)
-      ota_header_generator = "${qpg_sdk_root}/Tools/ota/generate_ota_img.py"
+      ota_header_generator = "${qpg_sdk_root}/Tools/Ota/generate_ota_img.py"
 
       ota_header_options = [
         string_join("=",
@@ -115,7 +120,31 @@ template("qpg_executable") {
                       "--out_file",
                       "${out_dir}/${invoker.output_name}.ota",
                     ]),
+        string_join("=",
+                    [
+                      "--pem_file_path",
+                      rebase_path(qpg_sdk_root, root_build_dir) +
+                          "/Tools/Ota/example_private_key.pem.example",
+                    ]),
+        "--pem_password=test1234",
+        "--sign",
       ]
+
+      # Use build-time overrules in OTA header creation
+      # Normally taken from CHIPProjectConfig.h by scripting
+      if (matter_device_vid != "") {
+        ota_header_options += [ "-vid=${matter_device_vid}" ]
+      }
+      if (matter_device_pid != "") {
+        ota_header_options += [ "-pid=${matter_device_pid}" ]
+      }
+      if (matter_device_software_version != "") {
+        ota_header_options += [ "-vn=${matter_device_software_version}" ]
+      }
+      if (matter_device_software_version_string != "") {
+        ota_header_options +=
+            [ "-vs=\"${matter_device_software_version_string}\"" ]
+      }
       deps = [ ":$executable_target_name" ]
     }
   }

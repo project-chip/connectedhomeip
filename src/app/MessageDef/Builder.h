@@ -25,7 +25,7 @@
 
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -81,9 +81,13 @@ public:
     /**
      * Rollback the request state to the checkpointed TLVWriter
      *
-     * @param[in] aPoint A that captured the state via Checkpoint() at some point in the past
+     * @param[in] aPoint A writer that captured the state via Checkpoint() at some point in the past
      */
-    void Rollback(const chip::TLV::TLVWriter & aPoint) { *mpWriter = aPoint; }
+    void Rollback(const chip::TLV::TLVWriter & aPoint)
+    {
+        *mpWriter = aPoint;
+        ResetError();
+    }
 
     void EndOfContainer();
 

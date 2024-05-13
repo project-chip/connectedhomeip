@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,50 +24,57 @@
 
 #pragma once
 
+#include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/asn1/ASN1.h>
 #include <lib/asn1/ASN1Macros.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 
 namespace chip {
 namespace Credentials {
 
-static constexpr uint32_t kMaxProductIdsCountPerCD = 100;
-static constexpr uint32_t kCertificateIdLength     = 19;
+static constexpr uint32_t kMaxProductIdsCount        = 100;
+static constexpr uint32_t kMaxAuthorizedPAAListCount = 10;
+static constexpr uint32_t kCertificateIdLength       = 19;
 static constexpr uint32_t kCertificationElements_TLVEncodedMaxLength =
     TLV::EstimateStructOverhead(sizeof(uint16_t), // FormatVersion
                                 sizeof(uint16_t), // VendorId
                                 // ProductIds. Formally, the following extression should be used here:
-                                //     ( TLV::EstimateStructOverhead(sizeof(uint16_t)) * kMaxProductIdsCountPerCD ),
+                                //     ( TLV::EstimateStructOverhead(sizeof(uint16_t)) * kMaxProductIdsCount ),
                                 // Because exact structure of the elements of this array is known, more accurate estimate is used.
-                                (1 + sizeof(uint16_t)) * kMaxProductIdsCountPerCD,
-                                sizeof(uint32_t),     // DeviceTypeId
-                                kCertificateIdLength, // CertificateId
-                                sizeof(uint8_t),      // SecurityLevel
-                                sizeof(uint16_t),     // SecurityInformation
-                                sizeof(uint16_t),     // VersionNumber
-                                sizeof(uint8_t),      // CertificationType
-                                sizeof(uint16_t),     // DACOriginVendorId
-                                sizeof(uint16_t));    // DACOriginProductId
+                                (1 + sizeof(uint16_t)) * kMaxProductIdsCount,
+                                sizeof(uint32_t),                                         // DeviceTypeId
+                                kCertificateIdLength,                                     // CertificateId
+                                sizeof(uint8_t),                                          // SecurityLevel
+                                sizeof(uint16_t),                                         // SecurityInformation
+                                sizeof(uint16_t),                                         // VersionNumber
+                                sizeof(uint8_t),                                          // CertificationType
+                                sizeof(uint16_t),                                         // DACOriginVendorId
+                                sizeof(uint16_t),                                         // DACOriginProductId
+                                (2 + kKeyIdentifierLength) * kMaxAuthorizedPAAListCount); // AuthorizedPAAList
 static constexpr uint32_t kMaxCMSSignedCDMessage = 183 + kCertificationElements_TLVEncodedMaxLength;
 
 struct CertificationElements
 {
-    uint16_t FormatVersion;
-    uint16_t VendorId;
-    uint16_t ProductIds[kMaxProductIdsCountPerCD];
-    uint8_t ProductIdsCount;
-    uint32_t DeviceTypeId;
-    char CertificateId[kCertificateIdLength + 1];
-    uint8_t SecurityLevel;
-    uint16_t SecurityInformation;
-    uint16_t VersionNumber;
-    uint8_t CertificationType;
-    uint16_t DACOriginVendorId;
-    uint16_t DACOriginProductId;
-    bool DACOriginVIDandPIDPresent;
+    typedef uint8_t KeyId[kKeyIdentifierLength];
+
+    uint16_t FormatVersion                              = 0;
+    uint16_t VendorId                                   = VendorId::NotSpecified;
+    uint16_t ProductIds[kMaxProductIdsCount]            = { 0 };
+    uint8_t ProductIdsCount                             = 0;
+    uint32_t DeviceTypeId                               = 0;
+    char CertificateId[kCertificateIdLength + 1]        = { 0 };
+    uint8_t SecurityLevel                               = 0;
+    uint16_t SecurityInformation                        = 0;
+    uint16_t VersionNumber                              = 0;
+    uint8_t CertificationType                           = 0;
+    uint16_t DACOriginVendorId                          = VendorId::NotSpecified;
+    uint16_t DACOriginProductId                         = 0;
+    bool DACOriginVIDandPIDPresent                      = false;
+    KeyId AuthorizedPAAList[kMaxAuthorizedPAAListCount] = { { 0 } };
+    uint8_t AuthorizedPAAListCount                      = 0;
 };
 
 struct CertificationElementsWithoutPIDs
@@ -82,23 +89,39 @@ struct CertificationElementsWithoutPIDs
     uint16_t dacOriginVendorId                   = VendorId::NotSpecified;
     uint16_t dacOriginProductId                  = 0;
     bool dacOriginVIDandPIDPresent               = false;
+    bool authorizedPAAListPresent                = false;
     char certificateId[kCertificateIdLength + 1] = { 0 };
+};
+
+enum class CertificationType : uint8_t
+{
+    kDevelopmentAndTest,
+    kProvisional,
+    kOfficial,
+    kReserved,
 };
 
 class CertificationElementsDecoder
 {
 public:
     bool IsProductIdIn(const ByteSpan & encodedCertElements, uint16_t productId);
+    bool HasAuthorizedPAA(const ByteSpan & encodedCertElements, const ByteSpan & authorizedPAA);
 
 private:
-    CHIP_ERROR PrepareToReadProductIdList(const ByteSpan & encodedCertElements);
-    CHIP_ERROR GetNextProductId(uint16_t & productId);
+    /**
+     * @brief Positions mReader inside at the top of an Array with listTag tag.
+     *
+     * @param[in] encodedCertElements  TLV encoded structure of CD elements.
+     * @param[in] listTag              A tag of an array to be found in the encodedCertElements TLV structure.
+     *
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR FindAndEnterArray(const ByteSpan & encodedCertElements, TLV::Tag listTag);
 
-    ByteSpan mCertificationDeclarationData;
-    bool mIsInitialized = false;
+    CHIP_ERROR GetNextProductId(uint16_t & productId);
+    CHIP_ERROR GetNextAuthorizedPAA(ByteSpan & authorizedPAA);
+
     TLV::TLVReader mReader;
-    TLV::TLVType mOuterContainerType1 = TLV::kTLVType_Structure;
-    TLV::TLVType mOuterContainerType2 = TLV::kTLVType_Structure;
 };
 
 /**

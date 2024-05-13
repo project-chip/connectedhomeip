@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,9 +16,26 @@
  */
 
 #include "AppPreference.h"
+
+#include <algorithm>
+#include <cstdint>
+#include <cstdlib>
+#include <cstring>
+#include <memory>
+#include <utility>
+
 #include <app_preference.h>
+#include <tizen.h>
+
 #include <lib/support/Base64.h>
-#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/Span.h>
+#include <lib/support/logging/CHIPLogging.h>
+
+#include "ErrorUtils.h"
+
+using chip::DeviceLayer::Internal::TizenToChipError;
 
 namespace chip {
 namespace DeviceLayer {
@@ -26,138 +43,86 @@ namespace PersistedStorage {
 namespace Internal {
 namespace AppPreference {
 
-static CHIP_ERROR __IsKeyExist(const char * key)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    int preErr     = PREFERENCE_ERROR_NONE;
-    bool isExist   = false;
-
-    preErr = preference_is_existing(key, &isExist);
-    if (preErr != PREFERENCE_ERROR_NONE)
-    {
-        err = CHIP_ERROR_INCORRECT_STATE;
-    }
-    else if (isExist == false)
-    {
-        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-    }
-
-    return err;
-}
-
 CHIP_ERROR CheckData(const char * key)
 {
-    return __IsKeyExist(key);
+    bool isExist = false;
+    int err      = preference_is_existing(key, &isExist);
+    VerifyOrReturnError(err == PREFERENCE_ERROR_NONE, CHIP_ERROR_INCORRECT_STATE);
+    return isExist ? CHIP_NO_ERROR : CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
 }
 
 CHIP_ERROR GetData(const char * key, void * data, size_t dataSize, size_t * getDataSize, size_t offset)
 {
-    CHIP_ERROR err                = CHIP_NO_ERROR;
-    int preErr                    = PREFERENCE_ERROR_NONE;
-    char * encodedData            = NULL;
-    uint8_t * decodedData         = NULL;
-    size_t encodedDataSize        = 0;
-    size_t encodedDataPaddingSize = 0;
-    size_t decodedDataSize        = 0;
-    size_t expectedDecodedSize    = 0;
-    size_t copy_size              = 0;
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrExit(data != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
+    char * encodedData = nullptr;
+    // Make sure that string allocated by preference_get_string() will be freed
+    std::unique_ptr<char, decltype(&::free)> _{ encodedData, &::free };
 
-    err = __IsKeyExist(key);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogProgress(DeviceLayer, "Not found data [%s]", key));
-
-    preErr = preference_get_string(key, &encodedData);
-    VerifyOrExit(preErr == PREFERENCE_ERROR_NONE, err = CHIP_ERROR_INCORRECT_STATE);
-    encodedDataSize = strlen(encodedData);
-
-    if ((encodedDataSize > 0) && (encodedData[encodedDataSize - 1] == '='))
+    int err = preference_get_string(key, &encodedData);
+    if (err != PREFERENCE_ERROR_NONE)
     {
-        encodedDataPaddingSize++;
-        if ((encodedDataSize > 1) && (encodedData[encodedDataSize - 2] == '='))
-            encodedDataPaddingSize++;
+        if (err != PREFERENCE_ERROR_NO_KEY)
+            ChipLogError(DeviceLayer, "Failed to get preference [%s]: %s", StringOrNullMarker(key), get_error_message(err));
+        return TizenToChipError(err);
     }
-    expectedDecodedSize = ((encodedDataSize - encodedDataPaddingSize) * 3) / 4;
 
-    decodedData = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(expectedDecodedSize));
-    VerifyOrExit(decodedData != NULL, err = CHIP_ERROR_INCORRECT_STATE);
+    size_t encodedDataSize = strlen(encodedData);
 
-    decodedDataSize = Base64Decode(encodedData, static_cast<uint16_t>(encodedDataSize), decodedData);
+    Platform::ScopedMemoryBuffer<uint8_t> decodedData;
+    size_t expectedMaxDecodedSize = BASE64_MAX_DECODED_LEN(encodedDataSize);
+    VerifyOrReturnError(decodedData.Alloc(expectedMaxDecodedSize), CHIP_ERROR_NO_MEMORY);
 
-    copy_size = min(dataSize, decodedDataSize - offset);
-    if (getDataSize != NULL)
+    size_t decodedDataSize = Base64Decode(encodedData, static_cast<uint16_t>(encodedDataSize), decodedData.Get());
+    VerifyOrReturnError(dataSize >= decodedDataSize - offset, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    size_t copySize = std::min(dataSize, decodedDataSize - offset);
+    if (getDataSize != nullptr)
     {
-        *getDataSize = copy_size;
+        *getDataSize = copySize;
     }
-    memset(data, 0, dataSize);
-    memcpy(data, decodedData + offset, copy_size);
+    ::memcpy(data, decodedData.Get() + offset, copySize);
 
-    ChipLogProgress(DeviceLayer, "Get data [%s:%s]", key, (char *) data);
+    ChipLogDetail(DeviceLayer, "Get preference data: key=%s len=%u", key, static_cast<unsigned int>(copySize));
+    ChipLogByteSpan(DeviceLayer, ByteSpan(reinterpret_cast<uint8_t *>(data), copySize));
 
-    chip::Platform::MemoryFree(decodedData);
-
-    VerifyOrExit(dataSize >= decodedDataSize - offset, err = CHIP_ERROR_BUFFER_TOO_SMALL);
-
-exit:
-    free(encodedData);
-    return err;
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SaveData(const char * key, const uint8_t * data, size_t dataSize)
+CHIP_ERROR SaveData(const char * key, const void * data, size_t dataSize)
 {
-    CHIP_ERROR err             = CHIP_NO_ERROR;
-    int preErr                 = PREFERENCE_ERROR_NONE;
-    char * encodedData         = NULL;
-    size_t encodedDataSize     = 0;
-    size_t expectedEncodedSize = ((dataSize + 3) * 4) / 3;
+    // Expected size for null-terminated base64 string
+    size_t expectedEncodedSize = BASE64_ENCODED_LEN(dataSize) + 1;
 
-    err = __IsKeyExist(key);
-    if (err == CHIP_NO_ERROR)
-    {
-        VerifyOrExit(RemoveData(key) == CHIP_NO_ERROR, err = CHIP_ERROR_INCORRECT_STATE);
-    }
-    err = CHIP_NO_ERROR;
+    Platform::ScopedMemoryBuffer<char> encodedData;
+    VerifyOrReturnError(encodedData.Alloc(expectedEncodedSize), CHIP_ERROR_NO_MEMORY);
 
-    encodedData = static_cast<char *>(chip::Platform::MemoryAlloc(expectedEncodedSize));
-    VerifyOrExit(encodedData != NULL, err = CHIP_ERROR_INCORRECT_STATE);
+    size_t encodedDataSize = Base64Encode(static_cast<const uint8_t *>(data), static_cast<uint16_t>(dataSize), encodedData.Get());
+    encodedData[encodedDataSize] = '\0';
 
-    encodedDataSize              = Base64Encode(data, static_cast<uint16_t>(dataSize), encodedData);
-    encodedData[encodedDataSize] = 0;
+    int err = preference_set_string(key, encodedData.Get());
+    VerifyOrReturnError(
+        err == PREFERENCE_ERROR_NONE, TizenToChipError(err),
+        ChipLogError(DeviceLayer, "Failed to set preference [%s]: %s", StringOrNullMarker(key), get_error_message(err)));
 
-    preErr = preference_set_string(key, encodedData);
-    if (preErr == PREFERENCE_ERROR_NONE)
-    {
-        ChipLogProgress(DeviceLayer, "Save data [%s:%s]", key, data);
-    }
-    else
-    {
-        ChipLogProgress(DeviceLayer, "FAIL: set string [%s]", get_error_message(preErr));
-        err = CHIP_ERROR_INCORRECT_STATE;
-    }
+    ChipLogDetail(DeviceLayer, "Save preference data: key=%s len=%u", key, static_cast<unsigned int>(dataSize));
+    ChipLogByteSpan(DeviceLayer, ByteSpan(reinterpret_cast<const uint8_t *>(data), dataSize));
 
-    chip::Platform::MemoryFree(encodedData);
-
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR RemoveData(const char * key)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    int preErr     = PREFERENCE_ERROR_NONE;
-
-    preErr = preference_remove(key);
-    if (preErr == PREFERENCE_ERROR_NONE)
+    int err = preference_remove(key);
+    if (err != PREFERENCE_ERROR_NONE)
     {
-        ChipLogProgress(DeviceLayer, "Remove data [%s]", key);
-    }
-    else
-    {
-        ChipLogProgress(DeviceLayer, "FAIL: remove preference [%s]", get_error_message(preErr));
-        err = CHIP_ERROR_INCORRECT_STATE;
+        if (err != PREFERENCE_ERROR_NO_KEY)
+            ChipLogError(DeviceLayer, "Failed to remove preference [%s]: %s", StringOrNullMarker(key), get_error_message(err));
+        return TizenToChipError(err);
     }
 
-    return err;
+    ChipLogProgress(DeviceLayer, "Remove preference data: key=%s", key);
+    return CHIP_NO_ERROR;
 }
 
 } // namespace AppPreference

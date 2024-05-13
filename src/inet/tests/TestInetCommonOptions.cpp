@@ -23,11 +23,6 @@
  *
  */
 
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
-#define __STDC_FORMAT_MACROS
-
 #include "TestInetCommonOptions.h"
 
 #include <assert.h>
@@ -248,6 +243,7 @@ FaultInjectionOptions::FaultInjectionOptions()
     ExtraCleanupTimeMsec = 0;
 }
 
+#if defined(CHIP_WITH_NLFAULTINJECTION) && CHIP_WITH_NLFAULTINJECTION
 bool FaultInjectionOptions::HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg)
 {
     using namespace nl::FaultInjection;
@@ -297,3 +293,4 @@ bool FaultInjectionOptions::HandleOption(const char * progName, OptionSet * optS
 
     return true;
 }
+#endif // defined(CHIP_WITH_NLFAULTINJECTION) && CHIP_WITH_NLFAULTINJECTION

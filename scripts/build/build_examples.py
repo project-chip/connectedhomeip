@@ -14,16 +14,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import logging
 import os
 import sys
 
 import click
 import coloredlogs
+from builders.builder import BuilderOptions
+from runner import PrintOnlyRunner, ShellRunner
 
 import build
-from glob_matcher import GlobMatcher
-from runner import PrintOnlyRunner, ShellRunner
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
@@ -59,6 +60,18 @@ def ValidateRepoPath(context, parameter, value):
     return value
 
 
+def ValidateTargetNames(context, parameter, values):
+    """
+    Validates that the given target name is valid.
+    """
+    for value in values:
+        if not any(target.StringIntoTargetParts(value.lower())
+                   for target in build.targets.BUILD_TARGETS):
+            raise click.BadParameter(
+                "'%s' is not a valid target name." % value)
+    return values
+
+
 @click.group(chain=True)
 @click.option(
     '--log-level',
@@ -67,21 +80,10 @@ def ValidateRepoPath(context, parameter, value):
     help='Determines the verbosity of script output.')
 @click.option(
     '--target',
-    default=['all'],
-    type=click.Choice(
-        ['all'] + [t.name for t in build.ALL_TARGETS], case_sensitive=False),
+    default=[],
     multiple=True,
-    help='Build target(s). Note that "all" includes glob blacklisted targets'
-)
-@click.option(
-    '--target-glob',
-    default=None,
-    help='Glob matching for targets to include'
-)
-@click.option(
-    '--skip-target-glob',
-    default=None,
-    help='Glob matching for targets to explicitly exclude'
+    callback=ValidateTargetNames,
+    help='Build target(s)'
 )
 @click.option(
     '--enable-flashbundle',
@@ -99,6 +101,11 @@ def ValidateRepoPath(context, parameter, value):
     default='./out',
     type=click.Path(file_okay=False, resolve_path=True),
     help='Prefix for the generated file output.')
+@click.option(
+    '--pregen-dir',
+    default=None,
+    type=click.Path(file_okay=False, resolve_path=True),
+    help='Directory where generated files have been pre-generated.')
 @click.option(
     '--clean',
     default=False,
@@ -119,10 +126,15 @@ def ValidateRepoPath(context, parameter, value):
     default=False,
     is_flag=True,
     help='Skip timestaps in log output')
+@click.option(
+    '--pw-command-launcher',
+    help=(
+        'Set pigweed command launcher. E.g.: "--pw-command-launcher=ccache" '
+        'for using ccache when building examples.'))
 @click.pass_context
-def main(context, log_level, target, target_glob, skip_target_glob, repo,
-         out_prefix, clean, dry_run, dry_run_output, enable_flashbundle,
-         no_log_timestamps):
+def main(context, log_level, target, repo,
+         out_prefix, pregen_dir, clean, dry_run, dry_run_output, enable_flashbundle,
+         no_log_timestamps, pw_command_launcher):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s %(levelname)-7s %(message)s'
     if no_log_timestamps:
@@ -142,40 +154,16 @@ before running this script.
     else:
         runner = ShellRunner(root=repo)
 
-    if 'all' in target:
-        # NOTE: The "all" target includes things that are glob blacklisted
-        #       (so that 'targets' works and displays all)
-        targets = build.ALL_TARGETS
-    else:
-        requested_targets = set([t.lower for t in target])
-        targets = [
-            target for target in build.ALL_TARGETS
-            if target.name.lower in requested_targets
-        ]
-
-        actual_targes = set([t.name.lower for t in targets])
-        if requested_targets != actual_targes:
-            logging.error('Targets not found: %s',
-                          CommaSeparate(actual_targes))
-
-    if target_glob:
-        matcher = GlobMatcher(target_glob)
-        targets = [t for t in targets if matcher.matches(
-            t.name) and not t.IsGlobBlacklisted]
-
-    if skip_target_glob:
-        matcher = GlobMatcher(skip_target_glob)
-        targets = [t for t in targets if not matcher.matches(t.name)]
-
-    # force consistent sorting
-    targets.sort(key=lambda t: t.name)
-    logging.info('Building targets: %s',
-                 CommaSeparate([t.name for t in targets]))
+    requested_targets = set([t.lower() for t in target])
+    logging.info('Building targets: %s', CommaSeparate(requested_targets))
 
     context.obj = build.Context(
         repository_path=repo, output_prefix=out_prefix, runner=runner)
-    context.obj.SetupBuilders(
-        targets=targets, enable_flashbundle=enable_flashbundle)
+    context.obj.SetupBuilders(targets=requested_targets, options=BuilderOptions(
+        enable_flashbundle=enable_flashbundle,
+        pw_command_launcher=pw_command_launcher,
+        pregen_dir=pregen_dir,
+    ))
 
     if clean:
         context.obj.CleanOutputDirectories()
@@ -190,16 +178,30 @@ def cmd_generate(context):
 
 @main.command(
     'targets',
-    help=('List the targets that would be generated/built given '
-          'the input arguments'))
+    help=('Lists the targets that can be used with the build and gen commands'))
+@click.option(
+    '--format',
+    default='summary',
+    type=click.Choice(['summary', 'expanded', 'json'], case_sensitive=False),
+    help="""
+        summary - list of shorthand strings summarzing the available targets;
+
+        expanded - list all possible targets rather than the shorthand string;
+
+        json - a JSON representation of the available targets
+        """)
 @click.pass_context
-def cmd_targets(context):
-    for builder in context.obj.builders:
-        if builder.target.IsGlobBlacklisted:
-            print("%s (NOGLOB: %s)" %
-                  (builder.target.name, builder.target.GlobBlacklistReason))
-        else:
-            print(builder.target.name)
+def cmd_targets(context, format):
+    if format == 'expanded':
+        for target in build.targets.BUILD_TARGETS:
+            build.target.report_rejected_parts = False
+            for s in target.AllVariants():
+                print(s)
+    elif format == 'json':
+        print(json.dumps([target.ToDict() for target in build.targets.BUILD_TARGETS], indent=4))
+    else:
+        for target in build.targets.BUILD_TARGETS:
+            print(target.HumanString())
 
 
 @main.command('build', help='generate and run ninja/make as needed to compile')
@@ -225,4 +227,4 @@ def cmd_build(context, copy_artifacts_to, create_archives):
 
 
 if __name__ == '__main__':
-    main()
+    main(auto_envvar_prefix='CHIP')

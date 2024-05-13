@@ -1,0 +1,619 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 88.2.1. [TC-DGGEN-2.1] Attributes [DUT as Server]
+
+PICS:
+    - DGGEN.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "General Diagnostics"
+    endpoint: 0
+    timeout: 11500
+
+    TEST_EVENT_ENABLE_KEY:
+        type: octet_string
+        defaultValue: "hex:00112233445566778899aabbccddeeff"
+    TEST_EVENT_TRIGGER_KEY:
+        type: int64u
+        defaultValue: "0x0000000000000003"
+    payload:
+        type: char_string
+        defaultValue: "MT:-24J0AFN00KA0648G00"
+
+tests:
+    - label: "Step 1a: Reset Devices to factory defaults"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "FactoryReset"
+
+    - label: "Step 1a: Reset Devices to factory defaults"
+      PICS: PICS_USER_PROMPT
+      verification: |
+          Reset Devices to factory defaults
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Factory Reset the DUT and enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 1a: TH starts a commissioning process with DUT"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: payload
+
+    - label: "Step 1b: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2a: TH reads a RebootCount attribute value from DUT."
+      PICS: DGGEN.S.A0001
+      command: "readAttribute"
+      attribute: "RebootCount"
+      response:
+          saveAs: boot_count1
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 1
+
+    - label: "Step 2b: Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "Reboot"
+
+    - label: "Step 2b: Reboot target device(DUT)"
+      PICS: PICS_USER_PROMPT
+      verification: |
+          Did the DUT successfully reboot?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Step 2b: TH reads a RebootCount attribute value from DUT. Verify that
+          boot_count2 is greater than boot_count1."
+      PICS: DGGEN.S.A0001
+      command: "readAttribute"
+      attribute: "RebootCount"
+      response:
+          constraints:
+              type: int16u
+              minValue: boot_count1 + 1
+              maxValue: 65535
+
+    #Not possible in YAML. what extact values to be checked
+    - label: "Step 3: TH reads NetworkInterfaces structure attribute from DUT."
+      verification: |
+          ./chip-tool generaldiagnostics read network-interfaces 1 0
+
+          On TH(chip-tool), Verify that The NetworkInterfaces attribute SHALL be a list of NetworkInterface structs, i.e The read data type( NetworkInterface struct) must match the value listed below
+              • Name(interface name)
+              • IsOperational (indicates the node is operational in the fabric)
+              • OffPremiseServicesReachableIPv4(Ability to reach off-premise services it uses by utilizing IPv4, if not NULL)
+              • OffPremiseServicesReachableIPv6(Ability to reach off-premise services it uses by utilizing IPv6, if not NULL)
+              • HardwareAddress(MAC-layer address for a 802.3 or IEEE 802.11-2020 network interface, or 802.15.4)
+              •  IPv4Addresses and IPv6Addresses (a list of the unicast IPv6 addresses that are GUA and ULA)
+              • Type(Interface types).
+
+          Below is the example value which is observed in the RPI platform the value may be differ based on the dut implementation.
+
+          [1692949910.768802][3792:3794] CHIP:DMG: }
+          [1692949910.769530][3792:3794] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0000 DataVersion: 131147943
+          [1692949910.769722][3792:3794] CHIP:TOO:   NetworkInterfaces: 11 entries
+          [1692949910.769815][3792:3794] CHIP:TOO:     [1]: {
+          [1692949910.769837][3792:3794] CHIP:TOO:       Name: veth6419a29
+          [1692949910.769856][3792:3794] CHIP:TOO:       IsOperational: TRUE
+          [1692949910.769875][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv4: null
+          [1692949910.769894][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv6: null
+          [1692949910.770166][3792:3794] CHIP:TOO:       HardwareAddress: 2209DC9A5648
+          [1692949910.770207][3792:3794] CHIP:TOO:       IPv4Addresses: 0 entries
+          [1692949910.770233][3792:3794] CHIP:TOO:       IPv6Addresses: 1 entries
+          [1692949910.770258][3792:3794] CHIP:TOO:         [1]: FE800000000000002009DCFFFE9A5648
+          [1692949910.770290][3792:3794] CHIP:TOO:       Type: 0
+          [1692949910.770309][3792:3794] CHIP:TOO:      }
+          [1692949910.770343][3792:3794] CHIP:TOO:     [2]: {
+          [1692949910.770362][3792:3794] CHIP:TOO:       Name: vethdd2acfa
+          [1692949910.770380][3792:3794] CHIP:TOO:       IsOperational: TRUE
+          [1692949910.770398][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv4: null
+          [1692949910.770416][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv6: null
+          [1692949910.770435][3792:3794] CHIP:TOO:       HardwareAddress: 4ED603419EAE
+          [1692949910.770454][3792:3794] CHIP:TOO:       IPv4Addresses: 0 entries
+          [1692949910.770474][3792:3794] CHIP:TOO:       IPv6Addresses: 1 entries
+          [1692949910.770497][3792:3794] CHIP:TOO:         [1]: FE800000000000004CD603FFFE419EAE
+          [1692949910.770517][3792:3794] CHIP:TOO:       Type: 0
+          [1692949910.770535][3792:3794] CHIP:TOO:      }
+          [1692949910.770564][3792:3794] CHIP:TOO:     [3]: {
+          [1692949910.770583][3792:3794] CHIP:TOO:       Name: vethdf8d5bd
+          [1692949910.770601][3792:3794] CHIP:TOO:       IsOperational: TRUE
+          [1692949910.770618][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv4: null
+          [1692949910.770636][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv6: null
+          [1692949910.770655][3792:3794] CHIP:TOO:       HardwareAddress: 5E39DB1257D2
+          [1692949910.770673][3792:3794] CHIP:TOO:       IPv4Addresses: 0 entries
+          [1692949910.770694][3792:3794] CHIP:TOO:       IPv6Addresses: 1 entries
+          [1692949910.770717][3792:3794] CHIP:TOO:         [1]: FE800000000000005C39DBFFFE1257D2
+          [1692949910.770737][3792:3794] CHIP:TOO:       Type: 0
+          [1692949910.770755][3792:3794] CHIP:TOO:      }
+          [1692949910.770784][3792:3794] CHIP:TOO:     [4]: {
+          [1692949910.770820][3792:3794] CHIP:TOO:       Name: veth0c1b827
+          [1692949910.770838][3792:3794] CHIP:TOO:       IsOperational: TRUE
+          [1692949910.770856][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv4: null
+          [1692949910.770874][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv6: null
+          [1692949910.770893][3792:3794] CHIP:TOO:       HardwareAddress: 5200F618FE06
+          [1692949910.770913][3792:3794] CHIP:TOO:       IPv4Addresses: 0 entries
+          [1692949910.770934][3792:3794] CHIP:TOO:       IPv6Addresses: 1 entries
+          [1692949910.770957][3792:3794] CHIP:TOO:         [1]: FE800000000000005000F6FFFE18FE06
+          [1692949910.770979][3792:3794] CHIP:TOO:       Type: 0
+          [1692949910.771001][3792:3794] CHIP:TOO:      }
+          [1692949910.771047][3792:3794] CHIP:TOO:     [5]: {
+          [1692949910.771079][3792:3794] CHIP:TOO:       Name: veth95d2688
+          [1692949910.771099][3792:3794] CHIP:TOO:       IsOperational: TRUE
+          [1692949910.771119][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv4: null
+          [1692949910.771140][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv6: null
+          [1692949910.771161][3792:3794] CHIP:TOO:       HardwareAddress: EE70AD9213F7
+          [1692949910.771182][3792:3794] CHIP:TOO:       IPv4Addresses: 0 entries
+          [1692949910.771206][3792:3794] CHIP:TOO:       IPv6Addresses: 1 entries
+          [1692949910.771231][3792:3794] CHIP:TOO:         [1]: FE80000000000000EC70ADFFFE9213F7
+          [1692949910.771254][3792:3794] CHIP:TOO:       Type: 0
+          [1692949910.771274][3792:3794] CHIP:TOO:      }
+          [1692949910.771308][3792:3794] CHIP:TOO:     [6]: {
+          [1692949910.771329][3792:3794] CHIP:TOO:       Name: br-78aec9e78929
+          [1692949910.771348][3792:3794] CHIP:TOO:       IsOperational: TRUE
+          [1692949910.771368][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv4: null
+          [1692949910.771388][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv6: null
+          [1692949910.771409][3792:3794] CHIP:TOO:       HardwareAddress: 024209ABE784
+          [1692949910.771431][3792:3794] CHIP:TOO:       IPv4Addresses: 1 entries
+          [1692949910.771455][3792:3794] CHIP:TOO:         [1]: AC130001
+          [1692949910.771478][3792:3794] CHIP:TOO:       IPv6Addresses: 1 entries
+          [1692949910.771503][3792:3794] CHIP:TOO:         [1]: FE80000000000000004209FFFEABE784
+          [1692949910.771526][3792:3794] CHIP:TOO:       Type: 0
+          [1692949910.771546][3792:3794] CHIP:TOO:      }
+          [1692949910.771579][3792:3794] CHIP:TOO:     [7]: {
+          [1692949910.771600][3792:3794] CHIP:TOO:       Name: docker0
+          [1692949910.771620][3792:3794] CHIP:TOO:       IsOperational: FALSE
+          [1692949910.771639][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv4: null
+          [1692949910.771659][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv6: null
+          [1692949910.771680][3792:3794] CHIP:TOO:       HardwareAddress: 0242AB987D7E
+          [1692949910.771702][3792:3794] CHIP:TOO:       IPv4Addresses: 1 entries
+          [1692949910.771726][3792:3794] CHIP:TOO:         [1]: AC110001
+          [1692949910.771750][3792:3794] CHIP:TOO:       IPv6Addresses: 1 entries
+          [1692949910.771774][3792:3794] CHIP:TOO:         [1]:
+          [1692949910.771796][3792:3794] CHIP:TOO:       Type: 0
+          [1692949910.771816][3792:3794] CHIP:TOO:      }
+          [1692949910.771973][3792:3794] CHIP:TOO:     [8]: {
+          [1692949910.771999][3792:3794] CHIP:TOO:       Name: br-33eb65c97608
+          [1692949910.772020][3792:3794] CHIP:TOO:       IsOperational: TRUE
+          [1692949910.772041][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv4: null
+          [1692949910.772062][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv6: null
+          [1692949910.772083][3792:3794] CHIP:TOO:       HardwareAddress: 02426545C6AD
+          [1692949910.772106][3792:3794] CHIP:TOO:       IPv4Addresses: 1 entries
+          [1692949910.772130][3792:3794] CHIP:TOO:         [1]: AC120001
+          [1692949910.772154][3792:3794] CHIP:TOO:       IPv6Addresses: 3 entries
+          [1692949910.772179][3792:3794] CHIP:TOO:         [1]: FD006D61747465720000000000000001
+          [1692949910.772204][3792:3794] CHIP:TOO:         [2]: FE80000000000000004265FFFE45C6AD
+          [1692949910.772229][3792:3794] CHIP:TOO:         [3]: FE800000000000000000000000000001
+          [1692949910.772251][3792:3794] CHIP:TOO:       Type: 0
+          [1692949910.772271][3792:3794] CHIP:TOO:      }
+          [1692949910.772304][3792:3794] CHIP:TOO:     [9]: {
+          [1692949910.772325][3792:3794] CHIP:TOO:       Name: wlan0
+          [1692949910.772345][3792:3794] CHIP:TOO:       IsOperational: TRUE
+          [1692949910.772365][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv4: null
+          [1692949910.772385][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv6: null
+          [1692949910.772405][3792:3794] CHIP:TOO:       HardwareAddress: E45F010F1A01
+          [1692949910.772426][3792:3794] CHIP:TOO:       IPv4Addresses: 0 entries
+          [1692949910.772450][3792:3794] CHIP:TOO:       IPv6Addresses: 1 entries
+          [1692949910.772475][3792:3794] CHIP:TOO:         [1]: FE80000000000000E65F01FFFE0F1A01
+          [1692949910.772498][3792:3794] CHIP:TOO:       Type: 1
+          [1692949910.772518][3792:3794] CHIP:TOO:      }
+          [1692949910.772552][3792:3794] CHIP:TOO:     [10]: {
+          [1692949910.772572][3792:3794] CHIP:TOO:       Name: eth0
+          [1692949910.772592][3792:3794] CHIP:TOO:       IsOperational: TRUE
+          [1692949910.772612][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv4: null
+          [1692949910.772632][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv6: null
+          [1692949910.772653][3792:3794] CHIP:TOO:       HardwareAddress: E45F010F19FF
+          [1692949910.772675][3792:3794] CHIP:TOO:       IPv4Addresses: 1 entries
+          [1692949910.772698][3792:3794] CHIP:TOO:         [1]: C0A80864
+          [1692949910.772721][3792:3794] CHIP:TOO:       IPv6Addresses: 1 entries
+          [1692949910.772746][3792:3794] CHIP:TOO:         [1]: FE80000000000000E65F01FFFE0F19FF
+          [1692949910.772769][3792:3794] CHIP:TOO:       Type: 2
+          [1692949910.772789][3792:3794] CHIP:TOO:      }
+          [1692949910.772821][3792:3794] CHIP:TOO:     [11]: {
+          [1692949910.772842][3792:3794] CHIP:TOO:       Name: lo
+          [1692949910.772862][3792:3794] CHIP:TOO:       IsOperational: TRUE
+          [1692949910.772882][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv4: null
+          [1692949910.772901][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv6: null
+          [1692949910.772922][3792:3794] CHIP:TOO:       HardwareAddress: 000000000000
+          [1692949910.772944][3792:3794] CHIP:TOO:       IPv4Addresses: 1 entries
+          [1692949910.772968][3792:3794] CHIP:TOO:         [1]: 7F000001
+          [1692949910.772991][3792:3794] CHIP:TOO:       IPv6Addresses: 1 entries
+          [1692949910.773016][3792:3794] CHIP:TOO:         [1]: 00000000000000000000000000000001
+          [1692949910.773039][3792:3794] CHIP:TOO:       Type: 0
+          [1692949910.773059][3792:3794] CHIP:TOO:      }
+          [1692949910.773294][3792:3794] CHIP:EM: <<< [E:2323i S:55592 M:93290487 (Ack:187838562)] (S) Msg TX to 1:0000000000000001 [3E67] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1692949910.773342][3792:3794] CHIP:IN: (S) Sending msg 93290487 on secure session with LSID: 55592
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && DGGEN.S.A0000
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 4a: TH reads the Uptime attribute value of DUT. Store the value
+          in uptime1"
+      command: "readAttribute"
+      attribute: "UpTime"
+      response:
+          saveAs: uptime1
+          constraints:
+              type: int64u
+
+    - label: "Wait 10 seconds"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label:
+          "Step 4b: TH reads a Uptime attribute value of DUT. Store the value in
+          uptime2. Verify that uptime2 is greater than uptime1."
+      command: "readAttribute"
+      attribute: "UpTime"
+      response:
+          saveAs: uptime2
+          constraints:
+              type: int64u
+              minValue: uptime1
+
+    - label: "Step 4c: Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "Reboot"
+
+    - label: "Step 4c:Reboot target device(DUT)"
+      PICS: PICS_USER_PROMPT
+      verification: |
+          Did the DUT successfully reboot?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Step 4c: TH reads a Uptime attribute value of DUT. Store the value in
+          uptime3. Verify that uptime3 is lesser than uptime2."
+      command: "readAttribute"
+      attribute: "UpTime"
+      response:
+          saveAs: uptime3
+          constraints:
+              type: int64u
+              maxValue: uptime2
+
+    - label: "Step 5a: Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "Reboot"
+
+    - label: "Step 5a: Reboot target device(DUT)"
+      PICS: PICS_USER_PROMPT
+      verification: |
+          Did the DUT successfully reboot?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 5b: TH reads BootReason attribute value from DUT."
+      PICS: DGGEN.S.A0004
+      command: "readAttribute"
+      attribute: "BootReason"
+      response:
+          constraints:
+              minValue: 0
+              maxValue: 6
+
+    - label: "Step 6a: TH subscribes to ActiveHardwareFaults attribute from DUT"
+      PICS: DGGEN.S.A0005
+      command: "subscribeAttribute"
+      attribute: "ActiveHardwareFaults"
+      minInterval: 10
+      maxInterval: 1000
+      response:
+          constraints:
+              type: list
+
+    - label: "Step 6b: TH reads ActiveHardwareFaults attribute value from DUT."
+      PICS: DGGEN.S.A0005
+      command: "readAttribute"
+      attribute: "ActiveHardwareFaults"
+      response:
+          constraints:
+              type: list
+              minLength: 0
+              maxLength: 11
+
+    - label: "Step 7a: TH subscribes to ActiveRadioFaults attribute from DUT"
+      PICS: DGGEN.S.A0006
+      command: "subscribeAttribute"
+      attribute: "ActiveRadioFaults"
+      minInterval: 10
+      maxInterval: 1000
+      response:
+          constraints:
+              type: list
+
+    - label: "Step 7b: TH reads ActiveRadioFaults attribute value from DUT."
+      PICS: DGGEN.S.A0006
+      command: "readAttribute"
+      attribute: "ActiveRadioFaults"
+      response:
+          constraints:
+              type: list
+              minLength: 0
+              maxLength: 7
+
+    - label: "Step 8a: TH subscribes to ActiveNetworkFaults attribute from DUT"
+      PICS: DGGEN.S.A0007
+      command: "subscribeAttribute"
+      attribute: "ActiveNetworkFaults"
+      minInterval: 100
+      maxInterval: 1000
+      response:
+          constraints:
+              type: list
+
+    - label: "Step 8b: TH reads ActiveNetworkFaults attribute value from DUT."
+      PICS: DGGEN.S.A0007
+      command: "readAttribute"
+      attribute: "ActiveNetworkFaults"
+      response:
+          constraints:
+              type: list
+              minLength: 0
+              maxLength: 4
+
+    - label: "Step 9a: TH reads TestEventTriggersEnabled attribute value"
+      PICS: DGGEN.S.A0008
+      cluster: "General Diagnostics"
+      command: "readAttribute"
+      attribute: "TestEventTriggersEnabled"
+      response:
+          saveAs: TestEventTriggersEnabledValue
+
+    - label:
+          "Step 9b: Verify TestEventTriggersEnabled attribute value is set to
+          True"
+      PICS: DGGEN.S.A0008
+      cluster: "EqualityCommands"
+      command: "BooleanEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: true
+              - name: "Value2"
+                value: TestEventTriggersEnabledValue
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsExpectedValue
+
+    - label:
+          "Step 9c: When configured TRUE, Node has been configured with one or
+          more test event triggers by virtue of the internally programmed non
+          zero EnableKey value"
+      runIf: IsExpectedValue
+      PICS: DGGEN.S.C00.Rsp
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_ENABLE_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_KEY
+
+    - label:
+          "Step 10a: TH reads the TotalOperationalHours attribute from the DUT.
+          Store the value in operational_hours1."
+      PICS: DGGEN.S.A0003
+      command: "readAttribute"
+      attribute: "TotalOperationalHours"
+      response:
+          saveAs: operational_hours1
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFE
+
+    #Issue: https://github.com/project-chip/connectedhomeip/issues/29580
+    - label: "Wait for 2 hours and 5 minutes."
+      PICS: DGGEN.S.A0003
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 7500000
+
+    - label:
+          "Step 10a: TH reads the TotalOperationalHours attribute from the DUT.
+          Verify that operational_hours2 is greater than operational_hours1."
+      PICS: DGGEN.S.A0003
+      command: "readAttribute"
+      attribute: "TotalOperationalHours"
+      response:
+          constraints:
+              type: int32u
+              minValue: operational_hours1
+              maxValue: 0xFFFFFFFE
+
+    - label: "Step 10b: Reset Devices to factory defaults"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "FactoryReset"
+
+    - label: "Step 10b: Reset Devices to factory defaults"
+      PICS: PICS_USER_PROMPT
+      verification: |
+          Reset Devices to factory defaults
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Factory Reset the DUT and enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 10b: TH starts a commissioning process with DUT"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: payload
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Step 10b: TH reads the TotalOperationalHours attribute from the DUT.
+          Verify that the value of 'TotalOperationalHours' is 0."
+      PICS: DGGEN.S.A0003
+      command: "readAttribute"
+      attribute: "TotalOperationalHours"
+      response:
+          value: 0
+          constraints:
+              type: int32u
+
+    #Issue: https://github.com/project-chip/connectedhomeip/issues/29580
+    - label: "Wait for 1 hour 5 minutes."
+      PICS: DGGEN.S.A0003
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 3900000
+
+    - label:
+          "Step 10c: TH reads the TotalOperationalHours attribute from the DUT.
+          Verify that the value of 'TotalOperationalHours' is 1."
+      PICS: DGGEN.S.A0003
+      command: "readAttribute"
+      attribute: "TotalOperationalHours"
+      response:
+          value: 1
+          constraints:
+              type: int32u
+
+    - label: "Step 10d: Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "Reboot"
+
+    - label: "Step 10d: Reboot target device(DUT)"
+      PICS: PICS_USER_PROMPT
+      verification: |
+          Did the DUT successfully reboot?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Step 10c: TH reads the TotalOperationalHours attribute from the DUT.
+          Verify that the value of 'TotalOperationalHours' is 1."
+      PICS: DGGEN.S.A0003
+      command: "readAttribute"
+      attribute: "TotalOperationalHours"
+      response:
+          value: 1
+          constraints:
+              type: int32u

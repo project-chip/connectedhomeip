@@ -1,0 +1,554 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2023). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Demand Response Load Control" revision="4">
+  <revisionHistory>
+    <revision revision="1" summary="mandatory global ClusterRevision attribute added"/>
+    <revision revision="2" summary="Updated from SE1.4 version; CCB 1291 1297 1447 1513 1880 2287 2964 2965"/>
+    <revision revision="3" summary="CCB 2966 3396"/>
+    <revision revision="4" summary="Matter Release"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0096" name="Demand Response and Load Control"/>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="DRLC" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="ENRLG" name="Enrollment Groups" summary="Supports enrollment groups">
+      <optionalConform/>
+    </feature>
+    <feature bit="1" code="TEMPO" name="TemperatureOffset" summary="Supports temperature offsets">
+      <optionalConform choice="a" more="true"/>
+    </feature>
+    <feature bit="2" code="TEMPS" name="TemperatureSetpoint" summary="Supports temperature setpoints">
+      <optionalConform choice="a" more="true"/>
+    </feature>
+    <feature bit="3" code="LOADA" name="LoadAdjustment" summary="Supports average load adjustment percentage">
+      <optionalConform choice="a" more="true"/>
+    </feature>
+    <feature bit="4" code="DUTYC" name="DutyCycle" summary="Supports duty cycle adjustment">
+      <optionalConform choice="a" more="true"/>
+    </feature>
+    <feature bit="5" code="PWRSV" name="PowerSavings" summary="Supports power savings">
+      <optionalConform choice="a" more="true"/>
+    </feature>
+    <feature bit="6" code="HEATS" name="HeatingSource" summary="Supports selecting heating source">
+      <optionalConform choice="a" more="true"/>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="CriticalityLevelEnum">
+      <item value="0" name="Invalid">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Green" summary="Voluntary">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Level1" summary="Voluntary">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="Level2" summary="Voluntary">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="Level3" summary="Voluntary">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="Level4" summary="Voluntary">
+        <mandatoryConform/>
+      </item>
+      <item value="6" name="Level5" summary="Voluntary">
+        <mandatoryConform/>
+      </item>
+      <item value="7" name="Emergency" summary="Mandatory">
+        <mandatoryConform/>
+      </item>
+      <item value="8" name="PlannedOutage" summary="Mandatory">
+        <mandatoryConform/>
+      </item>
+      <item value="9" name="ServiceDisconnect" summary="Mandatory">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="HeatingSourceEnum">
+      <item value="0" name="Any" summary="Any heating source">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Electric" summary="Electric heating">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="NaturalGas" summary="Gas heating">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="LoadControlEventChangeSourceEnum">
+      <item value="0" name="Automatic" summary="This event change was automatic">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="UserAction" summary="This event change was due to a user action">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="LoadControlEventStatusEnum">
+      <item value="1" name="Received" summary="Load Control Event command received">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="InProgress" summary="Event in progress">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="Completed" summary="Event completed">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="OptedOut" summary="User opted-out">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="OptedIn" summary="User opted-in">
+        <mandatoryConform/>
+      </item>
+      <item value="6" name="Canceled" summary="Event canceled">
+        <mandatoryConform/>
+      </item>
+      <item value="7" name="Superseded" summary="Event superseded">
+        <mandatoryConform/>
+      </item>
+      <item value="8" name="PartialOptedOut" summary="Event partially completed due to opt-out">
+        <mandatoryConform/>
+      </item>
+      <item value="9" name="PartialOptedIn" summary="Event partially completed due to opt-in">
+        <mandatoryConform/>
+      </item>
+      <item value="10" name="NoParticipation" summary="Event complete with no participation">
+        <mandatoryConform/>
+      </item>
+      <item value="11" name="Unavailable" summary="Device not available to participate">
+        <mandatoryConform/>
+      </item>
+      <item value="12" name="Failed" summary="Device failed to process the event">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="PowerSavingsEnum">
+      <item value="0" name="Low" summary="40% savings">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Medium" summary="70% savings">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="High" summary="100% savings; device off">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <bitmap name="CancelControlBitmap">
+      <bitfield name="RandomEnd" bit="0" summary="Randomize end time">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <bitmap name="DeviceClassBitmap">
+      <bitfield name="Field0" bit="0" summary="HVAC Compressor or Furnace">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Field1" bit="1" summary="Strip Heaters/Baseboard Heaters">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Field2" bit="2" summary="Water Heater">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Field3" bit="3" summary="Pool Pump/Spa/Jacuzzi">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Field4" bit="4" summary="Smart Appliances">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Field5" bit="5" summary="Irrigation Pump">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Field6" bit="6" summary="Managed Commercial &amp; Industrial (C&amp;I) loads">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Field7" bit="7" summary="Simple misc. (Residential On/Off) loads">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Field8" bit="8" summary="Exterior Lighting">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Field9" bit="9" summary="Interior Lighting">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Field10" bit="10" summary="Electric Vehicle">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Field11" bit="11" summary="Generation Systems">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Field12" bit="12" summary="Smart Inverter">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Field13" bit="13" summary="EVSE">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Field14" bit="14" summary="RESU (Residential Energy Storage Unit)">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Field15" bit="15" summary="Energy Management System">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Field16" bit="16" summary="Smart Energy Module">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <bitmap name="EventControlBitmap">
+      <bitfield name="RandomStart" bit="0" summary="Randomize start time">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <bitmap name="EventTransitionControlBitmap">
+      <bitfield name="RandomDuration" bit="0" summary="Randomize duration">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="IgnoreOptOut" bit="1" summary="Ignore opt-out">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <struct name="AverageLoadControlStruct">
+      <field id="1" name="LoadAdjustment" type="int8">
+        <mandatoryConform/>
+        <constraint type="between" from="0" to="100"/>
+      </field>
+    </struct>
+    <struct name="DutyCycleControlStruct">
+      <field id="1" name="DutyCycle" type="uint8">
+        <mandatoryConform/>
+        <constraint type="between" from="0" to="100"/>
+      </field>
+    </struct>
+    <struct name="HeatingSourceControlStruct">
+      <field id="1" name="HeatingSource" type="HeatingSourceEnum">
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="LoadControlEventStruct">
+      <field id="0" name="EventID" type="octstr" default="0">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="16"/>
+      </field>
+      <field id="1" name="ProgramID" type="octstr" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint type="maxLength" value="16"/>
+      </field>
+      <field id="2" name="Control" type="EventControlBitmap" default="1">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="DeviceClass" type="DeviceClassBitmap">
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="EnrollmentGroup" type="uint8" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <feature name="ENRLG"/>
+        </mandatoryConform>
+      </field>
+      <field id="5" name="Criticality" type="CriticalityLevelEnum" default="0">
+        <mandatoryConform/>
+      </field>
+      <field id="6" name="StartTime" type="epoch-s" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="7" name="Transitions" type="list" default="empty">
+        <entry type="LoadControlEventTransitionStruct"/>
+        <mandatoryConform/>
+        <constraint type="maxCount" value="10"/>
+      </field>
+    </struct>
+    <struct name="LoadControlEventTransitionStruct">
+      <field id="1" name="Duration" type="uint16" default="0">
+        <mandatoryConform/>
+        <constraint type="max" value="1440"/>
+      </field>
+      <field id="2" name="Control" type="EventTransitionControlBitmap" default="0">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="TemperatureControl" type="TemperatureControlStruct" default="null">
+        <quality nullable="true"/>
+      </field>
+      <field id="4" name="AverageLoadControl" type="AverageLoadControlStruct" default="null">
+        <quality nullable="true"/>
+      </field>
+      <field id="5" name="DutyCycleControl" type="DutyCycleControlStruct" default="null">
+        <quality nullable="true"/>
+      </field>
+      <field id="6" name="PowerSavingsControl" type="PowerSavingsControlStruct" default="null">
+        <quality nullable="true"/>
+      </field>
+      <field id="7" name="HeatingSourceControl" type="HeatingSourceControlStruct" default="null">
+        <quality nullable="true"/>
+      </field>
+    </struct>
+    <struct name="LoadControlProgramStruct">
+      <field id="0" name="ProgramID" type="octstr" default="0">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="16"/>
+      </field>
+      <field id="1" name="Name" type="string">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="32"/>
+      </field>
+      <field id="2" name="EnrollmentGroup" type="uint8" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <feature name="ENRLG"/>
+        </mandatoryConform>
+        <constraint type="between" from="0x01" to="0xFF"/>
+      </field>
+      <field id="3" name="RandomStartMinutes" type="uint8" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint type="between" from="0x00" to="0x3C"/>
+      </field>
+      <field id="4" name="RandomDurationMinutes" type="uint8" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint type="between" from="0x00" to="0x3C"/>
+      </field>
+      <access fabricScoped="true"/>
+    </struct>
+    <struct name="PowerSavingsControlStruct">
+      <field id="1" name="PowerSavings" type="PowerSavingsEnum">
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="TemperatureControlStruct">
+      <field id="0" name="CoolingTempOffset" type="ref_TempDiff" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <feature name="TEMPO"/>
+        </mandatoryConform>
+        <constraint type="between" from="0x00" to="0x0FE"/>
+      </field>
+      <field id="1" name="HeatingTempOffset" type="ref_TempDiff" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <feature name="TEMPO"/>
+        </mandatoryConform>
+        <constraint type="between" from="0x00" to="0x0FE"/>
+      </field>
+      <field id="2" name="CoolingTempSetpoint" type="temperature" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <feature name="TEMPS"/>
+        </mandatoryConform>
+        <constraint type="between" from="0x954D" to="0x7FFF"/>
+      </field>
+      <field id="3" name="HeatingTempSetpoint" type="temperature" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <feature name="TEMPS"/>
+        </mandatoryConform>
+        <constraint type="between" from="0x954D" to="0x7FFF"/>
+      </field>
+      <access fabricScoped="true"/>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="DeviceClass" type="DeviceClassBitmap" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0001" name="LoadControlPrograms" type="list" default="empty">
+      <entry type="LoadControlProgramStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0002" name="NumberOfLoadControlPrograms" type="uint8" default="5">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <mandatoryConform/>
+      <constraint type="min" value="5"/>
+    </attribute>
+    <attribute id="0x0003" name="Events" type="list" default="empty">
+      <entry type="LoadControlEventStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0004" name="NumberOfEventsPerProgram" type="uint8" default="10">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <mandatoryConform/>
+      <constraint type="min" value="10"/>
+    </attribute>
+    <attribute id="0x0005" name="NumberOfTransitions" type="uint8" default="3">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <mandatoryConform/>
+      <constraint type="min" value="3"/>
+    </attribute>
+    <attribute id="0x0006" name="DefaultRandomStart" type="uint8" default="0x1E">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <mandatoryConform/>
+      <constraint type="between" from="0x00" to="0x3C"/>
+    </attribute>
+    <attribute id="0x0007" name="DefaultRandomDuration" type="uint8" default="0">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <mandatoryConform/>
+      <constraint type="between" from="0x00" to="0x3C"/>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="RegisterLoadControlProgramRequest" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+      <field id="0" name="LoadControlProgram" type="LoadControlProgramStruct">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x01" name="UnregisterLoadControlProgramRequest" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+      <field id="0" name="LoadControlProgramID" type="octstr">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="16"/>
+      </field>
+    </command>
+    <command id="0x02" name="AddLoadControlEventRequest" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+      <field id="0" name="Event" type="LoadControlEventStruct">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x03" name="RemoveLoadControlEventRequest" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+      <field id="0" name="EventID" type="octstr">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="16"/>
+      </field>
+      <field id="1" name="CancelControl" type="CancelControlBitmap" default="0">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x04" name="ClearLoadControlEventsRequest" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <optionalConform/>
+    </command>
+  </commands>
+  <events>
+    <event id="0x00" name="LoadControlEventStatusChange" priority="info">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+      <field id="0" name="EventID" type="octstr">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="16"/>
+      </field>
+      <field id="1" name="TransitionIndex" type="uint8" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="Status" type="LoadControlEventStatusEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="Criticality" type="CriticalityLevelEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="Control" type="EventControlBitmap" default="0">
+        <mandatoryConform/>
+      </field>
+      <field id="5" name="TemperatureControl" type="TemperatureControlStruct" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <orTerm>
+            <feature name="TEMPO"/>
+            <feature name="TEMPS"/>
+          </orTerm>
+        </mandatoryConform>
+      </field>
+      <field id="6" name="AverageLoadControl" type="AverageLoadControlStruct" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <feature name="LOADA"/>
+        </mandatoryConform>
+      </field>
+      <field id="7" name="DutyCycleControl" type="DutyCycleControlStruct" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <feature name="DUTYC"/>
+        </mandatoryConform>
+      </field>
+      <field id="8" name="PowerSavingsControl" type="PowerSavingsControlStruct" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <feature name="PWRSV"/>
+        </mandatoryConform>
+      </field>
+      <field id="9" name="HeatingSourceControl" type="HeatingSourceControlStruct" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <feature name="HEATS"/>
+        </mandatoryConform>
+      </field>
+      <field id="255" name="Signature" type="octstr" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint type="maxLength" value="48"/>
+      </field>
+    </event>
+  </events>
+</cluster>

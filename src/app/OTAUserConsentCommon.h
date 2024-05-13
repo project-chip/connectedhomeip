@@ -71,9 +71,9 @@ struct UserConsentSubject
         ChipLogDetail(SoftwareUpdate, "User consent request for:");
         ChipLogDetail(SoftwareUpdate, ":  FabricIndex: %u", this->fabricIndex);
         ChipLogDetail(SoftwareUpdate, ":  RequestorNodeId: " ChipLogFormatX64, ChipLogValueX64(this->requestorNodeId));
-        ChipLogDetail(SoftwareUpdate, ":  ProviderEndpointId: %" PRIu16, this->providerEndpointId);
-        ChipLogDetail(SoftwareUpdate, ":  RequestorVendorId: %" PRIu16, this->requestorVendorId);
-        ChipLogDetail(SoftwareUpdate, ":  RequestorProductId: %" PRIu16, this->requestorProductId);
+        ChipLogDetail(SoftwareUpdate, ":  ProviderEndpointId: %u", this->providerEndpointId);
+        ChipLogDetail(SoftwareUpdate, ":  RequestorVendorId: %u", this->requestorVendorId);
+        ChipLogDetail(SoftwareUpdate, ":  RequestorProductId: %u", this->requestorProductId);
         ChipLogDetail(SoftwareUpdate, ":  RequestorCurrentVersion: %" PRIu32, this->requestorCurrentVersion);
         ChipLogDetail(SoftwareUpdate, ":  RequestorTargetVersion: %" PRIu32, this->requestorTargetVersion);
         ChipLogDetail(SoftwareUpdate, ":  Metadata:");

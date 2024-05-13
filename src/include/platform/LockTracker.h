@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <platform/CHIPDeviceBuildConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 
 /// Defines support for asserting that the chip stack is locked by the current thread via
 /// the macro:

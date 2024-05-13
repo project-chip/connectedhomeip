@@ -1,9 +1,9 @@
 package com.chip.casting.app;
 
 import android.content.Context;
-import android.net.nsd.NsdManager;
 import android.widget.LinearLayout;
 import androidx.fragment.app.FragmentActivity;
+import com.R;
 
 public class CastingContext {
   private FragmentActivity fragmentActivity;
@@ -16,9 +16,8 @@ public class CastingContext {
     return fragmentActivity.getApplicationContext();
   }
 
-  public NsdManager getNsdManager() {
-    return (NsdManager)
-        fragmentActivity.getApplicationContext().getSystemService(Context.NSD_SERVICE);
+  public FragmentActivity getFragmentActivity() {
+    return fragmentActivity;
   }
 
   public LinearLayout getCommissionersLayout() {

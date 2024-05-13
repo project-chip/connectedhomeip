@@ -1,0 +1,98 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 19.7.3. [TC-CHANNEL-5.3] Skip Channel Verification
+
+PICS:
+    - CHANNEL.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Channel"
+    endpoint: 1
+    majornumber:
+        type: int16u
+        defaultValue: 6
+    minornumber:
+        type: int16u
+        defaultValue: 0
+    majornumber2:
+        type: int16u
+        defaultValue: 9
+    minornumber2:
+        type: int16u
+        defaultValue: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    #Issue 13029
+    #This step implicitly validating the attribute(Lineup)constraints, as long as the payload is being parsed successfully
+    - label:
+          "Step 1: TH reads the Lineup attribute from the DUT to show list of
+          Inputs available and Verify that the response contains a lineup info
+          object"
+      PICS: CHANNEL.S.A0001
+      command: "readAttribute"
+      attribute: "Lineup"
+
+    - label: "Step 2: TH reads the ChannelList attribute from the DUT"
+      PICS: CHANNEL.S.A0000
+      command: "readAttribute"
+      attribute: "ChannelList"
+      response:
+          constraints:
+              type: list
+
+    - label: "Step 3: TH reads the CurrentChannel attribute from the DUT"
+      PICS: CHANNEL.S.A0002
+      command: "readAttribute"
+      attribute: "CurrentChannel"
+      response:
+          value: { MajorNumber: majornumber, MinorNumber: minornumber }
+
+    - label:
+          "Step 4: TH sends a SkipChannel command to the DUT with a value of 1"
+      PICS: CHANNEL.S.C03.Rsp
+      command: "SkipChannel"
+      arguments:
+          values:
+              - name: "Count"
+                value: 1
+
+    - label: "Step 4a: Verify that the channel has changed on the device"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CHANNEL.S.C03.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' if channel has changed on the device"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 5: TH reads the CurrentChannel attribute from the DUT"
+      PICS: CHANNEL.S.A0002 && CHANNEL.S.C03.Rsp
+      command: "readAttribute"
+      attribute: "CurrentChannel"
+      response:
+          value: { MajorNumber: majornumber2, MinorNumber: minornumber2 }
+          constraints:
+              type: ChannelInfoStruct

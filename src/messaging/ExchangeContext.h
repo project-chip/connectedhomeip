@@ -54,10 +54,11 @@ public:
  *    This class represents an ongoing conversation (ExchangeContext) between two or more nodes.
  *    It defines methods for encoding and communicating CHIP messages within an ExchangeContext
  *    over various transport mechanisms, for example, TCP, UDP, or CHIP Reliable Messaging.
+ *
  */
 class DLL_EXPORT ExchangeContext : public ReliableMessageContext,
                                    public ReferenceCounted<ExchangeContext, ExchangeContextDeletor>,
-                                   public SessionReleaseDelegate
+                                   public SessionDelegate
 {
     friend class ExchangeManager;
     friend class ExchangeContextDeletor;
@@ -66,7 +67,7 @@ public:
     typedef System::Clock::Timeout Timeout; // Type used to express the timeout in this ExchangeContext
 
     ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, const SessionHandle & session, bool Initiator,
-                    ExchangeDelegate * delegate);
+                    ExchangeDelegate * delegate, bool isEphemeralExchange = false);
 
     ~ExchangeContext() override;
 
@@ -81,9 +82,13 @@ public:
 
     bool IsGroupExchangeContext() const { return mSession && mSession->IsGroupSession(); }
 
-    // Implement SessionReleaseDelegate
+    // Implement SessionDelegate
+    NewSessionHandlingPolicy GetNewSessionHandlingPolicy() override { return NewSessionHandlingPolicy::kStayAtOldSession; }
     void OnSessionReleased() override;
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    void OnSessionConnectionClosed(CHIP_ERROR conErr) override;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     /**
      *  Send a CHIP message on this exchange.
      *
@@ -102,8 +107,6 @@ public:
      *  @param[in]    sendFlags     Flags set by the application for the CHIP message being sent.
      *
      *  @retval  #CHIP_ERROR_INVALID_ARGUMENT               if an invalid argument was passed to this SendMessage API.
-     *  @retval  #CHIP_ERROR_WRONG_MSG_VERSION_FOR_EXCHANGE if there is a mismatch in the specific send operation and the
-     *                                                       CHIP message protocol version that is supported.
      *  @retval  #CHIP_ERROR_NOT_CONNECTED                  if the context was associated with a connection that is now
      *                                                       closed.
      *  @retval  #CHIP_ERROR_INCORRECT_STATE                if the state of the exchange context is incorrect.
@@ -135,7 +138,6 @@ public:
      *
      *  @param[in]    messageCounter  The message counter of the packet.
      *  @param[in]    payloadHeader   A reference to the PayloadHeader object.
-     *  @param[in]    peerAddress     The address of the sender
      *  @param[in]    msgFlags        The message flags corresponding to the received message
      *  @param[in]    msgBuf          A handle to the packet buffer holding the CHIP message.
      *
@@ -144,8 +146,7 @@ public:
      *  @retval  #CHIP_NO_ERROR                             if the CHIP layer successfully delivered the message up to the
      *                                                       protocol layer.
      */
-    CHIP_ERROR HandleMessage(uint32_t messageCounter, const PayloadHeader & payloadHeader,
-                             const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,
+    CHIP_ERROR HandleMessage(uint32_t messageCounter, const PayloadHeader & payloadHeader, MessageFlags msgFlags,
                              System::PacketBufferHandle && msgBuf);
 
     ExchangeDelegate * GetDelegate() const { return mDelegate; }
@@ -155,9 +156,13 @@ public:
 
     ReliableMessageContext * GetReliableMessageContext() { return static_cast<ReliableMessageContext *>(this); };
 
-    ExchangeMessageDispatch & GetMessageDispatch() { return mDispatch; }
+    SessionHandle GetSessionHandle() const
+    {
+        VerifyOrDie(mSession);
+        auto sessionHandle = mSession.Get();
+        return std::move(sessionHandle.Value());
+    }
 
-    SessionHandle GetSessionHandle() const { return mSession.Get(); }
     bool HasSessionHandle() const { return mSession; }
 
     uint16_t GetExchangeId() const { return mExchangeId; }
@@ -170,17 +175,31 @@ public:
     void Close();
     void Abort();
 
+    // Applies a suggested response timeout value based on the session type and the given upper layer processing time for
+    // the next message to the exchange. The exchange context must have a valid session when calling this function.
+    //
+    // This function is an equivalent of SetResponseTimeout(mSession->ComputeRoundTripTimeout(applicationProcessingTimeout))
+    void UseSuggestedResponseTimeout(Timeout applicationProcessingTimeout);
+
+    // Set the response timeout for the exchange context, regardless of the underlying session type. Using
+    // UseSuggestedResponseTimeout to set a timeout based on the type of the session and the application processing time instead of
+    // using this function is recommended.
+    //
+    // If a timeout of 0 is provided, it implies no response is expected. Consequently, ExchangeDelegate::OnResponseTimeout will not
+    // be called.
+    //
     void SetResponseTimeout(Timeout timeout);
 
-private:
-    Timeout mResponseTimeout{ 0 }; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
-    ExchangeDelegate * mDelegate   = nullptr;
-    ExchangeManager * mExchangeMgr = nullptr;
-
-    ExchangeMessageDispatch & mDispatch;
-
-    SessionHolderWithDelegate mSession; // The connection state
-    uint16_t mExchangeId;               // Assigned exchange ID.
+    // This API is used by commands that need to shut down all existing
+    // sessions/exchanges on a fabric but need to make sure the response to the
+    // command still goes out on the exchange the command came in on.  This API
+    // will ensure that all secure sessions for the fabric this exchanges is on
+    // are released except the one this exchange is using, and will release
+    // that session once this exchange is done sending the response.
+    //
+    // This API is a no-op if called on an exchange that is not using a
+    // SecureSession.
+    void AbortAllOtherCommunicationOnFabric();
 
     /**
      *  Determine whether a response is currently expected for a message that was sent over
@@ -197,6 +216,48 @@ private:
      * yet been sent).
      */
     bool IsSendExpected() const { return mFlags.Has(Flags::kFlagWillSendMessage); }
+
+    /**
+     * Tracks whether we have received at least one application level message
+     * during the life-time of this exchange
+     *
+     * @return Returns 'true' if we have received at least one message, else 'false'
+     */
+    inline bool HasReceivedAtLeastOneMessage() { return mFlags.Has(Flags::kFlagReceivedAtLeastOneMessage); }
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    SessionHolder & GetSessionHolder() { return mSession; }
+
+    enum class InjectedFailureType : uint8_t
+    {
+        kFailOnSend = 0x01
+    };
+
+    void InjectFailure(InjectedFailureType failureType) { mInjectedFailures.Set(failureType); }
+
+    void ClearInjectedFailures() { mInjectedFailures.ClearAll(); }
+#endif
+
+private:
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    BitFlags<InjectedFailureType> mInjectedFailures;
+#endif
+
+    class ExchangeSessionHolder : public SessionHolderWithDelegate
+    {
+    public:
+        ExchangeSessionHolder(ExchangeContext & exchange) : SessionHolderWithDelegate(exchange) {}
+        void GrabExpiredSession(const SessionHandle & session);
+    };
+
+    Timeout mResponseTimeout{ 0 }; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
+    ExchangeDelegate * mDelegate   = nullptr;
+    ExchangeManager * mExchangeMgr = nullptr;
+
+    ExchangeMessageDispatch & mDispatch;
+
+    ExchangeSessionHolder mSession; // The connection state
+    uint16_t mExchangeId;           // Assigned exchange ID.
 
     /**
      *  Track whether we are now expecting a response to a message sent via this exchange (because that
@@ -224,9 +285,10 @@ private:
 
     /**
      * Notify our delegate, if any, that we have timed out waiting for a
-     * response.
+     * response.  If aCloseIfNeeded is true, check whether the exchange needs to
+     * be closed.
      */
-    void NotifyResponseTimeout();
+    void NotifyResponseTimeout(bool aCloseIfNeeded);
 
     CHIP_ERROR StartResponseTimer();
 
@@ -241,24 +303,18 @@ private:
      */
     void MessageHandled();
 
-    /**
-     * Updates Sleepy End Device polling mode in the following way:
-     * - does nothing for exchanges over Bluetooth LE
-     * - requests fast-polling (active) mode if there are more messages,
-     *   including MRP acknowledgements, expected to be sent or received on
-     *   this exchange.
-     * - withdraws the request for fast-polling (active) mode, otherwise.
-     */
-    void UpdateSEDPollingMode();
+    static ExchangeMessageDispatch & GetMessageDispatch(bool isEphemeralExchange, ExchangeDelegate * delegate);
 
-    /**
-     * Requests or withdraws the request for Sleepy End Device fast-polling mode
-     * based on the argument value.
-     *
-     * Note that the device switches to the slow-polling (idle) mode if no
-     * exchange nor other component requests the fast-polling mode.
-     */
-    void UpdateSEDPollingMode(bool fastPollingMode);
+    // If SetAutoReleaseSession() is called, this exchange must be using a SecureSession, and should
+    // evict it when the exchange is done with all its work (including any MRP traffic).
+    inline void SetIgnoreSessionRelease(bool ignore) { mFlags.Set(Flags::kFlagIgnoreSessionRelease, ignore); }
+
+    inline bool ShouldIgnoreSessionRelease() { return mFlags.Has(Flags::kFlagIgnoreSessionRelease); }
+
+    inline void SetHasReceivedAtLeastOneMessage(bool hasReceivedMessage)
+    {
+        mFlags.Set(Flags::kFlagReceivedAtLeastOneMessage, hasReceivedMessage);
+    }
 };
 
 } // namespace Messaging

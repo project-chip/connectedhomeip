@@ -28,7 +28,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/EventManagement.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -69,7 +69,7 @@ namespace app {
 class AttributePathExpandIterator
 {
 public:
-    AttributePathExpandIterator(ObjectList<AttributePathParams> * aAttributePath);
+    AttributePathExpandIterator(SingleLinkedListNode<AttributePathParams> * aAttributePath);
 
     /**
      * Proceed the iterator to the next attribute path in the given cluster info.
@@ -105,17 +105,18 @@ public:
     inline bool Valid() const { return mpAttributePath != nullptr; }
 
 private:
-    ObjectList<AttributePathParams> * mpAttributePath;
+    SingleLinkedListNode<AttributePathParams> * mpAttributePath;
+
+    ConcreteAttributePath mOutputPath;
 
     uint16_t mEndpointIndex, mEndEndpointIndex;
+    uint16_t mAttributeIndex, mEndAttributeIndex;
+
     // Note: should use decltype(EmberAfEndpointType::clusterCount) here, but af-types is including app specific generated files.
     uint8_t mClusterIndex, mEndClusterIndex;
-    uint16_t mAttributeIndex, mEndAttributeIndex;
     // For dealing with global attributes that are not part of the attribute
     // metadata.
     uint8_t mGlobalAttributeIndex, mGlobalAttributeEndIndex;
-
-    ConcreteAttributePath mOutputPath;
 
     /**
      * Prepare*IndexRange will update mBegin*Index and mEnd*Index variables.

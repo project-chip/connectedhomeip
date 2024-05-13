@@ -24,19 +24,19 @@
  * needs to use HDLC/UART for another purpose like the RPC server.
  */
 
-#include <logging/log.h>
-#include <logging/log_backend.h>
-#include <logging/log_backend_std.h>
-#include <logging/log_output.h>
-#include <zephyr.h>
+#include <zephyr/kernel.h>
+#include <zephyr/logging/log.h>
+#include <zephyr/logging/log_backend.h>
+#include <zephyr/logging/log_backend_std.h>
+#include <zephyr/logging/log_output.h>
 
 #include <pw_hdlc/encoder.h>
 #include <pw_stream/sys_io_stream.h>
 #include <pw_sys_io_nrfconnect/init.h>
 
+#include "pw_span/span.h"
 #include <cassert>
 #include <cstdint>
-#include <span>
 #include <string_view>
 
 namespace PigweedLogger {
@@ -61,7 +61,7 @@ bool sIsPanicMode;
 
 void flush()
 {
-    pw::hdlc::WriteUIFrame(kLogHdlcAddress, std::as_bytes(std::span(sWriteBuffer, sWriteBufferPos)), sWriter);
+    pw::hdlc::WriteUIFrame(kLogHdlcAddress, pw::as_bytes(pw::span(sWriteBuffer, sWriteBufferPos)), sWriter);
     sWriteBufferPos = 0;
 }
 
@@ -98,25 +98,17 @@ void init(const log_backend *)
     pw_sys_io_Init();
 }
 
-void putMessageSync(const log_backend *, log_msg_ids srcLevel, uint32_t timestamp, const char * fmt, va_list args)
+void processMessage(const struct log_backend * const backend, union log_msg_generic * msg)
 {
     int ret = k_sem_take(&sLoggerLock, K_FOREVER);
     assert(ret == 0);
 
     if (!sIsPanicMode)
-        log_backend_std_sync_string(&pigweedLogOutput, 0, srcLevel, timestamp, fmt, args);
+    {
+        log_format_func_t outputFunc = log_format_func_t_get(LOG_OUTPUT_TEXT);
 
-    k_sem_give(&sLoggerLock);
-}
-
-void putHexdumpSync(const log_backend *, log_msg_ids srcLevel, uint32_t timestamp, const char * metadata, const uint8_t * data,
-                    uint32_t length)
-{
-    int ret = k_sem_take(&sLoggerLock, K_FOREVER);
-    assert(ret == 0);
-
-    if (!sIsPanicMode)
-        log_backend_std_sync_hexdump(&pigweedLogOutput, 0, srcLevel, timestamp, metadata, data, length);
+        outputFunc(&pigweedLogOutput, &msg->log, log_backend_std_get_flags());
+    }
 
     k_sem_give(&sLoggerLock);
 }
@@ -134,11 +126,9 @@ void panic(const log_backend *)
 }
 
 const log_backend_api pigweedLogApi = {
-    .put              = nullptr,
-    .put_sync_string  = putMessageSync,
-    .put_sync_hexdump = putHexdumpSync,
-    .panic            = panic,
-    .init             = init,
+    .process = processMessage,
+    .panic   = panic,
+    .init    = init,
 };
 
 LOG_BACKEND_DEFINE(pigweedLogBackend, pigweedLogApi, /* autostart */ true);

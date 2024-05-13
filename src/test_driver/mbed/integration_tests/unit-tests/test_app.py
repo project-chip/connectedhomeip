@@ -13,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pytest
 import re
 
 
@@ -21,9 +20,9 @@ def test_unit_tests(device):
     device.reset(duration=1)
     # smoke test
     ret = device.wait_for_output("Mbed unit-tests application start")
-    assert ret != None and len(ret) > 0
+    assert ret is not None and len(ret) > 0
     ret = device.wait_for_output("Mbed unit-tests application run", 60)
-    assert ret != None and len(ret) > 0
+    assert ret is not None and len(ret) > 0
 
     ret = device.wait_for_output("CHIP test status:", 500)
     # extract number of failures:

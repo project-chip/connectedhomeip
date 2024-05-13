@@ -82,20 +82,37 @@ void ConnectivityManagerImpl::OnWiFiPlatformEvent(const ChipDeviceEvent * event)
 {
     if (event->Type == DeviceEventType::kWiFiConnectivityChange)
     {
+        WiFiStationState wifiStaState;
         switch (event->WiFiConnectivityChange.Result)
         {
         case kConnectivity_NoChange:
-            mWiFiStationState = kWiFiStationState_Connecting;
+            wifiStaState = kWiFiStationState_Connecting;
             break;
         case kConnectivity_Established:
             ChipLogProgress(DeviceLayer, "WiFi station connected");
-            mWiFiStationState = kWiFiStationState_Connected;
+            wifiStaState = kWiFiStationState_Connected;
             break;
         case kConnectivity_Lost:
             ChipLogProgress(DeviceLayer, "WiFi station disconnected");
-            mWiFiStationState = kWiFiStationState_NotConnected;
+            wifiStaState = kWiFiStationState_NotConnected;
+            NetworkCommissioning::WiFiDriverImpl::GetInstance().SetLastDisconnectReason(event);
             break;
+        default:
+            ChipLogError(DeviceLayer, "Unknown WiFi connectivity state");
+            return;
         }
+        ChangeWiFiStationState(wifiStaState);
+    }
+}
+
+void ConnectivityManagerImpl::ChangeWiFiStationState(WiFiStationState newState)
+{
+    if (mWiFiStationState != newState)
+    {
+        ChipLogProgress(DeviceLayer, "WiFi station state change: %s -> %s", WiFiStationStateToStr(mWiFiStationState),
+                        WiFiStationStateToStr(newState));
+        mWiFiStationState = newState;
+        SystemLayer().ScheduleLambda([]() { NetworkCommissioning::WiFiDriverImpl::GetInstance().OnNetworkStatusChange(); });
     }
 }
 

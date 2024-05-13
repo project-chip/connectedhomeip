@@ -1,0 +1,37 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 14.1.4. [TC-SC-1.4] MRP message counter and duplicate messaging
+
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "TH sends a message to DUT with the R flag set to 1."
+      verification: |
+          Verify DUT responds with an acknowledgement message with the A flag set and the Acknowledged Message Counter field set to the Message Counter of the received message.
+      disabled: true
+
+    - label:
+          "TH sends a duplicate message to the DUT, with the R flag set to 1 and
+          the same message counter as the message in step 1."
+      verification: |
+          Verify DUT responds with an acknowledgement message with the A flag set and the Acknowledged Message Counter field set to the Message Counter of the received message. Verify that the DUT takes no further action on duplicate messages.
+      disabled: true

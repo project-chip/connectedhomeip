@@ -23,6 +23,7 @@
  */
 #include <transport/raw/UDP.h>
 
+#include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <transport/raw/MessageHeader.h>
@@ -68,7 +69,7 @@ CHIP_ERROR UDP::Init(UdpListenParameters & params)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(Inet, "Failed to initialize Udp transport: %s", ErrorStr(err));
+        ChipLogProgress(Inet, "Failed to initialize Udp transport: %" CHIP_ERROR_FORMAT, err.Format());
         if (mUDPEndPoint)
         {
             mUDPEndPoint->Free();
@@ -110,6 +111,9 @@ CHIP_ERROR UDP::SendMessage(const Transport::PeerAddress & address, System::Pack
     addrInfo.DestPort    = address.GetPort();
     addrInfo.Interface   = address.GetInterface();
 
+    // Drop the message and return. Free the buffer.
+    CHIP_FAULT_INJECT(FaultInjection::kFault_DropOutgoingUDPMsg, msgBuf = nullptr; return CHIP_ERROR_CONNECTION_ABORTED;);
+
     return mUDPEndPoint->SendMsg(&addrInfo, std::move(msgBuf));
 }
 
@@ -119,17 +123,19 @@ void UDP::OnUdpReceive(Inet::UDPEndPoint * endPoint, System::PacketBufferHandle 
     UDP * udp               = reinterpret_cast<UDP *>(endPoint->mAppState);
     PeerAddress peerAddress = PeerAddress::UDP(pktInfo->SrcAddress, pktInfo->SrcPort, pktInfo->Interface);
 
+    CHIP_FAULT_INJECT(FaultInjection::kFault_DropIncomingUDPMsg, buffer = nullptr; return;);
+
     udp->HandleMessageReceived(peerAddress, std::move(buffer));
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Inet, "Failed to receive UDP message: %s", ErrorStr(err));
+        ChipLogError(Inet, "Failed to receive UDP message: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
 void UDP::OnUdpError(Inet::UDPEndPoint * endPoint, CHIP_ERROR err, const Inet::IPPacketInfo * pktInfo)
 {
-    ChipLogError(Inet, "Failed to receive UDP message: %s", ErrorStr(err));
+    ChipLogError(Inet, "Failed to receive UDP message: %" CHIP_ERROR_FORMAT, err.Format());
 }
 
 CHIP_ERROR UDP::MulticastGroupJoinLeave(const Transport::PeerAddress & address, bool join)
