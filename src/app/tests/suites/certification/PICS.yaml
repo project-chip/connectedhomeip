@@ -8692,9 +8692,7 @@ PICS:
           "Does the device implement the UserActiveModeTriggerHint attribute?"
       id: ICDM.S.A0006
 
-    - label:
-          "Does the device implement the OperatingMode?
-          attribute?"
+    - label: "Does the device implement the OperatingMode? attribute?"
       id: ICDM.S.A0007
 
     - label:

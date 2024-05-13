@@ -15,55 +15,36 @@
 #    limitations under the License.
 #
 import logging
+import re
 from enum import IntEnum, IntFlag, auto
 
 import chip.clusters as Clusters
+from chip.clusters import Attribute
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
 
-
-class UserActiveModeTriggerHintBitmap(IntFlag):
-    PowerCycle = auto()
-    SettingsMenu = auto()
-    CustomInstruction = auto()
-    DeviceManual = auto()
-    ActuateSensor = auto()
-    ActuateSensorSeconds = auto()
-    ActuateSensorTimes = auto()
-    ActuateSensorLightsBlink = auto()
-    ResetButton = auto()
-    ResetButtonLightsBlink = auto()
-    ResetButtonSeconds = auto()
-    ResetButtonTimes = auto()
-    SetupButton = auto()
-    SetupButtonSeconds = auto()
-    SetupButtonLightsBlink = auto()
-    SetupButtonTimes = auto()
-    AppDefinedButton = auto()
-
-
-class OperatingModeEnum(IntEnum):
-    SIT = 0
-    LIT = 1
-
-
 kRootEndpointId = 0
 kMaxUserActiveModeBitmap = 0x1FFFF
 kMaxUserActiveModeTriggerInstructionByteLength = 128
 
+cluster = Clusters.Objects.IcdManagement
+uat = cluster.Bitmaps.UserActiveModeTriggerBitmap
+modes = cluster.Enums.OperatingModeEnum
+features = cluster.Bitmaps.Feature
+
 # BitMask for all user active mode trigger hints that are depedent on the UserActiveModeTriggerInstruction
-kUatInstructionDependentBitMask = UserActiveModeTriggerHintBitmap.CustomInstruction | UserActiveModeTriggerHintBitmap.ActuateSensorSeconds | UserActiveModeTriggerHintBitmap.ActuateSensorTimes | UserActiveModeTriggerHintBitmap.ActuateSensorLightsBlink | UserActiveModeTriggerHintBitmap.ResetButtonLightsBlink | UserActiveModeTriggerHintBitmap.ResetButtonSeconds | UserActiveModeTriggerHintBitmap.ResetButtonTimes | UserActiveModeTriggerHintBitmap.SetupButtonSeconds | UserActiveModeTriggerHintBitmap.SetupButtonLightsBlink | UserActiveModeTriggerHintBitmap.SetupButtonTimes | UserActiveModeTriggerHintBitmap.AppDefinedButton
+kUatInstructionDependentBitMask = uat.kCustomInstruction | uat.kActuateSensorSeconds | uat.kActuateSensorTimes | uat.kActuateSensorLightsBlink | uat.kResetButtonLightsBlink | uat.kResetButtonSeconds | uat.kResetButtonTimes | uat.kSetupButtonSeconds | uat.kSetupButtonLightsBlink | uat.kSetupButtonTimes | uat.kAppDefinedButton
 
 # BitMask for UserActiveModeTriggerHint that REQUIRE the prescense of the UserActiveModeTriggerInstruction
-kUatInstructionMandatoryBitMask = UserActiveModeTriggerHintBitmap.CustomInstruction | UserActiveModeTriggerHintBitmap.ActuateSensorSeconds | UserActiveModeTriggerHintBitmap.ActuateSensorTimes | UserActiveModeTriggerHintBitmap.ResetButtonSeconds | UserActiveModeTriggerHintBitmap.ResetButtonTimes | UserActiveModeTriggerHintBitmap.SetupButtonSeconds | UserActiveModeTriggerHintBitmap.SetupButtonTimes | UserActiveModeTriggerHintBitmap.AppDefinedButton
+kUatInstructionMandatoryBitMask = uat.kCustomInstruction | uat.kActuateSensorSeconds | uat.kActuateSensorTimes | uat.kResetButtonSeconds | uat.kResetButtonTimes | uat.kSetupButtonSeconds | uat.kSetupButtonTimes | uat.kAppDefinedButton
 
 # BitMask for all user active mode trigger hints that have the UserActiveModeTriggerInstruction as an uint
-kUatNumberInstructionBitMask = UserActiveModeTriggerHintBitmap.ActuateSensorSeconds | UserActiveModeTriggerHintBitmap.ActuateSensorTimes | UserActiveModeTriggerHintBitmap.ResetButtonSeconds | UserActiveModeTriggerHintBitmap.ResetButtonTimes | UserActiveModeTriggerHintBitmap.SetupButtonSeconds | UserActiveModeTriggerHintBitmap.SetupButtonTimes
+kUatNumberInstructionBitMask = uat.kActuateSensorSeconds | uat.kActuateSensorTimes | uat.kResetButtonSeconds | uat.kResetButtonTimes | uat.kSetupButtonSeconds | uat.kSetupButtonTimes
 
 # BitMask for all user active mode trigger hints that provide a color in the UserActiveModeTriggerInstruction
-kUatColorInstructionBitMask = UserActiveModeTriggerHintBitmap.ActuateSensorLightsBlink | UserActiveModeTriggerHintBitmap.ResetButtonLightsBlink | UserActiveModeTriggerHintBitmap.SetupButtonLightsBlink
+kUatColorInstructionBitMask = uat.kActuateSensorLightsBlink | uat.kResetButtonLightsBlink | uat.kSetupButtonLightsBlink
 
 
 @staticmethod
@@ -88,11 +69,9 @@ class TC_ICDM_2_1(MatterBaseTest):
     #
 
     async def _read_icdm_attribute_expect_success(self, attribute):
-        cluster = Clusters.Objects.IcdManagement
         return await self.read_single_attribute_check_success(endpoint=kRootEndpointId, cluster=cluster, attribute=attribute)
 
     async def _wildcard_cluster_read(self):
-        cluster = Clusters.IcdManagement
         return await self.default_controller.ReadAttribute(self.dut_node_id, [(kRootEndpointId, cluster)])
 
     #
@@ -140,15 +119,24 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         # Commissioning
         self.step(1)
+        # Read feature map
+        featureMap = await self._read_icdm_attribute_expect_success(
+            attributes.FeatureMap)
 
         # Validate ActiveModeThreshold
         self.step(2)
         if self.check_pics("ICDM.S.A0002"):
+
             activeModeThreshold = await self._read_icdm_attribute_expect_success(
                 attributes.ActiveModeThreshold)
             # Verify ActiveModeThreshold is not bigger than uint16
             asserts.assert_true(is_valid_uint16_value(activeModeThreshold),
                                 "ActiveModeThreshold attribute does not fit in a uint16.")
+
+            if featureMap > 0 and features.kLongIdleTimeSupport in features(featureMap):
+                asserts.assert_greater_equal(
+                    activeModeThreshold, 5000, "Minimum ActiveModeThreshold is 5s for a LIT ICD.")
+
         else:
             asserts.assert_true(
                 False, "ActiveModeThreshold is a mandatory attribute and must be present in the PICS file")
@@ -224,7 +212,7 @@ class TC_ICDM_2_1(MatterBaseTest):
                                 "UserActiveModeTriggerHint attribute does not fit in a bitmap32")
 
             # Verify that only a single UserActiveModeTriggerInstruction dependent bit is set
-            uatHintInstructionDepedentBitmap = UserActiveModeTriggerHintBitmap(
+            uatHintInstructionDepedentBitmap = uat(
                 userActiveModeTriggerHint) & kUatInstructionDependentBitMask
 
             asserts.assert_less_equal(
@@ -240,7 +228,7 @@ class TC_ICDM_2_1(MatterBaseTest):
             try:
                 encodedUATInstruction = userActiveModeTriggerInstruction.encode(
                     'utf-8')
-            except Exception as e:
+            except Exception:
                 asserts.assert_true(
                     false, "UserActiveModeTriggerInstruction is not encoded in the correct format (utf-8).")
 
@@ -248,14 +236,14 @@ class TC_ICDM_2_1(MatterBaseTest):
             asserts.assert_less_equal(
                 len(encodedUATInstruction), kMaxUserActiveModeTriggerInstructionByteLength, "UserActiveModeTriggerInstruction is longuer than the maximum allowed length (128).")
 
-            if uatHintInstructionDepedentBitmap in kUatNumberInstructionBitMask:
+            if uatHintInstructionDepedentBitmap > 0 and uatHintInstructionDepedentBitmap in kUatNumberInstructionBitMask:
                 # Validate Instruction is a decimal unsigned integer using the ASCII digits 0-9, and without leading zeros.
-                asserts.assert_true(userActiveModeTriggerInstruction.isdigit(
-                ), "UserActiveModeTriggerInstruction is not in the correct format for the associated UserActiveModeTriggerHint")
+                asserts.assert_true((re.search(r'^(?!0)[0-9]*$', userActiveModeTriggerInstruction) is not None),
+                                    "UserActiveModeTriggerInstruction is not in the correct format for the associated UserActiveModeTriggerHint")
 
-            if uatHintInstructionDepedentBitmap in kUatColorInstructionBitMask:
+            if uatHintInstructionDepedentBitmap > 0 and uatHintInstructionDepedentBitmap in kUatColorInstructionBitMask:
                 # TODO: https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/9194
-                asserts.assert_true(true, "Nothing to do for now")
+                asserts.assert_true(False, "Nothing to do for now")
         else:
             # Check if the UserActiveModeTriggerInstruction was required
             asserts.assert_false(uatHintInstructionDepedentBitmap in kUatInstructionMandatoryBitMask,
@@ -270,8 +258,8 @@ class TC_ICDM_2_1(MatterBaseTest):
             asserts.assert_true(is_valid_uint8_value(operatingMode),
                                 "OperatingMode does not fit in an enum8")
 
-            asserts.assert_less_equal(
-                operatingMode, 1, "OperatingMode can only have 0 and 1 as valid values")
+            asserts.assert_less(
+                operatingMode, modes.kUnknownEnumValue, "OperatingMode can only have 0 and 1 as valid values")
 
 
 if __name__ == "__main__":
