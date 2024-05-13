@@ -33,10 +33,12 @@ TOP_LEVEL_CONFORMANCE_TAGS = {OTHERWISE_CONFORM, OPTIONAL_CONFORM,
 AND_TERM = 'andTerm'
 OR_TERM = 'orTerm'
 NOT_TERM = 'notTerm'
+GREATER_TERM = 'greaterTerm'
 FEATURE_TAG = 'feature'
 ATTRIBUTE_TAG = 'attribute'
 COMMAND_TAG = 'command'
 CONDITION_TAG = 'condition'
+LITERAL_TAG = 'literal'
 
 
 class ConformanceException(Exception):
@@ -121,6 +123,18 @@ class provisional:
 
     def __str__(self):
         return 'P'
+
+
+class literal:
+    def __init__(self, value: str):
+        self.value = int(value)
+
+    def __call__(self):
+        # This should never be called
+        raise ConformanceException(f'Literal conformance function should not be called - this is simply a value holder')
+
+    def __str__(self):
+        return str(self.value)
 
 
 class feature:
@@ -267,8 +281,25 @@ class or_operation:
         op_strs = [str(op) for op in self.op_list]
         return f'({" | ".join(op_strs)})'
 
-# TODO: add xor operation once it's required
-# TODO: how would equal and unequal operations work here?
+
+class greater_operation:
+    def _type_ok(self, op: Callable):
+        return type(op) == attribute or type(op) == literal
+
+    def __init__(self, op1: Callable, op2: Callable):
+        if not self._type_ok(op1) or not self._type_ok(op2):
+            raise ConformanceException('Arithmetic operations can only have attribute or literal value children')
+        self.op1 = op1
+        self.op2 = op2
+
+    def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecision:
+        # For now, this is fully optional, need to implement this properly later, but it requires access to the actual attribute values
+        # We need to reach into the attribute, but can't use it directly because the attribute callable is an EXISTENCE check and
+        # the arithmetic functions require a value.
+        return ConformanceDecision.OPTIONAL
+
+    def __str__(self):
+        return f'{str(self.op1)} > {str(self.op2)}'
 
 
 class otherwise:
@@ -325,6 +356,8 @@ def parse_callable_from_xml(element: ElementTree.Element, params: ConformancePar
             return command(params.command_map[element.get('name')], element.get('name'))
         elif element.tag == CONDITION_TAG and element.get('name').lower() == 'zigbee':
             return zigbee()
+        elif element.tag == LITERAL_TAG:
+            return literal(element.get('value'))
         else:
             raise ConformanceException(
                 f'Unexpected xml conformance element with no children {str(element.tag)} {str(element.attrib)}')
@@ -354,5 +387,9 @@ def parse_callable_from_xml(element: ElementTree.Element, params: ConformancePar
         return not_operation(ops[0])
     elif element.tag == OTHERWISE_CONFORM:
         return otherwise(ops)
+    elif element.tag == GREATER_TERM:
+        if len(ops) != 2:
+            raise ConformanceException(f'Greater than term found with more than two subelements {list(element)}')
+        return greater_operation(ops[0], ops[1])
     else:
         raise ConformanceException(f'Unexpected conformance tag with children {element}')
