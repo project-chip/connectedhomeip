@@ -14,7 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "app/util/af-types.h"
 #include <optional>
 #include <variant>
 
@@ -29,6 +28,7 @@
 #include <app/RequiredPrivilege.h>
 #include <app/codegen-interaction-model/Model.h>
 #include <app/data-model/FabricScoped.h>
+#include <app/util/af-types.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/attribute-storage-detail.h>
 #include <app/util/attribute-storage-null-handling.h>
