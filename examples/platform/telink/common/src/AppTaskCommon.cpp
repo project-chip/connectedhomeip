@@ -90,8 +90,8 @@ void OnIdentifyTriggerEffect(Identify * identify)
 
 Identify sIdentify = {
     kExampleEndpointId,
-    [](Identify *) { ChipLogProgress(Zcl, "OnIdentifyStart"); },
-    [](Identify *) { ChipLogProgress(Zcl, "OnIdentifyStop"); },
+    AppTask::IdentifyStartHandler,
+    AppTask::IdentifyStopHandler,
     Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
     OnIdentifyTriggerEffect,
 };
@@ -316,6 +316,30 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     }
 
     return CHIP_NO_ERROR;
+}
+
+void AppTaskCommon::IdentifyStartHandler(Identify *)
+{
+    AppEvent event;
+
+    event.Type    = AppEvent::kEventType_IdentifyStart;
+    event.Handler = [](AppEvent *event) {
+        ChipLogProgress(Zcl, "OnIdentifyStart");
+        PwmManager::getInstance().setPwmBlink(PwmManager::EAppPwm_Indication, kIdentifyBlinkRateMs, kIdentifyBlinkRateMs);
+    };
+    GetAppTask().PostEvent(&event);
+}
+
+void AppTaskCommon::IdentifyStopHandler(Identify *)
+{
+    AppEvent event;
+
+    event.Type    = AppEvent::kEventType_IdentifyStop;
+    event.Handler = [](AppEvent *event) {
+        ChipLogProgress(Zcl, "OnIdentifyStop");
+        PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Indication, false);
+    };
+    GetAppTask().PostEvent(&event);
 }
 
 #ifdef CONFIG_CHIP_PW_RPC
