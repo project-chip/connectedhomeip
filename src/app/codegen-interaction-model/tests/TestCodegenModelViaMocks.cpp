@@ -16,11 +16,16 @@
  */
 #include <app/codegen-interaction-model/Model.h>
 
+#include <access/AccessControl.h>
+
+#include <app/MessageDef/ReportDataMessage.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <app/util/mock/MockNodeConfig.h>
 
 #include <gtest/gtest.h>
+
+#include <pw_span/span.h>
 
 using namespace chip;
 using namespace chip::Test;
@@ -28,7 +33,23 @@ using namespace chip::app;
 using namespace chip::app::InteractionModel;
 using namespace chip::app::Clusters::Globals::Attributes;
 
+namespace pw {
+template <>
+StatusWithSize ToString<CHIP_ERROR>(const CHIP_ERROR & err, pw::span<char> buffer)
+{
+    if (CHIP_ERROR::IsSuccess(err))
+    {
+        // source location probably does not matter
+        return pw::string::Format(buffer, "CHIP_NO_ERROR");
+    }
+    return pw::string::Format(buffer, "CHIP_ERROR:<%" CHIP_ERROR_FORMAT ">", err.Format());
+}
+} // namespace pw
+
 namespace {
+
+constexpr FabricIndex kTestFabrixIndex = kMinValidFabricIndex;
+constexpr NodeId kTestNodeId           = 0xFFFF'1234'ABCD'4321;
 
 constexpr EndpointId kEndpointIdThatIsMissing = kMockEndpointMin - 1;
 
@@ -36,6 +57,12 @@ static_assert(kEndpointIdThatIsMissing != kInvalidEndpointId);
 static_assert(kEndpointIdThatIsMissing != kMockEndpoint1);
 static_assert(kEndpointIdThatIsMissing != kMockEndpoint2);
 static_assert(kEndpointIdThatIsMissing != kMockEndpoint3);
+
+constexpr Access::SubjectDescriptor kCaseSubjectDescriptor{
+    .fabricIndex = kTestFabrixIndex,
+    .authMode    = Access::AuthMode::kCase,
+    .subject     = kTestNodeId,
+};
 
 // clang-format off
 const MockNodeConfig gTestNodeConfig({
@@ -286,4 +313,40 @@ TEST(TestCodegenModelViaMocks, GetAttributeInfo)
     info = model.GetAttributeInfo(ConcreteAttributePath(kMockEndpoint2, MockClusterId(2), MockAttributeId(2)));
     ASSERT_TRUE(info.has_value());
     EXPECT_TRUE(info->flags.Has(AttributeQualityFlags::kListAttribute)); // NOLINT(bugprone-unchecked-optional-access)
+}
+
+TEST(TestCodegenModelViaMocks, EmberAttributeRead)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    chip::app::CodegenDataModel::Model model;
+
+
+    // TODO: AccessControl init how?
+    // Access::GetAccessControl().Init(delegate, resolver);
+
+    ReadAttributeRequest readRequest;
+
+    // operationFlags is 0 i.e. not internal
+    // readFlags is 0 i.e. not fabric filtered
+    // dataVersion is missing (no data version filtering)
+    readRequest.subjectDescriptor = kCaseSubjectDescriptor;
+    readRequest.path              = ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), MockAttributeId(10));
+
+    std::optional<ClusterInfo> info = model.GetClusterInfo(readRequest.path);
+    ASSERT_TRUE(info.has_value());
+
+    DataVersion dataVersion = info->dataVersion; // NOLINT(bugprone-unchecked-optional-access)
+
+    uint8_t tlvBuffer[1024];
+
+    TLV::TLVWriter tlvWriter;
+    tlvWriter.Init(tlvBuffer);
+
+    AttributeReportIBs::Builder builder;
+    CHIP_ERROR err = builder.Init(&tlvWriter);
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+    AttributeValueEncoder encoder(builder, kCaseSubjectDescriptor, readRequest.path, dataVersion);
+
+    err = model.ReadAttribute(readRequest, encoder);
+    ASSERT_EQ(err, CHIP_NO_ERROR);
 }
