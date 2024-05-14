@@ -73,15 +73,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSMutableArray<MTRDownload *> * downloads;
 
 - (MTRDownload * _Nullable)get:(NSString *)fileDesignator
-                fabricIndex:(NSNumber *)fabricIndex
-                     nodeID:(NSNumber *)nodeID;
+                   fabricIndex:(NSNumber *)fabricIndex
+                        nodeID:(NSNumber *)nodeID;
 
 - (MTRDownload * _Nullable)add:(MTRDiagnosticLogType)type
-                fabricIndex:(NSNumber *)fabricIndex
-                     nodeID:(NSNumber *)nodeID
-                      queue:(dispatch_queue_t)queue
-                 completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
-                       done:(void (^)(MTRDownload * finishedDownload))done;
+                   fabricIndex:(NSNumber *)fabricIndex
+                        nodeID:(NSNumber *)nodeID
+                         queue:(dispatch_queue_t)queue
+                    completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
+                          done:(void (^)(MTRDownload * finishedDownload))done;
 @end
 
 @interface MTRDiagnosticLogsDownloader ()
@@ -333,11 +333,11 @@ private:
 }
 
 - (MTRDownload * _Nullable)add:(MTRDiagnosticLogType)type
-                fabricIndex:(NSNumber *)fabricIndex
-                     nodeID:(NSNumber *)nodeID
-                      queue:(dispatch_queue_t)queue
-                 completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
-                       done:(void (^)(MTRDownload * finishedDownload))done
+                   fabricIndex:(NSNumber *)fabricIndex
+                        nodeID:(NSNumber *)nodeID
+                         queue:(dispatch_queue_t)queue
+                    completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
+                          done:(void (^)(MTRDownload * finishedDownload))done
 {
     assertChipStackLockedByCurrentThread();
 
