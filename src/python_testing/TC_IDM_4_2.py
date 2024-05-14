@@ -27,7 +27,7 @@ from chip.clusters.Attribute import AttributePath, TypedAttributePath
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
 from matter_testing_support import (AttributeChangeCallback, MatterBaseTest, async_test_body, default_matter_test_main,
-                                    wait_for_attribute_report)
+                   wait_for_attribute_report)
 from mobly import asserts
 
 
