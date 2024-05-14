@@ -19,6 +19,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 #include "Options.h"
 
@@ -28,12 +29,20 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/Base64.h>
 #include <lib/support/BytesToHex.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
 #if ENABLE_TRACING
 #include <TracingCommandLineArgument.h> // nogncheck
+#endif
+
+#if CHIP_WITH_NLFAULTINJECTION
+#include <inet/InetFaultInjection.h>
+#include <lib/support/CHIPFaultInjection.h>
+#include <system/SystemFaultInjection.h>
 #endif
 
 using namespace chip;
@@ -93,6 +102,9 @@ enum
     kDeviceOption_WiFiSupports5g = 0x1025,
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     kDeviceOption_SubscriptionResumptionRetryIntervalSec = 0x1026,
+#endif
+#if CHIP_WITH_NLFAULTINJECTION
+    kDeviceOption_FaultInjection = 0x1027,
 #endif
 };
 
@@ -155,6 +167,9 @@ OptionDef sDeviceOptionDefs[] = {
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     { "subscription-capacity", kArgumentRequired, kDeviceOption_SubscriptionCapacity },
     { "subscription-resumption-retry-interval", kArgumentRequired, kDeviceOption_SubscriptionResumptionRetryIntervalSec },
+#endif
+#if CHIP_WITH_NLFAULTINJECTION
+    { "faults", kArgumentRequired, kDeviceOption_FaultInjection },
 #endif
     {}
 };
@@ -286,6 +301,10 @@ const char * sDeviceOptionHelp =
     "       Max number of subscriptions the device will allow\n"
     "  --subscription-resumption-retry-interval\n"
     "       subscription timeout resumption retry interval in seconds\n"
+#endif
+#if CHIP_WITH_NLFAULTINJECTION
+    "  --faults <fault-string,...>\n"
+    "       Inject specified fault(s) at runtime.\n"
 #endif
     "\n";
 
@@ -556,6 +575,20 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
     case kDeviceOption_SubscriptionResumptionRetryIntervalSec:
         LinuxDeviceOptions::GetInstance().subscriptionResumptionRetryIntervalSec = static_cast<int32_t>(atoi(aValue));
         break;
+#endif
+#if CHIP_WITH_NLFAULTINJECTION
+    case kDeviceOption_FaultInjection: {
+        constexpr nl::FaultInjection::GetManagerFn faultManagerFns[] = { FaultInjection::GetManager,
+                                                                         Inet::FaultInjection::GetManager,
+                                                                         System::FaultInjection::GetManager };
+        Platform::ScopedMemoryString mutableArg(aValue, strlen(aValue)); // ParseFaultInjectionStr may mutate
+        if (!nl::FaultInjection::ParseFaultInjectionStr(mutableArg.Get(), faultManagerFns, ArraySize(faultManagerFns)))
+        {
+            PrintArgError("%s: Invalid fault injection specification\n", aProgram);
+            retval = false;
+        }
+        break;
+    }
 #endif
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);

@@ -15,6 +15,9 @@
  *    limitations under the License.
  */
 
+// TODO To prevent config with nl headers has to be included before  nl test headers
+#include <pw_unit_test/unit_test_service.h>
+
 #include <AppConfig.h>
 #include <FreeRTOS.h>
 #include <PigweedLogger.h>
@@ -30,6 +33,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+#include <sl_system_init.h>
 #include <sl_system_kernel.h>
 #include <task.h>
 
@@ -166,10 +170,11 @@ StaticTask_t sTestTaskBuffer;
 StackType_t sTestTaskStack[TEST_TASK_STACK_SIZE];
 
 chip::rpc::NlTest nl_test_service;
+pw::unit_test::UnitTestService unit_test_service;
 
 void RegisterServices(pw::rpc::Server & server)
 {
-    server.RegisterService(nl_test_service);
+    server.RegisterService(nl_test_service, unit_test_service);
 }
 
 void RunRpcService(void *)
@@ -181,6 +186,7 @@ void RunRpcService(void *)
 
 int main(void)
 {
+    sl_system_init();
     chip::DeviceLayer::Silabs::GetPlatform().Init();
     PigweedLogger::init();
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);

@@ -28,6 +28,9 @@ typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *
 @property (nonatomic, nullable) MTRDeviceTestDelegateDataHandler onEventDataReceived;
 @property (nonatomic, nullable) dispatch_block_t onReportEnd;
 @property (nonatomic, nullable) dispatch_block_t onDeviceCachePrimed;
+@property (nonatomic) BOOL skipExpectedValuesForWrite;
+@property (nonatomic) BOOL forceAttributeReportsIfMatchingCache;
+@property (nonatomic, nullable) dispatch_block_t onDeviceConfigurationChanged;
 @end
 
 NS_ASSUME_NONNULL_END

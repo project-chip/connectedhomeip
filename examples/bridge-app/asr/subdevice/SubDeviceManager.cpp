@@ -27,6 +27,7 @@
 #include <app/reporting/reporting.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/endpoint-config-api.h>
 #include <assert.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/ErrorStr.h>

@@ -52,19 +52,29 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
 
     dispatch_queue_t workQueue = [[MCCastingApp getSharedInstance] getWorkQueue];
     dispatch_sync(workQueue, ^{
+        matter::casting::core::IdentificationDeclarationOptions idOptions;
+
+        // TODO: In the following PRs. Replace EndpointFilter objC class with IdentificationDeclarationOptions objC class.
         __block matter::casting::core::EndpointFilter cppDesiredEndpointFilter;
         if (desiredEndpointFilter != nil) {
-            cppDesiredEndpointFilter.vendorId = desiredEndpointFilter.vendorId;
-            cppDesiredEndpointFilter.productId = desiredEndpointFilter.productId;
+            chip::Protocols::UserDirectedCommissioning::TargetAppInfo targetAppInfo;
+            targetAppInfo.vendorId = desiredEndpointFilter.vendorId;
+            targetAppInfo.productId = desiredEndpointFilter.productId;
+
+            CHIP_ERROR result = idOptions.addTargetAppInfo(targetAppInfo);
+            if (result != CHIP_NO_ERROR) {
+                ChipLogError(AppServer, "MCCastingPlayer.verifyOrEstablishConnectionWithCompletionBlock failed to add targetAppInfo: %" CHIP_ERROR_FORMAT, result.Format());
+            }
         }
 
+        // TODO: In the following PRs. Add optional CommissionerDeclarationHandler callback parameter.
         _cppCastingPlayer->VerifyOrEstablishConnection(
             [completion](CHIP_ERROR err, matter::casting::core::CastingPlayer * castingPlayer) {
                 dispatch_queue_t clientQueue = [[MCCastingApp getSharedInstance] getClientQueue];
                 dispatch_async(clientQueue, ^{
                     completion(err == CHIP_NO_ERROR ? nil : [MCErrorUtils NSErrorFromChipError:err]);
                 });
-            }, timeout, cppDesiredEndpointFilter);
+            }, timeout, idOptions);
     });
 }
 
@@ -87,10 +97,24 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
     return self;
 }
 
++ (MCCastingPlayer * _Nullable)getTargetCastingPlayer
+{
+    ChipLogProgress(AppServer, "MCCastingPlayer.getTargetCastingPlayer called");
+    VerifyOrReturnValue([[MCCastingApp getSharedInstance] isRunning], nil, ChipLogError(AppServer, "MCCastingApp NOT running"));
+    __block MCCastingPlayer * castingPlayer = nil;
+    dispatch_sync([[MCCastingApp getSharedInstance] getWorkQueue], ^{
+        matter::casting::core::CastingPlayer * cppCastingPlayer = matter::casting::core::CastingPlayer::GetTargetCastingPlayer();
+        if (cppCastingPlayer != nullptr) {
+            castingPlayer = [[MCCastingPlayer alloc] initWithCppCastingPlayer:std::make_shared<matter::casting::core::CastingPlayer>(*cppCastingPlayer)];
+        }
+    });
+    return castingPlayer;
+}
+
 - (NSString * _Nonnull)description
 {
-    return [NSString stringWithFormat:@"%@ with Product ID: %hu and Vendor ID: %hu. Resolved IPAddr?: %@",
-                     self.deviceName, self.productId, self.vendorId, self.ipAddresses != nil && self.ipAddresses.count > 0 ? @"YES" : @"NO"];
+    return [NSString stringWithFormat:@"%@ with Product ID: %hu and Vendor ID: %hu. Resolved IPAddr?: %@. Supports Commissioner Generated Passcode?: %@.",
+                     self.deviceName, self.productId, self.vendorId, self.ipAddresses != nil && self.ipAddresses.count > 0 ? @"YES" : @"NO", self.supportsCommissionerGeneratedPasscode ? @"YES" : @"NO"];
 }
 
 - (NSString * _Nonnull)identifier
@@ -116,6 +140,21 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
 - (uint32_t)deviceType
 {
     return _cppCastingPlayer->GetDeviceType();
+}
+
+- (bool)supportsCommissionerGeneratedPasscode
+{
+    return _cppCastingPlayer->GetSupportsCommissionerGeneratedPasscode();
+}
+
+- (NSString * _Nonnull)hostName
+{
+    return [NSString stringWithCString:_cppCastingPlayer->GetHostName() encoding:NSUTF8StringEncoding];
+}
+
+- (NSString * _Nonnull)instanceName
+{
+    return [NSString stringWithCString:_cppCastingPlayer->GetInstanceName() encoding:NSUTF8StringEncoding];
 }
 
 - (NSArray * _Nonnull)ipAddresses

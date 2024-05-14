@@ -74,6 +74,9 @@ enum class WiFiStatsCountType
     kWiFiOverrunCount
 };
 
+// Static variable to store the maximum heap size
+static size_t maxHeapHighWatermark = 0;
+
 CHIP_ERROR GetEthernetStatsCount(EthernetStatsCountType type, uint64_t & count)
 {
     CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
@@ -244,6 +247,11 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeap
     // the current running program.
     currentHeapUsed = mallocInfo.uordblks;
 
+    // Update the maximum heap high watermark if the current heap usage exceeds it.
+    if (currentHeapUsed > maxHeapHighWatermark)
+    {
+        maxHeapHighWatermark = currentHeapUsed;
+    }
     return CHIP_NO_ERROR;
 #endif
 }
@@ -260,9 +268,15 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
     // has been used by the Node.
     // On Linux, since it uses virtual memory, whereby a page of memory could be copied to
     // the hard disk, called swap space, and free up that page of memory. So it is impossible
-    // to know accurately peak physical memory it use. We just return the current heap memory
-    // being used by the current running program.
-    currentHeapHighWatermark = mallocInfo.uordblks;
+    // to know accurately peak physical memory it use.
+    // Update the maximum heap high watermark if the current heap usage exceeds it.
+    if (mallocInfo.uordblks > static_cast<int>(maxHeapHighWatermark))
+    {
+        maxHeapHighWatermark = mallocInfo.uordblks;
+    }
+
+    // Set the current heap high watermark.
+    currentHeapHighWatermark = maxHeapHighWatermark;
 
     return CHIP_NO_ERROR;
 #endif
@@ -273,8 +287,10 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
     // If implemented, the server SHALL set the value of the CurrentHeapHighWatermark attribute to the
     // value of the CurrentHeapUsed.
 
-    // On Linux, the write operation is non-op since we always rely on the mallinfo system
-    // function to get the current heap memory.
+    // Get the current amount of heap memory, in bytes, that are being used by
+    // the current running program and reset the max heap high watermark to current heap amount.
+    struct mallinfo mallocInfo = mallinfo();
+    maxHeapHighWatermark       = mallocInfo.uordblks;
 
     return CHIP_NO_ERROR;
 }
@@ -757,6 +773,16 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiOverrunCount(uint64_t & overrunCou
     overrunCount = count - mOverrunCount;
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconRxCount(uint32_t & beaconRxCount)
+{
+    if (DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
+    {
+        beaconRxCount = mBeaconRxCount;
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()

@@ -122,10 +122,24 @@ static_library("ESP32") {
       "NetworkCommissioningDriver.cpp",
       "NetworkCommissioningDriver.h",
     ]
+  }
+
+  if (chip_mdns == "platform") {
+    sources += [ "DnssdImpl.cpp" ]
+  }
+
+  if (chip_enable_ethernet) {
+    sources += [
+      "ConnectivityManagerImpl_Ethernet.cpp",
+      "NetworkCommissioningDriver_Ethernet.cpp",
+    ]
+  }
+
+  if (chip_enable_ethernet || chip_enable_wifi) {
     if (chip_mdns == "platform") {
       sources += [
-        "WiFiDnssdImpl.cpp",
-        "WiFiDnssdImpl.h",
+        "ESP32DnssdImpl.cpp",
+        "ESP32DnssdImpl.h",
       ]
     }
     if (chip_mdns == "minimal") {
@@ -139,17 +153,6 @@ static_library("ESP32") {
         "route_hook/ESP32RouteTable.h",
       ]
     }
-  }
-
-  if (chip_mdns == "platform") {
-    sources += [ "DnssdImpl.cpp" ]
-  }
-
-  if (chip_enable_ethernet) {
-    sources += [
-      "ConnectivityManagerImpl_Ethernet.cpp",
-      "NetworkCommissioningDriver_Ethernet.cpp",
-    ]
   }
 
   if (chip_enable_openthread) {
@@ -182,6 +185,8 @@ static_library("ESP32") {
     sources += [
       "ESP32DeviceInfoProvider.cpp",
       "ESP32DeviceInfoProvider.h",
+      "StaticESP32DeviceInfoProvider.cpp",
+      "StaticESP32DeviceInfoProvider.h",
     ]
   }
 

@@ -22,6 +22,9 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/content-launch-server/content-launch-server.h>
 
+#include <list>
+#include <string>
+
 using chip::CharSpan;
 using chip::EndpointId;
 using chip::app::AttributeValueEncoder;

@@ -175,6 +175,16 @@ void ReadHandler::Close(CloseOptions options)
         }
     }
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+
+#if CHIP_PROGRESS_LOGGING
+    if (IsType(InteractionType::Subscribe))
+    {
+        const ScopedNodeId & peer = mSessionHandle ? mSessionHandle->GetPeer() : ScopedNodeId();
+        ChipLogProgress(DataManagement, "Subscription id 0x%" PRIx32 " from node " ChipLogFormatScopedNodeId " torn down",
+                        mSubscriptionId, ChipLogValueScopedNodeId(peer));
+    }
+#endif // CHIP_PROGRESS_LOGGING
+
     MoveToState(HandlerState::AwaitingDestruction);
     mManagementCallback.OnDone(*this);
 }
@@ -821,6 +831,7 @@ void ReadHandler::PersistSubscription()
     auto * subscriptionResumptionStorage = mManagementCallback.GetInteractionModelEngine()->GetSubscriptionResumptionStorage();
     VerifyOrReturn(subscriptionResumptionStorage != nullptr);
 
+    // TODO(#31873): We need to store the CAT information to enable better interactions with ICDs
     SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo = { .mNodeId         = GetInitiatorNodeId(),
                                                                          .mFabricIndex    = GetAccessingFabricIndex(),
                                                                          .mSubscriptionId = mSubscriptionId,
@@ -840,7 +851,7 @@ void ReadHandler::PersistSubscription()
 void ReadHandler::ResetPathIterator()
 {
     mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributePathList);
-    mAttributeEncoderState       = AttributeValueEncoder::AttributeEncodeState();
+    mAttributeEncoderState.Reset();
 }
 
 void ReadHandler::AttributePathIsDirty(const AttributePathParams & aAttributeChanged)
@@ -869,7 +880,7 @@ void ReadHandler::AttributePathIsDirty(const AttributePathParams & aAttributeCha
         // our iterator to point back to the beginning of that cluster. This ensures that the receiver will get a coherent view of
         // the state of the cluster as present on the server
         mAttributePathExpandIterator.ResetCurrentCluster();
-        mAttributeEncoderState = AttributeValueEncoder::AttributeEncodeState();
+        mAttributeEncoderState.Reset();
     }
 
     // ReportScheduler will take care of verifying the reportability of the handler and schedule the run

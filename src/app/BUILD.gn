@@ -76,6 +76,8 @@ buildconfig_header("app_buildconfig") {
     "CHIP_CONFIG_STATIC_GLOBAL_INTERACTION_MODEL_ENGINE=${chip_im_static_global_interaction_model_engine}",
     "TIME_SYNC_ENABLE_TSC_FEATURE=${time_sync_enable_tsc_feature}",
     "NON_SPEC_COMPLIANT_OTA_ACTION_DELAY_FLOOR=${non_spec_compliant_ota_action_delay_floor}",
+    "CHIP_DEVICE_CONFIG_DYNAMIC_SERVER=${chip_build_controller_dynamic_server}",
+    "CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP=${chip_enable_busy_handling_for_operational_session_setup}",
   ]
 
   visibility = [ ":app_config" ]
@@ -116,11 +118,12 @@ source_set("global-attributes") {
   # as a dependency
   public_deps = [
     ":app_config",
+    "${chip_root}/src/app/common:ids",
     "${chip_root}/src/lib/support",
   ]
 }
 
-source_set("subscription-manager") {
+source_set("subscription-info-provider") {
   sources = [ "SubscriptionsInfoProvider.h" ]
 
   public_deps = [ "${chip_root}/src/lib/core" ]
@@ -142,6 +145,10 @@ source_set("constants") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/system",
   ]
+}
+
+source_set("test-event-trigger") {
+  sources = [ "TestEventTriggerDelegate.h" ]
 }
 
 # interaction-model is a static-library because it currently requires global functions (app/util/...) that are stubbed in different test files that depend on the app static_library
@@ -189,6 +196,13 @@ static_library("interaction-model") {
     "reporting/ReportSchedulerImpl.h",
     "reporting/SynchronizedReportSchedulerImpl.cpp",
     "reporting/SynchronizedReportSchedulerImpl.h",
+
+    # TODO: reporting header is part of interaction-model, however actual implementation depends
+    #       on generated code as subscriptions depend on attribute data versioning to determine
+    #       when "data changed" reports should be sent.
+    #
+    #       This breaks having `.h` and `.cpp` based off the same compilation unit and
+    #       should ideally be cleaned up.
     "reporting/reporting.h",
   ]
 
@@ -198,10 +212,13 @@ static_library("interaction-model") {
     ":app_config",
     ":constants",
     ":paths",
-    ":subscription-manager",
+    ":subscription-info-provider",
     "${chip_root}/src/app/MessageDef",
     "${chip_root}/src/app/icd/server:icd-server-config",
+    "${chip_root}/src/app/icd/server:manager",
     "${chip_root}/src/app/icd/server:observer",
+    "${chip_root}/src/app/util:af-types",
+    "${chip_root}/src/app/util:callbacks",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/lib/support:static-support",
@@ -238,6 +255,7 @@ static_library("interaction-model") {
     public_deps += [
       ":global-attributes",
       "${chip_root}/src/access",
+      "${chip_root}/src/app/dynamic_server:mock-codegen-includes",
     ]
 
     public_configs += [ ":config-controller-dynamic-server" ]
@@ -247,12 +265,39 @@ static_library("interaction-model") {
 source_set("events") {
   sources = [
     "EventHeader.h",
+    "EventLoggingDelegate.h",
     "EventLoggingTypes.h",
   ]
 
   deps = [
     ":paths",
     "${chip_root}/src/access:types",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
+static_library("attribute-access") {
+  sources = [
+    "AttributeAccessInterface.h",
+    "AttributeAccessInterfaceCache.h",
+    "AttributeAccessInterfaceRegistry.cpp",
+    "AttributeAccessInterfaceRegistry.h",
+    "AttributeEncodeState.h",
+    "AttributeReportBuilder.cpp",
+    "AttributeReportBuilder.h",
+    "AttributeValueDecoder.h",
+    "AttributeValueEncoder.cpp",
+    "AttributeValueEncoder.h",
+  ]
+
+  deps = [
+    ":paths",
+    "${chip_root}/src/access:types",
+    "${chip_root}/src/app/MessageDef",
+    "${chip_root}/src/app/data-model",
+    "${chip_root}/src/app/util:af-types",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
   ]
 }
 
@@ -262,23 +307,20 @@ static_library("app") {
   output_name = "libCHIPDataModel"
 
   sources = [
-    "AttributeAccessInterface.cpp",
-    "AttributeAccessInterfaceCache.h",
     "AttributePathExpandIterator.cpp",
     "AttributePathExpandIterator.h",
     "AttributePersistenceProvider.h",
     "ChunkedWriteCallback.cpp",
     "ChunkedWriteCallback.h",
     "CommandHandler.cpp",
+    "CommandHandlerExchangeInterface.h",
     "CommandResponseHelper.h",
     "CommandResponseSender.cpp",
-    "CommandResponseSender.h",
     "DefaultAttributePersistenceProvider.cpp",
     "DefaultAttributePersistenceProvider.h",
     "DeferredAttributePersistenceProvider.cpp",
     "DeferredAttributePersistenceProvider.h",
     "EventLogging.h",
-    "EventLoggingDelegate.h",
     "EventManagement.cpp",
     "EventManagement.h",
     "FailSafeContext.cpp",
@@ -293,23 +335,21 @@ static_library("app") {
     # TODO: the following items cannot be included due to interaction-model circularity
     #       (app depending on im and im including these headers):
     #       Name with _ so that linter does not recognize it
+    # "CommandResponseSender._h"
     # "CommandHandler._h"
     # "ReadHandler._h",
     # "WriteHandler._h"
-
-    # TODO: the following items cannot be included due to platform includes not being
-    #       able to depend on src/app
-    #       Name with _ so that linter does not recognize it
-    # "_AttributeAccessInterface._h",
   ]
 
   public_deps = [
     ":app_config",
+    ":attribute-access",
     ":constants",
     ":global-attributes",
     ":interaction-model",
     "${chip_root}/src/app/data-model",
     "${chip_root}/src/app/icd/server:icd-server-config",
+    "${chip_root}/src/app/util:callbacks",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",

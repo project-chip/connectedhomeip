@@ -374,7 +374,7 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
     }
 
     (void) mode; // currently not used;
-    error_t rsiError = RSI_ERROR_NONE;
+    int16_t rsiError = RSI_ERROR_NONE;
 
     xSemaphoreTake(spiTransferLock, portMAX_DELAY);
 

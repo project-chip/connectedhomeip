@@ -24,8 +24,6 @@
  *
  */
 
-#define __STDC_FORMAT_MACROS
-
 #include "chip-cert.h"
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/BytesToHex.h>

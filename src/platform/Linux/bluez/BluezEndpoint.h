@@ -52,40 +52,41 @@
 #include <gio/gio.h>
 #include <glib.h>
 
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <lib/core/CHIPError.h>
 #include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/dbus/bluez/DbusBluez.h>
 
 #include "BluezConnection.h"
+#include "BluezObjectManager.h"
 #include "Types.h"
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-class BluezEndpoint
+class BluezEndpoint : public BluezObjectManagerAdapterNotificationsDelegate
 {
 public:
-    BluezEndpoint()  = default;
+    BluezEndpoint(BluezObjectManager & aObjectManager) : mObjectManager(aObjectManager) {}
     ~BluezEndpoint() = default;
 
-    CHIP_ERROR Init(bool aIsCentral, uint32_t aAdapterId);
-    CHIP_ERROR Init(bool aIsCentral, const char * apBleAddr);
+    CHIP_ERROR Init(BluezAdapter1 * apAdapter, bool aIsCentral);
     void Shutdown();
 
-    BluezAdapter1 * GetAdapter() const { return mAdapter.get(); }
-
     CHIP_ERROR RegisterGattApplication();
-    GDBusObjectManagerServer * GetGattApplicationObjectManager() const { return mpRoot; }
+    GDBusObjectManagerServer * GetGattApplicationObjectManager() const { return mRoot.get(); }
 
     CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice);
     void CancelConnect();
 
-private:
-    CHIP_ERROR StartupEndpointBindings();
+    // Members that implement virtual methods on BluezObjectManagerAdapterNotificationsDelegate
+    void OnDeviceAdded(BluezDevice1 & device) override;
+    void OnDevicePropertyChanged(BluezDevice1 & device, GVariant * changedProps, const char * const * invalidatedProps) override;
+    void OnDeviceRemoved(BluezDevice1 & device) override;
 
-    CHIP_ERROR SetupAdapter();
+private:
+    CHIP_ERROR SetupEndpointBindings();
     void SetupGattServer(GDBusConnection * aConn);
     void SetupGattService();
 
@@ -93,49 +94,42 @@ private:
     BluezGattCharacteristic1 * CreateGattCharacteristic(BluezGattService1 * aService, const char * aCharName, const char * aUUID,
                                                         const char * const * aFlags);
 
-    void HandleNewDevice(BluezDevice1 * aDevice);
-    void UpdateConnectionTable(BluezDevice1 * aDevice);
+    void HandleNewDevice(BluezDevice1 & aDevice);
+    void UpdateConnectionTable(BluezDevice1 & aDevice);
     BluezConnection * GetBluezConnection(const char * aPath);
     BluezConnection * GetBluezConnectionViaDevice();
 
     gboolean BluezCharacteristicReadValue(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOptions);
-    gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOptions);
-    gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOptions);
+    gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GUnixFDList * aFDList,
+                                             GVariant * aOptions);
+    gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GUnixFDList * aFDList,
+                                              GVariant * aOptions);
     gboolean BluezCharacteristicConfirm(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv);
-
-    void BluezSignalOnObjectAdded(GDBusObjectManager * aManager, GDBusObject * aObject);
-    void BluezSignalOnObjectRemoved(GDBusObjectManager * aManager, GDBusObject * aObject);
-    void BluezSignalInterfacePropertiesChanged(GDBusObjectManagerClient * aManager, GDBusObjectProxy * aObject,
-                                               GDBusProxy * aInterface, GVariant * aChangedProperties,
-                                               const char * const * aInvalidatedProps);
 
     void RegisterGattApplicationDone(GObject * aObject, GAsyncResult * aResult);
     CHIP_ERROR RegisterGattApplicationImpl();
 
     CHIP_ERROR ConnectDeviceImpl(BluezDevice1 & aDevice);
 
+    BluezObjectManager & mObjectManager;
+    GAutoPtr<BluezAdapter1> mAdapter;
+
     bool mIsCentral     = false;
     bool mIsInitialized = false;
-
-    // Adapter properties
-    uint32_t mAdapterId  = 0;
-    char * mpAdapterAddr = nullptr;
 
     // Paths for objects published by this service
     char * mpRootPath    = nullptr;
     char * mpServicePath = nullptr;
 
-    // Objects (interfaces) subscribed to by this service
-    GDBusObjectManager * mpObjMgr = nullptr;
-    GAutoPtr<BluezAdapter1> mAdapter;
-
     // Objects (interfaces) published by this service
-    GDBusObjectManagerServer * mpRoot = nullptr;
-    BluezGattService1 * mpService     = nullptr;
-    BluezGattCharacteristic1 * mpC1   = nullptr;
-    BluezGattCharacteristic1 * mpC2   = nullptr;
+    GAutoPtr<GDBusObjectManagerServer> mRoot;
+    GAutoPtr<BluezGattService1> mService;
+    GAutoPtr<BluezGattCharacteristic1> mC1;
+    GAutoPtr<BluezGattCharacteristic1> mC2;
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     // additional data characteristics
-    BluezGattCharacteristic1 * mpC3 = nullptr;
+    GAutoPtr<BluezGattCharacteristic1> mC3;
+#endif
 
     std::unordered_map<std::string, BluezConnection *> mConnMap;
     GAutoPtr<GCancellable> mConnectCancellable;

@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <ble/BlePlatformDelegate.h>
+#include <ble/Ble.h>
 #include <system/SystemPacketBuffer.h>
 
 using ::chip::Ble::ChipBleUUID;

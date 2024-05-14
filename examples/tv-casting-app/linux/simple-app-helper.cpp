@@ -45,11 +45,14 @@ DiscoveryDelegateImpl * DiscoveryDelegateImpl::GetInstance()
 
 void DiscoveryDelegateImpl::HandleOnAdded(matter::casting::memory::Strong<matter::casting::core::CastingPlayer> player)
 {
+    ChipLogProgress(AppServer, "DiscoveryDelegateImpl::HandleOnAdded() called");
     if (commissionersCount == 0)
     {
         ChipLogProgress(AppServer, "Select discovered Casting Player (start index = 0) to request commissioning");
+        ChipLogProgress(AppServer, "Include the cgp flag to attempt the Commissioner-Generated Passcode commissioning flow");
 
-        ChipLogProgress(AppServer, "Example: cast request 0");
+        ChipLogProgress(AppServer, "Example1 Commissionee Passcode: cast request 0");
+        ChipLogProgress(AppServer, "Example2 Commissioner Passcode: cast request 0 cgp");
     }
     ChipLogProgress(AppServer, "Discovered CastingPlayer #%d", commissionersCount);
     ++commissionersCount;
@@ -58,7 +61,7 @@ void DiscoveryDelegateImpl::HandleOnAdded(matter::casting::memory::Strong<matter
 
 void DiscoveryDelegateImpl::HandleOnUpdated(matter::casting::memory::Strong<matter::casting::core::CastingPlayer> player)
 {
-    ChipLogProgress(AppServer, "Updated CastingPlayer with ID: %s", player->GetId());
+    ChipLogProgress(AppServer, "DiscoveryDelegateImpl::HandleOnUpdated() Updated CastingPlayer with ID: %s", player->GetId());
 }
 
 void InvokeContentLauncherLaunchURL(matter::casting::memory::Strong<matter::casting::core::Endpoint> endpoint)
@@ -169,10 +172,12 @@ void ConnectionHandler(CHIP_ERROR err, matter::casting::core::CastingPlayer * ca
 {
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    ChipLogProgress(AppServer,
-                                   "ConnectionHandler: Failed to connect to CastingPlayer(ID: %s) with err %" CHIP_ERROR_FORMAT,
+                                   "ConnectionHandler(): Failed to connect to CastingPlayer(ID: %s) with err %" CHIP_ERROR_FORMAT,
                                    castingPlayer->GetId(), err.Format()));
 
-    ChipLogProgress(AppServer, "ConnectionHandler: Successfully connected to CastingPlayer(ID: %s)", castingPlayer->GetId());
+    ChipLogProgress(AppServer, "ConnectionHandler(): Successfully connected to CastingPlayer(ID: %s)", castingPlayer->GetId());
+    ChipLogProgress(AppServer, "ConnectionHandler(): Triggering demo interactions with CastingPlayer(ID: %s)",
+                    castingPlayer->GetId());
 
     std::vector<matter::casting::memory::Strong<matter::casting::core::Endpoint>> endpoints = castingPlayer->GetEndpoints();
     // Find the desired Endpoint and auto-trigger some Matter Casting demo interactions
@@ -218,18 +223,18 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
     }
     if (strcmp(argv[0], "discover") == 0)
     {
-        ChipLogProgress(AppServer, "discover");
+        ChipLogProgress(AppServer, "CommandHandler() discover");
 
         return matter::casting::core::CastingPlayerDiscovery::GetInstance()->StartDiscovery(kTargetPlayerDeviceType);
     }
     if (strcmp(argv[0], "stop-discovery") == 0)
     {
-        ChipLogProgress(AppServer, "stop-discovery");
+        ChipLogProgress(AppServer, "CommandHandler() stop-discovery");
         return matter::casting::core::CastingPlayerDiscovery::GetInstance()->StopDiscovery();
     }
     if (strcmp(argv[0], "request") == 0)
     {
-        ChipLogProgress(AppServer, "request");
+        ChipLogProgress(AppServer, "CommandHandler() request");
         if (argc < 2)
         {
             return PrintAllCommands();
@@ -242,10 +247,40 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
                             ChipLogError(AppServer, "Invalid casting player index provided: %lu", index));
         std::shared_ptr<matter::casting::core::CastingPlayer> targetCastingPlayer = castingPlayers.at(index);
 
-        matter::casting::core::EndpointFilter desiredEndpointFilter;
-        desiredEndpointFilter.vendorId = kDesiredEndpointVendorId;
+        matter::casting::core::IdentificationDeclarationOptions idOptions;
+        if (argc == 3)
+        {
+            if (strcmp(argv[2], "cgp") == 0)
+            {
+                // Attempt Commissioner-Generated Passcode (cgp) commissioning flow only if the CastingPlayer indicates support for
+                // it.
+                if (targetCastingPlayer->GetSupportsCommissionerGeneratedPasscode())
+                {
+                    ChipLogProgress(
+                        AppServer,
+                        "CommandHandler() request %lu cgp. Attempting the Commissioner-Generated Passcode commissioning flow",
+                        index);
+                    idOptions.mCommissionerPasscode = true;
+                }
+                else
+                {
+                    ChipLogError(AppServer,
+                                 "CommandHandler() request %lu cgp. Selected CastingPLayer does not support the "
+                                 "Commissioner-Generated Passcode commissioning flow",
+                                 index);
+                }
+            }
+        }
+        chip::Protocols::UserDirectedCommissioning::TargetAppInfo targetAppInfo;
+        targetAppInfo.vendorId = kDesiredEndpointVendorId;
+        CHIP_ERROR result      = idOptions.addTargetAppInfo(targetAppInfo);
+        if (result != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "CommandHandler() request, failed to add targetAppInfo: %" CHIP_ERROR_FORMAT, result.Format());
+        }
+
         targetCastingPlayer->VerifyOrEstablishConnection(ConnectionHandler, matter::casting::core::kCommissioningWindowTimeoutSec,
-                                                         desiredEndpointFilter);
+                                                         idOptions);
         return CHIP_NO_ERROR;
     }
     if (strcmp(argv[0], "print-bindings") == 0)
@@ -279,8 +314,12 @@ CHIP_ERROR PrintAllCommands()
         "  delete-fabric <index>     Delete a fabric from the casting client's fabric store. Usage: cast delete-fabric 1\r\n");
     streamer_printf(sout, "  discover             Discover Casting Players. Usage: cast discover\r\n");
     streamer_printf(sout, "  stop-discovery       Stop Discovery of Casting Players. Usage: cast stop-discovery\r\n");
-    streamer_printf(
-        sout, "  request <index>      Request connecting to discovered Casting Player with [index]. Usage: cast request 0\r\n");
+    streamer_printf(sout,
+                    "  request <index>      Request connecting to discovered Casting Player with [index] using the "
+                    "Commissionee-Generated Passcode commissioning flow. Usage: cast request 0\r\n");
+    streamer_printf(sout,
+                    "  request <index> cgp  Request connecting to discovered Casting Player with [index] using the "
+                    "Commissioner-Generated Passcode commissioning flow. Usage: cast request 0 cgp\r\n");
     streamer_printf(sout, "\r\n");
 
     return CHIP_NO_ERROR;
@@ -294,7 +333,7 @@ void PrintBindings()
                         "Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
                         " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                         binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
-                        binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
+                        binding.remote, ChipLogValueMEI(binding.clusterId.value_or(0)));
     }
 }
 

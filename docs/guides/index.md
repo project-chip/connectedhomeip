@@ -10,6 +10,7 @@ and features.
 
 *
 esp32/README
+nxp/README
 ti/ti_platform_overview
 ```
 
@@ -34,9 +35,7 @@ ti/ti_platform_overview
 -   [nRF Connect - Factory Data Configuration](./nrfconnect_factory_data_configuration.md)
 -   [nRF Connect - Platform Overview](./nrfconnect_platform_overview.md)
 -   [nRF Connect - Software Update](./nrfconnect_examples_software_update.md)
--   [NXP - Android Commissioning](./nxp_k32w_android_commissioning.md)
--   [NXP - Linux Examples](./nxp_imx8m_linux_examples.md)
--   [NXP - Manufacturing Data](./nxp_manufacturing_flow.md)
+-   [NXP - Getting Started Guide](./nxp/README.md)
 -   [Silicon Labs - Documentation](https://siliconlabs.github.io/matter/latest/index.html)
 -   [Silicon Labs - Getting Started](./silabs_getting_started.md)
 -   [Silicon Labs - Software Update](./silabs_efr32_software_update.md)

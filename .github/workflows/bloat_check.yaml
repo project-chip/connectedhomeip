@@ -14,6 +14,7 @@
 
 name: Bloat Check
 on:
+    workflow_dispatch:
     schedule:
         - cron: "*/5 * * * *"
 
@@ -33,7 +34,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:35
+            image: ghcr.io/project-chip/chip-build:50
 
         steps:
             - name: Checkout

@@ -22,6 +22,7 @@
 #include <controller/CommissioneeDeviceProxy.h>
 #include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/Variant.h>
 #include <system/SystemClock.h>
 
@@ -46,6 +47,7 @@ enum CommissioningStage : uint8_t
     kSendDACCertificateRequest,  ///< Send DAC CertificateChainRequest (0x3E:2) command to the device
     kSendAttestationRequest,     ///< Send AttestationRequest (0x3E:0) command to the device
     kAttestationVerification,    ///< Verify AttestationResponse (0x3E:1) validity
+    kAttestationRevocationCheck, ///< Verify Revocation Status of device's DAC chain
     kSendOpCertSigningRequest,   ///< Send CSRRequest (0x3E:4) command to the device
     kValidateCSR,                ///< Verify CSRResponse (0x3E:5) validity
     kGenerateNOCChain,           ///< TLV encode Node Operational Credentials (NOC) chain certs
@@ -54,16 +56,20 @@ enum CommissioningStage : uint8_t
     kConfigureTrustedTimeSource, ///< Configure a trusted time source if one is required and available (must be done after SendNOC)
     kICDGetRegistrationInfo,     ///< Waiting for the higher layer to provide ICD registraion informations.
     kICDRegistration,            ///< Register for ICD management
-    kICDSendStayActive,          ///< Send Keep Alive to ICD
     kWiFiNetworkSetup,           ///< Send AddOrUpdateWiFiNetwork (0x31:2) command to the device
     kThreadNetworkSetup,         ///< Send AddOrUpdateThreadNetwork (0x31:3) command to the device
     kFailsafeBeforeWiFiEnable,   ///< Extend the fail-safe before doing kWiFiNetworkEnable
     kFailsafeBeforeThreadEnable, ///< Extend the fail-safe before doing kThreadNetworkEnable
     kWiFiNetworkEnable,          ///< Send ConnectNetwork (0x31:6) command to the device for the WiFi network
     kThreadNetworkEnable,        ///< Send ConnectNetwork (0x31:6) command to the device for the Thread network
-    kFindOperational,            ///< Perform operational discovery and establish a CASE session with the device
-    kSendComplete,               ///< Send CommissioningComplete (0x30:4) command to the device
-    kCleanup,                    ///< Call delegates with status, free memory, clear timers and state
+    kEvictPreviousCaseSessions,  ///< Evict previous stale case sessions from a commissioned device with this node ID before
+    kFindOperationalForStayActive, ///< Perform operational discovery and establish a CASE session with the device for ICD
+                                   ///< StayActive command
+    kFindOperationalForCommissioningComplete, ///< Perform operational discovery and establish a CASE session with the device for
+                                              ///< Commissioning Complete command
+    kSendComplete,                            ///< Send CommissioningComplete (0x30:4) command to the device
+    kICDSendStayActive,                       ///< Send Keep Alive to ICD
+    kCleanup,                                 ///< Call delegates with status, free memory, clear timers and state
     /// Send ScanNetworks (0x31:0) command to the device.
     /// ScanNetworks can happen anytime after kArmFailsafe.
     /// However, the cirque tests fail if it is earlier in the list
@@ -74,7 +80,7 @@ enum CommissioningStage : uint8_t
     kNeedsNetworkCreds,
 };
 
-enum ICDRegistrationStrategy : uint8_t
+enum class ICDRegistrationStrategy : uint8_t
 {
     kIgnore,         ///< Do not check whether the device is an ICD during commissioning
     kBeforeComplete, ///< Do commissioner self-registration or external controller registration,
@@ -228,9 +234,9 @@ public:
     // Epoch key for the identity protection key for the node being commissioned. In the AutoCommissioner, this is set by by the
     // kGenerateNOCChain stage through the OperationalCredentialsDelegate.
     // This value must be set before calling PerformCommissioningStep for the kSendNOC step.
-    const Optional<IdentityProtectionKeySpan> GetIpk() const
+    const Optional<Crypto::IdentityProtectionKeySpan> GetIpk() const
     {
-        return mIpk.HasValue() ? Optional<IdentityProtectionKeySpan>(mIpk.Value().Span()) : Optional<IdentityProtectionKeySpan>();
+        return mIpk.HasValue() ? MakeOptional(mIpk.Value().Span()) : NullOptional;
     }
 
     // Admin subject id used for the case access control entry created if the AddNOC command succeeds. In the AutoCommissioner, this
@@ -412,9 +418,9 @@ public:
         mIcac.SetValue(icac);
         return *this;
     }
-    CommissioningParameters & SetIpk(const IdentityProtectionKeySpan ipk)
+    CommissioningParameters & SetIpk(const Crypto::IdentityProtectionKeySpan ipk)
     {
-        mIpk.SetValue(IdentityProtectionKey(ipk));
+        mIpk.SetValue(Crypto::IdentityProtectionKey(ipk));
         return *this;
     }
     CommissioningParameters & SetAdminSubject(const NodeId adminSubject)
@@ -544,6 +550,14 @@ public:
         return *this;
     }
 
+    Optional<uint32_t> GetICDStayActiveDurationMsec() const { return mICDStayActiveDurationMsec; }
+    CommissioningParameters & SetICDStayActiveDurationMsec(uint32_t stayActiveDurationMsec)
+    {
+        mICDStayActiveDurationMsec = MakeOptional(stayActiveDurationMsec);
+        return *this;
+    }
+    void ClearICDStayActiveDurationMsec() { mICDStayActiveDurationMsec.ClearValue(); }
+
     // Clear all members that depend on some sort of external buffer.  Can be
     // used to make sure that we are not holding any dangling pointers.
     void ClearExternalBufferDependentValues()
@@ -587,7 +601,7 @@ private:
     Optional<ByteSpan> mRootCert;
     Optional<ByteSpan> mNoc;
     Optional<ByteSpan> mIcac;
-    Optional<IdentityProtectionKey> mIpk;
+    Optional<Crypto::IdentityProtectionKey> mIpk;
     Optional<NodeId> mAdminSubject;
     // Items that come from the device in commissioning steps
     Optional<ByteSpan> mAttestationElements;
@@ -610,7 +624,7 @@ private:
     Optional<NodeId> mICDCheckInNodeId;
     Optional<uint64_t> mICDMonitoredSubject;
     Optional<ByteSpan> mICDSymmetricKey;
-
+    Optional<uint32_t> mICDStayActiveDurationMsec;
     ICDRegistrationStrategy mICDRegistrationStrategy = ICDRegistrationStrategy::kIgnore;
     bool mCheckForMatchingFabric                     = false;
 };
@@ -639,13 +653,15 @@ struct CSRResponse
 
 struct NocChain
 {
-    NocChain(ByteSpan newNoc, ByteSpan newIcac, ByteSpan newRcac, IdentityProtectionKeySpan newIpk, NodeId newAdminSubject) :
-        noc(newNoc), icac(newIcac), rcac(newRcac), ipk(newIpk), adminSubject(newAdminSubject)
+    NocChain(ByteSpan newNoc, ByteSpan newIcac, ByteSpan newRcac, Crypto::IdentityProtectionKeySpan newIpk,
+             NodeId newAdminSubject) :
+        noc(newNoc),
+        icac(newIcac), rcac(newRcac), ipk(newIpk), adminSubject(newAdminSubject)
     {}
     ByteSpan noc;
     ByteSpan icac;
     ByteSpan rcac;
-    IdentityProtectionKeySpan ipk;
+    Crypto::IdentityProtectionKeySpan ipk;
     NodeId adminSubject;
 };
 
@@ -687,11 +703,18 @@ struct GeneralCommissioningInfo
 struct ICDManagementClusterInfo
 {
     // Whether the ICD is capable of functioning as a LIT device.  If false, the ICD can only be a SIT device.
-    bool isLIT;
+    bool isLIT = false;
     // Whether the ICD supports the check-in protocol.  LIT devices have to support it, but SIT devices
     // might or might not.
-    bool checkInProtocolSupport;
-
+    bool checkInProtocolSupport = false;
+    // Indicate the maximum interval in seconds the server can stay in idle mode.
+    uint32_t idleModeDuration = 0;
+    // Indicate the minimum interval in milliseconds the server typically will stay in active mode after initial transition out of
+    // idle mode.
+    uint32_t activeModeDuration = 0;
+    // Indicate the minimum amount of time in milliseconds the server typically will stay active after network activity when in
+    // active mode.
+    uint16_t activeModeThreshold = 0;
     // userActiveModeTriggerHint indicates which user action(s) will trigger the ICD to switch to Active mode.
     // For a LIT: The device is required to provide a value for the bitmap.
     // For a SIT: The device may not provide a value.  In that case, none of the bits will be set.
@@ -760,18 +783,22 @@ public:
      * kSendDACCertificateRequest: RequestedCertificate
      * kSendAttestationRequest: AttestationResponse
      * kAttestationVerification: AttestationErrorInfo if there is an error
+     * kAttestationRevocationCheck: AttestationErrorInfo if there is an error
      * kSendOpCertSigningRequest: CSRResponse
      * kGenerateNOCChain: NocChain
      * kSendTrustedRootCert: None
-     * kSendNOC: none
+     * kSendNOC: None
      * kConfigureTrustedTimeSource: None
      * kWiFiNetworkSetup: NetworkCommissioningStatusInfo if there is an error
      * kThreadNetworkSetup: NetworkCommissioningStatusInfo if there is an error
      * kWiFiNetworkEnable: NetworkCommissioningStatusInfo if there is an error
      * kThreadNetworkEnable: NetworkCommissioningStatusInfo if there is an error
-     * kFindOperational: OperationalNodeFoundData
+     * kEvictPreviousCaseSessions: None
+     * kFindOperationalForStayActive OperationalNodeFoundData
+     * kFindOperationalForCommissioningComplete: OperationalNodeFoundData
+     * kICDSendStayActive: CommissioningErrorInfo if there is an error
      * kSendComplete: CommissioningErrorInfo if there is an error
-     * kCleanup: none
+     * kCleanup: None
      */
     struct CommissioningReport
         : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData, ReadCommissioningInfo,

@@ -38,6 +38,10 @@ public:
     BluezObjectList() = default;
     explicit BluezObjectList(GDBusObjectManager * manager) { Init(manager); }
 
+    // This class is not trivially copyable
+    BluezObjectList(const BluezObjectList &)             = delete;
+    BluezObjectList & operator=(const BluezObjectList &) = delete;
+
     ~BluezObjectList()
     {
         if (mObjectList != nullptr)

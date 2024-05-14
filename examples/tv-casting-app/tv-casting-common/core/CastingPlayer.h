@@ -18,7 +18,9 @@
 
 #pragma once
 
+#include "CommissionerDeclarationHandler.h"
 #include "Endpoint.h"
+#include "IdentificationDeclarationOptions.h"
 #include "Types.h"
 #include "support/ChipDeviceEventHandler.h"
 #include "support/EndpointListLoader.h"
@@ -56,13 +58,14 @@ public:
     char deviceName[chip::Dnssd::kMaxDeviceNameLen + 1]                    = {};
     char hostName[chip::Dnssd::kHostNameMaxLength + 1]                     = {};
     char instanceName[chip::Dnssd::Commission::kInstanceNameMaxLength + 1] = {};
-    unsigned int numIPs; // number of valid IP addresses
+    unsigned int numIPs; // Number of valid IP addresses
     chip::Inet::IPAddress ipAddresses[chip::Dnssd::CommonResolutionData::kMaxIPAddresses];
     chip::Inet::InterfaceId interfaceId;
     uint16_t port;
     uint16_t productId;
     uint16_t vendorId;
     uint32_t deviceType;
+    bool supportsCommissionerGeneratedPasscode;
 
     chip::NodeId nodeId           = 0;
     chip::FabricIndex fabricIndex = 0;
@@ -122,13 +125,15 @@ public:
      * For failure - called back with an error and nullptr.
      * @param commissioningWindowTimeoutSec (Optional) time (in sec) to keep the commissioning window open, if commissioning is
      * required. Needs to be >= kCommissioningWindowTimeoutSec.
-     * @param desiredEndpointFilter (Optional) Attributes (such as VendorId) describing an Endpoint that the client wants to
-     * interact with after commissioning. If this value is passed in, the VerifyOrEstablishConnection will force User Directed
-     * Commissioning, in case the desired Endpoint is not found in the on device CastingStore.
+     * @param idOptions (Optional) Parameters in the IdentificationDeclaration message sent by the Commissionee to the Commissioner.
+     * These parameters specify the information relating to the requested commissioning session.
+     * Furthermore, attributes (such as VendorId) describe the TargetApp that the client wants to interact with after commissioning.
+     * If this value is passed in, VerifyOrEstablishConnection() will force User Directed Commissioning, in case the desired
+     * TargetApp is not found in the on-device CastingStore.
      */
     void VerifyOrEstablishConnection(ConnectCallback onCompleted,
                                      unsigned long long int commissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec,
-                                     EndpointFilter desiredEndpointFilter                 = EndpointFilter());
+                                     IdentificationDeclarationOptions idOptions           = IdentificationDeclarationOptions());
 
     /**
      * @brief Sets the internal connection state of this CastingPlayer to "disconnected"
@@ -182,6 +187,8 @@ public:
 
     uint32_t GetDeviceType() const { return mAttributes.deviceType; }
 
+    bool GetSupportsCommissionerGeneratedPasscode() const { return mAttributes.supportsCommissionerGeneratedPasscode; }
+
     chip::NodeId GetNodeId() const { return mAttributes.nodeId; }
 
     chip::FabricIndex GetFabricIndex() const { return mAttributes.fabricIndex; }
@@ -194,6 +201,7 @@ private:
     std::vector<memory::Strong<Endpoint>> mEndpoints;
     ConnectionState mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
     CastingPlayerAttributes mAttributes;
+    IdentificationDeclarationOptions mIdOptions;
     static CastingPlayer * mTargetCastingPlayer;
     unsigned long long int mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
     ConnectCallback mOnCompleted                          = {};
@@ -214,12 +222,12 @@ private:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
     /**
-     * @brief Checks if the cachedCastingPlayer contains an Endpoint that matches the description of the desiredEndpointFilter
-     *
-     * @return true - cachedCastingPlayer contains at least one endpoint that matches all the (non-default) values in
-     * desiredEndpointFilter, false otherwise
+     * @brief Checks if the cachedCastingPlayer contains at least one Endpoint/TargetApp described in the desiredTargetApps list.
+     * @return true - cachedCastingPlayer contains at least one endpoints with matching (non-default) values for vendorID and
+     * productID as described in the desiredTargetApps list, false otherwise.
      */
-    bool ContainsDesiredEndpoint(core::CastingPlayer * cachedCastingPlayer, EndpointFilter desiredEndpointFilter);
+    bool ContainsDesiredTargetApp(core::CastingPlayer * cachedCastingPlayer,
+                                  std::vector<chip::Protocols::UserDirectedCommissioning::TargetAppInfo> desiredTargetApps);
 
     // ChipDeviceEventHandler handles chip::DeviceLayer::ChipDeviceEvent events and helps the CastingPlayer class commission with
     // and connect to a CastingPlayer

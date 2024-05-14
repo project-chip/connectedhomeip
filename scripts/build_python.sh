@@ -37,6 +37,7 @@ echo_bold_white() {
 CHIP_ROOT=$(_normpath "$(dirname "$0")/..")
 OUTPUT_ROOT="$CHIP_ROOT/out/python_lib"
 
+declare enable_ble=true
 declare chip_detail_logging=false
 declare enable_pybindings=false
 declare chip_mdns
@@ -53,6 +54,7 @@ help() {
     echo "General Options:
   -h, --help                Display this information.
 Input Options:
+  -b, --enable_ble          <true/false>                    Enable BLE in the controller (default=true)
   -d, --chip_detail_logging <true/false>                    Specify ChipDetailLoggingValue as true or false.
                                                             By default it is false.
   -m, --chip_mdns           ChipMDNSValue                   Specify ChipMDNSValue as platform or minimal.
@@ -81,6 +83,14 @@ while (($#)); do
         --help | -h)
             help
             exit 1
+            ;;
+        --enable_ble | -b)
+            enable_ble=$2
+            if [[ "$enable_ble" != "true" && "$enable_ble" != "false" ]]; then
+                echo "chip_detail_logging should have a true/false value, not '$enable_ble'"
+                exit
+            fi
+            shift
             ;;
         --chip_detail_logging | -d)
             chip_detail_logging=$2
@@ -147,7 +157,7 @@ while (($#)); do
 done
 
 # Print input values
-echo "Input values: chip_detail_logging = $chip_detail_logging , chip_mdns = \"$chip_mdns\", enable_pybindings = $enable_pybindings, chip_case_retry_delta=\"$chip_case_retry_delta\", pregen_dir=\"$pregen_dir\""
+echo "Input values: chip_detail_logging = $chip_detail_logging , chip_mdns = \"$chip_mdns\", enable_pybindings = $enable_pybindings, chip_case_retry_delta=\"$chip_case_retry_delta\", pregen_dir=\"$pregen_dir\", enable_ble=\"$enable_ble\""
 
 # Ensure we have a compilation environment
 source "$CHIP_ROOT/scripts/activate.sh"
@@ -174,7 +184,7 @@ export SYSTEM_VERSION_COMPAT=0
 # Make all possible human redable tracing available.
 tracing_options="matter_log_json_payload_hex=true matter_log_json_payload_decode_full=true matter_enable_tracing_support=true"
 
-gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="$tracing_options chip_detail_logging=$chip_detail_logging enable_pylib=$enable_pybindings enable_rtti=$enable_pybindings chip_project_config_include_dirs=[\"//config/python\"] $chip_mdns_arg $chip_case_retry_arg $pregen_dir_arg"
+gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="$tracing_options chip_detail_logging=$chip_detail_logging enable_pylib=$enable_pybindings enable_rtti=$enable_pybindings chip_project_config_include_dirs=[\"//config/python\"] $chip_mdns_arg $chip_case_retry_arg $pregen_dir_arg chip_config_network_layer_ble=$enable_ble chip_enable_ble=$enable_ble"
 
 function ninja_target() {
     # Print the ninja target required to build a gn label.

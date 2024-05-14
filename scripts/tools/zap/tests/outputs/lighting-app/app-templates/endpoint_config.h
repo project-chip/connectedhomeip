@@ -1207,8 +1207,8 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
         0, 1                                                                                                                       \
     }
 
-// Array of networks supported on each endpoint
-#define FIXED_NETWORKS                                                                                                             \
+// Array of parent endpoints for each endpoint
+#define FIXED_PARENT_ENDPOINTS                                                                                                     \
     {                                                                                                                              \
-        0, 0                                                                                                                       \
+        kInvalidEndpointId, kInvalidEndpointId                                                                                     \
     }

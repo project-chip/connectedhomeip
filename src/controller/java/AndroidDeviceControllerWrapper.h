@@ -17,6 +17,7 @@
  */
 #pragma once
 
+#include <controller/java/ControllerConfig.h>
 #include <lib/support/JniReferences.h>
 
 #include <memory>
@@ -24,6 +25,7 @@
 
 #include <jni.h>
 
+#include <app/icd/client/CheckInHandler.h>
 #include <app/icd/client/DefaultICDClientStorage.h>
 #include <controller/CHIPDeviceController.h>
 #include <credentials/GroupDataProviderImpl.h>
@@ -41,6 +43,7 @@
 #include <platform/android/CHIPP256KeypairBridge.h>
 #endif // JAVA_MATTER_CONTROLLER_TEST
 
+#include "AndroidCheckInDelegate.h"
 #include "AndroidOperationalCredentialsIssuer.h"
 #include "AttestationTrustStoreBridge.h"
 #include "DeviceAttestationDelegateBridge.h"
@@ -84,7 +87,8 @@ public:
     }
 #endif // JAVA_MATTER_CONTROLLER_TEST
 
-    void CallJavaMethod(const char * methodName, jint argument);
+    void CallJavaIntMethod(const char * methodName, jint argument);
+    void CallJavaLongMethod(const char * methodName, jlong argument);
     CHIP_ERROR InitializeOperationalCredentialsIssuer();
 
     /**
@@ -170,19 +174,21 @@ public:
      * @param[in] skipCommissioningComplete whether to skip the CASE commissioningComplete command during commissioning
      * @param[out] errInfoOnFailure a pointer to a CHIP_ERROR that will be populated if this method returns nullptr
      */
-    static AndroidDeviceControllerWrapper * AllocateNew(
-        JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId, chip::FabricId fabricId, const chip::CATValues & cats,
-        chip::System::Layer * systemLayer, chip::Inet::EndPointManager<chip::Inet::TCPEndPoint> * tcpEndPointManager,
-        chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager,
+    static AndroidDeviceControllerWrapper *
+    AllocateNew(JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId, chip::FabricId fabricId,
+                const chip::CATValues & cats, chip::System::Layer * systemLayer,
+                chip::Inet::EndPointManager<chip::Inet::TCPEndPoint> * tcpEndPointManager,
+                chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager,
 #ifdef JAVA_MATTER_CONTROLLER_TEST
-        ExampleOperationalCredentialsIssuerPtr opCredsIssuer,
+                ExampleOperationalCredentialsIssuerPtr opCredsIssuer,
 #else
-        AndroidOperationalCredentialsIssuerPtr opCredsIssuer,
+                AndroidOperationalCredentialsIssuerPtr opCredsIssuer,
 #endif
-        jobject keypairDelegate, jbyteArray rootCertificate, jbyteArray intermediateCertificate,
-        jbyteArray nodeOperationalCertificate, jbyteArray ipkEpochKey, uint16_t listenPort, uint16_t controllerVendorId,
-        uint16_t failsafeTimerSeconds, bool attemptNetworkScanWiFi, bool attemptNetworkScanThread, bool skipCommissioningComplete,
-        bool skipAttestationCertificateValidation, jstring countryCode, CHIP_ERROR * errInfoOnFailure);
+                jobject keypairDelegate, jbyteArray rootCertificate, jbyteArray intermediateCertificate,
+                jbyteArray nodeOperationalCertificate, jbyteArray ipkEpochKey, uint16_t listenPort, uint16_t controllerVendorId,
+                uint16_t failsafeTimerSeconds, bool attemptNetworkScanWiFi, bool attemptNetworkScanThread,
+                bool skipCommissioningComplete, bool skipAttestationCertificateValidation, jstring countryCode,
+                bool enableServerInteractions, CHIP_ERROR * errInfoOnFailure);
 
     void Shutdown();
 
@@ -206,7 +212,7 @@ public:
 
     CHIP_ERROR FinishOTAProvider();
 
-    chip::app::DefaultICDClientStorage * getICDClientStorage() { return &mICDClientStorage; }
+    CHIP_ERROR SetICDCheckInDelegate(jobject checkInDelegate);
 
 private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;
@@ -220,7 +226,8 @@ private:
     // TODO: This may need to be injected as a SessionKeystore*
     chip::Crypto::RawKeySessionKeystore mSessionKeystore;
 
-    chip::app::DefaultICDClientStorage mICDClientStorage;
+    chip::app::AndroidCheckInDelegate mCheckInDelegate;
+    chip::app::CheckInHandler mCheckInHandler;
 
     JavaVM * mJavaVM = nullptr;
     chip::JniGlobalReference mJavaObjectRef;
@@ -262,6 +269,9 @@ private:
     chip::MutableCharSpan mUserActiveModeTriggerInstruction = chip::MutableCharSpan(mUserActiveModeTriggerInstructionBuffer);
     chip::BitMask<chip::app::Clusters::IcdManagement::UserActiveModeTriggerBitmap> mUserActiveModeTriggerHint;
 
+    uint32_t mIdleModeDuration    = 0;
+    uint32_t mActiveModeDuration  = 0;
+    uint16_t mActiveModeThreshold = 0;
     chip::Controller::CommissioningParameters mCommissioningParameter;
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller,

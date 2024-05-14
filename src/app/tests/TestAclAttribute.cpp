@@ -16,9 +16,7 @@
  *    limitations under the License.
  */
 
-#include "lib/support/CHIPMem.h"
 #include <access/examples/PermissiveAccessControlDelegate.h>
-#include <app/AttributeAccessInterface.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteEventPath.h>
 #include <app/InteractionModelEngine.h>
@@ -83,12 +81,11 @@ class TestAccessContext : public chip::Test::AppContext
 {
 public:
     // Performs setup for each individual test in the test suite
-    CHIP_ERROR SetUp() override
+    void SetUp() override
     {
-        ReturnErrorOnFailure(chip::Test::AppContext::SetUp());
+        chip::Test::AppContext::SetUp();
         Access::GetAccessControl().Finish();
         Access::GetAccessControl().Init(GetTestAccessControlDelegate(), gDeviceTypeResolver);
-        return CHIP_NO_ERROR;
     }
 };
 

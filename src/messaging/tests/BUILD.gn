@@ -38,6 +38,12 @@ static_library("helpers") {
     "${chip_root}/src/transport",
     "${chip_root}/src/transport/tests:helpers",
   ]
+
+  # MessagingContext exposes nl-test compatible setup/teardown functions, specifically
+  # they return nltest specific SUCCESS/FAILURE constants hence this dependency.
+  #
+  # Once all tests are moved to pw_unittest/gtest, this dependency should be removed
+  public_deps = [ "${nlunit_test_root}:nlunit-test" ]
 }
 
 chip_test_suite_using_nltest("tests") {
@@ -48,14 +54,16 @@ chip_test_suite_using_nltest("tests") {
   if (chip_device_platform != "efr32") {
     # TODO(#10447): ReliableMessage Test has HF, and ExchangeMgr hangs on EFR32.
     # And TestAbortExchangesForFabric does not link on EFR32 for some reason.
+    # TODO #33372: TestExchange.cpp asserts in ExchangeContext::SendMessage
     test_sources += [
       "TestAbortExchangesForFabric.cpp",
+      "TestExchange.cpp",
       "TestExchangeMgr.cpp",
       "TestReliableMessageProtocol.cpp",
     ]
 
     if (chip_device_platform != "esp32" && chip_device_platform != "mbed" &&
-        chip_device_platform != "nrfconnect") {
+        chip_device_platform != "nrfconnect" && chip_device_platform != "nxp") {
       test_sources += [ "TestExchangeHolder.cpp" ]
     }
 

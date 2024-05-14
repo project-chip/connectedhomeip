@@ -71,7 +71,8 @@ typedef enum
                                         with 1 InvokeResponseMessage, dropping the response to the second request */
 #if CONFIG_NETWORK_LAYER_BLE
     kFault_CHIPOBLESend, /**< Inject a GATT error when sending the first fragment of a chip message over BLE */
-#endif                   // CONFIG_NETWORK_LAYER_BLE
+#endif
+    kFault_CASEServerBusy, /**< Respond to CASE_Sigma1 with a BUSY status */
     kFault_NumItems,
 } Id;
 

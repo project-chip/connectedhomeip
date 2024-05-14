@@ -40,6 +40,10 @@
 #include <errno.h>
 #include <utility>
 
+#if CHIP_CRYPTO_PSA
+#include "psa/crypto.h"
+#endif
+
 namespace {
 
 using namespace chip;
@@ -47,7 +51,19 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::Messaging;
 
-using TestContext = Test::LoopbackMessagingContext;
+struct TestContext : Test::LoopbackMessagingContext
+{
+    // TODO Add TearDown function during changing test framework to Pigweed to make it more clear how does it work.
+    // Currently, the TearDown function is from LoopbackMessagingContext
+    void SetUp() override
+    {
+#if CHIP_CRYPTO_PSA
+        // TODO: use ASSERT_EQ, once transition to pw_unit_test is complete
+        VerifyOrDie(psa_crypto_init() == PSA_SUCCESS);
+#endif
+        chip::Test::LoopbackMessagingContext::SetUp();
+    }
+};
 
 enum : uint8_t
 {

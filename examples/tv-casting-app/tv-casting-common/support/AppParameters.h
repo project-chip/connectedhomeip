@@ -42,6 +42,7 @@ public:
                       chip::Credentials::DeviceAttestationCredentialsProvider * deviceAttestationCredentialsProvider,
                       chip::Credentials::DeviceAttestationVerifier * deviceAttestationVerifier,
                       ServerInitParamsProvider * serverInitParamsProvider)
+    // TODO: In the following PRs. Add CommissionerDeclarationHandler.
     {
         VerifyOrReturnError(commissionableDataProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(deviceAttestationCredentialsProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);

@@ -55,6 +55,7 @@ if (chip_build_tests) {
   chip_test_group("tests") {
     deps = []
     tests = [
+      "${chip_root}/src/app/interaction-model/tests",
       "${chip_root}/src/access/tests",
       "${chip_root}/src/crypto/tests",
       "${chip_root}/src/inet/tests",
@@ -66,6 +67,7 @@ if (chip_build_tests) {
       "${chip_root}/src/protocols/interaction_model/tests",
       "${chip_root}/src/protocols/user_directed_commissioning/tests",
       "${chip_root}/src/transport/retransmit/tests",
+      "${chip_root}/src/app/icd/server/tests",
     ]
 
     # Skip DNSSD tests for Mbed platform due to flash memory size limitations
@@ -98,12 +100,13 @@ if (chip_build_tests) {
         "${chip_root}/src/lib/format/tests",
         "${chip_root}/src/lib/support/tests",
         "${chip_root}/src/protocols/secure_channel/tests",
+        "${chip_root}/src/protocols/secure_channel/tests:tests_nltest",
         "${chip_root}/src/system/tests",
         "${chip_root}/src/transport/tests",
       ]
 
       if (matter_enable_tracing_support &&
-          matter_trace_config == "multiplexed") {
+          matter_trace_config == "${chip_root}/src/tracing/multiplexed") {
         tests += [ "${chip_root}/src/tracing/tests" ]
       }
     }
@@ -141,12 +144,7 @@ if (chip_build_tests) {
     }
 
     if (chip_monolithic_tests) {
-      # TODO [PW_MIGRATION] Remove this if after migartion to PW_TEST is completed for all platforms
-      # TODO [PW_MIGRATION] There will be a list of already migrated platforms
-      if (chip_device_platform == "esp32" ||
-          chip_device_platform == "nrfconnect") {
-        deps += [ "${chip_root}/src/lib/support:pw_tests_wrapper" ]
-      }
+      deps += [ "${chip_root}/src/lib/support:pw_tests_wrapper" ]
       build_monolithic_library = true
       output_name = "libCHIP_tests"
       output_dir = "${root_out_dir}/lib"

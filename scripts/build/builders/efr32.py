@@ -100,6 +100,7 @@ class Efr32Board(Enum):
     BRD4187C = 9
     BRD4186C = 10
     BRD4338A = 11
+    BRD2703A = 12
 
     def GnArgName(self):
         if self == Efr32Board.BRD4161A:
@@ -124,6 +125,8 @@ class Efr32Board(Enum):
             return 'BRD4187C'
         elif self == Efr32Board.BRD4338A:
             return 'BRD4338A'
+        elif self == Efr32Board.BRD2703A:
+            return 'BRD2703A'
         else:
             raise Exception('Unknown board #: %r' % self)
 
@@ -146,8 +149,9 @@ class Efr32Builder(GnBuilder):
                  enable_icd: bool = False,
                  enable_low_power: bool = False,
                  enable_wifi: bool = False,
-                 enable_rs911x: bool = False,
+                 enable_rs9116: bool = False,
                  enable_wf200: bool = False,
+                 enable_917_ncp: bool = False,
                  enable_wifi_ipv4: bool = False,
                  enable_additional_data_advertising: bool = False,
                  enable_ot_lib: bool = False,
@@ -196,19 +200,22 @@ class Efr32Builder(GnBuilder):
 
         if enable_wifi:
             self.dotfile += self.root + '/build_for_wifi_gnfile.gn'
-            if board == Efr32Board.BRD4161A:
-                self.extra_gn_options.append('is_debug=false chip_logging=false')
-            else:
-                self.extra_gn_options.append('disable_lcd=true use_external_flash=false')
-
-            if enable_rs911x:
-                self.extra_gn_options.append('use_rs911x=true')
-            elif enable_wf200:
-                self.extra_gn_options.append('use_wf200=true')
-            elif enable_917_soc:
+            if enable_917_soc:
+                # Wifi SoC platform
                 self.extra_gn_options.append('chip_device_platform=\"SiWx917\"')
             else:
-                raise Exception('Wifi usage: ...-wifi-[rs911x|wf200]-...')
+                # EFR32 + WiFi NCP combos
+                if board == Efr32Board.BRD4161A:
+                    self.extra_gn_options.append('is_debug=false chip_logging=false')
+
+                if enable_rs9116:
+                    self.extra_gn_options.append('use_rs9116=true chip_device_platform =\"efr32\"')
+                elif enable_wf200:
+                    self.extra_gn_options.append('use_wf200=true chip_device_platform =\"efr32\"')
+                elif enable_917_ncp:
+                    self.extra_gn_options.append('use_SiWx917=true chip_device_platform =\"efr32\"')
+                else:
+                    raise Exception('Wifi usage: ...-wifi-[rs9116|wf200|siwx917]-...')
 
         if enable_wifi_ipv4:
             self.extra_gn_options.append('chip_enable_wifi_ipv4=true')
@@ -230,10 +237,10 @@ class Efr32Builder(GnBuilder):
                 ['git', 'describe', '--always', '--dirty', '--exclude', '*']).decode('ascii').strip()
             branchName = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).decode('ascii').strip()
             self.extra_gn_options.append(
-                'sl_matter_version_str="v1.2-%s-%s"' % (branchName, shortCommitSha))
-        if enable_917_soc:
-            if use_rps_extension is False:
-                self.extra_gn_options.append('use_rps_extension=false')
+                'sl_matter_version_str="v1.3-%s-%s"' % (branchName, shortCommitSha))
+
+        if use_rps_extension is False:
+            self.extra_gn_options.append('use_rps_extension=false')
 
         if "GSDK_ROOT" in os.environ:
             # EFR32 SDK is very large. If the SDK path is already known (the
@@ -244,11 +251,11 @@ class Efr32Builder(GnBuilder):
         if "GSDK_ROOT" in os.environ and not enable_wifi:
             self.extra_gn_options.append(f"openthread_root=\"{sdk_path}/util/third_party/openthread\"")
 
-        if "WISECONNECT_SDK_ROOT" in os.environ and enable_rs911x:
+        if "WISECONNECT_SDK_ROOT" in os.environ:
             wiseconnect_sdk_path = shlex.quote(os.environ['WISECONNECT_SDK_ROOT'])
             self.extra_gn_options.append(f"wiseconnect_sdk_root=\"{wiseconnect_sdk_path}\"")
 
-        if "WIFI_SDK_ROOT" in os.environ and enable_917_soc:
+        if "WIFI_SDK_ROOT" in os.environ:
             wifi_sdk_path = shlex.quote(os.environ['WIFI_SDK_ROOT'])
             self.extra_gn_options.append(f"wifi_sdk_root=\"{wifi_sdk_path}\"")
 

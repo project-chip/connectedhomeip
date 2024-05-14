@@ -17,6 +17,7 @@
 
 #include "energy-preference-server.h"
 
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/util/attribute-storage.h> // Needed for registerAttributeAccessOverride
 
 #include <app-common/zap-generated/attributes/Accessors.h>

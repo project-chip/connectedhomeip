@@ -24,7 +24,7 @@
 
 #include "lib/support/CHIPMem.h"
 #include <access/examples/PermissiveAccessControlDelegate.h>
-#include <app/AttributeAccessInterface.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/InteractionModelEngine.h>
 #include <app/InteractionModelHelper.h>
 #include <app/MessageDef/AttributeReportIBs.h>
@@ -79,9 +79,9 @@ class TestContext : public chip::Test::AppContext
 {
 public:
     // Performs shared setup for all tests in the test suite
-    CHIP_ERROR SetUpTestSuite() override
+    void SetUpTestSuite() override
     {
-        ReturnErrorOnFailure(chip::Test::AppContext::SetUpTestSuite());
+        chip::Test::AppContext::SetUpTestSuite();
         gRealClock = &chip::System::SystemClock();
         chip::System::Clock::Internal::SetSystemClockForTesting(&gMockClock);
 
@@ -94,8 +94,6 @@ public:
         {
             gReportScheduler = chip::app::reporting::GetDefaultReportScheduler();
         }
-
-        return CHIP_NO_ERROR;
     }
 
     static int nlTestSetUpTestSuite_Sync(void * context)
@@ -112,7 +110,7 @@ public:
     }
 
     // Performs setup for each individual test in the test suite
-    CHIP_ERROR SetUp() override
+    void SetUp() override
     {
         const chip::app::LogStorageResources logStorageResources[] = {
             { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
@@ -120,16 +118,12 @@ public:
             { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
         };
 
-        ReturnErrorOnFailure(chip::Test::AppContext::SetUp());
+        chip::Test::AppContext::SetUp();
 
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        VerifyOrExit((err = mEventCounter.Init(0)) == CHIP_NO_ERROR,
-                     ChipLogError(AppServer, "Init EventCounter failed: %" CHIP_ERROR_FORMAT, err.Format()));
+        // TODO: change to ASSERT_EQ, once transition to pw_unit_test is complete
+        VerifyOrDie(mEventCounter.Init(0) == CHIP_NO_ERROR);
         chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), ArraySize(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
-
-    exit:
-        return err;
     }
 
     // Performs teardown for each individual test in the test suite
@@ -303,7 +297,7 @@ namespace app {
 
 CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
                                  const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
-                                 AttributeValueEncoder::AttributeEncodeState * apEncoderState)
+                                 AttributeEncodeState * apEncoderState)
 {
     if (aPath.mClusterId >= Test::kMockEndpointMin)
     {
@@ -331,7 +325,7 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
         return attributeReport.EndOfAttributeReportIB();
     }
 
-    return AttributeValueEncoder(aAttributeReports, 0, aPath, 0).Encode(kTestFieldValue1);
+    return AttributeValueEncoder(aAttributeReports, aSubjectDescriptor, aPath, 0 /* dataVersion */).Encode(kTestFieldValue1);
 }
 
 bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion)

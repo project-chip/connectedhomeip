@@ -117,3 +117,28 @@ tests:
           constraints:
               type: list
               contains: [0, 1]
+
+    - label: "Step 5*: TH reads EventList attribute from DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Step 6: TH reads the AcceptedCommandList attribute from the DUT"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Step 7: TH reads the GeneratedCommandList attribute from the DUT"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list

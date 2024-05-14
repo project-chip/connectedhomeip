@@ -22,7 +22,6 @@
 #include <EVSECallbacks.h>
 #include <EnergyEvseTargetsStore.h>
 
-#include <app/util/af.h>
 #include <app/util/config.h>
 #include <cstring>
 

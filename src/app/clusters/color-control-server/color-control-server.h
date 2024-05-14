@@ -22,7 +22,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/clusters/scenes-server/SceneTable.h>
 #include <app/util/af-types.h>
-#include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 #include <app/util/basic-types.h>
 #include <app/util/config.h>
 #include <platform/CHIPDeviceConfig.h>

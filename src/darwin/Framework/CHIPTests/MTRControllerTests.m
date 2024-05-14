@@ -62,6 +62,10 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
     XCTAssertTrue([factory startControllerFactory:factoryParams error:nil]);
     XCTAssertTrue([factory isRunning]);
 
+    // Starting again with identical params is a no-op
+    __auto_type * factoryParams2 = [[MTRDeviceControllerFactoryParams alloc] initWithStorage:storage];
+    XCTAssertTrue([factory startControllerFactory:factoryParams2 error:nil]);
+
     [factory stopControllerFactory];
     XCTAssertFalse([factory isRunning]);
 

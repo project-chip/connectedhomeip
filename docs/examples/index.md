@@ -85,6 +85,15 @@ darwin-framework-tool/README
 energy-management-app/**/README
 ```
 
+## Fabric Bridge example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+fabric-bridge-app/**/README
+```
+
 ## Java matter controller example
 
 ```{toctree}
@@ -110,6 +119,15 @@ kotlin-matter-controller/README
 :maxdepth: 1
 
 virtual-device-app/**/README
+```
+
+## Laundry washer example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+laundry-washer-app/**/README
 ```
 
 ## Lighting example
@@ -204,7 +222,6 @@ pigweed-app/**/README
 :maxdepth: 1
 
 pump-app/**/README
-pump-app/cc13x2x7_26x2x7/doc/programming*
 ```
 
 ## Pump controller example
@@ -214,7 +231,6 @@ pump-app/cc13x2x7_26x2x7/doc/programming*
 :maxdepth: 1
 
 pump-controller-app/**/README
-pump-controller-app/cc13x2x7_26x2x7/doc/programming*
 ```
 
 ## Refrigerator example

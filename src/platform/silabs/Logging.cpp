@@ -136,9 +136,10 @@ static void PrintLog(const char * msg)
 
 #if SILABS_LOG_OUT_UART
         uartLogWrite(msg, sz);
-#elif PW_RPC_ENABLED
-        PigweedLogger::putString(msg, sz);
 #else
+#if PW_RPC_ENABLED
+        PigweedLogger::putString(msg, sz);
+#endif // PW_RPC_ENABLED
         SEGGER_RTT_WriteNoLock(LOG_RTT_BUFFER_INDEX, msg, sz);
 #endif // SILABS_LOG_OUT_UART
 
@@ -147,9 +148,8 @@ static void PrintLog(const char * msg)
         sz                   = strlen(newline);
 #if PW_RPC_ENABLED
         PigweedLogger::putString(newline, sz);
-#else
-        SEGGER_RTT_WriteNoLock(LOG_RTT_BUFFER_INDEX, newline, sz);
 #endif // PW_RPC_ENABLED
+        SEGGER_RTT_WriteNoLock(LOG_RTT_BUFFER_INDEX, newline, sz);
 #endif
     }
 }

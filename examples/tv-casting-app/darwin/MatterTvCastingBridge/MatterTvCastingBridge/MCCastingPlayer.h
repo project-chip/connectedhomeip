@@ -70,7 +70,10 @@
 - (uint16_t)vendorId;
 - (uint16_t)productId;
 - (uint32_t)deviceType;
+- (bool)supportsCommissionerGeneratedPasscode;
 - (NSArray * _Nonnull)ipAddresses;
+- (NSString * _Nonnull)hostName;
+- (NSString * _Nonnull)instanceName;
 
 /**
  * @brief Returns the NSArray of MCEndpoints associated with this MCCastingPlayer

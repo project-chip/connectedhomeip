@@ -50,6 +50,10 @@
 #include <app/icd/server/ICDConfigurationData.h> // nogncheck
 #endif
 
+#if CHIP_CRYPTO_PSA
+#include "psa/crypto.h"
+#endif
+
 namespace {
 
 using namespace chip;
@@ -61,24 +65,19 @@ using namespace chip::System::Clock::Literals;
 
 const char PAYLOAD[] = "Hello!";
 
-// The CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST can be set to non-zero value
-// to boost the retransmission timeout for a high latency network like Thread to
-// avoid spurious retransmits.
-//
-// This adds extra I/O time to account for this. See the documentation for
-// CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST for more details.
-constexpr auto retryBoosterTimeout = CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS * CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST;
-
 class TestContext : public chip::Test::LoopbackMessagingContext
 {
 public:
     // Performs setup for each individual test in the test suite
-    CHIP_ERROR SetUp() override
+    void SetUp() override
     {
-        ReturnErrorOnFailure(chip::Test::LoopbackMessagingContext::SetUp());
+#if CHIP_CRYPTO_PSA
+        // TODO: use ASSERT_EQ, once transition to pw_unit_test is complete
+        VerifyOrDie(psa_crypto_init() == PSA_SUCCESS);
+#endif
+        chip::Test::LoopbackMessagingContext::SetUp();
         GetSessionAliceToBob()->AsSecureSession()->SetRemoteSessionParameters(GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));
         GetSessionBobToAlice()->AsSecureSession()->SetRemoteSessionParameters(GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));
-        return CHIP_NO_ERROR;
     }
 };
 
@@ -225,92 +224,125 @@ struct BackoffComplianceTestVector
     System::Clock::Timeout backoffMax;
 };
 
-struct BackoffComplianceTestVector theBackoffComplianceTestVector[] = {
+struct BackoffComplianceTestVector theBackoffComplianceTestVector[] = { {
+                                                                            .sendCount   = 0,
+                                                                            .backoffBase = System::Clock::Timeout(300),
+                                                                            .backoffMin  = System::Clock::Timeout(330),
+                                                                            .backoffMax  = System::Clock::Timeout(413),
+                                                                        },
+                                                                        {
+                                                                            .sendCount   = 1,
+                                                                            .backoffBase = System::Clock::Timeout(300),
+                                                                            .backoffMin  = System::Clock::Timeout(330),
+                                                                            .backoffMax  = System::Clock::Timeout(413),
+                                                                        },
+                                                                        {
+                                                                            .sendCount   = 2,
+                                                                            .backoffBase = System::Clock::Timeout(300),
+                                                                            .backoffMin  = System::Clock::Timeout(528),
+                                                                            .backoffMax  = System::Clock::Timeout(661),
+                                                                        },
+                                                                        {
+                                                                            .sendCount   = 3,
+                                                                            .backoffBase = System::Clock::Timeout(300),
+                                                                            .backoffMin  = System::Clock::Timeout(844),
+                                                                            .backoffMax  = System::Clock::Timeout(1057),
+                                                                        },
+                                                                        {
+                                                                            .sendCount   = 4,
+                                                                            .backoffBase = System::Clock::Timeout(300),
+                                                                            .backoffMin  = System::Clock::Timeout(1351),
+                                                                            .backoffMax  = System::Clock::Timeout(1691),
+                                                                        },
+                                                                        {
+                                                                            .sendCount   = 5,
+                                                                            .backoffBase = System::Clock::Timeout(300),
+                                                                            .backoffMin  = System::Clock::Timeout(2162),
+                                                                            .backoffMax  = System::Clock::Timeout(2705),
+                                                                        },
+                                                                        {
+                                                                            .sendCount   = 6,
+                                                                            .backoffBase = System::Clock::Timeout(300),
+                                                                            .backoffMin  = System::Clock::Timeout(2162),
+                                                                            .backoffMax  = System::Clock::Timeout(2705),
+                                                                        },
+                                                                        {
+                                                                            .sendCount   = 0,
+                                                                            .backoffBase = System::Clock::Timeout(4000),
+                                                                            .backoffMin  = System::Clock::Timeout(4400),
+                                                                            .backoffMax  = System::Clock::Timeout(5503),
+                                                                        },
+                                                                        {
+                                                                            .sendCount   = 1,
+                                                                            .backoffBase = System::Clock::Timeout(4000),
+                                                                            .backoffMin  = System::Clock::Timeout(4400),
+                                                                            .backoffMax  = System::Clock::Timeout(5503),
+                                                                        },
+                                                                        {
+                                                                            .sendCount   = 2,
+                                                                            .backoffBase = System::Clock::Timeout(4000),
+                                                                            .backoffMin  = System::Clock::Timeout(7040),
+                                                                            .backoffMax  = System::Clock::Timeout(8805),
+                                                                        },
+                                                                        {
+                                                                            .sendCount   = 3,
+                                                                            .backoffBase = System::Clock::Timeout(4000),
+                                                                            .backoffMin  = System::Clock::Timeout(11264),
+                                                                            .backoffMax  = System::Clock::Timeout(14088),
+                                                                        },
+                                                                        {
+                                                                            .sendCount   = 4,
+                                                                            .backoffBase = System::Clock::Timeout(4000),
+                                                                            .backoffMin  = System::Clock::Timeout(18022),
+                                                                            .backoffMax  = System::Clock::Timeout(22541),
+                                                                        },
+                                                                        {
+                                                                            .sendCount   = 5,
+                                                                            .backoffBase = System::Clock::Timeout(4000),
+                                                                            .backoffMin  = System::Clock::Timeout(28835),
+                                                                            .backoffMax  = System::Clock::Timeout(36065),
+                                                                        },
+                                                                        {
+                                                                            .sendCount   = 6,
+                                                                            .backoffBase = System::Clock::Timeout(4000),
+                                                                            .backoffMin  = System::Clock::Timeout(28835),
+                                                                            .backoffMax  = System::Clock::Timeout(36065),
+                                                                        },
+                                                                        {
+                                                                            // test theoretical worst-case 1-hour interval
+                                                                            .sendCount   = 4,
+                                                                            .backoffBase = System::Clock::Timeout(3'600'000),
+                                                                            .backoffMin  = System::Clock::Timeout(16'220'160),
+                                                                            .backoffMax  = System::Clock::Timeout(20'286'001),
+                                                                        } };
+
+void CheckGetBackoffImpl(nlTestSuite * inSuite, System::Clock::Timeout additionalMRPBackoffTime)
+{
+    ReliableMessageMgr::SetAdditionalMRPBackoffTime(MakeOptional(additionalMRPBackoffTime));
+
+    // Run 3x iterations to thoroughly test random jitter always results in backoff within bounds.
+    for (uint32_t j = 0; j < 3; j++)
     {
-        .sendCount   = 0,
-        .backoffBase = System::Clock::Timeout(300),
-        .backoffMin  = System::Clock::Timeout(330),
-        .backoffMax  = System::Clock::Timeout(413),
-    },
-    {
-        .sendCount   = 1,
-        .backoffBase = System::Clock::Timeout(300),
-        .backoffMin  = System::Clock::Timeout(330),
-        .backoffMax  = System::Clock::Timeout(413),
-    },
-    {
-        .sendCount   = 2,
-        .backoffBase = System::Clock::Timeout(300),
-        .backoffMin  = System::Clock::Timeout(528),
-        .backoffMax  = System::Clock::Timeout(660),
-    },
-    {
-        .sendCount   = 3,
-        .backoffBase = System::Clock::Timeout(300),
-        .backoffMin  = System::Clock::Timeout(844),
-        .backoffMax  = System::Clock::Timeout(1057),
-    },
-    {
-        .sendCount   = 4,
-        .backoffBase = System::Clock::Timeout(300),
-        .backoffMin  = System::Clock::Timeout(1351),
-        .backoffMax  = System::Clock::Timeout(1690),
-    },
-    {
-        .sendCount   = 5,
-        .backoffBase = System::Clock::Timeout(300),
-        .backoffMin  = System::Clock::Timeout(2162),
-        .backoffMax  = System::Clock::Timeout(2704),
-    },
-    {
-        .sendCount   = 6,
-        .backoffBase = System::Clock::Timeout(300),
-        .backoffMin  = System::Clock::Timeout(2162),
-        .backoffMax  = System::Clock::Timeout(2704),
-    },
-    {
-        .sendCount   = 0,
-        .backoffBase = System::Clock::Timeout(4000),
-        .backoffMin  = System::Clock::Timeout(4400),
-        .backoffMax  = System::Clock::Timeout(5500),
-    },
-    {
-        .sendCount   = 1,
-        .backoffBase = System::Clock::Timeout(4000),
-        .backoffMin  = System::Clock::Timeout(4400),
-        .backoffMax  = System::Clock::Timeout(5500),
-    },
-    {
-        .sendCount   = 2,
-        .backoffBase = System::Clock::Timeout(4000),
-        .backoffMin  = System::Clock::Timeout(7040),
-        .backoffMax  = System::Clock::Timeout(8800),
-    },
-    {
-        .sendCount   = 3,
-        .backoffBase = System::Clock::Timeout(4000),
-        .backoffMin  = System::Clock::Timeout(11264),
-        .backoffMax  = System::Clock::Timeout(14081),
-    },
-    {
-        .sendCount   = 4,
-        .backoffBase = System::Clock::Timeout(4000),
-        .backoffMin  = System::Clock::Timeout(18022),
-        .backoffMax  = System::Clock::Timeout(22529),
-    },
-    {
-        .sendCount   = 5,
-        .backoffBase = System::Clock::Timeout(4000),
-        .backoffMin  = System::Clock::Timeout(28835),
-        .backoffMax  = System::Clock::Timeout(36045),
-    },
-    {
-        .sendCount   = 6,
-        .backoffBase = System::Clock::Timeout(4000),
-        .backoffMin  = System::Clock::Timeout(28835),
-        .backoffMax  = System::Clock::Timeout(36045),
-    },
-};
+        for (const auto & test : theBackoffComplianceTestVector)
+        {
+            System::Clock::Timeout backoff      = ReliableMessageMgr::GetBackoff(test.backoffBase, test.sendCount);
+            System::Clock::Timeout extraBackoff = additionalMRPBackoffTime;
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+            // If running as an ICD, increase maxBackoff to account for the polling interval
+            extraBackoff += ICDConfigurationData::GetInstance().GetFastPollingInterval();
+#endif
+
+            ChipLogProgress(Test, "Backoff base %" PRIu32 " extra %" PRIu32 " # %d: %" PRIu32, test.backoffBase.count(),
+                            extraBackoff.count(), test.sendCount, backoff.count());
+
+            NL_TEST_ASSERT(inSuite, backoff >= test.backoffMin + extraBackoff);
+            NL_TEST_ASSERT(inSuite, backoff <= test.backoffMax + extraBackoff);
+        }
+    }
+
+    ReliableMessageMgr::SetAdditionalMRPBackoffTime(NullOptional);
+}
 
 } // namespace
 
@@ -336,6 +368,7 @@ public:
     static void CheckLostStandaloneAck(nlTestSuite * inSuite, void * inContext);
     static void CheckIsPeerActiveNotInitiator(nlTestSuite * inSuite, void * inContext);
     static void CheckGetBackoff(nlTestSuite * inSuite, void * inContext);
+    static void CheckGetBackoffAdditionalTime(nlTestSuite * inSuite, void * inContext);
     static void CheckApplicationResponseDelayed(nlTestSuite * inSuite, void * inContext);
     static void CheckApplicationResponseNeverComes(nlTestSuite * inSuite, void * inContext);
 };
@@ -437,7 +470,7 @@ void TestReliableMessageProtocol::CheckResendApplicationMessage(nlTestSuite * in
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
     // Wait for the initial message to fail (should take 330-413ms)
-    ctx.GetIOContext().DriveIOUntil(1000_ms32 + retryBoosterTimeout, [&] { return loopback.mSentMessageCount >= 2; });
+    ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 2; });
     now         = System::SystemClock().GetMonotonicTimestamp();
     timeoutTime = now - startTime;
     ChipLogProgress(Test, "Attempt #1  Timeout : %" PRIu32 "ms", timeoutTime.count());
@@ -454,7 +487,7 @@ void TestReliableMessageProtocol::CheckResendApplicationMessage(nlTestSuite * in
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
     // Wait for the 1st retry to fail (should take 330-413ms)
-    ctx.GetIOContext().DriveIOUntil(1000_ms32 + retryBoosterTimeout, [&] { return loopback.mSentMessageCount >= 3; });
+    ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 3; });
     now         = System::SystemClock().GetMonotonicTimestamp();
     timeoutTime = now - startTime;
     ChipLogProgress(Test, "Attempt #2  Timeout : %" PRIu32 "ms", timeoutTime.count());
@@ -471,7 +504,7 @@ void TestReliableMessageProtocol::CheckResendApplicationMessage(nlTestSuite * in
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
     // Wait for the 2nd retry to fail (should take 528-660ms)
-    ctx.GetIOContext().DriveIOUntil(1000_ms32 + retryBoosterTimeout, [&] { return loopback.mSentMessageCount >= 4; });
+    ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 4; });
     now         = System::SystemClock().GetMonotonicTimestamp();
     timeoutTime = now - startTime;
     ChipLogProgress(Test, "Attempt #3  Timeout : %" PRIu32 "ms", timeoutTime.count());
@@ -488,7 +521,7 @@ void TestReliableMessageProtocol::CheckResendApplicationMessage(nlTestSuite * in
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
     // Wait for the 3rd retry to fail (should take 845-1056ms)
-    ctx.GetIOContext().DriveIOUntil(1500_ms32 + retryBoosterTimeout, [&] { return loopback.mSentMessageCount >= 5; });
+    ctx.GetIOContext().DriveIOUntil(1500_ms32, [&] { return loopback.mSentMessageCount >= 5; });
     now         = System::SystemClock().GetMonotonicTimestamp();
     timeoutTime = now - startTime;
     ChipLogProgress(Test, "Attempt #4  Timeout : %" PRIu32 "ms", timeoutTime.count());
@@ -1833,25 +1866,12 @@ void TestReliableMessageProtocol::CheckLostStandaloneAck(nlTestSuite * inSuite, 
 
 void TestReliableMessageProtocol::CheckGetBackoff(nlTestSuite * inSuite, void * inContext)
 {
-    // Run 3x iterations to thoroughly test random jitter always results in backoff within bounds.
-    for (uint32_t j = 0; j < 3; j++)
-    {
-        for (const auto & test : theBackoffComplianceTestVector)
-        {
-            System::Clock::Timeout backoff = ReliableMessageMgr::GetBackoff(test.backoffBase, test.sendCount);
-            ChipLogProgress(Test, "Backoff base %" PRIu32 " # %d: %" PRIu32, test.backoffBase.count(), test.sendCount,
-                            backoff.count());
+    CheckGetBackoffImpl(inSuite, System::Clock::kZero);
+}
 
-            NL_TEST_ASSERT(inSuite, backoff >= test.backoffMin);
-
-            auto maxBackoff = test.backoffMax + retryBoosterTimeout;
-#if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
-            // If running as an ICD, increase maxBackoff to account for the polling interval
-            maxBackoff += ICDConfigurationData::GetInstance().GetSlowPollingInterval();
-#endif
-            NL_TEST_ASSERT(inSuite, backoff <= maxBackoff);
-        }
-    }
+void TestReliableMessageProtocol::CheckGetBackoffAdditionalTime(nlTestSuite * inSuite, void * inContext)
+{
+    CheckGetBackoffImpl(inSuite, System::Clock::Seconds32(1));
 }
 
 void TestReliableMessageProtocol::CheckApplicationResponseDelayed(nlTestSuite * inSuite, void * inContext)
@@ -2195,6 +2215,7 @@ const nlTest sTests[] = {
                 TestReliableMessageProtocol::CheckLostStandaloneAck),
     NL_TEST_DEF("Test Is Peer Active Retry logic", TestReliableMessageProtocol::CheckIsPeerActiveNotInitiator),
     NL_TEST_DEF("Test MRP backoff algorithm", TestReliableMessageProtocol::CheckGetBackoff),
+    NL_TEST_DEF("Test MRP backoff algorithm with additional time", TestReliableMessageProtocol::CheckGetBackoffAdditionalTime),
     // TODO: Re-enable this test, after changing test to use Mock clock / DriveIO rather than DriveIOUntil.
     // Issue: https://github.com/project-chip/connectedhomeip/issues/32440
     // NL_TEST_DEF("Test an application response that comes after MRP retransmits run out",

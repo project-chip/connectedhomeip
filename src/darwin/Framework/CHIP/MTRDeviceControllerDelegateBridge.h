@@ -42,10 +42,13 @@ public:
 
     void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR error) override;
 
+    void SetDeviceNodeID(chip::NodeId deviceNodeId);
+
 private:
     MTRDeviceController * __weak mController;
     _Nullable id<MTRDeviceControllerDelegate> mDelegate;
     _Nullable dispatch_queue_t mQueue;
+    chip::NodeId mDeviceNodeId;
 
     MTRCommissioningStatus MapStatus(chip::Controller::DevicePairingDelegate::Status status);
 };
