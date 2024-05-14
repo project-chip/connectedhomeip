@@ -4035,6 +4035,18 @@ static id _Nullable DecodeEventPayloadForRadonConcentrationMeasurementCluster(Ev
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForThreadBorderRouterManagementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::ThreadBorderRouterManagement;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForWakeOnLANCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::WakeOnLan;
@@ -4835,6 +4847,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::RadonConcentrationMeasurement::Id: {
         return DecodeEventPayloadForRadonConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::ThreadBorderRouterManagement::Id: {
+        return DecodeEventPayloadForThreadBorderRouterManagementCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::WakeOnLan::Id: {
         return DecodeEventPayloadForWakeOnLANCluster(aPath.mEventId, aReader, aError);

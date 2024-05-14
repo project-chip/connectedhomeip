@@ -1381,6 +1381,40 @@ static constexpr CommandId Id = 0x0000004C;
 } // namespace Commands
 } // namespace ColorControl
 
+namespace ThreadBorderRouterManagement {
+namespace Commands {
+
+namespace GetActiveDatasetRequest {
+static constexpr CommandId Id = 0x00000000;
+} // namespace GetActiveDatasetRequest
+
+namespace GetPendingDatasetRequest {
+static constexpr CommandId Id = 0x00000001;
+} // namespace GetPendingDatasetRequest
+
+namespace DatasetResponse {
+static constexpr CommandId Id = 0x00000002;
+} // namespace DatasetResponse
+
+namespace SetActiveDatasetRequest {
+static constexpr CommandId Id = 0x00000003;
+} // namespace SetActiveDatasetRequest
+
+namespace SetPendingDatasetRequest {
+static constexpr CommandId Id = 0x00000004;
+} // namespace SetPendingDatasetRequest
+
+namespace TopologyRequest {
+static constexpr CommandId Id = 0x00000005;
+} // namespace TopologyRequest
+
+namespace TopologyResponse {
+static constexpr CommandId Id = 0x00000006;
+} // namespace TopologyResponse
+
+} // namespace Commands
+} // namespace ThreadBorderRouterManagement
+
 namespace Channel {
 namespace Commands {
 

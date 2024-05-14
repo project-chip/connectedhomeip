@@ -6884,6 +6884,159 @@ NS_ASSUME_NONNULL_BEGIN
 @dynamic coolSetpoint;
 @end
 
+@implementation MTRThreadBorderRouterManagementClusterChildTableStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _rloc16 = @(0);
+
+        _linkQuality = @(0);
+
+        _routingRole = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThreadBorderRouterManagementClusterChildTableStruct alloc] init];
+
+    other.rloc16 = self.rloc16;
+    other.linkQuality = self.linkQuality;
+    other.routingRole = self.routingRole;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: rloc16:%@; linkQuality:%@; routingRole:%@; >", NSStringFromClass([self class]), _rloc16, _linkQuality, _routingRole];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThreadBorderRouterManagementClusterRouteTableStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _routerId = @(0);
+
+        _pathCost = @(0);
+
+        _lqiIn = @(0);
+
+        _lqiOut = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThreadBorderRouterManagementClusterRouteTableStruct alloc] init];
+
+    other.routerId = self.routerId;
+    other.pathCost = self.pathCost;
+    other.lqiIn = self.lqiIn;
+    other.lqiOut = self.lqiOut;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: routerId:%@; pathCost:%@; lqiIn:%@; lqiOut:%@; >", NSStringFromClass([self class]), _routerId, _pathCost, _lqiIn, _lqiOut];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThreadBorderRouterManagementClusterThreadNodeStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _extAddress = @(0);
+
+        _rloc16 = @(0);
+
+        _iPv6s = [NSArray array];
+
+        _routingRole = @(0);
+
+        _routeTable = [NSArray array];
+
+        _childTable = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThreadBorderRouterManagementClusterThreadNodeStruct alloc] init];
+
+    other.extAddress = self.extAddress;
+    other.rloc16 = self.rloc16;
+    other.iPv6s = self.iPv6s;
+    other.routingRole = self.routingRole;
+    other.routeTable = self.routeTable;
+    other.childTable = self.childTable;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: extAddress:%@; rloc16:%@; iPv6s:%@; routingRole:%@; routeTable:%@; childTable:%@; >", NSStringFromClass([self class]), _extAddress, _rloc16, _iPv6s, _routingRole, _routeTable, _childTable];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThreadBorderRouterManagementClusterNeiborTableStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _extAddress = @(0);
+
+        _age = @(0);
+
+        _rloc16 = @(0);
+
+        _averageRssi = nil;
+
+        _lastRssi = nil;
+
+        _routingRole = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThreadBorderRouterManagementClusterNeiborTableStruct alloc] init];
+
+    other.extAddress = self.extAddress;
+    other.age = self.age;
+    other.rloc16 = self.rloc16;
+    other.averageRssi = self.averageRssi;
+    other.lastRssi = self.lastRssi;
+    other.routingRole = self.routingRole;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: extAddress:%@; age:%@; rloc16:%@; averageRssi:%@; lastRssi:%@; routingRole:%@; >", NSStringFromClass([self class]), _extAddress, _age, _rloc16, _averageRssi, _lastRssi, _routingRole];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRChannelClusterProgramCastStruct
 - (instancetype)init
 {

@@ -113,6 +113,7 @@
         "test-cluster.xml",
         "thermostat-cluster.xml",
         "thermostat-user-interface-configuration-cluster.xml",
+        "thread-border-router-management-cluster.xml",
         "thread-network-diagnostics-cluster.xml",
         "time-format-localization-cluster.xml",
         "time-synchronization-cluster.xml",
@@ -286,6 +287,15 @@
             "nullable_struct",
             "general_error_boolean",
             "cluster_error_boolean"
+        ],
+        "Thread Border Router Management": [
+            "BorderRouterName",
+            "BorderAgentId",
+            "ThreadVersion",
+            "InterfaceEnabled",
+            "ThreadNode",
+            "ActiveDatasetTimestamp",
+            "FeatureMap"
         ],
         "Thread Network Diagnostics": [
             "Channel",

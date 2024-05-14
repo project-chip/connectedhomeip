@@ -956,6 +956,15 @@ static BOOL CommandNeedsTimedInvokeInRadonConcentrationMeasurementCluster(Attrib
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInThreadBorderRouterManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ThreadBorderRouterManagement;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInWakeOnLANCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::WakeOnLan;
@@ -1418,6 +1427,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::RadonConcentrationMeasurement::Id: {
         return CommandNeedsTimedInvokeInRadonConcentrationMeasurementCluster(commandID);
+    }
+    case Clusters::ThreadBorderRouterManagement::Id: {
+        return CommandNeedsTimedInvokeInThreadBorderRouterManagementCluster(commandID);
     }
     case Clusters::WakeOnLan::Id: {
         return CommandNeedsTimedInvokeInWakeOnLANCluster(commandID);

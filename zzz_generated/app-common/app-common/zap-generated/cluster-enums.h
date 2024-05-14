@@ -4309,6 +4309,32 @@ enum class Feature : uint32_t
 };
 } // namespace RadonConcentrationMeasurement
 
+namespace ThreadBorderRouterManagement {
+
+// Enum for RoutingRoleEnum
+enum class RoutingRoleEnum : uint8_t
+{
+    kUnspecified     = 0x00,
+    kUnassigned      = 0x01,
+    kSleepyEndDevice = 0x02,
+    kEndDevice       = 0x03,
+    kReed            = 0x04,
+    kRouter          = 0x05,
+    kLeader          = 0x06,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 7,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kPANChange = 0x1,
+};
+} // namespace ThreadBorderRouterManagement
+
 namespace WakeOnLan {} // namespace WakeOnLan
 
 namespace Channel {

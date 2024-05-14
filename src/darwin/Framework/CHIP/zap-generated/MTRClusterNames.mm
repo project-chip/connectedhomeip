@@ -318,6 +318,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeRadonConcentrationMeasurementID:
         result = @"RadonConcentrationMeasurement";
         break;
+    case MTRClusterIDTypeThreadBorderRouterManagementID:
+        result = @"ThreadBorderRouterManagement";
+        break;
     case MTRClusterIDTypeWakeOnLANID:
         result = @"WakeOnLAN";
         break;
@@ -7204,6 +7207,64 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             break;
 
         case MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+            break;
+        }
+
+    case MTRClusterIDTypeThreadBorderRouterManagementID:
+
+        switch (attributeID) {
+
+            // Cluster ThreadBorderRouterManagement attributes
+        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeBorderRouterNameID:
+            result = @"BorderRouterName";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeBorderAgentIdID:
+            result = @"BorderAgentId";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeThreadVersionID:
+            result = @"ThreadVersion";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeInterfaceEnabledID:
+            result = @"InterfaceEnabled";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeThreadNodeID:
+            result = @"ThreadNode";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeActiveDatasetTimestampID:
+            result = @"ActiveDatasetTimestamp";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeEventListID:
+            result = @"EventList";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeClusterRevisionID:
             result = @"ClusterRevision";
             break;
 

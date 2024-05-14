@@ -3636,6 +3636,8 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("totalVolatileOrganicCompoundsConcentrationMeasurement", writeTotalVolatileOrganicCompoundsConcentrationMeasurementInteractionInfo);
     Map<String, InteractionInfo> writeRadonConcentrationMeasurementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("radonConcentrationMeasurement", writeRadonConcentrationMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeThreadBorderRouterManagementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("threadBorderRouterManagement", writeThreadBorderRouterManagementInteractionInfo);
     Map<String, InteractionInfo> writeWakeOnLanInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("wakeOnLan", writeWakeOnLanInteractionInfo);
     Map<String, InteractionInfo> writeChannelInteractionInfo = new LinkedHashMap<>();

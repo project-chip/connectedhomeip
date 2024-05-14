@@ -5288,6 +5288,51 @@ static BOOL AttributeIsSpecifiedInRadonConcentrationMeasurementCluster(Attribute
     }
     }
 }
+static BOOL AttributeIsSpecifiedInThreadBorderRouterManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ThreadBorderRouterManagement;
+    switch (aAttributeId) {
+    case Attributes::BorderRouterName::Id: {
+        return YES;
+    }
+    case Attributes::BorderAgentId::Id: {
+        return YES;
+    }
+    case Attributes::ThreadVersion::Id: {
+        return YES;
+    }
+    case Attributes::InterfaceEnabled::Id: {
+        return YES;
+    }
+    case Attributes::ThreadNode::Id: {
+        return YES;
+    }
+    case Attributes::ActiveDatasetTimestamp::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInWakeOnLANCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::WakeOnLan;
@@ -6803,6 +6848,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::RadonConcentrationMeasurement::Id: {
         return AttributeIsSpecifiedInRadonConcentrationMeasurementCluster(aAttributeId);
+    }
+    case Clusters::ThreadBorderRouterManagement::Id: {
+        return AttributeIsSpecifiedInThreadBorderRouterManagementCluster(aAttributeId);
     }
     case Clusters::WakeOnLan::Id: {
         return AttributeIsSpecifiedInWakeOnLANCluster(aAttributeId);

@@ -325,6 +325,9 @@ static constexpr ClusterId Id = 0x0000042E;
 namespace RadonConcentrationMeasurement {
 static constexpr ClusterId Id = 0x0000042F;
 } // namespace RadonConcentrationMeasurement
+namespace ThreadBorderRouterManagement {
+static constexpr ClusterId Id = 0x00000452;
+} // namespace ThreadBorderRouterManagement
 namespace WakeOnLan {
 static constexpr ClusterId Id = 0x00000503;
 } // namespace WakeOnLan

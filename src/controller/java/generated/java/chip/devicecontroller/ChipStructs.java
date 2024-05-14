@@ -9277,6 +9277,415 @@ public static class ThermostatClusterWeeklyScheduleTransitionStruct {
     return output.toString();
   }
 }
+public static class ThreadBorderRouterManagementClusterChildTableStruct {
+  public Integer rloc16;
+  public Integer linkQuality;
+  public Integer routingRole;
+  private static final long RLOC16_ID = 0L;
+  private static final long LINK_QUALITY_ID = 1L;
+  private static final long ROUTING_ROLE_ID = 2L;
+
+  public ThreadBorderRouterManagementClusterChildTableStruct(
+    Integer rloc16,
+    Integer linkQuality,
+    Integer routingRole
+  ) {
+    this.rloc16 = rloc16;
+    this.linkQuality = linkQuality;
+    this.routingRole = routingRole;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(RLOC16_ID, new UIntType(rloc16)));
+    values.add(new StructElement(LINK_QUALITY_ID, new UIntType(linkQuality)));
+    values.add(new StructElement(ROUTING_ROLE_ID, new UIntType(routingRole)));
+
+    return new StructType(values);
+  }
+
+  public static ThreadBorderRouterManagementClusterChildTableStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer rloc16 = null;
+    Integer linkQuality = null;
+    Integer routingRole = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == RLOC16_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          rloc16 = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == LINK_QUALITY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          linkQuality = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == ROUTING_ROLE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          routingRole = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new ThreadBorderRouterManagementClusterChildTableStruct(
+      rloc16,
+      linkQuality,
+      routingRole
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ThreadBorderRouterManagementClusterChildTableStruct {\n");
+    output.append("\trloc16: ");
+    output.append(rloc16);
+    output.append("\n");
+    output.append("\tlinkQuality: ");
+    output.append(linkQuality);
+    output.append("\n");
+    output.append("\troutingRole: ");
+    output.append(routingRole);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ThreadBorderRouterManagementClusterRouteTableStruct {
+  public Integer routerId;
+  public Integer pathCost;
+  public Integer LQIIn;
+  public Integer LQIOut;
+  private static final long ROUTER_ID_ID = 0L;
+  private static final long PATH_COST_ID = 1L;
+  private static final long L_Q_I_IN_ID = 2L;
+  private static final long L_Q_I_OUT_ID = 3L;
+
+  public ThreadBorderRouterManagementClusterRouteTableStruct(
+    Integer routerId,
+    Integer pathCost,
+    Integer LQIIn,
+    Integer LQIOut
+  ) {
+    this.routerId = routerId;
+    this.pathCost = pathCost;
+    this.LQIIn = LQIIn;
+    this.LQIOut = LQIOut;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ROUTER_ID_ID, new UIntType(routerId)));
+    values.add(new StructElement(PATH_COST_ID, new UIntType(pathCost)));
+    values.add(new StructElement(L_Q_I_IN_ID, new UIntType(LQIIn)));
+    values.add(new StructElement(L_Q_I_OUT_ID, new UIntType(LQIOut)));
+
+    return new StructType(values);
+  }
+
+  public static ThreadBorderRouterManagementClusterRouteTableStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer routerId = null;
+    Integer pathCost = null;
+    Integer LQIIn = null;
+    Integer LQIOut = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ROUTER_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          routerId = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == PATH_COST_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          pathCost = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == L_Q_I_IN_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          LQIIn = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == L_Q_I_OUT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          LQIOut = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new ThreadBorderRouterManagementClusterRouteTableStruct(
+      routerId,
+      pathCost,
+      LQIIn,
+      LQIOut
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ThreadBorderRouterManagementClusterRouteTableStruct {\n");
+    output.append("\trouterId: ");
+    output.append(routerId);
+    output.append("\n");
+    output.append("\tpathCost: ");
+    output.append(pathCost);
+    output.append("\n");
+    output.append("\tLQIIn: ");
+    output.append(LQIIn);
+    output.append("\n");
+    output.append("\tLQIOut: ");
+    output.append(LQIOut);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ThreadBorderRouterManagementClusterThreadNodeStruct {
+  public Long extAddress;
+  public Integer rloc16;
+  public ArrayList<byte[]> IPv6s;
+  public Integer routingRole;
+  public ArrayList<ChipStructs.ThreadBorderRouterManagementClusterRouteTableStruct> routeTable;
+  public ArrayList<ChipStructs.ThreadBorderRouterManagementClusterChildTableStruct> childTable;
+  private static final long EXT_ADDRESS_ID = 0L;
+  private static final long RLOC16_ID = 1L;
+  private static final long I_PV6S_ID = 2L;
+  private static final long ROUTING_ROLE_ID = 3L;
+  private static final long ROUTE_TABLE_ID = 4L;
+  private static final long CHILD_TABLE_ID = 5L;
+
+  public ThreadBorderRouterManagementClusterThreadNodeStruct(
+    Long extAddress,
+    Integer rloc16,
+    ArrayList<byte[]> IPv6s,
+    Integer routingRole,
+    ArrayList<ChipStructs.ThreadBorderRouterManagementClusterRouteTableStruct> routeTable,
+    ArrayList<ChipStructs.ThreadBorderRouterManagementClusterChildTableStruct> childTable
+  ) {
+    this.extAddress = extAddress;
+    this.rloc16 = rloc16;
+    this.IPv6s = IPv6s;
+    this.routingRole = routingRole;
+    this.routeTable = routeTable;
+    this.childTable = childTable;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(EXT_ADDRESS_ID, new UIntType(extAddress)));
+    values.add(new StructElement(RLOC16_ID, new UIntType(rloc16)));
+    values.add(new StructElement(I_PV6S_ID, ArrayType.generateArrayType(IPv6s, (elementIPv6s) -> new ByteArrayType(elementIPv6s))));
+    values.add(new StructElement(ROUTING_ROLE_ID, new UIntType(routingRole)));
+    values.add(new StructElement(ROUTE_TABLE_ID, ArrayType.generateArrayType(routeTable, (elementrouteTable) -> elementrouteTable.encodeTlv())));
+    values.add(new StructElement(CHILD_TABLE_ID, ArrayType.generateArrayType(childTable, (elementchildTable) -> elementchildTable.encodeTlv())));
+
+    return new StructType(values);
+  }
+
+  public static ThreadBorderRouterManagementClusterThreadNodeStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long extAddress = null;
+    Integer rloc16 = null;
+    ArrayList<byte[]> IPv6s = null;
+    Integer routingRole = null;
+    ArrayList<ChipStructs.ThreadBorderRouterManagementClusterRouteTableStruct> routeTable = null;
+    ArrayList<ChipStructs.ThreadBorderRouterManagementClusterChildTableStruct> childTable = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == EXT_ADDRESS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          extAddress = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == RLOC16_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          rloc16 = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == I_PV6S_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          IPv6s = castingValue.map((elementcastingValue) -> elementcastingValue.value(byte[].class));
+        }
+      } else if (element.contextTagNum() == ROUTING_ROLE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          routingRole = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == ROUTE_TABLE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          routeTable = castingValue.map((elementcastingValue) -> ChipStructs.ThreadBorderRouterManagementClusterRouteTableStruct.decodeTlv(elementcastingValue));
+        }
+      } else if (element.contextTagNum() == CHILD_TABLE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          childTable = castingValue.map((elementcastingValue) -> ChipStructs.ThreadBorderRouterManagementClusterChildTableStruct.decodeTlv(elementcastingValue));
+        }
+      }
+    }
+    return new ThreadBorderRouterManagementClusterThreadNodeStruct(
+      extAddress,
+      rloc16,
+      IPv6s,
+      routingRole,
+      routeTable,
+      childTable
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ThreadBorderRouterManagementClusterThreadNodeStruct {\n");
+    output.append("\textAddress: ");
+    output.append(extAddress);
+    output.append("\n");
+    output.append("\trloc16: ");
+    output.append(rloc16);
+    output.append("\n");
+    output.append("\tIPv6s: ");
+    output.append(IPv6s);
+    output.append("\n");
+    output.append("\troutingRole: ");
+    output.append(routingRole);
+    output.append("\n");
+    output.append("\trouteTable: ");
+    output.append(routeTable);
+    output.append("\n");
+    output.append("\tchildTable: ");
+    output.append(childTable);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ThreadBorderRouterManagementClusterNeiborTableStruct {
+  public Long extAddress;
+  public Long age;
+  public Integer rloc16;
+  public @Nullable Integer averageRssi;
+  public @Nullable Integer lastRssi;
+  public Integer routingRole;
+  private static final long EXT_ADDRESS_ID = 0L;
+  private static final long AGE_ID = 1L;
+  private static final long RLOC16_ID = 2L;
+  private static final long AVERAGE_RSSI_ID = 3L;
+  private static final long LAST_RSSI_ID = 4L;
+  private static final long ROUTING_ROLE_ID = 5L;
+
+  public ThreadBorderRouterManagementClusterNeiborTableStruct(
+    Long extAddress,
+    Long age,
+    Integer rloc16,
+    @Nullable Integer averageRssi,
+    @Nullable Integer lastRssi,
+    Integer routingRole
+  ) {
+    this.extAddress = extAddress;
+    this.age = age;
+    this.rloc16 = rloc16;
+    this.averageRssi = averageRssi;
+    this.lastRssi = lastRssi;
+    this.routingRole = routingRole;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(EXT_ADDRESS_ID, new UIntType(extAddress)));
+    values.add(new StructElement(AGE_ID, new UIntType(age)));
+    values.add(new StructElement(RLOC16_ID, new UIntType(rloc16)));
+    values.add(new StructElement(AVERAGE_RSSI_ID, averageRssi != null ? new IntType(averageRssi) : new NullType()));
+    values.add(new StructElement(LAST_RSSI_ID, lastRssi != null ? new IntType(lastRssi) : new NullType()));
+    values.add(new StructElement(ROUTING_ROLE_ID, new UIntType(routingRole)));
+
+    return new StructType(values);
+  }
+
+  public static ThreadBorderRouterManagementClusterNeiborTableStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long extAddress = null;
+    Long age = null;
+    Integer rloc16 = null;
+    @Nullable Integer averageRssi = null;
+    @Nullable Integer lastRssi = null;
+    Integer routingRole = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == EXT_ADDRESS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          extAddress = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == AGE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          age = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == RLOC16_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          rloc16 = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == AVERAGE_RSSI_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          averageRssi = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == LAST_RSSI_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          lastRssi = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == ROUTING_ROLE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          routingRole = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new ThreadBorderRouterManagementClusterNeiborTableStruct(
+      extAddress,
+      age,
+      rloc16,
+      averageRssi,
+      lastRssi,
+      routingRole
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ThreadBorderRouterManagementClusterNeiborTableStruct {\n");
+    output.append("\textAddress: ");
+    output.append(extAddress);
+    output.append("\n");
+    output.append("\tage: ");
+    output.append(age);
+    output.append("\n");
+    output.append("\trloc16: ");
+    output.append(rloc16);
+    output.append("\n");
+    output.append("\taverageRssi: ");
+    output.append(averageRssi);
+    output.append("\n");
+    output.append("\tlastRssi: ");
+    output.append(lastRssi);
+    output.append("\n");
+    output.append("\troutingRole: ");
+    output.append(routingRole);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class ChannelClusterProgramCastStruct {
   public String name;
   public String role;

@@ -3528,6 +3528,198 @@ DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::ThreadBorderRouterManagement::Structs::ChildTableStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("Rloc16", indent + 1, value.rloc16);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Rloc16'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("LinkQuality", indent + 1, value.linkQuality);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LinkQuality'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("RoutingRole", indent + 1, value.routingRole);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'RoutingRole'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::ThreadBorderRouterManagement::Structs::RouteTableStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("RouterId", indent + 1, value.routerId);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'RouterId'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("PathCost", indent + 1, value.pathCost);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PathCost'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("LQIIn", indent + 1, value.LQIIn);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LQIIn'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("LQIOut", indent + 1, value.LQIOut);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LQIOut'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::ThreadBorderRouterManagement::Structs::ThreadNodeStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("ExtAddress", indent + 1, value.extAddress);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ExtAddress'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Rloc16", indent + 1, value.rloc16);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Rloc16'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("IPv6s", indent + 1, value.IPv6s);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'IPv6s'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("RoutingRole", indent + 1, value.routingRole);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'RoutingRole'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("RouteTable", indent + 1, value.routeTable);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'RouteTable'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ChildTable", indent + 1, value.childTable);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ChildTable'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::ThreadBorderRouterManagement::Structs::NeiborTableStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("ExtAddress", indent + 1, value.extAddress);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ExtAddress'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Age", indent + 1, value.age);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Age'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Rloc16", indent + 1, value.rloc16);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Rloc16'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("AverageRssi", indent + 1, value.averageRssi);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AverageRssi'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("LastRssi", indent + 1, value.lastRssi);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LastRssi'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("RoutingRole", indent + 1, value.routingRole);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'RoutingRole'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::Channel::Structs::ProgramCastStruct::DecodableType & value)
 {
@@ -7716,6 +7908,25 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     ReturnErrorOnFailure(DataModelLogger::LogValue("dayOfWeekForSequence", indent + 1, value.dayOfWeekForSequence));
     ReturnErrorOnFailure(DataModelLogger::LogValue("modeForSequence", indent + 1, value.modeForSequence));
     ReturnErrorOnFailure(DataModelLogger::LogValue("transitions", indent + 1, value.transitions));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const ThreadBorderRouterManagement::Commands::DatasetResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("dataset", indent + 1, value.dataset));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const ThreadBorderRouterManagement::Commands::TopologyResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("snapshot", indent + 1, value.snapshot));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("numberOfDevices", indent + 1, value.numberOfDevices));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("threadTopology", indent + 1, value.threadTopology));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -16089,6 +16300,72 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
+    case ThreadBorderRouterManagement::Id: {
+        switch (path.mAttributeId)
+        {
+        case ThreadBorderRouterManagement::Attributes::BorderRouterName::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("BorderRouterName", 1, value);
+        }
+        case ThreadBorderRouterManagement::Attributes::BorderAgentId::Id: {
+            chip::ByteSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("BorderAgentId", 1, value);
+        }
+        case ThreadBorderRouterManagement::Attributes::ThreadVersion::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ThreadVersion", 1, value);
+        }
+        case ThreadBorderRouterManagement::Attributes::InterfaceEnabled::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("InterfaceEnabled", 1, value);
+        }
+        case ThreadBorderRouterManagement::Attributes::ThreadNode::Id: {
+            chip::app::Clusters::ThreadBorderRouterManagement::Structs::ThreadNodeStruct::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ThreadNode", 1, value);
+        }
+        case ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id: {
+            chip::app::DataModel::Nullable<uint64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ActiveDatasetTimestamp", 1, value);
+        }
+        case ThreadBorderRouterManagement::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+        }
+        case ThreadBorderRouterManagement::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+        }
+        case ThreadBorderRouterManagement::Attributes::EventList::Id: {
+            chip::app::DataModel::DecodableList<chip::EventId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EventList", 1, value);
+        }
+        case ThreadBorderRouterManagement::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case ThreadBorderRouterManagement::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case ThreadBorderRouterManagement::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
     case WakeOnLan::Id: {
         switch (path.mAttributeId)
         {
@@ -18434,6 +18711,22 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GetWeeklyScheduleResponse", 1, value);
+        }
+        }
+        break;
+    }
+    case ThreadBorderRouterManagement::Id: {
+        switch (path.mCommandId)
+        {
+        case ThreadBorderRouterManagement::Commands::DatasetResponse::Id: {
+            ThreadBorderRouterManagement::Commands::DatasetResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("DatasetResponse", 1, value);
+        }
+        case ThreadBorderRouterManagement::Commands::TopologyResponse::Id: {
+            ThreadBorderRouterManagement::Commands::TopologyResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TopologyResponse", 1, value);
         }
         }
         break;

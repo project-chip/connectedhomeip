@@ -43,8 +43,8 @@ from .Objects import (AccessControl, AccountLogin, Actions, ActivatedCarbonFilte
                       RadonConcentrationMeasurement, RefrigeratorAlarm, RefrigeratorAndTemperatureControlledCabinetMode,
                       RelativeHumidityMeasurement, RvcCleanMode, RvcOperationalState, RvcRunMode, ScenesManagement, SmokeCoAlarm,
                       SoftwareDiagnostics, Switch, TargetNavigator, TemperatureControl, TemperatureMeasurement, Thermostat,
-                      ThermostatUserInterfaceConfiguration, ThreadNetworkDiagnostics, TimeFormatLocalization, TimeSynchronization,
-                      TotalVolatileOrganicCompoundsConcentrationMeasurement, UnitLocalization, UnitTesting, UserLabel,
+                      ThermostatUserInterfaceConfiguration, ThreadBorderRouterManagement, ThreadNetworkDiagnostics, TimeFormatLocalization,
+                      TimeSynchronization, TotalVolatileOrganicCompoundsConcentrationMeasurement, UnitLocalization, UnitTesting, UserLabel,
                       ValveConfigurationAndControl, WakeOnLan, WiFiNetworkDiagnostics, WindowCovering)
 
 __all__ = [Attribute, CHIPClusters, Command, AccessControl, AccountLogin, Actions, ActivatedCarbonFilterMonitoring, AdministratorCommissioning, AirQuality,
@@ -66,6 +66,6 @@ __all__ = [Attribute, CHIPClusters, Command, AccessControl, AccountLogin, Action
            RefrigeratorAlarm, RefrigeratorAndTemperatureControlledCabinetMode, RelativeHumidityMeasurement, RvcCleanMode,
            RvcOperationalState, RvcRunMode, ScenesManagement, SmokeCoAlarm, SoftwareDiagnostics,
            Switch, TargetNavigator, TemperatureControl, TemperatureMeasurement, Thermostat, ThermostatUserInterfaceConfiguration,
-           ThreadNetworkDiagnostics, TimeFormatLocalization, TimeSynchronization,
+           ThreadBorderRouterManagement, ThreadNetworkDiagnostics, TimeFormatLocalization, TimeSynchronization,
            TotalVolatileOrganicCompoundsConcentrationMeasurement, UnitLocalization,
            UnitTesting, UserLabel, ValveConfigurationAndControl, WakeOnLan, WiFiNetworkDiagnostics, WindowCovering]

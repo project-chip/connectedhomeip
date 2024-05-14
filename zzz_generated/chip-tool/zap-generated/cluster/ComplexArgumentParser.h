@@ -455,6 +455,30 @@ static CHIP_ERROR Setup(const char * label,
 
 static void Finalize(chip::app::Clusters::Thermostat::Structs::WeeklyScheduleTransitionStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ThreadBorderRouterManagement::Structs::ChildTableStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ThreadBorderRouterManagement::Structs::ChildTableStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ThreadBorderRouterManagement::Structs::RouteTableStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ThreadBorderRouterManagement::Structs::RouteTableStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ThreadBorderRouterManagement::Structs::ThreadNodeStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ThreadBorderRouterManagement::Structs::ThreadNodeStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ThreadBorderRouterManagement::Structs::NeiborTableStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ThreadBorderRouterManagement::Structs::NeiborTableStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Channel::Structs::ProgramCastStruct::Type & request,
                         Json::Value & value);
 
