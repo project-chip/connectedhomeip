@@ -1193,16 +1193,16 @@ class BaseTestHelper:
         failed_attribute_write = []
         for req in requests:
             try:
-                try:
-                    await self.devCtrl.WriteAttribute(nodeid, [(endpoint, req.attribute, 0)])
-                    if req.expected_status != IM.Status.Success:
-                        raise AssertionError(
-                            f"Write attribute {req.attribute.__qualname__} expects failure but got success response")
-                except ChipStackError as ex:
-                    if req.expected_status != IM.Status.Success:
-                        continue
-                    else:
-                        raise ex
+                # Errors tested here is in the per-attribute result list (type AttributeStatus)
+                write_res = await self.devCtrl.WriteAttribute(nodeid, [(endpoint, req.attribute(req.value))])
+                status = write_res[0].Status
+                if req.expected_status != status:
+                    raise AssertionError(
+                        f"Write attribute {req.attribute.__qualname__} expects {req.expected_status} but got {status}")
+
+                # Only execute read tests where write is successful.
+                if req.expected_status != IM.Status.Success:
+                    continue
 
                 res = await self.devCtrl.ReadAttribute(nodeid, [(endpoint, req.attribute)])
                 val = res[endpoint][req.cluster][req.attribute]
