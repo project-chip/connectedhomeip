@@ -25,8 +25,8 @@ import("//build_overrides/chip.gni")
 # be cleanly built as a stand-alone and instead have to be imported as part of
 # a different data model or compilation unit.
 codegen_interaction_model_SOURCES = [
-  "${chip_root}/src/app/codegen-interaction-model/Model.h",
-  "${chip_root}/src/app/codegen-interaction-model/Model.cpp",
+  "${chip_root}/src/app/codegen-interaction-model/CodegenDataModel.h",
+  "${chip_root}/src/app/codegen-interaction-model/CodegenDataModel.cpp",
 ]
 
 codegen_interaction_model_PUBLIC_DEPS = [

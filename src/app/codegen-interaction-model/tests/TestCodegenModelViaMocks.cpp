@@ -15,7 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/codegen-interaction-model/Model.h>
+#include <app/codegen-interaction-model/CodegenDataModel.h>
 
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
@@ -92,7 +92,7 @@ struct UseMockNodeConfig
 TEST(TestCodegenModelViaMocks, IterateOverEndpoints)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel::Model model;
+    chip::app::CodegenDataModel model;
 
     // This iteration relies on the hard-coding that occurs when mock_ember is used
     EXPECT_EQ(model.FirstEndpoint(), kMockEndpoint1);
@@ -116,7 +116,7 @@ TEST(TestCodegenModelViaMocks, IterateOverEndpoints)
 TEST(TestCodegenModelViaMocks, IterateOverClusters)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel::Model model;
+    chip::app::CodegenDataModel model;
 
     chip::Test::ResetVersion();
 
@@ -176,7 +176,7 @@ TEST(TestCodegenModelViaMocks, GetClusterInfo)
 {
 
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel::Model model;
+    chip::app::CodegenDataModel model;
 
     chip::Test::ResetVersion();
 
@@ -201,7 +201,7 @@ TEST(TestCodegenModelViaMocks, GetClusterInfo)
 TEST(TestCodegenModelViaMocks, IterateOverAttributes)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel::Model model;
+    chip::app::CodegenDataModel model;
 
     // invalid paths should return in "no more data"
     ASSERT_FALSE(model.FirstAttribute(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1))).path.HasValidIds());
@@ -266,7 +266,7 @@ TEST(TestCodegenModelViaMocks, IterateOverAttributes)
 TEST(TestCodegenModelViaMocks, GetAttributeInfo)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel::Model model;
+    chip::app::CodegenDataModel model;
 
     // various non-existent or invalid paths should return no info data
     ASSERT_FALSE(

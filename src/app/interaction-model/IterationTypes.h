@@ -35,7 +35,7 @@ enum class ClusterQualityFlags : uint32_t
 
 struct ClusterInfo
 {
-    DataVersion dataVersion = 0; // current version of this cluster
+    DataVersion dataVersion = 0; // current cluster data version
     BitFlags<ClusterQualityFlags> flags;
 };
 
