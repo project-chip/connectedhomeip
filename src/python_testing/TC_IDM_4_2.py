@@ -19,7 +19,6 @@ import copy
 import logging
 import time
 import queue
-import traceback
 
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
@@ -45,27 +44,28 @@ Full test plan link for details:
 https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/interactiondatamodel.adoc#tc-idm-4-2-subscription-response-messages-from-dut-test-cases-dut_server
 '''
 
-# class AttributeChangeCallback:
-#     def __init__(self, expected_attribute: ClusterObjects.ClusterAttributeDescriptor, output: queue.Queue):
-#         self._output = output
-#         self._expected_attribute = expected_attribute
-#         print(f'[callback] AttributeChangeCallback')
+def WaitForAttributeReport(q: queue.Queue, expected_attribute: ClusterObjects.ClusterAttributeDescriptor):
+    try:
+        path, transaction = q.get(block=True, timeout=10)
+    except queue.Empty:
+        asserts.fail(f"Failed to receive a report for the attribute change for {expected_attribute}")
 
-#     def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
-#         logging.info(f'[callback] !if -Got subscription report for {path.AttributeType}')
-#         if path.AttributeType == self._expected_attribute:
-#             q = (path, transaction)
-#             logging.info(f'[callback] Got subscription report for {path.AttributeType}')
-#             self._output.put(q)
-
+    asserts.assert_equal(path.AttributeType, expected_attribute, f"Received incorrect attribute report. Expected: {expected_attribute}, received: {path.AttributeType}")
+    try:
+        transaction.GetAttribute(path)
+    except KeyError:
+        asserts.fail("Attribute {expected_attribute} not found in returned report")
 
 class AttributeChangeCallback:
-    def __init__(self):
-        print(f'[callback] AttributeChangeCallback')
+    def __init__(self, expected_attribute: ClusterObjects.ClusterAttributeDescriptor, output: queue.Queue):
+        self._output = output
+        self._expected_attribute = expected_attribute
 
-    def __call__(self):
-        logging.info(f'[callback] !if -Got subscription report')
-      
+    def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
+        if path.AttributeType == self._expected_attribute:
+            q = (path, transaction)
+            logging.info(f'[callback] Got subscription report for {path.AttributeType}')
+            self._output.put(q)
 
 
 class TC_IDM_4_2(MatterBaseTest):
@@ -177,7 +177,7 @@ class TC_IDM_4_2(MatterBaseTest):
         # Will write ACL for controller 2 and validate success/error codes
         CR1: ChipDeviceController = self.default_controller
         
-        # Original DUT ACL used for reseting ACL on some steps
+        # Original DUT ACL used for reseting the ACL on some steps
         dut_acl_original = await self.get_dut_acl(CR1)
 
         # Controller 2 setup
@@ -454,24 +454,8 @@ class TC_IDM_4_2(MatterBaseTest):
 
         sub_cr1_step8.Shutdown()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         # *** Step 8 ***
-        self.print_step(8, "CR1 sends a subscription request action for an attribute and sets the MinIntervalFloor to min_interval_floor_s and MaxIntervalCeiling to 10. Activate the Subscription between CR1 and DUT and record the time when the priming ReportDataMessage is received as t_report. Save the returned MaxInterval from the SubscribeResponseMessage as max_interval_s.")
+        self.print_step(8, "CR1 sends a subscription request action for an attribute and sets the MinIntervalFloor to min_interval_floor_sec and MaxIntervalCeiling to 10. Activate the Subscription between CR1 and DUT and record the time when the priming ReportDataMessage is received as t_report_sec. Save the returned MaxInterval from the SubscribeResponseMessage as max_interval_sec.")
 
         # Subscribe to attribute
         min_interval_floor_sec = 3
@@ -482,22 +466,23 @@ class TC_IDM_4_2(MatterBaseTest):
             reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
             keepSubscriptions=False
         )
-        
+
         # Record the time when the priming ReportDataMessage is received
         t_report_sec = time.time()
-        
-        print(f"@@_begin: {t_report_sec}")
-        
+
+        # *** Step 9 ***
+        self.print_step(9, "CR1 modifies the attribute which has been subscribed to on the DUT and waits for an incoming ReportDataMessage")
+
         # Saving the returned MaxInterval from the SubscribeResponseMessage
         sub_cr1_step8_intervals = sub_cr1_update_value.GetReportingIntervalsSeconds()
-        min_interval_sec, max_interval_sec = sub_cr1_step8_intervals
-        
+        min_interval_floor_sec, max_interval_sec = sub_cr1_step8_intervals
+
         # Get subscription timeout
-        subscription_timeout = sub_cr1_update_value.GetSubscriptionTimeoutMs()
-        print(f"subscription_timeout: {subscription_timeout}")
+        subscription_timeout_sec = sub_cr1_update_value.GetSubscriptionTimeoutMs() / 1000
 
         # Set Attribute Update Callback
-        node_label_update_cb = AttributeChangeCallback()
+        node_label_queue = queue.Queue()
+        node_label_update_cb = AttributeChangeCallback(node_label_attr, node_label_queue)
         sub_cr1_update_value.SetAttributeUpdateCallback(node_label_update_cb)
 
         # Update attribute value
@@ -507,52 +492,19 @@ class TC_IDM_4_2(MatterBaseTest):
             [(0, node_label_attr(value=new_node_label_write))]
         )
 
+        WaitForAttributeReport(node_label_queue, node_label_attr)
 
+        # Save the time that the report is received
+        t_update_sec = time.time()
 
+        # Elapsed time between attribute subscription and write update
+        t_elapsed_sec = t_update_sec - t_report_sec
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-        # f_time = node_label_update_cb.time()
-        # print(f"@@_f_time: {f_time}")
-        # write time - sub time -> bigger than floor and less than sub timeout
-        # Wait MinIntervalFloor seconds before reading updated attribute value
-        # new_node_label_read = self.get_attribute_value_wait(sub_cr1_update_value, node_label_attr_typed_path)
-        # Verify new attribute value after MinIntervalFloor time, deprecated
-        # asserts.assert_equal(new_node_label_read, new_node_label_write, "Attribute value not updated after write operation.")
+        # Verify that t_update - t_report is greater than min_interval_floor_s and less than the ReadClient SubscriptionTimeout
+        asserts.assert_greater(t_elapsed_sec, min_interval_floor_sec, f"t_update_sec - t_report_sec ({t_elapsed_sec}s) must be greater than min_interval_floor_sec ({min_interval_floor_sec}s)")
+        asserts.assert_less(t_elapsed_sec, subscription_timeout_sec, f"t_update_sec  - t_report_sec ({t_elapsed_sec}s) must be less than subscription_timeout_sec ({subscription_timeout_sec}s)")
 
         sub_cr1_update_value.Shutdown()
-
-        # *** Step 9 ***
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         # *** Step 10 ***
         self.print_step(
