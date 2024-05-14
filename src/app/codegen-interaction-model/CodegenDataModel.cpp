@@ -235,7 +235,10 @@ std::optional<unsigned> CodegenDataModel::TryFindServerClusterIndex(const EmberA
 
 InteractionModel::ClusterEntry CodegenDataModel::NextCluster(const ConcreteClusterPath & before)
 {
+    // TODO: This search still seems slow (ember will loop). Should use index hints as long
+    //       as ember API supports it
     const EmberAfEndpointType * endpoint = emberAfFindEndpointType(before.mEndpointId);
+
     VerifyOrReturnValue(endpoint != nullptr, InteractionModel::ClusterEntry::Invalid());
     VerifyOrReturnValue(endpoint->clusterCount > 0, InteractionModel::ClusterEntry::Invalid());
     VerifyOrReturnValue(endpoint->cluster != nullptr, InteractionModel::ClusterEntry::Invalid());
@@ -251,7 +254,10 @@ InteractionModel::ClusterEntry CodegenDataModel::NextCluster(const ConcreteClust
 
 std::optional<InteractionModel::ClusterInfo> CodegenDataModel::GetClusterInfo(const ConcreteClusterPath & path)
 {
+    // TODO: This search still seems slow (ember will loop). Should use index hints as long
+    //       as ember API supports it
     const EmberAfCluster * cluster = emberAfFindServerCluster(path.mEndpointId, path.mClusterId);
+
     VerifyOrReturnValue(cluster != nullptr, std::nullopt);
 
     InteractionModel::ClusterInfo info;
@@ -262,7 +268,10 @@ std::optional<InteractionModel::ClusterInfo> CodegenDataModel::GetClusterInfo(co
 
 InteractionModel::AttributeEntry CodegenDataModel::FirstAttribute(const ConcreteClusterPath & path)
 {
+    // TODO: This search still seems slow (ember will loop). Should use index hints as long
+    //       as ember API supports it
     const EmberAfCluster * cluster = emberAfFindServerCluster(path.mEndpointId, path.mClusterId);
+
     VerifyOrReturnValue(cluster != nullptr, InteractionModel::AttributeEntry::Invalid());
     VerifyOrReturnValue(cluster->attributeCount > 0, InteractionModel::AttributeEntry::Invalid());
     VerifyOrReturnValue(cluster->attributes != nullptr, InteractionModel::AttributeEntry::Invalid());
@@ -295,7 +304,10 @@ std::optional<unsigned> CodegenDataModel::TryFindAttributeIndex(const EmberAfClu
 
 InteractionModel::AttributeEntry CodegenDataModel::NextAttribute(const ConcreteAttributePath & before)
 {
+    // TODO: This search still seems slow (ember will loop). Should use index hints as long
+    //       as ember API supports it
     const EmberAfCluster * cluster = emberAfFindServerCluster(before.mEndpointId, before.mClusterId);
+
     VerifyOrReturnValue(cluster != nullptr, InteractionModel::AttributeEntry::Invalid());
     VerifyOrReturnValue(cluster->attributeCount > 0, InteractionModel::AttributeEntry::Invalid());
     VerifyOrReturnValue(cluster->attributes != nullptr, InteractionModel::AttributeEntry::Invalid());
@@ -319,7 +331,10 @@ InteractionModel::AttributeEntry CodegenDataModel::NextAttribute(const ConcreteA
 
 std::optional<InteractionModel::AttributeInfo> CodegenDataModel::GetAttributeInfo(const ConcreteAttributePath & path)
 {
+    // TODO: This search still seems slow (ember will loop). Should use index hints as long
+    //       as ember API supports it
     const EmberAfCluster * cluster = emberAfFindServerCluster(path.mEndpointId, path.mClusterId);
+
     VerifyOrReturnValue(cluster != nullptr, std::nullopt);
     VerifyOrReturnValue(cluster->attributeCount > 0, std::nullopt);
     VerifyOrReturnValue(cluster->attributes != nullptr, std::nullopt);
