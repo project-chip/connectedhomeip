@@ -20,11 +20,10 @@ import os
 import re
 import subprocess
 import sys
+import xml.etree.ElementTree as ElementTree
+from pathlib import Path
 
 import click
-
-from pathlib import Path
-import xml.etree.ElementTree as ElementTree
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
