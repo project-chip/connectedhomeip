@@ -16,7 +16,21 @@
 
 rsource "../common/cmake/Kconfig"
 
-# See config/common/cmake/Kconfig for full definition
+# Workaround to pass the nRF compliance check
+config CHIP_NXP_PLATFORM
+	bool
+	help
+	  States that the configuration uses Matter NXP platform,
+	  what can be used to conditionally deviate from Zephyr generic configuration
+	  for NXP platform related purposes.
+
+config CHIP_TELINK_PLATFORM
+	bool
+	help
+	  States that the configuration uses Matter Telink platform,
+	  what can be used to conditionally deviate from Zephyr generic configuration
+	  for Telink platform related purposes.
+
 config CHIP
 	select CPP
 	imply REQUIRES_FULL_LIBCPP
@@ -87,7 +101,6 @@ config CHIP_CRYPTO_PSA
 	imply PSA_WANT_KEY_TYPE_AES
 	imply PSA_WANT_ALG_CCM
 	imply PSA_WANT_ALG_SHA_256
-	imply PSA_WANT_KEY_TYPE_ECC_KEY_PAIR
 	imply PSA_WANT_KEY_TYPE_ECC_PUBLIC_KEY
 	imply PSA_WANT_ECC_SECP_R1_256
 	imply PSA_WANT_KEY_TYPE_ECC_KEY_PAIR_BASIC
