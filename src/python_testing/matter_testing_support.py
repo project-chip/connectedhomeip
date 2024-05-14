@@ -54,7 +54,7 @@ import chip.native
 from chip import discovery
 from chip.ChipStack import ChipStack
 from chip.clusters import ClusterObjects as ClusterObjects
-from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction
+from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
 from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError, Status
 from chip.setup_payload import SetupPayload
@@ -309,6 +309,33 @@ class EventChangeCallback:
         asserts.assert_equal(res.Header.ClusterId, expected_event.cluster_id, "Expected cluster ID not found in event report")
         asserts.assert_equal(res.Header.EventId, expected_event.event_id, "Expected event ID not found in event report")
         return res.Data
+
+
+class AttributeChangeCallback:
+    def __init__(self, expected_attribute: ClusterObjects.ClusterAttributeDescriptor, output: queue.Queue):
+        self._output = output
+        self._expected_attribute = expected_attribute
+
+    def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
+        if path.AttributeType == self._expected_attribute:
+            q = (path, transaction)
+            logging.info(f'[callback] Got subscription report for {path.AttributeType}')
+            self._output.put(q)
+        else:
+            logging.error(f"Expected attribute {self._expected_attribute} mismatch: {path.AttributeType}")
+
+
+def wait_for_attribute_report(q: queue.Queue, expected_attribute: ClusterObjects.ClusterAttributeDescriptor):
+    try:
+        path, transaction = q.get(block=True, timeout=10)
+    except queue.Empty:
+        asserts.fail(f"Failed to receive a report for the attribute change for {expected_attribute}")
+
+    asserts.assert_equal(path.AttributeType, expected_attribute, f"Received incorrect attribute report. Expected: {expected_attribute}, received: {path.AttributeType}")
+    try:
+        transaction.GetAttribute(path)
+    except KeyError:
+        asserts.fail("Attribute {expected_attribute} not found in returned report")
 
 
 class InternalTestRunnerHooks(TestRunnerHooks):
