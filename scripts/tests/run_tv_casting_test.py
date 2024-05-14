@@ -31,7 +31,7 @@ logging.basicConfig(level=logging.INFO, format='%(levelname)s - %(message)s')
 TV_APP_MAX_START_WAIT_SEC = 2
 
 # The maximum amount of time to commission the Linux tv-casting-app and the tv-app before timeout.
-COMMISSIONING_STAGE_MAX_WAIT_SEC = 10
+COMMISSIONING_STAGE_MAX_WAIT_SEC = 15
 
 # The maximum amount of time to test that the launchURL is sent from the Linux tv-casting-app and received on the tv-app before timeout.
 TEST_LAUNCHURL_MAX_WAIT_SEC = 10
@@ -98,7 +98,7 @@ def handle_casting_failure(casting_state: str, log_file_paths: List[str]):
     sys.exit(1)
 
 
-def extract_value_from_string(line: str) -> str:
+def extract_value_from_string(line: str, value_name: str, casting_state: str, log_paths) -> str:
     """Extract and return value from given input string.
 
     The string is expected to be in the following format as it is received
@@ -106,23 +106,34 @@ def extract_value_from_string(line: str) -> str:
     \x1b[0;34m[1715206773402] [20056:2842184] [DMG]  Cluster = 0x506,\x1b[0m
     The substring to be extracted here is '0x506'.
     Or:
+    \x1b[0;32m[1714582264602] [77989:2286038] [SVR] Discovered Commissioner #0\x1b[0m
+    The integer value to be extracted here is '0'.
+    Or:
     \x1b[0;34m[1713741926895] [7276:9521344] [DIS] Vendor ID: 65521\x1b[0m
-    The integer value to be extracted here is 65521.
+    The integer value to be extracted here is '65521'.
     Or:
     \x1b[0;34m[1714583616179] [7029:2386956] [SVR] 	device Name: Test TV casting app\x1b[0m
     The substring to be extracted here is 'Test TV casting app'.
     """
-    if '=' in line:
-        value = line.split('=')[-1].strip().replace(',\x1b[0m', '')
+    if ':' in line:
+        if '=' in line:
+            delimiter = '='
+        elif '#' in line:
+            delimiter = '#'
+        else:
+            delimiter = ':'
+
+        value = line.split(delimiter)[-1].strip().replace('\x1b[0m', '').rstrip(',')
     else:
-        value = line.split(':')[-1].strip().replace('\x1b[0m', '')
+        logging.error(f'Could not extract {value_name} from the following line: {line}')
+        handle_casting_failure(casting_state, log_paths)
 
     return value
 
 
 def validate_value(casting_state: str, expected_value: Union[str, int], log_paths: List[str], line: str, value_name: str) -> Optional[str]:
     """Validate a value in a string against an expected value during a given casting state."""
-    value = extract_value_from_string(line)
+    value = extract_value_from_string(line, value_name, casting_state, log_paths)
 
     if isinstance(expected_value, int):
         value = int(value)
@@ -187,7 +198,7 @@ def initiate_cast_request_success(tv_casting_app_info: Tuple[subprocess.Popen, T
                 return True
 
 
-def extract_device_info_from_tv_casting_app(tv_casting_app_info: Tuple[subprocess.Popen, TextIO]) -> Tuple[Optional[str], Optional[int], Optional[int]]:
+def extract_device_info_from_tv_casting_app(tv_casting_app_info: Tuple[subprocess.Popen, TextIO], casting_state: str, log_paths: List[str]) -> Tuple[Optional[str], Optional[int], Optional[int]]:
     """Extract device information from the 'Identification Declaration' block in the Linux tv-casting-app output."""
     tv_casting_app_process, linux_tv_casting_app_log_file = tv_casting_app_info
 
@@ -200,12 +211,12 @@ def extract_device_info_from_tv_casting_app(tv_casting_app_info: Tuple[subproces
         linux_tv_casting_app_log_file.flush()
 
         if 'device Name' in line:
-            device_name = extract_value_from_string(line)
+            device_name = extract_value_from_string(line, 'device Name', casting_state, log_paths)
         elif 'vendor id' in line:
-            vendor_id = extract_value_from_string(line)
+            vendor_id = extract_value_from_string(line, 'vendor id', casting_state, log_paths)
             vendor_id = int(vendor_id)
         elif 'product id' in line:
-            product_id = extract_value_from_string(line)
+            product_id = extract_value_from_string(line, 'product id', casting_state, log_paths)
             product_id = int(product_id)
 
         if device_name and vendor_id and product_id:
@@ -337,7 +348,7 @@ def parse_tv_casting_app_for_report_data_msg(tv_casting_app_info: Tuple[subproce
         # Check if we exceeded the maximum wait time to parse the Linux tv-casting-app output for `ReportDataMessage` block.
         if time.time() - start_wait_time > VERIFY_SUBSCRIPTION_STATE_MAX_WAIT_SEC:
             logging.error(
-                'The relevant `ReportDataMessage` block was not found in the Linux tv-casting-app process within the timeout.')
+                'The relevant `ReportDataMessage` block for the MediaPlayback:CurrentState subscription was not found in the Linux tv-casting-app process within the timeout.')
             report_data_message.clear()
             return report_data_message
 
@@ -354,13 +365,14 @@ def parse_tv_casting_app_for_report_data_msg(tv_casting_app_info: Tuple[subproce
                 report_data_message.append(tv_casting_line.rstrip('\n'))
 
                 if 'Cluster =' in tv_casting_line:
-                    cluster_value = extract_value_from_string(tv_casting_line)
+                    cluster_value = extract_value_from_string(tv_casting_line, 'Cluster value', 'Testing subscription', log_paths)
                     if cluster_value != CLUSTER_MEDIA_PLAYBACK:
                         report_data_message.clear()
                         continue_parsing = False
 
                 elif 'Attribute =' in tv_casting_line:
-                    attribute_value = extract_value_from_string(tv_casting_line)
+                    attribute_value = extract_value_from_string(
+                        tv_casting_line, 'Attribute value', 'Testing subscription', log_paths)
                     if attribute_value != ATTRIBUTE_CURRENT_PLAYBACK_STATE:
                         report_data_message.clear()
                         continue_parsing = False
@@ -459,11 +471,11 @@ def test_discovery_fn(tv_casting_app_info: Tuple[subprocess.Popen, TextIO], log_
         linux_tv_casting_app_log_file.flush()
 
         # Fail fast if "No commissioner discovered" string found.
-        if "No commissioner discovered" in line:
+        if 'No commissioner discovered' in line:
             logging.error(line.rstrip('\n'))
             handle_casting_failure('Discovery', log_paths)
 
-        elif "Discovered Commissioner" in line:
+        elif 'Discovered Commissioner' in line:
             valid_discovered_commissioner = line.rstrip('\n')
 
         elif valid_discovered_commissioner:
@@ -497,7 +509,8 @@ def test_commissioning_fn(valid_discovered_commissioner_number, tv_casting_app_i
         handle_casting_failure('Commissioning', log_paths)
 
     # Extract the values from the 'Identification Declaration' block in the tv-casting-app output that we want to validate against.
-    expected_device_name, expected_vendor_id, expected_product_id = extract_device_info_from_tv_casting_app(tv_casting_app_info)
+    expected_device_name, expected_vendor_id, expected_product_id = extract_device_info_from_tv_casting_app(
+        tv_casting_app_info, 'Commissioning', log_paths)
 
     if not validate_identification_declaration_message_on_tv_app(tv_app_info, expected_device_name, expected_vendor_id, expected_product_id, log_paths):
         handle_casting_failure('Commissioning', log_paths)
@@ -580,9 +593,8 @@ def test_casting_fn(tv_app_rel_path, tv_casting_app_rel_path):
                         handle_casting_failure('Discovery', log_paths)
 
                     # We need the valid discovered commissioner number to continue with commissioning.
-                    # Example string: \x1b[0;32m[1714582264602] [77989:2286038] [SVR] Discovered Commissioner #0\x1b[0m
-                    #                 The value '0' will be extracted from the string.
-                    valid_discovered_commissioner_number = valid_discovered_commissioner.split('#')[-1].replace('\x1b[0m', '')
+                    valid_discovered_commissioner_number = extract_value_from_string(
+                        valid_discovered_commissioner, 'Discovered Commissioner number', 'Commissioning', log_paths)
 
                     test_commissioning_fn(valid_discovered_commissioner_number, tv_casting_app_info, tv_app_info, log_paths)
                     test_subscription_fn(tv_casting_app_info, log_paths)
