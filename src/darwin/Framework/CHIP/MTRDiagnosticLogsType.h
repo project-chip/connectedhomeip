@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#import <Matter/MTRDefines.h>
+
 /**
  * This enum is used to specify the type of log requested from this device.
  *
