@@ -218,6 +218,29 @@ InteractionModel::AttributeEntry CodegenDataModel::FirstAttribute(const Concrete
     return AttributeEntryFrom(path, cluster->attributes[0]);
 }
 
+std::optional<unsigned> CodegenDataModel::TryFindAttributeIndex(const EmberAfCluster * cluster, chip::AttributeId id) const
+{
+    const unsigned attributeCount = cluster->attributeCount;
+
+    // attempt to find this based on the embedded hint
+    if ((mAttributeIterationHint < attributeCount) && (cluster->attributes[mAttributeIterationHint].attributeId == id))
+    {
+        return std::make_optional(mAttributeIterationHint);
+    }
+
+    // linear search is required. This may be slow
+    for (unsigned attribute_idx = 0; attribute_idx < attributeCount; attribute_idx++)
+    {
+
+        if (cluster->attributes[attribute_idx].attributeId == id)
+        {
+            return std::make_optional(attribute_idx);
+        }
+    }
+
+    return std::nullopt;
+}
+
 InteractionModel::AttributeEntry CodegenDataModel::NextAttribute(const ConcreteAttributePath & before)
 {
     const EmberAfCluster * cluster = emberAfFindServerCluster(before.mEndpointId, before.mClusterId);
@@ -226,29 +249,20 @@ InteractionModel::AttributeEntry CodegenDataModel::NextAttribute(const ConcreteA
     VerifyOrReturnValue(cluster->attributes != nullptr, InteractionModel::AttributeEntry::Invalid());
 
     // find the given attribute in the list and then return the next one
-    bool foundPosition            = false;
-    const unsigned attributeCount = cluster->attributeCount;
-    unsigned startIdx             = 0;
-
-    // Attempt to use the hint
-    if ((mAttributeIterationHint < attributeCount) &&
-        (cluster->attributes[mAttributeIterationHint].attributeId == before.mAttributeId))
+    std::optional<unsigned> attribute_idx = TryFindAttributeIndex(cluster, before.mAttributeId);
+    if (!attribute_idx.has_value())
     {
-        startIdx = mAttributeIterationHint;
+        return InteractionModel::AttributeEntry::Invalid();
     }
 
-    for (unsigned attribute_idx = startIdx; attribute_idx < attributeCount; attribute_idx++)
+    unsigned next_idx = *attribute_idx + 1;
+    if (next_idx >= cluster->attributeCount)
     {
-        if (foundPosition)
-        {
-            mAttributeIterationHint = attribute_idx;
-            return AttributeEntryFrom(before, cluster->attributes[attribute_idx]);
-        }
-
-        foundPosition = (cluster->attributes[attribute_idx].attributeId == before.mAttributeId);
+        return InteractionModel::AttributeEntry::Invalid();
     }
 
-    return InteractionModel::AttributeEntry::Invalid();
+    mAttributeIterationHint = next_idx;
+    return AttributeEntryFrom(before, cluster->attributes[next_idx]);
 }
 
 std::optional<InteractionModel::AttributeInfo> CodegenDataModel::GetAttributeInfo(const ConcreteAttributePath & path)
@@ -257,18 +271,17 @@ std::optional<InteractionModel::AttributeInfo> CodegenDataModel::GetAttributeInf
     VerifyOrReturnValue(cluster != nullptr, std::nullopt);
     VerifyOrReturnValue(cluster->attributeCount > 0, std::nullopt);
     VerifyOrReturnValue(cluster->attributes != nullptr, std::nullopt);
-    const unsigned attributeCount = cluster->attributeCount;
-    for (unsigned attribute_idx = 0; attribute_idx < attributeCount; attribute_idx++)
+
+    std::optional<unsigned> attribute_idx = TryFindAttributeIndex(cluster, path.mAttributeId);
+
+    if (!attribute_idx.has_value())
     {
-        if (cluster->attributes[attribute_idx].attributeId == path.mAttributeId)
-        {
-            InteractionModel::AttributeInfo info;
-            LoadAttributeInfo(path, cluster->attributes[attribute_idx], &info);
-            return std::make_optional(info);
-        }
+        return std::nullopt;
     }
 
-    return std::nullopt;
+    InteractionModel::AttributeInfo info;
+    LoadAttributeInfo(path, cluster->attributes[*attribute_idx], &info);
+    return std::make_optional(info);
 }
 
 } // namespace app

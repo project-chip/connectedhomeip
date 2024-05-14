@@ -18,6 +18,8 @@
 
 #include <app/interaction-model/Model.h>
 
+#include <app/util/af-types.h>
+
 namespace chip {
 namespace app {
 
@@ -52,6 +54,8 @@ private:
     // uint16_t mClusterIterationHint = 0;
     unsigned mAttributeIterationHint = 0;
 
+    /// Find the index of the given attribute id
+    std::optional<unsigned> TryFindAttributeIndex(const EmberAfCluster *cluster, chip::AttributeId search_for_id) const;
 };
 
 } // namespace app
