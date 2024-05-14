@@ -248,7 +248,7 @@ void CommissionerDiscoveryController::InternalOk()
     bool isContentAppInstalled = mAppInstallationService->HasContentApp(client->GetVendorId(), client->GetProductId());
 
     if (!isContentAppInstalled) {
-        ChipLogError(AppServer, "UX InternalOk: app not installed.");
+        ChipLogDetail(AppServer, "UX InternalOk: app not installed.");
 
         // dialog
         ChipLogDetail(Controller,
