@@ -125,7 +125,7 @@ def send_zcl_command(devCtrl, line):
             raise exceptions.UnknownCommand(cluster, command)
 
         try:
-            req = commandObj(**FormatZCLArguments(args[5:], command))
+            req = commandObj(**FormatZCLArguments(args[5:], commandObj))
         except BaseException:
             raise exceptions.UnknownCommand(cluster, command)
 
