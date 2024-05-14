@@ -104,11 +104,7 @@ class MyUserPrompter : public UserPrompter
     // tv should override this with a dialog prompt
     inline void PromptForAppInstallOKPermission(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override
     {
-        ChipLogError(Controller, "Adding Content App");
-        gFactory.AddContentApp((uint16_t)65521, (uint16_t)32768);
-
-        // ContentAppPlatform::GetInstance().LoadContentAppByClient(vendorId, productId);
-
+        gFactory.AddContentApp(vendorId, productId);
         return;
     }
 };
