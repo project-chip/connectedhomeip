@@ -48,7 +48,7 @@ static constexpr char TAG[] = "ESP32Appserver";
 
 namespace {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+#if (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !defined(CONFIG_OPENTHREAD_BORDER_ROUTER)) || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
 constexpr chip::EndpointId kNetworkCommissioningEndpointWiFi = 0xFFFE;
 #else
 constexpr chip::EndpointId kNetworkCommissioningEndpointWiFi = 0;
