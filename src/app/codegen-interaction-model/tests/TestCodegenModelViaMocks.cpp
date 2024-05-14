@@ -14,6 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "access/SubjectDescriptor.h"
+#include "lib/core/CHIPError.h"
 #include <app/codegen-interaction-model/Model.h>
 
 #include <access/AccessControl.h>
@@ -34,6 +36,7 @@ using namespace chip::app::InteractionModel;
 using namespace chip::app::Clusters::Globals::Attributes;
 
 namespace pw {
+
 template <>
 StatusWithSize ToString<CHIP_ERROR>(const CHIP_ERROR & err, pw::span<char> buffer)
 {
@@ -44,6 +47,7 @@ StatusWithSize ToString<CHIP_ERROR>(const CHIP_ERROR & err, pw::span<char> buffe
     }
     return pw::string::Format(buffer, "CHIP_ERROR:<%" CHIP_ERROR_FORMAT ">", err.Format());
 }
+
 } // namespace pw
 
 namespace {
@@ -58,10 +62,75 @@ static_assert(kEndpointIdThatIsMissing != kMockEndpoint1);
 static_assert(kEndpointIdThatIsMissing != kMockEndpoint2);
 static_assert(kEndpointIdThatIsMissing != kMockEndpoint3);
 
-constexpr Access::SubjectDescriptor kCaseSubjectDescriptor{
+constexpr Access::SubjectDescriptor kAdminSubjectDescriptor{
     .fabricIndex = kTestFabrixIndex,
     .authMode    = Access::AuthMode::kCase,
     .subject     = kTestNodeId,
+};
+constexpr Access::SubjectDescriptor kViewSubjectDescriptor{
+    .fabricIndex = kTestFabrixIndex + 1,
+    .authMode    = Access::AuthMode::kCase,
+    .subject     = kTestNodeId,
+};
+
+constexpr Access::SubjectDescriptor kDenySubjectDescriptor{
+    .fabricIndex = kTestFabrixIndex + 2,
+    .authMode    = Access::AuthMode::kCase,
+    .subject     = kTestNodeId,
+};
+
+bool operator==(const Access::SubjectDescriptor & a, const Access::SubjectDescriptor & b)
+{
+    if (a.fabricIndex != b.fabricIndex)
+    {
+        return false;
+    }
+    if (a.authMode != b.authMode)
+    {
+        return false;
+    }
+    if (a.subject != b.subject)
+    {
+        return false;
+    }
+    for (unsigned i = 0; i < a.cats.values.size(); i++)
+    {
+        if (a.cats.values[i] != b.cats.values[i])
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+class MockAccessControl : public Access::AccessControl::Delegate, public Access::AccessControl::DeviceTypeResolver
+{
+public:
+    CHIP_ERROR Check(const Access::SubjectDescriptor & subjectDescriptor, const Access::RequestPath & requestPath,
+                     Access::Privilege requestPrivilege) override
+    {
+        if (subjectDescriptor == kAdminSubjectDescriptor)
+        {
+            return CHIP_NO_ERROR;
+        }
+        if ((subjectDescriptor == kViewSubjectDescriptor) && (requestPrivilege == Access::Privilege::kView))
+        {
+            return CHIP_NO_ERROR;
+        }
+        return CHIP_ERROR_ACCESS_DENIED;
+    }
+
+    bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) override { return true; }
+};
+
+class ScopedMockAccessControl
+{
+public:
+    ScopedMockAccessControl() { Access::GetAccessControl().Init(&mMock, mMock); }
+    ~ScopedMockAccessControl() { Access::GetAccessControl().Finish(); }
+
+private:
+    MockAccessControl mMock;
 };
 
 // clang-format off
@@ -315,21 +384,35 @@ TEST(TestCodegenModelViaMocks, GetAttributeInfo)
     EXPECT_TRUE(info->flags.Has(AttributeQualityFlags::kListAttribute)); // NOLINT(bugprone-unchecked-optional-access)
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeRead)
+class ADelegate : public Access::AccessControl::Delegate
+{
+public:
+    virtual CHIP_ERROR Check(const Access::SubjectDescriptor & subjectDescriptor, const Access::RequestPath & requestPath,
+                             Access::Privilege requestPrivilege)
+    {
+        // return CHIP_ERROR_ACCESS_DENIED;
+        return CHIP_NO_ERROR;
+    }
+};
+
+class AResolver : public Access::AccessControl::DeviceTypeResolver
+{
+public:
+    bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) override { return true; }
+};
+
+TEST(TestCodegenModelViaMocks, EmberAttributeReadAclDeny)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     chip::app::CodegenDataModel::Model model;
-
-
-    // TODO: AccessControl init how?
-    // Access::GetAccessControl().Init(delegate, resolver);
+    ScopedMockAccessControl accessControl;
 
     ReadAttributeRequest readRequest;
 
     // operationFlags is 0 i.e. not internal
     // readFlags is 0 i.e. not fabric filtered
     // dataVersion is missing (no data version filtering)
-    readRequest.subjectDescriptor = kCaseSubjectDescriptor;
+    readRequest.subjectDescriptor = kDenySubjectDescriptor;
     readRequest.path              = ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), MockAttributeId(10));
 
     std::optional<ClusterInfo> info = model.GetClusterInfo(readRequest.path);
@@ -345,7 +428,40 @@ TEST(TestCodegenModelViaMocks, EmberAttributeRead)
     AttributeReportIBs::Builder builder;
     CHIP_ERROR err = builder.Init(&tlvWriter);
     ASSERT_EQ(err, CHIP_NO_ERROR);
-    AttributeValueEncoder encoder(builder, kCaseSubjectDescriptor, readRequest.path, dataVersion);
+    AttributeValueEncoder encoder(builder, kAdminSubjectDescriptor, readRequest.path, dataVersion);
+
+    err = model.ReadAttribute(readRequest, encoder);
+    ASSERT_EQ(err, CHIP_ERROR_ACCESS_DENIED);
+}
+
+TEST(TestCodegenModelViaMocks, EmberAttributeRead)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    chip::app::CodegenDataModel::Model model;
+    ScopedMockAccessControl accessControl;
+
+    ReadAttributeRequest readRequest;
+
+    // operationFlags is 0 i.e. not internal
+    // readFlags is 0 i.e. not fabric filtered
+    // dataVersion is missing (no data version filtering)
+    readRequest.subjectDescriptor = kAdminSubjectDescriptor;
+    readRequest.path              = ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), MockAttributeId(10));
+
+    std::optional<ClusterInfo> info = model.GetClusterInfo(readRequest.path);
+    ASSERT_TRUE(info.has_value());
+
+    DataVersion dataVersion = info->dataVersion; // NOLINT(bugprone-unchecked-optional-access)
+
+    uint8_t tlvBuffer[1024];
+
+    TLV::TLVWriter tlvWriter;
+    tlvWriter.Init(tlvBuffer);
+
+    AttributeReportIBs::Builder builder;
+    CHIP_ERROR err = builder.Init(&tlvWriter);
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+    AttributeValueEncoder encoder(builder, kAdminSubjectDescriptor, readRequest.path, dataVersion);
 
     err = model.ReadAttribute(readRequest, encoder);
     ASSERT_EQ(err, CHIP_NO_ERROR);
