@@ -49,27 +49,20 @@ static_library("helpers") {
 chip_test_suite_using_nltest("tests") {
   output_name = "libMessagingLayerTests"
 
-  test_sources = []
+  test_sources = [
+    "TestAbortExchangesForFabric.cpp",
+    "TestExchange.cpp",
+    "TestExchangeMgr.cpp",
+    "TestReliableMessageProtocol.cpp",
+  ]
 
-  if (chip_device_platform != "efr32") {
-    # TODO(#10447): ReliableMessage Test has HF, and ExchangeMgr hangs on EFR32.
-    # And TestAbortExchangesForFabric does not link on EFR32 for some reason.
-    # TODO #33372: TestExchange.cpp asserts in ExchangeContext::SendMessage
-    test_sources += [
-      "TestAbortExchangesForFabric.cpp",
-      "TestExchange.cpp",
-      "TestExchangeMgr.cpp",
-      "TestReliableMessageProtocol.cpp",
-    ]
+  if (chip_device_platform != "esp32" && chip_device_platform != "mbed" &&
+      chip_device_platform != "nrfconnect" && chip_device_platform != "nxp") {
+    test_sources += [ "TestExchangeHolder.cpp" ]
+  }
 
-    if (chip_device_platform != "esp32" && chip_device_platform != "mbed" &&
-        chip_device_platform != "nrfconnect" && chip_device_platform != "nxp") {
-      test_sources += [ "TestExchangeHolder.cpp" ]
-    }
-
-    if (chip_device_platform == "linux") {
-      test_sources += [ "TestMessagingLayer.cpp" ]
-    }
+  if (chip_device_platform == "linux") {
+    test_sources += [ "TestMessagingLayer.cpp" ]
   }
 
   cflags = [ "-Wconversion" ]
