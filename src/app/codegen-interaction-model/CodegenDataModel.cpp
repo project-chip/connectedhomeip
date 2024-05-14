@@ -19,6 +19,7 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
+#include <lib/core/DataModelTypes.h>
 #include <optional>
 
 namespace chip {
@@ -103,6 +104,17 @@ InteractionModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & 
 
     entry.path = ConcreteAttributePath(clusterPath.mEndpointId, clusterPath.mClusterId, attribute.attributeId);
     LoadAttributeInfo(entry.path, attribute, &entry.info);
+
+    return entry;
+}
+
+InteractionModel::AttributeEntry AttributeEntryForGlobalListAttribute(const ConcreteClusterPath & clusterPath,
+                                                                      chip::AttributeId globalAttributeId)
+{
+    InteractionModel::AttributeEntry entry;
+
+    entry.path = ConcreteAttributePath(clusterPath.mEndpointId, clusterPath.mClusterId, globalAttributeId);
+    entry.info.flags.Set(InteractionModel::AttributeQualityFlags::kListAttribute);
 
     return entry;
 }
@@ -321,6 +333,24 @@ InteractionModel::AttributeEntry CodegenDataModel::NextAttribute(const ConcreteA
     VerifyOrReturnValue(cluster->attributeCount > 0, InteractionModel::AttributeEntry::Invalid());
     VerifyOrReturnValue(cluster->attributes != nullptr, InteractionModel::AttributeEntry::Invalid());
 
+    // Handles global attribute iteration: if we got a global attribute, move to the next
+    switch (before.mAttributeId)
+    {
+    case Clusters::Globals::Attributes::GeneratedCommandList::Id:
+        return AttributeEntryForGlobalListAttribute(before, Clusters::Globals::Attributes::AcceptedCommandList::Id);
+    case Clusters::Globals::Attributes::AcceptedCommandList::Id:
+#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
+        return AttributeEntryForGlobalListAttribute(before, Clusters::Globals::Attributes::EventList::Id);
+    case Clusters::Globals::Attributes::EventList::Id:
+#endif // CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
+        return AttributeEntryForGlobalListAttribute(before, Clusters::Globals::Attributes::AttributeList::Id);
+    case Clusters::Globals::Attributes::AttributeList::Id:
+        return InteractionModel::AttributeEntry::Invalid();
+    default:
+        // pass-through: not a global attribute, try to find a "regular" attribute
+        break;
+    }
+
     // find the given attribute in the list and then return the next one
     std::optional<unsigned> attribute_idx = TryFindAttributeIndex(cluster, before.mAttributeId);
     if (!attribute_idx.has_value())
@@ -329,13 +359,15 @@ InteractionModel::AttributeEntry CodegenDataModel::NextAttribute(const ConcreteA
     }
 
     unsigned next_idx = *attribute_idx + 1;
-    if (next_idx >= cluster->attributeCount)
+    if (next_idx < cluster->attributeCount)
     {
-        return InteractionModel::AttributeEntry::Invalid();
+        mAttributeIterationHint = next_idx;
+        return AttributeEntryFrom(before, cluster->attributes[next_idx]);
     }
 
-    mAttributeIterationHint = next_idx;
-    return AttributeEntryFrom(before, cluster->attributes[next_idx]);
+    // We reach here if next_idx is just past the last attribute metadata. Return the first global
+    // attribute
+    return AttributeEntryForGlobalListAttribute(before, Clusters::Globals::Attributes::GeneratedCommandList::Id);
 }
 
 std::optional<InteractionModel::AttributeInfo> CodegenDataModel::GetAttributeInfo(const ConcreteAttributePath & path)
@@ -345,6 +377,23 @@ std::optional<InteractionModel::AttributeInfo> CodegenDataModel::GetAttributeInf
     VerifyOrReturnValue(cluster != nullptr, std::nullopt);
     VerifyOrReturnValue(cluster->attributeCount > 0, std::nullopt);
     VerifyOrReturnValue(cluster->attributes != nullptr, std::nullopt);
+
+    switch (path.mAttributeId)
+    {
+    case Clusters::Globals::Attributes::GeneratedCommandList::Id:
+    case Clusters::Globals::Attributes::AcceptedCommandList::Id:
+#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
+    case Clusters::Globals::Attributes::EventList::Id:
+#endif // CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
+    case Clusters::Globals::Attributes::AttributeList::Id: {
+        InteractionModel::AttributeInfo info;
+        info.flags.Set(InteractionModel::AttributeQualityFlags::kListAttribute);
+        return info;
+    }
+    default:
+        // pass-through: not a global attribute, try to find a "regular" attribute
+        break;
+    }
 
     std::optional<unsigned> attribute_idx = TryFindAttributeIndex(cluster, path.mAttributeId);
 
