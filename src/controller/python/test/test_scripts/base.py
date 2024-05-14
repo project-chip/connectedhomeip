@@ -41,6 +41,7 @@ import chip.native
 from chip import ChipDeviceCtrl
 from chip.ChipStack import ChipStack
 from chip.crypto import p256keypair
+from chip.exceptions import ChipStackError
 from chip.utils import CommissioningBuildingBlocks
 from cirque_restart_remote_device import restartRemoteDevice
 from ecdsa import NIST256p
@@ -375,7 +376,7 @@ class BaseTestHelper:
             self.logger.error(
                 'Incorrectly succeeded in opening basic commissioning window')
             return False
-        except Exception:
+        except ChipStackError:
             pass
 
         # TODO:
@@ -403,7 +404,7 @@ class BaseTestHelper:
             self.logger.error(
                 'Incorrectly succeeded in opening enhanced commissioning window')
             return False
-        except Exception:
+        except ChipStackError:
             pass
 
         self.logger.info("Disarming failsafe on CASE connection")
@@ -1197,7 +1198,7 @@ class BaseTestHelper:
                     if req.expected_status != IM.Status.Success:
                         raise AssertionError(
                             f"Write attribute {req.attribute.__qualname__} expects failure but got success response")
-                except Exception as ex:
+                except ChipStackError as ex:
                     if req.expected_status != IM.Status.Success:
                         continue
                     else:
