@@ -19,6 +19,7 @@ import copy
 import logging
 import time
 import queue
+import traceback
 
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
@@ -44,31 +45,32 @@ Full test plan link for details:
 https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/interactiondatamodel.adoc#tc-idm-4-2-subscription-response-messages-from-dut-test-cases-dut_server
 '''
 
+# class AttributeChangeCallback:
+#     def __init__(self, expected_attribute: ClusterObjects.ClusterAttributeDescriptor, output: queue.Queue):
+#         self._output = output
+#         self._expected_attribute = expected_attribute
+#         print(f'[callback] AttributeChangeCallback')
+
+#     def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
+#         logging.info(f'[callback] !if -Got subscription report for {path.AttributeType}')
+#         if path.AttributeType == self._expected_attribute:
+#             q = (path, transaction)
+#             logging.info(f'[callback] Got subscription report for {path.AttributeType}')
+#             self._output.put(q)
+
+
 class AttributeChangeCallback:
-    def __init__(self, expected_attribute: ClusterObjects.ClusterAttributeDescriptor, output: queue.Queue):
-        self._output = output
-        self._expected_attribute = expected_attribute
-        self.callback_trigger_time_ms = 0;
+    def __init__(self):
+        print(f'[callback] AttributeChangeCallback')
 
-    def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
-        if path.AttributeType == self._expected_attribute:
-            current_time = time.time()
-            q = (path, transaction)
-            logging.info(f'Got subscription report for {path.AttributeType} at {current_time}')
-
-            print(f"@@_end: {current_time}")
-
-            self._output.put(q)
-            self.callback_trigger_time_ms = current_time
+    def __call__(self):
+        logging.info(f'[callback] !if -Got subscription report')
+      
 
 
 class TC_IDM_4_2(MatterBaseTest):
 
     ROOT_NODE_ENDPOINT_ID = 0
-
-    async def write_acl(self, ctrl, acl, ep=ROOT_NODE_ENDPOINT_ID):
-        result = await ctrl.WriteAttribute(self.dut_node_id, [(ep, Clusters.AccessControl.Attributes.Acl(acl))])
-        asserts.assert_equal(result[ep].Status, Status.Success, "ACL write failed")
 
     async def get_descriptor_server_list(self, ctrl, ep=ROOT_NODE_ENDPOINT_ID):
         return await self.read_single_attribute_check_success(
@@ -129,8 +131,12 @@ class TC_IDM_4_2(MatterBaseTest):
             )
         )
 
-    async def get_dut_acl(self, ep=ROOT_NODE_ENDPOINT_ID):
-        sub = await self.default_controller.ReadAttribute(
+    async def write_dut_acl(self, ctrl, acl, ep=ROOT_NODE_ENDPOINT_ID):
+        result = await ctrl.WriteAttribute(self.dut_node_id, [(ep, Clusters.AccessControl.Attributes.Acl(acl))])
+        asserts.assert_equal(result[ep].Status, Status.Success, "ACL write failed")
+
+    async def get_dut_acl(self, ctrl, ep=ROOT_NODE_ENDPOINT_ID):
+        sub = await ctrl.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=[(ep, Clusters.AccessControl.Attributes.Acl)],
             keepSubscriptions=False,
@@ -141,11 +147,10 @@ class TC_IDM_4_2(MatterBaseTest):
 
         return acl_list
 
-    async def add_ace_to_dut_acl(self, ctrl, ace):
-        dut_acl_original = await self.get_dut_acl()
+    async def add_ace_to_dut_acl(self, ctrl, ace, dut_acl_original):
         dut_acl = copy.deepcopy(dut_acl_original)
         dut_acl.append(ace)
-        await self.write_acl(ctrl=ctrl, acl=dut_acl)
+        await self.write_dut_acl(ctrl=ctrl, acl=dut_acl)
 
     @staticmethod
     def is_valid_uint32_value(var):
@@ -171,6 +176,9 @@ class TC_IDM_4_2(MatterBaseTest):
         # Subscriber/client with admin access to the DUT
         # Will write ACL for controller 2 and validate success/error codes
         CR1: ChipDeviceController = self.default_controller
+        
+        # Original DUT ACL used for reseting ACL on some steps
+        dut_acl_original = await self.get_dut_acl(CR1)
 
         # Controller 2 setup
         # Subscriber/client with limited access to the DUT
@@ -285,8 +293,12 @@ class TC_IDM_4_2(MatterBaseTest):
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(cluster=Clusters.BasicInformation.id)],
             subjects=[CR2_nodeid])
+        
+        # Restore original DUT ACL
+        await self.write_dut_acl(CR1, dut_acl_original)
 
-        self.add_ace_to_dut_acl(CR1, CR2_limited_ace)
+        # Add limited ACE
+        await self.add_ace_to_dut_acl(CR1, CR2_limited_ace, dut_acl_original)        
 
         # Controller 2 tries to subscribe an attribute from a cluster
         # it doesn't have access to
@@ -315,10 +327,14 @@ class TC_IDM_4_2(MatterBaseTest):
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
                 endpoint=1,
-                cluster=Clusters.BasicInformation.id)],
+                cluster=Clusters.Descriptor.id)],
             subjects=[CR2_nodeid])
 
-        self.add_ace_to_dut_acl(CR1, CR2_limited_ace)
+        # Restore original DUT ACL
+        await self.write_dut_acl(CR1, dut_acl_original)
+
+        # Add limited ACE
+        await self.add_ace_to_dut_acl(CR1, CR2_limited_ace, dut_acl_original)
 
         # Controller 2 tries to subscribe to all attributes from a cluster
         # it doesn't have access to
@@ -334,9 +350,14 @@ class TC_IDM_4_2(MatterBaseTest):
             )
             raise ValueError("Expected exception not thrown")
         except ChipStackError as e:
+            print('INVALID_ACTION_ERROR_CODE')
             # Verify that the DUT returns an "INVALID_ACTION" status response
             asserts.assert_equal(e.err, INVALID_ACTION_ERROR_CODE,
                                  "Incorrect error response for subscription to unallowed cluster")
+
+        await self.write_dut_acl(CR1, dut_acl_original)
+        acl_list = await self.get_dut_acl(CR1)
+        print(f'acl_list - reset 4: {acl_list}')
 
         # *** Step 5 ***
         self.print_step(5, "Setup CR2 such that it does not have access to an Endpoint. CR2 sends a subscription request to subscribe to all attributes on all clusters on a specific Endpoint for which it does not have access.")
@@ -348,7 +369,11 @@ class TC_IDM_4_2(MatterBaseTest):
             targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=1)],
             subjects=[CR2_nodeid])
 
-        self.add_ace_to_dut_acl(CR1, CR2_limited_ace)
+        # Restore original DUT ACL
+        await self.write_dut_acl(CR1, dut_acl_original)
+
+        # Add limited ACE
+        await self.add_ace_to_dut_acl(CR1, CR2_limited_ace, dut_acl_original)
 
         # Controller 2 tries to subscribe to all attributes from all clusters
         # on an endpoint it doesn't have access to
@@ -367,16 +392,14 @@ class TC_IDM_4_2(MatterBaseTest):
             # Verify that the DUT returns an "INVALID_ACTION" status response
             asserts.assert_equal(e.err, INVALID_ACTION_ERROR_CODE,
                                  "Incorrect error response for subscription to unallowed endpoint")
-
+            
         # *** Step 6 ***
         self.print_step(6, "Setup CR2 such that it does not have access to the Node. CR2 sends a subscription request to subscribe to all attributes on all clusters on all endpoints on a Node for which it does not have access.")
 
-        # Skip setting an ACE for controller 2 so
-        # the DUT node rejects subscribing to it
+        # Skip setting an ACE for controller 2 so the DUT node rejects subscribing to it
 
-        # Write original DUT ACL into DUT
-        dut_acl_original = await self.get_dut_acl()
-        await self.write_acl(ctrl=CR1, acl=dut_acl_original)
+        # Restore original DUT ACL
+        await self.write_dut_acl(CR1, dut_acl_original)
 
         # Controller 2 tries to subscribe to all attributes from all clusters
         # from all endpoints on a node it doesn't have access to
@@ -431,6 +454,22 @@ class TC_IDM_4_2(MatterBaseTest):
 
         sub_cr1_step8.Shutdown()
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         # *** Step 8 ***
         self.print_step(8, "CR1 sends a subscription request action for an attribute and sets the MinIntervalFloor to min_interval_floor_s and MaxIntervalCeiling to 10. Activate the Subscription between CR1 and DUT and record the time when the priming ReportDataMessage is received as t_report. Save the returned MaxInterval from the SubscribeResponseMessage as max_interval_s.")
 
@@ -450,42 +489,70 @@ class TC_IDM_4_2(MatterBaseTest):
         print(f"@@_begin: {t_report_sec}")
         
         # Saving the returned MaxInterval from the SubscribeResponseMessage
-        sub_cr1_step8_intervals = sub_cr1_step8.GetReportingIntervalsSeconds()
+        sub_cr1_step8_intervals = sub_cr1_update_value.GetReportingIntervalsSeconds()
         min_interval_sec, max_interval_sec = sub_cr1_step8_intervals
         
         # Get subscription timeout
         subscription_timeout = sub_cr1_update_value.GetSubscriptionTimeoutMs()
         print(f"subscription_timeout: {subscription_timeout}")
 
-        # Set Attribute Update Callb
-        nodel_label_queue = queue.Queue()
-        node_label_update_cb = AttributeChangeCallback(node_label_attr, nodel_label_queue)
+        # Set Attribute Update Callback
+        node_label_update_cb = AttributeChangeCallback()
         sub_cr1_update_value.SetAttributeUpdateCallback(node_label_update_cb)
 
-        # Modify attribute value
+        # Update attribute value
         new_node_label_write = "NewNodeLabel_011235813"
         await CR1.WriteAttribute(
             self.dut_node_id,
             [(0, node_label_attr(value=new_node_label_write))]
         )
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        # f_time = node_label_update_cb.time()
+        # print(f"@@_f_time: {f_time}")
         # write time - sub time -> bigger than floor and less than sub timeout
-
         # Wait MinIntervalFloor seconds before reading updated attribute value
-
         # new_node_label_read = self.get_attribute_value_wait(sub_cr1_update_value, node_label_attr_typed_path)
-
         # Verify new attribute value after MinIntervalFloor time, deprecated
         # asserts.assert_equal(new_node_label_read, new_node_label_write, "Attribute value not updated after write operation.")
 
         sub_cr1_update_value.Shutdown()
-        
-
-
 
         # *** Step 9 ***
-        
-        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         # *** Step 10 ***
         self.print_step(
