@@ -23,7 +23,7 @@ silabs_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 chip_enable_pw_rpc = true
 chip_build_tests = true
 chip_enable_openthread = true
-chip_openthread_ftd = true
+chip_openthread_ftd = false  # use mtd as it is smaller.
 chip_monolithic_tests = true
 
 openthread_external_platform =
