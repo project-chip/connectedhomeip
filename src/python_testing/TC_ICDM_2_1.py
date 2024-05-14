@@ -63,6 +63,9 @@ class TC_ICDM_2_1(MatterBaseTest):
     def is_valid_uint8_value(var):
         return isinstance(var, int) and 0 <= var <= 0xFF
 
+    def bit_count(self):
+        return bin(self).count("1")
+
     async def _read_icdm_attribute_expect_success(self, attribute):
         return await self.read_single_attribute_check_success(endpoint=kRootEndpointId, cluster=cluster, attribute=attribute)
 
