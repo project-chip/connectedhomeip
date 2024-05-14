@@ -19,6 +19,7 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
+#include <optional>
 
 namespace chip {
 namespace app {
@@ -145,22 +146,49 @@ EndpointId CodegenDataModel::FirstEndpoint()
     return kInvalidEndpointId;
 }
 
-EndpointId CodegenDataModel::NextEndpoint(EndpointId before)
+std::optional<unsigned> CodegenDataModel::TryFindEndpointIndex(chip::EndpointId id) const
 {
-    // find the first enabled index
-    bool beforeFound = false;
+    const unsigned lastEndpointIndex = emberAfEndpointCount();
 
-    const uint16_t lastEndpointIndex = emberAfEndpointCount();
-    for (uint16_t endpoint_idx = 0; endpoint_idx < lastEndpointIndex; endpoint_idx++)
+    if ((mEndpointIterationHint < lastEndpointIndex) && emberAfEndpointIndexIsEnabled(mEndpointIterationHint) &&
+        (id == emberAfEndpointFromIndex(mEndpointIterationHint)))
     {
-        if (!beforeFound)
+        return std::make_optional(mEndpointIterationHint);
+    }
+
+    // Linear search, this may be slow
+    for (unsigned endpoint_idx = 0; endpoint_idx < lastEndpointIndex; endpoint_idx++)
+    {
+        if (!emberAfEndpointIndexIsEnabled(endpoint_idx))
         {
-            beforeFound = (before == emberAfEndpointFromIndex(endpoint_idx));
             continue;
         }
 
+        if (id == emberAfEndpointFromIndex(endpoint_idx))
+        {
+            return std::make_optional(endpoint_idx);
+        }
+    }
+
+    return std::nullopt;
+}
+
+EndpointId CodegenDataModel::NextEndpoint(EndpointId before)
+{
+    const unsigned lastEndpointIndex = emberAfEndpointCount();
+
+    std::optional<unsigned> before_idx = TryFindEndpointIndex(before);
+    if (!before_idx.has_value())
+    {
+        return kInvalidEndpointId;
+    }
+
+    // find the first enabled index
+    for (unsigned endpoint_idx = *before_idx + 1; endpoint_idx < lastEndpointIndex; endpoint_idx++)
+    {
         if (emberAfEndpointIndexIsEnabled(endpoint_idx))
         {
+            mEndpointIterationHint = endpoint_idx;
             return emberAfEndpointFromIndex(endpoint_idx);
         }
     }
