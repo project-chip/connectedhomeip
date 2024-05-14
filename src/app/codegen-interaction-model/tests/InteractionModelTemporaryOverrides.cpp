@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "lib/support/logging/TextOnlyLogging.h"
 #include <app/AttributeEncodeState.h>
 #include <app/AttributeReportBuilder.h>
 #include <app/CommandHandler.h>
@@ -86,9 +87,10 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPat
 Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, const EmberAfAttributeMetadata ** metadata,
                                 uint8_t * buffer, uint16_t readLength, bool write)
 {
+    ChipLogError(Test, "Read/Write attribute is NOT implemented!!!")
 
-    // FIXME: this is supposed to be an ember implementation
-    //        however mock library SHOULD be able to implement it ... it is unclear
-    //        to me why we do not have this...
-    return Status::NotFound;
+        // FIXME: this is supposed to be an ember implementation
+        //        however mock library SHOULD be able to implement it ... it is unclear
+        //        to me why we do not have this...
+        return Status::NotFound;
 }

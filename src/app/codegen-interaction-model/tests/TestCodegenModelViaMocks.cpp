@@ -434,7 +434,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadAclDeny)
     ASSERT_EQ(err, CHIP_ERROR_ACCESS_DENIED);
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeRead)
+TEST(TestCodegenModelViaMocks, EmberAttributeInvalidRead)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     chip::app::CodegenDataModel::Model model;
@@ -464,5 +464,42 @@ TEST(TestCodegenModelViaMocks, EmberAttributeRead)
     AttributeValueEncoder encoder(builder, kAdminSubjectDescriptor, readRequest.path, dataVersion);
 
     err = model.ReadAttribute(readRequest, encoder);
+    ASSERT_EQ(err, CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+
+    // TODO: value validation here?
+}
+
+TEST(TestCodegenModelViaMocks, EmberAttributeRead)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    chip::app::CodegenDataModel::Model model;
+    ScopedMockAccessControl accessControl;
+
+    ReadAttributeRequest readRequest;
+
+    // operationFlags is 0 i.e. not internal
+    // readFlags is 0 i.e. not fabric filtered
+    // dataVersion is missing (no data version filtering)
+    readRequest.subjectDescriptor = kAdminSubjectDescriptor;
+    readRequest.path              = ConcreteAttributePath(kMockEndpoint3, MockClusterId(2), MockAttributeId(3));
+
+    std::optional<ClusterInfo> info = model.GetClusterInfo(readRequest.path);
+    ASSERT_TRUE(info.has_value());
+
+    DataVersion dataVersion = info->dataVersion; // NOLINT(bugprone-unchecked-optional-access)
+
+    uint8_t tlvBuffer[1024];
+
+    TLV::TLVWriter tlvWriter;
+    tlvWriter.Init(tlvBuffer);
+
+    AttributeReportIBs::Builder builder;
+    CHIP_ERROR err = builder.Init(&tlvWriter);
     ASSERT_EQ(err, CHIP_NO_ERROR);
+    AttributeValueEncoder encoder(builder, kAdminSubjectDescriptor, readRequest.path, dataVersion);
+
+    err = model.ReadAttribute(readRequest, encoder);
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+
+    // TODO: value validation here?
 }
