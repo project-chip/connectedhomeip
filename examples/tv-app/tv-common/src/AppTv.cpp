@@ -55,6 +55,8 @@ using namespace chip::AppPlatform;
 using namespace chip::app::Clusters;
 using namespace chip::Protocols::UserDirectedCommissioning;
 
+ContentAppFactoryImpl gFactory;
+
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 class MyUserPrompter : public UserPrompter
 {
@@ -102,6 +104,13 @@ class MyUserPrompter : public UserPrompter
     // tv should override this with a dialog prompt
     inline void PromptForAppInstallOKPermission(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override
     {
+        // mContentApps[5] = ContentAppImpl("Vendor1", vendorId, "exampleid", productId, "Version3", "20202021");
+
+        gFactory.AddContentApp(vendorId, productId);
+        // ContentAppFactoryImpl::GetContentAppFactoryImpl().AddContentApp(vendorId, productId);
+
+        ContentAppPlatform::GetInstance().LoadContentAppByClient(vendorId, productId);
+
         return;
     }
 };
@@ -154,6 +163,7 @@ MyPasscodeService gMyPasscodeService;
 
 class MyAppInstallationService : public AppInstallationService
 {
+    // intentionally ambigiously named, need to find a better method name
     bool HasContentApp(uint16_t vendorId, uint16_t productId) override
     {
         return ContentAppPlatform::GetInstance().LoadContentAppByClient(vendorId, productId) != nullptr;
@@ -288,7 +298,6 @@ MyPostCommissioningListener gMyPostCommissioningListener;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-ContentAppFactoryImpl gFactory;
 
 ContentAppFactoryImpl * GetContentAppFactoryImpl()
 {
@@ -565,6 +574,11 @@ ContentApp * ContentAppFactoryImpl::LoadContentApp(const CatalogVendorApp & vend
 void ContentAppFactoryImpl::AddAdminVendorId(uint16_t vendorId)
 {
     mAdminVendorIds.push_back(vendorId);
+}
+
+void ContentAppFactoryImpl::AddContentApp(uint16_t vendorId, uint16_t productId)
+{
+    // mContentApps[5] = ContentAppImpl("Vendor1", vendorId, "exampleid", productId, "Version3", "20202021");
 }
 
 Access::Privilege ContentAppFactoryImpl::GetVendorPrivilege(uint16_t vendorId)

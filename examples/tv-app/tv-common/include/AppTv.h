@@ -139,14 +139,19 @@ public:
 
     void AddAdminVendorId(uint16_t vendorId);
 
+    void AddContentApp(uint16_t vendorId, uint16_t productId);
+
 protected:
-    ContentAppImpl mContentApps[APP_LIBRARY_SIZE] = {
-        ContentAppImpl("Vendor1", 1, "exampleid", 11, "Version1", "34567890"),
-        // ContentAppImpl("Vendor2", 65521, "exampleString", 32768, "Version2", "20202021"),
-        ContentAppImpl("Vendor2", 2, "exampleString", 10, "Version2", "20202021"),
-        ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3", "20202021"),
-        ContentAppImpl("TestSuiteVendor", 1111, "applicationId", 22, "v2", "20202021")
-    };
+    // ContentAppImpl mContentApps[APP_LIBRARY_SIZE] = {
+    //     ContentAppImpl("Vendor1", 1, "exampleid", 11, "Version1", "34567890"),
+    //     // ContentAppImpl("Vendor2", 65521, "exampleString", 32768, "Version2", "20202021"),
+    //     ContentAppImpl("Vendor2", 2, "exampleString", 10, "Version2", "20202021"),
+    //     ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3", "20202021"),
+    //     ContentAppImpl("TestSuiteVendor", 1111, "applicationId", 22, "v2", "20202021")
+    // };
+
+    ContentAppImpl mContentApps[APP_LIBRARY_SIZE];
+    //  = [];
 
     std::vector<uint16_t> mAdminVendorIds{};
 };

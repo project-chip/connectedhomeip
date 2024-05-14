@@ -255,7 +255,11 @@ void CommissionerDiscoveryController::InternalOk()
                         "------PROMPT USER: %s is requesting to install app on this TV, accept? [" ChipLogFormatMEI "," ChipLogFormatMEI "]",
                         client->GetDeviceName(), ChipLogValueMEI(client->GetVendorId()), ChipLogValueMEI(client->GetProductId()));
 
-        mUserPrompter->PromptForAppInstallOKPermission(client->GetVendorId(), client->GetProductId(), client->GetDeviceName());
+        if (mUserPrompter != nullptr)
+        {
+            mUserPrompter->PromptForAppInstallOKPermission(client->GetVendorId(), client->GetProductId(), client->GetDeviceName());
+        }
+        ChipLogDetail(Controller, "------Via Shell Enter: controller ux accept|cancel");
         return;
     }
 
