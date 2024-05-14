@@ -67,6 +67,7 @@ class HostApp(Enum):
     EFR32_TEST_RUNNER = auto()
     TV_CASTING = auto()
     BRIDGE = auto()
+    FABRIC_ADMIN = auto()
     FABRIC_BRIDGE = auto()
     JAVA_MATTER_CONTROLLER = auto()
     KOTLIN_MATTER_CONTROLLER = auto()
@@ -120,6 +121,8 @@ class HostApp(Enum):
             return 'tv-casting-app/linux'
         elif self == HostApp.BRIDGE:
             return 'bridge-app/linux'
+        elif self == HostApp.FABRIC_ADMIN:
+            return 'fabric-admin'
         elif self == HostApp.FABRIC_BRIDGE:
             return 'fabric-bridge-app/linux'
         elif self == HostApp.JAVA_MATTER_CONTROLLER:
@@ -219,6 +222,9 @@ class HostApp(Enum):
         elif self == HostApp.BRIDGE:
             yield 'chip-bridge-app'
             yield 'chip-bridge-app.map'
+        elif self == HostApp.FABRIC_ADMIN:
+            yield 'fabric-admin'
+            yield 'fabric-admin.map'
         elif self == HostApp.FABRIC_BRIDGE:
             yield 'fabric-bridge-app'
             yield 'fabric-bridge-app.map'
