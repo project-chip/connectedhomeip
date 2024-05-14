@@ -8509,8 +8509,12 @@
               ContentLaunchStatusEnum:
                   - URLNotAvailable
 
-- release: "Future"
-  versions: "future"
+- release: "Middle of 2024"
+  versions:
+      iOS: "17.6"
+      macOS: "14.6"
+      watchOS: "10.6"
+      tvOS: "17.6"
   introduced:
       clusters:
           - ActivatedCarbonFilterMonitoring
@@ -8531,6 +8535,7 @@
           - PM25ConcentrationMeasurement
           - RadonConcentrationMeasurement
           - TotalVolatileOrganicCompoundsConcentrationMeasurement
+          - ValveConfigurationAndControl
       attributes:
           ActivatedCarbonFilterMonitoring:
               - Condition
@@ -8805,6 +8810,23 @@
               - AttributeList
               - FeatureMap
               - ClusterRevision
+          ValveConfigurationAndControl:
+              - OpenDuration
+              - DefaultOpenDuration
+              - AutoCloseTime
+              - RemainingDuration
+              - CurrentState
+              - TargetState
+              - CurrentLevel
+              - TargetLevel
+              - DefaultOpenLevel
+              - ValveFault
+              - LevelStep
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
       commands:
           BooleanStateConfiguration:
               - SuppressAlarm
@@ -8817,6 +8839,9 @@
               - ResetCondition
           SmokeCOAlarm:
               - SelfTestRequest
+          ValveConfigurationAndControl:
+              - Open
+              - Close
       command fields:
           BooleanStateConfiguration:
               SuppressAlarm:
@@ -8828,6 +8853,10 @@
                   - direction
                   - wrap
                   - lowestOff
+          ValveConfigurationAndControl:
+              Open:
+                  - openDuration
+                  - targetLevel
       structs:
           ActivatedCarbonFilterMonitoring:
               - ReplacementProductStruct
@@ -8930,6 +8959,9 @@
               - InterconnectSmokeAlarm
               - InterconnectCOAlarm
               - AllClear
+          ValveConfigurationAndControl:
+              - ValveStateChanged
+              - ValveFault
       event fields:
           BooleanStateConfiguration:
               AlarmsStateChanged:
@@ -8958,6 +8990,12 @@
                   - alarmSeverityLevel
               InterconnectCOAlarm:
                   - alarmSeverityLevel
+          ValveConfigurationAndControl:
+              ValveStateChanged:
+                  - valveState
+                  - valveLevel
+              ValveFault:
+                  - valveFault
       enums:
           ActivatedCarbonFilterMonitoring:
               - DegradationDirectionEnum
@@ -9022,6 +9060,9 @@
               - MeasurementUnitEnum
               - MeasurementMediumEnum
               - LevelValueEnum
+          ValveConfigurationAndControl:
+              - ValveStateEnum
+              - StatusCodeEnum
       enum values:
           ActivatedCarbonFilterMonitoring:
               DegradationDirectionEnum:
@@ -9319,6 +9360,13 @@
                   - Medium
                   - High
                   - Critical
+          ValveConfigurationAndControl:
+              ValveStateEnum:
+                  - Closed
+                  - Open
+                  - Transitioning
+              StatusCodeEnum:
+                  - FailureDueToFault
       bitmaps:
           ActivatedCarbonFilterMonitoring:
               - Feature
@@ -9356,6 +9404,9 @@
               - Feature
           TotalVolatileOrganicCompoundsConcentrationMeasurement:
               - Feature
+          ValveConfigurationAndControl:
+              - Feature
+              - ValveFaultBitmap
       bitmap values:
           ActivatedCarbonFilterMonitoring:
               Feature:
@@ -9485,6 +9536,17 @@
                   - CriticalLevel
                   - PeakMeasurement
                   - AverageMeasurement
+          ValveConfigurationAndControl:
+              Feature:
+                  - TimeSync
+                  - Level
+              ValveFaultBitmap:
+                  - GeneralFault
+                  - Blocked
+                  - Leaking
+                  - NotConnected
+                  - ShortCircuit
+                  - CurrentExceeded
   provisional:
       clusters:
           # Targeting Spring 2024 Matter release
@@ -9622,3 +9684,6 @@
                   # Not really part of the spec, need to think about whether to
                   # expose this.
                   - NoFeatures
+
+- release: "Future"
+  versions: "future"

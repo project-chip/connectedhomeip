@@ -16,6 +16,11 @@
  *    limitations under the License.
  */
 
+#include <memory>
+#include <utility>
+
+#include <gtest/gtest.h>
+
 #include "app-common/zap-generated/ids/Attributes.h"
 #include "app-common/zap-generated/ids/Clusters.h"
 #include "app/ConcreteAttributePath.h"
@@ -32,14 +37,8 @@
 #include <app/util/attribute-storage.h>
 #include <controller/InvokeInteraction.h>
 #include <lib/core/ErrorStr.h>
-#include <lib/support/UnitTestContext.h>
-#include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/tests/MessagingContext.h>
-#include <nlunit-test.h>
-
-#include <memory>
-#include <utility>
 
 using TestContext = chip::Test::AppContext;
 using namespace chip;
@@ -49,7 +48,6 @@ using namespace chip::app::Clusters;
 namespace {
 
 uint32_t gIterationCount = 0;
-nlTestSuite * gSuite     = nullptr;
 
 //
 // The generated endpoint_config for the controller app has Endpoint 1
@@ -64,18 +62,41 @@ constexpr uint32_t kTestListLength        = 5;
 // We don't really care about the content, we just need a buffer.
 uint8_t sByteSpanData[app::kMaxSecureSduLengthBytes];
 
-class TestWriteChunking
+class TestWriteChunking : public ::testing::Test
 {
 public:
-    TestWriteChunking() {}
-    static void TestListChunking(nlTestSuite * apSuite, void * apContext);
-    static void TestBadChunking(nlTestSuite * apSuite, void * apContext);
-    static void TestConflictWrite(nlTestSuite * apSuite, void * apContext);
-    static void TestNonConflictWrite(nlTestSuite * apSuite, void * apContext);
-    static void TestTransactionalList(nlTestSuite * apSuite, void * apContext);
+    // Performs shared setup for all tests in the test suite
+    static void SetUpTestSuite()
+    {
+        if (mpContext == nullptr)
+        {
+            mpContext = new TestContext();
+            ASSERT_NE(mpContext, nullptr);
+        }
+        mpContext->SetUpTestSuite();
+    }
 
-private:
+    // Performs shared teardown for all tests in the test suite
+    static void TearDownTestSuite()
+    {
+        mpContext->TearDownTestSuite();
+        if (mpContext != nullptr)
+        {
+            delete mpContext;
+            mpContext = nullptr;
+        }
+    }
+
+protected:
+    // Performs setup for each test in the suite
+    void SetUp() { mpContext->SetUp(); }
+
+    // Performs teardown for each test in the suite
+    void TearDown() { mpContext->TearDown(); }
+
+    static TestContext * mpContext;
 };
+TestContext * TestWriteChunking::mpContext = nullptr;
 
 //clang-format off
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(testClusterAttrsOnEndpoint)
@@ -188,10 +209,9 @@ CHIP_ERROR TestAttrAccess::Write(const app::ConcreteDataAttributePath & aPath, a
  * This will cause all the various corner cases encountered of closing out the various containers within the write request and
  * thoroughly and definitely validate those edge cases.
  */
-void TestWriteChunking::TestListChunking(nlTestSuite * apSuite, void * apContext)
+TEST_F(TestWriteChunking, TestListChunking)
 {
-    TestContext & ctx  = *static_cast<TestContext *>(apContext);
-    auto sessionHandle = ctx.GetSessionBobToAlice();
+    auto sessionHandle = mpContext->GetSessionBobToAlice();
 
     // Initialize the ember side server logic
     InitDataModelHandler();
@@ -218,16 +238,16 @@ void TestWriteChunking::TestListChunking(nlTestSuite * apSuite, void * apContext
 
         gIterationCount = i;
 
-        app::WriteClient writeClient(&ctx.GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
+        app::WriteClient writeClient(&mpContext->GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
                                      static_cast<uint16_t>(minReservationSize + i) /* reserved buffer size */);
 
         ByteSpan list[kTestListLength];
 
         err = writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLength));
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
 
         err = writeClient.SendWriteRequest(sessionHandle);
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
 
         //
         // Service the IO + Engine till we get a ReportEnd callback on the client.
@@ -236,20 +256,19 @@ void TestWriteChunking::TestListChunking(nlTestSuite * apSuite, void * apContext
         //
         for (int j = 0; j < 10 && writeCallback.mOnDoneCount == 0; j++)
         {
-            ctx.DrainAndServiceIO();
+            mpContext->DrainAndServiceIO();
         }
 
-        NL_TEST_ASSERT(apSuite,
-                       writeCallback.mSuccessCount == kTestListLength + 1 /* an extra item for the empty list at the beginning */);
-        NL_TEST_ASSERT(apSuite, writeCallback.mErrorCount == 0);
-        NL_TEST_ASSERT(apSuite, writeCallback.mOnDoneCount == 1);
+        EXPECT_EQ(writeCallback.mSuccessCount, kTestListLength + 1 /* an extra item for the empty list at the beginning */);
+        EXPECT_EQ(writeCallback.mErrorCount, 0u);
+        EXPECT_EQ(writeCallback.mOnDoneCount, 1u);
 
-        NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+        EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
 
         //
         // Stop the test if we detected an error. Otherwise, it'll be difficult to read the logs.
         //
-        if (apSuite->flagError)
+        if (HasFailure())
         {
             break;
         }
@@ -260,10 +279,9 @@ void TestWriteChunking::TestListChunking(nlTestSuite * apSuite, void * apContext
 // We encode a pretty large write payload to test the corner cases related to message layer and secure session overheads.
 // The test should gurantee that if encode returns no error, the send should also success.
 // As the actual overhead may change, we will test over a few possible payload lengths, from 850 to MTU used in write clients.
-void TestWriteChunking::TestBadChunking(nlTestSuite * apSuite, void * apContext)
+TEST_F(TestWriteChunking, TestBadChunking)
 {
-    TestContext & ctx  = *static_cast<TestContext *>(apContext);
-    auto sessionHandle = ctx.GetSessionBobToAlice();
+    auto sessionHandle = mpContext->GetSessionBobToAlice();
 
     bool atLeastOneRequestSent   = false;
     bool atLeastOneRequestFailed = false;
@@ -288,7 +306,7 @@ void TestWriteChunking::TestBadChunking(nlTestSuite * apSuite, void * apContext)
 
         gIterationCount = (uint32_t) i;
 
-        app::WriteClient writeClient(&ctx.GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing());
+        app::WriteClient writeClient(&mpContext->GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing());
 
         ByteSpan list[kTestListLength];
         for (auto & item : list)
@@ -308,7 +326,7 @@ void TestWriteChunking::TestBadChunking(nlTestSuite * apSuite, void * apContext)
 
         // If we successfully encoded the attribute, then we must be able to send the message.
         err = writeClient.SendWriteRequest(sessionHandle);
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
 
         //
         // Service the IO + Engine till we get a ReportEnd callback on the client.
@@ -317,26 +335,25 @@ void TestWriteChunking::TestBadChunking(nlTestSuite * apSuite, void * apContext)
         //
         for (int j = 0; j < 10 && writeCallback.mOnDoneCount == 0; j++)
         {
-            ctx.DrainAndServiceIO();
+            mpContext->DrainAndServiceIO();
         }
 
-        NL_TEST_ASSERT(apSuite,
-                       writeCallback.mSuccessCount == kTestListLength + 1 /* an extra item for the empty list at the beginning */);
-        NL_TEST_ASSERT(apSuite, writeCallback.mErrorCount == 0);
-        NL_TEST_ASSERT(apSuite, writeCallback.mOnDoneCount == 1);
+        EXPECT_EQ(writeCallback.mSuccessCount, kTestListLength + 1 /* an extra item for the empty list at the beginning */);
+        EXPECT_EQ(writeCallback.mErrorCount, 0u);
+        EXPECT_EQ(writeCallback.mOnDoneCount, 1u);
 
-        NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+        EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
 
         //
         // Stop the test if we detected an error. Otherwise, it'll be difficult to read the logs.
         //
-        if (apSuite->flagError)
+        if (HasFailure())
         {
             break;
         }
     }
-    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
-    NL_TEST_ASSERT(apSuite, atLeastOneRequestSent && atLeastOneRequestFailed);
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_TRUE(atLeastOneRequestSent && atLeastOneRequestFailed);
     emberAfClearDynamicEndpoint(0);
 }
 
@@ -344,10 +361,9 @@ void TestWriteChunking::TestBadChunking(nlTestSuite * apSuite, void * apContext)
  * When chunked write is enabled, it is dangerious to handle multiple write requests at the same time. In this case, we will reject
  * the latter write requests to the same attribute.
  */
-void TestWriteChunking::TestConflictWrite(nlTestSuite * apSuite, void * apContext)
+TEST_F(TestWriteChunking, TestConflictWrite)
 {
-    TestContext & ctx  = *static_cast<TestContext *>(apContext);
-    auto sessionHandle = ctx.GetSessionBobToAlice();
+    auto sessionHandle = mpContext->GetSessionBobToAlice();
 
     // Initialize the ember side server logic
     InitDataModelHandler();
@@ -364,11 +380,11 @@ void TestWriteChunking::TestConflictWrite(nlTestSuite * apSuite, void * apContex
     constexpr size_t kReserveSize = kMaxSecureSduLengthBytes - 128;
 
     TestWriteCallback writeCallback1;
-    app::WriteClient writeClient1(&ctx.GetExchangeManager(), &writeCallback1, Optional<uint16_t>::Missing(),
+    app::WriteClient writeClient1(&mpContext->GetExchangeManager(), &writeCallback1, Optional<uint16_t>::Missing(),
                                   static_cast<uint16_t>(kReserveSize));
 
     TestWriteCallback writeCallback2;
-    app::WriteClient writeClient2(&ctx.GetExchangeManager(), &writeCallback2, Optional<uint16_t>::Missing(),
+    app::WriteClient writeClient2(&mpContext->GetExchangeManager(), &writeCallback2, Optional<uint16_t>::Missing(),
                                   static_cast<uint16_t>(kReserveSize));
 
     ByteSpan list[kTestListLength];
@@ -376,17 +392,17 @@ void TestWriteChunking::TestConflictWrite(nlTestSuite * apSuite, void * apContex
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     err = writeClient1.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLength));
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
     err = writeClient2.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLength));
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = writeClient1.SendWriteRequest(sessionHandle);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = writeClient2.SendWriteRequest(sessionHandle);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    ctx.DrainAndServiceIO();
+    mpContext->DrainAndServiceIO();
 
     {
         const TestWriteCallback * writeCallbackRef1 = &writeCallback1;
@@ -400,19 +416,17 @@ void TestWriteChunking::TestConflictWrite(nlTestSuite * apSuite, void * apContex
             writeCallbackRef1 = &writeCallback2;
         }
 
-        NL_TEST_ASSERT(apSuite,
-                       writeCallbackRef1->mSuccessCount ==
-                           kTestListLength + 1 /* an extra item for the empty list at the beginning */);
-        NL_TEST_ASSERT(apSuite, writeCallbackRef1->mErrorCount == 0);
-        NL_TEST_ASSERT(apSuite, writeCallbackRef2->mSuccessCount == 0);
-        NL_TEST_ASSERT(apSuite, writeCallbackRef2->mErrorCount == kTestListLength + 1);
-        NL_TEST_ASSERT(apSuite, writeCallbackRef2->mLastErrorReason.mStatus == Protocols::InteractionModel::Status::Busy);
+        EXPECT_EQ(writeCallbackRef1->mSuccessCount, kTestListLength + 1 /* an extra item for the empty list at the beginning */);
+        EXPECT_EQ(writeCallbackRef1->mErrorCount, 0u);
+        EXPECT_EQ(writeCallbackRef2->mSuccessCount, 0u);
+        EXPECT_EQ(writeCallbackRef2->mErrorCount, kTestListLength + 1);
+        EXPECT_EQ(writeCallbackRef2->mLastErrorReason.mStatus, Protocols::InteractionModel::Status::Busy);
 
-        NL_TEST_ASSERT(apSuite, writeCallbackRef1->mOnDoneCount == 1);
-        NL_TEST_ASSERT(apSuite, writeCallbackRef2->mOnDoneCount == 1);
+        EXPECT_EQ(writeCallbackRef1->mOnDoneCount, 1u);
+        EXPECT_EQ(writeCallbackRef2->mOnDoneCount, 1u);
     }
 
-    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
 
     emberAfClearDynamicEndpoint(0);
 }
@@ -421,10 +435,9 @@ void TestWriteChunking::TestConflictWrite(nlTestSuite * apSuite, void * apContex
  * When chunked write is enabled, it is dangerious to handle multiple write requests at the same time. However, we will allow such
  * change when writing to different attributes in parallel.
  */
-void TestWriteChunking::TestNonConflictWrite(nlTestSuite * apSuite, void * apContext)
+TEST_F(TestWriteChunking, TestNonConflictWrite)
 {
-    TestContext & ctx  = *static_cast<TestContext *>(apContext);
-    auto sessionHandle = ctx.GetSessionBobToAlice();
+    auto sessionHandle = mpContext->GetSessionBobToAlice();
 
     // Initialize the ember side server logic
     InitDataModelHandler();
@@ -442,11 +455,11 @@ void TestWriteChunking::TestNonConflictWrite(nlTestSuite * apSuite, void * apCon
     constexpr size_t kReserveSize = kMaxSecureSduLengthBytes - 128;
 
     TestWriteCallback writeCallback1;
-    app::WriteClient writeClient1(&ctx.GetExchangeManager(), &writeCallback1, Optional<uint16_t>::Missing(),
+    app::WriteClient writeClient1(&mpContext->GetExchangeManager(), &writeCallback1, Optional<uint16_t>::Missing(),
                                   static_cast<uint16_t>(kReserveSize));
 
     TestWriteCallback writeCallback2;
-    app::WriteClient writeClient2(&ctx.GetExchangeManager(), &writeCallback2, Optional<uint16_t>::Missing(),
+    app::WriteClient writeClient2(&mpContext->GetExchangeManager(), &writeCallback2, Optional<uint16_t>::Missing(),
                                   static_cast<uint16_t>(kReserveSize));
 
     ByteSpan list[kTestListLength];
@@ -454,29 +467,29 @@ void TestWriteChunking::TestNonConflictWrite(nlTestSuite * apSuite, void * apCon
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     err = writeClient1.EncodeAttribute(attributePath1, app::DataModel::List<ByteSpan>(list, kTestListLength));
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
     err = writeClient2.EncodeAttribute(attributePath2, app::DataModel::List<ByteSpan>(list, kTestListLength));
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = writeClient1.SendWriteRequest(sessionHandle);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = writeClient2.SendWriteRequest(sessionHandle);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    ctx.DrainAndServiceIO();
+    mpContext->DrainAndServiceIO();
 
     {
-        NL_TEST_ASSERT(apSuite, writeCallback1.mErrorCount == 0);
-        NL_TEST_ASSERT(apSuite, writeCallback1.mSuccessCount == kTestListLength + 1);
-        NL_TEST_ASSERT(apSuite, writeCallback2.mErrorCount == 0);
-        NL_TEST_ASSERT(apSuite, writeCallback2.mSuccessCount == kTestListLength + 1);
+        EXPECT_EQ(writeCallback1.mErrorCount, 0u);
+        EXPECT_EQ(writeCallback1.mSuccessCount, kTestListLength + 1);
+        EXPECT_EQ(writeCallback2.mErrorCount, 0u);
+        EXPECT_EQ(writeCallback2.mSuccessCount, kTestListLength + 1);
 
-        NL_TEST_ASSERT(apSuite, writeCallback1.mOnDoneCount == 1);
-        NL_TEST_ASSERT(apSuite, writeCallback2.mOnDoneCount == 1);
+        EXPECT_EQ(writeCallback1.mOnDoneCount, 1u);
+        EXPECT_EQ(writeCallback2.mOnDoneCount, 1u);
     }
 
-    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
 
     emberAfClearDynamicEndpoint(0);
 }
@@ -510,14 +523,14 @@ struct Instructions
     std::vector<bool> expectedStatus;
 };
 
-void RunTest(nlTestSuite * apSuite, TestContext & ctx, Instructions instructions)
+void RunTest(TestContext * pContext, Instructions instructions)
 {
     CHIP_ERROR err     = CHIP_NO_ERROR;
-    auto sessionHandle = ctx.GetSessionBobToAlice();
+    auto sessionHandle = pContext->GetSessionBobToAlice();
 
     TestWriteCallback writeCallback;
     std::unique_ptr<WriteClient> writeClient = std::make_unique<WriteClient>(
-        &ctx.GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
+        &pContext->GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
         static_cast<uint16_t>(kMaxSecureSduLengthBytes -
                               128) /* use a smaller chunk so we only need a few attributes in the write request. */);
 
@@ -525,7 +538,7 @@ void RunTest(nlTestSuite * apSuite, TestContext & ctx, Instructions instructions
     std::vector<PathStatus> status;
 
     testServer.mOnListWriteBegin = [&](const ConcreteAttributePath & aPath) {
-        NL_TEST_ASSERT(apSuite, onGoingPath == ConcreteAttributePath());
+        EXPECT_EQ(onGoingPath, ConcreteAttributePath());
         onGoingPath = aPath;
         ChipLogProgress(Zcl, "OnListWriteBegin endpoint=%u Cluster=" ChipLogFormatMEI " attribute=" ChipLogFormatMEI,
                         aPath.mEndpointId, ChipLogValueMEI(aPath.mClusterId), ChipLogValueMEI(aPath.mAttributeId));
@@ -542,7 +555,7 @@ void RunTest(nlTestSuite * apSuite, TestContext & ctx, Instructions instructions
         }
     };
     testServer.mOnListWriteEnd = [&](const ConcreteAttributePath & aPath, bool aWasSuccessful) {
-        NL_TEST_ASSERT(apSuite, onGoingPath == aPath);
+        EXPECT_EQ(onGoingPath, aPath);
         status.push_back(PathStatus(aPath, aWasSuccessful));
         onGoingPath = ConcreteAttributePath();
         ChipLogProgress(Zcl, "OnListWriteEnd endpoint=%u Cluster=" ChipLogFormatMEI " attribute=" ChipLogFormatMEI,
@@ -556,7 +569,7 @@ void RunTest(nlTestSuite * apSuite, TestContext & ctx, Instructions instructions
     {
         instructions.data = std::vector<ListData>(instructions.paths.size(), ListData::kList);
     }
-    NL_TEST_ASSERT(apSuite, instructions.paths.size() == instructions.data.size());
+    EXPECT_EQ(instructions.paths.size(), instructions.data.size());
 
     for (size_t i = 0; i < instructions.paths.size(); i++)
     {
@@ -579,22 +592,22 @@ void RunTest(nlTestSuite * apSuite, TestContext & ctx, Instructions instructions
             break;
         }
         }
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
     }
 
     err = writeClient->SendWriteRequest(sessionHandle);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    ctx.GetIOContext().DriveIOUntil(sessionHandle->ComputeRoundTripTimeout(app::kExpectedIMProcessingTime) +
-                                        System::Clock::Seconds16(1),
-                                    [&]() { return ctx.GetExchangeManager().GetNumActiveExchanges() == 0; });
+    pContext->GetIOContext().DriveIOUntil(sessionHandle->ComputeRoundTripTimeout(app::kExpectedIMProcessingTime) +
+                                              System::Clock::Seconds16(1),
+                                          [&]() { return pContext->GetExchangeManager().GetNumActiveExchanges() == 0; });
 
-    NL_TEST_ASSERT(apSuite, onGoingPath == app::ConcreteAttributePath());
-    NL_TEST_ASSERT(apSuite, status.size() == instructions.expectedStatus.size());
+    EXPECT_EQ(onGoingPath, app::ConcreteAttributePath());
+    EXPECT_EQ(status.size(), instructions.expectedStatus.size());
 
     for (size_t i = 0; i < status.size(); i++)
     {
-        NL_TEST_ASSERT(apSuite, status[i] == PathStatus(instructions.paths[i], instructions.expectedStatus[i]));
+        EXPECT_EQ(status[i], PathStatus(instructions.paths[i], instructions.expectedStatus[i]));
     }
 
     testServer.mOnListWriteBegin = nullptr;
@@ -603,11 +616,9 @@ void RunTest(nlTestSuite * apSuite, TestContext & ctx, Instructions instructions
 
 } // namespace TestTransactionalListInstructions
 
-void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apContext)
+TEST_F(TestWriteChunking, TestTransactionalList)
 {
     using namespace TestTransactionalListInstructions;
-
-    TestContext & ctx = *static_cast<TestContext *>(apContext);
 
     // Initialize the ember side server logic
     InitDataModelHandler();
@@ -620,7 +631,7 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
 
     // Test 1: we should receive transaction notifications
     ChipLogProgress(Zcl, "Test 1: we should receive transaction notifications");
-    RunTest(apSuite, ctx,
+    RunTest(mpContext,
             Instructions{
                 .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
                 .expectedStatus = { true },
@@ -628,7 +639,7 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
 
     ChipLogProgress(Zcl, "Test 2: we should receive transaction notifications for incomplete list operations");
     RunTest(
-        apSuite, ctx,
+        mpContext,
         Instructions{
             .paths                   = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
             .onListWriteBeginActions = [&](const app::ConcreteAttributePath & aPath) { return Operations::kShutdownWriteClient; },
@@ -636,7 +647,7 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
         });
 
     ChipLogProgress(Zcl, "Test 3: we should receive transaction notifications for every list in the transaction");
-    RunTest(apSuite, ctx,
+    RunTest(mpContext,
             Instructions{
                 .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
                                     ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute2) },
@@ -644,7 +655,7 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
             });
 
     ChipLogProgress(Zcl, "Test 4: we should receive transaction notifications with the status of each list");
-    RunTest(apSuite, ctx,
+    RunTest(mpContext,
             Instructions{
                 .paths = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
                            ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute2) },
@@ -662,7 +673,7 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
     ChipLogProgress(Zcl,
                     "Test 5: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
                     "null value before non null values");
-    RunTest(apSuite, ctx,
+    RunTest(mpContext,
             Instructions{
                 .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
                                     ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
@@ -673,7 +684,7 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
     ChipLogProgress(Zcl,
                     "Test 6: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
                     "null value after non null values");
-    RunTest(apSuite, ctx,
+    RunTest(mpContext,
             Instructions{
                 .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
                                     ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
@@ -684,7 +695,7 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
     ChipLogProgress(Zcl,
                     "Test 7: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
                     "null value between non null values");
-    RunTest(apSuite, ctx,
+    RunTest(mpContext,
             Instructions{
                 .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
                                     ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
@@ -694,7 +705,7 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
             });
 
     ChipLogProgress(Zcl, "Test 8: transactional list callbacks will be called for nullable lists");
-    RunTest(apSuite, ctx,
+    RunTest(mpContext,
             Instructions{
                 .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
                 .data           = { ListData::kNull },
@@ -704,42 +715,16 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
     ChipLogProgress(Zcl,
                     "Test 9: for nullable lists, we should receive notifications for unsuccessful writes when non-fatal occurred "
                     "during processing the requests");
-    RunTest(apSuite, ctx,
+    RunTest(mpContext,
             Instructions{
                 .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
                 .data           = { ListData::kBadValue },
                 .expectedStatus = { false },
             });
 
-    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
 
     emberAfClearDynamicEndpoint(0);
 }
 
-const nlTest sTests[] = {
-    NL_TEST_DEF("TestListChunking", TestWriteChunking::TestListChunking),
-    NL_TEST_DEF("TestBadChunking", TestWriteChunking::TestBadChunking),
-    NL_TEST_DEF("TestConflictWrite", TestWriteChunking::TestConflictWrite),
-    NL_TEST_DEF("TestNonConflictWrite", TestWriteChunking::TestNonConflictWrite),
-    NL_TEST_DEF("TestTransactionalList", TestWriteChunking::TestTransactionalList),
-    NL_TEST_SENTINEL(),
-};
-
-nlTestSuite sSuite = {
-    "TestWriteChunking",
-    &sTests[0],
-    NL_TEST_WRAP_FUNCTION(TestContext::SetUpTestSuite),
-    NL_TEST_WRAP_FUNCTION(TestContext::TearDownTestSuite),
-    NL_TEST_WRAP_METHOD(TestContext, SetUp),
-    NL_TEST_WRAP_METHOD(TestContext, TearDown),
-};
-
 } // namespace
-
-int TestWriteChunkingTests()
-{
-    gSuite = &sSuite;
-    return chip::ExecuteTestsWithContext<TestContext>(&sSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestWriteChunkingTests)

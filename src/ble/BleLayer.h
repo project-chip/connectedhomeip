@@ -327,7 +327,6 @@ private:
 
     // Private functions:
     void HandleAckReceived(BLE_CONNECTION_OBJECT connObj);
-    void DriveSending();
     CHIP_ERROR HandleBleTransportConnectionInitiated(BLE_CONNECTION_OBJECT connObj, System::PacketBufferHandle && pBuf);
 
     static BleTransportProtocolVersion GetHighestSupportedProtocolVersion(const BleTransportCapabilitiesRequestMessage & reqMsg);

@@ -38,7 +38,6 @@ source_set("common") {
 executable("chip-im-initiator") {
   sources = [
     "${chip_root}/src/app/reporting/tests/MockReportScheduler.cpp",
-    "RequiredPrivilegeStubs.cpp",
     "chip_im_initiator.cpp",
   ]
 
@@ -61,7 +60,6 @@ executable("chip-im-responder") {
     "${chip_root}/src/app/reporting/tests/MockReportScheduler.cpp",
     "MockEvents.cpp",
     "MockEvents.h",
-    "RequiredPrivilegeStubs.cpp",
     "chip_im_responder.cpp",
   ]
 

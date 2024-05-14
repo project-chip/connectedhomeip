@@ -106,7 +106,7 @@ if (chip_build_tests) {
       ]
 
       if (matter_enable_tracing_support &&
-          matter_trace_config == "multiplexed") {
+          matter_trace_config == "${chip_root}/src/tracing/multiplexed") {
         tests += [ "${chip_root}/src/tracing/tests" ]
       }
     }

@@ -409,13 +409,13 @@ public:
      *
      * This template ensures that the numeric value is constant and well-formed.
      */
-    template <SdkPart PART, StorageType CODE>
+    template <SdkPart PART, StorageType SCODE>
     struct SdkErrorConstant
     {
         static_assert(FitsInField(kSdkPartLength, to_underlying(PART)), "part is too large");
-        static_assert(FitsInField(kSdkCodeLength, CODE), "code is too large");
-        static_assert(MakeInteger(PART, CODE) != 0, "value is zero");
-        static constexpr StorageType value = MakeInteger(PART, CODE);
+        static_assert(FitsInField(kSdkCodeLength, SCODE), "code is too large");
+        static_assert(MakeInteger(PART, SCODE) != 0, "value is zero");
+        static constexpr StorageType value = MakeInteger(PART, SCODE);
     };
 };
 
@@ -743,7 +743,14 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_INVALID_LIST_LENGTH                         CHIP_CORE_ERROR(0x1f)
 
-// AVAILABLE: 0x20
+/**
+ *  @def CHIP_ERROR_FAILED_DEVICE_ATTESTATION
+ *
+ *  @brief
+ *    Device Attestation failed.
+ *
+ */
+#define CHIP_ERROR_FAILED_DEVICE_ATTESTATION                   CHIP_CORE_ERROR(0x20)
 
 /**
  *  @def CHIP_END_OF_TLV

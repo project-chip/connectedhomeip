@@ -54,6 +54,7 @@ public:
 
     CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter());
     CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter());
+    CHIP_ERROR DiscoverOperationalNodes(DiscoveryFilter filter = DiscoveryFilter());
     CHIP_ERROR StopDiscovery();
 
 private:
