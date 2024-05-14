@@ -107,21 +107,22 @@ InteractionModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & 
 
 } // namespace
 
-CHIP_ERROR CodegenDataModel::ReadAttribute(const InteractionModel::ReadAttributeRequest & request, InteractionModel::ReadState & state,
-                                AttributeValueEncoder & encoder)
+CHIP_ERROR CodegenDataModel::ReadAttribute(const InteractionModel::ReadAttributeRequest & request,
+                                           InteractionModel::ReadState & state, AttributeValueEncoder & encoder)
 {
     // TODO: this needs an implementation
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder)
+CHIP_ERROR CodegenDataModel::WriteAttribute(const InteractionModel::WriteAttributeRequest & request,
+                                            AttributeValueDecoder & decoder)
 {
     // TODO: this needs an implementation
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR CodegenDataModel::Invoke(const InteractionModel::InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
-                         InteractionModel::InvokeReply & reply)
+                                    InteractionModel::InvokeReply & reply)
 {
     // TODO: this needs an implementation
     return CHIP_ERROR_NOT_IMPLEMENTED;
@@ -227,14 +228,24 @@ InteractionModel::AttributeEntry CodegenDataModel::NextAttribute(const ConcreteA
     // find the given attribute in the list and then return the next one
     bool foundPosition            = false;
     const unsigned attributeCount = cluster->attributeCount;
-    for (unsigned attribute_idx = 0; attribute_idx < attributeCount; attribute_idx++)
+    unsigned startIdx             = 0;
+
+    // Attempt to use the hint
+    if ((mAttributeIterationHint < attributeCount) &&
+        (cluster->attributes[mAttributeIterationHint].attributeId == before.mAttributeId))
+    {
+        startIdx = mAttributeIterationHint;
+    }
+
+    for (unsigned attribute_idx = startIdx; attribute_idx < attributeCount; attribute_idx++)
     {
         if (foundPosition)
         {
+            mAttributeIterationHint = attribute_idx;
             return AttributeEntryFrom(before, cluster->attributes[attribute_idx]);
         }
 
-        foundPosition = (cluster->attributes[i].attributeId == before.mAttributeId);
+        foundPosition = (cluster->attributes[attribute_idx].attributeId == before.mAttributeId);
     }
 
     return InteractionModel::AttributeEntry::Invalid();

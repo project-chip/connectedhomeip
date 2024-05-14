@@ -44,6 +44,14 @@ public:
     InteractionModel::AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster) override;
     InteractionModel::AttributeEntry NextAttribute(const ConcreteAttributePath & before) override;
     std::optional<InteractionModel::AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) override;
+
+private:
+    // Iteration is often done in a tight loop going through all values.
+    // To avoid N^2 iterations, cache a hint of where something is positioned
+    // uint16_t mEndpointIterationHint = 0;
+    // uint16_t mClusterIterationHint = 0;
+    unsigned mAttributeIterationHint = 0;
+
 };
 
 } // namespace app
