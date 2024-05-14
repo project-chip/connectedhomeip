@@ -644,8 +644,8 @@ CHIP_ERROR AppTvInit()
     ContentAppPlatform::GetInstance().SetContentAppFactory(&gFactory);
     gFactory.AddContentApp((uint16_t)1, (uint16_t)11);
     // gFactory.AddContentApp((uint16_t)65521, (uint16_t)32768);
-    // gFactory.AddContentApp((uint16_t)9050, (uint16_t)22);
-    // gFactory.AddContentApp((uint16_t)1111, (uint16_t)22);
+    gFactory.AddContentApp((uint16_t)9050, (uint16_t)22);
+    gFactory.AddContentApp((uint16_t)1111, (uint16_t)22);
     uint16_t value;
     if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(value) != CHIP_NO_ERROR)
     {
