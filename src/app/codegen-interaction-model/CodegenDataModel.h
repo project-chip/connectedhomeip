@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include "app/ConcreteClusterPath.h"
 #include <app/interaction-model/Model.h>
 
 #include <app/util/af-types.h>
@@ -53,6 +54,22 @@ private:
     uint16_t mEndpointIterationHint  = 0;
     unsigned mClusterIterationHint   = 0;
     unsigned mAttributeIterationHint = 0;
+
+    // represents a remembered cluster reference that has been found as
+    // looking for clusters is very common (for every attribute iteration)
+    struct ClusterReference
+    {
+        ConcreteClusterPath path;
+        const EmberAfCluster * cluster;
+
+        ClusterReference(const ConcreteClusterPath p, const EmberAfCluster * c) : path(p), cluster(c) {}
+    };
+    std::optional<ClusterReference> mPreviouslyFoundCluster;
+
+    /// Finds the specified ember cluster
+    ///
+    /// Effectively the same as `emberAfFindServerCluster` except with some caching capabilities
+    const EmberAfCluster * FindServerCluster(const ConcreteClusterPath & path);
 
     /// Find the index of the given attribute id
     std::optional<unsigned> TryFindAttributeIndex(const EmberAfCluster * cluster, chip::AttributeId id) const;
