@@ -78,7 +78,7 @@ class ProcessManager:
 def dump_temporary_logs_to_console(log_file_path: str):
     """Dump log file to the console; log file will be removed once the function exits."""
     """Write the entire content of `log_file_path` to the console."""
-    print('\nDumping logs from: ', log_file_path)
+    print(f'\nDumping logs from: {log_file_path}')
 
     with open(log_file_path, 'r') as file:
         for line in file:
@@ -87,13 +87,13 @@ def dump_temporary_logs_to_console(log_file_path: str):
 
 def handle_casting_failure(casting_state: str, log_file_paths: List[str]):
     """Log '{casting_state} failed!' as error, dump log files to console, exit on error."""
-    logging.error(casting_state + ' failed!')
+    logging.error(f'{casting_state} failed!')
 
     for log_file_path in log_file_paths:
         try:
             dump_temporary_logs_to_console(log_file_path)
         except Exception as e:
-            logging.exception(f"Failed to dump {log_file_path}: {e}")
+            logging.exception(f'Failed to dump {log_file_path}: {e}')
 
     sys.exit(1)
 
@@ -178,8 +178,8 @@ def initiate_cast_request_success(tv_casting_app_info: Tuple[subprocess.Popen, T
     while True:
         # Check if we exceeded the maximum wait time for initiating 'cast request' from the Linux tv-casting-app to the Linux tv-app.
         if time.time() - start_wait_time > COMMISSIONING_STAGE_MAX_WAIT_SEC:
-            logging.error('The command `cast request ' + valid_discovered_commissioner_number +
-                          '` was not issued to the Linux tv-casting-app process within the timeout.')
+            logging.error(
+                f'The command `cast request {valid_discovered_commissioner_number}` was not issued to the Linux tv-casting-app process within the timeout.')
             return False
 
         tv_casting_app_output_line = tv_casting_app_process.stdout.readline()
@@ -194,7 +194,9 @@ def initiate_cast_request_success(tv_casting_app_info: Tuple[subprocess.Popen, T
                 next_line = tv_casting_app_process.stdout.readline()
                 linux_tv_casting_app_log_file.write(next_line)
                 linux_tv_casting_app_log_file.flush()
-                logging.info('Sent `' + next_line.rstrip('\n') + '` to the Linux tv-casting-app process.')
+                next_line = next_line.rstrip('\n')
+                logging.info(f'Sent `{next_line}` to the Linux tv-casting-app process.')
+
                 return True
 
 
@@ -291,8 +293,8 @@ def validate_tv_casting_request_approval(tv_app_info: Tuple[subprocess.Popen, Te
                 tv_app_line = tv_app_process.stdout.readline()
                 linux_tv_app_log_file.write(tv_app_line)
                 linux_tv_app_log_file.flush()
-
-                logging.info('Sent `' + tv_app_line.rstrip('\n') + '` to the Linux tv-app process.')
+                tv_app_line = tv_app_line.rstrip('\n')
+                logging.info(f'Sent `{tv_app_line}` to the Linux tv-app process.')
                 return True
 
 
@@ -511,6 +513,12 @@ def test_commissioning_fn(valid_discovered_commissioner_number, tv_casting_app_i
     # Extract the values from the 'Identification Declaration' block in the tv-casting-app output that we want to validate against.
     expected_device_name, expected_vendor_id, expected_product_id = extract_device_info_from_tv_casting_app(
         tv_casting_app_info, 'Commissioning', log_paths)
+
+    if not expected_device_name or not expected_vendor_id or not expected_product_id:
+        logging.error('The is an error with the expected device info values that were extracted from the `Identification Declaration` block.')
+        logging.error(
+            f'expected_device_name: {expected_device_name}, expected_vendor_id: {expected_vendor_id}, expected_product_id: {expected_product_id}')
+        handle_casting_failure('Commissioning', log_paths)
 
     if not validate_identification_declaration_message_on_tv_app(tv_app_info, expected_device_name, expected_vendor_id, expected_product_id, log_paths):
         handle_casting_failure('Commissioning', log_paths)
