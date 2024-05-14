@@ -23,7 +23,7 @@ import queue
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.ChipDeviceCtrl import ChipDeviceController
-from chip.clusters.Attribute import AttributePath, TypedAttributePath, SubscriptionTransaction
+from chip.clusters.Attribute import AttributePath, TypedAttributePath
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
 from matter_testing_support import MatterBaseTest, AttributeChangeCallback, async_test_body, default_matter_test_main, wait_for_attribute_report
@@ -144,7 +144,6 @@ class TC_IDM_4_2(MatterBaseTest):
         cluster_rev_attr_typed_path = self.get_typed_attribute_path(cluster_rev_attr)
         node_label_attr = Clusters.BasicInformation.Attributes.NodeLabel
         node_label_attr_path = [(0, node_label_attr)]
-        node_label_attr_typed_path = self.get_typed_attribute_path(node_label_attr)
         subscription_max_interval_publisher_limit_sec = 0
         INVALID_ACTION_ERROR_CODE = 0x580
 
