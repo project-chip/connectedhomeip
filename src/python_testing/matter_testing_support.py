@@ -331,7 +331,8 @@ def wait_for_attribute_report(q: queue.Queue, expected_attribute: ClusterObjects
     except queue.Empty:
         asserts.fail(f"Failed to receive a report for the attribute change for {expected_attribute}")
 
-    asserts.assert_equal(path.AttributeType, expected_attribute, f"Received incorrect attribute report. Expected: {expected_attribute}, received: {path.AttributeType}")
+    asserts.assert_equal(path.AttributeType, expected_attribute,
+                         f"Received incorrect attribute report. Expected: {expected_attribute}, received: {path.AttributeType}")
     try:
         transaction.GetAttribute(path)
     except KeyError:

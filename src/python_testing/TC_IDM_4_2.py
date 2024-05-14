@@ -17,17 +17,19 @@
 
 import copy
 import logging
-import time
 import queue
+import time
 
 import chip.clusters as Clusters
-from chip.clusters import ClusterObjects as ClusterObjects
 from chip.ChipDeviceCtrl import ChipDeviceController
+from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import AttributePath, TypedAttributePath
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
-from matter_testing_support import MatterBaseTest, AttributeChangeCallback, async_test_body, default_matter_test_main, wait_for_attribute_report
+from matter_testing_support import (MatterBaseTest, AttributeChangeCallback, async_test_body, default_matter_test_main,
+                                    wait_for_attribute_report)
 from mobly import asserts
+
 
 '''
 Category:
@@ -151,7 +153,7 @@ class TC_IDM_4_2(MatterBaseTest):
         # Subscriber/client with admin access to the DUT
         # Will write ACL for controller 2 and validate success/error codes
         CR1: ChipDeviceController = self.default_controller
-        
+
         # Original DUT ACL used for reseting the ACL on some steps
         dut_acl_original = await self.get_dut_acl(CR1)
 
@@ -268,12 +270,12 @@ class TC_IDM_4_2(MatterBaseTest):
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(cluster=Clusters.BasicInformation.id)],
             subjects=[CR2_nodeid])
-        
+
         # Restore original DUT ACL
         await self.write_dut_acl(CR1, dut_acl_original)
 
         # Add limited ACE
-        await self.add_ace_to_dut_acl(CR1, CR2_limited_ace, dut_acl_original)        
+        await self.add_ace_to_dut_acl(CR1, CR2_limited_ace, dut_acl_original)
 
         # Controller 2 tries to subscribe an attribute from a cluster
         # it doesn't have access to
@@ -367,7 +369,7 @@ class TC_IDM_4_2(MatterBaseTest):
             # Verify that the DUT returns an "INVALID_ACTION" status response
             asserts.assert_equal(e.err, INVALID_ACTION_ERROR_CODE,
                                  "Incorrect error response for subscription to unallowed endpoint")
-            
+
         # *** Step 6 ***
         self.print_step(6, "Setup CR2 such that it does not have access to the Node. CR2 sends a subscription request to subscribe to all attributes on all clusters on all endpoints on a Node for which it does not have access.")
 
@@ -423,7 +425,7 @@ class TC_IDM_4_2(MatterBaseTest):
             keepSubscriptions=False,
             dataVersionFilters=data_version_filter
         )
-        
+
         # Verify that the subscription is activated between CR1 and DUT
         asserts.assert_true(sub_cr1_step8.subscriptionId, "Subscription not activated")
 
@@ -476,8 +478,10 @@ class TC_IDM_4_2(MatterBaseTest):
         t_elapsed_sec = t_update_sec - t_report_sec
 
         # Verify that t_update - t_report is greater than min_interval_floor_s and less than the ReadClient SubscriptionTimeout
-        asserts.assert_greater(t_elapsed_sec, min_interval_floor_sec, f"t_update_sec - t_report_sec ({t_elapsed_sec}s) must be greater than min_interval_floor_sec ({min_interval_floor_sec}s)")
-        asserts.assert_less(t_elapsed_sec, subscription_timeout_sec, f"t_update_sec  - t_report_sec ({t_elapsed_sec}s) must be less than subscription_timeout_sec ({subscription_timeout_sec}s)")
+        asserts.assert_greater(t_elapsed_sec, min_interval_floor_sec,
+                               f"t_update_sec - t_report_sec ({t_elapsed_sec}s) must be greater than min_interval_floor_sec ({min_interval_floor_sec}s)")
+        asserts.assert_less(t_elapsed_sec, subscription_timeout_sec,
+                            f"t_update_sec  - t_report_sec ({t_elapsed_sec}s) must be less than subscription_timeout_sec ({subscription_timeout_sec}s)")
 
         sub_cr1_update_value.Shutdown()
 
