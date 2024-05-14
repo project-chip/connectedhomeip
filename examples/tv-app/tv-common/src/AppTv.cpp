@@ -103,10 +103,7 @@ class MyUserPrompter : public UserPrompter
 
     // tv should override this with a dialog prompt
     inline void PromptForAppInstallOKPermission(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override
-    {
-        gFactory.AddContentApp(vendorId, productId);
-        return;
-    }
+    { return; }
 };
 
 MyUserPrompter gMyUserPrompter;

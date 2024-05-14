@@ -219,6 +219,28 @@ void CommissionerDiscoveryController::InternalOk()
         ChipLogError(AppServer, "UX InternalOk: could not find instance=%s", mCurrentInstance);
         return;
     }
+
+    bool isContentAppInstalled = mAppInstallationService->HasContentApp(client->GetVendorId(), client->GetProductId());
+
+    if (!isContentAppInstalled) {
+        ChipLogDetail(AppServer, "UX InternalOk: app not installed.");
+
+        // TODO: send CDC message that user is prompted to install the app
+
+        // dialog
+        ChipLogDetail(Controller,
+                        "------PROMPT USER: %s is requesting to install app on this TV. [" ChipLogFormatMEI "," ChipLogFormatMEI "]",
+                        client->GetDeviceName(), ChipLogValueMEI(client->GetVendorId()), ChipLogValueMEI(client->GetProductId()));
+
+        if (mUserPrompter != nullptr)
+        {
+            mUserPrompter->PromptForAppInstallOKPermission(client->GetVendorId(), client->GetProductId(), client->GetDeviceName());
+        }
+        ChipLogDetail(Controller, "------Via Shell Enter: app add <pid> <vid>");
+        // TODO: force user to send again "cast request <id>" command?
+        return;
+    }
+
     if (client->GetUDCClientProcessingState() != UDCClientProcessingState::kPromptingUser)
     {
         ChipLogError(AppServer, "UX InternalOk: invalid state for ok");
@@ -244,25 +266,6 @@ void CommissionerDiscoveryController::InternalOk()
     CharSpan rotatingIdSpan(rotatingIdBuffer, 2 * rotatingIdLength);
 
     uint8_t targetAppCount = client->GetNumTargetAppInfos();
-
-    bool isContentAppInstalled = mAppInstallationService->HasContentApp(client->GetVendorId(), client->GetProductId());
-
-    if (!isContentAppInstalled) {
-        ChipLogDetail(AppServer, "UX InternalOk: app not installed.");
-
-        // dialog
-        ChipLogDetail(Controller,
-                        "------PROMPT USER: %s is requesting to install app on this TV, accept? [" ChipLogFormatMEI "," ChipLogFormatMEI "]",
-                        client->GetDeviceName(), ChipLogValueMEI(client->GetVendorId()), ChipLogValueMEI(client->GetProductId()));
-
-        if (mUserPrompter != nullptr)
-        {
-            mUserPrompter->PromptForAppInstallOKPermission(client->GetVendorId(), client->GetProductId(), client->GetDeviceName());
-        }
-        ChipLogDetail(Controller, "------Via Shell Enter: controller ux accept|cancel");
-        client->SetUDCClientProcessingState(UDCClientProcessingState::kPromptingUser);
-        return;
-    }
 
     if (targetAppCount > 0)
     {
