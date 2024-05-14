@@ -378,7 +378,7 @@ class TestDefinition:
                 pairing_server_args = []
                 if tool_hci_number is not None:
                     pairing_cmd = paths.chip_tool_with_python_cmd + [
-                        "pairing", "ble-wifi",  TEST_NODE_ID, "Virtual_Wifi", "ExamplePassword", "20202021",  "3840", ]
+                        "pairing", "code-wifi",  TEST_NODE_ID, "Virtual_Wifi", "ExamplePassword", "MT:-24J0AFN00KA0648G00"]
                     pairing_server_args = [
                         "--ble-adapter", str(tool_hci_number)]
                 else:
@@ -406,6 +406,7 @@ class TestDefinition:
                         test_cmd,
                         name='TEST', dependencies=[apps_register],
                         timeout_seconds=timeout_seconds)
+            runner.capture_delegate.LogContents()
 
         except Exception:
             logging.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")
