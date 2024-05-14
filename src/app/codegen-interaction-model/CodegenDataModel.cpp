@@ -65,7 +65,7 @@ InteractionModel::ClusterEntry ClusterEntryFrom(EndpointId endpointId, const Emb
 ///
 /// Returns an invalid entry if no more server clusters are found
 InteractionModel::ClusterEntry FirstServerClusterEntry(EndpointId endpointId, const EmberAfEndpointType * endpoint,
-                                                       uint16_t start_index)
+                                                       uint16_t start_index, unsigned & found_index)
 {
     for (unsigned cluster_idx = start_index; cluster_idx < endpoint->clusterCount; cluster_idx++)
     {
@@ -75,6 +75,7 @@ InteractionModel::ClusterEntry FirstServerClusterEntry(EndpointId endpointId, co
             continue;
         }
 
+        found_index = cluster_idx;
         return ClusterEntryFrom(endpointId, cluster);
     }
 
@@ -175,7 +176,33 @@ InteractionModel::ClusterEntry CodegenDataModel::FirstCluster(EndpointId endpoin
     VerifyOrReturnValue(endpoint->clusterCount > 0, InteractionModel::ClusterEntry::Invalid());
     VerifyOrReturnValue(endpoint->cluster != nullptr, InteractionModel::ClusterEntry::Invalid());
 
-    return FirstServerClusterEntry(endpointId, endpoint, 0);
+    return FirstServerClusterEntry(endpointId, endpoint, 0, mClusterIterationHint);
+}
+
+std::optional<unsigned> CodegenDataModel::TryFindServerClusterIndex(const EmberAfEndpointType * endpoint, chip::ClusterId id) const
+{
+    const unsigned clusterCount = endpoint->clusterCount;
+
+    if (mClusterIterationHint < clusterCount)
+    {
+        const EmberAfCluster & cluster = endpoint->cluster[mClusterIterationHint];
+        if (IsServerMask(cluster.mask) && (cluster.clusterId == id))
+        {
+            return std::make_optional(mClusterIterationHint);
+        }
+    }
+
+    // linear search, this may be slow
+    for (unsigned cluster_idx = 0; cluster_idx < clusterCount; cluster_idx++)
+    {
+        const EmberAfCluster & cluster = endpoint->cluster[cluster_idx];
+        if (IsServerMask(cluster.mask) && (cluster.clusterId == id))
+        {
+            return std::make_optional(cluster_idx);
+        }
+    }
+
+    return std::nullopt;
 }
 
 InteractionModel::ClusterEntry CodegenDataModel::NextCluster(const ConcreteClusterPath & before)
@@ -185,16 +212,13 @@ InteractionModel::ClusterEntry CodegenDataModel::NextCluster(const ConcreteClust
     VerifyOrReturnValue(endpoint->clusterCount > 0, InteractionModel::ClusterEntry::Invalid());
     VerifyOrReturnValue(endpoint->cluster != nullptr, InteractionModel::ClusterEntry::Invalid());
 
-    for (uint16_t cluster_idx = 0; cluster_idx < endpoint->clusterCount; cluster_idx++)
+    std::optional<unsigned> cluster_idx = TryFindServerClusterIndex(endpoint, before.mClusterId);
+    if (!cluster_idx.has_value())
     {
-        const EmberAfCluster & cluster = endpoint->cluster[cluster_idx];
-        if (IsServerMask(cluster.mask) && (cluster.clusterId == before.mClusterId))
-        {
-            return FirstServerClusterEntry(before.mEndpointId, endpoint, cluster_idx + 1);
-        }
+        return InteractionModel::ClusterEntry::Invalid();
     }
 
-    return InteractionModel::ClusterEntry::Invalid();
+    return FirstServerClusterEntry(before.mEndpointId, endpoint, *cluster_idx + 1, mClusterIterationHint);
 }
 
 std::optional<InteractionModel::ClusterInfo> CodegenDataModel::GetClusterInfo(const ConcreteClusterPath & path)

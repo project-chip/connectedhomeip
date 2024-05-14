@@ -51,11 +51,14 @@ private:
     // Iteration is often done in a tight loop going through all values.
     // To avoid N^2 iterations, cache a hint of where something is positioned
     // uint16_t mEndpointIterationHint = 0;
-    // uint16_t mClusterIterationHint = 0;
+    unsigned mClusterIterationHint = 0;
     unsigned mAttributeIterationHint = 0;
 
     /// Find the index of the given attribute id
-    std::optional<unsigned> TryFindAttributeIndex(const EmberAfCluster * cluster, chip::AttributeId search_for_id) const;
+    std::optional<unsigned> TryFindAttributeIndex(const EmberAfCluster * cluster, chip::AttributeId id) const;
+
+    /// Find the index of the given cluster id
+    std::optional<unsigned> TryFindServerClusterIndex(const EmberAfEndpointType * endpoint, chip::ClusterId id) const;
 };
 
 } // namespace app
