@@ -45,26 +45,23 @@ kUatNumberInstructionBitMask = uat.kActuateSensorSeconds | uat.kActuateSensorTim
 kUatColorInstructionBitMask = uat.kActuateSensorLightsBlink | uat.kResetButtonLightsBlink | uat.kSetupButtonLightsBlink
 
 
-@staticmethod
-def is_valid_uint32_value(var):
-    return isinstance(var, int) and 0 <= var <= 0xFFFFFFFF
-
-
-@staticmethod
-def is_valid_uint16_value(var):
-    return isinstance(var, int) and 0 <= var <= 0xFFFF
-
-
-@staticmethod
-def is_valid_uint8_value(var):
-    return isinstance(var, int) and 0 <= var <= 0xFF
-
-
 class TC_ICDM_2_1(MatterBaseTest):
 
     #
     # Class Helper functions
     #
+
+    @staticmethod
+    def is_valid_uint32_value(var):
+        return isinstance(var, int) and 0 <= var <= 0xFFFFFFFF
+
+    @staticmethod
+    def is_valid_uint16_value(var):
+        return isinstance(var, int) and 0 <= var <= 0xFFFF
+
+    @staticmethod
+    def is_valid_uint8_value(var):
+        return isinstance(var, int) and 0 <= var <= 0xFF
 
     async def _read_icdm_attribute_expect_success(self, attribute):
         return await self.read_single_attribute_check_success(endpoint=kRootEndpointId, cluster=cluster, attribute=attribute)
@@ -128,7 +125,7 @@ class TC_ICDM_2_1(MatterBaseTest):
             activeModeThreshold = await self._read_icdm_attribute_expect_success(
                 attributes.ActiveModeThreshold)
             # Verify ActiveModeThreshold is not bigger than uint16
-            asserts.assert_true(is_valid_uint16_value(activeModeThreshold),
+            asserts.assert_true(self.is_valid_uint16_value(activeModeThreshold),
                                 "ActiveModeThreshold attribute does not fit in a uint16.")
 
             if featureMap > 0 and features.kLongIdleTimeSupport in features(featureMap):
@@ -145,7 +142,7 @@ class TC_ICDM_2_1(MatterBaseTest):
             activeModeDuration = await self._read_icdm_attribute_expect_success(
                 attributes.ActiveModeDuration)
             # Verify ActiveModeDuration is not bigger than uint32
-            asserts.assert_true(is_valid_uint32_value(activeModeDuration),
+            asserts.assert_true(self.is_valid_uint32_value(activeModeDuration),
                                 "ActiveModeDuration attribute does not fit in a uint32")
         else:
             asserts.assert_true(
@@ -174,7 +171,7 @@ class TC_ICDM_2_1(MatterBaseTest):
                 attributes.ClientsSupportedPerFabric)
 
             # Verify ClientsSupportedPerFabric is not bigger than uint16
-            asserts.assert_true(is_valid_uint16_value(clientsSupportedPerFabric),
+            asserts.assert_true(self.is_valid_uint16_value(clientsSupportedPerFabric),
                                 "ClientsSupportedPerFabric attribute does not fit in a uint16.")
 
             asserts.assert_greater_equal(
@@ -196,7 +193,7 @@ class TC_ICDM_2_1(MatterBaseTest):
             icdCounter = await self._read_icdm_attribute_expect_success(
                 attributes.ICDCounter)
             # Verify ICDCounter is not bigger than uint32
-            asserts.assert_true(is_valid_uint32_value(icdCounter),
+            asserts.assert_true(self.is_valid_uint32_value(icdCounter),
                                 "ActiveModeDuration attribute does not fit in a uint32")
 
         # Validate UserActiveModeTriggerHint
@@ -253,7 +250,7 @@ class TC_ICDM_2_1(MatterBaseTest):
             operatingMode = await self._read_icdm_attribute_expect_success(
                 attributes.OperatingMode)
 
-            asserts.assert_true(is_valid_uint8_value(operatingMode),
+            asserts.assert_true(self.is_valid_uint8_value(operatingMode),
                                 "OperatingMode does not fit in an enum8")
 
             asserts.assert_less(
