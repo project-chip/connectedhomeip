@@ -67,7 +67,7 @@ InteractionModel::ClusterEntry ClusterEntryFrom(EndpointId endpointId, const Emb
 ///
 /// Returns an invalid entry if no more server clusters are found
 InteractionModel::ClusterEntry FirstServerClusterEntry(EndpointId endpointId, const EmberAfEndpointType * endpoint,
-                                                       uint16_t start_index, unsigned & found_index)
+                                                       unsigned start_index, unsigned & found_index)
 {
     for (unsigned cluster_idx = start_index; cluster_idx < endpoint->clusterCount; cluster_idx++)
     {
@@ -160,7 +160,7 @@ EndpointId CodegenDataModel::FirstEndpoint()
 
 std::optional<unsigned> CodegenDataModel::TryFindEndpointIndex(chip::EndpointId id) const
 {
-    const unsigned lastEndpointIndex = emberAfEndpointCount();
+    const uint16_t lastEndpointIndex = emberAfEndpointCount();
 
     if ((mEndpointIterationHint < lastEndpointIndex) && emberAfEndpointIndexIsEnabled(mEndpointIterationHint) &&
         (id == emberAfEndpointFromIndex(mEndpointIterationHint)))
@@ -169,7 +169,7 @@ std::optional<unsigned> CodegenDataModel::TryFindEndpointIndex(chip::EndpointId 
     }
 
     // Linear search, this may be slow
-    for (unsigned endpoint_idx = 0; endpoint_idx < lastEndpointIndex; endpoint_idx++)
+    for (uint16_t endpoint_idx = 0; endpoint_idx < lastEndpointIndex; endpoint_idx++)
     {
         if (!emberAfEndpointIndexIsEnabled(endpoint_idx))
         {
@@ -196,7 +196,7 @@ EndpointId CodegenDataModel::NextEndpoint(EndpointId before)
     }
 
     // find the first enabled index
-    for (unsigned endpoint_idx = *before_idx + 1; endpoint_idx < lastEndpointIndex; endpoint_idx++)
+    for (uint16_t endpoint_idx = static_cast<uint16_t>(*before_idx + 1); endpoint_idx < lastEndpointIndex; endpoint_idx++)
     {
         if (emberAfEndpointIndexIsEnabled(endpoint_idx))
         {
