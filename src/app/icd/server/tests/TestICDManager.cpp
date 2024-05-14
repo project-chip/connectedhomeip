@@ -1064,6 +1064,7 @@ TEST_F(TestICDManager, TestICDStateObserverOnTransitionToIdleModeEqualActiveMode
     // In this scenario, The ICD state machine kicked a OnTransitionToIdle timer with a duration of 0 seconds.
     // The freeRTOS systemlayer timer calls a 0s timer's callback instantly while on posix it take and 1 addition event loop.
     // Thefore, the expect result diverges here based on the systemlayer implementation. Skip this check.
+    // https://github.com/project-chip/connectedhomeip/issues/33441
     // EXPECT_FALSE(mICDStateObserver.mOnTransitionToIdleCalled);
 
     // Expire OnTransitionToIdleMode
