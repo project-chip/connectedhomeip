@@ -55,6 +55,9 @@
 #include <app/MessageDef/InvokeResponseMessage.h>
 
 namespace chip {
+namespace Test {
+class CommandHandlerTestAccess;
+}
 namespace app {
 
 class CommandHandler
@@ -445,6 +448,7 @@ public:
 private:
     friend class TestCommandInteraction;
     friend class CommandHandler::Handle;
+    friend class chip::Test::CommandHandlerTestAccess;
 
     enum class State : uint8_t
     {
