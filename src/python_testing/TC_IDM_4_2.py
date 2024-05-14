@@ -26,7 +26,7 @@ from chip.ChipDeviceCtrl import ChipDeviceController
 from chip.clusters.Attribute import AttributePath, TypedAttributePath, SubscriptionTransaction
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from matter_testing_support import MatterBaseTest, AttributeChangeCallback, async_test_body, default_matter_test_main, wait_for_attribute_report
 from mobly import asserts
 
 '''
@@ -43,30 +43,6 @@ Validates Interaction Data Model (IDM), specifically subscription responses. Som
 Full test plan link for details:
 https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/interactiondatamodel.adoc#tc-idm-4-2-subscription-response-messages-from-dut-test-cases-dut_server
 '''
-
-def WaitForAttributeReport(q: queue.Queue, expected_attribute: ClusterObjects.ClusterAttributeDescriptor):
-    try:
-        path, transaction = q.get(block=True, timeout=10)
-    except queue.Empty:
-        asserts.fail(f"Failed to receive a report for the attribute change for {expected_attribute}")
-
-    asserts.assert_equal(path.AttributeType, expected_attribute, f"Received incorrect attribute report. Expected: {expected_attribute}, received: {path.AttributeType}")
-    try:
-        transaction.GetAttribute(path)
-    except KeyError:
-        asserts.fail("Attribute {expected_attribute} not found in returned report")
-
-class AttributeChangeCallback:
-    def __init__(self, expected_attribute: ClusterObjects.ClusterAttributeDescriptor, output: queue.Queue):
-        self._output = output
-        self._expected_attribute = expected_attribute
-
-    def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
-        if path.AttributeType == self._expected_attribute:
-            q = (path, transaction)
-            logging.info(f'[callback] Got subscription report for {path.AttributeType}')
-            self._output.put(q)
-
 
 class TC_IDM_4_2(MatterBaseTest):
 
@@ -492,7 +468,7 @@ class TC_IDM_4_2(MatterBaseTest):
             [(0, node_label_attr(value=new_node_label_write))]
         )
 
-        WaitForAttributeReport(node_label_queue, node_label_attr)
+        wait_for_attribute_report(node_label_queue, node_label_attr)
 
         # Save the time that the report is received
         t_update_sec = time.time()
