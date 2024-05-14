@@ -19,6 +19,7 @@ mbed-cy8cproto_062_4343w-{lock,light,all-clusters,all-clusters-minimal,pigweed,o
 mw320-all-clusters-app
 nrf-{nrf5340dk,nrf52840dk,nrf52840dongle}-{all-clusters,all-clusters-minimal,lock,light,light-switch,shell,pump,pump-controller,window-covering}[-rpc]
 nrf-native-posix-64-tests
+nuttx-x64-light
 qpg-qpg6105-{lock,light,shell,persistent-storage,light-switch,thermostat}[-updateimage]
 stm32-stm32wb5mm-dk-light
 tizen-arm-{all-clusters,all-clusters-minimal,chip-tool,light,tests}[-no-ble][-no-thread][-no-wifi][-asan][-ubsan][-with-ui]
