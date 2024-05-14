@@ -31,6 +31,27 @@ constexpr char kInteractiveModeStopCommand[]     = "quit()";
 
 namespace {
 
+// File pointer for the log file
+FILE * logFile = nullptr;
+
+void OpenLogFile(const char * filePath)
+{
+    logFile = fopen(filePath, "a");
+    if (logFile == nullptr)
+    {
+        perror("Failed to open log file");
+    }
+}
+
+void CloseLogFile()
+{
+    if (logFile != nullptr)
+    {
+        fclose(logFile);
+        logFile = nullptr;
+    }
+}
+
 void ClearLine()
 {
     printf("\r\x1B[0J"); // Move cursor to the beginning of the line and clear from cursor to end of the screen
@@ -38,9 +59,25 @@ void ClearLine()
 
 void ENFORCE_FORMAT(3, 0) LoggingCallback(const char * module, uint8_t category, const char * msg, va_list args)
 {
-    ClearLine();
-    chip::Logging::Platform::LogV(module, category, msg, args);
-    ClearLine();
+    struct timeval tv;
+
+    // Should not fail per man page of gettimeofday(), but failed to get time is not a fatal error in log. The bad time value will
+    // indicate the error occurred during getting time.
+    gettimeofday(&tv, nullptr);
+
+    FILE * outputStream = (logFile == nullptr) ? stdout : logFile;
+    // Lock outputStream, so a single log line will not be corrupted in case
+    // where multiple threads are using logging subsystem at the same time.
+    flockfile(outputStream);
+
+    fprintf(outputStream, "[%llu.%06llu][%lld:%lld] CHIP:%s: ", static_cast<unsigned long long>(tv.tv_sec),
+            static_cast<unsigned long long>(tv.tv_usec), static_cast<long long>(syscall(SYS_getpid)),
+            static_cast<long long>(syscall(SYS_gettid)), module);
+    vfprintf(outputStream, msg, args);
+    fprintf(outputStream, "\n");
+    fflush(outputStream);
+
+    funlockfile(outputStream);
 }
 
 } // namespace
@@ -90,6 +127,8 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
 {
     read_history(GetHistoryFilePath().c_str());
 
+    OpenLogFile("/tmp/fabric_admin.log");
+
     // Logs needs to be redirected in order to refresh the screen appropriately when something
     // is dumped to stdout while the user is typing a command.
     chip::Logging::SetLogRedirectCallback(LoggingCallback);
@@ -112,6 +151,8 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
     }
 
     SetCommandExitStatus(CHIP_NO_ERROR);
+    CloseLogFile();
+
     return CHIP_NO_ERROR;
 }
 

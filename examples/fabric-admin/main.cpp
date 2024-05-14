@@ -28,6 +28,7 @@
 // ================================================================================
 int main(int argc, char * argv[])
 {
+    const char * args[] = { argv[0], "interactive", "start" };
     ExampleCredentialIssuerCommands credIssuerCommands;
     Commands commands;
 
@@ -36,5 +37,5 @@ int main(int argc, char * argv[])
     registerClusters(commands, &credIssuerCommands);
     registerCommandsSubscriptions(commands, &credIssuerCommands);
 
-    return commands.Run(argc, argv);
+    return commands.Run(3, const_cast<char **>(args));
 }
