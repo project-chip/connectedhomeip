@@ -15246,6 +15246,151 @@ static id _Nullable DecodeAttributeValueForWiFiNetworkManagementCluster(Attribut
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeAttributeValueForThreadBorderRouterManagementCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::ThreadBorderRouterManagement;
+    switch (aAttributeId) {
+    case Attributes::BorderRouterName::Id: {
+        using TypeInfo = Attributes::BorderRouterName::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSString * _Nonnull value;
+        value = AsString(cppValue);
+        if (value == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            *aError = err;
+            return nil;
+        }
+        return value;
+    }
+    case Attributes::BorderAgentId::Id: {
+        using TypeInfo = Attributes::BorderAgentId::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSData * _Nonnull value;
+        value = AsData(cppValue);
+        return value;
+    }
+    case Attributes::ThreadVersion::Id: {
+        using TypeInfo = Attributes::ThreadVersion::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedShort:cppValue];
+        return value;
+    }
+    case Attributes::InterfaceEnabled::Id: {
+        using TypeInfo = Attributes::InterfaceEnabled::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithBool:cppValue];
+        return value;
+    }
+    case Attributes::ThreadNode::Id: {
+        using TypeInfo = Attributes::ThreadNode::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTRThreadBorderRouterManagementClusterThreadNodeStruct * _Nonnull value;
+        value = [MTRThreadBorderRouterManagementClusterThreadNodeStruct new];
+        value.extAddress = [NSNumber numberWithUnsignedLongLong:cppValue.extAddress];
+        value.rloc16 = [NSNumber numberWithUnsignedShort:cppValue.rloc16];
+        { // Scope for our temporary variables
+            auto * array_1 = [NSMutableArray new];
+            auto iter_1 = cppValue.IPv6s.begin();
+            while (iter_1.Next()) {
+                auto & entry_1 = iter_1.GetValue();
+                NSData * newElement_1;
+                newElement_1 = AsData(entry_1);
+                [array_1 addObject:newElement_1];
+            }
+            CHIP_ERROR err = iter_1.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value.iPv6s = array_1;
+        }
+        value.routingRole = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.routingRole)];
+        { // Scope for our temporary variables
+            auto * array_1 = [NSMutableArray new];
+            auto iter_1 = cppValue.routeTable.begin();
+            while (iter_1.Next()) {
+                auto & entry_1 = iter_1.GetValue();
+                MTRThreadBorderRouterManagementClusterRouteTableStruct * newElement_1;
+                newElement_1 = [MTRThreadBorderRouterManagementClusterRouteTableStruct new];
+                newElement_1.routerId = [NSNumber numberWithUnsignedChar:entry_1.routerId];
+                newElement_1.pathCost = [NSNumber numberWithUnsignedChar:entry_1.pathCost];
+                newElement_1.lqiIn = [NSNumber numberWithUnsignedChar:entry_1.LQIIn];
+                newElement_1.lqiOut = [NSNumber numberWithUnsignedChar:entry_1.LQIOut];
+                [array_1 addObject:newElement_1];
+            }
+            CHIP_ERROR err = iter_1.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value.routeTable = array_1;
+        }
+        { // Scope for our temporary variables
+            auto * array_1 = [NSMutableArray new];
+            auto iter_1 = cppValue.childTable.begin();
+            while (iter_1.Next()) {
+                auto & entry_1 = iter_1.GetValue();
+                MTRThreadBorderRouterManagementClusterChildTableStruct * newElement_1;
+                newElement_1 = [MTRThreadBorderRouterManagementClusterChildTableStruct new];
+                newElement_1.rloc16 = [NSNumber numberWithUnsignedShort:entry_1.rloc16];
+                newElement_1.linkQuality = [NSNumber numberWithUnsignedChar:entry_1.linkQuality];
+                newElement_1.routingRole = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.routingRole)];
+                [array_1 addObject:newElement_1];
+            }
+            CHIP_ERROR err = iter_1.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value.childTable = array_1;
+        }
+        return value;
+    }
+    case Attributes::ActiveDatasetTimestamp::Id: {
+        using TypeInfo = Attributes::ActiveDatasetTimestamp::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedLongLong:cppValue.Value()];
+        }
+        return value;
+    }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeAttributeValueForThreadNetworkDirectoryCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::ThreadNetworkDirectory;
@@ -19694,6 +19839,9 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     }
     case Clusters::WiFiNetworkManagement::Id: {
         return DecodeAttributeValueForWiFiNetworkManagementCluster(aPath.mAttributeId, aReader, aError);
+    }
+    case Clusters::ThreadBorderRouterManagement::Id: {
+        return DecodeAttributeValueForThreadBorderRouterManagementCluster(aPath.mAttributeId, aReader, aError);
     }
     case Clusters::ThreadNetworkDirectory::Id: {
         return DecodeAttributeValueForThreadNetworkDirectoryCluster(aPath.mAttributeId, aReader, aError);

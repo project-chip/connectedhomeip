@@ -1,0 +1,139 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2024 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+
+  <bitmap name="Feature" type="bitmap32">
+    <cluster code="0x0452"/>
+    <field name="PANChange" mask="0x1"/>
+  </bitmap>
+
+  <enum name="RoutingRoleEnum" type="enum8">
+    <cluster code="0x0452"/>
+    <item name="Unspecified" value="0x00"/>
+    <item name="Unassigned" value="0x01"/>
+    <item name="SleepyEndDevice" value="0x02"/>
+    <item name="EndDevice" value="0x03"/>
+    <item name="REED" value="0x04"/>
+    <item name="Router" value="0x05"/>
+    <item name="Leader" value="0x06"/>
+  </enum>
+
+  <struct name="NeiborTableStruct">
+    <cluster code="0x0452"/>
+    <item fieldId="0" name="ExtAddress" type="int64u"/>
+    <item fieldId="1" name="Age" type="int32u"/>
+    <item fieldId="2" name="Rloc16" type="int16u"/>
+    <item fieldId="3" name="AverageRssi" type="int8s" isNullable="true"/>
+    <item fieldId="4" name="LastRssi" type="int8s" isNullable="true"/>
+    <item fieldId="5" name="RoutingRole" type="RoutingRoleEnum"/>
+  </struct>
+
+  <struct name="RouteTableStruct">
+    <cluster code="0x0452"/>
+    <item fieldId="0" name="RouterId" type="int8u"/>
+    <item fieldId="1" name="PathCost" type="int8u"/>
+    <item fieldId="2" name="LQIIn" type="int8u"/>
+    <item fieldId="3" name="LQIOut" type="int8u"/>
+  </struct>
+
+  <struct name="ChildTableStruct">
+    <cluster code="0x0452"/>
+    <item fieldId="0" name="Rloc16" type="int16u"/>
+    <item fieldId="1" name="LinkQuality" type="int8u"/>
+    <item fieldId="2" name="RoutingRole" type="RoutingRoleEnum"/>
+  </struct>
+
+  <struct name="ThreadNodeStruct">
+    <cluster code="0x0452"/>
+    <item fieldId="0" name="ExtAddress" type="int64u"/>
+    <item fieldId="1" name="Rloc16" type="int16u"/>
+    <item fieldId="2" name="IPv6s" type="octet_string" array="true"/>
+    <item fieldId="3" name="RoutingRole" type="RoutingRoleEnum"/>
+    <item fieldId="4" name="RouteTable" type="RouteTableStruct" array="true"/>
+    <item fieldId="5" name="ChildTable" type="ChildTableStruct" array="true"/>
+  </struct>
+
+  <cluster>
+    <domain>HRAP</domain>
+    <name>Thread Border Router Management</name>
+    <code>0x0452</code>
+    <define>THREAD_BORDER_ROUTER_MANAGEMENT</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <description>Thread BR management</description>
+
+    <globalAttribute code="0xFFFD" side="either" value="1"/>
+
+    <attribute side="server" code="0x0000" define="BORDER_ROUTER_NAME" type="char_string" length="63">BorderRouterName</attribute>
+
+    <attribute side="server" code="0x0001" define="BORDER_AGENT_ID" type="octet_string" length="16">BorderAgentId</attribute>
+
+    <attribute side="server" code="0x0002" define="THREAD_VERSION" type="int16u">ThreadVersion</attribute>
+
+    <attribute side="server" code="0x0003" define="INTERFACE_ENABLED" type="boolean">InterfaceEnabled</attribute>
+
+    <attribute side="server" code="0x0004" define="THREAD_NODE" type="ThreadNodeStruct">ThreadNode</attribute>
+
+    <attribute side="server" code="0x0005" define="ACTIVE_DATASET_TIMESTAMP" type="int64u" isNullable="true">ActiveDatasetTimestamp</attribute>
+
+
+    <command source="client" code="0x00" name="GetActiveDatasetRequest" response="DatasetResponse" optional="false">
+      <description>On receipt of this command, the Thread Border Router will read the active operational dataset of the Thread network that it is connaected to, and send the DatasetResponse as the response. This command must be sent over a valid CASE session</description>
+      <access op="invoke" privilege="manage"/>
+    </command>
+
+    <command source="client" code="0x01" name="GetPendingDatasetRequest" response="DatasetResponse" optional="false">
+      <description>On receipt of this command, the Thread Border Router will read the pending dataset and send the DatasetResponse as the response. This command must be sent over a valid CASE session</description>
+      <access op="invoke" privilege="manage"/>
+    </command>
+
+    <command source="server" code="0x02" name="DatasetResponse" optional="false">
+      <description>Generated response to GetActiveDatasetRequest or GetPendingDatasetRequest commands</description>
+      <arg name="Dataset" type="octet_string" length="254"/>
+    </command>
+
+    <command source="client" code="0x03" name="SetActiveDatasetRequest" optional="false">
+      <description>On receipt of this command, the Thread Border Router will set or update the active Dataset of the Thread network that the Stub Router is connected to.</description>
+      <arg name="ActiveDataset" type="octet_string" length="254"/>
+      <arg name="Breadcrumb" type="int64u"/>
+      <access op="invoke" privilege="manage"/>
+    </command>
+
+    <command source="client" code="0x04" name="SetPendingDatasetRequest" optional="true">
+      <description>On receipt of this command, the Thread Border Router will set or update the pending Dataset</description>
+      <arg name="PendingDataset" type="octet_string" length="254"/>
+      <access op="invoke" privilege="manage"/>
+    </command>
+
+    <command source="client" code="0x05" name="TopologyRequest" response="TopologyResponse" optional="false">
+      <description>On receipt of this command, the Thread Border Router will response the current topology of the Thread network that it is connected to.</description>
+      <arg name="Count" type="int16u"/>
+      <arg name="StartIndex" type="int16u"/>
+      <arg name="Snapshot" type="int8u"/>
+      <access op="invoke" privilege="administer"/>
+    </command>
+
+    <command source="server" code="0x06" name="TopologyResponse" optional="false">
+      <description>Generated response to TopologyRequest command</description>
+      <arg name="Snapshot" type="int8u"/>
+      <arg name="NumberOfDevices" type="int16u"/>
+      <arg name="ThreadTopology" type="ThreadNodeStruct" array="true"/>
+    </command>
+
+  </cluster>
+</configurator>

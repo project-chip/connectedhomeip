@@ -2429,6 +2429,21 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
+        <name>MA-thread-border-router</name>
+        <domain>HRAP</domain>
+        <typeName>Matter Thread Border Router</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0xFFF10011</deviceId><!-- TODO: ID-TBD -->
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"/>
+            <include cluster="Thread Network Diagnostics" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Thread Border Router Mangement" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+
+    <deviceType>
         <name>MA-all-clusters-app</name>
         <domain>CHIP</domain>
         <typeName>Matter All-clusters-app Server Example</typeName>

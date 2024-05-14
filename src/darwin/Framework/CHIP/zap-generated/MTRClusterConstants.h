@@ -185,6 +185,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeTotalVolatileOrganicCompoundsConcentrationMeasurementID MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x0000042E,
     MTRClusterIDTypeRadonConcentrationMeasurementID MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x0000042F,
     MTRClusterIDTypeWiFiNetworkManagementID MTR_PROVISIONALLY_AVAILABLE = 0x00000451,
+    MTRClusterIDTypeThreadBorderRouterManagementID MTR_PROVISIONALLY_AVAILABLE = 0x00000452,
     MTRClusterIDTypeThreadNetworkDirectoryID MTR_PROVISIONALLY_AVAILABLE = 0x00000453,
     MTRClusterIDTypeWakeOnLANID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000503,
     MTRClusterIDTypeChannelID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000504,
@@ -4372,6 +4373,20 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
+    // Cluster ThreadBorderRouterManagement attributes
+    MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeBorderRouterNameID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeBorderAgentIdID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeThreadVersionID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeInterfaceEnabledID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeThreadNodeID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeActiveDatasetTimestampID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
+    MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterThreadBorderRouterManagementAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
     // Cluster ThreadNetworkDirectory attributes
     MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributePreferredExtendedPanIDID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTRAttributeIDTypeClusterThreadNetworkDirectoryAttributeThreadNetworksID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
@@ -6600,6 +6615,15 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     // Cluster WiFiNetworkManagement commands
     MTRCommandIDTypeClusterWiFiNetworkManagementCommandNetworkPassphraseRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTRCommandIDTypeClusterWiFiNetworkManagementCommandNetworkPassphraseResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+
+    // Cluster ThreadBorderRouterManagement commands
+    MTRCommandIDTypeClusterThreadBorderRouterManagementCommandGetActiveDatasetRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterThreadBorderRouterManagementCommandGetPendingDatasetRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterThreadBorderRouterManagementCommandDatasetResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRCommandIDTypeClusterThreadBorderRouterManagementCommandSetActiveDatasetRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRCommandIDTypeClusterThreadBorderRouterManagementCommandSetPendingDatasetRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTRCommandIDTypeClusterThreadBorderRouterManagementCommandTopologyRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
+    MTRCommandIDTypeClusterThreadBorderRouterManagementCommandTopologyResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
 
     // Cluster ThreadNetworkDirectory commands
     MTRCommandIDTypeClusterThreadNetworkDirectoryCommandAddNetworkID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
