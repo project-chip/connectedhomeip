@@ -154,6 +154,7 @@ MyPasscodeService gMyPasscodeService;
 
 class MyAppInstallationService : public AppInstallationService
 {
+    // TODO: rename the method
     // intentionally ambigiously named, need to find a better method name
     bool HasContentApp(uint16_t vendorId, uint16_t productId) override
     {
