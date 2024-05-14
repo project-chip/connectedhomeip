@@ -722,11 +722,11 @@ static BOOL sNeedsStackShutdown = YES;
  */
 - (NSString *)absolutePathFor:(NSString *)matterRootRelativePath
 {
-    // Find the right absolute path to our file.  PWD should
-    // point to our src/darwin/Framework.
-    NSString * pwd = [[NSProcessInfo processInfo] environment][@"PWD"];
+    // Start with the absolute path to our file, then remove the suffix that
+    // comes after the path to the Matter SDK root.
+    NSString * pathToTest = [NSString stringWithUTF8String:__FILE__];
     NSMutableArray * pathComponents = [[NSMutableArray alloc] init];
-    [pathComponents addObject:[pwd substringToIndex:(pwd.length - @"src/darwin/Framework".length)]];
+    [pathComponents addObject:[pathToTest substringToIndex:(pathToTest.length - @"src/darwin/Framework/CHIPTests/MTROTAProviderTests.m".length)]];
     [pathComponents addObjectsFromArray:[matterRootRelativePath pathComponents]];
     return [NSString pathWithComponents:pathComponents];
 }
