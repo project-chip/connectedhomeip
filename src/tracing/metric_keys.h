@@ -49,7 +49,7 @@ constexpr MetricKey kMetricDeviceCommissioningOperationalSetup = "core_dcm_opera
 constexpr MetricKey kMetricDeviceOperationalDiscovery = "core_dev_operational_discovery";
 
 // Operational Discovery Attempt Count
-constexpr MetricKey kMetricDeviceOperationalDiscoveryAttemptCount = "ore_dev_operational_discovery_attempt_ctr";
+constexpr MetricKey kMetricDeviceOperationalDiscoveryAttemptCount = "core_dev_operational_discovery_attempt_ctr";
 
 // CASE Session
 constexpr MetricKey kMetricDeviceCASESession = "core_dev_case_session";
