@@ -104,12 +104,10 @@ class MyUserPrompter : public UserPrompter
     // tv should override this with a dialog prompt
     inline void PromptForAppInstallOKPermission(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override
     {
-        // mContentApps[5] = ContentAppImpl("Vendor1", vendorId, "exampleid", productId, "Version3", "20202021");
+        ChipLogError(Controller, "Adding Content App");
+        gFactory.AddContentApp((uint16_t)65521, (uint16_t)32768);
 
-        gFactory.AddContentApp(vendorId, productId);
-        // ContentAppFactoryImpl::GetContentAppFactoryImpl().AddContentApp(vendorId, productId);
-
-        ContentAppPlatform::GetInstance().LoadContentAppByClient(vendorId, productId);
+        // ContentAppPlatform::GetInstance().LoadContentAppByClient(vendorId, productId);
 
         return;
     }
@@ -552,19 +550,23 @@ ContentApp * ContentAppFactoryImpl::LoadContentApp(const CatalogVendorApp & vend
 {
     ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl: LoadContentAppByAppId catalogVendorId=%d applicationId=%s ",
                     vendorApp.catalogVendorId, vendorApp.applicationId);
+    int index = 0;
 
-    for (size_t i = 0; i < ArraySize(mContentApps); ++i)
-    {
-        auto & app = mContentApps[i];
+    for (auto & contentApp : mContentApps) {
 
-        ChipLogProgress(DeviceLayer, " Looking next=%s ", app.GetApplicationBasicDelegate()->GetCatalogVendorApp()->applicationId);
-        if (app.GetApplicationBasicDelegate()->GetCatalogVendorApp()->Matches(vendorApp))
+
+        auto app = contentApp.get();
+
+        ChipLogProgress(DeviceLayer, " Looking next=%s ", app->GetApplicationBasicDelegate()->GetCatalogVendorApp()->applicationId);
+        if (app->GetApplicationBasicDelegate()->GetCatalogVendorApp()->Matches(vendorApp))
         {
-            ContentAppPlatform::GetInstance().AddContentApp(&app, &contentAppEndpoint, Span<DataVersion>(gDataVersions[i]),
+            ContentAppPlatform::GetInstance().AddContentApp(app, &contentAppEndpoint, Span<DataVersion>(gDataVersions[index]),
                                                             Span<const EmberAfDeviceType>(gContentAppDeviceType));
-            return &app;
+            return app;
         }
+        index++;
     }
+
     ChipLogProgress(DeviceLayer, "LoadContentAppByAppId NOT FOUND catalogVendorId=%d applicationId=%s ", vendorApp.catalogVendorId,
                     vendorApp.applicationId);
 
@@ -578,7 +580,17 @@ void ContentAppFactoryImpl::AddAdminVendorId(uint16_t vendorId)
 
 void ContentAppFactoryImpl::AddContentApp(uint16_t vendorId, uint16_t productId)
 {
-    // mContentApps[5] = ContentAppImpl("Vendor1", vendorId, "exampleid", productId, "Version3", "20202021");
+    if (vendorId == 1 && productId == 11) {
+        mContentApps.emplace_back(std::make_unique<ContentAppImpl>("Vendor1", vendorId, "exampleid", productId, "Version1", "34567890"));
+    } else if (vendorId == 65521 && productId == 32768) {
+        mContentApps.emplace_back(std::make_unique<ContentAppImpl>("Vendor2", vendorId, "exampleString", productId, "Version2", "20202021"));
+    } else if (vendorId == 9050 && productId == 22) {
+        mContentApps.emplace_back(std::make_unique<ContentAppImpl>("Vendor3", vendorId, "App3", productId, "Version3", "20202021"));
+    } else if (vendorId == 1111 && productId == 22) {
+        mContentApps.emplace_back(std::make_unique<ContentAppImpl>("TestSuiteVendor", vendorId, "applicationId", productId, "v2", "20202021"));
+    } else {
+        mContentApps.emplace_back(std::make_unique<ContentAppImpl>("NewAppVendor", vendorId, "newAppApplicationId", productId, "v2", "20202021"));
+    }
 }
 
 Access::Privilege ContentAppFactoryImpl::GetVendorPrivilege(uint16_t vendorId)
@@ -637,6 +649,10 @@ CHIP_ERROR AppTvInit()
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ContentAppPlatform::GetInstance().SetupAppPlatform();
     ContentAppPlatform::GetInstance().SetContentAppFactory(&gFactory);
+    gFactory.AddContentApp((uint16_t)1, (uint16_t)11);
+    // gFactory.AddContentApp((uint16_t)65521, (uint16_t)32768);
+    // gFactory.AddContentApp((uint16_t)9050, (uint16_t)22);
+    // gFactory.AddContentApp((uint16_t)1111, (uint16_t)22);
     uint16_t value;
     if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(value) != CHIP_NO_ERROR)
     {

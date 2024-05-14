@@ -260,6 +260,7 @@ void CommissionerDiscoveryController::InternalOk()
             mUserPrompter->PromptForAppInstallOKPermission(client->GetVendorId(), client->GetProductId(), client->GetDeviceName());
         }
         ChipLogDetail(Controller, "------Via Shell Enter: controller ux accept|cancel");
+        client->SetUDCClientProcessingState(UDCClientProcessingState::kPromptingUser);
         return;
     }
 
