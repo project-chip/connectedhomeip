@@ -55,7 +55,7 @@ private:
     unsigned mAttributeIterationHint = 0;
 
     /// Find the index of the given attribute id
-    std::optional<unsigned> TryFindAttributeIndex(const EmberAfCluster *cluster, chip::AttributeId search_for_id) const;
+    std::optional<unsigned> TryFindAttributeIndex(const EmberAfCluster * cluster, chip::AttributeId search_for_id) const;
 };
 
 } // namespace app
