@@ -14,16 +14,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "access/SubjectDescriptor.h"
-#include "lib/core/CHIPError.h"
 #include <app/codegen-interaction-model/Model.h>
 
-#include <access/AccessControl.h>
+#include "EmberReadWriteOverride.h"
 
+#include <access/AccessControl.h>
+#include <access/SubjectDescriptor.h>
 #include <app/MessageDef/ReportDataMessage.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <app/util/mock/MockNodeConfig.h>
+#include <lib/core/CHIPError.h>
 
 #include <gtest/gtest.h>
 
@@ -497,6 +498,9 @@ TEST(TestCodegenModelViaMocks, EmberAttributeRead)
     CHIP_ERROR err = builder.Init(&tlvWriter);
     ASSERT_EQ(err, CHIP_NO_ERROR);
     AttributeValueEncoder encoder(builder, kAdminSubjectDescriptor, readRequest.path, dataVersion);
+
+    uint8_t data[] = {0x01, 0x02, 0x03, 0x04};
+    Testing::SetEmberReadOutput(ByteSpan(data));
 
     err = model.ReadAttribute(readRequest, encoder);
     ASSERT_EQ(err, CHIP_NO_ERROR);

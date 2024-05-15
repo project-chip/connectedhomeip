@@ -22,6 +22,8 @@ source_set("ember_extra_files") {
     # data-model access and ember-compatibility (we share the same buffer)
     "${chip_root}/src/app/util/ember-global-attribute-access-interface.cpp",
     "${chip_root}/src/app/util/ember-io-storage.cpp",
+    "EmberReadWriteOverride.cpp",
+    "EmberReadWriteOverride.h",
     "InteractionModelTemporaryOverrides.cpp",
   ]
 
