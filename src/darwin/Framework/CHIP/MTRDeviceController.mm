@@ -19,6 +19,7 @@
 
 #import "MTRDeviceController_Internal.h"
 
+#import "MTRAsyncWorkQueue.h"
 #import "MTRAttestationTrustStoreBridge.h"
 #import "MTRBaseDevice_Internal.h"
 #import "MTRCommissionableBrowser.h"
@@ -144,13 +145,16 @@ using namespace chip::Tracing::DarwinFramework;
     return [MTRDeviceControllerFactory.sharedInstance initializeController:self withParameters:controllerParameters error:error];
 }
 
+constexpr NSUInteger kDefaultConcurrentSubscriptionPoolSize = 3;
+
 - (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
-                          queue:(dispatch_queue_t)queue
-                storageDelegate:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
-           storageDelegateQueue:(dispatch_queue_t _Nullable)storageDelegateQueue
-            otaProviderDelegate:(id<MTROTAProviderDelegate> _Nullable)otaProviderDelegate
-       otaProviderDelegateQueue:(dispatch_queue_t _Nullable)otaProviderDelegateQueue
-               uniqueIdentifier:(NSUUID *)uniqueIdentifier
+                             queue:(dispatch_queue_t)queue
+                   storageDelegate:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
+              storageDelegateQueue:(dispatch_queue_t _Nullable)storageDelegateQueue
+               otaProviderDelegate:(id<MTROTAProviderDelegate> _Nullable)otaProviderDelegate
+          otaProviderDelegateQueue:(dispatch_queue_t _Nullable)otaProviderDelegateQueue
+                  uniqueIdentifier:(NSUUID *)uniqueIdentifier
+    concurrentSubscriptionPoolSize:(NSUInteger)concurrentSubscriptionPoolSize
 {
     if (self = [super init]) {
         // Make sure our storage is all set up to work as early as possible,
@@ -249,6 +253,11 @@ using namespace chip::Tracing::DarwinFramework;
         if ([self checkForInitError:(_operationalCredentialsDelegate != nullptr) logMsg:kErrorOperationalCredentialsInit]) {
             return nil;
         }
+
+        if (!concurrentSubscriptionPoolSize) {
+            concurrentSubscriptionPoolSize = kDefaultConcurrentSubscriptionPoolSize;
+        }
+        _concurrentSubscriptionPool = [[MTRAsyncWorkQueue alloc] initWithContext:self width:concurrentSubscriptionPoolSize];
 
         _storedFabricIndex = chip::kUndefinedFabricIndex;
     }

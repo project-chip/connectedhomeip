@@ -77,6 +77,11 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  */
 - (void)setOTAProviderDelegate:(id<MTROTAProviderDelegate>)otaProviderDelegate queue:(dispatch_queue_t)queue;
 
+/**
+ * Sets the maximum subscriptions allowed for devices on Thread. This defaults to 3.
+ */
+@property (nonatomic, assign) NSUInteger concurrentSubscriptionsAllowedOnThread;
+
 @end
 
 MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
