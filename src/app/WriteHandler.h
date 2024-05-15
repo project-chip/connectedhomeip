@@ -194,7 +194,7 @@ private:
     bool mAttributeWriteSuccessful                = false;
     Optional<AttributeAccessToken> mACLCheckCache = NullOptional;
 
-    // This may be "fake" pointer or a real delegate pointer, depending
+    // This may be a "fake" pointer or a real delegate pointer, depending
     // on CHIP_CONFIG_STATIC_GLOBAL_INTERACTION_MODEL_ENGINE setting.
     //
     // When this is not a real pointer, it checks that the value is always
