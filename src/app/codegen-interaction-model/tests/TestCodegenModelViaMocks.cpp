@@ -627,3 +627,41 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadOctetString)
     ByteSpan expected(reinterpret_cast<const uint8_t *>(data + 1), 4);
     ASSERT_TRUE(actual.data_equal(expected));
 }
+
+TEST(TestCodegenModelViaMocks, EmberAttributeReadLongString)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    chip::app::CodegenDataModel::Model model;
+    ScopedMockAccessControl accessControl;
+
+    TestReadRequest testRequest(
+        kAdminSubjectDescriptor,
+        ConcreteAttributePath(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_TYPE(ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE)));
+
+    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
+
+    // NOTE: This is a pascal string, so actual data is "test"
+    //       the longer encoding is to make it clear we do not encode the overflow
+    char data[] = "\0\0abcdef...this is the alphabet";
+    uint16_t len = 4;
+    memcpy(data, &len, sizeof(uint16_t));
+    chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
+
+    ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_NO_ERROR);
+
+    ASSERT_EQ(testRequest.FinishEncoding(), CHIP_NO_ERROR);
+
+    /////// VALIDATE
+    std::vector<DecodedAttributeData> attribute_data;
+    ASSERT_EQ(testRequest.encodedIBs.Decode(attribute_data), CHIP_NO_ERROR);
+    ASSERT_EQ(attribute_data.size(), 1u);
+
+    const DecodedAttributeData & encodedData = attribute_data[0];
+    ASSERT_EQ(encodedData.attributePath, testRequest.request.path);
+
+    // data element should be a encoded byte string as this is what the attribute type is
+    ASSERT_EQ(encodedData.dataReader.GetType(), TLV::kTLVType_UTF8String);
+    CharSpan actual;
+    ASSERT_EQ(encodedData.dataReader.Get(actual), CHIP_NO_ERROR);
+    ASSERT_TRUE(actual.data_equal("abcd"_span));
+}
