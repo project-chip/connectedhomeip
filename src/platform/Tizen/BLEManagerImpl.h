@@ -33,7 +33,6 @@
 #include <glib.h>
 
 #include <ble/Ble.h>
-#include <ble/CHIPBleServiceData.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/SetupDiscriminator.h>
@@ -150,6 +149,7 @@ private:
     static BLEManagerImpl sInstance;
 
     // ===== Private members reserved for use by this class only.
+
     enum class Flags : uint16_t
     {
         kAsyncInitCompleted       = 0x0001, /**< One-time asynchronous initialization actions have been performed. */
@@ -164,25 +164,24 @@ private:
         kAdvertisingRefreshNeeded = 0x0200, /**< The advertising configuration/state in BLE layer needs to be updated. */
     };
 
-    static CHIP_ERROR _BleInitialize(void * userData);
+    // Minimum and maximum advertising intervals in units of 0.625ms.
+    using AdvertisingIntervals = std::pair<uint16_t, uint16_t>;
+
+    CHIP_ERROR _InitImpl();
+
     void DriveBLEState();
-    static void DriveBLEState(intptr_t arg);
 
     void InitiateScan(BleScanState scanType);
-    static void InitiateScan(intptr_t arg);
 
-    static void AdvertisingStateChangedCb(int result, bt_advertiser_h advertiser, bt_adapter_le_advertising_state_e advState,
-                                          void * userData);
-    static void NotificationStateChangedCb(bool notify, bt_gatt_server_h server, bt_gatt_h gattHandle, void * userData);
-    static void ReadValueRequestedCb(const char * remoteAddress, int requestId, bt_gatt_server_h server, bt_gatt_h gattHandle,
-                                     int offset, void * userData);
-    static void WriteValueRequestedCb(const char * remoteAddress, int requestId, bt_gatt_server_h server, bt_gatt_h gattHandle,
-                                      bool responseNeeded, int offset, const char * value, int len, void * userData);
-    static void IndicationConfirmationCb(int result, const char * remoteAddress, bt_gatt_server_h server, bt_gatt_h characteristic,
-                                         bool completed, void * userData);
-    static void IndicationConfirmationCb(bt_gatt_h characteristic, bt_gatt_server_notification_sent_cb callback,
-                                         const char * device_address, void * userData);
-    static void GattConnectionStateChangedCb(int result, bool connected, const char * remoteAddress, void * userData);
+    void AdapterStateChangedCb(int result, bt_adapter_state_e adapterState);
+    void AdvertisingStateChangedCb(int result, bt_advertiser_h advertiser, bt_adapter_le_advertising_state_e advState);
+    void NotificationStateChangedCb(bool notify, bt_gatt_server_h server, bt_gatt_h gattHandle);
+    void ReadValueRequestedCb(const char * remoteAddress, int requestId, bt_gatt_server_h server, bt_gatt_h gattHandle, int offset);
+    void WriteValueRequestedCb(const char * remoteAddress, int requestId, bt_gatt_server_h server, bt_gatt_h gattHandle,
+                               bool responseNeeded, int offset, const char * value, int len);
+    void IndicationConfirmationCb(int result, const char * remoteAddress, bt_gatt_server_h server, bt_gatt_h characteristic,
+                                  bool completed);
+    void GattConnectionStateChangedCb(int result, bool connected, const char * remoteAddress);
     static void WriteCompletedCb(int result, bt_gatt_h gattHandle, void * userData);
     static void CharacteristicNotificationCb(bt_gatt_h characteristic, char * value, int len, void * userData);
 
@@ -193,8 +192,8 @@ private:
     void HandleC1CharWriteEvent(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
     void HandleRXCharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
     void HandleConnectionEvent(bool connected, const char * remoteAddress);
-    static void HandleConnectionTimeout(System::Layer * layer, void * data);
-    static bool IsDeviceChipPeripheral(BLE_CONNECTION_OBJECT conId);
+    static void HandleConnectionTimeout(System::Layer * layer, void * appState);
+    bool IsDeviceChipPeripheral(BLE_CONNECTION_OBJECT conId);
 
     // ==== BLE Adv & GATT Server.
     void NotifyBLEPeripheralGATTServerRegisterComplete(bool aIsSuccess, void * apAppstate);
@@ -204,9 +203,11 @@ private:
     void NotifyBLESubscribed(bool indicationsEnabled, BLE_CONNECTION_OBJECT conId);
     void NotifyBLEIndicationConfirmation(BLE_CONNECTION_OBJECT conId);
     void NotifyBLEWriteReceived(System::PacketBufferHandle & buf, BLE_CONNECTION_OBJECT conId);
+    static void HandleAdvertisingTimeout(chip::System::Layer *, void * appState);
+    AdvertisingIntervals GetAdvertisingIntervals() const;
 
     // ==== Connection.
-    static CHIP_ERROR ConnectChipThing(const char * userData);
+    CHIP_ERROR ConnectChipThing(const char * address);
     void NotifyBLEConnectionEstablished(BLE_CONNECTION_OBJECT conId, CHIP_ERROR error);
     void NotifyBLEDisconnection(BLE_CONNECTION_OBJECT conId, CHIP_ERROR error);
     void NotifyHandleNewConnection(BLE_CONNECTION_OBJECT conId);

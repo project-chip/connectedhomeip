@@ -117,5 +117,15 @@ struct StatusIB
 
 }; // struct StatusIB
 
+constexpr bool operator==(const StatusIB & one, const StatusIB & two)
+{
+    return one.mStatus == two.mStatus && one.mClusterStatus == two.mClusterStatus;
+}
+
+constexpr bool operator!=(const StatusIB & one, const StatusIB & two)
+{
+    return !(one == two);
+}
+
 }; // namespace app
 }; // namespace chip

@@ -18,6 +18,7 @@
 #include <app/AttributePersistenceProvider.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
+#include <system/SystemClock.h>
 
 namespace chip {
 namespace app {

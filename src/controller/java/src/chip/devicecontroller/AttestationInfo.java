@@ -11,11 +11,22 @@ public final class AttestationInfo {
   private byte[] pai;
   private byte[] certificationDeclaration;
   private byte[] firmwareInfo;
+  private int vendorId;
+  private int productId;
 
   public AttestationInfo(byte[] dac, byte[] pai, byte[] certificationDeclaration) {
     this.dac = dac;
     this.pai = pai;
     this.certificationDeclaration = certificationDeclaration;
+  }
+
+  public AttestationInfo(
+      byte[] dac, byte[] pai, byte[] certificationDeclaration, int vendorId, int productId) {
+    this.dac = dac;
+    this.pai = pai;
+    this.certificationDeclaration = certificationDeclaration;
+    this.vendorId = vendorId;
+    this.productId = productId;
   }
 
   public AttestationInfo(
@@ -35,6 +46,29 @@ public final class AttestationInfo {
     this.pai = pai;
     this.certificationDeclaration = certificationDeclaration;
     this.firmwareInfo = firmwareInfo;
+  }
+
+  public AttestationInfo(
+      byte[] challenge,
+      byte[] nonce,
+      byte[] elements,
+      byte[] elementsSignature,
+      byte[] dac,
+      byte[] pai,
+      byte[] certificationDeclaration,
+      byte[] firmwareInfo,
+      int vendorId,
+      int productId) {
+    this.challenge = challenge;
+    this.nonce = nonce;
+    this.elements = elements;
+    this.elementsSignature = elementsSignature;
+    this.dac = dac;
+    this.pai = pai;
+    this.certificationDeclaration = certificationDeclaration;
+    this.firmwareInfo = firmwareInfo;
+    this.vendorId = vendorId;
+    this.productId = productId;
   }
 
   public byte[] getChallenge() {
@@ -67,5 +101,13 @@ public final class AttestationInfo {
 
   public byte[] getFirmwareInfo() {
     return firmwareInfo;
+  }
+
+  public int getVendorId() {
+    return vendorId;
+  }
+
+  public int getProductId() {
+    return productId;
   }
 }

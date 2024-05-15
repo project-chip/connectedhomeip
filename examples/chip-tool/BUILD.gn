@@ -86,7 +86,7 @@ static_library("chip-tool-utils") {
     "commands/storage/StorageManagementCommand.cpp",
   ]
 
-  deps = []
+  deps = [ "${chip_root}/src/app:events" ]
 
   if (config_use_interactive_mode) {
     sources += [ "commands/interactive/InteractiveCommands.cpp" ]
@@ -110,6 +110,7 @@ static_library("chip-tool-utils") {
     "${chip_root}/src/controller/data_model",
     "${chip_root}/src/credentials:file_attestation_trust_store",
     "${chip_root}/src/lib",
+    "${chip_root}/src/lib/core:types",
     "${chip_root}/src/lib/support/jsontlv",
     "${chip_root}/src/platform",
     "${chip_root}/third_party/inipp",

@@ -43,6 +43,7 @@ MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
 @end
 
 @class MTRDeviceController;
+@class MTRMetrics;
 
 /**
  * The protocol definition for the MTRDeviceControllerDelegate.
@@ -81,6 +82,20 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 - (void)controller:(MTRDeviceController *)controller
     commissioningComplete:(NSError * _Nullable)error
                    nodeID:(NSNumber * _Nullable)nodeID MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+
+/**
+ * Notify the delegate when commissioning is completed.
+ *
+ * Exactly one of error and nodeID will be nil.
+ *
+ * If nodeID is not nil, then it represents the node id the node was assigned, as encoded in its operational certificate.
+ *
+ * The metrics object contains information corresponding to the commissioning session.
+ */
+- (void)controller:(MTRDeviceController *)controller
+    commissioningComplete:(NSError * _Nullable)error
+                   nodeID:(NSNumber * _Nullable)nodeID
+                  metrics:(MTRMetrics *)metrics MTR_NEWLY_AVAILABLE;
 
 /**
  * Notify the delegate when commissioning infomation has been read from the Basic

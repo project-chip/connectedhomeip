@@ -205,6 +205,12 @@ protected:
         return *this;
     }
 
+    InteractionModelReports & SetPeerLIT(bool isPeerLIT)
+    {
+        mIsPeerLIT = isPeerLIT;
+        return *this;
+    }
+
     void ResetOptions()
     {
         mDataVersions      = chip::NullOptional;
@@ -213,6 +219,7 @@ protected:
         mFabricFiltered    = chip::Optional<bool>(true);
         mKeepSubscriptions = chip::NullOptional;
         mAutoResubscribe   = chip::NullOptional;
+        mIsPeerLIT         = false;
         mMinInterval       = 0;
         mMaxInterval       = 0;
     }
@@ -223,6 +230,7 @@ protected:
     chip::Optional<bool> mFabricFiltered;
     chip::Optional<bool> mKeepSubscriptions;
     chip::Optional<bool> mAutoResubscribe;
+    bool mIsPeerLIT;
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
 };
@@ -247,7 +255,9 @@ protected:
                 mCallback, device->GetExchangeManager(), mTimedInteractionTimeoutMs.HasValue(), mSuppressResponse.ValueOr(false));
             VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-            ReturnErrorOnFailure(commandSender->AddRequestDataNoTimedCheck(commandPath, value, mTimedInteractionTimeoutMs));
+            chip::app::CommandSender::AddRequestDataParameters addRequestDataParams(mTimedInteractionTimeoutMs);
+            // Using TestOnly AddRequestData to allow for an intentionally malformed request for server validation testing.
+            ReturnErrorOnFailure(commandSender->TestOnlyAddRequestDataNoTimedCheck(commandPath, value, addRequestDataParams));
             ReturnErrorOnFailure(commandSender->SendCommandRequest(device->GetSecureSession().Value()));
             mCommandSender.push_back(std::move(commandSender));
 
@@ -274,7 +284,9 @@ protected:
         VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
         chip::app::CommandSender commandSender(mCallback, exchangeManager);
-        ReturnErrorOnFailure(commandSender.AddRequestDataNoTimedCheck(commandPath, value, chip::NullOptional));
+        chip::app::CommandSender::AddRequestDataParameters addRequestDataParams;
+        // Using TestOnly AddRequestData to allow for an intentionally malformed request for server validation testing.
+        ReturnErrorOnFailure(commandSender.TestOnlyAddRequestDataNoTimedCheck(commandPath, value, addRequestDataParams));
 
         chip::Transport::OutgoingGroupSession session(groupId, fabricIndex);
         return commandSender.SendGroupCommandRequest(chip::SessionHandle(session));

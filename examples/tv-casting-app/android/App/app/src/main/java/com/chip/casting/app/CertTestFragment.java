@@ -310,6 +310,13 @@ public class CertTestFragment extends Fragment {
         });
 
     runAndWait(
+        "messages_presentMessages",
+        successFailureCallback,
+        () -> {
+          tvCastingApp.messages_presentMessages(kTVApp, "CastingAppTestMessage", callback);
+        });
+
+    runAndWait(
         "mediaPlayback_subscribeToCurrentState",
         successFailureCallback,
         () -> {

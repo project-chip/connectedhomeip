@@ -33,7 +33,6 @@ CHIP_ERROR BDXTransferProxyDiagnosticLog::Init(TransferSession * transferSession
     uint16_t fileDesignatorLength = 0;
     auto fileDesignator           = transferSession->GetFileDesignator(fileDesignatorLength);
 
-    VerifyOrReturnError(fileDesignatorLength > 0, CHIP_ERROR_INVALID_STRING_LENGTH);
     VerifyOrReturnError(fileDesignatorLength <= ArraySize(mFileDesignator), CHIP_ERROR_INVALID_STRING_LENGTH);
 
     mTransfer          = transferSession;

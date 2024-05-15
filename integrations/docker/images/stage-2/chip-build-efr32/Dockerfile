@@ -13,8 +13,8 @@ RUN set -x \
     && : # last line
 
 
-# Clone Gecko SDK 4.4.0 (124fa19)
-RUN wget https://github.com/SiliconLabs/gecko_sdk/releases/download/v4.4.0/gecko-sdk.zip -O /tmp/gecko_sdk.zip \
+# Clone Gecko SDK 4.4.2 (e359ba4)
+RUN wget https://github.com/SiliconLabs/gecko_sdk/releases/download/v4.4.2/gecko-sdk.zip -O /tmp/gecko_sdk.zip \
     && unzip /tmp/gecko_sdk.zip -d /tmp/gecko_sdk \
     && rm -rf /tmp/gecko_sdk.zip \
     # Deleting files that are not needed to save space
@@ -30,8 +30,8 @@ RUN git clone --depth=1 --single-branch --branch=2.8.2 https://github.com/Silico
     rm -rf .git \
     && : # last line
 
-# Clone WiSeConnect SDK 3.1.1 (b2c1cd0)
-RUN git clone --depth=1 --single-branch --branch=v3.1.1 https://github.com/SiliconLabs/wiseconnect.git /tmp/wifi_sdk && \
+# Clone WiSeConnect SDK 3.1.3-matter-hotfix.4 (aa514d4)
+RUN git clone --depth=1 --single-branch --branch=v3.1.3-matter-hotfix.4 https://github.com/SiliconLabs/wiseconnect.git /tmp/wifi_sdk && \
     cd /tmp/wifi_sdk && \
     rm -rf .git \
     && : # last line

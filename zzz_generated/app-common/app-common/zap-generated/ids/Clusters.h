@@ -220,6 +220,9 @@ static constexpr ClusterId Id = 0x00000080;
 namespace ValveConfigurationAndControl {
 static constexpr ClusterId Id = 0x00000081;
 } // namespace ValveConfigurationAndControl
+namespace ElectricalPowerMeasurement {
+static constexpr ClusterId Id = 0x00000090;
+} // namespace ElectricalPowerMeasurement
 namespace ElectricalEnergyMeasurement {
 static constexpr ClusterId Id = 0x00000091;
 } // namespace ElectricalEnergyMeasurement
@@ -238,6 +241,9 @@ static constexpr ClusterId Id = 0x00000099;
 namespace EnergyPreference {
 static constexpr ClusterId Id = 0x0000009B;
 } // namespace EnergyPreference
+namespace PowerTopology {
+static constexpr ClusterId Id = 0x0000009C;
+} // namespace PowerTopology
 namespace EnergyEvseMode {
 static constexpr ClusterId Id = 0x0000009D;
 } // namespace EnergyEvseMode

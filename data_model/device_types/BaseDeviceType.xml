@@ -57,7 +57,6 @@ Davis, CA 95616, USA
 -->
 <deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="" name="Base Device Type" revision="2">
   <revisionHistory>
-    <revision revision="0" summary="Represents device definitions prior to device type revision numbers"/>
     <revision revision="1" summary="Initial release of this document"/>
     <revision revision="2" summary="Duplicate condition replaces Multiple condition"/>
   </revisionHistory>
@@ -65,6 +64,13 @@ Davis, CA 95616, USA
   <clusters>
     <cluster id="0x001D" name="Descriptor" side="server">
       <mandatoryConform/>
+      <features>
+        <feature code="" name="TagList">
+          <mandatoryConform>
+            <attribute name="Duplicate"/>
+          </mandatoryConform>
+        </feature>
+      </features>
     </cluster>
     <cluster id="0x001E" name="Binding" side="server">
       <mandatoryConform>

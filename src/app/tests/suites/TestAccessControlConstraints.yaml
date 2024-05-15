@@ -28,6 +28,14 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "Read the commissioner node ID from the alpha fabric"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: commissionerNodeIdAlpha
+
     - label: "Constraint error: PASE reserved for future (TC-ACL-2.4 step 29)"
       cluster: "Access Control"
       command: "writeAttribute"
@@ -35,14 +43,14 @@ tests:
       arguments:
           value: [
                   {
-                      FabricIndex: 1,
+                      FabricIndex: 0,
                       Privilege: 5, # Administer
                       AuthMode: 2, # CASE
-                      Subjects: [112233],
+                      Subjects: [commissionerNodeIdAlpha],
                       Targets: null,
                   },
                   {
-                      FabricIndex: 1,
+                      FabricIndex: 0,
                       Privilege: 3,
                       AuthMode: 1, # PASE
                       Subjects: [],
@@ -61,14 +69,14 @@ tests:
       arguments:
           value: [
                   {
-                      FabricIndex: 1,
+                      FabricIndex: 0,
                       Privilege: 5, # Administer
                       AuthMode: 2, # CASE
-                      Subjects: [112233],
+                      Subjects: [commissionerNodeIdAlpha],
                       Targets: null,
                   },
                   {
-                      FabricIndex: 1,
+                      FabricIndex: 0,
                       Privilege: 5, # Administer
                       AuthMode: 3, # Group
                       Subjects: [],
@@ -89,14 +97,14 @@ tests:
       arguments:
           value: [
                   {
-                      FabricIndex: 1,
+                      FabricIndex: 0,
                       Privilege: 5, # Administer
                       AuthMode: 2, # CASE
-                      Subjects: [112233],
+                      Subjects: [commissionerNodeIdAlpha],
                       Targets: null,
                   },
                   {
-                      FabricIndex: 1,
+                      FabricIndex: 0,
                       Privilege: 6,
                       AuthMode: 2,
                       Subjects: null,
@@ -113,16 +121,16 @@ tests:
       arguments:
           value: [
                   {
-                      FabricIndex: 1,
+                      FabricIndex: 0,
                       Privilege: 5, # Administer
                       AuthMode: 2, # CASE
-                      Subjects: [112233],
+                      Subjects: [commissionerNodeIdAlpha],
                       Targets: null,
                   },
                   {
-                      FabricIndex: 1,
+                      FabricIndex: 0,
                       Privilege: 3,
-                      AuthMode: 4, # INVALID
+                      AuthMode: AccessControlEntryAuthModeEnum.UnknownEnumValue,
                       Subjects: [],
                       Targets: null,
                   },
@@ -137,14 +145,14 @@ tests:
       arguments:
           value: [
                   {
-                      FabricIndex: 1,
+                      FabricIndex: 0,
                       Privilege: 5, # Administer
                       AuthMode: 2, # CASE
-                      Subjects: [112233],
+                      Subjects: [commissionerNodeIdAlpha],
                       Targets: null,
                   },
                   {
-                      FabricIndex: 1,
+                      FabricIndex: 0,
                       Privilege: 3,
                       AuthMode: 2,
                       Subjects: [0],
@@ -161,14 +169,14 @@ tests:
       arguments:
           value: [
                   {
-                      FabricIndex: 1,
+                      FabricIndex: 0,
                       Privilege: 5, # Administer
                       AuthMode: 2, # CASE
-                      Subjects: [112233],
+                      Subjects: [commissionerNodeIdAlpha],
                       Targets: null,
                   },
                   {
-                      FabricIndex: 1,
+                      FabricIndex: 0,
                       Privilege: 3,
                       AuthMode: 2,
                       Subjects: null,
@@ -189,14 +197,14 @@ tests:
       arguments:
           value: [
                   {
-                      FabricIndex: 1,
+                      FabricIndex: 0,
                       Privilege: 5, # Administer
                       AuthMode: 2, # CASE
-                      Subjects: [112233],
+                      Subjects: [commissionerNodeIdAlpha],
                       Targets: null,
                   },
                   {
-                      FabricIndex: 1,
+                      FabricIndex: 0,
                       Privilege: 3,
                       AuthMode: 2,
                       Subjects: null,
@@ -215,15 +223,15 @@ tests:
       arguments:
           value: [
                   {
-                      FabricIndex: 1,
+                      FabricIndex: 0,
                       Privilege: 5, # Administer
                       AuthMode: 2, # CASE
-                      Subjects: [112233],
+                      Subjects: [commissionerNodeIdAlpha],
                       Targets: null,
                   },
                   {
-                      FabricIndex: 1,
-                      Privilege: 6, # INVALID
+                      FabricIndex: 0,
+                      Privilege: AccessControlEntryPrivilegeEnum.UnknownEnumValue,
                       AuthMode: 2, # CASE
                       Subjects: null,
                       Targets: null,
@@ -241,14 +249,14 @@ tests:
       arguments:
           value: [
                   {
-                      FabricIndex: 1,
+                      FabricIndex: 0,
                       Privilege: 5, # Administer
                       AuthMode: 2, # CASE
-                      Subjects: [112233],
+                      Subjects: [commissionerNodeIdAlpha],
                       Targets: null,
                   },
                   {
-                      FabricIndex: 1,
+                      FabricIndex: 0,
                       Privilege: 3, # Operate
                       AuthMode: 2, # CASE
                       Subjects: ["18446744073709551615"],
@@ -269,14 +277,14 @@ tests:
       arguments:
           value: [
                   {
-                      FabricIndex: 1,
+                      FabricIndex: 0,
                       Privilege: 5, # Administer
                       AuthMode: 2, # CASE
-                      Subjects: [112233],
+                      Subjects: [commissionerNodeIdAlpha],
                       Targets: null,
                   },
                   {
-                      FabricIndex: 1,
+                      FabricIndex: 0,
                       Privilege: 3, # Operate
                       AuthMode: 2, # CASE
                       Subjects: ["18446744060824649728"],
@@ -295,14 +303,14 @@ tests:
       arguments:
           value: [
                   {
-                      FabricIndex: 1,
+                      FabricIndex: 0,
                       Privilege: 5, # Administer
                       AuthMode: 2, # CASE
-                      Subjects: [112233],
+                      Subjects: [commissionerNodeIdAlpha],
                       Targets: null,
                   },
                   {
-                      FabricIndex: 1,
+                      FabricIndex: 0,
                       Privilege: 3, # Operate
                       AuthMode: 2, # CASE
                       Subjects: ["18446744073709486080"],

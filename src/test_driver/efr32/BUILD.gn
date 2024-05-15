@@ -80,10 +80,12 @@ silabs_executable("efr32_device_tests") {
   deps = [
     ":nl_test_service.nanopb_rpc",
     ":sdk",
+    "$dir_pw_unit_test:rpc_service",
     "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
     "${chip_root}/examples/common/pigweed:system_rpc_server",
     "${chip_root}/src:tests",
     "${chip_root}/src/lib",
+    "${chip_root}/src/lib/support:pw_tests_wrapper",
     "${chip_root}/src/lib/support:testing_nlunit",
     "${examples_common_plat_dir}/pw_sys_io:pw_sys_io_silabs",
     "${nlunit_test_root}:nlunit-test",

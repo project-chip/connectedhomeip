@@ -21,7 +21,7 @@
 #import "MCCluster_Internal.h"
 #import "MCDeviceTypeStruct.h"
 
-#import "MCClusterObjects.h"
+#import "zap-generated/MCClusterObjects.h"
 
 #import "clusters/Clusters.h"
 #import "core/Endpoint.h"

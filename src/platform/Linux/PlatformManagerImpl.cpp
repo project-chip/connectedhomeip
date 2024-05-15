@@ -108,13 +108,13 @@ gboolean WiFiIPChangeListener(GIOChannel * ch, GIOCondition /* condition */, voi
                             continue;
                         }
 
-                        if (ConnectivityManagerImpl::GetWiFiIfName() == nullptr)
+                        if (ConnectivityMgrImpl().GetWiFiIfName() == nullptr)
                         {
                             ChipLogDetail(DeviceLayer, "No wifi interface name. Ignoring IP update event.");
                             continue;
                         }
 
-                        if (strcmp(name, ConnectivityManagerImpl::GetWiFiIfName()) != 0)
+                        if (strcmp(name, ConnectivityMgrImpl().GetWiFiIfName()) != 0)
                         {
                             continue;
                         }
@@ -123,10 +123,9 @@ gboolean WiFiIPChangeListener(GIOChannel * ch, GIOCondition /* condition */, voi
                         inet_ntop(AF_INET, RTA_DATA(routeInfo), ipStrBuf, sizeof(ipStrBuf));
                         ChipLogDetail(DeviceLayer, "Got IP address on interface: %s IP: %s", name, ipStrBuf);
 
-                        ChipDeviceEvent event;
-                        event.Type                            = DeviceEventType::kInternetConnectivityChange;
-                        event.InternetConnectivityChange.IPv4 = kConnectivity_Established;
-                        event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
+                        ChipDeviceEvent event{ .Type                       = DeviceEventType::kInternetConnectivityChange,
+                                               .InternetConnectivityChange = { .IPv4 = kConnectivity_Established,
+                                                                               .IPv6 = kConnectivity_NoChange } };
 
                         if (!chip::Inet::IPAddress::FromString(ipStrBuf, event.InternetConnectivityChange.ipAddress))
                         {

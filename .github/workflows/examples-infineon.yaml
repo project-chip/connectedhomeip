@@ -16,6 +16,8 @@ name: Build example - Infineon
 
 on:
     push:
+        branches-ignore:
+            - 'dependabot/**'
     pull_request:
     merge_group:
     workflow_dispatch:
@@ -35,7 +37,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-infineon:32
+            image: ghcr.io/project-chip/chip-build-infineon:47
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:

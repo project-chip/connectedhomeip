@@ -36,7 +36,7 @@
 
 - (instancetype _Nonnull)initWithCppAttribute:(void * _Nonnull)cppAttribute;
 
-- (id _Nullable)getObjTypeFromCpp:(std::any)cppValue;
+- (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR * _Nonnull)aError;
 
 @end
 
@@ -44,10 +44,10 @@ template <typename TypeInfo>
 class MCAttributeTemplate {
 public:
     MCAttributeTemplate(void * _Nonnull cppAttribute,
-        std::function<id(std::any)> getObjTypeFromCppFn)
+        std::function<id(std::any, CHIP_ERROR * _Nonnull)> getObjCTypeFromCppFn)
     {
         mCppAttribute = cppAttribute;
-        mGetObjTypeFromCppFn = getObjTypeFromCppFn;
+        mGetObjCTypeFromCppFn = getObjCTypeFromCppFn;
     }
 
     void read(void * _Nullable context, std::function<void(void * _Nullable, id _Nullable, id _Nullable, NSError * _Nullable)> completion)
@@ -58,18 +58,23 @@ public:
 
             attribute->Read(
                 context,
-                [clientQueue, completion, this](void * context, chip::Optional<typename TypeInfo::DecodableArgType> before, typename TypeInfo::DecodableArgType after) {
+                [clientQueue, completion, this](void * context, chip::Optional<typename TypeInfo::DecodableType> before, typename TypeInfo::DecodableArgType after) {
                     NSNumber *objCBefore = nil, *objCAfter = nil;
+                    CHIP_ERROR errBefore = CHIP_NO_ERROR, errAfter = CHIP_NO_ERROR;
                     if (before.HasValue()) {
                         ChipLogProgress(AppServer, "<MCAttributeTemplate> converting 'before' value from Cpp to ObjC");
-                        std::any anyBefore = std::any(std::make_shared<typename TypeInfo::DecodableArgType>(before.Value()));
-                        objCBefore = mGetObjTypeFromCppFn(anyBefore);
+                        std::any anyBefore = std::any(std::make_shared<typename TypeInfo::DecodableType>(before.Value()));
+                        objCBefore = mGetObjCTypeFromCppFn(anyBefore, &errBefore);
                     }
                     ChipLogProgress(AppServer, "<MCAttributeTemplate> converting 'after' value from Cpp to ObjC");
-                    std::any anyAfter = std::any(std::make_shared<typename TypeInfo::DecodableArgType>(after));
-                    objCAfter = mGetObjTypeFromCppFn(anyAfter);
+                    std::any anyAfter = std::any(std::make_shared<typename TypeInfo::DecodableType>(after));
+                    objCAfter = mGetObjCTypeFromCppFn(anyAfter, &errAfter);
                     dispatch_async(clientQueue, ^{
-                        completion(context, objCBefore, objCAfter, nil);
+                        if (errBefore == CHIP_NO_ERROR && errAfter == CHIP_NO_ERROR) {
+                            completion(context, objCBefore, objCAfter, nil);
+                        } else {
+                            completion(context, nil, nil, [MCErrorUtils NSErrorFromChipError:(errAfter != CHIP_NO_ERROR ? errAfter : errBefore)]);
+                        }
                     });
                 },
                 [clientQueue, completion](void * context, CHIP_ERROR error) {
@@ -89,18 +94,23 @@ public:
 
             attribute->Subscribe(
                 context,
-                [clientQueue, completion, this](void * context, chip::Optional<typename TypeInfo::DecodableArgType> before, typename TypeInfo::DecodableArgType after) {
+                [clientQueue, completion, this](void * context, chip::Optional<typename TypeInfo::DecodableType> before, typename TypeInfo::DecodableArgType after) {
                     NSNumber *objCBefore = nil, *objCAfter = nil;
+                    CHIP_ERROR errBefore = CHIP_NO_ERROR, errAfter = CHIP_NO_ERROR;
                     if (before.HasValue()) {
                         ChipLogProgress(AppServer, "<MCAttributeTemplate> converting 'before' value from Cpp to ObjC");
-                        std::any anyBefore = std::any(std::make_shared<typename TypeInfo::DecodableArgType>(before.Value()));
-                        objCBefore = mGetObjTypeFromCppFn(anyBefore);
+                        std::any anyBefore = std::any(std::make_shared<typename TypeInfo::DecodableType>(before.Value()));
+                        objCBefore = mGetObjCTypeFromCppFn(anyBefore, &errBefore);
                     }
                     ChipLogProgress(AppServer, "<MCAttributeTemplate> converting 'after' value from Cpp to ObjC");
-                    std::any anyAfter = std::any(std::make_shared<typename TypeInfo::DecodableArgType>(after));
-                    objCAfter = mGetObjTypeFromCppFn(anyAfter);
+                    std::any anyAfter = std::any(std::make_shared<typename TypeInfo::DecodableType>(after));
+                    objCAfter = mGetObjCTypeFromCppFn(anyAfter, &errAfter);
                     dispatch_async(clientQueue, ^{
-                        completion(context, objCBefore, objCAfter, nil);
+                        if (errBefore == CHIP_NO_ERROR && errAfter == CHIP_NO_ERROR) {
+                            completion(context, objCBefore, objCAfter, nil);
+                        } else {
+                            completion(context, nil, nil, [MCErrorUtils NSErrorFromChipError:(errAfter != CHIP_NO_ERROR ? errAfter : errBefore)]);
+                        }
                     });
                 },
                 [clientQueue, completion](void * context, CHIP_ERROR error) {
@@ -115,6 +125,6 @@ public:
 
 private:
     void * _Nonnull mCppAttribute;
-    std::function<id(std::any)> mGetObjTypeFromCppFn;
+    std::function<id(std::any, CHIP_ERROR * _Nonnull)> mGetObjCTypeFromCppFn;
 };
 #endif /* MCAttribute_Internal_h */

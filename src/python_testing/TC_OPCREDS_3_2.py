@@ -15,65 +15,47 @@
 #    limitations under the License.
 #
 
-import logging
-import random
-
 import chip.clusters as Clusters
-from chip.utils import CommissioningBuildingBlocks
-from chip import ChipDeviceCtrl
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
-from mobly import asserts
+from matter_testing_support import MatterBaseTest, TestStep, async_test_body
+from test_plan_support import *
+
+
+def verify_fabric(controller: str) -> str:
+    return (f"- Verify there is one entry returned. Verify FabricIndex matches `fabric_index_{controller}`.\n"
+            f"- Verify the RootPublicKey matches the public key for rcac_{controller}.\n"
+            f"- Verify the VendorID matches the vendor ID for {controller}.\n"
+            f"- Verify the FabricID matches the fabricID for {controller}")
 
 
 class TC_OPCREDS_3_2(MatterBaseTest):
-    # All global functions
+    def desc_TC_OPCREDS_3_2(self):
+        return " Attribute-CurrentFabricIndex validation [DUTServer]"
+
+    def steps_TC_OPCREDS_3_2(self):
+        return [TestStep(0, commission_if_required('CR1'), is_commissioning=True),
+                TestStep(1, f"{commission_from_existing('CR1', 'CR2')}\n. Save the FabricIndex from the NOCResponse as `fabric_index_CR2`.",
+                         verify_commissioning_successful()),
+                TestStep(2, f"{commission_from_existing('CR1', 'CR3')}\n. Save the FabricIndex from the NOCResponse as `fabric_index_CR3`.",
+                         verify_commissioning_successful()),
+                TestStep(3, f"CR2 {read_attribute('CurrentFabricIndex')}",
+                         "Verify the returned value is `fabric_index_CR2`"),
+                TestStep(4, f"CR3 {read_attribute('CurrentFabricIndex')}",
+                         "Verify the returned value is `fabric_index_CR3`"),
+                TestStep(
+                    5, f"CR2 {read_attribute('Fabrics')} using a fabric-filtered read", verify_fabric('CR2')),
+                TestStep(
+                    6, f"CR3 {read_attribute('Fabrics')} using a fabric-filtered read", verify_fabric('CR3')),
+                TestStep(7, remove_fabric(
+                    'fabric_index_CR2', 'CR1'), verify_success()),
+                TestStep(8, remove_fabric(
+                    'fabric_index_CR3', 'CR1'), verify_success()),
+                ]
+
     @async_test_body
     async def test_TC_OPCREDS_3_2(self):
+        # TODO: implement
+        pass
 
-        
-
-        # It is not necessary implement factory reset to DUT
-        self.print_step(1, "Step 1: Factory Reset DUT")
-
-        dev_ctrl = self.default_controller
-
-        new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
-        th1_new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=2222)
-        th1_nodeid = self.default_controller.nodeId+1
-        th1_dut_nodeid = self.dut_node_id+1
-
-        th1_new_admin_ctrl = th1_new_fabric_admin.NewController(nodeId=th1_nodeid)
-        resp = await CommissioningBuildingBlocks.AddNOCForNewFabricFromExisting(
-            commissionerDevCtrl=dev_ctrl, newFabricDevCtrl=th1_new_admin_ctrl,
-            existingNodeId=self.dut_node_id, newNodeId=th1_dut_nodeid
-        )
-
-        self.print_step(2, "Commission DUT to TH1's Fabric")
-
-        # CommissioningBuildingBlocks just return a boolean. I need to get the NOC Response
-        # so I just I will add a new step for now update the fabric label just to get the NOC response.
-        opcreds = Clusters.OperationalCredentials
-
-
-        nocResponse = await self.read_single_attribute_check_success(
-            dev_ctrl=th1_new_admin_ctrl, node_id=th1_dut_nodeid, cluster=opcreds, attribute=opcreds.Attributes.NOCs, fabric_filtered=False)
-        )
-
-        print("Here is NOCResponse below")
-        print(nocResponse)
-        print("Here is NOCResponse")
-
-        cmd = opcreds.Commands.UpdateFabricLabel(label="Label1")
-        resp = await self.send_single_cmd(cmd=cmd, dev_ctrl=th1_new_admin_ctrl, node_id=th1_dut_nodeid)
-        self.print_step(3, "When DUT sends NOC response save FabricIndex as FabricIndex_TH1")
-        FabricIndex_TH1 = resp.fabricIndex
-
-        self.print_step(4, "Save TH1's Fabric ID as FabricID1")
-        TH1_CurrentFabricIndex = await self.read_single_attribute_check_success(
-            cluster=opcreds, attribute=opcreds.Attributes.CurrentFabricIndex, dev_ctrl=th1_new_admin_ctrl, node_id=th1_dut_nodeid)
-
-        self.print_step(5, "From TH1 read the CurrentFabricIndex")
-        print(TH1_CurrentFabricIndex)
 
 if __name__ == "__main__":
     default_matter_test_main()

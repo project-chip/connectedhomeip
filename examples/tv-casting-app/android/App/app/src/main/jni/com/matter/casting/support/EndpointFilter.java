@@ -26,6 +26,8 @@ public class EndpointFilter {
   public Integer vendorId;
   public List<DeviceTypeStruct> requiredDeviceTypes;
 
+  public EndpointFilter() {}
+
   public EndpointFilter(
       Integer productId, Integer vendorId, List<DeviceTypeStruct> requiredDeviceTypes) {
     this.productId = productId;

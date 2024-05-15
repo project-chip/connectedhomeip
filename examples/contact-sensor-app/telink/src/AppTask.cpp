@@ -17,6 +17,7 @@
  */
 
 #include "AppTask.h"
+#include "LEDManager.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 
@@ -25,25 +26,14 @@
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
-namespace {
-#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-LEDWidget sContactSensorLED;
-#endif
-} // namespace
-
 AppTask AppTask::sAppTask;
 
 CHIP_ERROR AppTask::Init(void)
 {
-#if APP_USE_EXAMPLE_START_BUTTON
     SetExampleButtonCallbacks(ContactActionEventHandler);
-#endif
     InitCommonParts();
 
-#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-    sContactSensorLED.Init(GPIO_DT_SPEC_GET(DT_ALIAS(led2), gpios));
-    sContactSensorLED.Set(ContactSensorMgr().IsContactClosed());
-#endif
+    LedManager::getInstance().setLed(LedManager::EAppLed_App0, ContactSensorMgr().IsContactClosed());
 
     UpdateDeviceState();
 
@@ -60,16 +50,12 @@ void AppTask::OnStateChanged(ContactSensorManager::State aState)
     if (ContactSensorManager::State::kContactClosed == aState)
     {
         LOG_INF("Contact state changed to CLOSED");
-#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-        sContactSensorLED.Set(true);
-#endif
+        LedManager::getInstance().setLed(LedManager::EAppLed_App0, true);
     }
     else if (ContactSensorManager::State::kContactOpened == aState)
     {
         LOG_INF("Contact state changed to OPEN");
-#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-        sContactSensorLED.Set(false);
-#endif
+        LedManager::getInstance().setLed(LedManager::EAppLed_App0, false);
     }
 
     if (sAppTask.IsSyncClusterToButtonAction())
@@ -95,10 +81,10 @@ void AppTask::UpdateClusterStateInternal(intptr_t arg)
     ChipLogProgress(NotSpecified, "StateValue::Set : %d", newValue);
 
     // write the new boolean state value
-    EmberAfStatus status = app::Clusters::BooleanState::Attributes::StateValue::Set(1, newValue);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    Protocols::InteractionModel::Status status = app::Clusters::BooleanState::Attributes::StateValue::Set(1, newValue);
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: updating boolean status value %x", status);
+        ChipLogError(NotSpecified, "ERR: updating boolean status value %x", to_underlying(status));
     }
 }
 
@@ -155,8 +141,15 @@ void AppTask::UpdateDeviceStateInternal(intptr_t arg)
     /* get boolean state attribute value */
     (void) app::Clusters::BooleanState::Attributes::StateValue::Get(1, &stateValueAttrValue);
 
-    ChipLogProgress(NotSpecified, "StateValue::Get : %d", stateValueAttrValue);
+    LedManager::getInstance().setLed(LedManager::EAppLed_App0, stateValueAttrValue);
+}
+
+void AppTask::LinkLeds(LedManager & ledManager)
+{
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-    sContactSensorLED.Set(stateValueAttrValue);
-#endif
+    ledManager.linkLed(LedManager::EAppLed_Status, 0);
+    ledManager.linkLed(LedManager::EAppLed_App0, 1);
+#else
+    ledManager.linkLed(LedManager::EAppLed_App0, 0);
+#endif // CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
 }

@@ -23,7 +23,7 @@
 #include "MinimalMdnsServer.h"
 #include "ServiceNaming.h"
 
-#include <app/icd/ICDConfig.h>
+#include <app/icd/server/ICDServerConfig.h>
 #include <crypto/RandUtils.h>
 #include <lib/dnssd/Advertiser_ImplMinimalMdnsAllocator.h>
 #include <lib/dnssd/minimal_mdns/AddressPolicy.h>
@@ -232,13 +232,9 @@ private:
         {
             auto mrp = optionalMrp.Value();
 
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-            // An ICD operating as a LIT should not advertise its slow polling interval.
-            // When the ICD doesn't support the LIT feature, it doesn't set nor advertise the GetICDOperatingAsLIT entry.
-            // Therefore when GetICDOperatingAsLIT has no value or a value of 0, we advertise the slow polling interval
-            // otherwise we don't include the SII key in the advertisement.
-            if (!params.GetICDOperatingAsLIT().ValueOr(false))
-#endif
+            // An ICD operating as a LIT shall not advertise its slow polling interval.
+            // Don't include the SII key in the advertisement when operating as so.
+            if (params.GetICDModeToAdvertise() != ICDModeAdvertise::kLIT)
             {
                 if (mrp.mIdleRetransTimeout > kMaxRetryInterval)
                 {
@@ -290,11 +286,11 @@ private:
                                 CHIP_ERROR_INVALID_STRING_LENGTH);
             txtFields[numTxtFields++] = storage.tcpSupportedBuf;
         }
-        if (params.GetICDOperatingAsLIT().HasValue())
+        if (params.GetICDModeToAdvertise() != ICDModeAdvertise::kNone)
         {
             size_t writtenCharactersNumber =
                 static_cast<size_t>(snprintf(storage.operatingICDAsLITBuf, sizeof(storage.operatingICDAsLITBuf), "ICD=%d",
-                                             params.GetICDOperatingAsLIT().Value()));
+                                             (params.GetICDModeToAdvertise() == ICDModeAdvertise::kLIT)));
             VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber < sizeof(storage.operatingICDAsLITBuf)),
                                 CHIP_ERROR_INVALID_STRING_LENGTH);
             txtFields[numTxtFields++] = storage.operatingICDAsLITBuf;
@@ -652,9 +648,9 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    if (!allocator->AddResponder<SrvResponder>(SrvResourceRecord(instanceName, hostName, params.GetPort()))
-             .SetReportAdditional(hostName)
-             .IsValid())
+    SrvResourceRecord srvRecord(instanceName, hostName, params.GetPort());
+    srvRecord.SetCacheFlush(true);
+    if (!allocator->AddResponder<SrvResponder>(srvRecord).SetReportAdditional(hostName).IsValid())
     {
         ChipLogError(Discovery, "Failed to add SRV record mDNS responder");
         return CHIP_ERROR_NO_MEMORY;
@@ -763,9 +759,9 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
         }
     }
 
-    if (!allocator->AddResponder<TxtResponder>(TxtResourceRecord(instanceName, GetCommissioningTxtEntries(params)))
-             .SetReportAdditional(hostName)
-             .IsValid())
+    TxtResourceRecord txtRecord(instanceName, GetCommissioningTxtEntries(params));
+    txtRecord.SetCacheFlush(true);
+    if (!allocator->AddResponder<TxtResponder>(txtRecord).SetReportAdditional(hostName).IsValid())
     {
         ChipLogError(Discovery, "Failed to add TXT record mDNS responder");
         return CHIP_ERROR_NO_MEMORY;
@@ -979,10 +975,14 @@ void AdvertiserMinMdns::AdvertiseRecords(BroadcastAdvertiseType type)
 AdvertiserMinMdns gAdvertiser;
 } // namespace
 
-ServiceAdvertiser & ServiceAdvertiser::Instance()
+#if CHIP_DNSSD_DEFAULT_MINIMAL
+
+ServiceAdvertiser & GetDefaultAdvertiser()
 {
     return gAdvertiser;
 }
+
+#endif // CHIP_DNSSD_DEFAULT_MINIMAL
 
 } // namespace Dnssd
 } // namespace chip

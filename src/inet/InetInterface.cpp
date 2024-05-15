@@ -23,10 +23,6 @@
  *
  */
 
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
-
 #include <inet/InetInterface.h>
 
 #include <inet/IPPrefix.h>
@@ -113,6 +109,23 @@ bool InterfaceIterator::Next()
     return false;
 }
 
+CHIP_ERROR InterfaceIterator::GetInterfaceName(char * nameBuf, size_t nameBufSize)
+{
+    VerifyOrReturnError(HasCurrent(), CHIP_ERROR_INCORRECT_STATE);
+    return InterfaceId(1).GetInterfaceName(nameBuf, nameBufSize);
+}
+
+InterfaceId InterfaceIterator::GetInterfaceId()
+{
+    // only 1 interface is supported
+    return HasCurrent() ? InterfaceId(1) : InterfaceId::Null();
+}
+
+bool InterfaceIterator::IsUp()
+{
+    return HasCurrent() && (otThreadGetDeviceRole(Inet::globalOtInstance) != OT_DEVICE_ROLE_DISABLED);
+}
+
 InterfaceAddressIterator::InterfaceAddressIterator()
 {
     mNetifAddrList = nullptr;
@@ -128,6 +141,8 @@ bool InterfaceAddressIterator::Next()
 {
     if (mNetifAddrList == nullptr)
     {
+        if (Inet::globalOtInstance == nullptr)
+            return false;
         mNetifAddrList = otIp6GetUnicastAddresses(Inet::globalOtInstance);
         mCurAddr       = mNetifAddrList;
     }
@@ -153,6 +168,22 @@ uint8_t InterfaceAddressIterator::GetPrefixLength()
 {
     // Only 64 bits prefix are supported
     return 64;
+}
+
+bool InterfaceAddressIterator::IsUp()
+{
+    return HasCurrent() && (otThreadGetDeviceRole(Inet::globalOtInstance) != OT_DEVICE_ROLE_DISABLED);
+}
+
+InterfaceId InterfaceAddressIterator::GetInterfaceId()
+{
+    // only 1 interface is supported
+    return HasCurrent() ? InterfaceId(1) : InterfaceId::Null();
+}
+
+bool InterfaceAddressIterator::HasBroadcastAddress()
+{
+    return HasCurrent() && (otIp6GetMulticastAddresses(Inet::globalOtInstance) != nullptr);
 }
 
 #endif
@@ -469,12 +500,12 @@ int GetIOCTLSocket()
     {
         int s;
 #ifdef SOCK_CLOEXEC
-        s = socket(AF_INET, SOCK_STREAM, SOCK_CLOEXEC);
+        s = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0);
         if (s < 0)
 #endif
         {
             s = socket(AF_INET, SOCK_STREAM, 0);
-            fcntl(s, O_CLOEXEC);
+            fcntl(s, F_SETFD, O_CLOEXEC);
         }
 
         if (!__sync_bool_compare_and_swap(&sIOCTLSocket, -1, s))

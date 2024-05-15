@@ -19,6 +19,7 @@
 
 #include <controller/CurrentFabricRemover.h>
 #include <jni.h>
+#include <lib/support/JniReferences.h>
 
 namespace chip {
 namespace Controller {
@@ -34,12 +35,11 @@ public:
 
 private:
     AndroidCurrentFabricRemover(DeviceController * controller, jobject javaCallbackObject);
-    ~AndroidCurrentFabricRemover();
 
     static void OnRemoveCurrentFabric(void * context, NodeId remoteNodeId, CHIP_ERROR status);
     chip::Callback::Callback<OnCurrentFabricRemove> mOnRemoveCurrentFabricCallback;
 
-    jobject mJavaCallback;
+    chip::JniGlobalReference mJavaCallback;
     jmethodID mOnSuccessMethod = nullptr;
     jmethodID mOnErrorMethod   = nullptr;
 };

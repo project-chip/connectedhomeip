@@ -40,6 +40,10 @@
 #include <zephyr/settings/settings.h>
 #endif
 
+#ifdef CONFIG_NET_L2_OPENTHREAD
+#include <platform/ThreadStackManager.h>
+#endif
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -179,6 +183,11 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
     ChipLogProgress(DeviceLayer, "Performing factory reset");
 
+// Lock the Thread stack to avoid unwanted interaction with settings NVS during factory reset.
+#ifdef CONFIG_NET_L2_OPENTHREAD
+    ThreadStackMgr().LockThreadStack();
+#endif
+
 #ifdef CONFIG_CHIP_FACTORY_RESET_ERASE_NVS
     void * storage = nullptr;
     int status     = settings_storage_get(&storage);
@@ -209,8 +218,8 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    const net_if * const iface = InetUtils::GetInterface();
-    VerifyOrReturnError(iface != nullptr && iface->if_dev != nullptr, CHIP_ERROR_INTERNAL);
+    const net_if * const iface = InetUtils::GetWiFiInterface();
+    VerifyOrReturnError(iface != nullptr, CHIP_ERROR_INTERNAL);
 
     const auto linkAddrStruct = iface->if_dev->link_addr;
     memcpy(buf, linkAddrStruct.addr, linkAddrStruct.len);

@@ -647,28 +647,26 @@
  * CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN
  *
  * The minimum interval (in units of 0.625ms) at which the device will send BLE advertisements while
- * in the extended advertising mode. The minimum interval shall not be smaller than the default value
- * and should not be equal to the CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX.
+ * in the extended advertising mode. The minimum interval shall not be smaller than the default value.
  *
- * Defaults to 1920 (1200 ms).
+ * Defaults to 2056 (1285 ms).
  */
-#define CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN 1920
+#define CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN 2056
 
 /**
  * CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX
  *
  * The maximum interval (in units of 0.625ms) at which the device will send BLE advertisements while
- * in the extended advertising mode. The maximum interval should be greater and not equal to the
- * CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN.
+ * in the extended advertising mode. The maximum interval should be greater.
  *
- * Defaults to 1936 (1210 ms).
+ * Defaults to 2056 (1285 ms).
  */
 #ifndef CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX
-#define CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX 1936
+#define CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX 2056
 #endif
 
-static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN < CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX,
-              "Max Extended Advertising Interval cannot be smaller or equal to the Min Extended Advertising Interval");
+static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN <= CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX,
+              "Max Extended Advertising Interval cannot be larger to the Min Extended Advertising Interval");
 
 #endif
 
@@ -715,8 +713,19 @@ static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN < CHIP_DEVICE_
  * Time in seconds that a factory new device will advertise commissionable node discovery.
  */
 #ifndef CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS
+#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+/**
+ * By default, the extended announcement, when enabled, starts its extended advertising 15 mins
+ * after the standard slow advertisement. Time at which the default discovery time would close the
+ * commissioning window and stop the BLE.
+ * Therefore, when CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING is enabled bump the default Discovery timeout
+ * to the maximum allowed by the spec. 48h.
+ */
+#define CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS (60 * 60 * 48)
+#else
 #define CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS (15 * 60)
-#endif
+#endif // CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+#endif // CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS
 
 /**
  * CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES
@@ -738,6 +747,19 @@ static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN < CHIP_DEVICE_
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 #define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS
+ *
+ * The number of target apps that a client can include in a UDC message.
+ *
+ * Depends upon CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY set to 1
+ *
+ * For Video Players, this value should be set to 10
+ */
+#ifndef CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS
+#define CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS 3
 #endif
 
 /**
@@ -952,6 +974,17 @@ static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN < CHIP_DEVICE_
  */
 #ifndef CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER
 #define CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK
+ *
+ * Indicate if the matter device thread stack is implemented using the ot-br-posix dbus API
+ * Rather than the standard openthread stack api
+ *
+ */
+#ifndef CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK
+#define CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK 0
 #endif
 /**
  * CHIP_DEVICE_CONFIG_THREAD_TASK_NAME

@@ -35,6 +35,7 @@
 
 #include "FreeRtosHooks.h"
 #include "app_config.h"
+#include "pin_mux.h"
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -42,6 +43,10 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::Logging;
 
 #include <AppTask.h>
+
+#if PW_RPC_ENABLED
+#include "Rpc.h"
+#endif
 
 typedef void (*InitFunc)(void);
 extern InitFunc __init_array_start;
@@ -68,6 +73,17 @@ extern "C" void main_task(void const * argument)
 
     /* Used for HW initializations */
     otSysInit(0, NULL);
+
+#if PW_RPC_ENABLED
+    /* set clock */
+    CLOCK_SetIpSrc(kCLOCK_Lpuart1, kCLOCK_IpSrcFro192M);
+    /* enable clock */
+    CLOCK_EnableClock(kCLOCK_Lpuart1);
+
+    BOARD_InitPinLPUART1_TX();
+    BOARD_InitPinLPUART1_RX();
+    chip::rpc::Init();
+#endif
 
     K32W_LOG("Welcome to NXP Lighting Demo App");
 

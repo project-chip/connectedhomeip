@@ -14,14 +14,15 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/k32w0_sdk.gni")
 import("//build_overrides/mbedtls.gni")
+import("//build_overrides/nxp_sdk.gni")
 import("//build_overrides/openthread.gni")
 
 import("${build_root}/config/compiler/compiler.gni")
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/lib/core/core.gni")
-import("${chip_root}/src/platform/nxp/k32w/k32w0/args.gni")
+import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
 
 declare_args() {
   # Location of the k32w0 SDK.
@@ -38,7 +39,6 @@ declare_args() {
   board = "k32w061dk6"
   chip_with_ntag = 1
   chip_with_high_power = 0
-  chip_with_factory_data = 0
   use_fro_32k = 0
   use_custom_factory_provider = 0
   chip_crypto_flavor = "NXP-Ultrafast-P256"
@@ -48,16 +48,6 @@ declare_args() {
   chip_with_pdm_encryption = 1
   ota_custom_entry_address = "0x000C1000"
   use_antenna_diversity = 0
-
-  #ICD Matter Configuration flags
-
-  chip_ot_idle_interval_ms = 2000  # 2s Idle Intervals
-  chip_ot_active_interval_ms = 500  # 500ms Active Intervals
-
-  nxp_idle_mode_interval_s = 600  # 10min Idle Mode Interval
-  nxp_active_mode_interval_ms = 10000  # 10s Active Mode Interval
-  nxp_active_mode_threshold_ms = 1000  # 1s Active Mode Threshold
-  nxp_icd_supported_clients_per_fabric = 2  # 2 registration slots per fabric
 
   chip_with_ota_encryption = 0
   chip_with_ota_key = "1234567890ABCDEFA1B2C3D4E5F6F1B4"
@@ -98,6 +88,16 @@ template("k32w0_sdk") {
   assert(
       use_custom_factory_provider == 0 || chip_with_factory_data == 1,
       "Please set chip_with_factory_data=1 if using custom factory provider.")
+
+  assert(
+      chip_enable_ota_factory_data_processor == 0 ||
+          chip_enable_ota_firmware_processor == 1,
+      "Please set chip_enable_ota_firmware_processor=1 if using default factory data processor.")
+
+  assert(
+      chip_enable_ota_factory_data_processor == 0 ||
+          chip_with_factory_data == 1,
+      "Please set chip_with_factory_data=1 if using default factory data processor.")
 
   assert(
       chip_enable_ota_factory_data_processor == 0 ||
@@ -163,6 +163,7 @@ template("k32w0_sdk") {
   print("OTA default factory data processor: ",
         chip_enable_ota_factory_data_processor)
   print("PDM Encryption: ", chip_with_pdm_encryption)
+  print("Antenna Diversity enabled: ", use_antenna_diversity)
 
   if (chip_with_low_power == 1 && chip_logging == true) {
     print(
@@ -367,14 +368,19 @@ template("k32w0_sdk") {
       "gResetSystemReset_d=1",
 
       # TODO: move these platform specific defines to args.gni
-      "NXP_OT_IDLE_INTERVAL=${chip_ot_idle_interval_ms}",
-      "NXP_OT_ACTIVE_INTERVAL=${chip_ot_active_interval_ms}",
+      "NXP_OT_IDLE_INTERVAL=${nxp_ot_idle_interval_ms}",
+      "NXP_OT_ACTIVE_INTERVAL=${nxp_ot_active_interval_ms}",
       "NXP_ICD_ENABLED=1",
       "NXP_ACTIVE_MODE_THRESHOLD=${nxp_active_mode_threshold_ms}",
-      "NXP_ACTIVE_MODE_INTERVAL=${nxp_active_mode_interval_ms}",
-      "NXP_IDLE_MODE_INTERVAL=${nxp_idle_mode_interval_s}",
+      "NXP_ACTIVE_MODE_DURATION_MS=${nxp_active_mode_duration_ms}",
+      "NXP_IDLE_MODE_DURATION_SEC=${nxp_idle_mode_duration_s}",
       "NXP_ICD_SUPPORTED_CLIENTS_PER_FABRIC=${nxp_icd_supported_clients_per_fabric}",
     ]
+
+    if (use_antenna_diversity == 1) {
+      print("Check ADO/ADE pin configuration when using Antenna Diversity.")
+      defines += [ "ANTENNA_DIVERSITY_ENABLE" ]
+    }
 
     # If OTA default processors are enabled, then OTA custom entry structure
     # will be saved in external flash: gOTACustomOtaEntryMemory=OTACustomStorage_ExtFlash (1)
@@ -406,6 +412,12 @@ template("k32w0_sdk") {
         "gClkUseFro32K=0",
         "gPWR_CpuClk_48MHz=1",
       ]
+    }
+
+    if (chip_with_pdm_encryption == 1) {
+      defines += [ "PDM_ENCRYPTION=1" ]
+    } else {
+      defines += [ "PDM_ENCRYPTION=0" ]
     }
 
     if (chip_with_pdm_encryption == 1) {

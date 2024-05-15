@@ -43,9 +43,6 @@ config("includes") {
     include_dirs += [ "${chip_external_platform_include_dir}" ]
   }
 
-  # TODO: generated file dependency should be a lib NOT an include
-  include_dirs += [ "${chip_root}/zzz_generated/app-common" ]
-
   defines = [ "CHIP_HAVE_CONFIG_H=1" ]
 
   # Make __FILE__ and related macros relative to chip_root
@@ -100,7 +97,9 @@ if (chip_build_tests) {
         "${chip_root}/src/credentials/tests",
         "${chip_root}/src/lib/format/tests",
         "${chip_root}/src/lib/support/tests",
+        "${chip_root}/src/lib/support/tests:tests_nltest",
         "${chip_root}/src/protocols/secure_channel/tests",
+        "${chip_root}/src/protocols/secure_channel/tests:tests_nltest",
         "${chip_root}/src/system/tests",
         "${chip_root}/src/transport/tests",
       ]
@@ -144,11 +143,7 @@ if (chip_build_tests) {
     }
 
     if (chip_monolithic_tests) {
-      # TODO [PW_MIGRATION] Remove this if after migartion to PW_TEST is completed for all platforms
-      # TODO [PW_MIGRATION] There will be a list of already migrated platforms
-      if (false) {
-        deps += [ "${chip_root}/src/lib/support:pw_tests_wrapper" ]
-      }
+      deps += [ "${chip_root}/src/lib/support:pw_tests_wrapper" ]
       build_monolithic_library = true
       output_name = "libCHIP_tests"
       output_dir = "${root_out_dir}/lib"

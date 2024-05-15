@@ -22,7 +22,7 @@
 #include <app/clusters/microwave-oven-control-server/microwave-oven-control-server.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
-#include <app/util/af-enums.h>
+
 #include <app/util/config.h>
 #include <cstring>
 #include <protocols/interaction_model/StatusCode.h>
@@ -230,7 +230,7 @@ private:
     static constexpr uint8_t kMaxPowerNum            = 90u;
     static constexpr uint8_t kPowerStepNum           = 10u;
     static constexpr uint32_t kMaxCookTimeSec        = 86400u;
-    static constexpr uint8_t kDefaultPowerSettingNum = 100u;
+    static constexpr uint8_t kDefaultPowerSettingNum = kMaxPowerNum;
 
     // define the mode value
     static constexpr uint8_t kModeNormal  = 0u;

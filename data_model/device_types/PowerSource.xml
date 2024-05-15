@@ -55,21 +55,14 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0011" name="Power Source" revision="2">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0011" name="Power Source" revision="1">
   <classification class="utility" scope="node"/>
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
-    <revision revision="2" summary="Added optional measurement clusters for energy and power"/>
   </revisionHistory>
   <clusters>
     <cluster id="0x002F" name="Power Source" side="server">
       <mandatoryConform/>
-    </cluster>
-    <cluster id="0x0090" name="Electrical Power Measurement" side="server">
-      <optionalConform/>
-    </cluster>
-    <cluster id="0x0091" name="Electrical Energy Measurement" side="server">
-      <optionalConform/>
     </cluster>
   </clusters>
 </deviceType>

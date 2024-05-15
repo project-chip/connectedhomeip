@@ -35,7 +35,8 @@
 #include <avahi-common/error.h>
 #include <avahi-common/watch.h>
 
-#include "lib/dnssd/platform/Dnssd.h"
+#include <lib/dnssd/platform/Dnssd.h>
+#include <system/SystemLayer.h>
 
 struct AvahiWatch
 {

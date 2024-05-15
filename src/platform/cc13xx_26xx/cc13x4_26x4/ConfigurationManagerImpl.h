@@ -30,7 +30,7 @@ namespace chip {
 namespace DeviceLayer {
 
 /**
- * Concrete implementation of the ConfigurationManager singleton object for the CC13X2_26X2 platform.
+ * Concrete implementation of the ConfigurationManager singleton object for the CC13X4_26X4 platform.
  */
 class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::CC13XX_26XXConfig>
 {

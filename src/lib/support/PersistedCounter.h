@@ -32,6 +32,7 @@
 #include <lib/support/CHIPCounter.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
+#include <limits>
 
 namespace chip {
 
@@ -92,29 +93,62 @@ public:
         ReturnErrorOnFailure(ReadStartValue(startValue));
 
 #if CHIP_CONFIG_PERSISTED_COUNTER_DEBUG_LOGGING
-        // Compiler should optimize these branches.
-        if (is_same_v<decltype(T), uint64_t>)
+        if constexpr (std::is_same_v<decltype(startValue), uint64_t>)
         {
             ChipLogDetail(EventLogging, "PersistedCounter::Init() aEpoch 0x" ChipLogFormatX64 " startValue 0x" ChipLogFormatX64,
                           ChipLogValueX64(aEpoch), ChipLogValueX64(startValue));
         }
-        else if (is_same_v<decltype(T), uint32_t>)
+        else if (std::is_same_v<decltype(startValue), uint32_t>)
         {
             ChipLogDetail(EventLogging, "PersistedCounter::Init() aEpoch 0x%" PRIx32 " startValue 0x%" PRIx32,
                           static_cast<uint32_t>(aEpoch), static_cast<uint32_t>(startValue));
         }
 #endif
 
-        ReturnErrorOnFailure(PersistNextEpochStart(startValue + aEpoch));
+        ReturnErrorOnFailure(PersistNextEpochStart(static_cast<T>(startValue + aEpoch)));
 
         // This will set the starting value, after which we're ready.
         return MonotonicallyIncreasingCounter<T>::Init(startValue);
     }
 
     /**
-     *  @brief
-     *  Increment the counter and write to persisted storage if we've completed
-     *  the current epoch.
+     *  @brief Increment the counter by N and write to persisted storage if we've completed the current epoch.
+     *
+     *  @param value value of N
+     *
+     *  @return Any error returned by a write to persisted storage.
+     */
+    CHIP_ERROR AdvanceBy(T value) override
+    {
+        VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(mKey.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+
+        // If value is 0, we do not need to do anything
+        VerifyOrReturnError(value > 0, CHIP_NO_ERROR);
+
+        // We should update the persisted epoch value if :
+        // 1- Sum of the current counter and value is greater or equal to the mNextEpoch.
+        //    This is the standard operating case.
+        // 2- Increasing the current counter by value would cause a roll over. This would cause the current value to be < to the
+        //    mNextEpoch so we force an update.
+        bool shouldDoEpochUpdate = ((MonotonicallyIncreasingCounter<T>::GetValue() + value) >= mNextEpoch) ||
+            (MonotonicallyIncreasingCounter<T>::GetValue() > std::numeric_limits<T>::max() - value);
+
+        ReturnErrorOnFailure(MonotonicallyIncreasingCounter<T>::AdvanceBy(value));
+
+        if (shouldDoEpochUpdate)
+        {
+            // Since AdvanceBy allows the counter to be increased by an arbitrary value, it is possible that the new counter value
+            // is greater than mNextEpoch + mEpoch. As such, we want the next Epoch value to be calculated from the new current
+            // value.
+            PersistAndVerifyNextEpochStart(MonotonicallyIncreasingCounter<T>::GetValue());
+        }
+
+        return CHIP_NO_ERROR;
+    }
+
+    /**
+     *  @brief Increment the counter and write to persisted storage if we've completed the current epoch.
      *
      *  @return Any error returned by a write to persisted storage.
      */
@@ -127,18 +161,32 @@ public:
 
         if (MonotonicallyIncreasingCounter<T>::GetValue() >= mNextEpoch)
         {
-            // Value advanced past the previously persisted "start point".
-            // Ensure that a new starting point is persisted.
-            ReturnErrorOnFailure(PersistNextEpochStart(mNextEpoch + mEpoch));
-
-            // Advancing the epoch should have ensured that the current value
-            // is valid
-            VerifyOrReturnError(MonotonicallyIncreasingCounter<T>::GetValue() < mNextEpoch, CHIP_ERROR_INTERNAL);
+            ReturnErrorOnFailure(PersistAndVerifyNextEpochStart(mNextEpoch));
         }
+
         return CHIP_NO_ERROR;
     }
 
 private:
+    CHIP_ERROR PersistAndVerifyNextEpochStart(T refEpoch)
+    {
+        // Value advanced past the previously persisted "start point".
+        // Ensure that a new starting point is persisted.
+        ReturnErrorOnFailure(PersistNextEpochStart(static_cast<T>(refEpoch + mEpoch)));
+
+        // Advancing the epoch should have ensured that the current value is valid
+        VerifyOrReturnError(static_cast<T>(MonotonicallyIncreasingCounter<T>::GetValue() + mEpoch) == mNextEpoch,
+                            CHIP_ERROR_INTERNAL);
+
+        // Previous check did not take into consideration that the counter value can be equal to the max counter value or
+        // rollover.
+        // TODO(#33175): PersistedCounter allows rollover so this check is incorrect. We need a Counter class that adequatly
+        // manages rollover behavior for counters that cannot rollover.
+        // VerifyOrReturnError(MonotonicallyIncreasingCounter<T>::GetValue() < mNextEpoch, CHIP_ERROR_INTERNAL);
+
+        return CHIP_NO_ERROR;
+    }
+
     /**
      *  @brief
      *    Write out the counter value to persistent storage.
@@ -147,12 +195,12 @@ private:
      *
      *  @return Any error returned by a write to persistent storage.
      */
-    CHIP_ERROR PersistNextEpochStart(T aStartValue)
+    CHIP_ERROR
+    PersistNextEpochStart(T aStartValue)
     {
         mNextEpoch = aStartValue;
 #if CHIP_CONFIG_PERSISTED_COUNTER_DEBUG_LOGGING
-        // Compiler should optimize these branches.
-        if (is_same_v<decltype(T), uint64_t>)
+        if constexpr (std::is_same_v<decltype(aStartValue), uint64_t>)
         {
             ChipLogDetail(EventLogging, "PersistedCounter::WriteStartValue() aStartValue 0x" ChipLogFormatX64,
                           ChipLogValueX64(aStartValue));
@@ -178,7 +226,7 @@ private:
      */
     CHIP_ERROR ReadStartValue(T & aStartValue)
     {
-        T valueLE     = 0;
+        T valueLE     = GetInitialCounterValue();
         uint16_t size = sizeof(valueLE);
 
         VerifyOrReturnError(mKey.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
@@ -206,11 +254,27 @@ private:
         aStartValue = Encoding::LittleEndian::HostSwap<T>(valueLE);
 
 #if CHIP_CONFIG_PERSISTED_COUNTER_DEBUG_LOGGING
-        ChipLogDetail(EventLogging, "PersistedCounter::ReadStartValue() aStartValue 0x%x", aStartValue);
+        if constexpr (std::is_same_v<decltype(aStartValue), uint64_t>)
+        {
+            ChipLogDetail(EventLogging, "PersistedCounter::ReadStartValue() aStartValue 0x" ChipLogFormatX64,
+                          ChipLogValueX64(aStartValue));
+        }
+        else
+        {
+            ChipLogDetail(EventLogging, "PersistedCounter::ReadStartValue() aStartValue 0x%" PRIx32,
+                          static_cast<uint32_t>(aStartValue));
+        }
 #endif
 
         return CHIP_NO_ERROR;
     }
+
+    /**
+     * @brief Get the Initial Counter Value
+     *
+     * By default, persisted counters start off at 0.
+     */
+    virtual inline T GetInitialCounterValue() { return 0; }
 
     PersistentStorageDelegate * mStorage = nullptr; // start value is stored here
     StorageKeyName mKey;

@@ -148,6 +148,17 @@ _ALIASES = {
         }
     },
 
+    'Bdx': {
+        'commands': {
+            'Download': {
+                'arguments': {
+                    'LogType': 'log-type',
+                },
+                'has_endpoint': False,
+            }
+        }
+    },
+
     'DelayCommands': {
         'alias': 'delay',
         'commands': {

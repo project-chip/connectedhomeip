@@ -37,7 +37,7 @@ data secure by applying hardware write protection.
             -   [Appearance field description](#appearance-field-description)
     -   [Enabling factory data support](#enabling-factory-data-support)
     -   [Generating factory data](#generating-factory-data)
-        -   [Creating the factory data JSON file with the first script](#creating-the-factory-data-json-file-with-the-first-script)
+        -   [Creating the factory data JSON and HEX files with the first script](#creating-the-factory-data-json-and-hex-files-with-the-first-script)
         -   [How to set user data](#how-to-set-user-data)
             -   [How to handle user data](#how-to-handle-user-data)
         -   [Verifying using the JSON Schema tool](#verifying-using-the-json-schema-tool)
@@ -51,6 +51,7 @@ data secure by applying hardware write protection.
     -   [Building an example with factory data](#building-an-example-with-factory-data)
         -   [Providing factory data parameters as a build argument list](#providing-factory-data-parameters-as-a-build-argument-list)
         -   [Setting factory data parameters using interactive Kconfig interfaces](#setting-factory-data-parameters-using-interactive-kconfig-interfaces)
+        -   [Default Kconfig values and developing aspects](#default-kconfig-values-and-developing-aspects)
     -   [Programming factory data](#programming-factory-data)
     -   [Using own factory data implementation](#using-own-factory-data-implementation)
 
@@ -217,14 +218,19 @@ file written in another way. To make sure that the JSON file is correct and the
 device is able to read out parameters,
 [verify the file using the JSON schema tool](#verifying-using-the-json-schema-tool).
 
-### Creating the factory data JSON file with the first script
+You can also use only the first script to generate both JSON and HEX files, by
+providing optional `offset` and `size` arguments, which results in invoking the
+script internally. Such option is the recommended one, but invoking two scripts
+one by one is also supported to provide backward compatibility.
+
+### Creating the factory data JSON and HEX files with the first script
 
 A Matter device needs a proper factory data partition stored in the flash memory
 to read out all required parameters during startup. To simplify the factory data
 generation, you can use the
 [generate_nrfconnect_chip_factory_data.py](../../scripts/tools/nrfconnect/generate_nrfconnect_chip_factory_data.py)
 Python script to provide all required parameters and generate a human-readable
-JSON file.
+JSON file and save it to a HEX file.
 
 To use this script, complete the following steps:
 
@@ -244,10 +250,10 @@ To use this script, complete the following steps:
     --sn --vendor_id, --product_id, --vendor_name, --product_name, --date, --hw_ver, --hw_ver_str, --spake2_it, --spake2_salt, --discriminator
     ```
 
-    b. Add output file path:
+    b. Add output path to store .json file, e.g. my_dir/output:
 
     ```
-    -o <path_to_output_json_file>
+    -o <path_to_output_file>
     ```
 
     c. Generate SPAKE2 verifier using one of the following methods:
@@ -272,6 +278,7 @@ To use this script, complete the following steps:
 
         ```
         --chip_cert_path <path to chip-cert executable>
+        --gen_certs
         ```
 
     > **Note:** To generate new certificates, you need the `chip-cert`
@@ -293,7 +300,7 @@ To use this script, complete the following steps:
         --rd_uid <rotating device ID unique ID>
         ```
 
-    - Generate a new ID and provide it ():
+    - (optional) Generate a new ID and provide it:
 
         ```
         --generate_rd_uid
@@ -328,6 +335,45 @@ To use this script, complete the following steps:
     --product_color <color>
     ```
 
+    j. (optional) Generate Certification Declaration for testing purposes
+
+    ```
+    --chip_cert_path <path to chip-cert executable>
+    --gen_cd
+    ```
+
+    > **Note:** To generate new Certification Declaration, you need the
+    > `chip-cert` executable. See the note at the end of this section to learn
+    > how to get it.
+
+    k. (optional) Partition offset that is an address in device's NVM memory,
+    where factory data will be stored.
+
+    ```
+    --offset <offset>
+    ```
+
+    > **Note:** To generate a HEX file with factory data, you need to provide
+    > both `offset` and `size` optional arguments. As a result,
+    > `factory_data.hex` and `factory_data.bin` files are created in the
+    > `output` directory. The first file contains the required memory offset.
+    > For this reason, it can be programmed directly to the device using a
+    > programmer (for example, `nrfjprog`).
+
+    l. (optional) The maximum partition size in device's NVM memory, where
+    factory data will be stored.
+
+    ```
+    --size <size>
+    ```
+
+    > **Note:** To generate a HEX file with factory data, you need to provide
+    > both `offset` and `size` optional arguments. As a result,
+    > `factory_data.hex` and `factory_data.bin` files are created in the
+    > `output` directory. The first file contains the required memory offset.
+    > For this reason, it can be programmed directly to the device using a
+    > programmer (for example, `nrfjprog`).
+
 4. Run the script using the prepared list of arguments:
 
     ```
@@ -357,8 +403,10 @@ $ python scripts/tools/nrfconnect/generate_nrfconnect_chip_factory_data.py \
 --passcode 20202021 \
 --product_finish "matte" \
 --product_color "black" \
---out "build.json" \
---schema "scripts/tools/nrfconnect/nrfconnect_factory_data.schema"
+--out "build" \
+--schema "scripts/tools/nrfconnect/nrfconnect_factory_data.schema" \
+--offset 0xf7000 \
+--size 0x1000
 ```
 
 As the result of the above example, a unique ID for the rotating device ID is
@@ -557,7 +605,7 @@ To generate a manual pairing code and a QR code, complete the following steps:
     ```
 
 2. Complete steps 1, 2, and 3 from the
-   [Creating the factory data JSON file with the first script](#creating-the-factory-data-json-file-with-the-first-script)
+   [Creating the factory data JSON and HEX files with the first script](#creating-the-factory-data-json-and-hex-files-with-the-first-script)
    section to prepare the final invocation of the Python script.
 
 3. Add the `--generate_onboarding` argument to the Python script final
@@ -673,10 +721,15 @@ The output will look similar to the following one:
 ### Creating a factory data partition with the second script
 
 To store the factory data set in the device's persistent storage, convert the
-data from the JSON file to its binary representation in the CBOR format. To do
-this, use the
+data from the JSON file to its binary representation in the CBOR format. This is
+done by the
+[generate_nrfconnect_chip_factory_data.py](../../scripts/tools/nrfconnect/generate_nrfconnect_chip_factory_data.py),
+if you provide optional `offset` and `size` arguments. If you provided these
+arguments, skip the following steps of this section.
+
+You can skip these optional arguments and do this, using the
 [nrfconnect_generate_partition.py](../../scripts/tools/nrfconnect/nrfconnect_generate_partition.py)
-to generate the factory data partition:
+script, but this is obsolete solution kept only for backward compatibility:
 
 1. Navigate to the _connectedhomeip_ root directory
 2. Run the following command pattern:
@@ -794,6 +847,55 @@ snippet:
 > interfaces, read the
 > [Kconfig documentation](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/build/kconfig/menuconfig.html).
 
+### Default Kconfig values and developing aspects
+
+Each factory data parameter has its default value reflected in the Kconfig. The
+list below shows some Kconfig settings that are configured in the nRF Connect
+build system and have an impact on the application. You can modify them to
+achieve the desired behavior of your application.
+
+-   The device uses the test certificates located in the
+    `credentials/development/attestation/` directory, which are generated using
+    all default values. If you want to change the default `vendor_id`,
+    `product_id`, `vendor_name`, or `device_name` and generate new test
+    certificates, add the `CONFIG_CHIP_FACTORY_DATA_CERT_SOURCE_GENERATED=y`
+    Kconfig option. Remember to build the `chip-cert` application and add it to
+    the system PATH.
+
+    For developing a production-ready product, you need to write the
+    certificates obtained during the certification process. To do this, add the
+    `CONFIG_CHIP_FACTORY_DATA_CERT_SOURCE_USER=y` Kconfig option and set the
+    appropriate paths for the following Kconfig options:
+
+    -   `CONFIG_CHIP_FACTORY_DATA_USER_CERTS_DAC_CERT`
+    -   `CONFIG_CHIP_FACTORY_DATA_USER_CERTS_DAC_KEY`
+    -   `CONFIG_CHIP_FACTORY_DATA_USER_CERTS_PAI_CERT`
+
+-   By default, the SPAKE2+ verifier is generated during each example's build.
+    This means that this value will change automatically if you change any of
+    the following parameters:
+
+    -   `CONFIG_CHIP_DEVICE_SPAKE2_PASSCODE`
+    -   `CONFIG_CHIP_DEVICE_SPAKE2_SALT`
+    -   `CONFIG_CHIP_DEVICE_SPAKE2_IT`
+
+    You can disable the generation of the SPAKE2+ verifier by setting the
+    `CONFIG_CHIP_FACTORY_DATA_GENERATE_SPAKE2_VERIFIER=n` Kconfig option. Then,
+    you will need to provide the externally-generated SPAKE2+ verifier using the
+    `CONFIG_CHIP_DEVICE_SPAKE2_TEST_VERIFIER` Kconfig value.
+
+-   Generating the rotating device ID unique ID is disabled by default, but you
+    can enable it by setting the `CONFIG_CHIP_ROTATING_DEVICE_ID=y` and
+    `CONFIG_CHIP_DEVICE_GENERATE_ROTATING_DEVICE_UID=y` Kconfig values.
+    Moreover, if you set the `CONFIG_CHIP_ROTATING_DEVICE_ID` Kconfig option to
+    `y` and disable the `CONFIG_CHIP_DEVICE_GENERATE_ROTATING_DEVICE_UID`
+    Kconfig option, you will need to provide it manually using the
+    `CONFIG_CHIP_DEVICE_ROTATING_DEVICE_UID` Kconfig value.
+
+-   You can generate the test Certification Declaration by using the
+    `CONFIG_CHIP_FACTORY_DATA_GENERATE_CD=y` Kconfig option. Remember to build
+    the `chip-cert` application and add it to the system PATH.
+
 <hr>
 
 ## Programming factory data
@@ -862,14 +964,13 @@ $ west flash
 ## Using own factory data implementation
 
 The [factory data generation process](#generating-factory-data) described above
-is only an example valid for the nRF Connect platform. You can also create a HEX
-file containing all components from the
-[factory data component table](#factory-data-component-table) in any format and
-then implement a parser to read out all parameters and pass them to a provider.
-Each manufacturer can implement a factory data set on its own by implementing a
-parser and a factory data accessor inside the Matter stack. Use the
-[nRF Connect Provider](../../src/platform/nrfconnect/FactoryDataProvider.h) and
-[FactoryDataParser](../../src/platform/nrfconnect/FactoryDataParser.h) as
+is only an example valid for the nRF Connect platform. You can well create a HEX
+file containing all [factory data components](#factory-data-component-table) in
+any format and then implement a parser to read out all parameters and pass them
+to a provider. Each manufacturer can implement a factory data set on its own by
+implementing a parser and a factory data accessor inside the Matter stack. Use
+the [nRF Connect Provider](../../src/platform/nrfconnect/FactoryDataProvider.h)
+and [FactoryDataParser](../../src/platform/nrfconnect/FactoryDataParser.h) as
 examples.
 
 You can read the factory data set from the device's flash memory in different

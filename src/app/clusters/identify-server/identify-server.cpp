@@ -24,11 +24,6 @@
 #include <app-common/zap-generated/ids/Commands.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-
-#include <app/util/af.h>
-#include <app/util/common.h>
-#include <app/util/error-mapping.h>
-#include <array>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <tracing/macros.h>
@@ -105,7 +100,7 @@ static void onIdentifyClusterTick(chip::System::Layer * systemLayer, void * appS
     {
         EndpointId endpoint = identify->mEndpoint;
 
-        if (EMBER_ZCL_STATUS_SUCCESS == Attributes::IdentifyTime::Get(endpoint, &identifyTime) && 0 != identifyTime)
+        if (Status::Success == Attributes::IdentifyTime::Get(endpoint, &identifyTime) && 0 != identifyTime)
         {
             identifyTime = static_cast<uint16_t>(identifyTime == 0 ? 0 : identifyTime - 1);
             // This tick writes the new attribute, which will trigger the Attribute
@@ -146,7 +141,7 @@ void MatterIdentifyClusterServerAttributeChangedCallback(const app::ConcreteAttr
             return;
         }
 
-        if (EMBER_ZCL_STATUS_SUCCESS == Attributes::IdentifyTime::Get(endpoint, &identifyTime))
+        if (Status::Success == Attributes::IdentifyTime::Get(endpoint, &identifyTime))
         {
             /* effect identifier changed during identify */
             if (identify->mTargetEffectIdentifier != identify->mCurrentEffectIdentifier)
@@ -201,8 +196,7 @@ bool emberAfIdentifyClusterIdentifyCallback(CommandHandler * commandObj, const C
     auto & identifyTime = commandData.identifyTime;
 
     // cmd Identify
-    commandObj->AddStatus(commandPath,
-                          ToInteractionModelStatus(Attributes::IdentifyTime::Set(commandPath.mEndpointId, identifyTime)));
+    commandObj->AddStatus(commandPath, Attributes::IdentifyTime::Set(commandPath.mEndpointId, identifyTime));
     return true;
 }
 
@@ -231,8 +225,8 @@ bool emberAfIdentifyClusterTriggerEffectCallback(CommandHandler * commandObj, co
     identify->mEffectVariant          = effectVariant;
 
     /* only call the callback if no identify is in progress */
-    if (nullptr != identify->mOnEffectIdentifier &&
-        EMBER_ZCL_STATUS_SUCCESS == Attributes::IdentifyTime::Get(endpoint, &identifyTime) && 0 == identifyTime)
+    if (nullptr != identify->mOnEffectIdentifier && Status::Success == Attributes::IdentifyTime::Get(endpoint, &identifyTime) &&
+        0 == identifyTime)
     {
         identify->mCurrentEffectIdentifier = identify->mTargetEffectIdentifier;
         identify->mOnEffectIdentifier(identify);

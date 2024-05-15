@@ -130,7 +130,7 @@ struct PayloadContents
 
     bool isValidQRCodePayload() const;
     bool isValidManualCode() const;
-    bool operator==(PayloadContents & input) const;
+    bool operator==(const PayloadContents & input) const;
 
     static bool IsValidSetupPIN(uint32_t setupPIN);
 
@@ -233,7 +233,7 @@ public:
      **/
     CHIP_ERROR removeSerialNumber();
 
-    bool operator==(SetupPayload & input);
+    bool operator==(const SetupPayload & input) const;
 
 private:
     std::map<uint8_t, OptionalQRCodeInfo> optionalVendorData;
@@ -267,14 +267,14 @@ private:
      * @brief A function to retrieve the vector of CHIPQRCodeInfo infos
      * @return Returns a vector of CHIPQRCodeInfos
      **/
-    std::vector<OptionalQRCodeInfoExtension> getAllOptionalExtensionData();
+    std::vector<OptionalQRCodeInfoExtension> getAllOptionalExtensionData() const;
 
     /** @brief A function to retrieve an optional QR Code info vendor object
      * @param tag 7 bit [0-127] tag number
      * @param info retrieved OptionalQRCodeInfo object
      * @return Returns a CHIP_ERROR_KEY_NOT_FOUND on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR getOptionalVendorData(uint8_t tag, OptionalQRCodeInfo & info);
+    CHIP_ERROR getOptionalVendorData(uint8_t tag, OptionalQRCodeInfo & info) const;
 
     /** @brief A function to retrieve an optional QR Code info extended object
      * @param tag 8 bit [128-255] tag number
@@ -287,7 +287,7 @@ private:
      * @param tag 8 bit [0-255] tag number
      * @return Returns an optionalQRCodeInfoType value
      **/
-    optionalQRCodeInfoType getNumericTypeFor(uint8_t tag);
+    optionalQRCodeInfoType getNumericTypeFor(uint8_t tag) const;
 };
 
 } // namespace chip

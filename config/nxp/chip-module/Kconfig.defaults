@@ -87,7 +87,7 @@ config PTHREAD_IPC
 
 config POSIX_MAX_FDS
 	int
-	default 16
+	default 8
 
 # Application stack size
 config MAIN_STACK_SIZE
@@ -99,11 +99,20 @@ config INIT_STACKS
 config NET_MGMT_EVENT_STACK_SIZE
 	default 2048
 
+config NET_MGMT_EVENT_QUEUE_SIZE
+	default 20
+
 config NET_IPV6_MLD
 	default y
 
 config NET_IF_MCAST_IPV6_ADDR_COUNT
 	default 14
+
+config NET_IF_MAX_IPV4_COUNT
+	default 2
+
+config NET_IF_MAX_IPV6_COUNT
+	default 2
 
 config NET_TC_TX_COUNT
 	default 1
@@ -118,7 +127,7 @@ choice NET_TC_THREAD_TYPE
 	default NET_TC_THREAD_PREEMPTIVE
 endchoice
 
-config NET_TCP_WORK_QUEUE_THREAD_PRIO
+config NET_TCP_WORKER_PRIO
 	default -16
 
 config NET_TC_TX_THREAD_BASE_PRIO
@@ -129,10 +138,10 @@ config NET_TC_RX_THREAD_BASE_PRIO
 
 # Network buffers
 config NET_PKT_RX_COUNT
-	default 16
+	default 60
 
 config NET_PKT_TX_COUNT
-	default 16
+	default 40
 
 config NET_BUF_RX_COUNT
 	default 60
@@ -141,7 +150,7 @@ config NET_BUF_TX_COUNT
 	default 80
 
 config NET_BUF_DATA_SIZE
-	default 1700
+	default 1744
 
 # Bluetooth Low Energy configs
 
@@ -233,9 +242,12 @@ choice WPA_SUPP_LOG_LEVEL_CHOICE
 endchoice
 
 config WPA_SUPP_THREAD_STACK_SIZE
-	default 6144
+	default 12288
 
 config SYSTEM_WORKQUEUE_STACK_SIZE
+	default 2048
+
+config NET_TCP_WORKQ_STACK_SIZE
 	default 2048
 
 # align these numbers to match the OpenThread config
@@ -246,7 +258,25 @@ config NET_IF_MCAST_IPV6_ADDR_COUNT
 	default 8
 
 config NET_SOCKETS_POLL_MAX
-	default 4
+	default 8
+
+config NET_IPV4_FRAGMENT_MAX_COUNT
+	default 3
+
+config NET_IPV4_FRAGMENT_MAX_PKT
+	default 7
+
+config NET_IPV4_FRAGMENT_TIMEOUT
+	default 3
+
+config NET_IPV6_FRAGMENT_MAX_COUNT
+	default 3
+
+config NET_IPV6_FRAGMENT_MAX_PKT
+	default 7
+
+config NET_IPV6_FRAGMENT_TIMEOUT
+	default 3
 
 # options managed by IP4/IP6 simultaneous support
 # aligned here to match OpenThread config
@@ -260,7 +290,7 @@ config SHELL_STACK_SIZE
 	default 2616
 
 config HEAP_MEM_POOL_SIZE
-	default 65536
+	default 122880
 
 config CHIP_MALLOC_SYS_HEAP_SIZE
 	default 28672 # 28 kB
@@ -376,6 +406,3 @@ config FLASH_SHELL
 endif # SHELL
 
 endif
-
-config NXP_FW_LOADER_MONOLITHIC
-	default y if NXP_FW_LOADER

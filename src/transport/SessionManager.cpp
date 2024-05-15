@@ -57,6 +57,45 @@ using Transport::SecureSession;
 
 namespace {
 Global<GroupPeerTable> gGroupPeerTable;
+
+/// RAII class for iterators that guarantees that Release() will be called
+/// on the underlying type
+template <typename Releasable>
+class AutoRelease
+{
+public:
+    AutoRelease(Releasable * iter) : mIter(iter) {}
+    ~AutoRelease() { Release(); }
+
+    Releasable * operator->() { return mIter; }
+    const Releasable * operator->() const { return mIter; }
+
+    bool IsNull() const { return mIter == nullptr; }
+
+    void Release()
+    {
+        VerifyOrReturn(mIter != nullptr);
+        mIter->Release();
+        mIter = nullptr;
+    }
+
+private:
+    Releasable * mIter = nullptr;
+};
+
+// Helper function that strips off the interface ID from a peer address that is
+// not an IPv6 link-local address.  For any other address type we should rely on
+// the device's routing table to route messages sent.  Forcing messages down a
+// specific interface might fail with "no route to host".
+void CorrectPeerAddressInterfaceID(Transport::PeerAddress & peerAddress)
+{
+    if (peerAddress.GetIPAddress().IsIPv6LinkLocal())
+    {
+        return;
+    }
+    peerAddress.SetInterface(Inet::InterfaceId::Null());
+}
+
 } // namespace
 
 uint32_t EncryptedPacketBufferHandle::GetMessageCounter() const
@@ -432,7 +471,16 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
 
     if (mTransportMgr != nullptr)
     {
-        return mTransportMgr->SendMessage(*destination, std::move(msgBuf));
+        CHIP_ERROR err = mTransportMgr->SendMessage(*destination, std::move(msgBuf));
+#if CHIP_ERROR_LOGGING
+        if (err != CHIP_NO_ERROR)
+        {
+            char addressStr[Transport::PeerAddress::kMaxToStringSize] = { 0 };
+            destination->ToString(addressStr);
+            ChipLogError(Inet, "SendMessage() to %s failed: %" CHIP_ERROR_FORMAT, addressStr, err.Format());
+        }
+#endif // CHIP_ERROR_LOGGING
+        return err;
     }
 
     ChipLogError(Inet, "The transport manager is not initialized. Unable to send the message");
@@ -633,7 +681,9 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & partial
 
     const SessionHandle & session                        = optionalSession.Value();
     Transport::UnauthenticatedSession * unsecuredSession = session->AsUnauthenticatedSession();
-    unsecuredSession->SetPeerAddress(peerAddress);
+    Transport::PeerAddress mutablePeerAddress            = peerAddress;
+    CorrectPeerAddressInterfaceID(mutablePeerAddress);
+    unsecuredSession->SetPeerAddress(mutablePeerAddress);
     SessionMessageDelegate::DuplicateMessage isDuplicate = SessionMessageDelegate::DuplicateMessage::No;
 
     unsecuredSession->MarkActiveRx();
@@ -766,12 +816,11 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
         secureSession->GetSessionMessageCounter().GetPeerMessageCounter().CommitEncryptedUnicast(packetHeader.GetMessageCounter());
     }
 
-    // TODO: once mDNS address resolution is available reconsider if this is required
-    // This updates the peer address once a packet is received from a new address
-    // and serves as a way to auto-detect peer changing IPs.
-    if (secureSession->GetPeerAddress() != peerAddress)
+    Transport::PeerAddress mutablePeerAddress = peerAddress;
+    CorrectPeerAddressInterfaceID(mutablePeerAddress);
+    if (secureSession->GetPeerAddress() != mutablePeerAddress)
     {
-        secureSession->SetPeerAddress(peerAddress);
+        secureSession->SetPeerAddress(mutablePeerAddress);
     }
 
     if (mCB != nullptr)
@@ -868,8 +917,11 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
 
     // Trial decryption with GroupDataProvider
     Credentials::GroupDataProvider::GroupSession groupContext;
-    auto iter = groups->IterateGroupSessions(partialPacketHeader.GetSessionId());
-    if (iter == nullptr)
+
+    AutoRelease<Credentials::GroupDataProvider::GroupSessionIterator> iter(
+        groups->IterateGroupSessions(partialPacketHeader.GetSessionId()));
+
+    if (iter.IsNull())
     {
         ChipLogError(Inet, "Failed to retrieve Groups iterator. Discarding everything");
         return;
@@ -877,7 +929,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
 
     // Extract MIC from the end of the message.
     uint8_t * data     = msg->Start();
-    uint16_t len       = msg->DataLength();
+    size_t len         = msg->DataLength();
     uint16_t footerLen = partialPacketHeader.MICTagLength();
     VerifyOrReturn(footerLen <= len);
 
@@ -916,7 +968,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
         }
 #endif // CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
     }
-    iter->Release();
+    iter.Release();
 
     if (!decrypted)
     {
@@ -954,7 +1006,6 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
         gGroupPeerTable->FindOrAddPeer(groupContext.fabric_index, packetHeaderCopy.GetSourceNodeId().Value(),
                                        packetHeaderCopy.IsSecureSessionControlMsg(), counter))
     {
-
         if (Credentials::GroupDataProvider::SecurityPolicy::kTrustFirst == groupContext.security_policy)
         {
             err = counter->VerifyOrTrustFirstGroup(packetHeaderCopy.GetMessageCounter());

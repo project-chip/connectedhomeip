@@ -4297,6 +4297,207 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRElectricalPowerMeasurementClusterMeasurementAccuracyRangeStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _rangeMin = @(0);
+
+        _rangeMax = @(0);
+
+        _percentMax = nil;
+
+        _percentMin = nil;
+
+        _percentTypical = nil;
+
+        _fixedMax = nil;
+
+        _fixedMin = nil;
+
+        _fixedTypical = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRElectricalPowerMeasurementClusterMeasurementAccuracyRangeStruct alloc] init];
+
+    other.rangeMin = self.rangeMin;
+    other.rangeMax = self.rangeMax;
+    other.percentMax = self.percentMax;
+    other.percentMin = self.percentMin;
+    other.percentTypical = self.percentTypical;
+    other.fixedMax = self.fixedMax;
+    other.fixedMin = self.fixedMin;
+    other.fixedTypical = self.fixedTypical;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: rangeMin:%@; rangeMax:%@; percentMax:%@; percentMin:%@; percentTypical:%@; fixedMax:%@; fixedMin:%@; fixedTypical:%@; >", NSStringFromClass([self class]), _rangeMin, _rangeMax, _percentMax, _percentMin, _percentTypical, _fixedMax, _fixedMin, _fixedTypical];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRElectricalPowerMeasurementClusterMeasurementAccuracyStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _measurementType = @(0);
+
+        _measured = @(0);
+
+        _minMeasuredValue = @(0);
+
+        _maxMeasuredValue = @(0);
+
+        _accuracyRanges = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRElectricalPowerMeasurementClusterMeasurementAccuracyStruct alloc] init];
+
+    other.measurementType = self.measurementType;
+    other.measured = self.measured;
+    other.minMeasuredValue = self.minMeasuredValue;
+    other.maxMeasuredValue = self.maxMeasuredValue;
+    other.accuracyRanges = self.accuracyRanges;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: measurementType:%@; measured:%@; minMeasuredValue:%@; maxMeasuredValue:%@; accuracyRanges:%@; >", NSStringFromClass([self class]), _measurementType, _measured, _minMeasuredValue, _maxMeasuredValue, _accuracyRanges];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRElectricalPowerMeasurementClusterHarmonicMeasurementStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _order = @(0);
+
+        _measurement = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRElectricalPowerMeasurementClusterHarmonicMeasurementStruct alloc] init];
+
+    other.order = self.order;
+    other.measurement = self.measurement;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: order:%@; measurement:%@; >", NSStringFromClass([self class]), _order, _measurement];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRElectricalPowerMeasurementClusterMeasurementRangeStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _measurementType = @(0);
+
+        _min = @(0);
+
+        _max = @(0);
+
+        _startTimestamp = nil;
+
+        _endTimestamp = nil;
+
+        _minTimestamp = nil;
+
+        _maxTimestamp = nil;
+
+        _startSystime = nil;
+
+        _endSystime = nil;
+
+        _minSystime = nil;
+
+        _maxSystime = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRElectricalPowerMeasurementClusterMeasurementRangeStruct alloc] init];
+
+    other.measurementType = self.measurementType;
+    other.min = self.min;
+    other.max = self.max;
+    other.startTimestamp = self.startTimestamp;
+    other.endTimestamp = self.endTimestamp;
+    other.minTimestamp = self.minTimestamp;
+    other.maxTimestamp = self.maxTimestamp;
+    other.startSystime = self.startSystime;
+    other.endSystime = self.endSystime;
+    other.minSystime = self.minSystime;
+    other.maxSystime = self.maxSystime;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: measurementType:%@; min:%@; max:%@; startTimestamp:%@; endTimestamp:%@; minTimestamp:%@; maxTimestamp:%@; startSystime:%@; endSystime:%@; minSystime:%@; maxSystime:%@; >", NSStringFromClass([self class]), _measurementType, _min, _max, _startTimestamp, _endTimestamp, _minTimestamp, _maxTimestamp, _startSystime, _endSystime, _minSystime, _maxSystime];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRElectricalPowerMeasurementClusterMeasurementPeriodRangesEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _ranges = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRElectricalPowerMeasurementClusterMeasurementPeriodRangesEvent alloc] init];
+
+    other.ranges = self.ranges;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ranges:%@; >", NSStringFromClass([self class]), _ranges];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRElectricalEnergyMeasurementClusterMeasurementAccuracyRangeStruct
 - (instancetype)init
 {
@@ -4379,6 +4580,42 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: measurementType:%@; measured:%@; minMeasuredValue:%@; maxMeasuredValue:%@; accuracyRanges:%@; >", NSStringFromClass([self class]), _measurementType, _measured, _minMeasuredValue, _maxMeasuredValue, _accuracyRanges];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _importedResetTimestamp = nil;
+
+        _exportedResetTimestamp = nil;
+
+        _importedResetSystime = nil;
+
+        _exportedResetSystime = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct alloc] init];
+
+    other.importedResetTimestamp = self.importedResetTimestamp;
+    other.exportedResetTimestamp = self.exportedResetTimestamp;
+    other.importedResetSystime = self.importedResetSystime;
+    other.exportedResetSystime = self.exportedResetSystime;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: importedResetTimestamp:%@; exportedResetTimestamp:%@; importedResetSystime:%@; exportedResetSystime:%@; >", NSStringFromClass([self class]), _importedResetTimestamp, _exportedResetTimestamp, _importedResetSystime, _exportedResetSystime];
     return descriptionString;
 }
 

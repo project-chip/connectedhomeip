@@ -26,6 +26,7 @@
 #include <app/clusters/application-basic-server/application-basic-server.h>
 
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/data-model/Encode.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
@@ -36,6 +37,7 @@
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 #include <list>
+#include <string>
 
 using namespace chip;
 using namespace chip::app::Clusters;
@@ -45,7 +47,7 @@ using namespace chip::AppPlatform;
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 static constexpr size_t kApplicationBasicDelegateTableSize =
-    EMBER_AF_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 static_assert(kApplicationBasicDelegateTableSize <= kEmberInvalidEndpointIndex, "ApplicationBasic Delegate table size error");
 
 // -----------------------------------------------------------------------------
@@ -70,7 +72,7 @@ Delegate * GetDelegate(EndpointId endpoint)
     ChipLogProgress(Zcl, "ApplicationBasic NOT returning ContentApp delegate for endpoint:%u", endpoint);
 
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, chip::app::Clusters::ApplicationBasic::Id,
-                                                       EMBER_AF_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kApplicationBasicDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
@@ -93,7 +95,7 @@ namespace ApplicationBasic {
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, ApplicationBasic::Id,
-                                                       EMBER_AF_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
     if (ep < kApplicationBasicDelegateTableSize)
     {
@@ -170,30 +172,22 @@ CHIP_ERROR ApplicationBasicAttrAccess::Read(const app::ConcreteReadAttributePath
 
     switch (aPath.mAttributeId)
     {
-    case chip::app::Clusters::ApplicationBasic::Attributes::VendorName::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::VendorName::Id:
         return ReadVendorNameAttribute(aEncoder, delegate);
-    }
-    case chip::app::Clusters::ApplicationBasic::Attributes::VendorID::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::VendorID::Id:
         return ReadVendorIdAttribute(aEncoder, delegate);
-    }
-    case chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::Id:
         return ReadApplicationNameAttribute(aEncoder, delegate);
-    }
-    case chip::app::Clusters::ApplicationBasic::Attributes::ProductID::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::ProductID::Id:
         return ReadProductIdAttribute(aEncoder, delegate);
-    }
-    case chip::app::Clusters::ApplicationBasic::Attributes::Application::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::Application::Id:
         return ReadApplicationAttribute(aEncoder, delegate);
-    }
-    case chip::app::Clusters::ApplicationBasic::Attributes::Status::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::Status::Id:
         return ReadStatusAttribute(aEncoder, delegate);
-    }
-    case chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::Id:
         return ReadApplicationVersionAttribute(aEncoder, delegate);
-    }
-    case chip::app::Clusters::ApplicationBasic::Attributes::AllowedVendorList::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::AllowedVendorList::Id:
         return ReadAllowedVendorListAttribute(aEncoder, delegate);
-    }
     default: {
         break;
     }

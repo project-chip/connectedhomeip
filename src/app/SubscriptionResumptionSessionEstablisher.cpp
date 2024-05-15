@@ -50,6 +50,9 @@ SubscriptionResumptionSessionEstablisher::ResumeSubscription(
     mSubscriptionInfo.mMinInterval    = subscriptionInfo.mMinInterval;
     mSubscriptionInfo.mMaxInterval    = subscriptionInfo.mMaxInterval;
     mSubscriptionInfo.mFabricFiltered = subscriptionInfo.mFabricFiltered;
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    mSubscriptionInfo.mResumptionRetries = subscriptionInfo.mResumptionRetries;
+#endif
     // Copy the Attribute Paths and Event Paths
     if (subscriptionInfo.mAttributePaths.AllocatedSize() > 0)
     {
@@ -87,34 +90,71 @@ void SubscriptionResumptionSessionEstablisher::HandleDeviceConnected(void * cont
     AutoDeleteEstablisher establisher(static_cast<SubscriptionResumptionSessionEstablisher *>(context));
     SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo = establisher->mSubscriptionInfo;
     InteractionModelEngine * imEngine                                  = InteractionModelEngine::GetInstance();
+
+    // Decrement the number of subscriptions to resume since we have completed our retry attempt for a given subscription.
+    // We do this before the readHandler creation since we do not care if the subscription has successfully been resumed or
+    // not. Counter only tracks the number of individual subscriptions we will try to resume.
+    imEngine->DecrementNumSubscriptionsToResume();
+
     if (!imEngine->EnsureResourceForSubscription(subscriptionInfo.mFabricIndex, subscriptionInfo.mAttributePaths.AllocatedSize(),
                                                  subscriptionInfo.mEventPaths.AllocatedSize()))
     {
+        // TODO - Should we keep the subscription here?
         ChipLogProgress(InteractionModel, "no resource for subscription resumption");
         return;
     }
     ReadHandler * readHandler = imEngine->mReadHandlers.CreateObject(*imEngine, imEngine->GetReportScheduler());
     if (readHandler == nullptr)
     {
+        // TODO - Should we keep the subscription here?
         ChipLogProgress(InteractionModel, "no resource for ReadHandler creation");
         return;
     }
     readHandler->OnSubscriptionResumed(sessionHandle, *establisher);
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    // Reset the resumption retries to 0 if subscription is resumed
+    subscriptionInfo.mResumptionRetries  = 0;
+    auto * subscriptionResumptionStorage = InteractionModelEngine::GetInstance()->GetSubscriptionResumptionStorage();
+    if (subscriptionResumptionStorage)
+    {
+        subscriptionResumptionStorage->Save(subscriptionInfo);
+    }
+#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 }
 
 void SubscriptionResumptionSessionEstablisher::HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId,
                                                                              CHIP_ERROR error)
 {
     AutoDeleteEstablisher establisher(static_cast<SubscriptionResumptionSessionEstablisher *>(context));
+    InteractionModelEngine * imEngine                                  = InteractionModelEngine::GetInstance();
     SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo = establisher->mSubscriptionInfo;
     ChipLogError(DataManagement, "Failed to establish CASE for subscription-resumption with error '%" CHIP_ERROR_FORMAT "'",
                  error.Format());
-    // If the device fails to establish the session, the subscriber might be offline and its subscription read client will
-    // be deleted when the device reconnect to the subscriber. This subscription will be never used again. So clean up
-    // the persistent subscription information storage.
-    auto * subscriptionResumptionStorage = InteractionModelEngine::GetInstance()->GetSubscriptionResumptionStorage();
-    if (subscriptionResumptionStorage)
+
+    // Decrement the number of subscriptions to resume since we have completed our retry attempt for a given subscription.
+    // We do this here since we were not able to connect to the subscriber thus we have completed our resumption attempt.
+    // Counter only tracks the number of individual subscriptions we will try to resume.
+    imEngine->DecrementNumSubscriptionsToResume();
+
+    auto * subscriptionResumptionStorage = imEngine->GetSubscriptionResumptionStorage();
+    if (!subscriptionResumptionStorage)
     {
+        ChipLogError(DataManagement, "Failed to get subscription resumption storage");
+        return;
+    }
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    if (subscriptionInfo.mResumptionRetries <= CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_FIBONACCI_STEP_INDEX)
+    {
+        InteractionModelEngine::GetInstance()->TryToResumeSubscriptions();
+        subscriptionInfo.mResumptionRetries++;
+        subscriptionResumptionStorage->Save(subscriptionInfo);
+    }
+    else
+#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    {
+        // If the device fails to establish the session several times, the subscriber might be offline and its subscription
+        // read client will be deleted when the device reconnects to the subscriber. This subscription will be never used again.
+        // Clean up the persistent subscription information storage.
         subscriptionResumptionStorage->Delete(subscriptionInfo.mNodeId, subscriptionInfo.mFabricIndex,
                                               subscriptionInfo.mSubscriptionId);
     }

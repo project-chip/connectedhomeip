@@ -31,13 +31,17 @@
     <string name="update_device_address_btn_text">Update address</string>
     <string name="update_device_address_failure">Device address update failed: %1$s</string>
     <string name="commissioned_device_id_text">Commissioned Device ID :</string>
+    <string name="icd_interaction_text">ICD Stay Active : </string>
+    <string name="icd_active_duration_hint_text">Duration</string>
 
     <string name="address_commissioning_title_text">Commission with IP address</string>
     <string name="default_discriminator">3840</string>
     <string name="default_pincode">20202021</string>
+    <string name="default_port">5540</string>
     <string name="enter_device_address_label_text">Device address</string>
     <string name="enter_discriminator_label_text">Discriminator</string>
     <string name="enter_pincode_label_text">Pincode</string>
+    <string name="enter_port_label_text">Port</string>
     <string name="commission_btn_text">Commission</string>
     <string name="dns_discover_btn_text">Discover</string>
     <string name="wifi_scan_btn_text">Wi-Fi Scan</string>
@@ -156,20 +160,14 @@
 
     <string name="write_dialog_title_text">Write</string>
     <string name="write_dialog_write_btn_text">Write</string>
-    <string name="write_dialog_value_type_hint">Write Value Type</string>
-    <string name="write_dialog_write_value_hint">Write Value</string>
-    <string name="write_dialog_data_version_hint">Data Version (Optional)</string>
     <string name="write_dialog_timed_request_timeout_hint">Timed Request Timeout</string>
     <string name="write_dialog_im_timeout_hint">Timeout</string>
     <string name="write_dialog_user_guide_hint">Example:\nIdentifyCluster, IdentifyTime - Type : UInt\nBasicInformationCluster, UserLabel - Type : String\nIf you want to enter an array, separate the value by \',\'.(abc,def)</string>
 
     <string name="invoke_dialog_title_text">Invoke</string>
-    <string name="invoke_dialog_write_btn_text">Invoke</string>
-    <string name="invoke_dialog_value_type_hint">Invoke Value Type</string>
-    <string name="invoke_dialog_write_value_hint">Invoke Value</string>
+    <string name="invoke_dialog_invoke_btn_text">Invoke</string>
     <string name="invoke_dialog_timed_request_timeout_hint">Timed Request Timeout</string>
     <string name="invoke_dialog_im_timeout_hint">Timeout</string>
-    <string name="invoke_dialog_user_guide_hint">Usage : [Type]:[Value],[Type]:[Value]\nType:UnsignedInt, Int, Boolean, Float, Double, String, ByteArray(Hex)\nExample:\nLevelControlCluster, moveToLevel : UnsignedInt:100,UnsignedInt:0</string>
 
     <string name="shutdown_dialog_title_text">Shutdown Subscription</string>
     <string name="shutdown_dialog_fabric_index_hint">Fabric Index</string>
@@ -190,11 +188,18 @@
     <string name="wildcard_write_btn_text">Write</string>
     <string name="wildcard_add_attribute_btn_text">Add Attribute</string>
     <string name="wildcard_add_event_btn_text">Add Event</string>
+    <string name="wildcard_add_btn_text">Add</string>
     <string name="wildcard_reset_btn_text">Reset</string>
     <string name="wildcard_send_btn_text">Send</string>
     <string name="wildcard_shutdown_subscription_btn_text">Shutdown Subscription</string>
     <string name="wildcard_subscribe_event_btn_text">Subscribe Event</string>
     <string name="wildcard_read_event_btn_text">Read Event</string>
+    <string name="wildcard_write_value_type_text">Write Value Type</string>
+    <string name="wildcard_write_value_text">Write Value</string>
+    <string name="wildcard_write_data_version_text">Data Version</string>
+    <string name="wildcard_write_data_version_help_label">optional</string>
+    <string name="wildcard_invoke_value_text">Invoke Value(Json)</string>
+    <string name="wildcard_invoke_value_help_label">Example: {"0:UINT":1}</string>
     <string name="wildcard_empty_error_toast_message">Please add it to the list using Add Button.</string>
     <string name="wildcard_subscribe_established_toast_message">Subscription established</string>
 

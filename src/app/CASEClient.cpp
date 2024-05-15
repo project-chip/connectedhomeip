@@ -16,6 +16,7 @@
  */
 
 #include <app/CASEClient.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
 
 namespace chip {
 
@@ -49,10 +50,12 @@ CHIP_ERROR CASEClient::EstablishSession(const CASEClientInitParams & params, con
     Messaging::ExchangeContext * exchange = params.exchangeMgr->NewContext(session.Value(), &mCASESession);
     VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_INTERNAL);
 
+    const Optional<ReliableMessageProtocolConfig> & mrpLocalConfig =
+        params.mrpLocalConfig.HasValue() ? params.mrpLocalConfig : GetLocalMRPConfig();
     mCASESession.SetGroupDataProvider(params.groupDataProvider);
     ReturnErrorOnFailure(mCASESession.EstablishSession(*params.sessionManager, params.fabricTable, peer, exchange,
                                                        params.sessionResumptionStorage, params.certificateValidityPolicy, delegate,
-                                                       params.mrpLocalConfig));
+                                                       mrpLocalConfig));
 
     return CHIP_NO_ERROR;
 }

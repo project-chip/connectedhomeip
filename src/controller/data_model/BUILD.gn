@@ -42,9 +42,5 @@ chip_codegen("cluster-tlv-metadata") {
 
 chip_data_model("data_model") {
   zap_file = "controller-clusters.zap"
-
-  zap_pregenerated_dir =
-      "${chip_root}/zzz_generated/controller-clusters/zap-generated"
-
   allow_circular_includes_from = [ "${chip_root}/src/controller" ]
 }

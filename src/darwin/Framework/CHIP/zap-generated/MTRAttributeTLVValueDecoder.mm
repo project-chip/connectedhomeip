@@ -7631,6 +7631,454 @@ static id _Nullable DecodeAttributeValueForValveConfigurationAndControlCluster(A
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeAttributeValueForElectricalPowerMeasurementCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::ElectricalPowerMeasurement;
+    switch (aAttributeId) {
+    case Attributes::PowerMode::Id: {
+        using TypeInfo = Attributes::PowerMode::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+        return value;
+    }
+    case Attributes::NumberOfMeasurementTypes::Id: {
+        using TypeInfo = Attributes::NumberOfMeasurementTypes::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:cppValue];
+        return value;
+    }
+    case Attributes::Accuracy::Id: {
+        using TypeInfo = Attributes::Accuracy::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRElectricalPowerMeasurementClusterMeasurementAccuracyStruct * newElement_0;
+                newElement_0 = [MTRElectricalPowerMeasurementClusterMeasurementAccuracyStruct new];
+                newElement_0.measurementType = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_0.measurementType)];
+                newElement_0.measured = [NSNumber numberWithBool:entry_0.measured];
+                newElement_0.minMeasuredValue = [NSNumber numberWithLongLong:entry_0.minMeasuredValue];
+                newElement_0.maxMeasuredValue = [NSNumber numberWithLongLong:entry_0.maxMeasuredValue];
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    auto iter_2 = entry_0.accuracyRanges.begin();
+                    while (iter_2.Next()) {
+                        auto & entry_2 = iter_2.GetValue();
+                        MTRElectricalPowerMeasurementClusterMeasurementAccuracyRangeStruct * newElement_2;
+                        newElement_2 = [MTRElectricalPowerMeasurementClusterMeasurementAccuracyRangeStruct new];
+                        newElement_2.rangeMin = [NSNumber numberWithLongLong:entry_2.rangeMin];
+                        newElement_2.rangeMax = [NSNumber numberWithLongLong:entry_2.rangeMax];
+                        if (entry_2.percentMax.HasValue()) {
+                            newElement_2.percentMax = [NSNumber numberWithUnsignedShort:entry_2.percentMax.Value()];
+                        } else {
+                            newElement_2.percentMax = nil;
+                        }
+                        if (entry_2.percentMin.HasValue()) {
+                            newElement_2.percentMin = [NSNumber numberWithUnsignedShort:entry_2.percentMin.Value()];
+                        } else {
+                            newElement_2.percentMin = nil;
+                        }
+                        if (entry_2.percentTypical.HasValue()) {
+                            newElement_2.percentTypical = [NSNumber numberWithUnsignedShort:entry_2.percentTypical.Value()];
+                        } else {
+                            newElement_2.percentTypical = nil;
+                        }
+                        if (entry_2.fixedMax.HasValue()) {
+                            newElement_2.fixedMax = [NSNumber numberWithUnsignedLongLong:entry_2.fixedMax.Value()];
+                        } else {
+                            newElement_2.fixedMax = nil;
+                        }
+                        if (entry_2.fixedMin.HasValue()) {
+                            newElement_2.fixedMin = [NSNumber numberWithUnsignedLongLong:entry_2.fixedMin.Value()];
+                        } else {
+                            newElement_2.fixedMin = nil;
+                        }
+                        if (entry_2.fixedTypical.HasValue()) {
+                            newElement_2.fixedTypical = [NSNumber numberWithUnsignedLongLong:entry_2.fixedTypical.Value()];
+                        } else {
+                            newElement_2.fixedTypical = nil;
+                        }
+                        [array_2 addObject:newElement_2];
+                    }
+                    CHIP_ERROR err = iter_2.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
+                    }
+                    newElement_0.accuracyRanges = array_2;
+                }
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    case Attributes::Ranges::Id: {
+        using TypeInfo = Attributes::Ranges::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRElectricalPowerMeasurementClusterMeasurementRangeStruct * newElement_0;
+                newElement_0 = [MTRElectricalPowerMeasurementClusterMeasurementRangeStruct new];
+                newElement_0.measurementType = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_0.measurementType)];
+                newElement_0.min = [NSNumber numberWithLongLong:entry_0.min];
+                newElement_0.max = [NSNumber numberWithLongLong:entry_0.max];
+                if (entry_0.startTimestamp.HasValue()) {
+                    newElement_0.startTimestamp = [NSNumber numberWithUnsignedInt:entry_0.startTimestamp.Value()];
+                } else {
+                    newElement_0.startTimestamp = nil;
+                }
+                if (entry_0.endTimestamp.HasValue()) {
+                    newElement_0.endTimestamp = [NSNumber numberWithUnsignedInt:entry_0.endTimestamp.Value()];
+                } else {
+                    newElement_0.endTimestamp = nil;
+                }
+                if (entry_0.minTimestamp.HasValue()) {
+                    newElement_0.minTimestamp = [NSNumber numberWithUnsignedInt:entry_0.minTimestamp.Value()];
+                } else {
+                    newElement_0.minTimestamp = nil;
+                }
+                if (entry_0.maxTimestamp.HasValue()) {
+                    newElement_0.maxTimestamp = [NSNumber numberWithUnsignedInt:entry_0.maxTimestamp.Value()];
+                } else {
+                    newElement_0.maxTimestamp = nil;
+                }
+                if (entry_0.startSystime.HasValue()) {
+                    newElement_0.startSystime = [NSNumber numberWithUnsignedLongLong:entry_0.startSystime.Value()];
+                } else {
+                    newElement_0.startSystime = nil;
+                }
+                if (entry_0.endSystime.HasValue()) {
+                    newElement_0.endSystime = [NSNumber numberWithUnsignedLongLong:entry_0.endSystime.Value()];
+                } else {
+                    newElement_0.endSystime = nil;
+                }
+                if (entry_0.minSystime.HasValue()) {
+                    newElement_0.minSystime = [NSNumber numberWithUnsignedLongLong:entry_0.minSystime.Value()];
+                } else {
+                    newElement_0.minSystime = nil;
+                }
+                if (entry_0.maxSystime.HasValue()) {
+                    newElement_0.maxSystime = [NSNumber numberWithUnsignedLongLong:entry_0.maxSystime.Value()];
+                } else {
+                    newElement_0.maxSystime = nil;
+                }
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    case Attributes::Voltage::Id: {
+        using TypeInfo = Attributes::Voltage::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithLongLong:cppValue.Value()];
+        }
+        return value;
+    }
+    case Attributes::ActiveCurrent::Id: {
+        using TypeInfo = Attributes::ActiveCurrent::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithLongLong:cppValue.Value()];
+        }
+        return value;
+    }
+    case Attributes::ReactiveCurrent::Id: {
+        using TypeInfo = Attributes::ReactiveCurrent::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithLongLong:cppValue.Value()];
+        }
+        return value;
+    }
+    case Attributes::ApparentCurrent::Id: {
+        using TypeInfo = Attributes::ApparentCurrent::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithLongLong:cppValue.Value()];
+        }
+        return value;
+    }
+    case Attributes::ActivePower::Id: {
+        using TypeInfo = Attributes::ActivePower::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithLongLong:cppValue.Value()];
+        }
+        return value;
+    }
+    case Attributes::ReactivePower::Id: {
+        using TypeInfo = Attributes::ReactivePower::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithLongLong:cppValue.Value()];
+        }
+        return value;
+    }
+    case Attributes::ApparentPower::Id: {
+        using TypeInfo = Attributes::ApparentPower::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithLongLong:cppValue.Value()];
+        }
+        return value;
+    }
+    case Attributes::RMSVoltage::Id: {
+        using TypeInfo = Attributes::RMSVoltage::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithLongLong:cppValue.Value()];
+        }
+        return value;
+    }
+    case Attributes::RMSCurrent::Id: {
+        using TypeInfo = Attributes::RMSCurrent::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithLongLong:cppValue.Value()];
+        }
+        return value;
+    }
+    case Attributes::RMSPower::Id: {
+        using TypeInfo = Attributes::RMSPower::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithLongLong:cppValue.Value()];
+        }
+        return value;
+    }
+    case Attributes::Frequency::Id: {
+        using TypeInfo = Attributes::Frequency::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithLongLong:cppValue.Value()];
+        }
+        return value;
+    }
+    case Attributes::HarmonicCurrents::Id: {
+        using TypeInfo = Attributes::HarmonicCurrents::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            { // Scope for our temporary variables
+                auto * array_1 = [NSMutableArray new];
+                auto iter_1 = cppValue.Value().begin();
+                while (iter_1.Next()) {
+                    auto & entry_1 = iter_1.GetValue();
+                    MTRElectricalPowerMeasurementClusterHarmonicMeasurementStruct * newElement_1;
+                    newElement_1 = [MTRElectricalPowerMeasurementClusterHarmonicMeasurementStruct new];
+                    newElement_1.order = [NSNumber numberWithUnsignedChar:entry_1.order];
+                    if (entry_1.measurement.IsNull()) {
+                        newElement_1.measurement = nil;
+                    } else {
+                        newElement_1.measurement = [NSNumber numberWithLongLong:entry_1.measurement.Value()];
+                    }
+                    [array_1 addObject:newElement_1];
+                }
+                CHIP_ERROR err = iter_1.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_1;
+            }
+        }
+        return value;
+    }
+    case Attributes::HarmonicPhases::Id: {
+        using TypeInfo = Attributes::HarmonicPhases::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            { // Scope for our temporary variables
+                auto * array_1 = [NSMutableArray new];
+                auto iter_1 = cppValue.Value().begin();
+                while (iter_1.Next()) {
+                    auto & entry_1 = iter_1.GetValue();
+                    MTRElectricalPowerMeasurementClusterHarmonicMeasurementStruct * newElement_1;
+                    newElement_1 = [MTRElectricalPowerMeasurementClusterHarmonicMeasurementStruct new];
+                    newElement_1.order = [NSNumber numberWithUnsignedChar:entry_1.order];
+                    if (entry_1.measurement.IsNull()) {
+                        newElement_1.measurement = nil;
+                    } else {
+                        newElement_1.measurement = [NSNumber numberWithLongLong:entry_1.measurement.Value()];
+                    }
+                    [array_1 addObject:newElement_1];
+                }
+                CHIP_ERROR err = iter_1.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_1;
+            }
+        }
+        return value;
+    }
+    case Attributes::PowerFactor::Id: {
+        using TypeInfo = Attributes::PowerFactor::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithLongLong:cppValue.Value()];
+        }
+        return value;
+    }
+    case Attributes::NeutralCurrent::Id: {
+        using TypeInfo = Attributes::NeutralCurrent::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithLongLong:cppValue.Value()];
+        }
+        return value;
+    }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeAttributeValueForElectricalEnergyMeasurementCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::ElectricalEnergyMeasurement;
@@ -7838,6 +8286,57 @@ static id _Nullable DecodeAttributeValueForElectricalEnergyMeasurementCluster(At
                 value.endSystime = [NSNumber numberWithUnsignedLongLong:cppValue.Value().endSystime.Value()];
             } else {
                 value.endSystime = nil;
+            }
+        }
+        return value;
+    }
+    case Attributes::CumulativeEnergyReset::Id: {
+        using TypeInfo = Attributes::CumulativeEnergyReset::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTRElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [MTRElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct new];
+            if (cppValue.Value().importedResetTimestamp.HasValue()) {
+                if (cppValue.Value().importedResetTimestamp.Value().IsNull()) {
+                    value.importedResetTimestamp = nil;
+                } else {
+                    value.importedResetTimestamp = [NSNumber numberWithUnsignedInt:cppValue.Value().importedResetTimestamp.Value().Value()];
+                }
+            } else {
+                value.importedResetTimestamp = nil;
+            }
+            if (cppValue.Value().exportedResetTimestamp.HasValue()) {
+                if (cppValue.Value().exportedResetTimestamp.Value().IsNull()) {
+                    value.exportedResetTimestamp = nil;
+                } else {
+                    value.exportedResetTimestamp = [NSNumber numberWithUnsignedInt:cppValue.Value().exportedResetTimestamp.Value().Value()];
+                }
+            } else {
+                value.exportedResetTimestamp = nil;
+            }
+            if (cppValue.Value().importedResetSystime.HasValue()) {
+                if (cppValue.Value().importedResetSystime.Value().IsNull()) {
+                    value.importedResetSystime = nil;
+                } else {
+                    value.importedResetSystime = [NSNumber numberWithUnsignedLongLong:cppValue.Value().importedResetSystime.Value().Value()];
+                }
+            } else {
+                value.importedResetSystime = nil;
+            }
+            if (cppValue.Value().exportedResetSystime.HasValue()) {
+                if (cppValue.Value().exportedResetSystime.Value().IsNull()) {
+                    value.exportedResetSystime = nil;
+                } else {
+                    value.exportedResetSystime = [NSNumber numberWithUnsignedLongLong:cppValue.Value().exportedResetSystime.Value().Value()];
+                }
+            } else {
+                value.exportedResetSystime = nil;
             }
         }
         return value;
@@ -8251,7 +8750,7 @@ static id _Nullable DecodeAttributeValueForMessagesCluster(AttributeId aAttribut
                 if (entry_0.duration.IsNull()) {
                     newElement_0.duration = nil;
                 } else {
-                    newElement_0.duration = [NSNumber numberWithUnsignedShort:entry_0.duration.Value()];
+                    newElement_0.duration = [NSNumber numberWithUnsignedLongLong:entry_0.duration.Value()];
                 }
                 newElement_0.messageText = AsString(entry_0.messageText);
                 if (newElement_0.messageText == nil) {
@@ -9053,6 +9552,70 @@ static id _Nullable DecodeAttributeValueForEnergyPreferenceCluster(AttributeId a
         }
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedChar:cppValue];
+        return value;
+    }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeAttributeValueForPowerTopologyCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::PowerTopology;
+    switch (aAttributeId) {
+    case Attributes::AvailableEndpoints::Id: {
+        using TypeInfo = Attributes::AvailableEndpoints::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    case Attributes::ActiveEndpoints::Id: {
+        using TypeInfo = Attributes::ActiveEndpoints::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
         return value;
     }
     default: {
@@ -18925,6 +19488,9 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     case Clusters::ValveConfigurationAndControl::Id: {
         return DecodeAttributeValueForValveConfigurationAndControlCluster(aPath.mAttributeId, aReader, aError);
     }
+    case Clusters::ElectricalPowerMeasurement::Id: {
+        return DecodeAttributeValueForElectricalPowerMeasurementCluster(aPath.mAttributeId, aReader, aError);
+    }
     case Clusters::ElectricalEnergyMeasurement::Id: {
         return DecodeAttributeValueForElectricalEnergyMeasurementCluster(aPath.mAttributeId, aReader, aError);
     }
@@ -18942,6 +19508,9 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     }
     case Clusters::EnergyPreference::Id: {
         return DecodeAttributeValueForEnergyPreferenceCluster(aPath.mAttributeId, aReader, aError);
+    }
+    case Clusters::PowerTopology::Id: {
+        return DecodeAttributeValueForPowerTopologyCluster(aPath.mAttributeId, aReader, aError);
     }
     case Clusters::EnergyEvseMode::Id: {
         return DecodeAttributeValueForEnergyEVSEModeCluster(aPath.mAttributeId, aReader, aError);

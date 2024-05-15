@@ -122,8 +122,6 @@ chip_data_model("bouffalolab-lighting") {
   } else {
     zap_file = "${example_dir}/data_model/lighting-app-ethernet.zap"
   }
-
-  zap_pregenerated_dir = "${chip_root}/zzz_generated/lighting-app/zap-generated"
   is_server = true
 }
 

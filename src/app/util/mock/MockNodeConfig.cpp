@@ -18,8 +18,8 @@
 
 #include <app/util/mock/MockNodeConfig.h>
 
-#include <app/att-storage.h>
-#include <app/util/af.h>
+#include <app/util/att-storage.h>
+#include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 
 #include <utility>
@@ -70,6 +70,22 @@ MockClusterConfig::MockClusterConfig(ClusterId aId, std::initializer_list<MockAt
     mEmberCluster.mask           = CLUSTER_MASK_SERVER;
     mEmberCluster.eventCount     = static_cast<uint16_t>(mEmberEventList.size());
     mEmberCluster.eventList      = mEmberEventList.data();
+
+    for (auto & attr : attributes)
+    {
+        mAttributeMetaData.push_back(attr.attributeMetaData);
+    }
+
+    // Make sure ember side has access to attribute metadata
+    mEmberCluster.attributes = mAttributeMetaData.data();
+}
+
+MockClusterConfig::MockClusterConfig(const MockClusterConfig & other) :
+    id(other.id), attributes(other.attributes), events(other.events), mEmberCluster(other.mEmberCluster),
+    mEmberEventList(other.mEmberEventList), mAttributeMetaData(other.mAttributeMetaData)
+{
+    // Fix self-referencial dependencies after data copy
+    mEmberCluster.attributes = mAttributeMetaData.data();
 }
 
 const MockAttributeConfig * MockClusterConfig::attributeById(AttributeId attributeId, ptrdiff_t * outIndex) const
@@ -89,6 +105,13 @@ MockEndpointConfig::MockEndpointConfig(EndpointId aId, std::initializer_list<Moc
     }
     mEmberEndpoint.clusterCount = static_cast<uint8_t>(mEmberClusters.size());
     mEmberEndpoint.cluster      = mEmberClusters.data();
+}
+
+MockEndpointConfig::MockEndpointConfig(const MockEndpointConfig & other) :
+    id(other.id), clusters(other.clusters), mEmberClusters(other.mEmberClusters), mEmberEndpoint(other.mEmberEndpoint)
+{
+    // fix self-referencing pointers
+    mEmberEndpoint.cluster = mEmberClusters.data();
 }
 
 const MockClusterConfig * MockEndpointConfig::clusterById(ClusterId clusterId, ptrdiff_t * outIndex) const

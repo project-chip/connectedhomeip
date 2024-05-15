@@ -441,7 +441,7 @@ CHIP_ERROR TCPEndPointImplSockets::DisableKeepAlive()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TCPEndPointImplSockets::AckReceive(uint16_t len)
+CHIP_ERROR TCPEndPointImplSockets::AckReceive(size_t len)
 {
     VerifyOrReturnError(IsConnected(), CHIP_ERROR_INCORRECT_STATE);
 
@@ -483,7 +483,7 @@ CHIP_ERROR TCPEndPointImplSockets::DriveSendingImpl()
 
     while (!mSendQueue.IsNull())
     {
-        uint16_t bufLen = mSendQueue->DataLength();
+        size_t bufLen = mSendQueue->DataLength();
 
         ssize_t lenSentRaw = send(mSocket, mSendQueue->Start(), bufLen, sendFlags);
 
@@ -496,14 +496,13 @@ CHIP_ERROR TCPEndPointImplSockets::DriveSendingImpl()
             break;
         }
 
-        if (lenSentRaw < 0 || lenSentRaw > bufLen)
+        if (lenSentRaw < 0 || bufLen < static_cast<size_t>(lenSentRaw))
         {
             err = CHIP_ERROR_INCORRECT_STATE;
             break;
         }
 
-        // Cast is safe because bufLen is uint16_t.
-        uint16_t lenSent = static_cast<uint16_t>(lenSentRaw);
+        size_t lenSent = static_cast<size_t>(lenSentRaw);
 
         // Mark the connection as being active.
         MarkActive();

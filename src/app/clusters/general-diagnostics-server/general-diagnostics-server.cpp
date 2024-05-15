@@ -17,6 +17,9 @@
 
 #include "general-diagnostics-server.h"
 
+#include <stdint.h>
+#include <string.h>
+
 #include <app/util/config.h>
 
 #include "app/server/Server.h"
@@ -25,9 +28,11 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/EventLogging.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
+#include <lib/support/ScopedBuffer.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/DiagnosticDataProvider.h>
 
@@ -43,6 +48,8 @@ using chip::DeviceLayer::GetDiagnosticDataProvider;
 using chip::Protocols::InteractionModel::Status;
 
 namespace {
+
+constexpr uint8_t kCurrentClusterRevision = 2;
 
 bool IsTestEventTriggerEnabled()
 {
@@ -209,10 +216,24 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & a
         bool isTestEventTriggersEnabled = IsTestEventTriggerEnabled();
         return aEncoder.Encode(isTestEventTriggersEnabled);
     }
-    // Note: Attribute ID 0x0009 was removed (#30002).
-    default: {
-        break;
+        // Note: Attribute ID 0x0009 was removed (#30002).
+
+    case FeatureMap::Id: {
+        uint32_t features = 0;
+
+#if CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
+        features |= to_underlying(Clusters::GeneralDiagnostics::Feature::kDataModelTest);
+#endif // CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
+
+        return aEncoder.Encode(features);
     }
+
+    case ClusterRevision::Id: {
+        return aEncoder.Encode(kCurrentClusterRevision);
+    }
+
+    default:
+        break;
     }
     return CHIP_NO_ERROR;
 }
@@ -352,29 +373,37 @@ void GeneralDiagnosticsServer::OnNetworkFaultsDetect(const GeneralFaults<kMaxNet
 } // namespace app
 } // namespace chip
 
-bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                              const Commands::TestEventTrigger::DecodableType & commandData)
-{
+namespace {
 
-    if (commandData.enableKey.size() != TestEventTriggerDelegate::kEnableKeyLength)
+TestEventTriggerDelegate * GetTriggerDelegateOnMatchingKey(ByteSpan enableKey)
+{
+    if (enableKey.size() != TestEventTriggerDelegate::kEnableKeyLength)
     {
-        commandObj->AddStatus(commandPath, Status::ConstraintError);
-        return true;
+        return nullptr;
     }
 
-    if (IsByteSpanAllZeros(commandData.enableKey))
+    if (IsByteSpanAllZeros(enableKey))
     {
-        commandObj->AddStatus(commandPath, Status::ConstraintError);
-        return true;
+        return nullptr;
     }
 
     auto * triggerDelegate = chip::Server::GetInstance().GetTestEventTriggerDelegate();
 
-    // Spec says "EnableKeyMismatch" but this never existed prior to 1.0 SVE2 and mismatches
-    // test plans as well. ConstraintError is specified for most other errors, so
-    // we keep the behavior as close as possible, except for EnableKeyMismatch which
-    // is going to be a ConstraintError.
-    if (triggerDelegate == nullptr || !triggerDelegate->DoesEnableKeyMatch(commandData.enableKey))
+    if (triggerDelegate == nullptr || !triggerDelegate->DoesEnableKeyMatch(enableKey))
+    {
+        return nullptr;
+    }
+
+    return triggerDelegate;
+}
+
+} // namespace
+
+bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                              const Commands::TestEventTrigger::DecodableType & commandData)
+{
+    auto * triggerDelegate = GetTriggerDelegateOnMatchingKey(commandData.enableKey);
+    if (triggerDelegate == nullptr)
     {
         commandObj->AddStatus(commandPath, Status::ConstraintError);
         return true;
@@ -417,6 +446,44 @@ bool emberAfGeneralDiagnosticsClusterTimeSnapshotCallback(CommandHandler * comma
             static_cast<uint64_t>(std::chrono::duration_cast<System::Clock::Milliseconds64>(posix_time_us).count()));
     }
     commandObj->AddResponse(commandPath, response);
+    return true;
+}
+
+bool emberAfGeneralDiagnosticsClusterPayloadTestRequestCallback(CommandHandler * commandObj,
+                                                                const ConcreteCommandPath & commandPath,
+                                                                const Commands::PayloadTestRequest::DecodableType & commandData)
+{
+    // Max allowed is 2048.
+    if (commandData.count > 2048)
+    {
+        commandObj->AddStatus(commandPath, Status::ConstraintError);
+        return true;
+    }
+
+    // Ensure Test Event triggers are enabled and key matches.
+    auto * triggerDelegate = GetTriggerDelegateOnMatchingKey(commandData.enableKey);
+    if (triggerDelegate == nullptr)
+    {
+        commandObj->AddStatus(commandPath, Status::ConstraintError);
+        return true;
+    }
+
+    Commands::PayloadTestResponse::Type response;
+    Platform::ScopedMemoryBufferWithSize<uint8_t> payload;
+    if (!payload.Calloc(commandData.count))
+    {
+        commandObj->AddStatus(commandPath, Status::ResourceExhausted);
+        return true;
+    }
+
+    memset(payload.Get(), commandData.value, payload.AllocatedSize());
+    response.payload = ByteSpan{ payload.Get(), payload.AllocatedSize() };
+
+    if (commandObj->AddResponseData(commandPath, response) != CHIP_NO_ERROR)
+    {
+        commandObj->AddStatus(commandPath, Status::ResourceExhausted);
+    }
+
     return true;
 }
 

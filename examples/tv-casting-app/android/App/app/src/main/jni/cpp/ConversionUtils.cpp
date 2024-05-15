@@ -32,7 +32,7 @@ CHIP_ERROR convertJAppParametersToCppAppParams(jobject appParameters, AppParams 
 
     jclass jAppParametersClass;
     ReturnErrorOnFailure(
-        chip::JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/AppParameters", jAppParametersClass));
+        chip::JniReferences::GetInstance().GetLocalClassRef(env, "com/chip/casting/AppParameters", jAppParametersClass));
 
     jmethodID getRotatingDeviceIdUniqueIdMethod = env->GetMethodID(jAppParametersClass, "getRotatingDeviceIdUniqueId", "()[B");
     if (getRotatingDeviceIdUniqueIdMethod == nullptr)
@@ -67,7 +67,7 @@ CHIP_ERROR convertJContentAppToTargetEndpointInfo(jobject contentApp, TargetEndp
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
 
     jclass jContentAppClass;
-    ReturnErrorOnFailure(chip::JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/ContentApp", jContentAppClass));
+    ReturnErrorOnFailure(chip::JniReferences::GetInstance().GetLocalClassRef(env, "com/chip/casting/ContentApp", jContentAppClass));
 
     jfieldID jEndpointIdField = env->GetFieldID(jContentAppClass, "endpointId", "S");
     jshort jEndpointId        = env->GetShortField(contentApp, jEndpointIdField);
@@ -104,7 +104,8 @@ CHIP_ERROR convertTargetEndpointInfoToJContentApp(TargetEndpointInfo * targetEnd
         JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
 
         jclass jContentAppClass;
-        ReturnErrorOnFailure(chip::JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/ContentApp", jContentAppClass));
+        ReturnErrorOnFailure(
+            chip::JniReferences::GetInstance().GetLocalClassRef(env, "com/chip/casting/ContentApp", jContentAppClass));
         jmethodID jContentAppConstructor = env->GetMethodID(jContentAppClass, "<init>", "(SLjava/util/List;)V");
         chip::ClusterId * clusters       = targetEndpointInfo->GetClusters();
         jobject jClustersArrayList       = nullptr;
@@ -132,7 +133,8 @@ CHIP_ERROR convertJVideoPlayerToTargetVideoPlayerInfo(jobject videoPlayer, Targe
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
 
     jclass jVideoPlayerClass;
-    ReturnErrorOnFailure(chip::JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/VideoPlayer", jVideoPlayerClass));
+    ReturnErrorOnFailure(
+        chip::JniReferences::GetInstance().GetLocalClassRef(env, "com/chip/casting/VideoPlayer", jVideoPlayerClass));
 
     jfieldID jNodeIdField = env->GetFieldID(jVideoPlayerClass, "nodeId", "J");
     chip::NodeId nodeId   = static_cast<chip::NodeId>(env->GetLongField(videoPlayer, jNodeIdField));
@@ -206,7 +208,8 @@ CHIP_ERROR convertJVideoPlayerToTargetVideoPlayerInfo(jobject videoPlayer, Targe
         jobject jContentApp = env->CallObjectMethod(jIterator, jNextMid);
 
         jclass jContentAppClass;
-        ReturnErrorOnFailure(chip::JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/ContentApp", jContentAppClass));
+        ReturnErrorOnFailure(
+            chip::JniReferences::GetInstance().GetLocalClassRef(env, "com/chip/casting/ContentApp", jContentAppClass));
         jfieldID jEndpointIdField     = env->GetFieldID(jContentAppClass, "endpointId", "S");
         chip::EndpointId endpointId   = static_cast<chip::EndpointId>(env->GetShortField(jContentApp, jEndpointIdField));
         TargetEndpointInfo * endpoint = outTargetVideoPlayerInfo.GetOrAddEndpoint(endpointId);
@@ -226,7 +229,7 @@ CHIP_ERROR convertTargetVideoPlayerInfoToJVideoPlayer(TargetVideoPlayerInfo * ta
 
         jclass jVideoPlayerClass;
         ReturnErrorOnFailure(
-            chip::JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/VideoPlayer", jVideoPlayerClass));
+            chip::JniReferences::GetInstance().GetLocalClassRef(env, "com/chip/casting/VideoPlayer", jVideoPlayerClass));
         jmethodID jVideoPlayerConstructor = env->GetMethodID(jVideoPlayerClass, "<init>",
                                                              "(JBLjava/lang/String;IIILjava/util/List;ILjava/util/List;Ljava/lang/"
                                                              "String;Ljava/lang/String;IJLjava/lang/String;ZZ)V");
@@ -277,7 +280,8 @@ CHIP_ERROR convertTargetVideoPlayerInfoToJVideoPlayer(TargetVideoPlayerInfo * ta
                 jstring jIPAddressStr = env->NewStringUTF(addrCString);
 
                 jclass jIPAddressClass;
-                ReturnErrorOnFailure(chip::JniReferences::GetInstance().GetClassRef(env, "java/net/InetAddress", jIPAddressClass));
+                ReturnErrorOnFailure(
+                    chip::JniReferences::GetInstance().GetLocalClassRef(env, "java/net/InetAddress", jIPAddressClass));
                 jmethodID jGetByNameMid =
                     env->GetStaticMethodID(jIPAddressClass, "getByName", "(Ljava/lang/String;)Ljava/net/InetAddress;");
                 jobject jIPAddress = env->CallStaticObjectMethod(jIPAddressClass, jGetByNameMid, jIPAddressStr);
@@ -297,7 +301,7 @@ CHIP_ERROR convertTargetVideoPlayerInfoToJVideoPlayer(TargetVideoPlayerInfo * ta
 }
 
 CHIP_ERROR convertJDiscoveredNodeDataToCppDiscoveredNodeData(jobject jDiscoveredNodeData,
-                                                             chip::Dnssd::DiscoveredNodeData & outCppDiscoveredNodeData)
+                                                             chip::Dnssd::CommissionNodeData & outCppDiscoveredNodeData)
 {
     ChipLogProgress(AppServer, "convertJDiscoveredNodeDataToCppDiscoveredNodeData called");
     VerifyOrReturnError(jDiscoveredNodeData != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -306,13 +310,13 @@ CHIP_ERROR convertJDiscoveredNodeDataToCppDiscoveredNodeData(jobject jDiscovered
 
     jclass jDiscoveredNodeDataClass;
     ReturnErrorOnFailure(
-        chip::JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/DiscoveredNodeData", jDiscoveredNodeDataClass));
+        chip::JniReferences::GetInstance().GetLocalClassRef(env, "com/chip/casting/DiscoveredNodeData", jDiscoveredNodeDataClass));
 
     jfieldID getHostNameField = env->GetFieldID(jDiscoveredNodeDataClass, "hostName", "Ljava/lang/String;");
     jstring jHostName         = static_cast<jstring>(env->GetObjectField(jDiscoveredNodeData, getHostNameField));
     if (jHostName != nullptr)
     {
-        chip::Platform::CopyString(outCppDiscoveredNodeData.resolutionData.hostName, chip::Dnssd::kHostNameMaxLength + 1,
+        chip::Platform::CopyString(outCppDiscoveredNodeData.hostName, chip::Dnssd::kHostNameMaxLength + 1,
                                    env->GetStringUTFChars(jHostName, 0));
     }
 
@@ -320,64 +324,58 @@ CHIP_ERROR convertJDiscoveredNodeDataToCppDiscoveredNodeData(jobject jDiscovered
     jstring jInstanceName         = static_cast<jstring>(env->GetObjectField(jDiscoveredNodeData, getInstanceNameField));
     if (jInstanceName != nullptr)
     {
-        chip::Platform::CopyString(outCppDiscoveredNodeData.commissionData.instanceName,
-                                   chip::Dnssd::Commission::kInstanceNameMaxLength + 1, env->GetStringUTFChars(jInstanceName, 0));
+        chip::Platform::CopyString(outCppDiscoveredNodeData.instanceName, chip::Dnssd::Commission::kInstanceNameMaxLength + 1,
+                                   env->GetStringUTFChars(jInstanceName, 0));
     }
 
-    jfieldID jLongDiscriminatorField = env->GetFieldID(jDiscoveredNodeDataClass, "longDiscriminator", "J");
-    outCppDiscoveredNodeData.commissionData.vendorId =
-        static_cast<uint16_t>(env->GetLongField(jDiscoveredNodeData, jLongDiscriminatorField));
+    jfieldID jLongDiscriminatorField  = env->GetFieldID(jDiscoveredNodeDataClass, "longDiscriminator", "J");
+    outCppDiscoveredNodeData.vendorId = static_cast<uint16_t>(env->GetLongField(jDiscoveredNodeData, jLongDiscriminatorField));
 
-    jfieldID jVendorIdField = env->GetFieldID(jDiscoveredNodeDataClass, "vendorId", "J");
-    outCppDiscoveredNodeData.commissionData.vendorId =
-        static_cast<uint16_t>(env->GetLongField(jDiscoveredNodeData, jVendorIdField));
+    jfieldID jVendorIdField           = env->GetFieldID(jDiscoveredNodeDataClass, "vendorId", "J");
+    outCppDiscoveredNodeData.vendorId = static_cast<uint16_t>(env->GetLongField(jDiscoveredNodeData, jVendorIdField));
 
-    jfieldID jProductIdField = env->GetFieldID(jDiscoveredNodeDataClass, "productId", "J");
-    outCppDiscoveredNodeData.commissionData.productId =
-        static_cast<uint16_t>(env->GetLongField(jDiscoveredNodeData, jProductIdField));
+    jfieldID jProductIdField           = env->GetFieldID(jDiscoveredNodeDataClass, "productId", "J");
+    outCppDiscoveredNodeData.productId = static_cast<uint16_t>(env->GetLongField(jDiscoveredNodeData, jProductIdField));
 
     jfieldID jCommissioningModeField = env->GetFieldID(jDiscoveredNodeDataClass, "commissioningMode", "B");
-    outCppDiscoveredNodeData.commissionData.commissioningMode =
+    outCppDiscoveredNodeData.commissioningMode =
         static_cast<uint8_t>(env->GetByteField(jDiscoveredNodeData, jCommissioningModeField));
 
-    jfieldID jDeviceTypeField = env->GetFieldID(jDiscoveredNodeDataClass, "deviceType", "J");
-    outCppDiscoveredNodeData.commissionData.deviceType =
-        static_cast<uint16_t>(env->GetLongField(jDiscoveredNodeData, jDeviceTypeField));
+    jfieldID jDeviceTypeField           = env->GetFieldID(jDiscoveredNodeDataClass, "deviceType", "J");
+    outCppDiscoveredNodeData.deviceType = static_cast<uint16_t>(env->GetLongField(jDiscoveredNodeData, jDeviceTypeField));
 
     jfieldID getDeviceNameField = env->GetFieldID(jDiscoveredNodeDataClass, "deviceName", "Ljava/lang/String;");
     jstring jDeviceName         = static_cast<jstring>(env->GetObjectField(jDiscoveredNodeData, getDeviceNameField));
     if (jDeviceName != nullptr)
     {
-        chip::Platform::CopyString(outCppDiscoveredNodeData.commissionData.deviceName, chip::Dnssd::kMaxDeviceNameLen + 1,
+        chip::Platform::CopyString(outCppDiscoveredNodeData.deviceName, chip::Dnssd::kMaxDeviceNameLen + 1,
                                    env->GetStringUTFChars(jDeviceName, 0));
     }
 
     // TODO: map rotating ID
-    jfieldID jRotatingIdLenField = env->GetFieldID(jDiscoveredNodeDataClass, "rotatingIdLen", "I");
-    outCppDiscoveredNodeData.commissionData.rotatingIdLen =
-        static_cast<size_t>(env->GetIntField(jDiscoveredNodeData, jRotatingIdLenField));
+    jfieldID jRotatingIdLenField           = env->GetFieldID(jDiscoveredNodeDataClass, "rotatingIdLen", "I");
+    outCppDiscoveredNodeData.rotatingIdLen = static_cast<size_t>(env->GetIntField(jDiscoveredNodeData, jRotatingIdLenField));
 
-    jfieldID jPairingHintField = env->GetFieldID(jDiscoveredNodeDataClass, "pairingHint", "S");
-    outCppDiscoveredNodeData.commissionData.pairingHint =
-        static_cast<uint16_t>(env->GetShortField(jDiscoveredNodeData, jPairingHintField));
+    jfieldID jPairingHintField           = env->GetFieldID(jDiscoveredNodeDataClass, "pairingHint", "S");
+    outCppDiscoveredNodeData.pairingHint = static_cast<uint16_t>(env->GetShortField(jDiscoveredNodeData, jPairingHintField));
 
     jfieldID getPairingInstructionField = env->GetFieldID(jDiscoveredNodeDataClass, "pairingInstruction", "Ljava/lang/String;");
     jstring jPairingInstruction = static_cast<jstring>(env->GetObjectField(jDiscoveredNodeData, getPairingInstructionField));
     if (jPairingInstruction != nullptr)
     {
-        chip::Platform::CopyString(outCppDiscoveredNodeData.commissionData.pairingInstruction,
-                                   chip::Dnssd::kMaxPairingInstructionLen + 1, env->GetStringUTFChars(jPairingInstruction, 0));
+        chip::Platform::CopyString(outCppDiscoveredNodeData.pairingInstruction, chip::Dnssd::kMaxPairingInstructionLen + 1,
+                                   env->GetStringUTFChars(jPairingInstruction, 0));
     }
 
-    jfieldID jPortField                          = env->GetFieldID(jDiscoveredNodeDataClass, "port", "I");
-    outCppDiscoveredNodeData.resolutionData.port = static_cast<uint16_t>(env->GetIntField(jDiscoveredNodeData, jPortField));
+    jfieldID jPortField           = env->GetFieldID(jDiscoveredNodeDataClass, "port", "I");
+    outCppDiscoveredNodeData.port = static_cast<uint16_t>(env->GetIntField(jDiscoveredNodeData, jPortField));
 
-    jfieldID jNumIpsField                          = env->GetFieldID(jDiscoveredNodeDataClass, "numIPs", "I");
-    outCppDiscoveredNodeData.resolutionData.numIPs = static_cast<size_t>(env->GetIntField(jDiscoveredNodeData, jNumIpsField));
+    jfieldID jNumIpsField           = env->GetFieldID(jDiscoveredNodeDataClass, "numIPs", "I");
+    outCppDiscoveredNodeData.numIPs = static_cast<size_t>(env->GetIntField(jDiscoveredNodeData, jNumIpsField));
 
     jfieldID jIPAddressesField = env->GetFieldID(jDiscoveredNodeDataClass, "ipAddresses", "Ljava/util/List;");
     jobject jIPAddresses       = env->GetObjectField(jDiscoveredNodeData, jIPAddressesField);
-    if (jIPAddresses == nullptr && outCppDiscoveredNodeData.resolutionData.numIPs > 0)
+    if (jIPAddresses == nullptr && outCppDiscoveredNodeData.numIPs > 0)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -392,18 +390,18 @@ CHIP_ERROR convertJDiscoveredNodeDataToCppDiscoveredNodeData(jobject jDiscovered
     {
         jobject jIPAddress = env->CallObjectMethod(jIterator, jNextMid);
         jclass jIPAddressClass;
-        ReturnErrorOnFailure(chip::JniReferences::GetInstance().GetClassRef(env, "java/net/InetAddress", jIPAddressClass));
+        ReturnErrorOnFailure(chip::JniReferences::GetInstance().GetLocalClassRef(env, "java/net/InetAddress", jIPAddressClass));
         jmethodID jGetHostAddressMid = env->GetMethodID(jIPAddressClass, "getHostAddress", "()Ljava/lang/String;");
         jstring jIPAddressStr        = static_cast<jstring>(env->CallObjectMethod(jIPAddress, jGetHostAddressMid));
 
         chip::Inet::IPAddress addressInet;
         chip::JniUtfString addressJniString(env, jIPAddressStr);
         VerifyOrReturnError(chip::Inet::IPAddress::FromString(addressJniString.c_str(), addressInet), CHIP_ERROR_INVALID_ARGUMENT);
-        outCppDiscoveredNodeData.resolutionData.ipAddress[ipAddressCount] = addressInet;
+        outCppDiscoveredNodeData.ipAddress[ipAddressCount] = addressInet;
 
         if (ipAddressCount == 0)
         {
-            outCppDiscoveredNodeData.resolutionData.interfaceId = chip::Inet::InterfaceId::FromIPAddress(addressInet);
+            outCppDiscoveredNodeData.interfaceId = chip::Inet::InterfaceId::FromIPAddress(addressInet);
         }
         ipAddressCount++;
     }

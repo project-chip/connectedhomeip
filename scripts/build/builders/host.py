@@ -228,14 +228,14 @@ class HostApp(Enum):
             yield 'dishwasher-app'
             yield 'dishwasher-app.map'
         elif self == HostApp.MICROWAVE_OVEN:
-            yield 'microwave-oven-app'
-            yield 'microwave-oven-app.map'
+            yield 'chip-microwave-oven-app'
+            yield 'chip-microwave-oven-app.map'
         elif self == HostApp.REFRIGERATOR:
             yield 'refrigerator-app'
             yield 'refrigerator-app.map'
         elif self == HostApp.RVC:
-            yield 'rvc-app'
-            yield 'rvc-app.map'
+            yield 'chip-rvc-app'
+            yield 'chip-rvc-app.map'
         elif self == HostApp.AIR_PURIFIER:
             yield 'air-purifier-app'
             yield 'air-purifier-app.map'
@@ -295,7 +295,7 @@ class HostBuilder(GnBuilder):
                  enable_ipv4=True, enable_ble=True, enable_wifi=True,
                  enable_thread=True, use_tsan=False, use_asan=False, use_ubsan=False,
                  separate_event_loop=True, fuzzing_type: HostFuzzingType = HostFuzzingType.NONE, use_clang=False,
-                 interactive_mode=True, extra_tests=False, use_platform_mdns=False, enable_rpcs=False,
+                 interactive_mode=True, extra_tests=False, use_nl_fault_injection=False, use_platform_mdns=False, enable_rpcs=False,
                  use_coverage=False, use_dmalloc=False, minmdns_address_policy=None,
                  minmdns_high_verbosity=False, imgui_ui=False, crypto_library: HostCryptoLibrary = None,
                  enable_test_event_triggers=None):
@@ -367,6 +367,9 @@ class HostBuilder(GnBuilder):
                 # Fake uses "//build/toolchain/fake:fake_x64_gcc"
                 # so setting clang is not correct
                 raise Exception('Fake host board is always gcc (not clang)')
+
+        if use_nl_fault_injection:
+            self.extra_gn_options.append('chip_with_nlfaultinjection=true')
 
         if minmdns_address_policy:
             if use_platform_mdns:
@@ -509,19 +512,21 @@ class HostBuilder(GnBuilder):
     def PreBuildCommand(self):
         if self.app == HostApp.TESTS and self.use_coverage:
             self._Execute(['ninja', '-C', self.output_dir, 'default'], title="Build-only")
-            self._Execute(['find', os.path.join(self.output_dir, 'obj/src/'), '-depth',
-                           '-name', 'tests', '-exec', 'rm -rf {} \\;'], title="Cleanup unit tests")
             self._Execute(['lcov', '--initial', '--capture', '--directory', os.path.join(self.output_dir, 'obj'),
+                           '--exclude', os.path.join(self.chip_dir, '**/tests/*'),
                            '--exclude', os.path.join(self.chip_dir, 'zzz_generated/*'),
                            '--exclude', os.path.join(self.chip_dir, 'third_party/*'),
+                           '--exclude', os.path.join(self.chip_dir, 'out/*'),
                            '--exclude', '/usr/include/*',
                            '--output-file', os.path.join(self.coverage_dir, 'lcov_base.info')], title="Initial coverage baseline")
 
     def PostBuildCommand(self):
         if self.app == HostApp.TESTS and self.use_coverage:
             self._Execute(['lcov', '--capture', '--directory', os.path.join(self.output_dir, 'obj'),
+                           '--exclude', os.path.join(self.chip_dir, '**/tests/*'),
                            '--exclude', os.path.join(self.chip_dir, 'zzz_generated/*'),
                            '--exclude', os.path.join(self.chip_dir, 'third_party/*'),
+                           '--exclude', os.path.join(self.chip_dir, 'out/*'),
                            '--exclude', '/usr/include/*',
                            '--output-file', os.path.join(self.coverage_dir, 'lcov_test.info')], title="Update coverage")
             self._Execute(['lcov', '--add-tracefile', os.path.join(self.coverage_dir, 'lcov_base.info'),

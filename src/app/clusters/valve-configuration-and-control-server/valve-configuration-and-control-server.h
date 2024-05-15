@@ -30,6 +30,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
 #include <lib/support/BitMask.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
@@ -40,7 +41,7 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
 Delegate * GetDefaultDelegate(EndpointId endpoint);
 
 CHIP_ERROR CloseValve(chip::EndpointId ep);
-CHIP_ERROR SetValveLevel(chip::EndpointId ep, chip::Percent level, DataModel::Nullable<uint32_t> openDuration);
+CHIP_ERROR SetValveLevel(chip::EndpointId ep, DataModel::Nullable<Percent> level, DataModel::Nullable<uint32_t> openDuration);
 CHIP_ERROR UpdateCurrentLevel(chip::EndpointId ep, chip::Percent currentLevel);
 CHIP_ERROR UpdateCurrentState(chip::EndpointId ep, ValveConfigurationAndControl::ValveStateEnum currentState);
 CHIP_ERROR EmitValveFault(chip::EndpointId ep, chip::BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault);
@@ -49,7 +50,7 @@ void UpdateAutoCloseTime(uint64_t time);
 inline bool HasFeature(EndpointId ep, Feature feature)
 {
     uint32_t map;
-    bool success = (Attributes::FeatureMap::Get(ep, &map) == EMBER_ZCL_STATUS_SUCCESS);
+    bool success = (Attributes::FeatureMap::Get(ep, &map) == Protocols::InteractionModel::Status::Success);
     return success ? (map & to_underlying(feature)) : false;
 }
 

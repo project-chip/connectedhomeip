@@ -33,6 +33,7 @@ set(PRIV_INCLUDE_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/nlio/repo/include"
                       "${CMAKE_SOURCE_DIR}/../"
                       "${CMAKE_SOURCE_DIR}/../common"
+                      "${CMAKE_SOURCE_DIR}/../common/clusters"
                       "${CMAKE_SOURCE_DIR}/main/include/"
 )
 
@@ -62,6 +63,15 @@ set(SRC_DIRS_LIST
                       ${SRC_DIRS_LIST}
                       "${CMAKE_CURRENT_LIST_DIR}"
                       "${CMAKE_SOURCE_DIR}/../common"
+                      "${CMAKE_SOURCE_DIR}/../common/clusters/audio-output/"
+                      "${CMAKE_SOURCE_DIR}/../common/clusters/channel/"
+                      "${CMAKE_SOURCE_DIR}/../common/clusters/door-lock/"
+                      "${CMAKE_SOURCE_DIR}/../common/clusters/keypad-input/"
+                      "${CMAKE_SOURCE_DIR}/../common/clusters/low-power/"
+                      "${CMAKE_SOURCE_DIR}/../common/clusters/media-input/"
+                      "${CMAKE_SOURCE_DIR}/../common/clusters/media-playback/"
+                      "${CMAKE_SOURCE_DIR}/../common/clusters/target-navigator/"
+                      "${CMAKE_SOURCE_DIR}/../common/clusters/wake-on-lan/"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated/attributes"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/util"
@@ -141,6 +151,17 @@ pw_proto_library(attributes_service
     pw_protobuf.common_proto
 )
 
+pw_proto_library(boolean_state_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/boolean_state_service.proto
+  PREFIX
+    boolean_state_service
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  DEPS
+    pw_protobuf.common_proto
+)
+
 pw_proto_library(button_service
   SOURCES
     ${CHIP_ROOT}/examples/common/pigweed/protos/button_service.proto
@@ -191,6 +212,7 @@ pw_proto_library(wifi_service
 
 target_link_libraries(${COMPONENT_LIB} PUBLIC
   attributes_service.nanopb_rpc
+  boolean_state_service.nanopb_rpc
   button_service.nanopb_rpc
   descriptor_service.nanopb_rpc
   device_service.nanopb_rpc
@@ -215,6 +237,7 @@ target_link_options(${COMPONENT_LIB}
 
 target_compile_options(${COMPONENT_LIB} PRIVATE
                        "-DPW_RPC_ATTRIBUTE_SERVICE=1"
+                       "-DPW_RPC_BOOLEAN_STATE_SERVICE=1"
                        "-DPW_RPC_BUTTON_SERVICE=1"
                        "-DPW_RPC_DEVICE_SERVICE=1"
                        "-DPW_RPC_DESCRIPTOR_SERVICE=1"

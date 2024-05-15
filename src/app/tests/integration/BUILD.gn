@@ -19,15 +19,31 @@ import("${chip_root}/build/chip/tools.gni")
 
 assert(chip_build_tools)
 
+source_set("common") {
+  sources = [
+    "common.cpp",
+    "common.h",
+  ]
+
+  deps = [
+    "${chip_root}/src/credentials",
+    "${chip_root}/src/crypto",
+    "${chip_root}/src/lib/support:testing",
+    "${chip_root}/src/messaging",
+    "${chip_root}/src/protocols",
+    "${chip_root}/src/transport",
+  ]
+}
+
 executable("chip-im-initiator") {
   sources = [
     "${chip_root}/src/app/reporting/tests/MockReportScheduler.cpp",
     "RequiredPrivilegeStubs.cpp",
     "chip_im_initiator.cpp",
-    "common.cpp",
   ]
 
   deps = [
+    ":common",
     "${chip_root}/src/app",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
@@ -44,16 +60,18 @@ executable("chip-im-responder") {
   sources = [
     "${chip_root}/src/app/reporting/tests/MockReportScheduler.cpp",
     "MockEvents.cpp",
+    "MockEvents.h",
     "RequiredPrivilegeStubs.cpp",
     "chip_im_responder.cpp",
-    "common.cpp",
   ]
 
   deps = [
+    ":common",
     "${chip_root}/src/app",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/messaging",
     "${chip_root}/src/platform",
     "${chip_root}/src/protocols",
     "${chip_root}/src/system",

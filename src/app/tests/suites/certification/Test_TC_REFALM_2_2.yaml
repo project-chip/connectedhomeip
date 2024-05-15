@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 223.2.2. [TC-REFALM-2.2] Primary functionality with DUT as Server
 
@@ -20,117 +19,189 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
-    endpoint: 0
+    cluster: "Refrigerator Alarm"
+    endpoint: 1
+    PIXIT.REFALM.AlarmThreshold:
+        type: int16u
+        defaultValue: 5
 
 tests:
-    - label: "Note"
-      verification: |
-          This is a simulated example log for instructional purposes only. In real scenarios, the actual log may vary depending on the feature implementation in Reference App.
-      disabled: true
-
     - label:
           "Step 1: Commission DUT to TH (can be skipped if done in a preceding
           test)"
-      verification: |
-
-      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Step 2: Ensure that the door on the DUT is closed"
       verification: |
           Ensure that the door on the DUT is closed
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Step 3: TH reads from the DUT the State attribute"
+    - label: "Step 3:TH reads from the DUT the State attribute"
+      command: "readAttribute"
+      attribute: "State"
       PICS: REFALM.S.A0002
-      verification: |
-          ./chip-tool refrigeratoralarm read state 1 1
-          On TH(chip-tool), Verify that the DUT response contains a 32-bit value with bit 0 set to 0.
-
-          [1688447820.603249][4247:4249] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0057 Attribute 0x0000_0002 DataVersion: 1795162772
-          [1688447820.603415][4247:4249] CHIP:TOO:   State: 1
-          [1688447820.603708][4247:4249] CHIP:EM: <<< [E:2198i S:4260 M:156565261 (Ack:46517349)] (S) Msg TX to 1:0000000000000001 [10DB] --- Type 0000:10 (SecureChannel:StandaloneAck)
-      disabled: true
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x1]
 
     - label: "Step 4: Manually open the door on the DUT"
       verification: |
           Manually open the door on the DUT
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 5: Wait for the time defined in PIXIT.REFALM.AlarmThreshold"
-      verification: |
-          Wait for the time defined in PIXIT.REFALM.AlarmThreshold
-      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "ms"
+                value: PIXIT.REFALM.AlarmThreshold * 1000
 
     - label: "Step 6: TH reads from the DUT the State attribute"
-      PICS: REFALM.S.A0002
-      verification: |
-          ./chip-tool refrigeratoralarm read state 1 1
-          On TH(chip-tool), Verify that the DUT response contains a 32-bit value with bit 0 set to 1.
-
-          [1688447820.603249][4247:4249] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0057 Attribute 0x0000_0002 DataVersion: 1795162772
-          [1688447820.603415][4247:4249] CHIP:TOO:   State: 1
-          [1688447820.603708][4247:4249] CHIP:EM: <<< [E:2198i S:4260 M:156565261 (Ack:46517349)] (S) Msg TX to 1:0000000000000001 [10DB] --- Type 0000:10 (SecureChannel:StandaloneAck)
-      disabled: true
+      command: "readAttribute"
+      attribute: "State"
+      PICS: REFALM.S.A0002 && PICS_USER_PROMPT
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
 
     - label: "Step 7: Ensure that the door on the DUT is closed"
       verification: |
           Ensure that the door on the DUT is closed
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 8: TH reads from the DUT the State attribute"
-      PICS: REFALM.S.A0002
-      verification: |
-          ./chip-tool refrigeratoralarm read state 1 1
-          On TH(chip-tool), Verify that the DUT response contains a 32-bit value with bit 0 set to 0.
+      command: "readAttribute"
+      attribute: "State"
+      PICS: REFALM.S.A0002 PICS_USER_PROMPT
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x1]
 
-          [1688447820.603249][4247:4249] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0057 Attribute 0x0000_0002 DataVersion: 1795162772
-          [1688447820.603415][4247:4249] CHIP:TOO:   State: 0
-          [1688447820.603708][4247:4249] CHIP:EM: <<< [E:2198i S:4260 M:156565261 (Ack:46517349)] (S) Msg TX to 1:0000000000000001 [10DB] --- Type 0000:10 (SecureChannel:StandaloneAck)
-      disabled: true
-
+      # Issue: https://github.com/project-chip/connectedhomeip/issues/28325
+      # Issue: https://github.com/project-chip/connectedhomeip/issues/27235
     - label: "Step 9: TH sends Reset command to the DUT"
-      PICS: REFALM.S.C00.Rsp
+      PICS: REFALM.S.C00.Rsp && PICS_USER_PROMPT
       verification: |
           Reset command is not implemeted in Chip-tool
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 10: TH sends ModifyEnabledAlarms command to the DUT"
-      PICS: REFALM.S.C01.Rsp
+      PICS: REFALM.S.C01.Rsp && PICS_USER_PROMPT
       verification: |
           ModifyEnabledAlarms is not implemeted in Chip-tool
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 11: Set up subscription to the Notify event."
       PICS: REFALM.S.E00 && REFALM.S.A0002
+      command: "subscribeEvent"
+      event: "Notify"
+      minInterval: 2
+      maxInterval: 10
+
+    - label: "Step 12a: Repeating step 4 Manually open the door on the DUT"
       verification: |
-          Please use Interactive mode to  subscribe the OperationalError event
-          Here the command to enter interactive mode after provision :-
-           ./chip-tool interactive start
+          Manually open the door on the DUT
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
-          Please subscribe to the Notify event by sending below mentioned command
-           refrigeratoralarm  subscribe-event notify 2 10 1 1
+    - label:
+          "Step 12b: Repeat step 5 Wait for the time defined in
+          PIXIT.REFALM.AlarmThreshold"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "ms"
+                value: PIXIT.REFALM.AlarmThreshold * 1000
 
-          [1690959967.087585][3549:3551] CHIP:EM: Rxd Ack; Removing MessageCounter:144404037 from Retrans Table on exchange 19895i
-          [1690959967.087651][3549:3551] CHIP:DMG: ReportDataMessage =
-          [1690959967.087684][3549:3551] CHIP:DMG: {
-          [1690959967.087712][3549:3551] CHIP:DMG: 	SubscriptionId = 0x959257ec,
-          [1690959967.087743][3549:3551] CHIP:DMG: 	InteractionModelRevision = 1
-          [1690959967.087770][3549:3551] CHIP:DMG: }
-          [1690959967.087813][3549:3551] CHIP:DMG: MoveToState ReadClient[0xffff80010ac0]: Moving to [AwaitingSu]
-          [1690959967.087923][3549:3551] CHIP:EM: <<< [E:19895i S:58037 M:144404038 (Ack:133694741)] (S) Msg TX to 1:0000000000000001 [7C8C] --- Type 0001:01 (IM:StatusResponse)
-          [1690959967.087966][3549:3551] CHIP:IN: (S) Sending msg 144404038 on secure session with LSID: 58037
-      disabled: true
+    - label:
+          "Step 12c: After step 5 (repeated), receive a Notify event with the
+          State attribute bit 0 set to 1."
+      command: "readAttribute"
+      attribute: "State"
+      PICS: REFALM.S.A0002 && PICS_USER_PROMPT
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
 
-    - label: "Step 12: Repeat steps 4 then 5"
-      PICS: REFALM.S.E00
+    - label:
+          "Step 13a : Repeat step 7 Ensure that the door on the DUT is closed"
       verification: |
-          Repeat steps 4 - Manually open the door on the DUT
-           then 5 - Wait for the time defined in PIXIT.REFALM.AlarmThreshold
-      disabled: true
+          Manually open the door on the DUT
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Step 13: Repeat step 7"
-      PICS: REFALM.S.E00
-      verification: |
-          Repeat step 7 - that is Ensure that the door on the DUT is closed
-      disabled: true
+    - label:
+          "Step 13b: Receive a Notify event with the State attribute bit 0 set
+          to 0"
+      command: "readAttribute"
+      attribute: "State"
+      PICS: REFALM.S.A0002 && PICS_USER_PROMPT
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x1]

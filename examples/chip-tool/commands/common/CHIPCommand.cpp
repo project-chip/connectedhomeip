@@ -27,6 +27,8 @@
 #include <lib/support/TestGroupData.h>
 #include <platform/LockTracker.h>
 
+#include <string>
+
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 #include "TraceDecoder.h"
 #include "TraceHandlers.h"
@@ -149,9 +151,11 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
 
     ReturnErrorOnFailure(GetAttestationTrustStore(mPaaTrustStorePath.ValueOr(nullptr), &sTrustStore));
 
-    ReturnLogErrorOnFailure(sCheckInDelegate.Init(&sICDClientStorage));
+    auto engine = chip::app::InteractionModelEngine::GetInstance();
+    VerifyOrReturnError(engine != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnLogErrorOnFailure(sCheckInDelegate.Init(&sICDClientStorage, engine));
     ReturnLogErrorOnFailure(sCheckInHandler.Init(DeviceControllerFactory::GetInstance().GetSystemState()->ExchangeMgr(),
-                                                 &sICDClientStorage, &sCheckInDelegate));
+                                                 &sICDClientStorage, &sCheckInDelegate, engine));
 
     CommissionerIdentity nullIdentity{ kIdentityNull, chip::kUndefinedNodeId };
     ReturnLogErrorOnFailure(InitializeCommissioner(nullIdentity, kIdentityNullFabricId));
@@ -164,7 +168,8 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
             cdTrustStorePath = getenv(kCDTrustStorePathVariable);
         }
 
-        auto additionalCdCerts = chip::Credentials::LoadAllX509DerCerts(cdTrustStorePath);
+        auto additionalCdCerts =
+            chip::Credentials::LoadAllX509DerCerts(cdTrustStorePath, chip::Credentials::CertificateValidationMode::kPublicKeyOnly);
         if (cdTrustStorePath != nullptr && additionalCdCerts.size() == 0)
         {
             ChipLogError(chipTool, "Warning: no CD signing certs found in path: %s, only defaults will be used", cdTrustStorePath);

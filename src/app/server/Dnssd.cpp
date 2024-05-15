@@ -38,6 +38,11 @@
 #include <setup_payload/SetupPayload.h>
 #include <system/TimeSource.h>
 
+#include <algorithm>
+
+using namespace chip;
+using namespace chip::DeviceLayer;
+
 namespace chip {
 namespace app {
 namespace {
@@ -48,9 +53,6 @@ void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
     {
     case DeviceLayer::DeviceEventType::kDnssdInitialized:
     case DeviceLayer::DeviceEventType::kDnssdRestartNeeded:
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-    case DeviceLayer::DeviceEventType::kICDPollingIntervalChange:
-#endif
         app::DnssdServer::Instance().StartServer();
         break;
     default:
@@ -150,13 +152,38 @@ void DnssdServer::AddICDKeyToAdvertisement(AdvertisingParams & advParams)
     VerifyOrDieWithMsg(mICDManager != nullptr, Discovery,
                        "Invalid pointer to the ICDManager which is required for the LIT operating mode");
 
+    Dnssd::ICDModeAdvertise ICDModeToAdvertise = Dnssd::ICDModeAdvertise::kNone;
     // Only advertise the ICD key if the device can operate as a LIT
     if (mICDManager->SupportsFeature(Clusters::IcdManagement::Feature::kLongIdleTimeSupport))
     {
-        advParams.SetICDOperatingAsLIT(Optional<bool>(mICDManager->GetICDMode() == ICDConfigurationData::ICDMode::LIT));
+        if (mICDManager->GetICDMode() == ICDConfigurationData::ICDMode::LIT)
+        {
+            ICDModeToAdvertise = Dnssd::ICDModeAdvertise::kLIT;
+        }
+        else
+        {
+            ICDModeToAdvertise = Dnssd::ICDModeAdvertise::kSIT;
+        }
     }
+
+    advParams.SetICDModeToAdvertise(ICDModeToAdvertise);
 }
 #endif
+
+void DnssdServer::GetPrimaryOrFallbackMACAddress(chip::MutableByteSpan mac)
+{
+    if (ConfigurationMgr().GetPrimaryMACAddress(mac) != CHIP_NO_ERROR)
+    {
+        // Only generate a fallback "MAC" once, so we don't keep constantly changing our host name.
+        if (std::all_of(std::begin(mFallbackMAC), std::end(mFallbackMAC), [](uint8_t v) { return v == 0; }))
+        {
+            ChipLogError(Discovery, "Failed to get primary mac address of device. Generating a random one.");
+            Crypto::DRBG_get_bytes(mFallbackMAC, sizeof(mFallbackMAC));
+        }
+        VerifyOrDie(mac.size() == sizeof(mFallbackMAC)); // kPrimaryMACAddressLength
+        memcpy(mac.data(), mFallbackMAC, sizeof(mFallbackMAC));
+    }
+}
 
 /// Set MDNS operational advertisement
 CHIP_ERROR DnssdServer::AdvertiseOperational()
@@ -172,11 +199,7 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
 
         uint8_t macBuffer[DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength];
         MutableByteSpan mac(macBuffer);
-        if (chip::DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac) != CHIP_NO_ERROR)
-        {
-            ChipLogError(Discovery, "Failed to get primary mac address of device. Generating a random one.");
-            Crypto::DRBG_get_bytes(macBuffer, sizeof(macBuffer));
-        }
+        GetPrimaryOrFallbackMACAddress(mac);
 
         auto advertiseParameters = chip::Dnssd::OperationalAdvertisingParameters()
                                        .SetPeerId(fabricInfo.GetPeerId())
@@ -184,7 +207,6 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
                                        .SetPort(GetSecuredPort())
                                        .SetInterfaceId(GetInterfaceId())
                                        .SetLocalMRPConfig(GetLocalMRPConfig())
-                                       .SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT))
                                        .EnableIpV4(true);
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -218,11 +240,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
 
     uint8_t macBuffer[DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength];
     MutableByteSpan mac(macBuffer);
-    if (chip::DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac) != CHIP_NO_ERROR)
-    {
-        ChipLogError(Discovery, "Failed to get primary mac address of device. Generating a random one.");
-        Crypto::DRBG_get_bytes(macBuffer, sizeof(macBuffer));
-    }
+    GetPrimaryOrFallbackMACAddress(mac);
     advertiseParameters.SetMac(mac);
 
     uint16_t value;
@@ -258,7 +276,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
         advertiseParameters.SetDeviceName(chip::Optional<const char *>::Value(deviceName));
     }
 
-    advertiseParameters.SetLocalMRPConfig(GetLocalMRPConfig()).SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT));
+    advertiseParameters.SetLocalMRPConfig(GetLocalMRPConfig());
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     AddICDKeyToAdvertisement(advertiseParameters);
@@ -499,7 +517,7 @@ CHIP_ERROR DnssdServer::GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[
 void DnssdServer::OnICDModeChange()
 {
     // ICDMode changed, restart DNS-SD advertising, because SII and ICD key are affected by this change.
-    // StartServer will take care of setting the operational and commissionable advertissements
+    // StartServer will take care of setting the operational and commissionable advertisements
     StartServer();
 }
 

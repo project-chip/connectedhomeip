@@ -994,6 +994,10 @@ cluster GeneralDiagnostics = 51 {
     kEthernetFault = 6;
   }
 
+  bitmap Feature : bitmap32 {
+    kDataModelTest = 0x1;
+  }
+
   struct NetworkInterface {
     char_string<32> name = 0;
     boolean isOperational = 1;
@@ -1050,10 +1054,22 @@ cluster GeneralDiagnostics = 51 {
     nullable posix_ms posixTimeMs = 1;
   }
 
+  request struct PayloadTestRequestRequest {
+    octet_string<16> enableKey = 0;
+    int8u value = 1;
+    int16u count = 2;
+  }
+
+  response struct PayloadTestResponse = 4 {
+    octet_string payload = 0;
+  }
+
   /** Provide a means for certification tests to trigger some test-plan-specific events */
   command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
   /** Take a snapshot of system time and epoch time. */
   command TimeSnapshot(): TimeSnapshotResponse = 1;
+  /** Request a variable length payload response. */
+  command PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
@@ -1483,6 +1499,99 @@ cluster FixedLabel = 64 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+}
+
+/** This cluster provides an interface for passing messages to be presented by a device. */
+provisional cluster Messages = 151 {
+  revision 3;
+
+  enum FutureMessagePreferenceEnum : enum8 {
+    kAllowed = 0;
+    kIncreased = 1;
+    kReduced = 2;
+    kDisallowed = 3;
+    kBanned = 4;
+  }
+
+  enum MessagePriorityEnum : enum8 {
+    kLow = 0;
+    kMedium = 1;
+    kHigh = 2;
+    kCritical = 3;
+  }
+
+  bitmap Feature : bitmap32 {
+    kReceivedConfirmation = 0x1;
+    kConfirmationResponse = 0x2;
+    kConfirmationReply = 0x4;
+    kProtectedMessages = 0x8;
+  }
+
+  bitmap MessageControlBitmap : bitmap8 {
+    kConfirmationRequired = 0x1;
+    kResponseRequired = 0x2;
+    kReplyMessage = 0x4;
+    kMessageConfirmed = 0x8;
+    kMessageProtected = 0x10;
+  }
+
+  struct MessageResponseOptionStruct {
+    optional int32u messageResponseID = 0;
+    optional char_string<32> label = 1;
+  }
+
+  struct MessageStruct {
+    octet_string<16> messageID = 0;
+    MessagePriorityEnum priority = 1;
+    MessageControlBitmap messageControl = 2;
+    nullable epoch_s startTime = 3;
+    nullable int64u duration = 4;
+    char_string<256> messageText = 5;
+    optional MessageResponseOptionStruct responses[] = 6;
+  }
+
+  info event MessageQueued = 0 {
+    octet_string messageID = 0;
+  }
+
+  info event MessagePresented = 1 {
+    octet_string messageID = 0;
+  }
+
+  info event MessageComplete = 2 {
+    octet_string messageID = 0;
+    optional nullable int32u responseID = 1;
+    optional nullable char_string reply = 2;
+    nullable FutureMessagePreferenceEnum futureMessagesPreference = 3;
+  }
+
+  readonly attribute MessageStruct messages[] = 0;
+  readonly attribute octet_string activeMessageIDs[] = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct PresentMessagesRequestRequest {
+    octet_string<16> messageID = 0;
+    MessagePriorityEnum priority = 1;
+    MessageControlBitmap messageControl = 2;
+    nullable epoch_s startTime = 3;
+    nullable int64u duration = 4;
+    char_string<256> messageText = 5;
+    optional MessageResponseOptionStruct responses[] = 6;
+  }
+
+  request struct CancelMessagesRequestRequest {
+    octet_string messageIDs[] = 0;
+  }
+
+  /** Command for requesting messages be presented */
+  fabric command PresentMessagesRequest(PresentMessagesRequestRequest): DefaultSuccess = 0;
+  /** Command for cancelling message present requests */
+  fabric command CancelMessagesRequest(CancelMessagesRequestRequest): DefaultSuccess = 1;
 }
 
 /** This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol. */
@@ -2142,7 +2251,6 @@ cluster ContentLauncher = 1290 {
   bitmap SupportedProtocolsBitmap : bitmap32 {
     kDASH = 0x1;
     kHLS = 0x2;
-    kWebRTC = 0x2;
   }
 
   struct DimensionStruct {
@@ -2407,7 +2515,7 @@ cluster AccountLogin = 1294 {
 }
 
 /** This cluster is used for managing the content control (including "parental control") settings on a media device such as a TV, or Set-top Box. */
-cluster ContentControl = 1295 {
+provisional cluster ContentControl = 1295 {
   revision 1; // NOTE: Default/not specifically set
 
   bitmap Feature : bitmap32 {
@@ -2490,7 +2598,7 @@ cluster ContentControl = 1295 {
 }
 
 /** This cluster provides an interface for sending targeted commands to an Observer of a Content App on a Video Player device such as a Streaming Media Player, Smart TV or Smart Screen. The cluster server for Content App Observer is implemented by an endpoint that communicates with a Content App, such as a Casting Video Client. The cluster client for Content App Observer is implemented by a Content App endpoint. A Content App is informed of the NodeId of an Observer when a binding is set on the Content App. The Content App can then send the ContentAppMessage to the Observer (server cluster), and the Observer responds with a ContentAppMessageResponse. */
-cluster ContentAppObserver = 1296 {
+provisional cluster ContentAppObserver = 1296 {
   revision 1; // NOTE: Default/not specifically set
 
   enum StatusEnum : enum8 {
@@ -2653,8 +2761,8 @@ endpoint 0 {
     callback attribute activeRadioFaults;
     callback attribute activeNetworkFaults;
     callback attribute testEventTriggersEnabled default = false;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0002;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command TestEventTrigger;
     handle command TimeSnapshot;
@@ -2763,6 +2871,7 @@ endpoint 1 {
   binding cluster OnOff;
   binding cluster LevelControl;
   binding cluster Descriptor;
+  binding cluster Messages;
   binding cluster WakeOnLan;
   binding cluster Channel;
   binding cluster TargetNavigator;

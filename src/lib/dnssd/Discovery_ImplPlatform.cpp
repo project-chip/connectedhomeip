@@ -19,7 +19,7 @@
 
 #include <inttypes.h>
 
-#include <app/icd/ICDConfig.h>
+#include <app/icd/server/ICDServerConfig.h>
 #include <crypto/RandUtils.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -51,7 +51,7 @@ static void HandleNodeResolve(void * context, DnssdService * result, const Span<
     DiscoveredNodeData nodeData;
     result->ToDiscoveredNodeData(addresses, nodeData);
 
-    nodeData.LogDetail();
+    nodeData.Get<CommissionNodeData>().LogDetail();
     discoveryContext->OnNodeDiscovered(nodeData);
     discoveryContext->Release();
 }
@@ -213,19 +213,20 @@ CHIP_ERROR CopyTxtRecord(TxtFieldKey key, char * buffer, size_t bufferLen, const
     case TxtFieldKey::kSessionIdleInterval:
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
         // A ICD operating as a LIT should not advertise its slow polling interval
-        if (params.GetICDOperatingAsLIT().HasValue() && params.GetICDOperatingAsLIT().Value())
-        {
-            // Returning UNINITIALIZED ensures that the SII string isn't added by the AddTxtRecord
-            // without erroring out the action.
-            return CHIP_ERROR_UNINITIALIZED;
-        }
+        // Returning UNINITIALIZED ensures that the SII string isn't added by the AddTxtRecord
+        // without erroring out the action.
+        VerifyOrReturnError(params.GetICDModeToAdvertise() != ICDModeAdvertise::kLIT, CHIP_ERROR_UNINITIALIZED);
         FALLTHROUGH;
 #endif
     case TxtFieldKey::kSessionActiveInterval:
     case TxtFieldKey::kSessionActiveThreshold:
         return CopyTextRecordValue(buffer, bufferLen, params.GetLocalMRPConfig(), key);
     case TxtFieldKey::kLongIdleTimeICD:
-        return CopyTextRecordValue(buffer, bufferLen, params.GetICDOperatingAsLIT());
+        // The ICD key is only added to the advertissment when the device supports the ICD LIT feature-set.
+        // Return UNINITIALIZED when the operating mode is kNone to ensure that the ICD string isn't added
+        // by the AddTxtRecord without erroring out the action.
+        VerifyOrReturnError(params.GetICDModeToAdvertise() != ICDModeAdvertise::kNone, CHIP_ERROR_UNINITIALIZED);
+        return CopyTextRecordValue(buffer, bufferLen, (params.GetICDModeToAdvertise() == ICDModeAdvertise::kLIT));
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -338,37 +339,37 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, DnssdService * r
 
 void DnssdService::ToDiscoveredNodeData(const Span<Inet::IPAddress> & addresses, DiscoveredNodeData & nodeData)
 {
-    auto & resolutionData = nodeData.resolutionData;
-    auto & commissionData = nodeData.commissionData;
+    nodeData.Set<CommissionNodeData>();
+    auto & discoveredData = nodeData.Get<CommissionNodeData>();
 
-    Platform::CopyString(resolutionData.hostName, mHostName);
-    Platform::CopyString(commissionData.instanceName, mName);
+    Platform::CopyString(discoveredData.hostName, mHostName);
+    Platform::CopyString(discoveredData.instanceName, mName);
 
     IPAddressSorter::Sort(addresses, mInterface);
 
     size_t addressesFound = 0;
     for (auto & ip : addresses)
     {
-        if (addressesFound == ArraySize(resolutionData.ipAddress))
+        if (addressesFound == ArraySize(discoveredData.ipAddress))
         {
             // Out of space.
             ChipLogProgress(Discovery, "Can't add more IPs to DiscoveredNodeData");
             break;
         }
-        resolutionData.ipAddress[addressesFound] = ip;
+        discoveredData.ipAddress[addressesFound] = ip;
         ++addressesFound;
     }
 
-    resolutionData.interfaceId = mInterface;
-    resolutionData.numIPs      = addressesFound;
-    resolutionData.port        = mPort;
+    discoveredData.interfaceId = mInterface;
+    discoveredData.numIPs      = addressesFound;
+    discoveredData.port        = mPort;
 
     for (size_t i = 0; i < mTextEntrySize; ++i)
     {
         ByteSpan key(reinterpret_cast<const uint8_t *>(mTextEntries[i].mKey), strlen(mTextEntries[i].mKey));
         ByteSpan val(mTextEntries[i].mData, mTextEntries[i].mDataSize);
-        FillNodeDataFromTxt(key, val, resolutionData);
-        FillNodeDataFromTxt(key, val, commissionData);
+        FillNodeDataFromTxt(key, val, discoveredData);
+        FillNodeDataFromTxt(key, val, discoveredData);
     }
 }
 
@@ -419,8 +420,13 @@ void DiscoveryImplPlatform::HandleDnssdInit(void * context, CHIP_ERROR initError
 
 void DiscoveryImplPlatform::HandleDnssdError(void * context, CHIP_ERROR error)
 {
+    DiscoveryImplPlatform * publisher = static_cast<DiscoveryImplPlatform *>(context);
+
     if (error == CHIP_ERROR_FORCED_RESET)
     {
+        // Restore dnssd state before restart, also needs to call ChipDnssdShutdown()
+        publisher->Shutdown();
+
         DeviceLayer::ChipDeviceEvent event;
         event.Type = DeviceLayer::DeviceEventType::kDnssdRestartNeeded;
         error      = DeviceLayer::PlatformMgr().PostEvent(&event);
@@ -737,6 +743,21 @@ CHIP_ERROR DiscoveryImplPlatform::DiscoverCommissioners(DiscoveryFilter filter, 
     return error;
 }
 
+CHIP_ERROR DiscoveryImplPlatform::StartDiscovery(DiscoveryType type, DiscoveryFilter filter, DiscoveryContext & context)
+{
+    switch (type)
+    {
+    case DiscoveryType::kCommissionableNode:
+        return DiscoverCommissionableNodes(filter, context);
+    case DiscoveryType::kCommissionerNode:
+        return DiscoverCommissioners(filter, context);
+    case DiscoveryType::kOperational:
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+
 CHIP_ERROR DiscoveryImplPlatform::StopDiscovery(DiscoveryContext & context)
 {
     if (!context.GetBrowseIdentifier().HasValue())
@@ -763,15 +784,19 @@ DiscoveryImplPlatform & DiscoveryImplPlatform::GetInstance()
     return sManager.get();
 }
 
-ServiceAdvertiser & chip::Dnssd::ServiceAdvertiser::Instance()
+#if CHIP_DNSSD_DEFAULT_PLATFORM
+
+ServiceAdvertiser & GetDefaultAdvertiser()
 {
     return DiscoveryImplPlatform::GetInstance();
 }
 
-Resolver & chip::Dnssd::Resolver::Instance()
+Resolver & GetDefaultResolver()
 {
     return DiscoveryImplPlatform::GetInstance();
 }
+
+#endif // CHIP_DNSSD_DEFAULT_PLATFORM
 
 } // namespace Dnssd
 } // namespace chip

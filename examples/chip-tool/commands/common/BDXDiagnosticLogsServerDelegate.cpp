@@ -18,6 +18,7 @@
 
 #include "BDXDiagnosticLogsServerDelegate.h"
 
+#include <string>
 #include <unistd.h>
 
 constexpr const char kTmpDir[]          = "/tmp/";
@@ -25,9 +26,10 @@ constexpr uint8_t kMaxFileDesignatorLen = 32;
 constexpr uint16_t kMaxFilePathLen      = kMaxFileDesignatorLen + sizeof(kTmpDir) + 1;
 
 // For testing a few file names trigger an error depending on the current 'phase'.
-constexpr char kErrorOnTransferBegin[] = "Error:OnTransferBegin";
-constexpr char kErrorOnTransferData[]  = "Error:OnTransferData";
-constexpr char kErrorOnTransferEnd[]   = "Error:OnTransferEnd";
+constexpr char kErrorOnTransferBegin[]            = "Error:OnTransferBegin";
+constexpr char kErrorOnTransferData[]             = "Error:OnTransferData";
+constexpr char kErrorOnTransferEnd[]              = "Error:OnTransferEnd";
+constexpr char kErrorTransferMethodNotSupported[] = "TransferMethodNotSupported.txt";
 
 BDXDiagnosticLogsServerDelegate BDXDiagnosticLogsServerDelegate::sInstance;
 
@@ -136,8 +138,14 @@ CHIP_ERROR BDXDiagnosticLogsServerDelegate::OnTransferBegin(chip::bdx::BDXTransf
     auto fileDesignator = transfer->GetFileDesignator();
     LogFileDesignator("OnTransferBegin", fileDesignator);
 
+    VerifyOrReturnError(fileDesignator.size() != 0, CHIP_ERROR_UNKNOWN_RESOURCE_ID);
+
     chip::CharSpan phaseErrorTarget(kErrorOnTransferBegin, sizeof(kErrorOnTransferBegin) - 1);
     ReturnErrorOnFailure(CheckForErrorRequested(phaseErrorTarget, fileDesignator));
+
+    chip::CharSpan transferErrorTarget(kErrorTransferMethodNotSupported, sizeof(kErrorTransferMethodNotSupported) - 1);
+    VerifyOrReturnError(!transferErrorTarget.data_equal(fileDesignator), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
     ReturnErrorOnFailure(CheckFileDesignatorAllowed(mFileDesignators, fileDesignator));
 
     char outputFilePath[kMaxFilePathLen] = { 0 };

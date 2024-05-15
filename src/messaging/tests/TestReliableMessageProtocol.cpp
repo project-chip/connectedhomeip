@@ -22,6 +22,7 @@
  *      implementation.
  */
 
+#include <app/icd/server/ICDServerConfig.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestContext.h>
@@ -46,7 +47,11 @@
 #include <messaging/tests/MessagingContext.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDConfigurationData.h> // nogncheck
+#include <app/icd/server/ICDConfigurationData.h> // nogncheck
+#endif
+
+#if CHIP_CRYPTO_PSA
+#include "psa/crypto.h"
 #endif
 
 namespace {
@@ -74,6 +79,9 @@ public:
     // Performs setup for each individual test in the test suite
     CHIP_ERROR SetUp() override
     {
+#if CHIP_CRYPTO_PSA
+        ReturnErrorOnFailure(psa_crypto_init() == PSA_SUCCESS ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL);
+#endif
         ReturnErrorOnFailure(chip::Test::LoopbackMessagingContext::SetUp());
         GetSessionAliceToBob()->AsSecureSession()->SetRemoteSessionParameters(GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));
         GetSessionBobToAlice()->AsSecureSession()->SetRemoteSessionParameters(GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));
@@ -2194,8 +2202,10 @@ const nlTest sTests[] = {
                 TestReliableMessageProtocol::CheckLostStandaloneAck),
     NL_TEST_DEF("Test Is Peer Active Retry logic", TestReliableMessageProtocol::CheckIsPeerActiveNotInitiator),
     NL_TEST_DEF("Test MRP backoff algorithm", TestReliableMessageProtocol::CheckGetBackoff),
-    NL_TEST_DEF("Test an application response that comes after MRP retransmits run out",
-                TestReliableMessageProtocol::CheckApplicationResponseDelayed),
+    // TODO: Re-enable this test, after changing test to use Mock clock / DriveIO rather than DriveIOUntil.
+    // Issue: https://github.com/project-chip/connectedhomeip/issues/32440
+    // NL_TEST_DEF("Test an application response that comes after MRP retransmits run out",
+    //            TestReliableMessageProtocol::CheckApplicationResponseDelayed),
     NL_TEST_DEF("Test an application response that never comes, so MRP retransmits run out and then exchange times out",
                 TestReliableMessageProtocol::CheckApplicationResponseNeverComes),
     NL_TEST_SENTINEL(),

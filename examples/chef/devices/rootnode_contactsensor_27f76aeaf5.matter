@@ -1018,6 +1018,10 @@ cluster GeneralDiagnostics = 51 {
     kEthernetFault = 6;
   }
 
+  bitmap Feature : bitmap32 {
+    kDataModelTest = 0x1;
+  }
+
   struct NetworkInterface {
     char_string<32> name = 0;
     boolean isOperational = 1;
@@ -1074,10 +1078,22 @@ cluster GeneralDiagnostics = 51 {
     nullable posix_ms posixTimeMs = 1;
   }
 
+  request struct PayloadTestRequestRequest {
+    octet_string<16> enableKey = 0;
+    int8u value = 1;
+    int16u count = 2;
+  }
+
+  response struct PayloadTestResponse = 4 {
+    octet_string payload = 0;
+  }
+
   /** Provide a means for certification tests to trigger some test-plan-specific events */
   command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
   /** Take a snapshot of system time and epoch time. */
   command TimeSnapshot(): TimeSnapshotResponse = 1;
+  /** Request a variable length payload response. */
+  command PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
@@ -1407,6 +1423,491 @@ cluster BooleanState = 69 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** The Test Cluster is meant to validate the generated code */
+internal cluster UnitTesting = 4294048773 {
+  revision 1; // NOTE: Default/not specifically set
+
+  enum SimpleEnum : enum8 {
+    kUnspecified = 0;
+    kValueA = 1;
+    kValueB = 2;
+    kValueC = 3;
+  }
+
+  bitmap Bitmap16MaskMap : bitmap16 {
+    kMaskVal1 = 0x1;
+    kMaskVal2 = 0x2;
+    kMaskVal3 = 0x4;
+    kMaskVal4 = 0x4000;
+  }
+
+  bitmap Bitmap32MaskMap : bitmap32 {
+    kMaskVal1 = 0x1;
+    kMaskVal2 = 0x2;
+    kMaskVal3 = 0x4;
+    kMaskVal4 = 0x40000000;
+  }
+
+  bitmap Bitmap64MaskMap : bitmap64 {
+    kMaskVal1 = 0x1;
+    kMaskVal2 = 0x2;
+    kMaskVal3 = 0x4;
+    kMaskVal4 = 0x4000000000000000;
+  }
+
+  bitmap Bitmap8MaskMap : bitmap8 {
+    kMaskVal1 = 0x1;
+    kMaskVal2 = 0x2;
+    kMaskVal3 = 0x4;
+    kMaskVal4 = 0x40;
+  }
+
+  bitmap SimpleBitmap : bitmap8 {
+    kValueA = 0x1;
+    kValueB = 0x2;
+    kValueC = 0x4;
+  }
+
+  struct SimpleStruct {
+    int8u a = 0;
+    boolean b = 1;
+    SimpleEnum c = 2;
+    octet_string d = 3;
+    char_string e = 4;
+    SimpleBitmap f = 5;
+    single g = 6;
+    double h = 7;
+  }
+
+  fabric_scoped struct TestFabricScoped {
+    fabric_sensitive int8u fabricSensitiveInt8u = 1;
+    optional fabric_sensitive int8u optionalFabricSensitiveInt8u = 2;
+    nullable fabric_sensitive int8u nullableFabricSensitiveInt8u = 3;
+    optional nullable fabric_sensitive int8u nullableOptionalFabricSensitiveInt8u = 4;
+    fabric_sensitive char_string fabricSensitiveCharString = 5;
+    fabric_sensitive SimpleStruct fabricSensitiveStruct = 6;
+    fabric_sensitive int8u fabricSensitiveInt8uList[] = 7;
+    fabric_idx fabricIndex = 254;
+  }
+
+  struct NullablesAndOptionalsStruct {
+    nullable int16u nullableInt = 0;
+    optional int16u optionalInt = 1;
+    optional nullable int16u nullableOptionalInt = 2;
+    nullable char_string nullableString = 3;
+    optional char_string optionalString = 4;
+    optional nullable char_string nullableOptionalString = 5;
+    nullable SimpleStruct nullableStruct = 6;
+    optional SimpleStruct optionalStruct = 7;
+    optional nullable SimpleStruct nullableOptionalStruct = 8;
+    nullable SimpleEnum nullableList[] = 9;
+    optional SimpleEnum optionalList[] = 10;
+    optional nullable SimpleEnum nullableOptionalList[] = 11;
+  }
+
+  struct NestedStruct {
+    int8u a = 0;
+    boolean b = 1;
+    SimpleStruct c = 2;
+  }
+
+  struct NestedStructList {
+    int8u a = 0;
+    boolean b = 1;
+    SimpleStruct c = 2;
+    SimpleStruct d[] = 3;
+    int32u e[] = 4;
+    octet_string f[] = 5;
+    int8u g[] = 6;
+  }
+
+  struct DoubleNestedStructList {
+    NestedStructList a[] = 0;
+  }
+
+  struct TestListStructOctet {
+    int64u member1 = 0;
+    octet_string<32> member2 = 1;
+  }
+
+  info event TestEvent = 1 {
+    int8u arg1 = 1;
+    SimpleEnum arg2 = 2;
+    boolean arg3 = 3;
+    SimpleStruct arg4 = 4;
+    SimpleStruct arg5[] = 5;
+    SimpleEnum arg6[] = 6;
+  }
+
+  fabric_sensitive info event TestFabricScopedEvent = 2 {
+    fabric_idx fabricIndex = 254;
+  }
+
+  info event TestDifferentVendorMeiEvent = 4294050030 {
+    int8u arg1 = 1;
+  }
+
+  attribute boolean boolean = 0;
+  attribute Bitmap8MaskMap bitmap8 = 1;
+  attribute Bitmap16MaskMap bitmap16 = 2;
+  attribute Bitmap32MaskMap bitmap32 = 3;
+  attribute Bitmap64MaskMap bitmap64 = 4;
+  attribute int8u int8u = 5;
+  attribute int16u int16u = 6;
+  attribute int24u int24u = 7;
+  attribute int32u int32u = 8;
+  attribute int40u int40u = 9;
+  attribute int48u int48u = 10;
+  attribute int56u int56u = 11;
+  attribute int64u int64u = 12;
+  attribute int8s int8s = 13;
+  attribute int16s int16s = 14;
+  attribute int24s int24s = 15;
+  attribute int32s int32s = 16;
+  attribute int40s int40s = 17;
+  attribute int48s int48s = 18;
+  attribute int56s int56s = 19;
+  attribute int64s int64s = 20;
+  attribute enum8 enum8 = 21;
+  attribute enum16 enum16 = 22;
+  attribute single floatSingle = 23;
+  attribute double floatDouble = 24;
+  attribute octet_string<10> octetString = 25;
+  attribute int8u listInt8u[] = 26;
+  attribute octet_string listOctetString[] = 27;
+  attribute TestListStructOctet listStructOctetString[] = 28;
+  attribute long_octet_string<1000> longOctetString = 29;
+  attribute char_string<10> charString = 30;
+  attribute long_char_string<1000> longCharString = 31;
+  attribute epoch_us epochUs = 32;
+  attribute epoch_s epochS = 33;
+  attribute vendor_id vendorId = 34;
+  attribute NullablesAndOptionalsStruct listNullablesAndOptionalsStruct[] = 35;
+  attribute SimpleEnum enumAttr = 36;
+  attribute SimpleStruct structAttr = 37;
+  attribute int8u rangeRestrictedInt8u = 38;
+  attribute int8s rangeRestrictedInt8s = 39;
+  attribute int16u rangeRestrictedInt16u = 40;
+  attribute int16s rangeRestrictedInt16s = 41;
+  attribute long_octet_string listLongOctetString[] = 42;
+  attribute TestFabricScoped listFabricScoped[] = 43;
+  timedwrite attribute boolean timedWriteBoolean = 48;
+  attribute boolean generalErrorBoolean = 49;
+  attribute boolean clusterErrorBoolean = 50;
+  attribute optional boolean unsupported = 255;
+  attribute nullable boolean nullableBoolean = 16384;
+  attribute nullable Bitmap8MaskMap nullableBitmap8 = 16385;
+  attribute nullable Bitmap16MaskMap nullableBitmap16 = 16386;
+  attribute nullable Bitmap32MaskMap nullableBitmap32 = 16387;
+  attribute nullable Bitmap64MaskMap nullableBitmap64 = 16388;
+  attribute nullable int8u nullableInt8u = 16389;
+  attribute nullable int16u nullableInt16u = 16390;
+  attribute nullable int24u nullableInt24u = 16391;
+  attribute nullable int32u nullableInt32u = 16392;
+  attribute nullable int40u nullableInt40u = 16393;
+  attribute nullable int48u nullableInt48u = 16394;
+  attribute nullable int56u nullableInt56u = 16395;
+  attribute nullable int64u nullableInt64u = 16396;
+  attribute nullable int8s nullableInt8s = 16397;
+  attribute nullable int16s nullableInt16s = 16398;
+  attribute nullable int24s nullableInt24s = 16399;
+  attribute nullable int32s nullableInt32s = 16400;
+  attribute nullable int40s nullableInt40s = 16401;
+  attribute nullable int48s nullableInt48s = 16402;
+  attribute nullable int56s nullableInt56s = 16403;
+  attribute nullable int64s nullableInt64s = 16404;
+  attribute nullable enum8 nullableEnum8 = 16405;
+  attribute nullable enum16 nullableEnum16 = 16406;
+  attribute nullable single nullableFloatSingle = 16407;
+  attribute nullable double nullableFloatDouble = 16408;
+  attribute nullable octet_string<10> nullableOctetString = 16409;
+  attribute nullable char_string<10> nullableCharString = 16414;
+  attribute nullable SimpleEnum nullableEnumAttr = 16420;
+  attribute nullable SimpleStruct nullableStruct = 16421;
+  attribute nullable int8u nullableRangeRestrictedInt8u = 16422;
+  attribute nullable int8s nullableRangeRestrictedInt8s = 16423;
+  attribute nullable int16u nullableRangeRestrictedInt16u = 16424;
+  attribute nullable int16s nullableRangeRestrictedInt16s = 16425;
+  attribute optional int8u writeOnlyInt8u = 16426;
+  attribute int8u meiInt8u = 4294070017;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  response struct TestSpecificResponse = 0 {
+    int8u returnValue = 0;
+  }
+
+  response struct TestAddArgumentsResponse = 1 {
+    int8u returnValue = 0;
+  }
+
+  response struct TestSimpleArgumentResponse = 2 {
+    boolean returnValue = 0;
+  }
+
+  response struct TestStructArrayArgumentResponse = 3 {
+    NestedStructList arg1[] = 0;
+    SimpleStruct arg2[] = 1;
+    SimpleEnum arg3[] = 2;
+    boolean arg4[] = 3;
+    SimpleEnum arg5 = 4;
+    boolean arg6 = 5;
+  }
+
+  request struct TestAddArgumentsRequest {
+    int8u arg1 = 0;
+    int8u arg2 = 1;
+  }
+
+  response struct TestListInt8UReverseResponse = 4 {
+    int8u arg1[] = 0;
+  }
+
+  request struct TestSimpleArgumentRequestRequest {
+    boolean arg1 = 0;
+  }
+
+  response struct TestEnumsResponse = 5 {
+    vendor_id arg1 = 0;
+    SimpleEnum arg2 = 1;
+  }
+
+  request struct TestStructArrayArgumentRequestRequest {
+    NestedStructList arg1[] = 0;
+    SimpleStruct arg2[] = 1;
+    SimpleEnum arg3[] = 2;
+    boolean arg4[] = 3;
+    SimpleEnum arg5 = 4;
+    boolean arg6 = 5;
+  }
+
+  response struct TestNullableOptionalResponse = 6 {
+    boolean wasPresent = 0;
+    optional boolean wasNull = 1;
+    optional int8u value = 2;
+    optional nullable int8u originalValue = 3;
+  }
+
+  request struct TestStructArgumentRequestRequest {
+    SimpleStruct arg1 = 0;
+  }
+
+  response struct TestComplexNullableOptionalResponse = 7 {
+    boolean nullableIntWasNull = 0;
+    optional int16u nullableIntValue = 1;
+    boolean optionalIntWasPresent = 2;
+    optional int16u optionalIntValue = 3;
+    boolean nullableOptionalIntWasPresent = 4;
+    optional boolean nullableOptionalIntWasNull = 5;
+    optional int16u nullableOptionalIntValue = 6;
+    boolean nullableStringWasNull = 7;
+    optional char_string nullableStringValue = 8;
+    boolean optionalStringWasPresent = 9;
+    optional char_string optionalStringValue = 10;
+    boolean nullableOptionalStringWasPresent = 11;
+    optional boolean nullableOptionalStringWasNull = 12;
+    optional char_string nullableOptionalStringValue = 13;
+    boolean nullableStructWasNull = 14;
+    optional SimpleStruct nullableStructValue = 15;
+    boolean optionalStructWasPresent = 16;
+    optional SimpleStruct optionalStructValue = 17;
+    boolean nullableOptionalStructWasPresent = 18;
+    optional boolean nullableOptionalStructWasNull = 19;
+    optional SimpleStruct nullableOptionalStructValue = 20;
+    boolean nullableListWasNull = 21;
+    optional SimpleEnum nullableListValue[] = 22;
+    boolean optionalListWasPresent = 23;
+    optional SimpleEnum optionalListValue[] = 24;
+    boolean nullableOptionalListWasPresent = 25;
+    optional boolean nullableOptionalListWasNull = 26;
+    optional SimpleEnum nullableOptionalListValue[] = 27;
+  }
+
+  request struct TestNestedStructArgumentRequestRequest {
+    NestedStruct arg1 = 0;
+  }
+
+  response struct BooleanResponse = 8 {
+    boolean value = 0;
+  }
+
+  request struct TestListStructArgumentRequestRequest {
+    SimpleStruct arg1[] = 0;
+  }
+
+  response struct SimpleStructResponse = 9 {
+    SimpleStruct arg1 = 0;
+  }
+
+  request struct TestListInt8UArgumentRequestRequest {
+    int8u arg1[] = 0;
+  }
+
+  response struct TestEmitTestEventResponse = 10 {
+    int64u value = 0;
+  }
+
+  request struct TestNestedStructListArgumentRequestRequest {
+    NestedStructList arg1 = 0;
+  }
+
+  response struct TestEmitTestFabricScopedEventResponse = 11 {
+    int64u value = 0;
+  }
+
+  request struct TestListNestedStructListArgumentRequestRequest {
+    NestedStructList arg1[] = 0;
+  }
+
+  response struct TestBatchHelperResponse = 12 {
+    octet_string<800> buffer = 0;
+  }
+
+  request struct TestListInt8UReverseRequestRequest {
+    int8u arg1[] = 0;
+  }
+
+  request struct TestEnumsRequestRequest {
+    vendor_id arg1 = 0;
+    SimpleEnum arg2 = 1;
+  }
+
+  request struct TestNullableOptionalRequestRequest {
+    optional nullable int8u arg1 = 0;
+  }
+
+  request struct TestComplexNullableOptionalRequestRequest {
+    nullable int16u nullableInt = 0;
+    optional int16u optionalInt = 1;
+    optional nullable int16u nullableOptionalInt = 2;
+    nullable char_string nullableString = 3;
+    optional char_string optionalString = 4;
+    optional nullable char_string nullableOptionalString = 5;
+    nullable SimpleStruct nullableStruct = 6;
+    optional SimpleStruct optionalStruct = 7;
+    optional nullable SimpleStruct nullableOptionalStruct = 8;
+    nullable SimpleEnum nullableList[] = 9;
+    optional SimpleEnum optionalList[] = 10;
+    optional nullable SimpleEnum nullableOptionalList[] = 11;
+  }
+
+  request struct SimpleStructEchoRequestRequest {
+    SimpleStruct arg1 = 0;
+  }
+
+  request struct TestSimpleOptionalArgumentRequestRequest {
+    optional boolean arg1 = 0;
+  }
+
+  request struct TestEmitTestEventRequestRequest {
+    int8u arg1 = 0;
+    SimpleEnum arg2 = 1;
+    boolean arg3 = 2;
+  }
+
+  request struct TestEmitTestFabricScopedEventRequestRequest {
+    int8u arg1 = 0;
+  }
+
+  request struct TestBatchHelperRequestRequest {
+    int16u sleepBeforeResponseTimeMs = 0;
+    int16u sizeOfResponseBuffer = 1;
+    int8u fillCharacter = 2;
+  }
+
+  request struct TestSecondBatchHelperRequestRequest {
+    int16u sleepBeforeResponseTimeMs = 0;
+    int16u sizeOfResponseBuffer = 1;
+    int8u fillCharacter = 2;
+  }
+
+  request struct TestDifferentVendorMeiRequestRequest {
+    int8u arg1 = 0;
+  }
+
+  response struct TestDifferentVendorMeiResponse = 4294049979 {
+    int8u arg1 = 0;
+    int64u eventNumber = 1;
+  }
+
+  /** Simple command without any parameters and without a specific response.
+        To aid in unit testing, this command will re-initialize attribute storage to defaults. */
+  command Test(): DefaultSuccess = 0;
+  /** Simple command without any parameters and without a specific response not handled by the server */
+  command TestNotHandled(): DefaultSuccess = 1;
+  /** Simple command without any parameters and with a specific response */
+  command TestSpecific(): TestSpecificResponse = 2;
+  /** Simple command that should not be added to the server. */
+  command TestUnknownCommand(): DefaultSuccess = 3;
+  /** Command that takes two arguments and returns their sum. */
+  command TestAddArguments(TestAddArgumentsRequest): TestAddArgumentsResponse = 4;
+  /** Command that takes an argument which is bool */
+  command TestSimpleArgumentRequest(TestSimpleArgumentRequestRequest): TestSimpleArgumentResponse = 5;
+  /** Command that takes various arguments that are arrays, including an array of structs which have a list member. */
+  command TestStructArrayArgumentRequest(TestStructArrayArgumentRequestRequest): TestStructArrayArgumentResponse = 6;
+  /** Command that takes an argument which is struct.  The response echoes the
+        'b' field of the single arg. */
+  command TestStructArgumentRequest(TestStructArgumentRequestRequest): BooleanResponse = 7;
+  /** Command that takes an argument which is nested struct.  The response
+        echoes the 'b' field of ar1.c. */
+  command TestNestedStructArgumentRequest(TestNestedStructArgumentRequestRequest): BooleanResponse = 8;
+  /** Command that takes an argument which is a list of structs.  The response
+        returns false if there is some struct in the list whose 'b' field is
+        false, and true otherwise (including if the list is empty). */
+  command TestListStructArgumentRequest(TestListStructArgumentRequestRequest): BooleanResponse = 9;
+  /** Command that takes an argument which is a list of INT8U.  The response
+        returns false if the list contains a 0 in it, true otherwise (including
+        if the list is empty). */
+  command TestListInt8UArgumentRequest(TestListInt8UArgumentRequestRequest): BooleanResponse = 10;
+  /** Command that takes an argument which is a Nested Struct List.  The
+        response returns false if there is some struct in arg1 (either directly
+        in arg1.c or in the arg1.d list) whose 'b' field is false, and true
+        otherwise. */
+  command TestNestedStructListArgumentRequest(TestNestedStructListArgumentRequestRequest): BooleanResponse = 11;
+  /** Command that takes an argument which is a list of Nested Struct List.
+        The response returns false if there is some struct in arg1 (either
+        directly in as the 'c' field of an entry 'd' list of an entry) whose 'b'
+        field is false, and true otherwise (including if the list is empty). */
+  command TestListNestedStructListArgumentRequest(TestListNestedStructListArgumentRequestRequest): BooleanResponse = 12;
+  /** Command that takes an argument which is a list of INT8U and expects a
+        response that reverses the list. */
+  command TestListInt8UReverseRequest(TestListInt8UReverseRequestRequest): TestListInt8UReverseResponse = 13;
+  /** Command that sends a vendor id and an enum.  The server is expected to
+        echo them back. */
+  command TestEnumsRequest(TestEnumsRequestRequest): TestEnumsResponse = 14;
+  /** Command that takes an argument which is nullable and optional.  The
+        response returns a boolean indicating whether the argument was present,
+        if that's true a boolean indicating whether the argument was null, and
+        if that' false the argument it received. */
+  command TestNullableOptionalRequest(TestNullableOptionalRequestRequest): TestNullableOptionalResponse = 15;
+  /** Command that takes various arguments which can be nullable and/or optional.  The
+        response returns information about which things were received and what
+        their state was. */
+  command TestComplexNullableOptionalRequest(TestComplexNullableOptionalRequestRequest): TestComplexNullableOptionalResponse = 16;
+  /** Command that takes an argument which is a struct.  The response echoes
+        the struct back. */
+  command SimpleStructEchoRequest(SimpleStructEchoRequestRequest): SimpleStructResponse = 17;
+  /** Command that just responds with a success status if the timed invoke
+        conditions are met. */
+  timed command TimedInvokeRequest(): DefaultSuccess = 18;
+  /** Command that takes an optional argument which is bool. It responds with a success value if the optional is set to any value. */
+  command TestSimpleOptionalArgumentRequest(TestSimpleOptionalArgumentRequestRequest): DefaultSuccess = 19;
+  /** Command that takes identical arguments to the fields of the TestEvent and logs the TestEvent to the buffer.  Command returns an event ID as the response. */
+  command TestEmitTestEventRequest(TestEmitTestEventRequestRequest): TestEmitTestEventResponse = 20;
+  /** Command that takes identical arguments to the fields of the TestFabricScopedEvent and logs the TestFabricScopedEvent to the buffer.  Command returns an event ID as the response. */
+  command TestEmitTestFabricScopedEventRequest(TestEmitTestFabricScopedEventRequestRequest): TestEmitTestFabricScopedEventResponse = 21;
+  /** Command that responds after sleepBeforeResponseTimeMs with an octet_string the size requested with fillCharacter. */
+  command TestBatchHelperRequest(TestBatchHelperRequestRequest): TestBatchHelperResponse = 22;
+  /** Second command that responds after sleepBeforeResponseTimeMs with an octet_string the size requested with fillCharacter. */
+  command TestSecondBatchHelperRequest(TestSecondBatchHelperRequestRequest): TestBatchHelperResponse = 23;
+  /** Command having a different MEI vendor ID than the cluster. Also emits TestDifferentVendorMeiEvent. */
+  command TestDifferentVendorMeiRequest(TestDifferentVendorMeiRequestRequest): TestDifferentVendorMeiResponse = 4294049962;
+}
+
 endpoint 0 {
   device type ma_rootdevice = 22, version 1;
 
@@ -1535,8 +2036,8 @@ endpoint 0 {
     callback attribute activeRadioFaults;
     callback attribute activeNetworkFaults;
     callback attribute testEventTriggersEnabled default = false;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0002;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command TestEventTrigger;
     handle command TimeSnapshot;
@@ -1613,6 +2114,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
+  device type ma_powersource = 17, version 1;
   device type ma_contactsensor = 21, version 1;
 
 
@@ -1621,11 +2123,13 @@ endpoint 1 {
     ram      attribute identifyType default = 0x0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 2;
 
     handle command Identify;
+    handle command TriggerEffect;
   }
 
   server cluster Descriptor {
@@ -1641,15 +2145,25 @@ endpoint 1 {
   }
 
   server cluster PowerSource {
-    ram      attribute status;
-    ram      attribute order;
-    ram      attribute description;
+    ram      attribute status default = 1;
+    ram      attribute order default = 1;
+    ram      attribute description default = "Primary Battery";
+    ram      attribute batVoltage default = 4100;
+    ram      attribute batPercentRemaining default = 95;
+    ram      attribute batTimeRemaining default = 5184000;
+    ram      attribute batChargeLevel default = 0;
+    ram      attribute batReplacementNeeded default = 0;
+    ram      attribute batReplaceability default = 1;
+    ram      attribute batPresent default = 1;
+    ram      attribute batCapacity default = 350;
+    ram      attribute batChargeState default = 4;
+    ram      attribute batFunctionalWhileCharging default = 1;
     callback attribute endpointList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 0x06;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -1660,6 +2174,127 @@ endpoint 1 {
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster UnitTesting {
+    emits event TestEvent;
+    emits event TestFabricScopedEvent;
+    emits event TestDifferentVendorMeiEvent;
+    ram      attribute boolean default = false;
+    ram      attribute bitmap8 default = 0;
+    ram      attribute bitmap16 default = 0;
+    ram      attribute bitmap32 default = 0;
+    ram      attribute bitmap64 default = 0;
+    ram      attribute int8u default = 0;
+    ram      attribute int16u default = 0;
+    ram      attribute int24u default = 0;
+    ram      attribute int32u default = 0;
+    ram      attribute int40u default = 0;
+    ram      attribute int48u default = 0;
+    ram      attribute int56u default = 0;
+    ram      attribute int64u default = 0;
+    ram      attribute int8s default = 0;
+    ram      attribute int16s default = 0;
+    ram      attribute int24s default = 0;
+    ram      attribute int32s default = 0;
+    ram      attribute int40s default = 0;
+    ram      attribute int48s default = 0;
+    ram      attribute int56s default = 0;
+    ram      attribute int64s default = 0;
+    ram      attribute enum8 default = 0;
+    ram      attribute enum16 default = 0;
+    ram      attribute floatSingle default = 0;
+    ram      attribute floatDouble default = 0;
+    ram      attribute octetString;
+    callback attribute listInt8u;
+    callback attribute listOctetString;
+    callback attribute listStructOctetString;
+    ram      attribute longOctetString;
+    ram      attribute charString;
+    ram      attribute longCharString;
+    ram      attribute epochUs;
+    ram      attribute epochS;
+    ram      attribute vendorId;
+    callback attribute listNullablesAndOptionalsStruct;
+    ram      attribute enumAttr;
+    callback attribute structAttr;
+    ram      attribute rangeRestrictedInt8u default = 70;
+    ram      attribute rangeRestrictedInt8s default = -20;
+    ram      attribute rangeRestrictedInt16u default = 200;
+    ram      attribute rangeRestrictedInt16s default = -100;
+    callback attribute listLongOctetString;
+    callback attribute listFabricScoped;
+    ram      attribute timedWriteBoolean;
+    callback attribute generalErrorBoolean;
+    callback attribute clusterErrorBoolean;
+    ram      attribute nullableBoolean default = false;
+    ram      attribute nullableBitmap8 default = 0;
+    ram      attribute nullableBitmap16 default = 0;
+    ram      attribute nullableBitmap32 default = 0;
+    ram      attribute nullableBitmap64 default = 0;
+    ram      attribute nullableInt8u default = 0;
+    ram      attribute nullableInt16u default = 0;
+    ram      attribute nullableInt24u default = 0;
+    ram      attribute nullableInt32u default = 0;
+    ram      attribute nullableInt40u default = 0;
+    ram      attribute nullableInt48u default = 0;
+    ram      attribute nullableInt56u default = 0;
+    ram      attribute nullableInt64u default = 0;
+    ram      attribute nullableInt8s default = 0;
+    ram      attribute nullableInt16s default = 0;
+    ram      attribute nullableInt24s default = 0;
+    ram      attribute nullableInt32s default = 0;
+    ram      attribute nullableInt40s default = 0;
+    ram      attribute nullableInt48s default = 0;
+    ram      attribute nullableInt56s default = 0;
+    ram      attribute nullableInt64s default = 0;
+    ram      attribute nullableEnum8 default = 0;
+    ram      attribute nullableEnum16 default = 0;
+    ram      attribute nullableFloatSingle default = 0;
+    ram      attribute nullableFloatDouble default = 0;
+    ram      attribute nullableOctetString;
+    ram      attribute nullableCharString;
+    ram      attribute nullableEnumAttr;
+    callback attribute nullableStruct;
+    ram      attribute nullableRangeRestrictedInt8u default = 70;
+    ram      attribute nullableRangeRestrictedInt8s default = -20;
+    ram      attribute nullableRangeRestrictedInt16u default = 200;
+    ram      attribute nullableRangeRestrictedInt16s default = -100;
+    callback attribute writeOnlyInt8u default = 0;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+    ram      attribute meiInt8u default = 0;
+
+    handle command Test;
+    handle command TestSpecificResponse;
+    handle command TestNotHandled;
+    handle command TestAddArgumentsResponse;
+    handle command TestSpecific;
+    handle command TestAddArguments;
+    handle command TestListInt8UReverseResponse;
+    handle command TestEnumsResponse;
+    handle command TestNullableOptionalResponse;
+    handle command TestStructArgumentRequest;
+    handle command TestNestedStructArgumentRequest;
+    handle command TestListStructArgumentRequest;
+    handle command SimpleStructResponse;
+    handle command TestListInt8UArgumentRequest;
+    handle command TestEmitTestEventResponse;
+    handle command TestNestedStructListArgumentRequest;
+    handle command TestEmitTestFabricScopedEventResponse;
+    handle command TestListNestedStructListArgumentRequest;
+    handle command TestListInt8UReverseRequest;
+    handle command TestEnumsRequest;
+    handle command TestNullableOptionalRequest;
+    handle command SimpleStructEchoRequest;
+    handle command TimedInvokeRequest;
+    handle command TestSimpleOptionalArgumentRequest;
+    handle command TestEmitTestEventRequest;
+    handle command TestEmitTestFabricScopedEventRequest;
+    handle command TestBatchHelperRequest;
+    handle command TestSecondBatchHelperRequest;
+    handle command TestDifferentVendorMeiRequest;
+    handle command TestDifferentVendorMeiResponse;
   }
 }
 

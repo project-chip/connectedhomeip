@@ -57,7 +57,6 @@ Davis, CA 95616, USA
 -->
 <deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0016" name="Root Node" revision="2">
   <revisionHistory>
-    <revision revision="0" summary="Represents device definitions prior to device type revision numbers"/>
     <revision revision="1" summary="Initial release of this document"/>
     <revision revision="2" summary="Added Power Source to device type; Deprecated Power Source Configuration"/>
   </revisionHistory>
@@ -152,6 +151,22 @@ Davis, CA 95616, USA
     <cluster id="0x003F" name="Group Key Management" side="server">
       <quality singleton="true"/>
       <mandatoryConform/>
+    </cluster>
+    <cluster id="0x0046" name="ICD Management" side="server">
+      <quality singleton="true"/>
+      <mandatoryConform>
+        <feature name="SIT"/>
+      </mandatoryConform>
+      <features>
+        <feature code="" name="LongIdleTimeSupport">
+          <otherwiseConform>
+            <provisionalConform/>
+            <mandatoryConform>
+              <feature name="LIT"/>
+            </mandatoryConform>
+          </otherwiseConform>
+        </feature>
+      </features>
     </cluster>
   </clusters>
 </deviceType>

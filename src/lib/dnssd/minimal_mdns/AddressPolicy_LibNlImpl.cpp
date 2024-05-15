@@ -48,6 +48,7 @@ private:
 
     nl_sock * mNlSocket            = nullptr;
     nl_cache * mNlCache            = nullptr;
+    nl_cache * mNlAddrCache        = nullptr;
     nl_object * mCurrentLink       = nullptr;
     IPAddressType mCurrentLinkType = IPAddressType::kUnknown;
 
@@ -92,6 +93,12 @@ AllListenIterator::~AllListenIterator()
     {
         nl_cache_free(mNlCache);
         mNlCache = nullptr;
+    }
+
+    if (mNlAddrCache != nullptr)
+    {
+        nl_cache_free(mNlAddrCache);
+        mNlAddrCache = nullptr;
     }
 
     if (mNlSocket != nullptr)
@@ -151,7 +158,6 @@ bool AllListenIterator::Next(InterfaceId * id, IPAddressType * type)
     while (true)
     {
 #if INET_CONFIG_ENABLE_IPV4
-        // FOR IPv4, report all interfaces as 'try IPv4 here as well'
         if (mCurrentLinkType == IPAddressType::kIPv6)
         {
             mCurrentLinkType = IPAddressType::kIPv4;
@@ -176,14 +182,42 @@ bool AllListenIterator::Next(InterfaceId * id, IPAddressType * type)
             continue;
         }
 
-        int idx = rtnl_link_get_ifindex(CurrentLink());
-        if (idx == 0)
+        int ifindex = rtnl_link_get_ifindex(CurrentLink());
+        if (ifindex == 0)
         {
             // Invalid index, move to the next interface
             continue;
         }
 
-        *id   = InterfaceId(idx);
+        // For IPv4, report only interfaces which have an IPv4 address
+        if (mCurrentLinkType == IPAddressType::kIPv4)
+        {
+            if (mNlAddrCache == nullptr)
+            {
+                int result = rtnl_addr_alloc_cache(mNlSocket, &mNlAddrCache);
+                if (result != 0)
+                {
+                    ChipLogError(Inet, "Failed to cache addresses");
+                    return false;
+                }
+            }
+
+            // Find IPv4 address for this interface
+            struct rtnl_addr * filter = rtnl_addr_alloc();
+            rtnl_addr_set_family(filter, AF_INET);
+            rtnl_addr_set_ifindex(filter, ifindex);
+
+            struct nl_object * addr = nl_cache_find(mNlAddrCache, OBJ_CAST(filter));
+            nl_object_put(OBJ_CAST(filter));
+
+            // No IPv4 address, skip this interface for IPv4.
+            if (addr == nullptr)
+                continue;
+
+            nl_object_put(addr);
+        }
+
+        *id   = InterfaceId(ifindex);
         *type = mCurrentLinkType; // advancing should have set this
         return true;
     }

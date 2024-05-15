@@ -73,7 +73,8 @@ struct LinuxDeviceOptions
     uint16_t rpcServerPort = 33000;
 #endif
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    int32_t subscriptionCapacity = CHIP_IM_MAX_NUM_SUBSCRIPTIONS;
+    int32_t subscriptionCapacity                   = CHIP_IM_MAX_NUM_SUBSCRIPTIONS;
+    int32_t subscriptionResumptionRetryIntervalSec = -1;
 #endif
     static LinuxDeviceOptions & GetInstance();
 };

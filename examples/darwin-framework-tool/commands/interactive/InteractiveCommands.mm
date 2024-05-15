@@ -19,11 +19,18 @@
 #include "InteractiveCommands.h"
 
 #include <lib/support/Base64.h>
+#include <logging/logging.h>
 #include <platform/logging/LogV.h>
 
-#include <editline.h>
+#include <string>
 
-constexpr char kInteractiveModePrompt[] = "Stop and restart stack: [Ctrl+_] & [Ctrl+^] \nQuit Interactive: 'quit()'\n>>> ";
+#include <editline.h>
+#include <stdlib.h>
+
+constexpr char kInteractiveModePrompt[] = "Stop and restart stack: [Ctrl+_] & [Ctrl+^]\n"
+                                          "Trigger exit(0): [Ctrl+@]\n"
+                                          "Quit Interactive: 'quit()'\n"
+                                          ">>> ";
 constexpr char kInteractiveModeHistoryFilePath[] = "/tmp/darwin_framework_tool_history";
 constexpr char kInteractiveModeStopCommand[] = "quit()";
 constexpr char kCategoryError[] = "Error";
@@ -72,7 +79,7 @@ void ClearLine()
 void ENFORCE_FORMAT(3, 0) LoggingCallback(const char * module, uint8_t category, const char * msg, va_list args)
 {
     ClearLine();
-    chip::Logging::Platform::LogV(module, category, msg, args);
+    dft::logging::LogRedirectCallback(module, category, msg, args);
     ClearLine();
 }
 
@@ -244,7 +251,7 @@ void ENFORCE_FORMAT(3, 0) InteractiveServerLoggingCallback(const char * module, 
     va_list args_copy;
     va_copy(args_copy, args);
 
-    chip::Logging::Platform::LogV(module, category, msg, args);
+    dft::logging::LogRedirectCallback(module, category, msg, args);
 
     char message[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
     vsnprintf(message, sizeof(message), msg, args_copy);
@@ -295,6 +302,12 @@ el_status_t StopFunction()
     return CSstay;
 }
 
+el_status_t ExitFunction()
+{
+    exit(0);
+    return CSstay;
+}
+
 CHIP_ERROR InteractiveStartCommand::RunCommand()
 {
     read_history(kInteractiveModeHistoryFilePath);
@@ -303,8 +316,13 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
     // is dumped to stdout while the user is typing a command.
     chip::Logging::SetLogRedirectCallback(LoggingCallback);
 
+    // The valid keys to bind are listed at
+    // https://github.com/troglobit/editline/blob/425584840c09f83bb8fedbf76b599d3a917621ba/src/editline.c#L1941
+    // but note that some bindings (like Ctrl+Q) might be captured by terminals
+    // and not make their way to this code.
     el_bind_key(CTL('^'), RestartFunction);
     el_bind_key(CTL('_'), StopFunction);
+    el_bind_key(CTL('@'), ExitFunction);
 
     char * command = nullptr;
     int status;

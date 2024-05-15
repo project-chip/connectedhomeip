@@ -88,10 +88,13 @@ class TestBatchInvoke(MatterBaseTest):
             sleepBeforeResponseTimeMs=0, sizeOfResponseBuffer=response_size, fillCharacter=ord(request_2_fill_character))
         invoke_request_2 = Clusters.Command.InvokeRequestInfo(endpoint, command)
         try:
-            result = await dev_ctrl.SendBatchCommands(dut_node_id, [invoke_request_1, invoke_request_2])
+            testOnlyResponse = await dev_ctrl.TestOnlySendBatchCommands(dut_node_id, [invoke_request_1, invoke_request_2])
         except InteractionModelError:
             asserts.fail("DUT failed to successfully responded to a InvokeRequest action with two valid commands")
 
+        asserts.assert_greater(testOnlyResponse.ResponseMessageCount, 1,
+                               "Unexpected, DUT sent response back in single InvokeResponseMessage")
+        result = testOnlyResponse.Responses
         asserts.assert_true(type_matches(result, list), "Unexpected return from SendBatchCommands")
         asserts.assert_equal(len(result), 2, "Unexpected number of InvokeResponses sent back from DUT")
         asserts.assert_true(type_matches(

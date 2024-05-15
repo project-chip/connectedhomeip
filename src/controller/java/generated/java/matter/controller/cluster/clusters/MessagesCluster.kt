@@ -102,7 +102,13 @@ class MessagesCluster(private val controller: MatterController, private val endp
   }
 
   suspend fun presentMessagesRequest(
-    messages: List<MessagesClusterMessageStruct>,
+    messageID: ByteArray,
+    priority: UByte,
+    messageControl: UByte,
+    startTime: UInt?,
+    duration: ULong?,
+    messageText: String,
+    responses: List<MessagesClusterMessageResponseOptionStruct>?,
     timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 0u
@@ -110,12 +116,32 @@ class MessagesCluster(private val controller: MatterController, private val endp
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_MESSAGES_REQ: Int = 0
-    tlvWriter.startArray(ContextSpecificTag(TAG_MESSAGES_REQ))
-    for (item in messages.iterator()) {
-      item.toTlv(AnonymousTag, tlvWriter)
+    val TAG_MESSAGE_I_D_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_MESSAGE_I_D_REQ), messageID)
+
+    val TAG_PRIORITY_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_PRIORITY_REQ), priority)
+
+    val TAG_MESSAGE_CONTROL_REQ: Int = 2
+    tlvWriter.put(ContextSpecificTag(TAG_MESSAGE_CONTROL_REQ), messageControl)
+
+    val TAG_START_TIME_REQ: Int = 3
+    startTime?.let { tlvWriter.put(ContextSpecificTag(TAG_START_TIME_REQ), startTime) }
+
+    val TAG_DURATION_REQ: Int = 4
+    duration?.let { tlvWriter.put(ContextSpecificTag(TAG_DURATION_REQ), duration) }
+
+    val TAG_MESSAGE_TEXT_REQ: Int = 5
+    tlvWriter.put(ContextSpecificTag(TAG_MESSAGE_TEXT_REQ), messageText)
+
+    val TAG_RESPONSES_REQ: Int = 6
+    responses?.let {
+      tlvWriter.startArray(ContextSpecificTag(TAG_RESPONSES_REQ))
+      for (item in responses.iterator()) {
+        item.toTlv(AnonymousTag, tlvWriter)
+      }
+      tlvWriter.endArray()
     }
-    tlvWriter.endArray()
     tlvWriter.endStructure()
 
     val request: InvokeRequest =

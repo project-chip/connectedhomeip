@@ -19,7 +19,6 @@
 #pragma once
 
 #include <app/clusters/mode-base-server/mode-base-server.h>
-#include <app/util/af.h>
 #include <app/util/config.h>
 #include <cstring>
 #include <utility>
@@ -45,7 +44,7 @@ private:
     using ModeTagStructType               = detail::Structs::ModeTagStruct::Type;
     ModeTagStructType ModeTagsIdle[1]     = { { .value = to_underlying(ModeTag::kIdle) } };
     ModeTagStructType ModeTagsCleaning[1] = { { .value = to_underlying(ModeTag::kCleaning) } };
-    ModeTagStructType ModeTagsMapping[1]  = { { .mfgCode = MakeOptional(TestVendor1), .value = 0x8001 } };
+    ModeTagStructType ModeTagsMapping[1]  = { { .value = to_underlying(ModeTag::kMapping) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
         detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Idle"),

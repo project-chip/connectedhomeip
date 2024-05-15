@@ -1,5 +1,4 @@
-#include <ble/BleUUID.h>
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/Darwin/UUIDHelper.h>
@@ -131,7 +130,7 @@ using ScanErrorCallback = void (*)(PyObject * context, uint32_t error);
 
 @end
 
-extern "C" void * pychip_ble_start_scanning(PyObject * context, void * adapter, uint32_t timeout,
+extern "C" void * pychip_ble_scanner_start(PyObject * context, void * adapter, uint32_t timeout,
     DeviceScannedCallback scanCallback, ScanCompleteCallback completeCallback, ScanErrorCallback errorCallback)
 {
     // NOTE: adapter is ignored as it does not apply to mac
@@ -143,4 +142,9 @@ extern "C" void * pychip_ble_start_scanning(PyObject * context, void * adapter, 
                                                                          timeoutMs:timeout];
 
     return (__bridge_retained void *) (scanner);
+}
+
+extern "C" void pychip_ble_scanner_delete(void * scanner)
+{
+    CFRelease((CFTypeRef) scanner);
 }

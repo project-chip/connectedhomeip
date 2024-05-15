@@ -27,13 +27,16 @@
 #include <app/clusters/application-basic-server/application-basic-delegate.h>
 #include <app/clusters/application-launcher-server/application-launcher-delegate.h>
 #include <app/clusters/channel-server/channel-delegate.h>
-#include <app/clusters/content-app-observer/content-app-observer-delegate.h>
 #include <app/clusters/content-control-server/content-control-delegate.h>
 #include <app/clusters/content-launch-server/content-launch-delegate.h>
 #include <app/clusters/keypad-input-server/keypad-input-delegate.h>
 #include <app/clusters/media-playback-server/media-playback-delegate.h>
 #include <app/clusters/target-navigator-server/target-navigator-delegate.h>
 #include <app/util/attribute-storage.h>
+#include <controller/CHIPDeviceController.h>
+#include <protocols/interaction_model/StatusCode.h>
+
+#include <string>
 
 namespace chip {
 namespace AppPlatform {
@@ -43,11 +46,50 @@ using ApplicationBasicDelegate    = app::Clusters::ApplicationBasic::Delegate;
 using ApplicationLauncherDelegate = app::Clusters::ApplicationLauncher::Delegate;
 using ChannelDelegate             = app::Clusters::Channel::Delegate;
 using ContentLauncherDelegate     = app::Clusters::ContentLauncher::Delegate;
-using ContentAppObserverDelegate  = app::Clusters::ContentAppObserver::Delegate;
 using ContentControlDelegate      = app::Clusters::ContentControl::Delegate;
 using KeypadInputDelegate         = app::Clusters::KeypadInput::Delegate;
 using MediaPlaybackDelegate       = app::Clusters::MediaPlayback::Delegate;
 using TargetNavigatorDelegate     = app::Clusters::TargetNavigator::Delegate;
+
+inline constexpr uint8_t kMaxClientNodes = 8;
+
+class ContentAppClientCommandSender
+{
+public:
+    ContentAppClientCommandSender() :
+        mOnDeviceConnectedCallback(OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
+    {}
+
+    bool IsBusy() const { return mIsBusy; }
+    CHIP_ERROR SendContentAppMessage(chip::Controller::DeviceCommissioner * commissioner, chip::NodeId destinationId,
+                                     chip::EndpointId endPointId, char * data, char * encodingHint);
+
+protected:
+    CHIP_ERROR SendMessage(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle);
+
+    void Cleanup();
+
+private:
+    static void OnDeviceConnectedFn(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
+                                    const chip::SessionHandle & sessionHandle);
+    static void OnDeviceConnectionFailureFn(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error);
+
+    using ContentAppMessageResponseDecodableType =
+        chip::app::Clusters::ContentAppObserver::Commands::ContentAppMessageResponse::DecodableType;
+
+    static void OnCommandResponse(void * context, const ContentAppMessageResponseDecodableType & response);
+    static void OnCommandFailure(void * context, CHIP_ERROR error);
+
+    chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
+    chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
+
+    bool mIsBusy                 = false;
+    chip::NodeId mDestinationId  = 0;
+    chip::EndpointId mEndPointId = 0;
+
+    std::string mData;
+    std::string mEncodingHint;
+};
 
 class DLL_EXPORT ContentApp
 {
@@ -63,16 +105,29 @@ public:
     virtual ChannelDelegate * GetChannelDelegate()                         = 0;
     virtual ContentLauncherDelegate * GetContentLauncherDelegate()         = 0;
     virtual ContentControlDelegate * GetContentControlDelegate()           = 0;
-    virtual ContentAppObserverDelegate * GetContentAppObserverDelegate()   = 0;
     virtual KeypadInputDelegate * GetKeypadInputDelegate()                 = 0;
     virtual MediaPlaybackDelegate * GetMediaPlaybackDelegate()             = 0;
     virtual TargetNavigatorDelegate * GetTargetNavigatorDelegate()         = 0;
 
-    EmberAfStatus HandleReadAttribute(ClusterId clusterId, AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength);
-    EmberAfStatus HandleWriteAttribute(ClusterId clusterId, AttributeId attributeId, uint8_t * buffer);
+    Protocols::InteractionModel::Status HandleReadAttribute(ClusterId clusterId, AttributeId attributeId, uint8_t * buffer,
+                                                            uint16_t maxReadLength);
+    Protocols::InteractionModel::Status HandleWriteAttribute(ClusterId clusterId, AttributeId attributeId, uint8_t * buffer);
+
+    void AddClientNode(NodeId clientNodeId);
+    uint8_t GetClientNodeCount() const { return mClientNodeCount; }
+    NodeId GetClientNode(uint8_t index) const { return mClientNodes[index]; }
+
+    void SendAppObserverCommand(chip::Controller::DeviceCommissioner * commissioner, NodeId clientNodeId, char * data,
+                                char * encodingHint);
 
 protected:
     EndpointId mEndpointId = 0;
+
+    uint8_t mClientNodeCount     = 0;
+    uint8_t mNextClientNodeIndex = 0;
+    NodeId mClientNodes[kMaxClientNodes];
+
+    ContentAppClientCommandSender mContentAppClientCommandSender;
 };
 
 } // namespace AppPlatform
