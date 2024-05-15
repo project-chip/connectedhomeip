@@ -140,6 +140,9 @@ private:
     MockAccessControl mMock;
 };
 
+#define MOCK_ATTRIBUTE_ID_FOR_TYPE(zcl_type) MockAttributeId(zcl_type + 0x1000)
+#define MOCK_ATTRIBUTE_CONFIG(zcl_type) MockAttributeConfig(MOCK_ATTRIBUTE_ID_FOR_TYPE(zcl_type), zcl_type)
+
 // clang-format off
 const MockNodeConfig gTestNodeConfig({
     MockEndpointConfig(kMockEndpoint1, {
@@ -177,7 +180,82 @@ const MockNodeConfig gTestNodeConfig({
             ClusterRevision::Id, FeatureMap::Id,
         }),
         MockClusterConfig(MockClusterId(4), {
-            ClusterRevision::Id, FeatureMap::Id,
+            ClusterRevision::Id, 
+            FeatureMap::Id,
+            // several attributes of varying data types for testing.
+            MOCK_ATTRIBUTE_CONFIG(ZCL_BOOLEAN_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_BITMAP8_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_BITMAP16_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_BITMAP32_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_BITMAP64_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_INT8U_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_INT16U_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_INT24U_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_INT32U_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_INT40U_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_INT48U_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_INT56U_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_INT64U_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_INT8S_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_INT16S_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_INT24S_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_INT32S_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_INT40S_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_INT48S_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_INT56S_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_INT64S_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_ENUM8_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_ENUM16_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_PRIORITY_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_STATUS_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_SINGLE_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_DOUBLE_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_OCTET_STRING_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_CHAR_STRING_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_ARRAY_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_STRUCT_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_GROUP_ID_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_ENDPOINT_NO_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_VENDOR_ID_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_DEVTYPE_ID_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_FABRIC_ID_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_FABRIC_IDX_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_ENTRY_IDX_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_DATA_VER_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_EVENT_NO_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_SEMTAG_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_NAMESPACE_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_TAG_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_SYSTIME_US_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_SYSTIME_MS_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_ELAPSED_S_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_TEMPERATURE_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_POWER_MW_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_AMPERAGE_MA_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_VOLTAGE_MV_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_ENERGY_MWH_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_TOD_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_DATE_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_EPOCH_US_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_EPOCH_S_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_POSIX_MS_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_PERCENT_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_PERCENT100THS_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_CLUSTER_ID_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_ATTRIB_ID_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_FIELD_ID_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_EVENT_ID_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_COMMAND_ID_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_ACTION_ID_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_TRANS_ID_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_NODE_ID_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_IPADR_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_IPV4ADR_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_IPV6ADR_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_IPV6PRE_ATTRIBUTE_TYPE),
+            MOCK_ATTRIBUTE_CONFIG(ZCL_HWADR_ATTRIBUTE_TYPE),
         }),
     }),
 });
@@ -477,14 +555,15 @@ TEST(TestCodegenModelViaMocks, EmberAttributeInvalidRead)
     ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
 }
 
-TEST(TestCodegenModelViaMocks, EmberAttributeRead)
+TEST(TestCodegenModelViaMocks, EmberAttributeReadInt32U)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     chip::app::CodegenDataModel::Model model;
     ScopedMockAccessControl accessControl;
 
-    TestReadRequest testRequest(kAdminSubjectDescriptor,
-                                ConcreteAttributePath(kMockEndpoint3, MockClusterId(2), MockAttributeId(3)));
+    TestReadRequest testRequest(
+        kAdminSubjectDescriptor,
+        ConcreteAttributePath(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_TYPE(ZCL_INT32U_ATTRIBUTE_TYPE)));
 
     std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
 
@@ -509,4 +588,42 @@ TEST(TestCodegenModelViaMocks, EmberAttributeRead)
     uint32_t actual;
     ASSERT_EQ(encodedData.dataReader.Get(actual), CHIP_NO_ERROR);
     ASSERT_EQ(actual, expected);
+}
+
+TEST(TestCodegenModelViaMocks, EmberAttributeReadOctetString)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    chip::app::CodegenDataModel::Model model;
+    ScopedMockAccessControl accessControl;
+
+    TestReadRequest testRequest(
+        kAdminSubjectDescriptor,
+        ConcreteAttributePath(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_TYPE(ZCL_INT32U_ATTRIBUTE_TYPE)));
+
+    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
+
+    // NOTE: This is a pascal string, so actual data is "test"
+    //       the longer encoding is to make it clear we do not encode the overflow
+    const char data[] = "\x04testing here with overflow";
+    chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
+
+    ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_NO_ERROR);
+
+    ASSERT_EQ(testRequest.FinishEncoding(), CHIP_NO_ERROR);
+
+    /////// VALIDATE
+    std::vector<DecodedAttributeData> attribute_data;
+    ASSERT_EQ(testRequest.encodedIBs.Decode(attribute_data), CHIP_NO_ERROR);
+    ASSERT_EQ(attribute_data.size(), 1u);
+
+    const DecodedAttributeData & encodedData = attribute_data[0];
+    ASSERT_EQ(encodedData.attributePath, testRequest.request.path);
+
+    // data element should be a uint32 encoded as TLV
+    ASSERT_EQ(encodedData.dataReader.GetType(), TLV::kTLVType_ByteString);
+    ByteSpan actual;
+    ASSERT_EQ(encodedData.dataReader.Get(actual), CHIP_NO_ERROR);
+
+    ByteSpan expected(reinterpret_cast<const uint8_t *>(data + 1), 4);
+    ASSERT_TRUE(actual.data_equal(expected));
 }
