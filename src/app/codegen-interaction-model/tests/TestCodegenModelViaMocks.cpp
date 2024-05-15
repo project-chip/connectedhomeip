@@ -25,9 +25,13 @@
 #include <app/util/mock/Functions.h>
 #include <app/util/mock/MockNodeConfig.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/TLVReader.h>
+#include <lib/core/TLVWriter.h>
 
 #include <gtest/gtest.h>
+#include <vector>
 
+// TODO: CHIP_ERROR tostring should be separated out
 #include <pw_span/span.h>
 
 using namespace chip;
@@ -182,6 +186,59 @@ struct UseMockNodeConfig
     UseMockNodeConfig(const MockNodeConfig & config) { SetMockNodeConfig(config); }
     ~UseMockNodeConfig() { ResetMockNodeConfig(); }
 };
+
+struct DecodedAttributeData
+{
+    chip::DataVersion dataVersion;
+    ConcreteDataAttributePath attributePath;
+    ByteSpan dataSpan;
+
+    CHIP_ERROR DecodeFrom(const AttributeDataIB::Parser & parser)
+    {
+        ReturnErrorOnFailure(parser.GetDataVersion(&dataVersion));
+
+        AttributePathIB::Parser pathParser;
+        ReturnErrorOnFailure(parser.GetPath(&pathParser));
+        ReturnErrorOnFailure(pathParser.GetConcreteAttributePath(attributePath, AttributePathIB::ValidateIdRanges::kNo));
+
+        TLV::TLVReader dataReader;
+        ReturnErrorOnFailure(parser.GetData(&dataReader));
+
+        dataSpan = ByteSpan(dataReader.GetReadPoint(), dataReader.GetLength());
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+CHIP_ERROR DecodeAttributeReportIBs(ByteSpan data, std::vector<DecodedAttributeData> & decoded_items)
+{
+    TLV::TLVReader reportIBsReader;
+    reportIBsReader.Init(data);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    while (CHIP_NO_ERROR == (err = reportIBsReader.Next()))
+    {
+        TLV::TLVReader attributeReportReader = reportIBsReader;
+        AttributeReportIB::Parser attributeReportParser;
+        ReturnErrorOnFailure(attributeReportParser.Init(attributeReportReader));
+
+        AttributeDataIB::Parser dataParser;
+        // NOTE: to also grab statuses, use GetAttributeStatus and check for CHIP_END_OF_TLV
+        ReturnErrorOnFailure(attributeReportParser.GetAttributeData(&dataParser));
+
+        DecodedAttributeData decoded;
+        ReturnErrorOnFailure(decoded.DecodeFrom(dataParser));
+        decoded_items.push_back(decoded);
+    }
+
+    if (CHIP_END_OF_TLV == err)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    return err;
+}
 
 } // namespace
 
@@ -493,9 +550,14 @@ TEST(TestCodegenModelViaMocks, EmberAttributeRead)
 
     TLV::TLVWriter tlvWriter;
     tlvWriter.Init(tlvBuffer);
+    TLV::TLVType outer;
+
+    CHIP_ERROR err = tlvWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer);
+    ASSERT_EQ(err, CHIP_NO_ERROR);
 
     AttributeReportIBs::Builder builder;
-    CHIP_ERROR err = builder.Init(&tlvWriter);
+
+    err = builder.Init(&tlvWriter, 0x01 /* report context tag */);
     ASSERT_EQ(err, CHIP_NO_ERROR);
     AttributeValueEncoder encoder(builder, kAdminSubjectDescriptor, readRequest.path, dataVersion);
 
@@ -505,5 +567,20 @@ TEST(TestCodegenModelViaMocks, EmberAttributeRead)
     err = model.ReadAttribute(readRequest, encoder);
     ASSERT_EQ(err, CHIP_NO_ERROR);
 
-    // TODO: value validation here?
+    builder.EndOfContainer();
+
+    err = tlvWriter.EndContainer(outer);
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+
+    err = tlvWriter.Finalize();
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+
+    //// VALIDATE
+    std::vector<DecodedAttributeData> attribute_data;
+    err = DecodeAttributeReportIBs(ByteSpan(tlvBuffer, tlvWriter.GetLengthWritten()), attribute_data);
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+
+    EXPECT_EQ(attribute_data.size(), 1u);
+
+    // FIXME: validate data
 }
