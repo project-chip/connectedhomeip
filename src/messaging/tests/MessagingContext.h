@@ -32,8 +32,6 @@
 #include <transport/tests/LoopbackTransportManager.h>
 #include <transport/tests/UDPTransportManager.h>
 
-#include <nlunit-test.h>
-
 #include <vector>
 
 namespace chip {
