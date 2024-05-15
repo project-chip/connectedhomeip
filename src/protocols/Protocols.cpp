@@ -123,4 +123,3 @@ const char * GetMessageTypeName(Id protocolId, uint8_t msgType)
 
 } // namespace Protocols
 } // namespace chip
-                   
