@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022-2023 Project CHIP Authors
+ *    Copyright (c) 2022-2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -67,9 +67,9 @@ void AppTask::OnStateChanged(ContactSensorManager::State aState)
 void AppTask::PostContactActionRequest(ContactSensorManager::Action aAction)
 {
     AppEvent event;
-    event.Type                = AppEvent::kEventType_Contact;
-    event.ContactEvent.Action = static_cast<uint8_t>(aAction);
-    event.Handler             = ContactActionEventHandler;
+    event.Type               = AppEvent::kEventType_DeviceAction;
+    event.DeviceEvent.Action = static_cast<uint8_t>(aAction);
+    event.Handler            = ContactActionEventHandler;
 
     sAppTask.PostEvent(&event);
 }
@@ -95,9 +95,9 @@ void AppTask::ContactActionEventHandler(AppEvent * aEvent)
 
     ChipLogProgress(NotSpecified, "ContactActionEventHandler");
 
-    if (aEvent->Type == AppEvent::kEventType_Contact)
+    if (aEvent->Type == AppEvent::kEventType_DeviceAction)
     {
-        action = static_cast<ContactSensorManager::Action>(aEvent->ContactEvent.Action);
+        action = static_cast<ContactSensorManager::Action>(aEvent->DeviceEvent.Action);
     }
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {
