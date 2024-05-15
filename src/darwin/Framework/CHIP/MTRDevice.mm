@@ -940,7 +940,7 @@ static NSString * const sAttributesKey = @"attributes";
 
 // This method is used for signaling whether to use the subscription pool. This functions as
 // a heuristic for whether to throttle subscriptions to the device via a pool of subscriptions.
-// If products appear that have both Thread and Wifi enabled but is primarily on wifi, this
+// If products appear that have both Thread and Wifi enabled but are primarily on wifi, this
 // method will need to be updated to reflect that.
 - (BOOL)_deviceUsesThread
 {
