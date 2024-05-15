@@ -28,4 +28,4 @@ namespace Testing {
 /// It may return a value with success or some error. The byte span WILL BE COPIED.
 void SetEmberReadOutput(std::variant<chip::ByteSpan, chip::Protocols::InteractionModel::Status> what);
 
-}
+} // namespace Testing

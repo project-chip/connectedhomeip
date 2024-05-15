@@ -499,7 +499,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeRead)
     ASSERT_EQ(err, CHIP_NO_ERROR);
     AttributeValueEncoder encoder(builder, kAdminSubjectDescriptor, readRequest.path, dataVersion);
 
-    uint8_t data[] = {0x01, 0x02, 0x03, 0x04};
+    uint8_t data[] = { 0x01, 0x02, 0x03, 0x04 };
     Testing::SetEmberReadOutput(ByteSpan(data));
 
     err = model.ReadAttribute(readRequest, encoder);
