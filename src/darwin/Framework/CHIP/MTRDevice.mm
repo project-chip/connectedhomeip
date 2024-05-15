@@ -393,7 +393,7 @@ static NSString * const sAttributesKey = @"attributes";
     // If this is true when the report ends, we notify the delegate.
     BOOL _deviceConfigurationChanged;
 
-    // The completion block is set when the subscription / resubscription work is enqueued, and called / cleared when:
+    // The completion block is set when the subscription / resubscription work is enqueued, and called / cleared when any of the following happen:
     //   1. Subscription establishes
     //   2. When OnResubscriptionNeeded is called
     //   3. On subscription reset (including when getSessionForNode fails)
