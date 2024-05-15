@@ -68,7 +68,6 @@ public class MatterServant {
   }
 
   private Context context;
-  private Activity activity;
 
   public void init(@NonNull Context context) {
 
@@ -148,14 +147,6 @@ public class MatterServant {
   public void toggleOnOff() {
     mTvApp.setOnOff(mOnOffEndpoint, mIsOn);
     mIsOn = !mIsOn;
-  }
-
-  public void setActivity(Activity activity) {
-    this.activity = activity;
-  }
-
-  public Activity getActivity() {
-    return activity;
   }
 
   public void sendCustomCommand(String customCommand) {
