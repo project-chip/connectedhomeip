@@ -514,6 +514,15 @@ WindowManager::Timer::Timer(uint32_t timeoutInMs, Callback callback, void * cont
     }
 }
 
+WindowManager::Timer::~Timer()
+{
+    if (mHandler)
+    {
+        osTimerDelete(mHandler);
+        mHandler = nullptr;
+    }
+}
+
 void WindowManager::Timer::Stop()
 {
     mIsActive = false;

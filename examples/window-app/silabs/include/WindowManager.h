@@ -40,6 +40,7 @@ public:
         typedef void (*Callback)(Timer & timer);
 
         Timer(uint32_t timeoutInMs, Callback callback, void * context);
+        ~Timer();
 
         void Start();
         void Stop();
