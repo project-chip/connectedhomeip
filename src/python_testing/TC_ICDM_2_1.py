@@ -63,8 +63,9 @@ class TC_ICDM_2_1(MatterBaseTest):
     def is_valid_uint8_value(var):
         return isinstance(var, int) and 0 <= var <= 0xFF
 
-    def bit_count(self):
-        return bin(self).count("1")
+    @staticmethod
+    def set_bits_count(number):
+        return bin(number).count("1")
 
     async def _read_icdm_attribute_expect_success(self, attribute):
         return await self.read_single_attribute_check_success(endpoint=kRootEndpointId, cluster=cluster, attribute=attribute)
@@ -213,8 +214,8 @@ class TC_ICDM_2_1(MatterBaseTest):
             uatHintInstructionDepedentBitmap = uat(
                 userActiveModeTriggerHint) & kUatInstructionDependentBitMask
 
-            asserts.assert_less_equal(
-                uatHintInstructionDepedentBitmap.bit_count(), 1, "UserActiveModeTriggerHint has more than 1 bit that is dependent on the UserActiveModeTriggerInstruction")
+        asserts.assert_less_equal(
+            self.set_bits_count(uatHintInstructionDepedentBitmap), 1, "UserActiveModeTriggerHint has more than 1 bit that is dependent on the UserActiveModeTriggerInstruction")
 
         # Valdate UserActiveModeTriggerInstruction
         self.step(9)
