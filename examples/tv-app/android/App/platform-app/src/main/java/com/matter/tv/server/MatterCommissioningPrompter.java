@@ -50,7 +50,7 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
     ContentResolver contentResolver = context.getContentResolver();
     boolean authorisationDialogDisabled =
         Settings.Secure.getInt(contentResolver, "matter_show_authorisation_dialog", 0) == 0;
-    // By default do not show authorisation dialog 
+    // By default do not show authorisation dialog
     // only do so if customer or OS explicitly ask for it, by updating matter_show_authorisation_dialog flag to 1
     if (authorisationDialogDisabled) {
       OnPromptAccepted();
