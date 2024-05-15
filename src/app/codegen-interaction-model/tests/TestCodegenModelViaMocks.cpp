@@ -189,6 +189,49 @@ struct UseMockNodeConfig
     ~UseMockNodeConfig() { ResetMockNodeConfig(); }
 };
 
+struct TestReadRequest
+{
+    ReadAttributeRequest request;
+
+    // encoded-used classes
+    EncodedReportIBs encodedIBs;
+    AttributeReportIBs::Builder reportBuilder;
+    std::unique_ptr<AttributeValueEncoder> encoder;
+
+    TestReadRequest(const Access::SubjectDescriptor & subject, const ConcreteAttributePath & path)
+    {
+        // operationFlags is 0 i.e. not internal
+        // readFlags is 0 i.e. not fabric filtered
+        // dataVersion is missing (no data version filtering)
+        request.subjectDescriptor = subject;
+        request.path              = path;
+    }
+
+    std::unique_ptr<AttributeValueEncoder> StartEncoding(chip::app::InteractionModel::Model * model)
+    {
+        std::optional<ClusterInfo> info = model->GetClusterInfo(request.path);
+        if (!info.has_value())
+        {
+            ChipLogError(Test, "Missing cluster information - no data version");
+            return nullptr;
+        }
+
+        DataVersion dataVersion = info->dataVersion; // NOLINT(bugprone-unchecked-optional-access)
+
+        CHIP_ERROR err = encodedIBs.StartEncoding(reportBuilder);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Test, "FAILURE starting encoding %" CHIP_ERROR_FORMAT, err.Format());
+            return nullptr;
+        }
+
+        // TODO: isFabricFiltered? EncodeState?
+        return std::make_unique<AttributeValueEncoder>(reportBuilder, request.subjectDescriptor.value(), request.path, dataVersion);
+    }
+
+    CHIP_ERROR FinishEncoding() { return encodedIBs.FinishEncoding(reportBuilder); }
+};
+
 } // namespace
 
 TEST(TestCodegenModelViaMocks, IterateOverEndpoints)
@@ -414,25 +457,11 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadAclDeny)
     chip::app::CodegenDataModel::Model model;
     ScopedMockAccessControl accessControl;
 
-    ReadAttributeRequest readRequest;
+    TestReadRequest testRequest(kDenySubjectDescriptor,
+                                ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), MockAttributeId(10)));
+    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
 
-    // operationFlags is 0 i.e. not internal
-    // readFlags is 0 i.e. not fabric filtered
-    // dataVersion is missing (no data version filtering)
-    readRequest.subjectDescriptor = kDenySubjectDescriptor;
-    readRequest.path              = ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), MockAttributeId(10));
-
-    std::optional<ClusterInfo> info = model.GetClusterInfo(readRequest.path);
-    ASSERT_TRUE(info.has_value());
-
-    DataVersion dataVersion = info->dataVersion; // NOLINT(bugprone-unchecked-optional-access)
-    EncodedReportIBs reportIBs;
-    AttributeReportIBs::Builder builder;
-    ASSERT_EQ(reportIBs.StartEncoding(builder), CHIP_NO_ERROR);
-    AttributeValueEncoder encoder(builder, kDenySubjectDescriptor, readRequest.path, dataVersion);
-
-    CHIP_ERROR err = model.ReadAttribute(readRequest, encoder);
-    ASSERT_EQ(err, CHIP_ERROR_ACCESS_DENIED);
+    ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_ERROR_ACCESS_DENIED);
 }
 
 TEST(TestCodegenModelViaMocks, EmberAttributeInvalidRead)
@@ -441,25 +470,11 @@ TEST(TestCodegenModelViaMocks, EmberAttributeInvalidRead)
     chip::app::CodegenDataModel::Model model;
     ScopedMockAccessControl accessControl;
 
-    ReadAttributeRequest readRequest;
+    TestReadRequest testRequest(kAdminSubjectDescriptor,
+                                ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), MockAttributeId(10)));
+    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
 
-    // operationFlags is 0 i.e. not internal
-    // readFlags is 0 i.e. not fabric filtered
-    // dataVersion is missing (no data version filtering)
-    readRequest.subjectDescriptor = kAdminSubjectDescriptor;
-    readRequest.path              = ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), MockAttributeId(10));
-
-    std::optional<ClusterInfo> info = model.GetClusterInfo(readRequest.path);
-    ASSERT_TRUE(info.has_value());
-
-    DataVersion dataVersion = info->dataVersion; // NOLINT(bugprone-unchecked-optional-access)
-    EncodedReportIBs reportIBs;
-    AttributeReportIBs::Builder builder;
-    ASSERT_EQ(reportIBs.StartEncoding(builder), CHIP_NO_ERROR);
-    AttributeValueEncoder encoder(builder, kAdminSubjectDescriptor, readRequest.path, dataVersion);
-
-    CHIP_ERROR err = model.ReadAttribute(readRequest, encoder);
-    ASSERT_EQ(err, CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+    ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
 }
 
 TEST(TestCodegenModelViaMocks, EmberAttributeRead)
@@ -468,51 +483,30 @@ TEST(TestCodegenModelViaMocks, EmberAttributeRead)
     chip::app::CodegenDataModel::Model model;
     ScopedMockAccessControl accessControl;
 
-    ///////// INPUT ARGUMENTS SETUP
-    ReadAttributeRequest readRequest;
+    TestReadRequest testRequest(kAdminSubjectDescriptor,
+                                ConcreteAttributePath(kMockEndpoint3, MockClusterId(2), MockAttributeId(3)));
 
-    // operationFlags is 0 i.e. not internal
-    // readFlags is 0 i.e. not fabric filtered
-    // dataVersion is missing (no data version filtering)
-    readRequest.subjectDescriptor = kAdminSubjectDescriptor;
-    readRequest.path              = ConcreteAttributePath(kMockEndpoint3, MockClusterId(2), MockAttributeId(3));
+    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
 
-    std::optional<ClusterInfo> info = model.GetClusterInfo(readRequest.path);
-    ASSERT_TRUE(info.has_value());
+    // Ember encoding for integers is IDENTICAL to the in-memory representation for them
+    const uint32_t expected = 0x01020304;
+    chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(&expected), sizeof(expected)));
 
-    DataVersion dataVersion = info->dataVersion; // NOLINT(bugprone-unchecked-optional-access)
+    ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_NO_ERROR);
 
-    EncodedReportIBs reportIBs;
-    AttributeReportIBs::Builder builder;
-    ASSERT_EQ(reportIBs.StartEncoding(builder), CHIP_NO_ERROR);
-    AttributeValueEncoder encoder(builder, kAdminSubjectDescriptor, readRequest.path, dataVersion);
-
-    ///////// FAKE DATA SETUP
-    uint8_t data[] = { 0x01, 0x02, 0x03, 0x04 };
-    chip::Test::SetEmberReadOutput(ByteSpan(data));
-
-    CHIP_ERROR err = model.ReadAttribute(readRequest, encoder);
-    ASSERT_EQ(err, CHIP_NO_ERROR);
-
-    ///////// OVERHEAD: finish!
-    ASSERT_EQ(reportIBs.FinishEncoding(builder), CHIP_NO_ERROR);
+    ASSERT_EQ(testRequest.FinishEncoding(), CHIP_NO_ERROR);
 
     /////// VALIDATE
     std::vector<DecodedAttributeData> attribute_data;
-    err = reportIBs.Decode(attribute_data);
-    ASSERT_EQ(err, CHIP_NO_ERROR);
+    ASSERT_EQ(testRequest.encodedIBs.Decode(attribute_data), CHIP_NO_ERROR);
     ASSERT_EQ(attribute_data.size(), 1u);
 
     const DecodedAttributeData & encodedData = attribute_data[0];
-    ASSERT_EQ(encodedData.attributePath, readRequest.path);
+    ASSERT_EQ(encodedData.attributePath, testRequest.request.path);
 
     // data element should be a uint32 encoded as TLV
     ASSERT_EQ(encodedData.dataReader.GetType(), TLV::kTLVType_UnsignedInteger);
-    uint32_t expected;
-    static_assert(sizeof(expected) == sizeof(data));
-    memcpy(&expected, data, sizeof(expected));
     uint32_t actual;
-    err = encodedData.dataReader.Get(actual);
-    ASSERT_EQ(CHIP_NO_ERROR, err);
+    ASSERT_EQ(encodedData.dataReader.Get(actual), CHIP_NO_ERROR);
     ASSERT_EQ(actual, expected);
 }
