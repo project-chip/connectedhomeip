@@ -117,8 +117,8 @@ public:
         UnsolicitedMessageFromPublisherHandler unsolicitedMessageFromPublisherHandler, ReportBeginHandler reportBeginHandler,
         ReportEndHandler reportEndHandler)
         : MTRBaseSubscriptionCallback(attributeReportCallback, eventReportCallback, errorCallback, resubscriptionCallback,
-            subscriptionEstablishedHandler, onDoneHandler, unsolicitedMessageFromPublisherHandler, reportBeginHandler,
-            reportEndHandler)
+              subscriptionEstablishedHandler, onDoneHandler, unsolicitedMessageFromPublisherHandler, reportBeginHandler,
+              reportEndHandler)
     {
     }
 
@@ -2534,8 +2534,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             NSNumber * dataVersion = attributeDataValue[MTRDataVersionKey];
             MTRClusterPath * clusterPath = [MTRClusterPath clusterPathWithEndpointID:attributePath.endpoint clusterID:attributePath.cluster];
             if (dataVersion) {
-                [self _noteDataVersion:dataVersion forClusterPath:clusterPath];
-
                 // Remove data version from what we cache in memory
                 attributeDataValue = [self _dataValueWithoutDataVersion:attributeDataValue];
             }
@@ -2544,6 +2542,10 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             BOOL readCacheValueChanged = ![self _attributeDataValue:attributeDataValue isEqualToDataValue:previousValue];
             // Now that we have grabbed previousValue, update our cache with the attribute value.
             if (readCacheValueChanged) {
+                if (dataVersion) {
+                    [self _noteDataVersion:dataVersion forClusterPath:clusterPath];
+                }
+
                 [self _setCachedAttributeValue:attributeDataValue forPath:attributePath];
                 if (!_deviceConfigurationChanged) {
                     _deviceConfigurationChanged = [self _attributeAffectsDeviceConfiguration:attributePath];
