@@ -80,7 +80,7 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 /**
  * Sets the maximum subscriptions allowed for devices on Thread. This defaults to 3.
  */
-@property (nonatomic, assign) NSUInteger concurrentSubscriptionsAllowedOnThread;
+@property (nonatomic, assign) NSUInteger concurrentSubscriptionsAllowedOnThread MTR_NEWLY_AVAILABLE;
 
 @end
 
