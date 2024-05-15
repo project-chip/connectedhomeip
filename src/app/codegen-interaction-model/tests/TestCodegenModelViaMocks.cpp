@@ -640,10 +640,10 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadLongString)
 
     std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
 
-    // NOTE: This is a pascal string, so actual data is "test"
+    // NOTE: This is a pascal string, so actual data is "abcde"
     //       the longer encoding is to make it clear we do not encode the overflow
     char data[]  = "\0\0abcdef...this is the alphabet";
-    uint16_t len = 4;
+    uint16_t len = 5;
     memcpy(data, &len, sizeof(uint16_t));
     chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
 
@@ -663,5 +663,5 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadLongString)
     ASSERT_EQ(encodedData.dataReader.GetType(), TLV::kTLVType_UTF8String);
     CharSpan actual;
     ASSERT_EQ(encodedData.dataReader.Get(actual), CHIP_NO_ERROR);
-    ASSERT_TRUE(actual.data_equal("abcd"_span));
+    ASSERT_TRUE(actual.data_equal("abcde"_span));
 }
