@@ -18,8 +18,11 @@
 
 #include <app/ConcreteAttributePath.h>
 #include <app/MessageDef/AttributeDataIB.h>
+#include <app/MessageDef/AttributeReportIBs.h>
+#include <app/MessageDef/ReportDataMessage.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/TLVReader.h>
+#include <lib/core/TLVWriter.h>
 
 #include <vector>
 
@@ -36,6 +39,30 @@ struct DecodedAttributeData
 };
 
 CHIP_ERROR DecodeAttributeReportIBs(ByteSpan data, std::vector<DecodedAttributeData> & decoded_items);
+
+/// Maintains an internal TLV buffer for data encoding and
+/// decoding for ReportIBs.
+///
+/// Main use case is that explicit TLV layouts (structure and container starting) need to be
+/// prepared to have a proper AttributeReportIBs::Builder/parser to exist.
+class EncodedReportIBs
+{
+public:
+    /// Initialize the report structures required to encode a
+    CHIP_ERROR StartEncoding(app::AttributeReportIBs::Builder & builder);
+    CHIP_ERROR FinishEncoding(app::AttributeReportIBs::Builder & builder);
+
+    /// Decode the embedded attribute report IBs.
+    /// The TLVReaders inside data have a lifetime tied to the current object (its readers point
+    /// inside the current object)
+    CHIP_ERROR Decode(std::vector<DecodedAttributeData> & decoded_items);
+
+private:
+    uint8_t mTlvDataBuffer[1024];
+    TLV::TLVType mOuterStructureType;
+    TLV::TLVWriter mEncodeWriter;
+    ByteSpan mDecodeSpan;
+};
 
 } // namespace Test
 } // namespace chip

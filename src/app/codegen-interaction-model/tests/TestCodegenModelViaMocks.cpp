@@ -426,18 +426,12 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadAclDeny)
     ASSERT_TRUE(info.has_value());
 
     DataVersion dataVersion = info->dataVersion; // NOLINT(bugprone-unchecked-optional-access)
-
-    uint8_t tlvBuffer[1024];
-
-    TLV::TLVWriter tlvWriter;
-    tlvWriter.Init(tlvBuffer);
-
+    EncodedReportIBs reportIBs;
     AttributeReportIBs::Builder builder;
-    CHIP_ERROR err = builder.Init(&tlvWriter);
-    ASSERT_EQ(err, CHIP_NO_ERROR);
-    AttributeValueEncoder encoder(builder, kAdminSubjectDescriptor, readRequest.path, dataVersion);
+    ASSERT_EQ(reportIBs.StartEncoding(builder), CHIP_NO_ERROR);
+    AttributeValueEncoder encoder(builder, kDenySubjectDescriptor, readRequest.path, dataVersion);
 
-    err = model.ReadAttribute(readRequest, encoder);
+    CHIP_ERROR err = model.ReadAttribute(readRequest, encoder);
     ASSERT_EQ(err, CHIP_ERROR_ACCESS_DENIED);
 }
 
@@ -459,21 +453,13 @@ TEST(TestCodegenModelViaMocks, EmberAttributeInvalidRead)
     ASSERT_TRUE(info.has_value());
 
     DataVersion dataVersion = info->dataVersion; // NOLINT(bugprone-unchecked-optional-access)
-
-    uint8_t tlvBuffer[1024];
-
-    TLV::TLVWriter tlvWriter;
-    tlvWriter.Init(tlvBuffer);
-
+    EncodedReportIBs reportIBs;
     AttributeReportIBs::Builder builder;
-    CHIP_ERROR err = builder.Init(&tlvWriter);
-    ASSERT_EQ(err, CHIP_NO_ERROR);
+    ASSERT_EQ(reportIBs.StartEncoding(builder), CHIP_NO_ERROR);
     AttributeValueEncoder encoder(builder, kAdminSubjectDescriptor, readRequest.path, dataVersion);
 
-    err = model.ReadAttribute(readRequest, encoder);
+    CHIP_ERROR err = model.ReadAttribute(readRequest, encoder);
     ASSERT_EQ(err, CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
-
-    // TODO: value validation here?
 }
 
 TEST(TestCodegenModelViaMocks, EmberAttributeRead)
@@ -495,39 +481,22 @@ TEST(TestCodegenModelViaMocks, EmberAttributeRead)
 
     DataVersion dataVersion = info->dataVersion; // NOLINT(bugprone-unchecked-optional-access)
 
-    uint8_t tlvBuffer[1024];
-
-    TLV::TLVWriter tlvWriter;
-    tlvWriter.Init(tlvBuffer);
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    TLV::TLVType outer;
-    err = tlvWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer);
-    ASSERT_EQ(err, CHIP_NO_ERROR);
-
+    EncodedReportIBs reportIBs;
     AttributeReportIBs::Builder builder;
-
-    err = builder.Init(&tlvWriter, to_underlying(ReportDataMessage::Tag::kAttributeReportIBs));
-    ASSERT_EQ(err, CHIP_NO_ERROR);
+    ASSERT_EQ(reportIBs.StartEncoding(builder), CHIP_NO_ERROR);
     AttributeValueEncoder encoder(builder, kAdminSubjectDescriptor, readRequest.path, dataVersion);
 
     uint8_t data[] = { 0x01, 0x02, 0x03, 0x04 };
     chip::Test::SetEmberReadOutput(ByteSpan(data));
 
-    err = model.ReadAttribute(readRequest, encoder);
+    CHIP_ERROR err = model.ReadAttribute(readRequest, encoder);
     ASSERT_EQ(err, CHIP_NO_ERROR);
 
-    builder.EndOfContainer();
-
-    err = tlvWriter.EndContainer(outer);
-    ASSERT_EQ(err, CHIP_NO_ERROR);
-
-    err = tlvWriter.Finalize();
-    ASSERT_EQ(err, CHIP_NO_ERROR);
+    ASSERT_EQ(reportIBs.FinishEncoding(builder), CHIP_NO_ERROR);
 
     //// VALIDATE
     std::vector<DecodedAttributeData> attribute_data;
-    err = DecodeAttributeReportIBs(ByteSpan(tlvBuffer, tlvWriter.GetLengthWritten()), attribute_data);
+    err = reportIBs.Decode(attribute_data);
     ASSERT_EQ(err, CHIP_NO_ERROR);
     ASSERT_EQ(attribute_data.size(), 1u);
 

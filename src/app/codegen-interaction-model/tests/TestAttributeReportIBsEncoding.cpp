@@ -104,5 +104,27 @@ CHIP_ERROR DecodeAttributeReportIBs(ByteSpan data, std::vector<DecodedAttributeD
     return err;
 }
 
+CHIP_ERROR EncodedReportIBs::StartEncoding(app::AttributeReportIBs::Builder & builder)
+{
+    mEncodeWriter.Init(mTlvDataBuffer);
+    ReturnErrorOnFailure(mEncodeWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, mOuterStructureType));
+    return builder.Init(&mEncodeWriter, to_underlying(ReportDataMessage::Tag::kAttributeReportIBs));
+}
+
+CHIP_ERROR EncodedReportIBs::FinishEncoding(app::AttributeReportIBs::Builder & builder)
+{
+    builder.EndOfContainer();
+    ReturnErrorOnFailure(mEncodeWriter.EndContainer(mOuterStructureType));
+    ReturnErrorOnFailure(mEncodeWriter.Finalize());
+
+    mDecodeSpan = ByteSpan(mTlvDataBuffer, mEncodeWriter.GetLengthWritten());
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EncodedReportIBs::Decode(std::vector<DecodedAttributeData> & decoded_items)
+{
+    return DecodeAttributeReportIBs(mDecodeSpan, decoded_items);
+}
+
 } // namespace Test
 } // namespace chip
