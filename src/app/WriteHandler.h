@@ -45,7 +45,7 @@ public:
     virtual ~WriteHandlerDelegate() = default;
 
     /**
-     * Returns whether the write operation to the given path is conflict with another write operations.
+     * Returns whether the write operation to the given path is in conflict with another write operation.
      * (i.e. another write transaction is in the middle of processing the chunked value of the given path.)
      */
     virtual bool HasConflictWriteRequests(const WriteHandler * apWriteHandler, const ConcreteAttributePath & aPath) = 0;
