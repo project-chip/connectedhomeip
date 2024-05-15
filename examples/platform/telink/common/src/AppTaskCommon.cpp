@@ -28,6 +28,7 @@
 
 #include <DeviceInfoProviderImpl.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -88,20 +89,16 @@ void OnIdentifyTriggerEffect(Identify * identify)
 }
 
 Identify sIdentify = {
-    kExampleEndpointId,
-    [](Identify *) { ChipLogProgress(Zcl, "OnIdentifyStart"); },
-    [](Identify *) { ChipLogProgress(Zcl, "OnIdentifyStop"); },
-    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
+    kExampleEndpointId,           AppTask::IdentifyStartHandler,
+    AppTask::IdentifyStopHandler, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
     OnIdentifyTriggerEffect,
 };
 
 #endif
 
-#if CONFIG_CHIP_FACTORY_DATA
 // NOTE! This key is for test/certification only and should not be available in production devices!
 uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
                                                                                    0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
-#endif
 
 class AppCallbacks : public AppDelegate
 {
@@ -271,8 +268,15 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
 
     // Init ZCL Data Model and start server
     static CommonCaseDeviceServerInitParams initParams;
+    static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
+    VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
+#if CONFIG_CHIP_OTA_REQUESTOR
+    static OTATestEventTriggerHandler sOtaTestEventTriggerHandler{};
+    VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler) == CHIP_NO_ERROR);
+#endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.appDelegate = &sCallbacks;
+    initParams.appDelegate              = &sCallbacks;
+    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
 
 #if APP_SET_DEVICE_INFO_PROVIDER
@@ -312,6 +316,30 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     }
 
     return CHIP_NO_ERROR;
+}
+
+void AppTaskCommon::IdentifyStartHandler(Identify *)
+{
+    AppEvent event;
+
+    event.Type    = AppEvent::kEventType_IdentifyStart;
+    event.Handler = [](AppEvent * event) {
+        ChipLogProgress(Zcl, "OnIdentifyStart");
+        PwmManager::getInstance().setPwmBlink(PwmManager::EAppPwm_Indication, kIdentifyBlinkRateMs, kIdentifyBlinkRateMs);
+    };
+    GetAppTask().PostEvent(&event);
+}
+
+void AppTaskCommon::IdentifyStopHandler(Identify *)
+{
+    AppEvent event;
+
+    event.Type    = AppEvent::kEventType_IdentifyStop;
+    event.Handler = [](AppEvent * event) {
+        ChipLogProgress(Zcl, "OnIdentifyStop");
+        PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Indication, false);
+    };
+    GetAppTask().PostEvent(&event);
 }
 
 #ifdef CONFIG_CHIP_PW_RPC
