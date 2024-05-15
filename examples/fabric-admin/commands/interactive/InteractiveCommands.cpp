@@ -19,9 +19,12 @@
 #include "InteractiveCommands.h"
 
 #include <platform/logging/LogV.h>
+#include <system/SystemClock.h>
 
 #include <editline.h>
 
+#include <stdarg.h>
+#include <stdio.h>
 #include <string>
 #include <vector>
 
@@ -32,12 +35,12 @@ constexpr char kInteractiveModeStopCommand[]     = "quit()";
 namespace {
 
 // File pointer for the log file
-FILE * logFile = nullptr;
+FILE * sLogFile = nullptr;
 
 void OpenLogFile(const char * filePath)
 {
-    logFile = fopen(filePath, "a");
-    if (logFile == nullptr)
+    sLogFile = fopen(filePath, "a");
+    if (sLogFile == nullptr)
     {
         perror("Failed to open log file");
     }
@@ -45,10 +48,10 @@ void OpenLogFile(const char * filePath)
 
 void CloseLogFile()
 {
-    if (logFile != nullptr)
+    if (sLogFile != nullptr)
     {
-        fclose(logFile);
-        logFile = nullptr;
+        fclose(sLogFile);
+        sLogFile = nullptr;
     }
 }
 
@@ -59,25 +62,23 @@ void ClearLine()
 
 void ENFORCE_FORMAT(3, 0) LoggingCallback(const char * module, uint8_t category, const char * msg, va_list args)
 {
-    struct timeval tv;
+    uint64_t timeMs       = chip::System::SystemClock().GetMonotonicMilliseconds64().count();
+    uint64_t seconds      = timeMs / 1000;
+    uint64_t milliseconds = timeMs % 1000;
 
-    // Should not fail per man page of gettimeofday(), but failed to get time is not a fatal error in log. The bad time value will
-    // indicate the error occurred during getting time.
-    gettimeofday(&tv, nullptr);
+    flockfile(sLogFile);
 
-    FILE * outputStream = (logFile == nullptr) ? stdout : logFile;
-    // Lock outputStream, so a single log line will not be corrupted in case
-    // where multiple threads are using logging subsystem at the same time.
-    flockfile(outputStream);
+    // Portable thread and process identifiers
+    auto pid = static_cast<unsigned long>(getpid());
+    auto tid = static_cast<unsigned long>(pthread_self());
 
-    fprintf(outputStream, "[%llu.%06llu][%lld:%lld] CHIP:%s: ", static_cast<unsigned long long>(tv.tv_sec),
-            static_cast<unsigned long long>(tv.tv_usec), static_cast<long long>(syscall(SYS_getpid)),
-            static_cast<long long>(syscall(SYS_gettid)), module);
-    vfprintf(outputStream, msg, args);
-    fprintf(outputStream, "\n");
-    fflush(outputStream);
+    fprintf(sLogFile, "[%llu.%06llu][%lu:%lu] CHIP:%s: ", static_cast<unsigned long long>(seconds),
+            static_cast<unsigned long long>(milliseconds), pid, tid, module);
+    vfprintf(sLogFile, msg, args);
+    fprintf(sLogFile, "\n");
+    fflush(sLogFile);
 
-    funlockfile(outputStream);
+    funlockfile(sLogFile);
 }
 
 } // namespace
@@ -127,11 +128,13 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
 {
     read_history(GetHistoryFilePath().c_str());
 
-    OpenLogFile("/tmp/fabric_admin.log");
+    if (mLogFilePath.HasValue())
+    {
+        OpenLogFile(mLogFilePath.Value());
 
-    // Logs needs to be redirected in order to refresh the screen appropriately when something
-    // is dumped to stdout while the user is typing a command.
-    chip::Logging::SetLogRedirectCallback(LoggingCallback);
+        // Redirect logs to the custom logging callback
+        chip::Logging::SetLogRedirectCallback(LoggingCallback);
+    }
 
     char * command = nullptr;
     int status;

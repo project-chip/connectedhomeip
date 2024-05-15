@@ -23,12 +23,34 @@
 #include "commands/pairing/Commands.h"
 #include <zap-generated/cluster/Commands.h>
 
+#include <iostream>
+#include <string>
+#include <vector>
+
 // ================================================================================
 // Main Code
 // ================================================================================
 int main(int argc, char * argv[])
 {
-    const char * args[] = { argv[0], "interactive", "start" };
+    // Convert command line arguments to a vector of strings for easier manipulation
+    std::vector<std::string> args(argv, argv + argc);
+
+    // Check if "interactive" and "start" are not in the arguments
+    if (args.size() < 3 || args[1] != "interactive" || args[2] != "start")
+    {
+        // Insert "interactive" and "start" after the executable name
+        args.insert(args.begin() + 1, "interactive");
+        args.insert(args.begin() + 2, "start");
+
+        // Update argc and argv to reflect the new arguments
+        argc = static_cast<int>(args.size());
+        for (size_t i = 0; i < args.size(); ++i)
+        {
+            argv[i] = const_cast<char *>(args[i].c_str());
+        }
+    }
+
+    // const char * args[] = { argv[0], "interactive", "start" };
     ExampleCredentialIssuerCommands credIssuerCommands;
     Commands commands;
 
@@ -37,5 +59,5 @@ int main(int argc, char * argv[])
     registerClusters(commands, &credIssuerCommands);
     registerCommandsSubscriptions(commands, &credIssuerCommands);
 
-    return commands.Run(3, const_cast<char **>(args));
+    return commands.Run(argc, argv);
 }
