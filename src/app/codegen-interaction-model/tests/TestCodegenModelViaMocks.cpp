@@ -468,6 +468,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeRead)
     chip::app::CodegenDataModel::Model model;
     ScopedMockAccessControl accessControl;
 
+    ///////// INPUT ARGUMENTS SETUP
     ReadAttributeRequest readRequest;
 
     // operationFlags is 0 i.e. not internal
@@ -486,15 +487,17 @@ TEST(TestCodegenModelViaMocks, EmberAttributeRead)
     ASSERT_EQ(reportIBs.StartEncoding(builder), CHIP_NO_ERROR);
     AttributeValueEncoder encoder(builder, kAdminSubjectDescriptor, readRequest.path, dataVersion);
 
+    ///////// FAKE DATA SETUP
     uint8_t data[] = { 0x01, 0x02, 0x03, 0x04 };
     chip::Test::SetEmberReadOutput(ByteSpan(data));
 
     CHIP_ERROR err = model.ReadAttribute(readRequest, encoder);
     ASSERT_EQ(err, CHIP_NO_ERROR);
 
+    ///////// OVERHEAD: finish!
     ASSERT_EQ(reportIBs.FinishEncoding(builder), CHIP_NO_ERROR);
 
-    //// VALIDATE
+    /////// VALIDATE
     std::vector<DecodedAttributeData> attribute_data;
     err = reportIBs.Decode(attribute_data);
     ASSERT_EQ(err, CHIP_NO_ERROR);
