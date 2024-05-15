@@ -231,12 +231,10 @@ chip::Protocols::InteractionModel::Status chefRvcOperationalStateReadCallback(ch
                                                                               const EmberAfAttributeMetadata * attributeMetadata,
                                                                               uint8_t * buffer, uint16_t maxReadLength)
 {
-    if (sizeof(*attributeMetadata) <= sizeof(buffer))
-    {
-        memcpy(buffer, &attributeMetadata, sizeof(attributeMetadata));
-        return chip::Protocols::InteractionModel::Status::Success;
-    }
-    return chip::Protocols::InteractionModel::Status::ResourceExhausted;
+    app::DataModel::Nullable<uint8_t> m = gRvcOperationalStateInstance->GetCurrentPhase();
+    memcpy(buffer, &m, sizeof(m));
+
+    return chip::Protocols::InteractionModel::Status::Success;
 }
 
 void emberAfRvcOperationalStateClusterInitCallback(chip::EndpointId endpointId)
