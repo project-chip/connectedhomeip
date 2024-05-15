@@ -19,30 +19,15 @@
 #include "AppMain.h"
 #include <app-common/zap-generated/ids/Clusters.h>
 
-#include <sys/inotify.h>
-#include <sys/types.h>
-#include <unistd.h>
-
 using namespace chip;
 using namespace chip::app;
-
-int inotifyWatchFd = -1;
-
-pid_t selfPid = 0;
 
 void ApplicationInit() {}
 
 void ApplicationShutdown() {}
 
-void IcdWatchThread()
-{
-
-}
-
 int main(int argc, char * argv[])
 {
-    self_pid = getpid();
-
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
     ChipLinuxAppMainLoop();
     return 0;
