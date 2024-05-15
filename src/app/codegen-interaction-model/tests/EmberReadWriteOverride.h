@@ -21,11 +21,13 @@
 
 #include <variant>
 
-namespace Testing {
+namespace chip {
+namespace Test {
 
 /// specify what the next `emAfReadOrWriteAttribute` will contain
 ///
 /// It may return a value with success or some error. The byte span WILL BE COPIED.
 void SetEmberReadOutput(std::variant<chip::ByteSpan, chip::Protocols::InteractionModel::Status> what);
 
-} // namespace Testing
+} // namespace Test
+} // namespace chip

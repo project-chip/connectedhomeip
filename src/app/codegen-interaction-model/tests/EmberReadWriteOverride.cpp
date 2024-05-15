@@ -30,7 +30,8 @@ Status gEmberStatusCode = Status::InvalidAction;
 
 } // namespace
 
-namespace Testing {
+namespace chip {
+namespace Test {
 
 void SetEmberReadOutput(std::variant<chip::ByteSpan, Status> what)
 {
@@ -62,7 +63,8 @@ void SetEmberReadOutput(std::variant<chip::ByteSpan, Status> what)
     gEmberStatusCode = Status::InvalidAction;
 }
 
-} // namespace Testing
+} // namespace Test
+} // namespace chip
 
 /// TODO: this SHOULD be part of attribute-storage mocks and allow proper I/O control
 ///       with helpers for "ember encoding"
