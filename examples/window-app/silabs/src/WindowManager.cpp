@@ -767,13 +767,19 @@ void WindowManager::GeneralEventHandler(AppEvent * aEvent)
         window->UpdateLCD();
         break;
     case AppEvent::kEventType_CoverChange:
-        if (window->mIconTimer != nullptr) { window->mIconTimer->Start(); }
+        if (window->mIconTimer != nullptr)
+        {
+            window->mIconTimer->Start();
+        }
         window->mIcon = (window->GetCover().mEndpoint == 1) ? LcdIcon::One : LcdIcon::Two;
         window->UpdateLCD();
         break;
     case AppEvent::kEventType_TiltModeChange:
         ChipLogDetail(AppServer, "App control mode changed to %s", window->mTiltMode ? "Tilt" : "Lift");
-        if (window->mIconTimer != nullptr) { window->mIconTimer->Start(); }
+        if (window->mIconTimer != nullptr)
+        {
+            window->mIconTimer->Start();
+        }
         window->mIcon = window->mTiltMode ? LcdIcon::Tilt : LcdIcon::Lift;
         window->UpdateLCD();
         break;
