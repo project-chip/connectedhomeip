@@ -130,6 +130,7 @@ def BuildHostTarget():
         TargetPart('tv-app', app=HostApp.TV_APP),
         TargetPart('tv-casting-app', app=HostApp.TV_CASTING),
         TargetPart('bridge', app=HostApp.BRIDGE),
+        TargetPart('fabric-admin', app=HostApp.FABRIC_ADMIN),
         TargetPart('fabric-bridge', app=HostApp.FABRIC_BRIDGE),
         TargetPart('tests', app=HostApp.TESTS),
         TargetPart('chip-cert', app=HostApp.CERT_TOOL),
