@@ -25,6 +25,7 @@
 #include <app/util/mock/Functions.h>
 #include <app/util/mock/MockNodeConfig.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/TLVDebug.h>
 #include <lib/core/TLVReader.h>
 #include <lib/core/TLVWriter.h>
 
@@ -191,7 +192,7 @@ struct DecodedAttributeData
 {
     chip::DataVersion dataVersion;
     ConcreteDataAttributePath attributePath;
-    ByteSpan dataSpan;
+    TLV::TLVReader dataReader;
 
     CHIP_ERROR DecodeFrom(const AttributeDataIB::Parser & parser)
     {
@@ -200,11 +201,7 @@ struct DecodedAttributeData
         AttributePathIB::Parser pathParser;
         ReturnErrorOnFailure(parser.GetPath(&pathParser));
         ReturnErrorOnFailure(pathParser.GetConcreteAttributePath(attributePath, AttributePathIB::ValidateIdRanges::kNo));
-
-        TLV::TLVReader dataReader;
         ReturnErrorOnFailure(parser.GetData(&dataReader));
-
-        dataSpan = ByteSpan(dataReader.GetReadPoint(), dataReader.GetLength());
 
         return CHIP_NO_ERROR;
     }
@@ -212,11 +209,34 @@ struct DecodedAttributeData
 
 CHIP_ERROR DecodeAttributeReportIBs(ByteSpan data, std::vector<DecodedAttributeData> & decoded_items)
 {
+    // Espected data format:
+    //   CONTAINER (anonymous)
+    //     0x01 => Array (i.e. report data ib)
+    //       ReportIB*
+    //
+    // Overally this is VERY hard to process ...
+    //
     TLV::TLVReader reportIBsReader;
     reportIBsReader.Init(data);
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    ReturnErrorOnFailure(reportIBsReader.Next());
+    if (reportIBsReader.GetType() != TLV::TLVType::kTLVType_Structure)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    TLV::TLVType outer1;
+    reportIBsReader.EnterContainer(outer1);
 
+    ReturnErrorOnFailure(reportIBsReader.Next());
+    if (reportIBsReader.GetType() != TLV::TLVType::kTLVType_Array)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    TLV::TLVType outer2;
+    reportIBsReader.EnterContainer(outer2);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while (CHIP_NO_ERROR == (err = reportIBsReader.Next()))
     {
         TLV::TLVReader attributeReportReader = reportIBsReader;
@@ -232,9 +252,24 @@ CHIP_ERROR DecodeAttributeReportIBs(ByteSpan data, std::vector<DecodedAttributeD
         decoded_items.push_back(decoded);
     }
 
-    if (CHIP_END_OF_TLV == err)
+    if ((CHIP_END_OF_TLV != err) && (err != CHIP_NO_ERROR))
     {
         return CHIP_NO_ERROR;
+    }
+
+    ReturnErrorOnFailure(reportIBsReader.ExitContainer(outer2));
+    ReturnErrorOnFailure(reportIBsReader.ExitContainer(outer1));
+
+    err = reportIBsReader.Next();
+
+    if (CHIP_ERROR_END_OF_TLV == err)
+    {
+        return CHIP_NO_ERROR;
+    }
+    if (CHIP_NO_ERROR == err)
+    {
+        // This is NOT ok ... we have multiple things in our buffer?
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     return err;
@@ -550,14 +585,15 @@ TEST(TestCodegenModelViaMocks, EmberAttributeRead)
 
     TLV::TLVWriter tlvWriter;
     tlvWriter.Init(tlvBuffer);
-    TLV::TLVType outer;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    CHIP_ERROR err = tlvWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer);
+    TLV::TLVType outer;
+    err = tlvWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer);
     ASSERT_EQ(err, CHIP_NO_ERROR);
 
     AttributeReportIBs::Builder builder;
 
-    err = builder.Init(&tlvWriter, 0x01 /* report context tag */);
+    err = builder.Init(&tlvWriter, to_underlying(ReportDataMessage::Tag::kAttributeReportIBs));
     ASSERT_EQ(err, CHIP_NO_ERROR);
     AttributeValueEncoder encoder(builder, kAdminSubjectDescriptor, readRequest.path, dataVersion);
 
@@ -579,8 +615,18 @@ TEST(TestCodegenModelViaMocks, EmberAttributeRead)
     std::vector<DecodedAttributeData> attribute_data;
     err = DecodeAttributeReportIBs(ByteSpan(tlvBuffer, tlvWriter.GetLengthWritten()), attribute_data);
     ASSERT_EQ(err, CHIP_NO_ERROR);
+    ASSERT_EQ(attribute_data.size(), 1u);
 
-    EXPECT_EQ(attribute_data.size(), 1u);
+    const DecodedAttributeData & encodedData = attribute_data[0];
+    ASSERT_EQ(encodedData.attributePath, readRequest.path);
 
-    // FIXME: validate data
+    // data element should be a uint32 encoded as TLV
+    ASSERT_EQ(encodedData.dataReader.GetType(), TLV::kTLVType_UnsignedInteger);
+    uint32_t expected;
+    static_assert(sizeof(expected) == sizeof(data));
+    memcpy(&expected, data, sizeof(expected));
+    uint32_t actual;
+    err = encodedData.dataReader.Get(actual);
+    ASSERT_EQ(CHIP_NO_ERROR, err);
+    ASSERT_EQ(actual, expected);
 }
