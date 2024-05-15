@@ -25,6 +25,8 @@ source_set("ember_extra_files") {
     "EmberReadWriteOverride.cpp",
     "EmberReadWriteOverride.h",
     "InteractionModelTemporaryOverrides.cpp",
+    "TestAttributeReportIBsEncoding.cpp",
+    "TestAttributeReportIBsEncoding.h",
   ]
 
   public_deps = [

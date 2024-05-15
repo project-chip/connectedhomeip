@@ -17,6 +17,7 @@
 #include <app/codegen-interaction-model/Model.h>
 
 #include "EmberReadWriteOverride.h"
+#include "TestAttributeReportIBsEncoding.h"
 
 #include <access/AccessControl.h>
 #include <access/SubjectDescriptor.h>
@@ -187,93 +188,6 @@ struct UseMockNodeConfig
     UseMockNodeConfig(const MockNodeConfig & config) { SetMockNodeConfig(config); }
     ~UseMockNodeConfig() { ResetMockNodeConfig(); }
 };
-
-struct DecodedAttributeData
-{
-    chip::DataVersion dataVersion;
-    ConcreteDataAttributePath attributePath;
-    TLV::TLVReader dataReader;
-
-    CHIP_ERROR DecodeFrom(const AttributeDataIB::Parser & parser)
-    {
-        ReturnErrorOnFailure(parser.GetDataVersion(&dataVersion));
-
-        AttributePathIB::Parser pathParser;
-        ReturnErrorOnFailure(parser.GetPath(&pathParser));
-        ReturnErrorOnFailure(pathParser.GetConcreteAttributePath(attributePath, AttributePathIB::ValidateIdRanges::kNo));
-        ReturnErrorOnFailure(parser.GetData(&dataReader));
-
-        return CHIP_NO_ERROR;
-    }
-};
-
-CHIP_ERROR DecodeAttributeReportIBs(ByteSpan data, std::vector<DecodedAttributeData> & decoded_items)
-{
-    // Espected data format:
-    //   CONTAINER (anonymous)
-    //     0x01 => Array (i.e. report data ib)
-    //       ReportIB*
-    //
-    // Overally this is VERY hard to process ...
-    //
-    TLV::TLVReader reportIBsReader;
-    reportIBsReader.Init(data);
-
-    ReturnErrorOnFailure(reportIBsReader.Next());
-    if (reportIBsReader.GetType() != TLV::TLVType::kTLVType_Structure)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    TLV::TLVType outer1;
-    reportIBsReader.EnterContainer(outer1);
-
-    ReturnErrorOnFailure(reportIBsReader.Next());
-    if (reportIBsReader.GetType() != TLV::TLVType::kTLVType_Array)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    TLV::TLVType outer2;
-    reportIBsReader.EnterContainer(outer2);
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    while (CHIP_NO_ERROR == (err = reportIBsReader.Next()))
-    {
-        TLV::TLVReader attributeReportReader = reportIBsReader;
-        AttributeReportIB::Parser attributeReportParser;
-        ReturnErrorOnFailure(attributeReportParser.Init(attributeReportReader));
-
-        AttributeDataIB::Parser dataParser;
-        // NOTE: to also grab statuses, use GetAttributeStatus and check for CHIP_END_OF_TLV
-        ReturnErrorOnFailure(attributeReportParser.GetAttributeData(&dataParser));
-
-        DecodedAttributeData decoded;
-        ReturnErrorOnFailure(decoded.DecodeFrom(dataParser));
-        decoded_items.push_back(decoded);
-    }
-
-    if ((CHIP_END_OF_TLV != err) && (err != CHIP_NO_ERROR))
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    ReturnErrorOnFailure(reportIBsReader.ExitContainer(outer2));
-    ReturnErrorOnFailure(reportIBsReader.ExitContainer(outer1));
-
-    err = reportIBsReader.Next();
-
-    if (CHIP_ERROR_END_OF_TLV == err)
-    {
-        return CHIP_NO_ERROR;
-    }
-    if (CHIP_NO_ERROR == err)
-    {
-        // This is NOT ok ... we have multiple things in our buffer?
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    return err;
-}
 
 } // namespace
 
