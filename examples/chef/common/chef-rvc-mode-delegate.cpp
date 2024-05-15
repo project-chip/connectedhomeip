@@ -292,7 +292,7 @@ chip::Protocols::InteractionModel::Status chefRvcCleanModeReadCallback(chip::End
 {
     uint8_t m = gRvcCleanModeInstance->GetCurrentMode();
     memcpy(buffer, &m, sizeof(m));
-    
+
     return chip::Protocols::InteractionModel::Status::Success;
 }
 
