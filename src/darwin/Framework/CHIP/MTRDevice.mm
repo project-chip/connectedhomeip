@@ -948,7 +948,7 @@ static NSString * const sAttributesKey = @"attributes";
 
     // Device is thread-enabled if there is a Thread Network Diagnostics cluster on endpoint 0
     for (MTRClusterPath * path in [self _knownClusters]) {
-        if (path.endpoint.unsignedShortValue != 0) {
+        if (path.endpoint.unsignedShortValue != kRootEndpointId) {
             continue;
         }
 
