@@ -39,7 +39,7 @@ void SetEmberReadOutput(std::variant<chip::ByteSpan, Status> what)
     {
         gEmberStatusCode = Status::Success;
 
-        if (span->size() > sizeof(gEmberIoBufferFill))
+        if (span->size() > sizeof(gEmberIoBuffer))
         {
             ChipLogError(Test, "UNEXPECTED STATE: Too much data set for ember read output");
             gEmberStatusCode = Status::ResourceExhausted;

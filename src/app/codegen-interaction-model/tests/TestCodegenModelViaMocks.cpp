@@ -619,7 +619,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadOctetString)
     const DecodedAttributeData & encodedData = attribute_data[0];
     ASSERT_EQ(encodedData.attributePath, testRequest.request.path);
 
-    // data element should be a uint32 encoded as TLV
+    // data element should be a encoded byte string as this is what the attribute type is
     ASSERT_EQ(encodedData.dataReader.GetType(), TLV::kTLVType_ByteString);
     ByteSpan actual;
     ASSERT_EQ(encodedData.dataReader.Get(actual), CHIP_NO_ERROR);
