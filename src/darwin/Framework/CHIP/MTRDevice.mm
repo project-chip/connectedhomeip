@@ -395,8 +395,8 @@ static NSString * const sAttributesKey = @"attributes";
 
     // The completion block is set when the subscription / resubscription work is enqueued, and called / cleared when any of the following happen:
     //   1. Subscription establishes
-    //   2. When OnResubscriptionNeeded is called
-    //   3. On subscription reset (including when getSessionForNode fails)
+    //   2. OnResubscriptionNeeded is called
+    //   3. Subscription reset (including when getSessionForNode fails)
     MTRAsyncWorkCompletionBlock _subscriptionPoolWorkCompletionBlock;
 }
 
