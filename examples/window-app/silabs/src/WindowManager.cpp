@@ -538,11 +538,7 @@ WindowManager & WindowManager::Instance()
     return WindowManager::sWindow;
 }
 
-#ifdef DISPLAY_ENABLED
-WindowManager::WindowManager() : mIconTimer(LCD_ICON_TIMEOUT, OnIconTimeout, this) {}
-#else
 WindowManager::WindowManager() {}
-#endif
 
 void WindowManager::OnIconTimeout(WindowManager::Timer & timer)
 {
@@ -556,6 +552,9 @@ CHIP_ERROR WindowManager::Init()
 {
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
+#ifdef DISPLAY_ENABLED
+    mIconTimer = new Timer(LCD_ICON_TIMEOUT, OnIconTimeout, this);
+#endif
     // Timers
     mLongPressTimer = new Timer(LONG_PRESS_TIMEOUT, OnLongPressTimeout, this);
 
@@ -768,13 +767,13 @@ void WindowManager::GeneralEventHandler(AppEvent * aEvent)
         window->UpdateLCD();
         break;
     case AppEvent::kEventType_CoverChange:
-        window->mIconTimer.Start();
+        if (window->mIconTimer != nullptr) { window->mIconTimer->Start(); }
         window->mIcon = (window->GetCover().mEndpoint == 1) ? LcdIcon::One : LcdIcon::Two;
         window->UpdateLCD();
         break;
     case AppEvent::kEventType_TiltModeChange:
         ChipLogDetail(AppServer, "App control mode changed to %s", window->mTiltMode ? "Tilt" : "Lift");
-        window->mIconTimer.Start();
+        if (window->mIconTimer != nullptr) { window->mIconTimer->Start(); }
         window->mIcon = window->mTiltMode ? LcdIcon::Tilt : LcdIcon::Lift;
         window->UpdateLCD();
         break;
