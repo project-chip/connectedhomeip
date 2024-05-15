@@ -104,6 +104,5 @@ CHIP_ERROR DecodeAttributeReportIBs(ByteSpan data, std::vector<DecodedAttributeD
     return err;
 }
 
-
 } // namespace Test
 } // namespace chip

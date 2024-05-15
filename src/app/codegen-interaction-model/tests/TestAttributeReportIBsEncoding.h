@@ -33,7 +33,6 @@ struct DecodedAttributeData
     chip::TLV::TLVReader dataReader;
 
     CHIP_ERROR DecodeFrom(const chip::app::AttributeDataIB::Parser & parser);
-
 };
 
 CHIP_ERROR DecodeAttributeReportIBs(ByteSpan data, std::vector<DecodedAttributeData> & decoded_items);
