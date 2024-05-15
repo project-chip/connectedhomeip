@@ -376,7 +376,7 @@ class BaseTestHelper:
             self.logger.error(
                 'Incorrectly succeeded in opening basic commissioning window')
             return False
-        except ChipStackError:
+        except IM.InteractionModelError:
             pass
 
         # TODO:
@@ -404,7 +404,7 @@ class BaseTestHelper:
             self.logger.error(
                 'Incorrectly succeeded in opening enhanced commissioning window')
             return False
-        except ChipStackError:
+        except IM.InteractionModelError:
             pass
 
         self.logger.info("Disarming failsafe on CASE connection")
