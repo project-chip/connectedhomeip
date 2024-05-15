@@ -26,6 +26,7 @@
 #include "UserDirectedCommissioning.h"
 #include <lib/core/CHIPSafeCasts.h>
 #include <system/TLVPacketBufferBackingStore.h>
+#include <transport/raw/Base.h>
 
 #include <unistd.h>
 
@@ -33,7 +34,8 @@ namespace chip {
 namespace Protocols {
 namespace UserDirectedCommissioning {
 
-void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msg)
+void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msg,
+                                                        Transport::MessageTransportContext * ctxt)
 {
     char addrBuffer[chip::Transport::PeerAddress::kMaxToStringSize];
     source.ToString(addrBuffer);
@@ -365,6 +367,7 @@ CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t p
                 {
                     ChipLogProgress(AppServer, "TLV end of array");
                     ReturnErrorOnFailure(reader.ExitContainer(listContainerType));
+                    err = CHIP_NO_ERROR;
                 }
             }
             break;

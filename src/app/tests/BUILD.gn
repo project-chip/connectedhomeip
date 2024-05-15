@@ -29,7 +29,6 @@ static_library("helpers") {
     "${chip_root}/src/app/reporting/tests/MockReportScheduler.cpp",
     "AppTestContext.cpp",
     "AppTestContext.h",
-    "integration/RequiredPrivilegeStubs.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -219,16 +218,6 @@ chip_test_suite_using_nltest("tests") {
     "${nlunit_test_root}:nlunit-test",
   ]
 
-  if (chip_enable_icd_server) {
-    public_deps += [ "${chip_root}/src/app/icd/server:manager" ]
-
-    test_sources += [ "TestICDManager.cpp" ]
-  }
-
-  if (chip_enable_icd_checkin) {
-    test_sources += [ "TestICDMonitoringTable.cpp" ]
-  }
-
   if (chip_device_platform != "android") {
     test_sources += [
       "TestExtensionFieldSets.cpp",
@@ -240,9 +229,6 @@ chip_test_suite_using_nltest("tests") {
     ]
   }
 
-  # Do not run TestCommissionManager when running ICD specific unit tests.
-  # ICDManager has a dependency on the Accessors.h file which causes a link error
-  # when building the TestCommissionManager
   if (chip_config_network_layer_ble &&
       (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
     test_sources += [ "TestCommissionManager.cpp" ]

@@ -108,6 +108,9 @@
 		3CF134AF289D90FF0017A19E /* MTROperationalCertificateIssuer.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CF134AE289D90FF0017A19E /* MTROperationalCertificateIssuer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3D0C484B29DA4FA0006D811F /* MTRErrorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D0C484A29DA4FA0006D811F /* MTRErrorTests.m */; };
 		3D3928D72BBCEA3D00CDEBB2 /* MTRAvailabilityTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D3928D62BBCEA3D00CDEBB2 /* MTRAvailabilityTests.m */; settings = {COMPILER_FLAGS = "-UMTR_NO_AVAILABILITY -Wno-unguarded-availability-new"; }; };
+		3D4733AF2BDF1B80003DC19B /* MTRSetupPayloadTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D4733AE2BDF1B80003DC19B /* MTRSetupPayloadTests.m */; };
+		3D4733B32BE2D1DA003DC19B /* MTRUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D4733B22BE2D1CF003DC19B /* MTRUtilities.h */; };
+		3D4733B52BE2D3D7003DC19B /* MTRUtilities.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3D4733B42BE2D3D1003DC19B /* MTRUtilities.mm */; };
 		3D69868529383096007314E7 /* com.csa.matter.plist in Copy Logging Preferences */ = {isa = PBXBuildFile; fileRef = 3D69868029382EF4007314E7 /* com.csa.matter.plist */; };
 		3D843711294977000070D20A /* NSStringSpanConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D84370E294977000070D20A /* NSStringSpanConversion.h */; };
 		3D843712294977000070D20A /* MTRCallbackBridgeBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D84370F294977000070D20A /* MTRCallbackBridgeBase.h */; };
@@ -138,6 +141,7 @@
 		512431282BA0C8BF000BC136 /* SetMRPParametersCommand.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5124311C2BA0C09A000BC136 /* SetMRPParametersCommand.mm */; };
 		512431292BA0C8BF000BC136 /* ResetMRPParametersCommand.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5124311A2BA0C09A000BC136 /* ResetMRPParametersCommand.mm */; };
 		5129BCFD26A9EE3300122DDF /* MTRError.h in Headers */ = {isa = PBXBuildFile; fileRef = 5129BCFC26A9EE3300122DDF /* MTRError.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5131BF662BE2E1B000D5D6BC /* MTRTestCase.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5131BF642BE2E1B000D5D6BC /* MTRTestCase.mm */; };
 		51339B1F2A0DA64D00C798C1 /* MTRCertificateValidityTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 51339B1E2A0DA64D00C798C1 /* MTRCertificateValidityTests.m */; };
 		5136661328067D550025EDAE /* MTRDeviceController_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 5136660F28067D540025EDAE /* MTRDeviceController_Internal.h */; };
 		5136661428067D550025EDAE /* MTRDeviceControllerFactory.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5136661028067D540025EDAE /* MTRDeviceControllerFactory.mm */; };
@@ -193,7 +197,7 @@
 		517BF3F3282B62CB00A8B7DB /* MTRCertificateTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 517BF3F2282B62CB00A8B7DB /* MTRCertificateTests.m */; };
 		518D3F832AA132DC008E0007 /* MTRTestPerControllerStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = 518D3F812AA132DC008E0007 /* MTRTestPerControllerStorage.m */; };
 		518D3F852AA14006008E0007 /* MTRControllerAdvertisingTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 518D3F842AA14006008E0007 /* MTRControllerAdvertisingTests.m */; };
-		519498322A25581C00B3BABE /* MTRSetupPayloadSerializerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 519498312A25581C00B3BABE /* MTRSetupPayloadSerializerTests.m */; };
+		519498322A25581C00B3BABE /* MTRSetupPayloadInitializationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 519498312A25581C00B3BABE /* MTRSetupPayloadInitializationTests.m */; };
 		51A2F1322A00402A00F03298 /* MTRDataValueParserTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 51A2F1312A00402A00F03298 /* MTRDataValueParserTests.m */; };
 		51B22C1E2740CB0A008D5055 /* MTRStructsObjc.h in Headers */ = {isa = PBXBuildFile; fileRef = 51B22C1D2740CB0A008D5055 /* MTRStructsObjc.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		51B22C222740CB1D008D5055 /* MTRCommandPayloadsObjc.h in Headers */ = {isa = PBXBuildFile; fileRef = 51B22C212740CB1D008D5055 /* MTRCommandPayloadsObjc.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -309,7 +313,6 @@
 		B2E0D7B7245B0B5C003C5B48 /* MTRQRCodeSetupPayloadParser.mm in Sources */ = {isa = PBXBuildFile; fileRef = B2E0D7AE245B0B5C003C5B48 /* MTRQRCodeSetupPayloadParser.mm */; };
 		B2E0D7B8245B0B5C003C5B48 /* MTRSetupPayload.h in Headers */ = {isa = PBXBuildFile; fileRef = B2E0D7AF245B0B5C003C5B48 /* MTRSetupPayload.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B2E0D7B9245B0B5C003C5B48 /* MTRSetupPayload.mm in Sources */ = {isa = PBXBuildFile; fileRef = B2E0D7B0245B0B5C003C5B48 /* MTRSetupPayload.mm */; };
-		B2F53AF2245B0DCF0010745E /* MTRSetupPayloadParserTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B2F53AF1245B0DCF0010745E /* MTRSetupPayloadParserTests.m */; };
 		B45373AA2A9FE73400807602 /* WebSocketServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B45373A92A9FE73400807602 /* WebSocketServer.cpp */; };
 		B45373BD2A9FEA9100807602 /* service.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373B22A9FEA9000807602 /* service.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
 		B45373BE2A9FEA9100807602 /* network.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373B32A9FEA9000807602 /* network.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
@@ -361,6 +364,10 @@
 		B4FCD5732B611EB300832859 /* MTRDiagnosticLogsDownloader.h in Headers */ = {isa = PBXBuildFile; fileRef = B4C8E6B32B3453AD00FCD54D /* MTRDiagnosticLogsDownloader.h */; };
 		BA09EB43247477BA00605257 /* libCHIP.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BA09EB3F2474762900605257 /* libCHIP.a */; };
 		D4772A46285AE98400383630 /* MTRClusterConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = D4772A45285AE98300383630 /* MTRClusterConstants.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E04AC67D2BEEA17F00BA409B /* ember-io-storage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E04AC67B2BEEA17F00BA409B /* ember-io-storage.cpp */; };
+		E04AC67E2BEEA17F00BA409B /* ember-io-storage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E04AC67B2BEEA17F00BA409B /* ember-io-storage.cpp */; };
+		E04AC67F2BEEA17F00BA409B /* ember-global-attribute-access-interface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E04AC67C2BEEA17F00BA409B /* ember-global-attribute-access-interface.cpp */; };
+		E04AC6802BEEA17F00BA409B /* ember-global-attribute-access-interface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E04AC67C2BEEA17F00BA409B /* ember-global-attribute-access-interface.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -498,6 +505,9 @@
 		3CF134AE289D90FF0017A19E /* MTROperationalCertificateIssuer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTROperationalCertificateIssuer.h; sourceTree = "<group>"; };
 		3D0C484A29DA4FA0006D811F /* MTRErrorTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRErrorTests.m; sourceTree = "<group>"; };
 		3D3928D62BBCEA3D00CDEBB2 /* MTRAvailabilityTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRAvailabilityTests.m; sourceTree = "<group>"; };
+		3D4733AE2BDF1B80003DC19B /* MTRSetupPayloadTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRSetupPayloadTests.m; sourceTree = "<group>"; };
+		3D4733B22BE2D1CF003DC19B /* MTRUtilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRUtilities.h; sourceTree = "<group>"; };
+		3D4733B42BE2D3D1003DC19B /* MTRUtilities.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRUtilities.mm; sourceTree = "<group>"; };
 		3D69868029382EF4007314E7 /* com.csa.matter.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = com.csa.matter.plist; sourceTree = "<group>"; };
 		3D84370E294977000070D20A /* NSStringSpanConversion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSStringSpanConversion.h; sourceTree = "<group>"; };
 		3D84370F294977000070D20A /* MTRCallbackBridgeBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRCallbackBridgeBase.h; sourceTree = "<group>"; };
@@ -548,6 +558,8 @@
 		5124311B2BA0C09A000BC136 /* SetMRPParametersCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SetMRPParametersCommand.h; sourceTree = "<group>"; };
 		5124311C2BA0C09A000BC136 /* SetMRPParametersCommand.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SetMRPParametersCommand.mm; sourceTree = "<group>"; };
 		5129BCFC26A9EE3300122DDF /* MTRError.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRError.h; sourceTree = "<group>"; };
+		5131BF642BE2E1B000D5D6BC /* MTRTestCase.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRTestCase.mm; sourceTree = "<group>"; };
+		5131BF652BE2E1B000D5D6BC /* MTRTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRTestCase.h; sourceTree = "<group>"; };
 		51339B1E2A0DA64D00C798C1 /* MTRCertificateValidityTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRCertificateValidityTests.m; sourceTree = "<group>"; };
 		5136660F28067D540025EDAE /* MTRDeviceController_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRDeviceController_Internal.h; sourceTree = "<group>"; };
 		5136661028067D540025EDAE /* MTRDeviceControllerFactory.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDeviceControllerFactory.mm; sourceTree = "<group>"; };
@@ -601,7 +613,7 @@
 		518D3F812AA132DC008E0007 /* MTRTestPerControllerStorage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRTestPerControllerStorage.m; sourceTree = "<group>"; };
 		518D3F822AA132DC008E0007 /* MTRTestPerControllerStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRTestPerControllerStorage.h; sourceTree = "<group>"; };
 		518D3F842AA14006008E0007 /* MTRControllerAdvertisingTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRControllerAdvertisingTests.m; sourceTree = "<group>"; };
-		519498312A25581C00B3BABE /* MTRSetupPayloadSerializerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRSetupPayloadSerializerTests.m; sourceTree = "<group>"; };
+		519498312A25581C00B3BABE /* MTRSetupPayloadInitializationTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRSetupPayloadInitializationTests.m; sourceTree = "<group>"; };
 		51A2F1312A00402A00F03298 /* MTRDataValueParserTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRDataValueParserTests.m; sourceTree = "<group>"; };
 		51B22C1D2740CB0A008D5055 /* MTRStructsObjc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRStructsObjc.h; sourceTree = "<group>"; };
 		51B22C212740CB1D008D5055 /* MTRCommandPayloadsObjc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRCommandPayloadsObjc.h; sourceTree = "<group>"; };
@@ -725,7 +737,6 @@
 		B2E0D7AE245B0B5C003C5B48 /* MTRQRCodeSetupPayloadParser.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRQRCodeSetupPayloadParser.mm; sourceTree = "<group>"; };
 		B2E0D7AF245B0B5C003C5B48 /* MTRSetupPayload.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRSetupPayload.h; sourceTree = "<group>"; };
 		B2E0D7B0245B0B5C003C5B48 /* MTRSetupPayload.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRSetupPayload.mm; sourceTree = "<group>"; };
-		B2F53AF1245B0DCF0010745E /* MTRSetupPayloadParserTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRSetupPayloadParserTests.m; sourceTree = "<group>"; };
 		B45373A92A9FE73400807602 /* WebSocketServer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WebSocketServer.cpp; sourceTree = "<group>"; };
 		B45373B22A9FEA9000807602 /* service.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = service.c; path = "repo/lib/core-net/service.c"; sourceTree = "<group>"; };
 		B45373B32A9FEA9000807602 /* network.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = network.c; path = "repo/lib/core-net/network.c"; sourceTree = "<group>"; };
@@ -781,6 +792,8 @@
 		D437613F285BDC0D0051FEA2 /* MTRTestKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRTestKeys.h; sourceTree = "<group>"; };
 		D4376140285BDC0D0051FEA2 /* MTRTestStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRTestStorage.h; sourceTree = "<group>"; };
 		D4772A45285AE98300383630 /* MTRClusterConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRClusterConstants.h; sourceTree = "<group>"; };
+		E04AC67B2BEEA17F00BA409B /* ember-io-storage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "ember-io-storage.cpp"; path = "util/ember-io-storage.cpp"; sourceTree = "<group>"; };
+		E04AC67C2BEEA17F00BA409B /* ember-global-attribute-access-interface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "ember-global-attribute-access-interface.cpp"; path = "util/ember-global-attribute-access-interface.cpp"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1026,6 +1039,8 @@
 				514C79F22B62ED5500DD6D7B /* attribute-storage.cpp */,
 				514C79EF2B62ADDA00DD6D7B /* descriptor.cpp */,
 				514C79EC2B62ADCD00DD6D7B /* ember-compatibility-functions.cpp */,
+				E04AC67C2BEEA17F00BA409B /* ember-global-attribute-access-interface.cpp */,
+				E04AC67B2BEEA17F00BA409B /* ember-io-storage.cpp */,
 				516415FE2B6B132200D5CE11 /* DataModelHandler.cpp */,
 				514C79F52B62F0B900DD6D7B /* util.cpp */,
 				514C79FB2B62F94C00DD6D7B /* ota-provider.cpp */,
@@ -1119,6 +1134,8 @@
 		51189FC72A33ACE900184508 /* TestHelpers */ = {
 			isa = PBXGroup;
 			children = (
+				5131BF652BE2E1B000D5D6BC /* MTRTestCase.h */,
+				5131BF642BE2E1B000D5D6BC /* MTRTestCase.mm */,
 				D437613F285BDC0D0051FEA2 /* MTRTestKeys.h */,
 				51C8E3F72825CDB600D47D00 /* MTRTestKeys.m */,
 				D4376140285BDC0D0051FEA2 /* MTRTestStorage.h */,
@@ -1350,6 +1367,8 @@
 				997DED152695343400975E97 /* MTRThreadOperationalDataset.mm */,
 				51C659D72BA3787500C54922 /* MTRTimeUtils.h */,
 				51C659D82BA3787500C54922 /* MTRTimeUtils.mm */,
+				3D4733B22BE2D1CF003DC19B /* MTRUtilities.h */,
+				3D4733B42BE2D3D1003DC19B /* MTRUtilities.mm */,
 				3D843710294977000070D20A /* NSDataSpanConversion.h */,
 				3D84370E294977000070D20A /* NSStringSpanConversion.h */,
 				5117DD3729A931AE00FFA1AA /* MTROperationalBrowser.h */,
@@ -1390,8 +1409,8 @@
 				51742B4D29CB6B88009974FE /* MTRPairingTests.m */,
 				51E95DF72A78110900A434F0 /* MTRPerControllerStorageTests.m */,
 				51D0B1292B61766F006E3511 /* MTRServerEndpointTests.m */,
-				B2F53AF1245B0DCF0010745E /* MTRSetupPayloadParserTests.m */,
-				519498312A25581C00B3BABE /* MTRSetupPayloadSerializerTests.m */,
+				3D4733AE2BDF1B80003DC19B /* MTRSetupPayloadTests.m */,
+				519498312A25581C00B3BABE /* MTRSetupPayloadInitializationTests.m */,
 				51E0FC0F2ACBBF230001E197 /* MTRSwiftDeviceTests.swift */,
 				5143851D2A65885500EDC8E6 /* MTRSwiftPairingTests.swift */,
 				997DED1926955D0200975E97 /* MTRThreadOperationalDatasetTests.mm */,
@@ -1638,6 +1657,7 @@
 				514C7A022B64223400DD6D7B /* MTRServerEndpoint_Internal.h in Headers */,
 				511913FC28C100EF009235E9 /* MTRBaseSubscriptionCallback.h in Headers */,
 				51565CB12A7AD77600469F18 /* MTRDeviceControllerDataStore.h in Headers */,
+				3D4733B32BE2D1DA003DC19B /* MTRUtilities.h in Headers */,
 				3D843713294977000070D20A /* NSDataSpanConversion.h in Headers */,
 				991DC08B247704DC00C13860 /* MTRLogging_Internal.h in Headers */,
 				51FE723F2ACDEF3E00437032 /* MTRCommandPayloadExtensions_Internal.h in Headers */,
@@ -1833,6 +1853,7 @@
 				B45373FE2A9FEC4F00807602 /* unix-fds.c in Sources */,
 				B45374002A9FEC4F00807602 /* unix-init.c in Sources */,
 				B45373FF2A9FEC4F00807602 /* unix-misc.c in Sources */,
+				E04AC67E2BEEA17F00BA409B /* ember-io-storage.cpp in Sources */,
 				B45373FD2A9FEC4F00807602 /* unix-pipe.c in Sources */,
 				B45373FB2A9FEC4F00807602 /* unix-service.c in Sources */,
 				B45374012A9FEC4F00807602 /* unix-sockets.c in Sources */,
@@ -1879,6 +1900,7 @@
 				037C3DB62991BD5000B7EEE2 /* ModelCommandBridge.mm in Sources */,
 				516411322B6BF75700E67C05 /* MTRIMDispatch.mm in Sources */,
 				037C3DB42991BD5000B7EEE2 /* DeviceControllerDelegateBridge.mm in Sources */,
+				E04AC6802BEEA17F00BA409B /* ember-global-attribute-access-interface.cpp in Sources */,
 				039547012992D461006D42A8 /* generic-callback-stubs.cpp in Sources */,
 				514C79F12B62ADDA00DD6D7B /* descriptor.cpp in Sources */,
 			);
@@ -1888,6 +1910,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3D4733B52BE2D3D7003DC19B /* MTRUtilities.mm in Sources */,
 				2C8C8FC2253E0C2100797F05 /* MTRPersistentStorageDelegateBridge.mm in Sources */,
 				99AECC802798A57F00B6355B /* MTRCommissioningParameters.mm in Sources */,
 				2CB7163C252E8A7C0026E2BB /* MTRDeviceControllerDelegateBridge.mm in Sources */,
@@ -1913,6 +1936,7 @@
 				7534F12828BFF20300390851 /* MTRDeviceAttestationDelegate.mm in Sources */,
 				B4C8E6B72B3453AD00FCD54D /* MTRDiagnosticLogsDownloader.mm in Sources */,
 				2C5EEEF7268A85C400CAE3D3 /* MTRDeviceConnectionBridge.mm in Sources */,
+				E04AC67D2BEEA17F00BA409B /* ember-io-storage.cpp in Sources */,
 				51B22C262740CB32008D5055 /* MTRStructsObjc.mm in Sources */,
 				2C222AD1255C620600E446B9 /* MTRBaseDevice.mm in Sources */,
 				1EC3238D271999E2002A8BF0 /* cluster-objects.cpp in Sources */,
@@ -1954,6 +1978,7 @@
 				5178E67E2AE098210069DF72 /* MTRCommandTimedCheck.mm in Sources */,
 				7596A84928762783004DAE0E /* MTRAsyncCallbackWorkQueue.mm in Sources */,
 				B2E0D7B9245B0B5C003C5B48 /* MTRSetupPayload.mm in Sources */,
+				E04AC67F2BEEA17F00BA409B /* ember-global-attribute-access-interface.cpp in Sources */,
 				B2E0D7B6245B0B5C003C5B48 /* MTRManualSetupPayloadParser.mm in Sources */,
 				7596A85528788557004DAE0E /* MTRClusters.mm in Sources */,
 				88EBF8CF27FABDD500686BC1 /* MTRDeviceAttestationDelegateBridge.mm in Sources */,
@@ -1974,6 +1999,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				51742B4E29CB6B88009974FE /* MTRPairingTests.m in Sources */,
+				5131BF662BE2E1B000D5D6BC /* MTRTestCase.mm in Sources */,
 				51669AF02913204400F4AA36 /* MTRBackwardsCompatTests.m in Sources */,
 				51D10D2E2808E2CA00E8CA3D /* MTRTestStorage.m in Sources */,
 				51D0B12A2B61766F006E3511 /* MTRServerEndpointTests.m in Sources */,
@@ -2000,13 +2026,13 @@
 				5AE6D4E427A99041001F2493 /* MTRDeviceTests.m in Sources */,
 				510CECA8297F72970064E0B3 /* MTROperationalCertificateIssuerTests.m in Sources */,
 				5A7947DE27BEC3F500434CF2 /* MTRXPCListenerSampleTests.m in Sources */,
-				B2F53AF2245B0DCF0010745E /* MTRSetupPayloadParserTests.m in Sources */,
 				3DFCB3292966684500332B35 /* MTRCertificateInfoTests.m in Sources */,
 				517BF3F3282B62CB00A8B7DB /* MTRCertificateTests.m in Sources */,
 				5142E39829D377F000A206F0 /* MTROTAProviderTests.m in Sources */,
 				51E0FC102ACBBF230001E197 /* MTRSwiftDeviceTests.swift in Sources */,
+				3D4733AF2BDF1B80003DC19B /* MTRSetupPayloadTests.m in Sources */,
 				51E24E73274E0DAC007CCF6E /* MTRErrorTestUtils.mm in Sources */,
-				519498322A25581C00B3BABE /* MTRSetupPayloadSerializerTests.m in Sources */,
+				519498322A25581C00B3BABE /* MTRSetupPayloadInitializationTests.m in Sources */,
 				51A2F1322A00402A00F03298 /* MTRDataValueParserTests.m in Sources */,
 				51E95DF82A78110900A434F0 /* MTRPerControllerStorageTests.m in Sources */,
 				51D9CB0B2BA37DCE0049D6DB /* MTRDSTOffsetTests.m in Sources */,

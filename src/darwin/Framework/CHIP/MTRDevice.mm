@@ -378,6 +378,10 @@ static NSString * const sAttributesKey = @"attributes";
     // ReadClient).  Nil if we have had no such failures.
     NSDate * _Nullable _lastSubscriptionFailureTime;
     MTRDeviceConnectivityMonitor * _connectivityMonitor;
+
+    // This boolean keeps track of any device configuration changes received in an attribute report.
+    // If this is true when the report ends, we notify the delegate.
+    BOOL _deviceConfigurationChanged;
 }
 
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
@@ -1090,6 +1094,19 @@ static NSString * const sAttributesKey = @"attributes";
         _clusterDataToPersist = nil;
     }
 
+    // After the handling of the report, if we detected a device configuration change, notify the delegate
+    // of the same.
+    if (_deviceConfigurationChanged) {
+        id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
+        if (delegate) {
+            dispatch_async(_delegateQueue, ^{
+                if ([delegate respondsToSelector:@selector(deviceConfigurationChanged:)])
+                    [delegate deviceConfigurationChanged:self];
+            });
+        }
+        _deviceConfigurationChanged = NO;
+    }
+
 // For unit testing only
 #ifdef DEBUG
     id delegate = _weakDelegate.strongObject;
@@ -1130,6 +1147,15 @@ static NSString * const sAttributesKey = @"attributes";
 {
     dispatch_async(self.queue, ^{
         [self _handleEventReport:eventReport];
+    });
+}
+
+- (void)unitTestInjectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
+{
+    dispatch_async(self.queue, ^{
+        [self _handleReportBegin];
+        [self _handleAttributeReport:attributeReport];
+        [self _handleReportEnd];
     });
 }
 #endif
@@ -2443,6 +2469,30 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     }
 }
 
+- (BOOL)_attributeAffectsDeviceConfiguration:(MTRAttributePath *)attributePath
+{
+    // Check for attributes in the descriptor cluster that affect device configuration.
+    if (attributePath.cluster.unsignedLongValue == MTRClusterIDTypeDescriptorID) {
+        switch (attributePath.attribute.unsignedLongValue) {
+        case MTRAttributeIDTypeClusterDescriptorAttributePartsListID:
+        case MTRAttributeIDTypeClusterDescriptorAttributeServerListID:
+        case MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID: {
+            return YES;
+        }
+        }
+    }
+
+    // Check for global attributes that affect device configuration.
+    switch (attributePath.attribute.unsignedLongValue) {
+    case MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID:
+    case MTRAttributeIDTypeGlobalAttributeAttributeListID:
+    case MTRAttributeIDTypeGlobalAttributeClusterRevisionID:
+    case MTRAttributeIDTypeGlobalAttributeFeatureMapID:
+        return YES;
+    }
+    return NO;
+}
+
 // assume lock is held
 - (NSArray *)_getAttributesToReportWithReportedValues:(NSArray<NSDictionary<NSString *, id> *> *)reportedAttributeValues
 {
@@ -2484,8 +2534,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             NSNumber * dataVersion = attributeDataValue[MTRDataVersionKey];
             MTRClusterPath * clusterPath = [MTRClusterPath clusterPathWithEndpointID:attributePath.endpoint clusterID:attributePath.cluster];
             if (dataVersion) {
-                [self _noteDataVersion:dataVersion forClusterPath:clusterPath];
-
                 // Remove data version from what we cache in memory
                 attributeDataValue = [self _dataValueWithoutDataVersion:attributeDataValue];
             }
@@ -2494,7 +2542,17 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             BOOL readCacheValueChanged = ![self _attributeDataValue:attributeDataValue isEqualToDataValue:previousValue];
             // Now that we have grabbed previousValue, update our cache with the attribute value.
             if (readCacheValueChanged) {
+                if (dataVersion) {
+                    [self _noteDataVersion:dataVersion forClusterPath:clusterPath];
+                }
+
                 [self _setCachedAttributeValue:attributeDataValue forPath:attributePath];
+                if (!_deviceConfigurationChanged) {
+                    _deviceConfigurationChanged = [self _attributeAffectsDeviceConfiguration:attributePath];
+                    if (_deviceConfigurationChanged) {
+                        MTR_LOG_INFO("Device configuration changed due to changes in attribute %@", attributePath);
+                    }
+                }
             }
 
 #ifdef DEBUG

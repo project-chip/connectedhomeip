@@ -227,18 +227,22 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
 
             ThreadDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetThreadDiagnosticsDelegate();
 
-            if (mIsAttached)
+            if (delegate)
             {
-                delegate->OnConnectionStatusChanged(app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum::kConnected);
-            }
-            else
-            {
-                delegate->OnConnectionStatusChanged(app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum::kNotConnected);
+                if (mIsAttached)
+                {
+                    delegate->OnConnectionStatusChanged(app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum::kConnected);
+                }
+                else
+                {
+                    delegate->OnConnectionStatusChanged(
+                        app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum::kNotConnected);
 
-                GeneralFaults<kMaxNetworkFaults> current;
-                current.add(to_underlying(chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum::kLinkDown));
-                delegate->OnNetworkFaultChanged(mNetworkFaults, current);
-                mNetworkFaults = current;
+                    GeneralFaults<kMaxNetworkFaults> current;
+                    current.add(to_underlying(chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum::kLinkDown));
+                    delegate->OnNetworkFaultChanged(mNetworkFaults, current);
+                    mNetworkFaults = current;
+                }
             }
         }
 
@@ -1219,6 +1223,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ErasePersistentInfo(v
     ChipLogProgress(DeviceLayer, "Erasing Thread persistent info...");
     Impl()->LockThreadStack();
     otThreadSetEnabled(mOTInst, false);
+    otIp6SetEnabled(mOTInst, false);
     otInstanceErasePersistentInfo(mOTInst);
     Impl()->UnlockThreadStack();
 }
@@ -1737,7 +1742,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
     if (!otIp6IsAddressUnspecified(&serviceInfo.mHostAddress))
     {
         mdnsService.mAddressType = Inet::IPAddressType::kIPv6;
-        mdnsService.mAddress     = MakeOptional(ToIPAddress(serviceInfo.mHostAddress));
+        mdnsService.mAddress     = std::make_optional(ToIPAddress(serviceInfo.mHostAddress));
     }
 
     // Check if TXT record was included in DNS response.
@@ -1811,9 +1816,9 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::DispatchResolve(intptr
     Dnssd::DnssdService & service = dnsResult->mMdnsService;
     Span<Inet::IPAddress> ipAddrs;
 
-    if (service.mAddress.HasValue())
+    if (service.mAddress.has_value())
     {
-        ipAddrs = Span<Inet::IPAddress>(&service.mAddress.Value(), 1);
+        ipAddrs = Span<Inet::IPAddress>(&*service.mAddress, 1);
     }
 
     ThreadStackMgrImpl().mDnsResolveCallback(dnsResult->context, &service, ipAddrs, dnsResult->error);
@@ -1963,7 +1968,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsAddressResolveRes
     error = MapOpenThreadError(otDnsAddressResponseGetAddress(aResponse, 0, &address, nullptr));
     if (error == CHIP_NO_ERROR)
     {
-        dnsResult->mMdnsService.mAddress = MakeOptional(ToIPAddress(address));
+        dnsResult->mMdnsService.mAddress = std::make_optional(ToIPAddress(address));
     }
 
     dnsResult->error = error;

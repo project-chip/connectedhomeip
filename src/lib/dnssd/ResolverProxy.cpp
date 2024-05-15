@@ -55,6 +55,13 @@ CHIP_ERROR ResolverProxy::DiscoverCommissioners(DiscoveryFilter filter)
     return mResolver.StartDiscovery(DiscoveryType::kCommissionerNode, filter, *mContext);
 }
 
+CHIP_ERROR ResolverProxy::DiscoverOperationalNodes(DiscoveryFilter filter)
+{
+    VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    return mResolver.StartDiscovery(DiscoveryType::kOperational, filter, *mContext);
+}
+
 CHIP_ERROR ResolverProxy::StopDiscovery()
 {
     VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);

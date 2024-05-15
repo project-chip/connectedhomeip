@@ -905,6 +905,7 @@ MoveWithOnOff
 MPSL
 MRP
 MTD
+MTR
 MTU
 Multiband
 Multicast
@@ -964,6 +965,7 @@ NTP
 nullable
 nullptr
 NUM
+NuttX
 NVM
 NVS
 nwdiag

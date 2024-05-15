@@ -213,7 +213,7 @@ void PacketParser::ParseSRVResource(const ResourceData & data)
             continue;
         }
 
-        CHIP_ERROR err = resolver.InitializeParsing(data.GetName(), srv);
+        CHIP_ERROR err = resolver.InitializeParsing(data.GetName(), data.GetTtlSeconds(), srv);
         if (err != CHIP_NO_ERROR)
         {
             // Receiving records that we do not need to parse is normal:
@@ -370,7 +370,7 @@ void MinMdnsResolver::AdvancePendingResolverStates()
 
         if (missing.Has(IncrementalResolver::RequiredInformationBitFlags::kIpAddress))
         {
-            if (resolver->IsActiveBrowseParse())
+            if (resolver->IsActiveCommissionParse())
             {
                 // Browse wants IP addresses
                 ScheduleIpAddressResolve(resolver->GetTargetHostName());
@@ -399,7 +399,7 @@ void MinMdnsResolver::AdvancePendingResolverStates()
         }
 
         // SUCCESS. Call the delegates
-        if (resolver->IsActiveBrowseParse())
+        if (resolver->IsActiveCommissionParse())
         {
             MATTER_TRACE_SCOPE("Active commissioning delegate call", "MinMdnsResolver");
             DiscoveredNodeData nodeData;
@@ -452,18 +452,39 @@ void MinMdnsResolver::AdvancePendingResolverStates()
         else if (resolver->IsActiveOperationalParse())
         {
             MATTER_TRACE_SCOPE("Active operational delegate call", "MinMdnsResolver");
-            ResolvedNodeData nodeData;
+            ResolvedNodeData nodeResolvedData;
+            CHIP_ERROR err = resolver->Take(nodeResolvedData);
 
-            CHIP_ERROR err = resolver->Take(nodeData);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Discovery, "Failed to take discovery result: %" CHIP_ERROR_FORMAT, err.Format());
+                ChipLogError(Discovery, "Failed to take NodeData - result: %" CHIP_ERROR_FORMAT, err.Format());
+                continue;
             }
 
-            mActiveResolves.Complete(nodeData.operationalData.peerId);
+            if (mActiveResolves.HasBrowseFor(chip::Dnssd::DiscoveryType::kOperational))
+            {
+                if (mDiscoveryContext != nullptr)
+                {
+                    DiscoveredNodeData nodeData;
+                    OperationalNodeBrowseData opNodeData;
+
+                    opNodeData.peerId     = nodeResolvedData.operationalData.peerId;
+                    opNodeData.hasZeroTTL = nodeResolvedData.operationalData.hasZeroTTL;
+                    nodeData.Set<OperationalNodeBrowseData>(opNodeData);
+                    mDiscoveryContext->OnNodeDiscovered(nodeData);
+                }
+                else
+                {
+#if CHIP_MINMDNS_HIGH_VERBOSITY
+                    ChipLogError(Discovery, "No delegate to report operational node discovery");
+#endif
+                }
+            }
+
+            mActiveResolves.Complete(nodeResolvedData.operationalData.peerId);
             if (mOperationalDelegate != nullptr)
             {
-                mOperationalDelegate->OnOperationalNodeResolved(nodeData);
+                mOperationalDelegate->OnOperationalNodeResolved(nodeResolvedData);
             }
             else
             {
@@ -644,9 +665,9 @@ CHIP_ERROR MinMdnsResolver::SendAllPendingQueries()
 {
     while (true)
     {
-        Optional<ActiveResolveAttempts::ScheduledAttempt> resolve = mActiveResolves.NextScheduled();
+        std::optional<ActiveResolveAttempts::ScheduledAttempt> resolve = mActiveResolves.NextScheduled();
 
-        if (!resolve.HasValue())
+        if (!resolve.has_value())
         {
             break;
         }
@@ -657,9 +678,9 @@ CHIP_ERROR MinMdnsResolver::SendAllPendingQueries()
         QueryBuilder builder(std::move(buffer));
         builder.Header().SetMessageId(0);
 
-        ReturnErrorOnFailure(BuildQuery(builder, resolve.Value()));
+        ReturnErrorOnFailure(BuildQuery(builder, *resolve));
 
-        if (resolve.Value().firstSend)
+        if (resolve->firstSend)
         {
             ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastUnicastQuery(builder.ReleasePacket(), kMdnsPort));
         }
@@ -744,14 +765,14 @@ CHIP_ERROR MinMdnsResolver::ScheduleRetries()
     ReturnErrorCodeIf(mSystemLayer == nullptr, CHIP_ERROR_INCORRECT_STATE);
     mSystemLayer->CancelTimer(&RetryCallback, this);
 
-    Optional<System::Clock::Timeout> delay = mActiveResolves.GetTimeUntilNextExpectedResponse();
+    std::optional<System::Clock::Timeout> delay = mActiveResolves.GetTimeUntilNextExpectedResponse();
 
-    if (!delay.HasValue())
+    if (!delay.has_value())
     {
         return CHIP_NO_ERROR;
     }
 
-    return mSystemLayer->StartTimer(delay.Value(), &RetryCallback, this);
+    return mSystemLayer->StartTimer(*delay, &RetryCallback, this);
 }
 
 void MinMdnsResolver::RetryCallback(System::Layer *, void * self)

@@ -48,6 +48,20 @@
         VerifyOrDie(chip::RegisterUnitTests(&FUNCTION) == CHIP_NO_ERROR);                                                          \
     }
 
+// TODO: remove these once transition to pw_unit_test is completed
+#define NL_TEST_WRAP_FUNCTION(FUNCTION)                                                                                            \
+    [](void * _context) -> int {                                                                                                   \
+        FUNCTION();                                                                                                                \
+        return SUCCESS;                                                                                                            \
+    }
+
+#define NL_TEST_WRAP_METHOD(CLASS, METHOD)                                                                                         \
+    [](void * context) -> int {                                                                                                    \
+        auto ctx = static_cast<CLASS *>(context);                                                                                  \
+        ctx->METHOD();                                                                                                             \
+        return SUCCESS;                                                                                                            \
+    }
+
 namespace chip {
 
 typedef int (*UnitTestTriggerFunction)();

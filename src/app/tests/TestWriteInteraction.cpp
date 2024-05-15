@@ -55,22 +55,21 @@ class TestContext : public chip::Test::AppContext
 {
 public:
     // Performs setup for each individual test in the test suite
-    CHIP_ERROR SetUp() override
+    void SetUp() override
     {
-        ReturnErrorOnFailure(chip::Test::AppContext::SetUp());
+        chip::Test::AppContext::SetUp();
 
         gTestStorage.ClearStorage();
         gGroupsProvider.SetStorageDelegate(&gTestStorage);
         gGroupsProvider.SetSessionKeystore(&gSessionKeystore);
-        ReturnErrorOnFailure(gGroupsProvider.Init());
+        // TODO: use ASSERT_EQ, once transition to pw_unit_test is complete
+        VerifyOrDie(gGroupsProvider.Init() == CHIP_NO_ERROR);
         chip::Credentials::SetGroupDataProvider(&gGroupsProvider);
 
         uint8_t buf[sizeof(chip::CompressedFabricId)];
         chip::MutableByteSpan span(buf);
-        ReturnErrorOnFailure(GetBobFabric()->GetCompressedFabricIdBytes(span));
-        ReturnErrorOnFailure(chip::GroupTesting::InitData(&gGroupsProvider, GetBobFabricIndex(), span));
-
-        return CHIP_NO_ERROR;
+        VerifyOrDie(GetBobFabric()->GetCompressedFabricIdBytes(span) == CHIP_NO_ERROR);
+        VerifyOrDie(chip::GroupTesting::InitData(&gGroupsProvider, GetBobFabricIndex(), span) == CHIP_NO_ERROR);
     }
 
     // Performs teardown for each individual test in the test suite
@@ -1064,10 +1063,10 @@ const nlTest sTests[] =
 nlTestSuite sSuite = {
     "TestWriteInteraction",
     &sTests[0],
-    TestContext::nlTestSetUpTestSuite,
-    TestContext::nlTestTearDownTestSuite,
-    TestContext::nlTestSetUp,
-    TestContext::nlTestTearDown,
+    NL_TEST_WRAP_FUNCTION(TestContext::SetUpTestSuite),
+    NL_TEST_WRAP_FUNCTION(TestContext::TearDownTestSuite),
+    NL_TEST_WRAP_METHOD(TestContext, SetUp),
+    NL_TEST_WRAP_METHOD(TestContext, TearDown),
 };
 
 } // namespace

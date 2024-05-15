@@ -85,6 +85,15 @@ darwin-framework-tool/README
 energy-management-app/**/README
 ```
 
+## Fabric Bridge example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+fabric-bridge-app/**/README
+```
+
 ## Java matter controller example
 
 ```{toctree}

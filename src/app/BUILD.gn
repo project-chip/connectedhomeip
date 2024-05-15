@@ -118,6 +118,7 @@ source_set("global-attributes") {
   # as a dependency
   public_deps = [
     ":app_config",
+    "${chip_root}/src/app/common:ids",
     "${chip_root}/src/lib/support",
   ]
 }
@@ -281,6 +282,7 @@ static_library("attribute-access") {
     "AttributeAccessInterfaceCache.h",
     "AttributeAccessInterfaceRegistry.cpp",
     "AttributeAccessInterfaceRegistry.h",
+    "AttributeEncodeState.h",
     "AttributeReportBuilder.cpp",
     "AttributeReportBuilder.h",
     "AttributeValueDecoder.h",

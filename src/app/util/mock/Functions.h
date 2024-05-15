@@ -35,7 +35,7 @@ namespace Test {
 
 CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const app::ConcreteAttributePath & aPath,
                                      app::AttributeReportIBs::Builder & aAttributeReports,
-                                     app::AttributeValueEncoder::AttributeEncodeState * apEncoderState);
+                                     app::AttributeEncodeState * apEncoderState);
 
 /// Increase the current value for `GetVersion`
 void BumpVersion();

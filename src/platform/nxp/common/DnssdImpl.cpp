@@ -778,9 +778,9 @@ void DispatchResolve(intptr_t context)
     Dnssd::DnssdService & service = resolveContext->mMdnsService;
     Span<Inet::IPAddress> ipAddrs;
 
-    if (service.mAddress.HasValue())
+    if (service.mAddress.has_value())
     {
-        ipAddrs = Span<Inet::IPAddress>(&service.mAddress.Value(), 1);
+        ipAddrs = Span<Inet::IPAddress>(&*service.mAddress, 1);
     }
 
     mDnsResolveCallback(resolveContext->matterCtx, &service, ipAddrs, resolveContext->error);
