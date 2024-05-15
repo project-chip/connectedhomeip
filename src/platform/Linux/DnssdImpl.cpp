@@ -809,7 +809,6 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
             {
                 service.mInterface = static_cast<chip::Inet::InterfaceId>(interface);
             }
-            service.mType[kDnssdTypeMaxSize] = 0;
             service.mTtlSeconds              = 0;
             context->mCallback(context->mContext, &service, 1, false, CHIP_NO_ERROR);
         }

@@ -277,7 +277,7 @@ void RegisterDnsCommands()
           "Browse Matter commissionables. Usage: dns browse commissionable [subtype]" },
         { &BrowseCommissionerHandler, "commissioner", "Browse Matter commissioners. Usage: dns browse commissioner [subtype]" },
         { &BrowseOperationalHandler, "operational", "Browse Matter operational nodes. Usage: dns browse operational" },
-        { &BrowseStopHandler, "stop", "Stop ongoing browse. USage: dns browse stop"},
+        { &BrowseStopHandler, "stop", "Stop ongoing browse. Usage: dns browse stop"},
 
     };
 
