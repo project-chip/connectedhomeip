@@ -180,7 +180,7 @@ const MockNodeConfig gTestNodeConfig({
             ClusterRevision::Id, FeatureMap::Id,
         }),
         MockClusterConfig(MockClusterId(4), {
-            ClusterRevision::Id, 
+            ClusterRevision::Id,
             FeatureMap::Id,
             // several attributes of varying data types for testing.
             MOCK_ATTRIBUTE_CONFIG(ZCL_BOOLEAN_ATTRIBUTE_TYPE),
