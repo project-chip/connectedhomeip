@@ -598,7 +598,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadOctetString)
 
     TestReadRequest testRequest(
         kAdminSubjectDescriptor,
-        ConcreteAttributePath(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_TYPE(ZCL_INT32U_ATTRIBUTE_TYPE)));
+        ConcreteAttributePath(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_TYPE(ZCL_OCTET_STRING_ATTRIBUTE_TYPE)));
 
     std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
 
