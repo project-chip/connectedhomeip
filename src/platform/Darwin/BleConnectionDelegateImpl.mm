@@ -34,8 +34,8 @@
 #include <setup_payload/SetupPayload.h>
 #include <tracing/metric_event.h>
 
-#import "PlatformMetricKeys.h"
 #import "MTRUUIDHelper.h"
+#import "PlatformMetricKeys.h"
 
 using namespace chip::Ble;
 using namespace chip::DeviceLayer;
