@@ -47,14 +47,14 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
             + ". Commissionee: "
             + commissioneeName);
 
-      ContentResolver contentResolver = context.getContentResolver();
-      boolean authorisationDialogDisabled = Settings.Secure.getInt(contentResolver,
-              "matter_show_authorisation_dialog", 0) == 0;
+    ContentResolver contentResolver = context.getContentResolver();
+    boolean authorisationDialogDisabled =
+        Settings.Secure.getInt(contentResolver, "matter_show_authorisation_dialog", 0) == 0;
 
-      if (authorisationDialogDisabled) {
-          OnPromptAccepted();
-          return;
-      }
+    if (authorisationDialogDisabled) {
+      OnPromptAccepted();
+      return;
+    }
 
     getActivity()
         .runOnUiThread(
