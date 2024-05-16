@@ -2037,7 +2037,7 @@ static NSString * const kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey = @
     NSUserDefaults * defaults = [[NSUserDefaults alloc] initWithSuiteName:kLocalTestUserDefaultDomain];
     NSNumber * subscriptionPoolSizeOverrideOriginalValue = [defaults objectForKey:kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey];
 
-    // Test DeviceController with a Subscription pool of 2
+    // Test DeviceController with a Subscription pool
     [defaults setInteger:subscriptionPoolSize forKey:kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey];
 
     MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
