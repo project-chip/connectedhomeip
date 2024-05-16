@@ -20,3 +20,4 @@ SecureChannelTests
 ICDServerTests
 DataModelTests
 InetLayerTests
+AppTests
