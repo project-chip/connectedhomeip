@@ -959,6 +959,7 @@ static NSString * const sAttributesKey = @"attributes";
 #ifdef DEBUG
     id testDelegate = _weakDelegate.strongObject;
     if (testDelegate) {
+        // Note: This is a hack to allow our unit tests to test the subscription pooling behavior we have implemented for thread, so we mock devices to be a thread device
         if ([testDelegate respondsToSelector:@selector(unitTestPretendThreadEnabled:)]) {
             if ([testDelegate unitTestPretendThreadEnabled:self]) {
                 return YES;
