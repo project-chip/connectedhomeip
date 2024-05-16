@@ -307,9 +307,6 @@ CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ReliableMessagePro
     mCASEClient = mClientPool->Allocate();
     ReturnErrorCodeIf(mCASEClient == nullptr, CHIP_ERROR_NO_MEMORY);
 
-    // Session has been established. This is when discovery is also stopped
-    MATTER_LOG_METRIC_END(kMetricDeviceOperationalDiscovery, CHIP_NO_ERROR);
-
     MATTER_LOG_METRIC_BEGIN(kMetricDeviceCASESession);
     CHIP_ERROR err = mCASEClient->EstablishSession(mInitParams, mPeerId, mDeviceAddress, config, this);
     if (err != CHIP_NO_ERROR)
@@ -510,7 +507,11 @@ void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error, Sess
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     }
 
+
+    // Session failed to be established. This is when discovery is also stopped
+    MATTER_LOG_METRIC_END(kMetricDeviceOperationalDiscovery, error);
     MATTER_LOG_METRIC_END(kMetricDeviceCASESession, error);
+
     DequeueConnectionCallbacks(error, stage);
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }
@@ -528,6 +529,9 @@ void OperationalSessionSetup::OnSessionEstablished(const SessionHandle & session
 {
     VerifyOrReturn(mState == State::Connecting,
                    ChipLogError(Discovery, "OnSessionEstablished was called while we were not connecting"));
+
+    // Session has been established. This is when discovery is also stopped
+    MATTER_LOG_METRIC_END(kMetricDeviceOperationalDiscovery, CHIP_NO_ERROR);
 
     MATTER_LOG_METRIC_END(kMetricDeviceCASESession, CHIP_NO_ERROR);
 
