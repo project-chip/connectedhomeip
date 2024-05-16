@@ -198,11 +198,13 @@ TEST_F(YourTestContext, YourTestFunction2)
 }
 ```
 
-Note that you don't have to define all 4 functions `SetUpTestsuite`, `TearDownTestSuite`, `SetUp`, `TearDown`.
-If you don't have any custom behavior for one of those functions just omit it.
+You don't have to override all 4 functions `SetUpTestsuite`, `TearDownTestSuite`, `SetUp`, `TearDown`.
+If you don't need any custom behavior in one of those functions just omit it.
+
+If you override one of the setup/teardown functions make sure to invoke the parent's version of the function as well.  `AppContext::SetUpTestSuite` and `AppContext::SetUp` may generate fatal failures, so after you call these from your overriding function make sure to check `HasFailure()` and return if the parent function failed.
 
 
-## Notes and tips
+## Best practices
 
 - Try to use as specific an assertion as possible.  For example use these
     ```
