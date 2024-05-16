@@ -254,7 +254,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 }
 @end
 
-constexpr NSUInteger kDefaultConcurrentSubscriptionPoolSize = 3;
+constexpr NSUInteger kDefaultConcurrentSubscriptionPoolSize = 300;
 
 @implementation MTRDeviceControllerParameters
 - (instancetype)initWithStorageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
