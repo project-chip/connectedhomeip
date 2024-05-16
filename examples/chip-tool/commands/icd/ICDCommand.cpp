@@ -103,7 +103,7 @@ void ICDWaitForDeviceCommand::OnCheckInComplete(const chip::app::ICDClientInfo &
 CHIP_ERROR ICDWaitForDeviceCommand::SendCommand(DeviceProxy * device,
                                                 std::vector<chip::EndpointId> /* not used, always send to endpoint 0 */)
 {
-    chip::app::Clusters::IcdManagement::Commands::StayActiveRequest::Type request;
+    Clusters::IcdManagement::Commands::StayActiveRequest::Type request;
     request.stayActiveDuration = mStayActiveDurationSeconds;
     return ClusterCommand::SendCommand(device, kRootEndpointId, Clusters::IcdManagement::Id,
                                        Clusters::IcdManagement::Commands::StayActiveRequest::Id, request);
