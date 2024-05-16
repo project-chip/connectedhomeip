@@ -64,7 +64,7 @@ class TestContext : public chip::Test::AppContext
 {
 public:
     // Performs setup for each individual test in the test suite
-    CHIP_ERROR SetUp() override
+    void SetUp() override
     {
         const chip::app::LogStorageResources logStorageResources[] = {
             { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
@@ -72,16 +72,14 @@ public:
             { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
         };
 
-        ReturnErrorOnFailure(chip::Test::AppContext::SetUp());
+        chip::Test::AppContext::SetUp();
 
         CHIP_ERROR err = CHIP_NO_ERROR;
-        VerifyOrExit((err = mEventCounter.Init(0)) == CHIP_NO_ERROR,
-                     ChipLogError(AppServer, "Init EventCounter failed: %" CHIP_ERROR_FORMAT, err.Format()));
+        // TODO: use ASSERT_EQ, once transition to pw_unit_test is complete
+        VerifyOrDieWithMsg((err = mEventCounter.Init(0)) == CHIP_NO_ERROR, AppServer,
+                           "Init EventCounter failed: %" CHIP_ERROR_FORMAT, err.Format());
         chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), ArraySize(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
-
-    exit:
-        return err;
     }
 
     // Performs teardown for each individual test in the test suite
@@ -320,10 +318,10 @@ const nlTest sTests[] = {
 nlTestSuite sSuite = {
     "EventLogging",
     &sTests[0],
-    TestContext::nlTestSetUpTestSuite,
-    TestContext::nlTestTearDownTestSuite,
-    TestContext::nlTestSetUp,
-    TestContext::nlTestTearDown,
+    NL_TEST_WRAP_FUNCTION(TestContext::SetUpTestSuite),
+    NL_TEST_WRAP_FUNCTION(TestContext::TearDownTestSuite),
+    NL_TEST_WRAP_METHOD(TestContext, SetUp),
+    NL_TEST_WRAP_METHOD(TestContext, TearDown),
 };
 
 } // namespace

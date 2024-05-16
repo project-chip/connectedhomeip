@@ -150,5 +150,10 @@ private:
     psa_key_derivation_operation_t mOperation = PSA_KEY_DERIVATION_OPERATION_INIT;
 };
 
+/**
+ * @brief Log PSA status code if it indicates an error.
+ */
+void LogPsaError(psa_status_t status);
+
 } // namespace Crypto
 } // namespace chip

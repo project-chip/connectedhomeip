@@ -89,10 +89,10 @@ class TestContext : public chip::Test::LoopbackMessagingContext
 {
 public:
     // Performs shared setup for all tests in the test suite
-    CHIP_ERROR SetUpTestSuite() override
+    static void SetUpTestSuite()
     {
         ConfigInitializeNodes(false);
-        return chip::Test::LoopbackMessagingContext::SetUpTestSuite();
+        chip::Test::LoopbackMessagingContext::SetUpTestSuite();
     }
 };
 
@@ -305,11 +305,14 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, S
 
     while (delegate.mMessageDropped)
     {
-        auto waitTimeout = 100_ms + CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST;
+        auto waitTimeout = 100_ms;
 
-#if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
-        // If running as an ICD, increase waitTimeout to account for the polling interval
-        waitTimeout += ICDConfigurationData::GetInstance().GetSlowPollingInterval();
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+        // If running as an ICD, increase waitTimeout to account for:
+        // - longer MRP intervals, configured above to 1s/1s,
+        // - the fast-polling interval that is added to the MRP backoff time.
+        waitTimeout += 2000_ms32;
+        waitTimeout += ICDConfigurationData::GetInstance().GetFastPollingInterval();
 #endif
 
         // Wait some time so the dropped message will be retransmitted when we drain the IO.
@@ -538,10 +541,10 @@ static nlTestSuite sSuite =
 {
     "Test-CHIP-SecurePairing-PASE",
     &sTests[0],
-    TestContext::nlTestSetUpTestSuite,
-    TestContext::nlTestTearDownTestSuite,
-    TestContext::nlTestSetUp,
-    TestContext::nlTestTearDown,
+    NL_TEST_WRAP_FUNCTION(TestContext::SetUpTestSuite),
+    NL_TEST_WRAP_FUNCTION(TestContext::TearDownTestSuite),
+    NL_TEST_WRAP_METHOD(TestContext, SetUp),
+    NL_TEST_WRAP_METHOD(TestContext, TearDown),
 };
 // clang-format on
 

@@ -25,7 +25,7 @@ typedef NS_ENUM(NSUInteger, MTRStorageSecurityLevel) {
     MTRStorageSecurityLevelSecure,
     // Data may be stored in the clear.
     MTRStorageSecurityLevelNotSecure,
-} MTR_NEWLY_AVAILABLE;
+} MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 typedef NS_ENUM(NSUInteger, MTRStorageSharingType) {
     // Data must not be shared at all (just store locally).
@@ -42,7 +42,7 @@ typedef NS_ENUM(NSUInteger, MTRStorageSharingType) {
 
     // Data must be shared across all controllers on a given fabric.
     MTRStorageSharingTypeSameFabric,
-} MTR_NEWLY_AVAILABLE;
+} MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
  * Protocol for storing and retrieving controller-specific data.
@@ -65,7 +65,7 @@ typedef NS_ENUM(NSUInteger, MTRStorageSharingType) {
  *    and are provided to describe the data should the storage delegate choose to
  *    implement separating storage location by security level and sharing type.
  */
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @protocol MTRDeviceControllerStorageDelegate <NSObject>
 @required
 /**
@@ -125,8 +125,7 @@ MTR_NEWLY_AVAILABLE
        sharingType:(MTRStorageSharingType)sharingType;
 @end
 
-MTR_EXTERN MTR_NEWLY_AVAILABLE
-    NSSet<Class> *
-    MTRDeviceControllerStorageClasses(void);
+MTR_EXTERN MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
+    NSSet<Class> * MTRDeviceControllerStorageClasses(void);
 
 NS_ASSUME_NONNULL_END

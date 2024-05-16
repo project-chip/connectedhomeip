@@ -25,6 +25,7 @@ source_set("mock_ember") {
     "MockNodeConfig.cpp",
     "MockNodeConfig.h",
     "attribute-storage.cpp",
+    "privilege-storage.cpp",
   ]
 
   public_deps = [

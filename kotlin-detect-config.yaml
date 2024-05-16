@@ -343,6 +343,7 @@ complexity:
             - "**/src/controller/java/tests/matter/tlv/TlvReaderTest.kt"
     LargeClass:
         excludes:
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/WildcardFragment.kt"
             - "**/src/controller/java/generated/java/**/*"
             - "**/src/controller/java/tests/matter/tlv/TlvReadWriteTest.kt"
             - "**/src/controller/java/tests/matter/jsontlv/JsonToTlvToJsonTest.kt"

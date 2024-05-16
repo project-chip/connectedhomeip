@@ -100,6 +100,7 @@ class Efr32Board(Enum):
     BRD4187C = 9
     BRD4186C = 10
     BRD4338A = 11
+    BRD2703A = 12
 
     def GnArgName(self):
         if self == Efr32Board.BRD4161A:
@@ -124,6 +125,8 @@ class Efr32Board(Enum):
             return 'BRD4187C'
         elif self == Efr32Board.BRD4338A:
             return 'BRD4338A'
+        elif self == Efr32Board.BRD2703A:
+            return 'BRD2703A'
         else:
             raise Exception('Unknown board #: %r' % self)
 

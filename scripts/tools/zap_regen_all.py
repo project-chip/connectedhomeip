@@ -35,6 +35,9 @@ from typing import List
 CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../..'))
 
+# TODO: Can we share this constant definition with generate.py?
+DEFAULT_DATA_MODEL_DESCRIPTION_FILE = 'src/app/zap-templates/zcl/zcl.json'
+
 
 class TargetType(Flag):
     """Type of targets that can be re-generated"""
@@ -108,6 +111,12 @@ class ZapInput:
         """What command to execute for this zap input. """
         if self.zap_file:
             return [script, self.zap_file]
+        if self.properties_json == DEFAULT_DATA_MODEL_DESCRIPTION_FILE:
+            # Omit the -z bits because that's the default generate.py
+            # will use anyway, and this leads to nicer-looking command
+            # lines if people need to run the regen manually and get
+            # their command line from our --dry-run.
+            return [script]
         return [script, '-z', self.properties_json]
 
 
@@ -382,7 +391,7 @@ def getGlobalTemplatesTargets():
 
         targets.append(ZAPGenerateTarget.MatterIdlTarget(ZapInput.FromZap(filepath)))
 
-    targets.append(ZAPGenerateTarget.MatterIdlTarget(ZapInput.FromPropertiesJson('src/app/zap-templates/zcl/zcl.json'),
+    targets.append(ZAPGenerateTarget.MatterIdlTarget(ZapInput.FromPropertiesJson(DEFAULT_DATA_MODEL_DESCRIPTION_FILE),
                    client_side=True, matter_file_name="src/controller/data_model/controller-clusters.matter"))
 
     return targets
@@ -414,7 +423,7 @@ def getGoldenTestImageTargets():
 
 
 def getSpecificTemplatesTargets():
-    zap_input = ZapInput.FromPropertiesJson('src/app/zap-templates/zcl/zcl.json')
+    zap_input = ZapInput.FromPropertiesJson(DEFAULT_DATA_MODEL_DESCRIPTION_FILE)
 
     # Mapping of required template and output directory
     templates = {

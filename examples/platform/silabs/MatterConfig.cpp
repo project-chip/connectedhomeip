@@ -240,7 +240,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 #endif
 
 #ifdef HEAP_MONITORING
-    MemMonitoring::startHeapMonitoring();
+    MemMonitoring::StartMonitor();
 #endif
 
     //==============================================

@@ -331,6 +331,8 @@ private:
             return mNeedsDST && mParams.GetDSTOffsets().HasValue();
         case chip::Controller::CommissioningStage::kError:
         case chip::Controller::CommissioningStage::kSecurePairing:
+        // "not valid" because attestation verification always fails after entering revocation check step
+        case chip::Controller::CommissioningStage::kAttestationVerification:
             return false;
         default:
             return true;
