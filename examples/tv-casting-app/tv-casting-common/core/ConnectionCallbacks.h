@@ -38,13 +38,13 @@ using ConnectCallback = std::function<void(CHIP_ERROR err, CastingPlayer * casti
  * @param[in] source The source of the Commissioner Declaration message.
  * @param[in] cd The Commissioner Declaration message.
  */
-using CommissionerDeclarationCallback = std::function<void(const chip::Transport::PeerAddress & source,
-                                                           chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cd)>;
+using CommissionerDeclarationCallback = std::function<void(
+    const chip::Transport::PeerAddress & source, const chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cd)>;
 
 /**
- * @brief A container class for User Directed Commissioning (UDC) callbacks.
+ * @brief A container struct for User Directed Commissioning (UDC) callbacks.
  */
-class ConnectionCallbacks
+struct ConnectionCallbacks
 {
 public:
     /**
@@ -57,6 +57,6 @@ public:
     CommissionerDeclarationCallback mCommissionerDeclarationCallback = nullptr;
 };
 
-}; // namespace core
-}; // namespace casting
-}; // namespace matter
+} // namespace core
+} // namespace casting
+} // namespace matter

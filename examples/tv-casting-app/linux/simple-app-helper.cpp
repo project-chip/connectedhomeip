@@ -35,7 +35,7 @@
 const uint16_t kDesiredEndpointVendorId = 65521;
 
 DiscoveryDelegateImpl * DiscoveryDelegateImpl::_discoveryDelegateImpl = nullptr;
-bool awaitingCommissionerPasscodeInput                                = false;
+bool gAwaitingCommissionerPasscodeInput                                = false;
 std::shared_ptr<matter::casting::core::CastingPlayer> targetCastingPlayer;
 
 DiscoveryDelegateImpl * DiscoveryDelegateImpl::GetInstance()
@@ -206,13 +206,16 @@ CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & prov
         // properly to the commissioner later, PASE will succeed.
     }
 
-    // Default to minimum PBKDF iterations
+    // Default to the minimum PBKDF iterations (1000) for this example implementation. For TV devices and TV casting app production
+    // implementations, you should use a higher number of PBKDF iterations to enhance security. The default minimum iterations are
+    // not sufficient against brute-force and rainbow table attacks.
     uint32_t spake2pIterationCount = chip::Crypto::kSpake2p_Min_PBKDF_Iterations;
     if (options.spake2pIterations != 0)
     {
         spake2pIterationCount = options.spake2pIterations;
     }
-    ChipLogError(Support, "PASE PBKDF iterations set to %u", static_cast<unsigned>(spake2pIterationCount));
+    ChipLogError(Support, "PASE PBKDF iterations set to %u. Should be set higher for a production app implementation.",
+                 static_cast<unsigned>(spake2pIterationCount));
 
     return provider.Init(options.spake2pVerifier, options.spake2pSalt, spake2pIterationCount, setupPasscode,
                          options.payload.discriminator.GetLongValue());
@@ -278,7 +281,7 @@ void CommissionerDeclarationCallback(const chip::Transport::PeerAddress & source
         ChipLogProgress(AppServer, "Input 1245678 to use the defualt passcode.");
         ChipLogProgress(AppServer, "Example:     cast setcommissionerpasscode 12345678");
         ChipLogProgress(AppServer, "---- Awaiting user input ----");
-        awaitingCommissionerPasscodeInput = true;
+        gAwaitingCommissionerPasscodeInput = true;
     }
 }
 
@@ -375,10 +378,10 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
         }
         char * eptr;
         uint32_t passcode = (uint32_t) strtol(argv[1], &eptr, 10);
-        if (awaitingCommissionerPasscodeInput)
+        if (gAwaitingCommissionerPasscodeInput)
         {
             ChipLogProgress(AppServer, "CommandHandler() setcommissionerpasscode user enterd passcode: %d", passcode);
-            awaitingCommissionerPasscodeInput = false;
+            gAwaitingCommissionerPasscodeInput = false;
 
             // Per connectedhomeip/examples/platform/linux/LinuxCommissionableDataProvider.h: We don't support overriding the
             // passcode post-init (it is deprecated!). Therefore we need to initiate a new provider with the user entered

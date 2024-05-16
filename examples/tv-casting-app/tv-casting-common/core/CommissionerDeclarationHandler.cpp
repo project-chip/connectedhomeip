@@ -68,6 +68,6 @@ void CommissionerDeclarationHandler::SetCommissionerDeclarationCallback(
     mCmmissionerDeclarationCallback_ = std::move(callback);
 }
 
-}; // namespace core
-}; // namespace casting
-}; // namespace matter
+} // namespace core
+} // namespace casting
+} // namespace matter

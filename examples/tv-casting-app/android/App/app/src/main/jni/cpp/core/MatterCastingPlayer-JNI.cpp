@@ -101,6 +101,8 @@ JNI_METHOD(jobject, verifyOrEstablishConnection)
                             "MatterCastingPlayer-JNI::verifyOrEstablishConnection() ConnectCallback() Connected to Casting Player "
                             "with device ID: %s",
                             playerPtr->GetId());
+            // The Java jSuccessCallback is expecting a Void v callback parameter which translates to a nullptr. When calling the
+            // Java method from C++ via JNI, passing nullptr is equivalent to passing a Void object in Java.
             MatterCastingPlayerJNIMgr().mConnectionSuccessHandler.Handle(nullptr);
         }
         else
@@ -118,6 +120,7 @@ JNI_METHOD(jobject, verifyOrEstablishConnection)
     matter::casting::core::ConnectionCallbacks connectionCallbacks;
     connectionCallbacks.mOnConnectionComplete = connectCallback;
 
+    // TODO: Verify why commissioningWindowTimeoutSec is a "unsigned long long int" type. Seems too big.
     castingPlayer->VerifyOrEstablishConnection(connectionCallbacks,
                                                static_cast<unsigned long long int>(commissioningWindowTimeoutSec), idOptions);
     return support::convertMatterErrorFromCppToJava(CHIP_NO_ERROR);

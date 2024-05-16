@@ -64,6 +64,6 @@ private:
     ~CommissionerDeclarationHandler() {}
 };
 
-}; // namespace core
-}; // namespace casting
-}; // namespace matter
+} // namespace core
+} // namespace casting
+} // namespace matter

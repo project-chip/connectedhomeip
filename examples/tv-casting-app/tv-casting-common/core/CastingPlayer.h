@@ -224,7 +224,8 @@ private:
     ConnectCallback mOnCompleted                          = {};
 
     /**
-     * @brief resets this CastingPlayer's state and calls mOnCompleted with the CHIP_ERROR.
+     * @brief resets this CastingPlayer's state and calls mOnCompleted with the CHIP_ERROR. Also, after calling mOnCompleted, it
+     * clears mOnCompleted by setting it to a nullptr.
      */
     void resetState(CHIP_ERROR err);
 

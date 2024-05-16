@@ -90,9 +90,7 @@ CHIP_ERROR CastingApp::UpdateCommissionableDataProvider(chip::DeviceLayer::Commi
 {
     ChipLogProgress(Discovery, "CastingApp::UpdateCommissionableDataProvider()");
     chip::DeviceLayer::SetCommissionableDataProvider(commissionableDataProvider);
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    err            = mAppParameters->SetCommissionableDataProvider(commissionableDataProvider);
-    return err;
+    return mAppParameters->SetCommissionableDataProvider(commissionableDataProvider);
 }
 
 void ReconnectHandler(CHIP_ERROR err, matter::casting::core::CastingPlayer * castingPlayer)

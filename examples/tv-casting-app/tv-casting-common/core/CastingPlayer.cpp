@@ -29,6 +29,7 @@ namespace core {
 
 CastingPlayer * CastingPlayer::mTargetCastingPlayer = nullptr;
 
+// TODO: Verify why commissioningWindowTimeoutSec is a "unsigned long long int" type. Seems too big.
 void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCallbacks,
                                                 unsigned long long int commissioningWindowTimeoutSec,
                                                 IdentificationDeclarationOptions idOptions)
@@ -225,12 +226,16 @@ exit:
 
 void CastingPlayer::resetState(CHIP_ERROR err)
 {
+    ChipLogProgress(AppServer, "CastingPlayer::resetState()");
     support::ChipDeviceEventHandler::SetUdcStatus(false);
     mConnectionState               = CASTING_PLAYER_NOT_CONNECTED;
     mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
     mTargetCastingPlayer           = nullptr;
-    mOnCompleted(err, nullptr);
-    mOnCompleted = nullptr;
+    if (mOnCompleted)
+    {
+        mOnCompleted(err, nullptr);
+        mOnCompleted = nullptr;
+    }
 }
 
 void CastingPlayer::Disconnect()
