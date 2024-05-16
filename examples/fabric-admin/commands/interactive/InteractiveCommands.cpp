@@ -19,9 +19,12 @@
 #include "InteractiveCommands.h"
 
 #include <platform/logging/LogV.h>
+#include <system/SystemClock.h>
 
 #include <editline.h>
 
+#include <stdarg.h>
+#include <stdio.h>
 #include <string>
 #include <vector>
 
@@ -31,6 +34,27 @@ constexpr char kInteractiveModeStopCommand[]     = "quit()";
 
 namespace {
 
+// File pointer for the log file
+FILE * sLogFile = nullptr;
+
+void OpenLogFile(const char * filePath)
+{
+    sLogFile = fopen(filePath, "a");
+    if (sLogFile == nullptr)
+    {
+        perror("Failed to open log file");
+    }
+}
+
+void CloseLogFile()
+{
+    if (sLogFile != nullptr)
+    {
+        fclose(sLogFile);
+        sLogFile = nullptr;
+    }
+}
+
 void ClearLine()
 {
     printf("\r\x1B[0J"); // Move cursor to the beginning of the line and clear from cursor to end of the screen
@@ -38,9 +62,24 @@ void ClearLine()
 
 void ENFORCE_FORMAT(3, 0) LoggingCallback(const char * module, uint8_t category, const char * msg, va_list args)
 {
-    ClearLine();
-    chip::Logging::Platform::LogV(module, category, msg, args);
-    ClearLine();
+    if (sLogFile == nullptr)
+    {
+        return;
+    }
+
+    uint64_t timeMs       = chip::System::SystemClock().GetMonotonicMilliseconds64().count();
+    uint64_t seconds      = timeMs / 1000;
+    uint64_t milliseconds = timeMs % 1000;
+
+    flockfile(sLogFile);
+
+    fprintf(sLogFile, "[%llu.%06llu] CHIP:%s: ", static_cast<unsigned long long>(seconds),
+            static_cast<unsigned long long>(milliseconds), module);
+    vfprintf(sLogFile, msg, args);
+    fprintf(sLogFile, "\n");
+    fflush(sLogFile);
+
+    funlockfile(sLogFile);
 }
 
 } // namespace
@@ -90,9 +129,13 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
 {
     read_history(GetHistoryFilePath().c_str());
 
-    // Logs needs to be redirected in order to refresh the screen appropriately when something
-    // is dumped to stdout while the user is typing a command.
-    chip::Logging::SetLogRedirectCallback(LoggingCallback);
+    if (mLogFilePath.HasValue())
+    {
+        OpenLogFile(mLogFilePath.Value());
+
+        // Redirect logs to the custom logging callback
+        chip::Logging::SetLogRedirectCallback(LoggingCallback);
+    }
 
     char * command = nullptr;
     int status;
@@ -112,6 +155,8 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
     }
 
     SetCommandExitStatus(CHIP_NO_ERROR);
+    CloseLogFile();
+
     return CHIP_NO_ERROR;
 }
 
