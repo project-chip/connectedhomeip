@@ -100,7 +100,7 @@ void ICDWaitForDeviceCommand::OnCheckInComplete(const chip::app::ICDClientInfo &
     }
 }
 
-CHIP_ERROR ICDWaitForDeviceCommand::SendCommand(chip::DeviceProxy * device,
+CHIP_ERROR ICDWaitForDeviceCommand::SendCommand(DeviceProxy * device,
                                                 std::vector<chip::EndpointId> /* not used, always send to endpoint 0 */)
 {
     chip::app::Clusters::IcdManagement::Commands::StayActiveRequest::Type request;
