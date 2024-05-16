@@ -13,6 +13,8 @@
 
 ## Unit testing in the SDK - pw_unit_test
 
+### Simple unit tests
+
 The following example demonstrates how to use pw_unit_test to write a simple unit test.
 Each test function is defined using `TEST(NameOfFunction)`.
 The set of test functions in a given source file is called a "suite". 
@@ -49,6 +51,9 @@ See
 for an example of a simple unit test.
 
 In the above example there are no fixtures or setup/teardown behavior.
+
+### Test fixtures and setup/teardown behavior
+
 If your tests need fixtures or some kind of setup/teardown you will need to define a test context that derives from `::testing::Test`.
 Each of your test functions will be defined with `TEST_F(NameOfTestContext, NameOfFunction)`.
 The following example demonstrates how to use pw_unit_test to write a unit test that uses fixtures and setup/teardown.
@@ -119,6 +124,8 @@ TEST_F(YourTestContext, YourTestFunction2)
     EXPECT_EQ(mPerTestFixture.GetResultCount(), 9);
 }
 ```
+
+### A loopback messaging context for convenience
 
 If you need messaging, there is a convenience class [Test::AppContext](https://github.com/project-chip/connectedhomeip/blob/master/src/app/tests/AppTestContext.h) that you can derive your test context from.
 It provides a network layer and a system layer and two secure sessions connected with each other.
@@ -203,7 +210,7 @@ If you don't have any custom behavior for one of those functions just omit it.
     EXPECT_GT(result, 1);
     EXPECT_STREQ(myString, "hello");
     ```
-instead of these
+    instead of these
     ```
     EXPECT_TRUE(result == 3);
     EXPECT_TRUE(result > 1);
