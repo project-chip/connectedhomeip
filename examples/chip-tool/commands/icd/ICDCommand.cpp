@@ -131,7 +131,7 @@ void registerCommandsICD(Commands & commands, CredentialIssuerCommands * credsIs
     commands.RegisterCommandSet(name, list, "Commands for client-side ICD management.");
 }
 
-DefaultCheckInDelegate * chipToolCheckInDelegate()
+DefaultCheckInDelegate * ChipToolCheckInDelegate()
 {
     return sCheckInDelegate;
 }
