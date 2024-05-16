@@ -35,11 +35,11 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/UnitTest.h>
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/CASESession.h>
 #include <stdarg.h>
-#include <lib/support/UnitTest.h>
 
 #include "credentials/tests/CHIPCert_test_vectors.h"
 
@@ -106,8 +106,40 @@ protected:
     FabricIndex mSingleFabricIndex = kUndefinedFabricIndex;
 };
 
-struct TestCASESession : public Test::LoopbackMessagingContext, public ::testing::Test
+namespace {
+#if CHIP_CONFIG_SLOW_CRYPTO
+constexpr uint32_t sTestCaseMessageCount           = 8;
+constexpr uint32_t sTestCaseResumptionMessageCount = 6;
+#else  // CHIP_CONFIG_SLOW_CRYPTO
+constexpr uint32_t sTestCaseMessageCount           = 5;
+constexpr uint32_t sTestCaseResumptionMessageCount = 4;
+#endif // CHIP_CONFIG_SLOW_CRYPTO
+
+FabricTable gCommissionerFabrics;
+FabricIndex gCommissionerFabricIndex;
+GroupDataProviderImpl gCommissionerGroupDataProvider;
+TestPersistentStorageDelegate gCommissionerStorageDelegate;
+Crypto::DefaultSessionKeystore gCommissionerSessionKeystore;
+
+FabricTable gDeviceFabrics;
+FabricIndex gDeviceFabricIndex;
+GroupDataProviderImpl gDeviceGroupDataProvider;
+TestPersistentStorageDelegate gDeviceStorageDelegate;
+TestOperationalKeystore gDeviceOperationalKeystore;
+Crypto::DefaultSessionKeystore gDeviceSessionKeystore;
+
+Credentials::PersistentStorageOpCertStore gCommissionerOpCertStore;
+Credentials::PersistentStorageOpCertStore gDeviceOpCertStore;
+
+CASEServer gPairingServer;
+
+NodeId Node01_01 = 0xDEDEDEDE00010001;
+NodeId Node01_02 = 0xDEDEDEDE00010002;
+} // namespace
+
+class TestCASESession : public Test::LoopbackMessagingContext, public ::testing::Test
 {
+public:
     static void SetUpTestSuite()
     {
         ConfigInitializeNodes(false);
@@ -115,13 +147,13 @@ struct TestCASESession : public Test::LoopbackMessagingContext, public ::testing
         LoopbackMessagingContext::SetUpTestSuite();
         err = chip::DeviceLayer::PlatformMgr().InitChipStack();
 
-        EXPECT_EQ(err, CHIP_NO_ERROR) << "Init CHIP stack failed: " << std::hex << err.Format();
-        err =
-            InitFabricTable(gCommissionerFabrics, &gCommissionerStorageDelegate, /* opKeyStore = */ nullptr, &gCommissionerOpCertStore);
-        EXPECT_EQ(err, CHIP_NO_ERROR) << "InitFabricTable failed: " << std::hex << err.Format();
+        ASSERT_EQ(err, CHIP_NO_ERROR) << "Init CHIP stack failed: " << std::hex << err.Format();
+        err = InitFabricTable(gCommissionerFabrics, &gCommissionerStorageDelegate, /* opKeyStore = */ nullptr,
+                              &gCommissionerOpCertStore);
+        ASSERT_EQ(err, CHIP_NO_ERROR) << "InitFabricTable failed: " << std::hex << err.Format();
 
         err = InitCredentialSets();
-        EXPECT_EQ(err, CHIP_NO_ERROR) << "InitCredentialSets failed: " << std::hex << err.Format();
+        ASSERT_EQ(err, CHIP_NO_ERROR) << "InitCredentialSets failed: " << std::hex << err.Format();
         chip::DeviceLayer::SetSystemLayerForTesting(&GetSystemLayer());
     }
 
@@ -157,101 +189,60 @@ struct TestCASESession : public Test::LoopbackMessagingContext, public ::testing
 
     static CHIP_ERROR InitCredentialSets();
     static CHIP_ERROR InitFabricTable(chip::FabricTable & fabricTable, chip::TestPersistentStorageDelegate * testStorage,
-                               chip::Crypto::OperationalKeystore * opKeyStore,
-                               chip::Credentials::PersistentStorageOpCertStore * opCertStore);
+                                      chip::Crypto::OperationalKeystore * opKeyStore,
+                                      chip::Credentials::PersistentStorageOpCertStore * opCertStore);
 
     void SecurePairingHandshakeTestCommon(SessionManager & sessionManager, CASESession & pairingCommissioner,
-                                      TestCASESecurePairingDelegate & delegateCommissioner);
-
-   void SimulateUpdateNOCInvalidatePendingEstablishment();
-
-#if CHIP_CONFIG_SLOW_CRYPTO
-    constexpr uint32_t sTestCaseMessageCount           = 8;
-    constexpr uint32_t sTestCaseResumptionMessageCount = 6;
-#else  // CHIP_CONFIG_SLOW_CRYPTO
-    static constexpr uint32_t sTestCaseMessageCount           = 5;
-    static constexpr uint32_t sTestCaseResumptionMessageCount = 4;
-#endif // CHIP_CONFIG_SLOW_CRYPTO
-
-    static FabricTable gCommissionerFabrics;
-    static FabricIndex gCommissionerFabricIndex;
-    static GroupDataProviderImpl gCommissionerGroupDataProvider;
-    static TestPersistentStorageDelegate gCommissionerStorageDelegate;
-    static Crypto::DefaultSessionKeystore gCommissionerSessionKeystore;
-
-    static FabricTable gDeviceFabrics;
-    static FabricIndex gDeviceFabricIndex;
-    static GroupDataProviderImpl gDeviceGroupDataProvider;
-    static TestPersistentStorageDelegate gDeviceStorageDelegate;
-    static TestOperationalKeystore gDeviceOperationalKeystore;
-    static Crypto::DefaultSessionKeystore gDeviceSessionKeystore;
-
-    static Credentials::PersistentStorageOpCertStore gCommissionerOpCertStore;
-    static Credentials::PersistentStorageOpCertStore gDeviceOpCertStore;
-
-    static CASEServer gPairingServer;
-
-    static NodeId Node01_01;
-    static NodeId Node01_02;
+                                          TestCASESecurePairingDelegate & delegateCommissioner);
 };
 
-NodeId TestCASESession::Node01_01 = 0xDEDEDEDE00010001;
-NodeId TestCASESession::Node01_02 = 0xDEDEDEDE00010002;
-
-FabricTable TestCASESession::gCommissionerFabrics;
-FabricIndex TestCASESession::gCommissionerFabricIndex;
-GroupDataProviderImpl TestCASESession::gCommissionerGroupDataProvider;
-TestPersistentStorageDelegate TestCASESession::gCommissionerStorageDelegate;
-Crypto::DefaultSessionKeystore TestCASESession::gCommissionerSessionKeystore;
-
-FabricTable TestCASESession::gDeviceFabrics;
-FabricIndex TestCASESession::gDeviceFabricIndex;
-GroupDataProviderImpl TestCASESession::gDeviceGroupDataProvider;
-TestPersistentStorageDelegate TestCASESession::gDeviceStorageDelegate;
-TestOperationalKeystore TestCASESession::gDeviceOperationalKeystore;
-Crypto::DefaultSessionKeystore TestCASESession::gDeviceSessionKeystore;
-
-Credentials::PersistentStorageOpCertStore TestCASESession::gCommissionerOpCertStore;
-Credentials::PersistentStorageOpCertStore TestCASESession::gDeviceOpCertStore;
-
-CASEServer TestCASESession::gPairingServer;
-
-
-class TemporarySessionManager
+class TestCASESessionWithManager : public TestCASESession
 {
 public:
-    TemporarySessionManager(TestCASESession & ctx) : mCtx(ctx)
+    static void SetUpTestSuite() { TestCASESession::SetUpTestSuite(); }
+    static void TearDownTestSuite() { TestCASESession::TearDownTestSuite(); }
+    void SetUp() override
+    {
+        TestCASESession::SetUp();
+        SetUpSessionManager();
+    }
+
+    void TearDown() override
+    {
+        TestCASESession::TearDown();
+        TearDownSessionManager();
+    }
+
+    void SimulateUpdateNOCInvalidatePendingEstablishment();
+
+    void SetUpSessionManager()
     {
         EXPECT_EQ(CHIP_NO_ERROR,
-                  mSessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &ctx.GetMessageCounterManager(), &mStorage,
-                                       &ctx.GetFabricTable(), ctx.GetSessionKeystore()));
+                  sessionManager.Init(&GetSystemLayer(), &GetTransportMgr(), &GetMessageCounterManager(), &mStorage,
+                                      &GetFabricTable(), GetSessionKeystore()));
         // The setup here is really weird: we are using one session manager for
         // the actual messages we send (the PASE handshake, so the
         // unauthenticated sessions) and a different one for allocating the PASE
         // sessions.  Since our Init() set us up as the thing to handle messages
         // on the transport manager, undo that.
-        mCtx.GetTransportMgr().SetSessionManager(&mCtx.GetSecureSessionManager());
+        GetTransportMgr().SetSessionManager(&GetSecureSessionManager());
     }
 
-    ~TemporarySessionManager()
+    void TearDownSessionManager()
     {
-        mSessionManager.Shutdown();
+        sessionManager.Shutdown();
         // Reset the session manager on the transport again, just in case
         // shutdown messed with it.
-        mCtx.GetTransportMgr().SetSessionManager(&mCtx.GetSecureSessionManager());
+        GetTransportMgr().SetSessionManager(&GetSecureSessionManager());
     }
 
-    operator SessionManager &() { return mSessionManager; }
-
-private:
-    TestCASESession & mCtx;
     TestPersistentStorageDelegate mStorage;
-    SessionManager mSessionManager;
+    SessionManager sessionManager;
 };
 
 CHIP_ERROR TestCASESession::InitFabricTable(chip::FabricTable & fabricTable, chip::TestPersistentStorageDelegate * testStorage,
-                           chip::Crypto::OperationalKeystore * opKeyStore,
-                           chip::Credentials::PersistentStorageOpCertStore * opCertStore)
+                                            chip::Crypto::OperationalKeystore * opKeyStore,
+                                            chip::Credentials::PersistentStorageOpCertStore * opCertStore)
 {
     ReturnErrorOnFailure(opCertStore->Init(testStorage));
 
@@ -290,8 +281,6 @@ public:
     uint32_t mNumPairingComplete = 0;
     uint32_t mNumBusyResponses   = 0;
 };
-
-
 
 CHIP_ERROR InitTestIpk(GroupDataProvider & groupDataProvider, const FabricInfo & fabricInfo, size_t numIpks)
 {
@@ -387,15 +376,12 @@ CHIP_ERROR TestCASESession::InitCredentialSets()
     return CHIP_NO_ERROR;
 }
 
-
 // Specifically for SimulateUpdateNOCInvalidatePendingEstablishment, we need it to be static so that the class below can
 // be a friend to CASESession so that test can get access to CASESession::State and test method that are not public. To
 // keep the rest of this file consistent we brought all other tests into this class.
 
-TEST_F(TestCASESession, SecurePairingWaitTest)
+TEST_F(TestCASESessionWithManager, SecurePairingWaitTest)
 {
-    TemporarySessionManager sessionManager(*this);
-
     // Test all combinations of invalid parameters
     TestCASESecurePairingDelegate delegate;
     FabricTable fabrics;
@@ -420,10 +406,8 @@ TEST_F(TestCASESession, SecurePairingWaitTest)
     caseSession.Clear();
 }
 
-TEST_F(TestCASESession, SecurePairingStartTest)
+TEST_F(TestCASESessionWithManager, SecurePairingStartTest)
 {
-    TemporarySessionManager sessionManager(*this);
-
     // Test all combinations of invalid parameters
     TestCASESecurePairingDelegate delegate;
     CASESession pairing;
@@ -471,7 +455,7 @@ TEST_F(TestCASESession, SecurePairingStartTest)
 }
 
 void TestCASESession::SecurePairingHandshakeTestCommon(SessionManager & sessionManager, CASESession & pairingCommissioner,
-                                      TestCASESecurePairingDelegate & delegateCommissioner)
+                                                       TestCASESecurePairingDelegate & delegateCommissioner)
 {
     // Test all combinations of invalid parameters
     TestCASESecurePairingDelegate delegateAccessory;
@@ -485,7 +469,7 @@ void TestCASESession::SecurePairingHandshakeTestCommon(SessionManager & sessionM
     loopback.mSentMessageCount = 0;
 
     EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
-                                                                                &pairingAccessory),
+                                                                            &pairingAccessory),
               CHIP_NO_ERROR);
 
     ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(&pairingCommissioner);
@@ -526,10 +510,8 @@ void TestCASESession::SecurePairingHandshakeTestCommon(SessionManager & sessionM
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 }
 
-TEST_F(TestCASESession, SecurePairingHandshakeTest)
+TEST_F(TestCASESessionWithManager, SecurePairingHandshakeTest)
 {
-    TemporarySessionManager sessionManager(*this);
-
     TestCASESecurePairingDelegate delegateCommissioner;
     CASESession pairingCommissioner;
     pairingCommissioner.SetGroupDataProvider(&gCommissionerGroupDataProvider);
@@ -589,10 +571,8 @@ TEST_F(TestCASESession, SecurePairingHandshakeServerTest)
     gPairingServer.Shutdown();
 }
 
-TEST_F(TestCASESession, ClientReceivesBusyTest)
+TEST_F(TestCASESessionWithManager, ClientReceivesBusyTest)
 {
-    TemporarySessionManager sessionManager(*this);
-
     TestCASESecurePairingDelegate delegateCommissioner1, delegateCommissioner2;
     CASESession pairingCommissioner1, pairingCommissioner2;
 
@@ -764,35 +744,33 @@ static CHIP_ERROR EncodeSigma1(MutableByteSpan & buf)
 }
 
 // A macro, so we can tell which test failed based on line number.
-// #define TestSigma1Parsing(inSuite, mem, bufferSize, params)
-template <unsigned int bufferSize, class params>
-void TestSigma1Parsing(chip::Platform::ScopedMemoryBuffer<uint8_t> & mem)
-{
-    MutableByteSpan buf(mem.Get(), bufferSize);
-    CHIP_ERROR err = EncodeSigma1<params>(buf);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-
-    TLV::ContiguousBufferTLVReader reader;
-    reader.Init(buf);
-
-    ByteSpan initiatorRandom;
-    uint16_t initiatorSessionId;
-    ByteSpan destinationId;
-    ByteSpan initiatorEphPubKey;
-    bool resumptionRequested;
-    ByteSpan resumptionId;
-    ByteSpan initiatorResumeMIC;
-    CASESession session;
-    err = session.ParseSigma1(reader, initiatorRandom, initiatorSessionId, destinationId, initiatorEphPubKey, resumptionRequested,
-                              resumptionId, initiatorResumeMIC);
-    EXPECT_TRUE((err == CHIP_NO_ERROR) == params::expectSuccess);
-    if (params::expectSuccess)
-    {
-        EXPECT_TRUE(resumptionRequested ==
-                    (params::resumptionIdLen != 0 &&
-                     params::initiatorResumeMICLen != 0)); /* Add other verification tests here as desired */
-    }
-}
+#define TestSigma1Parsing(mem, bufferSize, params)                                                                                 \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        MutableByteSpan buf(mem.Get(), bufferSize);                                                                                \
+        CHIP_ERROR err = EncodeSigma1<params>(buf);                                                                                \
+        EXPECT_EQ(err, CHIP_NO_ERROR);                                                                                             \
+                                                                                                                                   \
+        TLV::ContiguousBufferTLVReader reader;                                                                                     \
+        reader.Init(buf);                                                                                                          \
+                                                                                                                                   \
+        ByteSpan initiatorRandom;                                                                                                  \
+        uint16_t initiatorSessionId;                                                                                               \
+        ByteSpan destinationId;                                                                                                    \
+        ByteSpan initiatorEphPubKey;                                                                                               \
+        bool resumptionRequested;                                                                                                  \
+        ByteSpan resumptionId;                                                                                                     \
+        ByteSpan initiatorResumeMIC;                                                                                               \
+        CASESession session;                                                                                                       \
+        err = session.ParseSigma1(reader, initiatorRandom, initiatorSessionId, destinationId, initiatorEphPubKey,                  \
+                                  resumptionRequested, resumptionId, initiatorResumeMIC);                                          \
+        EXPECT_EQ(err == CHIP_NO_ERROR, params::expectSuccess);                                                                    \
+        if (params::expectSuccess)                                                                                                 \
+        {                                                                                                                          \
+            EXPECT_EQ(resumptionRequested, params::resumptionIdLen != 0 && params::initiatorResumeMICLen != 0);                    \
+            /* Add other verification tests here as desired */                                                                     \
+        }                                                                                                                          \
+    } while (0)
 
 struct BadSigma1ParamsBase : public Sigma1Params
 {
@@ -886,22 +864,22 @@ TEST_F(TestCASESession, Sigma1ParsingTest)
     chip::Platform::ScopedMemoryBuffer<uint8_t> mem;
     EXPECT_TRUE(mem.Calloc(bufferSize));
 
-    TestSigma1Parsing<bufferSize, Sigma1Params>(mem);
-    TestSigma1Parsing<bufferSize, Sigma1NoStructEnd>(mem);
-    TestSigma1Parsing<bufferSize, Sigma1WrongTags>(mem);
-    TestSigma1Parsing<bufferSize, Sigma1TooLongRandom>(mem);
-    TestSigma1Parsing<bufferSize, Sigma1TooShortRandom>(mem);
-    TestSigma1Parsing<bufferSize, Sigma1TooLongDest>(mem);
-    TestSigma1Parsing<bufferSize, Sigma1TooShortDest>(mem);
-    TestSigma1Parsing<bufferSize, Sigma1TooLongPubkey>(mem);
-    TestSigma1Parsing<bufferSize, Sigma1TooShortPubkey>(mem);
-    TestSigma1Parsing<bufferSize, Sigma1WithResumption>(mem);
-    TestSigma1Parsing<bufferSize, Sigma1TooLongResumptionId>(mem);
-    TestSigma1Parsing<bufferSize, Sigma1TooShortResumptionId>(mem);
-    TestSigma1Parsing<bufferSize, Sigma1TooLongResumeMIC>(mem);
-    TestSigma1Parsing<bufferSize, Sigma1TooShortResumeMIC>(mem);
-    TestSigma1Parsing<bufferSize, Sigma1SessionIdMax>(mem);
-    TestSigma1Parsing<bufferSize, Sigma1SessionIdTooBig>(mem);
+    TestSigma1Parsing(mem, bufferSize, Sigma1Params);
+    TestSigma1Parsing(mem, bufferSize, Sigma1NoStructEnd);
+    TestSigma1Parsing(mem, bufferSize, Sigma1WrongTags);
+    TestSigma1Parsing(mem, bufferSize, Sigma1TooLongRandom);
+    TestSigma1Parsing(mem, bufferSize, Sigma1TooShortRandom);
+    TestSigma1Parsing(mem, bufferSize, Sigma1TooLongDest);
+    TestSigma1Parsing(mem, bufferSize, Sigma1TooShortDest);
+    TestSigma1Parsing(mem, bufferSize, Sigma1TooLongPubkey);
+    TestSigma1Parsing(mem, bufferSize, Sigma1TooShortPubkey);
+    TestSigma1Parsing(mem, bufferSize, Sigma1WithResumption);
+    TestSigma1Parsing(mem, bufferSize, Sigma1TooLongResumptionId);
+    TestSigma1Parsing(mem, bufferSize, Sigma1TooShortResumptionId);
+    TestSigma1Parsing(mem, bufferSize, Sigma1TooLongResumeMIC);
+    TestSigma1Parsing(mem, bufferSize, Sigma1TooShortResumeMIC);
+    TestSigma1Parsing(mem, bufferSize, Sigma1SessionIdMax);
+    TestSigma1Parsing(mem, bufferSize, Sigma1SessionIdTooBig);
 }
 
 struct SessionResumptionTestStorage : SessionResumptionStorage
@@ -1049,10 +1027,8 @@ TEST_F(TestCASESession, SessionResumptionStorage)
 }
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-TEST_F_FROM_FIXTURE(TestCASESession, SimulateUpdateNOCInvalidatePendingEstablishment)
+TEST_F_FROM_FIXTURE(TestCASESessionWithManager, SimulateUpdateNOCInvalidatePendingEstablishment)
 {
-    TemporarySessionManager sessionManager(*this);
-
     TestCASESecurePairingDelegate delegateCommissioner;
     CASESession pairingCommissioner;
     pairingCommissioner.SetGroupDataProvider(&gCommissionerGroupDataProvider);
