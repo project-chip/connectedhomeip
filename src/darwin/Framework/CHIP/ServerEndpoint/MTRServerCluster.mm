@@ -26,6 +26,7 @@
 #import <Matter/MTRClusterConstants.h>
 #import <Matter/MTRServerCluster.h>
 
+#import <os/lock.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/clusters/descriptor/descriptor.h>
 #include <app/data-model/PreEncodedValue.h>
