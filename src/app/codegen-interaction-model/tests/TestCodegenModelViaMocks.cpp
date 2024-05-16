@@ -457,18 +457,17 @@ void TestEmberScalarTypeRead(typename NumericAttributeTraits<T>::WorkingType val
         kAdminSubjectDescriptor,
         ConcreteAttributePath(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZclType)));
 
-    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
-
     // Ember encoding for integers is IDENTICAL to the in-memory representation for them
     typename NumericAttributeTraits<T>::StorageType storage;
     NumericAttributeTraits<T>::WorkingToStorage(value, storage);
     chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(&storage), sizeof(storage)));
 
+    // Data read via the encoder
+    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
     ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_NO_ERROR);
-
     ASSERT_EQ(testRequest.FinishEncoding(), CHIP_NO_ERROR);
 
-    /////// VALIDATE
+    // Validate after read
     std::vector<DecodedAttributeData> attribute_data;
     ASSERT_EQ(testRequest.encodedIBs.Decode(attribute_data), CHIP_NO_ERROR);
     ASSERT_EQ(attribute_data.size(), 1u);
@@ -493,18 +492,17 @@ void TestEmberScalarNullRead()
         kAdminSubjectDescriptor,
         ConcreteAttributePath(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZclType)));
 
-    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
-
     // Ember encoding for integers is IDENTICAL to the in-memory representation for them
     typename NumericAttributeTraits<T>::StorageType nullValue;
     NumericAttributeTraits<T>::SetNull(nullValue);
     chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(&nullValue), sizeof(nullValue)));
 
+    // Data read via the encoder
+    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
     ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_NO_ERROR);
-
     ASSERT_EQ(testRequest.FinishEncoding(), CHIP_NO_ERROR);
 
-    /////// VALIDATE
+    // Validate after read
     std::vector<DecodedAttributeData> attribute_data;
     ASSERT_EQ(testRequest.encodedIBs.Decode(attribute_data), CHIP_NO_ERROR);
     ASSERT_EQ(attribute_data.size(), 1u);
@@ -832,18 +830,17 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadOctetString)
                                 ConcreteAttributePath(kMockEndpoint3, MockClusterId(4),
                                                       MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_OCTET_STRING_ATTRIBUTE_TYPE)));
 
-    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
-
     // NOTE: This is a pascal string, so actual data is "test"
     //       the longer encoding is to make it clear we do not encode the overflow
     const char data[] = "\x04testing here with overflow";
     chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
 
+    // Actual read via an encoder
+    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
     ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_NO_ERROR);
-
     ASSERT_EQ(testRequest.FinishEncoding(), CHIP_NO_ERROR);
 
-    /////// VALIDATE
+    // Validate after read
     std::vector<DecodedAttributeData> attribute_data;
     ASSERT_EQ(testRequest.encodedIBs.Decode(attribute_data), CHIP_NO_ERROR);
     ASSERT_EQ(attribute_data.size(), 1u);
@@ -871,8 +868,6 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadLongString)
         ConcreteAttributePath(kMockEndpoint3, MockClusterId(4),
                               MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE)));
 
-    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
-
     // NOTE: This is a pascal string, so actual data is "abcde"
     //       the longer encoding is to make it clear we do not encode the overflow
     char data[]  = "\0\0abcdef...this is the alphabet";
@@ -880,11 +875,12 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadLongString)
     memcpy(data, &len, sizeof(uint16_t));
     chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
 
+    // Actual read via an encoder
+    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
     ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_NO_ERROR);
-
     ASSERT_EQ(testRequest.FinishEncoding(), CHIP_NO_ERROR);
 
-    /////// VALIDATE
+    // Validate after reading
     std::vector<DecodedAttributeData> attribute_data;
     ASSERT_EQ(testRequest.encodedIBs.Decode(attribute_data), CHIP_NO_ERROR);
     ASSERT_EQ(attribute_data.size(), 1u);
@@ -923,7 +919,7 @@ TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceStructRead)
     ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_NO_ERROR);
     ASSERT_EQ(testRequest.FinishEncoding(), CHIP_NO_ERROR);
 
-    /////// VALIDATE
+    // Validate after read
     std::vector<DecodedAttributeData> attribute_data;
     ASSERT_EQ(testRequest.encodedIBs.Decode(attribute_data), CHIP_NO_ERROR);
     ASSERT_EQ(attribute_data.size(), 1u);
@@ -931,10 +927,7 @@ TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceStructRead)
     DecodedAttributeData & encodedData = attribute_data[0];
     ASSERT_EQ(encodedData.attributePath, testRequest.request.path);
 
-    // data element should be a encoded byte string as this is what the attribute type is
     ASSERT_EQ(encodedData.dataReader.GetType(), TLV::kTLVType_Structure);
-
-
     Clusters::UnitTesting::Structs::SimpleStruct::DecodableType actual;
     ASSERT_EQ(chip::app::DataModel::Decode(encodedData.dataReader, actual), CHIP_NO_ERROR);
 
