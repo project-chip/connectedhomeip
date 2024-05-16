@@ -86,10 +86,9 @@ data class CHIPDeviceInfo(
         setupPayload.getLongDiscriminatorValue(),
         setupPayload.setupPinCode,
         setupPayload.commissioningFlow,
-        setupPayload
-          .getAllOptionalVendorData().associate { info ->
-            info.tag to QrCodeInfo(info.tag, info.type, info.data, info.int32)
-          },
+        setupPayload.getAllOptionalVendorData().associate { info ->
+          info.tag to QrCodeInfo(info.tag, info.type, info.data, info.int32)
+        },
         setupPayload.discoveryCapabilities,
         setupPayload.hasShortDiscriminator,
         serialNumber
