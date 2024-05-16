@@ -223,7 +223,7 @@ If you override one of the setup/teardown functions make sure to invoke the pare
 
 - If you want a test to abort when an assertion fails, use `ASSERT_*` instead of `EXPECT_*`.  This will cause the current function to return.
 
-- If a test calls a subroutine which exits due to an ASSERT failing, execution of the test will continue after the subroutine call.  This is because ASSERT causes the subroutine to return (as opposed to throwing an execption).  If you want to prevent the test from continuing, check the value of `HasFailure()` and stop execution if true.  Example:
+- If a test calls a subroutine which exits due to an ASSERT failing, execution of the test will continue after the subroutine call.  This is because ASSERT causes the subroutine to return (as opposed to throwing an exception).  If you want to prevent the test from continuing, check the value of `HasFailure()` and stop execution if true.  Example:
     ```
     void Subroutine()
     {
@@ -240,7 +240,7 @@ If you override one of the setup/teardown functions make sure to invoke the pare
     }
     ```
 
-- If you want to force a fatal failure use `FAIL()`, which will record a fatal failure and exit the current fuction.  This is similar to using `ASSERT_TRUE(false)`.  If you want to force a non-fatal failure use `ADD_FAILURE()`, which will record a non-fatal failure and continue executing the current function.  This is similar to using `EXPECT_TRUE(false)`.
+- If you want to force a fatal failure use `FAIL()`, which will record a fatal failure and exit the current function.  This is similar to using `ASSERT_TRUE(false)`.  If you want to force a non-fatal failure use `ADD_FAILURE()`, which will record a non-fatal failure and continue executing the current function.  This is similar to using `EXPECT_TRUE(false)`.
 
 - `ASSERT_*` and `FAIL` will only work in functions with void return type, since they generate a `return;` statement.
     If you must use these in a non-void function, instead use `EXPECT_*` or `ADD_FAILURE` and then check `HasFailure()` afterward and return if needed.
