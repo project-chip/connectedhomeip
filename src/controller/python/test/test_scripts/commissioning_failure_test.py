@@ -19,6 +19,7 @@
 
 # Commissioning test.
 
+import asyncio
 import os
 import sys
 from optparse import OptionParser
@@ -121,9 +122,8 @@ def main():
     FailIfNot(test.TestCommissionFailure(1, 0), "Failed to commission device")
 
     logger.info("Testing on off cluster")
-    FailIfNot(test.TestOnOffCluster(nodeid=1,
-                                    endpoint=LIGHTING_ENDPOINT_ID,
-                                    group=GROUP_ID), "Failed to test on off cluster")
+    FailIfNot(asyncio.run(test.TestOnOffCluster(nodeid=1,
+                                                endpoint=LIGHTING_ENDPOINT_ID)), "Failed to test on off cluster")
 
     timeoutTicker.stop()
 
