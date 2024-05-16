@@ -35,6 +35,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/UnitTest.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemPacketBuffer.h>
 
@@ -191,16 +192,6 @@ public:
     void CheckSetDataLength();
     void CheckSetStart();
 };
-
-/*
- * Run fixture's class function as a test.
- */
-#define TEST_F_FROM_FIXTURE(test_fixture, test_name)                                                                               \
-    TEST_F(test_fixture, test_name)                                                                                                \
-    {                                                                                                                              \
-        test_name();                                                                                                               \
-    }                                                                                                                              \
-    void test_fixture::test_name()
 
 /**
  *  Allocate memory for a test buffer and configure according to test buffer configuration.
