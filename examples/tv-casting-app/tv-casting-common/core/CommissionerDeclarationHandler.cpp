@@ -19,6 +19,8 @@
 #include "CommissionerDeclarationHandler.h"
 
 #include "Types.h"
+#include "support/ChipDeviceEventHandler.h"
+#include <app/server/Server.h>
 
 namespace matter {
 namespace casting {
@@ -36,12 +38,34 @@ CommissionerDeclarationHandler * CommissionerDeclarationHandler::GetInstance()
 }
 
 // TODO: In the following PRs. Implement setHandler() for CommissionerDeclaration messages and expose messages to higher layers for
-// Linux, Android and iOS.
+// Linux(DONE), Android(pending) and iOS(pending).
 void CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(
     const chip::Transport::PeerAddress & source, chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cd)
 {
-    ChipLogProgress(AppServer, "CommissionerDeclarationHandler::OnCommissionerDeclarationMessage() called TODO: handle message");
-    cd.DebugLog();
+    ChipLogProgress(AppServer,
+                    "CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(), calling CloseCommissioningWindow()");
+    // Close the commissioning window. Since we recived a CommissionerDeclaration message from the Commissioner, we know that
+    // commissioning via AccountLogin cluster failed. We will open a new commissioningWindow prior to sending the next
+    // IdentificationDeclaration Message to the Commissioner.
+    chip::Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
+    support::ChipDeviceEventHandler::SetUdcStatus(false);
+
+    if (mCmmissionerDeclarationCallback_)
+    {
+        mCmmissionerDeclarationCallback_(source, cd);
+    }
+    else
+    {
+        ChipLogError(AppServer,
+                     "CommissionerDeclarationHandler::OnCommissionerDeclarationMessage() mCmmissionerDeclarationCallback_ not set");
+    }
+}
+
+void CommissionerDeclarationHandler::SetCommissionerDeclarationCallback(
+    matter::casting::core::CommissionerDeclarationCallback callback)
+{
+    ChipLogProgress(AppServer, "CommissionerDeclarationHandler::SetCommissionerDeclarationCallback()");
+    mCmmissionerDeclarationCallback_ = std::move(callback);
 }
 
 }; // namespace core

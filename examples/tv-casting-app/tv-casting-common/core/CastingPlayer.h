@@ -19,6 +19,7 @@
 #pragma once
 
 #include "CommissionerDeclarationHandler.h"
+#include "ConnectionCallbacks.h"
 #include "Endpoint.h"
 #include "IdentificationDeclarationOptions.h"
 #include "Types.h"
@@ -86,7 +87,6 @@ enum ConnectionState
 
 class ConnectionContext;
 class CastingPlayer;
-using ConnectCallback = std::function<void(CHIP_ERROR, CastingPlayer *)>;
 
 /**
  * @brief CastingPlayer represents a Matter commissioner that is able to play media to a physical
@@ -119,21 +119,38 @@ public:
     /**
      * @brief Verifies that a connection exists with this CastingPlayer, or triggers a new session
      * request. If the CastingApp does not have the nodeId and fabricIndex of this CastingPlayer cached on disk,
-     * this will execute the user directed commissioning process.
+     * this will execute the User Directed Commissioning (UDC) process.
      *
-     * @param onCompleted for success - called back with CHIP_NO_ERROR and CastingPlayer *.
-     * For failure - called back with an error and nullptr.
+     * @param connectionCallbacks contains the ConnectCallback and CommissionerDeclarationCallback (Optional).
      * @param commissioningWindowTimeoutSec (Optional) time (in sec) to keep the commissioning window open, if commissioning is
      * required. Needs to be >= kCommissioningWindowTimeoutSec.
      * @param idOptions (Optional) Parameters in the IdentificationDeclaration message sent by the Commissionee to the Commissioner.
      * These parameters specify the information relating to the requested commissioning session.
      * Furthermore, attributes (such as VendorId) describe the TargetApp that the client wants to interact with after commissioning.
-     * If this value is passed in, VerifyOrEstablishConnection() will force User Directed Commissioning, in case the desired
+     * If this value is passed in, VerifyOrEstablishConnection() will force UDC, in case the desired
      * TargetApp is not found in the on-device CastingStore.
      */
-    void VerifyOrEstablishConnection(ConnectCallback onCompleted,
+    void VerifyOrEstablishConnection(ConnectionCallbacks connectionCallbacks,
                                      unsigned long long int commissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec,
                                      IdentificationDeclarationOptions idOptions           = IdentificationDeclarationOptions());
+
+    /**
+     * @brief Continues the UDC process during the Commissioner-Generated passcode commissioning flow by sending a second
+     * IdentificationDeclaration to Commissioner containing CommissionerPasscode and CommissionerPasscodeReady set to true. At this
+     * point it is assumed that the following have occurred:
+     * 1. Client has handled the Commissioner's CommissionerDecelration message with PasscodeDialogDisplayed and
+     * CommissionerPasscode set to true.
+     * 2. Client prompted user to input Passcode from Commissioner.
+     * 3. Client has updated the commissioning session's PAKE verifier using the user input Passcode by updating the CastingApps
+     * CommissionableDataProvider
+     * (matter::casting::core::CastingApp::GetInstance()->UpdateCommissionableDataProvider(CommissionableDataProvider)).
+     *
+     * @param connectionCallbacks contains the ConnectCallback and CommissionerDeclarationCallback (Optional).
+     * @param commissioningWindowTimeoutSec (Optional) time (in sec) to keep the commissioning window open, if commissioning is
+     * required. Needs to be >= kCommissioningWindowTimeoutSec.
+     */
+    void ContinueConnecting(ConnectionCallbacks connectionCallbacks,
+                            unsigned long long int commissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec);
 
     /**
      * @brief Sets the internal connection state of this CastingPlayer to "disconnected"
@@ -205,6 +222,11 @@ private:
     static CastingPlayer * mTargetCastingPlayer;
     unsigned long long int mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
     ConnectCallback mOnCompleted                          = {};
+
+    /**
+     * @brief resets this CastingPlayer's state and calls mOnCompleted with the CHIP_ERROR.
+     */
+    void resetState(CHIP_ERROR err);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     /**
