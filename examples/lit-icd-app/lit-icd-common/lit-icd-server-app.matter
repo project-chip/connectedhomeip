@@ -1783,7 +1783,7 @@ endpoint 0 {
     callback attribute registeredClients;
     callback attribute ICDCounter;
     callback attribute clientsSupportedPerFabric;
-    ram      attribute userActiveModeTriggerHint default = 0x110D;
+    ram      attribute userActiveModeTriggerHint default = 0x111D;
     ram      attribute userActiveModeTriggerInstruction default = "Restart the application";
     ram      attribute operatingMode default = 0;
     callback attribute generatedCommandList;
