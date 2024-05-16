@@ -71,4 +71,4 @@ private:
 
 void registerCommandsICD(Commands & commands, CredentialIssuerCommands * credsIssuerConfig);
 
-chip::app::DefaultCheckInDelegate * chipToolCheckInDelegate();
+chip::app::DefaultCheckInDelegate * ChipToolCheckInDelegate();
