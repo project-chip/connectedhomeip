@@ -14,7 +14,8 @@
 ## Unit testing in the SDK - pw_unit_test
 
 The following example demonstrates how to use pw_unit_test to write a simple unit test.
-Note that this test does not use any fixtures or setup/teardown.
+Each test function is defined using `TEST(NameOfFunction)`.
+The set of test functions in a given source file is called a "suite". 
 
 ```
 #include <gtest/gtest.h>
@@ -45,12 +46,12 @@ TEST(YourTestFunction2)
 
 See 
 [TestSpan.cpp](https://github.com/project-chip/connectedhomeip/blob/master/src/lib/support/tests/TestSpan.cpp)
-for a good example of a unit test without fixtures or setup/teardown.
+for an example of a simple unit test.
 
-If your tests need fixtures or some kind of setup/teardown you will need to define a test context
-that derives from `::testing::Test`.  Your test functions will be defined with `TEST_F()` instead
-of `TEST()`.  The following example demonstrates how to use pw_unit_test to write a unit test that
-uses fixtures and setup/teardown.
+In the above example there are no fixtures or setup/teardown behavior.
+If your tests need fixtures or some kind of setup/teardown you will need to define a test context that derives from `::testing::Test`.
+Each of your test functions will be defined with `TEST_F(NameOfTestContext, NameOfFunction)`.
+The following example demonstrates how to use pw_unit_test to write a unit test that uses fixtures and setup/teardown.
 
 ```
 #include <gtest/gtest.h>
@@ -119,9 +120,9 @@ TEST_F(YourTestContext, YourTestFunction2)
 }
 ```
 
-If you need messaging, there is a convenience class `Test::AppContext` that you
-can derive your test context from.  It provides a network layer and a system layer and
-two secure sessions connected with each other.  The following example demonstrates this.
+If you need messaging, there is a convenience class [Test::AppContext](https://github.com/project-chip/connectedhomeip/blob/master/src/app/tests/AppTestContext.h) that you can derive your test context from.
+It provides a network layer and a system layer and two secure sessions connected with each other.
+The following example demonstrates this.
 
 ```
 #include <app/tests/AppTestContext.h>
@@ -190,44 +191,48 @@ TEST_F(YourTestContext, YourTestFunction2)
 }
 ```
 
-Note that our text context derives from
-[Test::AppContext](https://github.com/project-chip/connectedhomeip/blob/master/src/app/tests/AppTestContext.h)
+Note that you don't have to define all 4 functions `SetUpTestsuite`, `TearDownTestSuite`, `SetUp`, `TearDown`.
+If you don't have any custom behavior for one of those functions just omit it.
+
 
 ## Notes and tips
 
-- Try to use as specific a test as possible.  For example use these
-```
+- Try to use as specific an assertion as possible.  For example use these
+    ```
     EXPECT_EQ(result, 3);
     EXPECT_GT(result, 1);
     EXPECT_STREQ(myString, "hello");
-```
+    ```
 instead of these
-```
+    ```
     EXPECT_TRUE(result == 3);
     EXPECT_TRUE(result > 1);
     EXPECT_EQ(strcmp(myString, "hello"), 0);
-```
+    ```
 
-- If you want a test to abort use `ASSERT_*` instead of `EXPECT_*`.  This will cause the current function to return.  Note that this can not be usd in 
+- If you want a test to abort when an assertion fails, use `ASSERT_*` instead of `EXPECT_*`.  This will cause the current function to return.
 
 - If a test calls a subroutine which exits due to an ASSERT failing, execution of the test will continue after the subroutine call.  This is because ASSERT causes the subroutine to return (as opposed to throwing an execption).  If you want to prevent the test from continuing, check the value of HasFailure() and stop execution if true.  Example:
-```
-void Subroutine()
-{
-    ASSERT_EQ(1, 2);  // Fatal failure.
-}
+    ```
+    void Subroutine()
+    {
+        ASSERT_EQ(1, 2);  // Fatal failure.
+    }
 
-TEST(YourTestContext, YourTestFunction1)
-{
-    Subroutine();  // A fatal failure happens in this subroutine...
-    // ... however execution still continues.
-    print("This gets executed");
-    VerifyOrReturn(!HasFailure());
-    print("This does not get executed");
-}
-```
+    TEST(YourTestContext, YourTestFunction1)
+    {
+        Subroutine();  // A fatal failure happens in this subroutine...
+        // ... however execution still continues.
+        print("This gets executed");
+        VerifyOrReturn(!HasFailure());
+        print("This does not get executed");
+    }
+    ```
 
 - If you want to force a fatal failure use `FAIL()`, which will record a fatal failure and exit the current fuction.  This is similar to using `ASSERT_TRUE(false)`.  If you want to force a non-fatal failure use `ADD_FAILURE()`, which will record a non-fatal failure and continue executing the current function.  This is similar to using `EXPECT_TRUE(false)`.
+
+- `ASSERT_*` and `FAIL` will only work in functions with void return type, since they generate a `return;` statement.
+    If you must use these in a non-void function, instead use `EXPECT_*` or `ADD_FAILURE` and then check `HasFailure()` afterward and return if needed.
 
 - If your test requires access to private/protected members of the underlying class you're testing, you'll need to create an accessor class that performs these operations and is friended to the underlying class.  Please name the class `chip::Test::SomethingTestAccess` where `Something` is the name of the underlying class whose private/protected members you're trying to access.  Then add `friend class chip::Test::SomethingTestAccess;` to the underlying class.  Make sure your test's BUILD.gn file contains `sources = [ "SomethingTestAccess.h" ]`.  Before creating a new TestAccess class, check if one already exists.  If it does exist but doesn't expose the member you need, you can add a function to that class to do so.  Note that you should make these functions as minimal as possible, with no logic besides just exposing the private/protected member.
     - For an example see `ICDConfigurationDataTestAccess` which is defined in [ICDConfigurationDataTestAccess.h](https://github.com/project-chip/connectedhomeip/blob/master/src/app/icd/server/tests/ICDConfigurationDataTestAccess.h), friends the underlying class in [ICDConfigurationData.h](https://github.com/project-chip/connectedhomeip/blob/master/src/app/icd/server/ICDConfigurationData.h), is included in [BUILD.gn](https://github.com/project-chip/connectedhomeip/blob/master/src/app/icd/server/tests/BUILD.gn), and is used by a test in [TestICDManager.cpp](https://github.com/project-chip/connectedhomeip/blob/master/src/app/icd/server/tests/TestICDManager.cpp).
