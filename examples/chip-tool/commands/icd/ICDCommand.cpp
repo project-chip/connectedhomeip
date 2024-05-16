@@ -119,8 +119,8 @@ void registerCommandsICD(Commands & commands, CredentialIssuerCommands * credsIs
 
     auto icdWaitForDeviceCommand = make_unique<ICDWaitForDeviceCommand>(credsIssuerConfig);
 
-    // This should be safe within CHIPTool, since the lifespan of Commands is longer than any commands and the CHIPStack.
-    // So this object will not be used after free within CHIPTool.
+    // This should be safe within chip-tool, since the lifespan of Commands is longer than any commands and the CHIPStack.
+    // So this object will not be used after free within chip-tool.
     sCheckInDelegate = static_cast<ICDWaitForDeviceCommand *>(icdWaitForDeviceCommand.get());
 
     commands_list list = {
