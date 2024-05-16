@@ -23,6 +23,7 @@ source_set("types") {
     "attribute-metadata.h",
     "attribute-storage-null-handling.h",
     "basic-types.h",
+    "ember-server-cluster.h",
     "ember-strings.cpp",
     "ember-strings.h",
     "endpoint-config-defines.h",

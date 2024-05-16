@@ -328,6 +328,8 @@ static_library("app") {
     "OTAUserConsentCommon.h",
     "ReadHandler.cpp",
     "SafeAttributePersistenceProvider.h",
+    "ServerCluster.cpp",
+    "ServerCluster.h",
     "TimerDelegates.cpp",
     "TimerDelegates.h",
     "WriteHandler.cpp",
