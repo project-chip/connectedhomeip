@@ -967,7 +967,7 @@ static NSString * const sAttributesKey = @"attributes";
     }
 #endif
 
-    MTRClusterPath * networkCommissioningClusterPath = [MTRClusterPath clusterPathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeNetworkCommissioningID)];
+    MTRClusterPath * networkCommissioningClusterPath = [MTRClusterPath clusterPathWithEndpointID:@(kRootEndpointId) clusterID:@(MTRClusterIDTypeNetworkCommissioningID)];
     MTRDeviceClusterData * networkCommissioningClusterData = [self _clusterDataForPath:networkCommissioningClusterPath];
     NSNumber * networkCommissioningClusterFeatureMapValueNumber = networkCommissioningClusterData.attributes[@(MTRClusterGlobalAttributeFeatureMapID)][MTRValueKey];
     if (![networkCommissioningClusterFeatureMapValueNumber isKindOfClass:[NSNumber class]]) {
