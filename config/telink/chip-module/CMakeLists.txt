@@ -46,6 +46,7 @@ include(${COMMON_CMAKE_SOURCE_DIR}/chip_gn_args.cmake)
 include(${COMMON_CMAKE_SOURCE_DIR}/chip_gn.cmake)
 
 # Prepare compiler flags
+matter_add_flags(-isystem${ZEPHYR_BASE}/../modules/crypto/mbedtls/include/)
 
 if (CONFIG_POSIX_API)
     matter_add_flags(-D_DEFAULT_SOURCE)
@@ -102,6 +103,7 @@ matter_add_gn_arg_bool  ("chip_error_logging"                     CONFIG_MATTER_
 matter_add_gn_arg_bool  ("chip_progress_logging"                  CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 3)
 matter_add_gn_arg_bool  ("chip_detail_logging"                    CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 4)
 matter_add_gn_arg_bool  ("chip_automation_logging"                FALSE)
+matter_add_gn_arg_bool  ("chip_enable_wifi"                       CONFIG_WIFI_W91)
 matter_add_gn_arg_bool  ("chip_enable_icd_server"                 CONFIG_CHIP_ENABLE_ICD_SUPPORT)
 
 if (CONFIG_CHIP_ENABLE_ICD_SUPPORT)
@@ -122,8 +124,12 @@ if (CONFIG_CHIP_ROTATING_DEVICE_ID)
     matter_add_gn_arg_bool("chip_enable_additional_data_advertising" "true")
 endif()
 
-if (CONFIG_CHIP_ENABLE_DNSSD_SRP)
+if (CONFIG_NET_L2_OPENTHREAD)
     matter_add_gn_arg_string("chip_mdns" "platform")
+elseif(CONFIG_WIFI_W91)
+    matter_add_gn_arg_string("chip_mdns" "minimal")
+else()
+    matter_add_gn_arg_string("chip_mdns" "none")
 endif()
 
 if (CONFIG_CHIP_PW_RPC)

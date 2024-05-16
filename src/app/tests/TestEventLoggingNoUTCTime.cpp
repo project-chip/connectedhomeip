@@ -84,16 +84,16 @@ class TestContext : public chip::Test::AppContext
 {
 public:
     // Performs shared setup for all tests in the test suite
-    void SetUpTestSuite() override
+    static void SetUpTestSuite()
     {
         chip::Test::AppContext::SetUpTestSuite();
-        mClock.Emplace(chip::System::SystemClock());
+        sClock.Emplace(chip::System::SystemClock());
     }
 
     // Performs shared teardown for all tests in the test suite
-    void TearDownTestSuite() override
+    static void TearDownTestSuite()
     {
-        mClock.ClearValue();
+        sClock.ClearValue();
         chip::Test::AppContext::TearDownTestSuite();
     }
 
@@ -125,8 +125,10 @@ public:
 
 private:
     chip::MonotonicallyIncreasingCounter<chip::EventNumber> mEventCounter;
-    chip::Optional<MockClock> mClock;
+    static chip::Optional<MockClock> sClock;
 };
+
+chip::Optional<MockClock> TestContext::sClock;
 
 void ENFORCE_FORMAT(1, 2) SimpleDumpWriter(const char * aFormat, ...)
 {
@@ -370,10 +372,10 @@ const nlTest sTests[] = {
 nlTestSuite sSuite = {
     "EventLogging",
     &sTests[0],
-    TestContext::nlTestSetUpTestSuite,
-    TestContext::nlTestTearDownTestSuite,
-    TestContext::nlTestSetUp,
-    TestContext::nlTestTearDown,
+    NL_TEST_WRAP_FUNCTION(TestContext::SetUpTestSuite),
+    NL_TEST_WRAP_FUNCTION(TestContext::TearDownTestSuite),
+    NL_TEST_WRAP_METHOD(TestContext, SetUp),
+    NL_TEST_WRAP_METHOD(TestContext, TearDown),
 };
 
 } // namespace

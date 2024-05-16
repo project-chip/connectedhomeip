@@ -197,7 +197,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY 48
 #endif // SLI_SI91X_MCU_INTERFACE
 
-#define configENABLE_FPU 0
+#define configENABLE_FPU 1
 #define configENABLE_MPU 0
 /* FreeRTOS Secure Side Only and TrustZone Security Extension */
 #define configRUN_FREERTOS_SECURE_ONLY 1

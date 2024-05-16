@@ -29,7 +29,12 @@ namespace Dnssd {
  * Matter DNS host settings
  */
 
-inline constexpr size_t kHostNameMaxLength = 16; // MAC or 802.15.4 Extended Address in hex
+// Matter spec expects hostname to be MAC or 802.15.4 Extended Address in hex.
+// But in latest android nsdManager, it would set hostname with 40 bytes with prefix as android_,
+// and there is no existing API to update the hostname, therefore we put temporary workaround with 40 bytes.
+// Follow-up with ticket issue https://github.com/project-chip/connectedhomeip/issues/33474
+inline constexpr size_t kHostNameMaxLength = 40;
+//
 
 /*
  * Matter DNS service subtypes

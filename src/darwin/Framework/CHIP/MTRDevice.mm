@@ -140,7 +140,15 @@ typedef NS_ENUM(NSUInteger, MTRInternalDeviceState) {
     // InitialSubscriptionEstablished means we have at some point finished setting up a
     // subscription.  That subscription may have dropped since then, but if so it's the ReadClient's
     // responsibility to re-establish it.
-    MTRInternalDeviceStateInitalSubscriptionEstablished = 2,
+    MTRInternalDeviceStateInitialSubscriptionEstablished = 2,
+    // Resubscribing means we had established a subscription, but then
+    // detected a subscription drop due to not receiving a report on time. This
+    // covers all the actions that happen when re-subscribing (discovery, CASE,
+    // getting priming reports, etc).
+    MTRInternalDeviceStateResubscribing = 3,
+    // LaterSubscriptionEstablished meant that we had a subscription drop and
+    // then re-created a subscription.
+    MTRInternalDeviceStateLaterSubscriptionEstablished = 4,
 };
 
 // Utility methods for working with MTRInternalDeviceState, located near the
@@ -148,12 +156,17 @@ typedef NS_ENUM(NSUInteger, MTRInternalDeviceState) {
 namespace {
 bool HadSubscriptionEstablishedOnce(MTRInternalDeviceState state)
 {
-    return state >= MTRInternalDeviceStateInitalSubscriptionEstablished;
+    return state >= MTRInternalDeviceStateInitialSubscriptionEstablished;
 }
 
 bool NeedToStartSubscriptionSetup(MTRInternalDeviceState state)
 {
     return state <= MTRInternalDeviceStateUnsubscribed;
+}
+
+bool HaveSubscriptionEstablishedRightNow(MTRInternalDeviceState state)
+{
+    return state == MTRInternalDeviceStateInitialSubscriptionEstablished || state == MTRInternalDeviceStateLaterSubscriptionEstablished;
 }
 } // anonymous namespace
 
@@ -878,6 +891,16 @@ static NSString * const sAttributesKey = @"attributes";
     }
 }
 
+- (void)_changeInternalState:(MTRInternalDeviceState)state
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+    MTRInternalDeviceState lastState = _internalDeviceState;
+    _internalDeviceState = state;
+    if (lastState != state) {
+        MTR_LOG_DEFAULT("%@ internal state change %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
+    }
+}
+
 // First Time Sync happens 2 minutes after reachability (this can be changed in the future)
 #define MTR_DEVICE_TIME_UPDATE_INITIAL_WAIT_TIME_SEC (60 * 2)
 - (void)_handleSubscriptionEstablished
@@ -886,7 +909,11 @@ static NSString * const sAttributesKey = @"attributes";
 
     // reset subscription attempt wait time when subscription succeeds
     _lastSubscriptionAttemptWait = 0;
-    _internalDeviceState = MTRInternalDeviceStateInitalSubscriptionEstablished;
+    if (HadSubscriptionEstablishedOnce(_internalDeviceState)) {
+        [self _changeInternalState:MTRInternalDeviceStateLaterSubscriptionEstablished];
+    } else {
+        [self _changeInternalState:MTRInternalDeviceStateInitialSubscriptionEstablished];
+    }
 
     // As subscription is established, check if the delegate needs to be informed
     if (!_delegateDeviceCachePrimedCalled) {
@@ -913,7 +940,7 @@ static NSString * const sAttributesKey = @"attributes";
 {
     std::lock_guard lock(_lock);
 
-    _internalDeviceState = MTRInternalDeviceStateUnsubscribed;
+    [self _changeInternalState:MTRInternalDeviceStateUnsubscribed];
     _unreportedEvents = nil;
 
     [self _changeState:MTRDeviceStateUnreachable];
@@ -924,6 +951,7 @@ static NSString * const sAttributesKey = @"attributes";
     std::lock_guard lock(_lock);
 
     [self _changeState:MTRDeviceStateUnknown];
+    [self _changeInternalState:MTRInternalDeviceStateResubscribing];
 
     // If we are here, then the ReadClient either just detected a subscription
     // drop or just tried again and failed.  Either way, count it as "tried and
@@ -1044,11 +1072,12 @@ static NSString * const sAttributesKey = @"attributes";
 
     _receivingReport = YES;
     if (_state != MTRDeviceStateReachable) {
-        _receivingPrimingReport = YES;
         [self _changeState:MTRDeviceStateReachable];
-    } else {
-        _receivingPrimingReport = NO;
     }
+
+    // If we currently don't have an established subscription, this must be a
+    // priming report.
+    _receivingPrimingReport = !HaveSubscriptionEstablishedRightNow(_internalDeviceState);
 }
 
 - (NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)_clusterDataToPersistSnapshot
@@ -1134,12 +1163,17 @@ static NSString * const sAttributesKey = @"attributes";
     }
 }
 
-- (void)_handleAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
+- (void)_handleAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription
 {
     std::lock_guard lock(_lock);
 
     // _getAttributesToReportWithReportedValues will log attribute paths reported
-    [self _reportAttributes:[self _getAttributesToReportWithReportedValues:attributeReport]];
+    [self _reportAttributes:[self _getAttributesToReportWithReportedValues:attributeReport fromSubscription:isFromSubscription]];
+}
+
+- (void)_handleAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
+{
+    [self _handleAttributeReport:attributeReport fromSubscription:NO];
 }
 
 #ifdef DEBUG
@@ -1349,11 +1383,11 @@ static NSString * const sAttributesKey = @"attributes";
     return clusterData.attributes[path.attribute];
 }
 
-- (void)_setCachedAttributeValue:(MTRDeviceDataValueDictionary _Nullable)value forPath:(MTRAttributePath *)path
+- (void)_setCachedAttributeValue:(MTRDeviceDataValueDictionary _Nullable)value forPath:(MTRAttributePath *)path fromSubscription:(BOOL)isFromSubscription
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
-    // We need an actual MTRClusterPath, not a subsclass, to do _clusterDataForPath.
+    // We need an actual MTRClusterPath, not a subclass, to do _clusterDataForPath.
     auto * clusterPath = [MTRClusterPath clusterPathWithEndpointID:path.endpoint clusterID:path.cluster];
 
     MTRDeviceClusterData * clusterData = [self _clusterDataForPath:clusterPath];
@@ -1367,6 +1401,16 @@ static NSString * const sAttributesKey = @"attributes";
     }
 
     [clusterData storeValue:value forAttribute:path.attribute];
+
+    if (value != nil
+        && isFromSubscription
+        && !_receivingPrimingReport
+        && AttributeHasChangesOmittedQuality(path)) {
+        // Do not persist new values for Changes Omitted Quality attributes unless
+        // they're part of a Priming Report or from a read response.
+        // (removals are OK)
+        return;
+    }
 
     if (_clusterDataToPersist == nil) {
         _clusterDataToPersist = [NSMutableDictionary dictionary];
@@ -1461,7 +1505,7 @@ static NSString * const sAttributesKey = @"attributes";
         return;
     }
 
-    _internalDeviceState = MTRInternalDeviceStateSubscribing;
+    [self _changeInternalState:MTRInternalDeviceStateSubscribing];
 
     // Set up a timer to mark as not reachable if it takes too long to set up a subscription
     MTRWeakReference<MTRDevice *> * weakSelf = [MTRWeakReference weakReferenceWithObject:self];
@@ -1492,7 +1536,7 @@ static NSString * const sAttributesKey = @"attributes";
                            MTR_LOG_INFO("%@ got attribute report %@", self, value);
                            dispatch_async(self.queue, ^{
                                // OnAttributeData
-                               [self _handleAttributeReport:value];
+                               [self _handleAttributeReport:value fromSubscription:YES];
 #ifdef DEBUG
                                self->_unitTestAttributesReportedSinceLastCheck += value.count;
 #endif
@@ -2494,7 +2538,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 }
 
 // assume lock is held
-- (NSArray *)_getAttributesToReportWithReportedValues:(NSArray<NSDictionary<NSString *, id> *> *)reportedAttributeValues
+- (NSArray *)_getAttributesToReportWithReportedValues:(NSArray<NSDictionary<NSString *, id> *> *)reportedAttributeValues fromSubscription:(BOOL)isFromSubscription
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
@@ -2528,14 +2572,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 _expectedValueCache[attributePath], previousValue);
             _expectedValueCache[attributePath] = nil;
             // TODO: Is this clearing business really what we want?
-            [self _setCachedAttributeValue:nil forPath:attributePath];
+            [self _setCachedAttributeValue:nil forPath:attributePath fromSubscription:isFromSubscription];
         } else {
             // First separate data version and restore data value to a form without data version
             NSNumber * dataVersion = attributeDataValue[MTRDataVersionKey];
             MTRClusterPath * clusterPath = [MTRClusterPath clusterPathWithEndpointID:attributePath.endpoint clusterID:attributePath.cluster];
             if (dataVersion) {
-                [self _noteDataVersion:dataVersion forClusterPath:clusterPath];
-
                 // Remove data version from what we cache in memory
                 attributeDataValue = [self _dataValueWithoutDataVersion:attributeDataValue];
             }
@@ -2544,7 +2586,11 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             BOOL readCacheValueChanged = ![self _attributeDataValue:attributeDataValue isEqualToDataValue:previousValue];
             // Now that we have grabbed previousValue, update our cache with the attribute value.
             if (readCacheValueChanged) {
-                [self _setCachedAttributeValue:attributeDataValue forPath:attributePath];
+                if (dataVersion) {
+                    [self _noteDataVersion:dataVersion forClusterPath:clusterPath];
+                }
+
+                [self _setCachedAttributeValue:attributeDataValue forPath:attributePath fromSubscription:isFromSubscription];
                 if (!_deviceConfigurationChanged) {
                     _deviceConfigurationChanged = [self _attributeAffectsDeviceConfiguration:attributePath];
                     if (_deviceConfigurationChanged) {
