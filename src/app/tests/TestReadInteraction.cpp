@@ -22,6 +22,8 @@
  *
  */
 
+// #include "app/tests/ember-test-compatibility.h"
+
 #include "lib/support/CHIPMem.h"
 #include <access/examples/PermissiveAccessControlDelegate.h>
 #include <app/AttributeValueEncoder.h>
@@ -1363,8 +1365,7 @@ void TestReadInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void 
         public:
             DirtyingMockDelegate(AttributePathParams (&aReadPaths)[2], int & aNumAttributeResponsesWhenSetDirty,
                                  int & aNumArrayItemsWhenSetDirty) :
-                mReadPaths(aReadPaths),
-                mNumAttributeResponsesWhenSetDirty(aNumAttributeResponsesWhenSetDirty),
+                mReadPaths(aReadPaths), mNumAttributeResponsesWhenSetDirty(aNumAttributeResponsesWhenSetDirty),
                 mNumArrayItemsWhenSetDirty(aNumArrayItemsWhenSetDirty)
             {}
 

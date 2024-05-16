@@ -50,6 +50,41 @@
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
+/**
+ * Helper macro we can use to pretend we got a reply from the server in cases
+ * when the reply was actually dropped due to us not wanting the client's state
+ * machine to advance.
+ *
+ * When this macro is used, the client has sent a message and is waiting for an
+ * ack+response, and the server has sent a response that got dropped and is
+ * waiting for an ack (and maybe a response).
+ *
+ * What this macro then needs to do is:
+ *
+ * 1. Pretend that the client got an ack (and clear out the corresponding ack
+ *    state).
+ * 2. Pretend that the client got a message from the server, with the id of the
+ *    message that was dropped, which requires an ack, so the client will send
+ *    that ack in its next message.
+ *
+ * This is a macro so we get useful line numbers on assertion failures
+ */
+#define PretendWeGotReplyFromServer(aContext, aClientExchange)                                                                     \
+    {                                                                                                                              \
+        Messaging::ReliableMessageMgr * localRm    = aContext->GetExchangeManager().GetReliableMessageMgr();                       \
+        Messaging::ExchangeContext * localExchange = aClientExchange;                                                              \
+        EXPECT_EQ(localRm->TestGetCountRetransTable(), 2);                                                                         \
+                                                                                                                                   \
+        localRm->ClearRetransTable(localExchange);                                                                                 \
+        EXPECT_EQ(localRm->TestGetCountRetransTable(), 1);                                                                         \
+                                                                                                                                   \
+        localRm->EnumerateRetransTable([localExchange](auto * entry) {                                                             \
+            chip::Test::ReliableMessageContextTestAccess(localExchange)                                                            \
+                .SetPendingPeerAckMessageCounter(entry->retainedBuf.GetMessageCounter());                                          \
+            return Loop::Break;                                                                                                    \
+        });                                                                                                                        \
+    }
+
 using TestContext = chip::Test::AppContext;
 using namespace chip::Protocols;
 
@@ -67,6 +102,24 @@ void CheckForInvalidAction(chip::Test::MessageCapturer & messageLog)
 } // anonymous namespace
 
 namespace chip {
+
+inline void PretendWeGotReplyFromServers(TestContext * aContext, Messaging::ExchangeContext * aClientExchange)
+{
+    Messaging::ReliableMessageMgr * localRm = aContext->GetExchangeManager().GetReliableMessageMgr();
+
+    EXPECT_EQ(localRm->TestGetCountRetransTable(), 2);
+    printf("AMINE checking  TestGetCountRetransTable = %d", localRm->TestGetCountRetransTable());
+
+    localRm->ClearRetransTable(aClientExchange);
+    EXPECT_EQ(localRm->TestGetCountRetransTable(), 1);
+    printf("AMINE checking  TestGetCountRetransTable = %d", localRm->TestGetCountRetransTable());
+
+    localRm->EnumerateRetransTable([aClientExchange](auto * entry) {
+        chip::Test::ReliableMessageContextTestAccess(aClientExchange)
+            .SetPendingPeerAckMessageCounter(entry->retainedBuf.GetMessageCounter());
+        return Loop::Break;
+    });
+}
 
 namespace {
 bool isCommandDispatched      = false;
@@ -695,6 +748,300 @@ void TestCommandInteraction::ValidateCommandHandlerEncodeInvokeResponseMessage(b
     EXPECT_FALSE(commandHandler.mMockCommandResponder.mChunks.IsNull());
 }
 
+// Command Sender sends invoke request, command handler drops invoke response, then test injects status response message with
+// busy to client, client sends out a status response with invalid action.
+TEST_F(TestCommandInteraction, TestCommandInvalidMessage1)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    mockCommandSenderDelegate.ResetCounter();
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &pTestContext->GetExchangeManager());
+
+    AddInvokeRequestData(&commandSender);
+    asyncCommand = false;
+
+    pTestContext->GetLoopback().mSentMessageCount                 = 0;
+    pTestContext->GetLoopback().mNumMessagesToDrop                = 1;
+    pTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
+    err = commandSender.SendCommandRequest(pTestContext->GetSessionBobToAlice());
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    pTestContext->DrainAndServiceIO();
+
+    EXPECT_EQ(pTestContext->GetLoopback().mSentMessageCount, 2u);
+    EXPECT_EQ(pTestContext->GetLoopback().mDroppedMessageCount, 1u);
+
+    EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
+    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 0);
+    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
+
+    EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
+
+    System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
+    EXPECT_FALSE(msgBuf.IsNull());
+    System::PacketBufferTLVWriter writer;
+    writer.Init(std::move(msgBuf));
+    StatusResponseMessage::Builder response;
+    response.Init(&writer);
+    response.Status(Protocols::InteractionModel::Status::Busy);
+    EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
+
+    PayloadHeader payloadHeader;
+    payloadHeader.SetExchangeID(0);
+    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::StatusResponse);
+    chip::Test::MessageCapturer messageLog(*pTestContext);
+    messageLog.mCaptureStandaloneAcks = false;
+
+    chip::Test::CommandSenderTestAccess privatecommandSender(&commandSender);
+
+    // Since we are dropping packets, things are not getting acked.  Set up our
+    // MRP state to look like what it would have looked like if the packet had
+    // not gotten dropped.
+
+    // PretendWeGotReplyFromServer(pTestContext, privatecommandSender.GetExchangeCtx().Get());
+    PretendWeGotReplyFromServers(pTestContext, privatecommandSender.GetExchangeCtx().Get());
+
+    pTestContext->GetLoopback().mSentMessageCount                 = 0;
+    pTestContext->GetLoopback().mNumMessagesToDrop                = 0;
+    pTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
+    pTestContext->GetLoopback().mDroppedMessageCount              = 0;
+
+    err = privatecommandSender.OnMessageReceived(privatecommandSender.GetExchangeCtx().Get(), payloadHeader, std::move(msgBuf));
+    EXPECT_EQ(err, CHIP_IM_GLOBAL_STATUS(Busy));
+    EXPECT_EQ(mockCommandSenderDelegate.mError, CHIP_IM_GLOBAL_STATUS(Busy));
+    EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
+    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 1);
+    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 1);
+    EXPECT_EQ(commandSender.GetInvokeResponseMessageCount(), 0u);
+
+    pTestContext->DrainAndServiceIO();
+
+    // Client sent status report with invalid action, server's exchange has been closed, so all it sent is an MRP Ack
+    EXPECT_EQ(pTestContext->GetLoopback().mSentMessageCount, 2u);
+    CheckForInvalidAction(messageLog);
+    EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
+    pTestContext->ExpireSessionAliceToBob();
+    pTestContext->ExpireSessionBobToAlice();
+    pTestContext->CreateSessionAliceToBob();
+    pTestContext->CreateSessionBobToAlice();
+}
+
+// Command Sender sends invoke request, command handler drops invoke response, then test injects unknown message to client,
+// client sends out status response with invalid action.
+TEST_F(TestCommandInteraction, TestCommandInvalidMessage2)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    mockCommandSenderDelegate.ResetCounter();
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &pTestContext->GetExchangeManager());
+
+    AddInvokeRequestData(&commandSender);
+    asyncCommand = false;
+
+    pTestContext->GetLoopback().mSentMessageCount                 = 0;
+    pTestContext->GetLoopback().mNumMessagesToDrop                = 1;
+    pTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
+    err = commandSender.SendCommandRequest(pTestContext->GetSessionBobToAlice());
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    pTestContext->DrainAndServiceIO();
+
+    EXPECT_EQ(pTestContext->GetLoopback().mSentMessageCount, 2u);
+    EXPECT_EQ(pTestContext->GetLoopback().mDroppedMessageCount, 1u);
+
+    EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
+    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 0);
+    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
+
+    EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
+
+    System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
+    EXPECT_FALSE(msgBuf.IsNull());
+    System::PacketBufferTLVWriter writer;
+    writer.Init(std::move(msgBuf));
+    ReportDataMessage::Builder response;
+    response.Init(&writer);
+    EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
+
+    PayloadHeader payloadHeader;
+    payloadHeader.SetExchangeID(0);
+    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::ReportData);
+    chip::Test::MessageCapturer messageLog(*pTestContext);
+    messageLog.mCaptureStandaloneAcks = false;
+
+    // Since we are dropping packets, things are not getting acked.  Set up our
+    // MRP state to look like what it would have looked like if the packet had
+    // not gotten dropped.
+    chip::Test::CommandSenderTestAccess privatecommandSender(&commandSender);
+
+    PretendWeGotReplyFromServer(pTestContext, privatecommandSender.GetExchangeCtx().Get());
+
+    pTestContext->GetLoopback().mSentMessageCount                 = 0;
+    pTestContext->GetLoopback().mNumMessagesToDrop                = 0;
+    pTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
+    pTestContext->GetLoopback().mDroppedMessageCount              = 0;
+
+    err = privatecommandSender.OnMessageReceived(privatecommandSender.GetExchangeCtx().Get(), payloadHeader, std::move(msgBuf));
+    // err = chip::Test::CommandSenderTestAccess(&commandSender).OnMessageReceived(payloadHeader, std::move(msgBuf));
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_MESSAGE_TYPE);
+    EXPECT_EQ(mockCommandSenderDelegate.mError, CHIP_ERROR_INVALID_MESSAGE_TYPE);
+    EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
+    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 1);
+    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 1);
+
+    pTestContext->DrainAndServiceIO();
+
+    // Client sent status report with invalid action, server's exchange has been closed, so all it sent is an MRP Ack
+    EXPECT_EQ(pTestContext->GetLoopback().mSentMessageCount, 2u);
+    CheckForInvalidAction(messageLog);
+    EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
+    pTestContext->ExpireSessionAliceToBob();
+    pTestContext->ExpireSessionBobToAlice();
+    pTestContext->CreateSessionAliceToBob();
+    pTestContext->CreateSessionBobToAlice();
+}
+
+// Command Sender sends invoke request, command handler drops invoke response, then test injects malformed invoke response
+// message to client, client sends out status response with invalid action.
+TEST_F(TestCommandInteraction, TestCommandInvalidMessage3)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    mockCommandSenderDelegate.ResetCounter();
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &pTestContext->GetExchangeManager());
+
+    AddInvokeRequestData(&commandSender);
+    asyncCommand = false;
+
+    pTestContext->GetLoopback().mSentMessageCount                 = 0;
+    pTestContext->GetLoopback().mNumMessagesToDrop                = 1;
+    pTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
+    err = commandSender.SendCommandRequest(pTestContext->GetSessionBobToAlice());
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    pTestContext->DrainAndServiceIO();
+
+    EXPECT_EQ(pTestContext->GetLoopback().mSentMessageCount, 2u);
+    EXPECT_EQ(pTestContext->GetLoopback().mDroppedMessageCount, 1u);
+
+    EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
+    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 0);
+    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
+
+    EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
+
+    System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
+    EXPECT_FALSE(msgBuf.IsNull());
+    System::PacketBufferTLVWriter writer;
+    writer.Init(std::move(msgBuf));
+    InvokeResponseMessage::Builder response;
+    response.Init(&writer);
+    EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
+
+    PayloadHeader payloadHeader;
+    payloadHeader.SetExchangeID(0);
+    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::InvokeCommandResponse);
+    chip::Test::MessageCapturer messageLog(*pTestContext);
+    messageLog.mCaptureStandaloneAcks = false;
+
+    // Since we are dropping packets, things are not getting acked.  Set up our
+    // MRP state to look like what it would have looked like if the packet had
+    // not gotten dropped.
+    chip::Test::CommandSenderTestAccess privatecommandSender(&commandSender);
+    PretendWeGotReplyFromServer(pTestContext, privatecommandSender.GetExchangeCtx().Get());
+
+    pTestContext->GetLoopback().mSentMessageCount                 = 0;
+    pTestContext->GetLoopback().mNumMessagesToDrop                = 0;
+    pTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
+    pTestContext->GetLoopback().mDroppedMessageCount              = 0;
+
+    err = privatecommandSender.OnMessageReceived(privatecommandSender.GetExchangeCtx().Get(), payloadHeader, std::move(msgBuf));
+
+    // err = chip::Test::CommandSenderTestAccess(&commandSender).OnMessageReceived(payloadHeader, std::move(msgBuf));
+    EXPECT_EQ(err, CHIP_ERROR_END_OF_TLV);
+    EXPECT_EQ(mockCommandSenderDelegate.mError, CHIP_ERROR_END_OF_TLV);
+    EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
+    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 1);
+    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 1);
+
+    pTestContext->DrainAndServiceIO();
+
+    // Client sent status report with invalid action, server's exchange has been closed, so all it sent is an MRP Ack
+    EXPECT_EQ(pTestContext->GetLoopback().mSentMessageCount, 2u);
+    CheckForInvalidAction(messageLog);
+    EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
+    pTestContext->ExpireSessionAliceToBob();
+    pTestContext->ExpireSessionBobToAlice();
+    pTestContext->CreateSessionAliceToBob();
+    pTestContext->CreateSessionBobToAlice();
+}
+
+// Command Sender sends invoke request, command handler drops invoke response, then test injects malformed status response to
+// client, client responds to the status response with invalid action.
+TEST_F(TestCommandInteraction, TestCommandInvalidMessage4)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    mockCommandSenderDelegate.ResetCounter();
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &pTestContext->GetExchangeManager());
+
+    AddInvokeRequestData(&commandSender);
+    asyncCommand = false;
+
+    pTestContext->GetLoopback().mSentMessageCount                 = 0;
+    pTestContext->GetLoopback().mNumMessagesToDrop                = 1;
+    pTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
+    err = commandSender.SendCommandRequest(pTestContext->GetSessionBobToAlice());
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    pTestContext->DrainAndServiceIO();
+
+    EXPECT_EQ(pTestContext->GetLoopback().mSentMessageCount, 2u);
+    EXPECT_EQ(pTestContext->GetLoopback().mDroppedMessageCount, 1u);
+
+    EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
+    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 0);
+    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
+    EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
+
+    System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
+    EXPECT_FALSE(msgBuf.IsNull());
+    System::PacketBufferTLVWriter writer;
+    writer.Init(std::move(msgBuf));
+    StatusResponseMessage::Builder response;
+    response.Init(&writer);
+    EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
+
+    PayloadHeader payloadHeader;
+    payloadHeader.SetExchangeID(0);
+    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::StatusResponse);
+    chip::Test::MessageCapturer messageLog(*pTestContext);
+    messageLog.mCaptureStandaloneAcks = false;
+
+    // Since we are dropping packets, things are not getting acked.  Set up our
+    // MRP state to look like what it would have looked like if the packet had
+    // not gotten dropped.
+    chip::Test::CommandSenderTestAccess privatecommandSender(&commandSender);
+    PretendWeGotReplyFromServer(pTestContext, privatecommandSender.GetExchangeCtx().Get());
+
+    pTestContext->GetLoopback().mSentMessageCount                 = 0;
+    pTestContext->GetLoopback().mNumMessagesToDrop                = 0;
+    pTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
+    pTestContext->GetLoopback().mDroppedMessageCount              = 0;
+
+    err = privatecommandSender.OnMessageReceived(privatecommandSender.GetExchangeCtx().Get(), payloadHeader, std::move(msgBuf));
+
+    // err = chip::Test::CommandSenderTestAccess(&commandSender).OnMessageReceived(payloadHeader, std::move(msgBuf));
+    EXPECT_EQ(err, CHIP_ERROR_END_OF_TLV);
+    EXPECT_EQ(mockCommandSenderDelegate.mError, CHIP_ERROR_END_OF_TLV);
+    EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
+    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 1);
+    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 1);
+
+    pTestContext->DrainAndServiceIO();
+
+    // Client sent status report with invalid action, server's exchange has been closed, so all it sent is an MRP Ack
+    EXPECT_EQ(pTestContext->GetLoopback().mSentMessageCount, 2u);
+    CheckForInvalidAction(messageLog);
+    EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
+    pTestContext->ExpireSessionAliceToBob();
+    pTestContext->ExpireSessionBobToAlice();
+    pTestContext->CreateSessionAliceToBob();
+    pTestContext->CreateSessionBobToAlice();
+}
+
 TEST_F(TestCommandInteraction, TestCommandSenderWithWrongState)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -886,322 +1233,6 @@ TEST_F(TestCommandInteraction, TestCommandHandlerCommandEncodeFailure)
         commandHandler.AddResponse(requestCommandPath, BadFields());
     }
     EXPECT_FALSE(commandHandler.mMockCommandResponder.mChunks.IsNull());
-}
-
-/**
- * Helper macro we can use to pretend we got a reply from the server in cases
- * when the reply was actually dropped due to us not wanting the client's state
- * machine to advance.
- *
- * When this macro is used, the client has sent a message and is waiting for an
- * ack+response, and the server has sent a response that got dropped and is
- * waiting for an ack (and maybe a response).
- *
- * What this macro then needs to do is:
- *
- * 1. Pretend that the client got an ack (and clear out the corresponding ack
- *    state).
- * 2. Pretend that the client got a message from the server, with the id of the
- *    message that was dropped, which requires an ack, so the client will send
- *    that ack in its next message.
- *
- * This is a macro so we get useful line numbers on assertion failures
- */
-#define PretendWeGotReplyFromServer(aContext, aClientExchange)                                                                     \
-    {                                                                                                                              \
-        Messaging::ReliableMessageMgr * localRm    = aContext->GetExchangeManager().GetReliableMessageMgr();                       \
-        Messaging::ExchangeContext * localExchange = aClientExchange;                                                              \
-        EXPECT_EQ(localRm->TestGetCountRetransTable(), 2);                                                                         \
-                                                                                                                                   \
-        localRm->ClearRetransTable(localExchange);                                                                                 \
-        EXPECT_EQ(localRm->TestGetCountRetransTable(), 1);                                                                         \
-                                                                                                                                   \
-        localRm->EnumerateRetransTable([localExchange](auto * entry) {                                                             \
-            chip::Test::ReliableMessageContextTestAccess(localExchange)                                                            \
-                .SetPendingPeerAckMessageCounter(entry->retainedBuf.GetMessageCounter());                                          \
-            return Loop::Break;                                                                                                    \
-        });                                                                                                                        \
-    }
-
-// Command Sender sends invoke request, command handler drops invoke response, then test injects status response message with
-// busy to client, client sends out a status response with invalid action.
-TEST_F(TestCommandInteraction, TestCommandInvalidMessage1)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &pTestContext->GetExchangeManager());
-
-    AddInvokeRequestData(&commandSender);
-    asyncCommand = false;
-
-    pTestContext->GetLoopback().mSentMessageCount                 = 0;
-    pTestContext->GetLoopback().mNumMessagesToDrop                = 1;
-    pTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
-    err = commandSender.SendCommandRequest(pTestContext->GetSessionBobToAlice());
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-    pTestContext->DrainAndServiceIO();
-
-    EXPECT_EQ(pTestContext->GetLoopback().mSentMessageCount, 2u);
-    EXPECT_EQ(pTestContext->GetLoopback().mDroppedMessageCount, 1u);
-
-    EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
-    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 0);
-    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
-
-    EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
-
-    System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
-    EXPECT_FALSE(msgBuf.IsNull());
-    System::PacketBufferTLVWriter writer;
-    writer.Init(std::move(msgBuf));
-    StatusResponseMessage::Builder response;
-    response.Init(&writer);
-    response.Status(Protocols::InteractionModel::Status::Busy);
-    EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
-
-    PayloadHeader payloadHeader;
-    payloadHeader.SetExchangeID(0);
-    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::StatusResponse);
-    chip::Test::MessageCapturer messageLog(*pTestContext);
-    messageLog.mCaptureStandaloneAcks = false;
-
-    // Since we are dropping packets, things are not getting acked.  Set up our
-    // MRP state to look like what it would have looked like if the packet had
-    // not gotten dropped.
-    PretendWeGotReplyFromServer(pTestContext, chip::Test::CommandSenderTestAccess(&commandSender).GetExchangeCtx().Get());
-
-    pTestContext->GetLoopback().mSentMessageCount                 = 0;
-    pTestContext->GetLoopback().mNumMessagesToDrop                = 0;
-    pTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
-    pTestContext->GetLoopback().mDroppedMessageCount              = 0;
-
-    err = chip::Test::CommandSenderTestAccess(&commandSender).OnMessageReceived(payloadHeader, std::move(msgBuf));
-    EXPECT_EQ(err, CHIP_IM_GLOBAL_STATUS(Busy));
-    EXPECT_EQ(mockCommandSenderDelegate.mError, CHIP_IM_GLOBAL_STATUS(Busy));
-    EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
-    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 1);
-    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 1);
-    EXPECT_EQ(commandSender.GetInvokeResponseMessageCount(), 0u);
-
-    pTestContext->DrainAndServiceIO();
-
-    // Client sent status report with invalid action, server's exchange has been closed, so all it sent is an MRP Ack
-    EXPECT_EQ(pTestContext->GetLoopback().mSentMessageCount, 2u);
-    CheckForInvalidAction(messageLog);
-    EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
-    pTestContext->ExpireSessionAliceToBob();
-    pTestContext->ExpireSessionBobToAlice();
-    pTestContext->CreateSessionAliceToBob();
-    pTestContext->CreateSessionBobToAlice();
-}
-
-// Command Sender sends invoke request, command handler drops invoke response, then test injects unknown message to client,
-// client sends out status response with invalid action.
-TEST_F(TestCommandInteraction, TestCommandInvalidMessage2)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &pTestContext->GetExchangeManager());
-
-    AddInvokeRequestData(&commandSender);
-    asyncCommand = false;
-
-    pTestContext->GetLoopback().mSentMessageCount                 = 0;
-    pTestContext->GetLoopback().mNumMessagesToDrop                = 1;
-    pTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
-    err = commandSender.SendCommandRequest(pTestContext->GetSessionBobToAlice());
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-    pTestContext->DrainAndServiceIO();
-
-    EXPECT_EQ(pTestContext->GetLoopback().mSentMessageCount, 2u);
-    EXPECT_EQ(pTestContext->GetLoopback().mDroppedMessageCount, 1u);
-
-    EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
-    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 0);
-    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
-
-    EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
-
-    System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
-    EXPECT_FALSE(msgBuf.IsNull());
-    System::PacketBufferTLVWriter writer;
-    writer.Init(std::move(msgBuf));
-    ReportDataMessage::Builder response;
-    response.Init(&writer);
-    EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
-
-    PayloadHeader payloadHeader;
-    payloadHeader.SetExchangeID(0);
-    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::ReportData);
-    chip::Test::MessageCapturer messageLog(*pTestContext);
-    messageLog.mCaptureStandaloneAcks = false;
-
-    // Since we are dropping packets, things are not getting acked.  Set up our
-    // MRP state to look like what it would have looked like if the packet had
-    // not gotten dropped.
-    PretendWeGotReplyFromServer(pTestContext, chip::Test::CommandSenderTestAccess(&commandSender).GetExchangeCtx().Get());
-
-    pTestContext->GetLoopback().mSentMessageCount                 = 0;
-    pTestContext->GetLoopback().mNumMessagesToDrop                = 0;
-    pTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
-    pTestContext->GetLoopback().mDroppedMessageCount              = 0;
-
-    err = chip::Test::CommandSenderTestAccess(&commandSender).OnMessageReceived(payloadHeader, std::move(msgBuf));
-    EXPECT_EQ(err, CHIP_ERROR_INVALID_MESSAGE_TYPE);
-    EXPECT_EQ(mockCommandSenderDelegate.mError, CHIP_ERROR_INVALID_MESSAGE_TYPE);
-    EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
-    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 1);
-    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 1);
-
-    pTestContext->DrainAndServiceIO();
-
-    // Client sent status report with invalid action, server's exchange has been closed, so all it sent is an MRP Ack
-    EXPECT_EQ(pTestContext->GetLoopback().mSentMessageCount, 2u);
-    CheckForInvalidAction(messageLog);
-    EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
-    pTestContext->ExpireSessionAliceToBob();
-    pTestContext->ExpireSessionBobToAlice();
-    pTestContext->CreateSessionAliceToBob();
-    pTestContext->CreateSessionBobToAlice();
-}
-
-// Command Sender sends invoke request, command handler drops invoke response, then test injects malformed invoke response
-// message to client, client sends out status response with invalid action.
-TEST_F(TestCommandInteraction, TestCommandInvalidMessage3)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &pTestContext->GetExchangeManager());
-
-    AddInvokeRequestData(&commandSender);
-    asyncCommand = false;
-
-    pTestContext->GetLoopback().mSentMessageCount                 = 0;
-    pTestContext->GetLoopback().mNumMessagesToDrop                = 1;
-    pTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
-    err = commandSender.SendCommandRequest(pTestContext->GetSessionBobToAlice());
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-    pTestContext->DrainAndServiceIO();
-
-    EXPECT_EQ(pTestContext->GetLoopback().mSentMessageCount, 2u);
-    EXPECT_EQ(pTestContext->GetLoopback().mDroppedMessageCount, 1u);
-
-    EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
-    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 0);
-    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
-
-    EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
-
-    System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
-    EXPECT_FALSE(msgBuf.IsNull());
-    System::PacketBufferTLVWriter writer;
-    writer.Init(std::move(msgBuf));
-    InvokeResponseMessage::Builder response;
-    response.Init(&writer);
-    EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
-
-    PayloadHeader payloadHeader;
-    payloadHeader.SetExchangeID(0);
-    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::InvokeCommandResponse);
-    chip::Test::MessageCapturer messageLog(*pTestContext);
-    messageLog.mCaptureStandaloneAcks = false;
-
-    // Since we are dropping packets, things are not getting acked.  Set up our
-    // MRP state to look like what it would have looked like if the packet had
-    // not gotten dropped.
-    PretendWeGotReplyFromServer(pTestContext, chip::Test::CommandSenderTestAccess(&commandSender).GetExchangeCtx().Get());
-
-    pTestContext->GetLoopback().mSentMessageCount                 = 0;
-    pTestContext->GetLoopback().mNumMessagesToDrop                = 0;
-    pTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
-    pTestContext->GetLoopback().mDroppedMessageCount              = 0;
-
-    err = chip::Test::CommandSenderTestAccess(&commandSender).OnMessageReceived(payloadHeader, std::move(msgBuf));
-    EXPECT_EQ(err, CHIP_ERROR_END_OF_TLV);
-    EXPECT_EQ(mockCommandSenderDelegate.mError, CHIP_ERROR_END_OF_TLV);
-    EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
-    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 1);
-    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 1);
-
-    pTestContext->DrainAndServiceIO();
-
-    // Client sent status report with invalid action, server's exchange has been closed, so all it sent is an MRP Ack
-    EXPECT_EQ(pTestContext->GetLoopback().mSentMessageCount, 2u);
-    CheckForInvalidAction(messageLog);
-    EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
-    pTestContext->ExpireSessionAliceToBob();
-    pTestContext->ExpireSessionBobToAlice();
-    pTestContext->CreateSessionAliceToBob();
-    pTestContext->CreateSessionBobToAlice();
-}
-
-// Command Sender sends invoke request, command handler drops invoke response, then test injects malformed status response to
-// client, client responds to the status response with invalid action.
-TEST_F(TestCommandInteraction, TestCommandInvalidMessage4)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &pTestContext->GetExchangeManager());
-
-    AddInvokeRequestData(&commandSender);
-    asyncCommand = false;
-
-    pTestContext->GetLoopback().mSentMessageCount                 = 0;
-    pTestContext->GetLoopback().mNumMessagesToDrop                = 1;
-    pTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 1;
-    err = commandSender.SendCommandRequest(pTestContext->GetSessionBobToAlice());
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-    pTestContext->DrainAndServiceIO();
-
-    EXPECT_EQ(pTestContext->GetLoopback().mSentMessageCount, 2u);
-    EXPECT_EQ(pTestContext->GetLoopback().mDroppedMessageCount, 1u);
-
-    EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
-    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 0);
-    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 0);
-    EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
-
-    System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
-    EXPECT_FALSE(msgBuf.IsNull());
-    System::PacketBufferTLVWriter writer;
-    writer.Init(std::move(msgBuf));
-    StatusResponseMessage::Builder response;
-    response.Init(&writer);
-    EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
-
-    PayloadHeader payloadHeader;
-    payloadHeader.SetExchangeID(0);
-    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::StatusResponse);
-    chip::Test::MessageCapturer messageLog(*pTestContext);
-    messageLog.mCaptureStandaloneAcks = false;
-
-    // Since we are dropping packets, things are not getting acked.  Set up our
-    // MRP state to look like what it would have looked like if the packet had
-    // not gotten dropped.
-    PretendWeGotReplyFromServer(pTestContext, chip::Test::CommandSenderTestAccess(&commandSender).GetExchangeCtx().Get());
-
-    pTestContext->GetLoopback().mSentMessageCount                 = 0;
-    pTestContext->GetLoopback().mNumMessagesToDrop                = 0;
-    pTestContext->GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
-    pTestContext->GetLoopback().mDroppedMessageCount              = 0;
-
-    err = chip::Test::CommandSenderTestAccess(&commandSender).OnMessageReceived(payloadHeader, std::move(msgBuf));
-    EXPECT_EQ(err, CHIP_ERROR_END_OF_TLV);
-    EXPECT_EQ(mockCommandSenderDelegate.mError, CHIP_ERROR_END_OF_TLV);
-    EXPECT_EQ(mockCommandSenderDelegate.onResponseCalledTimes, 0);
-    EXPECT_EQ(mockCommandSenderDelegate.onFinalCalledTimes, 1);
-    EXPECT_EQ(mockCommandSenderDelegate.onErrorCalledTimes, 1);
-
-    pTestContext->DrainAndServiceIO();
-
-    // Client sent status report with invalid action, server's exchange has been closed, so all it sent is an MRP Ack
-    EXPECT_EQ(pTestContext->GetLoopback().mSentMessageCount, 2u);
-    CheckForInvalidAction(messageLog);
-    EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
-    pTestContext->ExpireSessionAliceToBob();
-    pTestContext->ExpireSessionBobToAlice();
-    pTestContext->CreateSessionAliceToBob();
-    pTestContext->CreateSessionBobToAlice();
 }
 
 // Command Sender sends malformed invoke request, handler fails to process it and sends status report with invalid action

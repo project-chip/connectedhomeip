@@ -46,7 +46,6 @@ public:
     {
 
         pTestContext = new TestContext;
-
         pTestContext->SetUpTestSuite();
     }
     static void TearDownTestSuite()

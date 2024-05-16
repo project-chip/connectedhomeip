@@ -44,9 +44,10 @@ public:
 
     Messaging::ExchangeHolder GetExchangeCtx() { return pCommandSender->mExchangeCtx; }
 
-    CHIP_ERROR OnMessageReceived(const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                 System::PacketBufferHandle && aPayload)
     {
-        return pCommandSender->OnMessageReceived(pCommandSender->mExchangeCtx.Get(), aPayloadHeader, std::move(aPayload));
+        return pCommandSender->OnMessageReceived(apExchangeContext, aPayloadHeader, std::move(aPayload));
     }
 
     CHIP_ERROR Finalize(System::PacketBufferHandle & commandPacket) { return pCommandSender->Finalize(commandPacket); }

@@ -96,7 +96,10 @@ if (chip_build_tests) {
       tests += [
         # TODO(#10447): App test has HF on EFR32.
         "${chip_root}/src/app/tests",
+        "${chip_root}/src/app/tests:tests_ember",
         "${chip_root}/src/app/tests:tests_nltest",
+        "${chip_root}/src/app/tests:tests_nltest_ember",
+
         "${chip_root}/src/credentials/tests",
         "${chip_root}/src/lib/format/tests",
         "${chip_root}/src/lib/support/tests",
