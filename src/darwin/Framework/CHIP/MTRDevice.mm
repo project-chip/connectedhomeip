@@ -979,9 +979,6 @@ static NSString * const sAttributesKey = @"attributes";
         return NO;
     }
 
-    // Bit 0 WiFi
-    // Bit 1 Thread
-    // Bit 2 Ethernet
     uint32_t networkCommissioningClusterFeatureMapValue = static_cast<uint32_t>(networkCommissioningClusterFeatureMapValueNumber.unsignedLongValue);
 
     return (networkCommissioningClusterFeatureMapValue & MTRNetworkCommissioningFeatureThreadNetworkInterface) != 0 ? YES : NO;
