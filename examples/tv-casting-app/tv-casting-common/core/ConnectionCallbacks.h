@@ -30,30 +30,31 @@ class CastingPlayer;
  * @brief Called when the User Directed Commissioning (UDC) process succeeds or fails.
  * @param[in] err For success, called back with CHIP_NO_ERROR. For failure, called back with an error.
  * @param[in] castingPlayer For success, called back with a CastingPlayer *. For failure, called back with a nullptr.
-*/
+ */
 using ConnectCallback = std::function<void(CHIP_ERROR err, CastingPlayer * castingPlayer)>;
 
 /**
-* @brief Called when a Commissioner Declaration UDC message has been received.
-* @param[in] source The source of the Commissioner Declaration message.
-* @param[in] cd The Commissioner Declaration message.
-*/
-using CommissionerDeclarationCallback = std::function<void(const chip::Transport::PeerAddress & source, chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cd)>;
+ * @brief Called when a Commissioner Declaration UDC message has been received.
+ * @param[in] source The source of the Commissioner Declaration message.
+ * @param[in] cd The Commissioner Declaration message.
+ */
+using CommissionerDeclarationCallback = std::function<void(const chip::Transport::PeerAddress & source,
+                                                           chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cd)>;
 
 /**
  * @brief A container class for User Directed Commissioning (UDC) callbacks.
  */
 class ConnectionCallbacks
 {
-    public:
-        /**
-         * The callback called when the connection process has ended, regardless of whether it was successful or not.
-         */
-        ConnectCallback mOnConnectionComplete = nullptr;
-        /**
-         * The callback called when the Commissionee receives a CommissionerDeclaration message from the Commissioner.
-         */
-        CommissionerDeclarationCallback mCommissionerDeclarationCallback = nullptr;
+public:
+    /**
+     * The callback called when the connection process has ended, regardless of whether it was successful or not.
+     */
+    ConnectCallback mOnConnectionComplete = nullptr;
+    /**
+     * The callback called when the Commissionee receives a CommissionerDeclaration message from the Commissioner.
+     */
+    CommissionerDeclarationCallback mCommissionerDeclarationCallback = nullptr;
 };
 
 }; // namespace core
