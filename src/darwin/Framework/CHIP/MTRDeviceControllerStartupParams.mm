@@ -288,7 +288,7 @@ constexpr NSUInteger kDefaultConcurrentSubscriptionPoolSize = 300;
     _storageDelegateQueue = storageDelegateQueue;
     _uniqueIdentifier = uniqueIdentifier;
 
-    _concurrentSubscriptionsAllowedOnThread = kDefaultConcurrentSubscriptionPoolSize;
+    _concurrentSubscriptionEstablishmentsAllowedOnThread = kDefaultConcurrentSubscriptionPoolSize;
 
     return self;
 }

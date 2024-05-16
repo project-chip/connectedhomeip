@@ -480,7 +480,7 @@ MTR_DIRECT_MEMBERS
         uniqueIdentifier = params.uniqueIdentifier;
         otaProviderDelegate = params.otaProviderDelegate;
         otaProviderDelegateQueue = params.otaProviderDelegateQueue;
-        concurrentSubscriptionPoolSize = params.concurrentSubscriptionsAllowedOnThread;
+        concurrentSubscriptionPoolSize = params.concurrentSubscriptionEstablishmentsAllowedOnThread;
     } else if ([startupParams isKindOfClass:[MTRDeviceControllerStartupParams class]]) {
         MTRDeviceControllerStartupParams * params = startupParams;
         storageDelegate = nil;
