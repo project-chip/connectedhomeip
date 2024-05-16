@@ -1375,11 +1375,11 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     });
 }
 
-- (void)unitTestInjectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
+- (void)unitTestInjectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription
 {
     dispatch_async(self.queue, ^{
         [self _handleReportBegin];
-        [self _handleAttributeReport:attributeReport fromSubscription:NO];
+        [self _handleAttributeReport:attributeReport fromSubscription:isFromSubscription];
         [self _handleReportEnd];
     });
 }
