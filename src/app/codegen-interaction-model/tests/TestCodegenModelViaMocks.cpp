@@ -937,4 +937,3 @@ TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceStructRead)
     ASSERT_EQ(actual.h, 0.125);
     ASSERT_TRUE(actual.e.data_equal("foo"_span));
 }
-
