@@ -73,7 +73,7 @@ CHIP_ERROR ICDWaitForDeviceCommand::RunCommand()
         return CHIP_ERROR_NOT_FOUND;
     }
     mInterestedNode = ScopedNodeId(GetDestinationId(), CurrentCommissioner().GetFabricIndex());
-    ChipLogError(chipTool, "Please trigger the device active mode.");
+    ChipLogProgress(chipTool, "Please trigger the device active mode.");
     return CHIP_NO_ERROR;
 }
 
