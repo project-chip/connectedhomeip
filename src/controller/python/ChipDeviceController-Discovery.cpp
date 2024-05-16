@@ -142,7 +142,9 @@ void pychip_DeviceController_IterateDiscoveredCommissionableNodes(Controller::De
         {
             jsonVal["mrpRetryActiveThreshold"] = activeThreshold->count();
         }
-        jsonVal["supportsTcp"] = dnsSdInfo->supportsTcp;
+
+        jsonVal["supportsTcpClient"] = dnsSdInfo->supportsTcpClient;
+        jsonVal["supportsTcpServer"] = dnsSdInfo->supportsTcpServer;
         {
             Json::Value addresses;
             for (unsigned j = 0; j < dnsSdInfo->numIPs; ++j)
@@ -215,7 +217,8 @@ void pychip_DeviceController_PrintDiscoveredDevices(Controller::DeviceCommission
             ChipLogProgress(Discovery, "\tMrp Interval active\tNot present");
         }
 
-        ChipLogProgress(Discovery, "\tSupports TCP\t\t%d", dnsSdInfo->supportsTcp);
+        ChipLogProgress(Discovery, "\tSupports Client TCP\t\t%d", dnsSdInfo->supportsTcpClient);
+        ChipLogProgress(Discovery, "\tSupports Server TCP\t\t%d", dnsSdInfo->supportsTcpServer);
         if (dnsSdInfo->isICDOperatingAsLIT.has_value())
         {
             ChipLogProgress(Discovery, "\tICD is operating as a\t%s", *(dnsSdInfo->isICDOperatingAsLIT) ? "LIT" : "SIT");

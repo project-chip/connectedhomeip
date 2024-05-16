@@ -288,7 +288,8 @@ void Resolver::OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeDat
         result.address.SetPort(nodeData.resolutionData.port);
         result.address.SetInterface(nodeData.resolutionData.interfaceId);
         result.mrpRemoteConfig = nodeData.resolutionData.GetRemoteMRPConfig();
-        result.supportsTcp     = nodeData.resolutionData.supportsTcp;
+        result.supportsTcpClient = nodeData.resolutionData.supportsTcpClient;
+        result.supportsTcpServer = nodeData.resolutionData.supportsTcpServer;
 
         if (nodeData.resolutionData.isICDOperatingAsLIT.has_value())
         {
@@ -305,6 +306,8 @@ void Resolver::OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeDat
             }
 #endif
             result.address.SetIPAddress(nodeData.resolutionData.ipAddress[i]);
+            result.address.SetTransportType((result.supportsTcpClient || result.supportsTcpServer) ? Transport::Type::kTcp
+                                                                                                   : Transport::Type::kUdp);
             current->LookupResult(result);
         }
 

@@ -418,7 +418,8 @@ void JsonBackend::LogNodeDiscovered(NodeDiscoveredInfo & info)
 
         info.result->address.ToString(address_buff);
 
-        result["supports_tcp"] = info.result->supportsTcp;
+        result["supports_tcp_client"] = info.result->supportsTcpClient;
+        result["supports_tcp_server"] = info.result->supportsTcpServer;
         result["address"]      = address_buff;
 
         result["mrp"]["idle_retransmit_timeout_ms"]   = info.result->mrpRemoteConfig.mIdleRetransTimeout.count();

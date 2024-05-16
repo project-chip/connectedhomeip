@@ -306,7 +306,8 @@ bool NodeDataIsEmpty(const CommissionNodeData & node)
     if (node.longDiscriminator != 0 || node.vendorId != 0 || node.productId != 0 || node.commissioningMode != 0 ||
         node.deviceType != 0 || node.rotatingIdLen != 0 || node.pairingHint != 0 || node.mrpRetryIntervalIdle.has_value() ||
         node.mrpRetryIntervalActive.has_value() || node.mrpRetryActiveThreshold.has_value() ||
-        node.isICDOperatingAsLIT.has_value() || node.supportsTcp || node.supportsCommissionerGeneratedPasscode != 0)
+        node.isICDOperatingAsLIT.has_value() || node.supportsTcpServer || node.supportsTcpClient ||
+        node.supportsCommissionerGeneratedPasscode != 0)
     {
         return false;
     }
@@ -412,8 +413,8 @@ bool NodeDataIsEmpty(const ResolvedNodeData & nodeData)
 {
     return nodeData.operationalData.peerId == PeerId{} && nodeData.resolutionData.numIPs == 0 &&
         nodeData.resolutionData.port == 0 && !nodeData.resolutionData.mrpRetryIntervalIdle.has_value() &&
-        !nodeData.resolutionData.mrpRetryIntervalActive.has_value() && !nodeData.resolutionData.supportsTcp &&
-        !nodeData.resolutionData.isICDOperatingAsLIT.has_value();
+        !nodeData.resolutionData.mrpRetryIntervalActive.has_value() && !nodeData.resolutionData.supportsTcpClient &&
+        !nodeData.resolutionData.supportsTcpServer && !nodeData.resolutionData.isICDOperatingAsLIT.has_value();
 }
 
 void ResetRetryIntervalIdle(DiscoveredNodeData & nodeData)
@@ -646,25 +647,29 @@ void DiscoveredTxtFieldTcpSupport()
 
     // True
     strcpy(key, "T");
-    strcpy(val, "1");
+    strcpy(val, "3");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
-    EXPECT_TRUE(nodeData.Get<NodeData>().supportsTcp);
+    EXPECT_TRUE(nodeData.Get<NodeData>().supportsTcpClient);
+    EXPECT_TRUE(nodeData.Get<NodeData>().supportsTcpServer);
 
     // Test no other fields were populated
-    nodeData.Get<NodeData>().supportsTcp = false;
+    nodeData.Get<NodeData>().supportsTcpClient = false;
+    nodeData.Get<NodeData>().supportsTcpServer = false;
     EXPECT_TRUE(NodeDataIsEmpty(nodeData.Get<NodeData>()));
 
     // False
     strcpy(key, "T");
     strcpy(val, "0");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
-    EXPECT_TRUE(nodeData.Get<NodeData>().supportsTcp == false);
+    EXPECT_TRUE(nodeData.Get<NodeData>().supportsTcpServer == false);
+    EXPECT_TRUE(nodeData.Get<NodeData>().supportsTcpClient == false);
 
     // Invalid value, stil false
     strcpy(key, "T");
     strcpy(val, "asdf");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
-    EXPECT_TRUE(nodeData.Get<NodeData>().supportsTcp == false);
+    EXPECT_TRUE(nodeData.Get<NodeData>().supportsTcpClient == false);
+    EXPECT_TRUE(nodeData.Get<NodeData>().supportsTcpServer == false);
 }
 
 // Test ICD (ICD operation Mode)
@@ -983,23 +988,27 @@ void TxtFieldTcpSupport()
     strcpy(key, "T");
     strcpy(val, "1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    EXPECT_TRUE(nodeData.resolutionData.supportsTcp);
+    EXPECT_TRUE(nodeData.resolutionData.supportsTcpServer);
+    EXPECT_TRUE(nodeData.resolutionData.supportsTcpClient);
 
     // Test no other fields were populated
-    nodeData.resolutionData.supportsTcp = false;
+    nodeData.resolutionData.supportsTcpServer = false;
+    nodeData.resolutionData.supportsTcpClient = false;
     EXPECT_TRUE(NodeDataIsEmpty(nodeData));
 
     // False
     strcpy(key, "T");
     strcpy(val, "0");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    EXPECT_EQ(nodeData.resolutionData.supportsTcp, false);
+    EXPECT_EQ(nodeData.resolutionData.supportsTcpServer, false);
+    EXPECT_EQ(nodeData.resolutionData.supportsTcpClient, false);
 
     // Invalid value, stil false
     strcpy(key, "T");
     strcpy(val, "asdf");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    EXPECT_EQ(nodeData.resolutionData.supportsTcp, false);
+    EXPECT_EQ(nodeData.resolutionData.supportsTcpClient, false);
+    EXPECT_EQ(nodeData.resolutionData.supportsTcpServer, false);
 }
 
 TEST(TestTxtFields, TxtDiscoveredFieldTcpSupport)

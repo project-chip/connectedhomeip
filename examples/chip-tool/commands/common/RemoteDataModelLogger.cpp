@@ -241,7 +241,8 @@ CHIP_ERROR LogDiscoveredNodeData(const chip::Dnssd::CommissionNodeData & nodeDat
     value["rotatingIdLen"]      = static_cast<uint64_t>(commissionData.rotatingIdLen);
     value["pairingHint"]        = commissionData.pairingHint;
     value["pairingInstruction"] = commissionData.pairingInstruction;
-    value["supportsTcp"]        = resolutionData.supportsTcp;
+    value["supportsTcpClient"]  = resolutionData.supportsTcpClient;
+    value["supportsTcpServer"]  = resolutionData.supportsTcpServer;
     value["port"]               = resolutionData.port;
     value["numIPs"]             = static_cast<uint8_t>(resolutionData.numIPs);
 
