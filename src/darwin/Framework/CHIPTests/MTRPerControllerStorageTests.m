@@ -2132,7 +2132,7 @@ static NSString * const kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey = @
     XCTAssertEqual(subscriptionDequeueCount, orderedDeviceIDs.count);
 
     // Reset our commissionees.
-    for (NSNumber * deviceID in deviceOnboardingPayloads) {
+    for (NSNumber * deviceID in orderedDeviceIDs) {
         __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
         ResetCommissionee(baseDevice, queue, self, kTimeoutInSeconds);
     }
