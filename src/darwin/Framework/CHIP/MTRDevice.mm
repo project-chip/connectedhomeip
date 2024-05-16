@@ -362,6 +362,9 @@ static NSString * const sAttributesKey = @"attributes";
 - (BOOL)unitTestShouldSkipExpectedValuesForWrite:(MTRDevice *)device;
 - (NSNumber *)unitTestMaxIntervalOverrideForSubscription:(MTRDevice *)device;
 - (BOOL)unitTestForceAttributeReportsIfMatchingCache:(MTRDevice *)device;
+- (BOOL)unitTestPretendThreadEnabled:(MTRDevice *)device;
+- (void)unitTestSubscriptionPoolDequeue:(MTRDevice *)device;
+- (void)unitTestSubscriptionPoolWorkComplete:(MTRDevice *)device;
 @end
 #endif
 
@@ -689,7 +692,14 @@ static NSString * const sAttributesKey = @"attributes";
     }
 
     if (setUpSubscription) {
-        [self _setupSubscription];
+        if ([self _deviceUsesThread]) {
+            [self _scheduleSubscriptionPoolWork:^{
+                std::lock_guard lock(self->_lock);
+                [self _setupSubscription];
+            } inNanoseconds:0 description:@"MTRDevice setDelegate first subscription"];
+        } else {
+            [self _setupSubscription];
+        }
     }
 }
 
@@ -946,6 +956,17 @@ static NSString * const sAttributesKey = @"attributes";
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
+#ifdef DEBUG
+    id testDelegate = _weakDelegate.strongObject;
+    if (testDelegate) {
+        if ([testDelegate respondsToSelector:@selector(unitTestPretendThreadEnabled:)]) {
+            if ([testDelegate unitTestPretendThreadEnabled:self]) {
+                return YES;
+            }
+        }
+    }
+#endif
+
     // Device is thread-enabled if there is a Thread Network Diagnostics cluster on endpoint 0
     for (MTRClusterPath * path in [self _knownClusters]) {
         if (path.endpoint.unsignedShortValue != kRootEndpointId) {
@@ -965,18 +986,28 @@ static NSString * const sAttributesKey = @"attributes";
     os_unfair_lock_assert_owner(&self->_lock);
     MTRAsyncWorkCompletionBlock completion = self->_subscriptionPoolWorkCompletionBlock;
     if (completion) {
+#ifdef DEBUG
+        id delegate = self->_weakDelegate.strongObject;
+        if (delegate) {
+            dispatch_async(self->_delegateQueue, ^{
+                if ([delegate respondsToSelector:@selector(unitTestSubscriptionPoolWorkComplete:)]) {
+                    [delegate unitTestSubscriptionPoolWorkComplete:self];
+                }
+            });
+        }
+#endif
         self->_subscriptionPoolWorkCompletionBlock = nil;
         completion(MTRAsyncWorkComplete);
     }
 }
 
-- (void)_scheduleSubscriptionPoolWork:(void (^)(void))workBlock inNanoseconds:(int64_t)inNanoseconds description:(NSString *)description
+- (void)_scheduleSubscriptionPoolWork:(dispatch_block_t)workBlock inNanoseconds:(int64_t)inNanoseconds description:(NSString *)description
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
     // Sanity check we are not scheduling for this device multiple times in the pool
     if (_subscriptionPoolWorkCompletionBlock) {
-        MTR_LOG_DEFAULT("%@ already scheduled in subscription pool for this device - ignoring: %@", self, description);
+        MTR_LOG_ERROR("%@ already scheduled in subscription pool for this device - ignoring: %@", self, description);
         return;
     }
 
@@ -986,6 +1017,16 @@ static NSString * const sAttributesKey = @"attributes";
         MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
         [workItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull completion) {
             os_unfair_lock_lock(&self->_lock);
+#ifdef DEBUG
+            id delegate = self->_weakDelegate.strongObject;
+            if (delegate) {
+                dispatch_async(self->_delegateQueue, ^{
+                    if ([delegate respondsToSelector:@selector(unitTestSubscriptionPoolDequeue:)]) {
+                        [delegate unitTestSubscriptionPoolDequeue:self];
+                    }
+                });
+            }
+#endif
             if (self->_subscriptionPoolWorkCompletionBlock) {
                 // This means a resubscription triggering event happened and is now in-progress
                 MTR_LOG_DEFAULT("%@ timer fired but already running in subscription pool - ignoring: %@", self, description);

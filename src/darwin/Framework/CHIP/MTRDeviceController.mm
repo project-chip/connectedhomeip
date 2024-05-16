@@ -145,7 +145,8 @@ using namespace chip::Tracing::DarwinFramework;
     return [MTRDeviceControllerFactory.sharedInstance initializeController:self withParameters:controllerParameters error:error];
 }
 
-constexpr NSUInteger kDefaultConcurrentSubscriptionPoolSize = 3;
+static NSString * const kLocalTestUserDefaultDomain = @"org.csa-iot.matter.darwintest";
+static NSString * const kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey = @"subscriptionPoolSizeOverride";
 
 - (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
                              queue:(dispatch_queue_t)queue
@@ -254,8 +255,19 @@ constexpr NSUInteger kDefaultConcurrentSubscriptionPoolSize = 3;
             return nil;
         }
 
+        // Provide a way to test different subscription pool sizes without code change
+        NSUserDefaults * defaults = [[NSUserDefaults alloc] initWithSuiteName:kLocalTestUserDefaultDomain];
+        if ([defaults objectForKey:kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey]) {
+            NSInteger subscriptionPoolSizeOverride = [defaults integerForKey:kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey];
+            if (subscriptionPoolSizeOverride < 1) {
+                concurrentSubscriptionPoolSize = 1;
+            } else {
+                concurrentSubscriptionPoolSize = static_cast<NSUInteger>(subscriptionPoolSizeOverride);
+            }
+        }
+
         if (!concurrentSubscriptionPoolSize) {
-            concurrentSubscriptionPoolSize = kDefaultConcurrentSubscriptionPoolSize;
+            concurrentSubscriptionPoolSize = 1;
         }
         _concurrentSubscriptionPool = [[MTRAsyncWorkQueue alloc] initWithContext:self width:concurrentSubscriptionPoolSize];
 

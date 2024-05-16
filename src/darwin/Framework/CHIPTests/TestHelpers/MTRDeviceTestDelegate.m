@@ -77,4 +77,23 @@
     }
 }
 
+- (BOOL)unitTestPretendThreadEnabled:(MTRDevice *)device
+{
+    return self.pretendThreadEnabled;
+}
+
+- (void)unitTestSubscriptionPoolDequeue:(MTRDevice *)device
+{
+    if (self.onSubscriptionPoolDequeue != nil) {
+        self.onSubscriptionPoolDequeue();
+    }
+}
+
+- (void)unitTestSubscriptionPoolWorkComplete:(MTRDevice *)device
+{
+    if (self.onSubscriptionPoolWorkComplete != nil) {
+        self.onSubscriptionPoolWorkComplete();
+    }
+}
+
 @end

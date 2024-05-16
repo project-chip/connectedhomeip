@@ -145,8 +145,6 @@ protected:
     NSMutableArray * _Nullable mEventReports = nil;
 
     void CallResubscriptionScheduledHandler(NSError * error, NSNumber * resubscriptionDelay);
-    // Copied from ReadClient and customized for MTRDevice resubscription time reset
-    uint32_t ComputeTimeTillNextSubscription();
 
 private:
     DataReportCallback _Nullable mAttributeReportCallback = nil;

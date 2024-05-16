@@ -254,6 +254,8 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 }
 @end
 
+constexpr NSUInteger kDefaultConcurrentSubscriptionPoolSize = 3;
+
 @implementation MTRDeviceControllerParameters
 - (instancetype)initWithStorageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
                    storageDelegateQueue:(dispatch_queue_t)storageDelegateQueue
@@ -285,6 +287,8 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
     _storageDelegate = storageDelegate;
     _storageDelegateQueue = storageDelegateQueue;
     _uniqueIdentifier = uniqueIdentifier;
+
+    _concurrentSubscriptionsAllowedOnThread = kDefaultConcurrentSubscriptionPoolSize;
 
     return self;
 }
