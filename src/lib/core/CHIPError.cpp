@@ -146,6 +146,9 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_INVALID_LIST_LENGTH.AsInteger():
         desc = "Invalid list length";
         break;
+    case CHIP_ERROR_FAILED_DEVICE_ATTESTATION.AsInteger():
+        desc = "Failed Device Attestation";
+        break;
     case CHIP_END_OF_TLV.AsInteger():
         desc = "End of TLV";
         break;

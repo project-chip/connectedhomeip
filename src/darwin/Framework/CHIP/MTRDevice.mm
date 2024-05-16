@@ -140,7 +140,15 @@ typedef NS_ENUM(NSUInteger, MTRInternalDeviceState) {
     // InitialSubscriptionEstablished means we have at some point finished setting up a
     // subscription.  That subscription may have dropped since then, but if so it's the ReadClient's
     // responsibility to re-establish it.
-    MTRInternalDeviceStateInitalSubscriptionEstablished = 2,
+    MTRInternalDeviceStateInitialSubscriptionEstablished = 2,
+    // Resubscribing means we had established a subscription, but then
+    // detected a subscription drop due to not receiving a report on time. This
+    // covers all the actions that happen when re-subscribing (discovery, CASE,
+    // getting priming reports, etc).
+    MTRInternalDeviceStateResubscribing = 3,
+    // LaterSubscriptionEstablished meant that we had a subscription drop and
+    // then re-created a subscription.
+    MTRInternalDeviceStateLaterSubscriptionEstablished = 4,
 };
 
 // Utility methods for working with MTRInternalDeviceState, located near the
@@ -148,12 +156,17 @@ typedef NS_ENUM(NSUInteger, MTRInternalDeviceState) {
 namespace {
 bool HadSubscriptionEstablishedOnce(MTRInternalDeviceState state)
 {
-    return state >= MTRInternalDeviceStateInitalSubscriptionEstablished;
+    return state >= MTRInternalDeviceStateInitialSubscriptionEstablished;
 }
 
 bool NeedToStartSubscriptionSetup(MTRInternalDeviceState state)
 {
     return state <= MTRInternalDeviceStateUnsubscribed;
+}
+
+bool HaveSubscriptionEstablishedRightNow(MTRInternalDeviceState state)
+{
+    return state == MTRInternalDeviceStateInitialSubscriptionEstablished || state == MTRInternalDeviceStateLaterSubscriptionEstablished;
 }
 } // anonymous namespace
 
@@ -878,6 +891,16 @@ static NSString * const sAttributesKey = @"attributes";
     }
 }
 
+- (void)_changeInternalState:(MTRInternalDeviceState)state
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+    MTRInternalDeviceState lastState = _internalDeviceState;
+    _internalDeviceState = state;
+    if (lastState != state) {
+        MTR_LOG_DEFAULT("%@ internal state change %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
+    }
+}
+
 // First Time Sync happens 2 minutes after reachability (this can be changed in the future)
 #define MTR_DEVICE_TIME_UPDATE_INITIAL_WAIT_TIME_SEC (60 * 2)
 - (void)_handleSubscriptionEstablished
@@ -886,7 +909,11 @@ static NSString * const sAttributesKey = @"attributes";
 
     // reset subscription attempt wait time when subscription succeeds
     _lastSubscriptionAttemptWait = 0;
-    _internalDeviceState = MTRInternalDeviceStateInitalSubscriptionEstablished;
+    if (HadSubscriptionEstablishedOnce(_internalDeviceState)) {
+        [self _changeInternalState:MTRInternalDeviceStateLaterSubscriptionEstablished];
+    } else {
+        [self _changeInternalState:MTRInternalDeviceStateInitialSubscriptionEstablished];
+    }
 
     // As subscription is established, check if the delegate needs to be informed
     if (!_delegateDeviceCachePrimedCalled) {
@@ -913,7 +940,7 @@ static NSString * const sAttributesKey = @"attributes";
 {
     std::lock_guard lock(_lock);
 
-    _internalDeviceState = MTRInternalDeviceStateUnsubscribed;
+    [self _changeInternalState:MTRInternalDeviceStateUnsubscribed];
     _unreportedEvents = nil;
 
     [self _changeState:MTRDeviceStateUnreachable];
@@ -924,6 +951,7 @@ static NSString * const sAttributesKey = @"attributes";
     std::lock_guard lock(_lock);
 
     [self _changeState:MTRDeviceStateUnknown];
+    [self _changeInternalState:MTRInternalDeviceStateResubscribing];
 
     // If we are here, then the ReadClient either just detected a subscription
     // drop or just tried again and failed.  Either way, count it as "tried and
@@ -1044,11 +1072,12 @@ static NSString * const sAttributesKey = @"attributes";
 
     _receivingReport = YES;
     if (_state != MTRDeviceStateReachable) {
-        _receivingPrimingReport = YES;
         [self _changeState:MTRDeviceStateReachable];
-    } else {
-        _receivingPrimingReport = NO;
     }
+
+    // If we currently don't have an established subscription, this must be a
+    // priming report.
+    _receivingPrimingReport = !HaveSubscriptionEstablishedRightNow(_internalDeviceState);
 }
 
 - (NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)_clusterDataToPersistSnapshot
@@ -1461,7 +1490,7 @@ static NSString * const sAttributesKey = @"attributes";
         return;
     }
 
-    _internalDeviceState = MTRInternalDeviceStateSubscribing;
+    [self _changeInternalState:MTRInternalDeviceStateSubscribing];
 
     // Set up a timer to mark as not reachable if it takes too long to set up a subscription
     MTRWeakReference<MTRDevice *> * weakSelf = [MTRWeakReference weakReferenceWithObject:self];
@@ -2534,8 +2563,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             NSNumber * dataVersion = attributeDataValue[MTRDataVersionKey];
             MTRClusterPath * clusterPath = [MTRClusterPath clusterPathWithEndpointID:attributePath.endpoint clusterID:attributePath.cluster];
             if (dataVersion) {
-                [self _noteDataVersion:dataVersion forClusterPath:clusterPath];
-
                 // Remove data version from what we cache in memory
                 attributeDataValue = [self _dataValueWithoutDataVersion:attributeDataValue];
             }
@@ -2544,6 +2571,10 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             BOOL readCacheValueChanged = ![self _attributeDataValue:attributeDataValue isEqualToDataValue:previousValue];
             // Now that we have grabbed previousValue, update our cache with the attribute value.
             if (readCacheValueChanged) {
+                if (dataVersion) {
+                    [self _noteDataVersion:dataVersion forClusterPath:clusterPath];
+                }
+
                 [self _setCachedAttributeValue:attributeDataValue forPath:attributePath];
                 if (!_deviceConfigurationChanged) {
                     _deviceConfigurationChanged = [self _attributeAffectsDeviceConfiguration:attributePath];

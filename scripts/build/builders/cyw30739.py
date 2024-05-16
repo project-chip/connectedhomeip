@@ -22,6 +22,7 @@ class Cyw30739App(Enum):
     LIGHT = auto()
     LIGHT_SWITCH = auto()
     LOCK = auto()
+    THERMOSTAT = auto()
 
     def ExampleName(self):
         if self == Cyw30739App.LIGHT:
@@ -30,6 +31,8 @@ class Cyw30739App(Enum):
             return "light-switch-app"
         elif self == Cyw30739App.LOCK:
             return "lock-app"
+        elif self == Cyw30739App.THERMOSTAT:
+            return "thermostat"
         else:
             raise Exception("Unknown app type: %r" % self)
 

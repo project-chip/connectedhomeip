@@ -45,6 +45,8 @@ extern "C" {
 #include "netif/etharp.h"
 #include "silabs_utils.h"
 
+#include <lib/support/logging/CHIPLogging.h>
+
 StaticSemaphore_t xEthernetIfSemaBuffer;
 
 /*****************************************************************************
@@ -130,13 +132,14 @@ static void low_level_input(struct netif * netif, uint8_t * b, uint16_t len)
         (memcmp(netif->hwaddr, dst_mac, netif->hwaddr_len) != 0))
     {
 #ifdef WIFI_DEBUG_ENABLED
-        SILABS_LOG("%s: DROP, [%02x:%02x:%02x:%02x:%02x:%02x]<-[%02x:%02x:%02x:%02x:%02x:%02x] type=%02x%02x", __func__,
+        ChipLogProgress(DeviceLayer, "%s: DROP, [%02x:%02x:%02x:%02x:%02x:%02x]<-[%02x:%02x:%02x:%02x:%02x:%02x] type=%02x%02x",
+                        __func__,
 
-                   dst_mac[0], dst_mac[1], dst_mac[2], dst_mac[3], dst_mac[4], dst_mac[5],
+                        dst_mac[0], dst_mac[1], dst_mac[2], dst_mac[3], dst_mac[4], dst_mac[5],
 
-                   src_mac[0], src_mac[1], src_mac[2], src_mac[3], src_mac[4], src_mac[5],
+                        src_mac[0], src_mac[1], src_mac[2], src_mac[3], src_mac[4], src_mac[5],
 
-                   b[12], b[13]);
+                        b[12], b[13]);
 #endif
         return;
     }
@@ -152,14 +155,15 @@ static void low_level_input(struct netif * netif, uint8_t * b, uint16_t len)
             bufferoffset += q->len;
         }
 #ifdef WIFI_DEBUG_ENABLED
-        SILABS_LOG("%s: ACCEPT %d, [%02x:%02x:%02x:%02x:%02x:%02x]<-[%02x:%02x:%02x:%02x:%02x:%02x] type=%02x%02x", __func__,
-                   bufferoffset,
+        ChipLogProgress(DeviceLayer,
+                        "%s: ACCEPT %d, [%02x:%02x:%02x:%02x:%02x:%02x]<-[%02x:%02x:%02x:%02x:%02x:%02x] type=%02x%02x", __func__,
+                        bufferoffset,
 
-                   dst_mac[0], dst_mac[1], dst_mac[2], dst_mac[3], dst_mac[4], dst_mac[5],
+                        dst_mac[0], dst_mac[1], dst_mac[2], dst_mac[3], dst_mac[4], dst_mac[5],
 
-                   src_mac[0], src_mac[1], src_mac[2], src_mac[3], src_mac[4], src_mac[5],
+                        src_mac[0], src_mac[1], src_mac[2], src_mac[3], src_mac[4], src_mac[5],
 
-                   b[12], b[13]);
+                        b[12], b[13]);
 #endif
 
         if (netif->input(p, netif) != ERR_OK)
@@ -199,7 +203,7 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
     uint16_t datalength  = 0;
 
 #ifdef WIFI_DEBUG_ENABLED
-    SILABS_LOG("LWIP : low_level_output");
+    ChipLogProgress(DeviceLayer, "LWIP : low_level_output");
 #endif
     if (xSemaphoreTake(ethout_sem, portMAX_DELAY) != pdTRUE)
     {
@@ -221,24 +225,24 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
     VERIFY_STATUS_AND_RETURN(status);
     if (packet == NULL)
     {
-        SILABS_LOG("EN-RSI:No buf");
+        ChipLogProgress(DeviceLayer, "EN-RSI:No buf");
         xSemaphoreGive(ethout_sem);
         return SL_STATUS_ALLOCATION_FAILED;
     }
     memset(packet->desc, 0, sizeof(packet->desc));
 #ifdef WIFI_DEBUG_ENABLED
-    SILABS_LOG("EN-RSI: Output");
+    ChipLogProgress(DeviceLayer, "EN-RSI: Output");
 #endif
     if ((netif->flags & (NETIF_FLAG_LINK_UP | NETIF_FLAG_UP)) != (NETIF_FLAG_LINK_UP | NETIF_FLAG_UP))
     {
-        SILABS_LOG("EN-RSI:NOT UP");
+        ChipLogProgress(DeviceLayer, "EN-RSI:NOT UP");
         xSemaphoreGive(ethout_sem);
         return ERR_IF;
     }
 #ifdef WIFI_DEBUG_ENABLED
     uint8_t * b = (uint8_t *) p->payload;
-    SILABS_LOG("EN-RSI: Out [%02x:%02x:%02x:%02x:%02x:%02x][%02x:%02x:%02x:%02x:%02x:%02x]type=%02x%02x", b[0], b[1], b[2], b[3],
-               b[4], b[5], b[6], b[7], b[8], b[9], b[10], b[11], b[12], b[13]);
+    ChipLogProgress(DeviceLayer, "EN-RSI: Out [%02x:%02x:%02x:%02x:%02x:%02x][%02x:%02x:%02x:%02x:%02x:%02x]type=%02x%02x", b[0],
+                    b[1], b[2], b[3], b[4], b[5], b[6], b[7], b[8], b[9], b[10], b[11], b[12], b[13]);
 #endif
     /* Generate the packet */
     for (q = p, datalength = 0; q != NULL; q = q->next)
@@ -252,13 +256,13 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
         wfx_rsi_pkt_add_data(packet, (uint8_t *) (p->payload), LWIP_FRAME_ALIGNMENT - datalength, datalength);
     }
 #ifdef WIFI_DEBUG_ENABLED
-    SILABS_LOG("EN-RSI: Sending %d", framelength);
+    ChipLogProgress(DeviceLayer, "EN-RSI: Sending %d", framelength);
 #endif
     packet->length  = framelength & 0xFFF;
     packet->command = RSI_SEND_RAW_DATA;
     if (sl_si91x_driver_send_data_packet(SI91X_WLAN_CMD_QUEUE, buffer, 1000))
     {
-        SILABS_LOG("*ERR*EN-RSI:Send fail");
+        ChipLogProgress(DeviceLayer, "*ERR*EN-RSI:Send fail");
         xSemaphoreGive(ethout_sem);
         return ERR_IF;
     }

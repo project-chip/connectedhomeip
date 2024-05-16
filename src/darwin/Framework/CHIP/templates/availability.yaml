@@ -8509,12 +8509,17 @@
               ContentLaunchStatusEnum:
                   - URLNotAvailable
 
-- release: "Future"
-  versions: "future"
+- release: "Middle of 2024"
+  versions:
+      iOS: "17.6"
+      macOS: "14.6"
+      watchOS: "10.6"
+      tvOS: "17.6"
   introduced:
       clusters:
           - ActivatedCarbonFilterMonitoring
           - AirQuality
+          - BooleanStateConfiguration
           - ElectricalEnergyMeasurement
           - ElectricalPowerMeasurement
           - HEPAFilterMonitoring
@@ -8530,6 +8535,7 @@
           - PM25ConcentrationMeasurement
           - RadonConcentrationMeasurement
           - TotalVolatileOrganicCompoundsConcentrationMeasurement
+          - ValveConfigurationAndControl
       attributes:
           ActivatedCarbonFilterMonitoring:
               - Condition
@@ -8545,6 +8551,20 @@
               - ClusterRevision
           AirQuality:
               - AirQuality
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          BooleanStateConfiguration:
+              - CurrentSensitivityLevel
+              - SupportedSensitivityLevels
+              - DefaultSensitivityLevel
+              - AlarmsActive
+              - AlarmsSuppressed
+              - AlarmsEnabled
+              - AlarmsSupported
+              - SensorFault
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
@@ -8790,7 +8810,27 @@
               - AttributeList
               - FeatureMap
               - ClusterRevision
+          ValveConfigurationAndControl:
+              - OpenDuration
+              - DefaultOpenDuration
+              - AutoCloseTime
+              - RemainingDuration
+              - CurrentState
+              - TargetState
+              - CurrentLevel
+              - TargetLevel
+              - DefaultOpenLevel
+              - ValveFault
+              - LevelStep
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
       commands:
+          BooleanStateConfiguration:
+              - SuppressAlarm
+              - EnableDisableAlarm
           ActivatedCarbonFilterMonitoring:
               - ResetCondition
           FanControl:
@@ -8799,12 +8839,24 @@
               - ResetCondition
           SmokeCOAlarm:
               - SelfTestRequest
+          ValveConfigurationAndControl:
+              - Open
+              - Close
       command fields:
+          BooleanStateConfiguration:
+              SuppressAlarm:
+                  - alarmsToSuppress
+              EnableDisableAlarm:
+                  - alarmsToEnableDisable
           FanControl:
               Step:
                   - direction
                   - wrap
                   - lowestOff
+          ValveConfigurationAndControl:
+              Open:
+                  - openDuration
+                  - targetLevel
       structs:
           ActivatedCarbonFilterMonitoring:
               - ReplacementProductStruct
@@ -8887,6 +8939,9 @@
                   - productIdentifierType
                   - productIdentifierValue
       events:
+          BooleanStateConfiguration:
+              - AlarmsStateChanged
+              - SensorFault
           ElectricalEnergyMeasurement:
               - CumulativeEnergyMeasured
               - PeriodicEnergyMeasured
@@ -8904,7 +8959,16 @@
               - InterconnectSmokeAlarm
               - InterconnectCOAlarm
               - AllClear
+          ValveConfigurationAndControl:
+              - ValveStateChanged
+              - ValveFault
       event fields:
+          BooleanStateConfiguration:
+              AlarmsStateChanged:
+                  - alarmsActive
+                  - alarmsSuppressed
+              SensorFault:
+                  - sensorFault
           ElectricalEnergyMeasurement:
               CumulativeEnergyMeasured:
                   - energyImported
@@ -8926,6 +8990,12 @@
                   - alarmSeverityLevel
               InterconnectCOAlarm:
                   - alarmSeverityLevel
+          ValveConfigurationAndControl:
+              ValveStateChanged:
+                  - valveState
+                  - valveLevel
+              ValveFault:
+                  - valveFault
       enums:
           ActivatedCarbonFilterMonitoring:
               - DegradationDirectionEnum
@@ -8990,6 +9060,9 @@
               - MeasurementUnitEnum
               - MeasurementMediumEnum
               - LevelValueEnum
+          ValveConfigurationAndControl:
+              - ValveStateEnum
+              - StatusCodeEnum
       enum values:
           ActivatedCarbonFilterMonitoring:
               DegradationDirectionEnum:
@@ -9287,11 +9360,22 @@
                   - Medium
                   - High
                   - Critical
+          ValveConfigurationAndControl:
+              ValveStateEnum:
+                  - Closed
+                  - Open
+                  - Transitioning
+              StatusCodeEnum:
+                  - FailureDueToFault
       bitmaps:
           ActivatedCarbonFilterMonitoring:
               - Feature
           AirQuality:
               - Feature
+          BooleanStateConfiguration:
+              - Feature
+              - AlarmModeBitmap
+              - SensorFaultBitmap
           ElectricalEnergyMeasurement:
               - Feature
           ElectricalPowerMeasurement:
@@ -9320,6 +9404,9 @@
               - Feature
           TotalVolatileOrganicCompoundsConcentrationMeasurement:
               - Feature
+          ValveConfigurationAndControl:
+              - Feature
+              - ValveFaultBitmap
       bitmap values:
           ActivatedCarbonFilterMonitoring:
               Feature:
@@ -9332,6 +9419,17 @@
                   - Moderate
                   - VeryPoor
                   - ExtremelyPoor
+          BooleanStateConfiguration:
+              Feature:
+                  - Visual
+                  - Audible
+                  - AlarmSuppress
+                  - SensitivityLevel
+              AlarmModeBitmap:
+                  - Visual
+                  - Audible
+              SensorFaultBitmap:
+                  - GeneralFault
           ElectricalEnergyMeasurement:
               Feature:
                   - ImportedEnergy
@@ -9438,6 +9536,17 @@
                   - CriticalLevel
                   - PeakMeasurement
                   - AverageMeasurement
+          ValveConfigurationAndControl:
+              Feature:
+                  - TimeSync
+                  - Level
+              ValveFaultBitmap:
+                  - GeneralFault
+                  - Blocked
+                  - Leaking
+                  - NotConnected
+                  - ShortCircuit
+                  - CurrentExceeded
   provisional:
       clusters:
           # Targeting Spring 2024 Matter release
@@ -9575,3 +9684,6 @@
                   # Not really part of the spec, need to think about whether to
                   # expose this.
                   - NoFeatures
+
+- release: "Future"
+  versions: "future"

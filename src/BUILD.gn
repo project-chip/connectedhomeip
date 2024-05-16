@@ -92,9 +92,9 @@ if (chip_build_tests) {
       ]
     }
 
+    # Skip on efr32 due to flash and/or ram limitations.
     if (chip_device_platform != "efr32") {
       tests += [
-        # TODO(#10447): App test has HF on EFR32.
         "${chip_root}/src/app/tests",
         "${chip_root}/src/app/tests:tests_nltest",
         "${chip_root}/src/credentials/tests",
@@ -107,7 +107,7 @@ if (chip_build_tests) {
       ]
 
       if (matter_enable_tracing_support &&
-          matter_trace_config == "multiplexed") {
+          matter_trace_config == "${chip_root}/src/tracing/multiplexed") {
         tests += [ "${chip_root}/src/tracing/tests" ]
       }
     }
@@ -129,7 +129,7 @@ if (chip_build_tests) {
     # https://github.com/project-chip/connectedhomeip/issues/9630
     if (chip_device_platform != "nrfconnect" &&
         chip_device_platform != "efr32") {
-      # TODO(#10447): Controller test has HF on EFR32.
+      # Doesn't compile on ef32. Multiple definitions issues with attribute storage and overflows flash memory.
       tests += [ "${chip_root}/src/controller/tests/data_model" ]
 
       # Skip controller test for Open IoT SDK

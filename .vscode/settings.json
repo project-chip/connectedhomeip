@@ -14,7 +14,18 @@
         "${workspaceFolder}/src/lib/**",
         "${workspaceFolder}/src/system/**",
         "${workspaceFolder}/third_party/nlassert/repo/include/**",
-        "${workspaceFolder}/third_party/nlio/repo/include/**"
+        "${workspaceFolder}/third_party/nlio/repo/include/**",
+        "${workspaceFolder}/darwin/Framework/CHIP/**",
+        "${workspaceFolder}/src/messaging/**",
+        "${workspaceFolder}/src/protocols/**",
+        "${workspaceFolder}/src/tracing/**",
+        "${workspaceFolder}/src/transport/**",
+        "${workspaceFolder}/src/inet/**",
+        "${workspaceFolder}/src/credentials/**",
+        "${workspaceFolder}/src/data_model/**",
+        "${workspaceFolder}/src/app/**",
+        "${workspaceFolder}/src/crytpo/**",
+        "${workspaceFolder}/src/platform/**"
     ],
     "[cpp]": {
         "editor.defaultFormatter": "xaver.clang-format"
@@ -35,6 +46,7 @@
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "files.associations": {
+        "*.mm": "cpp",
         "iostream": "cpp",
         "array": "cpp",
         "atomic": "cpp",
