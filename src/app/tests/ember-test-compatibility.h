@@ -7,20 +7,23 @@
 #include <app/util/mock/Functions.h>
 
 namespace chip {
+
+namespace Test {
+
+constexpr chip::ClusterId kTestDeniedClusterId1 = 1000;
+constexpr chip::ClusterId kTestDeniedClusterId2 = 3;
+
+constexpr chip::ClusterId kTestClusterId      = 6;
+constexpr uint8_t kTestFieldValue1            = 1;
+constexpr chip::EndpointId kTestEndpointId    = 1;
+constexpr chip::DataVersion kTestDataVersion1 = 3;
+
+constexpr chip::DataVersion kRejectedDataVersion = 1;
+extern uint8_t attributeDataTLV[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
+extern size_t attributeDataTLVLen;
+
+} // namespace Test
 namespace app {
-
-// constexpr uint8_t kTestFieldValue1 = 1;
-
-// constexpr chip::ClusterId kTestClusterId      = 3;
-// constexpr chip::EndpointId kTestEndpointId    = 1;
-// constexpr chip::DataVersion kTestDataVersion1 = 3;
-// constexpr chip::DataVersion kTestDataVersion2 = 5;
-
-// constexpr chip::DataVersion kRejectedDataVersion = 1;
-
-// constexpr chip::ClusterId kTestDeniedClusterId1 = 1000;
-
-// constexpr CommandId kTestNonExistCommandId = 0;
 
 CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
                                  const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,

@@ -11,38 +11,48 @@
 #include <messaging/ReliableMessageContext.h>
 
 namespace chip {
+uint8_t chip::Test::attributeDataTLV[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
+size_t chip::Test::attributeDataTLVLen = 0;
 namespace app {
 
-constexpr chip::ClusterId kTestClusterId   = 6;
-constexpr uint8_t kTestFieldValue1         = 1;
-constexpr chip::EndpointId kTestEndpointId = 1;
-
-// strong defintion in TestWriteInteraction.cpp
-__attribute__((weak)) CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor,
-                                                        const ConcreteDataAttributePath & aPath, TLV::TLVReader & aReader,
-                                                        WriteHandler * aWriteHandler)
-{
-
-    return CHIP_NO_ERROR;
-}
-
-// strong defintion in TestWriteInteraction.cpp
-__attribute__((weak)) const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath)
+// was previously in TestWriteInteraction.cpp
+const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath)
 {
     // Note: This test does not make use of the real attribute metadata.
     static EmberAfAttributeMetadata stub = { .defaultValue = EmberAfDefaultOrMinMaxAttributeValue(uint32_t(0)) };
     return &stub;
 }
 
-// strong defintion in TestAclAttribute.cpp
-__attribute__((weak)) bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
+// was previously in TestWriteInteraction.cpp
+CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
+                                  TLV::TLVReader & aReader, WriteHandler * aWriteHandler)
 {
-    return true;
+    if (aPath.mDataVersion.HasValue() && aPath.mDataVersion.Value() == Test::kRejectedDataVersion)
+    {
+        return aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::DataVersionMismatch);
+    }
+
+    TLV::TLVWriter writer;
+    writer.Init(chip::Test::attributeDataTLV);
+    writer.CopyElement(TLV::AnonymousTag(), aReader);
+    chip::Test::attributeDataTLVLen = writer.GetLengthWritten();
+    return aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::Success);
 }
 
-// strong defintion in TestAclAttribute.cpp
-__attribute__((weak)) Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
+// was previously in TestAclAttribute.cpp
+bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
 {
+    return aPath.mClusterId != Test::kTestDeniedClusterId1;
+}
+
+// was previously in TestAclAttribute.cpp
+Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
+{
+    if (aPath.mClusterId == Test::kTestDeniedClusterId1)
+    {
+        return Protocols::InteractionModel::Status::UnsupportedCluster;
+    }
+
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -63,30 +73,34 @@ __attribute__((weak)) void DispatchSingleClusterCommand(const ConcreteCommandPat
     return;
 }
 
-// strong defintion in TestReadInteraction.cpp
-__attribute__((weak)) bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
+// was previously in TestReadInteraction.cpp
+bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion)
+{
+    if (Test::kTestDataVersion1 == aRequiredVersion)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+// was previously in TestReadInteraction.cpp
+bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
 {
     return false;
 }
 
-// strong defintion in TestReadInteraction.cpp
-__attribute__((weak)) bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion)
-{
-    return false;
-}
-
-// strong defintion in TestReadInteraction.cpp
-__attribute__((weak)) CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
-                                                       const ConcreteReadAttributePath & aPath,
-                                                       AttributeReportIBs::Builder & aAttributeReports,
-                                                       AttributeEncodeState * apEncoderState)
+// was previously in TestReadInteraction.cpp
+CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
+                                 const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
+                                 AttributeEncodeState * apEncoderState)
 {
     if (aPath.mClusterId >= Test::kMockEndpointMin)
     {
         return Test::ReadSingleMockClusterData(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState);
     }
 
-    if (!(aPath.mClusterId == kTestClusterId && aPath.mEndpointId == kTestEndpointId))
+    if (!(aPath.mClusterId == Test::kTestClusterId && aPath.mEndpointId == Test::kTestEndpointId))
     {
         AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
         ReturnErrorOnFailure(aAttributeReports.GetError());
@@ -107,7 +121,7 @@ __attribute__((weak)) CHIP_ERROR ReadSingleClusterData(const Access::SubjectDesc
         return attributeReport.EndOfAttributeReportIB();
     }
 
-    return AttributeValueEncoder(aAttributeReports, aSubjectDescriptor, aPath, 0 /* dataVersion */).Encode(kTestFieldValue1);
+    return AttributeValueEncoder(aAttributeReports, aSubjectDescriptor, aPath, 0 /* dataVersion */).Encode(Test::kTestFieldValue1);
 }
 
 } // namespace app

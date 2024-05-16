@@ -135,36 +135,36 @@ source_set("ember-apptest-compatibility") {
   ]
 }
 
-chip_test_suite("tests_ember") {
-  output_name = "libAppTestsEMBER"
+# chip_test_suite("tests_ember") {
+#   output_name = "libAppTestsEMBER"
 
-  sources = [
-    "${chip_root}/src/messaging/tests/ReliableMessageContextTestAccess.h",
-    "CommandHandlerTestAccess.h",
-    "CommandSenderTestAccess.h",
-  ]
-  test_sources = [ "TestCommandInteraction.cpp" ]
+#   sources = [
+#     "${chip_root}/src/messaging/tests/ReliableMessageContextTestAccess.h",
+#     "CommandHandlerTestAccess.h",
+#     "CommandSenderTestAccess.h",
+#   ]
+#   test_sources = [ "TestCommandInteraction.cpp" ]
 
-  cflags = [ "-Wconversion" ]
+#   cflags = [ "-Wconversion" ]
 
-  public_deps = [
-    ":binding-test-srcs",
-    ":ember-apptest-compatibility",
-    ":operational-state-test-srcs",
-    ":ota-requestor-test-srcs",
-    ":time-sync-data-provider-test-srcs",
-    "${chip_root}/src/app",
-    "${chip_root}/src/app/common:cluster-objects",
-    "${chip_root}/src/app/icd/client:manager",
-    "${chip_root}/src/app/tests:helpers",
-    "${chip_root}/src/app/util/mock:mock_ember",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support:test_utils",
-    "${chip_root}/src/lib/support:testing",
-    "${chip_root}/src/lib/support:testing_nlunit",
-    "${nlunit_test_root}:nlunit-test",
-  ]
-}
+#   public_deps = [
+#     ":binding-test-srcs",
+#     ":ember-apptest-compatibility",
+#     ":operational-state-test-srcs",
+#     ":ota-requestor-test-srcs",
+#     ":time-sync-data-provider-test-srcs",
+#     "${chip_root}/src/app",
+#     "${chip_root}/src/app/common:cluster-objects",
+#     "${chip_root}/src/app/icd/client:manager",
+#     "${chip_root}/src/app/tests:helpers",
+#     "${chip_root}/src/app/util/mock:mock_ember",
+#     "${chip_root}/src/lib/core",
+#     "${chip_root}/src/lib/support:test_utils",
+#     "${chip_root}/src/lib/support:testing",
+#     "${chip_root}/src/lib/support:testing_nlunit",
+#     "${nlunit_test_root}:nlunit-test",
+#   ]
+# }
 
 chip_test_suite("tests") {
   output_name = "libAppTests"
@@ -177,8 +177,7 @@ chip_test_suite("tests") {
   test_sources = [
     "TestAclAttribute.cpp",
     "TestBuilderParser.cpp",
-
-    # "TestCommandInteraction.cpp",
+    "TestCommandInteraction.cpp",
     "TestMessageDef.cpp",
     "TestNullable.cpp",
     "TestStatusIB.cpp",
@@ -202,37 +201,6 @@ chip_test_suite("tests") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support:test_utils",
     "${chip_root}/src/lib/support:testing",
-    "${chip_root}/src/lib/support:testing_nlunit",
-    "${nlunit_test_root}:nlunit-test",
-  ]
-}
-
-chip_test_suite_using_nltest("tests_nltest_ember") {
-  output_name = "libAppTestsNLEMBER"
-
-  test_sources = [
-    "TestReadInteraction.cpp",
-    "TestWriteInteraction.cpp",
-  ]
-
-  cflags = [ "-Wconversion" ]
-
-  public_deps = [
-    ":binding-test-srcs",
-    ":ember-apptest-compatibility",
-    ":operational-state-test-srcs",
-    ":ota-requestor-test-srcs",
-    ":time-sync-data-provider-test-srcs",
-    "${chip_root}/src/app",
-    "${chip_root}/src/app/common:cluster-objects",
-    "${chip_root}/src/app/icd/client:manager",
-    "${chip_root}/src/app/tests:helpers",
-    "${chip_root}/src/app/util/mock:mock_ember",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support:test_utils",
-    "${chip_root}/src/lib/support:testing",
-    "${chip_root}/src/lib/support:testing_nlunit",
-    "${nlunit_test_root}:nlunit-test",
   ]
 }
 
@@ -263,9 +231,11 @@ chip_test_suite_using_nltest("tests_nltest") {
     "TestPendingNotificationMap.cpp",
     "TestPendingResponseTrackerImpl.cpp",
     "TestPowerSourceCluster.cpp",
+    "TestReadInteraction.cpp",
     "TestReportingEngine.cpp",
     "TestTestEventTriggerDelegate.cpp",
     "TestTimeSyncDataProvider.cpp",
+    "TestWriteInteraction.cpp",
   ]
 
   if (!chip_fake_platform) {

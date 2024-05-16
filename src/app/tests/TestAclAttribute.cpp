@@ -26,6 +26,7 @@
 #include <app/MessageDef/EventDataIB.h>
 #include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
+#include <app/tests/ember-test-compatibility.h>
 #include <app/util/basic-types.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
@@ -45,10 +46,10 @@ namespace {
 using namespace chip;
 using namespace chip::Access;
 
-chip::ClusterId kTestClusterId        = 1;
-chip::ClusterId kTestDeniedClusterId1 = 1000;
-chip::ClusterId kTestDeniedClusterId2 = 3;
-chip::EndpointId kTestEndpointId      = 4;
+// chip::ClusterId kTestClusterId        = 1;
+// chip::ClusterId kTestDeniedClusterId1 = 1000;
+// chip::ClusterId kTestDeniedClusterId2 = 3;
+// chip::EndpointId kTestEndpointId      = 4;
 
 class TestAccessControlDelegate : public AccessControl::Delegate
 {
@@ -56,7 +57,7 @@ public:
     CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const chip::Access::RequestPath & requestPath,
                      Privilege requestPrivilege) override
     {
-        if (requestPath.cluster == kTestDeniedClusterId2)
+        if (requestPath.cluster == chip::Test::kTestDeniedClusterId2)
         {
             return CHIP_ERROR_ACCESS_DENIED;
         }
@@ -111,21 +112,6 @@ public:
 
 namespace chip {
 namespace app {
-
-bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
-{
-    return aPath.mClusterId != kTestDeniedClusterId1;
-}
-
-Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
-{
-    if (aPath.mClusterId == kTestDeniedClusterId1)
-    {
-        return Protocols::InteractionModel::Status::UnsupportedCluster;
-    }
-
-    return Protocols::InteractionModel::Status::Success;
-}
 
 class TestAclAttribute : public ::testing::Test
 {
@@ -189,12 +175,12 @@ TEST_F(TestAclAttribute, TestACLDeniedAttribute)
                                    chip::app::ReadClient::InteractionType::Subscribe);
 
         chip::app::AttributePathParams attributePathParams[2];
-        attributePathParams[0].mEndpointId  = kTestEndpointId;
-        attributePathParams[0].mClusterId   = kTestDeniedClusterId1;
+        attributePathParams[0].mEndpointId  = chip::Test::kTestEndpointId;
+        attributePathParams[0].mClusterId   = chip::Test::kTestDeniedClusterId1;
         attributePathParams[0].mAttributeId = 1;
 
-        attributePathParams[1].mEndpointId  = kTestEndpointId;
-        attributePathParams[1].mClusterId   = kTestDeniedClusterId1;
+        attributePathParams[1].mEndpointId  = chip::Test::kTestEndpointId;
+        attributePathParams[1].mClusterId   = chip::Test::kTestDeniedClusterId1;
         attributePathParams[1].mAttributeId = 2;
 
         ReadPrepareParams readPrepareParams(pTestContext->GetSessionBobToAlice());
@@ -217,10 +203,10 @@ TEST_F(TestAclAttribute, TestACLDeniedAttribute)
 
         chip::app::AttributePathParams attributePathParams[2];
 
-        attributePathParams[0].mClusterId   = kTestDeniedClusterId2;
+        attributePathParams[0].mClusterId   = chip::Test::kTestDeniedClusterId2;
         attributePathParams[0].mAttributeId = 1;
 
-        attributePathParams[1].mClusterId   = kTestDeniedClusterId2;
+        attributePathParams[1].mClusterId   = chip::Test::kTestDeniedClusterId2;
         attributePathParams[1].mAttributeId = 2;
 
         ReadPrepareParams readPrepareParams(pTestContext->GetSessionBobToAlice());
@@ -242,12 +228,12 @@ TEST_F(TestAclAttribute, TestACLDeniedAttribute)
                                    chip::app::ReadClient::InteractionType::Subscribe);
 
         chip::app::AttributePathParams attributePathParams[2];
-        attributePathParams[0].mEndpointId  = kTestEndpointId;
-        attributePathParams[0].mClusterId   = kTestDeniedClusterId1;
+        attributePathParams[0].mEndpointId  = chip::Test::kTestEndpointId;
+        attributePathParams[0].mClusterId   = chip::Test::kTestDeniedClusterId1;
         attributePathParams[0].mAttributeId = 1;
 
-        attributePathParams[1].mEndpointId  = kTestEndpointId;
-        attributePathParams[1].mClusterId   = kTestClusterId;
+        attributePathParams[1].mEndpointId  = chip::Test::kTestEndpointId;
+        attributePathParams[1].mClusterId   = chip::Test::kTestClusterId;
         attributePathParams[1].mAttributeId = 2;
 
         ReadPrepareParams readPrepareParams(pTestContext->GetSessionBobToAlice());

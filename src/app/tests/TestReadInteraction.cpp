@@ -56,14 +56,14 @@ uint8_t gDebugEventBuffer[128];
 uint8_t gInfoEventBuffer[128];
 uint8_t gCritEventBuffer[128];
 chip::app::CircularEventBuffer gCircularEventBuffer[3];
-chip::ClusterId kTestClusterId          = 6;
-chip::ClusterId kTestEventClusterId     = chip::Test::MockClusterId(1);
-chip::ClusterId kInvalidTestClusterId   = 7;
-chip::EndpointId kTestEndpointId        = 1;
-chip::EndpointId kTestEventEndpointId   = chip::Test::kMockEndpoint1;
-chip::EventId kTestEventIdDebug         = chip::Test::MockEventId(1);
-chip::EventId kTestEventIdCritical      = chip::Test::MockEventId(2);
-uint8_t kTestFieldValue1                = 1;
+chip::ClusterId kTestClusterId        = 6;
+chip::ClusterId kTestEventClusterId   = chip::Test::MockClusterId(1);
+chip::ClusterId kInvalidTestClusterId = 7;
+chip::EndpointId kTestEndpointId      = 1;
+chip::EndpointId kTestEventEndpointId = chip::Test::kMockEndpoint1;
+chip::EventId kTestEventIdDebug       = chip::Test::MockEventId(1);
+chip::EventId kTestEventIdCritical    = chip::Test::MockEventId(2);
+// uint8_t kTestFieldValue1                = 1;
 chip::TLV::Tag kTestEventTag            = chip::TLV::ContextTag(1);
 chip::EndpointId kInvalidTestEndpointId = 3;
 chip::DataVersion kTestDataVersion1     = 3;
@@ -297,53 +297,54 @@ using ReadHandlerNode     = chip::app::reporting::ReportScheduler::ReadHandlerNo
 namespace chip {
 namespace app {
 
-CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
-                                 const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
-                                 AttributeEncodeState * apEncoderState)
-{
-    if (aPath.mClusterId >= Test::kMockEndpointMin)
-    {
-        return Test::ReadSingleMockClusterData(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState);
-    }
+// CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
+//                                  const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
+//                                  AttributeEncodeState * apEncoderState)
+// {
+//     if (aPath.mClusterId >= Test::kMockEndpointMin)
+//     {
+//         return Test::ReadSingleMockClusterData(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState);
+//     }
 
-    if (!(aPath.mClusterId == kTestClusterId && aPath.mEndpointId == kTestEndpointId))
-    {
-        AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
-        ReturnErrorOnFailure(aAttributeReports.GetError());
-        ChipLogDetail(DataManagement, "TEST Cluster %" PRIx32 ", Field %" PRIx32 " is dirty", aPath.mClusterId, aPath.mAttributeId);
+//     if (!(aPath.mClusterId == kTestClusterId && aPath.mEndpointId == kTestEndpointId))
+//     {
+//         AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
+//         ReturnErrorOnFailure(aAttributeReports.GetError());
+//         ChipLogDetail(DataManagement, "TEST Cluster %" PRIx32 ", Field %" PRIx32 " is dirty", aPath.mClusterId,
+//         aPath.mAttributeId);
 
-        AttributeStatusIB::Builder & attributeStatus = attributeReport.CreateAttributeStatus();
-        ReturnErrorOnFailure(attributeReport.GetError());
-        AttributePathIB::Builder & attributePath = attributeStatus.CreatePath();
-        ReturnErrorOnFailure(attributeStatus.GetError());
+//         AttributeStatusIB::Builder & attributeStatus = attributeReport.CreateAttributeStatus();
+//         ReturnErrorOnFailure(attributeReport.GetError());
+//         AttributePathIB::Builder & attributePath = attributeStatus.CreatePath();
+//         ReturnErrorOnFailure(attributeStatus.GetError());
 
-        attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
-        ReturnErrorOnFailure(attributePath.GetError());
-        StatusIB::Builder & errorStatus = attributeStatus.CreateErrorStatus();
-        ReturnErrorOnFailure(attributeStatus.GetError());
-        errorStatus.EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::UnsupportedAttribute));
-        ReturnErrorOnFailure(errorStatus.GetError());
-        ReturnErrorOnFailure(attributeStatus.EndOfAttributeStatusIB());
-        return attributeReport.EndOfAttributeReportIB();
-    }
+//         attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
+//         ReturnErrorOnFailure(attributePath.GetError());
+//         StatusIB::Builder & errorStatus = attributeStatus.CreateErrorStatus();
+//         ReturnErrorOnFailure(attributeStatus.GetError());
+//         errorStatus.EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::UnsupportedAttribute));
+//         ReturnErrorOnFailure(errorStatus.GetError());
+//         ReturnErrorOnFailure(attributeStatus.EndOfAttributeStatusIB());
+//         return attributeReport.EndOfAttributeReportIB();
+//     }
 
-    return AttributeValueEncoder(aAttributeReports, aSubjectDescriptor, aPath, 0 /* dataVersion */).Encode(kTestFieldValue1);
-}
+//     return AttributeValueEncoder(aAttributeReports, aSubjectDescriptor, aPath, 0 /* dataVersion */).Encode(kTestFieldValue1);
+// }
 
-bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion)
-{
-    if (kTestDataVersion1 == aRequiredVersion)
-    {
-        return true;
-    }
+// bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion)
+// {
+//     if (kTestDataVersion1 == aRequiredVersion)
+//     {
+//         return true;
+//     }
 
-    return false;
-}
+//     return false;
+// }
 
-bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
-{
-    return false;
-}
+// bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
+// {
+//     return false;
+// }
 
 class TestReadInteraction
 {
