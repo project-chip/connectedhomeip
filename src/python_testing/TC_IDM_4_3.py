@@ -26,8 +26,9 @@ from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import AttributePath, TypedAttributePath
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
-from matter_testing_support import (AttributeChangeCallback, MatterBaseTest, async_test_body, default_matter_test_main,
-                                    wait_for_attribute_report)
+from matter_testing_support import (MatterBaseTest, async_test_body, default_matter_test_main)
+# from matter_testing_support import (AttributeChangeCallback, MatterBaseTest, async_test_body, default_matter_test_main,
+#                                     wait_for_attribute_report)
 from mobly import asserts
 
 '''
@@ -47,7 +48,49 @@ class TC_IDM_4_3(MatterBaseTest):
 
     @async_test_body
     async def test_TC_IDM_4_3(self):
-        print()
+
+        # Test setup
+        node_label_attr = Clusters.BasicInformation.Attributes.NodeLabel
+        node_label_attr_path = [(0, node_label_attr)]
+        TH: ChipDeviceController = self.default_controller
+
+        # *** Step 1a ***
+        self.print_step("1a", "DUT and TH activate the subscription.")
+
+        # Subscribe to attribute
+        sub_th_step1a = await TH.ReadAttribute(
+            nodeid=self.dut_node_id,
+            attributes=node_label_attr_path,
+            reportInterval=(3, 10),
+            keepSubscriptions=False
+        )
+        
+        # Verify that the subscription is activated between TH and DUT
+        # Verify on the TH, a report data message is received.
+        asserts.assert_true(sub_th_step1a.subscriptionId, "Subscription not activated")
+
+        # Verify subscriptionId field is present
+        asserts.assert_is_not_none(sub_th_step1a.subscriptionId, "SubscriptionId field not present")
+
+        # Verify MaxInterval field is present
+        sub_th_step1a_intervals = sub_th_step1a.GetReportingIntervalsSeconds()
+        sub_th_step1a_min_interval_sec, sub_th_step1a_max_interval_sec = sub_th_step1a_intervals
+        asserts.assert_is_not_none(sub_th_step1a_max_interval_sec, "MaxInterval field not present")
+
+        sub_th_step1a.Shutdown()
+
+        # *** Step 1b ***
+        self.print_step("1b", "Change the value of the attribute which has been subscribed on the DUT by manually changing some settings on the device.")
+
+        # Modify attribute value
+        new_node_label_write = "NewNodeLabel_11001100"
+        await TH.WriteAttribute(
+            self.dut_node_id,
+            [(0, node_label_attr(value=new_node_label_write))]
+        )
+        
+        
+        
 
 
 if __name__ == "__main__":
