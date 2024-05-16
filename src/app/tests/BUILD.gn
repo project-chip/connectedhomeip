@@ -120,19 +120,46 @@ source_set("operational-state-test-srcs") {
   ]
 }
 
+source_set("ember-apptest-compatibility") {
+  sources = [
+    "ember-test-compatibility.cpp",
+    "ember-test-compatibility.h",
+  ]
+  public_configs = [ "${chip_root}/src/lib/support/pw_log_chip:config" ]
+
+  public_deps = [
+    "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
 chip_test_suite("tests") {
   output_name = "libAppTests"
 
-  test_sources = [ "TestReportingEngine.cpp" ]
-
   sources = [
+    "${chip_root}/src/messaging/tests/ReliableMessageContextTestAccess.h",
+    "CommandHandlerTestAccess.h",
+    "CommandSenderTestAccess.h",
     "EngineTestAccess.h",
     "ReadHandlerTestAccess.h",
   ]
+  test_sources = [
+    "TestAclAttribute.cpp",
+    "TestBuilderParser.cpp",
+    "TestMessageDef.cpp",
+    "TestNullable.cpp",
+    "TestReportingEngine.cpp",
+    "TestStatusIB.cpp",
+    "TestStatusResponseMessage.cpp",
+    "TestTimedHandler.cpp",
+  ]
+
   cflags = [ "-Wconversion" ]
 
   public_deps = [
     ":binding-test-srcs",
+    ":ember-apptest-compatibility",
     ":operational-state-test-srcs",
     ":ota-requestor-test-srcs",
     ":time-sync-data-provider-test-srcs",
@@ -159,7 +186,6 @@ chip_test_suite_using_nltest("tests_nltest") {
     "TestAttributeValueEncoder.cpp",
     "TestBasicCommandPathRegistry.cpp",
     "TestBindingTable.cpp",
-    "TestBuilderParser.cpp",
     "TestClusterInfo.cpp",
     "TestCommandInteraction.cpp",
     "TestCommandPathParams.cpp",
@@ -171,27 +197,20 @@ chip_test_suite_using_nltest("tests_nltest") {
     "TestEventPathParams.cpp",
     "TestFabricScopedEventLogging.cpp",
     "TestInteractionModelEngine.cpp",
-    "TestMessageDef.cpp",
-    "TestNullable.cpp",
     "TestNumericAttributeTraits.cpp",
     "TestOperationalStateClusterObjects.cpp",
     "TestPendingNotificationMap.cpp",
     "TestPendingResponseTrackerImpl.cpp",
     "TestPowerSourceCluster.cpp",
     "TestReadInteraction.cpp",
-    "TestStatusIB.cpp",
-    "TestStatusResponseMessage.cpp",
     "TestTestEventTriggerDelegate.cpp",
     "TestTimeSyncDataProvider.cpp",
-    "TestTimedHandler.cpp",
     "TestWriteInteraction.cpp",
   ]
 
   if (!chip_fake_platform) {
     test_sources += [ "TestFailSafeContext.cpp" ]
   }
-
-  test_sources += [ "TestAclAttribute.cpp" ]
 
   # DefaultICDClientStorage assumes that raw AES key is used by the application
   if (chip_crypto != "psa") {
@@ -230,6 +249,7 @@ chip_test_suite_using_nltest("tests_nltest") {
 
   public_deps = [
     ":binding-test-srcs",
+    ":ember-apptest-compatibility",
     ":operational-state-test-srcs",
     ":ota-requestor-test-srcs",
     ":time-sync-data-provider-test-srcs",
