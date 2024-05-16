@@ -287,7 +287,7 @@ void Resolver::OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeDat
 
         result.address.SetPort(nodeData.resolutionData.port);
         result.address.SetInterface(nodeData.resolutionData.interfaceId);
-        result.mrpRemoteConfig = nodeData.resolutionData.GetRemoteMRPConfig();
+        result.mrpRemoteConfig   = nodeData.resolutionData.GetRemoteMRPConfig();
         result.supportsTcpClient = nodeData.resolutionData.supportsTcpClient;
         result.supportsTcpServer = nodeData.resolutionData.supportsTcpServer;
 
