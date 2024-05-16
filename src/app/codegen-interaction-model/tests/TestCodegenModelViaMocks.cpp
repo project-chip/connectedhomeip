@@ -25,10 +25,10 @@
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <app/util/attribute-storage-null-handling.h>
-#include <app/util/odd-sized-integers.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <app/util/mock/MockNodeConfig.h>
+#include <app/util/odd-sized-integers.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVReader.h>
