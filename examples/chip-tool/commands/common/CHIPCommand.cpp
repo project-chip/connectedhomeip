@@ -153,9 +153,9 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
 
     auto engine = chip::app::InteractionModelEngine::GetInstance();
     VerifyOrReturnError(engine != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnLogErrorOnFailure(chipToolCheckInDelegate()->Init(&sICDClientStorage, engine));
+    ReturnLogErrorOnFailure(ChipToolCheckInDelegate()->Init(&sICDClientStorage, engine));
     ReturnLogErrorOnFailure(sCheckInHandler.Init(DeviceControllerFactory::GetInstance().GetSystemState()->ExchangeMgr(),
-                                                 &sICDClientStorage, chipToolCheckInDelegate(), engine));
+                                                 &sICDClientStorage, ChipToolCheckInDelegate(), engine));
 
     CommissionerIdentity nullIdentity{ kIdentityNull, chip::kUndefinedNodeId };
     ReturnLogErrorOnFailure(InitializeCommissioner(nullIdentity, kIdentityNullFabricId));
