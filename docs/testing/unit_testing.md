@@ -13,7 +13,7 @@
 
 ## Unit testing in the SDK using pw_unit_test
 
-This SDK uses Pigweed unit tests (pw_unit_test), which are an implementation of GoogleTest.  For more information see the [pw_unit_test documentation](https://pigweed.dev/pw_unit_test/) or the [GoogleTest documentation](https://google.github.io/googletest/).
+This SDK uses Pigweed unit test (pw_unit_test), which is an implementation of GoogleTest.  For more information see the [pw_unit_test documentation](https://pigweed.dev/pw_unit_test/) or the [GoogleTest documentation](https://google.github.io/googletest/).
 
 ### Simple unit tests
 
