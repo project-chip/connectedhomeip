@@ -251,26 +251,27 @@ If you override one of the setup/teardown functions make sure to invoke the pare
 
 -   Add to `src/some_directory/tests/BUILD.gn`
     - Example
-        - ```chip_test_suite("tests") {
-  output_name = "libSomethingTests"
+        ```
+        chip_test_suite("tests") {
+            output_name = "libSomethingTests"
 
-  test_sources = [
-    "TestSuite1.cpp",
-    "TestSuite2.cpp",
-    // Other test source files go here.
-  ]
+            test_sources = [
+                "TestSuite1.cpp",
+                "TestSuite2.cpp",
+                // Other test source files go here.
+            ]
 
-  sources = [
-    // Non-test source files go here.
-  ]
+            sources = [
+                // Non-test source files go here.
+            ]
 
-  cflags = [ "-Wconversion" ]
+            cflags = [ "-Wconversion" ]
 
-  public_deps = [
-    // Dependencies go here.
-  ]
-}
-```
+            public_deps = [
+                // Dependencies go here.
+            ]
+        }
+        ```
     - Another example: [src/lib/support/tests/BUILD.gn](https://github.com/project-chip/connectedhomeip/blob/master/src/lib/support/tests/BUILD.gn)
 -   Build and run all tests with [./gn_build.sh](https://github.com/project-chip/connectedhomeip/blob/master/gn_build.sh)
     -   CI runs this, so any unit tests that get added will automatically be
