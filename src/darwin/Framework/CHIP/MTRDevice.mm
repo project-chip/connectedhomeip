@@ -981,7 +981,7 @@ static NSString * const sAttributesKey = @"attributes";
     // Bit 2 Ethernet
     uint32_t networkCommissioningClusterFeatureMapValue = static_cast<uint32_t>(networkCommissioningClusterFeatureMapValueNumber.unsignedLongValue);
 
-    return (networkCommissioningClusterFeatureMapValue & (1 << 1)) ? YES : NO;
+    return (networkCommissioningClusterFeatureMapValue & MTRNetworkCommissioningFeatureThreadNetworkInterface) != 0 ? YES : NO;
 }
 
 - (void)_clearSubscriptionPoolWork
