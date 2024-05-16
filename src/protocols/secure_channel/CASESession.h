@@ -212,7 +212,7 @@ public:
     bool InvokeBackgroundWorkWatchdog();
 
 private:
-    friend class TestCASESessionWithManager;
+    friend class TestCASESession;
 
     using AutoReleaseSessionKey = Crypto::AutoReleaseSymmetricKey<Crypto::Aes128KeyHandle>;
 

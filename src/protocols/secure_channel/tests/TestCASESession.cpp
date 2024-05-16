@@ -54,6 +54,84 @@ using namespace chip::Protocols;
 using namespace chip::Crypto;
 
 namespace chip {
+class TestCASESecurePairingDelegate;
+
+class TestCASESession : public Test::LoopbackMessagingContext, public ::testing::Test
+{
+public:
+    // Performs shared setup for all tests in the test suite
+    static void SetUpTestSuite();
+    // Performs shared teardown for all tests in the test suite
+    static void TearDownTestSuite();
+    void SetUp() override { chip::Test::LoopbackMessagingContext::SetUp(); }
+    void TearDown() override { chip::Test::LoopbackMessagingContext::TearDown(); }
+
+    void ServiceEvents();
+    void SecurePairingHandshakeTestCommon(SessionManager & sessionManager, CASESession & pairingCommissioner,
+                                          TestCASESecurePairingDelegate & delegateCommissioner);
+
+    void SimulateUpdateNOCInvalidatePendingEstablishment();
+};
+
+void TestCASESession::ServiceEvents()
+{
+    // Takes a few rounds of this because handling IO messages may schedule work,
+    // and scheduled work may queue messages for sending...
+    for (int i = 0; i < 3; ++i)
+    {
+        DrainAndServiceIO();
+
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(
+            [](intptr_t) -> void { chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); }, (intptr_t) nullptr);
+        chip::DeviceLayer::PlatformMgr().RunEventLoop();
+    }
+}
+
+class TemporarySessionManager
+{
+public:
+    TemporarySessionManager(TestCASESession & ctx) : mCtx(ctx)
+    {
+        EXPECT_EQ(CHIP_NO_ERROR,
+                  mSessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &ctx.GetMessageCounterManager(), &mStorage,
+                                       &ctx.GetFabricTable(), ctx.GetSessionKeystore()));
+        // The setup here is really weird: we are using one session manager for
+        // the actual messages we send (the PASE handshake, so the
+        // unauthenticated sessions) and a different one for allocating the PASE
+        // sessions.  Since our Init() set us up as the thing to handle messages
+        // on the transport manager, undo that.
+        mCtx.GetTransportMgr().SetSessionManager(&mCtx.GetSecureSessionManager());
+    }
+
+    ~TemporarySessionManager()
+    {
+        mSessionManager.Shutdown();
+        // Reset the session manager on the transport again, just in case
+        // shutdown messed with it.
+        mCtx.GetTransportMgr().SetSessionManager(&mCtx.GetSecureSessionManager());
+    }
+
+    operator SessionManager &() { return mSessionManager; }
+
+private:
+    TestCASESession & mCtx;
+    TestPersistentStorageDelegate mStorage;
+    SessionManager mSessionManager;
+};
+
+CHIP_ERROR InitFabricTable(chip::FabricTable & fabricTable, chip::TestPersistentStorageDelegate * testStorage,
+                           chip::Crypto::OperationalKeystore * opKeyStore,
+                           chip::Credentials::PersistentStorageOpCertStore * opCertStore)
+{
+    ReturnErrorOnFailure(opCertStore->Init(testStorage));
+
+    chip::FabricTable::InitParams initParams;
+    initParams.storage             = testStorage;
+    initParams.operationalKeystore = opKeyStore;
+    initParams.opCertStore         = opCertStore;
+
+    return fabricTable.Init(initParams);
+}
 
 class TestCASESecurePairingDelegate : public SessionEstablishmentDelegate
 {
@@ -132,7 +210,6 @@ protected:
     FabricIndex mSingleFabricIndex = kUndefinedFabricIndex;
 };
 
-namespace {
 #if CHIP_CONFIG_SLOW_CRYPTO
 constexpr uint32_t sTestCaseMessageCount           = 8;
 constexpr uint32_t sTestCaseResumptionMessageCount = 6;
@@ -161,124 +238,6 @@ CASEServer gPairingServer;
 
 NodeId Node01_01 = 0xDEDEDEDE00010001;
 NodeId Node01_02 = 0xDEDEDEDE00010002;
-} // namespace
-
-class TestCASESession : public Test::LoopbackMessagingContext, public ::testing::Test
-{
-public:
-    static void SetUpTestSuite()
-    {
-        ConfigInitializeNodes(false);
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        LoopbackMessagingContext::SetUpTestSuite();
-        err = chip::DeviceLayer::PlatformMgr().InitChipStack();
-
-        ASSERT_EQ(err, CHIP_NO_ERROR) << "Init CHIP stack failed: " << std::hex << err.Format();
-        err = InitFabricTable(gCommissionerFabrics, &gCommissionerStorageDelegate, /* opKeyStore = */ nullptr,
-                              &gCommissionerOpCertStore);
-        ASSERT_EQ(err, CHIP_NO_ERROR) << "InitFabricTable failed: " << std::hex << err.Format();
-
-        err = InitCredentialSets();
-        ASSERT_EQ(err, CHIP_NO_ERROR) << "InitCredentialSets failed: " << std::hex << err.Format();
-        chip::DeviceLayer::SetSystemLayerForTesting(&GetSystemLayer());
-    }
-
-    static void TearDownTestSuite()
-    {
-        chip::DeviceLayer::SetSystemLayerForTesting(nullptr);
-        gDeviceOperationalKeystore.Shutdown();
-        gPairingServer.Shutdown();
-        gCommissionerStorageDelegate.ClearStorage();
-        gDeviceStorageDelegate.ClearStorage();
-        gCommissionerFabrics.DeleteAllFabrics();
-        gDeviceFabrics.DeleteAllFabrics();
-        chip::DeviceLayer::PlatformMgr().Shutdown();
-        LoopbackMessagingContext::TearDownTestSuite();
-    }
-
-    void SetUp() override { chip::Test::LoopbackMessagingContext::SetUp(); }
-    void TearDown() override { chip::Test::LoopbackMessagingContext::TearDown(); }
-
-    void ServiceEvents()
-    {
-        // Takes a few rounds of this because handling IO messages may schedule work,
-        // and scheduled work may queue messages for sending...
-        for (int i = 0; i < 3; ++i)
-        {
-            DrainAndServiceIO();
-
-            chip::DeviceLayer::PlatformMgr().ScheduleWork(
-                [](intptr_t) -> void { chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); }, (intptr_t) nullptr);
-            chip::DeviceLayer::PlatformMgr().RunEventLoop();
-        }
-    };
-
-    static CHIP_ERROR InitCredentialSets();
-    static CHIP_ERROR InitFabricTable(chip::FabricTable & fabricTable, chip::TestPersistentStorageDelegate * testStorage,
-                                      chip::Crypto::OperationalKeystore * opKeyStore,
-                                      chip::Credentials::PersistentStorageOpCertStore * opCertStore);
-
-    void SecurePairingHandshakeTestCommon(SessionManager & sessionManager, CASESession & pairingCommissioner,
-                                          TestCASESecurePairingDelegate & delegateCommissioner);
-};
-
-class TestCASESessionWithManager : public TestCASESession
-{
-public:
-    static void SetUpTestSuite() { TestCASESession::SetUpTestSuite(); }
-    static void TearDownTestSuite() { TestCASESession::TearDownTestSuite(); }
-    void SetUp() override
-    {
-        TestCASESession::SetUp();
-        SetUpSessionManager();
-    }
-
-    void TearDown() override
-    {
-        TestCASESession::TearDown();
-        TearDownSessionManager();
-    }
-
-    void SimulateUpdateNOCInvalidatePendingEstablishment();
-
-    void SetUpSessionManager()
-    {
-        EXPECT_EQ(CHIP_NO_ERROR,
-                  sessionManager.Init(&GetSystemLayer(), &GetTransportMgr(), &GetMessageCounterManager(), &mStorage,
-                                      &GetFabricTable(), GetSessionKeystore()));
-        // The setup here is really weird: we are using one session manager for
-        // the actual messages we send (the PASE handshake, so the
-        // unauthenticated sessions) and a different one for allocating the PASE
-        // sessions.  Since our Init() set us up as the thing to handle messages
-        // on the transport manager, undo that.
-        GetTransportMgr().SetSessionManager(&GetSecureSessionManager());
-    }
-
-    void TearDownSessionManager()
-    {
-        sessionManager.Shutdown();
-        // Reset the session manager on the transport again, just in case
-        // shutdown messed with it.
-        GetTransportMgr().SetSessionManager(&GetSecureSessionManager());
-    }
-
-    TestPersistentStorageDelegate mStorage;
-    SessionManager sessionManager;
-};
-
-CHIP_ERROR TestCASESession::InitFabricTable(chip::FabricTable & fabricTable, chip::TestPersistentStorageDelegate * testStorage,
-                                            chip::Crypto::OperationalKeystore * opKeyStore,
-                                            chip::Credentials::PersistentStorageOpCertStore * opCertStore)
-{
-    ReturnErrorOnFailure(opCertStore->Init(testStorage));
-
-    chip::FabricTable::InitParams initParams;
-    initParams.storage             = testStorage;
-    initParams.operationalKeystore = opKeyStore;
-    initParams.opCertStore         = opCertStore;
-
-    return fabricTable.Init(initParams);
-}
 
 CHIP_ERROR InitTestIpk(GroupDataProvider & groupDataProvider, const FabricInfo & fabricInfo, size_t numIpks)
 {
@@ -302,7 +261,7 @@ CHIP_ERROR InitTestIpk(GroupDataProvider & groupDataProvider, const FabricInfo &
     return groupDataProvider.SetKeySet(fabricInfo.GetFabricIndex(), compressedIdSpan, ipkKeySet);
 }
 
-CHIP_ERROR TestCASESession::InitCredentialSets()
+CHIP_ERROR InitCredentialSets()
 {
     gCommissionerStorageDelegate.ClearStorage();
     gCommissionerGroupDataProvider.SetStorageDelegate(&gCommissionerStorageDelegate);
@@ -374,12 +333,41 @@ CHIP_ERROR TestCASESession::InitCredentialSets()
     return CHIP_NO_ERROR;
 }
 
-// Specifically for SimulateUpdateNOCInvalidatePendingEstablishment, we need it to be static so that the class below can
-// be a friend to CASESession so that test can get access to CASESession::State and test method that are not public. To
-// keep the rest of this file consistent we brought all other tests into this class.
-
-TEST_F(TestCASESessionWithManager, SecurePairingWaitTest)
+void TestCASESession::SetUpTestSuite()
 {
+    ConfigInitializeNodes(false);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    LoopbackMessagingContext::SetUpTestSuite();
+
+    err = chip::DeviceLayer::PlatformMgr().InitChipStack();
+    ASSERT_EQ(err, CHIP_NO_ERROR) << "Init CHIP stack failed: " << std::hex << err.Format();
+
+    err =
+        InitFabricTable(gCommissionerFabrics, &gCommissionerStorageDelegate, /* opKeyStore = */ nullptr, &gCommissionerOpCertStore);
+    ASSERT_EQ(err, CHIP_NO_ERROR) << "InitFabricTable failed: " << std::hex << err.Format();
+
+    err = InitCredentialSets();
+    ASSERT_EQ(err, CHIP_NO_ERROR) << "InitCredentialSets failed: " << std::hex << err.Format();
+
+    chip::DeviceLayer::SetSystemLayerForTesting(&GetSystemLayer());
+}
+
+void TestCASESession::TearDownTestSuite()
+{
+    chip::DeviceLayer::SetSystemLayerForTesting(nullptr);
+    gDeviceOperationalKeystore.Shutdown();
+    gPairingServer.Shutdown();
+    gCommissionerStorageDelegate.ClearStorage();
+    gDeviceStorageDelegate.ClearStorage();
+    gCommissionerFabrics.DeleteAllFabrics();
+    gDeviceFabrics.DeleteAllFabrics();
+    chip::DeviceLayer::PlatformMgr().Shutdown();
+    LoopbackMessagingContext::TearDownTestSuite();
+}
+
+TEST_F(TestCASESession, SecurePairingWaitTest)
+{
+    TemporarySessionManager sessionManager(*this);
     // Test all combinations of invalid parameters
     TestCASESecurePairingDelegate delegate;
     FabricTable fabrics;
@@ -404,8 +392,9 @@ TEST_F(TestCASESessionWithManager, SecurePairingWaitTest)
     caseSession.Clear();
 }
 
-TEST_F(TestCASESessionWithManager, SecurePairingStartTest)
+TEST_F(TestCASESession, SecurePairingStartTest)
 {
+    TemporarySessionManager sessionManager(*this);
     // Test all combinations of invalid parameters
     TestCASESecurePairingDelegate delegate;
     CASESession pairing;
@@ -508,8 +497,9 @@ void TestCASESession::SecurePairingHandshakeTestCommon(SessionManager & sessionM
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 }
 
-TEST_F(TestCASESessionWithManager, SecurePairingHandshakeTest)
+TEST_F(TestCASESession, SecurePairingHandshakeTest)
 {
+    TemporarySessionManager sessionManager(*this);
     TestCASESecurePairingDelegate delegateCommissioner;
     CASESession pairingCommissioner;
     pairingCommissioner.SetGroupDataProvider(&gCommissionerGroupDataProvider);
@@ -569,8 +559,9 @@ TEST_F(TestCASESession, SecurePairingHandshakeServerTest)
     gPairingServer.Shutdown();
 }
 
-TEST_F(TestCASESessionWithManager, ClientReceivesBusyTest)
+TEST_F(TestCASESession, ClientReceivesBusyTest)
 {
+    TemporarySessionManager sessionManager(*this);
     TestCASESecurePairingDelegate delegateCommissioner1, delegateCommissioner2;
     CASESession pairingCommissioner1, pairingCommissioner2;
 
@@ -1023,10 +1014,12 @@ TEST_F(TestCASESession, SessionResumptionStorage)
         chip::Platform::Delete(pairingCommissioner);
     }
 }
+// #endif
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-TEST_F_FROM_FIXTURE(TestCASESessionWithManager, SimulateUpdateNOCInvalidatePendingEstablishment)
+TEST_F_FROM_FIXTURE(TestCASESession, SimulateUpdateNOCInvalidatePendingEstablishment)
 {
+    TemporarySessionManager sessionManager(*this);
     TestCASESecurePairingDelegate delegateCommissioner;
     CASESession pairingCommissioner;
     pairingCommissioner.SetGroupDataProvider(&gCommissionerGroupDataProvider);
@@ -1089,7 +1082,6 @@ TEST_F_FROM_FIXTURE(TestCASESessionWithManager, SimulateUpdateNOCInvalidatePendi
 }
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
-namespace {
 class ExpectErrorExchangeDelegate : public ExchangeDelegate
 {
 public:
@@ -1119,7 +1111,6 @@ private:
 
     uint16_t mExpectedProtocolCode;
 };
-} // anonymous namespace
 
 TEST_F(TestCASESession, Sigma1BadDestinationIdTest)
 {
@@ -1129,7 +1120,7 @@ TEST_F(TestCASESession, Sigma1BadDestinationIdTest)
 
     constexpr size_t bufferSize     = 600;
     System::PacketBufferHandle data = chip::System::PacketBufferHandle::New(bufferSize);
-    EXPECT_FALSE(data.IsNull());
+    ASSERT_FALSE(data.IsNull());
 
     MutableByteSpan buf(data->Start(), data->AvailableDataLength());
     // This uses a bogus destination id that is not going to match anything in practice.
@@ -1152,7 +1143,7 @@ TEST_F(TestCASESession, Sigma1BadDestinationIdTest)
 
     ExpectErrorExchangeDelegate delegate(SecureChannel::kProtocolCodeNoSharedRoot);
     ExchangeContext * exchange = GetExchangeManager().NewContext(session.Value(), &delegate);
-    EXPECT_NE(exchange, nullptr);
+    ASSERT_NE(exchange, nullptr);
 
     err = exchange->SendMessage(MsgType::CASE_Sigma1, std::move(data), SendMessageFlags::kExpectResponse);
     EXPECT_EQ(err, CHIP_NO_ERROR);
