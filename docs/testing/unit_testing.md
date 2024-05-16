@@ -11,7 +11,9 @@
     example applications.
     -   e.g. feature combinations not in example apps.
 
-## Unit testing in the SDK - pw_unit_test
+## Unit testing in the SDK using pw_unit_test
+
+This SDK uses Pigweed unit tests (pw_unit_test), which are an implementation of GoogleTest.  For more information see the [pw_unit_test documentation](https://pigweed.dev/pw_unit_test/) or the [GoogleTest documentation](https://google.github.io/googletest/).
 
 ### Simple unit tests
 
@@ -56,7 +58,7 @@ In the above example there are no fixtures or setup/teardown behavior.
 
 If your tests need fixtures or some kind of setup/teardown you will need to define a test context that derives from `::testing::Test`.
 Each of your test functions will be defined with `TEST_F(NameOfTestContext, NameOfFunction)`.
-The following example demonstrates how to use pw_unit_test to write a unit test that uses fixtures and setup/teardown.
+The following example demonstrates how to use pw_unit_test to write a unit test that uses fixtures and setup/teardown behavior.
 
 ```
 #include <gtest/gtest.h>
@@ -247,7 +249,7 @@ If you override one of the setup/teardown functions make sure to invoke the pare
     - For an example see `ICDConfigurationDataTestAccess` which is defined in [ICDConfigurationDataTestAccess.h](https://github.com/project-chip/connectedhomeip/blob/master/src/app/icd/server/tests/ICDConfigurationDataTestAccess.h), friends the underlying class in [ICDConfigurationData.h](https://github.com/project-chip/connectedhomeip/blob/master/src/app/icd/server/ICDConfigurationData.h), is included as a source in [BUILD.gn](https://github.com/project-chip/connectedhomeip/blob/master/src/app/icd/server/tests/BUILD.gn), and is used by a test in [TestICDManager.cpp](https://github.com/project-chip/connectedhomeip/blob/master/src/app/icd/server/tests/TestICDManager.cpp).
     - For another example see `TCPBaseTestAccess` which is defined in [TCPBaseTestAccess.h](https://github.com/project-chip/connectedhomeip/blob/master/src/transport/raw/tests/TCPBaseTestAccess.h), friends the underlying class in [TCP.h](https://github.com/project-chip/connectedhomeip/blob/master/src/transport/raw/TCP.h), is included as a source in [BUILD.gn](https://github.com/project-chip/connectedhomeip/blob/master/src/transport/raw/tests/BUILD.gn), and is used by a test in [TestTCP.cpp](https://github.com/project-chip/connectedhomeip/blob/master/src/transport/raw/tests/TestTCP.cpp).
 
-## pw_unit_test - Compiling and running
+## Compiling and running
 
 -   Add to `src/some_directory/tests/BUILD.gn`
     - Example
