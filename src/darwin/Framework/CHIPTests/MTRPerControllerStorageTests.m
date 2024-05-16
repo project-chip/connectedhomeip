@@ -1362,9 +1362,17 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
         [subscriptionExpectation fulfill];
     };
 
+    // Verify that initially (before we have ever subscribed while using this
+    // datastore) the device has no estimate for subscription latency.
+    XCTAssertNil(device.estimatedSubscriptionLatency);
+
+    __auto_type * beforeSetDelegate = [NSDate now];
+
     [device setDelegate:delegate queue:queue];
 
     [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+
+    __auto_type * afterInitialSubscription = [NSDate now];
 
     NSUInteger dataStoreValuesCount = 0;
     NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * dataStoreClusterData = [controller.controllerDataStore getStoredClusterDataForNodeID:deviceID];
@@ -1399,6 +1407,21 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     //   * With all-clusters-app as of 2024-02-10, about 1.476% of attributes change.
     double storedAttributeDifferFromMTRDevicePercentage = storedAttributeDifferFromMTRDeviceCount * 100.0 / dataStoreValuesCount;
     XCTAssertTrue(storedAttributeDifferFromMTRDevicePercentage < 10.0);
+
+    // Check that the new device has an estimated subscription latency.
+    XCTAssertNotNil(device.estimatedSubscriptionLatency);
+
+    // Check that this estimate is positive, since subscribing must have taken
+    // some time.
+    XCTAssertGreaterThan(device.estimatedSubscriptionLatency.doubleValue, 0);
+
+    // Check that this estimate is no larger than the measured latency observed
+    // above.  Unfortunately, We measure our observed latency to report end, not
+    // to the immediately following internal subscription established
+    // notification, so in fact our measured value can end up shorter than the
+    // estimated latency the device has.  Add some slop to handle that.
+    const NSTimeInterval timingSlopInSeconds = 0.1;
+    XCTAssertLessThanOrEqual(device.estimatedSubscriptionLatency.doubleValue, [afterInitialSubscription timeIntervalSinceDate:beforeSetDelegate] + timingSlopInSeconds);
 
     // Now set up new delegate for the new device and verify that once subscription reestablishes, the data version filter loaded from storage will work
     __auto_type * newDelegate = [[MTRDeviceTestDelegate alloc] init];

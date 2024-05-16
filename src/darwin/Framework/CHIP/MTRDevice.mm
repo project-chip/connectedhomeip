@@ -213,6 +213,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 static NSString * const sDataVersionKey = @"dataVersion";
 static NSString * const sAttributesKey = @"attributes";
+static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribeLatency";
 
 - (void)storeValue:(MTRDeviceDataValueDictionary _Nullable)value forAttribute:(NSNumber *)attribute
 {
@@ -414,6 +415,10 @@ static NSString * const sAttributesKey = @"attributes";
     //   2. OnResubscriptionNeeded is called
     //   3. Subscription reset (including when getSessionForNode fails)
     MTRAsyncWorkCompletionBlock _subscriptionPoolWorkCompletionBlock;
+
+    // Tracking of initial subscribe latency.  When _initialSubscribeStart is
+    // nil, we are not tracking the latency.
+    NSDate * _Nullable _initialSubscribeStart;
 }
 
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
@@ -705,6 +710,7 @@ static NSString * const sAttributesKey = @"attributes";
     }
 
     if (setUpSubscription) {
+        _initialSubscribeStart = [NSDate now];
         if ([self _deviceUsesThread]) {
             [self _scheduleSubscriptionPoolWork:^{
                 std::lock_guard lock(self->_lock);
@@ -953,6 +959,18 @@ static NSString * const sAttributesKey = @"attributes";
 
     // No need to monitor connectivity after subscription establishment
     [self _stopConnectivityMonitoring];
+
+    auto initialSubscribeStart = _initialSubscribeStart;
+    // We no longer need to track subscribe latency for this device.
+    _initialSubscribeStart = nil;
+
+    if (initialSubscribeStart != nil) {
+        // We want time interval from initialSubscribeStart to now, not the other
+        // way around.
+        NSTimeInterval subscriptionLatency = -[initialSubscribeStart timeIntervalSinceNow];
+        _estimatedSubscriptionLatency = @(subscriptionLatency);
+        [self _storePersistedDeviceData];
+    }
 
     os_unfair_lock_unlock(&self->_lock);
 
@@ -2882,6 +2900,50 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     if ([self _isCachePrimedWithInitialConfigurationData]) {
         _delegateDeviceCachePrimedCalled = YES;
     }
+}
+
+- (void)_setLastInitialSubscribeLatency:(id)latency
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    if (![latency isKindOfClass:NSNumber.class]) {
+        // Unexpected value of some sort; just ignore it.
+        return;
+    }
+
+    _estimatedSubscriptionLatency = latency;
+}
+
+- (void)setPersistedDeviceData:(NSDictionary<NSString *, id> *)data
+{
+    MTR_LOG_INFO("%@ setPersistedDeviceData: %@", self, data);
+
+    std::lock_guard lock(_lock);
+
+    // For now the only data we care about is our initial subscribe latency.
+    id initialSubscribeLatency = data[sLastInitialSubscribeLatencyKey];
+    if (initialSubscribeLatency != nil) {
+        [self _setLastInitialSubscribeLatency:initialSubscribeLatency];
+    }
+}
+
+- (void)_storePersistedDeviceData
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    auto datastore = _deviceController.controllerDataStore;
+    if (datastore == nil) {
+        // No way to store.
+        return;
+    }
+
+    // For now the only data we have is our initial subscribe latency.
+    NSMutableDictionary<NSString *, id> * data = [NSMutableDictionary dictionary];
+    if (_estimatedSubscriptionLatency != nil) {
+        data[sLastInitialSubscribeLatencyKey] = _estimatedSubscriptionLatency;
+    }
+
+    [datastore storeDeviceData:[data copy] forNodeID:self.nodeID];
 }
 
 - (BOOL)deviceCachePrimed
