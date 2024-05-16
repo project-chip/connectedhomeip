@@ -24,6 +24,7 @@ import kotlinx.parcelize.Parcelize
 import matter.onboardingpayload.DiscoveryCapability
 import matter.onboardingpayload.OnboardingPayload
 import matter.onboardingpayload.OnboardingPayloadException
+import matter.onboardingpayload.OptionalQRCodeInfoType
 
 /** Class to hold the CHIP device information. */
 @Parcelize
@@ -57,6 +58,13 @@ data class CHIPDeviceInfo(
     if (serialNumber.isNotEmpty()) {
       onboardingPayload.addSerialNumber(serialNumber)
     }
+    optionalQrCodeInfoMap.forEach { (_, info) ->
+      if (info.type == OptionalQRCodeInfoType.TYPE_STRING && info.data != null) {
+        onboardingPayload.addOptionalVendorData(info.tag, info.data)
+      } else {
+        onboardingPayload.addOptionalVendorData(info.tag, info.intDataValue)
+      }
+    }
     return onboardingPayload
   }
 
@@ -78,9 +86,10 @@ data class CHIPDeviceInfo(
         setupPayload.getLongDiscriminatorValue(),
         setupPayload.setupPinCode,
         setupPayload.commissioningFlow,
-        setupPayload.optionalQRCodeInfo.mapValues { (_, info) ->
-          QrCodeInfo(info.tag, info.type, info.data, info.int32)
-        },
+        setupPayload
+          .getAllOptionalVendorData().associate { info ->
+            info.tag to QrCodeInfo(info.tag, info.type, info.data, info.int32)
+          },
         setupPayload.discoveryCapabilities,
         setupPayload.hasShortDiscriminator,
         serialNumber
