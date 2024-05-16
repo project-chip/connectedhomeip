@@ -972,7 +972,7 @@ static NSString * const sAttributesKey = @"attributes";
     MTRDeviceClusterData * networkCommissioningClusterData = [self _clusterDataForPath:networkCommissioningClusterPath];
     NSNumber * networkCommissioningClusterFeatureMapValueNumber = networkCommissioningClusterData.attributes[@(MTRClusterGlobalAttributeFeatureMapID)][MTRValueKey];
 
-    if ( networkCommissioningClusterFeatureMapValueNumber == nil )
+    if (networkCommissioningClusterFeatureMapValueNumber == nil)
         return NO;
     if (![networkCommissioningClusterFeatureMapValueNumber isKindOfClass:[NSNumber class]]) {
         MTR_LOG_ERROR("%@ Unexpected NetworkCommissioning FeatureMap value %@", self, networkCommissioningClusterFeatureMapValueNumber);
