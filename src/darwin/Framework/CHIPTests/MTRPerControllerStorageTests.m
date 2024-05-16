@@ -31,6 +31,7 @@ static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kTimeoutInSeconds = 3;
 static NSString * kOnboardingPayload = @"MT:-24J0AFN00KA0648G00";
 static const uint16_t kTestVendorId = 0xFFF1u;
+static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
 
 @interface MTRPerControllerStorageTestsControllerDelegate : NSObject <MTRDeviceControllerDelegate>
 @property (nonatomic, strong) XCTestExpectation * expectation;
@@ -227,6 +228,11 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 
 - (void)commissionWithController:(MTRDeviceController *)controller newNodeID:(NSNumber *)newNodeID
 {
+    [self commissionWithController:controller newNodeID:newNodeID onboardingPayload:kOnboardingPayload];
+}
+
+- (void)commissionWithController:(MTRDeviceController *)controller newNodeID:(NSNumber *)newNodeID onboardingPayload:(NSString *)onboardingPayload
+{
     XCTestExpectation * expectation = [self expectationWithDescription:@"Pairing Complete"];
 
     __auto_type * deviceControllerDelegate = [[MTRPerControllerStorageTestsControllerDelegate alloc] initWithExpectation:expectation
@@ -236,7 +242,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     [controller setDeviceControllerDelegate:deviceControllerDelegate queue:callbackQueue];
 
     NSError * error;
-    __auto_type * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:kOnboardingPayload error:&error];
+    __auto_type * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:onboardingPayload error:&error];
     XCTAssertNil(error);
     XCTAssertNotNil(payload);
 
@@ -1356,9 +1362,17 @@ static const uint16_t kTestVendorId = 0xFFF1u;
         [subscriptionExpectation fulfill];
     };
 
+    // Verify that initially (before we have ever subscribed while using this
+    // datastore) the device has no estimate for subscription latency.
+    XCTAssertNil(device.estimatedSubscriptionLatency);
+
+    __auto_type * beforeSetDelegate = [NSDate now];
+
     [device setDelegate:delegate queue:queue];
 
     [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+
+    __auto_type * afterInitialSubscription = [NSDate now];
 
     NSUInteger dataStoreValuesCount = 0;
     NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * dataStoreClusterData = [controller.controllerDataStore getStoredClusterDataForNodeID:deviceID];
@@ -1393,6 +1407,21 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     //   * With all-clusters-app as of 2024-02-10, about 1.476% of attributes change.
     double storedAttributeDifferFromMTRDevicePercentage = storedAttributeDifferFromMTRDeviceCount * 100.0 / dataStoreValuesCount;
     XCTAssertTrue(storedAttributeDifferFromMTRDevicePercentage < 10.0);
+
+    // Check that the new device has an estimated subscription latency.
+    XCTAssertNotNil(device.estimatedSubscriptionLatency);
+
+    // Check that this estimate is positive, since subscribing must have taken
+    // some time.
+    XCTAssertGreaterThan(device.estimatedSubscriptionLatency.doubleValue, 0);
+
+    // Check that this estimate is no larger than the measured latency observed
+    // above.  Unfortunately, We measure our observed latency to report end, not
+    // to the immediately following internal subscription established
+    // notification, so in fact our measured value can end up shorter than the
+    // estimated latency the device has.  Add some slop to handle that.
+    const NSTimeInterval timingSlopInSeconds = 0.1;
+    XCTAssertLessThanOrEqual(device.estimatedSubscriptionLatency.doubleValue, [afterInitialSubscription timeIntervalSinceDate:beforeSetDelegate] + timingSlopInSeconds);
 
     // Now set up new delegate for the new device and verify that once subscription reestablishes, the data version filter loaded from storage will work
     __auto_type * newDelegate = [[MTRDeviceTestDelegate alloc] init];
@@ -2002,6 +2031,149 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 
     [controllerClient shutdown];
     [controllerServer shutdown];
+}
+
+static NSString * const kLocalTestUserDefaultDomain = @"org.csa-iot.matter.darwintest";
+static NSString * const kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey = @"subscriptionPoolSizeOverride";
+
+// TODO: This might also want to go in a separate test file, with some shared setup for commissioning devices per test
+- (void)doTestSubscriptionPoolWithSize:(NSInteger)subscriptionPoolSize
+{
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type queue = dispatch_get_main_queue();
+
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+
+    NSNumber * nodeID = @(555);
+    NSNumber * fabricID = @(555);
+
+    NSError * error;
+
+    NSUserDefaults * defaults = [[NSUserDefaults alloc] initWithSuiteName:kLocalTestUserDefaultDomain];
+    NSNumber * subscriptionPoolSizeOverrideOriginalValue = [defaults objectForKey:kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey];
+
+    // Test DeviceController with a Subscription pool
+    [defaults setInteger:subscriptionPoolSize forKey:kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey];
+
+    MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:fabricID
+                                                                  nodeID:nodeID
+                                                                 storage:storageDelegate
+                                                                   error:&error
+                                                       certificateIssuer:&certificateIssuer];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    XCTAssertEqualObjects(controller.controllerNodeID, nodeID);
+
+    // QRCodes generated for discriminators 101~105 and passcodes 1001~1005
+    NSArray<NSNumber *> * orderedDeviceIDs = @[ @(101), @(102), @(103), @(104), @(105) ];
+    NSDictionary<NSNumber *, NSString *> * deviceOnboardingPayloads = @{
+        @(101) : @"MT:00000EBQ15IZC900000",
+        @(102) : @"MT:00000MNY16-AD900000",
+        @(103) : @"MT:00000UZ427GOD900000",
+        @(104) : @"MT:00000CQM00Z.D900000",
+        @(105) : @"MT:00000K0V01FDE900000",
+    };
+
+    // Commission 5 devices
+    for (NSNumber * deviceID in orderedDeviceIDs) {
+        certificateIssuer.nextNodeID = deviceID;
+        [self commissionWithController:controller newNodeID:deviceID onboardingPayload:deviceOnboardingPayloads[deviceID]];
+    }
+
+    // Set up expectations and delegates
+
+    NSDictionary<NSNumber *, XCTestExpectation *> * subscriptionExpectations = @{
+        @(101) : [self expectationWithDescription:@"Subscription 1 has been set up"],
+        @(102) : [self expectationWithDescription:@"Subscription 2 has been set up"],
+        @(103) : [self expectationWithDescription:@"Subscription 3 has been set up"],
+        @(104) : [self expectationWithDescription:@"Subscription 4 has been set up"],
+        @(105) : [self expectationWithDescription:@"Subscription 5 has been set up"],
+    };
+
+    NSDictionary<NSNumber *, MTRDeviceTestDelegate *> * deviceDelegates = @{
+        @(101) : [[MTRDeviceTestDelegate alloc] init],
+        @(102) : [[MTRDeviceTestDelegate alloc] init],
+        @(103) : [[MTRDeviceTestDelegate alloc] init],
+        @(104) : [[MTRDeviceTestDelegate alloc] init],
+        @(105) : [[MTRDeviceTestDelegate alloc] init],
+    };
+
+    // Test with counters
+    __block os_unfair_lock counterLock = OS_UNFAIR_LOCK_INIT;
+    __block NSUInteger subscriptionRunningCount = 0;
+    __block NSUInteger subscriptionDequeueCount = 0;
+
+    for (NSNumber * deviceID in orderedDeviceIDs) {
+        MTRDeviceTestDelegate * delegate = deviceDelegates[deviceID];
+        delegate.pretendThreadEnabled = YES;
+
+        delegate.onSubscriptionPoolDequeue = ^{
+            // Count subscribing when dequeued from the subscription pool
+            os_unfair_lock_lock(&counterLock);
+            subscriptionRunningCount++;
+            subscriptionDequeueCount++;
+            // At any given moment, only up to subscriptionPoolSize subcriptions can be going on
+            XCTAssertLessThanOrEqual(subscriptionRunningCount, subscriptionPoolSize);
+            os_unfair_lock_unlock(&counterLock);
+        };
+        delegate.onSubscriptionPoolWorkComplete = ^{
+            // Stop counting subscribing right before calling work item completion
+            os_unfair_lock_lock(&counterLock);
+            subscriptionRunningCount--;
+            os_unfair_lock_unlock(&counterLock);
+        };
+        __weak __auto_type weakDelegate = delegate;
+        delegate.onReportEnd = ^{
+            [subscriptionExpectations[deviceID] fulfill];
+            // reset callback so expectation not fulfilled twice, given the run time of this can be long due to subscription pool
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onReportEnd = nil;
+        };
+    }
+
+    for (NSNumber * deviceID in orderedDeviceIDs) {
+        __auto_type * device = [MTRDevice deviceWithNodeID:deviceID controller:controller];
+        [device setDelegate:deviceDelegates[deviceID] queue:queue];
+    }
+
+    // Make the wait time depend on pool size and device count (can expand number of devices in the future)
+    [self waitForExpectations:subscriptionExpectations.allValues timeout:(kSubscriptionPoolBaseTimeoutInSeconds * orderedDeviceIDs.count / subscriptionPoolSize)];
+
+    XCTAssertEqual(subscriptionDequeueCount, orderedDeviceIDs.count);
+
+    // Reset our commissionees.
+    for (NSNumber * deviceID in orderedDeviceIDs) {
+        __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
+        ResetCommissionee(baseDevice, queue, self, kTimeoutInSeconds);
+    }
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+
+    if (subscriptionPoolSizeOverrideOriginalValue) {
+        [defaults setInteger:subscriptionPoolSizeOverrideOriginalValue.integerValue forKey:kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey];
+    } else {
+        [defaults removeObjectForKey:kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey];
+    }
+}
+
+- (void)testSubscriptionPool
+{
+    [self doTestSubscriptionPoolWithSize:1];
+    [self doTestSubscriptionPoolWithSize:2];
 }
 
 @end
