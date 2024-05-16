@@ -78,7 +78,8 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 - (void)setOTAProviderDelegate:(id<MTROTAProviderDelegate>)otaProviderDelegate queue:(dispatch_queue_t)queue;
 
 /**
- * Sets the maximum simultaneous subscriptions allowed to be established at one time for devices on Thread. This defaults to a large number.
+ * Sets the maximum simultaneous subscription establishments that can be happening
+ * at one time for devices on Thread. This defaults to a large number.
  *
  * If this value is 0, the maximum subscription establishments allowed at a time will be set to 1.
  */
