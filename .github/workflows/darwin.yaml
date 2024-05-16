@@ -115,6 +115,11 @@ jobs:
                   echo "This is a simple log" > /tmp/darwin/framework-tests/end_user_support_log.txt
                   ../../../out/debug/chip-all-clusters-app --interface-id -1 --end_user_support_log /tmp/darwin/framework-tests/end_user_support_log.txt > >(tee /tmp/darwin/framework-tests/all-cluster-app.log) 2> >(tee /tmp/darwin/framework-tests/all-cluster-app-err.log >&2) &
                   ../../../out/debug/chip-all-clusters-app --interface-id -1 --dac_provider ../../../credentials/development/commissioner_dut/struct_cd_origin_pid_vid_correct/test_case_vector.json --product-id 32768 --discriminator 3839 --secured-device-port 5539 --KVS /tmp/chip-all-clusters-app-kvs2 > >(tee /tmp/darwin/framework-tests/all-cluster-app-origin-vid.log) 2> >(tee /tmp/darwin/framework-tests/all-cluster-app-origin-vid-err.log >&2) &
+                  ../../../out/debug/chip-all-clusters-app --interface-id -1 --discriminator 101 --passcode 1001 --KVS /tmp/chip-all-clusters-app-kvs101 --secured-device-port 5531 &
+                  ../../../out/debug/chip-all-clusters-app --interface-id -1 --discriminator 102 --passcode 1002 --KVS /tmp/chip-all-clusters-app-kvs102 --secured-device-port 5532 &
+                  ../../../out/debug/chip-all-clusters-app --interface-id -1 --discriminator 103 --passcode 1003 --KVS /tmp/chip-all-clusters-app-kvs103 --secured-device-port 5533 &
+                  ../../../out/debug/chip-all-clusters-app --interface-id -1 --discriminator 104 --passcode 1004 --KVS /tmp/chip-all-clusters-app-kvs104 --secured-device-port 5534 &
+                  ../../../out/debug/chip-all-clusters-app --interface-id -1 --discriminator 105 --passcode 1005 --KVS /tmp/chip-all-clusters-app-kvs105 --secured-device-port 5535 &
 
                   export TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1
 
