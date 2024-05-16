@@ -1012,6 +1012,7 @@ TEST_F(TestCASESession, SessionResumptionStorage)
         EXPECT_TRUE(bool(holder));
         EXPECT_EQ(holder->GetPeer(), fabricInfo->GetScopedNodeIdForNode(Node01_01));
         chip::Platform::Delete(pairingCommissioner);
+        gPairingServer.Shutdown();
     }
 }
 // #endif
@@ -1157,5 +1158,3 @@ TEST_F(TestCASESession, Sigma1BadDestinationIdTest)
 }
 
 } // namespace chip
-
-// Test Suite
