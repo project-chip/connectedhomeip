@@ -16,11 +16,14 @@
  */
 #include <app/codegen-interaction-model/Model.h>
 
-#include "EmberReadWriteOverride.h"
-#include "TestAttributeReportIBsEncoding.h"
+#include <app/codegen-interaction-model/tests/EmberReadWriteOverride.h>
+#include <app/codegen-interaction-model/tests/TestAttributeReportIBsEncoding.h>
 
 #include <access/AccessControl.h>
 #include <access/SubjectDescriptor.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/MessageDef/ReportDataMessage.h>
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
@@ -349,6 +352,57 @@ struct UseMockNodeConfig
     ~UseMockNodeConfig() { ResetMockNodeConfig(); }
 };
 
+class StructAttributeAccessInterface : public AttributeAccessInterface
+{
+public:
+    StructAttributeAccessInterface(ConcreteAttributePath path) :
+        AttributeAccessInterface(MakeOptional(path.mEndpointId), path.mClusterId), mPath(path)
+    {}
+    ~StructAttributeAccessInterface() = default;
+
+    CHIP_ERROR Read(const ConcreteReadAttributePath & path, AttributeValueEncoder & encoder) override
+    {
+        if (static_cast<const ConcreteAttributePath &>(path) != mPath)
+        {
+            // returning without trying to handle means "I do not handle this"
+            return CHIP_NO_ERROR;
+        }
+
+        return encoder.Encode(mData);
+    }
+
+    void SetReturnedData(const Clusters::UnitTesting::Structs::SimpleStruct::Type & data) { mData = data; }
+    Clusters::UnitTesting::Structs::SimpleStruct::Type simpleStruct;
+
+private:
+    ConcreteAttributePath mPath;
+    Clusters::UnitTesting::Structs::SimpleStruct::Type mData;
+};
+
+/// RAII registration of an attribute access interface
+template <typename T>
+class RegisteredAttributeAccessInterface
+{
+public:
+    template <typename... Args>
+    RegisteredAttributeAccessInterface(Args &&... args) : mData(std::forward<Args>(args)...)
+    {
+        VerifyOrDie(registerAttributeAccessOverride(&mData));
+    }
+    ~RegisteredAttributeAccessInterface() { unregisterAttributeAccessOverride(&mData); }
+
+    T * operator->() { return &mData; }
+    T & operator*() { return mData; }
+
+private:
+    T mData;
+};
+
+/// Contains a `ReadAttributeRequest` as well as classes to convert this into a AttributeReportIBs
+/// and later decode it
+///
+/// It wraps boilerplate code to obtain a `AttributeValueEncoder` as well as later decoding
+/// the underlying encoded data for verification.
 struct TestReadRequest
 {
     ReadAttributeRequest request;
@@ -844,3 +898,50 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadLongString)
     ASSERT_EQ(encodedData.dataReader.Get(actual), CHIP_NO_ERROR);
     ASSERT_TRUE(actual.data_equal("abcde"_span));
 }
+
+TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceStructRead)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    chip::app::CodegenDataModel::Model model;
+    ScopedMockAccessControl accessControl;
+
+    const ConcreteAttributePath kStructPath(kMockEndpoint3, MockClusterId(4),
+                                            MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_STRUCT_ATTRIBUTE_TYPE));
+
+    TestReadRequest testRequest(kAdminSubjectDescriptor, kStructPath);
+    RegisteredAttributeAccessInterface<StructAttributeAccessInterface> aai(kStructPath);
+
+    aai->SetReturnedData(Clusters::UnitTesting::Structs::SimpleStruct::Type{
+        .a = 123,
+        .b = true,
+        .e = "foo"_span,
+        .g = 0.5,
+        .h = 0.125,
+    });
+
+    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
+    ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_NO_ERROR);
+    ASSERT_EQ(testRequest.FinishEncoding(), CHIP_NO_ERROR);
+
+    /////// VALIDATE
+    std::vector<DecodedAttributeData> attribute_data;
+    ASSERT_EQ(testRequest.encodedIBs.Decode(attribute_data), CHIP_NO_ERROR);
+    ASSERT_EQ(attribute_data.size(), 1u);
+
+    DecodedAttributeData & encodedData = attribute_data[0];
+    ASSERT_EQ(encodedData.attributePath, testRequest.request.path);
+
+    // data element should be a encoded byte string as this is what the attribute type is
+    ASSERT_EQ(encodedData.dataReader.GetType(), TLV::kTLVType_Structure);
+
+
+    Clusters::UnitTesting::Structs::SimpleStruct::DecodableType actual;
+    ASSERT_EQ(chip::app::DataModel::Decode(encodedData.dataReader, actual), CHIP_NO_ERROR);
+
+    ASSERT_EQ(actual.a, 123);
+    ASSERT_EQ(actual.b, true);
+    ASSERT_EQ(actual.g, 0.5);
+    ASSERT_EQ(actual.h, 0.125);
+    ASSERT_TRUE(actual.e.data_equal("foo"_span));
+}
+
