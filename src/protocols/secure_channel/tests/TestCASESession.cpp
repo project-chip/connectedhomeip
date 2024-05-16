@@ -55,7 +55,33 @@ using namespace chip::Crypto;
 
 namespace chip {
 
-class TestCASESecurePairingDelegate;
+class TestCASESecurePairingDelegate : public SessionEstablishmentDelegate
+{
+public:
+    void OnSessionEstablishmentError(CHIP_ERROR error) override
+    {
+        mNumPairingErrors++;
+        if (error == CHIP_ERROR_BUSY)
+        {
+            mNumBusyResponses++;
+        }
+    }
+
+    void OnSessionEstablished(const SessionHandle & session) override
+    {
+        mSession.Grab(session);
+        mNumPairingComplete++;
+    }
+
+    SessionHolder & GetSessionHolder() { return mSession; }
+
+    SessionHolder mSession;
+
+    // TODO: Rename mNumPairing* to mNumEstablishment*
+    uint32_t mNumPairingErrors   = 0;
+    uint32_t mNumPairingComplete = 0;
+    uint32_t mNumBusyResponses   = 0;
+};
 
 class TestOperationalKeystore : public chip::Crypto::OperationalKeystore
 {
@@ -253,34 +279,6 @@ CHIP_ERROR TestCASESession::InitFabricTable(chip::FabricTable & fabricTable, chi
 
     return fabricTable.Init(initParams);
 }
-
-class TestCASESecurePairingDelegate : public SessionEstablishmentDelegate
-{
-public:
-    void OnSessionEstablishmentError(CHIP_ERROR error) override
-    {
-        mNumPairingErrors++;
-        if (error == CHIP_ERROR_BUSY)
-        {
-            mNumBusyResponses++;
-        }
-    }
-
-    void OnSessionEstablished(const SessionHandle & session) override
-    {
-        mSession.Grab(session);
-        mNumPairingComplete++;
-    }
-
-    SessionHolder & GetSessionHolder() { return mSession; }
-
-    SessionHolder mSession;
-
-    // TODO: Rename mNumPairing* to mNumEstablishment*
-    uint32_t mNumPairingErrors   = 0;
-    uint32_t mNumPairingComplete = 0;
-    uint32_t mNumBusyResponses   = 0;
-};
 
 CHIP_ERROR InitTestIpk(GroupDataProvider & groupDataProvider, const FabricInfo & fabricInfo, size_t numIpks)
 {
