@@ -967,18 +967,20 @@ static NSString * const sAttributesKey = @"attributes";
     }
 #endif
 
-    // Device is thread-enabled if there is a Thread Network Diagnostics cluster on endpoint 0
-    for (MTRClusterPath * path in [self _knownClusters]) {
-        if (path.endpoint.unsignedShortValue != kRootEndpointId) {
-            continue;
-        }
-
-        if (path.cluster.unsignedLongValue == MTRClusterIDTypeThreadNetworkDiagnosticsID) {
-            return YES;
-        }
+    MTRClusterPath * networkCommissioningClusterPath = [MTRClusterPath clusterPathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeNetworkCommissioningID)];
+    MTRDeviceClusterData * networkCommissioningClusterData = [self _clusterDataForPath:networkCommissioningClusterPath];
+    NSNumber * networkCommissioningClusterFeatureMapValueNumber = networkCommissioningClusterData.attributes[@(MTRClusterGlobalAttributeFeatureMapID)][MTRValueKey];
+    if (![networkCommissioningClusterFeatureMapValueNumber isKindOfClass:[NSNumber class]]) {
+        MTR_LOG_ERROR("%@ Unexpected NetworkCommissioning FeatureMap value %@", self, networkCommissioningClusterFeatureMapValueNumber);
+        return NO;
     }
 
-    return NO;
+    // Bit 0 WiFi
+    // Bit 1 Thread
+    // Bit 2 Ethernet
+    uint32_t networkCommissioningClusterFeatureMapValue = static_cast<uint32_t>(networkCommissioningClusterFeatureMapValueNumber.unsignedLongValue);
+
+    return (networkCommissioningClusterFeatureMapValue & (1 << 1));
 }
 
 - (void)_clearSubscriptionPoolWork
