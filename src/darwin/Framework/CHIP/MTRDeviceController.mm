@@ -966,12 +966,20 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         if (prefetchedClusterData.count) {
             [deviceToReturn setPersistedClusterData:prefetchedClusterData];
         }
-    } else {
+    } else if (_controllerDataStore) {
         // Load persisted cluster data if they exist.
         NSDictionary * clusterData = [_controllerDataStore getStoredClusterDataForNodeID:nodeID];
         MTR_LOG_INFO("Loaded %lu cluster data from storage for %@", static_cast<unsigned long>(clusterData.count), deviceToReturn);
         if (clusterData.count) {
             [deviceToReturn setPersistedClusterData:clusterData];
+        }
+    }
+
+    // TODO: Figure out how to get the device data as part of our bulk-read bits.
+    if (_controllerDataStore) {
+        auto * deviceData = [_controllerDataStore getStoredDeviceDataForNodeID:nodeID];
+        if (deviceData.count) {
+            [deviceToReturn setPersistedDeviceData:deviceData];
         }
     }
 
