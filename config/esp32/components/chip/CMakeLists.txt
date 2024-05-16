@@ -185,6 +185,12 @@ if ((CONFIG_BT_ENABLED) AND (CONFIG_ENABLE_CHIPOBLE))
         endif()
 endif()
 
+if (CONFIG_ENABLE_PERSIST_SUBSCRIPTIONS)
+    chip_gn_arg_append("chip_persist_subscriptions"                 "true")
+else()
+    chip_gn_arg_append("chip_persist_subscriptions"                 "false")
+endif()
+
 if (CONFIG_ENABLE_ESP32_BLE_CONTROLLER)
     chip_gn_arg_append("chip_enable_ble_controller"             "true")
 endif()

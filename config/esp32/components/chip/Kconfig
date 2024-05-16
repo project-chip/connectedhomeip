@@ -114,6 +114,13 @@ menu "CHIP Core"
             help
                 Some device types don't require the read client. Enabling this option may save some flash/ram.
 
+        config ENABLE_PERSIST_SUBSCRIPTIONS
+            bool "Enable persist subscriptions"
+            default y
+            help
+                Enable persist subscriptions to make the device resume the subscriptions from the persist
+                subscriptions information after reboot.
+
         config BUILD_CHIP_TESTS
             bool "Build CHIP tests"
             default n
