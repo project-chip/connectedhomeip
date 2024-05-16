@@ -218,9 +218,9 @@ class TC_IDM_4_2(MatterBaseTest):
         asserts.assert_true(self.is_valid_uint32_value(sub_cr1_step1_max_interval_ceiling_sec),
                             "MaxInterval is not of uint32 type.")
 
-        # Verify MaxInterval is less than or equal to subscription_max_interval_publisher_limit_sec
+        # Verify MaxInterval is less than or equal to MaxIntervalCeiling
         asserts.assert_less_equal(sub_cr1_step1_max_interval_ceiling_sec, max_interval_ceiling_sec,
-                                  "MaxInterval is not less than or equal to subscription_max_interval_publisher_limit_sec")
+                                  "MaxInterval is not less than or equal to MaxIntervalCeiling")
 
         sub_cr1_step1.Shutdown()
 
@@ -418,7 +418,7 @@ class TC_IDM_4_2(MatterBaseTest):
         data_version_filter = [(0, Clusters.BasicInformation, data_version)]
 
         # Subscribe to attribute with provided DataVersion
-        sub_cr1_step8 = await CR1.ReadAttribute(
+        sub_cr1_step7 = await CR1.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=node_label_attr_path,
             reportInterval=(10, 20),
@@ -427,9 +427,9 @@ class TC_IDM_4_2(MatterBaseTest):
         )
 
         # Verify that the subscription is activated between CR1 and DUT
-        asserts.assert_true(sub_cr1_step8.subscriptionId, "Subscription not activated")
+        asserts.assert_true(sub_cr1_step7.subscriptionId, "Subscription not activated")
 
-        sub_cr1_step8.Shutdown()
+        sub_cr1_step7.Shutdown()
 
         # *** Step 8 ***
         self.print_step(8, "CR1 sends a subscription request action for an attribute and sets the MinIntervalFloor to min_interval_floor_sec and MaxIntervalCeiling to 10. Activate the Subscription between CR1 and DUT and record the time when the priming ReportDataMessage is received as t_report_sec. Save the returned MaxInterval from the SubscribeResponseMessage as max_interval_sec.")
@@ -451,8 +451,8 @@ class TC_IDM_4_2(MatterBaseTest):
         self.print_step(9, "CR1 modifies the attribute which has been subscribed to on the DUT and waits for an incoming ReportDataMessage")
 
         # Saving the returned MaxInterval from the SubscribeResponseMessage
-        sub_cr1_step8_intervals = sub_cr1_update_value.GetReportingIntervalsSeconds()
-        min_interval_floor_sec, max_interval_sec = sub_cr1_step8_intervals
+        sub_cr1_step9_intervals = sub_cr1_update_value.GetReportingIntervalsSeconds()
+        min_interval_floor_sec, max_interval_sec = sub_cr1_step9_intervals
 
         # Get subscription timeout
         subscription_timeout_sec = sub_cr1_update_value.GetSubscriptionTimeoutMs() / 1000
