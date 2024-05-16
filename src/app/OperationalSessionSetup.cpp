@@ -620,8 +620,8 @@ CHIP_ERROR OperationalSessionSetup::LookupPeerAddress()
         return CHIP_NO_ERROR;
     }
 
-    // This call be called multiple times for each discovered address.The metric backend can handle this 
-    // and always pick the earliest occurance as the start of the event.
+    // This code can be reached multiple times, if we discover multiple addresses or do retries.
+    // The metric backend can handle this and always picks the earliest occurrence as the start of the event.
     MATTER_LOG_METRIC_BEGIN(kMetricDeviceOperationalDiscovery);
 
     auto const * fabricInfo = mInitParams.fabricTable->FindFabricWithIndex(mPeerId.GetFabricIndex());
