@@ -548,7 +548,6 @@ ContentApp * ContentAppFactoryImpl::LoadContentApp(const CatalogVendorApp & vend
 
     for (auto & contentApp : mContentApps) {
 
-
         auto app = contentApp.get();
 
         ChipLogProgress(DeviceLayer, " Looking next=%s ", app->GetApplicationBasicDelegate()->GetCatalogVendorApp()->applicationId);
@@ -572,7 +571,7 @@ void ContentAppFactoryImpl::AddAdminVendorId(uint16_t vendorId)
     mAdminVendorIds.push_back(vendorId);
 }
 
-void ContentAppFactoryImpl::AddContentApp(uint16_t vendorId, uint16_t productId)
+void ContentAppFactoryImpl::InstallContentApp(uint16_t vendorId, uint16_t productId)
 {
     if (vendorId == 1 && productId == 11) {
         mContentApps.emplace_back(std::make_unique<ContentAppImpl>("Vendor1", vendorId, "exampleid", productId, "Version1", "34567890"));
@@ -584,6 +583,28 @@ void ContentAppFactoryImpl::AddContentApp(uint16_t vendorId, uint16_t productId)
         mContentApps.emplace_back(std::make_unique<ContentAppImpl>("TestSuiteVendor", vendorId, "applicationId", productId, "v2", "20202021"));
     } else {
         mContentApps.emplace_back(std::make_unique<ContentAppImpl>("NewAppVendor", vendorId, "newAppApplicationId", productId, "v2", "20202021"));
+    }
+}
+
+void ContentAppFactoryImpl::UninstallContentApp(uint16_t vendorId, uint16_t productId)
+{   
+    ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl: RemoveContentApp vendorId=%d productId=%d ",
+                    vendorId, productId);
+
+    int index = 0;
+    for (auto & contentApp : mContentApps) {
+
+        auto app = contentApp.get();
+
+        ChipLogProgress(DeviceLayer, "Looking next vid=%d pid=%d", app->GetApplicationBasicDelegate()->HandleGetVendorId(), app->GetApplicationBasicDelegate()->HandleGetProductId());
+        
+        if (app->MatchesPidVid(productId, vendorId)) {
+            ChipLogProgress(DeviceLayer, "Found an app. vid=%d pid=%d. Uninstalling it.", app->GetApplicationBasicDelegate()->HandleGetVendorId(), app->GetApplicationBasicDelegate()->HandleGetProductId());
+            mContentApps.erase(mContentApps.begin() + index);
+            return;
+        }
+
+        index++;
     }
 }
 
@@ -643,10 +664,10 @@ CHIP_ERROR AppTvInit()
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ContentAppPlatform::GetInstance().SetupAppPlatform();
     ContentAppPlatform::GetInstance().SetContentAppFactory(&gFactory);
-    gFactory.AddContentApp((uint16_t)1, (uint16_t)11);
-    // gFactory.AddContentApp((uint16_t)65521, (uint16_t)32768);
-    gFactory.AddContentApp((uint16_t)9050, (uint16_t)22);
-    gFactory.AddContentApp((uint16_t)1111, (uint16_t)22);
+    gFactory.InstallContentApp((uint16_t)1, (uint16_t)11);
+    gFactory.InstallContentApp((uint16_t)65521, (uint16_t)32768);
+    gFactory.InstallContentApp((uint16_t)9050, (uint16_t)22);
+    gFactory.InstallContentApp((uint16_t)1111, (uint16_t)22);
     uint16_t value;
     if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(value) != CHIP_NO_ERROR)
     {

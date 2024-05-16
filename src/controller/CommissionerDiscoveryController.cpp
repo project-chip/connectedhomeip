@@ -225,18 +225,21 @@ void CommissionerDiscoveryController::InternalOk()
     if (!isContentAppInstalled) {
         ChipLogDetail(AppServer, "UX InternalOk: app not installed.");
 
-        // TODO: send CDC message that user is prompted to install the app
+        // prompt user to install missing app 
+        CommissionerDeclaration cd;
+        cd.SetErrorCode(CommissionerDeclaration::CdError::kAppInstallConsentPending);
+        mUdcServer->SendCDCMessage(cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
 
         // dialog
         ChipLogDetail(Controller,
-                        "------PROMPT USER: %s is requesting to install app on this TV. [" ChipLogFormatMEI "," ChipLogFormatMEI "]",
-                        client->GetDeviceName(), ChipLogValueMEI(client->GetVendorId()), ChipLogValueMEI(client->GetProductId()));
+                        "------PROMPT USER: %s is requesting to install app on this TV. vendorId=%d, productId=%d",
+                        client->GetDeviceName(), client->GetVendorId(), client->GetProductId());
 
         if (mUserPrompter != nullptr)
         {
             mUserPrompter->PromptForAppInstallOKPermission(client->GetVendorId(), client->GetProductId(), client->GetDeviceName());
         }
-        ChipLogDetail(Controller, "------Via Shell Enter: app add <pid> <vid>");
+        ChipLogDetail(Controller, "------Via Shell Enter: app install <pid> <vid>");
         // TODO: force user to send again "cast request <id>" command?
         return;
     }

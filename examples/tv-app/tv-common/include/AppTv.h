@@ -91,6 +91,7 @@ public:
     KeypadInputDelegate * GetKeypadInputDelegate() override { return &mKeypadInputDelegate; };
     MediaPlaybackDelegate * GetMediaPlaybackDelegate() override { return &mMediaPlaybackDelegate; };
     TargetNavigatorDelegate * GetTargetNavigatorDelegate() override { return &mTargetNavigatorDelegate; };
+    bool MatchesPidVid(uint16_t productId, uint16_t vendorId) { return vendorId == mApplicationBasicDelegate.HandleGetVendorId() && productId == mApplicationBasicDelegate.HandleGetProductId(); }
 
 protected:
     ApplicationBasicManager mApplicationBasicDelegate;
@@ -139,7 +140,8 @@ public:
 
     void AddAdminVendorId(uint16_t vendorId);
 
-    void AddContentApp(uint16_t vendorId, uint16_t productId);
+    void InstallContentApp(uint16_t vendorId, uint16_t productId);
+    void UninstallContentApp(uint16_t vendorId, uint16_t productId);
 
 protected:
     std::vector<std::unique_ptr<ContentAppImpl>> mContentApps;

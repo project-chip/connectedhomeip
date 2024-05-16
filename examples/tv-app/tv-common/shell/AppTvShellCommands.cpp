@@ -243,7 +243,7 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
 
         return CHIP_NO_ERROR;
     }
-    else if (strcmp(argv[0], "add") == 0)
+    else if (strcmp(argv[0], "install") == 0)
     {
         if (argc < 2)
         {
@@ -258,7 +258,47 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
             pid = (uint16_t) strtol(argv[2], &eptr, 10);
         }
         ContentAppFactoryImpl * factory = GetContentAppFactoryImpl();
-        factory->AddContentApp(vid, pid);
+        factory->InstallContentApp(vid, pid);
+
+        ChipLogProgress(DeviceLayer, "installed an app");
+
+        return CHIP_NO_ERROR;
+    }
+    else if (strcmp(argv[0], "uninstall") == 0)
+    {
+        if (argc < 2)
+        {
+            return PrintAllCommands();
+        }
+        char * eptr;
+
+        uint16_t vid = (uint16_t) strtol(argv[1], &eptr, 10);
+        uint16_t pid = 0;
+        if (argc >= 3)
+        {
+            pid = (uint16_t) strtol(argv[2], &eptr, 10);
+        }
+        ContentAppFactoryImpl * factory = GetContentAppFactoryImpl();
+        factory->UninstallContentApp(vid, pid);
+
+        ChipLogProgress(DeviceLayer, "uninstalled an app");
+
+        return CHIP_NO_ERROR;
+    }
+    else if (strcmp(argv[0], "add") == 0)
+    {
+        if (argc < 2)
+        {
+            return PrintAllCommands();
+        }
+        char * eptr;
+
+        uint16_t vid = (uint16_t) strtol(argv[1], &eptr, 10);
+        uint16_t pid = 0;
+        if (argc >= 3)
+        {
+            pid = (uint16_t) strtol(argv[2], &eptr, 10);
+        }
         ContentAppPlatform::GetInstance().LoadContentAppByClient(vid, pid);
 
         ChipLogProgress(DeviceLayer, "added app");
