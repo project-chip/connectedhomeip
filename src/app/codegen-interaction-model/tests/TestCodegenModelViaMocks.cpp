@@ -25,6 +25,7 @@
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <app/util/attribute-storage-null-handling.h>
+#include <app/util/odd-sized-integers.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <app/util/mock/MockNodeConfig.h>
@@ -405,7 +406,9 @@ void TestEmberScalarTypeRead(typename NumericAttributeTraits<T>::WorkingType val
     std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
 
     // Ember encoding for integers is IDENTICAL to the in-memory representation for them
-    chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(&value), sizeof(value)));
+    typename NumericAttributeTraits<T>::StorageType storage;
+    NumericAttributeTraits<T>::WorkingToStorage(value, storage);
+    chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(&storage), sizeof(storage)));
 
     ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_NO_ERROR);
 
@@ -454,7 +457,7 @@ void TestEmberScalarNullRead()
 
     DecodedAttributeData & encodedData = attribute_data[0];
     ASSERT_EQ(encodedData.attributePath, testRequest.request.path);
-    chip::app::DataModel::Nullable<typename NumericAttributeTraits<T>::StorageType> actual;
+    chip::app::DataModel::Nullable<typename NumericAttributeTraits<T>::WorkingType> actual;
     ASSERT_EQ(chip::app::DataModel::Decode(encodedData.dataReader, actual), CHIP_NO_ERROR);
     ASSERT_TRUE(actual.IsNull());
 }
@@ -731,7 +734,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadInt32U)
 
 TEST(TestCodegenModelViaMocks, EmberAttributeReadInt48U)
 {
-    TestEmberScalarTypeRead<uint64_t, ZCL_INT48U_ATTRIBUTE_TYPE>(0xAABB11223344);
+    TestEmberScalarTypeRead<OddSizedInteger<6, false>, ZCL_INT48U_ATTRIBUTE_TYPE>(0xAABB11223344);
 }
 
 TEST(TestCodegenModelViaMocks, EmberAttributeReadBool)
@@ -749,6 +752,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadNulls)
 {
     TestEmberScalarNullRead<uint8_t, ZCL_INT8U_ATTRIBUTE_TYPE>();
     TestEmberScalarNullRead<uint16_t, ZCL_INT16U_ATTRIBUTE_TYPE>();
+    TestEmberScalarNullRead<OddSizedInteger<3, false>, ZCL_INT24U_ATTRIBUTE_TYPE>();
     TestEmberScalarNullRead<uint32_t, ZCL_INT32U_ATTRIBUTE_TYPE>();
     TestEmberScalarNullRead<uint64_t, ZCL_INT64U_ATTRIBUTE_TYPE>();
 
@@ -756,8 +760,12 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadNulls)
     TestEmberScalarNullRead<int16_t, ZCL_INT16S_ATTRIBUTE_TYPE>();
     TestEmberScalarNullRead<int32_t, ZCL_INT32S_ATTRIBUTE_TYPE>();
     TestEmberScalarNullRead<int64_t, ZCL_INT64S_ATTRIBUTE_TYPE>();
+    TestEmberScalarNullRead<OddSizedInteger<5, true>, ZCL_INT40S_ATTRIBUTE_TYPE>();
 
     TestEmberScalarNullRead<bool, ZCL_BOOLEAN_ATTRIBUTE_TYPE>();
+
+    TestEmberScalarNullRead<float, ZCL_SINGLE_ATTRIBUTE_TYPE>();
+    TestEmberScalarNullRead<double, ZCL_DOUBLE_ATTRIBUTE_TYPE>();
 }
 
 TEST(TestCodegenModelViaMocks, EmberAttributeReadOctetString)
