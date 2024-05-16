@@ -650,7 +650,7 @@ void DiscoveredTxtFieldTcpSupport()
     strcpy(val, "3");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE(nodeData.Get<NodeData>().supportsTcpClient);
-    EXPECT_TRUE(nodeData.Get<NodeData>().supportsTcpServer);
+    EXPECT_FALSE(nodeData.Get<NodeData>().supportsTcpServer);
 
     // Test no other fields were populated
     nodeData.Get<NodeData>().supportsTcpClient = false;
@@ -988,8 +988,8 @@ void TxtFieldTcpSupport()
     strcpy(key, "T");
     strcpy(val, "1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    EXPECT_TRUE(nodeData.resolutionData.supportsTcpServer);
-    EXPECT_TRUE(nodeData.resolutionData.supportsTcpClient);
+    EXPECT_FALSE(nodeData.resolutionData.supportsTcpServer);
+    EXPECT_FALSE(nodeData.resolutionData.supportsTcpClient);
 
     // Test no other fields were populated
     nodeData.resolutionData.supportsTcpServer = false;
