@@ -310,6 +310,40 @@ struct TestReadRequest
     CHIP_ERROR FinishEncoding() { return encodedIBs.FinishEncoding(reportBuilder); }
 };
 
+template<typename T, EmberAfAttributeType ZclType, TLV::TLVType TlvType>
+void TestEmberScalarTypeRead(T value) {
+    UseMockNodeConfig config(gTestNodeConfig);
+    chip::app::CodegenDataModel::Model model;
+    ScopedMockAccessControl accessControl;
+
+    TestReadRequest testRequest(
+        kAdminSubjectDescriptor,
+        ConcreteAttributePath(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_TYPE(ZclType)));
+
+    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
+
+    // Ember encoding for integers is IDENTICAL to the in-memory representation for them
+    chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(&value), sizeof(value)));
+
+    ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_NO_ERROR);
+
+    ASSERT_EQ(testRequest.FinishEncoding(), CHIP_NO_ERROR);
+
+    /////// VALIDATE
+    std::vector<DecodedAttributeData> attribute_data;
+    ASSERT_EQ(testRequest.encodedIBs.Decode(attribute_data), CHIP_NO_ERROR);
+    ASSERT_EQ(attribute_data.size(), 1u);
+
+    const DecodedAttributeData & encodedData = attribute_data[0];
+    ASSERT_EQ(encodedData.attributePath, testRequest.request.path);
+
+    // data element should be a uint32 encoded as TLV
+    ASSERT_EQ(encodedData.dataReader.GetType(), TlvType);
+    T actual;
+    ASSERT_EQ(encodedData.dataReader.Get(actual), CHIP_NO_ERROR);
+    ASSERT_EQ(actual, value);
+}
+
 } // namespace
 
 TEST(TestCodegenModelViaMocks, IterateOverEndpoints)
@@ -555,39 +589,46 @@ TEST(TestCodegenModelViaMocks, EmberAttributeInvalidRead)
     ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
 }
 
+TEST(TestCodegenModelViaMocks, EmberAttributeReadInt32S)
+{
+  TestEmberScalarTypeRead<int32_t, ZCL_INT32S_ATTRIBUTE_TYPE, TLV::kTLVType_SignedInteger>(-1234);
+}
+
+TEST(TestCodegenModelViaMocks, EmberAttributeReadEnum16)
+{
+  TestEmberScalarTypeRead<uint16_t, ZCL_ENUM16_ATTRIBUTE_TYPE, TLV::kTLVType_UnsignedInteger>(0x1234);
+}
+
+TEST(TestCodegenModelViaMocks, EmberAttributeReadFloat)
+{
+  TestEmberScalarTypeRead<float, ZCL_SINGLE_ATTRIBUTE_TYPE, TLV::kTLVType_FloatingPointNumber>(0.625);
+}
+
+TEST(TestCodegenModelViaMocks, EmberAttributeReadDouble)
+{
+  TestEmberScalarTypeRead<double, ZCL_DOUBLE_ATTRIBUTE_TYPE, TLV::kTLVType_FloatingPointNumber>(0.625);
+}
+
+
 TEST(TestCodegenModelViaMocks, EmberAttributeReadInt32U)
 {
-    UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel::Model model;
-    ScopedMockAccessControl accessControl;
+  TestEmberScalarTypeRead<uint32_t, ZCL_INT32U_ATTRIBUTE_TYPE, TLV::kTLVType_UnsignedInteger>(0x1234ABCD);
+}
 
-    TestReadRequest testRequest(
-        kAdminSubjectDescriptor,
-        ConcreteAttributePath(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_TYPE(ZCL_INT32U_ATTRIBUTE_TYPE)));
+TEST(TestCodegenModelViaMocks, EmberAttributeReadInt48U)
+{
+  TestEmberScalarTypeRead<uint64_t, ZCL_INT48U_ATTRIBUTE_TYPE, TLV::kTLVType_UnsignedInteger>(0xAABB11223344);
+}
 
-    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
+TEST(TestCodegenModelViaMocks, EmberAttributeReadBool)
+{
+  TestEmberScalarTypeRead<bool, ZCL_BOOLEAN_ATTRIBUTE_TYPE, TLV::kTLVType_Boolean>(true);
+  TestEmberScalarTypeRead<bool, ZCL_BOOLEAN_ATTRIBUTE_TYPE, TLV::kTLVType_Boolean>(false);
+}
 
-    // Ember encoding for integers is IDENTICAL to the in-memory representation for them
-    const uint32_t expected = 0x01020304;
-    chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(&expected), sizeof(expected)));
-
-    ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_NO_ERROR);
-
-    ASSERT_EQ(testRequest.FinishEncoding(), CHIP_NO_ERROR);
-
-    /////// VALIDATE
-    std::vector<DecodedAttributeData> attribute_data;
-    ASSERT_EQ(testRequest.encodedIBs.Decode(attribute_data), CHIP_NO_ERROR);
-    ASSERT_EQ(attribute_data.size(), 1u);
-
-    const DecodedAttributeData & encodedData = attribute_data[0];
-    ASSERT_EQ(encodedData.attributePath, testRequest.request.path);
-
-    // data element should be a uint32 encoded as TLV
-    ASSERT_EQ(encodedData.dataReader.GetType(), TLV::kTLVType_UnsignedInteger);
-    uint32_t actual;
-    ASSERT_EQ(encodedData.dataReader.Get(actual), CHIP_NO_ERROR);
-    ASSERT_EQ(actual, expected);
+TEST(TestCodegenModelViaMocks, EmberAttributeReadInt8U)
+{
+  TestEmberScalarTypeRead<uint8_t, ZCL_INT8U_ATTRIBUTE_TYPE, TLV::kTLVType_UnsignedInteger>(0x12);
 }
 
 TEST(TestCodegenModelViaMocks, EmberAttributeReadOctetString)
