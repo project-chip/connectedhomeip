@@ -62,18 +62,19 @@ void ClearLine()
 
 void ENFORCE_FORMAT(3, 0) LoggingCallback(const char * module, uint8_t category, const char * msg, va_list args)
 {
+    if (sLogFile == nullptr)
+    {
+        return;
+    }
+
     uint64_t timeMs       = chip::System::SystemClock().GetMonotonicMilliseconds64().count();
     uint64_t seconds      = timeMs / 1000;
     uint64_t milliseconds = timeMs % 1000;
 
     flockfile(sLogFile);
 
-    // Portable thread and process identifiers
-    auto pid = static_cast<unsigned long>(getpid());
-    auto tid = static_cast<unsigned long>(pthread_self());
-
-    fprintf(sLogFile, "[%llu.%06llu][%lu:%lu] CHIP:%s: ", static_cast<unsigned long long>(seconds),
-            static_cast<unsigned long long>(milliseconds), pid, tid, module);
+    fprintf(sLogFile, "[%llu.%06llu] CHIP:%s: ", static_cast<unsigned long long>(seconds),
+            static_cast<unsigned long long>(milliseconds), module);
     vfprintf(sLogFile, msg, args);
     fprintf(sLogFile, "\n");
     fflush(sLogFile);

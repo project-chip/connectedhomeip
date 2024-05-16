@@ -41,16 +41,8 @@ int main(int argc, char * argv[])
         // Insert "interactive" and "start" after the executable name
         args.insert(args.begin() + 1, "interactive");
         args.insert(args.begin() + 2, "start");
-
-        // Update argc and argv to reflect the new arguments
-        argc = static_cast<int>(args.size());
-        for (size_t i = 0; i < args.size(); ++i)
-        {
-            argv[i] = const_cast<char *>(args[i].c_str());
-        }
     }
 
-    // const char * args[] = { argv[0], "interactive", "start" };
     ExampleCredentialIssuerCommands credIssuerCommands;
     Commands commands;
 
@@ -59,5 +51,11 @@ int main(int argc, char * argv[])
     registerClusters(commands, &credIssuerCommands);
     registerCommandsSubscriptions(commands, &credIssuerCommands);
 
-    return commands.Run(argc, argv);
+    std::vector<char *> c_args;
+    for (auto & arg : args)
+    {
+        c_args.push_back(const_cast<char *>(arg.c_str()));
+    }
+
+    return commands.Run(static_cast<int>(c_args.size()), c_args.data());
 }
