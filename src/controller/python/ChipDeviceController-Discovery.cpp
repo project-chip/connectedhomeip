@@ -217,8 +217,8 @@ void pychip_DeviceController_PrintDiscoveredDevices(Controller::DeviceCommission
             ChipLogProgress(Discovery, "\tMrp Interval active\tNot present");
         }
 
-        ChipLogProgress(Discovery, "\tSupports Client TCP\t\t%d", dnsSdInfo->supportsTcpClient);
-        ChipLogProgress(Discovery, "\tSupports Server TCP\t\t%d", dnsSdInfo->supportsTcpServer);
+        ChipLogProgress(Discovery, "\tSupports TCP Client\t\t%d", dnsSdInfo->supportsTcpClient);
+        ChipLogProgress(Discovery, "\tSupports TCP Server\t\t%d", dnsSdInfo->supportsTcpServer);
         if (dnsSdInfo->isICDOperatingAsLIT.has_value())
         {
             ChipLogProgress(Discovery, "\tICD is operating as a\t%s", *(dnsSdInfo->isICDOperatingAsLIT) ? "LIT" : "SIT");

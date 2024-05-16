@@ -645,31 +645,80 @@ void DiscoveredTxtFieldTcpSupport()
     nodeData.Set<NodeData>();
     CommonResolutionData & resolutionData = nodeData.Get<NodeData>();
 
-    // True
+    // Neither TCP Client nor TCP Server are enabled
+    strcpy(key, "T");
+    strcpy(val, "0");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().supportsTcpServer);
+    EXPECT_FALSE(nodeData.Get<NodeData>().supportsTcpClient);
+
+    // Neither TCP Client nor TCP Server are enabled - ignoring first bit
+    strcpy(key, "T");
+    strcpy(val, "1");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().supportsTcpServer);
+    EXPECT_FALSE(nodeData.Get<NodeData>().supportsTcpClient);
+
+    // Supporting TCP Client only
+    strcpy(key, "T");
+    strcpy(val, "2");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_TRUE(nodeData.Get<NodeData>().supportsTcpClient);
+    EXPECT_FALSE(nodeData.Get<NodeData>().supportsTcpServer);
+
+    // Supporting TCP Client only - ignoring first bit
     strcpy(key, "T");
     strcpy(val, "3");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE(nodeData.Get<NodeData>().supportsTcpClient);
     EXPECT_FALSE(nodeData.Get<NodeData>().supportsTcpServer);
 
+    // Supporting TCP Server only
+    strcpy(key, "T");
+    strcpy(val, "4");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().supportsTcpClient);
+    EXPECT_TRUE(nodeData.Get<NodeData>().supportsTcpServer);
+
+    // Supporting TCP Server only - ignoring first bit
+    strcpy(key, "T");
+    strcpy(val, "5");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().supportsTcpClient);
+    EXPECT_TRUE(nodeData.Get<NodeData>().supportsTcpServer);
+
+    // Supporting TCP Server and Client
+    strcpy(key, "T");
+    strcpy(val, "6");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_TRUE(nodeData.Get<NodeData>().supportsTcpClient);
+    EXPECT_TRUE(nodeData.Get<NodeData>().supportsTcpServer);
+
+    // Supporting TCP Server and Client - ignoring first bit
+    strcpy(key, "T");
+    strcpy(val, "7");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_TRUE(nodeData.Get<NodeData>().supportsTcpClient);
+    EXPECT_TRUE(nodeData.Get<NodeData>().supportsTcpServer);
+
+    // Invalid value, means neither TCP Client or Server are enabled
+    strcpy(key, "T");
+    strcpy(val, "8");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().supportsTcpClient);
+    EXPECT_FALSE(nodeData.Get<NodeData>().supportsTcpServer);
+
+    // Invalid value, means neither TCP Client or Server are enabled
+    strcpy(key, "T");
+    strcpy(val, "asdf");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
+    EXPECT_FALSE(nodeData.Get<NodeData>().supportsTcpClient);
+    EXPECT_FALSE(nodeData.Get<NodeData>().supportsTcpServer);
+
     // Test no other fields were populated
     nodeData.Get<NodeData>().supportsTcpClient = false;
     nodeData.Get<NodeData>().supportsTcpServer = false;
     EXPECT_TRUE(NodeDataIsEmpty(nodeData.Get<NodeData>()));
-
-    // False
-    strcpy(key, "T");
-    strcpy(val, "0");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
-    EXPECT_TRUE(nodeData.Get<NodeData>().supportsTcpServer == false);
-    EXPECT_TRUE(nodeData.Get<NodeData>().supportsTcpClient == false);
-
-    // Invalid value, stil false
-    strcpy(key, "T");
-    strcpy(val, "asdf");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
-    EXPECT_TRUE(nodeData.Get<NodeData>().supportsTcpClient == false);
-    EXPECT_TRUE(nodeData.Get<NodeData>().supportsTcpServer == false);
 }
 
 // Test ICD (ICD operation Mode)
@@ -984,31 +1033,80 @@ void TxtFieldTcpSupport()
     char val[8];
     NodeData nodeData;
 
-    // True
+    // Neither TCP Client nor TCP Server are enabled
+    strcpy(key, "T");
+    strcpy(val, "0");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
+    EXPECT_FALSE(nodeData.resolutionData.supportsTcpServer);
+    EXPECT_FALSE(nodeData.resolutionData.supportsTcpClient);
+
+    // Neither TCP Client nor TCP Server are enabled - ignoring first bit
     strcpy(key, "T");
     strcpy(val, "1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
     EXPECT_FALSE(nodeData.resolutionData.supportsTcpServer);
     EXPECT_FALSE(nodeData.resolutionData.supportsTcpClient);
 
+    // Supporting TCP Client only
+    strcpy(key, "T");
+    strcpy(val, "2");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
+    EXPECT_FALSE(nodeData.resolutionData.supportsTcpServer);
+    EXPECT_TRUE(nodeData.resolutionData.supportsTcpClient);
+
+    // Supporting TCP Client only - ignoring first bit
+    strcpy(key, "T");
+    strcpy(val, "3");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
+    EXPECT_FALSE(nodeData.resolutionData.supportsTcpServer);
+    EXPECT_TRUE(nodeData.resolutionData.supportsTcpClient);
+
+    // Supporting TCP Server only
+    strcpy(key, "T");
+    strcpy(val, "4");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
+    EXPECT_TRUE(nodeData.resolutionData.supportsTcpServer);
+    EXPECT_FALSE(nodeData.resolutionData.supportsTcpClient);
+
+    // Supporting TCP Server only - ignoring first bit
+    strcpy(key, "T");
+    strcpy(val, "5");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
+    EXPECT_TRUE(nodeData.resolutionData.supportsTcpServer);
+    EXPECT_FALSE(nodeData.resolutionData.supportsTcpClient);
+
+    // Supporting TCP Server and Client
+    strcpy(key, "T");
+    strcpy(val, "6");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
+    EXPECT_TRUE(nodeData.resolutionData.supportsTcpServer);
+    EXPECT_TRUE(nodeData.resolutionData.supportsTcpClient);
+
+    // Supporting TCP Server and Client - ignoring first bit
+    strcpy(key, "T");
+    strcpy(val, "7");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
+    EXPECT_TRUE(nodeData.resolutionData.supportsTcpServer);
+    EXPECT_TRUE(nodeData.resolutionData.supportsTcpClient);
+
+    // Invalid value, means neither TCP Client or Server are enabled
+    strcpy(key, "T");
+    strcpy(val, "8");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
+    EXPECT_FALSE(nodeData.resolutionData.supportsTcpClient);
+    EXPECT_FALSE(nodeData.resolutionData.supportsTcpServer);
+
+    // Invalid value, means neither TCP Client or Server are enabled
+    strcpy(key, "T");
+    strcpy(val, "asdf");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
+    EXPECT_FALSE(nodeData.resolutionData.supportsTcpClient);
+    EXPECT_FALSE(nodeData.resolutionData.supportsTcpServer);
+
     // Test no other fields were populated
     nodeData.resolutionData.supportsTcpServer = false;
     nodeData.resolutionData.supportsTcpClient = false;
     EXPECT_TRUE(NodeDataIsEmpty(nodeData));
-
-    // False
-    strcpy(key, "T");
-    strcpy(val, "0");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    EXPECT_EQ(nodeData.resolutionData.supportsTcpServer, false);
-    EXPECT_EQ(nodeData.resolutionData.supportsTcpClient, false);
-
-    // Invalid value, stil false
-    strcpy(key, "T");
-    strcpy(val, "asdf");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    EXPECT_EQ(nodeData.resolutionData.supportsTcpClient, false);
-    EXPECT_EQ(nodeData.resolutionData.supportsTcpServer, false);
 }
 
 TEST(TestTxtFields, TxtDiscoveredFieldTcpSupport)

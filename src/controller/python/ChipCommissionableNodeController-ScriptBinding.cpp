@@ -118,8 +118,8 @@ void pychip_CommissionableNodeController_PrintDiscoveredCommissioners(
             ChipLogProgress(Discovery, "\tMrp Interval active\tNot present");
         }
 
-        ChipLogProgress(Discovery, "\tSupports Client TCP\t\t%d", dnsSdInfo->supportsTcpClient);
-        ChipLogProgress(Discovery, "\tSupports Server TCP\t\t%d", dnsSdInfo->supportsTcpServer);
+        ChipLogProgress(Discovery, "\tSupports TCP Client\t\t%d", dnsSdInfo->supportsTcpClient);
+        ChipLogProgress(Discovery, "\tSupports TCP Server\t\t%d", dnsSdInfo->supportsTcpServer);
 
         if (dnsSdInfo->isICDOperatingAsLIT.has_value())
         {
