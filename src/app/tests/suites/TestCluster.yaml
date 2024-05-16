@@ -707,6 +707,20 @@ tests:
       response:
           value: 0
 
+    # Tests for Nullable String attribute
+
+    - label: "Write attribute NULLABLE_CHAR_STRING - Value starting with null"
+      command: "writeAttribute"
+      attribute: "nullable_char_string"
+      arguments:
+          value: "nulla"
+
+    - label: "Read attribute NULLABLE_CHAR_STRING"
+      command: "readAttribute"
+      attribute: "nullable_char_string"
+      response:
+          value: "nulla"
+
     # Tests for Octet String attribute
 
     - label: "Read attribute OCTET_STRING Default Value"
