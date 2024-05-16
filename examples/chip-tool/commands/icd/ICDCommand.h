@@ -51,7 +51,7 @@ class ICDWaitForDeviceCommand : public ClusterCommand, public chip::app::Default
 public:
     ICDWaitForDeviceCommand(CredentialIssuerCommands * credIssuerCmds) : ClusterCommand("wait-for-device", credIssuerCmds)
     {
-        ModelCommand::AddArguments(/*skipEndpoints=*/true);
+        ModelCommand::AddArguments(/* skipEndpoints= */ true);
         AddArgument("stay-active-duration-seconds", 30, UINT32_MAX, &mStayActiveDurationSeconds,
                     "The duration in seconds for the device to stay active after check-in completes.");
     }
