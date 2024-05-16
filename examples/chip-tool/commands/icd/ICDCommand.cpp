@@ -110,7 +110,7 @@ CHIP_ERROR ICDWaitForDeviceCommand::SendCommand(DeviceProxy * device,
 }
 
 namespace {
-DefaultCheckInDelegate * checkInDelegate;
+DefaultCheckInDelegate * sCheckInDelegate;
 }
 
 void registerCommandsICD(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
