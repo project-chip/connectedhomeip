@@ -20,9 +20,9 @@
 #error This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
 #endif
 
-#import "UUIDHelper.h"
+#import "MTRUUIDHelper.h"
 
-@implementation UUIDHelper
+@implementation MTRUUIDHelper
 
 + (CBUUID *)GetShortestServiceUUID:(const chip::Ble::ChipBleUUID *)svcId
 {

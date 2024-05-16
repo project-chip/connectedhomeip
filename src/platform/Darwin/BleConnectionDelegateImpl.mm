@@ -34,8 +34,8 @@
 #include <setup_payload/SetupPayload.h>
 #include <tracing/metric_event.h>
 
+#import "MTRUUIDHelper.h"
 #import "PlatformMetricKeys.h"
-#import "UUIDHelper.h"
 
 using namespace chip::Ble;
 using namespace chip::DeviceLayer;
@@ -245,7 +245,7 @@ namespace DeviceLayer {
 {
     self = [super init];
     if (self) {
-        self.shortServiceUUID = [UUIDHelper GetShortestServiceUUID:&chip::Ble::CHIP_BLE_SVC_ID];
+        self.shortServiceUUID = [MTRUUIDHelper GetShortestServiceUUID:&chip::Ble::CHIP_BLE_SVC_ID];
         _chipWorkQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
         _workQueue = queue;
         _centralManager = [CBCentralManager alloc];

@@ -21,6 +21,6 @@
 
 #import <CoreBluetooth/CoreBluetooth.h>
 
-@interface UUIDHelper : NSObject
+@interface MTRUUIDHelper : NSObject
 + (CBUUID *)GetShortestServiceUUID:(const chip::Ble::ChipBleUUID *)svcId;
 @end

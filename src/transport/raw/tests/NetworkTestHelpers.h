@@ -72,7 +72,12 @@ public:
 class LoopbackTransport : public Transport::Base
 {
 public:
-    void InitLoopbackTransport(System::Layer * systemLayer) { mSystemLayer = systemLayer; }
+    void InitLoopbackTransport(System::Layer * systemLayer)
+    {
+        Reset();
+        mSystemLayer = systemLayer;
+    }
+
     void ShutdownLoopbackTransport()
     {
         // Make sure no one left packets hanging out that they thought got

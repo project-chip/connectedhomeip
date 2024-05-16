@@ -1,6 +1,5 @@
-/*
- *
- *    Copyright (c) 2022 Project CHIP Authors
+/**
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,8 +13,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <access/Privilege.h>
+#include <lib/core/DataModelTypes.h>
 
-#include <app/util/privilege-storage.h>
+// Privilege mocks here are MUCH more strict so that
+// testing code can generally validatate access without something
+// being permissive like kView.
 
 chip::Access::Privilege MatterGetAccessPrivilegeForReadAttribute(chip::ClusterId cluster, chip::AttributeId attribute)
 {
