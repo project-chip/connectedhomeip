@@ -6,7 +6,7 @@ tests that are located in the `test` directory, e.g. `src/inet/tests`. Those
 sources are built as a static library that can be linked to the unit test
 application separately or as a monolithic test library. The common Matter test
 library collects all test cases and provides the engine based on
-[Nest Labs Unit Test](https://github.com/nestlabs/nlunit-test) to run them in
+[Pigweed Unit Test](https://pigweed.dev/pw_unit_test) to run them in
 the application.
 
 The Open IoT SDK unit tests implementation are located in the
@@ -27,6 +27,7 @@ ChipCryptoTests
 CoreTests
 CredentialsTest
 DataModelTests
+ICDServerTests
 InetLayerTests
 MdnsTests
 MessagingLayerTests
@@ -41,7 +42,6 @@ SetupPayloadTests
 SupportTests
 SystemLayerTests
 TestShell
-TransportLayerTests
 UserDirectedCommissioningTests
 ```
 
