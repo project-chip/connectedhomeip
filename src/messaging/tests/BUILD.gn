@@ -26,6 +26,7 @@ static_library("helpers") {
   sources = [
     "MessagingContext.cpp",
     "MessagingContext.h",
+    "ReliableMessageContextTestAccess.h",
   ]
 
   cflags = [ "-Wconversion" ]
