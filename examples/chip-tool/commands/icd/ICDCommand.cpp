@@ -79,7 +79,7 @@ CHIP_ERROR ICDWaitForDeviceCommand::RunCommand()
 
 void ICDWaitForDeviceCommand::OnCheckInComplete(const chip::app::ICDClientInfo & clientInfo)
 {
-    DefaultCheckInDelegate::OnCheckInComplete(clientInfo);
+    Default::OnCheckInComplete(clientInfo);
 
     if (clientInfo.peer_node != mInterestedNode)
     {
@@ -121,7 +121,7 @@ void registerCommandsICD(Commands & commands, CredentialIssuerCommands * credsIs
 
     // This should be safe within CHIPTool, since the lifespan of Commands is longer than any commands and the CHIPStack.
     // So this object will not be used after free within CHIPTool.
-    checkInDelegate = static_cast<ICDWaitForDeviceCommand *>(icdWaitForDeviceCommand.get());
+    sCheckInDelegate = static_cast<ICDWaitForDeviceCommand *>(icdWaitForDeviceCommand.get());
 
     commands_list list = {
         make_unique<ICDListCommand>(credsIssuerConfig),
@@ -133,5 +133,5 @@ void registerCommandsICD(Commands & commands, CredentialIssuerCommands * credsIs
 
 DefaultCheckInDelegate * chipToolCheckInDelegate()
 {
-    return checkInDelegate;
+    return sCheckInDelegate;
 }
