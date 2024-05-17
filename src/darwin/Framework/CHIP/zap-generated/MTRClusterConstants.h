@@ -199,6 +199,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeContentControlID MTR_PROVISIONALLY_AVAILABLE = 0x0000050F,
     MTRClusterIDTypeContentAppObserverID MTR_PROVISIONALLY_AVAILABLE = 0x00000510,
     MTRClusterIDTypeElectricalMeasurementID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000B04,
+    MTRClusterIDTypeWiFiNetworkManagementID MTR_PROVISIONALLY_AVAILABLE = 0x00000C00,
     MTRClusterIDTypeUnitTestingID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0xFFF1FC05,
     MTRClusterIDTypeSampleMEIID MTR_PROVISIONALLY_AVAILABLE = 0xFFF1FC20,
 };
@@ -5343,6 +5344,15 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterElectricalMeasurementAttributeFeatureMapID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterElectricalMeasurementAttributeClusterRevisionID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
+    // Cluster WiFiNetworkManagement attributes
+    MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeSSIDID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
+    MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
     // Cluster TestCluster deprecated attribute names
     MTRClusterTestClusterAttributeBooleanID
         MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeBooleanID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -6810,6 +6820,10 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterElectricalMeasurementCommandGetProfileInfoCommandID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000000,
     MTRCommandIDTypeClusterElectricalMeasurementCommandGetMeasurementProfileResponseCommandID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000001,
     MTRCommandIDTypeClusterElectricalMeasurementCommandGetMeasurementProfileCommandID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000001,
+
+    // Cluster WiFiNetworkManagement commands
+    MTRCommandIDTypeClusterWiFiNetworkManagementCommandNetworkPassphraseRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterWiFiNetworkManagementCommandNetworkPassphraseResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
 
     // Cluster TestCluster deprecated command id names
     MTRClusterTestClusterCommandTestID

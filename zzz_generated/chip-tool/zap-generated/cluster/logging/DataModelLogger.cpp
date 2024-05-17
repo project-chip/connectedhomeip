@@ -7833,6 +7833,14 @@ DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const WiFiNetworkManagement::Commands::NetworkPassphraseResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("passphrase", indent + 1, value.passphrase));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const UnitTesting::Commands::TestSpecificResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -17488,6 +17496,47 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
+    case WiFiNetworkManagement::Id: {
+        switch (path.mAttributeId)
+        {
+        case WiFiNetworkManagement::Attributes::Ssid::Id: {
+            chip::app::DataModel::Nullable<chip::ByteSpan> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SSID", 1, value);
+        }
+        case WiFiNetworkManagement::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+        }
+        case WiFiNetworkManagement::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+        }
+        case WiFiNetworkManagement::Attributes::EventList::Id: {
+            chip::app::DataModel::DecodableList<chip::EventId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EventList", 1, value);
+        }
+        case WiFiNetworkManagement::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case WiFiNetworkManagement::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case WiFiNetworkManagement::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
     case UnitTesting::Id: {
         switch (path.mAttributeId)
         {
@@ -18554,6 +18603,17 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             ElectricalMeasurement::Commands::GetMeasurementProfileResponseCommand::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GetMeasurementProfileResponseCommand", 1, value);
+        }
+        }
+        break;
+    }
+    case WiFiNetworkManagement::Id: {
+        switch (path.mCommandId)
+        {
+        case WiFiNetworkManagement::Commands::NetworkPassphraseResponse::Id: {
+            WiFiNetworkManagement::Commands::NetworkPassphraseResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NetworkPassphraseResponse", 1, value);
         }
         }
         break;

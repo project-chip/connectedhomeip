@@ -127,6 +127,7 @@ Generally regenerate using one of:
 |       1295 |      0x50F | ContentControl                                          |
 |       1296 |      0x510 | ContentAppObserver                                      |
 |       2820 |      0xB04 | ElectricalMeasurement                                   |
+|       3072 |      0xC00 | WiFiNetworkManagement                                   |
 | 4294048773 | 0xFFF1FC05 | UnitTesting                                             |
 | 4294048774 | 0xFFF1FC06 | FaultInjection                                          |
 | 4294048800 | 0xFFF1FC20 | SampleMei                                               |

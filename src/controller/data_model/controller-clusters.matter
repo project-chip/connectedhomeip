@@ -8855,6 +8855,26 @@ deprecated cluster ElectricalMeasurement = 2820 {
   command GetMeasurementProfileCommand(GetMeasurementProfileCommandRequest): DefaultSuccess = 1;
 }
 
+/** Functionality to retrieve operational information about a managed Wi-Fi network. */
+cluster WiFiNetworkManagement = 3072 {
+  revision 1;
+
+  readonly attribute nullable octet_string<32> ssid = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  response struct NetworkPassphraseResponse = 1 {
+    octet_string<64> passphrase = 0;
+  }
+
+  /** Request the current WPA-Personal passphrase or PSK associated with the managed Wi-Fi network. */
+  command access(invoke: administer) NetworkPassphraseRequest(): NetworkPassphraseResponse = 0;
+}
+
 /** The Test Cluster is meant to validate the generated code */
 internal cluster UnitTesting = 4294048773 {
   revision 1; // NOTE: Default/not specifically set

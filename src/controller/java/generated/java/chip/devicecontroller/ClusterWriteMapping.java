@@ -3842,6 +3842,8 @@ public class ClusterWriteMapping {
     );
     writeElectricalMeasurementInteractionInfo.put("writeAcOverloadAlarmsMaskAttribute", writeElectricalMeasurementAcOverloadAlarmsMaskAttributeInteractionInfo);
     writeAttributeMap.put("electricalMeasurement", writeElectricalMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeWiFiNetworkManagementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("wiFiNetworkManagement", writeWiFiNetworkManagementInteractionInfo);
     Map<String, InteractionInfo> writeUnitTestingInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeUnitTestingBooleanCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo unitTestingbooleanCommandParameterInfo =

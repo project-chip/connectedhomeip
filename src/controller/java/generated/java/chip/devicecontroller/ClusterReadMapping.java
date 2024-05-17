@@ -19372,6 +19372,87 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readWiFiNetworkManagementInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readWiFiNetworkManagementSsidCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readWiFiNetworkManagementSsidAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.WiFiNetworkManagementCluster) cluster).readSsidAttribute(
+              (ChipClusters.WiFiNetworkManagementCluster.SsidAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedWiFiNetworkManagementClusterSsidAttributeCallback(),
+          readWiFiNetworkManagementSsidCommandParams
+        );
+        result.put("readSsidAttribute", readWiFiNetworkManagementSsidAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readWiFiNetworkManagementGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readWiFiNetworkManagementGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.WiFiNetworkManagementCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.WiFiNetworkManagementCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedWiFiNetworkManagementClusterGeneratedCommandListAttributeCallback(),
+          readWiFiNetworkManagementGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readWiFiNetworkManagementGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readWiFiNetworkManagementAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readWiFiNetworkManagementAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.WiFiNetworkManagementCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.WiFiNetworkManagementCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedWiFiNetworkManagementClusterAcceptedCommandListAttributeCallback(),
+          readWiFiNetworkManagementAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readWiFiNetworkManagementAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readWiFiNetworkManagementEventListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readWiFiNetworkManagementEventListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.WiFiNetworkManagementCluster) cluster).readEventListAttribute(
+              (ChipClusters.WiFiNetworkManagementCluster.EventListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedWiFiNetworkManagementClusterEventListAttributeCallback(),
+          readWiFiNetworkManagementEventListCommandParams
+        );
+        result.put("readEventListAttribute", readWiFiNetworkManagementEventListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readWiFiNetworkManagementAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readWiFiNetworkManagementAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.WiFiNetworkManagementCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.WiFiNetworkManagementCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedWiFiNetworkManagementClusterAttributeListAttributeCallback(),
+          readWiFiNetworkManagementAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readWiFiNetworkManagementAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readWiFiNetworkManagementFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readWiFiNetworkManagementFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.WiFiNetworkManagementCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readWiFiNetworkManagementFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readWiFiNetworkManagementFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readWiFiNetworkManagementClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readWiFiNetworkManagementClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.WiFiNetworkManagementCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readWiFiNetworkManagementClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readWiFiNetworkManagementClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readUnitTestingInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readUnitTestingBooleanCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readUnitTestingBooleanAttributeInteractionInfo = new InteractionInfo(
@@ -20603,6 +20684,7 @@ public class ClusterReadMapping {
             put("contentControl", readContentControlInteractionInfo());
             put("contentAppObserver", readContentAppObserverInteractionInfo());
             put("electricalMeasurement", readElectricalMeasurementInteractionInfo());
+            put("wiFiNetworkManagement", readWiFiNetworkManagementInteractionInfo());
             put("unitTesting", readUnitTestingInteractionInfo());
             put("faultInjection", readFaultInjectionInteractionInfo());
             put("sampleMei", readSampleMeiInteractionInfo());}};
