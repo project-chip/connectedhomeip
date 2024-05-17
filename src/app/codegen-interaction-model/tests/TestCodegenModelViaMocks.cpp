@@ -903,6 +903,39 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadNulls)
     TestEmberScalarNullRead<double, ZCL_DOUBLE_ATTRIBUTE_TYPE>();
 }
 
+TEST(TestCodegenModelViaMocks, EmberAttributeReadErrorReading)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    chip::app::CodegenDataModel model;
+    ScopedMockAccessControl accessControl;
+
+    {
+        TestReadRequest testRequest(
+            kAdminSubjectDescriptor,
+            ConcreteAttributePath(kMockEndpoint3, MockClusterId(4),
+                                  MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE)));
+
+        chip::Test::SetEmberReadOutput(Protocols::InteractionModel::Status::Failure);
+
+        // Actual read via an encoder
+        std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
+        ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_IM_GLOBAL_STATUS(Failure));
+    }
+
+    {
+        TestReadRequest testRequest(
+            kAdminSubjectDescriptor,
+            ConcreteAttributePath(kMockEndpoint3, MockClusterId(4),
+                                  MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE)));
+
+        chip::Test::SetEmberReadOutput(Protocols::InteractionModel::Status::Busy);
+
+        // Actual read via an encoder
+        std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
+        ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_IM_GLOBAL_STATUS(Busy));
+    }
+}
+
 TEST(TestCodegenModelViaMocks, EmberAttributeReadNullOctetString)
 {
     UseMockNodeConfig config(gTestNodeConfig);
