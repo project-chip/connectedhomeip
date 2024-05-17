@@ -36,12 +36,10 @@
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVReader.h>
 #include <lib/core/TLVWriter.h>
+#include <lib/core/StringBuilderAdapters.h>
 
 #include <gtest/gtest.h>
 #include <vector>
-
-// TODO: CHIP_ERROR tostring should be separated out
-#include <pw_span/span.h>
 
 using namespace chip;
 using namespace chip::Test;
@@ -49,20 +47,6 @@ using namespace chip::app;
 using namespace chip::app::InteractionModel;
 using namespace chip::app::Clusters::Globals::Attributes;
 
-namespace pw {
-
-template <>
-StatusWithSize ToString<CHIP_ERROR>(const CHIP_ERROR & err, pw::span<char> buffer)
-{
-    if (CHIP_ERROR::IsSuccess(err))
-    {
-        // source location probably does not matter
-        return pw::string::Format(buffer, "CHIP_NO_ERROR");
-    }
-    return pw::string::Format(buffer, "CHIP_ERROR:<%" CHIP_ERROR_FORMAT ">", err.Format());
-}
-
-} // namespace pw
 
 namespace {
 

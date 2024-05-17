@@ -44,6 +44,7 @@ source_set("mock_model") {
   public_deps += [
     ":ember_extra_files",
     "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/lib/core:string-builder-adapters",
   ]
 }
 
