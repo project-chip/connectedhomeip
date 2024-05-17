@@ -5,8 +5,10 @@ import static androidx.core.content.ContextCompat.getSystemService;
 import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.os.Build;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.EditText;
 import androidx.appcompat.app.AlertDialog;
@@ -44,6 +46,17 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
             + productId
             + ". Commissionee: "
             + commissioneeName);
+
+    ContentResolver contentResolver = context.getContentResolver();
+    boolean authorisationDialogDisabled =
+        Settings.Secure.getInt(contentResolver, "matter_show_authorisation_dialog", 0) == 0;
+    // By default do not show authorisation dialog
+    // only do so if customer or OS explicitly ask for it, by updating
+    // matter_show_authorisation_dialog flag to 1
+    if (authorisationDialogDisabled) {
+      OnPromptAccepted();
+      return;
+    }
 
     getActivity()
         .runOnUiThread(

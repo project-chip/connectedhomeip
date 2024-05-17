@@ -81,3 +81,9 @@ void ModelCommand::Shutdown()
     mOnDeviceConnectedCallback.Cancel();
     mOnDeviceConnectionFailureCallback.Cancel();
 }
+
+bool ModelCommand::IsPeerLIT()
+{
+    // Does not support tv-casting-app
+    return false;
+}
