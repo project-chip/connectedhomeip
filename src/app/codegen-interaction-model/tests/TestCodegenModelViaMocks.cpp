@@ -14,6 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/AttributeValueDecoder.h"
+#include "lib/core/TLVTypes.h"
+#include "lib/support/CodeUtils.h"
 #include <app/codegen-interaction-model/Model.h>
 
 #include <app/codegen-interaction-model/tests/EmberReadWriteOverride.h>
@@ -335,6 +338,27 @@ struct UseMockNodeConfig
     ~UseMockNodeConfig() { ResetMockNodeConfig(); }
 };
 
+template <typename T>
+CHIP_ERROR DecodeList(TLV::TLVReader & reader, std::vector<T> & out)
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(reader.EnterContainer(outer));
+    while (true)
+    {
+        CHIP_ERROR err = reader.Next();
+
+        if (err == CHIP_END_OF_TLV)
+        {
+            return CHIP_NO_ERROR;
+        }
+        ReturnErrorOnFailure(err);
+
+        T value;
+        ReturnErrorOnFailure(DataModel::Decode(reader, value));
+        out.emplace_back(std::move(value));
+    }
+}
+
 class StructAttributeAccessInterface : public AttributeAccessInterface
 {
 public:
@@ -360,6 +384,42 @@ public:
 private:
     ConcreteAttributePath mPath;
     Clusters::UnitTesting::Structs::SimpleStruct::Type mData;
+};
+
+class ListAttributeAcessInterface : public AttributeAccessInterface
+{
+public:
+    ListAttributeAcessInterface(ConcreteAttributePath path) :
+        AttributeAccessInterface(MakeOptional(path.mEndpointId), path.mClusterId), mPath(path)
+    {}
+    ~ListAttributeAcessInterface() = default;
+
+    CHIP_ERROR Read(const ConcreteReadAttributePath & path, AttributeValueEncoder & encoder) override
+    {
+        if (static_cast<const ConcreteAttributePath &>(path) != mPath)
+        {
+            // returning without trying to handle means "I do not handle this"
+            return CHIP_NO_ERROR;
+        }
+
+        return encoder.EncodeList([this](const auto & encoder) {
+            for (unsigned i = 0; i < mCount; i++)
+            {
+                mData.a = static_cast<uint8_t>(i % 0xFF);
+                ReturnErrorOnFailure(encoder.Encode(mData));
+            }
+            return CHIP_NO_ERROR;
+        });
+    }
+
+    void SetReturnedData(const Clusters::UnitTesting::Structs::SimpleStruct::Type & data) { mData = data; }
+    void SetReturnedDataCount(unsigned count) { mCount = count; }
+    Clusters::UnitTesting::Structs::SimpleStruct::Type simpleStruct;
+
+private:
+    ConcreteAttributePath mPath;
+    Clusters::UnitTesting::Structs::SimpleStruct::Type mData;
+    unsigned mCount = 0;
 };
 
 /// RAII registration of an attribute access interface
@@ -919,4 +979,115 @@ TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceStructRead)
     ASSERT_EQ(actual.g, 0.5);
     ASSERT_EQ(actual.h, 0.125);
     ASSERT_TRUE(actual.e.data_equal("foo"_span));
+}
+
+TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceListRead)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    chip::app::CodegenDataModel::Model model;
+    ScopedMockAccessControl accessControl;
+
+    const ConcreteAttributePath kStructPath(kMockEndpoint3, MockClusterId(4),
+                                            MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_ARRAY_ATTRIBUTE_TYPE));
+
+    TestReadRequest testRequest(kAdminSubjectDescriptor, kStructPath);
+    RegisteredAttributeAccessInterface<ListAttributeAcessInterface> aai(kStructPath);
+
+    constexpr unsigned kDataCount = 5;
+    aai->SetReturnedData(Clusters::UnitTesting::Structs::SimpleStruct::Type{
+        .b = true,
+        .e = "xyz"_span,
+        .g = 0.25,
+        .h = 0.5,
+    });
+    aai->SetReturnedDataCount(kDataCount);
+
+    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
+    ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_NO_ERROR);
+    ASSERT_EQ(testRequest.FinishEncoding(), CHIP_NO_ERROR);
+
+    // Validate after read
+    std::vector<DecodedAttributeData> attribute_data;
+    ASSERT_EQ(testRequest.encodedIBs.Decode(attribute_data), CHIP_NO_ERROR);
+    ASSERT_EQ(attribute_data.size(), 1u);
+
+    DecodedAttributeData & encodedData = attribute_data[0];
+    ASSERT_EQ(encodedData.attributePath, testRequest.request.path);
+
+    ASSERT_EQ(encodedData.dataReader.GetType(), TLV::kTLVType_Array);
+
+    std::vector<Clusters::UnitTesting::Structs::SimpleStruct::DecodableType> items;
+    ASSERT_EQ(DecodeList(encodedData.dataReader, items), CHIP_NO_ERROR);
+
+    ASSERT_EQ(items.size(), kDataCount);
+
+    for (unsigned i = 0; i < kDataCount; i++)
+    {
+        Clusters::UnitTesting::Structs::SimpleStruct::DecodableType & actual = items[i];
+
+        ASSERT_EQ(actual.a, static_cast<uint8_t>(i & 0xFF));
+        ASSERT_EQ(actual.b, true);
+        ASSERT_EQ(actual.g, 0.25);
+        ASSERT_EQ(actual.h, 0.5);
+        ASSERT_TRUE(actual.e.data_equal("xyz"_span));
+    }
+}
+
+TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceListOverflowRead)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    chip::app::CodegenDataModel::Model model;
+    ScopedMockAccessControl accessControl;
+
+    const ConcreteAttributePath kStructPath(kMockEndpoint3, MockClusterId(4),
+                                            MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_ARRAY_ATTRIBUTE_TYPE));
+
+    TestReadRequest testRequest(kAdminSubjectDescriptor, kStructPath);
+    RegisteredAttributeAccessInterface<ListAttributeAcessInterface> aai(kStructPath);
+
+    constexpr unsigned kDataCount = 1024;
+    aai->SetReturnedData(Clusters::UnitTesting::Structs::SimpleStruct::Type{
+        .b = true,
+        .e = "thisislongertofillupfaster"_span,
+        .g = 0.25,
+        .h = 0.5,
+    });
+    aai->SetReturnedDataCount(kDataCount);
+
+    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
+    // NOTE: overflow, however data should be valid. Technically both NO_MEMORY and BUFFER_TOO_SMALL
+    // should be ok here, however we know buffer-too-small is the error in this case hence
+    // the compare (easier to write the test and read the output)
+    ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_ERROR_BUFFER_TOO_SMALL);
+    ASSERT_EQ(testRequest.FinishEncoding(), CHIP_NO_ERROR);
+
+    // Validate after read
+    std::vector<DecodedAttributeData> attribute_data;
+    ASSERT_EQ(testRequest.encodedIBs.Decode(attribute_data), CHIP_NO_ERROR);
+    ASSERT_EQ(attribute_data.size(), 1u);
+
+    DecodedAttributeData & encodedData = attribute_data[0];
+    ASSERT_EQ(encodedData.attributePath, testRequest.request.path);
+
+    ASSERT_EQ(encodedData.dataReader.GetType(), TLV::kTLVType_Array);
+
+    std::vector<Clusters::UnitTesting::Structs::SimpleStruct::DecodableType> items;
+    ASSERT_EQ(DecodeList(encodedData.dataReader, items), CHIP_NO_ERROR);
+
+    // On last check, 16 items can be encoded. Set some non-zero range to be enforced here that
+    // SOME list items are actually encoded. Actual lower bound here IS ARBITRARY and was picked
+    // to just ensure non-zero item count for checks.
+    ASSERT_GT(items.size(), 5u);
+    ASSERT_LT(items.size(), kDataCount);
+
+    for (unsigned i = 0; i < items.size(); i++)
+    {
+        Clusters::UnitTesting::Structs::SimpleStruct::DecodableType & actual = items[i];
+
+        ASSERT_EQ(actual.a, static_cast<uint8_t>(i & 0xFF));
+        ASSERT_EQ(actual.b, true);
+        ASSERT_EQ(actual.g, 0.25);
+        ASSERT_EQ(actual.h, 0.5);
+        ASSERT_TRUE(actual.e.data_equal("thisislongertofillupfaster"_span));
+    }
 }
