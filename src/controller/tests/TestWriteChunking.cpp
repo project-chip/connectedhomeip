@@ -19,8 +19,6 @@
 #include <memory>
 #include <utility>
 
-#include <gtest/gtest.h>
-
 #include "app-common/zap-generated/ids/Attributes.h"
 #include "app-common/zap-generated/ids/Clusters.h"
 #include "app/ConcreteAttributePath.h"
@@ -40,7 +38,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/tests/MessagingContext.h>
 
-using TestContext = chip::Test::AppContext;
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -62,41 +59,39 @@ constexpr uint32_t kTestListLength        = 5;
 // We don't really care about the content, we just need a buffer.
 uint8_t sByteSpanData[app::kMaxSecureSduLengthBytes];
 
-class TestWriteChunking : public ::testing::Test
+class TestWriteChunking : public Test::AppContext
 {
-public:
-    // Performs shared setup for all tests in the test suite
-    static void SetUpTestSuite()
-    {
-        if (mpContext == nullptr)
-        {
-            mpContext = new TestContext();
-            ASSERT_NE(mpContext, nullptr);
-        }
-        mpContext->SetUpTestSuite();
-    }
-
-    // Performs shared teardown for all tests in the test suite
-    static void TearDownTestSuite()
-    {
-        mpContext->TearDownTestSuite();
-        if (mpContext != nullptr)
-        {
-            delete mpContext;
-            mpContext = nullptr;
-        }
-    }
+private:
+    using PathStatus = std::pair<app::ConcreteAttributePath, bool>;
 
 protected:
-    // Performs setup for each test in the suite
-    void SetUp() { mpContext->SetUp(); }
+    enum class Operations : uint8_t
+    {
+        kNoop,
+        kShutdownWriteClient,
+    };
 
-    // Performs teardown for each test in the suite
-    void TearDown() { mpContext->TearDown(); }
+    enum class ListData : uint8_t
+    {
+        kNull,
+        kList,
+        kBadValue,
+    };
 
-    static TestContext * mpContext;
+    struct Instructions
+    {
+        // The paths used in write request
+        std::vector<ConcreteAttributePath> paths;
+        // The type of content of the list, it should be an empty vector or its size should equals to the list of paths.
+        std::vector<ListData> data;
+        // operations on OnListWriteBegin and OnListWriteEnd on the server side.
+        std::function<Operations(const app::ConcreteAttributePath & path)> onListWriteBeginActions;
+        // The expected status when OnListWriteEnd is called. In the same order as paths
+        std::vector<bool> expectedStatus;
+    };
+
+    void RunTest(Instructions instructions);
 };
-TestContext * TestWriteChunking::mpContext = nullptr;
 
 //clang-format off
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(testClusterAttrsOnEndpoint)
@@ -211,7 +206,7 @@ CHIP_ERROR TestAttrAccess::Write(const app::ConcreteDataAttributePath & aPath, a
  */
 TEST_F(TestWriteChunking, TestListChunking)
 {
-    auto sessionHandle = mpContext->GetSessionBobToAlice();
+    auto sessionHandle = GetSessionBobToAlice();
 
     // Initialize the ember side server logic
     InitDataModelHandler();
@@ -238,7 +233,7 @@ TEST_F(TestWriteChunking, TestListChunking)
 
         gIterationCount = i;
 
-        app::WriteClient writeClient(&mpContext->GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
+        app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
                                      static_cast<uint16_t>(minReservationSize + i) /* reserved buffer size */);
 
         ByteSpan list[kTestListLength];
@@ -256,14 +251,14 @@ TEST_F(TestWriteChunking, TestListChunking)
         //
         for (int j = 0; j < 10 && writeCallback.mOnDoneCount == 0; j++)
         {
-            mpContext->DrainAndServiceIO();
+            DrainAndServiceIO();
         }
 
         EXPECT_EQ(writeCallback.mSuccessCount, kTestListLength + 1 /* an extra item for the empty list at the beginning */);
         EXPECT_EQ(writeCallback.mErrorCount, 0u);
         EXPECT_EQ(writeCallback.mOnDoneCount, 1u);
 
-        EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+        EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 
         //
         // Stop the test if we detected an error. Otherwise, it'll be difficult to read the logs.
@@ -281,7 +276,7 @@ TEST_F(TestWriteChunking, TestListChunking)
 // As the actual overhead may change, we will test over a few possible payload lengths, from 850 to MTU used in write clients.
 TEST_F(TestWriteChunking, TestBadChunking)
 {
-    auto sessionHandle = mpContext->GetSessionBobToAlice();
+    auto sessionHandle = GetSessionBobToAlice();
 
     bool atLeastOneRequestSent   = false;
     bool atLeastOneRequestFailed = false;
@@ -306,7 +301,7 @@ TEST_F(TestWriteChunking, TestBadChunking)
 
         gIterationCount = (uint32_t) i;
 
-        app::WriteClient writeClient(&mpContext->GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing());
+        app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing());
 
         ByteSpan list[kTestListLength];
         for (auto & item : list)
@@ -335,14 +330,14 @@ TEST_F(TestWriteChunking, TestBadChunking)
         //
         for (int j = 0; j < 10 && writeCallback.mOnDoneCount == 0; j++)
         {
-            mpContext->DrainAndServiceIO();
+            DrainAndServiceIO();
         }
 
         EXPECT_EQ(writeCallback.mSuccessCount, kTestListLength + 1 /* an extra item for the empty list at the beginning */);
         EXPECT_EQ(writeCallback.mErrorCount, 0u);
         EXPECT_EQ(writeCallback.mOnDoneCount, 1u);
 
-        EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+        EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 
         //
         // Stop the test if we detected an error. Otherwise, it'll be difficult to read the logs.
@@ -352,7 +347,7 @@ TEST_F(TestWriteChunking, TestBadChunking)
             break;
         }
     }
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
     EXPECT_TRUE(atLeastOneRequestSent && atLeastOneRequestFailed);
     emberAfClearDynamicEndpoint(0);
 }
@@ -363,7 +358,7 @@ TEST_F(TestWriteChunking, TestBadChunking)
  */
 TEST_F(TestWriteChunking, TestConflictWrite)
 {
-    auto sessionHandle = mpContext->GetSessionBobToAlice();
+    auto sessionHandle = GetSessionBobToAlice();
 
     // Initialize the ember side server logic
     InitDataModelHandler();
@@ -380,11 +375,11 @@ TEST_F(TestWriteChunking, TestConflictWrite)
     constexpr size_t kReserveSize = kMaxSecureSduLengthBytes - 128;
 
     TestWriteCallback writeCallback1;
-    app::WriteClient writeClient1(&mpContext->GetExchangeManager(), &writeCallback1, Optional<uint16_t>::Missing(),
+    app::WriteClient writeClient1(&GetExchangeManager(), &writeCallback1, Optional<uint16_t>::Missing(),
                                   static_cast<uint16_t>(kReserveSize));
 
     TestWriteCallback writeCallback2;
-    app::WriteClient writeClient2(&mpContext->GetExchangeManager(), &writeCallback2, Optional<uint16_t>::Missing(),
+    app::WriteClient writeClient2(&GetExchangeManager(), &writeCallback2, Optional<uint16_t>::Missing(),
                                   static_cast<uint16_t>(kReserveSize));
 
     ByteSpan list[kTestListLength];
@@ -402,7 +397,7 @@ TEST_F(TestWriteChunking, TestConflictWrite)
     err = writeClient2.SendWriteRequest(sessionHandle);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    mpContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     {
         const TestWriteCallback * writeCallbackRef1 = &writeCallback1;
@@ -426,7 +421,7 @@ TEST_F(TestWriteChunking, TestConflictWrite)
         EXPECT_EQ(writeCallbackRef2->mOnDoneCount, 1u);
     }
 
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 
     emberAfClearDynamicEndpoint(0);
 }
@@ -437,7 +432,7 @@ TEST_F(TestWriteChunking, TestConflictWrite)
  */
 TEST_F(TestWriteChunking, TestNonConflictWrite)
 {
-    auto sessionHandle = mpContext->GetSessionBobToAlice();
+    auto sessionHandle = GetSessionBobToAlice();
 
     // Initialize the ember side server logic
     InitDataModelHandler();
@@ -455,11 +450,11 @@ TEST_F(TestWriteChunking, TestNonConflictWrite)
     constexpr size_t kReserveSize = kMaxSecureSduLengthBytes - 128;
 
     TestWriteCallback writeCallback1;
-    app::WriteClient writeClient1(&mpContext->GetExchangeManager(), &writeCallback1, Optional<uint16_t>::Missing(),
+    app::WriteClient writeClient1(&GetExchangeManager(), &writeCallback1, Optional<uint16_t>::Missing(),
                                   static_cast<uint16_t>(kReserveSize));
 
     TestWriteCallback writeCallback2;
-    app::WriteClient writeClient2(&mpContext->GetExchangeManager(), &writeCallback2, Optional<uint16_t>::Missing(),
+    app::WriteClient writeClient2(&GetExchangeManager(), &writeCallback2, Optional<uint16_t>::Missing(),
                                   static_cast<uint16_t>(kReserveSize));
 
     ByteSpan list[kTestListLength];
@@ -477,7 +472,7 @@ TEST_F(TestWriteChunking, TestNonConflictWrite)
     err = writeClient2.SendWriteRequest(sessionHandle);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    mpContext->DrainAndServiceIO();
+    DrainAndServiceIO();
 
     {
         EXPECT_EQ(writeCallback1.mErrorCount, 0u);
@@ -489,48 +484,19 @@ TEST_F(TestWriteChunking, TestNonConflictWrite)
         EXPECT_EQ(writeCallback2.mOnDoneCount, 1u);
     }
 
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 
     emberAfClearDynamicEndpoint(0);
 }
 
-namespace TestTransactionalListInstructions {
-
-using PathStatus = std::pair<app::ConcreteAttributePath, bool>;
-
-enum class Operations : uint8_t
-{
-    kNoop,
-    kShutdownWriteClient,
-};
-
-enum class ListData : uint8_t
-{
-    kNull,
-    kList,
-    kBadValue,
-};
-
-struct Instructions
-{
-    // The paths used in write request
-    std::vector<ConcreteAttributePath> paths;
-    // The type of content of the list, it should be an empty vector or its size should equals to the list of paths.
-    std::vector<ListData> data;
-    // operations on OnListWriteBegin and OnListWriteEnd on the server side.
-    std::function<Operations(const app::ConcreteAttributePath & path)> onListWriteBeginActions;
-    // The expected status when OnListWriteEnd is called. In the same order as paths
-    std::vector<bool> expectedStatus;
-};
-
-void RunTest(TestContext * pContext, Instructions instructions)
+void TestWriteChunking::RunTest(Instructions instructions)
 {
     CHIP_ERROR err     = CHIP_NO_ERROR;
-    auto sessionHandle = pContext->GetSessionBobToAlice();
+    auto sessionHandle = GetSessionBobToAlice();
 
     TestWriteCallback writeCallback;
     std::unique_ptr<WriteClient> writeClient = std::make_unique<WriteClient>(
-        &pContext->GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
+        &GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
         static_cast<uint16_t>(kMaxSecureSduLengthBytes -
                               128) /* use a smaller chunk so we only need a few attributes in the write request. */);
 
@@ -598,9 +564,9 @@ void RunTest(TestContext * pContext, Instructions instructions)
     err = writeClient->SendWriteRequest(sessionHandle);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    pContext->GetIOContext().DriveIOUntil(sessionHandle->ComputeRoundTripTimeout(app::kExpectedIMProcessingTime) +
-                                              System::Clock::Seconds16(1),
-                                          [&]() { return pContext->GetExchangeManager().GetNumActiveExchanges() == 0; });
+    GetIOContext().DriveIOUntil(sessionHandle->ComputeRoundTripTimeout(app::kExpectedIMProcessingTime) +
+                                    System::Clock::Seconds16(1),
+                                [&]() { return GetExchangeManager().GetNumActiveExchanges() == 0; });
 
     EXPECT_EQ(onGoingPath, app::ConcreteAttributePath());
     EXPECT_EQ(status.size(), instructions.expectedStatus.size());
@@ -614,12 +580,8 @@ void RunTest(TestContext * pContext, Instructions instructions)
     testServer.mOnListWriteEnd   = nullptr;
 }
 
-} // namespace TestTransactionalListInstructions
-
 TEST_F(TestWriteChunking, TestTransactionalList)
 {
-    using namespace TestTransactionalListInstructions;
-
     // Initialize the ember side server logic
     InitDataModelHandler();
 
@@ -631,98 +593,88 @@ TEST_F(TestWriteChunking, TestTransactionalList)
 
     // Test 1: we should receive transaction notifications
     ChipLogProgress(Zcl, "Test 1: we should receive transaction notifications");
-    RunTest(mpContext,
-            Instructions{
-                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
-                .expectedStatus = { true },
-            });
+    RunTest(Instructions{
+        .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
+        .expectedStatus = { true },
+    });
 
     ChipLogProgress(Zcl, "Test 2: we should receive transaction notifications for incomplete list operations");
-    RunTest(
-        mpContext,
-        Instructions{
-            .paths                   = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
-            .onListWriteBeginActions = [&](const app::ConcreteAttributePath & aPath) { return Operations::kShutdownWriteClient; },
-            .expectedStatus          = { false },
-        });
+    RunTest(Instructions{
+        .paths                   = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
+        .onListWriteBeginActions = [&](const app::ConcreteAttributePath & aPath) { return Operations::kShutdownWriteClient; },
+        .expectedStatus          = { false },
+    });
 
     ChipLogProgress(Zcl, "Test 3: we should receive transaction notifications for every list in the transaction");
-    RunTest(mpContext,
-            Instructions{
-                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
-                                    ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute2) },
-                .expectedStatus = { true, true },
-            });
+    RunTest(Instructions{
+        .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
+                            ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute2) },
+        .expectedStatus = { true, true },
+    });
 
     ChipLogProgress(Zcl, "Test 4: we should receive transaction notifications with the status of each list");
-    RunTest(mpContext,
-            Instructions{
-                .paths = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
-                           ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute2) },
-                .onListWriteBeginActions =
-                    [&](const app::ConcreteAttributePath & aPath) {
-                        if (aPath.mAttributeId == kTestListAttribute2)
-                        {
-                            return Operations::kShutdownWriteClient;
-                        }
-                        return Operations::kNoop;
-                    },
-                .expectedStatus = { true, false },
-            });
+    RunTest(Instructions{
+        .paths = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
+                   ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute2) },
+        .onListWriteBeginActions =
+            [&](const app::ConcreteAttributePath & aPath) {
+                if (aPath.mAttributeId == kTestListAttribute2)
+                {
+                    return Operations::kShutdownWriteClient;
+                }
+                return Operations::kNoop;
+            },
+        .expectedStatus = { true, false },
+    });
 
     ChipLogProgress(Zcl,
                     "Test 5: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
                     "null value before non null values");
-    RunTest(mpContext,
-            Instructions{
-                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
-                                    ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
-                .data           = { ListData::kNull, ListData::kList },
-                .expectedStatus = { true },
-            });
+    RunTest(Instructions{
+        .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
+                            ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
+        .data           = { ListData::kNull, ListData::kList },
+        .expectedStatus = { true },
+    });
 
     ChipLogProgress(Zcl,
                     "Test 6: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
                     "null value after non null values");
-    RunTest(mpContext,
-            Instructions{
-                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
-                                    ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
-                .data           = { ListData::kList, ListData::kNull },
-                .expectedStatus = { true },
-            });
+    RunTest(Instructions{
+        .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
+                            ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
+        .data           = { ListData::kList, ListData::kNull },
+        .expectedStatus = { true },
+    });
 
     ChipLogProgress(Zcl,
                     "Test 7: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
                     "null value between non null values");
-    RunTest(mpContext,
-            Instructions{
-                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
-                                    ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
-                                    ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
-                .data           = { ListData::kList, ListData::kNull, ListData::kList },
-                .expectedStatus = { true },
-            });
+    RunTest(Instructions{
+        .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
+                            ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
+                            ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
+        .data           = { ListData::kList, ListData::kNull, ListData::kList },
+        .expectedStatus = { true },
+    });
 
     ChipLogProgress(Zcl, "Test 8: transactional list callbacks will be called for nullable lists");
-    RunTest(mpContext,
-            Instructions{
-                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
-                .data           = { ListData::kNull },
-                .expectedStatus = { true },
-            });
+    RunTest(Instructions{
+        .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
+        .data           = { ListData::kNull },
+        .expectedStatus = { true },
+    });
 
     ChipLogProgress(Zcl,
                     "Test 9: for nullable lists, we should receive notifications for unsuccessful writes when non-fatal occurred "
                     "during processing the requests");
-    RunTest(mpContext,
-            Instructions{
-                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
-                .data           = { ListData::kBadValue },
-                .expectedStatus = { false },
-            });
+    RunTest(Instructions{
+        .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
+        .data           = { ListData::kBadValue },
+        .expectedStatus = { false },
+    });
 
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 
     emberAfClearDynamicEndpoint(0);
 }
