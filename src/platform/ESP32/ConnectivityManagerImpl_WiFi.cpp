@@ -1108,7 +1108,7 @@ void ConnectivityManagerImpl::OnStationIPv6AddressAvailable(const ip_event_got_i
     event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV6_Assigned;
     PlatformMgr().PostEventOrDie(&event);
 
-#if CONFIG_ENABLE_ENDPOINT_QUEUE_FILTER
+#ifdef CONFIG_ENABLE_ENDPOINT_QUEUE_FILTER
     uint8_t station_mac[6];
     if (esp_wifi_get_mac(WIFI_IF_STA, station_mac) == ESP_OK)
     {
@@ -1136,7 +1136,7 @@ void ConnectivityManagerImpl::OnStationIPv6AddressAvailable(const ip_event_got_i
     }
 #endif // CONFIG_ENABLE_ENDPOINT_QUEUE_FILTER
 
-#if CONFIG_ENABLE_ROUTE_HOOK
+#ifdef CONFIG_ENABLE_ROUTE_HOOK
     esp_route_hook_init(esp_netif_get_handle_from_ifkey(ESP32Utils::kDefaultWiFiStationNetifKey));
 #endif
 }

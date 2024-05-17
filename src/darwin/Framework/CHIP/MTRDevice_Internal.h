@@ -86,6 +86,9 @@ MTR_TESTABLE
 //   Contains data version information and attribute values.
 - (void)setPersistedClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData;
 
+// Method to insert persisted data that pertains to the whole device.
+- (void)setPersistedDeviceData:(NSDictionary<NSString *, id> *)data;
+
 #ifdef DEBUG
 - (NSUInteger)unitTestAttributeCount;
 #endif
