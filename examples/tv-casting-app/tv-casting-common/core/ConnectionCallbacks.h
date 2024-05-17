@@ -46,7 +46,6 @@ using CommissionerDeclarationCallback = std::function<void(
  */
 struct ConnectionCallbacks
 {
-public:
     /**
      * The callback called when the connection process has ended, regardless of whether it was successful or not.
      */

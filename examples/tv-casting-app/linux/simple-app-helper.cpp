@@ -192,7 +192,8 @@ CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & prov
         VerifyOrDie(TestOnlyCommissionableDataProvider.GetSetupPasscode(defaultTestPasscode) == CHIP_NO_ERROR);
 
         ChipLogError(Support,
-                     "*** WARNING: Using temporary passcode %u due to no neither --passcode or --spake2p-verifier-base64 "
+                     "InitCommissionableDataProvider() *** WARNING: Using temporary passcode %u due to no neither --passcode or "
+                     "--spake2p-verifier-base64 "
                      "given on command line. This is temporary and will be deprecated. Please update your scripts "
                      "to explicitly configure onboarding credentials. ***",
                      static_cast<unsigned>(defaultTestPasscode));
@@ -201,21 +202,43 @@ CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & prov
     }
     else
     {
-        // Passcode is 0, so will be ignored, and verifier will take over. Onboarding payload
-        // printed for debug will be invalid, but if the onboarding payload had been given
-        // properly to the commissioner later, PASE will succeed.
+        ChipLogError(Support,
+                     "InitCommissionableDataProvider() *** WARNING: Passcode is 0, so will be ignored, and verifier will take "
+                     "over. Onboarding payload printed for debug will be invalid, but if the onboarding payload had been given "
+                     "properly to the commissioner later, PASE will succeed. ***");
     }
 
-    // Default to the minimum PBKDF iterations (1000) for this example implementation. For TV devices and TV casting app production
+    // Default to the minimum PBKDF iterations (1,000) for this example implementation. For TV devices and TV casting app production
     // implementations, you should use a higher number of PBKDF iterations to enhance security. The default minimum iterations are
-    // not sufficient against brute-force and rainbow table attacks.
-    uint32_t spake2pIterationCount = chip::Crypto::kSpake2p_Min_PBKDF_Iterations;
-    if (options.spake2pIterations != 0)
+    // not sufficient against brute-force and rainbow table attacks. Increasing the number of iterations will increase the
+    // computational time required to derive the key. This can slow down the authentication process, especially on devices with
+    // limited processing power like a Raspberry Pi 4. For a production implementation, you should measure the actual performance on
+    // the target device.
+    uint32_t spake2pIterationCount =
+        chip::Crypto::kSpake2p_Min_PBKDF_Iterations; // 1,000 - Hypothetical key derivation time: ~20 milliseconds (ms).
+    // uint32_t spake2pIterationCount = chip::Crypto::kSpake2p_Max_PBKDF_Iterations; // 100,000 - Hypothetical key derivation time:
+    // ~2 seconds.
+    if (options.spake2pIterations == 1000)
     {
         spake2pIterationCount = options.spake2pIterations;
+        ChipLogError(Support,
+                     "InitCommissionableDataProvider() *** WARNING: PASE PBKDF iterations provided are the minimum allowable: %u. "
+                     "Increase for production use to enhance security. ***",
+                     static_cast<unsigned>(spake2pIterationCount));
     }
-    ChipLogError(Support, "PASE PBKDF iterations set to %u. Should be set higher for a production app implementation.",
-                 static_cast<unsigned>(spake2pIterationCount));
+    else if ((options.spake2pIterations > 1000))
+    {
+        spake2pIterationCount = options.spake2pIterations;
+        ChipLogProgress(Support, "InitCommissionableDataProvider() PASE PBKDF iterations set to: %u.",
+                        static_cast<unsigned>(spake2pIterationCount));
+    }
+    else
+    {
+        ChipLogError(Support,
+                     "InitCommissionableDataProvider() *** WARNING: PASE PBKDF iterations set to the minimum allowable: %u. "
+                     "Increase for production use to enhance security. ***",
+                     static_cast<unsigned>(spake2pIterationCount));
+    }
 
     return provider.Init(options.spake2pVerifier, options.spake2pSalt, spake2pIterationCount, setupPasscode,
                          options.payload.discriminator.GetLongValue());
@@ -278,7 +301,7 @@ void CommissionerDeclarationCallback(const chip::Transport::PeerAddress & source
     {
         ChipLogProgress(AppServer, "---- Awaiting user input ----");
         ChipLogProgress(AppServer, "Input the Commissioner-Generated passcode displayed on the CastingPlayer UX.");
-        ChipLogProgress(AppServer, "Input 1245678 to use the defualt passcode.");
+        ChipLogProgress(AppServer, "Input 1245678 to use the default passcode.");
         ChipLogProgress(AppServer, "Example:     cast setcommissionerpasscode 12345678");
         ChipLogProgress(AppServer, "---- Awaiting user input ----");
         gAwaitingCommissionerPasscodeInput = true;
