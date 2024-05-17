@@ -822,7 +822,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeInvalidRead)
 
         ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
     }
-  
+
     // Invalid cluster
     {
         TestReadRequest testRequest(kAdminSubjectDescriptor,
