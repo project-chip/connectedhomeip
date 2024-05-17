@@ -151,16 +151,16 @@ public:
         kExpireSessionAfterMsg3Send  = 0x18,
     };
 
-    MockProtocolInitiator(TestExchangeHolder & testExchangeHolder, BehaviorModifier modifier = BehaviorModifier::kNone) :
-        mExchangeCtx(*this), testExchangeHolder(testExchangeHolder)
+    MockProtocolInitiator(TestExchangeHolder & ctx, BehaviorModifier modifier = BehaviorModifier::kNone) :
+        mExchangeCtx(*this), testExchangeHolder(ctx)
     {
         mBehaviorModifier.Set(modifier);
         ChipLogDetail(ExchangeManager, "[%p] MockProtocolInitiator: %p", this, &mExchangeCtx);
     }
 
     template <typename... Args>
-    MockProtocolInitiator(TestExchangeHolder & testExchangeHolder, BehaviorModifier modifier1, Args &&... args) :
-        mExchangeCtx(*this), mBehaviorModifier(modifier1, std::forward<Args>(args)...), testExchangeHolder(testExchangeHolder)
+    MockProtocolInitiator(TestExchangeHolder & ctx, BehaviorModifier modifier1, Args &&... args) :
+        mExchangeCtx(*this), mBehaviorModifier(modifier1, std::forward<Args>(args)...), testExchangeHolder(ctx)
     {
         ChipLogDetail(ExchangeManager, "[%p] MockProtocolInitiator: %p", this, &mExchangeCtx);
     }
