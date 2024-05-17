@@ -17,6 +17,7 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#ifdef MATTER_DM_PLUGIN_SWITCH_SERVER
 #include <app/clusters/switch-server/switch-server.h>
 #include <app/server/Server.h>
 #include <app/util/att-storage.h>
@@ -78,3 +79,4 @@ void SwitchEventHandler::OnMultiPressComplete(EndpointId endpointId, uint8_t pre
 
     Clusters::SwitchServer::Instance().OnMultiPressComplete(endpointId, previousPosition, count);
 }
+#endif // MATTER_DM_PLUGIN_SWITCH_SERVER

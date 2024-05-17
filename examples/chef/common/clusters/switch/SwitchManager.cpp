@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#ifdef MATTER_DM_PLUGIN_SWITCH_SERVER
 #include "SwitchEventHandler.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/switch-server/switch-server.h>
@@ -168,3 +169,4 @@ void emberAfSwitchClusterInitCallback(EndpointId endpointId)
     ChefRpcActionsWorker::Instance().RegisterRpcActionsDelegate(Clusters::Switch::Id, gSwitchActionsDelegate);
     SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gLatchingSwitch));
 }
+#endif // MATTER_DM_PLUGIN_SWITCH_SERVER
