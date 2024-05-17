@@ -627,12 +627,6 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     MATTER_LOG_METRIC(kMetricDeviceProductID, [payload.productID unsignedIntValue]);
 }
 
-- (void)preparePASESessionMetric:(chip::NodeId)nodeId
-{
-    self->_deviceControllerDelegateBridge->SetDeviceNodeID(nodeId);
-    MATTER_LOG_METRIC_BEGIN(kMetricSetupPASESession);
-}
-
 - (BOOL)setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload
                                    newNodeID:(NSNumber *)newNodeID
                                        error:(NSError * __autoreleasing *)error
@@ -667,9 +661,13 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         chip::NodeId nodeId = [newNodeID unsignedLongLongValue];
         self->_operationalCredentialsDelegate->SetDeviceID(nodeId);
 
-        [self preparePASESessionMetric:nodeId];
+        MATTER_LOG_METRIC_BEGIN(kMetricSetupPASESession);
         errorCode = self->_cppCommissioner->EstablishPASEConnection(nodeId, [pairingCode UTF8String]);
-        VerifyOrDo(errorCode != CHIP_NO_ERROR, MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode));
+        if (CHIP_NO_ERROR == errorCode) {
+            self->_deviceControllerDelegateBridge->SetDeviceNodeID(nodeId);
+        } else {
+            MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode);
+        }
 
         return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
     };
@@ -711,9 +709,13 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             auto pinCode = static_cast<uint32_t>(payload.setupPasscode.unsignedLongValue);
             params.Value().SetSetupPINCode(pinCode);
 
-            [self preparePASESessionMetric:nodeId];
+            MATTER_LOG_METRIC_BEGIN(kMetricSetupPASESession);
             errorCode = self->_cppCommissioner->EstablishPASEConnection(nodeId, params.Value());
-            VerifyOrDo(errorCode != CHIP_NO_ERROR, MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode));
+            if (CHIP_NO_ERROR == errorCode) {
+                self->_deviceControllerDelegateBridge->SetDeviceNodeID(nodeId);
+            } else {
+                MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode);
+            }
         } else {
             // Try to get a QR code if possible (because it has a better
             // discriminator, etc), then fall back to manual code if that fails.
@@ -732,10 +734,12 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
                     continue;
                 }
 
-                [self preparePASESessionMetric:nodeId];
+                MATTER_LOG_METRIC_BEGIN(kMetricSetupPASESession);
                 errorCode = self->_cppCommissioner->EstablishPASEConnection(
                     nodeId, [pairingCode UTF8String], chip::Controller::DiscoveryType::kDiscoveryNetworkOnly, resolutionData);
-                if (CHIP_NO_ERROR != errorCode) {
+                if (CHIP_NO_ERROR == errorCode) {
+                    self->_deviceControllerDelegateBridge->SetDeviceNodeID(nodeId);
+                } else {
                     MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode);
                     break;
                 }
@@ -1710,9 +1714,13 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
         self->_operationalCredentialsDelegate->SetDeviceID(deviceID);
 
-        [self preparePASESessionMetric:deviceID];
+        MATTER_LOG_METRIC_BEGIN(kMetricSetupPASESession);
         errorCode = self->_cppCommissioner->EstablishPASEConnection(deviceID, manualPairingCode.c_str());
-        VerifyOrDo(errorCode != CHIP_NO_ERROR, MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode));
+        if (CHIP_NO_ERROR == errorCode) {
+            self->_deviceControllerDelegateBridge->SetDeviceNodeID(deviceID);
+        } else {
+            MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode);
+        }
 
         return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
     };
@@ -1751,9 +1759,13 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
         auto params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode).SetPeerAddress(peerAddress);
 
-        [self preparePASESessionMetric:deviceID];
+        MATTER_LOG_METRIC_BEGIN(kMetricSetupPASESession);
         errorCode = self->_cppCommissioner->EstablishPASEConnection(deviceID, params);
-        VerifyOrDo(errorCode != CHIP_NO_ERROR, MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode));
+        if (CHIP_NO_ERROR == errorCode) {
+            self->_deviceControllerDelegateBridge->SetDeviceNodeID(deviceID);
+        } else {
+            MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode);
+        }
 
         return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
     };
@@ -1783,9 +1795,13 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
         self->_operationalCredentialsDelegate->SetDeviceID(deviceID);
 
-        [self preparePASESessionMetric:deviceID];
+        MATTER_LOG_METRIC_BEGIN(kMetricSetupPASESession);
         errorCode = self->_cppCommissioner->EstablishPASEConnection(deviceID, [onboardingPayload UTF8String]);
-        VerifyOrDo(errorCode != CHIP_NO_ERROR, MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode));
+        if (CHIP_NO_ERROR == errorCode) {
+            self->_deviceControllerDelegateBridge->SetDeviceNodeID(deviceID);
+        } else {
+            MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode);
+        }
 
         return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
     };
