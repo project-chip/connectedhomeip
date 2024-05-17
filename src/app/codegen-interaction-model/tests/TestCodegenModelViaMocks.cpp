@@ -37,6 +37,7 @@
 #include <app/util/mock/MockNodeConfig.h>
 #include <app/util/odd-sized-integers.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVReader.h>

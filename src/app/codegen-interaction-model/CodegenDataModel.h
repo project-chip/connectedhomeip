@@ -16,7 +16,6 @@
  */
 #pragma once
 
-#include "app/ConcreteClusterPath.h"
 #include <app/interaction-model/Model.h>
 
 #include <app/util/af-types.h>
