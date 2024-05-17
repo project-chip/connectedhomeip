@@ -18,10 +18,10 @@
 
 #pragma once
 
-#include <app/ServerCluster.h>
-
 #include <app-common/zap-generated/callback.h>
 #include <app/util/config.h>
+
+// Note: This file does not itself include <app/ServerCluster.h> to avoid dependency issues.
 
 /**
  * Defines static storage for the specified number of instances of the specified class
