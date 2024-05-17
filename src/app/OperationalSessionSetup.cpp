@@ -297,8 +297,8 @@ CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & re
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     // TODO: Combine LargePayload flag with DNS-SD advertisements from peer.
     // Issue #32348.
-    if (mTransportPayloadCapability == TransportPayloadCapability::kLargePayload &&
-        result.supportsTcpServer && result.supportsTcpClient)
+    if (mTransportPayloadCapability == TransportPayloadCapability::kLargePayload && result.supportsTcpServer &&
+        result.supportsTcpClient)
     {
         // Set the transport type for carrying large payloads
         mDeviceAddress.SetTransportType(chip::Transport::Type::kTcp);
