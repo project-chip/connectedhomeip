@@ -1172,3 +1172,59 @@ TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceListIncrementalRead)
         ASSERT_TRUE(actual.e.data_equal("thisislongertofillupfaster"_span));
     }
 }
+
+TEST(TestCodegenModelViaMocks, ReadGlobalAttributeAttributeList)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    chip::app::CodegenDataModel model;
+    ScopedMockAccessControl accessControl;
+
+    TestReadRequest testRequest(kAdminSubjectDescriptor,
+                                ConcreteAttributePath(kMockEndpoint2, MockClusterId(3), AttributeList::Id));
+
+    // Data read via the encoder
+    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
+    ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_NO_ERROR);
+    ASSERT_EQ(testRequest.FinishEncoding(), CHIP_NO_ERROR);
+
+    // Validate after read
+    std::vector<DecodedAttributeData> attribute_data;
+    ASSERT_EQ(testRequest.encodedIBs.Decode(attribute_data), CHIP_NO_ERROR);
+    ASSERT_EQ(attribute_data.size(), 1u);
+
+    DecodedAttributeData & encodedData = attribute_data[0];
+    ASSERT_EQ(encodedData.attributePath, testRequest.request.path);
+
+    ASSERT_EQ(encodedData.dataReader.GetType(), TLV::kTLVType_Array);
+
+    std::vector<AttributeId> items;
+    ASSERT_EQ(DecodeList(encodedData.dataReader, items), CHIP_NO_ERROR);
+
+    // Mock data contains ClusterRevision and FeatureMap.
+    // After this, Global attributes are auto-added
+    std::vector<AttributeId> expected;
+
+    // Encoding in global-attribute-access-interface has a logic of:
+    //   - Append global attributes in front of the first specified
+    //     large number global attribute.
+    // Since ClusterRevision and FeatureMap are
+    // global attributes, the order here is reversed for them
+    for (AttributeId id : GlobalAttributesNotInMetadata)
+    {
+        expected.push_back(id);
+    }
+    expected.push_back(ClusterRevision::Id);
+    expected.push_back(FeatureMap::Id);
+    expected.push_back(MockAttributeId(1));
+    expected.push_back(MockAttributeId(2));
+    expected.push_back(MockAttributeId(3));
+
+    ASSERT_EQ(items.size(), expected.size());
+
+    // Since we have no std::vector formatter, comparing element by element is somewhat
+    // more readable in case of failure.
+    for (unsigned i = 0; i < items.size(); i++)
+    {
+        EXPECT_EQ(items[i], expected[i]);
+    }
+}
