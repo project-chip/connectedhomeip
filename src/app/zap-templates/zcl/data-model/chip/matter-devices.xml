@@ -2420,11 +2420,12 @@ limitations under the License.
         <domain>CHIP</domain>
         <typeName>Matter Network Infrastructure Manager</typeName>
         <profileId editable="false">0x0103</profileId>
-        <deviceId editable="false">0xFFF10010</deviceId><!-- TODO: ID-TBD -->
+        <deviceId editable="false">0x0090</deviceId>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"/>
+            <include cluster="Wi-Fi Network Management" client="false" server="true" clientLocked="true" serverLocked="true"/>
         </clusters>
     </deviceType>
     <deviceType>

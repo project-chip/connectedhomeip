@@ -16,12 +16,20 @@
  */
 
 #include <AppMain.h>
+#include <app/clusters/wifi-network-management-server/wifi-network-management-server.h>
+#include <lib/support/Span.h>
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters;
 
 void ApplicationInit() {}
 void ApplicationShutdown() {}
+
+ByteSpan ByteSpanFromCharSpan(CharSpan span)
+{
+    return ByteSpan(reinterpret_cast<const uint8_t *>(span.data()), span.size());
+}
 
 int main(int argc, char * argv[])
 {
@@ -29,6 +37,9 @@ int main(int argc, char * argv[])
     {
         return -1;
     }
+
+    WiFiNetworkManagement::Server::Instance().SetNetworkCredentials(ByteSpanFromCharSpan("MatterAP"_span),
+                                                                    ByteSpanFromCharSpan("Seatec Astronomy"_span));
 
     ChipLinuxAppMainLoop();
     return 0;
