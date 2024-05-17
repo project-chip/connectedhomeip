@@ -14,7 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/AttributeEncodeState.h"
 #include "app/AttributeValueDecoder.h"
+#include "app/ConcreteAttributePath.h"
 #include "lib/core/TLVTypes.h"
 #include "lib/support/CodeUtils.h"
 #include <app/codegen-interaction-model/Model.h>
@@ -464,7 +466,8 @@ struct TestReadRequest
         request.path              = path;
     }
 
-    std::unique_ptr<AttributeValueEncoder> StartEncoding(chip::app::InteractionModel::Model * model)
+    std::unique_ptr<AttributeValueEncoder> StartEncoding(chip::app::InteractionModel::Model * model,
+                                                         AttributeEncodeState state = AttributeEncodeState())
     {
         std::optional<ClusterInfo> info = model->GetClusterInfo(request.path);
         if (!info.has_value())
@@ -483,7 +486,8 @@ struct TestReadRequest
         }
 
         // TODO: isFabricFiltered? EncodeState?
-        return std::make_unique<AttributeValueEncoder>(reportBuilder, request.subjectDescriptor.value(), request.path, dataVersion);
+        return std::make_unique<AttributeValueEncoder>(reportBuilder, request.subjectDescriptor.value(), request.path, dataVersion,
+                                                       false /* aIsFabricFiltered */, state);
     }
 
     CHIP_ERROR FinishEncoding() { return encodedIBs.FinishEncoding(reportBuilder); }
@@ -1085,6 +1089,68 @@ TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceListOverflowRead)
         Clusters::UnitTesting::Structs::SimpleStruct::DecodableType & actual = items[i];
 
         ASSERT_EQ(actual.a, static_cast<uint8_t>(i & 0xFF));
+        ASSERT_EQ(actual.b, true);
+        ASSERT_EQ(actual.g, 0.25);
+        ASSERT_EQ(actual.h, 0.5);
+        ASSERT_TRUE(actual.e.data_equal("thisislongertofillupfaster"_span));
+    }
+}
+
+TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceListIncrementalRead)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    chip::app::CodegenDataModel::Model model;
+    ScopedMockAccessControl accessControl;
+
+    const ConcreteAttributePath kStructPath(kMockEndpoint3, MockClusterId(4),
+                                            MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_ARRAY_ATTRIBUTE_TYPE));
+
+    TestReadRequest testRequest(kAdminSubjectDescriptor, kStructPath);
+    RegisteredAttributeAccessInterface<ListAttributeAcessInterface> aai(kStructPath);
+
+    constexpr unsigned kDataCount        = 1024;
+    constexpr unsigned kEncodeIndexStart = 101;
+    aai->SetReturnedData(Clusters::UnitTesting::Structs::SimpleStruct::Type{
+        .b = true,
+        .e = "thisislongertofillupfaster"_span,
+        .g = 0.25,
+        .h = 0.5,
+    });
+    aai->SetReturnedDataCount(kDataCount);
+
+    AttributeEncodeState encodeState;
+    encodeState.SetCurrentEncodingListIndex(kEncodeIndexStart);
+
+    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model, encodeState);
+    // NOTE: overflow, however data should be valid. Technically both NO_MEMORY and BUFFER_TOO_SMALL
+    // should be ok here, however we know buffer-too-small is the error in this case hence
+    // the compare (easier to write the test and read the output)
+    ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_ERROR_BUFFER_TOO_SMALL);
+    ASSERT_EQ(testRequest.FinishEncoding(), CHIP_NO_ERROR);
+
+    // Validate after read
+    std::vector<DecodedAttributeData> attribute_data;
+    ASSERT_EQ(testRequest.encodedIBs.Decode(attribute_data), CHIP_NO_ERROR);
+
+    // Incremental encodes are separate list items, repeated
+    // actual size IS ARBITRARY (current test sets it at 11)
+    ASSERT_GT(attribute_data.size(), 3u);
+
+    for (unsigned i = 0; i < attribute_data.size(); i++)
+    {
+        DecodedAttributeData & encodedData = attribute_data[i];
+        ASSERT_EQ(encodedData.attributePath.mEndpointId, testRequest.request.path.mEndpointId);
+        ASSERT_EQ(encodedData.attributePath.mClusterId, testRequest.request.path.mClusterId);
+        ASSERT_EQ(encodedData.attributePath.mAttributeId, testRequest.request.path.mAttributeId);
+        ASSERT_EQ(encodedData.attributePath.mListOp, ConcreteDataAttributePath::ListOperation::AppendItem);
+
+        // individual structures encoded in each item
+        ASSERT_EQ(encodedData.dataReader.GetType(), TLV::kTLVType_Structure);
+
+        Clusters::UnitTesting::Structs::SimpleStruct::DecodableType actual;
+        ASSERT_EQ(chip::app::DataModel::Decode(encodedData.dataReader, actual), CHIP_NO_ERROR);
+
+        ASSERT_EQ(actual.a, static_cast<uint8_t>((i + kEncodeIndexStart) & 0xFF));
         ASSERT_EQ(actual.b, true);
         ASSERT_EQ(actual.g, 0.25);
         ASSERT_EQ(actual.h, 0.5);
