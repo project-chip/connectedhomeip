@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -130,11 +130,11 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     {
     case LockManager::kState_NotFulyLocked:
     case LockManager::kState_LockCompleted:
-        LockMgr().LockAction(AppEvent::kEventType_Lock, LockManager::UNLOCK_ACTION, LockManager::OperationSource::kButton,
+        LockMgr().LockAction(AppEvent::kEventType_DeviceAction, LockManager::UNLOCK_ACTION, LockManager::OperationSource::kButton,
                              kExampleEndpointId);
         break;
     case LockManager::kState_UnlockCompleted:
-        LockMgr().LockAction(AppEvent::kEventType_Lock, LockManager::LOCK_ACTION, LockManager::OperationSource::kButton,
+        LockMgr().LockAction(AppEvent::kEventType_DeviceAction, LockManager::LOCK_ACTION, LockManager::OperationSource::kButton,
                              kExampleEndpointId);
         break;
     default:

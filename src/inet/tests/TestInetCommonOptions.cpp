@@ -51,7 +51,7 @@ NetworkOptions::NetworkOptions()
     static OptionDef optionDefs[] = {
         { "local-addr", kArgumentRequired, 'a' },
         { "node-addr", kArgumentRequired, kToolCommonOpt_NodeAddr }, /* alias for local-addr */
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
         { "tap-device", kArgumentRequired, kToolCommonOpt_TapDevice },
         { "ipv4-gateway", kArgumentRequired, kToolCommonOpt_IPv4GatewayAddr },
         { "ipv6-gateway", kArgumentRequired, kToolCommonOpt_IPv6GatewayAddr },
@@ -59,7 +59,7 @@ NetworkOptions::NetworkOptions()
         { "debug-lwip", kNoArgument, kToolCommonOpt_DebugLwIP },
         { "event-delay", kArgumentRequired, kToolCommonOpt_EventDelay },
         { "tap-system-config", kNoArgument, kToolCommonOpt_TapInterfaceConfig },
-#endif
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
         {}
     };
     OptionDefs = optionDefs;
@@ -69,7 +69,7 @@ NetworkOptions::NetworkOptions()
     OptionHelp = "  -a, --local-addr, --node-addr <ip-addr>\n"
                  "       Local address for the node.\n"
                  "\n"
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
                  "  --tap-device <tap-dev-name>\n"
                  "       TAP device name for LwIP hosted OS usage. Defaults to chip-dev-<node-id>.\n"
                  "\n"
@@ -91,14 +91,14 @@ NetworkOptions::NetworkOptions()
                  "  --tap-system-config\n"
                  "       Use configuration on each of the Linux TAP interfaces to configure LwIP's interfaces.\n"
                  "\n"
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
         ;
 
     // Defaults.
     LocalIPv4Addr.clear();
     LocalIPv6Addr.clear();
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
     TapDeviceName.clear();
     LwIPDebugFlags = 0;
     EventDelay     = 0;
@@ -106,7 +106,7 @@ NetworkOptions::NetworkOptions()
     IPv6GatewayAddr.clear();
     DNSServerAddr      = Inet::IPAddress::Any;
     TapUseSystemConfig = false;
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 }
 
 bool NetworkOptions::HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg)

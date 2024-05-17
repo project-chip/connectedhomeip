@@ -22,11 +22,15 @@ chip_test_suite("tests") {
 
   test_sources = [
     "TestBleErrorStr.cpp",
+    "TestBleLayer.cpp",
     "TestBleUUID.cpp",
     "TestBtpEngine.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
 
-  public_deps = [ "${chip_root}/src/ble" ]
+  public_deps = [
+    "${chip_root}/src/ble",
+    "${chip_root}/src/platform",
+  ]
 }

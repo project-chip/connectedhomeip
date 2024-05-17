@@ -389,6 +389,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
     case CommissioningStage::kSendAttestationRequest:
         return CommissioningStage::kAttestationVerification;
     case CommissioningStage::kAttestationVerification:
+        return CommissioningStage::kAttestationRevocationCheck;
+    case CommissioningStage::kAttestationRevocationCheck:
         return CommissioningStage::kSendOpCertSigningRequest;
     case CommissioningStage::kSendOpCertSigningRequest:
         return CommissioningStage::kValidateCSR;
@@ -692,6 +694,13 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                 ChipLogError(Controller,
                              "Failed device attestation. Device vendor and/or product ID do not match the IDs expected. "
                              "Verify DAC certificate chain and certification declaration to ensure spec rules followed.");
+            }
+
+            if (report.stageCompleted == CommissioningStage::kAttestationVerification)
+            {
+                ChipLogError(Controller, "Failed verifying attestation information. Now checking DAC chain revoked status.");
+                // don't error out until we check for DAC chain revocation status
+                err = CHIP_NO_ERROR;
             }
         }
         else if (report.Is<CommissioningErrorInfo>())

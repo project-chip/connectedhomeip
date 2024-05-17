@@ -19,6 +19,7 @@
 
 # Commissioning test.
 
+import asyncio
 import os
 import sys
 from optparse import OptionParser
@@ -99,7 +100,7 @@ def main():
                                      nodeid=1),
               "Failed to finish key exchange")
 
-    FailIfNot(test.TestFailsafe(nodeid=1), "Failed failsafe test")
+    FailIfNot(asyncio.run(test.TestFailsafe(nodeid=1)), "Failed failsafe test")
 
     timeoutTicker.stop()
 

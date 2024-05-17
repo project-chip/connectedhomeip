@@ -122,7 +122,7 @@ class CHIPToolActivity :
     startActivity(redirectIntent)
   }
 
-  override fun SetNetworkType(type: ProvisionNetworkType) {
+  override fun setNetworkType(type: ProvisionNetworkType?) {
     networkType = type
   }
 
