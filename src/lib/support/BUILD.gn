@@ -341,8 +341,7 @@ static_library("test_utils") {
   ]
 }
 
-pw_static_library("pw_test_utils") {
-  output_name = "libPWTestsUtils"
+pw_source_set("pw_test_utils") {
   output_dir = "${root_out_dir}/lib"
   public_deps = [
     "$dir_pw_log:impl",
