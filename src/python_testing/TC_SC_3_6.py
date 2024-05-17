@@ -20,6 +20,7 @@ import logging
 import queue
 import time
 from threading import Event
+from typing import List
 
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClustersObjects
