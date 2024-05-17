@@ -681,7 +681,6 @@ TEST_F(TestCASESession, DestinationIdTest)
     EXPECT_FALSE(destinationIdSpan.data_equal(ByteSpan(kExpectedDestinationIdFromSpec)));
 }
 
-
 template <typename Params>
 static CHIP_ERROR EncodeSigma1(MutableByteSpan & buf)
 {
@@ -1002,9 +1001,9 @@ TEST_F(TestCASESession, SessionResumptionStorage)
                   CHIP_NO_ERROR);
         ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(pairingCommissioner);
         auto establishmentReturnVal           = pairingCommissioner->EstablishSession(
-                      GetSecureSessionManager(), &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex },
-                      contextCommissioner, &testVectors[i].initiatorStorage, nullptr, &delegateCommissioner,
-                      Optional<ReliableMessageProtocolConfig>::Missing());
+            GetSecureSessionManager(), &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex },
+            contextCommissioner, &testVectors[i].initiatorStorage, nullptr, &delegateCommissioner,
+            Optional<ReliableMessageProtocolConfig>::Missing());
         ServiceEvents();
         EXPECT_EQ(establishmentReturnVal, CHIP_NO_ERROR);
         EXPECT_EQ(loopback.mSentMessageCount, testVectors[i].expectedSentMessageCount);
@@ -1016,7 +1015,7 @@ TEST_F(TestCASESession, SessionResumptionStorage)
         gPairingServer.Shutdown();
     }
 }
-// #endif
+
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
 TEST_F_FROM_FIXTURE(TestCASESession, SimulateUpdateNOCInvalidatePendingEstablishment)
 {

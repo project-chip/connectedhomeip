@@ -15,10 +15,9 @@
  *    limitations under the License.
  */
 
+#include <gtest/gtest.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
-
-#include <gtest/gtest.h>
 
 // DefaultSessionResumptionStorage is a partial implementation.
 // Use SimpleSessionResumptionStorage, which extends it, to test.

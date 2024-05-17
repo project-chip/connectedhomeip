@@ -18,9 +18,9 @@
 
 #include <crypto/DefaultSessionKeystore.h>
 #include <crypto/RandUtils.h>
+#include <gtest/gtest.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CHIPMem.h>
-#include <gtest/gtest.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/CheckinMessage.h>
 #include <protocols/secure_channel/Constants.h>
@@ -34,9 +34,7 @@ using namespace chip::Protocols::SecureChannel;
 using namespace chip::Crypto;
 using TestSessionKeystoreImpl = Crypto::DefaultSessionKeystore;
 
-namespace chip {
-namespace Protocols {
-namespace SecureChannel {
+namespace {
 
 class TestCheckInMsg : public ::testing::Test
 {
@@ -75,7 +73,6 @@ CHIP_ERROR TestCheckInMsg::GenerateAndVerifyPayload(MutableByteSpan & output, co
     memcpy(hmacKeyMaterial, vector.key, vector.key_len);
 
     Aes128KeyHandle aes128KeyHandle;
-
     EXPECT_EQ(keystore.CreateKey(aesKeyMaterial, aes128KeyHandle), CHIP_NO_ERROR);
 
     Hmac128KeyHandle hmac128KeyHandle;
@@ -237,7 +234,6 @@ TEST_F(TestCheckInMsg, TestCheckinMessageGenerate_ValidInputsTooSmallOutput)
 
     // Create output buffer with 0 size
     MutableByteSpan output;
-
     EXPECT_EQ(CHIP_ERROR_BUFFER_TOO_SMALL, GenerateAndVerifyPayload(output, vector));
 }
 
@@ -268,10 +264,10 @@ TEST_F(TestCheckInMsg, TestCheckInMessageGenerate_EmptyAesKeyHandle)
     // Create application data ByteSpan
     ByteSpan applicationData(vector.application_data, vector.application_data_len);
 
-    /*
-        TODO(#28986): Passing an empty key handle while using PSA crypto will result in a failure.
-                      When using OpenSSL this same test result in a success.
-    */
+/*
+    TODO(#28986): Passing an empty key handle while using PSA crypto will result in a failure.
+                  When using OpenSSL this same test result in a success.
+*/
 #if 0
    // Verify that the generation fails with an empty key handle
     NL_TEST_ASSERT_(inSuite,
@@ -310,10 +306,10 @@ TEST_F(TestCheckInMsg, TestCheckInMessageGenerate_EmptyHmacKeyHandle)
     // Create application data ByteSpan
     ByteSpan applicationData(vector.application_data, vector.application_data_len);
 
-    /*
-        TODO(#28986): Passing an empty key handle while using PSA crypto will result in a failure.
-                      When using OpenSSL this same test result in a success.
-    */
+/*
+    TODO(#28986): Passing an empty key handle while using PSA crypto will result in a failure.
+                  When using OpenSSL this same test result in a success.
+*/
 #if 0
     // Verify that the generation fails with an empty key handle
     NL_TEST_ASSERT_(inSuite,
@@ -403,10 +399,10 @@ TEST_F(TestCheckInMsg, TestCheckInMessageParse_EmptyAesKeyHandle)
     Hmac128KeyHandle hmac128KeyHandle;
     EXPECT_EQ(keystore.CreateKey(hmacKeyMaterial, hmac128KeyHandle), CHIP_NO_ERROR);
 
-    /*
-        TODO(#28986): Passing an empty key handle while using PSA crypto will result in a failure.
-                      When using OpenSSL this same test result in a success.
-    */
+/*
+    TODO(#28986): Passing an empty key handle while using PSA crypto will result in a failure.
+                  When using OpenSSL this same test result in a success.
+*/
 #if 0
     // Verify that the generation fails with an empty key handle
     EXPECT_EQ(
@@ -447,10 +443,10 @@ TEST_F(TestCheckInMsg, TestCheckInMessageParse_EmptyHmacKeyHandle)
     Aes128KeyHandle aes128KeyHandle;
     EXPECT_EQ(keystore.CreateKey(aesKeyMaterial, aes128KeyHandle), CHIP_NO_ERROR);
 
-    /*
-        TODO(#28986): Passing an empty key handle while using PSA crypto will result in a failure.
-                      When using OpenSSL this same test result in a success.
-    */
+/*
+    TODO(#28986): Passing an empty key handle while using PSA crypto will result in a failure.
+                  When using OpenSSL this same test result in a success.
+*/
 #if 0
     // Verify that the generation fails with an empty key handle
     EXPECT_EQ(
@@ -525,6 +521,4 @@ TEST_F(TestCheckInMsg, TestCheckInMessagePayloadSizeNullBuffer)
     EXPECT_EQ(calculated_size, 0u);
 }
 
-} // namespace SecureChannel
-} // namespace Protocols
-} // namespace chip
+} // namespace
