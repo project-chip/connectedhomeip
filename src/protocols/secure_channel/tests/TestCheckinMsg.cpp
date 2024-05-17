@@ -269,11 +269,10 @@ TEST_F(TestCheckInMsg, TestCheckInMessageGenerate_EmptyAesKeyHandle)
                   When using OpenSSL this same test result in a success.
 */
 #if 0
-   // Verify that the generation fails with an empty key handle
-    NL_TEST_ASSERT_(inSuite,
-                    CHIP_NO_ERROR !=
-                        CheckinMessage::GenerateCheckinMessagePayload(aes128KeyHandle, hmac128KeyHandle, vector.counter,
-                                                                      applicationData, output));
+    // Verify that the generation fails with an empty key handle
+    EXPECT_NE(
+        CHIP_NO_ERROR,
+        CheckinMessage::GenerateCheckinMessagePayload(aes128KeyHandle, hmac128KeyHandle, vector.counter, applicationData, output));
 #endif
 
     // Clean up
@@ -312,10 +311,9 @@ TEST_F(TestCheckInMsg, TestCheckInMessageGenerate_EmptyHmacKeyHandle)
 */
 #if 0
     // Verify that the generation fails with an empty key handle
-    NL_TEST_ASSERT_(inSuite,
-                    CHIP_NO_ERROR !=
-                        CheckinMessage::GenerateCheckinMessagePayload(aes128KeyHandle, hmac128KeyHandle, vector.counter,
-                                                                      applicationData, output));
+    EXPECT_NE(
+        CHIP_NO_ERROR,
+        CheckinMessage::GenerateCheckinMessagePayload(aes128KeyHandle, hmac128KeyHandle, vector.counter, applicationData, output));
 #endif
 
     // Clean up
