@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#include <gtest/gtest.h>
+
 #include "app-common/zap-generated/ids/Attributes.h"
 #include "app-common/zap-generated/ids/Clusters.h"
 #include "app/ClusterStateCache.h"
@@ -27,7 +29,7 @@
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
 #include <app/data-model/Decode.h>
-#include "AppTestContextPW.h"//+++ should be <app/tests/AppTestContext.h> version
+#include <app/tests/AppTestContext.h>
 #include <app/util/DataModelHandler.h>
 #include <app/util/attribute-storage.h>
 #include <controller/InvokeInteraction.h>
@@ -35,6 +37,7 @@
 #include <lib/support/TimeUtils.h>
 #include <lib/support/UnitTestUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <messaging/tests/MessagingContext.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -47,6 +50,8 @@ static uint8_t gInfoEventBuffer[4096];
 static uint8_t gCritEventBuffer[4096];
 static chip::app::CircularEventBuffer gCircularEventBuffer[3];
 
+using TestContext = chip::Test::AppContext;
+
 //
 // The generated endpoint_config for the controller app has Endpoint 1
 // already used in the fixed endpoint set of size 1. Consequently, let's use the next
@@ -54,10 +59,33 @@ static chip::app::CircularEventBuffer gCircularEventBuffer[3];
 //
 constexpr EndpointId kTestEndpointId = 2;
 
-class TestEventCaching : public Test::AppContextPW
+class TestEventCaching : public ::testing::Test
 {
+public:
+    // Performs shared setup for all tests in the test suite
+    static void SetUpTestSuite()
+    {
+        if (mpContext == nullptr)
+        {
+            mpContext = new TestContext();
+            ASSERT_NE(mpContext, nullptr);
+        }
+        mpContext->SetUpTestSuite();
+    }
+
+    // Performs shared teardown for all tests in the test suite
+    static void TearDownTestSuite()
+    {
+        mpContext->TearDownTestSuite();
+        if (mpContext != nullptr)
+        {
+            delete mpContext;
+            mpContext = nullptr;
+        }
+    }
+
 protected:
-    // Performs setup for each test in the suite.  Run once for each test function.
+    // Performs setup for each test in the suite
     void SetUp()
     {
         const chip::app::LogStorageResources logStorageResources[] = {
@@ -66,23 +94,29 @@ protected:
             { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
         };
 
-        AppContextPW::SetUp();  // Call parent.
-        VerifyOrReturn(!HasFailure());  // Stop if parent had a failure.
+        mpContext->SetUp();
 
-        ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
-        chip::app::EventManagement::CreateEventManagement(&this->GetExchangeManager(), ArraySize(logStorageResources), gCircularEventBuffer, logStorageResources, &mEventCounter);
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        // TODO: use ASSERT_EQ, once transition to pw_unit_test is complete
+        VerifyOrDieWithMsg((err = mEventCounter.Init(0)) == CHIP_NO_ERROR, AppServer,
+                           "Init EventCounter failed: %" CHIP_ERROR_FORMAT, err.Format());
+        chip::app::EventManagement::CreateEventManagement(&mpContext->GetExchangeManager(), ArraySize(logStorageResources),
+                                                          gCircularEventBuffer, logStorageResources, &mEventCounter);
     }
 
-    // Performs teardown for each test in the suite.  Run once for each test function.
+    // Performs teardown for each test in the suite
     void TearDown()
     {
         chip::app::EventManagement::DestroyEventManagement();
-        AppContextPW::TearDown();  // Call parent.
+        mpContext->TearDown();
     }
+
+    static TestContext * mpContext;
 
 private:
     MonotonicallyIncreasingCounter<EventNumber> mEventCounter;
 };
+TestContext * TestEventCaching::mpContext = nullptr;
 
 //clang-format off
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(testClusterAttrs)
@@ -145,7 +179,7 @@ void GenerateEvents(chip::EventNumber & firstEventNumber, chip::EventNumber & la
  */
 TEST_F(TestEventCaching, TestBasicCaching)
 {
-    auto sessionHandle                   = GetSessionBobToAlice();
+    auto sessionHandle                   = mpContext->GetSessionBobToAlice();
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
@@ -173,12 +207,12 @@ TEST_F(TestEventCaching, TestBasicCaching)
     TestReadCallback readCallback;
 
     {
-        app::ReadClient readClient(engine, &GetExchangeManager(),
+        app::ReadClient readClient(engine, &mpContext->GetExchangeManager(),
                                    readCallback.mClusterCacheAdapter.GetBufferedCallback(), app::ReadClient::InteractionType::Read);
 
         EXPECT_EQ(readClient.SendRequest(readParams), CHIP_NO_ERROR);
 
-        DrainAndServiceIO();
+        mpContext->DrainAndServiceIO();
 
         uint8_t generationCount = 0;
         readCallback.mClusterCacheAdapter.ForEachEventData(
@@ -306,12 +340,12 @@ TEST_F(TestEventCaching, TestBasicCaching)
     GenerateEvents(firstEventNumber, lastEventNumber);
 
     {
-        app::ReadClient readClient(engine, &GetExchangeManager(),
+        app::ReadClient readClient(engine, &mpContext->GetExchangeManager(),
                                    readCallback.mClusterCacheAdapter.GetBufferedCallback(), app::ReadClient::InteractionType::Read);
 
         EXPECT_EQ(readClient.SendRequest(readParams), CHIP_NO_ERROR);
 
-        DrainAndServiceIO();
+        mpContext->DrainAndServiceIO();
 
         //
         // Validate that we still have all 5 of the old events we received, as well as the new ones that just got generated.
@@ -358,7 +392,7 @@ TEST_F(TestEventCaching, TestBasicCaching)
     // we don't receive events lower than that value.
     //
     {
-        app::ReadClient readClient(engine, &GetExchangeManager(),
+        app::ReadClient readClient(engine, &mpContext->GetExchangeManager(),
                                    readCallback.mClusterCacheAdapter.GetBufferedCallback(), app::ReadClient::InteractionType::Read);
 
         readCallback.mClusterCacheAdapter.ClearEventCache();
@@ -371,7 +405,7 @@ TEST_F(TestEventCaching, TestBasicCaching)
 
         EXPECT_EQ(readClient.SendRequest(readParams), CHIP_NO_ERROR);
 
-        DrainAndServiceIO();
+        mpContext->DrainAndServiceIO();
 
         // We should only get events with event numbers larger than kHighestEventNumberSeen.
         EXPECT_EQ(readCallback.mEventsSeen, lastEventNumber - kLastSeenEventNumber);
@@ -407,12 +441,12 @@ TEST_F(TestEventCaching, TestBasicCaching)
 
     {
         readParams.mEventNumber.SetValue(5);
-        app::ReadClient readClient(engine, &GetExchangeManager(),
+        app::ReadClient readClient(engine, &mpContext->GetExchangeManager(),
                                    readCallback.mClusterCacheAdapter.GetBufferedCallback(), app::ReadClient::InteractionType::Read);
         readCallback.mClusterCacheAdapter.ClearEventCache(true);
         EXPECT_EQ(readClient.SendRequest(readParams), CHIP_NO_ERROR);
 
-        DrainAndServiceIO();
+        mpContext->DrainAndServiceIO();
 
         //
         // Validate that we would receive 5 events
@@ -440,7 +474,7 @@ TEST_F(TestEventCaching, TestBasicCaching)
         EXPECT_TRUE(highestEventNumber.HasValue() && highestEventNumber.Value() == 9);
     }
 
-    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
 
     emberAfClearDynamicEndpoint(0);
 }

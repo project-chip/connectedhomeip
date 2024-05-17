@@ -19,6 +19,8 @@
 #include <memory>
 #include <utility>
 
+#include <gtest/gtest.h>
+
 #include "app-common/zap-generated/ids/Attributes.h"
 #include "app-common/zap-generated/ids/Clusters.h"
 #include "app/ConcreteAttributePath.h"
@@ -30,7 +32,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/WriteClient.h>
 #include <app/data-model/Decode.h>
-#include "AppTestContextPW.h"//+++ should be <app/tests/AppTestContext.h> version
+#include <app/tests/AppTestContext.h>
 #include <app/util/DataModelHandler.h>
 #include <app/util/attribute-storage.h>
 #include <controller/InvokeInteraction.h>
@@ -38,6 +40,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/tests/MessagingContext.h>
 
+using TestContext = chip::Test::AppContext;
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -59,9 +62,41 @@ constexpr uint32_t kTestListLength        = 5;
 // We don't really care about the content, we just need a buffer.
 uint8_t sByteSpanData[app::kMaxSecureSduLengthBytes];
 
-class TestWriteChunking : public Test::AppContextPW//++++ can this just be: using TestContext = chip::Test::AppContext;
+class TestWriteChunking : public ::testing::Test
 {
+public:
+    // Performs shared setup for all tests in the test suite
+    static void SetUpTestSuite()
+    {
+        if (mpContext == nullptr)
+        {
+            mpContext = new TestContext();
+            ASSERT_NE(mpContext, nullptr);
+        }
+        mpContext->SetUpTestSuite();
+    }
+
+    // Performs shared teardown for all tests in the test suite
+    static void TearDownTestSuite()
+    {
+        mpContext->TearDownTestSuite();
+        if (mpContext != nullptr)
+        {
+            delete mpContext;
+            mpContext = nullptr;
+        }
+    }
+
+protected:
+    // Performs setup for each test in the suite
+    void SetUp() { mpContext->SetUp(); }
+
+    // Performs teardown for each test in the suite
+    void TearDown() { mpContext->TearDown(); }
+
+    static TestContext * mpContext;
 };
+TestContext * TestWriteChunking::mpContext = nullptr;
 
 //clang-format off
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(testClusterAttrsOnEndpoint)
