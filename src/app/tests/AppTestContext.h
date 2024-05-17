@@ -32,9 +32,9 @@ public:
     // Performs shared teardown for all tests in the test suite
     static void TearDownTestSuite();
     // Performs setup for each individual test in the test suite
-    virtual void SetUp();
+    void SetUp();
     // Performs teardown for each individual test in the test suite
-    virtual void TearDown();
+    void TearDown();
 };
 
 } // namespace Test

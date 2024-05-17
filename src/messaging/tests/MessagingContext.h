@@ -26,12 +26,13 @@
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
-#include <pw_unit_test/framework.h>
 #include <system/SystemClock.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/tests/LoopbackTransportManager.h>
 #include <transport/tests/UDPTransportManager.h>
+
+#include <nlunit-test.h>
 
 #include <vector>
 
@@ -206,105 +207,94 @@ private:
 };
 
 // LoopbackMessagingContext enriches MessagingContext with an async loopback transport
-class LoopbackMessagingContext : public ::testing::Test, public MessagingContext
+class LoopbackMessagingContext : public MessagingContext
 {
 public:
     virtual ~LoopbackMessagingContext() {}
 
-    // These functions wrap spLoopbackTransportManager methods
-    static auto & GetSystemLayer() { return spLoopbackTransportManager->GetSystemLayer(); }
-    static auto & GetLoopback() { return spLoopbackTransportManager->GetLoopback(); }
-    static auto & GetTransportMgr() { return spLoopbackTransportManager->GetTransportMgr(); }
-    static auto & GetIOContext() { return spLoopbackTransportManager->GetIOContext(); }
+    // These functions wrap sLoopbackTransportManager methods
+    static auto & GetSystemLayer() { return sLoopbackTransportManager.GetSystemLayer(); }
+    static auto & GetLoopback() { return sLoopbackTransportManager.GetLoopback(); }
+    static auto & GetTransportMgr() { return sLoopbackTransportManager.GetTransportMgr(); }
+    static auto & GetIOContext() { return sLoopbackTransportManager.GetIOContext(); }
 
     template <typename... Ts>
     static void DrainAndServiceIO(Ts... args)
     {
-        return spLoopbackTransportManager->DrainAndServiceIO(args...);
+        return sLoopbackTransportManager.DrainAndServiceIO(args...);
     }
 
     // Performs shared setup for all tests in the test suite
     static void SetUpTestSuite()
     {
-        // Initialize memory.
-        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
-        // Instantiate the LoopbackTransportManager.
-        ASSERT_EQ(spLoopbackTransportManager, nullptr);
-        spLoopbackTransportManager = new LoopbackTransportManager();
-        ASSERT_NE(spLoopbackTransportManager, nullptr);
-        // Initialize the LoopbackTransportManager.
-        ASSERT_EQ(spLoopbackTransportManager->Init(), CHIP_NO_ERROR);
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        // TODO: use ASSERT_EQ, once transition to pw_unit_test is complete
+        VerifyOrDieWithMsg((err = chip::Platform::MemoryInit()) == CHIP_NO_ERROR, AppServer,
+                           "Init CHIP memory failed: %" CHIP_ERROR_FORMAT, err.Format());
+        VerifyOrDieWithMsg((err = sLoopbackTransportManager.Init()) == CHIP_NO_ERROR, AppServer,
+                           "Init LoopbackTransportManager failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     // Performs shared teardown for all tests in the test suite
     static void TearDownTestSuite()
     {
-        // Shutdown the LoopbackTransportManager.
-        spLoopbackTransportManager->Shutdown();
-        // Destroy the LoopbackTransportManager.
-        if (spLoopbackTransportManager != nullptr)
-        {
-            delete spLoopbackTransportManager;
-            spLoopbackTransportManager = nullptr;
-        }
-        // Shutdown memory.
+        sLoopbackTransportManager.Shutdown();
         chip::Platform::MemoryShutdown();
     }
 
     // Performs setup for each individual test in the test suite
-    virtual void SetUp() { ASSERT_EQ(MessagingContext::Init(&GetTransportMgr(), &GetIOContext()), CHIP_NO_ERROR); }
+    virtual void SetUp()
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        VerifyOrDieWithMsg((err = MessagingContext::Init(&GetTransportMgr(), &GetIOContext())) == CHIP_NO_ERROR, AppServer,
+                           "Init MessagingContext failed: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 
     // Performs teardown for each individual test in the test suite
     virtual void TearDown() { MessagingContext::Shutdown(); }
 
-    static LoopbackTransportManager * spLoopbackTransportManager;
+    static LoopbackTransportManager sLoopbackTransportManager;
 };
 
 // UDPMessagingContext enriches MessagingContext with an UDP transport
-class UDPMessagingContext : public ::testing::Test, public MessagingContext
+class UDPMessagingContext : public MessagingContext
 {
 public:
     virtual ~UDPMessagingContext() {}
 
-    static auto & GetSystemLayer() { return spUDPTransportManager->GetSystemLayer(); }
-    static auto & GetTransportMgr() { return spUDPTransportManager->GetTransportMgr(); }
-    static auto & GetIOContext() { return spUDPTransportManager->GetIOContext(); }
+    static auto & GetSystemLayer() { return sUDPTransportManager.GetSystemLayer(); }
+    static auto & GetTransportMgr() { return sUDPTransportManager.GetTransportMgr(); }
+    static auto & GetIOContext() { return sUDPTransportManager.GetIOContext(); }
 
     // Performs shared setup for all tests in the test suite
     static void SetUpTestSuite()
     {
-        // Initialize memory.
-        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
-        // Instantiate the UDPTransportManager.
-        ASSERT_EQ(spUDPTransportManager, nullptr);
-        spUDPTransportManager = new UDPTransportManager();
-        ASSERT_NE(spUDPTransportManager, nullptr);
-        // Initialize the UDPTransportManager.
-        ASSERT_EQ(spUDPTransportManager->Init(), CHIP_NO_ERROR);
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        VerifyOrDieWithMsg((err = chip::Platform::MemoryInit()) == CHIP_NO_ERROR, AppServer,
+                           "Init CHIP memory failed: %" CHIP_ERROR_FORMAT, err.Format());
+        VerifyOrDieWithMsg((err = sUDPTransportManager.Init()) == CHIP_NO_ERROR, AppServer,
+                           "Init UDPTransportManager failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     // Performs shared teardown for all tests in the test suite
     static void TearDownTestSuite()
     {
-        // Shutdown the UDPTransportManager.
-        spUDPTransportManager->Shutdown();
-        // Destroy the UDPTransportManager.
-        if (spUDPTransportManager != nullptr)
-        {
-            delete spUDPTransportManager;
-            spUDPTransportManager = nullptr;
-        }
-        // Shutdown memory.
+        sUDPTransportManager.Shutdown();
         chip::Platform::MemoryShutdown();
     }
 
     // Performs setup for each individual test in the test suite
-    virtual void SetUp() { ASSERT_EQ(MessagingContext::Init(&GetTransportMgr(), &GetIOContext()), CHIP_NO_ERROR); }
+    virtual void SetUp()
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        VerifyOrDieWithMsg((err = MessagingContext::Init(&GetTransportMgr(), &GetIOContext())) == CHIP_NO_ERROR, AppServer,
+                           "Init MessagingContext failed: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 
     // Performs teardown for each individual test in the test suite
     virtual void TearDown() { MessagingContext::Shutdown(); }
 
-    static UDPTransportManager * spUDPTransportManager;
+    static UDPTransportManager sUDPTransportManager;
 };
 
 // Class that can be used to capture decrypted message traffic in tests using

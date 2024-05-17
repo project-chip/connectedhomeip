@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include "AppTestContext.h"
+#include <app/tests/AppTestContext.h>
 
 #include <access/AccessControl.h>
 #include <access/examples/PermissiveAccessControlDelegate.h>
@@ -40,10 +40,11 @@ namespace Test {
 
 void AppContext::SetUpTestSuite()
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     LoopbackMessagingContext::SetUpTestSuite();
-    VerifyOrReturn(!HasFailure()); // Stop if parent had a failure.
-
-    ASSERT_EQ(chip::DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
+    // TODO: use ASSERT_EQ, once transition to pw_unit_test is complete
+    VerifyOrDieWithMsg((err = chip::DeviceLayer::PlatformMgr().InitChipStack()) == CHIP_NO_ERROR, AppServer,
+                       "Init CHIP stack failed: %" CHIP_ERROR_FORMAT, err.Format());
 }
 
 void AppContext::TearDownTestSuite()
@@ -54,15 +55,17 @@ void AppContext::TearDownTestSuite()
 
 void AppContext::SetUp()
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     LoopbackMessagingContext::SetUp();
-    VerifyOrReturn(!HasFailure()); // Stop if parent had a failure.
-
-    ASSERT_EQ(app::InteractionModelEngine::GetInstance()->Init(&GetExchangeManager(), &GetFabricTable(),
-                                                               app::reporting::GetDefaultReportScheduler()),
-              CHIP_NO_ERROR);
+    // TODO: use ASSERT_EQ, once transition to pw_unit_test is complete
+    VerifyOrDieWithMsg((err = app::InteractionModelEngine::GetInstance()->Init(&GetExchangeManager(), &GetFabricTable(),
+                                                                               app::reporting::GetDefaultReportScheduler())) ==
+                           CHIP_NO_ERROR,
+                       AppServer, "Init InteractionModelEngine failed: %" CHIP_ERROR_FORMAT, err.Format());
     Access::SetAccessControl(gPermissiveAccessControl);
-    ASSERT_EQ(Access::GetAccessControl().Init(chip::Access::Examples::GetPermissiveAccessControlDelegate(), gDeviceTypeResolver),
-              CHIP_NO_ERROR);
+    VerifyOrDieWithMsg((err = Access::GetAccessControl().Init(chip::Access::Examples::GetPermissiveAccessControlDelegate(),
+                                                              gDeviceTypeResolver)) == CHIP_NO_ERROR,
+                       AppServer, "Init AccessControl failed: %" CHIP_ERROR_FORMAT, err.Format());
 }
 
 void AppContext::TearDown()
@@ -70,7 +73,6 @@ void AppContext::TearDown()
     Access::GetAccessControl().Finish();
     Access::ResetAccessControlToDefault();
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
-
     LoopbackMessagingContext::TearDown();
 }
 

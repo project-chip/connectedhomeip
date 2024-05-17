@@ -27,7 +27,7 @@
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
 #include <app/data-model/Decode.h>
-#include <app/tests/AppTestContext.h>
+#include "AppTestContextPW.h"//+++ should be <app/tests/AppTestContext.h> version
 #include <app/util/DataModelHandler.h>
 #include <app/util/attribute-storage.h>
 #include <controller/InvokeInteraction.h>
@@ -54,7 +54,7 @@ static chip::app::CircularEventBuffer gCircularEventBuffer[3];
 //
 constexpr EndpointId kTestEndpointId = 2;
 
-class TestEventCaching : public Test::AppContext
+class TestEventCaching : public Test::AppContextPW
 {
 protected:
     // Performs setup for each test in the suite.  Run once for each test function.
@@ -66,19 +66,18 @@ protected:
             { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
         };
 
-        AppContext::SetUp();           // Call parent.
-        VerifyOrReturn(!HasFailure()); // Stop if parent had a failure.
+        AppContextPW::SetUp();  // Call parent.
+        VerifyOrReturn(!HasFailure());  // Stop if parent had a failure.
 
         ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
-        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), ArraySize(logStorageResources),
-                                                          gCircularEventBuffer, logStorageResources, &mEventCounter);
+        chip::app::EventManagement::CreateEventManagement(&this->GetExchangeManager(), ArraySize(logStorageResources), gCircularEventBuffer, logStorageResources, &mEventCounter);
     }
 
     // Performs teardown for each test in the suite.  Run once for each test function.
     void TearDown()
     {
         chip::app::EventManagement::DestroyEventManagement();
-        AppContext::TearDown(); // Call parent.
+        AppContextPW::TearDown();  // Call parent.
     }
 
 private:
@@ -174,8 +173,8 @@ TEST_F(TestEventCaching, TestBasicCaching)
     TestReadCallback readCallback;
 
     {
-        app::ReadClient readClient(engine, &GetExchangeManager(), readCallback.mClusterCacheAdapter.GetBufferedCallback(),
-                                   app::ReadClient::InteractionType::Read);
+        app::ReadClient readClient(engine, &GetExchangeManager(),
+                                   readCallback.mClusterCacheAdapter.GetBufferedCallback(), app::ReadClient::InteractionType::Read);
 
         EXPECT_EQ(readClient.SendRequest(readParams), CHIP_NO_ERROR);
 
@@ -307,8 +306,8 @@ TEST_F(TestEventCaching, TestBasicCaching)
     GenerateEvents(firstEventNumber, lastEventNumber);
 
     {
-        app::ReadClient readClient(engine, &GetExchangeManager(), readCallback.mClusterCacheAdapter.GetBufferedCallback(),
-                                   app::ReadClient::InteractionType::Read);
+        app::ReadClient readClient(engine, &GetExchangeManager(),
+                                   readCallback.mClusterCacheAdapter.GetBufferedCallback(), app::ReadClient::InteractionType::Read);
 
         EXPECT_EQ(readClient.SendRequest(readParams), CHIP_NO_ERROR);
 
@@ -359,8 +358,8 @@ TEST_F(TestEventCaching, TestBasicCaching)
     // we don't receive events lower than that value.
     //
     {
-        app::ReadClient readClient(engine, &GetExchangeManager(), readCallback.mClusterCacheAdapter.GetBufferedCallback(),
-                                   app::ReadClient::InteractionType::Read);
+        app::ReadClient readClient(engine, &GetExchangeManager(),
+                                   readCallback.mClusterCacheAdapter.GetBufferedCallback(), app::ReadClient::InteractionType::Read);
 
         readCallback.mClusterCacheAdapter.ClearEventCache();
         constexpr EventNumber kLastSeenEventNumber = 3;
@@ -408,8 +407,8 @@ TEST_F(TestEventCaching, TestBasicCaching)
 
     {
         readParams.mEventNumber.SetValue(5);
-        app::ReadClient readClient(engine, &GetExchangeManager(), readCallback.mClusterCacheAdapter.GetBufferedCallback(),
-                                   app::ReadClient::InteractionType::Read);
+        app::ReadClient readClient(engine, &GetExchangeManager(),
+                                   readCallback.mClusterCacheAdapter.GetBufferedCallback(), app::ReadClient::InteractionType::Read);
         readCallback.mClusterCacheAdapter.ClearEventCache(true);
         EXPECT_EQ(readClient.SendRequest(readParams), CHIP_NO_ERROR);
 
