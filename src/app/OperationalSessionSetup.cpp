@@ -507,7 +507,6 @@ void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error, Sess
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     }
 
-
     // Session failed to be established. This is when discovery is also stopped
     MATTER_LOG_METRIC_END(kMetricDeviceOperationalDiscovery, error);
     MATTER_LOG_METRIC_END(kMetricDeviceCASESession, error);
