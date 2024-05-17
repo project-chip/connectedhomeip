@@ -29,7 +29,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/crypto/tests:tests.lib",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
-    "${chip_root}/src/lib/support:pw_tests_wrapper",
+    "${chip_root}/src/lib/support:pw_test_utils",
     "${chip_root}/src/lib/support:test_utils",
     "${chip_root}/src/lib/support:testing",
     "${chip_root}/src/messaging/tests:helpers",

@@ -36,7 +36,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
-#include <lib/support/UnitTest.h>
+#include <lib/support/UnitTestPigweedUtils.h>
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/CASESession.h>
