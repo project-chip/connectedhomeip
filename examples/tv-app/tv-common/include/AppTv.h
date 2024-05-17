@@ -139,9 +139,10 @@ public:
                                                                 uint16_t productId) override;
 
     void AddAdminVendorId(uint16_t vendorId);
-
+    // Add the app to the list of mContentApps
     void InstallContentApp(uint16_t vendorId, uint16_t productId);
-    void UninstallContentApp(uint16_t vendorId, uint16_t productId);
+    // Remove the app from the list of mContentApps
+    bool UninstallContentApp(uint16_t vendorId, uint16_t productId);
 
 protected:
     std::vector<std::unique_ptr<ContentAppImpl>> mContentApps;

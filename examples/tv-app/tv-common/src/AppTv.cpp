@@ -154,9 +154,7 @@ MyPasscodeService gMyPasscodeService;
 
 class MyAppInstallationService : public AppInstallationService
 {
-    // TODO: rename the method
-    // intentionally ambigiously named, need to find a better method name
-    bool HasContentApp(uint16_t vendorId, uint16_t productId) override
+    bool LookupTargetContentApp(uint16_t vendorId, uint16_t productId) override
     {
         return ContentAppPlatform::GetInstance().LoadContentAppByClient(vendorId, productId) != nullptr;
     }
@@ -573,6 +571,8 @@ void ContentAppFactoryImpl::AddAdminVendorId(uint16_t vendorId)
 
 void ContentAppFactoryImpl::InstallContentApp(uint16_t vendorId, uint16_t productId)
 {
+    ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl: InstallContentApp vendorId=%d productId=%d ",
+                    vendorId, productId);
     if (vendorId == 1 && productId == 11) {
         mContentApps.emplace_back(std::make_unique<ContentAppImpl>("Vendor1", vendorId, "exampleid", productId, "Version1", "34567890"));
     } else if (vendorId == 65521 && productId == 32768) {
@@ -586,9 +586,9 @@ void ContentAppFactoryImpl::InstallContentApp(uint16_t vendorId, uint16_t produc
     }
 }
 
-void ContentAppFactoryImpl::UninstallContentApp(uint16_t vendorId, uint16_t productId)
+bool ContentAppFactoryImpl::UninstallContentApp(uint16_t vendorId, uint16_t productId)
 {   
-    ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl: RemoveContentApp vendorId=%d productId=%d ",
+    ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl: UninstallContentApp vendorId=%d productId=%d ",
                     vendorId, productId);
 
     int index = 0;
@@ -599,13 +599,14 @@ void ContentAppFactoryImpl::UninstallContentApp(uint16_t vendorId, uint16_t prod
         ChipLogProgress(DeviceLayer, "Looking next vid=%d pid=%d", app->GetApplicationBasicDelegate()->HandleGetVendorId(), app->GetApplicationBasicDelegate()->HandleGetProductId());
         
         if (app->MatchesPidVid(productId, vendorId)) {
-            ChipLogProgress(DeviceLayer, "Found an app. vid=%d pid=%d. Uninstalling it.", app->GetApplicationBasicDelegate()->HandleGetVendorId(), app->GetApplicationBasicDelegate()->HandleGetProductId());
+            ChipLogProgress(DeviceLayer, "Found an app vid=%d pid=%d. Uninstalling it.", app->GetApplicationBasicDelegate()->HandleGetVendorId(), app->GetApplicationBasicDelegate()->HandleGetProductId());
             mContentApps.erase(mContentApps.begin() + index);
-            return;
+            return true;
         }
 
         index++;
     }
+    return false;
 }
 
 Access::Privilege ContentAppFactoryImpl::GetVendorPrivilege(uint16_t vendorId)

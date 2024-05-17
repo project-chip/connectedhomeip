@@ -174,7 +174,7 @@ class DLL_EXPORT PasscodeService
 public:
     /**
      * @brief
-     *   Called to determine if the given target app is available to the commissionee with the given given
+     *   Called to determine if the given target app is available to the commissionee with the given
      * vendorId/productId, and if so, return the passcode.
      *
      * This will be called by the main chip thread so any blocking work should be moved to a separate thread.
@@ -225,18 +225,16 @@ class DLL_EXPORT AppInstallationService
 public:
     /**
      * @brief
-     *   Called to get the setup passcode from the content app corresponding to the given vendorId/productId.
+     *   Called to check if the given target app is available to the commissione with th given 
+     *   vendorId/productId
      *
      * This will be called by the main chip thread so any blocking work should be moved to a separate thread.
      *
-     * After attempting to obtain the passcode, implementor should call HandleContentAppPasscodeResponse();
-     *
      *  @param[in]    vendorId           The vendorId in the DNS-SD advertisement of the requesting commissionee.
      *  @param[in]    productId          The productId in the DNS-SD advertisement of the requesting commissionee.
-     *  @param[in]    rotatingId         The rotatingId in the DNS-SD advertisement of the requesting commissionee.
      *
      */
-    virtual bool HasContentApp(uint16_t vendorId, uint16_t productId) = 0;
+    virtual bool LookupTargetContentApp(uint16_t vendorId, uint16_t productId) = 0;
 
     virtual ~AppInstallationService() = default;
 };
