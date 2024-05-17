@@ -903,7 +903,82 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadNulls)
     TestEmberScalarNullRead<double, ZCL_DOUBLE_ATTRIBUTE_TYPE>();
 }
 
+TEST(TestCodegenModelViaMocks, EmberAttributeReadNullOctetString)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    chip::app::CodegenDataModel model;
+    ScopedMockAccessControl accessControl;
+
+    TestReadRequest testRequest(kAdminSubjectDescriptor,
+                                ConcreteAttributePath(kMockEndpoint3, MockClusterId(4),
+                                                      MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE)));
+
+    // NOTE: This is a pascal string of size 0xFFFF which for null strings is a null marker
+    char data[] = "\xFF\xFFInvalid length string is null";
+    chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
+
+    // Actual read via an encoder
+    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
+    ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_NO_ERROR);
+    ASSERT_EQ(testRequest.FinishEncoding(), CHIP_NO_ERROR);
+
+    // Validate after read
+    std::vector<DecodedAttributeData> attribute_data;
+    ASSERT_EQ(testRequest.encodedIBs.Decode(attribute_data), CHIP_NO_ERROR);
+    ASSERT_EQ(attribute_data.size(), 1u);
+
+    DecodedAttributeData & encodedData = attribute_data[0];
+    ASSERT_EQ(encodedData.attributePath, testRequest.request.path);
+
+    // data element should be null for the given 0xFFFF length
+    ASSERT_EQ(encodedData.dataReader.GetType(), TLV::kTLVType_Null);
+
+    chip::app::DataModel::Nullable<ByteSpan> actual;
+    ASSERT_EQ(chip::app::DataModel::Decode(encodedData.dataReader, actual), CHIP_NO_ERROR);
+    ASSERT_TRUE(actual.IsNull());
+}
+
 TEST(TestCodegenModelViaMocks, EmberAttributeReadOctetString)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    chip::app::CodegenDataModel model;
+    ScopedMockAccessControl accessControl;
+
+    TestReadRequest testRequest(
+        kAdminSubjectDescriptor,
+        ConcreteAttributePath(kMockEndpoint3, MockClusterId(4),
+                              MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE)));
+
+    // NOTE: This is a pascal string, so actual data is "test"
+    //       the longer encoding is to make it clear we do not encode the overflow
+    char data[]  = "\0\0testing here with overflow";
+    uint16_t len = 4;
+    memcpy(data, &len, sizeof(uint16_t));
+    chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
+
+    // Actual read via an encoder
+    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
+    ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_NO_ERROR);
+    ASSERT_EQ(testRequest.FinishEncoding(), CHIP_NO_ERROR);
+
+    // Validate after read
+    std::vector<DecodedAttributeData> attribute_data;
+    ASSERT_EQ(testRequest.encodedIBs.Decode(attribute_data), CHIP_NO_ERROR);
+    ASSERT_EQ(attribute_data.size(), 1u);
+
+    const DecodedAttributeData & encodedData = attribute_data[0];
+    ASSERT_EQ(encodedData.attributePath, testRequest.request.path);
+
+    // data element should be a encoded byte string as this is what the attribute type is
+    ASSERT_EQ(encodedData.dataReader.GetType(), TLV::kTLVType_ByteString);
+    ByteSpan actual;
+    ASSERT_EQ(encodedData.dataReader.Get(actual), CHIP_NO_ERROR);
+
+    ByteSpan expected(reinterpret_cast<const uint8_t *>(data + 2), 4);
+    ASSERT_TRUE(actual.data_equal(expected));
+}
+
+TEST(TestCodegenModelViaMocks, EmberAttributeReadLongOctetString)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     chip::app::CodegenDataModel model;
@@ -938,6 +1013,43 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadOctetString)
 
     ByteSpan expected(reinterpret_cast<const uint8_t *>(data + 1), 4);
     ASSERT_TRUE(actual.data_equal(expected));
+}
+
+TEST(TestCodegenModelViaMocks, EmberAttributeReadShortString)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    chip::app::CodegenDataModel model;
+    ScopedMockAccessControl accessControl;
+
+    TestReadRequest testRequest(kAdminSubjectDescriptor,
+                                ConcreteAttributePath(kMockEndpoint3, MockClusterId(4),
+                                                      MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_CHAR_STRING_ATTRIBUTE_TYPE)));
+
+    // NOTE: This is a pascal string, so actual data is "abcde"
+    //       the longer encoding is to make it clear we do not encode the overflow
+    char data[]  = "\0abcdef...this is the alphabet";
+    uint16_t len = 5;
+    memcpy(data, &len, sizeof(uint8_t));
+    chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
+
+    // Actual read via an encoder
+    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
+    ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_NO_ERROR);
+    ASSERT_EQ(testRequest.FinishEncoding(), CHIP_NO_ERROR);
+
+    // Validate after reading
+    std::vector<DecodedAttributeData> attribute_data;
+    ASSERT_EQ(testRequest.encodedIBs.Decode(attribute_data), CHIP_NO_ERROR);
+    ASSERT_EQ(attribute_data.size(), 1u);
+
+    const DecodedAttributeData & encodedData = attribute_data[0];
+    ASSERT_EQ(encodedData.attributePath, testRequest.request.path);
+
+    // data element should be a encoded byte string as this is what the attribute type is
+    ASSERT_EQ(encodedData.dataReader.GetType(), TLV::kTLVType_UTF8String);
+    CharSpan actual;
+    ASSERT_EQ(encodedData.dataReader.Get(actual), CHIP_NO_ERROR);
+    ASSERT_TRUE(actual.data_equal("abcde"_span));
 }
 
 TEST(TestCodegenModelViaMocks, EmberAttributeReadLongString)
