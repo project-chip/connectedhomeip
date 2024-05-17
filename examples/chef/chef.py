@@ -868,7 +868,7 @@ def main() -> int:
                         """))
             if options.do_clean:
                 shell.run_cmd("rm -rf out")
-            shell.run_cmd("gn gen out")
+            shell.run_cmd("gn gen --export-compile-commands out")
             shell.run_cmd("ninja -C out")
 
     #

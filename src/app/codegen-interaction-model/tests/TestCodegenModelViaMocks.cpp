@@ -403,11 +403,11 @@ public:
             return CHIP_NO_ERROR;
         }
 
-        return encoder.EncodeList([this](const auto & encoder) {
+        return encoder.EncodeList([this](const auto & listEncoder) {
             for (unsigned i = 0; i < mCount; i++)
             {
                 mData.a = static_cast<uint8_t>(i % 0xFF);
-                ReturnErrorOnFailure(encoder.Encode(mData));
+                ReturnErrorOnFailure(listEncoder.Encode(mData));
             }
             return CHIP_NO_ERROR;
         });
