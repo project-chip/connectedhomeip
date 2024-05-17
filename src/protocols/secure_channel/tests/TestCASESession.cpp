@@ -27,6 +27,7 @@
 #include <crypto/DefaultSessionKeystore.h>
 #include <errno.h>
 #include <gtest/gtest.h>
+#include <ios>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/DataModelTypes.h>
@@ -370,7 +371,8 @@ TEST_F(TestCASESession, SecurePairingWaitTest)
     TemporarySessionManager sessionManager(*this);
     // Test all combinations of invalid parameters
     TestCASESecurePairingDelegate delegate;
-    FabricTable fabrics;
+    // Making this static to reduce stack usage, as some platforms have limits on stack size.
+    static FabricTable fabrics;
     CASESession caseSession;
 
     EXPECT_EQ(caseSession.GetSecureSessionType(), SecureSession::Type::kCASE);
