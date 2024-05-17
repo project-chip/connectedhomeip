@@ -14,12 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "app/AttributeEncodeState.h"
-#include "app/AttributeValueDecoder.h"
-#include "app/ConcreteAttributePath.h"
-#include "lib/core/TLVTypes.h"
-#include "lib/support/CodeUtils.h"
-#include <app/codegen-interaction-model/Model.h>
+#include <app/codegen-interaction-model/CodegenDataModel.h>
 
 #include <app/codegen-interaction-model/tests/EmberReadWriteOverride.h>
 #include <app/codegen-interaction-model/tests/TestAttributeReportIBsEncoding.h>
@@ -29,6 +24,10 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/AttributeEncodeState.h>
+#include <app/AttributeValueDecoder.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/GlobalAttributes.h>
 #include <app/MessageDef/ReportDataMessage.h>
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
@@ -497,7 +496,7 @@ template <typename T, EmberAfAttributeType ZclType>
 void TestEmberScalarTypeRead(typename NumericAttributeTraits<T>::WorkingType value)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel::Model model;
+    chip::app::CodegenDataModel model;
     ScopedMockAccessControl accessControl;
 
     TestReadRequest testRequest(
@@ -532,7 +531,7 @@ template <typename T, EmberAfAttributeType ZclType>
 void TestEmberScalarNullRead()
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel::Model model;
+    chip::app::CodegenDataModel model;
     ScopedMockAccessControl accessControl;
 
     TestReadRequest testRequest(
@@ -566,7 +565,7 @@ void TestEmberScalarNullRead()
 TEST(TestCodegenModelViaMocks, IterateOverEndpoints)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel::Model model;
+    chip::app::CodegenDataModel model;
 
     // This iteration relies on the hard-coding that occurs when mock_ember is used
     EXPECT_EQ(model.FirstEndpoint(), kMockEndpoint1);
@@ -590,7 +589,7 @@ TEST(TestCodegenModelViaMocks, IterateOverEndpoints)
 TEST(TestCodegenModelViaMocks, IterateOverClusters)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel::Model model;
+    chip::app::CodegenDataModel model;
 
     chip::Test::ResetVersion();
 
@@ -650,7 +649,7 @@ TEST(TestCodegenModelViaMocks, GetClusterInfo)
 {
 
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel::Model model;
+    chip::app::CodegenDataModel model;
 
     chip::Test::ResetVersion();
 
@@ -675,7 +674,7 @@ TEST(TestCodegenModelViaMocks, GetClusterInfo)
 TEST(TestCodegenModelViaMocks, IterateOverAttributes)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel::Model model;
+    chip::app::CodegenDataModel model;
 
     // invalid paths should return in "no more data"
     ASSERT_FALSE(model.FirstAttribute(ConcreteClusterPath(kEndpointIdThatIsMissing, MockClusterId(1))).path.HasValidIds());
@@ -712,6 +711,21 @@ TEST(TestCodegenModelViaMocks, IterateOverAttributes)
     ASSERT_EQ(entry.path.mAttributeId, MockAttributeId(2));
     ASSERT_TRUE(entry.info.flags.Has(AttributeQualityFlags::kListAttribute));
 
+    // Iteration MUST include global attributes. Ember does not provide those, so we
+    // assert here that we present them in order
+    for (auto globalAttributeId : GlobalAttributesNotInMetadata)
+    {
+
+        entry = model.NextAttribute(entry.path);
+        ASSERT_TRUE(entry.path.HasValidIds());
+        ASSERT_EQ(entry.path.mEndpointId, kMockEndpoint2);
+        ASSERT_EQ(entry.path.mClusterId, MockClusterId(2));
+        ASSERT_EQ(entry.path.mAttributeId, globalAttributeId);
+
+        // all global attributes not in ember metadata are LIST typed
+        ASSERT_TRUE(entry.info.flags.Has(AttributeQualityFlags::kListAttribute));
+    }
+
     entry = model.NextAttribute(entry.path);
     ASSERT_FALSE(entry.path.HasValidIds());
 
@@ -740,7 +754,7 @@ TEST(TestCodegenModelViaMocks, IterateOverAttributes)
 TEST(TestCodegenModelViaMocks, GetAttributeInfo)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel::Model model;
+    chip::app::CodegenDataModel model;
 
     // various non-existent or invalid paths should return no info data
     ASSERT_FALSE(
@@ -763,27 +777,27 @@ TEST(TestCodegenModelViaMocks, GetAttributeInfo)
     EXPECT_TRUE(info->flags.Has(AttributeQualityFlags::kListAttribute)); // NOLINT(bugprone-unchecked-optional-access)
 }
 
-class ADelegate : public Access::AccessControl::Delegate
+TEST(TestCodegenModelViaMocks, GlobalAttributeInfo)
 {
-public:
-    virtual CHIP_ERROR Check(const Access::SubjectDescriptor & subjectDescriptor, const Access::RequestPath & requestPath,
-                             Access::Privilege requestPrivilege)
-    {
-        // return CHIP_ERROR_ACCESS_DENIED;
-        return CHIP_NO_ERROR;
-    }
-};
+    UseMockNodeConfig config(gTestNodeConfig);
+    chip::app::CodegenDataModel model;
 
-class AResolver : public Access::AccessControl::DeviceTypeResolver
-{
-public:
-    bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) override { return true; }
-};
+    std::optional<AttributeInfo> info = model.GetAttributeInfo(
+        ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::GeneratedCommandList::Id));
+
+    ASSERT_TRUE(info.has_value());
+    EXPECT_TRUE(info->flags.Has(AttributeQualityFlags::kListAttribute)); // NOLINT(bugprone-unchecked-optional-access)
+
+    info = model.GetAttributeInfo(
+        ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::AttributeList::Id));
+    ASSERT_TRUE(info.has_value());
+    EXPECT_TRUE(info->flags.Has(AttributeQualityFlags::kListAttribute)); // NOLINT(bugprone-unchecked-optional-access)
+}
 
 TEST(TestCodegenModelViaMocks, EmberAttributeReadAclDeny)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel::Model model;
+    chip::app::CodegenDataModel model;
     ScopedMockAccessControl accessControl;
 
     TestReadRequest testRequest(kDenySubjectDescriptor,
@@ -796,7 +810,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadAclDeny)
 TEST(TestCodegenModelViaMocks, EmberAttributeInvalidRead)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel::Model model;
+    chip::app::CodegenDataModel model;
     ScopedMockAccessControl accessControl;
 
     TestReadRequest testRequest(kAdminSubjectDescriptor,
@@ -870,7 +884,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadNulls)
 TEST(TestCodegenModelViaMocks, EmberAttributeReadOctetString)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel::Model model;
+    chip::app::CodegenDataModel model;
     ScopedMockAccessControl accessControl;
 
     TestReadRequest testRequest(kAdminSubjectDescriptor,
@@ -907,7 +921,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadOctetString)
 TEST(TestCodegenModelViaMocks, EmberAttributeReadLongString)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel::Model model;
+    chip::app::CodegenDataModel model;
     ScopedMockAccessControl accessControl;
 
     TestReadRequest testRequest(
@@ -945,7 +959,7 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadLongString)
 TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceStructRead)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel::Model model;
+    chip::app::CodegenDataModel model;
     ScopedMockAccessControl accessControl;
 
     const ConcreteAttributePath kStructPath(kMockEndpoint3, MockClusterId(4),
@@ -988,7 +1002,7 @@ TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceStructRead)
 TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceListRead)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel::Model model;
+    chip::app::CodegenDataModel model;
     ScopedMockAccessControl accessControl;
 
     const ConcreteAttributePath kStructPath(kMockEndpoint3, MockClusterId(4),
@@ -1040,7 +1054,7 @@ TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceListRead)
 TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceListOverflowRead)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel::Model model;
+    chip::app::CodegenDataModel model;
     ScopedMockAccessControl accessControl;
 
     const ConcreteAttributePath kStructPath(kMockEndpoint3, MockClusterId(4),
@@ -1099,7 +1113,7 @@ TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceListOverflowRead)
 TEST(TestCodegenModelViaMocks, AttributeAccessInterfaceListIncrementalRead)
 {
     UseMockNodeConfig config(gTestNodeConfig);
-    chip::app::CodegenDataModel::Model model;
+    chip::app::CodegenDataModel model;
     ScopedMockAccessControl accessControl;
 
     const ConcreteAttributePath kStructPath(kMockEndpoint3, MockClusterId(4),

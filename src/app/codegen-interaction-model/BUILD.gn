@@ -19,9 +19,9 @@ import("//build_overrides/chip.gni")
 # be available at link time for this model to use
 #
 # Use `model.gni` to get access to:
-#   Model.cpp
-#   Model_Read.cpp
-#   Model.h
+#   CodegenDataModel.cpp
+#   CodegenDataModel_Read.cpp
+#   CodegenDataModel.h
 #
 # The abolve list of files exists to satisfy the "dependency linter"
 # since those files should technically be "visible to gn" even though we

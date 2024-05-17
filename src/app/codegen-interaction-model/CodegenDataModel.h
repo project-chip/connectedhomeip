@@ -16,13 +16,15 @@
  */
 #pragma once
 
+#include "app/ConcreteClusterPath.h"
 #include <app/interaction-model/Model.h>
+
+#include <app/util/af-types.h>
 
 namespace chip {
 namespace app {
-namespace CodegenDataModel {
 
-class Model : public chip::app::InteractionModel::Model
+class CodegenDataModel : public chip::app::InteractionModel::Model
 {
 public:
     /// Generic model implementations
@@ -44,8 +46,39 @@ public:
     InteractionModel::AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster) override;
     InteractionModel::AttributeEntry NextAttribute(const ConcreteAttributePath & before) override;
     std::optional<InteractionModel::AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) override;
+
+private:
+    // Iteration is often done in a tight loop going through all values.
+    // To avoid N^2 iterations, cache a hint of where something is positioned
+    uint16_t mEndpointIterationHint  = 0;
+    unsigned mClusterIterationHint   = 0;
+    unsigned mAttributeIterationHint = 0;
+
+    // represents a remembered cluster reference that has been found as
+    // looking for clusters is very common (for every attribute iteration)
+    struct ClusterReference
+    {
+        ConcreteClusterPath path;
+        const EmberAfCluster * cluster;
+
+        ClusterReference(const ConcreteClusterPath p, const EmberAfCluster * c) : path(p), cluster(c) {}
+    };
+    std::optional<ClusterReference> mPreviouslyFoundCluster;
+
+    /// Finds the specified ember cluster
+    ///
+    /// Effectively the same as `emberAfFindServerCluster` except with some caching capabilities
+    const EmberAfCluster * FindServerCluster(const ConcreteClusterPath & path);
+
+    /// Find the index of the given attribute id
+    std::optional<unsigned> TryFindAttributeIndex(const EmberAfCluster * cluster, chip::AttributeId id) const;
+
+    /// Find the index of the given cluster id
+    std::optional<unsigned> TryFindServerClusterIndex(const EmberAfEndpointType * endpoint, chip::ClusterId id) const;
+
+    /// Find the index of the given endpoint id
+    std::optional<unsigned> TryFindEndpointIndex(chip::EndpointId id) const;
 };
 
-} // namespace CodegenDataModel
 } // namespace app
 } // namespace chip
