@@ -29,14 +29,14 @@ of test functions in a given source file is called a "suite".
 
 TEST(YourTestFunction1)
 {
-    //// Do some test things here, then check the results using EXPECT_*
+    // Do some test things here, then check the results using EXPECT_*
     SomeTypeX foo;
     foo.DoSomething();
     EXPECT_EQ(foo.GetResultCount(), 7);
     foo.DoSomethingElse();
     EXPECT_EQ(foo.GetResultCount(), 5);
 
-    //// If you want to abort the rest of the test upon failure, use ASSERT_*
+    // If you want to abort the rest of the test upon failure, use ASSERT_*
     SomeTypeY * ptr = foo.GetSomePointer();
     ASSERT_NE(ptr, nullptr);
     ptr->DoTheThing();  // Won't reach here if the ASSERT failed.
@@ -44,7 +44,7 @@ TEST(YourTestFunction1)
 
 TEST(YourTestFunction2)
 {
-    //// Do some test things here, then check the results using EXPECT_*
+    // Do some test things here, then check the results using EXPECT_*
     SomeTypeZ foo;
     foo.DoSomething();
     EXPECT_EQ(foo.GetResultCount(), 3);
@@ -74,51 +74,51 @@ public:
     // Performs shared setup for all tests in the test suite.  Run once for the whole suite.
     static void SetUpTestSuite()
     {
-        //// Your per-suite setup goes here:
-        // sPerSuiteFixture.Init();
-        // ASSERT_TRUE(sPerSuiteFixture.WorkingGreat());
+        // Your per-suite setup goes here:
+        sPerSuiteFixture.Init();
+        ASSERT_TRUE(sPerSuiteFixture.WorkingGreat());
     }
 
     // Performs shared teardown for all tests in the test suite.  Run once for the whole suite.
     static void TearDownTestSuite()
     {
-        //// Your per-suite teardown goes here:
-        // sPerSuiteFixture.Shutdown();
+        // Your per-suite teardown goes here:
+        sPerSuiteFixture.Shutdown();
     }
 
 protected:
     // Performs setup for each test in the suite.  Run once for each test function.
     void SetUp()
     {
-        //// Your per-test setup goes here:
-        // mPerTestFixture.Init();
-        // ASSERT_TRUE(mPerTestFixture.WorkingGreat());
+        // Your per-test setup goes here:
+        mPerTestFixture.Init();
+        ASSERT_TRUE(mPerTestFixture.WorkingGreat());
     }
 
     // Performs teardown for each test in the suite.  Run once for each test function.
     void TearDown()
     {
-        //// Your per-test teardown goes here:
-        // mPerTestFixture.Shutdown();
+        // Your per-test teardown goes here:
+        mPerTestFixture.Shutdown();
     }
 
 private:
-    //// Your per-suite and per-test fixtures are declared here:
-    // static SomeTypeA sPerSuiteFixture;
-    // SomeTypeB mPerTestFixture;
+    // Your per-suite and per-test fixtures are declared here:
+    static SomeTypeA sPerSuiteFixture;
+    SomeTypeB mPerTestFixture;
 };
-//// Your per-suite fixtures are defined here:
-// SomeTypeA YourTestContext::sPerSuiteFixture;
+// Your per-suite fixtures are defined here:
+SomeTypeA YourTestContext::sPerSuiteFixture;
 
 TEST_F(YourTestContext, YourTestFunction1)
 {
-    //// Do some test things here, then check the results using EXPECT_*
+    // Do some test things here, then check the results using EXPECT_*
     mPerTestFixture.DoSomething();
     EXPECT_EQ(mPerTestFixture.GetResultCount(), 7);
     sPerSuiteFixture.DoSomething();
     EXPECT_EQ(sPerSuiteFixture.GetResultCount(), 5);
 
-    //// If you want to abort the rest of the test upon failure, use ASSERT_*
+    // If you want to abort the rest of the test upon failure, use ASSERT_*
     SomeTypeC * ptr = mPerTestFixture.GetSomePointer();
     ASSERT_NE(ptr, nullptr);
     ptr->DoTheThing();  // Won't reach here if the ASSERT failed.
@@ -126,7 +126,7 @@ TEST_F(YourTestContext, YourTestFunction1)
 
 TEST_F(YourTestContext, YourTestFunction2)
 {
-    //// Do some test things here, then check the results using EXPECT_*
+    // Do some test things here, then check the results using EXPECT_*
     mPerTestFixture.DoSomethingElse();
     EXPECT_EQ(mPerTestFixture.GetResultCount(), 9);
 }
@@ -152,16 +152,16 @@ public:
         AppContext::SetUpTestSuite();  // Call parent.
         VerifyOrReturn(!HasFailure());  // Stop if parent had a failure.
 
-        //// Your per-suite setup goes here:
-        // sPerSuiteFixture.Init();
-        // ASSERT_TRUE(sPerSuiteFixture.WorkingGreat());
+        // Your per-suite setup goes here:
+        sPerSuiteFixture.Init();
+        ASSERT_TRUE(sPerSuiteFixture.WorkingGreat());
     }
 
     // Performs shared teardown for all tests in the test suite.  Run once for the whole suite.
     static void TearDownTestSuite()
     {
-        //// Your per-suite teardown goes here:
-        // sPerSuiteFixture.Shutdown();
+        // Your per-suite teardown goes here:
+        sPerSuiteFixture.Shutdown();
 
         AppContext::TearDownTestSuite();  // Call parent.
     }
@@ -173,37 +173,37 @@ protected:
         AppContext::SetUp();  // Call parent.
         VerifyOrReturn(!HasFailure());  // Stop if parent had a failure.
 
-        //// Your per-test setup goes here:
-        // mPerTestFixture.Init();
-        // ASSERT_TRUE(mPerTestFixture.WorkingGreat());
+        // Your per-test setup goes here:
+        mPerTestFixture.Init();
+        ASSERT_TRUE(mPerTestFixture.WorkingGreat());
     }
 
     // Performs teardown for each test in the suite.  Run once for each test function.
     void TearDown()
     {
-        //// Your per-test teardown goes here:
-        // mPerTestFixture.Shutdown();
+        // Your per-test teardown goes here:
+        mPerTestFixture.Shutdown();
 
         chip::app::EventManagement::DestroyEventManagement();
         AppContext::TearDown();  // Call parent.
     }
 
 private:
-    //// Your per-suite and per-test fixtures are declared here:
-    // static SomeTypeA sPerSuiteFixture;
-    // SomeTypeB mPerTestFixture;
+    // Your per-suite and per-test fixtures are declared here:
+    static SomeTypeA sPerSuiteFixture;
+    SomeTypeB mPerTestFixture;
 };
-//// Your per-suite fixtures are defined here:
-// SomeTypeA YourTestContext::sPerSuiteFixture;
+// Your per-suite fixtures are defined here:
+SomeTypeA YourTestContext::sPerSuiteFixture;
 
 TEST_F(YourTestContext, YourTestFunction1)
 {
-    //// Do some test things here, then check the results using EXPECT_*
+    // Do some test things here, then check the results using EXPECT_*
 }
 
 TEST_F(YourTestContext, YourTestFunction2)
 {
-    //// Do some test things here, then check the results using EXPECT_*
+    // Do some test things here, then check the results using EXPECT_*
 }
 ```
 
