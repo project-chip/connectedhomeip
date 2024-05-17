@@ -21,6 +21,7 @@
 #include <app/SpecificationDefinedRevisions.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/TLVTypes.h>
+#include <lib/dnssd/Advertiser.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/TypeTraits.h>
 #include <platform/CHIPDeviceEvent.h>
@@ -142,6 +143,16 @@ CHIP_ERROR PairingSession::EncodeSessionParameters(TLV::Tag tag, const ReliableM
 
     uint16_t maxPathsPerInvoke = CHIP_CONFIG_MAX_PATHS_PER_INVOKE;
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kMaxPathsPerInvoke), maxPathsPerInvoke));
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    // Support for both TCP CLient and Server(0x06)
+    uint16_t supportedTransports = to_underlying(Dnssd::TCPModeAdvertise::kTCPClientServer);
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kSupportedTransports), supportedTransports));
+
+    uint32_t maxTCPMessageSize = System::PacketBuffer::kLargeBufMaxSizeWithoutReserve - 4 /* Framing length field of 4 bytes */;
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kMaxTCPMessageSize), maxTCPMessageSize));
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
     return tlvWriter.EndContainer(mrpParamsContainer);
 }
 
@@ -233,6 +244,31 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
         // The next element is optional. If it's not present, return CHIP_NO_ERROR.
         SuccessOrExit(err = tlvReader.Next());
     }
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+
+    if (TLV::TagNumFromTag(tlvReader.GetTag()) == SessionParameters::Tag::kSupportedTransports)
+    {
+        ChipLogDetail(SecureChannel, "Found TCPSupport parameter in the message");
+        uint16_t supportedTransports;
+        ReturnErrorOnFailure(tlvReader.Get(supportedTransports));
+        mRemoteSessionParams.SetSupportedTransports(supportedTransports);
+
+        // The next element is optional. If it's not present, return CHIP_NO_ERROR.
+        SuccessOrExit(err = tlvReader.Next());
+    }
+
+    if (TLV::TagNumFromTag(tlvReader.GetTag()) == SessionParameters::Tag::kMaxTCPMessageSize)
+    {
+        ChipLogDetail(SecureChannel, "Found TCP Max message size parameter in the message");
+        uint32_t maxTCPMessageSize;
+        ReturnErrorOnFailure(tlvReader.Get(maxTCPMessageSize));
+        mRemoteSessionParams.SetMaxTCPMessageSize(maxTCPMessageSize);
+
+        // The next element is optional. If it's not present, return CHIP_NO_ERROR.
+        SuccessOrExit(err = tlvReader.Next());
+    }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     // Future proofing - Don't error out if there are other tags
 exit:

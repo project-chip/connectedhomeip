@@ -35,6 +35,9 @@
 #include <credentials/OperationalCertificateStore.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <protocols/secure_channel/SessionResumptionStorage.h>
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+#include <transport/raw/TCPParamsStorageInterface.h>
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 namespace chip {
 
@@ -148,6 +151,9 @@ struct FactoryInitParams
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     Transport::WiFiPAFLayer * wifipaf_layer = nullptr;
 #endif
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    chip::Transport::TCPParamsStorageInterface * peerTCPParamsStorage = nullptr;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     //
     // Controls enabling server cluster interactions on a controller. This in turn
@@ -292,7 +298,10 @@ private:
     Credentials::OperationalCertificateStore * mOpCertStore             = nullptr;
     Credentials::CertificateValidityPolicy * mCertificateValidityPolicy = nullptr;
     SessionResumptionStorage * mSessionResumptionStorage                = nullptr;
-    bool mEnableServerInteractions                                      = false;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    chip::Transport::TCPParamsStorageInterface * mPeerTCPParamsStorage = nullptr;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+    bool mEnableServerInteractions = false;
 };
 
 } // namespace Controller

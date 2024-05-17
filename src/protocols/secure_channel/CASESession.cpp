@@ -49,6 +49,9 @@
 #include <tracing/macros.h>
 #include <tracing/metric_event.h>
 #include <transport/SessionManager.h>
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+#include <transport/raw/PeerTCPParamsStorage.h>
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 namespace {
 
@@ -696,6 +699,37 @@ CHIP_ERROR CASESession::RecoverInitiatorIpk()
 }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
+CHIP_ERROR CASESession::SaveTCPInfoFromRemoteSessionParams()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (GetRemoteSessionParameters().GetSupportedTransports().HasValue() &&
+        GetRemoteSessionParameters().GetMaxTCPMessageSize().HasValue())
+    {
+        err = mSessionManager->GetPeerTCPParamsStorage()->SaveTCPParams(
+            GetPeer(), GetRemoteSessionParameters().GetSupportedTransports().Value(),
+            GetRemoteSessionParameters().GetMaxTCPMessageSize().Value());
+    }
+    else
+    {
+        // Store zeroes for the TCP parameters as sentinel values from CASE
+        // session for no TCP support.
+        err = mSessionManager->GetPeerTCPParamsStorage()->SaveTCPParams(GetPeer(), 0, 0);
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        // Log and bypass failure in saving TCP Params to storage.
+        // Some platforms(e.g., Darwin) may not have the storage logic/keys
+        // implemented.
+        // TODO: return error from this method after Darwin platform has
+        // a corresponding implementation of the interface.
+        ChipLogError(SecureChannel, "Failed to save TCP param info.");
+        err = CHIP_NO_ERROR;
+    }
+
+    return err;
+}
+
 void CASESession::HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR err)
 {
     VerifyOrReturn(conn != nullptr);
@@ -1298,6 +1332,13 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
         SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(4), tlvReader));
         mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
             GetRemoteSessionParameters());
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+        if (mSessionManager->GetPeerTCPParamsStorage() != nullptr)
+        {
+            ReturnErrorOnFailure(SaveTCPInfoFromRemoteSessionParams());
+        }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     }
 
     ChipLogDetail(SecureChannel, "Peer assigned session session ID %d", responderSessionId);
@@ -1500,6 +1541,13 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
         SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(kTag_Sigma2_ResponderMRPParams), tlvReader));
         mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
             GetRemoteSessionParameters());
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+        if (mSessionManager->GetPeerTCPParamsStorage() != nullptr)
+        {
+            ReturnErrorOnFailure(SaveTCPInfoFromRemoteSessionParams());
+        }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     }
 
 exit:
@@ -2198,6 +2246,14 @@ CHIP_ERROR CASESession::ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, 
         ReturnErrorOnFailure(DecodeMRPParametersIfPresent(TLV::ContextTag(kInitiatorMRPParamsTag), tlvReader));
         mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
             GetRemoteSessionParameters());
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+        if (mSessionManager->GetPeerTCPParamsStorage() != nullptr)
+        {
+            ReturnErrorOnFailure(SaveTCPInfoFromRemoteSessionParams());
+        }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
         err = tlvReader.Next();
     }
 

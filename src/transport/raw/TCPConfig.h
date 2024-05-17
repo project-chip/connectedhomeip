@@ -115,4 +115,16 @@ namespace chip {
 #define CHIP_CONFIG_MAX_UNACKED_DATA_TIMEOUT_SECS (30)
 #endif // CHIP_CONFIG_MAX_UNACKED_DATA_TIMEOUT_SECS
 
+/**
+ *  @def CHIP_CONFIG_PEER_TCP_PARAMS_CACHE_SIZE
+ *
+ *  @brief
+ *    This defines the default value for the size
+ *    of the storage cache for peer TCP parameters.
+ *
+ */
+#ifndef CHIP_CONFIG_PEER_TCP_PARAMS_CACHE_SIZE
+#define CHIP_CONFIG_PEER_TCP_PARAMS_CACHE_SIZE (32)
+#endif // CHIP_CONFIG_PEER_TCP_PARAMS_CACHE_SIZE
+
 } // namespace chip

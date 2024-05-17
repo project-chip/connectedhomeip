@@ -44,6 +44,10 @@ struct __attribute__((packed)) SessionParametersStruct
     uint16_t interactionModelRevision = 0;
     uint32_t specificationVersion     = 0;
     uint16_t maxPathsPerInvoke        = 0;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    uint16_t supportedTransports = 0;
+    uint32_t maxTCPMessageSize   = 0;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 };
 
 } // namespace python
@@ -99,6 +103,11 @@ PyChipError pychip_DeviceProxy_GetRemoteSessionParameters(DeviceProxy * device, 
     sessionParam->interactionModelRevision = remoteSessionParameters.GetInteractionModelRevision().ValueOr(0);
     sessionParam->specificationVersion     = remoteSessionParameters.GetSpecificationVersion().ValueOr(0);
     sessionParam->maxPathsPerInvoke        = remoteSessionParameters.GetMaxPathsPerInvoke();
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    sessionParam->supportedTransports = remoteSessionParameters.GetSupportedTransports().ValueOr(0);
+    sessionParam->maxTCPMessageSize =
+        remoteSessionParameters.GetMaxTCPMessageSize().ValueOr(System::PacketBuffer::kLargeBufMaxSizeWithoutReserve - 4);
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     return ToPyChipError(CHIP_NO_ERROR);
 }
 }

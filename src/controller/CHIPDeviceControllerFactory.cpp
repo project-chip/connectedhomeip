@@ -39,6 +39,9 @@
 #include <app/server/Dnssd.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/SimpleSessionResumptionStorage.h>
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+#include <transport/raw/PeerTCPParamsStorage.h>
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 using namespace chip::Inet;
 using namespace chip::System;
@@ -68,6 +71,9 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
     mSessionResumptionStorage  = params.sessionResumptionStorage;
     mEnableServerInteractions  = params.enableServerInteractions;
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    mPeerTCPParamsStorage = params.peerTCPParamsStorage;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     // Initialize the system state. Note that it is left in a somewhat
     // special state where it is initialized, but has a ref count of 0.
     CHIP_ERROR err = InitSystemState(params);
@@ -84,7 +90,8 @@ CHIP_ERROR DeviceControllerFactory::ReinitSystemStateIfNecessary()
     params.systemLayer        = mSystemState->SystemLayer();
     params.udpEndPointManager = mSystemState->UDPEndPointManager();
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    params.tcpEndPointManager = mSystemState->TCPEndPointManager();
+    params.tcpEndPointManager   = mSystemState->TCPEndPointManager();
+    params.peerTCPParamsStorage = mPeerTCPParamsStorage;
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
     params.bleLayer = mSystemState->BleLayer();
@@ -237,6 +244,27 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     ReturnErrorOnFailure(stateParams.messageCounterManager->Init(stateParams.exchangeMgr));
     ReturnErrorOnFailure(stateParams.unsolicitedStatusHandler->Init(stateParams.exchangeMgr));
     ReturnErrorOnFailure(stateParams.bdxTransferServer->Init(stateParams.systemLayer, stateParams.exchangeMgr));
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    chip::Transport::TCPParamsStorageInterface * peerTCPParamsStorage;
+    if (params.peerTCPParamsStorage == nullptr)
+    {
+        auto ownedPeerTCPParamStorage = chip::Platform::MakeUnique<chip::Transport::PeerTCPParamsStorage>();
+        ReturnErrorOnFailure(ownedPeerTCPParamStorage->Init(params.fabricIndependentStorage));
+        stateParams.ownedPeerTCPParamsStorage = std::move(ownedPeerTCPParamStorage);
+        stateParams.peerTCPParamsStorage      = nullptr;
+        peerTCPParamsStorage                  = stateParams.ownedPeerTCPParamsStorage.get();
+    }
+    else
+    {
+        stateParams.ownedPeerTCPParamsStorage = nullptr;
+        stateParams.peerTCPParamsStorage      = params.peerTCPParamsStorage;
+        peerTCPParamsStorage                  = stateParams.peerTCPParamsStorage;
+    }
+
+    // Set the TCP Params storage after initializing SessionManager
+    stateParams.sessionMgr->SetPeerTCPParamsStorage(peerTCPParamsStorage);
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     InitDataModelHandler();
 
@@ -429,6 +457,9 @@ void DeviceControllerFactory::Shutdown()
     mOpCertStore               = nullptr;
     mCertificateValidityPolicy = nullptr;
     mSessionResumptionStorage  = nullptr;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    mPeerTCPParamsStorage = nullptr;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 }
 
 void DeviceControllerSystemState::Shutdown()

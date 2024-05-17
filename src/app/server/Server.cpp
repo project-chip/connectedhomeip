@@ -140,6 +140,9 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mOperationalKeystore           = initParams.operationalKeystore;
     mOpCertStore                   = initParams.opCertStore;
     mSessionKeystore               = initParams.sessionKeystore;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    mPeerTCPParamsStorage = initParams.peerTCPParamsStorage;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     if (initParams.certificateValidityPolicy)
     {
@@ -277,6 +280,11 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                                                        std::chrono::duration_cast<System::Clock::Milliseconds64>(mInitTimestamp));
     }
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    // Set the TCP Params storage after initializing SessionManager
+    mSessions.SetPeerTCPParamsStorage(mPeerTCPParamsStorage);
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     // This initializes clusters, so should come after lower level initialization.
     InitDataModelHandler();
@@ -788,5 +796,8 @@ Crypto::DefaultSessionKeystore CommonCaseDeviceServerInitParams::sSessionKeystor
 #if CHIP_CONFIG_ENABLE_ICD_CIP
 app::DefaultICDCheckInBackOffStrategy CommonCaseDeviceServerInitParams::sDefaultICDCheckInBackOffStrategy;
 #endif
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+Transport::PeerTCPParamsStorage CommonCaseDeviceServerInitParams::sPeerTCPParamsStorage;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 } // namespace chip

@@ -33,6 +33,7 @@
 #include <lib/address_resolve/AddressResolve.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
+#include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -300,19 +301,42 @@ CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & re
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (mTransportPayloadCapability == TransportPayloadCapability::kLargePayload)
     {
-        if (result.supportsTcpServer)
+        // First check if the TCPSupport information is available from prior
+        // CASE session negotiations with peer.
+        // Else, fall back to TCP support information from DNS-SD
+        // advertisements.
+        uint16_t supportedTransports;
+        uint32_t maxTCPMessageSize;
+        VerifyOrDie(mInitParams.sessionManager != nullptr);
+
+        if (mInitParams.sessionManager->GetPeerTCPParamsStorage() != nullptr &&
+            mInitParams.sessionManager->GetPeerTCPParamsStorage()->FindByScopedNodeId(mPeerId, supportedTransports,
+                                                                                      maxTCPMessageSize) == CHIP_NO_ERROR)
         {
-            // Set the transport type for carrying large payloads
-            mDeviceAddress.SetTransportType(chip::Transport::Type::kTcp);
+            if ((supportedTransports & to_underlying(Dnssd::TCPModeAdvertise::kTCPServer)) != 0)
+            {
+                // Set the transport type for carrying large payloads
+                mDeviceAddress.SetTransportType(chip::Transport::Type::kTcp);
+            }
         }
-        else
+        else // Failed to retrieve TCP Params from storage or TCPParamsStorage
+             // is not set up
         {
-            // we should not set the large payload while the TCP support is not enabled
-            ChipLogError(
-                Discovery,
-                "LargePayload session requested but peer does not support TCP server, PeerNodeId=" ChipLogFormatScopedNodeId,
-                ChipLogValueScopedNodeId(mPeerId));
-            return CHIP_ERROR_INTERNAL;
+            // Check DNS-SD advertisement values if information not available via CASE session parameters
+            if (result.supportsTcpServer)
+            {
+                // Set the transport type for carrying large payloads
+                mDeviceAddress.SetTransportType(chip::Transport::Type::kTcp);
+            }
+            else
+            {
+                // we should not set the large payload while the TCP support is not enabled from the peer's side.
+                ChipLogError(
+                    Discovery,
+                    "LargePayload session requested but peer does not support TCP server, PeerNodeId=" ChipLogFormatScopedNodeId,
+                    ChipLogValueScopedNodeId(mPeerId));
+                return CHIP_ERROR_INTERNAL;
+            }
         }
     }
 #endif
