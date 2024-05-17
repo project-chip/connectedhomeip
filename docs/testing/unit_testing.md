@@ -22,7 +22,7 @@ Each test function is defined using `TEST(NameOfFunction)`.
 The set of test functions in a given source file is called a "suite". 
 
 ```
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 TEST(YourTestFunction1)
 {
@@ -204,6 +204,8 @@ You don't have to override all 4 functions `SetUpTestsuite`, `TearDownTestSuite`
 If you don't need any custom behavior in one of those functions just omit it.
 
 If you override one of the setup/teardown functions make sure to invoke the parent's version of the function as well.  `AppContext::SetUpTestSuite` and `AppContext::SetUp` may generate fatal failures, so after you call these from your overriding function make sure to check `HasFailure()` and return if the parent function failed.
+
+If you don't override any of the setup/teardown functions, you can simply make a type alias:  `using YourTestContext = Test::AppContextPW;` instead of defining your own text context class.
 
 
 ## Best practices
