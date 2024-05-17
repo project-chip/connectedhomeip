@@ -1,7 +1,7 @@
 # Working with Python CHIP Controller
 
-The Python CHIP Controller is a tool that allows to commission a Matter device
-into the network and to communicate with it.
+The Python CHIP controller is a library that allows to create a Matter fabric
+and commission Matter devices with it.
 
 The `chip-repl` is a REPl which sets up a Python CHIP Controller and allows to
 explore the Python CHIP Controller API and communicate with devices from the
