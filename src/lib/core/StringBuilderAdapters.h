@@ -48,15 +48,6 @@
 namespace pw {
 
 template <>
-
-StatusWithSize ToString<CHIP_ERROR>(const CHIP_ERROR & err, pw::span<char> buffer)
-{
-    if (CHIP_ERROR::IsSuccess(err))
-    {
-        // source location probably does not matter
-        return pw::string::Format(buffer, "CHIP_NO_ERROR");
-    }
-    return pw::string::Format(buffer, "CHIP_ERROR:<%" CHIP_ERROR_FORMAT ">", err.Format());
-}
+StatusWithSize ToString<CHIP_ERROR>(const CHIP_ERROR & err, pw::span<char> buffer);
 
 } // namespace pw
