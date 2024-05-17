@@ -66,7 +66,7 @@ following example demonstrates how to use pw_unit_test to write a unit test that
 uses fixtures and setup/teardown behavior.
 
 ```
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 class YourTestContext : public ::testing::Test
 {
