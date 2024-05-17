@@ -33,10 +33,10 @@
 #include <app/util/mock/MockNodeConfig.h>
 #include <app/util/odd-sized-integers.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVReader.h>
 #include <lib/core/TLVWriter.h>
-#include <lib/core/StringBuilderAdapters.h>
 
 #include <gtest/gtest.h>
 #include <vector>
@@ -46,7 +46,6 @@ using namespace chip::Test;
 using namespace chip::app;
 using namespace chip::app::InteractionModel;
 using namespace chip::app::Clusters::Globals::Attributes;
-
 
 namespace {
 

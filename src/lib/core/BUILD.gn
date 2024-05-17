@@ -108,9 +108,7 @@ source_set("error") {
 }
 
 source_set("string-builder-adapters") {
-  sources = [
-    "StringBuilderAdapters.h",
-  ]
+  sources = [ "StringBuilderAdapters.h" ]
 
   public_deps = [
     ":error",

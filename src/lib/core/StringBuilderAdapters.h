@@ -19,7 +19,7 @@
 /// You can see https://pigweed.dev/pw_string/guide.html as a reference.
 ///
 /// In particular, pigweed code generally looks like:
-/// 
+///
 ///    pw::StringBuffer<42> sb;
 ///    sb << "Here is a value: ";
 ///    sb << value;
@@ -37,7 +37,6 @@
 
 #include <lib/core/CHIPError.h>
 
-
 namespace pw {
 
 template <>
@@ -52,4 +51,4 @@ StatusWithSize ToString<CHIP_ERROR>(const CHIP_ERROR & err, pw::span<char> buffe
     return pw::string::Format(buffer, "CHIP_ERROR:<%" CHIP_ERROR_FORMAT ">", err.Format());
 }
 
-}
+} // namespace pw
