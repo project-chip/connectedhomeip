@@ -69,9 +69,7 @@ ServerClusterCommandExists(const ConcreteCommandPath & aRequestCommandPath)
 // strong defintion in TestCommandInteraction.cpp
 __attribute__((weak)) void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPath,
                                                         chip::TLV::TLVReader & aReader, CommandHandler * apCommandObj)
-{
-    return;
-}
+{}
 
 // was previously in TestReadInteraction.cpp
 bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion)
