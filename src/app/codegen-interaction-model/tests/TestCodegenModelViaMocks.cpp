@@ -15,13 +15,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "app/GlobalAttributes.h"
-#include "lib/core/DataModelTypes.h"
 #include <app/codegen-interaction-model/CodegenDataModel.h>
 
+#include <app/GlobalAttributes.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <app/util/mock/MockNodeConfig.h>
+#include <lib/core/DataModelTypes.h>
 
 #include <gtest/gtest.h>
 
