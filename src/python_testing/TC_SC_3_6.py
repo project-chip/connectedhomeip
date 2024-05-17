@@ -123,6 +123,24 @@ class TC_SC_3_6(MatterBaseTest):
         )
         asserts.assert_greater_equal(capability_minima.caseSessionsPerFabric, 3)
 
+        logging.info("Pre-condition: Remove all pre-existing fabrics on the device that do not belong to the TH")
+        commissioned_fabric_count: int = await self.read_single_attribute(
+            dev_ctrl, node_id=self.dut_node_id,
+            endpoint=0, attribute=Clusters.OperationalCredentials.Attributes.CommissionedFabrics)
+
+        if commissioned_fabric_count > 1:
+            fabrics: List[Clusters.OperationalCredentials.Structs.FabricDescriptorStruct] = await self.read_single_attribute(
+                dev_ctrl, node_id=self.dut_node_id, endpoint=0,
+                attribute=Clusters.OperationalCredentials.Attributes.Fabrics, fabricFiltered=False)
+            current_fabric_index = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
+            for fabric in fabrics:
+                if fabric.fabricIndex == current_fabric_index:
+                    continue
+                # This is not the test client's fabric, so remove it.
+                logging.info(f"Removing extra fabric at {fabric.fabricIndex} from device.")
+                await dev_ctrl.SendCommand(
+                    self.dut_node_id, 0, Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=fabric.fabricIndex))
+
         logging.info("Pre-conditions: use existing fabric to configure new fabrics so that total is %d fabrics" %
                      num_fabrics_to_commission)
 
