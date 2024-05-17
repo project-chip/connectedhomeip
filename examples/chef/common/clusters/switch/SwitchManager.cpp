@@ -44,6 +44,7 @@ public:
     ~SwitchActionsDelegate() override{};
 
     void AttributeWriteHandler(chip::EndpointId endpointId, chip::AttributeId attributeId, std::vector<uint32_t> args) override;
+    void CommandHandler(chip::EndpointId endpointId, chip::AttributeId attributeId, std::vector<uint32_t> args) override {};
     void EventHandler(chip::EndpointId endpointId, chip::EventId eventId, std::vector<uint32_t> args) override;
 
 private:
@@ -118,7 +119,7 @@ void SwitchActionsDelegate::EventHandler(chip::EndpointId endpointId, chip::Even
     case Events::MultiPressOngoing::Id: {
         if (args.size() < 2)
         {
-            ChipLogError(NotSpecified, "MultiPressOngoing to few arguments");
+            ChipLogError(NotSpecified, "MultiPressOngoing has too few arguments");
             return;
         }
         uint8_t newPosition                   = static_cast<uint8_t>(args[0]);
@@ -129,7 +130,7 @@ void SwitchActionsDelegate::EventHandler(chip::EndpointId endpointId, chip::Even
     case Events::MultiPressComplete::Id: {
         if (args.size() < 2)
         {
-            ChipLogError(NotSpecified, "MultiPressComplete to few arguments");
+            ChipLogError(NotSpecified, "MultiPressComplete has too few arguments");
             return;
         }
         uint8_t previousPosition            = static_cast<uint8_t>(args[0]);
@@ -157,11 +158,13 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type gLatchingSwitch[] =
           { chip::app::DataModel::MakeNullable(chip::CharSpan("High", 4)) }) }
 };
 
+static SwitchEventHandler * gSwitchEventHandler = new SwitchEventHandler();
+static SwitchActionsDelegate * gSwitchActionsDelegate = new SwitchActionsDelegate(Clusters::Switch::Id, gSwitchEventHandler);
+
 void emberAfSwitchClusterInitCallback(EndpointId endpointId)
 {
     ChipLogProgress(Zcl, "Chef: emberAfSwitchClusterInitCallback");
 
-    ChefRpcActionsWorker::Instance().RegisterRpcActionsDelegate(
-        Clusters::Switch::Id, new SwitchActionsDelegate(Clusters::Switch::Id, new SwitchEventHandler()));
+    ChefRpcActionsWorker::Instance().RegisterRpcActionsDelegate(Clusters::Switch::Id, gSwitchActionsDelegate);
     SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gLatchingSwitch));
 }
