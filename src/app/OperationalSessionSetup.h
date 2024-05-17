@@ -347,7 +347,7 @@ private:
 
     void MoveToState(State aTargetState);
 
-    CHIP_ERROR EstablishConnection(const ReliableMessageProtocolConfig & config);
+    CHIP_ERROR EstablishConnection(const AddressResolve::ResolveResult & result);
 
     /*
      * This checks to see if an existing CASE session exists to the peer within the SessionManager
@@ -421,7 +421,7 @@ private:
     /**
      * This function will set new IP address, port and MRP retransmission intervals of the device.
      */
-    void UpdateDeviceData(const Transport::PeerAddress & addr, const ReliableMessageProtocolConfig & config);
+    void UpdateDeviceData(const Transport::PeerAddress & addr, const AddressResolve::ResolveResult & result);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     /**
