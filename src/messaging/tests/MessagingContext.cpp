@@ -304,9 +304,9 @@ Messaging::ExchangeContext * MessagingContext::NewExchangeToBob(Messaging::Excha
     return mExchangeManager.NewContext(GetSessionAliceToBob(), delegate, isInitiator);
 }
 
-LoopbackTransportManager LoopbackMessagingContext::sLoopbackTransportManager;
+LoopbackTransportManager * LoopbackMessagingContext::spLoopbackTransportManager = nullptr;
 
-UDPTransportManager UDPMessagingContext::sUDPTransportManager;
+UDPTransportManager * UDPMessagingContext::spUDPTransportManager = nullptr;
 
 void MessageCapturer::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                         const SessionHandle & session, DuplicateMessage isDuplicate,
