@@ -63,9 +63,9 @@ tests:
           saveAs: TH1_Fabric_Index
 
     - label:
-          "Step 3.2: TH1 does a fabric-filtered read of the Fabrics
-          attribute from the Node Operational Credentials cluster. Save the
-          FabricIndex for TH1 as TH1_Fabric_Index for future use."
+          "Step 3.2: TH1 does a fabric-filtered read of the Fabrics attribute
+          from the Node Operational Credentials cluster. Save the FabricIndex
+          for TH1 as TH1_Fabric_Index for future use."
       identity: "alpha"
       command: "readAttribute"
       cluster: "Operational Credentials"
@@ -245,10 +245,7 @@ tests:
       attribute: "Fabrics"
       fabricFiltered: true
       response:
-          value:
-              [
-                  { "FabricIndex": TH1_Fabric_Index, "Label": "" },
-              ]
+          value: [{ "FabricIndex": TH1_Fabric_Index, "Label": "" }]
           constraints:
               type: list
 
@@ -263,10 +260,7 @@ tests:
       attribute: "Fabrics"
       fabricFiltered: true
       response:
-          value:
-              [
-                  { "FabricIndex": TH2_Fabric_Index, "Label": "" },
-              ]
+          value: [{ "FabricIndex": TH2_Fabric_Index, "Label": "" }]
           constraints:
               type: list
 
