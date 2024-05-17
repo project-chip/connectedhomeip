@@ -13,13 +13,16 @@
 
 ## Unit testing in the SDK using pw_unit_test
 
-This SDK uses Pigweed unit test (pw_unit_test), which is an implementation of GoogleTest.  For more information see the [pw_unit_test documentation](https://pigweed.dev/pw_unit_test/) or the [GoogleTest documentation](https://google.github.io/googletest/).
+This SDK uses Pigweed unit test (pw_unit_test), which is an implementation of
+GoogleTest. For more information see the
+[pw_unit_test documentation](https://pigweed.dev/pw_unit_test/) or the
+[GoogleTest documentation](https://google.github.io/googletest/).
 
 ### Simple unit tests
 
-The following example demonstrates how to use pw_unit_test to write a simple unit test.
-Each test function is defined using `TEST(NameOfFunction)`.
-The set of test functions in a given source file is called a "suite". 
+The following example demonstrates how to use pw_unit_test to write a simple
+unit test. Each test function is defined using `TEST(NameOfFunction)`. The set
+of test functions in a given source file is called a "suite".
 
 ```
 #include <pw_unit_test/framework.h>
@@ -48,7 +51,7 @@ TEST(YourTestFunction2)
 }
 ```
 
-See 
+See
 [TestSpan.cpp](https://github.com/project-chip/connectedhomeip/blob/master/src/lib/support/tests/TestSpan.cpp)
 for an example of a simple unit test.
 
@@ -56,9 +59,11 @@ In the above example there are no fixtures or setup/teardown behavior.
 
 ### Test fixtures and setup/teardown behavior
 
-If your tests need fixtures or some kind of setup/teardown you will need to define a test context that derives from `::testing::Test`.
-Each of your test functions will be defined with `TEST_F(NameOfTestContext, NameOfFunction)`.
-The following example demonstrates how to use pw_unit_test to write a unit test that uses fixtures and setup/teardown behavior.
+If your tests need fixtures or some kind of setup/teardown you will need to
+define a test context that derives from `::testing::Test`. Each of your test
+functions will be defined with `TEST_F(NameOfTestContext, NameOfFunction)`. The
+following example demonstrates how to use pw_unit_test to write a unit test that
+uses fixtures and setup/teardown behavior.
 
 ```
 #include <gtest/gtest.h>
@@ -129,9 +134,11 @@ TEST_F(YourTestContext, YourTestFunction2)
 
 ### A loopback messaging context for convenience
 
-If you need messaging, there is a convenience class [Test::AppContext](https://github.com/project-chip/connectedhomeip/blob/master/src/app/tests/AppTestContext.h) that you can derive your test context from.
-It provides a network layer and a system layer and two secure sessions connected with each other.
-The following example demonstrates this.
+If you need messaging, there is a convenience class
+[Test::AppContext](https://github.com/project-chip/connectedhomeip/blob/master/src/app/tests/AppTestContext.h)
+that you can derive your test context from. It provides a network layer and a
+system layer and two secure sessions connected with each other. The following
+example demonstrates this.
 
 ```
 #include <app/tests/AppTestContext.h>
@@ -200,32 +207,47 @@ TEST_F(YourTestContext, YourTestFunction2)
 }
 ```
 
-You don't have to override all 4 functions `SetUpTestsuite`, `TearDownTestSuite`, `SetUp`, `TearDown`.
-If you don't need any custom behavior in one of those functions just omit it.
+You don't have to override all 4 functions `SetUpTestsuite`,
+`TearDownTestSuite`, `SetUp`, `TearDown`. If you don't need any custom behavior
+in one of those functions just omit it.
 
-If you override one of the setup/teardown functions make sure to invoke the parent's version of the function as well.  `AppContext::SetUpTestSuite` and `AppContext::SetUp` may generate fatal failures, so after you call these from your overriding function make sure to check `HasFailure()` and return if the parent function failed.
+If you override one of the setup/teardown functions make sure to invoke the
+parent's version of the function as well. `AppContext::SetUpTestSuite` and
+`AppContext::SetUp` may generate fatal failures, so after you call these from
+your overriding function make sure to check `HasFailure()` and return if the
+parent function failed.
 
-If you don't override any of the setup/teardown functions, you can simply make a type alias:  `using YourTestContext = Test::AppContextPW;` instead of defining your own text context class.
-
+If you don't override any of the setup/teardown functions, you can simply make a
+type alias: `using YourTestContext = Test::AppContextPW;` instead of defining
+your own text context class.
 
 ## Best practices
 
-- Try to use as specific an assertion as possible.  For example use these
+-   Try to use as specific an assertion as possible. For example use these
+
     ```
     EXPECT_EQ(result, 3);
     EXPECT_GT(result, 1);
     EXPECT_STREQ(myString, "hello");
     ```
+
     instead of these
+
     ```
     EXPECT_TRUE(result == 3);
     EXPECT_TRUE(result > 1);
     EXPECT_EQ(strcmp(myString, "hello"), 0);
     ```
 
-- If you want a test to abort when an assertion fails, use `ASSERT_*` instead of `EXPECT_*`.  This will cause the current function to return.
+-   If you want a test to abort when an assertion fails, use `ASSERT_*` instead
+    of `EXPECT_*`. This will cause the current function to return.
 
-- If a test calls a subroutine which exits due to an ASSERT failing, execution of the test will continue after the subroutine call.  This is because ASSERT causes the subroutine to return (as opposed to throwing an exception).  If you want to prevent the test from continuing, check the value of `HasFailure()` and stop execution if true.  Example:
+-   If a test calls a subroutine which exits due to an ASSERT failing, execution
+    of the test will continue after the subroutine call. This is because ASSERT
+    causes the subroutine to return (as opposed to throwing an exception). If
+    you want to prevent the test from continuing, check the value of
+    `HasFailure()` and stop execution if true. Example:
+
     ```
     void Subroutine()
     {
@@ -242,19 +264,53 @@ If you don't override any of the setup/teardown functions, you can simply make a
     }
     ```
 
-- If you want to force a fatal failure use `FAIL()`, which will record a fatal failure and exit the current function.  This is similar to using `ASSERT_TRUE(false)`.  If you want to force a non-fatal failure use `ADD_FAILURE()`, which will record a non-fatal failure and continue executing the current function.  This is similar to using `EXPECT_TRUE(false)`.
+-   If you want to force a fatal failure use `FAIL()`, which will record a fatal
+    failure and exit the current function. This is similar to using
+    `ASSERT_TRUE(false)`. If you want to force a non-fatal failure use
+    `ADD_FAILURE()`, which will record a non-fatal failure and continue
+    executing the current function. This is similar to using
+    `EXPECT_TRUE(false)`.
 
-- `ASSERT_*` and `FAIL` will only work in functions with void return type, since they generate a `return;` statement.
-    If you must use these in a non-void function, instead use `EXPECT_*` or `ADD_FAILURE` and then check `HasFailure()` afterward and return if needed.
+-   `ASSERT_*` and `FAIL` will only work in functions with void return type,
+    since they generate a `return;` statement. If you must use these in a
+    non-void function, instead use `EXPECT_*` or `ADD_FAILURE` and then check
+    `HasFailure()` afterward and return if needed.
 
-- If your test requires access to private/protected members of the underlying class you're testing, you'll need to create an accessor class that performs these operations and is friended to the underlying class.  Please name the class `chip::Test::SomethingTestAccess` where `Something` is the name of the underlying class whose private/protected members you're trying to access.  Then add `friend class chip::Test::SomethingTestAccess;` to the underlying class.  Make sure your test's BUILD.gn file contains `sources = [ "SomethingTestAccess.h" ]`.  Before creating a new TestAccess class, check if one already exists.  If it does exist but doesn't expose the member you need, you can add a function to that class to do so.  Note that you should make these functions as minimal as possible, with no logic besides just exposing the private/protected member.
-    - For an example see `ICDConfigurationDataTestAccess` which is defined in [ICDConfigurationDataTestAccess.h](https://github.com/project-chip/connectedhomeip/blob/master/src/app/icd/server/tests/ICDConfigurationDataTestAccess.h), friends the underlying class in [ICDConfigurationData.h](https://github.com/project-chip/connectedhomeip/blob/master/src/app/icd/server/ICDConfigurationData.h), is included as a source in [BUILD.gn](https://github.com/project-chip/connectedhomeip/blob/master/src/app/icd/server/tests/BUILD.gn), and is used by a test in [TestICDManager.cpp](https://github.com/project-chip/connectedhomeip/blob/master/src/app/icd/server/tests/TestICDManager.cpp).
-    - For another example see `TCPBaseTestAccess` which is defined in [TCPBaseTestAccess.h](https://github.com/project-chip/connectedhomeip/blob/master/src/transport/raw/tests/TCPBaseTestAccess.h), friends the underlying class in [TCP.h](https://github.com/project-chip/connectedhomeip/blob/master/src/transport/raw/TCP.h), is included as a source in [BUILD.gn](https://github.com/project-chip/connectedhomeip/blob/master/src/transport/raw/tests/BUILD.gn), and is used by a test in [TestTCP.cpp](https://github.com/project-chip/connectedhomeip/blob/master/src/transport/raw/tests/TestTCP.cpp).
+-   If your test requires access to private/protected members of the underlying
+    class you're testing, you'll need to create an accessor class that performs
+    these operations and is friended to the underlying class. Please name the
+    class `chip::Test::SomethingTestAccess` where `Something` is the name of the
+    underlying class whose private/protected members you're trying to access.
+    Then add `friend class chip::Test::SomethingTestAccess;` to the underlying
+    class. Make sure your test's BUILD.gn file contains
+    `sources = [ "SomethingTestAccess.h" ]`. Before creating a new TestAccess
+    class, check if one already exists. If it does exist but doesn't expose the
+    member you need, you can add a function to that class to do so. Note that
+    you should make these functions as minimal as possible, with no logic
+    besides just exposing the private/protected member.
+    -   For an example see `ICDConfigurationDataTestAccess` which is defined in
+        [ICDConfigurationDataTestAccess.h](https://github.com/project-chip/connectedhomeip/blob/master/src/app/icd/server/tests/ICDConfigurationDataTestAccess.h),
+        friends the underlying class in
+        [ICDConfigurationData.h](https://github.com/project-chip/connectedhomeip/blob/master/src/app/icd/server/ICDConfigurationData.h),
+        is included as a source in
+        [BUILD.gn](https://github.com/project-chip/connectedhomeip/blob/master/src/app/icd/server/tests/BUILD.gn),
+        and is used by a test in
+        [TestICDManager.cpp](https://github.com/project-chip/connectedhomeip/blob/master/src/app/icd/server/tests/TestICDManager.cpp).
+    -   For another example see `TCPBaseTestAccess` which is defined in
+        [TCPBaseTestAccess.h](https://github.com/project-chip/connectedhomeip/blob/master/src/transport/raw/tests/TCPBaseTestAccess.h),
+        friends the underlying class in
+        [TCP.h](https://github.com/project-chip/connectedhomeip/blob/master/src/transport/raw/TCP.h),
+        is included as a source in
+        [BUILD.gn](https://github.com/project-chip/connectedhomeip/blob/master/src/transport/raw/tests/BUILD.gn),
+        and is used by a test in
+        [TestTCP.cpp](https://github.com/project-chip/connectedhomeip/blob/master/src/transport/raw/tests/TestTCP.cpp).
 
 ## Compiling and running
 
 -   Add to `src/some_directory/tests/BUILD.gn`
-    - Example
+
+    -   Example
+
         ```
         chip_test_suite("tests") {
             output_name = "libSomethingTests"
@@ -276,15 +332,19 @@ If you don't override any of the setup/teardown functions, you can simply make a
             ]
         }
         ```
-    - Another example: [src/lib/support/tests/BUILD.gn](https://github.com/project-chip/connectedhomeip/blob/master/src/lib/support/tests/BUILD.gn)
--   Build and run all tests with [./gn_build.sh](https://github.com/project-chip/connectedhomeip/blob/master/gn_build.sh)
+
+    -   Another example:
+        [src/lib/support/tests/BUILD.gn](https://github.com/project-chip/connectedhomeip/blob/master/src/lib/support/tests/BUILD.gn)
+
+-   Build and run all tests with
+    [./gn_build.sh](https://github.com/project-chip/connectedhomeip/blob/master/gn_build.sh)
     -   CI runs this, so any unit tests that get added will automatically be
         added to the CI.
 -   Test binaries are compiled into:
     -   `out/debug/<host_compiler>/tests`
     -   e.g. `out/debug/linux_x64_clang/tests`
--   Tests are run when `./gn_build.sh` runs, but you can run them individually in
-    a debugger from their location.
+-   Tests are run when `./gn_build.sh` runs, but you can run them individually
+    in a debugger from their location.
 
 ## Debugging unit tests
 
