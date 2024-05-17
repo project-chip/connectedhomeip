@@ -841,14 +841,29 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadDouble)
     TestEmberScalarTypeRead<double, ZCL_DOUBLE_ATTRIBUTE_TYPE>(0.625);
 }
 
+TEST(TestCodegenModelViaMocks, EmberAttributeReadInt24U)
+{
+    TestEmberScalarTypeRead<OddSizedInteger<3, false>, ZCL_INT24U_ATTRIBUTE_TYPE>(0x1234AB);
+}
+
 TEST(TestCodegenModelViaMocks, EmberAttributeReadInt32U)
 {
     TestEmberScalarTypeRead<uint32_t, ZCL_INT32U_ATTRIBUTE_TYPE>(0x1234ABCD);
 }
 
+TEST(TestCodegenModelViaMocks, EmberAttributeReadInt40U)
+{
+    TestEmberScalarTypeRead<OddSizedInteger<5, false>, ZCL_INT40U_ATTRIBUTE_TYPE>(0x1122334455);
+}
+
 TEST(TestCodegenModelViaMocks, EmberAttributeReadInt48U)
 {
     TestEmberScalarTypeRead<OddSizedInteger<6, false>, ZCL_INT48U_ATTRIBUTE_TYPE>(0xAABB11223344);
+}
+
+TEST(TestCodegenModelViaMocks, EmberAttributeReadInt56U)
+{
+    TestEmberScalarTypeRead<OddSizedInteger<7, false>, ZCL_INT56U_ATTRIBUTE_TYPE>(0xAABB11223344);
 }
 
 TEST(TestCodegenModelViaMocks, EmberAttributeReadBool)
@@ -868,13 +883,19 @@ TEST(TestCodegenModelViaMocks, EmberAttributeReadNulls)
     TestEmberScalarNullRead<uint16_t, ZCL_INT16U_ATTRIBUTE_TYPE>();
     TestEmberScalarNullRead<OddSizedInteger<3, false>, ZCL_INT24U_ATTRIBUTE_TYPE>();
     TestEmberScalarNullRead<uint32_t, ZCL_INT32U_ATTRIBUTE_TYPE>();
+    TestEmberScalarNullRead<OddSizedInteger<5, false>, ZCL_INT40U_ATTRIBUTE_TYPE>();
+    TestEmberScalarNullRead<OddSizedInteger<6, false>, ZCL_INT48U_ATTRIBUTE_TYPE>();
+    TestEmberScalarNullRead<OddSizedInteger<7, false>, ZCL_INT56U_ATTRIBUTE_TYPE>();
     TestEmberScalarNullRead<uint64_t, ZCL_INT64U_ATTRIBUTE_TYPE>();
 
     TestEmberScalarNullRead<int8_t, ZCL_INT8S_ATTRIBUTE_TYPE>();
     TestEmberScalarNullRead<int16_t, ZCL_INT16S_ATTRIBUTE_TYPE>();
+    TestEmberScalarNullRead<OddSizedInteger<3, true>, ZCL_INT24S_ATTRIBUTE_TYPE>();
     TestEmberScalarNullRead<int32_t, ZCL_INT32S_ATTRIBUTE_TYPE>();
-    TestEmberScalarNullRead<int64_t, ZCL_INT64S_ATTRIBUTE_TYPE>();
     TestEmberScalarNullRead<OddSizedInteger<5, true>, ZCL_INT40S_ATTRIBUTE_TYPE>();
+    TestEmberScalarNullRead<OddSizedInteger<6, true>, ZCL_INT48S_ATTRIBUTE_TYPE>();
+    TestEmberScalarNullRead<OddSizedInteger<7, true>, ZCL_INT56S_ATTRIBUTE_TYPE>();
+    TestEmberScalarNullRead<int64_t, ZCL_INT64S_ATTRIBUTE_TYPE>();
 
     TestEmberScalarNullRead<bool, ZCL_BOOLEAN_ATTRIBUTE_TYPE>();
 
