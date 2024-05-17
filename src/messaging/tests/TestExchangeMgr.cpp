@@ -56,7 +56,7 @@ struct TestExchangeMgr : public chip::Test::LoopbackMessagingContext, public ::t
     void SetUp() override
     {
 #if CHIP_CRYPTO_PSA
-        ReturnErrorOnFailure(psa_crypto_init() == PSA_SUCCESS ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL);
+        ASSERT_EQ(psa_crypto_init(), PSA_SUCCESS);
 #endif
         chip::Test::LoopbackMessagingContext::SetUp();
     }
