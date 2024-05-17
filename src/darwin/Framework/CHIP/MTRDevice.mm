@@ -1367,11 +1367,6 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     [self _reportAttributes:[self _getAttributesToReportWithReportedValues:attributeReport fromSubscription:isFromSubscription]];
 }
 
-- (void)_handleAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
-{
-    [self _handleAttributeReport:attributeReport fromSubscription:NO];
-}
-
 #ifdef DEBUG
 - (void)unitTestInjectEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
 {
@@ -1380,11 +1375,11 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     });
 }
 
-- (void)unitTestInjectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
+- (void)unitTestInjectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription
 {
     dispatch_async(self.queue, ^{
         [self _handleReportBegin];
-        [self _handleAttributeReport:attributeReport];
+        [self _handleAttributeReport:attributeReport fromSubscription:isFromSubscription];
         [self _handleReportEnd];
     });
 }
@@ -2168,7 +2163,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                                 // Since the format is the same data-value dictionary, this looks like an
                                 // attribute report
                                 MTR_LOG_INFO("Read attribute work item [%llu] result: %@  [0x%016llX:%@:0x%llX:0x%llX]", workItemID, values, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
-                                [self _handleAttributeReport:values];
+                                [self _handleAttributeReport:values fromSubscription:NO];
                             }
 
                             // TODO: better retry logic
