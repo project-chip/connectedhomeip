@@ -406,7 +406,7 @@ private:
     void AddAttributeValuePair(ScenesManagement::Structs::AttributeValuePairStruct::Type * pairs, AttributeId id, Type value,
                                size_t & attributeCount)
     {
-        static_assert(sizeof(Type) == sizeof(uint8_t) || sizeof(Type) == sizeof(uint16_t), "Type must be uint8_t or uint16_t");
+        static_assert((std::is_same_v<Type, uint8_t>) || (std::is_same_v<Type, uint16_t>), "Type must be uint8_t or uint16_t");
 
         pairs[attributeCount].attributeID = id;
         if constexpr ((std::is_same_v<Type, uint8_t>) )
