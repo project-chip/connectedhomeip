@@ -79,7 +79,7 @@ CHIP_ERROR ICDWaitForDeviceCommand::RunCommand()
 
 void ICDWaitForDeviceCommand::OnCheckInComplete(const chip::app::ICDClientInfo & clientInfo)
 {
-    Default::OnCheckInComplete(clientInfo);
+    DefaultCheckInDelegate::OnCheckInComplete(clientInfo);
 
     if (clientInfo.peer_node != mInterestedNode)
     {
