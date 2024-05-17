@@ -92,16 +92,16 @@ public:
     };
 
     template <typename... Args>
-    MockProtocolResponder(TestExchangeHolder & testExchangeHolder, BehaviorModifier modifier1, Args &&... args) :
-        mExchangeCtx(*this), mBehaviorModifier(modifier1, std::forward<Args>(args)...), testExchangeHolder(testExchangeHolder)
+    MockProtocolResponder(TestExchangeHolder & ctx, BehaviorModifier modifier1, Args &&... args) :
+        mExchangeCtx(*this), mBehaviorModifier(modifier1, std::forward<Args>(args)...), testExchangeHolder(ctx)
     {
         testExchangeHolder.GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(chip::Protocols::MockProtocol::Id,
                                                                                              this);
         ChipLogDetail(ExchangeManager, "[%p] MockProtocolResponder: %p", this, &mExchangeCtx);
     }
 
-    MockProtocolResponder(TestExchangeHolder & testExchangeHolder, BehaviorModifier modifier = BehaviorModifier::kNone) :
-        mExchangeCtx(*this), testExchangeHolder(testExchangeHolder)
+    MockProtocolResponder(TestExchangeHolder & ctx, BehaviorModifier modifier = BehaviorModifier::kNone) :
+        mExchangeCtx(*this), testExchangeHolder(ctx)
     {
         mBehaviorModifier.Set(modifier);
         testExchangeHolder.GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(chip::Protocols::MockProtocol::Id,
