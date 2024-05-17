@@ -35,7 +35,7 @@
 const uint16_t kDesiredEndpointVendorId = 65521;
 
 DiscoveryDelegateImpl * DiscoveryDelegateImpl::_discoveryDelegateImpl = nullptr;
-bool gAwaitingCommissionerPasscodeInput                                = false;
+bool gAwaitingCommissionerPasscodeInput                               = false;
 std::shared_ptr<matter::casting::core::CastingPlayer> targetCastingPlayer;
 
 DiscoveryDelegateImpl * DiscoveryDelegateImpl::GetInstance()
