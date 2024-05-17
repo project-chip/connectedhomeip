@@ -59,19 +59,24 @@ class Actions final : public pw_rpc::nanopb::Actions::Service<Actions>
      *      In [1]: request=protos.chip.rpc.ActionsWrite(endpoint_id=1, cluster_id=int("0x003B", 16))
      *
      *      # Add an action to write attribute id 0x1 (CurrentPosition) with data 2 after 1000 ms (meaning right away)
-     *      In [2]: request.actions.append(protos.chip.rpc.Action(type=protos.chip.rpc.ActionType.WRITE_ATTRIBUTE, delayMs=1000, actionId=1, arg1=2))
+     *      In [2]: request.actions.append(protos.chip.rpc.Action(type=protos.chip.rpc.ActionType.WRITE_ATTRIBUTE, delayMs=1000,
+     * actionId=1, arg1=2))
      *
      *      # Define the follow action to emit an event id 0x1 (InitialPress) with data 2 (NewPosition) after 1000 ms
-     *      In [3]: message.actions.append(protos.chip.rpc.Action(type=protos.chip.rpc.ActionType.EMIT_EVENT, delayMs=1000, actionId=1, arg1=2))
+     *      In [3]: message.actions.append(protos.chip.rpc.Action(type=protos.chip.rpc.ActionType.EMIT_EVENT, delayMs=1000,
+     * actionId=1, arg1=2))
      *
      *      # Define the follow action to emit an event id 0x2 (LongPress) with data 2 (NewPosition) after 2000 ms
-     *      In [4]: message.actions.append(protos.chip.rpc.Action(type=protos.chip.rpc.ActionType.EMIT_EVENT, delayMs=2000, actionId=2, arg1=2))
+     *      In [4]: message.actions.append(protos.chip.rpc.Action(type=protos.chip.rpc.ActionType.EMIT_EVENT, delayMs=2000,
+     * actionId=2, arg1=2))
      *
      *      # Define an action to write attribute id 0x1 (CurrentPosition) with data 0 after 2000 ms (meaning button bouncing back)
-     *      In [5]: message.actions.append(protos.chip.rpc.Action(type=protos.chip.rpc.ActionType.WRITE_ATTRIBUTE, delayMs=2000, actionId=1, arg1=0))
+     *      In [5]: message.actions.append(protos.chip.rpc.Action(type=protos.chip.rpc.ActionType.WRITE_ATTRIBUTE, delayMs=2000,
+     * actionId=1, arg1=0))
      *
      *      # Define the follow action to emit an event id 0x4 (LongRelease) with data 2 (PreviousPosition) after 1000 ms
-     *      In [6]: message.actions.append(protos.chip.rpc.Action(type=protos.chip.rpc.ActionType.EMIT_EVENT, delayMs=1000, actionId=4, arg1=2))
+     *      In [6]: message.actions.append(protos.chip.rpc.Action(type=protos.chip.rpc.ActionType.EMIT_EVENT, delayMs=1000,
+     * actionId=4, arg1=2))
      *
      *      # Set the actions to device
      *      In [7]: rpcs.chip.rpc.Actions.Set(message, pw_rpc_timeout_s=10000)

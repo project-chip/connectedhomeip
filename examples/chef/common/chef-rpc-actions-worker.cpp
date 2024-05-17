@@ -92,35 +92,34 @@ void ChefRpcActionsWorker::ProcessActionQueue()
         return;
     }
 
-   ActionType type = static_cast<ActionType>(task.type);
+    ActionType type = static_cast<ActionType>(task.type);
 
-   switch (type)
-   {
-   case ActionType::WRITE_ATTRIBUTE: {
-       ChipLogProgress(NotSpecified, "Writing Attribute: endpointId=%d, clusterId=%04lx, attributeId=%04lx, args.size=%lu",
-                       task.endpointId, static_cast<unsigned long>(task.clusterId), static_cast<unsigned long>(task.actionId),
-                       static_cast<unsigned long>(task.args.size()));
-       delegate->AttributeWriteHandler(task.endpointId, static_cast<chip::AttributeId>(task.actionId), task.args);
-   }
-   break;
-   case ActionType::RUN_COMMAND: {
-       ChipLogProgress(NotSpecified, "Running Command: endpointId=%d, clusterId=%04lx, commandId=%04lx, args.size=%lu",
-                       task.endpointId, static_cast<unsigned long>(task.clusterId), static_cast<unsigned long>(task.actionId),
-                       static_cast<unsigned long>(task.args.size()));
-       delegate->CommandHandler(task.endpointId, static_cast<chip::CommandId>(task.actionId), task.args);
-   }
-   break;
-   case ActionType::EMIT_EVENT: {
-       ChipLogProgress(NotSpecified, "Emitting Event: endpointId=%d, clusterId=%04lx, eventIdId=%04lx, args.size=%lu",
-                       task.endpointId, static_cast<unsigned long>(task.clusterId), static_cast<unsigned long>(task.actionId),
-                       static_cast<unsigned long>(task.args.size()));
-       delegate->EventHandler(task.endpointId, static_cast<chip::EventId>(task.actionId), task.args);
-   }
-   break;
-   default:
-       break;
-   }
-
+    switch (type)
+    {
+    case ActionType::WRITE_ATTRIBUTE: {
+        ChipLogProgress(NotSpecified, "Writing Attribute: endpointId=%d, clusterId=%04lx, attributeId=%04lx, args.size=%lu",
+                        task.endpointId, static_cast<unsigned long>(task.clusterId), static_cast<unsigned long>(task.actionId),
+                        static_cast<unsigned long>(task.args.size()));
+        delegate->AttributeWriteHandler(task.endpointId, static_cast<chip::AttributeId>(task.actionId), task.args);
+    }
+    break;
+    case ActionType::RUN_COMMAND: {
+        ChipLogProgress(NotSpecified, "Running Command: endpointId=%d, clusterId=%04lx, commandId=%04lx, args.size=%lu",
+                        task.endpointId, static_cast<unsigned long>(task.clusterId), static_cast<unsigned long>(task.actionId),
+                        static_cast<unsigned long>(task.args.size()));
+        delegate->CommandHandler(task.endpointId, static_cast<chip::CommandId>(task.actionId), task.args);
+    }
+    break;
+    case ActionType::EMIT_EVENT: {
+        ChipLogProgress(NotSpecified, "Emitting Event: endpointId=%d, clusterId=%04lx, eventIdId=%04lx, args.size=%lu",
+                        task.endpointId, static_cast<unsigned long>(task.clusterId), static_cast<unsigned long>(task.actionId),
+                        static_cast<unsigned long>(task.args.size()));
+        delegate->EventHandler(task.endpointId, static_cast<chip::EventId>(task.actionId), task.args);
+    }
+    break;
+    default:
+        break;
+    }
 
     if (queue.empty())
     {

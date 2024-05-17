@@ -38,8 +38,8 @@ public:
     virtual ~ActionsDelegate() = default;
 
     virtual void AttributeWriteHandler(chip::EndpointId endpointId, chip::AttributeId attributeId, std::vector<uint32_t> args) = 0;
-    virtual void CommandHandler(chip::EndpointId endpointId, chip::CommandId commandId, std::vector<uint32_t> args) = 0;
-    virtual void EventHandler(chip::EndpointId endpointId, chip::EventId eventId, std::vector<uint32_t> args) = 0;
+    virtual void CommandHandler(chip::EndpointId endpointId, chip::CommandId commandId, std::vector<uint32_t> args)            = 0;
+    virtual void EventHandler(chip::EndpointId endpointId, chip::EventId eventId, std::vector<uint32_t> args)                  = 0;
 
 protected:
     ClusterId mClusterId;
@@ -53,8 +53,10 @@ struct ActionTask
     uint32_t delayMs;
     uint32_t actionId;
     std::vector<uint32_t> args;
-    ActionTask(chip::EndpointId endpoint, chip::ClusterId cluster, chip::rpc::ActionType actionType, uint32_t delay, uint32_t id, std::vector<uint32_t> arg) :
-        endpointId(endpoint), clusterId(cluster), type(actionType), delayMs(delay), actionId(id), args(arg){};
+    ActionTask(chip::EndpointId endpoint, chip::ClusterId cluster, chip::rpc::ActionType actionType, uint32_t delay, uint32_t id,
+               std::vector<uint32_t> arg) :
+        endpointId(endpoint),
+        clusterId(cluster), type(actionType), delayMs(delay), actionId(id), args(arg){};
     ~ActionTask(){};
 };
 
