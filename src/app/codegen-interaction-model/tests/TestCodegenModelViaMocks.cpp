@@ -814,11 +814,32 @@ TEST(TestCodegenModelViaMocks, EmberAttributeInvalidRead)
     chip::app::CodegenDataModel model;
     ScopedMockAccessControl accessControl;
 
-    TestReadRequest testRequest(kAdminSubjectDescriptor,
-                                ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), MockAttributeId(10)));
-    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
+    // Invalid attribute
+    {
+        TestReadRequest testRequest(kAdminSubjectDescriptor,
+                                    ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), MockAttributeId(10)));
+        std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
 
-    ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+        ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+    }
+  
+    // Invalid cluster
+    {
+        TestReadRequest testRequest(kAdminSubjectDescriptor,
+                                    ConcreteAttributePath(kMockEndpoint1, MockClusterId(100), MockAttributeId(1)));
+        std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
+
+        ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_IM_GLOBAL_STATUS(UnsupportedCluster));
+    }
+
+    // Invalid endpoint
+    {
+        TestReadRequest testRequest(kAdminSubjectDescriptor,
+                                    ConcreteAttributePath(kEndpointIdThatIsMissing, MockClusterId(1), MockAttributeId(1)));
+        std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding(&model);
+
+        ASSERT_EQ(model.ReadAttribute(testRequest.request, *encoder), CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint));
+    }
 }
 
 TEST(TestCodegenModelViaMocks, EmberAttributeReadInt32S)
