@@ -408,8 +408,8 @@ class TC_IDM_4_2(MatterBaseTest):
             [(0, node_label_attr(value=new_node_label_write))]
         )
 
-        # Wait MinIntervalFloor seconds before reading updated attribute value
-        time.sleep(same_min_max_interval_sec)
+        # Wait MinIntervalFloor seconds (plus a bit longer for timing reasons) before reading updated attribute value
+        time.sleep(same_min_max_interval_sec + 0.1)
         new_node_label_read = sub_cr1_update_value.GetAttribute(node_label_attr_typed_path)
 
         # Verify new attribute value after MinIntervalFloor time
