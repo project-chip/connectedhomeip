@@ -33,6 +33,7 @@
 #include <messaging/ReliableMessageMgr.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <platform/LockTracker.h>
+#include <tracing/metric_event.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -186,6 +187,11 @@ void ReadClient::Close(CHIP_ERROR aError, bool allowResubscription)
     }
     else
     {
+        if (IsAwaitingInitialReport() || IsAwaitingSubscribeResponse())
+        {
+            MATTER_LOG_METRIC_END(Tracing::kMetricDeviceSubscriptionSetup, aError);
+        }
+
         ClearActiveSubscriptionState();
         if (aError != CHIP_NO_ERROR)
         {
@@ -491,6 +497,7 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
         ChipLogProgress(DataManagement, "SubscribeResponse is received");
         VerifyOrExit(apExchangeContext == mExchange.Get(), err = CHIP_ERROR_INCORRECT_STATE);
         err = ProcessSubscribeResponse(std::move(aPayload));
+        MATTER_LOG_METRIC_END(Tracing::kMetricDeviceSubscriptionSetup, err);
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
     {
@@ -684,6 +691,7 @@ void ReadClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContex
 {
     ChipLogError(DataManagement, "Time out! failed to receive report data from Exchange: " ChipLogFormatExchange,
                  ChipLogValueExchange(apExchangeContext));
+
     Close(CHIP_ERROR_TIMEOUT);
 }
 
@@ -1096,11 +1104,18 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(const ReadPrepareParams & aReadPrepa
     VerifyOrReturnError(aReadPrepareParams.mMinIntervalFloorSeconds <= aReadPrepareParams.mMaxIntervalCeilingSeconds,
                         CHIP_ERROR_INVALID_ARGUMENT);
 
-    return SendSubscribeRequestImpl(aReadPrepareParams);
+    auto err =  SendSubscribeRequestImpl(aReadPrepareParams);
+    if (CHIP_NO_ERROR != err)
+    {
+        MATTER_LOG_METRIC_END(Tracing::kMetricDeviceSubscriptionSetup, err);
+    }
+    return err;
 }
 
 CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadPrepareParams)
 {
+    MATTER_LOG_METRIC_BEGIN(Tracing::kMetricDeviceSubscriptionSetup);
+
     VerifyOrReturnError(ClientState::Idle == mState, CHIP_ERROR_INCORRECT_STATE);
 
     if (&aReadPrepareParams != &mReadPrepareParams)

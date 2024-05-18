@@ -36,6 +36,7 @@
 #include <messaging/ReliableMessageContext.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <platform/ConnectivityManager.h>
+#include <tracing/metric_event.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDConfigurationData.h> // nogncheck
@@ -170,6 +171,7 @@ void ReliableMessageMgr::ExecuteActions()
                         "Retransmitting MessageCounter:" ChipLogFormatMessageCounter " on exchange " ChipLogFormatExchange
                         " Send Cnt %d",
                         messageCounter, ChipLogValueExchange(&entry->ec.Get()), entry->sendCount);
+        MATTER_LOG_METRIC(Tracing::kMetricDeviceRMPRetryCount, entry->sendCount);
 
         CalculateNextRetransTime(*entry);
         SendFromRetransTable(entry);

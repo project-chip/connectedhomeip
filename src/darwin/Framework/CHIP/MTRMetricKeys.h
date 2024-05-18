@@ -16,6 +16,7 @@
 
 #include <lib/core/CHIPError.h>
 #include <tracing/metric_event.h>
+#include <tracing/metric_keys.h>
 
 namespace chip {
 namespace Tracing {
@@ -86,6 +87,9 @@ constexpr Tracing::MetricKey kMetricBLEDevicesRemoved = "dwnfw_ble_devices_remov
 
 // Unexpected C quality attribute update outside of priming
 constexpr Tracing::MetricKey kMetricUnexpectedCQualityUpdate = "dwnpm_bad_c_attr_update";
+
+// Subscription setup from darwin MTRDevice
+constexpr Tracing::MetricKey kMetricMTRDeviceSubscriptionSetup = "dwnpm_dev_subscription_setup";
 
 } // namespace DarwinFramework
 } // namespace Tracing

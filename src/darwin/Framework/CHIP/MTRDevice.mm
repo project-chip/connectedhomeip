@@ -160,7 +160,7 @@ NSNumber * MTRClampedNumber(NSNumber * aNumber, NSNumber * min, NSNumber * max)
 using namespace chip;
 using namespace chip::app;
 using namespace chip::Protocols::InteractionModel;
-
+using namespace chip::Tracing::DarwinFramework;
 typedef void (^FirstReportHandler)(void);
 
 namespace {
@@ -1176,6 +1176,8 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 {
     os_unfair_lock_lock(&self->_lock);
 
+    MATTER_LOG_METRIC_END(kMetricMTRDeviceSubscriptionSetup, CHIP_NO_ERROR);
+
     // We have completed the subscription work - remove from the subscription pool.
     [self _clearSubscriptionPoolWork];
 
@@ -1223,6 +1225,8 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 - (void)_handleSubscriptionError:(NSError *)error
 {
     std::lock_guard lock(_lock);
+
+    MATTER_LOG_METRIC_END(kMetricMTRDeviceSubscriptionSetup, [MTRError errorToCHIPErrorCode:error]);
 
     [self _changeInternalState:MTRInternalDeviceStateUnsubscribed];
     _unreportedEvents = nil;
@@ -2339,6 +2343,8 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
             }
         });
     }
+
+    MATTER_LOG_METRIC_BEGIN(kMetricMTRDeviceSubscriptionSetup);
 
     // Call directlyGetSessionForNode because the subscription setup already goes through the subscription pool queue
     [_deviceController
