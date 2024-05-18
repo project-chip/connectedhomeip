@@ -241,7 +241,7 @@ class TC_IDM_1_2(MatterBaseTest):
             # TODO: Once the above issue is resolved, this needs a check to ensure that (always) no response was received.
         except ChipStackError:
             logging.info("DUT correctly supressed the response")
-        
+
         # Verify that the command had the correct side effect even if a response was sent
         breadcrumb = await self.read_single_attribute_check_success(
             cluster=Clusters.GeneralCommissioning, attribute=Clusters.GeneralCommissioning.Attributes.Breadcrumb, endpoint=0)
