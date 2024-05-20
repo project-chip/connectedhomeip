@@ -42,7 +42,7 @@ public:
 
     void SetFinishedCommandCount(uint16_t aFinishedCommandCount) { pCommandSender->mFinishedCommandCount = aFinishedCommandCount; }
 
-    Messaging::ExchangeHolder GetExchangeCtx() { return pCommandSender->mExchangeCtx; }
+    Messaging::ExchangeHolder & GetExchangeCtx() { return pCommandSender->mExchangeCtx; }
 
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload)

@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include <access/examples/PermissiveAccessControlDelegate.h>
 #include <app/ConcreteAttributePath.h>

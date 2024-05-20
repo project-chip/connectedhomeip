@@ -35,6 +35,9 @@
 #include <system/TLVPacketBufferBackingStore.h>
 
 namespace chip {
+namespace Test {
+class WriteHandlerTestAccess;
+}
 namespace app {
 
 class WriteHandler;
@@ -132,6 +135,8 @@ public:
 
 private:
     friend class TestWriteInteraction;
+    friend class chip::Test::WriteHandlerTestAccess;
+
     enum class State
     {
         Uninitialized = 0, // The handler has not been initialized
