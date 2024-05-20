@@ -43,6 +43,8 @@
 #include <app/DeviceProxy.h>
 #include <app/InteractionModelEngine.h>
 #include <app/server/Dnssd.h>
+#include <app/icd/client/DefaultCheckInDelegate.h>
+#include <app/icd/client/DefaultICDClientStorage.h>
 #include <controller/AutoCommissioner.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerFactory.h>
@@ -105,6 +107,7 @@ chip::Controller::CommissioningParameters sCommissioningParameters;
 
 } // namespace
 
+chip::app::DefaultICDClientStorage sICDClientStorage;
 chip::Controller::ScriptPairingDeviceDiscoveryDelegate sPairingDeviceDiscoveryDelegate;
 chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
 chip::Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
@@ -260,6 +263,8 @@ PyChipError pychip_DeviceController_StackInit(Controller::Python::StorageAdapter
 
     factoryParams.fabricIndependentStorage = storageAdapter;
     factoryParams.sessionKeystore          = &sSessionKeystore;
+
+    sICDClientStorage.Init(storageAdapter, &sSessionKeystore);
 
     sGroupDataProvider.SetStorageDelegate(storageAdapter);
     sGroupDataProvider.SetSessionKeystore(factoryParams.sessionKeystore);
