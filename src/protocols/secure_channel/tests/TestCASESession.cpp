@@ -52,6 +52,7 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::Messaging;
 using namespace chip::Protocols;
+using namespace chip::Crypto;
 
 namespace chip {
 namespace {
@@ -60,9 +61,9 @@ class TestContext : public Test::LoopbackMessagingContext
 {
 public:
     // Performs shared setup for all tests in the test suite
-    CHIP_ERROR SetUpTestSuite() override;
+    static void SetUpTestSuite();
     // Performs shared teardown for all tests in the test suite
-    void TearDownTestSuite() override;
+    static void TearDownTestSuite();
 };
 
 void ServiceEvents(TestContext & ctx)
@@ -326,22 +327,20 @@ CHIP_ERROR InitCredentialSets()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TestContext::SetUpTestSuite()
+void TestContext::SetUpTestSuite()
 {
     ConfigInitializeNodes(false);
     CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit((err = LoopbackMessagingContext::SetUpTestSuite()) == CHIP_NO_ERROR,
-                 ChipLogError(AppServer, "SetUpTestSuite lo messaging context failed: %" CHIP_ERROR_FORMAT, err.Format()));
-    VerifyOrExit((err = chip::DeviceLayer::PlatformMgr().InitChipStack()) == CHIP_NO_ERROR,
-                 ChipLogError(AppServer, "Init CHIP stack failed: %" CHIP_ERROR_FORMAT, err.Format()));
-    VerifyOrExit((err = InitFabricTable(gCommissionerFabrics, &gCommissionerStorageDelegate, /* opKeyStore = */ nullptr,
-                                        &gCommissionerOpCertStore)) == CHIP_NO_ERROR,
-                 ChipLogError(AppServer, "InitFabricTable failed: %" CHIP_ERROR_FORMAT, err.Format()));
-    VerifyOrExit((err = InitCredentialSets()) == CHIP_NO_ERROR,
-                 ChipLogError(AppServer, "InitCredentialSets failed: %" CHIP_ERROR_FORMAT, err.Format()));
+    LoopbackMessagingContext::SetUpTestSuite();
+    // TODO: use ASSERT_EQ, once transition to pw_unit_test is complete
+    VerifyOrDieWithMsg((err = chip::DeviceLayer::PlatformMgr().InitChipStack()) == CHIP_NO_ERROR, AppServer,
+                       "Init CHIP stack failed: %" CHIP_ERROR_FORMAT, err.Format());
+    VerifyOrDieWithMsg((err = InitFabricTable(gCommissionerFabrics, &gCommissionerStorageDelegate, /* opKeyStore = */ nullptr,
+                                              &gCommissionerOpCertStore)) == CHIP_NO_ERROR,
+                       AppServer, "InitFabricTable failed: %" CHIP_ERROR_FORMAT, err.Format());
+    VerifyOrDieWithMsg((err = InitCredentialSets()) == CHIP_NO_ERROR, AppServer, "InitCredentialSets failed: %" CHIP_ERROR_FORMAT,
+                       err.Format());
     chip::DeviceLayer::SetSystemLayerForTesting(&GetSystemLayer());
-exit:
-    return err;
 }
 
 void TestContext::TearDownTestSuite()
@@ -1241,10 +1240,10 @@ static nlTestSuite sSuite =
 {
     "Test-CHIP-SecurePairing-CASE",
     &sTests[0],
-    TestContext::nlTestSetUpTestSuite,
-    TestContext::nlTestTearDownTestSuite,
-    TestContext::nlTestSetUp,
-    TestContext::nlTestTearDown,
+    NL_TEST_WRAP_FUNCTION(TestContext::SetUpTestSuite),
+    NL_TEST_WRAP_FUNCTION(TestContext::TearDownTestSuite),
+    NL_TEST_WRAP_METHOD(TestContext, SetUp),
+    NL_TEST_WRAP_METHOD(TestContext, TearDown),
 };
 // clang-format on
 

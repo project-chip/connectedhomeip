@@ -23,7 +23,7 @@ on:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    
+
 jobs:
     esp32:
         name: ESP32
@@ -32,19 +32,15 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:35
+            image: ghcr.io/project-chip/chip-build-esp32:50
 
         steps:
             - name: Checkout
               uses: actions/checkout@v4
               with:
-                ref: "${{ github.event.inputs.releaseTag }}"
-            - name: Bootstrap Cache
-              uses: ./.github/actions/bootstrap-cache
+                  ref: "${{ github.event.inputs.releaseTag }}"
             - name: Bootstrap
               uses: ./.github/actions/bootstrap
-            - name: Upload Bootstrap Logs
-              uses: ./.github/actions/upload-bootstrap-logs
 
             - name: Build
               run: scripts/examples/esp_example.sh all-clusters-app
@@ -68,21 +64,18 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build-efr32:36
+            image: ghcr.io/project-chip/chip-build-efr32:50
         steps:
             - name: Checkout
               uses: actions/checkout@v4
               with:
-                ref: "${{ github.event.inputs.releaseTag }}"
-            - name: Bootstrap Cache
-              uses: ./.github/actions/bootstrap-cache
+                  ref: "${{ github.event.inputs.releaseTag }}"
             - name: Bootstrap
               uses: ./.github/actions/bootstrap
-            - name: Upload Bootstrap Logs
-              uses: ./.github/actions/upload-bootstrap-logs
 
             - name: Build example EFR32 Lock App
-              run: scripts/examples/gn_silabs_example.sh examples/lock-app/efr32/
+              run:
+                  scripts/examples/gn_silabs_example.sh examples/lock-app/efr32/
                   out/lock_app_debug $SILABS_BOARD
 
             - name: Upload artifact

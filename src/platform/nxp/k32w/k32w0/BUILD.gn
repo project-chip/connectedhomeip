@@ -13,18 +13,19 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/k32w0_sdk.gni")
+import("//build_overrides/nxp_sdk.gni")
 
 import("${chip_root}/src/platform/device.gni")
-import("${k32w0_sdk_build_root}/k32w0_sdk.gni")
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
 
-assert(chip_device_platform == "k32w0")
+assert(chip_device_platform == "nxp")
+assert(nxp_platform == "k32w/k32w0")
 
 if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
 }
 
-static_library("k32w0") {
+static_library("nxp_platform") {
   sources = [
     "../../../SingletonConfigurationManager.cpp",
     "../common/BLEManagerCommon.cpp",
@@ -60,6 +61,7 @@ static_library("k32w0") {
     "${chip_root}/src/credentials/examples/DeviceAttestationCredsExample.h",
     "${chip_root}/src/credentials/examples/ExampleDACs.h",
     "${chip_root}/src/credentials/examples/ExamplePAI.h",
+    "${chip_root}/src/platform/nxp/k32w/k32w0/BLEManagerImpl.h",
   ]
 
   if (chip_with_factory_data == 1) {
@@ -106,7 +108,10 @@ static_library("k32w0") {
 
   deps = [ "${chip_root}/src/platform/logging:headers" ]
 
-  public_deps = [ "${chip_root}/src/platform:platform_base" ]
+  public_deps = [
+    "${chip_root}/src/app:test-event-trigger",
+    "${chip_root}/src/platform:platform_base",
+  ]
 
   if (chip_crypto == "platform") {
     if (chip_crypto_flavor == "tinycrypt") {
@@ -119,8 +124,8 @@ static_library("k32w0") {
       sources += [ "${chip_root}/src/platform/nxp/k32w/k32w0/crypto/CHIPCryptoPALNXPUltrafastP256.cpp" ]
 
       public_deps += [
-        "${chip_root}/third_party/nxp/k32w0_sdk:k32w0_sdk",
         "${mbedtls_root}:mbedtls",
+        "${nxp_sdk_build_root}/${nxp_sdk_name}:nxp_sdk",
       ]
     }
   }

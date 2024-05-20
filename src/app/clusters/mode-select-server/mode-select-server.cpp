@@ -20,10 +20,10 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/clusters/mode-select-server/supported-modes-manager.h>
-#include <app/util/af.h>
 #include <app/util/att-storage.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>

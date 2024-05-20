@@ -204,10 +204,13 @@ template("chip_data_model") {
 
     if (!chip_build_controller_dynamic_server) {
       sources += [
+        "${_app_root}/reporting/reporting.cpp",
         "${_app_root}/util/DataModelHandler.cpp",
         "${_app_root}/util/attribute-storage.cpp",
         "${_app_root}/util/attribute-table.cpp",
         "${_app_root}/util/ember-compatibility-functions.cpp",
+        "${_app_root}/util/ember-global-attribute-access-interface.cpp",
+        "${_app_root}/util/ember-io-storage.cpp",
         "${_app_root}/util/util.cpp",
       ]
     }

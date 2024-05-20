@@ -1,18 +1,20 @@
 steps:
-    - name: "ghcr.io/project-chip/chip-build-vscode:36"
+    - name: "ghcr.io/project-chip/chip-build-vscode:50"
       entrypoint: "bash"
       args:
           - "-c"
           - |
               git config --global --add safe.directory "*"
-              git submodule update --init --recursive
+              python scripts/checkout_submodules.py --shallow --recursive --platform esp32 nrfconnect silabs linux android 
       id: Submodules
-    - name: "ghcr.io/project-chip/chip-build-vscode:36"
+    - name: "ghcr.io/project-chip/chip-build-vscode:50"
+      # NOTE: silabs boostrap is NOT done with the rest as it requests a conflicting
+      #       jinja2 version (asks for 3.1.3 when constraints.txt asks for 3.0.3)
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - "-c"
-          - source ./scripts/bootstrap.sh -p all,nrfconnect
+          - source ./scripts/bootstrap.sh -p all,esp32,nrfconnect,linux,android
       id: Bootstrap
       waitFor:
           - Submodules
@@ -22,7 +24,7 @@ steps:
             path: /pwenv
       timeout: 900s
 
-    - name: "ghcr.io/project-chip/chip-build-vscode:36"
+    - name: "ghcr.io/project-chip/chip-build-vscode:50"
       id: ESP32
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -43,7 +45,7 @@ steps:
       volumes:
           - name: pwenv
             path: /pwenv
-    - name: "ghcr.io/project-chip/chip-build-vscode:36"
+    - name: "ghcr.io/project-chip/chip-build-vscode:50"
       id: NRFConnect
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -64,7 +66,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "ghcr.io/project-chip/chip-build-vscode:36"
+    - name: "ghcr.io/project-chip/chip-build-vscode:50"
       id: EFR32
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -73,9 +75,9 @@ steps:
               ./scripts/build/build_examples.py --enable-flashbundle
               --target efr32-brd4161a-light
               --target efr32-brd4161a-light-rpc
-              --target efr32-brd4161a-lock-openthread_mtd
-              --target efr32-brd4161a-lock-rpc-openthread_mtd
-              --target efr32-brd4161a-unit-test
+              --target efr32-brd4161a-lock-openthread-mtd
+              --target efr32-brd4161a-lock-rpc-openthread-mtd
+              --target efr32-brd4187c-unit-test
               build
               --create-archives /workspace/artifacts/
       waitFor:
@@ -86,7 +88,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "ghcr.io/project-chip/chip-build-vscode:36"
+    - name: "ghcr.io/project-chip/chip-build-vscode:50"
       id: Linux
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -139,7 +141,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "ghcr.io/project-chip/chip-build-vscode:36"
+    - name: "ghcr.io/project-chip/chip-build-vscode:50"
       id: Android
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv

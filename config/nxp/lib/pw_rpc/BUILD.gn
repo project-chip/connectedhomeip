@@ -24,7 +24,6 @@ static_library("pw_rpc") {
     "$dir_pw_rpc:server",
     "$dir_pw_rpc/nanopb:echo_service",
     "${chip_root}/examples/platform/nxp/pw_sys_io:pw_sys_io_nxp",
-    "${dir_pigweed}/pw_hdlc:pw_rpc",
     dir_pw_assert,
     dir_pw_hdlc,
     dir_pw_log,

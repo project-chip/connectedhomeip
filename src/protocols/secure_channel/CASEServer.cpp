@@ -18,6 +18,7 @@
 #include <protocols/secure_channel/CASEServer.h>
 
 #include <lib/core/CHIPError.h>
+#include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -79,7 +80,10 @@ CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const 
                                          System::PacketBufferHandle && payload)
 {
     MATTER_TRACE_SCOPE("OnMessageReceived", "CASEServer");
-    if (GetSession().GetState() != CASESession::State::kInitialized)
+
+    bool busy = GetSession().GetState() != CASESession::State::kInitialized;
+    CHIP_FAULT_INJECT(FaultInjection::kFault_CASEServerBusy, busy = true);
+    if (busy)
     {
         // We are in the middle of CASE handshake
 

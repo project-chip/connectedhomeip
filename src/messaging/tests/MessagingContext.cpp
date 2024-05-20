@@ -21,6 +21,7 @@
 #include <credentials/tests/CHIPCert_unit_test_vectors.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/CodeUtils.h>
+#include <messaging/ReliableMessageMgr.h>
 #include <protocols/secure_channel/Constants.h>
 
 namespace chip {
@@ -57,7 +58,7 @@ CHIP_ERROR MessagingContext::Init(TransportMgrBase * transport, IOContext * ioCo
     ReturnErrorOnFailure(mExchangeManager.Init(&mSessionManager));
     ReturnErrorOnFailure(mMessageCounterManager.Init(&mExchangeManager));
 
-    if (mInitializeNodes)
+    if (sInitializeNodes)
     {
         ReturnErrorOnFailure(CreateAliceFabric());
         ReturnErrorOnFailure(CreateBobFabric());
@@ -69,6 +70,9 @@ CHIP_ERROR MessagingContext::Init(TransportMgrBase * transport, IOContext * ioCo
         ReturnErrorOnFailure(CreatePASESessionCharlieToDavid());
         ReturnErrorOnFailure(CreatePASESessionDavidToCharlie());
     }
+
+    // Set the additional MRP backoff to zero so that it does not affect the test execution time.
+    Messaging::ReliableMessageMgr::SetAdditionalMRPBackoffTime(MakeOptional(System::Clock::kZero));
 
     return CHIP_NO_ERROR;
 }
@@ -85,6 +89,9 @@ void MessagingContext::Shutdown()
     mFabricTable.Shutdown();
     mOpCertStore.Finish();
     mOpKeyStore.Finish();
+
+    // Reset the default additional MRP backoff.
+    Messaging::ReliableMessageMgr::SetAdditionalMRPBackoffTime(NullOptional);
 }
 
 CHIP_ERROR MessagingContext::InitFromExisting(const MessagingContext & existing)
@@ -104,6 +111,8 @@ using namespace System::Clock::Literals;
 
 constexpr chip::System::Clock::Timeout MessagingContext::kResponsiveIdleRetransTimeout;
 constexpr chip::System::Clock::Timeout MessagingContext::kResponsiveActiveRetransTimeout;
+
+bool MessagingContext::sInitializeNodes = true;
 
 void MessagingContext::SetMRPMode(MRPMode mode)
 {
@@ -174,6 +183,13 @@ CHIP_ERROR MessagingContext::CreateCASESessionBobToAlice()
                                                         CryptoContext::SessionRole::kInitiator);
 }
 
+CHIP_ERROR MessagingContext::CreateCASESessionBobToAlice(const CATValues & cats)
+{
+    return mSessionManager.InjectCaseSessionWithTestKey(mSessionBobToAlice, kBobKeyId, kAliceKeyId, GetBobFabric()->GetNodeId(),
+                                                        GetAliceFabric()->GetNodeId(), mBobFabricIndex, mAliceAddress,
+                                                        CryptoContext::SessionRole::kInitiator, cats);
+}
+
 CHIP_ERROR MessagingContext::CreateSessionAliceToBob()
 {
     return mSessionManager.InjectPaseSessionWithTestKey(mSessionAliceToBob, kAliceKeyId, GetBobFabric()->GetNodeId(), kBobKeyId,
@@ -185,6 +201,13 @@ CHIP_ERROR MessagingContext::CreateCASESessionAliceToBob()
     return mSessionManager.InjectCaseSessionWithTestKey(mSessionAliceToBob, kAliceKeyId, kBobKeyId, GetAliceFabric()->GetNodeId(),
                                                         GetBobFabric()->GetNodeId(), mAliceFabricIndex, mBobAddress,
                                                         CryptoContext::SessionRole::kResponder);
+}
+
+CHIP_ERROR MessagingContext::CreateCASESessionAliceToBob(const CATValues & cats)
+{
+    return mSessionManager.InjectCaseSessionWithTestKey(mSessionAliceToBob, kAliceKeyId, kBobKeyId, GetAliceFabric()->GetNodeId(),
+                                                        GetBobFabric()->GetNodeId(), mAliceFabricIndex, mBobAddress,
+                                                        CryptoContext::SessionRole::kResponder, cats);
 }
 
 CHIP_ERROR MessagingContext::CreatePASESessionCharlieToDavid()
@@ -280,6 +303,10 @@ Messaging::ExchangeContext * MessagingContext::NewExchangeToBob(Messaging::Excha
 {
     return mExchangeManager.NewContext(GetSessionAliceToBob(), delegate, isInitiator);
 }
+
+LoopbackTransportManager LoopbackMessagingContext::sLoopbackTransportManager;
+
+UDPTransportManager UDPMessagingContext::sUDPTransportManager;
 
 void MessageCapturer::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                         const SessionHandle & session, DuplicateMessage isDuplicate,

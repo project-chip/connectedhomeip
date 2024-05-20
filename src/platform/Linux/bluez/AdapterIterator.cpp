@@ -17,35 +17,24 @@
 
 #include "AdapterIterator.h"
 
+#include <cstdio>
+
+#include <gio/gio.h>
+
+#include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/GLibTypeDeleter.h>
-#include <platform/PlatformManager.h>
+#include <platform/Linux/dbus/bluez/DbusBluez.h>
+
+#include "BluezObjectIterator.h"
+#include "BluezObjectList.h"
+#include "BluezObjectManager.h"
+#include "Types.h"
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
-
-CHIP_ERROR AdapterIterator::Initialize()
-{
-    // When creating D-Bus proxy object, the thread default context must be initialized. Otherwise,
-    // all D-Bus signals will be delivered to the GLib global default main context.
-    VerifyOrDie(g_main_context_get_thread_default() != nullptr);
-
-    GAutoPtr<GError> error;
-    mManager.reset(g_dbus_object_manager_client_new_for_bus_sync(
-        G_BUS_TYPE_SYSTEM, G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, BLUEZ_INTERFACE, "/",
-        bluez_object_manager_client_get_proxy_type, nullptr /* unused user data in the Proxy Type Func */,
-        nullptr /* destroy notify */, nullptr /* cancellable */, &error.GetReceiver()));
-
-    VerifyOrReturnError(mManager, CHIP_ERROR_INTERNAL,
-                        ChipLogError(DeviceLayer, "Failed to get D-Bus object manager for listing adapters: %s", error->message));
-
-    mObjectList.Init(mManager.get());
-    mIterator = mObjectList.begin();
-
-    return CHIP_NO_ERROR;
-}
 
 bool AdapterIterator::Advance()
 {
@@ -81,11 +70,15 @@ uint32_t AdapterIterator::GetIndex() const
 
 bool AdapterIterator::Next()
 {
-    if (!mManager)
+    if (!mIsInitialized)
     {
-        CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(
-            +[](AdapterIterator * self) { return self->Initialize(); }, this);
-        VerifyOrReturnError(err == CHIP_NO_ERROR, false, ChipLogError(DeviceLayer, "Failed to initialize adapter iterator"));
+        CHIP_ERROR err = mObjectManager.Init();
+        VerifyOrReturnError(
+            err == CHIP_NO_ERROR, false,
+            ChipLogError(DeviceLayer, "Failed to initialize BlueZ object manager: %" CHIP_ERROR_FORMAT, err.Format()));
+        mObjectList.Init(mObjectManager.GetObjectManager());
+        mIterator      = mObjectList.begin();
+        mIsInitialized = true;
     }
 
     return Advance();

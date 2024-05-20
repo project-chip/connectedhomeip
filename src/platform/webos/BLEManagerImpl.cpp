@@ -23,7 +23,7 @@
  */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <new>
@@ -32,6 +32,7 @@
 
 #include <cassert>
 #include <iomanip>
+#include <string>
 #include <type_traits>
 #include <utility>
 
@@ -66,11 +67,6 @@ const ChipBleUUID ChipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0
 } // namespace
 
 BLEManagerImpl BLEManagerImpl::sInstance;
-
-void HandleIncomingBleConnection(BLEEndPoint * bleEP)
-{
-    ChipLogProgress(DeviceLayer, "con rcvd");
-}
 
 void BLEManagerImpl::InitConnectionData()
 {
@@ -113,8 +109,6 @@ CHIP_ERROR BLEManagerImpl::_Init()
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
 
     memset(mDeviceName, 0, sizeof(mDeviceName));
-
-    OnChipBleConnectReceived = HandleIncomingBleConnection;
 
     ret = MainLoop::Instance().Init(_BleInitialize);
     VerifyOrExit(ret != false, err = CHIP_ERROR_INTERNAL);

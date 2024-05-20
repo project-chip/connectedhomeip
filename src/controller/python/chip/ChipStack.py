@@ -26,6 +26,7 @@
 
 from __future__ import absolute_import, print_function
 
+import asyncio
 import builtins
 import logging
 import os
@@ -164,6 +165,35 @@ class AsyncCallableHandle:
             return self._res
 
 
+class AsyncioCallableHandle:
+    """Class which handles Matter SDK Calls asyncio friendly"""
+
+    def __init__(self, callback):
+        self._callback = callback
+        self._loop = asyncio.get_event_loop()
+        self._future = self._loop.create_future()
+        self._result = None
+        self._exception = None
+
+    @property
+    def future(self):
+        return self._future
+
+    def _done(self):
+        if self._exception:
+            self._future.set_exception(self._exception)
+        else:
+            self._future.set_result(self._result)
+
+    def __call__(self):
+        try:
+            self._result = self._callback()
+        except Exception as ex:
+            self._exception = ex
+        self._loop.call_soon_threadsafe(self._done)
+        pythonapi.Py_DecRef(py_object(self))
+
+
 _CompleteFunct = CFUNCTYPE(None, c_void_p, c_void_p)
 _ErrorFunct = CFUNCTYPE(None, c_void_p, c_void_p,
                         c_ulong, POINTER(DeviceStatusStruct))
@@ -178,6 +208,7 @@ class ChipStack(object):
                  bluetoothAdapter=None, enableServerInteractions=True):
         builtins.enableDebugMode = False
 
+        # TODO: Probably no longer necessary, see https://github.com/project-chip/connectedhomeip/issues/33321.
         self.networkLock = Lock()
         self.completeEvent = Event()
         self.commissioningCompleteEvent = Event()
@@ -318,6 +349,7 @@ class ChipStack(object):
             logFunct = 0
         if not isinstance(logFunct, _LogMessageFunct):
             logFunct = _LogMessageFunct(logFunct)
+        # TODO: Lock probably no longer necessary, see https://github.com/project-chip/connectedhomeip/issues/33321.
         with self.networkLock:
             # NOTE: ChipStack must hold a reference to the CFUNCTYPE object while it is
             # set. Otherwise it may get garbage collected, and logging calls from the
@@ -360,6 +392,7 @@ class ChipStack(object):
         # throw error if op in progress
         self.callbackRes = None
         self.completeEvent.clear()
+        # TODO: Lock probably no longer necessary, see https://github.com/project-chip/connectedhomeip/issues/33321.
         with self.networkLock:
             res = self.PostTaskOnChipThread(callFunct).Wait(timeoutMs)
         self.completeEvent.set()
@@ -367,14 +400,32 @@ class ChipStack(object):
             return self.callbackRes
         return res
 
-    def CallAsync(self, callFunct):
+    async def CallAsync(self, callFunct, timeoutMs: int = None):
+        '''Run a Python function on CHIP stack, and wait for the response.
+        This function will post a task on CHIP mainloop and waits for the call response in a asyncio friendly manner.
+        '''
+        callObj = AsyncioCallableHandle(callFunct)
+        pythonapi.Py_IncRef(py_object(callObj))
+
+        res = self._ChipStackLib.pychip_DeviceController_PostTaskOnChipThread(
+            self.cbHandleChipThreadRun, py_object(callObj))
+
+        if not res.is_success:
+            pythonapi.Py_DecRef(py_object(callObj))
+            raise res.to_exception()
+
+        return await asyncio.wait_for(callObj.future, timeoutMs / 1000 if timeoutMs else None)
+
+    def CallAsyncWithCompleteCallback(self, callFunct):
         '''Run a Python function on CHIP stack, and wait for the application specific response.
         This function is a wrapper of PostTaskOnChipThread, which includes some handling of application specific logics.
         Calling this function on CHIP on CHIP mainloop thread will cause deadlock.
+        Make sure to register the necessary callbacks which release the function by setting the completeEvent.
         '''
         # throw error if op in progress
         self.callbackRes = None
         self.completeEvent.clear()
+        # TODO: Lock probably no longer necessary, see https://github.com/project-chip/connectedhomeip/issues/33321.
         with self.networkLock:
             res = self.PostTaskOnChipThread(callFunct).Wait()
 

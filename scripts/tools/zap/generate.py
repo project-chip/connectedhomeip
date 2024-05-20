@@ -30,6 +30,9 @@ from typing import Optional
 
 from zap_execution import ZapTool
 
+# TODO: Can we share this constant definition with zap_regen_all.py?
+DEFAULT_DATA_MODEL_DESCRIPTION_FILE = 'src/app/zap-templates/zcl/zcl.json'
+
 
 @dataclass
 class CmdLineArgs:
@@ -88,22 +91,23 @@ def detectZclFile(zapFile):
     print(f"Searching for zcl file from {zapFile}")
 
     prefix_chip_root_dir = True
-    path = 'src/app/zap-templates/zcl/zcl.json'
+    path = DEFAULT_DATA_MODEL_DESCRIPTION_FILE
 
-    data = json.load(open(zapFile))
-    for package in data["package"]:
-        if package["type"] != "zcl-properties":
-            continue
+    if zapFile:
+        data = json.load(open(zapFile))
+        for package in data["package"]:
+            if package["type"] != "zcl-properties":
+                continue
 
-        prefix_chip_root_dir = (package["pathRelativity"] != "resolveEnvVars")
-        # found the right path, try to figure out the actual path
-        if package["pathRelativity"] == "relativeToZap":
-            path = os.path.abspath(os.path.join(
-                os.path.dirname(zapFile), package["path"]))
-        elif package["pathRelativity"] == "resolveEnvVars":
-            path = os.path.expandvars(package["path"])
-        else:
-            path = package["path"]
+            prefix_chip_root_dir = (package["pathRelativity"] != "resolveEnvVars")
+            # found the right path, try to figure out the actual path
+            if package["pathRelativity"] == "relativeToZap":
+                path = os.path.abspath(os.path.join(
+                    os.path.dirname(zapFile), package["path"]))
+            elif package["pathRelativity"] == "resolveEnvVars":
+                path = os.path.expandvars(package["path"])
+            else:
+                path = package["path"]
 
     return getFilePath(path, prefix_chip_root_dir)
 

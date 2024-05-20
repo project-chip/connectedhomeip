@@ -95,7 +95,7 @@ class CHIPToolActivity :
     }
   }
 
-  override fun onCommissioningComplete(code: Int, nodeId: Long) {
+  override fun onCommissioningComplete(code: Long, nodeId: Long) {
     runOnUiThread {
       Toast.makeText(this, getString(R.string.commissioning_completed, code), Toast.LENGTH_SHORT)
         .show()
@@ -122,7 +122,7 @@ class CHIPToolActivity :
     startActivity(redirectIntent)
   }
 
-  override fun SetNetworkType(type: ProvisionNetworkType) {
+  override fun setNetworkType(type: ProvisionNetworkType?) {
     networkType = type
   }
 

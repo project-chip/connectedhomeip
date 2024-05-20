@@ -7458,24 +7458,8 @@
   provisional:
       clusters:
           ## Not ready at cutoff
-          - AirQuality
-          # Replaceable Monitoring clusters
-          - HEPAFilterMonitoring
-          - ActivatedCarbonFilterMonitoring
-          # Concentration Measurement clusters
-          - CarbonDioxideConcentrationMeasurement
-          - CarbonMonoxideConcentrationMeasurement
-          - FormaldehydeConcentrationMeasurement
-          - NitrogenDioxideConcentrationMeasurement
-          - OzoneConcentrationMeasurement
-          - PM10ConcentrationMeasurement
-          - PM1ConcentrationMeasurement
-          - PM25ConcentrationMeasurement
-          - RadonConcentrationMeasurement
-          - TotalVolatileOrganicCompoundsConcentrationMeasurement
           - RefrigeratorAlarm
           - TemperatureControl
-          - SmokeCOAlarm
           ## Not ready to be public API yet.
           - ICDManagement
           - LaundryWasherMode
@@ -8525,26 +8509,606 @@
               ContentLaunchStatusEnum:
                   - URLNotAvailable
 
-- release: "Future"
-  versions: "future"
+- release: "Middle of 2024"
+  versions:
+      iOS: "17.6"
+      macOS: "14.6"
+      watchOS: "10.6"
+      tvOS: "17.6"
   introduced:
+      clusters:
+          - ActivatedCarbonFilterMonitoring
+          - AirQuality
+          - BooleanStateConfiguration
+          - ElectricalEnergyMeasurement
+          - ElectricalPowerMeasurement
+          - HEPAFilterMonitoring
+          - SmokeCOAlarm
+          # Concentration Measurement clusters
+          - CarbonDioxideConcentrationMeasurement
+          - CarbonMonoxideConcentrationMeasurement
+          - FormaldehydeConcentrationMeasurement
+          - NitrogenDioxideConcentrationMeasurement
+          - OzoneConcentrationMeasurement
+          - PM10ConcentrationMeasurement
+          - PM1ConcentrationMeasurement
+          - PM25ConcentrationMeasurement
+          - RadonConcentrationMeasurement
+          - TotalVolatileOrganicCompoundsConcentrationMeasurement
+          - ValveConfigurationAndControl
       attributes:
+          ActivatedCarbonFilterMonitoring:
+              - Condition
+              - DegradationDirection
+              - ChangeIndication
+              - InPlaceIndicator
+              - LastChangedTime
+              - ReplacementProductList
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          AirQuality:
+              - AirQuality
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          BooleanStateConfiguration:
+              - CurrentSensitivityLevel
+              - SupportedSensitivityLevels
+              - DefaultSensitivityLevel
+              - AlarmsActive
+              - AlarmsSuppressed
+              - AlarmsEnabled
+              - AlarmsSupported
+              - SensorFault
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          ElectricalEnergyMeasurement:
+              - Accuracy
+              - CumulativeEnergyImported
+              - CumulativeEnergyExported
+              - PeriodicEnergyImported
+              - PeriodicEnergyExported
+              - CumulativeEnergyReset
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          ElectricalPowerMeasurement:
+              - PowerMode
+              - NumberOfMeasurementTypes
+              - Accuracy
+              - Ranges
+              - Voltage
+              - ActiveCurrent
+              - ReactiveCurrent
+              - ApparentCurrent
+              - ActivePower
+              - ReactivePower
+              - ApparentPower
+              - RMSVoltage
+              - RMSCurrent
+              - RMSPower
+              - Frequency
+              - HarmonicCurrents
+              - HarmonicPhases
+              - PowerFactor
+              - NeutralCurrent
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
           FanControl:
               - AirflowDirection
+          HEPAFilterMonitoring:
+              - Condition
+              - DegradationDirection
+              - ChangeIndication
+              - InPlaceIndicator
+              - LastChangedTime
+              - ReplacementProductList
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          SmokeCOAlarm:
+              - ExpressedState
+              - SmokeState
+              - COState
+              - BatteryAlert
+              - DeviceMuted
+              - TestInProgress
+              - HardwareFaultAlert
+              - EndOfServiceAlert
+              - InterconnectSmokeAlarm
+              - InterconnectCOAlarm
+              - ContaminationState
+              - SmokeSensitivityLevel
+              - ExpiryDate
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          CarbonDioxideConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          CarbonMonoxideConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          FormaldehydeConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          NitrogenDioxideConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          OzoneConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          PM10ConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          PM1ConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          PM25ConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          RadonConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          TotalVolatileOrganicCompoundsConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          ValveConfigurationAndControl:
+              - OpenDuration
+              - DefaultOpenDuration
+              - AutoCloseTime
+              - RemainingDuration
+              - CurrentState
+              - TargetState
+              - CurrentLevel
+              - TargetLevel
+              - DefaultOpenLevel
+              - ValveFault
+              - LevelStep
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
       commands:
+          BooleanStateConfiguration:
+              - SuppressAlarm
+              - EnableDisableAlarm
+          ActivatedCarbonFilterMonitoring:
+              - ResetCondition
           FanControl:
               - Step
+          HEPAFilterMonitoring:
+              - ResetCondition
+          SmokeCOAlarm:
+              - SelfTestRequest
+          ValveConfigurationAndControl:
+              - Open
+              - Close
       command fields:
+          BooleanStateConfiguration:
+              SuppressAlarm:
+                  - alarmsToSuppress
+              EnableDisableAlarm:
+                  - alarmsToEnableDisable
           FanControl:
               Step:
                   - direction
                   - wrap
                   - lowestOff
+          ValveConfigurationAndControl:
+              Open:
+                  - openDuration
+                  - targetLevel
+      structs:
+          ActivatedCarbonFilterMonitoring:
+              - ReplacementProductStruct
+          ElectricalEnergyMeasurement:
+              - EnergyMeasurementStruct
+              - CumulativeEnergyResetStruct
+              - MeasurementAccuracyStruct
+          ElectricalPowerMeasurement:
+              - HarmonicMeasurementStruct
+              - MeasurementRangeStruct
+              - MeasurementAccuracyRangeStruct
+              - MeasurementAccuracyStruct
+          HEPAFilterMonitoring:
+              - ReplacementProductStruct
+      struct fields:
+          ActivatedCarbonFilterMonitoring:
+              ReplacementProductStruct:
+                  - productIdentifierType
+                  - productIdentifierValue
+          ElectricalEnergyMeasurement:
+              EnergyMeasurementStruct:
+                  - energy
+                  - startTimestamp
+                  - endTimestamp
+                  - startSystime
+                  - endSystime
+              CumulativeEnergyResetStruct:
+                  - importedResetTimestamp
+                  - exportedResetTimestamp
+                  - importedResetSystime
+                  - exportedResetSystime
+              MeasurementAccuracyStruct:
+                  - measurementType
+                  - measured
+                  - minMeasuredValue
+                  - maxMeasuredValue
+                  - accuracyRanges
+              MeasurementAccuracyRangeStruct:
+                  - rangeMin
+                  - rangeMax
+                  - percentMax
+                  - percentMin
+                  - percentTypical
+                  - fixedMax
+                  - fixedMin
+                  - fixedTypical
+          ElectricalPowerMeasurement:
+              MeasurementRangeStruct:
+                  - measurementType
+                  - min
+                  - max
+                  - startTimestamp
+                  - endTimestamp
+                  - minTimestamp
+                  - maxTimestamp
+                  - startSystime
+                  - endSystime
+                  - minSystime
+                  - maxSystime
+              HarmonicMeasurementStruct:
+                  - order
+                  - measurement
+              MeasurementAccuracyStruct:
+                  - measurementType
+                  - measured
+                  - minMeasuredValue
+                  - maxMeasuredValue
+                  - accuracyRanges
+              MeasurementAccuracyRangeStruct:
+                  - rangeMin
+                  - rangeMax
+                  - percentMax
+                  - percentMin
+                  - percentTypical
+                  - fixedMax
+                  - fixedMin
+                  - fixedTypical
+          HEPAFilterMonitoring:
+              ReplacementProductStruct:
+                  - productIdentifierType
+                  - productIdentifierValue
+      events:
+          BooleanStateConfiguration:
+              - AlarmsStateChanged
+              - SensorFault
+          ElectricalEnergyMeasurement:
+              - CumulativeEnergyMeasured
+              - PeriodicEnergyMeasured
+          ElectricalPowerMeasurement:
+              - MeasurementPeriodRanges
+          SmokeCOAlarm:
+              - SmokeAlarm
+              - COAlarm
+              - LowBattery
+              - HardwareFault
+              - EndOfService
+              - SelfTestComplete
+              - AlarmMuted
+              - MuteEnded
+              - InterconnectSmokeAlarm
+              - InterconnectCOAlarm
+              - AllClear
+          ValveConfigurationAndControl:
+              - ValveStateChanged
+              - ValveFault
+      event fields:
+          BooleanStateConfiguration:
+              AlarmsStateChanged:
+                  - alarmsActive
+                  - alarmsSuppressed
+              SensorFault:
+                  - sensorFault
+          ElectricalEnergyMeasurement:
+              CumulativeEnergyMeasured:
+                  - energyImported
+                  - energyExported
+              PeriodicEnergyMeasured:
+                  - energyImported
+                  - energyExported
+          ElectricalPowerMeasurement:
+              MeasurementPeriodRanges:
+                  - ranges
+          SmokeCOAlarm:
+              SmokeAlarm:
+                  - alarmSeverityLevel
+              COAlarm:
+                  - alarmSeverityLevel
+              LowBattery:
+                  - alarmSeverityLevel
+              InterconnectSmokeAlarm:
+                  - alarmSeverityLevel
+              InterconnectCOAlarm:
+                  - alarmSeverityLevel
+          ValveConfigurationAndControl:
+              ValveStateChanged:
+                  - valveState
+                  - valveLevel
+              ValveFault:
+                  - valveFault
       enums:
+          ActivatedCarbonFilterMonitoring:
+              - DegradationDirectionEnum
+              - ChangeIndicationEnum
+              - ProductIdentifierTypeEnum
+          AirQuality:
+              - AirQualityEnum
+          ElectricalPowerMeasurement:
+              - PowerModeEnum
+              - MeasurementTypeEnum
           FanControl:
               - StepDirectionEnum
               - AirflowDirectionEnum
+          HEPAFilterMonitoring:
+              - DegradationDirectionEnum
+              - ChangeIndicationEnum
+              - ProductIdentifierTypeEnum
+          SmokeCOAlarm:
+              - AlarmStateEnum
+              - SensitivityEnum
+              - ExpressedStateEnum
+              - MuteStateEnum
+              - EndOfServiceEnum
+              - ContaminationStateEnum
+          CarbonDioxideConcentrationMeasurement:
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+              - LevelValueEnum
+          CarbonMonoxideConcentrationMeasurement:
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+              - LevelValueEnum
+          FormaldehydeConcentrationMeasurement:
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+              - LevelValueEnum
+          NitrogenDioxideConcentrationMeasurement:
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+              - LevelValueEnum
+          OzoneConcentrationMeasurement:
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+              - LevelValueEnum
+          PM10ConcentrationMeasurement:
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+              - LevelValueEnum
+          PM1ConcentrationMeasurement:
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+              - LevelValueEnum
+          PM25ConcentrationMeasurement:
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+              - LevelValueEnum
+          RadonConcentrationMeasurement:
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+              - LevelValueEnum
+          TotalVolatileOrganicCompoundsConcentrationMeasurement:
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+              - LevelValueEnum
+          ValveConfigurationAndControl:
+              - ValveStateEnum
+              - StatusCodeEnum
       enum values:
+          ActivatedCarbonFilterMonitoring:
+              DegradationDirectionEnum:
+                  - Up
+                  - Down
+              ChangeIndicationEnum:
+                  - OK
+                  - Warning
+                  - Critical
+              ProductIdentifierTypeEnum:
+                  - UPC
+                  - GTIN8
+                  - EAN
+                  - GTIN14
+                  - OEM
+          AirQuality:
+              AirQualityEnum:
+                  - Unknown
+                  - Good
+                  - Fair
+                  - Moderate
+                  - Poor
+                  - VeryPoor
+                  - ExtremelyPoor
+          ElectricalPowerMeasurement:
+              PowerModeEnum:
+                  - Unknown
+                  - DC
+                  - AC
+              MeasurementTypeEnum:
+                  - Unspecified
+                  - Voltage
+                  - ActiveCurrent
+                  - ReactiveCurrent
+                  - ApparentCurrent
+                  - ActivePower
+                  - ReactivePower
+                  - ApparentPower
+                  - RMSVoltage
+                  - RMSCurrent
+                  - RMSPower
+                  - Frequency
+                  - PowerFactor
+                  - NeutralCurrent
+                  - ElectricalEnergy
+
           FanControl:
               StepDirectionEnum:
                   - Increase
@@ -8552,18 +9116,443 @@
               AirflowDirectionEnum:
                   - Forward
                   - Reverse
+          HEPAFilterMonitoring:
+              DegradationDirectionEnum:
+                  - Up
+                  - Down
+              ChangeIndicationEnum:
+                  - OK
+                  - Warning
+                  - Critical
+              ProductIdentifierTypeEnum:
+                  - UPC
+                  - GTIN8
+                  - EAN
+                  - GTIN14
+                  - OEM
+          SmokeCOAlarm:
+              AlarmStateEnum:
+                  - Normal
+                  - Warning
+                  - Critical
+              SensitivityEnum:
+                  - High
+                  - Standard
+                  - Low
+              ExpressedStateEnum:
+                  - Normal
+                  - SmokeAlarm
+                  - COAlarm
+                  - BatteryAlert
+                  - Testing
+                  - HardwareFault
+                  - EndOfService
+                  - InterconnectSmoke
+                  - InterconnectCO
+              MuteStateEnum:
+                  - NotMuted
+                  - Muted
+              EndOfServiceEnum:
+                  - Normal
+                  - Expired
+              ContaminationStateEnum:
+                  - Normal
+                  - Low
+                  - Warning
+                  - Critical
+          CarbonDioxideConcentrationMeasurement:
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Air
+                  - Water
+                  - Soil
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+          CarbonMonoxideConcentrationMeasurement:
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Air
+                  - Water
+                  - Soil
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+          FormaldehydeConcentrationMeasurement:
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Air
+                  - Water
+                  - Soil
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+          NitrogenDioxideConcentrationMeasurement:
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Air
+                  - Water
+                  - Soil
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+          OzoneConcentrationMeasurement:
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Air
+                  - Water
+                  - Soil
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+          PM10ConcentrationMeasurement:
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Air
+                  - Water
+                  - Soil
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+          PM1ConcentrationMeasurement:
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Air
+                  - Water
+                  - Soil
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+          PM25ConcentrationMeasurement:
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Air
+                  - Water
+                  - Soil
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+          RadonConcentrationMeasurement:
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Air
+                  - Water
+                  - Soil
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+          TotalVolatileOrganicCompoundsConcentrationMeasurement:
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Air
+                  - Water
+                  - Soil
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+          ValveConfigurationAndControl:
+              ValveStateEnum:
+                  - Closed
+                  - Open
+                  - Transitioning
+              StatusCodeEnum:
+                  - FailureDueToFault
+      bitmaps:
+          ActivatedCarbonFilterMonitoring:
+              - Feature
+          AirQuality:
+              - Feature
+          BooleanStateConfiguration:
+              - Feature
+              - AlarmModeBitmap
+              - SensorFaultBitmap
+          ElectricalEnergyMeasurement:
+              - Feature
+          ElectricalPowerMeasurement:
+              - Feature
+          HEPAFilterMonitoring:
+              - Feature
+          SmokeCOAlarm:
+              - Feature
+          CarbonDioxideConcentrationMeasurement:
+              - Feature
+          CarbonMonoxideConcentrationMeasurement:
+              - Feature
+          FormaldehydeConcentrationMeasurement:
+              - Feature
+          NitrogenDioxideConcentrationMeasurement:
+              - Feature
+          OzoneConcentrationMeasurement:
+              - Feature
+          PM10ConcentrationMeasurement:
+              - Feature
+          PM1ConcentrationMeasurement:
+              - Feature
+          PM25ConcentrationMeasurement:
+              - Feature
+          RadonConcentrationMeasurement:
+              - Feature
+          TotalVolatileOrganicCompoundsConcentrationMeasurement:
+              - Feature
+          ValveConfigurationAndControl:
+              - Feature
+              - ValveFaultBitmap
       bitmap values:
+          ActivatedCarbonFilterMonitoring:
+              Feature:
+                  - Condition
+                  - Warning
+                  - ReplacementProductList
+          AirQuality:
+              Feature:
+                  - Fair
+                  - Moderate
+                  - VeryPoor
+                  - ExtremelyPoor
+          BooleanStateConfiguration:
+              Feature:
+                  - Visual
+                  - Audible
+                  - AlarmSuppress
+                  - SensitivityLevel
+              AlarmModeBitmap:
+                  - Visual
+                  - Audible
+              SensorFaultBitmap:
+                  - GeneralFault
+          ElectricalEnergyMeasurement:
+              Feature:
+                  - ImportedEnergy
+                  - ExportedEnergy
+                  - CumulativeEnergy
+                  - PeriodicEnergy
+          ElectricalPowerMeasurement:
+              Feature:
+                  - DirectCurrent
+                  - AlternatingCurrent
+                  - PolyphasePower
+                  - Harmonics
+                  - PowerQuality
+          HEPAFilterMonitoring:
+              Feature:
+                  - Condition
+                  - Warning
+                  - ReplacementProductList
           FanControl:
               Feature:
                   - Step
                   - AirflowDirection
+          SmokeCOAlarm:
+              Feature:
+                  - SmokeAlarm
+                  - COAlarm
+          CarbonDioxideConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          CarbonMonoxideConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          FormaldehydeConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          NitrogenDioxideConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          OzoneConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          PM10ConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          PM1ConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          PM25ConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          RadonConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          TotalVolatileOrganicCompoundsConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          ValveConfigurationAndControl:
+              Feature:
+                  - TimeSync
+                  - Level
+              ValveFaultBitmap:
+                  - GeneralFault
+                  - Blocked
+                  - Leaking
+                  - NotConnected
+                  - ShortCircuit
+                  - CurrentExceeded
   provisional:
       clusters:
           # Targeting Spring 2024 Matter release
           - EnergyEVSEMode
           - DeviceEnergyManagementMode
           - Messages
-          - ElectricalPowerMeasurement
           - PowerTopology
       attributes:
           DoorLock:
@@ -8695,3 +9684,6 @@
                   # Not really part of the spec, need to think about whether to
                   # expose this.
                   - NoFeatures
+
+- release: "Future"
+  versions: "future"

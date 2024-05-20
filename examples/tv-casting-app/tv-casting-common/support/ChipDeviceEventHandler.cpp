@@ -91,16 +91,33 @@ void ChipDeviceEventHandler::Handle(const chip::DeviceLayer::ChipDeviceEvent * e
 
 void ChipDeviceEventHandler::HandleFailSafeTimerExpired()
 {
-    ChipLogProgress(AppServer, "ChipDeviceEventHandler::HandleFailSafeTimerExpired called");
+    // if UDC was in progress (when the Fail-Safe timer expired), reset TargetCastingPlayer commissioning state and return early
+    if (sUdcInProgress)
+    {
+        ChipLogProgress(AppServer, "ChipDeviceEventHandler::HandleFailSafeTimerExpired() when sUdcInProgress: %d, returning early",
+                        sUdcInProgress);
+        sUdcInProgress                                            = false;
+        CastingPlayer::GetTargetCastingPlayer()->mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
+        CastingPlayer::GetTargetCastingPlayer()->mOnCompleted(CHIP_ERROR_TIMEOUT, nullptr);
+        CastingPlayer::GetTargetCastingPlayer()->mOnCompleted         = nullptr;
+        CastingPlayer::GetTargetCastingPlayer()->mTargetCastingPlayer = nullptr;
+        return;
+    }
+
+    // if UDC was NOT in progress (when the Fail-Safe timer expired), start UDC
+    ChipLogProgress(AppServer, "ChipDeviceEventHandler::HandleFailSafeTimerExpired() when sUdcInProgress: %d, starting UDC",
+                    sUdcInProgress);
     chip::DeviceLayer::SystemLayer().StartTimer(
         chip::System::Clock::Milliseconds32(1),
         [](chip::System::Layer * aSystemLayer, void * aAppState) {
-            ChipLogProgress(AppServer, "ChipDeviceEventHandler::Handle running OpenBasicCommissioningWindow");
+            ChipLogProgress(AppServer, "ChipDeviceEventHandler::HandleFailSafeTimerExpired() running OpenBasicCommissioningWindow");
             CHIP_ERROR err = chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(
                 chip::System::Clock::Seconds16(CastingPlayer::GetTargetCastingPlayer()->mCommissioningWindowTimeoutSec));
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(AppServer, "ChipDeviceEventHandler::Handle Failed to OpenBasicCommissioningWindow %" CHIP_ERROR_FORMAT,
+                ChipLogError(AppServer,
+                             "ChipDeviceEventHandler::HandleFailSafeTimerExpired() Failed to OpenBasicCommissioningWindow "
+                             "%" CHIP_ERROR_FORMAT,
                              err.Format());
                 CastingPlayer::GetTargetCastingPlayer()->mOnCompleted(err, nullptr);
                 return;
@@ -111,7 +128,8 @@ void ChipDeviceEventHandler::HandleFailSafeTimerExpired()
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(AppServer,
-                             "ChipDeviceEventHandler::Handle Failed to SendUserDirectedCommissioningRequest %" CHIP_ERROR_FORMAT,
+                             "ChipDeviceEventHandler::HandleFailSafeTimerExpired() Failed to SendUserDirectedCommissioningRequest "
+                             "%" CHIP_ERROR_FORMAT,
                              err.Format());
                 CastingPlayer::GetTargetCastingPlayer()->mOnCompleted(err, nullptr);
                 return;
@@ -155,7 +173,7 @@ void ChipDeviceEventHandler::HandleBindingsChangedViaCluster(const chip::DeviceL
                             "nodeId=0x" ChipLogFormatX64
                             " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                             binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
-                            binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
+                            binding.remote, ChipLogValueMEI(binding.clusterId.value_or(0)));
             if (binding.type == MATTER_UNICAST_BINDING && event->BindingsChanged.fabricIndex == binding.fabricIndex)
             {
                 ChipLogProgress(AppServer,
@@ -194,9 +212,10 @@ void ChipDeviceEventHandler::HandleCommissioningComplete(const chip::DeviceLayer
 
 CHIP_ERROR ChipDeviceEventHandler::SetUdcStatus(bool udcInProgress)
 {
+    ChipLogProgress(AppServer, "ChipDeviceEventHandler::SetUdcStatus() called with udcInProgress: %d", udcInProgress);
     if (sUdcInProgress == udcInProgress)
     {
-        ChipLogError(AppServer, "UDC in progress state is already %d", sUdcInProgress);
+        ChipLogError(AppServer, "ChipDeviceEventHandler::SetUdcStatus() UDC in progress state is already %d", sUdcInProgress);
         return CHIP_ERROR_INCORRECT_STATE;
     }
     sUdcInProgress = udcInProgress;

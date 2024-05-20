@@ -27,145 +27,238 @@ const char * StageToString(CommissioningStage stage)
     {
     case kError:
         return "Error";
-        break;
 
     case kSecurePairing:
         return "SecurePairing";
-        break;
 
     case kReadCommissioningInfo:
         return "ReadCommissioningInfo";
-        break;
 
     case kReadCommissioningInfo2:
         return "ReadCommissioningInfo2";
-        break;
 
     case kArmFailsafe:
         return "ArmFailSafe";
-        break;
 
     case kScanNetworks:
         return "ScanNetworks";
-        break;
 
     case kConfigRegulatory:
         return "ConfigRegulatory";
-        break;
 
     case kConfigureUTCTime:
         return "ConfigureUTCTime";
-        break;
 
     case kConfigureTimeZone:
         return "ConfigureTimeZone";
-        break;
 
     case kConfigureDSTOffset:
         return "ConfigureDSTOffset";
-        break;
 
     case kConfigureDefaultNTP:
         return "ConfigureDefaultNTP";
-        break;
 
     case kSendPAICertificateRequest:
         return "SendPAICertificateRequest";
-        break;
 
     case kSendDACCertificateRequest:
         return "SendDACCertificateRequest";
-        break;
 
     case kSendAttestationRequest:
         return "SendAttestationRequest";
-        break;
 
     case kAttestationVerification:
         return "AttestationVerification";
-        break;
+
+    case kAttestationRevocationCheck:
+        return "AttestationRevocationCheck";
 
     case kSendOpCertSigningRequest:
         return "SendOpCertSigningRequest";
-        break;
 
     case kValidateCSR:
         return "ValidateCSR";
-        break;
 
     case kGenerateNOCChain:
         return "GenerateNOCChain";
-        break;
 
     case kSendTrustedRootCert:
         return "SendTrustedRootCert";
-        break;
 
     case kSendNOC:
         return "SendNOC";
-        break;
 
     case kConfigureTrustedTimeSource:
         return "ConfigureTrustedTimeSource";
-        break;
 
     case kICDGetRegistrationInfo:
         return "ICDGetRegistrationInfo";
-        break;
 
     case kICDRegistration:
         return "ICDRegistration";
-        break;
-
-    case kICDSendStayActive:
-        return "ICDSendStayActive";
-        break;
 
     case kWiFiNetworkSetup:
         return "WiFiNetworkSetup";
-        break;
 
     case kThreadNetworkSetup:
         return "ThreadNetworkSetup";
-        break;
 
     case kFailsafeBeforeWiFiEnable:
         return "FailsafeBeforeWiFiEnable";
-        break;
 
     case kFailsafeBeforeThreadEnable:
         return "FailsafeBeforeThreadEnable";
-        break;
 
     case kWiFiNetworkEnable:
         return "WiFiNetworkEnable";
-        break;
 
     case kThreadNetworkEnable:
         return "ThreadNetworkEnable";
-        break;
 
-    case kFindOperational:
-        return "FindOperational";
-        break;
+    case kEvictPreviousCaseSessions:
+        return "kEvictPreviousCaseSessions";
+
+    case kFindOperationalForStayActive:
+        return "kFindOperationalForStayActive";
+
+    case kFindOperationalForCommissioningComplete:
+        return "kFindOperationalForCommissioningComplete";
+
+    case kICDSendStayActive:
+        return "ICDSendStayActive";
 
     case kSendComplete:
         return "SendComplete";
-        break;
 
     case kCleanup:
         return "Cleanup";
-        break;
 
     case kNeedsNetworkCreds:
         return "NeedsNetworkCreds";
-        break;
 
     default:
         return "???";
-        break;
     }
 }
+
+#if MATTER_TRACING_ENABLED
+const char * MetricKeyForCommissioningStage(CommissioningStage stage)
+{
+    switch (stage)
+    {
+    case kError:
+        return "core_commissioning_stage_error";
+
+    case kSecurePairing:
+        return "core_commissioning_stage_secure_pairing";
+
+    case kReadCommissioningInfo:
+        return "core_commissioning_stage_read_commissioning_info";
+
+    case kReadCommissioningInfo2:
+        return "core_commissioning_stage_read_commissioning_info2";
+
+    case kArmFailsafe:
+        return "core_commissioning_stage_arm_failsafe";
+
+    case kScanNetworks:
+        return "core_commissioning_stage_scan_networks";
+
+    case kConfigRegulatory:
+        return "core_commissioning_stage_config_regulatory";
+
+    case kConfigureUTCTime:
+        return "core_commissioning_stage_configure_utc_time";
+
+    case kConfigureTimeZone:
+        return "core_commissioning_stage_configure_timezone";
+
+    case kConfigureDSTOffset:
+        return "core_commissioning_stage_configure_dst_offset";
+
+    case kConfigureDefaultNTP:
+        return "core_commissioning_stage_configure_default_ntp";
+
+    case kSendPAICertificateRequest:
+        return "core_commissioning_stage_send_pai_certificate_request";
+
+    case kSendDACCertificateRequest:
+        return "core_commissioning_stage_send_dac_certificate_request";
+
+    case kSendAttestationRequest:
+        return "core_commissioning_stage_send_attestation_request";
+
+    case kAttestationVerification:
+        return "core_commissioning_stage_attestation_verification";
+
+    case kSendOpCertSigningRequest:
+        return "core_commissioning_stage_opcert_signing_request";
+
+    case kValidateCSR:
+        return "core_commissioning_stage_validate_csr";
+
+    case kGenerateNOCChain:
+        return "core_commissioning_stage_generate_noc_chain";
+
+    case kSendTrustedRootCert:
+        return "core_commissioning_stage_send_trusted_root_cert";
+
+    case kSendNOC:
+        return "core_commissioning_stage_send_noc";
+
+    case kConfigureTrustedTimeSource:
+        return "core_commissioning_stage_configure_trusted_time_source";
+
+    case kICDGetRegistrationInfo:
+        return "core_commissioning_stage_icd_get_registration_info";
+
+    case kICDRegistration:
+        return "core_commissioning_stage_icd_registration";
+
+    case kWiFiNetworkSetup:
+        return "core_commissioning_stage_wifi_network_setup";
+
+    case kThreadNetworkSetup:
+        return "core_commissioning_stage_thread_network_setup";
+
+    case kFailsafeBeforeWiFiEnable:
+        return "core_commissioning_stage_failsafe_before_wifi_enable";
+
+    case kFailsafeBeforeThreadEnable:
+        return "core_commissioning_stage_failsafe_before_thread_enable";
+
+    case kWiFiNetworkEnable:
+        return "core_commissioning_stage_wifi_network_enable";
+
+    case kThreadNetworkEnable:
+        return "core_commissioning_stage_thread_network_enable";
+
+    case kEvictPreviousCaseSessions:
+        return "core_commissioning_stage_evict_previous_case_sessions";
+
+    case kFindOperationalForStayActive:
+        return "core_commissioning_stage_find_operational_for_stay_active";
+
+    case kFindOperationalForCommissioningComplete:
+        return "core_commissioning_stage_find_operational_for_commissioning_complete";
+
+    case kICDSendStayActive:
+        return "core_commissioning_stage_icd_send_stay_active";
+
+    case kSendComplete:
+        return "core_commissioning_stage_send_complete";
+
+    case kCleanup:
+        return "core_commissioning_stage_cleanup";
+
+    case kNeedsNetworkCreds:
+        return "core_commissioning_stage_need_network_creds";
+
+    default:
+        return "core_commissioning_stage_unknown";
+    }
+}
+#endif
 
 } // namespace Controller
 } // namespace chip

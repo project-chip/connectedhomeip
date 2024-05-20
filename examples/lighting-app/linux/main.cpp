@@ -26,6 +26,8 @@
 #include <app/server/Server.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <string>
+
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
 #include <imgui_ui/ui.h>
 #include <imgui_ui/windows/light.h>
@@ -93,7 +95,7 @@ void ApplicationShutdown()
     }
 }
 
-int main(int argc, char * argv[])
+extern "C" int main(int argc, char * argv[])
 {
     if (ChipLinuxAppInit(argc, argv) != 0)
     {

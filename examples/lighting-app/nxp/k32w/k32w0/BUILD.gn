@@ -13,11 +13,13 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/k32w0_sdk.gni")
+import("//build_overrides/nxp_sdk.gni")
 import("//build_overrides/openthread.gni")
 
-import("${k32w0_sdk_build_root}/k32w0_executable.gni")
-import("${k32w0_sdk_build_root}/k32w0_sdk.gni")
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/nxp_executable.gni")
 
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/lib/core/core.gni")
@@ -26,6 +28,9 @@ import("${chip_root}/src/platform/device.gni")
 declare_args() {
   chip_software_version = 0
   chip_simple_hash_verification = 0
+
+  # Setup discriminator as argument
+  setup_discriminator = 3840
 }
 
 if (chip_pw_tokenizer_logging) {
@@ -70,6 +75,10 @@ k32w0_sdk("sdk") {
       "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=${chip_software_version}",
     ]
   }
+
+  defines += [
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setup_discriminator}",
+  ]
 }
 
 k32w0_executable("light_app") {
@@ -103,6 +112,7 @@ k32w0_executable("light_app") {
     "${chip_root}/examples/common/QRCode",
     "${chip_root}/examples/lighting-app/nxp/zap/",
     "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/src/app:test-event-trigger",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform:syscalls_stub",
     "${chip_root}/third_party/mbedtls:mbedtls",

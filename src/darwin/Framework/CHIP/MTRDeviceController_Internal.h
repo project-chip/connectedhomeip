@@ -35,17 +35,14 @@
 
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceControllerStartupParams.h>
-#import <Matter/MTRDiagnosticLogsType.h>
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
-#else
-#import "MTRDeviceControllerStorageDelegate_Wrapper.h"
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
+#import <Matter/MTRDiagnosticLogsType.h>
 #import <Matter/MTROTAProviderDelegate.h>
 
 @class MTRDeviceControllerStartupParamsInternal;
 @class MTRDeviceControllerFactory;
 @class MTRDevice;
+@class MTRAsyncWorkQueue;
 
 namespace chip {
 class FabricTable;
@@ -58,13 +55,6 @@ namespace Controller {
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRDeviceController ()
-
-#if !MTR_PER_CONTROLLER_STORAGE_ENABLED
-/**
- * The ID assigned to this controller at creation time.
- */
-@property (readonly, nonatomic) NSUUID * uniqueIdentifier;
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 #pragma mark - MTRDeviceControllerFactory methods
 
@@ -106,17 +96,24 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, nullable) dispatch_queue_t otaProviderDelegateQueue;
 
 /**
+ * A queue with a fixed width that allows a number of MTRDevice objects to perform
+ * subscription at the same time.
+ */
+@property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentSubscriptionPool;
+
+/**
  * Init a newly created controller.
  *
  * Only MTRDeviceControllerFactory should be calling this.
  */
 - (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
-                          queue:(dispatch_queue_t)queue
-                storageDelegate:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
-           storageDelegateQueue:(dispatch_queue_t _Nullable)storageDelegateQueue
-            otaProviderDelegate:(id<MTROTAProviderDelegate> _Nullable)otaProviderDelegate
-       otaProviderDelegateQueue:(dispatch_queue_t _Nullable)otaProviderDelegateQueue
-               uniqueIdentifier:(NSUUID *)uniqueIdentifier;
+                             queue:(dispatch_queue_t)queue
+                   storageDelegate:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
+              storageDelegateQueue:(dispatch_queue_t _Nullable)storageDelegateQueue
+               otaProviderDelegate:(id<MTROTAProviderDelegate> _Nullable)otaProviderDelegate
+          otaProviderDelegateQueue:(dispatch_queue_t _Nullable)otaProviderDelegateQueue
+                  uniqueIdentifier:(NSUUID *)uniqueIdentifier
+    concurrentSubscriptionPoolSize:(NSUInteger)concurrentSubscriptionPoolSize;
 
 /**
  * Check whether this controller is running on the given fabric, as represented
@@ -266,6 +263,8 @@ NS_ASSUME_NONNULL_BEGIN
 // DeviceController will act as a central repository for this opaque dictionary that MTRDevice manages
 - (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID;
 - (void)removeDevice:(MTRDevice *)device;
+
+- (NSNumber * _Nullable)syncGetCompressedFabricID;
 
 @end
 

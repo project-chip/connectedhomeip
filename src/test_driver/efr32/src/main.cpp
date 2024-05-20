@@ -15,13 +15,19 @@
  *    limitations under the License.
  */
 
+// TODO To prevent config with nl headers has to be included before  nl test headers
+#include <pw_unit_test/unit_test_service.h>
+
 #include <AppConfig.h>
 #include <FreeRTOS.h>
 #include <PigweedLogger.h>
 #include <PigweedLoggerMutex.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
 #include <cstring>
+#include <examples/platform/silabs/SilabsDeviceAttestationCreds.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
+#include <lib/support/UnitTest.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <mbedtls/platform.h>
 #include <nl_test_service/nl_test.rpc.pb.h>
@@ -30,8 +36,11 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+#include <sl_system_init.h>
 #include <sl_system_kernel.h>
 #include <task.h>
+
+#include "SilabsDeviceDataProvider.h"
 
 extern "C" int printf(const char * format, ...)
 {
@@ -52,8 +61,11 @@ public:
         stream_writer = &writer;
         nlTestSetLogger(&nl_test_logger);
 
-        RunRegisteredUnitTests();
-
+        printf("--- Running nltest ---");
+        int status = RunRegisteredUnitTests();
+        printf("--- Running gtest ---");
+        status += chip::test::RunAllTests();
+        printf("Test status: %d", status);
         stream_writer = nullptr;
         writer.Finish();
     }
@@ -166,10 +178,11 @@ StaticTask_t sTestTaskBuffer;
 StackType_t sTestTaskStack[TEST_TASK_STACK_SIZE];
 
 chip::rpc::NlTest nl_test_service;
+pw::unit_test::UnitTestService unit_test_service;
 
 void RegisterServices(pw::rpc::Server & server)
 {
-    server.RegisterService(nl_test_service);
+    server.RegisterService(nl_test_service, unit_test_service);
 }
 
 void RunRpcService(void *)
@@ -181,6 +194,7 @@ void RunRpcService(void *)
 
 int main(void)
 {
+    sl_system_init();
     chip::DeviceLayer::Silabs::GetPlatform().Init();
     PigweedLogger::init();
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
@@ -188,6 +202,9 @@ int main(void)
     chip::Platform::MemoryInit();
 
     chip::DeviceLayer::PlatformMgr().InitChipStack();
+    // required for inits tied to the event loop
+    chip::DeviceLayer::SetDeviceInstanceInfoProvider(&chip::DeviceLayer::Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider());
+    chip::DeviceLayer::SetCommissionableDataProvider(&chip::DeviceLayer::Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider());
 
     SILABS_LOG("***** CHIP EFR32 device tests *****\r\n");
 

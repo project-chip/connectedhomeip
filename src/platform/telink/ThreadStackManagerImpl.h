@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -29,9 +29,6 @@
 #include <zephyr/net/openthread.h>
 
 #include <openthread/thread.h>
-#if !CONFIG_SOC_SERIES_RISCV_TELINK_B9X
-#include <platform/Zephyr/BLEManagerImpl.h>
-#endif // !CONFIG_SOC_SERIES_RISCV_TELINK_B9X
 
 #include <lib/support/logging/CHIPLogging.h>
 

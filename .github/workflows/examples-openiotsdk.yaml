@@ -16,6 +16,8 @@ name: Build example - Open IoT SDK
 
 on:
     push:
+        branches-ignore:
+            - 'dependabot/**'
     pull_request:
     merge_group:
     workflow_dispatch:
@@ -38,7 +40,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-openiotsdk:35
+            image: ghcr.io/project-chip/chip-build-openiotsdk:50
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
             options: --privileged

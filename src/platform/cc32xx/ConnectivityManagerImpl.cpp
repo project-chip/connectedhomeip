@@ -62,7 +62,6 @@ extern void SlNetConnEventHandler(uint32_t ifID, SlNetConnStatus_e netStatus, vo
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
-using namespace ::chip::TLV;
 
 extern "C" void cc32xxLog(const char * aFormat, ...);
 static struct netif * m_pNetIf = NULL;

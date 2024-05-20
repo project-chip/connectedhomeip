@@ -279,7 +279,7 @@ private:
     CHIPoBLEServiceMode mServiceMode;
     char mDeviceName[GAP_DEVICE_NAME_LEN];
 
-    ConnRec_t connList[MAX_NUM_BLE_CONNS];
+    ConnRec_t connList[LL_MAX_NUM_BLE_CONNS];
     // List to store connection handles for queued param updates
     List_List paramUpdateList;
 
@@ -316,8 +316,6 @@ private:
     uint8_t ClearBLEConnListEntry(uint16_t connHandle);
     void ClearPendingBLEParamUpdate(uint16_t connHandle);
     void UpdateBLERPA(void);
-
-    static void HandleIncomingBleConnection(Ble::BLEEndPoint * bleEP);
 
     /* Static helper function */
     static void EventHandler(void * arg);

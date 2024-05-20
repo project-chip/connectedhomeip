@@ -33,4 +33,4 @@ CHIP_ERROR convertJVideoPlayerToTargetVideoPlayerInfo(jobject videoPlayer, Targe
 CHIP_ERROR convertTargetVideoPlayerInfoToJVideoPlayer(TargetVideoPlayerInfo * targetVideoPlayerInfo, jobject & outVideoPlayer);
 
 CHIP_ERROR convertJDiscoveredNodeDataToCppDiscoveredNodeData(jobject jDiscoveredNodeData,
-                                                             chip::Dnssd::DiscoveredNodeData & cppDiscoveredNodeData);
+                                                             chip::Dnssd::CommissionNodeData & cppDiscoveredNodeData);

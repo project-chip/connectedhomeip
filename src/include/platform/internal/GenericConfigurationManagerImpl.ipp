@@ -27,7 +27,7 @@
 #define GENERIC_CONFIGURATION_MANAGER_IMPL_CPP
 
 #include <FirmwareBuildTime.h>
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <crypto/RandUtils.h>
 #include <inttypes.h>
@@ -374,19 +374,21 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetPrimaryMACAddress(Mu
     if (buf.size() != ConfigurationManager::kPrimaryMACAddressLength)
         return CHIP_ERROR_INVALID_ARGUMENT;
 
-    memset(buf.data(), 0, buf.size());
+    memset(buf.data(), 0, buf.size()); // zero the whole buffer, in case the caller ignores buf.size()
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     if (chip::DeviceLayer::ThreadStackMgr().GetPrimary802154MACAddress(buf.data()) == CHIP_NO_ERROR)
     {
         ChipLogDetail(DeviceLayer, "Using Thread extended MAC for hostname.");
+        buf.reduce_size(kThreadMACAddressLength);
         return CHIP_NO_ERROR;
     }
 #endif
 
     if (chip::DeviceLayer::ConfigurationMgr().GetPrimaryWiFiMACAddress(buf.data()) == CHIP_NO_ERROR)
     {
-        ChipLogDetail(DeviceLayer, "Using wifi MAC for hostname");
+        ChipLogDetail(DeviceLayer, "Using WiFi MAC for hostname");
+        buf.reduce_size(kEthernetMACAddressLength);
         return CHIP_NO_ERROR;
     }
 

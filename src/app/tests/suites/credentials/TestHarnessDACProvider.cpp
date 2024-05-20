@@ -29,6 +29,7 @@
 #include <platform/CHIPDeviceConfig.h>
 
 #include <fstream>
+#include <string>
 
 //-> format_version = 1
 //-> vendor_id = 0xFFF1/0xFFF2/0xFFF3

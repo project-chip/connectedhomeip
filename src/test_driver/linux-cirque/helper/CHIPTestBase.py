@@ -299,13 +299,13 @@ class CHIPVirtualHome:
         assert(Not)Equal
         python unittest style functions that raise exceptions when condition not met
         '''
-        if not (exp is True):
+        if exp is not True:
             if note:
                 self.logger.error(note)
             raise AssertionError
 
     def assertFalse(self, exp, note=None):
-        if not (exp is False):
+        if exp is not False:
             if note:
                 self.logger.error(note)
             raise AssertionError

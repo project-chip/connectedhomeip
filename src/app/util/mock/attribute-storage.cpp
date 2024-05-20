@@ -33,12 +33,13 @@
 #include <app/MessageDef/AttributeDataIB.h>
 #include <app/MessageDef/AttributeReportIB.h>
 #include <app/MessageDef/AttributeStatusIB.h>
-#include <app/util/af.h>
 #include <app/util/att-storage.h>
+#include <app/util/attribute-storage.h>
+#include <app/util/endpoint-config-api.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/MockNodeConfig.h>
 
-#include <app/AttributeAccessInterface.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventManagement.h>
 #include <lib/core/CHIPCore.h>
@@ -151,6 +152,50 @@ uint8_t emberAfGetClusterCountForEndpoint(EndpointId endpointId)
     return static_cast<uint8_t>(endpoint->clusters.size());
 }
 
+const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId)
+{
+    auto ep = GetMockNodeConfig().endpointById(endpointId);
+    VerifyOrReturnValue(ep != nullptr, nullptr);
+
+    auto cluster = ep->clusterById(clusterId);
+    VerifyOrReturnValue(cluster != nullptr, nullptr);
+
+    auto attr = cluster->attributeById(attributeId);
+    VerifyOrReturnValue(attr != nullptr, nullptr);
+
+    return &attr->attributeMetaData;
+}
+
+const EmberAfCluster * emberAfFindClusterInType(const EmberAfEndpointType * endpointType, ClusterId clusterId,
+                                                EmberAfClusterMask mask, uint8_t * index)
+{
+    // This is a copy & paste implementation from ember attribute storage
+    // TODO: this hard-codes ember logic and is duplicated code.
+    uint8_t scopedIndex = 0;
+
+    for (uint8_t i = 0; i < endpointType->clusterCount; i++)
+    {
+        const EmberAfCluster * cluster = &(endpointType->cluster[i]);
+
+        if (mask == 0 || ((cluster->mask & mask) != 0))
+        {
+            if (cluster->clusterId == clusterId)
+            {
+                if (index)
+                {
+                    *index = scopedIndex;
+                }
+
+                return cluster;
+            }
+
+            scopedIndex++;
+        }
+    }
+
+    return nullptr;
+}
+
 uint8_t emberAfClusterCount(chip::EndpointId endpoint, bool server)
 {
     return (server) ? emberAfGetClusterCountForEndpoint(endpoint) : 0;
@@ -257,18 +302,26 @@ const EmberAfCluster * emberAfFindServerCluster(EndpointId endpointId, ClusterId
     return cluster->emberCluster();
 }
 
+DataVersion * emberAfDataVersionStorage(const chip::app::ConcreteClusterPath & aConcreteClusterPath)
+{
+    // shared data version storage
+    return &dataVersion;
+}
+
 namespace chip {
 namespace app {
 
-AttributeAccessInterface * GetAttributeAccessOverride(EndpointId aEndpointId, ClusterId aClusterId)
+EndpointId EnabledEndpointsWithServerCluster::operator*() const
 {
-    return nullptr;
+    return emberAfEndpointFromIndex(mEndpointIndex);
 }
 
-EnabledEndpointsWithServerCluster::EnabledEndpointsWithServerCluster(ClusterId clusterId) : mClusterId(clusterId)
+EnabledEndpointsWithServerCluster::EnabledEndpointsWithServerCluster(ClusterId clusterId) :
+    mEndpointCount(emberAfEndpointCount()), mClusterId(clusterId)
 {
     EnsureMatchingEndpoint();
 }
+
 EnabledEndpointsWithServerCluster & EnabledEndpointsWithServerCluster::operator++()
 {
     ++mEndpointIndex;
@@ -293,7 +346,13 @@ void EnabledEndpointsWithServerCluster::EnsureMatchingEndpoint()
 }
 
 } // namespace app
+
 namespace Test {
+
+void ResetVersion()
+{
+    dataVersion = 0;
+}
 
 void BumpVersion()
 {
@@ -306,8 +365,7 @@ DataVersion GetVersion()
 }
 
 CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath,
-                                     AttributeReportIBs::Builder & aAttributeReports,
-                                     AttributeValueEncoder::AttributeEncodeState * apEncoderState)
+                                     AttributeReportIBs::Builder & aAttributeReports, AttributeEncodeState * apEncoderState)
 {
     bool dataExists =
         (emberAfGetServerAttributeIndexByAttributeId(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId) != UINT16_MAX);
@@ -336,9 +394,11 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
     // Attribute 4 acts as a large attribute to trigger chunking.
     if (aPath.mAttributeId == MockAttributeId(4))
     {
-        AttributeValueEncoder::AttributeEncodeState state =
-            (apEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *apEncoderState);
-        AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex, aPath, dataVersion, false, state);
+        AttributeEncodeState state(apEncoderState);
+        Access::SubjectDescriptor subject;
+        subject.fabricIndex = aAccessingFabricIndex;
+
+        AttributeValueEncoder valueEncoder(aAttributeReports, subject, aPath, dataVersion, /* aIsFabricFiltered = */ false, state);
 
         CHIP_ERROR err = valueEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
             for (int i = 0; i < 6; i++)
@@ -391,6 +451,17 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
 
     ReturnErrorOnFailure(attributeData.EndOfAttributeDataIB());
     return attributeReport.EndOfAttributeReportIB();
+}
+
+void SetMockNodeConfig(const MockNodeConfig & config)
+{
+    mockConfig = &config;
+}
+
+/// Resets the mock attribute storage to the default configuration.
+void ResetMockNodeConfig()
+{
+    mockConfig = nullptr;
 }
 
 } // namespace Test

@@ -287,6 +287,7 @@ complexity:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/CHIPToolActivity.kt"
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/ClusterDetailFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/AddressUpdateFragment.kt"
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/GroupSettingFragment.kt"
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/OnOffClientFragment.kt"
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/OtaProviderClientFragment.kt"
@@ -342,6 +343,7 @@ complexity:
             - "**/src/controller/java/tests/matter/tlv/TlvReaderTest.kt"
     LargeClass:
         excludes:
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/WildcardFragment.kt"
             - "**/src/controller/java/generated/java/**/*"
             - "**/src/controller/java/tests/matter/tlv/TlvReadWriteTest.kt"
             - "**/src/controller/java/tests/matter/jsontlv/JsonToTlvToJsonTest.kt"

@@ -17,9 +17,10 @@
 package com.matter.casting.core;
 
 import com.matter.casting.support.EndpointFilter;
+import com.matter.casting.support.MatterCallback;
+import com.matter.casting.support.MatterError;
 import java.net.InetAddress;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * The CastingPlayer interface defines a Matter commissioner that is able to play media to a
@@ -48,6 +49,10 @@ public interface CastingPlayer {
 
   long getDeviceType();
 
+  boolean getSupportsCommissionerGeneratedPasscode();
+
+  List<Endpoint> getEndpoints();
+
   @Override
   String toString();
 
@@ -68,27 +73,30 @@ public interface CastingPlayer {
    *     that the client wants to interact with after commissioning. If this value is passed in, the
    *     VerifyOrEstablishConnection will force User Directed Commissioning, in case the desired
    *     Endpoint is not found in the on device CastingStore.
-   * @return A CompletableFuture that completes when the VerifyOrEstablishConnection is completed.
-   *     The CompletableFuture will be completed with a Void value if the
-   *     VerifyOrEstablishConnection is successful. Otherwise, the CompletableFuture will be
-   *     completed with an Exception. The Exception will be of type
-   *     com.matter.casting.core.CastingException. If the VerifyOrEstablishConnection fails, the
-   *     CastingException will contain the error code and message from the CastingApp.
+   * @param successCallback called when the connection is established successfully
+   * @param failureCallback called with MatterError when the connection is fails to establish
+   * @return MatterError - Matter.NO_ERROR if request submitted successfully, otherwise a
+   *     MatterError object corresponding to the error
    */
-  CompletableFuture<Void> VerifyOrEstablishConnection(
-      long commissioningWindowTimeoutSec, EndpointFilter desiredEndpointFilter);
+  MatterError verifyOrEstablishConnection(
+      long commissioningWindowTimeoutSec,
+      EndpointFilter desiredEndpointFilter,
+      MatterCallback<Void> successCallback,
+      MatterCallback<MatterError> failureCallback);
 
   /**
    * Verifies that a connection exists with this CastingPlayer, or triggers a new session request.
    * If the CastingApp does not have the nodeId and fabricIndex of this CastingPlayer cached on
    * disk, this will execute the user directed commissioning process.
    *
-   * @return A CompletableFuture that completes when the VerifyOrEstablishConnection is completed.
-   *     The CompletableFuture will be completed with a Void value if the
-   *     VerifyOrEstablishConnection is successful. Otherwise, the CompletableFuture will be
-   *     completed with an Exception. The Exception will be of type
-   *     com.matter.casting.core.CastingException. If the VerifyOrEstablishConnection fails, the
-   *     CastingException will contain the error code and message from the CastingApp.
+   * @param successCallback called when the connection is established successfully
+   * @param failureCallback called with MatterError when the connection is fails to establish
+   * @return MatterError - Matter.NO_ERROR if request submitted successfully, otherwise a
+   *     MatterError object corresponding to the error
    */
-  CompletableFuture<Void> VerifyOrEstablishConnection();
+  MatterError verifyOrEstablishConnection(
+      MatterCallback<Void> successCallback, MatterCallback<MatterError> failureCallback);
+
+  /** @brief Sets the internal connection state of this CastingPlayer to "disconnected" */
+  void disconnect();
 }

@@ -647,7 +647,7 @@ void * __wrap_realloc(void * ptr, size_t new_size)
     return pvPortRealloc(ptr, new_size);
 }
 
-void * __wrap_calloc(size_t num, size_t size)
+__attribute__((used)) void * __wrap_calloc(size_t num, size_t size)
 {
     return pvPortCalloc(num, size);
 }

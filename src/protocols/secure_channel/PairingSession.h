@@ -96,7 +96,7 @@ public:
      * @param session     Reference to the secure session that will be initialized once pairing is complete
      * @return CHIP_ERROR The result of session derivation
      */
-    virtual CHIP_ERROR DeriveSecureSession(CryptoContext & session) const = 0;
+    virtual CHIP_ERROR DeriveSecureSession(CryptoContext & session) = 0;
 
     const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const { return mRemoteSessionParams.GetMRPConfig(); }
     const SessionParameters & GetRemoteSessionParameters() const { return mRemoteSessionParams; }
@@ -139,14 +139,14 @@ protected:
         return CHIP_ERROR_INTERNAL;
     }
 
-    void SendStatusReport(Messaging::ExchangeContext * exchangeCtxt, uint16_t protocolCode)
+    void SendStatusReport(Optional<Messaging::ExchangeHandle> & exchangeCtxt, uint16_t protocolCode)
     {
         Protocols::SecureChannel::GeneralStatusCode generalCode = (protocolCode == Protocols::SecureChannel::kProtocolCodeSuccess)
             ? Protocols::SecureChannel::GeneralStatusCode::kSuccess
             : Protocols::SecureChannel::GeneralStatusCode::kFailure;
 
         ChipLogDetail(SecureChannel, "Sending status report. Protocol code %d, exchange %d", protocolCode,
-                      exchangeCtxt->GetExchangeId());
+                      exchangeCtxt.Value()->GetExchangeId());
 
         Protocols::SecureChannel::StatusReport statusReport(generalCode, Protocols::SecureChannel::Id, protocolCode);
 
@@ -159,7 +159,7 @@ protected:
         System::PacketBufferHandle msg = bbuf.Finalize();
         VerifyOrReturn(!msg.IsNull(), ChipLogError(SecureChannel, "Failed to allocate status report message"));
 
-        CHIP_ERROR err = exchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::StatusReport, std::move(msg));
+        CHIP_ERROR err = exchangeCtxt.Value()->SendMessage(Protocols::SecureChannel::MsgType::StatusReport, std::move(msg));
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(SecureChannel, "Failed to send status report message: %" CHIP_ERROR_FORMAT, err.Format());
@@ -238,13 +238,14 @@ protected:
     SessionHolderWithDelegate mSecureSessionHolder;
     // mSessionManager is set if we actually allocate a secure session, so we
     // can clean it up later as needed.
-    SessionManager * mSessionManager           = nullptr;
-    Messaging::ExchangeContext * mExchangeCtxt = nullptr;
-    SessionEstablishmentDelegate * mDelegate   = nullptr;
+    SessionManager * mSessionManager                  = nullptr;
+    Optional<Messaging::ExchangeHandle> mExchangeCtxt = NullOptional;
+    SessionEstablishmentDelegate * mDelegate          = nullptr;
 
     // mLocalMRPConfig is our config which is sent to the other end and used by the peer session.
     // mRemoteSessionParams is received from other end and set to our session.
-    ReliableMessageProtocolConfig mLocalMRPConfig = GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig());
+    // It is set the first time that session establishment is initiated.
+    Optional<ReliableMessageProtocolConfig> mLocalMRPConfig;
     SessionParameters mRemoteSessionParams;
 
 private:

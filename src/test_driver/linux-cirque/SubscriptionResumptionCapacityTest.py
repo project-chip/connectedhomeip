@@ -52,7 +52,7 @@ CHIP_REPO = os.path.join(os.path.abspath(
 TEST_EXTPANID = "fedcba9876543210"
 TEST_DISCRIMINATOR = 3840
 MATTER_DEVELOPMENT_PAA_ROOT_CERTS = "credentials/development/paa-root-certs"
-TEST_END_DEVICE_APP = "chip-all-clusters-app"
+TEST_END_DEVICE_APP = "standalone/chip-all-clusters-app"
 TEST_SUBSCRIPTION_CAPACITY = 3
 
 
@@ -119,7 +119,7 @@ class TestSubscriptionResumptionCapacity(CHIPVirtualHome):
             ("CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q -ex \"set pagination off\" "
              "-ex run -ex \"thread apply all bt\" --args {} --thread --discriminator {} "
              "--subscription-capacity {}").format(
-                 os.path.join(CHIP_REPO, "out/debug/standalone", TEST_END_DEVICE_APP), TEST_DISCRIMINATOR,
+                 os.path.join(CHIP_REPO, "out/debug", TEST_END_DEVICE_APP), TEST_DISCRIMINATOR,
                  TEST_SUBSCRIPTION_CAPACITY))
 
         self.reset_thread_devices(server_ids)

@@ -32,6 +32,7 @@
 #include <app/RequiredPrivilege.h>
 #include <app/reporting/Engine.h>
 #include <app/util/MatterCallbacks.h>
+#include <app/util/ember-compatibility-functions.h>
 
 using namespace chip::Access;
 
@@ -81,13 +82,19 @@ bool Engine::IsClusterDataVersionMatch(const SingleLinkedListNode<DataVersionFil
 CHIP_ERROR
 Engine::RetrieveClusterData(const SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
                             AttributeReportIBs::Builder & aAttributeReportIBs, const ConcreteReadAttributePath & aPath,
-                            AttributeValueEncoder::AttributeEncodeState * aEncoderState)
+                            AttributeEncodeState * aEncoderState)
 {
     ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Attribute %" PRIx32 " is dirty", aPath.mClusterId,
                   aPath.mAttributeId);
-    MatterPreAttributeReadCallback(aPath);
+
+    DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Read,
+                                                          DataModelCallbacks::OperationOrder::Pre, aPath);
+
     ReturnErrorOnFailure(ReadSingleClusterData(aSubjectDescriptor, aIsFabricFiltered, aPath, aAttributeReportIBs, aEncoderState));
-    MatterPostAttributeReadCallback(aPath);
+
+    DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Read,
+                                                          DataModelCallbacks::OperationOrder::Post, aPath);
+
     return CHIP_NO_ERROR;
 }
 
@@ -192,21 +199,21 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             attributeReportIBs.Checkpoint(attributeBackup);
             ConcreteReadAttributePath pathForRetrieval(readPath);
             // Load the saved state from previous encoding session for chunking of one single attribute (list chunking).
-            AttributeValueEncoder::AttributeEncodeState encodeState = apReadHandler->GetAttributeEncodeState();
+            AttributeEncodeState encodeState = apReadHandler->GetAttributeEncodeState();
             err = RetrieveClusterData(apReadHandler->GetSubjectDescriptor(), apReadHandler->IsFabricFiltered(), attributeReportIBs,
                                       pathForRetrieval, &encodeState);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(DataManagement,
-                             "Error retrieving data from clusterId: " ChipLogFormatMEI ", err = %" CHIP_ERROR_FORMAT,
-                             ChipLogValueMEI(pathForRetrieval.mClusterId), err.Format());
-
                 // If error is not an "out of writer space" error, rollback and encode status.
                 // Otherwise, if partial data allowed, save the encode state.
                 // Otherwise roll back. If we have already encoded some chunks, we are done; otherwise encode status.
 
                 if (encodeState.AllowPartialData() && IsOutOfWriterSpaceError(err))
                 {
+                    ChipLogDetail(DataManagement,
+                                  "List does not fit in packet, chunk between list items for clusterId: " ChipLogFormatMEI
+                                  ", attributeId: " ChipLogFormatMEI,
+                                  ChipLogValueMEI(pathForRetrieval.mClusterId), ChipLogValueMEI(pathForRetrieval.mAttributeId));
                     // Encoding is aborted but partial data is allowed, then we don't rollback and save the state for next chunk.
                     // The expectation is that RetrieveClusterData has already reset attributeReportIBs to a good state (rolled
                     // back any partially-written AttributeReportIB instances, reset its error status).  Since AllowPartialData()
@@ -219,10 +226,15 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                     // We met a error during writing reports, one common case is we are running out of buffer, rollback the
                     // attributeReportIB to avoid any partial data.
                     attributeReportIBs.Rollback(attributeBackup);
-                    apReadHandler->SetAttributeEncodeState(AttributeValueEncoder::AttributeEncodeState());
+                    apReadHandler->SetAttributeEncodeState(AttributeEncodeState());
 
                     if (!IsOutOfWriterSpaceError(err))
                     {
+                        ChipLogError(DataManagement,
+                                     "Fail to retrieve data, roll back and encode status on clusterId: " ChipLogFormatMEI
+                                     ", attributeId: " ChipLogFormatMEI "err = %" CHIP_ERROR_FORMAT,
+                                     ChipLogValueMEI(pathForRetrieval.mClusterId), ChipLogValueMEI(pathForRetrieval.mAttributeId),
+                                     err.Format());
                         // Try to encode our error as a status response.
                         err = attributeReportIBs.EncodeAttributeStatus(pathForRetrieval, StatusIB(err));
                         if (err != CHIP_NO_ERROR)
@@ -232,11 +244,19 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                             attributeReportIBs.Rollback(attributeBackup);
                         }
                     }
+                    else
+                    {
+                        ChipLogDetail(DataManagement,
+                                      "Next attribute value does not fit in packet, roll back on clusterId: " ChipLogFormatMEI
+                                      ", attributeId: " ChipLogFormatMEI ", err = %" CHIP_ERROR_FORMAT,
+                                      ChipLogValueMEI(pathForRetrieval.mClusterId), ChipLogValueMEI(pathForRetrieval.mAttributeId),
+                                      err.Format());
+                    }
                 }
             }
             SuccessOrExit(err);
             // Successfully encoded the attribute, clear the internal state.
-            apReadHandler->SetAttributeEncodeState(AttributeValueEncoder::AttributeEncodeState());
+            apReadHandler->SetAttributeEncodeState(AttributeEncodeState());
         }
         // We just visited all paths interested by this read handler and did not abort in the middle of iteration, there are no more
         // chunks for this report.
@@ -994,9 +1014,6 @@ void Engine::ScheduleUrgentEventDeliverySync(Optional<FabricIndex> fabricIndex)
 }; // namespace reporting
 } // namespace app
 } // namespace chip
-
-void __attribute__((weak)) MatterPreAttributeReadCallback(const chip::app::ConcreteAttributePath & attributePath) {}
-void __attribute__((weak)) MatterPostAttributeReadCallback(const chip::app::ConcreteAttributePath & attributePath) {}
 
 // TODO: MatterReportingAttributeChangeCallback should just live in libCHIP,
 // instead of being in ember-compatibility-functions.  It does not depend on any

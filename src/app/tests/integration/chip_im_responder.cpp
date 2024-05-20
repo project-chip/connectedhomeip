@@ -25,7 +25,7 @@
  */
 
 #include "MockEvents.h"
-#include <app/AttributeAccessInterface.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
 #include <app/ConcreteAttributePath.h>
@@ -121,10 +121,9 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPat
 
 CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
                                  const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
-                                 AttributeValueEncoder::AttributeEncodeState * apEncoderState)
+                                 AttributeEncodeState * apEncoderState)
 {
-    ReturnErrorOnFailure(AttributeValueEncoder(aAttributeReports, 0, aPath, 0).Encode(kTestFieldValue1));
-    return CHIP_NO_ERROR;
+    return AttributeValueEncoder(aAttributeReports, aSubjectDescriptor, aPath, 0).Encode(kTestFieldValue1);
 }
 
 bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
