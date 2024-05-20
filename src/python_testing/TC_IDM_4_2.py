@@ -468,19 +468,17 @@ class TC_IDM_4_2(MatterBaseTest):
 
         # Subscribe to attribute with invalid reportInterval arguments, expect an error
         sub_cr1_invalid_intervals = None
-        try:
-            with asserts.assert_raises(ChipStackError):
-                sub_cr1_invalid_intervals = await CR1.ReadAttribute(
-                    nodeid=self.dut_node_id,
-                    attributes=node_label_attr_path,
-                    reportInterval=(20, 10),
-                    keepSubscriptions=False
-                )
-            # Verify no subscription was established
-            with asserts.assert_raises(AttributeError):
-                sub_cr1_invalid_intervals.subscriptionId
-        except Exception as e:
-            asserts.fail(f"Expected exception was not thrown. Instead, caught: {type(e).__name__}")
+        with asserts.assert_raises(ChipStackError, "Expected exception wasn't thrown."):
+            sub_cr1_invalid_intervals = await CR1.ReadAttribute(
+                nodeid=self.dut_node_id,
+                attributes=node_label_attr_path,
+                reportInterval=(20, 10),
+                keepSubscriptions=False
+            )
+            
+        # Verify no subscription was established
+        with asserts.assert_raises(AttributeError):
+            sub_cr1_invalid_intervals.subscriptionId
 
         # *** Step 11 ***
         self.print_step(
