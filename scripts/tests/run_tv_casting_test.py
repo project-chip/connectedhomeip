@@ -122,7 +122,7 @@ def handle_casting_failure(casting_state: str, log_file_paths: List[str]):
 def extract_value_from_string(line: str, value_name: str, casting_state: str, log_paths) -> str:
     """Extract and return value from given input string.
 
-    Some input string examples as they are received from the Linux tv-casting-app and tv-app output:
+    Some string examples as they are received from the Linux tv-casting-app and/or tv-app output:
     1. On 'darwin' machines:
         \x1b[0;34m[1715206773402] [20056:2842184] [DMG]  Cluster = 0x506,\x1b[0m
         The substring to be extracted here is '0x506'.
