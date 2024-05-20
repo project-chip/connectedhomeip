@@ -23,6 +23,7 @@ limitations under the License.
     <define>APPLICATION_BASIC_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
+    <globalAttribute code="0xFFFD" side="either" value="1"/>
     <description>This cluster provides information about an application running on a TV or media player device which is represented as an endpoint.</description>
     <attribute side="server" code="0x0000" define="APPLICATION_VENDOR_NAME"         type="char_string"                default=""     length="32"               writable="false" optional="true">VendorName</attribute>
     <attribute side="server" code="0x0001" define="APPLICATION_VENDOR_ID"           type="vendor_id"                  default="0x0"  min="0x0000" max="0xFFFF" writable="false" optional="true">VendorID</attribute>

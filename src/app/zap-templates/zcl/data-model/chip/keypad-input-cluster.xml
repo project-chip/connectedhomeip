@@ -23,8 +23,8 @@ limitations under the License.
     <define>KEYPAD_INPUT_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
+    <globalAttribute code="0xFFFD" side="either" value="1"/>
     <description>This cluster provides an interface for controlling a device like a TV using action commands such as UP, DOWN, and SELECT.</description>
-
     <features>
       <feature bit="0" code="NV" name="NavigationKeyCodes" summary="Supports UP, DOWN, LEFT, RIGHT, SELECT, BACK, EXIT, MENU">
         <optionalConform/>
@@ -42,7 +42,7 @@ limitations under the License.
       <arg name="KeyCode" type="CECKeyCodeEnum"/>
     </command>
 
-    <command source="server" code="0x01" name="SendKeyResponse" optional="false">
+    <command source="server" code="0x01" name="SendKeyResponse" optional="false" disableDefaultResponse="true">
       <description>This command SHALL be generated in response to a SendKey Request command.</description>
       <arg name="Status" type="StatusEnum"/>
     </command>

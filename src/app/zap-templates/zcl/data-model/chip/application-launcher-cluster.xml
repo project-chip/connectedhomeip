@@ -23,6 +23,7 @@ limitations under the License.
     <define>APPLICATION_LAUNCHER_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
+    <globalAttribute code="0xFFFD" side="either" value="1"/>
     <description>This cluster provides an interface for launching content on a media player device such as a TV or Speaker.</description>
 
     <features>
@@ -50,7 +51,7 @@ limitations under the License.
       <arg name="Application" type="ApplicationStruct" optional="true"/>
     </command>
 
-    <command source="server" code="0x03" name="LauncherResponse" optional="false">
+    <command source="server" code="0x03" name="LauncherResponse" optional="false" disableDefaultResponse="true">
       <description>This command SHALL be generated in response to LaunchApp commands.</description>
       <arg name="Status" type="StatusEnum"/>
       <arg name="Data" type="octet_string" optional="true"/>

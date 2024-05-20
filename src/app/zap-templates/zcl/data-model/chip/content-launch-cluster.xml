@@ -24,11 +24,9 @@ limitations under the License.
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <description>This cluster provides an interface for launching content on a media player device such as a TV or Speaker.</description>
-    <globalAttribute side="either" code="0xFFFD" value="1"/>
-
-    <attribute side="server" code="0x0000" define="CONTENT_LAUNCHER_ACCEPT_HEADER"                 type="array" entryType="char_string" length="254" writable="false" optional="true">AcceptHeader</attribute>
-    <attribute side="server" code="0x0001" define="CONTENT_LAUNCHER_SUPPORTED_STREAMING_PROTOCOLS" type="SupportedProtocolsBitmap" default="0"                       writable="false"  optional="true">SupportedStreamingProtocols</attribute>
-
+    <globalAttribute side="either" code="0xFFFD" value="2"/>
+    <attribute side="server" code="0x0000" define="CONTENT_LAUNCHER_ACCEPT_HEADER" type="array" entryType="char_string" length="100" optional="true">AcceptHeader</attribute>
+    <attribute side="server" code="0x0001" define="CONTENT_LAUNCHER_SUPPORTED_STREAMING_PROTOCOLS" type="SupportedProtocolsBitmap" default="0" optional="true" min="0x00000000" max="0x00000003">SupportedStreamingProtocols</attribute>
     <command source="client" code="0x00" name="LaunchContent" response="LauncherResponse" optional="true">
       <description>Upon receipt, this SHALL launch the specified content with optional search criteria.</description>
       <arg name="Search" type="ContentSearchStruct"/>
@@ -40,9 +38,10 @@ limitations under the License.
 
     <command source="client" code="0x01" name="LaunchURL" response="LauncherResponse" optional="true">
       <description>Upon receipt, this SHALL launch content from the specified URL.</description>
-      <arg name="ContentURL" type="char_string"/>
-      <arg name="DisplayString" type="char_string" optional="true"/>
-      <arg name="BrandingInformation" type="BrandingInformationStruct" optional="true"/>
+      <arg id="0" name="ContentURL" type="char_string"/>
+      <arg id="1" name="DisplayString" type="char_string" optional="true"/>
+      <arg id="2" name="BrandingInformation" type="BrandingInformationStruct" optional="true"/>
+      <arg id="3" name="PlaybackPreferences" type="PlaybackPreferencesStruct" optional="true"/>
     </command>
 
     <command source="server" code="0x02" name="LauncherResponse" optional="true" disableDefaultResponse="true">
@@ -60,9 +59,9 @@ limitations under the License.
 
   <struct name="AdditionalInfoStruct">
     <cluster code="0x050a"/>
-    <item name="Name" type="char_string" length="256" />
+    <item fieldId="0" name="Name" type="long_char_string" length="256"/>
     <!-- TODO: spec sets this max size, but seems impossible given UDP size limits -->
-    <item name="Value" type="char_string" length="8192" />
+    <item fieldId="1" name="Value" type="long_char_string" length="8192"/>
   </struct>
 
   <enum name="MetricTypeEnum" type="enum8">
@@ -79,21 +78,21 @@ limitations under the License.
   </struct>
 
   <struct name="StyleInformationStruct">
-      <cluster code="0x050a"/>
-      <!-- TODO: spec sets this max size, but seems impossible given UDP size limits -->
-      <item name="ImageURL" type="char_string" length="8192" optional="true"/>
-      <item name="Color" type="char_string" length="9" optional="true"/>
-      <item name="Size" type="DimensionStruct" optional="true"/>
+    <cluster code="0x050a"/>
+    <!-- TODO: spec sets this max size, but seems impossible given UDP size limits -->
+    <item fieldId="0" name="ImageURL" type="long_char_string" length="8192" optional="true"/>
+    <item fieldId="1" name="Color" type="char_string" length="9" optional="true" minLength="7"/>
+    <item fieldId="2" name="Size" type="DimensionStruct" optional="true"/>
   </struct>
 
   <struct name="BrandingInformationStruct">
     <cluster code="0x050a"/>
-    <item name="ProviderName" type="char_string" length="256" />
-    <item name="Background" type="StyleInformationStruct" optional="true"/>
-    <item name="Logo" type="StyleInformationStruct" optional="true"/>
-    <item name="ProgressBar" type="StyleInformationStruct" optional="true"/>
-    <item name="Splash" type="StyleInformationStruct" optional="true"/>
-    <item name="WaterMark" type="StyleInformationStruct" optional="true"/>
+    <item fieldId="0" name="ProviderName" type="long_char_string" length="256"/>
+    <item fieldId="1" name="Background" type="StyleInformationStruct" optional="true"/>
+    <item fieldId="2" name="Logo" type="StyleInformationStruct" optional="true"/>
+    <item fieldId="3" name="ProgressBar" type="StyleInformationStruct" optional="true"/>
+    <item fieldId="4" name="Splash" type="StyleInformationStruct" optional="true"/>
+    <item fieldId="5" name="WaterMark" type="StyleInformationStruct" optional="true"/>
   </struct>
 
 
@@ -129,23 +128,23 @@ limitations under the License.
 
   <struct name="ParameterStruct">
     <cluster code="0x050a"/>
-    <item name="Type" type="ParameterEnum"/>
-    <item name="Value" type="char_string" length="1024" />
-    <item name="ExternalIDList" type="AdditionalInfoStruct" array="true" optional="true"/>
+    <item fieldId="0" name="Type" type="ParameterEnum" min="0x00" max="0x10"/>
+    <item fieldId="1" name="Value" type="long_char_string" length="1024"/>
+    <item fieldId="2" name="ExternalIDList" type="AdditionalInfoStruct" array="true" optional="true"/>
   </struct>
 
   <struct name="PlaybackPreferencesStruct">
     <cluster code="0x050a"/>
-    <item name="PlaybackPosition" type="int64u"/>
-    <item name="TextTrack" type="TrackPreferenceStruct"/>
-    <item name="AudioTracks" type="TrackPreferenceStruct" array="true" optional="true"/>
+    <item fieldId="0" name="PlaybackPosition" type="int64u" isNullable="true" optional="true"/>
+    <item fieldId="1" name="TextTrack" type="TrackPreferenceStruct" isNullable="true" optional="true"/>
+    <item fieldId="2" name="AudioTracks" type="TrackPreferenceStruct" array="true" optional="true" isNullable="true"/>
   </struct>
 
   <struct name="TrackPreferenceStruct">
     <cluster code="0x050a"/>
-    <item name="LanguageCode" type="char_string" length="32" optional="false"/>
-    <item name="Characteristics" type="CharacteristicEnum" array="true" optional="true"/>
-    <item name="AudioOutputIndex" type="int8u"/>
+    <item fieldId="0" name="LanguageCode" type="char_string" length="32"/>
+    <item fieldId="1" name="Characteristics" type="CharacteristicEnum" array="true" optional="true" isNullable="true"/>
+    <item fieldId="2" name="AudioOutputIndex" type="int8u" isNullable="true" optional="true"/>
   </struct>
 
   <enum name="CharacteristicEnum" type="enum8">
@@ -177,12 +176,11 @@ limitations under the License.
   </bitmap>
 
   <bitmap name="Feature" type="bitmap32">
-     <cluster code="0x050a"/>
-     <field name="ContentSearch" mask="0x1"/>
-     <field name="URLPlayback" mask="0x2"/>
-     <field name="AdvancedSeek" mask="0x3"/>
-     <field name="TextTracks" mask="0x4"/>
-     <field name="AudioTracks" mask="0x5"/>
-   </bitmap>
-
+    <cluster code="0x050a"/>
+    <field name="ContentSearch" mask="0x1"/>
+    <field name="URLPlayback" mask="0x2"/>
+    <field name="AdvancedSeek" mask="0x04"/>
+    <field name="TextTracks" mask="0x08"/>
+    <field name="AudioTracks" mask="0x10"/>
+  </bitmap>
 </configurator>
