@@ -59,6 +59,8 @@ public:
                            chip::CommandId commandId,
                            const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::Type & value)
     {
+        mPeerNodeId = device->GetDeviceId();
+        mFabricIndex = device->GetSecureSession().Value()->GetFabricIndex();
         ReturnErrorOnFailure(InteractionModelCommands::SendCommand(device, endpointId, clusterId, commandId, value));
 
         if (value.transferFileDesignator.HasValue() &&
@@ -107,6 +109,15 @@ public:
                 ChipLogError(chipTool, "Response Failure: Can not decode Data");
                 mError = error;
                 return;
+            }
+        }
+        if ((path.mEndpointId == chip::kRootEndpointId) && (path.mClusterId == chip::app::Clusters::IcdManagement::Id) && (path.mCommandId == chip::app::Clusters::IcdManagement::Commands::UnregisterClient::Id))
+        {
+            CHIP_ERROR deleteEntryError =
+                CHIPCommand::sICDClientStorage.DeleteEntry(chip::ScopedNodeId(mPeerNodeId, mFabricIndex));
+            if (deleteEntryError != CHIP_NO_ERROR)
+            {
+                ChipLogError(chipTool, "Failed to delete ICD entry: %s", chip::ErrorStr(deleteEntryError));
             }
         }
     }
@@ -208,7 +219,8 @@ protected:
 private:
     chip::ClusterId mClusterId;
     chip::CommandId mCommandId;
-
+    chip::FabricIndex mFabricIndex = 0;
+    chip::NodeId mPeerNodeId = 0;
     CHIP_ERROR mError = CHIP_NO_ERROR;
     CustomArgument mPayload;
 };
