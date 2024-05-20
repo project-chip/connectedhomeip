@@ -138,11 +138,12 @@ chip_test_suite("tests") {
   output_name = "libAppTests"
 
   sources = [
-    "${chip_root}/src/messaging/tests/ReliableMessageContextTestAccess.h",
     "CommandHandlerTestAccess.h",
     "CommandSenderTestAccess.h",
     "EngineTestAccess.h",
     "ReadHandlerTestAccess.h",
+    "WriteClientTestAccess.h",
+    "WriteHandlerTestAccess.h",
   ]
   test_sources = [
     "TestAclAttribute.cpp",
