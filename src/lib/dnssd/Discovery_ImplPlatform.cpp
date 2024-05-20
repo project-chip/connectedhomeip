@@ -94,12 +94,12 @@ static void HandleNodeBrowse(void * context, DnssdService * services, size_t ser
         // For some platforms browsed services are already resolved, so verify if resolve is really needed or call resolve callback
 
         auto & ipAddress = services[i].mAddress;
-        bool isOperationalBrowse = (strncmp(services[i].mType, kOperationalServiceName, sizeof(kOperationalServiceName)) == 0 
+        bool isOperationalBrowse = (strncmp(services[i].mType, kOperationalServiceName, sizeof(kOperationalServiceName)) == 0
                                         && strlen(services[i].mType) == strlen(kOperationalServiceName));
 
-        // if SRV, TXT and AAAA records were received in DNS responses, also for operational browse result we currently 
+        // if SRV, TXT and AAAA records were received in DNS responses, also for operational browse result we currently
         // don't need IP address hence skip resolution.
-        if ( !isOperationalBrowse && (strlen(services[i].mHostName) == 0 
+        if ( !isOperationalBrowse && (strlen(services[i].mHostName) == 0
                 || services[i].mTextEntrySize == 0 || !ipAddress.has_value()))
         {
             ChipDnssdResolve(&services[i], services[i].mInterface, HandleNodeResolve, context);
