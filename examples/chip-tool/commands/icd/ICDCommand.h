@@ -19,8 +19,12 @@
 #pragma once
 
 #include "../common/CHIPCommand.h"
+#include "commands/clusters/ClusterCommand.h"
 #include "commands/common/Commands.h"
 
+#include <app/CommandSender.h>
+#include <app/icd/client/DefaultCheckInDelegate.h>
+#include <app/tests/suites/commands/interaction_model/InteractionModel.h>
 #include <lib/support/Span.h>
 
 class ICDCommand : public CHIPCommand
@@ -42,4 +46,29 @@ public:
     CHIP_ERROR RunCommand() override;
 };
 
+class ICDWaitForDeviceCommand : public ClusterCommand, public chip::app::DefaultCheckInDelegate
+{
+public:
+    ICDWaitForDeviceCommand(CredentialIssuerCommands * credIssuerCmds) : ClusterCommand("wait-for-device", credIssuerCmds)
+    {
+        ModelCommand::AddArguments(/* skipEndpoints= */ true);
+        AddArgument("stay-active-duration-seconds", 30, UINT32_MAX, &mStayActiveDurationSeconds,
+                    "The requested duration in seconds for the device to stay active after check-in completes.");
+    }
+
+    virtual ~ICDWaitForDeviceCommand() = default;
+
+    CHIP_ERROR RunCommand() override;
+
+    void OnCheckInComplete(const chip::app::ICDClientInfo & clientInfo) override;
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endPointIds) override;
+
+private:
+    chip::ScopedNodeId mInterestedNode;
+    uint32_t mStayActiveDurationSeconds = 30;
+};
+
 void registerCommandsICD(Commands & commands, CredentialIssuerCommands * credsIssuerConfig);
+
+chip::app::DefaultCheckInDelegate * ChipToolCheckInDelegate();

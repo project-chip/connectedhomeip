@@ -120,8 +120,6 @@
     "GeneralDiagnostics": ["Test_TC_DGGEN_2_2"],
     "Identify": ["Test_TC_I_3_2"],
     "IcdManagement": [
-        "Test_TC_ICDM_2_2",
-        "Test_TC_ICDM_3_1",
         "Test_TC_ICDM_3_2",
         "Test_TC_ICDM_3_3",
         "Test_TC_ICDM_4_1",

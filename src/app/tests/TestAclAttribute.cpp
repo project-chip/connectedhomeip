@@ -259,10 +259,10 @@ const nlTest sTests[] = {
 nlTestSuite sSuite = {
     "TestAclAttribute",
     &sTests[0],
-    TestAccessContext::nlTestSetUpTestSuite,
-    TestAccessContext::nlTestTearDownTestSuite,
-    TestAccessContext::nlTestSetUp,
-    TestAccessContext::nlTestTearDown,
+    NL_TEST_WRAP_FUNCTION(TestAccessContext::SetUpTestSuite),
+    NL_TEST_WRAP_FUNCTION(TestAccessContext::TearDownTestSuite),
+    NL_TEST_WRAP_METHOD(TestAccessContext, SetUp),
+    NL_TEST_WRAP_METHOD(TestAccessContext, TearDown),
 };
 
 } // namespace

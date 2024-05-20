@@ -27,7 +27,7 @@
 #include "esp_system.h"
 #include "lib/core/CHIPError.h"
 
-#if CONFIG_ENABLE_ENCRYPTED_OTA
+#ifdef CONFIG_ENABLE_ENCRYPTED_OTA
 #include <esp_encrypted_img.h>
 #endif // CONFIG_ENABLE_ENCRYPTED_OTA
 
@@ -150,7 +150,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
         return;
     }
 
-#if CONFIG_ENABLE_ENCRYPTED_OTA
+#ifdef CONFIG_ENABLE_ENCRYPTED_OTA
     CHIP_ERROR chipError = imageProcessor->DecryptStart();
     if (chipError != CHIP_NO_ERROR)
     {
@@ -171,7 +171,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
     auto * imageProcessor          = reinterpret_cast<OTAImageProcessorImpl *>(context);
     VerifyOrReturn(imageProcessor, ChipLogError(SoftwareUpdate, "ImageProcessor context is null"));
 
-#if CONFIG_ENABLE_ENCRYPTED_OTA
+#ifdef CONFIG_ENABLE_ENCRYPTED_OTA
     if (CHIP_NO_ERROR != imageProcessor->DecryptEnd())
     {
         ChipLogError(SoftwareUpdate, "Failed to end pre encrypted OTA");
@@ -213,7 +213,7 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
         return;
     }
 
-#if CONFIG_ENABLE_ENCRYPTED_OTA
+#ifdef CONFIG_ENABLE_ENCRYPTED_OTA
     imageProcessor->DecryptAbort();
 #endif // CONFIG_ENABLE_ENCRYPTED_OTA
 
@@ -253,7 +253,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
     esp_err_t err;
     ByteSpan blockToWrite = block;
 
-#if CONFIG_ENABLE_ENCRYPTED_OTA
+#ifdef CONFIG_ENABLE_ENCRYPTED_OTA
     error = imageProcessor->DecryptBlock(block, blockToWrite);
     if (error != CHIP_NO_ERROR)
     {
@@ -266,7 +266,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 
     err = esp_ota_write(imageProcessor->mOTAUpdateHandle, blockToWrite.data(), blockToWrite.size());
 
-#if CONFIG_ENABLE_ENCRYPTED_OTA
+#ifdef CONFIG_ENABLE_ENCRYPTED_OTA
     free((void *) (blockToWrite.data()));
 #endif // CONFIG_ENABLE_ENCRYPTED_OTA
 
@@ -297,7 +297,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
 
     PostOTAStateChangeEvent(DeviceLayer::kOtaApplyComplete);
 
-#if CONFIG_OTA_AUTO_REBOOT_ON_APPLY
+#ifdef CONFIG_OTA_AUTO_REBOOT_ON_APPLY
     // HandleApply is called after delayed action time seconds are elapsed, so it would be safe to schedule the restart
     DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(CONFIG_OTA_AUTO_REBOOT_DELAY_MS), HandleRestart, nullptr);
 #else
@@ -362,7 +362,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
     return CHIP_NO_ERROR;
 }
 
-#if CONFIG_ENABLE_ENCRYPTED_OTA
+#ifdef CONFIG_ENABLE_ENCRYPTED_OTA
 CHIP_ERROR OTAImageProcessorImpl::InitEncryptedOTA(const CharSpan & key)
 {
     VerifyOrReturnError(mEncryptedOTAEnabled == false, CHIP_ERROR_INCORRECT_STATE);
