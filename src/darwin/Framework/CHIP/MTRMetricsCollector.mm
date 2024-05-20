@@ -20,6 +20,7 @@
 #import "MTRMetrics.h"
 #import "MTRMetrics_Internal.h"
 #import <MTRUnfairLock.h>
+#import <os/lock.h>
 #include <platform/Darwin/Tracing.h>
 #include <system/SystemClock.h>
 #include <tracing/metric_event.h>

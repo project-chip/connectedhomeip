@@ -1020,6 +1020,65 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
     });
 }
 
+static NSString * sDeviceDataKeyPrefix = @"deviceData";
+
+- (NSString *)_deviceDataKeyForNodeID:(NSNumber *)nodeID
+{
+    return [sDeviceDataKeyPrefix stringByAppendingFormat:@":0x%016llX", nodeID.unsignedLongLongValue];
+}
+
+- (nullable NSDictionary<NSString *, id> *)getStoredDeviceDataForNodeID:(NSNumber *)nodeID
+{
+    __block NSDictionary<NSString *, id> * deviceData = nil;
+    dispatch_sync(_storageDelegateQueue, ^{
+        MTRDeviceController * controller = self->_controller;
+        VerifyOrReturn(controller != nil); // No way to call delegate without controller.
+
+        id data;
+        @autoreleasepool {
+            data = [self->_storageDelegate controller:controller
+                                          valueForKey:[self _deviceDataKeyForNodeID:nodeID]
+                                        securityLevel:MTRStorageSecurityLevelSecure
+                                          sharingType:MTRStorageSharingTypeNotShared];
+        }
+        if (data == nil) {
+            return;
+        }
+
+        if (![data isKindOfClass:NSDictionary.class]) {
+            return;
+        }
+
+        // Check that all the keys are in fact strings.
+        NSDictionary * dictionary = data;
+        for (id key in dictionary) {
+            if (![key isKindOfClass:NSString.class]) {
+                return;
+            }
+        }
+
+        // We can't do value type verification; our API consumer will need
+        // to do that.
+        deviceData = dictionary;
+    });
+    return deviceData;
+}
+
+- (void)storeDeviceData:(NSDictionary<NSString *, id> *)data forNodeID:(NSNumber *)nodeID
+{
+    dispatch_async(_storageDelegateQueue, ^{
+        MTRDeviceController * controller = self->_controller;
+        VerifyOrReturn(controller != nil); // No way to call delegate without controller.
+
+        // Ignore store failures, since they are not actionable for us here.
+        [self->_storageDelegate controller:controller
+                                storeValue:data
+                                    forKey:[self _deviceDataKeyForNodeID:nodeID]
+                             securityLevel:MTRStorageSecurityLevelSecure
+                               sharingType:MTRStorageSharingTypeNotShared];
+    });
+}
+
 @end
 
 @implementation MTRCASESessionResumptionInfo
