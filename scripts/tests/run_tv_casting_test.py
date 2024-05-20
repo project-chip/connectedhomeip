@@ -122,21 +122,35 @@ def handle_casting_failure(casting_state: str, log_file_paths: List[str]):
 def extract_value_from_string(line: str, value_name: str, casting_state: str, log_paths) -> str:
     """Extract and return value from given input string.
 
-    The string is expected to be in the following format as it is received
-    from the Linux tv-casting-app output:
-    \x1b[0;34m[1715206773402] [20056:2842184] [DMG]  Cluster = 0x506,\x1b[0m
-    The substring to be extracted here is '0x506'.
-    Or:
-    \x1b[0;32m[1714582264602] [77989:2286038] [SVR] Discovered Commissioner #0\x1b[0m
-    The integer value to be extracted here is '0'.
-    Or:
-    \x1b[0;34m[1713741926895] [7276:9521344] [DIS] Vendor ID: 65521\x1b[0m
-    The integer value to be extracted here is '65521'.
-    Or:
-    \x1b[0;34m[1714583616179] [7029:2386956] [SVR] 	device Name: Test TV casting app\x1b[0m
-    The substring to be extracted here is 'Test TV casting app'.
+    Some input string examples as they are received from the Linux tv-casting-app and tv-app output:
+    1. On 'darwin' machines:
+        \x1b[0;34m[1715206773402] [20056:2842184] [DMG]  Cluster = 0x506,\x1b[0m
+        The substring to be extracted here is '0x506'.
+
+        Or:
+        \x1b[0;32m[1714582264602] [77989:2286038] [SVR] Discovered Commissioner #0\x1b[0m
+        The integer value to be extracted here is '0'.
+
+        Or:
+        \x1b[0;34m[1713741926895] [7276:9521344] [DIS] Vendor ID: 65521\x1b[0m
+        The integer value to be extracted here is '65521'.
+
+        Or:
+        \x1b[0;34m[1714583616179] [7029:2386956] [SVR] 	device Name: Test TV casting app\x1b[0m
+        The substring to be extracted here is 'Test TV casting app'.
+
+    2. On 'linux' machines:
+        [1716224960.316809][6906:6906] CHIP:DMG: \t\t\t\t\tCluster = 0x506,\n
+        [1716224958.576320][6906:6906] CHIP:SVR: Discovered Commissioner #0
+        [1716224958.576407][6906:6906] CHIP:DIS: \tVendor ID: 65521\n
+        [1716224959.580746][6906:6906] CHIP:SVR: \tdevice Name: Test TV casting app\n
     """
-    log_line_pattern = r'\x1b\[0;\d+m\[\d+\] \[\d+:\d+\] \[[A-Z]{1,3}\] (.+?)\x1b\[0m'
+    log_line_pattern = ''
+    if sys.platform == 'darwin':
+        log_line_pattern = r'\x1b\[0;\d+m\[\d+\] \[\d+:\d+\] \[[A-Z]{1,3}\] (.+)\x1b\[0m'
+    elif sys.platform == 'linux':
+        log_line_pattern = r'\[\d+\.\d+\]\[\d+:\d+\] [A-Z]{1,4}:[A-Z]{1,3}: (.+)'
+
     log_line_match = re.search(log_line_pattern, line)
 
     if log_line_match:
