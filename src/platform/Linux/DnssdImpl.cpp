@@ -611,8 +611,8 @@ CHIP_ERROR MdnsAvahi::Browse(const char * type, DnssdServiceProtocol protocol, c
     {
         avahiInterface = AVAHI_IF_UNSPEC;
     }
-    browseContext->mInterface     = avahiInterface;
-    browseContext->mProtocol      = GetFullType(type, protocol);
+    browseContext->mInterface         = avahiInterface;
+    browseContext->mProtocol          = GetFullType(type, protocol);
     browseContext->mReceivedAllCached = false;
     browseContext->mStopped.store(false);
 
@@ -688,12 +688,11 @@ void CopyTypeWithoutProtocol(char (&dest)[N], const char * typeAndProtocol)
 
 void MdnsAvahi::InvokeDelegateOrCleanUp(BrowseContext * context, AvahiServiceBrowser * browser)
 {
-     // If we were already asked to stop, no need to send a callback - no one is listening.
+    // If we were already asked to stop, no need to send a callback - no one is listening.
     if (!context->mStopped.load())
     {
         // since this is continuous browse, finalBrowse will always be false.
-        context->mCallback(context->mContext, context->mServices.data(), context->mServices.size(), false,
-                            CHIP_NO_ERROR);
+        context->mCallback(context->mContext, context->mServices.data(), context->mServices.size(), false, CHIP_NO_ERROR);
 
         // Clearing records/services already passed to application through delegate. Keeping it may cause
         // duplicates in next query / retry attempt as currently found will also come again from cache.
@@ -765,8 +764,8 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
             // don't attempt to erase if vector has been cleared
             if (context->mServices.size())
             {
-                context->mServices.erase(
-                    std::remove_if(context->mServices.begin(), context->mServices.end(), [name, type](const DnssdService & service) {
+                context->mServices.erase(std::remove_if(
+                    context->mServices.begin(), context->mServices.end(), [name, type](const DnssdService & service) {
                         return strcmp(name, service.mName) == 0 && type == GetFullType(service.mType, service.mProtocol);
                     }));
             }
@@ -783,7 +782,7 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
             {
                 service.mInterface = static_cast<chip::Inet::InterfaceId>(interface);
             }
-            service.mTtlSeconds              = 0;
+            service.mTtlSeconds = 0;
             if (context->mReceivedAllCached)
             {
                 context->mServices.push_back(service);
