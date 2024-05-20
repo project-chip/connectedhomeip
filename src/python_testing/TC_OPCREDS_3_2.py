@@ -19,8 +19,8 @@ import chip.clusters as Clusters
 from chip.tlv import TLVReader
 from chip.utils import CommissioningBuildingBlocks
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from test_plan_support import *
 from mobly import asserts
+from test_plan_support import *
 
 
 def verify_fabric(controller: str) -> str:
