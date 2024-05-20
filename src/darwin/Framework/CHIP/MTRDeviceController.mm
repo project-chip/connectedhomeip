@@ -19,6 +19,7 @@
 
 #import "MTRDeviceController_Internal.h"
 
+#import "MTRAsyncWorkQueue.h"
 #import "MTRAttestationTrustStoreBridge.h"
 #import "MTRBaseDevice_Internal.h"
 #import "MTRCommissionableBrowser.h"
@@ -144,13 +145,17 @@ using namespace chip::Tracing::DarwinFramework;
     return [MTRDeviceControllerFactory.sharedInstance initializeController:self withParameters:controllerParameters error:error];
 }
 
+static NSString * const kLocalTestUserDefaultDomain = @"org.csa-iot.matter.darwintest";
+static NSString * const kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey = @"subscriptionPoolSizeOverride";
+
 - (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
-                          queue:(dispatch_queue_t)queue
-                storageDelegate:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
-           storageDelegateQueue:(dispatch_queue_t _Nullable)storageDelegateQueue
-            otaProviderDelegate:(id<MTROTAProviderDelegate> _Nullable)otaProviderDelegate
-       otaProviderDelegateQueue:(dispatch_queue_t _Nullable)otaProviderDelegateQueue
-               uniqueIdentifier:(NSUUID *)uniqueIdentifier
+                             queue:(dispatch_queue_t)queue
+                   storageDelegate:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
+              storageDelegateQueue:(dispatch_queue_t _Nullable)storageDelegateQueue
+               otaProviderDelegate:(id<MTROTAProviderDelegate> _Nullable)otaProviderDelegate
+          otaProviderDelegateQueue:(dispatch_queue_t _Nullable)otaProviderDelegateQueue
+                  uniqueIdentifier:(NSUUID *)uniqueIdentifier
+    concurrentSubscriptionPoolSize:(NSUInteger)concurrentSubscriptionPoolSize
 {
     if (self = [super init]) {
         // Make sure our storage is all set up to work as early as possible,
@@ -249,6 +254,22 @@ using namespace chip::Tracing::DarwinFramework;
         if ([self checkForInitError:(_operationalCredentialsDelegate != nullptr) logMsg:kErrorOperationalCredentialsInit]) {
             return nil;
         }
+
+        // Provide a way to test different subscription pool sizes without code change
+        NSUserDefaults * defaults = [[NSUserDefaults alloc] initWithSuiteName:kLocalTestUserDefaultDomain];
+        if ([defaults objectForKey:kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey]) {
+            NSInteger subscriptionPoolSizeOverride = [defaults integerForKey:kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey];
+            if (subscriptionPoolSizeOverride < 1) {
+                concurrentSubscriptionPoolSize = 1;
+            } else {
+                concurrentSubscriptionPoolSize = static_cast<NSUInteger>(subscriptionPoolSizeOverride);
+            }
+        }
+
+        if (!concurrentSubscriptionPoolSize) {
+            concurrentSubscriptionPoolSize = 1;
+        }
+        _concurrentSubscriptionPool = [[MTRAsyncWorkQueue alloc] initWithContext:self width:concurrentSubscriptionPoolSize];
 
         _storedFabricIndex = chip::kUndefinedFabricIndex;
     }
@@ -606,12 +627,6 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     MATTER_LOG_METRIC(kMetricDeviceProductID, [payload.productID unsignedIntValue]);
 }
 
-- (void)preparePASESessionMetric:(chip::NodeId)nodeId
-{
-    self->_deviceControllerDelegateBridge->SetDeviceNodeID(nodeId);
-    MATTER_LOG_METRIC_BEGIN(kMetricSetupPASESession);
-}
-
 - (BOOL)setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload
                                    newNodeID:(NSNumber *)newNodeID
                                        error:(NSError * __autoreleasing *)error
@@ -646,9 +661,13 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         chip::NodeId nodeId = [newNodeID unsignedLongLongValue];
         self->_operationalCredentialsDelegate->SetDeviceID(nodeId);
 
-        [self preparePASESessionMetric:nodeId];
+        MATTER_LOG_METRIC_BEGIN(kMetricSetupPASESession);
         errorCode = self->_cppCommissioner->EstablishPASEConnection(nodeId, [pairingCode UTF8String]);
-        VerifyOrDo(errorCode != CHIP_NO_ERROR, MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode));
+        if (CHIP_NO_ERROR == errorCode) {
+            self->_deviceControllerDelegateBridge->SetDeviceNodeID(nodeId);
+        } else {
+            MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode);
+        }
 
         return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
     };
@@ -690,9 +709,13 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             auto pinCode = static_cast<uint32_t>(payload.setupPasscode.unsignedLongValue);
             params.Value().SetSetupPINCode(pinCode);
 
-            [self preparePASESessionMetric:nodeId];
+            MATTER_LOG_METRIC_BEGIN(kMetricSetupPASESession);
             errorCode = self->_cppCommissioner->EstablishPASEConnection(nodeId, params.Value());
-            VerifyOrDo(errorCode != CHIP_NO_ERROR, MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode));
+            if (CHIP_NO_ERROR == errorCode) {
+                self->_deviceControllerDelegateBridge->SetDeviceNodeID(nodeId);
+            } else {
+                MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode);
+            }
         } else {
             // Try to get a QR code if possible (because it has a better
             // discriminator, etc), then fall back to manual code if that fails.
@@ -711,10 +734,12 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
                     continue;
                 }
 
-                [self preparePASESessionMetric:nodeId];
+                MATTER_LOG_METRIC_BEGIN(kMetricSetupPASESession);
                 errorCode = self->_cppCommissioner->EstablishPASEConnection(
                     nodeId, [pairingCode UTF8String], chip::Controller::DiscoveryType::kDiscoveryNetworkOnly, resolutionData);
-                if (CHIP_NO_ERROR != errorCode) {
+                if (CHIP_NO_ERROR == errorCode) {
+                    self->_deviceControllerDelegateBridge->SetDeviceNodeID(nodeId);
+                } else {
                     MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode);
                     break;
                 }
@@ -945,12 +970,20 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         if (prefetchedClusterData.count) {
             [deviceToReturn setPersistedClusterData:prefetchedClusterData];
         }
-    } else {
+    } else if (_controllerDataStore) {
         // Load persisted cluster data if they exist.
         NSDictionary * clusterData = [_controllerDataStore getStoredClusterDataForNodeID:nodeID];
         MTR_LOG_INFO("Loaded %lu cluster data from storage for %@", static_cast<unsigned long>(clusterData.count), deviceToReturn);
         if (clusterData.count) {
             [deviceToReturn setPersistedClusterData:clusterData];
+        }
+    }
+
+    // TODO: Figure out how to get the device data as part of our bulk-read bits.
+    if (_controllerDataStore) {
+        auto * deviceData = [_controllerDataStore getStoredDeviceDataForNodeID:nodeID];
+        if (deviceData.count) {
+            [deviceToReturn setPersistedDeviceData:deviceData];
         }
     }
 
@@ -1681,9 +1714,13 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
         self->_operationalCredentialsDelegate->SetDeviceID(deviceID);
 
-        [self preparePASESessionMetric:deviceID];
+        MATTER_LOG_METRIC_BEGIN(kMetricSetupPASESession);
         errorCode = self->_cppCommissioner->EstablishPASEConnection(deviceID, manualPairingCode.c_str());
-        VerifyOrDo(errorCode != CHIP_NO_ERROR, MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode));
+        if (CHIP_NO_ERROR == errorCode) {
+            self->_deviceControllerDelegateBridge->SetDeviceNodeID(deviceID);
+        } else {
+            MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode);
+        }
 
         return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
     };
@@ -1722,9 +1759,13 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
         auto params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode).SetPeerAddress(peerAddress);
 
-        [self preparePASESessionMetric:deviceID];
+        MATTER_LOG_METRIC_BEGIN(kMetricSetupPASESession);
         errorCode = self->_cppCommissioner->EstablishPASEConnection(deviceID, params);
-        VerifyOrDo(errorCode != CHIP_NO_ERROR, MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode));
+        if (CHIP_NO_ERROR == errorCode) {
+            self->_deviceControllerDelegateBridge->SetDeviceNodeID(deviceID);
+        } else {
+            MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode);
+        }
 
         return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
     };
@@ -1754,9 +1795,13 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
         self->_operationalCredentialsDelegate->SetDeviceID(deviceID);
 
-        [self preparePASESessionMetric:deviceID];
+        MATTER_LOG_METRIC_BEGIN(kMetricSetupPASESession);
         errorCode = self->_cppCommissioner->EstablishPASEConnection(deviceID, [onboardingPayload UTF8String]);
-        VerifyOrDo(errorCode != CHIP_NO_ERROR, MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode));
+        if (CHIP_NO_ERROR == errorCode) {
+            self->_deviceControllerDelegateBridge->SetDeviceNodeID(deviceID);
+        } else {
+            MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode);
+        }
 
         return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
     };

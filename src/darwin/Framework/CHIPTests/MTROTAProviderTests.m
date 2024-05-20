@@ -20,8 +20,10 @@
 
 #import "MTRDeviceTestDelegate.h"
 #import "MTRErrorTestUtils.h"
+#import "MTRTestCase.h"
 #import "MTRTestKeys.h"
 #import "MTRTestResetCommissioneeHelper.h"
+#import "MTRTestServerAppRunner.h"
 #import "MTRTestStorage.h"
 
 // system dependencies
@@ -73,23 +75,12 @@ static NSNumber * kUpdatedSoftwareVersion_10 = @10;
 
 static NSString * kUpdatedSoftwareVersionString_10 = @"10.0";
 
-// kOtaRequestorBasePort gets the discriminator added to it to figure out the
-// port the ota-requestor app should be using.  This ensures that apps with
-// distinct discriminators use distinct ports.
-static const uint16_t kOtaRequestorBasePort = 5542 - 1111;
-
-@class MTROTARequestorAppRunner;
-
-@interface MTROTAProviderTests : XCTestCase
-- (NSTask *)createTaskForPath:(NSString *)path;
+@interface MTROTAProviderTests : MTRTestCase
 - (NSString *)createImageFromRawImage:(NSString *)rawImage withVersion:(NSNumber *)version;
 - (MTRDevice *)commissionDeviceWithPayload:(NSString *)payloadString nodeID:(NSNumber *)nodeID;
-- (void)registerRunningRequestor:(MTROTARequestorAppRunner *)requestor;
 @end
 
-static unsigned sAppRunnerIndex = 1;
-
-@interface MTROTARequestorAppRunner : NSObject
+@interface MTROTARequestorAppRunner : MTRTestServerAppRunner
 @property (nonatomic, copy) NSString * downloadFilePath;
 
 - (instancetype)initWithPayload:(NSString *)payload testcase:(MTROTAProviderTests *)testcase;
@@ -97,11 +88,8 @@ static unsigned sAppRunnerIndex = 1;
 @end
 
 @implementation MTROTARequestorAppRunner {
-    unsigned _uniqueIndex;
-    NSTask * _appTask;
     MTROTAProviderTests * _testcase;
     NSString * _payload;
-    MTRDevice * commissionedDevice;
 }
 
 - (MTRDevice *)commissionWithNodeID:(NSNumber *)nodeID
@@ -111,65 +99,22 @@ static unsigned sAppRunnerIndex = 1;
 
 - (instancetype)initWithPayload:(NSString *)payload testcase:(MTROTAProviderTests *)testcase
 {
-    if (!(self = [super init])) {
-        return nil;
-    }
-
-    _uniqueIndex = sAppRunnerIndex++;
-    _testcase = testcase;
-    _payload = payload;
-    _downloadFilePath = [NSString stringWithFormat:@"/tmp/chip-ota-requestor-downloaded-image%u", _uniqueIndex];
-
-    NSError * error;
-    __auto_type * parsedPayload = [MTRSetupPayload setupPayloadWithOnboardingPayload:payload error:&error];
-    XCTAssertNotNil(parsedPayload);
-    XCTAssertNil(error);
-
-    XCTAssertFalse(parsedPayload.hasShortDiscriminator);
-
-    __auto_type * discriminator = parsedPayload.discriminator;
-
-    _appTask = [testcase createTaskForPath:@"out/debug/ota-requestor-app/chip-ota-requestor-app"];
-
-    __auto_type * arguments = @[
-        @"--interface-id",
-        @"-1",
-        @"--secured-device-port",
-        [NSString stringWithFormat:@"%u", kOtaRequestorBasePort + discriminator.unsignedShortValue],
-        @"--discriminator",
-        [NSString stringWithFormat:@"%u", discriminator.unsignedShortValue],
-        @"--KVS",
-        [NSString stringWithFormat:@"/tmp/chip-ota-requestor-kvs%u", _uniqueIndex],
+    __auto_type * downloadFilePath = [NSString stringWithFormat:@"/tmp/chip-ota-requestor-downloaded-image%u", [MTRTestServerAppRunner nextUniqueIndex]];
+    __auto_type * extraArguments = @[
         @"--otaDownloadPath",
-        _downloadFilePath,
+        downloadFilePath,
         @"--autoApplyImage",
     ];
 
-    [_appTask setArguments:arguments];
+    if (!(self = [super initWithAppName:@"ota-requestor" arguments:extraArguments payload:payload testcase:testcase])) {
+        return nil;
+    }
 
-    NSString * outFile = [NSString stringWithFormat:@"/tmp/darwin/framework-tests/ota-requestor-app-%u.log", _uniqueIndex];
-    NSString * errorFile = [NSString stringWithFormat:@"/tmp/darwin/framework-tests/ota-requestor-app-err-%u.log", _uniqueIndex];
-
-    // Make sure the files exist.
-    [[NSFileManager defaultManager] createFileAtPath:outFile contents:nil attributes:nil];
-    [[NSFileManager defaultManager] createFileAtPath:errorFile contents:nil attributes:nil];
-
-    _appTask.standardOutput = [NSFileHandle fileHandleForWritingAtPath:outFile];
-    _appTask.standardError = [NSFileHandle fileHandleForWritingAtPath:errorFile];
-
-    [_appTask launchAndReturnError:&error];
-    XCTAssertNil(error);
-
-    NSLog(@"Started requestor with arguments %@ stdout=%@ and stderr=%@", arguments, outFile, errorFile);
-
-    [_testcase registerRunningRequestor:self];
+    _testcase = testcase;
+    _payload = payload;
+    _downloadFilePath = downloadFilePath;
 
     return self;
-}
-
-- (void)terminate
-{
-    [_appTask terminate];
 }
 
 @end
@@ -579,7 +524,6 @@ static BOOL sNeedsStackShutdown = YES;
 
 @implementation MTROTAProviderTests {
     NSMutableSet<NSNumber *> * _commissionedNodeIDs;
-    NSMutableSet<MTROTARequestorAppRunner *> * _runningRequestors;
 }
 
 + (void)tearDown
@@ -605,7 +549,6 @@ static BOOL sNeedsStackShutdown = YES;
     }
 
     _commissionedNodeIDs = [[NSMutableSet alloc] init];
-    _runningRequestors = [[NSMutableSet alloc] init];
 
     XCTAssertNil(sOTAProviderDelegate.queryImageHandler);
     XCTAssertNil(sOTAProviderDelegate.applyUpdateRequestHandler);
@@ -636,12 +579,6 @@ static BOOL sNeedsStackShutdown = YES;
         __auto_type * device = [MTRBaseDevice deviceWithNodeID:nodeID controller:sController];
         ResetCommissionee(device, dispatch_get_main_queue(), self, kTimeoutInSeconds);
     }
-
-    for (MTROTARequestorAppRunner * runner in _runningRequestors) {
-        [runner terminate];
-    }
-    // Break cycle.
-    _runningRequestors = nil;
 
     if (sController != nil) {
         [sController shutdown];
@@ -686,11 +623,6 @@ static BOOL sNeedsStackShutdown = YES;
     return [MTRDevice deviceWithNodeID:nodeID controller:sController];
 }
 
-- (void)registerRunningRequestor:(MTROTARequestorAppRunner *)requestor
-{
-    [_runningRequestors addObject:requestor];
-}
-
 - (void)initStack
 {
     sStackInitRan = YES;
@@ -715,43 +647,6 @@ static BOOL sNeedsStackShutdown = YES;
     sNeedsStackShutdown = NO;
 
     [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
-}
-
-/**
- * Given a path relative to the Matter root, create an absolute path to the file.
- */
-- (NSString *)absolutePathFor:(NSString *)matterRootRelativePath
-{
-    // Start with the absolute path to our file, then remove the suffix that
-    // comes after the path to the Matter SDK root.
-    NSString * pathToTest = [NSString stringWithUTF8String:__FILE__];
-    NSMutableArray * pathComponents = [[NSMutableArray alloc] init];
-    [pathComponents addObject:[pathToTest substringToIndex:(pathToTest.length - @"src/darwin/Framework/CHIPTests/MTROTAProviderTests.m".length)]];
-    [pathComponents addObjectsFromArray:[matterRootRelativePath pathComponents]];
-    return [NSString pathWithComponents:pathComponents];
-}
-
-/**
- * Create a task given a path relative to the Matter root.
- */
-- (NSTask *)createTaskForPath:(NSString *)path
-{
-    NSTask * task = [[NSTask alloc] init];
-    [task setLaunchPath:[self absolutePathFor:path]];
-    return task;
-}
-
-/**
- * Runs a task to completion and makes sure it succeeds.
- */
-- (void)runTask:(NSTask *)task
-{
-    NSError * launchError;
-    [task launchAndReturnError:&launchError];
-    XCTAssertNil(launchError);
-
-    [task waitUntilExit];
-    XCTAssertEqual([task terminationStatus], 0);
 }
 
 /**
