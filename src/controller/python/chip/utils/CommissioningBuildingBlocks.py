@@ -62,7 +62,8 @@ async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDevic
     '''
     data = await adminCtrl.ReadAttribute(targetNodeId, [(Clusters.AccessControl.Attributes.Acl)])
     if 0 not in data:
-        raise ValueError("Did not get back any data (possible cause: controller has no access..")
+        raise ValueError(
+            "Did not get back any data (possible cause: controller has no access..")
 
     currentAcls = data[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]
 
@@ -73,12 +74,14 @@ async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDevic
         targetSubjects = [grantedCtrl.nodeId]
 
     if (len(targetSubjects) > 4):
-        raise ValueError(f"List of target subjects of len {len(targetSubjects)} exceeeded the minima of 4!")
+        raise ValueError(
+            f"List of target subjects of len {len(targetSubjects)} exceeeded the minima of 4!")
 
     # Step 1: Wipe the subject from all existing ACLs.
     for acl in currentAcls:
         if (acl.subjects != NullValue):
-            acl.subjects = [subject for subject in acl.subjects if subject not in targetSubjects]
+            acl.subjects = [
+                subject for subject in acl.subjects if subject not in targetSubjects]
 
     if (privilege):
         addedPrivilege = False
@@ -107,7 +110,8 @@ async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDevic
             ))
 
     # Step 4: Prune ACLs which have empty subjects.
-    currentAcls = [acl for acl in currentAcls if acl.subjects != NullValue and len(acl.subjects) != 0]
+    currentAcls = [acl for acl in currentAcls if acl.subjects !=
+                   NullValue and len(acl.subjects) != 0]
 
     logger.info(f'GrantPrivilege: Writing acls: {currentAcls}')
     await adminCtrl.WriteAttribute(targetNodeId, [(0, Clusters.AccessControl.Attributes.Acl(currentAcls))])
@@ -137,7 +141,8 @@ async def CreateControllersOnFabric(fabricAdmin: FabricAdmin,
     controllerList = []
 
     for nodeId in controllerNodeIds:
-        newController = fabricAdmin.NewController(nodeId=nodeId, paaTrustStorePath=paaTrustStorePath, catTags=catTags)
+        newController = fabricAdmin.NewController(
+            nodeId=nodeId, paaTrustStorePath=paaTrustStorePath, catTags=catTags)
         await GrantPrivilege(adminDevCtrl, newController, privilege, targetNodeId, catTags)
         controllerList.append(newController)
 
@@ -156,12 +161,14 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
         newNodeId (int): Node ID to use for the target node on the new fabric.
 
     Return:
-        bool: True if successful, False otherwise.
+        tuple: (bool, nocResp): True if successful, False otherwise, along with nocResp, rcacResp value.
 
     '''
+    nocResp = None
+
     resp = await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(60))
     if resp.errorCode is not generalCommissioning.Enums.CommissioningErrorEnum.kOk:
-        return False
+        return False, nocResp
 
     csrForAddNOC = await commissionerDevCtrl.SendCommand(existingNodeId, 0, opCreds.Commands.CSRRequest(CSRNonce=os.urandom(32)))
 
@@ -171,31 +178,35 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
             chainForAddNOC.nocBytes is None or chainForAddNOC.ipkBytes is None):
         # Expiring the failsafe timer in an attempt to clean up.
         await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
-        return False
+        return False, nocResp
 
     await commissionerDevCtrl.SendCommand(existingNodeId, 0, opCreds.Commands.AddTrustedRootCertificate(chainForAddNOC.rcacBytes))
-    resp = await commissionerDevCtrl.SendCommand(existingNodeId,
-                                                 0,
-                                                 opCreds.Commands.AddNOC(chainForAddNOC.nocBytes,
-                                                                         chainForAddNOC.icacBytes,
-                                                                         chainForAddNOC.ipkBytes,
-                                                                         newFabricDevCtrl.nodeId,
-                                                                         newFabricDevCtrl.fabricAdmin.vendorId))
-    if resp.statusCode is not opCreds.Enums.NodeOperationalCertStatusEnum.kOk:
+    nocResp = await commissionerDevCtrl.SendCommand(existingNodeId,
+                                                    0,
+                                                    opCreds.Commands.AddNOC(chainForAddNOC.nocBytes,
+                                                                            chainForAddNOC.icacBytes,
+                                                                            chainForAddNOC.ipkBytes,
+                                                                            newFabricDevCtrl.nodeId,
+                                                                            newFabricDevCtrl.fabricAdmin.vendorId))
+
+    rcacResp = chainForAddNOC.rcacBytes
+
+    if nocResp.statusCode is not opCreds.Enums.NodeOperationalCertStatusEnum.kOk:
         # Expiring the failsafe timer in an attempt to clean up.
         await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
-        return False
+        return False, nocResp
 
     resp = await newFabricDevCtrl.SendCommand(newNodeId, 0, generalCommissioning.Commands.CommissioningComplete())
+
     if resp.errorCode is not generalCommissioning.Enums.CommissioningErrorEnum.kOk:
         # Expiring the failsafe timer in an attempt to clean up.
         await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
-        return False
+        return False, nocResp
 
     if not await _IsNodeInFabricList(newFabricDevCtrl, newNodeId):
-        return False
+        return False, nocResp
 
-    return True
+    return True, nocResp, rcacResp
 
 
 async def UpdateNOC(devCtrl, existingNodeId, newNodeId):
