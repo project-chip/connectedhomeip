@@ -19,13 +19,14 @@ import copy
 import logging
 import queue
 import time
+import traceback
 
 import chip.clusters as Clusters
 from chip.ChipDeviceCtrl import ChipDeviceController
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import AttributePath, TypedAttributePath
 from chip.exceptions import ChipStackError
-from chip.interaction_model import Status
+from chip.interaction_model import Status, InteractionModelError
 from matter_testing_support import (AttributeChangeCallback, MatterBaseTest, async_test_body, default_matter_test_main,
                                     wait_for_attribute_report)
 from mobly import asserts
@@ -466,21 +467,21 @@ class TC_IDM_4_2(MatterBaseTest):
         self.print_step(
             10, "CR1 sends a subscription request action for an attribute and set the MinIntervalFloor value to be greater than MaxIntervalCeiling.")
 
-        # Subscribe to attribute with invalid reportInterval arguments, expect and exception
+        # Subscribe to attribute with invalid reportInterval arguments, expect an error
         sub_cr1_invalid_intervals = None
         try:
-            sub_cr1_invalid_intervals = await CR1.ReadAttribute(
-                nodeid=self.dut_node_id,
-                attributes=node_label_attr_path,
-                reportInterval=(20, 10),
-                keepSubscriptions=False
-            )
-        except ChipStackError:
-            # Verify no subscription is established
+            with asserts.assert_raises(ChipStackError):
+                sub_cr1_invalid_intervals = await CR1.ReadAttribute(
+                    nodeid=self.dut_node_id,
+                    attributes=node_label_attr_path,
+                    reportInterval=(20, 10),
+                    keepSubscriptions=False
+                )
+            # Verify no subscription was established
             with asserts.assert_raises(AttributeError):
                 sub_cr1_invalid_intervals.subscriptionId
-        except Exception:
-            asserts.fail("Expected exception was not thrown")
+        except Exception as e:
+            asserts.fail(f"Expected exception was not thrown. Instead, caught: {type(e).__name__}")
 
         # *** Step 11 ***
         self.print_step(
