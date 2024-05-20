@@ -62,27 +62,6 @@ def chip_tool_parse_setup_payload(chip_tool, payload):
     return parsed_params
 
 
-def chip_tool_generate_code(chip_tool, payload_data, cmd, key, is_qrcode):
-    cmd_args = [chip_tool, 'payload', cmd]
-    cmd_args += ['--setup-pin-code', str(payload_data.pincode)]
-    cmd_args += ['--vendor-id', str(payload_data.vid)] if payload_data.vid else []
-    cmd_args += ['--product-id', str(payload_data.pid)] if payload_data.pid else []
-    cmd_args += ['--commissioning-mode', str(int(payload_data.flow))]
-
-    if is_qrcode:
-        cmd_args += ['--discriminator', str(payload_data.long_discriminator)]
-        cmd_args += ['--rendezvous', str(payload_data.discovery)]
-    else:
-        # generate-manualcode always takes in the long discriminator, but the python parsed data only has the short one
-        cmd_args += ['--discriminator', str(payload_data.short_discriminator << 8)]
-
-    data = subprocess.check_output(cmd_args).decode('utf-8')
-    data = remove_escape_sequence(data)
-    st = data.find(key) + len(key)
-    end = data.find('\n', st)
-    return data[st:end].strip()
-
-
 def generate_payloads(in_params):
     payloads = SetupPayload(in_params['Long discriminator'], in_params['Passcode'],
                             in_params['Discovery Bitmask'], CommissioningFlow(in_params['Custom flow']),
@@ -109,7 +88,7 @@ def verify_generated_payloads(in_params, manualcode_params, qrcode_params):
     assert in_params['Long discriminator'] == int(qrcode_params['Long discriminator'], 0)
 
 
-def get_payload_params(discriminator, passcode, discovery=4, flow=0, vid=0, pid=0, version=0):
+def get_payload_params(discriminator, passcode, discovery=4, flow=0, vid=0, pid=0, version=0, short_discriminator=None):
     p = payload_param_dict()
     p['Version'] = version
     p['VendorID'] = vid
@@ -117,7 +96,7 @@ def get_payload_params(discriminator, passcode, discovery=4, flow=0, vid=0, pid=
     p['Custom flow'] = flow
     p['Discovery Bitmask'] = discovery
     p['Long discriminator'] = discriminator
-    p['Short discriminator'] = discriminator >> 8
+    p['Short discriminator'] = short_discriminator if short_discriminator is not None else (discriminator >> 8)
     p['Passcode'] = passcode
     return p
 
@@ -140,43 +119,94 @@ def test_code_generation(chip_tool):
         verify_generated_payloads(test_params, manualcode_params, qrcode_params)
 
 
-def test_manualcode_parsing(chip_tool):
-    test_data_set = [
-        '34970112332',
-        '745492075300001000013',
-        '619156140465523329207',
-        '702871264504387000187',
-        '402104334209029041311',
-        '403732495800069000166',
-    ]
-    for test_payload in test_data_set:
-        payload = SetupPayload.parse(test_payload)
-        code = chip_tool_generate_code(chip_tool, payload, 'generate-manualcode', 'Manual Code:', is_qrcode=False)
-        assert test_payload == code
+def test_onboardingcode_parsing():
+    # This test dataset is generated using `chip-tool payload parse-setup-payload <payload>`
 
-
-def test_qrcode_parsing(chip_tool):
     test_data_set = [
-        'MT:U9VJ0OMV172PX813210',
-        'MT:00000CQM00KA0648G00',
-        'MT:A3L90ARR15G6N57Y900',
-        'MT:MZWA6G6026O2XP0II00',
-        'MT:KSNK4M5113-JPR4UY00',
-        'MT:0A.T0P--00Y0OJ0.510',
-        'MT:EPX0482F26DAVY09R10',
+        {
+            'code': '34970112332',
+            'res': get_payload_params(discriminator=None, passcode=20202021, discovery=None,
+                                      flow=0, vid=None, pid=None, version=0, short_discriminator=15),
+        },
+        {
+            'code': '745492075300001000013',
+            'res': get_payload_params(discriminator=None, passcode=12349876, discovery=None,
+                                      flow=2, vid=1, pid=1, version=0, short_discriminator=14),
+        },
+        {
+            'code': '619156140465523329207',
+            'res': get_payload_params(discriminator=None, passcode=23005908, discovery=None,
+                                      flow=2, vid=65523, pid=32920, version=0, short_discriminator=9),
+        },
+        {
+            'code': '702871264504387000187',
+            'res': get_payload_params(discriminator=None, passcode=43338551, discovery=None,
+                                      flow=2, vid=4387, pid=18, version=0, short_discriminator=12),
+        },
+        {
+            'code': '402104334209029041311',
+            'res': get_payload_params(discriminator=None, passcode=54757432, discovery=None,
+                                      flow=2, vid=9029, pid=4131, version=0, short_discriminator=0),
+        },
+        {
+            'code': '403732495800069000166',
+            'res': get_payload_params(discriminator=None, passcode=81235604, discovery=None,
+                                      flow=2, vid=69, pid=16, version=0, short_discriminator=0),
+        },
+        {
+            'code': 'MT:U9VJ0OMV172PX813210',
+            'res': get_payload_params(discriminator=3431, passcode=49910688, discovery=2,
+                                      flow=0, vid=4891, pid=2, version=0, short_discriminator=None),
+        },
+        {
+            'code': 'MT:00000CQM00KA0648G00',
+            'res': get_payload_params(discriminator=3840, passcode=20202021, discovery=4,
+                                      flow=0, vid=0, pid=0, version=0, short_discriminator=None),
+        },
+        {
+            'code': 'MT:A3L90ARR15G6N57Y900',
+            'res': get_payload_params(discriminator=3781, passcode=12349876, discovery=4,
+                                      flow=1, vid=1, pid=1, version=0, short_discriminator=None),
+        },
+        {
+            'code': 'MT:MZWA6G6026O2XP0II00',
+            'res': get_payload_params(discriminator=2310, passcode=23005908, discovery=4,
+                                      flow=2, vid=65523, pid=32920, version=0, short_discriminator=None),
+        },
+        {
+            'code': 'MT:KSNK4M5113-JPR4UY00',
+            'res': get_payload_params(discriminator=3091, passcode=43338551, discovery=2,
+                                      flow=2, vid=4387, pid=18, version=0, short_discriminator=12),
+        },
+        {
+            'code': 'MT:0A.T0P--00Y0OJ0.510',
+            'res': get_payload_params(discriminator=80, passcode=54757432, discovery=6,
+                                      flow=2, vid=9029, pid=4131, version=0, short_discriminator=None),
+        },
+        {
+            'code': 'MT:EPX0482F26DAVY09R10',
+            'res': get_payload_params(discriminator=174, passcode=81235604, discovery=7,
+                                      flow=1, vid=69, pid=16, version=0, short_discriminator=None),
+        },
     ]
+
     for test_payload in test_data_set:
-        payload = SetupPayload.parse(test_payload)
-        code = chip_tool_generate_code(chip_tool, payload, 'generate-qrcode', 'QR Code:', is_qrcode=True)
-        assert test_payload == code
+        payload = SetupPayload.parse(test_payload['code'])
+
+        assert payload.long_discriminator == test_payload['res']['Long discriminator']
+        assert payload.short_discriminator == test_payload['res']['Short discriminator']
+        assert payload.pincode == test_payload['res']['Passcode']
+        assert payload.discovery == test_payload['res']['Discovery Bitmask']
+        assert payload.flow == test_payload['res']['Custom flow']
+        assert payload.vid == test_payload['res']['VendorID']
+        assert payload.pid == test_payload['res']['ProductID']
 
 
 def main():
     if len(sys.argv) == 2:
         chip_tool = sys.argv[1]
         test_code_generation(chip_tool)
-        test_manualcode_parsing(chip_tool)
-        test_qrcode_parsing(chip_tool)
+        test_onboardingcode_parsing()
 
 
 if __name__ == '__main__':
