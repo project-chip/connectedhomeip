@@ -232,8 +232,8 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
         issuer_subject_key_id = ''.join('{:02X}'.format(x) for x in crl_authority_key_id)
 
         # b.
-        count_with_matching_vid_issuer_skid = sum(item.get('vid') == vid for item in same_issuer_points)
         same_issuer_points = dcld_helper.get_revocations_points_by_skid(issuer_subject_key_id)
+        count_with_matching_vid_issuer_skid = sum(item.get('vid') == vid for item in same_issuer_points)
 
         if count_with_matching_vid_issuer_skid > 1:
             try:
