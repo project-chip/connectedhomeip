@@ -456,8 +456,7 @@ static NSString * sAttributeCacheEndpointIndexKeyPrefix = @"attrCacheEndpointInd
     }
 
     NSMutableArray * endpointIndex = [NSMutableArray arrayWithArray:[self _fetchEndpointIndexForNodeID:nodeID]];
-    if (endpointIndex == nil)
-    {
+    if (endpointIndex == nil) {
         return NO;
     }
 
