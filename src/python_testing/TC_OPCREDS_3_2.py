@@ -20,7 +20,8 @@ from chip.tlv import TLVReader
 from chip.utils import CommissioningBuildingBlocks
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
-from test_plan_support import commission_if_required, commission_from_existing, verify_commissioning_successful, read_attribute, remove_fabric, verify_success
+from test_plan_support import (commission_from_existing, commission_if_required, read_attribute, remove_fabric,
+                               verify_commissioning_successful, verify_success)
 
 
 def verify_fabric(controller: str) -> str:
