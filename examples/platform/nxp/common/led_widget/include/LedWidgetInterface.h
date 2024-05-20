@@ -31,9 +31,9 @@ class LedWidgetInterface
 public:
     virtual ~LedWidgetInterface() {}
 
-    virtual void Init(uint8_t index = 0, bool inverted = false) = 0;
-    virtual void Set(uint8_t level = 0)                         = 0;
-    virtual void Animate(uint32_t onTimeMS = 0, uint32_t offTimeMS = 0);
+    virtual void Init(uint8_t index = 0, bool inverted = false)         = 0;
+    virtual void Set(uint8_t level = 0)                                 = 0;
+    virtual void Animate(uint32_t onTimeMS = 0, uint32_t offTimeMS = 0) = 0;
 
     bool IsTurnedOff() { return !mState; }
 
