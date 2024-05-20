@@ -51,18 +51,28 @@ static void HandleNodeResolve(void * context, DnssdService * result, const Span<
 
     DiscoveredNodeData nodeData;
 
-    if (0 == strncmp(result->mType, kOperationalServiceName, sizeof(kOperationalServiceName)))
-    {
-        result->ToDiscoveredOperationalNodeBrowseData(nodeData);
-
-        nodeData.Get<OperationalNodeBrowseData>().LogDetail();
-        discoveryContext->OnNodeDiscovered(nodeData);
-        return;
-    }
-
     result->ToDiscoveredCommissionNodeData(addresses, nodeData);
 
     nodeData.Get<CommissionNodeData>().LogDetail();
+    discoveryContext->OnNodeDiscovered(nodeData);
+    discoveryContext->Release();
+}
+
+static void HandleNodeOperationalBrowse(void * context, DnssdService * result, CHIP_ERROR error)
+{
+    DiscoveryContext * discoveryContext = static_cast<DiscoveryContext *>(context);
+
+    if (error != CHIP_NO_ERROR)
+    {
+        discoveryContext->Release();
+        return;
+    }
+
+    DiscoveredNodeData nodeData;
+
+    result->ToDiscoveredOperationalNodeBrowseData(nodeData);
+
+    nodeData.Get<OperationalNodeBrowseData>().LogDetail();
     discoveryContext->OnNodeDiscovered(nodeData);
     discoveryContext->Release();
 }
@@ -84,12 +94,20 @@ static void HandleNodeBrowse(void * context, DnssdService * services, size_t ser
         // For some platforms browsed services are already resolved, so verify if resolve is really needed or call resolve callback
 
         auto & ipAddress = services[i].mAddress;
+        bool isOperationalBrowse = (strncmp(services[i].mType, kOperationalServiceName, sizeof(kOperationalServiceName)) == 0 
+                                        && strlen(services[i].mType) == strlen(kOperationalServiceName));
 
-        // Check that this is not operational browse result and if SRV, TXT and AAAA records were received in DNS responses
-        if (strncmp(services[i].mType, kOperationalServiceName, sizeof(kOperationalServiceName)) != 0 &&
-            (strlen(services[i].mHostName) == 0 || services[i].mTextEntrySize == 0 || !ipAddress.has_value()))
+        // if SRV, TXT and AAAA records were received in DNS responses, also for operational browse result we currently 
+        // don't need IP address hence skip resolution.
+        if ( !isOperationalBrowse && (strlen(services[i].mHostName) == 0 
+                || services[i].mTextEntrySize == 0 || !ipAddress.has_value()))
         {
             ChipDnssdResolve(&services[i], services[i].mInterface, HandleNodeResolve, context);
+        }
+        else if (isOperationalBrowse)
+        {
+            // Operational browse currently doesn't need IP info, so handle differently
+            HandleNodeOperationalBrowse(context, &services[i], error);
         }
         else
         {

@@ -613,7 +613,7 @@ CHIP_ERROR MdnsAvahi::Browse(const char * type, DnssdServiceProtocol protocol, c
     }
     browseContext->mInterface     = avahiInterface;
     browseContext->mProtocol      = GetFullType(type, protocol);
-    browseContext->mBrowseRetries = 0;
+    browseContext->mReceivedAllCached = false;
     browseContext->mStopped.store(false);
 
     browser = avahi_service_browser_new(mClient, avahiInterface, AVAHI_PROTO_UNSPEC, browseContext->mProtocol.c_str(), nullptr,
@@ -686,28 +686,23 @@ void CopyTypeWithoutProtocol(char (&dest)[N], const char * typeAndProtocol)
     }
 }
 
-void MdnsAvahi::BrowseRetryCallback(chip::System::Layer * aLayer, void * appState)
+void MdnsAvahi::InvokeDelegateOrCleanUp(BrowseContext * context, AvahiServiceBrowser * browser)
 {
-    BrowseContext * context = static_cast<BrowseContext *>(appState);
-
-    // free existing browser handle
-    avahi_service_browser_free(context->mBrowser);
-    context->mBrowser = nullptr;
-
-    // Don't schedule anything new if we've stopped.
-    if (context->mStopped.load())
+     // If we were already asked to stop, no need to send a callback - no one is listening.
+    if (!context->mStopped.load())
     {
-        chip::Platform::Delete(context);
-        return;
+        // since this is continuous browse, finalBrowse will always be false.
+        context->mCallback(context->mContext, context->mServices.data(), context->mServices.size(), false,
+                            CHIP_NO_ERROR);
+
+        // Clearing records/services already passed to application through delegate. Keeping it may cause
+        // duplicates in next query / retry attempt as currently found will also come again from cache.
+        context->mServices.clear();
     }
-    AvahiServiceBrowser * newBrowser =
-        avahi_service_browser_new(context->mInstance->mClient, context->mInterface, AVAHI_PROTO_UNSPEC, context->mProtocol.c_str(),
-                                  nullptr, static_cast<AvahiLookupFlags>(0), HandleBrowse, context);
-    if (newBrowser == nullptr)
+    else
     {
-        // If we failed to create the browser, this browse context is effectively done. We need to call the final callback and
-        // delete the context.
-        context->mCallback(context->mContext, context->mServices.data(), context->mServices.size(), true, CHIP_NO_ERROR);
+        // browse is stopped, so free browse handle and context
+        avahi_service_browser_free(browser);
         chip::Platform::Delete(context);
     }
 }
@@ -727,6 +722,13 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
         break;
     case AVAHI_BROWSER_NEW:
         ChipLogProgress(DeviceLayer, "Avahi browse: cache new");
+        if (context->mStopped.load())
+        {
+            // browse is stopped, so free browse handle and context
+            avahi_service_browser_free(browser);
+            chip::Platform::Delete(context);
+            break;
+        }
         if (strcmp("local", domain) == 0)
         {
             DnssdService service = {};
@@ -743,59 +745,31 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
             }
             service.mType[kDnssdTypeMaxSize] = 0;
             context->mServices.push_back(service);
+            if (context->mReceivedAllCached)
+            {
+                InvokeDelegateOrCleanUp(context, browser);
+            }
         }
         break;
     case AVAHI_BROWSER_ALL_FOR_NOW: {
         ChipLogProgress(DeviceLayer, "Avahi browse: all for now");
-        bool needRetries = context->mBrowseRetries++ < kMaxBrowseRetries && !context->mStopped.load();
+        context->mReceivedAllCached = true;
 
-        // If we were already asked to stop, no need to send a callback - no one is listening.
-        if (!context->mStopped.load())
-        {
-            context->mCallback(context->mContext, context->mServices.data(), context->mServices.size(), !needRetries,
-                               CHIP_NO_ERROR);
-
-            // Clearing records/services already passed to application through delegate. Keeping it may cause
-            // duplicates in next query / retry attempt as currently found will also come again from cache.
-            context->mServices.clear();
-        }
-        // hold on to browser handle so we don't lose out any message, this will be freed just before next query
-        context->mBrowser = browser;
-
-        if (needRetries)
-        {
-            context->mNextRetryDelay *= 2;
-            // Hand the ownership of the context over to the timer. It will either schedule a new browse on the context,
-            // triggering this function, or it will delete and not reschedule (if stopped).
-            DeviceLayer::SystemLayer().StartTimer(context->mNextRetryDelay / 2, BrowseRetryCallback, context);
-        }
-        else if (!context->mStopped.load())
-        {
-            // Re-trigger query until StopBrowse() is called
-
-            // Clear retry info and services.
-            context->mNextRetryDelay = chip::System::Clock::Seconds16(1);
-            context->mBrowseRetries  = 0;
-            context->mServices.clear();
-            // Hand the ownership of the context over to the timer. It will either schedule a new browse on the context,
-            // triggering this function, or it will delete and not reschedule (if stopped).
-            DeviceLayer::SystemLayer().StartTimer(context->mNextQueryDelay, BrowseRetryCallback, context);
-        }
-        else
-        {
-            // We didn't schedule a timer, so we're responsible for deleting the context
-            chip::Platform::Delete(context);
-        }
+        InvokeDelegateOrCleanUp(context, browser);
         break;
     }
     case AVAHI_BROWSER_REMOVE:
         ChipLogProgress(DeviceLayer, "Avahi browse: remove");
         if (strcmp("local", domain) == 0)
         {
-            context->mServices.erase(
-                std::remove_if(context->mServices.begin(), context->mServices.end(), [name, type](const DnssdService & service) {
-                    return strcmp(name, service.mName) == 0 && type == GetFullType(service.mType, service.mProtocol);
-                }));
+            // don't attempt to erase if vector has been cleared
+            if (context->mServices.size())
+            {
+                context->mServices.erase(
+                    std::remove_if(context->mServices.begin(), context->mServices.end(), [name, type](const DnssdService & service) {
+                        return strcmp(name, service.mName) == 0 && type == GetFullType(service.mType, service.mProtocol);
+                    }));
+            }
 
             DnssdService service = {};
 
@@ -810,7 +784,11 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
                 service.mInterface = static_cast<chip::Inet::InterfaceId>(interface);
             }
             service.mTtlSeconds              = 0;
-            context->mCallback(context->mContext, &service, 1, false, CHIP_NO_ERROR);
+            if (context->mReceivedAllCached)
+            {
+                context->mServices.push_back(service);
+                InvokeDelegateOrCleanUp(context, browser);
+            }
         }
 
         break;
