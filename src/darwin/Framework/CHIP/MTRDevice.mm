@@ -3134,7 +3134,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                     NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * dataStoreClusterData = [self.deviceController.controllerDataStore getStoredClusterDataForNodeID:self.nodeID];
                     NSMutableDictionary<MTRClusterPath *, MTRDeviceClusterData *> * dataStoreClusterDataCopy = [dataStoreClusterData mutableCopy];
                     for (MTRClusterPath * dataStorePath in dataStoreClusterData) {
-                        if ([dataStorePath isEqualTo:path]) {
+                        if ([dataStorePath.endpoint isEqualToNumber:path.endpoint] && [dataStorePath.cluster isEqualToNumber:path.cluster]) {
                             [dataStoreClusterDataCopy removeObjectForKey:path];
                             [dataStoreClusterDataCopy setObject:clusterData forKey:path];
                             [self.deviceController.controllerDataStore storeClusterData:dataStoreClusterDataCopy forNodeID:self.nodeID];
