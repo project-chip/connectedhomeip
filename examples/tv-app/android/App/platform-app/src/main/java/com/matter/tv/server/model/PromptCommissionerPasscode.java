@@ -11,7 +11,13 @@ public class PromptCommissionerPasscode implements Parcelable {
   private int pairingHint;
   private String pairingInstruction;
 
-  public PromptCommissionerPasscode(int vendorId, int productId, String commissioneeName, long passcode, int pairingHint, String pairingInstruction) {
+  public PromptCommissionerPasscode(
+      int vendorId,
+      int productId,
+      String commissioneeName,
+      long passcode,
+      int pairingHint,
+      String pairingInstruction) {
     this.vendorId = vendorId;
     this.productId = productId;
     this.commissioneeName = commissioneeName;
@@ -29,17 +35,18 @@ public class PromptCommissionerPasscode implements Parcelable {
     pairingInstruction = in.readString();
   }
 
-  public static final Creator<PromptCommissionerPasscode> CREATOR = new Creator<PromptCommissionerPasscode>() {
-    @Override
-    public PromptCommissionerPasscode createFromParcel(Parcel in) {
-      return new PromptCommissionerPasscode(in);
-    }
+  public static final Creator<PromptCommissionerPasscode> CREATOR =
+      new Creator<PromptCommissionerPasscode>() {
+        @Override
+        public PromptCommissionerPasscode createFromParcel(Parcel in) {
+          return new PromptCommissionerPasscode(in);
+        }
 
-    @Override
-    public PromptCommissionerPasscode[] newArray(int size) {
-      return new PromptCommissionerPasscode[size];
-    }
-  };
+        @Override
+        public PromptCommissionerPasscode[] newArray(int size) {
+          return new PromptCommissionerPasscode[size];
+        }
+      };
 
   public int getVendorId() {
     return vendorId;
@@ -91,14 +98,22 @@ public class PromptCommissionerPasscode implements Parcelable {
 
   @Override
   public String toString() {
-    return "PromptCommissionerPasscode{" +
-        "vendorId=" + vendorId +
-        ", productId=" + productId +
-        ", commissioneeName='" + commissioneeName + '\'' +
-        ", passcode=" + passcode +
-        ", pairingHint=" + pairingHint +
-        ", pairingInstruction='" + pairingInstruction + '\'' +
-        '}';
+    return "PromptCommissionerPasscode{"
+        + "vendorId="
+        + vendorId
+        + ", productId="
+        + productId
+        + ", commissioneeName='"
+        + commissioneeName
+        + '\''
+        + ", passcode="
+        + passcode
+        + ", pairingHint="
+        + pairingHint
+        + ", pairingInstruction='"
+        + pairingInstruction
+        + '\''
+        + '}';
   }
 
   @Override

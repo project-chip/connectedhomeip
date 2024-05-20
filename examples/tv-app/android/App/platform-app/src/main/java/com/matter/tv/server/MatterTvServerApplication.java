@@ -11,6 +11,7 @@ public class MatterTvServerApplication extends Application {
   public static Application getApplication() {
     return mApp;
   }
+
   @Override
   public void onCreate() {
     super.onCreate();

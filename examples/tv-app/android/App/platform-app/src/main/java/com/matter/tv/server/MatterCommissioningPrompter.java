@@ -10,18 +10,15 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.Build;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.NotificationCompat;
-
 import com.matter.tv.server.databinding.LayoutDialogBinding;
 import com.matter.tv.server.databinding.LayoutInputDialogBinding;
 import com.matter.tv.server.model.PromptCommissionerPasscode;
@@ -29,7 +26,6 @@ import com.matter.tv.server.tvapp.Message;
 import com.matter.tv.server.tvapp.UserPrompter;
 import com.matter.tv.server.tvapp.UserPrompterResolver;
 import com.matter.tv.server.utils.PxConvert;
-
 import java.lang.ref.WeakReference;
 
 public class MatterCommissioningPrompter extends UserPrompterResolver implements UserPrompter {
@@ -123,7 +119,9 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
             + ". Commissionee: "
             + commissioneeName);
     Bundle bundle = new Bundle();
-    PromptCommissionerPasscode promptCommissionerPasscode = new PromptCommissionerPasscode(vendorId, productId, commissioneeName, passcode, pairingHint, pairingInstruction);
+    PromptCommissionerPasscode promptCommissionerPasscode =
+        new PromptCommissionerPasscode(
+            vendorId, productId, commissioneeName, passcode, pairingHint, pairingInstruction);
     bundle.putParcelable(MsgHandler.KEY_PROMPT_COMMISSIONER_PASSCODE, promptCommissionerPasscode);
     android.os.Message obtained = android.os.Message.obtain();
     obtained.what = MsgHandler.MSG_CommissionerPasscode;
@@ -144,7 +142,6 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
     obtained.what = MsgHandler.MSG_CommissioningStarted;
     obtained.obj = commissioneeName;
     mHandler.sendMessage(obtained);
-
   }
 
   public void promptCommissioningSucceeded(int vendorId, int productId, String commissioneeName) {
@@ -184,61 +181,78 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
   private void handleCommissionOkPermission(android.os.Message msg) {
     String commissioneeName = (String) msg.obj;
 
-    PromptDialogManager promptDialogManager = new PromptDialogManager.Builder()
-        .setCancelable(false)
-        .setWidth(PxConvert.dp2px(MatterTvServerApplication.getApplication(), 350))
-        .setStyle(PromptDialogManager.DIALOG_STYLE_1)
-        .build();
+    PromptDialogManager promptDialogManager =
+        new PromptDialogManager.Builder()
+            .setCancelable(false)
+            .setWidth(PxConvert.dp2px(MatterTvServerApplication.getApplication(), 350))
+            .setStyle(PromptDialogManager.DIALOG_STYLE_1)
+            .build();
 
-    LayoutDialogBinding udcDialogBinding = LayoutDialogBinding.inflate(LayoutInflater.from(MatterTvServerApplication.getApplication().getApplicationContext()));
-    udcDialogBinding.tvContent.setText(commissioneeName + " is requesting permission to cast to this device, approve?");
+    LayoutDialogBinding udcDialogBinding =
+        LayoutDialogBinding.inflate(
+            LayoutInflater.from(
+                MatterTvServerApplication.getApplication().getApplicationContext()));
+    udcDialogBinding.tvContent.setText(
+        commissioneeName + " is requesting permission to cast to this device, approve?");
     udcDialogBinding.tvTitle.setText("Allow access to " + commissioneeName);
-    udcDialogBinding.tvLeft.setOnClickListener(v -> {
-      OnPromptDeclined();
-      promptDialogManager.removeViewImmediate(udcDialogBinding.getRoot());
-    });
-    udcDialogBinding.tvRight.setOnClickListener(v -> {
-      OnPromptAccepted();
-      promptDialogManager.removeViewImmediate(udcDialogBinding.getRoot());
-    });
+    udcDialogBinding.tvLeft.setOnClickListener(
+        v -> {
+          OnPromptDeclined();
+          promptDialogManager.removeViewImmediate(udcDialogBinding.getRoot());
+        });
+    udcDialogBinding.tvRight.setOnClickListener(
+        v -> {
+          OnPromptAccepted();
+          promptDialogManager.removeViewImmediate(udcDialogBinding.getRoot());
+        });
     promptDialogManager.addView(udcDialogBinding.getRoot(), this::OnPromptDeclined);
   }
 
   private void handleCommissionPinCode(android.os.Message msg) {
     String commissioneeName = (String) msg.obj;
 
-    PromptDialogManager promptDialogManager = new PromptDialogManager.Builder()
-        .setCancelable(false)
-        .setWidth(PxConvert.dp2px(MatterTvServerApplication.getApplication(), 350))
-        .setStyle(PromptDialogManager.DIALOG_STYLE_2)
-        .build();
+    PromptDialogManager promptDialogManager =
+        new PromptDialogManager.Builder()
+            .setCancelable(false)
+            .setWidth(PxConvert.dp2px(MatterTvServerApplication.getApplication(), 350))
+            .setStyle(PromptDialogManager.DIALOG_STYLE_2)
+            .build();
 
-    LayoutInputDialogBinding inputDialogBinding = LayoutInputDialogBinding.inflate(LayoutInflater.from(MatterTvServerApplication.getApplication().getApplicationContext()));
+    LayoutInputDialogBinding inputDialogBinding =
+        LayoutInputDialogBinding.inflate(
+            LayoutInflater.from(
+                MatterTvServerApplication.getApplication().getApplicationContext()));
     EditText etPin = inputDialogBinding.etPin;
     inputDialogBinding.tvTitle.setText("Allow access to " + commissioneeName);
     inputDialogBinding.tvContent.setText("Please enter PIN displayed in casting app.");
-    inputDialogBinding.tvLeft.setOnClickListener(view -> {
-      OnPinCodeDeclined();
-      promptDialogManager.removeViewImmediate(inputDialogBinding.getRoot());
-    });
-    inputDialogBinding.tvRight.setOnClickListener(view -> {
-      String pinCode = etPin.getText().toString();
-      OnPinCodeEntered(Integer.parseInt(pinCode));
-      promptDialogManager.removeViewImmediate(inputDialogBinding.getRoot());
-    });
+    inputDialogBinding.tvLeft.setOnClickListener(
+        view -> {
+          OnPinCodeDeclined();
+          promptDialogManager.removeViewImmediate(inputDialogBinding.getRoot());
+        });
+    inputDialogBinding.tvRight.setOnClickListener(
+        view -> {
+          String pinCode = etPin.getText().toString();
+          OnPinCodeEntered(Integer.parseInt(pinCode));
+          promptDialogManager.removeViewImmediate(inputDialogBinding.getRoot());
+        });
     promptDialogManager.addView(inputDialogBinding.getRoot(), this::OnPinCodeDeclined);
   }
 
   private void handleHidePromptsOnCancel(android.os.Message msg) {
     String commissioneeName = (String) msg.obj;
 
-    PromptDialogManager promptDialogManager = new PromptDialogManager.Builder()
-        .setCancelable(true)
-        .setWidth(PxConvert.dp2px(MatterTvServerApplication.getApplication(), 300))
-        .setStyle(PromptDialogManager.DIALOG_STYLE_3)
-        .build();
+    PromptDialogManager promptDialogManager =
+        new PromptDialogManager.Builder()
+            .setCancelable(true)
+            .setWidth(PxConvert.dp2px(MatterTvServerApplication.getApplication(), 300))
+            .setStyle(PromptDialogManager.DIALOG_STYLE_3)
+            .build();
 
-    LayoutDialogBinding dialogBinding = LayoutDialogBinding.inflate(LayoutInflater.from(MatterTvServerApplication.getApplication().getApplicationContext()));
+    LayoutDialogBinding dialogBinding =
+        LayoutDialogBinding.inflate(
+            LayoutInflater.from(
+                MatterTvServerApplication.getApplication().getApplicationContext()));
     dialogBinding.tvContent.setText("Cancelled connection to " + commissioneeName);
     dialogBinding.tvTitle.setText("Connection Cancelled");
     dialogBinding.llAction.setVisibility(View.GONE);
@@ -256,46 +270,58 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
 
   private void handleCommissionerPasscode(android.os.Message msg) {
     Bundle bundle = msg.getData();
-    PromptCommissionerPasscode parcelable = bundle.getParcelable(MsgHandler.KEY_PROMPT_COMMISSIONER_PASSCODE);
+    PromptCommissionerPasscode parcelable =
+        bundle.getParcelable(MsgHandler.KEY_PROMPT_COMMISSIONER_PASSCODE);
 
-    PromptDialogManager promptDialogManager = new PromptDialogManager.Builder()
-        .setCancelable(false)
-        .setWidth(PxConvert.dp2px(MatterTvServerApplication.getApplication(), 350))
-        .setStyle(PromptDialogManager.DIALOG_STYLE_1)
-        .build();
+    PromptDialogManager promptDialogManager =
+        new PromptDialogManager.Builder()
+            .setCancelable(false)
+            .setWidth(PxConvert.dp2px(MatterTvServerApplication.getApplication(), 350))
+            .setStyle(PromptDialogManager.DIALOG_STYLE_1)
+            .build();
 
-    LayoutDialogBinding udcDialogBinding = LayoutDialogBinding.inflate(LayoutInflater.from(MatterTvServerApplication.getApplication().getApplicationContext()));
-    udcDialogBinding.tvContent.setText("Please enter "
-        + parcelable.getPasscode()
-        + " in "
-        + parcelable.getCommissioneeName()
-        + " app. "
-        + parcelable.getPairingInstruction()
-        + " ["
-        + parcelable.getPairingHint()
-        + "]");
+    LayoutDialogBinding udcDialogBinding =
+        LayoutDialogBinding.inflate(
+            LayoutInflater.from(
+                MatterTvServerApplication.getApplication().getApplicationContext()));
+    udcDialogBinding.tvContent.setText(
+        "Please enter "
+            + parcelable.getPasscode()
+            + " in "
+            + parcelable.getCommissioneeName()
+            + " app. "
+            + parcelable.getPairingInstruction()
+            + " ["
+            + parcelable.getPairingHint()
+            + "]");
     udcDialogBinding.tvTitle.setText("Passcode" + parcelable.getPasscode());
-    udcDialogBinding.tvLeft.setOnClickListener(v -> {
-      OnCommissionerPasscodeCancel();
-      promptDialogManager.removeViewImmediate(udcDialogBinding.getRoot());
-    });
-    udcDialogBinding.tvRight.setOnClickListener(v -> {
-      OnCommissionerPasscodeOK();
-      promptDialogManager.removeViewImmediate(udcDialogBinding.getRoot());
-    });
+    udcDialogBinding.tvLeft.setOnClickListener(
+        v -> {
+          OnCommissionerPasscodeCancel();
+          promptDialogManager.removeViewImmediate(udcDialogBinding.getRoot());
+        });
+    udcDialogBinding.tvRight.setOnClickListener(
+        v -> {
+          OnCommissionerPasscodeOK();
+          promptDialogManager.removeViewImmediate(udcDialogBinding.getRoot());
+        });
     promptDialogManager.addView(udcDialogBinding.getRoot(), this::OnCommissionerPasscodeCancel);
   }
 
   private void handleCommissioningStarted(android.os.Message msg) {
     String commissioneeName = (String) msg.obj;
 
-    PromptDialogManager promptDialogManager = new PromptDialogManager.Builder()
-        .setCancelable(true)
-        .setWidth(PxConvert.dp2px(MatterTvServerApplication.getApplication(), 300))
-        .setStyle(PromptDialogManager.DIALOG_STYLE_3)
-        .build();
+    PromptDialogManager promptDialogManager =
+        new PromptDialogManager.Builder()
+            .setCancelable(true)
+            .setWidth(PxConvert.dp2px(MatterTvServerApplication.getApplication(), 300))
+            .setStyle(PromptDialogManager.DIALOG_STYLE_3)
+            .build();
 
-    LayoutDialogBinding dialogBinding = LayoutDialogBinding.inflate(LayoutInflater.from(MatterTvServerApplication.getApplication().getApplicationContext()));
+    LayoutDialogBinding dialogBinding =
+        LayoutDialogBinding.inflate(
+            LayoutInflater.from(
+                MatterTvServerApplication.getApplication().getApplicationContext()));
     dialogBinding.tvContent.setText("Starting connection to " + commissioneeName);
     dialogBinding.tvTitle.setText("Connection Starting");
     dialogBinding.llAction.setVisibility(View.GONE);
@@ -313,16 +339,21 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
 
   private void handleCommissioningSucceeded(android.os.Message msg) {
     String commissioneeName = (String) msg.obj;
-    PromptDialogManager promptDialogManager = new PromptDialogManager.Builder()
-        .setCancelable(true)
-        .setWidth(PxConvert.dp2px(MatterTvServerApplication.getApplication(), 300))
-        .setStyle(PromptDialogManager.DIALOG_STYLE_3)
-        .build();
+    PromptDialogManager promptDialogManager =
+        new PromptDialogManager.Builder()
+            .setCancelable(true)
+            .setWidth(PxConvert.dp2px(MatterTvServerApplication.getApplication(), 300))
+            .setStyle(PromptDialogManager.DIALOG_STYLE_3)
+            .build();
 
-    LayoutDialogBinding dialogBinding = LayoutDialogBinding.inflate(LayoutInflater.from(MatterTvServerApplication.getApplication().getApplicationContext()));
-    dialogBinding.tvContent.setText("Success. "
-        + commissioneeName
-        + " can now cast to this device. Visit settings to manage access control for casting.");
+    LayoutDialogBinding dialogBinding =
+        LayoutDialogBinding.inflate(
+            LayoutInflater.from(
+                MatterTvServerApplication.getApplication().getApplicationContext()));
+    dialogBinding.tvContent.setText(
+        "Success. "
+            + commissioneeName
+            + " can now cast to this device. Visit settings to manage access control for casting.");
     dialogBinding.tvTitle.setText("Connection Complete");
     dialogBinding.llAction.setVisibility(View.GONE);
     promptDialogManager.addView(dialogBinding.getRoot(), null);
@@ -344,10 +375,11 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
     String commissioneeName = (String) msg.obj;
     String error = (String) msg.obj;
     AlertDialog.Builder abuilder = new AlertDialog.Builder(getContext());
-    AlertDialog alertDialog = abuilder
-        .setMessage("Failed. " + commissioneeName + " experienced error: " + error + ".")
-        .setTitle("Connection Failed")
-        .create();
+    AlertDialog alertDialog =
+        abuilder
+            .setMessage("Failed. " + commissioneeName + " experienced error: " + error + ".")
+            .setTitle("Connection Failed")
+            .create();
     alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_PANEL);
     alertDialog.show();
 
@@ -355,8 +387,7 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
         new NotificationCompat.Builder(getContext(), CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_baseline_clear_24)
             .setContentTitle("Connection Failed")
-            .setContentText(
-                "Failed. " + commissioneeName + " experienced error: " + error + ".")
+            .setContentText("Failed. " + commissioneeName + " experienced error: " + error + ".")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
     notificationManager.notify(FAIL_ID, builder.build());
@@ -365,48 +396,57 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
   private void handlePromptWithMessage(android.os.Message msg) {
     Message message = (Message) msg.obj;
 
-    PromptDialogManager promptDialogManager = new PromptDialogManager.Builder()
-        .setCancelable(false)
-        .setWidth(PxConvert.dp2px(MatterTvServerApplication.getApplication(), 380))
-        .setStyle(PromptDialogManager.DIALOG_STYLE_1)
-        .build();
+    PromptDialogManager promptDialogManager =
+        new PromptDialogManager.Builder()
+            .setCancelable(false)
+            .setWidth(PxConvert.dp2px(MatterTvServerApplication.getApplication(), 380))
+            .setStyle(PromptDialogManager.DIALOG_STYLE_1)
+            .build();
 
-    LayoutDialogBinding dialogBinding = LayoutDialogBinding.inflate(LayoutInflater.from(MatterTvServerApplication.getApplication().getApplicationContext()));
+    LayoutDialogBinding dialogBinding =
+        LayoutDialogBinding.inflate(
+            LayoutInflater.from(
+                MatterTvServerApplication.getApplication().getApplicationContext()));
     dialogBinding.tvContent.setText("" + message.messageId + ":" + message.messageText);
     dialogBinding.tvTitle.setText("New Message from Test");
     if (message.responseOptions.length != 2) {
       dialogBinding.tvLeft.setText("Ignore");
       dialogBinding.tvRight.setText("Ok");
-      dialogBinding.tvLeft.setOnClickListener(v -> {
-        OnMessageResponse(message.messageId, -1);
-        promptDialogManager.removeViewImmediate(dialogBinding.getRoot());
-      });
-      dialogBinding.tvRight.setOnClickListener(v -> {
-        OnMessageResponse(message.messageId, 0);
-        promptDialogManager.removeViewImmediate(dialogBinding.getRoot());
-      });
+      dialogBinding.tvLeft.setOnClickListener(
+          v -> {
+            OnMessageResponse(message.messageId, -1);
+            promptDialogManager.removeViewImmediate(dialogBinding.getRoot());
+          });
+      dialogBinding.tvRight.setOnClickListener(
+          v -> {
+            OnMessageResponse(message.messageId, 0);
+            promptDialogManager.removeViewImmediate(dialogBinding.getRoot());
+          });
     } else {
       dialogBinding.tvLeft.setText(message.responseOptions[1].label);
       dialogBinding.tvRight.setText(message.responseOptions[0].label);
-      dialogBinding.tvLeft.setOnClickListener(v -> {
-        OnMessageResponse(message.messageId, message.responseOptions[1].id);
-        promptDialogManager.removeViewImmediate(dialogBinding.getRoot());
-      });
-      dialogBinding.tvRight.setOnClickListener(v -> {
-        OnMessageResponse(message.messageId, message.responseOptions[0].id);
-        promptDialogManager.removeViewImmediate(dialogBinding.getRoot());
-      });
+      dialogBinding.tvLeft.setOnClickListener(
+          v -> {
+            OnMessageResponse(message.messageId, message.responseOptions[1].id);
+            promptDialogManager.removeViewImmediate(dialogBinding.getRoot());
+          });
+      dialogBinding.tvRight.setOnClickListener(
+          v -> {
+            OnMessageResponse(message.messageId, message.responseOptions[0].id);
+            promptDialogManager.removeViewImmediate(dialogBinding.getRoot());
+          });
     }
-    promptDialogManager.addView(dialogBinding.getRoot(), () -> {
-      if (message.responseOptions.length != 2) {
-        OnMessageResponse(message.messageId, -1);
-        promptDialogManager.removeViewImmediate(dialogBinding.getRoot());
-      } else {
-        OnMessageResponse(message.messageId, message.responseOptions[1].id);
-        promptDialogManager.removeViewImmediate(dialogBinding.getRoot());
-      }
-    });
-
+    promptDialogManager.addView(
+        dialogBinding.getRoot(),
+        () -> {
+          if (message.responseOptions.length != 2) {
+            OnMessageResponse(message.messageId, -1);
+            promptDialogManager.removeViewImmediate(dialogBinding.getRoot());
+          } else {
+            OnMessageResponse(message.messageId, message.responseOptions[1].id);
+            promptDialogManager.removeViewImmediate(dialogBinding.getRoot());
+          }
+        });
   }
 
   private void createNotificationChannel() {
@@ -435,7 +475,8 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
     public static final int MSG_CommissioningSucceeded = 106;
     public static final int MSG_CommissioningFailed = 107;
     public static final int MSG_PromptWithMessage = 108;
-    public static final String KEY_PROMPT_COMMISSIONER_PASSCODE = "KEY_PROMPT_COMMISSIONER_PASSCODE";
+    public static final String KEY_PROMPT_COMMISSIONER_PASSCODE =
+        "KEY_PROMPT_COMMISSIONER_PASSCODE";
     private final WeakReference<MatterCommissioningPrompter> mPrompterWeakReference;
 
     public MsgHandler(MatterCommissioningPrompter commissioningPrompter) {

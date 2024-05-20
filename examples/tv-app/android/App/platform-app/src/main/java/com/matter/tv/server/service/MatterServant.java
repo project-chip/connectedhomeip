@@ -17,7 +17,6 @@
  */
 package com.matter.tv.server.service;
 
-import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 import androidx.annotation.NonNull;

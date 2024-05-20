@@ -9,25 +9,17 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-
 import androidx.annotation.Nullable;
-
-import com.matter.tv.server.utils.PxConvert;
 
 public class PromptDialogManager {
   private static final String TAG = "PromptDialogManager";
-  /**
-   * normal type,like a standard AlertDialog
-   */
+  /** normal type,like a standard AlertDialog */
   public static final int DIALOG_STYLE_1 = 1;
-  /**
-   * input type,include an EditText
-   */
+  /** input type,include an EditText */
   public static final int DIALOG_STYLE_2 = 2;
-  /**
-   * normal type,no action area
-   */
+  /** normal type,no action area */
   public static final int DIALOG_STYLE_3 = 3;
+
   public static final int DIALOG_STYLE_4 = 4;
   private final int width;
   private final int height;
@@ -44,7 +36,7 @@ public class PromptDialogManager {
   }
 
   @SuppressLint("ClickableViewAccessibility")
-  public void addView(View view,@Nullable onBackPressListener onBackPressListener) {
+  public void addView(View view, @Nullable onBackPressListener onBackPressListener) {
     WindowManager.LayoutParams params = new WindowManager.LayoutParams();
     params.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
     params.format = PixelFormat.TRANSLUCENT;
@@ -54,49 +46,61 @@ public class PromptDialogManager {
     params.windowAnimations = android.R.style.Animation_Dialog;
     params.dimAmount = this.dimAmount;
     params.flags = convert2Flag(this.style);
-    WindowManager windowManager = (WindowManager) MatterTvServerApplication.getApplication().getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
+    WindowManager windowManager =
+        (WindowManager)
+            MatterTvServerApplication.getApplication()
+                .getApplicationContext()
+                .getSystemService(Context.WINDOW_SERVICE);
 
     view.setFocusable(true);
     view.setFocusableInTouchMode(true);
     view.requestFocus();
 
-    View.OnKeyListener onKeyListener = (view1, keyCode, keyEvent) -> {
-      Log.d(TAG, "addView: setOnKeyListener keyCode = " + keyCode);
-      if (keyCode == KeyEvent.KEYCODE_BACK && keyEvent.getAction() == KeyEvent.ACTION_UP) {
-        windowManager.removeView(view);
-        if (onBackPressListener != null) {
-          onBackPressListener.onBackPress();
-        }
-        return true;
-      }
-      return false;
-    };
+    View.OnKeyListener onKeyListener =
+        (view1, keyCode, keyEvent) -> {
+          Log.d(TAG, "addView: setOnKeyListener keyCode = " + keyCode);
+          if (keyCode == KeyEvent.KEYCODE_BACK && keyEvent.getAction() == KeyEvent.ACTION_UP) {
+            windowManager.removeView(view);
+            if (onBackPressListener != null) {
+              onBackPressListener.onBackPress();
+            }
+            return true;
+          }
+          return false;
+        };
     view.setOnKeyListener(onKeyListener);
-    view.setOnTouchListener((v, motionEvent) -> {
-
-      if (motionEvent.getAction() == MotionEvent.ACTION_OUTSIDE) {
-        Log.d(TAG, "handleCommissionOkPermission: setOnTouchListener ACTION_OUTSIDE");
-        windowManager.removeView(view);
-        return true;
-      }
-      return false;
-    });
+    view.setOnTouchListener(
+        (v, motionEvent) -> {
+          if (motionEvent.getAction() == MotionEvent.ACTION_OUTSIDE) {
+            Log.d(TAG, "handleCommissionOkPermission: setOnTouchListener ACTION_OUTSIDE");
+            windowManager.removeView(view);
+            return true;
+          }
+          return false;
+        });
 
     windowManager.addView(view, params);
   }
 
   public void removeView(View view) {
-    WindowManager windowManager = (WindowManager) MatterTvServerApplication.getApplication().getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
+    WindowManager windowManager =
+        (WindowManager)
+            MatterTvServerApplication.getApplication()
+                .getApplicationContext()
+                .getSystemService(Context.WINDOW_SERVICE);
     try {
       windowManager.removeView(view);
     } catch (Exception ex) {
       Log.w(TAG, "removeView: error = " + ex);
     }
-
   }
 
   public void removeViewImmediate(View view) {
-    WindowManager windowManager = (WindowManager) MatterTvServerApplication.getApplication().getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
+    WindowManager windowManager =
+        (WindowManager)
+            MatterTvServerApplication.getApplication()
+                .getApplicationContext()
+                .getSystemService(Context.WINDOW_SERVICE);
     try {
       windowManager.removeViewImmediate(view);
     } catch (Exception ex) {
@@ -107,15 +111,20 @@ public class PromptDialogManager {
   private static int convert2Flag(int style) {
     int flags = WindowManager.LayoutParams.FLAG_DIM_BEHIND;
     if (style == DIALOG_STYLE_1) {
-      return flags | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
+      return flags
+          | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+          | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
     } else if (style == DIALOG_STYLE_2) {
       return flags;
     } else if (style == DIALOG_STYLE_3) {
-      return flags | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH;
+      return flags
+          | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+          | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH;
     } else {
       return flags;
     }
   }
+
   public static class Builder {
 
     private int width = WindowManager.LayoutParams.WRAP_CONTENT;
@@ -155,7 +164,7 @@ public class PromptDialogManager {
     }
   }
 
-  public interface onBackPressListener{
-     void onBackPress();
+  public interface onBackPressListener {
+    void onBackPress();
   }
 }
