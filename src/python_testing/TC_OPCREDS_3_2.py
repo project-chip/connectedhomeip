@@ -19,7 +19,7 @@ import chip.clusters as Clusters
 from chip.tlv import TLVReader
 from chip.utils import CommissioningBuildingBlocks
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from test_plan_support import commission_if_required, commission_from_existing, verify_commissioning_successful, read_attribute, remove_fabric, verify_success
+from test_plan_support import *
 from mobly import asserts
 
 
@@ -56,13 +56,11 @@ class TC_OPCREDS_3_2(MatterBaseTest):
 
     @async_test_body
     async def test_TC_OPCREDS_3_2(self):
-        # TODO: implement
         opcreds = Clusters.OperationalCredentials
 
         self.step(0)
 
         self.step(1)
-        # Create a new controller on a new fabric called CR2. Commission the new controller from CR1 as follows:
         dev_ctrl = self.default_controller
 
         new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
@@ -79,17 +77,10 @@ class TC_OPCREDS_3_2(MatterBaseTest):
             commissionerDevCtrl=dev_ctrl, newFabricDevCtrl=cr2_new_admin_ctrl,
             existingNodeId=self.dut_node_id, newNodeId=cr2_dut_node_id
         )
+
         fabric_index_CR2 = nocResp.fabricIndex
-        tlvReaderRCAC = TLVReader(rcacResp).get()["Any"]
-        rcac_CR2 = tlvReaderRCAC[9]  # public key is field 9
-
-        print(f"Success: {success}, nocResp: {nocResp}, rcacResp: {rcacResp}")
-        nocs = await self.read_single_attribute_check_success(dev_ctrl=cr2_new_admin_ctrl, node_id=cr2_dut_node_id, cluster=opcreds, attribute=opcreds.Attributes.NOCs, fabric_filtered=False)
-
-        print(f"nocs: {nocs}")
-
-        # rcac_CR2 = TLVReader(rcacResp).get()["Any"]
-        # print(rcac_CR2[9])
+        tlvReaderRCAC_CR2 = TLVReader(rcacResp).get()["Any"]
+        rcac_CR2 = tlvReaderRCAC_CR2[9]  # public key is field 9
 
         self.step(2)
         new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
@@ -106,30 +97,37 @@ class TC_OPCREDS_3_2(MatterBaseTest):
             commissionerDevCtrl=dev_ctrl, newFabricDevCtrl=cr3_new_admin_ctrl,
             existingNodeId=self.dut_node_id, newNodeId=cr3_dut_node_id
         )
-        fabric_index_CR3 = nocResp.fabricIndex
-        # rcac_CR3 = TLVReader(rcacResp).get()["Any"]
 
-        # print(f"Success: {success}, nocResp: {nocResp}, rcacResp: {rcacResp}")
+        fabric_index_CR3 = nocResp.fabricIndex
+        tlvReaderRCAC_CR3 = TLVReader(rcacResp).get()["Any"]
+        rcac_CR3 = tlvReaderRCAC_CR3[9]
 
         self.step(3)
-        cr2_read_fabricIndex = await self.read_single_attribute_check_success(dev_ctrl=cr2_new_admin_ctrl, node_id=cr2_dut_node_id, cluster=opcreds, attribute=opcreds.Attributes.CurrentFabricIndex)
-        print(f"fabric_index_CR2: {cr2_read_fabricIndex}")
+        cr2_read_fabricIndex = await self.read_single_attribute_check_success(dev_ctrl=cr2_new_admin_ctrl,
+                                                                              node_id=cr2_dut_node_id,
+                                                                              cluster=opcreds,
+                                                                              attribute=opcreds.Attributes.CurrentFabricIndex)
         if fabric_index_CR2 == cr2_read_fabricIndex:
             print("Success fabric_index_CR2 is equal to read fabricIndex from CR2")
         else:
             print("Fail fabric_index_CR2 is not equal to read fabricIndex from CR2")
 
         self.step(4)
-        cr3_read_fabricIndex = await self.read_single_attribute_check_success(dev_ctrl=cr3_new_admin_ctrl, node_id=cr3_dut_node_id, cluster=opcreds, attribute=opcreds.Attributes.CurrentFabricIndex)
-        print(f"fabric_index_CR3: {cr3_read_fabricIndex}")
+        cr3_read_fabricIndex = await self.read_single_attribute_check_success(dev_ctrl=cr3_new_admin_ctrl,
+                                                                              node_id=cr3_dut_node_id,
+                                                                              cluster=opcreds,
+                                                                              attribute=opcreds.Attributes.CurrentFabricIndex)
         if fabric_index_CR3 == cr3_read_fabricIndex:
             print("Success fabric_index_CR3 is equal to read fabricIndex from CR3")
         else:
             print("Fail fabric_index_CR3 is not equal to read fabricIndex from CR3")
 
         self.step(5)
-        cr2_fabric = await self.read_single_attribute_check_success(dev_ctrl=cr2_new_admin_ctrl, node_id=cr2_dut_node_id, cluster=opcreds, attribute=opcreds.Attributes.Fabrics, fabric_filtered=True)
-        print(f"cr2_fabric: {cr2_fabric}")
+        cr2_fabric = await self.read_single_attribute_check_success(dev_ctrl=cr2_new_admin_ctrl,
+                                                                    node_id=cr2_dut_node_id,
+                                                                    cluster=opcreds,
+                                                                    attribute=opcreds.Attributes.Fabrics,
+                                                                    fabric_filtered=True)
 
         for fabric in cr2_fabric:
             cr2_fabric_fabricIndex = fabric.fabricIndex
@@ -146,11 +144,39 @@ class TC_OPCREDS_3_2(MatterBaseTest):
         asserts.assert_equal(cr2_fabric_fabricId, cr2_fabricId,
                              "Unexpected fabricId does not match with CR2 fabricID")
 
-        print(f"cr2_fabric_fabricIndex: {cr2_fabric_fabricIndex}, cr2_fabric_rootPublicKey: {cr2_fabric_rootPublicKey}, cr2_fabric_vendorId: {cr2_fabric_vendorId}, cr2_fabric_fabricId: {cr2_fabric_fabricId}")
-
         self.step(6)
+        cr3_fabric = await self.read_single_attribute_check_success(dev_ctrl=cr3_new_admin_ctrl,
+                                                                    node_id=cr3_dut_node_id,
+                                                                    cluster=opcreds,
+                                                                    attribute=opcreds.Attributes.Fabrics,
+                                                                    fabric_filtered=True)
+
+        for fabric in cr3_fabric:
+            cr3_fabric_fabricIndex = fabric.fabricIndex
+            cr3_fabric_rootPublicKey = fabric.rootPublicKey
+            cr3_fabric_vendorId = fabric.vendorID
+            cr3_fabric_fabricId = fabric.fabricID
+
+        asserts.assert_equal(cr3_fabric_fabricIndex,
+                             fabric_index_CR3, "Unexpected CR3 fabric index")
+        asserts.assert_equal(cr3_fabric_rootPublicKey, rcac_CR3,
+                             "Unexpected RootPublicKey does not match with rcac_CR3")
+        asserts.assert_equal(cr3_fabric_vendorId, cr3_vid,
+                             "Unexpected vendorId does not match with CR3 VendorID")
+        asserts.assert_equal(cr3_fabric_fabricId, cr3_fabricId,
+                             "Unexpected fabricId does not match with CR3 fabricID")
+
         self.step(7)
+        cmd = opcreds.Commands.RemoveFabric(fabric_index_CR2)
+        resp = await self.send_single_cmd(cmd=cmd)
+        asserts.assert_equal(
+            resp.statusCode, opcreds.Enums.NodeOperationalCertStatusEnum.kOk)
+
         self.step(8)
+        cmd = opcreds.Commands.RemoveFabric(fabric_index_CR3)
+        resp = await self.send_single_cmd(cmd=cmd)
+        asserts.assert_equal(
+            resp.statusCode, opcreds.Enums.NodeOperationalCertStatusEnum.kOk)
 
 
 if __name__ == "__main__":
