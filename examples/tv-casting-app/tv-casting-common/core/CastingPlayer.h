@@ -38,8 +38,8 @@ namespace core {
 
 const int kPortMaxLength = 5; // port is uint16_t
 // +1 for the : between the hostname and the port.
-const int kIdMaxLength                                      = chip::Dnssd::kHostNameMaxLength + kPortMaxLength + 1;
-const unsigned long long int kCommissioningWindowTimeoutSec = 3 * 60; // 3 minutes
+const int kIdMaxLength                        = chip::Dnssd::kHostNameMaxLength + kPortMaxLength + 1;
+const uint64_t kCommissioningWindowTimeoutSec = 3 * 60; // 3 minutes
 
 /**
  * @brief Describes an Endpoint that the client wants to connect to
@@ -131,8 +131,8 @@ public:
      * TargetApp is not found in the on-device CastingStore.
      */
     void VerifyOrEstablishConnection(ConnectionCallbacks connectionCallbacks,
-                                     unsigned long long int commissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec,
-                                     IdentificationDeclarationOptions idOptions           = IdentificationDeclarationOptions());
+                                     uint64_t commissioningWindowTimeoutSec     = kCommissioningWindowTimeoutSec,
+                                     IdentificationDeclarationOptions idOptions = IdentificationDeclarationOptions());
 
     /**
      * @brief Continues the UDC process during the Commissioner-Generated passcode commissioning flow by sending a second
@@ -145,12 +145,10 @@ public:
      * CommissionableDataProvider
      * (matter::casting::core::CastingApp::GetInstance()->UpdateCommissionableDataProvider(CommissionableDataProvider)).
      *
-     * @param connectionCallbacks contains the ConnectCallback and CommissionerDeclarationCallback (Optional).
-     * @param commissioningWindowTimeoutSec (Optional) time (in sec) to keep the commissioning window open, if commissioning is
-     * required. Needs to be >= kCommissioningWindowTimeoutSec.
+     * The same connectionCallbacks and commissioningWindowTimeoutSec parameters passed in to VerifyOrEstablishConnection() will be
+     * used.
      */
-    void ContinueConnecting(ConnectionCallbacks connectionCallbacks,
-                            unsigned long long int commissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec);
+    void ContinueConnecting();
 
     /**
      * @brief Sets the internal connection state of this CastingPlayer to "disconnected"
@@ -220,8 +218,8 @@ private:
     CastingPlayerAttributes mAttributes;
     IdentificationDeclarationOptions mIdOptions;
     static CastingPlayer * mTargetCastingPlayer;
-    unsigned long long int mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
-    ConnectCallback mOnCompleted                          = {};
+    uint64_t mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
+    ConnectCallback mOnCompleted            = {};
 
     /**
      * @brief resets this CastingPlayer's state and calls mOnCompleted with the CHIP_ERROR. Also, after calling mOnCompleted, it

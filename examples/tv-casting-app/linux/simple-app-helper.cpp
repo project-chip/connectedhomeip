@@ -33,6 +33,8 @@
 
 // VendorId of the Endpoint on the CastingPlayer that the CastingApp desires to interact with after connection
 const uint16_t kDesiredEndpointVendorId = 65521;
+// Indicates that the Commissioner-Generated passcode commissioning flow is in progress.
+bool gCommissionerGeneratedPasscodeFlow = false;
 
 DiscoveryDelegateImpl * DiscoveryDelegateImpl::_discoveryDelegateImpl = nullptr;
 bool gAwaitingCommissionerPasscodeInput                               = false;
@@ -244,6 +246,22 @@ CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & prov
                          options.payload.discriminator.GetLongValue());
 }
 
+void PrintEndpointsVendorAndProductIDs(
+    const std::vector<matter::casting::memory::Strong<matter::casting::core::Endpoint>> & endpoints)
+{
+    ChipLogProgress(AppServer, "simple-app-helper.cpp::PrintEndpointsVendorAndProductIDs() Number of Endpoints: %d",
+                    static_cast<int>(endpoints.size()));
+    for (const auto & endpoint : endpoints)
+    {
+        int endpointId = endpoint->GetId();
+        int vendorId   = endpoint->GetVendorId();
+        int productId  = endpoint->GetProductId();
+        ChipLogProgress(AppServer,
+                        "simple-app-helper.cpp::PrintEndpointsVendorAndProductIDs() Endpoint ID: %d, Vendor ID: %d, Product ID: %d",
+                        endpointId, vendorId, productId);
+    }
+}
+
 void ConnectionHandler(CHIP_ERROR err, matter::casting::core::CastingPlayer * castingPlayer)
 {
     ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler()");
@@ -256,22 +274,48 @@ void ConnectionHandler(CHIP_ERROR err, matter::casting::core::CastingPlayer * ca
             "simple-app-helper.cpp::ConnectionHandler(): Failed to connect to CastingPlayer (ID: %s) with err %" CHIP_ERROR_FORMAT,
             targetCastingPlayer->GetId(), err.Format()));
 
-    ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler(): Successfully connected to CastingPlayer (ID: %s)",
-                    castingPlayer->GetId());
-    ChipLogProgress(AppServer,
-                    "simple-app-helper.cpp::ConnectionHandler(): Triggering demo interactions with CastingPlayer (ID: %s)",
-                    castingPlayer->GetId());
+    if (gCommissionerGeneratedPasscodeFlow)
+    {
+        ChipLogProgress(AppServer,
+                        "simple-app-helper.cpp::ConnectionHandler(): Successfully connected to CastingPlayer (ID: %s) using "
+                        "Commissioner-Generated passcode",
+                        castingPlayer->GetId());
+        ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler(): Desired Endpoint ID for demo interactions: 1");
+    }
+    else
+    {
+        ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler(): Successfully connected to CastingPlayer (ID: %s)",
+                        castingPlayer->GetId());
+        ChipLogProgress(AppServer,
+                        "simple-app-helper.cpp::ConnectionHandler(): Desired Endpoint Vendor ID for demo interactions: %d",
+                        kDesiredEndpointVendorId);
+    }
 
+    ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler(): Getting endpoints avaiable for demo interactions");
     std::vector<matter::casting::memory::Strong<matter::casting::core::Endpoint>> endpoints = castingPlayer->GetEndpoints();
+    PrintEndpointsVendorAndProductIDs(endpoints);
+
     // Find the desired Endpoint and auto-trigger some Matter Casting demo interactions
     auto it = std::find_if(endpoints.begin(), endpoints.end(),
                            [](const matter::casting::memory::Strong<matter::casting::core::Endpoint> & endpoint) {
-                               return endpoint->GetVendorId() == kDesiredEndpointVendorId;
+                               if (gCommissionerGeneratedPasscodeFlow)
+                               {
+                                   // Since the tv-app with Vendor ID 1111 does not implement the endpoint with Vendor ID 65521 we
+                                   // will (temporarily) use the first available endpoint for demo interactions. See
+                                   // connectedhomeip/examples/tv-app/tv-common/include/AppTv.h.
+                                   return endpoint->GetId() == 1;
+                               }
+                               return endpoint->GetVendorId() == kDesiredEndpointVendorId; // 65521
                            });
     if (it != endpoints.end())
     {
         // The desired endpoint is endpoints[index]
         unsigned index = (unsigned int) std::distance(endpoints.begin(), it);
+
+        ChipLogProgress(
+            AppServer,
+            "simple-app-helper.cpp::ConnectionHandler(): Triggering demo interactions with CastingPlayer (ID: %s). Endpoint ID: %d",
+            castingPlayer->GetId(), endpoints[index]->GetId());
 
         // demonstrate invoking a command
         InvokeContentLauncherLaunchURL(endpoints[index]);
@@ -286,8 +330,8 @@ void ConnectionHandler(CHIP_ERROR err, matter::casting::core::CastingPlayer * ca
     {
         ChipLogError(
             AppServer,
-            "simple-app-helper.cpp::ConnectionHandler():Desired Endpoint Vendor Id (%d) not found on the CastingPlayer (ID: %s)",
-            kDesiredEndpointVendorId, castingPlayer->GetId());
+            "simple-app-helper.cpp::ConnectionHandler():Desired Endpoint Vendor ID not found on the CastingPlayer (ID: %s)",
+            castingPlayer->GetId());
     }
 }
 
@@ -350,9 +394,14 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
                             ChipLogError(AppServer, "Invalid casting player index provided: %lu", index));
         targetCastingPlayer = castingPlayers.at(index);
 
+        gCommissionerGeneratedPasscodeFlow = false;
         matter::casting::core::IdentificationDeclarationOptions idOptions;
+        chip::Protocols::UserDirectedCommissioning::TargetAppInfo targetAppInfo;
+        targetAppInfo.vendorId = kDesiredEndpointVendorId;
+
         if (argc == 3)
         {
+
             if (strcmp(argv[2], "commissioner-generated-passcode") == 0)
             {
                 // Attempt Commissioner-Generated Passcode (commissioner-generated-passcode) commissioning flow only if the
@@ -364,6 +413,13 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
                                     "Commissioner-Generated Passcode commissioning flow",
                                     index);
                     idOptions.mCommissionerPasscode = true;
+
+                    // Override the default target Vendor ID for this example (Commissioner-Generated passcode commissioning flow).
+                    // This tv-app target Vendor ID (1111), does not implement the AccountLogin cluster, which would otherwise auto
+                    // commission using the Commissionee-Generated passcode upon recieving the IdentificationDeclaration Message.
+                    // See connectedhomeip/examples/tv-app/tv-common/include/AppTv.h.
+                    targetAppInfo.vendorId             = 1111;
+                    gCommissionerGeneratedPasscodeFlow = true;
                 }
                 else
                 {
@@ -374,9 +430,8 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
                 }
             }
         }
-        chip::Protocols::UserDirectedCommissioning::TargetAppInfo targetAppInfo;
-        targetAppInfo.vendorId = kDesiredEndpointVendorId;
-        CHIP_ERROR result      = idOptions.addTargetAppInfo(targetAppInfo);
+
+        CHIP_ERROR result = idOptions.addTargetAppInfo(targetAppInfo);
         if (result != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "CommandHandler() request, failed to add targetAppInfo: %" CHIP_ERROR_FORMAT, result.Format());
@@ -430,11 +485,8 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
                              err.Format());
             }
 
-            matter::casting::core::ConnectionCallbacks connectionCallbacks;
-            connectionCallbacks.mOnConnectionComplete = ConnectionHandler;
-
             // Continue Connecting to the target CastingPlayer with the user entered Commissioner-generated Passcode.
-            targetCastingPlayer->ContinueConnecting(connectionCallbacks, matter::casting::core::kCommissioningWindowTimeoutSec);
+            targetCastingPlayer->ContinueConnecting();
         }
         else
         {
