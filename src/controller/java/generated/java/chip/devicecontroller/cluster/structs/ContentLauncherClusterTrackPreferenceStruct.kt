@@ -26,8 +26,8 @@ import matter.tlv.TlvWriter
 
 class ContentLauncherClusterTrackPreferenceStruct(
   val languageCode: String,
-  val characteristics: Optional<List<UInt>>,
-  val audioOutputIndex: UInt
+  val characteristics: Optional<List<UInt>>?,
+  val audioOutputIndex: Optional<UInt>?
 ) {
   override fun toString(): String = buildString {
     append("ContentLauncherClusterTrackPreferenceStruct {\n")
@@ -41,15 +41,26 @@ class ContentLauncherClusterTrackPreferenceStruct(
     tlvWriter.apply {
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_LANGUAGE_CODE), languageCode)
-      if (characteristics.isPresent) {
-        val optcharacteristics = characteristics.get()
-        startArray(ContextSpecificTag(TAG_CHARACTERISTICS))
-        for (item in optcharacteristics.iterator()) {
-          put(AnonymousTag, item)
+      if (characteristics != null) {
+        if (characteristics.isPresent) {
+          val optcharacteristics = characteristics.get()
+          startArray(ContextSpecificTag(TAG_CHARACTERISTICS))
+          for (item in optcharacteristics.iterator()) {
+            put(AnonymousTag, item)
+          }
+          endArray()
         }
-        endArray()
+      } else {
+        putNull(ContextSpecificTag(TAG_CHARACTERISTICS))
       }
-      put(ContextSpecificTag(TAG_AUDIO_OUTPUT_INDEX), audioOutputIndex)
+      if (audioOutputIndex != null) {
+        if (audioOutputIndex.isPresent) {
+          val optaudioOutputIndex = audioOutputIndex.get()
+          put(ContextSpecificTag(TAG_AUDIO_OUTPUT_INDEX), optaudioOutputIndex)
+        }
+      } else {
+        putNull(ContextSpecificTag(TAG_AUDIO_OUTPUT_INDEX))
+      }
       endStructure()
     }
   }
@@ -63,20 +74,35 @@ class ContentLauncherClusterTrackPreferenceStruct(
       tlvReader.enterStructure(tlvTag)
       val languageCode = tlvReader.getString(ContextSpecificTag(TAG_LANGUAGE_CODE))
       val characteristics =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CHARACTERISTICS))) {
-          Optional.of(
-            buildList<UInt> {
-              tlvReader.enterArray(ContextSpecificTag(TAG_CHARACTERISTICS))
-              while (!tlvReader.isEndOfContainer()) {
-                add(tlvReader.getUInt(AnonymousTag))
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_CHARACTERISTICS))) {
+            Optional.of(
+              buildList<UInt> {
+                tlvReader.enterArray(ContextSpecificTag(TAG_CHARACTERISTICS))
+                while (!tlvReader.isEndOfContainer()) {
+                  add(tlvReader.getUInt(AnonymousTag))
+                }
+                tlvReader.exitContainer()
               }
-              tlvReader.exitContainer()
-            }
-          )
+            )
+          } else {
+            Optional.empty()
+          }
         } else {
-          Optional.empty()
+          tlvReader.getNull(ContextSpecificTag(TAG_CHARACTERISTICS))
+          null
         }
-      val audioOutputIndex = tlvReader.getUInt(ContextSpecificTag(TAG_AUDIO_OUTPUT_INDEX))
+      val audioOutputIndex =
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_AUDIO_OUTPUT_INDEX))) {
+            Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_AUDIO_OUTPUT_INDEX)))
+          } else {
+            Optional.empty()
+          }
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_AUDIO_OUTPUT_INDEX))
+          null
+        }
 
       tlvReader.exitContainer()
 

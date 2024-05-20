@@ -9277,6 +9277,67 @@ public static class ThermostatClusterWeeklyScheduleTransitionStruct {
     return output.toString();
   }
 }
+public static class ChannelClusterAdditionalInfoStruct {
+  public String name;
+  public String value;
+  private static final long NAME_ID = 0L;
+  private static final long VALUE_ID = 1L;
+
+  public ChannelClusterAdditionalInfoStruct(
+    String name,
+    String value
+  ) {
+    this.name = name;
+    this.value = value;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(NAME_ID, new StringType(name)));
+    values.add(new StructElement(VALUE_ID, new StringType(value)));
+
+    return new StructType(values);
+  }
+
+  public static ChannelClusterAdditionalInfoStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    String name = null;
+    String value = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == NAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          name = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == VALUE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          value = castingValue.value(String.class);
+        }
+      }
+    }
+    return new ChannelClusterAdditionalInfoStruct(
+      name,
+      value
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ChannelClusterAdditionalInfoStruct {\n");
+    output.append("\tname: ");
+    output.append(name);
+    output.append("\n");
+    output.append("\tvalue: ");
+    output.append(value);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class ChannelClusterProgramCastStruct {
   public String name;
   public String role;
@@ -9611,11 +9672,11 @@ public static class ChannelClusterProgramStruct {
   public Optional<String> dvbiUrl;
   public Optional<String> releaseDate;
   public Optional<String> parentalGuidanceText;
-  public Optional<Long> recordingFlag;
+  public Optional<Integer> recordingFlag;
   public @Nullable Optional<ChipStructs.ChannelClusterSeriesInfoStruct> seriesInfo;
   public Optional<ArrayList<ChipStructs.ChannelClusterProgramCategoryStruct>> categoryList;
   public Optional<ArrayList<ChipStructs.ChannelClusterProgramCastStruct>> castList;
-  public Optional<ArrayList<ChipStructs.ChannelClusterProgramCastStruct>> externalIDList;
+  public Optional<ArrayList<ChipStructs.ChannelClusterAdditionalInfoStruct>> externalIDList;
   private static final long IDENTIFIER_ID = 0L;
   private static final long CHANNEL_ID = 1L;
   private static final long START_TIME_ID = 2L;
@@ -9651,11 +9712,11 @@ public static class ChannelClusterProgramStruct {
     Optional<String> dvbiUrl,
     Optional<String> releaseDate,
     Optional<String> parentalGuidanceText,
-    Optional<Long> recordingFlag,
+    Optional<Integer> recordingFlag,
     @Nullable Optional<ChipStructs.ChannelClusterSeriesInfoStruct> seriesInfo,
     Optional<ArrayList<ChipStructs.ChannelClusterProgramCategoryStruct>> categoryList,
     Optional<ArrayList<ChipStructs.ChannelClusterProgramCastStruct>> castList,
-    Optional<ArrayList<ChipStructs.ChannelClusterProgramCastStruct>> externalIDList
+    Optional<ArrayList<ChipStructs.ChannelClusterAdditionalInfoStruct>> externalIDList
   ) {
     this.identifier = identifier;
     this.channel = channel;
@@ -9721,11 +9782,11 @@ public static class ChannelClusterProgramStruct {
     Optional<String> dvbiUrl = Optional.empty();
     Optional<String> releaseDate = Optional.empty();
     Optional<String> parentalGuidanceText = Optional.empty();
-    Optional<Long> recordingFlag = Optional.empty();
+    Optional<Integer> recordingFlag = Optional.empty();
     @Nullable Optional<ChipStructs.ChannelClusterSeriesInfoStruct> seriesInfo = null;
     Optional<ArrayList<ChipStructs.ChannelClusterProgramCategoryStruct>> categoryList = Optional.empty();
     Optional<ArrayList<ChipStructs.ChannelClusterProgramCastStruct>> castList = Optional.empty();
-    Optional<ArrayList<ChipStructs.ChannelClusterProgramCastStruct>> externalIDList = Optional.empty();
+    Optional<ArrayList<ChipStructs.ChannelClusterAdditionalInfoStruct>> externalIDList = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == IDENTIFIER_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.String) {
@@ -9800,7 +9861,7 @@ public static class ChannelClusterProgramStruct {
       } else if (element.contextTagNum() == RECORDING_FLAG_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          recordingFlag = Optional.of(castingValue.value(Long.class));
+          recordingFlag = Optional.of(castingValue.value(Integer.class));
         }
       } else if (element.contextTagNum() == SERIES_INFO_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
@@ -9820,7 +9881,7 @@ public static class ChannelClusterProgramStruct {
       } else if (element.contextTagNum() == EXTERNAL_I_D_LIST_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {
           ArrayType castingValue = element.value(ArrayType.class);
-          externalIDList = Optional.of(castingValue.map((elementcastingValue) -> ChipStructs.ChannelClusterProgramCastStruct.decodeTlv(elementcastingValue)));
+          externalIDList = Optional.of(castingValue.map((elementcastingValue) -> ChipStructs.ChannelClusterAdditionalInfoStruct.decodeTlv(elementcastingValue)));
         }
       }
     }
@@ -10049,67 +10110,6 @@ public static class ChannelClusterChannelPagingStruct {
     return output.toString();
   }
 }
-public static class ChannelClusterAdditionalInfoStruct {
-  public String name;
-  public String value;
-  private static final long NAME_ID = 0L;
-  private static final long VALUE_ID = 1L;
-
-  public ChannelClusterAdditionalInfoStruct(
-    String name,
-    String value
-  ) {
-    this.name = name;
-    this.value = value;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(NAME_ID, new StringType(name)));
-    values.add(new StructElement(VALUE_ID, new StringType(value)));
-
-    return new StructType(values);
-  }
-
-  public static ChannelClusterAdditionalInfoStruct decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    String name = null;
-    String value = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == NAME_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.String) {
-          StringType castingValue = element.value(StringType.class);
-          name = castingValue.value(String.class);
-        }
-      } else if (element.contextTagNum() == VALUE_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.String) {
-          StringType castingValue = element.value(StringType.class);
-          value = castingValue.value(String.class);
-        }
-      }
-    }
-    return new ChannelClusterAdditionalInfoStruct(
-      name,
-      value
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("ChannelClusterAdditionalInfoStruct {\n");
-    output.append("\tname: ");
-    output.append(name);
-    output.append("\n");
-    output.append("\tvalue: ");
-    output.append(value);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
 public static class ChannelClusterLineupInfoStruct {
   public String operatorName;
   public Optional<String> lineupName;
@@ -10264,21 +10264,26 @@ public static class TargetNavigatorClusterTargetInfoStruct {
 }
 public static class MediaPlaybackClusterTrackAttributesStruct {
   public String languageCode;
+  public @Nullable Optional<ArrayList<Integer>> characteristics;
   public @Nullable Optional<String> displayName;
   private static final long LANGUAGE_CODE_ID = 0L;
-  private static final long DISPLAY_NAME_ID = 1L;
+  private static final long CHARACTERISTICS_ID = 1L;
+  private static final long DISPLAY_NAME_ID = 2L;
 
   public MediaPlaybackClusterTrackAttributesStruct(
     String languageCode,
+    @Nullable Optional<ArrayList<Integer>> characteristics,
     @Nullable Optional<String> displayName
   ) {
     this.languageCode = languageCode;
+    this.characteristics = characteristics;
     this.displayName = displayName;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(LANGUAGE_CODE_ID, new StringType(languageCode)));
+    values.add(new StructElement(CHARACTERISTICS_ID, characteristics != null ? characteristics.<BaseTLVType>map((nonOptionalcharacteristics) -> ArrayType.generateArrayType(nonOptionalcharacteristics, (elementnonOptionalcharacteristics) -> new UIntType(elementnonOptionalcharacteristics))).orElse(new EmptyType()) : new NullType()));
     values.add(new StructElement(DISPLAY_NAME_ID, displayName != null ? displayName.<BaseTLVType>map((nonOptionaldisplayName) -> new StringType(nonOptionaldisplayName)).orElse(new EmptyType()) : new NullType()));
 
     return new StructType(values);
@@ -10289,12 +10294,18 @@ public static class MediaPlaybackClusterTrackAttributesStruct {
       return null;
     }
     String languageCode = null;
+    @Nullable Optional<ArrayList<Integer>> characteristics = null;
     @Nullable Optional<String> displayName = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == LANGUAGE_CODE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.String) {
           StringType castingValue = element.value(StringType.class);
           languageCode = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == CHARACTERISTICS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          characteristics = Optional.of(castingValue.map((elementcastingValue) -> elementcastingValue.value(Integer.class)));
         }
       } else if (element.contextTagNum() == DISPLAY_NAME_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.String) {
@@ -10305,6 +10316,7 @@ public static class MediaPlaybackClusterTrackAttributesStruct {
     }
     return new MediaPlaybackClusterTrackAttributesStruct(
       languageCode,
+      characteristics,
       displayName
     );
   }
@@ -10316,6 +10328,9 @@ public static class MediaPlaybackClusterTrackAttributesStruct {
     output.append("\tlanguageCode: ");
     output.append(languageCode);
     output.append("\n");
+    output.append("\tcharacteristics: ");
+    output.append(characteristics);
+    output.append("\n");
     output.append("\tdisplayName: ");
     output.append(displayName);
     output.append("\n");
@@ -10325,13 +10340,13 @@ public static class MediaPlaybackClusterTrackAttributesStruct {
 }
 public static class MediaPlaybackClusterTrackStruct {
   public String id;
-  public @Nullable ChipStructs.MediaPlaybackClusterTrackAttributesStruct trackAttributes;
+  public ChipStructs.MediaPlaybackClusterTrackAttributesStruct trackAttributes;
   private static final long ID_ID = 0L;
   private static final long TRACK_ATTRIBUTES_ID = 1L;
 
   public MediaPlaybackClusterTrackStruct(
     String id,
-    @Nullable ChipStructs.MediaPlaybackClusterTrackAttributesStruct trackAttributes
+    ChipStructs.MediaPlaybackClusterTrackAttributesStruct trackAttributes
   ) {
     this.id = id;
     this.trackAttributes = trackAttributes;
@@ -10340,7 +10355,7 @@ public static class MediaPlaybackClusterTrackStruct {
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(ID_ID, new StringType(id)));
-    values.add(new StructElement(TRACK_ATTRIBUTES_ID, trackAttributes != null ? trackAttributes.encodeTlv() : new NullType()));
+    values.add(new StructElement(TRACK_ATTRIBUTES_ID, trackAttributes.encodeTlv()));
 
     return new StructType(values);
   }
@@ -10350,7 +10365,7 @@ public static class MediaPlaybackClusterTrackStruct {
       return null;
     }
     String id = null;
-    @Nullable ChipStructs.MediaPlaybackClusterTrackAttributesStruct trackAttributes = null;
+    ChipStructs.MediaPlaybackClusterTrackAttributesStruct trackAttributes = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.String) {
@@ -10614,16 +10629,16 @@ public static class ContentLauncherClusterDimensionStruct {
 }
 public static class ContentLauncherClusterTrackPreferenceStruct {
   public String languageCode;
-  public Optional<ArrayList<Integer>> characteristics;
-  public Integer audioOutputIndex;
+  public @Nullable Optional<ArrayList<Integer>> characteristics;
+  public @Nullable Optional<Integer> audioOutputIndex;
   private static final long LANGUAGE_CODE_ID = 0L;
   private static final long CHARACTERISTICS_ID = 1L;
   private static final long AUDIO_OUTPUT_INDEX_ID = 2L;
 
   public ContentLauncherClusterTrackPreferenceStruct(
     String languageCode,
-    Optional<ArrayList<Integer>> characteristics,
-    Integer audioOutputIndex
+    @Nullable Optional<ArrayList<Integer>> characteristics,
+    @Nullable Optional<Integer> audioOutputIndex
   ) {
     this.languageCode = languageCode;
     this.characteristics = characteristics;
@@ -10633,8 +10648,8 @@ public static class ContentLauncherClusterTrackPreferenceStruct {
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(LANGUAGE_CODE_ID, new StringType(languageCode)));
-    values.add(new StructElement(CHARACTERISTICS_ID, characteristics.<BaseTLVType>map((nonOptionalcharacteristics) -> ArrayType.generateArrayType(nonOptionalcharacteristics, (elementnonOptionalcharacteristics) -> new UIntType(elementnonOptionalcharacteristics))).orElse(new EmptyType())));
-    values.add(new StructElement(AUDIO_OUTPUT_INDEX_ID, new UIntType(audioOutputIndex)));
+    values.add(new StructElement(CHARACTERISTICS_ID, characteristics != null ? characteristics.<BaseTLVType>map((nonOptionalcharacteristics) -> ArrayType.generateArrayType(nonOptionalcharacteristics, (elementnonOptionalcharacteristics) -> new UIntType(elementnonOptionalcharacteristics))).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(AUDIO_OUTPUT_INDEX_ID, audioOutputIndex != null ? audioOutputIndex.<BaseTLVType>map((nonOptionalaudioOutputIndex) -> new UIntType(nonOptionalaudioOutputIndex)).orElse(new EmptyType()) : new NullType()));
 
     return new StructType(values);
   }
@@ -10644,8 +10659,8 @@ public static class ContentLauncherClusterTrackPreferenceStruct {
       return null;
     }
     String languageCode = null;
-    Optional<ArrayList<Integer>> characteristics = Optional.empty();
-    Integer audioOutputIndex = null;
+    @Nullable Optional<ArrayList<Integer>> characteristics = null;
+    @Nullable Optional<Integer> audioOutputIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == LANGUAGE_CODE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.String) {
@@ -10660,7 +10675,7 @@ public static class ContentLauncherClusterTrackPreferenceStruct {
       } else if (element.contextTagNum() == AUDIO_OUTPUT_INDEX_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          audioOutputIndex = castingValue.value(Integer.class);
+          audioOutputIndex = Optional.of(castingValue.value(Integer.class));
         }
       }
     }
@@ -10689,17 +10704,17 @@ public static class ContentLauncherClusterTrackPreferenceStruct {
   }
 }
 public static class ContentLauncherClusterPlaybackPreferencesStruct {
-  public Long playbackPosition;
-  public ChipStructs.ContentLauncherClusterTrackPreferenceStruct textTrack;
-  public Optional<ArrayList<ChipStructs.ContentLauncherClusterTrackPreferenceStruct>> audioTracks;
+  public @Nullable Optional<Long> playbackPosition;
+  public @Nullable Optional<ChipStructs.ContentLauncherClusterTrackPreferenceStruct> textTrack;
+  public @Nullable Optional<ArrayList<ChipStructs.ContentLauncherClusterTrackPreferenceStruct>> audioTracks;
   private static final long PLAYBACK_POSITION_ID = 0L;
   private static final long TEXT_TRACK_ID = 1L;
   private static final long AUDIO_TRACKS_ID = 2L;
 
   public ContentLauncherClusterPlaybackPreferencesStruct(
-    Long playbackPosition,
-    ChipStructs.ContentLauncherClusterTrackPreferenceStruct textTrack,
-    Optional<ArrayList<ChipStructs.ContentLauncherClusterTrackPreferenceStruct>> audioTracks
+    @Nullable Optional<Long> playbackPosition,
+    @Nullable Optional<ChipStructs.ContentLauncherClusterTrackPreferenceStruct> textTrack,
+    @Nullable Optional<ArrayList<ChipStructs.ContentLauncherClusterTrackPreferenceStruct>> audioTracks
   ) {
     this.playbackPosition = playbackPosition;
     this.textTrack = textTrack;
@@ -10708,9 +10723,9 @@ public static class ContentLauncherClusterPlaybackPreferencesStruct {
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(PLAYBACK_POSITION_ID, new UIntType(playbackPosition)));
-    values.add(new StructElement(TEXT_TRACK_ID, textTrack.encodeTlv()));
-    values.add(new StructElement(AUDIO_TRACKS_ID, audioTracks.<BaseTLVType>map((nonOptionalaudioTracks) -> ArrayType.generateArrayType(nonOptionalaudioTracks, (elementnonOptionalaudioTracks) -> elementnonOptionalaudioTracks.encodeTlv())).orElse(new EmptyType())));
+    values.add(new StructElement(PLAYBACK_POSITION_ID, playbackPosition != null ? playbackPosition.<BaseTLVType>map((nonOptionalplaybackPosition) -> new UIntType(nonOptionalplaybackPosition)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(TEXT_TRACK_ID, textTrack != null ? textTrack.<BaseTLVType>map((nonOptionaltextTrack) -> nonOptionaltextTrack.encodeTlv()).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(AUDIO_TRACKS_ID, audioTracks != null ? audioTracks.<BaseTLVType>map((nonOptionalaudioTracks) -> ArrayType.generateArrayType(nonOptionalaudioTracks, (elementnonOptionalaudioTracks) -> elementnonOptionalaudioTracks.encodeTlv())).orElse(new EmptyType()) : new NullType()));
 
     return new StructType(values);
   }
@@ -10719,19 +10734,19 @@ public static class ContentLauncherClusterPlaybackPreferencesStruct {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Long playbackPosition = null;
-    ChipStructs.ContentLauncherClusterTrackPreferenceStruct textTrack = null;
-    Optional<ArrayList<ChipStructs.ContentLauncherClusterTrackPreferenceStruct>> audioTracks = Optional.empty();
+    @Nullable Optional<Long> playbackPosition = null;
+    @Nullable Optional<ChipStructs.ContentLauncherClusterTrackPreferenceStruct> textTrack = null;
+    @Nullable Optional<ArrayList<ChipStructs.ContentLauncherClusterTrackPreferenceStruct>> audioTracks = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == PLAYBACK_POSITION_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          playbackPosition = castingValue.value(Long.class);
+          playbackPosition = Optional.of(castingValue.value(Long.class));
         }
       } else if (element.contextTagNum() == TEXT_TRACK_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
           StructType castingValue = element.value(StructType.class);
-          textTrack = ChipStructs.ContentLauncherClusterTrackPreferenceStruct.decodeTlv(castingValue);
+          textTrack = Optional.of(ChipStructs.ContentLauncherClusterTrackPreferenceStruct.decodeTlv(castingValue));
         }
       } else if (element.contextTagNum() == AUDIO_TRACKS_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {
@@ -11398,6 +11413,325 @@ public static class ApplicationBasicClusterApplicationStruct {
     output.append("\n");
     output.append("\tapplicationID: ");
     output.append(applicationID);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ContentControlClusterTimePeriodStruct {
+  public Integer startHour;
+  public Integer startMinute;
+  public Integer endHour;
+  public Integer endMinute;
+  private static final long START_HOUR_ID = 0L;
+  private static final long START_MINUTE_ID = 1L;
+  private static final long END_HOUR_ID = 2L;
+  private static final long END_MINUTE_ID = 3L;
+
+  public ContentControlClusterTimePeriodStruct(
+    Integer startHour,
+    Integer startMinute,
+    Integer endHour,
+    Integer endMinute
+  ) {
+    this.startHour = startHour;
+    this.startMinute = startMinute;
+    this.endHour = endHour;
+    this.endMinute = endMinute;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(START_HOUR_ID, new UIntType(startHour)));
+    values.add(new StructElement(START_MINUTE_ID, new UIntType(startMinute)));
+    values.add(new StructElement(END_HOUR_ID, new UIntType(endHour)));
+    values.add(new StructElement(END_MINUTE_ID, new UIntType(endMinute)));
+
+    return new StructType(values);
+  }
+
+  public static ContentControlClusterTimePeriodStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer startHour = null;
+    Integer startMinute = null;
+    Integer endHour = null;
+    Integer endMinute = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == START_HOUR_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          startHour = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == START_MINUTE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          startMinute = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == END_HOUR_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          endHour = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == END_MINUTE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          endMinute = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new ContentControlClusterTimePeriodStruct(
+      startHour,
+      startMinute,
+      endHour,
+      endMinute
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ContentControlClusterTimePeriodStruct {\n");
+    output.append("\tstartHour: ");
+    output.append(startHour);
+    output.append("\n");
+    output.append("\tstartMinute: ");
+    output.append(startMinute);
+    output.append("\n");
+    output.append("\tendHour: ");
+    output.append(endHour);
+    output.append("\n");
+    output.append("\tendMinute: ");
+    output.append(endMinute);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ContentControlClusterTimeWindowStruct {
+  public @Nullable Integer timeWindowIndex;
+  public Integer dayOfWeek;
+  public ArrayList<ChipStructs.ContentControlClusterTimePeriodStruct> timePeriod;
+  private static final long TIME_WINDOW_INDEX_ID = 0L;
+  private static final long DAY_OF_WEEK_ID = 1L;
+  private static final long TIME_PERIOD_ID = 2L;
+
+  public ContentControlClusterTimeWindowStruct(
+    @Nullable Integer timeWindowIndex,
+    Integer dayOfWeek,
+    ArrayList<ChipStructs.ContentControlClusterTimePeriodStruct> timePeriod
+  ) {
+    this.timeWindowIndex = timeWindowIndex;
+    this.dayOfWeek = dayOfWeek;
+    this.timePeriod = timePeriod;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(TIME_WINDOW_INDEX_ID, timeWindowIndex != null ? new UIntType(timeWindowIndex) : new NullType()));
+    values.add(new StructElement(DAY_OF_WEEK_ID, new UIntType(dayOfWeek)));
+    values.add(new StructElement(TIME_PERIOD_ID, ArrayType.generateArrayType(timePeriod, (elementtimePeriod) -> elementtimePeriod.encodeTlv())));
+
+    return new StructType(values);
+  }
+
+  public static ContentControlClusterTimeWindowStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    @Nullable Integer timeWindowIndex = null;
+    Integer dayOfWeek = null;
+    ArrayList<ChipStructs.ContentControlClusterTimePeriodStruct> timePeriod = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == TIME_WINDOW_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          timeWindowIndex = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == DAY_OF_WEEK_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          dayOfWeek = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == TIME_PERIOD_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          timePeriod = castingValue.map((elementcastingValue) -> ChipStructs.ContentControlClusterTimePeriodStruct.decodeTlv(elementcastingValue));
+        }
+      }
+    }
+    return new ContentControlClusterTimeWindowStruct(
+      timeWindowIndex,
+      dayOfWeek,
+      timePeriod
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ContentControlClusterTimeWindowStruct {\n");
+    output.append("\ttimeWindowIndex: ");
+    output.append(timeWindowIndex);
+    output.append("\n");
+    output.append("\tdayOfWeek: ");
+    output.append(dayOfWeek);
+    output.append("\n");
+    output.append("\ttimePeriod: ");
+    output.append(timePeriod);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ContentControlClusterAppInfoStruct {
+  public Integer catalogVendorID;
+  public String applicationID;
+  private static final long CATALOG_VENDOR_I_D_ID = 0L;
+  private static final long APPLICATION_I_D_ID = 1L;
+
+  public ContentControlClusterAppInfoStruct(
+    Integer catalogVendorID,
+    String applicationID
+  ) {
+    this.catalogVendorID = catalogVendorID;
+    this.applicationID = applicationID;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CATALOG_VENDOR_I_D_ID, new UIntType(catalogVendorID)));
+    values.add(new StructElement(APPLICATION_I_D_ID, new StringType(applicationID)));
+
+    return new StructType(values);
+  }
+
+  public static ContentControlClusterAppInfoStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer catalogVendorID = null;
+    String applicationID = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CATALOG_VENDOR_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          catalogVendorID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == APPLICATION_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          applicationID = castingValue.value(String.class);
+        }
+      }
+    }
+    return new ContentControlClusterAppInfoStruct(
+      catalogVendorID,
+      applicationID
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ContentControlClusterAppInfoStruct {\n");
+    output.append("\tcatalogVendorID: ");
+    output.append(catalogVendorID);
+    output.append("\n");
+    output.append("\tapplicationID: ");
+    output.append(applicationID);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ContentControlClusterBlockChannelStruct {
+  public @Nullable Integer blockChannelIndex;
+  public Integer majorNumber;
+  public Integer minorNumber;
+  public Optional<String> identifier;
+  private static final long BLOCK_CHANNEL_INDEX_ID = 0L;
+  private static final long MAJOR_NUMBER_ID = 1L;
+  private static final long MINOR_NUMBER_ID = 2L;
+  private static final long IDENTIFIER_ID = 3L;
+
+  public ContentControlClusterBlockChannelStruct(
+    @Nullable Integer blockChannelIndex,
+    Integer majorNumber,
+    Integer minorNumber,
+    Optional<String> identifier
+  ) {
+    this.blockChannelIndex = blockChannelIndex;
+    this.majorNumber = majorNumber;
+    this.minorNumber = minorNumber;
+    this.identifier = identifier;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(BLOCK_CHANNEL_INDEX_ID, blockChannelIndex != null ? new UIntType(blockChannelIndex) : new NullType()));
+    values.add(new StructElement(MAJOR_NUMBER_ID, new UIntType(majorNumber)));
+    values.add(new StructElement(MINOR_NUMBER_ID, new UIntType(minorNumber)));
+    values.add(new StructElement(IDENTIFIER_ID, identifier.<BaseTLVType>map((nonOptionalidentifier) -> new StringType(nonOptionalidentifier)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static ContentControlClusterBlockChannelStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    @Nullable Integer blockChannelIndex = null;
+    Integer majorNumber = null;
+    Integer minorNumber = null;
+    Optional<String> identifier = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == BLOCK_CHANNEL_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          blockChannelIndex = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == MAJOR_NUMBER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          majorNumber = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == MINOR_NUMBER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          minorNumber = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == IDENTIFIER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          identifier = Optional.of(castingValue.value(String.class));
+        }
+      }
+    }
+    return new ContentControlClusterBlockChannelStruct(
+      blockChannelIndex,
+      majorNumber,
+      minorNumber,
+      identifier
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ContentControlClusterBlockChannelStruct {\n");
+    output.append("\tblockChannelIndex: ");
+    output.append(blockChannelIndex);
+    output.append("\n");
+    output.append("\tmajorNumber: ");
+    output.append(majorNumber);
+    output.append("\n");
+    output.append("\tminorNumber: ");
+    output.append(minorNumber);
+    output.append("\n");
+    output.append("\tidentifier: ");
+    output.append(identifier);
     output.append("\n");
     output.append("}\n");
     return output.toString();

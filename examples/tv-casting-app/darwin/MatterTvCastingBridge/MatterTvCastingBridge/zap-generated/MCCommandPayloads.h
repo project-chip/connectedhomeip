@@ -170,7 +170,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MCMediaPlaybackClusterActivateAudioTrackParams : MCAbstractPayload
 @property (nonatomic, copy) NSString * _Nonnull trackID;
-@property (nonatomic, copy) NSNumber * _Nonnull audioOutputIndex;
+@property (nonatomic, copy) NSNumber * _Nullable audioOutputIndex;
 @end
 
 @interface MCMediaPlaybackClusterActivateTextTrackParams : MCAbstractPayload
@@ -204,6 +204,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString * _Nonnull contentURL;
 @property (nonatomic, copy) NSString * _Nullable displayString;
 @property (nonatomic, copy) MCContentLauncherClusterBrandingInformationStruct * _Nullable brandingInformation;
+@property (nonatomic, copy) MCContentLauncherClusterPlaybackPreferencesStruct * _Nullable playbackPreferences;
 @end
 
 @interface MCContentLauncherClusterLauncherResponseParams : MCAbstractPayload

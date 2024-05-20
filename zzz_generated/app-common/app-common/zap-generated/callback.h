@@ -6397,6 +6397,42 @@ bool emberAfContentControlClusterSetScheduledContentRatingThresholdCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ContentControl::Commands::SetScheduledContentRatingThreshold::DecodableType & commandData);
 /**
+ * @brief Content Control Cluster AddBlockChannels Command callback (from client)
+ */
+bool emberAfContentControlClusterAddBlockChannelsCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentControl::Commands::AddBlockChannels::DecodableType & commandData);
+/**
+ * @brief Content Control Cluster RemoveBlockChannels Command callback (from client)
+ */
+bool emberAfContentControlClusterRemoveBlockChannelsCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentControl::Commands::RemoveBlockChannels::DecodableType & commandData);
+/**
+ * @brief Content Control Cluster AddBlockApplications Command callback (from client)
+ */
+bool emberAfContentControlClusterAddBlockApplicationsCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentControl::Commands::AddBlockApplications::DecodableType & commandData);
+/**
+ * @brief Content Control Cluster RemoveBlockApplications Command callback (from client)
+ */
+bool emberAfContentControlClusterRemoveBlockApplicationsCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentControl::Commands::RemoveBlockApplications::DecodableType & commandData);
+/**
+ * @brief Content Control Cluster SetBlockContentTimeWindow Command callback (from client)
+ */
+bool emberAfContentControlClusterSetBlockContentTimeWindowCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentControl::Commands::SetBlockContentTimeWindow::DecodableType & commandData);
+/**
+ * @brief Content Control Cluster RemoveBlockContentTimeWindow Command callback (from client)
+ */
+bool emberAfContentControlClusterRemoveBlockContentTimeWindowCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentControl::Commands::RemoveBlockContentTimeWindow::DecodableType & commandData);
+/**
  * @brief Content App Observer Cluster ContentAppMessage Command callback (from client)
  */
 bool emberAfContentAppObserverClusterContentAppMessageCallback(

@@ -38205,60 +38205,88 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 jobject value_id;
                 LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue.Value().id, value_id));
                 jobject value_trackAttributes;
-                if (cppValue.Value().trackAttributes.IsNull())
+                jobject value_trackAttributes_languageCode;
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue.Value().trackAttributes.languageCode,
+                                                                                     value_trackAttributes_languageCode));
+                jobject value_trackAttributes_characteristics;
+                if (!cppValue.Value().trackAttributes.characteristics.HasValue())
                 {
-                    value_trackAttributes = nullptr;
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_trackAttributes_characteristics);
                 }
                 else
                 {
-                    jobject value_trackAttributes_languageCode;
-                    LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
-                        cppValue.Value().trackAttributes.Value().languageCode, value_trackAttributes_languageCode));
-                    jobject value_trackAttributes_displayName;
-                    if (!cppValue.Value().trackAttributes.Value().displayName.HasValue())
+                    jobject value_trackAttributes_characteristicsInsideOptional;
+                    if (cppValue.Value().trackAttributes.characteristics.Value().IsNull())
                     {
-                        chip::JniReferences::GetInstance().CreateOptional(nullptr, value_trackAttributes_displayName);
+                        value_trackAttributes_characteristicsInsideOptional = nullptr;
                     }
                     else
                     {
-                        jobject value_trackAttributes_displayNameInsideOptional;
-                        if (cppValue.Value().trackAttributes.Value().displayName.Value().IsNull())
+                        chip::JniReferences::GetInstance().CreateArrayList(value_trackAttributes_characteristicsInsideOptional);
+
+                        auto iter_value_trackAttributes_characteristicsInsideOptional_5 =
+                            cppValue.Value().trackAttributes.characteristics.Value().Value().begin();
+                        while (iter_value_trackAttributes_characteristicsInsideOptional_5.Next())
                         {
-                            value_trackAttributes_displayNameInsideOptional = nullptr;
+                            auto & entry_5 = iter_value_trackAttributes_characteristicsInsideOptional_5.GetValue();
+                            jobject newElement_5;
+                            std::string newElement_5ClassName     = "java/lang/Integer";
+                            std::string newElement_5CtorSignature = "(I)V";
+                            jint jninewElement_5                  = static_cast<jint>(entry_5);
+                            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                                newElement_5ClassName.c_str(), newElement_5CtorSignature.c_str(), jninewElement_5, newElement_5);
+                            chip::JniReferences::GetInstance().AddToList(value_trackAttributes_characteristicsInsideOptional,
+                                                                         newElement_5);
                         }
-                        else
-                        {
-                            LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
-                                cppValue.Value().trackAttributes.Value().displayName.Value().Value(),
-                                value_trackAttributes_displayNameInsideOptional));
-                        }
-                        chip::JniReferences::GetInstance().CreateOptional(value_trackAttributes_displayNameInsideOptional,
-                                                                          value_trackAttributes_displayName);
                     }
-
-                    jclass trackAttributesStructStructClass_3;
-                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
-                        env, "chip/devicecontroller/ChipStructs$MediaPlaybackClusterTrackAttributesStruct",
-                        trackAttributesStructStructClass_3);
-                    if (err != CHIP_NO_ERROR)
-                    {
-                        ChipLogError(Zcl, "Could not find class ChipStructs$MediaPlaybackClusterTrackAttributesStruct");
-                        return nullptr;
-                    }
-
-                    jmethodID trackAttributesStructStructCtor_3;
-                    err = chip::JniReferences::GetInstance().FindMethod(env, trackAttributesStructStructClass_3, "<init>",
-                                                                        "(Ljava/lang/String;Ljava/util/Optional;)V",
-                                                                        &trackAttributesStructStructCtor_3);
-                    if (err != CHIP_NO_ERROR || trackAttributesStructStructCtor_3 == nullptr)
-                    {
-                        ChipLogError(Zcl, "Could not find ChipStructs$MediaPlaybackClusterTrackAttributesStruct constructor");
-                        return nullptr;
-                    }
-
-                    value_trackAttributes = env->NewObject(trackAttributesStructStructClass_3, trackAttributesStructStructCtor_3,
-                                                           value_trackAttributes_languageCode, value_trackAttributes_displayName);
+                    chip::JniReferences::GetInstance().CreateOptional(value_trackAttributes_characteristicsInsideOptional,
+                                                                      value_trackAttributes_characteristics);
                 }
+                jobject value_trackAttributes_displayName;
+                if (!cppValue.Value().trackAttributes.displayName.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_trackAttributes_displayName);
+                }
+                else
+                {
+                    jobject value_trackAttributes_displayNameInsideOptional;
+                    if (cppValue.Value().trackAttributes.displayName.Value().IsNull())
+                    {
+                        value_trackAttributes_displayNameInsideOptional = nullptr;
+                    }
+                    else
+                    {
+                        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
+                            cppValue.Value().trackAttributes.displayName.Value().Value(),
+                            value_trackAttributes_displayNameInsideOptional));
+                    }
+                    chip::JniReferences::GetInstance().CreateOptional(value_trackAttributes_displayNameInsideOptional,
+                                                                      value_trackAttributes_displayName);
+                }
+
+                jclass trackAttributesStructStructClass_2;
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                    env, "chip/devicecontroller/ChipStructs$MediaPlaybackClusterTrackAttributesStruct",
+                    trackAttributesStructStructClass_2);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "Could not find class ChipStructs$MediaPlaybackClusterTrackAttributesStruct");
+                    return nullptr;
+                }
+
+                jmethodID trackAttributesStructStructCtor_2;
+                err = chip::JniReferences::GetInstance().FindMethod(env, trackAttributesStructStructClass_2, "<init>",
+                                                                    "(Ljava/lang/String;Ljava/util/Optional;Ljava/util/Optional;)V",
+                                                                    &trackAttributesStructStructCtor_2);
+                if (err != CHIP_NO_ERROR || trackAttributesStructStructCtor_2 == nullptr)
+                {
+                    ChipLogError(Zcl, "Could not find ChipStructs$MediaPlaybackClusterTrackAttributesStruct constructor");
+                    return nullptr;
+                }
+
+                value_trackAttributes = env->NewObject(trackAttributesStructStructClass_2, trackAttributesStructStructCtor_2,
+                                                       value_trackAttributes_languageCode, value_trackAttributes_characteristics,
+                                                       value_trackAttributes_displayName);
 
                 jclass trackStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetLocalClassRef(
@@ -38309,61 +38337,92 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     jobject newElement_1_id;
                     LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_1.id, newElement_1_id));
                     jobject newElement_1_trackAttributes;
-                    if (entry_1.trackAttributes.IsNull())
+                    jobject newElement_1_trackAttributes_languageCode;
+                    LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
+                        entry_1.trackAttributes.languageCode, newElement_1_trackAttributes_languageCode));
+                    jobject newElement_1_trackAttributes_characteristics;
+                    if (!entry_1.trackAttributes.characteristics.HasValue())
                     {
-                        newElement_1_trackAttributes = nullptr;
+                        chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_1_trackAttributes_characteristics);
                     }
                     else
                     {
-                        jobject newElement_1_trackAttributes_languageCode;
-                        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
-                            entry_1.trackAttributes.Value().languageCode, newElement_1_trackAttributes_languageCode));
-                        jobject newElement_1_trackAttributes_displayName;
-                        if (!entry_1.trackAttributes.Value().displayName.HasValue())
+                        jobject newElement_1_trackAttributes_characteristicsInsideOptional;
+                        if (entry_1.trackAttributes.characteristics.Value().IsNull())
                         {
-                            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_1_trackAttributes_displayName);
+                            newElement_1_trackAttributes_characteristicsInsideOptional = nullptr;
                         }
                         else
                         {
-                            jobject newElement_1_trackAttributes_displayNameInsideOptional;
-                            if (entry_1.trackAttributes.Value().displayName.Value().IsNull())
+                            chip::JniReferences::GetInstance().CreateArrayList(
+                                newElement_1_trackAttributes_characteristicsInsideOptional);
+
+                            auto iter_newElement_1_trackAttributes_characteristicsInsideOptional_6 =
+                                entry_1.trackAttributes.characteristics.Value().Value().begin();
+                            while (iter_newElement_1_trackAttributes_characteristicsInsideOptional_6.Next())
                             {
-                                newElement_1_trackAttributes_displayNameInsideOptional = nullptr;
+                                auto & entry_6 = iter_newElement_1_trackAttributes_characteristicsInsideOptional_6.GetValue();
+                                jobject newElement_6;
+                                std::string newElement_6ClassName     = "java/lang/Integer";
+                                std::string newElement_6CtorSignature = "(I)V";
+                                jint jninewElement_6                  = static_cast<jint>(entry_6);
+                                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_6ClassName.c_str(),
+                                                                                           newElement_6CtorSignature.c_str(),
+                                                                                           jninewElement_6, newElement_6);
+                                chip::JniReferences::GetInstance().AddToList(
+                                    newElement_1_trackAttributes_characteristicsInsideOptional, newElement_6);
                             }
-                            else
-                            {
-                                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
-                                    entry_1.trackAttributes.Value().displayName.Value().Value(),
-                                    newElement_1_trackAttributes_displayNameInsideOptional));
-                            }
-                            chip::JniReferences::GetInstance().CreateOptional(
-                                newElement_1_trackAttributes_displayNameInsideOptional, newElement_1_trackAttributes_displayName);
                         }
-
-                        jclass trackAttributesStructStructClass_4;
-                        err = chip::JniReferences::GetInstance().GetLocalClassRef(
-                            env, "chip/devicecontroller/ChipStructs$MediaPlaybackClusterTrackAttributesStruct",
-                            trackAttributesStructStructClass_4);
-                        if (err != CHIP_NO_ERROR)
-                        {
-                            ChipLogError(Zcl, "Could not find class ChipStructs$MediaPlaybackClusterTrackAttributesStruct");
-                            return nullptr;
-                        }
-
-                        jmethodID trackAttributesStructStructCtor_4;
-                        err = chip::JniReferences::GetInstance().FindMethod(env, trackAttributesStructStructClass_4, "<init>",
-                                                                            "(Ljava/lang/String;Ljava/util/Optional;)V",
-                                                                            &trackAttributesStructStructCtor_4);
-                        if (err != CHIP_NO_ERROR || trackAttributesStructStructCtor_4 == nullptr)
-                        {
-                            ChipLogError(Zcl, "Could not find ChipStructs$MediaPlaybackClusterTrackAttributesStruct constructor");
-                            return nullptr;
-                        }
-
-                        newElement_1_trackAttributes =
-                            env->NewObject(trackAttributesStructStructClass_4, trackAttributesStructStructCtor_4,
-                                           newElement_1_trackAttributes_languageCode, newElement_1_trackAttributes_displayName);
+                        chip::JniReferences::GetInstance().CreateOptional(
+                            newElement_1_trackAttributes_characteristicsInsideOptional,
+                            newElement_1_trackAttributes_characteristics);
                     }
+                    jobject newElement_1_trackAttributes_displayName;
+                    if (!entry_1.trackAttributes.displayName.HasValue())
+                    {
+                        chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_1_trackAttributes_displayName);
+                    }
+                    else
+                    {
+                        jobject newElement_1_trackAttributes_displayNameInsideOptional;
+                        if (entry_1.trackAttributes.displayName.Value().IsNull())
+                        {
+                            newElement_1_trackAttributes_displayNameInsideOptional = nullptr;
+                        }
+                        else
+                        {
+                            LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
+                                entry_1.trackAttributes.displayName.Value().Value(),
+                                newElement_1_trackAttributes_displayNameInsideOptional));
+                        }
+                        chip::JniReferences::GetInstance().CreateOptional(newElement_1_trackAttributes_displayNameInsideOptional,
+                                                                          newElement_1_trackAttributes_displayName);
+                    }
+
+                    jclass trackAttributesStructStructClass_3;
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                        env, "chip/devicecontroller/ChipStructs$MediaPlaybackClusterTrackAttributesStruct",
+                        trackAttributesStructStructClass_3);
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(Zcl, "Could not find class ChipStructs$MediaPlaybackClusterTrackAttributesStruct");
+                        return nullptr;
+                    }
+
+                    jmethodID trackAttributesStructStructCtor_3;
+                    err = chip::JniReferences::GetInstance().FindMethod(
+                        env, trackAttributesStructStructClass_3, "<init>",
+                        "(Ljava/lang/String;Ljava/util/Optional;Ljava/util/Optional;)V", &trackAttributesStructStructCtor_3);
+                    if (err != CHIP_NO_ERROR || trackAttributesStructStructCtor_3 == nullptr)
+                    {
+                        ChipLogError(Zcl, "Could not find ChipStructs$MediaPlaybackClusterTrackAttributesStruct constructor");
+                        return nullptr;
+                    }
+
+                    newElement_1_trackAttributes =
+                        env->NewObject(trackAttributesStructStructClass_3, trackAttributesStructStructCtor_3,
+                                       newElement_1_trackAttributes_languageCode, newElement_1_trackAttributes_characteristics,
+                                       newElement_1_trackAttributes_displayName);
 
                     jclass trackStructStructClass_2;
                     err = chip::JniReferences::GetInstance().GetLocalClassRef(
@@ -38410,60 +38469,88 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 jobject value_id;
                 LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue.Value().id, value_id));
                 jobject value_trackAttributes;
-                if (cppValue.Value().trackAttributes.IsNull())
+                jobject value_trackAttributes_languageCode;
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue.Value().trackAttributes.languageCode,
+                                                                                     value_trackAttributes_languageCode));
+                jobject value_trackAttributes_characteristics;
+                if (!cppValue.Value().trackAttributes.characteristics.HasValue())
                 {
-                    value_trackAttributes = nullptr;
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_trackAttributes_characteristics);
                 }
                 else
                 {
-                    jobject value_trackAttributes_languageCode;
-                    LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
-                        cppValue.Value().trackAttributes.Value().languageCode, value_trackAttributes_languageCode));
-                    jobject value_trackAttributes_displayName;
-                    if (!cppValue.Value().trackAttributes.Value().displayName.HasValue())
+                    jobject value_trackAttributes_characteristicsInsideOptional;
+                    if (cppValue.Value().trackAttributes.characteristics.Value().IsNull())
                     {
-                        chip::JniReferences::GetInstance().CreateOptional(nullptr, value_trackAttributes_displayName);
+                        value_trackAttributes_characteristicsInsideOptional = nullptr;
                     }
                     else
                     {
-                        jobject value_trackAttributes_displayNameInsideOptional;
-                        if (cppValue.Value().trackAttributes.Value().displayName.Value().IsNull())
+                        chip::JniReferences::GetInstance().CreateArrayList(value_trackAttributes_characteristicsInsideOptional);
+
+                        auto iter_value_trackAttributes_characteristicsInsideOptional_5 =
+                            cppValue.Value().trackAttributes.characteristics.Value().Value().begin();
+                        while (iter_value_trackAttributes_characteristicsInsideOptional_5.Next())
                         {
-                            value_trackAttributes_displayNameInsideOptional = nullptr;
+                            auto & entry_5 = iter_value_trackAttributes_characteristicsInsideOptional_5.GetValue();
+                            jobject newElement_5;
+                            std::string newElement_5ClassName     = "java/lang/Integer";
+                            std::string newElement_5CtorSignature = "(I)V";
+                            jint jninewElement_5                  = static_cast<jint>(entry_5);
+                            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                                newElement_5ClassName.c_str(), newElement_5CtorSignature.c_str(), jninewElement_5, newElement_5);
+                            chip::JniReferences::GetInstance().AddToList(value_trackAttributes_characteristicsInsideOptional,
+                                                                         newElement_5);
                         }
-                        else
-                        {
-                            LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
-                                cppValue.Value().trackAttributes.Value().displayName.Value().Value(),
-                                value_trackAttributes_displayNameInsideOptional));
-                        }
-                        chip::JniReferences::GetInstance().CreateOptional(value_trackAttributes_displayNameInsideOptional,
-                                                                          value_trackAttributes_displayName);
                     }
-
-                    jclass trackAttributesStructStructClass_3;
-                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
-                        env, "chip/devicecontroller/ChipStructs$MediaPlaybackClusterTrackAttributesStruct",
-                        trackAttributesStructStructClass_3);
-                    if (err != CHIP_NO_ERROR)
-                    {
-                        ChipLogError(Zcl, "Could not find class ChipStructs$MediaPlaybackClusterTrackAttributesStruct");
-                        return nullptr;
-                    }
-
-                    jmethodID trackAttributesStructStructCtor_3;
-                    err = chip::JniReferences::GetInstance().FindMethod(env, trackAttributesStructStructClass_3, "<init>",
-                                                                        "(Ljava/lang/String;Ljava/util/Optional;)V",
-                                                                        &trackAttributesStructStructCtor_3);
-                    if (err != CHIP_NO_ERROR || trackAttributesStructStructCtor_3 == nullptr)
-                    {
-                        ChipLogError(Zcl, "Could not find ChipStructs$MediaPlaybackClusterTrackAttributesStruct constructor");
-                        return nullptr;
-                    }
-
-                    value_trackAttributes = env->NewObject(trackAttributesStructStructClass_3, trackAttributesStructStructCtor_3,
-                                                           value_trackAttributes_languageCode, value_trackAttributes_displayName);
+                    chip::JniReferences::GetInstance().CreateOptional(value_trackAttributes_characteristicsInsideOptional,
+                                                                      value_trackAttributes_characteristics);
                 }
+                jobject value_trackAttributes_displayName;
+                if (!cppValue.Value().trackAttributes.displayName.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_trackAttributes_displayName);
+                }
+                else
+                {
+                    jobject value_trackAttributes_displayNameInsideOptional;
+                    if (cppValue.Value().trackAttributes.displayName.Value().IsNull())
+                    {
+                        value_trackAttributes_displayNameInsideOptional = nullptr;
+                    }
+                    else
+                    {
+                        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
+                            cppValue.Value().trackAttributes.displayName.Value().Value(),
+                            value_trackAttributes_displayNameInsideOptional));
+                    }
+                    chip::JniReferences::GetInstance().CreateOptional(value_trackAttributes_displayNameInsideOptional,
+                                                                      value_trackAttributes_displayName);
+                }
+
+                jclass trackAttributesStructStructClass_2;
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                    env, "chip/devicecontroller/ChipStructs$MediaPlaybackClusterTrackAttributesStruct",
+                    trackAttributesStructStructClass_2);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "Could not find class ChipStructs$MediaPlaybackClusterTrackAttributesStruct");
+                    return nullptr;
+                }
+
+                jmethodID trackAttributesStructStructCtor_2;
+                err = chip::JniReferences::GetInstance().FindMethod(env, trackAttributesStructStructClass_2, "<init>",
+                                                                    "(Ljava/lang/String;Ljava/util/Optional;Ljava/util/Optional;)V",
+                                                                    &trackAttributesStructStructCtor_2);
+                if (err != CHIP_NO_ERROR || trackAttributesStructStructCtor_2 == nullptr)
+                {
+                    ChipLogError(Zcl, "Could not find ChipStructs$MediaPlaybackClusterTrackAttributesStruct constructor");
+                    return nullptr;
+                }
+
+                value_trackAttributes = env->NewObject(trackAttributesStructStructClass_2, trackAttributesStructStructCtor_2,
+                                                       value_trackAttributes_languageCode, value_trackAttributes_characteristics,
+                                                       value_trackAttributes_displayName);
 
                 jclass trackStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetLocalClassRef(
@@ -38514,61 +38601,92 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     jobject newElement_1_id;
                     LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_1.id, newElement_1_id));
                     jobject newElement_1_trackAttributes;
-                    if (entry_1.trackAttributes.IsNull())
+                    jobject newElement_1_trackAttributes_languageCode;
+                    LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
+                        entry_1.trackAttributes.languageCode, newElement_1_trackAttributes_languageCode));
+                    jobject newElement_1_trackAttributes_characteristics;
+                    if (!entry_1.trackAttributes.characteristics.HasValue())
                     {
-                        newElement_1_trackAttributes = nullptr;
+                        chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_1_trackAttributes_characteristics);
                     }
                     else
                     {
-                        jobject newElement_1_trackAttributes_languageCode;
-                        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
-                            entry_1.trackAttributes.Value().languageCode, newElement_1_trackAttributes_languageCode));
-                        jobject newElement_1_trackAttributes_displayName;
-                        if (!entry_1.trackAttributes.Value().displayName.HasValue())
+                        jobject newElement_1_trackAttributes_characteristicsInsideOptional;
+                        if (entry_1.trackAttributes.characteristics.Value().IsNull())
                         {
-                            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_1_trackAttributes_displayName);
+                            newElement_1_trackAttributes_characteristicsInsideOptional = nullptr;
                         }
                         else
                         {
-                            jobject newElement_1_trackAttributes_displayNameInsideOptional;
-                            if (entry_1.trackAttributes.Value().displayName.Value().IsNull())
+                            chip::JniReferences::GetInstance().CreateArrayList(
+                                newElement_1_trackAttributes_characteristicsInsideOptional);
+
+                            auto iter_newElement_1_trackAttributes_characteristicsInsideOptional_6 =
+                                entry_1.trackAttributes.characteristics.Value().Value().begin();
+                            while (iter_newElement_1_trackAttributes_characteristicsInsideOptional_6.Next())
                             {
-                                newElement_1_trackAttributes_displayNameInsideOptional = nullptr;
+                                auto & entry_6 = iter_newElement_1_trackAttributes_characteristicsInsideOptional_6.GetValue();
+                                jobject newElement_6;
+                                std::string newElement_6ClassName     = "java/lang/Integer";
+                                std::string newElement_6CtorSignature = "(I)V";
+                                jint jninewElement_6                  = static_cast<jint>(entry_6);
+                                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_6ClassName.c_str(),
+                                                                                           newElement_6CtorSignature.c_str(),
+                                                                                           jninewElement_6, newElement_6);
+                                chip::JniReferences::GetInstance().AddToList(
+                                    newElement_1_trackAttributes_characteristicsInsideOptional, newElement_6);
                             }
-                            else
-                            {
-                                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
-                                    entry_1.trackAttributes.Value().displayName.Value().Value(),
-                                    newElement_1_trackAttributes_displayNameInsideOptional));
-                            }
-                            chip::JniReferences::GetInstance().CreateOptional(
-                                newElement_1_trackAttributes_displayNameInsideOptional, newElement_1_trackAttributes_displayName);
                         }
-
-                        jclass trackAttributesStructStructClass_4;
-                        err = chip::JniReferences::GetInstance().GetLocalClassRef(
-                            env, "chip/devicecontroller/ChipStructs$MediaPlaybackClusterTrackAttributesStruct",
-                            trackAttributesStructStructClass_4);
-                        if (err != CHIP_NO_ERROR)
-                        {
-                            ChipLogError(Zcl, "Could not find class ChipStructs$MediaPlaybackClusterTrackAttributesStruct");
-                            return nullptr;
-                        }
-
-                        jmethodID trackAttributesStructStructCtor_4;
-                        err = chip::JniReferences::GetInstance().FindMethod(env, trackAttributesStructStructClass_4, "<init>",
-                                                                            "(Ljava/lang/String;Ljava/util/Optional;)V",
-                                                                            &trackAttributesStructStructCtor_4);
-                        if (err != CHIP_NO_ERROR || trackAttributesStructStructCtor_4 == nullptr)
-                        {
-                            ChipLogError(Zcl, "Could not find ChipStructs$MediaPlaybackClusterTrackAttributesStruct constructor");
-                            return nullptr;
-                        }
-
-                        newElement_1_trackAttributes =
-                            env->NewObject(trackAttributesStructStructClass_4, trackAttributesStructStructCtor_4,
-                                           newElement_1_trackAttributes_languageCode, newElement_1_trackAttributes_displayName);
+                        chip::JniReferences::GetInstance().CreateOptional(
+                            newElement_1_trackAttributes_characteristicsInsideOptional,
+                            newElement_1_trackAttributes_characteristics);
                     }
+                    jobject newElement_1_trackAttributes_displayName;
+                    if (!entry_1.trackAttributes.displayName.HasValue())
+                    {
+                        chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_1_trackAttributes_displayName);
+                    }
+                    else
+                    {
+                        jobject newElement_1_trackAttributes_displayNameInsideOptional;
+                        if (entry_1.trackAttributes.displayName.Value().IsNull())
+                        {
+                            newElement_1_trackAttributes_displayNameInsideOptional = nullptr;
+                        }
+                        else
+                        {
+                            LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
+                                entry_1.trackAttributes.displayName.Value().Value(),
+                                newElement_1_trackAttributes_displayNameInsideOptional));
+                        }
+                        chip::JniReferences::GetInstance().CreateOptional(newElement_1_trackAttributes_displayNameInsideOptional,
+                                                                          newElement_1_trackAttributes_displayName);
+                    }
+
+                    jclass trackAttributesStructStructClass_3;
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                        env, "chip/devicecontroller/ChipStructs$MediaPlaybackClusterTrackAttributesStruct",
+                        trackAttributesStructStructClass_3);
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(Zcl, "Could not find class ChipStructs$MediaPlaybackClusterTrackAttributesStruct");
+                        return nullptr;
+                    }
+
+                    jmethodID trackAttributesStructStructCtor_3;
+                    err = chip::JniReferences::GetInstance().FindMethod(
+                        env, trackAttributesStructStructClass_3, "<init>",
+                        "(Ljava/lang/String;Ljava/util/Optional;Ljava/util/Optional;)V", &trackAttributesStructStructCtor_3);
+                    if (err != CHIP_NO_ERROR || trackAttributesStructStructCtor_3 == nullptr)
+                    {
+                        ChipLogError(Zcl, "Could not find ChipStructs$MediaPlaybackClusterTrackAttributesStruct constructor");
+                        return nullptr;
+                    }
+
+                    newElement_1_trackAttributes =
+                        env->NewObject(trackAttributesStructStructClass_3, trackAttributesStructStructCtor_3,
+                                       newElement_1_trackAttributes_languageCode, newElement_1_trackAttributes_characteristics,
+                                       newElement_1_trackAttributes_displayName);
 
                     jclass trackStructStructClass_2;
                     err = chip::JniReferences::GetInstance().GetLocalClassRef(
@@ -40531,6 +40649,270 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             jboolean jnivalue              = static_cast<jboolean>(cppValue);
             chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(valueClassName.c_str(), valueCtorSignature.c_str(),
                                                                            jnivalue, value);
+            return value;
+        }
+        case Attributes::BlockChannelList::Id: {
+            using TypeInfo = Attributes::BlockChannelList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                jobject newElement_0_blockChannelIndex;
+                if (entry_0.blockChannelIndex.IsNull())
+                {
+                    newElement_0_blockChannelIndex = nullptr;
+                }
+                else
+                {
+                    std::string newElement_0_blockChannelIndexClassName     = "java/lang/Integer";
+                    std::string newElement_0_blockChannelIndexCtorSignature = "(I)V";
+                    jint jninewElement_0_blockChannelIndex                  = static_cast<jint>(entry_0.blockChannelIndex.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        newElement_0_blockChannelIndexClassName.c_str(), newElement_0_blockChannelIndexCtorSignature.c_str(),
+                        jninewElement_0_blockChannelIndex, newElement_0_blockChannelIndex);
+                }
+                jobject newElement_0_majorNumber;
+                std::string newElement_0_majorNumberClassName     = "java/lang/Integer";
+                std::string newElement_0_majorNumberCtorSignature = "(I)V";
+                jint jninewElement_0_majorNumber                  = static_cast<jint>(entry_0.majorNumber);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_majorNumberClassName.c_str(),
+                                                                           newElement_0_majorNumberCtorSignature.c_str(),
+                                                                           jninewElement_0_majorNumber, newElement_0_majorNumber);
+                jobject newElement_0_minorNumber;
+                std::string newElement_0_minorNumberClassName     = "java/lang/Integer";
+                std::string newElement_0_minorNumberCtorSignature = "(I)V";
+                jint jninewElement_0_minorNumber                  = static_cast<jint>(entry_0.minorNumber);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_minorNumberClassName.c_str(),
+                                                                           newElement_0_minorNumberCtorSignature.c_str(),
+                                                                           jninewElement_0_minorNumber, newElement_0_minorNumber);
+                jobject newElement_0_identifier;
+                if (!entry_0.identifier.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_identifier);
+                }
+                else
+                {
+                    jobject newElement_0_identifierInsideOptional;
+                    LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.identifier.Value(),
+                                                                                         newElement_0_identifierInsideOptional));
+                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_identifierInsideOptional,
+                                                                      newElement_0_identifier);
+                }
+
+                jclass blockChannelStructStructClass_1;
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                    env, "chip/devicecontroller/ChipStructs$ContentControlClusterBlockChannelStruct",
+                    blockChannelStructStructClass_1);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "Could not find class ChipStructs$ContentControlClusterBlockChannelStruct");
+                    return nullptr;
+                }
+
+                jmethodID blockChannelStructStructCtor_1;
+                err = chip::JniReferences::GetInstance().FindMethod(
+                    env, blockChannelStructStructClass_1, "<init>",
+                    "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;)V",
+                    &blockChannelStructStructCtor_1);
+                if (err != CHIP_NO_ERROR || blockChannelStructStructCtor_1 == nullptr)
+                {
+                    ChipLogError(Zcl, "Could not find ChipStructs$ContentControlClusterBlockChannelStruct constructor");
+                    return nullptr;
+                }
+
+                newElement_0 =
+                    env->NewObject(blockChannelStructStructClass_1, blockChannelStructStructCtor_1, newElement_0_blockChannelIndex,
+                                   newElement_0_majorNumber, newElement_0_minorNumber, newElement_0_identifier);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
+        case Attributes::BlockApplicationList::Id: {
+            using TypeInfo = Attributes::BlockApplicationList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                jobject newElement_0_catalogVendorID;
+                std::string newElement_0_catalogVendorIDClassName     = "java/lang/Integer";
+                std::string newElement_0_catalogVendorIDCtorSignature = "(I)V";
+                jint jninewElement_0_catalogVendorID                  = static_cast<jint>(entry_0.catalogVendorID);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0_catalogVendorIDClassName.c_str(), newElement_0_catalogVendorIDCtorSignature.c_str(),
+                    jninewElement_0_catalogVendorID, newElement_0_catalogVendorID);
+                jobject newElement_0_applicationID;
+                LogErrorOnFailure(
+                    chip::JniReferences::GetInstance().CharToStringUTF(entry_0.applicationID, newElement_0_applicationID));
+
+                jclass appInfoStructStructClass_1;
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                    env, "chip/devicecontroller/ChipStructs$ContentControlClusterAppInfoStruct", appInfoStructStructClass_1);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "Could not find class ChipStructs$ContentControlClusterAppInfoStruct");
+                    return nullptr;
+                }
+
+                jmethodID appInfoStructStructCtor_1;
+                err = chip::JniReferences::GetInstance().FindMethod(env, appInfoStructStructClass_1, "<init>",
+                                                                    "(Ljava/lang/Integer;Ljava/lang/String;)V",
+                                                                    &appInfoStructStructCtor_1);
+                if (err != CHIP_NO_ERROR || appInfoStructStructCtor_1 == nullptr)
+                {
+                    ChipLogError(Zcl, "Could not find ChipStructs$ContentControlClusterAppInfoStruct constructor");
+                    return nullptr;
+                }
+
+                newElement_0 = env->NewObject(appInfoStructStructClass_1, appInfoStructStructCtor_1, newElement_0_catalogVendorID,
+                                              newElement_0_applicationID);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
+        case Attributes::BlockContentTimeWindow::Id: {
+            using TypeInfo = Attributes::BlockContentTimeWindow::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                jobject newElement_0_timeWindowIndex;
+                if (entry_0.timeWindowIndex.IsNull())
+                {
+                    newElement_0_timeWindowIndex = nullptr;
+                }
+                else
+                {
+                    std::string newElement_0_timeWindowIndexClassName     = "java/lang/Integer";
+                    std::string newElement_0_timeWindowIndexCtorSignature = "(I)V";
+                    jint jninewElement_0_timeWindowIndex                  = static_cast<jint>(entry_0.timeWindowIndex.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        newElement_0_timeWindowIndexClassName.c_str(), newElement_0_timeWindowIndexCtorSignature.c_str(),
+                        jninewElement_0_timeWindowIndex, newElement_0_timeWindowIndex);
+                }
+                jobject newElement_0_dayOfWeek;
+                std::string newElement_0_dayOfWeekClassName     = "java/lang/Integer";
+                std::string newElement_0_dayOfWeekCtorSignature = "(I)V";
+                jint jninewElement_0_dayOfWeek                  = static_cast<jint>(entry_0.dayOfWeek.Raw());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_dayOfWeekClassName.c_str(),
+                                                                           newElement_0_dayOfWeekCtorSignature.c_str(),
+                                                                           jninewElement_0_dayOfWeek, newElement_0_dayOfWeek);
+                jobject newElement_0_timePeriod;
+                chip::JniReferences::GetInstance().CreateArrayList(newElement_0_timePeriod);
+
+                auto iter_newElement_0_timePeriod_2 = entry_0.timePeriod.begin();
+                while (iter_newElement_0_timePeriod_2.Next())
+                {
+                    auto & entry_2 = iter_newElement_0_timePeriod_2.GetValue();
+                    jobject newElement_2;
+                    jobject newElement_2_startHour;
+                    std::string newElement_2_startHourClassName     = "java/lang/Integer";
+                    std::string newElement_2_startHourCtorSignature = "(I)V";
+                    jint jninewElement_2_startHour                  = static_cast<jint>(entry_2.startHour);
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_2_startHourClassName.c_str(),
+                                                                               newElement_2_startHourCtorSignature.c_str(),
+                                                                               jninewElement_2_startHour, newElement_2_startHour);
+                    jobject newElement_2_startMinute;
+                    std::string newElement_2_startMinuteClassName     = "java/lang/Integer";
+                    std::string newElement_2_startMinuteCtorSignature = "(I)V";
+                    jint jninewElement_2_startMinute                  = static_cast<jint>(entry_2.startMinute);
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        newElement_2_startMinuteClassName.c_str(), newElement_2_startMinuteCtorSignature.c_str(),
+                        jninewElement_2_startMinute, newElement_2_startMinute);
+                    jobject newElement_2_endHour;
+                    std::string newElement_2_endHourClassName     = "java/lang/Integer";
+                    std::string newElement_2_endHourCtorSignature = "(I)V";
+                    jint jninewElement_2_endHour                  = static_cast<jint>(entry_2.endHour);
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_2_endHourClassName.c_str(),
+                                                                               newElement_2_endHourCtorSignature.c_str(),
+                                                                               jninewElement_2_endHour, newElement_2_endHour);
+                    jobject newElement_2_endMinute;
+                    std::string newElement_2_endMinuteClassName     = "java/lang/Integer";
+                    std::string newElement_2_endMinuteCtorSignature = "(I)V";
+                    jint jninewElement_2_endMinute                  = static_cast<jint>(entry_2.endMinute);
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_2_endMinuteClassName.c_str(),
+                                                                               newElement_2_endMinuteCtorSignature.c_str(),
+                                                                               jninewElement_2_endMinute, newElement_2_endMinute);
+
+                    jclass timePeriodStructStructClass_3;
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                        env, "chip/devicecontroller/ChipStructs$ContentControlClusterTimePeriodStruct",
+                        timePeriodStructStructClass_3);
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(Zcl, "Could not find class ChipStructs$ContentControlClusterTimePeriodStruct");
+                        return nullptr;
+                    }
+
+                    jmethodID timePeriodStructStructCtor_3;
+                    err = chip::JniReferences::GetInstance().FindMethod(
+                        env, timePeriodStructStructClass_3, "<init>",
+                        "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V",
+                        &timePeriodStructStructCtor_3);
+                    if (err != CHIP_NO_ERROR || timePeriodStructStructCtor_3 == nullptr)
+                    {
+                        ChipLogError(Zcl, "Could not find ChipStructs$ContentControlClusterTimePeriodStruct constructor");
+                        return nullptr;
+                    }
+
+                    newElement_2 =
+                        env->NewObject(timePeriodStructStructClass_3, timePeriodStructStructCtor_3, newElement_2_startHour,
+                                       newElement_2_startMinute, newElement_2_endHour, newElement_2_endMinute);
+                    chip::JniReferences::GetInstance().AddToList(newElement_0_timePeriod, newElement_2);
+                }
+
+                jclass timeWindowStructStructClass_1;
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                    env, "chip/devicecontroller/ChipStructs$ContentControlClusterTimeWindowStruct", timeWindowStructStructClass_1);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "Could not find class ChipStructs$ContentControlClusterTimeWindowStruct");
+                    return nullptr;
+                }
+
+                jmethodID timeWindowStructStructCtor_1;
+                err = chip::JniReferences::GetInstance().FindMethod(
+                    env, timeWindowStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/ArrayList;)V",
+                    &timeWindowStructStructCtor_1);
+                if (err != CHIP_NO_ERROR || timeWindowStructStructCtor_1 == nullptr)
+                {
+                    ChipLogError(Zcl, "Could not find ChipStructs$ContentControlClusterTimeWindowStruct constructor");
+                    return nullptr;
+                }
+
+                newElement_0 = env->NewObject(timeWindowStructStructClass_1, timeWindowStructStructCtor_1,
+                                              newElement_0_timeWindowIndex, newElement_0_dayOfWeek, newElement_0_timePeriod);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {

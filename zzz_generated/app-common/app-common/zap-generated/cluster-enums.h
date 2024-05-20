@@ -4361,7 +4361,7 @@ enum class Feature : uint32_t
 };
 
 // Bitmap for RecordingFlagBitmap
-enum class RecordingFlagBitmap : uint32_t
+enum class RecordingFlagBitmap : uint8_t
 {
     kScheduled    = 0x1,
     kRecordSeries = 0x2,
@@ -4698,9 +4698,9 @@ enum class Feature : uint32_t
 {
     kContentSearch = 0x1,
     kURLPlayback   = 0x2,
-    kAdvancedSeek  = 0x3,
-    kTextTracks    = 0x4,
-    kAudioTracks   = 0x5,
+    kAdvancedSeek  = 0x4,
+    kTextTracks    = 0x8,
+    kAudioTracks   = 0x10,
 };
 
 // Bitmap for SupportedProtocolsBitmap
@@ -4778,6 +4778,18 @@ enum class ApplicationStatusEnum : uint8_t
 namespace AccountLogin {} // namespace AccountLogin
 
 namespace ContentControl {
+
+// Bitmap for DayOfWeekBitmap
+enum class DayOfWeekBitmap : uint8_t
+{
+    kSunday    = 0x1,
+    kMonday    = 0x2,
+    kTuesday   = 0x4,
+    kWednesday = 0x8,
+    kThursday  = 0x10,
+    kFriday    = 0x20,
+    kSaturday  = 0x40,
+};
 
 // Bitmap for Feature
 enum class Feature : uint32_t

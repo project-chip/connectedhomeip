@@ -2893,30 +2893,50 @@
                 *aError = err;
                 return nil;
             }
-            if (_cppValue.Value().trackAttributes.IsNull()) {
-                value.trackAttributes = nil;
-            } else {
-                value.trackAttributes = [MCMediaPlaybackClusterTrackAttributesStruct new];
-                value.trackAttributes.languageCode = AsString(_cppValue.Value().trackAttributes.Value().languageCode);
-                if (value.trackAttributes.languageCode == nil) {
-                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                    *aError = err;
-                    return nil;
-                }
-                if (_cppValue.Value().trackAttributes.Value().displayName.HasValue()) {
-                    if (_cppValue.Value().trackAttributes.Value().displayName.Value().IsNull()) {
-                        value.trackAttributes.displayName = nil;
-                    } else {
-                        value.trackAttributes.displayName = AsString(_cppValue.Value().trackAttributes.Value().displayName.Value().Value());
-                        if (value.trackAttributes.displayName == nil) {
-                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            value.trackAttributes = [MCMediaPlaybackClusterTrackAttributesStruct new];
+            value.trackAttributes.languageCode = AsString(_cppValue.Value().trackAttributes.languageCode);
+            if (value.trackAttributes.languageCode == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                *aError = err;
+                return nil;
+            }
+            if (_cppValue.Value().trackAttributes.characteristics.HasValue()) {
+                if (_cppValue.Value().trackAttributes.characteristics.Value().IsNull()) {
+                    value.trackAttributes.characteristics = nil;
+                } else {
+                    { // Scope for our temporary variables
+                        auto * array_5 = [NSMutableArray new];
+                        auto iter_5 = _cppValue.Value().trackAttributes.characteristics.Value().Value().begin();
+                        while (iter_5.Next()) {
+                            auto & entry_5 = iter_5.GetValue();
+                            NSNumber * newElement_5;
+                            newElement_5 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_5)];
+                            [array_5 addObject:newElement_5];
+                        }
+                        CHIP_ERROR err = iter_5.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
                             *aError = err;
                             return nil;
                         }
+                        value.trackAttributes.characteristics = array_5;
                     }
-                } else {
-                    value.trackAttributes.displayName = nil;
                 }
+            } else {
+                value.trackAttributes.characteristics = nil;
+            }
+            if (_cppValue.Value().trackAttributes.displayName.HasValue()) {
+                if (_cppValue.Value().trackAttributes.displayName.Value().IsNull()) {
+                    value.trackAttributes.displayName = nil;
+                } else {
+                    value.trackAttributes.displayName = AsString(_cppValue.Value().trackAttributes.displayName.Value().Value());
+                    if (value.trackAttributes.displayName == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        *aError = err;
+                        return nil;
+                    }
+                }
+            } else {
+                value.trackAttributes.displayName = nil;
             }
         }
         return value;
@@ -2980,30 +3000,50 @@
                         *aError = err;
                         return nil;
                     }
-                    if (entry_1.trackAttributes.IsNull()) {
-                        newElement_1.trackAttributes = nil;
-                    } else {
-                        newElement_1.trackAttributes = [MCMediaPlaybackClusterTrackAttributesStruct new];
-                        newElement_1.trackAttributes.languageCode = AsString(entry_1.trackAttributes.Value().languageCode);
-                        if (newElement_1.trackAttributes.languageCode == nil) {
-                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                            *aError = err;
-                            return nil;
-                        }
-                        if (entry_1.trackAttributes.Value().displayName.HasValue()) {
-                            if (entry_1.trackAttributes.Value().displayName.Value().IsNull()) {
-                                newElement_1.trackAttributes.displayName = nil;
-                            } else {
-                                newElement_1.trackAttributes.displayName = AsString(entry_1.trackAttributes.Value().displayName.Value().Value());
-                                if (newElement_1.trackAttributes.displayName == nil) {
-                                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    newElement_1.trackAttributes = [MCMediaPlaybackClusterTrackAttributesStruct new];
+                    newElement_1.trackAttributes.languageCode = AsString(entry_1.trackAttributes.languageCode);
+                    if (newElement_1.trackAttributes.languageCode == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        *aError = err;
+                        return nil;
+                    }
+                    if (entry_1.trackAttributes.characteristics.HasValue()) {
+                        if (entry_1.trackAttributes.characteristics.Value().IsNull()) {
+                            newElement_1.trackAttributes.characteristics = nil;
+                        } else {
+                            { // Scope for our temporary variables
+                                auto * array_6 = [NSMutableArray new];
+                                auto iter_6 = entry_1.trackAttributes.characteristics.Value().Value().begin();
+                                while (iter_6.Next()) {
+                                    auto & entry_6 = iter_6.GetValue();
+                                    NSNumber * newElement_6;
+                                    newElement_6 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_6)];
+                                    [array_6 addObject:newElement_6];
+                                }
+                                CHIP_ERROR err = iter_6.GetStatus();
+                                if (err != CHIP_NO_ERROR) {
                                     *aError = err;
                                     return nil;
                                 }
+                                newElement_1.trackAttributes.characteristics = array_6;
                             }
-                        } else {
-                            newElement_1.trackAttributes.displayName = nil;
                         }
+                    } else {
+                        newElement_1.trackAttributes.characteristics = nil;
+                    }
+                    if (entry_1.trackAttributes.displayName.HasValue()) {
+                        if (entry_1.trackAttributes.displayName.Value().IsNull()) {
+                            newElement_1.trackAttributes.displayName = nil;
+                        } else {
+                            newElement_1.trackAttributes.displayName = AsString(entry_1.trackAttributes.displayName.Value().Value());
+                            if (newElement_1.trackAttributes.displayName == nil) {
+                                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                *aError = err;
+                                return nil;
+                            }
+                        }
+                    } else {
+                        newElement_1.trackAttributes.displayName = nil;
                     }
                     [array_1 addObject:newElement_1];
                 }
@@ -3070,30 +3110,50 @@
                 *aError = err;
                 return nil;
             }
-            if (_cppValue.Value().trackAttributes.IsNull()) {
-                value.trackAttributes = nil;
-            } else {
-                value.trackAttributes = [MCMediaPlaybackClusterTrackAttributesStruct new];
-                value.trackAttributes.languageCode = AsString(_cppValue.Value().trackAttributes.Value().languageCode);
-                if (value.trackAttributes.languageCode == nil) {
-                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                    *aError = err;
-                    return nil;
-                }
-                if (_cppValue.Value().trackAttributes.Value().displayName.HasValue()) {
-                    if (_cppValue.Value().trackAttributes.Value().displayName.Value().IsNull()) {
-                        value.trackAttributes.displayName = nil;
-                    } else {
-                        value.trackAttributes.displayName = AsString(_cppValue.Value().trackAttributes.Value().displayName.Value().Value());
-                        if (value.trackAttributes.displayName == nil) {
-                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            value.trackAttributes = [MCMediaPlaybackClusterTrackAttributesStruct new];
+            value.trackAttributes.languageCode = AsString(_cppValue.Value().trackAttributes.languageCode);
+            if (value.trackAttributes.languageCode == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                *aError = err;
+                return nil;
+            }
+            if (_cppValue.Value().trackAttributes.characteristics.HasValue()) {
+                if (_cppValue.Value().trackAttributes.characteristics.Value().IsNull()) {
+                    value.trackAttributes.characteristics = nil;
+                } else {
+                    { // Scope for our temporary variables
+                        auto * array_5 = [NSMutableArray new];
+                        auto iter_5 = _cppValue.Value().trackAttributes.characteristics.Value().Value().begin();
+                        while (iter_5.Next()) {
+                            auto & entry_5 = iter_5.GetValue();
+                            NSNumber * newElement_5;
+                            newElement_5 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_5)];
+                            [array_5 addObject:newElement_5];
+                        }
+                        CHIP_ERROR err = iter_5.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
                             *aError = err;
                             return nil;
                         }
+                        value.trackAttributes.characteristics = array_5;
                     }
-                } else {
-                    value.trackAttributes.displayName = nil;
                 }
+            } else {
+                value.trackAttributes.characteristics = nil;
+            }
+            if (_cppValue.Value().trackAttributes.displayName.HasValue()) {
+                if (_cppValue.Value().trackAttributes.displayName.Value().IsNull()) {
+                    value.trackAttributes.displayName = nil;
+                } else {
+                    value.trackAttributes.displayName = AsString(_cppValue.Value().trackAttributes.displayName.Value().Value());
+                    if (value.trackAttributes.displayName == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        *aError = err;
+                        return nil;
+                    }
+                }
+            } else {
+                value.trackAttributes.displayName = nil;
             }
         }
         return value;
@@ -3157,30 +3217,50 @@
                         *aError = err;
                         return nil;
                     }
-                    if (entry_1.trackAttributes.IsNull()) {
-                        newElement_1.trackAttributes = nil;
-                    } else {
-                        newElement_1.trackAttributes = [MCMediaPlaybackClusterTrackAttributesStruct new];
-                        newElement_1.trackAttributes.languageCode = AsString(entry_1.trackAttributes.Value().languageCode);
-                        if (newElement_1.trackAttributes.languageCode == nil) {
-                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                            *aError = err;
-                            return nil;
-                        }
-                        if (entry_1.trackAttributes.Value().displayName.HasValue()) {
-                            if (entry_1.trackAttributes.Value().displayName.Value().IsNull()) {
-                                newElement_1.trackAttributes.displayName = nil;
-                            } else {
-                                newElement_1.trackAttributes.displayName = AsString(entry_1.trackAttributes.Value().displayName.Value().Value());
-                                if (newElement_1.trackAttributes.displayName == nil) {
-                                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    newElement_1.trackAttributes = [MCMediaPlaybackClusterTrackAttributesStruct new];
+                    newElement_1.trackAttributes.languageCode = AsString(entry_1.trackAttributes.languageCode);
+                    if (newElement_1.trackAttributes.languageCode == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        *aError = err;
+                        return nil;
+                    }
+                    if (entry_1.trackAttributes.characteristics.HasValue()) {
+                        if (entry_1.trackAttributes.characteristics.Value().IsNull()) {
+                            newElement_1.trackAttributes.characteristics = nil;
+                        } else {
+                            { // Scope for our temporary variables
+                                auto * array_6 = [NSMutableArray new];
+                                auto iter_6 = entry_1.trackAttributes.characteristics.Value().Value().begin();
+                                while (iter_6.Next()) {
+                                    auto & entry_6 = iter_6.GetValue();
+                                    NSNumber * newElement_6;
+                                    newElement_6 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_6)];
+                                    [array_6 addObject:newElement_6];
+                                }
+                                CHIP_ERROR err = iter_6.GetStatus();
+                                if (err != CHIP_NO_ERROR) {
                                     *aError = err;
                                     return nil;
                                 }
+                                newElement_1.trackAttributes.characteristics = array_6;
                             }
-                        } else {
-                            newElement_1.trackAttributes.displayName = nil;
                         }
+                    } else {
+                        newElement_1.trackAttributes.characteristics = nil;
+                    }
+                    if (entry_1.trackAttributes.displayName.HasValue()) {
+                        if (entry_1.trackAttributes.displayName.Value().IsNull()) {
+                            newElement_1.trackAttributes.displayName = nil;
+                        } else {
+                            newElement_1.trackAttributes.displayName = AsString(entry_1.trackAttributes.displayName.Value().Value());
+                            if (newElement_1.trackAttributes.displayName == nil) {
+                                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                *aError = err;
+                                return nil;
+                            }
+                        }
+                    } else {
+                        newElement_1.trackAttributes.displayName = nil;
                     }
                     [array_1 addObject:newElement_1];
                 }

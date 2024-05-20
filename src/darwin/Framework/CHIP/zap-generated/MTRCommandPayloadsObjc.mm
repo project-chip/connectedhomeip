@@ -24311,9 +24311,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _startTime = nil;
+        _startTime = @(0);
 
-        _endTime = nil;
+        _endTime = @(0);
 
         _channelList = nil;
 
@@ -24362,16 +24362,10 @@ NS_ASSUME_NONNULL_BEGIN
     chip::app::Clusters::Channel::Commands::GetProgramGuide::Type encodableStruct;
     ListFreer listFreer;
     {
-        if (self.startTime != nil) {
-            auto & definedValue_0 = encodableStruct.startTime.Emplace();
-            definedValue_0 = self.startTime.unsignedIntValue;
-        }
+        encodableStruct.startTime = self.startTime.unsignedIntValue;
     }
     {
-        if (self.endTime != nil) {
-            auto & definedValue_0 = encodableStruct.endTime.Emplace();
-            definedValue_0 = self.endTime.unsignedIntValue;
-        }
+        encodableStruct.endTime = self.endTime.unsignedIntValue;
     }
     {
         if (self.channelList != nil) {
@@ -24424,24 +24418,34 @@ NS_ASSUME_NONNULL_BEGIN
     {
         if (self.pageToken != nil) {
             auto & definedValue_0 = encodableStruct.pageToken.Emplace();
-            if (self.pageToken.limit != nil) {
-                auto & definedValue_2 = definedValue_0.limit.Emplace();
-                definedValue_2 = self.pageToken.limit.unsignedShortValue;
-            }
-            if (self.pageToken.after != nil) {
-                auto & definedValue_2 = definedValue_0.after.Emplace();
-                definedValue_2 = AsCharSpan(self.pageToken.after);
-            }
-            if (self.pageToken.before != nil) {
-                auto & definedValue_2 = definedValue_0.before.Emplace();
-                definedValue_2 = AsCharSpan(self.pageToken.before);
+            if (self.pageToken == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                if (self.pageToken.limit != nil) {
+                    auto & definedValue_3 = nonNullValue_1.limit.Emplace();
+                    definedValue_3 = self.pageToken.limit.unsignedShortValue;
+                }
+                if (self.pageToken.after != nil) {
+                    auto & definedValue_3 = nonNullValue_1.after.Emplace();
+                    definedValue_3 = AsCharSpan(self.pageToken.after);
+                }
+                if (self.pageToken.before != nil) {
+                    auto & definedValue_3 = nonNullValue_1.before.Emplace();
+                    definedValue_3 = AsCharSpan(self.pageToken.before);
+                }
             }
         }
     }
     {
         if (self.recordingFlag != nil) {
             auto & definedValue_0 = encodableStruct.recordingFlag.Emplace();
-            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.recordingFlag.unsignedIntValue);
+            if (self.recordingFlag == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                nonNullValue_1 = static_cast<std::remove_reference_t<decltype(nonNullValue_1)>>(self.recordingFlag.unsignedCharValue);
+            }
         }
     }
     {
@@ -24832,7 +24836,7 @@ NS_ASSUME_NONNULL_BEGIN
                     newElement_0.parentalGuidanceText = nil;
                 }
                 if (entry_0.recordingFlag.HasValue()) {
-                    newElement_0.recordingFlag = [NSNumber numberWithUnsignedInt:entry_0.recordingFlag.Value().Raw()];
+                    newElement_0.recordingFlag = [NSNumber numberWithUnsignedChar:entry_0.recordingFlag.Value().Raw()];
                 } else {
                     newElement_0.recordingFlag = nil;
                 }
@@ -24923,15 +24927,15 @@ NS_ASSUME_NONNULL_BEGIN
                         auto iter_3 = entry_0.externalIDList.Value().begin();
                         while (iter_3.Next()) {
                             auto & entry_3 = iter_3.GetValue();
-                            MTRChannelClusterProgramCastStruct * newElement_3;
-                            newElement_3 = [MTRChannelClusterProgramCastStruct new];
+                            MTRChannelClusterAdditionalInfoStruct * newElement_3;
+                            newElement_3 = [MTRChannelClusterAdditionalInfoStruct new];
                             newElement_3.name = AsString(entry_3.name);
                             if (newElement_3.name == nil) {
                                 CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                                 return err;
                             }
-                            newElement_3.role = AsString(entry_3.role);
-                            if (newElement_3.role == nil) {
+                            newElement_3.value = AsString(entry_3.value);
+                            if (newElement_3.value == nil) {
                                 CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                                 return err;
                             }
@@ -24969,9 +24973,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _shouldRecordSeries = @(0);
 
-        _externalIDList = [NSArray array];
+        _externalIDList = nil;
 
-        _data = [NSData data];
+        _data = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -25013,32 +25017,38 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.shouldRecordSeries = self.shouldRecordSeries.boolValue;
     }
     {
-        {
-            using ListType_0 = std::remove_reference_t<decltype(encodableStruct.externalIDList)>;
-            using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-            if (self.externalIDList.count != 0) {
-                auto * listHolder_0 = new ListHolder<ListMemberType_0>(self.externalIDList.count);
-                if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                    return CHIP_ERROR_INVALID_ARGUMENT;
-                }
-                listFreer.add(listHolder_0);
-                for (size_t i_0 = 0; i_0 < self.externalIDList.count; ++i_0) {
-                    if (![self.externalIDList[i_0] isKindOfClass:[MTRChannelClusterAdditionalInfoStruct class]]) {
-                        // Wrong kind of value.
+        if (self.externalIDList != nil) {
+            auto & definedValue_0 = encodableStruct.externalIDList.Emplace();
+            {
+                using ListType_1 = std::remove_reference_t<decltype(definedValue_0)>;
+                using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+                if (self.externalIDList.count != 0) {
+                    auto * listHolder_1 = new ListHolder<ListMemberType_1>(self.externalIDList.count);
+                    if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (MTRChannelClusterAdditionalInfoStruct *) self.externalIDList[i_0];
-                    listHolder_0->mList[i_0].name = AsCharSpan(element_0.name);
-                    listHolder_0->mList[i_0].value = AsCharSpan(element_0.value);
+                    listFreer.add(listHolder_1);
+                    for (size_t i_1 = 0; i_1 < self.externalIDList.count; ++i_1) {
+                        if (![self.externalIDList[i_1] isKindOfClass:[MTRChannelClusterAdditionalInfoStruct class]]) {
+                            // Wrong kind of value.
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        auto element_1 = (MTRChannelClusterAdditionalInfoStruct *) self.externalIDList[i_1];
+                        listHolder_1->mList[i_1].name = AsCharSpan(element_1.name);
+                        listHolder_1->mList[i_1].value = AsCharSpan(element_1.value);
+                    }
+                    definedValue_0 = ListType_1(listHolder_1->mList, self.externalIDList.count);
+                } else {
+                    definedValue_0 = ListType_1();
                 }
-                encodableStruct.externalIDList = ListType_0(listHolder_0->mList, self.externalIDList.count);
-            } else {
-                encodableStruct.externalIDList = ListType_0();
             }
         }
     }
     {
-        encodableStruct.data = AsByteSpan(self.data);
+        if (self.data != nil) {
+            auto & definedValue_0 = encodableStruct.data.Emplace();
+            definedValue_0 = AsByteSpan(self.data);
+        }
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -25088,9 +25098,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _shouldRecordSeries = @(0);
 
-        _externalIDList = [NSArray array];
+        _externalIDList = nil;
 
-        _data = [NSData data];
+        _data = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -25132,32 +25142,38 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.shouldRecordSeries = self.shouldRecordSeries.boolValue;
     }
     {
-        {
-            using ListType_0 = std::remove_reference_t<decltype(encodableStruct.externalIDList)>;
-            using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-            if (self.externalIDList.count != 0) {
-                auto * listHolder_0 = new ListHolder<ListMemberType_0>(self.externalIDList.count);
-                if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                    return CHIP_ERROR_INVALID_ARGUMENT;
-                }
-                listFreer.add(listHolder_0);
-                for (size_t i_0 = 0; i_0 < self.externalIDList.count; ++i_0) {
-                    if (![self.externalIDList[i_0] isKindOfClass:[MTRChannelClusterAdditionalInfoStruct class]]) {
-                        // Wrong kind of value.
+        if (self.externalIDList != nil) {
+            auto & definedValue_0 = encodableStruct.externalIDList.Emplace();
+            {
+                using ListType_1 = std::remove_reference_t<decltype(definedValue_0)>;
+                using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+                if (self.externalIDList.count != 0) {
+                    auto * listHolder_1 = new ListHolder<ListMemberType_1>(self.externalIDList.count);
+                    if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (MTRChannelClusterAdditionalInfoStruct *) self.externalIDList[i_0];
-                    listHolder_0->mList[i_0].name = AsCharSpan(element_0.name);
-                    listHolder_0->mList[i_0].value = AsCharSpan(element_0.value);
+                    listFreer.add(listHolder_1);
+                    for (size_t i_1 = 0; i_1 < self.externalIDList.count; ++i_1) {
+                        if (![self.externalIDList[i_1] isKindOfClass:[MTRChannelClusterAdditionalInfoStruct class]]) {
+                            // Wrong kind of value.
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        auto element_1 = (MTRChannelClusterAdditionalInfoStruct *) self.externalIDList[i_1];
+                        listHolder_1->mList[i_1].name = AsCharSpan(element_1.name);
+                        listHolder_1->mList[i_1].value = AsCharSpan(element_1.value);
+                    }
+                    definedValue_0 = ListType_1(listHolder_1->mList, self.externalIDList.count);
+                } else {
+                    definedValue_0 = ListType_1();
                 }
-                encodableStruct.externalIDList = ListType_0(listHolder_0->mList, self.externalIDList.count);
-            } else {
-                encodableStruct.externalIDList = ListType_0();
             }
         }
     }
     {
-        encodableStruct.data = AsByteSpan(self.data);
+        if (self.data != nil) {
+            auto & definedValue_0 = encodableStruct.data.Emplace();
+            definedValue_0 = AsByteSpan(self.data);
+        }
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -26327,7 +26343,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _trackID = @"";
 
-        _audioOutputIndex = @(0);
+        _audioOutputIndex = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -26364,7 +26380,15 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.trackID = AsCharSpan(self.trackID);
     }
     {
-        encodableStruct.audioOutputIndex = self.audioOutputIndex.unsignedCharValue;
+        if (self.audioOutputIndex != nil) {
+            auto & definedValue_0 = encodableStruct.audioOutputIndex.Emplace();
+            if (self.audioOutputIndex == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                nonNullValue_1 = self.audioOutputIndex.unsignedCharValue;
+            }
+        }
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -27212,82 +27236,129 @@ NS_ASSUME_NONNULL_BEGIN
     {
         if (self.playbackPreferences != nil) {
             auto & definedValue_0 = encodableStruct.playbackPreferences.Emplace();
-            definedValue_0.playbackPosition = self.playbackPreferences.playbackPosition.unsignedLongLongValue;
-            definedValue_0.textTrack.languageCode = AsCharSpan(self.playbackPreferences.textTrack.languageCode);
-            if (self.playbackPreferences.textTrack.characteristics != nil) {
-                auto & definedValue_3 = definedValue_0.textTrack.characteristics.Emplace();
-                {
-                    using ListType_4 = std::remove_reference_t<decltype(definedValue_3)>;
-                    using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
-                    if (self.playbackPreferences.textTrack.characteristics.count != 0) {
-                        auto * listHolder_4 = new ListHolder<ListMemberType_4>(self.playbackPreferences.textTrack.characteristics.count);
-                        if (listHolder_4 == nullptr || listHolder_4->mList == nullptr) {
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        listFreer.add(listHolder_4);
-                        for (size_t i_4 = 0; i_4 < self.playbackPreferences.textTrack.characteristics.count; ++i_4) {
-                            if (![self.playbackPreferences.textTrack.characteristics[i_4] isKindOfClass:[NSNumber class]]) {
-                                // Wrong kind of value.
-                                return CHIP_ERROR_INVALID_ARGUMENT;
+            if (self.playbackPreferences.playbackPosition != nil) {
+                auto & definedValue_2 = definedValue_0.playbackPosition.Emplace();
+                if (self.playbackPreferences.playbackPosition == nil) {
+                    definedValue_2.SetNull();
+                } else {
+                    auto & nonNullValue_3 = definedValue_2.SetNonNull();
+                    nonNullValue_3 = self.playbackPreferences.playbackPosition.unsignedLongLongValue;
+                }
+            }
+            if (self.playbackPreferences.textTrack != nil) {
+                auto & definedValue_2 = definedValue_0.textTrack.Emplace();
+                if (self.playbackPreferences.textTrack == nil) {
+                    definedValue_2.SetNull();
+                } else {
+                    auto & nonNullValue_3 = definedValue_2.SetNonNull();
+                    nonNullValue_3.languageCode = AsCharSpan(self.playbackPreferences.textTrack.languageCode);
+                    if (self.playbackPreferences.textTrack.characteristics != nil) {
+                        auto & definedValue_5 = nonNullValue_3.characteristics.Emplace();
+                        if (self.playbackPreferences.textTrack.characteristics == nil) {
+                            definedValue_5.SetNull();
+                        } else {
+                            auto & nonNullValue_6 = definedValue_5.SetNonNull();
+                            {
+                                using ListType_7 = std::remove_reference_t<decltype(nonNullValue_6)>;
+                                using ListMemberType_7 = ListMemberTypeGetter<ListType_7>::Type;
+                                if (self.playbackPreferences.textTrack.characteristics.count != 0) {
+                                    auto * listHolder_7 = new ListHolder<ListMemberType_7>(self.playbackPreferences.textTrack.characteristics.count);
+                                    if (listHolder_7 == nullptr || listHolder_7->mList == nullptr) {
+                                        return CHIP_ERROR_INVALID_ARGUMENT;
+                                    }
+                                    listFreer.add(listHolder_7);
+                                    for (size_t i_7 = 0; i_7 < self.playbackPreferences.textTrack.characteristics.count; ++i_7) {
+                                        if (![self.playbackPreferences.textTrack.characteristics[i_7] isKindOfClass:[NSNumber class]]) {
+                                            // Wrong kind of value.
+                                            return CHIP_ERROR_INVALID_ARGUMENT;
+                                        }
+                                        auto element_7 = (NSNumber *) self.playbackPreferences.textTrack.characteristics[i_7];
+                                        listHolder_7->mList[i_7] = static_cast<std::remove_reference_t<decltype(listHolder_7->mList[i_7])>>(element_7.unsignedCharValue);
+                                    }
+                                    nonNullValue_6 = ListType_7(listHolder_7->mList, self.playbackPreferences.textTrack.characteristics.count);
+                                } else {
+                                    nonNullValue_6 = ListType_7();
+                                }
                             }
-                            auto element_4 = (NSNumber *) self.playbackPreferences.textTrack.characteristics[i_4];
-                            listHolder_4->mList[i_4] = static_cast<std::remove_reference_t<decltype(listHolder_4->mList[i_4])>>(element_4.unsignedCharValue);
                         }
-                        definedValue_3 = ListType_4(listHolder_4->mList, self.playbackPreferences.textTrack.characteristics.count);
-                    } else {
-                        definedValue_3 = ListType_4();
+                    }
+                    if (self.playbackPreferences.textTrack.audioOutputIndex != nil) {
+                        auto & definedValue_5 = nonNullValue_3.audioOutputIndex.Emplace();
+                        if (self.playbackPreferences.textTrack.audioOutputIndex == nil) {
+                            definedValue_5.SetNull();
+                        } else {
+                            auto & nonNullValue_6 = definedValue_5.SetNonNull();
+                            nonNullValue_6 = self.playbackPreferences.textTrack.audioOutputIndex.unsignedCharValue;
+                        }
                     }
                 }
             }
-            definedValue_0.textTrack.audioOutputIndex = self.playbackPreferences.textTrack.audioOutputIndex.unsignedCharValue;
             if (self.playbackPreferences.audioTracks != nil) {
                 auto & definedValue_2 = definedValue_0.audioTracks.Emplace();
-                {
-                    using ListType_3 = std::remove_reference_t<decltype(definedValue_2)>;
-                    using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
-                    if (self.playbackPreferences.audioTracks.count != 0) {
-                        auto * listHolder_3 = new ListHolder<ListMemberType_3>(self.playbackPreferences.audioTracks.count);
-                        if (listHolder_3 == nullptr || listHolder_3->mList == nullptr) {
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        listFreer.add(listHolder_3);
-                        for (size_t i_3 = 0; i_3 < self.playbackPreferences.audioTracks.count; ++i_3) {
-                            if (![self.playbackPreferences.audioTracks[i_3] isKindOfClass:[MTRContentLauncherClusterTrackPreferenceStruct class]]) {
-                                // Wrong kind of value.
+                if (self.playbackPreferences.audioTracks == nil) {
+                    definedValue_2.SetNull();
+                } else {
+                    auto & nonNullValue_3 = definedValue_2.SetNonNull();
+                    {
+                        using ListType_4 = std::remove_reference_t<decltype(nonNullValue_3)>;
+                        using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
+                        if (self.playbackPreferences.audioTracks.count != 0) {
+                            auto * listHolder_4 = new ListHolder<ListMemberType_4>(self.playbackPreferences.audioTracks.count);
+                            if (listHolder_4 == nullptr || listHolder_4->mList == nullptr) {
                                 return CHIP_ERROR_INVALID_ARGUMENT;
                             }
-                            auto element_3 = (MTRContentLauncherClusterTrackPreferenceStruct *) self.playbackPreferences.audioTracks[i_3];
-                            listHolder_3->mList[i_3].languageCode = AsCharSpan(element_3.languageCode);
-                            if (element_3.characteristics != nil) {
-                                auto & definedValue_5 = listHolder_3->mList[i_3].characteristics.Emplace();
-                                {
-                                    using ListType_6 = std::remove_reference_t<decltype(definedValue_5)>;
-                                    using ListMemberType_6 = ListMemberTypeGetter<ListType_6>::Type;
-                                    if (element_3.characteristics.count != 0) {
-                                        auto * listHolder_6 = new ListHolder<ListMemberType_6>(element_3.characteristics.count);
-                                        if (listHolder_6 == nullptr || listHolder_6->mList == nullptr) {
-                                            return CHIP_ERROR_INVALID_ARGUMENT;
-                                        }
-                                        listFreer.add(listHolder_6);
-                                        for (size_t i_6 = 0; i_6 < element_3.characteristics.count; ++i_6) {
-                                            if (![element_3.characteristics[i_6] isKindOfClass:[NSNumber class]]) {
-                                                // Wrong kind of value.
-                                                return CHIP_ERROR_INVALID_ARGUMENT;
-                                            }
-                                            auto element_6 = (NSNumber *) element_3.characteristics[i_6];
-                                            listHolder_6->mList[i_6] = static_cast<std::remove_reference_t<decltype(listHolder_6->mList[i_6])>>(element_6.unsignedCharValue);
-                                        }
-                                        definedValue_5 = ListType_6(listHolder_6->mList, element_3.characteristics.count);
+                            listFreer.add(listHolder_4);
+                            for (size_t i_4 = 0; i_4 < self.playbackPreferences.audioTracks.count; ++i_4) {
+                                if (![self.playbackPreferences.audioTracks[i_4] isKindOfClass:[MTRContentLauncherClusterTrackPreferenceStruct class]]) {
+                                    // Wrong kind of value.
+                                    return CHIP_ERROR_INVALID_ARGUMENT;
+                                }
+                                auto element_4 = (MTRContentLauncherClusterTrackPreferenceStruct *) self.playbackPreferences.audioTracks[i_4];
+                                listHolder_4->mList[i_4].languageCode = AsCharSpan(element_4.languageCode);
+                                if (element_4.characteristics != nil) {
+                                    auto & definedValue_6 = listHolder_4->mList[i_4].characteristics.Emplace();
+                                    if (element_4.characteristics == nil) {
+                                        definedValue_6.SetNull();
                                     } else {
-                                        definedValue_5 = ListType_6();
+                                        auto & nonNullValue_7 = definedValue_6.SetNonNull();
+                                        {
+                                            using ListType_8 = std::remove_reference_t<decltype(nonNullValue_7)>;
+                                            using ListMemberType_8 = ListMemberTypeGetter<ListType_8>::Type;
+                                            if (element_4.characteristics.count != 0) {
+                                                auto * listHolder_8 = new ListHolder<ListMemberType_8>(element_4.characteristics.count);
+                                                if (listHolder_8 == nullptr || listHolder_8->mList == nullptr) {
+                                                    return CHIP_ERROR_INVALID_ARGUMENT;
+                                                }
+                                                listFreer.add(listHolder_8);
+                                                for (size_t i_8 = 0; i_8 < element_4.characteristics.count; ++i_8) {
+                                                    if (![element_4.characteristics[i_8] isKindOfClass:[NSNumber class]]) {
+                                                        // Wrong kind of value.
+                                                        return CHIP_ERROR_INVALID_ARGUMENT;
+                                                    }
+                                                    auto element_8 = (NSNumber *) element_4.characteristics[i_8];
+                                                    listHolder_8->mList[i_8] = static_cast<std::remove_reference_t<decltype(listHolder_8->mList[i_8])>>(element_8.unsignedCharValue);
+                                                }
+                                                nonNullValue_7 = ListType_8(listHolder_8->mList, element_4.characteristics.count);
+                                            } else {
+                                                nonNullValue_7 = ListType_8();
+                                            }
+                                        }
+                                    }
+                                }
+                                if (element_4.audioOutputIndex != nil) {
+                                    auto & definedValue_6 = listHolder_4->mList[i_4].audioOutputIndex.Emplace();
+                                    if (element_4.audioOutputIndex == nil) {
+                                        definedValue_6.SetNull();
+                                    } else {
+                                        auto & nonNullValue_7 = definedValue_6.SetNonNull();
+                                        nonNullValue_7 = element_4.audioOutputIndex.unsignedCharValue;
                                     }
                                 }
                             }
-                            listHolder_3->mList[i_3].audioOutputIndex = element_3.audioOutputIndex.unsignedCharValue;
+                            nonNullValue_3 = ListType_4(listHolder_4->mList, self.playbackPreferences.audioTracks.count);
+                        } else {
+                            nonNullValue_3 = ListType_4();
                         }
-                        definedValue_2 = ListType_3(listHolder_3->mList, self.playbackPreferences.audioTracks.count);
-                    } else {
-                        definedValue_2 = ListType_3();
                     }
                 }
             }
@@ -27348,6 +27419,8 @@ NS_ASSUME_NONNULL_BEGIN
         _displayString = nil;
 
         _brandingInformation = nil;
+
+        _playbackPreferences = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -27361,6 +27434,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.contentURL = self.contentURL;
     other.displayString = self.displayString;
     other.brandingInformation = self.brandingInformation;
+    other.playbackPreferences = self.playbackPreferences;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -27369,7 +27443,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contentURL:%@; displayString:%@; brandingInformation:%@; >", NSStringFromClass([self class]), _contentURL, _displayString, _brandingInformation];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contentURL:%@; displayString:%@; brandingInformation:%@; playbackPreferences:%@; >", NSStringFromClass([self class]), _contentURL, _displayString, _brandingInformation, _playbackPreferences];
     return descriptionString;
 }
 
@@ -27477,6 +27551,137 @@ NS_ASSUME_NONNULL_BEGIN
                     definedValue_4.width = self.brandingInformation.waterMark.size.width.doubleValue;
                     definedValue_4.height = self.brandingInformation.waterMark.size.height.doubleValue;
                     definedValue_4.metric = static_cast<std::remove_reference_t<decltype(definedValue_4.metric)>>(self.brandingInformation.waterMark.size.metric.unsignedCharValue);
+                }
+            }
+        }
+    }
+    {
+        if (self.playbackPreferences != nil) {
+            auto & definedValue_0 = encodableStruct.playbackPreferences.Emplace();
+            if (self.playbackPreferences.playbackPosition != nil) {
+                auto & definedValue_2 = definedValue_0.playbackPosition.Emplace();
+                if (self.playbackPreferences.playbackPosition == nil) {
+                    definedValue_2.SetNull();
+                } else {
+                    auto & nonNullValue_3 = definedValue_2.SetNonNull();
+                    nonNullValue_3 = self.playbackPreferences.playbackPosition.unsignedLongLongValue;
+                }
+            }
+            if (self.playbackPreferences.textTrack != nil) {
+                auto & definedValue_2 = definedValue_0.textTrack.Emplace();
+                if (self.playbackPreferences.textTrack == nil) {
+                    definedValue_2.SetNull();
+                } else {
+                    auto & nonNullValue_3 = definedValue_2.SetNonNull();
+                    nonNullValue_3.languageCode = AsCharSpan(self.playbackPreferences.textTrack.languageCode);
+                    if (self.playbackPreferences.textTrack.characteristics != nil) {
+                        auto & definedValue_5 = nonNullValue_3.characteristics.Emplace();
+                        if (self.playbackPreferences.textTrack.characteristics == nil) {
+                            definedValue_5.SetNull();
+                        } else {
+                            auto & nonNullValue_6 = definedValue_5.SetNonNull();
+                            {
+                                using ListType_7 = std::remove_reference_t<decltype(nonNullValue_6)>;
+                                using ListMemberType_7 = ListMemberTypeGetter<ListType_7>::Type;
+                                if (self.playbackPreferences.textTrack.characteristics.count != 0) {
+                                    auto * listHolder_7 = new ListHolder<ListMemberType_7>(self.playbackPreferences.textTrack.characteristics.count);
+                                    if (listHolder_7 == nullptr || listHolder_7->mList == nullptr) {
+                                        return CHIP_ERROR_INVALID_ARGUMENT;
+                                    }
+                                    listFreer.add(listHolder_7);
+                                    for (size_t i_7 = 0; i_7 < self.playbackPreferences.textTrack.characteristics.count; ++i_7) {
+                                        if (![self.playbackPreferences.textTrack.characteristics[i_7] isKindOfClass:[NSNumber class]]) {
+                                            // Wrong kind of value.
+                                            return CHIP_ERROR_INVALID_ARGUMENT;
+                                        }
+                                        auto element_7 = (NSNumber *) self.playbackPreferences.textTrack.characteristics[i_7];
+                                        listHolder_7->mList[i_7] = static_cast<std::remove_reference_t<decltype(listHolder_7->mList[i_7])>>(element_7.unsignedCharValue);
+                                    }
+                                    nonNullValue_6 = ListType_7(listHolder_7->mList, self.playbackPreferences.textTrack.characteristics.count);
+                                } else {
+                                    nonNullValue_6 = ListType_7();
+                                }
+                            }
+                        }
+                    }
+                    if (self.playbackPreferences.textTrack.audioOutputIndex != nil) {
+                        auto & definedValue_5 = nonNullValue_3.audioOutputIndex.Emplace();
+                        if (self.playbackPreferences.textTrack.audioOutputIndex == nil) {
+                            definedValue_5.SetNull();
+                        } else {
+                            auto & nonNullValue_6 = definedValue_5.SetNonNull();
+                            nonNullValue_6 = self.playbackPreferences.textTrack.audioOutputIndex.unsignedCharValue;
+                        }
+                    }
+                }
+            }
+            if (self.playbackPreferences.audioTracks != nil) {
+                auto & definedValue_2 = definedValue_0.audioTracks.Emplace();
+                if (self.playbackPreferences.audioTracks == nil) {
+                    definedValue_2.SetNull();
+                } else {
+                    auto & nonNullValue_3 = definedValue_2.SetNonNull();
+                    {
+                        using ListType_4 = std::remove_reference_t<decltype(nonNullValue_3)>;
+                        using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
+                        if (self.playbackPreferences.audioTracks.count != 0) {
+                            auto * listHolder_4 = new ListHolder<ListMemberType_4>(self.playbackPreferences.audioTracks.count);
+                            if (listHolder_4 == nullptr || listHolder_4->mList == nullptr) {
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            listFreer.add(listHolder_4);
+                            for (size_t i_4 = 0; i_4 < self.playbackPreferences.audioTracks.count; ++i_4) {
+                                if (![self.playbackPreferences.audioTracks[i_4] isKindOfClass:[MTRContentLauncherClusterTrackPreferenceStruct class]]) {
+                                    // Wrong kind of value.
+                                    return CHIP_ERROR_INVALID_ARGUMENT;
+                                }
+                                auto element_4 = (MTRContentLauncherClusterTrackPreferenceStruct *) self.playbackPreferences.audioTracks[i_4];
+                                listHolder_4->mList[i_4].languageCode = AsCharSpan(element_4.languageCode);
+                                if (element_4.characteristics != nil) {
+                                    auto & definedValue_6 = listHolder_4->mList[i_4].characteristics.Emplace();
+                                    if (element_4.characteristics == nil) {
+                                        definedValue_6.SetNull();
+                                    } else {
+                                        auto & nonNullValue_7 = definedValue_6.SetNonNull();
+                                        {
+                                            using ListType_8 = std::remove_reference_t<decltype(nonNullValue_7)>;
+                                            using ListMemberType_8 = ListMemberTypeGetter<ListType_8>::Type;
+                                            if (element_4.characteristics.count != 0) {
+                                                auto * listHolder_8 = new ListHolder<ListMemberType_8>(element_4.characteristics.count);
+                                                if (listHolder_8 == nullptr || listHolder_8->mList == nullptr) {
+                                                    return CHIP_ERROR_INVALID_ARGUMENT;
+                                                }
+                                                listFreer.add(listHolder_8);
+                                                for (size_t i_8 = 0; i_8 < element_4.characteristics.count; ++i_8) {
+                                                    if (![element_4.characteristics[i_8] isKindOfClass:[NSNumber class]]) {
+                                                        // Wrong kind of value.
+                                                        return CHIP_ERROR_INVALID_ARGUMENT;
+                                                    }
+                                                    auto element_8 = (NSNumber *) element_4.characteristics[i_8];
+                                                    listHolder_8->mList[i_8] = static_cast<std::remove_reference_t<decltype(listHolder_8->mList[i_8])>>(element_8.unsignedCharValue);
+                                                }
+                                                nonNullValue_7 = ListType_8(listHolder_8->mList, element_4.characteristics.count);
+                                            } else {
+                                                nonNullValue_7 = ListType_8();
+                                            }
+                                        }
+                                    }
+                                }
+                                if (element_4.audioOutputIndex != nil) {
+                                    auto & definedValue_6 = listHolder_4->mList[i_4].audioOutputIndex.Emplace();
+                                    if (element_4.audioOutputIndex == nil) {
+                                        definedValue_6.SetNull();
+                                    } else {
+                                        auto & nonNullValue_7 = definedValue_6.SetNonNull();
+                                        nonNullValue_7 = element_4.audioOutputIndex.unsignedCharValue;
+                                    }
+                                }
+                            }
+                            nonNullValue_3 = ListType_4(listHolder_4->mList, self.playbackPreferences.audioTracks.count);
+                        } else {
+                            nonNullValue_3 = ListType_4();
+                        }
+                    }
                 }
             }
         }
@@ -28479,7 +28684,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _oldPIN = nil;
+        _oldPIN = @"";
 
         _newPIN = @"";
         _timedInvokeTimeoutMs = nil;
@@ -28515,10 +28720,7 @@ NS_ASSUME_NONNULL_BEGIN
     chip::app::Clusters::ContentControl::Commands::UpdatePIN::Type encodableStruct;
     ListFreer listFreer;
     {
-        if (self.oldPIN != nil) {
-            auto & definedValue_0 = encodableStruct.oldPIN.Emplace();
-            definedValue_0 = AsCharSpan(self.oldPIN);
-        }
+        encodableStruct.oldPIN = AsCharSpan(self.oldPIN);
     }
     {
         encodableStruct.newPIN = AsCharSpan(self.newPIN);
@@ -28871,7 +29073,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _pinCode = nil;
 
-        _bonusTime = nil;
+        _bonusTime = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -28911,10 +29113,7 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
     {
-        if (self.bonusTime != nil) {
-            auto & definedValue_0 = encodableStruct.bonusTime.Emplace();
-            definedValue_0 = self.bonusTime.unsignedIntValue;
-        }
+        encodableStruct.bonusTime = self.bonusTime.unsignedIntValue;
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -29338,14 +29537,637 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation MTRContentControlClusterAddBlockChannelsParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _channels = [NSArray array];
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRContentControlClusterAddBlockChannelsParams alloc] init];
+
+    other.channels = self.channels;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: channels:%@; >", NSStringFromClass([self class]), _channels];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRContentControlClusterAddBlockChannelsParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::ContentControl::Commands::AddBlockChannels::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        {
+            using ListType_0 = std::remove_reference_t<decltype(encodableStruct.channels)>;
+            using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+            if (self.channels.count != 0) {
+                auto * listHolder_0 = new ListHolder<ListMemberType_0>(self.channels.count);
+                if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                    return CHIP_ERROR_INVALID_ARGUMENT;
+                }
+                listFreer.add(listHolder_0);
+                for (size_t i_0 = 0; i_0 < self.channels.count; ++i_0) {
+                    if (![self.channels[i_0] isKindOfClass:[MTRContentControlClusterBlockChannelStruct class]]) {
+                        // Wrong kind of value.
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    auto element_0 = (MTRContentControlClusterBlockChannelStruct *) self.channels[i_0];
+                    if (element_0.blockChannelIndex == nil) {
+                        listHolder_0->mList[i_0].blockChannelIndex.SetNull();
+                    } else {
+                        auto & nonNullValue_2 = listHolder_0->mList[i_0].blockChannelIndex.SetNonNull();
+                        nonNullValue_2 = element_0.blockChannelIndex.unsignedShortValue;
+                    }
+                    listHolder_0->mList[i_0].majorNumber = element_0.majorNumber.unsignedShortValue;
+                    listHolder_0->mList[i_0].minorNumber = element_0.minorNumber.unsignedShortValue;
+                    if (element_0.identifier != nil) {
+                        auto & definedValue_2 = listHolder_0->mList[i_0].identifier.Emplace();
+                        definedValue_2 = AsCharSpan(element_0.identifier);
+                    }
+                }
+                encodableStruct.channels = ListType_0(listHolder_0->mList, self.channels.count);
+            } else {
+                encodableStruct.channels = ListType_0();
+            }
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRContentControlClusterRemoveBlockChannelsParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _channelIndexes = [NSArray array];
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRContentControlClusterRemoveBlockChannelsParams alloc] init];
+
+    other.channelIndexes = self.channelIndexes;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: channelIndexes:%@; >", NSStringFromClass([self class]), _channelIndexes];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRContentControlClusterRemoveBlockChannelsParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::ContentControl::Commands::RemoveBlockChannels::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        {
+            using ListType_0 = std::remove_reference_t<decltype(encodableStruct.channelIndexes)>;
+            using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+            if (self.channelIndexes.count != 0) {
+                auto * listHolder_0 = new ListHolder<ListMemberType_0>(self.channelIndexes.count);
+                if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                    return CHIP_ERROR_INVALID_ARGUMENT;
+                }
+                listFreer.add(listHolder_0);
+                for (size_t i_0 = 0; i_0 < self.channelIndexes.count; ++i_0) {
+                    if (![self.channelIndexes[i_0] isKindOfClass:[NSNumber class]]) {
+                        // Wrong kind of value.
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    auto element_0 = (NSNumber *) self.channelIndexes[i_0];
+                    listHolder_0->mList[i_0] = element_0.unsignedShortValue;
+                }
+                encodableStruct.channelIndexes = ListType_0(listHolder_0->mList, self.channelIndexes.count);
+            } else {
+                encodableStruct.channelIndexes = ListType_0();
+            }
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRContentControlClusterAddBlockApplicationsParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _applications = [NSArray array];
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRContentControlClusterAddBlockApplicationsParams alloc] init];
+
+    other.applications = self.applications;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: applications:%@; >", NSStringFromClass([self class]), _applications];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRContentControlClusterAddBlockApplicationsParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::ContentControl::Commands::AddBlockApplications::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        {
+            using ListType_0 = std::remove_reference_t<decltype(encodableStruct.applications)>;
+            using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+            if (self.applications.count != 0) {
+                auto * listHolder_0 = new ListHolder<ListMemberType_0>(self.applications.count);
+                if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                    return CHIP_ERROR_INVALID_ARGUMENT;
+                }
+                listFreer.add(listHolder_0);
+                for (size_t i_0 = 0; i_0 < self.applications.count; ++i_0) {
+                    if (![self.applications[i_0] isKindOfClass:[MTRContentControlClusterAppInfoStruct class]]) {
+                        // Wrong kind of value.
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    auto element_0 = (MTRContentControlClusterAppInfoStruct *) self.applications[i_0];
+                    listHolder_0->mList[i_0].catalogVendorID = element_0.catalogVendorID.unsignedShortValue;
+                    listHolder_0->mList[i_0].applicationID = AsCharSpan(element_0.applicationID);
+                }
+                encodableStruct.applications = ListType_0(listHolder_0->mList, self.applications.count);
+            } else {
+                encodableStruct.applications = ListType_0();
+            }
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRContentControlClusterRemoveBlockApplicationsParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _applications = [NSArray array];
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRContentControlClusterRemoveBlockApplicationsParams alloc] init];
+
+    other.applications = self.applications;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: applications:%@; >", NSStringFromClass([self class]), _applications];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRContentControlClusterRemoveBlockApplicationsParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::ContentControl::Commands::RemoveBlockApplications::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        {
+            using ListType_0 = std::remove_reference_t<decltype(encodableStruct.applications)>;
+            using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+            if (self.applications.count != 0) {
+                auto * listHolder_0 = new ListHolder<ListMemberType_0>(self.applications.count);
+                if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                    return CHIP_ERROR_INVALID_ARGUMENT;
+                }
+                listFreer.add(listHolder_0);
+                for (size_t i_0 = 0; i_0 < self.applications.count; ++i_0) {
+                    if (![self.applications[i_0] isKindOfClass:[MTRContentControlClusterAppInfoStruct class]]) {
+                        // Wrong kind of value.
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    auto element_0 = (MTRContentControlClusterAppInfoStruct *) self.applications[i_0];
+                    listHolder_0->mList[i_0].catalogVendorID = element_0.catalogVendorID.unsignedShortValue;
+                    listHolder_0->mList[i_0].applicationID = AsCharSpan(element_0.applicationID);
+                }
+                encodableStruct.applications = ListType_0(listHolder_0->mList, self.applications.count);
+            } else {
+                encodableStruct.applications = ListType_0();
+            }
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRContentControlClusterSetBlockContentTimeWindowParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _timeWindow = [MTRContentControlClusterTimeWindowStruct new];
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRContentControlClusterSetBlockContentTimeWindowParams alloc] init];
+
+    other.timeWindow = self.timeWindow;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: timeWindow:%@; >", NSStringFromClass([self class]), _timeWindow];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRContentControlClusterSetBlockContentTimeWindowParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::ContentControl::Commands::SetBlockContentTimeWindow::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        if (self.timeWindow.timeWindowIndex == nil) {
+            encodableStruct.timeWindow.timeWindowIndex.SetNull();
+        } else {
+            auto & nonNullValue_1 = encodableStruct.timeWindow.timeWindowIndex.SetNonNull();
+            nonNullValue_1 = self.timeWindow.timeWindowIndex.unsignedShortValue;
+        }
+        encodableStruct.timeWindow.dayOfWeek = static_cast<std::remove_reference_t<decltype(encodableStruct.timeWindow.dayOfWeek)>>(self.timeWindow.dayOfWeek.unsignedCharValue);
+        {
+            using ListType_1 = std::remove_reference_t<decltype(encodableStruct.timeWindow.timePeriod)>;
+            using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+            if (self.timeWindow.timePeriod.count != 0) {
+                auto * listHolder_1 = new ListHolder<ListMemberType_1>(self.timeWindow.timePeriod.count);
+                if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
+                    return CHIP_ERROR_INVALID_ARGUMENT;
+                }
+                listFreer.add(listHolder_1);
+                for (size_t i_1 = 0; i_1 < self.timeWindow.timePeriod.count; ++i_1) {
+                    if (![self.timeWindow.timePeriod[i_1] isKindOfClass:[MTRContentControlClusterTimePeriodStruct class]]) {
+                        // Wrong kind of value.
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    auto element_1 = (MTRContentControlClusterTimePeriodStruct *) self.timeWindow.timePeriod[i_1];
+                    listHolder_1->mList[i_1].startHour = element_1.startHour.unsignedCharValue;
+                    listHolder_1->mList[i_1].startMinute = element_1.startMinute.unsignedCharValue;
+                    listHolder_1->mList[i_1].endHour = element_1.endHour.unsignedCharValue;
+                    listHolder_1->mList[i_1].endMinute = element_1.endMinute.unsignedCharValue;
+                }
+                encodableStruct.timeWindow.timePeriod = ListType_1(listHolder_1->mList, self.timeWindow.timePeriod.count);
+            } else {
+                encodableStruct.timeWindow.timePeriod = ListType_1();
+            }
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRContentControlClusterRemoveBlockContentTimeWindowParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _timeWindowIndexes = [NSArray array];
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRContentControlClusterRemoveBlockContentTimeWindowParams alloc] init];
+
+    other.timeWindowIndexes = self.timeWindowIndexes;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: timeWindowIndexes:%@; >", NSStringFromClass([self class]), _timeWindowIndexes];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRContentControlClusterRemoveBlockContentTimeWindowParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::ContentControl::Commands::RemoveBlockContentTimeWindow::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        {
+            using ListType_0 = std::remove_reference_t<decltype(encodableStruct.timeWindowIndexes)>;
+            using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+            if (self.timeWindowIndexes.count != 0) {
+                auto * listHolder_0 = new ListHolder<ListMemberType_0>(self.timeWindowIndexes.count);
+                if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                    return CHIP_ERROR_INVALID_ARGUMENT;
+                }
+                listFreer.add(listHolder_0);
+                for (size_t i_0 = 0; i_0 < self.timeWindowIndexes.count; ++i_0) {
+                    if (![self.timeWindowIndexes[i_0] isKindOfClass:[NSNumber class]]) {
+                        // Wrong kind of value.
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    auto element_0 = (NSNumber *) self.timeWindowIndexes[i_0];
+                    listHolder_0->mList[i_0] = element_0.unsignedShortValue;
+                }
+                encodableStruct.timeWindowIndexes = ListType_0(listHolder_0->mList, self.timeWindowIndexes.count);
+            } else {
+                encodableStruct.timeWindowIndexes = ListType_0();
+            }
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
 @implementation MTRContentAppObserverClusterContentAppMessageParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _data = nil;
+        _data = @"";
 
-        _encodingHint = @"";
+        _encodingHint = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -29379,13 +30201,13 @@ NS_ASSUME_NONNULL_BEGIN
     chip::app::Clusters::ContentAppObserver::Commands::ContentAppMessage::Type encodableStruct;
     ListFreer listFreer;
     {
-        if (self.data != nil) {
-            auto & definedValue_0 = encodableStruct.data.Emplace();
-            definedValue_0 = AsCharSpan(self.data);
-        }
+        encodableStruct.data = AsCharSpan(self.data);
     }
     {
-        encodableStruct.encodingHint = AsCharSpan(self.encodingHint);
+        if (self.encodingHint != nil) {
+            auto & definedValue_0 = encodableStruct.encodingHint.Emplace();
+            definedValue_0 = AsCharSpan(self.encodingHint);
+        }
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);

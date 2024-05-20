@@ -16,6 +16,7 @@
  */
 package matter.controller.cluster.eventstructs
 
+import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -24,9 +25,10 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class TargetNavigatorClusterTargetUpdatedEvent(
-  val targetList: List<matter.controller.cluster.structs.TargetNavigatorClusterTargetInfoStruct>,
-  val currentTarget: UByte,
-  val data: ByteArray
+  val targetList:
+    Optional<List<matter.controller.cluster.structs.TargetNavigatorClusterTargetInfoStruct>>,
+  val currentTarget: Optional<UByte>,
+  val data: Optional<ByteArray>
 ) {
   override fun toString(): String = buildString {
     append("TargetNavigatorClusterTargetUpdatedEvent {\n")
@@ -39,13 +41,22 @@ class TargetNavigatorClusterTargetUpdatedEvent(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      startArray(ContextSpecificTag(TAG_TARGET_LIST))
-      for (item in targetList.iterator()) {
-        item.toTlv(AnonymousTag, this)
+      if (targetList.isPresent) {
+        val opttargetList = targetList.get()
+        startArray(ContextSpecificTag(TAG_TARGET_LIST))
+        for (item in opttargetList.iterator()) {
+          item.toTlv(AnonymousTag, this)
+        }
+        endArray()
       }
-      endArray()
-      put(ContextSpecificTag(TAG_CURRENT_TARGET), currentTarget)
-      put(ContextSpecificTag(TAG_DATA), data)
+      if (currentTarget.isPresent) {
+        val optcurrentTarget = currentTarget.get()
+        put(ContextSpecificTag(TAG_CURRENT_TARGET), optcurrentTarget)
+      }
+      if (data.isPresent) {
+        val optdata = data.get()
+        put(ContextSpecificTag(TAG_DATA), optdata)
+      }
       endStructure()
     }
   }
@@ -58,20 +69,36 @@ class TargetNavigatorClusterTargetUpdatedEvent(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): TargetNavigatorClusterTargetUpdatedEvent {
       tlvReader.enterStructure(tlvTag)
       val targetList =
-        buildList<matter.controller.cluster.structs.TargetNavigatorClusterTargetInfoStruct> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_TARGET_LIST))
-          while (!tlvReader.isEndOfContainer()) {
-            this.add(
-              matter.controller.cluster.structs.TargetNavigatorClusterTargetInfoStruct.fromTlv(
-                AnonymousTag,
-                tlvReader
-              )
-            )
-          }
-          tlvReader.exitContainer()
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_TARGET_LIST))) {
+          Optional.of(
+            buildList<matter.controller.cluster.structs.TargetNavigatorClusterTargetInfoStruct> {
+              tlvReader.enterArray(ContextSpecificTag(TAG_TARGET_LIST))
+              while (!tlvReader.isEndOfContainer()) {
+                this.add(
+                  matter.controller.cluster.structs.TargetNavigatorClusterTargetInfoStruct.fromTlv(
+                    AnonymousTag,
+                    tlvReader
+                  )
+                )
+              }
+              tlvReader.exitContainer()
+            }
+          )
+        } else {
+          Optional.empty()
         }
-      val currentTarget = tlvReader.getUByte(ContextSpecificTag(TAG_CURRENT_TARGET))
-      val data = tlvReader.getByteArray(ContextSpecificTag(TAG_DATA))
+      val currentTarget =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CURRENT_TARGET))) {
+          Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_CURRENT_TARGET)))
+        } else {
+          Optional.empty()
+        }
+      val data =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_DATA))) {
+          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_DATA)))
+        } else {
+          Optional.empty()
+        }
 
       tlvReader.exitContainer()
 

@@ -7421,60 +7421,88 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jobject value_targetList;
-            chip::JniReferences::GetInstance().CreateArrayList(value_targetList);
-
-            auto iter_value_targetList_0 = cppValue.targetList.begin();
-            while (iter_value_targetList_0.Next())
+            if (!cppValue.targetList.HasValue())
             {
-                auto & entry_0 = iter_value_targetList_0.GetValue();
-                jobject newElement_0;
-                jobject newElement_0_identifier;
-                std::string newElement_0_identifierClassName     = "java/lang/Integer";
-                std::string newElement_0_identifierCtorSignature = "(I)V";
-                jint jninewElement_0_identifier                  = static_cast<jint>(entry_0.identifier);
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_identifierClassName.c_str(),
-                                                                           newElement_0_identifierCtorSignature.c_str(),
-                                                                           jninewElement_0_identifier, newElement_0_identifier);
-                jobject newElement_0_name;
-                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.name, newElement_0_name));
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_targetList);
+            }
+            else
+            {
+                jobject value_targetListInsideOptional;
+                chip::JniReferences::GetInstance().CreateArrayList(value_targetListInsideOptional);
 
-                jclass targetInfoStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetLocalClassRef(
-                    env, "chip/devicecontroller/ChipStructs$TargetNavigatorClusterTargetInfoStruct", targetInfoStructStructClass_1);
-                if (err != CHIP_NO_ERROR)
+                auto iter_value_targetListInsideOptional_1 = cppValue.targetList.Value().begin();
+                while (iter_value_targetListInsideOptional_1.Next())
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$TargetNavigatorClusterTargetInfoStruct");
-                    return nullptr;
-                }
+                    auto & entry_1 = iter_value_targetListInsideOptional_1.GetValue();
+                    jobject newElement_1;
+                    jobject newElement_1_identifier;
+                    std::string newElement_1_identifierClassName     = "java/lang/Integer";
+                    std::string newElement_1_identifierCtorSignature = "(I)V";
+                    jint jninewElement_1_identifier                  = static_cast<jint>(entry_1.identifier);
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_1_identifierClassName.c_str(),
+                                                                               newElement_1_identifierCtorSignature.c_str(),
+                                                                               jninewElement_1_identifier, newElement_1_identifier);
+                    jobject newElement_1_name;
+                    LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_1.name, newElement_1_name));
 
-                jmethodID targetInfoStructStructCtor_1;
-                err = chip::JniReferences::GetInstance().FindMethod(env, targetInfoStructStructClass_1, "<init>",
-                                                                    "(Ljava/lang/Integer;Ljava/lang/String;)V",
-                                                                    &targetInfoStructStructCtor_1);
-                if (err != CHIP_NO_ERROR || targetInfoStructStructCtor_1 == nullptr)
-                {
-                    ChipLogError(Zcl, "Could not find ChipStructs$TargetNavigatorClusterTargetInfoStruct constructor");
-                    return nullptr;
-                }
+                    jclass targetInfoStructStructClass_2;
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                        env, "chip/devicecontroller/ChipStructs$TargetNavigatorClusterTargetInfoStruct",
+                        targetInfoStructStructClass_2);
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(Zcl, "Could not find class ChipStructs$TargetNavigatorClusterTargetInfoStruct");
+                        return nullptr;
+                    }
 
-                newElement_0 = env->NewObject(targetInfoStructStructClass_1, targetInfoStructStructCtor_1, newElement_0_identifier,
-                                              newElement_0_name);
-                chip::JniReferences::GetInstance().AddToList(value_targetList, newElement_0);
+                    jmethodID targetInfoStructStructCtor_2;
+                    err = chip::JniReferences::GetInstance().FindMethod(env, targetInfoStructStructClass_2, "<init>",
+                                                                        "(Ljava/lang/Integer;Ljava/lang/String;)V",
+                                                                        &targetInfoStructStructCtor_2);
+                    if (err != CHIP_NO_ERROR || targetInfoStructStructCtor_2 == nullptr)
+                    {
+                        ChipLogError(Zcl, "Could not find ChipStructs$TargetNavigatorClusterTargetInfoStruct constructor");
+                        return nullptr;
+                    }
+
+                    newElement_1 = env->NewObject(targetInfoStructStructClass_2, targetInfoStructStructCtor_2,
+                                                  newElement_1_identifier, newElement_1_name);
+                    chip::JniReferences::GetInstance().AddToList(value_targetListInsideOptional, newElement_1);
+                }
+                chip::JniReferences::GetInstance().CreateOptional(value_targetListInsideOptional, value_targetList);
             }
 
             jobject value_currentTarget;
-            std::string value_currentTargetClassName     = "java/lang/Integer";
-            std::string value_currentTargetCtorSignature = "(I)V";
-            jint jnivalue_currentTarget                  = static_cast<jint>(cppValue.currentTarget);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(value_currentTargetClassName.c_str(),
-                                                                       value_currentTargetCtorSignature.c_str(),
-                                                                       jnivalue_currentTarget, value_currentTarget);
+            if (!cppValue.currentTarget.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_currentTarget);
+            }
+            else
+            {
+                jobject value_currentTargetInsideOptional;
+                std::string value_currentTargetInsideOptionalClassName     = "java/lang/Integer";
+                std::string value_currentTargetInsideOptionalCtorSignature = "(I)V";
+                jint jnivalue_currentTargetInsideOptional                  = static_cast<jint>(cppValue.currentTarget.Value());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    value_currentTargetInsideOptionalClassName.c_str(), value_currentTargetInsideOptionalCtorSignature.c_str(),
+                    jnivalue_currentTargetInsideOptional, value_currentTargetInsideOptional);
+                chip::JniReferences::GetInstance().CreateOptional(value_currentTargetInsideOptional, value_currentTarget);
+            }
 
             jobject value_data;
-            jbyteArray value_dataByteArray = env->NewByteArray(static_cast<jsize>(cppValue.data.size()));
-            env->SetByteArrayRegion(value_dataByteArray, 0, static_cast<jsize>(cppValue.data.size()),
-                                    reinterpret_cast<const jbyte *>(cppValue.data.data()));
-            value_data = value_dataByteArray;
+            if (!cppValue.data.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_data);
+            }
+            else
+            {
+                jobject value_dataInsideOptional;
+                jbyteArray value_dataInsideOptionalByteArray = env->NewByteArray(static_cast<jsize>(cppValue.data.Value().size()));
+                env->SetByteArrayRegion(value_dataInsideOptionalByteArray, 0, static_cast<jsize>(cppValue.data.Value().size()),
+                                        reinterpret_cast<const jbyte *>(cppValue.data.Value().data()));
+                value_dataInsideOptional = value_dataInsideOptionalByteArray;
+                chip::JniReferences::GetInstance().CreateOptional(value_dataInsideOptional, value_data);
+            }
 
             jclass targetUpdatedStructClass;
             err = chip::JniReferences::GetInstance().GetLocalClassRef(
@@ -7486,8 +7514,9 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jmethodID targetUpdatedStructCtor;
-            err = chip::JniReferences::GetInstance().FindMethod(
-                env, targetUpdatedStructClass, "<init>", "(Ljava/util/ArrayList;Ljava/lang/Integer;[B)V", &targetUpdatedStructCtor);
+            err = chip::JniReferences::GetInstance().FindMethod(env, targetUpdatedStructClass, "<init>",
+                                                                "(Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V",
+                                                                &targetUpdatedStructCtor);
             if (err != CHIP_NO_ERROR || targetUpdatedStructCtor == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipEventStructs$TargetNavigatorClusterTargetUpdatedEvent constructor");
@@ -7525,88 +7554,149 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                        jnivalue_currentState, value_currentState);
 
             jobject value_startTime;
-            std::string value_startTimeClassName     = "java/lang/Long";
-            std::string value_startTimeCtorSignature = "(J)V";
-            jlong jnivalue_startTime                 = static_cast<jlong>(cppValue.startTime);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                value_startTimeClassName.c_str(), value_startTimeCtorSignature.c_str(), jnivalue_startTime, value_startTime);
-
-            jobject value_duration;
-            std::string value_durationClassName     = "java/lang/Long";
-            std::string value_durationCtorSignature = "(J)V";
-            jlong jnivalue_duration                 = static_cast<jlong>(cppValue.duration);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                value_durationClassName.c_str(), value_durationCtorSignature.c_str(), jnivalue_duration, value_duration);
-
-            jobject value_sampledPosition;
-            jobject value_sampledPosition_updatedAt;
-            std::string value_sampledPosition_updatedAtClassName     = "java/lang/Long";
-            std::string value_sampledPosition_updatedAtCtorSignature = "(J)V";
-            jlong jnivalue_sampledPosition_updatedAt                 = static_cast<jlong>(cppValue.sampledPosition.updatedAt);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                value_sampledPosition_updatedAtClassName.c_str(), value_sampledPosition_updatedAtCtorSignature.c_str(),
-                jnivalue_sampledPosition_updatedAt, value_sampledPosition_updatedAt);
-            jobject value_sampledPosition_position;
-            if (cppValue.sampledPosition.position.IsNull())
+            if (!cppValue.startTime.HasValue())
             {
-                value_sampledPosition_position = nullptr;
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_startTime);
             }
             else
             {
-                std::string value_sampledPosition_positionClassName     = "java/lang/Long";
-                std::string value_sampledPosition_positionCtorSignature = "(J)V";
-                jlong jnivalue_sampledPosition_position = static_cast<jlong>(cppValue.sampledPosition.position.Value());
+                jobject value_startTimeInsideOptional;
+                std::string value_startTimeInsideOptionalClassName     = "java/lang/Long";
+                std::string value_startTimeInsideOptionalCtorSignature = "(J)V";
+                jlong jnivalue_startTimeInsideOptional                 = static_cast<jlong>(cppValue.startTime.Value());
                 chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                    value_sampledPosition_positionClassName.c_str(), value_sampledPosition_positionCtorSignature.c_str(),
-                    jnivalue_sampledPosition_position, value_sampledPosition_position);
+                    value_startTimeInsideOptionalClassName.c_str(), value_startTimeInsideOptionalCtorSignature.c_str(),
+                    jnivalue_startTimeInsideOptional, value_startTimeInsideOptional);
+                chip::JniReferences::GetInstance().CreateOptional(value_startTimeInsideOptional, value_startTime);
             }
 
-            jclass playbackPositionStructStructClass_0;
-            err = chip::JniReferences::GetInstance().GetLocalClassRef(
-                env, "chip/devicecontroller/ChipStructs$MediaPlaybackClusterPlaybackPositionStruct",
-                playbackPositionStructStructClass_0);
-            if (err != CHIP_NO_ERROR)
+            jobject value_duration;
+            if (!cppValue.duration.HasValue())
             {
-                ChipLogError(Zcl, "Could not find class ChipStructs$MediaPlaybackClusterPlaybackPositionStruct");
-                return nullptr;
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_duration);
             }
-
-            jmethodID playbackPositionStructStructCtor_0;
-            err = chip::JniReferences::GetInstance().FindMethod(env, playbackPositionStructStructClass_0, "<init>",
-                                                                "(Ljava/lang/Long;Ljava/lang/Long;)V",
-                                                                &playbackPositionStructStructCtor_0);
-            if (err != CHIP_NO_ERROR || playbackPositionStructStructCtor_0 == nullptr)
+            else
             {
-                ChipLogError(Zcl, "Could not find ChipStructs$MediaPlaybackClusterPlaybackPositionStruct constructor");
-                return nullptr;
+                jobject value_durationInsideOptional;
+                std::string value_durationInsideOptionalClassName     = "java/lang/Long";
+                std::string value_durationInsideOptionalCtorSignature = "(J)V";
+                jlong jnivalue_durationInsideOptional                 = static_cast<jlong>(cppValue.duration.Value());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    value_durationInsideOptionalClassName.c_str(), value_durationInsideOptionalCtorSignature.c_str(),
+                    jnivalue_durationInsideOptional, value_durationInsideOptional);
+                chip::JniReferences::GetInstance().CreateOptional(value_durationInsideOptional, value_duration);
             }
 
-            value_sampledPosition = env->NewObject(playbackPositionStructStructClass_0, playbackPositionStructStructCtor_0,
-                                                   value_sampledPosition_updatedAt, value_sampledPosition_position);
+            jobject value_sampledPosition;
+            if (!cppValue.sampledPosition.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_sampledPosition);
+            }
+            else
+            {
+                jobject value_sampledPositionInsideOptional;
+                jobject value_sampledPositionInsideOptional_updatedAt;
+                std::string value_sampledPositionInsideOptional_updatedAtClassName     = "java/lang/Long";
+                std::string value_sampledPositionInsideOptional_updatedAtCtorSignature = "(J)V";
+                jlong jnivalue_sampledPositionInsideOptional_updatedAt =
+                    static_cast<jlong>(cppValue.sampledPosition.Value().updatedAt);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    value_sampledPositionInsideOptional_updatedAtClassName.c_str(),
+                    value_sampledPositionInsideOptional_updatedAtCtorSignature.c_str(),
+                    jnivalue_sampledPositionInsideOptional_updatedAt, value_sampledPositionInsideOptional_updatedAt);
+                jobject value_sampledPositionInsideOptional_position;
+                if (cppValue.sampledPosition.Value().position.IsNull())
+                {
+                    value_sampledPositionInsideOptional_position = nullptr;
+                }
+                else
+                {
+                    std::string value_sampledPositionInsideOptional_positionClassName     = "java/lang/Long";
+                    std::string value_sampledPositionInsideOptional_positionCtorSignature = "(J)V";
+                    jlong jnivalue_sampledPositionInsideOptional_position =
+                        static_cast<jlong>(cppValue.sampledPosition.Value().position.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_sampledPositionInsideOptional_positionClassName.c_str(),
+                        value_sampledPositionInsideOptional_positionCtorSignature.c_str(),
+                        jnivalue_sampledPositionInsideOptional_position, value_sampledPositionInsideOptional_position);
+                }
+
+                jclass playbackPositionStructStructClass_1;
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                    env, "chip/devicecontroller/ChipStructs$MediaPlaybackClusterPlaybackPositionStruct",
+                    playbackPositionStructStructClass_1);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "Could not find class ChipStructs$MediaPlaybackClusterPlaybackPositionStruct");
+                    return nullptr;
+                }
+
+                jmethodID playbackPositionStructStructCtor_1;
+                err = chip::JniReferences::GetInstance().FindMethod(env, playbackPositionStructStructClass_1, "<init>",
+                                                                    "(Ljava/lang/Long;Ljava/lang/Long;)V",
+                                                                    &playbackPositionStructStructCtor_1);
+                if (err != CHIP_NO_ERROR || playbackPositionStructStructCtor_1 == nullptr)
+                {
+                    ChipLogError(Zcl, "Could not find ChipStructs$MediaPlaybackClusterPlaybackPositionStruct constructor");
+                    return nullptr;
+                }
+
+                value_sampledPositionInsideOptional =
+                    env->NewObject(playbackPositionStructStructClass_1, playbackPositionStructStructCtor_1,
+                                   value_sampledPositionInsideOptional_updatedAt, value_sampledPositionInsideOptional_position);
+                chip::JniReferences::GetInstance().CreateOptional(value_sampledPositionInsideOptional, value_sampledPosition);
+            }
 
             jobject value_playbackSpeed;
-            std::string value_playbackSpeedClassName     = "java/lang/Float";
-            std::string value_playbackSpeedCtorSignature = "(F)V";
-            jfloat jnivalue_playbackSpeed                = static_cast<jfloat>(cppValue.playbackSpeed);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jfloat>(value_playbackSpeedClassName.c_str(),
-                                                                         value_playbackSpeedCtorSignature.c_str(),
-                                                                         jnivalue_playbackSpeed, value_playbackSpeed);
+            if (!cppValue.playbackSpeed.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_playbackSpeed);
+            }
+            else
+            {
+                jobject value_playbackSpeedInsideOptional;
+                std::string value_playbackSpeedInsideOptionalClassName     = "java/lang/Float";
+                std::string value_playbackSpeedInsideOptionalCtorSignature = "(F)V";
+                jfloat jnivalue_playbackSpeedInsideOptional                = static_cast<jfloat>(cppValue.playbackSpeed.Value());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jfloat>(
+                    value_playbackSpeedInsideOptionalClassName.c_str(), value_playbackSpeedInsideOptionalCtorSignature.c_str(),
+                    jnivalue_playbackSpeedInsideOptional, value_playbackSpeedInsideOptional);
+                chip::JniReferences::GetInstance().CreateOptional(value_playbackSpeedInsideOptional, value_playbackSpeed);
+            }
 
             jobject value_seekRangeEnd;
-            std::string value_seekRangeEndClassName     = "java/lang/Long";
-            std::string value_seekRangeEndCtorSignature = "(J)V";
-            jlong jnivalue_seekRangeEnd                 = static_cast<jlong>(cppValue.seekRangeEnd);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_seekRangeEndClassName.c_str(),
-                                                                        value_seekRangeEndCtorSignature.c_str(),
-                                                                        jnivalue_seekRangeEnd, value_seekRangeEnd);
+            if (!cppValue.seekRangeEnd.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_seekRangeEnd);
+            }
+            else
+            {
+                jobject value_seekRangeEndInsideOptional;
+                std::string value_seekRangeEndInsideOptionalClassName     = "java/lang/Long";
+                std::string value_seekRangeEndInsideOptionalCtorSignature = "(J)V";
+                jlong jnivalue_seekRangeEndInsideOptional                 = static_cast<jlong>(cppValue.seekRangeEnd.Value());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    value_seekRangeEndInsideOptionalClassName.c_str(), value_seekRangeEndInsideOptionalCtorSignature.c_str(),
+                    jnivalue_seekRangeEndInsideOptional, value_seekRangeEndInsideOptional);
+                chip::JniReferences::GetInstance().CreateOptional(value_seekRangeEndInsideOptional, value_seekRangeEnd);
+            }
 
             jobject value_seekRangeStart;
-            std::string value_seekRangeStartClassName     = "java/lang/Long";
-            std::string value_seekRangeStartCtorSignature = "(J)V";
-            jlong jnivalue_seekRangeStart                 = static_cast<jlong>(cppValue.seekRangeStart);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_seekRangeStartClassName.c_str(),
-                                                                        value_seekRangeStartCtorSignature.c_str(),
-                                                                        jnivalue_seekRangeStart, value_seekRangeStart);
+            if (!cppValue.seekRangeStart.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_seekRangeStart);
+            }
+            else
+            {
+                jobject value_seekRangeStartInsideOptional;
+                std::string value_seekRangeStartInsideOptionalClassName     = "java/lang/Long";
+                std::string value_seekRangeStartInsideOptionalCtorSignature = "(J)V";
+                jlong jnivalue_seekRangeStartInsideOptional                 = static_cast<jlong>(cppValue.seekRangeStart.Value());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    value_seekRangeStartInsideOptionalClassName.c_str(), value_seekRangeStartInsideOptionalCtorSignature.c_str(),
+                    jnivalue_seekRangeStartInsideOptional, value_seekRangeStartInsideOptional);
+                chip::JniReferences::GetInstance().CreateOptional(value_seekRangeStartInsideOptional, value_seekRangeStart);
+            }
 
             jobject value_data;
             if (!cppValue.data.HasValue())
@@ -7624,12 +7714,23 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jobject value_audioAdvanceUnmuted;
-            std::string value_audioAdvanceUnmutedClassName     = "java/lang/Boolean";
-            std::string value_audioAdvanceUnmutedCtorSignature = "(Z)V";
-            jboolean jnivalue_audioAdvanceUnmuted              = static_cast<jboolean>(cppValue.audioAdvanceUnmuted);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(value_audioAdvanceUnmutedClassName.c_str(),
-                                                                           value_audioAdvanceUnmutedCtorSignature.c_str(),
-                                                                           jnivalue_audioAdvanceUnmuted, value_audioAdvanceUnmuted);
+            if (!cppValue.audioAdvanceUnmuted.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_audioAdvanceUnmuted);
+            }
+            else
+            {
+                jobject value_audioAdvanceUnmutedInsideOptional;
+                std::string value_audioAdvanceUnmutedInsideOptionalClassName     = "java/lang/Boolean";
+                std::string value_audioAdvanceUnmutedInsideOptionalCtorSignature = "(Z)V";
+                jboolean jnivalue_audioAdvanceUnmutedInsideOptional = static_cast<jboolean>(cppValue.audioAdvanceUnmuted.Value());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
+                    value_audioAdvanceUnmutedInsideOptionalClassName.c_str(),
+                    value_audioAdvanceUnmutedInsideOptionalCtorSignature.c_str(), jnivalue_audioAdvanceUnmutedInsideOptional,
+                    value_audioAdvanceUnmutedInsideOptional);
+                chip::JniReferences::GetInstance().CreateOptional(value_audioAdvanceUnmutedInsideOptional,
+                                                                  value_audioAdvanceUnmuted);
+            }
 
             jclass stateChangedStructClass;
             err = chip::JniReferences::GetInstance().GetLocalClassRef(
@@ -7643,9 +7744,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             jmethodID stateChangedStructCtor;
             err = chip::JniReferences::GetInstance().FindMethod(
                 env, stateChangedStructClass, "<init>",
-                "(Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;Lchip/devicecontroller/"
-                "ChipStructs$MediaPlaybackClusterPlaybackPositionStruct;Ljava/lang/Float;Ljava/lang/Long;Ljava/lang/Long;Ljava/"
-                "util/Optional;Ljava/lang/Boolean;)V",
+                "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/"
+                "Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V",
                 &stateChangedStructCtor);
             if (err != CHIP_NO_ERROR || stateChangedStructCtor == nullptr)
             {
@@ -7763,6 +7863,14 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 chip::JniReferences::GetInstance().CreateOptional(value_nodeInsideOptional, value_node);
             }
 
+            jobject value_fabricIndex;
+            std::string value_fabricIndexClassName     = "java/lang/Integer";
+            std::string value_fabricIndexCtorSignature = "(I)V";
+            jint jnivalue_fabricIndex                  = static_cast<jint>(cppValue.fabricIndex);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(value_fabricIndexClassName.c_str(),
+                                                                       value_fabricIndexCtorSignature.c_str(), jnivalue_fabricIndex,
+                                                                       value_fabricIndex);
+
             jclass loggedOutStructClass;
             err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$AccountLoginClusterLoggedOutEvent", loggedOutStructClass);
@@ -7773,15 +7881,15 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jmethodID loggedOutStructCtor;
-            err = chip::JniReferences::GetInstance().FindMethod(env, loggedOutStructClass, "<init>", "(Ljava/util/Optional;)V",
-                                                                &loggedOutStructCtor);
+            err = chip::JniReferences::GetInstance().FindMethod(env, loggedOutStructClass, "<init>",
+                                                                "(Ljava/util/Optional;Ljava/lang/Integer;)V", &loggedOutStructCtor);
             if (err != CHIP_NO_ERROR || loggedOutStructCtor == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipEventStructs$AccountLoginClusterLoggedOutEvent constructor");
                 return nullptr;
             }
 
-            jobject value = env->NewObject(loggedOutStructClass, loggedOutStructCtor, value_node);
+            jobject value = env->NewObject(loggedOutStructClass, loggedOutStructCtor, value_node, value_fabricIndex);
 
             return value;
         }
@@ -7823,6 +7931,37 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jobject value = env->NewObject(remainingScreenTimeExpiredStructClass, remainingScreenTimeExpiredStructCtor);
+
+            return value;
+        }
+        case Events::EnteringBlockContentTimeWindow::Id: {
+            Events::EnteringBlockContentTimeWindow::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jclass enteringBlockContentTimeWindowStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$ContentControlClusterEnteringBlockContentTimeWindowEvent",
+                enteringBlockContentTimeWindowStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$ContentControlClusterEnteringBlockContentTimeWindowEvent");
+                return nullptr;
+            }
+
+            jmethodID enteringBlockContentTimeWindowStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, enteringBlockContentTimeWindowStructClass, "<init>", "()V",
+                                                                &enteringBlockContentTimeWindowStructCtor);
+            if (err != CHIP_NO_ERROR || enteringBlockContentTimeWindowStructCtor == nullptr)
+            {
+                ChipLogError(
+                    Zcl, "Could not find ChipEventStructs$ContentControlClusterEnteringBlockContentTimeWindowEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(enteringBlockContentTimeWindowStructClass, enteringBlockContentTimeWindowStructCtor);
 
             return value;
         }

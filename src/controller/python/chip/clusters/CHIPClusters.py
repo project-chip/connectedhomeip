@@ -12180,6 +12180,7 @@ class ChipClusters:
                     "contentURL": "str",
                     "displayString": "str",
                     "brandingInformation": "BrandingInformationStruct",
+                    "playbackPreferences": "PlaybackPreferencesStruct",
                 },
             },
         },
@@ -12613,6 +12614,48 @@ class ChipClusters:
                     "rating": "str",
                 },
             },
+            0x0000000B: {
+                "commandId": 0x0000000B,
+                "commandName": "AddBlockChannels",
+                "args": {
+                    "channels": "BlockChannelStruct",
+                },
+            },
+            0x0000000C: {
+                "commandId": 0x0000000C,
+                "commandName": "RemoveBlockChannels",
+                "args": {
+                    "channelIndexes": "int",
+                },
+            },
+            0x0000000D: {
+                "commandId": 0x0000000D,
+                "commandName": "AddBlockApplications",
+                "args": {
+                    "applications": "AppInfoStruct",
+                },
+            },
+            0x0000000E: {
+                "commandId": 0x0000000E,
+                "commandName": "RemoveBlockApplications",
+                "args": {
+                    "applications": "AppInfoStruct",
+                },
+            },
+            0x0000000F: {
+                "commandId": 0x0000000F,
+                "commandName": "SetBlockContentTimeWindow",
+                "args": {
+                    "timeWindow": "TimeWindowStruct",
+                },
+            },
+            0x00000010: {
+                "commandId": 0x00000010,
+                "commandName": "RemoveBlockContentTimeWindow",
+                "args": {
+                    "timeWindowIndexes": "int",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -12661,6 +12704,24 @@ class ChipClusters:
                 "attributeName": "BlockUnrated",
                 "attributeId": 0x00000007,
                 "type": "bool",
+                "reportable": True,
+            },
+            0x00000008: {
+                "attributeName": "BlockChannelList",
+                "attributeId": 0x00000008,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000009: {
+                "attributeName": "BlockApplicationList",
+                "attributeId": 0x00000009,
+                "type": "",
+                "reportable": True,
+            },
+            0x0000000A: {
+                "attributeName": "BlockContentTimeWindow",
+                "attributeId": 0x0000000A,
+                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {

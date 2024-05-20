@@ -648,6 +648,10 @@ namespace RemainingScreenTimeExpired {
 static constexpr EventId Id = 0x00000000;
 } // namespace RemainingScreenTimeExpired
 
+namespace EnteringBlockContentTimeWindow {
+static constexpr EventId Id = 0x00000001;
+} // namespace EnteringBlockContentTimeWindow
+
 } // namespace Events
 } // namespace ContentControl
 

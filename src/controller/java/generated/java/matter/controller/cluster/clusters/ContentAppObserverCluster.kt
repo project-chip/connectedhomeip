@@ -86,8 +86,8 @@ class ContentAppObserverCluster(
   }
 
   suspend fun contentAppMessage(
-    data: String?,
-    encodingHint: String,
+    data: String,
+    encodingHint: String?,
     timedInvokeTimeout: Duration? = null
   ): ContentAppMessageResponse {
     val commandId: UInt = 0u
@@ -96,10 +96,10 @@ class ContentAppObserverCluster(
     tlvWriter.startStructure(AnonymousTag)
 
     val TAG_DATA_REQ: Int = 0
-    data?.let { tlvWriter.put(ContextSpecificTag(TAG_DATA_REQ), data) }
+    tlvWriter.put(ContextSpecificTag(TAG_DATA_REQ), data)
 
     val TAG_ENCODING_HINT_REQ: Int = 1
-    tlvWriter.put(ContextSpecificTag(TAG_ENCODING_HINT_REQ), encodingHint)
+    encodingHint?.let { tlvWriter.put(ContextSpecificTag(TAG_ENCODING_HINT_REQ), encodingHint) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =

@@ -1466,7 +1466,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _trackID = @"";
 
-        _audioOutputIndex = @(0);
+        _audioOutputIndex = nil;
     }
     return self;
 }
@@ -1495,7 +1495,15 @@ NS_ASSUME_NONNULL_BEGIN
         cppStruct.trackID = AsCharSpan(self.trackID);
     }
     {
-        cppStruct.audioOutputIndex = self.audioOutputIndex.unsignedCharValue;
+        if (self.audioOutputIndex != nil) {
+            auto & definedValue_0 = cppStruct.audioOutputIndex.Emplace();
+            if (self.audioOutputIndex == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                nonNullValue_1 = self.audioOutputIndex.unsignedCharValue;
+            }
+        }
     }
 
     return std::any(cppStruct);
@@ -1781,82 +1789,129 @@ NS_ASSUME_NONNULL_BEGIN
     {
         if (self.playbackPreferences != nil) {
             auto & definedValue_0 = cppStruct.playbackPreferences.Emplace();
-            definedValue_0.playbackPosition = self.playbackPreferences.playbackPosition.unsignedLongLongValue;
-            definedValue_0.textTrack.languageCode = AsCharSpan(self.playbackPreferences.textTrack.languageCode);
-            if (self.playbackPreferences.textTrack.characteristics != nil) {
-                auto & definedValue_3 = definedValue_0.textTrack.characteristics.Emplace();
-                {
-                    using ListType_4 = std::remove_reference_t<decltype(definedValue_3)>;
-                    using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
-                    if (self.playbackPreferences.textTrack.characteristics.count != 0) {
-                        auto * listHolder_4 = new ListHolder<ListMemberType_4>(self.playbackPreferences.textTrack.characteristics.count);
-                        if (listHolder_4 == nullptr || listHolder_4->mList == nullptr) {
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        listFreer.add(listHolder_4);
-                        for (size_t i_4 = 0; i_4 < self.playbackPreferences.textTrack.characteristics.count; ++i_4) {
-                            if (![self.playbackPreferences.textTrack.characteristics[i_4] isKindOfClass:[NSNumber class]]) {
-                                // Wrong kind of value.
-                                return CHIP_ERROR_INVALID_ARGUMENT;
+            if (self.playbackPreferences.playbackPosition != nil) {
+                auto & definedValue_2 = definedValue_0.playbackPosition.Emplace();
+                if (self.playbackPreferences.playbackPosition == nil) {
+                    definedValue_2.SetNull();
+                } else {
+                    auto & nonNullValue_3 = definedValue_2.SetNonNull();
+                    nonNullValue_3 = self.playbackPreferences.playbackPosition.unsignedLongLongValue;
+                }
+            }
+            if (self.playbackPreferences.textTrack != nil) {
+                auto & definedValue_2 = definedValue_0.textTrack.Emplace();
+                if (self.playbackPreferences.textTrack == nil) {
+                    definedValue_2.SetNull();
+                } else {
+                    auto & nonNullValue_3 = definedValue_2.SetNonNull();
+                    nonNullValue_3.languageCode = AsCharSpan(self.playbackPreferences.textTrack.languageCode);
+                    if (self.playbackPreferences.textTrack.characteristics != nil) {
+                        auto & definedValue_5 = nonNullValue_3.characteristics.Emplace();
+                        if (self.playbackPreferences.textTrack.characteristics == nil) {
+                            definedValue_5.SetNull();
+                        } else {
+                            auto & nonNullValue_6 = definedValue_5.SetNonNull();
+                            {
+                                using ListType_7 = std::remove_reference_t<decltype(nonNullValue_6)>;
+                                using ListMemberType_7 = ListMemberTypeGetter<ListType_7>::Type;
+                                if (self.playbackPreferences.textTrack.characteristics.count != 0) {
+                                    auto * listHolder_7 = new ListHolder<ListMemberType_7>(self.playbackPreferences.textTrack.characteristics.count);
+                                    if (listHolder_7 == nullptr || listHolder_7->mList == nullptr) {
+                                        return CHIP_ERROR_INVALID_ARGUMENT;
+                                    }
+                                    listFreer.add(listHolder_7);
+                                    for (size_t i_7 = 0; i_7 < self.playbackPreferences.textTrack.characteristics.count; ++i_7) {
+                                        if (![self.playbackPreferences.textTrack.characteristics[i_7] isKindOfClass:[NSNumber class]]) {
+                                            // Wrong kind of value.
+                                            return CHIP_ERROR_INVALID_ARGUMENT;
+                                        }
+                                        auto element_7 = (NSNumber *) self.playbackPreferences.textTrack.characteristics[i_7];
+                                        listHolder_7->mList[i_7] = static_cast<std::remove_reference_t<decltype(listHolder_7->mList[i_7])>>(element_7.unsignedCharValue);
+                                    }
+                                    nonNullValue_6 = ListType_7(listHolder_7->mList, self.playbackPreferences.textTrack.characteristics.count);
+                                } else {
+                                    nonNullValue_6 = ListType_7();
+                                }
                             }
-                            auto element_4 = (NSNumber *) self.playbackPreferences.textTrack.characteristics[i_4];
-                            listHolder_4->mList[i_4] = static_cast<std::remove_reference_t<decltype(listHolder_4->mList[i_4])>>(element_4.unsignedCharValue);
                         }
-                        definedValue_3 = ListType_4(listHolder_4->mList, self.playbackPreferences.textTrack.characteristics.count);
-                    } else {
-                        definedValue_3 = ListType_4();
+                    }
+                    if (self.playbackPreferences.textTrack.audioOutputIndex != nil) {
+                        auto & definedValue_5 = nonNullValue_3.audioOutputIndex.Emplace();
+                        if (self.playbackPreferences.textTrack.audioOutputIndex == nil) {
+                            definedValue_5.SetNull();
+                        } else {
+                            auto & nonNullValue_6 = definedValue_5.SetNonNull();
+                            nonNullValue_6 = self.playbackPreferences.textTrack.audioOutputIndex.unsignedCharValue;
+                        }
                     }
                 }
             }
-            definedValue_0.textTrack.audioOutputIndex = self.playbackPreferences.textTrack.audioOutputIndex.unsignedCharValue;
             if (self.playbackPreferences.audioTracks != nil) {
                 auto & definedValue_2 = definedValue_0.audioTracks.Emplace();
-                {
-                    using ListType_3 = std::remove_reference_t<decltype(definedValue_2)>;
-                    using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
-                    if (self.playbackPreferences.audioTracks.count != 0) {
-                        auto * listHolder_3 = new ListHolder<ListMemberType_3>(self.playbackPreferences.audioTracks.count);
-                        if (listHolder_3 == nullptr || listHolder_3->mList == nullptr) {
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        listFreer.add(listHolder_3);
-                        for (size_t i_3 = 0; i_3 < self.playbackPreferences.audioTracks.count; ++i_3) {
-                            if (![self.playbackPreferences.audioTracks[i_3] isKindOfClass:[MCContentLauncherClusterTrackPreferenceStruct class]]) {
-                                // Wrong kind of value.
+                if (self.playbackPreferences.audioTracks == nil) {
+                    definedValue_2.SetNull();
+                } else {
+                    auto & nonNullValue_3 = definedValue_2.SetNonNull();
+                    {
+                        using ListType_4 = std::remove_reference_t<decltype(nonNullValue_3)>;
+                        using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
+                        if (self.playbackPreferences.audioTracks.count != 0) {
+                            auto * listHolder_4 = new ListHolder<ListMemberType_4>(self.playbackPreferences.audioTracks.count);
+                            if (listHolder_4 == nullptr || listHolder_4->mList == nullptr) {
                                 return CHIP_ERROR_INVALID_ARGUMENT;
                             }
-                            auto element_3 = (MCContentLauncherClusterTrackPreferenceStruct *) self.playbackPreferences.audioTracks[i_3];
-                            listHolder_3->mList[i_3].languageCode = AsCharSpan(element_3.languageCode);
-                            if (element_3.characteristics != nil) {
-                                auto & definedValue_5 = listHolder_3->mList[i_3].characteristics.Emplace();
-                                {
-                                    using ListType_6 = std::remove_reference_t<decltype(definedValue_5)>;
-                                    using ListMemberType_6 = ListMemberTypeGetter<ListType_6>::Type;
-                                    if (element_3.characteristics.count != 0) {
-                                        auto * listHolder_6 = new ListHolder<ListMemberType_6>(element_3.characteristics.count);
-                                        if (listHolder_6 == nullptr || listHolder_6->mList == nullptr) {
-                                            return CHIP_ERROR_INVALID_ARGUMENT;
-                                        }
-                                        listFreer.add(listHolder_6);
-                                        for (size_t i_6 = 0; i_6 < element_3.characteristics.count; ++i_6) {
-                                            if (![element_3.characteristics[i_6] isKindOfClass:[NSNumber class]]) {
-                                                // Wrong kind of value.
-                                                return CHIP_ERROR_INVALID_ARGUMENT;
-                                            }
-                                            auto element_6 = (NSNumber *) element_3.characteristics[i_6];
-                                            listHolder_6->mList[i_6] = static_cast<std::remove_reference_t<decltype(listHolder_6->mList[i_6])>>(element_6.unsignedCharValue);
-                                        }
-                                        definedValue_5 = ListType_6(listHolder_6->mList, element_3.characteristics.count);
+                            listFreer.add(listHolder_4);
+                            for (size_t i_4 = 0; i_4 < self.playbackPreferences.audioTracks.count; ++i_4) {
+                                if (![self.playbackPreferences.audioTracks[i_4] isKindOfClass:[MCContentLauncherClusterTrackPreferenceStruct class]]) {
+                                    // Wrong kind of value.
+                                    return CHIP_ERROR_INVALID_ARGUMENT;
+                                }
+                                auto element_4 = (MCContentLauncherClusterTrackPreferenceStruct *) self.playbackPreferences.audioTracks[i_4];
+                                listHolder_4->mList[i_4].languageCode = AsCharSpan(element_4.languageCode);
+                                if (element_4.characteristics != nil) {
+                                    auto & definedValue_6 = listHolder_4->mList[i_4].characteristics.Emplace();
+                                    if (element_4.characteristics == nil) {
+                                        definedValue_6.SetNull();
                                     } else {
-                                        definedValue_5 = ListType_6();
+                                        auto & nonNullValue_7 = definedValue_6.SetNonNull();
+                                        {
+                                            using ListType_8 = std::remove_reference_t<decltype(nonNullValue_7)>;
+                                            using ListMemberType_8 = ListMemberTypeGetter<ListType_8>::Type;
+                                            if (element_4.characteristics.count != 0) {
+                                                auto * listHolder_8 = new ListHolder<ListMemberType_8>(element_4.characteristics.count);
+                                                if (listHolder_8 == nullptr || listHolder_8->mList == nullptr) {
+                                                    return CHIP_ERROR_INVALID_ARGUMENT;
+                                                }
+                                                listFreer.add(listHolder_8);
+                                                for (size_t i_8 = 0; i_8 < element_4.characteristics.count; ++i_8) {
+                                                    if (![element_4.characteristics[i_8] isKindOfClass:[NSNumber class]]) {
+                                                        // Wrong kind of value.
+                                                        return CHIP_ERROR_INVALID_ARGUMENT;
+                                                    }
+                                                    auto element_8 = (NSNumber *) element_4.characteristics[i_8];
+                                                    listHolder_8->mList[i_8] = static_cast<std::remove_reference_t<decltype(listHolder_8->mList[i_8])>>(element_8.unsignedCharValue);
+                                                }
+                                                nonNullValue_7 = ListType_8(listHolder_8->mList, element_4.characteristics.count);
+                                            } else {
+                                                nonNullValue_7 = ListType_8();
+                                            }
+                                        }
+                                    }
+                                }
+                                if (element_4.audioOutputIndex != nil) {
+                                    auto & definedValue_6 = listHolder_4->mList[i_4].audioOutputIndex.Emplace();
+                                    if (element_4.audioOutputIndex == nil) {
+                                        definedValue_6.SetNull();
+                                    } else {
+                                        auto & nonNullValue_7 = definedValue_6.SetNonNull();
+                                        nonNullValue_7 = element_4.audioOutputIndex.unsignedCharValue;
                                     }
                                 }
                             }
-                            listHolder_3->mList[i_3].audioOutputIndex = element_3.audioOutputIndex.unsignedCharValue;
+                            nonNullValue_3 = ListType_4(listHolder_4->mList, self.playbackPreferences.audioTracks.count);
+                        } else {
+                            nonNullValue_3 = ListType_4();
                         }
-                        definedValue_2 = ListType_3(listHolder_3->mList, self.playbackPreferences.audioTracks.count);
-                    } else {
-                        definedValue_2 = ListType_3();
                     }
                 }
             }
@@ -1889,6 +1944,8 @@ NS_ASSUME_NONNULL_BEGIN
         _displayString = nil;
 
         _brandingInformation = nil;
+
+        _playbackPreferences = nil;
     }
     return self;
 }
@@ -1900,13 +1957,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.contentURL = self.contentURL;
     other.displayString = self.displayString;
     other.brandingInformation = self.brandingInformation;
+    other.playbackPreferences = self.playbackPreferences;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contentURL:%@; displayString:%@; brandingInformation:%@; >", NSStringFromClass([self class]), _contentURL, _displayString, _brandingInformation];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contentURL:%@; displayString:%@; brandingInformation:%@; playbackPreferences:%@; >", NSStringFromClass([self class]), _contentURL, _displayString, _brandingInformation, _playbackPreferences];
     return descriptionString;
 }
 
@@ -2010,6 +2068,137 @@ NS_ASSUME_NONNULL_BEGIN
                     definedValue_4.width = self.brandingInformation.waterMark.size.width.doubleValue;
                     definedValue_4.height = self.brandingInformation.waterMark.size.height.doubleValue;
                     definedValue_4.metric = static_cast<std::remove_reference_t<decltype(definedValue_4.metric)>>(self.brandingInformation.waterMark.size.metric.unsignedCharValue);
+                }
+            }
+        }
+    }
+    {
+        if (self.playbackPreferences != nil) {
+            auto & definedValue_0 = cppStruct.playbackPreferences.Emplace();
+            if (self.playbackPreferences.playbackPosition != nil) {
+                auto & definedValue_2 = definedValue_0.playbackPosition.Emplace();
+                if (self.playbackPreferences.playbackPosition == nil) {
+                    definedValue_2.SetNull();
+                } else {
+                    auto & nonNullValue_3 = definedValue_2.SetNonNull();
+                    nonNullValue_3 = self.playbackPreferences.playbackPosition.unsignedLongLongValue;
+                }
+            }
+            if (self.playbackPreferences.textTrack != nil) {
+                auto & definedValue_2 = definedValue_0.textTrack.Emplace();
+                if (self.playbackPreferences.textTrack == nil) {
+                    definedValue_2.SetNull();
+                } else {
+                    auto & nonNullValue_3 = definedValue_2.SetNonNull();
+                    nonNullValue_3.languageCode = AsCharSpan(self.playbackPreferences.textTrack.languageCode);
+                    if (self.playbackPreferences.textTrack.characteristics != nil) {
+                        auto & definedValue_5 = nonNullValue_3.characteristics.Emplace();
+                        if (self.playbackPreferences.textTrack.characteristics == nil) {
+                            definedValue_5.SetNull();
+                        } else {
+                            auto & nonNullValue_6 = definedValue_5.SetNonNull();
+                            {
+                                using ListType_7 = std::remove_reference_t<decltype(nonNullValue_6)>;
+                                using ListMemberType_7 = ListMemberTypeGetter<ListType_7>::Type;
+                                if (self.playbackPreferences.textTrack.characteristics.count != 0) {
+                                    auto * listHolder_7 = new ListHolder<ListMemberType_7>(self.playbackPreferences.textTrack.characteristics.count);
+                                    if (listHolder_7 == nullptr || listHolder_7->mList == nullptr) {
+                                        return CHIP_ERROR_INVALID_ARGUMENT;
+                                    }
+                                    listFreer.add(listHolder_7);
+                                    for (size_t i_7 = 0; i_7 < self.playbackPreferences.textTrack.characteristics.count; ++i_7) {
+                                        if (![self.playbackPreferences.textTrack.characteristics[i_7] isKindOfClass:[NSNumber class]]) {
+                                            // Wrong kind of value.
+                                            return CHIP_ERROR_INVALID_ARGUMENT;
+                                        }
+                                        auto element_7 = (NSNumber *) self.playbackPreferences.textTrack.characteristics[i_7];
+                                        listHolder_7->mList[i_7] = static_cast<std::remove_reference_t<decltype(listHolder_7->mList[i_7])>>(element_7.unsignedCharValue);
+                                    }
+                                    nonNullValue_6 = ListType_7(listHolder_7->mList, self.playbackPreferences.textTrack.characteristics.count);
+                                } else {
+                                    nonNullValue_6 = ListType_7();
+                                }
+                            }
+                        }
+                    }
+                    if (self.playbackPreferences.textTrack.audioOutputIndex != nil) {
+                        auto & definedValue_5 = nonNullValue_3.audioOutputIndex.Emplace();
+                        if (self.playbackPreferences.textTrack.audioOutputIndex == nil) {
+                            definedValue_5.SetNull();
+                        } else {
+                            auto & nonNullValue_6 = definedValue_5.SetNonNull();
+                            nonNullValue_6 = self.playbackPreferences.textTrack.audioOutputIndex.unsignedCharValue;
+                        }
+                    }
+                }
+            }
+            if (self.playbackPreferences.audioTracks != nil) {
+                auto & definedValue_2 = definedValue_0.audioTracks.Emplace();
+                if (self.playbackPreferences.audioTracks == nil) {
+                    definedValue_2.SetNull();
+                } else {
+                    auto & nonNullValue_3 = definedValue_2.SetNonNull();
+                    {
+                        using ListType_4 = std::remove_reference_t<decltype(nonNullValue_3)>;
+                        using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
+                        if (self.playbackPreferences.audioTracks.count != 0) {
+                            auto * listHolder_4 = new ListHolder<ListMemberType_4>(self.playbackPreferences.audioTracks.count);
+                            if (listHolder_4 == nullptr || listHolder_4->mList == nullptr) {
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            listFreer.add(listHolder_4);
+                            for (size_t i_4 = 0; i_4 < self.playbackPreferences.audioTracks.count; ++i_4) {
+                                if (![self.playbackPreferences.audioTracks[i_4] isKindOfClass:[MCContentLauncherClusterTrackPreferenceStruct class]]) {
+                                    // Wrong kind of value.
+                                    return CHIP_ERROR_INVALID_ARGUMENT;
+                                }
+                                auto element_4 = (MCContentLauncherClusterTrackPreferenceStruct *) self.playbackPreferences.audioTracks[i_4];
+                                listHolder_4->mList[i_4].languageCode = AsCharSpan(element_4.languageCode);
+                                if (element_4.characteristics != nil) {
+                                    auto & definedValue_6 = listHolder_4->mList[i_4].characteristics.Emplace();
+                                    if (element_4.characteristics == nil) {
+                                        definedValue_6.SetNull();
+                                    } else {
+                                        auto & nonNullValue_7 = definedValue_6.SetNonNull();
+                                        {
+                                            using ListType_8 = std::remove_reference_t<decltype(nonNullValue_7)>;
+                                            using ListMemberType_8 = ListMemberTypeGetter<ListType_8>::Type;
+                                            if (element_4.characteristics.count != 0) {
+                                                auto * listHolder_8 = new ListHolder<ListMemberType_8>(element_4.characteristics.count);
+                                                if (listHolder_8 == nullptr || listHolder_8->mList == nullptr) {
+                                                    return CHIP_ERROR_INVALID_ARGUMENT;
+                                                }
+                                                listFreer.add(listHolder_8);
+                                                for (size_t i_8 = 0; i_8 < element_4.characteristics.count; ++i_8) {
+                                                    if (![element_4.characteristics[i_8] isKindOfClass:[NSNumber class]]) {
+                                                        // Wrong kind of value.
+                                                        return CHIP_ERROR_INVALID_ARGUMENT;
+                                                    }
+                                                    auto element_8 = (NSNumber *) element_4.characteristics[i_8];
+                                                    listHolder_8->mList[i_8] = static_cast<std::remove_reference_t<decltype(listHolder_8->mList[i_8])>>(element_8.unsignedCharValue);
+                                                }
+                                                nonNullValue_7 = ListType_8(listHolder_8->mList, element_4.characteristics.count);
+                                            } else {
+                                                nonNullValue_7 = ListType_8();
+                                            }
+                                        }
+                                    }
+                                }
+                                if (element_4.audioOutputIndex != nil) {
+                                    auto & definedValue_6 = listHolder_4->mList[i_4].audioOutputIndex.Emplace();
+                                    if (element_4.audioOutputIndex == nil) {
+                                        definedValue_6.SetNull();
+                                    } else {
+                                        auto & nonNullValue_7 = definedValue_6.SetNonNull();
+                                        nonNullValue_7 = element_4.audioOutputIndex.unsignedCharValue;
+                                    }
+                                }
+                            }
+                            nonNullValue_3 = ListType_4(listHolder_4->mList, self.playbackPreferences.audioTracks.count);
+                        } else {
+                            nonNullValue_3 = ListType_4();
+                        }
+                    }
                 }
             }
         }
