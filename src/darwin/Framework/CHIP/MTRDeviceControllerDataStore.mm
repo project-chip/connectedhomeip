@@ -454,13 +454,13 @@ static NSString * sAttributeCacheEndpointIndexKeyPrefix = @"attrCacheEndpointInd
         MTR_LOG_ERROR("%s: unexpected nil input", __func__);
         return NO;
     }
-    
+
     NSMutableArray * endpointIndex = [NSMutableArray arrayWithArray:[self _fetchEndpointIndexForNodeID:nodeID]];
     if (endpointIndex == nil)
     {
         return NO;
     }
-    
+
     [endpointIndex removeObject:endpointID];
     return [self _storeAttributeCacheValue:endpointIndex forKey:[self _endpointIndexKeyForNodeID:nodeID]];
 }
@@ -734,7 +734,7 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
     if (!success) {
         MTR_LOG_INFO("Delete failed for clusterIndex @ node 0x%016llX endpoint %u", nodeID.unsignedLongLongValue, endpointID.unsignedShortValue);
     }
-    
+
     success = [self _deleteEndpointIndex:endpointID forNodeID:(nodeID)];
     if (!success) {
         MTR_LOG_INFO("Delete failed for endpoint index %@ for @ node 0x%016llX", endpointID, nodeID.unsignedLongLongValue);
@@ -761,7 +761,7 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
             MTR_LOG_INFO("clearStoredClusterDataForNodeIDWithClusterID: _deleteClusterDataForNodeID failed for @ node 0x%016llX endpoint %u cluster 0x%08lX", nodeID.unsignedLongLongValue, endpointID.unsignedShortValue, clusterID.unsignedLongValue);
             return;
         }
-               
+
         NSArray<NSNumber *> * clusterIndex = [self _fetchClusterIndexForNodeID:nodeID endpointID:endpointID];
         NSMutableArray<NSNumber *> * clusterIndexCopy = [clusterIndex mutableCopy];
         [clusterIndexCopy removeObject:clusterID];
