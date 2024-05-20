@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2023 Project CHIP Authors
+# Copyright (c) 2021-2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -69,6 +69,13 @@ static_library("telink") {
     ]
   }
 
+  if (chip_enable_openthread || chip_enable_wifi) {
+    sources += [
+      "../Zephyr/InetUtils.cpp",
+      "../Zephyr/InetUtils.h",
+    ]
+  }
+
   if (chip_enable_openthread) {
     sources += [
       "../OpenThread/OpenThreadUtils.cpp",
@@ -84,6 +91,17 @@ static_library("telink") {
       ]
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
+  }
+
+  if (chip_enable_wifi) {
+    sources += [
+      "wifi/ConnectivityManagerImplWiFi.cpp",
+      "wifi/ConnectivityManagerImplWiFi.h",
+      "wifi/TelinkWiFiDriver.cpp",
+      "wifi/TelinkWiFiDriver.h",
+      "wifi/WiFiManager.cpp",
+      "wifi/WiFiManager.h",
+    ]
   }
 
   if (chip_enable_ota_requestor) {

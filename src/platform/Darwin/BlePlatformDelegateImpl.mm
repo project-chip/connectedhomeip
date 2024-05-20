@@ -29,7 +29,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/Darwin/BlePlatformDelegate.h>
 
-#import "UUIDHelper.h"
+#import "MTRUUIDHelper.h"
 
 using namespace ::chip;
 using namespace ::chip::Ble;
@@ -47,7 +47,7 @@ namespace DeviceLayer {
                 return found;
             }
 
-            CBUUID * serviceId = [UUIDHelper GetShortestServiceUUID:svcId];
+            CBUUID * serviceId = [MTRUUIDHelper GetShortestServiceUUID:svcId];
             CBUUID * characteristicId = [CBUUID UUIDWithData:[NSData dataWithBytes:charId->bytes length:sizeof(charId->bytes)]];
             CBPeripheral * peripheral = (__bridge CBPeripheral *) connObj;
 
@@ -74,7 +74,7 @@ namespace DeviceLayer {
                 return found;
             }
 
-            CBUUID * serviceId = [UUIDHelper GetShortestServiceUUID:svcId];
+            CBUUID * serviceId = [MTRUUIDHelper GetShortestServiceUUID:svcId];
             CBUUID * characteristicId = characteristicId = [CBUUID UUIDWithData:[NSData dataWithBytes:charId->bytes
                                                                                                length:sizeof(charId->bytes)]];
             CBPeripheral * peripheral = (__bridge CBPeripheral *) connObj;
@@ -131,7 +131,7 @@ namespace DeviceLayer {
                 return found;
             }
 
-            CBUUID * serviceId = [UUIDHelper GetShortestServiceUUID:svcId];
+            CBUUID * serviceId = [MTRUUIDHelper GetShortestServiceUUID:svcId];
             CBUUID * characteristicId = [CBUUID UUIDWithData:[NSData dataWithBytes:charId->bytes length:sizeof(charId->bytes)]];
             NSData * data = [NSData dataWithBytes:pBuf->Start() length:pBuf->DataLength()];
             CBPeripheral * peripheral = (__bridge CBPeripheral *) connObj;

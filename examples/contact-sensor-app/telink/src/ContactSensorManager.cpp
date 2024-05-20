@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -54,15 +54,15 @@ bool ContactSensorManager::IsContactClosed()
 void ContactSensorManager::InitiateAction(Action aAction)
 {
     AppEvent event;
-    event.Type                = AppEvent::kEventType_Contact;
-    event.ContactEvent.Action = static_cast<uint8_t>(aAction);
-    event.Handler             = HandleAction;
+    event.Type               = AppEvent::kEventType_DeviceAction;
+    event.DeviceEvent.Action = static_cast<uint8_t>(aAction);
+    event.Handler            = HandleAction;
     GetAppTask().PostEvent(&event);
 }
 
 void ContactSensorManager::HandleAction(AppEvent * aEvent)
 {
-    Action action = static_cast<Action>(aEvent->ContactEvent.Action);
+    Action action = static_cast<Action>(aEvent->DeviceEvent.Action);
     // Change current state based on action:
     // - if state is closed and action is signal lost, change state to opened
     // - if state is opened and action is signal detected, change state to closed

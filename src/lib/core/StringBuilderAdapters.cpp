@@ -1,6 +1,5 @@
 /*
- *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,13 +13,19 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <lib/core/StringBuilderAdapters.h>
 
-#pragma once
+namespace pw {
 
-#include <ble/Ble.h>
+template <>
+StatusWithSize ToString<CHIP_ERROR>(const CHIP_ERROR & err, pw::span<char> buffer)
+{
+    if (CHIP_ERROR::IsSuccess(err))
+    {
+        // source location probably does not matter
+        return pw::string::Format(buffer, "CHIP_NO_ERROR");
+    }
+    return pw::string::Format(buffer, "CHIP_ERROR:<%" CHIP_ERROR_FORMAT ">", err.Format());
+}
 
-#import <CoreBluetooth/CoreBluetooth.h>
-
-@interface UUIDHelper : NSObject
-+ (CBUUID *)GetShortestServiceUUID:(const chip::Ble::ChipBleUUID *)svcId;
-@end
+} // namespace pw

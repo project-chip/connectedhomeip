@@ -42,6 +42,7 @@
 #include "lib/core/CHIPError.h"
 #include "lib/core/DataModelTypes.h"
 #include <app/ConcreteAttributePath.h>
+#include <lib/support/FibonacciUtils.h>
 
 #include <app/AttributePathParams.h>
 #include <app/BufferedReadCallback.h>
@@ -122,10 +123,19 @@ public:
     {
     }
 
+    // Used to reset Resubscription backoff on events that indicate likely availability of device to come back online
+    void ResetResubscriptionBackoff() { mResubscriptionNumRetries = 0; }
+
 private:
     void OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) override;
 
     void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
+
+    CHIP_ERROR OnResubscriptionNeeded(chip::app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override;
+
+    // Copied from ReadClient and customized for MTRDevice resubscription time reset
+    uint32_t ComputeTimeTillNextSubscription();
+    uint32_t mResubscriptionNumRetries = 0;
 };
 
 } // anonymous namespace
@@ -140,7 +150,15 @@ typedef NS_ENUM(NSUInteger, MTRInternalDeviceState) {
     // InitialSubscriptionEstablished means we have at some point finished setting up a
     // subscription.  That subscription may have dropped since then, but if so it's the ReadClient's
     // responsibility to re-establish it.
-    MTRInternalDeviceStateInitalSubscriptionEstablished = 2,
+    MTRInternalDeviceStateInitialSubscriptionEstablished = 2,
+    // Resubscribing means we had established a subscription, but then
+    // detected a subscription drop due to not receiving a report on time. This
+    // covers all the actions that happen when re-subscribing (discovery, CASE,
+    // getting priming reports, etc).
+    MTRInternalDeviceStateResubscribing = 3,
+    // LaterSubscriptionEstablished meant that we had a subscription drop and
+    // then re-created a subscription.
+    MTRInternalDeviceStateLaterSubscriptionEstablished = 4,
 };
 
 // Utility methods for working with MTRInternalDeviceState, located near the
@@ -148,12 +166,17 @@ typedef NS_ENUM(NSUInteger, MTRInternalDeviceState) {
 namespace {
 bool HadSubscriptionEstablishedOnce(MTRInternalDeviceState state)
 {
-    return state >= MTRInternalDeviceStateInitalSubscriptionEstablished;
+    return state >= MTRInternalDeviceStateInitialSubscriptionEstablished;
 }
 
 bool NeedToStartSubscriptionSetup(MTRInternalDeviceState state)
 {
     return state <= MTRInternalDeviceStateUnsubscribed;
+}
+
+bool HaveSubscriptionEstablishedRightNow(MTRInternalDeviceState state)
+{
+    return state == MTRInternalDeviceStateInitialSubscriptionEstablished || state == MTRInternalDeviceStateLaterSubscriptionEstablished;
 }
 } // anonymous namespace
 
@@ -190,6 +213,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 static NSString * const sDataVersionKey = @"dataVersion";
 static NSString * const sAttributesKey = @"attributes";
+static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribeLatency";
 
 - (void)storeValue:(MTRDeviceDataValueDictionary _Nullable)value forAttribute:(NSNumber *)attribute
 {
@@ -352,6 +376,9 @@ static NSString * const sAttributesKey = @"attributes";
 - (BOOL)unitTestShouldSkipExpectedValuesForWrite:(MTRDevice *)device;
 - (NSNumber *)unitTestMaxIntervalOverrideForSubscription:(MTRDevice *)device;
 - (BOOL)unitTestForceAttributeReportsIfMatchingCache:(MTRDevice *)device;
+- (BOOL)unitTestPretendThreadEnabled:(MTRDevice *)device;
+- (void)unitTestSubscriptionPoolDequeue:(MTRDevice *)device;
+- (void)unitTestSubscriptionPoolWorkComplete:(MTRDevice *)device;
 @end
 #endif
 
@@ -382,6 +409,16 @@ static NSString * const sAttributesKey = @"attributes";
     // This boolean keeps track of any device configuration changes received in an attribute report.
     // If this is true when the report ends, we notify the delegate.
     BOOL _deviceConfigurationChanged;
+
+    // The completion block is set when the subscription / resubscription work is enqueued, and called / cleared when any of the following happen:
+    //   1. Subscription establishes
+    //   2. OnResubscriptionNeeded is called
+    //   3. Subscription reset (including when getSessionForNode fails)
+    MTRAsyncWorkCompletionBlock _subscriptionPoolWorkCompletionBlock;
+
+    // Tracking of initial subscribe latency.  When _initialSubscribeStart is
+    // nil, we are not tracking the latency.
+    NSDate * _Nullable _initialSubscribeStart;
 }
 
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
@@ -673,7 +710,15 @@ static NSString * const sAttributesKey = @"attributes";
     }
 
     if (setUpSubscription) {
-        [self _setupSubscription];
+        _initialSubscribeStart = [NSDate now];
+        if ([self _deviceUsesThread]) {
+            [self _scheduleSubscriptionPoolWork:^{
+                std::lock_guard lock(self->_lock);
+                [self _setupSubscription];
+            } inNanoseconds:0 description:@"MTRDevice setDelegate first subscription"];
+        } else {
+            [self _setupSubscription];
+        }
     }
 }
 
@@ -878,15 +923,32 @@ static NSString * const sAttributesKey = @"attributes";
     }
 }
 
+- (void)_changeInternalState:(MTRInternalDeviceState)state
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+    MTRInternalDeviceState lastState = _internalDeviceState;
+    _internalDeviceState = state;
+    if (lastState != state) {
+        MTR_LOG_DEFAULT("%@ internal state change %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
+    }
+}
+
 // First Time Sync happens 2 minutes after reachability (this can be changed in the future)
 #define MTR_DEVICE_TIME_UPDATE_INITIAL_WAIT_TIME_SEC (60 * 2)
 - (void)_handleSubscriptionEstablished
 {
     os_unfair_lock_lock(&self->_lock);
 
+    // We have completed the subscription work - remove from the subscription pool.
+    [self _clearSubscriptionPoolWork];
+
     // reset subscription attempt wait time when subscription succeeds
     _lastSubscriptionAttemptWait = 0;
-    _internalDeviceState = MTRInternalDeviceStateInitalSubscriptionEstablished;
+    if (HadSubscriptionEstablishedOnce(_internalDeviceState)) {
+        [self _changeInternalState:MTRInternalDeviceStateLaterSubscriptionEstablished];
+    } else {
+        [self _changeInternalState:MTRInternalDeviceStateInitialSubscriptionEstablished];
+    }
 
     // As subscription is established, check if the delegate needs to be informed
     if (!_delegateDeviceCachePrimedCalled) {
@@ -897,6 +959,18 @@ static NSString * const sAttributesKey = @"attributes";
 
     // No need to monitor connectivity after subscription establishment
     [self _stopConnectivityMonitoring];
+
+    auto initialSubscribeStart = _initialSubscribeStart;
+    // We no longer need to track subscribe latency for this device.
+    _initialSubscribeStart = nil;
+
+    if (initialSubscribeStart != nil) {
+        // We want time interval from initialSubscribeStart to now, not the other
+        // way around.
+        NSTimeInterval subscriptionLatency = -[initialSubscribeStart timeIntervalSinceNow];
+        _estimatedSubscriptionLatency = @(subscriptionLatency);
+        [self _storePersistedDeviceData];
+    }
 
     os_unfair_lock_unlock(&self->_lock);
 
@@ -913,17 +987,122 @@ static NSString * const sAttributesKey = @"attributes";
 {
     std::lock_guard lock(_lock);
 
-    _internalDeviceState = MTRInternalDeviceStateUnsubscribed;
+    [self _changeInternalState:MTRInternalDeviceStateUnsubscribed];
     _unreportedEvents = nil;
 
     [self _changeState:MTRDeviceStateUnreachable];
 }
 
-- (void)_handleResubscriptionNeeded
+// This method is used for signaling whether to use the subscription pool. This functions as
+// a heuristic for whether to throttle subscriptions to the device via a pool of subscriptions.
+// If products appear that have both Thread and Wifi enabled but are primarily on wifi, this
+// method will need to be updated to reflect that.
+- (BOOL)_deviceUsesThread
 {
-    std::lock_guard lock(_lock);
+    os_unfair_lock_assert_owner(&self->_lock);
+
+#ifdef DEBUG
+    id testDelegate = _weakDelegate.strongObject;
+    if (testDelegate) {
+        // Note: This is a hack to allow our unit tests to test the subscription pooling behavior we have implemented for thread, so we mock devices to be a thread device
+        if ([testDelegate respondsToSelector:@selector(unitTestPretendThreadEnabled:)]) {
+            if ([testDelegate unitTestPretendThreadEnabled:self]) {
+                return YES;
+            }
+        }
+    }
+#endif
+
+    MTRClusterPath * networkCommissioningClusterPath = [MTRClusterPath clusterPathWithEndpointID:@(kRootEndpointId) clusterID:@(MTRClusterIDTypeNetworkCommissioningID)];
+    MTRDeviceClusterData * networkCommissioningClusterData = [self _clusterDataForPath:networkCommissioningClusterPath];
+    NSNumber * networkCommissioningClusterFeatureMapValueNumber = networkCommissioningClusterData.attributes[@(MTRClusterGlobalAttributeFeatureMapID)][MTRValueKey];
+
+    if (networkCommissioningClusterFeatureMapValueNumber == nil)
+        return NO;
+    if (![networkCommissioningClusterFeatureMapValueNumber isKindOfClass:[NSNumber class]]) {
+        MTR_LOG_ERROR("%@ Unexpected NetworkCommissioning FeatureMap value %@", self, networkCommissioningClusterFeatureMapValueNumber);
+        return NO;
+    }
+
+    uint32_t networkCommissioningClusterFeatureMapValue = static_cast<uint32_t>(networkCommissioningClusterFeatureMapValueNumber.unsignedLongValue);
+
+    return (networkCommissioningClusterFeatureMapValue & MTRNetworkCommissioningFeatureThreadNetworkInterface) != 0 ? YES : NO;
+}
+
+- (void)_clearSubscriptionPoolWork
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+    MTRAsyncWorkCompletionBlock completion = self->_subscriptionPoolWorkCompletionBlock;
+    if (completion) {
+#ifdef DEBUG
+        id delegate = self->_weakDelegate.strongObject;
+        if (delegate) {
+            dispatch_async(self->_delegateQueue, ^{
+                if ([delegate respondsToSelector:@selector(unitTestSubscriptionPoolWorkComplete:)]) {
+                    [delegate unitTestSubscriptionPoolWorkComplete:self];
+                }
+            });
+        }
+#endif
+        self->_subscriptionPoolWorkCompletionBlock = nil;
+        completion(MTRAsyncWorkComplete);
+    }
+}
+
+- (void)_scheduleSubscriptionPoolWork:(dispatch_block_t)workBlock inNanoseconds:(int64_t)inNanoseconds description:(NSString *)description
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    // Sanity check we are not scheduling for this device multiple times in the pool
+    if (_subscriptionPoolWorkCompletionBlock) {
+        MTR_LOG_ERROR("%@ already scheduled in subscription pool for this device - ignoring: %@", self, description);
+        return;
+    }
+
+    // Wait the required amount of time, then put it in the subscription pool to wait additionally for a spot, if needed
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, inNanoseconds), dispatch_get_main_queue(), ^{
+        // In the case where a resubscription triggering event happened and already established, running the work block should result in a no-op
+        MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
+        [workItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull completion) {
+            os_unfair_lock_lock(&self->_lock);
+#ifdef DEBUG
+            id delegate = self->_weakDelegate.strongObject;
+            if (delegate) {
+                dispatch_async(self->_delegateQueue, ^{
+                    if ([delegate respondsToSelector:@selector(unitTestSubscriptionPoolDequeue:)]) {
+                        [delegate unitTestSubscriptionPoolDequeue:self];
+                    }
+                });
+            }
+#endif
+            if (self->_subscriptionPoolWorkCompletionBlock) {
+                // This means a resubscription triggering event happened and is now in-progress
+                MTR_LOG_DEFAULT("%@ timer fired but already running in subscription pool - ignoring: %@", self, description);
+                os_unfair_lock_unlock(&self->_lock);
+
+                // call completion as complete to remove from queue
+                completion(MTRAsyncWorkComplete);
+                return;
+            }
+
+            // Otherwise, save the completion block
+            self->_subscriptionPoolWorkCompletionBlock = completion;
+            os_unfair_lock_unlock(&self->_lock);
+
+            workBlock();
+        }];
+        [self->_deviceController.concurrentSubscriptionPool enqueueWorkItem:workItem description:description];
+    });
+}
+
+- (void)_handleResubscriptionNeededWithDelay:(NSNumber *)resubscriptionDelayMs
+{
+    BOOL deviceUsesThread;
+
+    os_unfair_lock_lock(&self->_lock);
 
     [self _changeState:MTRDeviceStateUnknown];
+    [self _changeInternalState:MTRInternalDeviceStateResubscribing];
 
     // If we are here, then the ReadClient either just detected a subscription
     // drop or just tried again and failed.  Either way, count it as "tried and
@@ -931,6 +1110,36 @@ static NSString * const sAttributesKey = @"attributes";
     // former case we recently had a subscription and do not want to be forcing
     // retries immediately.
     _lastSubscriptionFailureTime = [NSDate now];
+
+    deviceUsesThread = [self _deviceUsesThread];
+
+    // If a previous resubscription failed, remove the item from the subscription pool.
+    [self _clearSubscriptionPoolWork];
+
+    os_unfair_lock_unlock(&self->_lock);
+
+    // Use the existing _triggerResubscribeWithReason mechanism, which does the right checks when
+    // this block is run -- if other triggering events had happened, this would become a no-op.
+    auto resubscriptionBlock = ^{
+        [self->_deviceController asyncDispatchToMatterQueue:^{
+            [self _triggerResubscribeWithReason:"ResubscriptionNeeded timer fired" nodeLikelyReachable:NO];
+        } errorHandler:^(NSError * _Nonnull error) {
+            // If controller is not running, clear work item from the subscription queue
+            MTR_LOG_INFO("%@ could not dispatch to matter queue for resubscription - error %@", self, error);
+            std::lock_guard lock(self->_lock);
+            [self _clearSubscriptionPoolWork];
+        }];
+    };
+
+    int64_t resubscriptionDelayNs = static_cast<int64_t>(resubscriptionDelayMs.unsignedIntValue * NSEC_PER_MSEC);
+    if (deviceUsesThread) {
+        std::lock_guard lock(_lock);
+        // For Thread-enabled devices, schedule the _triggerResubscribeWithReason call to run in the subscription pool
+        [self _scheduleSubscriptionPoolWork:resubscriptionBlock inNanoseconds:resubscriptionDelayNs description:@"ReadClient resubscription"];
+    } else {
+        // For non-Thread-enabled devices, just call the resubscription block after the specified time
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, resubscriptionDelayNs), self.queue, resubscriptionBlock);
+    }
 
     // Set up connectivity monitoring in case network routability changes for the positive, to accellerate resubscription
     [self _setupConnectivityMonitoring];
@@ -984,11 +1193,26 @@ static NSString * const sAttributesKey = @"attributes";
     }
 
     MTR_LOG_DEFAULT("%@ scheduling to reattempt subscription in %f seconds", self, secondsToWait);
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (secondsToWait * NSEC_PER_SEC)), self.queue, ^{
+
+    // If we started subscription or session establishment but failed, remove item from the subscription pool so we can re-queue.
+    [self _clearSubscriptionPoolWork];
+
+    // Call _reattemptSubscriptionNowIfNeeded when timer fires - if subscription is
+    // in a better state at that time this will be a no-op.
+    auto resubscriptionBlock = ^{
         os_unfair_lock_lock(&self->_lock);
         [self _reattemptSubscriptionNowIfNeeded];
         os_unfair_lock_unlock(&self->_lock);
-    });
+    };
+
+    int64_t resubscriptionDelayNs = static_cast<int64_t>(secondsToWait * NSEC_PER_SEC);
+    if ([self _deviceUsesThread]) {
+        // For Thread-enabled devices, schedule the _reattemptSubscriptionNowIfNeeded call to run in the subscription pool
+        [self _scheduleSubscriptionPoolWork:resubscriptionBlock inNanoseconds:resubscriptionDelayNs description:@"MTRDevice resubscription"];
+    } else {
+        // For non-Thread-enabled devices, just call the resubscription block after the specified time
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, resubscriptionDelayNs), self.queue, resubscriptionBlock);
+    }
 }
 
 - (void)_reattemptSubscriptionNowIfNeeded
@@ -1044,11 +1268,12 @@ static NSString * const sAttributesKey = @"attributes";
 
     _receivingReport = YES;
     if (_state != MTRDeviceStateReachable) {
-        _receivingPrimingReport = YES;
         [self _changeState:MTRDeviceStateReachable];
-    } else {
-        _receivingPrimingReport = NO;
     }
+
+    // If we currently don't have an established subscription, this must be a
+    // priming report.
+    _receivingPrimingReport = !HaveSubscriptionEstablishedRightNow(_internalDeviceState);
 }
 
 - (NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)_clusterDataToPersistSnapshot
@@ -1134,12 +1359,12 @@ static NSString * const sAttributesKey = @"attributes";
     }
 }
 
-- (void)_handleAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
+- (void)_handleAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription
 {
     std::lock_guard lock(_lock);
 
     // _getAttributesToReportWithReportedValues will log attribute paths reported
-    [self _reportAttributes:[self _getAttributesToReportWithReportedValues:attributeReport]];
+    [self _reportAttributes:[self _getAttributesToReportWithReportedValues:attributeReport fromSubscription:isFromSubscription]];
 }
 
 #ifdef DEBUG
@@ -1150,11 +1375,11 @@ static NSString * const sAttributesKey = @"attributes";
     });
 }
 
-- (void)unitTestInjectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
+- (void)unitTestInjectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription
 {
     dispatch_async(self.queue, ^{
         [self _handleReportBegin];
-        [self _handleAttributeReport:attributeReport];
+        [self _handleAttributeReport:attributeReport fromSubscription:isFromSubscription];
         [self _handleReportEnd];
     });
 }
@@ -1349,11 +1574,11 @@ static NSString * const sAttributesKey = @"attributes";
     return clusterData.attributes[path.attribute];
 }
 
-- (void)_setCachedAttributeValue:(MTRDeviceDataValueDictionary _Nullable)value forPath:(MTRAttributePath *)path
+- (void)_setCachedAttributeValue:(MTRDeviceDataValueDictionary _Nullable)value forPath:(MTRAttributePath *)path fromSubscription:(BOOL)isFromSubscription
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
-    // We need an actual MTRClusterPath, not a subsclass, to do _clusterDataForPath.
+    // We need an actual MTRClusterPath, not a subclass, to do _clusterDataForPath.
     auto * clusterPath = [MTRClusterPath clusterPathWithEndpointID:path.endpoint clusterID:path.cluster];
 
     MTRDeviceClusterData * clusterData = [self _clusterDataForPath:clusterPath];
@@ -1367,6 +1592,16 @@ static NSString * const sAttributesKey = @"attributes";
     }
 
     [clusterData storeValue:value forAttribute:path.attribute];
+
+    if (value != nil
+        && isFromSubscription
+        && !_receivingPrimingReport
+        && AttributeHasChangesOmittedQuality(path)) {
+        // Do not persist new values for Changes Omitted Quality attributes unless
+        // they're part of a Priming Report or from a read response.
+        // (removals are OK)
+        return;
+    }
 
     if (_clusterDataToPersist == nil) {
         _clusterDataToPersist = [NSMutableDictionary dictionary];
@@ -1423,7 +1658,7 @@ static NSString * const sAttributesKey = @"attributes";
         self->_connectivityMonitor = [[MTRDeviceConnectivityMonitor alloc] initWithCompressedFabricID:compressedFabricID nodeID:self.nodeID];
         [self->_connectivityMonitor startMonitoringWithHandler:^{
             [self->_deviceController asyncDispatchToMatterQueue:^{
-                [self _triggerResubscribeWithReason:"read-through skipped while not subscribed" nodeLikelyReachable:YES];
+                [self _triggerResubscribeWithReason:"device connectivity changed" nodeLikelyReachable:YES];
             }
                                                    errorHandler:nil];
         } queue:self.queue];
@@ -1461,7 +1696,7 @@ static NSString * const sAttributesKey = @"attributes";
         return;
     }
 
-    _internalDeviceState = MTRInternalDeviceStateSubscribing;
+    [self _changeInternalState:MTRInternalDeviceStateSubscribing];
 
     // Set up a timer to mark as not reachable if it takes too long to set up a subscription
     MTRWeakReference<MTRDevice *> * weakSelf = [MTRWeakReference weakReferenceWithObject:self];
@@ -1492,7 +1727,7 @@ static NSString * const sAttributesKey = @"attributes";
                            MTR_LOG_INFO("%@ got attribute report %@", self, value);
                            dispatch_async(self.queue, ^{
                                // OnAttributeData
-                               [self _handleAttributeReport:value];
+                               [self _handleAttributeReport:value fromSubscription:YES];
 #ifdef DEBUG
                                self->_unitTestAttributesReportedSinceLastCheck += value.count;
 #endif
@@ -1512,11 +1747,11 @@ static NSString * const sAttributesKey = @"attributes";
                                [self _handleSubscriptionError:error];
                            });
                        },
-                       ^(NSError * error, NSNumber * resubscriptionDelay) {
-                           MTR_LOG_DEFAULT("%@ got resubscription error %@ delay %@", self, error, resubscriptionDelay);
+                       ^(NSError * error, NSNumber * resubscriptionDelayMs) {
+                           MTR_LOG_DEFAULT("%@ got resubscription error %@ delay %@", self, error, resubscriptionDelayMs);
                            dispatch_async(self.queue, ^{
                                // OnResubscriptionNeeded
-                               [self _handleResubscriptionNeeded];
+                               [self _handleResubscriptionNeededWithDelay:resubscriptionDelayMs];
                            });
                        },
                        ^(void) {
@@ -1928,7 +2163,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                                 // Since the format is the same data-value dictionary, this looks like an
                                 // attribute report
                                 MTR_LOG_INFO("Read attribute work item [%llu] result: %@  [0x%016llX:%@:0x%llX:0x%llX]", workItemID, values, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
-                                [self _handleAttributeReport:values];
+                                [self _handleAttributeReport:values fromSubscription:NO];
                             }
 
                             // TODO: better retry logic
@@ -2494,7 +2729,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 }
 
 // assume lock is held
-- (NSArray *)_getAttributesToReportWithReportedValues:(NSArray<NSDictionary<NSString *, id> *> *)reportedAttributeValues
+- (NSArray *)_getAttributesToReportWithReportedValues:(NSArray<NSDictionary<NSString *, id> *> *)reportedAttributeValues fromSubscription:(BOOL)isFromSubscription
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
@@ -2528,14 +2763,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 _expectedValueCache[attributePath], previousValue);
             _expectedValueCache[attributePath] = nil;
             // TODO: Is this clearing business really what we want?
-            [self _setCachedAttributeValue:nil forPath:attributePath];
+            [self _setCachedAttributeValue:nil forPath:attributePath fromSubscription:isFromSubscription];
         } else {
             // First separate data version and restore data value to a form without data version
             NSNumber * dataVersion = attributeDataValue[MTRDataVersionKey];
             MTRClusterPath * clusterPath = [MTRClusterPath clusterPathWithEndpointID:attributePath.endpoint clusterID:attributePath.cluster];
             if (dataVersion) {
-                [self _noteDataVersion:dataVersion forClusterPath:clusterPath];
-
                 // Remove data version from what we cache in memory
                 attributeDataValue = [self _dataValueWithoutDataVersion:attributeDataValue];
             }
@@ -2544,7 +2777,11 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             BOOL readCacheValueChanged = ![self _attributeDataValue:attributeDataValue isEqualToDataValue:previousValue];
             // Now that we have grabbed previousValue, update our cache with the attribute value.
             if (readCacheValueChanged) {
-                [self _setCachedAttributeValue:attributeDataValue forPath:attributePath];
+                if (dataVersion) {
+                    [self _noteDataVersion:dataVersion forClusterPath:clusterPath];
+                }
+
+                [self _setCachedAttributeValue:attributeDataValue forPath:attributePath fromSubscription:isFromSubscription];
                 if (!_deviceConfigurationChanged) {
                     _deviceConfigurationChanged = [self _attributeAffectsDeviceConfiguration:attributePath];
                     if (_deviceConfigurationChanged) {
@@ -2658,6 +2895,50 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     if ([self _isCachePrimedWithInitialConfigurationData]) {
         _delegateDeviceCachePrimedCalled = YES;
     }
+}
+
+- (void)_setLastInitialSubscribeLatency:(id)latency
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    if (![latency isKindOfClass:NSNumber.class]) {
+        // Unexpected value of some sort; just ignore it.
+        return;
+    }
+
+    _estimatedSubscriptionLatency = latency;
+}
+
+- (void)setPersistedDeviceData:(NSDictionary<NSString *, id> *)data
+{
+    MTR_LOG_INFO("%@ setPersistedDeviceData: %@", self, data);
+
+    std::lock_guard lock(_lock);
+
+    // For now the only data we care about is our initial subscribe latency.
+    id initialSubscribeLatency = data[sLastInitialSubscribeLatencyKey];
+    if (initialSubscribeLatency != nil) {
+        [self _setLastInitialSubscribeLatency:initialSubscribeLatency];
+    }
+}
+
+- (void)_storePersistedDeviceData
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    auto datastore = _deviceController.controllerDataStore;
+    if (datastore == nil) {
+        // No way to store.
+        return;
+    }
+
+    // For now the only data we have is our initial subscribe latency.
+    NSMutableDictionary<NSString *, id> * data = [NSMutableDictionary dictionary];
+    if (_estimatedSubscriptionLatency != nil) {
+        data[sLastInitialSubscribeLatencyKey] = _estimatedSubscriptionLatency;
+    }
+
+    [datastore storeDeviceData:[data copy] forNodeID:self.nodeID];
 }
 
 - (BOOL)deviceCachePrimed
@@ -3069,5 +3350,50 @@ void SubscriptionCallback::OnAttributeData(
     }
 
     QueueInterimReport();
+}
+
+uint32_t SubscriptionCallback::ComputeTimeTillNextSubscription()
+{
+    uint32_t maxWaitTimeInMsec = 0;
+    uint32_t waitTimeInMsec = 0;
+    uint32_t minWaitTimeInMsec = 0;
+
+    if (mResubscriptionNumRetries <= CHIP_RESUBSCRIBE_MAX_FIBONACCI_STEP_INDEX) {
+        maxWaitTimeInMsec = GetFibonacciForIndex(mResubscriptionNumRetries) * CHIP_RESUBSCRIBE_WAIT_TIME_MULTIPLIER_MS;
+    } else {
+        maxWaitTimeInMsec = CHIP_RESUBSCRIBE_MAX_RETRY_WAIT_INTERVAL_MS;
+    }
+
+    if (maxWaitTimeInMsec != 0) {
+        minWaitTimeInMsec = (CHIP_RESUBSCRIBE_MIN_WAIT_TIME_INTERVAL_PERCENT_PER_STEP * maxWaitTimeInMsec) / 100;
+        waitTimeInMsec = minWaitTimeInMsec + (Crypto::GetRandU32() % (maxWaitTimeInMsec - minWaitTimeInMsec));
+    }
+
+    return waitTimeInMsec;
+}
+
+CHIP_ERROR SubscriptionCallback::OnResubscriptionNeeded(ReadClient * apReadClient, CHIP_ERROR aTerminationCause)
+{
+    // No need to check ReadClient internal state is Idle because ReadClient only calls OnResubscriptionNeeded after calling ClearActiveSubscriptionState(), which sets the state to Idle.
+
+    // This part is copied from ReadClient's DefaultResubscribePolicy:
+    auto timeTillNextResubscriptionMs = ComputeTimeTillNextSubscription();
+    ChipLogProgress(DataManagement,
+        "Will try to resubscribe to %02x:" ChipLogFormatX64 " at retry index %" PRIu32 " after %" PRIu32
+        "ms due to error %" CHIP_ERROR_FORMAT,
+        apReadClient->GetFabricIndex(), ChipLogValueX64(apReadClient->GetPeerNodeId()), mResubscriptionNumRetries, timeTillNextResubscriptionMs,
+        aTerminationCause.Format());
+
+    // Schedule a maximum time resubscription, to be triggered with TriggerResubscribeIfScheduled after a separate timer.
+    // This way the aReestablishCASE value is saved, and the sanity checks in ScheduleResubscription are observed and returned.
+    ReturnErrorOnFailure(apReadClient->ScheduleResubscription(UINT32_MAX, NullOptional, aTerminationCause == CHIP_ERROR_TIMEOUT));
+
+    // Not as good a place to increment as when resubscription timer fires, but as is, this should be as good, because OnResubscriptionNeeded is only called from ReadClient's Close() while Idle, and nothing should cause this to happen
+    mResubscriptionNumRetries++;
+
+    auto error = [MTRError errorForCHIPErrorCode:aTerminationCause];
+    CallResubscriptionScheduledHandler(error, @(timeTillNextResubscriptionMs));
+
+    return CHIP_NO_ERROR;
 }
 } // anonymous namespace

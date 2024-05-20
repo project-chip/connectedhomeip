@@ -76,16 +76,24 @@ class DeviceConformanceTests(BasicCompositionTests):
 
         success = True
         allow_provisional = self.user_params.get("allow_provisional", False)
+        # TODO: automate this once https://github.com/csa-data-model/projects/issues/454 is done.
+        provisional_cluster_ids = [Clusters.ContentControl.id, Clusters.ScenesManagement.id, Clusters.BallastConfiguration.id,
+                                   Clusters.EnergyPreference.id, Clusters.DeviceEnergyManagement.id, Clusters.DeviceEnergyManagementMode.id, Clusters.PulseWidthModulation.id,
+                                   Clusters.ProxyConfiguration.id, Clusters.ProxyDiscovery.id, Clusters.ProxyValid.id]
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
+                cluster_location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id)
                 if cluster_id not in self.xml_clusters.keys():
                     if (cluster_id & 0xFFFF_0000) != 0:
                         # manufacturer cluster
                         continue
-                    location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id)
                     # TODO: update this from a warning once we have all the data
-                    record_warning(location=location, problem='Standard cluster found on device, but is not present in spec data')
+                    record_warning(location=cluster_location,
+                                   problem='Standard cluster found on device, but is not present in spec data')
                     continue
+
+                if not allow_provisional and cluster_id in provisional_cluster_ids:
+                    record_error(location=cluster_location, problem='Provisional cluster found on device')
 
                 feature_map = cluster[GlobalAttributeIds.FEATURE_MAP_ID]
                 attribute_list = cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID]
