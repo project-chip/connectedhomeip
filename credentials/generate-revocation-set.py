@@ -29,8 +29,8 @@ from enum import Enum
 import click
 import requests
 from click_option_group import RequiredMutuallyExclusiveOptionGroup, optgroup
-from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography import x509
+from cryptography.hazmat.primitives.asymmetric import ec
 
 
 class RevocationType(Enum):
@@ -172,7 +172,8 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
 
         # Convert CRL Signer AKID to colon separated hex
         crl_signer_authority_key_id = crl_signer_authority_key_id.hex().upper()
-        crl_signer_authority_key_id = ':'.join([crl_signer_authority_key_id[i:i+2] for i in range(0, len(crl_signer_authority_key_id), 2)])
+        crl_signer_authority_key_id = ':'.join([crl_signer_authority_key_id[i:i+2]
+                                               for i in range(0, len(crl_signer_authority_key_id), 2)])
 
         paa_certificate = dcld_helper.get_paa_cert_for_crl_issuer(crl_signer_issuer_name, crl_signer_authority_key_id)
 
@@ -204,8 +205,8 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
         # verify if PAA singed the crl's public key
         try:
             paa_certificate_object.public_key().verify(crl_signer_certificate.signature,
-                                                        crl_signer_certificate.tbs_certificate_bytes,
-                                                        ec.ECDSA(crl_signer_certificate.signature_hash_algorithm))
+                                                       crl_signer_certificate.tbs_certificate_bytes,
+                                                       ec.ECDSA(crl_signer_certificate.signature_hash_algorithm))
         except Exception as e:
             print("CRL Signer Certificate is not signed by PAA Certificate, continue...")
             print("Error: ", e)
@@ -230,26 +231,11 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
 
         issuer_subject_key_id = ''.join('{:02X}'.format(x) for x in crl_authority_key_id)
 
-        same_issuer_points = None
+        # b.
+        count_with_matching_vid_issuer_skid = sum(item.get('vid') == vid for item in same_issuer_points)
+        same_issuer_points = dcld_helper.get_revocations_points_by_skid(issuer_subject_key_id)
 
-        # TODO: Extract this to a helper function
-        if use_rest:
-            response = requests.get(
-                f"{rest_node_url}/dcl/pki/revocation-points/{issuer_subject_key_id}").json()["pkiRevocationDistributionPointsByIssuerSubjectKeyID"]
-            same_issuer_points = response["points"]
-        else:
-            cmdlist = ['query', 'pki', 'revocation-points', '--issuer-subject-key-id', issuer_subject_key_id]
-            cmdpipe = subprocess.Popen(use_dcld(dcld, production, cmdlist), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            same_issuer_points = json.loads(cmdpipe.stdout.read())[
-                "pkiRevocationDistributionPointsByIssuerSubjectKeyID"]["points"]
-
-        matching_entries = False
-        for same_issuer_point in same_issuer_points:
-            if same_issuer_point["vid"] == vid:
-                matching_entries = True
-                break
-
-        if matching_entries:
+        if count_with_matching_vid_issuer_skid > 1:
             try:
                 issuing_distribution_point = crl_file.extensions.get_extension_for_oid(
                     x509.OID_ISSUING_DISTRIBUTION_POINT).value
@@ -268,10 +254,13 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
 
         # 9. Assign CRL File Issuer
         certificate_authority_name = base64.b64encode(crl_file.issuer.public_bytes()).decode('utf-8')
+        print(f"CRL File Issuer: {certificate_authority_name}")
 
         serialnumber_list = []
         # 10. Iterate through the Revoked Certificates List
         for revoked_cert in crl_file:
+            print(revoked_cert)
+            # a.
             try:
                 revoked_cert_issuer = revoked_cert.extensions.get_extension_for_oid(
                     x509.CRLEntryExtensionOID.CERTIFICATE_ISSUER).value.get_values_for_type(x509.DirectoryName).value
@@ -284,16 +273,16 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
                 pass
 
             # b.
-            try:
-                revoked_cert_authority_key_id = revoked_cert.extensions.get_extension_for_oid(
-                    x509.OID_AUTHORITY_KEY_IDENTIFIER).value.key_identifier
-
-                if revoked_cert_authority_key_id is None or revoked_cert_authority_key_id != crl_signer_subject_key_id:
-                    print("CRL Authority Key ID is not CRL Signer Subject Key ID, continue...")
-                    continue
-            except Exception:
-                print("CRL Authority Key ID not found, continue...")
-                continue
+            # try:
+            #     revoked_cert_authority_key_id = revoked_cert.extensions.get_extension_for_oid(
+            #         x509.OID_AUTHORITY_KEY_IDENTIFIER).value.key_identifier
+            #
+            #     if revoked_cert_authority_key_id is None or revoked_cert_authority_key_id != crl_signer_subject_key_id:
+            #         print("CRL Authority Key ID is not CRL Signer Subject Key ID, continue...")
+            #         continue
+            # except Exception:
+            #     print("CRL Authority Key ID not found, continue...")
+            #     continue
 
             # c. and d.
             serialnumber_list.append(bytes(str('{:02X}'.format(revoked_cert.serial_number)), 'utf-8').decode('utf-8'))
