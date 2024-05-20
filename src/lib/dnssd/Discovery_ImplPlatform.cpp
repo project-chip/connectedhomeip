@@ -788,7 +788,7 @@ CHIP_ERROR DiscoveryImplPlatform::DiscoverOperational(DiscoveryFilter filter, Di
     ReturnErrorOnFailure(InitImpl());
     StopDiscovery(context);
 
-    char serviceName[kMaxCommissionerServiceNameSize];
+    char serviceName[kMaxOperationalServiceNameSize];
     ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kOperational));
 
     intptr_t browseIdentifier;
