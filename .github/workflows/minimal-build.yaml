@@ -27,7 +27,7 @@ concurrency:
 
 jobs:
     minimal:
-        name: Linux / configure build of all-clusters-app
+        name: Linux / configure build of network-manager-app
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: ubuntu-latest
@@ -44,6 +44,6 @@ jobs:
               with:
                 platform: linux
 
-            - name: Configure and build All Clusters App
+            - name: Configure and build Network Manager App
               run: |
-                  CC=gcc CXX=g++ scripts/configure --project=examples/all-clusters-app/linux && ./ninja-build
+                  CC=gcc CXX=g++ scripts/configure --project=examples/network-manager-app/linux && ./ninja-build
