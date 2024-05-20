@@ -66,29 +66,6 @@ class TC_IDM_4_2(MatterBaseTest):
             attribute=Clusters.IcdManagement.Attributes.IdleModeDuration
         )
 
-    def get_attribute_value_wait(self, sub, typed_attr_path):
-        start_time = time.time()
-        timeout = 10
-        increment = 0.1
-        loop = True
-        attribute_value = None
-        while loop:
-            # Get the attribute value
-            attribute_value = sub.GetAttribute(typed_attr_path)
-
-            # Check if the value is not an empty string
-            if attribute_value != "":
-                loop = False  # Exit the loop
-            else:
-                # Check if the timeout has been reached
-                if time.time() - start_time > timeout:
-                    error_msg = f"Timeout: Value for '{typed_attr_path.AttributeName}' attribute not found within {timeout} seconds."
-                    raise TimeoutError(error_msg)
-                else:
-                    time.sleep(increment)
-
-        return attribute_value
-
     @staticmethod
     def verify_attribute_exists(sub, cluster, attribute, ep=ROOT_NODE_ENDPOINT_ID):
         sub_attrs = sub
