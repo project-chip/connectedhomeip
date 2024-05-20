@@ -3138,7 +3138,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                             [dataStoreClusterDataCopy removeObjectForKey:path];
                             [dataStoreClusterDataCopy setObject:clusterData forKey:path];
                             [self.deviceController.controllerDataStore storeClusterData:dataStoreClusterDataCopy forNodeID:self.nodeID];
-                            dataStoreClusterData = [NSMutableDictionary dictionaryWithDictionary:[self.deviceController.controllerDataStore getStoredClusterDataForNodeID:self.nodeID]];
                         }
                     }
                     [self _removeCachedAttributeValue:path forPath:attributePath];
