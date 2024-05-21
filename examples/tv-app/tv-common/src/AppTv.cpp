@@ -586,7 +586,7 @@ void ContentAppFactoryImpl::InstallContentApp(uint16_t vendorId, uint16_t produc
 }
 
 bool ContentAppFactoryImpl::UninstallContentApp(uint16_t vendorId, uint16_t productId)
-{   
+{
     ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl: UninstallContentApp vendorId=%d productId=%d ",
                     vendorId, productId);
 
@@ -596,7 +596,7 @@ bool ContentAppFactoryImpl::UninstallContentApp(uint16_t vendorId, uint16_t prod
         auto app = contentApp.get();
 
         ChipLogProgress(DeviceLayer, "Looking next vid=%d pid=%d", app->GetApplicationBasicDelegate()->HandleGetVendorId(), app->GetApplicationBasicDelegate()->HandleGetProductId());
-        
+
         if (app->MatchesPidVid(productId, vendorId)) {
             ChipLogProgress(DeviceLayer, "Found an app vid=%d pid=%d. Uninstalling it.", app->GetApplicationBasicDelegate()->HandleGetVendorId(), app->GetApplicationBasicDelegate()->HandleGetProductId());
             mContentApps.erase(mContentApps.begin() + index);

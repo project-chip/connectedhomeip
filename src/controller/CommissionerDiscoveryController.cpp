@@ -223,7 +223,7 @@ void CommissionerDiscoveryController::InternalOk()
     if (mAppInstallationService == nullptr)
     {
         ChipLogError(AppServer, "UX InternalOk: no app installation service");
-        return; 
+        return;
     }
 
     if (!mAppInstallationService->LookupTargetContentApp(client->GetVendorId(), client->GetProductId())) {
