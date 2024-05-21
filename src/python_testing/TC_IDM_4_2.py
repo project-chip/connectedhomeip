@@ -427,8 +427,7 @@ class TC_IDM_4_2(MatterBaseTest):
         self.print_step(9, "CR1 modifies the attribute which has been subscribed to on the DUT and waits for an incoming ReportDataMessage")
 
         # Saving the returned MaxInterval from the SubscribeResponseMessage
-        sub_cr1_step9_intervals = sub_cr1_update_value.GetReportingIntervalsSeconds()
-        min_interval_floor_sec, max_interval_sec = sub_cr1_step9_intervals
+        min_interval_floor_sec, max_interval_sec = sub_cr1_update_value.GetReportingIntervalsSeconds()
 
         # Get subscription timeout
         subscription_timeout_sec = sub_cr1_update_value.GetSubscriptionTimeoutMs() / 1000
