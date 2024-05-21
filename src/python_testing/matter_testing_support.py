@@ -312,8 +312,8 @@ class EventChangeCallback:
 
 
 class AttributeChangeCallback:
-    def __init__(self, expected_attribute: ClusterObjects.ClusterAttributeDescriptor, output: queue.Queue):
-        self._output = output
+    def __init__(self, expected_attribute: ClusterObjects.ClusterAttributeDescriptor):
+        self._output = queue.Queue()
         self._expected_attribute = expected_attribute
 
     def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
@@ -324,19 +324,18 @@ class AttributeChangeCallback:
         else:
             logging.error(f"Expected attribute {self._expected_attribute} mismatch: {path.AttributeType}")
 
+    def wait_for_report(self):
+        try:
+            path, transaction = self._output.get(block=True, timeout=10)
+        except queue.Empty:
+            asserts.fail(f"Failed to receive a report for the attribute change for {self._expected_attribute}")
 
-def wait_for_attribute_report(q: queue.Queue, expected_attribute: ClusterObjects.ClusterAttributeDescriptor):
-    try:
-        path, transaction = q.get(block=True, timeout=10)
-    except queue.Empty:
-        asserts.fail(f"Failed to receive a report for the attribute change for {expected_attribute}")
-
-    asserts.assert_equal(path.AttributeType, expected_attribute,
-                         f"Received incorrect attribute report. Expected: {expected_attribute}, received: {path.AttributeType}")
-    try:
-        transaction.GetAttribute(path)
-    except KeyError:
-        asserts.fail("Attribute {expected_attribute} not found in returned report")
+        asserts.assert_equal(path.AttributeType, self._expected_attribute,
+                            f"Received incorrect attribute report. Expected: {self._expected_attribute}, received: {path.AttributeType}")
+        try:
+            transaction.GetAttribute(path)
+        except KeyError:
+            asserts.fail("Attribute {expected_attribute} not found in returned report")
 
 
 class InternalTestRunnerHooks(TestRunnerHooks):
