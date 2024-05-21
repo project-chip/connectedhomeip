@@ -226,7 +226,8 @@ void CommissionerDiscoveryController::InternalOk()
         return;
     }
 
-    if (!mAppInstallationService->LookupTargetContentApp(client->GetVendorId(), client->GetProductId())) {
+    if (!mAppInstallationService->LookupTargetContentApp(client->GetVendorId(), client->GetProductId()))
+    {
         ChipLogDetail(AppServer, "UX InternalOk: app not installed.");
 
         // notify client that app will be installed
@@ -235,9 +236,8 @@ void CommissionerDiscoveryController::InternalOk()
         mUdcServer->SendCDCMessage(cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
 
         // dialog
-        ChipLogDetail(Controller,
-                        "------PROMPT USER: %s is requesting to install app on this TV. vendorId=%d, productId=%d",
-                        client->GetDeviceName(), client->GetVendorId(), client->GetProductId());
+        ChipLogDetail(Controller, "------PROMPT USER: %s is requesting to install app on this TV. vendorId=%d, productId=%d",
+                      client->GetDeviceName(), client->GetVendorId(), client->GetProductId());
 
         if (mUserPrompter != nullptr)
         {

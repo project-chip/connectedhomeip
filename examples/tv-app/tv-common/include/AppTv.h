@@ -91,7 +91,11 @@ public:
     KeypadInputDelegate * GetKeypadInputDelegate() override { return &mKeypadInputDelegate; };
     MediaPlaybackDelegate * GetMediaPlaybackDelegate() override { return &mMediaPlaybackDelegate; };
     TargetNavigatorDelegate * GetTargetNavigatorDelegate() override { return &mTargetNavigatorDelegate; };
-    bool MatchesPidVid(uint16_t productId, uint16_t vendorId) { return vendorId == mApplicationBasicDelegate.HandleGetVendorId() && productId == mApplicationBasicDelegate.HandleGetProductId(); }
+    bool MatchesPidVid(uint16_t productId, uint16_t vendorId)
+    {
+        return vendorId == mApplicationBasicDelegate.HandleGetVendorId() &&
+            productId == mApplicationBasicDelegate.HandleGetProductId();
+    }
 
 protected:
     ApplicationBasicManager mApplicationBasicDelegate;

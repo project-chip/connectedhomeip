@@ -165,7 +165,6 @@ public:
      */
     virtual void PromptForAppInstallOKPermission(uint16_t vendorId, uint16_t productId, const char * commissioneeName) = 0;
 
-
     virtual ~UserPrompter() = default;
 };
 
@@ -430,7 +429,10 @@ public:
     /**
      * Assign an AppInstallationService
      */
-    inline void SetAppInstallationService(AppInstallationService * appInstallationService) { mAppInstallationService = appInstallationService; }
+    inline void SetAppInstallationService(AppInstallationService * appInstallationService)
+    {
+        mAppInstallationService = appInstallationService;
+    }
 
     /**
      * Assign a Commissioner Callback to perform commissioning once user consent has been given

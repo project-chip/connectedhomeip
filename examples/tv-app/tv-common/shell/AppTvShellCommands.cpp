@@ -279,11 +279,14 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
             pid = (uint16_t) strtol(argv[2], &eptr, 10);
         }
         ContentAppFactoryImpl * factory = GetContentAppFactoryImpl();
-        bool isAppUninstalled = factory->UninstallContentApp(vid, pid);
+        bool isAppUninstalled           = factory->UninstallContentApp(vid, pid);
 
-        if (isAppUninstalled) {
+        if (isAppUninstalled)
+        {
             ChipLogProgress(DeviceLayer, "uninstalled an app");
-        } else {
+        }
+        else
+        {
             ChipLogProgress(DeviceLayer, "app not found.");
         }
 
