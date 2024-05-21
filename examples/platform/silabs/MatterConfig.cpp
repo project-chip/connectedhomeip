@@ -57,10 +57,10 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #endif
 
 #include "SilabsDeviceDataProvider.h"
-#include <app/server/Dnssd.h>
-#include <app/server/Server.h>
 #include <app/InteractionModelEngine.h>
 #include <app/TimerDelegates.h>
+#include <app/server/Dnssd.h>
+#include <app/server/Server.h>
 
 #ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 #include "SilabsTestEventTriggerDelegate.h" // nogncheck
