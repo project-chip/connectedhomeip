@@ -42,9 +42,10 @@
 
 #include <app/DeviceProxy.h>
 #include <app/InteractionModelEngine.h>
-#include <app/server/Dnssd.h>
+#include <app/icd/client/CheckInHandler.h>
 #include <app/icd/client/DefaultCheckInDelegate.h>
 #include <app/icd/client/DefaultICDClientStorage.h>
+#include <app/server/Dnssd.h>
 #include <controller/AutoCommissioner.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerFactory.h>
@@ -57,6 +58,7 @@
 #include <controller/python/ChipDeviceController-ScriptDevicePairingDelegate.h>
 #include <controller/python/ChipDeviceController-ScriptPairingDeviceDiscoveryDelegate.h>
 #include <controller/python/ChipDeviceController-StorageDelegate.h>
+#include <controller/python/chip/icd/CheckInDelegate.h>
 #include <controller/python/chip/interaction_model/Delegate.h>
 #include <controller/python/chip/native/PyChipError.h>
 
@@ -103,21 +105,23 @@ chip::Platform::ScopedMemoryBuffer<char> sDefaultNTPBuf;
 app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type sDSTBuf;
 app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type sTimeZoneBuf;
 chip::Platform::ScopedMemoryBuffer<char> sTimeZoneNameBuf;
-chip::Controller::CommissioningParameters sCommissioningParameters;
-
 } // namespace
 
+chip::Controller::CommissioningParameters sCommissioningParameters;
 chip::app::DefaultICDClientStorage sICDClientStorage;
 chip::Controller::ScriptPairingDeviceDiscoveryDelegate sPairingDeviceDiscoveryDelegate;
 chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
 chip::Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
 chip::Crypto::RawKeySessionKeystore sSessionKeystore;
 
+chip::app::CheckInHandler sCheckInHandler;
+
 // NOTE: Remote device ID is in sync with the echo server device id
 // At some point, we may want to add an option to connect to a device without
 // knowing its id, because the ID can be learned on the first response that is received.
 chip::NodeId kDefaultLocalDeviceId = chip::kTestControllerNodeId;
 chip::NodeId kRemoteDeviceId       = chip::kTestDeviceNodeId;
+uint8_t sICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
 
 extern "C" {
 PyChipError pychip_DeviceController_StackInit(Controller::Python::StorageAdapter * storageAdapter, bool enableServerInteractions);
@@ -147,6 +151,9 @@ PyChipError pychip_DeviceController_SetDSTOffset(int32_t offset, uint64_t validS
 PyChipError pychip_DeviceController_SetDefaultNtp(const char * defaultNTP);
 PyChipError pychip_DeviceController_SetTrustedTimeSource(chip::NodeId nodeId, chip::EndpointId endpoint);
 PyChipError pychip_DeviceController_SetCheckMatchingFabric(bool check);
+PyChipError pychip_DeviceController_SetIcdRegistrationParameters(chip::Controller::DeviceCommissioner * devCtrl, bool enabled,
+                                                                 uint8_t * icdSymmetricKeyOrNull, uint64_t icdCheckInNodeIdOrZero,
+                                                                 uint64_t icdMonitoredSubjectOrZero, uint32_t icdStayActiveMsec);
 PyChipError pychip_DeviceController_ResetCommissioningParameters();
 PyChipError pychip_DeviceController_CloseSession(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_EstablishPASESessionIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
@@ -265,6 +272,12 @@ PyChipError pychip_DeviceController_StackInit(Controller::Python::StorageAdapter
     factoryParams.sessionKeystore          = &sSessionKeystore;
 
     sICDClientStorage.Init(storageAdapter, &sSessionKeystore);
+
+    auto engine = chip::app::InteractionModelEngine::GetInstance();
+    PyReturnErrorOnFailure(ToPyChipError(PyChipCheckInDelegate::GetInstance().Init(&sICDClientStorage, engine)));
+    PyReturnErrorOnFailure(
+        ToPyChipError(sCheckInHandler.Init(DeviceControllerFactory::GetInstance().GetSystemState()->ExchangeMgr(),
+                                           &sICDClientStorage, &PyChipCheckInDelegate::GetInstance(), engine)));
 
     sGroupDataProvider.SetStorageDelegate(storageAdapter);
     sGroupDataProvider.SetSessionKeystore(factoryParams.sessionKeystore);
@@ -557,6 +570,46 @@ PyChipError pychip_DeviceController_SetTrustedTimeSource(chip::NodeId nodeId, ch
 PyChipError pychip_DeviceController_SetCheckMatchingFabric(bool check)
 {
     sCommissioningParameters.SetCheckForMatchingFabric(check);
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_DeviceController_SetIcdRegistrationParameters(chip::Controller::DeviceCommissioner * devCtrl, bool enabled,
+                                                                 uint8_t * icdSymmetricKeyOrNull, uint64_t icdCheckInNodeIdOrZero,
+                                                                 uint64_t icdMonitoredSubjectOrZero, uint32_t icdStayActiveMsec)
+{
+    if (!enabled)
+    {
+        return ToPyChipError(CHIP_NO_ERROR);
+    }
+
+    sCommissioningParameters.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
+
+    if (icdSymmetricKeyOrNull != nullptr)
+    {
+        memcpy(sICDSymmetricKey, icdSymmetricKeyOrNull, sizeof(sICDSymmetricKey));
+    }
+    else
+    {
+        chip::Crypto::DRBG_get_bytes(sICDSymmetricKey, sizeof(sICDSymmetricKey));
+    }
+    if (icdCheckInNodeIdOrZero == 0)
+    {
+        icdCheckInNodeIdOrZero = devCtrl->GetNodeId();
+    }
+    if (icdMonitoredSubjectOrZero == 0)
+    {
+        icdMonitoredSubjectOrZero = icdCheckInNodeIdOrZero;
+    }
+    // These Optionals must have values now.
+    // The commissioner will verify these values.
+    sCommissioningParameters.SetICDSymmetricKey(ByteSpan(sICDSymmetricKey));
+    if (icdStayActiveMsec != 0)
+    {
+        sCommissioningParameters.SetICDStayActiveDurationMsec(icdStayActiveMsec);
+    }
+    sCommissioningParameters.SetICDCheckInNodeId(icdCheckInNodeIdOrZero);
+    sCommissioningParameters.SetICDMonitoredSubject(icdMonitoredSubjectOrZero);
+
     return ToPyChipError(CHIP_NO_ERROR);
 }
 

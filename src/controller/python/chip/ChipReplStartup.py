@@ -94,6 +94,8 @@ def main():
         "-d", "--debug", help="Set default logging level to debug.", action="store_true")
     parser.add_argument(
         "-t", "--trust-store", help="Path to the PAA trust store.", action="store", default="./credentials/development/paa-root-certs")
+    parser.add_argument(
+        "-s", "--server-interactions", help="Enable server interactions.", action="store_true")
     args = parser.parse_args()
 
     if not os.path.exists(args.trust_store):
@@ -137,7 +139,7 @@ or run `os.chdir` to the root of your CHIP repository checkout.
 
     ReplInit(args.debug)
 
-    chipStack = ChipStack(persistentStoragePath=args.storagepath, enableServerInteractions=False)
+    chipStack = ChipStack(persistentStoragePath=args.storagepath, enableServerInteractions=args.server_interactions)
     certificateAuthorityManager = chip.CertificateAuthority.CertificateAuthorityManager(chipStack, chipStack.GetStorageManager())
 
     certificateAuthorityManager.LoadAuthoritiesFromStorage()

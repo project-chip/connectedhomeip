@@ -572,6 +572,7 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
     VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
 
     sICDClientStorage.UpdateFabricList(devCtrl->GetFabricIndex());
+    pairingDelegate->SetFabricIndex(devCtrl->GetFabricIndex());
 
     *outDevCtrl         = devCtrl.release();
     *outPairingDelegate = pairingDelegate.release();

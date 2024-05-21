@@ -1631,6 +1631,11 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_SetCheckMatchingFabric.restype = PyChipError
             self._dmLib.pychip_DeviceController_SetCheckMatchingFabric.argtypes = [c_bool]
 
+            self._dmLib.pychip_DeviceController_SetIcdRegistrationParameters.restype = PyChipError
+            self._dmLib.pychip_DeviceController_SetIcdRegistrationParameters.argtypes = [
+                c_void_p, c_bool, c_char_p, c_uint64, c_uint64, c_uint32
+            ]
+
             self._dmLib.pychip_DeviceController_ResetCommissioningParameters.restype = PyChipError
             self._dmLib.pychip_DeviceController_ResetCommissioningParameters.argtypes = []
 
@@ -1977,6 +1982,27 @@ class ChipDeviceController(ChipDeviceControllerBase):
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetCheckMatchingFabric(check)
+        ).raise_on_error()
+
+    def SetIcdRegistrationParameters(self, symmetricKey: bytes = None, checkInNodeId: int = 0, monitoredSubject: int = 0, stayActiveMs: int = 0):
+        if symmetricKey is not None:
+            if len(symmetricKey) != 16:
+                raise ValueError("symmetricKey should be 16 bytes")
+        if not checkInNodeId:
+            checkInNodeId = self._nodeId
+        if not monitoredSubject:
+            monitoredSubject = checkInNodeId
+
+        self.CheckIsActive()
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetIcdRegistrationParameters(
+                self.devCtrl, True, symmetricKey, checkInNodeId, monitoredSubject, stayActiveMs)
+        ).raise_on_error()
+
+    def DisableIcdRegistration(self):
+        self.CheckIsActive()
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetIcdRegistrationParameters(self.devCtrl, False, None, 0, 0, 0)
         ).raise_on_error()
 
     def GetFabricCheckResult(self) -> int:
