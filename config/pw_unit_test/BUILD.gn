@@ -1,0 +1,18 @@
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
+
+import("${chip_root}/build/chip/chip_test_suite.gni")
+
+import("$dir_pw_build/target_types.gni")
+pw_source_set("define_overrides") {
+  public_configs = [ ":define_options" ]
+}
+
+config("define_options") {
+  if (chip_fake_platform && chip_link_tests) {
+    defines = [ "PW_UNIT_TEST_CONFIG_MEMORY_POOL_SIZE=65536" ]
+  } else {
+    defines = [ "PW_UNIT_TEST_CONFIG_MEMORY_POOL_SIZE=16384" ]
+  }
+}
