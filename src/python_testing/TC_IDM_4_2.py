@@ -74,7 +74,7 @@ class TC_IDM_4_2(MatterBaseTest):
                          "Verify that the Subscription succeeds and the DUT sends back the attribute values for the global attribute. Verify no data from other endpoints is sent back."),
                 TestStep(13, "CR1 sends a subscription request to the DUT with both AttributeRequests and EventRequests as empty.",
                          "Verify that the Subscription does not succeed and the DUT sends back a Status Response Action with the INVALID_ACTION Status Code")
-            ]
+                ]
 
     ROOT_NODE_ENDPOINT_ID = 0
 
