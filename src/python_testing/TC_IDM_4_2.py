@@ -293,6 +293,10 @@ class TC_IDM_4_2(MatterBaseTest):
         # Setup CR2 such that it does not have access to a specific cluster. CR2 sends a subscription
         # message to subscribe to an attribute on that cluster for which it does not have access.
         self.step(3)
+        
+        # Setting reportInterval values for steps 3-8
+        min_interval_floor_sec = 3
+        max_interval_ceiling_sec = 10
 
         # Limited ACE for controller 2 with single cluster access
         CR2_limited_ace = Clusters.AccessControl.Structs.AccessControlEntryStruct(
@@ -310,13 +314,14 @@ class TC_IDM_4_2(MatterBaseTest):
         # Controller 2 tries to subscribe an attribute from a cluster
         # it doesn't have access to
         # "INVALID_ACTION" status response expected
+        
         try:
             await CR2.ReadAttribute(
                 nodeid=self.dut_node_id,
                 # Attribute from a cluster controller 2 has no access to
                 attributes=[(0, Clusters.AccessControl.Attributes.Acl)],
                 keepSubscriptions=False,
-                reportInterval=[3, 3],
+                reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
                 autoResubscribe=False
             )
             asserts.fail("Expected exception not thrown")
@@ -355,7 +360,7 @@ class TC_IDM_4_2(MatterBaseTest):
                 # Cluster controller 2 has no access to
                 attributes=[(0, Clusters.BasicInformation)],
                 keepSubscriptions=False,
-                reportInterval=[3, 3],
+                reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
                 autoResubscribe=False
             )
             raise ValueError("Expected exception not thrown")
@@ -402,7 +407,7 @@ class TC_IDM_4_2(MatterBaseTest):
                 # Endpoint controller 2 has no access to
                 attributes=[(0)],
                 keepSubscriptions=False,
-                reportInterval=[3, 3],
+                reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
                 autoResubscribe=False
             )
             raise ValueError("Expected exception not thrown")
@@ -431,7 +436,7 @@ class TC_IDM_4_2(MatterBaseTest):
                 nodeid=self.dut_node_id,
                 attributes=[],
                 keepSubscriptions=False,
-                reportInterval=[3, 3],
+                reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
                 autoResubscribe=False
             )
             raise ValueError("Expected exception not thrown")
@@ -470,7 +475,7 @@ class TC_IDM_4_2(MatterBaseTest):
         sub_cr1_step7 = await CR1.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=node_label_attr_path,
-            reportInterval=(10, 20),
+            reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
             keepSubscriptions=False,
             dataVersionFilters=data_version_filter
         )
@@ -489,8 +494,6 @@ class TC_IDM_4_2(MatterBaseTest):
         self.step(8)
 
         # Subscribe to attribute
-        min_interval_floor_sec = 3
-        max_interval_ceiling_sec = 10
         sub_cr1_update_value = await CR1.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=node_label_attr_path,
@@ -562,6 +565,10 @@ class TC_IDM_4_2(MatterBaseTest):
         # CR1 sends a subscription request to subscribe to a specific global attribute from
         # all clusters on all endpoints.
         self.step(11)
+        
+        # Setting reportInterval values for steps 11-13
+        min_interval_floor_sec = 3
+        max_interval_ceiling_sec = 10
 
         # Omitting endpoint to indicate endpoint wildcard
         cluster_rev_attr_path = [(cluster_rev_attr)]
@@ -570,7 +577,7 @@ class TC_IDM_4_2(MatterBaseTest):
         sub_cr1_step11 = await CR1.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=cluster_rev_attr_path,
-            reportInterval=(3, 3),
+            reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
             keepSubscriptions=False
         )
 
@@ -607,7 +614,7 @@ class TC_IDM_4_2(MatterBaseTest):
         sub_cr1_step12 = await CR1.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=cluster_rev_attr_path,
-            reportInterval=(3, 3),
+            reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
             keepSubscriptions=False
         )
 
@@ -646,7 +653,7 @@ class TC_IDM_4_2(MatterBaseTest):
                 nodeid=self.dut_node_id,
                 attributes=[],
                 events=[],
-                reportInterval=(3, 3)
+                reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
             )
             raise ValueError("Expected exception not thrown")
         except ChipStackError as e:
