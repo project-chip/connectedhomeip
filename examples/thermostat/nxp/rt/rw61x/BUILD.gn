@@ -47,6 +47,8 @@ declare_args() {
 
   # Setup discriminator as argument
   setup_discriminator = 3840
+
+  chip_with_diag_logs_demo = true
 }
 
 example_platform_dir =
@@ -127,6 +129,10 @@ rt_executable("thermostat") {
     defines += [ "CONFIG_NET_L2_OPENTHREAD=1" ]
   }
 
+  if (chip_with_diag_logs_demo) {
+    defines += [ "CONFIG_DIAG_LOGS_DEMO=1", "CHIP_DEVICE_CONFIG_MAX_DIAG_LOG_SIZE=1024" ]
+  }
+
   include_dirs = [
     "../../common/main/include",
     "../../common/main",
@@ -145,6 +151,17 @@ rt_executable("thermostat") {
     "../../common/main/include/DeviceCallbacks.h",
     "../../common/main/main.cpp",
   ]
+
+  if (chip_with_diag_logs_demo) {
+    include_dirs += [
+      "${common_example_dir}/diagnostic_logs/include",
+      "${chip_root}",
+    ]
+    sources += [
+      "${common_example_dir}/diagnostic_logs/source/DiagnosticLogsDemo.cpp",
+      "${common_example_dir}/diagnostic_logs/source/DiagnosticLogsProviderDelegateImpl.cpp",
+    ]
+  }
 
   if (chip_enable_secure_dac_private_key_storage == 1) {
     sources += [ "${chip_root}/examples/platform/nxp/${nxp_platform}/factory_data/source/AppFactoryDataExample.cpp" ]
