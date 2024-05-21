@@ -21,7 +21,8 @@
 #import "MCEndpoint_Internal.h"
 #import "MCErrorUtils.h"
 
-#import "core/CastingPlayer.h"
+#import "core/CastingPlayer.h" // from tv-casting-common
+#import "core/ConnectionCallbacks.h" // from tv-casting-common
 
 #import <Foundation/Foundation.h>
 
@@ -47,7 +48,7 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
 
 - (void)verifyOrEstablishConnectionWithCompletionBlock:(void (^_Nonnull)(NSError * _Nullable))completion timeout:(long long)timeout desiredEndpointFilter:(MCEndpointFilter * _Nullable)desiredEndpointFilter
 {
-    ChipLogProgress(AppServer, "MCCastingPlayer.verifyOrEstablishConnectionWithCompletionBlock called");
+    ChipLogProgress(AppServer, "MCCastingPlayer.verifyOrEstablishConnectionWithCompletionBlock() called");
     VerifyOrReturn([[MCCastingApp getSharedInstance] isRunning], ChipLogError(AppServer, "MCCastingApp NOT running"));
 
     dispatch_queue_t workQueue = [[MCCastingApp getSharedInstance] getWorkQueue];
@@ -63,18 +64,23 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
 
             CHIP_ERROR result = idOptions.addTargetAppInfo(targetAppInfo);
             if (result != CHIP_NO_ERROR) {
-                ChipLogError(AppServer, "MCCastingPlayer.verifyOrEstablishConnectionWithCompletionBlock failed to add targetAppInfo: %" CHIP_ERROR_FORMAT, result.Format());
+                ChipLogError(AppServer, "MCCastingPlayer.verifyOrEstablishConnectionWithCompletionBlock() failed to add targetAppInfo: %" CHIP_ERROR_FORMAT, result.Format());
             }
         }
 
-        // TODO: In the following PRs. Add optional CommissionerDeclarationHandler callback parameter.
-        _cppCastingPlayer->VerifyOrEstablishConnection(
-            [completion](CHIP_ERROR err, matter::casting::core::CastingPlayer * castingPlayer) {
-                dispatch_queue_t clientQueue = [[MCCastingApp getSharedInstance] getClientQueue];
-                dispatch_async(clientQueue, ^{
-                    completion(err == CHIP_NO_ERROR ? nil : [MCErrorUtils NSErrorFromChipError:err]);
-                });
-            }, timeout, idOptions);
+        void (^connectCallback)(CHIP_ERROR, matter::casting::core::CastingPlayer *) = ^(CHIP_ERROR err, matter::casting::core::CastingPlayer * castingPlayer) {
+            ChipLogProgress(AppServer, "MCCastingPlayer.verifyOrEstablishConnectionWithCompletionBlock() ConnectCallback()");
+            dispatch_queue_t clientQueue = [[MCCastingApp getSharedInstance] getClientQueue];
+            dispatch_async(clientQueue, ^{
+                completion(err == CHIP_NO_ERROR ? nil : [MCErrorUtils NSErrorFromChipError:err]);
+            });
+        };
+
+        matter::casting::core::ConnectionCallbacks connectionCallbacks;
+        connectionCallbacks.mOnConnectionComplete = connectCallback;
+
+        // TODO: In the following PRs. Add optional CommissionerDeclarationHandler callback parameter for the Commissioner-Generated passcode commissioning flow.
+        _cppCastingPlayer->VerifyOrEstablishConnection(connectionCallbacks, timeout, idOptions);
     });
 }
 

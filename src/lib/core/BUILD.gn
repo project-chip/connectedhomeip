@@ -15,6 +15,7 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlio.gni")
+import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/build/chip/tests.gni")
@@ -103,6 +104,18 @@ source_set("error") {
     ":chip_config_header",
     "${chip_root}/src/lib/support:attributes",
     "${chip_root}/src/lib/support:type-traits",
+  ]
+}
+
+source_set("string-builder-adapters") {
+  sources = [
+    "StringBuilderAdapters.cpp",
+    "StringBuilderAdapters.h",
+  ]
+
+  public_deps = [
+    ":error",
+    "$dir_pw_string",
   ]
 }
 

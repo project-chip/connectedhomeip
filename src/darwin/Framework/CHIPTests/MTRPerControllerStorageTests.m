@@ -16,6 +16,8 @@
 
 #import <Matter/Matter.h>
 
+#import <os/lock.h>
+
 #import "MTRDeviceControllerLocalTestStorage.h"
 #import "MTRDeviceTestDelegate.h"
 #import "MTRDevice_Internal.h"
