@@ -41,7 +41,6 @@ class TestPairingSession : public PairingSession, public ::testing::Test
 public:
     static void SetUpTestSuite()
     {
-
         CHIP_ERROR error = chip::Platform::MemoryInit();
         ASSERT_EQ(error, CHIP_NO_ERROR);
     }
