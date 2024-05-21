@@ -18,6 +18,7 @@
 import copy
 import logging
 import queue
+import threading
 import time
 
 import chip.clusters as Clusters
@@ -90,12 +91,13 @@ class TC_IDM_4_3(MatterBaseTest):
                 # TestStep(21, "TH sends a subscription request to subscribe to all attributes from a specific cluster on all endpoints. AttributePath = [[Cluster = ClusterID]]. Set the MinIntervalFloor to some value say \"N\"(seconds). Change all or few of the attributes on the DUT",
                 #          "Verify that the DUT sends reports for all the attributes that have changed after N seconds.")
                 ]
-
+        
     @async_test_body
     async def test_TC_IDM_4_3(self):
 
         # Test setup
         node_label_attr = Clusters.BasicInformation.Attributes.NodeLabel
+        # node_label_attr = Clusters.OnOff
         node_label_attr_path = [(0, node_label_attr)]
         TH: ChipDeviceController = self.default_controller
 
@@ -107,9 +109,20 @@ class TC_IDM_4_3(MatterBaseTest):
         sub_th_step1a = await TH.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=node_label_attr_path,
-            reportInterval=(3, 10),
+            reportInterval=(3, 5),
             keepSubscriptions=False
         )
+                
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
 
         # Verify that the subscription is activated between TH and DUT
         # Verify on the TH, a report data message is received.
@@ -130,12 +143,12 @@ class TC_IDM_4_3(MatterBaseTest):
         # Turning on/off on a light bulb.
         self.step("1b")
 
-        # Modify attribute value
-        new_node_label_write = "NewNodeLabel_11001100"
-        await TH.WriteAttribute(
-            self.dut_node_id,
-            [(0, node_label_attr(value=new_node_label_write))]
-        )
+        # # Modify attribute value
+        # new_node_label_write = "NewNodeLabel_11001100"
+        # await TH.WriteAttribute(
+        #     self.dut_node_id,
+        #     [(0, node_label_attr(value=new_node_label_write))]
+        # )
 
 
 if __name__ == "__main__":
