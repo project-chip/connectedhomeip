@@ -56,6 +56,14 @@ class TC_IDM_4_2(MatterBaseTest):
             cluster=Clusters.Descriptor,
             attribute=Clusters.Descriptor.Attributes.ServerList
         )
+        
+    async def get_descriptor_parts_list(self, ctrl, ep=ROOT_NODE_ENDPOINT_ID):
+        return await self.read_single_attribute_check_success(
+            endpoint=ep,
+            dev_ctrl=ctrl,
+            cluster=Clusters.Descriptor,
+            attribute=Clusters.Descriptor.Attributes.PartsList
+        )        
 
     async def get_idle_mode_duration_sec(self, ctrl, ep=ROOT_NODE_ENDPOINT_ID):
         return await self.read_single_attribute_check_success(
@@ -203,7 +211,7 @@ class TC_IDM_4_2(MatterBaseTest):
         # *** Step 2 ***
         self.print_step(2, "CR1 sends a subscription message to the DUT with MaxIntervalCeiling set to a value less than subscription_max_interval_publisher_limit_sec. DUT sends a report data action to the CR1. CR1 sends a success status response to the DUT. DUT sends a Subscribe Response Message to the CR1 to activate the subscription.")
         min_interval_floor_sec = 1
-        max_interval_ceiling_sec = max(2, subscription_max_interval_publisher_limit_sec - 5)
+        max_interval_ceiling_sec = max(0, subscription_max_interval_publisher_limit_sec - 5)
         asserts.assert_greater(max_interval_ceiling_sec, min_interval_floor_sec,
                                "MaxIntervalCeiling must be greater than MinIntervalFloor")
 
@@ -315,11 +323,16 @@ class TC_IDM_4_2(MatterBaseTest):
         # *** Step 5 ***
         self.print_step(5, "Setup CR2 such that it does not have access to an Endpoint. CR2 sends a subscription request to subscribe to all attributes on all clusters on a specific Endpoint for which it does not have access.")
 
+        # Get first value of parts list for the endpoint
+        parts_list = await self.get_descriptor_parts_list(CR1)
+        asserts.assert_greater(len(parts_list), 0, "Parts list is empty.")
+        endpoint = parts_list[0]
+
         # Limited ACE for controller 2 with endpoint 1 access only to all clusters and all attributes
         CR2_limited_ace = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=1)],
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=endpoint)],
             subjects=[CR2_nodeid])
 
         # Restore original DUT ACL
