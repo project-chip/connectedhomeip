@@ -331,7 +331,7 @@ class AttributeChangeCallback:
             asserts.fail(f"Failed to receive a report for the attribute change for {self._expected_attribute}")
 
         asserts.assert_equal(path.AttributeType, self._expected_attribute,
-                            f"Received incorrect attribute report. Expected: {self._expected_attribute}, received: {path.AttributeType}")
+                             f"Received incorrect attribute report. Expected: {self._expected_attribute}, received: {path.AttributeType}")
         try:
             transaction.GetAttribute(path)
         except KeyError:
