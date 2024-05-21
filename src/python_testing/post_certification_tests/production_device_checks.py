@@ -22,6 +22,7 @@
 # - CD is valid and, signed by one of the known CSA signing certs and
 #   is marked as a production CD
 # - DCL entries for this device and vendor have all been registered
+# - DCL OTA entries have proper sizes and checksums
 # - TestEventTriggers have been turned off
 #
 # This test is performed over PASE on a factory reset device.
@@ -29,9 +30,11 @@
 # To run this test, first build and install the python chip wheel
 # files, then add the extra dependencies. From the root:
 #
+# . scripts/activate.sh
 # ./scripts/build_python.sh -i py
 # source py/bin/activate
 # pip install opencv-python requests click_option_group
+# python src/python_testing/post_certification_tests/production_device_checks.py
 
 import base64
 import hashlib
