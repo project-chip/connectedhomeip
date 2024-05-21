@@ -23,7 +23,6 @@
 
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/UnitTestContext.h>
 
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
@@ -67,8 +66,11 @@ public:
 
 struct TestMessageCounterManager : public chip::Test::LoopbackMessagingContext, public ::testing::Test
 {
-    static void SetUpTestSuite() { EXPECT_EQ(chip::Test::LoopbackTransportManager::Init(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { chip::Test::LoopbackTransportManager::Shutdown(); }
+    static void SetUpTestSuite() { chip::Test::LoopbackMessagingContext::SetUpTestSuite(); }
+    static void TearDownTestSuite() { chip::Test::LoopbackMessagingContext::TearDownTestSuite(); }
+
+    void SetUp() override { chip::Test::LoopbackMessagingContext::SetUp(); }
+    void TearDown() override { chip::Test::LoopbackMessagingContext::TearDown(); }
 };
 
 TEST_F(TestMessageCounterManager, MessageCounterSyncProcess)

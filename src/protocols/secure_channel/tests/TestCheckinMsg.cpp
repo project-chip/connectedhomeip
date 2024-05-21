@@ -36,23 +36,6 @@ using TestSessionKeystoreImpl = Crypto::DefaultSessionKeystore;
 
 namespace {
 
-class TestCheckInMsg : public ::testing::Test
-{
-public:
-    static void SetUpTestSuite()
-    {
-        CHIP_ERROR error = chip::Platform::MemoryInit();
-        EXPECT_EQ(error, CHIP_NO_ERROR);
-    }
-    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
-
-protected:
-    static CHIP_ERROR GenerateAndVerifyPayload(MutableByteSpan & output, const CheckIn_Message_test_vector & vector);
-
-    static CHIP_ERROR ParseAndVerifyPayload(MutableByteSpan & applicationData, const CheckIn_Message_test_vector & vector,
-                                            bool injectInvalidNonce);
-};
-
 /**
  * @brief Helper function that generates the Check-In message based on the test vector
  *        and verifies the generated Check-In message
@@ -61,7 +44,7 @@ protected:
  * @return CHIP_NO_ERROR if the generation was successful
  *         error code if the generation failed - see GenerateCheckinMessagePayload
  */
-CHIP_ERROR TestCheckInMsg::GenerateAndVerifyPayload(MutableByteSpan & output, const CheckIn_Message_test_vector & vector)
+CHIP_ERROR GenerateAndVerifyPayload(MutableByteSpan & output, const CheckIn_Message_test_vector & vector)
 {
     TestSessionKeystoreImpl keystore;
 
@@ -128,8 +111,8 @@ CHIP_ERROR TestCheckInMsg::GenerateAndVerifyPayload(MutableByteSpan & output, co
  * @return CHIP_NO_ERROR if the parsing was successful
  *         error code if the generation failed - see ParseCheckinMessagePayload
  */
-CHIP_ERROR TestCheckInMsg::ParseAndVerifyPayload(MutableByteSpan & applicationData, const CheckIn_Message_test_vector & vector,
-                                                 bool injectInvalidNonce)
+CHIP_ERROR ParseAndVerifyPayload(MutableByteSpan & applicationData, const CheckIn_Message_test_vector & vector,
+                                 bool injectInvalidNonce)
 {
     TestSessionKeystoreImpl keystore;
 
@@ -189,7 +172,7 @@ CHIP_ERROR TestCheckInMsg::ParseAndVerifyPayload(MutableByteSpan & applicationDa
 /**
  * @brief Test verifies that the Check-In message generation is successful when using an output size equal to the payload size
  */
-TEST_F(TestCheckInMsg, TestCheckinMessageGenerate_ValidInputsSameSizeOutputAsPayload)
+TEST(TestCheckInMsg, TestCheckinMessageGenerate_ValidInputsSameSizeOutputAsPayload)
 {
     int numOfTestCases = ArraySize(checkIn_message_test_vectors);
     for (int numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
@@ -210,7 +193,7 @@ TEST_F(TestCheckInMsg, TestCheckinMessageGenerate_ValidInputsSameSizeOutputAsPay
 /**
  * @brief Test verifies that the Check-In message generation is successful when using an output size greater than the payload size
  */
-TEST_F(TestCheckInMsg, TestCheckinMessageGenerate_ValidInputsBiggerSizeOutput)
+TEST(TestCheckInMsg, TestCheckinMessageGenerate_ValidInputsBiggerSizeOutput)
 {
     int numOfTestCases = ArraySize(checkIn_message_test_vectors);
     for (int numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
@@ -228,19 +211,19 @@ TEST_F(TestCheckInMsg, TestCheckinMessageGenerate_ValidInputsBiggerSizeOutput)
 /**
  * @brief Test verifies that the Check-In message generation returns an error if the output buffer is too small
  */
-TEST_F(TestCheckInMsg, TestCheckinMessageGenerate_ValidInputsTooSmallOutput)
+TEST(TestCheckInMsg, TestCheckinMessageGenerate_ValidInputsTooSmallOutput)
 {
     CheckIn_Message_test_vector vector = checkIn_message_test_vectors[0];
 
     // Create output buffer with 0 size
     MutableByteSpan output;
-    EXPECT_EQ(CHIP_ERROR_BUFFER_TOO_SMALL, GenerateAndVerifyPayload(output, vector));
+    EXPECT_EQ(GenerateAndVerifyPayload(output, vector), CHIP_ERROR_BUFFER_TOO_SMALL);
 }
 
 /**
  * @brief Test verifies that the Check-In Message generations returns an error if the AesKeyHandle is empty
  */
-TEST_F(TestCheckInMsg, TestCheckInMessageGenerate_EmptyAesKeyHandle)
+TEST(TestCheckInMsg, TestCheckInMessageGenerate_EmptyAesKeyHandle)
 {
     TestSessionKeystoreImpl keystore;
     CheckIn_Message_test_vector vector = checkIn_message_test_vectors[0];
@@ -282,7 +265,7 @@ TEST_F(TestCheckInMsg, TestCheckInMessageGenerate_EmptyAesKeyHandle)
 /**
  * @brief Test verifies that the Check-In Message generations returns an error if the HmacKeyHandle is empty
  */
-TEST_F(TestCheckInMsg, TestCheckInMessageGenerate_EmptyHmacKeyHandle)
+TEST(TestCheckInMsg, TestCheckInMessageGenerate_EmptyHmacKeyHandle)
 {
     TestSessionKeystoreImpl keystore;
     CheckIn_Message_test_vector vector = checkIn_message_test_vectors[0];
@@ -323,7 +306,7 @@ TEST_F(TestCheckInMsg, TestCheckInMessageGenerate_EmptyHmacKeyHandle)
 /**
  * @brief Test verifies that the Check-In message parsing succeeds with the Application buffer set to the minimum required size
  */
-TEST_F(TestCheckInMsg, TestCheckinMessageParse_ValidInputsSameSizeMinAppData)
+TEST(TestCheckInMsg, TestCheckinMessageParse_ValidInputsSameSizeMinAppData)
 {
     int numOfTestCases = ArraySize(checkIn_message_test_vectors);
     for (int numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
@@ -341,7 +324,7 @@ TEST_F(TestCheckInMsg, TestCheckinMessageParse_ValidInputsSameSizeMinAppData)
 /**
  * @brief Test verifies that the Check-In message parsing succeeds with the Application buffer set to a larger than necessary size
  */
-TEST_F(TestCheckInMsg, TestCheckinMessageParse_ValidInputsBiggerSizeMinAppData)
+TEST(TestCheckInMsg, TestCheckinMessageParse_ValidInputsBiggerSizeMinAppData)
 {
     int numOfTestCases = ArraySize(checkIn_message_test_vectors);
     for (int numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
@@ -358,20 +341,20 @@ TEST_F(TestCheckInMsg, TestCheckinMessageParse_ValidInputsBiggerSizeMinAppData)
 /**
  * @brief Test verifies that the Check-In message throws an error if the application data buffer is too small
  */
-TEST_F(TestCheckInMsg, TestCheckinMessageParse_ValidInputsTooSmallAppData)
+TEST(TestCheckInMsg, TestCheckinMessageParse_ValidInputsTooSmallAppData)
 {
     CheckIn_Message_test_vector vector = checkIn_message_test_vectors[0];
 
     // Create applicationData buffer with 0 size
     MutableByteSpan applicationData;
 
-    EXPECT_EQ(CHIP_ERROR_BUFFER_TOO_SMALL, ParseAndVerifyPayload(applicationData, vector, false));
+    EXPECT_EQ(ParseAndVerifyPayload(applicationData, vector, false), CHIP_ERROR_BUFFER_TOO_SMALL);
 }
 
 /**
  * @brief Test verifies that the Check-In Message parsing returns an error if the AesKeyHandle is empty
  */
-TEST_F(TestCheckInMsg, TestCheckInMessageParse_EmptyAesKeyHandle)
+TEST(TestCheckInMsg, TestCheckInMessageParse_EmptyAesKeyHandle)
 {
     TestSessionKeystoreImpl keystore;
     CheckIn_Message_test_vector vector = checkIn_message_test_vectors[0];
@@ -403,9 +386,9 @@ TEST_F(TestCheckInMsg, TestCheckInMessageParse_EmptyAesKeyHandle)
 */
 #if 0
     // Verify that the generation fails with an empty key handle
-    EXPECT_EQ(
-        CheckinMessage::ParseCheckinMessagePayload(aes128KeyHandle, hmac128KeyHandle, payload, decryptedCounter, applicationData),
-        CHIP_NO_ERROR);
+    EXPECT_NE(
+        CHIP_NO_ERROR,
+        CheckinMessage::ParseCheckinMessagePayload(aes128KeyHandle, hmac128KeyHandle, payload, decryptedCounter, applicationData));
 #endif
 
     // Clean up
@@ -415,7 +398,7 @@ TEST_F(TestCheckInMsg, TestCheckInMessageParse_EmptyAesKeyHandle)
 /**
  * @brief Test verifies that the Check-In Message parsing returns an error if the HmacKeyHandle is empty
  */
-TEST_F(TestCheckInMsg, TestCheckInMessageParse_EmptyHmacKeyHandle)
+TEST(TestCheckInMsg, TestCheckInMessageParse_EmptyHmacKeyHandle)
 {
     TestSessionKeystoreImpl keystore;
     CheckIn_Message_test_vector vector = checkIn_message_test_vectors[0];
@@ -447,9 +430,9 @@ TEST_F(TestCheckInMsg, TestCheckInMessageParse_EmptyHmacKeyHandle)
 */
 #if 0
     // Verify that the generation fails with an empty key handle
-    EXPECT_EQ(
-        CheckinMessage::ParseCheckinMessagePayload(aes128KeyHandle, hmac128KeyHandle, payload, decryptedCounter, applicationData),
-        CHIP_NO_ERROR);
+    EXPECT_NE(
+        CHIP_NO_ERROR,
+        CheckinMessage::ParseCheckinMessagePayload(aes128KeyHandle, hmac128KeyHandle, payload, decryptedCounter, applicationData));
 #endif
 
     // Clean up
@@ -459,7 +442,7 @@ TEST_F(TestCheckInMsg, TestCheckInMessageParse_EmptyHmacKeyHandle)
 /**
  * @brief Test verifies that the Check-In message processing throws an error if the nonce is corrupted
  */
-TEST_F(TestCheckInMsg, TestCheckinMessageParse_CorruptedNonce)
+TEST(TestCheckInMsg, TestCheckinMessageParse_CorruptedNonce)
 {
     int numOfTestCases = ArraySize(checkIn_message_test_vectors);
     for (int numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
@@ -478,7 +461,7 @@ TEST_F(TestCheckInMsg, TestCheckinMessageParse_CorruptedNonce)
  * @brief Test verifies that the Check-In message processing throws an error if the nonce was not calculated with the counter in the
  * payload
  */
-TEST_F(TestCheckInMsg, TestCheckinMessageParse_InvalidNonce)
+TEST(TestCheckInMsg, TestCheckinMessageParse_InvalidNonce)
 {
     CheckIn_Message_test_vector vector = invalidNonceVector;
 
@@ -486,13 +469,13 @@ TEST_F(TestCheckInMsg, TestCheckinMessageParse_InvalidNonce)
     MutableByteSpan applicationData(applicationDataBuffer, sizeof(applicationDataBuffer));
     applicationData.reduce_size(vector.application_data_len + sizeof(CounterType));
 
-    EXPECT_EQ(ParseAndVerifyPayload(applicationData, vector, false), CHIP_ERROR_INTERNAL);
+    EXPECT_EQ(ParseAndVerifyPayload(applicationData, vector, true), CHIP_ERROR_INTERNAL);
 }
 
 /**
  * @brief test verifies that GetAppDataSize returns the correct application data size
  */
-TEST_F(TestCheckInMsg, TestCheckInMessagePayloadSize)
+TEST(TestCheckInMsg, TestCheckInMessagePayloadSize)
 {
     int numOfTestCases = ArraySize(checkIn_message_test_vectors);
     for (int numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
@@ -510,13 +493,14 @@ TEST_F(TestCheckInMsg, TestCheckInMessagePayloadSize)
 /**
  * @brief test verifies that GetAppDataSize returns 0 if the payload is smaller that the minimum size
  */
-TEST_F(TestCheckInMsg, TestCheckInMessagePayloadSizeNullBuffer)
+TEST(TestCheckInMsg, TestCheckInMessagePayloadSizeNullBuffer)
 {
     ByteSpan payload;
     size_t calculated_size = CheckinMessage::GetAppDataSize(payload);
+    size_t expected_size   = 0;
 
     // Verify that the size is 0
-    EXPECT_EQ(calculated_size, 0u);
+    EXPECT_EQ(calculated_size, expected_size);
 }
 
 } // namespace
