@@ -43,7 +43,7 @@ public:
     {
 
         CHIP_ERROR error = chip::Platform::MemoryInit();
-        EXPECT_EQ(error, CHIP_NO_ERROR);
+        ASSERT_EQ(error, CHIP_NO_ERROR);
     }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
