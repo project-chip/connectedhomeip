@@ -436,5 +436,5 @@ void chip::NXP::App::AppTaskBase::PrintCurrentVersion()
     err = ConfigurationMgr().GetSoftwareVersion(currentVersion);
     ReturnOnFailure(err);
 
-    ChipLogProgress(DeviceLayer, "Current Software Version: %s, %lu", currentSoftwareVer, currentVersion);
+    ChipLogProgress(DeviceLayer, "Current Software Version: %s, %d", currentSoftwareVer, static_cast<int>(currentVersion));
 }
