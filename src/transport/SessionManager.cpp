@@ -478,7 +478,7 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
     {
         CHIP_ERROR err = mTransportMgr->SendMessage(*destination, std::move(msgBuf));
 #if CHIP_ERROR_LOGGING
-        if (err != CHIP_NO_ERROR)
+        if (!IsSuccess(err))
         {
             char addressStr[Transport::PeerAddress::kMaxToStringSize] = { 0 };
             destination->ToString(addressStr);
