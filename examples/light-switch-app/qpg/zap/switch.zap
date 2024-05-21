@@ -18,16 +18,16 @@
   ],
   "package": [
     {
-      "pathRelativity": "resolveEnvVars",
-      "path": "$CHIP_ROOT/src/app/zap-templates/zcl/zcl.json",
+      "pathRelativity": "relativeToZap",
+      "path": "../../../../src/app/zap-templates/zcl/zcl.json",
       "type": "zcl-properties",
       "category": "matter",
       "version": 1,
       "description": "Matter SDK ZCL data"
     },
     {
-      "pathRelativity": "resolveEnvVars",
-      "path": "$CHIP_ROOT/src/app/zap-templates/app-templates.json",
+      "pathRelativity": "relativeToZap",
+      "path": "../../../../src/app/zap-templates/app-templates.json",
       "type": "gen-templates-json",
       "version": "chip-v1"
     }

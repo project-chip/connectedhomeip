@@ -46,8 +46,7 @@ source_set("openthread_core_config_qpg") {
 }
 
 source_set("openthread_mbedtls_config_qpg") {
-  sources = [ # "${openthread_qpg_root}/third_party/Qorvo/repo/${openthread_qpg_family}/inc/${openthread_qpg_family}-mbedtls-config.h",
-              "${qpg_sdk_build_root}/repo/Libraries/Qorvo/mbedtls_alt/inc/${openthread_qpg_family}-mbedtls-config.h" ]
+  sources = [ "${qpg_sdk_build_root}/repo/Libraries/Qorvo/mbedtls_alt/inc/${openthread_qpg_family}-mbedtls-config.h" ]  # "${openthread_qpg_root}/third_party/Qorvo/repo/${openthread_qpg_family}/inc/${openthread_qpg_family}-mbedtls-config.h",
 }
 
 source_set("libopenthread-qpg") {

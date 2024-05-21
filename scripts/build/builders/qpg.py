@@ -88,6 +88,16 @@ class QpgBoard(Enum):
             raise Exception('Unknown board #: %r' % self)
 
 
+class QpgFlavour(Enum):
+    EXT_FLASH = 1
+
+    def GnFlavourName(self):
+        if self == QpgFlavour.EXT_FLASH:
+            return '_ext_flash'
+        else:
+            raise Exception('Unknown flavour #: %r' % self)
+
+
 class QpgBuilder(GnBuilder):
 
     def __init__(self,
@@ -95,6 +105,7 @@ class QpgBuilder(GnBuilder):
                  runner,
                  app: QpgApp = QpgApp.LIGHT,
                  board: QpgBoard = QpgBoard.QPG6105,
+                 flavour: QpgFlavour = QpgFlavour.EXT_FLASH,
                  enable_rpcs: bool = False,
                  update_image: bool = False):
         super(QpgBuilder, self).__init__(
@@ -102,11 +113,12 @@ class QpgBuilder(GnBuilder):
             runner=runner)
         self.app = app
         self.board = board
+        self.flavour = flavour
         self.enable_rpcs = enable_rpcs
         self.update_image = update_image
 
     def GnBuildArgs(self):
-        args = ['qpg_target_ic=\"%s\"' % self.board.GnArgName()]
+        args = ['qpg_target_ic=\"%s\" qpg_flavour=\"%s\"' % (self.board.GnArgName(), self.flavour.GnFlavourName())]
         if self.enable_rpcs:
             args.append('import("//with_pw_rpc.gni")')
         if self.update_image:
