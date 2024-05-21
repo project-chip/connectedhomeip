@@ -883,23 +883,19 @@ MTR_DIRECT_MEMBERS
 {
     assertChipStackLockedByCurrentThread();
 
-    if (!_advertiseOperational) {
-        // No need to reset anything; we are not advertising the things that
-        // would need to get reset.
-        return;
+    // If we're not advertising, then there's no need to reset anything.
+    VerifyOrReturn(_advertiseOperational);
+
+    // If there are no running controllers there will be no advertisements to reset.
+    {
+        std::lock_guard lock(_controllersLock);
+        VerifyOrReturn(_controllers.count > 0);
     }
 
-    std::lock_guard lock(_controllersLock);
-    if (_controllers.count != 0) {
-        // We have a running controller.  That means we likely need to reset
-        // operational advertising for that controller.
-
-        // StartServer() is the only API we have for resetting DNS-SD
-        // advertising.  It sure would be nice if there were a "restart"
-        // that was a no-op if the DNS-SD server was not already
-        // running.
-        app::DnssdServer::Instance().StartServer();
-    }
+    // StartServer() is the only API we have for resetting DNS-SD advertising.
+    // It sure would be nice if there were a "restart" that was a no-op if the
+    // DNS-SD server was not already running.
+    app::DnssdServer::Instance().StartServer();
 }
 
 - (void)controllerShuttingDown:(MTRDeviceController *)controller
@@ -1172,7 +1168,7 @@ MTR_DIRECT_MEMBERS
                           additionalRetransmitDelayMs:(nullable NSNumber *)additionalRetransmitDelayMs
 {
     [self _assertCurrentQueueIsNotMatterQueue];
-    dispatch_sync(_chipWorkQueue, ^{
+    dispatch_async(_chipWorkQueue, ^{
         bool resetAdvertising;
         if (idleRetransmitMs == nil && activeRetransmitMs == nil && activeThresholdMs == nil && additionalRetransmitDelayMs == nil) {
             Messaging::ReliableMessageMgr::SetAdditionalMRPBackoffTime(NullOptional);
