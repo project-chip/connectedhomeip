@@ -57,6 +57,8 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #endif
 
 #include "SilabsDeviceDataProvider.h"
+#include <app/server/Dnssd.h>
+#include <app/server/Server.h>
 #include <app/InteractionModelEngine.h>
 #include <app/TimerDelegates.h>
 
@@ -211,12 +213,18 @@ void SilabsMatterConfig::InitOTARequestorHandler(System::Layer * systemLayer, vo
 
 void SilabsMatterConfig::ConnectivityEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
-    // Initialize OTA only when Thread or WiFi connectivity is established
     if (((event->Type == DeviceEventType::kThreadConnectivityChange) &&
          (event->ThreadConnectivityChange.Result == kConnectivity_Established)) ||
         ((event->Type == DeviceEventType::kInternetConnectivityChange) &&
          (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)))
     {
+
+#if SL_WIFI
+        // Starting the MDNS server on the IP assignment
+        // TODO: Improve the connectivity event callback
+        chip::app::DnssdServer::Instance().StartServer(/*Dnssd::CommissioningMode::kEnabledBasic*/);
+#endif /* SL_WIFI */
+
 #if SILABS_OTA_ENABLED
         SILABS_LOG("Scheduling OTA Requestor initialization")
         chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec),
