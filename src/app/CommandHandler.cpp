@@ -944,7 +944,8 @@ CHIP_ERROR TestOnlyExtractCommandPathFromNextInvokeRequest(TLV::TLVReader & invo
     case CommandHandler::NlFaultInjectionType::SkipSecondResponse:
         return "Single InvokeResponseMessages. Dropping response to second request";
     }
-    VerifyOrDieWithMsg(false, DataManagement, "TH Failure: Unexpected fault type");
+    ChipLogError(DataManagement, "TH Failure: Unexpected fault type");
+    chipAbort();
 }
 
 } // anonymous namespace
