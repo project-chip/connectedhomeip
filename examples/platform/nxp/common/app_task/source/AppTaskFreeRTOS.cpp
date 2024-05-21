@@ -38,6 +38,10 @@
 #include "UserInterfaceFeedback.h"
 #endif
 
+#if CONFIG_ENABLE_PW_RPC
+#include "AppRpc.h"
+#endif
+
 #include <platform/CHIPDeviceLayer.h>
 
 #include <platform/internal/DeviceNetworkInfo.h>
@@ -107,6 +111,10 @@ CHIP_ERROR chip::NXP::App::AppTaskFreeRTOS::Start()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TaskHandle_t taskHandle;
+
+#if CONFIG_ENABLE_PW_RPC
+    chip::NXP::App::Rpc::Init();
+#endif
 
     appEventQueue = xQueueCreate(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent));
     if (appEventQueue == NULL)

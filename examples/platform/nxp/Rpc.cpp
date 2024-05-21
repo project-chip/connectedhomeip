@@ -43,8 +43,14 @@
 #include "pigweed/rpc_services/Locking.h"
 #endif // defined(PW_RPC_LOCKING_SERVICE) && PW_RPC_LOCKING_SERVICE
 
+#ifndef RPC_TASK_STACK_SIZE
 #define RPC_TASK_STACK_SIZE 2048
+#endif
+
+#ifndef RPC_TASK_PRIORITY
 #define RPC_TASK_PRIORITY 1
+#endif
+
 TaskHandle_t RpcTaskHandle;
 
 namespace chip {
