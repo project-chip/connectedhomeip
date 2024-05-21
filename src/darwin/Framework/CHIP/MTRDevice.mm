@@ -118,8 +118,8 @@ public:
         UnsolicitedMessageFromPublisherHandler unsolicitedMessageFromPublisherHandler, ReportBeginHandler reportBeginHandler,
         ReportEndHandler reportEndHandler)
         : MTRBaseSubscriptionCallback(attributeReportCallback, eventReportCallback, errorCallback, resubscriptionCallback,
-            subscriptionEstablishedHandler, onDoneHandler, unsolicitedMessageFromPublisherHandler, reportBeginHandler,
-            reportEndHandler)
+              subscriptionEstablishedHandler, onDoneHandler, unsolicitedMessageFromPublisherHandler, reportBeginHandler,
+              reportEndHandler)
     {
     }
 
@@ -442,7 +442,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         }
         _clusterDataToPersist = nil;
         _persistedClusters = [NSMutableSet set];
-        MTR_LOG_INFO("%@ init with hex nodeID 0x%016llX", self, _nodeID.unsignedLongLongValue);
+        MTR_LOG_DEBUG("%@ init with hex nodeID 0x%016llX", self, _nodeID.unsignedLongLongValue);
     }
     return self;
 }
@@ -1125,7 +1125,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
             [self _triggerResubscribeWithReason:"ResubscriptionNeeded timer fired" nodeLikelyReachable:NO];
         } errorHandler:^(NSError * _Nonnull error) {
             // If controller is not running, clear work item from the subscription queue
-            MTR_LOG_INFO("%@ could not dispatch to matter queue for resubscription - error %@", self, error);
+            MTR_LOG_ERROR("%@ could not dispatch to matter queue for resubscription - error %@", self, error);
             std::lock_guard lock(self->_lock);
             [self _clearSubscriptionPoolWork];
         }];
@@ -1554,7 +1554,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         dataVersions[path] = [self _clusterDataForPath:path].dataVersion;
     }
 
-    MTR_LOG_INFO("%@ _getCachedDataVersions dataVersions count: %lu", self, static_cast<unsigned long>(dataVersions.count));
+    MTR_LOG_DEBUG("%@ _getCachedDataVersions dataVersions count: %lu", self, static_cast<unsigned long>(dataVersions.count));
 
     return dataVersions;
 }
@@ -1644,7 +1644,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         // Get the required info before setting up the connectivity monitor
         NSNumber * compressedFabricID = [self->_deviceController syncGetCompressedFabricID];
         if (!compressedFabricID) {
-            MTR_LOG_INFO("%@ could not get compressed fabricID", self);
+            MTR_LOG_ERROR("%@ could not get compressed fabricID", self);
             return;
         }
 
@@ -1748,7 +1748,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
                            });
                        },
                        ^(NSError * error, NSNumber * resubscriptionDelayMs) {
-                           MTR_LOG_DEFAULT("%@ got resubscription error %@ delay %@", self, error, resubscriptionDelayMs);
+                           MTR_LOG_ERROR("%@ got resubscription error %@ delay %@", self, error, resubscriptionDelayMs);
                            dispatch_async(self.queue, ^{
                                // OnResubscriptionNeeded
                                [self _handleResubscriptionNeededWithDelay:resubscriptionDelayMs];
@@ -2099,14 +2099,14 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             while (readRequestsNext.count) {
                 // Can only read up to 9 paths at a time, per spec
                 if (readRequestsCurrent.count >= 9) {
-                    MTR_LOG_INFO("Batching read attribute work item [%llu]: cannot add more work, item is full [0x%016llX:%@:0x%llx:0x%llx]", workItemID, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
+                    MTR_LOG_ERROR("Batching read attribute work item [%llu]: cannot add more work, item is full [0x%016llX:%@:0x%llx:0x%llx]", workItemID, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
                     return outcome;
                 }
 
                 // if params don't match then they cannot be merged
                 if (![readRequestsNext[0][MTRDeviceReadRequestFieldParamsIndex]
                         isEqual:readRequestsCurrent[0][MTRDeviceReadRequestFieldParamsIndex]]) {
-                    MTR_LOG_INFO("Batching read attribute work item [%llu]: cannot add more work, parameter mismatch [0x%016llX:%@:0x%llx:0x%llx]", workItemID, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
+                    MTR_LOG_ERROR("Batching read attribute work item [%llu]: cannot add more work, parameter mismatch [0x%016llX:%@:0x%llx:0x%llx]", workItemID, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
                     return outcome;
                 }
 
@@ -2114,7 +2114,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 auto readItem = readRequestsNext.firstObject;
                 [readRequestsNext removeObjectAtIndex:0];
                 [readRequestsCurrent addObject:readItem];
-                MTR_LOG_INFO("Batching read attribute work item [%llu]: added %@ (now %tu requests total) [0x%016llX:%@:0x%llx:0x%llx]",
+                MTR_LOG_ERROR("Batching read attribute work item [%llu]: added %@ (now %tu requests total) [0x%016llX:%@:0x%llx:0x%llx]",
                     workItemID, readItem, readRequestsCurrent.count, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
                 outcome = MTRBatchedPartially;
             }
@@ -2252,7 +2252,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             // with the later one.
             if (![writeRequestsNext[0][MTRDeviceWriteRequestFieldPathIndex]
                     isEqual:writeRequestsCurrent[0][MTRDeviceWriteRequestFieldPathIndex]]) {
-                MTR_LOG_INFO("Batching write attribute work item [%llu]: cannot replace with next work item due to path mismatch", workItemID);
+                MTR_LOG_ERROR("Batching write attribute work item [%llu]: cannot replace with next work item due to path mismatch", workItemID);
                 return outcome;
             }
 
@@ -2759,7 +2759,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         if (attributeError) {
             shouldReportAttribute = YES;
             previousValue = [self _cachedAttributeValueForPath:attributePath];
-            MTR_LOG_INFO("%@ report %@ error %@ purge expected value %@ read cache %@", self, attributePath, attributeError,
+            MTR_LOG_ERROR("%@ report %@ error %@ purge expected value %@ read cache %@", self, attributePath, attributeError,
                 _expectedValueCache[attributePath], previousValue);
             _expectedValueCache[attributePath] = nil;
             // TODO: Is this clearing business really what we want?
@@ -2911,7 +2911,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (void)setPersistedDeviceData:(NSDictionary<NSString *, id> *)data
 {
-    MTR_LOG_INFO("%@ setPersistedDeviceData: %@", self, data);
+    MTR_LOG_DEBUG("%@ setPersistedDeviceData: %@", self, data);
 
     std::lock_guard lock(_lock);
 
