@@ -3202,7 +3202,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         wasOnDeviceConfigurationChangedCallbackCalled = YES;
     };
 
-    [device unitTestInjectAttributeReport:attributeReport];
+    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
 
     [testcase waitForExpectations:@[ gotAttributeReportExpectation, gotAttributeReportEndExpectation, deviceConfigurationChangedExpectation ] timeout:kTimeoutInSeconds];
     if (!expectConfigurationChanged) {
@@ -3530,7 +3530,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         [deviceConfigurationChangedExpectationForAttributeReportWithMultipleAttributes fulfill];
     };
 
-    [device unitTestInjectAttributeReport:attributeReport];
+    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
     [self waitForExpectations:@[ gotAttributeReportWithMultipleAttributesExpectation, gotAttributeReportWithMultipleAttributesEndExpectation, deviceConfigurationChangedExpectationForAttributeReportWithMultipleAttributes ] timeout:kTimeoutInSeconds];
 }
 
