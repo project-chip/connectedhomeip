@@ -120,7 +120,7 @@ JNI_METHOD(jobject, verifyOrEstablishConnection)
     matter::casting::core::ConnectionCallbacks connectionCallbacks;
     connectionCallbacks.mOnConnectionComplete = connectCallback;
 
-    castingPlayer->VerifyOrEstablishConnection(connectionCallbacks, static_cast<uint64_t>(commissioningWindowTimeoutSec),
+    castingPlayer->VerifyOrEstablishConnection(connectionCallbacks, static_cast<uint16_t>(commissioningWindowTimeoutSec),
                                                idOptions);
     return support::convertMatterErrorFromCppToJava(CHIP_NO_ERROR);
 }

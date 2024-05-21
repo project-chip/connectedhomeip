@@ -29,7 +29,7 @@ namespace core {
 
 CastingPlayer * CastingPlayer::mTargetCastingPlayer = nullptr;
 
-void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCallbacks, uint64_t commissioningWindowTimeoutSec,
+void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCallbacks, uint16_t commissioningWindowTimeoutSec,
                                                 IdentificationDeclarationOptions idOptions)
 {
     ChipLogProgress(AppServer, "CastingPlayer::VerifyOrEstablishConnection() called");
@@ -387,6 +387,26 @@ void CastingPlayer::LogDetail() const
     {
         ChipLogDetail(AppServer, "\tFabric Index: %u", mAttributes.fabricIndex);
     }
+}
+
+CastingPlayer::CastingPlayer(const CastingPlayer & other) :
+    mEndpoints(other.mEndpoints), mConnectionState(other.mConnectionState), mAttributes(other.mAttributes),
+    mIdOptions(other.mIdOptions), mCommissioningWindowTimeoutSec(other.mCommissioningWindowTimeoutSec),
+    mOnCompleted(other.mOnCompleted)
+{}
+
+CastingPlayer & CastingPlayer::operator=(const CastingPlayer & other)
+{
+    if (this != &other)
+    {
+        mAttributes                    = other.mAttributes;
+        mEndpoints                     = other.mEndpoints;
+        mConnectionState               = other.mConnectionState;
+        mIdOptions                     = other.mIdOptions;
+        mCommissioningWindowTimeoutSec = other.mCommissioningWindowTimeoutSec;
+        mOnCompleted                   = other.mOnCompleted;
+    }
+    return *this;
 }
 
 ConnectionContext::ConnectionContext(void * clientContext, core::CastingPlayer * targetCastingPlayer,
