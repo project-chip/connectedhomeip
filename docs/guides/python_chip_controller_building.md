@@ -14,7 +14,7 @@ command line.
 -   [Running the CHIP REPL](#running-the-chip-repl)
 -   [Using Python CHIP Controller REPL for Matter accessory testing](#using-python-chip-controller-repl-for-matter-accessory-testing)
 -   [List of commands](#list-of-commands)
--   [Explore Clusters, Attributes and Commands](#explore-clusters-attribtues-and-commands)
+-   [Explore Clusters, Attributes and Commands](#explore-clusters-attributes-and-commands)
 
 <hr>
 
