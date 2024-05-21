@@ -327,8 +327,9 @@ class CastingPlayerArrayAdapter extends ArrayAdapter<CastingPlayer> {
               TAG,
               "OnClickListener.onClick() called for CastingPlayer with deviceId: "
                   + castingPlayer.getDeviceId());
-          DiscoveryExampleFragment.Callback callback1 = (DiscoveryExampleFragment.Callback) context;
-          callback1.handleConnectionButtonClicked(castingPlayer);
+          DiscoveryExampleFragment.Callback onClickCallback =
+              (DiscoveryExampleFragment.Callback) context;
+          onClickCallback.handleConnectionButtonClicked(castingPlayer);
         };
     playerDescription.setOnClickListener(clickListener);
     return view;

@@ -24,20 +24,27 @@ RUN set -x \
     && rm -rf ../../gcc_build \
     && : # last line
 
+    RUN set -x \
+    && ! test -f /opt/nuttx/gcc-13/bin/cc \
+    && ln -s /opt/nuttx/gcc-13/bin/gcc /opt/nuttx/gcc-13/bin/cc \
+    && : # last line
+
 # ------------------------------------------------------------------------------
 # Download NuttX SDK
 RUN set -x \
     && cd /opt/nuttx \
     && rm -rf nuttx \
-    && wget -q -O nuttx.zip https://codeload.github.com/apache/nuttx/zip/ce61e866 \
+    && wget -q -O nuttx.zip https://codeload.github.com/apache/nuttx/zip/6e941aed \
     && unzip -q nuttx.zip \
-    && mv nuttx-ce61e866 nuttx \
-    && rm nuttx.zip
+    && mv nuttx-6e941aed nuttx \
+    && rm nuttx.zip \
+    && : # last line
 
 RUN set -x \
     && cd /opt/nuttx \
     && rm -rf apps \
-    && wget -q -O nuttx_app.zip https://codeload.github.com/apache/nuttx-apps/zip/e2805fc9 \
+    && wget -q -O nuttx_app.zip https://codeload.github.com/apache/nuttx-apps/zip/c6051e4c \
     && unzip -q nuttx_app.zip \
-    && mv nuttx-apps-e2805fc9 apps \
-    && rm nuttx_app.zip
+    && mv nuttx-apps-c6051e4c apps \
+    && rm nuttx_app.zip \
+    && : # last line

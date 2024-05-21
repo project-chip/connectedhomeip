@@ -102,20 +102,17 @@ def TestDatamodel(test: BaseTestHelper, device_nodeid: int):
     logger.info("Testing datamodel functions")
 
     logger.info("Testing on off cluster")
-    FailIfNot(test.TestOnOffCluster(nodeid=device_nodeid,
-                                    endpoint=LIGHTING_ENDPOINT_ID,
-                                    group=GROUP_ID), "Failed to test on off cluster")
+    FailIfNot(asyncio.run(test.TestOnOffCluster(nodeid=device_nodeid,
+                                                endpoint=LIGHTING_ENDPOINT_ID)), "Failed to test on off cluster")
 
     logger.info("Testing level control cluster")
-    FailIfNot(test.TestLevelControlCluster(nodeid=device_nodeid,
-                                           endpoint=LIGHTING_ENDPOINT_ID,
-                                           group=GROUP_ID),
+    FailIfNot(asyncio.run(test.TestLevelControlCluster(nodeid=device_nodeid,
+                                                       endpoint=LIGHTING_ENDPOINT_ID)),
               "Failed to test level control cluster")
 
     logger.info("Testing sending commands to non exist endpoint")
-    FailIfNot(not test.TestOnOffCluster(nodeid=device_nodeid,
-                                        endpoint=233,
-                                        group=GROUP_ID), "Failed to test on off cluster on non-exist endpoint")
+    FailIfNot(not asyncio.run(test.TestOnOffCluster(nodeid=device_nodeid,
+                                                    endpoint=233)), "Failed to test on off cluster on non-exist endpoint")
 
     # Test experimental Python cluster objects API
     logger.info("Testing cluster objects API")
@@ -123,29 +120,26 @@ def TestDatamodel(test: BaseTestHelper, device_nodeid: int):
               "Failed when testing Python Cluster Object APIs")
 
     logger.info("Testing attribute reading")
-    FailIfNot(test.TestReadBasicAttributes(nodeid=device_nodeid,
-                                           endpoint=ENDPOINT_ID,
-                                           group=GROUP_ID),
+    FailIfNot(asyncio.run(test.TestReadBasicAttributes(nodeid=device_nodeid,
+                                                       endpoint=ENDPOINT_ID)),
               "Failed to test Read Basic Attributes")
 
     logger.info("Testing attribute writing")
-    FailIfNot(test.TestWriteBasicAttributes(nodeid=device_nodeid,
-                                            endpoint=ENDPOINT_ID,
-                                            group=GROUP_ID),
+    FailIfNot(asyncio.run(test.TestWriteBasicAttributes(nodeid=device_nodeid,
+                                                        endpoint=ENDPOINT_ID)),
               "Failed to test Write Basic Attributes")
 
     logger.info("Testing attribute reading basic again")
-    FailIfNot(test.TestReadBasicAttributes(nodeid=1,
-                                           endpoint=ENDPOINT_ID,
-                                           group=GROUP_ID),
+    FailIfNot(asyncio.run(test.TestReadBasicAttributes(nodeid=1,
+                                                       endpoint=ENDPOINT_ID)),
               "Failed to test Read Basic Attributes")
 
     logger.info("Testing subscription")
-    FailIfNot(test.TestSubscription(nodeid=device_nodeid, endpoint=LIGHTING_ENDPOINT_ID),
+    FailIfNot(asyncio.run(test.TestSubscription(nodeid=device_nodeid, endpoint=LIGHTING_ENDPOINT_ID)),
               "Failed to subscribe attributes.")
 
     logger.info("Testing another subscription that kills previous subscriptions")
-    FailIfNot(test.TestSubscription(nodeid=device_nodeid, endpoint=LIGHTING_ENDPOINT_ID),
+    FailIfNot(asyncio.run(test.TestSubscription(nodeid=device_nodeid, endpoint=LIGHTING_ENDPOINT_ID)),
               "Failed to subscribe attributes.")
 
     logger.info("Testing re-subscription")
@@ -153,9 +147,8 @@ def TestDatamodel(test: BaseTestHelper, device_nodeid: int):
               "Failed to validated re-subscription")
 
     logger.info("Testing on off cluster over resolved connection")
-    FailIfNot(test.TestOnOffCluster(nodeid=device_nodeid,
-                                    endpoint=LIGHTING_ENDPOINT_ID,
-                                    group=GROUP_ID), "Failed to test on off cluster")
+    FailIfNot(asyncio.run(test.TestOnOffCluster(nodeid=device_nodeid,
+                                                endpoint=LIGHTING_ENDPOINT_ID)), "Failed to test on off cluster")
 
     logger.info("Testing writing/reading fabric sensitive data")
     asyncio.run(test.TestFabricSensitive(nodeid=device_nodeid))

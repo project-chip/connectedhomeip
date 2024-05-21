@@ -91,7 +91,8 @@ class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public ReadHandler::ManagementCallback,
                                public FabricTable::Delegate,
                                public SubscriptionsInfoProvider,
-                               public TimedHandlerDelegate
+                               public TimedHandlerDelegate,
+                               public WriteHandlerDelegate
 {
 public:
     /**
@@ -192,11 +193,6 @@ public:
      */
     WriteHandler * ActiveWriteHandlerAt(unsigned int aIndex);
 
-    /**
-     * The Magic number of this InteractionModelEngine, the magic number is set during Init()
-     */
-    uint32_t GetMagicNumber() const { return mMagic; }
-
     reporting::Engine & GetReportingEngine() { return mReportingEngine; }
 
     reporting::ReportScheduler * GetReportScheduler() { return mReportScheduler; }
@@ -239,6 +235,9 @@ public:
                        const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) override;
     void OnTimedWrite(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) override;
+
+    // WriteHandlerDelegate implementation
+    bool HasConflictWriteRequests(const WriteHandler * apWriteHandler, const ConcreteAttributePath & apath) override;
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     /**
@@ -283,12 +282,6 @@ public:
      * Returns the number of dirty subscriptions. Including the subscriptions that are generating reports.
      */
     size_t GetNumDirtySubscriptions() const;
-
-    /**
-     * Returns whether the write operation to the given path is conflict with another write operations. (i.e. another write
-     * transaction is in the middle of processing the chunked value of the given path.)
-     */
-    bool HasConflictWriteRequests(const WriteHandler * apWriteHandler, const ConcreteAttributePath & aPath);
 
     /**
      * Select the oldest (and the one that exceeds the per subscription resource minimum if there are any) read handler on the
@@ -706,10 +699,6 @@ private:
     CASESessionManager * mpCASESessionMgr = nullptr;
 
     SubscriptionResumptionStorage * mpSubscriptionResumptionStorage = nullptr;
-
-    // A magic number for tracking values between stack Shutdown()-s and Init()-s.
-    // An ObjectHandle is valid iff. its magic equals to this one.
-    uint32_t mMagic = 0;
 };
 
 } // namespace app

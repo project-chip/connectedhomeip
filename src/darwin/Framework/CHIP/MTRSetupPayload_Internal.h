@@ -19,18 +19,17 @@
 
 #import "MTRDefines_Internal.h"
 
-#ifdef __cplusplus
-#import <lib/core/Optional.h>
 #import <setup_payload/SetupPayload.h>
-#endif
+
+NS_ASSUME_NONNULL_BEGIN
 
 MTR_DIRECT_MEMBERS
 @interface MTRSetupPayload ()
 
-#ifdef __cplusplus
 - (instancetype)initWithSetupPayload:(chip::SetupPayload)setupPayload;
-- (MTRDiscoveryCapabilities)convertRendezvousFlags:(const chip::Optional<chip::RendezvousInformationFlags> &)value;
-- (MTRCommissioningFlow)convertCommissioningFlow:(chip::CommissioningFlow)value;
-#endif
+- (nullable instancetype)initWithQRCode:(NSString *)qrCodePayload;
+- (nullable instancetype)initWithManualPairingCode:(NSString *)manualCode;
 
 @end
+
+NS_ASSUME_NONNULL_END

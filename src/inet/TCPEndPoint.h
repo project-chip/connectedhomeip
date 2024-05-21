@@ -38,10 +38,6 @@
 
 namespace chip {
 
-namespace Transport {
-class TCPTest;
-};
-
 namespace Inet {
 
 class TCPTest;
@@ -529,7 +525,6 @@ public:
     constexpr static size_t kMaxReceiveMessageSize = System::PacketBuffer::kMaxSizeWithoutReserve;
 
 protected:
-    friend class ::chip::Transport::TCPTest;
     friend class TCPTest;
 
     TCPEndPoint(EndPointManager<TCPEndPoint> & endPointManager) :

@@ -103,3 +103,9 @@ void ModelCommand::CheckPeerICDType()
         }
     }
 }
+
+bool ModelCommand::IsPeerLIT()
+{
+    CheckPeerICDType();
+    return mIsPeerLIT.ValueOr(false);
+}

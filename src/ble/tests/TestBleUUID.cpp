@@ -34,6 +34,12 @@ using namespace chip::Ble;
 
 namespace {
 
+TEST(TestBleUUID, CheckUUIDsMatch_NULL)
+{
+    // Test that NULL pointer UUIDs are not equal
+    EXPECT_FALSE(UUIDsMatch(nullptr, nullptr));
+}
+
 TEST(TestBleUUID, CheckStringToUUID_ChipUUID)
 {
     // Test positive scenario - CHIP Service UUID

@@ -178,6 +178,6 @@ private fun populateTLVBits(
 
   for (i in 0 until tlvBufSizeInBytes) {
     val value = tlvBuf[i]
-    populateBits(bits, offset, value.toLong(), 8, totalPayloadDataSizeInBits)
+    populateBits(bits, offset, value.toUByte().toLong(), 8, totalPayloadDataSizeInBits)
   }
 }

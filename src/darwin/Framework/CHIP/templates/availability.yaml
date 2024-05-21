@@ -8509,12 +8509,19 @@
               ContentLaunchStatusEnum:
                   - URLNotAvailable
 
-- release: "Future"
-  versions: "future"
+- release: "Middle of 2024"
+  versions:
+      iOS: "17.6"
+      macOS: "14.6"
+      watchOS: "10.6"
+      tvOS: "17.6"
   introduced:
       clusters:
           - ActivatedCarbonFilterMonitoring
           - AirQuality
+          - BooleanStateConfiguration
+          - ElectricalEnergyMeasurement
+          - ElectricalPowerMeasurement
           - HEPAFilterMonitoring
           - SmokeCOAlarm
           # Concentration Measurement clusters
@@ -8528,6 +8535,7 @@
           - PM25ConcentrationMeasurement
           - RadonConcentrationMeasurement
           - TotalVolatileOrganicCompoundsConcentrationMeasurement
+          - ValveConfigurationAndControl
       attributes:
           ActivatedCarbonFilterMonitoring:
               - Condition
@@ -8543,6 +8551,57 @@
               - ClusterRevision
           AirQuality:
               - AirQuality
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          BooleanStateConfiguration:
+              - CurrentSensitivityLevel
+              - SupportedSensitivityLevels
+              - DefaultSensitivityLevel
+              - AlarmsActive
+              - AlarmsSuppressed
+              - AlarmsEnabled
+              - AlarmsSupported
+              - SensorFault
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          ElectricalEnergyMeasurement:
+              - Accuracy
+              - CumulativeEnergyImported
+              - CumulativeEnergyExported
+              - PeriodicEnergyImported
+              - PeriodicEnergyExported
+              - CumulativeEnergyReset
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          ElectricalPowerMeasurement:
+              - PowerMode
+              - NumberOfMeasurementTypes
+              - Accuracy
+              - Ranges
+              - Voltage
+              - ActiveCurrent
+              - ReactiveCurrent
+              - ApparentCurrent
+              - ActivePower
+              - ReactivePower
+              - ApparentPower
+              - RMSVoltage
+              - RMSCurrent
+              - RMSPower
+              - Frequency
+              - HarmonicCurrents
+              - HarmonicPhases
+              - PowerFactor
+              - NeutralCurrent
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
@@ -8751,7 +8810,27 @@
               - AttributeList
               - FeatureMap
               - ClusterRevision
+          ValveConfigurationAndControl:
+              - OpenDuration
+              - DefaultOpenDuration
+              - AutoCloseTime
+              - RemainingDuration
+              - CurrentState
+              - TargetState
+              - CurrentLevel
+              - TargetLevel
+              - DefaultOpenLevel
+              - ValveFault
+              - LevelStep
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
       commands:
+          BooleanStateConfiguration:
+              - SuppressAlarm
+              - EnableDisableAlarm
           ActivatedCarbonFilterMonitoring:
               - ResetCondition
           FanControl:
@@ -8760,15 +8839,36 @@
               - ResetCondition
           SmokeCOAlarm:
               - SelfTestRequest
+          ValveConfigurationAndControl:
+              - Open
+              - Close
       command fields:
+          BooleanStateConfiguration:
+              SuppressAlarm:
+                  - alarmsToSuppress
+              EnableDisableAlarm:
+                  - alarmsToEnableDisable
           FanControl:
               Step:
                   - direction
                   - wrap
                   - lowestOff
+          ValveConfigurationAndControl:
+              Open:
+                  - openDuration
+                  - targetLevel
       structs:
           ActivatedCarbonFilterMonitoring:
               - ReplacementProductStruct
+          ElectricalEnergyMeasurement:
+              - EnergyMeasurementStruct
+              - CumulativeEnergyResetStruct
+              - MeasurementAccuracyStruct
+          ElectricalPowerMeasurement:
+              - HarmonicMeasurementStruct
+              - MeasurementRangeStruct
+              - MeasurementAccuracyRangeStruct
+              - MeasurementAccuracyStruct
           HEPAFilterMonitoring:
               - ReplacementProductStruct
       struct fields:
@@ -8776,11 +8876,77 @@
               ReplacementProductStruct:
                   - productIdentifierType
                   - productIdentifierValue
+          ElectricalEnergyMeasurement:
+              EnergyMeasurementStruct:
+                  - energy
+                  - startTimestamp
+                  - endTimestamp
+                  - startSystime
+                  - endSystime
+              CumulativeEnergyResetStruct:
+                  - importedResetTimestamp
+                  - exportedResetTimestamp
+                  - importedResetSystime
+                  - exportedResetSystime
+              MeasurementAccuracyStruct:
+                  - measurementType
+                  - measured
+                  - minMeasuredValue
+                  - maxMeasuredValue
+                  - accuracyRanges
+              MeasurementAccuracyRangeStruct:
+                  - rangeMin
+                  - rangeMax
+                  - percentMax
+                  - percentMin
+                  - percentTypical
+                  - fixedMax
+                  - fixedMin
+                  - fixedTypical
+          ElectricalPowerMeasurement:
+              MeasurementRangeStruct:
+                  - measurementType
+                  - min
+                  - max
+                  - startTimestamp
+                  - endTimestamp
+                  - minTimestamp
+                  - maxTimestamp
+                  - startSystime
+                  - endSystime
+                  - minSystime
+                  - maxSystime
+              HarmonicMeasurementStruct:
+                  - order
+                  - measurement
+              MeasurementAccuracyStruct:
+                  - measurementType
+                  - measured
+                  - minMeasuredValue
+                  - maxMeasuredValue
+                  - accuracyRanges
+              MeasurementAccuracyRangeStruct:
+                  - rangeMin
+                  - rangeMax
+                  - percentMax
+                  - percentMin
+                  - percentTypical
+                  - fixedMax
+                  - fixedMin
+                  - fixedTypical
           HEPAFilterMonitoring:
               ReplacementProductStruct:
                   - productIdentifierType
                   - productIdentifierValue
       events:
+          BooleanStateConfiguration:
+              - AlarmsStateChanged
+              - SensorFault
+          ElectricalEnergyMeasurement:
+              - CumulativeEnergyMeasured
+              - PeriodicEnergyMeasured
+          ElectricalPowerMeasurement:
+              - MeasurementPeriodRanges
           SmokeCOAlarm:
               - SmokeAlarm
               - COAlarm
@@ -8793,7 +8959,26 @@
               - InterconnectSmokeAlarm
               - InterconnectCOAlarm
               - AllClear
+          ValveConfigurationAndControl:
+              - ValveStateChanged
+              - ValveFault
       event fields:
+          BooleanStateConfiguration:
+              AlarmsStateChanged:
+                  - alarmsActive
+                  - alarmsSuppressed
+              SensorFault:
+                  - sensorFault
+          ElectricalEnergyMeasurement:
+              CumulativeEnergyMeasured:
+                  - energyImported
+                  - energyExported
+              PeriodicEnergyMeasured:
+                  - energyImported
+                  - energyExported
+          ElectricalPowerMeasurement:
+              MeasurementPeriodRanges:
+                  - ranges
           SmokeCOAlarm:
               SmokeAlarm:
                   - alarmSeverityLevel
@@ -8805,6 +8990,12 @@
                   - alarmSeverityLevel
               InterconnectCOAlarm:
                   - alarmSeverityLevel
+          ValveConfigurationAndControl:
+              ValveStateChanged:
+                  - valveState
+                  - valveLevel
+              ValveFault:
+                  - valveFault
       enums:
           ActivatedCarbonFilterMonitoring:
               - DegradationDirectionEnum
@@ -8812,6 +9003,9 @@
               - ProductIdentifierTypeEnum
           AirQuality:
               - AirQualityEnum
+          ElectricalPowerMeasurement:
+              - PowerModeEnum
+              - MeasurementTypeEnum
           FanControl:
               - StepDirectionEnum
               - AirflowDirectionEnum
@@ -8866,6 +9060,9 @@
               - MeasurementUnitEnum
               - MeasurementMediumEnum
               - LevelValueEnum
+          ValveConfigurationAndControl:
+              - ValveStateEnum
+              - StatusCodeEnum
       enum values:
           ActivatedCarbonFilterMonitoring:
               DegradationDirectionEnum:
@@ -8890,6 +9087,28 @@
                   - Poor
                   - VeryPoor
                   - ExtremelyPoor
+          ElectricalPowerMeasurement:
+              PowerModeEnum:
+                  - Unknown
+                  - DC
+                  - AC
+              MeasurementTypeEnum:
+                  - Unspecified
+                  - Voltage
+                  - ActiveCurrent
+                  - ReactiveCurrent
+                  - ApparentCurrent
+                  - ActivePower
+                  - ReactivePower
+                  - ApparentPower
+                  - RMSVoltage
+                  - RMSCurrent
+                  - RMSPower
+                  - Frequency
+                  - PowerFactor
+                  - NeutralCurrent
+                  - ElectricalEnergy
+
           FanControl:
               StepDirectionEnum:
                   - Increase
@@ -9141,10 +9360,25 @@
                   - Medium
                   - High
                   - Critical
+          ValveConfigurationAndControl:
+              ValveStateEnum:
+                  - Closed
+                  - Open
+                  - Transitioning
+              StatusCodeEnum:
+                  - FailureDueToFault
       bitmaps:
           ActivatedCarbonFilterMonitoring:
               - Feature
           AirQuality:
+              - Feature
+          BooleanStateConfiguration:
+              - Feature
+              - AlarmModeBitmap
+              - SensorFaultBitmap
+          ElectricalEnergyMeasurement:
+              - Feature
+          ElectricalPowerMeasurement:
               - Feature
           HEPAFilterMonitoring:
               - Feature
@@ -9170,6 +9404,9 @@
               - Feature
           TotalVolatileOrganicCompoundsConcentrationMeasurement:
               - Feature
+          ValveConfigurationAndControl:
+              - Feature
+              - ValveFaultBitmap
       bitmap values:
           ActivatedCarbonFilterMonitoring:
               Feature:
@@ -9182,6 +9419,30 @@
                   - Moderate
                   - VeryPoor
                   - ExtremelyPoor
+          BooleanStateConfiguration:
+              Feature:
+                  - Visual
+                  - Audible
+                  - AlarmSuppress
+                  - SensitivityLevel
+              AlarmModeBitmap:
+                  - Visual
+                  - Audible
+              SensorFaultBitmap:
+                  - GeneralFault
+          ElectricalEnergyMeasurement:
+              Feature:
+                  - ImportedEnergy
+                  - ExportedEnergy
+                  - CumulativeEnergy
+                  - PeriodicEnergy
+          ElectricalPowerMeasurement:
+              Feature:
+                  - DirectCurrent
+                  - AlternatingCurrent
+                  - PolyphasePower
+                  - Harmonics
+                  - PowerQuality
           HEPAFilterMonitoring:
               Feature:
                   - Condition
@@ -9275,13 +9536,23 @@
                   - CriticalLevel
                   - PeakMeasurement
                   - AverageMeasurement
+          ValveConfigurationAndControl:
+              Feature:
+                  - TimeSync
+                  - Level
+              ValveFaultBitmap:
+                  - GeneralFault
+                  - Blocked
+                  - Leaking
+                  - NotConnected
+                  - ShortCircuit
+                  - CurrentExceeded
   provisional:
       clusters:
           # Targeting Spring 2024 Matter release
           - EnergyEVSEMode
           - DeviceEnergyManagementMode
           - Messages
-          - ElectricalPowerMeasurement
           - PowerTopology
       attributes:
           DoorLock:
@@ -9413,3 +9684,6 @@
                   # Not really part of the spec, need to think about whether to
                   # expose this.
                   - NoFeatures
+
+- release: "Future"
+  versions: "future"

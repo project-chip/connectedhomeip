@@ -33,6 +33,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
+#import <os/lock.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 // TODO: These attribute-*.h and AttributeAccessInterfaceRegistry.h bits are a hack that should eventually go away.

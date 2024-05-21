@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -40,6 +40,8 @@
     XCTAssertEqual(payload.commissioningFlow, MTRCommissioningFlowCustom);
     XCTAssertEqual(payload.version.unsignedIntegerValue, 0);
     XCTAssertEqual(payload.discoveryCapabilities, MTRDiscoveryCapabilitiesUnknown);
+
+    XCTAssertEqualObjects(payload.manualEntryCode, @"641286075300001000016");
 }
 
 - (void)testOnboardingPayloadParser_QRCode_NoError
@@ -90,31 +92,13 @@
     XCTAssertEqual(payload.discoveryCapabilities, MTRDiscoveryCapabilitiesSoftAP);
 }
 
-- (void)testManualParser
-{
-    NSError * error;
-    MTRSetupPayload * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:@"641286075300001000016" error:&error];
-
-    XCTAssertNotNil(payload);
-    XCTAssertNil(error);
-
-    XCTAssertTrue(payload.hasShortDiscriminator);
-    XCTAssertEqual(payload.discriminator.unsignedIntegerValue, 10);
-    XCTAssertEqual(payload.setupPasscode.unsignedIntegerValue, 12345670);
-    XCTAssertEqual(payload.vendorID.unsignedIntegerValue, 1);
-    XCTAssertEqual(payload.productID.unsignedIntegerValue, 1);
-    XCTAssertEqual(payload.commissioningFlow, MTRCommissioningFlowCustom);
-    XCTAssertEqual(payload.version.unsignedIntegerValue, 0);
-    XCTAssertEqual(payload.discoveryCapabilities, MTRDiscoveryCapabilitiesUnknown);
-}
-
 - (void)testManualParser_Error
 {
     NSError * error;
     MTRSetupPayload * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:@"" error:&error];
 
     XCTAssertNil(payload);
-    XCTAssertEqual(error.code, MTRErrorCodeInvalidStringLength);
+    XCTAssertNotNil(error);
 }
 
 - (void)testQRCodeParser_Error
@@ -123,7 +107,7 @@
     MTRSetupPayload * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:@"MT:M5L90MP500K64J0000." error:&error];
 
     XCTAssertNil(payload);
-    XCTAssertEqual(error.code, MTRErrorCodeInvalidArgument);
+    XCTAssertNotNil(error);
 }
 
 - (void)testQRCodeParser
@@ -178,6 +162,62 @@
             XCTAssertEqual(info.integerValue.intValue, 12);
         }
     }
+
+    // Test access by tag
+    XCTAssertEqualObjects([payload vendorElementWithTag:@130].stringValue, @"myData");
+    XCTAssertEqualObjects([payload vendorElementWithTag:@131].integerValue, @12);
+}
+
+- (void)testAddVendorElement
+{
+    MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithSetupPasscode:@314159 discriminator:@555];
+    XCTAssertEqual(payload.vendorElements.count, 0);
+    [payload addOrReplaceVendorElement:[[MTROptionalQRCodeInfo alloc] initWithTag:@0xff int32Value:42]];
+    XCTAssertEqual(payload.vendorElements.count, 1);
+    XCTAssertEqualObjects(payload.vendorElements.firstObject.integerValue, @42);
+    XCTAssertEqualObjects([payload vendorElementWithTag:@0xff].integerValue, @42);
+}
+
+- (void)testVendorElementsEncodedToQRCode
+{
+    MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithSetupPasscode:@314159 discriminator:@555];
+    [payload addOrReplaceVendorElement:[[MTROptionalQRCodeInfo alloc] initWithTag:@0x80 stringValue:@"Hello"]];
+    MTRSetupPayload * decoded = [[MTRSetupPayload alloc] initWithPayload:payload.qrCodeString];
+    XCTAssertNotNil(decoded);
+    XCTAssertEqualObjects([decoded vendorElementWithTag:@0x80].stringValue, @"Hello");
+}
+
+- (void)testRemoveVendorElements
+{
+    MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithPayload:@"MT:M5L90MP500K64J0A33P0SET70.QT52B.E23-WZE0WISA0DK5N1K8SQ1RYCU1O0"];
+    XCTAssertNotNil(payload);
+    XCTAssertEqual(payload.vendorElements.count, 2);
+    [payload removeVendorElementWithTag:@128]; // no change, no vendor element present with this tag
+    XCTAssertEqual(payload.vendorElements.count, 2);
+    [payload removeVendorElementWithTag:@130];
+    XCTAssertEqual(payload.vendorElements.count, 1);
+    [payload removeVendorElementWithTag:@131];
+    XCTAssertEqual(payload.vendorElements.count, 0);
+}
+
+- (void)testQrCodeInfoCopyAndEquality
+{
+    MTROptionalQRCodeInfo * a = [[MTROptionalQRCodeInfo alloc] initWithTag:@0x88 stringValue:@"hello"];
+    MTROptionalQRCodeInfo * b = [[MTROptionalQRCodeInfo alloc] initWithTag:@0x88 stringValue:@"hello"];
+    MTROptionalQRCodeInfo * c = [[MTROptionalQRCodeInfo alloc] initWithTag:@0xff stringValue:@"hello"];
+    MTROptionalQRCodeInfo * d = [[MTROptionalQRCodeInfo alloc] initWithTag:@0x88 int32Value:42];
+    MTROptionalQRCodeInfo * e = [[MTROptionalQRCodeInfo alloc] initWithTag:@0x88 int32Value:0xbad];
+    XCTAssertTrue([a isEqual:a]);
+    XCTAssertTrue([a isEqual:[a copy]]);
+    XCTAssertTrue([a isEqual:b]);
+    XCTAssertTrue([a isEqual:[b copy]]);
+    XCTAssertEqual(a.hash, b.hash);
+    XCTAssertEqual(a.hash, [[a copy] hash]);
+    XCTAssertFalse([a isEqual:nil]);
+    XCTAssertFalse([a isEqual:c]);
+    XCTAssertFalse([a isEqual:d]);
+    XCTAssertFalse([a isEqual:e]);
+    XCTAssertFalse([d isEqual:e]);
 }
 
 - (void)testQRCodeWithNoCapabilities
@@ -198,7 +238,7 @@
     XCTAssertEqual(payload.discoveryCapabilities, MTRDiscoveryCapabilitiesOnNetwork);
 }
 
-- (void)testQRCodePropertyAliases
+- (void)testDeprecatedPropertyAliases
 {
     NSError * error;
     MTRSetupPayload * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:@"MT:M5L9000000K64J00000" error:&error];
@@ -294,6 +334,9 @@
          ]) {
         MTRSetupPayload * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:string error:&error];
         XCTAssertNotNil(payload, @"Error: %@", error);
+        // Ensure our test data has discriminator values that make for the most meaningful round-trip tests.
+        XCTAssert(payload.discriminator.integerValue != 0);
+        XCTAssert(payload.hasShortDiscriminator || payload.discriminator.integerValue > 0xf);
         [payloads addObject:payload];
     }
 
@@ -301,7 +344,14 @@
     [payloads addObject:[[MTRSetupPayload alloc] init]];
     [payloads addObject:[[MTRSetupPayload alloc] initWithSetupPasscode:@22222222 discriminator:@42]];
 
+    MTRSetupPayload * futureValues = [[MTRSetupPayload alloc] initWithSetupPasscode:@314159 discriminator:@555];
+    futureValues.commissioningFlow = 3; // reserved in the spec
+    futureValues.discoveryCapabilities = 0x84; // bits 3-7 reserved in the spec
+    [payloads addObject:futureValues];
+
     for (MTRSetupPayload * payload in payloads) {
+        NSLog(@"Payload: %@", payload);
+
         NSData * data = [NSKeyedArchiver archivedDataWithRootObject:payload requiringSecureCoding:YES error:&error];
         XCTAssertNotNil(data, @"Error: %@", error);
         MTRSetupPayload * decoded = [NSKeyedUnarchiver unarchivedObjectOfClass:MTRSetupPayload.class fromData:data error:&error];
@@ -322,18 +372,16 @@
         NSArray<MTROptionalQRCodeInfo *> * decodedVDs = [decoded getAllOptionalVendorData:&error];
         XCTAssertNotNil(decodedVDs, @"Error: %@", error);
 
-#if 0 // TODO: Encode / decode optional vendor data
-      // MTROptionalQRCodeInfo does not implement isEqual (yet)
         XCTAssertEqual(decodedVDs.count, payloadVDs.count);
-        for (int i = 0; i < decodedVDs.count; i++){
+        for (int i = 0; i < decodedVDs.count; i++) {
             MTROptionalQRCodeInfo * decodedVD = decodedVDs[i];
             MTROptionalQRCodeInfo * payloadVD = payloadVDs[i];
             XCTAssertEqual(decodedVD.type, payloadVD.type);
             XCTAssertEqualObjects(decodedVD.tag, payloadVD.tag);
             XCTAssertEqualObjects(decodedVD.integerValue, payloadVD.integerValue);
             XCTAssertEqualObjects(decodedVD.stringValue, payloadVD.stringValue);
+            XCTAssertEqualObjects(decodedVD, payloadVD); // also check with isEqual:
         }
-#endif
 
         // Note that we can't necessarily expect the manualEntryCode and qrCode strings
         // we generate here to match the original string, but we should get the same
@@ -341,6 +389,54 @@
         XCTAssertEqualObjects([decoded qrCodeString:NULL], [payload qrCodeString:NULL]);
         XCTAssertEqualObjects(decoded.manualEntryCode, payload.manualEntryCode);
     }
+}
+
+- (void)testCopyingAndEquality
+{
+    MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithPayload:@"MT:M5L9000000K64J00000"];
+    XCTAssertFalse(payload.hasShortDiscriminator); // came from a QR code
+    XCTAssert(payload.discriminator.integerValue > 0xf); // can't "accidentally" round-trip through a short discriminator
+
+    MTRSetupPayload * copy = [payload copy];
+    XCTAssertNotIdentical(payload, copy); // MTRSetupPayload is mutable, must be a new object
+
+    XCTAssertTrue([payload isEqual:copy]);
+    XCTAssertTrue([copy isEqual:payload]);
+    XCTAssertEqual(payload.hash, copy.hash);
+
+    copy.hasShortDiscriminator = YES;
+    XCTAssertFalse([copy isEqual:payload]);
+    copy.hasShortDiscriminator = NO;
+    XCTAssertTrue([copy isEqual:payload]);
+    XCTAssertEqual(payload.hash, copy.hash);
+
+    MTROptionalQRCodeInfo * element = [[MTROptionalQRCodeInfo alloc] initWithTag:@0x80 stringValue:@"To infinity and beyond!"];
+    [copy addOrReplaceVendorElement:element];
+    XCTAssertFalse([copy isEqual:payload]);
+    [payload addOrReplaceVendorElement:element];
+    XCTAssertTrue([copy isEqual:payload]);
+    XCTAssertEqual(payload.hash, copy.hash);
+
+    copy.serialNumber = @"555-123";
+    XCTAssertFalse([copy isEqual:payload]);
+    payload.serialNumber = @"555-123";
+    XCTAssertTrue([copy isEqual:payload]);
+    XCTAssertEqual(payload.hash, copy.hash);
+}
+
+- (void)testCanParseFutureDiscoveryMethod
+{
+    // We must be able to process QR codes that include discovery methods we don't understand yet
+    XCTAssertEqual([[MTRSetupPayload alloc] initWithPayload:@"MT:000002VDK3VHMR49000"].discoveryCapabilities, 0x84);
+    XCTAssertEqual([[MTRSetupPayload alloc] initWithPayload:@"MT:-24J0Q.C.0KA0648G00"].discoveryCapabilities, 0xfa);
+}
+
+- (void)testDescriptionShowsUnknownDiscoveryMethods
+{
+    MTRSetupPayload * a = [[MTRSetupPayload alloc] initWithSetupPasscode:@888 discriminator:@555];
+    MTRSetupPayload * b = [a copy];
+    b.discoveryCapabilities |= 0x80;
+    XCTAssertNotEqualObjects(a.description, b.description);
 }
 
 @end

@@ -65,14 +65,6 @@ using namespace chip::System::Clock::Literals;
 
 const char PAYLOAD[] = "Hello!";
 
-// The CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST can be set to non-zero value
-// to boost the retransmission timeout for a high latency network like Thread to
-// avoid spurious retransmits.
-//
-// This adds extra I/O time to account for this. See the documentation for
-// CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST for more details.
-constexpr auto retryBoosterTimeout = CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS * CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST;
-
 class TestContext : public chip::Test::LoopbackMessagingContext
 {
 public:
@@ -324,6 +316,34 @@ struct BackoffComplianceTestVector theBackoffComplianceTestVector[] = { {
                                                                             .backoffMax  = System::Clock::Timeout(20'286'001),
                                                                         } };
 
+void CheckGetBackoffImpl(nlTestSuite * inSuite, System::Clock::Timeout additionalMRPBackoffTime)
+{
+    ReliableMessageMgr::SetAdditionalMRPBackoffTime(MakeOptional(additionalMRPBackoffTime));
+
+    // Run 3x iterations to thoroughly test random jitter always results in backoff within bounds.
+    for (uint32_t j = 0; j < 3; j++)
+    {
+        for (const auto & test : theBackoffComplianceTestVector)
+        {
+            System::Clock::Timeout backoff      = ReliableMessageMgr::GetBackoff(test.backoffBase, test.sendCount);
+            System::Clock::Timeout extraBackoff = additionalMRPBackoffTime;
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+            // If running as an ICD, increase maxBackoff to account for the polling interval
+            extraBackoff += ICDConfigurationData::GetInstance().GetFastPollingInterval();
+#endif
+
+            ChipLogProgress(Test, "Backoff base %" PRIu32 " extra %" PRIu32 " # %d: %" PRIu32, test.backoffBase.count(),
+                            extraBackoff.count(), test.sendCount, backoff.count());
+
+            NL_TEST_ASSERT(inSuite, backoff >= test.backoffMin + extraBackoff);
+            NL_TEST_ASSERT(inSuite, backoff <= test.backoffMax + extraBackoff);
+        }
+    }
+
+    ReliableMessageMgr::SetAdditionalMRPBackoffTime(NullOptional);
+}
+
 } // namespace
 
 class TestReliableMessageProtocol
@@ -348,6 +368,7 @@ public:
     static void CheckLostStandaloneAck(nlTestSuite * inSuite, void * inContext);
     static void CheckIsPeerActiveNotInitiator(nlTestSuite * inSuite, void * inContext);
     static void CheckGetBackoff(nlTestSuite * inSuite, void * inContext);
+    static void CheckGetBackoffAdditionalTime(nlTestSuite * inSuite, void * inContext);
     static void CheckApplicationResponseDelayed(nlTestSuite * inSuite, void * inContext);
     static void CheckApplicationResponseNeverComes(nlTestSuite * inSuite, void * inContext);
 };
@@ -449,7 +470,7 @@ void TestReliableMessageProtocol::CheckResendApplicationMessage(nlTestSuite * in
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
     // Wait for the initial message to fail (should take 330-413ms)
-    ctx.GetIOContext().DriveIOUntil(1000_ms32 + retryBoosterTimeout, [&] { return loopback.mSentMessageCount >= 2; });
+    ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 2; });
     now         = System::SystemClock().GetMonotonicTimestamp();
     timeoutTime = now - startTime;
     ChipLogProgress(Test, "Attempt #1  Timeout : %" PRIu32 "ms", timeoutTime.count());
@@ -466,7 +487,7 @@ void TestReliableMessageProtocol::CheckResendApplicationMessage(nlTestSuite * in
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
     // Wait for the 1st retry to fail (should take 330-413ms)
-    ctx.GetIOContext().DriveIOUntil(1000_ms32 + retryBoosterTimeout, [&] { return loopback.mSentMessageCount >= 3; });
+    ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 3; });
     now         = System::SystemClock().GetMonotonicTimestamp();
     timeoutTime = now - startTime;
     ChipLogProgress(Test, "Attempt #2  Timeout : %" PRIu32 "ms", timeoutTime.count());
@@ -483,7 +504,7 @@ void TestReliableMessageProtocol::CheckResendApplicationMessage(nlTestSuite * in
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
     // Wait for the 2nd retry to fail (should take 528-660ms)
-    ctx.GetIOContext().DriveIOUntil(1000_ms32 + retryBoosterTimeout, [&] { return loopback.mSentMessageCount >= 4; });
+    ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 4; });
     now         = System::SystemClock().GetMonotonicTimestamp();
     timeoutTime = now - startTime;
     ChipLogProgress(Test, "Attempt #3  Timeout : %" PRIu32 "ms", timeoutTime.count());
@@ -500,7 +521,7 @@ void TestReliableMessageProtocol::CheckResendApplicationMessage(nlTestSuite * in
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
     // Wait for the 3rd retry to fail (should take 845-1056ms)
-    ctx.GetIOContext().DriveIOUntil(1500_ms32 + retryBoosterTimeout, [&] { return loopback.mSentMessageCount >= 5; });
+    ctx.GetIOContext().DriveIOUntil(1500_ms32, [&] { return loopback.mSentMessageCount >= 5; });
     now         = System::SystemClock().GetMonotonicTimestamp();
     timeoutTime = now - startTime;
     ChipLogProgress(Test, "Attempt #4  Timeout : %" PRIu32 "ms", timeoutTime.count());
@@ -1845,25 +1866,12 @@ void TestReliableMessageProtocol::CheckLostStandaloneAck(nlTestSuite * inSuite, 
 
 void TestReliableMessageProtocol::CheckGetBackoff(nlTestSuite * inSuite, void * inContext)
 {
-    // Run 3x iterations to thoroughly test random jitter always results in backoff within bounds.
-    for (uint32_t j = 0; j < 3; j++)
-    {
-        for (const auto & test : theBackoffComplianceTestVector)
-        {
-            System::Clock::Timeout backoff = ReliableMessageMgr::GetBackoff(test.backoffBase, test.sendCount);
-            ChipLogProgress(Test, "Backoff base %" PRIu32 " # %d: %" PRIu32, test.backoffBase.count(), test.sendCount,
-                            backoff.count());
+    CheckGetBackoffImpl(inSuite, System::Clock::kZero);
+}
 
-            NL_TEST_ASSERT(inSuite, backoff >= test.backoffMin);
-
-            auto maxBackoff = test.backoffMax + retryBoosterTimeout;
-#if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
-            // If running as an ICD, increase maxBackoff to account for the polling interval
-            maxBackoff += ICDConfigurationData::GetInstance().GetSlowPollingInterval();
-#endif
-            NL_TEST_ASSERT(inSuite, backoff <= maxBackoff);
-        }
-    }
+void TestReliableMessageProtocol::CheckGetBackoffAdditionalTime(nlTestSuite * inSuite, void * inContext)
+{
+    CheckGetBackoffImpl(inSuite, System::Clock::Seconds32(1));
 }
 
 void TestReliableMessageProtocol::CheckApplicationResponseDelayed(nlTestSuite * inSuite, void * inContext)
@@ -2207,6 +2215,7 @@ const nlTest sTests[] = {
                 TestReliableMessageProtocol::CheckLostStandaloneAck),
     NL_TEST_DEF("Test Is Peer Active Retry logic", TestReliableMessageProtocol::CheckIsPeerActiveNotInitiator),
     NL_TEST_DEF("Test MRP backoff algorithm", TestReliableMessageProtocol::CheckGetBackoff),
+    NL_TEST_DEF("Test MRP backoff algorithm with additional time", TestReliableMessageProtocol::CheckGetBackoffAdditionalTime),
     // TODO: Re-enable this test, after changing test to use Mock clock / DriveIO rather than DriveIOUntil.
     // Issue: https://github.com/project-chip/connectedhomeip/issues/32440
     // NL_TEST_DEF("Test an application response that comes after MRP retransmits run out",
@@ -2220,10 +2229,10 @@ const nlTest sTests[] = {
 nlTestSuite sSuite = {
     "Test-CHIP-ReliableMessageProtocol",
     &sTests[0],
-    TestContext::nlTestSetUpTestSuite,
-    TestContext::nlTestTearDownTestSuite,
-    TestContext::nlTestSetUp,
-    TestContext::nlTestTearDown,
+    NL_TEST_WRAP_FUNCTION(TestContext::SetUpTestSuite),
+    NL_TEST_WRAP_FUNCTION(TestContext::TearDownTestSuite),
+    NL_TEST_WRAP_METHOD(TestContext, SetUp),
+    NL_TEST_WRAP_METHOD(TestContext, TearDown),
 };
 // clang-format on
 

@@ -19,6 +19,7 @@
 
 # Commissioning test.
 
+import asyncio
 import os
 import sys
 from optparse import OptionParser
@@ -96,7 +97,7 @@ def main():
 
     # TODO: Start at stage 2 once handling for arming failsafe on pase is done.
     if options.report:
-        for testFailureStage in range(3, 20):
+        for testFailureStage in range(3, 21):
             FailIfNot(test.TestPaseOnly(ip=options.deviceAddress1,
                                         setuppin=20202021,
                                         nodeid=1),
@@ -105,7 +106,7 @@ def main():
                       "Commissioning failure tests failed for simulated report failure on stage {}".format(testFailureStage))
 
     else:
-        for testFailureStage in range(3, 20):
+        for testFailureStage in range(3, 21):
             FailIfNot(test.TestPaseOnly(ip=options.deviceAddress1,
                                         setuppin=20202021,
                                         nodeid=1),
@@ -121,9 +122,8 @@ def main():
     FailIfNot(test.TestCommissionFailure(1, 0), "Failed to commission device")
 
     logger.info("Testing on off cluster")
-    FailIfNot(test.TestOnOffCluster(nodeid=1,
-                                    endpoint=LIGHTING_ENDPOINT_ID,
-                                    group=GROUP_ID), "Failed to test on off cluster")
+    FailIfNot(asyncio.run(test.TestOnOffCluster(nodeid=1,
+                                                endpoint=LIGHTING_ENDPOINT_ID)), "Failed to test on off cluster")
 
     timeoutTicker.stop()
 
