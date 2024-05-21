@@ -83,6 +83,7 @@ constexpr Spake2pVerifierSerialized sTestSpake2p01_SerializedVerifier = {
     0xB7, 0xC0, 0x7F, 0xCC, 0x06, 0x27, 0xA1, 0xB8, 0x57, 0x3A, 0x14, 0x9F, 0xCD, 0x1F, 0xA4, 0x66, 0xCF
 };
 
+class TestSecurePairingDelegate;
 class TestPASESession : public chip::Test::LoopbackMessagingContext, public ::testing::Test
 {
 public:
@@ -97,6 +98,11 @@ public:
     void SetUp() override { chip::Test::LoopbackMessagingContext::SetUp(); }
 
     void TearDown() override { chip::Test::LoopbackMessagingContext::TearDown(); }
+
+    void SecurePairingHandshakeTestCommon(SessionManager & sessionManager, PASESession & pairingCommissioner,
+                                          Optional<ReliableMessageProtocolConfig> mrpCommissionerConfig,
+                                          Optional<ReliableMessageProtocolConfig> mrpAccessoryConfig,
+                                          TestSecurePairingDelegate & delegateCommissioner);
 };
 
 class PASETestLoopbackTransportDelegate : public Test::LoopbackTransportDelegate
@@ -242,25 +248,25 @@ TEST_F(TestPASESession, SecurePairingStartTest)
     loopback.mMessageSendError = CHIP_NO_ERROR;
 }
 
-void SecurePairingHandshakeTestCommon(TestPASESession & ctx, SessionManager & sessionManager, PASESession & pairingCommissioner,
-                                      Optional<ReliableMessageProtocolConfig> mrpCommissionerConfig,
-                                      Optional<ReliableMessageProtocolConfig> mrpAccessoryConfig,
-                                      TestSecurePairingDelegate & delegateCommissioner)
+void TestPASESession::SecurePairingHandshakeTestCommon(SessionManager & sessionManager, PASESession & pairingCommissioner,
+                                                       Optional<ReliableMessageProtocolConfig> mrpCommissionerConfig,
+                                                       Optional<ReliableMessageProtocolConfig> mrpAccessoryConfig,
+                                                       TestSecurePairingDelegate & delegateCommissioner)
 {
 
     TestSecurePairingDelegate delegateAccessory;
     PASESession pairingAccessory;
 
     PASETestLoopbackTransportDelegate delegate;
-    auto & loopback = ctx.GetLoopback();
+    auto & loopback = GetLoopback();
     loopback.SetLoopbackTransportDelegate(&delegate);
     loopback.mSentMessageCount = 0;
 
-    ExchangeContext * contextCommissioner = ctx.NewUnauthenticatedExchangeToBob(&pairingCommissioner);
+    ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(&pairingCommissioner);
 
     if (loopback.mNumMessagesToDrop != 0)
     {
-        ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
+        ReliableMessageMgr * rm     = GetExchangeManager().GetReliableMessageMgr();
         ReliableMessageContext * rc = contextCommissioner->GetReliableMessageContext();
         ASSERT_NE(rm, nullptr);
         ASSERT_NE(rc, nullptr);
@@ -282,19 +288,19 @@ void SecurePairingHandshakeTestCommon(TestPASESession & ctx, SessionManager & se
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     }
 
-    EXPECT_EQ(ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
-                  Protocols::SecureChannel::MsgType::PBKDFParamRequest, &pairingAccessory),
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::PBKDFParamRequest,
+                                                                            &pairingAccessory),
               CHIP_NO_ERROR);
 
     EXPECT_EQ(pairingAccessory.WaitForPairing(sessionManager, sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount,
                                               ByteSpan(sTestSpake2p01_Salt), mrpAccessoryConfig, &delegateAccessory),
               CHIP_NO_ERROR);
-    ctx.DrainAndServiceIO();
+    DrainAndServiceIO();
 
     EXPECT_EQ(pairingCommissioner.Pair(sessionManager, sTestSpake2p01_PinCode, mrpCommissionerConfig, contextCommissioner,
                                        &delegateCommissioner),
               CHIP_NO_ERROR);
-    ctx.DrainAndServiceIO();
+    DrainAndServiceIO();
 
     while (delegate.mMessageDropped)
     {
@@ -311,8 +317,8 @@ void SecurePairingHandshakeTestCommon(TestPASESession & ctx, SessionManager & se
         // Wait some time so the dropped message will be retransmitted when we drain the IO.
         chip::test_utils::SleepMillis(waitTimeout.count());
         delegate.mMessageDropped = false;
-        ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), ctx.GetExchangeManager().GetReliableMessageMgr());
-        ctx.DrainAndServiceIO();
+        ReliableMessageMgr::Timeout(&GetSystemLayer(), GetExchangeManager().GetReliableMessageMgr());
+        DrainAndServiceIO();
     };
 
     // Standalone acks also increment the mSentMessageCount. But some messages could be acked
@@ -350,7 +356,7 @@ void SecurePairingHandshakeTestCommon(TestPASESession & ctx, SessionManager & se
     // that notification is what would delete the PASESession, but in our case
     // that will happen as soon as things come off the stack.  So make sure to
     // process the async bits before that happens.
-    ctx.DrainAndServiceIO();
+    DrainAndServiceIO();
 
     // And check that this did not result in any new notifications.
     EXPECT_EQ(delegateAccessory.mNumPairingErrors, 0u);
@@ -369,7 +375,7 @@ TEST_F(TestPASESession, SecurePairingHandshakeTest)
     PASESession pairingCommissioner;
     auto & loopback = GetLoopback();
     loopback.Reset();
-    SecurePairingHandshakeTestCommon(*this, sessionManager, pairingCommissioner, Optional<ReliableMessageProtocolConfig>::Missing(),
+    SecurePairingHandshakeTestCommon(sessionManager, pairingCommissioner, Optional<ReliableMessageProtocolConfig>::Missing(),
                                      Optional<ReliableMessageProtocolConfig>::Missing(), delegateCommissioner);
 }
 
@@ -382,8 +388,7 @@ TEST_F(TestPASESession, SecurePairingHandshakeWithCommissionerMRPTest)
     auto & loopback = GetLoopback();
     loopback.Reset();
     ReliableMessageProtocolConfig config(1000_ms32, 10000_ms32, 4000_ms16);
-    SecurePairingHandshakeTestCommon(*this, sessionManager, pairingCommissioner,
-                                     Optional<ReliableMessageProtocolConfig>::Value(config),
+    SecurePairingHandshakeTestCommon(sessionManager, pairingCommissioner, Optional<ReliableMessageProtocolConfig>::Value(config),
                                      Optional<ReliableMessageProtocolConfig>::Missing(), delegateCommissioner);
 }
 
@@ -396,7 +401,7 @@ TEST_F(TestPASESession, SecurePairingHandshakeWithDeviceMRPTest)
     auto & loopback = GetLoopback();
     loopback.Reset();
     ReliableMessageProtocolConfig config(1000_ms32, 10000_ms32, 4000_ms16);
-    SecurePairingHandshakeTestCommon(*this, sessionManager, pairingCommissioner, Optional<ReliableMessageProtocolConfig>::Missing(),
+    SecurePairingHandshakeTestCommon(sessionManager, pairingCommissioner, Optional<ReliableMessageProtocolConfig>::Missing(),
                                      Optional<ReliableMessageProtocolConfig>::Value(config), delegateCommissioner);
 }
 
@@ -410,7 +415,7 @@ TEST_F(TestPASESession, SecurePairingHandshakeWithAllMRPTest)
     loopback.Reset();
     ReliableMessageProtocolConfig commissionerConfig(1000_ms32, 10000_ms32, 4000_ms16);
     ReliableMessageProtocolConfig deviceConfig(2000_ms32, 7000_ms32, 4000_ms16);
-    SecurePairingHandshakeTestCommon(*this, sessionManager, pairingCommissioner,
+    SecurePairingHandshakeTestCommon(sessionManager, pairingCommissioner,
                                      Optional<ReliableMessageProtocolConfig>::Value(commissionerConfig),
                                      Optional<ReliableMessageProtocolConfig>::Value(deviceConfig), delegateCommissioner);
 }
@@ -424,7 +429,7 @@ TEST_F(TestPASESession, SecurePairingHandshakeWithPacketLossTest)
     auto & loopback = GetLoopback();
     loopback.Reset();
     loopback.mNumMessagesToDrop = 2;
-    SecurePairingHandshakeTestCommon(*this, sessionManager, pairingCommissioner, Optional<ReliableMessageProtocolConfig>::Missing(),
+    SecurePairingHandshakeTestCommon(sessionManager, pairingCommissioner, Optional<ReliableMessageProtocolConfig>::Missing(),
                                      Optional<ReliableMessageProtocolConfig>::Missing(), delegateCommissioner);
     EXPECT_EQ(loopback.mDroppedMessageCount, 2u);
     EXPECT_EQ(loopback.mNumMessagesToDrop, 0u);
