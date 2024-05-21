@@ -390,9 +390,9 @@ void CastingPlayer::LogDetail() const
 }
 
 CastingPlayer::CastingPlayer(const CastingPlayer & other) :
-    mEndpoints(other.mEndpoints), mConnectionState(other.mConnectionState), mAttributes(other.mAttributes),
-    mIdOptions(other.mIdOptions), mCommissioningWindowTimeoutSec(other.mCommissioningWindowTimeoutSec),
-    mOnCompleted(other.mOnCompleted)
+    std::enable_shared_from_this<CastingPlayer>(other), mEndpoints(other.mEndpoints), mConnectionState(other.mConnectionState),
+    mAttributes(other.mAttributes), mIdOptions(other.mIdOptions),
+    mCommissioningWindowTimeoutSec(other.mCommissioningWindowTimeoutSec), mOnCompleted(other.mOnCompleted)
 {}
 
 CastingPlayer & CastingPlayer::operator=(const CastingPlayer & other)
