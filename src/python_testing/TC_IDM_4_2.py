@@ -17,7 +17,6 @@
 
 import copy
 import logging
-import queue
 import time
 
 import chip.clusters as Clusters
@@ -26,7 +25,8 @@ from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import AttributePath, TypedAttributePath
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
-from matter_testing_support import (AttributeChangeCallback, MatterBaseTest, async_test_body, default_matter_test_main)
+from matter_testing_support import (AttributeChangeCallback, MatterBaseTest, async_test_body, default_matter_test_main,
+                                    TestStep)
 from mobly import asserts
 
 '''
@@ -46,6 +46,36 @@ https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/interacti
 
 
 class TC_IDM_4_2(MatterBaseTest):
+
+    def steps_TC_IDM_4_2(self):
+        return [TestStep(0, "CR1 reads the ServerList attribute from the Descriptor cluster on EP0.",
+                         "If the ICD Management cluster ID (70,0x46) is present, set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = IdleModeDuration and min_interval_floor_s to 0, otherwise, set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = 60 mins and min_interval_floor_s to 3."),
+                TestStep(1, "CR1 sends a subscription message to the DUT with MaxIntervalCeiling set to a value greater than subscription_max_interval_publisher_limit_sec. DUT sends a report data action to the TH. CR1 sends a success status response to the DUT. DUT sends a Subscribe Response Message to the CR1 to activate the subscription.",
+                         "Verify on the CR1, a report data message is received. Verify it contains the following data Report data - data of the attribute/event requested earlier. Verify on the CR1 the Subscribe Response has the following fields, SubscriptionId - Verify it is of type uint32. MaxInterval - Verify it is of type uint32. Verify that the MaxInterval is less than or equal to MaxIntervalCeiling."),
+                TestStep(2, "CR1 sends a subscription message to the DUT with MaxIntervalCeiling set to a value less than subscription_max_interval_publisher_limit_sec. DUT sends a report data action to the CR1. CR1 sends a success status response to the DUT. DUT sends a Subscribe Response Message to the CR1 to activate the subscription.",
+                        "Verify on the CR1, a report data message is received. Verify it contains the following data: Report data - data of the attribute/event requested earlier. Verify on the CR1 the Subscribe Response has the following fields, SubscriptionId - Verify it is of type uint32. MaxInterval - Verify it is of type uint32. Verify that the MaxInterval is less than or equal to SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT."),
+                TestStep(3, "Setup CR2 such that it does not have access to a specific cluster. CR2 sends a subscription message to subscribe to an attribute on that cluster for which it does not have access.",
+                        "Verify that the DUT returns a \"INVALID_ACTION\" status response."),
+                TestStep(4, "Setup CR2 such that it does not have access to all attributes on a specific cluster and endpoint. CR2 sends a subscription request to subscribe to all attributes for which it does not have access.",
+                        "Verify that the DUT returns a \"INVALID_ACTION\" status response."),
+                TestStep(5, "Setup CR2 such that it does not have access to an Endpoint. CR2 sends a subscription request to subscribe to all attributes on all clusters on a specific Endpoint for which it does not have access.",
+                        "Verify that the DUT returns a \"INVALID_ACTION\" status response."),
+                TestStep(6, "Setup CR2 such that it does not have access to the Node. CR2 sends a subscription request to subscribe to all attributes on all clusters on all endpoints on a Node for which it does not have access.",
+                        "Verify that the DUT returns a \"INVALID_ACTION\" status response."),
+                TestStep(7, "CR1 sends a subscription request action for an attribute with an empty DataVersionFilters field. DUT sends a report data action with the data of the attribute along with the data version. Tear down the subscription for that attribute. Start another subscription with the DataVersionFilter field set to the data version received above.",
+                        "Verify that the subscription is activated between CR1 and DUT."),
+                TestStep(8, "CR1 sends a subscription request action for an attribute and sets the MinIntervalFloor to min_interval_floor_sec and MaxIntervalCeiling to 10. Activate the Subscription between CR1 and DUT and record the time when the priming ReportDataMessage is received as t_report_sec. Save the returned MaxInterval from the SubscribeResponseMessage as max_interval_sec."),
+                TestStep(9, "CR1 modifies the attribute which has been subscribed to on the DUT and waits for an incoming ReportDataMessage",
+                        "Verify that t_update - t_report is greater than min_interval_floor_s and less than the ReadClient SubscriptionTimeout (calculated by the ReadClient using max_interval_s and the maximum estimated network delay based on the MRP parameters for retries with backoff)"),
+                TestStep(10, "CR1 sends a subscription request action for an attribute and set the MinIntervalFloor value to be greater than MaxIntervalCeiling.",
+                        "Verify that the DUT sends an error message and the subscription is not established."),
+                TestStep(11, "CR1 sends a subscription request to subscribe to a specific global attribute from all clusters on all endpoints.",
+                        "Verify that the Subscription succeeds and the DUT sends back the attribute values for the global attribute."),
+                TestStep(12, "CR1 sends a subscription request to subscribe to a global attribute on an endpoint on all clusters.",
+                        "Verify that the Subscription succeeds and the DUT sends back the attribute values for the global attribute. Verify no data from other endpoints is sent back."),
+                TestStep(13, "CR1 sends a subscription request to the DUT with both AttributeRequests and EventRequests as empty.",
+                        "Verify that the Subscription does not succeed and the DUT sends back a Status Response Action with the INVALID_ACTION Status Code")
+            ]
 
     ROOT_NODE_ENDPOINT_ID = 0
 
@@ -152,7 +182,13 @@ class TC_IDM_4_2(MatterBaseTest):
         )
 
         # *** Step 0 ***
-        self.print_step("0", "CR1 reads the Descriptor cluster ServerList attribute from EP0")
+        # CR1 reads the ServerList attribute from the Descriptor cluster on EP0. If the ICDManagement cluster ID
+        # (70,0x46) is present, set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = IdleModeDuration and
+        # min_interval_floor_s to 0, otherwise, set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = 60 mins and
+        # min_interval_floor_s to 3.
+        self.step(0)
+        
+        # Reads the ServerList attribute
         ep0_servers = await self.get_descriptor_server_list(CR1)
 
         # Check if ep0_servers contains the ICD Management cluster ID (0x0046)
@@ -173,7 +209,11 @@ class TC_IDM_4_2(MatterBaseTest):
             f"Set subscription_max_interval_publisher_limit_sec to {subscription_max_interval_publisher_limit_sec} seconds")
 
         # *** Step 1 ***
-        self.print_step(1, "CR1 sends a subscription message to the DUT with MaxIntervalCeiling set to a value greater than subscription_max_interval_publisher_limit_sec. DUT sends a report data action to the TH. CR1 sends a success status response to the DUT. DUT sends a Subscribe Response Message to the CR1 to activate the subscription.")
+        # CR1 sends a subscription message to the DUT with MaxIntervalCeiling set to a value greater than
+        # subscription_max_interval_publisher_limit_sec. DUT sends a report data action to the TH. CR1 sends
+        # a success status response to the DUT. DUT sends a Subscribe Response Message to the CR1 to activate
+        # the subscription.
+        self.step(1)
         max_interval_ceiling_sec = subscription_max_interval_publisher_limit_sec + 5
         asserts.assert_greater(max_interval_ceiling_sec, min_interval_floor_sec,
                                "MaxIntervalCeiling must be greater than MinIntervalFloor")
@@ -209,7 +249,11 @@ class TC_IDM_4_2(MatterBaseTest):
         sub_cr1_step1.Shutdown()
 
         # *** Step 2 ***
-        self.print_step(2, "CR1 sends a subscription message to the DUT with MaxIntervalCeiling set to a value less than subscription_max_interval_publisher_limit_sec. DUT sends a report data action to the CR1. CR1 sends a success status response to the DUT. DUT sends a Subscribe Response Message to the CR1 to activate the subscription.")
+        # CR1 sends a subscription message to the DUT with MaxIntervalCeiling set to a value less than
+        # subscription_max_interval_publisher_limit_sec. DUT sends a report data action to the CR1.
+        # CR1 sends a success status response to the DUT. DUT sends a Subscribe Response Message to the
+        # CR1 to activate the subscription.
+        self.step(2)
         min_interval_floor_sec = 1
         max_interval_ceiling_sec = max(0, subscription_max_interval_publisher_limit_sec - 5)
         asserts.assert_greater(max_interval_ceiling_sec, min_interval_floor_sec,
@@ -246,7 +290,9 @@ class TC_IDM_4_2(MatterBaseTest):
         sub_cr1_step2.Shutdown()
 
         # *** Step 3 ***
-        self.print_step(3, "Setup CR2 such that it does not have access to a specific cluster. CR2 sends a subscription message to subscribe to an attribute on that cluster for which it does not have access.")
+        # Setup CR2 such that it does not have access to a specific cluster. CR2 sends a subscription
+        # message to subscribe to an attribute on that cluster for which it does not have access.
+        self.step(3)
 
         # Limited ACE for controller 2 with single cluster access
         CR2_limited_ace = Clusters.AccessControl.Structs.AccessControlEntryStruct(
@@ -280,7 +326,10 @@ class TC_IDM_4_2(MatterBaseTest):
                                  "Incorrect error response for subscription to unallowed cluster")
 
         # *** Step 4 ***
-        self.print_step(4, "Setup CR2 such that it does not have access to all attributes on a specific cluster and endpoint. CR2 sends a subscription request to subscribe to all attributes for which it does not have access.")
+        # Setup CR2 such that it does not have access to all attributes on a specific cluster and
+        # endpoint. CR2 sends a subscription request to subscribe to all attributes for which it
+        # does not have access.
+        self.step(4)
 
         # Limited ACE for controller 2 with single cluster access and specific endpoint
         CR2_limited_ace = Clusters.AccessControl.Structs.AccessControlEntryStruct(
@@ -321,7 +370,10 @@ class TC_IDM_4_2(MatterBaseTest):
         print(f'acl_list - reset 4: {acl_list}')
 
         # *** Step 5 ***
-        self.print_step(5, "Setup CR2 such that it does not have access to an Endpoint. CR2 sends a subscription request to subscribe to all attributes on all clusters on a specific Endpoint for which it does not have access.")
+        # Setup CR2 such that it does not have access to an Endpoint. CR2 sends a subscription
+        # request to subscribe to all attributes on all clusters on a specific Endpoint for which
+        # it does not have access.
+        self.step(5)
 
         # Get first value of parts list for the endpoint
         parts_list = await self.get_descriptor_parts_list(CR1)
@@ -360,7 +412,10 @@ class TC_IDM_4_2(MatterBaseTest):
                                  "Incorrect error response for subscription to unallowed endpoint")
 
         # *** Step 6 ***
-        self.print_step(6, "Setup CR2 such that it does not have access to the Node. CR2 sends a subscription request to subscribe to all attributes on all clusters on all endpoints on a Node for which it does not have access.")
+        # Setup CR2 such that it does not have access to the Node. CR2 sends a subscription
+        # request to subscribe to all attributes on all clusters on all endpoints on a Node
+        # for which it does not have access.
+        self.step(6)
 
         # Skip setting an ACE for controller 2 so the DUT node rejects subscribing to it
 
@@ -386,7 +441,12 @@ class TC_IDM_4_2(MatterBaseTest):
                                  "Incorrect error response for subscription to unallowed node")
 
         # *** Step 7 ***
-        self.print_step(7, "CR1 sends a subscription request action for an attribute with an empty DataVersionFilters field. DUT sends a report data action with the data of the attribute along with the data version. Tear down the subscription for that attribute. Start another subscription with the DataVersionFilter field set to the data version received above.")
+        # CR1 sends a subscription request action for an attribute with an empty
+        # DataVersionFilters field. DUT sends a report data action with the data
+        # of the attribute along with the data version. Tear down the subscription
+        # for that attribute. Start another subscription with the DataVersionFilter
+        # field set to the data version received above.
+        self.step(7)
 
         # Subscribe to attribute with empty dataVersionFilters
         sub_cr1_empty_dvf = await CR1.ReadAttribute(
@@ -421,7 +481,12 @@ class TC_IDM_4_2(MatterBaseTest):
         sub_cr1_step7.Shutdown()
 
         # *** Step 8 ***
-        self.print_step(8, "CR1 sends a subscription request action for an attribute and sets the MinIntervalFloor to min_interval_floor_sec and MaxIntervalCeiling to 10. Activate the Subscription between CR1 and DUT and record the time when the priming ReportDataMessage is received as t_report_sec. Save the returned MaxInterval from the SubscribeResponseMessage as max_interval_sec.")
+        # CR1 sends a subscription request action for an attribute and sets the
+        # MinIntervalFloor to min_interval_floor_sec and MaxIntervalCeiling to 10.
+        # Activate the Subscription between CR1 and DUT and record the time when
+        # the priming ReportDataMessage is received as t_report_sec. Save the
+        # returned MaxInterval from the SubscribeResponseMessage as max_interval_sec.
+        self.step(8)
 
         # Subscribe to attribute
         min_interval_floor_sec = 3
@@ -437,7 +502,9 @@ class TC_IDM_4_2(MatterBaseTest):
         t_report_sec = time.time()
 
         # *** Step 9 ***
-        self.print_step(9, "CR1 modifies the attribute which has been subscribed to on the DUT and waits for an incoming ReportDataMessage")
+        # CR1 modifies the attribute which has been subscribed to on the DUT
+        # and waits for an incoming ReportDataMessage
+        self.step(9)
 
         # Saving the returned MaxInterval from the SubscribeResponseMessage
         min_interval_floor_sec, max_interval_sec = sub_cr1_update_value.GetReportingIntervalsSeconds()
@@ -473,8 +540,9 @@ class TC_IDM_4_2(MatterBaseTest):
         sub_cr1_update_value.Shutdown()
 
         # *** Step 10 ***
-        self.print_step(
-            10, "CR1 sends a subscription request action for an attribute and set the MinIntervalFloor value to be greater than MaxIntervalCeiling.")
+        # CR1 sends a subscription request action for an attribute and set the MinIntervalFloor
+        # value to be greater than MaxIntervalCeiling.
+        self.step(10)
 
         # Subscribe to attribute with invalid reportInterval arguments, expect an error
         sub_cr1_invalid_intervals = None
@@ -491,8 +559,9 @@ class TC_IDM_4_2(MatterBaseTest):
             sub_cr1_invalid_intervals.subscriptionId
 
         # *** Step 11 ***
-        self.print_step(
-            11, "CR1 sends a subscription request to subscribe to a specific global attribute from all clusters on all endpoints.")
+        # CR1 sends a subscription request to subscribe to a specific global attribute from
+        # all clusters on all endpoints.
+        self.step(11)
 
         # Omitting endpoint to indicate endpoint wildcard
         cluster_rev_attr_path = [(cluster_rev_attr)]
@@ -527,7 +596,8 @@ class TC_IDM_4_2(MatterBaseTest):
         sub_cr1_step11.Shutdown()
 
         # *** Step 12 ***
-        self.print_step(12, "CR1 sends a subscription request to subscribe to a global attribute on an endpoint on all clusters.")
+        # CR1 sends a subscription request to subscribe to a global attribute on an endpoint on all clusters.
+        self.step(12)
 
         # Specifying single endpoint 0
         requested_ep = 0
@@ -566,7 +636,8 @@ class TC_IDM_4_2(MatterBaseTest):
         sub_cr1_step12.Shutdown()
 
         # *** Step 13 ***
-        self.print_step(13, "CR1 sends a subscription request to the DUT with both AttributeRequests and EventRequests as empty.")
+        # CR1 sends a subscription request to the DUT with both AttributeRequests and EventRequests as empty.
+        self.step(13)
 
         # Attempt a subscription with both AttributeRequests and EventRequests as empty
         sub_cr1_step13 = None
