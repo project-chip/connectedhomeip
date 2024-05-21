@@ -1552,4 +1552,11 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
     XCTAssertFalse([factory isRunning]);
 }
 
+- (void)testSetMRPParameters
+{
+    // Can be called before starting the factory
+    XCTAssertFalse(MTRDeviceControllerFactory.sharedInstance.running);
+    MTRSetMessageReliabilityParameters(@2000, @2000, @2000, @2000);
+}
+
 @end

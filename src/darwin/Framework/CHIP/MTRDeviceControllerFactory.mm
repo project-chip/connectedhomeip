@@ -881,6 +881,8 @@ MTR_DIRECT_MEMBERS
 
 - (void)resetOperationalAdvertising
 {
+    assertChipStackLockedByCurrentThread();
+
     if (!_advertiseOperational) {
         // No need to reset anything; we are not advertising the things that
         // would need to get reset.
@@ -891,13 +893,12 @@ MTR_DIRECT_MEMBERS
     if (_controllers.count != 0) {
         // We have a running controller.  That means we likely need to reset
         // operational advertising for that controller.
-        dispatch_async(_chipWorkQueue, ^{
-            // StartServer() is the only API we have for resetting DNS-SD
-            // advertising.  It sure would be nice if there were a "restart"
-            // that was a no-op if the DNS-SD server was not already
-            // running.
-            app::DnssdServer::Instance().StartServer();
-        });
+
+        // StartServer() is the only API we have for resetting DNS-SD
+        // advertising.  It sure would be nice if there were a "restart"
+        // that was a no-op if the DNS-SD server was not already
+        // running.
+        app::DnssdServer::Instance().StartServer();
     }
 }
 
@@ -1165,6 +1166,45 @@ MTR_DIRECT_MEMBERS
                                   error:error];
 }
 
+- (void)setMessageReliabilityProtocolIdleRetransmitMs:(nullable NSNumber *)idleRetransmitMs
+                                   activeRetransmitMs:(nullable NSNumber *)activeRetransmitMs
+                                    activeThresholdMs:(nullable NSNumber *)activeThresholdMs
+                          additionalRetransmitDelayMs:(nullable NSNumber *)additionalRetransmitDelayMs
+{
+    [self _assertCurrentQueueIsNotMatterQueue];
+    dispatch_sync(_chipWorkQueue, ^{
+        bool resetAdvertising;
+        if (idleRetransmitMs == nil && activeRetransmitMs == nil && activeThresholdMs == nil && additionalRetransmitDelayMs == nil) {
+            Messaging::ReliableMessageMgr::SetAdditionalMRPBackoffTime(NullOptional);
+            resetAdvertising = ReliableMessageProtocolConfig::SetLocalMRPConfig(NullOptional);
+        } else {
+            if (additionalRetransmitDelayMs != nil) {
+                System::Clock::Timeout additionalBackoff(additionalRetransmitDelayMs.unsignedLongValue);
+                Messaging::ReliableMessageMgr::SetAdditionalMRPBackoffTime(MakeOptional(additionalBackoff));
+            }
+
+            // Get current MRP parameters, then override the things we were asked to
+            // override.
+            ReliableMessageProtocolConfig mrpConfig = GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig());
+            if (idleRetransmitMs != nil) {
+                mrpConfig.mIdleRetransTimeout = System::Clock::Milliseconds32(idleRetransmitMs.unsignedLongValue);
+            }
+            if (activeRetransmitMs != nil) {
+                mrpConfig.mActiveRetransTimeout = System::Clock::Milliseconds32(activeRetransmitMs.unsignedLongValue);
+            }
+            if (activeThresholdMs != nil) {
+                mrpConfig.mActiveThresholdTime = System::Clock::Milliseconds32(activeThresholdMs.unsignedLongValue);
+            }
+
+            resetAdvertising = ReliableMessageProtocolConfig::SetLocalMRPConfig(MakeOptional(mrpConfig));
+        }
+
+        if (resetAdvertising) {
+            [self resetOperationalAdvertising];
+        }
+    });
+}
+
 - (PersistentStorageDelegate *)storageDelegate
 {
     return _persistentStorageDelegate;
@@ -1327,33 +1367,8 @@ void MTRSetMessageReliabilityParameters(NSNumber * _Nullable idleRetransmitMs,
     NSNumber * _Nullable activeThresholdMs,
     NSNumber * _Nullable additionalRetransmitDelayMs)
 {
-    bool resetAdvertising = false;
-    if (idleRetransmitMs == nil && activeRetransmitMs == nil && activeThresholdMs == nil && additionalRetransmitDelayMs == nil) {
-        Messaging::ReliableMessageMgr::SetAdditionalMRPBackoffTime(NullOptional);
-        resetAdvertising = ReliableMessageProtocolConfig::SetLocalMRPConfig(NullOptional);
-    } else {
-        if (additionalRetransmitDelayMs != nil) {
-            System::Clock::Timeout additionalBackoff(additionalRetransmitDelayMs.unsignedLongValue);
-            Messaging::ReliableMessageMgr::SetAdditionalMRPBackoffTime(MakeOptional(additionalBackoff));
-        }
-
-        // Get current MRP parameters, then override the things we were asked to
-        // override.
-        ReliableMessageProtocolConfig mrpConfig = GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig());
-        if (idleRetransmitMs != nil) {
-            mrpConfig.mIdleRetransTimeout = System::Clock::Milliseconds32(idleRetransmitMs.unsignedLongValue);
-        }
-        if (activeRetransmitMs != nil) {
-            mrpConfig.mActiveRetransTimeout = System::Clock::Milliseconds32(activeRetransmitMs.unsignedLongValue);
-        }
-        if (activeThresholdMs != nil) {
-            mrpConfig.mActiveThresholdTime = System::Clock::Milliseconds32(activeThresholdMs.unsignedLongValue);
-        }
-
-        resetAdvertising = ReliableMessageProtocolConfig::SetLocalMRPConfig(MakeOptional(mrpConfig));
-    }
-
-    if (resetAdvertising) {
-        [[MTRDeviceControllerFactory sharedInstance] resetOperationalAdvertising];
-    }
+    [MTRDeviceControllerFactory.sharedInstance setMessageReliabilityProtocolIdleRetransmitMs:idleRetransmitMs
+                                                                          activeRetransmitMs:activeThresholdMs
+                                                                           activeThresholdMs:activeThresholdMs
+                                                                 additionalRetransmitDelayMs:additionalRetransmitDelayMs];
 }
