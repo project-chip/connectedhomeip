@@ -55,8 +55,6 @@ using namespace chip::AppPlatform;
 using namespace chip::app::Clusters;
 using namespace chip::Protocols::UserDirectedCommissioning;
 
-ContentAppFactoryImpl gFactory;
-
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 class MyUserPrompter : public UserPrompter
 {
@@ -288,6 +286,7 @@ MyPostCommissioningListener gMyPostCommissioningListener;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+ContentAppFactoryImpl gFactory;
 
 ContentAppFactoryImpl * GetContentAppFactoryImpl()
 {
