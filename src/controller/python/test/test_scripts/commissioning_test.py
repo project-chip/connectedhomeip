@@ -19,6 +19,7 @@
 
 # Commissioning test.
 
+import asyncio
 import os
 import sys
 from optparse import OptionParser
@@ -146,9 +147,8 @@ def main():
         TestFail("Must provide device address or setup payload to commissioning the device")
 
     logger.info("Testing on off cluster")
-    FailIfNot(test.TestOnOffCluster(nodeid=options.nodeid,
-                                    endpoint=LIGHTING_ENDPOINT_ID,
-                                    group=GROUP_ID), "Failed to test on off cluster")
+    FailIfNot(asyncio.run(test.TestOnOffCluster(nodeid=options.nodeid,
+                                                endpoint=LIGHTING_ENDPOINT_ID)), "Failed to test on off cluster")
 
     FailIfNot(test.TestUsedTestCommissioner(),
               "Test commissioner check failed")

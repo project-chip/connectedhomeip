@@ -78,6 +78,16 @@ typedef void (^MTRDeviceControllerDataStoreClusterDataHandler)(NSDictionary<NSNu
 - (void)clearStoredClusterDataForNodeID:(NSNumber *)nodeID;
 - (void)clearAllStoredClusterData;
 
+/**
+ * Storage for miscellaneous MTRDevice data that only needs to be stored
+ * locally.
+ *
+ * storeDeviceData uses data and nodeID async without copying, so callers should
+ * not modify the passed-in dictionary or nodeID.
+ */
+- (nullable NSDictionary<NSString *, id> *)getStoredDeviceDataForNodeID:(NSNumber *)nodeID;
+- (void)storeDeviceData:(NSDictionary<NSString *, id> *)data forNodeID:(NSNumber *)nodeID;
+
 @end
 
 NS_ASSUME_NONNULL_END
