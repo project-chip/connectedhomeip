@@ -1,13 +1,13 @@
 /* USER CODE BEGIN Header */
 /**
  ******************************************************************************
- * @file    app_ble.h
+ * @file    app_debug.h
  * @author  MCD Application Team
- * @brief   Header for ble application
+ * @brief   Header for app_debug.c module
  ******************************************************************************
  * @attention
  *
- * Copyright (c) 2019-2021 STMicroelectronics.
+ * Copyright (c) 2020-2021 STMicroelectronics.
  * All rights reserved.
  *
  * This software is licensed under terms that can be found in the LICENSE file
@@ -19,15 +19,14 @@
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef APP_BLE_H
-#define APP_BLE_H
+#ifndef APP_DEBUG_H
+#define APP_DEBUG_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "hci_tl.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -35,18 +34,6 @@ extern "C" {
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
-
-typedef enum
-{
-    APP_BLE_IDLE,
-    APP_BLE_FAST_ADV,
-    APP_BLE_LP_ADV,
-    APP_BLE_SCAN,
-    APP_BLE_LP_CONNECTING,
-    APP_BLE_CONNECTED_SERVER,
-    APP_BLE_CONNECTED_CLIENT
-} APP_BLE_ConnStatus_t;
-
 /* USER CODE BEGIN ET */
 
 /* USER CODE END ET */
@@ -56,32 +43,25 @@ typedef enum
 
 /* USER CODE END EC */
 
-/* External variables --------------------------------------------------------*/
+/* Exported variables --------------------------------------------------------*/
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
 
-/* Exported macro ------------------------------------------------------------*/
+/* Exported macros ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
 
 /* USER CODE END EM */
 
 /* Exported functions ---------------------------------------------*/
-void APP_BLE_Init_Dyn_1(void);
-void APP_BLE_Init_Dyn_2(void);
-APP_BLE_ConnStatus_t APP_BLE_Get_Server_Connection_Status(void);
-
+void APPD_Init(void);
+void APPD_EnableCPU2(void);
 /* USER CODE BEGIN EF */
-void APP_BLE_Key_Button1_Action(void);
-void APP_BLE_Key_Button2_Action(void);
-void APP_BLE_Key_Button3_Action(void);
-void APP_BLE_Stop(void);
-void APP_BLE_Adv_Request(APP_BLE_ConnStatus_t New_Status);
-void APP_BLE_Adv_Cancel(void);
+
 /* USER CODE END EF */
 
 #ifdef __cplusplus
-}
+} /* extern "C" */
 #endif
 
-#endif /*APP_BLE_H */
+#endif /*APP_DEBUG_H */
