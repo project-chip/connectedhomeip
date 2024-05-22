@@ -219,6 +219,34 @@ void CommissionerDiscoveryController::InternalOk()
         ChipLogError(AppServer, "UX InternalOk: could not find instance=%s", mCurrentInstance);
         return;
     }
+
+    if (mAppInstallationService == nullptr)
+    {
+        ChipLogError(AppServer, "UX InternalOk: no app installation service");
+        return;
+    }
+
+    if (!mAppInstallationService->LookupTargetContentApp(client->GetVendorId(), client->GetProductId()))
+    {
+        ChipLogDetail(AppServer, "UX InternalOk: app not installed.");
+
+        // notify client that app will be installed
+        CommissionerDeclaration cd;
+        cd.SetErrorCode(CommissionerDeclaration::CdError::kAppInstallConsentPending);
+        mUdcServer->SendCDCMessage(cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
+
+        // dialog
+        ChipLogDetail(Controller, "------PROMPT USER: %s is requesting to install app on this TV. vendorId=%d, productId=%d",
+                      client->GetDeviceName(), client->GetVendorId(), client->GetProductId());
+
+        if (mUserPrompter != nullptr)
+        {
+            mUserPrompter->PromptForAppInstallOKPermission(client->GetVendorId(), client->GetProductId(), client->GetDeviceName());
+        }
+        ChipLogDetail(Controller, "------Via Shell Enter: app install <pid> <vid>");
+        return;
+    }
+
     if (client->GetUDCClientProcessingState() != UDCClientProcessingState::kPromptingUser)
     {
         ChipLogError(AppServer, "UX InternalOk: invalid state for ok");
@@ -244,6 +272,7 @@ void CommissionerDiscoveryController::InternalOk()
     CharSpan rotatingIdSpan(rotatingIdBuffer, 2 * rotatingIdLength);
 
     uint8_t targetAppCount = client->GetNumTargetAppInfos();
+
     if (targetAppCount > 0)
     {
         ChipLogDetail(AppServer, "UX InternalOk: checking for each target app specified");
@@ -583,6 +612,7 @@ void CommissionerDiscoveryController::Cancel()
     }
     client->SetUDCClientProcessingState(UDCClientProcessingState::kUserDeclined);
     mPendingConsent = false;
+    ResetState();
 }
 
 void CommissionerDiscoveryController::CommissioningSucceeded(uint16_t vendorId, uint16_t productId, NodeId nodeId,
