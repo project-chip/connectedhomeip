@@ -54,47 +54,130 @@ def extract_single_integer_attribute(subject, oid):
     return None
 
 
-class DCLDRequestsHelper:
-    def __init__(self, use_rest, dcld, production, rest_node_url):
+class DCLDClient:
+    '''
+    A client for interacting with DCLD using either the REST API or command line interface (CLI).
+
+    '''
+
+    def __init__(self, use_rest:bool, dcld_exe:str, production:bool, rest_node_url:str):
+        '''
+        Initialize the client
+
+        use_rest: bool
+            Use RESTful API with HTTPS against `rest_node_url`
+        dcld_exe: str
+            Path to `dcld` executable
+        production: bool
+            Use MainNet DCL URL with dcld executable
+        rest_node_url: str
+            RESTful API URL
+        '''
+
         self.use_rest = use_rest
-        self.dcld = dcld
+        self.dcld_exe = dcld_exe
         self.production = production
         self.rest_node_url = rest_node_url
 
-    def use_dcld(self, dcld, production, cmdlist):
-        return [dcld] + cmdlist + (['--node', PRODUCTION_NODE_URL] if production else [])
+    def build_dcld_command_line(self, cmdlist:list[str])->list[str]:
+        '''
+        Build command line for `dcld` executable.
 
-    def get_dcld_cmd_output(self, cmdlist):
+        Parameters
+        ----------
+        cmdlist: list[str]
+            List of command line arguments to append to some predefined arguments
+
+        Returns
+        -------
+        list[str]
+            The complete command list including the DCLD executable and node option if in production
+        '''
+
+        return [self.dcld_exe] + cmdlist + (['--node', PRODUCTION_NODE_URL] if self.production else [])
+
+    def get_dcld_cmd_output_json(self, cmdlist:list[str])->dict:
+        '''
+        Executes a DCLD CLI command and returns the JSON output.
+
+        Parameters
+        ----------
+        cmdlist: list[str]
+            List of command line arguments to append to some predefined arguments
+
+        Returns
+        -------
+        dict
+            The JSON output from the command
+        '''
+
         # Set the output as JSON
-        subprocess.Popen([self.dcld, 'config', 'output', 'json'])
+        subprocess.Popen([self.dcld_exe, 'config', 'output', 'json'])
 
-        cmdpipe = subprocess.Popen(self.use_dcld(self.dcld, self.production, cmdlist),
+        cmdpipe = subprocess.Popen(self.build_dcld_command_line(cmdlist),
                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         return json.loads(cmdpipe.stdout.read())
 
-    def get_revocation_points(self):
+    def get_revocation_points(self)->list[dict]:
+        '''
+        Get revocation points from DCL
+
+        Returns
+        -------
+        list[dict]
+            List of revocation points
+        '''
+
         if self.use_rest:
             response = requests.get(f"{self.rest_node_url}/dcl/pki/revocation-points").json()
         else:
-            response = self.get_dcld_cmd_output(['query', 'pki', 'all-revocation-points'])
+            response = self.get_dcld_cmd_output_json(['query', 'pki', 'all-revocation-points'])
 
         return response["PkiRevocationDistributionPoint"]
 
-    def get_paa_cert_for_crl_issuer(self, crl_signer_issuer_name, crl_signer_authority_key_id):
+    def get_paa_cert_for_crl_issuer(self, crl_signer_issuer_name_b64, crl_signer_authority_key_id)->str:
+        '''
+        Get PAA certificate for CRL issuer
+
+        Parameters
+        ----------
+        crl_signer_issuer_name_b64: str
+            The issuer name of the CRL signer.
+        crl_signer_authority_key_id: str
+            The authority key ID of the CRL signer.
+
+        Returns
+        -------
+        str
+            PAA certificate in PEM format
+        '''
         if self.use_rest:
             response = requests.get(
-                f"{self.rest_node_url}/dcl/pki/certificates/{crl_signer_issuer_name}/{crl_signer_authority_key_id}").json()
+                f"{self.rest_node_url}/dcl/pki/certificates/{crl_signer_issuer_name_b64}/{crl_signer_authority_key_id}").json()
         else:
-            response = self.get_dcld_cmd_output(
-                ['query', 'pki', 'x509-cert', '-u', crl_signer_issuer_name, '-k', crl_signer_authority_key_id])
+            response = self.get_dcld_cmd_output_json(
+                ['query', 'pki', 'x509-cert', '-u', crl_signer_issuer_name_b64, '-k', crl_signer_authority_key_id])
 
         return response["approvedCertificates"]["certs"][0]["pemCert"]
 
-    def get_revocations_points_by_skid(self, issuer_subject_key_id):
+    def get_revocations_points_by_skid(self, issuer_subject_key_id)->list[dict]:
+        '''
+        Get revocation points by subject key ID
+
+        Parameters
+        ----------
+        issuer_subject_key_id: str
+            Subject key ID
+
+        Returns
+        -------
+        list[dict]
+            List of revocation points
+        '''
         if self.use_rest:
             response = requests.get(f"{self.rest_node_url}/dcl/pki/revocation-points/{issuer_subject_key_id}").json()
         else:
-            response = self.get_dcld_cmd_output(['query', 'pki', 'revocation-points',
+            response = self.get_dcld_cmd_output_json(['query', 'pki', 'revocation-points',
                                                 '--issuer-subject-key-id', issuer_subject_key_id])
 
         return response["pkiRevocationDistributionPointsByIssuerSubjectKeyID"]["points"]
@@ -125,9 +208,9 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
 
     rest_node_url = PRODUCTION_NODE_URL_REST if production else TEST_NODE_URL_REST
 
-    dcld_helper = DCLDRequestsHelper(use_rest, dcld, production, rest_node_url)
+    dcld_client = DCLDClient(use_rest, dcld, production, rest_node_url)
 
-    revocation_point_list = dcld_helper.get_revocation_points()
+    revocation_point_list = dcld_client.get_revocation_points()
 
     revocation_set = []
 
@@ -175,7 +258,7 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
         crl_signer_authority_key_id = ':'.join([crl_signer_authority_key_id[i:i+2]
                                                for i in range(0, len(crl_signer_authority_key_id), 2)])
 
-        paa_certificate = dcld_helper.get_paa_cert_for_crl_issuer(crl_signer_issuer_name, crl_signer_authority_key_id)
+        paa_certificate = dcld_client.get_paa_cert_for_crl_issuer(crl_signer_issuer_name, crl_signer_authority_key_id)
 
         if paa_certificate is None:
             print("PAA Certificate not found, continue...")
@@ -183,13 +266,7 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
 
         paa_certificate_object = x509.load_pem_x509_certificate(bytes(paa_certificate, 'utf-8'))
 
-        # This requires cryptography 40.0.0 and this haults on 40.0.0
-        # try:
-        #     crl_signer_certificate.verify_directly_issued_by(paa_certificate_object)
-        # except Exception as e:
-        #     print("CRL Signer Certificate is not issued by PAA Certificate, continue...")
-        #     continue
-
+        # TODO: use verify_directly_issued_by() method when we upgrade cryptography to v40.0.0
         # Verify issuer matches with subject
         if crl_signer_certificate.issuer != paa_certificate_object.subject:
             print("CRL Signer Certificate issuer does not match with PAA Certificate subject, continue...")
@@ -232,7 +309,7 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
         issuer_subject_key_id = ''.join('{:02X}'.format(x) for x in crl_authority_key_id)
 
         # b.
-        same_issuer_points = dcld_helper.get_revocations_points_by_skid(issuer_subject_key_id)
+        same_issuer_points = dcld_client.get_revocations_points_by_skid(issuer_subject_key_id)
         count_with_matching_vid_issuer_skid = sum(item.get('vid') == vid for item in same_issuer_points)
 
         if count_with_matching_vid_issuer_skid > 1:
@@ -259,7 +336,6 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
         serialnumber_list = []
         # 10. Iterate through the Revoked Certificates List
         for revoked_cert in crl_file:
-            print(revoked_cert)
             # a.
             try:
                 revoked_cert_issuer = revoked_cert.extensions.get_extension_for_oid(
@@ -273,16 +349,16 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
                 pass
 
             # b.
-            # try:
-            #     revoked_cert_authority_key_id = revoked_cert.extensions.get_extension_for_oid(
-            #         x509.OID_AUTHORITY_KEY_IDENTIFIER).value.key_identifier
-            #
-            #     if revoked_cert_authority_key_id is None or revoked_cert_authority_key_id != crl_signer_subject_key_id:
-            #         print("CRL Authority Key ID is not CRL Signer Subject Key ID, continue...")
-            #         continue
-            # except Exception:
-            #     print("CRL Authority Key ID not found, continue...")
-            #     continue
+            try:
+                revoked_cert_authority_key_id = revoked_cert.extensions.get_extension_for_oid(
+                    x509.OID_AUTHORITY_KEY_IDENTIFIER).value.key_identifier
+
+                if revoked_cert_authority_key_id is None or revoked_cert_authority_key_id != crl_signer_subject_key_id:
+                    print("CRL Authority Key ID is not CRL Signer Subject Key ID, continue...")
+                    continue
+            except Exception:
+                print("CRL Authority Key ID not found, continue...")
+                continue
 
             # c. and d.
             serialnumber_list.append(bytes(str('{:02X}'.format(revoked_cert.serial_number)), 'utf-8').decode('utf-8'))
