@@ -204,7 +204,8 @@ class TC_IDM_4_2(MatterBaseTest):
             subscription_max_interval_publisher_limit_sec = 60 * 60
             min_interval_floor_sec = 3
 
-        asserts.assert_greater_equal(subscription_max_interval_publisher_limit_sec, 1, "SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC must be at least 1")
+        asserts.assert_greater_equal(subscription_max_interval_publisher_limit_sec, 1,
+                                     "SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC must be at least 1")
 
         logging.info(
             f"Set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC to {subscription_max_interval_publisher_limit_sec} seconds")
