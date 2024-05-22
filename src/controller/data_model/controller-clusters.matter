@@ -9410,3 +9410,4 @@ cluster SampleMei = 4294048800 {
   /** Command that takes two uint8 arguments and returns their sum. */
   command AddArguments(AddArgumentsRequest): AddArgumentsResponse = 2;
 }
+
