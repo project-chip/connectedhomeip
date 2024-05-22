@@ -21,9 +21,10 @@
  *      one) for a fabric.
  */
 
+#include <gtest/gtest.h>
+
 #include "messaging/ExchangeDelegate.h"
 #include "system/SystemClock.h"
-#include <gtest/gtest.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeHolder.h>
 #include <messaging/ExchangeMgr.h>

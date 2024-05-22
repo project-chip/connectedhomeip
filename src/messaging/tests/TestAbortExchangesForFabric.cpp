@@ -21,8 +21,9 @@
  *      one) for a fabric.
  */
 
-#include <app/icd/server/ICDServerConfig.h>
 #include <gtest/gtest.h>
+
+#include <app/icd/server/ICDServerConfig.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/ReliableMessageProtocolConfig.h>

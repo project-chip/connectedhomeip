@@ -14,6 +14,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <errno.h>
+#include <utility>
+
+#include <gtest/gtest.h>
 
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CHIPMem.h>
@@ -25,12 +29,6 @@
 #include <protocols/Protocols.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
-
-#include <gtest/gtest.h>
-#include <nlbyteorder.h>
-
-#include <errno.h>
-#include <utility>
 
 #if CHIP_CRYPTO_PSA
 #include "psa/crypto.h"

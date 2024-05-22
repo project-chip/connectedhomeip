@@ -20,8 +20,11 @@
  *    @file
  *      This file implements unit tests for the ExchangeManager implementation.
  */
+#include <errno.h>
+#include <utility>
 
 #include <gtest/gtest.h>
+
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -32,9 +35,6 @@
 #include <protocols/Protocols.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
-
-#include <errno.h>
-#include <utility>
 
 #if CHIP_CRYPTO_PSA
 #include "psa/crypto.h"

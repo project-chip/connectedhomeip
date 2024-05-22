@@ -21,9 +21,11 @@
  *      This file implements unit tests for the ReliableMessageProtocol
  *      implementation.
  */
+#include <errno.h>
+
+#include <gtest/gtest.h>
 
 #include <app/icd/server/ICDServerConfig.h>
-#include <gtest/gtest.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <messaging/ReliableMessageContext.h>
@@ -33,8 +35,6 @@
 #include <protocols/echo/Echo.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
-
-#include <errno.h>
 
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
