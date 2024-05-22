@@ -60,7 +60,7 @@ class DCLDClient:
 
     '''
 
-    def __init__(self, use_rest:bool, dcld_exe:str, production:bool, rest_node_url:str):
+    def __init__(self, use_rest: bool, dcld_exe: str, production: bool, rest_node_url: str):
         '''
         Initialize the client
 
@@ -79,7 +79,7 @@ class DCLDClient:
         self.production = production
         self.rest_node_url = rest_node_url
 
-    def build_dcld_command_line(self, cmdlist:list[str])->list[str]:
+    def build_dcld_command_line(self, cmdlist: list[str]) -> list[str]:
         '''
         Build command line for `dcld` executable.
 
@@ -96,7 +96,7 @@ class DCLDClient:
 
         return [self.dcld_exe] + cmdlist + (['--node', PRODUCTION_NODE_URL] if self.production else [])
 
-    def get_dcld_cmd_output_json(self, cmdlist:list[str])->dict:
+    def get_dcld_cmd_output_json(self, cmdlist: list[str]) -> dict:
         '''
         Executes a DCLD CLI command and returns the JSON output.
 
@@ -118,7 +118,7 @@ class DCLDClient:
                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         return json.loads(cmdpipe.stdout.read())
 
-    def get_revocation_points(self)->list[dict]:
+    def get_revocation_points(self) -> list[dict]:
         '''
         Get revocation points from DCL
 
@@ -135,7 +135,7 @@ class DCLDClient:
 
         return response["PkiRevocationDistributionPoint"]
 
-    def get_paa_cert_for_crl_issuer(self, crl_signer_issuer_name_b64, crl_signer_authority_key_id)->str:
+    def get_paa_cert_for_crl_issuer(self, crl_signer_issuer_name_b64, crl_signer_authority_key_id) -> str:
         '''
         Get PAA certificate for CRL issuer
 
@@ -160,7 +160,7 @@ class DCLDClient:
 
         return response["approvedCertificates"]["certs"][0]["pemCert"]
 
-    def get_revocations_points_by_skid(self, issuer_subject_key_id)->list[dict]:
+    def get_revocations_points_by_skid(self, issuer_subject_key_id) -> list[dict]:
         '''
         Get revocation points by subject key ID
 
@@ -178,7 +178,7 @@ class DCLDClient:
             response = requests.get(f"{self.rest_node_url}/dcl/pki/revocation-points/{issuer_subject_key_id}").json()
         else:
             response = self.get_dcld_cmd_output_json(['query', 'pki', 'revocation-points',
-                                                '--issuer-subject-key-id', issuer_subject_key_id])
+                                                      '--issuer-subject-key-id', issuer_subject_key_id])
 
         return response["pkiRevocationDistributionPointsByIssuerSubjectKeyID"]["points"]
 
