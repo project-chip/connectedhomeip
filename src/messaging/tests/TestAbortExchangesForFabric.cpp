@@ -233,7 +233,7 @@ void TestAbortExchangesForFabric::CommonCheckAbortAllButOneExchange(bool dropRes
         //
         auto waitTimeout = System::Clock::Milliseconds32(1000);
 
-#if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
         // If running as an ICD, increase waitTimeout to account for the polling interval
         waitTimeout += ICDConfigurationData::GetInstance().GetFastPollingInterval();
 #endif
