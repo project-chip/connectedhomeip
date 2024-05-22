@@ -146,9 +146,9 @@ limitations under the License.
   <struct name="LocationInfoStruct">
     <cluster code="0x0150"/>
     <item name="HomeLocationInfo"  type="HomeLocationStruct"    optional="false" isNullable="true"/>
-    <item name="LandmarkTag"       type="enum8"                 optional="false" isNullable="true"/>
-    <item name="PositionTag"       type="enum8"                 optional="false" isNullable="true"/>
-    <item name="SurfaceTag"        type="enum8"                 optional="false" isNullable="true"/>
+    <item name="LandmarkTag"       type="LandmarkTag"           optional="false" isNullable="true"/>
+    <item name="PositionTag"       type="PositionTag"           optional="false" isNullable="true"/>
+    <item name="SurfaceTag"        type="SurfaceTag"            optional="false" isNullable="true"/>
   </struct>
 
   <struct name="MapStruct">
