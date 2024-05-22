@@ -22,8 +22,6 @@
 #include "../common/CHIPCommand.h"
 #include "../common/Commands.h"
 
-#include <websocket-server/WebSocketServer.h>
-
 #include <string>
 
 class Commands;
