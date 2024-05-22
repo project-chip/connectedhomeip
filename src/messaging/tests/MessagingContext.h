@@ -96,6 +96,8 @@ public:
         mInitialized(false), mAliceAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT + 1)),
         mBobAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT))
     {}
+    // TODO Replace VerifyOrDie with Pigweed assert after transition app/tests to Pigweed.
+    // TODO Currently src/app/icd/server/tests is using MessagingConetext as dependency.
     ~MessagingContext() { VerifyOrDie(mInitialized == false); }
 
     // Whether Alice and Bob are initialized, must be called before Init
