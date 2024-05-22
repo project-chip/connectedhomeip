@@ -65,15 +65,14 @@ tests:
           saveAs: TH1_Fabric_Index
 
     - label:
-          "Step 3.2: TH1 does a non-fabric-filtered read of the Fabrics
-          attribute from the Node Operational Credentials cluster. Save the
-          FabricIndex for TH1 as TH1_Fabric_Index for future use."
-      PICS: OPCREDS.S.A0001
+          "Step 3.2: TH1 does a fabric-filtered read of the Fabrics attribute
+          from the Node Operational Credentials cluster. Save the FabricIndex
+          for TH1 as TH1_Fabric_Index for future use."
       identity: "alpha"
       command: "readAttribute"
       cluster: "Operational Credentials"
       attribute: "Fabrics"
-      fabricFiltered: false
+      fabricFiltered: true
       response:
           value: [{ "FabricIndex": TH1_Fabric_Index, "Label": "" }]
           constraints:
@@ -251,7 +250,21 @@ tests:
 
       # verification: ""
     - label:
-          "Step 13: TH2 does a non-fabric-filtered read of the Fabrics attribute
+          "Step 13a: TH1 does a fabric-filtered read of the Fabrics attribute
+          from the Node Operational Credentials cluster"
+      nodeId: 0x43211234
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "Fabrics"
+      fabricFiltered: true
+      response:
+          value: [{ "FabricIndex": TH1_Fabric_Index, "Label": "" }]
+          constraints:
+              type: list
+
+      # verification: ""
+    - label:
+          "Step 13b: TH2 does a fabric-filtered read of the Fabrics attribute
           from the Node Operational Credentials cluster"
       PICS: OPCREDS.S.A0001
       identity: "beta"
@@ -259,13 +272,9 @@ tests:
       command: "readAttribute"
       cluster: "Operational Credentials"
       attribute: "Fabrics"
-      fabricFiltered: false
+      fabricFiltered: true
       response:
-          value:
-              [
-                  { "FabricIndex": TH1_Fabric_Index, "Label": "" },
-                  { "FabricIndex": TH2_Fabric_Index, "Label": "" },
-              ]
+          value: [{ "FabricIndex": TH2_Fabric_Index, "Label": "" }]
           constraints:
               type: list
 
