@@ -23,7 +23,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MATTER_KEY_NAME_MAX_LENGTH (15 * 2) // ADD Max key name string size is 30 "keyType...;KeyName..."
 namespace chip {
 namespace DeviceLayer {
 namespace PersistedStorage {
