@@ -30,6 +30,7 @@
 #endif
 
 using namespace ::chip::DeviceLayer;
+using chip::DeviceLayer::Internal::ESP32Utils;
 
 namespace chip {
 namespace Dnssd {
@@ -39,7 +40,7 @@ CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturn
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
     ReturnErrorOnFailure(EspDnssdInit(initCallback, errorCallback, context));
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
     ReturnErrorOnFailure(OpenThreadDnssdInit(initCallback, errorCallback, context));
 #endif
     return CHIP_NO_ERROR;
@@ -52,7 +53,7 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCal
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
     ReturnErrorOnFailure(EspDnssdPublishService(service, callback, context));
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
     if (ConnectivityMgr().IsThreadProvisioned())
     {
         ReturnErrorOnFailure(OpenThreadDnssdPublishService(service, callback, context));
@@ -66,7 +67,7 @@ CHIP_ERROR ChipDnssdRemoveServices()
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
     ReturnErrorOnFailure(EspDnssdRemoveServices());
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
     if (ConnectivityMgr().IsThreadProvisioned())
     {
         ReturnErrorOnFailure(OpenThreadDnssdRemoveServices());
@@ -77,7 +78,7 @@ CHIP_ERROR ChipDnssdRemoveServices()
 
 CHIP_ERROR ChipDnssdFinalizeServiceUpdate()
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
     if (ConnectivityMgr().IsThreadProvisioned())
     {
         ReturnErrorOnFailure(OpenThreadDnssdFinalizeServiceUpdate());
@@ -92,12 +93,12 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
     if (ConnectivityMgr().IsWiFiStationProvisioned() ||
-        Internal::ESP32Utils::HasIPv6LinkLocalAddress(Internal::ESP32Utils::kDefaultEthernetNetifKey))
+        ESP32Utils::HasIPv6LinkLocalAddress(ESP32Utils::kDefaultEthernetNetifKey))
     {
         ReturnErrorOnFailure(EspDnssdBrowse(type, protocol, addressType, interface, callback, context, browseIdentifier));
     }
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT && CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
     if (ConnectivityMgr().IsThreadProvisioned())
     {
         ReturnErrorOnFailure(OpenThreadDnssdBrowse(type, protocol, addressType, interface, callback, context, browseIdentifier));
@@ -116,12 +117,12 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId inte
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
     if (ConnectivityMgr().IsWiFiStationProvisioned() ||
-        Internal::ESP32Utils::HasIPv6LinkLocalAddress(Internal::ESP32Utils::kDefaultEthernetNetifKey))
+        ESP32Utils::HasIPv6LinkLocalAddress(ESP32Utils::kDefaultEthernetNetifKey))
     {
         ReturnErrorOnFailure(EspDnssdResolve(service, interface, callback, context));
     }
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT && CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
     if (ConnectivityMgr().IsThreadProvisioned())
     {
         ReturnErrorOnFailure(OpenThreadDnssdResolve(service, interface, callback, context));
