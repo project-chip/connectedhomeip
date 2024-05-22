@@ -213,7 +213,7 @@ limitations under the License.
       <description>EVNotDetected</description>
       <field id="0" name="SessionID" type="int32u"/>
       <field id="1" name="State" type="StateEnum" min="0x00" max="0x06"/>
-      <field id="2" name="SessionDuration" type="elapsed_s" apiMaturit/>
+      <field id="2" name="SessionDuration" type="elapsed_s"/>
       <field id="3" name="SessionEnergyCharged" type="energy_mwh" min="0"/>
       <field id="4" name="SessionEnergyDischarged" type="energy_mwh" min="0" optional="true" apiMaturity="provisional"/>
     </event>
