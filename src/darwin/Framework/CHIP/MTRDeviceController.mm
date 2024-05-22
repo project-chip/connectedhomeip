@@ -934,7 +934,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (MTRBaseDevice *)deviceBeingCommissionedWithNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error
 {
-    auto block = ^MTRBaseDevice * {
+    auto block = ^MTRBaseDevice *
+    {
         chip::CommissioneeDeviceProxy * deviceProxy;
 
         auto errorCode = self->_cppCommissioner->GetDeviceBeingCommissioned(nodeID.unsignedLongLongValue, &deviceProxy);
@@ -1091,7 +1092,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (NSData * _Nullable)attestationChallengeForDeviceID:(NSNumber *)deviceID
 {
-    auto block = ^NSData * {
+    auto block = ^NSData *
+    {
         chip::CommissioneeDeviceProxy * deviceProxy;
 
         auto errorCode = CHIP_NO_ERROR;
@@ -1889,7 +1891,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         return nil;
     }
 
-    auto block = ^NSString * {
+    auto block = ^NSString *
+    {
         chip::SetupPayload setupPayload;
         errorCode = chip::Controller::AutoCommissioningWindowOpener::OpenCommissioningWindow(self->_cppCommissioner, deviceID,
             chip::System::Clock::Seconds16(static_cast<uint16_t>(duration)), chip::Crypto::kSpake2p_Min_PBKDF_Iterations,
