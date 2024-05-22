@@ -250,7 +250,7 @@ using namespace chip::Credentials;
         return nil;
     }
 
-    MTR_LOG_INFO("convertX509Certificate: Success");
+    MTR_LOG_DEBUG("convertX509Certificate: Success");
 
     return AsData(chipCertBytes);
 }
