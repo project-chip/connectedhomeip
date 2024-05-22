@@ -3092,8 +3092,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         // If the server list changed and clusters were removed, remove the clusters from the _persistedClusters and _persistedClusterData for that endpoint
         // Also remove it from the data store.
         case MTRAttributeIDTypeClusterDescriptorAttributeServerListID: {
-            NSMutableSet * toBeRemovedClusters = [NSMutableSet setWithArray:[self arrayOfNumbersFromAttributeValue:previousValue]];
-            NSSet * clustersOnDevice = [NSSet setWithArray:[self arrayOfNumbersFromAttributeValue:attributeDataValue]];
+            NSMutableSet<NSNumber *> * toBeRemovedClusters = [NSMutableSet setWithArray:[self arrayOfNumbersFromAttributeValue:previousValue]];
+            NSSet<NSNumber *> * clustersStillOnEndpoint = [NSSet setWithArray:[self arrayOfNumbersFromAttributeValue:attributeDataValue]];
             [toBeRemovedClusters minusSet:clustersOnDevice];
 
             NSMutableSet<MTRClusterPath *> * clusterPathsToRemove = [[NSMutableSet alloc] init];
@@ -3117,8 +3117,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     // If the attribute list changed and attributes were removed, remove the attributes from the _persistedClusterData for that cluster and endpoint.
     // Also remove it from the data store cluster data.
     case MTRAttributeIDTypeGlobalAttributeAttributeListID: {
-        NSMutableSet * toBeRemovedAttributes = [NSMutableSet setWithArray:[self arrayOfNumbersFromAttributeValue:[self _cachedAttributeValueForPath:attributePath]]];
-        NSSet * attributesOnDevice = [NSSet setWithArray:[self arrayOfNumbersFromAttributeValue:attributeDataValue]];
+        NSMutableSet<NSNumber *> * toBeRemovedAttributes = [NSMutableSet setWithArray:[self arrayOfNumbersFromAttributeValue:[self _cachedAttributeValueForPath:attributePath]]];
+        NSSet<NSNumber *> * attributesStillIncluster = [NSSet setWithArray:[self arrayOfNumbersFromAttributeValue:attributeDataValue]];
 
         [toBeRemovedAttributes minusSet:attributesOnDevice];
         for (NSNumber * attribute in toBeRemovedAttributes) {
