@@ -118,8 +118,8 @@ public:
         UnsolicitedMessageFromPublisherHandler unsolicitedMessageFromPublisherHandler, ReportBeginHandler reportBeginHandler,
         ReportEndHandler reportEndHandler)
         : MTRBaseSubscriptionCallback(attributeReportCallback, eventReportCallback, errorCallback, resubscriptionCallback,
-            subscriptionEstablishedHandler, onDoneHandler, unsolicitedMessageFromPublisherHandler, reportBeginHandler,
-            reportEndHandler)
+              subscriptionEstablishedHandler, onDoneHandler, unsolicitedMessageFromPublisherHandler, reportBeginHandler,
+              reportEndHandler)
     {
     }
 
@@ -486,7 +486,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         auto dstOffsetsMaxSize = [self readAttributeWithEndpointID:dstOffsetsMaxSizePath.endpoint clusterID:dstOffsetsMaxSizePath.cluster attributeID:dstOffsetsMaxSizePath.attribute params:nil];
         if (dstOffsetsMaxSize == nil) {
             // This endpoint does not support TZ, so won't support SetDSTOffset.
-            MTR_LOG_DEFAULT("%@ Unable to SetDSTOffset on endpoint %@, since it does not support the TZ feature", self, endpoint);
+            MTR_LOG("%@ Unable to SetDSTOffset on endpoint %@, since it does not support the TZ feature", self, endpoint);
             continue;
         }
         auto attrReport = [[MTRAttributeReport alloc] initWithResponseValue:@{
@@ -687,7 +687,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
 - (void)setDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue
 {
-    MTR_LOG_INFO("%@ setDelegate %@", self, delegate);
+    MTR_LOG("%@ setDelegate %@", self, delegate);
 
     BOOL setUpSubscription = YES;
 
@@ -724,7 +724,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
 - (void)invalidate
 {
-    MTR_LOG_INFO("%@ invalidate", self);
+    MTR_LOG("%@ invalidate", self);
 
     [_asyncWorkQueue invalidate];
 
@@ -755,7 +755,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 {
     assertChipStackLockedByCurrentThread();
 
-    MTR_LOG_DEFAULT("%@ saw new operational advertisement", self);
+    MTR_LOG("%@ saw new operational advertisement", self);
 
     [self _triggerResubscribeWithReason:"operational advertisement seen"
                     nodeLikelyReachable:YES];
@@ -903,12 +903,12 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     _state = state;
     if (lastState != state) {
         if (state != MTRDeviceStateReachable) {
-            MTR_LOG_INFO("%@ reachability state change %lu => %lu, set estimated start time to nil", self, static_cast<unsigned long>(lastState),
+            MTR_LOG("%@ reachability state change %lu => %lu, set estimated start time to nil", self, static_cast<unsigned long>(lastState),
                 static_cast<unsigned long>(state));
             _estimatedStartTime = nil;
             _estimatedStartTimeFromGeneralDiagnosticsUpTime = nil;
         } else {
-            MTR_LOG_INFO(
+            MTR_LOG(
                 "%@ reachability state change %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
         }
         id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
@@ -918,7 +918,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
             });
         }
     } else {
-        MTR_LOG_INFO(
+        MTR_LOG(
             "%@ Not reporting reachability state change, since no change in state %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
     }
 }
@@ -929,7 +929,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     MTRInternalDeviceState lastState = _internalDeviceState;
     _internalDeviceState = state;
     if (lastState != state) {
-        MTR_LOG_DEFAULT("%@ internal state change %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
+        MTR_LOG("%@ internal state change %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
     }
 }
 
@@ -1077,7 +1077,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 #endif
             if (self->_subscriptionPoolWorkCompletionBlock) {
                 // This means a resubscription triggering event happened and is now in-progress
-                MTR_LOG_DEFAULT("%@ timer fired but already running in subscription pool - ignoring: %@", self, description);
+                MTR_LOG("%@ timer fired but already running in subscription pool - ignoring: %@", self, description);
                 os_unfair_lock_unlock(&self->_lock);
 
                 // call completion as complete to remove from queue
@@ -1165,7 +1165,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
     // don't schedule multiple retries
     if (self.reattemptingSubscription) {
-        MTR_LOG_DEFAULT("%@ already reattempting subscription", self);
+        MTR_LOG("%@ already reattempting subscription", self);
         return;
     }
 
@@ -1182,7 +1182,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         // the device told us to use.
         _lastSubscriptionAttemptWait = 0;
         secondsToWait = retryDelay.doubleValue;
-        MTR_LOG_INFO("%@ resetting resubscribe attempt counter, and delaying by the server-provided delay: %f",
+        MTR_LOG("%@ resetting resubscribe attempt counter, and delaying by the server-provided delay: %f",
             self, secondsToWait);
     } else {
         _lastSubscriptionAttemptWait *= 2;
@@ -1192,7 +1192,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         secondsToWait = _lastSubscriptionAttemptWait;
     }
 
-    MTR_LOG_DEFAULT("%@ scheduling to reattempt subscription in %f seconds", self, secondsToWait);
+    MTR_LOG("%@ scheduling to reattempt subscription in %f seconds", self, secondsToWait);
 
     // If we started subscription or session establishment but failed, remove item from the subscription pool so we can re-queue.
     [self _clearSubscriptionPoolWork];
@@ -1222,7 +1222,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         return;
     }
 
-    MTR_LOG_DEFAULT("%@ reattempting subscription", self);
+    MTR_LOG("%@ reattempting subscription", self);
     self.reattemptingSubscription = NO;
     [self _setupSubscription];
 }
@@ -1258,7 +1258,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         return;
     }
 
-    MTR_LOG_DEFAULT("%@ still not subscribed, marking the device as unreachable", self);
+    MTR_LOG("%@ still not subscribed, marking the device as unreachable", self);
     [self _changeState:MTRDeviceStateUnreachable];
 }
 
@@ -1296,7 +1296,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
     BOOL dataStoreExists = _deviceController.controllerDataStore != nil;
     if (dataStoreExists && _clusterDataToPersist != nil && _clusterDataToPersist.count) {
-        MTR_LOG_DEFAULT("%@ Storing cluster information (data version and attributes) count: %lu", self, static_cast<unsigned long>(_clusterDataToPersist.count));
+        MTR_LOG("%@ Storing cluster information (data version and attributes) count: %lu", self, static_cast<unsigned long>(_clusterDataToPersist.count));
         // We're going to hand out these MTRDeviceClusterData objects to our
         // storage implementation, which will try to read them later.  Make sure
         // we snapshot the state here instead of handing out live copies.
@@ -1428,12 +1428,12 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         if (isStartUpEvent) {
             if (_estimatedStartTimeFromGeneralDiagnosticsUpTime) {
                 // If UpTime was received, make use of it as mark of system start time
-                MTR_LOG_INFO("%@ StartUp event: set estimated start time forward to %@", self,
+                MTR_LOG("%@ StartUp event: set estimated start time forward to %@", self,
                     _estimatedStartTimeFromGeneralDiagnosticsUpTime);
                 _estimatedStartTime = _estimatedStartTimeFromGeneralDiagnosticsUpTime;
             } else {
                 // If UpTime was not received, reset estimated start time in case of reboot
-                MTR_LOG_INFO("%@ StartUp event: set estimated start time to nil", self);
+                MTR_LOG("%@ StartUp event: set estimated start time to nil", self);
                 _estimatedStartTime = nil;
             }
         }
@@ -1468,7 +1468,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         [reportToReturn addObject:eventToReturn];
     }
     if (oldEstimatedStartTime != _estimatedStartTime) {
-        MTR_LOG_DEFAULT("%@ updated estimated start time to %@", self, _estimatedStartTime);
+        MTR_LOG("%@ updated estimated start time to %@", self, _estimatedStartTime);
     }
 
     id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
@@ -1724,7 +1724,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
                    auto callback = std::make_unique<SubscriptionCallback>(
                        ^(NSArray * value) {
-                           MTR_LOG_INFO("%@ got attribute report %@", self, value);
+                           MTR_LOG("%@ got attribute report %@", self, value);
                            dispatch_async(self.queue, ^{
                                // OnAttributeData
                                [self _handleAttributeReport:value fromSubscription:YES];
@@ -1734,7 +1734,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
                            });
                        },
                        ^(NSArray * value) {
-                           MTR_LOG_INFO("%@ got event report %@", self, value);
+                           MTR_LOG("%@ got event report %@", self, value);
                            dispatch_async(self.queue, ^{
                                // OnEventReport
                                [self _handleEventReport:value];
@@ -1755,14 +1755,14 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
                            });
                        },
                        ^(void) {
-                           MTR_LOG_DEFAULT("%@ got subscription established", self);
+                           MTR_LOG("%@ got subscription established", self);
                            dispatch_async(self.queue, ^{
                                // OnSubscriptionEstablished
                                [self _handleSubscriptionEstablished];
                            });
                        },
                        ^(void) {
-                           MTR_LOG_DEFAULT("%@ got subscription done", self);
+                           MTR_LOG("%@ got subscription done", self);
                            // Drop our pointer to the ReadClient immediately, since
                            // it's about to be destroyed and we don't want to be
                            // holding a dangling pointer.
@@ -1776,20 +1776,20 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
                            });
                        },
                        ^(void) {
-                           MTR_LOG_DEFAULT("%@ got unsolicited message from publisher", self);
+                           MTR_LOG("%@ got unsolicited message from publisher", self);
                            dispatch_async(self.queue, ^{
                                // OnUnsolicitedMessageFromPublisher
                                [self _handleUnsolicitedMessageFromPublisher];
                            });
                        },
                        ^(void) {
-                           MTR_LOG_DEFAULT("%@ got report begin", self);
+                           MTR_LOG("%@ got report begin", self);
                            dispatch_async(self.queue, ^{
                                [self _handleReportBegin];
                            });
                        },
                        ^(void) {
-                           MTR_LOG_DEFAULT("%@ got report end", self);
+                           MTR_LOG("%@ got report end", self);
                            dispatch_async(self.queue, ^{
                                [self _handleReportEnd];
                            });
@@ -1884,7 +1884,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
                        return;
                    }
 
-                   MTR_LOG_DEFAULT("%@ Subscribe with data version list size %lu, reduced by %lu", self, (unsigned long) dataVersions.count, (unsigned long) dataVersionFilterListSizeReduction);
+                   MTR_LOG("%@ Subscribe with data version list size %lu, reduced by %lu", self, (unsigned long) dataVersions.count, (unsigned long) dataVersionFilterListSizeReduction);
 
                    // Callback and ClusterStateCache and ReadClient will be deleted
                    // when OnDone is called.
@@ -2099,14 +2099,14 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             while (readRequestsNext.count) {
                 // Can only read up to 9 paths at a time, per spec
                 if (readRequestsCurrent.count >= 9) {
-                    MTR_LOG_INFO("Batching read attribute work item [%llu]: cannot add more work, item is full [0x%016llX:%@:0x%llx:0x%llx]", workItemID, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
+                    MTR_LOG("Batching read attribute work item [%llu]: cannot add more work, item is full [0x%016llX:%@:0x%llx:0x%llx]", workItemID, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
                     return outcome;
                 }
 
                 // if params don't match then they cannot be merged
                 if (![readRequestsNext[0][MTRDeviceReadRequestFieldParamsIndex]
                         isEqual:readRequestsCurrent[0][MTRDeviceReadRequestFieldParamsIndex]]) {
-                    MTR_LOG_INFO("Batching read attribute work item [%llu]: cannot add more work, parameter mismatch [0x%016llX:%@:0x%llx:0x%llx]", workItemID, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
+                    MTR_LOG("Batching read attribute work item [%llu]: cannot add more work, parameter mismatch [0x%016llX:%@:0x%llx:0x%llx]", workItemID, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
                     return outcome;
                 }
 
@@ -2114,7 +2114,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 auto readItem = readRequestsNext.firstObject;
                 [readRequestsNext removeObjectAtIndex:0];
                 [readRequestsCurrent addObject:readItem];
-                MTR_LOG_INFO("Batching read attribute work item [%llu]: added %@ (now %tu requests total) [0x%016llX:%@:0x%llx:0x%llx]",
+                MTR_LOG("Batching read attribute work item [%llu]: added %@ (now %tu requests total) [0x%016llX:%@:0x%llx:0x%llx]",
                     workItemID, readItem, readRequestsCurrent.count, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
                 outcome = MTRBatchedPartially;
             }
@@ -2125,7 +2125,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             mtr_hide(self); // don't capture self accidentally
             for (NSArray * readItem in readRequests) {
                 if ([readItem isEqual:opaqueItemData]) {
-                    MTR_LOG_DEFAULT("Read attribute work item [%llu] report duplicate %@ [0x%016llX:%@:0x%llx:0x%llx]", workItemID, readItem, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
+                    MTR_LOG("Read attribute work item [%llu] report duplicate %@ [0x%016llX:%@:0x%llx:0x%llx]", workItemID, readItem, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
                     *isDuplicate = YES;
                     *stop = YES;
                     return;
@@ -2162,7 +2162,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                             if (values) {
                                 // Since the format is the same data-value dictionary, this looks like an
                                 // attribute report
-                                MTR_LOG_INFO("Read attribute work item [%llu] result: %@  [0x%016llX:%@:0x%llX:0x%llX]", workItemID, values, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
+                                MTR_LOG("Read attribute work item [%llu] result: %@  [0x%016llX:%@:0x%llX:0x%llX]", workItemID, values, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
                                 [self _handleAttributeReport:values fromSubscription:NO];
                             }
 
@@ -2172,7 +2172,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                                 completion(MTRAsyncWorkNeedsRetry);
                             } else {
                                 if (error) {
-                                    MTR_LOG_DEFAULT("Read attribute work item [%llu] failed (giving up): %@   [0x%016llX:%@:0x%llx:0x%llx]", workItemID, error, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
+                                    MTR_LOG("Read attribute work item [%llu] failed (giving up): %@   [0x%016llX:%@:0x%llx:0x%llx]", workItemID, error, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
                                 }
                                 completion(MTRAsyncWorkComplete);
                             }
@@ -2252,7 +2252,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             // with the later one.
             if (![writeRequestsNext[0][MTRDeviceWriteRequestFieldPathIndex]
                     isEqual:writeRequestsCurrent[0][MTRDeviceWriteRequestFieldPathIndex]]) {
-                MTR_LOG_INFO("Batching write attribute work item [%llu]: cannot replace with next work item due to path mismatch", workItemID);
+                MTR_LOG("Batching write attribute work item [%llu]: cannot replace with next work item due to path mismatch", workItemID);
                 return outcome;
             }
 
@@ -2260,7 +2260,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             auto writeItem = writeRequestsNext.firstObject;
             [writeRequestsNext removeObjectAtIndex:0];
             [writeRequestsCurrent replaceObjectAtIndex:0 withObject:writeItem];
-            MTR_LOG_INFO("Batching write attribute work item [%llu]: replaced with new write value %@ [0x%016llX]",
+            MTR_LOG("Batching write attribute work item [%llu]: replaced with new write value %@ [0x%016llX]",
                 workItemID, writeItem, nodeID.unsignedLongLongValue);
             outcome = MTRBatchedPartially;
         }
@@ -2444,7 +2444,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                               completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                                   // Log the data at the INFO level (not usually persisted permanently),
                                   // but make sure we log the work completion at the DEFAULT level.
-                                  MTR_LOG_INFO("Invoke work item [%llu] received command response: %@ error: %@", workItemID, values, error);
+                                  MTR_LOG("Invoke work item [%llu] received command response: %@ error: %@", workItemID, values, error);
                                   // TODO: This 5-retry cap is very arbitrary.
                                   // TODO: Should there be some sort of backoff here?
                                   if (error != nil && error.domain == MTRInteractionErrorDomain && error.code == MTRInteractionErrorCodeBusy && retryCount < 5) {
@@ -2591,7 +2591,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     }
 
     // log attribute paths
-    MTR_LOG_INFO("%@ report from expired expected values %@", self, attributePathsToReport);
+    MTR_LOG("%@ report from expired expected values %@", self, attributePathsToReport);
     [self _reportAttributes:attributesToReport];
 
 // Have a reasonable minimum wait time for expiration timers
@@ -2642,7 +2642,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         return cachedAttributeValue;
     } else {
         // TODO: when not found in cache, generated default values should be used
-        MTR_LOG_INFO("%@ _attributeValueDictionaryForAttributePath: could not find cached attribute values for attribute %@", self,
+        MTR_LOG("%@ _attributeValueDictionaryForAttributePath: could not find cached attribute values for attribute %@", self,
             attributePath);
     }
 
@@ -2743,7 +2743,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
         // sanity check either data value or error must exist
         if (!attributeDataValue && !attributeError) {
-            MTR_LOG_INFO("%@ report %@ no data value or error: %@", self, attributePath, attributeResponseValue);
+            MTR_LOG("%@ report %@ no data value or error: %@", self, attributePath, attributeResponseValue);
             continue;
         }
 
@@ -2785,7 +2785,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 if (!_deviceConfigurationChanged) {
                     _deviceConfigurationChanged = [self _attributeAffectsDeviceConfiguration:attributePath];
                     if (_deviceConfigurationChanged) {
-                        MTR_LOG_INFO("Device configuration changed due to changes in attribute %@", attributePath);
+                        MTR_LOG("Device configuration changed due to changes in attribute %@", attributePath);
                     }
                 }
             }
@@ -2815,9 +2815,9 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 // When the expected value interval expires, the correct value will be reported,
                 // if needed.
                 if (expectedValue) {
-                    MTR_LOG_INFO("%@ report %@ value filtered - expected value still present", self, attributePath);
+                    MTR_LOG("%@ report %@ value filtered - expected value still present", self, attributePath);
                 } else {
-                    MTR_LOG_INFO("%@ report %@ value filtered - same as read cache", self, attributePath);
+                    MTR_LOG("%@ report %@ value filtered - same as read cache", self, attributePath);
                 }
             }
 
@@ -2831,7 +2831,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                     NSDate * potentialSystemStartTime = [NSDate dateWithTimeIntervalSinceNow:-upTime];
                     NSDate * oldSystemStartTime = _estimatedStartTime;
                     if (!_estimatedStartTime || ([potentialSystemStartTime compare:_estimatedStartTime] == NSOrderedAscending)) {
-                        MTR_LOG_INFO("%@ General Diagnostics UpTime %.3lf: estimated start time %@ => %@", self, upTime,
+                        MTR_LOG("%@ General Diagnostics UpTime %.3lf: estimated start time %@ => %@", self, upTime,
                             oldSystemStartTime, potentialSystemStartTime);
                         _estimatedStartTime = potentialSystemStartTime;
                     }
@@ -2854,7 +2854,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         }
     }
 
-    MTR_LOG_INFO("%@ report from reported values %@", self, attributePathsToReport);
+    MTR_LOG("%@ report from reported values %@", self, attributePathsToReport);
 
     return attributesToReport;
 }
@@ -2873,7 +2873,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (void)setPersistedClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData
 {
-    MTR_LOG_INFO("%@ setPersistedClusterData count: %lu", self, static_cast<unsigned long>(clusterData.count));
+    MTR_LOG("%@ setPersistedClusterData count: %lu", self, static_cast<unsigned long>(clusterData.count));
     if (!clusterData.count) {
         return;
     }
@@ -3044,7 +3044,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         *expectedValueID = expectedValueIDToReturn;
     }
 
-    MTR_LOG_INFO("%@ report from new expected values %@", self, attributePathsToReport);
+    MTR_LOG("%@ report from new expected values %@", self, attributePathsToReport);
 
     return attributesToReport;
 }
@@ -3062,7 +3062,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     // since NSTimeInterval is in seconds, convert ms into seconds in double
     NSDate * expirationTime = [NSDate dateWithTimeIntervalSinceNow:expectedValueInterval.doubleValue / 1000];
 
-    MTR_LOG_INFO(
+    MTR_LOG(
         "%@ Setting expected values %@ with expiration time %f seconds from now", self, values, [expirationTime timeIntervalSinceNow]);
 
     std::lock_guard lock(_lock);
@@ -3107,7 +3107,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                expectedValueID:expectedValueID
                  previousValue:&previousValue];
 
-    MTR_LOG_INFO("%@ remove expected value for path %@ should report %@", self, attributePath, shouldReportValue ? @"YES" : @"NO");
+    MTR_LOG("%@ remove expected value for path %@ should report %@", self, attributePath, shouldReportValue ? @"YES" : @"NO");
 
     if (shouldReportValue) {
         NSMutableDictionary * attribute = [NSMutableDictionary dictionaryWithObject:attributePath forKey:MTRAttributePathKey];
