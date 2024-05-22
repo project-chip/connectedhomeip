@@ -194,25 +194,33 @@ class TC_IDM_4_2(MatterBaseTest):
         if Clusters.IcdManagement.id in ep0_servers:
             # Read the IdleModeDuration attribute value from the DUT
             logging.info(
-                "CR1 reads from the DUT the IdleModeDuration attribute and sets subscription_max_interval_publisher_limit_sec = IdleModeDuration")
+                "CR1 reads from the DUT the IdleModeDuration attribute and sets SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = IdleModeDuration")
 
             idleModeDuration = await self.get_idle_mode_duration_sec(CR1)
             subscription_max_interval_publisher_limit_sec = idleModeDuration
             min_interval_floor_sec = 0
         else:
-            # Defaulting subscription_max_interval_publisher_limit_sec to 60 minutes
+            # Defaulting SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC to 60 minutes
             subscription_max_interval_publisher_limit_sec = 60 * 60
             min_interval_floor_sec = 3
 
+        asserts.assert_greater_equal(subscription_max_interval_publisher_limit_sec, 1, "SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC must be at least 1")
+
         logging.info(
-            f"Set subscription_max_interval_publisher_limit_sec to {subscription_max_interval_publisher_limit_sec} seconds")
+            f"Set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC to {subscription_max_interval_publisher_limit_sec} seconds")
 
         # *** Step 1 ***
         # CR1 sends a subscription message to the DUT with MaxIntervalCeiling set to a value greater than
-        # subscription_max_interval_publisher_limit_sec. DUT sends a report data action to the TH. CR1 sends
+        # SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC. DUT sends a report data action to the TH. CR1 sends
         # a success status response to the DUT. DUT sends a Subscribe Response Message to the CR1 to activate
         # the subscription.
         self.step(1)
+
+        # Adding 5 to subscription_max_interval_publisher_limit_sec and setting result to MaxIntervalCeiling,
+        # as per test step instructions.
+        # The edge cases here are:
+        #       min_interval_floor_sec = 0, max_interval_ceiling_sec = 6
+        #       min_interval_floor_sec = 3, max_interval_ceiling_sec = 3605
         max_interval_ceiling_sec = subscription_max_interval_publisher_limit_sec + 5
         asserts.assert_greater(max_interval_ceiling_sec, min_interval_floor_sec,
                                "MaxIntervalCeiling must be greater than MinIntervalFloor")
@@ -253,8 +261,14 @@ class TC_IDM_4_2(MatterBaseTest):
         # CR1 sends a success status response to the DUT. DUT sends a Subscribe Response Message to the
         # CR1 to activate the subscription.
         self.step(2)
-        min_interval_floor_sec = 1
-        max_interval_ceiling_sec = max(0, subscription_max_interval_publisher_limit_sec - 5)
+
+        min_interval_floor_sec = 0
+
+        # Subtracting 5 to subscription_max_interval_publisher_limit_sec and setting result to MaxIntervalCeiling,
+        # as per test step instructions.
+        # The edge case here is:
+        #       min_interval_floor_sec = 0, max_interval_ceiling_sec = 1
+        max_interval_ceiling_sec = max(1, subscription_max_interval_publisher_limit_sec - 5)
         asserts.assert_greater(max_interval_ceiling_sec, min_interval_floor_sec,
                                "MaxIntervalCeiling must be greater than MinIntervalFloor")
 
@@ -284,7 +298,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         # Verify MaxInterval is less than or equal to MaxIntervalCeiling
         asserts.assert_less_equal(sub_cr1_step2_max_interval_ceiling_sec, subscription_max_interval_publisher_limit_sec,
-                                  "MaxInterval is not less than or equal to subscription_max_interval_publisher_limit_sec")
+                                  "MaxInterval is not less than or equal to SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC")
 
         sub_cr1_step2.Shutdown()
 
