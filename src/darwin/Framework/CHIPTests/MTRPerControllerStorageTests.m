@@ -2035,6 +2035,22 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     [controllerServer shutdown];
 }
 
+- (void)testSetMRPParametersWithRunningController
+{
+    NSError * error;
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
+    MTRDeviceController * controller = [self startControllerWithRootKeys:[[MTRTestKeys alloc] init]
+                                                         operationalKeys:[[MTRTestKeys alloc] init]
+                                                                fabricID:@555
+                                                                  nodeID:@888
+                                                                 storage:storageDelegate
+                                                                   error:&error];
+    XCTAssertNotNil(controller);
+    XCTAssertTrue(controller.running);
+    MTRSetMessageReliabilityParameters(@2000, @2000, @2000, @2000);
+    [controller shutdown];
+}
+
 static NSString * const kLocalTestUserDefaultDomain = @"org.csa-iot.matter.darwintest";
 static NSString * const kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey = @"subscriptionPoolSizeOverride";
 
