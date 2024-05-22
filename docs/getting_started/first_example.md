@@ -33,8 +33,8 @@ for testing. More information about the python controller can be found in the
 ## Building your first demo app (lighting)
 
 The examples directory contains a set of apps using an example device
-composition \.zap file. (For more information about device composition and zap,
-see [ZAP documentation](./zap.md)).
+composition \.zap file. For more information about device composition and zap,
+see [ZAP documentation](./zap.md).
 
 This quick start guide will walk you through
 
