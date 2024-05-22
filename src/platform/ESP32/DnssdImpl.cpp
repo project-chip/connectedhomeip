@@ -92,8 +92,7 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
                            intptr_t * browseIdentifier)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
-    if (ConnectivityMgr().IsWiFiStationProvisioned() ||
-        ESP32Utils::HasIPv6LinkLocalAddress(ESP32Utils::kDefaultEthernetNetifKey))
+    if (ConnectivityMgr().IsWiFiStationProvisioned() || ESP32Utils::HasIPv6LinkLocalAddress(ESP32Utils::kDefaultEthernetNetifKey))
     {
         ReturnErrorOnFailure(EspDnssdBrowse(type, protocol, addressType, interface, callback, context, browseIdentifier));
     }
@@ -116,8 +115,7 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId inte
                             void * context)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
-    if (ConnectivityMgr().IsWiFiStationProvisioned() ||
-        ESP32Utils::HasIPv6LinkLocalAddress(ESP32Utils::kDefaultEthernetNetifKey))
+    if (ConnectivityMgr().IsWiFiStationProvisioned() || ESP32Utils::HasIPv6LinkLocalAddress(ESP32Utils::kDefaultEthernetNetifKey))
     {
         ReturnErrorOnFailure(EspDnssdResolve(service, interface, callback, context));
     }
