@@ -80,6 +80,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/refrigerator-and-temperature-
 load "../src/app/zap-templates/zcl/data-model/chip/relative-humidity-measurement-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/rvc-clean-mode-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/rvc-run-mode-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/service-area-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/scene.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/smoke-co-alarm-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/software-diagnostics-cluster.xml";

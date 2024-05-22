@@ -104,6 +104,7 @@
         "replacable-monitoring-cluster.xml",
         "resource-monitoring-cluster.xml",
         "scene.xml",
+        "service-area-cluster.xml",
         "smoke-co-alarm-cluster.xml",
         "software-diagnostics-cluster.xml",
         "switch-cluster.xml",

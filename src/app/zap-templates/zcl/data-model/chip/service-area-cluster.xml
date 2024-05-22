@@ -1,0 +1,135 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2023-24 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+
+
+
+  <bitmap name="Feature" type="bitmap32">
+    <cluster code="0x0150" />
+    <field name="ListOrder"       mask="0x01" />
+  </bitmap>
+
+  <!-- Enum definitions for structures-->
+  <enum name="OpStatusEnum" type="enum8">
+    <cluster code="0x0150"/>
+    <item value="0x00" name="Pending"/>
+    <item value="0x01" name="Traversing"/>
+    <item value="0x02" name="Operating"/>
+    <item value="0x03" name="Skipped"/>
+    <item value="0x04" name="Completed"/>
+  </enum>
+
+  <!-- Data types -->
+  <struct name="LocationInfoStruct">
+    <cluster code="0x0150"/>
+    <item name="HomeLocationInfo"  type="HomeLocationStruct"    optional="false" isNullable="true"/>
+    <item name="LandmarkTag"       type="enum8"                 optional="false" isNullable="true"/>
+    <item name="PositionTag"       type="enum8"                 optional="false" isNullable="true"/>
+    <item name="SurfaceTag"        type="enum8"                 optional="false" isNullable="true"/>
+  </struct>
+
+  <struct name="MapStruct">
+    <cluster code="0x0150"/>
+    <item name="MapId"   type="int8u"                optional="false"/>
+    <item name="Name" type="char_string" length="64" optional="false"/>
+  </struct>
+
+  <struct name="LocStruct">
+    <cluster code="0x0150"/>
+    <item name="LocationId"   type="int32u"                  optional="false" isNullable="false"/>
+    <item name="MapId"        type="int8u"                   optional="false" isNullable="true"/>
+    <item name="LocationInfo" type="LocationInfoStruct"      optional="false" isNullable="false"/>
+  </struct>
+
+  <struct name="ProgStruct">
+    <cluster code="0x0150"/>
+    <item name="LocationId"             type="int32u"        optional="false"/>
+    <item name="Status"                 type="OpStatusEnum"  optional="false"/>
+    <item name="TotalOperationalTime"   type="elapsed_s"     optional="true" isNullable="true"/>
+    <item name="EstimatedTime"          type="elapsed_s"     optional="true" isNullable="true"/>
+  </struct>
+
+
+
+  <!-- Enum definitions for select locations command response-->
+  <enum name="SelectLocationsStatus" type="enum8">
+    <cluster code="0x0150"/>
+    <item value="0x00" name="Success"/>
+    <item value="0x01" name="UnsupportedLocation"/>
+    <item value="0x02" name="DuplicatedLocations"/>
+    <item value="0x03" name="InvalidInMode"/>
+    <item value="0x04" name="InvalidSet"/>
+  </enum>
+
+  <!-- Enum definitions for skip location command response-->
+  <enum name="SkipCurrentStatus" type="enum8">
+    <cluster code="0x0150"/>
+    <item value="0x00" name="Success"/>
+    <item value="0x01" name="InvalidLocation"/>
+    <item value="0x02" name="InvalidInMode"/>
+  </enum>
+
+
+  <cluster>
+    <domain>General</domain>
+    <name>Service Area</name>
+      <code>0x0150</code>
+    <define>SERVICE_AREA_CLUSTER</define>
+    <description>The Service Area cluster provides an interface for controlling the locations where a device should operate, and for querying the current location.</description>
+
+    <!-- Attributes -->
+    <attribute side="server" code="0x0000" define="SupportedLocations"  type="array"     entryType="LocStruct"  writable="false" isNullable="false" optional="false">SupportedLocations</attribute>
+    <attribute side="server" code="0x0001" define="SupportedMaps"       type="array"     entryType="MapStruct"  writable="false" isNullable="false" optional="false">SupportedMaps</attribute>
+    <attribute side="server" code="0x0002" define="SelectedLocations"   type="array"     entryType="int32u"     writable="false" isNullable="true"  optional="false" scene="true">SelectedLocations</attribute>
+    <attribute side="server" code="0x0003" define="CurrentLocation"     type="int32u"                           writable="false" isNullable="true"  optional="true">CurrentLocation</attribute>
+    <attribute side="server" code="0x0004" define="EstimatedEndTime"    type="epoch_s"                          writable="false" isNullable="true"  optional="true" >EstimatedEndTime</attribute>
+    <attribute side="server" code="0x0005" define="Progress"            type="array"     entryType="ProgStruct" writable="false" isNullable="true"  optional="true">Progress</attribute>
+
+    <!-- Commands -->
+    <command source="client" code="0x00" name="SelectLocations" response="SelectLocationsResponse" optional="false">
+      <description>
+        Command used to select a set of device locations, where the device is to operate
+      </description>
+      <arg name="NewLocations" type="int32u" array="true"/>
+    </command>
+
+    <command source="server" code="0x01" name="SelectLocationsResponse" disableDefaultResponse="true" optional="false">
+      <description>
+        This command is sent by the device on receipt of the SelectLocations command.
+      </description>
+      <arg name="Status"     type="SelectLocationsStatus"               optional="false"/>
+      <arg name="StatusText" type="char_string"             length="64" optional="true"/>
+    </command>
+
+    <command source="client" code="0x02" name="SkipCurrent" response="SkipCurrentResponse" optional="true">
+      <description>
+        This command is used to skip the current location where the device operates.
+      </description>
+    </command>
+
+    <command source="server" code="0x03" name="SkipCurrentResponse" disableDefaultResponse="true" optional="true">
+      <description>
+        This command is sent by the device on receipt of the SelectLocations command.
+      </description>
+      <arg name="Status"     type="SkipCurrentStatus"              optional="false"/>
+      <arg name="StatusText" type="char_string"        length="64" optional="true"/>
+    </command>
+
+  </cluster>
+
+</configurator>
