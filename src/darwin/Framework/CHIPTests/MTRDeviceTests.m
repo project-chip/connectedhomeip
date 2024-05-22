@@ -3626,25 +3626,25 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         xpcConnectBlock:^NSXPCConnection * _Nonnull {
             return nil;
         }];
-    
+
     __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:remoteController];
     dispatch_queue_t queue = dispatch_get_main_queue();
-    
+
     // We should not set up a subscription when creating a MTRDevice with a remote controller.
     XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up"];
     subscriptionExpectation.inverted = YES;
-    
+
     __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
-       
+
     XCTAssertTrue([device _getInternalState] == MTRInternalDeviceStateUnsubscribed);
-    
+
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
         [subscriptionExpectation fulfill];
     };
-    
+
     [device setDelegate:delegate queue:queue];
     [self waitForExpectations:@[ subscriptionExpectation ] timeout:30];
-    
+
     XCTAssertTrue([device _getInternalState] == MTRInternalDeviceStateUnsubscribed);
 }
 
