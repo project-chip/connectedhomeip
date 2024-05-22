@@ -2252,7 +2252,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             // with the later one.
             if (![writeRequestsNext[0][MTRDeviceWriteRequestFieldPathIndex]
                     isEqual:writeRequestsCurrent[0][MTRDeviceWriteRequestFieldPathIndex]]) {
-                MTR_LOG_ERROR("Batching write attribute work item [%llu]: cannot replace with next work item due to path mismatch", workItemID);
+                MTR_LOG_INFO("Batching write attribute work item [%llu]: cannot replace with next work item due to path mismatch", workItemID);
                 return outcome;
             }
 
