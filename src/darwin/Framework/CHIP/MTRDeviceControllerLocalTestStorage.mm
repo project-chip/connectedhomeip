@@ -83,7 +83,7 @@ static NSString * const kLocalTestUserDefaultEnabledKey = @"enableTestStorage";
         NSError * error = nil;
         NSData * data = [NSKeyedArchiver archivedDataWithRootObject:value requiringSecureCoding:YES error:&error];
         if (error) {
-            MTR_LOG("MTRDeviceControllerLocalTestStorage storeValue: failed to convert value object to data %@", error);
+            MTR_LOG_ERROR("MTRDeviceControllerLocalTestStorage storeValue: failed to convert value object to data %@", error);
             return NO;
         }
         NSUserDefaults * defaults = [[NSUserDefaults alloc] initWithSuiteName:kLocalTestUserDefaultDomain];
