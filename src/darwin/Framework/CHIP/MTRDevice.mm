@@ -685,13 +685,16 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 #define MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN (10 * 60) // 10 minutes (for now)
 #define MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX (60 * 60) // 60 minutes
 
+-(BOOL)_subscriptionsAllowed {
+    return ![_deviceController isKindOfClass:MTRDeviceControllerOverXPC.class];
+}
+
 - (void)setDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue
 {
     MTR_LOG_INFO("%@ setDelegate %@", self, delegate);
 
     // We should not set up a subscription for device controllers over XPC.
-    BOOL setUpSubscription = ![_deviceController isKindOfClass:MTRDeviceControllerOverXPC.class];
-    ;
+    BOOL setUpSubscription = [self _subscriptionsAllowed];
 
     // For unit testing only
 #ifdef DEBUG
@@ -1689,6 +1692,12 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 - (void)_setupSubscription
 {
     os_unfair_lock_assert_owner(&self->_lock);
+
+    if (![self _subscriptionsAllowed])
+    {
+        MTR_LOG("_setupSubscription: Subscriptions not allowed. Do not set up subscription");
+        return;
+    }
 
 #ifdef DEBUG
     id delegate = _weakDelegate.strongObject;
