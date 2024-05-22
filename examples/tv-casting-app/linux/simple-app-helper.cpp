@@ -33,6 +33,9 @@
 
 // VendorId of the Endpoint on the CastingPlayer that the CastingApp desires to interact with after connection
 const uint16_t kDesiredEndpointVendorId = 65521;
+// EndpointId of the Endpoint on the CastingPlayer that the CastingApp desires to interact with after connection using the
+// Commissioner-Generated passcode commissioning flow
+const uint8_t kDesiredEndpointId = 1;
 // Indicates that the Commissioner-Generated passcode commissioning flow is in progress.
 bool gCommissionerGeneratedPasscodeFlowRunning = false;
 
@@ -294,12 +297,14 @@ void ConnectionHandler(CHIP_ERROR err, matter::casting::core::CastingPlayer * ca
                            [](const matter::casting::memory::Strong<matter::casting::core::Endpoint> & endpoint) {
                                if (gCommissionerGeneratedPasscodeFlowRunning)
                                {
-                                   // Since the tv-app with Vendor ID 1111 does not implement the endpoint with Vendor ID 65521 we
-                                   // will (temporarily) use the endpoint with ID == 1 for demo interactions. See
+                                   // For the example Commissioner-Generated passcode commissioning flow, run demo interactions with
+                                   // the Endpoint with ID 1. For this flow, we commissioned with the Target Content Application
+                                   // with Vendor ID 1111. Since this target content application does not report its Endpoint's
+                                   // Vendor IDs, we find the desired endpoint based on the Endpoint ID. See
                                    // connectedhomeip/examples/tv-app/tv-common/include/AppTv.h.
-                                   return endpoint->GetId() == 1;
+                                   return endpoint->GetId() == kDesiredEndpointId;
                                }
-                               return endpoint->GetVendorId() == kDesiredEndpointVendorId; // 65521
+                               return endpoint->GetVendorId() == kDesiredEndpointVendorId;
                            });
     if (it != endpoints.end())
     {
@@ -408,10 +413,11 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
                                     index);
                     idOptions.mCommissionerPasscode = true;
 
-                    // Override the default target Vendor ID for this example (Commissioner-Generated passcode commissioning flow).
-                    // This tv-app target Vendor ID (1111), does not implement the AccountLogin cluster, which would otherwise auto
-                    // commission using the Commissionee-Generated passcode upon recieving the IdentificationDeclaration Message.
-                    // See connectedhomeip/examples/tv-app/tv-common/include/AppTv.h.
+                    // For the example Commissioner-Generated passcode commissioning flow, override the default Target Content
+                    // Application Vendor ID, which is configured on the tv-app. This Target Content Application Vendor ID (1111),
+                    // does not implement the AccountLogin cluster, which would otherwise auto commission using the
+                    // Commissionee-Generated passcode upon recieving the IdentificationDeclaration Message. See
+                    // connectedhomeip/examples/tv-app/tv-common/include/AppTv.h.
                     targetAppInfo.vendorId                    = 1111;
                     gCommissionerGeneratedPasscodeFlowRunning = true;
                 }
