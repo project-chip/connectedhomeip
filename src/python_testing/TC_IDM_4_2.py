@@ -378,7 +378,6 @@ class TC_IDM_4_2(MatterBaseTest):
             )
             raise ValueError("Expected exception not thrown")
         except ChipStackError as e:
-            print('INVALID_ACTION_ERROR_CODE')
             # Verify that the DUT returns an "INVALID_ACTION" status response
             asserts.assert_equal(e.err, INVALID_ACTION_ERROR_CODE,
                                  "Incorrect error response for subscription to unallowed cluster")
