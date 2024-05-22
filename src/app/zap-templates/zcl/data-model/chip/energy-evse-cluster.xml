@@ -14,7 +14,7 @@ limitations under the License.
 <configurator>
   <domain name="Energy Management"/>
 
-  <enum name="StateEnum" type="enum8" apiMaturity="provisional">
+  <enum name="StateEnum" type="enum8">
     <cluster code="0x0099"/>
     <item name="NotPluggedIn" value="0x00"/>
     <item name="PluggedInNoDemand" value="0x01"/>
@@ -25,7 +25,7 @@ limitations under the License.
     <item name="Fault" value="0x06"/>
   </enum>
 
-  <enum name="SupplyStateEnum" type="enum8" apiMaturity="provisional">
+  <enum name="SupplyStateEnum" type="enum8">
     <cluster code="0x0099"/>
     <item name="Disabled" value="0x00"/>
     <item name="ChargingEnabled" value="0x01"/>
@@ -34,7 +34,7 @@ limitations under the License.
     <item name="DisabledDiagnostics" value="0x04"/>
   </enum>
 
-  <enum name="FaultStateEnum" type="enum8" apiMaturity="provisional">
+  <enum name="FaultStateEnum" type="enum8">
     <cluster code="0x0099"/>
     <item name="NoError" value="0x00"/>
     <item name="MeterFailure" value="0x01"/>
@@ -55,7 +55,7 @@ limitations under the License.
     <item name="Other" value="0xFF"/>
   </enum>
 
-  <enum name="EnergyTransferStoppedReasonEnum" type="enum8" apiMaturity="provisional">
+  <enum name="EnergyTransferStoppedReasonEnum" type="enum8">
     <cluster code="0x0099"/>
     <item name="EVStopped" value="0x00"/>
     <item name="EVSEStopped" value="0x01"/>
@@ -86,7 +86,7 @@ limitations under the License.
     <item fieldId="1" name="ChargingTargets" array="true" type="ChargingTargetStruct" length="10"/>
   </struct>
 
-  <cluster apiMaturity="provisional">
+  <cluster>
     <name>Energy EVSE</name>
     <domain>Energy Management</domain>
     <code>0x0099</code>
@@ -177,7 +177,7 @@ limitations under the License.
     <command source="client" code="0x01" name="Disable" optional="false" mustUseTimedInvoke="true" apiMaturity="provisional">
       <description>Allows a client to disable the EVSE from charging and discharging.</description>
     </command>
-    <command source="client" code="0x02" name="EnableCharging" optional="false" mustUseTimedInvoke="true" apiMaturity="provisional">
+    <command source="client" code="0x02" name="EnableCharging" optional="false" mustUseTimedInvoke="true">
       <arg name="ChargingEnabledUntil" type="epoch_s" isNullable="true"/>
       <arg name="MinimumChargeCurrent" type="amperage_ma" min="0" max="80000"/>
       <arg name="MaximumChargeCurrent" type="amperage_ma" min="0" max="80000"/>
@@ -188,7 +188,7 @@ limitations under the License.
       <arg name="MaximumDischargeCurrent" type="amperage_ma" min="0" max="80000"/>
       <description>Allows a client to enable the EVSE to discharge an EV.</description>
     </command>
-    <command source="client" code="0x04" name="StartDiagnostics" optional="true" mustUseTimedInvoke="true" apiMaturity="provisional">
+    <command source="client" code="0x04" name="StartDiagnostics" optional="true" mustUseTimedInvoke="true">
       <description>Allows a client to put the EVSE into a self-diagnostics mode.</description>
     </command>
     <command source="client" code="0x05" name="SetTargets" optional="true" mustUseTimedInvoke="true" apiMaturity="provisional">
@@ -205,41 +205,41 @@ limitations under the License.
       <arg name="ChargingTargetSchedules" type="ChargingTargetScheduleStruct" array="true" length="7"/>
       <description>The GetTargetsResponse is sent in response to the GetTargets Command.</description>
     </command>
-    <event side="server" code="0x00" name="EVConnected" priority="info" apiMaturity="provisional">
+    <event side="server" code="0x00" name="EVConnected" priority="info">
       <description>EVConnected</description>
-      <field id="0" name="SessionID" type="int32u" apiMaturity="provisional"/>
+      <field id="0" name="SessionID" type="int32u"/>
     </event>
-    <event side="server" code="0x01" name="EVNotDetected" priority="info" apiMaturity="provisional">
+    <event side="server" code="0x01" name="EVNotDetected" priority="info">
       <description>EVNotDetected</description>
-      <field id="0" name="SessionID" type="int32u" apiMaturity="provisional"/>
-      <field id="1" name="State" type="StateEnum" apiMaturity="provisional" min="0x00" max="0x06"/>
-      <field id="2" name="SessionDuration" type="elapsed_s" apiMaturity="provisional"/>
-      <field id="3" name="SessionEnergyCharged" type="energy_mwh" min="0" apiMaturity="provisional"/>
+      <field id="0" name="SessionID" type="int32u"/>
+      <field id="1" name="State" type="StateEnum" min="0x00" max="0x06"/>
+      <field id="2" name="SessionDuration" type="elapsed_s" apiMaturit/>
+      <field id="3" name="SessionEnergyCharged" type="energy_mwh" min="0"/>
       <field id="4" name="SessionEnergyDischarged" type="energy_mwh" min="0" optional="true" apiMaturity="provisional"/>
     </event>
-    <event side="server" code="0x02" name="EnergyTransferStarted" priority="info" apiMaturity="provisional">
+    <event side="server" code="0x02" name="EnergyTransferStarted" priority="info">
       <description>EnergyTransferStarted</description>
-      <field id="0" name="SessionID" type="int32u" apiMaturity="provisional"/>
-      <field id="1" name="State" type="StateEnum" apiMaturity="provisional" min="0x00" max="0x06"/>
-      <field id="2" name="MaximumCurrent" type="amperage_ma" min="0" max="80000" apiMaturity="provisional"/>
+      <field id="0" name="SessionID" type="int32u"/>
+      <field id="1" name="State" type="StateEnum" min="0x00" max="0x06"/>
+      <field id="2" name="MaximumCurrent" type="amperage_ma" min="0" max="80000"/>
     </event>
-    <event side="server" code="0x03" name="EnergyTransferStopped" priority="info" apiMaturity="provisional">
+    <event side="server" code="0x03" name="EnergyTransferStopped" priority="info">
       <description>EnergyTransferStopped</description>
-      <field id="0" name="SessionID" type="int32u" apiMaturity="provisional"/>
-      <field id="1" name="State" type="StateEnum" apiMaturity="provisional" min="0x00" max="0x06"/>
-      <field id="2" name="Reason" type="EnergyTransferStoppedReasonEnum" apiMaturity="provisional" min="0x00" max="0x02"/>
-      <field id="4" name="EnergyTransferred" type="energy_mwh" min="0" apiMaturity="provisional"/>
+      <field id="0" name="SessionID" type="int32u"/>
+      <field id="1" name="State" type="StateEnum" min="0x00" max="0x06"/>
+      <field id="2" name="Reason" type="EnergyTransferStoppedReasonEnum" min="0x00" max="0x02"/>
+      <field id="4" name="EnergyTransferred" type="energy_mwh" min="0"/>
     </event>
-    <event side="server" code="0x04" name="Fault" priority="critical" apiMaturity="provisional">
+    <event side="server" code="0x04" name="Fault" priority="critical">
       <description>Fault</description>
-      <field id="0" name="SessionID" type="int32u" isNullable="true" apiMaturity="provisional"/>
-      <field id="1" name="State" type="StateEnum" apiMaturity="provisional" min="0x00" max="0x06"/>
-      <field id="2" name="FaultStatePreviousState" type="FaultStateEnum" apiMaturity="provisional" min="0x00" max="0xFF"/>
-      <field id="4" name="FaultStateCurrentState" type="FaultStateEnum" apiMaturity="provisional" min="0x00" max="0xFF"/>
+      <field id="0" name="SessionID" type="int32u" isNullable="true"/>
+      <field id="1" name="State" type="StateEnum" min="0x00" max="0x06"/>
+      <field id="2" name="FaultStatePreviousState" type="FaultStateEnum" min="0x00" max="0xFF"/>
+      <field id="4" name="FaultStateCurrentState" type="FaultStateEnum" min="0x00" max="0xFF"/>
     </event>
-    <event side="server" code="0x05" name="RFID" priority="info" apiMaturity="provisional" optional="true">
+    <event side="server" code="0x05" name="RFID" priority="info" optional="true">
       <description>RFID</description>
-      <field id="0" name="UID" type="octet_string" length="10" apiMaturity="provisional"/>
+      <field id="0" name="UID" type="octet_string" length="10"/>
     </event>
   </cluster>
 
