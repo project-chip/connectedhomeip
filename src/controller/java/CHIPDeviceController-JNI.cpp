@@ -2154,6 +2154,26 @@ JNI_METHOD(jbyteArray, validateAndExtractCSR)(JNIEnv * env, jclass clazz, jbyteA
     return javaCsr;
 }
 
+JNI_METHOD(void, startDnssd)(JNIEnv * env, jobject self, jlong handle)
+{
+    ChipLogProgress(Controller, "startDnssd() called");
+    chip::DeviceLayer::StackLock lock;
+
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    wrapper->StartDnssd();
+}
+
+JNI_METHOD(void, stopDnssd)(JNIEnv * env, jobject self, jlong handle)
+{
+    ChipLogProgress(Controller, "stopDnssd() called");
+    chip::DeviceLayer::StackLock lock;
+
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    wrapper->StopDnssd();
+}
+
 void * IOThreadMain(void * arg)
 {
     JNIEnv * env;

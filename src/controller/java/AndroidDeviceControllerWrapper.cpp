@@ -25,6 +25,8 @@
 
 #include <string.h>
 
+#include <app/server/Dnssd.h>
+
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
@@ -1084,4 +1086,14 @@ CHIP_ERROR AndroidDeviceControllerWrapper::SyncDeleteKeyValue(const char * key)
 {
     ChipLogProgress(chipTool, "KVS: Deleting key %s", StringOrNullMarker(key));
     return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key);
+}
+
+void AndroidDeviceControllerWrapper::StartDnssd() {
+    FabricTable * fabricTable = DeviceControllerFactory::GetInstance().GetSystemState()->Fabrics();
+    chip::app::DnssdServer::Instance().SetFabricTable(fabricTable);
+    chip::app::DnssdServer::Instance().StartServer();
+}
+
+void AndroidDeviceControllerWrapper::StopDnssd() {
+    chip::app::DnssdServer::Instance().StopServer();
 }
