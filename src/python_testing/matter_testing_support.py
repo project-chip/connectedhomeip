@@ -320,7 +320,7 @@ class AttributeChangeCallback:
         """This is the subscription callback when an attribute is updated.
            It checks the passed in attribute is the same as the subscribed to attribute and
            then posts it into the queue for later processing."""
-           
+
         asserts.assert_equal(path.AttributeType, self._expected_attribute,
                              f"[AttributeChangeCallback] Attribute mismatch. Expected: {self._expected_attribute}, received: {path.AttributeType}")
         logging.info(f"[AttributeChangeCallback] Attribute update callback for {path.AttributeType}")
@@ -331,13 +331,15 @@ class AttributeChangeCallback:
         try:
             path, transaction = self._output.get(block=True, timeout=10)
         except queue.Empty:
-            asserts.fail(f"[AttributeChangeCallback] Failed to receive a report for the {self._expected_attribute} attribute change")
+            asserts.fail(
+                f"[AttributeChangeCallback] Failed to receive a report for the {self._expected_attribute} attribute change")
 
         asserts.assert_equal(path.AttributeType, self._expected_attribute,
                              f"[AttributeChangeCallback] Received incorrect report. Expected: {self._expected_attribute}, received: {path.AttributeType}")
         try:
             attribute_value = transaction.GetAttribute(path)
-            logging.info(f"[AttributeChangeCallback] Got attribute subscription report. Attribute {path.AttributeType}. Updated value: {attribute_value}. SubscriptionId: {transaction.subscriptionId}")
+            logging.info(
+                f"[AttributeChangeCallback] Got attribute subscription report. Attribute {path.AttributeType}. Updated value: {attribute_value}. SubscriptionId: {transaction.subscriptionId}")
         except KeyError:
             asserts.fail("[AttributeChangeCallback] Attribute {expected_attribute} not found in returned report")
 
