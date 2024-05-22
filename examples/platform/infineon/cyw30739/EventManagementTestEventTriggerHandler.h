@@ -18,14 +18,14 @@
 
 #pragma once
 
-#include <app/TestEventTriggerDelegate.h>
+#include <app/GenericEventManagementTestEventTriggerHandler.h>
 
 namespace chip {
 namespace DeviceLayer {
 namespace Infineon {
 namespace CYW30739 {
 
-class TestEventTriggerHandler : public chip::TestEventTriggerHandler
+class EventManagementTestEventTriggerHandler : public app::GenericEventManagementTestEventTriggerHandler
 {
 public:
     static constexpr uint64_t kFillUpEventLoggingBuffer = 0xffff'ffff'1388'0000;
@@ -33,7 +33,7 @@ public:
     CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override;
 
 private:
-    CHIP_ERROR HandleFillUpEventLoggingBufferEventTriger();
+    virtual void TriggerSoftwareFaultEvent(const char * faultRecordString) override;
 };
 
 } // namespace CYW30739

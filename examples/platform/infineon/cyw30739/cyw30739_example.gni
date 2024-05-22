@@ -24,10 +24,10 @@ template("cyw30739_example") {
 
   static_library(target_name) {
     sources = [
+      "${cyw30739_example_dir}/EventManagementTestEventTriggerHandler.cpp",
       "${cyw30739_example_dir}/LEDWidget.cpp",
       "${cyw30739_example_dir}/OTAConfig.cpp",
       "${cyw30739_example_dir}/SoftwareDiagnostics.cpp",
-      "${cyw30739_example_dir}/TestEventTriggerHandler.cpp",
       "${cyw30739_example_dir}/matter_config.cpp",
     ]
 

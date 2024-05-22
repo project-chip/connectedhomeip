@@ -20,10 +20,10 @@ import("${cyw30739_sdk_build_root}/cyw30739_sdk.gni")
 
 static_library("platform") {
   sources = [
+    "EventManagementTestEventTriggerHandler.h",
     "LEDWidget.h",
     "OTAConfig.h",
     "SoftwareDiagnostics.h",
-    "TestEventTriggerHandler.h",
     "main.cpp",
   ]
 

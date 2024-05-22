@@ -16,32 +16,18 @@
  *    limitations under the License.
  */
 
-#include "TestEventTriggerHandler.h"
-
-#include "SoftwareDiagnostics.h"
+#include "GenericEventManagementTestEventTriggerHandler.h"
 
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
-#include <platform/CHIPDeviceLayer.h>
+#include <platform/GeneralFaults.h>
 
 namespace chip {
-namespace DeviceLayer {
-namespace Infineon {
-namespace CYW30739 {
+namespace app {
 
+using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters;
 
-CHIP_ERROR TestEventTriggerHandler::HandleEventTrigger(uint64_t eventTrigger)
-{
-    switch (eventTrigger)
-    {
-    case kFillUpEventLoggingBuffer:
-        return HandleFillUpEventLoggingBufferEventTriger();
-    default:
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-}
-
-CHIP_ERROR TestEventTriggerHandler::HandleFillUpEventLoggingBufferEventTriger()
+CHIP_ERROR GenericEventManagementTestEventTriggerHandler::HandleFillUpEventLoggingBufferEventTriger()
 {
     /* Create a fake hardware fault list. */
     GeneralFaults<kMaxHardwareFaults> hardwareFaults;
@@ -58,23 +44,29 @@ CHIP_ERROR TestEventTriggerHandler::HandleFillUpEventLoggingBufferEventTriger()
         GeneralDiagnosticsServer::Instance().OnHardwareFaultsDetect(hardwareFaults, hardwareFaults);
     }
 
-    /* Create a fake fault message. */
-    constexpr uint64_t kEncodingOverhead        = 0x40;
-    constexpr uint64_t kMaxEventLoggingInfoSize = CHIP_DEVICE_CONFIG_EVENT_LOGGING_INFO_BUFFER_SIZE - kEncodingOverhead;
-    static char recordString[kMaxEventLoggingInfoSize + 1];
-    memset(recordString, 0x55, kMaxEventLoggingInfoSize);
-    recordString[kMaxEventLoggingInfoSize] = '\0';
+    /* Fill up the info logging buffer. */
+    FillUpEventLoggingBufferWithFakeSoftwareFault(CHIP_DEVICE_CONFIG_EVENT_LOGGING_INFO_BUFFER_SIZE);
 
-    /* Fill up the info logging buffer by a software fault. */
-    OnSoftwareFaultEventHandler(recordString);
-
-    /* Fill up the debug logging buffer by a software fault. */
-    OnSoftwareFaultEventHandler(recordString);
+    /* Fill up the debug logging buffer. */
+    FillUpEventLoggingBufferWithFakeSoftwareFault(CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE);
 
     return CHIP_NO_ERROR;
 }
 
-} // namespace CYW30739
-} // namespace Infineon
-} // namespace DeviceLayer
+void GenericEventManagementTestEventTriggerHandler::FillUpEventLoggingBufferWithFakeSoftwareFault(size_t bufferSize)
+{
+    /* Create a fake fault message. */
+    constexpr size_t kEncodingOverhead = 0x40;
+    const size_t recordSize            = bufferSize - kEncodingOverhead;
+    char * recordBuffer                = static_cast<char *>(Platform::MemoryAlloc(recordSize));
+    VerifyOrReturn(recordBuffer != nullptr);
+    std::unique_ptr<char, decltype(&Platform::MemoryFree)> recordString(recordBuffer, &Platform::MemoryFree);
+    memset(recordString.get(), 0x55, recordSize);
+    recordString.get()[recordSize - 1] = '\0';
+
+    /* Fill up the logging buffer by a software fault. */
+    TriggerSoftwareFaultEvent(recordString.get());
+}
+
+} // namespace app
 } // namespace chip
