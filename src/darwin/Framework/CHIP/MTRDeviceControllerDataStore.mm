@@ -597,7 +597,7 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
                 }
                 if (!success) {
                     storeFailures++;
-                    MTR_LOG_INFO("Store failed in _pruneEmptyStoredClusterDataBranches for clusterIndex (%lu) @ node 0x%016llX endpoint %u", static_cast<unsigned long>(clusterIndexCopy.count), nodeID.unsignedLongLongValue, endpointID.unsignedShortValue);
+                    MTR_LOG_ERROR("Store failed in _pruneEmptyStoredClusterDataBranches for clusterIndex (%lu) @ node 0x%016llX endpoint %u", static_cast<unsigned long>(clusterIndexCopy.count), nodeID.unsignedLongLongValue, endpointID.unsignedShortValue);
                 }
             }
         }
@@ -612,7 +612,7 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
             }
             if (!success) {
                 storeFailures++;
-                MTR_LOG_INFO("Store failed in _pruneEmptyStoredClusterDataBranches for endpointIndex (%lu) @ node 0x%016llX", static_cast<unsigned long>(endpointIndexCopy.count), nodeID.unsignedLongLongValue);
+                MTR_LOG_ERROR("Store failed in _pruneEmptyStoredClusterDataBranches for endpointIndex (%lu) @ node 0x%016llX", static_cast<unsigned long>(endpointIndexCopy.count), nodeID.unsignedLongLongValue);
             }
         }
     }
@@ -626,7 +626,7 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
         }
         if (!success) {
             storeFailures++;
-            MTR_LOG_INFO("Store failed in _pruneEmptyStoredClusterDataBranches for nodeIndex (%lu)", static_cast<unsigned long>(nodeIndexCopy.count));
+            MTR_LOG_ERROR("Store failed in _pruneEmptyStoredClusterDataBranches for nodeIndex (%lu)", static_cast<unsigned long>(nodeIndexCopy.count));
         }
     }
 
@@ -656,7 +656,7 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
         for (NSNumber * clusterID in clusterIndex) {
             BOOL success = [self _deleteClusterDataForNodeID:nodeID endpointID:endpointID clusterID:clusterID];
             if (!success) {
-                MTR_LOG_INFO("Delete failed for clusterData @ node 0x%016llX endpoint %u cluster 0x%08lX", nodeID.unsignedLongLongValue, endpointID.unsignedShortValue, clusterID.unsignedLongValue);
+                MTR_LOG_ERROR("Delete failed for clusterData @ node 0x%016llX endpoint %u cluster 0x%08lX", nodeID.unsignedLongLongValue, endpointID.unsignedShortValue, clusterID.unsignedLongValue);
             } else {
                 clusterDataCleared++;
             }
@@ -664,7 +664,7 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
 
         BOOL success = [self _deleteClusterIndexForNodeID:nodeID endpointID:endpointID];
         if (!success) {
-            MTR_LOG_INFO("Delete failed for clusterIndex @ node 0x%016llX endpoint %u", nodeID.unsignedLongLongValue, endpointID.unsignedShortValue);
+            MTR_LOG_ERROR("Delete failed for clusterIndex @ node 0x%016llX endpoint %u", nodeID.unsignedLongLongValue, endpointID.unsignedShortValue);
         } else {
             endpointsCleared++;
         }
@@ -672,7 +672,7 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
 
     BOOL success = [self _deleteEndpointIndexForNodeID:nodeID];
     if (!success) {
-        MTR_LOG_INFO("Delete failed for endpointIndex @ node 0x%016llX", nodeID.unsignedLongLongValue);
+        MTR_LOG_ERROR("Delete failed for endpointIndex @ node 0x%016llX", nodeID.unsignedLongLongValue);
     }
 
     MTR_LOG_INFO("clearStoredClusterDataForNodeID: deleted endpoints %lu/%lu clusters %lu/%lu", static_cast<unsigned long>(endpointsCleared), static_cast<unsigned long>(endpointsClearAttempts), static_cast<unsigned long>(clusterDataCleared), static_cast<unsigned long>(clusterDataClearAttempts));
@@ -693,7 +693,7 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
                 success = [self _deleteNodeIndex];
             }
             if (!success) {
-                MTR_LOG_INFO("Store failed in clearStoredAttributesForNodeID for nodeIndex (%lu)", static_cast<unsigned long>(nodeIndexCopy.count));
+                MTR_LOG_ERROR("Store failed in clearStoredAttributesForNodeID for nodeIndex (%lu)", static_cast<unsigned long>(nodeIndexCopy.count));
             }
         }
     });
@@ -711,7 +711,7 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
 
         BOOL success = [self _deleteNodeIndex];
         if (!success) {
-            MTR_LOG_INFO("Delete failed for nodeIndex");
+            MTR_LOG_ERROR("Delete failed for nodeIndex");
         }
     });
 }
@@ -906,7 +906,7 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
                 BOOL storeFailed = ![self _storeClusterData:data forNodeID:nodeID endpointID:path.endpoint clusterID:path.cluster];
                 if (storeFailed) {
                     storeFailures++;
-                    MTR_LOG_INFO("Store failed for clusterData @ node 0x%016llX endpoint %u cluster 0x%08lX", nodeID.unsignedLongLongValue, path.endpoint.unsignedShortValue, path.cluster.unsignedLongValue);
+                    MTR_LOG_ERROR("Store failed for clusterData @ node 0x%016llX endpoint %u cluster 0x%08lX", nodeID.unsignedLongLongValue, path.endpoint.unsignedShortValue, path.cluster.unsignedLongValue);
                 }
             }
 
@@ -962,7 +962,7 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
                     BOOL storeFailed = ![self _storeClusterIndex:clusterIndexToStore forNodeID:nodeID endpointID:endpointID];
                     if (storeFailed) {
                         storeFailures++;
-                        MTR_LOG_INFO("Store failed for clusterIndex @ node 0x%016llX endpoint %u", nodeID.unsignedLongLongValue, endpointID.unsignedShortValue);
+                        MTR_LOG_ERROR("Store failed for clusterIndex @ node 0x%016llX endpoint %u", nodeID.unsignedLongLongValue, endpointID.unsignedShortValue);
                         continue;
                     }
                 }
@@ -977,7 +977,7 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
                 BOOL storeFailed = ![self _storeEndpointIndex:endpointIndexToStore forNodeID:nodeID];
                 if (storeFailed) {
                     storeFailures++;
-                    MTR_LOG_INFO("Store failed for endpointIndex @ node 0x%016llX", nodeID.unsignedLongLongValue);
+                    MTR_LOG_ERROR("Store failed for endpointIndex @ node 0x%016llX", nodeID.unsignedLongLongValue);
                 }
             }
         }
@@ -999,7 +999,7 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
                 BOOL storeFailed = ![self _storeNodeIndex:nodeIndexToStore];
                 if (storeFailed) {
                     storeFailures++;
-                    MTR_LOG_INFO("Store failed for nodeIndex");
+                    MTR_LOG_ERROR("Store failed for nodeIndex");
                 }
             }
         }
@@ -1008,7 +1008,7 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
             BOOL storeFailed = ![self _bulkStoreAttributeCacheValues:bulkValuesToStore];
             if (storeFailed) {
                 storeFailures++;
-                MTR_LOG_INFO("Store failed for bulk values count %lu", static_cast<unsigned long>(bulkValuesToStore.count));
+                MTR_LOG_ERROR("Store failed for bulk values count %lu", static_cast<unsigned long>(bulkValuesToStore.count));
             }
         }
 
