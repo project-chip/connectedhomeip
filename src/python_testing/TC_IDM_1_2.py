@@ -236,8 +236,11 @@ class TC_IDM_1_2(MatterBaseTest):
 
         # Lucky candidate ArmFailSafe is at it again - command side effect is to set breadcrumb attribute
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=2)
-        await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd, suppressResponse=True)
-        # TODO: Once the above issue is resolved, this needs a check to ensure that no response was received.
+        try:
+            await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd, suppressResponse=True)
+            # TODO: Once the above issue is resolved, this needs a check to ensure that (always) no response was received.
+        except ChipStackError:
+            logging.info("DUT correctly supressed the response")
 
         # Verify that the command had the correct side effect even if a response was sent
         breadcrumb = await self.read_single_attribute_check_success(
