@@ -685,11 +685,17 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 #define MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN (10 * 60) // 10 minutes (for now)
 #define MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX (60 * 60) // 60 minutes
 
+- (BOOL)_subscriptionsAllowed
+{
+    return ![_deviceController isKindOfClass:MTRDeviceControllerOverXPC.class];
+}
+
 - (void)setDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue
 {
     MTR_LOG("%@ setDelegate %@", self, delegate);
 
-    BOOL setUpSubscription = YES;
+    // We should not set up a subscription for device controllers over XPC.
+    BOOL setUpSubscription = [self _subscriptionsAllowed];
 
     // For unit testing only
 #ifdef DEBUG
@@ -932,6 +938,14 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         MTR_LOG("%@ internal state change %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
     }
 }
+
+#ifdef DEBUG
+- (MTRInternalDeviceState)_getInternalState
+{
+    std::lock_guard lock(self->_lock);
+    return _internalDeviceState;
+}
+#endif
 
 // First Time Sync happens 2 minutes after reachability (this can be changed in the future)
 #define MTR_DEVICE_TIME_UPDATE_INITIAL_WAIT_TIME_SEC (60 * 2)
@@ -1679,6 +1693,11 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 - (void)_setupSubscription
 {
     os_unfair_lock_assert_owner(&self->_lock);
+
+    if (![self _subscriptionsAllowed]) {
+        MTR_LOG("_setupSubscription: Subscriptions not allowed. Do not set up subscription");
+        return;
+    }
 
 #ifdef DEBUG
     id delegate = _weakDelegate.strongObject;
