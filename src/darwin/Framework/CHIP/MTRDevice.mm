@@ -35,6 +35,8 @@
 #import "MTRError_Internal.h"
 #import "MTREventTLVValueDecoder_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "MTRMetricKeys.h"
+#import "MTRMetricsCollector.h"
 #import "MTRTimeUtils.h"
 #import "MTRUnfairLock.h"
 #import "zap-generated/MTRCommandPayloads_Internal.h"
@@ -89,6 +91,39 @@ NSString * const MTRDataVersionKey = @"dataVersion";
 {
     return _object;
 }
+@end
+
+// Stores essential-for-logging attributes immutably for use in logs
+@interface MTRDeviceEssentialAttributes : NSObject
+@property (readonly) UInt16 vendorID;
+@property (readonly) UInt16 productID;
+@property (readonly) BOOL usesThread;
+
+- (void)addEssentialAttributesToCurrentMetricScope;
+
+@end
+
+@implementation MTRDeviceEssentialAttributes
+
+- (instancetype)initWithVendorID:(UInt16)vendorID productID:(UInt16)productID usesThread:(BOOL)usesThread {
+    self = [super init];
+    
+    if (self) {
+        _vendorID = vendorID;
+        _productID = productID;
+        _usesThread = usesThread;
+    }
+    
+    return self;
+}
+
+- (void)addEssentialAttributesToCurrentMetricScope {
+    using namespace chip::Tracing::DarwinFramework;
+    MATTER_LOG_METRIC(kMetricDeviceVendorID, _vendorID);
+    MATTER_LOG_METRIC(kMetricDeviceProductID, _productID);
+    MATTER_LOG_METRIC(kMetricDeviceUsesThread, _usesThread);
+}
+
 @end
 
 NSNumber * MTRClampedNumber(NSNumber * aNumber, NSNumber * min, NSNumber * max)
@@ -323,6 +358,10 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 //   Actively receiving priming report
 
 @property (nonatomic) MTRInternalDeviceState internalDeviceState;
+
+// TODO:  cache this once I understand the point in the MTRDevice lifecycle that the relevant attributes will be present.
+// kmo 22 may 2024 14h55
+// @property (nonatomic) MTRDeviceEssentialAttributes * essentialAttributes;
 
 #define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS (1)
 #define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MAX_WAIT_SECONDS (3600)
@@ -1715,6 +1754,8 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         BOOL isStartUpEvent = (eventPath.cluster.unsignedLongValue == MTRClusterIDTypeBasicInformationID)
             && (eventPath.event.unsignedLongValue == MTREventIDTypeClusterBasicInformationEventStartUpID);
         if (isStartUpEvent) {
+            // REVIEWERS:  this seems like a good place to set up / cache
+            // the essential device attributes - is it?
             if (_estimatedStartTimeFromGeneralDiagnosticsUpTime) {
                 // If UpTime was received, make use of it as mark of system start time
                 MTR_LOG("%@ StartUp event: set estimated start time forward to %@", self,
@@ -1886,9 +1927,18 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         && isFromSubscription
         && !_receivingPrimingReport
         && AttributeHasChangesOmittedQuality(path)) {
-        // Do not persist new values for Changes Omitted Quality attributes unless
-        // they're part of a Priming Report or from a read response.
+        // Do not persist new values for Changes Omitted Quality (aka C Quality)
+        // attributes unless they're part of a Priming Report or from a read response.
         // (removals are OK)
+        
+        // log when a device violates expectations for Changes Omitted Quality attributes.
+        MTRDeviceEssentialAttributes * attributes = [self _essentialAttributesForCurrentState];
+        
+        using namespace chip::Tracing::DarwinFramework;
+        MATTER_LOG_METRIC_BEGIN(kMetricUnexpectedCQualityUpdate);
+        [attributes addEssentialAttributesToCurrentMetricScope];
+        MATTER_LOG_METRIC_END(kMetricUnexpectedCQualityUpdate);
+        
         return;
     }
 
@@ -3640,6 +3690,22 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         return;
 
     [self.temporaryMetaDataCache removeObjectForKey:[NSString stringWithFormat:@"%@:%@", key, endpointID]];
+}
+
+#pragma mark Log Help
+
+- (MTRDeviceEssentialAttributes *)_essentialAttributesForCurrentState {
+    MTRClusterPath * basicInfoClusterPath = [MTRClusterPath clusterPathWithEndpointID:@(kRootEndpointId) clusterID:@(MTRClusterIDTypeBasicInformationID)];
+    MTRDeviceClusterData * basicInfoClusterData = [self _clusterDataForPath:basicInfoClusterPath];
+    
+    NSNumber * vidObj = basicInfoClusterData.attributes[@(MTRAttributeIDTypeClusterBasicInformationAttributeVendorIDID)][MTRValueKey];
+    UInt16 vendorID = vidObj.unsignedShortValue;
+    NSNumber * pidObj = basicInfoClusterData.attributes[@(MTRAttributeIDTypeClusterBasicInformationAttributeProductIDID)][MTRValueKey];
+    UInt16 productID = pidObj.unsignedShortValue;
+    
+    BOOL usesThread = [self _deviceUsesThread];
+    
+    return [[MTRDeviceEssentialAttributes alloc] initWithVendorID:vendorID productID:productID usesThread:usesThread];
 }
 
 @end
