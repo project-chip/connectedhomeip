@@ -41,24 +41,22 @@ class GlobalAttributeIds(IntEnum):
             return "ClusterRevision"
 
 
-@dataclass
-class IdRange:
-    min: int
-    max: int
+class IdRange():
+    def __init__(self, min, max):
+        self.min_max = range(min, max+1)
 
-    def _contains(self, id: int):
-        return id in range(self.min, self.max+1)
+    def __contains__(self, key):
+        return key in self.min_max
 
 
-@dataclass
 class PrefixIdRange(IdRange):
-    def contains(self, id: int):
-        return super()._contains(id >> 16)
+    def __contains__(self, id: int):
+        return super().__contains__(id >> 16)
 
 
 class SuffixIdRange(IdRange):
-    def contains(self, id: int):
-        return super()._contains(id & 0xFFFF)
+    def __contains__(self, id: int):
+        return super().__contains__(id & 0xFFFF)
 
 
 STANDARD_PREFIX = PrefixIdRange(0x0000, 0x0000)
@@ -73,15 +71,15 @@ ATTRIBUTE_ID_NON_GLOBAL_RANGE_SUFFIX = SuffixIdRange(0x0000, 0x4FFF)
 
 
 def standard_device_type_range(id: int):
-    return STANDARD_PREFIX.contains(id) and DEVICE_TYPE_ID_RANGE_SUFFIX.contains(id)
+    return id in STANDARD_PREFIX and id in DEVICE_TYPE_ID_RANGE_SUFFIX
 
 
 def manufacturer_device_type_range(id: int):
-    return MANUFACTURER_PREFIX.contains(id) and DEVICE_TYPE_ID_RANGE_SUFFIX.contains(id)
+    return id in MANUFACTURER_PREFIX and id in DEVICE_TYPE_ID_RANGE_SUFFIX
 
 
 def test_device_type_range(id: int):
-    return TEST_PREFIX.contains(id) and DEVICE_TYPE_ID_RANGE_SUFFIX.contains(id)
+    return id in TEST_PREFIX and id in DEVICE_TYPE_ID_RANGE_SUFFIX
 
 
 def valid_device_type_range(id: int, allow_test: bool = False):
@@ -92,15 +90,15 @@ def valid_device_type_range(id: int, allow_test: bool = False):
 
 
 def standard_cluster_range(id: int):
-    return STANDARD_PREFIX.contains(id) and CLUSTER_ID_STANDARD_RANGE_SUFFIX.contains(id)
+    return id in STANDARD_PREFIX and id in CLUSTER_ID_STANDARD_RANGE_SUFFIX
 
 
 def manufacturer_cluster_range(id: int):
-    return MANUFACTURER_PREFIX.contains(id) and CLUSTER_ID_MANUFACTURER_RANGE_SUFFIX.contains(id)
+    return id in MANUFACTURER_PREFIX and id in CLUSTER_ID_MANUFACTURER_RANGE_SUFFIX
 
 
 def test_cluster_range(id: int):
-    return TEST_PREFIX.contains(id) and CLUSTER_ID_MANUFACTURER_RANGE_SUFFIX.contains(id)
+    return id in TEST_PREFIX and id in CLUSTER_ID_MANUFACTURER_RANGE_SUFFIX
 
 
 def valid_cluster_range(id: int, allow_test: bool = False):
@@ -111,19 +109,19 @@ def valid_cluster_range(id: int, allow_test: bool = False):
 
 
 def standard_non_global_attribute_range(id: int):
-    return STANDARD_PREFIX.contains(id) and ATTRIBUTE_ID_NON_GLOBAL_RANGE_SUFFIX.contains(id)
+    return id in STANDARD_PREFIX and id in ATTRIBUTE_ID_NON_GLOBAL_RANGE_SUFFIX
 
 
 def standard_global_attribute_range(id: str):
-    return STANDARD_PREFIX.contains(id) and ATTRIBUTE_ID_GLOBAL_RANGE_SUFFIX.contains(id)
+    return id in STANDARD_PREFIX and id in ATTRIBUTE_ID_GLOBAL_RANGE_SUFFIX
 
 
 def manufacturer_attribute_range(id: str):
-    return MANUFACTURER_PREFIX.contains(id) and ATTRIBUTE_ID_NON_GLOBAL_RANGE_SUFFIX.contains(id)
+    return id in MANUFACTURER_PREFIX and id in ATTRIBUTE_ID_NON_GLOBAL_RANGE_SUFFIX
 
 
 def test_attribute_range(id: str):
-    return TEST_PREFIX.contains(id) and ATTRIBUTE_ID_NON_GLOBAL_RANGE_SUFFIX.contains(id)
+    return id in TEST_PREFIX and id in ATTRIBUTE_ID_NON_GLOBAL_RANGE_SUFFIX
 
 
 def valid_attribute_range(id: str, allow_test: bool = False):
