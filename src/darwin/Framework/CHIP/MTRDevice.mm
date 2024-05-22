@@ -689,7 +689,8 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 {
     MTR_LOG_INFO("%@ setDelegate %@", self, delegate);
 
-    BOOL setUpSubscription = YES;
+    // We should not set up a subscription for device controllers over XPC.
+    BOOL setUpSubscription = ![_deviceController isKindOfClass:MTRDeviceControllerOverXPC.class];;
 
     // For unit testing only
 #ifdef DEBUG
@@ -932,6 +933,14 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         MTR_LOG_DEFAULT("%@ internal state change %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
     }
 }
+
+#ifdef DEBUG
+- (MTRInternalDeviceState)_getInternalState
+{
+    std::lock_guard lock(self->_lock);
+    return _internalDeviceState;
+}
+#endif
 
 // First Time Sync happens 2 minutes after reachability (this can be changed in the future)
 #define MTR_DEVICE_TIME_UPDATE_INITIAL_WAIT_TIME_SEC (60 * 2)
