@@ -74,7 +74,7 @@ class TC_IDM_1_4(MatterBaseTest):
         cap_for_batch_commands = 100
         number_of_commands_to_send = min(max_paths_per_invoke + 1, cap_for_batch_commands)
 
-        invalid_command_id = 0xffff_ffff
+        invalid_command_id = 0xfff4_00ff
         list_of_commands_to_send = []
         for endpoint_index in range(number_of_commands_to_send):
             # Using Toggle command to form the base as it is a command that doesn't take
