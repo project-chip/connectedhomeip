@@ -76,11 +76,9 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
     return 0;
 }
 #endif // SL_MBEDTLS_USE_TINYCRYPT
-
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     CHIP_ERROR err;
-
     // Initialize the configuration system.
     err = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
     SuccessOrExit(err);
