@@ -3623,9 +3623,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     static NSString * const MTRDeviceControllerId = @"MTRController";
     __auto_type remoteController = [MTRDeviceController
         sharedControllerWithID:MTRDeviceControllerId
-        xpcConnectBlock:^NSXPCConnection * _Nonnull {
-            return nil;
-        }];
+               xpcConnectBlock:^NSXPCConnection * _Nonnull {
+                   return nil;
+               }];
 
     __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:remoteController];
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -3647,7 +3647,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     XCTAssertTrue([device _getInternalState] == MTRInternalDeviceStateUnsubscribed);
 }
-
 
 @end
 

@@ -690,7 +690,8 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     MTR_LOG_INFO("%@ setDelegate %@", self, delegate);
 
     // We should not set up a subscription for device controllers over XPC.
-    BOOL setUpSubscription = ![_deviceController isKindOfClass:MTRDeviceControllerOverXPC.class];;
+    BOOL setUpSubscription = ![_deviceController isKindOfClass:MTRDeviceControllerOverXPC.class];
+    ;
 
     // For unit testing only
 #ifdef DEBUG
