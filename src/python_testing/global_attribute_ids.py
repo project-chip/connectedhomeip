@@ -17,8 +17,7 @@
 
 # This file should be removed once we have a good way to get this from the codegen or XML
 
-from dataclasses import dataclass
-from enum import IntEnum
+from enum import Enum, IntEnum, auto
 
 
 class GlobalAttributeIds(IntEnum):
@@ -39,6 +38,31 @@ class GlobalAttributeIds(IntEnum):
             return "FeatureMap"
         if self == GlobalAttributeIds.CLUSTER_REVISION_ID:
             return "ClusterRevision"
+
+
+class DeviceTypeIdType(Enum):
+    kInvalid = auto(),
+    kStandard = auto(),
+    kManufacturer = auto(),
+    kTest = auto(),
+
+
+class ClusterIdType(Enum):
+    kInvalid = auto()
+    kStandard = auto(),
+    kManufacturer = auto(),
+    kTest = auto(),
+
+
+class AttributeIdType(Enum):
+    kInvalid = auto()
+    kStandardGlobal = auto(),
+    kStandardNonGlobal = auto(),
+    kManufacturer = auto(),
+    kTest = auto(),
+
+# ID helper classes - this allows us to use the values from the prefix and suffix table directly
+# because the class handles the non-inclusive range.
 
 
 class IdRange():
@@ -70,62 +94,54 @@ ATTRIBUTE_ID_GLOBAL_RANGE_SUFFIX = SuffixIdRange(0xF000, 0xFFFE)
 ATTRIBUTE_ID_NON_GLOBAL_RANGE_SUFFIX = SuffixIdRange(0x0000, 0x4FFF)
 
 
-def standard_device_type_range(id: int):
-    return id in STANDARD_PREFIX and id in DEVICE_TYPE_ID_RANGE_SUFFIX
+def device_type_id_type(id: int) -> DeviceTypeIdType:
+    if id in STANDARD_PREFIX and id in DEVICE_TYPE_ID_RANGE_SUFFIX:
+        return DeviceTypeIdType.kStandard
+    if id in MANUFACTURER_PREFIX and id in DEVICE_TYPE_ID_RANGE_SUFFIX:
+        return DeviceTypeIdType.kManufacturer
+    if id in TEST_PREFIX and id in DEVICE_TYPE_ID_RANGE_SUFFIX:
+        return DeviceTypeIdType.kTest
+    return DeviceTypeIdType.kInvalid
 
 
-def manufacturer_device_type_range(id: int):
-    return id in MANUFACTURER_PREFIX and id in DEVICE_TYPE_ID_RANGE_SUFFIX
-
-
-def test_device_type_range(id: int):
-    return id in TEST_PREFIX and id in DEVICE_TYPE_ID_RANGE_SUFFIX
-
-
-def valid_device_type_range(id: int, allow_test: bool = False):
-    ret = manufacturer_device_type_range(id) or standard_device_type_range(id)
+def is_valid_device_type_id(id_type: DeviceTypeIdType, allow_test=False) -> bool:
+    valid = [DeviceTypeIdType.kStandard, DeviceTypeIdType.kManufacturer]
     if allow_test:
-        ret = ret or test_device_type_range(id)
-    return ret
+        valid.append(DeviceTypeIdType.kTest)
+    return id_type in valid
 
 
-def standard_cluster_range(id: int):
-    return id in STANDARD_PREFIX and id in CLUSTER_ID_STANDARD_RANGE_SUFFIX
+def cluster_id_type(id: int) -> ClusterIdType:
+    if id in STANDARD_PREFIX and id in CLUSTER_ID_STANDARD_RANGE_SUFFIX:
+        return ClusterIdType.kStandard
+    if id in MANUFACTURER_PREFIX and id in CLUSTER_ID_MANUFACTURER_RANGE_SUFFIX:
+        return ClusterIdType.kManufacturer
+    if id in TEST_PREFIX and id in CLUSTER_ID_MANUFACTURER_RANGE_SUFFIX:
+        return ClusterIdType.kTest
+    return ClusterIdType.kInvalid
 
 
-def manufacturer_cluster_range(id: int):
-    return id in MANUFACTURER_PREFIX and id in CLUSTER_ID_MANUFACTURER_RANGE_SUFFIX
-
-
-def test_cluster_range(id: int):
-    return id in TEST_PREFIX and id in CLUSTER_ID_MANUFACTURER_RANGE_SUFFIX
-
-
-def valid_cluster_range(id: int, allow_test: bool = False):
-    ret = standard_cluster_range(id) or manufacturer_cluster_range(id)
+def is_valid_cluster_id(id_type: ClusterIdType, allow_test: bool = False) -> bool:
+    valid = [ClusterIdType.kStandard, ClusterIdType.kManufacturer]
     if allow_test:
-        ret = ret or test_cluster_range(id)
-    return ret
+        valid.append(ClusterIdType.kTest)
+    return id_type in valid
 
 
-def standard_non_global_attribute_range(id: int):
-    return id in STANDARD_PREFIX and id in ATTRIBUTE_ID_NON_GLOBAL_RANGE_SUFFIX
+def attribute_id_type(id: int) -> AttributeIdType:
+    if id in STANDARD_PREFIX and id in ATTRIBUTE_ID_NON_GLOBAL_RANGE_SUFFIX:
+        return AttributeIdType.kStandardNonGlobal
+    if id in STANDARD_PREFIX and id in ATTRIBUTE_ID_GLOBAL_RANGE_SUFFIX:
+        return AttributeIdType.kStandardGlobal
+    if id in MANUFACTURER_PREFIX and id in ATTRIBUTE_ID_NON_GLOBAL_RANGE_SUFFIX:
+        return AttributeIdType.kManufacturer
+    if id in TEST_PREFIX and id in ATTRIBUTE_ID_NON_GLOBAL_RANGE_SUFFIX:
+        return AttributeIdType.kTest
+    return AttributeIdType.kInvalid
 
 
-def standard_global_attribute_range(id: str):
-    return id in STANDARD_PREFIX and id in ATTRIBUTE_ID_GLOBAL_RANGE_SUFFIX
-
-
-def manufacturer_attribute_range(id: str):
-    return id in MANUFACTURER_PREFIX and id in ATTRIBUTE_ID_NON_GLOBAL_RANGE_SUFFIX
-
-
-def test_attribute_range(id: str):
-    return id in TEST_PREFIX and id in ATTRIBUTE_ID_NON_GLOBAL_RANGE_SUFFIX
-
-
-def valid_attribute_range(id: str, allow_test: bool = False):
-    ret = standard_global_attribute_range(id) or standard_non_global_attribute_range(id) or manufacturer_attribute_range(id)
+def is_valid_attribute_id(id_type: AttributeIdType, allow_test: bool = False):
+    valid = [AttributeIdType.kStandardGlobal, AttributeIdType.kStandardNonGlobal, AttributeIdType.kManufacturer]
     if allow_test:
-        ret = ret or test_attribute_range(id)
-    return ret
+        valid.append(AttributeIdType.kTest)
+    return id_type in valid
