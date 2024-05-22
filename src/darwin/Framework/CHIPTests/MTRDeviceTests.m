@@ -3620,7 +3620,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test035_TestMTRDeviceSubscriptionNotEstablishedOverXPC
 {
-    static NSString * const MTRDeviceControllerId = @"MTRController";
+   NSString * const MTRDeviceControllerId = @"MTRController";
     __auto_type remoteController = [MTRDeviceController
         sharedControllerWithID:MTRDeviceControllerId
                xpcConnectBlock:^NSXPCConnection * _Nonnull {
