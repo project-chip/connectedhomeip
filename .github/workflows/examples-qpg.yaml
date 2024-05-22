@@ -63,8 +63,6 @@ jobs:
                         --enable-flashbundle \
                         --target qpg-qpg6105-lock \
                         --target qpg-qpg6105-light \
-                        --target qpg-qpg6105-shell \
-                        --target qpg-qpg6105-persistent-storage \
                         --target qpg-qpg6105-light-switch \
                         --target qpg-qpg6105-thermostat \
                         build \
