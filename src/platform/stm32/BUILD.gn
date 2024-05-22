@@ -32,6 +32,7 @@ if (chip_enable_openthread) {
 }
 
 static_library("stm32") {
+  friend = [ ":lighting_app" ]
   deps = [ "${chip_root}/src/setup_payload" ]
 
   if (stm32_board == "STM32WB5MM-DK") {
@@ -48,6 +49,8 @@ static_library("stm32") {
       "CHIPPlatformConfig.h",
       "ConfigurationManagerImpl.cpp",
       "ConfigurationManagerImpl.h",
+      "DeviceInfoProviderImpl.cpp",
+      "DeviceInfoProviderImpl.h",
       "DiagnosticDataProviderImpl.cpp",
       "DiagnosticDataProviderImpl.h",
       "FactoryDataProvider.cpp",
@@ -55,6 +58,8 @@ static_library("stm32") {
       "InetPlatformConfig.h",
       "KeyValueStoreManagerImpl.cpp",
       "KeyValueStoreManagerImpl.h",
+      "OTAImageProcessorImpl.cpp",
+      "OTAImageProcessorImpl.h",
       "PlatformManagerImpl.cpp",
       "PlatformManagerImpl.h",
       "STM32Config.cpp",
@@ -67,7 +72,10 @@ static_library("stm32") {
     deps += [ "${chip_root}/src/platform/logging:headers" ]
   }
 
-  public = [ "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h" ]
+  public = [
+    "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
+    "${chip_root}/src/credentials/examples/ExampleDACs.h",
+  ]
   public_deps = [
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:platform_base",
