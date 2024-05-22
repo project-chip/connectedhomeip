@@ -40,7 +40,7 @@ limitations under the License.
      <item name="FailureDueToFault" value="0x02"/>
   </enum>
 
-  <cluster apiMaturity="provisional">
+  <cluster>
     <domain>HVAC</domain>
     <name>Valve Configuration and Control</name>
     <code>0x0081</code>

@@ -32,6 +32,14 @@
 ///
 /// On failure without adapters, the objects are reported as "24-byte object at 0x....."
 /// which is not as helpful as a full CHIP_ERROR formatted output.
+///
+/// Example output WITHOUT the adapters
+///    Expected: .... == CHIP_ERROR(0, "src/setup_payload/tests/TestAdditionalDataPayload.cpp", 234)
+///    Actual: <24-byte object at 0x7ffe39510b80> == <24-byte object at 0x7ffe39510ba0>
+///
+/// Example output WITH the adapters:
+///    Expected: .... == CHIP_ERROR(0, "src/setup_payload/tests/TestAdditionalDataPayload.cpp", 234)
+///    Actual: CHIP_ERROR:<src/lib/core/TLVReader.cpp:889: Error 0x00000022> == CHIP_NO_ERROR
 
 #include <pw_string/string_builder.h>
 
@@ -40,15 +48,6 @@
 namespace pw {
 
 template <>
-
-StatusWithSize ToString<CHIP_ERROR>(const CHIP_ERROR & err, pw::span<char> buffer)
-{
-    if (CHIP_ERROR::IsSuccess(err))
-    {
-        // source location probably does not matter
-        return pw::string::Format(buffer, "CHIP_NO_ERROR");
-    }
-    return pw::string::Format(buffer, "CHIP_ERROR:<%" CHIP_ERROR_FORMAT ">", err.Format());
-}
+StatusWithSize ToString<CHIP_ERROR>(const CHIP_ERROR & err, pw::span<char> buffer);
 
 } // namespace pw

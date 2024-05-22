@@ -442,7 +442,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         }
         _clusterDataToPersist = nil;
         _persistedClusters = [NSMutableSet set];
-        MTR_LOG_INFO("%@ init with hex nodeID 0x%016llX", self, _nodeID.unsignedLongLongValue);
+        MTR_LOG_DEBUG("%@ init with hex nodeID 0x%016llX", self, _nodeID.unsignedLongLongValue);
     }
     return self;
 }
@@ -682,7 +682,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 #pragma mark Subscription and delegate handling
 
 // subscription intervals are in seconds
-#define MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN (1 * 60) // 1 minute (for now)
+#define MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN (10 * 60) // 10 minutes (for now)
 #define MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX (60 * 60) // 60 minutes
 
 - (void)setDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue
@@ -1125,7 +1125,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
             [self _triggerResubscribeWithReason:"ResubscriptionNeeded timer fired" nodeLikelyReachable:NO];
         } errorHandler:^(NSError * _Nonnull error) {
             // If controller is not running, clear work item from the subscription queue
-            MTR_LOG_INFO("%@ could not dispatch to matter queue for resubscription - error %@", self, error);
+            MTR_LOG_ERROR("%@ could not dispatch to matter queue for resubscription - error %@", self, error);
             std::lock_guard lock(self->_lock);
             [self _clearSubscriptionPoolWork];
         }];
@@ -1367,11 +1367,6 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     [self _reportAttributes:[self _getAttributesToReportWithReportedValues:attributeReport fromSubscription:isFromSubscription]];
 }
 
-- (void)_handleAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
-{
-    [self _handleAttributeReport:attributeReport fromSubscription:NO];
-}
-
 #ifdef DEBUG
 - (void)unitTestInjectEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
 {
@@ -1380,11 +1375,11 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     });
 }
 
-- (void)unitTestInjectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
+- (void)unitTestInjectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription
 {
     dispatch_async(self.queue, ^{
         [self _handleReportBegin];
-        [self _handleAttributeReport:attributeReport];
+        [self _handleAttributeReport:attributeReport fromSubscription:isFromSubscription];
         [self _handleReportEnd];
     });
 }
@@ -1559,7 +1554,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         dataVersions[path] = [self _clusterDataForPath:path].dataVersion;
     }
 
-    MTR_LOG_INFO("%@ _getCachedDataVersions dataVersions count: %lu", self, static_cast<unsigned long>(dataVersions.count));
+    MTR_LOG_DEBUG("%@ _getCachedDataVersions dataVersions count: %lu", self, static_cast<unsigned long>(dataVersions.count));
 
     return dataVersions;
 }
@@ -1649,7 +1644,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         // Get the required info before setting up the connectivity monitor
         NSNumber * compressedFabricID = [self->_deviceController syncGetCompressedFabricID];
         if (!compressedFabricID) {
-            MTR_LOG_INFO("%@ could not get compressed fabricID", self);
+            MTR_LOG_ERROR("%@ could not get compressed fabricID", self);
             return;
         }
 
@@ -1753,7 +1748,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
                            });
                        },
                        ^(NSError * error, NSNumber * resubscriptionDelayMs) {
-                           MTR_LOG_DEFAULT("%@ got resubscription error %@ delay %@", self, error, resubscriptionDelayMs);
+                           MTR_LOG_ERROR("%@ got resubscription error %@ delay %@", self, error, resubscriptionDelayMs);
                            dispatch_async(self.queue, ^{
                                // OnResubscriptionNeeded
                                [self _handleResubscriptionNeededWithDelay:resubscriptionDelayMs];
@@ -2168,7 +2163,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                                 // Since the format is the same data-value dictionary, this looks like an
                                 // attribute report
                                 MTR_LOG_INFO("Read attribute work item [%llu] result: %@  [0x%016llX:%@:0x%llX:0x%llX]", workItemID, values, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
-                                [self _handleAttributeReport:values];
+                                [self _handleAttributeReport:values fromSubscription:NO];
                             }
 
                             // TODO: better retry logic
@@ -2764,7 +2759,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         if (attributeError) {
             shouldReportAttribute = YES;
             previousValue = [self _cachedAttributeValueForPath:attributePath];
-            MTR_LOG_INFO("%@ report %@ error %@ purge expected value %@ read cache %@", self, attributePath, attributeError,
+            MTR_LOG_ERROR("%@ report %@ error %@ purge expected value %@ read cache %@", self, attributePath, attributeError,
                 _expectedValueCache[attributePath], previousValue);
             _expectedValueCache[attributePath] = nil;
             // TODO: Is this clearing business really what we want?
@@ -2916,7 +2911,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (void)setPersistedDeviceData:(NSDictionary<NSString *, id> *)data
 {
-    MTR_LOG_INFO("%@ setPersistedDeviceData: %@", self, data);
+    MTR_LOG_DEBUG("%@ setPersistedDeviceData: %@", self, data);
 
     std::lock_guard lock(_lock);
 

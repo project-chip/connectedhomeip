@@ -22,5 +22,5 @@
 
 #define MTR_LOG_ERROR(msg, ...) ChipLogError(NotSpecified, msg, ##__VA_ARGS__)
 #define MTR_LOG_DEFAULT(msg, ...) ChipLogProgress(NotSpecified, msg, ##__VA_ARGS__)
-#define MTR_LOG_INFO(msg, ...) ChipLogDetail(NotSpecified, msg, ##__VA_ARGS__)
+#define MTR_LOG_INFO(msg, ...) ChipLogProgress(NotSpecified, msg, ##__VA_ARGS__)
 #define MTR_LOG_DEBUG(msg, ...) ChipLogDetail(NotSpecified, msg, ##__VA_ARGS__) // same as INFO

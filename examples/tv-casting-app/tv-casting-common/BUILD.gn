@@ -107,6 +107,8 @@ chip_data_model("tv-casting-common") {
     "core/CastingPlayerDiscovery.h",
     "core/Command.h",
     "core/CommissionerDeclarationHandler.cpp",
+    "core/CommissionerDeclarationHandler.h",
+    "core/ConnectionCallbacks.h",
     "core/Endpoint.cpp",
     "core/Endpoint.h",
     "core/Types.h",
