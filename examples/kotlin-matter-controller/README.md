@@ -109,7 +109,7 @@ the top Matter directory:
 ```
 
 The Java executable file `kotlin-matter-controller` will be generated at
-`out/android-x86-kotlin-matter-controller/bin/`
+`out/linux-x64-kotlin-matter-controller/bin/`
 
 Run the kotlin-matter-controller
 

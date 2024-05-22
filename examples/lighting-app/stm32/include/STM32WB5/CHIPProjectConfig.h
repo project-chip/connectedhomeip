@@ -23,15 +23,25 @@
  */
 #ifndef CHIPPROJECTCONFIG_H
 #define CHIPPROJECTCONFIG_H
+#include "app_conf.h"
 
 // Use a default pairing code if one hasn't been provisioned in flash.
-#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
-#endif
 
 #ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
 #endif
+
+// Use a default pairing code if one hasn't been provisioned in flash.
+#define CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE "CHIPUS"
+
+// For convenience, Chip Security Test Mode can be enabled and the
+// requirement for authentication in various protocols can be disabled.
+//
+//    WARNING: These options make it possible to circumvent basic Chip security functionality,
+//    including message encryption. Because of this they MUST NEVER BE ENABLED IN PRODUCTION BUILDS.
+//
+#define CHIP_CONFIG_SECURITY_TEST_MODE 0
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
@@ -74,6 +84,25 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 0
 
 /**
+ * CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
+ *
+ * Enables the use of a hard-coded default Chip device id and credentials if no device id
+ * is found in Chip NV storage.
+ *
+ * This option is for testing only and should be disabled in production releases.
+ */
+#define CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY 34
+
+// For convenience, enable Chip Security Test Mode and disable the requirement for
+// authentication in various protocols.
+//
+//    WARNING: These options make it possible to circumvent basic Chip security functionality,
+//    including message encryption. Because of this they MUST NEVER BE ENABLED IN PRODUCTION BUILDS.
+//
+#define CHIP_CONFIG_SECURITY_TEST_MODE 0
+#define CHIP_CONFIG_REQUIRE_AUTH 1
+
+/**
  * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
  *
  * A string identifying the software version running on the device.
@@ -82,6 +111,15 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
 #define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "1.1"
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
+ *
+ * A monothonic number identifying the software version running on the device.
+ */
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 1
 #endif
 
 /**

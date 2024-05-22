@@ -110,16 +110,12 @@ typedef enum
 /* USER CODE END EM */
 
 /* Exported functions ------------------------------------------------------- */
-void APP_THREAD_Init(void);
+void APP_THREAD_Init_Dyn_1(void);
+void APP_THREAD_Init_Dyn_2(void);
 void APP_THREAD_Error(uint32_t ErrId, uint32_t ErrCode);
 void APP_THREAD_RegisterCmdBuffer(TL_CmdPacket_t * p_buffer);
 void APP_THREAD_ProcessMsgM0ToM4(void);
-void APP_THREAD_Init_UART_CLI(void);
 void APP_THREAD_TL_THREAD_INIT(void);
-void APP_THREAD_SEND_MSG(void);
-/* **** */
-void APP_THREAD_Stop(void);
-void APP_THREAD_CleanCallbacks(void);
 
 /* USER CODE BEGIN EF */
 
