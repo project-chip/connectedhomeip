@@ -44,6 +44,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/general-diagnostics-cluster.x
 load "../src/app/zap-templates/zcl/data-model/chip/global-attributes.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/groups-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/group-key-mgmt-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/home-location.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/identify-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/illuminance-measurement-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/keypad-input-cluster.xml";

@@ -61,6 +61,7 @@
         "global-attributes.xml",
         "groups-cluster.xml",
         "group-key-mgmt-cluster.xml",
+        "home-location.xml",
         "icd-management-cluster.xml",
         "identify-cluster.xml",
         "illuminance-measurement-cluster.xml",
