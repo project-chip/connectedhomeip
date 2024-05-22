@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,23 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
-import("${chip_root}/config/standalone/args.gni")
-import("${chip_root}/examples/platform/qpg/args.gni")
 
-qpg_sdk_target = get_label_info(":sdk", "label_no_toolchain")
+import("${chip_root}/build/chip/tests.gni")
 
-pw_log_BACKEND = "${chip_root}/src/lib/support/pw_log_chip"
-pw_assert_BACKEND = "$dir_pw_assert_log:check_backend"
-chip_build_libshell = true
+import("$dir_pw_build/target_types.gni")
+pw_source_set("define_overrides") {
+  public_configs = [ ":define_options" ]
+}
 
-# Disable lock tracking, since our FreeRTOS configuration does not set
-# INCLUDE_xSemaphoreGetMutexHolder
-chip_stack_lock_tracking = "none"
-
-matter_device_vid = "0xFFF1"
-matter_device_pid = "0x8006"
-matter_ota_test_image = false
-
-chip_openthread_ftd = false
+config("define_options") {
+  if (chip_fake_platform && chip_link_tests) {
+    defines = [ "PW_UNIT_TEST_CONFIG_MEMORY_POOL_SIZE=65536" ]
+  } else {
+    defines = [ "PW_UNIT_TEST_CONFIG_MEMORY_POOL_SIZE=16384" ]
+  }
+}
