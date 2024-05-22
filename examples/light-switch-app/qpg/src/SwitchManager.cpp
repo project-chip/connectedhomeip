@@ -107,20 +107,40 @@ void SwitchManager::ColorHandler(AppEvent * aEvent)
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
 }
 
-void SwitchManager::GenericSwitchInitialPress(void)
+void SwitchManager::GenericSwitchInitialPressHandler(AppEvent * aEvent)
 {
     // Press moves Position from 0 (idle) to 1 (press)
     uint8_t newPosition = 1;
 
-    SystemLayer().ScheduleLambda(
-        [newPosition] { chip::app::Clusters::Switch::Attributes::CurrentPosition::Set(GENERICSWITCH_ENDPOINT_ID, newPosition); });
+    if (aEvent->Type != AppEvent::kEventType_Button)
+    {
+        ChipLogError(NotSpecified, "Event type not supported!");
+        return;
+    }
+
+    ChipLogProgress(NotSpecified, "GenericSwitchInitialPress new position %d", newPosition);
+    SystemLayer().ScheduleLambda([newPosition] {
+        chip::app::Clusters::Switch::Attributes::CurrentPosition::Set(GENERICSWITCH_ENDPOINT_ID, newPosition);
+        // InitialPress event takes newPosition as event data
+        chip::app::Clusters::SwitchServer::Instance().OnInitialPress(GENERICSWITCH_ENDPOINT_ID, newPosition);
+    });
 }
 
-void SwitchManager::GenericSwitchReleasePress(void)
+void SwitchManager::GenericSwitchReleasePressHandler(AppEvent * aEvent)
 {
     // Release moves Position from 1 (press) to 0
     uint8_t newPosition = 0;
 
-    SystemLayer().ScheduleLambda(
-        [newPosition] { chip::app::Clusters::Switch::Attributes::CurrentPosition::Set(GENERICSWITCH_ENDPOINT_ID, newPosition); });
+    if (aEvent->Type != AppEvent::kEventType_Button)
+    {
+        ChipLogError(NotSpecified, "Event type not supported!");
+        return;
+    }
+
+    ChipLogProgress(NotSpecified, "GenericSwitchReleasePress new position %d", newPosition);
+    SystemLayer().ScheduleLambda([newPosition] {
+        chip::app::Clusters::Switch::Attributes::CurrentPosition::Set(GENERICSWITCH_ENDPOINT_ID, newPosition);
+        // Short Release event takes newPosition as event data
+        chip::app::Clusters::SwitchServer::Instance().OnShortRelease(GENERICSWITCH_ENDPOINT_ID, newPosition);
+    });
 }
