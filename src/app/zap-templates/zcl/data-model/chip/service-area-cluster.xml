@@ -97,7 +97,7 @@ limitations under the License.
     </enum>
 
 
-    <enum name="SurfaceTag" type="enum8">
+    <enum name="FloorSurfaceTag" type="enum8">
       <cluster code="0x0150"/>
       <item value="0x00" name="Carpet"/>
       <item value="0x01" name="Ceramic"/>
@@ -148,7 +148,7 @@ limitations under the License.
     <item name="HomeLocationInfo"  type="HomeLocationStruct"    optional="false" isNullable="true"/>
     <item name="LandmarkTag"       type="LandmarkTag"           optional="false" isNullable="true"/>
     <item name="PositionTag"       type="PositionTag"           optional="false" isNullable="true"/>
-    <item name="SurfaceTag"        type="SurfaceTag"            optional="false" isNullable="true"/>
+    <item name="SurfaceTag"        type="FloorSurfaceTag"       optional="false" isNullable="true"/>
   </struct>
 
   <struct name="MapStruct">
