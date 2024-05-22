@@ -310,6 +310,7 @@ class EventChangeCallback:
         asserts.assert_equal(res.Header.EventId, expected_event.event_id, "Expected event ID not found in event report")
         return res.Data
 
+
 class AttributeChangeCallback:
     def __init__(self, expected_attribute: ClusterObjects.ClusterAttributeDescriptor):
         self._output = queue.Queue()
@@ -339,6 +340,7 @@ class AttributeChangeCallback:
             logging.info(f"[AttributeChangeCallback] Got attribute subscription report. Attribute {path.AttributeType}. Updated value: {attribute_value}. SubscriptionId: {transaction.subscriptionId}")
         except KeyError:
             asserts.fail("[AttributeChangeCallback] Attribute {expected_attribute} not found in returned report")
+
 
 class InternalTestRunnerHooks(TestRunnerHooks):
 
