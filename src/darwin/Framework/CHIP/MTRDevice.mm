@@ -812,7 +812,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     }
 #endif
 
-    // setup. Based on whether subscriptions are allowed or not, return YES or NO.
+    // Subscriptions are not able to report if they are not allowed.
     return [self _subscriptionsAllowed];
 }
 
