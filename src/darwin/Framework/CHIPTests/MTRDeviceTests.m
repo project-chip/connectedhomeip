@@ -242,7 +242,6 @@ static BOOL slocalTestStorageEnabledBeforeUnitTest;
     // existing subscriptions and then fail out due to requesting a subscribe to
     // a nonexistent cluster.
     if (mConnectedDevice != nil) {
-        NSLog(@"JEFFTEST: teardown - unsubscribe");
         dispatch_queue_t queue = dispatch_get_main_queue();
 
         MTRSubscribeParams * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(0) maxInterval:@(10)];
