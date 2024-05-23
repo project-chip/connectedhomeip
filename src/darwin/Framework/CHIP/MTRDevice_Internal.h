@@ -21,6 +21,7 @@
 
 #import "MTRAsyncWorkQueue.h"
 #import "MTRDefines_Internal.h"
+#import "MTRDeviceStorageBehaviorConfiguration_Internal.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -112,6 +113,8 @@ MTR_TESTABLE
 #ifdef DEBUG
 - (NSUInteger)unitTestAttributeCount;
 #endif
+
+- (void)setStorageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration;
 
 @end
 

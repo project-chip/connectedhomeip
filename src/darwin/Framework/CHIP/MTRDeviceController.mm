@@ -128,6 +128,8 @@ using namespace chip::Tracing::DarwinFramework;
 
     // _serverEndpoints is only touched on the Matter queue.
     NSMutableArray<MTRServerEndpoint *> * _serverEndpoints;
+
+    MTRDeviceStorageBehaviorConfiguration * _storageBehaviorConfiguration;
 }
 
 - (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters error:(NSError * __autoreleasing *)error
@@ -153,6 +155,7 @@ using namespace chip::Tracing::DarwinFramework;
           otaProviderDelegateQueue:(dispatch_queue_t _Nullable)otaProviderDelegateQueue
                   uniqueIdentifier:(NSUUID *)uniqueIdentifier
     concurrentSubscriptionPoolSize:(NSUInteger)concurrentSubscriptionPoolSize
+      storageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration
 {
     if (self = [super init]) {
         // Make sure our storage is all set up to work as early as possible,
@@ -274,6 +277,8 @@ using namespace chip::Tracing::DarwinFramework;
         _concurrentSubscriptionPool = [[MTRAsyncWorkQueue alloc] initWithContext:self width:concurrentSubscriptionPoolSize];
 
         _storedFabricIndex = chip::kUndefinedFabricIndex;
+
+        _storageBehaviorConfiguration = storageBehaviorConfiguration;
     }
     return self;
 }
@@ -988,6 +993,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             [deviceToReturn setPersistedDeviceData:deviceData];
         }
     }
+
+    [deviceToReturn setStorageBehaviorConfiguration:_storageBehaviorConfiguration];
 
     return deviceToReturn;
 }

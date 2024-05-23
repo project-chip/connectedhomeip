@@ -96,4 +96,16 @@
     }
 }
 
+- (BOOL)unitTestShouldSetUpSubscriptionForDevice:(MTRDevice *)device
+{
+    return !_skipSetupSubscription;
+}
+
+- (void)unitTestClusterDataPersisted:(MTRDevice *)device
+{
+    if (self.onClusterDataPersisted != nil) {
+        self.onClusterDataPersisted();
+    }
+}
+
 @end

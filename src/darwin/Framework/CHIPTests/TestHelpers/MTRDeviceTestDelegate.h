@@ -34,6 +34,8 @@ typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *
 @property (nonatomic) BOOL pretendThreadEnabled;
 @property (nonatomic, nullable) dispatch_block_t onSubscriptionPoolDequeue;
 @property (nonatomic, nullable) dispatch_block_t onSubscriptionPoolWorkComplete;
+@property (nonatomic) BOOL skipSetupSubscription;
+@property (nonatomic, nullable) dispatch_block_t onClusterDataPersisted;
 @end
 
 NS_ASSUME_NONNULL_END

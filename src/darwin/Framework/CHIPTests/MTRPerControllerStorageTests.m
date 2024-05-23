@@ -19,6 +19,7 @@
 #import <os/lock.h>
 
 #import "MTRDeviceControllerLocalTestStorage.h"
+#import "MTRDeviceStorageBehaviorConfiguration.h"
 #import "MTRDeviceTestDelegate.h"
 #import "MTRDevice_Internal.h"
 #import "MTRErrorTestUtils.h"
@@ -259,10 +260,12 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
                                                      fabricID:(NSNumber *)fabricID
                                                        nodeID:(NSNumber *)nodeID
                                                       storage:(MTRTestPerControllerStorage *)storage
-                                        caseAuthenticatedTags:(nullable NSSet *)caseAuthenticatedTags
+                                        caseAuthenticatedTags:(NSSet * _Nullable)caseAuthenticatedTags
                                                         error:(NSError * __autoreleasing *)error
                                             certificateIssuer:
                                                 (MTRPerControllerStorageTestsCertificateIssuer * __autoreleasing *)certificateIssuer
+                               concurrentSubscriptionPoolSize:(NSUInteger)concurrentSubscriptionPoolSize
+                                 storageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration * _Nullable)storageBehaviorConfiguration
 {
     XCTAssertTrue(error != NULL);
 
@@ -307,7 +310,72 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
 
     [params setOperationalCertificateIssuer:ourCertificateIssuer queue:dispatch_get_main_queue()];
 
+    if (concurrentSubscriptionPoolSize > 0) {
+        params.concurrentSubscriptionEstablishmentsAllowedOnThread = concurrentSubscriptionPoolSize;
+    }
+
+    if (storageBehaviorConfiguration) {
+        params.storageBehaviorConfiguration = storageBehaviorConfiguration;
+    }
+
     return [[MTRDeviceController alloc] initWithParameters:params error:error];
+}
+
+- (nullable MTRDeviceController *)startControllerWithRootKeys:(MTRTestKeys *)rootKeys
+                                              operationalKeys:(MTRTestKeys *)operationalKeys
+                                                     fabricID:(NSNumber *)fabricID
+                                                       nodeID:(NSNumber *)nodeID
+                                                      storage:(MTRTestPerControllerStorage *)storage
+                                        caseAuthenticatedTags:(nullable NSSet *)caseAuthenticatedTags
+                                                        error:(NSError * __autoreleasing *)error
+                                            certificateIssuer:
+                                                (MTRPerControllerStorageTestsCertificateIssuer * __autoreleasing *)certificateIssuer
+{
+    return [self startControllerWithRootKeys:rootKeys operationalKeys:operationalKeys fabricID:fabricID nodeID:nodeID storage:storage caseAuthenticatedTags:caseAuthenticatedTags error:error certificateIssuer:certificateIssuer concurrentSubscriptionPoolSize:0 storageBehaviorConfiguration:nil];
+}
+
+- (nullable MTRDeviceController *)startControllerWithRootKeys:(MTRTestKeys *)rootKeys
+                                              operationalKeys:(MTRTestKeys *)operationalKeys
+                                                     fabricID:(NSNumber *)fabricID
+                                                       nodeID:(NSNumber *)nodeID
+                                                      storage:(MTRTestPerControllerStorage *)storage
+                                                        error:(NSError * __autoreleasing *)error
+                                            certificateIssuer:
+                                                (MTRPerControllerStorageTestsCertificateIssuer * __autoreleasing *)certificateIssuer
+                               concurrentSubscriptionPoolSize:(NSUInteger)concurrentSubscriptionPoolSize
+{
+    return [self startControllerWithRootKeys:rootKeys
+                             operationalKeys:operationalKeys
+                                    fabricID:fabricID
+                                      nodeID:nodeID
+                                     storage:storage
+                       caseAuthenticatedTags:nil
+                                       error:error
+                           certificateIssuer:certificateIssuer
+              concurrentSubscriptionPoolSize:concurrentSubscriptionPoolSize
+                storageBehaviorConfiguration:nil];
+}
+
+- (nullable MTRDeviceController *)startControllerWithRootKeys:(MTRTestKeys *)rootKeys
+                                              operationalKeys:(MTRTestKeys *)operationalKeys
+                                                     fabricID:(NSNumber *)fabricID
+                                                       nodeID:(NSNumber *)nodeID
+                                                      storage:(MTRTestPerControllerStorage *)storage
+                                                        error:(NSError * __autoreleasing *)error
+                                            certificateIssuer:
+                                                (MTRPerControllerStorageTestsCertificateIssuer * __autoreleasing *)certificateIssuer
+                                 storageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration * _Nullable)storageBehaviorConfiguration
+{
+    return [self startControllerWithRootKeys:rootKeys
+                             operationalKeys:operationalKeys
+                                    fabricID:fabricID
+                                      nodeID:nodeID
+                                     storage:storage
+                       caseAuthenticatedTags:nil
+                                       error:error
+                           certificateIssuer:certificateIssuer
+              concurrentSubscriptionPoolSize:0
+                storageBehaviorConfiguration:storageBehaviorConfiguration];
 }
 
 - (nullable MTRDeviceController *)startControllerWithRootKeys:(MTRTestKeys *)rootKeys
@@ -326,7 +394,9 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
                                      storage:storage
                        caseAuthenticatedTags:nil
                                        error:error
-                           certificateIssuer:certificateIssuer];
+                           certificateIssuer:certificateIssuer
+              concurrentSubscriptionPoolSize:0
+                storageBehaviorConfiguration:nil];
 }
 
 - (nullable MTRDeviceController *)startControllerWithRootKeys:(MTRTestKeys *)rootKeys
@@ -344,7 +414,9 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
                                      storage:storage
                        caseAuthenticatedTags:caseAuthenticatedTags
                                        error:error
-                           certificateIssuer:nil];
+                           certificateIssuer:nil
+              concurrentSubscriptionPoolSize:0
+                storageBehaviorConfiguration:nil];
 }
 
 - (nullable MTRDeviceController *)startControllerWithRootKeys:(MTRTestKeys *)rootKeys
@@ -1315,7 +1387,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     XCTAssertFalse([controller isRunning]);
 }
 
-- (void)doDataStoreMTRDeviceTestWithStorageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
+- (void)doDataStoreMTRDeviceTestWithStorageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate disableStorageBehaviorOptimization:(BOOL)disableStorageBehaviorOptimization
 {
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
@@ -1334,13 +1406,18 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     NSError * error;
 
     MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
+    MTRDeviceStorageBehaviorConfiguration * storageBehaviorConfiguration = nil;
+    if (disableStorageBehaviorOptimization) {
+        storageBehaviorConfiguration = [MTRDeviceStorageBehaviorConfiguration configurationWithStorageBehaviorOptimizationDisabled];
+    }
     MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
                                                          operationalKeys:operationalKeys
                                                                 fabricID:fabricID
                                                                   nodeID:nodeID
                                                                  storage:storageDelegate
                                                                    error:&error
-                                                       certificateIssuer:&certificateIssuer];
+                                                       certificateIssuer:&certificateIssuer
+                                            storageBehaviorConfiguration:storageBehaviorConfiguration];
     XCTAssertNil(error);
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
@@ -1359,9 +1436,16 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
 
     XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up"];
+    XCTestExpectation * gotClusterDataPersisted = nil;
+    if (!disableStorageBehaviorOptimization) {
+        gotClusterDataPersisted = [self expectationWithDescription:@"Cluster data persisted"];
+    }
 
     delegate.onReportEnd = ^{
         [subscriptionExpectation fulfill];
+    };
+    delegate.onClusterDataPersisted = ^{
+        [gotClusterDataPersisted fulfill];
     };
 
     // Verify that initially (before we have ever subscribed while using this
@@ -1373,6 +1457,9 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     [device setDelegate:delegate queue:queue];
 
     [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+    if (!disableStorageBehaviorOptimization) {
+        [self waitForExpectations:@[ gotClusterDataPersisted ] timeout:60];
+    }
 
     __auto_type * afterInitialSubscription = [NSDate now];
 
@@ -1429,14 +1516,24 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     __auto_type * newDelegate = [[MTRDeviceTestDelegate alloc] init];
 
     XCTestExpectation * newDeviceSubscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up for new device"];
+    XCTestExpectation * newDeviceGotClusterDataPersisted = nil;
+    if (!disableStorageBehaviorOptimization) {
+        newDeviceGotClusterDataPersisted = [self expectationWithDescription:@"Cluster data persisted on new device"];
+    }
 
     newDelegate.onReportEnd = ^{
         [newDeviceSubscriptionExpectation fulfill];
+    };
+    newDelegate.onClusterDataPersisted = ^{
+        [newDeviceGotClusterDataPersisted fulfill];
     };
 
     [newDevice setDelegate:newDelegate queue:queue];
 
     [self waitForExpectations:@[ newDeviceSubscriptionExpectation ] timeout:60];
+    if (!disableStorageBehaviorOptimization) {
+        [self waitForExpectations:@[ newDeviceGotClusterDataPersisted ] timeout:60];
+    }
     newDelegate.onReportEnd = nil;
 
     // 1) MTRDevice actually gets some attributes reported more than once
@@ -1456,7 +1553,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
 
 - (void)test009_TestDataStoreMTRDevice
 {
-    [self doDataStoreMTRDeviceTestWithStorageDelegate:[[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]]];
+    [self doDataStoreMTRDeviceTestWithStorageDelegate:[[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]] disableStorageBehaviorOptimization:NO];
 }
 
 - (void)test010_TestDataStoreMTRDeviceWithBulkReadWrite
@@ -1464,7 +1561,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
 
     // First do the same test as the above
-    [self doDataStoreMTRDeviceTestWithStorageDelegate:storageDelegate];
+    [self doDataStoreMTRDeviceTestWithStorageDelegate:storageDelegate disableStorageBehaviorOptimization:NO];
 
     // Then restart controller with same storage and see that bulk read through MTRDevice initialization works
 
@@ -1507,6 +1604,11 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
+}
+
+- (void)test011_TestDataStoreMTRDeviceWithStorageBehaviorOptimizationDisabled
+{
+    [self doDataStoreMTRDeviceTestWithStorageDelegate:[[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]] disableStorageBehaviorOptimization:YES];
 }
 
 // TODO: This might want to go in a separate test file, with some shared setup
@@ -2072,12 +2174,7 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
 
     NSError * error;
 
-    NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
-    NSNumber * subscriptionPoolSizeOverrideOriginalValue = [defaults objectForKey:kDefaultSubscriptionPoolSizeOverrideKey];
-
     // Test DeviceController with a Subscription pool
-    [defaults setInteger:subscriptionPoolSize forKey:kDefaultSubscriptionPoolSizeOverrideKey];
-
     MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
     MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
                                                          operationalKeys:operationalKeys
@@ -2085,7 +2182,8 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
                                                                   nodeID:nodeID
                                                                  storage:storageDelegate
                                                                    error:&error
-                                                       certificateIssuer:&certificateIssuer];
+                                                       certificateIssuer:&certificateIssuer
+                                          concurrentSubscriptionPoolSize:subscriptionPoolSize];
     XCTAssertNil(error);
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
@@ -2177,12 +2275,6 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
-
-    if (subscriptionPoolSizeOverrideOriginalValue) {
-        [defaults setInteger:subscriptionPoolSizeOverrideOriginalValue.integerValue forKey:kDefaultSubscriptionPoolSizeOverrideKey];
-    } else {
-        [defaults removeObjectForKey:kDefaultSubscriptionPoolSizeOverrideKey];
-    }
 }
 
 - (void)testSubscriptionPool
