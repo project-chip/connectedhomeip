@@ -13,7 +13,7 @@ command line.
 -   [Building Python CHIP Controller](#building-and-installing)
 -   [Running the CHIP REPL](#running-the-chip-repl)
 -   [Using Python CHIP Controller REPL for Matter accessory testing](#using-python-chip-controller-repl-for-matter-accessory-testing)
--   [List of commands](#list-of-commands)
+-   [Example usage of the Python CHIP Controller REPL](#example-usage-of-the-python-chip-controller-repl)
 -   [Explore Clusters, Attributes and Commands](#explore-clusters-attributes-and-commands)
 
 <hr>
@@ -212,8 +212,6 @@ with the following assumptions for the Matter accessory device:
 -   The setup pin code of the device is _20202021_
 -   The temporary Node ID is _1234_
 
-devCtrl.CommissionWithCode("MT:-24J0AFN00KA0648G00", 10)
-
 ```
 devCtrl.ConnectBLE(3840, 20202021, 1234)
 ```
@@ -296,7 +294,14 @@ await devCtrl.ReadAttribute(1234, attributes)
 
 <hr>
 
-## List of commands
+## Example usage of the Python CHIP Controller REPL
+
+These section covers a few useful commands of the Python CHIP Controller along
+with examples demonstrating how they can be called from the REPL.
+
+The
+[CHIP Device Controller API documentation offer](https://project-chip.github.io/connectedhomeip-doc/testing/ChipDeviceCtrlAPI.html#chip-chipdevicectrl)
+the full list of available commands.
 
 ### `SetThreadOperationalDataset(<thread-dataset>)`
 
@@ -317,55 +322,16 @@ device commissioning procedure to configure the device with a Wi-Fi interface.
 devCtrl.SetWiFiCredentials('TESTSSID', 'P455W4RD')
 ```
 
-### `ConnectBLE(<discriminator>: int, <setup pin code>: int, <nodeid>: int)`
+### `CommissionWithCode(<setupPayload>: str, <nodeid>: int, <discoveryType>: DiscoveryType)`
 
-Do key exchange and establish a secure session between controller and device
-using Bluetooth LE transport.
-
-The Node ID will be used by controller to distinguish multiple devices.
+Commission with the given nodeid from the setupPayload. setupPayload may be a QR
+or the manual setup code.
 
 ```
-devCtrl.ConnectBLE(3840, 20202021, 1234)
+devCtrl.CommissionWithCode("MT:-24J0AFN00KA0648G00", 1234)
 ```
 
-### `CloseSession(<nodeid>: int)`
-
-If case there exists an open session (PASE or CASE) to the device with a given
-Node ID, mark it as expired.
-
-### `discover`
-
-> To be implemented in REPL
-
-Discover available Matter accessory devices:
-
-### `resolve <node_id>`
-
-> To be implemented in REPL
-
-Resolve DNS-SD name corresponding with the given Node ID and update address of
-the node in the device controller:
-
-### `setup-payload generate [-v <Vendor ID>] [-p <Product ID>] [-cf <Custom Flow>] [-dc <Discovery Capabilities>] [-dv <Discriminator Value>] [-ps <Passcode>]`
-
-> To be implemented in REPL
-
-Print the generated Onboarding Payload Contents in human-readable (Manual
-Pairing Code) and machine-readable (QR Code) format:
-
-### `setup-payload parse-manual <manual-pairing-code>`
-
-> To be implemented in REPL
-
-Print the commissioning information encoded in the Manual Pairing Code:
-
-### `setup-payload parse-qr <qr-code>`
-
-> To be implemented in REPL
-
-Print the commissioning information encoded in the QR Code payload:
-
-### `devCtrl.SendCommand(<nodeid>: int, <endpoint>: int, Clusters.<cluster>.Commands.<command>(<arguments>))`
+### `SendCommand(<nodeid>: int, <endpoint>: int, Clusters.<cluster>.Commands.<command>(<arguments>))`
 
 Send a Matter command to the device. For example:
 
