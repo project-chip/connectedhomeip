@@ -19,6 +19,7 @@
 
 #include "matter_config.h"
 #include "AppTask.h"
+#include "EventManagementTestEventTriggerHandler.h"
 #ifdef BOARD_ENABLE_DISPLAY
 #include "GUI.h"
 #endif
@@ -208,8 +209,10 @@ void CYW30739MatterConfig::InitApp(void)
     /* Start CHIP datamodel server */
     static chip::SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
     static chip::OTATestEventTriggerHandler sOtaTestEventTriggerHandler{};
+    static Infineon::CYW30739::EventManagementTestEventTriggerHandler sEventManagementTestEventTriggerHandler{};
     VerifyOrDie(sTestEventTriggerDelegate.Init(chip::ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler) == CHIP_NO_ERROR);
+    VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sEventManagementTestEventTriggerHandler) == CHIP_NO_ERROR);
     // Create initParams with SDK example defaults here
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
