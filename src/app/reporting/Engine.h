@@ -72,7 +72,7 @@ public:
      * @retval #CHIP_NO_ERROR On success.
      * @retval other           Was unable to retrieve data and write it into the writer.
      */
-    CHIP_ERROR Init(EventManagement* apEventManagement = nullptr);
+    CHIP_ERROR Init(EventManagement * apEventManagement = nullptr);
 
     void Shutdown();
 
@@ -287,7 +287,7 @@ private:
 
     InteractionModelEngine * mpImEngine = nullptr;
 
-    EventManagement* mpEventManagement = nullptr;
+    EventManagement * mpEventManagement = nullptr;
 };
 
 }; // namespace reporting

@@ -42,14 +42,17 @@ namespace reporting {
 
 Engine::Engine(InteractionModelEngine * apImEngine) : mpImEngine(apImEngine) {}
 
-CHIP_ERROR Engine::Init(EventManagement* apEventManagement)
+CHIP_ERROR Engine::Init(EventManagement * apEventManagement)
 {
     mNumReportsInFlight = 0;
     mCurReadHandlerIdx  = 0;
 
-    if (apEventManagement == nullptr) {
+    if (apEventManagement == nullptr)
+    {
         mpEventManagement = &EventManagement::GetInstance();
-    } else {
+    }
+    else
+    {
         mpEventManagement = apEventManagement;
     }
 
@@ -393,9 +396,9 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
     size_t eventCount     = 0;
     bool hasEncodedStatus = false;
     TLV::TLVWriter backup;
-    bool eventClean                = true;
-    auto & eventMin                = apReadHandler->GetEventMin();
-    bool hasMoreChunks             = false;
+    bool eventClean    = true;
+    auto & eventMin    = apReadHandler->GetEventMin();
+    bool hasMoreChunks = false;
 
     aReportDataBuilder.Checkpoint(backup);
 
@@ -403,7 +406,8 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
 
     // If the eventManager is not valid or has not been initialized,
     // skip the rest of processing
-    VerifyOrExit(mpEventManagement != nullptr && mpEventManagement->IsValid(), ChipLogError(DataManagement, "EventManagement has not yet initialized"));
+    VerifyOrExit(mpEventManagement != nullptr && mpEventManagement->IsValid(),
+                 ChipLogError(DataManagement, "EventManagement has not yet initialized"));
 
     eventClean = apReadHandler->CheckEventClean(*mpEventManagement);
 
@@ -425,8 +429,8 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
         err = CheckAccessDeniedEventPaths(*(eventReportIBs.GetWriter()), hasEncodedStatus, apReadHandler);
         SuccessOrExit(err);
 
-        err = mpEventManagement->FetchEventsSince(*(eventReportIBs.GetWriter()), apReadHandler->GetEventPathList(), eventMin, eventCount,
-                                            apReadHandler->GetSubjectDescriptor());
+        err = mpEventManagement->FetchEventsSince(*(eventReportIBs.GetWriter()), apReadHandler->GetEventPathList(), eventMin,
+                                                  eventCount, apReadHandler->GetSubjectDescriptor());
 
         if ((err == CHIP_END_OF_TLV) || (err == CHIP_ERROR_TLV_UNDERRUN) || (err == CHIP_NO_ERROR))
         {
