@@ -125,6 +125,8 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
 
     mParams = params;
 
+    mNeedIcdRegistration = false;
+
     if (haveMaybeDanglingBufferPointers)
     {
         mParams.ClearExternalBufferDependentValues();
@@ -760,7 +762,6 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                 }
             }
 
-            mNeedIcdRegistration = false;
             if (mParams.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore)
             {
                 if (mDeviceCommissioningInfo.icd.isLIT && mDeviceCommissioningInfo.icd.checkInProtocolSupport)
