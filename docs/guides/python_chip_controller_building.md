@@ -317,14 +317,6 @@ device commissioning procedure to configure the device with a Wi-Fi interface.
 devCtrl.SetWiFiCredentials('TESTSSID', 'P455W4RD')
 ```
 
-### `CommissionIP(<ip address>: str, <setup pin code>: int, <nodeid>: int)`
-
-Commission a device using IP address directly.
-
-The Node ID will be used by controller to distinguish multiple devices. This
-does not match the spec and will be removed later. The nodeid will not be
-persisted by controller / device.
-
 ### `ConnectBLE(<discriminator>: int, <setup pin code>: int, <nodeid>: int)`
 
 Do key exchange and establish a secure session between controller and device
@@ -401,7 +393,7 @@ MoveWithOnOff(
 
 ### `ReadAttribute(<nodeid>: int, [(<endpoint id>: int, Clusters.<cluster>.Attributes.<attribute>)])`
 
-Read the value of ZCL attribute. For example:
+Read the value of an attribute. For example:
 
 ```python
 await devCtrl.ReadAttribute(1234, [(0, Clusters.BasicInformation.Attributes.VendorName)])
@@ -409,7 +401,7 @@ await devCtrl.ReadAttribute(1234, [(0, Clusters.BasicInformation.Attributes.Vend
 
 ### `WriteAttribute(<nodeid>: int, [(<endpointid>: int, Clusters.<cluster>.Attributes.<attribute>(value=<attribute value>))])`
 
-Write the value to a ZCL attribute. For example:
+Write a value to an attribute. For example:
 
 ```python
 await devCtrl.WriteAttribute(1234, [(1, Clusters.UnitTesting.Attributes.Int8u(value=1))])
