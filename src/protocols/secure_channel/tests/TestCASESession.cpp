@@ -64,6 +64,14 @@ public:
     static void SetUpTestSuite();
     // Performs shared teardown for all tests in the test suite
     static void TearDownTestSuite();
+
+    virtual void SetUp() override
+    {
+        ConfigInitializeNodes(false);
+        chip::Test::LoopbackMessagingContext::SetUp();
+    }
+    virtual void TearDown() override { chip::Test::LoopbackMessagingContext::TearDown(); }
+
 };
 
 void ServiceEvents(TestContext & ctx)
@@ -329,7 +337,6 @@ CHIP_ERROR InitCredentialSets()
 
 void TestContext::SetUpTestSuite()
 {
-    ConfigInitializeNodes(false);
     CHIP_ERROR err = CHIP_NO_ERROR;
     LoopbackMessagingContext::SetUpTestSuite();
     // TODO: use ASSERT_EQ, once transition to pw_unit_test is complete
