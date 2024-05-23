@@ -16,6 +16,7 @@
  */
 
 #import "MTRDeviceControllerLocalTestStorage.h"
+#import "MTRDevice_Internal.h"
 #import "MTRLogging_Internal.h"
 
 @implementation MTRDeviceControllerLocalTestStorage {
