@@ -118,8 +118,8 @@ public:
         UnsolicitedMessageFromPublisherHandler unsolicitedMessageFromPublisherHandler, ReportBeginHandler reportBeginHandler,
         ReportEndHandler reportEndHandler)
         : MTRBaseSubscriptionCallback(attributeReportCallback, eventReportCallback, errorCallback, resubscriptionCallback,
-            subscriptionEstablishedHandler, onDoneHandler, unsolicitedMessageFromPublisherHandler, reportBeginHandler,
-            reportEndHandler)
+              subscriptionEstablishedHandler, onDoneHandler, unsolicitedMessageFromPublisherHandler, reportBeginHandler,
+              reportEndHandler)
     {
     }
 
@@ -936,6 +936,14 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     _internalDeviceState = state;
     if (lastState != state) {
         MTR_LOG("%@ internal state change %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
+
+        /* BEGIN DRAGONS: This is a huge hack for a specific use case, do not rename, remove or modify behavior here */
+        if ([delegate respondsToSelector:@selector(_deviceInternalStateChanged:)]) {
+            dispatch_async(_delegateQueue, ^{
+                [(id) delegate _deviceInternalStateChanged:self];
+            });
+        }
+        /* END DRAGONS */
     }
 }
 
@@ -3265,6 +3273,35 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     [self.temporaryMetaDataCache removeObjectForKey:[NSString stringWithFormat:@"%@:%@", key, endpointID]];
 }
+
+@end
+
+/* BEGIN DRAGONS: Note methods here cannot be renamed, and are used by private callers, do not rename, remove or modify behavior here */
+
+@interface NSObject (MatterPrivateForInternalDragonsDoNotFeed)
+- (void)_deviceInternalStateChanged:(MTRDevice *)device;
+@end
+
+@implementation MTRDevice (MatterPrivateForInternalDragonsDoNotFeed)
+
+- (BOOL)_deviceHasActiveSubscription
+{
+    std::lock_guard lock(_lock);
+
+    return HaveSubscriptionEstablishedRightNow(_internalDeviceState);
+}
+
+- (void)_deviceMayBeOnline
+{
+    assertChipStackLockedByCurrentThread();
+
+    MTR_LOG("%@ deviceMayBeOnline called", self);
+
+    [self _triggerResubscribeWithReason:"SPI client indicated the device may now be online"
+                    nodeLikelyReachable:YES];
+}
+
+/* END DRAGONS */
 
 @end
 
