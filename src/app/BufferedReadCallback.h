@@ -70,6 +70,10 @@ private:
     //
     void OnReportBegin() override;
     void OnReportEnd() override;
+    void NotifySubscriptionStillActive(const ReadClient & apReadClient) override
+    {
+        mCallback.NotifySubscriptionStillActive(apReadClient);
+    }
     void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
     void OnError(CHIP_ERROR aError) override
     {

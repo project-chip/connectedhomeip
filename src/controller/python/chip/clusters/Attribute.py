@@ -680,12 +680,52 @@ class AsyncReadTransaction:
         self._pReadClient = None
         self._pReadCallback = None
         self._resultError = None
+        
+        print("\n\n\n")
+        print(f"AsyncReadTransaction - __init__")
+        print(f"self._event_loop: {self._event_loop}")
+        print(f"self._future: {self._future}")
+        print(f"self._subscription_handler: {self._subscription_handler}")
+        print(f"self._events: {self._events}")
+        print(f"self._devCtrl: {self._devCtrl}")
+        print(f"self._cache: {self._cache}")
+        print(f"self._changedPathSet: {self._changedPathSet}")
+        print(f"self._pReadClient: {self._pReadClient}")
+        print(f"self._pReadCallback: {self._pReadCallback}")
+        print(f"self._resultError: {self._resultError}")
+        print("\n\n\n")
 
     def SetClientObjPointers(self, pReadClient, pReadCallback):
         self._pReadClient = pReadClient
         self._pReadCallback = pReadCallback
+        print("\n\n\n")
+        print(f"AsyncReadTransaction - SetClientObjPointers")
+        print(f"self._event_loop: {self._event_loop}")
+        print(f"self._future: {self._future}")
+        print(f"self._subscription_handler: {self._subscription_handler}")
+        print(f"self._events: {self._events}")
+        print(f"self._devCtrl: {self._devCtrl}")
+        print(f"self._cache: {self._cache}")
+        print(f"self._changedPathSet: {self._changedPathSet}")
+        print(f"self._pReadClient: {self._pReadClient}")
+        print(f"self._pReadCallback: {self._pReadCallback}")
+        print(f"self._resultError: {self._resultError}")
+        print("\n\n\n")
 
     def GetAllEventValues(self):
+        print("\n\n\n")
+        print(f"AsyncReadTransaction - GetAllEventValues")
+        print(f"self._event_loop: {self._event_loop}")
+        print(f"self._future: {self._future}")
+        print(f"self._subscription_handler: {self._subscription_handler}")
+        print(f"self._events: {self._events}")
+        print(f"self._devCtrl: {self._devCtrl}")
+        print(f"self._cache: {self._cache}")
+        print(f"self._changedPathSet: {self._changedPathSet}")
+        print(f"self._pReadClient: {self._pReadClient}")
+        print(f"self._pReadCallback: {self._pReadCallback}")
+        print(f"self._resultError: {self._resultError}")
+        print("\n\n\n")
         return self._events
 
     def handleAttributeData(self, path: AttributePathWithListIndex, dataVersion: int, status: int, data: bytes):
@@ -701,6 +741,20 @@ class AsyncReadTransaction:
 
             self._cache.UpdateTLV(path, dataVersion, attributeValue)
             self._changedPathSet.add(path)
+
+            print("\n\n\n")
+            print(f"AsyncReadTransaction - handleAttributeData")
+            print(f"self._event_loop: {self._event_loop}")
+            print(f"self._future: {self._future}")
+            print(f"self._subscription_handler: {self._subscription_handler}")
+            print(f"self._events: {self._events}")
+            print(f"self._devCtrl: {self._devCtrl}")
+            print(f"self._cache: {self._cache}")
+            print(f"self._changedPathSet: {self._changedPathSet}")
+            print(f"self._pReadClient: {self._pReadClient}")
+            print(f"self._pReadCallback: {self._pReadCallback}")
+            print(f"self._resultError: {self._resultError}")
+            print("\n\n\n")
 
         except Exception as ex:
             logging.exception(ex)
@@ -742,11 +796,39 @@ class AsyncReadTransaction:
                 self._subscription_handler.OnEventChangeCb(
                     eventResult, self._subscription_handler)
 
+            print("\n\n\n")
+            print(f"AsyncReadTransaction - handleEventData")
+            print(f"self._event_loop: {self._event_loop}")
+            print(f"self._future: {self._future}")
+            print(f"self._subscription_handler: {self._subscription_handler}")
+            print(f"self._events: {self._events}")
+            print(f"self._devCtrl: {self._devCtrl}")
+            print(f"self._cache: {self._cache}")
+            print(f"self._changedPathSet: {self._changedPathSet}")
+            print(f"self._pReadClient: {self._pReadClient}")
+            print(f"self._pReadCallback: {self._pReadCallback}")
+            print(f"self._resultError: {self._resultError}")
+            print("\n\n\n")
+
         except Exception as ex:
             logging.exception(ex)
 
     def handleError(self, chipError: PyChipError):
         self._resultError = chipError.code
+        
+        print("\n\n\n")
+        print(f"AsyncReadTransaction - handleError")
+        print(f"self._event_loop: {self._event_loop}")
+        print(f"self._future: {self._future}")
+        print(f"self._subscription_handler: {self._subscription_handler}")
+        print(f"self._events: {self._events}")
+        print(f"self._devCtrl: {self._devCtrl}")
+        print(f"self._cache: {self._cache}")
+        print(f"self._changedPathSet: {self._changedPathSet}")
+        print(f"self._pReadClient: {self._pReadClient}")
+        print(f"self._pReadCallback: {self._pReadCallback}")
+        print(f"self._resultError: {self._resultError}")
+        print("\n\n\n")
 
     def _handleSubscriptionEstablished(self, subscriptionId):
         if not self._future.done():
@@ -762,6 +844,20 @@ class AsyncReadTransaction:
                 else:
                     self._subscription_handler._onResubscriptionSucceededCb(self._subscription_handler)
 
+        print("\n\n\n")
+        print(f"AsyncReadTransaction - _handleSubscriptionEstablished")
+        print(f"self._event_loop: {self._event_loop}")
+        print(f"self._future: {self._future}")
+        print(f"self._subscription_handler: {self._subscription_handler}")
+        print(f"self._events: {self._events}")
+        print(f"self._devCtrl: {self._devCtrl}")
+        print(f"self._cache: {self._cache}")
+        print(f"self._changedPathSet: {self._changedPathSet}")
+        print(f"self._pReadClient: {self._pReadClient}")
+        print(f"self._pReadCallback: {self._pReadCallback}")
+        print(f"self._resultError: {self._resultError}")
+        print("\n\n\n")
+        
     def handleSubscriptionEstablished(self, subscriptionId):
         self._event_loop.call_soon_threadsafe(
             self._handleSubscriptionEstablished, subscriptionId)
@@ -777,11 +873,52 @@ class AsyncReadTransaction:
                 self._subscription_handler._onResubscriptionAttemptedCb,
                 self._subscription_handler, terminationCause.code, nextResubscribeIntervalMsec)
 
+        print("\n\n\n")
+        print(f"AsyncReadTransaction - handleResubscriptionAttempted")
+        print(f"self._event_loop: {self._event_loop}")
+        print(f"self._future: {self._future}")
+        print(f"self._subscription_handler: {self._subscription_handler}")
+        print(f"self._events: {self._events}")
+        print(f"self._devCtrl: {self._devCtrl}")
+        print(f"self._cache: {self._cache}")
+        print(f"self._changedPathSet: {self._changedPathSet}")
+        print(f"self._pReadClient: {self._pReadClient}")
+        print(f"self._pReadCallback: {self._pReadCallback}")
+        print(f"self._resultError: {self._resultError}")
+        print("\n\n\n")
+
     def _handleReportBegin(self):
+        print("\n\n\n")
+        print(f"AsyncReadTransaction - _handleReportBegin")
+        print(f"self._event_loop: {self._event_loop}")
+        print(f"self._future: {self._future}")
+        print(f"self._subscription_handler: {self._subscription_handler}")
+        print(f"self._events: {self._events}")
+        print(f"self._devCtrl: {self._devCtrl}")
+        print(f"self._cache: {self._cache}")
+        print(f"self._changedPathSet: {self._changedPathSet}")
+        print(f"self._pReadClient: {self._pReadClient}")
+        print(f"self._pReadCallback: {self._pReadCallback}")
+        print(f"self._resultError: {self._resultError}")
+        print("\n\n\n")
         pass
 
-    def _handleReportEnd(self):
+    def _handleReportEnd(self):        
         self._cache.UpdateCachedData(self._changedPathSet)
+        
+        print("\n\n\n")
+        print(f"AsyncReadTransaction - _handleReportEnd")
+        print(f"self._event_loop: {self._event_loop}")
+        print(f"self._future: {self._future}")
+        print(f"self._subscription_handler: {self._subscription_handler}")
+        print(f"self._events: {self._events}")
+        print(f"self._devCtrl: {self._devCtrl}")
+        print(f"self._cache: {self._cache}")
+        print(f"self._changedPathSet: {self._changedPathSet}")
+        print(f"self._pReadClient: {self._pReadClient}")
+        print(f"self._pReadCallback: {self._pReadCallback}")
+        print(f"self._resultError: {self._resultError}")
+        print("\n\n\n")
 
         if (self._subscription_handler is not None):
             for change in self._changedPathSet:
@@ -813,6 +950,20 @@ class AsyncReadTransaction:
             else:
                 self._future.set_result(AsyncReadTransaction.ReadResponse(
                     attributes=self._cache.attributeCache, events=self._events, tlvAttributes=self._cache.attributeTLVCache))
+                
+        print("\n\n\n")
+        print(f"AsyncReadTransaction - _handleDone")
+        print(f"self._event_loop: {self._event_loop}")
+        print(f"self._future: {self._future}")
+        print(f"self._subscription_handler: {self._subscription_handler}")
+        print(f"self._events: {self._events}")
+        print(f"self._devCtrl: {self._devCtrl}")
+        print(f"self._cache: {self._cache}")
+        print(f"self._changedPathSet: {self._changedPathSet}")
+        print(f"self._pReadClient: {self._pReadClient}")
+        print(f"self._pReadCallback: {self._pReadCallback}")
+        print(f"self._resultError: {self._resultError}")
+        print("\n\n\n")
 
         #
         # Decrement the ref on ourselves to match the increment that happened at allocation.
@@ -823,13 +974,32 @@ class AsyncReadTransaction:
 
     def handleDone(self):
         self._event_loop.call_soon_threadsafe(self._handleDone)
-
+        
     def handleReportBegin(self):
+        self._handleReportBegin()
+        
+    def handleReportEnd(self):
+        self._handleReportEnd()
+
+    def _handleNotifySubscriptionStillActive(self):
         pass
 
-    def handleReportEnd(self):
-        # self._event_loop.call_soon_threadsafe(self._handleReportEnd)
-        self._handleReportEnd()
+    def handleNotifySubscriptionStillActive(self):
+        print("\n\n\n\n\n\n\n\n\n\n\n")
+        print(f"closure.handleNotifySubscriptionStillActive")
+        print(f"\t\tAsyncReadTransaction - _handleReportBegin")
+        print(f"\t\tself._event_loop: {self._event_loop}")
+        print(f"\t\tself._future: {self._future}")
+        print(f"\t\tself._subscription_handler: {self._subscription_handler}")
+        print(f"\t\tself._events: {self._events}")
+        print(f"\t\tself._devCtrl: {self._devCtrl}")
+        print(f"\t\tself._cache: {self._cache}")
+        print(f"\t\tself._changedPathSet: {self._changedPathSet}")
+        print(f"\t\tself._pReadClient: {self._pReadClient}")
+        print(f"\t\tself._pReadCallback: {self._pReadCallback}")
+        print(f"\t\tself._resultError: {self._resultError}")
+        print("\n\n\n\n\n\n\n\n\n\n\n")
+        self._handleNotifySubscriptionStillActive()
 
 
 class AsyncWriteTransaction:
@@ -889,7 +1059,8 @@ _OnReportBeginCallbackFunct = CFUNCTYPE(
     None, py_object)
 _OnReportEndCallbackFunct = CFUNCTYPE(
     None, py_object)
-
+_OnNotifySubscriptionStillActiveCallbackFunct = CFUNCTYPE(
+    None, py_object)
 
 @_OnReadAttributeDataCallbackFunct
 def _OnReadAttributeDataCallback(closure, dataVersion: int, endpoint: int, cluster: int, attribute: int, status, data, len):
@@ -935,6 +1106,11 @@ def _OnReportBeginCallback(closure):
 @_OnReportEndCallbackFunct
 def _OnReportEndCallback(closure):
     closure.handleReportEnd()
+
+
+@_OnNotifySubscriptionStillActiveCallbackFunct
+def _OnNotifySubscriptionStillActiveCallback(closure):
+    closure.handleNotifySubscriptionStillActive()
 
 
 @_OnReadDoneCallbackFunct
@@ -1208,14 +1384,15 @@ def Init():
                    _OnReadAttributeDataCallbackFunct, _OnReadEventDataCallbackFunct,
                    _OnSubscriptionEstablishedCallbackFunct, _OnResubscriptionAttemptedCallbackFunct,
                    _OnReadErrorCallbackFunct, _OnReadDoneCallbackFunct,
-                   _OnReportBeginCallbackFunct, _OnReportEndCallbackFunct])
+                   _OnReportBeginCallbackFunct, _OnReportEndCallbackFunct,
+                   _OnNotifySubscriptionStillActiveCallbackFunct])
 
     handle.pychip_WriteClient_InitCallbacks(
         _OnWriteResponseCallback, _OnWriteErrorCallback, _OnWriteDoneCallback)
     handle.pychip_ReadClient_InitCallbacks(
         _OnReadAttributeDataCallback, _OnReadEventDataCallback,
         _OnSubscriptionEstablishedCallback, _OnResubscriptionAttemptedCallback, _OnReadErrorCallback, _OnReadDoneCallback,
-        _OnReportBeginCallback, _OnReportEndCallback)
+        _OnReportBeginCallback, _OnReportEndCallback, _OnNotifySubscriptionStillActiveCallback)
 
     _BuildAttributeIndex()
     _BuildClusterIndex()

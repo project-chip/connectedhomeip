@@ -115,10 +115,10 @@ class TC_IDM_4_3(MatterBaseTest):
         
         
         
-        # secs = 60
-        # print(f"\n\n\n\n\nTime to sleep {secs} second(s)")
-        # time.sleep(secs)
-        # print(f"Rise and shine after {secs} second(s)\n\n\n\n\n")
+        secs = 60
+        print(f"\n\n\n\n\nTime to sleep {secs} second(s)")
+        time.sleep(secs)
+        print(f"Rise and shine after {secs} second(s)\n\n\n\n\n")
 
         
         
