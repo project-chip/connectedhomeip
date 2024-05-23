@@ -54,36 +54,26 @@ class EventPriority(Enum):
     CRITICAL = 2
 
 
-@dataclass
+@dataclass(frozen=True)
 class AttributePath:
     EndpointId: int = None
     ClusterId: int = None
     AttributeId: int = None
 
-    def __init__(self, EndpointId: int = None, Cluster=None, Attribute=None, ClusterId=None, AttributeId=None):
-        self.EndpointId = EndpointId
-        if Cluster is not None:
-            # Wildcard read for a specific cluster
-            if (Attribute is not None) or (ClusterId is not None) or (AttributeId is not None):
-                raise Warning(
-                    "Attribute, ClusterId and AttributeId is ignored when Cluster is specified")
-            self.ClusterId = Cluster.id
-            return
-        if Attribute is not None:
-            if (ClusterId is not None) or (AttributeId is not None):
-                raise Warning(
-                    "ClusterId and AttributeId is ignored when Attribute is specified")
-            self.ClusterId = Attribute.cluster_id
-            self.AttributeId = Attribute.attribute_id
-            return
-        self.ClusterId = ClusterId
-        self.AttributeId = AttributeId
+    @staticmethod
+    def from_cluster(EndpointId: int, Cluster: Cluster) -> AttributePath:
+        if Cluster is None:
+            raise ValueError("Cluster cannot be None")
+        return AttributePath(EndpointId=EndpointId, ClusterId=Cluster.id)
+
+    @staticmethod
+    def from_attribute(EndpointId: int, Attribute: ClusterAttributeDescriptor) -> AttributePath:
+        if Attribute is None:
+            raise ValueError("Attribute cannot be None")
+        return AttributePath(EndpointId=EndpointId, ClusterId=Attribute.cluster_id, AttributeId=Attribute.attribute_id)
 
     def __str__(self) -> str:
         return f"{self.EndpointId}/{self.ClusterId}/{self.AttributeId}"
-
-    def __hash__(self):
-        return str(self).__hash__()
 
 
 @dataclass
