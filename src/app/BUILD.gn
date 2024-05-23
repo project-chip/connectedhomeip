@@ -322,7 +322,6 @@ static_library("app") {
     "DeferredAttributePersistenceProvider.h",
     "EventLogging.h",
     "EventManagement.cpp",
-    "EventManagement.h",
     "FailSafeContext.cpp",
     "FailSafeContext.h",
     "GenericEventManagementTestEventTriggerHandler.cpp",
@@ -340,7 +339,8 @@ static_library("app") {
     # "CommandResponseSender._h"
     # "CommandHandler._h"
     # "ReadHandler._h",
-    # "WriteHandler._h"
+    # "WriteHandler._h",
+    # "EventManagement._h"
   ]
 
   public_deps = [

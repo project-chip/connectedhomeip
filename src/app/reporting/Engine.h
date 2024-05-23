@@ -25,6 +25,7 @@
 #pragma once
 
 #include <access/AccessControl.h>
+#include <app/EventManagement.h>
 #include <app/MessageDef/ReportDataMessage.h>
 #include <app/ReadHandler.h>
 #include <app/util/basic-types.h>
@@ -40,6 +41,7 @@
 namespace chip {
 namespace app {
 
+class EventManagement;
 class InteractionModelEngine;
 class TestReadInteraction;
 
@@ -54,7 +56,7 @@ namespace reporting {
  *         At its core, it  tries to gather and pack as much relevant attributes changes and/or events as possible into a report
  * message before sending that to the reader. It continues to do so until it has no more work to do.
  */
-class Engine
+class Engine : public EventScheduler
 {
 public:
     /**
@@ -64,11 +66,13 @@ public:
 
     /**
      * Initializes the reporting engine. Should only be called once.
+     * 
+     * @param[in] A pointer to EventManagement. Use the global one by default.
      *
      * @retval #CHIP_NO_ERROR On success.
      * @retval other           Was unable to retrieve data and write it into the writer.
      */
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(EventManagement* apEventManagement = nullptr);
 
     void Shutdown();
 
@@ -94,13 +98,6 @@ public:
      * Application marks mutated change path and would be sent out in later report.
      */
     CHIP_ERROR SetDirty(AttributePathParams & aAttributePathParams);
-
-    /**
-     * @brief
-     *  Schedule the event delivery
-     *
-     */
-    CHIP_ERROR ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBytesWritten);
 
     /*
      * Resets the tracker that tracks the currently serviced read handler.
@@ -148,6 +145,9 @@ private:
 
     friend class TestReportingEngine;
     friend class ::chip::app::TestReadInteraction;
+
+    // EventScheduler implementations.
+    CHIP_ERROR ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBytesWritten) override;
 
     bool IsRunScheduled() const { return mRunScheduled; }
 
@@ -286,6 +286,8 @@ private:
 #endif
 
     InteractionModelEngine * mpImEngine = nullptr;
+
+    EventManagement* mpEventManagement = nullptr;
 };
 
 }; // namespace reporting
