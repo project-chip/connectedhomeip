@@ -3704,7 +3704,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Do not subscribe - only inject sequence of reports to control the timing
     delegate.skipSetupSubscription = YES;
 
-    NSTimeInterval baseTestDelayTime = 1;
+    NSTimeInterval baseTestDelayTime = 3;
 
     // Set up a config of relatively short timers so this test doesn't take too long
     MTRDeviceStorageBehaviorConfiguration * config = [MTRDeviceStorageBehaviorConfiguration
