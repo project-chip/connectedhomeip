@@ -147,6 +147,7 @@ chip_test_suite("tests") {
     "WriteHandlerTestAccess.h",
   ]
   test_sources = [
+    "TestAclAttribute.cpp",
     "TestBuilderParser.cpp",
     "TestCommandInteraction.cpp",
     "TestMessageDef.cpp",
@@ -181,7 +182,6 @@ chip_test_suite_using_nltest("tests_nltest") {
   output_name = "libAppTestsNL"
 
   test_sources = [
-    "TestAclAttribute.cpp",
     "TestAclEvent.cpp",
     "TestAttributeAccessInterfaceCache.cpp",
     "TestAttributePathExpandIterator.cpp",
