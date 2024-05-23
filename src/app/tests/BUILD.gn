@@ -138,14 +138,6 @@ source_set("ember-apptest-compatibility") {
 chip_test_suite("tests") {
   output_name = "libAppTests"
 
-  sources = [
-    "CommandHandlerTestAccess.h",
-    "CommandSenderTestAccess.h",
-    "EngineTestAccess.h",
-    "ReadHandlerTestAccess.h",
-    "WriteClientTestAccess.h",
-    "WriteHandlerTestAccess.h",
-  ]
   test_sources = [
     "TestBindingTable.cpp",
     "TestBuilderParser.cpp",
