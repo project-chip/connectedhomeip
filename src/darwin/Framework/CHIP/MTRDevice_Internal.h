@@ -103,7 +103,6 @@ NSNumber * MTRClampedNumber(NSNumber * aNumber, NSNumber * min, NSNumber * max);
 #pragma mark - Constants
 
 static NSString * const kDefaultSubscriptionPoolSizeOverrideKey = @"subscriptionPoolSizeOverride";
-static NSString * const kSRPTimeoutInMsecsUserDefaultKey = @"SRPTimeoutInMSecsOverride";
 static NSString * const kTestStorageUserDefaultEnabledKey = @"enableTestStorage";
 
 NS_ASSUME_NONNULL_END

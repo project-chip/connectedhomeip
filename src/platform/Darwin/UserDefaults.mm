@@ -21,6 +21,8 @@
 
 #import <Foundation/Foundation.h>
 
+static NSString * const kSRPTimeoutInMsecsUserDefaultKey = @"SRPTimeoutInMSecsOverride";
+
 namespace chip {
 namespace Platform {
 
