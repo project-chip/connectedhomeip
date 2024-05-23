@@ -682,7 +682,8 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
     BOOL setUpSubscription = [self _subscriptionsAllowed];
 
-    // For unit testing only
+    // For unit testing only. If this ever changes to not being for unit testing purposes,
+    // we would need to move the code outside of where we acquire the lock above.
 #ifdef DEBUG
     id testDelegate = delegate;
     if ([testDelegate respondsToSelector:@selector(unitTestShouldSetUpSubscriptionForDevice:)]) {
