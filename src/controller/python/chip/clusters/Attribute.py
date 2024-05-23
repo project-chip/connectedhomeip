@@ -190,11 +190,6 @@ class EventPath:
 
 
 @dataclass
-class AttributePathWithListIndex(AttributePath):
-    ListIndex: int = None
-
-
-@dataclass
 class EventHeader:
     EndpointId: int = None
     ClusterId: int = None
@@ -678,7 +673,7 @@ class AsyncReadTransaction:
     def GetAllEventValues(self):
         return self._events
 
-    def handleAttributeData(self, path: AttributePathWithListIndex, dataVersion: int, status: int, data: bytes):
+    def handleAttributeData(self, path: AttributePath, dataVersion: int, status: int, data: bytes):
         try:
             imStatus = chip.interaction_model.Status(status)
 
