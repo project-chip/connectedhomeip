@@ -3743,7 +3743,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Check delay exists
     XCTAssertGreaterThan(reportToPersistenceDelay, baseTestDelayTime / 2);
     // Check delay is expectd - use base delay plus small fudge in case of CPU slowness with dispatch_after
-    XCTAssertLessThan(reportToPersistenceDelay, baseTestDelayTime * 1.1);
+    XCTAssertLessThan(reportToPersistenceDelay, baseTestDelayTime * 1.3);
 
     XCTestExpectation * dataPersisted2 = [self expectationWithDescription:@"data persisted 2"];
 
@@ -3790,7 +3790,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     os_unfair_lock_unlock(&lock);
     // Check delay exists and approximately reportToPersistenceDelayTimeMax, which is base delay times 2
     XCTAssertGreaterThan(reportToPersistenceDelay, baseTestDelayTime * 2 * 0.9);
-    XCTAssertLessThan(reportToPersistenceDelay, baseTestDelayTime * 2 * 1.1);
+    XCTAssertLessThan(reportToPersistenceDelay, baseTestDelayTime * 2 * 1.3); // larger upper limit in case machine is slow
 
     delegate.onClusterDataPersisted = nil;
 
@@ -3833,7 +3833,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     os_unfair_lock_unlock(&lock);
     // Check delay exists and approximately base delay times 3
     XCTAssertGreaterThan(reportToPersistenceDelay, baseTestDelayTime * 3 * 0.9);
-    XCTAssertLessThan(reportToPersistenceDelay, baseTestDelayTime * 3 * 1.1);
+    XCTAssertLessThan(reportToPersistenceDelay, baseTestDelayTime * 3 * 1.3); // larger upper limit in case machine is slow
 
     // Test 4: test reporting excessively, and see that persistence does not happen until
     // reporting frequency goes back above the threshold
