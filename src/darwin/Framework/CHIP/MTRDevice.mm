@@ -141,25 +141,6 @@ private:
 } // anonymous namespace
 
 #pragma mark - MTRDevice
-typedef NS_ENUM(NSUInteger, MTRInternalDeviceState) {
-    // Unsubscribed means we do not have a subscription and are not trying to set one up.
-    MTRInternalDeviceStateUnsubscribed = 0,
-    // Subscribing means we are actively trying to establish our initial subscription (e.g. doing
-    // DNS-SD discovery, trying to establish CASE to the peer, getting priming reports, etc).
-    MTRInternalDeviceStateSubscribing = 1,
-    // InitialSubscriptionEstablished means we have at some point finished setting up a
-    // subscription.  That subscription may have dropped since then, but if so it's the ReadClient's
-    // responsibility to re-establish it.
-    MTRInternalDeviceStateInitialSubscriptionEstablished = 2,
-    // Resubscribing means we had established a subscription, but then
-    // detected a subscription drop due to not receiving a report on time. This
-    // covers all the actions that happen when re-subscribing (discovery, CASE,
-    // getting priming reports, etc).
-    MTRInternalDeviceStateResubscribing = 3,
-    // LaterSubscriptionEstablished meant that we had a subscription drop and
-    // then re-created a subscription.
-    MTRInternalDeviceStateLaterSubscriptionEstablished = 4,
-};
 
 // Utility methods for working with MTRInternalDeviceState, located near the
 // enum so it's easier to notice that they need to stay in sync.
@@ -687,6 +668,9 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
 - (BOOL)_subscriptionsAllowed
 {
+    os_unfair_lock_assert_owner(&self->_lock);
+    
+    // We should not allow a subscription for device controllers over XPC.
     return ![_deviceController isKindOfClass:MTRDeviceControllerOverXPC.class];
 }
 
@@ -694,9 +678,10 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 {
     MTR_LOG("%@ setDelegate %@", self, delegate);
 
-    // We should not set up a subscription for device controllers over XPC.
+    std::lock_guard lock(_lock);
+    
     BOOL setUpSubscription = [self _subscriptionsAllowed];
-
+    
     // For unit testing only
 #ifdef DEBUG
     id testDelegate = delegate;
@@ -704,8 +689,6 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         setUpSubscription = [testDelegate unitTestShouldSetUpSubscriptionForDevice:self];
     }
 #endif
-
-    std::lock_guard lock(_lock);
 
     _weakDelegate = [MTRWeakReference weakReferenceWithObject:delegate];
     _delegateQueue = queue;
@@ -830,12 +813,8 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 #endif
 
     // Unfortunately, we currently have no subscriptions over our hacked-up XPC
-    // setup.  Try to detect that situation.
-    if ([_deviceController isKindOfClass:MTRDeviceControllerOverXPC.class]) {
-        return NO;
-    }
-
-    return YES;
+    // setup. Based on whether subscriptions are allowed or not, return YES or NO.
+    return [self _subscriptionsAllowed];
 }
 
 // Notification that read-through was skipped for an attribute read.
