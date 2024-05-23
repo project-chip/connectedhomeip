@@ -227,18 +227,22 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
 
             ThreadDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetThreadDiagnosticsDelegate();
 
-            if (mIsAttached)
+            if (delegate)
             {
-                delegate->OnConnectionStatusChanged(app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum::kConnected);
-            }
-            else
-            {
-                delegate->OnConnectionStatusChanged(app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum::kNotConnected);
+                if (mIsAttached)
+                {
+                    delegate->OnConnectionStatusChanged(app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum::kConnected);
+                }
+                else
+                {
+                    delegate->OnConnectionStatusChanged(
+                        app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum::kNotConnected);
 
-                GeneralFaults<kMaxNetworkFaults> current;
-                current.add(to_underlying(chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum::kLinkDown));
-                delegate->OnNetworkFaultChanged(mNetworkFaults, current);
-                mNetworkFaults = current;
+                    GeneralFaults<kMaxNetworkFaults> current;
+                    current.add(to_underlying(chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum::kLinkDown));
+                    delegate->OnNetworkFaultChanged(mNetworkFaults, current);
+                    mNetworkFaults = current;
+                }
             }
         }
 

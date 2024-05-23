@@ -56,6 +56,8 @@ class LedManager;
 class PwmManager;
 class ButtonManager;
 
+struct Identify;
+
 class AppTaskCommon
 {
 public:
@@ -66,6 +68,8 @@ public:
     void PostEvent(AppEvent * event);
 
     static void IdentifyEffectHandler(Clusters::Identify::EffectIdentifierEnum aEffect);
+    static void IdentifyStartHandler(Identify *);
+    static void IdentifyStopHandler(Identify *);
 
 #ifdef CONFIG_CHIP_PW_RPC
     enum ButtonId_t

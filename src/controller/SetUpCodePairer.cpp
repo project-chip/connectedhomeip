@@ -30,8 +30,11 @@
 #include <lib/dnssd/Resolver.h>
 #include <lib/support/CodeUtils.h>
 #include <system/SystemClock.h>
+#include <tracing/metric_event.h>
 
 constexpr uint32_t kDeviceDiscoveredTimeout = CHIP_CONFIG_SETUP_CODE_PAIRER_DISCOVERY_TIMEOUT_SECS * chip::kMillisecondsPerSecond;
+
+using namespace chip::Tracing;
 
 namespace chip {
 namespace Controller {
@@ -59,15 +62,16 @@ CHIP_ERROR GetPayload(const char * setUpCode, SetupPayload & payload)
 CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, SetupCodePairerBehaviour commission,
                                        DiscoveryType discoveryType, Optional<Dnssd::CommonResolutionData> resolutionData)
 {
-    VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(remoteId != kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnErrorWithMetric(kMetricSetupCodePairerPairDevice, mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnErrorWithMetric(kMetricSetupCodePairerPairDevice, remoteId != kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT);
 
     SetupPayload payload;
     ReturnErrorOnFailure(GetPayload(setUpCode, payload));
 
     if (resolutionData.HasValue())
     {
-        VerifyOrReturnError(discoveryType != DiscoveryType::kAll, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnErrorWithMetric(kMetricSetupCodePairerPairDevice, discoveryType != DiscoveryType::kAll,
+                                      CHIP_ERROR_INVALID_ARGUMENT);
         if (mRemoteId == remoteId && mSetUpPINCode == payload.setUpPINCode && mConnectionType == commission &&
             mDiscoveryType == discoveryType)
         {
@@ -89,10 +93,16 @@ CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, 
         return CHIP_NO_ERROR;
     }
 
-    ReturnErrorOnFailure(Connect(payload));
-    return mSystemLayer->StartTimer(System::Clock::Milliseconds32(kDeviceDiscoveredTimeout), OnDeviceDiscoveredTimeoutCallback,
-                                    this);
+    ReturnErrorOnFailureWithMetric(kMetricSetupCodePairerPairDevice, Connect(payload));
+    auto errorCode =
+        mSystemLayer->StartTimer(System::Clock::Milliseconds32(kDeviceDiscoveredTimeout), OnDeviceDiscoveredTimeoutCallback, this);
+    if (CHIP_NO_ERROR == errorCode)
+    {
+        MATTER_LOG_METRIC_BEGIN(kMetricSetupCodePairerPairDevice);
+    }
+    return errorCode;
 }
+
 CHIP_ERROR SetUpCodePairer::Connect(SetupPayload & payload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -536,6 +546,7 @@ void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error)
         ChipLogProgress(Controller, "PASE session established with commissionee. Stopping discovery.");
         ResetDiscoveryState();
         mRemoteId = kUndefinedNodeId;
+        MATTER_LOG_METRIC_END(kMetricSetupCodePairerPairDevice, error);
         if (pairingDelegate != nullptr)
         {
             pairingDelegate->OnPairingComplete(error);
@@ -568,6 +579,7 @@ void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error)
         return;
     }
 
+    MATTER_LOG_METRIC_END(kMetricSetupCodePairerPairDevice, error);
     if (pairingDelegate != nullptr)
     {
         pairingDelegate->OnPairingComplete(error);
@@ -608,6 +620,7 @@ void SetUpCodePairer::OnDeviceDiscoveredTimeoutCallback(System::Layer * layer, v
         {
             err = CHIP_ERROR_TIMEOUT;
         }
+        MATTER_LOG_METRIC_END(kMetricSetupCodePairerPairDevice, err);
         pairer->mCommissioner->OnSessionEstablishmentError(err);
     }
 }

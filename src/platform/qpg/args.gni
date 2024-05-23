@@ -42,13 +42,6 @@ lwip_debug = false
 chip_build_tests = false
 
 openthread_external_mbedtls = mbedtls_target
-openthread_project_core_config_file =
-    "openthread-core-${qpg_target_ic}-config.h"
-openthread_core_config_platform_check_file =
-    "openthread-core-${qpg_target_ic}-config-check.h"
-openthread_core_config_deps = [
-  "${chip_root}/third_party/openthread/platforms/qpg:libopenthread-qpg-config",
-]
 
 openthread_external_platform =
     "${chip_root}/third_party/openthread/platforms/qpg:libopenthread-qpg"

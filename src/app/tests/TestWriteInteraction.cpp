@@ -338,7 +338,7 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
             app::WriteHandler writeHandler;
 
             System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-            err                            = writeHandler.Init();
+            err                            = writeHandler.Init(chip::app::InteractionModelEngine::GetInstance());
 
             GenerateWriteRequest(apSuite, apContext, messageIsTimed, buf);
 
@@ -1063,10 +1063,10 @@ const nlTest sTests[] =
 nlTestSuite sSuite = {
     "TestWriteInteraction",
     &sTests[0],
-    TestContext::nlTestSetUpTestSuite,
-    TestContext::nlTestTearDownTestSuite,
-    TestContext::nlTestSetUp,
-    TestContext::nlTestTearDown,
+    NL_TEST_WRAP_FUNCTION(TestContext::SetUpTestSuite),
+    NL_TEST_WRAP_FUNCTION(TestContext::TearDownTestSuite),
+    NL_TEST_WRAP_METHOD(TestContext, SetUp),
+    NL_TEST_WRAP_METHOD(TestContext, TearDown),
 };
 
 } // namespace

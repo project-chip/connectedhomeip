@@ -218,6 +218,56 @@ static BOOL slocalTestStorageEnabledBeforeUnitTest;
 {
     [super setUp];
     [self setContinueAfterFailure:NO];
+
+    // Ensure the test starts with clean slate in terms of stored data.
+    if (sController != nil) {
+        [sController.controllerDataStore clearAllStoredClusterData];
+        NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
+        XCTAssertEqual(storedClusterDataAfterClear.count, 0);
+    }
+}
+
+- (void)tearDown
+{
+    // Make sure our MTRDevice instances, which are stateful, do not keep that
+    // state between different tests.
+    if (sController != nil) {
+        __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sController];
+        [sController removeDevice:device];
+    }
+
+    // Try to make sure we don't have any outstanding subscriptions from
+    // previous tests, by sending a subscribe request that will get rid of
+    // existing subscriptions and then fail out due to requesting a subscribe to
+    // a nonexistent cluster.
+    if (mConnectedDevice != nil) {
+        dispatch_queue_t queue = dispatch_get_main_queue();
+
+        MTRSubscribeParams * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(0) maxInterval:@(10)];
+        params.resubscribeAutomatically = NO;
+        params.replaceExistingSubscriptions = YES;
+
+        XCTestExpectation * errorExpectation = [self expectationWithDescription:@"Canceled all subscriptions"];
+
+        // There should be no Basic Information cluster on random endpoints.
+        [mConnectedDevice subscribeToAttributesWithEndpointID:@10000
+            clusterID:@(MTRClusterIDTypeBasicInformationID)
+            attributeID:@(0)
+            params:params
+            queue:queue
+            reportHandler:^(id _Nullable values, NSError * _Nullable error) {
+                XCTAssertNil(values);
+                XCTAssertNotNil(error);
+                [errorExpectation fulfill];
+            }
+            subscriptionEstablished:^() {
+                XCTFail("Did not expect subscription to Basic Information on random endpoint to succeed");
+            }];
+
+        [self waitForExpectations:@[ errorExpectation ] timeout:kTimeoutInSeconds];
+    }
+
+    [super tearDown];
 }
 
 - (void)test001_ReadAttribute
@@ -406,6 +456,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Subscribe
     XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe OnOff attribute"];
     __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(1) maxInterval:@(10)];
+    params.resubscribeAutomatically = NO;
     [device subscribeToAttributesWithEndpointID:@1
         clusterID:@6
         attributeID:@0
@@ -1278,8 +1329,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     __auto_type clusterStateCacheContainer = [[MTRAttributeCacheContainer alloc] init];
     __auto_type * params = [[MTRSubscribeParams alloc] init];
     params.resubscribeAutomatically = NO;
-    params.replaceExistingSubscriptions = NO; // Not strictly needed, but checking that doing this does not
-    // affect this subscription erroring out correctly.
+    params.replaceExistingSubscriptions = NO; // Not strictly needed, but checking that doing this does not affect this subscription erroring out correctly.
     [device subscribeWithQueue:queue
         minInterval:1
         maxInterval:2
@@ -1387,11 +1437,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test017_TestMTRDeviceBasics
 {
-    // Ensure the test starts with clean slate, even with MTRDeviceControllerLocalTestStorage enabled
-    [sController.controllerDataStore clearAllStoredClusterData];
-    NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
-    XCTAssertEqual(storedClusterDataAfterClear.count, 0);
-
     __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
     dispatch_queue_t queue = dispatch_get_main_queue();
 
@@ -2149,6 +2194,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Subscribe
     XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe OnOff attribute"];
     __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(1) maxInterval:@(10)];
+    params.resubscribeAutomatically = NO;
 
     NSNumber * failClusterId = @5678;
     NSNumber * failEndpointId = @1000;
@@ -2406,6 +2452,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Subscribe
     XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe multiple events"];
     __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(1) maxInterval:@(10)];
+    params.resubscribeAutomatically = NO;
 
     NSArray<MTREventRequestPath *> * eventPaths = @[
         // Startup event.
@@ -2415,7 +2462,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     ];
 
     XCTestExpectation * startupEventExpectation = [self expectationWithDescription:@"report startup event"];
-    __auto_type reportHandler = ^(id _Nullable values, NSError * _Nullable error) {
+    __block __auto_type reportHandler = ^(id _Nullable values, NSError * _Nullable error) {
         XCTAssertNil(error);
         XCTAssertTrue([values isKindOfClass:[NSArray class]]);
 
@@ -2455,18 +2502,26 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     };
 
     [device subscribeToAttributePaths:nil
-                           eventPaths:eventPaths
-                               params:params
-                                queue:queue
-                        reportHandler:reportHandler
-              subscriptionEstablished:^{
-                  NSLog(@"subscribe complete");
-                  [expectation fulfill];
-              }
-              resubscriptionScheduled:nil];
+        eventPaths:eventPaths
+        params:params
+        queue:queue
+        reportHandler:^(id _Nullable values, NSError * _Nullable error) {
+            if (reportHandler != nil) {
+                reportHandler(values, error);
+            }
+        }
+        subscriptionEstablished:^{
+            NSLog(@"subscribe complete");
+            [expectation fulfill];
+        }
+        resubscriptionScheduled:nil];
 
     // Wait till establishment
     [self waitForExpectations:@[ startupEventExpectation, expectation ] timeout:kTimeoutInSeconds];
+
+    // Null out reportHandler, so we don't notify it when the
+    // subscription tears down.
+    reportHandler = nil;
 }
 
 - (void)test026_LocationAttribute
@@ -2634,11 +2689,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test029_MTRDeviceWriteCoalescing
 {
-    // Ensure the test starts with clean slate, even with MTRDeviceControllerLocalTestStorage enabled
-    [sController.controllerDataStore clearAllStoredClusterData];
-    NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
-    XCTAssertEqual(storedClusterDataAfterClear.count, 0);
-
     __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
     dispatch_queue_t queue = dispatch_get_main_queue();
 
@@ -2971,15 +3021,8 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 {
     dispatch_queue_t queue = dispatch_get_main_queue();
 
-    // First start with clean slate by removing the MTRDevice and clearing the persisted cache
+    // Get the subscription primed
     __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sController];
-    [sController removeDevice:device];
-    [sController.controllerDataStore clearAllStoredClusterData];
-    NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
-    XCTAssertEqual(storedClusterDataAfterClear.count, 0);
-
-    // Now recreate device and get subscription primed
-    device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sController];
     XCTestExpectation * gotReportsExpectation = [self expectationWithDescription:@"Attribute and Event reports have been received"];
     XCTestExpectation * gotDeviceCachePrimed = [self expectationWithDescription:@"Device cache primed for the first time"];
     __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
@@ -3038,12 +3081,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     }
     NSUInteger storedAttributeCountDifferenceFromMTRDeviceReport = dataStoreAttributeCountAfterSecondSubscription - attributesReportedWithSecondSubscription;
     XCTAssertTrue(storedAttributeCountDifferenceFromMTRDeviceReport > 300);
-
-    // We need to remove the device here since the MTRDevice retains its reachable state. So if the next test needs to start with a clean state,
-    // it can't do that since the MTRDevice becomes reachable in the previous test. Since there are no changes detected in reachability,
-    // the onReachable callback to the delegate is not called.
-    // TODO: #33205 Ensure we have a clean slate w.r.t MTRDevice before running each test.
-    [sController removeDevice:device];
 }
 
 - (void)test032_MTRPathClassesEncoding
@@ -3165,7 +3202,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         wasOnDeviceConfigurationChangedCallbackCalled = YES;
     };
 
-    [device unitTestInjectAttributeReport:attributeReport];
+    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
 
     [testcase waitForExpectations:@[ gotAttributeReportExpectation, gotAttributeReportEndExpectation, deviceConfigurationChangedExpectation ] timeout:kTimeoutInSeconds];
     if (!expectConfigurationChanged) {
@@ -3175,11 +3212,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test033_TestMTRDeviceDeviceConfigurationChanged
 {
-    // Ensure the test starts with clean slate.
-    [sController.controllerDataStore clearAllStoredClusterData];
-    NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
-    XCTAssertEqual(storedClusterDataAfterClear.count, 0);
-
     __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
     dispatch_queue_t queue = dispatch_get_main_queue();
 
@@ -3274,7 +3306,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     [device setDelegate:delegate queue:queue];
 
-    // Wait for subscription set up and intitial reports received.
+    // Wait for subscription set up and initial reports received.
     [self waitForExpectations:@[
         subscriptionExpectation,
         gotInitialReportsExpectation,
@@ -3498,13 +3530,122 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         [deviceConfigurationChangedExpectationForAttributeReportWithMultipleAttributes fulfill];
     };
 
-    [device unitTestInjectAttributeReport:attributeReport];
+    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
     [self waitForExpectations:@[ gotAttributeReportWithMultipleAttributesExpectation, gotAttributeReportWithMultipleAttributesEndExpectation, deviceConfigurationChangedExpectationForAttributeReportWithMultipleAttributes ] timeout:kTimeoutInSeconds];
+}
 
-    // We need to remove the device here, because we injected data into its attribute cache
-    // that does not match the actual server.
-    // TODO: #33205 Ensure we have a clean slate w.r.t MTRDevice before running each test.
+- (void)test034_TestMTRDeviceHistoricalEvents
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
+    XCTAssertEqual(storedClusterDataAfterClear.count, 0);
+
+    // Set up a subscription via mConnectedDevice that will send us continuous
+    // reports.
+    XCTestExpectation * firstSubscriptionExpectation = [self expectationWithDescription:@"First subscription established"];
+
+    MTRSubscribeParams * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(0) maxInterval:@(0)];
+    params.resubscribeAutomatically = NO;
+
+    [mConnectedDevice subscribeToAttributesWithEndpointID:@(0)
+        clusterID:@(MTRClusterIDTypeBasicInformationID)
+        attributeID:@(0)
+        params:params
+        queue:queue
+        reportHandler:^(id _Nullable values, NSError * _Nullable error) {
+        }
+        subscriptionEstablished:^() {
+            [firstSubscriptionExpectation fulfill];
+        }];
+
+    [self waitForExpectations:@[ firstSubscriptionExpectation ] timeout:kTimeoutInSeconds];
+
+    // Now set up our MTRDevice and do a subscribe.  Make sure all the events we
+    // get are marked "historical".
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
+    XCTestExpectation * secondSubscriptionExpectation = [self expectationWithDescription:@"Second subscription established"];
+    XCTestExpectation * gotFirstReportsExpectation = [self expectationWithDescription:@"First Attribute and Event reports have been received"];
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.onReachable = ^() {
+        [secondSubscriptionExpectation fulfill];
+    };
+
+    __block unsigned eventReportsReceived = 0;
+    delegate.onEventDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * eventReport) {
+        eventReportsReceived += eventReport.count;
+        for (NSDictionary<NSString *, id> * eventDict in eventReport) {
+            NSNumber * reportIsHistorical = eventDict[MTREventIsHistoricalKey];
+            XCTAssertTrue(reportIsHistorical.boolValue);
+        }
+    };
+
+    delegate.onReportEnd = ^() {
+        [gotFirstReportsExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ secondSubscriptionExpectation, gotFirstReportsExpectation ] timeout:60];
+
+    // Must have gotten some events (at least StartUp!)
+    XCTAssertTrue(eventReportsReceived > 0);
+
+    // Remove the device, then try again, now with us having stored cluster
+    // data.  All the events should still be reported as historical.
     [sController removeDevice:device];
+
+    eventReportsReceived = 0;
+
+    device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
+    XCTestExpectation * thirdSubscriptionExpectation = [self expectationWithDescription:@"Third subscription established"];
+    XCTestExpectation * gotSecondReportsExpectation = [self expectationWithDescription:@"Second Attribute and Event reports have been received"];
+
+    delegate.onReachable = ^() {
+        [thirdSubscriptionExpectation fulfill];
+    };
+
+    delegate.onReportEnd = ^() {
+        [gotSecondReportsExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ thirdSubscriptionExpectation, gotSecondReportsExpectation ] timeout:60];
+
+    // Must have gotten some events (at least StartUp!)
+    XCTAssertTrue(eventReportsReceived > 0);
+}
+
+- (void)test035_TestMTRDeviceSubscriptionNotEstablishedOverXPC
+{
+    NSString * const MTRDeviceControllerId = @"MTRController";
+    __auto_type remoteController = [MTRDeviceController
+        sharedControllerWithID:MTRDeviceControllerId
+               xpcConnectBlock:^NSXPCConnection * _Nonnull {
+                   return nil;
+               }];
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:remoteController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    // We should not set up a subscription when creating a MTRDevice with a remote controller.
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up"];
+    subscriptionExpectation.inverted = YES;
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+
+    XCTAssertTrue([device _getInternalState] == MTRInternalDeviceStateUnsubscribed);
+
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
+        [subscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:30];
+
+    XCTAssertTrue([device _getInternalState] == MTRInternalDeviceStateUnsubscribed);
 }
 
 @end
