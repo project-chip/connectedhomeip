@@ -22,6 +22,7 @@
 
 import base64
 import json
+import logging
 import subprocess
 import sys
 from enum import Enum
@@ -31,6 +32,15 @@ import requests
 from click_option_group import RequiredMutuallyExclusiveOptionGroup, optgroup
 from cryptography import x509
 from cryptography.hazmat.primitives.asymmetric import ec
+
+# Supported log levels, mapping string values required for argument
+# parsing into logging constants
+__LOG_LEVELS__ = {
+    'debug': logging.DEBUG,
+    'info': logging.INFO,
+    'warn': logging.WARN,
+    'fatal': logging.FATAL,
+}
 
 
 class RevocationType(Enum):
@@ -191,9 +201,19 @@ class DCLDClient:
 @optgroup.option('--use-main-net-http', is_flag=True, type=str, help="Use RESTful API with HTTPS against public MainNet observer.")
 @optgroup.option('--use-test-net-http', is_flag=True, type=str, help="Use RESTful API with HTTPS against public TestNet observer.")
 @optgroup.group('Optional arguments')
-@optgroup.option('--output', default='sample_revocation_set_list.json', type=str, metavar='FILEPATH', help="Output filename (default: sample_revocation_set_list.json)")
-def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_http, output):
+@optgroup.option('--output', default='sample_revocation_set_list.json', type=str, metavar='FILEPATH',
+                 help="Output filename (default: sample_revocation_set_list.json)")
+@optgroup.option('--log-level', default='INFO', show_default=True, type=click.Choice(__LOG_LEVELS__.keys(),
+                                                                                     case_sensitive=False), callback=lambda c, p, v: __LOG_LEVELS__[v],
+                 help='Determines the verbosity of script output')
+def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool, use_test_net_http: bool, output: str, log_level: str):
     """Tool to construct revocation set from DCL"""
+
+    logging.basicConfig(
+        level=log_level,
+        format='%(asctime)s %(name)s %(levelname)-7s %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
 
     production = False
     dcld = use_test_net_dcld
@@ -217,7 +237,7 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
     for revocation_point in revocation_point_list:
         # 1. Validate Revocation Type
         if revocation_point["revocationType"] != RevocationType.CRL.value:
-            print("Revocation Type is not CRL, continue...")
+            logging.warning("Revocation Type is not CRL, continue...")
             continue
 
         # 2. Parse the certificate
@@ -236,15 +256,15 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
             if crl_vid is not None:
                 if vid != crl_vid:
                     # TODO: Need to log all situations where a continue is called
-                    print("VID is not CRL VID, continue...")
+                    logging.warning("VID is not CRL VID, continue...")
                     continue
         else:
             if crl_vid is None or vid != crl_vid:
-                print("VID is not CRL VID, continue...")
+                logging.warning("VID is not CRL VID, continue...")
                 continue
             if crl_pid is not None:
                 if pid != crl_pid:
-                    print("PID is not CRL PID, continue...")
+                    logging.warning("PID is not CRL PID, continue...")
                     continue
 
         # 5. Validate the certification path containing CRLSignerCertificate.
@@ -261,7 +281,7 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
         paa_certificate = dcld_client.get_paa_cert_for_crl_issuer(crl_signer_issuer_name, crl_signer_authority_key_id)
 
         if paa_certificate is None:
-            print("PAA Certificate not found, continue...")
+            logging.warning("PAA Certificate not found, continue...")
             continue
 
         paa_certificate_object = x509.load_pem_x509_certificate(bytes(paa_certificate, 'utf-8'))
@@ -269,14 +289,14 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
         # TODO: use verify_directly_issued_by() method when we upgrade cryptography to v40.0.0
         # Verify issuer matches with subject
         if crl_signer_certificate.issuer != paa_certificate_object.subject:
-            print("CRL Signer Certificate issuer does not match with PAA Certificate subject, continue...")
+            logging.warning("CRL Signer Certificate issuer does not match with PAA Certificate subject, continue...")
             continue
 
         # Check crl signers AKID matches with SKID of paa_certificate_object's AKID
         paa_skid = paa_certificate_object.extensions.get_extension_for_oid(x509.OID_SUBJECT_KEY_IDENTIFIER).value.key_identifier
         crl_akid = crl_signer_certificate.extensions.get_extension_for_oid(x509.OID_AUTHORITY_KEY_IDENTIFIER).value.key_identifier
         if paa_skid != crl_akid:
-            print("CRL Signer's AKID does not match with PAA Certificate SKID, continue...")
+            logging.warning("CRL Signer's AKID does not match with PAA Certificate SKID, continue...")
             continue
 
         # verify if PAA singed the crl's public key
@@ -285,15 +305,15 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
                                                        crl_signer_certificate.tbs_certificate_bytes,
                                                        ec.ECDSA(crl_signer_certificate.signature_hash_algorithm))
         except Exception as e:
-            print("CRL Signer Certificate is not signed by PAA Certificate, continue...")
-            print("Error: ", e)
+            logging.warning("CRL Signer Certificate is not signed by PAA Certificate, continue...")
+            logging.error("Error: ", e)
             continue
 
         # 6. Obtain the CRL
         try:
             r = requests.get(revocation_point["dataURL"], timeout=5)
         except requests.exceptions.Timeout:
-            print("Timeout fetching CRL from ", revocation_point["dataURL"])
+            logging.warning("Timeout fetching CRL from ", revocation_point["dataURL"])
             continue
 
         crl_file = x509.load_der_x509_crl(r.content)
@@ -303,7 +323,7 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
         crl_signer_subject_key_id = crl_signer_certificate.extensions.get_extension_for_oid(
             x509.OID_SUBJECT_KEY_IDENTIFIER).value.key_identifier
         if crl_authority_key_id != crl_signer_subject_key_id:
-            print("CRL Authority Key ID is not CRL Signer Subject Key ID, continue...")
+            logging.warning("CRL Authority Key ID is not CRL Signer Subject Key ID, continue...")
             continue
 
         issuer_subject_key_id = ''.join('{:02X}'.format(x) for x in crl_authority_key_id)
@@ -317,21 +337,21 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
                 issuing_distribution_point = crl_file.extensions.get_extension_for_oid(
                     x509.OID_ISSUING_DISTRIBUTION_POINT).value
             except Exception:
-                print("CRL Issuing Distribution Point not found, continue...")
+                logging.warning("CRL Issuing Distribution Point not found, continue...")
                 continue
 
             uri_list = issuing_distribution_point.full_name
             if len(uri_list) == 1 and isinstance(uri_list[0], x509.UniformResourceIdentifier):
                 if uri_list[0].value != revocation_point["dataURL"]:
-                    print("CRL Issuing Distribution Point URI is not CRL URL, continue...")
+                    logging.warning("CRL Issuing Distribution Point URI is not CRL URL, continue...")
                     continue
             else:
-                print("CRL Issuing Distribution Point URI is not CRL URL, continue...")
+                logging.warning("CRL Issuing Distribution Point URI is not CRL URL, continue...")
                 continue
 
         # 9. Assign CRL File Issuer
         certificate_authority_name = base64.b64encode(crl_file.issuer.public_bytes()).decode('utf-8')
-        print(f"CRL File Issuer: {certificate_authority_name}")
+        logging.debug(f"CRL File Issuer: {certificate_authority_name}")
 
         serialnumber_list = []
         # 10. Iterate through the Revoked Certificates List
@@ -343,7 +363,7 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
 
                 if revoked_cert_issuer is not None:
                     if revoked_cert_issuer != certificate_authority_name:
-                        print("CRL Issuer is not CRL File Issuer, continue...")
+                        logging.warning("CRL Issuer is not CRL File Issuer, continue...")
                         continue
             except Exception:
                 pass
@@ -354,10 +374,10 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
                     x509.OID_AUTHORITY_KEY_IDENTIFIER).value.key_identifier
 
                 if revoked_cert_authority_key_id is None or revoked_cert_authority_key_id != crl_signer_subject_key_id:
-                    print("CRL Authority Key ID is not CRL Signer Subject Key ID, continue...")
+                    logging.warning("CRL Authority Key ID is not CRL Signer Subject Key ID, continue...")
                     continue
             except Exception:
-                print("CRL Authority Key ID not found, continue...")
+                logging.warning("CRL Authority Key ID not found, continue...")
                 continue
 
             # c. and d.
