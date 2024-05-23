@@ -938,6 +938,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         MTR_LOG("%@ internal state change %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
 
         /* BEGIN DRAGONS: This is a huge hack for a specific use case, do not rename, remove or modify behavior here */
+        id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
         if ([delegate respondsToSelector:@selector(_deviceInternalStateChanged:)]) {
             dispatch_async(_delegateQueue, ^{
                 [(id) delegate _deviceInternalStateChanged:self];
