@@ -2160,7 +2160,8 @@ JNI_METHOD(void, startDnssd)(JNIEnv * env, jobject self, jlong handle)
     chip::DeviceLayer::StackLock lock;
 
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-    VerifyOrReturn(wrapper != nullptr, ChipLogError(Controller, "AndroidDeviceControllerWrapper::FromJNIHandle in startDnssd fails!"));
+    VerifyOrReturn(wrapper != nullptr,
+                   ChipLogError(Controller, "AndroidDeviceControllerWrapper::FromJNIHandle in startDnssd fails!"));
     wrapper->StartDnssd();
 }
 
@@ -2170,7 +2171,8 @@ JNI_METHOD(void, stopDnssd)(JNIEnv * env, jobject self, jlong handle)
     chip::DeviceLayer::StackLock lock;
 
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-    VerifyOrReturn(wrapper != nullptr, ChipLogError(Controller, "AndroidDeviceControllerWrapper::FromJNIHandle in stopDnssd fails!"));
+    VerifyOrReturn(wrapper != nullptr,
+                   ChipLogError(Controller, "AndroidDeviceControllerWrapper::FromJNIHandle in stopDnssd fails!"));
     wrapper->StopDnssd();
 }
 
