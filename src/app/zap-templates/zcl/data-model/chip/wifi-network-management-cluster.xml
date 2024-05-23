@@ -20,7 +20,7 @@ limitations under the License.
     <cluster>
         <domain>Network Infrastructure</domain>
         <name>Wi-Fi Network Management</name>
-        <code>0x0C00</code>
+        <code>0x0451</code>
         <define>WIFI_NETWORK_MANAGEMENT_CLUSTER</define>
         <description>Functionality to retrieve operational information about a managed Wi-Fi network.</description>
 

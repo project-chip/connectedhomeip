@@ -3212,7 +3212,7 @@
         },
         {
           "name": "Wi-Fi Network Management",
-          "code": 3072,
+          "code": 1105,
           "mfgCode": null,
           "define": "WIFI_NETWORK_MANAGEMENT_CLUSTER",
           "side": "server",
