@@ -3668,6 +3668,18 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateUnsubscribed);
 }
 
+- (NSArray<NSDictionary<NSString *, id> *> *)testAttributeReportWithValue:(unsigned int)testValue
+{
+    return @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeCurrentLevelID)],
+        MTRDataKey : @ {
+            MTRDataVersionKey : @(testValue),
+            MTRTypeKey : MTRUnsignedIntegerValueType,
+            MTRValueKey : @(testValue),
+        }
+    } ];
+}
+
 - (void)test036_TestStorageBehaviorConfiguration
 {
     // Use separate queue for timing sensitive test
@@ -3719,21 +3731,11 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     [device setDelegate:delegate queue:queue];
 
-    // Use a mutable dictionary so the data value can be changed between reports
+    // Use a mutable dictionary so the data value can be easily changed between reports
     unsigned int currentTestValue = 1;
-    NSMutableDictionary * mutableResponseValue = [NSMutableDictionary dictionaryWithDictionary:@{
-        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeCurrentLevelID)],
-        MTRDataKey : @ {
-            MTRDataVersionKey : @(currentTestValue),
-            MTRTypeKey : MTRUnsignedIntegerValueType,
-            MTRValueKey : @(currentTestValue),
-        }
-    }];
-
-    NSArray<NSDictionary<NSString *, id> *> * attributeReport = @[ mutableResponseValue ];
 
     // Test 1: Inject report and see that the attribute persisted, with a delay
-    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
+    [device unitTestInjectAttributeReport:[self testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
 
     [self waitForExpectations:@[ dataPersisted1 ] timeout:60];
 
@@ -3759,25 +3761,20 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Test 2: Inject multiple reports with delay and see that the attribute persisted eventually
     reportEndTime = nil;
     dataPersistedTime = nil;
-    mutableResponseValue[MTRDataKey] = @{ MTRDataVersionKey : @(++currentTestValue), MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(currentTestValue) };
-    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
+    [device unitTestInjectAttributeReport:[self testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
 
     double frequentReportMultiplier = 0.5;
     usleep((useconds_t) (baseTestDelayTime * frequentReportMultiplier * USEC_PER_SEC));
-    mutableResponseValue[MTRDataKey] = @{ MTRDataVersionKey : @(++currentTestValue), MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(currentTestValue) };
-    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
+    [device unitTestInjectAttributeReport:[self testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
 
     usleep((useconds_t) (baseTestDelayTime * frequentReportMultiplier * USEC_PER_SEC));
-    mutableResponseValue[MTRDataKey] = @{ MTRDataVersionKey : @(++currentTestValue), MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(currentTestValue) };
-    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
+    [device unitTestInjectAttributeReport:[self testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
 
     usleep((useconds_t) (baseTestDelayTime * frequentReportMultiplier * USEC_PER_SEC));
-    mutableResponseValue[MTRDataKey] = @{ MTRDataVersionKey : @(++currentTestValue), MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(currentTestValue) };
-    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
+    [device unitTestInjectAttributeReport:[self testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
 
     usleep((useconds_t) (baseTestDelayTime * frequentReportMultiplier * USEC_PER_SEC));
-    mutableResponseValue[MTRDataKey] = @{ MTRDataVersionKey : @(++currentTestValue), MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(currentTestValue) };
-    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
+    [device unitTestInjectAttributeReport:[self testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
 
     // At this point, the threshold for reportToPersistenceDelayTimeMax should have hit, and persistence
     // should have happened with timer running down to persist again with the 5th report above. Need to
@@ -3819,8 +3816,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     ]]];
 
     // Inject final report that makes MTRDevice recalculate delay with multiplier
-    mutableResponseValue[MTRDataKey] = @{ MTRDataVersionKey : @(++currentTestValue), MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(currentTestValue) };
-    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
+    [device unitTestInjectAttributeReport:[self testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
 
     [self waitForExpectations:@[ dataPersisted3 ] timeout:60];
 
@@ -3859,15 +3855,13 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     ]]];
 
     // Inject report that makes MTRDevice detect the device is reporting excessively
-    mutableResponseValue[MTRDataKey] = @{ MTRDataVersionKey : @(++currentTestValue), MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(currentTestValue) };
-    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
+    [device unitTestInjectAttributeReport:[self testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
 
     // Now keep reporting excessively for base delay time max times max multiplier, plus a bit more
     NSDate * excessiveStartTime = [NSDate now];
     for (;;) {
         usleep((useconds_t) (baseTestDelayTime * 0.1 * USEC_PER_SEC));
-        mutableResponseValue[MTRDataKey] = @{ MTRDataVersionKey : @(++currentTestValue), MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(currentTestValue) };
-        [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
+        [device unitTestInjectAttributeReport:[self testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
         NSTimeInterval elapsed = -[excessiveStartTime timeIntervalSinceNow];
         if (elapsed > (baseTestDelayTime * 2 * 5 * 1.2)) {
             break;
@@ -3884,8 +3878,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // And inject a report to trigger MTRDevice to recalculate that this device is no longer
     // reporting excessively
-    mutableResponseValue[MTRDataKey] = @{ MTRDataVersionKey : @(++currentTestValue), MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(currentTestValue) };
-    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
+    [device unitTestInjectAttributeReport:[self testAttributeReportWithValue:currentTestValue++] fromSubscription:YES];
 
     [self waitForExpectations:@[ dataPersisted4 ] timeout:60];
 
