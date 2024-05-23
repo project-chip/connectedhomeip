@@ -669,7 +669,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 - (BOOL)_subscriptionsAllowed
 {
     os_unfair_lock_assert_owner(&self->_lock);
-    
+
     // We should not allow a subscription for device controllers over XPC.
     return ![_deviceController isKindOfClass:MTRDeviceControllerOverXPC.class];
 }
@@ -679,9 +679,9 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     MTR_LOG("%@ setDelegate %@", self, delegate);
 
     std::lock_guard lock(_lock);
-    
+
     BOOL setUpSubscription = [self _subscriptionsAllowed];
-    
+
     // For unit testing only
 #ifdef DEBUG
     id testDelegate = delegate;
