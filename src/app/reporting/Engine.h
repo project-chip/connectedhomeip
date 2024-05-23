@@ -26,6 +26,7 @@
 
 #include <access/AccessControl.h>
 #include <app/EventScheduler.h>
+#include <app/EventManagement.h>
 #include <app/MessageDef/ReportDataMessage.h>
 #include <app/ReadHandler.h>
 #include <app/data-model-provider/ProviderChangeListener.h>
@@ -67,6 +68,8 @@ public:
 
     /**
      * Initializes the reporting engine. Should only be called once.
+     * 
+     * @param[in] A pointer to EventManagement. Use the global one by default.
      *
      * @param[in] A pointer to EventManagement. Use the global one by default.
      *
