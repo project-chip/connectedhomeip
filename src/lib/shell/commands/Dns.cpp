@@ -285,6 +285,12 @@ void RegisterDnsCommands()
         { &ResolveHandler, "resolve",
           "Resolve Matter operational service. Usage: dns resolve fabricid nodeid (e.g. dns resolve 5544332211 1)" },
         { &SubShellCommand<ArraySize(browseSubCommands), browseSubCommands>, "browse", "Browse Matter DNS services" },
+    };
 
     static constexpr Command dnsCommand = { &SubShellCommand<ArraySize(subCommands), subCommands>, "dns", "DNS client commands" };
+
+    Engine::Root().RegisterCommands(&dnsCommand, 1);
+}
+
+} // namespace Shell
 } // namespace chip

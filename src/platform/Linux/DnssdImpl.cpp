@@ -770,21 +770,22 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
                     }));
             }
 
-            DnssdService service = {};
-
-            Platform::CopyString(service.mName, name);
-            CopyTypeWithoutProtocol(service.mType, type);
-            service.mProtocol      = GetProtocolInType(type);
-            service.mAddressType   = context->mAddressType;
-            service.mTransportType = ToAddressType(protocol);
-            service.mInterface     = Inet::InterfaceId::Null();
-            if (interface != AVAHI_IF_UNSPEC)
-            {
-                service.mInterface = static_cast<chip::Inet::InterfaceId>(interface);
-            }
-            service.mTtlSeconds = 0;
             if (context->mReceivedAllCached)
             {
+                DnssdService service = {};
+
+                Platform::CopyString(service.mName, name);
+                CopyTypeWithoutProtocol(service.mType, type);
+                service.mProtocol      = GetProtocolInType(type);
+                service.mAddressType   = context->mAddressType;
+                service.mTransportType = ToAddressType(protocol);
+                service.mInterface     = Inet::InterfaceId::Null();
+                if (interface != AVAHI_IF_UNSPEC)
+                {
+                    service.mInterface = static_cast<chip::Inet::InterfaceId>(interface);
+                }
+                service.mTtlSeconds = 0;
+
                 context->mServices.push_back(service);
                 InvokeDelegateOrCleanUp(context, browser);
             }
