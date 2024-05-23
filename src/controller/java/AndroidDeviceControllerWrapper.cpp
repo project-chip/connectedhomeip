@@ -1088,12 +1088,14 @@ CHIP_ERROR AndroidDeviceControllerWrapper::SyncDeleteKeyValue(const char * key)
     return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key);
 }
 
-void AndroidDeviceControllerWrapper::StartDnssd() {
+void AndroidDeviceControllerWrapper::StartDnssd()
+{
     FabricTable * fabricTable = DeviceControllerFactory::GetInstance().GetSystemState()->Fabrics();
     chip::app::DnssdServer::Instance().SetFabricTable(fabricTable);
     chip::app::DnssdServer::Instance().StartServer();
 }
 
-void AndroidDeviceControllerWrapper::StopDnssd() {
+void AndroidDeviceControllerWrapper::StopDnssd()
+{
     chip::app::DnssdServer::Instance().StopServer();
 }
