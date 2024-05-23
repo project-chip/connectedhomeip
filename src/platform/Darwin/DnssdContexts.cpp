@@ -617,7 +617,7 @@ bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceInde
         else
         {
             service.ToDiscoveredCommissionNodeData(addresses, nodeData);
-        }        
+        }
         delegate->OnNodeDiscovered(nodeData);
     }
     else
