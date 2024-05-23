@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,10 +16,22 @@
  *    limitations under the License.
  */
 
-#import <Matter/MTRLogging.h>
+#pragma once
 
-#include <lib/support/logging/CHIPLogging.h>
+#include <app/TestEventTriggerDelegate.h>
 
-#define MTR_LOG(msg, ...) ChipLogProgress(NotSpecified, msg, ##__VA_ARGS__)
-#define MTR_LOG_ERROR(msg, ...) ChipLogError(NotSpecified, msg, ##__VA_ARGS__)
-#define MTR_LOG_DEBUG(msg, ...) ChipLogDetail(NotSpecified, msg, ##__VA_ARGS__) // same as INFO
+namespace chip {
+namespace app {
+
+class GenericEventManagementTestEventTriggerHandler : public TestEventTriggerHandler
+{
+protected:
+    CHIP_ERROR HandleFillUpEventLoggingBufferEventTriger();
+
+private:
+    void FillUpEventLoggingBufferWithFakeSoftwareFault(size_t bufferSize);
+    virtual void TriggerSoftwareFaultEvent(const char * faultRecordString) = 0;
+};
+
+} // namespace app
+} // namespace chip

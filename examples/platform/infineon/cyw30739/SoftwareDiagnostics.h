@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,10 +16,14 @@
  *    limitations under the License.
  */
 
-#import <Matter/MTRLogging.h>
+namespace chip {
+namespace DeviceLayer {
+namespace Infineon {
+namespace CYW30739 {
 
-#include <lib/support/logging/CHIPLogging.h>
+void OnSoftwareFaultEventHandler(const char * faultRecordString);
 
-#define MTR_LOG(msg, ...) ChipLogProgress(NotSpecified, msg, ##__VA_ARGS__)
-#define MTR_LOG_ERROR(msg, ...) ChipLogError(NotSpecified, msg, ##__VA_ARGS__)
-#define MTR_LOG_DEBUG(msg, ...) ChipLogDetail(NotSpecified, msg, ##__VA_ARGS__) // same as INFO
+} // namespace CYW30739
+} // namespace Infineon
+} // namespace DeviceLayer
+} // namespace chip

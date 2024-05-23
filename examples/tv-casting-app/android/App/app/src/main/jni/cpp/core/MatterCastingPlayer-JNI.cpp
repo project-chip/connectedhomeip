@@ -120,9 +120,8 @@ JNI_METHOD(jobject, verifyOrEstablishConnection)
     matter::casting::core::ConnectionCallbacks connectionCallbacks;
     connectionCallbacks.mOnConnectionComplete = connectCallback;
 
-    // TODO: Verify why commissioningWindowTimeoutSec is a "unsigned long long int" type. Seems too big.
-    castingPlayer->VerifyOrEstablishConnection(connectionCallbacks,
-                                               static_cast<unsigned long long int>(commissioningWindowTimeoutSec), idOptions);
+    castingPlayer->VerifyOrEstablishConnection(connectionCallbacks, static_cast<uint16_t>(commissioningWindowTimeoutSec),
+                                               idOptions);
     return support::convertMatterErrorFromCppToJava(CHIP_NO_ERROR);
 }
 
