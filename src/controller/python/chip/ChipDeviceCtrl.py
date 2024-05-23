@@ -46,7 +46,7 @@ import dacite
 
 from . import FabricAdmin
 from . import clusters as Clusters
-from . import discovery
+from . import discovery, icd
 from .clusters import Attribute as ClusterAttribute
 from .clusters import ClusterObjects as ClusterObjects
 from .clusters import Command as ClusterCommand
@@ -99,6 +99,14 @@ class NOCChain:
     rcacBytes: bytes
     ipkBytes: bytes
     adminSubject: int
+
+
+@dataclass
+class ICDRegistrationParameters:
+    symmetricKey: typing.Optional[bytes] = None
+    checkInNodeId: typing.Optional[int] = None
+    monitoredSubject: typing.Optional[int] = None
+    stayActiveMs: typing.Optional[int] = None
 
 
 @_DeviceAvailableCallbackFunct
@@ -272,6 +280,7 @@ class ChipDeviceControllerBase():
             else:
                 logging.warning("Failed to commission: {}".format(err))
 
+            self.DisableIcdRegistration()
             self.state = DCState.IDLE
             self._ChipStack.callbackRes = err
             self._ChipStack.commissioningEventRes = err
@@ -350,6 +359,7 @@ class ChipDeviceControllerBase():
         self._isActive = True
         # Validate FabricID/NodeID followed from NOC Chain
         self._fabricId = self.GetFabricIdInternal()
+        self._fabricIndex = self.GetFabricIndexInternal()
         self._nodeId = self.GetNodeIdInternal()
 
     def _finish_init(self):
@@ -769,6 +779,19 @@ class ChipDeviceControllerBase():
 
         return fabricid.value
 
+    def GetFabricIndexInternal(self):
+        """Get the fabric index from the object. Only used to validate cached value from property."""
+        self.CheckIsActive()
+
+        fabricindex = c_uint8(0)
+
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_GetFabricIndex(
+                self.devCtrl, pointer(fabricindex))
+        ).raise_on_error()
+
+        return fabricindex.value
+
     def GetNodeIdInternal(self) -> int:
         """Get the node ID from the object. Only used to validate cached value from property."""
         self.CheckIsActive()
@@ -843,6 +866,18 @@ class ChipDeviceControllerBase():
             returnErr.raise_on_error()
 
         return DeviceProxyWrapper(returnDevice, self._dmLib)
+
+    async def WaitForActive(self, nodeid, stayActiveDurationMs=30000):
+        ''' Waits a LIT ICD device to become active. Will send a StayActive command to the device on active to allow human operations.
+
+        nodeId: Node ID of the LID ICD
+        stayActiveDurationMs: The duration in the StayActive command, in milliseconds
+
+        Returns:
+            - StayActiveResponse on success
+        '''
+        await icd.WaitForCheckIn(self._fabricIndex, nodeid)
+        return await self.SendCommand(nodeid, 0, GeneratedObjects.IcdManagement.Commands.StayActiveRequest(stayActiveDuration=stayActiveDurationMilliseconds))
 
     async def GetConnectedDevice(self, nodeid, allowPASE: bool = True, timeoutMs: int = None):
         ''' Gets an OperationalDeviceProxy or CommissioneeDeviceProxy for the specified Node.
@@ -1822,6 +1857,9 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_GetFabricId.argtypes = [c_void_p, POINTER(c_uint64)]
             self._dmLib.pychip_DeviceController_GetFabricId.restype = PyChipError
 
+            self._dmLib.pychip_DeviceController_GetFabricIndex.argtypes = [c_void_p, POINTER(c_uint8)]
+            self._dmLib.pychip_DeviceController_GetFabricIndex.restype = PyChipError
+
             self._dmLib.pychip_DeviceController_GetLogFilter = [None]
             self._dmLib.pychip_DeviceController_GetLogFilter = c_uint8
 
@@ -1984,22 +2022,30 @@ class ChipDeviceController(ChipDeviceControllerBase):
             lambda: self._dmLib.pychip_DeviceController_SetCheckMatchingFabric(check)
         ).raise_on_error()
 
-    def SetIcdRegistrationParameters(self, symmetricKey: bytes = None, checkInNodeId: int = 0, monitoredSubject: int = 0, stayActiveMs: int = 0):
-        if symmetricKey is not None:
+    def EnableICDRegistration(self, parameters: typing.Optional[ICDRegistrationParameters] = None):
+        ''' Enables ICD registration for the following commissioning session.
+
+        Args:
+            parameters: A ICDRegistrationParameters for the parameters used for ICD registration, or None for default arguments.
+        '''
+        if parameters is None:
+            parameters = ICDRegistrationParameters()
+        if parameters.symmetricKey is not None:
             if len(symmetricKey) != 16:
                 raise ValueError("symmetricKey should be 16 bytes")
-        if not checkInNodeId:
-            checkInNodeId = self._nodeId
-        if not monitoredSubject:
-            monitoredSubject = checkInNodeId
+        if parameters.checkInNodeId is None:
+            parameters.checkInNodeId = self._nodeId
+        if parameters.monitoredSubject is None:
+            parameters.monitoredSubject = checkInNodeId
 
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetIcdRegistrationParameters(
-                self.devCtrl, True, symmetricKey, checkInNodeId, monitoredSubject, stayActiveMs)
+                self.devCtrl, True, parameters.symmetricKey, parameters.checkInNodeId, parameters.monitoredSubject, parameters.stayActiveMs)
         ).raise_on_error()
 
-    def DisableIcdRegistration(self):
+    def DisableICDRegistration(self):
+        ''' Disables ICD registration. '''
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetIcdRegistrationParameters(self.devCtrl, False, None, 0, 0, 0)

@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "CheckInDelegate.h"
+#include "PyChipCheckInDelegate.h"
 
 using namespace ::chip;
 using namespace ::chip::app;
@@ -33,7 +33,7 @@ void PyChipCheckInDelegate::OnCheckInComplete(const ICDClientInfo & clientInfo)
     }
 }
 
-void pychip_CheckInDelegate_SetOnCheckInCompleteCallback(PyChipCheckInDelegate::OnCheckInCompleteCallback * callback)
+extern "C" void pychip_CheckInDelegate_SetOnCheckInCompleteCallback(PyChipCheckInDelegate::OnCheckInCompleteCallback * callback)
 {
     PyChipCheckInDelegate::GetInstance().SetOnCheckInCompleteCallback(callback);
 }

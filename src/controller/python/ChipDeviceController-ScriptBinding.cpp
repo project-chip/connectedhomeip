@@ -58,7 +58,7 @@
 #include <controller/python/ChipDeviceController-ScriptDevicePairingDelegate.h>
 #include <controller/python/ChipDeviceController-ScriptPairingDeviceDiscoveryDelegate.h>
 #include <controller/python/ChipDeviceController-StorageDelegate.h>
-#include <controller/python/chip/icd/CheckInDelegate.h>
+#include <controller/python/chip/icd/PyChipCheckInDelegate.h>
 #include <controller/python/chip/interaction_model/Delegate.h>
 #include <controller/python/chip/native/PyChipError.h>
 
@@ -133,6 +133,7 @@ PyChipError pychip_DeviceController_GetAddressAndPort(chip::Controller::DeviceCo
                                                       char * outAddress, uint64_t maxAddressLen, uint16_t * outPort);
 PyChipError pychip_DeviceController_GetCompressedFabricId(chip::Controller::DeviceCommissioner * devCtrl, uint64_t * outFabricId);
 PyChipError pychip_DeviceController_GetFabricId(chip::Controller::DeviceCommissioner * devCtrl, uint64_t * outFabricId);
+PyChipError pychip_DeviceController_GetFabricIndex(chip::Controller::DeviceCommissioner * devCtrl, uint8_t * outFabricIndex);
 PyChipError pychip_DeviceController_GetNodeId(chip::Controller::DeviceCommissioner * devCtrl, uint64_t * outNodeId);
 
 // Rendezvous
@@ -273,12 +274,6 @@ PyChipError pychip_DeviceController_StackInit(Controller::Python::StorageAdapter
 
     sICDClientStorage.Init(storageAdapter, &sSessionKeystore);
 
-    auto engine = chip::app::InteractionModelEngine::GetInstance();
-    PyReturnErrorOnFailure(ToPyChipError(PyChipCheckInDelegate::GetInstance().Init(&sICDClientStorage, engine)));
-    PyReturnErrorOnFailure(
-        ToPyChipError(sCheckInHandler.Init(DeviceControllerFactory::GetInstance().GetSystemState()->ExchangeMgr(),
-                                           &sICDClientStorage, &PyChipCheckInDelegate::GetInstance(), engine)));
-
     sGroupDataProvider.SetStorageDelegate(storageAdapter);
     sGroupDataProvider.SetSessionKeystore(factoryParams.sessionKeystore);
     PyReturnErrorOnFailure(ToPyChipError(sGroupDataProvider.Init()));
@@ -308,6 +303,12 @@ PyChipError pychip_DeviceController_StackInit(Controller::Python::StorageAdapter
     // This retain call ensures the stack doesn't get de-initialized in the REPL.
     //
     DeviceControllerFactory::GetInstance().RetainSystemState();
+
+    auto engine = chip::app::InteractionModelEngine::GetInstance();
+    PyReturnErrorOnFailure(ToPyChipError(PyChipCheckInDelegate::GetInstance().Init(&sICDClientStorage, engine)));
+    PyReturnErrorOnFailure(
+        ToPyChipError(sCheckInHandler.Init(DeviceControllerFactory::GetInstance().GetSystemState()->ExchangeMgr(),
+                                           &sICDClientStorage, &PyChipCheckInDelegate::GetInstance(), engine)));
 
     //
     // Finally, start up the main Matter thread. Any further interactions with the stack
@@ -358,6 +359,12 @@ PyChipError pychip_DeviceController_GetCompressedFabricId(chip::Controller::Devi
 PyChipError pychip_DeviceController_GetFabricId(chip::Controller::DeviceCommissioner * devCtrl, uint64_t * outFabricId)
 {
     *outFabricId = devCtrl->GetFabricId();
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_DeviceController_GetFabricIndex(chip::Controller::DeviceCommissioner * devCtrl, uint8_t * outFabricIndex)
+{
+    *outFabricIndex = devCtrl->GetFabricIndex();
     return ToPyChipError(CHIP_NO_ERROR);
 }
 

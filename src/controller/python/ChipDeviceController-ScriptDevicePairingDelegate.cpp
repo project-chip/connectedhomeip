@@ -201,13 +201,13 @@ void ScriptDevicePairingDelegate::OnICDRegistrationComplete(NodeId nodeId, uint3
     if (err != CHIP_NO_ERROR)
     {
         sICDClientStorage.RemoveKey(clientInfo);
-        ChipLogError(chipTool, "Failed to persist symmetric key for " ChipLogFormatX64 ": %s", ChipLogValueX64(nodeId),
+        ChipLogError(Controller, "Failed to persist symmetric key for " ChipLogFormatX64 ": %s", ChipLogValueX64(nodeId),
                      err.AsString());
         return;
     }
 
-    ChipLogProgress(Zcl, "Saved ICD Symmetric key for " ChipLogFormatX64, ChipLogValueX64(nodeId));
-    ChipLogProgress(Zcl,
+    ChipLogProgress(Controller, "Saved ICD Symmetric key for " ChipLogFormatX64, ChipLogValueX64(nodeId));
+    ChipLogProgress(Controller,
                     "ICD Registration Complete for device " ChipLogFormatX64 " / Check-In NodeID: " ChipLogFormatX64
                     " / Monitored Subject: " ChipLogFormatX64 " / ICDCounter %u",
                     ChipLogValueX64(nodeId), ChipLogValueX64(sCommissioningParameters.GetICDCheckInNodeId().Value()),
@@ -216,7 +216,7 @@ void ScriptDevicePairingDelegate::OnICDRegistrationComplete(NodeId nodeId, uint3
 
 void ScriptDevicePairingDelegate::OnICDStayActiveComplete(NodeId deviceId, uint32_t promisedActiveDuration)
 {
-    ChipLogProgress(Zcl, "ICD Stay Active Complete for device " ChipLogFormatX64 " / promisedActiveDuration: %u",
+    ChipLogProgress(Controller, "ICD Stay Active Complete for device " ChipLogFormatX64 " / promisedActiveDuration: %u",
                     ChipLogValueX64(deviceId), promisedActiveDuration);
 }
 

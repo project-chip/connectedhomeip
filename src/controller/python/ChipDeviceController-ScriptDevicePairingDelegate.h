@@ -88,7 +88,7 @@ private:
     Callback::Callback<Controller::OnOpenCommissioningWindow> mOpenWindowCallback;
     Controller::CommissioningWindowOpener * mWindowOpener = nullptr;
     bool expectingPairingComplete                         = false;
-    FabricIndex mFabricIndex;
+    FabricIndex mFabricIndex                              = 0;
 };
 
 } // namespace Controller
