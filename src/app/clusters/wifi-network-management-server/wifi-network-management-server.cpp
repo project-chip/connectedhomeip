@@ -24,7 +24,8 @@
 #include <lib/core/Global.h>
 #include <lib/support/CodeUtils.h>
 
-#include <functional>
+#include <algorithm>
+#include <cctype>
 
 using namespace chip;
 using namespace chip::app;
@@ -46,6 +47,12 @@ Server & Server::Instance()
 
 Server::Server() : AttributeAccessInterface(NullOptional, Id), CommandHandlerInterface(NullOptional, Id) {}
 
+Server::~Server()
+{
+    unregisterAttributeAccessOverride(this);
+    InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
+}
+
 CHIP_ERROR Server::Init(EndpointId endpoint)
 {
     VerifyOrReturnError(endpoint != kInvalidEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
@@ -59,7 +66,7 @@ CHIP_ERROR Server::Init(EndpointId endpoint)
 
 CHIP_ERROR Server::ClearNetworkCredentials()
 {
-    VerifyOrReturnError(!SsidSpan().empty() || !PassphraseSpan().empty(), CHIP_NO_ERROR);
+    VerifyOrReturnError(HaveNetworkCredentials(), CHIP_NO_ERROR);
 
     mSsidLen = 0;
     mPassphrase.SetLength(0);
@@ -67,20 +74,41 @@ CHIP_ERROR Server::ClearNetworkCredentials()
     return CHIP_NO_ERROR;
 }
 
+// TODO: Move this into lib/support somewhere and also use it network-commissioning.cpp
+bool IsValidWpaPersonalCredential(ByteSpan credential)
+{
+    // As per spec section 11.9.7.3. AddOrUpdateWiFiNetwork Command
+    if (8 <= credential.size() && credential.size() <= 63) // passphrase
+    {
+        return true;
+    }
+    if (credential.size() == 64) // raw hex psk
+    {
+        return std::all_of(credential.begin(), credential.end(), [](auto c) { return std::isxdigit(c); });
+    }
+    return false;
+}
+
 CHIP_ERROR Server::SetNetworkCredentials(ByteSpan ssid, ByteSpan passphrase)
 {
     VerifyOrReturnError(1 <= ssid.size() && ssid.size() <= sizeof(mSsid), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(1 <= passphrase.size() && passphrase.size() <= mPassphrase.Capacity(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(IsValidWpaPersonalCredential(passphrase), CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrReturnError(!SsidSpan().data_equal(ssid) || !PassphraseSpan().data_equal(passphrase), CHIP_NO_ERROR);
+    bool ssidChanged       = !SsidSpan().data_equal(ssid);
+    bool passphraseChanged = !PassphraseSpan().data_equal(passphrase);
+    VerifyOrReturnError(ssidChanged || passphraseChanged, CHIP_NO_ERROR);
 
     memcpy(mSsid, ssid.data(), ssid.size());
     mSsidLen = static_cast<decltype(mSsidLen)>(ssid.size());
 
-    ReturnErrorOnFailure(mPassphrase.SetLength(passphrase.size()));
+    VerifyOrDie(mPassphrase.SetLength(passphrase.size()) == CHIP_NO_ERROR);
     memcpy(mPassphrase.Bytes(), passphrase.data(), passphrase.size());
 
-    MatterReportingAttributeChangeCallback(mEndpointId, Id, Ssid::Id); // report SSID change even if only passphrase changed
+    // Note: The spec currently defines no way to signal a passphrase change
+    if (ssidChanged)
+    {
+        MatterReportingAttributeChangeCallback(mEndpointId, Id, Ssid::Id);
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -88,10 +116,8 @@ CHIP_ERROR Server::Read(const ConcreteReadAttributePath & aPath, AttributeValueE
 {
     switch (aPath.mAttributeId)
     {
-    case Ssid::Id: {
-        auto ssid = SsidSpan();
-        return (ssid.empty()) ? aEncoder.EncodeNull() : aEncoder.Encode(ssid);
-    }
+    case Ssid::Id:
+        return HaveNetworkCredentials() ? aEncoder.Encode(SsidSpan()) : aEncoder.EncodeNull();
     }
     return CHIP_NO_ERROR;
 }
@@ -102,14 +128,14 @@ void Server::InvokeCommand(HandlerContext & ctx)
     {
     case Commands::NetworkPassphraseRequest::Id:
         HandleCommand<Commands::NetworkPassphraseRequest::DecodableType>(
-            ctx, std::bind(&Server::HandleNetworkPassphraseRequest, this, _1, _2));
+            ctx, [this](HandlerContext & aCtx, const auto & req) { HandleNetworkPassphraseRequest(aCtx, req); });
         return;
     }
 }
 
 void Server::HandleNetworkPassphraseRequest(HandlerContext & ctx, const Commands::NetworkPassphraseRequest::DecodableType & req)
 {
-    if (mPassphrase.Length() > 0)
+    if (HaveNetworkCredentials())
     {
         Commands::NetworkPassphraseResponse::Type response;
         response.passphrase = mPassphrase.Span();
@@ -117,6 +143,7 @@ void Server::HandleNetworkPassphraseRequest(HandlerContext & ctx, const Commands
     }
     else
     {
+        // TODO: Status code TBC: https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/9234
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidInState);
     }
 }

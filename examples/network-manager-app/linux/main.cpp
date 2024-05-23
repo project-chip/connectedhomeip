@@ -17,6 +17,7 @@
 
 #include <AppMain.h>
 #include <app/clusters/wifi-network-management-server/wifi-network-management-server.h>
+#include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/Span.h>
 
 using namespace chip;
@@ -28,7 +29,7 @@ void ApplicationShutdown() {}
 
 ByteSpan ByteSpanFromCharSpan(CharSpan span)
 {
-    return ByteSpan(reinterpret_cast<const uint8_t *>(span.data()), span.size());
+    return ByteSpan(Uint8::from_const_char(span.data()), span.size());
 }
 
 int main(int argc, char * argv[])
@@ -39,7 +40,7 @@ int main(int argc, char * argv[])
     }
 
     WiFiNetworkManagement::Server::Instance().SetNetworkCredentials(ByteSpanFromCharSpan("MatterAP"_span),
-                                                                    ByteSpanFromCharSpan("Seatec Astronomy"_span));
+                                                                    ByteSpanFromCharSpan("Setec Astronomy"_span));
 
     ChipLinuxAppMainLoop();
     return 0;

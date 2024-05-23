@@ -45,6 +45,7 @@ private:
     friend void ::emberAfWiFiNetworkManagementClusterServerInitCallback(chip::EndpointId);
 
     Server();
+    ~Server();
     CHIP_ERROR Init(EndpointId endpoint);
 
     Server(Server const &)             = delete;
@@ -64,6 +65,8 @@ private:
 
     Crypto::SensitiveDataBuffer<64> mPassphrase;
     ByteSpan PassphraseSpan() const { return mPassphrase.Span(); }
+
+    bool HaveNetworkCredentials() { return mSsidLen > 0; }
 };
 
 } // namespace WiFiNetworkManagement
