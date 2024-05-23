@@ -21,3 +21,4 @@ ICDServerTests
 DataModelTests
 InetLayerTests
 AppTests
+MessagingLayerTests

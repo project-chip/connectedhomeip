@@ -26,7 +26,9 @@
 
 #include <nlbyteorder.h>
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
+
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/Span.h>
 
 using namespace chip;

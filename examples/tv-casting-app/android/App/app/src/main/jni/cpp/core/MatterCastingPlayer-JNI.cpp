@@ -24,6 +24,7 @@
 #include "core/CastingApp.h"             // from tv-casting-common
 #include "core/CastingPlayer.h"          // from tv-casting-common
 #include "core/CastingPlayerDiscovery.h" // from tv-casting-common
+#include "core/ConnectionCallbacks.h"    // from tv-casting-common
 
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/server/Server.h>
@@ -92,24 +93,35 @@ JNI_METHOD(jobject, verifyOrEstablishConnection)
     MatterCastingPlayerJNIMgr().mConnectionSuccessHandler.SetUp(env, jSuccessCallback);
     MatterCastingPlayerJNIMgr().mConnectionFailureHandler.SetUp(env, jFailureCallback);
 
-    // TODO: In the following PRs. Add optional CommissionerDeclarationHandler callback parameter.
-    castingPlayer->VerifyOrEstablishConnection(
-        [](CHIP_ERROR err, CastingPlayer * playerPtr) {
-            ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::verifyOrEstablishConnection() ConnectCallback called");
-            if (err == CHIP_NO_ERROR)
-            {
-                ChipLogProgress(AppServer, "MatterCastingPlayer-JNI:: Connected to Casting Player with device ID: %s",
-                                playerPtr->GetId());
-                MatterCastingPlayerJNIMgr().mConnectionSuccessHandler.Handle(nullptr);
-            }
-            else
-            {
-                ChipLogError(AppServer, "MatterCastingPlayer-JNI:: ConnectCallback, connection error: %" CHIP_ERROR_FORMAT,
-                             err.Format());
-                MatterCastingPlayerJNIMgr().mConnectionFailureHandler.Handle(err);
-            }
-        },
-        static_cast<unsigned long long int>(commissioningWindowTimeoutSec), idOptions);
+    auto connectCallback = [](CHIP_ERROR err, CastingPlayer * playerPtr) {
+        ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::verifyOrEstablishConnection() ConnectCallback()");
+        if (err == CHIP_NO_ERROR)
+        {
+            ChipLogProgress(AppServer,
+                            "MatterCastingPlayer-JNI::verifyOrEstablishConnection() ConnectCallback() Connected to Casting Player "
+                            "with device ID: %s",
+                            playerPtr->GetId());
+            // The Java jSuccessCallback is expecting a Void v callback parameter which translates to a nullptr. When calling the
+            // Java method from C++ via JNI, passing nullptr is equivalent to passing a Void object in Java.
+            MatterCastingPlayerJNIMgr().mConnectionSuccessHandler.Handle(nullptr);
+        }
+        else
+        {
+            ChipLogError(
+                AppServer,
+                "MatterCastingPlayer-JNI::verifyOrEstablishConnection() ConnectCallback() Connection error: %" CHIP_ERROR_FORMAT,
+                err.Format());
+            MatterCastingPlayerJNIMgr().mConnectionFailureHandler.Handle(err);
+        }
+    };
+
+    // TODO: In the following PRs. Add optional CommissionerDeclarationHandler callback parameter for the Commissioner-Generated
+    // passcode commissioning flow.
+    matter::casting::core::ConnectionCallbacks connectionCallbacks;
+    connectionCallbacks.mOnConnectionComplete = connectCallback;
+
+    castingPlayer->VerifyOrEstablishConnection(connectionCallbacks, static_cast<uint16_t>(commissioningWindowTimeoutSec),
+                                               idOptions);
     return support::convertMatterErrorFromCppToJava(CHIP_NO_ERROR);
 }
 

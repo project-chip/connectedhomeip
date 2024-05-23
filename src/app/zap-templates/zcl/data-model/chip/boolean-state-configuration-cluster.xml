@@ -28,7 +28,7 @@ limitations under the License.
     <field name="GeneralFault" mask="0x1"/>
   </bitmap>
 
-  <cluster apiMaturity="provisional">
+  <cluster>
     <domain>General</domain>
     <name>Boolean State Configuration</name>
     <code>0x0080</code>

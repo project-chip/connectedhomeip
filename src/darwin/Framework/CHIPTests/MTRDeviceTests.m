@@ -3202,7 +3202,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         wasOnDeviceConfigurationChangedCallbackCalled = YES;
     };
 
-    [device unitTestInjectAttributeReport:attributeReport];
+    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
 
     [testcase waitForExpectations:@[ gotAttributeReportExpectation, gotAttributeReportEndExpectation, deviceConfigurationChangedExpectation ] timeout:kTimeoutInSeconds];
     if (!expectConfigurationChanged) {
@@ -3530,7 +3530,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         [deviceConfigurationChangedExpectationForAttributeReportWithMultipleAttributes fulfill];
     };
 
-    [device unitTestInjectAttributeReport:attributeReport];
+    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
     [self waitForExpectations:@[ gotAttributeReportWithMultipleAttributesExpectation, gotAttributeReportWithMultipleAttributesEndExpectation, deviceConfigurationChangedExpectationForAttributeReportWithMultipleAttributes ] timeout:kTimeoutInSeconds];
 }
 
@@ -3616,6 +3616,36 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Must have gotten some events (at least StartUp!)
     XCTAssertTrue(eventReportsReceived > 0);
+}
+
+- (void)test035_TestMTRDeviceSubscriptionNotEstablishedOverXPC
+{
+    NSString * const MTRDeviceControllerId = @"MTRController";
+    __auto_type remoteController = [MTRDeviceController
+        sharedControllerWithID:MTRDeviceControllerId
+               xpcConnectBlock:^NSXPCConnection * _Nonnull {
+                   return nil;
+               }];
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:remoteController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    // We should not set up a subscription when creating a MTRDevice with a remote controller.
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up"];
+    subscriptionExpectation.inverted = YES;
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+
+    XCTAssertTrue([device _getInternalState] == MTRInternalDeviceStateUnsubscribed);
+
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
+        [subscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:30];
+
+    XCTAssertTrue([device _getInternalState] == MTRInternalDeviceStateUnsubscribed);
 }
 
 @end

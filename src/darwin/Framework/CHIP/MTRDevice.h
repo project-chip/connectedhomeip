@@ -102,6 +102,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, readonly, copy) NSNumber * nodeID NS_REFINED_FOR_SWIFT MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 
 /**
+ * An estimate of how much time is likely to elapse between setDelegate being
+ * called and the current device state (attributes, stored events) being known.
+ *
+ * nil if no such estimate is available.  Otherwise, the NSNumber stores an NSTimeInterval.
+ */
+@property (nonatomic, readonly, nullable, copy) NSNumber * estimatedSubscriptionLatency MTR_NEWLY_AVAILABLE;
+
+/**
  * Set the delegate to receive asynchronous callbacks about the device.
  *
  * The delegate will be called on the provided queue, for attribute reports, event reports, and device state changes.

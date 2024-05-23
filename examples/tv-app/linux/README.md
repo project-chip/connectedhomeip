@@ -107,6 +107,11 @@ id):
     $ app add 9050 (vendor id 9050)
     $ app remove 1
 
+You can also install or uninstall the app by using commands:
+
+    $ app install 65521 32768
+    $ app uninstall 65521 32768
+
 As an app platform, local apps can be used to facilitate commissioning using
 their AccountLogin clusters. The dummy apps have hardcoded setup codes - on a
 real device, these apps would communicate with a cloud service to obtain the

@@ -29,6 +29,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/SafeInt.h>
+#import <os/lock.h>
 
 using namespace chip;
 
@@ -135,14 +136,14 @@ MTR_DIRECT_MEMBERS
 
     _value = [value copy];
 
-    MTR_LOG_DEFAULT("Attribute value updated: %@", [self _descriptionWhileLocked]); // Logs new value as part of our description.
+    MTR_LOG("Attribute value updated: %@", [self _descriptionWhileLocked]); // Logs new value as part of our description.
 
     MTRDeviceController * deviceController = _deviceController;
     if (deviceController == nil) {
         // We're not bound to a controller, so safe to directly update
         // _serializedValue.
         if (logIfNotAssociated) {
-            MTR_LOG_DEFAULT("Not publishing value for attribute " ChipLogFormatMEI "; not bound to a controller",
+            MTR_LOG("Not publishing value for attribute " ChipLogFormatMEI "; not bound to a controller",
                 ChipLogValueMEI(static_cast<AttributeId>(_attributeID.unsignedLongLongValue)));
         }
         _serializedValue = serializedValue;
@@ -180,7 +181,7 @@ MTR_DIRECT_MEMBERS
 
     _deviceController = controller;
 
-    MTR_LOG_DEFAULT("Associated %@ with controller", [self _descriptionWhileLocked]);
+    MTR_LOG("Associated %@ with controller", [self _descriptionWhileLocked]);
 
     return YES;
 }
