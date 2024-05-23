@@ -1381,6 +1381,20 @@ static constexpr CommandId Id = 0x0000004C;
 } // namespace Commands
 } // namespace ColorControl
 
+namespace WiFiNetworkManagement {
+namespace Commands {
+
+namespace NetworkPassphraseRequest {
+static constexpr CommandId Id = 0x00000000;
+} // namespace NetworkPassphraseRequest
+
+namespace NetworkPassphraseResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace NetworkPassphraseResponse
+
+} // namespace Commands
+} // namespace WiFiNetworkManagement
+
 namespace Channel {
 namespace Commands {
 
@@ -1706,20 +1720,6 @@ static constexpr CommandId Id = 0x00000001;
 
 } // namespace Commands
 } // namespace ElectricalMeasurement
-
-namespace WiFiNetworkManagement {
-namespace Commands {
-
-namespace NetworkPassphraseRequest {
-static constexpr CommandId Id = 0x00000000;
-} // namespace NetworkPassphraseRequest
-
-namespace NetworkPassphraseResponse {
-static constexpr CommandId Id = 0x00000001;
-} // namespace NetworkPassphraseResponse
-
-} // namespace Commands
-} // namespace WiFiNetworkManagement
 
 namespace UnitTesting {
 namespace Commands {

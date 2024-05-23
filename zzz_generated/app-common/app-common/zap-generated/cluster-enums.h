@@ -4309,6 +4309,8 @@ enum class Feature : uint32_t
 };
 } // namespace RadonConcentrationMeasurement
 
+namespace WiFiNetworkManagement {} // namespace WiFiNetworkManagement
+
 namespace WakeOnLan {} // namespace WakeOnLan
 
 namespace Channel {
@@ -4806,8 +4808,6 @@ enum class StatusEnum : uint8_t
 } // namespace ContentAppObserver
 
 namespace ElectricalMeasurement {} // namespace ElectricalMeasurement
-
-namespace WiFiNetworkManagement {} // namespace WiFiNetworkManagement
 
 namespace UnitTesting {
 

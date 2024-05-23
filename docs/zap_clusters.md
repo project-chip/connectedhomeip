@@ -112,6 +112,7 @@ Generally regenerate using one of:
 |       1069 |      0x42D | Pm10ConcentrationMeasurement                            |
 |       1070 |      0x42E | TotalVolatileOrganicCompoundsConcentrationMeasurement   |
 |       1071 |      0x42F | RadonConcentrationMeasurement                           |
+|       1105 |      0x451 | WiFiNetworkManagement                                   |
 |       1283 |      0x503 | WakeOnLan                                               |
 |       1284 |      0x504 | Channel                                                 |
 |       1285 |      0x505 | TargetNavigator                                         |
@@ -127,7 +128,6 @@ Generally regenerate using one of:
 |       1295 |      0x50F | ContentControl                                          |
 |       1296 |      0x510 | ContentAppObserver                                      |
 |       2820 |      0xB04 | ElectricalMeasurement                                   |
-|       3072 |      0xC00 | WiFiNetworkManagement                                   |
 | 4294048773 | 0xFFF1FC05 | UnitTesting                                             |
 | 4294048774 | 0xFFF1FC06 | FaultInjection                                          |
 | 4294048800 | 0xFFF1FC20 | SampleMei                                               |

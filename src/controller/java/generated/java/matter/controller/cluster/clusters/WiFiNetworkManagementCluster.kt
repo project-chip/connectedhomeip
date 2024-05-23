@@ -781,6 +781,6 @@ class WiFiNetworkManagementCluster(
 
   companion object {
     private val logger = Logger.getLogger(WiFiNetworkManagementCluster::class.java.name)
-    const val CLUSTER_ID: UInt = 3072u
+    const val CLUSTER_ID: UInt = 1105u
   }
 }

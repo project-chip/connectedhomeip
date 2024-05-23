@@ -325,6 +325,9 @@ static constexpr ClusterId Id = 0x0000042E;
 namespace RadonConcentrationMeasurement {
 static constexpr ClusterId Id = 0x0000042F;
 } // namespace RadonConcentrationMeasurement
+namespace WiFiNetworkManagement {
+static constexpr ClusterId Id = 0x00000451;
+} // namespace WiFiNetworkManagement
 namespace WakeOnLan {
 static constexpr ClusterId Id = 0x00000503;
 } // namespace WakeOnLan
@@ -370,9 +373,6 @@ static constexpr ClusterId Id = 0x00000510;
 namespace ElectricalMeasurement {
 static constexpr ClusterId Id = 0x00000B04;
 } // namespace ElectricalMeasurement
-namespace WiFiNetworkManagement {
-static constexpr ClusterId Id = 0x00000C00;
-} // namespace WiFiNetworkManagement
 namespace UnitTesting {
 static constexpr ClusterId Id = 0xFFF1FC05;
 } // namespace UnitTesting

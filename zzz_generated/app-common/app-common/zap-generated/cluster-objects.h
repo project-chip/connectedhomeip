@@ -34846,6 +34846,157 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace RadonConcentrationMeasurement
+namespace WiFiNetworkManagement {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace NetworkPassphraseRequest {
+struct Type;
+struct DecodableType;
+} // namespace NetworkPassphraseRequest
+
+namespace NetworkPassphraseResponse {
+struct Type;
+struct DecodableType;
+} // namespace NetworkPassphraseResponse
+
+} // namespace Commands
+
+namespace Commands {
+namespace NetworkPassphraseRequest {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::NetworkPassphraseRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkManagement::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::WiFiNetworkManagement::Commands::NetworkPassphraseResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::NetworkPassphraseRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkManagement::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace NetworkPassphraseRequest
+namespace NetworkPassphraseResponse {
+enum class Fields : uint8_t
+{
+    kPassphrase = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::NetworkPassphraseResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkManagement::Id; }
+
+    chip::ByteSpan passphrase;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::NetworkPassphraseResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkManagement::Id; }
+
+    chip::ByteSpan passphrase;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace NetworkPassphraseResponse
+} // namespace Commands
+
+namespace Attributes {
+
+namespace Ssid {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<chip::ByteSpan>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::ByteSpan>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::ByteSpan> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Ssid::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 32; }
+};
+} // namespace Ssid
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkManagement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkManagement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkManagement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkManagement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkManagement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkManagement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkManagement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::Ssid::TypeInfo::DecodableType ssid;
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace WiFiNetworkManagement
 namespace WakeOnLan {
 
 namespace Attributes {
@@ -41355,157 +41506,6 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace ElectricalMeasurement
-namespace WiFiNetworkManagement {
-
-namespace Commands {
-// Forward-declarations so we can reference these later.
-
-namespace NetworkPassphraseRequest {
-struct Type;
-struct DecodableType;
-} // namespace NetworkPassphraseRequest
-
-namespace NetworkPassphraseResponse {
-struct Type;
-struct DecodableType;
-} // namespace NetworkPassphraseResponse
-
-} // namespace Commands
-
-namespace Commands {
-namespace NetworkPassphraseRequest {
-enum class Fields : uint8_t
-{
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::NetworkPassphraseRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkManagement::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = Clusters::WiFiNetworkManagement::Commands::NetworkPassphraseResponse::DecodableType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::NetworkPassphraseRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkManagement::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace NetworkPassphraseRequest
-namespace NetworkPassphraseResponse {
-enum class Fields : uint8_t
-{
-    kPassphrase = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::NetworkPassphraseResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkManagement::Id; }
-
-    chip::ByteSpan passphrase;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::NetworkPassphraseResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkManagement::Id; }
-
-    chip::ByteSpan passphrase;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace NetworkPassphraseResponse
-} // namespace Commands
-
-namespace Attributes {
-
-namespace Ssid {
-struct TypeInfo
-{
-    using Type             = chip::app::DataModel::Nullable<chip::ByteSpan>;
-    using DecodableType    = chip::app::DataModel::Nullable<chip::ByteSpan>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<chip::ByteSpan> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::Ssid::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-    static constexpr size_t MaxLength() { return 32; }
-};
-} // namespace Ssid
-namespace GeneratedCommandList {
-struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkManagement::Id; }
-};
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkManagement::Id; }
-};
-} // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkManagement::Id; }
-};
-} // namespace EventList
-namespace AttributeList {
-struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkManagement::Id; }
-};
-} // namespace AttributeList
-namespace FeatureMap {
-struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkManagement::Id; }
-};
-} // namespace FeatureMap
-namespace ClusterRevision {
-struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkManagement::Id; }
-};
-} // namespace ClusterRevision
-
-struct TypeInfo
-{
-    struct DecodableType
-    {
-        static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkManagement::Id; }
-
-        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
-
-        Attributes::Ssid::TypeInfo::DecodableType ssid;
-        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
-        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
-        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
-        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
-    };
-};
-} // namespace Attributes
-} // namespace WiFiNetworkManagement
 namespace UnitTesting {
 namespace Structs {
 namespace SimpleStruct {

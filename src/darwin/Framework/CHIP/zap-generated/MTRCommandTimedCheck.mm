@@ -956,6 +956,15 @@ static BOOL CommandNeedsTimedInvokeInRadonConcentrationMeasurementCluster(Attrib
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInWiFiNetworkManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::WiFiNetworkManagement;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInWakeOnLANCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::WakeOnLan;
@@ -1094,15 +1103,6 @@ static BOOL CommandNeedsTimedInvokeInContentAppObserverCluster(AttributeId aAttr
 static BOOL CommandNeedsTimedInvokeInElectricalMeasurementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ElectricalMeasurement;
-    switch (aAttributeId) {
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL CommandNeedsTimedInvokeInWiFiNetworkManagementCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::WiFiNetworkManagement;
     switch (aAttributeId) {
     default: {
         return NO;
@@ -1428,6 +1428,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::RadonConcentrationMeasurement::Id: {
         return CommandNeedsTimedInvokeInRadonConcentrationMeasurementCluster(commandID);
     }
+    case Clusters::WiFiNetworkManagement::Id: {
+        return CommandNeedsTimedInvokeInWiFiNetworkManagementCluster(commandID);
+    }
     case Clusters::WakeOnLan::Id: {
         return CommandNeedsTimedInvokeInWakeOnLANCluster(commandID);
     }
@@ -1472,9 +1475,6 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::ElectricalMeasurement::Id: {
         return CommandNeedsTimedInvokeInElectricalMeasurementCluster(commandID);
-    }
-    case Clusters::WiFiNetworkManagement::Id: {
-        return CommandNeedsTimedInvokeInWiFiNetworkManagementCluster(commandID);
     }
     case Clusters::UnitTesting::Id: {
         return CommandNeedsTimedInvokeInUnitTestingCluster(commandID);

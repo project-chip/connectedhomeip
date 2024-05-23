@@ -1176,7 +1176,7 @@ cluster GroupKeyManagement = 63 {
 }
 
 /** Functionality to retrieve operational information about a managed Wi-Fi network. */
-cluster WiFiNetworkManagement = 3072 {
+cluster WiFiNetworkManagement = 1105 {
   revision 1;
 
   readonly attribute nullable octet_string<32> ssid = 1;
