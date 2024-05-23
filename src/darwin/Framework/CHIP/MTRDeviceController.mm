@@ -145,9 +145,6 @@ using namespace chip::Tracing::DarwinFramework;
     return [MTRDeviceControllerFactory.sharedInstance initializeController:self withParameters:controllerParameters error:error];
 }
 
-static NSString * const kLocalTestUserDefaultDomain = @"org.csa-iot.matter.darwintest";
-static NSString * const kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey = @"subscriptionPoolSizeOverride";
-
 - (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
                              queue:(dispatch_queue_t)queue
                    storageDelegate:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
@@ -256,9 +253,9 @@ static NSString * const kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey = @
         }
 
         // Provide a way to test different subscription pool sizes without code change
-        NSUserDefaults * defaults = [[NSUserDefaults alloc] initWithSuiteName:kLocalTestUserDefaultDomain];
-        if ([defaults objectForKey:kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey]) {
-            NSInteger subscriptionPoolSizeOverride = [defaults integerForKey:kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey];
+        NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
+        if ([defaults objectForKey:kDefaultSubscriptionPoolSizeOverrideKey]) {
+            NSInteger subscriptionPoolSizeOverride = [defaults integerForKey:kDefaultSubscriptionPoolSizeOverrideKey];
             if (subscriptionPoolSizeOverride < 1) {
                 concurrentSubscriptionPoolSize = 1;
             } else {
