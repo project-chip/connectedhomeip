@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include "../clusters/DataModelLogger.h"
-#include "../common/CHIPCommand.h"
-#include "../common/Commands.h"
+#include <commands/clusters/DataModelLogger.h>
+#include <commands/common/CHIPCommand.h>
+#include <commands/common/Commands.h>
 
 #include <string>
 
