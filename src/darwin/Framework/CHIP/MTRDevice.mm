@@ -812,7 +812,6 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     }
 #endif
 
-    // Unfortunately, we currently have no subscriptions over our hacked-up XPC
     // setup. Based on whether subscriptions are allowed or not, return YES or NO.
     return [self _subscriptionsAllowed];
 }
