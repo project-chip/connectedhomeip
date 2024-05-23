@@ -87,7 +87,7 @@ void ChefRpcActionsWorker::ProcessActionQueue()
     if (nullptr == delegate)
     {
         ChipLogError(NotSpecified,
-                     "Cannot run action due to not finding delegate: endpointId=%d, clusterId=%04lx, attributeId=%04lx \033[0m \n",
+                     "Cannot run action due to not finding delegate: endpointId=%d, clusterId=%04lx, attributeId=%04lx",
                      task.endpointId, static_cast<unsigned long>(task.clusterId), static_cast<unsigned long>(task.actionId));
         return;
     }
