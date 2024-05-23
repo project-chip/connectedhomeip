@@ -104,5 +104,6 @@ NSNumber * MTRClampedNumber(NSNumber * aNumber, NSNumber * min, NSNumber * max);
 
 static NSString * const kDefaultSubscriptionPoolSizeOverrideKey = @"subscriptionPoolSizeOverride";
 static NSString * const kSRPTimeoutInMsecsUserDefaultKey = @"SRPTimeoutInMSecsOverride";
+static NSString * const kTestUserDefaultEnabledKey = @"enableTestStorage";
 
 NS_ASSUME_NONNULL_END
