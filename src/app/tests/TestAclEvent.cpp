@@ -16,6 +16,10 @@
  *    limitations under the License.
  */
 
+#include <type_traits>
+
+#include <pw_unit_test/framework.h>
+
 #include <access/AccessControl.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeReportIBs.h>
@@ -31,14 +35,9 @@
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CHIPCounter.h>
-#include <lib/support/UnitTestContext.h>
-#include <lib/support/UnitTestRegistration.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
-#include <nlunit-test.h>
 #include <protocols/interaction_model/Constants.h>
-
-#include <type_traits>
 
 namespace {
 using namespace chip;
@@ -82,42 +81,6 @@ public:
     bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) override { return false; }
 } gDeviceTypeResolver;
 
-class TestContext : public chip::Test::AppContext
-{
-public:
-    // Performs setup for each individual test in the test suite
-    void SetUp() override
-    {
-        const chip::app::LogStorageResources logStorageResources[] = {
-            { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
-            { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), chip::app::PriorityLevel::Info },
-            { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
-        };
-
-        chip::Test::AppContext::SetUp();
-
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        // TODO: use ASSERT_EQ, once transition to pw_unit_test is complete
-        VerifyOrDieWithMsg((err = mEventCounter.Init(0)) == CHIP_NO_ERROR, AppServer,
-                           "Init EventCounter failed: %" CHIP_ERROR_FORMAT, err.Format());
-        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), ArraySize(logStorageResources),
-                                                          gCircularEventBuffer, logStorageResources, &mEventCounter);
-
-        Access::GetAccessControl().Finish();
-        Access::GetAccessControl().Init(GetTestAccessControlDelegate(), gDeviceTypeResolver);
-    }
-
-    // Performs teardown for each individual test in the test suite
-    void TearDown() override
-    {
-        chip::app::EventManagement::DestroyEventManagement();
-        chip::Test::AppContext::TearDown();
-    }
-
-private:
-    chip::MonotonicallyIncreasingCounter<chip::EventNumber> mEventCounter;
-};
-
 class TestEventGenerator : public chip::app::EventLoggingDelegate
 {
 public:
@@ -136,7 +99,7 @@ private:
     int32_t mStatus;
 };
 
-void GenerateEvents(nlTestSuite * apSuite, void * apContext)
+void GenerateEvents()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::EventNumber eid1, eid2;
@@ -153,10 +116,10 @@ void GenerateEvents(nlTestSuite * apSuite, void * apContext)
     ChipLogDetail(DataManagement, "Generating Events");
     testEventGenerator.SetStatus(0);
     err = logMgmt.LogEvent(&testEventGenerator, options1, eid1);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
     testEventGenerator.SetStatus(1);
     err = logMgmt.LogEvent(&testEventGenerator, options2, eid2);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 }
 
 class MockInteractionModelApp : public chip::app::ReadClient::Callback
@@ -210,26 +173,75 @@ public:
 
 namespace chip {
 namespace app {
-class TestAclEvent
+
+class TestAclEvent : public ::testing::Test
 {
 public:
-    static void TestReadRoundtripWithEventStatusIBInEventReport(nlTestSuite * apSuite, void * apContext);
+    static void SetUpTestSuite()
+    {
+
+        mpTestContext = new chip::Test::AppContext;
+
+        mpTestContext->SetUpTestSuite();
+    }
+    static void TearDownTestSuite()
+    {
+        mpTestContext->TearDownTestSuite();
+        if (mpTestContext != nullptr)
+        {
+            delete mpTestContext;
+        }
+    }
+
+    // Performs setup for each individual test in the test suite
+    void SetUp() override
+    {
+        const chip::app::LogStorageResources logStorageResources[] = {
+            { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
+            { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), chip::app::PriorityLevel::Info },
+            { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
+        };
+
+        mpTestContext->SetUp();
+
+        ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
+        chip::app::EventManagement::CreateEventManagement(&mpTestContext->GetExchangeManager(), ArraySize(logStorageResources),
+                                                          gCircularEventBuffer, logStorageResources, &mEventCounter);
+
+        Access::GetAccessControl().Finish();
+        Access::GetAccessControl().Init(GetTestAccessControlDelegate(), gDeviceTypeResolver);
+    }
+
+    // Performs teardown for each individual test in the test suite
+    void TearDown() override
+    {
+
+        chip::app::EventManagement::DestroyEventManagement();
+        mpTestContext->TearDown();
+    }
+
+    static chip::Test::AppContext * mpTestContext;
+
+private:
+    chip::MonotonicallyIncreasingCounter<chip::EventNumber> mEventCounter;
 };
 
-void TestAclEvent::TestReadRoundtripWithEventStatusIBInEventReport(nlTestSuite * apSuite, void * apContext)
+chip::Test::AppContext * TestAclEvent::mpTestContext = nullptr;
+
+TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
 {
-    TestContext & ctx = *static_cast<TestContext *>(apContext);
-    CHIP_ERROR err    = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    Messaging::ReliableMessageMgr * rm = mpTestContext->GetExchangeManager().GetReliableMessageMgr();
     // Shouldn't have anything in the retransmit table when starting the test.
-    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+    EXPECT_FALSE(rm->TestGetCountRetransTable());
 
-    GenerateEvents(apSuite, apContext);
+    GenerateEvents();
 
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err           = engine->Init(&mpTestContext->GetExchangeManager(), &mpTestContext->GetFabricTable(),
+                                 app::reporting::GetDefaultReportScheduler());
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     // A custom AccessControl::Delegate has been installed that grants privilege to any cluster except the test cluster.
     // When reading events with concrete paths without enough privilege, we will get a EventStatusIB
@@ -239,29 +251,29 @@ void TestAclEvent::TestReadRoundtripWithEventStatusIBInEventReport(nlTestSuite *
         eventPathParams[0].mClusterId  = kTestClusterId1;
         eventPathParams[0].mEventId    = kTestEventIdDebug;
 
-        ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+        ReadPrepareParams readPrepareParams(mpTestContext->GetSessionBobToAlice());
         readPrepareParams.mpEventPathParamsList    = eventPathParams;
         readPrepareParams.mEventPathParamsListSize = 1;
         readPrepareParams.mEventNumber.SetValue(1);
 
         MockInteractionModelApp delegate;
-        NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
+        EXPECT_FALSE(delegate.mGotEventResponse);
 
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &mpTestContext->GetExchangeManager(), delegate,
                                    chip::app::ReadClient::InteractionType::Read);
 
         err = readClient.SendRequest(readPrepareParams);
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
+        mpTestContext->DrainAndServiceIO();
 
-        NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
-        NL_TEST_ASSERT(apSuite, delegate.mNumReadEventFailureStatusReceived == 1);
-        NL_TEST_ASSERT(apSuite, delegate.mLastStatusReceived.mStatus == Protocols::InteractionModel::Status::UnsupportedAccess);
-        NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+        EXPECT_TRUE(delegate.mGotEventResponse);
+        EXPECT_TRUE(delegate.mNumReadEventFailureStatusReceived);
+        EXPECT_EQ(delegate.mLastStatusReceived.mStatus, Protocols::InteractionModel::Status::UnsupportedAccess);
+        EXPECT_FALSE(delegate.mReadError);
     }
 
-    GenerateEvents(apSuite, apContext);
+    GenerateEvents();
 
     // When reading events with withcard paths without enough privilege for reading all events, we will exclude all events without
     // enough priviledge when generating the report.
@@ -270,27 +282,27 @@ void TestAclEvent::TestReadRoundtripWithEventStatusIBInEventReport(nlTestSuite *
         eventPathParams[0].mEndpointId = kTestEndpointId;
         eventPathParams[0].mClusterId  = kTestClusterId1;
 
-        ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+        ReadPrepareParams readPrepareParams(mpTestContext->GetSessionBobToAlice());
         readPrepareParams.mpEventPathParamsList    = eventPathParams;
         readPrepareParams.mEventPathParamsListSize = 1;
         readPrepareParams.mEventNumber.SetValue(1);
 
         MockInteractionModelApp delegate;
-        NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
+        EXPECT_FALSE(delegate.mGotEventResponse);
 
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &mpTestContext->GetExchangeManager(), delegate,
                                    chip::app::ReadClient::InteractionType::Read);
 
         err = readClient.SendRequest(readPrepareParams);
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
-        NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
-        NL_TEST_ASSERT(apSuite, delegate.mNumReadEventFailureStatusReceived == 0);
-        NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+        mpTestContext->DrainAndServiceIO();
+        EXPECT_FALSE(delegate.mGotEventResponse);
+        EXPECT_FALSE(delegate.mNumReadEventFailureStatusReceived);
+        EXPECT_FALSE(delegate.mReadError);
     }
 
-    GenerateEvents(apSuite, apContext);
+    GenerateEvents();
 
     // When reading events with withcard paths where the partial don't have enough privilege, we will exclude those partial
     // when generating the report.
@@ -298,27 +310,27 @@ void TestAclEvent::TestReadRoundtripWithEventStatusIBInEventReport(nlTestSuite *
         chip::app::EventPathParams eventPathParams[1];
         eventPathParams[0].mEndpointId = kTestEndpointId;
 
-        ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+        ReadPrepareParams readPrepareParams(mpTestContext->GetSessionBobToAlice());
         readPrepareParams.mpEventPathParamsList    = eventPathParams;
         readPrepareParams.mEventPathParamsListSize = 1;
         readPrepareParams.mEventNumber.SetValue(1);
 
         MockInteractionModelApp delegate;
-        NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
+        EXPECT_FALSE(delegate.mGotEventResponse);
 
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &mpTestContext->GetExchangeManager(), delegate,
                                    chip::app::ReadClient::InteractionType::Read);
 
         err = readClient.SendRequest(readPrepareParams);
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
-        NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
-        NL_TEST_ASSERT(apSuite, delegate.mNumReadEventFailureStatusReceived == 0);
-        NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+        mpTestContext->DrainAndServiceIO();
+        EXPECT_TRUE(delegate.mGotEventResponse);
+        EXPECT_FALSE(delegate.mNumReadEventFailureStatusReceived);
+        EXPECT_FALSE(delegate.mReadError);
     }
 
-    GenerateEvents(apSuite, apContext);
+    GenerateEvents();
 
     // When reading events with two concrete paths where one has enough priviledge, another don't have , we will get a EventStatusIB
     // and eventDataIB
@@ -331,64 +343,29 @@ void TestAclEvent::TestReadRoundtripWithEventStatusIBInEventReport(nlTestSuite *
         eventPathParams[1].mClusterId  = kTestClusterId2;
         eventPathParams[1].mEventId    = kTestEventIdCritical;
 
-        ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+        ReadPrepareParams readPrepareParams(mpTestContext->GetSessionBobToAlice());
         readPrepareParams.mpEventPathParamsList    = eventPathParams;
         readPrepareParams.mEventPathParamsListSize = 1;
         readPrepareParams.mEventNumber.SetValue(1);
 
         MockInteractionModelApp delegate;
-        NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
+        EXPECT_FALSE(delegate.mGotEventResponse);
 
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &mpTestContext->GetExchangeManager(), delegate,
                                    chip::app::ReadClient::InteractionType::Read);
 
         err = readClient.SendRequest(readPrepareParams);
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
 
-        ctx.DrainAndServiceIO();
-        NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
-        NL_TEST_ASSERT(apSuite, delegate.mNumReadEventFailureStatusReceived == 1);
-        NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+        mpTestContext->DrainAndServiceIO();
+        EXPECT_TRUE(delegate.mGotEventResponse);
+        EXPECT_TRUE(delegate.mNumReadEventFailureStatusReceived);
+        EXPECT_FALSE(delegate.mReadError);
     }
-    NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
+    EXPECT_FALSE(engine->GetNumActiveReadClients());
     engine->Shutdown();
-    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+    EXPECT_FALSE(mpTestContext->GetExchangeManager().GetNumActiveExchanges());
 }
 
 } // namespace app
 } // namespace chip
-
-namespace {
-
-/**
- *   Test Suite. It lists all the test functions.
- */
-
-// clang-format off
-const nlTest sTests[] =
-{
-    NL_TEST_DEF("TestReadRoundtripWithEventStatusIBInEventReport", chip::app::TestAclEvent::TestReadRoundtripWithEventStatusIBInEventReport),
-    NL_TEST_SENTINEL()
-};
-// clang-format on
-
-// clang-format off
-nlTestSuite sSuite =
-{
-    "TestAclEvent",
-    &sTests[0],
-    NL_TEST_WRAP_FUNCTION(TestContext::SetUpTestSuite),
-    NL_TEST_WRAP_FUNCTION(TestContext::TearDownTestSuite),
-    NL_TEST_WRAP_METHOD(TestContext, SetUp),
-    NL_TEST_WRAP_METHOD(TestContext, TearDown),
-};
-// clang-format on
-
-} // namespace
-
-int TestAclEvent()
-{
-    return chip::ExecuteTestsWithContext<TestContext>(&sSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestAclEvent)

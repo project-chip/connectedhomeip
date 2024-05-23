@@ -148,6 +148,8 @@ chip_test_suite("tests") {
   ]
   test_sources = [
     "TestAclAttribute.cpp",
+    "TestAclEvent.cpp",
+    "TestBindingTable.cpp",
     "TestBuilderParser.cpp",
     "TestCommandInteraction.cpp",
     "TestMessageDef.cpp",
@@ -158,6 +160,10 @@ chip_test_suite("tests") {
     "TestTimedHandler.cpp",
     "TestWriteInteraction.cpp",
   ]
+
+  if (!chip_fake_platform) {
+    test_sources += [ "TestFailSafeContext.cpp" ]
+  }
 
   cflags = [ "-Wconversion" ]
 
@@ -182,14 +188,12 @@ chip_test_suite_using_nltest("tests_nltest") {
   output_name = "libAppTestsNL"
 
   test_sources = [
-    "TestAclEvent.cpp",
     "TestAttributeAccessInterfaceCache.cpp",
     "TestAttributePathExpandIterator.cpp",
     "TestAttributePersistenceProvider.cpp",
     "TestAttributeValueDecoder.cpp",
     "TestAttributeValueEncoder.cpp",
     "TestBasicCommandPathRegistry.cpp",
-    "TestBindingTable.cpp",
     "TestClusterInfo.cpp",
     "TestCommandPathParams.cpp",
     "TestConcreteAttributePath.cpp",
@@ -209,10 +213,6 @@ chip_test_suite_using_nltest("tests_nltest") {
     "TestTestEventTriggerDelegate.cpp",
     "TestTimeSyncDataProvider.cpp",
   ]
-
-  if (!chip_fake_platform) {
-    test_sources += [ "TestFailSafeContext.cpp" ]
-  }
 
   # DefaultICDClientStorage assumes that raw AES key is used by the application
   if (chip_crypto != "psa") {
