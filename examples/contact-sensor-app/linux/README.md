@@ -136,7 +136,7 @@ details.
 Device tracing is available to analyze the device performance. To turn on
 tracing, build with RPC enabled. See [Building with RPC enabled](#building).
 
-Obtain tracing json file.
+To obtain the tracing json file, run:
 
 ```
     $ ./{PIGWEED_REPO}/pw_trace_tokenized/py/pw_trace_tokenized/get_trace.py -s localhost:33000 \
