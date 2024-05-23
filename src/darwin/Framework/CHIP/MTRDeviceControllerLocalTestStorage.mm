@@ -25,15 +25,15 @@
 + (BOOL)localTestStorageEnabled
 {
     NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
-    return [defaults boolForKey:kTestUserDefaultEnabledKey];
+    return [defaults boolForKey:kTestStorageUserDefaultEnabledKey];
 }
 
 + (void)setLocalTestStorageEnabled:(BOOL)localTestStorageEnabled
 {
     NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setBool:localTestStorageEnabled forKey:kTestUserDefaultEnabledKey];
+    [defaults setBool:localTestStorageEnabled forKey:kTestStorageUserDefaultEnabledKey];
     MTR_LOG("MTRDeviceControllerLocalTestStorage setLocalTestStorageEnabled %d", localTestStorageEnabled);
-    BOOL storedLocalTestStorageEnabled = [defaults boolForKey:kTestUserDefaultEnabledKey];
+    BOOL storedLocalTestStorageEnabled = [defaults boolForKey:kTestStorageUserDefaultEnabledKey];
     if (storedLocalTestStorageEnabled != localTestStorageEnabled) {
         MTR_LOG_ERROR("MTRDeviceControllerLocalTestStorage setLocalTestStorageEnabled %d failed", localTestStorageEnabled);
     }
