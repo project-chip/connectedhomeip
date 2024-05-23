@@ -25,6 +25,31 @@
 namespace chip {
 namespace Controller {
 
+bool compareIpAddresses(const size_t sourceNumIPs, const size_t destinationNumIPs, const Inet::IPAddress *source, const Inet::IPAddress *destination)
+{
+    size_t sameIpAddress = 0;
+    bool addressUsed[chip::Dnssd::CommonResolutionData::kMaxIPAddresses] = {false};
+    if (sourceNumIPs != destinationNumIPs)
+    {
+        return false;
+    }
+
+    for (size_t s = 0 ; s < sourceNumIPs ; s++)
+    {
+        for (size_t d = 0 ; d < destinationNumIPs ; d++)
+        {
+            if (!addressUsed[d] && source[s] == destination[d])
+            {
+                // Change the user flag so that the compared target is no longer used
+                addressUsed[d] = true;
+                sameIpAddress++;
+                break;
+            }
+        }
+    }
+    return sameIpAddress == destinationNumIPs;
+}
+
 void AbstractDnssdDiscoveryController::OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & discNodeData)
 {
     VerifyOrReturn(discNodeData.Is<chip::Dnssd::CommissionNodeData>());
@@ -38,10 +63,8 @@ void AbstractDnssdDiscoveryController::OnNodeDiscovered(const chip::Dnssd::Disco
         {
             continue;
         }
-        // TODO(#32576) Check if IP address are the same. Must account for `numIPs` in the list of `ipAddress`.
-        // Additionally, must NOT assume that the ordering is consistent.
         if (strcmp(discoveredNode.hostName, nodeData.hostName) == 0 && discoveredNode.port == nodeData.port &&
-            discoveredNode.numIPs == nodeData.numIPs)
+            compareIpAddresses(discoveredNode.numIPs, nodeData.numIPs, discoveredNode.ipAddress, nodeData.ipAddress))
         {
             discoveredNode = nodeData;
             if (mDeviceDiscoveryDelegate != nullptr)
