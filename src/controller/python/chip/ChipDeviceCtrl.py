@@ -1202,7 +1202,7 @@ class ChipDeviceControllerBase():
         else:
             raise ValueError("Unsupported Cluster Path")
         dataVersion = pathTuple[2]
-        return ClusterAttribute.DataVersionFilter(
+        return ClusterAttribute.DataVersionFilter.from_cluster(
             EndpointId=endpoint, Cluster=cluster, DataVersion=dataVersion)
 
     def _parseEventPathTuple(self, pathTuple: typing.Union[
