@@ -31,7 +31,7 @@ limitations under the License.
     <item value="0x07" name="Border"/>
     <item value="0x08" name="Boxroom"/>
     <item value="0x09" name="Breakfast Room"/>
-    <item value="0x0A" name="Carort"/>
+    <item value="0x0A" name="Carport"/>
     <item value="0x0B" name="Cellar"/>
     <item value="0x0C" name="Cloakroom"/>
     <item value="0x0D" name="Closet"/>
@@ -123,7 +123,6 @@ limitations under the License.
 
     <item fieldId="0" name="LocationName"    type="char_string" length="64" isNullable="false"/>
     <item fieldId="1" name="FloorNumber"     type="int16s"                  isNullable="true"/>
-    <item fieldId="2" name="IsGroundFloor"   type="boolean"                 isNullable="true"/>
-    <item fieldId="3" name="AreaType"        type="AreaTypeTag"             isNullable="true"/>
+    <item fieldId="2" name="AreaType"        type="AreaTypeTag"             isNullable="true"/>
   </struct>
 </configurator>
