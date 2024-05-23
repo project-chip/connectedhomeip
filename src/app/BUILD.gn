@@ -325,6 +325,8 @@ static_library("app") {
     "EventManagement.h",
     "FailSafeContext.cpp",
     "FailSafeContext.h",
+    "GenericEventManagementTestEventTriggerHandler.cpp",
+    "GenericEventManagementTestEventTriggerHandler.h",
     "OTAUserConsentCommon.h",
     "ReadHandler.cpp",
     "SafeAttributePersistenceProvider.h",
