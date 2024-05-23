@@ -242,6 +242,7 @@ static BOOL slocalTestStorageEnabledBeforeUnitTest;
     // existing subscriptions and then fail out due to requesting a subscribe to
     // a nonexistent cluster.
     if (mConnectedDevice != nil) {
+        NSLog(@"JEFFTEST: teardown - unsubscribe");
         dispatch_queue_t queue = dispatch_get_main_queue();
 
         MTRSubscribeParams * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(0) maxInterval:@(10)];
@@ -3678,7 +3679,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
 
-    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
     __block os_unfair_lock lock = OS_UNFAIR_LOCK_INIT;
     __block NSDate * reportEndTime = nil;
     __block NSDate * dataPersistedTime = nil;
@@ -3831,9 +3832,10 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     os_unfair_lock_lock(&lock);
     reportToPersistenceDelay = [dataPersistedTime timeIntervalSinceDate:reportEndTime];
     os_unfair_lock_unlock(&lock);
-    // Check delay exists and approximately base delay times 3
+    // Check delay exists and at least base delay times 3
     XCTAssertGreaterThan(reportToPersistenceDelay, baseTestDelayTime * 3 * 0.9);
-    XCTAssertLessThan(reportToPersistenceDelay, baseTestDelayTime * 3 * 1.3); // larger upper limit in case machine is slow
+    // upper limit at most max delay times full multiplier + extra in case machine is slow
+    XCTAssertLessThan(reportToPersistenceDelay, baseTestDelayTime * 2 * 5 * 1.3);
 
     // Test 4: test reporting excessively, and see that persistence does not happen until
     // reporting frequency goes back above the threshold
@@ -3887,6 +3889,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
 
     [self waitForExpectations:@[ dataPersisted4 ] timeout:60];
+
+    delegate.onReportEnd = nil;
+    delegate.onClusterDataPersisted = nil;
 }
 
 @end
