@@ -1,0 +1,172 @@
+# Copyright (c) 2020-2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("${build_root}/config/compiler/compiler.gni")
+import("${chip_root}/build/chip/java/config.gni")
+import("${chip_root}/build/chip/tests.gni")
+import("${chip_root}/src/ble/ble.gni")
+import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/tracing/tracing_args.gni")
+
+declare_args() {
+  # Build monolithic test library.
+  chip_monolithic_tests = false
+}
+
+# chip_root relative to root_build_dir for macro-prefix-map.
+# "/." avoids trailing "/" in result when chip_root is "//"
+build_relative_chip_root = rebase_path("${chip_root}/.", root_build_dir)
+
+config("includes") {
+  include_dirs = [
+    "include",
+    ".",
+    "${root_gen_dir}/include",
+  ]
+
+  if (chip_device_platform == "external" &&
+      chip_external_platform_include_dir != "") {
+    include_dirs += [ "${chip_external_platform_include_dir}" ]
+  }
+
+  defines = [ "CHIP_HAVE_CONFIG_H=1" ]
+
+  # Make __FILE__ and related macros relative to chip_root
+  cflags = [ "-fmacro-prefix-map=${build_relative_chip_root}/=" ]
+}
+
+if (chip_build_tests) {
+  import("${chip_root}/build/chip/chip_test_group.gni")
+
+  chip_test_group("tests") {
+    deps = []
+    tests = [
+      "${chip_root}/src/app/interaction-model/tests",
+      "${chip_root}/src/access/tests",
+      "${chip_root}/src/crypto/tests",
+      "${chip_root}/src/inet/tests",
+      "${chip_root}/src/lib/address_resolve/tests",
+      "${chip_root}/src/lib/asn1/tests",
+      "${chip_root}/src/lib/core/tests",
+      "${chip_root}/src/messaging/tests",
+      "${chip_root}/src/protocols/bdx/tests",
+      "${chip_root}/src/protocols/interaction_model/tests",
+      "${chip_root}/src/protocols/user_directed_commissioning/tests",
+      "${chip_root}/src/transport/retransmit/tests",
+      "${chip_root}/src/app/icd/server/tests",
+    ]
+
+    # Skip DNSSD tests for Mbed platform due to flash memory size limitations
+    if (current_os != "mbed") {
+      tests += [
+        "${chip_root}/src/lib/dnssd/minimal_mdns/core/tests",
+        "${chip_root}/src/lib/dnssd/minimal_mdns/responders/tests",
+        "${chip_root}/src/lib/dnssd/minimal_mdns/tests",
+        "${chip_root}/src/lib/dnssd/tests",
+      ]
+    }
+
+    if (current_os != "zephyr" && current_os != "mbed") {
+      tests += [ "${chip_root}/src/lib/dnssd/minimal_mdns/records/tests" ]
+    }
+
+    if (current_os != "zephyr" && current_os != "mbed" &&
+        chip_device_platform != "efr32") {
+      tests += [
+        "${chip_root}/src/setup_payload/tests",
+        "${chip_root}/src/transport/raw/tests",
+      ]
+    }
+
+    # Skip on efr32 due to flash and/or ram limitations.
+    if (chip_device_platform != "efr32") {
+      tests += [
+        "${chip_root}/src/app/tests",
+        "${chip_root}/src/app/tests:tests_nltest",
+        "${chip_root}/src/credentials/tests",
+        "${chip_root}/src/lib/format/tests",
+        "${chip_root}/src/lib/support/tests",
+        "${chip_root}/src/protocols/secure_channel/tests",
+        "${chip_root}/src/protocols/secure_channel/tests:tests_nltest",
+        "${chip_root}/src/system/tests",
+        "${chip_root}/src/transport/tests",
+      ]
+
+      if (matter_enable_tracing_support &&
+          matter_trace_config == "${chip_root}/src/tracing/multiplexed") {
+        tests += [ "${chip_root}/src/tracing/tests" ]
+      }
+    }
+
+    if (chip_device_platform != "none") {
+      tests += [ "${chip_root}/src/lib/dnssd/minimal_mdns/tests" ]
+    }
+
+    if (chip_device_platform != "esp32" && chip_device_platform != "efr32" &&
+        chip_device_platform != "ameba") {
+      tests += [ "${chip_root}/src/platform/tests" ]
+    }
+
+    if (chip_config_network_layer_ble) {
+      tests += [ "${chip_root}/src/ble/tests" ]
+    }
+
+    # On nrfconnect, the controller tests run into
+    # https://github.com/project-chip/connectedhomeip/issues/9630
+    if (chip_device_platform != "nrfconnect" &&
+        chip_device_platform != "efr32") {
+      # Doesn't compile on ef32. Multiple definitions issues with attribute storage and overflows flash memory.
+      tests += [ "${chip_root}/src/controller/tests/data_model" ]
+
+      # Skip controller test for Open IoT SDK
+      # https://github.com/project-chip/connectedhomeip/issues/23747
+      if (chip_device_platform != "openiotsdk") {
+        tests += [ "${chip_root}/src/controller/tests" ]
+      }
+    }
+
+    if (current_os != "zephyr" && current_os != "mbed" &&
+        chip_device_platform != "esp32" && chip_device_platform != "ameba") {
+      tests += [ "${chip_root}/src/lib/shell/tests" ]
+    }
+
+    if (chip_monolithic_tests) {
+      deps += [ "${chip_root}/src/lib/support:pw_tests_wrapper" ]
+      build_monolithic_library = true
+      output_name = "libCHIP_tests"
+      output_dir = "${root_out_dir}/lib"
+    }
+  }
+
+  chip_test_group("fake_platform_tests") {
+    tests = [ "${chip_root}/src/lib/dnssd/platform/tests" ]
+  }
+
+  # Tests to run with each Crypto PAL
+  chip_test_group("crypto_tests") {
+    tests = [
+      "${chip_root}/src/credentials/tests",
+      "${chip_root}/src/crypto/tests",
+    ]
+  }
+
+  if (matter_enable_java_compilation) {
+    group("java_controller_tests") {
+      deps = [ "${chip_root}/src/controller/java:unit_tests" ]
+    }
+  }
+}

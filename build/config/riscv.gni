@@ -1,0 +1,64 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+
+if (current_cpu == "riscv") {
+  declare_args() {
+    # Build file to import for RISCV defaults.
+    riscv_platform_config = ""
+  }
+
+  # Allow platforms to override how RISCV architecture flags are chosen by
+  # providing a file to import.
+  if (riscv_platform_config != "") {
+    _platform_defaults = {
+      import(riscv_platform_config)
+    }
+  }
+
+  _defaults = {
+    riscv_arch = ""
+    riscv_cpu = ""
+    riscv_tune = ""
+    riscv_fpu = ""
+    riscv_float_abi = ""
+    riscv_abi = ""
+
+    # Update defaults with platform values, if any.
+    if (riscv_platform_config != "") {
+      forward_variables_from(_platform_defaults, "*")
+    }
+  }
+
+  declare_args() {
+    # RISCV architecture (value for -march flag).
+    riscv_arch = _defaults.riscv_arch
+
+    # RISCV CPU (value for -mcpu flag).
+    riscv_cpu = _defaults.riscv_cpu
+
+    # RISCV tuning (value for -mtune flag).
+    riscv_tune = _defaults.riscv_tune
+
+    # RISCV FPU (value for -mfpu flag).
+    riscv_fpu = _defaults.riscv_fpu
+
+    # RISCV float ABI (value for -mfloat-abi flag).
+    riscv_float_abi = _defaults.riscv_float_abi
+
+    # RISCV ABI (value for -mabi flag).
+    riscv_abi = _defaults.riscv_abi
+  }
+}

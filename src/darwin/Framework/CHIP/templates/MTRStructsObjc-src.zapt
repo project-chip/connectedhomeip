@@ -1,0 +1,182 @@
+{{> header excludeZapComment=true}}
+
+#import "MTRStructsObjc.h"
+
+NS_ASSUME_NONNULL_BEGIN
+
+{{#zcl_clusters}}
+{{#zcl_structs}}
+{{#*inline "interfaceImpl"}}
+@implementation {{interfaceName}}
+- (instancetype)init
+{
+  if (self = [super init]) {
+    {{#zcl_struct_items}}
+    {{#if (isSupported (asUpperCamelCase parent.parent.name preserveAcronyms=true) struct=(asUpperCamelCase parent.name preserveAcronyms=true) structField=(asStructPropertyName label))}}
+    {{>init_struct_member label=label type=type cluster=parent.parent.name}}
+    {{/if}}
+    {{/zcl_struct_items}}
+  }
+  return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+  auto other = [[{{interfaceName}} alloc] init];
+
+  {{#zcl_struct_items}}
+  {{#if (isSupported (asUpperCamelCase parent.parent.name preserveAcronyms=true) struct=(asUpperCamelCase parent.name preserveAcronyms=true) structField=(asStructPropertyName label))}}
+  other.{{asStructPropertyName label}} = self.{{asStructPropertyName label}};
+  {{/if}}
+  {{/zcl_struct_items}}
+
+  return other;
+}
+
+- (NSString *)description
+{
+  NSString *descriptionString = [NSString stringWithFormat:@"<%@: {{#zcl_struct_items~}}
+  {{~#if (isSupported (asUpperCamelCase parent.parent.name preserveAcronyms=true) struct=(asUpperCamelCase parent.name preserveAcronyms=true) structField=(asStructPropertyName label))~}}
+  {{~asStructPropertyName label}}:%@; {{!Just here to keep the preceding space}}
+  {{~/if~}}
+  {{~/zcl_struct_items}}>", NSStringFromClass([self class]){{#zcl_struct_items~}}
+  {{~#if (isSupported (asUpperCamelCase parent.parent.name preserveAcronyms=true) struct=(asUpperCamelCase parent.name preserveAcronyms=true) structField=(asStructPropertyName label))~}}
+  ,{{#if isArray}}_{{asStructPropertyName label}}{{else if (isOctetString type)}}[_{{asStructPropertyName label}} base64EncodedStringWithOptions:0]{{else}}_{{asStructPropertyName label}}{{/if}}
+  {{~/if~}}
+  {{~/zcl_struct_items}}];
+  return descriptionString;
+}
+{{#zcl_struct_items}}
+{{#if (and (hasOldName (asUpperCamelCase ../../name preserveAcronyms=true) struct=(asUpperCamelCase ../name preserveAcronyms=true) structField=(asStructPropertyName label))
+           (isSupported (asUpperCamelCase ../../name preserveAcronyms=true) struct=(asUpperCamelCase ../name preserveAcronyms=true) structField=(oldName (asUpperCamelCase ../../name preserveAcronyms=true) struct=(asUpperCamelCase ../name preserveAcronyms=true) structField=(asStructPropertyName label))))}}
+
+{{> renamed_struct_field_impl cluster=../../name type=type newName=label oldName=(oldName (asUpperCamelCase ../../name preserveAcronyms=true) struct=(asUpperCamelCase ../name preserveAcronyms=true) structField=(asStructPropertyName label))}}
+{{/if}}
+{{/zcl_struct_items}}
+
+@end
+{{/inline}}
+
+{{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) struct=(asUpperCamelCase name preserveAcronyms=true))}}
+{{> interfaceImpl interfaceName=(concat "MTR" (asUpperCamelCase parent.name preserveAcronyms=true) "Cluster" (asUpperCamelCase name preserveAcronyms=true))}}
+{{/if}}
+
+{{! Takes the name of the struct to use as structName. }}
+{{#*inline "oldNameImpl"}}
+{{#if (isSupported cluster struct=structName)}}
+@implementation MTR{{cluster}}Cluster{{structName}} : MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}
+{{#zcl_struct_items}}
+{{#if (isSupported ../cluster struct=../structName structField=(asStructPropertyName label))}}
+@dynamic {{asStructPropertyName label}};
+{{/if}}
+{{#if (hasOldName ../cluster struct=../structName structField=(asStructPropertyName label))}}
+{{#if (isSupported ../cluster struct=../structName structField=(oldName ../cluster struct=../structName structField=(asStructPropertyName label)))}}
+@dynamic {{oldName ../cluster struct=../structName structField=(asStructPropertyName label)}};
+{{/if}}
+{{/if}}
+{{/zcl_struct_items}}
+@end
+{{/if}}
+{{/inline}}
+{{! Takes the old name of the struct, if any, as oldStructName. }}
+{{#*inline "oldNameCheck"}}
+{{#if (or oldStructName
+          (hasOldName (asUpperCamelCase parent.name preserveAcronyms=true)))}}
+{{#if oldStructName}}
+{{> oldNameImpl cluster=(compatClusterNameRemapping parent.name) structName=oldStructName}}
+{{else}}
+{{> oldNameImpl cluster=(compatClusterNameRemapping parent.name) structName=(asUpperCamelCase name preserveAcronyms=true)}}
+{{/if}}
+{{/if}}
+{{/inline}}
+{{> oldNameCheck oldStructName=(oldName (asUpperCamelCase parent.name preserveAcronyms=true) struct=(asUpperCamelCase name preserveAcronyms=true))}}
+
+{{/zcl_structs}}
+
+{{#zcl_events}}
+{{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) event=(asUpperCamelCase name preserveAcronyms=true))}}
+@implementation MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Event
+- (instancetype)init
+{
+  if (self = [super init]) {
+    {{#zcl_event_fields}}
+    {{#if (isSupported (asUpperCamelCase parent.parent.name preserveAcronyms=true) event=(asUpperCamelCase parent.name preserveAcronyms=true) eventField=(asStructPropertyName name))}}
+    {{>init_struct_member label=name type=type cluster=parent.parent.name}}
+    {{/if}}
+    {{/zcl_event_fields}}
+  }
+  return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+  auto other = [[MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Event alloc] init];
+
+  {{#zcl_event_fields}}
+  {{#if (isSupported (asUpperCamelCase parent.parent.name preserveAcronyms=true) event=(asUpperCamelCase parent.name preserveAcronyms=true) eventField=(asStructPropertyName name))}}
+  other.{{asStructPropertyName name}} = self.{{asStructPropertyName name}};
+  {{/if}}
+  {{/zcl_event_fields}}
+
+  return other;
+}
+
+- (NSString *)description
+{
+  NSString *descriptionString = [NSString stringWithFormat:@"<%@: {{#zcl_event_fields~}}
+  {{~#if (isSupported (asUpperCamelCase parent.parent.name preserveAcronyms=true) event=(asUpperCamelCase parent.name preserveAcronyms=true) eventField=(asStructPropertyName name))~}}
+  {{asStructPropertyName name}}:%@; {{!Just here to keep the preceding space}}
+  {{~/if~}}
+  {{~/zcl_event_fields}}>", NSStringFromClass([self class]){{#zcl_event_fields~}}
+  {{~#if (isSupported (asUpperCamelCase parent.parent.name preserveAcronyms=true) event=(asUpperCamelCase parent.name preserveAcronyms=true) eventField=(asStructPropertyName name))~}}
+  ,{{#if isArray}}_{{asStructPropertyName name}}{{else if (isOctetString type)}}[_{{asStructPropertyName name}} base64EncodedStringWithOptions:0]{{else}}_{{asStructPropertyName name}}{{/if}}
+  {{~/if~}}
+  {{~/zcl_event_fields}}];
+  return descriptionString;
+}
+
+{{#zcl_event_fields}}
+{{#if (and (hasOldName (asUpperCamelCase ../parent.name preserveAcronyms=true) event=(asUpperCamelCase ../name preserveAcronyms=true) eventField=(asStructPropertyName name))
+           (isSupported (asUpperCamelCase ../parent.name preserveAcronyms=true) event=(asUpperCamelCase ../name preserveAcronyms=true) eventField=(oldName (asUpperCamelCase ../parent.name preserveAcronyms=true) event=(asUpperCamelCase ../name preserveAcronyms=true) eventField=(asStructPropertyName name))))}}
+
+{{> renamed_struct_field_impl cluster=../parent.name type=type newName=name oldName=(oldName (asUpperCamelCase ../parent.name preserveAcronyms=true) event=(asUpperCamelCase ../name preserveAcronyms=true) eventField=(asStructPropertyName name))}}
+{{/if}}
+{{/zcl_event_fields}}
+@end
+{{/if}}
+{{! Takes the name of the event to use as eventName. }}
+{{#*inline "oldNameImpl"}}
+{{#if (isSupported cluster event=eventName)}}
+
+@implementation MTR{{cluster}}Cluster{{eventName}}Event : MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Event
+{{#zcl_event_fields}}
+{{#if (isSupported ../cluster event=../eventName eventField=(asStructPropertyName name))}}
+@dynamic {{asStructPropertyName name}};
+{{/if}}
+{{#if (hasOldName ../cluster event=../eventName eventField=(asStructPropertyName name))}}
+{{#if (isSupported ../cluster event=../eventName eventField=(oldName ../cluster event=../eventName eventField=(asStructPropertyName name)))}}
+@dynamic {{oldName ../cluster event=../event eventField=(asStructPropertyName name)}};
+{{/if}}
+{{/if}}
+{{/zcl_event_fields}}
+@end
+{{/if}}
+{{/inline}}
+{{! Takes the old name of the event, if any, as oldEventName. }}
+{{#*inline "oldNameCheck"}}
+{{#if (or oldEventName
+          (hasOldName (asUpperCamelCase parent.name preserveAcronyms=true)))}}
+{{#if oldEventName}}
+{{> oldNameImpl cluster=(compatClusterNameRemapping parent.name) eventName=oldEventName}}
+{{else}}
+{{> oldNameImpl cluster=(compatClusterNameRemapping parent.name) eventName=(asUpperCamelCase name preserveAcronyms=true)}}
+{{/if}}
+{{/if}}
+{{/inline}}
+{{> oldNameCheck oldEventName=(oldName (asUpperCamelCase parent.name preserveAcronyms=true) event=(asUpperCamelCase name preserveAcronyms=true))}}
+
+{{/zcl_events}}
+
+{{/zcl_clusters}}
+
+NS_ASSUME_NONNULL_END

@@ -1,0 +1,181 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.1.1. [TC-IDM-1.1] Invoke Request Action from DUT to TH - [{DUT_Client}]
+
+PICS:
+    - MCORE.IDM.C.InvokeRequest
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label:
+          "Step 1: DUT sends the Invoke Request Message to the TH. The Message
+          should contain one valid CommandDataIB, which has the specific
+          Endpoint, Specific Cluster and Specific Command."
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
+
+          ./chip-tool onoff on 1 1
+
+          On TH(all-clusters-app), Verify that the EndpointID, CommandID, ClusterID in the InvokeRequestMessage (as below) matching with the data sent in the above command
+
+          [1686223199.951436][92512:92512] CHIP:DMG: InvokeRequestMessage =
+          [1686223199.951445][92512:92512] CHIP:DMG: {
+          [1686223199.951454][92512:92512] CHIP:DMG:         suppressResponse = false,
+          [1686223199.951464][92512:92512] CHIP:DMG:         timedRequest = false,
+          [1686223199.951473][92512:92512] CHIP:DMG:         InvokeRequests =
+          [1686223199.951489][92512:92512] CHIP:DMG:         [
+          [1686223199.951497][92512:92512] CHIP:DMG:                 CommandDataIB =
+          [1686223199.951509][92512:92512] CHIP:DMG:                 {
+          [1686223199.951518][92512:92512] CHIP:DMG:                         CommandPathIB =
+          [1686223199.951529][92512:92512] CHIP:DMG:                         {
+          [1686223199.951540][92512:92512] CHIP:DMG:                                 EndpointId = 0x1,
+          [1686223199.951552][92512:92512] CHIP:DMG:                                 ClusterId = 0x6,
+          [1686223199.951563][92512:92512] CHIP:DMG:                                 CommandId = 0x1,
+          [1686223199.951572][92512:92512] CHIP:DMG:                         },
+          [1686223199.951585][92512:92512] CHIP:DMG:
+          [1686223199.951595][92512:92512] CHIP:DMG:                         CommandFields =
+          [1686223199.951605][92512:92512] CHIP:DMG:                         {
+          [1686223199.951615][92512:92512] CHIP:DMG:                         },
+          [1686223199.951624][92512:92512] CHIP:DMG:                 },
+          [1686223199.951637][92512:92512] CHIP:DMG:
+          [1686223199.951644][92512:92512] CHIP:DMG:         ],
+          [1686223199.951658][92512:92512] CHIP:DMG:
+          [1686223199.951666][92512:92512] CHIP:DMG:         InteractionModelRevision = 1
+          [1686223199.951673][92512:92512] CHIP:DMG: },
+          [1686223199.951721][92512:92512] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0006 e=1 p=o
+          [1686223199.951739][92512:92512] CHIP:DMG: AccessControl: allowed
+      disabled: true
+
+    - label:
+          "Step 2: DUT sends the Invoke Request Message to the TH. The Message
+          should contain the wildcard for Endpoint, specific Cluster and
+          Specific Command in the CommandDataIB."
+      verification: |
+          Out of Scope
+      disabled: true
+
+    - label:
+          "Step 3: DUT sends the Invoke Request Message to the TH. The Message
+          should contain one valid CommandDataIB, which has the specific
+          Endpoint, Specific Cluster and Specific Command. Send 2 more Invoke
+          Request Messages to the TH."
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
+
+          #1 ./chip-tool onoff off 1 1
+
+          On TH(all-clusters-app), Verify that the EndpointID, CommandID, ClusterID in the InvokeRequestMessage (as below) matching with the data sent in the above command
+          [1686223361.917663][92512:92512] CHIP:EM: Handling via exchange: 54025r, Delegate: 0x559a0c929fc8
+          [1686223361.917699][92512:92512] CHIP:DMG: InvokeRequestMessage =
+          [1686223361.917706][92512:92512] CHIP:DMG: {
+          [1686223361.917712][92512:92512] CHIP:DMG:         suppressResponse = false,
+          [1686223361.917720][92512:92512] CHIP:DMG:         timedRequest = false,
+          [1686223361.917730][92512:92512] CHIP:DMG:         InvokeRequests =
+          [1686223361.917746][92512:92512] CHIP:DMG:         [
+          [1686223361.917754][92512:92512] CHIP:DMG:                 CommandDataIB =
+          [1686223361.917764][92512:92512] CHIP:DMG:                 {
+          [1686223361.917770][92512:92512] CHIP:DMG:                         CommandPathIB =
+          [1686223361.917778][92512:92512] CHIP:DMG:                         {
+          [1686223361.917786][92512:92512] CHIP:DMG:                                 EndpointId = 0x1,
+          [1686223361.917793][92512:92512] CHIP:DMG:                                 ClusterId = 0x6,
+          [1686223361.917800][92512:92512] CHIP:DMG:                                 CommandId = 0x0,
+          [1686223361.917806][92512:92512] CHIP:DMG:                         },
+          [1686223361.917815][92512:92512] CHIP:DMG:
+          [1686223361.917822][92512:92512] CHIP:DMG:                         CommandFields =
+          [1686223361.917829][92512:92512] CHIP:DMG:                         {
+          [1686223361.917836][92512:92512] CHIP:DMG:                         },
+          [1686223361.917842][92512:92512] CHIP:DMG:                 },
+          [1686223361.917851][92512:92512] CHIP:DMG:
+          [1686223361.917857][92512:92512] CHIP:DMG:         ],
+          [1686223361.917866][92512:92512] CHIP:DMG:
+          [1686223361.917872][92512:92512] CHIP:DMG:         InteractionModelRevision = 1
+          [1686223361.917878][92512:92512] CHIP:DMG: },
+          [1686223361.917910][92512:92512] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0006 e=1 p=o
+          [1686223361.917924][92512:92512] CHIP:DMG: AccessControl: allowed
+
+
+          #2 ./chip-tool onoff off 1 1
+          On TH(all-clusters-app), Verify that the EndpointID, CommandID, ClusterID in the InvokeRequestMessage (as below) matching with the data sent in the above command
+          [1686223661.425611][92512:92512] CHIP:EM: Handling via exchange: 47475r, Delegate: 0x559a0c929fc8
+          [1686223661.425644][92512:92512] CHIP:DMG: InvokeRequestMessage =
+          [1686223661.425654][92512:92512] CHIP:DMG: {
+          [1686223661.425664][92512:92512] CHIP:DMG:         suppressResponse = false,
+          [1686223661.425675][92512:92512] CHIP:DMG:         timedRequest = false,
+          [1686223661.425683][92512:92512] CHIP:DMG:         InvokeRequests =
+          [1686223661.425699][92512:92512] CHIP:DMG:         [
+          [1686223661.425706][92512:92512] CHIP:DMG:                 CommandDataIB =
+          [1686223661.425718][92512:92512] CHIP:DMG:                 {
+          [1686223661.425727][92512:92512] CHIP:DMG:                         CommandPathIB =
+          [1686223661.425739][92512:92512] CHIP:DMG:                         {
+          [1686223661.425749][92512:92512] CHIP:DMG:                                 EndpointId = 0x1,
+          [1686223661.425760][92512:92512] CHIP:DMG:                                 ClusterId = 0x6,
+          [1686223661.425771][92512:92512] CHIP:DMG:                                 CommandId = 0x0,
+          [1686223661.425782][92512:92512] CHIP:DMG:                         },
+          [1686223661.425795][92512:92512] CHIP:DMG:
+          [1686223661.425804][92512:92512] CHIP:DMG:                         CommandFields =
+          [1686223661.425815][92512:92512] CHIP:DMG:                         {
+          [1686223661.425825][92512:92512] CHIP:DMG:                         },
+          [1686223661.425834][92512:92512] CHIP:DMG:                 },
+          [1686223661.425848][92512:92512] CHIP:DMG:
+          [1686223661.425855][92512:92512] CHIP:DMG:         ],
+          [1686223661.425870][92512:92512] CHIP:DMG:
+          [1686223661.425878][92512:92512] CHIP:DMG:         InteractionModelRevision = 1
+          [1686223661.425887][92512:92512] CHIP:DMG: },
+          [1686223661.425923][92512:92512] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0006 e=1 p=o
+          [1686223661.425939][92512:92512] CHIP:DMG: AccessControl: allowed
+
+
+          #3 ./chip-tool onoff off 1 1
+          On TH(all-clusters-app), Verify that the EndpointID, CommandID, ClusterID in the InvokeRequestMessage (as below) matching with the data sent in the above command
+          [1686223661.425611][92512:92512] CHIP:EM: Handling via exchange: 47475r, Delegate: 0x559a0c929fc8
+          [1686223661.425644][92512:92512] CHIP:DMG: InvokeRequestMessage =
+          [1686223661.425654][92512:92512] CHIP:DMG: {
+          [1686223661.425664][92512:92512] CHIP:DMG:         suppressResponse = false,
+          [1686223661.425675][92512:92512] CHIP:DMG:         timedRequest = false,
+          [1686223661.425683][92512:92512] CHIP:DMG:         InvokeRequests =
+          [1686223661.425699][92512:92512] CHIP:DMG:         [
+          [1686223661.425706][92512:92512] CHIP:DMG:                 CommandDataIB =
+          [1686223661.425718][92512:92512] CHIP:DMG:                 {
+          [1686223661.425727][92512:92512] CHIP:DMG:                         CommandPathIB =
+          [1686223661.425739][92512:92512] CHIP:DMG:                         {
+          [1686223661.425749][92512:92512] CHIP:DMG:                                 EndpointId = 0x1,
+          [1686223661.425760][92512:92512] CHIP:DMG:                                 ClusterId = 0x6,
+          [1686223661.425771][92512:92512] CHIP:DMG:                                 CommandId = 0x0,
+          [1686223661.425782][92512:92512] CHIP:DMG:                         },
+          [1686223661.425795][92512:92512] CHIP:DMG:
+          [1686223661.425804][92512:92512] CHIP:DMG:                         CommandFields =
+          [1686223661.425815][92512:92512] CHIP:DMG:                         {
+          [1686223661.425825][92512:92512] CHIP:DMG:                         },
+          [1686223661.425834][92512:92512] CHIP:DMG:                 },
+          [1686223661.425848][92512:92512] CHIP:DMG:
+          [1686223661.425855][92512:92512] CHIP:DMG:         ],
+          [1686223661.425870][92512:92512] CHIP:DMG:
+          [1686223661.425878][92512:92512] CHIP:DMG:         InteractionModelRevision = 1
+          [1686223661.425887][92512:92512] CHIP:DMG: },
+          [1686223661.425923][92512:92512] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0006 e=1 p=o
+          [1686223661.425939][92512:92512] CHIP:DMG: AccessControl: allowed
+      disabled: true

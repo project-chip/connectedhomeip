@@ -1,0 +1,309 @@
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/jsoncpp.gni")
+
+import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/build/config/compiler/compiler.gni")
+import("${chip_root}/build/config/mac/mac_sdk.gni")
+import("${chip_root}/examples//chip-tool/chip-tool.gni")
+
+if (config_use_interactive_mode) {
+  import("//build_overrides/editline.gni")
+}
+
+assert(chip_build_tools)
+
+declare_args() {
+  chip_codesign = current_os == "ios"
+
+  chip_inet_config_enable_ipv4 = true
+
+  if (!defined(chip_config_network_layer_ble)) {
+    chip_config_network_layer_ble = true
+  }
+  if (!defined(is_clang)) {
+    is_clang = false
+  }
+
+  enable_provisional_features = config_enable_yaml_tests
+
+  # Disable generating compiler database by default
+  generate_compilation_database = false
+}
+
+sdk = "macosx"
+sdk_build_dir_suffix = ""
+if (getenv("SDKROOT") != "") {
+  sdk = getenv("SDKROOT")
+  sdk_root_parts = string_split(getenv("SDKROOT"), ".")
+  sdk_build_dir_suffix = "-${sdk_root_parts[0]}"
+}
+output_sdk_type = "Debug${sdk_build_dir_suffix}"
+
+action("build-darwin-framework") {
+  script = "${chip_root}/scripts/build/build_darwin_framework.py"
+
+  inputs = [
+    "${chip_root}/src/darwin/Framework/CHIP",
+    "${chip_root}/src/darwin/Framework/CHIP/zap-generated",
+    "${chip_root}/src/darwin/Framework/Matter.xcodeproj",
+  ]
+
+  args = [
+    "--project_path",
+    rebase_path("${chip_root}/src/darwin/Framework/Matter.xcodeproj",
+                root_build_dir),
+    "--out_path",
+    "macos_framework_output",
+    "--target",
+    "Matter Framework",
+    "--log_path",
+    rebase_path("${root_build_dir}/darwin_framework_build.log", root_build_dir),
+    "--target_arch",
+    mac_target_arch,
+  ]
+
+  if (sdk != "macosx") {
+    args += [
+      "--target_sdk",
+      sdk,
+    ]
+  }
+
+  if (defined(chip_inet_config_enable_ipv4) && chip_inet_config_enable_ipv4) {
+    args += [ "--ipv4" ]
+  } else {
+    args += [ "--no-ipv4" ]
+  }
+
+  if (defined(is_asan) && is_asan) {
+    args += [ "--asan" ]
+  } else {
+    args += [ "--no-asan" ]
+  }
+
+  if (defined(chip_config_network_layer_ble) && chip_config_network_layer_ble) {
+    args += [ "--ble" ]
+  } else {
+    args += [ "--no-ble" ]
+  }
+
+  if (defined(is_clang) && is_clang) {
+    args += [ "--clang" ]
+  } else {
+    args += [ "--no-clang" ]
+  }
+
+  if (generate_compilation_database) {
+    args += [ "--compdb" ]
+  } else {
+    args += [ "--no-compdb" ]
+  }
+
+  if (config_enable_yaml_tests) {
+    args += [ "--enable-encoding-sentinel-enum-values" ]
+  } else {
+    args += [ "--no-enable-encoding-sentinel-enum-values" ]
+  }
+
+  output_name = "Matter.framework"
+  outputs = [
+    "${root_out_dir}/macos_framework_output/Build/Products/${output_sdk_type}/${output_name}",
+    "${root_out_dir}/macos_framework_output/Build/Intermediates.noindex/Matter.build/${output_sdk_type}/Matter.build/out/gen/include",
+    "${root_build_dir}/darwin_framework_build.log",
+    "${root_out_dir}/macos_framework_output/ModuleCache.noindex/",
+    "${root_out_dir}/macos_framework_output/Logs",
+    "${root_out_dir}/macos_framework_output/Index",
+    "${root_out_dir}/macos_framework_output/Build",
+  ]
+
+  if (sdk == "macosx") {
+    outputs += [ "${root_out_dir}/macos_framework_output/Build/Intermediates.noindex/Matter.build/${output_sdk_type}/Matter.build/out/lib/libCHIP.a" ]
+  }
+}
+
+config("config") {
+  include_dirs = [
+    ".",
+    "include",
+    "${chip_root}/examples/common",
+    "${chip_root}/examples/darwin-framework-tool/commands/common",
+    "${chip_root}/zzz_generated/darwin-framework-tool",
+    "${chip_root}/zzz_generated/controller-clusters",
+    "${chip_root}/examples/chip-tool",
+    "${chip_root}/zzz_generated/chip-tool",
+    "${root_out_dir}/macos_framework_output/Build/Products/${output_sdk_type}/",
+  ]
+
+  framework_dirs = [
+    "${root_out_dir}/macos_framework_output/Build/Products/${output_sdk_type}/",
+  ]
+
+  defines = [
+    "CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>",
+    "CONFIG_USE_INTERACTIVE_MODE=${config_use_interactive_mode}",
+
+    # Disable availability annotations in Matter.framework headers because we
+    # are not building against a system Matter.framework here anyway.
+    "MTR_NO_AVAILABILITY=1",
+  ]
+
+  cflags = [
+    "-Wconversion",
+    "-fobjc-arc",
+  ]
+}
+
+executable("darwin-framework-tool") {
+  sources = [
+    "${chip_root}/examples/chip-tool/commands/common/Command.cpp",
+    "${chip_root}/examples/chip-tool/commands/common/Command.h",
+    "${chip_root}/examples/chip-tool/commands/common/Commands.cpp",
+    "${chip_root}/examples/chip-tool/commands/common/Commands.h",
+    "${chip_root}/examples/chip-tool/commands/common/HexConversion.h",
+    "${chip_root}/examples/common/websocket-server/WebSocketServer.cpp",
+    "${chip_root}/examples/common/websocket-server/WebSocketServer.h",
+    "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.cpp",
+    "commands/bdx/Commands.h",
+    "commands/bdx/DownloadLogCommand.mm",
+    "commands/clusters/ClusterCommandBridge.h",
+    "commands/clusters/ModelCommandBridge.mm",
+    "commands/clusters/ReportCommandBridge.h",
+    "commands/clusters/WriteAttributeCommandBridge.h",
+    "commands/common/CHIPCommandBridge.mm",
+    "commands/common/CHIPCommandStorageDelegate.mm",
+    "commands/common/CHIPToolKeypair.mm",
+    "commands/common/MTRDevice_Externs.h",
+    "commands/common/MTRError.mm",
+    "commands/common/MTRError_Utils.h",
+    "commands/common/MTRLogging.h",
+    "commands/common/RemoteDataModelLogger.h",
+    "commands/common/RemoteDataModelLogger.mm",
+    "commands/configuration/Commands.h",
+    "commands/configuration/ResetMRPParametersCommand.h",
+    "commands/configuration/ResetMRPParametersCommand.mm",
+    "commands/configuration/SetMRPParametersCommand.h",
+    "commands/configuration/SetMRPParametersCommand.mm",
+    "commands/delay/Commands.h",
+    "commands/delay/SleepCommand.h",
+    "commands/delay/SleepCommand.mm",
+    "commands/delay/WaitForCommissioneeCommand.h",
+    "commands/delay/WaitForCommissioneeCommand.mm",
+    "commands/discover/Commands.h",
+    "commands/discover/DiscoverCommissionablesCommand.h",
+    "commands/discover/DiscoverCommissionablesCommand.mm",
+    "commands/pairing/Commands.h",
+    "commands/pairing/DeviceControllerDelegateBridge.mm",
+    "commands/pairing/GetCommissionerNodeIdCommand.h",
+    "commands/pairing/GetCommissionerNodeIdCommand.mm",
+    "commands/pairing/OpenCommissioningWindowCommand.h",
+    "commands/pairing/OpenCommissioningWindowCommand.mm",
+    "commands/pairing/PairingCommandBridge.mm",
+    "commands/payload/SetupPayloadParseCommand.mm",
+    "commands/provider/Commands.h",
+    "commands/provider/OTAProviderDelegate.mm",
+    "commands/provider/OTASoftwareUpdateInteractive.mm",
+    "commands/storage/Commands.h",
+    "commands/storage/StorageManagementCommand.mm",
+    "logging/logging.mm",
+    "main.mm",
+  ]
+
+  deps = [
+    ":build-darwin-framework",
+    "${chip_root}/third_party/libwebsockets",
+    jsoncpp_root,
+  ]
+
+  if (config_use_interactive_mode) {
+    sources += [ "commands/interactive/InteractiveCommands.mm" ]
+
+    deps += [ "${editline_root}:editline" ]
+  }
+
+  ldflags = [
+    "-rpath",
+    "@executable_path/macos_framework_output/Build/Products/${output_sdk_type}/",
+  ]
+
+  frameworks = [
+    "Matter.framework",
+    "Security.framework",
+  ]
+
+  include_dirs = [
+    "${chip_root}/config/standalone/",
+    "${chip_root}/src/",
+    "${chip_root}/src/include/",
+    "${chip_root}/src/protocols/",
+    "${chip_root}/src/protocols/interaction_model",
+    "${chip_root}/third_party/nlassert/repo/include/",
+    "${chip_root}/third_party/nlio/repo/include/",
+    "${chip_root}/zzz_generated/app-common/",
+    "${root_gen_dir}/include",
+    "${root_out_dir}/macos_framework_output/Build/Intermediates.noindex/Matter.build/${output_sdk_type}/Matter.build/out/gen/include",
+  ]
+
+  defines = [
+    "CHIP_HAVE_CONFIG_H=1",
+    "CHIP_SYSTEM_CONFIG_USE_SOCKETS=1",
+  ]
+
+  frameworks += [
+    "CoreFoundation.framework",
+    "Foundation.framework",
+    "CoreBluetooth.framework",
+    "Network.framework",
+  ]
+
+  # Other SDKs are linked statically to Matter.framework but the macosx SDK is linked dynamically but needs some symbols that are
+  # not exposed by the dylib.
+  if (sdk == "macosx") {
+    libs = [ "${root_out_dir}/macos_framework_output/Build/Intermediates.noindex/Matter.build/${output_sdk_type}/Matter.build/out/lib/libCHIP.a" ]
+  }
+
+  if (enable_provisional_features) {
+    defines += [ "MTR_ENABLE_PROVISIONAL=1" ]
+  }
+
+  public_configs = [ ":config" ]
+
+  output_dir = root_out_dir
+}
+
+if (chip_codesign) {
+  action("codesign") {
+    script = "entitlements/codesign.py"
+    public_deps = [ ":darwin-framework-tool" ]
+
+    args = [
+      "--target_path",
+      rebase_path("${root_build_dir}/darwin-framework-tool", root_build_dir),
+      "--log_path",
+      rebase_path("${root_build_dir}/codesign_log.txt", root_build_dir),
+    ]
+
+    output_name = "codesign_log.txt"
+    outputs = [ "${root_build_dir}/${output_name}" ]
+  }
+}
+
+# Make sure we only build darwin-framework-tool, and not extraneous
+# things like address-resolve, by default.
+group("default") {
+  deps = [ ":darwin-framework-tool" ]
+}

@@ -1,0 +1,162 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("${build_root}/config/linux/pkg_config.gni")
+
+import("${chip_root}/src/lib/core/core.gni")
+import("${chip_root}/src/platform/device.gni")
+
+assert(chip_device_platform == "linux")
+
+if (chip_use_pw_logging) {
+  import("//build_overrides/pigweed.gni")
+}
+
+if (chip_enable_openthread) {
+  import("//build_overrides/openthread.gni")
+  import("//build_overrides/ot_br_posix.gni")
+}
+
+if (chip_mdns == "platform") {
+  pkg_config("avahi_client_config") {
+    packages = [ "avahi-client" ]
+  }
+}
+
+static_library("Linux") {
+  sources = [
+    "../DeviceSafeQueue.cpp",
+    "../DeviceSafeQueue.h",
+    "../GLibTypeDeleter.h",
+    "../SingletonConfigurationManager.cpp",
+    "CHIPDevicePlatformConfig.h",
+    "CHIPDevicePlatformEvent.h",
+    "CHIPLinuxStorage.cpp",
+    "CHIPLinuxStorage.h",
+    "CHIPLinuxStorageIni.cpp",
+    "CHIPLinuxStorageIni.h",
+    "CHIPPlatformConfig.h",
+    "ConfigurationManagerImpl.cpp",
+    "ConfigurationManagerImpl.h",
+    "ConnectivityManagerImpl.cpp",
+    "ConnectivityManagerImpl.h",
+    "ConnectivityUtils.cpp",
+    "ConnectivityUtils.h",
+    "DeviceInstanceInfoProviderImpl.cpp",
+    "DeviceInstanceInfoProviderImpl.h",
+    "DiagnosticDataProviderImpl.cpp",
+    "DiagnosticDataProviderImpl.h",
+    "InetPlatformConfig.h",
+    "KeyValueStoreManagerImpl.cpp",
+    "KeyValueStoreManagerImpl.h",
+    "NetworkCommissioningDriver.h",
+    "NetworkCommissioningEthernetDriver.cpp",
+    "PlatformManagerImpl.cpp",
+    "PlatformManagerImpl.h",
+    "PosixConfig.cpp",
+    "PosixConfig.h",
+    "SystemPlatformConfig.h",
+    "SystemTimeSupport.cpp",
+  ]
+
+  deps = [
+    "${chip_root}/src/app/icd/server:icd-server-config",
+    "${chip_root}/src/credentials:credentials_header",
+    "${chip_root}/src/setup_payload",
+  ]
+
+  if (!chip_use_external_logging) {
+    sources += [ "Logging.cpp" ]
+    deps += [ "${chip_root}/src/platform/logging:headers" ]
+  }
+
+  if (chip_enable_openthread) {
+    sources += [ "NetworkCommissioningThreadDriver.cpp" ]
+  }
+
+  if (chip_enable_ble) {
+    sources += [
+      "BLEManagerImpl.cpp",
+      "BLEManagerImpl.h",
+      "BlePlatformConfig.h",
+      "bluez/AdapterIterator.cpp",
+      "bluez/AdapterIterator.h",
+      "bluez/BluezAdvertisement.cpp",
+      "bluez/BluezAdvertisement.h",
+      "bluez/BluezConnection.cpp",
+      "bluez/BluezConnection.h",
+      "bluez/BluezEndpoint.cpp",
+      "bluez/BluezEndpoint.h",
+      "bluez/BluezObjectIterator.h",
+      "bluez/BluezObjectList.h",
+      "bluez/BluezObjectManager.cpp",
+      "bluez/BluezObjectManager.h",
+      "bluez/ChipDeviceScanner.cpp",
+      "bluez/ChipDeviceScanner.h",
+      "bluez/Types.h",
+    ]
+  }
+
+  public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/third_party/inipp",
+  ]
+
+  public_configs = []
+
+  if (chip_mdns == "platform") {
+    sources += [
+      "DnssdImpl.cpp",
+      "DnssdImpl.h",
+    ]
+
+    deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
+
+    public_configs += [ ":avahi_client_config" ]
+  }
+
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "OTAImageProcessorImpl.cpp",
+      "OTAImageProcessorImpl.h",
+    ]
+  }
+
+  if (chip_enable_openthread) {
+    sources += [
+      "ThreadStackManagerImpl.cpp",
+      "ThreadStackManagerImpl.h",
+    ]
+
+    public_deps += [ "dbus/openthread" ]
+  }
+
+  if (chip_use_pw_logging) {
+    deps += [ "$dir_pw_log" ]
+  }
+
+  if (chip_enable_wifi) {
+    sources += [ "NetworkCommissioningWiFiDriver.cpp" ]
+
+    public_deps += [ "dbus/wpa" ]
+  }
+
+  if (chip_enable_ble) {
+    public_deps += [ "dbus/bluez" ]
+  }
+}

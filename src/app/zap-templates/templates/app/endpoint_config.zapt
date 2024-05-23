@@ -1,0 +1,101 @@
+{{> header}}
+
+// Prevent multiple inclusion
+#pragma once
+
+#include <lib/core/CHIPConfig.h>
+#include <app/util/endpoint-config-defines.h>
+
+{{#endpoint_config allowUnknownStorageOption="false" spaceForDefaultValue=4}}
+
+// Default values for the attributes longer than a pointer,
+// in a form of a binary blob
+// Separate block is generated for big-endian and little-endian cases.
+#if CHIP_CONFIG_BIG_ENDIAN_TARGET
+#define GENERATED_DEFAULTS {{endpoint_attribute_long_defaults endian="big"}}
+
+#else // !CHIP_CONFIG_BIG_ENDIAN_TARGET
+#define GENERATED_DEFAULTS {{endpoint_attribute_long_defaults endian="little"}}
+#endif // CHIP_CONFIG_BIG_ENDIAN_TARGET
+
+#define GENERATED_DEFAULTS_COUNT ({{endpoint_attribute_long_defaults_count}})
+
+// This is an array of EmberAfAttributeMinMaxValue structures.
+#define GENERATED_MIN_MAX_DEFAULT_COUNT {{endpoint_attribute_min_max_count}}
+#define GENERATED_MIN_MAX_DEFAULTS {{endpoint_attribute_min_max_list}}
+
+// This is an array of EmberAfAttributeMetadata structures.
+#define GENERATED_ATTRIBUTE_COUNT {{endpoint_attribute_count}}
+#define GENERATED_ATTRIBUTES {{ endpoint_attribute_list order='default,id,size,type,mask'}}
+
+// clang-format off
+#define GENERATED_EVENT_COUNT {{ chip_endpoint_generated_event_count }}
+#define GENERATED_EVENTS {{ chip_endpoint_generated_event_list }}
+// clang-format on
+
+// Cluster function static arrays
+#define GENERATED_FUNCTION_ARRAYS   {{chip_endpoint_generated_functions}}
+
+{{#chip_endpoint_generated_commands_list}}
+{{#first}}
+// clang-format off
+#define GENERATED_COMMANDS { \
+{{/first}}
+{{text}}
+{{#last}}
+}
+
+// clang-format on
+{{/last}}
+{{/chip_endpoint_generated_commands_list}}
+
+// This is an array of EmberAfCluster structures.
+#define GENERATED_CLUSTER_COUNT {{endpoint_cluster_count}}
+// clang-format off
+#define GENERATED_CLUSTERS {{chip_endpoint_cluster_list order="clusterId,attributes,attributeCount,clusterSize,mask,functions,acceptedCommandList,generatedCommandList,eventList,eventCount"}}
+// clang-format on
+
+#define ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT {{chip_endpoint_data_version_count}}
+
+// This is an array of EmberAfEndpointType structures.
+#define GENERATED_ENDPOINT_TYPES {{endpoint_types_list}}
+
+
+// Largest attribute size is needed for various buffers
+#define ATTRIBUTE_LARGEST ({{endpoint_largest_attribute_size}})
+
+static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
+              "ATTRIBUTE_LARGEST larger than expected");
+
+// Total size of singleton attributes
+#define ATTRIBUTE_SINGLETONS_SIZE ({{endpoint_singletons_size}})
+
+// Total size of attribute storage
+#define ATTRIBUTE_MAX_SIZE ({{endpoint_total_storage_size}})
+
+// Number of fixed endpoints
+#define FIXED_ENDPOINT_COUNT ({{endpoint_count}})
+
+// Array of endpoints that are supported, the data inside
+// the array is the endpoint number.
+#define FIXED_ENDPOINT_ARRAY {{endpoint_fixed_endpoint_array}}
+
+// Array of profile ids
+#define FIXED_PROFILE_IDS {{endpoint_fixed_profile_id_array}}
+
+// Array of device types
+#define FIXED_DEVICE_TYPES {{endpoint_fixed_device_type_array}}
+
+// Array of device type offsets
+#define FIXED_DEVICE_TYPE_OFFSETS {{endpoint_fixed_device_type_array_offsets}}
+
+// Array of device type lengths
+#define FIXED_DEVICE_TYPE_LENGTHS {{endpoint_fixed_device_type_array_lengths}}
+
+// Array of endpoint types supported on each endpoint
+#define FIXED_ENDPOINT_TYPES {{endpoint_fixed_endpoint_type_array}}
+
+// Array of parent endpoints for each endpoint
+#define FIXED_PARENT_ENDPOINTS {{endpoint_fixed_parent_id_array}}
+
+{{/endpoint_config}}

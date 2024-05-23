@@ -1,0 +1,163 @@
+// These are global .matter idl linter rules
+// First load data from XML definitions
+
+load "../src/app/zap-templates/zcl/data-model/chip/access-control-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/access-control-definitions.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/account-login-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/administrator-commissioning-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/application-basic-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/application-launcher-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/audio-output-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/ballast-configuration-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/basic-information-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/binding-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/boolean-state-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/actions-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/bridged-device-basic-information.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/channel-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/chip-ota.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/chip-types.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/clusters-extensions.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/color-control-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/concentration-measurement-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/content-launch-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/content-app-observer-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/content-control-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/descriptor-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/device-energy-management-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/device-energy-management-mode-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/diagnostic-logs-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/dishwasher-alarm-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/dishwasher-mode-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/measurement-and-sensing.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/microwave-oven-mode-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/microwave-oven-control-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/door-lock-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/energy-evse-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/energy-evse-mode-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/ethernet-network-diagnostics-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/fan-control-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/fixed-label-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/flow-measurement-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/general-commissioning-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/general-diagnostics-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/global-attributes.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/groups-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/group-key-mgmt-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/identify-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/illuminance-measurement-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/keypad-input-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/laundry-washer-mode-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/laundry-dryer-controls-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/level-control-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/localization-configuration-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/low-power-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/matter-devices.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/media-input-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/media-playback-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/messages-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/mode-base-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/mode-select-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/network-commissioning-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/occupancy-sensing-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/onoff-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/operational-credentials-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/operational-state-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/operational-state-oven-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/operational-state-rvc-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/oven-mode-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/power-source-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/power-source-configuration-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/power-topology-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/pressure-measurement-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/proxy-configuration-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/proxy-discovery-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/proxy-valid-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/pump-configuration-and-control-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/pwm-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/refrigerator-and-temperature-controlled-cabinet-mode-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/relative-humidity-measurement-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/rvc-clean-mode-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/rvc-run-mode-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/scene.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/smoke-co-alarm-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/software-diagnostics-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/switch-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/target-navigator-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/temperature-measurement-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/test-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/thermostat-user-interface-configuration-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/thermostat-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/thread-network-diagnostics-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/time-format-localization-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/time-synchronization-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/timer-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/unit-localization-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/user-label-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/wake-on-lan-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/washer-controls-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/wifi-network-diagnostics-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/window-covering.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/temperature-control-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/refrigerator-alarm.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/air-quality-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/resource-monitoring-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/sample-mei-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/electrical-energy-measurement-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/electrical-power-measurement-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/draft/barrier-control-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/draft/electrical-measurement-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/draft/input-output-value-clusters.xml";
+load "../src/app/zap-templates/zcl/data-model/draft/onoff-switch-configuration-cluster.xml";
+
+all endpoints {
+    // These attributes follow a different code path and do not have to be
+    // present in the .matter file
+    //
+    // require global attribute generatedCommandList = 65528;
+    // require global attribute acceptedCommandList = 65529;
+    // require global attribute attributeList = 65531;
+
+    require global attribute featureMap = 65532;
+    require global attribute clusterRevision = 65533;
+
+    // Deny rules:
+    //   deny cluster Foo;  // denies entire cluster by name
+    //   deny cluster 123;  // denies entire cluster by id
+    //   deny cluster Foo attribute bar;  // denies specific attribute by name
+    //   deny cluster Foo attribute 123;  // denies specific attribute by id
+    //   deny cluster 234 attribute 567;  // Allows deny using ids only
+
+    // (previously AverageWearCount, see #30002/#29285 in GitHub)
+    deny cluster GeneralDiagnostics attribute 9;
+}
+
+endpoint 0 {
+  // Identifiers for clusters are loaded from XML files
+  // The required clusters are from the spec for RootNode (section 2.1.5 at the moment):
+
+  require server cluster BasicInformation;
+  require server cluster AccessControl;
+  require server cluster GroupKeyManagement;
+  require server cluster GeneralCommissioning;
+  require server cluster AdministratorCommissioning;
+  require server cluster OperationalCredentials;
+  require server cluster GeneralDiagnostics;
+
+  // Example rejection of clusters:
+  //
+  // reject server cluster Scenes;
+  // reject server cluster Groups;
+
+  // Required only if !CustomNetworkConfig.
+  // require server cluster NetworkCommissioning;
+
+  // If Ethernet
+  // require server cluster EthernetNetworkDiagnostics;
+
+  // If WiFi
+  // require server cluster WiFiNetworkDiagnostics;
+
+  // If Thread
+  // require server cluster ThreadNetworkDiagnostics;
+}

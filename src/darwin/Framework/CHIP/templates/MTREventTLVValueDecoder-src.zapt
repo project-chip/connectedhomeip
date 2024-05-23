@@ -1,0 +1,81 @@
+{{> header excludeZapComment=true}}
+
+#import "MTREventTLVValueDecoder_Internal.h"
+
+#import "MTRStructsObjc.h"
+#import "NSStringSpanConversion.h"
+#import "NSDataSpanConversion.h"
+
+#include <app/data-model/Decode.h>
+#include <app/data-model/DecodableList.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Events.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/EventHeader.h>
+#include <app/EventLoggingTypes.h>
+#include <lib/support/TypeTraits.h>
+
+using namespace chip;
+using namespace chip::app;
+
+{{#zcl_clusters}}
+{{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+static id _Nullable DecodeEventPayloadFor{{asUpperCamelCase name preserveAcronyms=true}}Cluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::{{asUpperCamelCase name}};
+    switch (aEventId) {
+        {{#zcl_events}}
+        {{#if (isSupported (asUpperCamelCase ../name preserveAcronyms=true) event=(asUpperCamelCase name preserveAcronyms=true))}}
+        case Events::{{asUpperCamelCase name}}::Id: {
+            Events::{{asUpperCamelCase name}}::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nil;
+            }
+
+            __auto_type *value = [MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Event new];
+
+            {{#zcl_event_fields}}
+            {{#if (isSupported (asUpperCamelCase ../../name preserveAcronyms=true) event=(asUpperCamelCase ../name preserveAcronyms=true) eventField=(asStructPropertyName name))}}
+            do {
+                {{asObjectiveCType type parent.parent.name}} memberValue;
+                {{>decode_value target="memberValue" source=(concat "cppValue." (asLowerCamelCase name)) cluster=parent.parent.name errorCode="*aError = err; return nil;" depth=0}}
+                value.{{asStructPropertyName name}} = memberValue;
+            } while(0);
+            {{/if}}
+            {{/zcl_event_fields}}
+
+            return value;
+        }
+        {{/if}}
+        {{/zcl_events}}
+        default: {
+            break;
+        }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+{{/if}}
+{{/zcl_clusters}}
+
+id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    switch (aPath.mClusterId) {
+        {{#zcl_clusters}}
+        {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+        case Clusters::{{asUpperCamelCase name}}::Id: {
+            return DecodeEventPayloadFor{{asUpperCamelCase name preserveAcronyms=true}}Cluster(aPath.mEventId, aReader, aError);
+        }
+        {{/if}}
+        {{/zcl_clusters}}
+        default: {
+            break;
+        }
+    }
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}

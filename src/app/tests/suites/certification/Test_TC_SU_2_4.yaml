@@ -1,0 +1,44 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    31.5.1. [TC-SU-2.4] Tests ApplyUpdateRequest command sent by the DUT to the
+    OTA-P
+
+PICS:
+    - MCORE.OTA.Requestor
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "Step 1: DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P
+          sends a QueryImageResponse back to DUT. QueryStatus is set to
+          'UpdateAvailable'. Set ImageURI to the location where the image is
+          located. After the DUT transfers the image, the DUT should send
+          ApplyUpdateRequest to the OTA-P."
+      verification: |
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
+          Verify that the ApplyUpdateRequest message received on the OTA Provider with UpdateToken and NewVersion fields from DUT
+
+          [1673956343.962557][17737:17737] CHIP:ZCL: OTA Provider received ApplyUpdateRequest
+          [1673956343.962601][17737:17737] CHIP:ZCL:   Update Token: 32
+          [1673956343.962639][17737:17737] CHIP:ZCL:   New Version: 2
+      disabled: true

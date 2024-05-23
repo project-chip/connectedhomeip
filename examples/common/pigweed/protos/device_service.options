@@ -1,0 +1,8 @@
+chip.rpc.DeviceInfo.serial_number max_size:32  // length defined in chip spec 11.1.6.1
+chip.rpc.DeviceInfo.software_version_string max_size:64  // length defined in chip spec 11.1.6.1
+chip.rpc.DeviceState.fabric_info max_count:2
+chip.rpc.PairingInfo.qr_code max_size:256
+chip.rpc.PairingInfo.qr_code_url max_size:256
+chip.rpc.SpakeInfo.verifier max_size:97  // kSpake2p_VerifierSerialized_Length
+chip.rpc.SpakeInfo.salt max_size:32      // kSpake2p_Max_PBKDF_Salt_Length
+chip.rpc.MetadataForProvider.tlv max_size:512 // length defined in chip spec 11.20.6.7

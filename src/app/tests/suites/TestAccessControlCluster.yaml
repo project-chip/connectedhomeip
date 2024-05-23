@@ -1,0 +1,622 @@
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Access Control Cluster Tests
+
+config:
+    nodeId: 0x12344321
+    cluster: "Access Control"
+    endpoint: 0
+
+tests:
+    - label: "Wait for commissionee"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Write entries"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 0, DeviceType: null },
+                              { Cluster: 1, Endpoint: null, DeviceType: null },
+                              { Cluster: 2, Endpoint: 3, DeviceType: null },
+                          ],
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 1, # view
+                      AuthMode: 2, # case
+                      Subjects: [4, 5, 6, 7],
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 8, DeviceType: null },
+                              { Cluster: 9, Endpoint: null, DeviceType: null },
+                              { Cluster: 10, Endpoint: 11, DeviceType: null },
+                          ],
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 3, # operate
+                      AuthMode: 3, # group
+                      Subjects: [12, 13, 14, 15],
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 16, DeviceType: null },
+                              { Cluster: 17, Endpoint: null, DeviceType: null },
+                              { Cluster: 18, Endpoint: 19, DeviceType: null },
+                          ],
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 3, # operate
+                      AuthMode: 2, # case
+                      Subjects: [20, 21, 22, 23],
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 24, DeviceType: null },
+                              { Cluster: 25, Endpoint: null, DeviceType: null },
+                              { Cluster: 26, Endpoint: 27, DeviceType: null },
+                          ],
+                  },
+              ]
+
+    - label: "Verify"
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 0, DeviceType: null },
+                              { Cluster: 1, Endpoint: null, DeviceType: null },
+                              { Cluster: 2, Endpoint: 3, DeviceType: null },
+                          ],
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 1, # view
+                      AuthMode: 2, # case
+                      Subjects: [4, 5, 6, 7],
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 8, DeviceType: null },
+                              { Cluster: 9, Endpoint: null, DeviceType: null },
+                              { Cluster: 10, Endpoint: 11, DeviceType: null },
+                          ],
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 3, # operate
+                      AuthMode: 3, # group
+                      Subjects: [12, 13, 14, 15],
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 16, DeviceType: null },
+                              { Cluster: 17, Endpoint: null, DeviceType: null },
+                              { Cluster: 18, Endpoint: 19, DeviceType: null },
+                          ],
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 3, # operate
+                      AuthMode: 2, # case
+                      Subjects: [20, 21, 22, 23],
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 24, DeviceType: null },
+                              { Cluster: 25, Endpoint: null, DeviceType: null },
+                              { Cluster: 26, Endpoint: 27, DeviceType: null },
+                          ],
+                  },
+              ]
+
+    - label: "Write entries empty lists"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 1, # view
+                      AuthMode: 2, # case
+                      Subjects: [],
+                      Targets: [],
+                  },
+              ]
+
+    - label: "Verify"
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 1, # view
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]
+
+    - label: "Write entry invalid privilege"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # admin
+                      AuthMode: 3, # group
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Verify"
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]
+
+    - label: "Write entry invalid auth mode"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 1, # view
+                      AuthMode: 1, # pase
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Verify"
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]
+
+    - label: "Write entry invalid subject"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 1, # view
+                      AuthMode: 2, # case
+                      Subjects: [0],
+                      Targets: null,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Verify"
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]
+
+    - label: "Write entry invalid target"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 1, # view
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets:
+                          [{ Cluster: null, Endpoint: null, DeviceType: null }],
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Verify"
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]
+
+    - label: "Write entry too many subjects"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 1, # view
+                      AuthMode: 2, # case
+                      Subjects:
+                          [
+                              1,
+                              2,
+                              3,
+                              4,
+                              5,
+                              6,
+                              7,
+                              8,
+                              9,
+                              10,
+                              11,
+                              12,
+                              13,
+                              14,
+                              15,
+                              16,
+                              17,
+                              18,
+                              19,
+                              20,
+                          ],
+                      Targets: null,
+                  },
+              ]
+      response:
+          error: FAILURE
+
+    - label: "Verify"
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]
+
+    - label: "Write entry too many targets"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 1, # view
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 1, DeviceType: null },
+                              { Cluster: null, Endpoint: 2, DeviceType: null },
+                              { Cluster: null, Endpoint: 3, DeviceType: null },
+                              { Cluster: null, Endpoint: 4, DeviceType: null },
+                              { Cluster: null, Endpoint: 5, DeviceType: null },
+                              { Cluster: null, Endpoint: 6, DeviceType: null },
+                              { Cluster: null, Endpoint: 7, DeviceType: null },
+                              { Cluster: null, Endpoint: 8, DeviceType: null },
+                              { Cluster: null, Endpoint: 9, DeviceType: null },
+                              { Cluster: null, Endpoint: 10, DeviceType: null },
+                              { Cluster: null, Endpoint: 11, DeviceType: null },
+                              { Cluster: null, Endpoint: 12, DeviceType: null },
+                              { Cluster: null, Endpoint: 13, DeviceType: null },
+                              { Cluster: null, Endpoint: 14, DeviceType: null },
+                              { Cluster: null, Endpoint: 15, DeviceType: null },
+                              { Cluster: null, Endpoint: 16, DeviceType: null },
+                              { Cluster: null, Endpoint: 17, DeviceType: null },
+                              { Cluster: null, Endpoint: 18, DeviceType: null },
+                              { Cluster: null, Endpoint: 19, DeviceType: null },
+                              { Cluster: null, Endpoint: 20, DeviceType: null },
+                          ],
+                  },
+              ]
+      response:
+          error: FAILURE
+
+    - label: "Verify"
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]
+
+    - label: "Write too many entries"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 0, DeviceType: null },
+                              { Cluster: 1, Endpoint: null, DeviceType: null },
+                              { Cluster: 2, Endpoint: 3, DeviceType: null },
+                          ],
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 1, # view
+                      AuthMode: 2, # case
+                      Subjects: [4, 5, 6, 7],
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 8, DeviceType: null },
+                              { Cluster: 9, Endpoint: null, DeviceType: null },
+                              { Cluster: 10, Endpoint: 11, DeviceType: null },
+                          ],
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 3, # operate
+                      AuthMode: 3, # group
+                      Subjects: [12, 13, 14, 15],
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 16, DeviceType: null },
+                              { Cluster: 17, Endpoint: null, DeviceType: null },
+                              { Cluster: 18, Endpoint: 19, DeviceType: null },
+                          ],
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 1, # view
+                      AuthMode: 2, # case
+                      Subjects: [20, 21, 22, 23],
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 24, DeviceType: null },
+                              { Cluster: 25, Endpoint: null, DeviceType: null },
+                              { Cluster: 26, Endpoint: 27, DeviceType: null },
+                          ],
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 3, # operate
+                      AuthMode: 2, # case
+                      Subjects: [28, 29, 30, 31],
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 32, DeviceType: null },
+                              { Cluster: 33, Endpoint: null, DeviceType: null },
+                              { Cluster: 34, Endpoint: 35, DeviceType: null },
+                          ],
+                  },
+              ]
+      response:
+          error: RESOURCE_EXHAUSTED
+
+    - label: "Verify"
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 0, DeviceType: null },
+                              { Cluster: 1, Endpoint: null, DeviceType: null },
+                              { Cluster: 2, Endpoint: 3, DeviceType: null },
+                          ],
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 1, # view
+                      AuthMode: 2, # case
+                      Subjects: [4, 5, 6, 7],
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 8, DeviceType: null },
+                              { Cluster: 9, Endpoint: null, DeviceType: null },
+                              { Cluster: 10, Endpoint: 11, DeviceType: null },
+                          ],
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 3, # operate
+                      AuthMode: 3, # group
+                      Subjects: [12, 13, 14, 15],
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 16, DeviceType: null },
+                              { Cluster: 17, Endpoint: null, DeviceType: null },
+                              { Cluster: 18, Endpoint: 19, DeviceType: null },
+                          ],
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 1, # view
+                      AuthMode: 2, # case
+                      Subjects: [20, 21, 22, 23],
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 24, DeviceType: null },
+                              { Cluster: 25, Endpoint: null, DeviceType: null },
+                              { Cluster: 26, Endpoint: 27, DeviceType: null },
+                          ],
+                  },
+              ]
+
+    # note missing last entry
+    - label: "Restore ACL"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]
+
+    - label: "Verify"
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]
+
+    - label: "Validate resource minima (SubjectsPerAccessControlEntry)"
+      command: "readAttribute"
+      attribute: "SubjectsPerAccessControlEntry"
+      response:
+          constraints:
+              minValue: 4
+
+    - label: "Validate resource minima (TargetsPerAccessControlEntry)"
+      command: "readAttribute"
+      attribute: "TargetsPerAccessControlEntry"
+      response:
+          constraints:
+              minValue: 3
+
+    - label: "Validate resource minima (AccessControlEntriesPerFabric)"
+      command: "readAttribute"
+      attribute: "AccessControlEntriesPerFabric"
+      response:
+          constraints:
+              minValue: 4

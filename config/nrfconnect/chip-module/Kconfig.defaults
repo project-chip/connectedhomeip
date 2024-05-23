@@ -1,0 +1,506 @@
+#
+#   Copyright (c) 2022 Project CHIP Authors
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+
+# The purpose of this file is to define new default values of settings used when building Matter samples.
+# This file only changes defaults and thus all symbols here must be promptless
+# and safeguarded so that they only are applied when building Matter.
+
+if CHIP
+
+# ==============================================================================
+# System configuration
+# ==============================================================================
+
+choice LIBC_IMPLEMENTATION
+    default NEWLIB_LIBC
+endchoice
+
+config ASSERT
+    default y
+
+config ASSERT_NO_COND_INFO
+    default y
+
+config ASSERT_NO_MSG_INFO
+    default y
+
+config HW_STACK_PROTECTION
+    default y
+
+config FPU
+    default y
+
+config POSIX_MAX_FDS
+    default 16
+
+config MAIN_STACK_SIZE
+    default 6144
+
+config INIT_STACKS
+    default y
+
+config SYSTEM_WORKQUEUE_STACK_SIZE
+    default 2560 if CHIP_WIFI
+
+config HEAP_MEM_POOL_SIZE
+    default 80000 if CHIP_WIFI
+
+config CHIP_MALLOC_SYS_HEAP_SIZE
+    default 30720 if CHIP_WIFI
+    default 8192 if NET_L2_OPENTHREAD
+
+# We use sys_heap based allocators, so make sure we don't reserve unused libc heap anyway
+config COMMON_LIBC_MALLOC_ARENA_SIZE
+    default -1
+
+config NVS_LOOKUP_CACHE_SIZE
+    default 512
+
+# ==============================================================================
+# Zephyr networking configuration
+# ==============================================================================
+
+config NET_IPV6_MLD
+    default y
+
+config NET_IPV6_NBR_CACHE
+    default y if CHIP_WIFI
+    default n if NET_L2_OPENTHREAD
+
+config NET_IF_UNICAST_IPV6_ADDR_COUNT
+    default 6
+
+config NET_IF_MCAST_IPV6_ADDR_COUNT
+    default 14
+
+config NET_IF_IPV6_PREFIX_COUNT
+    default NET_IF_UNICAST_IPV6_ADDR_COUNT if CHIP_WIFI
+
+config NET_PKT_RX_COUNT
+    default 8
+
+config NET_PKT_TX_COUNT
+    default 8
+
+config NET_BUF_RX_COUNT
+    default 16
+
+config NET_BUF_TX_COUNT
+    default 16
+
+config NET_SOCKETS_POLL_MAX
+    default 6 if CHIP_WIFI
+
+# ==============================================================================
+# Bluetooth Low Energy configuration
+# ==============================================================================
+
+config BT
+    default y
+
+config BT_PERIPHERAL
+    default y
+
+config BT_PERIPHERAL_PREF_MIN_INT
+    default 36
+
+config BT_PERIPHERAL_PREF_MAX_INT
+    default 36
+
+# Increase BT timeout to 5 s to improve connection reliability and avoid fast drop outs.
+config BT_PERIPHERAL_PREF_TIMEOUT
+    default 500
+
+config BT_GAP_AUTO_UPDATE_CONN_PARAMS
+    default y
+
+# Decrease connection parameters update time, as some Matter controllers request
+# enabling IP networking faster than BT connection parameters are updated, what may result
+# in commissioning instabilities.
+config BT_CONN_PARAM_UPDATE_TIMEOUT
+    default 1000
+
+config BT_GATT_DYNAMIC_DB
+    default y
+
+config BT_DEVICE_NAME_DYNAMIC
+    default y
+
+config BT_DEVICE_NAME_MAX
+    default 15
+
+config BT_MAX_CONN
+    default 1
+
+config BT_L2CAP_TX_MTU
+    default 247
+
+config BT_BUF_ACL_RX_SIZE
+    default 251
+
+config BT_BUF_ACL_TX_SIZE
+    default 251
+
+config BT_RX_STACK_SIZE
+    default 1200
+
+# Increase maximum data length of PDU supported in the Controller
+config BT_CTLR_DATA_LENGTH_MAX
+    default 251 if SOC_SERIES_NRF52X
+
+config BT_CTLR_ECDH
+    default n
+
+config BT_CTLR_LE_ENC
+    default n
+
+config BT_DEVICE_NAME_GATT_WRITABLE
+    default n
+
+config BT_GATT_CACHING
+    default n
+
+# Disable 2M PHY due to interoperability issues.
+config BT_CTLR_PHY_2M
+    default n
+
+config MPSL_FEM_NRF21540_RUNTIME_PA_GAIN_CONTROL
+    default y if MPSL_FEM
+
+# ==============================================================================
+# NFC configuration
+# ==============================================================================
+
+config CHIP_NFC_COMMISSIONING
+    default y
+
+# Disable not needed NFC callback to save flash
+config NFC_THREAD_CALLBACK
+    default n
+
+# ==============================================================================
+# DFU configuration
+# ==============================================================================
+
+config CHIP_OTA_REQUESTOR
+    default y
+
+# All boards except nRF7002DK use QSPI NOR external flash
+config CHIP_QSPI_NOR
+    default y if BOARD_NRF5340DK_NRF5340_CPUAPP || BOARD_NRF52840DK_NRF52840
+
+# nRF7002DK uses SPI NOR external flash
+
+if BOARD_NRF7002DK_NRF5340_CPUAPP || BOARD_NRF7002DK_NRF7001_NRF5340_CPUAPP
+
+config CHIP_SPI_NOR
+    default y
+
+endif # BOARD_NRF7002DK_NRF5340_CPUAPP || BOARD_NRF7002DK_NRF7001_NRF5340_CPUAPP
+
+config BOOT_IMAGE_ACCESS_HOOKS
+    default y if SOC_SERIES_NRF53X
+
+config UPDATEABLE_IMAGE_NUMBER
+    default 3 if NRF_WIFI_PATCHES_EXT_FLASH_STORE
+    default 2 if SOC_SERIES_NRF53X
+
+config DFU_MULTI_IMAGE_MAX_IMAGE_COUNT
+    default 3 if NRF_WIFI_PATCHES_EXT_FLASH_STORE
+
+config NRF_WIFI_FW_PATCH_DFU
+    default y if NRF_WIFI_PATCHES_EXT_FLASH_STORE
+
+# ==============================================================================
+# OpenThread configuration
+# ==============================================================================
+
+config NET_L2_OPENTHREAD
+    default y if !WIFI_NRF700X
+
+if NET_L2_OPENTHREAD
+
+# Increase the default RX stack size
+config IEEE802154_NRF5_RX_STACK_SIZE
+    default 1024
+
+config OPENTHREAD_THREAD_STACK_SIZE
+    default 6144 if PSA_CRYPTO_DRIVER_CC3XX && PSA_CRYPTO_DRIVER_OBERON
+    default 4096
+
+config OPENTHREAD_DEFAULT_TX_POWER
+    default 20 if MPSL_FEM
+    default 3 if SOC_SERIES_NRF53X
+    default 8 if SOC_SERIES_NRF52X
+
+endif # NET_L2_OPENTHREAD
+
+# ==============================================================================
+# Wi-Fi configuration
+# ==============================================================================
+
+if CHIP_WIFI
+
+choice WPA_SUPP_LOG_LEVEL_CHOICE
+    default WPA_SUPP_LOG_LEVEL_ERR
+endchoice
+
+# it saves us 20kB of FLASH
+config WPA_SUPP_NO_DEBUG
+    default y
+
+config NRF700X_LOG_VERBOSE
+    default n
+
+choice WIFI_NRF700X_LOG_LEVEL_CHOICE
+    default WIFI_NRF700X_LOG_LEVEL_OFF
+endchoice
+
+config NRF_WIFI_LOW_POWER
+    default n
+
+config NRF700X_RX_NUM_BUFS
+    default 16
+
+config NRF700X_MAX_TX_TOKENS
+    default 10
+
+config NRF700X_MAX_TX_AGGREGATION
+    default 1
+
+# it saves 25kB of FLASH
+config WPA_SUPP_ADVANCED_FEATURES
+    default n
+
+endif # CHIP_WIFI
+
+# ==============================================================================
+# Crypto configuration
+# ==============================================================================
+
+choice OPENTHREAD_SECURITY
+    default OPENTHREAD_NRF_SECURITY_PSA_CHOICE if CHIP_CRYPTO_PSA
+    default OPENTHREAD_NRF_SECURITY_CHOICE
+    
+endchoice
+
+choice RNG_GENERATOR_CHOICE
+    default XOSHIRO_RANDOM_GENERATOR if SOC_SERIES_NRF53X
+endchoice
+
+config OBERON_BACKEND
+    default y
+
+config MBEDTLS_ENABLE_HEAP
+    default y
+
+config MBEDTLS_HEAP_SIZE
+    default 8192
+    
+# Enable PSA Crypto dependencies for Matter
+
+config CHIP_CRYPTO_PSA
+    default y if !CHIP_WIFI
+    imply PSA_WANT_ALG_SPAKE2P_MATTER
+
+if CHIP_CRYPTO_PSA
+
+config PSA_CRYPTO_DRIVER_CC3XX
+    default n
+
+config PSA_WANT_ALG_SHA_224
+    default n
+
+# Extend the maximum number of PSA key slots to fit Matter requirements
+config MBEDTLS_PSA_KEY_SLOT_COUNT
+    default 64
+
+if PSA_CRYPTO_DRIVER_CC3XX && PSA_CRYPTO_DRIVER_OBERON
+
+# Do not use CC3XX hash driver when both Oberon and CC3xx are enabled.
+config PSA_USE_CC3XX_HASH_DRIVER
+    default n
+
+endif # PSA_CRYPTO_DRIVER_CC3XX && PSA_CRYPTO_DRIVER_OBERON
+
+# Spake2+ support
+config MBEDTLS_MD_C
+    default y
+
+endif # CHIP_CRYPTO_PSA
+
+if !CHIP_CRYPTO_PSA
+
+config NRF_SECURITY_ADVANCED
+    default y
+
+config MBEDTLS_AES_C
+    default y
+
+config MBEDTLS_CTR_DRBG_C
+    default y
+
+config MBEDTLS_CIPHER_MODE_CTR
+    default y
+
+config MBEDTLS_SHA1_C
+    default y if CHIP_WIFI
+
+config MBEDTLS_SHA256_C
+    default y
+
+config MBEDTLS_PK_C
+    default y
+
+config MBEDTLS_PKCS5_C
+    default y
+
+config MBEDTLS_PK_WRITE_C
+    default y
+
+config MBEDTLS_X509_CREATE_C
+    default y
+
+config MBEDTLS_X509_CSR_WRITE_C
+    default y
+
+config MBEDTLS_ECP_C
+    default y
+
+config MBEDTLS_ECP_DP_SECP256R1_ENABLED
+    default y
+
+endif # !CHIP_CRYPTO_PSA
+
+config MBEDTLS_PSA_CRYPTO_EXTERNAL_RNG
+    default n if CHIP_WIFI
+
+config MBEDTLS_SSL_OUT_CONTENT_LEN
+    default 900 if CHIP_WIFI
+
+# Disable unneeded crypto operations
+
+config MBEDTLS_SHA384_C
+    default n
+
+config MBEDTLS_SHA512_C
+    default n
+
+config MBEDTLS_CIPHER_MODE_XTS
+    default n
+
+config MBEDTLS_CHACHA20_C
+    default n
+
+config MBEDTLS_POLY1305_C
+    default n
+
+config MBEDTLS_CHACHAPOLY_C
+    default n
+
+config MBEDTLS_GCM_C
+    default n
+
+config MBEDTLS_RSA_C
+    default n
+
+config MBEDTLS_SSL_SRV_C
+    default n
+
+config MBEDTLS_SSL_COOKIE_C
+    default n
+
+# ==============================================================================
+# Logging configuration
+# ==============================================================================
+
+config LOG
+    default y
+
+if LOG
+
+choice LOG_MODE
+    default LOG_MODE_MINIMAL
+endchoice
+
+choice MATTER_LOG_LEVEL_CHOICE
+    default MATTER_LOG_LEVEL_DBG
+endchoice
+
+config CHIP_APP_LOG_LEVEL
+    default 4 # debug
+
+config LOG_DEFAULT_LEVEL
+    default 1 # error
+
+config CHIP_LOG_SIZE_OPTIMIZATION
+    default y
+
+# disable synchronous printk to avoid blocking IRQs which
+# may affect time sensitive components
+config PRINTK_SYNC
+    default n
+
+endif # LOG
+
+# ==============================================================================
+# Shell configuration
+# ==============================================================================
+
+config SHELL
+    default y
+
+if SHELL
+
+config SHELL_STACK_SIZE
+    default 2616 if CHIP_WIFI
+
+config SHELL_MINIMAL
+    default y if !CHIP_MEMORY_PROFILING
+
+config KERNEL_SHELL
+    default n if !CHIP_MEMORY_PROFILING
+
+config SENSOR_SHELL
+    default n
+
+config DEVICE_SHELL
+    default n
+
+config DATE_SHELL
+    default n
+
+config DEVMEM_SHELL
+    default n
+
+config MCUBOOT_SHELL
+    default n
+
+config CLOCK_CONTROL_NRF_SHELL
+    default n
+
+config FLASH_SHELL
+    default n
+
+config HWINFO_SHELL
+    default n
+
+config OPENTHREAD_SHELL
+    default n if !CHIP_MEMORY_PROFILING
+
+endif # SHELL
+
+endif # CHIP

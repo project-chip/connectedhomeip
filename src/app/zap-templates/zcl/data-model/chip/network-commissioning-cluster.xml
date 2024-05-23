@@ -1,0 +1,226 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+    <domain name="CHIP" spec="chip-0.7" dependsOn="zcl-1.0-07-5123-03" certifiable="true"/>
+    <enum name="NetworkCommissioningStatusEnum" type="enum8">
+        <cluster code="0x0031"/>
+        <item name="Success" value="0x0"/>
+        <item name="OutOfRange" value="0x1"/>
+        <item name="BoundsExceeded" value="0x2"/>
+        <item name="NetworkIDNotFound" value="0x3"/>
+        <item name="DuplicateNetworkID" value="0x4"/>
+        <item name="NetworkNotFound" value="0x5"/>
+        <item name="RegulatoryError" value="0x6"/>
+        <item name="AuthFailure" value="0x7"/>
+        <item name="UnsupportedSecurity" value="0x8"/>
+        <item name="OtherConnectionFailure" value="0x9"/>
+        <item name="IPV6Failed" value="0xa"/>
+        <item name="IPBindFailed" value="0xb"/>
+        <item name="UnknownError" value="0xc"/>
+    </enum>
+    <enum name="WiFiBandEnum" type="enum8">
+        <cluster code="0x0031"/>
+        <item name="2G4" value="0x0"/>
+        <item name="3G65" value="0x1"/>
+        <item name="5G" value="0x2"/>
+        <item name="6G" value="0x3"/>
+        <item name="60G" value="0x4"/>
+        <item name="1G" value="0x5"/>
+    </enum>
+    <bitmap name="WiFiSecurityBitmap" type="bitmap8">
+        <cluster code="0x0031"/>
+        <field name="Unencrypted" mask="0x1"/>
+        <field name="WEP" mask="0x2"/>
+        <field name="WPA-PERSONAL" mask="0x4"/>
+        <field name="WPA2-PERSONAL" mask="0x8"/>
+        <field name="WPA3-PERSONAL" mask="0x10"/>
+        <field name="WPA3-Matter-PDC" mask="0x20"/>
+    </bitmap>
+
+    <bitmap name="ThreadCapabilitiesBitmap" type="bitmap16" apiMaturity="provisional">
+      <cluster code="0x0031"/>
+      <field name="IsBorderRouterCapable" mask="0x1"/>
+      <field name="IsRouterCapable" mask="0x2"/>
+      <field name="IsSleepyEndDeviceCapable" mask="0x4"/>
+      <field name="IsFullThreadDevice" mask="0x8"/>
+      <field name="IsSynchronizedSleepyEndDeviceCapable" mask="0x10"/>
+    </bitmap>
+
+    <struct name="WiFiInterfaceScanResultStruct">
+        <cluster code="0x0031"/>
+        <item name="Security" type="WiFiSecurityBitmap"/>
+        <item name="SSID" type="octet_string" length="32"/>
+        <item name="BSSID" type="octet_string" length="6"/>
+        <item name="Channel" type="int16u"/>
+        <item name="WiFiBand" type="WiFiBandEnum"/>
+        <item name="RSSI" type="int8s"/>
+    </struct>
+    <struct name="ThreadInterfaceScanResultStruct">
+        <cluster code="0x0031"/>
+        <item name="PanId" type="int16u"/>
+        <item name="ExtendedPanId" type="int64u"/>
+        <item name="NetworkName" type="char_string" length="16"/>
+        <item name="Channel" type="int16u"/>
+        <item name="Version" type="int8u"/>
+        <item name="ExtendedAddress" type="octet_string" length="8"/> <!-- Note: hwadr is not supported yet, use its base type (octet_string) here -->
+        <item name="RSSI" type="int8s"/>
+        <item name="LQI" type="int8u"/>
+    </struct>
+    <struct name="NetworkInfoStruct">
+        <cluster code="0x0031"/>
+        <item name="NetworkID" type="octet_string" length="32"/>
+        <item name="Connected" type="boolean"/>
+        <item name="NetworkIdentifier" type="octet_string" length="20" optional="true" isNullable="true"/>
+        <item name="ClientIdentifier" type="octet_string" length="20" optional="true" isNullable="true"/>
+    </struct>
+
+    <cluster>
+        <name>Network Commissioning</name>
+        <domain>CHIP</domain>
+        <description>Functionality to configure, enable, disable network credentials and access on a Matter device.</description>
+        <code>0x0031</code>
+        <define>NETWORK_COMMISSIONING_CLUSTER</define>
+        <client tick="false" init="false">true</client>
+        <server tick="false" init="false">true</server>
+
+        <features>
+            <feature bit="0" code="WI" name="WiFiNetworkInterface" summary="Wi-Fi related features">
+            <optionalConform choice="a"/>
+            </feature>
+            <feature bit="1" code="TH" name="ThreadNetworkInterface" summary="Thread related features">
+            <optionalConform choice="a"/>
+            </feature>
+            <feature bit="2" code="ET" name="EthernetNetworkInterface" summary="Ethernet related features">
+            <optionalConform choice="a"/>
+            </feature>
+            <feature bit="3" code="PC" name="PerDeviceCredentials" summary="Device related features">
+            <optionalConform choice="a"/>
+            </feature>
+        </features>
+
+        <attribute side="server" code="0x0000" define="MAX_NETWORKS" type="int8u" writable="false" optional="false">
+            <description>MaxNetworks</description>
+            <access op="read" privilege="administer"/>
+        </attribute>
+        <attribute side="server" code="0x0001" define="NETWORKS" type="array" entryType="NetworkInfoStruct" writable="false" optional="false">
+            <description>Networks</description>
+            <access op="read" privilege="administer"/>
+        </attribute>
+        <attribute side="server" code="0x0002" define="SCAN_MAX_TIME_SECONDS" type="int8u" writable="false" optional="true">ScanMaxTimeSeconds</attribute>
+        <attribute side="server" code="0x0003" define="CONNECT_MAX_TIME_SECONDS" type="int8u" writable="false" optional="true">ConnectMaxTimeSeconds</attribute>
+        <attribute side="server" code="0x0004" define="INTERFACE_ENABLED" type="boolean" writable="true" optional="false">
+            <description>InterfaceEnabled</description>
+            <access op="read" privilege="view"/>
+            <access op="write" privilege="administer"/>
+        </attribute>
+        <attribute side="server" code="0x0005" define="LAST_NETWORKING_STATUS" type="NetworkCommissioningStatusEnum" writable="false" optional="false" isNullable="true">
+            <description>LastNetworkingStatus</description>
+            <access op="read" privilege="administer"/>
+        </attribute>
+        <attribute side="server" code="0x0006" define="LAST_NETWORK_ID" type="octet_string" length="32" writable="false" optional="false" isNullable="true">
+            <description>LastNetworkID</description>
+            <access op="read" privilege="administer"/>
+        </attribute>
+        <attribute side="server" code="0x0007" define="LAST_CONNECT_ERROR_VALUE" type="int32s" writable="false" optional="false" isNullable="true">
+            <description>LastConnectErrorValue</description>
+            <access op="read" privilege="administer"/>
+        </attribute>
+        <attribute side="server" code="0x0008" define="SUPPORTED_WIFI_BANDS" type="array" entryType="WiFiBandEnum" writable="false" optional="true" apiMaturity="provisional">
+          <description>SupportedWiFiBands</description>
+        </attribute>
+        <attribute side="server" code="0x0009" define="SUPPORTED_THREAD_FEATURES" type="ThreadCapabilitiesBitmap" writable="false" optional="true" apiMaturity="provisional">
+          <description>SupportedThreadFeatures</description>
+        </attribute>
+        <attribute side="server" code="0x000A" define="THREAD_VERSION" type="int16u" writable="false" optional="true" apiMaturity="provisional">
+          <description>ThreadVersion</description>
+        </attribute>
+
+        <command source="client" code="0x00" name="ScanNetworks" optional="true" response="ScanNetworksResponse" cli="chip network_commissioning scannetworks">
+            <description>Detemine the set of networks the device sees as available.</description>
+            <arg name="SSID" type="octet_string" length="32" isNullable="true" optional="true"/>
+            <arg name="Breadcrumb" type="int64u" optional="true"/>
+            <access op="invoke" privilege="administer"/>
+        </command>
+        <command source="server" code="0x01" name="ScanNetworksResponse" optional="true" cli="chip network_commissioning scannetworksresponse">
+            <description>Relay the set of networks the device sees as available back to the client.</description>
+            <arg name="NetworkingStatus" type="NetworkCommissioningStatusEnum"/>
+            <arg name="DebugText" type="char_string" optional="true"/>
+            <arg name="WiFiScanResults" type="WiFiInterfaceScanResultStruct" array="true" optional="true"/>
+            <arg name="ThreadScanResults" type="ThreadInterfaceScanResultStruct" array="true" optional="true"/>
+        </command>
+        <command source="client" code="0x02" name="AddOrUpdateWiFiNetwork" optional="true" response="NetworkConfigResponse" cli="chip network_commissioning addorupdatewifinetwork">
+            <description>Add or update the credentials for a given Wi-Fi network.</description>
+            <arg name="SSID" type="octet_string" length="32"/>
+            <arg name="Credentials" type="octet_string" length="64"/>
+            <arg name="Breadcrumb" type="int64u" optional="true"/>
+            <arg name="NetworkIdentity" type="octet_string" length="140" optional="true"/>
+            <arg name="ClientIdentifier" type="octet_string" length="20" optional="true"/>
+            <arg name="PossessionNonce" type="octet_string" length="32" optional="true"/>
+            <access op="invoke" privilege="administer"/>
+        </command>
+        <command source="client" code="0x03" name="AddOrUpdateThreadNetwork" optional="true" response="NetworkConfigResponse" cli="chip network_commissioning addorupdatethreadnetwork">
+            <description>Add or update the credentials for a given Thread network.</description>
+            <arg name="OperationalDataset" type="octet_string" length="254"/>
+            <arg name="Breadcrumb" type="int64u" optional="true"/>
+            <access op="invoke" privilege="administer"/>
+        </command>
+        <command source="client" code="0x04" name="RemoveNetwork" optional="true" response="NetworkConfigResponse" cli="chip network_commissioning removenetwork">
+            <description>Remove the definition of a given network (including its credentials).</description>
+            <arg name="NetworkID" type="octet_string" length="32"/>
+            <arg name="Breadcrumb" type="int64u" optional="true"/>
+            <access op="invoke" privilege="administer"/>
+        </command>
+        <command source="server" code="0x05" name="NetworkConfigResponse" optional="true" cli="chip network_commissioning addwifiresponse">
+            <description>Response command for various commands that add/remove/modify network credentials.</description>
+            <arg name="NetworkingStatus" type="NetworkCommissioningStatusEnum"/>
+            <arg name="DebugText" type="char_string" length="512" optional="true" />
+            <arg name="NetworkIndex" type="int8u" optional="true" />
+            <arg name="ClientIdentity" type="octet_string" length="140" optional="true"/>
+            <arg name="PossessionSignature" type="octet_string" length="64" optional="true"/>
+        </command>
+        <command source="client" code="0x06" name="ConnectNetwork" optional="true" response="ConnectNetworkResponse" cli="chip network_commissioning connectnetwork">
+            <description>Connect to the specified network, using previously-defined credentials.</description>
+            <arg name="NetworkID" type="octet_string" length="32"/>
+            <arg name="Breadcrumb" type="int64u" optional="true"/>
+            <access op="invoke" privilege="administer"/>
+        </command>
+        <command source="server" code="0x07" name="ConnectNetworkResponse" optional="true" cli="chip network_commissioning connectnetworkresponse">
+            <description>Command that indicates whether we have succcessfully connected to a network.</description>
+            <arg name="NetworkingStatus" type="NetworkCommissioningStatusEnum"/>
+            <arg name="DebugText" type="char_string" optional="true"/>
+            <arg name="ErrorValue" type="int32s" isNullable="true"/>
+        </command>
+        <command source="client" code="0x08" name="ReorderNetwork" optional="true" response="NetworkConfigResponse" cli="chip network_commissioning connectnetwork">
+            <description>Modify the order in which networks will be presented in the Networks attribute.</description>
+            <arg name="NetworkID" type="octet_string" length="32"/>
+            <arg name="NetworkIndex" type="int8u"/>
+            <arg name="Breadcrumb" type="int64u" optional="true"/>
+            <access op="invoke" privilege="administer"/>
+        </command>
+        <command source="client" code="0x09" name="QueryIdentity" optional="true" response="QueryIdentityResponse" cli="chip network_commissioning queryidentity">
+            <description>Retrieve details about and optionally proof of possession of a network client identity.</description>
+            <arg name="KeyIdentifier" type="octet_string" length="20"/>
+            <arg name="PossessionNonce" type="octet_string" length="32" optional="true"/>
+            <access op="invoke" privilege="administer"/>
+        </command>
+        <command source="server" code="0x0a" name="QueryIdentityResponse" optional="true">
+            <description>Command that contains details about a network client identity and optionally a proof of possession.</description>
+            <arg name="Identity" type="octet_string" length="140"/>
+            <arg name="PossessionSignature" type="octet_string" length="64" optional="true"/>
+        </command>
+    </cluster>
+</configurator>

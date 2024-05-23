@@ -1,0 +1,36 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+static_library("records") {
+  sources = [
+    "IP.cpp",
+    "IP.h",
+    "Ptr.h",
+    "ResourceRecord.cpp",
+    "ResourceRecord.h",
+    "Srv.h",
+    "Txt.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/inet",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/dnssd/minimal_mdns/core",
+    "${chip_root}/src/platform",
+  ]
+
+  cflags = [ "-Wconversion" ]
+}

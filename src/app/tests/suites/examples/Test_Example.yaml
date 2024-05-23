@@ -1,0 +1,35 @@
+tests:
+    - label: "Examples Test Step 1"
+      cluster: "ExampleCluster"
+      command: "writeAttribute"
+      attribute: "exampleAttribute"
+      arguments:
+          value: 255
+
+    - label: "Examples Test Step 2"
+      cluster: "ExampleCluster"
+      command: "readAttribute"
+      attribute: "exampleAttribute"
+      response: # Validates the response variables of the commands
+          value: 255
+
+    - label: "Examples Test Step 3"
+      cluster: "ExampleCluster"
+      command: "ExamplesCommand"
+      response: # Validates the response variables of the commands
+          saveAs: nameOfSaveVariable
+          values:
+              - name: "exampleResponseVariable"
+                value: 1
+      timedInteractionTimeoutMs: 10000
+      PICS: RUN_ONLY_IF_ENABLED
+      arguments:
+          values:
+              - name: "arg1"
+                value: 0
+              - name: "arg2"
+                value: { Key1: 1, Key2: 2 }
+              - name: "stringExamples"
+                value: "Hello World"
+              - name: "fromSaveAs"
+                value: nameOfSaveVariable

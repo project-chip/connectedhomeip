@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021-2023 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+  <cluster>
+    <domain>Media</domain>
+    <name>Media Input</name>
+    <code>0x0507</code>
+    <define>MEDIA_INPUT_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+
+    <description>This cluster provides an interface for controlling the Input Selector on a media device such as a TV.</description>
+
+    <features>
+      <feature bit="0" code="NU" name="NameUpdates" summary="Supports updates to the input names">
+        <optionalConform/>
+      </feature>
+    </features>
+
+    <attribute side="server" code="0x0000" define="MEDIA_INPUT_LIST"          type="array" entryType="InputInfoStruct" length="254"           writable="false" optional="false">InputList</attribute>
+    <attribute side="server" code="0x0001" define="MEDIA_INPUT_CURRENT_INPUT" type="int8u" default="0x00"              min="0x00" max="0xFF"  writable="false" optional="false">CurrentInput</attribute>
+
+    <command source="client" code="0x00" name="SelectInput" optional="false">
+      <description>Upon receipt, this SHALL change the input on the media device to the input at a specific index in the Input List.</description>
+      <arg name="Index" type="int8u"/>
+    </command>
+
+    <command source="client" code="0x01" name="ShowInputStatus" optional="false">
+      <description>Upon receipt, this SHALL display the active status of the input list on screen.</description>
+    </command>
+
+    <command source="client" code="0x02" name="HideInputStatus" optional="false">
+      <description>Upon receipt, this SHALL hide the input list from the screen.</description>
+    </command>
+
+    <command source="client" code="0x03" name="RenameInput" optional="true">
+      <description>Upon receipt, this SHALL rename the input at a specific index in the Input List. Updates to the input name SHALL appear in the TV settings menus.    </description>
+      <access op="invoke" privilege="manage"/>
+      <arg name="Index" type="int8u"/>
+      <arg name="Name" type="char_string"/>
+    </command>
+
+  </cluster>
+
+  <struct name="InputInfoStruct">
+    <cluster code="0x0507"/>
+    <item name="Index" type="int8u"/>
+    <item name="InputType" type="InputTypeEnum"/>
+    <item name="Name" type="char_string"/>
+    <item name="Description" type="char_string"/>
+  </struct>
+
+  <enum name="InputTypeEnum" type="enum8">
+    <cluster code="0x0507"/>
+    <item name="Internal" value="0x00"/>
+    <item name="Aux" value="0x01"/>
+    <item name="Coax" value="0x02"/>
+    <item name="Composite" value="0x03"/>
+    <item name="HDMI" value="0x04"/>
+    <item name="Input" value="0x05"/>
+    <item name="Line" value="0x06"/>
+    <item name="Optical" value="0x07"/>
+    <item name="Video" value="0x08"/>
+    <item name="SCART" value="0x09"/>
+    <item name="USB" value="0x0A"/>
+    <item name="Other" value="0x0B"/>
+  </enum>
+
+
+</configurator>

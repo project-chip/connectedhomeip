@@ -1,0 +1,133 @@
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Events Tests
+
+config:
+    nodeId: 0x12344321
+    cluster: "Unit Testing"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Check there is no event on the target endpoint"
+      command: "readEvent"
+      event: "TestEvent"
+      response: []
+
+    - label: "Check reading events from an invalid endpoint"
+      command: "readEvent"
+      event: "TestEvent"
+      endpoint: 0
+      response:
+          error: UNSUPPORTED_CLUSTER
+
+    - label: "Generate an event on the accessory"
+      command: "TestEmitTestEventRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: 1
+              - name: "arg2"
+                value: 2
+              - name: "arg3"
+                value: true
+      response:
+          values:
+              - name: "value"
+                saveAs: eventNumber
+
+    - label: "Read the event back"
+      command: "readEvent"
+      event: "TestEvent"
+      response:
+          value: { arg1: 1, arg2: 2, arg3: true }
+
+    - label: "Read the event with eventNumber set to the event value"
+      command: "readEvent"
+      event: "TestEvent"
+      eventNumber: eventNumber
+      response:
+          value: { arg1: 1, arg2: 2, arg3: true }
+
+    - label: "Read the event with eventNumber set to the event value + 1"
+      command: "readEvent"
+      event: "TestEvent"
+      eventNumber: eventNumber + 1
+      response: []
+
+    - label: "Generate a second event on the accessory"
+      command: "TestEmitTestEventRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: 3
+              - name: "arg2"
+                value: 1
+              - name: "arg3"
+                value: false
+      response:
+          values:
+              - name: "value"
+                value: eventNumber + 1
+
+    - label: "Read the event back"
+      command: "readEvent"
+      event: "TestEvent"
+      response:
+          - values:
+                - value: { arg1: 1, arg2: 2, arg3: true }
+          - values:
+                - value: { arg1: 3, arg2: 1, arg3: false }
+
+    - label: "Subscribe to the event"
+      command: "subscribeEvent"
+      event: "TestEvent"
+      minInterval: 3
+      maxInterval: 5
+      response:
+          - values:
+                - value: { arg1: 1, arg2: 2, arg3: true }
+          - values:
+                - value: { arg1: 3, arg2: 1, arg3: false }
+
+    - label: "Generate a third event on the accessory"
+      command: "TestEmitTestEventRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: 4
+              - name: "arg2"
+                value: 3
+              - name: "arg3"
+                value: true
+      response:
+          values:
+              - name: "value"
+                value: eventNumber + 2
+
+    - label: "Check for event report"
+      command: "waitForReport"
+      event: "TestEvent"
+      response:
+          values:
+              - name: "TestEvent"
+                value: { arg1: 4, arg2: 3, arg3: true }

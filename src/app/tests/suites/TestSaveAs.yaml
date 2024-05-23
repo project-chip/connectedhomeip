@@ -1,0 +1,839 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Test Cluster Tests
+
+config:
+    nodeId: 0x12344321
+    cluster: "Unit Testing"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Send Test Add Arguments Command"
+      command: "TestAddArguments"
+      arguments:
+          values:
+              - name: "arg1"
+                value: 3
+              - name: "arg2"
+                value: 17
+      response:
+          values:
+              - name: "returnValue"
+                saveAs: TestAddArgumentDefaultValue
+                value: 20
+
+    - label: "Send Test Add Arguments Command"
+      command: "TestAddArguments"
+      arguments:
+          values:
+              - name: "arg1"
+                value: 3
+              - name: "arg2"
+                value: 17
+      response:
+          values:
+              - name: "returnValue"
+                value: TestAddArgumentDefaultValue
+
+    - label: "Send Test Add Arguments Command"
+      command: "TestAddArguments"
+      arguments:
+          values:
+              - name: "arg1"
+                value: 3
+              - name: "arg2"
+                value: TestAddArgumentDefaultValue
+      response:
+          values:
+              - name: "returnValue"
+                constraints:
+                    notValue: TestAddArgumentDefaultValue
+
+    # Tests for Boolean attribute
+
+    - label: "Read attribute BOOLEAN Default Value"
+      command: "readAttribute"
+      attribute: "boolean"
+      response:
+          saveAs: readAttributeBooleanDefaultValue
+          value: 0
+
+    - label: "Write attribute BOOLEAN Not Default Value"
+      command: "writeAttribute"
+      attribute: "boolean"
+      arguments:
+          value: 1
+
+    - label: "Read attribute BOOLEAN Not Default Value"
+      command: "readAttribute"
+      attribute: "boolean"
+      response:
+          constraints:
+              notValue: readAttributeBooleanDefaultValue
+
+    - label: "Write attribute BOOLEAN DefaultValue"
+      command: "writeAttribute"
+      attribute: "boolean"
+      arguments:
+          value: readAttributeBooleanDefaultValue
+
+    - label: "Read attribute BOOLEAN False"
+      command: "readAttribute"
+      attribute: "boolean"
+      response:
+          value: readAttributeBooleanDefaultValue
+
+    # Tests for Bitmap8 attribute
+
+    - label: "Read attribute BITMAP8 Default Value"
+      command: "readAttribute"
+      attribute: "bitmap8"
+      response:
+          saveAs: readAttributeBitmap8DefaultValue
+          value: 0
+
+    - label: "Write attribute BITMAP8 Not Default Value"
+      command: "writeAttribute"
+      attribute: "bitmap8"
+      arguments:
+          value: 1
+
+    - label: "Read attribute BITMAP8 Not Default Value"
+      command: "readAttribute"
+      attribute: "bitmap8"
+      response:
+          constraints:
+              notValue: readAttributeBitmap8DefaultValue
+
+    - label: "Write attribute BITMAP8 Default Value"
+      command: "writeAttribute"
+      attribute: "bitmap8"
+      arguments:
+          value: readAttributeBitmap8DefaultValue
+
+    - label: "Read attribute BITMAP8 Default Value"
+      command: "readAttribute"
+      attribute: "bitmap8"
+      response:
+          value: readAttributeBitmap8DefaultValue
+
+    # Tests for Bitmap16 attribute
+
+    - label: "Read attribute BITMAP16 Default Value"
+      command: "readAttribute"
+      attribute: "bitmap16"
+      response:
+          saveAs: readAttributeBitmap16DefaultValue
+          value: 0
+
+    - label: "Write attribute BITMAP16 Not Default Value"
+      command: "writeAttribute"
+      attribute: "bitmap16"
+      arguments:
+          value: 1
+
+    - label: "Read attribute BITMAP16 Not Default Value"
+      command: "readAttribute"
+      attribute: "bitmap16"
+      response:
+          constraints:
+              notValue: readAttributeBitmap16DefaultValue
+
+    - label: "Write attribute BITMAP16 Default Value"
+      command: "writeAttribute"
+      attribute: "bitmap16"
+      arguments:
+          value: readAttributeBitmap16DefaultValue
+
+    - label: "Read attribute BITMAP16 Default Value"
+      command: "readAttribute"
+      attribute: "bitmap16"
+      response:
+          value: readAttributeBitmap16DefaultValue
+
+    # Tests for Bitmap32 attribute
+
+    - label: "Read attribute BITMAP32 Default Value"
+      command: "readAttribute"
+      attribute: "bitmap32"
+      response:
+          saveAs: readAttributeBitmap32DefaultValue
+          value: 0
+
+    - label: "Write attribute BITMAP32 Not Default Value"
+      command: "writeAttribute"
+      attribute: "bitmap32"
+      arguments:
+          value: 1
+
+    - label: "Read attribute BITMAP32 Not Default Value"
+      command: "readAttribute"
+      attribute: "bitmap32"
+      response:
+          constraints:
+              notValue: readAttributeBitmap32DefaultValue
+
+    - label: "Write attribute BITMAP32 Default Value"
+      command: "writeAttribute"
+      attribute: "bitmap32"
+      arguments:
+          value: readAttributeBitmap32DefaultValue
+
+    - label: "Read attribute BITMAP32 Default Value"
+      command: "readAttribute"
+      attribute: "bitmap32"
+      response:
+          value: readAttributeBitmap32DefaultValue
+
+    # Tests for Bitmap64 attribute
+
+    - label: "Read attribute BITMAP64 Default Value"
+      command: "readAttribute"
+      attribute: "bitmap64"
+      response:
+          saveAs: readAttributeBitmap64DefaultValue
+          value: 0
+
+    - label: "Write attribute BITMAP64 Not Default Value"
+      command: "writeAttribute"
+      attribute: "bitmap64"
+      arguments:
+          value: 1
+
+    - label: "Read attribute BITMAP64 Default Value"
+      command: "readAttribute"
+      attribute: "bitmap64"
+      response:
+          constraints:
+              notValue: readAttributeBitmap64DefaultValue
+
+    - label: "Write attribute BITMAP64 Default Value"
+      command: "writeAttribute"
+      attribute: "bitmap64"
+      arguments:
+          value: readAttributeBitmap64DefaultValue
+
+    - label: "Read attribute BITMAP64 Default Value"
+      command: "readAttribute"
+      attribute: "bitmap64"
+      response:
+          value: readAttributeBitmap64DefaultValue
+
+    # Tests for UInt8 attribute
+
+    - label: "Read attribute INT8U Default Value"
+      command: "readAttribute"
+      attribute: "int8u"
+      response:
+          saveAs: readAttributeInt8uDefaultValue
+          value: 0
+
+    - label: "Write attribute INT8U Not Default Value"
+      command: "writeAttribute"
+      attribute: "int8u"
+      arguments:
+          value: 1
+
+    - label: "Read attribute INT8U Not Default Value"
+      command: "readAttribute"
+      attribute: "int8u"
+      response:
+          constraints:
+              notValue: readAttributeInt8uDefaultValue
+
+    - label: "Write attribute INT8U Default Value"
+      command: "writeAttribute"
+      attribute: "int8u"
+      arguments:
+          value: readAttributeInt8uDefaultValue
+
+    - label: "Read attribute INT8U Default Value"
+      command: "readAttribute"
+      attribute: "int8u"
+      response:
+          value: readAttributeInt8uDefaultValue
+
+    # Tests for UInt16 attribute
+
+    - label: "Read attribute INT16U Default Value"
+      command: "readAttribute"
+      attribute: "int16u"
+      response:
+          saveAs: readAttributeInt16uDefaultValue
+          value: 0
+
+    - label: "Write attribute INT16U Not Default Value"
+      command: "writeAttribute"
+      attribute: "int16u"
+      arguments:
+          value: 1
+
+    - label: "Read attribute INT16U Not Default Value"
+      command: "readAttribute"
+      attribute: "int16u"
+      response:
+          constraints:
+              notValue: readAttributeInt16uDefaultValue
+
+    - label: "Write attribute INT16U Default Value"
+      command: "writeAttribute"
+      attribute: "int16u"
+      arguments:
+          value: readAttributeInt16uDefaultValue
+
+    - label: "Read attribute INT16U Default Value"
+      command: "readAttribute"
+      attribute: "int16u"
+      response:
+          value: readAttributeInt16uDefaultValue
+
+    # Tests for UInt32 attribute
+
+    - label: "Read attribute INT32U Default Value"
+      command: "readAttribute"
+      attribute: "int32u"
+      response:
+          saveAs: readAttributeInt32uDefaultValue
+          value: 0
+
+    - label: "Write attribute INT32U Not Default Value"
+      command: "writeAttribute"
+      attribute: "int32u"
+      arguments:
+          value: 1
+
+    - label: "Read attribute INT32U Not Default Value"
+      command: "readAttribute"
+      attribute: "int32u"
+      response:
+          constraints:
+              notValue: readAttributeInt32uDefaultValue
+
+    - label: "Write attribute INT32U Default Value"
+      command: "writeAttribute"
+      attribute: "int32u"
+      arguments:
+          value: readAttributeInt32uDefaultValue
+
+    - label: "Read attribute INT32U Default Value"
+      command: "readAttribute"
+      attribute: "int32u"
+      response:
+          value: readAttributeInt32uDefaultValue
+
+    # Tests for UInt64 attribute
+
+    - label: "Read attribute INT64U Default Value"
+      command: "readAttribute"
+      attribute: "int64u"
+      response:
+          saveAs: readAttributeInt64uDefaultValue
+          value: 0
+
+    - label: "Write attribute INT64U Not Default Value"
+      command: "writeAttribute"
+      attribute: "int64u"
+      arguments:
+          value: 1
+
+    - label: "Read attribute INT64U Not Default Value"
+      command: "readAttribute"
+      attribute: "int64u"
+      response:
+          constraints:
+              notValue: readAttributeInt64uDefaultValue
+
+    - label: "Write attribute INT64U Default Value"
+      command: "writeAttribute"
+      attribute: "int64u"
+      arguments:
+          value: readAttributeInt64uDefaultValue
+
+    - label: "Read attribute INT64U Default Value"
+      command: "readAttribute"
+      attribute: "int64u"
+      response:
+          value: readAttributeInt64uDefaultValue
+
+    # Tests for Int8 attribute
+
+    - label: "Read attribute INT8S Default Value"
+      command: "readAttribute"
+      attribute: "int8s"
+      response:
+          saveAs: readAttributeInt8sDefaultValue
+          value: 0
+
+    - label: "Write attribute INT8S Not Default Value"
+      command: "writeAttribute"
+      attribute: "int8s"
+      arguments:
+          value: 1
+
+    - label: "Read attribute INT8S Not Default Value"
+      command: "readAttribute"
+      attribute: "int8s"
+      response:
+          constraints:
+              notValue: readAttributeInt8sDefaultValue
+
+    - label: "Write attribute INT8S Default Value"
+      command: "writeAttribute"
+      attribute: "int8s"
+      arguments:
+          value: readAttributeInt8sDefaultValue
+
+    - label: "Read attribute INT8S Default Value"
+      command: "readAttribute"
+      attribute: "int8s"
+      response:
+          value: readAttributeInt8sDefaultValue
+
+    # Tests for Int16 attribute
+
+    - label: "Read attribute INT16S Default Value"
+      command: "readAttribute"
+      attribute: "int16s"
+      response:
+          saveAs: readAttributeInt16sDefaultValue
+          value: 0
+
+    - label: "Write attribute INT16S Not Default Value"
+      command: "writeAttribute"
+      attribute: "int16s"
+      arguments:
+          value: 1
+
+    - label: "Read attribute INT16S Not Default Value"
+      command: "readAttribute"
+      attribute: "int16s"
+      response:
+          constraints:
+              notValue: readAttributeInt16sDefaultValue
+
+    - label: "Write attribute INT16S Default Value"
+      command: "writeAttribute"
+      attribute: "int16s"
+      arguments:
+          value: readAttributeInt16sDefaultValue
+
+    - label: "Read attribute INT16S Default Value"
+      command: "readAttribute"
+      attribute: "int16s"
+      response:
+          value: readAttributeInt16sDefaultValue
+
+    # Tests for Int32 attribute
+
+    - label: "Read attribute INT32S Default Value"
+      command: "readAttribute"
+      attribute: "int32s"
+      response:
+          saveAs: readAttributeInt32sDefaultValue
+          value: 0
+
+    - label: "Write attribute INT32S Not Default Value"
+      command: "writeAttribute"
+      attribute: "int32s"
+      arguments:
+          value: 1
+
+    - label: "Read attribute INT32S Not Default Value"
+      command: "readAttribute"
+      attribute: "int32s"
+      response:
+          constraints:
+              notValue: readAttributeInt32sDefaultValue
+
+    - label: "Write attribute INT32S Default Value"
+      command: "writeAttribute"
+      attribute: "int32s"
+      arguments:
+          value: readAttributeInt32sDefaultValue
+
+    - label: "Read attribute INT32S Default Value"
+      command: "readAttribute"
+      attribute: "int32s"
+      response:
+          value: readAttributeInt32sDefaultValue
+
+    # Tests for Int64 attribute
+
+    - label: "Read attribute INT64S Default Value"
+      command: "readAttribute"
+      attribute: "int64s"
+      response:
+          saveAs: readAttributeInt64sDefaultValue
+          value: 0
+
+    - label: "Write attribute INTS Not Default Value"
+      command: "writeAttribute"
+      attribute: "int64s"
+      arguments:
+          value: 1
+
+    - label: "Read attribute INT64S Not Default Value"
+      command: "readAttribute"
+      attribute: "int64s"
+      response:
+          constraints:
+              notValue: readAttributeInt64sDefaultValue
+
+    - label: "Write attribute INT64S Default Value"
+      command: "writeAttribute"
+      attribute: "int64s"
+      arguments:
+          value: readAttributeInt64sDefaultValue
+
+    - label: "Read attribute INT64S Default Value"
+      command: "readAttribute"
+      attribute: "int64s"
+      response:
+          value: readAttributeInt64sDefaultValue
+
+    # Tests for Enum8 attribute
+
+    - label: "Read attribute ENUM8 Default Value"
+      command: "readAttribute"
+      attribute: "enum8"
+      response:
+          saveAs: readAttributeEnum8DefaultValue
+          value: 0
+
+    - label: "Write attribute ENUM8 Not Default Value"
+      command: "writeAttribute"
+      attribute: "enum8"
+      arguments:
+          value: 1
+
+    - label: "Read attribute ENUM8 Not Default Value"
+      command: "readAttribute"
+      attribute: "enum8"
+      response:
+          constraints:
+              notValue: readAttributeEnum8DefaultValue
+
+    - label: "Write attribute ENUM8 Default Value"
+      command: "writeAttribute"
+      attribute: "enum8"
+      arguments:
+          value: readAttributeEnum8DefaultValue
+
+    - label: "Read attribute ENUM8 Default Value"
+      command: "readAttribute"
+      attribute: "enum8"
+      response:
+          value: readAttributeEnum8DefaultValue
+
+    # Tests for Enum16 attribute
+
+    - label: "Read attribute ENUM16 Default Value"
+      command: "readAttribute"
+      attribute: "enum16"
+      response:
+          saveAs: readAttributeEnum16DefaultValue
+          value: 0
+
+    - label: "Write attribute ENUM16 Not Default Value"
+      command: "writeAttribute"
+      attribute: "enum16"
+      arguments:
+          value: 1
+
+    - label: "Read attribute ENUM16 Not Default Value"
+      command: "readAttribute"
+      attribute: "enum16"
+      response:
+          constraints:
+              notValue: readAttributeEnum16DefaultValue
+
+    - label: "Write attribute ENUM16 Default Value"
+      command: "writeAttribute"
+      attribute: "enum16"
+      arguments:
+          value: readAttributeEnum16DefaultValue
+
+    - label: "Read attribute ENUM16 Default Value"
+      command: "readAttribute"
+      attribute: "enum16"
+      response:
+          value: readAttributeEnum16DefaultValue
+
+    # Tests for Epoch Microseconds
+
+    - label: "Read attribute EPOCH_US Default Value"
+      command: "readAttribute"
+      attribute: "epoch_us"
+      response:
+          saveAs: readAttributeEpochUSDefaultValue
+          value: 0
+
+    - label: "Write attribute EPOCH_US Not Default Value"
+      command: "writeAttribute"
+      attribute: "epoch_us"
+      arguments:
+          value: 1
+
+    - label: "Read attribute EPOCH_US Not Default Value"
+      command: "readAttribute"
+      attribute: "epoch_us"
+      response:
+          constraints:
+              notValue: readAttributeEpochUSDefaultValue
+
+    - label: "Write attribute EPOCH_US Default Value"
+      command: "writeAttribute"
+      attribute: "epoch_us"
+      arguments:
+          value: readAttributeEpochUSDefaultValue
+
+    - label: "Read attribute EPOCH_US Default Value"
+      command: "readAttribute"
+      attribute: "epoch_us"
+      response:
+          value: readAttributeEpochUSDefaultValue
+
+    # Tests for Epoch Seconds
+
+    - label: "Read attribute EPOCH_S Default Value"
+      command: "readAttribute"
+      attribute: "epoch_s"
+      response:
+          saveAs: readAttributeEpochSDefaultValue
+          value: 0
+
+    - label: "Write attribute EPOCH_S Not Default Value"
+      command: "writeAttribute"
+      attribute: "epoch_s"
+      arguments:
+          value: 1
+
+    - label: "Read attribute EPOCH_S Not Default Value"
+      command: "readAttribute"
+      attribute: "epoch_s"
+      response:
+          constraints:
+              notValue: readAttributeEpochSDefaultValue
+
+    - label: "Write attribute EPOCH_S Default Value"
+      command: "writeAttribute"
+      attribute: "epoch_s"
+      arguments:
+          value: readAttributeEpochSDefaultValue
+
+    - label: "Read attribute EPOCH_S Default Value"
+      command: "readAttribute"
+      attribute: "epoch_s"
+      response:
+          value: readAttributeEpochSDefaultValue
+
+    # Tests for vendor id
+
+    - label: "Read attribute vendor_id Default Value"
+      command: "readAttribute"
+      attribute: "vendor_id"
+      response:
+          saveAs: readAttributeVendorIdDefaultValue
+          value: 0
+
+    - label: "Write attribute vendor_id Not Default Value"
+      command: "writeAttribute"
+      attribute: "vendor_id"
+      arguments:
+          value: 1
+
+    - label: "Read attribute vendor_id Not Default Value"
+      command: "readAttribute"
+      attribute: "vendor_id"
+      response:
+          constraints:
+              notValue: readAttributeVendorIdDefaultValue
+
+    - label: "Write attribute vendor_id Default Value"
+      command: "writeAttribute"
+      attribute: "vendor_id"
+      arguments:
+          value: readAttributeVendorIdDefaultValue
+
+    - label: "Read attribute vendor_id Default Value"
+      command: "readAttribute"
+      attribute: "vendor_id"
+      response:
+          value: readAttributeVendorIdDefaultValue
+
+    # Tests for CHAR_STRING
+
+    - label: "Read attribute char_string Default Value"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          saveAs: readAttributeCharStringDefaultValue
+          value: ""
+
+    - label:
+          "Read attribute char_string Default Value and compare to saved value"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          value: readAttributeCharStringDefaultValue
+
+    - label: "Write attribute char_string Not Default Value"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: "NotDefault"
+
+    - label: "Read attribute char_string Not Default Value"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          saveAs: readAttributeCharStringNotDefaultValue
+          value: "NotDefault"
+          constraints:
+              notValue: readAttributeCharStringDefaultValue
+
+    - label:
+          "Read attribute char_string Not Default Value and compare to saved
+          value"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          value: readAttributeCharStringNotDefaultValue
+          constraints:
+              notValue: readAttributeCharStringDefaultValue
+
+    - label: "Write attribute char_string Not Default Value from saved value"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: readAttributeCharStringNotDefaultValue
+
+    - label:
+          "Read attribute char_string Not Default Value and compare to expected
+          value"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          value: "NotDefault"
+
+    - label: "Write attribute char_string Default Value"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: readAttributeCharStringDefaultValue
+
+    # Tests for OCTET_STRING
+
+    - label: "Read attribute octet_string Default Value"
+      command: "readAttribute"
+      attribute: "octet_string"
+      response:
+          saveAs: readAttributeOctetStringDefaultValue
+          value: ""
+
+    - label:
+          "Read attribute octet_string Default Value and compare to saved value"
+      command: "readAttribute"
+      attribute: "octet_string"
+      response:
+          value: readAttributeOctetStringDefaultValue
+
+    - label: "Write attribute octet_string Not Default Value"
+      command: "writeAttribute"
+      attribute: "octet_string"
+      arguments:
+          value: "NotDefault"
+
+    - label: "Read attribute octet_string Not Default Value"
+      command: "readAttribute"
+      attribute: "octet_string"
+      response:
+          saveAs: readAttributeOctetStringNotDefaultValue
+          value: "NotDefault"
+          constraints:
+              notValue: readAttributeOctetStringDefaultValue
+
+    - label:
+          "Read attribute octet_string Not Default Value and compare to saved
+          value"
+      command: "readAttribute"
+      attribute: "octet_string"
+      response:
+          value: readAttributeOctetStringNotDefaultValue
+          constraints:
+              notValue: readAttributeOctetStringDefaultValue
+
+    - label: "Write attribute octet_string Not Default Value from saved value"
+      command: "writeAttribute"
+      attribute: "octet_string"
+      arguments:
+          value: readAttributeOctetStringNotDefaultValue
+
+    - label:
+          "Read attribute octet_string Not Default Value and compare to expected
+          value"
+      command: "readAttribute"
+      attribute: "octet_string"
+      response:
+          value: "NotDefault"
+
+    - label: "Write attribute octet_string Default Value"
+      command: "writeAttribute"
+      attribute: "octet_string"
+      arguments:
+          value: readAttributeOctetStringDefaultValue
+
+    # Tests for null values
+    - label: "Read attribute nullable_boolean Default Value"
+      command: "readAttribute"
+      attribute: "nullable_boolean"
+      response:
+          saveAs: readAttributeNullableBooleanDefaultValue
+          value: false
+
+    - label: "Write attribute nullable_boolean to null"
+      command: "writeAttribute"
+      attribute: "nullable_boolean"
+      arguments:
+          value: null
+
+    - label: "Read attribute nullable_boolean null Value"
+      command: "readAttribute"
+      attribute: "nullable_boolean"
+      response:
+          saveAs: readAttributeNullableBooleanNullValue
+          value: null
+
+    - label:
+          "Read attribute nullable_boolean null Value again and compare it to
+          the previously saved value"
+      command: "readAttribute"
+      attribute: "nullable_boolean"
+      response:
+          value: readAttributeNullableBooleanNullValue
+
+    - label: "Write attribute nullable_boolean Default Value"
+      command: "writeAttribute"
+      attribute: "nullable_boolean"
+      arguments:
+          value: readAttributeNullableBooleanDefaultValue

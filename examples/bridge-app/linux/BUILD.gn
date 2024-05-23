@@ -1,0 +1,50 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/chip/tools.gni")
+
+assert(chip_build_tools)
+
+executable("chip-bridge-app") {
+  sources = [
+    "${chip_root}/examples/bridge-app/bridge-common/include/CHIPProjectAppConfig.h",
+    "${chip_root}/examples/bridge-app/linux/bridged-actions-stub.cpp",
+    "Device.cpp",
+    "include/Device.h",
+    "include/main.h",
+    "main.cpp",
+  ]
+
+  deps = [
+    "${chip_root}/examples/bridge-app/bridge-common",
+    "${chip_root}/examples/platform/linux:app-main",
+    "${chip_root}/src/lib",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  include_dirs = [ "include" ]
+
+  output_dir = root_out_dir
+}
+
+group("linux") {
+  deps = [ ":chip-bridge-app" ]
+}
+
+group("default") {
+  deps = [ ":chip-bridge-app" ]
+}

@@ -1,0 +1,197 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+declare_args() {
+  # EFR32 board used
+  silabs_board = ""
+
+  # LCD is enabled by default
+  # Boards BRD4166A, BRD2601B, BRD2703A and BRD4319A do not have a LCD so they disable it explicitly
+  disable_lcd = false
+
+  # Enable Buttons by default
+  use_wstk_buttons = true
+
+  # Enable LEDs on development board by default
+  # Boards BRD4317A, BRD4316A and BRD4319A disable this explicitly
+  use_wstk_leds = true
+
+  # Boards BRD2703A and BRD4319A disable this explicitly
+  use_external_flash = true
+
+  # WIFI rcp boards options for wifi apps.
+  use_wf200 = false
+  use_rs9116 = false
+  use_SiWx917 = false
+
+  wifi_soc = false
+
+  #Disable MQTT by default
+  enable_dic = false
+
+  # Disable AWS SDK OTA by default
+  aws_sdk_ota = false
+
+  # Disable UART log forwarding by default
+  sl_uart_log_output = false
+
+  # Self-provision enabled
+  use_provision_channel = false
+}
+
+declare_args() {
+  # Enables LCD Qr Code on supported devices
+  show_qr_code = !disable_lcd
+
+  # Enabling BLE on 9116/917 NCP by default
+  chip_enable_ble_rs911x = use_rs9116 || use_SiWx917
+}
+
+if (silabs_board == "") {
+  silabs_board = getenv("SILABS_BOARD")
+}
+
+assert(silabs_board != "", "silabs_board must be specified")
+
+# Differentiate between boards
+# - BRD4304A / SLWSTK6000B / MGM12P Module / 2.4GHz@19dBm
+# - BRD4161A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
+# - BRD4163A / SLWSTK6000B / Dual band Wireless Starter Kit / 2.4GHz@19dBm, 868MHz@19dBm
+# - BRD4164A / SLWSTK6000B / Dual band Wireless Starter Kit / 2.4GHz@19dBm, 915MHz@19dBm
+# - BRD4166A / SLTB004A    / Thunderboard Sense 2 / 2.4GHz@10dBm
+# - BRD4170A / SLWSTK6000B / Multiband Wireless Starter Kit / 2.4GHz@19dBm, 915MHz@19dBm, 868MHz@19dBm
+# - BRD4180A / SLWSTK6006A / MG21 Module / 2.4GHz@20dBm
+# - BRD4186A / SLWSTK6006A  / MG24 / Wireless Starter Kit / 2.4GHz@10dBm
+# - BRD4187A / SLWSTK6006A  / MG24 / Wireless Starter Kit / 2.4GHz@20dBm
+
+board_defines = []
+
+if (silabs_board == "BRD4304A") {
+  silabs_family = "efr32mg12"
+  silabs_mcu = "EFR32MG12P432F1024GM48"
+  enable_fem = true
+
+  # Board does not support LEDs and Buttons at the same time
+  use_wstk_leds = false
+  board_defines += [ "PAL_RTCC_CLOCK_LFRCO" ]
+} else if (silabs_board == "BRD4161A") {
+  silabs_family = "efr32mg12"
+  silabs_mcu = "EFR32MG12P432F1024GL125"
+} else if (silabs_board == "BRD4162A") {
+  silabs_family = "efr32mg12"
+  silabs_mcu = "EFR32MG12P332F1024GL125"
+} else if (silabs_board == "BRD4163A") {
+  silabs_family = "efr32mg12"
+  silabs_mcu = "EFR32MG12P433F1024GL125"
+} else if (silabs_board == "BRD4164A") {
+  silabs_family = "efr32mg12"
+  silabs_mcu = "EFR32MG12P433F1024GL125"
+} else if (silabs_board == "BRD4166A") {
+  silabs_family = "efr32mg12"
+  silabs_mcu = "EFR32MG12P332F1024GL125"
+
+  # ThunderBoards don't have a LCD
+  show_qr_code = false
+  disable_lcd = true
+} else if (silabs_board == "BRD4170A") {
+  silabs_family = "efr32mg12"
+  silabs_mcu = "EFR32MG12P433F1024GM68"
+} else if (silabs_board == "BRD4338A") {
+  silabs_family = "SiWx917-common"
+  silabs_mcu = "SiWG917M111MGTBA"
+  wifi_soc = true
+} else if (silabs_board == "BRD4180A") {
+  assert(
+      false,
+      "The board ${silabs_board} not currently supported due to RAM limitation")
+  silabs_family = "efr32mg21"
+  silabs_mcu = "EFR32MG21A020F1024IM32"
+} else if (silabs_board == "BRD4186A" || silabs_board == "BRD4187A") {
+  variant = string_replace(silabs_board, "A", "C")
+  print(
+      "${silabs_board} is deprecated. It is recommended to use the 'C' variant of this board (${variant})")
+  silabs_family = "efr32mg24"
+  silabs_mcu = "EFR32MG24A010F1536GM48"
+} else if (silabs_board == "BRD4186C") {
+  silabs_family = "efr32mg24"
+  silabs_mcu = "EFR32MG24B210F1536IM48"
+} else if (silabs_board == "BRD4187C") {
+  silabs_family = "efr32mg24"
+  silabs_mcu = "EFR32MG24B220F1536IM48"
+} else if (silabs_board == "BRD2601B") {
+  silabs_family = "efr32mg24"
+  silabs_mcu = "EFR32MG24B310F1536IM48"
+
+  # ThunderBoards don't have a LCD,
+  show_qr_code = false
+  disable_lcd = true
+} else if (silabs_board == "BRD2703A") {
+  silabs_family = "efr32mg24"
+  silabs_mcu = "EFR32MG24B020F1536IM48"
+
+  # Explorer Kits do not have an external flash nor a LCD
+  use_external_flash = false
+  show_qr_code = false
+  disable_lcd = true
+} else if (silabs_board == "BRD4316A") {
+  silabs_family = "mgm24"
+  silabs_mcu = "MGM240PB22VNA"
+
+  # Board does not support LEDs and Buttons at the same time
+  use_wstk_leds = false
+} else if (silabs_board == "BRD4317A") {
+  silabs_family = "mgm24"
+  silabs_mcu = "MGM240PB32VNA"
+
+  # Board does not support LEDs and Buttons at the same time
+  use_wstk_leds = false
+} else if (silabs_board == "BRD4319A") {
+  silabs_family = "mgm24"
+  silabs_mcu = "MGM240L022RNF"
+
+  # Board does not support LEDs and Buttons at the same time
+  use_wstk_leds = false
+
+  # MGM240L do not have an external flash or LCD
+  use_external_flash = false
+  show_qr_code = false
+  disable_lcd = true
+} else if (silabs_board == "BRD2704A") {
+  silabs_family = "mgm24"
+  silabs_mcu = "MGM240PB32VNA"
+
+  # Explorer Kits do not have an external flash, buttons nor a LCD
+  use_wstk_buttons = false
+  use_external_flash = false
+  show_qr_code = false
+  disable_lcd = true
+} else if (silabs_board == "BRD4318A") {
+  silabs_family = "mgm24"
+  silabs_mcu = "MGM240SD22VNA"
+} else {
+  assert(
+      false,
+      "The board ${silabs_board} is unsupported. A list of supported board can be found here https://t.ly/_b3SK")
+}
+
+declare_args() {
+  # Wifi SoC Board require a .rps file to be flashed to the device to run
+  # this rps file is created from the built binary but it requires Silabs Commander tool
+  # User can set this arg to false to skip the rps creation for WiFi SoCs.
+  # e.g. for CI
+  use_rps_extension = wifi_soc
+}
+
+# qr code cannot be true if lcd is disabled
+assert(!(disable_lcd && show_qr_code))

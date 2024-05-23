@@ -1,0 +1,135 @@
+{{~#*inline "clusterName"}}{{asUpperCamelCase cluster}}{{/inline~}}
+
+{{~#*inline "maybePICS"}}
+{{#if PICS}}
+    VerifyOrDo(!ShouldSkip("{{PICS}}"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+{{/if}}
+{{/inline~}}
+
+{{~#*inline "maybeSetupSubStepCount"}}
+{{#if expectMultipleResponses}}
+    mTestSubStepCount = {{response.length}};
+{{/if}}
+{{/inline~}}
+
+{{~#*inline "maybePrepareArguments"}}
+{{#unless isWait}}
+{{#if hasSpecificArguments}}
+    ListFreer listFreer;
+    {{asEncodableType}} value;
+    {{#chip_tests_item_parameters}}
+        {{>commandValue ns=parent.cluster container=(asPropertyValue dontUnwrapValue=true) definedValue=definedValue depth=0}}
+    {{/chip_tests_item_parameters}}
+{{/if}}
+{{/unless}}
+{{/inline~}}
+
+{{~#*inline "maybeFabricFiltered"}}
+{{#if fabricFiltered}}
+    , true
+{{else}}
+    , false
+{{/if}}
+{{/inline~}}
+
+{{~#*inline "maybeSuppressResponse"}}
+{{#if suppressResponse}}
+    , chip::Optional<bool>({{suppressResponse}})
+{{else}}
+    , chip::NullOptional
+{{/if}}
+{{/inline~}}
+
+{{~#*inline "maybeDataVersion"}}
+{{#if dataVersion}}
+    , chip::Optional<chip::DataVersion>({{dataVersion}})
+{{else}}
+    , chip::NullOptional
+{{/if}}
+{{/inline~}}
+
+{{~#*inline "maybeTimedInteractionTimeoutMs"}}
+{{#if timedInteractionTimeoutMs}}
+    , chip::Optional<uint16_t>({{timedInteractionTimeoutMs}})
+{{else if commandObject.mustUseTimedInvoke}}
+    , chip::NullOptional
+{{else if attributeObject.mustUseTimedWrite}}
+    , chip::NullOptional
+{{/if}}
+{{/inline~}}
+
+{{~#*inline "maybeEventNumber"}}
+{{#if eventNumber}}
+    , chip::Optional<chip::EventNumber>({{eventNumber}})
+{{else}}
+    , chip::NullOptional
+{{/if}}
+{{/inline~}}
+
+{{~#*inline "maybeKeepSubscriptions"}}
+{{#if keepSubscriptions}}
+    , chip::Optional<bool>({{keepSubscriptions}})
+{{else}}
+    , chip::NullOptional
+{{/if}}
+{{/inline~}}
+
+{{~#*inline "kIdentity"}}kIdentity{{asUpperCamelCase identity}}{{/inline~}}
+{{~#*inline "groupId"}}{{groupId}}{{/inline~}}
+{{~#*inline "endpointId"}}GetEndpoint({{endpoint}}){{/inline~}}
+{{~#*inline "clusterId"}}{{>clusterName}}::Id{{/inline~}}
+{{~#*inline "attributeId"}}{{>clusterName}}::Attributes::{{asUpperCamelCase attribute}}::Id{{/inline~}}
+{{~#*inline "eventId"}}{{>clusterName}}::Events::{{asUpperCamelCase event}}::Id{{/inline~}}
+{{~#*inline "commandId"}}{{>clusterName}}::Commands::{{asUpperCamelCase command}}::Id{{/inline~}}
+
+{{~#*inline "testOnlyClusterArguments"}}{{>kIdentity}}{{/inline~}}
+{{~#*inline "attributeArguments"}}{{>kIdentity}}, {{>endpointId}}, {{>clusterId}}, {{>attributeId}}{{/inline~}}
+{{~#*inline "eventArguments"}}{{>kIdentity}}, {{>endpointId}}, {{>clusterId}}, {{>eventId}}{{/inline~}}
+{{~#*inline "commandArguments"}}{{>kIdentity}}, {{>endpointId}}, {{>clusterId}}, {{>commandId}}{{/inline~}}
+{{~#*inline "waitAttributeArguments"}}{{>endpointId}}, {{>clusterId}}, {{>attributeId}}{{/inline~}}
+{{~#*inline "waitEventArguments"}}{{>endpointId}}, {{>clusterId}}, {{>eventId}}{{/inline~}}
+{{~#*inline "waitCommandArguments"}}{{>endpointId}}, {{>clusterId}}, {{>commandId}}{{/inline~}}
+{{~#*inline "groupAttributeArguments"}}{{>kIdentity}}, {{>groupId}}, {{>clusterId}}, {{>attributeId}}{{/inline~}}
+{{~#*inline "groupCommandArguments"}}{{>kIdentity}}, {{>groupId}}, {{>clusterId}}, {{>commandId}}{{/inline~}}
+
+{{~#*inline "waitArguments"}}
+{{#if isAttribute}}
+  {{>waitAttributeArguments}}
+{{else if isEvent}}
+  {{>endpointId}}, {{>clusterId}}, {{>eventId}}
+{{else}}
+  {{>waitCommandArguments}}
+{{/if}}
+{{/inline~}}
+
+{{~#*inline "arguments"}}
+{{#if (isTestOnlyCluster cluster)}}{{>testOnlyClusterArguments}}, value
+{{else if isWait}}                 {{>waitArguments}}
+{{else if isReadAttribute}}        {{>attributeArguments}}{{>maybeFabricFiltered}}{{>maybeDataVersion~}}
+{{else if isSubscribeAttribute}}   {{>attributeArguments}}, {{minInterval}}, {{maxInterval}}{{>maybeFabricFiltered}}{{>maybeDataVersion}}{{>maybeKeepSubscriptions~}}, /* autoResubscribe = */ chip::NullOptional
+{{else if isWriteGroupAttribute}}  {{>groupAttributeArguments}}, value{{>maybeDataVersion~}}
+{{else if isWriteAttribute}}       {{>attributeArguments}}, value{{>maybeTimedInteractionTimeoutMs}}{{>maybeSuppressResponse}}{{>maybeDataVersion~}}
+{{else if isReadEvent}}            {{>eventArguments}}{{>maybeFabricFiltered}}{{>maybeEventNumber~}}
+{{else if isSubscribeEvent}}       {{>eventArguments}}, {{minInterval}}, {{maxInterval}}{{>maybeFabricFiltered}}{{>maybeEventNumber}}{{>maybeKeepSubscriptions~}}, /* autoResubscribe = */ chip::NullOptional
+{{else if isGroupCommand}}         {{>groupCommandArguments}}, value
+{{else if isCommand}}              {{>commandArguments}}, value{{>maybeTimedInteractionTimeoutMs}}{{>maybeSuppressResponse}}
+{{/if}}
+{{/inline~}}
+
+{{~#*inline "maybeBusyWait"}}
+{{#if busyWaitMs}}
+    ReturnErrorOnFailure({{commandName}}({{>arguments}}));
+
+    using namespace chip::System::Clock::Literals;
+    return BusyWaitFor({{busyWaitMs}}_ms);
+{{else}}
+    return {{commandName}}({{>arguments}});
+{{/if}}
+{{/inline~}}
+
+{{! --- Test Step Content --}}
+LogStep({{index}}, "{{label}}");
+{{>maybePICS}}
+{{>maybeSetupSubStepCount}}
+{{>maybePrepareArguments}}
+{{>maybeBusyWait}}

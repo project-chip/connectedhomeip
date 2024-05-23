@@ -1,0 +1,63 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    14.2.1. [TC-SC-2.1] Session Establishment - Passcode Authenticated Session
+    Establishment (PASE)
+
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "Initiator constructs and sends a TLV-encoded PBKDFParamRequest
+          message"
+      verification: |
+          Verify that the responder receives the PBKDFParamRequest message. Verify that the protocol header is properly constructed: Message Flags: S Flag is set to 0, and DSIZ field is set to 0 Session ID is set to 0 Security Flags: Session Type bits are set to 0 Exchange Flags: I Flag is set to 1 Protocol Opcode is set to 32 (0x20) Protocol ID is set to 0 Verify, if possible in a debug mode, that the PBKDFParamRequest message contains: initiatorRandom - randomly generated 32-bit octet string initiatorSessionId - max size 16-bits unsigned integer that does not overlap with existing initiator session identifiers passcodeId - max size 16-bits unsigned integer hasPBKDFParameters - boolean If hasPBKDFParameters is set to true then PBKDF parameters are not known for the given passcodeId If hasPBKDFParameters is set to false then PBKDF parameters are known for the given passcodeId initiatorSessionParams - optional session-parameter-struct which contains SESSION_IDLE_INTERVAL - max size 32-bits unsigned integer SESSION_ACTIVE_INTERVAL - max size 32-bits unsigned integer SESSION_ACTIVE_THRESHOLD - max size 16-bits unsigned integer
+      disabled: true
+
+    - label:
+          "Responder verifies the passcodeID, constructs and sends a TLV-encoded
+          PBKDFParamResponse message"
+      verification: |
+          Verify that the Initiator receives the PBKDFParamResponse message. Verify that the protocol header is properly constructed: Message Flags: S Flag is set to 0, and DSIZ field is set to 0 Session ID is set to 0 Security Flags: Session Type bits are set to 0 Exchange Flags: I Flag is set to 0 Protocol Opcode is set to 33 (0x21) Protocol ID is set to 0 Verify, if possible in a debug mode, that the PBKDFParamResponse message contains: initiatorRandom - value from the PBKDFParamRequest message responderRandom - randomly generated 32-bit octet string responderSessionId - max size 16-bits unsigned integer that does not overlap with existing that does not overlap with existing responder session identifiers pbkdf_parameters If hasPBKDFParameters from the PBKDFParamRequest message is true, then pbkdf_parameters should not be included. If hasPBKDFParameters from the PBKDFParamRequest message is false, then PBKDFParameters should contain a + Crypto_PBKDFParameterSet struct with values for iterations (max size 32 bit unsigned integer) and salt (octet string with a minimum of 16 bits and maximum of 32 bits) responderSessionParams - optional session-parameter-struct SESSION_IDLE_INTERVAL - max size 32-bits unsigned integer SESSION_ACTIVE_INTERVAL - max size 32-bits unsigned integer SESSION_ACTIVE_THRESHOLD - max size 16-bits unsigned integer
+      disabled: true
+
+    - label: "Initiator constructs and sends a TLV-encoded Pake1 message"
+      verification: |
+          Verify that the Responder receives the Pake1 message. Verify that the protocol header is properly constructed: 1. Message Flags: S Flag is set to 0, and DSIZ field is set to 0 2. Session ID is set to 0 3. Security Flags: Session Type bits are set to 0 4. Exchange Flags: I Flag is set to 1 5. Protocol Opcode is set to 34 (0x22) 6. Protocol ID is set to 0 Verify, if possible in a debug mode, that the Pake1 message contains: 1. pA - 65 bit octet string
+      disabled: true
+
+    - label: "Responder constructs and sends a TLV-encoded Pake2 message"
+      verification: |
+          Verify that the Initiator receives the Pake2 message. Verify that the protocol header is properly constructed: 1. Message Flags: S Flag is set to 0, and DSIZ field is set to 0 2. Session ID is set to 0 3. Security Flags: Session Type bits are set to 0 4. Exchange Flags: I Flag is set to 0 5. Protocol Opcode is set to 35 (0x23) 6. Protocol ID is set to 0 Verify, if possible in a debug mode, that the Pake1 message contains: 1. pB - 65 bit octet string 2. cB - 32 bit octet string
+      disabled: true
+
+    - label: "Initiator constructs and sends a TLV-encoded Pake3 message"
+      verification: |
+          Verify that the Responder receives the Pake3 message. Verify that the protocol header is properly constructed: 1. Message Flags: S Flag is set to 0, and DSIZ field is set to 0 2. Session ID is set to 0 3. Security Flags: Session Type bits are set to 0 4. Exchange Flags: I Flag is set to 1 5. Protocol Opcode is set to 36 (0x24) 6. Protocol ID is set to 0 Verify, if possible in a debug mode, that the Pake3 message contains: 1. cA - 32 bit octet string
+      disabled: true
+
+    - label:
+          "Responder validates Pake3, then constructs and sends a status report
+          (PakeFinished) message"
+      verification: |
+          Verify that the Initiator receives the status report/PakeFinished message. Verify that the status report contains: 1. GeneralCode - SUCCESS (value 0) 2. ProtocolId - SECURE_CHANNEL (value 0x0000) 3. ProtocolCode - SESSION_ESTABLISHMENT_SUCCESS (value 0x0000) Verify that the initiator has not sent any encrypted data to the responder prior to receiving PakeFinished.
+      disabled: true

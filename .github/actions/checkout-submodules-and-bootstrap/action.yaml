@@ -1,0 +1,43 @@
+name: Checkout submodules & Bootstrap
+description: Checkout submodules & Bootstrap
+inputs:
+  platform:
+    description: "Platform name"
+    required: true
+  extra-submodule-parameters:
+    description: "extra submodule parameters"
+    required: false
+    default: ""
+  bootstrap-log-name:
+    description: "Bootstrap log name"
+    required: false
+    default: bootstrap-logs-${{ github.job }}
+runs:
+  using: "composite"
+  steps:
+    - name: Maximize runner disk
+      uses: ./.github/actions/maximize-runner-disk
+    - name: Dump disk info
+      uses: ./.github/actions/dump-disk-info
+    - name: Set git safe directory for local act runs
+      uses: ./.github/actions/git-safe-directory
+    - name: Checkout submodules
+      uses: ./.github/actions/checkout-submodules
+      with:
+        platform: ${{ inputs.platform }}
+        extra-parameters: ${{ inputs.extra-submodule-parameters }}
+    - name: Bootstrap
+      uses: ./.github/actions/bootstrap
+      with:
+        platform: ${{ inputs.platform }}
+        bootstrap-log-name: ${{ inputs.bootstrap-log-name }}
+    - name: Dump disk info after checkout submodule & Bootstrap
+      shell: bash
+      run: scripts/dump_diskspace_info.sh
+    - name: Work around TSAN ASLR issues
+      if: runner.os == 'Linux' && !env.ACT
+      shell: bash
+      run: |
+        # See https://stackoverflow.com/a/77856955/2365113
+        if [[ "$UID" == 0 ]]; then function sudo() { "$@"; }; fi
+        sudo sysctl vm.mmap_rnd_bits=28

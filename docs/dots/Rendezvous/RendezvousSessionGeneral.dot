@@ -1,0 +1,37 @@
+digraph RendezvousSession
+{
+  node [shape=box, fillcolor="white:gray", gradientangle=90, style=filled]
+
+  # This section represents controller-only elements
+  subgraph cluster_controller {
+    label=<<b>Controller</b>>
+
+    DeviceCommissioner [shape=record label=<{DeviceCommissioner|<font point-size="11">RendezvousSessionDelegate</font>}>, URL="@ref chip::Controller::DeviceCommissioner"]
+  }
+
+  # This section represents device-only elements
+  subgraph cluster_device {
+    label=<<b>Device</b>>
+
+    RendezvousDeviceDelegate [shape=record label=<{RendezvousDeviceDelegate|<font point-size="11">RendezvousSessionDelegate</font>}> URL="@ref chip::RendezvousSessionDelegate"]
+  }
+
+  # This section represents elements which belongs to src/transport/
+  subgraph cluster_transport {
+    label=<<b>Transport</b>>
+
+    RendezvousSession [shape=record, label=<{RendezvousSession|<font point-size="11">SessionEstablishmentDelegate</font>}>, URL="@ref chip::SessionEstablishmentDelegate"]
+    TransportBle [label="Transport::BLE", URL="@ref chip::Transport::BLE"]
+    TransportInet [label="Transport::?", style=dashed, color=gray]
+  }
+
+  #############################
+  # Main relationships
+  #############################
+  RendezvousParameters [shape=ellipse, URL="@ref chip::RendezvousParameters"]
+  RendezvousParameters -> { DeviceCommissioner, RendezvousDeviceDelegate} [arrowhead=none]
+
+  {DeviceCommissioner, RendezvousDeviceDelegate} -> RendezvousSession
+  RendezvousSession -> TransportBle
+  RendezvousSession -> TransportInet [style=dashed, color=gray]
+}

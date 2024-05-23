@@ -1,0 +1,12 @@
+#include <lib/format/tlv_meta.h>
+#include <lib/format/FlatTree.h>
+
+#include <array>
+
+namespace chip {
+namespace TLVMeta {
+
+extern const std::array<const FlatTree::Node<ItemInfo>, {{ sub_tables | length }} + 2> {{table_name}};
+
+} // namespace TLVMeta
+} // namespace chip

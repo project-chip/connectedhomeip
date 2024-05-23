@@ -1,0 +1,94 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("${chip_root}/src/app/icd/icd.gni")
+
+declare_args() {
+  # Allows to change time between retries during the case session
+  chip_case_retry_delta = ""
+
+  chip_config_resolve_peer_on_first_transmit_failure = ""
+}
+
+defines = []
+
+if (chip_case_retry_delta != "") {
+  defines +=
+      [ "CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL=${chip_case_retry_delta}" ]
+}
+
+if (chip_config_resolve_peer_on_first_transmit_failure != "") {
+  defines += [ "CHIP_CONFIG_RESOLVE_PEER_ON_FIRST_TRANSMIT_FAILURE=${chip_config_resolve_peer_on_first_transmit_failure}" ]
+}
+
+source_set("configurations") {
+  sources = [
+    "ReliableMessageProtocolConfig.h",
+    "SessionParameters.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/system",
+  ]
+}
+
+static_library("messaging") {
+  output_name = "libMessagingLayer"
+
+  sources = [
+    "ApplicationExchangeDispatch.cpp",
+    "ApplicationExchangeDispatch.h",
+    "EphemeralExchangeDispatch.h",
+    "ErrorCategory.cpp",
+    "ErrorCategory.h",
+    "ExchangeContext.cpp",
+    "ExchangeContext.h",
+    "ExchangeDelegate.h",
+    "ExchangeHolder.h",
+    "ExchangeMessageDispatch.cpp",
+    "ExchangeMessageDispatch.h",
+    "ExchangeMgr.cpp",
+    "ExchangeMgr.h",
+    "Flags.h",
+    "ReliableMessageContext.cpp",
+    "ReliableMessageContext.h",
+    "ReliableMessageMgr.cpp",
+    "ReliableMessageMgr.h",
+    "ReliableMessageProtocolConfig.cpp",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    ":configurations",
+    "${chip_root}/src/app/icd/server:icd-server-config",
+    "${chip_root}/src/crypto",
+    "${chip_root}/src/inet",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
+    "${chip_root}/src/protocols/secure_channel:type_definitions",
+    "${chip_root}/src/transport",
+    "${chip_root}/src/transport/raw",
+  ]
+
+  if (chip_enable_icd_server) {
+    public_deps += [
+      "${chip_root}/src/app/icd/server:configuration-data",
+      "${chip_root}/src/app/icd/server:notifier",
+    ]
+  }
+}

@@ -1,0 +1,99 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    105.3.1. [TC-LUNIT-3.1] Read and Write Unit Localization Cluster Attributes
+    [DUT as Server]
+
+PICS:
+    - LUNIT.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Unit Localization"
+    endpoint: 0
+
+tests:
+    - label: "wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 1: TH reads from the DUT the TemperatureUnit"
+      PICS: LUNIT.S.A0000
+      command: "readAttribute"
+      attribute: "TemperatureUnit"
+      response:
+          constraints:
+              type: enum8
+
+    - label: "Step 2: TH writes 0 to TemperatureUnit"
+      PICS: LUNIT.S.A0000 && LUNIT.S.M.Fahrenheit
+      cluster: "Unit Localization"
+      command: "writeAttribute"
+      attribute: "TemperatureUnit"
+      arguments:
+          value: 0
+
+    - label: "Step 3: TH reads from the DUT the TemperatureUnit"
+      PICS: LUNIT.S.A0000 && LUNIT.S.M.Fahrenheit
+      command: "readAttribute"
+      attribute: "TemperatureUnit"
+      response:
+          value: 0
+
+    - label: "Step 4: TH writes 1 to TemperatureUnit"
+      PICS: LUNIT.S.A0000 && LUNIT.S.M.Celsius
+      cluster: "Unit Localization"
+      command: "writeAttribute"
+      attribute: "TemperatureUnit"
+      arguments:
+          value: 1
+
+    - label: "Step 5: TH reads from the DUT the TemperatureUnit"
+      PICS: LUNIT.S.A0000 && LUNIT.S.M.Celsius
+      command: "readAttribute"
+      attribute: "TemperatureUnit"
+      response:
+          value: 1
+
+    - label: "Step 6: TH writes 2 to TemperatureUnit"
+      PICS: LUNIT.S.A0000 && LUNIT.S.M.Kelvin
+      cluster: "Unit Localization"
+      command: "writeAttribute"
+      attribute: "TemperatureUnit"
+      arguments:
+          value: 2
+
+    - label: "Step 7: TH reads from the DUT the TemperatureUnit"
+      PICS: LUNIT.S.A0000 && LUNIT.S.M.Kelvin
+      command: "readAttribute"
+      attribute: "TemperatureUnit"
+      response:
+          value: 2
+
+    - label: "Step 8: TH writes 5 to TemperatureUnit"
+      PICS: LUNIT.S.A0000
+      cluster: "Unit Localization"
+      command: "writeAttribute"
+      attribute: "TemperatureUnit"
+      arguments:
+          # Per spec, if [TEMP] feature is enabled, then this attribute can be
+          # one of 0 (Farenheit), 1 (Celsius) or 2 (Kelvin)
+          value: TempUnitEnum.UnknownEnumValue(5)
+      response:
+          error: CONSTRAINT_ERROR

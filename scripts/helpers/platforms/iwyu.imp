@@ -1,0 +1,57 @@
+[
+    ## C/C++/*
+    { include: [ '"bits/shared_ptr.h"', private, '<memory>', public ] },
+    { include: [ '"cstdlib"', private, '<cstdlib>', public ] },
+    { include: [ '"iosfwd"', private, '<iosfwd>', public ] },
+    { include: [ '"ostream"', private, '<ostream>', public ] },
+    { include: [ '"stdlib.h"', private, '<cstdlib>', public ] },
+    { include: [ '"thread"', private, '<thread>', public ] },
+    { include: [ '"type_traits"', private, '<type_traits>', public ] },
+    { include: [ '<bits/shared_ptr.h>', private, '<memory>', public ] },
+    { symbol: [ 'declval', private, '<utility>', public ] },
+    { symbol: [ 'tm', private, '<sys/time.h>', public ] },
+
+    ## GLib/GIO
+    { include: [ '"gio/gdbusinterface.h"', private, '<gio/gio.h>', public ] },
+    { include: [ '"gio/gdbusinterfaceskeleton.h"', private, '<gio/gio.h>', public ] },
+    { include: [ '"gio/gdbusobject.h"', private, '<gio/gio.h>', public ] },
+    { include: [ '"gio/gdbusobjectmanager.h"', private, '<gio/gio.h>', public ] },
+    { include: [ '"gio/gdbusobjectmanagerclient.h"', private, '<gio/gio.h>', public ] },
+    { include: [ '"gio/gdbusobjectmanagerserver.h"', private, '<gio/gio.h>', public ] },
+    { include: [ '"gio/gdbusobjectskeleton.h"', private, '<gio/gio.h>', public ] },
+    { include: [ '"gobject/gclosure.h"', private, '<glib-object.h>', public ] },
+
+    ## ble/*
+    { include: [ '"ble/CHIPBleServiceData.h"', private, '<ble/CHIPBleServiceData.h>', public ] },
+    { include: [ '@"ble/Ble.*.h"', private, '<ble/Ble.h>', public ] },
+
+    ## inet/*
+    { include: [ '"inet/InetInterface.h"', private, '<inet/InetInterface.h>', public ] },
+    { include: [ '"inet/IPAddress.h"', private, '<inet/IPAddress.h>', public ] },
+
+    ## lib/*
+    { include: [ '"lib/core/CHIPError.h"', private, '<lib/core/CHIPError.h>', public ] },
+    { include: [ '"lib/dnssd/ServiceNaming.h"', private, '<lib/dnssd/platform/Dnssd.h>', public ] },
+
+    ## lib/support/logging/*
+    { include: [ '"lib/support/logging/BinaryLogging.h"', private, '<lib/support/logging/CHIPLogging.h>', public ] },
+    { include: [ '"lib/support/logging/CHIPLogging.h"', private, '<lib/support/logging/CHIPLogging.h>', public ] },
+    { include: [ '"lib/support/logging/Constants.h"', private, '<lib/support/logging/CHIPLogging.h>', public ] },
+    { include: [ '"lib/support/logging/TextOnlyLogging.h"', private, '<lib/support/logging/CHIPLogging.h>', public ] },
+
+    ## platform/*
+    { include: [ '"platform/NetworkCommissioning.h"', private, '<platform/NetworkCommissioning.h>', public ] },
+    { include: [ '"platform/PersistedStorage.h"', private, '<platform/PersistedStorage.h>', public ] },
+
+    ## Do not include some Impl headers directly
+    { include: [ '@"platform/.*/BLEManagerImpl.h"', private, '"platform/internal/BLEManager.h"', private ] },
+    { include: [ '@"platform/.*/ConnectivityManagerImpl.h"', private, '<platform/ConnectivityManager.h>', public ] },
+    { include: [ '@"platform/.*/KeyValueStoreManagerImpl.h"', private, '<platform/KeyValueStoreManager.h>', public ] },
+    { include: [ '@"platform/.*/PlatformManagerImpl.h"', private, '<platform/PlatformManager.h>', public ] },
+    { include: [ '@<platform/.*/ThreadStackManagerImpl.h>', private, '<platform/ThreadStackManager.h>', public ] },
+
+    ## Config
+    { include: [ '@"platform/.*/CHIPDevicePlatformConfig.h"', private, '<platform/CHIPDeviceConfig.h>', public ] },
+    { include: [ '@"platform/.*/SystemPlatformConfig.h"', private, '<system/SystemConfig.h>', public ] },
+
+]

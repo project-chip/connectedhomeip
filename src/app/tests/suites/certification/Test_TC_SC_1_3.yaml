@@ -1,0 +1,49 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 14.1.3. [TC-SC-1.3] MRP Retransmissions
+
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "Simulate TH to ignore all messages received by DUT (100% message
+          loss)"
+      verification: |
+
+      disabled: true
+
+    - label: "DUT sends a message to TH with the R flag set to 1"
+      verification: |
+          Verify that no reply is received by the DUT.
+      disabled: true
+
+    - label: "DUT sends a retransmission of the message in step 2"
+      verification: |
+          Verify that the message is sent after waiting for MRP_RETRY_INTERVAL_IDLE milliseconds. Verify that no response is received by the DUT.
+      disabled: true
+
+    - label:
+          "DUT continues to send retransmissions of the message in step 2 up to
+          MRP_MAX_TRANSMISSIONS times."
+      verification: |
+          Verify that the DUT stops sending messages after a total of MRP_MAX_TRANSMISSIONS - 1 messages have been sent.
+      disabled: true

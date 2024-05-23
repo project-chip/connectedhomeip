@@ -1,0 +1,64 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
+import("$dir_pw_build/target_types.gni")
+
+declare_args() {
+  chip_build_pw_rpc_echo_proto = false
+  chip_build_pw_rpc_common_proto = false
+  chip_build_pw_rpc_lighting_proto = false
+  chip_build_pw_rpc_locking_proto = false
+}
+
+static_library("pw_rpc") {
+  output_name = "libPwRpc"
+
+  public_configs = [ "${dir_pigweed}/pw_hdlc:default_config" ]
+  deps = [
+    "$dir_pw_rpc:server",
+    "${chip_root}/examples/platform/mbed/pw_sys_io:pw_sys_io_mbed",
+    dir_pw_assert,
+    dir_pw_hdlc,
+    dir_pw_log,
+  ]
+
+  if (chip_build_pw_rpc_echo_proto) {
+    deps += [ "$dir_pw_rpc/nanopb:echo_service" ]
+  }
+
+  if (chip_build_pw_rpc_common_proto) {
+    deps += [
+      "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
+    ]
+  }
+
+  if (chip_build_pw_rpc_lighting_proto) {
+    deps +=
+        [ "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc" ]
+  }
+
+  if (chip_build_pw_rpc_locking_proto) {
+    deps +=
+        [ "${chip_root}/examples/common/pigweed:locking_service.nanopb_rpc" ]
+  }
+
+  deps += pw_build_LINK_DEPS
+
+  output_dir = "${root_out_dir}/lib"
+
+  complete_static_lib = true
+}

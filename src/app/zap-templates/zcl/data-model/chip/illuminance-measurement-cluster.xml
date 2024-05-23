@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+
+  <cluster>
+      <name>Illuminance Measurement</name>
+      <domain>Measurement &amp; Sensing</domain>
+      <description>Attributes and commands for configuring the measurement of illuminance, and reporting illuminance measurements.</description>
+      <code>0x0400</code>
+      <define>ILLUMINANCE_MEASUREMENT_CLUSTER</define>
+      <client tick="false" init="false">true</client>
+      <server tick="false" init="false">true</server>
+      <globalAttribute side="either" code="0xFFFD" value="3"/>
+      <attribute side="server" code="0x0000" define="ILLUM_MEASURED_VALUE"     type="int16u" min="0x0000" max="0xFFFF" writable="false" reportable="true" isNullable="true" default="0x0000" optional="false">MeasuredValue</attribute>
+      <attribute side="server" code="0x0001" define="ILLUM_MIN_MEASURED_VALUE" type="int16u" min="0x0001" max="0xFFFD" writable="false"                   isNullable="true"                  optional="false">MinMeasuredValue</attribute>
+      <attribute side="server" code="0x0002" define="ILLUM_MAX_MEASURED_VALUE" type="int16u" min="0x0002" max="0xFFFE" writable="false"                   isNullable="true"                  optional="false">MaxMeasuredValue</attribute>
+      <attribute side="server" code="0x0003" define="ILLUM_TOLERANCE"          type="int16u" min="0x0000" max="0x0800" writable="false"                                                      optional="true" >Tolerance</attribute>
+      <attribute side="server" code="0x0004" define="ILLUM_LIGHT_SENSOR_TYPE"  type="LightSensorTypeEnum"  min="0x00"   max="0xFF"   writable="false"                   isNullable="true" default="0xFF"   optional="true" >LightSensorType</attribute>
+  </cluster>
+
+  <enum name="LightSensorTypeEnum" type="enum8">
+    <cluster code="0x0400"/>
+    <item name="Photodiode" value="0x00"/>
+    <item name="CMOS" value="0x01"/>
+    <!-- RESERVED = 0x40 - 0xFE -->
+  </enum>
+</configurator>

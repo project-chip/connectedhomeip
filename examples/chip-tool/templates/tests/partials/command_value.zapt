@@ -1,0 +1,74 @@
+{{#if isOptional}}
+  {{container}}.Emplace();
+  {{>commandValue ns=ns container=(concat container ".Value()") definedValue=definedValue type=type isOptional=false depth=(incrementDepth depth)}}
+{{else if isNullable}}
+  {{#if (isLiteralNull definedValue)}}
+    {{container}}.SetNull();
+  {{else}}
+    {{container}}.SetNonNull();
+    {{>commandValue ns=ns container=(concat container ".Value()") definedValue=definedValue type=type isNullable=false depth=(incrementDepth depth)}}
+  {{/if}}
+{{else if isArray}}
+
+  {{ensureIsArray definedValue~}}
+  {{! forceNotList=true because we really want the type of a single item here.
+      Similarly, forceNotOptional=true and forceNotNullable=true because we
+      have accounted for those already. }}
+  {{#if definedValue.length}}
+  {
+    auto * listHolder_{{depth}} = new ListHolder<{{zapTypeToEncodableClusterObjectType type ns=ns forceNotList=true forceNotNullable=true forceNotOptional=true}}>({{definedValue.length}});
+    listFreer.add(listHolder_{{depth}});
+    {{#each definedValue}}
+    {{>commandValue ns=../ns container=(concat "listHolder_" ../depth "->mList[" @index "]") definedValue=. type=../type depth=(incrementDepth ../depth) parent=../parent}}
+    {{/each}}
+    {{container}} = chip::app::DataModel::List<{{zapTypeToEncodableClusterObjectType type ns=ns forceNotList=true forceNotNullable=true forceNotOptional=true}}>(listHolder_{{depth}}->mList, {{definedValue.length}});
+  }
+  {{else}}
+  {{container}} = chip::app::DataModel::List<{{zapTypeToEncodableClusterObjectType type ns=ns forceNotList=true forceNotNullable=true forceNotOptional=true}}>();
+  {{/if}}
+{{else}}
+  {{#if_is_struct type}}
+
+    {{#zcl_struct_items_by_struct_and_cluster_name type ns}}
+      {{#if_include_struct_item_value ../definedValue name}}
+        {{>commandValue ns=parent.ns container=(concat parent.container "." (asLowerCamelCase label)) definedValue=(lookup ../definedValue name) depth=(incrementDepth ../depth)}}
+      {{/if_include_struct_item_value}}
+    {{/zcl_struct_items_by_struct_and_cluster_name}}
+
+  {{else}}
+    {{container}} =
+    {{~#if (chip_tests_variables_has definedValue)~}}
+      {{definedValue}};
+    {{else if (chip_tests_config_has definedValue)}}
+      m{{asUpperCamelCase definedValue}}.HasValue() ? m{{asUpperCamelCase definedValue}}.Value() :
+      {{~#if_is_strongly_typed_chip_enum type~}}
+        static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns}}>({{chip_tests_config_get_default_value definedValue}});
+      {{else if (isCharString type)}}
+        chip::Span<const char>("{{chip_tests_config_get_default_value definedValue}}", {{utf8StringLength (chip_tests_config_get_default_value definedValue)}});
+      {{else if (isOctetString type)}}
+        {{> octetStringValue value=(chip_tests_config_get_default_value definedValue)}};
+      {{else}}
+        {{#if_is_strongly_typed_bitmap type}}
+          static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns}}>({{asTypedLiteral (chip_tests_config_get_default_value definedValue) type}});
+        {{else}}
+          {{asTypedExpression (chip_tests_config_get_default_value definedValue) type}};
+        {{/if_is_strongly_typed_bitmap}}
+      {{/if_is_strongly_typed_chip_enum~}}
+    {{else~}}
+      {{~#if_is_strongly_typed_chip_enum type~}}
+        static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns}}>({{definedValue}});
+      {{else if (isCharString type)}}
+        chip::Span<const char>("{{definedValue}}garbage: not in length on purpose", {{utf8StringLength definedValue}});
+      {{else if (isOctetString type)}}
+        {{> octetStringValue value=definedValue extraGarbage="garbage: not in length on purpose"}};
+      {{else}}
+        {{#if_is_strongly_typed_bitmap type}}
+          static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns}}>({{asTypedLiteral definedValue type}});
+        {{else}}
+          {{asTypedExpression definedValue type}};
+        {{/if_is_strongly_typed_bitmap}}
+      {{/if_is_strongly_typed_chip_enum~}}
+    {{~/if~}}
+    
+  {{/if_is_struct}}
+{{/if}}

@@ -1,0 +1,252 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/jlink.gni")
+import("//build_overrides/mbedtls.gni")
+
+import("//build_overrides/asr.gni")
+
+# Defines an asr SDK build target.
+#
+# Parameters:
+#   sources - The sources files to build.
+#
+template("asr_sdk_sources") {
+  if (defined(invoker.asr_project_dir)) {
+    asr_project_dir = invoker.asr_project_dir
+  }
+
+  # While most asr sdk includes come from the asr_sdk_config config (in
+  # BUILD.gn), this template gets instantiated by each project each of which
+  # provides a few extra includes/defines. Handle those here.
+  config("project_configs") {
+    include_dirs = []
+    if (defined(invoker.include_dirs)) {
+      include_dirs += invoker.include_dirs
+    }
+    include_dirs += [ "${asr_project_dir}/include" ]
+
+    defines = []
+    if (defined(invoker.defines)) {
+      defines += invoker.defines
+    }
+  }
+
+  sdk_target_name = target_name
+
+  # Add sources here
+  source_set(sdk_target_name) {
+    sources = []
+    if (defined(invoker.sources)) {
+      sources += invoker.sources
+    }
+
+    _third_party_src = [
+      #at
+      "at_cmd/atcmd_comm.c",
+      "at_cmd/atcmd_user.c",
+      "at_cmd/atcmd_matter.c",
+
+      #peripheral
+      "driver/src/lega_flash.c",
+      "driver/src/lega_flash_alg.c",
+      "driver/src/lega_uart.c",
+      "driver/src/lega_wdg.c",
+      "driver/src/lega_i2c.c",
+      "driver/src/lega_timer.c",
+      "driver/src/lega_gpio.c",
+      "driver/src/lega_efuse.c",
+      "driver/src/lega_boot.c",
+      "driver/src/lega_board.c",
+      "driver/src/lega_pwm.c",
+      "driver/src/lega_pinmux.c",
+
+      #platform
+      "platform/sysCalls.c",
+      "platform/soc_init.c",
+      "platform/system_cm4.c",
+      "platform/ethernetif_wifi.c",
+      "platform/startup_cm4.S",
+      "platform/printf_uart.c",
+
+      #rtos
+      "platform/lega_rtos.c",
+      "../../components/freertos/Source/croutine.c",
+      "../../components/freertos/Source/event_groups.c",
+      "../../components/freertos/Source/list.c",
+      "../../components/freertos/Source/queue.c",
+      "../../components/freertos/Source/tasks.c",
+      "../../components/freertos/Source/timers.c",
+      "../../components/freertos/Source/portable/MemMang/heap_4.c",
+      "../../components/freertos/Source/portable/GCC/ARM_CM4F/port.c",
+
+      #elog
+      "common/easylogger/elog_async.c",
+      "common/easylogger/elog_buf.c",
+      "common/easylogger/elog_module.c",
+      "common/easylogger/elog_port.c",
+      "common/easylogger/elog_utils.c",
+      "common/easylogger/elog.c",
+
+      #lwip
+      "../../components/lwip_2.1.2/netif/ethernet.c",
+      "../../components/lwip_2.1.2/port/sys_arch.c",
+      "../../components/lwip_2.1.2/api/api_lib.c",
+      "../../components/lwip_2.1.2/api/api_msg.c",
+      "../../components/lwip_2.1.2/api/err.c",
+      "../../components/lwip_2.1.2/api/if_api.c",
+      "../../components/lwip_2.1.2/api/netbuf.c",
+      "../../components/lwip_2.1.2/api/netdb.c",
+      "../../components/lwip_2.1.2/api/netifapi.c",
+      "../../components/lwip_2.1.2/api/sockets.c",
+      "../../components/lwip_2.1.2/api/tcpip.c",
+      "../../components/lwip_2.1.2/core/altcp.c",
+      "../../components/lwip_2.1.2/core/altcp_alloc.c",
+      "../../components/lwip_2.1.2/core/altcp_tcp.c",
+      "../../components/lwip_2.1.2/core/def.c",
+      "../../components/lwip_2.1.2/core/dns.c",
+      "../../components/lwip_2.1.2/core/inet_chksum.c",
+      "../../components/lwip_2.1.2/core/init.c",
+      "../../components/lwip_2.1.2/core/ip.c",
+      "../../components/lwip_2.1.2/core/ipv4/autoip.c",
+      "../../components/lwip_2.1.2/core/ipv4/dhcp.c",
+      "../../components/lwip_2.1.2/core/ipv4/etharp.c",
+      "../../components/lwip_2.1.2/core/ipv4/icmp.c",
+      "../../components/lwip_2.1.2/core/ipv4/igmp.c",
+      "../../components/lwip_2.1.2/core/ipv4/ip4.c",
+      "../../components/lwip_2.1.2/core/ipv4/ip4_addr.c",
+      "../../components/lwip_2.1.2/core/ipv4/ip4_frag.c",
+      "../../components/lwip_2.1.2/core/ipv6/dhcp6.c",
+      "../../components/lwip_2.1.2/core/ipv6/ethip6.c",
+      "../../components/lwip_2.1.2/core/ipv6/icmp6.c",
+      "../../components/lwip_2.1.2/core/ipv6/inet6.c",
+      "../../components/lwip_2.1.2/core/ipv6/ip6.c",
+      "../../components/lwip_2.1.2/core/ipv6/ip6_addr.c",
+      "../../components/lwip_2.1.2/core/ipv6/ip6_frag.c",
+      "../../components/lwip_2.1.2/core/ipv6/mld6.c",
+      "../../components/lwip_2.1.2/core/ipv6/nd6.c",
+      "../../components/lwip_2.1.2/core/lwip_hooks.c",
+      "../../components/lwip_2.1.2/core/mem.c",
+      "../../components/lwip_2.1.2/core/memp.c",
+      "../../components/lwip_2.1.2/core/netif.c",
+      "../../components/lwip_2.1.2/core/pbuf.c",
+      "../../components/lwip_2.1.2/core/raw.c",
+      "../../components/lwip_2.1.2/core/stats.c",
+      "../../components/lwip_2.1.2/core/sys.c",
+      "../../components/lwip_2.1.2/core/tcp.c",
+      "../../components/lwip_2.1.2/core/tcp_in.c",
+      "../../components/lwip_2.1.2/core/tcp_out.c",
+      "../../components/lwip_2.1.2/core/timeouts.c",
+      "../../components/lwip_2.1.2/core/udp.c",
+
+      #mbedtls
+      "../../components/mbedtls-2.18/library/aes.c",
+      "../../components/mbedtls-2.18/library/aesni.c",
+      "../../components/mbedtls-2.18/library/arc4.c",
+      "../../components/mbedtls-2.18/library/aria.c",
+      "../../components/mbedtls-2.18/library/asn1parse.c",
+      "../../components/mbedtls-2.18/library/asn1write.c",
+      "../../components/mbedtls-2.18/library/base64.c",
+      "../../components/mbedtls-2.18/library/bignum.c",
+      "../../components/mbedtls-2.18/library/blowfish.c",
+      "../../components/mbedtls-2.18/library/camellia.c",
+      "../../components/mbedtls-2.18/library/ccm.c",
+      "../../components/mbedtls-2.18/library/certs.c",
+      "../../components/mbedtls-2.18/library/chacha20.c",
+      "../../components/mbedtls-2.18/library/chachapoly.c",
+      "../../components/mbedtls-2.18/library/cipher.c",
+      "../../components/mbedtls-2.18/library/cipher_wrap.c",
+      "../../components/mbedtls-2.18/library/cmac.c",
+      "../../components/mbedtls-2.18/library/ctr_drbg.c",
+      "../../components/mbedtls-2.18/library/debug.c",
+      "../../components/mbedtls-2.18/library/des.c",
+      "../../components/mbedtls-2.18/library/dhm.c",
+      "../../components/mbedtls-2.18/library/ecdh.c",
+      "../../components/mbedtls-2.18/library/ecdsa.c",
+      "../../components/mbedtls-2.18/library/ecjpake.c",
+      "../../components/mbedtls-2.18/library/ecp.c",
+      "../../components/mbedtls-2.18/library/ecp_curves.c",
+      "../../components/mbedtls-2.18/library/entropy.c",
+      "../../components/mbedtls-2.18/library/entropy_poll.c",
+      "../../components/mbedtls-2.18/library/error.c",
+      "../../components/mbedtls-2.18/library/gcm.c",
+      "../../components/mbedtls-2.18/library/havege.c",
+      "../../components/mbedtls-2.18/library/hkdf.c",
+      "../../components/mbedtls-2.18/library/hmac_drbg.c",
+      "../../components/mbedtls-2.18/library/md.c",
+      "../../components/mbedtls-2.18/library/md2.c",
+      "../../components/mbedtls-2.18/library/md4.c",
+      "../../components/mbedtls-2.18/library/md5.c",
+      "../../components/mbedtls-2.18/library/md_wrap.c",
+      "../../components/mbedtls-2.18/library/memory_buffer_alloc.c",
+      "../../components/mbedtls-2.18/library/nist_kw.c",
+      "../../components/mbedtls-2.18/library/oid.c",
+      "../../components/mbedtls-2.18/library/padlock.c",
+      "../../components/mbedtls-2.18/library/pem.c",
+      "../../components/mbedtls-2.18/library/pk.c",
+      "../../components/mbedtls-2.18/library/pk_wrap.c",
+      "../../components/mbedtls-2.18/library/pkcs11.c",
+      "../../components/mbedtls-2.18/library/pkcs12.c",
+      "../../components/mbedtls-2.18/library/pkcs5.c",
+      "../../components/mbedtls-2.18/library/pkparse.c",
+      "../../components/mbedtls-2.18/library/pkwrite.c",
+      "../../components/mbedtls-2.18/library/platform.c",
+      "../../components/mbedtls-2.18/library/platform_util.c",
+      "../../components/mbedtls-2.18/library/poly1305.c",
+      "../../components/mbedtls-2.18/library/ripemd160.c",
+      "../../components/mbedtls-2.18/library/rsa.c",
+      "../../components/mbedtls-2.18/library/rsa_internal.c",
+      "../../components/mbedtls-2.18/library/sha1.c",
+      "../../components/mbedtls-2.18/library/sha256.c",
+      "../../components/mbedtls-2.18/library/sha512.c",
+      "../../components/mbedtls-2.18/library/ssl_cache.c",
+      "../../components/mbedtls-2.18/library/ssl_ciphersuites.c",
+      "../../components/mbedtls-2.18/library/ssl_cli.c",
+      "../../components/mbedtls-2.18/library/ssl_cookie.c",
+      "../../components/mbedtls-2.18/library/ssl_srv.c",
+      "../../components/mbedtls-2.18/library/ssl_ticket.c",
+      "../../components/mbedtls-2.18/library/ssl_tls.c",
+      "../../components/mbedtls-2.18/library/threading.c",
+      "../../components/mbedtls-2.18/library/timing.c",
+      "../../components/mbedtls-2.18/library/version.c",
+      "../../components/mbedtls-2.18/library/version_features.c",
+      "../../components/mbedtls-2.18/library/x509.c",
+      "../../components/mbedtls-2.18/library/x509_create.c",
+      "../../components/mbedtls-2.18/library/x509_crl.c",
+      "../../components/mbedtls-2.18/library/x509_crt.c",
+      "../../components/mbedtls-2.18/library/x509_csr.c",
+      "../../components/mbedtls-2.18/library/x509write_crt.c",
+      "../../components/mbedtls-2.18/library/x509write_csr.c",
+      "../../components/mbedtls-2.18/library/xtea.c",
+      "../../components/mbedtls-2.18/asr_mbedtls/alt/entropy_hardware_alt.c",
+      "../../components/mbedtls-2.18/asr_mbedtls/alt/aes_alt.c",
+      "../../components/mbedtls-2.18/asr_mbedtls/alt/sha1_alt.c",
+      "../../components/mbedtls-2.18/asr_mbedtls/alt/sha256_alt.c",
+    ]
+
+    foreach(src, _third_party_src) {
+      sources += [ rebase_path(src,
+                               "${asr_project_dir}",
+                               "${asr_sdk_build_root}/asr_sdk/") ]
+    }
+
+    public_deps = [ "${chip_root}/src/lwip:lwip" ]
+
+    public_configs = [ ":project_configs" ]
+    if (defined(invoker.public_configs)) {
+      public_configs += invoker.public_configs
+    }
+  }
+}

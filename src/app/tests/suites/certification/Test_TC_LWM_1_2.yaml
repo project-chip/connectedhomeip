@@ -1,0 +1,101 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 183.1.2. [TC-LWM-1.2] Cluster attributes with DUT as Server
+
+PICS:
+    - LWM.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      verification: |
+
+      disabled: true
+
+    - label: "Step 2: TH reads from the DUT the SupportedModes attribute."
+      PICS: LWM.S.A0000
+      verification: |
+          ./chip-tool laundrywashermode read supported-modes 1 1
+
+          Verify that the DUT response contains list of ModeOptionsStruct entries.
+          - Verify that the list has at least 2 and at most 255 entries
+          - Verify that each ModeOptionsStruct entry has a unique Mode field value and Label field value
+          - If ModeOptionsStruct entry’s ModeTags field is not empty,  then Verify the values of the Value fields that are not larger than 16 bits, for each Value field: Is the mode tag value a defined common tag value ( Auto(0x0000), Quick(0x0001), Quiet(0x0002), LowNoise(0x0003), LowEnergy(0x0004), Vacation(0x0005), Min(0x0006), Max(0x0007), Night(0x0008), Day(0x0009)) or a defined cluster derived tag value ( Normal, Delicate, Heavy, Whites) or in the MfgTags (0x8000 to 0xBFFF) range
+          - If the Value field is in the MfgTags (0x8000 to 0xBFFF) range, the TagName field is a string with a length between 1 and 64
+          - Verify that at least one ModeOptionsStruct entry includes the Normal mode tag
+          - Save the Mode field values as supported_modes_dut on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
+
+          [1690184598.426478][15422:15424] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0051 Attribute 0x0000_0000 DataVersion: 3075628268
+          [1690184598.426516][15422:15424] CHIP:TOO:   SupportedModes: 4 entries
+          [1690184598.426540][15422:15424] CHIP:TOO:     [1]: {
+          [1690184598.426545][15422:15424] CHIP:TOO:       Label: Normal
+          [1690184598.426552][15422:15424] CHIP:TOO:       Mode: 0
+          [1690184598.426558][15422:15424] CHIP:TOO:       ModeTags: 1 entries
+          [1690184598.426565][15422:15424] CHIP:TOO:         [1]: {
+          [1690184598.426569][15422:15424] CHIP:TOO:           Value: 16384
+          [1690184598.426572][15422:15424] CHIP:TOO:          }
+          [1690184598.426576][15422:15424] CHIP:TOO:      }
+          [1690184598.426585][15422:15424] CHIP:TOO:     [2]: {
+          [1690184598.426589][15422:15424] CHIP:TOO:       Label: Delicate
+          [1690184598.426593][15422:15424] CHIP:TOO:       Mode: 1
+          [1690184598.426599][15422:15424] CHIP:TOO:       ModeTags: 3 entries
+          [1690184598.426605][15422:15424] CHIP:TOO:         [1]: {
+          [1690184598.426609][15422:15424] CHIP:TOO:           Value: 16385
+          [1690184598.426612][15422:15424] CHIP:TOO:          }
+          [1690184598.426617][15422:15424] CHIP:TOO:         [2]: {
+          [1690184598.426621][15422:15424] CHIP:TOO:           Value: 8
+          [1690184598.426624][15422:15424] CHIP:TOO:          }
+          [1690184598.426629][15422:15424] CHIP:TOO:         [3]: {
+          [1690184598.426633][15422:15424] CHIP:TOO:           Value: 2
+          [1690184598.426637][15422:15424] CHIP:TOO:          }
+          [1690184598.426640][15422:15424] CHIP:TOO:      }
+          [1690184598.426648][15422:15424] CHIP:TOO:     [3]: {
+          [1690184598.426652][15422:15424] CHIP:TOO:       Label: Heavy
+          [1690184598.426655][15422:15424] CHIP:TOO:       Mode: 2
+          [1690184598.426661][15422:15424] CHIP:TOO:       ModeTags: 2 entries
+          [1690184598.426666][15422:15424] CHIP:TOO:         [1]: {
+          [1690184598.426669][15422:15424] CHIP:TOO:           Value: 7
+          [1690184598.426672][15422:15424] CHIP:TOO:          }
+          [1690184598.426677][15422:15424] CHIP:TOO:         [2]: {
+          [1690184598.426680][15422:15424] CHIP:TOO:           Value: 16386
+          [1690184598.426683][15422:15424] CHIP:TOO:          }
+          [1690184598.426687][15422:15424] CHIP:TOO:      }
+          [1690184598.426693][15422:15424] CHIP:TOO:     [4]: {
+          [1690184598.426697][15422:15424] CHIP:TOO:       Label: Whites
+          [1690184598.426700][15422:15424] CHIP:TOO:       Mode: 3
+          [1690184598.426705][15422:15424] CHIP:TOO:       ModeTags: 1 entries
+          [1690184598.426710][15422:15424] CHIP:TOO:         [1]: {
+          [1690184598.426713][15422:15424] CHIP:TOO:           Value: 16387
+          [1690184598.426716][15422:15424] CHIP:TOO:          }
+          [1690184598.426720][15422:15424] CHIP:TOO:      }
+      disabled: true
+
+    - label: "Step 3: TH reads from the DUT the CurrentMode attribute."
+      PICS: LWM.S.A0001
+      verification: |
+          ./chip-tool laundrywashermode read current-mode 1 1
+
+          Verify on TH(chip-tool) logs, CurrentMode attribute value is an integer value from supported_modes_dut, below is the sample log provided for the raspi platform, Here CurrentMode attribute value is 0
+
+          [1690184642.211028][15428:15430] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0051 Attribute 0x0000_0001 DataVersion: 3075628268
+          [1690184642.211042][15428:15430] CHIP:TOO:   CurrentMode: 0
+      disabled: true

@@ -1,0 +1,272 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    130.1.1. [TC-BRBINFO-1.1] Global Attributes for Bridged Device Basic
+    Information Cluster Cluster [DUT-Server]
+
+PICS:
+    - BRBINFO.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Bridged Device Basic Information"
+    endpoint: 3
+
+tests:
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    #Issue: https://github.com/project-chip/connectedhomeip/issues/30467
+    - label: "Step 2: TH reads the ClusterRevision from DUT"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 2
+          constraints:
+              type: int16u
+
+    - label: "Step 3: TH reads the FeatureMap from DUT"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
+
+    - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [17, 65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: " !PICS_EVENT_LIST_ENABLED "
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [17, 65528, 65529, 65531, 65532, 65533]
+
+    - label: "Step 4b: TH reads optional attribute(VendorName) in AttributeList"
+      PICS: BRBINFO.S.A0001
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [1]
+
+    - label: "Step 4c: TH reads optional attribute(VendorID) in AttributeList"
+      PICS: BRBINFO.S.A0002
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [2]
+
+    - label:
+          "Step 4d: TH reads optional attribute(ProductName) in AttributeList"
+      PICS: BRBINFO.S.A0003
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [3]
+
+    - label: "Step 4e: TH reads optional attribute(NodeLabel) in AttributeList"
+      PICS: BRBINFO.S.A0005
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [5]
+
+    - label:
+          "Step 4f: TH reads optional attribute(HardwareVersion) in
+          AttributeList"
+      PICS: BRBINFO.S.A0007
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [7]
+
+    - label:
+          "Step 4g: TH reads optional attribute(HardwareVersionString) in
+          AttributeList"
+      PICS: BRBINFO.S.A0008
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [8]
+
+    - label:
+          "Step 4h: TH reads optional attribute(SoftwareVersion) in
+          AttributeList"
+      PICS: BRBINFO.S.A0009
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [9]
+
+    - label:
+          "Step 4i: TH reads optional attribute(SoftwareVersionString) in
+          AttributeList"
+      PICS: BRBINFO.S.A000a
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [10]
+
+    - label:
+          "Step 4j: TH reads optional attribute(ManufacturingDate) in
+          AttributeList"
+      PICS: BRBINFO.S.A000b
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [11]
+
+    - label: "Step 4k: TH reads optional attribute(PartNumber) in AttributeList"
+      PICS: BRBINFO.S.A000c
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [12]
+
+    - label: "Step 4l: TH reads optional attribute(ProductURL) in AttributeList"
+      PICS: BRBINFO.S.A000d
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [13]
+
+    - label:
+          "Step 4m: TH reads optional attribute(ProductLabel) in AttributeList"
+      PICS: BRBINFO.S.A000e
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [14]
+
+    - label:
+          "Step 4n: TH reads optional attribute(SerialNumber) in AttributeList"
+      PICS: BRBINFO.S.A000f
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [15]
+
+    - label: "Step 4o: TH reads optional attribute(UniqueID) in AttributeList"
+      PICS: BRBINFO.S.A0012
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [18]
+
+    - label:
+          "Step 4p: TH reads optional attribute(ProductAppearance) in
+          AttributeList"
+      PICS: BRBINFO.S.A0014
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [20]
+
+    - label: "Step 5a: TH reads from the DUT the EventList attribute"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [3]
+
+    - label: "Step 5b: TH reads optional event(StartUp) in EventList"
+      PICS: BRBINFO.S.E00 && PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
+
+    - label: "Step 5c: TH reads optional attribute(ShutDown) in EventList"
+      PICS: BRBINFO.S.E01 && PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [1]
+
+    - label: "Step 5d TH reads optional attribute(Leave) in EventList"
+      PICS: BRBINFO.S.E02 && PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [2]
+
+    - label: "Step 6: TH reads AcceptedCommandList from DUT"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Step 7: TH1 reads GeneratedCommandList from DUT"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list

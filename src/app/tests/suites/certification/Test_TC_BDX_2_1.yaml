@@ -1,0 +1,94 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 28.2.1. [TC-BDX-2.1] Synchronous file sending
+
+PICS:
+    - MCORE.BDX.SynchronousSender
+
+config:
+    nodeId: "0x12344321"
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Preconditions"
+      verification: |
+          This test can be verified using TC-SU-3.3 from the OTA Software Update section. Pls refer to OTA section for steps.
+          This test can also be verified with TH sending a ReceiveInit message to the DUT.
+      disabled: true
+
+    - label:
+          "Step 1: DUT sends the first Block message to TH + TH sends a BlockAck
+          message back to DUT."
+      verification: |
+          On OTA Reference Requester App logs,  Verify that the Block message has the following mandatory fields
+          - Block Counter - Must start at 0 at the start of the transfer.
+          - Data - The length must be in the range [0 < Length ⇐ Max Block Size], where Max Block Size is the negotiated Max Block Size matching the SendAccept message that initiated the transfer.
+
+          [1636410923701] [59208:62970584] CHIP: [ATM] Handling received BDX Message
+          [1636410923701] [59208:62970584] CHIP: [ATM] Block
+          [1636410923701] [59208:62970584] CHIP: [ATM]   Block Counter: 0
+          [1636410923701] [59208:62970584] CHIP: [ATM]   Data Length: 1024
+
+          Compare with
+
+          [1636410922200] [59208:62970584] CHIP: [ATM] Handling received BDX Message
+          [1636410922200] [59208:62970584] CHIP: [ATM] ReceiveAccept
+          [1636410922200] [59208:62970584] CHIP: [ATM]   Transfer Control: 0x20
+          [1636410922200] [59208:62970584] CHIP: [ATM]   Range Control: 0x0
+          [1636410922200] [59208:62970584] CHIP: [ATM]   Max Block Size: 1024
+          [1636410922200] [59208:62970584] CHIP: [ATM]   Length: 0x0000000000000000
+      disabled: true
+
+    - label:
+          "Step 2: DUT sends further Block messages to TH + TH sends BlockAck
+          messages back to DUT."
+      verification: |
+          On OTA Reference Requester App logs,  Verify that the Blocks are sent in ascending and sequential block counter order.
+
+          [1636410925203] [59208:62970585] CHIP: [ATM] Block
+          [1636410925203] [59208:62970585] CHIP: [ATM]   Block Counter: 1
+
+          [1636410926704] [59208:62970584] CHIP: [ATM] Block
+          [1636410926704] [59208:62970584] CHIP: [ATM]   Block Counter: 2
+
+          and so on
+      disabled: true
+
+    - label:
+          "Step 3: DUT sends a BlockEOF message to TH + TH sends a BlockAckEOF
+          message back to DUT."
+      verification: |
+          On OTA Reference Requester App logs, Verify that the BlockEOF message has the following mandatory fields.
+           - Block Counter.
+           - Data - The length must be in the range [0 ⇐ Length ⇐ Max Block Size], where Max Block Size is the negotiated Max Block Size matching the SendAccept message that initiated the transfer.
+           - Verify that the pre-negotiated file size was transferred, if a definite size had been given.
+
+
+          [1636410935710] [59208:62970585] CHIP: [ATM] Handling received BDX Message
+          [1636410935710] [59208:62970585] CHIP: [ATM] BlockEOF
+          [1636410935710] [59208:62970585] CHIP: [ATM]   Block Counter: 8
+          [1636410935710] [59208:62970585] CHIP: [ATM]   Data Length: 147
+
+          Compare with
+
+          [1636410922200] [59208:62970584] CHIP: [ATM] Handling received BDX Message
+          [1636410922200] [59208:62970584] CHIP: [ATM] ReceiveAccept
+          [1636410922200] [59208:62970584] CHIP: [ATM]   Transfer Control: 0x20
+          [1636410922200] [59208:62970584] CHIP: [ATM]   Range Control: 0x0
+          [1636410922200] [59208:62970584] CHIP: [ATM]   Max Block Size: 1024
+          [1636410922200] [59208:62970584] CHIP: [ATM]   Length: 0x0000000000000000
+      disabled: true

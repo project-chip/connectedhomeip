@@ -1,0 +1,555 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 15.1.1. [TC-PCC-1.1] Global attributes with server as DUT
+
+PICS:
+    - PCC.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Pump Configuration and Control"
+    endpoint: 1
+
+tests:
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH reads the ClusterRevision attribute from the DUT"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 4
+          constraints:
+              type: int16u
+
+    - label: "Step 3a: TH reads the FeatureMap attribute from the DUT"
+      PICS:
+          " !PCC.S.F00 && !PCC.S.F01 && !PCC.S.F02 && !PCC.S.F03 && !PCC.S.F04
+          && !PCC.S.F05 && !PCC.S.F06 "
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
+
+    - label:
+          "Step 3b: Given PCC.S.F00(PRSCONST) ensure featuremap has the correct
+          bit set"
+      PICS: PCC.S.F00
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
+
+    - label:
+          "Step 3c: Given PCC.S.F01(PRSCOMP) ensure featuremap has the correct
+          bit set"
+      PICS: PCC.S.F01
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2]
+
+    - label:
+          "Step 3d: Given PCC.S.F02(FLW) ensure featuremap has the correct bit
+          set"
+      PICS: PCC.S.F02
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x4]
+
+    - label:
+          "Step 3e: Given PCC.S.F03(SPD) ensure featuremap has the correct bit
+          set"
+      PICS: PCC.S.F03
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x8]
+
+    - label:
+          "Step 3f: Given PCC.S.F04(TEMP) ensure featuremap has the correct bit
+          set"
+      PICS: PCC.S.F04
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x10]
+
+    - label:
+          "Step 3g: Given PCC.S.F05(AUTO) ensure featuremap has the correct bit
+          set"
+      PICS: PCC.S.F05
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x20]
+
+    - label:
+          "Step 3h: Given PCC.S.F06(LOCAL) ensure featuremap has the correct bit
+          set"
+      PICS: PCC.S.F06
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x40]
+
+    - label: "Step 4a: TH reads the AttributeList attribute from the DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains:
+                  [
+                      0,
+                      1,
+                      2,
+                      17,
+                      18,
+                      19,
+                      32,
+                      65528,
+                      65529,
+                      65530,
+                      65531,
+                      65532,
+                      65533,
+                  ]
+
+    - label: "Step 4a: TH reads the AttributeList attribute from the DUT"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains:
+                  [0, 1, 2, 17, 18, 19, 32, 65528, 65529, 65531, 65532, 65533]
+
+    - label:
+          "Step 4b: TH reads optional attribute(MinConstPressure) attribute in
+          AttributeList from the DUT"
+      PICS: PCC.S.A0003
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [3]
+
+    - label:
+          "Step 4c TH reads optional attribute(MaxConstPressure) attribute in
+          AttributeList from the DUT"
+      PICS: PCC.S.A0004
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [4]
+
+    - label:
+          "Step 4d: TH reads optional attribute(MinCompPressure) attribute in
+          AttributeList from the DUT"
+      PICS: PCC.S.A0005
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [5]
+
+    - label:
+          "Step 4e: TH reads optional attribute(MaxCompPressure) attribute in
+          AttributeList from the DUT"
+      PICS: PCC.S.A0006
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [6]
+
+    - label:
+          "Step 4f: TH reads optional attribute(MinConstSpeed) attribute in
+          AttributeList from the DUT"
+      PICS: PCC.S.A0007
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [7]
+
+    - label:
+          "Step 4g: TH reads optional attribute(MaxConstSpeed) attribute in
+          AttributeList from the DUT"
+      PICS: PCC.S.A0008
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [8]
+
+    - label:
+          "Step 4h: TH reads optional attribute(MinConstFlow) attribute in
+          AttributeList from the DUT"
+      PICS: PCC.S.A0009
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [9]
+
+    - label:
+          "Step 4i: TH reads optional attribute(MaxConstFlow) attribute in
+          AttributeList from the DUT"
+      PICS: PCC.S.A000a
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [10]
+
+    - label:
+          "Step 4j: TH reads optional attribute(MinConstTemp) attribute in
+          AttributeList from the DUT"
+      PICS: PCC.S.A000b
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [11]
+
+    - label:
+          "Step 4k: TH reads optional attribute(MaxConstTemp) attribute in
+          AttributeList from the DUT"
+      PICS: PCC.S.A000c
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [12]
+
+    - label:
+          "Step 4l: TH reads optional attribute(PumpStatus) attribute in
+          AttributeList from the DUT"
+      PICS: PCC.S.A0010
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [16]
+
+    - label:
+          "Step 4m: TH reads optional attribute(Speed) attribute in
+          AttributeList from the DUT"
+      PICS: PCC.S.A0014
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [20]
+
+    - label:
+          "Step 4n: TH reads optional attribute(LifetimeRunningHours) attribute
+          in AttributeList from the DUT"
+      PICS: PCC.S.A0015
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [21]
+
+    - label:
+          "Step 4o: TH reads optional attribute(Power) attribute in
+          AttributeList from the DUT"
+      PICS: PCC.S.A0016
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [22]
+
+    - label:
+          "Step 4p: TH reads optional attribute(LifetimeEnergyConsumed)
+          attribute in AttributeList from the DUT"
+      PICS: PCC.S.A0017
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [23]
+
+    - label:
+          "Step 4q: TH reads optional attribute(ControlMode) attribute in
+          AttributeList from the DUT"
+      PICS: PCC.S.A0021
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [33]
+
+    - label: "Step 5a: TH reads EventList from DUT"
+      PICS:
+          "PICS_EVENT_LIST_ENABLED && !PCC.S.E00 && !PCC.S.E01 && !PCC.S.E02 &&
+          !PCC.S.E03 && !PCC.S.E04 && !PCC.S.E05 && !PCC.S.E06 && !PCC.S.E07 &&
+          !PCC.S.E08 && !PCC.S.E09 && !PCC.S.E0a && !PCC.S.E0b && !PCC.S.E0c &&
+          !PCC.S.E0d && !PCC.S.E0e && !PCC.S.E0f && !PCC.S.E10 "
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label:
+          "Step 5b: TH reads from the DUT the EventList optional
+          (SupplyVoltageLow)attribute."
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E00
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [0x00]
+
+    - label:
+          "Step 5c: TH reads from the DUT the EventList optional
+          (SupplyVoltageHigh)attribute."
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E01
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [0x01]
+
+    - label:
+          "Step 5d: TH reads from the DUT the EventList optional
+          (PowerMissingPhase)attribute."
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E02
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [0x02]
+
+    - label:
+          "Step 5e: TH reads from the DUT the EventList optional
+          (SystemPressureLow)attribute."
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E03
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [0x03]
+
+    - label:
+          "Step 5f: TH reads from the DUT the EventList optional
+          (SystemPressureHigh)attribute."
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E04
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [0x04]
+
+    - label:
+          "Step 5g: TH reads from the DUT the EventList optional
+          (DryRunning)attribute."
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E05
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [0x05]
+
+    - label:
+          "Step 5h: TH reads from the DUT the EventList optional
+          (MotorTemperatureHigh)attribute."
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E06
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [0x06]
+
+    - label:
+          "Step 5i: TH reads from the DUT the EventList optional
+          (PumpMotorFatalFailure)attribute."
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E07
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [0x07]
+
+    - label:
+          "Step 5j: TH reads from the DUT the EventList optional
+          (ElectronicTemperatureHigh)attribute."
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E08
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [0x08]
+
+    - label:
+          "Step 5k: TH reads from the DUT the EventList optional
+          (PumpBlocked)attribute."
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E09
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [0x09]
+
+    - label:
+          "Step 5l: TH reads from the DUT the EventList optional
+          (SensorFailure)attribute."
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E0a
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [0x0a]
+
+    - label:
+          "Step 5m: TH reads from the DUT the EventList optional
+          (ElectronicNonFatalFailure)attribute."
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E0b
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [0x0b]
+
+    - label:
+          "Step 5n: TH reads from the DUT the EventList optional
+          (ElectronicFatalFailure)attribute."
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E0c
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [0x0c]
+
+    - label:
+          "Step 5o: TH reads from the DUT the EventList optional
+          (GeneralFault)attribute."
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E0d
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [0x0d]
+
+    - label:
+          "Step 5p: TH reads from the DUT the EventList optional
+          (Leakage)attribute."
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E0e
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [0x0e]
+
+    - label:
+          "Step 5q: TH reads from the DUT the EventList optional
+          (AirDetection)attribute."
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E0f
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [0x0f]
+
+    - label:
+          "Step 5r: TH reads from the DUT the EventList optional
+          (TurbineOperation)attribute."
+      PICS: PICS_EVENT_LIST_ENABLED && PCC.S.E10
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [0x10]
+
+    - label: "Step 6: TH reads from the DUT the AcceptedCommandList attribute."
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label:
+          "Step 7:  TH reads from the DUT the GeneratedCommandList attribute."
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list

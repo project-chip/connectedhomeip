@@ -1,0 +1,4 @@
+client cluster MyCluster = 123 {
+    attribute int16u clusterAttr = 1;
+}
+

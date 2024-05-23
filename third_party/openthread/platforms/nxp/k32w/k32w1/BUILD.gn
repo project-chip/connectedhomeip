@@ -1,0 +1,95 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/nxp_sdk.gni")
+import("//build_overrides/openthread.gni")
+
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
+
+openthread_nxp_root = "${chip_root}/third_party/openthread/ot-nxp"
+
+config("openthread_k32w1_config") {
+  include_dirs = [ "${openthread_nxp_root}/src/k32w1/k32w1" ]
+  include_dirs += [ "${chip_root}/examples/platform/nxp/k32w/k32w1" ]
+
+  defines = [
+    "OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE=1",
+    "OPENTHREAD_CONFIG_IP6_SLAAC_ENABLE=1",
+    "MBEDTLS_ENTROPY_HARDWARE_ALT=1",
+    "MBEDTLS_THREADING_C=1",
+    "MBEDTLS_THREADING_ALT=1",
+  ]
+
+  if (use_smu2_dynamic) {
+    defines += [
+      "OPENTHREAD_CONFIG_MESSAGE_USE_HEAP_ENABLE=1",
+      "OPENTHREAD_CONFIG_ENABLE_BUILTIN_MBEDTLS_MANAGEMENT=0",
+    ]
+  }
+}
+
+source_set("openthread_core_config_k32w1") {
+  sources = [
+    "${openthread_nxp_root}/src/k32w1/k32w1/openthread-core-k32w1-config-check.h",
+    "${openthread_nxp_root}/src/k32w1/k32w1/openthread-core-k32w1-config.h",
+  ]
+
+  public_configs = [ ":openthread_k32w1_config" ]
+}
+
+source_set("openthread_mbedtls_config_k32w1") {
+  sources = [ "${openthread_nxp_root}/src/k32w1/k32w1/k32w1-mbedtls-config.h" ]
+}
+
+source_set("libopenthread-k32w1") {
+  sources = [
+    "${openthread_nxp_root}/src/common/crypto.c",
+    "${openthread_nxp_root}/src/common/flash_nvm.c",
+    "${openthread_nxp_root}/src/k32w1/k32w1/alarm.c",
+    "${openthread_nxp_root}/src/k32w1/k32w1/diag.c",
+    "${openthread_nxp_root}/src/k32w1/k32w1/entropy.c",
+    "${openthread_nxp_root}/src/k32w1/k32w1/logging.c",
+    "${openthread_nxp_root}/src/k32w1/k32w1/misc.c",
+    "${openthread_nxp_root}/src/k32w1/k32w1/radio.c",
+    "${openthread_nxp_root}/src/k32w1/k32w1/system.c",
+    "${openthread_nxp_root}/src/k32w1/k32w1/uart.c",
+  ]
+
+  if (chip_crypto == "platform") {
+    sources += [ "${openthread_nxp_root}/src/k32w1/k32w1/ecdsa_sss.cpp" ]
+
+    if (use_hw_sha256) {
+      sources += [ "${openthread_nxp_root}/src/k32w1/k32w1/sha256_sss.cpp" ]
+    }
+
+    if (use_hw_aes) {
+      sources += [ "${openthread_nxp_root}/src/k32w1/k32w1/aes_sss.cpp" ]
+    }
+  }
+
+  if (chip_with_ot_cli == 1) {
+    sources += [ "${openthread_root}/examples/apps/cli/cli_uart.cpp" ]
+  }
+
+  public_deps = [
+    ":openthread_core_config_k32w1",
+    "${nxp_sdk_build_root}:nxp_sdk",
+    "${openthread_root}/src/core:libopenthread_core_headers",
+    "../../..:libopenthread-platform",
+    "../../..:libopenthread-platform-utils",
+  ]
+}

@@ -1,0 +1,157 @@
+>>> ERRORS <<<
+>>> GENERATE <<<
+[batch]
+audioinput=-f ${builtin:audio_format} -ar ${builtin:audio_rate} -ac ${builtin:audio_num_channels} -i "${export:audio}"
+batchfile=${export:base}-run-encoder.bat
+codecs0=${presets:${preset0}_filter} ${presets:${preset0}_audiocodec} ${presets:${preset0}_videocodec}
+codecs1=${presets:${preset1}_filter} ${presets:${preset1}_audiocodec} ${presets:${preset1}_videocodec}
+codecs2=${presets:${preset2}_filter} ${presets:${preset2}_audiocodec} ${presets:${preset2}_videocodec}
+codecs3=${presets:${preset3}_filter} ${presets:${preset3}_audiocodec} ${presets:${preset3}_videocodec}
+codecs4=${presets:${preset4}_filter} ${presets:${preset4}_audiocodec} ${presets:${preset4}_videocodec}
+codecs5=${presets:${preset5}_filter} ${presets:${preset5}_audiocodec} ${presets:${preset5}_videocodec}
+codecs6=${presets:${preset6}_filter} ${presets:${preset6}_audiocodec} ${presets:${preset6}_videocodec}
+codecs7=${presets:${preset7}_filter} ${presets:${preset7}_audiocodec} ${presets:${preset7}_videocodec}
+codecs8=${presets:${preset8}_filter} ${presets:${preset8}_audiocodec} ${presets:${preset8}_videocodec}
+codecs9=${presets:${preset9}_filter} ${presets:${preset9}_audiocodec} ${presets:${preset9}_videocodec}
+command=${encode0} & ${encode1} & pause
+encode0=${ffmpeg} ${inputs} ${codecs0} "${output0}"
+encode1=${ffmpeg} ${inputs} ${codecs1} "${output1}"
+encode2=${ffmpeg} ${inputs} ${codecs2} "${output2}"
+encode3=${ffmpeg} ${inputs} ${codecs3} "${output3}"
+encode4=${ffmpeg} ${inputs} ${codecs4} "${output4}"
+encode5=${ffmpeg} ${inputs} ${codecs5} "${output5}"
+encode6=${ffmpeg} ${inputs} ${codecs6} "${output6}"
+encode7=${ffmpeg} ${inputs} ${codecs7} "${output7}"
+encode8=${ffmpeg} ${inputs} ${codecs8} "${output8}"
+encode9=${ffmpeg} ${inputs} ${codecs9} "${output9}"
+ffmpeg="${export:folder}\ffmpeg.exe" -y
+inputs=${audioinput} ${videoinput}
+output0=${export:base}-${preset0}.${presets:${preset0}_container}
+output1=${export:base}-${preset1}.${presets:${preset1}_container}
+output2=${export:base}-${preset2}.${presets:${preset2}_container}
+output3=${export:base}-${preset3}.${presets:${preset3}_container}
+output4=${export:base}-${preset4}.${presets:${preset4}_container}
+output5=${export:base}-${preset5}.${presets:${preset5}_container}
+output6=${export:base}-${preset6}.${presets:${preset6}_container}
+output7=${export:base}-${preset7}.${presets:${preset7}_container}
+output8=${export:base}-${preset8}.${presets:${preset8}_container}
+output9=${export:base}-${preset9}.${presets:${preset9}_container}
+preset0=lossless
+preset1=low
+preset2=medium
+preset3=high
+videoinput=-f rawvideo -pix_fmt ${builtin:video_format} -s:v ${builtin:width}x${builtin:height} -r ${builtin:framerate_numerator}/${builtin:framerate_denominator} -i "${export:video}"
+
+[builtin]
+audio_format=s16le
+audio_num_channels=2
+audio_rate=44100
+framerate_denominator=1001
+framerate_numerator=30000
+height=1080
+timestamp=20171126
+video_format=nv12
+width=1920
+
+[export]
+audio=${base}-raw-audio.raw
+base=${folder}\export-${builtin:timestamp}
+folder=d:
+video=${base}-raw-video.yuv
+
+[presets]
+high_audiocodec=-c:a aac -b:a 384k
+high_container=mkv
+high_filter=
+high_videocodec=-c:v libx264 -crf 18
+lossless_audiocodec=-c:a flac
+lossless_container=mkv
+lossless_filter=
+lossless_videocodec=-c:v ffv1
+low_audiocodec=-c:a aac -b:a 96k
+low_container=mkv
+low_filter=-vf scale=854:-1
+low_videocodec=-c:v libx264 -crf 28
+medium_audiocodec=-c:a aac -b:a 192k
+medium_container=mkv
+medium_filter=-vf scale=-1:720
+medium_videocodec=-c:v libx264 -crf 23
+
+>>> INTERPOLATE <<<
+[batch]
+audioinput=-f s16le -ar 44100 -ac 2 -i "d:\export-20171126-raw-audio.raw"
+batchfile=d:\export-20171126-run-encoder.bat
+codecs0= -c:a flac -c:v ffv1
+codecs1=-vf scale=854:-1 -c:a aac -b:a 96k -c:v libx264 -crf 28
+codecs2=-vf scale=-1:720 -c:a aac -b:a 192k -c:v libx264 -crf 23
+codecs3= -c:a aac -b:a 384k -c:v libx264 -crf 18
+codecs4=${presets:${preset4}_filter} ${presets:${preset4}_audiocodec} ${presets:${preset4}_videocodec}
+codecs5=${presets:${preset5}_filter} ${presets:${preset5}_audiocodec} ${presets:${preset5}_videocodec}
+codecs6=${presets:${preset6}_filter} ${presets:${preset6}_audiocodec} ${presets:${preset6}_videocodec}
+codecs7=${presets:${preset7}_filter} ${presets:${preset7}_audiocodec} ${presets:${preset7}_videocodec}
+codecs8=${presets:${preset8}_filter} ${presets:${preset8}_audiocodec} ${presets:${preset8}_videocodec}
+codecs9=${presets:${preset9}_filter} ${presets:${preset9}_audiocodec} ${presets:${preset9}_videocodec}
+command="d:\ffmpeg.exe" -y -f s16le -ar 44100 -ac 2 -i "d:\export-20171126-raw-audio.raw" -f rawvideo -pix_fmt nv12 -s:v 1920x1080 -r 30000/1001 -i "d:\export-20171126-raw-video.yuv"  -c:a flac -c:v ffv1 "d:\export-20171126-lossless.mkv" & "d:\ffmpeg.exe" -y -f s16le -ar 44100 -ac 2 -i "d:\export-20171126-raw-audio.raw" -f rawvideo -pix_fmt nv12 -s:v 1920x1080 -r 30000/1001 -i "d:\export-20171126-raw-video.yuv" -vf scale=854:-1 -c:a aac -b:a 96k -c:v libx264 -crf 28 "d:\export-20171126-low.mkv" & pause
+encode0="d:\ffmpeg.exe" -y -f s16le -ar 44100 -ac 2 -i "d:\export-20171126-raw-audio.raw" -f rawvideo -pix_fmt nv12 -s:v 1920x1080 -r 30000/1001 -i "d:\export-20171126-raw-video.yuv"  -c:a flac -c:v ffv1 "d:\export-20171126-lossless.mkv"
+encode1="d:\ffmpeg.exe" -y -f s16le -ar 44100 -ac 2 -i "d:\export-20171126-raw-audio.raw" -f rawvideo -pix_fmt nv12 -s:v 1920x1080 -r 30000/1001 -i "d:\export-20171126-raw-video.yuv" -vf scale=854:-1 -c:a aac -b:a 96k -c:v libx264 -crf 28 "d:\export-20171126-low.mkv"
+encode2="d:\ffmpeg.exe" -y -f s16le -ar 44100 -ac 2 -i "d:\export-20171126-raw-audio.raw" -f rawvideo -pix_fmt nv12 -s:v 1920x1080 -r 30000/1001 -i "d:\export-20171126-raw-video.yuv" -vf scale=-1:720 -c:a aac -b:a 192k -c:v libx264 -crf 23 "d:\export-20171126-medium.mkv"
+encode3="d:\ffmpeg.exe" -y -f s16le -ar 44100 -ac 2 -i "d:\export-20171126-raw-audio.raw" -f rawvideo -pix_fmt nv12 -s:v 1920x1080 -r 30000/1001 -i "d:\export-20171126-raw-video.yuv"  -c:a aac -b:a 384k -c:v libx264 -crf 18 "d:\export-20171126-high.mkv"
+encode4="d:\ffmpeg.exe" -y -f s16le -ar 44100 -ac 2 -i "d:\export-20171126-raw-audio.raw" -f rawvideo -pix_fmt nv12 -s:v 1920x1080 -r 30000/1001 -i "d:\export-20171126-raw-video.yuv" ${presets:${preset4}_filter} ${presets:${preset4}_audiocodec} ${presets:${preset4}_videocodec} "d:\export-20171126-${preset4}.${presets:${preset4}_container}"
+encode5="d:\ffmpeg.exe" -y -f s16le -ar 44100 -ac 2 -i "d:\export-20171126-raw-audio.raw" -f rawvideo -pix_fmt nv12 -s:v 1920x1080 -r 30000/1001 -i "d:\export-20171126-raw-video.yuv" ${presets:${preset5}_filter} ${presets:${preset5}_audiocodec} ${presets:${preset5}_videocodec} "d:\export-20171126-${preset5}.${presets:${preset5}_container}"
+encode6="d:\ffmpeg.exe" -y -f s16le -ar 44100 -ac 2 -i "d:\export-20171126-raw-audio.raw" -f rawvideo -pix_fmt nv12 -s:v 1920x1080 -r 30000/1001 -i "d:\export-20171126-raw-video.yuv" ${presets:${preset6}_filter} ${presets:${preset6}_audiocodec} ${presets:${preset6}_videocodec} "d:\export-20171126-${preset6}.${presets:${preset6}_container}"
+encode7="d:\ffmpeg.exe" -y -f s16le -ar 44100 -ac 2 -i "d:\export-20171126-raw-audio.raw" -f rawvideo -pix_fmt nv12 -s:v 1920x1080 -r 30000/1001 -i "d:\export-20171126-raw-video.yuv" ${presets:${preset7}_filter} ${presets:${preset7}_audiocodec} ${presets:${preset7}_videocodec} "d:\export-20171126-${preset7}.${presets:${preset7}_container}"
+encode8="d:\ffmpeg.exe" -y -f s16le -ar 44100 -ac 2 -i "d:\export-20171126-raw-audio.raw" -f rawvideo -pix_fmt nv12 -s:v 1920x1080 -r 30000/1001 -i "d:\export-20171126-raw-video.yuv" ${presets:${preset8}_filter} ${presets:${preset8}_audiocodec} ${presets:${preset8}_videocodec} "d:\export-20171126-${preset8}.${presets:${preset8}_container}"
+encode9="d:\ffmpeg.exe" -y -f s16le -ar 44100 -ac 2 -i "d:\export-20171126-raw-audio.raw" -f rawvideo -pix_fmt nv12 -s:v 1920x1080 -r 30000/1001 -i "d:\export-20171126-raw-video.yuv" ${presets:${preset9}_filter} ${presets:${preset9}_audiocodec} ${presets:${preset9}_videocodec} "d:\export-20171126-${preset9}.${presets:${preset9}_container}"
+ffmpeg="d:\ffmpeg.exe" -y
+inputs=-f s16le -ar 44100 -ac 2 -i "d:\export-20171126-raw-audio.raw" -f rawvideo -pix_fmt nv12 -s:v 1920x1080 -r 30000/1001 -i "d:\export-20171126-raw-video.yuv"
+output0=d:\export-20171126-lossless.mkv
+output1=d:\export-20171126-low.mkv
+output2=d:\export-20171126-medium.mkv
+output3=d:\export-20171126-high.mkv
+output4=d:\export-20171126-${preset4}.${presets:${preset4}_container}
+output5=d:\export-20171126-${preset5}.${presets:${preset5}_container}
+output6=d:\export-20171126-${preset6}.${presets:${preset6}_container}
+output7=d:\export-20171126-${preset7}.${presets:${preset7}_container}
+output8=d:\export-20171126-${preset8}.${presets:${preset8}_container}
+output9=d:\export-20171126-${preset9}.${presets:${preset9}_container}
+preset0=lossless
+preset1=low
+preset2=medium
+preset3=high
+videoinput=-f rawvideo -pix_fmt nv12 -s:v 1920x1080 -r 30000/1001 -i "d:\export-20171126-raw-video.yuv"
+
+[builtin]
+audio_format=s16le
+audio_num_channels=2
+audio_rate=44100
+framerate_denominator=1001
+framerate_numerator=30000
+height=1080
+timestamp=20171126
+video_format=nv12
+width=1920
+
+[export]
+audio=d:\export-20171126-raw-audio.raw
+base=d:\export-20171126
+folder=d:
+video=d:\export-20171126-raw-video.yuv
+
+[presets]
+high_audiocodec=-c:a aac -b:a 384k
+high_container=mkv
+high_filter=
+high_videocodec=-c:v libx264 -crf 18
+lossless_audiocodec=-c:a flac
+lossless_container=mkv
+lossless_filter=
+lossless_videocodec=-c:v ffv1
+low_audiocodec=-c:a aac -b:a 96k
+low_container=mkv
+low_filter=-vf scale=854:-1
+low_videocodec=-c:v libx264 -crf 28
+medium_audiocodec=-c:a aac -b:a 192k
+medium_container=mkv
+medium_filter=-vf scale=-1:720
+medium_videocodec=-c:v libx264 -crf 23
+

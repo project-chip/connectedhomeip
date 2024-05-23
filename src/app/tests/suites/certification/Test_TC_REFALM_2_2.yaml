@@ -1,0 +1,207 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 223.2.2. [TC-REFALM-2.2] Primary functionality with DUT as Server
+
+PICS:
+    - REFALM.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Refrigerator Alarm"
+    endpoint: 1
+    PIXIT.REFALM.AlarmThreshold:
+        type: int16u
+        defaultValue: 5
+
+tests:
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: Ensure that the door on the DUT is closed"
+      verification: |
+          Ensure that the door on the DUT is closed
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 3:TH reads from the DUT the State attribute"
+      command: "readAttribute"
+      attribute: "State"
+      PICS: REFALM.S.A0002
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x1]
+
+    - label: "Step 4: Manually open the door on the DUT"
+      verification: |
+          Manually open the door on the DUT
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 5: Wait for the time defined in PIXIT.REFALM.AlarmThreshold"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "ms"
+                value: PIXIT.REFALM.AlarmThreshold * 1000
+
+    - label: "Step 6: TH reads from the DUT the State attribute"
+      command: "readAttribute"
+      attribute: "State"
+      PICS: REFALM.S.A0002 && PICS_USER_PROMPT
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
+
+    - label: "Step 7: Ensure that the door on the DUT is closed"
+      verification: |
+          Ensure that the door on the DUT is closed
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 8: TH reads from the DUT the State attribute"
+      command: "readAttribute"
+      attribute: "State"
+      PICS: REFALM.S.A0002 PICS_USER_PROMPT
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x1]
+
+      # Issue: https://github.com/project-chip/connectedhomeip/issues/28325
+      # Issue: https://github.com/project-chip/connectedhomeip/issues/27235
+    - label: "Step 9: TH sends Reset command to the DUT"
+      PICS: REFALM.S.C00.Rsp && PICS_USER_PROMPT
+      verification: |
+          Reset command is not implemeted in Chip-tool
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 10: TH sends ModifyEnabledAlarms command to the DUT"
+      PICS: REFALM.S.C01.Rsp && PICS_USER_PROMPT
+      verification: |
+          ModifyEnabledAlarms is not implemeted in Chip-tool
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 11: Set up subscription to the Notify event."
+      PICS: REFALM.S.E00 && REFALM.S.A0002
+      command: "subscribeEvent"
+      event: "Notify"
+      minInterval: 2
+      maxInterval: 10
+
+    - label: "Step 12a: Repeating step 4 Manually open the door on the DUT"
+      verification: |
+          Manually open the door on the DUT
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 12b: Repeat step 5 Wait for the time defined in
+          PIXIT.REFALM.AlarmThreshold"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "ms"
+                value: PIXIT.REFALM.AlarmThreshold * 1000
+
+    - label:
+          "Step 12c: After step 5 (repeated), receive a Notify event with the
+          State attribute bit 0 set to 1."
+      command: "readAttribute"
+      attribute: "State"
+      PICS: REFALM.S.A0002 && PICS_USER_PROMPT
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
+
+    - label:
+          "Step 13a : Repeat step 7 Ensure that the door on the DUT is closed"
+      verification: |
+          Manually open the door on the DUT
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 13b: Receive a Notify event with the State attribute bit 0 set
+          to 0"
+      command: "readAttribute"
+      attribute: "State"
+      PICS: REFALM.S.A0002 && PICS_USER_PROMPT
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x1]

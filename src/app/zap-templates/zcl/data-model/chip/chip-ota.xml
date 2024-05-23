@@ -1,0 +1,160 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+    <domain name="CHIP" spec="chip-0.7" dependsOn="zcl-1.0-07-5123-03" certifiable="true"/>
+    <enum name="StatusEnum" type="enum8">
+        <cluster code="0x0029"/>
+        <item name="UpdateAvailable" value="0x0"/>
+        <item name="Busy" value="0x1"/>
+        <item name="NotAvailable" value="0x2"/>
+        <item name="DownloadProtocolNotSupported" value="0x3"/>
+    </enum>
+    <enum name="ApplyUpdateActionEnum" type="enum8">
+        <cluster code="0x0029"/>
+        <item name="Proceed" value="0x0"/>
+        <item name="AwaitNextAction" value="0x1"/>
+        <item name="Discontinue" value="0x2"/>
+    </enum>
+    <enum name="DownloadProtocolEnum" type="enum8">
+        <cluster code="0x0029"/>
+        <item name="BDXSynchronous" value="0x0"/>
+        <item name="BDXAsynchronous" value="0x1"/>
+        <item name="HTTPS" value="0x2"/>
+        <item name="VendorSpecific" value="0x3"/>
+    </enum>
+    <cluster>
+        <name>OTA Software Update Provider</name>
+        <domain>CHIP</domain>
+        <description>Provides an interface for providing OTA software updates</description>
+        <code>0x0029</code>
+        <define>OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER</define>
+        <client tick="false" init="false">true</client>
+        <server tick="false" init="false">true</server>
+        <command source="client" code="0x00" name="QueryImage" response="QueryImageResponse" optional="false" cli="chip ota queryimage">
+            <description>Determine availability of a new Software Image</description>
+            <arg name="VendorID" type="vendor_id"/>
+            <arg name="ProductID" type="int16u"/>
+            <arg name="SoftwareVersion" type="int32u"/>
+            <arg name="ProtocolsSupported" type="DownloadProtocolEnum" array="true"/>
+            <arg name="HardwareVersion" type="int16u" optional="true"/>
+            <arg name="Location" type="char_string" length="2" optional="true"/>
+            <arg name="RequestorCanConsent" type="boolean" default="false" optional="true"/>
+            <arg name="MetadataForProvider" type="octet_string" length="512" optional="true"/>
+        </command>
+        <command source="server" code="0x01" name="QueryImageResponse" optional="false" cli="chip ota queryimageresponse">
+            <description>Response to QueryImage command</description>
+            <arg name="Status" type="StatusEnum"/>
+            <arg name="DelayedActionTime" type="int32u" optional="true"/>
+            <arg name="ImageURI" type="char_string" length="256" optional="true"/>
+            <arg name="SoftwareVersion" type="int32u" optional="true"/>
+            <arg name="SoftwareVersionString" type="char_string" length="64" optional="true"/>
+            <arg name="UpdateToken" type="octet_string" length="32" optional="true"/>
+            <arg name="UserConsentNeeded" type="boolean" default="false" optional="true"/>
+            <arg name="MetadataForRequestor" type="octet_string" length="512" optional="true"/>
+        </command>
+        <command source="client" code="0x02" name="ApplyUpdateRequest" response="ApplyUpdateResponse" optional="false" cli="chip ota applyupdaterequest">
+            <description>Determine next action to take for a downloaded Software Image</description>
+            <arg name="UpdateToken" type="octet_string" length="32"/>
+            <arg name="NewVersion" type="int32u"/>
+        </command>
+        <command source="server" code="0x03" name="ApplyUpdateResponse" optional="false" cli="chip ota applyupdateresponse">
+            <description>Reponse to ApplyUpdateRequest command</description>
+            <arg name="Action" type="ApplyUpdateActionEnum"/>
+            <arg name="DelayedActionTime" type="int32u"/>
+        </command>
+        <command source="client" code="0x04" name="NotifyUpdateApplied" optional="false" cli="chip ota notifyupdateapplied">
+            <description>Notify OTA Provider that an update was applied</description>
+            <arg name="UpdateToken" type="octet_string" length="32"/>
+            <arg name="SoftwareVersion" type="int32u"/>
+        </command>
+    </cluster>
+    <enum name="AnnouncementReasonEnum" type="enum8">
+        <cluster code="0x002a"/>
+        <item name="SimpleAnnouncement" value="0x0"/>
+        <item name="UpdateAvailable" value="0x1"/>
+        <item name="UrgentUpdateAvailable" value="0x2"/>
+    </enum>
+    <enum name="UpdateStateEnum" type="enum8">
+        <cluster code="0x002a"/>
+        <item name="Unknown" value="0x0"/>
+        <item name="Idle" value="0x1"/>
+        <item name="Querying" value="0x2"/>
+        <item name="DelayedOnQuery" value="0x3"/>
+        <item name="Downloading" value="0x4"/>
+        <item name="Applying" value="0x5"/>       
+        <item name="DelayedOnApply" value="0x6"/>
+        <item name="RollingBack" value="0x7"/>
+        <item name="DelayedOnUserConsent" value="0x8"/>            
+    </enum>
+    <enum name="ChangeReasonEnum" type="enum8">
+        <cluster code="0x002a"/>
+        <item name="Unknown" value="0x0"/>
+        <item name="Success" value="0x1"/>
+        <item name="Failure" value="0x2"/>
+        <item name="TimeOut" value="0x3"/>
+        <item name="DelayByProvider" value="0x4"/>
+    </enum>
+    <struct name="ProviderLocation" isFabricScoped="true">
+        <cluster code="0x002a"/>
+        <item fieldId="1" name="ProviderNodeID" type="node_id"/>
+        <item fieldId="2" name="Endpoint" type="endpoint_no"/>
+    </struct>
+    <cluster>
+        <name>OTA Software Update Requestor</name>
+        <domain>CHIP</domain>
+        <description>Provides an interface for downloading and applying OTA software updates</description>
+        <code>0x002a</code>
+        <define>OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER</define>
+        <client tick="false" init="false">true</client>
+        <server tick="false" init="false">true</server>
+        <attribute side="server" code="0x0000" define="DEFAULT_OTA_PROVIDERS" type="array" entryType="ProviderLocation" writable="true" optional="false">
+            <description>DefaultOTAProviders</description>
+            <access op="read" privilege="view"/>
+            <access op="write" privilege="administer"/>
+        </attribute>
+        <attribute side="server" code="0x0001" define="UPDATE_POSSIBLE" type="boolean" default="true" writable="false" optional="false">UpdatePossible</attribute>
+        <attribute side="server" code="0x0002" define="UPDATE_STATE" type="UpdateStateEnum" default="Unknown" writable="false" optional="false">UpdateState</attribute>
+        <attribute side="server" code="0x0003" define="UPDATE_STATE_PROGRESS" type="int8u" min="0" max="100" writable="false" isNullable="true" optional="false">UpdateStateProgress</attribute>
+        <command source="client" code="0x00" name="AnnounceOTAProvider" optional="true" cli="chip ota announceotaprovider">
+            <description>Announce the presence of an OTA Provider</description>
+            <arg name="ProviderNodeID" type="node_id"/>
+            <arg name="VendorID" type="vendor_id"/>
+            <arg name="AnnouncementReason" type="AnnouncementReasonEnum"/>
+            <arg name="MetadataForNode" type="octet_string" length="512" optional="true"/>
+            <arg name="Endpoint" type="endpoint_no"/>
+        </command>
+        <event side="server" code="0x00" name="StateTransition" priority="info" optional="false">
+          <description>This event SHALL be generated when a change of the UpdateState attribute occurs due to an OTA Requestor moving through the states necessary to query for updates.</description>
+          <field id="0" name="PreviousState" type="UpdateStateEnum"/>
+          <field id="1" name="NewState" type="UpdateStateEnum"/>
+          <field id="2" name="Reason" type="ChangeReasonEnum"/>
+          <field id="3" name="TargetSoftwareVersion" type="int32u" isNullable="true"/>
+        </event> 
+        <event side="server" code="0x01" name="VersionApplied" priority="critical" optional="false">
+          <description>This event SHALL be generated whenever a new version starts executing after being applied due to a software update.</description>
+          <field id="0" name="SoftwareVersion" type="int32u"/> 
+          <field id="1" name="ProductID" type="int16u"/>
+        </event>
+        <event side="server" code="0x02" name="DownloadError" priority="info" optional="false">
+          <description>This event SHALL be generated whenever an error occurs during OTA Requestor download operation.</description>
+          <field id="0" name="SoftwareVersion" type="int32u"/> 
+          <field id="1" name="BytesDownloaded" type="int64u"/>
+          <field id="2" name="ProgressPercent" type="int8u" min="0" max="100" isNullable="true"/>
+          <field id="3" name="PlatformCode" type="int64s" isNullable="true"/>
+        </event>                     
+    </cluster>
+</configurator>

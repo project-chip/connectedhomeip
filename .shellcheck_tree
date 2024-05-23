@@ -1,0 +1,2 @@
+# configuration for shellcheck_tree.sh
+excludes+=('third_party/*' 'build/*' '.git/*')

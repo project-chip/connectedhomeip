@@ -1,0 +1,583 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Attach to running process",
+            "type": "lldb",
+            "request": "attach",
+            "pid": "${command:pickProcess}"
+        },
+        {
+            "name": "Run application (Darwin x64)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/${input:outAppDarwin}",
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Run application (Linux x64)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/${input:outAppLinux}",
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Run test (Linux x64)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/${input:outTestLinux}",
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "QRCode Tests",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/default/src/setup_payload/tests/TestQRCode",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "preLaunchTask": "Build QRCode Payload Tests",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "CHIP crypto Tests",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/default/src/crypto/tests/TestCrypto",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "preLaunchTask": "Build & Run Crypto Tests",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "CHIP openSSL Tests",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/default/src/crypto/tests/TestCryptoPAL",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "preLaunchTask": "Build openSSL crypto Tests",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "LightingApp (Tizen) [remote]",
+            "type": "cppdbg",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/out/tizen-arm-light",
+            "program": "${workspaceFolder}/out/tizen-arm-light/chip-lighting-app",
+            "miDebuggerPath": "${env:TIZEN_SDK_ROOT}/tools/arm-linux-gnueabi-gcc-9.2/bin/arm-linux-gnueabi-gdb",
+            "additionalSOLibSearchPath": "${env:TIZEN_ROOTFS}",
+            "preLaunchTask": "Launch LightingApp with gdbserver attached (Tizen)",
+            "miDebuggerServerAddress": "localhost:9999",
+            "linux": {
+                "MIMode": "gdb"
+            },
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "text": "set solib-absolute-prefix ${env:TIZEN_ROOTFS}"
+                },
+                {
+                    "text": "set sysroot ${env:TIZEN_SDK_SYSROOT}"
+                },
+                {
+                    "text": "set debug-file-directory {env:TIZEN_SDK_SYSROOT}/usr/lib/debug"
+                },
+                {
+                    "text": "set solib-search-path ${workspaceFolder}/out/tizen-arm-light"
+                }
+            ]
+        },
+
+        {
+            "name": "Debug Mbed examples",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/examples/${input:mbedApp}/mbed",
+            "executable": "./build-${input:mbedTarget}/${input:mbedDebugProfile}/chip-mbed-${input:mbedApp}-example.elf",
+            "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/packages/arm/bin/", // Pigweed environment bootstraping required
+            "serverpath": "${env:OPENOCD_PATH}/bin/openocd",
+            "servertype": "openocd",
+            "searchDir": [
+                "${workspaceRoot}/config/mbed/scripts",
+                "${env:OPENOCD_PATH}/scripts"
+            ],
+            "configFiles": ["${input:mbedTarget}.tcl"],
+            "overrideLaunchCommands": [
+                "-enable-pretty-printing",
+                "monitor program {./build-${input:mbedTarget}/${input:mbedDebugProfile}/chip-mbed-${input:mbedApp}-example.hex}",
+                "monitor reset run",
+                "monitor sleep 200",
+                "monitor psoc6 reset_halt sysresetreq"
+            ],
+            "numberOfProcessors": 2,
+            "targetProcessor": 1, // Set to 0 for the CM0+, set to 1 for the CM4
+            "overrideRestartCommands": [
+                "monitor reset init",
+                "monitor reset run",
+                "monitor sleep 200",
+                "monitor psoc6 reset_halt sysresetreq"
+            ],
+            "runToMain": true, // if true, program will halt at main. Not used for a restart
+            "showDevDebugOutput": false // When set to true, displays output of GDB.
+        },
+
+        {
+            "name": "Debug Mbed examples [remote]",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/examples/${input:mbedApp}/mbed",
+            "executable": "./build-${input:mbedTarget}/${input:mbedDebugProfile}/chip-mbed-${input:mbedApp}-example.elf",
+            "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/packages/arm/bin/", // Pigweed environment bootstraping required
+            "servertype": "external",
+            "gdbTarget": "host.docker.internal:3334", //port 3333 for the CM0+, 3334 for the CM4
+            "overrideLaunchCommands": [
+                "-enable-pretty-printing",
+                "monitor reset halt",
+                "load ./build-${input:mbedTarget}/${input:mbedDebugProfile}/chip-mbed-${input:mbedApp}-example.hex",
+                "monitor reset run",
+                "monitor sleep 200",
+                "monitor psoc6 reset_halt sysresetreq"
+            ],
+            "overrideRestartCommands": [
+                "monitor reset init",
+                "monitor reset run",
+                "monitor sleep 200",
+                "monitor psoc6 reset_halt sysresetreq"
+            ],
+            "runToMain": true, // if true, program will halt at main. Not used for a restart
+            "showDevDebugOutput": false // When set to true, displays output of GDB.
+        },
+
+        {
+            "name": "Flash Mbed examples",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/examples/${input:mbedApp}/mbed",
+            "executable": "./build-${input:mbedTarget}/${input:mbedFlashProfile}/chip-mbed-${input:mbedApp}-example.elf",
+            "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/packages/arm/bin/", // Pigweed environment bootstraping required
+            "serverpath": "${env:OPENOCD_PATH}/bin/openocd",
+            "servertype": "openocd",
+            "searchDir": [
+                "${workspaceRoot}/config/mbed/scripts",
+                "${env:OPENOCD_PATH}/scripts"
+            ],
+            "configFiles": ["${input:mbedTarget}.tcl"],
+            "overrideLaunchCommands": [
+                "monitor reset halt",
+                "monitor program {./build-${input:mbedTarget}/${input:mbedFlashProfile}/chip-mbed-${input:mbedApp}-example.hex}",
+                "monitor reset run",
+                "quit"
+            ],
+            "numberOfProcessors": 2,
+            "targetProcessor": 1, // Set to 0 for the CM0+, set to 1 for the CM4
+            "showDevDebugOutput": false // When set to true, displays output of GDB.
+        },
+
+        {
+            "name": "Flash Mbed examples [remote]",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/examples/${input:mbedApp}/mbed",
+            "executable": "./build-${input:mbedTarget}/${input:mbedFlashProfile}/chip-mbed-${input:mbedApp}-example.elf",
+            "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/packages/arm/bin/", // Pigweed environment bootstraping required
+            "servertype": "external",
+            "gdbTarget": "host.docker.internal:3334", //port 3333 for the CM0+, 3334 for the CM4
+            "overrideLaunchCommands": [
+                "monitor reset halt",
+                "load ./build-${input:mbedTarget}/${input:mbedFlashProfile}/chip-mbed-${input:mbedApp}-example.hex",
+                "monitor reset run",
+                "quit"
+            ],
+            "showDevDebugOutput": false // When set to true, displays output of GDB.
+        },
+
+        {
+            "name": "Debug Mbed unit tests",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/src/test_driver/mbed/unit_tests",
+            "executable": "./build-${input:mbedTarget}/${input:mbedDebugProfile}/chip-mbed-unit-tests.elf",
+            "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/packages/arm/bin/", // Pigweed environment bootstraping required
+            "servertype": "openocd",
+            "serverpath": "${env:OPENOCD_PATH}/bin/openocd",
+            "searchDir": [
+                "${workspaceRoot}/config/mbed/scripts",
+                "${env:OPENOCD_PATH}/scripts"
+            ],
+            "configFiles": ["${input:mbedTarget}.tcl"],
+            "overrideLaunchCommands": [
+                "-enable-pretty-printing",
+                "monitor program {./build-${input:mbedTarget}/${input:mbedDebugProfile}/chip-mbed-unit-tests.hex}",
+                "monitor reset run",
+                "monitor sleep 200",
+                "monitor psoc6 reset_halt sysresetreq"
+            ],
+            "numberOfProcessors": 2,
+            "targetProcessor": 1, // Set to 0 for the CM0+, set to 1 for the CM4
+            "overrideRestartCommands": [
+                "monitor reset init",
+                "monitor reset run",
+                "monitor sleep 200",
+                "monitor psoc6 reset_halt sysresetreq"
+            ],
+            "runToMain": true, // if true, program will halt at main. Not used for a restart
+            "showDevDebugOutput": false // When set to true, displays output of GDB.
+        },
+
+        {
+            "name": "Debug Mbed unit tests [remote]",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/src/test_driver/mbed/unit_tests",
+            "executable": "./build-${input:mbedTarget}/${input:mbedDebugProfile}/chip-mbed-unit-tests.elf",
+            "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/packages/arm/bin/", // Pigweed environment bootstraping required
+            "servertype": "external",
+            "gdbTarget": "host.docker.internal:3334", //port 3333 for the CM0+, 3334 for the CM4
+            "overrideLaunchCommands": [
+                "-enable-pretty-printing",
+                "monitor reset halt",
+                "load ./build-${input:mbedTarget}/${input:mbedDebugProfile}/chip-mbed-unit-tests.hex",
+                "monitor reset run",
+                "monitor sleep 200",
+                "monitor psoc6 reset_halt sysresetreq"
+            ],
+            "overrideRestartCommands": [
+                "monitor reset init",
+                "monitor reset run",
+                "monitor sleep 200",
+                "monitor psoc6 reset_halt sysresetreq"
+            ],
+            "runToMain": true, // if true, program will halt at main. Not used for a restart
+            "showDevDebugOutput": false // When set to true, displays output of GDB.
+        },
+
+        {
+            "name": "Flash Mbed unit tests",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/src/test_driver/mbed//unit_tests",
+            "executable": "./build-${input:mbedTarget}/${input:mbedFlashProfile}/chip-mbed-unit-tests.elf",
+            "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/packages/arm/bin/", // Pigweed environment bootstraping required
+            "servertype": "openocd",
+            "serverpath": "${env:OPENOCD_PATH}/bin/openocd",
+            "searchDir": [
+                "${workspaceRoot}/config/mbed/scripts",
+                "${env:OPENOCD_PATH/scripts}"
+            ],
+            "configFiles": ["${input:mbedTarget}.tcl"],
+            "overrideLaunchCommands": [
+                "monitor reset halt",
+                "monitor program {./build-${input:mbedTarget}/${input:mbedFlashProfile}/chip-mbed-unit-tests.hex}",
+                "monitor reset run",
+                "quit"
+            ],
+            "numberOfProcessors": 2,
+            "targetProcessor": 1, // Set to 0 for the CM0+, set to 1 for the CM4
+            "showDevDebugOutput": false // When set to true, displays output of GDB.
+        },
+
+        {
+            "name": "Flash Mbed unit tests [remote]",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/src/test_driver/mbed/unit_tests",
+            "executable": "./build-${input:mbedTarget}/${input:mbedFlashProfile}/chip-mbed-unit-tests.elf",
+            "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/packages/arm/bin/", // Pigweed environment bootstraping required
+            "servertype": "external",
+            "gdbTarget": "host.docker.internal:3334", //port 3333 for the CM0+, 3334 for the CM4
+            "overrideLaunchCommands": [
+                "monitor reset halt",
+                "load ./build-${input:mbedTarget}/${input:mbedFlashProfile}/chip-mbed-unit-tests.hex",
+                "monitor reset run",
+                "quit"
+            ],
+            "showDevDebugOutput": false // When set to true, displays output of GDB.
+        },
+
+        {
+            "name": "Debug Mbed bootloader",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/examples/platform/mbed/bootloader",
+            "executable": "./build-${input:mbedTarget}/${input:mbedDebugProfile}/chip-mbed-bootloader.elf",
+            "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/packages/arm/bin/", // Pigweed environment bootstraping required
+            "servertype": "openocd",
+            "serverpath": "${env:OPENOCD_PATH}/bin/openocd",
+            "searchDir": [
+                "${workspaceRoot}/config/mbed/scripts",
+                "${env:OPENOCD_PATH}/scripts"
+            ],
+            "configFiles": ["${input:mbedTarget}.tcl"],
+            "overrideLaunchCommands": [
+                "-enable-pretty-printing",
+                "monitor program {./build-${input:mbedTarget}/${input:mbedDebugProfile}/chip-mbed-bootloader.hex}",
+                "monitor reset run",
+                "monitor sleep 200",
+                "monitor psoc6 reset_halt sysresetreq"
+            ],
+            "numberOfProcessors": 2,
+            "targetProcessor": 1, // Set to 0 for the CM0+, set to 1 for the CM4
+            "overrideRestartCommands": [
+                "monitor reset init",
+                "monitor reset run",
+                "monitor sleep 200",
+                "monitor psoc6 reset_halt sysresetreq"
+            ],
+            "runToMain": true, // if true, program will halt at main. Not used for a restart
+            "showDevDebugOutput": false // When set to true, displays output of GDB.
+        },
+
+        {
+            "name": "Debug Mbed bootloader [remote]",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/examples/platform/mbed/bootloader",
+            "executable": "./build-${input:mbedTarget}/${input:mbedDebugProfile}/chip-mbed-bootloader.elf",
+            "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/packages/arm/bin/", // Pigweed environment bootstraping required
+            "servertype": "external",
+            "gdbTarget": "host.docker.internal:3334", //port 3333 for the CM0+, 3334 for the CM4
+            "overrideLaunchCommands": [
+                "-enable-pretty-printing",
+                "monitor reset halt",
+                "load ./build-${input:mbedTarget}/${input:mbedDebugProfile}/chip-mbed-bootloader.hex",
+                "monitor reset run",
+                "monitor sleep 200",
+                "monitor psoc6 reset_halt sysresetreq"
+            ],
+            "overrideRestartCommands": [
+                "monitor reset init",
+                "monitor reset run",
+                "monitor sleep 200",
+                "monitor psoc6 reset_halt sysresetreq"
+            ],
+            "runToMain": true, // if true, program will halt at main. Not used for a restart
+            "showDevDebugOutput": false // When set to true, displays output of GDB.
+        },
+
+        {
+            "name": "CHIP All Clusters App (Linux)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/debug/standalone/chip-all-clusters-app",
+            "cwd": "${workspaceFolder}"
+        },
+
+        {
+            "name": "Fabric Admin (Linux)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/debug/standalone/fabric-admin",
+            "args": ["--log-file-path", "/tmp/fabric_admin.log"],
+            "cwd": "${workspaceFolder}"
+        },
+
+        {
+            "name": "Fabric Bridge App (Linux)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/debug/standalone/fabric-bridge-app",
+            "cwd": "${workspaceFolder}"
+        },
+
+        {
+            "name": "OTA Requestor App (Linux)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/ota-requestor/chip-ota-requestor-app",
+            "args": [
+                "--discriminator",
+                "18",
+                "--secured-device-port",
+                "5560",
+                "--KVS",
+                "/tmp/chip_kvs_requestor"
+            ],
+            "cwd": "${workspaceFolder}"
+        },
+
+        {
+            "name": "OTA Provider App (Linux)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/ota-provider/chip-ota-provider-app",
+            "args": [
+                "--discriminator",
+                "22",
+                "--KVS",
+                "/tmp/chip_kvs_provider",
+                "--filepath",
+                "/tmp/ota-image.bin"
+            ],
+            "cwd": "${workspaceFolder}"
+        },
+
+        {
+            "name": "Debug Open IoT SDK example application",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/examples/${input:openiotsdkExample}/openiotsdk",
+            "executable": "./build/chip-openiotsdk-${input:openiotsdkExample}-example.elf",
+            "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/packages/arm/bin/",
+            "servertype": "external",
+            "gdbTarget": "${input:openiotsdkRemoteHost}:31627", //GDBserver port on FVP
+            "overrideLaunchCommands": [
+                "-enable-pretty-printing",
+                "add-symbol-file ./build/bl2.elf 0x10000000",
+                "add-symbol-file ./build/tfm_s.elf 0x38000400",
+                "add-symbol-file ./build/chip-openiotsdk-${input:openiotsdkExample}-example_ns.elf 0x28060400",
+                "break main_ns.cpp:main"
+            ],
+            "runToEntryPoint": "main",
+            "preLaunchTask": "Debug Open IoT SDK example",
+            "showDevDebugOutput": "parsed"
+        },
+        {
+            "name": "Debug Open IoT SDK unit-tests application",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/src/test_driver/openiotsdk/unit-tests",
+            "executable": "./build/${input:openiotsdkUnitTest}.elf",
+            "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/packages/arm/bin/",
+            "servertype": "external",
+            "gdbTarget": ":31627", //GDBserver port on FVP
+            "overrideLaunchCommands": [
+                "-enable-pretty-printing",
+                "add-symbol-file ./build/bl2.elf 0x10000000",
+                "add-symbol-file ./build/tfm_s.elf 0x38000400",
+                "add-symbol-file ./build/${input:openiotsdkUnitTest}_ns.elf 0x28060400",
+                "break main_ns.cpp:main"
+            ],
+            "runToEntryPoint": "main",
+            "preLaunchTask": "Debug Open IoT SDK unit-tests",
+            "showDevDebugOutput": "parsed"
+        }
+    ],
+    "inputs": [
+        {
+            "type": "command",
+            "id": "outAppDarwin",
+            "command": "shellCommand.execute",
+            "args": {
+                "command": "find ${workspaceFolder}/out/darwin-x64-* -maxdepth 2 -perm +111 -name 'chip-*' |sort |sed 's$${workspaceFolder}/out/$$'",
+                "description": "Select the application to run"
+            }
+        },
+        {
+            "type": "command",
+            "id": "outAppLinux",
+            "command": "shellCommand.execute",
+            "args": {
+                "command": "find ${workspaceFolder}/out/linux-x64-* -maxdepth 2 -executable -name 'chip-*' |sort |sed 's$${workspaceFolder}/out/$$'",
+                "description": "Select the application to run"
+            }
+        },
+        {
+            "type": "command",
+            "id": "outTestLinux",
+            "command": "shellCommand.execute",
+            "args": {
+                "command": "find ${workspaceFolder}/out/linux-x64-*/tests -type f -executable |sort |sed 's$${workspaceFolder}/out/$$'",
+                "description": "Select the test to run"
+            }
+        },
+        {
+            "type": "pickString",
+            "id": "mbedDebugProfile",
+            "description": "What mbed profile do you want to debug?",
+            "options": ["debug", "develop"],
+            "default": "debug"
+        },
+        {
+            "type": "pickString",
+            "id": "mbedFlashProfile",
+            "description": "What mbed profile do you want to flash?",
+            "options": ["release", "debug", "develop"],
+            "default": "release"
+        },
+        {
+            "type": "pickString",
+            "id": "mbedApp",
+            "description": "What mbed application do you want to use?",
+            "options": [
+                "lock-app",
+                "lighting-app",
+                "pigweed-app",
+                "all-clusters-app",
+                "shell",
+                "ota-requestor-app"
+            ],
+            "default": "lock-app"
+        },
+        {
+            "type": "pickString",
+            "id": "mbedTarget",
+            "description": "What mbed target do you want to use?",
+            "options": ["CY8CPROTO_062_4343W"],
+            "default": "CY8CPROTO_062_4343W"
+        },
+        {
+            "type": "command",
+            "id": "openiotsdkExample",
+            "command": "shellCommand.execute",
+            "args": {
+                "command": "cat examples/platform/openiotsdk/supported_examples.txt",
+                "description": "What Open IoT SDK example application do you want to use?"
+            }
+        },
+        {
+            "type": "promptString",
+            "id": "openiotsdkRemoteHost",
+            "description": "Type the hostname/IP address of external GDB target that you want to connect to. Leave blank for internal GDB server",
+            "default": ""
+        },
+        {
+            "type": "command",
+            "id": "openiotsdkUnitTest",
+            "command": "shellCommand.execute",
+            "args": {
+                "command": "cat src/test_driver/openiotsdk/unit-tests/test_components.txt",
+                "description": "What Open IoT SDK unit test application do you want to use?"
+            }
+        }
+    ]
+}

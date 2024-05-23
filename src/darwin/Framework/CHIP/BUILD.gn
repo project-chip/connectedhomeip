@@ -1,0 +1,49 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+config("darwin_config") {
+  include_dirs = [ "." ]
+
+  cflags = [
+    "-Wconversion",
+    "-fobjc-arc",
+  ]
+}
+
+static_library("framework") {
+  sources = [
+    "${chip_root}/src/app/clusters/ota-provider/ota-provider.cpp",
+    "MTRError.mm",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/controller",
+    "${chip_root}/src/credentials:default_attestation_verifier",
+    "${chip_root}/src/lib/address_resolve",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+
+  include_dirs = [ "${chip_root}/zzz_generated/controller-clusters" ]
+
+  frameworks = [ "Security.framework" ]
+
+  public_configs = [ ":darwin_config" ]
+}
+
+group("static-matter") {
+  public_deps = [ ":framework" ]
+}

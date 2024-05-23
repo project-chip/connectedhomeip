@@ -1,0 +1,453 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 25.3.23. [TC-CC-8.1] StopMoveStep functionality with server as DUT
+
+PICS:
+    - CC.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Color Control"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 0a: TH writes 0 to the Options attribute"
+      PICS: CC.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
+    - label: "Step 0b: TH sends On command to DUT"
+      PICS: OO.S.C01.Rsp
+      cluster: "On/Off"
+      command: "On"
+
+    - label:
+          "Step 2a: TH sends MoveToHue command to DUT with Hue=200,
+          Direction=0x00 (shortest distance) and TransitionTime=0 (immediately)."
+      PICS: CC.S.C00.Rsp
+      command: "MoveToHue"
+      arguments:
+          values:
+              - name: "Hue"
+                value: 200
+              - name: "Direction"
+                value: 0
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    - label:
+          "Step 2b: TH sends MoveHue command to DUT with MoveMode=0x01 (up) and
+          Rate=5 (units/s)"
+      PICS: CC.S.C01.Rsp
+      command: "MoveHue"
+      arguments:
+          values:
+              - name: "MoveMode"
+                value: 1
+              - name: "Rate"
+                value: 5
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 10s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "Step 2c: TH sends StopMoveStep command to DUT"
+      PICS: CC.S.C47.Rsp
+      command: "StopMoveStep"
+      arguments:
+          values:
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    #Tolerance to be computed from the range
+    #Start value 200, expected value 250, 200 - 250 = -50, 50 % 15 = 8 , So 250+/-8 We need two range here as 254 is the max value
+    #242...254...0...4
+    #Multiple range not supported in YAML: https://github.com/project-chip/connectedhomeip/issues/23197
+    - label: "Step 2d: TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.A0000 && CC.S.C01.Rsp && PICS_SKIP_SAMPLE_APP
+      verification: |
+          ./chip-tool colorcontrol read current-hue 1 1
+
+          Verify CurrentHue attribute is 250 on TH(chip-tool) Log and below is the sample log provided for the raspi platform
+
+          [1686057413.567938][20912:20914] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0000 DataVersion: 1835932678
+          [1686057413.567958][20912:20914] CHIP:TOO:   CurrentHue: 250
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Wait 2s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 2000
+
+    #Multiple range not supported in YAML: https://github.com/project-chip/connectedhomeip/issues/23197
+    - label: "Step 2e: TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.A0000 && CC.S.C01.Rsp && PICS_SKIP_SAMPLE_APP
+      verification: |
+          ./chip-tool colorcontrol read current-hue 1 1
+
+          After another 2 seconds, Verify CurrentHue value is stabilized at 250 on TH(chip-tool) Log and below is the sample log provided for the raspi platform
+
+          [1686057413.567938][20912:20914] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0000 DataVersion: 1835932678
+          [1686057413.567958][20912:20914] CHIP:TOO:   CurrentHue: 250
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 3a: TH sends MoveToSaturation command to DUT with Saturation=150
+          and TransitionTime=0 (immediately)"
+      PICS: CC.S.C03.Rsp
+      command: "MoveToSaturation"
+      arguments:
+          values:
+              - name: "Saturation"
+                value: 150
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    - label:
+          "Step 3b: TH sends MoveSaturation command to DUT with MoveMode=0x01
+          (up) and Rate=5 (units/s)"
+      command: "MoveSaturation"
+      PICS: CC.S.C04.Rsp
+      arguments:
+          values:
+              - name: "MoveMode"
+                value: 1
+              - name: "Rate"
+                value: 5
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 10s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "Step 3c: TH sends StopMoveStep command to DUT"
+      PICS: CC.S.C47.Rsp
+      command: "StopMoveStep"
+      arguments:
+          values:
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Step 3d: TH reads CurrentSaturation attribute from DUT"
+      PICS: CC.S.A0001
+      command: "readAttribute"
+      attribute: "CurrentSaturation"
+      response:
+          constraints:
+              minValue: 170
+              maxValue: 230
+
+    - label: "Wait 2s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 2000
+
+    - label: "Step 3e: TH reads CurrentSaturation attribute from DUT"
+      PICS: CC.S.A0001
+      command: "readAttribute"
+      attribute: "CurrentSaturation"
+      response:
+          constraints:
+              minValue: 170
+              maxValue: 230
+
+    - label: "Step 4a: TH reads ColorTempPhysicalMinMireds attribute from DUT"
+      PICS: CC.S.A400b
+      command: "readAttribute"
+      attribute: "ColorTempPhysicalMinMireds"
+      response:
+          saveAs: ColorTempPhysicalMinMiredsValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Step 4b: TH reads ColorTempPhysicalMaxMireds attribute from DUT."
+      PICS: CC.S.A400c
+      command: "readAttribute"
+      attribute: "ColorTempPhysicalMaxMireds"
+      response:
+          saveAs: ColorTempPhysicalMaxMiredsValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65279
+
+    - label:
+          "Step 4c: TH sends MoveToColorTemperature command to DUT with
+          ColorTemperatureMireds= ColorTempPhysicalMaxMireds / 2 and
+          TransitionTime=0 (immediately)."
+      PICS: CC.S.C0a.Rsp
+      command: "MoveToColorTemperature"
+      arguments:
+          values:
+              - name: "ColorTemperatureMireds"
+                value:
+                    ( ColorTempPhysicalMinMiredsValue +
+                    ColorTempPhysicalMaxMiredsValue ) / 2
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    - label:
+          "Step 4d: TH sends MoveColorTemperature command to DUT with MoveMode =
+          0x01 (up), Rate = (ColorTempPhysicalMaxMireds -
+          ColorTempPhysicalMinMireds)/40"
+      PICS: CC.S.C4b.Rsp
+      command: MoveColorTemperature
+      arguments:
+          values:
+              - name: "MoveMode"
+                value: 1
+              - name: "Rate"
+                value:
+                    ( ColorTempPhysicalMaxMiredsValue -
+                    ColorTempPhysicalMinMiredsValue ) / 40
+              - name: "ColorTemperatureMinimumMireds"
+                value: ColorTempPhysicalMinMiredsValue
+              - name: "ColorTemperatureMaximumMireds"
+                value: ColorTempPhysicalMaxMiredsValue
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 10s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "Step 4e: TH sends StopMoveStep command to DUT"
+      PICS: CC.S.C4b.Rsp && CC.S.C47.Rsp
+      command: StopMoveStep
+      arguments:
+          values:
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Step 4f: TH reads ColorTemperatureMireds attribute from DUT."
+      PICS: CC.S.A0007 && CC.S.C4b.Rsp && CC.S.C47.Rsp
+      command: "readAttribute"
+      attribute: "ColorTemperatureMireds"
+      response:
+          constraints:
+              minValue: ColorTempPhysicalMinMiredsValue
+              maxValue: ColorTempPhysicalMaxMiredsValue
+
+    - label: "Wait 2s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 2000
+
+    - label: "Step 4g: TH reads ColorTemperatureMireds attribute from DUT."
+      PICS: CC.S.A0007 && CC.S.C4b.Rsp && CC.S.C47.Rsp
+      command: "readAttribute"
+      attribute: "ColorTemperatureMireds"
+      response:
+          constraints:
+              minValue: ColorTempPhysicalMinMiredsValue
+              maxValue: ColorTempPhysicalMaxMiredsValue
+
+    - label:
+          "Step 5a: TH sends EnhancedMoveToHue command to DUT with
+          EnhancedHue=20000, Direction=0x00 (shortest distance) and
+          TransitionTime=0 (immediately)."
+      PICS: CC.S.C40.Rsp
+      command: "EnhancedMoveToHue"
+      arguments:
+          values:
+              - name: "EnhancedHue"
+                value: 20000
+              - name: "Direction"
+                value: 0
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    - label:
+          "Step 5b: TH sends EnhancedMoveHue command to DUT with MoveMode=0x01
+          (up) and Rate=500 (units/s)"
+      PICS: CC.S.C41.Rsp
+      command: "EnhancedMoveHue"
+      arguments:
+          values:
+              - name: "MoveMode"
+                value: 1
+              - name: "Rate"
+                value: 500
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 10s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "Step 5c: TH sends StopMoveStep command to DUT"
+      PICS: CC.S.C47.Rsp
+      command: "StopMoveStep"
+      arguments:
+          values:
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Step 5d: TH reads EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      PICS: CC.S.A4000 && CC.S.C47.Rsp
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              minValue: 21250
+              maxValue: 28750
+
+    - label: "Wait 10s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "Step 5e: TH reads EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      PICS: CC.S.A4000 && CC.S.C47.Rsp
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              minValue: 21250
+              maxValue: 28750
+
+    - label: "Turn Off light that we turned on"
+      PICS: OO.S.C00.Rsp
+      cluster: "On/Off"
+      command: "Off"
+
+    - label: "Check on/off attribute value is false after off command"
+      cluster: "On/Off"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000
+      response:
+          value: 0

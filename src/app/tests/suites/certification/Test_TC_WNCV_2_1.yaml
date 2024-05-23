@@ -1,0 +1,357 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# TODO : WindowCovering Test WNCV_2_1 add/complete some Conditional test using the FeatureMap (dynamics Mandatory and Optional attributes)
+
+name: Window Covering [TC-WNCV-2.1] Attributes [DUT as Server]
+
+PICS:
+    - WNCV.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Window Covering"
+    endpoint: 1
+
+tests:
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    ### MANDATORY Attributes
+    ### 1 MANDATORY Attributes
+    ### Attribute[  0]: Type  =======================================
+    - label: "Step 1a: TH reads from the DUT the ( 0) Type attribute"
+      command: "readAttribute"
+      attribute: "Type"
+      PICS: WNCV.S.A0000
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 9
+
+    ### Attribute[  7]: ConfigStatus  ===============================
+    - label: "Step 1b: TH reads from the DUT the ( 7) ConfigStatus attribute"
+      command: "readAttribute"
+      attribute: "ConfigStatus"
+      PICS: WNCV.S.A0007
+      response:
+          constraints:
+              type: bitmap8
+              minValue: 0
+              maxValue: 127
+
+    ### Attribute[ 10]: OperationalStatus  ==========================
+    - label:
+          "Step 1c: TH reads from the DUT the (10) OperationalStatus attribute:
+          OperationalStatus"
+      command: "readAttribute"
+      attribute: "OperationalStatus"
+      PICS: WNCV.S.A000a
+      response:
+          constraints:
+              type: bitmap8
+              minValue: 0
+              maxValue: 127
+
+    ### Attribute[ 13]: EndProductType ==============================
+    - label: "Step 1d: TH reads from the DUT the (13) EndProductType attribute"
+      command: "readAttribute"
+      attribute: "EndProductType"
+      PICS: WNCV.S.A000d
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 23
+
+    ### Attribute[ 23]: Mode ========================================
+    - label: "Step 1e: TH reads from the DUT the (23) Mode attribute"
+      command: "readAttribute"
+      attribute: "Mode"
+      PICS: WNCV.S.A0017
+      response:
+          constraints:
+              type: bitmap8
+              minValue: 0
+              maxValue: 15
+
+    - label: "Step 1f: TH writes to (23) Mode attribute the value 0"
+      command: "writeAttribute"
+      attribute: "Mode"
+      PICS: WNCV.S.A0017
+      arguments:
+          value: 0
+
+    ### 2 CONDITIONALLY MANDATORY Attributes
+    ### Attribute[ 11]: TargetPositionLiftPercent100ths  ====================
+    - label:
+          "Step 2a: TH reads from the DUT the (11)
+          TargetPositionLiftPercent100ths attribute"
+      command: "readAttribute"
+      attribute: "TargetPositionLiftPercent100ths"
+      PICS: WNCV.S.A000b
+      response:
+          constraints:
+              type: percent100ths
+              minValue: 0
+              maxValue: 10000
+
+    ### Attribute[ 12]: TargetPositionTiltPercent100ths  ====================
+    - label:
+          "Step 2b: TH reads from the DUT the (12)
+          TargetPositionTiltPercent100ths attribute"
+      command: "readAttribute"
+      attribute: "TargetPositionTiltPercent100ths"
+      PICS: WNCV.S.A000c
+      response:
+          constraints:
+              type: percent100ths
+              minValue: 0
+              maxValue: 10000
+
+    ### Attribute[ 14]: CurrentPositionLiftPercent100ths  ====================
+    - label:
+          "Step 2c: TH reads from the DUT the (14)
+          CurrentPositionLiftPercent100ths attribute"
+      command: "readAttribute"
+      attribute: "CurrentPositionLiftPercent100ths"
+      PICS: WNCV.S.A000e
+      response:
+          constraints:
+              type: percent100ths
+              minValue: 0
+              maxValue: 10000
+
+    ### Attribute[ 15]: CurrentPositionTiltPercent100ths  ====================
+    - label:
+          "Step 2d: TH reads from the DUT the (15)
+          CurrentPositionTiltPercent100ths attribute"
+      command: "readAttribute"
+      attribute: "CurrentPositionTiltPercent100ths"
+      PICS: WNCV.S.A000f
+      response:
+          constraints:
+              type: percent100ths
+              minValue: 0
+              maxValue: 10000
+
+    ### Attribute[ 16]: InstalledOpenLimitLift  ====================
+    - label:
+          "Step 2e: TH reads from the DUT the (16) InstalledOpenLimitLift
+          attribute"
+      command: "readAttribute"
+      attribute: "InstalledOpenLimitLift"
+      PICS: WNCV.S.A0010
+      response:
+          saveAs: InstalledOpenLimitLiftValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    ### Attribute[ 17]: InstalledClosedLimitLift  ====================
+    - label:
+          "Step 2f: TH reads from the DUT the (17) InstalledClosedLimitLift
+          attribute"
+      command: "readAttribute"
+      attribute: "InstalledClosedLimitLift"
+      PICS: WNCV.S.A0011
+      response:
+          saveAs: InstalledClosedLimitLiftValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    ### Attribute[ 18]: InstalledOpenLimitTilt  ====================
+    - label:
+          "Step 2g: TH reads from the DUT the (18) InstalledOpenLimitTilt
+          attribute"
+      command: "readAttribute"
+      attribute: "InstalledOpenLimitTilt"
+      PICS: WNCV.S.A0012
+      response:
+          saveAs: InstalledOpenLimitTiltValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    ### Attribute[ 19]: InstalledClosedLimitTilt  ====================
+    - label:
+          "Step 2h: TH reads from the DUT the (19) InstalledClosedLimitTilt
+          attribute"
+      command: "readAttribute"
+      attribute: "InstalledClosedLimitTilt"
+      PICS: WNCV.S.A0013
+      response:
+          saveAs: InstalledClosedLimitTiltValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    ### 3 CONDITIONALLY and PURELY OPTIONAL Attributes
+    ### Attribute[ 26]: SafetyStatus  ==========================
+    - label: "Step 3a: TH reads from the DUT the (26) SafetyStatus attribute"
+      command: "readAttribute"
+      attribute: "SafetyStatus"
+      PICS: WNCV.S.A001a
+      response:
+          constraints:
+              type: bitmap16
+              minValue: 0
+              maxValue: 2047
+
+    ### Attribute[  1]: PhysicalClosedLimitLift  ====================
+    - label:
+          "Step 3b: TH reads from the DUT the ( 1) PhysicalClosedLimitLift
+          attribute"
+      command: "readAttribute"
+      attribute: "PhysicalClosedLimitLift"
+      PICS: WNCV.S.A0001
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    ### Attribute[  2]: PhysicalClosedLimitTilt  ====================
+    - label:
+          "Step 3c: TH reads from the DUT the ( 2) PhysicalClosedLimitTilt
+          attribute"
+      command: "readAttribute"
+      attribute: "PhysicalClosedLimitTilt"
+      PICS: WNCV.S.A0002
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    ### Attribute[  3]: CurrentPositionLift  ====================
+    - label:
+          "Step 3d: TH reads from the DUT the ( 3) CurrentPositionLift attribute"
+      command: "readAttribute"
+      attribute: "CurrentPositionLift"
+      PICS: WNCV.S.A0003 && !WNCV.S.A0010 && !WNCV.S.A0011
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    ### Attribute[  3]: CurrentPositionLift  ====================
+    - label:
+          "Step 3d: TH reads the RO optional attribute default:
+          CurrentPositionLift"
+      command: "readAttribute"
+      attribute: "CurrentPositionLift"
+      PICS: WNCV.S.A0003 && WNCV.S.A0010 && WNCV.S.A0011
+      response:
+          constraints:
+              type: int16u
+              minValue: InstalledOpenLimitLiftValue
+              maxValue: InstalledClosedLimitLiftValue
+
+    ### Attribute[  4]: CurrentPositionTilt  ====================
+    - label:
+          "Step 3e: TH reads from the DUT the ( 4) CurrentPositionTilt attribute"
+      command: "readAttribute"
+      attribute: "CurrentPositionTilt"
+      PICS: WNCV.S.A0004 && !WNCV.S.A0012 && !WNCV.S.A0013
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    ### Attribute[  4]: CurrentPositionTilt  ====================
+    - label:
+          "Step 3e: TH reads the RO optional attribute default:
+          CurrentPositionTilt"
+      command: "readAttribute"
+      attribute: "CurrentPositionTilt"
+      PICS: WNCV.S.A0004 && WNCV.S.A0012 && WNCV.S.A0013
+      response:
+          constraints:
+              type: int16u
+              minValue: InstalledOpenLimitTiltValue
+              maxValue: InstalledClosedLimitTiltValue
+
+    ### Attribute[  5]: NumberOfActuationsLift  ====================
+    - label:
+          "Step 3f: TH reads from the DUT the ( 5) NumberOfActuationsLift
+          attribute"
+      command: "readAttribute"
+      attribute: "NumberOfActuationsLift"
+      PICS: WNCV.S.A0005
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    ### Attribute[  6]: NumberOfActuationsTilt  ====================
+    - label:
+          "Step 3g: TH reads from the DUT the ( 6) NumberOfActuationsTilt
+          attribute"
+      command: "readAttribute"
+      attribute: "NumberOfActuationsTilt"
+      PICS: WNCV.S.A0006
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    ### Attribute[  8]: CurrentPositionLiftPercentage  ====================
+    - label:
+          "Step 3h: TH reads from the DUT the ( 8) CurrentPositionLiftPercentage
+          attribute"
+      command: "readAttribute"
+      attribute: "CurrentPositionLiftPercentage"
+      PICS: WNCV.S.A0008
+      response:
+          constraints:
+              type: percent
+              minValue: 0
+              maxValue: 100
+
+    ### Attribute[  9]: CurrentPositionTiltPercentage  ====================
+    - label:
+          "Step 3i: TH reads from the DUT the ( 9) CurrentPositionTiltPercentage
+          attribute"
+      command: "readAttribute"
+      attribute: "CurrentPositionTiltPercentage"
+      PICS: WNCV.S.A0009
+      response:
+          constraints:
+              type: percent
+              minValue: 0
+              maxValue: 100
+    ###################################################
+    # FYI Non Tested deprecated attributes
+    # 20 VelocityLift
+    # 21 AccelerationTimeLift
+    # 22 DecelerationTimeLift
+    # 24 IntermediateSetpointsLift
+    # 25 IntermediateSetpointsTilt
+    ###################################################

@@ -1,0 +1,249 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/lwip.gni")
+
+import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/src/lwip/lwip.gni")
+
+assert(chip_with_lwip)
+
+if (lwip_platform == "") {
+  if (current_os != "freertos") {
+    lwip_platform = "standalone"
+  }
+}
+
+assert(lwip_platform == "external" || lwip_platform == "standalone" ||
+           lwip_platform == "cc13xx_26xx" || lwip_platform == "cc32xx" ||
+           lwip_platform == "nxp" || lwip_platform == "silabs" ||
+           lwip_platform == "qpg" || lwip_platform == "mbed" ||
+           lwip_platform == "psoc6" || lwip_platform == "cyw30739" ||
+           lwip_platform == "bl602" || lwip_platform == "mw320" ||
+           lwip_platform == "bl702" || lwip_platform == "bl702l" ||
+           lwip_platform == "mt793x" || lwip_platform == "asr",
+       "Unsupported lwIP platform: ${lwip_platform}")
+
+if (lwip_platform != "external") {
+  declare_args() {
+    # Enable lwIP debugging.
+    lwip_debug = is_debug
+  }
+}
+
+if (lwip_platform == "cc13xx_26xx") {
+  import("//build_overrides/ti_simplelink_sdk.gni")
+} else if (lwip_platform == "cc32xx") {
+  import("//build_overrides/ti_simplelink_sdk.gni")
+} else if (lwip_platform == "silabs") {
+  import("//build_overrides/efr32_sdk.gni")
+} else if (lwip_platform == "qpg") {
+  import("//build_overrides/qpg_sdk.gni")
+  import("${qpg_sdk_build_root}/qpg_sdk.gni")
+} else if (lwip_platform == "psoc6") {
+  import("//build_overrides/psoc6.gni")
+} else if (lwip_platform == "cyw30739") {
+  import("//build_overrides/cyw30739_sdk.gni")
+} else if (lwip_platform == "bl602") {
+  import("//build_overrides/bouffalolab_iot_sdk.gni")
+} else if (lwip_platform == "bl702") {
+  import("//build_overrides/bouffalolab_iot_sdk.gni")
+  import("${chip_root}/src/platform/device.gni")
+} else if (lwip_platform == "bl702l") {
+  import("//build_overrides/bouffalolab_iot_sdk.gni")
+} else if (lwip_platform == "nxp") {
+  import("//build_overrides/nxp_sdk.gni")
+} else if (lwip_platform == "mw320") {
+  import("//build_overrides/mw320_sdk.gni")
+} else if (lwip_platform == "mt793x") {
+  import("//build_overrides/mt793x_sdk.gni")
+} else if (lwip_platform == "asr") {
+  import("//build_overrides/asr.gni")
+}
+
+buildconfig_header("lwip_buildconfig") {
+  header = "lwip_buildconfig.h"
+  header_dir = "lwip"
+
+  defines = []
+
+  if (lwip_platform != "external") {
+    if (lwip_debug) {
+      # Automatically enable LWIP_DEBUG for internal is_debug builds.
+      defines += [ "LWIP_DEBUG=1" ]
+    }
+  }
+}
+
+if (current_os == "zephyr" || current_os == "mbed") {
+  group("lwip") {
+  }
+} else if (get_path_info(lwip_root, "abspath") !=
+           get_path_info("${chip_root}/third_party/lwip", "abspath")) {
+  # Redirect old dependencies on ${chip_root}/src/lwip onto ${lwip_root}:lwip
+  group("lwip") {
+    public_deps = [ "${lwip_root}:lwip" ]
+  }
+} else if (lwip_platform == "external" || lwip_platform == "mw320") {
+  group("lwip") {
+    public_deps = [ ":lwip_buildconfig" ]
+    if (lwip_platform == "mw320") {
+      public_deps += [ "${mw320_sdk_build_root}:mw320_sdk" ]
+    }
+  }
+
+  group("all") {
+    deps = [ ":lwip" ]
+  }
+} else if (lwip_platform == "psoc6") {
+  group("lwip") {
+    public_deps = [ ":lwip_buildconfig" ]
+    public_configs = [ "${chip_root}/src:includes" ]
+    public_configs += [ "${psoc6_sdk_build_root}:psoc6_sdk_config" ]
+  }
+} else if (lwip_platform == "qpg") {
+  import("${lwip_root}/lwip.gni")
+
+  config("lwip_config") {
+    include_dirs = [ "freertos" ]
+  }
+
+  lwip_target("legacy_lwip") {
+    public = [
+      "${qpg_sdk_root}/Components/ThirdParty/Lwip/arch/cc.h",
+      "${qpg_sdk_root}/Components/ThirdParty/Lwip/arch/perf.h",
+      "${qpg_sdk_root}/Components/ThirdParty/Lwip/lwipopts.h",
+      "${qpg_sdk_root}/Components/ThirdParty/Lwip/lwippools.h",
+      "freertos/arch/sys_arch.h",
+    ]
+    sources = [ "${qpg_sdk_root}/Components/ThirdParty/Lwip/sys_arch.c" ]
+
+    public_deps = [ ":lwip_buildconfig" ]
+    public_deps += [ "${qpg_sdk_build_root}:qpg_sdk" ]
+    public_configs = [
+      ":lwip_config",
+      "${chip_root}/src:includes",
+    ]
+  }
+
+  group("lwip") {
+    public_deps = [ ":legacy_lwip" ]
+  }
+} else if (lwip_platform == "bl602") {
+  group("lwip") {
+    public_deps = [ ":lwip_buildconfig" ]
+    public_deps += [ "${bouffalolab_iot_sdk_build_root}/bl602:bl_iot_sdk" ]
+  }
+
+  group("all") {
+    deps = [ ":lwip" ]
+  }
+} else if (lwip_platform == "bl702" && defined(chip_enable_openthread) &&
+           chip_enable_openthread == false) {
+  group("lwip") {
+    public_deps = [ ":lwip_buildconfig" ]
+    public_deps += [ "${bouffalolab_iot_sdk_build_root}/bl702:bl_iot_sdk" ]
+  }
+
+  group("all") {
+    deps = [ ":lwip" ]
+  }
+} else if (lwip_platform == "asr") {
+  group("lwip") {
+    public_deps = [ ":lwip_buildconfig" ]
+    public_configs = [ "${chip_root}/src:includes" ]
+    public_configs += [ "${asr_sdk_build_root}:asr_sdk_config" ]
+  }
+
+  group("all") {
+    deps = [ ":lwip" ]
+  }
+} else if (lwip_platform == "nxp") {
+  group("lwip") {
+    public_deps = [
+      ":lwip_buildconfig",
+      "${nxp_sdk_build_root}:nxp_lwip",
+    ]
+  }
+} else {
+  import("${lwip_root}/lwip.gni")
+
+  config("lwip_config") {
+    include_dirs = [ lwip_platform ]
+
+    if (lwip_platform != "standalone" && lwip_platform != "mbed") {
+      include_dirs += [ "freertos" ]
+    }
+  }
+
+  lwip_target("legacy_lwip") {
+    public = [
+      "${lwip_platform}/arch/cc.h",
+      "${lwip_platform}/arch/perf.h",
+      "${lwip_platform}/lwipopts.h",
+    ]
+
+    sources = []
+
+    if (lwip_platform == "standalone") {
+      public += [ "standalone/arch/sys_arch.h" ]
+      sources += [ "standalone/sys_arch.c" ]
+    } else if (lwip_platform == "cyw30739") {
+    } else if (lwip_platform == "mt793x") {
+    } else {
+      public += [
+        "${lwip_platform}/lwippools.h",
+        "freertos/arch/sys_arch.h",
+      ]
+      sources += [ "freertos/sys_arch.c" ]
+    }
+
+    public_deps = [ ":lwip_buildconfig" ]
+    if (lwip_platform == "cc13xx_26xx") {
+      public_deps += [ "${ti_simplelink_sdk_build_root}:ti_simplelink_sdk" ]
+    } else if (lwip_platform == "cc32xx") {
+      public_deps += [ "${ti_simplelink_sdk_build_root}:ti_simplelink_sdk" ]
+      sources +=
+          [ "${chip_root}/third_party/lwip/repo/lwip/src/apps/mdns/mdns.c" ]
+    } else if (lwip_platform == "silabs") {
+      public_deps += [ "${efr32_sdk_build_root}:efr32_sdk" ]
+
+      sources += [
+        "${lwip_platform}/lwipopts-rs911x.h",
+        "${lwip_platform}/lwipopts-wf200.h",
+      ]
+    } else if (lwip_platform == "standalone") {
+      public_deps += [ "${chip_root}/src/lib/support" ]
+    } else if (lwip_platform == "cyw30739") {
+      public_deps += [ "${cyw30739_sdk_build_root}:cyw30739_sdk" ]
+    } else if (lwip_platform == "bl702") {
+      public_deps += [ "${bouffalolab_iot_sdk_build_root}/bl702:bl_iot_sdk" ]
+    } else if (lwip_platform == "bl702l") {
+      public_deps += [ "${bouffalolab_iot_sdk_build_root}/bl702l:bl_iot_sdk" ]
+    } else if (lwip_platform == "mt793x") {
+      public_deps += [ "${mt793x_sdk_build_root}:mt793x_sdk" ]
+    }
+
+    public_configs = [
+      ":lwip_config",
+      "${chip_root}/src:includes",
+    ]
+  }
+
+  group("lwip") {
+    public_deps = [ ":legacy_lwip" ]
+  }
+}

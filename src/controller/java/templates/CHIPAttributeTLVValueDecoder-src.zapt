@@ -1,0 +1,72 @@
+/*
+ *
+ *    Copyright (c) 2022 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#include <controller/java/CHIPAttributeTLVValueDecoder.h>
+
+#include <app/data-model/Decode.h>
+#include <app/data-model/DecodableList.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <jni.h>
+#include <lib/support/JniReferences.h>
+#include <lib/support/JniTypeWrappers.h>
+#include <lib/support/TypeTraits.h>
+
+namespace chip {
+
+jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    
+    switch (aPath.mClusterId)
+    {
+        {{#zcl_clusters}}
+        case app::Clusters::{{asUpperCamelCase name}}::Id: {
+            using namespace app::Clusters::{{asUpperCamelCase name}};
+            switch (aPath.mAttributeId)
+            {
+                {{#zcl_attributes_server removeKeys='isOptional'}}
+                case Attributes::{{asUpperCamelCase name}}::Id: {
+                    using TypeInfo = Attributes::{{asUpperCamelCase name}}::TypeInfo;
+                    TypeInfo::DecodableType cppValue;
+                    *aError = app::DataModel::Decode(aReader, cppValue);
+                    if (*aError != CHIP_NO_ERROR)
+                    {
+                        return nullptr;
+                    }
+                    {{>decode_value target="value" source="cppValue" cluster=parent.name depth=0 earlyReturn="nullptr"}}
+                    return value;
+                }
+                {{/zcl_attributes_server}}
+                default:
+                    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+                    break;
+            }
+            break;
+        }
+        {{/zcl_clusters}}
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+            break;
+    } 
+    return nullptr;
+}
+
+} // namespace chip

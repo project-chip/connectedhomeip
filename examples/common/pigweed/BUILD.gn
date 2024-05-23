@@ -1,0 +1,131 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/pigweed.gni")
+
+import("$dir_pw_build/target_types.gni")
+import("pigweed_rpcs.gni")
+
+config("default_config") {
+  include_dirs = [
+    ".",
+    "..",
+  ]
+}
+
+import("//build_overrides/pigweed.gni")
+import("$dir_pw_protobuf_compiler/proto.gni")
+
+pw_proto_library("echo_service") {
+  sources = [ "$dir_pw_rpc/echo.proto" ]
+  inputs = [ "$dir_pw_rpc/echo.options" ]
+  deps = [ "$dir_pw_protobuf:common_protos" ]
+  strip_prefix = "$dir_pw_rpc"
+  prefix = "echo_service"
+}
+
+pw_proto_library("attributes_service") {
+  sources = [ "protos/attributes_service.proto" ]
+  inputs = [ "protos/attributes_service.options" ]
+  deps = [ "$dir_pw_protobuf:common_protos" ]
+  strip_prefix = "protos"
+  prefix = "attributes_service"
+}
+
+pw_proto_library("boolean_state_service") {
+  sources = [ "protos/boolean_state_service.proto" ]
+  deps = [ "$dir_pw_protobuf:common_protos" ]
+  strip_prefix = "protos"
+  prefix = "boolean_state_service"
+}
+
+pw_proto_library("device_service") {
+  sources = [ "protos/device_service.proto" ]
+  inputs = [ "protos/device_service.options" ]
+  deps = [ "$dir_pw_protobuf:common_protos" ]
+  strip_prefix = "protos"
+  prefix = "device_service"
+}
+
+pw_proto_library("descriptor_service") {
+  sources = [ "protos/descriptor_service.proto" ]
+  deps = [ "$dir_pw_protobuf:common_protos" ]
+  strip_prefix = "protos"
+  prefix = "descriptor_service"
+}
+
+pw_proto_library("button_service") {
+  sources = [ "protos/button_service.proto" ]
+  deps = [ "$dir_pw_protobuf:common_protos" ]
+  strip_prefix = "protos"
+  prefix = "button_service"
+}
+
+pw_proto_library("lighting_service") {
+  sources = [ "protos/lighting_service.proto" ]
+  deps = [ "$dir_pw_protobuf:common_protos" ]
+  strip_prefix = "protos"
+  prefix = "lighting_service"
+}
+
+pw_proto_library("locking_service") {
+  sources = [ "protos/locking_service.proto" ]
+  deps = [ "$dir_pw_protobuf:common_protos" ]
+  strip_prefix = "protos"
+  prefix = "locking_service"
+}
+
+pw_proto_library("ot_cli_service") {
+  sources = [ "protos/ot_cli_service.proto" ]
+  inputs = [ "protos/ot_cli_service.options" ]
+  deps = [ "$dir_pw_protobuf:common_protos" ]
+  strip_prefix = "protos"
+  prefix = "ot_cli_service"
+}
+
+pw_proto_library("thread_service") {
+  sources = [ "protos/thread_service.proto" ]
+  inputs = [ "protos/thread_service.options" ]
+  deps = [ "$dir_pw_protobuf:common_protos" ]
+  strip_prefix = "protos"
+  prefix = "thread_service"
+}
+
+pw_proto_library("wifi_service") {
+  sources = [ "protos/wifi_service.proto" ]
+  deps = [ "$dir_pw_protobuf:common_protos" ]
+  strip_prefix = "protos"
+  prefix = "wifi_service"
+}
+
+pw_source_set("rpc_services") {
+  public_configs = [ ":default_config" ]
+}
+
+pw_source_set("system_rpc_server") {
+  sources = [ "system_rpc_server.cc" ]
+
+  deps = [
+    "$dir_pw_rpc/system_server:facade",
+    dir_pw_log,
+  ]
+
+  public_deps = [
+    "$dir_pw_hdlc:default_addresses",
+    "$dir_pw_hdlc:rpc_channel_output",
+    "$dir_pw_stream:sys_io_stream",
+  ]
+
+  public_configs = [ ":default_config" ]
+}

@@ -1,0 +1,44 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 29.2.4. [TC-BDX-2.4] Asynchronous file sending
+
+PICS:
+    - MCORE.BDX.AsynchronousSender
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "DUT sends a SendInit message to TH + TH sends a SendAccept message
+          back to DUT + DUT sends a Block message to TH"
+      verification: |
+          Verify that the Block message has the following mandatory fields Block Counter - Must start at 0 at the start of the transfer. Data - The length must be in the range [0 < Length ⇐ Max Block Size], where Max Block Size is the negotiated Max Block Size matching the SendAccept message that initiated the transfer.
+      disabled: true
+
+    - label: "DUT sends a Block message to TH"
+      verification: |
+          Verify that the Blocks are sent in ascending and sequential block counter order.
+      disabled: true
+
+    - label:
+          "DUT sends a BlockEOF message to TH + TH sends a BlockAckEOF message
+          back to DUT"
+      verification: |
+          Verify that the BlockEOF message has the following mandatory fields Block Counter Data - The length must be in the range [0 ⇐ Length ⇐ Max Block Size], where Max Block Size is the negotiated Max Block Size matching the SendAccept message that initiated the transfer. Verify that the pre-negotiated file size was transferred, if a definite size had been given.
+      disabled: true

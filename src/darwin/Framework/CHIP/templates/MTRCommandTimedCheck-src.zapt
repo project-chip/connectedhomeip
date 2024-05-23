@@ -1,0 +1,51 @@
+{{> header excludeZapComment=true}}
+
+#import "MTRCommandTimedCheck.h"
+
+#include <app-common/zap-generated/ids/Commands.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+
+using namespace chip;
+using namespace chip::app;
+
+{{#zcl_clusters}}
+{{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+static BOOL CommandNeedsTimedInvokeIn{{asUpperCamelCase name preserveAcronyms=true}}Cluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::{{asUpperCamelCase name}};
+    switch (aAttributeId) {
+        {{#zcl_commands}}
+        {{#if (and (isSupported (asUpperCamelCase ../name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))
+                   mustUseTimedInvoke)}}
+        case Commands::{{asUpperCamelCase name}}::Id: {
+            return YES;
+        }
+        {{/if}}
+        {{/zcl_commands}}
+        default: {
+            return NO;
+        }
+    }
+}
+{{/if}}
+{{/zcl_clusters}}
+
+BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonnull aCommandID)
+{
+    ClusterId clusterID = static_cast<ClusterId>(aClusterID.unsignedLongLongValue);
+    CommandId commandID = static_cast<CommandId>(aCommandID.unsignedLongLongValue);
+
+    switch (clusterID)
+    {
+        {{#zcl_clusters}}
+        {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+        case Clusters::{{asUpperCamelCase name}}::Id: {
+            return CommandNeedsTimedInvokeIn{{asUpperCamelCase name preserveAcronyms=true}}Cluster(commandID);
+        }
+        {{/if}}
+        {{/zcl_clusters}}
+        default: {
+            return NO;
+        }
+    }
+}

@@ -1,0 +1,155 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 59.3.2. [TC-I-3.2] Functionality with Client as DUT
+
+PICS:
+    - I.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label:
+          "Step 1: DUT issues an Identify command to the Test Harness, with the
+          IdentifyTime argument set to 0x003C (60 seconds) or a reasonable time
+          that is supported by the DUT."
+      PICS: I.C.C00.Tx
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+
+          ./chip-tool identify identify 60 1 1
+
+          Verify  TH recieves "Identify" command with IdentifyTime (ID 0) parameter of type uint16 with value!==0 on TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
+
+          [1689773867.665951][49374:49374] CHIP:DMG: InvokeRequestMessage =
+          [1689773867.665963][49374:49374] CHIP:DMG: {
+          [1689773867.665974][49374:49374] CHIP:DMG:         suppressResponse = false,
+          [1689773867.665986][49374:49374] CHIP:DMG:         timedRequest = false,
+          [1689773867.665995][49374:49374] CHIP:DMG:         InvokeRequests =
+          [1689773867.666015][49374:49374] CHIP:DMG:         [
+          [1689773867.666025][49374:49374] CHIP:DMG:                 CommandDataIB =
+          [1689773867.666037][49374:49374] CHIP:DMG:                 {
+          [1689773867.666046][49374:49374] CHIP:DMG:                         CommandPathIB =
+          [1689773867.666059][49374:49374] CHIP:DMG:                         {
+          [1689773867.666071][49374:49374] CHIP:DMG:                         EndpointId = 0x1,
+          [1689773867.666083][49374:49374] CHIP:DMG:                         ClusterId = 0x3,
+          [1689773867.666097][49374:49374] CHIP:DMG:                         CommandId = 0x0,
+          [1689773867.666107][49374:49374] CHIP:DMG:                         },
+          [1689773867.666122][49374:49374] CHIP:DMG:
+          [1689773867.666133][49374:49374] CHIP:DMG:                         CommandFields =
+          [1689773867.666145][49374:49374] CHIP:DMG:                         {
+          [1689773867.666210][49374:49374] CHIP:DMG:                         0x0 = 60,
+          [1689773867.666223][49374:49374] CHIP:DMG:                         },
+          [1689773867.666232][49374:49374] CHIP:DMG:                 },
+          [1689773867.666249][49374:49374] CHIP:DMG:
+          [1689773867.666257][49374:49374] CHIP:DMG:         ],
+          [1689773867.666275][49374:49374] CHIP:DMG:
+          [1689773867.666285][49374:49374] CHIP:DMG:         InteractionModelRevision = 1
+          [1689773867.666294][49374:49374] CHIP:DMG: },
+      disabled: true
+
+    - label:
+          "Step 2: DUT issues an IdentifyQuery command to the Test Harness.
+          Note: IdentifyQuery is not supported by Matter."
+      PICS: I.C.C01.Tx
+      verification: |
+          IdentifyQuery is not supported by Matter
+      disabled: true
+
+    - label:
+          "Step 3: DUT issues an Identify command to the Test Harness, with the
+          IdentifyTime argument set to 0x0000 (Stop)."
+      PICS: I.C.C00.Tx
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool identify identify 0 1 1
+
+          Verify  TH recieves "Identify" command with IdentifyTime (ID 0) parameter of type uint16 with value == 0 on TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
+
+          [1689773832.333792][49374:49374] CHIP:DMG: InvokeRequestMessage =
+          [1689773832.333804][49374:49374] CHIP:DMG: {
+          [1689773832.333812][49374:49374] CHIP:DMG:         suppressResponse = false,
+          [1689773832.333825][49374:49374] CHIP:DMG:         timedRequest = false,
+          [1689773832.333835][49374:49374] CHIP:DMG:         InvokeRequests =
+          [1689773832.333861][49374:49374] CHIP:DMG:         [
+          [1689773832.333875][49374:49374] CHIP:DMG:                 CommandDataIB =
+          [1689773832.333891][49374:49374] CHIP:DMG:                 {
+          [1689773832.333905][49374:49374] CHIP:DMG:                         CommandPathIB =
+          [1689773832.333923][49374:49374] CHIP:DMG:                         {
+          [1689773832.333938][49374:49374] CHIP:DMG:                                 EndpointId = 0x1,
+          [1689773832.333956][49374:49374] CHIP:DMG:                                 ClusterId = 0x3,
+          [1689773832.333974][49374:49374] CHIP:DMG:                                 CommandId = 0x0,
+          [1689773832.333987][49374:49374] CHIP:DMG:                         },
+          [1689773832.334008][49374:49374] CHIP:DMG:
+          [1689773832.334021][49374:49374] CHIP:DMG:                         CommandFields =
+          [1689773832.334038][49374:49374] CHIP:DMG:                         {
+          [1689773832.334060][49374:49374] CHIP:DMG:                                 0x0 = 0,
+          [1689773832.334077][49374:49374] CHIP:DMG:                         },
+          [1689773832.334090][49374:49374] CHIP:DMG:                 },
+          [1689773832.334114][49374:49374] CHIP:DMG:
+          [1689773832.334125][49374:49374] CHIP:DMG:         ],
+          [1689773832.334151][49374:49374] CHIP:DMG:
+          [1689773832.334163][49374:49374] CHIP:DMG:         InteractionModelRevision = 1
+          [1689773832.334176][49374:49374] CHIP:DMG: },
+      disabled: true
+
+    - label:
+          "Step 4: DUT sends a TriggerEffect command to the Test Harness, with
+          any supported EffectIdentifier argument and EffectVariant set to 0."
+      PICS: I.C.C40.Tx
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool identify trigger-effect 0 0 1 1
+
+          Verify  TH recieves "TriggerEffect" command with EffectIdentifier(Id 0) and EffectVariant(Id0) parameters of type enum8 on TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
+
+          [1689773765.746962][49374:49374] CHIP:DMG: InvokeRequestMessage =
+          [1689773765.746977][49374:49374] CHIP:DMG: {
+          [1689773765.746985][49374:49374] CHIP:DMG:         suppressResponse = false,
+          [1689773765.747006][49374:49374] CHIP:DMG:         timedRequest = false,
+          [1689773765.747016][49374:49374] CHIP:DMG:         InvokeRequests =
+          [1689773765.747035][49374:49374] CHIP:DMG:         [
+          [1689773765.747045][49374:49374] CHIP:DMG:                 CommandDataIB =
+          [1689773765.747058][49374:49374] CHIP:DMG:                 {
+          [1689773765.747068][49374:49374] CHIP:DMG:                         CommandPathIB =
+          [1689773765.747082][49374:49374] CHIP:DMG:                         {
+          [1689773765.747094][49374:49374] CHIP:DMG:                                 EndpointId = 0x1,
+          [1689773765.747107][49374:49374] CHIP:DMG:                                 ClusterId = 0x3,
+          [1689773765.747119][49374:49374] CHIP:DMG:                                 CommandId = 0x40,
+          [1689773765.747130][49374:49374] CHIP:DMG:                         },
+          [1689773765.747144][49374:49374] CHIP:DMG:
+          [1689773765.747155][49374:49374] CHIP:DMG:                         CommandFields =
+          [1689773765.747167][49374:49374] CHIP:DMG:                         {
+          [1689773765.747181][49374:49374] CHIP:DMG:                                 0x0 = 0,
+          [1689773765.747194][49374:49374] CHIP:DMG:                                 0x1 = 0,
+          [1689773765.747205][49374:49374] CHIP:DMG:                         },
+          [1689773765.747215][49374:49374] CHIP:DMG:                 },
+          [1689773765.747234][49374:49374] CHIP:DMG:
+          [1689773765.747243][49374:49374] CHIP:DMG:         ],
+          [1689773765.747261][49374:49374] CHIP:DMG:
+          [1689773765.747271][49374:49374] CHIP:DMG:         InteractionModelRevision = 1
+          [1689773765.747284][49374:49374] CHIP:DMG: },
+      disabled: true

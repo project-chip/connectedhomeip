@@ -1,0 +1,494 @@
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
+
+import("$dir_pw_build/python.gni")
+import("${chip_root}/scripts/py_matter_idl/files.gni")
+
+declare_args() {
+  # Location where code has been pre-generated
+  chip_code_pre_generated_directory = ""
+}
+
+# Code generation that will happen at build time.
+#
+# uses `scripts/codegen.py` for code generation.
+template("_chip_build_time_codegen") {
+  _name = target_name
+  _generator = invoker.generator
+
+  pw_python_action("${_name}_generate") {
+    script = "${chip_root}/scripts/codegen.py"
+
+    # TODO: this seems to touch internals. Is this ok? speeds up builds!
+    _pw_internal_run_in_venv = false
+
+    _idl_file = invoker.input
+    _expected_outputs = "${target_gen_dir}/${_name}.expected.outputs"
+
+    write_file(_expected_outputs, invoker.outputs, "list lines")
+
+    args = [
+      "--generator",
+      _generator,
+      "--output-dir",
+      rebase_path(target_gen_dir, root_build_dir),
+      "--expected-outputs",
+      rebase_path(_expected_outputs, root_build_dir),
+    ]
+
+    if (defined(invoker.options)) {
+      foreach(option, invoker.options) {
+        args += [
+          "--option",
+          option,
+        ]
+      }
+    }
+
+    args += [ rebase_path(_idl_file, root_build_dir) ]
+
+    inputs = [
+      _idl_file,
+      _expected_outputs,
+    ]
+
+    # ensure any change in codegen files will result in a rebuild
+    inputs += matter_idl_generator_files
+
+    sources = [ _idl_file ]
+
+    outputs = []
+    foreach(name, invoker.outputs) {
+      outputs += [ "${target_gen_dir}/${name}" ]
+    }
+  }
+
+  source_set(_name) {
+    sources = []
+    foreach(name, invoker.outputs) {
+      sources += [ "${target_gen_dir}/${name}" ]
+    }
+
+    public_configs = [ ":${_name}_config" ]
+
+    if (defined(invoker.public_configs)) {
+      public_configs += invoker.public_configs
+    }
+
+    forward_variables_from(invoker, [ "deps" ])
+
+    if (!defined(deps)) {
+      deps = []
+    }
+    deps += [ ":${_name}_generate" ]
+  }
+}
+
+# Code generation that will happen at build time.
+#
+# variables:
+#   input
+#     The ".zap" file to use to start the code generation
+#
+#   generator
+#     Name of the generator to use. Supported variants:
+#        - "app-templates"
+#
+#
+#
+#   deps, public_configs
+#     Forwarded to the resulting source set
+#
+#
+# uses `zap` for code generation.
+template("_chip_build_time_zapgen") {
+  _name = target_name
+  _generator = invoker.generator
+
+  assert(_generator == "app-templates")
+
+  if (_generator == "app-templates") {
+    _template_path =
+        rebase_path("${chip_root}/src/app/zap-templates/app-templates.json")
+
+    _partials_dir = "${chip_root}/src/app/zap-templates/partials"
+    _template_dir = "${chip_root}/src/app/zap-templates/templates/app"
+
+    # TODO: unclear how to maintain these: there is no parser that can figure
+    #       out links of template files and zap files and such
+    _extra_dependencies = [
+      "${_partials_dir}/header.zapt",
+
+      # Application templates, actually generating files
+      "${_template_dir}/access.zapt",
+      "${_template_dir}/endpoint_config.zapt",
+      "${_template_dir}/gen_config.zapt",
+      "${_template_dir}/im-cluster-command-handler.zapt",
+    ]
+
+    _output_subdir = "zap-generated"
+  }
+
+  pw_python_action("${_name}_generate") {
+    script = "${chip_root}/scripts/tools/zap/generate.py"
+
+    # TODO: this seems to touch internals. Is this ok? speeds up builds!
+    _pw_internal_run_in_venv = false
+
+    _idl_file = invoker.input
+
+    args = [
+      "--no-prettify-output",
+      "--templates",
+      _template_path,
+      "--output-dir",
+      rebase_path(target_gen_dir) + "/zapgen/" + _output_subdir,
+
+      # TODO: lock file support should be removed as this serializes zap
+      # (slower), however this is currently done because on Darwin zap startup
+      # may conflict and error out with:
+      #    Error: EEXIST: file already exists, mkdir '/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/pkg/465fcc8a6282e28dc7a166859d5814d34e2fb94249a72fa9229033b5b32dff1a'
+      "--lock-file",
+      rebase_path("${root_out_dir}/zap_gen.lock"),
+      "--parallel",
+      _idl_file,
+    ]
+
+    inputs = [
+      _idl_file,
+      _template_path,
+    ]
+    inputs += _extra_dependencies
+
+    # ensure any change in codegen files will result in a rebuild
+    inputs += matter_idl_generator_files
+
+    sources = [ _idl_file ]
+
+    outputs = []
+    foreach(name, invoker.outputs) {
+      outputs += [ "${target_gen_dir}/zapgen/${name}" ]
+    }
+  }
+
+  source_set(_name) {
+    sources = []
+    foreach(name, invoker.outputs) {
+      sources += [ "${target_gen_dir}/zapgen/${name}" ]
+    }
+
+    public_configs = [ ":${_name}_config" ]
+
+    if (defined(invoker.public_configs)) {
+      public_configs += invoker.public_configs
+    }
+
+    forward_variables_from(invoker, [ "deps" ])
+
+    if (!defined(public_deps)) {
+      public_deps = []
+    }
+    public_deps += [ ":${_name}_generate" ]
+  }
+}
+
+# Defines a target that runs code generation based on
+# scripts/codegen.py
+#
+# Arguments:
+#   input
+#     The ".matter" file to use to start the code generation
+#
+#   generator
+#     Name of the generator to use (e.g. java-jni, java-class, cpp-app)
+#
+#     outputs MUST share the same directory prefix (e.g. 'app/' or 'tlv/meta'
+#     or 'jni')
+#
+#   outputs
+#     Explicit names of the expected outputs. Enforced to validate that
+#     expected outputs are generated when processing input files.
+#
+#   deps, public_configs
+#     Forwarded to the resulting source set
+#
+# Command line parameters:
+#
+#  chip_code_pre_generated_directory:
+#     - If this is set, generation will NOT happen at compile time but rather
+#       the code generation is assumed to have already happened and reside in
+#       the given location.
+#     - The TOP LEVEL directory is assumed to be given. Actual location for
+#       individual generators is expected to be of the form
+#       <top_dir>/<matter_path>/<generator>
+#
+# NOTE: content of "outputs" is verified to match the output of codegen.py
+#       exactly. It is not inferred on purpose, to make build-rules explicit
+#       and verifiable (even though codegen.py can at runtime report its outputs)
+#
+#       To find the list of generated files, you can run codegen.py with the
+#       "--name-only" argument
+#
+# NOTE:
+#   the result of the target_name WILL BE a `source_set`. Treat it as such.
+#
+# Example usage:
+#
+#  chip_codegen("java-jni-generate") {
+#    input = "controller-clusters.matter"
+#    generator = "java-jni"
+#
+#    outputs = [
+#       "jni/IdentifyClient-ReadImpl.cpp",
+#       "jni/IdentifyClient-InvokeSubscribeImpl.cpp",
+#       # ... more to follow
+#    ]
+#  }
+#
+# Guarantees a target named "${target_name}_generate" exists and contains all
+# generated files (this works even in the case of using a pre-generated directory
+# by using a copy target to import pre-generated data)
+#
+template("chip_codegen") {
+  _name = target_name
+
+  config("${_name}_config") {
+    include_dirs = [ target_gen_dir ]
+  }
+
+  if (chip_code_pre_generated_directory == "") {
+    _chip_build_time_codegen(target_name) {
+      forward_variables_from(invoker,
+                             [
+                               "deps",
+                               "generator",
+                               "input",
+                               "outputs",
+                               "options",
+                               "public_configs",
+                             ])
+    }
+  } else {
+    not_needed(invoker, [ "options" ])
+
+    # This constructs a path like:
+    #  FROM all-clusters-app.matter (inside examples/all-clusters-app/all-clusters-common/)
+    #  USING "cpp-app" for generator:
+    #    => ${pregen_dir}/examples/all-clusters-app/all-clusters-common/all-clusters-app/codegen/cpp-app
+    _generation_dir =
+        chip_code_pre_generated_directory + "/" +
+        string_replace(rebase_path(invoker.input, chip_root), ".matter", "") +
+        "/codegen/" + invoker.generator
+
+    # Generation in this case just involves some files copying
+    copy("${_name}_generate") {
+      sources = []
+
+      foreach(name, invoker.outputs) {
+        sources += [ "${_generation_dir}/${name}" ]
+      }
+
+      # NOTE: we assume ALL outputs have a common subdir. This is generally the case with
+      #       paths like "app/callback-stub.cpp" and "app/PluginApplicationCallbacks.h"
+      _outputs = invoker.outputs
+      _dir_name = get_path_info(_outputs[0], "dir")
+      outputs = [ "${target_gen_dir}/${_dir_name}/{{source_file_part}}" ]
+
+      public_configs = [ ":${_name}_config" ]
+    }
+
+    source_set(_name) {
+      public_configs = [ ":${_name}_config" ]
+
+      if (defined(invoker.public_configs)) {
+        public_configs += invoker.public_configs
+      }
+      sources = get_target_outputs(":${_name}_generate")
+
+      forward_variables_from(invoker, [ "deps" ])
+      if (!defined(deps)) {
+        deps = []
+      }
+      deps += [ ":${_name}_generate" ]
+    }
+  }
+}
+
+# Defines a target that runs code generation based on
+# scripts/codegen.py
+#
+# Arguments:
+#   input
+#     The ".matter" file to use to start the code generation
+#
+#   generator
+#     Name of the generator to use (e.g. java-jni, java-class, cpp-app)
+#
+#   outputs
+#     Explicit names of the expected outputs. Enforced to validate that
+#     expected outputs are generated when processing input files.
+#
+#     outputs MUST share the same directory prefix (e.g. 'app/' or 'tlv/meta'
+#     or 'jni')
+#
+#   deps, public_configs
+#     Forwarded to the resulting source set
+#
+# Command line parameters:
+#
+#  chip_code_pre_generated_directory:
+#     - If this is set, generation will NOT happen at compile time but rather
+#       the code generation is assumed to have already happened and reside in
+#       the given location.
+#     - The TOP LEVEL directory is assumed to be given. Actual location for
+#       individual generators is expected to be of the form
+#       <top_dir>/<matter_path>/<generator>
+#
+# NOTE: content of "outputs" is verified to match the output of codegen.py
+#       exactly. It is not inferred on purpose, to make build-rules explicit
+#       and verifiable (even though codegen.py can at runtime report its outputs)
+#
+#       To find the list of generated files, you can run codegen.py with the
+#       "--name-only" argument
+#
+# NOTE:
+#   the result of the target_name WILL BE a `source_set`. Treat it as such.
+#
+# Example usage:
+#
+# chip_zapgen("controller-clusters-zap") {
+#     input = "controller-clusters.zap"
+#     generator = "app-templates"
+#
+#     outputs = [
+#       "zap-generated/access.h",
+#       "zap-generated/gen_config.h",
+#       "zap-generated/endpoint_config.h",
+#     ]
+# }
+#
+# Guarantees a target named "${target_name}_generate" exists and contains all
+# generated files (this works even in the case of using a pre-generated directory
+# by using a copy target to import pre-generated data)
+#
+template("chip_zapgen") {
+  _name = target_name
+
+  config("${_name}_config") {
+    include_dirs = [ "${target_gen_dir}/zapgen/" ]
+  }
+
+  if (chip_code_pre_generated_directory == "") {
+    _chip_build_time_zapgen(target_name) {
+      forward_variables_from(invoker,
+                             [
+                               "deps",
+                               "generator",
+                               "input",
+                               "outputs",
+                               "public_configs",
+                             ])
+    }
+  } else {
+    # This contstructs a path like:
+    #  FROM all-clusters-app.zap (inside examples/all-clusters-app/all-clusters-common/)
+    #  USING "cpp-app" for generator:
+    #    => ${pregen_dir}/examples/all-clusters-app/all-clusters-common/all-clusters-app/codegen/cpp-app
+    _generation_dir =
+        chip_code_pre_generated_directory + "/" +
+        string_replace(rebase_path(invoker.input, chip_root), ".zap", "") +
+        "/zap/" + invoker.generator
+
+    # Pick up only the headers and mark them available to use
+    # Specifically controller seems to require header files but NOT cpp (does)
+    # not want to include cpp compilation of IM command handler data
+    source_set("${_name}_headers") {
+      sources = []
+      foreach(name, invoker.outputs) {
+        if (get_path_info(name, "extension") == "h") {
+          sources += [ "${_generation_dir}/${name}" ]
+        }
+      }
+
+      # Ugly, but references WILL reference back into main code.
+      check_includes = false
+    }
+
+    # need to have consistent naming. Make sure "files" exists
+    action("${_name}_files") {
+      script = "${chip_root}/scripts/tools/zap/check_file_existence.py"
+
+      _output_name = "${target_gen_dir}/${_name}_files_checked.stamp"
+
+      args = [
+        "--touch",
+        rebase_path(_output_name),
+      ]
+      outputs = [ _output_name ]
+
+      foreach(name, invoker.outputs) {
+        args += [
+          "--exists",
+          rebase_path("${_generation_dir}/${name}"),
+        ]
+      }
+
+      # Depending on the files gets access to the headers
+      public_deps = [ ":${_name}_headers" ]
+    }
+
+    # Generation in this case just involves some files copying
+    copy("${_name}_generate") {
+      sources = []
+
+      foreach(name, invoker.outputs) {
+        sources += [ "${_generation_dir}/${name}" ]
+      }
+
+      # NOTE: we assume ALL outputs have a common subdir. This is generally the case with
+      #       paths like "app/callback-stub.cpp" and "app/PluginApplicationCallbacks.h"
+      _outputs = invoker.outputs
+      _dir_name = get_path_info(_outputs[0], "dir")
+      outputs = [ "${target_gen_dir}/zapgen/${_dir_name}/{{source_file_part}}" ]
+
+      public_configs = [ ":${_name}_config" ]
+    }
+
+    source_set(_name) {
+      forward_variables_from(invoker,
+                             [
+                               "deps",
+                               "public_configs",
+                             ])
+      if (!defined(public_configs)) {
+        public_configs = []
+      }
+      public_configs += [ ":${_name}_config" ]
+
+      if (!defined(public_deps)) {
+        public_deps = []
+      }
+      public_deps += [ ":${_name}_generate" ]
+
+      sources = get_target_outputs(":${_name}_generate")
+
+      # Ugly, but references WILL reference back into main code.
+      check_includes = false
+    }
+  }
+}

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/titleTv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:text="@string/enter_thread_credentials_title"
+            android:padding="16dp"
+            android:textSize="20sp"/>
+
+        <TextView
+            android:id="@+id/channelTv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/titleTv"
+            android:layout_marginTop="16dp"
+            android:layout_marginHorizontal="16dp"
+            android:text="@string/enter_thread_channel_hint"
+            android:textSize="20sp"/>
+
+        <EditText
+            android:id="@+id/channelEd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/channelTv"
+            android:layout_marginHorizontal="16dp"
+            android:text="@string/enter_thread_channel_text"
+            android:inputType="number"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/panIdTv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/channelEd"
+            android:layout_marginTop="16dp"
+            android:layout_marginHorizontal="16dp"
+            android:text="@string/enter_thread_panid_hint"
+            android:textSize="20sp"/>
+
+        <EditText
+            android:id="@+id/panIdEd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/panIdTv"
+            android:layout_marginHorizontal="16dp"
+            android:text="@string/enter_thread_panid_text"
+            android:inputType="textCapCharacters"
+            android:digits="0123456789ABCDEF"
+            android:maxLength="4"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/xpanIdTv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/panIdEd"
+            android:layout_marginTop="16dp"
+            android:layout_marginHorizontal="16dp"
+            android:text="@string/enter_thread_xpanid_hint"
+            android:textSize="20sp"/>
+
+        <EditText
+            android:id="@+id/xpanIdEd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/xpanIdTv"
+            android:layout_marginHorizontal="16dp"
+            android:text="@string/enter_thread_xpanid_text"
+            android:inputType="textCapCharacters"
+            android:digits="0123456789ABCDEF:"
+            android:maxLength="24"
+            android:textSize="20sp"
+            />
+
+        <TextView
+            android:id="@+id/masterKeyTv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/xpanIdEd"
+            android:layout_marginTop="16dp"
+            android:layout_marginHorizontal="16dp"
+            android:text="@string/enter_thread_master_key_hint"
+            android:textSize="20sp"/>
+
+        <EditText
+            android:id="@+id/masterKeyEd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/masterKeyTv"
+            android:layout_marginHorizontal="16dp"
+            android:text="@string/enter_thread_master_key_text"
+            android:inputType="textCapCharacters"
+            android:digits="0123456789ABCDEF:"
+            android:maxLength="48"
+            android:textSize="20sp"
+            />
+
+        <Button
+            android:id="@+id/saveNetworkBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/masterKeyEd"
+            android:padding="16dp"
+            android:layout_margin="16dp"
+            android:text="@string/enter_thread_save_network_btn"/>
+
+    </RelativeLayout>
+
+</ScrollView>

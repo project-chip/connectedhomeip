@@ -1,0 +1,34 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+
+import("${build_root}/toolchain/gcc_toolchain.gni")
+
+template("arm_toolchain") {
+  gcc_toolchain(target_name) {
+    _tool_name_root = "arm-none-eabi-"
+    ar = _tool_name_root + "ar"
+    cc = _tool_name_root + "gcc"
+    cxx = _tool_name_root + "g++"
+
+    toolchain_args = {
+      current_cpu = "arm"
+      current_os = invoker.current_os
+      is_clang = false
+
+      forward_variables_from(invoker.toolchain_args, "*")
+    }
+  }
+}

@@ -1,0 +1,141 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 19.8.7. [TC-MEDIAPLAYBACK-6.8] Text Track Verification
+
+PICS:
+    - MEDIAPLAYBACK.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Media Playback"
+    endpoint: 3
+
+    ID_Value:
+        type: CHAR_STRING
+        defaultValue: activeTextTrackId_0
+
+tests:
+    - label:
+          "Commission DUT to TH (can be skipped if done in a preceding test)."
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 1: TH reads the ActiveTextTrack attribute from the DUT"
+      PICS: MEDIAPLAYBACK.S.A0009
+      command: "readAttribute"
+      attribute: "ActiveTextTrack"
+      response:
+          value: { ID: "", TrackAttributes: null }
+
+    - label: "Step 2: TH reads the AvailableTextTracks attribute from the DUT"
+      PICS: MEDIAPLAYBACK.S.A000a
+      command: "readAttribute"
+      attribute: "AvailableTextTracks"
+      response:
+          constraints:
+              type: list
+              minLength: 1
+
+    - label:
+          "Step 3: TH sends a ActivateTextTrack command to DUT specifying the ID
+          value from step 2"
+      PICS: MEDIAPLAYBACK.S.C0d.Rsp
+      verification: |
+          ./chip-tool mediaplayback activate-text-track activeTextTrackId_1 1 3
+
+          On TH(chip-tool), Verify response is a successful (value 0) status response
+
+          [1705920343.780331][14340:14342] CHIP:DMG:         InteractionModelRevision = 11
+          [1705920343.780356][14340:14342] CHIP:DMG: },
+          [1705920343.780439][14340:14342] CHIP:DMG: Received Command Response Status for Endpoint=3 Cluster=0x0000_0506 Command=0x0000_000D Status=0x0
+          [1705920343.780508][14340:14342] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1705920343.780756][14340:14342] CHIP:EM: <<< [E:28106i S:13054 M:170208295 (Ack:222967153)] (S) Msg TX to 1:0000000000000001 [D27C] [UDP:[fe80::e65f:1ff:fe0f:19ff%wlan0]:5640] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      disabled: true
+
+    - label: "Step 4: TH reads the ActiveTextTrack attribute from the DUT"
+      PICS: MEDIAPLAYBACK.S.A0009
+      verification: |
+          ./chip-tool mediaplayback read active-text-track 1 3
+
+          On TH(chip-tool), Verify that the attribute returned has a value equal to the ID value from step 2.
+
+          [1705920389.490076][14344:14346] CHIP:DMG:         InteractionModelRevision = 11
+          [1705920389.490106][14344:14346] CHIP:DMG: }
+          [1705920389.490347][14344:14346] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0506 Attribute 0x0000_0009 DataVersion: 402582000
+          [1705920389.490552][14344:14346] CHIP:TOO:   ActiveTextTrack: {
+          [1705920389.490588][14344:14346] CHIP:TOO:     Id: activeTextTrackId_1
+          [1705920389.490634][14344:14346] CHIP:TOO:     TrackAttributes: {
+          [1705920389.490697][14344:14346] CHIP:TOO:       LanguageCode: languageCode2
+          [1705920389.490731][14344:14346] CHIP:TOO:       DisplayName: displayName2
+          [1705920389.490761][14344:14346] CHIP:TOO:      }
+          [1705920389.490790][14344:14346] CHIP:TOO:    }
+          [1705920389.491114][14344:14346] CHIP:EM: <<< [E:21221i S:59617 M:230711552 (Ack:159745975)] (S) Msg TX to 1:0000000000000001 [D27C] [UDP:[fe80::e65f:1ff:fe0f:19ff%wlan0]:5640] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      disabled: true
+
+    - label: "Step 5: TH sends a DeactivateTextTrack command to DUT"
+      PICS: MEDIAPLAYBACK.S.C0e.Rsp
+      verification: |
+          ./chip-tool mediaplayback  deactivate-text-track 1 3
+
+          On TH(chip-tool), Verify response is a successful (value 0) status response
+          [1705920432.359994][14349:14351] CHIP:DMG: },
+          [1705920432.360088][14349:14351] CHIP:DMG: Received Command Response Status for Endpoint=3 Cluster=0x0000_0506 Command=0x0000_000E Status=0x0
+          [1705920432.360161][14349:14351] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1705920432.360460][14349:14351] CHIP:EM: <<< [E:34606i S:60686 M:245440743 (Ack:79584870)] (S) Msg TX to 1:0000000000000001 [D27C] [UDP:[fe80::e65f:1ff:fe0f:19ff%wlan0]:5640] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1705920432.360651][14349:14351] CHIP:EM: Flushed pending ack for MessageCounter:79584870 on exchange 34606i
+      disabled: true
+
+    - label: "Step 6: TH reads the ActiveTextTrack attribute from the DUT"
+      PICS: MEDIAPLAYBACK.S.A0009
+      verification: |
+          ./chip-tool mediaplayback read active-text-track 1 3
+
+          On TH(chip-tool), Verify that the attribute returned has a null value.
+          [1705920471.994181][14352:14354] CHIP:DMG: }
+          [1705920471.994472][14352:14354] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0506 Attribute 0x0000_0009 DataVersion: 402582000
+          [1705920471.994741][14352:14354] CHIP:TOO:   ActiveTextTrack: {
+          [1705920471.994789][14352:14354] CHIP:TOO:     Id:
+          [1705920471.994845][14352:14354] CHIP:TOO:     TrackAttributes: null
+          [1705920471.994886][14352:14354] CHIP:TOO:    }
+          [1705920471.995254][14352:14354] CHIP:EM: <<< [E:930i S:17726 M:66812520 (Ack:87654763)] (S) Msg TX to 1:0000000000000001 [D27C] [UDP:[fe80::e65f:1ff:fe0f:19ff%wlan0]:5640] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1705920471.995502][14352:14354] CHIP:EM: Flushed pending ack for MessageCounter:87654763 on exchange 930i
+      disabled: true
+      command: "ActivateTextTrack"
+      arguments:
+          values:
+              - name: "TrackID"
+                value: ID_Value
+
+    - label: "Step 4: TH reads the ActiveTextTrack attribute from the DUT"
+      PICS: MEDIAPLAYBACK.S.A0009
+      command: "readAttribute"
+      attribute: "ActiveTextTrack"
+      response:
+          value: { ID: ID_Value }
+
+    - label: "Step 5: TH sends a DeactivateTextTrack command to DUT"
+      PICS: MEDIAPLAYBACK.S.C0e.Rsp
+      command: "DeactivateTextTrack"
+
+    - label: "Step 6: TH reads the ActiveTextTrack attribute from the DUT"
+      PICS: MEDIAPLAYBACK.S.A0009
+      command: "readAttribute"
+      attribute: "ActiveTextTrack"
+      response:
+          value: { ID: "", TrackAttributes: null }

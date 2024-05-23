@@ -1,0 +1,77 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    29.1.5. [TC-BDX-1.5] Response to Sender Initiated BDX Transfer session -
+    Negative scenario
+
+PICS:
+    - MCORE.BDX.Receiver
+    - MCORE.BDX.Responder
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "TH sends a SendInit message to DUT with a file designator not
+          supported by DUT"
+      verification: |
+          Verify that the DUT sends back StatusReport message to TH with Error FILE_DESIGNATOR_UNKNOWN.
+      disabled: true
+
+    - label:
+          "TH sends a SendInit message to DUT with an invalid start offset or
+          one that is not supported by DUT"
+      verification: |
+          Verify that the DUT sends back StatusReport message to TH with Error START_OFFSET_NOT_SUPPORTED.
+      disabled: true
+
+    - label:
+          "TH sends a SendInit message to DUT with definite length field too
+          large for DUT"
+      verification: |
+          Verify that the DUT sends back StatusReport message to TH with Error LENGTH_TOO_LARGE.
+      disabled: true
+
+    - label:
+          "TH sends a SendInit message to DUT with definite length field too
+          short for DUT"
+      verification: |
+          Verify that the DUT sends back StatusReport message to TH with Error LENGTH_TOO_SHORT.
+      disabled: true
+
+    - label:
+          "TH sends a SendInit message to DUT with a missing definite length
+          field"
+      verification: |
+          Verify that the DUT sends back StatusReport message to TH with Error LENGTH_REQUIRED.
+      disabled: true
+
+    - label:
+          "TH sends a SendInit message to DUT with proposed transfer control
+          method not supported by DUT"
+      verification: |
+          Verify that the DUT sends back StatusReport message to TH with Error TRANSFER_METHOD_NOT_SUPPORTED.
+      disabled: true
+
+    - label:
+          "TH sends a SendInit message to DUT when the DUT is too busy to
+          process another transfer"
+      verification: |
+          Verify that the DUT sends back StatusReport message to TH with Error RESPONDER_BUSY.
+      disabled: true

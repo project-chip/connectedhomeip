@@ -1,0 +1,444 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Groups Cluster Tests
+
+config:
+    nodeId: 0x12344321
+    cluster: "Groups"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "View Group 0 (invalid)"
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0
+      response:
+          values:
+              - name: "Status"
+                value: 0x87
+              - name: "GroupID"
+                value: 0
+
+    - label: "View First Group (not found)"
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0101
+      response:
+          values:
+              - name: "Status"
+                value: 0x8B
+              - name: "GroupID"
+                value: 0x0101
+
+    - label: "Add First Group (no keys)"
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0101
+              - name: "GroupName"
+                value: "Group #1"
+      response:
+          values:
+              - name: "Status"
+                value: 0x7e # UNSUPPORTED_ACCESS
+              - name: "GroupID"
+                value: 0x0101
+
+    - label: "Add KeySet"
+      cluster: "Group Key Management"
+      endpoint: 0
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1110000,
+                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+                        EpochStartTime1: 1110001,
+                        EpochKey2: "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf",
+                        EpochStartTime2: 1110002,
+                    }
+
+    - label: "Write Group Keys"
+      cluster: "Group Key Management"
+      endpoint: 0
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value:
+              [
+                  { FabricIndex: 1, GroupId: 0x0101, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a1 },
+              ]
+
+    - label: "Add First Group (name too long)"
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0101
+              - name: "GroupName"
+                value: "12345678901234567"
+      response:
+          values:
+              - name: "Status"
+                value: 0x87 # CONSTRAINT_ERROR
+              - name: "GroupID"
+                value: 0x0101
+
+    - label: "Add First Group (new)"
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0101
+              - name: "GroupName"
+                value: "Group #101234567" # Maximal-length name, to check that this works
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0101
+
+    - label: "View First Group (new)"
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0101
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0101
+              - name: "GroupName"
+                value: "Group #101234567"
+
+    - label: "View Second Group (not found)"
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0102
+      response:
+          values:
+              - name: "Status"
+                value: 0x8B
+              - name: "GroupID"
+                value: 0x0102
+
+    - label: "Get Group Membership 1 (all)"
+      command: "GetGroupMembership"
+      arguments:
+          values:
+              - name: "GroupList"
+                value: []
+      response:
+          values:
+              - name: "Capacity"
+                value: null
+              - name: "GroupList"
+                value: [0x0101]
+
+    - label: "Add Second Group (new)"
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0102
+              - name: "GroupName"
+                value: "Group #2"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0102
+
+    - label: "View Second Group (new)"
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0102
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0102
+              - name: "GroupName"
+                value: "Group #2"
+
+    - label: "View Group 3 (not found)"
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x7fff
+      response:
+          values:
+              - name: "Status"
+                value: 0x8B
+              - name: "GroupID"
+                value: 0x7fff
+
+    - label: "Add Group 3 (new)"
+      # https://github.com/project-chip/connectedhomeip/issues/11312
+      disabled: true
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x7fff
+              - name: "GroupName"
+                value: "Group #3"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x7fff
+
+    - label: "View First Group (existing)"
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0101
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0101
+              - name: "GroupName"
+                value: "Group #101234567"
+
+    - label: "View Second Group (existing)"
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0102
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0102
+              - name: "GroupName"
+                value: "Group #2"
+
+    - label: "Get Group Membership 2"
+      command: "GetGroupMembership"
+      arguments:
+          values:
+              - name: "GroupList"
+                value: [0x0102, 0x0103, 0x7fff]
+      response:
+          values:
+              - name: "Capacity"
+                value: null
+              - name: "GroupList"
+                value: [0x0102]
+
+    - label: "View Group 3 (new)"
+      # https://github.com/project-chip/connectedhomeip/issues/11312
+      disabled: true
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x7fff
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x7fff
+              - name: "GroupName"
+                value: "Group #3"
+
+    - label: "Remove Group 0 (invalid)"
+      command: "RemoveGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0
+      response:
+          values:
+              - name: "Status"
+                value: 0x87
+              - name: "GroupID"
+                value: 0
+
+    - label: "Remove Group 4 (not found)"
+      command: "RemoveGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0104
+      response:
+          values:
+              - name: "Status"
+                value: 0x8B
+              - name: "GroupID"
+                value: 0x0104
+
+    - label: "Remove Second Group (existing)"
+      command: "RemoveGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0102
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0102
+
+    - label: "View First Group (not removed)"
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0101
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0101
+              - name: "GroupName"
+                value: "Group #101234567"
+
+    - label: "View Second Group (removed)"
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0102
+      response:
+          values:
+              - name: "Status"
+                value: 0x8B
+              - name: "GroupID"
+                value: 0x0102
+
+    - label: "View Group 3 (not removed)"
+      # https://github.com/project-chip/connectedhomeip/issues/11312
+      disabled: true
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x7fff
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x7fff
+              - name: "GroupName"
+                value: "Group #3"
+
+    - label: "Get Group Membership 3"
+      command: "GetGroupMembership"
+      arguments:
+          values:
+              - name: "GroupList"
+                value: [0x01, 0x0101, 0x0102, 0x03]
+      response:
+          values:
+              - name: "Capacity"
+                value: null
+              - name: "GroupList"
+                value: [0x0101]
+
+    - label: "Remove All"
+      command: "RemoveAllGroups"
+
+    - label: "View First Group (removed)"
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0101
+      response:
+          values:
+              - name: "Status"
+                value: 0x8B
+              - name: "GroupID"
+                value: 0x0101
+
+    - label: "View Second Group (still removed)"
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0102
+      response:
+          values:
+              - name: "Status"
+                value: 0x8B
+              - name: "GroupID"
+                value: 0x0102
+
+    - label: "View Group 3 (removed)"
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x7fff
+      response:
+          values:
+              - name: "Status"
+                value: 0x8B
+              - name: "GroupID"
+                value: 0x7fff
+
+    - label: "Get Group Membership 4"
+      command: "GetGroupMembership"
+      arguments:
+          values:
+              - name: "GroupList"
+                value: [0x01, 0x0101, 0x0102, 0x03, 0x7fff]
+      response:
+          values:
+              - name: "Capacity"
+                value: null
+              - name: "GroupList"
+                value: []

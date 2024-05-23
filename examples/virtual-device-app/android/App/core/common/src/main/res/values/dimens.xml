@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="menu_item_side_space">10dp</dimen>
+    <dimen name="menu_item_image_width">48dp</dimen>
+    <dimen name="menu_item_image_height">48dp</dimen>
+    <dimen name="menu_item_image_margin_top">7dp</dimen>
+    <dimen name="menu_item_image_margin_bottom">7dp</dimen>
+    <dimen name="menu_item_text_margin_vertical">13dp</dimen>
+    <dimen name="menu_item_image_margin_start">14dp</dimen>
+    <dimen name="menu_item_text_margin_end">24dp</dimen>
+    <dimen name="menu_item_title_size">17sp</dimen>
+    <dimen name="menu_item_text_margin_start">16dp</dimen>
+    <dimen name="menu_item_bottom_space">16dp</dimen>
+    <dimen name="menu_item_bg_radius">16dp</dimen>
+
+    <dimen name="device_item_text_size">11sp</dimen>
+    <dimen name="device_item_value_text_size">20sp</dimen>
+    <dimen name="device_item_value_text_small_size">15sp</dimen>
+
+    <dimen name="logo_height">50dp</dimen>
+</resources>

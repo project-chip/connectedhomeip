@@ -1,0 +1,207 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 50.2.3. [TC-DGTHREAD-2.3] Attributes-Rx [DUT- Server]
+
+PICS:
+    - DGTHREAD.S
+    - DGTHREAD.S.F03
+
+config:
+    nodeId: 0x12344321
+    cluster: "Thread Network Diagnostics"
+    endpoint: 0
+
+tests:
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH reads RxTotalCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0027
+      command: "readAttribute"
+      attribute: "RxTotalCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 3: TH reads RxUnicastCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0028
+      command: "readAttribute"
+      attribute: "RxUnicastCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 4: TH reads RxBroadcastCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0029
+      command: "readAttribute"
+      attribute: "RxBroadcastCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 5: TH reads RxDataCount attribute value from DUT"
+      PICS: DGTHREAD.S.A002a
+      command: "readAttribute"
+      attribute: "RxDataCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 6: TH reads RxDataPollCount attribute value from DUT"
+      PICS: DGTHREAD.S.A002b
+      command: "readAttribute"
+      attribute: "RxDataPollCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 7: TH reads RxBeaconCount attribute value from DUT"
+      PICS: DGTHREAD.S.A002c
+      command: "readAttribute"
+      attribute: "RxBeaconCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 8: TH reads RxBeaconRequestCount attribute value from DUT"
+      PICS: DGTHREAD.S.A002d
+      command: "readAttribute"
+      attribute: "RxBeaconRequestCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 9: TH reads RxOtherCount attribute value from DUT"
+      PICS: DGTHREAD.S.A002e
+      command: "readAttribute"
+      attribute: "RxOtherCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 10: TH reads RxAddressFilteredCount attribute value from DUT"
+      PICS: DGTHREAD.S.A002f
+      command: "readAttribute"
+      attribute: "RxAddressFilteredCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label:
+          "Step 11: TH reads RxDestAddrFilteredCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0030
+      command: "readAttribute"
+      attribute: "RxDestAddrFilteredCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 12: TH reads RxDuplicatedCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0031
+      command: "readAttribute"
+      attribute: "RxDuplicatedCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 13: TH reads RxErrNoFrameCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0032
+      command: "readAttribute"
+      attribute: "RxErrNoFrameCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label:
+          "Step 14: TH reads RxErrUnknownNeighborCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0033
+      command: "readAttribute"
+      attribute: "RxErrUnknownNeighborCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label:
+          "Step 15: TH reads RxErrInvalidSrcAddrCount attribute value from DUT
+          and verify data type"
+      PICS: DGTHREAD.S.A0034
+      command: "readAttribute"
+      attribute: "RxErrInvalidSrcAddrCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 16: TH reads RxErrSecCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0035
+      command: "readAttribute"
+      attribute: "RxErrSecCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 17: TH reads RxErrFcsCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0036
+      command: "readAttribute"
+      attribute: "RxErrFcsCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 18: TH reads RxErrOtherCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0037
+      command: "readAttribute"
+      attribute: "RxErrOtherCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF

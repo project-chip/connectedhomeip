@@ -1,0 +1,399 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 42.1.5. [TC-ACE-1.5] Multi-fabric
+
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+    - APPDEVICE.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Access Control"
+    endpoint: 0
+    payload:
+        type: char_string
+        defaultValue: "MT:-24J0AFN00KA0648G00"
+    discriminator:
+        type: int16u
+        defaultValue: 3840
+    waitAfterCommissioning:
+        type: int16u
+        defaultValue: 5000
+    PakeVerifier:
+        type: octet_string
+        defaultValue: "hex:b96170aae803346884724fe9a3b287c30330c2a660375d17bb205a8cf1aecb350457f8ab79ee253ab6a8e46bb09e543ae422736de501e3db37d441fe344920d09548e4c18240630c4ff4913c53513839b7c07fcc0627a1b8573a149fcd1fa466cf"
+
+tests:
+    - label: "Step 1: TH1 commissions DUT using admin node ID N1"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "TH1 reads the fabric index"
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: th1FabricIndex
+
+    - label:
+          "Step 2 & 3: TH1 puts DUT into commissioning mode, TH2 commissions DUT
+          using admin node ID N2"
+      verification: |
+          ./chip-tool pairing open-commissioning-window 1 1 400 2000 3841
+
+          On TH1(chip-tool) note the manual pairing code for commissioning the TH2
+
+          [1684416077.831754][118314:118316] CHIP:CTL: Successfully opened pairing window on the device
+          [1684416077.831763][118314:118316] CHIP:CTL: Manual pairing code: [36283142515]
+          [1684416077.831771][118314:118316] CHIP:CTL: SetupQRCode: [MT:-24J0IRV010UJE7ZH10]
+          [1684416077.831791][118314:118316] CHIP:DMG: ICR moving to [AwaitingDe]
+
+          ./chip-tool pairing code 2 36283142515 --commissioner-name beta
+
+          On TH2 (chip-tool) verify the commissioning completed with success
+
+          [1684416247.482777][118352:118354] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
+          [1684416247.482789][118352:118354] CHIP:TOO: Device commissioning completed with success
+          [1684416247.482823][118352:118354] CHIP:DMG: ICR moving to [AwaitingDe]
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 2: TH1 opens the commissioning window on the DUT"
+      cluster: "Administrator Commissioning"
+      command: "OpenCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      PICS: PICS_SDK_CI_ONLY
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+              - name: "PAKEPasscodeVerifier"
+                value: PakeVerifier
+              - name: "Discriminator"
+                value: discriminator
+              - name: "Iterations"
+                value: 1000
+              - name: "Salt"
+                value: "SPAKE2P Key Salt"
+
+    - label: "Waiting after opening commissioning window"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      PICS: PICS_SDK_CI_ONLY
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
+
+    - label: "Step 3: TH2 commissions DUT using admin node ID N2"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: PICS_SDK_CI_ONLY
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: payload
+
+    - label: "Wait for the commissioned device to be retrieved for TH2"
+      identity: beta
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      PICS: PICS_SDK_CI_ONLY
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Step 4: TH2 reads its fabric index from the Operational Credentials
+          cluster CurrentFabricIndex attribute"
+      identity: "beta"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: th2FabricIndex
+
+    #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/768
+    - label: "Step 4: TH2 reads the fabric index"
+      verification: |
+          ./chip-tool operationalcredentials read current-fabric-index 2 0 --commissioner-name beta
+
+          On TH2 (chip-tool) note the CurrentFabricIndex for the further use
+
+          [1684416368.885484][118383:118385] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0005 DataVersion: 3654336520
+          [1684416368.885511][118383:118385] CHIP:TOO:   CurrentFabricIndex: 2
+          [1684416368.885577][118383:118385] CHIP:EM: <<< [E:65212i S:18077 M:83303022 (Ack:184536262)] (S) Msg TX to 2:0000000000000002 [C33E] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Read the commissioner node ID from the alpha fabric"
+      identity: "alpha"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: commissionerNodeIdAlpha
+
+    - label:
+          "Step 5: TH1 writes DUT Endpoint 0 AccessControl cluster ACL
+          attribute,value is list of AccessControlEntryStruct containing 2
+          elements 1.Struct : a)Fabric Index: 1 b)Privilege field: Administer
+          (5) c)AuthMode field: CASE (2) d)Subjects field: [N1] e)Targets
+          field:[{Cluster: AccessControl (0x001f), Endpoint: 0}] 2.struct :
+          a)Fabric Index: 1 b)Privilege field: View (1) c)AuthMode field: CASE
+          (2) d)Subjects field: null e)Targets field: [{Cluster: Descriptor
+          (0x001d), Endpoint: 0}]"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: th1FabricIndex,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: [commissionerNodeIdAlpha],
+                      Targets:
+                          [{ Cluster: 0x001f, Endpoint: 0, DeviceType: null }],
+                  },
+                  {
+                      FabricIndex: th1FabricIndex,
+                      Privilege: 1, # view
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets:
+                          [{ Cluster: 0x001d, Endpoint: 0, DeviceType: null }],
+                  },
+              ]
+
+    - label: "Read the commissioner node ID from the beta fabric"
+      PICS: PICS_SDK_CI_ONLY
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: commissionerNodeIdBeta
+
+    - label:
+          "Step 6: TH2 writes DUT Endpoint 0 AccessControl cluster ACL
+          attribute,value is list of AccessControlEntryStruct containing 2
+          elements 1.Struct : a)Fabric Index: th2FabricIndex b)Privilege field:
+          Administer (5) c)AuthMode field: CASE (2) d)Subjects field: [N2]
+          e)Targets field: [{Cluster: AccessControl (0x001f), Endpoint: 0}]"
+      identity: beta
+      PICS: PICS_SDK_CI_ONLY
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: th2FabricIndex,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: [commissionerNodeIdBeta],
+                      Targets:
+                          [{ Cluster: 0x001f, Endpoint: 0, DeviceType: null }],
+                  },
+                  {
+                      FabricIndex: th2FabricIndex,
+                      Privilege: 1, # view
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets:
+                          [{ Cluster: 0x0028, Endpoint: 0, DeviceType: null }],
+                  },
+              ]
+
+    #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/768
+    - label: "Step 6: TH2 writes ACL giving view privilge for basic cluster"
+      verification: |
+          ./chip-tool accesscontrol write acl '[{"fabricIndex": 2, "privilege": 5, "authMode": 2, "subjects": [223344], "targets": [{ "cluster": 31, "endpoint": 0, "deviceType": null }]}, {"fabricIndex": 2, "privilege": 1, "authMode": 2, "subjects": null, "targets": [{ "cluster": 40, "endpoint": 0, "deviceType": null }]}]' 2 0 --commissioner-name beta
+
+          On TH2 (chip-tool) verify the success response for the write function
+
+          [1684416510.660175][118418:118420] CHIP:DMG:                         StatusIB =
+          [1684416510.660184][118418:118420] CHIP:DMG:                         {
+          [1684416510.660192][118418:118420] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1684416510.660201][118418:118420] CHIP:DMG:                         },
+          [1684416510.660211][118418:118420] CHIP:DMG:
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 7: TH1 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList
+          attribute"
+      command: "readAttribute"
+      cluster: "Descriptor"
+      attribute: "DeviceTypeList"
+
+    - label:
+          "Step 8: TH1 reads DUT Endpoint 0 Basic Information cluster VendorID
+          attribute"
+      command: "readAttribute"
+      cluster: "Basic Information"
+      attribute: "VendorID"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "Step 9: TH2 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList
+          attribute"
+      identity: "beta"
+      PICS: PICS_SDK_CI_ONLY
+      command: "readAttribute"
+      cluster: "Descriptor"
+      attribute: "DeviceTypeList"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/768
+    - label: "Step 9: TH2 reads descriptor cluster - expect UNSUPPORTED_ACCESS"
+      verification: |
+          ./chip-tool descriptor read device-type-list 2 0 --commissioner-name beta
+
+          On TH2(chip-tool) verify the UNSUPPORTED_ACCESS (0x7e) response
+
+          [1684416700.274460][118482:118484] CHIP:DMG:                                 StatusIB =
+          [1684416700.274467][118482:118484] CHIP:DMG:                                 {
+          [1684416700.274475][118482:118484] CHIP:DMG:                                         status = 0x7e (UNSUPPORTED_ACCESS),
+          [1684416700.274482][118482:118484] CHIP:DMG:                                 },
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 10: TH2 reads DUT Endpoint 0 Basic Information cluster VendorID
+          attribute"
+      identity: "beta"
+      PICS: PICS_SDK_CI_ONLY
+      command: "readAttribute"
+      cluster: "Basic Information"
+      attribute: "VendorID"
+
+    #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/768
+    - label:
+          "Step 10: TH2 reads DUT Endpoint 0 Basic Information cluster VendorID
+          attribute - expect SUCCESS"
+      verification: |
+          ./chip-tool basicinformation read vendor-id 2 0 --commissioner-name beta
+
+          On TH2(chip-tool) verify the success with the Vendor-id
+
+          [1684416789.682243][118505:118507] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0002 DataVersion: 2033462723
+          [1684416789.682271][118505:118507] CHIP:TOO:   VendorID: 65521
+          [1684416789.682327][118505:118507] CHIP:EM: <<< [E:11340i S:29188 M:208193949 (Ack:232576417)] (S) Msg TX to 2:0000000000000002 [C33E] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 11: TH1 resets the ACLs to the default value bywriting DUT
+          Endpoint 0 AccessControl cluster ACL attribute,value is list of
+          AccessControlEntryStruct containing 1 elements 1.Struct : a)Fabric
+          Index: 1 b)Privilege field: Administer (5) c)AuthMode field: CASE (2)
+          d)Subjects field: [N1] e)Targets field: null"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: [commissionerNodeIdAlpha],
+                      Targets: null,
+                  },
+              ]
+
+    - label:
+          "Step 12: TH1 removes the TH2 fabric by sending the RemoveFabric
+          command to the DUT with the FabricIndex set to th2FabricIndex"
+      cluster: "Operational Credentials"
+      PICS: PICS_SDK_CI_ONLY
+      command: "RemoveFabric"
+      arguments:
+          values:
+              - name: "FabricIndex"
+                value: th2FabricIndex
+
+    #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/768
+    - label:
+          "Step 12: TH1 removes the TH2 fabric by sending the RemoveFabric
+          commandto the DUT with the FabricIndex set to th2FabricIndex"
+      verification: |
+          ./chip-tool operationalcredentials remove-fabric 2 1 0
+
+          On TH1(chip-tool) verify the success with the nocresponse with statuscode is success(0)
+
+          [1684416866.004187][118527:118529] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          [1684416866.004214][118527:118529] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
+          [1684416866.004236][118527:118529] CHIP:TOO:   NOCResponse: {
+          [1684416866.004250][118527:118529] CHIP:TOO:     statusCode: 0
+          [1684416866.004255][118527:118529] CHIP:TOO:     fabricIndex: 2
+          [1684416866.004259][118527:118529] CHIP:TOO:    }
+          [1684416866.004270][118527:118529] CHIP:DMG: ICR moving to [AwaitingDe]
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"

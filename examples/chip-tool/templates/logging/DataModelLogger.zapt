@@ -1,0 +1,30 @@
+{{> header}}
+
+#include <lib/core/CHIPError.h>
+#include <app-common/zap-generated/cluster-objects.h>
+
+{{#zcl_structs}}
+{{#if has_more_than_one_cluster}}
+{{> struct_logger_decl namespace="detail"}}
+{{/if}}
+{{/zcl_structs}}
+
+{{#zcl_clusters}}
+{{#zcl_structs}}
+{{#unless has_more_than_one_cluster}}
+{{> struct_logger_decl namespace=(as_camel_cased ../name false)}}
+{{/unless}}
+{{/zcl_structs}}
+{{/zcl_clusters}}
+
+{{#zcl_clusters}}
+{{#zcl_events}}
+static CHIP_ERROR LogValue(const char * label, size_t indent, const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Events::{{asUpperCamelCase name}}::DecodableType & value);
+{{/zcl_events}}
+{{/zcl_clusters}}
+
+{{#zcl_clusters}}
+{{#zcl_commands_source_server}}
+static CHIP_ERROR LogValue(const char * label, size_t indent, const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType & value);
+{{/zcl_commands_source_server}}
+{{/zcl_clusters}}

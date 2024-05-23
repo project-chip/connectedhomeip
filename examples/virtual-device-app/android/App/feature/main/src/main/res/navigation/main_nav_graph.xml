@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_nav_graph"
+    app:startDestination="@id/mainFragment">
+
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.matter.virtual.device.app.feature.main.MainFragment"
+        android:label="MainFragment"
+        tools:layout="@layout/fragment_main" />
+
+    <fragment
+        android:id="@+id/loadingFragment"
+        android:name="com.matter.virtual.device.app.feature.main.LoadingFragment"
+        android:label="LoadingFragment"
+        tools:layout="@layout/fragment_loading">
+        <argument
+            android:name="setting"
+            app:argType="string" />
+        <deepLink app:uri="android-app://com.matter.virtual.device.app.feature.main/loadingFragment/{setting}" />
+    </fragment>
+</navigation>

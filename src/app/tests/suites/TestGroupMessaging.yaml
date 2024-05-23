@@ -1,0 +1,578 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# !!!!!!!!!! TEST INFORMATION !!!!!!!!!!!!!!!!!!
+# This test file tests Group Multicast Messaging.
+# For this test to work, A Group Write/Command and a unicast read need to occur to be able to confirm that the group Communication works. Every test comes in a pair
+# Only Works on Linux machines
+name: Basic Group Messaging Tests
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+    # Test that a group id can be a variable.
+    groupIdVariable:
+        type: int16u
+        defaultValue: 0x0101
+    nodeId2:
+        type: node_id
+        defaultValue: 0x43211234
+    discriminator:
+        type: int16u
+        defaultValue: 3840
+    payload:
+        type: char_string
+        defaultValue: "MT:-24J0AFN00KA0648G00" # This value needs to be generated automatically
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "KeySet Write 1"
+      cluster: "Group Key Management"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value: {
+                        GroupKeySetID: 0x01a1,
+                        #  TODO Revert this once MCSP is implemented
+                        # GroupKeySecurityPolicy: 1,
+                        GroupKeySecurityPolicy: 0, # 0 => TrustFirst
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1110000,
+                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+                        EpochStartTime1: 1110001,
+                        EpochKey2: "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf",
+                        EpochStartTime2: 1110002,
+                    }
+
+    - label: "KeySet Write 2"
+      cluster: "Group Key Management"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value: {
+                        GroupKeySetID: 0x01a2,
+                        GroupKeySecurityPolicy: 0, # TrustFirst
+                        EpochKey0: "\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf",
+                        EpochStartTime0: 2220000,
+                        EpochKey1: "\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef",
+                        EpochStartTime1: 2220001,
+                        EpochKey2: "\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff",
+                        EpochStartTime2: 2220002,
+                    }
+
+    - label: "Write Group Keys"
+      cluster: "Group Key Management"
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value:
+              [
+                  { FabricIndex: 0, GroupId: 0x0101, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 0, GroupId: 0x0102, GroupKeySetID: 0x01a2 },
+              ]
+
+    - label: "Add Group 1 (endpoint 1)"
+      cluster: "Groups"
+      command: "AddGroup"
+      endpoint: 1
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0101
+              - name: "GroupName"
+                value: "Group #1"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0101
+
+    - label: "Add Group 1 (endpoint 2)"
+      cluster: "Groups"
+      command: "AddGroup"
+      endpoint: 2
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0101
+              - name: "GroupName"
+                value: "Group #1"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0101
+
+    - label: "Add Group 2 (endpoint 0)"
+      cluster: "Groups"
+      command: "AddGroup"
+      endpoint: 0
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0102
+              - name: "GroupName"
+                value: "Group #2"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0102
+
+    - label: "Install ACLs"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  # Any CASE can administer
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+                  # Any group can manage
+                  {
+                      FabricIndex: 0,
+                      Privilege: 4, # manage
+                      AuthMode: 3, # group
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]
+
+    # Test Pair 1 : Check initial value (ensure it's not the test value)
+    - label: "Read initial Attribute value"
+      command: "readAttribute"
+      attribute: "NodeLabel"
+      response:
+          value: ""
+
+    # Test Pair 2 : Sends a Group Write Attribute
+    - label: "Group Write Attribute"
+      command: "writeAttribute"
+      attribute: "NodeLabel"
+      groupId: 0x0102
+      arguments:
+          value: "xyzzy"
+
+    # Give the group write time to actually happen; unicast delivery can outrace
+    # multicast if the unicast packet is sent immediately after the multicast one.
+    - label: "Wait for write 1"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+      # Test Pair 2 : Validates previous group write attribute with a unicast to read
+    - label: "Read back Attribute"
+      command: "readAttribute"
+      attribute: "NodeLabel"
+      response:
+          value: "xyzzy"
+
+    # Test Pair 3 : Sends a Group Write Attribute
+    - label: "Restore initial Attribute value"
+      command: "writeAttribute"
+      attribute: "NodeLabel"
+      groupId: 0x0102
+      arguments:
+          value: ""
+
+    # Give the group write time to actually happen; unicast delivery can outrace
+    # multicast if the unicast packet is sent immediately after the multicast one.
+    - label: "Wait for write 2"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    # Test Pair 3 : Validates previous group write attribute with a unicast to read
+    - label: "Read back Attribute"
+      command: "readAttribute"
+      attribute: "NodeLabel"
+      response:
+          value: ""
+
+    # Test Pair 4 : Sends a Group command
+    - label: "Check on/off attribute value is false for endpoint 1"
+      cluster: "On/Off"
+      command: "readAttribute"
+      attribute: "OnOff"
+      endpoint: 1
+      response:
+          value: 0
+
+    - label: "Check on/off attribute value is false for endpoint 2"
+      cluster: "On/Off"
+      command: "readAttribute"
+      attribute: "OnOff"
+      endpoint: 2
+      response:
+          value: 0
+
+    - label: "Turn On the light to see attribute change"
+      cluster: "On/Off"
+      command: "On"
+      groupId: groupIdVariable # 0x0101
+
+    # Give the group invoke time to actually happen; unicast delivery can outrace
+    # multicast if the unicast packet is sent immediately after the multicast one.
+    - label: "Wait for command 3"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    # Test Pair 4 : Validates previous group command with a unicast to read
+    - label:
+          "Check on/off attribute value is true after on command for endpoint 1"
+      cluster: "On/Off"
+      command: "readAttribute"
+      attribute: "OnOff"
+      endpoint: 1
+      response:
+          value: 1
+
+    - label:
+          "Check on/off attribute value is true after on command for endpoint 2"
+      cluster: "On/Off"
+      command: "readAttribute"
+      attribute: "OnOff"
+      endpoint: 2
+      response:
+          value: 1
+
+    - label: "Turn off the light to get ready for the next test for endpoint 1"
+      cluster: "On/Off"
+      command: "Off"
+      endpoint: 1
+
+    - label: "Turn off the light to get ready for the next test for endpoint 2"
+      cluster: "On/Off"
+      command: "Off"
+      endpoint: 2
+
+    - label: "Cleanup for next test remove Group 1 (endpoint 2)"
+      cluster: "Groups"
+      command: "RemoveGroup"
+      endpoint: 2
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0101
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0101
+
+    - label: "Cleanup ACLs"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  # Any CASE can administer
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]
+
+    - label: "Open Commissioning Window from alpha"
+      cluster: "Administrator Commissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+
+    # We want to repeat all that from the "gamma" fabric, where our fabric
+    # index is 3 but the device's will be 2, so we have different fabric
+    # indices for the same fabric id.
+    - label: "Commission from gamma"
+      identity: "gamma"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: payload
+
+    - label: "Wait for the commissioned device to be retrieved for gamma"
+      identity: "gamma"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+
+    - label: "KeySet Write 1 for gamma"
+      identity: "gamma"
+      cluster: "Group Key Management"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value: {
+                        GroupKeySetID: 0x01a1,
+                        #  TODO Revert this once MCSP is implemented
+                        # GroupKeySecurityPolicy: 1,
+                        GroupKeySecurityPolicy: 0, # 0 => TrustFirst
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1110000,
+                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+                        EpochStartTime1: 1110001,
+                        EpochKey2: "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf",
+                        EpochStartTime2: 1110002,
+                    }
+
+    - label: "KeySet Write 2 for gamma"
+      identity: "gamma"
+      cluster: "Group Key Management"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value: {
+                        GroupKeySetID: 0x01a2,
+                        GroupKeySecurityPolicy: 0, # TrustFirst
+                        EpochKey0: "\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf",
+                        EpochStartTime0: 2220000,
+                        EpochKey1: "\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef",
+                        EpochStartTime1: 2220001,
+                        EpochKey2: "\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff",
+                        EpochStartTime2: 2220002,
+                    }
+
+    - label: "Write Group Keys for gamma"
+      identity: "gamma"
+      cluster: "Group Key Management"
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value:
+              [
+                  { FabricIndex: 0, GroupId: 0x0101, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 0, GroupId: 0x0102, GroupKeySetID: 0x01a2 },
+              ]
+
+    - label: "Add Group 1 (endpoint 1) for gamma"
+      identity: "gamma"
+      cluster: "Groups"
+      command: "AddGroup"
+      endpoint: 1
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0101
+              - name: "GroupName"
+                value: "Group #1"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0101
+
+    - label: "Add Group 2 (endpoint 0) for gamma"
+      identity: "gamma"
+      cluster: "Groups"
+      command: "AddGroup"
+      endpoint: 0
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0102
+              - name: "GroupName"
+                value: "Group #2"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0102
+
+    - label: "Install ACLs for gamma"
+      identity: "gamma"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  # Any CASE can administer
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+                  # Any group can manage
+                  {
+                      FabricIndex: 0,
+                      Privilege: 4, # manage
+                      AuthMode: 3, # group
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]
+
+    # Test Pair 1 : Check initial value (ensure it's not the test value)
+    - label: "Read initial Attribute value for gamma"
+      identity: "gamma"
+      command: "readAttribute"
+      attribute: "NodeLabel"
+      response:
+          value: ""
+
+    # Test Pair 2 : Sends a Group Write Attribute
+    - label: "Group Write Attribute for gamma"
+      identity: "gamma"
+      command: "writeAttribute"
+      attribute: "NodeLabel"
+      groupId: 0x0102
+      arguments:
+          value: "xyzzy"
+
+    # Give the group write time to actually happen; unicast delivery can outrace
+    # multicast if the unicast packet is sent immediately after the multicast one.
+    - label: "Wait for write 1 for gamma"
+      identity: "gamma"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+      # Test Pair 2 : Validates previous group write attribute with a unicast to read
+    - label: "Read back Attribute for gamma"
+      identity: "gamma"
+      command: "readAttribute"
+      attribute: "NodeLabel"
+      response:
+          value: "xyzzy"
+
+    # Test Pair 3 : Sends a Group Write Attribute
+    - label: "Restore initial Attribute value for gamma"
+      identity: "gamma"
+      command: "writeAttribute"
+      attribute: "NodeLabel"
+      groupId: 0x0102
+      arguments:
+          value: ""
+
+    # Give the group write time to actually happen; unicast delivery can outrace
+    # multicast if the unicast packet is sent immediately after the multicast one.
+    - label: "Wait for write 2 for gamma"
+      identity: "gamma"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    # Test Pair 3 : Validates previous group write attribute with a unicast to read
+    - label: "Read back Attribute for gamma"
+      identity: "gamma"
+      command: "readAttribute"
+      attribute: "NodeLabel"
+      response:
+          value: ""
+
+    # Test Pair 4 : Sends a Group command
+    - label: "Check on/off attribute value is false for endpoint 1 for gamma"
+      cluster: "On/Off"
+      command: "readAttribute"
+      attribute: "OnOff"
+      endpoint: 1
+      response:
+          value: 0
+
+    - label: "Turn On the light to see attribute change for gamma"
+      identity: "gamma"
+      cluster: "On/Off"
+      command: "On"
+      groupId: 0x0101
+
+    # Give the group invoke time to actually happen; unicast delivery can outrace
+    # multicast if the unicast packet is sent immediately after the multicast one.
+    - label: "Wait for command 3 for gamma"
+      identity: "gamma"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    # Test Pair 4 : Validates previous group command with a unicast to read
+    - label:
+          "Check on/off attribute value is true after on command for endpoint 1
+          for gamma"
+      cluster: "On/Off"
+      command: "readAttribute"
+      attribute: "OnOff"
+      endpoint: 1
+      response:
+          value: 1
+
+    - label: "Cleanup ACLs for gamma"
+      identity: "gamma"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  # Any CASE can administer
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]

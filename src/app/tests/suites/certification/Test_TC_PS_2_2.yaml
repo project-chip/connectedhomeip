@@ -1,0 +1,296 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 62.2.2. [TC-PS-2.2] Event reporting with server as DUT
+
+PICS:
+    - PS.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Precondition"
+      verification: |
+          This test case is verified after the device is provisioned. Pls provision device first, Pass appropriate nodeID in the below command
+      disabled: true
+
+    - label: "Step 1: Commission DUT to TH"
+      verification: |
+
+      disabled: true
+
+    - label: "Step 2a: Bring the DUT into a state without any wired faults."
+      PICS: PS.S.A000a
+      verification: |
+
+      disabled: true
+
+    - label: "Step 2b: TH reads the ActiveWiredFaults attribute from the DUT"
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
+
+          ./chip-tool powersource read active-wired-faults 1 1
+
+          Verify on TH logs:
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      disabled: true
+
+    - label: "Step 3a: Set up subscription to WiredFaultChange event"
+      PICS: PS.S.E00 && PS.S.M.ManualWiredFault
+      verification: |
+          Please use Interactive mode to Verify subscription test step
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
+
+          >>> powersource subscribe-event-by-id 0 2 20 1 1
+
+
+          Verify on the TH Log
+
+          [1678874350.531309][348369:348369] CHIP:DMG: SubscribeRequestMessage =
+          [1678874350.531317][348369:348369] CHIP:DMG: {
+          [1678874350.531323][348369:348369] CHIP:DMG:         KeepSubscriptions = false,
+          [1678874350.531331][348369:348369] CHIP:DMG:         MinIntervalFloorSeconds = 0x2,
+          [1678874350.531339][348369:348369] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x14,
+          [1678874350.531345][348369:348369] CHIP:DMG:         EventPathIBs =
+          [1678874350.531356][348369:348369] CHIP:DMG:         [
+          [1678874350.531363][348369:348369] CHIP:DMG:                 EventPath =
+          [1678874350.531371][348369:348369] CHIP:DMG:                 {
+          [1678874350.531383][348369:348369] CHIP:DMG:                         Endpoint = 0x1,
+          [1678874350.531391][348369:348369] CHIP:DMG:                         Cluster = 0x2f,
+          [1678874350.531399][348369:348369] CHIP:DMG:                         Event = 0x0,
+          [1678874350.531406][348369:348369] CHIP:DMG:                 },
+          [1678874350.531415][348369:348369] CHIP:DMG:
+          [1678874350.531421][348369:348369] CHIP:DMG:         ],
+          [1678874350.531432][348369:348369] CHIP:DMG:
+          [1678874350.531440][348369:348369] CHIP:DMG:         isFabricFiltered = true,
+          [1678874350.531449][348369:348369] CHIP:DMG:         InteractionModelRevision = 1
+          [1678874350.531455][348369:348369] CHIP:DMG: },
+          [1678874350.531490][348369:348369] CHIP:DMG: Final negotiated min/max parameters: Min = 2s, Max = 20s
+
+          [1678874350.531517][348369:348369] CHIP:DMG: IM RH moving to [GeneratingReports]
+          MessageCounter:108699985 from Retrans Table on exchange 59500r
+          [1678874350.533233][348369:348369] CHIP:DMG: StatusResponseMessage =
+          [1678874350.533243][348369:348369] CHIP:DMG: {
+          [1678874350.533251][348369:348369] CHIP:DMG:         Status = 0x00 (SUCCESS),
+          [1678874350.533258][348369:348369] CHIP:DMG:         InteractionModelRevision = 1
+          [1678874350.533264][348369:348369] CHIP:DMG: }
+          [1678874350.533271][348369:348369] CHIP:IM: Received status response, status is 0x00 (SUCCESS)
+      disabled: true
+
+    - label: "Step 3b: Bring the DUT into a wired fault state."
+      PICS: PS.S.E00 && PS.S.M.ManualWiredFault
+      verification: |
+          DUT ACTION REQUIRED
+      disabled: true
+
+    - label: "Step 4: TH reads the ActiveWiredFaults attribute from the DUT"
+      PICS: PS.S.A000a && PS.S.M.ManualWiredFault
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
+
+          ./chip-tool powersource read active-wired-faults 1 1
+
+          Verify on the TH Log:
+
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      disabled: true
+
+    - label:
+          "Step 5: The Current field of Step 3b has to be the same as the value
+          of Step 4."
+      PICS: PS.S.E00 && PS.S.A000a && PS.S.M.ManualWiredFault
+      verification: |
+
+      disabled: true
+
+    - label: "Step 6: Bring the DUT back into a clean state."
+      PICS: PS.S.E00 && PS.S.M.ManualWiredFault
+      verification: |
+          DUT ACTION REQUIRED
+      disabled: true
+
+    - label: "Step 7a: Bring the DUT into a state without any battery faults."
+      PICS: PS.S.A0012
+      verification: |
+
+      disabled: true
+
+    - label: "Step 7b: TH reads the ActiveBatFaults attribute from the DUT"
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
+
+          ./chip-tool powersource read active-bat-faults 12345 1
+
+          Verify on the TH Log:
+
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      disabled: true
+
+    - label: "Step 8a: Set up subscription to BatFaultChange event"
+      PICS: PS.S.E01 && PS.S.M.ManualBatFault
+      verification: |
+          Please use Interactive mode to Verify subscription test step
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
+
+
+          powersource subscribe-event-by-id 1 0 100 1  1
+          Verify on the TH Log:
+
+          [1678874454.354931][348369:348369] CHIP:DMG: SubscribeRequestMessage =
+          [1678874454.354939][348369:348369] CHIP:DMG: {
+          [1678874454.354947][348369:348369] CHIP:DMG:         KeepSubscriptions = false,
+          [1678874454.354955][348369:348369] CHIP:DMG:         MinIntervalFloorSeconds = 0x0,
+          [1678874454.354962][348369:348369] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x64,
+          [1678874454.354972][348369:348369] CHIP:DMG:         EventPathIBs =
+          [1678874454.354979][348369:348369] CHIP:DMG:         [
+          [1678874454.354986][348369:348369] CHIP:DMG:                 EventPath =
+          [1678874454.354995][348369:348369] CHIP:DMG:                 {
+          [1678874454.355007][348369:348369] CHIP:DMG:                         Endpoint = 0x1,
+          [1678874454.355016][348369:348369] CHIP:DMG:                         Cluster = 0x2f,
+          [1678874454.355024][348369:348369] CHIP:DMG:                         Event = 0x1,
+          [1678874454.355031][348369:348369] CHIP:DMG:                 },
+          [1678874454.355039][348369:348369] CHIP:DMG:
+          [1678874454.355046][348369:348369] CHIP:DMG:         ],
+          [1678874454.355053][348369:348369] CHIP:DMG:
+          [1678874454.355061][348369:348369] CHIP:DMG:         isFabricFiltered = true,
+          [1678874454.355068][348369:348369] CHIP:DMG:         InteractionModelRevision = 1
+          [1678874454.355074][348369:348369] CHIP:DMG: },
+          [1678874454.355109][348369:348369] CHIP:DMG: Final negotiated min/max parameters: Min = 0s, Max = 100s
+
+          [1678874454.357156][348369:348369] CHIP:DMG: StatusResponseMessage =
+          [1678874454.357165][348369:348369] CHIP:DMG: {
+          [1678874454.357174][348369:348369] CHIP:DMG:         Status = 0x00 (SUCCESS),
+          [1678874454.357182][348369:348369] CHIP:DMG:         InteractionModelRevision = 1
+          [1678874454.357188][348369:348369] CHIP:DMG: }
+          [1678874454.357197][348369:348369] CHIP:IM: Received status response, status is 0x00 (SUCCESS)
+          [1678874454.357215][348369:348369] CHIP:DMG: Refresh Subscribe Sync Timer with min 0 seconds and max 100 seconds
+          [1678874454.357251][348369:348369] CHIP:EM: <<< [E:59501r S:3659 M:108699998 (Ack:239522570)] (S) Msg TX to 1:00
+      disabled: true
+
+    - label: "Step 8b: Bring the DUT into a battery fault state."
+      PICS: PS.S.E01 && PS.S.M.ManualBatFault
+      verification: |
+          DUT ACTION REQUIRED
+      disabled: true
+
+    - label: "Step 9: TH reads the ActiveBatFaults attribute from the DUT"
+      PICS: PS.S.A0012 && PS.S.M.ManualBatFault
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
+
+          ./chip-tool powersource read active-bat-faults 1 1
+
+          Verify on the TH Log:
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      disabled: true
+
+    - label: "Step 11: Bring the DUT back into a clean state."
+      PICS: PS.S.E01 && PS.S.M.ManualBatFault
+      verification: |
+          DUT ACTION REQUIRED
+      disabled: true
+
+    - label: "Step 12a: Bring the DUT into a state without any charge faults."
+      PICS: PS.S.A001e
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Step 12b: TH reads the ActiveBatChargeFaults attribute from the DUT"
+      PICS: PS.S.A001e
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
+
+          ./chip-tool powersource read active-bat-charge-faults 1 1
+
+          Verify on the TH Log:
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      disabled: true
+
+    - label: "Step 13a: Set up subscription to BatChargeFaultChange event"
+      PICS: PS.S.E02 && PS.S.M.ManualBatChargeFault
+      verification: |
+          ./chip-tool interactive start
+
+            powersource subscribe-event-by-id 2 100 1000 1 1
+
+            Verify on the TH Log:
+
+          [1678874515.570452][348369:348369] CHIP:DMG: SubscribeRequestMessage =
+          [1678874515.570455][348369:348369] CHIP:DMG: {
+          [1678874515.570457][348369:348369] CHIP:DMG: 	KeepSubscriptions = false,
+          [1678874515.570460][348369:348369] CHIP:DMG: 	MinIntervalFloorSeconds = 0x64,
+          [1678874515.570464][348369:348369] CHIP:DMG: 	MaxIntervalCeilingSeconds = 0x3e8,
+          [1678874515.570466][348369:348369] CHIP:DMG: 	EventPathIBs =
+          [1678874515.570469][348369:348369] CHIP:DMG: 	[
+          [1678874515.570472][348369:348369] CHIP:DMG: 		EventPath =
+          [1678874515.570475][348369:348369] CHIP:DMG: 		{
+          [1678874515.570478][348369:348369] CHIP:DMG: 			Endpoint = 0x1,
+          [1678874515.570481][348369:348369] CHIP:DMG: 			Cluster = 0x2f,
+          [1678874515.570484][348369:348369] CHIP:DMG: 			Event = 0x2,
+          [1678874515.570487][348369:348369] CHIP:DMG: 		},
+          [1678874515.570490][348369:348369] CHIP:DMG:
+          [1678874515.570492][348369:348369] CHIP:DMG: 	],
+          [1678874515.570495][348369:348369] CHIP:DMG:
+          [1678874515.570498][348369:348369] CHIP:DMG: 	isFabricFiltered = true,
+          [1678874515.570501][348369:348369] CHIP:DMG: 	InteractionModelRevision = 1
+          [1678874515.570503][348369:348369] CHIP:DMG: },
+          [1678874515.570517][348369:348369] CHIP:DMG: Final negotiated min/max parameters: Min = 100s, Max = 1000s
+
+
+          MessageCounter:243065879 from Retrans Table on exchange 59503r
+          [1678874515.571146][348369:348369] CHIP:DMG: StatusResponseMessage =
+          [1678874515.571148][348369:348369] CHIP:DMG: {
+          [1678874515.571150][348369:348369] CHIP:DMG: 	Status = 0x00 (SUCCESS),
+          [1678874515.571152][348369:348369] CHIP:DMG: 	InteractionModelRevision = 1
+          [1678874515.571154][348369:348369] CHIP:DMG: }
+          [1678874515.571157][348369:348369] CHIP:IM: Received status response, status is 0x00 (SUCCESS)
+      disabled: true
+
+    - label: "Step 13b: Bring the DUT into a charge fault state."
+      PICS: PS.S.E02 && PS.S.M.ManualBatChargeFault
+      verification: |
+          DUT ACTION REQUIRED
+      disabled: true
+
+    - label:
+          "Step 14: TH reads the ActiveBatChargeFaults attribute from the DUT"
+      PICS: PS.S.A001e && PS.M.ManualBatChargeFault
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
+
+          ./chip-tool powersource read active-bat-charge-faults 1 1
+
+          Verify on the TH Log:
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      disabled: true
+
+    - label:
+          "Step 5: The Current field of Step 13b has to be the same as the value
+          of Step 14."
+      PICS: PS.S.E02 && PS.S.A001e && PS.S.M.ManualWiredFault
+      verification: |
+
+      disabled: true
+
+    - label: "Step 16: Bring the DUT back into a clean state."
+      PICS: PS.S.E02 && PS.S.M.ManualBatChargeFault
+      verification: |
+          DUT ACTION REQUIRED
+      disabled: true

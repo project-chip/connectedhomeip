@@ -1,0 +1,11 @@
+{{> header}}
+
+// Prevent multiple inclusion
+#pragma once
+
+// ZCL attribute types
+enum {
+{{#zcl_atomics}}
+{{ident}}ZCL_{{asDelimitedMacro name}}_ATTRIBUTE_TYPE = {{asHex atomicId 2}}, // {{description}}
+{{/zcl_atomics}}
+};

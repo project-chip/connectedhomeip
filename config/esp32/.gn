@@ -1,0 +1,45 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/pigweed.gni")
+
+# The location of the build configuration file.
+buildconfig = "${build_root}/config/BUILDCONFIG.gn"
+
+# CHIP uses angle bracket includes.
+check_system_includes = true
+
+default_args = {
+  target_cpu = "esp32"
+  target_os = "freertos"
+
+  pw_sys_io_BACKEND = dir_pw_sys_io_stdio
+  pw_assert_BACKEND = dir_pw_assert_log
+  pw_log_BACKEND = dir_pw_log_basic
+
+  pw_build_LINK_DEPS = [
+    "$dir_pw_assert:impl",
+    "$dir_pw_log:impl",
+  ]
+
+  pw_build_PIP_CONSTRAINTS =
+      [ "//third_party/connectedhomeip/scripts/setup/constraints.txt" ]
+  pw_build_PIP_REQUIREMENTS = [
+    "//third_party/connectedhomeip/scripts/setup/requirements.build.txt",
+    "//third_party/connectedhomeip/scripts/setup/requirements.esp32.txt",
+  ]
+
+  import("//args.gni")
+}

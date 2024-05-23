@@ -1,0 +1,174 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
+
+import("$dir_pw_build/python.gni")
+
+import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/src/platform/device.gni")
+import("${dir_pw_unit_test}/test.gni")
+
+if (current_os == "mac") {
+  import("${build_root}/config/mac/mac_sdk.gni")
+}
+
+config("controller_wno_deprecate") {
+  cflags = [
+    "-Wno-deprecated-declarations",
+    "-Wno-shadow",
+    "-Wno-unused-result",
+    "-Wsign-compare",
+    "-Wunreachable-code",
+    "-Wno-macro-redefined",
+  ]
+}
+
+shared_library("CHIPController") {
+  configs -= [ "//build/config/compiler:exceptions_default" ]
+
+  output_name = "PyChip"
+  output_dir = "${target_out_dir}/pychip"
+
+  # TODO: Update to use GN tools to get actual paths
+  include_dirs = [ "${chip_root}/third_party/pybind11/repo/include" ]
+  if (current_os == "mac") {
+    include_dirs +=
+        [ "${chip_root}/.environment/cipd/packages/python/include/python3.9" ]
+  } else if (current_os == "linux") {
+    include_dirs += [ "/usr/include/python3.9" ]
+  } else {
+    assert(false, "OS not supported.")
+  }
+
+  sources = [
+    "ControllerBindings/PyChip_ChipError.cpp",
+    "ControllerBindings/PyChip_ErrorStr.cpp",
+    "ControllerBindings/PyChip_Main.cpp",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app",
+    "${chip_root}/src/controller/data_model",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/dnssd",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
+    "${chip_root}/src/setup_payload",
+    "${chip_root}/src/tracing/json",
+    "${chip_root}/src/tracing/perfetto",
+    "${chip_root}/src/tracing/perfetto:file_output",
+    "${chip_root}/src/transport",
+    "${chip_root}/third_party/jsoncpp",
+  ]
+  deps = [
+    "${chip_root}/src/tracing/perfetto:event_storage",
+    "${chip_root}/src/tracing/perfetto:simple_initialization",
+  ]
+  configs += [ ":controller_wno_deprecate" ]
+  if (current_os == "mac") {
+    ldflags = [
+      "-undefined",
+      "dynamic_lookup",
+    ]
+  }
+  if (current_os == "linux") {
+    libs = [ "python3.9" ]
+  }
+}
+
+pw_python_action("pycontroller") {
+  script = "build-chip-wheel.py"
+
+  _py_manifest_files = [
+    {
+      src_dir = "."
+      sources = [ "pychip/__init__.py" ]
+    },
+    {
+      src_dir = target_out_dir
+      sources = [ "${target_out_dir}/pychip/PyChip.so" ]
+    },
+    {
+      src_dir = "//"
+      sources = [ "//LICENSE" ]
+    },
+  ]
+
+  _py_manifest_file = "${target_gen_dir}/${target_name}.py_manifest.json"
+
+  inputs = []
+  _py_manifest_files_rebased = []
+  foreach(_manifest_entry, _py_manifest_files) {
+    inputs += _manifest_entry.sources
+    _py_manifest_files_rebased += [
+      {
+        src_dir = rebase_path(_manifest_entry.src_dir,
+                              get_path_info(_py_manifest_file, "dir"))
+        sources = rebase_path(_manifest_entry.sources, _manifest_entry.src_dir)
+      },
+    ]
+  }
+
+  _py_manifest = {
+    files = _py_manifest_files_rebased
+  }
+
+  write_file(_py_manifest_file, _py_manifest, "json")
+
+  _dist_dir = "${root_out_dir}/pybindings/pycontroller"
+
+  if (current_cpu == "x64") {
+    cpu_tag = "x86_64"
+  } else if (current_cpu == "arm64") {
+    cpu_tag = "aarch64"
+  } else {
+    cpu_tag = current_cpu
+  }
+
+  if (current_os == "mac") {
+    platform_tag = string_replace(
+            string_replace(mac_deployment_target, "macos", "macosx."),
+            ".",
+            "_")
+  } else {
+    platform_tag = current_os
+  }
+
+  platform_tag = platform_tag + "_" + cpu_tag
+
+  tags = "cp37-" + platform_tag
+
+  args = [
+    "--package_name",
+    "pychip",
+    "--build_number",
+    "0.0",
+    "--build_dir",
+    rebase_path("${target_gen_dir}/${target_name}.py_build", root_build_dir),
+    "--dist_dir",
+    rebase_path(_dist_dir, root_build_dir),
+    "--manifest",
+    rebase_path(_py_manifest_file, root_build_dir),
+    "--plat-name",
+    platform_tag,
+  ]
+
+  public_deps = [ ":CHIPController" ]
+
+  output_name = "pychip-0.0.dist-info-0.0-${tags}.whl"
+  outputs = [ "${_dist_dir}/$output_name" ]
+}

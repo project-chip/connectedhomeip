@@ -1,0 +1,16 @@
+click>=7.0
+future>=0.15.2
+# pyparsing: Min version was set based on https://github.com/pyparsing/pyparsing/issues/319
+# pyparsing: Max version was set to avoid breaking changes
+pyparsing>=3.0.3,<3.1
+idf-component-manager
+pygdbmi<=0.9.0.2
+reedsolo>=1.5.3,<=1.5.4
+bitarray==2.6.0
+bitstring>=3.1.6,<4
+ecdsa>=0.16.0
+construct>=2.10.70
+python-socketio<5
+itsdangerous<2.1 ; python_version < "3.11"
+esp_idf_monitor==1.1.1
+esp-idf-kconfig==1.2.0

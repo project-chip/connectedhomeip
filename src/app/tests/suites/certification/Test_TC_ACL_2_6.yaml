@@ -1,0 +1,248 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 129.2.6. [TC-ACL-2.6] AccessControlEntryChanged event
+
+PICS:
+    - ACL.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Access Control"
+    endpoint: 0
+
+tests:
+    - label: "Step 1: TH1 commissions DUT using admin node ID N1"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Read the commissioner node ID"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: CommissionerNodeId
+
+    - label:
+          "Step 2: TH1 reads DUT Endpoint 0 OperationalCredentials cluster
+          CurrentFabricIndex attribute"
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: CurrentFabricIndexValue
+
+    - label:
+          "Step 3: TH1 reads DUT Endpoint 0 AccessControl cluster
+          AccessControlEntryChanged event"
+      PICS: ACL.S.E00
+      command: "readEvent"
+      event: "AccessControlEntryChanged"
+      eventNumber: "LastReceivedEventNumber + 1"
+      response:
+          value:
+              {
+                  AdminNodeID: null,
+                  AdminPasscodeID: 0,
+                  ChangeType: 1,
+                  LatestValue:
+                      {
+                          Privilege: 5,
+                          AuthMode: 2,
+                          Subjects: [CommissionerNodeId],
+                          Targets: null,
+                          FabricIndex: CurrentFabricIndexValue,
+                      },
+                  FabricIndex: CurrentFabricIndexValue,
+              }
+
+    - label:
+          "Step 4: TH1 writes DUT Endpoint 0 AccessControl cluster ACL
+          attribute, value is list of AccessControlEntryStruct containing 2
+          elements 1.struct Privilege field: Administer (5) AuthMode field: CASE
+          (2) Subjects field: [N1] Targets field: null 2struct Privilege field:
+          Operate (3) AuthMode field: Group (3) Subjects field: null Targets
+          field: null"
+      PICS: ACL.S.E00
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 3,
+                      AuthMode: 3,
+                      Subjects: null,
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+
+    - label:
+          "Step 5: TH1 reads DUT Endpoint 0 AccessControl cluster
+          AccessControlEntryChanged event"
+      PICS: ACL.S.E00
+      command: "readEvent"
+      event: "AccessControlEntryChanged"
+      eventNumber: "LastReceivedEventNumber + 1"
+      response:
+          - values:
+                - value:
+                      {
+                          AdminNodeID: CommissionerNodeId,
+                          AdminPasscodeID: null,
+                          ChangeType: 2,
+                          LatestValue:
+                              {
+                                  Privilege: 5,
+                                  AuthMode: 2,
+                                  Subjects: [CommissionerNodeId],
+                                  Targets: null,
+                                  FabricIndex: CurrentFabricIndexValue,
+                              },
+                          FabricIndex: CurrentFabricIndexValue,
+                      }
+          - values:
+                - value:
+                      {
+                          AdminNodeID: CommissionerNodeId,
+                          AdminPasscodeID: null,
+                          ChangeType: 1,
+                          LatestValue:
+                              {
+                                  Privilege: 5,
+                                  AuthMode: 2,
+                                  Subjects: [CommissionerNodeId],
+                                  Targets: null,
+                                  FabricIndex: CurrentFabricIndexValue,
+                              },
+                          FabricIndex: CurrentFabricIndexValue,
+                      }
+          - values:
+                - value:
+                      {
+                          AdminNodeID: CommissionerNodeId,
+                          AdminPasscodeID: null,
+                          ChangeType: 1,
+                          LatestValue:
+                              {
+                                  Privilege: 3,
+                                  AuthMode: 3,
+                                  Subjects: null,
+                                  Targets: null,
+                                  FabricIndex: CurrentFabricIndexValue,
+                              },
+                          FabricIndex: CurrentFabricIndexValue,
+                      }
+
+    - label:
+          "Step 6: TH1 writes DUT Endpoint 0 AccessControl cluster ACL
+          attribute, value is list of AccessControlEntryStruct containing 2
+          elements. The first item is valid, the second item is invalid due to
+          group ID 0 being used, which is illegal. 1.struct Privilege field:
+          Administer (5) AuthMode field: CASE (2) Subjects field: [N1] Targets
+          field: null 2.struct Privilege field: Operate (3) AuthMode field:
+          Group (3) Subjects field: [0] Targets field: null"
+      PICS: ACL.S.E00
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 3,
+                      AuthMode: 3,
+                      Subjects: [0],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 7: TH1 reads DUT Endpoint 0 AccessControl cluster
+          AccessControlEntryChanged event"
+      PICS: ACL.S.E00
+      command: "readEvent"
+      event: "AccessControlEntryChanged"
+      eventNumber: "LastReceivedEventNumber + 1"
+      response:
+          - values:
+                - value:
+                      {
+                          AdminNodeID: CommissionerNodeId,
+                          AdminPasscodeID: null,
+                          ChangeType: 2,
+                          LatestValue:
+                              {
+                                  Privilege: 3,
+                                  AuthMode: 3,
+                                  Subjects: null,
+                                  Targets: null,
+                                  FabricIndex: CurrentFabricIndexValue,
+                              },
+                          FabricIndex: CurrentFabricIndexValue,
+                      }
+          - values:
+                - value:
+                      {
+                          AdminNodeID: CommissionerNodeId,
+                          AdminPasscodeID: null,
+                          ChangeType: 2,
+                          LatestValue:
+                              {
+                                  Privilege: 5,
+                                  AuthMode: 2,
+                                  Subjects: [CommissionerNodeId],
+                                  Targets: null,
+                                  FabricIndex: CurrentFabricIndexValue,
+                              },
+                          FabricIndex: CurrentFabricIndexValue,
+                      }
+          - values:
+                - value:
+                      {
+                          AdminNodeID: CommissionerNodeId,
+                          AdminPasscodeID: null,
+                          ChangeType: 1,
+                          LatestValue:
+                              {
+                                  Privilege: 5,
+                                  AuthMode: 2,
+                                  Subjects: [CommissionerNodeId],
+                                  Targets: null,
+                                  FabricIndex: CurrentFabricIndexValue,
+                              },
+                          FabricIndex: CurrentFabricIndexValue,
+                      }

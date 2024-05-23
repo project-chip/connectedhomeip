@@ -1,0 +1,377 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    4.1.11. [TC-CADMIN-1.11] Open commissioning window on DUT twice using ECM
+    then BCM [DUT - Commissionee]
+
+PICS:
+    - CADMIN.S
+    - CADMIN.S.F00
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Precondition"
+      verification: |
+          Reset Devices to factory defaults
+      disabled: true
+
+    - label: "Step 1: TH_CR1 starts a commissioning process with DUT_CE"
+      PICS: CADMIN.S
+      verification: |
+          "1. Provision the DUT_CE (all-cluster-app) device using TH_CR1 (chip-tool ) on the raspi"
+      disabled: true
+
+    - label:
+          "Step 2: TH_CR1 opens a commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
+      PICS: CADMIN.S.C00.Rsp
+      verification: |
+          On TH_CR1 send the below command
+
+          ./chip-tool pairing open-commissioning-window 1 1 180 1000 3840
+
+          Verify the Open commisioning window on the DUT_CE(all-cluster-app) Log:
+
+          [1660904553.796857][3537:3537] CHIP:DMG: Received command for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0000
+          [1660904553.796951][3537:3537] CHIP:ZCL: Received command to open commissioning window
+          [1660904553.797255][3537:3537] CHIP:IN: SecureSession[0xaaab142ef7f0]: Allocated Type:1 LSID:34523
+
+          Verify the Manual pairing code on the TH_CR1(chip-tool) Log:
+
+          [1635864513.699433][3850:3855] CHIP:DMG: ICR moving to [CommandSen]
+          [1635864513.699489][3850:3855] CHIP:CTL: Manual pairing code: [36177160937]
+          [1635864513.699566][3850:3855] CHIP:CTL: SetupQRCode: [MT:00000CQM00YZN476420]
+          [1635864513.699636][3850:3855] CHIP:EM: Sending Standalone Ack for MessageCounter:2599714227 on exchange 60688i
+          [1635864513.699685][3850:3855] CHIP:IN: Prepared plaintext message 0xffff8a7cd960 to 0x0000000000000000 of type
+      disabled: true
+
+    - label: "Step 3: DNS-SD records shows DUT_CE advertising"
+      verification: |
+          On TH_CR1 send the below command
+
+           avahi-browse -rt _matterc._udp
+          + wlp5s0 IPv6 C326228BDB082BF4                              _matterc._udp        local
+          + wlp5s0 IPv6 7B6545A75C5330BE                              _matterc._udp        local
+          = wlp5s0 IPv6 7B6545A75C5330BE                              _matterc._udp        local
+             hostname = [E45F010F27530000.local]
+             address = [fe80::e65f:1ff:fe0f:2755]
+             port = [5540]
+             txt = ["PI=" "PH=33" "CM=1" "D=3841" "T=1" "CRA=300" "CRI=5000" "VP=65521+32769"]
+          = wlp5s0 IPv6 C326228BDB082BF4                              _matterc._udp        local
+             hostname = [E45F010F27530000.local]
+             address = [fe80::e65f:1ff:fe0f:2755]
+             port = [5540]
+             txt = ["PI=" "PH=36" "CM=2" "D=3840" "T=1" "CRA=300" "CRI=5000" "VP=65521+32769"]
+          grl@grl-ThinkPad-L480:~/2nd_cntrl/connectedhomeip/examples/chip-tool/out/debug$ On TH_CR1 send the below command
+      disabled: true
+
+    - label: "Step 4: TH_CR3 Commissions with DUT_CE"
+      PICS: CADMIN.S
+      verification: |
+          On TH_CR3 send the below command
+
+          ./chip-tool pairing code 3 35484132896  --commissioner-name gamma
+
+          Verify you got below message TH_CR3(chip-tool) log
+          Device commissioning completed with success
+      disabled: true
+
+    - label:
+          "Step 5: TH_CR1 opens a commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM and
+          TH_CR2 Commissions with DUT_CE"
+      PICS: CADMIN.S.C00.Rsp
+      verification: |
+          On TH_CR1 send the below command
+
+          ./chip-tool pairing open-commissioning-window 1 1 180 1000 3840
+
+          Verify Manual pairing code on TH1(chip-tool) Log
+
+          0x0000000000000001 at monotonic time: 16129075 msec
+          [1635874557.417449][4549:4554] CHIP:DMG: ICR moving to [CommandSen]
+          [1635874557.417505][4549:4554] CHIP:CTL: Manual pairing code: [35484132896]
+          [1635874557.417577][4549:4554] CHIP:CTL: SetupQRCode: [MT:00000CQM00AT-F5A510]
+
+          On TH_CR2 send the below command
+
+          ./chip-tool pairing code 2 35484132896  --commissioner-name beta
+
+          Verify you got below message on TH_CR2(chip-tool) log
+          Device commissioning completed with success
+      disabled: true
+
+    - label:
+          "Step 6: TH_CR1 opens a commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
+      PICS: CADMIN.S.C00.Rsp
+      verification: |
+          On TH_CR1 send the below command
+
+          ./chip-tool pairing open-commissioning-window 1 1 180 1000 3840
+
+          Verify the Open commisioning window on the DUT_CE(all-cluster-app) Log:
+
+          [1660904553.796857][3537:3537] CHIP:DMG: Received command for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0000
+          [1660904553.796951][3537:3537] CHIP:ZCL: Received command to open commissioning window
+          [1660904553.797255][3537:3537] CHIP:IN: SecureSession[0xaaab142ef7f0]: Allocated Type:1 LSID:34523
+
+          Verify the Manual pairing code on the TH_CR1(chip-tool) Log:
+
+          [1635874557.417271][4549:4554] CHIP:IN: Sending encrypted msg 0xaaaac5947d10 with MessageCounter:0 to 0x0000000000000001 at monotonic time: 16129075 msec
+          [1635874557.417449][4549:4554] CHIP:DMG: ICR moving to [CommandSen]
+          [1635874557.417505][4549:4554] CHIP:CTL: Manual pairing code: [35484132896]
+          [1635874557.417577][4549:4554] CHIP:CTL: SetupQRCode: [MT:00000CQM00AT-F5A510]
+      disabled: true
+
+    - label:
+          "Step 7: Before the expiration of PIXIT.CADMIN.CwDuration seconds
+          which was set in step 5, TH_CR1 opens a 2nd commissioning window on
+          DUT_CE using a commissioning timeout of PIXIT.CADMIN.CwDuration
+          seconds using ECM"
+      PICS: CADMIN.S.C00.Rsp
+      verification: |
+          On TH_CR1 send the below command
+
+          Verify that the DUT_CE is rejecting the opening of second commissioning session  with  the response status 0x01 failure
+
+
+          ./chip-tool pairing open-commissioning-window 1 1 180 1000 3840
+
+          Verify cluster status 1 on TH_CR1(chip-tool) Log
+
+
+          [1650527291.952431][8566:8571] CHIP:DMG:
+          [1650527291.952458][8566:8571] CHIP:DMG:                                 StatusIB =
+          [1650527291.952488][8566:8571] CHIP:DMG:                                 {
+          [1650527291.952519][8566:8571] CHIP:DMG:                                         status = 0x01 (FAILURE),
+          [1650527291.952555][8566:8571] CHIP:DMG:                                         cluster-status = 0x2,
+          [1650527291.952578][8566:8571] CHIP:DMG:                                 },
+          [1650527291.952612][8566:8571] CHIP:DMG:
+          [1650527291.952634][8566:8571] CHIP:DMG:                         },
+      disabled: true
+
+    - label: "Step 8: TH_CR1 reads the list of Fabrics on DUT_CE"
+      PICS: OPCREDS.S.A0001
+      verification: |
+          On TH_CR1 send the below command
+
+          ./chip-tool operationalcredentials read fabrics 1 0 --fabric-filtered 0
+
+          Verify the list of Fabrics  consists of FabricIndex 1, FabricIndex 2, FabricIndex 3 on TH_CR1(chip-tool) log
+
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 268962768
+          [1650527361.425870][15792:15797] CHIP:TOO:   Fabrics: 3 entries
+          [1650527361.426777][15792:15797] CHIP:TOO:     [1]: {
+          [1650527361.426859][15792:15797] CHIP:TOO:       RootPublicKey: 0429A71383F336D80918C9EC655112513E428C073AF7FB44820EC793535302C6E3825C56EE6DD1A683EAA7B59E3F261B46FFA24A6D911E8D88839F4C1B3C84BA01
+          [1650527361.426923][15792:15797] CHIP:TOO:       VendorId: 65521
+          [1650527361.426979][15792:15797] CHIP:TOO:       FabricId: 1
+          [1650527361.427033][15792:15797] CHIP:TOO:       NodeId: 1
+          [1650527361.427088][15792:15797] CHIP:TOO:       Label:
+          [1650527361.427166][15792:15797] CHIP:TOO:       FabricIndex: 1
+          [1650527361.427376][15792:15797] CHIP:TOO:      }
+          [1650527361.427464][15792:15797] CHIP:TOO:     [2]: {
+          [1650527361.427532][15792:15797] CHIP:TOO:       RootPublicKey: 04781BCEE70118049ED61DD5B4E401CF1A09D2F78AE7F5770BE5506AD24238E5E0777277DABAFD062659651C95CC2CA7DEAACE40DB579A946CC07CADB141BE05D7
+          [1650527361.427595][15792:15797] CHIP:TOO:       VendorId: 65521
+          [1650527361.427649][15792:15797] CHIP:TOO:       FabricId: 1
+          [1650527361.427703][15792:15797] CHIP:TOO:       NodeId: 3
+          [1650527361.427756][15792:15797] CHIP:TOO:       Label:
+          [1650527361.427811][15792:15797] CHIP:TOO:       FabricIndex: 2
+          [1650527361.427868][15792:15797] CHIP:TOO:      }
+          [1650527361.427943][15792:15797] CHIP:TOO:     [3]: {
+          [1650527361.428008][15792:15797] CHIP:TOO:       RootPublicKey: 0403EDB5B461030A34EF7EA2F9DB0D46A36185E4755C365AF9344C4959F049EF21D55EAB903A2C7FBFC305EEFA42989250D7517A73E6156062390A60C0D4C41EBD
+          [1650527361.428067][15792:15797] CHIP:TOO:       VendorId: 65521
+          [1650527361.428122][15792:15797] CHIP:TOO:       FabricId: 1
+          [1650527361.428176][15792:15797] CHIP:TOO:       NodeId: 2
+          [1650527361.428229][15792:15797] CHIP:TOO:       Label:
+          [1650527361.428282][15792:15797] CHIP:TOO:       FabricIndex: 3
+          [1650527361.428335][15792:15797] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Step 9: Wait for the expiration of PIXIT.CADMIN.CwDuration seconds
+          that was set in step 6"
+      verification: |
+          Wait for the expiration of PIXIT.CADMIN.CwDuration seconds that was set in step 6
+      disabled: true
+
+    - label:
+          "Step 10: TH_CR1 re-opens a commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
+      PICS: CADMIN.S.C01.Rsp
+      verification: |
+          On TH_CR1 send the below command
+
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
+
+          Verify the Open commisioning window on the DUT_CE(all-cluster-app) Log:
+
+          [1660904553.796857][3537:3537] CHIP:DMG: Received command for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0000
+          [1660904553.796951][3537:3537] CHIP:ZCL: Received command to open commissioning window
+          [1660904553.797255][3537:3537] CHIP:IN: SecureSession[0xaaab142ef7f0]: Allocated Type:1 LSID:34523
+
+          Verify the Manual pairing code on the TH_CR1(chip-tool) Log:
+
+          [1650278416.249347][11064:11069] CHIP:DMG:                                 },
+          [1650278416.249430][11064:11069] CHIP:DMG:
+          [1650278416.249501][11064:11069] CHIP:DMG:                                 StatusIB =
+          [1650278416.249581][11064:11069] CHIP:DMG:                                 {
+          [1650278416.249664][11064:11069] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1650278416.249738][11064:11069] CHIP:DMG:                                 },
+          [1650278416.249823][11064:11069] CHIP:DMG:
+      disabled: true
+
+    - label: "Step 11: DNS-SD records shows DUT_CE advertising"
+      verification: |
+          On TH_CR1 send the below command
+           avahi-browse -rt _matterc._udp
+          +   eth0 IPv6 2664ED6939FC373C                              _matterc._udp        local
+          =   eth0 IPv6 2664ED6939FC373C                              _matterc._udp        local
+             hostname = [E45F010F27530000.local]
+             address = [fe80::e65f:1ff:fe0f:2753]
+             port = [5540]
+             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+          ubuntu@ubuntu:~/may16_cntrl/connectedhomeip/examples/chip-tool/out/debug$
+      disabled: true
+
+    - label:
+          "Step 12: Before the expiration of PIXIT.CADMIN.CwDuration seconds
+          that was set in step 10, TH_CR3 opens a 2nd commissioning window on
+          DUT_CE using a commissioning timeout of PIXIT.CADMIN.CwDuration
+          seconds using BCM"
+      PICS: CADMIN.S.C01.Rsp
+      verification: |
+          On TH_CR3 send the below command
+
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 3 0 --timedInteractionTimeoutMs 1000   --commissioner-name gamma
+
+          Verify that the DUT_CE is rejecting the opening of second commissioning session  with  the response status 0x01 failure
+
+
+
+          [1650527565.991042][24618:24623] CHIP:DMG:                                 {
+          [1650527565.991112][24618:24623] CHIP:DMG:                                         EndpointId = 0x0,
+          [1650527565.991186][24618:24623] CHIP:DMG:                                         ClusterId = 0x3c,
+          [1650527565.991257][24618:24623] CHIP:DMG:                                         CommandId = 0x1,
+          [1650527565.991332][24618:24623] CHIP:DMG:                                 },
+          [1650527565.991441][24618:24623] CHIP:DMG:
+          [1650527565.991505][24618:24623] CHIP:DMG:                                 StatusIB =
+          [1650527565.991574][24618:24623] CHIP:DMG:                                 {
+          [1650527565.991645][24618:24623] CHIP:DMG:                                         status = 0x01 (FAILURE),
+          [1650527565.991743][24618:24623] CHIP:DMG:                                         cluster-status = 0x2,
+          [1650527565.991830][24618:24623] CHIP:DMG:                                 },
+          [1650527565.991918][24618:24623] CHIP:DMG:
+          [1650527565.991976][24618:24623] CHIP:DMG:                         },
+          [1650527565.992061][24618:24623] CHIP:DMG:
+          [1650527565.992116][24618:24623] CHIP:DMG:                 },
+      disabled: true
+
+    - label:
+          "Step 13: Wait for the expiration of PIXIT.CADMIN.CwDuration seconds
+          that was set in step 11"
+      verification: |
+          Wait for the expiration of PIXIT.CADMIN.CwDuration seconds that was set in step 10
+      disabled: true
+
+    - label: "Step 14: TH_CR1 reads the list of Fabrics on DUT_CE"
+      PICS: OPCREDS.S.A0001
+      verification: |
+          On TH_CR1 send the below command
+
+          ./chip-tool operationalcredentials read fabrics 1 0 --fabric-filtered 0
+
+          Verify the list of Fabrics  consists of FabricIndex 1, FabricIndex 2, FabricIndex 3 on TH_CR1(chip-tool) log
+
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 268962768
+          [1678866402.096093][704851:704853] CHIP:TOO:   Fabrics: 3 entries
+          [1678866402.096119][704851:704853] CHIP:TOO:     [1]: {
+          [1678866402.096131][704851:704853] CHIP:TOO:       RootPublicKey: 045F808373B5CED7FC2AFF99D98C2DEE6CA3889A9B078E87DAD9E263C9DEDB47AD7D31703024B72F4CB68A3017963128748FC7E97C6CBB419AF8AA914CE67D7457
+          [1678866402.096141][704851:704853] CHIP:TOO:       VendorID: 65521
+          [1678866402.096147][704851:704853] CHIP:TOO:       FabricID: 1
+          [1678866402.096154][704851:704853] CHIP:TOO:       NodeID: 1
+          [1678866402.096160][704851:704853] CHIP:TOO:       Label:
+          [1678866402.096167][704851:704853] CHIP:TOO:       FabricIndex: 1
+          [1678866402.096173][704851:704853] CHIP:TOO:      }
+          [1678866402.096185][704851:704853] CHIP:TOO:     [2]: {
+          [1678866402.096194][704851:704853] CHIP:TOO:       RootPublicKey: 0458F2B4AD99F579EC01AA271EFDDF14526CE5222BADE218C703902544430F32FA9B951963C6C03713AC63E2D95785CFCD997946098957C4F5844BD2B3916B7148
+          [1678866402.096201][704851:704853] CHIP:TOO:       VendorID: 65521
+          [1678866402.096207][704851:704853] CHIP:TOO:       FabricID: 3
+          [1678866402.096213][704851:704853] CHIP:TOO:       NodeID: 3
+          [1678866402.096219][704851:704853] CHIP:TOO:       Label:
+          [1678866402.096224][704851:704853] CHIP:TOO:       FabricIndex: 2
+          [1678866402.096230][704851:704853] CHIP:TOO:      }
+          [1678866402.096241][704851:704853] CHIP:TOO:     [3]: {
+          [1678866402.096250][704851:704853] CHIP:TOO:       RootPublicKey: 04CE10BA136D610089C4810BF963C354CE93BA61D267E8B9594977E3CC5FF30741941CE3D2A0A9E62A66AEF02CAA9F25A614F033D304D9F2ACF4204FAB68E8F773
+          [1678866402.096257][704851:704853] CHIP:TOO:       VendorID: 65521
+          [1678866402.096263][704851:704853] CHIP:TOO:       FabricID: 2
+          [1678866402.096269][704851:704853] CHIP:TOO:       NodeID: 2
+          [1678866402.096274][704851:704853] CHIP:TOO:       Label:
+          [1678866402.096280][704851:704853] CHIP:TOO:       FabricIndex: 3
+          [1678866402.096286][704851:704853] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Step 15: TH_CR1 opens a commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
+      PICS: CADMIN.S.C01.Rsp
+      verification: |
+          On TH_CR1 send the below command
+
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
+
+          Verify success response On TH_CR1(chip-tool) Log
+
+          [1650278416.249268][11064:11069] CHIP:DMG:                                         CommandId = 0x1,
+          [1650278416.249347][11064:11069] CHIP:DMG:                                 },
+          [1650278416.249430][11064:11069] CHIP:DMG:
+          [1650278416.249501][11064:11069] CHIP:DMG:                                 StatusIB =
+          [1650278416.249581][11064:11069] CHIP:DMG:                                 {
+          [1650278416.249664][11064:11069] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1650278416.249738][11064:11069] CHIP:DMG:                                 },
+          [1650278416.249823][11064:11069] CHIP:DMG:
+      disabled: true
+
+    - label:
+          "Step 16: Before the expiration of PIXIT.CADMIN.CwDuration seconds
+          that was set in step 14, TH_CR2 opens a second commissioning window on
+          DUT_CE using a commissioning timeout of PIXIT.CADMIN.CwDuration
+          seconds using BCM"
+      PICS: CADMIN.S.C01.Rsp
+      verification: |
+          On TH_CR2 send the below command
+
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000  --commissioner-name beta
+
+
+          Verify that the DUT_CE is rejecting the opening of second commissioning session  with  the response status 0x01 failure
+
+
+
+          [1650527622.374682][15824:15829] CHIP:DMG:                                 },
+          [1650527622.374799][15824:15829] CHIP:DMG:
+          [1650527622.374896][15824:15829] CHIP:DMG:                                 StatusIB =
+          [1650527622.374979][15824:15829] CHIP:DMG:                                 {
+          [1650527622.375086][15824:15829] CHIP:DMG:                                         status = 0x01 (FAILURE),
+          [1650527622.375236][15824:15829] CHIP:DMG:                                         cluster-status = 0x2,
+          [1650527622.375320][15824:15829] CHIP:DMG:                                 },
+          [1650527622.375426][15824:15829] CHIP:DMG:
+          [1650527622.375527][15824:15829] CHIP:DMG:                         },
+          [1650527622.375616][15824:15829] CHIP:DMG:
+      disabled: true

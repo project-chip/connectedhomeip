@@ -1,0 +1,20 @@
+name: "Validate Gradle Wrapper"
+on:
+    push:
+        branches-ignore:
+            - 'dependabot/**'
+    pull_request:
+
+jobs:
+  validation:
+    name: "Validation"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Wandalen/wretry.action@v1.4.5
+        name: Gradle Validation
+        continue-on-error: true
+        with:
+          action: gradle/wrapper-validation-action@v1
+          attempt_limit: 3
+          attempt_delay: 2000

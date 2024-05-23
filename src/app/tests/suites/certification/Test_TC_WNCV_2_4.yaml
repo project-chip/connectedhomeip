@@ -1,0 +1,66 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 39.2.4. [TC-WNCV-2.4] Type attribute [DUT as Server]
+
+PICS:
+    - WNCV.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Window Covering"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Step 1a: TH reads Type attribute from DUT, If (WNCV.S.F00(LF) &
+          !WNCV.S.F01(TL)) value must be between [min=0, max=5] or equals to 9"
+      command: "readAttribute"
+      attribute: "Type"
+      PICS: WNCV.S.A0000 && WNCV.S.F00 && !WNCV.S.F01
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 9
+
+    - label:
+          "Step 1b: TH reads Type attribute from DUT, If (!WNCV.S.F00(LF) &
+          WNCV.S.F01(TL)) value must be only equal to 7"
+      command: "readAttribute"
+      attribute: "Type"
+      PICS: WNCV.S.A0000 && !WNCV.S.F00 && WNCV.S.F01
+      response:
+          value: 7
+          constraints:
+              type: enum8
+
+    - label:
+          "Step 1c: TH reads Type attribute from DUT, If (WNCV.S.F00(LF) &
+          WNCV.S.F01(TL)) value is either 6 or 8"
+      command: "readAttribute"
+      attribute: "Type"
+      PICS: WNCV.S.A0000 && WNCV.S.F00 && WNCV.S.F01
+      response:
+          constraints:
+              type: enum8
+              anyOf: [6, 8]

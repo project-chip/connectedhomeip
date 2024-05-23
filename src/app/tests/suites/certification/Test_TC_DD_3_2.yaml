@@ -1,0 +1,461 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    3.3.2. [TC-DD-3.2] Commissioning Flow - Non-concurrent [DUT - Commissionee]
+
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+    - MCORE.DD.NON_CONCURRENT_CONNECTION
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Preconditions"
+      verification: |
+          1 - 5.5 - Commissioner is on a network. - The network can either be IP-based(Ethernet or WiFi) or Thread. Commissioner can either be a Matter device which is already on a network or the test harness connected to the network.
+      disabled: true
+
+    - label:
+          "Step 1: Commissioner and Commissionee discover each other and connect
+          via the discovery mode applicable for the DUT."
+      verification: |
+          Verify in DUT(ALL-CLUSTER-APP) start BLE Advertising by specific DUT implementation
+
+          Verify in TH (CHIP-TOOL) start commissioning process (either Thread or WiFi)
+
+          ./chip-tool pairing ble-thread 1 hex:0e080000000000010000000300000f35060004001fffe0020811111111222222220708fd27e57b1b1e22d9051000112233445566778899aabbccddeeff030e4f70656e54687265616444656d6f01021234041061e1206d2c2b46e079eb775f41fc72190c0402a0fff8 20202021 3840
+          ./chip-tool pairing ble-wifi <Node ID> <SSID> <password> 20202021 3840
+      disabled: true
+
+    - label:
+          "Step 2: Establish encryption keys with Password Authenticated Session
+          Establishment on the commissioning channel"
+      verification: |
+          Verify in TH(CHIP-TOOL)
+
+          CHIP:SC: Received PBKDF param response
+      disabled: true
+
+    - label:
+          "Step 2a: Commissioner reads General Commissioning cluster attribute
+          SupportsConcurrentConnection"
+      verification: |
+          Verify in TH(CHIP-TOOL)
+          CHIP:DMG:         AttributeReportIB =
+          CHIP:DMG:         {
+          CHIP:DMG:             AttributeDataIB =
+          CHIP:DMG:             {
+          CHIP:DMG:                 DataVersion = 0xb0556660,
+          CHIP:DMG:                 AttributePathIB =
+          CHIP:DMG:                 {
+          CHIP:DMG:                     Endpoint = 0x0,
+          CHIP:DMG:                     Cluster = 0x30,
+          CHIP:DMG:                     Attribute = 0x0000_0004,
+          CHIP:DMG:                 }
+          CHIP:DMG:
+          CHIP:DMG:                 Data = false,
+          CHIP:DMG:             },
+          CHIP:DMG:
+          CHIP:DMG:         },
+          CHIP:DMG:
+          CHIP:DMG:     ],
+          CHIP:DMG:
+          CHIP:DMG:     SuppressResponse = true,
+          CHIP:DMG:     InteractionModelRevision = 11
+          CHIP:DMG: }
+          CHIP:CTL: ----- NetworkCommissioning Features: has WiFi. endpointid = 0
+          CHIP:SVR: OnReadCommissioningInfo - vendorId=0xFFF1 productId=0x8001
+          CHIP:CTL: Successfully finished commissioning step 'ReadCommissioningInfo2'
+      disabled: true
+
+    - label:
+          "Step 3: Commissioner SHALL re-arm Fail-safe timer on Commissionee
+          within 60s (the autonomously Fail-safe timer length set by
+          Commissionee)"
+      verification: |
+          Verify in TH(CHIP-TOOL)
+
+          CHIP:CTL: Arming failsafe (60 seconds)
+      disabled: true
+
+    - label:
+          "Step 4: Commissioner SHALL configure regulatory information in the
+          Commissionee."
+      PICS: MCORE.COM.WIRELESS
+      verification: |
+          Verify in TH(CHIP-TOOL)
+
+          CHIP:CTL: Setting Regulatory Config
+      disabled: true
+
+    - label:
+          "Step 5: Commissioner requests operational CSR from Commissionee with
+          OperationalCSRRequest command"
+      verification: |
+          Verify in TH(CHIP-TOOL)
+          CHIP:CTL: Sending CSR request to 0xffff7fe56480 device
+          CHIP:DMG: ICR moving to [AddingComm]
+          CHIP:DMG: ICR moving to [AddedComma]
+          CHIP:EM: <<< [E:11057i S:28473 M:98750543] (S) Msg TX to 0:FFFFFFFB00000000 [0000] [BLE] --- Type 0001:08 (IM:InvokeCommandRequest)
+          CHIP:DMG: ICR moving to [AwaitingRe]
+          CHIP:CTL: Sent CSR request, waiting for the CSR
+          CHIP:DMG: ICR moving to [AwaitingDe]
+          CHIP:DL: Long dispatch time: 118 ms, for event type 16389
+          CHIP:DL: HandlePlatformSpecificBLEEvent 16387
+          CHIP:DL: Indication received, conn = 0xffff81218b30
+          CHIP:DL: HandlePlatformSpecificBLEEvent 16389
+          CHIP:DL: Indication received, conn = 0xffff81218b30
+          CHIP:DL: HandlePlatformSpecificBLEEvent 16389
+          CHIP:EM: >>> [E:11057i S:28473 M:31913565] (S) Msg RX from 0:FFFFFFFB00000000 [0000] --- Type 0001:09 (IM:InvokeCommandResponse)
+          CHIP:EM: Found matching exchange: 11057i, Delegate: 0xffff78c217c8
+          CHIP:DMG: ICR moving to [ResponseRe]
+          CHIP:DMG: InvokeResponseMessage =
+          CHIP:DMG: {
+          CHIP:DMG:     suppressResponse = false,
+          CHIP:DMG:     InvokeResponseIBs =
+          CHIP:DMG:     [
+          CHIP:DMG:         InvokeResponseIB =
+          CHIP:DMG:         {
+          CHIP:DMG:             CommandDataIB =
+          CHIP:DMG:             {
+          CHIP:DMG:                 CommandPathIB =
+          CHIP:DMG:                 {
+          CHIP:DMG:                     EndpointId = 0x0,
+          CHIP:DMG:                     ClusterId = 0x3e,
+          CHIP:DMG:                     CommandId = 0x5,
+          CHIP:DMG:                 },
+          CHIP:DMG:
+          CHIP:DMG:                 CommandFields =
+          CHIP:DMG:                 {
+          CHIP:DMG:                     0x0 = [
+          CHIP:DMG:                             0x15, 0x30, 0x01, 0xca, 0x30, 0x81, 0xc7, 0x30, 0x70, 0x02, 0x01, 0x00, 0x30, 0x0e, 0x31, 0x0c, 0x30, 0x0a, 0x06, 0x03, 0x55, 0x04, 0x0a, 0x0c, 0x03, 0x43, 0x53, 0x52, 0x30, 0x59, 0x30, 0x13, 0x06, 0x07, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x02, 0x01, 0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03, 0x01, 0x07, 0x03, 0x42, 0x00, 0x04, 0xf1, 0xa2, 0x66, 0x01, 0xf7, 0xec, 0x41, 0x11, 0x82, 0x3f, 0xf6, 0x8f, 0x94, 0xe6, 0xeb, 0xe6, 0x6e, 0x6b, 0xbb, 0x2b, 0xad, 0x19, 0x7e, 0xb8, 0x11, 0xbb, 0xc8, 0xc8, 0xf8, 0x59, 0x73, 0x10, 0xd7, 0xff, 0x61, 0x01, 0x0e, 0x7d, 0x50, 0x6e, 0x9d, 0x66, 0xd3, 0x89, 0x83, 0x84, 0xfe, 0xe0, 0xee, 0x7b, 0xbf, 0xaa, 0xa6, 0x3c, 0x60, 0x0a, 0x8e, 0xda, 0xb1, 0xfc, 0xa4, 0xf5, 0xf2, 0xcb, 0xa0, 0x00, 0x30, 0x0a, 0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x04, 0x03, 0x02, 0x03, 0x47, 0x00, 0x30, 0x44, 0x02, 0x20, 0x23, 0x94, 0xd8, 0xc4, 0x00, 0x9a, 0xec, 0x9c, 0x0e, 0x11, 0x26, 0x7f, 0x9e, 0xea, 0x7b, 0xe3, 0x83, 0xde, 0xf8, 0xd3, 0xd3, 0xe7, 0x31, 0xeb, 0x3c, 0xf5, 0x73, 0x65, 0xcd, 0xd8, 0xc0, 0x48, 0x02, 0x20, 0x63, 0x5a, 0x67, 0x85, 0x71, 0xa9, 0x50, 0x30, 0x8e, 0x4c, 0x00, 0x0e, 0x65, 0x1e, 0x59, 0x53, 0x85, 0xb2, 0x6f, 0x5a, 0x01, 0x46, 0xda, 0xb5, 0x27, 0xea, 0x6b, 0x5c, 0x8a, 0x82, 0x48, 0x5e, 0x30, 0x02, 0x20, 0x08, 0x9b, 0x9c, 0xe3, 0xa4, 0xfd, 0xdb, 0xc5, 0xbd, 0x78, 0x36, 0x7c, 0x47, 0xd9, 0xaf, 0x57, 0x22, 0x5a, 0x70, 0xa8, 0x14, 0x86, 0xdd, 0xea, 0x1b, 0x44, 0x80, 0xbd, 0x39, 0x4f, 0xca, 0x76, 0x18,
+          CHIP:DMG:                     ] (242 bytes)
+          CHIP:DMG:                     0x1 = [
+          CHIP:DMG:                             0xc1, 0xa1, 0xf7, 0xba, 0xe4, 0x5f, 0xd5, 0x62, 0x06, 0xb9, 0xe7, 0xf3, 0x64, 0x47, 0x36, 0x6f, 0xcb, 0xf5, 0x74, 0x97, 0x61, 0xf1, 0x54, 0xbc, 0x9a, 0x6c, 0x1b, 0x60, 0xa7, 0xf0, 0xb6, 0x5e, 0x9b, 0x05, 0x06, 0xd8, 0x9f, 0x0e, 0x47, 0xd9, 0x3a, 0xbf, 0x8d, 0x71, 0x61, 0xd4, 0xcf, 0xee, 0x38, 0x64, 0x0d, 0xc0, 0xf8, 0x44, 0xe7, 0x77, 0x08, 0x7d, 0x6b, 0x20, 0x1e, 0x40, 0x1f, 0x94,
+          CHIP:DMG:                     ] (64 bytes)
+          CHIP:DMG:                 },
+          CHIP:DMG:             },
+          CHIP:DMG:
+          CHIP:DMG:         },
+          CHIP:DMG:
+          CHIP:DMG:     ],
+          CHIP:DMG:
+          CHIP:DMG:     InteractionModelRevision = 11
+          CHIP:DMG: },
+          CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0005
+          CHIP:CTL: Received certificate signing request from the device
+          CHIP:CTL: Successfully finished commissioning step 'SendOpCertSigningRequest'
+          CHIP:CTL: Commissioning stage next step: 'SendOpCertSigningRequest' -> 'ValidateCSR'
+          CHIP:CTL: Performing next commissioning step 'ValidateCSR'
+          CHIP:CTL: Successfully finished commissioning step 'ValidateCSR'
+          CHIP:CTL: Commissioning stage next step: 'ValidateCSR' -> 'GenerateNOCChain'
+          CHIP:CTL: Performing next commissioning step 'GenerateNOCChain'
+          CHIP:CTL: Getting certificate chain for the device from the issuer
+          CHIP:CTL: Verifying Certificate Signing Request
+          CHIP:CTL: Generating NOC
+          CHIP:CTL: Providing certificate chain to the commissioner
+          CHIP:CTL: Received callback from the CA for NOC Chain generation. Status src/controller/ExampleOperationalCredentialsIssuer.cpp:395: Success
+      disabled: true
+
+    - label:
+          "Step 6: Commissioner configures operational credentials on DUT if not
+          previously installed"
+      verification: |
+          Verify in TH(CHIP-TOOL)
+
+          CHIP:CTL: Sending root certificate to the device
+          CHIP:DMG: ICR moving to [AddingComm]
+          CHIP:DMG: ICR moving to [AddedComma]
+          CHIP:EM: <<< [E:11058i S:28473 M:98750544] (S) Msg TX to 0:FFFFFFFB00000000 [0000] [BLE] --- Type 0001:08 (IM:InvokeCommandRequest)
+          CHIP:DMG: ICR moving to [AwaitingRe]
+          CHIP:CTL: Sent root certificate to the device
+          CHIP:DMG: ICR moving to [AwaitingDe]
+          CHIP:DL: HandlePlatformSpecificBLEEvent 16387
+          CHIP:DL: HandlePlatformSpecificBLEEvent 16387
+          CHIP:DL: Indication received, conn = 0xffff81218b30
+          CHIP:DL: HandlePlatformSpecificBLEEvent 16389
+          CHIP:EM: >>> [E:11058i S:28473 M:31913566] (S) Msg RX from 0:FFFFFFFB00000000 [0000] --- Type 0001:09 (IM:InvokeCommandResponse)
+          CHIP:EM: Found matching exchange: 11058i, Delegate: 0xffff78c20b88
+          CHIP:DMG: ICR moving to [ResponseRe]
+          CHIP:DMG: InvokeResponseMessage =
+          CHIP:DMG: {
+          CHIP:DMG:     suppressResponse = false,
+          CHIP:DMG:     InvokeResponseIBs =
+          CHIP:DMG:     [
+          CHIP:DMG:         InvokeResponseIB =
+          CHIP:DMG:         {
+          CHIP:DMG:             CommandStatusIB =
+          CHIP:DMG:             {
+          CHIP:DMG:                 CommandPathIB =
+          CHIP:DMG:                 {
+          CHIP:DMG:                     EndpointId = 0x0,
+          CHIP:DMG:                     ClusterId = 0x3e,
+          CHIP:DMG:                     CommandId = 0xb,
+          CHIP:DMG:                 },
+          CHIP:DMG:
+          CHIP:DMG:                 StatusIB =
+          CHIP:DMG:                 {
+          CHIP:DMG:                     status = 0x00 (SUCCESS),
+          CHIP:DMG:                 },
+          CHIP:DMG:
+          CHIP:DMG:             },
+          CHIP:DMG:
+          CHIP:DMG:         },
+          CHIP:DMG:
+          CHIP:DMG:     ],
+          CHIP:DMG:
+          CHIP:DMG:     InteractionModelRevision = 11
+          CHIP:DMG: },
+          CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003E Command=0x0000_000B Status=0x0
+          CHIP:CTL: Device confirmed that it has received the root certificate
+      disabled: true
+
+    - label:
+          "Step 7: Commissioner configures itself as administrator in ACL on DUT
+          if needed"
+      verification: |
+          Verify in TH(CHIP-TOOL)
+
+          CHIP:CTL: Performing next commissioning step 'SendNOC'
+          CHIP:DMG: ICR moving to [AddingComm]
+          CHIP:DMG: ICR moving to [AddedComma]
+          CHIP:EM: <<< [E:11059i S:28473 M:98750545] (S) Msg TX to 0:FFFFFFFB00000000 [0000] [BLE] --- Type 0001:08 (IM:InvokeCommandRequest)
+          CHIP:DMG: ICR moving to [AwaitingRe]
+          CHIP:CTL: Sent operational certificate to the device
+          CHIP:DMG: ICR moving to [AwaitingDe]
+          CHIP:DL: HandlePlatformSpecificBLEEvent 16387
+          CHIP:DL: HandlePlatformSpecificBLEEvent 16387
+          CHIP:DL: HandlePlatformSpecificBLEEvent 16387
+          CHIP:DL: Indication received, conn = 0xffff81218b30
+          CHIP:DL: HandlePlatformSpecificBLEEvent 16389
+          CHIP:EM: >>> [E:11059i S:28473 M:31913567] (S) Msg RX from 0:FFFFFFFB00000000 [0000] --- Type 0001:09 (IM:InvokeCommandResponse)
+          CHIP:EM: Found matching exchange: 11059i, Delegate: 0xffff78c209c8
+          CHIP:DMG: ICR moving to [ResponseRe]
+          CHIP:DMG: InvokeResponseMessage =
+          CHIP:DMG: {
+          CHIP:DMG:     suppressResponse = false,
+          CHIP:DMG:     InvokeResponseIBs =
+          CHIP:DMG:     [
+          CHIP:DMG:         InvokeResponseIB =
+          CHIP:DMG:         {
+          CHIP:DMG:             CommandDataIB =
+          CHIP:DMG:             {
+          CHIP:DMG:                 CommandPathIB =
+          CHIP:DMG:                 {
+          CHIP:DMG:                     EndpointId = 0x0,
+          CHIP:DMG:                     ClusterId = 0x3e,
+          CHIP:DMG:                     CommandId = 0x8,
+          CHIP:DMG:                 },
+          CHIP:DMG:
+          CHIP:DMG:                 CommandFields =
+          CHIP:DMG:                 {
+          CHIP:DMG:                     0x0 = 0,
+          CHIP:DMG:                     0x1 = 1,
+          CHIP:DMG:                 },
+          CHIP:DMG:             },
+          CHIP:DMG:
+          CHIP:DMG:         },
+          CHIP:DMG:
+          CHIP:DMG:     ],
+          CHIP:DMG:
+          CHIP:DMG:     InteractionModelRevision = 11
+          CHIP:DMG: },
+          CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          CHIP:CTL: Device returned status 0 on receiving the NOC
+          CHIP:CTL: Operational credentials provisioned on device 0xffff7fe56480
+      disabled: true
+
+    - label:
+          "Step 8: Commissioner configures operational network on DUT if DUT
+          both supports and requires"
+      verification: |
+          Verify in TH(CHIP-TOOL)
+
+          CHIP:CTL: Performing next commissioning step 'WiFiNetworkSetup'
+          CHIP:DMG: ICR moving to [AddingComm]
+          CHIP:DMG: ICR moving to [AddedComma]
+          CHIP:EM: <<< [E:11060i S:28473 M:98750546] (S) Msg TX to 0:FFFFFFFB00000000 [0000] [BLE] --- Type 0001:08 (IM:InvokeCommandRequest)
+          CHIP:DMG: ICR moving to [AwaitingRe]
+          CHIP:DMG: ICR moving to [AwaitingDe]
+          CHIP:DL: HandlePlatformSpecificBLEEvent 16387
+          CHIP:DL: Indication received, conn = 0xffff81218b30
+          CHIP:DL: HandlePlatformSpecificBLEEvent 16389
+          CHIP:EM: >>> [E:11060i S:28473 M:31913568] (S) Msg RX from 0:FFFFFFFB00000000 [0000] --- Type 0001:09 (IM:InvokeCommandResponse)
+          CHIP:EM: Found matching exchange: 11060i, Delegate: 0xffff78c20808
+          CHIP:DMG: ICR moving to [ResponseRe]
+          CHIP:DMG: InvokeResponseMessage =
+          CHIP:DMG: {
+          CHIP:DMG:     suppressResponse = false,
+          CHIP:DMG:     InvokeResponseIBs =
+          CHIP:DMG:     [
+          CHIP:DMG:         InvokeResponseIB =
+          CHIP:DMG:         {
+          CHIP:DMG:             CommandDataIB =
+          CHIP:DMG:             {
+          CHIP:DMG:                 CommandPathIB =
+          CHIP:DMG:                 {
+          CHIP:DMG:                     EndpointId = 0x0,
+          CHIP:DMG:                     ClusterId = 0x31,
+          CHIP:DMG:                     CommandId = 0x5,
+          CHIP:DMG:                 },
+          CHIP:DMG:
+          CHIP:DMG:                 CommandFields =
+          CHIP:DMG:                 {
+          CHIP:DMG:                     0x0 = 0,
+          CHIP:DMG:                     0x2 = 0,
+          CHIP:DMG:                 },
+          CHIP:DMG:             },
+          CHIP:DMG:
+          CHIP:DMG:         },
+          CHIP:DMG:
+          CHIP:DMG:     ],
+          CHIP:DMG:
+          CHIP:DMG:     InteractionModelRevision = 11
+          CHIP:DMG: },
+          CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
+          CHIP:CTL: Received NetworkConfig response, networkingStatus=0
+      disabled: true
+
+    - label:
+          "Step 9: Commissioner instructs Commissionee to connect to operational
+          network"
+      verification: |
+          Verify in TH(CHIP-TOOL)
+
+          CHIP:CTL: SendCommand kWiFiNetworkEnable, supportsConcurrentConnection=0
+          CHIP:DMG: ICR moving to [AddingComm]
+          CHIP:DMG: ICR moving to [AddedComma]
+          CHIP:EM: <<< [E:11062i S:28473 M:98750548] (S) Msg TX to 0:FFFFFFFB00000000 [0000] [BLE] --- Type 0001:08 (IM:InvokeCommandRequest)
+          CHIP:DMG: ICR moving to [AwaitingRe]
+          CHIP:DMG: ICR moving to [AwaitingDe]
+          CHIP:DL: HandlePlatformSpecificBLEEvent 16387
+          CHIP:DL: Indication received, conn = 0xffff81218b30
+          CHIP:DL: HandlePlatformSpecificBLEEvent 16389
+          CHIP:EM: >>> [E:11062i S:28473 M:31913570] (S) Msg RX from 0:FFFFFFFB00000000 [0000] --- Type 0001:09 (IM:InvokeCommandResponse)
+          CHIP:EM: Found matching exchange: 11062i, Delegate: 0xffff78c20488
+          CHIP:DMG: ICR moving to [ResponseRe]
+          CHIP:DMG: InvokeResponseMessage =
+          CHIP:DMG: {
+          CHIP:DMG:     suppressResponse = false,
+          CHIP:DMG:     InvokeResponseIBs =
+          CHIP:DMG:     [
+          CHIP:DMG:         InvokeResponseIB =
+          CHIP:DMG:         {
+          CHIP:DMG:             CommandDataIB =
+          CHIP:DMG:             {
+          CHIP:DMG:                 CommandPathIB =
+          CHIP:DMG:                 {
+          CHIP:DMG:                     EndpointId = 0x0,
+          CHIP:DMG:                     ClusterId = 0x31,
+          CHIP:DMG:                     CommandId = 0x7,
+          CHIP:DMG:                 },
+          CHIP:DMG:
+          CHIP:DMG:                 CommandFields =
+          CHIP:DMG:                 {
+          CHIP:DMG:                     0x0 = 0,
+          CHIP:DMG:                     0x2 = NULL
+          CHIP:DMG:                 },
+          CHIP:DMG:             },
+          CHIP:DMG:
+          CHIP:DMG:         },
+          CHIP:DMG:
+          CHIP:DMG:     ],
+          CHIP:DMG:
+          CHIP:DMG:     InteractionModelRevision = 11
+          CHIP:DMG: },
+          CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0007
+          CHIP:CTL: Received ConnectNetwork response, networkingStatus=0
+      disabled: true
+
+    - label:
+          "Step 10: Commissioning channel between the Commissioner and
+          Commissionee is closed."
+      verification: |
+          Cannot be verified in TH(CHIP-TOOL)
+      disabled: true
+
+    - label: "Step 11: Commissionee starts the operational channel."
+      verification: |
+          Verify in TH(CHIP-TOOL)
+
+          Inferred by successful completion of Step 12
+      disabled: true
+
+    - label:
+          "Step 12: Commissioner starts discovery of DUT using Operational
+          Discovery"
+      verification: |
+          Verify in TH(CHIP-TOOL)
+
+          CHIP:CTL: Performing next commissioning step 'FindOperational'
+          CHIP:IN: Expiring all sessions for node <00000000000007CE, 1>!!
+          CHIP:CSM: FindOrEstablishSession: PeerId = [1:00000000000007CE]
+          CHIP:CSM: FindOrEstablishSession: No existing OperationalSessionSetup instance found
+          CHIP:DIS: OperationalSessionSetup[1:00000000000007CE]: State change 1 --> 2
+          CHIP:DMG: ICR moving to [AwaitingDe]
+          CHIP:DIS: Checking node lookup status after 200 ms
+          CHIP:DL: HandlePlatformSpecificBLEEvent 16387
+          CHIP:DIS: UDP:[fe80::e65f:1ff:fec2:47af%eth0]:5540: new best score: 7
+          CHIP:DIS: Lookup clearing interface for non LL address
+          CHIP:DIS: UDP:172.16.62.113%eth0:5540: new best score: 2
+          CHIP:DIS: Checking node lookup status after 7151 ms
+          CHIP:DIS: OperationalSessionSetup[1:00000000000007CE]: Updating device address to UDP:[fe80::e65f:1ff:fec2:47af%eth0]:5540 while in state 2
+          CHIP:DIS: OperationalSessionSetup[1:00000000000007CE]: State change 2 --> 3
+          CHIP:IN: SecureSession[0xffff7902f2c0]: Allocated Type:2 LSID:28474
+      disabled: true
+
+    - label:
+          "Step 13: Commissioner opens a CASE session with DUT over operational
+          network"
+      verification: |
+          Verify in TH(CHIP-TOOL)
+
+          CHIP:SC: Sent Sigma1 msg
+          CHIP:DIS: OperationalSessionSetup[1:00000000000007CE]: State change 3 --> 4
+          CHIP:EM: Retransmitting MessageCounter:226454874 on exchange 11063i Send Cnt 1
+          CHIP:EM: Retransmitting MessageCounter:226454874 on exchange 11063i Send Cnt 2
+          CHIP:EM: Retransmitting MessageCounter:226454874 on exchange 11063i Send Cnt 3
+          CHIP:EM: >>> [E:11063i S:0 M:192590746 (Ack:226454874)] (U) Msg RX from 0:0000000000000000 [0000] --- Type 0000:31 (SecureChannel:CASE_Sigma2)
+          CHIP:EM: Found matching exchange: 11063i, Delegate: 0xffff78207b08
+          CHIP:EM: Rxd Ack; Removing MessageCounter:226454874 from Retrans Table on exchange 11063i
+          CHIP:SC: Received Sigma2 msg
+          CHIP:SC: Peer assigned session session ID 24240
+          CHIP:SC: Found MRP parameters in the message
+          CHIP:SC: Sending Sigma3
+          CHIP:EM: <<< [E:11063i S:0 M:226454875 (Ack:192590746)] (U) Msg TX to 0:0000000000000000 [0000] [UDP:[fe80::e65f:1ff:fec2:47af%eth0]:5540] --- Type 0000:32 (SecureChannel:CASE_Sigma3)
+          CHIP:SC: Sent Sigma3 msg
+          CHIP:EM: >>> [E:11063i S:0 M:192590747 (Ack:226454875)] (U) Msg RX from 0:0000000000000000 [0000] --- Type 0000:40 (SecureChannel:StatusReport)
+          CHIP:EM: Found matching exchange: 11063i, Delegate: 0xffff78207b08
+          CHIP:EM: Rxd Ack; Removing MessageCounter:226454875 from Retrans Table on exchange 11063i
+          CHIP:SC: Success status report received. Session was established
+          CHIP:SC: SecureSession[0xffff7902f2c0, LSID:28474]: State change 'kEstablishing' --> 'kActive'
+          CHIP:IN: SecureSession[0xffff7902f2c0]: Activated - Type:2 LSID:28474
+          CHIP:IN: New secure session activated for device <00000000000007CE, 1>, LSID:28474 PSID:24240!
+          CHIP:DIS: OperationalSessionSetup[1:00000000000007CE]: State change 4 --> 5
+          CHIP:CTL: Successfully finished commissioning step 'FindOperational'
+      disabled: true
+
+    - label: "Step 14: Commissioner sends CommissioningComplete command"
+      verification: |
+          Verify in TH(CHIP-TOOL)
+
+          CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
+          CHIP:CTL: Received CommissioningComplete response, errorCode=0
+          CHIP:CTL: Successfully finished commissioning step 'SendComplete'
+      disabled: true

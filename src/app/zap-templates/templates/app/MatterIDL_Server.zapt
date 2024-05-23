@@ -1,0 +1,63 @@
+// This IDL was generated automatically by ZAP.
+// It is for view/code review purposes only.
+
+{{#all_user_clusters~}}
+{{>idl_cluster_definition}}
+{{/all_user_clusters}}
+{{#user_endpoints}}
+endpoint {{endpointId}} {
+  {{#user_device_types}}
+  device type 
+    {{~#zcl_device_types}}
+      {{~#if (is_num_equal id ../deviceTypeRef)}} {{as_underscore_lowercase name}} {{/if~}}
+    {{/zcl_device_types~}}
+    = {{deviceIdentifier}}, version {{deviceVersion}};
+  {{/user_device_types}}
+
+  {{#user_clusters}}
+    {{#if enabled}}
+      {{#unless (isServer side)}}
+  binding cluster {{asUpperCamelCase name}};
+      {{/unless}}
+    {{/if}}
+  {{/user_clusters}}
+  {{#user_clusters}}
+    {{#if enabled}}
+      {{#if (isServer side)}}
+
+  server cluster {{asUpperCamelCase name}} {
+    {{#user_cluster_events}}
+      {{#if included}}
+    emits event {{name}};
+      {{/if}}
+    {{/user_cluster_events}} 
+    {{#user_cluster_attributes}}
+       {{#if included}}
+        {{~#if (is_str_equal storageOption "NVM")}}
+    persist  {{!align~}}
+        {{~else if (is_str_equal storageOption "External")}}
+    callback {{!align~}}
+        {{~else}}
+    ram      {{!align~}}
+        {{~/if~}}
+        attribute {{asLowerCamelCase name}}
+        {{~#if defaultValue~}} 
+          {{!need space}} default = {{#if (isString type)}}"{{defaultValue}}"{{else}}{{defaultValue}}{{/if}}
+        {{~/if~}}
+        ;
+      {{/if}}
+    {{/user_cluster_attributes}}
+    {{#user_cluster_commands}}
+    {{~#first}}
+
+    {{/first}}
+    handle command {{asUpperCamelCase name}};
+    {{/user_cluster_commands}}
+  }
+      {{/if}}
+    {{/if}}
+  {{/user_clusters}}
+}
+{{/user_endpoints}}
+
+

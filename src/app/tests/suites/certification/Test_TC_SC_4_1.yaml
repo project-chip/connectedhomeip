@@ -1,0 +1,1371 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 22.4.1. [TC-SC-4.1] Commissionable Node Discovery [DUT as Commissionee]
+
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+
+config:
+    nodeId: 0x12344321
+    endpoint: 0
+    discriminator:
+        type: int16u
+        defaultValue: 3840
+    shortDiscriminator:
+        type: int16u
+        defaultValue: 15
+    vendorId:
+        type: int16u
+        defaultValue: 65521
+    productId:
+        type: int16u
+        defaultValue: 32769
+    deviceType:
+        type: int16u
+        defaultValue: 65535
+    PakeVerifier:
+        type: octet_string
+        defaultValue: "hex:b96170aae803346884724fe9a3b287c30330c2a660375d17bb205a8cf1aecb350457f8ab79ee253ab6a8e46bb09e543ae422736de501e3db37d441fe344920d09548e4c18240630c4ff4913c53513839b7c07fcc0627a1b8573a149fcd1fa466cf"
+    timeout: 900
+    waitAfterCommissioning:
+        type: int16u
+        defaultValue: 5000
+
+tests:
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Step 1a: DUT is put in Commissioning Mode using Open Basic
+          Commissioning Window command "
+      cluster: "Administrator Commissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+
+    - label: "Waiting after opening commissioning window"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
+
+    - label:
+          "Step 2a: Check DNS-SD instance name must be 64-bit randomly selected
+          ID expressed as a sixteen-char hex string with capital letters"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "instanceName"
+                saveAs: deviceInstanceNameBeforeReboot
+                constraints:
+                    minLength: 16
+                    maxLength: 16
+                    isUpperCase: true
+                    isHexString: true
+
+    - label: "Step 2b: Service type must be _matterc._udp"
+      verification: |
+          Run the below commands within the mentioned time interval used in open-commissioning-window in step-1.
+          Run the below avahi browse command in the TH terminal
+
+          avahi-browse -rt _matterc._udp
+
+
+          ubuntu@ubuntu:~$   avahi-browse -rt _matterc._udp
+
+          Verify the device is advertising _matterc._udp service like below output in TH terminal Log: (Verify for the DUT's actual values (like vendor ID, PID ..etc) as mentioned in the expected outcome of the test plan, The below log contains the data from the reference raspi accessory)
+
+
+          +  wlan0 IPv6 5A4E867284D08B13                              _matterc._udp        local
+          +   eth0 IPv6 5A4E867284D08B13                              _matterc._udp        local
+          =   eth0 IPv6 5A4E867284D08B13                              _matterc._udp        local
+            hostname = [E45F010F1A010000.local]
+            address = [fe80::e65f:1ff:fe0f:1a01]
+            port = [5540]
+            txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "VP=65521+32769"]
+          =  wlan0 IPv6 5A4E867284D08B13                              _matterc._udp        local
+            hostname = [E45F010F1A010000.local]
+            address = [fe80::e65f:1ff:fe0f:1a01]
+            port = [5540]
+            txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "VP=65521+32769"]
+
+
+          If we use Thread setup, then the Service Domain will be 422F10CDC290A406.local
+          verify CM flag is 1
+
+          to look for subtypes, on the raspi run $ avahi-browse -p _services._dns-sd._udp | grep _matterc
+
+          +;eth0;IPv6;_matterc;_udp;local
+          +;eth0;IPv6;_V65521;_sub._matterc._udp;local
+          +;eth0;IPv6;_S15;_sub._matterc._udp;local
+          +;eth0;IPv6;_L3840;_sub._matterc._udp;local
+          +;eth0;IPv6;_CM;_sub._matterc._udp;local
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    #validate the service type and the service domain not implemented in CI
+
+    - label:
+          "Step 2c: Check target hostname is derived from the 48bit or 64bit MAC
+          address expressed as a twelve or sixteen capital letter hex string"
+      PICS: "( MCORE.COM.WIFI || MCORE.COM.ETH) && !MCORE.COM.THR"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "hostName"
+                constraints:
+                    minLength: 12
+                    maxLength: 16
+                    isUpperCase: true
+                    isHexString: true
+
+    - label:
+          "Step 2c: Check target hostname is derived from the 48bit or 64bit MAC
+          address expressed as a twelve or sixteen capital letter hex string"
+      PICS: "(!MCORE.COM.WIFI && !MCORE.COM.WIFI) && MCORE.COM.THR"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "hostName"
+                constraints:
+                    minLength: 12
+                    maxLength: 16
+                    isUpperCase: true
+                    isHexString: true
+
+    #subtype
+    - label: "Step 2d: Check Long Discriminator _L"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByLongDiscriminator"
+      arguments:
+          values:
+              - name: "value"
+                value: discriminator
+
+    - label: "Step 2d: Check Short Discriminator (_S)"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByShortDiscriminator"
+      arguments:
+          values:
+              - name: "value"
+                value: shortDiscriminator
+
+    - label:
+          "Step 2e: If (MCORE.SC.VENDOR_SUBTYPE) present, subtype _V<ddddd> is
+          present must be 16-bit vendor id, encoded as a variable-length decimal
+          number in ASCII text, omitting any leading zeros"
+      PICS: MCORE.SC.VENDOR_SUBTYPE
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByVendorId"
+      arguments:
+          values:
+              - name: "value"
+                value: vendorId
+
+    - label:
+          "Step 2f: If (MCORE.SC.DEVTYPE_SUBTYPE) present, subtype _T<ddd> is
+          present, <ddd> represents device type from Data Model and must be
+          represented as a variable length decimal number in ASCII without
+          leading zeros"
+      PICS: MCORE.SC.DEVTYPE_SUBTYPE
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByDeviceType"
+      arguments:
+          values:
+              - name: "value"
+                value: deviceType
+
+    - label:
+          "Step 2g: Check Commissioning Mode (_CM) subtype _CM must be present"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByCommissioningMode"
+
+    - label:
+          "Step 2h: key D must be present and represents the discriminator which
+          must be encoded as a variable-length decimal value with up to 4 digits
+          omitting any leading zeros"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "longDiscriminator"
+                value: discriminator
+                constraints:
+                    minValue: 0
+                    maxValue: 4096
+
+    - label:
+          "Step 2i: If (MCORE.SC.VP_KEY) present, VP key must contain at least
+          Vendor ID is present"
+      PICS: MCORE.SC.VP_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "vendorId"
+                value: vendorId
+
+    - label:
+          "Step 2j: If (MCORE.SC.VP_KEY) present, VP key must contain at least
+          Product ID is present"
+      PICS: MCORE.SC.VP_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "productId"
+                value: productId
+
+    - label:
+          "Step 2k: If (MCORE.SC.SII_OP_DISCOVERY_KEY) present, SII key must be
+          an unsigned integer with units of milliseconds and shall be encoded as
+          a variable length decimal number in ASCII, omitting leading zeros.
+          Shall not exceed 3600000"
+      PICS: MCORE.SC.SII_OP_DISCOVERY_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "mrpRetryIntervalIdle"
+                constraints:
+                    maxValue: 3600000
+
+    - label:
+          "Step 2l: If (MCORE.SC.SAI_OP_DISCOVERY_KEY ) present, SAI key must be
+          an unsigned integer with units of milliseconds and shall be encoded as
+          a variable length decimal number in ASCII, omitting leading zeros.
+          Shall not exceed 3600000."
+      PICS: MCORE.SC.SAI_OP_DISCOVERY_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "mrpRetryIntervalActive"
+                constraints:
+                    maxValue: 3600000
+
+    - label:
+          "Step 2m: If (MCORE.SC.SAT_OP_DISCOVERY_KEY) present, SAT key must be
+          an unsigned integer with units of milliseconds and shall be encoded as
+          a variable length decimal number in ASCII, omitting leading zeros.
+          Shall not exceed 65535."
+      PICS: MCORE.SC.SAI_OP_DISCOVERY_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "mrpRetryActiveThreshold"
+                constraints:
+                    maxValue: 65535
+
+    - label: "Step 2n: TXT key for commissioning mode (CM) CM=1 must be present"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "commissioningMode"
+                value: 1
+
+    - label:
+          "Step 2o: If (MCORE.SC.DT_KEY) present, DT key must contain the device
+          type identifier from Data Model Device Types and must be encoded as a
+          variable length decimal ASCII number without leading zeros"
+      PICS: MCORE.SC.DT_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "deviceType"
+                value: deviceType
+
+    - label:
+          "Step 2p: If (MCORE.SC.DN_KEY) present, DN key must be a UTF-8 encoded
+          string with a maximum length of 32B"
+      PICS: MCORE.SC.DN_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "deviceName"
+                constraints:
+                    maxLength: 32
+
+    - label:
+          "Step 2q: If (MCORE.SC.RI_KEY ) present, key RI must include the
+          Rotating Device Identifier encoded as a uppercase string with a
+          maximum length of 100 chars"
+      PICS: MCORE.SC.RI_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "rotatingIdLen"
+                constraints:
+                    maxValue: 100
+
+    - label:
+          "Step 2r: If (MCORE.SC.PH_KEY) present, key PH must be encoded as a
+          variable-length decimal number in ASCII text, omitting any leading
+          zeros. If present value must be different of 0"
+      PICS: MCORE.SC.PH_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "pairingHint"
+                constraints:
+                    notValue: 0
+
+    - label:
+          "Step 2s: If (MCORE.SC.PI_KEY) present, key PI must be encoded as a
+          valid UTF-8 string with a maximum length of 128 bytes"
+      PICS: MCORE.SC.PI_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "pairingInstruction"
+                constraints:
+                    maxLength: 128
+
+    - label:
+          "Step 2t: DUT must publish AAAA records for each IPv6 address upon
+          which they are willing to accept Matter messages."
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "numIPs"
+                constraints:
+                    minValue: 1
+
+    ### DUT TurnOff
+    - label: "Step 3: Reboot/restart the DUT"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      endpoint: 0
+      command: "Reboot"
+
+    - label: "Step 3: Reboot target device(DUT)"
+      verification: |
+          Did the DUT successfully reboot?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Step 3a: DUT put in Commissioning Mode using Open Basic Commissioning
+          Window command, starting advertising Commissionable Node Discovery
+          service using DNS-SD"
+      PICS: CADMIN.S.C01.Rsp
+      cluster: "Administrator Commissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+
+    - label: "Waiting after opening commissioning window"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
+
+    - label:
+          "Step 4a: Check DNS-SD instance name must be 64-bit randomly selected
+          ID expressed as a sixteen-char hex string with capital letters and
+          must be different from the one at step 2"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "instanceName"
+                constraints:
+                    minLength: 16
+                    maxLength: 16
+                    isUpperCase: true
+                    isHexString: true
+                    notValue: deviceInstanceNameBeforeReboot
+
+    - label: "Step 4b: service type must be _matterc._udp"
+      verification: |
+          Run the below avahi browse command in  TH terminal
+
+          avahi-browse -rt _matterc._udp
+
+          Verify the device is advertising _matterc._udp service like below output in TH terminal Log: (Verify for the DUT's actual values (like vendor ID, PID ..etc) as mentioned in the expected outcome of the test plan, The below log contains the data from the reference raspi accessory)
+
+          +  wlan0 IPv6 F6385CBB29F7CE93                              _matterc._udp        local
+          +   eth0 IPv6 F6385CBB29F7CE93                              _matterc._udp        local
+          =   eth0 IPv6 F6385CBB29F7CE93                              _matterc._udp        local
+            hostname = [E45F010F1A010000.local]
+            address = [fe80::e65f:1ff:fe0f:1a01]
+            port = [5540]
+            txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "VP=65521+32769"]
+          =  wlan0 IPv6 F6385CBB29F7CE93                              _matterc._udp        local
+            hostname = [E45F010F1A010000.local]
+            address = [fe80::e65f:1ff:fe0f:1a01]
+            port = [5540]
+            txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "VP=65521+32769"]
+
+
+          Service Domain 422F10CDC290A406.local
+          verify CM flag is 1
+
+          to look for subtypes, on the raspi run $ avahi-browse -p _services._dns-sd._udp | grep _matterc
+
+          +;eth0;IPv6;_matterc;_udp;local
+          +;eth0;IPv6;_V65521;_sub._matterc._udp;local
+          +;eth0;IPv6;_S15;_sub._matterc._udp;local
+          +;eth0;IPv6;_L3840;_sub._matterc._udp;local
+          +;eth0;IPv6;_CM;_sub._matterc._udp;local
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    #validate the service type and the service domain not implemented in CI
+    - label:
+          "Step 4c: Check Hostname. If (MCORE.COM.WIFI) OR (MCORE.COM.ETH)
+          target hostname is derived from the 48bit or 64bit MAC address
+          expressed as a twelve or sixteen capital letter hex string"
+      PICS: "(MCORE.COM.WIFI || MCORE.COM.ETH) && !MCORE.COM.THR"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "hostName"
+                constraints:
+                    minLength: 12
+                    maxLength: 16
+                    isUpperCase: true
+                    isHexString: true
+
+    - label:
+          "Step 4c: Check Hostname. If (MCORE.COM.THR) target hostname is
+          derived from the 48bit or 64bit MAC address expressed as a twelve or
+          sixteen capital letter hex string"
+      PICS: "(!MCORE.COM.WIFI && !MCORE.COM.ETH) && MCORE.COM.THR"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "hostName"
+                constraints:
+                    minLength: 12
+                    maxLength: 16
+                    isUpperCase: true
+                    isHexString: true
+
+    - label: "Step 4d: Check Long Discriminator _L"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByLongDiscriminator"
+      arguments:
+          values:
+              - name: "value"
+                value: discriminator
+
+    - label: "Step 4e: Check Short Discriminator (_S)"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByShortDiscriminator"
+      arguments:
+          values:
+              - name: "value"
+                value: shortDiscriminator
+
+    - label:
+          "Step 4f: If (MCORE.SC.VENDOR_SUBTYPE ) present, subtype _V<ddddd> is
+          present must be 16-bit vendor id, encoded as a variable-length decimal
+          number in ASCII text, omitting any leading zeros"
+      PICS: MCORE.SC.VENDOR_SUBTYPE
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByVendorId"
+      arguments:
+          values:
+              - name: "value"
+                value: vendorId
+
+    - label:
+          "Step 4g: If (MCORE.SC.DEVTYPE_SUBTYPE) present, subtype _T<ddd> is
+          present, <ddd> represents device type from Data Model and must be
+          represented as a variable length decimal number in ASCII without
+          leading zeros"
+      # The device type is not broadcasted by the accessory under CI.
+      PICS: MCORE.SC.DEVTYPE_SUBTYPE
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByDeviceType"
+      arguments:
+          values:
+              - name: "value"
+                value: deviceType
+
+    - label: "Step 4h: Check Commissioning Mode (_CM) subtype _CM is present"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByCommissioningMode"
+
+    - label:
+          "Step 4i: key D must be present and represents the discriminator which
+          must be encoded as a variable-length decimal value with up to 4 digits
+          omitting any leading zeros"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "longDiscriminator"
+                value: discriminator
+                constraints:
+                    minValue: 0
+                    maxValue: 4096
+
+    - label:
+          "Step 4j: If (MCORE.SC.VP_KEY) present, VP key must contain at least
+          Vendor ID is present."
+      PICS: MCORE.SC.VP_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "vendorId"
+                value: vendorId
+
+    - label:
+          "Step 4k: If (MCORE.SC.VP_KEY) present, VP key must contain at least
+          Product ID is present."
+      PICS: MCORE.SC.VP_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "productId"
+                value: productId
+
+    - label:
+          "Step 4l: If (MCORE.SC.SII_OP_DISCOVERY_KEY ) present, SII key must be
+          an unsigned integer with units of milliseconds and shall be encoded as
+          a variable length decimal number in ASCII, omitting leading zeros.
+          Shall not exceed 3600000"
+      PICS: MCORE.SC.SII_OP_DISCOVERY_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "mrpRetryIntervalIdle"
+                constraints:
+                    maxValue: 3600000
+
+    - label:
+          "Step 4m: If (MCORE.SC.SAI_OP_DISCOVERY_KEY) present, SAI key must be
+          an unsigned integer with units of milliseconds and shall be encoded as
+          a variable length decimal number in ASCII, omitting leading zeros.
+          Shall not exceed 3600000."
+      PICS: MCORE.SC.SAI_OP_DISCOVERY_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "mrpRetryIntervalActive"
+                constraints:
+                    maxValue: 3600000
+
+    - label:
+          "Step 4n: If (MCORE.SC.SAT_OP_DISCOVERY_KEY) present, SAT key must be
+          an unsigned integer with units of milliseconds and shall be encoded as
+          a variable length decimal number in ASCII, omitting leading zeros.
+          Shall not exceed 65535."
+      PICS: MCORE.SC.SAI_OP_DISCOVERY_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "mrpRetryActiveThreshold"
+                constraints:
+                    maxValue: 65535
+
+    - label:
+          "Step 4o: TXT key for commissioning mode (CM) key CM=1 must be present"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "commissioningMode"
+                value: 1
+
+    - label:
+          "Step 4p: If (MCORE.SC.DT_KEY) present, DT key must contain the device
+          type identifier from Data Model Device Types and must be encoded as a
+          variable length decimal ASCII number without leading zeros"
+      PICS: MCORE.SC.DT_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "deviceType"
+                value: deviceType
+
+    - label:
+          "Step 4q: If (MCORE.SC.DN_KEY) present, DN key must be a UTF-8 encoded
+          string with a maximum length of 32B"
+      PICS: MCORE.SC.DN_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "deviceName"
+                constraints:
+                    maxLength: 32
+
+    - label:
+          "Step 4r: If (MCORE.SC.RI_KEY) present, key RI must include the
+          Rotating Device Identifier encoded as a uppercase string with a
+          maximum length of 100 chars"
+      PICS: MCORE.SC.RI_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "rotatingIdLen"
+                constraints:
+                    maxValue: 100
+
+    - label:
+          "Step 4s: If (MCORE.SC.PH_KEY) present, key PH must be encoded as a
+          variable-length decimal number in ASCII text, omitting any leading
+          zeros. If present value must be different of 0"
+      PICS: MCORE.SC.PH_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "pairingHint"
+                constraints:
+                    notValue: 0
+
+    - label:
+          "Step 4t: If (MCORE.SC.PI_KEY) present, key PI must be encoded as a
+          valid UTF-8 string with a maximum length of 128 bytes"
+      PICS: MCORE.SC.PI_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "pairingInstruction"
+                constraints:
+                    maxLength: 128
+
+    - label:
+          "Step 4u: DUT must publish AAAA records for each IPv6 address upon
+          which they are willing to accept Matter messages."
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "numIPs"
+                constraints:
+                    minValue: 1
+
+    - label: "Step 5: Wait for OpenBasicCommissioningWindow timeout to expire"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 180000
+
+    - label:
+          "Step 6: DUT is Commissioned and instructed to enter in commissioning
+          mode using Open Commissioning Window command"
+      cluster: "Administrator Commissioning"
+      command: "OpenCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      PICS: CADMIN.S.C00.Rsp && PICS_SDK_CI_ONLY
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+              - name: "PAKEPasscodeVerifier"
+                value: PakeVerifier
+              - name: "Discriminator"
+                value: discriminator
+              - name: "Iterations"
+                value: 1000
+              - name: "Salt"
+                value: "SPAKE2P Key Salt"
+
+    #Issue https://github.com/project-chip/connectedhomeip/issues/26127
+    - label:
+          "Step 6: DUT is Commissioned and instructed to enter in commissioning
+          mode using Open Commissioning Window command"
+      verification: |
+          Run the below open-commissioning-window in TH Terminal
+
+          The user needs to change this command to match the longDiscriminator override.
+          use the same discriminator as the longDiscriminator of the DUT.
+
+          ./chip-tool pairing open-commissioning-window 1 1 200 2000 <discriminator>
+
+          verify success on TH (Chip-tool) logs:
+
+          [1652341411.383669][2929:2934] CHIP:DMG: InvokeResponseMessage =
+          [1652341411.383720][2929:2934] CHIP:DMG: {
+          [1652341411.383769][2929:2934] CHIP:DMG:         suppressResponse = false,
+          [1652341411.383821][2929:2934] CHIP:DMG:         InvokeResponseIBs =
+          [1652341411.383886][2929:2934] CHIP:DMG:         [
+          [1652341411.383936][2929:2934] CHIP:DMG:                 InvokeResponseIB =
+          [1652341411.384009][2929:2934] CHIP:DMG:                 {
+          [1652341411.384068][2929:2934] CHIP:DMG:                         CommandStatusIB =
+          [1652341411.384139][2929:2934] CHIP:DMG:                         {
+          [1652341411.384203][2929:2934] CHIP:DMG:                                 CommandPathIB =
+          [1652341411.384278][2929:2934] CHIP:DMG:                                 {
+          [1652341411.384349][2929:2934] CHIP:DMG:                                         EndpointId = 0x0,
+          [1652341411.384427][2929:2934] CHIP:DMG:                                         ClusterId = 0x3c,
+          [1652341411.384501][2929:2934] CHIP:DMG:                                         CommandId = 0x0,
+          [1652341411.384624][2929:2934] CHIP:DMG:                                 },
+          [1652341411.384722][2929:2934] CHIP:DMG:
+          [1652341411.384795][2929:2934] CHIP:DMG:                                 StatusIB =
+          [1652341411.384877][2929:2934] CHIP:DMG:                                 {
+          [1652341411.384958][2929:2934] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1652341411.385035][2929:2934] CHIP:DMG:                                 },
+          [1652341411.385116][2929:2934] CHIP:DMG:
+          [1652341411.385188][2929:2934] CHIP:DMG:                         },
+          [1652341411.385271][2929:2934] CHIP:DMG:
+          [1652341411.385337][2929:2934] CHIP:DMG:                 },
+          [1652341411.385416][2929:2934] CHIP:DMG:
+          [1652341411.385474][2929:2934] CHIP:DMG:         ],
+          [1652341411.385547][2929:2934] CHIP:DMG:
+          [1652341411.385605][2929:2934] CHIP:DMG:         InteractionModelRevision = 1
+          [1652341411.385662][2929:2934] CHIP:DMG: },
+          [1652341411.385794][2929:2934] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0000 Status=0x0
+          [1652341411.385860][2929:2934] CHIP:CTL: Successfully opened pairing window on the device
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && CADMIN.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Waiting after opening commissioning window"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
+
+    - label:
+          "Step 7a: DNS-SD instance name must be 64-bit randomly selected ID
+          expressed as a sixteen-char hex string with capital letters"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "instanceName"
+                constraints:
+                    minLength: 16
+                    maxLength: 16
+                    isUpperCase: true
+                    isHexString: true
+
+    #validate the service type and the service domain not implemented in CI
+
+    - label:
+          "Step 7b: Check Hostname.If (MCORE.COM.WIFI) OR (MCORE.COM.ETH) target
+          hostname is derived from the 48bit or 64bit MAC address expressed as a
+          twelve or sixteen capital letter hex string."
+      # On macOS the hostname is the device name and because of it this test is disabled for now.
+      PICS: "(MCORE.COM.WIFI || MCORE.COM.ETH) && !MCORE.COM.THR"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "hostName"
+                constraints:
+                    minLength: 12
+                    maxLength: 16
+                    isUpperCase: true
+                    isHexString: true
+
+    - label:
+          "Step 7b: Check Hostname. If (MCORE.COM.THR) target hostname is
+          derived from the 48bit or 64bit MAC extended address expressed as a
+          twelve or sixteen capital letter hex string."
+      # On macOS the hostname is the device name and because of it this test is disabled for now.
+      PICS: "(!MCORE.COM.WIFI && !MCORE.COM.ETH) && MCORE.COM.THR"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "hostName"
+                constraints:
+                    minLength: 12
+                    maxLength: 16
+                    isUpperCase: true
+                    isHexString: true
+
+    - label: "Step 7c: Check Long Discriminator _L"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByLongDiscriminator"
+      arguments:
+          values:
+              - name: "value"
+                value: discriminator
+
+    - label: "Step 7d: Check Short Discriminator (_S)"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByShortDiscriminator"
+      arguments:
+          values:
+              - name: "value"
+                value: shortDiscriminator
+
+    - label:
+          "Step 7e: If (MCORE.SC.VENDOR_SUBTYPE) present, subtype _V<ddddd> is
+          present must be 16-bit vendor id, encoded as a variable-length decimal
+          number in ASCII text, omitting any leading zeros"
+      PICS: MCORE.SC.VENDOR_SUBTYPE
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByVendorId"
+      arguments:
+          values:
+              - name: "value"
+                value: vendorId
+
+    - label:
+          "Step 7f: If (MCORE.SC.DEVTYPE_SUBTYPE) present, subtype _T<ddd> is
+          present, <ddd> represents device type from Data Model and must be
+          represented as a variable length decimal number in ASCII without
+          leading zeros"
+      # The device type is not broadcasted by the accessory under CI.
+      PICS: MCORE.SC.DEVTYPE_SUBTYPE
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByDeviceType"
+      arguments:
+          values:
+              - name: "value"
+                value: deviceType
+
+    - label: "Step 7g: Check Commissioning Mode (_CM) subtype _CM is present"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByCommissioningMode"
+
+    - label:
+          "Step 7h: If (MCORE.SC.VP_KEY ) present, VP key must contain at least
+          Vendor ID is present."
+      PICS: MCORE.SC.VP_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "vendorId"
+                value: vendorId
+
+    - label:
+          "Step 7i: If (MCORE.SC.VP_KEY ) present, VP key must contain at least
+          Product ID is present"
+      PICS: MCORE.SC.VP_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "productId"
+                value: productId
+
+    - label:
+          "Step 7j: Optional TXT key for MRP Retry Interval Idle. if
+          (MCORE.SC.SII_OP_DISCOVERY_KEY) present, SII key must be an unsigned
+          integer with units of milliseconds and shall be encoded as a variable
+          length decimal number in ASCII, omitting leading zeros. Shall not
+          exceed 3600000"
+      PICS: MCORE.SC.SII_OP_DISCOVERY_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "mrpRetryIntervalIdle"
+                constraints:
+                    maxValue: 3600000
+
+    - label:
+          "Step 7k: Optional TXT key for MRP Retry Interval Active. if
+          (MCORE.SC.SAI_OP_DISCOVERY_KEY) present, SAI key must be an unsigned
+          integer with units of milliseconds and shall be encoded as a variable
+          length decimal number in ASCII, omitting leading zeros. Shall not
+          exceed 3600000."
+      PICS: MCORE.SC.SAI_OP_DISCOVERY_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "mrpRetryIntervalActive"
+                constraints:
+                    maxValue: 3600000
+
+    - label:
+          "Step 7l: Optional TXT key for MRP Retry Active Mode Threshold. If
+          (MCORE.SC.SAT_OP_DISCOVERY_KEY) present, SAT key must be an unsigned
+          integer with units of milliseconds and shall be encoded as a variable
+          length decimal number in ASCII, omitting leading zeros. Shall not
+          exceed 65535."
+      PICS: MCORE.SC.SAI_OP_DISCOVERY_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "mrpRetryActiveThreshold"
+                constraints:
+                    maxValue: 65535
+
+    - label: "Step 7m: TXT key for commissioning mode. CM=2 must be present"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "commissioningMode"
+                value: 2
+
+    - label:
+          "Step 7n: If (MCORE.SC.DT_KEY) present, DT key must contain the device
+          type identifier from Data Model Device Types and must be encoded as a
+          variable length decimal ASCII number without leading zeros"
+      PICS: MCORE.SC.DT_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "deviceType"
+                value: deviceType
+
+    - label:
+          "Step 7o: If (MCORE.SC.DN_KEY) present, DN key must be a UTF-8 encoded
+          string with a maximum length of 32B"
+      PICS: MCORE.SC.DN_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "deviceName"
+                constraints:
+                    maxLength: 32
+
+    - label:
+          "Step 7p: If (MCORE.SC.RI_KEY) present, key RI must include the
+          Rotating Device Identifier encoded as a uppercase string with a
+          maximum length of 100 chars"
+      PICS: MCORE.SC.RI_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "rotatingIdLen"
+                constraints:
+                    maxValue: 100
+
+    - label:
+          "Step 7q: If (MCORE.SC.PH_KEY) present, key PH must be encoded as a
+          variable-length decimal number in ASCII text, omitting any leading
+          zeros. If present value must be different of 0"
+      PICS: MCORE.SC.PH_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "pairingHint"
+                constraints:
+                    notValue: 0
+
+    - label:
+          "Step 7r: If (MCORE.SC.PI_KEY) present, key PI must be encoded as a
+          valid UTF-8 string with a maximum length of 128 bytes"
+      PICS: MCORE.SC.PI_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "pairingInstruction"
+                constraints:
+                    maxLength: 128
+
+    - label:
+          "Step 7s: DUT must publish AAAA records for each IPv6 address upon
+          which they are willing to accept Matter messages"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "numIPs"
+                constraints:
+                    minValue: 1
+
+    - label: "Step 8: Wait for OCW timeout to expire"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 180000
+
+    - label:
+          "Step 9: If (MCORE.SC.EXTENDED_DISCOVERY ) enable Extended Discovery.
+          DUT should start to send Commissionable Node Discovery DNS-SD
+          advertisements"
+      verification: |
+          If the device supports Extended Discovery, pass the PROMPT before the extended time period expires.
+
+          the Device should continue to advertise. Use the avahi-browse command and you should see the _matterc._udp advertisement
+
+          Reference Raspberrypi device is not supporting extended discovery.
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && MCORE.SC.EXTENDED_DISCOVERY
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 10a: Check DNS-SD instance name must be 64-bit randomly selected
+          ID expressed as a sixteen-char hex string with capital letters"
+      PICS: MCORE.SC.EXTENDED_DISCOVERY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "instanceName"
+                constraints:
+                    minLength: 16
+                    maxLength: 16
+                    isUpperCase: true
+                    isHexString: true
+
+    - label: "Step 10b: service type must be _matterc._udp"
+      verification: |
+          Run and Verify on  the below output in TH terminal Log: (Below is the sample log , as RPI doesn't support the extended discovery)
+          Verify the CM flag value is 0
+
+          avahi-browse -rt _matterc._udp
+          Verify the device is advertising _matterc._udp service like below output in TH terminal Log: (Verify for the DUT's actual values (like vendor ID, PID ..etc) as mentioned in the expected outcome of the test plan, The below log contains the data from the reference raspi accessory)
+
+          + wlp0s20f3 IPv6 FD37FE5156C56632                              _matterc._udp        local
+          = wlp0s20f3 IPv6 FD37FE5156C56632                              _matterc._udp        local
+            hostname = [8C1D96786A130000.local]
+            address = [fe80::e9f6:2c08:2794:357d]
+            port = [5540]
+            txt = ["PI=" "PH=36" "CM=2" "D=3840" "T=1" "DT=65535" "VP=65521+32769"]
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && MCORE.SC.EXTENDED_DISCOVERY
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    #validate the service type and the service domain
+
+    - label:
+          "Step 10c: Check Hostname. If (MCORE.COM.WIFI) OR (MCORE.COM.ETH)
+          target hostname is derived from the 48bit or 64bit MAC address
+          expressed as a twelve or sixteen capital letter hex string"
+      # On macOS the hostname is the device name and because of it this test is disabled for now.
+      PICS:
+          "(MCORE.COM.WIFI || MCORE.COM.ETH) && !MCORE.COM.THR &&
+          MCORE.SC.EXTENDED_DISCOVERY"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "hostName"
+                constraints:
+                    minLength: 12
+                    maxLength: 16
+                    isUpperCase: true
+                    isHexString: true
+
+    - label:
+          "Step 10c: Check Hostname. If (MCORE.COM.THR) target hostname is
+          derived from the 48bit or 64bit MAC extended address expressed as a
+          twelve or sixteen capital letter hex string."
+      # On macOS the hostname is the device name and because of it this test is disabled for now.
+      PICS:
+          "(!MCORE.COM.WIFI && !MCORE.COM.ETH) && MCORE.COM.THR &&
+          MCORE.SC.EXTENDED_DISCOVERY"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "hostName"
+                constraints:
+                    minLength: 12
+                    maxLength: 16
+                    isUpperCase: true
+                    isHexString: true
+
+    # Commissioning Subtypes
+
+    - label: "Step 10d: Check Long Discriminator _L"
+      PICS: MCORE.SC.EXTENDED_DISCOVERY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByLongDiscriminator"
+      arguments:
+          values:
+              - name: "value"
+                value: discriminator
+
+    - label: "Step 10e: Check Short Discriminator (_S)"
+      PICS: MCORE.SC.EXTENDED_DISCOVERY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByShortDiscriminator"
+      arguments:
+          values:
+              - name: "value"
+                value: shortDiscriminator
+
+    - label:
+          "Step 10f: If (MCORE.SC.VENDOR_SUBTYPE ) present, subtype _V<ddddd> is
+          present must be 16-bit vendor id, encoded as a variable-length decimal
+          number in ASCII text, omitting any leading zeros"
+      PICS: MCORE.SC.VENDOR_SUBTYPE && MCORE.SC.EXTENDED_DISCOVERY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByVendorId"
+      arguments:
+          values:
+              - name: "value"
+                value: vendorId
+
+    - label:
+          "Step 10g: If (MCORE.SC.DEVTYPE_SUBTYPE) present, subtype _T<ddd> is
+          present, <ddd> represents device type from Data Model and must be
+          represented as a variable length decimal number in ASCII without
+          leading zeros"
+      # The device type is not broadcasted by the accessory under CI.
+      PICS: MCORE.SC.DEVTYPE_SUBTYPE && MCORE.SC.EXTENDED_DISCOVERY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByDeviceType"
+      arguments:
+          values:
+              - name: "value"
+                value: deviceType
+
+    #TODO
+    - label: "Step 10h: Check Commissioning Mode (_CM)"
+      verification: |
+          subtype _CM must not be present
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && MCORE.SC.EXTENDED_DISCOVERY
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    # TXT Records
+
+    - label: "Step 10i: TXT key for discriminator (D)"
+      PICS: MCORE.SC.EXTENDED_DISCOVERY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "longDiscriminator"
+                value: discriminator
+                constraints:
+                    minValue: 0
+                    maxValue: 4096
+
+    - label:
+          "Step 10j: If (MCORE.SC.VP_KEY) present, VP key must contain at least
+          Vendor ID is present"
+      PICS: MCORE.SC.VP_KEY && MCORE.SC.EXTENDED_DISCOVERY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "vendorId"
+                value: vendorId
+
+    - label:
+          "Step 10k: If (MCORE.SC.VP_KEY) present, VP key must contain at least
+          Product ID is present"
+      PICS: MCORE.SC.VP_KEY && MCORE.SC.EXTENDED_DISCOVERY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "productId"
+                value: productId
+
+    - label:
+          "Step 10l: If (MCORE.SC.SII_OP_DISCOVERY_KEY) present, SII key must be
+          an unsigned integer with units of milliseconds and shall be encoded as
+          a variable length decimal number in ASCII, omitting leading zeros.
+          Shall not exceed 3600000."
+      PICS: MCORE.SC.SII_OP_DISCOVERY_KEY && MCORE.SC.EXTENDED_DISCOVERY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "mrpRetryIntervalIdle"
+                constraints:
+                    maxValue: 3600000
+
+    - label:
+          "Step 10m: If (MCORE.SC.SAI_OP_DISCOVERY_KEY) present, SAI key must be
+          an unsigned integer with units of milliseconds and shall be encoded as
+          a variable length decimal number in ASCII, omitting leading zeros.
+          Shall not exceed 3600000."
+      PICS: MCORE.SC.SAI_OP_DISCOVERY_KEY && MCORE.SC.EXTENDED_DISCOVERY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "mrpRetryIntervalActive"
+                constraints:
+                    maxValue: 3600000
+
+    - label:
+          "Step 10n: If (MCORE.SC.SAT_OP_DISCOVERY_KEY) present, SAT key must be
+          an unsigned integer with units of milliseconds and shall be encoded as
+          a variable length decimal number in ASCII, omitting leading zeros.
+          Shall not exceed 65535."
+      PICS: MCORE.SC.SAI_OP_DISCOVERY_KEY && MCORE.SC.EXTENDED_DISCOVERY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "mrpRetryActiveThreshold"
+                constraints:
+                    maxValue: 65535
+
+    - label:
+          "Step 10o: TXT key for commissioning mode (CM), CM=0 may be present"
+      PICS: MCORE.SC.EXTENDED_DISCOVERY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "commissioningMode"
+                value: 0
+
+    - label:
+          "Step 10p: If (MCORE.SC.DT_KEY) present, DT key must contain the
+          device type identifier from Data Model Device Types and must be
+          encoded as a variable length decimal ASCII number without leading
+          zeros"
+      PICS: MCORE.SC.DT_KEY && MCORE.SC.EXTENDED_DISCOVERY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "deviceType"
+                value: deviceType
+
+    - label:
+          "Step 10q: If (MCORE.SC.DN_KEY) present, DN key must be a UTF-8
+          encoded string with a maximum length of 32B"
+      PICS: MCORE.SC.DN_KEY && MCORE.SC.EXTENDED_DISCOVERY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "deviceName"
+                constraints:
+                    maxLength: 32
+
+    - label:
+          "Step 10r: If (MCORE.SC.RI_KEY) present, key RI must include the
+          Rotating Device Identifier encoded as a uppercase string with a
+          maximum length of 100 chars"
+      PICS: MCORE.SC.RI_KEY && MCORE.SC.EXTENDED_DISCOVERY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "rotatingIdLen"
+                constraints:
+                    maxValue: 100
+
+    - label:
+          "Step 10s: If (MCORE.SC.PH_KEY) present, key PH must be encoded as a
+          variable-length decimal number in ASCII text, omitting any leading
+          zeros. If present value must be different of 0"
+      PICS: MCORE.SC.PH_KEY && MCORE.SC.EXTENDED_DISCOVERY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "pairingHint"
+                constraints:
+                    notValue: 0
+
+    - label:
+          "Step 10t: If (MCORE.SC.PI_KEY) present, key PI must be encoded as a
+          valid UTF-8 string with a maximum length of 128 bytes"
+      PICS: MCORE.SC.PI_KEY && MCORE.SC.EXTENDED_DISCOVERY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "pairingInstruction"
+                constraints:
+                    maxLength: 128

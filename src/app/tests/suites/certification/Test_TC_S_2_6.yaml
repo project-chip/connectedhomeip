@@ -1,0 +1,1171 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    135.2.6. [TC-S-2.6] RemainingCapacity functionality with DUT as Server -
+    Multi-Fabric
+
+PICS:
+    - S.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Precondition: Commission DUT to TH1"
+      verification: |
+          Once DUT reach the  commissionable state send the following command on TH1:
+          pairing onnetwork 1 20202021
+          Verify the commissioning completed with success on TH(chip-tool) from DUT
+          [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success
+      disabled: true
+
+    - label: "Precondition: Commission DUT to TH2 (Open Commissioning Window)"
+      verification: |
+          Open a commissioning window On TH1(Chiptool)using below command
+
+           pairing open-commissioning-window 1 1 400 2000 3841
+
+          Verify the Successfully opened pairing window On TH1(Chiptool)e device
+
+          [1657186324.710951][10820:10825] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0000 Status=0x0
+          [1657186324.710980][10820:10825] CHIP:CTL: Successfully opened pairing window On TH(Chiptool)e device
+          [1657186324.711048][10820:10825] CHIP:CTL: Manual pairing code: [36253605617]
+          [1657186324.711108][10820:10825] CHIP:CTL: SetupQRCode: [MT:-24J0IRV01A7TB7E700]
+      disabled: true
+
+    - label: "Precondition: Commission DUT to TH2 (Pairing)"
+      verification: |
+          Now send the below command for commissionin DUT to TH2 with Manual pairing code generated in TH1 using open commission window
+
+          pairing code 2 36253605617 --commissioner-name beta
+
+          Verify the commissioning completed with success on TH2(chip-tool) from DUT
+
+          [1657186359.584672][3509:3514] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
+          [1657186359.584743][3509:3514] CHIP:TOO: Device commissioning completed with success
+      disabled: true
+
+    - label: "Precondition: Commission DUT to TH3 (Open Commissioning Window)"
+      verification: |
+          Open a commissioning window On TH1(Chiptool)using below command
+
+           pairing open-commissioning-window 1 1 400 2000 3842
+
+          Verify the Successfully opened pairing window On TH1(Chiptool)e device
+
+          [1701254594.851779][10096:10098] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0000 Status=0x0
+          [1701254594.851783][10096:10098] CHIP:CTL: Successfully opened pairing window on the device
+          [1701254594.851789][10096:10098] CHIP:CTL: Manual pairing code: [36545248276]
+          [1701254594.851795][10096:10098] CHIP:CTL: SetupQRCode: [MT:-24J0Q1212K4.08JP10]
+      disabled: true
+
+    - label: "Precondition: Commission DUT to TH3 (Pairing)"
+      verification: |
+          send the below command for commissionin DUT to TH3 with Manual pairing code generated in TH1 using open commission window
+
+          pairing code 3 36545248276 --commissioner-name gamma
+
+          Verify the commissioning completed with success on TH3(chip-tool) from DUT
+
+          [1657186359.584672][3509:3514] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
+          [1657186359.584743][3509:3514] CHIP:TOO: Device commissioning completed with success
+      disabled: true
+
+    - label:
+          "Step 1a: TH1 sends a RemoveAllScenes command to DUT with the GroupID
+          field set to 0x0000."
+      PICS: S.S.C03.Rsp
+      verification: |
+          scenesmanagement remove-all-scenes 0x0000 1 1
+
+          Verify the RemoveAllScenesResponse with following fields:
+          Status is SUCCESS
+          Group ID is 0x0000  on the TH(Chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1701173905.688536][36687:36689] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Command 0x0000_0003
+          [1701173905.688553][36687:36689] CHIP:TOO:   RemoveAllScenesResponse: {
+          [1701173905.688558][36687:36689] CHIP:TOO:     status: 0
+          [1701173905.688561][36687:36689] CHIP:TOO:     groupID: 0
+          [1701173905.688563][36687:36689] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 1b: Repeat Step 1a with TH2."
+      PICS: S.S.C03.Rsp
+      verification: |
+          scenesmanagement remove-all-scenes 0x0000 2 1 --commissioner-name beta
+
+          Verify the RemoveAllScenesResponse with following fields:
+          Status is SUCCESS
+          Group ID is 0x0000  on the TH(Chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1700826575.191275][15971:15973] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0062 Command=0x0000_0003
+          [1700826575.191321][15971:15973] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Command 0x0000_0003
+          [1700826575.191938][15971:15973] CHIP:TOO:   RemoveAllScenesResponse: {
+          [1700826575.191974][15971:15973] CHIP:TOO:     status: 0
+          [1700826575.191985][15971:15973] CHIP:TOO:     groupID: 0
+          [1700826575.191995][15971:15973] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 1C: Repeat Step 1a with TH3."
+      PICS: S.S.C03.Rsp
+      verification: |
+          scenesmanagement remove-all-scenes 0x0000 3 1 --commissioner-name gamma
+
+          Verify the RemoveAllScenesResponse with following fields:
+          Status is SUCCESS
+          Group ID is 0x0000  on the TH(Chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1700826595.190538][15975:15977] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0062 Command=0x0000_0003
+          [1700826595.190578][15975:15977] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Command 0x0000_0003
+          [1700826595.190637][15975:15977] CHIP:TOO:   RemoveAllScenesResponse: {
+          [1700826595.190652][15975:15977] CHIP:TOO:     status: 0
+          [1700826595.190661][15975:15977] CHIP:TOO:     groupID: 0
+          [1700826595.190669][15975:15977] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 2a: TH1 reads from the DUT the SceneTableSize attribute"
+      verification: |
+          scenesmanagement read scene-table-size 1 1
+
+          Verify the "SceneTableSize" attribute value is SceneTableSize(minimum=16) which is recorded into SceneTableSize on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
+
+          [1700826614.634340][15990:15992] CHIP:DMG: }
+          [1700826614.634390][15990:15992] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Attribute 0x0000_0006 DataVersion: 1908396086
+          [1700826614.634399][15990:15992] CHIP:TOO:   SceneTableSize: 16
+      disabled: true
+
+    - label:
+          "Step 2b: TH1 sends a subscription request action for FabricSceneInfo
+          to the DUT."
+      verification: |
+          Please use Interactive mode to Verify the subscription
+          Here the command to enter interactive mode:--
+          interactive start
+
+          Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
+
+          scenesmanagement subscribe fabric-scene-info 100 200 1 1
+
+          Verify  the DUT sends a report data to TH1 for FabricSceneInfo after the MinIntervalFloor time; store the RemainingCapacity field from this fabric’s entry reported in FabricSceneInfo into Remaining1stCapacity and is equals to (MaxRemainingCapacity) on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
+
+          [1701251118.633541][8779:8781] CHIP:DMG: ReportDataMessage =
+          [1701251118.633544][8779:8781] CHIP:DMG: {
+          [1701251118.633547][8779:8781] CHIP:DMG:         SubscriptionId = 0x349c4fb0,
+          [1701251118.633550][8779:8781] CHIP:DMG:         AttributeReportIBs =
+          [1701251118.633557][8779:8781] CHIP:DMG:         [
+          [1701251118.633560][8779:8781] CHIP:DMG:                 AttributeReportIB =
+          [1701251118.633567][8779:8781] CHIP:DMG:                 {
+          [1701251118.633570][8779:8781] CHIP:DMG:                         AttributeDataIB =
+          [1701251118.633574][8779:8781] CHIP:DMG:                         {
+          [1701251118.633577][8779:8781] CHIP:DMG:                                 DataVersion = 0xe203cd66,
+          [1701251118.633581][8779:8781] CHIP:DMG:                                 AttributePathIB =
+          [1701251118.633584][8779:8781] CHIP:DMG:                                 {
+          [1701251118.633587][8779:8781] CHIP:DMG:                                         Endpoint = 0x1,
+          [1701251118.633591][8779:8781] CHIP:DMG:                                         Cluster = 0x62,
+          [1701251118.633594][8779:8781] CHIP:DMG:                                         Attribute = 0x0000_0002,
+          [1701251118.633598][8779:8781] CHIP:DMG:                                 }
+          [1701251118.633602][8779:8781] CHIP:DMG:
+          [1701251118.633606][8779:8781] CHIP:DMG:                                 Data = [
+          [1701251118.633610][8779:8781] CHIP:DMG:
+          [1701251118.633614][8779:8781] CHIP:DMG:                                         {
+          [1701251118.633618][8779:8781] CHIP:DMG:                                                 0x0 = 0,
+          [1701251118.633621][8779:8781] CHIP:DMG:                                                 0x1 = 0,
+          [1701251118.633625][8779:8781] CHIP:DMG:                                                 0x2 = 0,
+          [1701251118.633629][8779:8781] CHIP:DMG:                                                 0x3 = false,
+          [1701251118.633633][8779:8781] CHIP:DMG:                                                 0x4 = 7,
+          [1701251118.633637][8779:8781] CHIP:DMG:                                                 0xfe = 1,
+          [1701251118.633640][8779:8781] CHIP:DMG:                                         },
+          [1701251118.633644][8779:8781] CHIP:DMG:                                 ],
+          [1701251118.633646][8779:8781] CHIP:DMG:                         },
+          [1701251118.633652][8779:8781] CHIP:DMG:
+          [1701251118.633655][8779:8781] CHIP:DMG:                 },
+          [1701251118.633661][8779:8781] CHIP:DMG:
+          [1701251118.633663][8779:8781] CHIP:DMG:         ],
+          [1701251118.633669][8779:8781] CHIP:DMG:
+          [1701251118.633672][8779:8781] CHIP:DMG:         InteractionModelRevision = 11
+          [1701251118.633675][8779:8781] CHIP:DMG: }
+          [1701251118.633729][8779:8781] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Attribute 0x0000_0002 DataVersion: 3791900006
+          [1701251118.633743][8779:8781] CHIP:TOO:   FabricSceneInfo: 1 entries
+          [1701251118.633758][8779:8781] CHIP:TOO:     [1]: {
+          [1701251118.633765][8779:8781] CHIP:TOO:       SceneCount: 0
+          [1701251118.633768][8779:8781] CHIP:TOO:       CurrentScene: 0
+          [1701251118.633770][8779:8781] CHIP:TOO:       CurrentGroup: 0
+          [1701251118.633773][8779:8781] CHIP:TOO:       SceneValid: FALSE
+          [1701251118.633776][8779:8781] CHIP:TOO:       RemainingCapacity: 7
+          [1701251118.633779][8779:8781] CHIP:TOO:       FabricIndex: 1
+          [1701251118.633783][8779:8781] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Step 2c:  Keep subscription session active for the remaining of the
+          test"
+      verification: |
+          Keep subscription session active for the remaining of the test
+
+          Confirm that the subscription session is active for the remainder of the test by the reception of Liveness checks:
+
+          CHIP:EM: >>> [E:44665r S:45698 M:201545516] (S) Msg RX from 1:0000000000000001 [1042] --- Type 0001:05 (IM:ReportData)
+          CHIP:EM: Handling via exchange: 44665r, Delegate: 0xaaaaea044808
+          CHIP:DMG: ReportDataMessage =
+          CHIP:DMG: {
+          CHIP:DMG:         SubscriptionId = 0xce6a96bc,
+          CHIP:DMG:         InteractionModelRevision = 11
+          CHIP:DMG: }
+          CHIP:DMG: Refresh LivenessCheckTime for 9224 milliseconds with SubscriptionId = 0xce6a96bc Peer = 01:0000000000000001
+      disabled: true
+
+    - label: "Step 2d:  Repeat Step 2b and 2c with TH2 and TH3"
+      verification: |
+          TH2:
+
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          interactive start
+
+          Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
+
+          scenesmanagement subscribe fabric-scene-info 100 200 2 1 --commissioner-name beta
+
+          Verify  the DUT sends a report data to TH2 for FabricSceneInfo after the MinIntervalFloor time; store the RemainingCapacity field from this fabric’s entry reported in FabricSceneInfo into Remaining2ndCapacity and is equals to (MaxRemainingCapacity) on the TH2 (Chip-tool) and below is the sample log provided for the raspi platform:
+
+          [1701242801.625064][7636:7638] CHIP:DMG: ReportDataMessage =
+          [1701242801.625076][7636:7638] CHIP:DMG: {
+          [1701242801.625089][7636:7638] CHIP:DMG:         SubscriptionId = 0x9682625a,
+          [1701242801.625100][7636:7638] CHIP:DMG:         AttributeReportIBs =
+          [1701242801.625126][7636:7638] CHIP:DMG:         [
+          [1701242801.625136][7636:7638] CHIP:DMG:                 AttributeReportIB =
+          [1701242801.625161][7636:7638] CHIP:DMG:                 {
+          [1701242801.625172][7636:7638] CHIP:DMG:                         AttributeDataIB =
+          [1701242801.625184][7636:7638] CHIP:DMG:                         {
+          [1701242801.625198][7636:7638] CHIP:DMG:                                 DataVersion = 0x4daee67b,
+          [1701242801.625209][7636:7638] CHIP:DMG:                                 AttributePathIB =
+          [1701242801.625223][7636:7638] CHIP:DMG:                                 {
+          [1701242801.625237][7636:7638] CHIP:DMG:                                         Endpoint = 0x1,
+          [1701242801.625250][7636:7638] CHIP:DMG:                                         Cluster = 0x62,
+          [1701242801.625263][7636:7638] CHIP:DMG:                                         Attribute = 0x0000_0002,
+          [1701242801.625275][7636:7638] CHIP:DMG:                                 }
+          [1701242801.625291][7636:7638] CHIP:DMG:
+          [1701242801.625303][7636:7638] CHIP:DMG:                                 Data = [
+          [1701242801.625316][7636:7638] CHIP:DMG:
+          [1701242801.625330][7636:7638] CHIP:DMG:                                         {
+          [1701242801.625346][7636:7638] CHIP:DMG:                                                 0x0 = 0,
+          [1701242801.625361][7636:7638] CHIP:DMG:                                                 0x1 = 0,
+          [1701242801.625375][7636:7638] CHIP:DMG:                                                 0x2 = 0,
+          [1701242801.625390][7636:7638] CHIP:DMG:                                                 0x3 = false,
+          [1701242801.625405][7636:7638] CHIP:DMG:                                                 0x4 = 7,
+          [1701242801.625418][7636:7638] CHIP:DMG:                                                 0xfe = 2,
+          [1701242801.625432][7636:7638] CHIP:DMG:                                         },
+          [1701242801.625444][7636:7638] CHIP:DMG:                                 ],
+          [1701242801.625455][7636:7638] CHIP:DMG:                         },
+          [1701242801.625477][7636:7638] CHIP:DMG:
+          [1701242801.625487][7636:7638] CHIP:DMG:                 },
+          [1701242801.625509][7636:7638] CHIP:DMG:
+          [1701242801.625519][7636:7638] CHIP:DMG:         ],
+          [1701242801.625541][7636:7638] CHIP:DMG:
+          [1701242801.625552][7636:7638] CHIP:DMG:         InteractionModelRevision = 11
+          [1701242801.625562][7636:7638] CHIP:DMG: }
+          [1701242801.625758][7636:7638] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Attribute 0x0000_0002 DataVersion: 1303307899
+          [1701242801.625808][7636:7638] CHIP:TOO:   FabricSceneInfo: 1 entries
+          [1701242801.625852][7636:7638] CHIP:TOO:     [1]: {
+          [1701242801.625874][7636:7638] CHIP:TOO:       SceneCount: 0
+          [1701242801.625885][7636:7638] CHIP:TOO:       CurrentScene: 0
+          [1701242801.625896][7636:7638] CHIP:TOO:       CurrentGroup: 0
+          [1701242801.625907][7636:7638] CHIP:TOO:       SceneValid: FALSE
+          [1701242801.625919][7636:7638] CHIP:TOO:       RemainingCapacity: 7
+          [1701242801.625930][7636:7638] CHIP:TOO:       FabricIndex: 2
+          [1701242801.625941][7636:7638] CHIP:TOO:      }
+      disabled: true
+
+    - label: "Step 2e:  Repeat Step 2b and 2c with TH3."
+      verification: |
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          interactive start
+
+          Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
+
+          scenesmanagement subscribe fabric-scene-info 100 200 3 1 --commissioner-name gamma
+
+          Verify  the DUT sends a report data to TH3 for FabricSceneInfo after the MinIntervalFloor time; store the RemainingCapacity field from this fabric’s entry reported in FabricSceneInfo into Remaining3ndCapacity and is equals to (MaxRemainingCapacity) on the TH3 (Chip-tool) and below is the sample log provided for the raspi platform:
+
+          [1701242829.236595][7642:7644] CHIP:DMG: ReportDataMessage =
+          [1701242829.236616][7642:7644] CHIP:DMG: {
+          [1701242829.236629][7642:7644] CHIP:DMG:         SubscriptionId = 0x31889fa9,
+          [1701242829.236640][7642:7644] CHIP:DMG:         AttributeReportIBs =
+          [1701242829.236665][7642:7644] CHIP:DMG:         [
+          [1701242829.236675][7642:7644] CHIP:DMG:                 AttributeReportIB =
+          [1701242829.236702][7642:7644] CHIP:DMG:                 {
+          [1701242829.236712][7642:7644] CHIP:DMG:                         AttributeDataIB =
+          [1701242829.236724][7642:7644] CHIP:DMG:                         {
+          [1701242829.236738][7642:7644] CHIP:DMG:                                 DataVersion = 0x4daee67b,
+          [1701242829.236750][7642:7644] CHIP:DMG:                                 AttributePathIB =
+          [1701242829.236766][7642:7644] CHIP:DMG:                                 {
+          [1701242829.236778][7642:7644] CHIP:DMG:                                         Endpoint = 0x1,
+          [1701242829.236792][7642:7644] CHIP:DMG:                                         Cluster = 0x62,
+          [1701242829.236807][7642:7644] CHIP:DMG:                                         Attribute = 0x0000_0001,
+          [1701242829.236818][7642:7644] CHIP:DMG:                                 }
+          [1701242829.236834][7642:7644] CHIP:DMG:
+          [1701242829.236847][7642:7644] CHIP:DMG:                                 Data = [
+          [1701242829.236861][7642:7644] CHIP:DMG:
+          [1701242829.236875][7642:7644] CHIP:DMG:                                         {
+          [1701242829.236891][7642:7644] CHIP:DMG:                                                 0x0 = 0,
+          [1701242829.236905][7642:7644] CHIP:DMG:                                                 0x1 = 0,
+          [1701242829.236921][7642:7644] CHIP:DMG:                                                 0x2 = 0,
+          [1701242829.236935][7642:7644] CHIP:DMG:                                                 0x3 = false,
+          [1701242829.236952][7642:7644] CHIP:DMG:                                                 0x4 = 7,
+          [1701242829.236966][7642:7644] CHIP:DMG:                                                 0xfe = 3,
+          [1701242829.236979][7642:7644] CHIP:DMG:                                         },
+          [1701242829.236992][7642:7644] CHIP:DMG:                                 ],
+          [1701242829.237003][7642:7644] CHIP:DMG:                         },
+          [1701242829.237026][7642:7644] CHIP:DMG:
+          [1701242829.237036][7642:7644] CHIP:DMG:                 },
+          [1701242829.237059][7642:7644] CHIP:DMG:
+          [1701242829.237069][7642:7644] CHIP:DMG:         ],
+          [1701242829.237092][7642:7644] CHIP:DMG:
+          [1701242829.237102][7642:7644] CHIP:DMG:         InteractionModelRevision = 11
+          [1701242829.237112][7642:7644] CHIP:DMG: }
+          [1701242829.237312][7642:7644] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Attribute 0x0000_0001 DataVersion: 1303307899
+          [1701242829.237369][7642:7644] CHIP:TOO:   FabricSceneInfo: 1 entries
+          [1701242829.237411][7642:7644] CHIP:TOO:     [1]: {
+          [1701242829.237433][7642:7644] CHIP:TOO:       SceneCount: 0
+          [1701242829.237443][7642:7644] CHIP:TOO:       CurrentScene: 0
+          [1701242829.237454][7642:7644] CHIP:TOO:       CurrentGroup: 0
+          [1701242829.237465][7642:7644] CHIP:TOO:       SceneValid: FALSE
+          [1701242829.237477][7642:7644] CHIP:TOO:       RemainingCapacity: 7
+          [1701242829.237487][7642:7644] CHIP:TOO:       FabricIndex: 3
+          [1701242829.237498][7642:7644] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Step 3a: TH1 sends a AddScene command to DUT with the GroupID field
+          set to 0x0000, the SceneID field set to 0x01, the TransitionTime field
+          set to 20000 (20s) and no extension field sets."
+      PICS: S.S.C00.Rsp
+      verification: |
+          scenesmanagement add-scene 0x0000 0x01 20000 scene1 [] 1 1
+
+          Verify the AddSceneResponse with following fields:
+          Status is SUCCESS
+          Group ID is 0x0000
+          SceneID field set to 0x01 on the TH(Chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1700827169.206479][16026:16028] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0062 Command=0x0000_0000
+          [1700827169.206492][16026:16028] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Command 0x0000_0000
+          [1700827169.206523][16026:16028] CHIP:TOO:   AddSceneResponse: {
+          [1700827169.206537][16026:16028] CHIP:TOO:     status: 0
+          [1700827169.206548][16026:16028] CHIP:TOO:     groupID: 0
+          [1700827169.206558][16026:16028] CHIP:TOO:     sceneID: 1
+          [1700827169.206568][16026:16028] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 3b: Verify that the DUT sends a report data to TH1 for
+          FabricSceneInfo after the MinIntervalFloor time; store the
+          RemainingCapacity field from this fabric’s entry reported in
+          FabricSceneInfo into Remaining1stCapacity; verify Remaining1stCapacity
+          equals (MaxRemainingCapacity-1)."
+      verification: |
+          scenesmanagement subscribe fabric-scene-info 100 200 1 1
+
+          Verify  the DUT sends a report data to TH1 for FabricSceneInfo after the MinIntervalFloor time; store the RemainingCapacity field from this fabric’s entry reported in FabricSceneInfo into Remaining1stCapacity and is equals to (MaxRemainingCapacity-1) on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
+
+          [1701246692.659639][8121:8123] CHIP:DMG: ReportDataMessage =
+          [1701246692.659654][8121:8123] CHIP:DMG: {
+          [1701246692.659667][8121:8123] CHIP:DMG:         SubscriptionId = 0xceee757a,
+          [1701246692.659678][8121:8123] CHIP:DMG:         AttributeReportIBs =
+          [1701246692.659702][8121:8123] CHIP:DMG:         [
+          [1701246692.659711][8121:8123] CHIP:DMG:                 AttributeReportIB =
+          [1701246692.659737][8121:8123] CHIP:DMG:                 {
+          [1701246692.659748][8121:8123] CHIP:DMG:                         AttributeDataIB =
+          [1701246692.659758][8121:8123] CHIP:DMG:                         {
+          [1701246692.659772][8121:8123] CHIP:DMG:                                 DataVersion = 0xa64c547f,
+          [1701246692.659783][8121:8123] CHIP:DMG:                                 AttributePathIB =
+          [1701246692.659797][8121:8123] CHIP:DMG:                                 {
+          [1701246692.659810][8121:8123] CHIP:DMG:                                         Endpoint = 0x1,
+          [1701246692.659822][8121:8123] CHIP:DMG:                                         Cluster = 0x62,
+          [1701246692.659836][8121:8123] CHIP:DMG:                                         Attribute = 0x0000_0002,
+          [1701246692.659847][8121:8123] CHIP:DMG:                                 }
+          [1701246692.659864][8121:8123] CHIP:DMG:
+          [1701246692.659876][8121:8123] CHIP:DMG:                                 Data = [
+          [1701246692.659889][8121:8123] CHIP:DMG:
+          [1701246692.659903][8121:8123] CHIP:DMG:                                         {
+          [1701246692.659918][8121:8123] CHIP:DMG:                                                 0x0 = 1,
+          [1701246692.659932][8121:8123] CHIP:DMG:                                                 0x1 = 0,
+          [1701246692.659946][8121:8123] CHIP:DMG:                                                 0x2 = 0,
+          [1701246692.659960][8121:8123] CHIP:DMG:                                                 0x3 = false,
+          [1701246692.659974][8121:8123] CHIP:DMG:                                                 0x4 = 6,
+          [1701246692.659987][8121:8123] CHIP:DMG:                                                 0xfe = 1,
+          [1701246692.660001][8121:8123] CHIP:DMG:                                         },
+          [1701246692.660024][8121:8123] CHIP:DMG:                                 ],
+          [1701246692.660035][8121:8123] CHIP:DMG:                         },
+          [1701246692.660055][8121:8123] CHIP:DMG:
+          [1701246692.660065][8121:8123] CHIP:DMG:                 },
+          [1701246692.660090][8121:8123] CHIP:DMG:
+          [1701246692.660100][8121:8123] CHIP:DMG:         ],
+          [1701246692.660125][8121:8123] CHIP:DMG:
+          [1701246692.660135][8121:8123] CHIP:DMG:         InteractionModelRevision = 11
+          [1701246692.660145][8121:8123] CHIP:DMG: }
+          [1701246692.660363][8121:8123] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Attribute 0x0000_0002 DataVersion: 2790020223
+          [1701246692.660403][8121:8123] CHIP:TOO:   FabricSceneInfo: 1 entries
+          [1701246692.660436][8121:8123] CHIP:TOO:     [1]: {
+          [1701246692.660449][8121:8123] CHIP:TOO:       SceneCount: 1
+          [1701246692.660459][8121:8123] CHIP:TOO:       CurrentScene: 0
+          [1701246692.660471][8121:8123] CHIP:TOO:       CurrentGroup: 0
+          [1701246692.660482][8121:8123] CHIP:TOO:       SceneValid: FALSE
+          [1701246692.660494][8121:8123] CHIP:TOO:       RemainingCapacity: 6
+          [1701246692.660505][8121:8123] CHIP:TOO:       FabricIndex: 1
+          [1701246692.660516][8121:8123] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Step 4a: TH1 sends AddScene command to DUT with same GroupID and
+          SceneID value starting at 2 and incrementing for each iteration for
+          Remaining1stCapacity more times until reported value to TH1 (after
+          MinIntervalFloor) for RemainingCapacity field from FabricSceneInfo
+          becomes 0."
+      PICS: S.S.C00.Rsp
+      verification: |
+          scenesmanagement add-scene 0x0000 0x02 20000 scene2 [] 1 1
+
+          Verify the AddSceneResponse with following fields:
+          Status is SUCCESS
+          Group ID is 0x0000
+          SceneID field set to 0x02 on the TH1(Chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1700827508.579671][16026:16028] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0062 Command=0x0000_0000
+          [1700827508.579675][16026:16028] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Command 0x0000_0000
+          [1700827508.579684][16026:16028] CHIP:TOO:   AddSceneResponse: {
+          [1700827508.579688][16026:16028] CHIP:TOO:     status: 0
+          [1700827508.579691][16026:16028] CHIP:TOO:     groupID: 0
+          [1700827508.579694][16026:16028] CHIP:TOO:     sceneID: 2
+          [1700827508.579697][16026:16028] CHIP:TOO:    }
+
+
+          scenesmanagement subscribe fabric-scene-info 100 200 1 1
+          Verify  the DUT sends a report data messages after the MinIntervalFloor time to TH1 for RemainingCapacity field in FabricSceneInfo for that fabric with updated valueon the TH1 (Chip-tool) and below is the sample log provided for the raspi platform:
+          [1701243677.717829][7642:7644] CHIP:DMG: ReportDataMessage =
+          [1701243677.717834][7642:7644] CHIP:DMG: {
+          [1701243677.717839][7642:7644] CHIP:DMG:         SubscriptionId = 0xbbe8695b,
+          [1701243677.717844][7642:7644] CHIP:DMG:         AttributeReportIBs =
+          [1701243677.717854][7642:7644] CHIP:DMG:         [
+          [1701243677.717858][7642:7644] CHIP:DMG:                 AttributeReportIB =
+          [1701243677.717866][7642:7644] CHIP:DMG:                 {
+          [1701243677.717870][7642:7644] CHIP:DMG:                         AttributeDataIB =
+          [1701243677.717875][7642:7644] CHIP:DMG:                         {
+          [1701243677.717881][7642:7644] CHIP:DMG:                                 DataVersion = 0x4daee689,
+          [1701243677.717886][7642:7644] CHIP:DMG:                                 AttributePathIB =
+          [1701243677.717893][7642:7644] CHIP:DMG:                                 {
+          [1701243677.717899][7642:7644] CHIP:DMG:                                         Endpoint = 0x1,
+          [1701243677.717906][7642:7644] CHIP:DMG:                                         Cluster = 0x62,
+          [1701243677.717912][7642:7644] CHIP:DMG:                                         Attribute = 0x0000_0002,
+          [1701243677.717917][7642:7644] CHIP:DMG:                                 }
+          [1701243677.717924][7642:7644] CHIP:DMG:
+          [1701243677.717929][7642:7644] CHIP:DMG:                                 Data = [
+          [1701243677.717935][7642:7644] CHIP:DMG:
+          [1701243677.717941][7642:7644] CHIP:DMG:                                         {
+          [1701243677.717948][7642:7644] CHIP:DMG:                                                 0x0 = 2,
+          [1701243677.717954][7642:7644] CHIP:DMG:                                                 0x1 = 0,
+          [1701243677.717960][7642:7644] CHIP:DMG:                                                 0x2 = 0,
+          [1701243677.717967][7642:7644] CHIP:DMG:                                                 0x3 = false,
+          [1701243677.717973][7642:7644] CHIP:DMG:                                                 0x4 = 5,
+          [1701243677.717979][7642:7644] CHIP:DMG:                                                 0xfe = 1,
+          [1701243677.717986][7642:7644] CHIP:DMG:                                         },
+          [1701243677.717991][7642:7644] CHIP:DMG:                                 ],
+          [1701243677.717996][7642:7644] CHIP:DMG:                         },
+          [1701243677.718006][7642:7644] CHIP:DMG:
+          [1701243677.718010][7642:7644] CHIP:DMG:                 },
+          [1701243677.718020][7642:7644] CHIP:DMG:
+          [1701243677.718024][7642:7644] CHIP:DMG:         ],
+          [1701243677.718034][7642:7644] CHIP:DMG:
+          [1701243677.718037][7642:7644] CHIP:DMG:         InteractionModelRevision = 11
+          [1701243677.718040][7642:7644] CHIP:DMG: }
+          [1701243677.718133][7642:7644] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Attribute 0x0000_0002 DataVersion: 1303307913
+          [1701243677.718146][7642:7644] CHIP:TOO:   FabricSceneInfo: 1 entries
+          [1701243677.718154][7642:7644] CHIP:TOO:     [1]: {
+          [1701243677.718157][7642:7644] CHIP:TOO:       SceneCount: 2
+          [1701243677.718160][7642:7644] CHIP:TOO:       CurrentScene: 0
+          [1701243677.718162][7642:7644] CHIP:TOO:       CurrentGroup: 0
+          [1701243677.718165][7642:7644] CHIP:TOO:       SceneValid: FALSE
+          [1701243677.718168][7642:7644] CHIP:TOO:       RemainingCapacity: 5
+          [1701243677.718170][7642:7644] CHIP:TOO:       FabricIndex: 1
+          [1701243677.718173][7642:7644] CHIP:TOO:      }
+          .
+          .
+          .
+          scenesmanagement add-scene 0x0000 0x07 20000 scene8 [] 1 1
+
+          Verify the AddSceneResponse with following fields:
+          Status is SUCCESS
+          Group ID is 0x0000
+          SceneID field set to 0x07 on the TH(Chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1700827941.415335][16068:16070] CHIP:DMG: },
+          [1700827941.415392][16068:16070] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0062 Command=0x0000_0000
+          [1700827941.415406][16068:16070] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Command 0x0000_0000
+          [1700827941.415462][16068:16070] CHIP:TOO:   AddSceneResponse: {
+          [1700827941.415477][16068:16070] CHIP:TOO:     status: 0
+          [1700827941.415488][16068:16070] CHIP:TOO:     groupID: 0
+          [1700827941.415498][16068:16070] CHIP:TOO:     sceneID: 7
+          [1700827941.415508][16068:16070] CHIP:TOO:    }
+
+          scenesmanagement subscribe fabric-scene-info 100 200 1 1
+
+          Verify  the DUT sends a report data messages after the MinIntervalFloor time to TH1 for RemainingCapacity field in FabricSceneInfo for that fabric with updated valueon the TH1 (Chip-tool) and below is the sample log provided for the raspi platform:
+
+          [1701244322.682421][7642:7644] CHIP:DMG: ReportDataMessage =
+          [1701244322.682435][7642:7644] CHIP:DMG: {
+          [1701244322.682447][7642:7644] CHIP:DMG:         SubscriptionId = 0xbbe8695b,
+          [1701244322.682458][7642:7644] CHIP:DMG:         AttributeReportIBs =
+          [1701244322.682484][7642:7644] CHIP:DMG:         [
+          [1701244322.682495][7642:7644] CHIP:DMG:                 AttributeReportIB =
+          [1701244322.682518][7642:7644] CHIP:DMG:                 {
+          [1701244322.682528][7642:7644] CHIP:DMG:                         AttributeDataIB =
+          [1701244322.682542][7642:7644] CHIP:DMG:                         {
+          [1701244322.682555][7642:7644] CHIP:DMG:                                 DataVersion = 0x4daee697,
+          [1701244322.682566][7642:7644] CHIP:DMG:                                 AttributePathIB =
+          [1701244322.682579][7642:7644] CHIP:DMG:                                 {
+          [1701244322.682592][7642:7644] CHIP:DMG:                                         Endpoint = 0x1,
+          [1701244322.682605][7642:7644] CHIP:DMG:                                         Cluster = 0x62,
+          [1701244322.682619][7642:7644] CHIP:DMG:                                         Attribute = 0x0000_0002,
+          [1701244322.682631][7642:7644] CHIP:DMG:                                 }
+          [1701244322.682647][7642:7644] CHIP:DMG:
+          [1701244322.682659][7642:7644] CHIP:DMG:                                 Data = [
+          [1701244322.682672][7642:7644] CHIP:DMG:
+          [1701244322.682687][7642:7644] CHIP:DMG:                                         {
+          [1701244322.682701][7642:7644] CHIP:DMG:                                                 0x0 = 7,
+          [1701244322.682715][7642:7644] CHIP:DMG:                                                 0x1 = 0,
+          [1701244322.682729][7642:7644] CHIP:DMG:                                                 0x2 = 0,
+          [1701244322.682742][7642:7644] CHIP:DMG:                                                 0x3 = false,
+          [1701244322.682756][7642:7644] CHIP:DMG:                                                 0x4 = 0,
+          [1701244322.682770][7642:7644] CHIP:DMG:                                                 0xfe = 1,
+          [1701244322.682784][7642:7644] CHIP:DMG:                                         },
+          [1701244322.682807][7642:7644] CHIP:DMG:                                 ],
+          [1701244322.682818][7642:7644] CHIP:DMG:                         },
+          [1701244322.682843][7642:7644] CHIP:DMG:
+          [1701244322.682853][7642:7644] CHIP:DMG:                 },
+          [1701244322.682876][7642:7644] CHIP:DMG:
+          [1701244322.682887][7642:7644] CHIP:DMG:         ],
+          [1701244322.682908][7642:7644] CHIP:DMG:
+          [1701244322.682919][7642:7644] CHIP:DMG:         InteractionModelRevision = 11
+          [1701244322.682930][7642:7644] CHIP:DMG: }
+          [1701244322.683149][7642:7644] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Attribute 0x0000_0002 DataVersion: 1303307927
+          [1701244322.683191][7642:7644] CHIP:TOO:   FabricSceneInfo: 1 entries
+          [1701244322.683224][7642:7644] CHIP:TOO:     [1]: {
+          [1701244322.683236][7642:7644] CHIP:TOO:       SceneCount: 7
+          [1701244322.683247][7642:7644] CHIP:TOO:       CurrentScene: 0
+          [1701244322.683258][7642:7644] CHIP:TOO:       CurrentGroup: 0
+          [1701244322.683269][7642:7644] CHIP:TOO:       SceneValid: FALSE
+          [1701244322.683282][7642:7644] CHIP:TOO:       RemainingCapacity: 0
+          [1701244322.683293][7642:7644] CHIP:TOO:       FabricIndex: 1
+          [1701244322.683304][7642:7644] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Step 4b: TH1 sends a AddScene command to DUT with the GroupID field
+          set to 0x0000, the SceneID field set to 1 more than last value used in
+          step 4a, the TransitionTime field set to 20000 (20s) and no extension
+          field sets."
+      PICS: S.S.C00.Rsp
+      verification: |
+          scenesmanagement add-scene 0x0000 0x08 20000 scene9 [] 1 1
+
+          Verify the AddSceneResponse with following fields:
+          Status is RESOURCE_EXHAUSTED(0x89) on the TH1(Chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1701244361.448569][7642:7644] CHIP:DMG: },
+          [1701244361.448586][7642:7644] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0062 Command=0x0000_0000
+          [1701244361.448590][7642:7644] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Command 0x0000_0000
+          [1701244361.448600][7642:7644] CHIP:TOO:   AddSceneResponse: {
+          [1701244361.448604][7642:7644] CHIP:TOO:     status: 137
+          [1701244361.448608][7642:7644] CHIP:TOO:     groupID: 0
+          [1701244361.448611][7642:7644] CHIP:TOO:     sceneID: 8
+          [1701244361.448614][7642:7644] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 5a: Repeat Step 4a with TH2"
+      PICS: S.S.C00.Rsp
+      verification: |
+          scenesmanagement add-scene 0x0000 0x02 0x0014 scene1 [] 2 1 --commissioner-name beta
+
+          Verify the AddSceneResponse with following fields:
+          Status is SUCCESS
+          Group ID is 0x0000
+          SceneID field set to 0x02 on the TH2(Chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1700828173.261569][16115:16117] CHIP:DMG: },
+          [1700828173.261586][16115:16117] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0062 Command=0x0000_0000
+          [1700828173.261600][16115:16117] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Command 0x0000_0000
+          [1700828173.261629][16115:16117] CHIP:TOO:   AddSceneResponse: {
+          [1700828173.261633][16115:16117] CHIP:TOO:     status: 0
+          [1700828173.261636][16115:16117] CHIP:TOO:     groupID: 0
+          [1700828173.261638][16115:16117] CHIP:TOO:     sceneID: 2
+          [1700828173.261640][16115:16117] CHIP:TOO:    }
+
+          scenesmanagement subscribe fabric-scene-info 100 200 2 1 --commissioner-name beta
+
+          Verify  the DUT sends a report data messages after the MinIntervalFloor time to TH2 for RemainingCapacity field in FabricSceneInfo for that fabric with updated value on the TH2 (Chip-tool) and below is the sample log provided for the raspi platform:
+
+          [1701244532.841112][7824:7826] CHIP:DMG: ReportDataMessage =
+          [1701244532.841116][7824:7826] CHIP:DMG: {
+          [1701244532.841120][7824:7826] CHIP:DMG:         SubscriptionId = 0xf6c52c20,
+          [1701244532.841123][7824:7826] CHIP:DMG:         AttributeReportIBs =
+          [1701244532.841131][7824:7826] CHIP:DMG:         [
+          [1701244532.841134][7824:7826] CHIP:DMG:                 AttributeReportIB =
+          [1701244532.841141][7824:7826] CHIP:DMG:                 {
+          [1701244532.841144][7824:7826] CHIP:DMG:                         AttributeDataIB =
+          [1701244532.841148][7824:7826] CHIP:DMG:                         {
+          [1701244532.841152][7824:7826] CHIP:DMG:                                 DataVersion = 0x4daee699,
+          [1701244532.841155][7824:7826] CHIP:DMG:                                 AttributePathIB =
+          [1701244532.841159][7824:7826] CHIP:DMG:                                 {
+          [1701244532.841163][7824:7826] CHIP:DMG:                                         Endpoint = 0x1,
+          [1701244532.841167][7824:7826] CHIP:DMG:                                         Cluster = 0x62,
+          [1701244532.841171][7824:7826] CHIP:DMG:                                         Attribute = 0x0000_0002,
+          [1701244532.841175][7824:7826] CHIP:DMG:                                 }
+          [1701244532.841179][7824:7826] CHIP:DMG:
+          [1701244532.841183][7824:7826] CHIP:DMG:                                 Data = [
+          [1701244532.841187][7824:7826] CHIP:DMG:
+          [1701244532.841192][7824:7826] CHIP:DMG:                                         {
+          [1701244532.841196][7824:7826] CHIP:DMG:                                                 0x0 = 1,
+          [1701244532.841200][7824:7826] CHIP:DMG:                                                 0x1 = 0,
+          [1701244532.841204][7824:7826] CHIP:DMG:                                                 0x2 = 0,
+          [1701244532.841209][7824:7826] CHIP:DMG:                                                 0x3 = false,
+          [1701244532.841213][7824:7826] CHIP:DMG:                                                 0x4 = 6,
+          [1701244532.841217][7824:7826] CHIP:DMG:                                                 0xfe = 2,
+          [1701244532.841221][7824:7826] CHIP:DMG:                                         },
+          [1701244532.841225][7824:7826] CHIP:DMG:                                 ],
+          [1701244532.841228][7824:7826] CHIP:DMG:                         },
+          [1701244532.841237][7824:7826] CHIP:DMG:
+          [1701244532.841240][7824:7826] CHIP:DMG:                 },
+          [1701244532.841248][7824:7826] CHIP:DMG:
+          [1701244532.841251][7824:7826] CHIP:DMG:         ],
+          [1701244532.841257][7824:7826] CHIP:DMG:
+          [1701244532.841261][7824:7826] CHIP:DMG:         InteractionModelRevision = 11
+          [1701244532.841264][7824:7826] CHIP:DMG: }
+          [1701244532.841324][7824:7826] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Attribute 0x0000_0002 DataVersion: 1303307929
+          [1701244532.841340][7824:7826] CHIP:TOO:   FabricSceneInfo: 1 entries
+          [1701244532.841351][7824:7826] CHIP:TOO:     [1]: {
+          [1701244532.841355][7824:7826] CHIP:TOO:       SceneCount: 1
+          [1701244532.841358][7824:7826] CHIP:TOO:       CurrentScene: 0
+          [1701244532.841361][7824:7826] CHIP:TOO:       CurrentGroup: 0
+          [1701244532.841365][7824:7826] CHIP:TOO:       SceneValid: FALSE
+          [1701244532.841368][7824:7826] CHIP:TOO:       RemainingCapacity: 6
+          [1701244532.841371][7824:7826] CHIP:TOO:       FabricIndex: 2
+          [1701244532.841375][7824:7826] CHIP:TOO:      }
+          .
+          .
+          .
+          scenesmanagement add-scene 0x0000 0x08 0x0014 scene7 [] 2 1 --commissioner-name beta
+
+          Verify the AddSceneResponse with following fields:
+          Status is SUCCESS
+          Group ID is 0x0000
+          SceneID field set to 0x08 on the TH2(Chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1700829509.052437][16198:16200] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0062 Command=0x0000_0000
+          [1700829509.052452][16198:16200] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Command 0x0000_0000
+          [1700829509.052485][16198:16200] CHIP:TOO:   AddSceneResponse: {
+          [1700829509.052500][16198:16200] CHIP:TOO:     status: 0
+          [1700829509.052511][16198:16200] CHIP:TOO:     groupID: 0
+          [1700829509.052521][16198:16200] CHIP:TOO:     sceneID: 8
+          [1700829509.052532][16198:16200] CHIP:TOO:    }
+
+          scenesmanagement subscribe fabric-scene-info 100 200 2 1 --commissioner-name beta
+
+          Verify  the DUT sends a report data messages after the MinIntervalFloor time to TH2 for RemainingCapacity field in FabricSceneInfo for that fabric with updated value(decreasing to 0) on the TH2 (Chip-tool) and below is the sample log provided for the raspi platform:
+
+          [1701245132.869725][7824:7826] CHIP:DMG: ReportDataMessage =
+          [1701245132.869737][7824:7826] CHIP:DMG: {
+          [1701245132.869748][7824:7826] CHIP:DMG:         SubscriptionId = 0xf6c52c20,
+          [1701245132.869756][7824:7826] CHIP:DMG:         AttributeReportIBs =
+          [1701245132.869779][7824:7826] CHIP:DMG:         [
+          [1701245132.869790][7824:7826] CHIP:DMG:                 AttributeReportIB =
+          [1701245132.869814][7824:7826] CHIP:DMG:                 {
+          [1701245132.869825][7824:7826] CHIP:DMG:                         AttributeDataIB =
+          [1701245132.869835][7824:7826] CHIP:DMG:                         {
+          [1701245132.869854][7824:7826] CHIP:DMG:                                 DataVersion = 0x4daee6a5,
+          [1701245132.869866][7824:7826] CHIP:DMG:                                 AttributePathIB =
+          [1701245132.869879][7824:7826] CHIP:DMG:                                 {
+          [1701245132.869893][7824:7826] CHIP:DMG:                                         Endpoint = 0x1,
+          [1701245132.869906][7824:7826] CHIP:DMG:                                         Cluster = 0x62,
+          [1701245132.869923][7824:7826] CHIP:DMG:                                         Attribute = 0x0000_0002,
+          [1701245132.869935][7824:7826] CHIP:DMG:                                 }
+          [1701245132.869951][7824:7826] CHIP:DMG:
+          [1701245132.869963][7824:7826] CHIP:DMG:                                 Data = [
+          [1701245132.869978][7824:7826] CHIP:DMG:
+          [1701245132.869995][7824:7826] CHIP:DMG:                                         {
+          [1701245132.870010][7824:7826] CHIP:DMG:                                                 0x0 = 7,
+          [1701245132.870026][7824:7826] CHIP:DMG:                                                 0x1 = 0,
+          [1701245132.870038][7824:7826] CHIP:DMG:                                                 0x2 = 0,
+          [1701245132.870052][7824:7826] CHIP:DMG:                                                 0x3 = false,
+          [1701245132.870066][7824:7826] CHIP:DMG:                                                 0x4 = 0,
+          [1701245132.870081][7824:7826] CHIP:DMG:                                                 0xfe = 2,
+          [1701245132.870094][7824:7826] CHIP:DMG:                                         },
+          [1701245132.870106][7824:7826] CHIP:DMG:                                 ],
+          [1701245132.870117][7824:7826] CHIP:DMG:                         },
+          [1701245132.870140][7824:7826] CHIP:DMG:
+          [1701245132.870149][7824:7826] CHIP:DMG:                 },
+          [1701245132.870171][7824:7826] CHIP:DMG:
+          [1701245132.870180][7824:7826] CHIP:DMG:         ],
+          [1701245132.870205][7824:7826] CHIP:DMG:
+          [1701245132.870215][7824:7826] CHIP:DMG:         InteractionModelRevision = 11
+          [1701245132.870225][7824:7826] CHIP:DMG: }
+          [1701245132.870446][7824:7826] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Attribute 0x0000_0002 DataVersion: 1303307941
+          [1701245132.870486][7824:7826] CHIP:TOO:   FabricSceneInfo: 1 entries
+          [1701245132.870517][7824:7826] CHIP:TOO:     [1]: {
+          [1701245132.870530][7824:7826] CHIP:TOO:       SceneCount: 7
+          [1701245132.870541][7824:7826] CHIP:TOO:       CurrentScene: 0
+          [1701245132.870549][7824:7826] CHIP:TOO:       CurrentGroup: 0
+          [1701245132.870561][7824:7826] CHIP:TOO:       SceneValid: FALSE
+          [1701245132.870573][7824:7826] CHIP:TOO:       RemainingCapacity: 0
+          [1701245132.870584][7824:7826] CHIP:TOO:       FabricIndex: 2
+          [1701245132.870594][7824:7826] CHIP:TOO:      }
+
+          scenesmanagement subscribe fabric-scene-info 100 200 3 1 --commissioner-name gamma
+
+          Verify that the DUT sends report data messages after the MinIntervalFloor time to TH3 for RemainingCapacity field in FabricSceneInfo for that fabric with updated value (decreasing to SceneTableSize - (2 * MaxRemainingCapacity)) on the TH2 (Chip-tool) and below is the sample log provided for the raspi platform:
+
+          [1705916737.108024][21608:21610] CHIP:DMG: ReportDataMessage =
+          [1705916737.108028][21608:21610] CHIP:DMG: {
+          [1705916737.108031][21608:21610] CHIP:DMG:         SubscriptionId = 0xbb681f96,
+          [1705916737.108034][21608:21610] CHIP:DMG:         AttributeReportIBs =
+          [1705916737.108041][21608:21610] CHIP:DMG:         [
+          [1705916737.108043][21608:21610] CHIP:DMG:                 AttributeReportIB =
+          [1705916737.108050][21608:21610] CHIP:DMG:                 {
+          [1705916737.108053][21608:21610] CHIP:DMG:                         AttributeDataIB =
+          [1705916737.108056][21608:21610] CHIP:DMG:                         {
+          [1705916737.108060][21608:21610] CHIP:DMG:                                 DataVersion = 0xb6069420,
+          [1705916737.108063][21608:21610] CHIP:DMG:                                 AttributePathIB =
+          [1705916737.108066][21608:21610] CHIP:DMG:                                 {
+          [1705916737.108070][21608:21610] CHIP:DMG:                                         Endpoint = 0x1,
+          [1705916737.108073][21608:21610] CHIP:DMG:                                         Cluster = 0x62,
+          [1705916737.108077][21608:21610] CHIP:DMG:                                         Attribute = 0x0000_0002,
+          [1705916737.108080][21608:21610] CHIP:DMG:                                 }
+          [1705916737.108084][21608:21610] CHIP:DMG:
+          [1705916737.108087][21608:21610] CHIP:DMG:                                 Data = [
+          [1705916737.108091][21608:21610] CHIP:DMG:
+          [1705916737.108094][21608:21610] CHIP:DMG:                                         {
+          [1705916737.108098][21608:21610] CHIP:DMG:                                                 0x0 = 0,
+          [1705916737.108102][21608:21610] CHIP:DMG:                                                 0x1 = 0,
+          [1705916737.108106][21608:21610] CHIP:DMG:                                                 0x2 = 0,
+          [1705916737.108109][21608:21610] CHIP:DMG:                                                 0x3 = false,
+          [1705916737.108113][21608:21610] CHIP:DMG:                                                 0x4 = 2,
+          [1705916737.108117][21608:21610] CHIP:DMG:                                                 0xfe = 3,
+          [1705916737.108120][21608:21610] CHIP:DMG:                                         },
+          [1705916737.108123][21608:21610] CHIP:DMG:                                 ],
+          [1705916737.108126][21608:21610] CHIP:DMG:                         },
+          [1705916737.108132][21608:21610] CHIP:DMG:
+          [1705916737.108135][21608:21610] CHIP:DMG:                 },
+          [1705916737.108141][21608:21610] CHIP:DMG:
+          [1705916737.108144][21608:21610] CHIP:DMG:         ],
+          [1705916737.108150][21608:21610] CHIP:DMG:
+          [1705916737.108153][21608:21610] CHIP:DMG:         InteractionModelRevision = 11
+          [1705916737.108155][21608:21610] CHIP:DMG: }
+          [1705916737.108218][21608:21610] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Attribute 0x0000_0002 DataVersion: 3053884448
+          [1705916737.108239][21608:21610] CHIP:TOO:   FabricSceneInfo: 1 entries
+          [1705916737.108259][21608:21610] CHIP:TOO:     [1]: {
+          [1705916737.108266][21608:21610] CHIP:TOO:       SceneCount: 0
+          [1705916737.108268][21608:21610] CHIP:TOO:       CurrentScene: 0
+          [1705916737.108271][21608:21610] CHIP:TOO:       CurrentGroup: 0
+          [1705916737.108274][21608:21610] CHIP:TOO:       SceneValid: FALSE
+          [1705916737.108277][21608:21610] CHIP:TOO:       RemainingCapacity: 2
+          [1705916737.108280][21608:21610] CHIP:TOO:       FabricIndex: 3
+          [1705916737.108283][21608:21610] CHIP:TOO:      }
+      disabled: true
+
+    - label: "Step 5b: Repeat Step 4b with TH2"
+      PICS: S.S.C00.Rsp
+      verification: |
+          scenesmanagement add-scene 0x0000 0x09 0x0014 scene8 [] 2 1 --commissioner-name beta
+
+          Verify the AddSceneResponse with following fields:
+          Status is RESOURCE_EXHAUSTED(0x89) on the TH2(Chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1701245223.543911][7824:7826] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0062 Command=0x0000_0000
+          [1701245223.543925][7824:7826] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Command 0x0000_0000
+          [1701245223.543957][7824:7826] CHIP:TOO:   AddSceneResponse: {
+          [1701245223.543971][7824:7826] CHIP:TOO:     status: 137
+          [1701245223.543983][7824:7826] CHIP:TOO:     groupID: 0
+          [1701245223.543994][7824:7826] CHIP:TOO:     sceneID: 9
+          [1701245223.544004][7824:7826] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 6a: Repeat Step 4a with TH3"
+      PICS: S.S.C00.Rsp
+      verification: |
+          scenesmanagement add-scene 0x0000 0x02 0x0014 scene1 [] 3 1 --commissioner-name gamma
+
+          Verify the AddSceneResponse with following fields:
+          Status is SUCCESS
+          Group ID is 0x0000
+          SceneID field set to 0x02 on the TH3(Chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1705915133.113882][21363:21365] CHIP:DMG: },
+          [1705915133.113949][21363:21365] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0062 Command=0x0000_0000
+          [1705915133.113982][21363:21365] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Command 0x0000_0000
+          [1705915133.114065][21363:21365] CHIP:TOO:   AddSceneResponse: {
+          [1705915133.114081][21363:21365] CHIP:TOO:     status: 0
+          [1705915133.114092][21363:21365] CHIP:TOO:     groupID: 0
+          [1705915133.114103][21363:21365] CHIP:TOO:     sceneID: 2
+          [1705915133.114113][21363:21365] CHIP:TOO:    }
+
+          scenesmanagement subscribe fabric-scene-info 100 200 3 1 --commissioner-name gamma
+
+          Verify that the DUT sends report data messages after the MinIntervalFloor time to TH3 for RemainingCapacity field in FabricSceneInfo for that fabric with updated value on the TH3(Chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1705915183.311738][21363:21365] CHIP:DMG: ReportDataMessage =
+          [1705915183.311752][21363:21365] CHIP:DMG: {
+          [1705915183.311765][21363:21365] CHIP:DMG:         SubscriptionId = 0x62039a894,
+          [1705915183.311775][21363:21365] CHIP:DMG:         AttributeReportIBs =
+          [1705915183.311801][21363:21365] CHIP:DMG:         [
+          [1705915183.311811][21363:21365] CHIP:DMG:                 AttributeReportIB =
+          [1705915183.311835][21363:21365] CHIP:DMG:                 {
+          [1705915183.311845][21363:21365] CHIP:DMG:                         AttributeDataIB =
+          [1705915183.311858][21363:21365] CHIP:DMG:                         {
+          [1705915183.311871][21363:21365] CHIP:DMG:                                 DataVersion = 0x7e84d696,
+          [1705915183.311882][21363:21365] CHIP:DMG:                                 AttributePathIB =
+          [1705915183.311896][21363:21365] CHIP:DMG:                                 {
+          [1705915183.311909][21363:21365] CHIP:DMG:                                         Endpoint = 0x1,
+          [1705915183.311923][21363:21365] CHIP:DMG:                                         Cluster = 0x62,
+          [1705915183.311937][21363:21365] CHIP:DMG:                                         Attribute = 0x0000_0002,
+          [1705915183.311948][21363:21365] CHIP:DMG:                                 }
+          [1705915183.311964][21363:21365] CHIP:DMG:
+          [1705915183.311976][21363:21365] CHIP:DMG:                                 Data = [
+          [1705915183.311990][21363:21365] CHIP:DMG:
+          [1705915183.312003][21363:21365] CHIP:DMG:                                         {
+          [1705915183.312018][21363:21365] CHIP:DMG:                                                 0x0 = 1,
+          [1705915183.312033][21363:21365] CHIP:DMG:                                                 0x1 = 0,
+          [1705915183.312047][21363:21365] CHIP:DMG:                                                 0x2 = 0,
+          [1705915183.312072][21363:21365] CHIP:DMG:                                                 0x3 = false,
+          [1705915183.312093][21363:21365] CHIP:DMG:                                                 0x4 = 1,
+          [1705915183.312115][21363:21365] CHIP:DMG:                                                 0xfe = 3,
+          [1705915183.312134][21363:21365] CHIP:DMG:                                         },
+          [1705915183.312154][21363:21365] CHIP:DMG:                                 ],
+          [1705915183.312170][21363:21365] CHIP:DMG:                         },
+          [1705915183.312197][21363:21365] CHIP:DMG:
+          [1705915183.312207][21363:21365] CHIP:DMG:                 },
+          [1705915183.312228][21363:21365] CHIP:DMG:
+          [1705915183.312239][21363:21365] CHIP:DMG:         ],
+          [1705915183.312263][21363:21365] CHIP:DMG:
+          [1705915183.312274][21363:21365] CHIP:DMG:         InteractionModelRevision = 11
+          [1705915183.312283][21363:21365] CHIP:DMG: }
+          [1705915183.312491][21363:21365] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Attribute 0x0000_0002 DataVersion: 2122634902
+          [1705915183.312553][21363:21365] CHIP:TOO:   FabricSceneInfo: 1 entries
+          [1705915183.312599][21363:21365] CHIP:TOO:     [1]: {
+          [1705915183.312613][21363:21365] CHIP:TOO:       SceneCount: 1
+          [1705915183.312623][21363:21365] CHIP:TOO:       CurrentScene: 0
+          [1705915183.312645][21363:21365] CHIP:TOO:       CurrentGroup: 0
+          [1705915183.312656][21363:21365] CHIP:TOO:       SceneValid: FALSE
+          [1705915183.312669][21363:21365] CHIP:TOO:       RemainingCapacity: 1
+          [1705915183.312679][21363:21365] CHIP:TOO:       FabricIndex: 3
+          [1705915183.312690][21363:21365] CHIP:TOO:      }
+
+
+          scenesmanagement add-scene 0x0000 0x03 0x0014 scene2 [] 3 1 --commissioner-name gamma
+
+          Verify the AddSceneResponse with following fields:
+          Status is SUCCESS
+          Group ID is 0x0000
+          SceneID field set to 0x03 on the TH3(Chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1705915237.987013][21363:21365] CHIP:DMG: },
+          [1705915237.987077][21363:21365] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0062 Command=0x0000_0000
+          [1705915237.987093][21363:21365] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Command 0x0000_0000
+          [1705915237.987124][21363:21365] CHIP:TOO:   AddSceneResponse: {
+          [1705915237.987140][21363:21365] CHIP:TOO:     status: 0
+          [1705915237.987150][21363:21365] CHIP:TOO:     groupID: 0
+          [1705915237.987161][21363:21365] CHIP:TOO:     sceneID: 3
+          [1705915237.987171][21363:21365] CHIP:TOO:    }
+
+
+          Verify that the DUT sends report data messages after the MinIntervalFloor time to TH3 for RemainingCapacity field in FabricSceneInfo for that fabric with updated value((decreasing to 0)) on the TH3(Chip-tool) log and below is the sample log provided for the raspi platform:
+
+
+          [1705915281.585175][21387:21389] CHIP:DMG: ReportDataMessage =
+          [1705915281.585187][21387:21389] CHIP:DMG: {
+          [1705915281.585198][21387:21389] CHIP:DMG:         SubscriptionId = 0x111160d4,
+          [1705915281.585206][21387:21389] CHIP:DMG:         AttributeReportIBs =
+          [1705915281.585228][21387:21389] CHIP:DMG:         [
+          [1705915281.585236][21387:21389] CHIP:DMG:                 AttributeReportIB =
+          [1705915281.585263][21387:21389] CHIP:DMG:                 {
+          [1705915281.585273][21387:21389] CHIP:DMG:                         AttributeDataIB =
+          [1705915281.585285][21387:21389] CHIP:DMG:                         {
+          [1705915281.585299][21387:21389] CHIP:DMG:                                 DataVersion = 0x7e84d698,
+          [1705915281.585310][21387:21389] CHIP:DMG:                                 AttributePathIB =
+          [1705915281.585323][21387:21389] CHIP:DMG:                                 {
+          [1705915281.585336][21387:21389] CHIP:DMG:                                         Endpoint = 0x1,
+          [1705915281.585349][21387:21389] CHIP:DMG:                                         Cluster = 0x62,
+          [1705915281.585362][21387:21389] CHIP:DMG:                                         Attribute = 0x0000_0002,
+          [1705915281.585374][21387:21389] CHIP:DMG:                                 }
+          [1705915281.585390][21387:21389] CHIP:DMG:
+          [1705915281.585402][21387:21389] CHIP:DMG:                                 Data = [
+          [1705915281.585415][21387:21389] CHIP:DMG:
+          [1705915281.585428][21387:21389] CHIP:DMG:                                         {
+          [1705915281.585443][21387:21389] CHIP:DMG:                                                 0x0 = 2,
+          [1705915281.585458][21387:21389] CHIP:DMG:                                                 0x1 = 0,
+          [1705915281.585472][21387:21389] CHIP:DMG:                                                 0x2 = 0,
+          [1705915281.585486][21387:21389] CHIP:DMG:                                                 0x3 = false,
+          [1705915281.585500][21387:21389] CHIP:DMG:                                                 0x4 = 0,
+          [1705915281.585513][21387:21389] CHIP:DMG:                                                 0xfe = 3,
+          [1705915281.585527][21387:21389] CHIP:DMG:                                         },
+          [1705915281.585539][21387:21389] CHIP:DMG:                                 ],
+          [1705915281.585550][21387:21389] CHIP:DMG:                         },
+          [1705915281.585573][21387:21389] CHIP:DMG:
+          [1705915281.585583][21387:21389] CHIP:DMG:                 },
+          [1705915281.585605][21387:21389] CHIP:DMG:
+          [1705915281.585615][21387:21389] CHIP:DMG:         ],
+          [1705915281.585638][21387:21389] CHIP:DMG:
+          [1705915281.585648][21387:21389] CHIP:DMG:         InteractionModelRevision = 11
+          [1705915281.585657][21387:21389] CHIP:DMG: }
+          [1705915281.585866][21387:21389] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Attribute 0x0000_0002 DataVersion: 2122634904
+          [1705915281.585940][21387:21389] CHIP:TOO:   FabricSceneInfo: 1 entries
+          [1705915281.586006][21387:21389] CHIP:TOO:     [1]: {
+          [1705915281.586029][21387:21389] CHIP:TOO:       SceneCount: 2
+          [1705915281.586040][21387:21389] CHIP:TOO:       CurrentScene: 0
+          [1705915281.586051][21387:21389] CHIP:TOO:       CurrentGroup: 0
+          [1705915281.586061][21387:21389] CHIP:TOO:       SceneValid: FALSE
+          [1705915281.586073][21387:21389] CHIP:TOO:       RemainingCapacity: 0
+          [1705915281.586084][21387:21389] CHIP:TOO:       FabricIndex: 3
+          [1705915281.586095][21387:21389] CHIP:TOO:      }
+
+      disabled: true
+
+    - label:
+          "Step 6b: TH3 sends a AddScene command to DUT with the GroupID field
+          set to 0x0000, the SceneID field set to 0x01, the TransitionTime field
+          set to 20000 20s and no extension field sets."
+      PICS: S.S.C00.Rsp
+      verification: |
+          scenesmanagement add-scene 0x0000 0x01 20000 scene [] 3 1 --commissioner-name gamma
+
+          Verify the AddSceneResponse with following fields:
+          Status is RESOURCE_EXHAUSTED(0x89) on the TH3(Chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1705915365.772920][21387:21389] CHIP:DMG: },
+          [1705915365.772985][21387:21389] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0062 Command=0x0000_0000
+          [1705915365.773001][21387:21389] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Command 0x0000_0000
+          [1705915365.773063][21387:21389] CHIP:TOO:   AddSceneResponse: {
+          [1705915365.773079][21387:21389] CHIP:TOO:     status: 137
+          [1705915365.773091][21387:21389] CHIP:TOO:     groupID: 0
+          [1705915365.773102][21387:21389] CHIP:TOO:     sceneID: 1
+          [1705915365.773112][21387:21389] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 7: TH3 sends a StoreScene command to DUT with the GroupID field
+          set to 0x0000, the SceneID field set to 0x01."
+      PICS: S.S.C04.Rsp
+      verification: |
+          scenesmanagement store-scene 0x0000 0x01 3 1 --commissioner-name gamma
+
+          Verify the StoreSceneResponse with following fields:
+          Status is RESOURCE_EXHAUSTED(0x89) on the TH3(Chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1705915551.740537][21417:21419] CHIP:DMG: },
+          [1705915551.740557][21417:21419] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0062 Command=0x0000_0004
+          [1705915551.740566][21417:21419] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Command 0x0000_0004
+          [1705915551.740585][21417:21419] CHIP:TOO:   StoreSceneResponse: {
+          [1705915551.740590][21417:21419] CHIP:TOO:     status: 137
+          [1705915551.740593][21417:21419] CHIP:TOO:     groupID: 0
+          [1705915551.740596][21417:21419] CHIP:TOO:     sceneID: 1
+          [1705915551.740598][21417:21419] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 8: TH sends a CopyScene command to DUT with the mode field set
+          to 0x00, the group identifier from field set to 0x0000, the scene
+          identifier from field set to 0x01, the group identifier to field set
+          to 0x0000 and the scene identifier to field set to 0xFE."
+      PICS: S.S.C40.Rsp
+      verification: |
+          scenesmanagement copy-scene 0x00 0x0000 0x02 0x0000 0x00 3 1 --commissioner-name gamma
+
+          Verify the CopySceneResponse with following fields:
+          Status is RESOURCE_EXHAUSTED(0x89) on the TH(Chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1705915659.672801][21417:21419] CHIP:DMG: },
+          [1705915659.672875][21417:21419] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0062 Command=0x0000_0040
+          [1705915659.672891][21417:21419] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Command 0x0000_0040
+          [1705915659.672923][21417:21419] CHIP:TOO:   CopySceneResponse: {
+          [1705915659.672937][21417:21419] CHIP:TOO:     status: 133
+          [1705915659.672950][21417:21419] CHIP:TOO:     groupIdentifierFrom: 0
+          [1705915659.672979][21417:21419] CHIP:TOO:     sceneIdentifierFrom: 2
+          [1705915659.672991][21417:21419] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 9a: TH1 sends a RemoveAllScenes command to DUT with the GroupID
+          field set to 0x0000."
+      PICS: S.S.C03.Rsp
+      verification: |
+          scenesmanagement remove-all-scenes 0x0000 1 1
+
+          Verify the RemoveAllScenesResponse with following fields:
+          Status is SUCCESS
+          Group ID is 0x0000  on TH1(Chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1700829746.586347][16198:16200] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0062 Command=0x0000_0003
+          [1700829746.586351][16198:16200] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Command 0x0000_0003
+          [1700829746.586362][16198:16200] CHIP:TOO:   RemoveAllScenesResponse: {
+          [1700829746.586366][16198:16200] CHIP:TOO:     status: 0
+          [1700829746.586368][16198:16200] CHIP:TOO:     groupID: 0
+          [1700829746.586370][16198:16200] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 9b: Verify that the DUT sends a report data to TH1 for
+          FabricSceneInfo after the MinIntervalFloor time; store the
+          RemainingCapacity field from this fabric’s entry the reported in
+          FabricSceneInfo into Remaining1stCapacity; verify Remaining1stCapacity
+          equals (MaxRemainingCapacity).
+
+          Verify that the DUT does not send report data to TH2 for
+          FabricSceneInfo after the MinIntervalFloor time with updated value (it
+          should send 'empty' report data since there is no update for this
+          attribute for TH2)."
+      verification: |
+          scenesmanagement subscribe fabric-scene-info 100 200 1 1
+
+          Verify that the DUT sends a report data to TH1 for FabricSceneInfo after the MinIntervalFloor time; store the RemainingCapacity field from this fabric’s entry the reported in FabricSceneInfo into Remaining1stCapacity; verify Remaining1stCapacity equals (MaxRemainingCapacity) on TH1(Chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1707984148.067226][18155:18157] CHIP:DMG: ReportDataMessage =
+          [1707984148.067240][18155:18157] CHIP:DMG: {
+          [1707984148.067250][18155:18157] CHIP:DMG:         SubscriptionId = 0x53cf322d,
+          [1707984148.067258][18155:18157] CHIP:DMG:         AttributeReportIBs =
+          [1707984148.067280][18155:18157] CHIP:DMG:         [
+          [1707984148.067295][18155:18157] CHIP:DMG:                 AttributeReportIB =
+          [1707984148.067320][18155:18157] CHIP:DMG:                 {
+          [1707984148.067331][18155:18157] CHIP:DMG:                         AttributeDataIB =
+          [1707984148.067343][18155:18157] CHIP:DMG:                         {
+          [1707984148.067355][18155:18157] CHIP:DMG:                                 DataVersion = 0xc9875f20,
+          [1707984148.067367][18155:18157] CHIP:DMG:                                 AttributePathIB =
+          [1707984148.067381][18155:18157] CHIP:DMG:                                 {
+          [1707984148.067397][18155:18157] CHIP:DMG:                                         Endpoint = 0x1,
+          [1707984148.067411][18155:18157] CHIP:DMG:                                         Cluster = 0x62,
+          [1707984148.067431][18155:18157] CHIP:DMG:                                         Attribute = 0x0000_0002,
+          [1707984148.067443][18155:18157] CHIP:DMG:                                 }
+          [1707984148.067462][18155:18157] CHIP:DMG:
+          [1707984148.067474][18155:18157] CHIP:DMG:                                 Data = [
+          [1707984148.067488][18155:18157] CHIP:DMG:
+          [1707984148.067502][18155:18157] CHIP:DMG:                                         {
+          [1707984148.067516][18155:18157] CHIP:DMG:                                                 0x0 = 0,
+          [1707984148.067531][18155:18157] CHIP:DMG:                                                 0x1 = 0,
+          [1707984148.067545][18155:18157] CHIP:DMG:                                                 0x2 = 0,
+          [1707984148.067561][18155:18157] CHIP:DMG:                                                 0x3 = false,
+          [1707984148.067575][18155:18157] CHIP:DMG:                                                 0x4 = 7,
+          [1707984148.067589][18155:18157] CHIP:DMG:                                                 0xfe = 1,
+          [1707984148.067603][18155:18157] CHIP:DMG:                                         },
+          [1707984148.067618][18155:18157] CHIP:DMG:                                 ],
+          [1707984148.067629][18155:18157] CHIP:DMG:                         },
+          [1707984148.067654][18155:18157] CHIP:DMG:
+          [1707984148.067664][18155:18157] CHIP:DMG:                 },
+          [1707984148.067687][18155:18157] CHIP:DMG:
+          [1707984148.067696][18155:18157] CHIP:DMG:         ],
+          [1707984148.067722][18155:18157] CHIP:DMG:
+          [1707984148.067733][18155:18157] CHIP:DMG:         InteractionModelRevision = 11
+          [1707984148.067744][18155:18157] CHIP:DMG: }
+          [1707984148.067925][18155:18157] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Attribute 0x0000_0002 DataVersion: 3381092128
+          [1707984148.067967][18155:18157] CHIP:TOO:   FabricSceneInfo: 1 entries
+          [1707984148.067999][18155:18157] CHIP:TOO:     [1]: {
+          [1707984148.068011][18155:18157] CHIP:TOO:       SceneCount: 0
+          [1707984148.068023][18155:18157] CHIP:TOO:       CurrentScene: 0
+          [1707984148.068033][18155:18157] CHIP:TOO:       CurrentGroup: 0
+          [1707984148.068045][18155:18157] CHIP:TOO:       SceneValid: FALSE
+          [1707984148.068057][18155:18157] CHIP:TOO:       RemainingCapacity: 7
+          [1707984148.068068][18155:18157] CHIP:TOO:       FabricIndex: 1
+          [1707984148.068079][18155:18157] CHIP:TOO:      }
+
+          Verify that the DUT does not send report data to TH2 for FabricSceneInfo after the MinIntervalFloor time with updated value (it should send 'empty' report data since there is no update for this attribute for TH2).
+      disabled: true
+
+    - label:
+          "Step 10a: TH2 sends a RemoveAllScenes command to DUT with the GroupID
+          field set to 0x0000."
+      PICS: S.S.C03.Rsp
+      verification: |
+          scenesmanagement remove-all-scenes 0x0000 2 1 --commissioner-name beta
+
+          Verify the RemoveAllScenesResponse with following fields:
+          Status is SUCCESS
+          Group ID is 0x0000  on TH2(Chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1705915798.595482][21433:21435] CHIP:DMG: },
+          [1705915798.595500][21433:21435] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0062 Command=0x0000_0003
+          [1705915798.595509][21433:21435] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Command 0x0000_0003
+          [1705915798.595529][21433:21435] CHIP:TOO:   RemoveAllScenesResponse: {
+          [1705915798.595534][21433:21435] CHIP:TOO:     status: 0
+          [1705915798.595537][21433:21435] CHIP:TOO:     groupID: 0
+          [1705915798.595540][21433:21435] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 10b: Verify that the DUT sends a report data to TH2 for
+          FabricSceneInfo after the MinIntervalFloor time; store the
+          RemainingCapacity field from this fabric’s entry reported in
+          FabricSceneInfo into Remaining2ndCapacity; verify Remaining2ndCapacity
+          equals (MaxRemainingCapacity)."
+      verification: |
+          scenesmanagement subscribe fabric-scene-info 100 200 2 1 --commissioner-name beta
+
+          Verify that the DUT sends a report data to TH2 for FabricSceneInfo after the MinIntervalFloor time; store the RemainingCapacity field from this fabric’s entry reported in FabricSceneInfo into Remaining2ndCapacity; verify Remaining2ndCapacity equals (MaxRemainingCapacity) on TH2(Chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1705915866.717469][21433:21435] CHIP:DMG: }
+          [1705915866.717543][21433:21435] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Attribute 0x0000_0002 DataVersion: 2122634913
+          [1705915866.717578][21433:21435] CHIP:TOO:   FabricSceneInfo: 1 entries
+          [1705915866.717600][21433:21435] CHIP:TOO:     [1]: {
+          [1705915866.717607][21433:21435] CHIP:TOO:       SceneCount: 0
+          [1705915866.717613][21433:21435] CHIP:TOO:       CurrentScene: 0
+          [1705915866.717619][21433:21435] CHIP:TOO:       CurrentGroup: 0
+          [1705915866.717624][21433:21435] CHIP:TOO:       SceneValid: FALSE
+          [1705915866.717630][21433:21435] CHIP:TOO:       RemainingCapacity: 7
+          [1705915866.717635][21433:21435] CHIP:TOO:       FabricIndex: 2
+          [1705915866.717640][21433:21435] CHIP:TOO:      }
+
+      disabled: true
+
+    - label:
+          "Step 11a: TH1 removes the TH2 fabric by sending the RemoveFabric
+          command to the DUT with the FabricIndex set to th2FabricIndex"
+      verification: |
+          operationalcredentials remove-fabric th2FabricIndex 1 0
+
+          On TH1(chip-tool) verify the success with the nocresponse with statuscode is success(0)
+
+          [1784416866.004187][21433:21435] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          [1784416866.004214][21433:21435] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
+          [1784416866.004236][21433:21435] CHIP:TOO:   NOCResponse: {
+          [1784416866.004250][21433:21435] CHIP:TOO:     statusCode: 0
+          [1784416866.004255][21433:21435] CHIP:TOO:     fabricIndex: th2FabricIndex
+          [1784416866.004259][21433:21435] CHIP:TOO:    }
+          [1784416866.004270][21433:21435] CHIP:DMG: ICR moving to [AwaitingDe]
+      disabled: true
+
+    - label:
+          "Step 11b: TH1 removes the TH3 fabric by sending the RemoveFabric
+          command to the DUT with the FabricIndex set to th3FabricIndex"
+      verification: |
+          operationalcredentials remove-fabric th3FabricIndex 1 0
+
+          On TH1(chip-tool) verify the success with the nocresponse with statuscode is success(0)
+
+          [1784416866.004187][21433:21435] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          [1784416866.004214][21433:21435] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
+          [1784416866.004236][21433:21435] CHIP:TOO:   NOCResponse: {
+          [1784416866.004250][21433:21435] CHIP:TOO:     statusCode: 0
+          [1784416866.004255][21433:21435] CHIP:TOO:     fabricIndex: th3FabricIndex
+          [1784416866.004259][21433:21435] CHIP:TOO:    }
+          [1784416866.004270][21433:21435] CHIP:DMG: ICR moving to [AwaitingDe]
+      disabled: true

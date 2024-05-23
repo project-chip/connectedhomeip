@@ -1,0 +1,127 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/ti_simplelink_sdk.gni")
+import("${build_root}/config/defaults.gni")
+import("${chip_root}/src/platform/device.gni")
+import("${ti_simplelink_sdk_build_root}/ti_simplelink_executable.gni")
+import("${ti_simplelink_sdk_build_root}/ti_simplelink_sdk.gni")
+
+assert(current_os == "freertos")
+
+project_dir = "${chip_root}/examples/air-purifier-app/cc32xx"
+
+ti_simplelink_sdk("sdk") {
+  include_dirs = [ "${project_dir}/main/include" ]
+
+  defines = []
+  if (is_debug) {
+    defines += [ "BUILD_RELEASE=0" ]
+  } else {
+    defines += [ "BUILD_RELEASE=1" ]
+  }
+}
+
+ti_sysconfig("sysconfig") {
+  sources = [ "${project_dir}/chip.syscfg" ]
+  outputs = [
+    "ti_drivers_net_wifi_config.c",
+    "ti_net_config.c",
+    "ti_drivers_config.c",
+    "ti_drivers_config.h",
+  ]
+}
+
+source_set("air-purifier_app_sdk") {
+  defines = []
+
+  configs -= [ "${build_root}/config/compiler:std_default" ]
+  configs += [ ":sdk_posix_config" ]
+
+  sources = [
+    "${chip_root}/src/platform/cc32xx/Logging.cpp",
+    "${project_dir}/main/cc32xxWifiInit.c",
+    "${project_dir}/main/main.cpp",
+    "${ti_simplelink_sdk_root}/examples/rtos/common/ifmod/lwip_if.c",
+    "${ti_simplelink_sdk_root}/examples/rtos/common/ifmod/utils_if.c",
+    "${ti_simplelink_sdk_root}/examples/rtos/common/ifmod/wifi_if.c",
+  ]
+
+  include_dirs = [
+    "${project_dir}/include",
+    "${project_dir}/main",
+    "${project_dir}/main/ifmod/",
+    "${chip_root}/src/platform/cc32xx",
+    "${chip_root}/examples/platform/cc32xx",
+  ]
+
+  deps = [
+    ":sdk",
+    ":sysconfig",
+    "${chip_root}/examples/air-purifier-app/air-purifier-common",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/setup_payload",
+  ]
+}
+
+ti_simplelink_executable("air-purifier_app") {
+  defines = []
+  output_name = "chip-${ti_simplelink_board}-air-purifier-example.out"
+
+  sources = [
+    "${chip_root}/examples/air-purifier-app/air-purifier-common/src/air-purifier-manager.cpp",
+    "${chip_root}/examples/air-purifier-app/air-purifier-common/src/air-quality-sensor-manager.cpp",
+    "${chip_root}/examples/air-purifier-app/air-purifier-common/src/filter-delegates.cpp",
+    "${chip_root}/examples/air-purifier-app/air-purifier-common/src/thermostat-manager.cpp",
+    "${project_dir}/main/AppTask.cpp",
+    "${project_dir}/main/CHIPDeviceManager.cpp",
+    "${project_dir}/main/CXXExceptionStubs.cpp",
+    "${project_dir}/main/DeviceCallbacks.cpp",
+    "${project_dir}/main/ZclCallbacks.cpp",
+  ]
+
+  deps = [
+    ":air-purifier_app_sdk",
+    ":sdk",
+    ":sysconfig",
+    "${chip_root}/examples/air-purifier-app/air-purifier-common",
+    "${chip_root}/examples/platform/cc32xx:cc32xx-attestation-credentials",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/setup_payload",
+  ]
+
+  include_dirs = [
+    "${project_dir}",
+    "${project_dir}/main",
+    "${chip_root}/examples/air-purifier-app/air-purifier-common/include",
+  ]
+
+  cflags = [
+    "-Wno-implicit-fallthrough",
+    "-Wno-sign-compare",
+    "-Wconversion",
+  ]
+
+  output_dir = root_out_dir
+}
+
+group("cc32xx") {
+  deps = [ ":air-purifier_app" ]
+}
+
+group("default") {
+  deps = [ ":cc32xx" ]
+}

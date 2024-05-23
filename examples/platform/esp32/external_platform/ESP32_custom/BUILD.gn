@@ -1,0 +1,162 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/src/platform/device.gni")
+
+declare_args() {
+  # By default use default/example implementation of CommissionableDataProvider,
+  # DeviceAttestationCredentialsProvider and DeviceInstanceInfoProvider
+  chip_use_transitional_commissionable_data_provider = true
+  chip_use_factory_data_provider = false
+  chip_use_device_info_provider = false
+  chip_config_software_version_number = 0
+  chip_enable_chipoble = true
+  chip_bt_nimble_enabled = true
+  chip_bt_bluedroid_enabled = true
+  chip_max_discovered_ip_addresses = 5
+  chip_enable_route_hook = false
+}
+
+buildconfig_header("custom_buildconfig") {
+  header = "CHIPDeviceBuildConfig.h"
+  header_dir = "platform"
+
+  defines = [
+    "CHIP_DEVICE_CONFIG_ENABLE_WPA=false",
+    "CHIP_ENABLE_OPENTHREAD=${chip_enable_openthread}",
+    "CHIP_DEVICE_CONFIG_THREAD_FTD=${chip_openthread_ftd}",
+    "OPENTHREAD_CONFIG_ENABLE_TOBLE=false",
+    "CHIP_BYPASS_RENDEZVOUS=false",
+    "CHIP_STACK_LOCK_TRACKING_ENABLED=true",
+    "CHIP_STACK_LOCK_TRACKING_ERROR_FATAL=false",
+    "CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING=false",
+    "CHIP_DEVICE_CONFIG_RUN_AS_ROOT=false",
+    "CHIP_DEVICE_LAYER_TARGET_ESP32=1",
+    "CHIP_DEVICE_LAYER_TARGET=ESP32_custom",
+    "CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER=1",
+    "BLE_PLATFORM_CONFIG_INCLUDE=<external_platform/ESP32_custom/BlePlatformConfig.h>",
+    "CHIP_DEVICE_PLATFORM_CONFIG_INCLUDE=<external_platform/ESP32_custom/CHIPDevicePlatformConfig.h>",
+    "CHIP_PLATFORM_CONFIG_INCLUDE=<external_platform/ESP32_custom/CHIPPlatformConfig.h>",
+    "INET_CONFIG_INCLUDE=<external_platform/ESP32_custom/InetPlatformConfig.h>",
+    "SYSTEM_PLATFORM_CONFIG_INCLUDE=<external_platform/ESP32_custom/SystemPlatformConfig.h>",
+    "EXTERNAL_CONFIGURATIONMANAGERIMPL_HEADER=<external_platform/ESP32_custom/ConfigurationManagerImpl.h>",
+    "EXTERNAL_CHIPDEVICEPLATFORMEVENT_HEADER=<external_platform/ESP32_custom/CHIPDevicePlatformEvent.h>",
+    "EXTERNAL_CONNECTIVITYMANAGERIMPL_HEADER=<external_platform/ESP32_custom/ConnectivityManagerImpl.h>",
+    "EXTERNAL_BLEMANAGERIMPL_HEADER=<external_platform/ESP32_custom/BLEManagerImpl.h>",
+    "EXTERNAL_KEYVALUESTOREMANAGERIMPL_HEADER=<external_platform/ESP32_custom/KeyValueStoreManagerImpl.h>",
+    "EXTERNAL_PLATFORMMANAGERIMPL_HEADER=<external_platform/ESP32_custom/PlatformManagerImpl.h>",
+    "CHIP_CONFIG_SOFTWARE_VERSION_NUMBER=${chip_config_software_version_number}",
+    "CHIP_DEVICE_CONFIG_MAX_DISCOVERED_IP_ADDRESSES=${chip_max_discovered_ip_addresses}",
+  ]
+
+  if (chip_enable_ota_requestor) {
+    defines += [ "CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR=1" ]
+  }
+}
+
+group("platform_buildconfig") {
+  public_deps = [ ":custom_buildconfig" ]
+}
+
+static_library("ESP32_custom") {
+  sources = [
+    "${chip_root}/src/platform/SingletonConfigurationManager.cpp",
+    "CHIPDevicePlatformConfig.h",
+    "CHIPDevicePlatformEvent.h",
+    "ConfigurationManagerImpl.cpp",
+    "ConfigurationManagerImpl.h",
+    "ConnectivityManagerImpl.cpp",
+    "ConnectivityManagerImpl.h",
+    "DiagnosticDataProviderImpl.cpp",
+    "DiagnosticDataProviderImpl.h",
+    "ESP32Config.cpp",
+    "ESP32Config.h",
+    "ESP32Utils.cpp",
+    "ESP32Utils.h",
+    "KeyValueStoreManagerImpl.cpp",
+    "KeyValueStoreManagerImpl.h",
+    "Logging.cpp",
+    "LwIPCoreLock.cpp",
+    "PlatformManagerImpl.cpp",
+    "PlatformManagerImpl.h",
+    "SystemTimeSupport.cpp",
+    "SystemTimeSupport.h",
+  ]
+
+  deps = [
+    "${chip_root}/src/lib/dnssd:platform_header",
+    "${chip_root}/src/platform/logging:headers",
+    "${chip_root}/src/setup_payload",
+  ]
+
+  public_deps = [
+    ":platform_buildconfig",
+    "${chip_root}/src/crypto",
+    "${chip_root}/src/platform:platform_base",
+  ]
+
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "OTAImageProcessorImpl.cpp",
+      "OTAImageProcessorImpl.h",
+    ]
+  }
+
+  if (chip_enable_chipoble) {
+    sources += [ "BLEManagerImpl.h" ]
+  }
+
+  if (chip_bt_nimble_enabled) {
+    sources += [ "nimble/BLEManagerImpl.cpp" ]
+  }
+
+  if (chip_bt_bluedroid_enabled) {
+    sources += [ "bluedroid/BLEManagerImpl.cpp" ]
+  }
+
+  if (chip_enable_wifi) {
+    sources += [
+      "ConnectivityManagerImpl_WiFi.cpp",
+      "NetworkCommissioningDriver.cpp",
+      "NetworkCommissioningDriver.h",
+      "route_hook/ESP32RouteHook.c",
+      "route_hook/ESP32RouteHook.h",
+      "route_hook/ESP32RouteTable.c",
+      "route_hook/ESP32RouteTable.h",
+    ]
+    if (chip_mdns == "platform") {
+      sources += [
+        "DnssdImpl.cpp",
+        "DnssdImpl.h",
+      ]
+    }
+  }
+
+  if (chip_use_factory_data_provider) {
+    sources += [
+      "ESP32FactoryDataProvider.cpp",
+      "ESP32FactoryDataProvider.h",
+    ]
+  }
+
+  if (chip_use_device_info_provider) {
+    sources += [
+      "ESP32DeviceInfoProvider.cpp",
+      "ESP32DeviceInfoProvider.h",
+    ]
+  }
+}

@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+  <cluster>
+    <name>Relative Humidity Measurement</name>
+    <domain>Measurement &amp; Sensing</domain>
+    <description>Attributes and commands for configuring the measurement of relative humidity, and reporting relative humidity measurements.</description>
+    <code>0x0405</code>
+    <define>RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER</define>
+    <client tick="false" init="false">true</client>
+    <server tick="false" tickFrequency="half" init="false">true</server>
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+    <attribute side="server" code="0x0000" define="RELATIVE_HUMIDITY_MEASURED_VALUE" type="int16u" writable="false" reportable="true" optional="false" isNullable="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="RELATIVE_HUMIDITY_MIN_MEASURED_VALUE" type="int16u" min="0x0000" max="0x270F" writable="false" optional="false" isNullable="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="RELATIVE_HUMIDITY_MAX_MEASURED_VALUE" type="int16u" min="0x0001" max="0x2710" writable="false" optional="false" isNullable="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="RELATIVE_HUMIDITY_TOLERANCE" type="int16u" min="0x0000" max="0x0800" writable="false" optional="true">Tolerance</attribute>
+  </cluster>
+</configurator>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/titleTv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:text="@string/enter_wifi_credentials_title"
+        android:padding="16dp"
+        android:textSize="20sp"/>
+
+    <EditText
+        android:id="@+id/ssidEd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_below="@id/titleTv"
+        android:inputType="text"
+        android:textSize="20sp"
+        android:hint="@string/enter_wifi_ssid_hint"/>
+
+    <EditText
+        android:id="@+id/pwdEd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_below="@id/ssidEd"
+        android:inputType="text"
+        android:textSize="20sp"
+        android:hint="@string/enter_wifi_password_hint"/>
+
+    <Button
+        android:id="@+id/saveNetworkBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:padding="16dp"
+        android:layout_margin="16dp"
+        android:text="@string/enter_wifi_save_network_btn"/>
+
+</RelativeLayout>

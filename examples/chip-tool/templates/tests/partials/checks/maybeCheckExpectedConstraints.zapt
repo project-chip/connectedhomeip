@@ -1,0 +1,73 @@
+{{#if hasExpectedConstraints}}
+    {{~#if isOptional}}
+        {{~#if (hasProperty expectedConstraints "hasValue")}}VerifyOrReturn(CheckConstraintHasValue("{{asPropertyValue dontUnwrapValue=true}}", {{asPropertyValue dontUnwrapValue=true}}, {{expectedConstraints.hasValue}}));
+        {{else}}
+        if ({{asPropertyValue dontUnwrapValue=true}}.HasValue()) {
+        {{/if}}
+    {{/if}}
+
+    {{~#chip_tests_iterate_constraints expectedConstraints}}
+    {{~#if (isStrEqual constraint "hasValue")}}
+      {{~! Already handled above~}}
+    {{~else if (isStrEqual constraint "type")}}
+      VerifyOrReturn(CheckConstraintType("{{asPropertyValue context=..}}", "{{asTestType ../type ../isArray}}", "{{value}}"));
+    {{~else if (isStrEqual constraint "format")}}VerifyOrReturn(CheckConstraintFormat("{{asPropertyValue context=..}}", "", "{{value}}"));
+
+    {{~else if (isStrEqual constraint "startsWith")}}VerifyOrReturn(CheckConstraintStartsWith("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}, "{{value}}"));
+
+    {{~else if (isStrEqual constraint "endsWith")}}VerifyOrReturn(CheckConstraintEndsWith("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}, "{{value}}"));
+
+    {{~else if (isStrEqual constraint "isUpperCase")}}VerifyOrReturn(CheckConstraintIsUpperCase("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}, {{value}}));
+
+    {{~else if (isStrEqual constraint "isLowerCase")}}VerifyOrReturn(CheckConstraintIsLowerCase("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}, {{value}}));
+
+    {{~else if (isStrEqual constraint "isHexString")}}VerifyOrReturn(CheckConstraintIsHexString("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}, {{value}}));
+
+    {{~else if (isStrEqual constraint "minLength")}}VerifyOrReturn(CheckConstraintMinLength("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}, {{value}}));
+
+    {{~else if (isStrEqual constraint "maxLength")}}VerifyOrReturn(CheckConstraintMaxLength("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}, {{value}}));
+
+    {{~else if (isStrEqual constraint "minValue")}}VerifyOrReturn(CheckConstraintMinValue("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}, {{asTypedLiteral value ../type}}));
+
+    {{~else if (isStrEqual constraint "maxValue")}}VerifyOrReturn(CheckConstraintMaxValue("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}, {{asTypedLiteral value ../type}}));
+
+    {{~else if (isStrEqual constraint "contains")}}
+        {{#chip_tests_iterate_expected_list value context=..}}
+    VerifyOrReturn(CheckConstraintContains("{{asPropertyValue context=..}}", {{asPropertyValue}}, {{asTypedLiteral value type}}));
+        {{/chip_tests_iterate_expected_list}}
+
+    {{~else if (isStrEqual constraint "excludes")}}
+        {{#chip_tests_iterate_expected_list value context=..}}
+    VerifyOrReturn(CheckConstraintExcludes("{{asPropertyValue context=..}}", {{asPropertyValue}}, {{asTypedLiteral value type}}));
+        {{/chip_tests_iterate_expected_list}}
+
+    {{~else if (isStrEqual constraint "hasMasksSet")}}
+        {{#chip_tests_iterate_expected_list value context=..}}
+    VerifyOrReturn(CheckConstraintHasMasksSet("{{asPropertyValue context=..}}", {{asPropertyValue}}, {{asTypedLiteral value type}}));
+        {{/chip_tests_iterate_expected_list}}
+
+    {{~else if (isStrEqual constraint "hasMasksClear")}}
+        {{#chip_tests_iterate_expected_list value context=..}}
+    VerifyOrReturn(CheckConstraintHasMasksClear("{{asPropertyValue context=..}}", {{asPropertyValue}}, {{asTypedLiteral value type}}));
+        {{/chip_tests_iterate_expected_list}}
+
+    {{~else if (isStrEqual constraint "notValue")}}
+        {{#if (isLiteralNull value)}}
+            VerifyOrReturn(CheckValueNonNull("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}));
+        {{else}}
+            VerifyOrReturn(CheckConstraintNotValue("{{asPropertyValue context=..}}", {{asPropertyValue context=..}}, {{asTypedLiteral value ../type}}));
+        {{/if}}
+
+    {{~else}}
+        {{! Ensure there's a line-break before the #error }}
+        #error "Unknown constraint {{constraint}}";
+        {{! Ensure there's a line-break after the #error }}
+    {{/if}}
+    {{/chip_tests_iterate_constraints}}
+
+    {{~#if isOptional}}
+        {{~#unless (hasProperty expectedConstraints "hasValue")}}
+        }
+        {{/unless}}
+    {{/if}}
+{{/if}}

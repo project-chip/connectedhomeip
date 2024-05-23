@@ -1,0 +1,306 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 84.2.1. [TC-DESC-2.1] Descriptor Cluster Attributes [DUT-Server]
+
+PICS:
+    - DESC.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          Mandatory cluster requirements for each device type can be found here.
+          https://github.com/CHIP-Specifications/chip-test-plans/tree/master/tools/device-type-requirements
+          Use the correct json required for the DUT, this file is PIXIT.DESC.DeviceTypeConformanceList.
+      disabled: true
+
+    - label: "Precondition"
+      verification: |
+          TH and DUT are commissioned
+      disabled: true
+
+    - label:
+          "Step 1a: TH reads DeviceTypeList and PartsList attributes from DUT
+          for Endpoint 0"
+      PICS: DESC.S.A0000 && DESC.S.A0003
+      verification: |
+          Send a read request to the DUT using chip-tool to read the partsList attribute in the descriptor cluster on Endpoint 0.
+          Make a note of all the items(Endpoint id’s) in the list. In the below example there are 2 endpoint id's listed [1,2]
+
+          ./chip-tool descriptor read  parts-list 1 0
+
+          Verify "PartsList" attribute is not empty (use this list of endpoints in step 1b) on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
+
+          [1672919206.069327][33426:33428] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 2847656117
+          [1672919206.069380][33426:33428] CHIP:TOO:   PartsList: 2 entries
+          [1672919206.069398][33426:33428] CHIP:TOO:     [1]: 1
+          [1672919206.069410][33426:33428] CHIP:TOO:     [2]: 2
+
+          ./chip-tool descriptor read device-type-list 1 0
+
+          on TH (Chip-tool) log, Verify that the DeviceTypeList contains one Root Node Device Type and may only contain other Node Device Types (device types with scope=node, it can be any of the following Power Source, OTA Requestor, OTA Provider) next to the Root Node Device Type. (here DeviceType: 17 is power source )
+          - Revision value is not less than 1 and it should match the Revision of the DeviceType and below is the sample log provided for the raspi platform
+
+          [1674552598.748946][21129:21131] CHIP:DMG: }
+          [[1692617243.785786][31325:31327] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1437984882
+          [1692617243.785840][31325:31327] CHIP:TOO:   DeviceTypeList: 2 entries
+          [1692617243.785862][31325:31327] CHIP:TOO:     [1]: {
+          [1692617243.785881][31325:31327] CHIP:TOO:       DeviceType: 17
+          [1692617243.785892][31325:31327] CHIP:TOO:       Revision: 1
+          [1692617243.785901][31325:31327] CHIP:TOO:      }
+          [1692617243.785917][31325:31327] CHIP:TOO:     [2]: {
+          [1692617243.785926][31325:31327] CHIP:TOO:       DeviceType: 22
+          [1692617243.785936][31325:31327] CHIP:TOO:       Revision: 1
+          [1692617243.785944][31325:31327] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Step 1b: TH reads DeviceTypeList and PartsList attributes from DUT
+          for each Endpoint supported by DUT (except Endpoint 0)."
+      PICS: DESC.S.A0000 && DESC.S.A0003
+      verification: |
+          For all the Endpoint’s listed from the previous step run the following steps. The device type should correspond to the id value in the device_type.json
+          Chip tool outputs all values in integer, convert to hex before comparing.
+
+          ./chip-tool descriptor read parts-list 1 1
+
+          Verify  parts-list response contains 0 entries on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
+
+          [1660127331.634565][46437:46442] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 934889243
+          [1660127331.634631][46437:46442] CHIP:TOO:   parts list: 0 entries
+
+          ./chip-tool descriptor read device-type-list 1 1
+
+          On TH (Chip-tool) log, Verify that  the DeviceTypeList count is at least one.
+            - If the DeviceTypeList contains more than one Application Device Type, verify that all the Application Device Types are part of the same superset.
+            - Verify the DeviceTypeList does not contain the Root Node Device Type.
+            - Revision value  is not less than 1 and it should match the Revision of the DeviceType and below is the sample log provided for the raspi platform
+
+          [1674552599.264189][21135:21137] CHIP:DMG: }
+          [1692617790.900384][31584:31586] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 2832593371
+          [1692617790.900398][31584:31586] CHIP:TOO:   DeviceTypeList: 2 entries
+          [1692617790.900410][31584:31586] CHIP:TOO:     [1]: {
+          [1692617790.900413][31584:31586] CHIP:TOO:       DeviceType: 256
+          [1692617790.900416][31584:31586] CHIP:TOO:       Revision: 1
+          [1692617790.900419][31584:31586] CHIP:TOO:      }
+          [1692617790.900423][31584:31586] CHIP:TOO:     [2]: {
+          [1692617790.900425][31584:31586] CHIP:TOO:       DeviceType: 17
+          [1692617790.900428][31584:31586] CHIP:TOO:       Revision: 1
+          [1692617790.900430][31584:31586] CHIP:TOO:      }
+
+          ./chip-tool descriptor read parts-list 1 2
+
+          Verify parts-list response contains 0 entries on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
+
+          [1660127879.565330][46472:46477] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 1237610137
+          [1660127879.565473][46472:46477] CHIP:TOO:   parts list: 0 entries
+
+          ./chip-tool descriptor read device-type-list 1 2
+
+          On TH (Chip-tool) log, Verify that  the DeviceTypeList count is at least one.
+            - If the DeviceTypeList contains more than one Application Device Type, verify that all the Application Device Types are part of the same superset.
+            - Verify the DeviceTypeList does not contain the Root Node Device Type.
+            - Revision value  is not less than 1 and it should match the Revision of the DeviceType and below is the sample log provided for the raspi platform
+
+          [1692618454.794870][31669:31671] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1103199808
+          [1692618454.794946][31669:31671] CHIP:TOO:   DeviceTypeList: 2 entries
+          [1692618454.794990][31669:31671] CHIP:TOO:     [1]: {
+          [1692618454.795027][31669:31671] CHIP:TOO:       DeviceType: 256
+          [1692618454.795038][31669:31671] CHIP:TOO:       Revision: 1
+          [1692618454.795048][31669:31671] CHIP:TOO:      }
+          [1692618454.795063][31669:31671] CHIP:TOO:     [2]: {
+          [1692618454.795072][31669:31671] CHIP:TOO:       DeviceType: 17
+          [1692618454.795080][31669:31671] CHIP:TOO:       Revision: 1
+          [1692618454.795089][31669:31671] CHIP:TOO:      }
+      disabled: true
+
+    - label: "Step 2: TH reads 'ServerList' attribute."
+      PICS: DESC.S.A0001
+      verification: |
+          For all the Endpoint id’s listed in step 1a run the following steps. For all the server list entries listed in the output - Convert them to Hex values. For example 29 is 0x001D. Verify that these are also present in the device_type.json. Every server cluster listed in the JSON should correspond to a number here in the output.
+
+          The cluster ID's listed in the below log is from the All-Cluster-app. Please run the below command in all the Reference apps (bridge-app, tv-app, microwave-oven-app, Lock-app, Energy-Management-app and Thermostat-app).
+
+          ./chip-tool descriptor read server-list 1 1
+
+          Verify ServerList entries on the TH (Chip-tool) and below is the sample log provided for the raspi platform,
+
+          [1707996554.409850][20755:20757] CHIP:DMG: }
+          [1707996554.410814][20755:20757] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0001 DataVersion: 3583190746
+          [1707996554.410955][20755:20757] CHIP:TOO:   ServerList: 71 entries
+          [1707996554.410990][20755:20757] CHIP:TOO:     [1]: 3
+          [1707996554.411002][20755:20757] CHIP:TOO:     [2]: 4
+          [1707996554.411013][20755:20757] CHIP:TOO:     [3]: 6
+          [1707996554.411024][20755:20757] CHIP:TOO:     [4]: 7
+          [1707996554.411034][20755:20757] CHIP:TOO:     [5]: 8
+          [1707996554.411045][20755:20757] CHIP:TOO:     [6]: 15
+          [1707996554.411056][20755:20757] CHIP:TOO:     [7]: 29
+          [1707996554.411067][20755:20757] CHIP:TOO:     [8]: 30
+          [1707996554.411078][20755:20757] CHIP:TOO:     [9]: 37
+          [1707996554.411092][20755:20757] CHIP:TOO:     [10]: 47
+          [1707996554.411103][20755:20757] CHIP:TOO:     [11]: 59
+          [1707996554.411113][20755:20757] CHIP:TOO:     [12]: 64
+          [1707996554.411124][20755:20757] CHIP:TOO:     [13]: 65
+          [1707996554.411135][20755:20757] CHIP:TOO:     [14]: 69
+          [1707996554.411146][20755:20757] CHIP:TOO:     [15]: 72
+          [1707996554.411156][20755:20757] CHIP:TOO:     [16]: 73
+          [1707996554.411167][20755:20757] CHIP:TOO:     [17]: 74
+          [1707996554.411177][20755:20757] CHIP:TOO:     [18]: 80
+          [1707996554.411188][20755:20757] CHIP:TOO:     [19]: 81
+          [1707996554.411199][20755:20757] CHIP:TOO:     [20]: 82
+          [1707996554.411209][20755:20757] CHIP:TOO:     [21]: 83
+          [1707996554.411220][20755:20757] CHIP:TOO:     [22]: 84
+          [1707996554.411231][20755:20757] CHIP:TOO:     [23]: 85
+          [1707996554.411240][20755:20757] CHIP:TOO:     [24]: 86
+          [1707996554.411251][20755:20757] CHIP:TOO:     [25]: 87
+          [1707996554.411261][20755:20757] CHIP:TOO:     [26]: 89
+          [1707996554.411271][20755:20757] CHIP:TOO:     [27]: 91
+          [1707996554.411282][20755:20757] CHIP:TOO:     [28]: 92
+          [1707996554.411293][20755:20757] CHIP:TOO:     [29]: 93
+          [1707996554.411303][20755:20757] CHIP:TOO:     [30]: 94
+          [1707996554.411313][20755:20757] CHIP:TOO:     [31]: 96
+          [1707996554.411323][20755:20757] CHIP:TOO:     [32]: 97
+          [1707996554.411334][20755:20757] CHIP:TOO:     [33]: 98
+          [1707996554.411345][20755:20757] CHIP:TOO:     [34]: 113
+          [1707996554.411355][20755:20757] CHIP:TOO:     [35]: 114
+          [1707996554.411367][20755:20757] CHIP:TOO:     [36]: 128
+          [1707996554.411376][20755:20757] CHIP:TOO:     [37]: 129
+          [1707996554.411387][20755:20757] CHIP:TOO:     [38]: 144
+          [1707996554.411396][20755:20757] CHIP:TOO:     [39]: 145
+          [1707996554.411406][20755:20757] CHIP:TOO:     [40]: 152
+          [1707996554.411417][20755:20757] CHIP:TOO:     [41]: 153
+          [1707996554.411427][20755:20757] CHIP:TOO:     [42]: 157
+          [1707996554.411437][20755:20757] CHIP:TOO:     [43]: 159
+          [1707996554.411449][20755:20757] CHIP:TOO:     [44]: 258
+          [1707996554.411459][20755:20757] CHIP:TOO:     [45]: 259
+          [1707996554.411469][20755:20757] CHIP:TOO:     [46]: 512
+          [1707996554.411480][20755:20757] CHIP:TOO:     [47]: 513
+          [1707996554.411490][20755:20757] CHIP:TOO:     [48]: 514
+          [1707996554.411500][20755:20757] CHIP:TOO:     [49]: 516
+          [1707996554.411511][20755:20757] CHIP:TOO:     [50]: 768
+          [1707996554.411521][20755:20757] CHIP:TOO:     [51]: 769
+          [1707996554.411532][20755:20757] CHIP:TOO:     [52]: 1024
+          [1707996554.411559][20755:20757] CHIP:TOO:     [53]: 1026
+          [1707996554.411562][20755:20757] CHIP:TOO:     [54]: 1027
+          [1707996554.411565][20755:20757] CHIP:TOO:     [55]: 1028
+          [1707996554.411568][20755:20757] CHIP:TOO:     [56]: 1029
+          [1707996554.411571][20755:20757] CHIP:TOO:     [57]: 1030
+          [1707996554.411575][20755:20757] CHIP:TOO:     [58]: 1036
+          [1707996554.411578][20755:20757] CHIP:TOO:     [59]: 1037
+          [1707996554.411581][20755:20757] CHIP:TOO:     [60]: 1043
+          [1707996554.411584][20755:20757] CHIP:TOO:     [61]: 1045
+          [1707996554.411587][20755:20757] CHIP:TOO:     [62]: 1066
+          [1707996554.411589][20755:20757] CHIP:TOO:     [63]: 1067
+          [1707996554.411592][20755:20757] CHIP:TOO:     [64]: 1068
+          [1707996554.411595][20755:20757] CHIP:TOO:     [65]: 1069
+          [1707996554.411598][20755:20757] CHIP:TOO:     [66]: 1070
+          [1707996554.411601][20755:20757] CHIP:TOO:     [67]: 1071
+          [1707996554.411604][20755:20757] CHIP:TOO:     [68]: 1283
+          [1707996554.411607][20755:20757] CHIP:TOO:     [69]: 1288
+          [1707996554.411610][20755:20757] CHIP:TOO:     [70]: 2820
+          [1707996554.411613][20755:20757] CHIP:TOO:     [71]: 4294048773
+
+
+          ./chip-tool descriptor read server-list 1 2
+
+          Verify ServerList entries on TH (Chip-tool) Log and below is the sample log provided for the raspi platform, Here ServerList entries are 7.
+
+          [1692618559.962829][31688:31690] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0001 DataVersion: 1103199808
+          [1692618559.962884][31688:31690] CHIP:TOO:   ServerList: 7 entries
+          [1692618559.962910][31688:31690] CHIP:TOO:     [1]: 3
+          [1692618559.962922][31688:31690] CHIP:TOO:     [2]: 4
+          [1692618559.962933][31688:31690] CHIP:TOO:     [3]: 5
+          [1692618559.962945][31688:31690] CHIP:TOO:     [4]: 6
+          [1692618559.962955][31688:31690] CHIP:TOO:     [5]: 29
+          [1692618559.962966][31688:31690] CHIP:TOO:     [6]: 47
+          [1692618559.962978][31688:31690] CHIP:TOO:     [7]: 1030
+      disabled: true
+
+    - label: "Step 3: TH reads 'ClientList' attribute"
+      PICS: DESC.S.A0002
+      verification: |
+          For all the Endpoint id’s listed in step 1a run the following steps. For all the client list entries listed in the output - Convert them to Hex values. For example 29 is 0x001D. Verify that these are also present in the device_type.json. Every server cluster listed in the JSON should correspond to a number here in the output.
+
+          The cluster ID's listed in the below log is from the All-Cluster-app. Please run the below command in all the Reference apps (bridge-app, tv-app, microwave-oven-app, Lock-app, Energy-Management-app and Thermostat-app).
+
+          ./chip-tool descriptor read client-list 1 1
+
+          Verify client list entries on the TH (Chip-tool) and below is the sample log provided for the raspi platform, Here ClientList entries are 1.
+
+          [1676367470.160199][9805:9807] CHIP:DMG: }
+          [1676367470.160268][9805:9807] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0002 DataVersion: 3336430903
+          [1676367470.160282][9805:9807] CHIP:TOO:   ClientList: 1 entries
+          [1676367470.160289][9805:9807] CHIP:TOO:     [1]: 6
+
+          ./chip-tool descriptor read client-list 1 2
+
+          Verify client list entries on the TH (Chip-tool) and below is the sample log provided for the raspi platform, Here ClientList entries are 0.
+
+          [1660146160.390200][46818:46823] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0002 DataVersion: 1051414887
+          [1660146160.390211][46818:46823] CHIP:TOO:   ClientList: 0 entries
+      disabled: true
+
+    - label: "Step 4: TH reads 'PartsList' attribute."
+      PICS: DESC.S.A0003
+      verification: |
+          ./chip-tool descriptor read  parts-list 1 0
+
+          Verify PartsList response  greater than 0 and  Endpoint is in the range of 1 to 65534 on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
+
+          [1672919326.178697][33468:33470] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 2847656117
+          [1672919326.178739][33468:33470] CHIP:TOO:   PartsList: 2 entries
+          [1672919326.178765][33468:33470] CHIP:TOO:     [1]: 1
+          [1672919326.178777][33468:33470] CHIP:TOO:     [2]: 2
+      disabled: true
+
+    - label: "Step 5: TH reads from the DUT the 'TagList' attribute."
+      PICS: DESC.S.A0004
+      verification: |
+          ./chip-tool descriptor read tag-list 1 0
+
+          - Verify that the DUT response contains a TagList and SHALL contain at least one element.
+          - Read each TagStruct from the list and check for the following:
+            - Number of entries in TagList is in the range of 1 to 6 and each entry contains at least a NamespaceID and a Tag property. Confirm that each entry is unique (i.e. no duplicate tags).
+            - If the MfgCode field is not null, confirm that it is the Vendor ID of the manufacturer who has defined a certain namespace and that the NamespaceID field indicates which namespace from the manufacturer is associated with the Tag field.
+            - Confirm that each non-manufacturer specific tag is from a namespace defined in the spec (either from an common namespace or from a namespace for the particular device type).
+            - If a manufacturer specific Tag field is indicated, at least one standardized tag which is not from any manufacturer’s namespace shall be included in the TagList.
+            - Tag field is the ID of a semantic tag within the namespace indicated by the NamespaceID property.
+
+          [1692959866.253223][12664:12666] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0004 DataVersion: 2088189574
+          [1692959866.253237][12664:12666] CHIP:TOO:   TagList: 2 entries
+          [1692959866.253248][12664:12666] CHIP:TOO:     [1]: {
+          [1692959866.253251][12664:12666] CHIP:TOO:       MfgCode: null
+          [1692959866.253255][12664:12666] CHIP:TOO:       NamespaceID: 7
+          [1692959866.253257][12664:12666] CHIP:TOO:       Tag: 0
+          [1692959866.253260][12664:12666] CHIP:TOO:      }
+          [1692959866.253265][12664:12666] CHIP:TOO:     [2]: {
+          [1692959866.253267][12664:12666] CHIP:TOO:       MfgCode: null
+          [1692959866.253270][12664:12666] CHIP:TOO:       NamespaceID: 8
+          [1692959866.253272][12664:12666] CHIP:TOO:       Tag: 3
+          [1692959866.253274][12664:12666] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Step 5: The cluster tests applicable to each Device Type should be
+          executed to make sure all mandatory (and applicable optional)
+          attributes/commands are implemented."
+      verification: |
+          This step is redundant as during certification the appropriate tests are being run
+      disabled: true

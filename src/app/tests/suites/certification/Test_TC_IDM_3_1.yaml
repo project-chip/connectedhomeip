@@ -1,0 +1,398 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.3.1. [TC-IDM-3.1] Write Request Action from DUT to TH. [DUT as Client]
+
+PICS:
+    - MCORE.IDM.C.WriteRequest
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label:
+          "Step 1: DUT sends the WriteRequestMessage to the TH to modify one
+          attribute data +"
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+
+           ./chip-tool levelcontrol write on-level 2 1 1
+
+          On TH(reference app) Verify that the correct WriteRequestMessage has been received for the data sent in the above command
+
+          [1655795552.551487][7331:7331] CHIP:EM: Handling via exchange: 41640r, Delegate: 0xaaaad9aed418
+          [1655795552.551552][7331:7331] CHIP:IM: Received Write request
+          [1655795552.551589][7331:7331] CHIP:DMG: IM WH moving to [Initialized]
+          [1655795552.551669][7331:7331] CHIP:DMG: WriteRequestMessage =
+          [1655795552.551710][7331:7331] CHIP:DMG: {
+          [1655795552.551747][7331:7331] CHIP:DMG:         suppressResponse = false,
+          [1655795552.551791][7331:7331] CHIP:DMG:         timedRequest = false,
+          [1655795552.551832][7331:7331] CHIP:DMG:         AttributeDataIBs =
+          [1655795552.551882][7331:7331] CHIP:DMG:         [
+          [1655795552.551921][7331:7331] CHIP:DMG:                 AttributeDataIB =
+          [1655795552.551966][7331:7331] CHIP:DMG:                 {
+          [1655795552.552009][7331:7331] CHIP:DMG:                         AttributePathIB =
+          [1655795552.552072][7331:7331] CHIP:DMG:                         {
+          [1655795552.552125][7331:7331] CHIP:DMG:                                 Endpoint = 0x1,
+          [1655795552.552180][7331:7331] CHIP:DMG:                                 Cluster = 0x8,
+          [1655795552.552234][7331:7331] CHIP:DMG:                                 Attribute = 0x0000_0011,
+          [1655795552.552275][7331:7331] CHIP:DMG:                         }
+          [1655795552.552327][7331:7331] CHIP:DMG:
+          [1655795552.552381][7331:7331] CHIP:DMG:                         Data = 2,
+          [1655795552.552428][7331:7331] CHIP:DMG:                 },
+          [1655795552.552478][7331:7331] CHIP:DMG:
+          [1655795552.552517][7331:7331] CHIP:DMG:         ],
+          [1655795552.552564][7331:7331] CHIP:DMG:
+          [1655795552.552605][7331:7331] CHIP:DMG:         moreChunkedMessages = false,
+          [1655795552.552647][7331:7331] CHIP:DMG:         InteractionModelRevision = 1
+          [1655795552.552686][7331:7331] CHIP:DMG: },
+      disabled: true
+
+    - label:
+          "Step 2: DUT sends the WriteRequestMessage to the TH to modify one
+          attribute on all Endpoints. On receipt of this message, TH should
+          modify the attribute and send a WriteResponseMessage to the DUT."
+      verification: |
+          Out of Scope for V1.0
+      disabled: true
+
+    - label:
+          "Step 3: DUT sends the WriteRequestMessage to the TH to write an
+          attribute of data type bool. +"
+      PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_Bool
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+           ./chip-tool  basicinformation write local-config-disabled 1 1 0
+
+
+          On TH(reference app) Verify that the correct WriteRequestMessage has been received for the data sent in the above command
+
+          [1655795795.033946][7331:7331] CHIP:EM: Handling via exchange: 11668r, Delegate: 0xaaaad9aed418
+          [1655795795.034011][7331:7331] CHIP:IM: Received Write request
+          [1655795795.034050][7331:7331] CHIP:DMG: IM WH moving to [Initialized]
+          [1655795795.034127][7331:7331] CHIP:DMG: WriteRequestMessage =
+          [1655795795.034168][7331:7331] CHIP:DMG: {
+          [1655795795.034206][7331:7331] CHIP:DMG:         suppressResponse = false,
+          [1655795795.034250][7331:7331] CHIP:DMG:         timedRequest = false,
+          [1655795795.034290][7331:7331] CHIP:DMG:         AttributeDataIBs =
+          [1655795795.034340][7331:7331] CHIP:DMG:         [
+          [1655795795.034380][7331:7331] CHIP:DMG:                 AttributeDataIB =
+          [1655795795.034425][7331:7331] CHIP:DMG:                 {
+          [1655795795.034467][7331:7331] CHIP:DMG:                         AttributePathIB =
+          [1655795795.034515][7331:7331] CHIP:DMG:                         {
+          [1655795795.034568][7331:7331] CHIP:DMG:                                 Endpoint = 0x0,
+          [1655795795.034625][7331:7331] CHIP:DMG:                                 Cluster = 0x28,
+          [1655795795.034680][7331:7331] CHIP:DMG:                                 Attribute = 0x0000_0010,
+          [1655795795.034737][7331:7331] CHIP:DMG:                         }
+          [1655795795.034784][7331:7331] CHIP:DMG:
+          [1655795795.034834][7331:7331] CHIP:DMG:                         Data = true,
+          [1655795795.034880][7331:7331] CHIP:DMG:                 },
+          [1655795795.034929][7331:7331] CHIP:DMG:
+          [1655795795.034968][7331:7331] CHIP:DMG:         ],
+          [1655795795.035015][7331:7331] CHIP:DMG:
+          [1655795795.035056][7331:7331] CHIP:DMG:         moreChunkedMessages = false,
+          [1655795795.035099][7331:7331] CHIP:DMG:         InteractionModelRevision = 1
+          [1655795795.035138][7331:7331] CHIP:DMG: },
+          [1655795795.035259][7331:7331] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=m
+      disabled: true
+
+    - label:
+          "Step 4: DUT sends the WriteRequestMessage to the TH to write an
+          attribute of data type string. +"
+      PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_String
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+           ./chip-tool basicinformation write node-label node 1 0
+
+
+          On TH(reference app) Verify that the correct WriteRequestMessage has been received for the data sent in the above command
+
+          [1655796035.022296][7331:7331] CHIP:EM: Handling via exchange: 64908r, Delegate: 0xaaaad9aed418
+          [1655796035.022365][7331:7331] CHIP:IM: Received Write request
+          [1655796035.022407][7331:7331] CHIP:DMG: IM WH moving to [Initialized]
+          [1655796035.022494][7331:7331] CHIP:DMG: WriteRequestMessage =
+          [1655796035.022541][7331:7331] CHIP:DMG: {
+          [1655796035.022584][7331:7331] CHIP:DMG:         suppressResponse = false,
+          [1655796035.022633][7331:7331] CHIP:DMG:         timedRequest = false,
+          [1655796035.022679][7331:7331] CHIP:DMG:         AttributeDataIBs =
+          [1655796035.022735][7331:7331] CHIP:DMG:         [
+          [1655796035.022780][7331:7331] CHIP:DMG:                 AttributeDataIB =
+          [1655796035.022831][7331:7331] CHIP:DMG:                 {
+          [1655796035.022879][7331:7331] CHIP:DMG:                         AttributePathIB =
+          [1655796035.022939][7331:7331] CHIP:DMG:                         {
+          [1655796035.022999][7331:7331] CHIP:DMG:                                 Endpoint = 0x0,
+          [1655796035.023067][7331:7331] CHIP:DMG:                                 Cluster = 0x28,
+          [1655796035.023134][7331:7331] CHIP:DMG:                                 Attribute = 0x0000_0005,
+          [1655796035.023192][7331:7331] CHIP:DMG:                         }
+          [1655796035.023252][7331:7331] CHIP:DMG:
+          [1655796035.023313][7331:7331] CHIP:DMG:                         Data = "node",
+          [1655796035.023366][7331:7331] CHIP:DMG:                 },
+          [1655796035.023421][7331:7331] CHIP:DMG:
+          [1655796035.023466][7331:7331] CHIP:DMG:         ],
+          [1655796035.023519][7331:7331] CHIP:DMG:
+          [1655796035.023565][7331:7331] CHIP:DMG:         moreChunkedMessages = false,
+          [1655796035.023613][7331:7331] CHIP:DMG:         InteractionModelRevision = 1
+          [1655796035.023656][7331:7331] CHIP:DMG: },
+          [1655796035.023791][7331:7331] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=m
+          [1655796035.023851][7331:7331] CHIP:DMG: AccessControl: allowed
+      disabled: true
+
+    - label:
+          "Step 5: DUT sends the WriteRequestMessage to the TH to write an
+          attribute of data type unsigned integer. +"
+      PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_UnsignedInteger
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool any write-by-id  0x0008 0x0010 1 1 1
+
+          On TH(reference app) Verify that the correct WriteRequestMessage has been received for the data sent in the above command
+
+          [1655796141.166846][7331:7331] CHIP:IM: Received Write request
+          [1655796141.166889][7331:7331] CHIP:DMG: IM WH moving to [Initialized]
+          [1655796141.166973][7331:7331] CHIP:DMG: WriteRequestMessage =
+          [1655796141.167019][7331:7331] CHIP:DMG: {
+          [1655796141.167062][7331:7331] CHIP:DMG:         suppressResponse = false,
+          [1655796141.167111][7331:7331] CHIP:DMG:         timedRequest = false,
+          [1655796141.167155][7331:7331] CHIP:DMG:         AttributeDataIBs =
+          [1655796141.167211][7331:7331] CHIP:DMG:         [
+          [1655796141.167255][7331:7331] CHIP:DMG:                 AttributeDataIB =
+          [1655796141.167311][7331:7331] CHIP:DMG:                 {
+          [1655796141.167362][7331:7331] CHIP:DMG:                         AttributePathIB =
+          [1655796141.167421][7331:7331] CHIP:DMG:                         {
+          [1655796141.167479][7331:7331] CHIP:DMG:                                 Endpoint = 0x1,
+          [1655796141.167542][7331:7331] CHIP:DMG:                                 Cluster = 0x8,
+          [1655796141.167603][7331:7331] CHIP:DMG:                                 Attribute = 0x0000_0010,
+          [1655796141.167660][7331:7331] CHIP:DMG:                         }
+          [1655796141.167719][7331:7331] CHIP:DMG:
+          [1655796141.167782][7331:7331] CHIP:DMG:                         Data = 1,
+          [1655796141.167836][7331:7331] CHIP:DMG:                 },
+          [1655796141.167890][7331:7331] CHIP:DMG:
+          [1655796141.167933][7331:7331] CHIP:DMG:         ],
+          [1655796141.167987][7331:7331] CHIP:DMG:
+          [1655796141.168032][7331:7331] CHIP:DMG:         moreChunkedMessages = false,
+          [1655796141.168079][7331:7331] CHIP:DMG:         InteractionModelRevision = 1
+          [1655796141.168121][7331:7331] CHIP:DMG: },
+          [1655796141.168253][7331:7331] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0008 e=1 p=o
+          [1655796141.168313][7331:7331] CHIP:DMG: AccessControl: allowed
+      disabled: true
+
+    - label:
+          "Step 6: DUT sends the WriteRequestMessage to the TH to write an
+          attribute of data type signed integer. +"
+      PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_SignedInteger
+      verification: |
+          DUT implementation required to verify write an attribute of data type signed integer.
+
+          If the Vendor DUT doesn't implement/supported this attribute, Please mark the test step as "Not Applicable"
+      disabled: true
+
+    - label:
+          "Step 7: DUT sends the WriteRequestMessage to the TH to write an
+          attribute of data type floating point. +"
+      PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_FloatingPoint
+      verification: |
+          DUT implementation required to verify write an attribute of data type float
+
+          If the Vendor DUT doesn't implement/supported this attribute, Please mark the test step as "Not Applicable"
+      disabled: true
+
+    - label:
+          "Step 8: DUT sends the WriteRequestMessage to the TH to write an
+          attribute of data type Octet String. +"
+      PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_OctetString
+      verification: |
+          DUT implementation required to verify write an attribute of data type Octet String
+
+          If the Vendor DUT doesn't implement/supported this attribute, Please mark the test step as "Not Applicable"
+      disabled: true
+
+    - label:
+          "Step 9: DUT sends the WriteRequestMessage to the TH to write an
+          attribute of data type Struct. +"
+      PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_Struct
+      verification: |
+          DUT implementation required to verify write an attribute ofdata type Struct
+
+          If the Vendor DUT doesn't implement/supported this attribute, Please mark the test step as "Not Applicable"
+      disabled: true
+
+    - label:
+          "Step 10: DUT sends the WriteRequestMessage to the TH to write an
+          attribute of data type List. +"
+      PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_List
+      verification: |
+          DUT implementation required to verify write an attribute of  data type List
+
+          If the Vendor DUT doesn't implement/supported this attribute, Please mark the test step as "Not Applicable"
+      disabled: true
+
+    - label:
+          "Step 11: DUT sends the WriteRequestMessage to the TH to write an
+          attribute of data type enum. +"
+      PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_Enum
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+           ./chip-tool any write-by-id 0x0204 0  1  1 1
+
+
+          On TH(reference app) Verify that the correct WriteRequestMessage has been received for the data sent in the above command
+
+          [1655796297.607841][7331:7331] CHIP:EM: Handling via exchange: 37495r, Delegate: 0xaaaad9aed418
+          [1655796297.607911][7331:7331] CHIP:IM: Received Write request
+          [1655796297.607954][7331:7331] CHIP:DMG: IM WH moving to [Initialized]
+          [1655796297.608038][7331:7331] CHIP:DMG: WriteRequestMessage =
+          [1655796297.608086][7331:7331] CHIP:DMG: {
+          [1655796297.608128][7331:7331] CHIP:DMG:         suppressResponse = false,
+          [1655796297.608178][7331:7331] CHIP:DMG:         timedRequest = false,
+          [1655796297.608222][7331:7331] CHIP:DMG:         AttributeDataIBs =
+          [1655796297.608278][7331:7331] CHIP:DMG:         [
+          [1655796297.608323][7331:7331] CHIP:DMG:                 AttributeDataIB =
+          [1655796297.608383][7331:7331] CHIP:DMG:                 {
+          [1655796297.608431][7331:7331] CHIP:DMG:                         AttributePathIB =
+          [1655796297.608491][7331:7331] CHIP:DMG:                         {
+          [1655796297.608549][7331:7331] CHIP:DMG:                                 Endpoint = 0x1,
+          [1655796297.608618][7331:7331] CHIP:DMG:                                 Cluster = 0x204,
+          [1655796297.608685][7331:7331] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1655796297.608749][7331:7331] CHIP:DMG:                         }
+          [1655796297.608810][7331:7331] CHIP:DMG:
+          [1655796297.608869][7331:7331] CHIP:DMG:                         Data = 1,
+          [1655796297.608923][7331:7331] CHIP:DMG:                 },
+          [1655796297.608981][7331:7331] CHIP:DMG:
+          [1655796297.609025][7331:7331] CHIP:DMG:         ],
+          [1655796297.609078][7331:7331] CHIP:DMG:
+          [1655796297.609124][7331:7331] CHIP:DMG:         moreChunkedMessages = false,
+          [1655796297.609171][7331:7331] CHIP:DMG:         InteractionModelRevision = 1
+          [1655796297.609214][7331:7331] CHIP:DMG: },
+          [1655796297.609342][7331:7331] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0204 e=1 p=o
+          [1655796297.609403][7331:7331] CHIP:DMG: AccessControl: allowed
+      disabled: true
+
+    - label:
+          "Step 12: DUT sends the WriteRequestMessage to the TH to write an
+          attribute of data type bitmap. +"
+      PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_Bitmap
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool colorcontrol write-by-id 0x000f 1 1 1
+
+
+          On TH(reference app) Verify that the correct WriteRequestMessage has been received for the data sent in the above command
+
+          [1655796429.696904][7331:7331] CHIP:IM: Received Write request
+          [1655796429.696947][7331:7331] CHIP:DMG: IM WH moving to [Initialized]
+          [1655796429.697031][7331:7331] CHIP:DMG: WriteRequestMessage =
+          [1655796429.697078][7331:7331] CHIP:DMG: {
+          [1655796429.697121][7331:7331] CHIP:DMG:         suppressResponse = false,
+          [1655796429.697170][7331:7331] CHIP:DMG:         timedRequest = false,
+          [1655796429.697215][7331:7331] CHIP:DMG:         AttributeDataIBs =
+          [1655796429.697270][7331:7331] CHIP:DMG:         [
+          [1655796429.697315][7331:7331] CHIP:DMG:                 AttributeDataIB =
+          [1655796429.697370][7331:7331] CHIP:DMG:                 {
+          [1655796429.697422][7331:7331] CHIP:DMG:                         AttributePathIB =
+          [1655796429.697487][7331:7331] CHIP:DMG:                         {
+          [1655796429.697582][7331:7331] CHIP:DMG:                                 Endpoint = 0x1,
+          [1655796429.697650][7331:7331] CHIP:DMG:                                 Cluster = 0x300,
+          [1655796429.697718][7331:7331] CHIP:DMG:                                 Attribute = 0x0000_000F,
+          [1655796429.697781][7331:7331] CHIP:DMG:                         }
+          [1655796429.697843][7331:7331] CHIP:DMG:
+          [1655796429.697910][7331:7331] CHIP:DMG:                         Data = 1,
+          [1655796429.697963][7331:7331] CHIP:DMG:                 },
+          [1655796429.698021][7331:7331] CHIP:DMG:
+          [1655796429.698065][7331:7331] CHIP:DMG:         ],
+          [1655796429.698118][7331:7331] CHIP:DMG:
+          [1655796429.698163][7331:7331] CHIP:DMG:         moreChunkedMessages = false,
+          [1655796429.698210][7331:7331] CHIP:DMG:         InteractionModelRevision = 1
+          [1655796429.698252][7331:7331] CHIP:DMG: },
+          [1655796429.698386][7331:7331] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=o
+          [1655796429.698446][7331:7331] CHIP:DMG: AccessControl: allowed
+      disabled: true
+
+    - label:
+          "Step 13: DUT sends a WriteRequestMessage to the TH with a large list
+          of attribute data, which is larger than 1 MTU(1280 bytes), that has to
+          be sent in multiple messages."
+      verification: |
+          DUT implementation required to verify write an attribute which is is larger than 1 MTU(1280 bytes)
+          Here is an example command to verify the write functionality. User must choose an attribute which has large list of attribute data.
+           ./chip-tool  basicinformation write node-label node 1 0
+
+          If the Vendor DUT doesn't implement/supported this attribute, Please mark the test step as "\Not Applicable\"
+      disabled: true
+
+    - label:
+          "Step 14: DUT sends the WriteRequestMessage to the TH to write one
+          attribute on a given cluster and endpoint. Repeat the above steps 3
+          times."
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool any write-by-id 0x0204 0  1  1 1
+
+          On TH(reference app) Verify that the correct WriteRequestMessage has been received for the data sent in the above command
+
+          [1655796724.510633][7331:7331] CHIP:EM: Handling via exchange: 51058r, Delegate: 0xaaaad9aed418
+          [1655796724.510711][7331:7331] CHIP:IM: Received Write request
+          [1655796724.510759][7331:7331] CHIP:DMG: IM WH moving to [Initialized]
+          [1655796724.510853][7331:7331] CHIP:DMG: WriteRequestMessage =
+          [1655796724.510907][7331:7331] CHIP:DMG: {
+          [1655796724.510955][7331:7331] CHIP:DMG:         suppressResponse = false,
+          [1655796724.511023][7331:7331] CHIP:DMG:         timedRequest = false,
+          [1655796724.511076][7331:7331] CHIP:DMG:         AttributeDataIBs =
+          [1655796724.511140][7331:7331] CHIP:DMG:         [
+          [1655796724.511191][7331:7331] CHIP:DMG:                 AttributeDataIB =
+          [1655796724.511253][7331:7331] CHIP:DMG:                 {
+          [1655796724.511312][7331:7331] CHIP:DMG:                         AttributePathIB =
+          [1655796724.511379][7331:7331] CHIP:DMG:                         {
+          [1655796724.511446][7331:7331] CHIP:DMG:                                 Endpoint = 0x1,
+          [1655796724.511520][7331:7331] CHIP:DMG:                                 Cluster = 0x204,
+          [1655796724.511592][7331:7331] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1655796724.511659][7331:7331] CHIP:DMG:                         }
+          [1655796724.511731][7331:7331] CHIP:DMG:
+          [1655796724.511801][7331:7331] CHIP:DMG:                         Data = 1,
+          [1655796724.511864][7331:7331] CHIP:DMG:                 },
+          [1655796724.511930][7331:7331] CHIP:DMG:
+          [1655796724.511980][7331:7331] CHIP:DMG:         ],
+          [1655796724.512041][7331:7331] CHIP:DMG:
+          [1655796724.512093][7331:7331] CHIP:DMG:         moreChunkedMessages = false,
+          [1655796724.512146][7331:7331] CHIP:DMG:         InteractionModelRevision = 1
+          [1655796724.512195][7331:7331] CHIP:DMG: },
+          [1655796724.512344][7331:7331] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0204 e=1 p=o
+
+          Repeat the above steps 3 times.
+      disabled: true
+
+    - label:
+          "Step 15: DUT sends a ReadRequest message to the TH to read any
+          attribute on two clusters. TH returns with a report data action with
+          the attribute values and the dataversions of the clusters. DUT sends a
+          WriteRequestMessage to the DUT to both the clusters with the
+          appropriate dataversions(received in the previous step) to modify the
+          value of an attribute +"
+      verification: |
+          Out of Scope
+      disabled: true

@@ -1,0 +1,7 @@
+{{indent extraIndent~}}
+{{#if isFabricScoped~}} fabric_scoped {{/if~}}
+struct {{name}} {
+{{#zcl_struct_items}}
+  {{indent extraIndent~}} {{> idl_structure_member}}
+{{/zcl_struct_items}}
+{{indent extraIndent~}} }

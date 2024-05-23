@@ -1,0 +1,65 @@
+{{> header}}
+
+// Prevent multiple inclusion
+#pragma once
+
+/**** Cluster endpoint counts ****/
+{{#all_user_clusters}}
+#define MATTER_DM_{{as_delimited_macro define}}_{{as_delimited_macro side}}_ENDPOINT_COUNT ({{user_endpoint_count_by_cluster id side}})
+{{/all_user_clusters}}
+
+/**** Cluster Plugins ****/
+{{#all_user_clusters}}
+
+// Use this macro to check if the {{side}} side of the {{name}} cluster is included
+#define ZCL_USING_{{as_delimited_macro define}}_{{as_delimited_macro side}}
+#define MATTER_DM_PLUGIN_{{as_delimited_macro name}}_{{as_delimited_macro side}}
+{{#if (is_server side)}}
+#define MATTER_DM_PLUGIN_{{as_delimited_macro name}}
+{{/if}}
+{{#if (is_str_equal name "Color Control")}}
+{{#if (is_server side)}}
+// User options for {{side}} plugin {{name}}
+#define MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
+#define MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#define MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
+{{/if}}
+{{else if (is_str_equal name "IAS Zone")}}
+// User options for {{side}} plugin {{name}}
+{{#if (is_server side)}}
+#define MATTER_DM_PLUGIN_IAS_ZONE_SERVER_ZONE_TYPE 541
+{{else}}
+#define MATTER_DM_PLUGIN_IAS_ZONE_CLIENT_MAX_DEVICES 10
+{{/if}}
+{{else if (is_str_equal name "Level Control")}}
+{{#if (is_server side)}}
+// User options for {{side}} plugin {{name}}
+#define MATTER_DM_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL 254
+#define MATTER_DM_PLUGIN_LEVEL_CONTROL_MINIMUM_LEVEL 0
+#define MATTER_DM_PLUGIN_LEVEL_CONTROL_RATE 0
+{{/if}}
+{{else if (is_str_equal name "Scenes Management")}}
+{{#if (is_server side)}}
+// User options for {{side}} plugin {{name}}
+{{/if}}
+{{#all_user_cluster_generated_attributes}}
+{{#if (is_str_equal ../name clusterName)}}
+{{#if (is_str_equal name "FeatureMap")}}
+// Scenes FeatureMap Attribute Toggle Scenes Name feature
+// App cluster specs 1.4.4
+#define MATTER_CLUSTER_SCENE_NAME_SUPPORT_MASK 0x0001
+#define MATTER_CLUSTER_SCENE_NAME_SUPPORT ({{asHex defaultValue 4}} & MATTER_CLUSTER_SCENE_NAME_SUPPORT_MASK)
+// Scenes FeatureMap Table Size feature used for the SCENES_MANAGEMENT_TABLE_SIZE define
+// App cluster specs 1.4.4.2
+#define MATTER_CLUSTER_TABLE_SIZE_SUPPORT_MASK 0x0001
+#define MATTER_CLUSTER_TABLE_SIZE_SUPPORT ({{asHex defaultValue 4}} & MATTER_CLUSTER_TABLE_SIZE_SUPPORT_MASK)
+{{/if}}
+{{#if (is_str_equal name "SceneTableSize")}}
+// Cluster spec 1.4.8.7
+#define SCENES_MANAGEMENT_TABLE_SIZE {{defaultValue}}
+{{/if}}
+{{/if}}
+{{/all_user_cluster_generated_attributes}}
+{{/if}}
+
+{{/all_user_clusters}}

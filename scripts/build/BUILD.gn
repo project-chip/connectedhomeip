@@ -1,0 +1,75 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("//build_overrides/pigweed.gni")
+import("$dir_pw_build/python.gni")
+
+pw_python_package("build_examples") {
+  setup = [ "setup.py" ]
+  inputs = [
+    # Dependency for the unit test
+    "testdata/all_targets_linux_x64.txt",
+    "testdata/dry_run_android-arm64-chip-tool.txt",
+    "testdata/dry_run_efr32-brd4161a-light-rpc-no-version.txt",
+    "testdata/dry_run_esp32-devkitc-light-rpc.txt",
+    "testdata/dry_run_esp32-m5stack-all-clusters-minimal-rpc-ipv6only.txt",
+    "testdata/dry_run_linux-arm64-chip-tool-ipv6only-clang.txt",
+    "testdata/dry_run_linux-arm64-ota-requestor-nodeps-ipv6only.txt",
+    "testdata/dry_run_linux-x64-all-clusters-coverage.txt",
+    "testdata/dry_run_nrf-nrf52840dk-pump.txt",
+    "testdata/dry_run_openiotsdk-lock-mbedtls.txt",
+    "testdata/dry_run_openiotsdk-shell-mbedtls.txt",
+  ]
+
+  sources = [
+    "build/__init__.py",
+    "build/target.py",
+    "build/targets.py",
+    "build_examples.py",
+    "builders/__init__.py",
+    "builders/ameba.py",
+    "builders/android.py",
+    "builders/asr.py",
+    "builders/bouffalolab.py",
+    "builders/builder.py",
+    "builders/efr32.py",
+    "builders/esp32.py",
+    "builders/genio.py",
+    "builders/gn.py",
+    "builders/host.py",
+    "builders/imx.py",
+    "builders/infineon.py",
+    "builders/mbed.py",
+    "builders/mw320.py",
+    "builders/nrf.py",
+    "builders/nxp.py",
+    "builders/openiotsdk.py",
+    "builders/qpg.py",
+    "builders/rw61x.py",
+    "builders/telink.py",
+    "builders/tizen.py",
+    "runner/__init__.py",
+    "runner/printonly.py",
+    "runner/shell.py",
+  ]
+
+  tests = [
+    "test.py",
+    "test_glob_matcher.py",
+    "build/test_target.py",
+  ]
+}

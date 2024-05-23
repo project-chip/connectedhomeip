@@ -1,0 +1,1125 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 3.2.3. [TC-OO-2.3] Secondary functionality with server as DUT
+
+PICS:
+    - OO.S
+    - OO.S.F00
+
+config:
+    nodeId: 0x12344321
+    cluster: "On/Off"
+    timeout: 400
+    endpoint: 1
+
+    PIXIT.OO.MaxCommunicationTurnaround:
+        type: int16u
+        defaultValue: 10
+
+tests:
+    - label: "1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "2a: TH sends On command to DUT"
+      PICS: OO.S.C01.Rsp
+      command: "On"
+
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "2b: after a few seconds,TH reads OnOff attribute from DUT"
+      PICS: OO.S.A0000
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 1
+
+    - label: "2b: TH reads GlobalSceneControl attribute from DUT"
+      command: "readAttribute"
+      attribute: "GlobalSceneControl"
+      PICS: OO.S.A4000
+      response:
+          value: 1
+
+    - label:
+          "3a: TH sends OffWithEffect command to DUT with EffectIdentifier and
+          EffectVariant both set to 0x00"
+      command: "OffWithEffect"
+      PICS: OO.S.C40.Rsp
+      arguments:
+          values:
+              - name: "EffectIdentifier"
+                value: 0
+              - name: "EffectVariant"
+                value: 0
+
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "3b: after a few seconds,TH reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000 && OO.S.C40.Rsp
+      response:
+          value: 0
+
+    - label: "3b: TH reads GlobalSceneControl attribute from DUT"
+      command: "readAttribute"
+      attribute: "GlobalSceneControl"
+      PICS: OO.S.A4000 && OO.S.C40.Rsp
+      response:
+          value: 0
+
+    - label: "4a: TH sends OnWithRecallGlobalScene command to DUT"
+      command: "OnWithRecallGlobalScene"
+      PICS: OO.S.C41.Rsp
+
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "4b: after a few seconds,TH Reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000 && OO.S.C41.Rsp
+      response:
+          value: 1
+
+    - label: "4b: TH Reads GlobalSceneControl attribute from DUT"
+      command: "readAttribute"
+      attribute: "GlobalSceneControl"
+      PICS: OO.S.A4000 && OO.S.C41.Rsp
+      response:
+          value: 1
+
+    - label:
+          "5a: TH sends OffWithEffect command to DUT with EffectIdentifier and
+          EffectVariant both set to 0x00"
+      command: "OffWithEffect"
+      PICS: OO.S.C40.Rsp
+      arguments:
+          values:
+              - name: "EffectIdentifier"
+                value: 0
+              - name: "EffectVariant"
+                value: 0
+
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "5b: after a few seconds, TH reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000 &&  OO.S.C40.Rsp
+      response:
+          value: 0
+
+    - label: "5b: TH reads GlobalSceneControl attribute from DUT"
+      command: "readAttribute"
+      attribute: "GlobalSceneControl"
+      PICS: OO.S.A4000 && OO.S.C40.Rsp
+      response:
+          value: 0
+
+    - label: "5c: TH sends On command to DUT"
+      PICS: OO.S.C01.Rsp
+      command: "On"
+
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "5d: after a few seconds, TH reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000 && OO.S.C01.Rsp
+      response:
+          value: 1
+
+    - label: "5d: TH reads GlobalSceneControl attribute from DUT"
+      command: "readAttribute"
+      attribute: "GlobalSceneControl"
+      PICS: OO.S.A4000 && OO.S.C01.Rsp
+      response:
+          value: 1
+
+    - label:
+          "6a: TH sends OffWithEffect command to DUT with EffectIdentifier set
+          to 0x01 (dying light) and EffectVariant set to 0x00"
+      command: "OffWithEffect"
+      PICS: OO.S.C40.Rsp
+      arguments:
+          values:
+              - name: "EffectIdentifier"
+                value: 1
+              - name: "EffectVariant"
+                value: 0
+
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "6b: after a few seconds, TH reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000 && OO.S.C40.Rsp
+      response:
+          value: 0
+
+    - label: "6b: TH reads GlobalSceneControl attribute from DUT"
+      command: "readAttribute"
+      attribute: "GlobalSceneControl"
+      PICS: OO.S.A4000 && OO.S.C40.Rsp
+      response:
+          value: 0
+
+    - label: "7a: TH sends On command to DUT"
+      PICS: OO.S.C01.Rsp
+      command: "On"
+
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "7b: after a few seconds, TH reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000 && OO.S.C01.Rsp
+      response:
+          value: 1
+
+    - label: "7b: TH reads GlobalSceneControl attribute from DUT"
+      command: "readAttribute"
+      attribute: "GlobalSceneControl"
+      PICS: OO.S.A4000 && OO.S.C01.Rsp
+      response:
+          value: 1
+
+    - label: "7c: TH sends OnWithRecallGlobalScene command to DUT"
+      command: "OnWithRecallGlobalScene"
+      PICS: OO.S.C41.Rsp
+
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "7d: after a few seconds, TH reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000 && OO.S.C41.Rsp
+      response:
+          value: 1
+
+    - label: "7d: TH reads GlobalSceneControl attribute from DUT"
+      command: "readAttribute"
+      attribute: "GlobalSceneControl"
+      PICS: OO.S.A4000 && OO.S.C41.Rsp
+      response:
+          value: 1
+
+    - label: "8: TH reads  OnTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: OO.S.A4001
+      response:
+          value: 0
+
+    - label: "8: TH reads OffWaitTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: OO.S.A4002
+      response:
+          value: 0
+
+    - label:
+          "9a:TH sends OnWithTimedOff command to DUT with 1)OnOffControl: 0x01
+          (AcceptOnlyWhenOn 1) 2)OnTime: 0x012c (30s) 3)OffTime: 0x012c (30s)"
+      command: "OnWithTimedOff"
+      PICS: OO.S.C42.Rsp
+      arguments:
+          values:
+              - name: "OnOffControl"
+                value: 1
+              - name: "OnTime"
+                value: 300
+              - name: "OffWaitTime"
+                value: 300
+
+    - label: "9b:Reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000 && OO.S.C42.Rsp
+      response:
+          value: 1
+
+    #Refer comment https://github.com/project-chip/connectedhomeip/pull/30636#discussion_r1404396743
+    - label: "9b: Immediately TH reads OnTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: OO.S.A4001 && OO.S.C42.Rsp
+      response:
+          constraints:
+              minValue: 300 - ( 2 * PIXIT.OO.MaxCommunicationTurnaround )
+              maxValue: 300
+
+    - label: "9b: TH reads OffWaitTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: OO.S.A4002 && OO.S.C42.Rsp
+      response:
+          value: 300
+
+    - label:
+          "10a: TH sends OnWithTimedOff command to DUT with 1)OnOffControl: 0x01
+          (AcceptOnlyWhenOn 1) 2)OnTime: 0x012c (30s) 3)OffTime: 0x012c (30s)"
+      command: "OnWithTimedOff"
+      PICS: OO.S.C42.Rsp
+      arguments:
+          values:
+              - name: "OnOffControl"
+                value: 1
+              - name: "OnTime"
+                value: 300
+              - name: "OffWaitTime"
+                value: 300
+
+    - label: "Wait 10000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label:
+          "10b: After 10s, TH sends OnWithTimedOff command to DUT with
+          1)OnOffControl: 0x01 (AcceptOnlyWhenOn 1) 2)OnTime: 0x012c (30s)
+          3)OffTime: 0x012c (30s)"
+      command: "OnWithTimedOff"
+      PICS: OO.S.C42.Rsp
+      arguments:
+          values:
+              - name: "OnOffControl"
+                value: 1
+              - name: "OnTime"
+                value: 300
+              - name: "OffWaitTime"
+                value: 300
+
+    - label: "Wait 10000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label:
+          "10c: After 10s, TH sends OnWithTimedOff command to DUT with
+          1)OnOffControl: 0x01 (AcceptOnlyWhenOn 1) 2)OnTime: 0x012c (30s)
+          3)OffTime: 0x012c (30s)"
+      command: "OnWithTimedOff"
+      PICS: OO.S.C42.Rsp
+      arguments:
+          values:
+              - name: "OnOffControl"
+                value: 1
+              - name: "OnTime"
+                value: 300
+              - name: "OffWaitTime"
+                value: 300
+
+    - label: "Wait 10000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label:
+          "10d: After 10s, TH sends OnWithTimedOff command to DUT with
+          1)OnOffControl: 0x01 (AcceptOnlyWhenOn 1) 2)OnTime: 0x012c (30s)
+          3)OffTime: 0x012c (30s)"
+      command: "OnWithTimedOff"
+      PICS: OO.S.C42.Rsp
+      arguments:
+          values:
+              - name: "OnOffControl"
+                value: 1
+              - name: "OnTime"
+                value: 300
+              - name: "OffWaitTime"
+                value: 300
+
+    - label: "10e: Immediately TH reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000 && OO.S.C42.Rsp
+      response:
+          value: 1
+
+    #Refer comment: https://github.com/project-chip/connectedhomeip/pull/30636#discussion_r1404397738
+    - label: "10e: Immediately TH reads OnTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: OO.S.A4001 && OO.S.C42.Rsp
+      response:
+          constraints:
+              minValue: 300 - ( 2 * PIXIT.OO.MaxCommunicationTurnaround )
+              maxValue: 300
+
+    - label: "10e: Immediately TH reads OffWaitTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: OO.S.A4002 && OO.S.C42.Rsp
+      response:
+          value: 300
+
+    - label: "Wait 10000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label:
+          "11a: After 10s, TH sends OffWithEffect command to DUT with
+          EffectIdentifier and EffectVariant both set to 0x00"
+      command: "OffWithEffect"
+      PICS: OO.S.C40.Rsp
+      arguments:
+          values:
+              - name: "EffectIdentifier"
+                value: 0
+              - name: "EffectVariant"
+                value: 0
+
+    - label: "11b: Immediately TH reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000 && OO.S.C40.Rsp
+      response:
+          value: 0
+
+    - label: "11b:Immediately TH reads OnTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: OO.S.A4001 && OO.S.C40.Rsp
+      response:
+          value: 0
+
+    #Refer comment https://github.com/project-chip/connectedhomeip/pull/30636#discussion_r1404400479
+    - label: "11b: Immediately TH reads OffWaitTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: OO.S.A4002 && OO.S.C40.Rsp
+      response:
+          constraints:
+              minValue: 300 - ( 3 * PIXIT.OO.MaxCommunicationTurnaround )
+              maxValue: 300
+
+    - label: "Wait 10000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label:
+          "12a: After 10s, TH sends OnWithTimedOff command to DUT with
+          1)OnOffControl: 0x01 (AcceptOnlyWhenOn 1) 2)OnTime: 0x012c (30s)
+          3)OffTime: 0x012c (30s)"
+      command: "OnWithTimedOff"
+      PICS: OO.S.C42.Rsp
+      arguments:
+          values:
+              - name: "OnOffControl"
+                value: 1
+              - name: "OnTime"
+                value: 300
+              - name: "OffWaitTime"
+                value: 300
+
+    - label: "12b: Immediately TH reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000 && OO.S.C42.Rsp
+      response:
+          value: 0
+
+    - label: "12b:Immediately TH reads OnTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: OO.S.A4001 && OO.S.C42.Rsp
+      response:
+          value: 0
+
+    #Refer comment https://github.com/project-chip/connectedhomeip/pull/30636#discussion_r1404406872
+    - label: "12b: Immediately TH reads OffWaitTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: OO.S.A4002 && OO.S.C42.Rsp
+      response:
+          constraints:
+              minValue: 185 - ( 7 * PIXIT.OO.MaxCommunicationTurnaround )
+              maxValue: 215
+
+    - label: "Wait 10000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "13a:After 10s, TH sends On command to DUT"
+      PICS: OO.S.C01.Rsp
+      command: "On"
+
+    - label: "13b:Immediately TH reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000 && OO.S.C01.Rsp
+      response:
+          value: 1
+
+    - label: "13b:Immediately TH reads OnTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: OO.S.A4001 && OO.S.C01.Rsp
+      response:
+          value: 0
+
+    - label: "13b:Immediately TH reads OffWaitTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: OO.S.A4002 && OO.S.C01.Rsp
+      response:
+          value: 0
+
+    - label: "Wait 10000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label:
+          "14a: After 10s, TH sends OnWithTimedOff command to DUT with
+          1)OnOffControl: 0x01 (AcceptOnlyWhenOn 1) 2)OnTime: 0x012c (30s)
+          3)OffTime: 0x012c (30s)"
+      command: "OnWithTimedOff"
+      PICS: OO.S.C42.Rsp
+      arguments:
+          values:
+              - name: "OnOffControl"
+                value: 1
+              - name: "OnTime"
+                value: 300
+              - name: "OffWaitTime"
+                value: 300
+
+    - label: "Wait 10000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "14b:After 10s, TH sends Off command to DUT"
+      command: "Off"
+      PICS: OO.S.C00.Rsp
+
+    - label: "14c: Immediately TH reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000 && OO.S.C00.Rsp
+      response:
+          value: 0
+
+    - label: "14c:Immediately TH reads OnTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: OO.S.A4001 && OO.S.C00.Rsp
+      response:
+          value: 0
+
+    #Refer comment https://github.com/project-chip/connectedhomeip/pull/30636#discussion_r1404423488
+    - label: "14c: Immediately TH reads OffWaitTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: OO.S.A4002 && OO.S.C00.Rsp
+      response:
+          constraints:
+              minValue: 300 - ( 3 * PIXIT.OO.MaxCommunicationTurnaround )
+              maxValue: 300
+
+    - label: "Wait 30000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 30000
+
+    - label: "15:After 30s, TH reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000
+      response:
+          value: 0
+
+    - label: "15:TH reads OnTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: OO.S.A4001
+      response:
+          value: 0
+
+    - label: "15: TH reads OffWaitTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: OO.S.A4002
+      response:
+          value: 0
+
+    - label: "Wait 10000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label:
+          "16a:After 10s, TH sends OnWithTimedOff command to DUT with
+          1)OnOffControl: 0x01 (AcceptOnlyWhenOn 1) 2)OnTime: 0x012c (30s)
+          3)OffTime: 0x012c (30s)"
+      command: "OnWithTimedOff"
+      PICS: OO.S.C42.Rsp
+      arguments:
+          values:
+              - name: "OnOffControl"
+                value: 1
+              - name: "OnTime"
+                value: 300
+              - name: "OffWaitTime"
+                value: 300
+
+    - label: "16b: Immediately TH reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000 && OO.S.C42.Rsp
+      response:
+          value: 0
+
+    - label: "16b:Immediately TH reads OnTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: OO.S.A4001 && OO.S.C42.Rsp
+      response:
+          value: 0
+
+    - label: "16b:Immediately TH reads OffWaitTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: OO.S.A4002 && OO.S.C42.Rsp
+      response:
+          value: 0
+
+    - label: "17a: TH sends On command to DUT"
+      PICS: OO.S.C01.Rsp
+      command: "On"
+
+    - label: "Wait 10000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label:
+          "17b: After 10s, TH sends OnWithTimedOff command to DUT with
+          1)OnOffControl: 0x01 (AcceptOnlyWhenOn 1) 2)OnTime: 0x012c (30s)
+          3)OffTime: 0x012c (30s)"
+      command: "OnWithTimedOff"
+      PICS: OO.S.C42.Rsp
+      arguments:
+          values:
+              - name: "OnOffControl"
+                value: 1
+              - name: "OnTime"
+                value: 300
+              - name: "OffWaitTime"
+                value: 300
+
+    - label: "17c:Immediately TH reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000 && OO.S.C42.Rsp
+      response:
+          value: 1
+
+    #Refer comment https://github.com/project-chip/connectedhomeip/pull/30636#discussion_r1404424832
+    - label: "17c: Immediately TH reads OnTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: OO.S.A4001 && OO.S.C42.Rsp
+      response:
+          constraints:
+              minValue: 300 - ( 2 * PIXIT.OO.MaxCommunicationTurnaround )
+              maxValue: 300
+
+    - label: "17c:Reads OffWaitTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: OO.S.A4002 && OO.S.C42.Rsp
+      response:
+          value: 300
+
+    - label: "Wait 40000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 40000
+
+    - label: "17d:After 40s, TH reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000 && OO.S.C42.Rsp
+      response:
+          value: 0
+
+    - label: "17d:TH reads OnTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: OO.S.A4001 && OO.S.C42.Rsp
+      response:
+          value: 0
+
+    - label: "17d:TH reads OffWaitTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: OO.S.A4002 && OO.S.C42.Rsp
+      response:
+          value: 0
+
+    - label: "Wait 10000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label:
+          "18a:After 10s, TH sends OnWithTimedOff command to DUT with
+          1)OnOffControl: 0x01 (AcceptOnlyWhenOn 0) 2)OnTime: 0x012c (30s)
+          3)OffTime: 0x012c (30s)"
+      command: "OnWithTimedOff"
+      PICS: OO.S.C42.Rsp
+      arguments:
+          values:
+              - name: "OnOffControl"
+                value: 0
+              - name: "OnTime"
+                value: 300
+              - name: "OffWaitTime"
+                value: 300
+
+    - label: "18b:Immediately TH reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000 && OO.S.C42.Rsp
+      response:
+          value: 1
+
+    #Refer comment https://github.com/project-chip/connectedhomeip/pull/30636#discussion_r1404425845
+    - label: "18b: Immediately TH reads OnTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: OO.S.A4001 && OO.S.C42.Rsp
+      response:
+          constraints:
+              minValue: 300 - ( 2 * PIXIT.OO.MaxCommunicationTurnaround )
+              maxValue: 300
+
+    - label: "18b:Reads OffWaitTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: OO.S.A4002 && OO.S.C42.Rsp
+      response:
+          value: 300
+
+    - label:
+          "19a: TH sends OnWithTimedOff command to DUT with 1)OnOffControl: 0x00
+          (AcceptOnlyWhenOn 0) 2)OnTime: 0x012c (30s) 3)OffTime: 0x012c (30s)"
+      command: "OnWithTimedOff"
+      PICS: OO.S.C42.Rsp
+      arguments:
+          values:
+              - name: "OnOffControl"
+                value: 0
+              - name: "OnTime"
+                value: 300
+              - name: "OffWaitTime"
+                value: 300
+
+    - label: "Wait 10000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label:
+          "19b: After 10s,TH sends OnWithTimedOff command to DUT with
+          1)OnOffControl: 0x00 (AcceptOnlyWhenOn 0) 2)OnTime: 0x012c (30s)
+          3)OffTime: 0x012c (30s)"
+      command: "OnWithTimedOff"
+      PICS: OO.S.C42.Rsp
+      arguments:
+          values:
+              - name: "OnOffControl"
+                value: 0
+              - name: "OnTime"
+                value: 300
+              - name: "OffWaitTime"
+                value: 300
+
+    - label: "Wait 10000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "19c:After 10s, TH reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000 && OO.S.C42.Rsp
+      response:
+          value: 1
+
+    #Refer comment https://github.com/project-chip/connectedhomeip/pull/30636#discussion_r1404428940
+    - label: "19c: TH reads OnTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: OO.S.A4001 && OO.S.C42.Rsp
+      response:
+          constraints:
+              minValue: 185 - ( 2 * PIXIT.OO.MaxCommunicationTurnaround )
+              maxValue: 215
+
+    - label: "19c: TH reads OffWaitTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: OO.S.A4002 && OO.S.C42.Rsp
+      response:
+          value: 300
+
+    - label: "20a: TH sends Off command to DUT"
+      command: "Off"
+      PICS: OO.S.C00.Rsp
+
+    - label: "20b: Immediately TH reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000 && OO.S.C00.Rsp
+      response:
+          value: 0
+
+    - label: "20b:Immediately TH reads OnTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: OO.S.A4001 && OO.S.C00.Rsp
+      response:
+          value: 0
+
+    #Refer comment https://github.com/project-chip/connectedhomeip/pull/30636#discussion_r1404430203
+    - label: "20b: Immediately TH reads OffWaitTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: OO.S.A4002 && OO.S.C00.Rsp
+      response:
+          constraints:
+              minValue: 300 - ( 3 * PIXIT.OO.MaxCommunicationTurnaround )
+              maxValue: 300
+
+    - label:
+          "21a:TH sends OnWithTimedOff command to DUT with 1)OnOffControl: 0x00
+          (AcceptOnlyWhenOn 0) 2)OnTime: 0x012c (30s) 3)OffTime: 0x012c (30s)"
+      command: "OnWithTimedOff"
+      PICS: OO.S.C42.Rsp
+      arguments:
+          values:
+              - name: "OnOffControl"
+                value: 0
+              - name: "OnTime"
+                value: 300
+              - name: "OffWaitTime"
+                value: 300
+
+    - label: "Wait 10000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "21b:After 10s, TH reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000 && OO.S.C42.Rsp
+      response:
+          value: 0
+
+    - label: "21b:TH reads  OnTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: OO.S.A4001 && OO.S.C42.Rsp
+      response:
+          value: 0
+
+    #Refer comment https://github.com/project-chip/connectedhomeip/pull/30636#discussion_r1404431785
+    - label: "21b: TH reads  OffWaitTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: OO.S.A4002 && PICS_SKIP_SAMPLE_APP && OO.S.C42.Rsp
+      response:
+          constraints:
+              minValue: 185 - ( 7 * PIXIT.OO.MaxCommunicationTurnaround )
+              maxValue: 215
+
+    - label: "22a:TH sends On command to DUT"
+      PICS: OO.S.C01.Rsp
+      command: "On"
+
+    - label: "22b: Immediately TH reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000 && OO.S.C01.Rsp
+      response:
+          value: 1
+
+    - label: "22b: Immediately TH reads OnTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: OO.S.A4001 && OO.S.C01.Rsp
+      response:
+          value: 0
+
+    - label: "22b: Immediately TH reads OffWaitTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: OO.S.A4002 && OO.S.C01.Rsp
+      response:
+          value: 0
+
+    - label: "Wait 10000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label:
+          "23a:After 10s, TH sends OnWithTimedOff command to DUT with
+          1)OnOffControl: 0x00 (AcceptOnlyWhenOn 0) 2)OnTime: 0x012c (30s)
+          3)OffTime: 0x012c (30s)"
+      command: "OnWithTimedOff"
+      PICS: OO.S.C42.Rsp
+      arguments:
+          values:
+              - name: "OnOffControl"
+                value: 0
+              - name: "OnTime"
+                value: 300
+              - name: "OffWaitTime"
+                value: 300
+
+    - label: "23b:TH sends Off command to DUT"
+      command: "Off"
+      PICS: OO.S.C00.Rsp
+
+    - label: "23c:Reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000 && OO.S.C00.Rsp
+      response:
+          value: 0
+
+    - label: "23c: Immediately TH reads  OnTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: OO.S.A4001 && OO.S.C00.Rsp
+      response:
+          value: 0
+
+    - label: "23c: Immediately TH reads  OffWaitTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: OO.S.A4002 && OO.S.C00.Rsp
+      response:
+          constraints:
+              minValue: 300 - ( 3 * PIXIT.OO.MaxCommunicationTurnaround )
+              maxValue: 300
+
+    - label: "Wait 40000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 40000
+
+    - label: "23d: After 40s, TH reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000 && OO.S.C00.Rsp
+      response:
+          value: 0
+
+    - label: "23d:TH reads  OnTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: OO.S.A4001 && OO.S.C00.Rsp
+      response:
+          value: 0
+
+    - label: "23d: TH reads  OffWaitTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: OO.S.A4002 && OO.S.C00.Rsp
+      response:
+          value: 0
+
+    - label:
+          "24a:TH sends OnWithTimedOff command to DUT with 1)OnOffControl: 0x00
+          (AcceptOnlyWhenOn 0) 2)OnTime: 0x012c (30s) 3)OffTime: 0x012c (30s)"
+      command: "OnWithTimedOff"
+      PICS: OO.S.C42.Rsp
+      arguments:
+          values:
+              - name: "OnOffControl"
+                value: 0
+              - name: "OnTime"
+                value: 300
+              - name: "OffWaitTime"
+                value: 300
+
+    - label: "24b: Immediately TH reads  OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000 && OO.S.C42.Rsp
+      response:
+          value: 1
+
+    - label: "24b: Immediately TH reads  OnTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: OO.S.A4001 && OO.S.C42.Rsp
+      response:
+          constraints:
+              minValue: 300 - ( 2 * PIXIT.OO.MaxCommunicationTurnaround )
+              maxValue: 300
+
+    - label: "24b: Immediately TH reads  OffWaitTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: OO.S.A4002 && OO.S.C42.Rsp
+      response:
+          value: 300
+
+    - label: "Wait 40000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 40000
+
+    - label: "24c:After 40s, TH reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000
+      response:
+          value: 0
+
+    - label: "24c:TH reads OnTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: OO.S.A4001
+      response:
+          value: 0
+
+    - label: "24c:TH reads OffWaitTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: OO.S.A4002
+      response:
+          value: 0

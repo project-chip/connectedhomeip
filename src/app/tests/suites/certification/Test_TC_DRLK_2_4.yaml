@@ -1,0 +1,256 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    111.2.4. [TC-DRLK-2.4] Verification for Unlock with Timeout command
+    [DUT-Server]
+
+PICS:
+    - DRLK.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Door Lock"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Create new user"
+      command: "SetUser"
+      PICS: DRLK.S.F08 && DRLK.S.F00
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "OperationType"
+                value: 0
+              - name: "UserIndex"
+                value: 1
+              - name: "UserName"
+                value: "xxx"
+              - name: "UserUniqueID"
+                value: 6452
+              - name: "UserStatus"
+                value: 1
+              - name: "UserType"
+                value: 0
+              - name: "CredentialRule"
+                value: 0
+
+    - label: "Read the user back and verify its fields"
+      command: "GetUser"
+      PICS: DRLK.S.F08 && DRLK.S.F00
+      arguments:
+          values:
+              - name: "UserIndex"
+                value: 1
+      response:
+          values:
+              - name: "UserIndex"
+                value: 1
+              - name: "UserName"
+                value: "xxx"
+              - name: "UserUniqueID"
+                value: 6452
+              - name: "UserStatus"
+                value: 1
+              - name: "UserType"
+                value: 0
+              - name: "CredentialRule"
+                value: 0
+              - name: "Credentials"
+                value: []
+              - name: "CreatorFabricIndex"
+                value: 1
+              - name: "LastModifiedFabricIndex"
+                value: 1
+              - name: "NextUserIndex"
+                value: null
+
+    - label: "Create new PIN credential and lock/unlock user"
+      command: "SetCredential"
+      PICS: DRLK.S.F08 && DRLK.S.F00
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "OperationType"
+                value: 0
+              - name: "Credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+              - name: "CredentialData"
+                value: "123456"
+              - name: "UserIndex"
+                value: 1
+              - name: "UserStatus"
+                value: null
+              - name: "UserType"
+                value: null
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "UserIndex"
+                value: null
+              - name: "NextCredentialIndex"
+                value: 2
+
+    - label: "Verify created PIN credential"
+      PICS: DRLK.S.F08 && DRLK.S.F00
+      command: "GetCredentialStatus"
+      arguments:
+          values:
+              - name: "Credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+      response:
+          values:
+              - name: "CredentialExists"
+                value: true
+              - name: "UserIndex"
+                value: 1
+              - name: "CreatorFabricIndex"
+                value: 1
+              - name: "LastModifiedFabricIndex"
+                value: 1
+              - name: "NextCredentialIndex"
+                value: null
+
+    - label:
+          "Step 1a: TH writes AutoRelockTime attribute value as 10 seconds on
+          the DUT"
+      PICS: DRLK.S.M.AutoRelockTimeAttributeWritable && PICS_SDK_CI_ONLY
+      command: "writeAttribute"
+      attribute: "AutoRelockTime"
+      arguments:
+          value: 10
+
+    - label:
+          "Step 1b: TH writes AutoRelockTime attribute value as 60 seconds on
+          the DUT"
+      PICS: DRLK.S.M.AutoRelockTimeAttributeWritable && PICS_SKIP_SAMPLE_APP
+      command: "writeAttribute"
+      attribute: "AutoRelockTime"
+      arguments:
+          value: 60
+
+    - label:
+          "Step 1c: TH writes AutoRelockTime attribute value as 10 seconds on
+          the DUT"
+      PICS: PICS_SDK_CI_ONLY && !DRLK.S.M.AutoRelockTimeAttributeWritable
+      command: "writeAttribute"
+      attribute: "AutoRelockTime"
+      arguments:
+          value: 10
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label:
+          "Step 1d: TH writes AutoRelockTime attribute value as 60 seconds on
+          the DUT"
+      PICS: PICS_SKIP_SAMPLE_APP && !DRLK.S.M.AutoRelockTimeAttributeWritable
+      command: "writeAttribute"
+      attribute: "AutoRelockTime"
+      arguments:
+          value: 60
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label:
+          "Step 2a: TH sends the Unlock with Timeout argument value as 10
+          seconds"
+      PICS: DRLK.S.C03.Rsp && PICS_SDK_CI_ONLY
+      command: "UnlockWithTimeout"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "Timeout"
+                value: 10
+              - name: "PINCode"
+                value: "123456"
+
+    - label:
+          "Step 2b: TH sends the Unlock with Timeout argument value as 60
+          seconds"
+      PICS:
+          " DRLK.S.F08 && DRLK.S.F00 && DRLK.S.C03.Rsp && PICS_SKIP_SAMPLE_APP "
+      command: "UnlockWithTimeout"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "Timeout"
+                value: 60
+              - name: "PINCode"
+                value: "123456"
+
+    - label:
+          "Step 2b: TH sends the Unlock with Timeout argument value as 60
+          seconds"
+      PICS:
+          " (!DRLK.S.F08 || !DRLK.S.F00) && DRLK.S.C03.Rsp &&
+          PICS_SKIP_SAMPLE_APP "
+      command: "UnlockWithTimeout"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "Timeout"
+                value: 60
+
+    - label: "Wait for AutoRelockTime Expires"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      PICS: DRLK.S.C03.Rsp && PICS_SDK_CI_ONLY
+      arguments:
+          values:
+              - name: "ms"
+                value: 11000
+
+    #https://github.com/project-chip/connectedhomeip/issues/27421#issuecomment-1603541308
+    - label: "Wait for AutoRelockTime Expires"
+      PICS: DRLK.S.C03.Rsp && PICS_SKIP_SAMPLE_APP
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 70000
+
+    - label: "Step 2c: TH reads LockState attribute"
+      PICS: DRLK.S.A0000 && DRLK.S.C03.Rsp
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: 1
+
+    - label: "Cleanup the created user"
+      command: "ClearUser"
+      PICS: DRLK.S.F08 && DRLK.S.F00
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "UserIndex"
+                value: 1
+
+    - label: "Clean the created credential"
+      PICS: DRLK.S.F08 && DRLK.S.F00 && DRLK.S.C26.Rsp
+      command: "ClearCredential"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "Credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }

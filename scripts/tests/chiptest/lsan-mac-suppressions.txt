@@ -1,0 +1,48 @@
+# Looks like some Objective C class bits are leaked, which is probably OK since
+# those are singletons.
+leak:realizeClassWithoutSwift
+leak:objc_initializeClassPair_internal
+
+# Something under map_images (as called from
+# dyld4::RuntimeState::setObjCNotifiers) seems to be randomly leaking a few
+# bytes.  Not a Matter issue, so just suppress it here.
+leak:map_images
+
+# TODO: Under [NSManagedObjectContext executeFetchRequest] there are managed object bits that seem to be leaky.
+leak:class_addMethod
+leak:class_addIvar
+
+# TODO: Leaks of blocks from dispatch source handlers that need to be investigated.
+leak:_Block_copy
+
+# TODO: OpenSSL random byte generation creates some sort of pools that we seem to never clean up.  This seems to be happening a _lot_.
+leak:drbg_ctr_init
+leak:rand_pool_new
+leak:RAND_priv_bytes
+leak:drbg_bytes
+
+# TODO: OpenSSL ERR_get_state seems to leak.
+leak:ERR_get_state
+
+#TODO: Figure out why nw_path_monitor_create leaks. The leak can be reproduced using:
+# -- testFile.cpp
+#
+##include <Network/Network.h>
+#
+#int main(int argc, char **argv) {
+#  auto monitor = nw_path_monitor_create();
+#  nw_release(monitor);
+#  return 0;
+#}
+#
+# -- testFile.mm (with -fobj-arc)
+##include <Network/Network.h>
+#
+#int main(int argc, char **argv) {
+#  __auto_type monitor = nw_path_monitor_create();
+#  return 0;
+#}
+leak:nw_path_monitor_create
+
+# TODO: See the previous comment about nw_path_monitor_create, since it also applies to nw_path_monitor_start
+leak:nw_path_monitor_start

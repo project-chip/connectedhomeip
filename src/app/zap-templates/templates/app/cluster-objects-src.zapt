@@ -1,0 +1,253 @@
+{{> header}}
+
+#include <app/data-model/WrappedStructEncoder.h>
+#include <app-common/zap-generated/cluster-objects.h>
+
+#include <variant>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+
+namespace detail {
+
+class StructDecodeIterator {
+  public:
+    // may return a context tag, a CHIP_ERROR (end iteration)
+    using EntryElement = std::variant<uint8_t, CHIP_ERROR>;
+
+    StructDecodeIterator(TLV::TLVReader &reader) : mReader(reader){}
+
+    // Iterate through structure elements. Returns one of:
+    //   - uint8_t CONTEXT TAG (keep iterating)
+    //   - CHIP_ERROR (including CHIP_NO_ERROR) which should be a final
+    //     return value (stop iterating)
+    EntryElement Next() {
+       if (!mEntered) {
+          VerifyOrReturnError(TLV::kTLVType_Structure == mReader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+          ReturnErrorOnFailure(mReader.EnterContainer(mOuter));
+          mEntered = true;
+       }
+
+       while (true) {
+          CHIP_ERROR err = mReader.Next();
+          if (err != CHIP_NO_ERROR) {
+             VerifyOrReturnError(err == CHIP_ERROR_END_OF_TLV, err);
+             break;
+          }
+
+          const TLV::Tag tag = mReader.GetTag();
+          if (!TLV::IsContextTag(tag)) {
+            continue;
+          }
+
+          // we know context tags are 8-bit
+          return static_cast<uint8_t>(TLV::TagNumFromTag(tag));
+       }
+
+       return mReader.ExitContainer(mOuter);
+    }
+
+  private:
+    bool mEntered = false;
+    TLV::TLVType mOuter;
+    TLV::TLVReader &mReader;
+};
+
+// Structs shared across multiple clusters.
+namespace Structs {
+{{#zcl_structs}}
+{{#if has_more_than_one_cluster}}
+{{> cluster_objects_struct header=false}}
+{{/if}}
+{{/zcl_structs}}
+} // namespace Structs
+} // namespace detail
+
+{{#zcl_clusters}}
+namespace {{asUpperCamelCase name}} {
+{{#zcl_structs}}
+{{#first}}
+namespace Structs {
+{{/first}}
+{{#unless has_more_than_one_cluster}}
+{{> cluster_objects_struct header=false}}
+{{/unless}}
+{{#last}}
+} // namespace Structs
+{{/last}}
+{{/zcl_structs}}
+
+namespace Commands {
+{{#zcl_commands}}
+namespace {{asUpperCamelCase name}} {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const{
+    DataModel::WrappedStructEncoder encoder{aWriter, aTag};
+    {{#zcl_command_arguments}}
+    encoder.Encode(to_underlying(Fields::k{{asUpperCamelCase label}}), {{asLowerCamelCase label}});
+    {{/zcl_command_arguments}}
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
+    detail::StructDecodeIterator __iterator(reader);
+    while (true) {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element)) {
+           return std::get<CHIP_ERROR>(__element);
+        }
+
+        {{#zcl_command_arguments~}}
+        {{#first}}
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        {{/first~}}
+        {{! NOTE: using if/else instead of switch because it seems to generate smaller code. ~}}
+        if (__context_tag == to_underlying(Fields::k{{asUpperCamelCase label}}))
+        {
+            err = DataModel::Decode(reader, {{asLowerCamelCase label}});
+        }
+        else
+        {{#last}}
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+        {{/last}}
+        {{/zcl_command_arguments}}
+    }
+}
+} // namespace {{asUpperCamelCase name}}.
+{{/zcl_commands}}
+} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader &reader, const ConcreteAttributePath &path) {
+    switch (path.mAttributeId)
+    {
+{{#zcl_attributes_server}}
+    case Attributes::{{asUpperCamelCase label}}::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, {{asLowerCamelCase label}});
+{{/zcl_attributes_server}}
+    default:
+        return CHIP_NO_ERROR;
+    }
+}
+} // namespace Attributes
+
+namespace Events {
+{{#zcl_events}}
+namespace {{asUpperCamelCase name}} {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
+    {{#zcl_event_fields}}
+    {{#if_is_fabric_scoped_struct type}}
+    ReturnErrorOnFailure(DataModel::EncodeForRead(aWriter, TLV::ContextTag(Fields::k{{asUpperCamelCase name}}), GetFabricIndex(), {{asLowerCamelCase name}}));
+    {{else}}
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::k{{asUpperCamelCase name}}), {{asLowerCamelCase name}}));
+    {{/if_is_fabric_scoped_struct}}
+    {{/zcl_event_fields}}
+    return aWriter.EndContainer(outer);
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
+    detail::StructDecodeIterator __iterator(reader);
+    while (true) {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element)) {
+           return std::get<CHIP_ERROR>(__element);
+        }
+
+        {{#zcl_event_fields}}
+        {{#first}}
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        {{/first~}}
+        {{! NOTE: using if/else instead of switch because it seems to generate smaller code. ~}}
+        if (__context_tag == to_underlying(Fields::k{{asUpperCamelCase name}}))
+        {
+            err = DataModel::Decode(reader, {{asLowerCamelCase name}});
+        }
+        else
+        {{#last}}
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+        {{/last}}
+        {{/zcl_event_fields}}
+    }
+}
+} // namespace {{asUpperCamelCase name}}.
+{{/zcl_events}}
+} // namespace Events
+
+} // namespace {{asUpperCamelCase name}}
+{{/zcl_clusters}}
+
+} // namespace Clusters
+
+bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand)
+{
+    // Maybe it would be smaller code to codegen a table and walk over it?
+    // Not sure.
+    switch (aCluster)
+    {
+    {{#zcl_clusters}}
+      {{#zcl_commands_that_need_timed_invoke}}
+      {{#first}}
+      case Clusters::{{asUpperCamelCase parent.name}}::Id:
+      {
+          switch (aCommand) {
+      {{/first}}
+          case Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Id:
+      {{#last}}
+              return true;
+          default:
+              return false;
+          }
+      }
+      {{/last}}
+      {{/zcl_commands_that_need_timed_invoke}}
+    {{/zcl_clusters}}
+    default:
+        break;
+    }
+
+    return false;
+}
+
+bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
+{
+    // Maybe it would be smaller code to codegen a table and walk over it?
+    // Not sure.
+    switch (aCluster)
+    {
+    {{#zcl_clusters}}
+      {{#zcl_commands}}
+      {{#first}}
+      case Clusters::{{asUpperCamelCase parent.name}}::Id:
+      {
+          switch (aCommand) {
+      {{/first}}
+          {{#if isFabricScoped}}
+          case Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Id:
+              return true;
+          {{/if}}
+      {{#last}}
+          default:
+              return false;
+          }
+      }
+      {{/last}}
+      {{/zcl_commands}}
+    {{/zcl_clusters}}
+    }
+    return false;
+}
+
+} // namespace app
+} // namespace chip

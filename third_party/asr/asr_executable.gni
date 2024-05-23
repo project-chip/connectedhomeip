@@ -1,0 +1,91 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/asr.gni")
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("${build_root}/toolchain/flashable_executable.gni")
+
+template("asr_executable") {
+  output_base_name = get_path_info(invoker.output_name, "name")
+
+  objcopy_image_name = output_base_name + ".bin"
+  objcopy_image_format = "binary"
+
+  if (asr_ic_family == "asr595x") {
+    objcopy = "${asr_toolchain_root}riscv-asr-elf-objcopy"
+  } else {
+    objcopy = "${asr_toolchain_root}arm-none-eabi-objcopy"
+  }
+
+  flash_target_name = target_name + ".flash_executable"
+  flashbundle_name = "${target_name}.flashbundle.txt"
+  flashable_executable(flash_target_name) {
+    forward_variables_from(invoker, "*")
+  }
+
+  action("generate_ota_image") {
+    script = "${build_root}/gn_run_binary.py"
+
+    outputs = [ "${root_out_dir}/${output_base_name}_ota.bin" ]
+
+    gen_ota_tool =
+        "${asr_sdk_build_root}/asr_sdk/tools/otaImage/image_gen_header"
+
+    _ota_tool_path = rebase_path(gen_ota_tool, root_build_dir)
+
+    _image_path =
+        rebase_path("$root_out_dir/${objcopy_image_name}", root_build_dir)
+
+    if (asr_ic_family == "asr595x") {
+      args = [
+        _ota_tool_path,
+        _image_path,
+        "-d",
+        "ALTO",
+        "-b",
+        "REMAPPING",
+        "-r",
+      ]
+    } else if (asr_ic_family == "asr582x") {
+      args = [
+        _ota_tool_path,
+        _image_path,
+        "-d",
+        "COMBO",
+        "-b",
+        "REMAPPING",
+        "-r",
+      ]
+    } else {
+      args = [
+        _ota_tool_path,
+        _image_path,
+        "-d",
+        "LEGA_A0V2",
+        "-b",
+        "COMPRESS",
+      ]
+    }
+
+    deps = [ ":$flash_target_name" ]
+  }
+
+  group(target_name) {
+    deps = [
+      ":$flash_target_name",
+      ":generate_ota_image",
+    ]
+  }
+}

@@ -1,0 +1,236 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    22.6.2. [TC-LVL-7.1] Verification of MoveToClosestFrequency command (DUT as
+    Server)
+
+PICS:
+    - LVL.S
+    - LVL.S.F02
+
+config:
+    nodeId: 0x12344321
+    cluster: "Level Control"
+    endpoint: 1
+    RandomLevelValue:
+        type: int8u
+        defaultValue: 100
+    RandomFrequencyValue:
+        type: int16u
+        defaultValue: 30000
+
+tests:
+    - label:
+          "Commission DUT to TH (can be skipped if done in a preceding test)."
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    #Adding below step resolve the issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/499
+    - label:
+          "Precondition: write default value of OnOffTransitionTime attribute"
+      PICS: LVL.S.A0010
+      command: "writeAttribute"
+      attribute: "OnOffTransitionTime"
+      arguments:
+          value: 0
+
+    - label: "Step 0a: TH writes 0x00 to the Options attribute"
+      PICS: LVL.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
+    - label: "Step 0b: TH sends On command to DUT"
+      cluster: "On/Off"
+      PICS: OO.S.C01.Rsp
+      command: "On"
+
+    - label: "Step 1a: TH reads the MinLevel attribute from the DUT"
+      PICS: LVL.S.A0002
+      command: "readAttribute"
+      attribute: "MinLevel"
+      response:
+          saveAs: minLevelValue
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 254
+
+    - label: "Step 1b: TH reads the MaxLevel attribute from the DUT"
+      PICS: LVL.S.A0003
+      command: "readAttribute"
+      attribute: "MaxLevel"
+      response:
+          saveAs: maxLevelValue
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 254
+
+    - label:
+          "Step 1c: TH sends a MoveToLevel command to DUT, with the Level field
+          set to a value between the MinLevel and MaxLevel values (if present,
+          otherwise between 0x01 and 0xFE) and the TransitionTime field set to
+          0x0000 (move immediately)."
+      PICS: LVL.S.C00.Rsp
+      command: "MoveToLevel"
+      arguments:
+          values:
+              - name: "Level"
+                value: RandomLevelValue
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    - label: "Step 1d: TH reads CurrentLevel attribute from DUT"
+      PICS: LVL.S.C00.Rsp && LVL.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentLevel"
+      response:
+          value: RandomLevelValue
+
+    - label: "Step 2a: TH reads the CurrentFrequency attribute."
+      PICS: LVL.S.A0004
+      command: "readAttribute"
+      attribute: "CurrentFrequency"
+      response:
+          saveAs: CurrentFrequencyValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Step 2b: TH reads the MinFrequency attribute."
+      PICS: LVL.S.A0005
+      command: "readAttribute"
+      attribute: "MinFrequency"
+      response:
+          saveAs: MinFrequencyValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label:
+          "Step 2c: TH reads the MaxFrequency attribute and check, if fmax <
+          fmin, FAIL the test."
+      PICS: LVL.S.A0006
+      command: "readAttribute"
+      attribute: "MaxFrequency"
+      response:
+          saveAs: MaxFrequencyValue
+          constraints:
+              type: int16u
+              minValue: MinFrequencyValue
+              maxValue: 65535
+
+    - label:
+          "Step 2d: sanity check on values read in steps 2a..2c, if fc < fmin,
+          FAIL the test and fc > fmax, FAIL the test"
+      PICS: LVL.S.A0004
+      command: "readAttribute"
+      attribute: "CurrentFrequency"
+      response:
+          constraints:
+              type: int16u
+              minValue: MinFrequencyValue
+              maxValue: MaxFrequencyValue
+
+    - label:
+          "Step 3a: TH sends a MoveToClosestFrequency command to DUT, with the
+          frequency field set to a random value frand, chosen such that: fmin <
+          frand < fmax"
+      PICS: LVL.S.C08.Rsp
+      command: "MoveToClosestFrequency"
+      arguments:
+          values:
+              - name: "Frequency"
+                value: RandomFrequencyValue
+
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    - label: "Step 3b: TH reads the CurrentFrequency attribute."
+      PICS: LVL.S.C08.Rsp && LVL.S.A0004
+      command: "readAttribute"
+      attribute: "CurrentFrequency"
+      response:
+          value: RandomFrequencyValue
+
+    - label:
+          "Step 4a: TH sends a MoveToClosestFrequency command to DUT, with the
+          frequency field set to fmax + 1"
+      PICS: LVL.S.C08.Rsp && PICS_USER_PROMPT
+      verification: |
+          Frequency feature is Optional & is not verifiable at this moment. Please skip this step
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 4b: TH reads the CurrentFrequency attribute."
+      PICS: LVL.S.C08.Rsp && LVL.S.A0004 && PICS_USER_PROMPT
+      command: "readAttribute"
+      attribute: "CurrentFrequency"
+      response:
+          value: RandomFrequencyValue
+
+    - label:
+          "Step 5a: TH sends a MoveToClosestFrequency command to DUT, with the
+          frequency field set to fmin - 1"
+      PICS: LVL.S.C08.Rsp && PICS_USER_PROMPT
+      verification: |
+          Frequency feature is Optional & is not verifiable at this moment. Please skip this step
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 5b: TH reads the CurrentFrequency attribute."
+      PICS: LVL.S.C08.Rsp && LVL.S.A0004 && PICS_USER_PROMPT
+      command: "readAttribute"
+      attribute: "CurrentFrequency"
+      response:
+          value: RandomFrequencyValue

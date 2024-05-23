@@ -1,0 +1,48 @@
+# Copyright 2020 The Pigweed Authors
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("android_toolchain.gni")
+
+android_clang_toolchain("android_arm") {
+  # TODO: Drop API level to 21 after getifaddrs issue fixed
+  api_level = "24"
+  toolchain_args = {
+    current_cpu = "arm"
+  }
+}
+
+android_clang_toolchain("android_arm64") {
+  # TODO: Drop API level to 21 after getifaddrs issue fixed
+  api_level = "24"
+  toolchain_args = {
+    current_cpu = "arm64"
+  }
+}
+
+android_clang_toolchain("android_x64") {
+  # TODO: Drop API level to 21 after getifaddrs issue fixed
+  api_level = "24"
+  toolchain_args = {
+    current_cpu = "x64"
+  }
+}
+
+android_clang_toolchain("android_x86") {
+  # TODO: Drop API level to 21 after getifaddrs issue fixed
+  api_level = "24"
+  toolchain_args = {
+    current_cpu = "x86"
+  }
+}

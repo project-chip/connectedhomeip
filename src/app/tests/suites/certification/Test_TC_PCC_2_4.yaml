@@ -1,0 +1,127 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 16.2.4. [TC-PCC-2.4] Life Time Counters with Server as DUT
+
+PICS:
+    - PCC.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Pump Configuration and Control"
+    endpoint: 1
+
+tests:
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2a: TH Write 1 to the LifetimeRunningHours attribute to DUT"
+      PICS: PCC.S.A0015
+      command: "writeAttribute"
+      attribute: "LifetimeRunningHours"
+      arguments:
+          value: 1
+
+    - label:
+          "Step 2b: TH reads from the DUT the LifetimeRunningHours attribute."
+      PICS: PCC.S.A0015
+      command: "readAttribute"
+      attribute: "LifetimeRunningHours"
+      response:
+          value: 1
+
+    - label: "Step 3a: TH write 2 to the LifetimeRunningHours attribute of DUT."
+      PICS: PCC.S.A0015
+      command: "writeAttribute"
+      attribute: "LifetimeRunningHours"
+      arguments:
+          value: 2
+
+    - label:
+          "Step 3b: TH reads from the DUT the LifetimeRunningHours attribute."
+      PICS: PCC.S.A0015
+      command: "readAttribute"
+      attribute: "LifetimeRunningHours"
+      response:
+          value: 2
+
+    - label: "Step 4a: TH Write 3 to the LifetimeRunningHours attribute to DUT"
+      PICS: PCC.S.A0015
+      command: "writeAttribute"
+      attribute: "LifetimeRunningHours"
+      arguments:
+          value: 3
+
+    - label:
+          "Step 4b: TH reads from the DUT the LifetimeRunningHours attribute."
+      PICS: PCC.S.A0015
+      command: "readAttribute"
+      attribute: "LifetimeRunningHours"
+      response:
+          value: 3
+
+    - label:
+          "Step 5a: TH write 1 to the LifetimeEnergyConsumed attribute of DUT."
+      PICS: PCC.S.A0017
+      command: "writeAttribute"
+      attribute: "LifetimeEnergyConsumed"
+      arguments:
+          value: 1
+
+    - label:
+          "Step 5b: TH reads from the DUT the LifetimeEnergyConsumed attribute."
+      PICS: PCC.S.A0017
+      command: "readAttribute"
+      attribute: "LifetimeEnergyConsumed"
+      response:
+          value: 1
+
+    - label:
+          "Step 6a: TH write 2 to the LifetimeEnergyConsumed attribute of DUT."
+      PICS: PCC.S.A0017
+      command: "writeAttribute"
+      attribute: "LifetimeEnergyConsumed"
+      arguments:
+          value: 2
+
+    - label:
+          "Step 6b: TH reads from the DUT the LifetimeEnergyConsumed attribute."
+      PICS: PCC.S.A0017
+      command: "readAttribute"
+      attribute: "LifetimeEnergyConsumed"
+      response:
+          value: 2
+
+    - label:
+          "Step 7a: TH write 3 to the LifetimeEnergyConsumed attribute of DUT."
+      PICS: PCC.S.A0017
+      command: "writeAttribute"
+      attribute: "LifetimeEnergyConsumed"
+      arguments:
+          value: 3
+
+    - label:
+          "Step 7b: TH reads from the DUT the LifetimeEnergyConsumed attribute."
+      PICS: PCC.S.A0017
+      command: "readAttribute"
+      attribute: "LifetimeEnergyConsumed"
+      response:
+          value: 3

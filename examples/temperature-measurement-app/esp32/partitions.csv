@@ -1,0 +1,7 @@
+# Name,   Type, SubType, Offset,  Size, Flags
+# Note: if you have increased the bootloader size, make sure to update the offsets to avoid overlap
+nvs,      data, nvs,     ,        0xC000,
+phy_init, data, phy,     ,        0x1000,
+# Factory partition size about 1.5MB
+factory,  app,  factory, ,        1536K,
+coredump, data, coredump,,        64K, encrypted

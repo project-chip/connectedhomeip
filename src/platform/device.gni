@@ -1,0 +1,270 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("${chip_root}/src/ble/ble.gni")
+
+declare_args() {
+  # Device platform layer: cc13x4_26x4, cc32xx, darwin, efr32, esp32, external, freertos, linux, nrfconnect, nxp, qpg, tizen, cyw30739, bl602, mw320, zephyr, beken, openiotsdk, none.
+
+  chip_device_platform = "auto"
+  chip_platform_target = ""
+
+  # Substitute fake platform when building with chip_device_platform=auto.
+  chip_fake_platform = false
+}
+
+if (chip_device_platform == "auto") {
+  if (chip_fake_platform) {
+    chip_device_platform = "fake"
+  } else if (current_os == "mac" || current_os == "ios") {
+    chip_device_platform = "darwin"
+  } else if (current_os == "linux") {
+    chip_device_platform = "linux"
+  } else if (current_os == "tizen") {
+    chip_device_platform = "tizen"
+  } else if (current_os == "android") {
+    chip_device_platform = "android"
+  } else if (current_os == "webos") {
+    chip_device_platform = "webos"
+  } else if (current_os == "zephyr") {
+    chip_device_platform = "zephyr"
+  } else if (current_os == "nuttx") {
+    chip_device_platform = "nuttx"
+  } else {
+    chip_device_platform = "none"
+  }
+}
+
+declare_args() {
+  # Enable openthread support.
+  chip_enable_openthread =
+      chip_device_platform == "linux" || chip_device_platform == "qpg" ||
+      chip_device_platform == "cc13x4_26x4" ||
+      chip_device_platform == "tizen" || chip_device_platform == "stm32" ||
+      chip_device_platform == "webos"
+}
+
+declare_args() {
+  chip_openthread_ftd = chip_enable_openthread
+
+  # Set platform define CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER
+  # Users should ensure that it sets their thread stack define OPENTHREAD_CONFIG_BORDER_ROUTER_ENABLE
+  # or that their setting matches.
+  chip_openthread_border_router = false
+
+  # Enable wifi support.
+  chip_enable_wifi =
+      chip_device_platform == "linux" || chip_device_platform == "esp32" ||
+      chip_device_platform == "mbed" || chip_device_platform == "tizen" ||
+      chip_device_platform == "android" || chip_device_platform == "ameba" ||
+      chip_device_platform == "webos" || chip_device_platform == "cc32xx" ||
+      chip_device_platform == "bl602" || chip_device_platform == "mw320" ||
+      chip_device_platform == "beken" || chip_device_platform == "mt793x" ||
+      chip_device_platform == "asr" ||
+      (chip_device_platform == "darwin" && current_os == "mac")
+
+  # Enable ble support.
+  if (chip_device_platform == "fake") {
+    chip_enable_ble = false
+  } else {
+    chip_enable_ble = chip_config_network_layer_ble
+  }
+
+  # Enable NFC support
+  chip_enable_nfc = false
+
+  # Enable OTA requestor support
+  chip_enable_ota_requestor = false
+
+  # Select DNS-SD implementation
+  if (chip_device_platform == "linux" || chip_device_platform == "esp32" ||
+      chip_device_platform == "mbed" || chip_device_platform == "psoc6" ||
+      chip_device_platform == "ameba" || chip_device_platform == "webos" ||
+      chip_device_platform == "cc32xx" || chip_device_platform == "mw320" ||
+      chip_device_platform == "beken" || chip_device_platform == "mt793x" ||
+      chip_device_platform == "asr" || chip_device_platform == "openiotsdk" ||
+      chip_device_platform == "nuttx") {
+    chip_mdns = "minimal"
+  } else if (chip_device_platform == "darwin" ||
+             chip_device_platform == "cc13x4_26x4" || current_os == "android" ||
+             chip_device_platform == "fake" ||
+             chip_device_platform == "tizen") {
+    chip_mdns = "platform"
+  } else {
+    chip_mdns = "none"
+  }
+
+  # Enable Subscription persistence / resumption for CI and supported platforms
+  if (chip_device_platform == "darwin" || chip_device_platform == "linux" ||
+      chip_device_platform == "fake" || chip_device_platform == "efr32" ||
+      chip_device_platform == "SiWx917" || chip_device_platform == "nuttx") {
+    chip_persist_subscriptions = true
+  } else {
+    chip_persist_subscriptions = false
+  }
+}
+
+declare_args() {
+  # Enable subscription resumption after timeout - separate configuration for power use measurement
+  chip_subscription_timeout_resumption = chip_persist_subscriptions
+}
+
+if (chip_device_platform == "nxp" && chip_enable_openthread) {
+  chip_mdns = "platform"
+} else if (chip_device_platform == "nxp" && chip_enable_wifi) {
+  chip_mdns = "minimal"
+}
+
+declare_args() {
+  # Select DNS-SD components to build
+  chip_mdns_minimal = chip_mdns == "minimal"
+  chip_mdns_platform = chip_mdns == "platform"
+}
+
+_chip_device_layer = "none"
+if (chip_device_platform == "cc13x4_26x4") {
+  _chip_device_layer = "cc13xx_26xx/cc13x4_26x4"
+} else if (chip_device_platform == "cc32xx") {
+  _chip_device_layer = "cc32xx"
+} else if (chip_device_platform == "darwin") {
+  _chip_device_layer = "Darwin"
+} else if (chip_device_platform == "efr32") {
+  _chip_device_layer = "silabs"
+} else if (chip_device_platform == "SiWx917") {
+  _chip_device_layer = "silabs"
+} else if (chip_device_platform == "esp32") {
+  _chip_device_layer = "ESP32"
+} else if (chip_device_platform == "linux") {
+  _chip_device_layer = "Linux"
+} else if (chip_device_platform == "tizen") {
+  _chip_device_layer = "Tizen"
+} else if (chip_device_platform == "nrfconnect") {
+  _chip_device_layer = "nrfconnect"
+} else if (chip_device_platform == "qpg") {
+  _chip_device_layer = "qpg"
+} else if (chip_device_platform == "nxp") {
+  import("//build_overrides/nxp_sdk.gni")
+  import("${nxp_sdk_build_root}/nxp_sdk.gni")
+  _chip_device_layer = "nxp/${nxp_platform}"
+} else if (chip_device_platform == "nxp_zephyr") {
+  _chip_device_layer = "nxp/zephyr"
+} else if (chip_device_platform == "telink") {
+  _chip_device_layer = "telink"
+} else if (chip_device_platform == "mbed") {
+  _chip_device_layer = "mbed"
+} else if (chip_device_platform == "psoc6") {
+  _chip_device_layer = "Infineon/PSOC6"
+} else if (chip_device_platform == "android") {
+  _chip_device_layer = "android"
+} else if (chip_device_platform == "ameba") {
+  _chip_device_layer = "Ameba"
+} else if (chip_device_platform == "bl602") {
+  _chip_device_layer = "bouffalolab/common"
+} else if (chip_device_platform == "bl702") {
+  _chip_device_layer = "bouffalolab/common"
+} else if (chip_device_platform == "bl702l") {
+  _chip_device_layer = "bouffalolab/common"
+} else if (chip_device_platform == "cyw30739") {
+  _chip_device_layer = "Infineon/CYW30739"
+} else if (chip_device_platform == "webos") {
+  _chip_device_layer = "webos"
+} else if (chip_device_platform == "mw320") {
+  _chip_device_layer = "nxp/mw320"
+} else if (chip_device_platform == "zephyr") {
+  _chip_device_layer = "Zephyr"
+} else if (chip_device_platform == "beken") {
+  _chip_device_layer = "Beken"
+} else if (chip_device_platform == "mt793x") {
+  _chip_device_layer = "mt793x"
+} else if (chip_device_platform == "openiotsdk") {
+  _chip_device_layer = "openiotsdk"
+} else if (chip_device_platform == "asr") {
+  _chip_device_layer = "ASR"
+} else if (chip_device_platform == "nuttx") {
+  _chip_device_layer = "NuttX"
+} else if (chip_device_platform == "stm32") {
+  _chip_device_layer = "stm32"
+}
+
+if (chip_device_platform != "external") {
+  chip_ble_platform_config_include = ""
+  chip_device_platform_config_include = ""
+  chip_platform_config_include = ""
+  chip_inet_platform_config_include = ""
+  chip_system_platform_config_include = ""
+  chip_system_layer_impl_config_file = ""
+} else {
+  declare_args() {
+    chip_ble_platform_config_include = ""
+    chip_device_platform_config_include = ""
+    chip_platform_config_include = ""
+    chip_inet_platform_config_include = ""
+    chip_system_platform_config_include = ""
+    chip_system_layer_impl_config_file = ""
+    chip_external_platform_include_dir = ""
+  }
+}
+
+declare_args() {
+  # If true, disables KVS implementation for the platform.  May not be
+  # supported on all platforms.
+  chip_disable_platform_kvs = false
+
+  # If true, builds the tv-casting-common static lib
+  build_tv_casting_common_a = false
+}
+
+assert(!chip_disable_platform_kvs || chip_device_platform == "darwin",
+       "Can only disable KVS on some platforms")
+
+if (_chip_device_layer != "none" && chip_device_platform != "external") {
+  chip_ble_platform_config_include =
+      "<platform/" + _chip_device_layer + "/BlePlatformConfig.h>"
+  chip_device_platform_config_include =
+      "<platform/" + _chip_device_layer + "/CHIPDevicePlatformConfig.h>"
+  chip_platform_config_include =
+      "<platform/" + _chip_device_layer + "/CHIPPlatformConfig.h>"
+  chip_inet_platform_config_include =
+      "<platform/" + _chip_device_layer + "/InetPlatformConfig.h>"
+  chip_system_platform_config_include =
+      "<platform/" + _chip_device_layer + "/SystemPlatformConfig.h>"
+}
+
+declare_args() {
+  # Enable jlink/segger_rtt support.
+  chip_enable_segger_rtt = chip_device_platform != "qpg"
+}
+
+assert(
+    (current_os != "freertos" && chip_device_platform == "none") ||
+        chip_device_platform == "fake" ||
+        chip_device_platform == "cc13x4_26x4" ||
+        chip_device_platform == "cc32xx" || chip_device_platform == "darwin" ||
+        chip_device_platform == "efr32" || chip_device_platform == "esp32" ||
+        chip_device_platform == "external" || chip_device_platform == "linux" ||
+        chip_device_platform == "tizen" ||
+        chip_device_platform == "nrfconnect" || chip_device_platform == "nxp" ||
+        chip_device_platform == "nxp_zephyr" || chip_device_platform == "qpg" ||
+        chip_device_platform == "telink" || chip_device_platform == "mbed" ||
+        chip_device_platform == "psoc6" || chip_device_platform == "android" ||
+        chip_device_platform == "ameba" || chip_device_platform == "cyw30739" ||
+        chip_device_platform == "webos" || chip_device_platform == "mw320" ||
+        chip_device_platform == "zephyr" || chip_device_platform == "beken" ||
+        chip_device_platform == "bl602" || chip_device_platform == "bl702" ||
+        chip_device_platform == "bl702l" || chip_device_platform == "mt793x" ||
+        chip_device_platform == "SiWx917" ||
+        chip_device_platform == "openiotsdk" || chip_device_platform == "asr" ||
+        chip_device_platform == "stm32" || chip_device_platform == "nuttx",
+    "Please select a valid value for chip_device_platform")

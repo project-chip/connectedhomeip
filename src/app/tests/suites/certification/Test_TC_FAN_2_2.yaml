@@ -1,0 +1,64 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 263.2.2. [TC-FAN-2.2] Optional speed attributes with DUT as Server
+
+PICS:
+    - FAN.S
+    - FAN.S.F00
+
+config:
+    nodeId: 0x12344321
+    cluster: "Fan Control"
+    endpoint: 1
+
+tests:
+    - label: "Step 1: Commission DUT to TH"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH reads from the DUT the the SpeedMax attribute"
+      PICS: FAN.S.A0004
+      command: "readAttribute"
+      attribute: "SpeedMax"
+      response:
+          saveAs: SpeedMaxValue
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 100
+
+    - label: "Step 3: TH reads from the DUT the the SpeedSetting attribute"
+      PICS: FAN.S.A0005 && FAN.S.A0004
+      command: "readAttribute"
+      attribute: "SpeedSetting"
+      response:
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: SpeedMaxValue
+
+    - label: "Step 4: TH reads from the DUT the the SpeedCurrent attribute"
+      PICS: FAN.S.A0006 && FAN.S.A0004
+      command: "readAttribute"
+      attribute: "SpeedCurrent"
+      response:
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: SpeedMaxValue

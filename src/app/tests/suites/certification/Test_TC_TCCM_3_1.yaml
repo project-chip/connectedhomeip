@@ -1,0 +1,127 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 219.3.1. [TC-TCCM-3.1] On Mode functionality with DUT as Server
+
+PICS:
+    - TCCM.S.A0003
+    - MOD.S.F00
+    - OO.S.C00.Rsp
+    - OO.S.C01.Rsp
+
+config:
+    nodeId: 0x12344321
+    cluster: "Refrigerator And Temperature Controlled Cabinet Mode"
+    endpoint: 1
+    #Configure newmode value
+    new_mode_th:
+        type: int8u
+        defaultValue: 2
+    nonNull_OnMode_value:
+        type: int8u
+        defaultValue: 0
+
+tests:
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Preconditions: The OnMode attribute is set to a non-NULL value from
+          the mode values indicated by the SupportedModes attribute."
+      PICS: TCCM.S.A0003 && MOD.S.F00
+      command: "writeAttribute"
+      attribute: "OnMode"
+      arguments:
+          value: nonNull_OnMode_value
+
+    - label: "Step 2: TH reads from the DUT the OnMode attribute."
+      PICS: TCCM.S.A0003 && MOD.S.F00
+      command: "readAttribute"
+      attribute: "OnMode"
+      response:
+          saveAs: on_mode_dut
+
+    - label: "Step 3a: TH reads from the DUT the CurrentMode attribute."
+      PICS: TCCM.S.A0001 && MOD.S.F00
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          saveAs: old_current_mode_dut
+
+    - label:
+          "Step 3b: If the OnMode and CurrentMode attributes have the same
+          value, proceed to step 4, Otherwise proceed to step 6"
+      PICS: TCCM.S.A0003 && TCCM.S.A0001 && MOD.S.F00
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: on_mode_dut
+              - name: "Value2"
+                value: old_current_mode_dut
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsExpectedValue
+
+    - label: "Step 4:TH reads the SupportedModes attribute from the DUT"
+      runIf: IsExpectedValue
+      PICS: TCCM.S.A0000 && MOD.S.F00
+      command: "readAttribute"
+      attribute: "SupportedModes"
+      response:
+          constraints:
+              type: list
+              minLength: 2
+
+    - label:
+          "Step 5: Select a value from supported_modes_dut different from
+          on_mode_dut. Save the value as new_mode_th. TH sends a ChangeToMode
+          command to the DUT with NewMode set to new_mode_th"
+      runIf: IsExpectedValue
+      PICS: TCCM.S.C00.Rsp && MOD.S.F00
+      command: "ChangeToMode"
+      arguments:
+          values:
+              - name: "NewMode"
+                value: new_mode_th
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+
+    - label: "Step 6: TH sends an Off command to the DUT"
+      PICS: OO.S.C00.Rsp && MOD.S.F00
+      cluster: "On/Off"
+      command: "Off"
+
+    - label: "Step 7: TH sends an On command to the DUT"
+      PICS: OO.S.C01.Rsp && MOD.S.F00
+      cluster: "On/Off"
+      command: "On"
+
+    - label: "Step 8: TH reads the CurrentMode attribute from the DUT"
+      PICS: TCCM.S.A0001 && MOD.S.F00
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          value: on_mode_dut

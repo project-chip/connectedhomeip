@@ -1,0 +1,774 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/mbedtls.gni")
+import("//build_overrides/nlassert.gni")
+import("//build_overrides/nlunit_test.gni")
+import("//build_overrides/pigweed.gni")
+
+import("//src/lwip/lwip.gni")
+import("//src/platform/device.gni")
+import("$dir_pw_build/python.gni")
+import("$dir_pw_build/python_dist.gni")
+import("$dir_pw_build/python_venv.gni")
+
+# This build file should not be used in superproject builds.
+assert(chip_root == "//")
+
+import("${chip_root}/build/chip/fuzz_test.gni")
+import("${chip_root}/build/chip/tests.gni")
+import("${chip_root}/build/chip/tools.gni")
+
+import("${build_root}/config/compiler/compiler.gni")
+
+import("//src/crypto/crypto.gni")
+
+if (chip_with_lwip) {
+  import("//build_overrides/lwip.gni")
+}
+
+if (current_toolchain != "${dir_pw_toolchain}/default:default") {
+  declare_args() {
+    chip_enable_python_modules =
+        (current_os == "mac" || current_os == "linux") &&
+        (host_cpu == "x64" || host_cpu == "arm64" || host_cpu == "arm")
+    enable_pylib = false
+
+    # Build the Linux all clusters app example with default group
+    chip_build_all_clusters_app = false
+  }
+
+  if (enable_fuzz_test_targets) {
+    group("fuzz_tests") {
+      deps = [
+        "${chip_root}/src/credentials/tests:fuzz-chip-cert",
+        "${chip_root}/src/lib/core/tests:fuzz-tlv-reader",
+        "${chip_root}/src/lib/dnssd/minimal_mdns/tests:fuzz-minmdns-packet-parsing",
+        "${chip_root}/src/lib/format/tests:fuzz-payload-decoder",
+      ]
+    }
+  }
+
+  # Matter's in-tree pw_python_package or pw_python_distribution targets.
+  _matter_python_packages = [
+    "//examples/chef",
+    "//examples/common/pigweed/rpc_console/py:chip_rpc",
+    "//integrations/mobly:chip_mobly",
+    "//scripts/py_matter_yamltests:matter_yamltests",
+  ]
+
+  pw_python_venv("matter_build_venv") {
+    path = "$root_build_dir/python-venv"
+    constraints = pw_build_PIP_CONSTRAINTS
+    requirements = pw_build_PIP_REQUIREMENTS
+
+    # Packages available to import within GN's build venv.
+    source_packages = _matter_python_packages +
+                      [ "$dir_pw_env_setup:core_pigweed_python_packages" ]
+  }
+
+  pw_python_pip_install("pip_install_matter_packages") {
+    packages = [ "//examples/common/pigweed/rpc_console:chip_rpc_distribution" ]
+  }
+
+  # Python packages installed during bootstrap.
+  pw_python_group("python_packages") {
+    python_deps = [
+      ":pip_install_editable_matter_packages",
+      ":pip_install_matter_packages",
+      "$dir_pw_env_setup:pip_install_pigweed_package",
+    ]
+  }
+
+  # These pw_python_package targets will be installed using 'pip install --editable'
+  pw_python_pip_install("pip_install_editable_matter_packages") {
+    packages = [
+      "//integrations/mobly:chip_mobly",
+      "//examples/chef",
+    ]
+    editable = true
+  }
+
+  # Python wheel targets, used by //scripts/build_python.sh
+  group("python_wheels") {
+    if (chip_enable_python_modules) {
+      deps = [
+        "${chip_root}/scripts:matter_yamltests_distribution.wheel",
+        "${chip_root}/src/controller/python:chip-repl",
+      ]
+      if (enable_pylib) {
+        deps += [ "${chip_root}/src/pybindings/pycontroller" ]
+      }
+    }
+  }
+
+  # This is a real toolchain. Build CHIP.
+  group("default") {
+    deps = [
+      "${chip_root}/src/app",
+      "${chip_root}/src/ble",
+      "${chip_root}/src/controller",
+      "${chip_root}/src/credentials",
+      "${chip_root}/src/credentials:default_attestation_verifier",
+      "${chip_root}/src/crypto",
+      "${chip_root}/src/inet",
+      "${chip_root}/src/lib",
+      "${chip_root}/src/lib/asn1",
+      "${chip_root}/src/lib/core",
+      "${chip_root}/src/lib/support",
+      "${chip_root}/src/messaging",
+      "${chip_root}/src/protocols",
+      "${chip_root}/src/setup_payload",
+      "${chip_root}/src/system",
+      "${chip_root}/src/transport",
+      "${nlassert_root}:nlassert",
+      "${nlunit_test_root}:nlunit-test",
+    ]
+
+    if (enable_fuzz_test_targets) {
+      deps += [ "//:fuzz_tests" ]
+    }
+
+    if (chip_device_platform != "none") {
+      deps += [ "${chip_root}/src/app/server" ]
+    }
+
+    if (chip_build_tests) {
+      deps += [ "//src:tests" ]
+      if (current_os == "android" && current_toolchain == default_toolchain) {
+        deps += [ "${chip_root}/build/chip/java/tests:java_build_test" ]
+      }
+    }
+
+    if (chip_with_lwip) {
+      deps += [ "${lwip_root}:lwip" ]
+    }
+
+    if (chip_build_tools) {
+      deps += [
+        ":certification",
+        "${chip_root}/examples/shell/standalone:chip-shell",
+        "${chip_root}/src/app/tests/integration:chip-im-initiator",
+        "${chip_root}/src/app/tests/integration:chip-im-responder",
+        "${chip_root}/src/lib/address_resolve:address-resolve-tool",
+        "${chip_root}/src/messaging/tests/echo:chip-echo-requester",
+        "${chip_root}/src/messaging/tests/echo:chip-echo-responder",
+        "${chip_root}/src/qrcodetool",
+        "${chip_root}/src/setup_payload",
+        "${chip_root}/src/tools/spake2p",
+      ]
+      if (chip_can_build_cert_tool) {
+        deps += [ "${chip_root}/src/tools/chip-cert" ]
+      }
+      if (chip_enable_python_modules) {
+        deps += [ ":python_wheels" ]
+      }
+    }
+
+    if (current_os == "android") {
+      deps += [
+        "${chip_root}/src/app/server/java",
+        "${chip_root}/src/controller/java",
+        "${chip_root}/src/controller/java:jsontlv",
+        "${chip_root}/src/controller/java:onboarding_payload",
+        "${chip_root}/src/controller/java:tlv",
+        "${chip_root}/src/platform/android:java",
+      ]
+    }
+
+    if (build_tv_casting_common_a) {
+      deps += [ "${chip_root}/examples/tv-casting-app/tv-casting-common:tvCastingCommon" ]
+    }
+
+    if (chip_build_all_clusters_app) {
+      if (is_libfuzzer) {
+        deps += [ "${chip_root}/examples/all-clusters-app/linux:chip-all-clusters-app-fuzzing" ]
+      } else {
+        deps += [
+          "${chip_root}/examples/all-clusters-app/linux:chip-all-clusters-app",
+        ]
+      }
+    }
+  }
+
+  if (chip_build_tools) {
+    group("certification") {
+      data_deps = [ "${chip_root}/examples/chip-tool" ]
+
+      if (chip_enable_python_modules) {
+        if (enable_pylib) {
+          data_deps += [ "${chip_root}/src/pybindings/pycontroller" ]
+        }
+        data_deps += [ "${chip_root}/src/controller/python:chip-repl" ]
+      }
+
+      write_runtime_deps = "${root_out_dir}/certification.runtime_deps"
+    }
+  }
+
+  group("fake_platform_tests") {
+    if (chip_link_tests) {
+      deps = [ "//src:fake_platform_tests_run" ]
+    }
+  }
+
+  group("check") {
+    if (chip_link_tests) {
+      deps = [
+        "//:fake_platform_tests",
+        "//examples/chef:chef.tests",
+        "//scripts/build:build_examples.tests",
+        "//scripts/py_matter_idl:matter_idl.tests",
+        "//scripts/py_matter_yamltests:matter_yamltests.tests",
+        "//scripts/tests/py:metadata_parser.tests",
+        "//src:tests_run",
+      ]
+
+      if (current_os == "linux" || current_os == "mac") {
+        deps += [ "${chip_root}/scripts/tools/zap:tests" ]
+      }
+    }
+  }
+} else {
+  # This is the unified build. Configure various real toolchains.
+  import("${chip_root}/build/chip/chip_build.gni")
+  declare_args() {
+    # Set this to false to disable all builds by default.
+    enable_default_builds = true
+
+    # Enable building for Android.
+    enable_android_builds = false
+
+    # Enable building for Tizen.
+    enable_tizen_builds = false
+
+    # Set this to true to enable TI builds by default.
+    enable_ti_simplelink_builds = false
+
+    # Set this to true to enable efr32 builds by default.
+    enable_efr32_builds = false
+
+    # Set this to true to enable psoc6 builds by default.
+    enable_psoc6_builds = false
+
+    # Set this to true to enable Qorvo qpg builds by default.
+    enable_qpg_builds = false
+
+    # Set this to true to enable k32w builds by default.
+    enable_k32w_builds = false
+
+    # Set this to true to enable bl602 builds by default.
+    enable_bl602_builds = false
+
+    # Set this to true to enable bl702 builds by default.
+    enable_bl702_builds = false
+
+    # Set this to true to enable mw320 builds by default.
+    enable_mw320_builds = false
+
+    # Set this to true to enable genio builds by default.
+    enable_genio_builds = false
+
+    # Set this to true to enable stm32 builds by default.
+    enable_stm32_builds = false
+  }
+
+  # Pigweed does not provide a clang in some configurations.
+  if (enable_default_builds) {
+    _have_pigweed_clang =
+        host_os != "win" && !(host_os == "mac" && host_cpu == "arm64")
+  }
+
+  declare_args() {
+    # Enable building chip with the pigweed clang.
+    enable_host_clang_build = enable_default_builds && _have_pigweed_clang
+
+    # Enable building chip with gcc.
+    enable_host_gcc_build = enable_default_builds && host_os != "win"
+
+    # Enable building chip with gcc & mbedtls.
+    enable_host_gcc_mbedtls_build = false
+
+    # Enable limited testing with gcc & mbedtls.
+    enable_host_gcc_mbedtls_crypto_tests =
+        enable_default_builds && host_os != "win"
+
+    # Enable building chip with clang & boringssl
+    enable_host_clang_boringssl_build = false
+
+    # Enable limited testing with pigweed clang & boringssl.  On Mac, boringssl
+    # tests do not compile with ASAN enabled.
+    enable_host_clang_boringssl_crypto_tests =
+        enable_default_builds && _have_pigweed_clang &&
+        !(is_asan == true && host_os == "mac")
+
+    # Build the chip-cert tool.
+    enable_standalone_chip_cert_build =
+        enable_default_builds && host_os != "win" && chip_can_build_cert_tool
+
+    # Build the chip-tool example.
+    enable_standalone_chip_tool_build =
+        enable_default_builds && host_os != "win"
+
+    # Build the darwin-framework-tool example.  By default this is off, because
+    # it requires a preceding XCode build of the framework.
+    enable_standalone_chip_tool_darwin_build = false
+
+    # Build the shell example.
+    enable_standalone_shell_build = enable_default_builds && host_os != "win"
+
+    # Build the Linux all clusters app example.
+    enable_linux_all_clusters_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux tv app example.
+    enable_linux_tv_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux tv casting app example.
+    enable_linux_tv_casting_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux bridge app example.
+    enable_linux_bridge_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux lighting app example.
+    enable_linux_lighting_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux microwave oven app example.
+    enable_microwave_oven_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux thermostat app example.
+    enable_linux_thermostat_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux lock app example.
+    enable_linux_lock_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux LIT ICD example.
+    enable_linux_lit_icd_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux RVC app example.
+    enable_linux_rvc_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the cc13x2x7_26x2x7 lock app example.
+    enable_cc13x2x7_26x2x7_lock_app_build = enable_ti_simplelink_builds
+
+    # Build the cc13x2x7_26x2x7 all-clusters app example.
+    enable_cc13x2x7_26x2x7_all_clusters_app_build = enable_ti_simplelink_builds
+
+    # Build the efr32 lock app example.
+    enable_efr32_lock_app_build = enable_efr32_builds
+
+    # Build the psoc6 lock app example.
+    enable_psoc6_lock_app_build = enable_psoc6_builds
+
+    # Build the qpgxxxx lock app example.
+    enable_qpg_lock_app_build = enable_qpg_builds && !is_debug
+
+    # Build the efr32 lighting app example.
+    enable_efr32_lighting_app_build = enable_efr32_builds
+
+    # Build the efr32 window app example.
+    enable_efr32_window_app_build = enable_efr32_builds
+
+    # Build the k32w lighting app example.
+    enable_k32w_lighting_app_build = enable_k32w_builds
+
+    # Build the k32w lock app example.
+    enable_k32w_lock_app_build = enable_k32w_builds
+
+    # Build the k32w shell app example.
+    enable_k32w_shell_app_build = enable_k32w_builds
+
+    # Build the bl602 lighting app example.
+    enable_bl602_lighting_app_build = enable_bl602_builds
+
+    # Build the bl702 lighting app example.
+    enable_bl702_lighting_app_build = enable_bl702_builds
+
+    # Build the mw320 shell app example.
+    enable_mw320_shell_build = enable_mw320_builds
+
+    # Build the genio shell app example.
+    enable_genio_shell_app_build = enable_genio_builds
+
+    enable_fake_tests = enable_default_builds && host_os == "linux"
+
+    enable_tizen_lighting_app = enable_tizen_builds
+  }
+
+  builds = []
+  extra_build_deps = []
+  extra_check_deps = []
+
+  if (enable_host_clang_build) {
+    chip_build("host_clang") {
+      toolchain = "${build_root}/toolchain/host:${host_os}_${host_cpu}_clang"
+    }
+
+    builds += [ ":host_clang" ]
+  }
+
+  if (enable_host_gcc_build) {
+    chip_build("host_gcc") {
+      toolchain = "${build_root}/toolchain/host:${host_os}_${host_cpu}_gcc"
+    }
+
+    builds += [ ":host_gcc" ]
+  }
+
+  if (enable_host_gcc_mbedtls_build) {
+    chip_build("host_gcc_mbedtls") {
+      toolchain = "${chip_root}/config/mbedtls/toolchain:${host_os}_${host_cpu}_gcc_mbedtls"
+    }
+
+    builds += [ ":host_gcc_mbedtls" ]
+  }
+
+  if (enable_host_gcc_mbedtls_crypto_tests) {
+    chip_build("host_gcc_mbedtls_crypto_tests") {
+      test_group = "//src:crypto_tests"
+      toolchain = "${chip_root}/config/mbedtls/toolchain:${host_os}_${host_cpu}_gcc_mbedtls"
+    }
+
+    builds += [ ":host_gcc_mbedtls_crypto_tests" ]
+  }
+
+  if (enable_host_clang_boringssl_build) {
+    chip_build("host_clang_boringssl") {
+      toolchain = "${chip_root}/config/boringssl/toolchain:${host_os}_${host_cpu}_clang_boringssl"
+    }
+
+    builds += [ ":host_clang_boringssl" ]
+  }
+
+  if (enable_host_clang_boringssl_crypto_tests) {
+    chip_build("host_clang_boringssl_crypto_tests") {
+      test_group = "//src:crypto_tests"
+      toolchain = "${chip_root}/config/boringssl/toolchain:${host_os}_${host_cpu}_clang_boringssl"
+    }
+
+    builds += [ ":host_clang_boringssl_crypto_tests" ]
+  }
+
+  if (enable_android_builds) {
+    chip_build("android_arm") {
+      toolchain = "${build_root}/toolchain/android:android_arm"
+    }
+
+    chip_build("android_arm64") {
+      toolchain = "${build_root}/toolchain/android:android_arm64"
+    }
+
+    chip_build("android_x64") {
+      toolchain = "${build_root}/toolchain/android:android_x64"
+    }
+
+    chip_build("android_x86") {
+      toolchain = "${build_root}/toolchain/android:android_x86"
+    }
+
+    builds += [
+      ":android_arm",
+      ":android_arm64",
+      ":android_x64",
+      ":android_x86",
+    ]
+  }
+
+  if (enable_fake_tests) {
+    chip_build("fake_platform") {
+      test_group = "//src:fake_platform_tests"
+      toolchain = "${build_root}/toolchain/fake:fake_${host_cpu}_gcc"
+    }
+
+    builds += [ ":fake_platform" ]
+  }
+
+  standalone_toolchain = "${chip_root}/config/standalone/toolchain:standalone"
+  not_needed([ "standalone_toolchain" ])  # Might not be needed.
+
+  if (enable_standalone_chip_cert_build) {
+    group("standalone_chip_cert") {
+      deps = [ "${chip_root}/src/tools/chip-cert(${standalone_toolchain})" ]
+    }
+
+    extra_build_deps += [ ":standalone_chip_cert" ]
+  }
+
+  if (enable_standalone_chip_tool_build) {
+    group("standalone_chip_tool") {
+      deps = [ "${chip_root}/examples/chip-tool(${standalone_toolchain})" ]
+    }
+
+    extra_build_deps += [ ":standalone_chip_tool" ]
+  }
+
+  if (enable_standalone_chip_tool_darwin_build) {
+    group("standalone_chip_tool_darwin") {
+      deps = [
+        "${chip_root}/examples/darwin-framework-tool(${standalone_toolchain})",
+      ]
+    }
+
+    extra_build_deps += [ ":standalone_chip_tool_darwin" ]
+  }
+
+  if (enable_cc13x2x7_26x2x7_lock_app_build) {
+    group("cc13x2x7_26x2x7_lock_app") {
+      deps = [ "${chip_root}/examples/lock-app/cc13x2x7_26x2x7(${chip_root}/config/cc13x2_26x2/toolchain:cc13x2x7_26x2x7_lock_app)" ]
+    }
+
+    extra_build_deps += [ ":cc13x2x7_26x2x7_lock_app" ]
+  }
+
+  if (enable_cc13x2x7_26x2x7_all_clusters_app_build) {
+    group("cc13x2x7_26x2x7_all_clusters_app") {
+      deps = [ "${chip_root}/examples/all-clusters-app/cc13x2x7_26x2x7(${chip_root}/config/cc13x2_26x2/toolchain:cc13x2x7_26x2x7_all_clusters_app)" ]
+    }
+
+    extra_build_deps += [ ":cc13x2x7_26x2x7_all_clusters_app" ]
+  }
+
+  if (enable_standalone_shell_build) {
+    group("standalone_shell") {
+      deps =
+          [ "${chip_root}/examples/shell/standalone(${standalone_toolchain})" ]
+    }
+
+    extra_build_deps += [ ":standalone_shell" ]
+  }
+
+  if (enable_linux_all_clusters_app_build) {
+    group("linux_all_clusters_app") {
+      deps = [
+        "${chip_root}/examples/all-clusters-app/linux(${standalone_toolchain})",
+      ]
+    }
+
+    extra_build_deps += [ ":linux_all_clusters_app" ]
+  }
+
+  if (enable_linux_thermostat_app_build) {
+    group("linux_thermostat_app") {
+      deps =
+          [ "${chip_root}/examples/thermostat/linux(${standalone_toolchain})" ]
+    }
+
+    extra_build_deps += [ ":linux_thermostat_app" ]
+  }
+
+  if (enable_linux_tv_app_build) {
+    group("linux_tv_app") {
+      deps = [ "${chip_root}/examples/tv-app/linux(${standalone_toolchain})" ]
+    }
+
+    extra_build_deps += [ ":linux_tv_app" ]
+  }
+
+  if (enable_linux_tv_casting_app_build) {
+    group("linux_tv_casting_app") {
+      deps = [
+        "${chip_root}/examples/tv-casting-app/linux(${standalone_toolchain})",
+      ]
+    }
+
+    extra_build_deps += [ ":linux_tv_casting_app" ]
+  }
+
+  if (enable_linux_bridge_app_build) {
+    group("linux_bridge_app") {
+      deps =
+          [ "${chip_root}/examples/bridge-app/linux(${standalone_toolchain})" ]
+    }
+
+    extra_build_deps += [ ":linux_bridge_app" ]
+  }
+
+  if (enable_microwave_oven_app_build) {
+    group("linux_microwave_oven_app") {
+      deps = [ "${chip_root}/examples/microwave-oven-app/linux(${standalone_toolchain})" ]
+    }
+
+    extra_build_deps += [ ":linux_microwave_oven_app" ]
+  }
+
+  if (enable_linux_lighting_app_build) {
+    group("linux_lighting_app") {
+      deps = [
+        "${chip_root}/examples/lighting-app/linux(${standalone_toolchain})",
+      ]
+    }
+
+    extra_build_deps += [ ":linux_lighting_app" ]
+  }
+
+  if (enable_linux_lock_app_build) {
+    group("linux_lock_app") {
+      deps = [ "${chip_root}/examples/lock-app/linux(${standalone_toolchain})" ]
+    }
+
+    extra_build_deps += [ ":linux_lock_app" ]
+  }
+
+  if (enable_linux_lit_icd_app_build) {
+    group("linux_lit_icd_app") {
+      lit_icd_standalone_toolchain =
+          "${chip_root}/config/standalone/toolchain:lit_icd"
+
+      deps = [ "${chip_root}/examples/lit-icd-app/linux(${lit_icd_standalone_toolchain})" ]
+    }
+
+    extra_build_deps += [ ":linux_lit_icd_app" ]
+  }
+
+  if (enable_efr32_lock_app_build) {
+    group("efr32_lock_app") {
+      deps = [ "${chip_root}/examples/lock-app/efr32(${chip_root}/config/efr32/toolchain:efr32_lock_app)" ]
+    }
+
+    extra_build_deps += [ ":efr32_lock_app" ]
+  }
+
+  if (enable_psoc6_lock_app_build) {
+    group("psoc6_lock_app") {
+      deps = [ "${chip_root}/examples/lock-app/infineon/psoc6(${chip_root}/config/psoc6/toolchain:psoc6_lock_app)" ]
+    }
+
+    extra_build_deps += [ ":psoc6_lock_app" ]
+  }
+
+  if (enable_qpg_lock_app_build) {
+    group("qpg_lock_app") {
+      deps = [ "${chip_root}/examples/lock-app/qpg(${chip_root}/config/qpg/toolchain:qpg_lock_app)" ]
+    }
+
+    extra_build_deps += [ ":qpg_lock_app" ]
+  }
+
+  if (enable_efr32_lighting_app_build) {
+    group("efr32_lighting_app") {
+      deps = [ "${chip_root}/examples/lighting-app/efr32(${chip_root}/config/efr32/toolchain:efr32_lighting_app)" ]
+    }
+
+    extra_build_deps += [ ":efr32_lighting_app" ]
+  }
+
+  if (enable_efr32_window_app_build) {
+    group("efr32_window_app") {
+      deps = [ "${chip_root}/examples/window-app/efr32(${chip_root}/config/efr32/toolchain:efr32_window_app)" ]
+    }
+
+    extra_build_deps += [ ":efr32_window_app" ]
+  }
+
+  if (enable_k32w_lighting_app_build) {
+    group("k32w_lighting_app") {
+      deps = [ "${chip_root}/examples/lighting-app/nxp/k32w/k32w0/(${chip_root}/config/k32w/toolchain:k32w_lighting_app)" ]
+    }
+
+    extra_build_deps += [ ":k32w_lighting_app" ]
+  }
+
+  if (enable_k32w_lock_app_build) {
+    group("k32w_lock_app") {
+      deps = [ "${chip_root}/examples/lock-app/nxp/k32w/k32w0/(${chip_root}/config/k32w/toolchain:k32w_lock_app)" ]
+    }
+
+    extra_build_deps += [ ":k32w_lock_app" ]
+  }
+
+  if (enable_k32w_shell_app_build) {
+    group("k32w_shell_app") {
+      deps = [ "${chip_root}/examples/shell/nxp/k32w/k32w0/(${chip_root}/config/k32w/toolchain:k32w_shell_app)" ]
+    }
+
+    extra_build_deps += [ ":k32w_shell_app" ]
+  }
+
+  if (enable_tizen_lighting_app) {
+    group("tizen_lighting_app") {
+      deps = [ "${chip_root}/examples/lighting-app/tizen(${chip_root}/build/toolchain/tizen:tizen_arm)" ]
+    }
+
+    extra_build_deps += [ ":tizen_lighting_app" ]
+  }
+
+  if (enable_tizen_builds) {
+    group("check:tizen") {
+      testonly = true
+      deps = [ "${chip_root}/src/test_driver/tizen:check(${chip_root}/build/toolchain/tizen:tizen_arm)" ]
+    }
+
+    # Include Tizen check target only if BLE is not enabled, since
+    # currently, QEMU-based Tizen does not support Bluetooth.
+    if (!chip_config_network_layer_ble) {
+      extra_check_deps += [ ":check:tizen" ]
+    }
+  }
+
+  if (enable_mw320_shell_build) {
+    group("mw320_shell") {
+      deps = [ "${chip_root}/examples/shell/mw320(${chip_root}/config/mw320/toolchain:mw320_shell)" ]
+    }
+
+    extra_build_deps += [ ":mw320_shell" ]
+  }
+
+  if (enable_bl702_lighting_app_build) {
+    group("bl702_lighting_app") {
+      deps = [ "${chip_root}/examples/lighting-app/bl702(${chip_root}/config/bl702/toolchain:bl702_lighting_app)" ]
+    }
+
+    extra_build_deps += [ ":bl702_shell" ]
+  }
+
+  if (enable_genio_shell_app_build) {
+    group("genio_shell_app") {
+      deps = [ "${chip_root}/examples/shell/genio(${chip_root}/config/genio/toolchain:genio_shell_app)" ]
+    }
+
+    extra_build_deps += [ ":genio_shell_app" ]
+  }
+
+  if (enable_linux_rvc_app_build) {
+    group("linux_rvc_app") {
+      deps = [ "${chip_root}/examples/rvc-app/linux(${standalone_toolchain})" ]
+    }
+
+    extra_build_deps += [ ":linux_rvc_app" ]
+  }
+
+  group("default") {
+    deps = extra_build_deps + builds
+  }
+
+  group("check") {
+    testonly = true
+    deps = extra_check_deps
+    foreach(_build, builds) {
+      deps += [ get_label_info(_build, "dir") + ":check_" +
+                get_label_info(_build, "name") ]
+    }
+  }
+}

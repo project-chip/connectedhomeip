@@ -1,0 +1,124 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 3.2.1. [TC-OO-2.1] Attributes with server as DUT
+
+PICS:
+    - OO.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "On/Off"
+    endpoint: 1
+
+tests:
+    - label: "Step 1: Commission DUT to TH"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH reads the OnOff attribute from the DUT"
+      PICS: OO.S.A0000
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          constraints:
+              type: boolean
+
+    - label: "Step 3: TH reads the GlobalSceneControl attribute from the DUT"
+      PICS: OO.S.A4000
+      command: "readAttribute"
+      attribute: "GlobalSceneControl"
+      response:
+          constraints:
+              type: boolean
+
+    - label: "Step 4: TH reads the OnTime attribute from the DUT"
+      PICS: OO.S.A4001
+      command: "readAttribute"
+      attribute: "OnTime"
+      response:
+          saveAs: initialOnTime
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Step 5: TH writes the OnTime attribute as 30"
+      PICS: OO.S.A4001
+      command: "writeAttribute"
+      attribute: "OnTime"
+      arguments:
+          value: 30
+
+    - label: "Step 6: TH reads the OnTime attribute from the DUT"
+      PICS: OO.S.A4001
+      command: "readAttribute"
+      attribute: "OnTime"
+      response:
+          value: 30
+
+    - label:
+          "Step 7: TH writes the OnTime attribute as 'initial-On-time' to
+          restore the original value"
+      PICS: OO.S.A4001
+      command: "writeAttribute"
+      attribute: "OnTime"
+      arguments:
+          value: initialOnTime
+
+    - label: "Step 8: TH reads the OffWaitTime attribute from the DUT"
+      PICS: OO.S.A4002
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      response:
+          saveAs: initialOffWaitTime
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Step 9: TH writes the OffWaitTime attribute as 30"
+      PICS: OO.S.A4002
+      command: "writeAttribute"
+      attribute: "OffWaitTime"
+      arguments:
+          value: 30
+
+    - label: "Step 10: TH reads the OffWaitTime attribute from the DUT"
+      PICS: OO.S.A4002
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      response:
+          value: 30
+
+    - label:
+          "Step 11: TH writes the OffWaitTime attribute as
+          'initial-Off-waittime' to restore the original value"
+      PICS: OO.S.A4002
+      command: "writeAttribute"
+      attribute: "OffWaitTime"
+      arguments:
+          value: initialOffWaitTime
+
+    - label: "Step 12: TH reads the StartUpOnOff attribute from the DUT"
+      PICS: OO.S.A4003
+      command: "readAttribute"
+      attribute: "StartUpOnOff"
+      response:
+          constraints:
+              type: enum8

@@ -1,0 +1,179 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.14.2. [TC-ALOGIN-12.2] Account Login Verification (DUT as Client)
+
+PICS:
+    - ALOGIN.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Preconditions"
+      verification: |
+          Commission TH to DUT, if not done so already. In some cases, such as with a Casting Video Player, the TH commissions the DUT.
+
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
+
+          The following command on the example tv-app will launch a content app on endpoint 4:
+          ./chip-tool applicationlauncher launch-app 1 1 --Application '{"catalogVendorID": 123, "applicationID": "exampleid"}'
+          ./chip-tv-casting-app applicationlauncher launch-app 1 1 --Application '{"catalogVendorID": 123, "applicationID": "exampleid"}'
+          On TH (tv-app), Verify the launch app command is received successfully.
+          1666779708.066501][24994:24994] CHIP:DMG: InvokeRequestMessage =
+          [1666779708.066504][24994:24994] CHIP:DMG: {
+          [1666779708.066507][24994:24994] CHIP:DMG:         suppressResponse = false,
+          [1666779708.066509][24994:24994] CHIP:DMG:         timedRequest = false,
+          [1666779708.066512][24994:24994] CHIP:DMG:         InvokeRequests =
+          [1666779708.066517][24994:24994] CHIP:DMG:         [
+          [1666779708.066520][24994:24994] CHIP:DMG:                 CommandDataIB =
+          [1666779708.066524][24994:24994] CHIP:DMG:                 {
+          [1666779708.066527][24994:24994] CHIP:DMG:                         CommandPathIB =
+          [1666779708.066532][24994:24994] CHIP:DMG:                         {
+          [1666779708.066536][24994:24994] CHIP:DMG:                                 EndpointId = 0x1,
+          [1666779708.066540][24994:24994] CHIP:DMG:                                 ClusterId = 0x50c,
+          [1666779708.066545][24994:24994] CHIP:DMG:                                 CommandId = 0x0,
+          [1666779708.066547][24994:24994] CHIP:DMG:                         },
+          [1666779708.066551][24994:24994] CHIP:DMG:
+          [1666779708.066553][24994:24994] CHIP:DMG:                         CommandFields =
+          [1666779708.066555][24994:24994] CHIP:DMG:                         {
+          [1666779708.066557][24994:24994] CHIP:DMG:                                 0x0 =
+          [1666779708.066560][24994:24994] CHIP:DMG:                                 {
+          [1666779708.066566][24994:24994] CHIP:DMG:                                         0x0 = 123,
+          [1666779708.066569][24994:24994] CHIP:DMG:                                         0x1 = "exampleid" (9 chars),
+          [1666779708.066572][24994:24994] CHIP:DMG:                                 },
+          [1666779708.066575][24994:24994] CHIP:DMG:                         },
+          [1666779708.066578][24994:24994] CHIP:DMG:                 },
+          [1666779708.066581][24994:24994] CHIP:DMG:
+          [1666779708.066583][24994:24994] CHIP:DMG:         ],
+          [1666779708.066586][24994:24994] CHIP:DMG:
+          [1666779708.066588][24994:24994] CHIP:DMG:         InteractionModelRevision = 1
+          [1666779708.066590][24994:24994] CHIP:DMG: },
+          [1666779708.066602][24994:24994] CHIP:DMG: AccessControl: checking f=2 a=c s=0x000000000001B669 t= c=0x0000_050C e=1 p=o
+      disabled: true
+
+    - label: "Step 1: DUT sends GetSetupPIN command to TH"
+      PICS: ALOGIN.C.C00.Tx
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
+
+          ./chip-tool accountlogin get-setup-pin 1111 1 4 --timedInteractionTimeoutMs 1000
+          ./chip-tv-casting-app accountlogin get-setup-pin 1111 1 4 --timedInteractionTimeoutMs 1000
+
+          On TH (tv-app), Verify the get setup pin command is received successfully.
+
+          [1658531772994] [21924:325733] CHIP: [DMG] InvokeRequestMessage =
+          [1658531772994] [21924:325733] CHIP: [DMG] {
+          [1658531772994] [21924:325733] CHIP: [DMG]         suppressResponse = false,
+          [1658531772994] [21924:325733] CHIP: [DMG]         timedRequest = true,
+          [1658531772994] [21924:325733] CHIP: [DMG]         InvokeRequests =
+          [1658531772994] [21924:325733] CHIP: [DMG]         [
+          [1658531772994] [21924:325733] CHIP: [DMG]                 CommandDataIB =
+          [1658531772994] [21924:325733] CHIP: [DMG]                 {
+          [1658531772994] [21924:325733] CHIP: [DMG]                         CommandPathIB =
+          [1658531772994] [21924:325733] CHIP: [DMG]                         {
+          [1658531772994] [21924:325733] CHIP: [DMG]                                 EndpointId = 0x6,
+          [1658531772994] [21924:325733] CHIP: [DMG]                                 ClusterId = 0x50e,
+          [1658531772994] [21924:325733] CHIP: [DMG]                                 CommandId = 0x0,
+          [1658531772994] [21924:325733] CHIP: [DMG]                         },
+          [1658531772994] [21924:325733] CHIP: [DMG]
+          [1658531772994] [21924:325733] CHIP: [DMG]                         CommandFields =
+          [1658531772994] [21924:325733] CHIP: [DMG]                         {
+          [1658531772994] [21924:325733] CHIP: [DMG]                                 0x0 = "1111",
+          [1658531772994] [21924:325733] CHIP: [DMG]                         },
+          [1658531772994] [21924:325733] CHIP: [DMG]                 },
+          [1658531772994] [21924:325733] CHIP: [DMG]
+          [1658531772994] [21924:325733] CHIP: [DMG]         ],
+          [1658531772994] [21924:325733] CHIP: [DMG]
+          [1658531772994] [21924:325733] CHIP: [DMG]         InteractionModelRevision = 1
+          [1658531772994] [21924:325733] CHIP: [DMG] },
+      disabled: true
+
+    - label: "Step 2: DUT sends Login command to TH"
+      PICS: ALOGIN.C.C00.Tx
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
+
+          ./chip-tool accountlogin login 11111 34567890 1 4 --timedInteractionTimeoutMs 1000
+          ./chip-tv-casting-app accountlogin login 11111 34567890 1 4 --timedInteractionTimeoutMs 1000
+
+          On TH (tv-app), Verify the  login command is received successfully.
+
+          [1658531831563] [21924:325733] CHIP: [DMG] InvokeRequestMessage =
+          [1658531831563] [21924:325733] CHIP: [DMG] {
+          [1658531831563] [21924:325733] CHIP: [DMG]         suppressResponse = false,
+          [1658531831563] [21924:325733] CHIP: [DMG]         timedRequest = true,
+          [1658531831563] [21924:325733] CHIP: [DMG]         InvokeRequests =
+          [1658531831563] [21924:325733] CHIP: [DMG]         [
+          [1658531831563] [21924:325733] CHIP: [DMG]                 CommandDataIB =
+          [1658531831563] [21924:325733] CHIP: [DMG]                 {
+          [1658531831563] [21924:325733] CHIP: [DMG]                         CommandPathIB =
+          [1658531831563] [21924:325733] CHIP: [DMG]                         {
+          [1658531831563] [21924:325733] CHIP: [DMG]                                 EndpointId = 0x6,
+          [1658531831563] [21924:325733] CHIP: [DMG]                                 ClusterId = 0x50e,
+          [1658531831563] [21924:325733] CHIP: [DMG]                                 CommandId = 0x2,
+          [1658531831563] [21924:325733] CHIP: [DMG]                         },
+          [1658531831563] [21924:325733] CHIP: [DMG]
+          [1658531831563] [21924:325733] CHIP: [DMG]                         CommandFields =
+          [1658531831563] [21924:325733] CHIP: [DMG]                         {
+          [1658531831563] [21924:325733] CHIP: [DMG]                                 0x0 = "11111",
+          [1658531831563] [21924:325733] CHIP: [DMG]                                 0x1 = "34567890",
+          [1658531831563] [21924:325733] CHIP: [DMG]                         },
+          [1658531831563] [21924:325733] CHIP: [DMG]                 },
+          [1658531831563] [21924:325733] CHIP: [DMG]
+          [1658531831563] [21924:325733] CHIP: [DMG]         ],
+          [1658531831563] [21924:325733] CHIP: [DMG]
+          [1658531831563] [21924:325733] CHIP: [DMG]         InteractionModelRevision = 1
+          [1658531831563] [21924:325733] CHIP: [DMG] },
+      disabled: true
+
+    - label: "Step 3: DUT sends Logout command to TH"
+      PICS: ALOGIN.C.C00.Tx
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
+
+          ./chip-tool accountlogin logout 1 4 --timedInteractionTimeoutMs 1000
+          ./chip-tv-casting-app accountlogin logout 1 4 --timedInteractionTimeoutMs 1000
+
+
+          On TH (tv-app), Verify the logout command is received successfully.
+
+          [1658531872518] [21924:331051] CHIP: [DMG] InvokeRequestMessage =
+          [1658531872518] [21924:331051] CHIP: [DMG] {
+          [1658531872518] [21924:331051] CHIP: [DMG]         suppressResponse = false,
+          [1658531872518] [21924:331051] CHIP: [DMG]         timedRequest = true,
+          [1658531872518] [21924:331051] CHIP: [DMG]         InvokeRequests =
+          [1658531872518] [21924:331051] CHIP: [DMG]         [
+          [1658531872518] [21924:331051] CHIP: [DMG]                 CommandDataIB =
+          [1658531872518] [21924:331051] CHIP: [DMG]                 {
+          [1658531872518] [21924:331051] CHIP: [DMG]                         CommandPathIB =
+          [1658531872518] [21924:331051] CHIP: [DMG]                         {
+          [1658531872518] [21924:331051] CHIP: [DMG]                                 EndpointId = 0x6,
+          [1658531872518] [21924:331051] CHIP: [DMG]                                 ClusterId = 0x50e,
+          [1658531872518] [21924:331051] CHIP: [DMG]                                 CommandId = 0x3,
+          [1658531872518] [21924:331051] CHIP: [DMG]                         },
+          [1658531872518] [21924:331051] CHIP: [DMG]
+          [1658531872518] [21924:331051] CHIP: [DMG]                         CommandFields =
+          [1658531872518] [21924:331051] CHIP: [DMG]                         {
+          [1658531872518] [21924:331051] CHIP: [DMG]                         },
+          [1658531872518] [21924:331051] CHIP: [DMG]                 },
+          [1658531872518] [21924:331051] CHIP: [DMG]
+          [1658531872518] [21924:331051] CHIP: [DMG]         ],
+          [1658531872518] [21924:331051] CHIP: [DMG]
+          [1658531872518] [21924:331051] CHIP: [DMG]         InteractionModelRevision = 1
+          [1658531872518] [21924:331051] CHIP: [DMG] },
+      disabled: true

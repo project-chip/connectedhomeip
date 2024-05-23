@@ -1,0 +1,74 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+
+import("${build_root}/config/android/config.gni")
+import("${build_root}/toolchain/gcc_toolchain.gni")
+
+template("android_clang_toolchain") {
+  _invoker_toolchain_args = invoker.toolchain_args
+
+  if (_invoker_toolchain_args.current_cpu == "arm") {
+    _tool_name_root = "armv7a-linux-androideabi${invoker.api_level}-"
+  } else if (_invoker_toolchain_args.current_cpu == "arm64") {
+    _tool_name_root = "aarch64-linux-android${invoker.api_level}-"
+  } else if (_invoker_toolchain_args.current_cpu == "x64") {
+    _tool_name_root = "x86_64-linux-android${invoker.api_level}-"
+  } else if (_invoker_toolchain_args.current_cpu == "x86") {
+    _tool_name_root = "i686-linux-android${invoker.api_level}-"
+  } else {
+    assert(
+        false,
+        "Unknown/invalid current_cpu value in toolchain_args::current_cpu for android_clang_toolchain")
+  }
+
+  _android_toolchain_args = {
+    current_os = "android"
+    is_clang = true
+    forward_variables_from(_invoker_toolchain_args, "*")
+  }
+
+  _ndk_prefix = ""
+  if (android_ndk_root != "") {
+    _ndk_host_os = ""
+    if (host_os == "linux") {
+      _ndk_host_os = "linux"
+    } else if (host_os == "mac") {
+      _ndk_host_os = "darwin"
+    } else if (host_os == "win") {
+      _ndk_host_os = "windows"
+    }
+
+    _ndk_host_cpu = ""
+    if (host_cpu == "x64") {
+      _ndk_host_cpu = "-x86_64"
+    } else if (host_cpu == "arm64") {
+      # until NDK 24.0.7856742-beta1, the host cpu on apple silicon is x86_64
+      _ndk_host_cpu = "-x86_64"
+    }
+
+    _ndk_host = _ndk_host_os + _ndk_host_cpu
+    _ndk_prefix =
+        "${android_ndk_root}/toolchains/llvm/prebuilt/${_ndk_host}/bin/"
+  }
+
+  gcc_toolchain(target_name) {
+    toolchain_args = _android_toolchain_args
+    ar = _ndk_prefix + "llvm-ar"
+    cc = _ndk_prefix + _tool_name_root + "clang"
+    cxx = _ndk_prefix + _tool_name_root + "clang++"
+    link_generate_map_file = false
+  }
+}

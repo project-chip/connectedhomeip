@@ -1,0 +1,89 @@
+EnumsNotUsedAsTypeInXML:
+    # List of enums that are not used as a type in XML. By adding an enum
+    # to this list you prevent incorrectly assuming from code that you are
+    # able to use kUnknownEnumValue safely. This happens for derived clusters
+    # such as ModeBase where there are CommonTag, DerivedClusterTags, MfgTags.
+    - "DishwasherMode::ModeTag"
+    - "LaundryWasherMode::ModeTag"
+    - "RefrigeratorAndTemperatureControlledCabinetMode::ModeTag"
+    - "RvcRunMode::ModeTag"
+    - "RvcRunMode::StatusCode"
+    - "RvcCleanMode::ModeTag"
+    - "RvcCleanMode::StatusCode"
+    - "RvcOperationalState::OperationalStateEnum"
+    - "RvcOperationalState::ErrorStateEnum"
+    - "EnergyEvseMode::ModeTag"
+    - "DeviceEnergyManagementMode::ModeTag"
+
+CommandHandlerInterfaceOnlyClusters:
+    # List of clusters that are implemented entirely with
+    # CommandHandlerInterface and hence do not need generated command dispatch.
+    # This uses asUpperCamelCase versions of the cluster name.
+    - Network Commissioning
+    - Scenes Management
+    - RVC Run Mode
+    - RVC Clean Mode
+    - Dishwasher Mode
+    - Laundry Washer Mode
+    - Oven Mode
+    - Oven Cavity Operational State
+    - Refrigerator And Temperature Controlled Cabinet Mode
+    - Operational State
+    - Activated Carbon Filter Monitoring
+    - HEPA Filter Monitoring
+    - RVC Operational State
+    - Sample MEI
+    - Microwave Oven Control
+    - Energy EVSE
+    - Energy EVSE Mode
+    - Device Energy Management
+    - Device Energy Management Mode
+    - Electrical Power Measurement
+    - Electrical Energy Measurement
+
+# We need a more configurable way of deciding which clusters have which init functions....
+# See https://github.com/project-chip/connectedhomeip/issues/4369
+ClustersWithInitFunctions:
+    - Color Control
+    - Groups
+    - Identify
+    - Level Control
+    - Localization Configuration
+    - Occupancy Sensing
+    - On/Off
+    - Pump Configuration and Control
+    - Time Format Localization
+    - Thermostat
+    - Mode Select
+    - Sample MEI
+    - Scenes Management
+
+ClustersWithAttributeChangedFunctions:
+    - Bridged Device Basic
+    - Door Lock
+    - Identify
+    - Pump Configuration and Control
+    - Window Covering
+    - Fan Control
+
+ClustersWithShutdownFunctions:
+    - Barrier Control
+    - On/Off
+    - Door Lock
+    - Level Control
+    - Color Control
+    - Sample MEI
+    - Scenes Management
+
+ClustersWithPreAttributeChangeFunctions:
+    - Door Lock
+    - Pump Configuration and Control
+    - Thermostat User Interface Configuration
+    - Time Format Localization
+    - Localization Configuration
+    - Mode Select
+    - Fan Control
+    - Thermostat
+    - Energy Preference
+    - Laundry Washer Controls
+    - Laundry Dryer Controls

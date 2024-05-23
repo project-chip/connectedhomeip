@@ -1,0 +1,17 @@
+name: upload-size-reports
+description: upload-size-reports
+inputs:
+  platform-name:
+    description: "Platform name Name"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Uploading Size Reports
+      uses: actions/upload-artifact@v4
+      if: ${{ !env.ACT }}
+      with:
+        name: Size,${{ inputs.platform-name }}-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
+        path: |
+          /tmp/bloat_reports/

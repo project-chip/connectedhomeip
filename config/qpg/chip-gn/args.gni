@@ -1,0 +1,51 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//examples/platform/qpg/args.gni")
+qpg_sdk_target = get_label_info(":sdk", "label_no_toolchain")
+
+chip_device_platform = "qpg"
+
+optimize_debug_level = "s"
+lwip_debug = false
+
+chip_enable_openthread = true
+chip_config_network_layer_ble = true
+chip_inet_config_enable_ipv4 = false
+chip_enable_nfc = false
+chip_build_tests = false
+chip_monolithic_tests = false
+chip_inet_config_enable_tcp_endpoint = false
+chip_build_libshell = false
+chip_enable_ota_requestor = true
+qpg_ar = "arm-none-eabi-ar"
+qpg_cc = "arm-none-eabi-gcc"
+qpg_cxx = "arm-none-eabi-g++"
+chip_mdns = "platform"
+
+# Disable lock tracking, since our FreeRTOS configuration does not set
+# INCLUDE_xSemaphoreGetMutexHolder
+chip_stack_lock_tracking = "none"
+
+# Using lighting-app as template config
+# Application specific override to be done as cmd line arg
+chip_project_config_include_dirs = [ "//examples/lighting-app/qpg/include" ]
+chip_project_config_include = "<CHIPProjectConfig.h>"
+chip_system_project_config_include = "<CHIPProjectConfig.h>"
+chip_ble_project_config_include = ""
+
+custom_toolchain = "//config/qpg/chip-gn/toolchain:qpgtoolchain"
+
+pw_build_PIP_CONSTRAINTS = [ "//scripts/setup/constraints.txt" ]

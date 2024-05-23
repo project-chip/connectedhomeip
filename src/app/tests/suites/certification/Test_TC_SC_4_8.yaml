@@ -1,0 +1,214 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    3.4.8. [TC-SC-4.8] Compressed Fabric ID remains the same for Nodes
+    commissioned to the same fabric [DUT - Commissioner]
+
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as commissioner test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Step 1: Commission TH1 to DUTs Fabric"
+      verification: |
+          Execute the below mentioned command to put TH1(all-clusters-app) into a commissionable state, Pls use equivalent command on the respective reference app
+           ./chip-all-clusters-app
+
+          Once TH1 reach the  commissionable state pls send below mentioned command on DUT. Pls use equivalent command on the respective reference app
+           ./chip-tool pairing onnetwork 1 20202021
+          Verify the commissioning completed with success on TH(chip-tool) from DUT
+          [1686292950.704507][64862:64862] CHIP:EM: <<< [E:19392r S:42475 M:231243250 (Ack:167107665)] (S) Msg TX to 1:000000000001B669 [A822] --- Type 0001:09 (IM:InvokeCommandResponse)
+          [1686292950.704551][64862:64862] CHIP:IN: (S) Sending msg 231243250 on secure session with LSID: 42475
+          [1686292950.704796][64862:64862] CHIP:DMG: Command handler moving to [CommandSen]
+          [1686292950.704822][64862:64862] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1686292950.704857][64862:64862] CHIP:DL: HandlePlatformSpecificBLEEvent 32781
+          [1686292950.704880][64862:64862] CHIP:SVR: Commissioning completed successfully
+          [1686292950.704920][64862:64862] CHIP:DIS: Updating services using commissioning mode 0
+          [1686292950.714125][64862:64862] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1686292950.760019][64862:64862] CHIP:DL: Using wifi MAC for hostname
+          [1686292950.760072][64862:64862] CHIP:DIS: Advertise operational node 03C4C7333070A822-0000000000000001
+          [1686292950.760120][64862:64862] CHIP:DIS: Responding with _matter._tcp.local
+          [1686292950.760141][64862:64862] CHIP:DIS: Responding with 03C4C7333070A822-0000000000000001._matter._tcp.local
+          [1686292950.760166][64862:64862] CHIP:DIS: Responding with 03C4C7333070A822-0000000000000001._matter._tcp.local
+          [1686292950.760184][64862:64862] CHIP:DIS: Responding with E45F010F28780000.local
+          [1686292950.760201][64862:64862] CHIP:DIS: Responding with E45F010F28780000.local
+
+
+          On TH1(all-clusters-app), Extract the Compressed Fabric ID assigned from DUT to TH1 and save the value for future use
+          [1686292950.701603][64862:64862] CHIP:DL: writing settings to file (/tmp/chip_kvs-H1eZH9)
+          [1686292950.702331][64862:64862] CHIP:DL: renamed tmp file to file (/tmp/chip_kvs)
+          [1686292950.702489][64862:64862] CHIP:DL: writing settings to file (/tmp/chip_kvs-Dmuetk)
+          [1686292950.703252][64862:64862] CHIP:DL: renamed tmp file to file (/tmp/chip_kvs)
+          [1686292950.703308][64862:64862] CHIP:ZCL: OpCreds: Fabric index 0x1 was committed to storage. Compressed Fabric Id 0x03C4C7333070A822, FabricId 0000000000000001, NodeId 0000000000000001, VendorId 0xFFF1
+          [1686292950.703427][64862:64862] CHIP:DL: writing settings to file (/tmp/chip_kvs-IyQ8P3)
+          [1686292950.704135][64862:64862] CHIP:DL: renamed tmp file to file (/tmp/chip_kvs)
+          [1686292950.704185][64862:64862] CHIP:FS: GeneralCommissioning: Successfully commited pending fabric data
+          [1686292950.704213][64862:64862] CHIP:FS: Fail-safe cleanly disarmed
+      disabled: true
+
+    - label: "Step 2: Commission TH2 to DUTs Fabric"
+      verification: |
+          Execute the below mentioned command to put TH2(all-clusters-app) into a commissionable state, Pls use equivalent command on the respective reference app
+           ./chip-all-clusters-app
+
+          Once TH1 reach the  commissionable state pls send below mentioned command on DUT. Pls use equivalent command on the respective reference app
+           ./chip-tool pairing onnetwork 2 20202021
+          Verify the commissioning completed with success on TH(chip-tool) from DUT
+          [1686293117.143110][56094:56094] CHIP:IN: (S) Sending msg 99387705 on secure session with LSID: 61285
+          [1686293117.143428][56094:56094] CHIP:DMG: Command handler moving to [CommandSen]
+          [1686293117.143492][56094:56094] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1686293117.143570][56094:56094] CHIP:DL: HandlePlatformSpecificBLEEvent 32781
+          [1686293117.143628][56094:56094] CHIP:SVR: Commissioning completed successfully
+          [1686293117.143720][56094:56094] CHIP:DIS: Updating services using commissioning mode 0
+          [1686293117.168263][56094:56094] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1686293117.307513][56094:56094] CHIP:DL: Using wifi MAC for hostname
+          [1686293117.307620][56094:56094] CHIP:DIS: Advertise operational node 03C4C7333070A822-0000000000000002
+          [1686293117.307731][56094:56094] CHIP:DIS: Responding with _matter._tcp.local
+
+
+          On TH2(All-clusters-app), Extract the Compressed Fabric ID assigned from DUT to TH2 and save the value for future use
+
+          [1686293117.138462][56094:56094] CHIP:DL: writing settings to file (/tmp/chip_kvs-gmI7KQ)
+          [1686293117.140132][56094:56094] CHIP:DL: renamed tmp file to file (/tmp/chip_kvs)
+          [1686293117.140260][56094:56094] CHIP:ZCL: OpCreds: Fabric index 0x1 was committed to storage. Compressed Fabric Id 0x03C4C7333070A822, FabricId 0000000000000001, NodeId 0000000000000002, VendorId 0xFFF1
+          [1686293117.140525][56094:56094] CHIP:DL: writing settings to file (/tmp/chip_kvs-8j38kK)
+          [1686293117.142196][56094:56094] CHIP:DL: renamed tmp file to file (/tmp/chip_kvs)
+          [1686293117.142319][56094:56094] CHIP:FS: GeneralCommissioning: Successfully commited pending fabric data
+
+
+
+          Verify that the value obtained from TH1 and TH2 are same
+      disabled: true
+
+    - label:
+          "Step 3: Send RemoveFabric from DUT to TH1 and commission DUT to TH1
+          again"
+      verification: |
+          Send RemoveFabric command  from DUT to TH1
+
+          ./chip-tool operationalcredentials remove-fabric 1 1 0
+          [1686293276.612334][64862:64862] CHIP:DL: renamed tmp file to file (/tmp/chip_kvs)
+          [1686293276.612456][64862:64862] CHIP:DL: writing settings to file (/tmp/chip_kvs-vK1UPi)
+          [1686293276.613051][64862:64862] CHIP:DL: renamed tmp file to file (/tmp/chip_kvs)
+          [1686293276.613202][64862:64862] CHIP:DL: writing settings to file (/tmp/chip_kvs-GDj42p)
+          [1686293276.613742][64862:64862] CHIP:DL: renamed tmp file to file (/tmp/chip_kvs)
+          [1686293276.613802][64862:64862] CHIP:ZCL: OpCreds: RemoveFabric successful
+          [1686293276.613839][64862:64862] CHIP:DMG: Command handler moving to [ Preparing]
+          [1686293276.613865][64862:64862] CHIP:DMG: Command handler moving to [AddingComm]
+          [1686293276.613890][64862:64862] CHIP:DMG: Command handler moving to [AddedComma]
+          [1686293276.613914][64862:64862] CHIP:IN: Expiring all sessions for fabric 0x1!!
+          [1686293276.613932][64862:64862] CHIP:IN: SecureSession[0xaaab194a0140]: MarkForEviction Type:2 LSID:42475
+          [1686293276.613950][64862:64862] CHIP:SC: SecureSession[0xaaab194a0140]: Moving from state 'kActive' --> 'kPendingEviction'
+          [1686293276.613968][64862:64862] CHIP:IN: SecureSession[0xaaab194a0140]: Released - Type:2 LSID:42475
+          [1686293276.613989][64862:64862] CHIP:IN: SecureSession[0xaaab194bc7d0]: MarkForEviction Type:2 LSID:42476
+          [1686293276.614006][64862:64862] CHIP:SC: SecureSession[0xaaab194bc7d0]: Moving from state 'kActive' --> 'kPendingEviction'
+
+
+           To perform commissioning please kill and relaunch the TH1
+          Execute the below mentioned command to put TH1(all-clusters-app) into a commissionable state, Pls use equivalent command on the respective reference app
+           ./chip-all-clusters-app
+
+          Once TH1 reach the  commissionable state pls send below mentioned command on DUT. Pls use equivalent command on the respective reference app
+           ./chip-tool pairing onnetwork 1 20202021
+          Verify the commissioning completed with success on TH(chip-tool) from DUT
+          [1686293410.303276][65235:65235] CHIP:DMG: Command handler moving to [ Preparing]
+          [1686293410.303304][65235:65235] CHIP:DMG: Command handler moving to [AddingComm]
+          [1686293410.303331][65235:65235] CHIP:DMG: Command handler moving to [AddedComma]
+          [1686293410.303378][65235:65235] CHIP:DMG: Decreasing reference count for CommandHandler, remaining 0
+          [1686293410.303491][65235:65235] CHIP:EM: <<< [E:60915r S:25073 M:122145546 (Ack:170627677)] (S) Msg TX to 1:000000000001B669 [A822] --- Type 0001:09 (IM:InvokeCommandResponse)
+          [1686293410.303534][65235:65235] CHIP:IN: (S) Sending msg 122145546 on secure session with LSID: 25073
+          [1686293410.303791][65235:65235] CHIP:DMG: Command handler moving to [CommandSen]
+          [1686293410.303817][65235:65235] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1686293410.303852][65235:65235] CHIP:DL: HandlePlatformSpecificBLEEvent 32781
+          [1686293410.303876][65235:65235] CHIP:SVR: Commissioning completed successfully
+          [1686293410.303915][65235:65235] CHIP:DIS: Updating services using commissioning mode 0
+          [1686293410.312301][65235:65235] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1686293410.358484][65235:65235] CHIP:DL: Using wifi MAC for hostname
+          [1686293410.359010][65235:65235] CHIP:DIS: Advertise operational node 03C4C7333070A822-0000000000000001
+          [1686293410.359062][65235:65235] CHIP:DIS: Responding with _matter._tcp.local
+          [1686293410.359083][65235:65235] CHIP:DIS: Responding with 03C4C7333070A822-0000000000000001._matter._tcp.local
+          [1686293410.359106][65235:65235] CHIP:DIS: Responding with 03C4C7333070A822-0000000000000001._matter._tcp.local
+          [1686293410.359124][65235:65235] CHIP:DIS: Responding with E45F010F28780000.local
+          [1686293410.359142][65235:65235] CHIP:DIS: Responding with E45F010F28780000.local
+          [1686293410.359166][65235:65235] CHIP:DIS: Responding with _I03C4C7333070A822._sub._matter._tcp.local
+
+
+          On TH1(all-clusters-app), Extract the Compressed Fabric ID assigned from DUT to TH1 and verify it is same as the value obtained in Step1
+          [1686293410.302175][65235:65235] CHIP:DL: renamed tmp file to file (/tmp/chip_kvs)
+          [1686293410.302230][65235:65235] CHIP:ZCL: OpCreds: Fabric index 0x1 was committed to storage. Compressed Fabric Id 0x03C4C7333070A822, FabricId 0000000000000001, NodeId 0000000000000001, VendorId 0xFFF1
+          [1686293410.302339][65235:65235] CHIP:DL: writing settings to file (/tmp/chip_kvs-AmY1St)
+          [1686293410.303115][65235:65235] CHIP:DL: renamed tmp file to file (/tmp/chip_kvs)
+          [1686293410.303167][65235:65235] CHIP:FS: GeneralCommissioning: Successfully commited pending fabric data
+      disabled: true
+
+    - label:
+          "Step 4: Send RemoveFabric from DUT to TH2 and commission DUT to TH2
+          again"
+      verification: |
+          Send RemoveFabric command  from DUT to TH2
+
+          ./chip-tool operationalcredentials remove-fabric 1 2 0
+          [1686293678.487042][56135:56135] CHIP:DL: writing settings to file (/tmp/chip_kvs-HJeN8j)
+          [1686293678.488371][56135:56135] CHIP:DL: renamed tmp file to file (/tmp/chip_kvs)
+          [1686293678.488534][56135:56135] CHIP:ZCL: OpCreds: RemoveFabric successful
+          [1686293678.488621][56135:56135] CHIP:DMG: Command handler moving to [ Preparing]
+          [1686293678.488691][56135:56135] CHIP:DMG: Command handler moving to [AddingComm]
+          [1686293678.488758][56135:56135] CHIP:DMG: Command handler moving to [AddedComma]
+          [1686293678.488850][56135:56135] CHIP:IN: Expiring all sessions for fabric 0x1!!
+          [1686293678.488910][56135:56135] CHIP:IN: SecureSession[0xaaaaebd03220]: MarkForEviction Type:2 LSID:8074
+          [1686293678.488962][56135:56135] CHIP:SC: SecureSession[0xaaaaebd03220, LSID:8074]: State change 'kActive' --> 'kPendingEviction'
+          [1686293678.489037][56135:56135] CHIP:IN: SecureSession[0xaaaaebd03220]: Released - Type:2 LSID:8074
+          [1686293678.489097][56135:56135] CHIP:IN: SecureSession[0xaaaaebcfffd0]: MarkForEviction Type:2 LSID:8075
+
+
+           To perform commissioning please kill and relaunch the TH2
+
+          Execute the below mentioned command to put TH2(all-clusters-app) into a commissionable state, Pls use equivalent command on the respective reference app
+           ./chip-all-clusters-app
+
+          Once TH2 reach the  commissionable state pls send below mentioned command on DUT. Pls use equivalent command on the respective reference app
+           ./chip-tool pairing onnetwork 2 20202021
+          Verify the commissioning completed with success on TH(chip-tool) from DUT
+          686293725.684989][56147:56147] CHIP:DMG: Command handler moving to [CommandSen]
+          [1686293725.685052][56147:56147] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1686293725.685130][56147:56147] CHIP:DL: HandlePlatformSpecificBLEEvent 32781
+          [1686293725.685187][56147:56147] CHIP:SVR: Commissioning completed successfully
+          [1686293725.685276][56147:56147] CHIP:DIS: Updating services using commissioning mode 0
+          [1686293725.710162][56147:56147] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1686293725.847432][56147:56147] CHIP:DL: Using wifi MAC for hostname
+          [1686293725.847540][56147:56147] CHIP:DIS: Advertise operational node 03C4C7333070A822-0000000000000002
+          [1686293725.847651][56147:56147] CHIP:DIS: Responding with _matter._tcp.local
+          [1686293725.847713][56147:56147] CHIP:DIS: Responding with 03C4C7333070A822-0000000000000002._matter._tcp.local
+          [1686293725.847779][56147:56147] CHIP:DIS: Responding with 03C4C7333070A822-0000000000000002._matter._tcp.local
+          [1686293725.847833][56147:56147] CHIP:DIS: Responding with E45F010F1A010000.local
+
+          On TH2(all-clusters-app), Extract the Compressed Fabric ID assigned from DUT to TH2 and verify it is same as the value obtained in Step2
+          [1686293725.679297][56147:56147] CHIP:DL: renamed tmp file to file (/tmp/chip_kvs)
+          [1686293725.679676][56147:56147] CHIP:DL: writing settings to file (/tmp/chip_kvs-SRjHIm)
+          [1686293725.681396][56147:56147] CHIP:DL: renamed tmp file to file (/tmp/chip_kvs)
+          [1686293725.681523][56147:56147] CHIP:ZCL: OpCreds: Fabric index 0x1 was committed to storage. Compressed Fabric Id 0x03C4C7333070A822, FabricId 0000000000000001, NodeId 0000000000000002, VendorId 0xFFF1
+          [1686293725.681835][56147:56147] CHIP:DL: writing settings to file (/tmp/chip_kvs-xLVGmX)
+          [1686293725.683612][56147:56147] CHIP:DL: renamed tmp file to file (/tmp/chip_kvs)
+      disabled: true

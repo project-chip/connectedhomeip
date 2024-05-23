@@ -1,0 +1,234 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 47.2.2. [TC-DGETH-2.2] Command Received [DUT as Server]
+
+PICS:
+    - DGETH.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Ethernet Network Diagnostics"
+    endpoint: 0
+
+tests:
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2a.1: TH reads PHYRate attribute from DUT"
+      PICS: DGETH.S.A0000
+      command: "readAttribute"
+      attribute: "PHYRate"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 9
+
+    - label: "Step 2a.2: TH reads PHYRate attribute from DUT"
+      PICS: DGETH.S.A0000
+      command: "readAttribute"
+      attribute: "PHYRate"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 9
+
+    - label: "Step 2a.3: TH reads PHYRate attribute from DUT"
+      PICS: DGETH.S.A0000
+      command: "readAttribute"
+      attribute: "PHYRate"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 9
+
+    - label: "Step 2a.4: TH reads PHYRate attribute from DUT"
+      PICS: DGETH.S.A0000
+      command: "readAttribute"
+      attribute: "PHYRate"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 9
+
+    - label: "Step 2a.5: TH reads PHYRate attribute from DUT"
+      PICS: DGETH.S.A0000
+      command: "readAttribute"
+      attribute: "PHYRate"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 9
+
+    - label: "Step 2a.6: TH reads PHYRate attribute from DUT"
+      PICS: DGETH.S.A0000
+      command: "readAttribute"
+      attribute: "PHYRate"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 9
+
+    - label: "Step 2a.7: TH reads PHYRate attribute from DUT"
+      PICS: DGETH.S.A0000
+      command: "readAttribute"
+      attribute: "PHYRate"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 9
+
+    - label: "Step 2a.8: TH reads PHYRate attribute from DUT"
+      PICS: DGETH.S.A0000
+      command: "readAttribute"
+      attribute: "PHYRate"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 9
+
+    - label: "Step 2a.9: TH reads PHYRate attribute from DUT"
+      PICS: DGETH.S.A0000
+      command: "readAttribute"
+      attribute: "PHYRate"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 9
+
+    - label: "Step 2a.10: TH reads PHYRate attribute from DUT"
+      PICS: DGETH.S.A0000
+      command: "readAttribute"
+      attribute: "PHYRate"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 9
+
+    - label: "Step 2b: TH reads PacketRxCount attribute value from DUT"
+      PICS: DGETH.S.A0002
+      command: "readAttribute"
+      attribute: "PacketRxCount"
+      response:
+          saveAs: PacketRxCountValue
+
+    - label: "Step 2c: TH reads PacketTxCount attribute value from DUT"
+      PICS: DGETH.S.A0003
+      command: "readAttribute"
+      attribute: "PacketTxCount"
+      response:
+          saveAs: PacketTxCountValue
+
+    - label: "Step 2d: TH reads TxErrCount attribute value from DUT"
+      PICS: DGETH.S.A0004
+      command: "readAttribute"
+      attribute: "TxErrCount"
+      response:
+          saveAs: TxErrCountValue
+
+    - label: "Step 2e: TH reads CollisionCount attribute value from DUT"
+      PICS: DGETH.S.A0005
+      command: "readAttribute"
+      attribute: "CollisionCount"
+      response:
+          saveAs: CollisionCountValue
+
+    - label: "Step 2f: TH reads OverrunCount attribute value from DUT"
+      PICS: DGETH.S.A0006
+      command: "readAttribute"
+      attribute: "OverrunCount"
+      response:
+          saveAs: OverrunCountValue
+
+    #issue #13648
+    - label: "Step 2g: Sends ResetCounts command"
+      PICS: DGETH.S.C00.Rsp
+      command: "ResetCounts"
+
+    #https://github.com/CHIP-Specifications/chip-certification-tool/issues/702#issuecomment-1427974329
+    - label: "Step 2h: TH reads PacketRxCount attribute value from DUT"
+      PICS: DGETH.S.A0002 && PICS_SKIP_SAMPLE_APP
+      verification: |
+          ./chip-tool ethernetnetworkdiagnostics read packet-rx-count 1 0
+
+          Verify the value of PacketRxCount is less than the value from step 2b on TH(chip-tool) log
+
+          [1657259203.212932][2661:2666] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0002 DataVersion: 4077191321
+          [1657259203.213000][2661:2666] CHIP:TOO:   PacketRxCount: 30
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    #https://github.com/CHIP-Specifications/chip-certification-tool/issues/702#issuecomment-1427974329
+    - label: "Step 2i: TH reads PacketTxCount attribute value from DUT"
+      PICS: DGETH.S.A0003 && PICS_SKIP_SAMPLE_APP
+      verification: |
+          ./chip-tool ethernetnetworkdiagnostics read packet-tx-count 1 0
+
+          Verify the value of PacketTxCount is less than the value from step 2c on TH(chip-tool) log
+
+          [1657259233.211240][2668:2673] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0003 DataVersion: 4077191321
+          [1657259233.211315][2668:2673] CHIP:TOO:   PacketTxCount: 96
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 2j: TH reads TxErrCount attribute value from DUT"
+      PICS: DGETH.S.A0004
+      command: "readAttribute"
+      attribute: "TxErrCount"
+      response:
+          constraints:
+              maxValue: TxErrCountValue
+
+    - label: "Step 2k: TH reads CollisionCount attribute value from DUT"
+      PICS: DGETH.S.A0005
+      command: "readAttribute"
+      attribute: "CollisionCount"
+      response:
+          constraints:
+              maxValue: CollisionCountValue
+
+    - label: "Step 2l: TH reads OverrunCount attribute value from DUT"
+      PICS: DGETH.S.A0006
+      command: "readAttribute"
+      attribute: "OverrunCount"
+      response:
+          constraints:
+              maxValue: OverrunCountValue

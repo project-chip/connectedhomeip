@@ -1,0 +1,110 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("${build_root}/config/compiler/compiler.gni")
+
+import("${chip_root}/src/lib/lib.gni")
+import("${chip_root}/src/platform/device.gni")
+
+source_set("chip-all-clusters-common") {
+  sources = [
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
+    "AppOptions.cpp",
+    "include/tv-callbacks.cpp",
+    "include/tv-callbacks.h",
+    "main-common.cpp",
+  ]
+
+  deps = [
+    "${chip_root}/examples/all-clusters-minimal-app/all-clusters-common",
+    "${chip_root}/examples/platform/linux:app-main",
+    "${chip_root}/src/app/tests/suites/credentials:dac_provider",
+    "${chip_root}/src/lib",
+  ]
+
+  include_dirs =
+      [ "${chip_root}/examples/all-clusters-app/all-clusters-common/include" ]
+
+  cflags = [ "-Wconversion" ]
+
+  if (chip_build_libshell) {
+    defines = [ "ENABLE_CHIP_SHELL" ]
+  }
+}
+
+source_set("chip-lock-app-common") {
+  sources = [
+    "${chip_root}/examples/lock-app/lock-common/include/LockEndpoint.h",
+    "${chip_root}/examples/lock-app/lock-common/include/LockManager.h",
+    "${chip_root}/examples/lock-app/lock-common/src/LockEndpoint.cpp",
+    "${chip_root}/examples/lock-app/lock-common/src/LockManager.cpp",
+    "${chip_root}/examples/lock-app/lock-common/src/ZCLDoorLockCallbacks.cpp",
+  ]
+
+  deps =
+      [ "${chip_root}/examples/all-clusters-minimal-app/all-clusters-common" ]
+
+  include_dirs = [ "${chip_root}/examples/lock-app/lock-common/include" ]
+
+  cflags = [ "-Wconversion" ]
+}
+
+executable("chip-all-clusters-minimal-app") {
+  sources = [ "main.cpp" ]
+
+  deps = [
+    ":chip-all-clusters-common",
+    ":chip-lock-app-common",
+    "${chip_root}/examples/platform/linux:app-main",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  include_dirs =
+      [ "${chip_root}/examples/all-clusters-app/all-clusters-common/include" ]
+
+  output_dir = root_out_dir
+}
+
+if (chip_device_platform == "darwin") {
+  action("codesign") {
+    script = "entitlements/codesign.py"
+    public_deps = [ ":chip-all-clusters-minimal-app" ]
+
+    args = [
+      "--target_path",
+      rebase_path("${root_build_dir}/chip-all-clusters-minimal-app",
+                  root_build_dir),
+      "--log_path",
+      rebase_path("${root_build_dir}/codesign_log.txt", root_build_dir),
+    ]
+
+    output_name = "codesign_log.txt"
+    outputs = [ "${root_build_dir}/${output_name}" ]
+  }
+}
+
+group("linux") {
+  deps = []
+  deps += [ ":chip-all-clusters-minimal-app" ]
+}
+
+group("default") {
+  deps = [ ":linux" ]
+}

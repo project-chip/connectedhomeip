@@ -1,0 +1,67 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+declare_args() {
+  # TI SimpleLink board used
+  ti_simplelink_board = ""
+  ti_simplelink_device = ""
+}
+
+if (ti_simplelink_board == "") {
+  ti_simplelink_board = getenv("TI_SIMPLELINK_BOARD")
+}
+
+assert(ti_simplelink_board != "", "ti_simplelink_board must be specified")
+
+# Differentiate between boards
+#
+# | Development Kit     | Device Family   | SoC           |                     |
+# | -----------------   | --------------- | ----------    | ------------------- |
+# | CC134P10_6_LAUNCHXL | cc13x4_26x4     | cc1354p10     | Thread FTD + BLE    |
+# | CC2674              | cc13x4_24x4     | CC2674P10RGZ  | Thread FTD + BLE    |
+# | CC2674              | cc13x4_24x4     | CC2674R10RGZ  | Thread FTD + BLE    |
+# | CC3220SF_LAUNCHXL   | cc32xx          | cc3220SF      | Wi-Fi               |
+# | CC3235SF_LAUNCHXL   | cc32xx          | cc3235SF      | Wi-Fi               |
+
+if (ti_simplelink_board == "LP_EM_CC1354P10_6" ||
+    ti_simplelink_board == "LP_EM_CC1354P10_1") {
+  ti_simplelink_device_family = "cc13x4_26x4"
+  ti_simplelink_device_family_driverlib = "cc13x4_cc26x4"
+  ti_simplelink_soc_family = "cc13x4"
+  ti_simplelink_isa = "m33f"
+  ti_simplelink_soc = "cc1354p10"
+  ti_simplelink_bim_name = "cc1354p10"
+} else if (ti_simplelink_board == "CC2674") {
+  ti_simplelink_device_family = "cc13x4_26x4"  #driverlib paths
+  ti_simplelink_device_family_driverlib = "cc13x4_cc26x4"
+  ti_simplelink_soc_family = "cc13x4"  #ble path
+  ti_simplelink_isa = "m33f"
+} else if (ti_simplelink_board == "CC3220SF_LAUNCHXL") {
+  ti_simplelink_device_family = "cc32xx"
+  ti_simplelink_soc_family = "cc32xx"
+  ti_simplelink_isa = "m4"
+
+  # set -DDeviceFamily_CC3220
+  ti_simplelink_soc = "cc32xxSF"
+} else if (ti_simplelink_board == "CC3235SF_LAUNCHXL") {
+  ti_simplelink_device_family = "cc32xx"
+  ti_simplelink_soc_family = "cc32xx"
+  ti_simplelink_isa = "m4"
+
+  # set -DDeviceFamily_CC3220
+  ti_simplelink_soc = "cc32xxSF"
+} else {
+  print("Please provide a valid value for TI_SIMPLELINK_BOARD env variable")
+  assert(false, "The board ${ti_simplelink_board} is unsupported as for now.")
+}

@@ -1,0 +1,123 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.4.7.[TC-SC-4.7] Commissioner Discovery [DUT as Commissionee]
+
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+    - MCORE.DD.COMM_DISCOVERY
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Precondition"
+      verification: |
+          1. DUT is connected to the IP network
+          2. DUT and TH support Commissioner Discovery
+      disabled: true
+
+    - label:
+          "Step 1: TH is instructed to start advertising its presence as a
+          commissioner in the network"
+      verification: |
+          To verify this test case use TV Reference app
+      disabled: true
+
+    - label: "Step 2: Scan for DNS-SD commissioner advertisements from TH"
+      PICS:
+          MCORE.SC.DEVTYPE_SUBTYPE && MCORE.SC.VP_KEY && MCORE.SC.DT_KEY &&
+          MCORE.SC.DN_KEY
+      verification: |
+          if DUT supports discovering UDC, DUT should be able to scan the TV-app
+
+          Execute the below command on TH terminal and verify the AAA records:
+
+
+           $  avahi-browse -rt _matterd._udp
+
+          ++   eth0 IPv6 8BA9B3B40B98E9BB                              _matterd._udp        local
+          =   eth0 IPv6 8BA9B3B40B98E9BB                              _matterd._udp        local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::e65f:1ff:fe49:ae29]
+             port = [5650]
+             txt = ["T=1" "SAI=300" "SII=5000" "DN=Test TV" "DT=35" "VP=65521+32769"]
+
+          to look for subtypes, on the raspi run $   avahi-browse -p _services._dns-sd._udp | grep _matterd
+
+          +;wlan0;IPv6;_T35;_sub._matterd._udp;local
+          +;wlan0;IPv6;_V65521;_sub._matterd._udp;local
+          +;wlan0;IPv6;_matterd;_udp;local
+          +;eth0;IPv6;_T35;_sub._matterd._udp;local
+          +;eth0;IPv6;_V65521;_sub._matterd._udp;local
+          +;eth0;IPv6;_matterd;_udp;local
+      disabled: true
+
+    - label: "Step 3: Scan for DNS-SD commissioner advertisements from TH"
+      verification: |
+          Verify the DUT is able to discover the TH.
+
+          As an example, In the case of chip-tool as commissioner, you can verify with the below command, (Use the equivalent command on the DUT)
+
+          % sudo ./out/debug/chip-tool discover commissionables
+
+          [1659544548029] [13752:9267297] CHIP: [DL] _OnPlatformEvent
+          [1659544548030] [13752:9267297] CHIP: [DIS] Browsing for: _matterc._udp
+          [1659544548031] [13752:9267297] CHIP: [DIS] Mdns: OnBrowseAdd  name: DD200C20D25AE5F7, type: _matterc._udp., domain: local., interface: 8
+          [1659544548031] [13752:9267297] CHIP: [DIS] Resolve type=_matterc._udp name=DD200C20D25AE5F7 interface=8
+          [1659544548032] [13752:9267297] CHIP: [DIS] Mdns : OnNewInterface hostname:ubuntuserverAccessory1.local. fullname:DD200C20D25AE5F7._matterc._udp.local. interface: 8 port: 26411 TXT:"D=840CM=2INVALID_TEST=40"
+          [1659544548033] [13752:9267297] CHIP: [DIS] Mdns: OnNewAddress interface: 8 ip:fd5d:9cc0:fc52:0:dea6:32ff:fe8d:7072
+          [1659544548033] [13752:9267297] CHIP: [DIS] Mdns: Resolve success on interface 8
+          [1660288371.031350][3364:3369] CHIP:DIS: Discovered node:
+          [1660288371.031374][3364:3369] CHIP:DIS:         Hostname: E45F0149AE290000
+          [1660288371.031402][3364:3369] CHIP:DIS:         IP Address #1: fe80::e65f:1ff:fe49:ae29
+          [1660288371.031427][3364:3369] CHIP:DIS:         Port: 5640
+          [1660288371.031450][3364:3369] CHIP:DIS:         Mrp Interval idle: 5000 ms
+          [1660288371.031473][3364:3369] CHIP:DIS:         Mrp Interval active: 300 ms
+          [1660288371.031496][3364:3369] CHIP:DIS:         TCP Supported: 1
+          [1660288371.031521][3364:3369] CHIP:DIS:         Rotating ID: 01005FDB39737473FB22B819CEBB1084AFD5
+          [1660288371.031544][3364:3369] CHIP:DIS:         Device Name: Test TV
+          [1660288371.031566][3364:3369] CHIP:DIS:         Vendor ID: 65521
+          [1660288371.031589][3364:3369] CHIP:DIS:         Product ID: 32769
+          [1660288371.031609][3364:3369] CHIP:DIS:         Device Type: 35
+          [1660288371.031628][3364:3369] CHIP:DIS:         Long Discriminator: 3840
+          [1660288371.031647][3364:3369] CHIP:DIS:         Pairing Hint: 36
+          [1660288371.031669][3364:3369] CHIP:DIS:         Instance Name: 35025D5C5DA30C17
+          [1660288371.031694][3364:3369] CHIP:DIS:         Commissioning Mode: 0
+          [1660288371.031722][3364:3369] CHIP:DIS: Discovered node:
+          [1660288371.031743][3364:3369] CHIP:DIS:         Hostname: E45F0149AE290000
+          [1660288371.031768][3364:3369] CHIP:DIS:         IP Address #1: fe80::e65f:1ff:fe49:ae29
+          [1660288371.031791][3364:3369] CHIP:DIS:         Port: 5640
+          [1660288371.031814][3364:3369] CHIP:DIS:         Mrp Interval idle: 5000 ms
+          [1660288371.031836][3364:3369] CHIP:DIS:         Mrp Interval active: 300 ms
+          [1660288371.031859][3364:3369] CHIP:DIS:         TCP Supported: 1
+          [1660288371.031888][3364:3369] CHIP:DIS:         Rotating ID: 01005FDB39737473FB22B819CEBB1084AFD5
+          [1660288371.031909][3364:3369] CHIP:DIS:         Device Name: Test TV
+          [1660288371.031928][3364:3369] CHIP:DIS:         Vendor ID: 65521
+          [1660288371.031950][3364:3369] CHIP:DIS:         Product ID: 32769
+          [1660288371.031973][3364:3369] CHIP:DIS:         Device Type: 35
+          [1660288371.031995][3364:3369] CHIP:DIS:         Long Discriminator: 3840
+          [1660288371.032018][3364:3369] CHIP:DIS:         Pairing Hint: 36
+          [1660288371.032042][3364:3369] CHIP:DIS:         Instance Name: 35025D5C5DA30C17
+          [1660288371.032064][3364:3369] CHIP:DIS:         Commissioning Mode: 0
+
+          [1659544578034] [13752:9267291] CHIP: [CTL] Shutting down the commissioner
+          [1659544578034] [13752:9267291] CHIP: [CTL] Stopping commissioning discovery over DNS-SD
+          [1659544578034] [13752:9267291] CHIP: [CTL] Shutting down the controller
+          [1659544578034] [13752:9267291] CHIP: [IN] Expiring all sessions for fabric 0x4!!
+          [1659544578034] [13752:9267291] CHIP: [FP] Forgetting fabric 0x4
+      disabled: true

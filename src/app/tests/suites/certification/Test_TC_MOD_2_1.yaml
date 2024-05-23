@@ -1,0 +1,80 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 80.2.1. [TC-MOD-2.1] ChangeToMode Verification (DUT as Server)
+
+PICS:
+    - MOD.S.C00.Rsp
+
+config:
+    nodeId: 0x12344321
+    cluster: "Mode Select"
+    endpoint: 1
+    #Configure newmode value
+    NewMode:
+        type: int8u
+        defaultValue: 4
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "TH reads the SupportedModes attribute from the DUT"
+      PICS: MOD.S.A0002
+      command: "readAttribute"
+      attribute: "SupportedModes"
+      response:
+          constraints:
+              type: list
+
+    - label: "TH reads the CurrentMode attribute from the DUT"
+      PICS: MOD.S.A0003
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          saveAs: old_current_mode_dut
+
+    - label:
+          "TH sends a ChangeToMode command to the DUT with a integer from the
+          list in step 1, but different from the integer from step 2"
+      PICS: MOD.S.C00.Rsp
+      command: "ChangeToMode"
+      arguments:
+          values:
+              - name: "NewMode"
+                value: NewMode
+
+    - label: "TH reads the CurrentMode attribute from the DUT"
+      PICS: MOD.S.A0003
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          value: NewMode
+
+    - label:
+          "TH sends a ChangeToMode command to the DUT with a integer that is not
+          in the list in step 1."
+      PICS: MOD.S.C00.Rsp
+      command: "ChangeToMode"
+      arguments:
+          values:
+              - name: "NewMode"
+                value: 100
+      response:
+          error: INVALID_COMMAND

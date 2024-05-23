@@ -1,0 +1,17 @@
+name: Bootstrap cache
+description: Bootstrap cache (deprecated)
+runs:
+  using: "composite"
+  steps:
+    - uses: Wandalen/wretry.action@v1.4.10
+      name: Bootstrap cache
+      continue-on-error: true
+      with:
+        action: buildjet/cache@v3
+        attempt_limit: 3
+        attempt_delay: 2000
+        with: |
+          key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+          path: |
+              .environment
+              build_overrides/pigweed_environment.gni

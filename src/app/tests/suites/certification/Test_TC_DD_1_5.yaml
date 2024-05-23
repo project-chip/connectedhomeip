@@ -1,0 +1,148 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    3.1.5. [TC-DD-1.5] NFC Rules of Advertisement and Onboarding [DUT -
+    Commissionee]
+
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+    - MCORE.DD.NFC
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Preconditions"
+      verification: |
+          1 - 5.1.7 - NFC Spec Requirements: NFC tags SHALL use the NFC Data Exchange Format (NDEF) as defined by NFC ForumTM in [NDEF 1.0 NFCForum-TS-NDEF 1.0]
+
+          An NDEF message is defined as a group of individual NDEF records as defined by NFC ForumTM in NFC Record Type Definition (RTD) RTD 1.0 [NFCForum-TS-RTD 1.0]
+
+          Onboarding Payload for NFC tags SHALL use NDEF URI Record Type Definition as defined by NFC ForumTM in URI Record Type Definition RTD-URI 1.0 [NFCForum-TS-RTD URI 1.0]. The URI for defined in section 3.3 Format
+      disabled: true
+
+    - label:
+          "Step 1: Keep the DUT in packaging and bring in TH NFC scanner close
+          to the DUT packaging."
+      verification: |
+          1. Using an NFC Scanner, physically bring the scanner close to the DUT in it's packaging.
+          2. NFC Scanner should not be able to read the Onboarding Payload from the DUT's NFC tag.
+
+          Note: chip-tool does not support physically scanning an NFC tag
+      disabled: true
+
+    - label:
+          "Step 2a: Unpack DUT from its packaging, make sure DUT is not powered
+          on and do not put the DUT in pairing mode. Bring in TH NFC scanner
+          close to the DUTs NFC tag"
+      verification: |
+          1. Using an NFC Scanner, physically bring the scanner close to the DUT that is out of it's packaging.
+          2. NFC Scanner should not be able to read the Onboarding Payload from the DUT's NFC tag.
+
+          Note: chip-tool does not support physically scanning an NFC tag
+      disabled: true
+
+    - label:
+          "Step 2b: Power on DUT and do not put the DUT in pairing mode. Bring
+          in TH NFC scanner close to the DUTs NFC tag"
+      PICS: MCORE.DD.PHYSICAL_TAMPERING
+      verification: |
+          1. Power on the DUT.
+          2. Using an NFC Scanner, physically bring the scanner close to the DUT.
+          3. NFC Scanner should not be able to read the Onboarding Payload from the DUT's NFC tag.
+
+          Note: chip-tool does not support physically scanning an NFC tag
+      disabled: true
+
+    - label:
+          "Step 2c: DUT must have an explicit trigger of the the NFC pairing
+          mode"
+      PICS: MCORE.DD.PHYSICAL_TAMPERING
+      verification: |
+          1. Manually verify that the DUT has an explicit trigger (a physical action that enables the NFC pairing flow).
+
+          Note: chip-tool does not support physically scanning an NFC tag
+      disabled: true
+
+    - label:
+          "Step 2d: Power on DUT and put the DUT in pairing mode. Bring in TH
+          NFC scanner close to NFC tag"
+      PICS: MCORE.DD.PHYSICAL_TAMPERING
+      verification: |
+          1. Power on the DUT.
+          2. Put the DUT into pairing mode.
+          2. Using an NFC Scanner, physically bring the scanner close to the DUT
+          3. NFC Scanner should be able to read the Onboarding Payload from the DUT's NFC tag.
+
+          Note: chip-tool does not support physically scanning an NFC tag
+      disabled: true
+
+    - label: "Step 2e: Power on DUT. Bring in NFC scanner close to NFC tag"
+      PICS: MCORE.DD.PHYSICAL_TAMPERING
+      verification: |
+          1. Power on the DUT.
+          2. Using an NFC Scanner, physically bring the scanner close to the DUT.
+          3. NFC Scanner should be able to read the Onboarding Payload from the DUT's NFC tag.
+
+          Note: chip-tool does not support physically scanning an NFC tag
+      disabled: true
+
+    - label: "Step 2f: Wait for the pairing mode to expire on device"
+      verification: |
+          1. After pairing mode expires on the DUT, verify that the NFC Scanner cannot read advertisements from the DUT.
+
+          Note: chip-tool does not support physically scanning an NFC tag
+      disabled: true
+
+    - label:
+          "Step 3: For Read only Tags, try to write using NFC tool a payload to
+          DUT"
+      verification: |
+          1. Using an NFC-programmer tool, attempt to write a payload to the DUT's NFC tag
+          2. DUT should reject the attempt and the NFC tag should not have been written to.
+
+          Note: chip-tool does not support physically scanning an NFC tag
+      disabled: true
+
+    - label:
+          "Step 4a: For Programmable Tag, NFC tag must be read only OTA. Try to
+          write a payload to DUT using NFC tool"
+      verification: |
+          1. Using an NFC-programmer tool, attempt to write a payload to the DUT's NFC tag
+          2. DUT should reject the attempt and the NFC tag should not have been written to.
+
+          Note: chip-tool does not support physically scanning an NFC tag
+      disabled: true
+
+    - label:
+          "Step 4b: Optional  For Programmable Tag, NFC tag may be reconfigured
+          using wired means"
+      verification: |
+          1. This is vendor-specific, attempt to write a payload to the DUT's NFC tag by way of a physical wired connection.
+          2. DUT's NFC tag should have been written to.
+
+          Note: chip-tool does not support physically scanning an NFC tag
+      disabled: true
+
+    - label: "Step 5: Using TH NFC scanner - read NFC tag Reader type"
+      verification: |
+          1. Using an NFC Scanner, physically bring the scanner close to the DUT
+          2. DUT's NFC tag should have a Reader type equal to 2 or greater
+
+          Note: chip-tool does not support physically scanning an NFC tag
+      disabled: true

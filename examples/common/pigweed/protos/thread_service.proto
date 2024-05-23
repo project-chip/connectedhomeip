@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package chip.rpc;
+
+import 'pw_protobuf_protos/common.proto';
+
+enum ThreadDeviceType {
+  DEVICE_TYPE_NOT_SUPPORTED = 0;
+  DEVICE_TYPE_ROUTER = 1;
+  DEVICE_TYPE_FULL_END_DEVICE = 2;
+  DEVICE_TYPE_MINIMAL_END_DEVICE = 3;
+  DEVICE_TYPE_SLEEPY_END_DEVICE = 4;
+}
+
+message ThreadState {
+  bool is_provisioned = 1;
+  bool is_enabled = 2;
+  bool is_attached = 3;
+  ThreadDeviceType device_type = 4;
+}
+
+message ThreadNetworkInfo {
+  uint32 pan_id = 1;
+  string network_name = 2;
+  uint32 channel = 3;
+  bytes extended_pan_id = 4;
+}
+
+service Thread {
+  rpc GetState(pw.protobuf.Empty) returns (ThreadState){}
+  rpc GetNetworkInfo(pw.protobuf.Empty) returns (ThreadNetworkInfo){}
+}

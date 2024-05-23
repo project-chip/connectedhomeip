@@ -1,0 +1,87 @@
+# VS Code Configs
+.vscode/*
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# Platforms
+.DS_Store
+
+# Build System
+out/
+/examples/virtual-device-app/android/App/buildSrc/build/
+/src/test_driver/nrfconnect/build/
+/src/darwin/Framework/build/
+
+# Pigweed Environment
+.environment/
+build_overrides/pigweed_environment.gni
+
+# Temporary Directories
+.tmp/
+
+# Xcode, other development environment stuff
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.xcuserstate
+project.xcworkspace/
+xcuserdata/
+*.xcodeproj/*
+*.xcworkspace/*
+TAGS
+
+# Text editors
+.*.sw[a-z]
+
+# Patch files
+*.rej
+*.orig
+
+# C-Lion / IDEA files
+.idea/**
+
+# Python bytecodes
+__pycache__
+*.pyc
+*.egg-info
+
+# Doxygen outputs
+docs/html
+
+# Python venv
+.venv
+
+# Documentation
+docs/_build
+
+# VSCode java extensions
+.project
+
+# clangd index files
+.cache
+
+# compilation database for VSCode and other Ides
+compile_commands.json
+
+# backup files, usually created by the ZAP tool
+*~
+
+# log files
+*.log
+examples/thermostat/ameba/build
+
+# Downloaded zap without a pigweed root (via zap_download.py)
+.zap
+
+# When building esp-idf application, if any component is fetched using idf-component-manager then they are stored in
+# managed_component directory. Along with that dependencies.lock file is generated.
+# https://github.com/espressif/idf-component-manager#using-with-a-project
+examples/*/esp32/managed_components
+examples/*/esp32/dependencies.lock
+
+# jupyter temporary files
+.ipynb_checkpoints
+

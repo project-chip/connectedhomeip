@@ -1,0 +1,145 @@
+{{> header excludeZapComment=true}}
+
+#import <Matter/MTRDefines.h>
+#import <Matter/MTRStructsObjc.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
+{{#zcl_clusters}}
+{{#zcl_commands}}
+{{#*inline "completeDecl"}}
+{{#if (isSupported cluster command=command isForCommandPayload=true)}}
+
+{{availability cluster command=command isForCommandPayload=true deprecationMessage=deprecationMessage}}
+@interface MTR{{cluster}}Cluster{{command}}Params : {{base}}
+{{#zcl_command_arguments}}
+
+{{#if (isSupported ../cluster command=../command commandField=(asStructPropertyName label))}}
+{{> struct_field_decl cluster=parent.parent.name type=type label=label}} {{availability ../cluster command=../command commandField=(asStructPropertyName label) deprecationMessage=(concat "The " (asStructPropertyName label) " field will be removed")}};
+{{/if}}
+{{#*inline "oldNameFieldDecl"}}
+
+{{#if (isSupported ../cluster command=../command commandField=commandField)}}
+{{> struct_field_decl cluster=parent.parent.name type=type label=commandField}} {{availability ../cluster command=../command commandField=commandField deprecationMessage=(concat "Please use " (asStructPropertyName label))}};
+{{/if}}
+{{/inline}}
+{{#if (and includeRenamedProperties
+           (hasOldName ../cluster command=../command commandField=(asStructPropertyName label)))}}
+{{> oldNameFieldDecl commandField=(oldName ../cluster command=../command commandField=(asStructPropertyName label))}}
+{{/if}}
+{{/zcl_command_arguments}}
+{{#if (isStrEqual source "client")}}
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+ @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+{{! This is using the pre-renaming names for the isAvailableBefore test, because the pre-rename things inherit
+    from the post-rename ones and need to have this selector.}}
+{{else if (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) command=(compatCommandNameRemapping parent.name name))}}
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs {{availability "" api="Timed Invoke for server to client commands" deprecationMessage="Timed invoke does not make sense for server to client commands"}};
+{{/if}}
+{{#if (and (isStrEqual source "server")
+           includeInitWithResponseValue)}}
+
+/**
+ * Initialize an MTR{{cluster}}Cluster{{command}}Params with a response-value dictionary
+ * of the sort that MTRDeviceResponseHandler would receive.
+ *
+ * Will return nil and hand out an error if the response-value dictionary is not
+ * a command data response or is not the right command response.
+ *
+ * Will return nil and hand out an error if the data response does not match the known
+ * schema for this command.
+ */
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error {{availability cluster command=command deprecationMessage="This command has been removed" minimalRelease="Fall 2023"}};
+{{/if}}
+@end
+{{/if}}
+{{/inline}}
+{{#*inline "oldNameDecl"}}
+
+{{> completeDecl cluster=cluster
+                 command=command
+                 includeRenamedProperties=true
+                 deprecationMessage=(concat "Please use MTR" (asUpperCamelCase parent.name preserveAcronyms=true) "Cluster" (asUpperCamelCase name preserveAcronyms=true) "Params")
+                 base=(concat "MTR" (asUpperCamelCase parent.name preserveAcronyms=true) "Cluster" (asUpperCamelCase name preserveAcronyms=true) "Params")
+                 includeInitWithResponseValue=false}}
+
+{{/inline}}
+{{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
+{{> completeDecl cluster=(asUpperCamelCase parent.name preserveAcronyms=true)
+                 command=(asUpperCamelCase name preserveAcronyms=true)
+                 includeRenamedProperties=false
+                 deprecationMessage="This command has been removed"
+                 base="NSObject <NSCopying>"
+                 includeInitWithResponseValue=true}}
+{{#if (or (not (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) (compatClusterNameRemapping parent.name)))
+          (not (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (compatCommandNameRemapping parent.name name))))}}
+{{> oldNameDecl cluster=(compatClusterNameRemapping parent.name)
+                command=(compatCommandNameRemapping parent.name name)}}
+{{/if}}
+{{#if (hasRenamedFields (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
+{{#*inline "deprecatedDecl"}}
+
+@interface MTR{{cluster}}Cluster{{command}}Params (Deprecated)
+{{#zcl_command_arguments}}
+{{#*inline "oldNameFieldDecl"}}
+
+{{> struct_field_decl cluster=parent.parent.name type=type label=commandField}} {{availability ../cluster command=../command commandField=commandField deprecationMessage=(concat "Please use " (asStructPropertyName label))}};
+{{/inline}}
+{{#if (hasOldName ../cluster command=../command commandField=(asStructPropertyName label))}}
+{{> oldNameFieldDecl commandField=(oldName ../cluster command=../command commandField=(asStructPropertyName label))}}
+{{/if}}
+{{/zcl_command_arguments}}
+@end
+{{/inline}}
+{{> deprecatedDecl cluster=(asUpperCamelCase parent.name preserveAcronyms=true)
+                   command=(asUpperCamelCase name preserveAcronyms=true)}}
+{{/if}}
+{{else}}
+{{> completeDecl cluster=(compatClusterNameRemapping parent.name)
+                 command=(compatCommandNameRemapping parent.name name)
+                 includeRenamedProperties=true
+                 deprecationMessage="This command has been removed"
+                 base="NSObject <NSCopying>"
+                 includeInitWithResponseValue=true}}
+{{/if}}
+{{/zcl_commands}}
+{{/zcl_clusters}}
+
+NS_ASSUME_NONNULL_END

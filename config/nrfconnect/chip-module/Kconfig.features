@@ -1,0 +1,296 @@
+#
+#   Copyright (c) 2022 Project CHIP Authors
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+
+# The purpose of this file is to define Kconfig options enabling specific features.
+# Feature options will define defaults for settings that are related to the specific feature.
+
+if CHIP
+
+config CHIP_WIFI
+	bool "Enable nrfconnect Wi-Fi support"
+	default y if SHIELD_NRF7002EK || BOARD_NRF7002DK_NRF5340_CPUAPP || SHIELD_NRF7002EB || BOARD_NRF7002DK_NRF7001_NRF5340_CPUAPP
+	select WIFI_NRF700X
+	select WIFI
+	select WPA_SUPP
+	imply NORDIC_SECURITY_BACKEND
+	imply MBEDTLS_ENTROPY_C
+	imply MBEDTLS_PSA_CRYPTO_C
+	imply NET_STATISTICS
+	imply NET_L2_ETHERNET
+	imply NET_PKT_TXTIME
+	imply NET_PKT_TIMESTAMP
+	imply MBEDTLS_PROMPTLESS
+	imply BUILD_OUTPUT_META
+	imply USE_DT_CODE_PARTITION # might be removed when the OTA is enabled
+	imply NET_IPV6_ND # enable Neighbor Discovery to handle Router Advertisements
+	imply NET_IPV6_NBR_CACHE
+	imply NET_STATISTICS_IPV6
+	imply NET_STATISTICS_USER_API
+
+config CHIP_QSPI_NOR
+	bool "Enable QSPI NOR feature set"
+	imply NORDIC_QSPI_NOR
+	help
+	  Enables QSPI NOR flash with a set of options for configuring pages and
+	  buffer sizes.
+
+if CHIP_QSPI_NOR
+
+config NORDIC_QSPI_NOR_STACK_WRITE_BUFFER_SIZE
+	default 16
+
+endif # CHIP_QSPI_NOR
+
+config CHIP_SPI_NOR
+	bool "Enable SPI NOR feature set"
+	imply SPI
+	imply SPI_NOR
+	imply MULTITHREADING
+	imply PM_OVERRIDE_EXTERNAL_DRIVER_CHECK
+	help
+	  Enables SPI NOR flash with a set of options for configuring pages and
+	  buffer sizes.
+
+if CHIP_SPI_NOR
+
+config SPI_NOR_FLASH_LAYOUT_PAGE_SIZE
+	default 4096
+
+endif # CHIP_SPI_NOR
+
+config CHIP_MEMORY_PROFILING
+	bool "Enable features for tracking memory usage"
+	# Matter stack
+	select CHIP_STATISTICS
+	# Heap
+	select CHIP_MALLOC_SYS_HEAP_WATERMARKS_SUPPORT if CHIP_MALLOC_SYS_HEAP
+	select SYS_HEAP_RUNTIME_STATS if CHIP_MALLOC_SYS_HEAP	
+	# Crypto
+	select MBEDTLS_MEMORY_DEBUG if !CHIP_CRYPTO_PSA
+	# Network
+	select NET_STATISTICS
+	select NET_SHELL
+	select NET_BUF_POOL_USAGE
+	select OPENTHREAD_SHELL if !CHIP_WIFI
+	# Zephyr
+	select KERNEL_SHELL
+	help
+	  Enables features for tracking memory usage in Matter.
+
+config CHIP_NUS
+	bool "Enable Nordic UART service for Matter purposes"
+	select BT_NUS
+	select BT_SMP
+	select BT_NUS_AUTHEN
+	help
+	  Enables Nordic UART service (NUS) for Matter samples.
+	  Using NUS service you can control a Matter sample using pre-defined BLE commands 
+	  and do defined operations. The CHIP NUS service can be useful to keep communication
+	  with a smart home device when a connection within Matter network is lost.
+
+if CHIP_NUS
+
+# Requires providing a PIN for each pair request
+config BT_BONDABLE
+	default n
+
+config BT_RX_STACK_SIZE
+	default 1536
+
+config SYSTEM_WORKQUEUE_STACK_SIZE
+	default 2048
+
+config BT_DEVICE_APPEARANCE
+	default 833
+
+if !LOG
+
+config BT_FIXED_PASSKEY
+	default y
+
+endif
+
+config CHIP_NUS_MAX_COMMAND_LEN
+	int "Maximum length of single command in Bytes"
+	default 10
+	help
+	  Maximum length of single command. This command will be send via Bluetooth LE to
+	  a paired smart home device.
+
+config CHIP_NUS_FIXED_PASSKEY
+	int "Define the default passkey for NUS"
+	depends on BT_FIXED_PASSKEY
+	default 123456
+	help
+	  Define the default password for pairing with the Bluetooth LE device.
+
+config CHIP_NUS_MAX_COMMANDS
+	int "Define maximum NUS commands amount"
+	default 2
+	help
+	  Define the maximum number of NUS commands to declare by user.
+
+endif
+
+
+config CHIP_DFU_OVER_BT_SMP
+	bool "Enable DFU over Bluetooth LE SMP feature set"
+	imply CHIP_QSPI_NOR if BOARD_NRF5340DK_NRF5340_CPUAPP || BOARD_NRF52840DK_NRF52840
+	imply CHIP_SPI_NOR if BOARD_NRF7002DK_NRF5340_CPUAPP || BOARD_NRF7002DK_NRF7001_NRF5340_CPUAPP
+	imply BOOTLOADER_MCUBOOT
+	select MCUMGR
+	select MCUMGR_TRANSPORT_BT
+	select IMG_MANAGER
+	select STREAM_FLASH
+	select ZCBOR
+	select MCUMGR_GRP_IMG
+	select MCUMGR_GRP_OS
+	# Enable custom SMP request to erase settings partition.
+	select MCUMGR_GRP_ZBASIC
+	select MCUMGR_GRP_ZBASIC_STORAGE_ERASE
+	help
+	  Enables Device Firmware Upgrade over Bluetooth LE with SMP and configures
+	  the set of options related to that feature.
+
+if CHIP_DFU_OVER_BT_SMP
+
+# MCU Manager and SMP configuration
+config MCUMGR_TRANSPORT_BT_AUTHEN
+	default n
+
+config MCUMGR_TRANSPORT_NETBUF_COUNT
+	default 6
+
+config MCUMGR_MGMT_NOTIFICATION_HOOKS
+	bool
+	default y
+
+config MCUMGR_GRP_IMG_UPLOAD_CHECK_HOOK
+	bool
+	default y
+
+config MCUMGR_SMP_COMMAND_STATUS_HOOKS
+	bool
+	default y
+
+# Increase BT MTU and RX buffer for big size DFU messages
+config BT_L2CAP_TX_MTU
+	default 498
+
+config BT_BUF_ACL_RX_SIZE
+	default 502
+
+# Increase MCUMGR_TRANSPORT_NETBUF_SIZE, as it must be big enough to fit MAX MTU + overhead and for single-image DFU default is 384 B
+config MCUMGR_TRANSPORT_NETBUF_SIZE
+	default 1024
+
+# Increase system workqueue size, as SMP is processed within it
+config SYSTEM_WORKQUEUE_STACK_SIZE
+	default 2800
+
+if SOC_SERIES_NRF53X
+
+# Enable custom SMP request to erase settings partition.
+config MCUMGR_GRP_ZBASIC
+	default y
+
+config MCUMGR_GRP_ZBASIC_STORAGE_ERASE
+	default y
+
+endif # SOC_SERIES_NRF53X
+
+endif # CHIP_DFU_OVER_BT_SMP
+
+config CHIP_WIFI_CONNECTION_RECOVERY_MINIMUM_INTERVAL
+	int "Define the minimum connection recovery time interval in milliseconds"
+	depends on CHIP_WIFI
+	default 500
+	help
+	  Specifies the minimum connection recovery interval (in milliseconds).
+
+config CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL
+	int "Define the maximum connection recovery time interval in milliseconds"
+	depends on CHIP_WIFI
+	default 3600000 # 1 hour
+	help
+	  Specifies the maximum connection recovery interval (in milliseconds).
+
+config CHIP_WIFI_CONNECTION_RECOVERY_MAX_RETRIES_NUMBER
+	int "Define the maximum amount of connection recovery occurrences"
+	depends on CHIP_WIFI
+	default 0
+	help
+	  Specifies the maximum number of connection recovery attempts.
+	  If set to 0, no limitation is applied and attempts
+	  to recover the connection are performed indefinitely.
+
+config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
+	int "Define the connection recovery jitter in milliseconds"
+	depends on CHIP_WIFI
+	default 2000
+	help
+	  Specifies the maximum connection recovery jitter interval (in milliseconds).
+	  Once the wait time reaches the current maximum value (defined by CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL),
+	  a random jitter interval is added to it to avoid periodicity. The random jitter is selected
+	  within range [-JITTER; +JITTER].
+
+choice CHIP_LAST_FABRIC_REMOVED_ACTION
+	prompt "An action to perform after removing the last fabric"
+	default CHIP_LAST_FABRIC_REMOVED_ERASE_AND_REBOOT
+
+	config CHIP_LAST_FABRIC_REMOVED_NONE
+	bool "After removing the last fabric do not perform any action"
+	help
+	  After removing the last fabric the device will not perform factory reset
+	  or reboot. The current state will be left as it is and the BLE advertising
+	  will not start automatically.
+
+	config CHIP_LAST_FABRIC_REMOVED_ERASE_AND_REBOOT
+	bool "After removing the last fabric erase NVS and reboot"
+	help
+	  After removing the last fabric the device will perform the factory reset and
+	  then reboot. The current RAM state will be removed and the new commissioning to
+	  the new fabric will use the initial fabric index. This option is the most safe.
+
+	config CHIP_LAST_FABRIC_REMOVED_ERASE_AND_PAIRING_START
+	bool "After removing the last fabric erase NVS and start Bluetooth LE advertising"
+	help
+	  After removing the last fabric the device will perform the factory reset without 
+	  rebooting and start the Bluetooth LE advertisement automatically.
+	  The current RAM state will be saved and the new commissioning to the next 
+	  fabric will use the next possible fabric index. This option should not be used for
+	  devices that normally do not advertise Bluetooth LE on boot to keep their original 
+	  behavior.
+
+	config CHIP_LAST_FABRIC_REMOVED_ERASE_ONLY
+	bool "After removing the last fabric erase NVS only"
+	help
+	  After removing the last fabric the device will perform the factory reset only without
+	  rebooting. The current RAM state will be saved and the new commissioning to the next 
+	  fabric will use the next possible fabric index.
+
+endchoice
+
+config CHIP_LAST_FABRIC_REMOVED_ACTION_DELAY
+	int "After removing the last fabric wait defined time [in milliseconds] to perform an action"
+	depends on !CHIP_LAST_FABRIC_REMOVED_NONE
+	default 1000
+	help
+	  After removing the last fabric the device will wait for the defined time and then perform
+	  an action chosen by the CHIP_LAST_FABRIC_REMOVED_ACTION option. This schedule will allow for
+	  avoiding race conditions before the device removes non-volatile data.
+
+endif # CHIP

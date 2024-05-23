@@ -1,0 +1,158 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 4.2.1. [TC-SMOKECO-2.1] Attributes with DUT as Server
+
+PICS:
+    - SMOKECO.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Smoke CO Alarm"
+    endpoint: 1
+
+tests:
+    - label: "Step 1: Commission DUT to TH"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH reads from the DUT the ExpressedState attribute"
+      PICS: SMOKECO.S.A0000
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 8
+
+    - label: "Step 3: TH reads from the DUT the SmokeState attribute"
+      PICS: SMOKECO.S.A0001
+      command: "readAttribute"
+      attribute: "SmokeState"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 2
+
+    - label: "Step 4: TH reads from the DUT the COState attribute"
+      PICS: SMOKECO.S.A0002
+      command: "readAttribute"
+      attribute: "COState"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 2
+
+    - label: "Step 5: TH reads from the DUT the BatteryAlert attribute"
+      PICS: SMOKECO.S.A0003
+      command: "readAttribute"
+      attribute: "BatteryAlert"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 2
+
+    - label: "Step 6: TH reads from the DUT the DeviceMuted attribute"
+      PICS: SMOKECO.S.A0004
+      command: "readAttribute"
+      attribute: "DeviceMuted"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 1
+
+    - label: "Step 7: TH reads from the DUT the TestInProgress attribute"
+      PICS: SMOKECO.S.A0005
+      command: "readAttribute"
+      attribute: "TestInProgress"
+      response:
+          constraints:
+              type: boolean
+
+    - label: "Step 8: TH reads from the DUT the HardwareFaultAlert attribute"
+      PICS: SMOKECO.S.A0006
+      command: "readAttribute"
+      attribute: "HardwareFaultAlert"
+      response:
+          constraints:
+              type: boolean
+
+    - label: "Step 9: TH reads from the DUT the EndOfServiceAlert attribute"
+      PICS: SMOKECO.S.A0007
+      command: "readAttribute"
+      attribute: "EndOfServiceAlert"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 1
+
+    - label:
+          "Step 10: TH reads from the DUT the InterconnectSmokeAlarm attribute"
+      PICS: SMOKECO.S.A0008
+      command: "readAttribute"
+      attribute: "InterconnectSmokeAlarm"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 2
+
+    - label: "Step 11: TH reads from the DUT the InterconnectCOAlarm attribute"
+      PICS: SMOKECO.S.A0009
+      command: "readAttribute"
+      attribute: "InterconnectCOAlarm"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 2
+
+    - label: "Step 12: TH reads from the DUT the ContaminationState attribute"
+      PICS: SMOKECO.S.A000a
+      command: "readAttribute"
+      attribute: "ContaminationState"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 3
+
+    - label:
+          "Step 13: TH reads from the DUT the SmokeSensitivityLevel attribute"
+      PICS: SMOKECO.S.A000b
+      command: "readAttribute"
+      attribute: "SmokeSensitivityLevel"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 2
+
+    - label: "Step 14: TH reads from the DUT the ExpiryDate attribute"
+      PICS: SMOKECO.S.A000c
+      command: "readAttribute"
+      attribute: "ExpiryDate"
+      response:
+          constraints:
+              type: epoch_s

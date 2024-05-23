@@ -1,0 +1,684 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0CA0E0CF248599BB009087B9 /* OnOffViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0CA0E0CE248599BB009087B9 /* OnOffViewController.m */; };
+		2C21071525D1A8F200DDA4AD /* MultiAdminViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C21071325D1A8F200DDA4AD /* MultiAdminViewController.m */; };
+		2C460C2425D7594B000512D6 /* DeviceSelector.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C460C2325D7594B000512D6 /* DeviceSelector.m */; };
+		2C460C3225D97CB3000512D6 /* UnpairDevicesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C460C3025D97CB3000512D6 /* UnpairDevicesViewController.m */; };
+		51C8E3FB28261DCF00D47D00 /* FabricKeys.m in Sources */ = {isa = PBXBuildFile; fileRef = 51C8E3FA28261DCF00D47D00 /* FabricKeys.m */; };
+		991DC091247747F500C13860 /* EnumerateViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 991DC090247747F500C13860 /* EnumerateViewController.m */; };
+		B204A621244E1D0600C7C0E1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A620244E1D0600C7C0E1 /* AppDelegate.m */; };
+		B204A624244E1D0600C7C0E1 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A623244E1D0600C7C0E1 /* SceneDelegate.m */; };
+		B204A627244E1D0600C7C0E1 /* QRCodeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A626244E1D0600C7C0E1 /* QRCodeViewController.m */; };
+		B204A62C244E1D0700C7C0E1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B204A62B244E1D0700C7C0E1 /* Assets.xcassets */; };
+		B204A632244E1D0700C7C0E1 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A631244E1D0700C7C0E1 /* main.m */; };
+		B232D8BA2514BD0800792CB4 /* CHIPUIViewUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = B232D8B92514BD0800792CB4 /* CHIPUIViewUtils.m */; };
+		B243A6692513A73600E56FEA /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B243A6682513A73600E56FEA /* RootViewController.m */; };
+		B2946A4224C99D53005C87D0 /* WiFiViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B2946A4124C99D53005C87D0 /* WiFiViewController.m */; };
+		B2946A9B24C9A7BF005C87D0 /* DefaultsUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = B2946A9A24C9A7BF005C87D0 /* DefaultsUtils.m */; };
+		B2B0209225C9C1AC00A4C220 /* BindingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B2B0209125C9C1AC00A4C220 /* BindingsViewController.m */; };
+		B2C2267526289324009DAB8B /* FabricUIViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B2C2267426289324009DAB8B /* FabricUIViewController.m */; };
+		B2F51E99252DCDC000911FA5 /* TemperatureSensorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B2F51E98252DCDC000911FA5 /* TemperatureSensorViewController.m */; };
+		B2F53AEB245B0D140010745E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B2F53AE9245B0D140010745E /* LaunchScreen.storyboard */; };
+		D437613C285BC0060051FEA2 /* Matter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D437613B285BC0060051FEA2 /* Matter.framework */; };
+		D437613D285BC0060051FEA2 /* Matter.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D437613B285BC0060051FEA2 /* Matter.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		B204A638244E1D0700C7C0E1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B204A614244E1D0600C7C0E1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B204A61B244E1D0600C7C0E1;
+			remoteInfo = CHIPTool;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		D437613A285BBE3B0051FEA2 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				D437613D285BC0060051FEA2 /* Matter.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		0CA0E0CD248599BB009087B9 /* OnOffViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OnOffViewController.h; sourceTree = "<group>"; };
+		0CA0E0CE248599BB009087B9 /* OnOffViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OnOffViewController.m; sourceTree = "<group>"; };
+		2C21071325D1A8F200DDA4AD /* MultiAdminViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MultiAdminViewController.m; sourceTree = "<group>"; };
+		2C21071425D1A8F200DDA4AD /* MultiAdminViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MultiAdminViewController.h; sourceTree = "<group>"; };
+		2C460C2225D7594B000512D6 /* DeviceSelector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeviceSelector.h; sourceTree = "<group>"; };
+		2C460C2325D7594B000512D6 /* DeviceSelector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceSelector.m; sourceTree = "<group>"; };
+		2C460C3025D97CB3000512D6 /* UnpairDevicesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UnpairDevicesViewController.m; sourceTree = "<group>"; };
+		2C460C3125D97CB3000512D6 /* UnpairDevicesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UnpairDevicesViewController.h; sourceTree = "<group>"; };
+		51C8E3F928261DCF00D47D00 /* FabricKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FabricKeys.h; sourceTree = "<group>"; };
+		51C8E3FA28261DCF00D47D00 /* FabricKeys.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FabricKeys.m; sourceTree = "<group>"; };
+		991DC08F247747F500C13860 /* EnumerateViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EnumerateViewController.h; sourceTree = "<group>"; };
+		991DC090247747F500C13860 /* EnumerateViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EnumerateViewController.m; sourceTree = "<group>"; };
+		B204A61C244E1D0600C7C0E1 /* CHIPTool.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CHIPTool.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B204A61F244E1D0600C7C0E1 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		B204A620244E1D0600C7C0E1 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		B204A622244E1D0600C7C0E1 /* SceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SceneDelegate.h; sourceTree = "<group>"; };
+		B204A623244E1D0600C7C0E1 /* SceneDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SceneDelegate.m; sourceTree = "<group>"; };
+		B204A625244E1D0600C7C0E1 /* QRCodeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QRCodeViewController.h; sourceTree = "<group>"; };
+		B204A626244E1D0600C7C0E1 /* QRCodeViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = QRCodeViewController.m; sourceTree = "<group>"; };
+		B204A62B244E1D0700C7C0E1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B204A630244E1D0700C7C0E1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B204A631244E1D0700C7C0E1 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		B204A637244E1D0700C7C0E1 /* CHIPToolTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CHIPToolTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B204A63D244E1D0700C7C0E1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B232D8B82514BD0800792CB4 /* CHIPUIViewUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPUIViewUtils.h; sourceTree = "<group>"; };
+		B232D8B92514BD0800792CB4 /* CHIPUIViewUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CHIPUIViewUtils.m; sourceTree = "<group>"; };
+		B243A6672513A73600E56FEA /* RootViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
+		B243A6682513A73600E56FEA /* RootViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
+		B27FAB67255D4B980038F0D2 /* CHIPTool.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CHIPTool.entitlements; sourceTree = "<group>"; };
+		B2946A4024C99D53005C87D0 /* WiFiViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WiFiViewController.h; sourceTree = "<group>"; };
+		B2946A4124C99D53005C87D0 /* WiFiViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WiFiViewController.m; sourceTree = "<group>"; };
+		B2946A9924C9A7BF005C87D0 /* DefaultsUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DefaultsUtils.h; sourceTree = "<group>"; };
+		B2946A9A24C9A7BF005C87D0 /* DefaultsUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DefaultsUtils.m; sourceTree = "<group>"; };
+		B2B0209025C9C1AC00A4C220 /* BindingsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BindingsViewController.h; sourceTree = "<group>"; };
+		B2B0209125C9C1AC00A4C220 /* BindingsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BindingsViewController.m; sourceTree = "<group>"; };
+		B2C2267326289324009DAB8B /* FabricUIViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FabricUIViewController.h; sourceTree = "<group>"; };
+		B2C2267426289324009DAB8B /* FabricUIViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FabricUIViewController.m; sourceTree = "<group>"; };
+		B2F51E97252DCDC000911FA5 /* TemperatureSensorViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TemperatureSensorViewController.h; sourceTree = "<group>"; };
+		B2F51E98252DCDC000911FA5 /* TemperatureSensorViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TemperatureSensorViewController.m; sourceTree = "<group>"; };
+		B2F53AEA245B0D140010745E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = UI/Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		D437613B285BC0060051FEA2 /* Matter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Matter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		B204A619244E1D0600C7C0E1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D437613C285BC0060051FEA2 /* Matter.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B204A634244E1D0700C7C0E1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0C79937824858B3B0047A373 /* QRCode */ = {
+			isa = PBXGroup;
+			children = (
+				B204A625244E1D0600C7C0E1 /* QRCodeViewController.h */,
+				B204A626244E1D0600C7C0E1 /* QRCodeViewController.m */,
+			);
+			path = QRCode;
+			sourceTree = "<group>";
+		};
+		0C79937924858B4F0047A373 /* Enumeration */ = {
+			isa = PBXGroup;
+			children = (
+				991DC08F247747F500C13860 /* EnumerateViewController.h */,
+				991DC090247747F500C13860 /* EnumerateViewController.m */,
+			);
+			path = Enumeration;
+			sourceTree = "<group>";
+		};
+		0CA0E0D0248599C4009087B9 /* OnOffCluster */ = {
+			isa = PBXGroup;
+			children = (
+				0CA0E0CD248599BB009087B9 /* OnOffViewController.h */,
+				0CA0E0CE248599BB009087B9 /* OnOffViewController.m */,
+			);
+			path = OnOffCluster;
+			sourceTree = "<group>";
+		};
+		2C21071225D1A8F200DDA4AD /* MultiAdmin */ = {
+			isa = PBXGroup;
+			children = (
+				2C21071325D1A8F200DDA4AD /* MultiAdminViewController.m */,
+				2C21071425D1A8F200DDA4AD /* MultiAdminViewController.h */,
+			);
+			path = MultiAdmin;
+			sourceTree = "<group>";
+		};
+		2C460C2F25D97CB3000512D6 /* UnpairDevices */ = {
+			isa = PBXGroup;
+			children = (
+				2C460C3025D97CB3000512D6 /* UnpairDevicesViewController.m */,
+				2C460C3125D97CB3000512D6 /* UnpairDevicesViewController.h */,
+			);
+			path = UnpairDevices;
+			sourceTree = "<group>";
+		};
+		B20252DE2459EC7600F97062 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D437613B285BC0060051FEA2 /* Matter.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		B204A613244E1D0600C7C0E1 = {
+			isa = PBXGroup;
+			children = (
+				B204A61E244E1D0600C7C0E1 /* CHIPTool */,
+				B204A63A244E1D0700C7C0E1 /* CHIPToolTests */,
+				B204A61D244E1D0600C7C0E1 /* Products */,
+				B20252DE2459EC7600F97062 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		B204A61D244E1D0600C7C0E1 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B204A61C244E1D0600C7C0E1 /* CHIPTool.app */,
+				B204A637244E1D0700C7C0E1 /* CHIPToolTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		B204A61E244E1D0600C7C0E1 /* CHIPTool */ = {
+			isa = PBXGroup;
+			children = (
+				B27FAB67255D4B980038F0D2 /* CHIPTool.entitlements */,
+				B204A62B244E1D0700C7C0E1 /* Assets.xcassets */,
+				B2F53AE9245B0D140010745E /* LaunchScreen.storyboard */,
+				B204A630244E1D0700C7C0E1 /* Info.plist */,
+				B204A631244E1D0700C7C0E1 /* main.m */,
+				B232D8C0251A0EE200792CB4 /* Framework Helpers */,
+				B232D8BF251A0EC500792CB4 /* View Controllers */,
+				B232D8BE251A0EA300792CB4 /* UI Helpers */,
+			);
+			path = CHIPTool;
+			sourceTree = "<group>";
+		};
+		B204A63A244E1D0700C7C0E1 /* CHIPToolTests */ = {
+			isa = PBXGroup;
+			children = (
+				B204A63D244E1D0700C7C0E1 /* Info.plist */,
+			);
+			path = CHIPToolTests;
+			sourceTree = "<group>";
+		};
+		B232D8BE251A0EA300792CB4 /* UI Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				B232D8B82514BD0800792CB4 /* CHIPUIViewUtils.h */,
+				B232D8B92514BD0800792CB4 /* CHIPUIViewUtils.m */,
+			);
+			path = "UI Helpers";
+			sourceTree = "<group>";
+		};
+		B232D8BF251A0EC500792CB4 /* View Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				2C460C2F25D97CB3000512D6 /* UnpairDevices */,
+				2C460C2225D7594B000512D6 /* DeviceSelector.h */,
+				2C460C2325D7594B000512D6 /* DeviceSelector.m */,
+				2C21071225D1A8F200DDA4AD /* MultiAdmin */,
+				B204A61F244E1D0600C7C0E1 /* AppDelegate.h */,
+				B204A620244E1D0600C7C0E1 /* AppDelegate.m */,
+				B204A622244E1D0600C7C0E1 /* SceneDelegate.h */,
+				B204A623244E1D0600C7C0E1 /* SceneDelegate.m */,
+				B243A6672513A73600E56FEA /* RootViewController.h */,
+				B243A6682513A73600E56FEA /* RootViewController.m */,
+				B2F51E93252DCC9E00911FA5 /* Temperature Sensor */,
+				B2B0208F25C9C18500A4C220 /* Bindings */,
+				B2946A3F24C99D21005C87D0 /* WiFi */,
+				0C79937824858B3B0047A373 /* QRCode */,
+				B2C22672262892D7009DAB8B /* Fabric */,
+				0C79937924858B4F0047A373 /* Enumeration */,
+				0CA0E0D0248599C4009087B9 /* OnOffCluster */,
+			);
+			path = "View Controllers";
+			sourceTree = "<group>";
+		};
+		B232D8C0251A0EE200792CB4 /* Framework Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				51C8E3F928261DCF00D47D00 /* FabricKeys.h */,
+				51C8E3FA28261DCF00D47D00 /* FabricKeys.m */,
+				B2946A9924C9A7BF005C87D0 /* DefaultsUtils.h */,
+				B2946A9A24C9A7BF005C87D0 /* DefaultsUtils.m */,
+			);
+			path = "Framework Helpers";
+			sourceTree = "<group>";
+		};
+		B2946A3F24C99D21005C87D0 /* WiFi */ = {
+			isa = PBXGroup;
+			children = (
+				B2946A4024C99D53005C87D0 /* WiFiViewController.h */,
+				B2946A4124C99D53005C87D0 /* WiFiViewController.m */,
+			);
+			path = WiFi;
+			sourceTree = "<group>";
+		};
+		B2B0208F25C9C18500A4C220 /* Bindings */ = {
+			isa = PBXGroup;
+			children = (
+				B2B0209025C9C1AC00A4C220 /* BindingsViewController.h */,
+				B2B0209125C9C1AC00A4C220 /* BindingsViewController.m */,
+			);
+			path = Bindings;
+			sourceTree = "<group>";
+		};
+		B2C22672262892D7009DAB8B /* Fabric */ = {
+			isa = PBXGroup;
+			children = (
+				B2C2267326289324009DAB8B /* FabricUIViewController.h */,
+				B2C2267426289324009DAB8B /* FabricUIViewController.m */,
+			);
+			path = Fabric;
+			sourceTree = "<group>";
+		};
+		B2F51E93252DCC9E00911FA5 /* Temperature Sensor */ = {
+			isa = PBXGroup;
+			children = (
+				B2F51E97252DCDC000911FA5 /* TemperatureSensorViewController.h */,
+				B2F51E98252DCDC000911FA5 /* TemperatureSensorViewController.m */,
+			);
+			path = "Temperature Sensor";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		B204A61B244E1D0600C7C0E1 /* CHIPTool */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B204A64B244E1D0700C7C0E1 /* Build configuration list for PBXNativeTarget "CHIPTool" */;
+			buildPhases = (
+				B204A618244E1D0600C7C0E1 /* Sources */,
+				B204A619244E1D0600C7C0E1 /* Frameworks */,
+				B204A61A244E1D0600C7C0E1 /* Resources */,
+				D437613A285BBE3B0051FEA2 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CHIPTool;
+			productName = CHIPTool;
+			productReference = B204A61C244E1D0600C7C0E1 /* CHIPTool.app */;
+			productType = "com.apple.product-type.application";
+		};
+		B204A636244E1D0700C7C0E1 /* CHIPToolTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B204A64E244E1D0700C7C0E1 /* Build configuration list for PBXNativeTarget "CHIPToolTests" */;
+			buildPhases = (
+				B204A633244E1D0700C7C0E1 /* Sources */,
+				B204A634244E1D0700C7C0E1 /* Frameworks */,
+				B204A635244E1D0700C7C0E1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B204A639244E1D0700C7C0E1 /* PBXTargetDependency */,
+			);
+			name = CHIPToolTests;
+			productName = CHIPToolTests;
+			productReference = B204A637244E1D0700C7C0E1 /* CHIPToolTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		B204A614244E1D0600C7C0E1 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1200;
+				ORGANIZATIONNAME = CHIP;
+				TargetAttributes = {
+					B204A61B244E1D0600C7C0E1 = {
+						CreatedOnToolsVersion = 11.4.1;
+					};
+					B204A636244E1D0700C7C0E1 = {
+						CreatedOnToolsVersion = 11.4.1;
+						TestTargetID = B204A61B244E1D0600C7C0E1;
+					};
+				};
+			};
+			buildConfigurationList = B204A617244E1D0600C7C0E1 /* Build configuration list for PBXProject "CHIPTool" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = B204A613244E1D0600C7C0E1;
+			productRefGroup = B204A61D244E1D0600C7C0E1 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				B204A61B244E1D0600C7C0E1 /* CHIPTool */,
+				B204A636244E1D0700C7C0E1 /* CHIPToolTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		B204A61A244E1D0600C7C0E1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B204A62C244E1D0700C7C0E1 /* Assets.xcassets in Resources */,
+				B2F53AEB245B0D140010745E /* LaunchScreen.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B204A635244E1D0700C7C0E1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		B204A618244E1D0600C7C0E1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2C460C2425D7594B000512D6 /* DeviceSelector.m in Sources */,
+				2C21071525D1A8F200DDA4AD /* MultiAdminViewController.m in Sources */,
+				B204A627244E1D0600C7C0E1 /* QRCodeViewController.m in Sources */,
+				2C460C3225D97CB3000512D6 /* UnpairDevicesViewController.m in Sources */,
+				B232D8BA2514BD0800792CB4 /* CHIPUIViewUtils.m in Sources */,
+				B2946A9B24C9A7BF005C87D0 /* DefaultsUtils.m in Sources */,
+				991DC091247747F500C13860 /* EnumerateViewController.m in Sources */,
+				B2C2267526289324009DAB8B /* FabricUIViewController.m in Sources */,
+				B2B0209225C9C1AC00A4C220 /* BindingsViewController.m in Sources */,
+				B204A621244E1D0600C7C0E1 /* AppDelegate.m in Sources */,
+				B2F51E99252DCDC000911FA5 /* TemperatureSensorViewController.m in Sources */,
+				B243A6692513A73600E56FEA /* RootViewController.m in Sources */,
+				B204A632244E1D0700C7C0E1 /* main.m in Sources */,
+				B204A624244E1D0600C7C0E1 /* SceneDelegate.m in Sources */,
+				51C8E3FB28261DCF00D47D00 /* FabricKeys.m in Sources */,
+				B2946A4224C99D53005C87D0 /* WiFiViewController.m in Sources */,
+				0CA0E0CF248599BB009087B9 /* OnOffViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B204A633244E1D0700C7C0E1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		B204A639244E1D0700C7C0E1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B204A61B244E1D0600C7C0E1 /* CHIPTool */;
+			targetProxy = B204A638244E1D0700C7C0E1 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		B2F53AE9245B0D140010745E /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				B2F53AEA245B0D140010745E /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		B204A649244E1D0700C7C0E1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Manual;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					CHIP_HAVE_CONFIG_H,
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		B204A64A244E1D0700C7C0E1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Manual;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					CHIP_HAVE_CONFIG_H,
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		B204A64C244E1D0700C7C0E1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = CHIPTool/CHIPTool.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_BITCODE = NO;
+				INFOPLIST_FILE = CHIPTool/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.matter.CHIPTool;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		B204A64D244E1D0700C7C0E1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = CHIPTool/CHIPTool.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_BITCODE = NO;
+				INFOPLIST_FILE = CHIPTool/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.matter.CHIPTool;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		B204A64F244E1D0700C7C0E1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				INFOPLIST_FILE = CHIPToolTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIPToolTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CHIPTool.app/CHIPTool";
+			};
+			name = Debug;
+		};
+		B204A650244E1D0700C7C0E1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				INFOPLIST_FILE = CHIPToolTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIPToolTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CHIPTool.app/CHIPTool";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		B204A617244E1D0600C7C0E1 /* Build configuration list for PBXProject "CHIPTool" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B204A649244E1D0700C7C0E1 /* Debug */,
+				B204A64A244E1D0700C7C0E1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B204A64B244E1D0700C7C0E1 /* Build configuration list for PBXNativeTarget "CHIPTool" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B204A64C244E1D0700C7C0E1 /* Debug */,
+				B204A64D244E1D0700C7C0E1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B204A64E244E1D0700C7C0E1 /* Build configuration list for PBXNativeTarget "CHIPToolTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B204A64F244E1D0700C7C0E1 /* Debug */,
+				B204A650244E1D0700C7C0E1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = B204A614244E1D0600C7C0E1 /* Project object */;
+}

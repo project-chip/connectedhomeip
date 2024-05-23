@@ -1,0 +1,181 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("${build_root}/config/android_abi.gni")
+import("${chip_root}/build/chip/java/rules.gni")
+import("${chip_root}/build/chip/tools.gni")
+
+shared_library("jni") {
+  output_name = "libTvApp"
+
+  sources = [
+    "${chip_root}/examples/tv-app/tv-common/include/CHIPProjectAppConfig.h",
+    "include/account-login/AccountLoginManager.cpp",
+    "include/account-login/AccountLoginManager.h",
+    "include/application-basic/ApplicationBasicManager.cpp",
+    "include/application-basic/ApplicationBasicManager.h",
+    "include/application-launcher/ApplicationLauncherManager.cpp",
+    "include/application-launcher/ApplicationLauncherManager.h",
+    "include/audio-output/AudioOutputManager.cpp",
+    "include/audio-output/AudioOutputManager.h",
+    "include/cluster-init.cpp",
+    "include/content-control/ContentController.cpp",
+    "include/content-control/ContentController.h",
+    "include/content-launcher/AppContentLauncherManager.cpp",
+    "include/content-launcher/AppContentLauncherManager.h",
+    "include/media-playback/AppMediaPlaybackManager.cpp",
+    "include/media-playback/AppMediaPlaybackManager.h",
+    "include/target-navigator/TargetNavigatorManager.cpp",
+    "include/target-navigator/TargetNavigatorManager.h",
+    "java/AppImpl.cpp",
+    "java/AppImpl.h",
+    "java/AppPlatform-JNI.cpp",
+    "java/AppPlatformShellCommands-JNI.cpp",
+    "java/AppPlatformShellCommands-JNI.h",
+    "java/ChannelManager.cpp",
+    "java/ChannelManager.h",
+    "java/ClusterChangeAttribute.cpp",
+    "java/ContentAppAttributeDelegate.cpp",
+    "java/ContentAppAttributeDelegate.h",
+    "java/ContentAppCommandDelegate.cpp",
+    "java/ContentAppCommandDelegate.h",
+    "java/ContentLauncherManager.cpp",
+    "java/ContentLauncherManager.h",
+    "java/DeviceCallbacks.cpp",
+    "java/DeviceCallbacks.h",
+    "java/JNIDACProvider.cpp",
+    "java/JNIDACProvider.h",
+    "java/KeypadInputManager.cpp",
+    "java/KeypadInputManager.h",
+    "java/LevelManager.cpp",
+    "java/LevelManager.h",
+    "java/LowPowerManager.cpp",
+    "java/LowPowerManager.h",
+    "java/MediaInputManager.cpp",
+    "java/MediaInputManager.h",
+    "java/MediaPlaybackManager.cpp",
+    "java/MediaPlaybackManager.h",
+    "java/MessagesManager.cpp",
+    "java/MessagesManager.h",
+    "java/MyUserPrompter-JNI.cpp",
+    "java/MyUserPrompter-JNI.h",
+    "java/MyUserPrompterResolver-JNI.cpp",
+    "java/MyUserPrompterResolver-JNI.h",
+    "java/OnOffManager.cpp",
+    "java/OnOffManager.h",
+    "java/TVApp-JNI.cpp",
+    "java/WakeOnLanManager.cpp",
+    "java/WakeOnLanManager.h",
+  ]
+
+  deps = [
+    "${chip_root}/examples/platform/linux:commissioner-main",
+    "${chip_root}/examples/tv-app/tv-common",
+    "${chip_root}/src/app/server/java:jni",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/lib/support/jsontlv",
+    "${chip_root}/third_party/inipp",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  output_dir = "${root_out_dir}/lib/jni/${android_abi}"
+
+  ldflags = [ "-Wl,--gc-sections" ]
+}
+
+android_library("java") {
+  output_name = "TvApp.jar"
+
+  deps = [
+    ":android",
+    "${chip_root}/third_party/android_deps:annotation",
+  ]
+
+  data_deps = [
+    ":jni",
+    "${chip_root}/build/chip/java:shared_cpplib",
+  ]
+
+  sources = [
+    "java/src/com/matter/tv/server/tvapp/AppPlatform.java",
+    "java/src/com/matter/tv/server/tvapp/AppPlatformShellCommands.java",
+    "java/src/com/matter/tv/server/tvapp/ChannelInfo.java",
+    "java/src/com/matter/tv/server/tvapp/ChannelLineupInfo.java",
+    "java/src/com/matter/tv/server/tvapp/ChannelManager.java",
+    "java/src/com/matter/tv/server/tvapp/ChannelManagerStub.java",
+    "java/src/com/matter/tv/server/tvapp/ChannelProgramInfo.java",
+    "java/src/com/matter/tv/server/tvapp/ChannelProgramResponse.java",
+    "java/src/com/matter/tv/server/tvapp/Clusters.java",
+    "java/src/com/matter/tv/server/tvapp/ContentAppEndpointManager.java",
+    "java/src/com/matter/tv/server/tvapp/ContentLaunchBrandingInformation.java",
+    "java/src/com/matter/tv/server/tvapp/ContentLaunchEntry.java",
+    "java/src/com/matter/tv/server/tvapp/ContentLaunchManager.java",
+    "java/src/com/matter/tv/server/tvapp/ContentLaunchManagerStub.java",
+    "java/src/com/matter/tv/server/tvapp/ContentLaunchResponse.java",
+    "java/src/com/matter/tv/server/tvapp/ContentLaunchSearchParameter.java",
+    "java/src/com/matter/tv/server/tvapp/ContentLaunchSearchParameterType.java",
+    "java/src/com/matter/tv/server/tvapp/DACProvider.java",
+    "java/src/com/matter/tv/server/tvapp/DACProviderStub.java",
+    "java/src/com/matter/tv/server/tvapp/DeviceEventProvider.java",
+    "java/src/com/matter/tv/server/tvapp/KeypadInputManager.java",
+    "java/src/com/matter/tv/server/tvapp/KeypadInputManagerStub.java",
+    "java/src/com/matter/tv/server/tvapp/LevelManager.java",
+    "java/src/com/matter/tv/server/tvapp/LevelManagerStub.java",
+    "java/src/com/matter/tv/server/tvapp/LowPowerManager.java",
+    "java/src/com/matter/tv/server/tvapp/LowPowerManagerStub.java",
+    "java/src/com/matter/tv/server/tvapp/MediaInputInfo.java",
+    "java/src/com/matter/tv/server/tvapp/MediaInputManager.java",
+    "java/src/com/matter/tv/server/tvapp/MediaInputManagerStub.java",
+    "java/src/com/matter/tv/server/tvapp/MediaPlaybackManager.java",
+    "java/src/com/matter/tv/server/tvapp/MediaPlaybackManagerStub.java",
+    "java/src/com/matter/tv/server/tvapp/MediaPlaybackPosition.java",
+    "java/src/com/matter/tv/server/tvapp/MediaTrack.java",
+    "java/src/com/matter/tv/server/tvapp/Message.java",
+    "java/src/com/matter/tv/server/tvapp/MessageResponseOption.java",
+    "java/src/com/matter/tv/server/tvapp/MessagesManager.java",
+    "java/src/com/matter/tv/server/tvapp/MessagesManagerStub.java",
+    "java/src/com/matter/tv/server/tvapp/OnOffManager.java",
+    "java/src/com/matter/tv/server/tvapp/OnOffManagerStub.java",
+    "java/src/com/matter/tv/server/tvapp/TvApp.java",
+    "java/src/com/matter/tv/server/tvapp/TvAppCallback.java",
+    "java/src/com/matter/tv/server/tvapp/UserPrompter.java",
+    "java/src/com/matter/tv/server/tvapp/UserPrompterResolver.java",
+    "java/src/com/matter/tv/server/tvapp/WakeOnLanManager.java",
+    "java/src/com/matter/tv/server/tvapp/WakeOnLanManagerStub.java",
+  ]
+
+  javac_flags = [ "-Xlint:deprecation" ]
+
+  # TODO: add classpath support (we likely need to add something like
+  #  ..../platforms/android-26/android.jar to access BLE items)
+}
+
+java_prebuilt("android") {
+  jar_path = "${android_sdk_root}/platforms/android-26/android.jar"
+}
+
+group("default") {
+  deps = [
+    ":android",
+    ":java",
+    ":jni",
+    "${chip_root}/src/app/server/java",
+    "${chip_root}/src/controller/java:onboarding_payload",
+    "${chip_root}/src/platform/android:java",
+  ]
+}

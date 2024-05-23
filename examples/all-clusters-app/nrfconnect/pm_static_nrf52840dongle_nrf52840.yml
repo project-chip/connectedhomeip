@@ -1,0 +1,8 @@
+settings_storage:
+    address: 0xd8000
+    size: 0x8000
+    region: flash_primary
+open_bootloader:
+    address: 0xe0000
+    size: 0x20000
+    region: flash_primary

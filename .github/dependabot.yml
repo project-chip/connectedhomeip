@@ -1,0 +1,63 @@
+version: 2
+updates:
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "gitsubmodule"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    allow:
+      - dependency-name: "third_party/pigweed/repo"
+      - dependency-name: "third_party/mbedtls/repo"
+      - dependency-name: "third_party/openthread/repo"
+
+      - dependency-name: "third_party/ameba/repo"
+      - dependency-name: "third_party/android_deps/repo"
+      - dependency-name: "third_party/asr/repo"
+      - dependency-name: "third_party/boringssl/repo"
+      - dependency-name: "third_party/bouffalolab/repo"
+      - dependency-name: "third_party/cirque/repo"
+      - dependency-name: "third_party/editline/repo"
+      - dependency-name: "third_party/freertos/repo"
+      - dependency-name: "third_party/imgui/repo"
+      - dependency-name: "third_party/infineon/repo"
+      - dependency-name: "third_party/inipp/repo"
+      - dependency-name: "third_party/java_deps/repo"
+      - dependency-name: "third_party/jlink/repo"
+      - dependency-name: "third_party/jsoncpp/repo"
+      - dependency-name: "third_party/libwebsockets/repo"
+      - dependency-name: "third_party/lwip/repo"
+      - dependency-name: "third_party/mbed-mcu-boot/repo"
+      - dependency-name: "third_party/mbed-os-cypress-capsense-button/repo"
+      - dependency-name: "third_party/mbed-os-posix-socket/repo"
+      - dependency-name: "third_party/mbedtls/repo"
+      - dependency-name: "third_party/mt793x_sdk/repo"
+      - dependency-name: "third_party/mynewt-core/repo"
+      - dependency-name: "third_party/nanopb/repo"
+      - dependency-name: "third_party/nlassert/repo"
+      - dependency-name: "third_party/nlfaultinjection/repo"
+      - dependency-name: "third_party/nlio/repo"
+      - dependency-name: "third_party/nlunit-test/repo"
+      - dependency-name: "third_party/nxp/repo"
+      - dependency-name: "third_party/open-iot-sdk/repo"
+      - dependency-name: "third_party/ot-br-posix/repo"
+      - dependency-name: "third_party/perfetto/repo"
+      - dependency-name: "third_party/pybind11/repo"
+      - dependency-name: "third_party/qpg_sdk/repo"
+      - dependency-name: "third_party/silabs/repo"
+      - dependency-name: "third_party/simw-top-mini/repo"
+      - dependency-name: "third_party/ti_simplelink_sdk/repo"
+      - dependency-name: "third_party/tizen/repo"

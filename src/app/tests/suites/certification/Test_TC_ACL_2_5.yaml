@@ -1,0 +1,263 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 133.2.5. [TC-ACL-2.5] AccessControlExtensionChanged event
+
+PICS:
+    - ACL.S
+    - ACL.S.A0001
+
+config:
+    nodeId: 0x12344321
+    cluster: "Access Control"
+    endpoint: 0
+    D_OK_EMPTY:
+        type: octet_string
+        defaultValue: "hex:1718"
+    D_OK_SINGLE:
+        type: octet_string
+        defaultValue: "hex:17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"
+    D_BAD_LENGTH:
+        type: octet_string
+        defaultValue: "hex:17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E6700D00000F1FF02003248656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E7420616761696E2E2E2E2E2E2E0018"
+
+tests:
+    - label: "Step 1: TH1 commissions DUT using admin node ID N1"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Read the commissioner node ID"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: CommissionerNodeId
+
+    - label:
+          "Step 2: TH1 reads DUT Endpoint 0 OperationalCredentials cluster
+          CurrentFabricIndex attribute"
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: CurrentFabricIndexValue
+
+    #Issue: https://github.com/project-chip/connectedhomeip/issues/24081
+    - label:
+          "Step 3: TH1 reads DUT Endpoint 0 AccessControl cluster
+          AccessControlExtensionChanged event"
+      verification: |
+          ./chip-tool   accesscontrol  read-event  access-control-extension-changed 1 0
+
+          Via the TH (chip-tool), Verify  AccessControl cluster AccessControlExtensionChanged event value is an empty list
+
+          848.856174][2311:2316] CHIP:EM: Removed CHIP MessageCounter:265690133 from RetransTable on exchange 23190i
+          [1657283848.856239][2311:2316] CHIP:DMG: ReportDataMessage =
+          [1657283848.856278][2311:2316] CHIP:DMG: {
+          [1657283848.856313][2311:2316] CHIP:DMG:        SuppressResponse = true,
+          [1657283848.856351][2311:2316] CHIP:DMG:        InteractionModelRevision = 1
+          [1657283848.856385][2311:2316] CHIP:DMG: }
+          [1657283848.856483][2311:2316] CHIP:EM: Sending Standalone Ack for MessageCounter:33251086 on exchange 23190i
+          [1657283848.856560][2311:2316] CHIP:IN: Prepared secure message 0xffff877ed958 to 0x0000000000000001 (1)  of type 0x10 and protocolId (0, 0) on exchange 23190i with MessageCounter:265690134.
+          [1657283848.856638][2311:2316] CHIP:IN: Sending encrypted msg 0xffff877ed958 with MessageCounter:265690134 to 0x0000000000000001 (1) at monotonic time: 00000000000A1C64 msec
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && ACL.S.E01
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 4: TH1 writes DUT Endpoint 0 AccessControl cluster Extension
+          attribute, value is list of AccessControlExtensionStruct containing 1
+          element struct Data field: D_OK_EMPTY"
+      PICS: ACL.S.A0001
+      command: "writeAttribute"
+      attribute: "Extension"
+      arguments:
+          value: [{ Data: D_OK_EMPTY, FabricIndex: CurrentFabricIndexValue }]
+
+    - label:
+          "Step 5: TH1 reads DUT Endpoint 0 AccessControl cluster
+          AccessControlExtensionChanged event"
+      PICS: ACL.S.E01
+      command: "readEvent"
+      event: "AccessControlExtensionChanged"
+      eventNumber: "LastReceivedEventNumber + 1"
+      response:
+          value:
+              {
+                  AdminNodeID: CommissionerNodeId,
+                  AdminPasscodeID: null,
+                  ChangeType: 1,
+                  LatestValue:
+                      {
+                          Data: D_OK_EMPTY,
+                          FabricIndex: CurrentFabricIndexValue,
+                      },
+                  FabricIndex: CurrentFabricIndexValue,
+              }
+
+    - label:
+          "Step 6: TH1 writes DUT Endpoint 0 AccessControl cluster Extension
+          attribute, value is list of AccessControlExtensionStruct containing 1
+          element struct Data field: D_OK_SINGLE"
+      PICS: ACL.S.A0001
+      command: "writeAttribute"
+      attribute: "Extension"
+      arguments:
+          value: [{ Data: D_OK_SINGLE, FabricIndex: CurrentFabricIndexValue }]
+
+    - label:
+          "Step 7: TH1 reads DUT Endpoint 0 AccessControl cluster
+          AccessControlExtensionChanged event"
+      PICS: ACL.S.E01
+      command: "readEvent"
+      event: "AccessControlExtensionChanged"
+      eventNumber: "LastReceivedEventNumber + 1"
+      response:
+          - values:
+                - value:
+                      {
+                          AdminNodeID: CommissionerNodeId,
+                          AdminPasscodeID: null,
+                          ChangeType: 2,
+                          LatestValue:
+                              {
+                                  Data: D_OK_EMPTY,
+                                  FabricIndex: CurrentFabricIndexValue,
+                              },
+                          FabricIndex: CurrentFabricIndexValue,
+                      }
+          - values:
+                - value:
+                      {
+                          AdminNodeID: CommissionerNodeId,
+                          AdminPasscodeID: null,
+                          ChangeType: 1,
+                          LatestValue:
+                              {
+                                  Data: D_OK_SINGLE,
+                                  FabricIndex: CurrentFabricIndexValue,
+                              },
+                          FabricIndex: CurrentFabricIndexValue,
+                      }
+
+    - label:
+          "Step 8: TH1 writes DUT Endpoint 0 AccessControl cluster Extension
+          attribute, value is list of AccessControlExtensionStruct containing 1
+          element struct Data field: D_BAD_LENGTH"
+      PICS: ACL.S.A0001
+      command: "writeAttribute"
+      attribute: "Extension"
+      arguments:
+          value: [{ Data: D_BAD_LENGTH, FabricIndex: CurrentFabricIndexValue }]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 9: TH1 reads DUT Endpoint 0 AccessControl cluster
+          AccessControlExtensionChanged event"
+      PICS: ACL.S.E01
+      command: "readEvent"
+      event: "AccessControlExtensionChanged"
+      eventNumber: "LastReceivedEventNumber + 1"
+      response:
+          value:
+              {
+                  AdminNodeID: CommissionerNodeId,
+                  AdminPasscodeID: null,
+                  ChangeType: 2,
+                  LatestValue:
+                      {
+                          Data: D_OK_SINGLE,
+                          FabricIndex: CurrentFabricIndexValue,
+                      },
+                  FabricIndex: CurrentFabricIndexValue,
+              }
+
+    - label:
+          "Step 10: TH1 writes DUT Endpoint 0 AccessControl cluster Extension
+          attribute, value is list of AccessControlExtensionStruct containing 2
+          elements struct Data field: D_OK_EMPTY struct Data field: D_OK_SINGLE"
+      PICS: ACL.S.A0001
+      command: "writeAttribute"
+      attribute: "Extension"
+      arguments:
+          value:
+              [
+                  { Data: D_OK_EMPTY, FabricIndex: CurrentFabricIndexValue },
+                  { Data: D_OK_SINGLE, FabricIndex: CurrentFabricIndexValue },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 11: TH1 reads DUT Endpoint 0 AccessControl cluster
+          AccessControlExtensionChanged event"
+      PICS: ACL.S.E01
+      command: "readEvent"
+      event: "AccessControlExtensionChanged"
+      eventNumber: "LastReceivedEventNumber + 1"
+      response:
+          value:
+              {
+                  AdminNodeID: CommissionerNodeId,
+                  AdminPasscodeID: null,
+                  ChangeType: 1,
+                  LatestValue:
+                      {
+                          Data: D_OK_EMPTY,
+                          FabricIndex: CurrentFabricIndexValue,
+                      },
+                  FabricIndex: CurrentFabricIndexValue,
+              }
+
+    - label:
+          "Step 12: TH1 writes DUT Endpoint 0 AccessControl cluster Extension
+          attribute, value is an empty list"
+      PICS: ACL.S.A0001
+      command: "writeAttribute"
+      attribute: "Extension"
+      arguments:
+          value: []
+
+    - label:
+          "Step 13: TH1 reads DUT Endpoint 0 AccessControl cluster
+          AccessControlExtensionChanged event"
+      PICS: ACL.S.E01
+      command: "readEvent"
+      event: "AccessControlExtensionChanged"
+      eventNumber: "LastReceivedEventNumber + 1"
+      response:
+          value:
+              {
+                  AdminNodeID: CommissionerNodeId,
+                  AdminPasscodeID: null,
+                  ChangeType: 2,
+                  LatestValue:
+                      {
+                          Data: D_OK_EMPTY,
+                          FabricIndex: CurrentFabricIndexValue,
+                      },
+                  FabricIndex: CurrentFabricIndexValue,
+              }

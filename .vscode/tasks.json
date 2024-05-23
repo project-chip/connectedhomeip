@@ -1,0 +1,703 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build specific example",
+            "type": "shell",
+            "command": "scripts/run_in_build_env.sh",
+            "args": [
+                "./scripts/build/build_examples.py --target ${input:exampleTarget} build"
+            ],
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc"
+            }
+        },
+        {
+            "label": "Main Build",
+            "type": "shell",
+            "command": "scripts/build/default.sh",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "isBackground": false,
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": ["relative", "${workspaceFolder}/out/default/"]
+            }
+        },
+        {
+            "label": "Build & Test (all)",
+            "type": "shell",
+            "command": "./gn_build.sh",
+            "group": "build",
+            "isBackground": false,
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": ["relative", "${workspaceFolder}/out/debug/"]
+            }
+        },
+        {
+            "label": "Update compilation database",
+            "type": "shell",
+            "command": "scripts/helpers/update_compile_commands.sh",
+            "group": "none",
+            "dependsOn": "Build & Test (all)",
+            "isBackground": false,
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Unit and Functional Tests",
+            "type": "shell",
+            "command": "scripts/tests/all_tests.sh",
+            "group": "test",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": ["relative", "${workspaceFolder}/out/default/"]
+            }
+        },
+        {
+            "label": "Bootstrap",
+            "type": "shell",
+            "command": "bash scripts/bootstrap.sh",
+            "group": "none",
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Clean Output",
+            "type": "shell",
+            "command": "scripts/helpers/clean.sh",
+            "group": "none",
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Clean Tree",
+            "type": "shell",
+            "command": "scripts/helpers/clean_tree.sh",
+            "group": "none",
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Build Minimal MDNS Example",
+            "type": "shell",
+            "command": "scripts/examples/gn_build_example.sh examples/minimal-mdns out/minimal_mdns 'chip_build_tools=false is_debug=false optimize_for_size=true'",
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/out/minimal_mdns/"
+                ]
+            }
+        },
+        {
+            "label": "QEMU: run esp32-qemu unit tests",
+            "type": "shell",
+            "command": "scripts/tests/esp32_qemu_tests.sh /tmp/test_logs",
+            "problemMatcher": []
+        },
+        {
+            "label": "Build i.MX Linux examples",
+            "type": "shell",
+            "command": "./scripts/examples/imxlinux_example.sh ${input:imxExampleTarget} out/aarch64",
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": ["relative", "${workspaceFolder}/out/aarch64/"]
+            }
+        },
+        {
+            "label": "Run Mbed Application",
+            "type": "shell",
+            "command": "scripts/examples/mbed_example.sh",
+            "args": [
+                "-c=${input:mbedCommand}",
+                "-a=${input:mbedApp}",
+                "-b=${input:mbedTarget}",
+                "-p=${input:mbedProfile}",
+                "-T=${input:mbedAppType}"
+            ],
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/examples/${input:mbedApp}/mbed/build"
+                ]
+            }
+        },
+        {
+            "label": "Run Mbed Unit Tests",
+            "type": "shell",
+            "command": "scripts/tests/mbed/mbed_unit_tests.sh",
+            "args": [
+                "-c=${input:mbedCommand}",
+                "-b=${input:mbedTarget}",
+                "-p=${input:mbedProfile}"
+            ],
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/src/test_driver/mbed/unit_tests/build"
+                ]
+            }
+        },
+        {
+            "label": "Flash EFR32 board",
+            "type": "shell",
+            "command": "python3",
+            "args": [
+                "${workspaceFolder}/out/${input:exampleTarget}/chip-efr32-*.flash.py"
+            ],
+            "problemMatcher": {
+                "base": "$gcc"
+            }
+        },
+        {
+            "label": "Build LightingApp (Tizen)",
+            "type": "shell",
+            "command": "scripts/run_in_build_env.sh",
+            "args": [
+                "${workspaceFolder}/scripts/build/build_examples.py --target tizen-arm-light --enable-flashbundle build"
+            ],
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc"
+            }
+        },
+        {
+            "label": "Connect to device (Tizen)",
+            "type": "shell",
+            "command": "sdb",
+            "args": ["connect", "${input:tizenTargetDeviceAddress}"],
+            "problemMatcher": [],
+            "runOptions": {
+                "reevaluateOnRerun": false
+            }
+        },
+        {
+            "label": "Install LightingApp (Tizen)",
+            "type": "shell",
+            "command": "sdb",
+            "args": [
+                "-s",
+                "${input:tizenTargetDeviceAddressSdb}",
+                "install",
+                "${workspaceFolder}/out/tizen-arm-light/package/out/org.tizen.matter.example.lighting-1.0.0.tpk"
+            ],
+            "problemMatcher": [],
+            "runOptions": {
+                "reevaluateOnRerun": false
+            }
+        },
+        {
+            "label": "Launch LightingApp with gdbserver attached (Tizen)",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "${workspaceFolder}/scripts/helpers/tizen_gdbserver_run.sh",
+                "--app-name",
+                "org.tizen.matter.example.lighting",
+                "--target",
+                "${input:tizenTargetDeviceAddressSdb}"
+            ],
+            "problemMatcher": [],
+            "runOptions": {
+                "reevaluateOnRerun": false
+            },
+            "isBackground": false,
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "dedicated",
+                "showReuseMessage": true,
+                "clear": true
+            }
+        },
+        {
+            "label": "Setup Open IoT SDK network",
+            "type": "shell",
+            "command": "sudo scripts/setup/openiotsdk/network_setup.sh -n${input:openiotsdkNetworkSetupName} ${input:openiotsdkNetworkSetupCmd}",
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "Build Open IoT SDK example",
+            "type": "shell",
+            "command": "scripts/examples/openiotsdk_example.sh",
+            "args": [
+                "-Cbuild",
+                "-d${input:openiotsdkDebugMode}",
+                "-l${input:openiotsdkLwipDebug}",
+                "-b${input:openiotsdkCryptoBackend}",
+                "${input:openiotsdkExample}"
+            ],
+            "group": "build",
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "Build Open IoT SDK unit-tests",
+            "type": "shell",
+            "command": "scripts/examples/openiotsdk_example.sh",
+            "args": [
+                "-Cbuild",
+                "-d${input:openiotsdkDebugMode}",
+                "-l${input:openiotsdkLwipDebug}",
+                "-b${input:openiotsdkCryptoBackend}",
+                "unit-tests"
+            ],
+            "group": "build",
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "Run Open IoT SDK example",
+            "type": "shell",
+            "command": "scripts/run_in_ns.sh",
+            "args": [
+                "${input:openiotsdkNetworkNamespace}",
+                "scripts/examples/openiotsdk_example.sh",
+                "-Crun",
+                "-n${input:openiotsdkNetworkInterface}",
+                "${input:openiotsdkExample}"
+            ],
+            "group": "test",
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "Run Open IoT SDK unit-tests",
+            "type": "shell",
+            "command": "scripts/examples/openiotsdk_example.sh",
+            "args": ["-Crun", "unit-tests", "${input:openiotsdkUnitTest}"],
+            "group": "test",
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "Test Open IoT SDK example",
+            "type": "shell",
+            "command": "scripts/run_in_ns.sh",
+            "args": [
+                "${input:openiotsdkNetworkNamespace}",
+                "scripts/examples/openiotsdk_example.sh",
+                "-Ctest",
+                "-n${input:openiotsdkNetworkInterface}",
+                "${input:openiotsdkExample}"
+            ],
+            "group": "test",
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "Test Open IoT SDK unit-tests",
+            "type": "shell",
+            "command": "scripts/examples/openiotsdk_example.sh",
+            "args": ["-Ctest", "unit-tests", "${input:openiotsdkUnitTest}"],
+            "group": "test",
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "Debug Open IoT SDK example",
+            "type": "shell",
+            "command": "scripts/run_in_ns.sh",
+            "args": [
+                "${input:openiotsdkNetworkNamespace}",
+                "scripts/examples/openiotsdk_example.sh",
+                "-Crun",
+                "-n${input:openiotsdkNetworkInterface}",
+                "-dtrue",
+                "${input:openiotsdkExample}"
+            ],
+            "group": "none",
+            "isBackground": true,
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "message": 5
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^.*Trying*",
+                    "endsPattern": "^.*Connected to localhost*"
+                }
+            }
+        },
+        {
+            "label": "Debug Open IoT SDK unit-tests",
+            "type": "shell",
+            "command": "scripts/examples/openiotsdk_example.sh",
+            "args": [
+                "-Crun",
+                "-dtrue",
+                "unit-tests",
+                "${input:openiotsdkUnitTest}"
+            ],
+            "group": "none",
+            "isBackground": true,
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "message": 5
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^.*Trying*",
+                    "endsPattern": "^.*Connected to localhost*"
+                }
+            }
+        }
+    ],
+    "inputs": [
+        {
+            "type": "pickString",
+            "id": "mbedCommand",
+            "description": "What do you want to do?",
+            "options": ["build", "flash", "build-flash"],
+            "default": "build"
+        },
+        {
+            "type": "pickString",
+            "id": "mbedApp",
+            "description": "What mbed application do you want to use?",
+            "options": [
+                "lock-app",
+                "lighting-app",
+                "pigweed-app",
+                "all-clusters-app",
+                "shell",
+                "ota-requestor-app"
+            ],
+            "default": "lock-app"
+        },
+        {
+            "type": "pickString",
+            "id": "mbedTarget",
+            "description": "What mbed target do you want to use?",
+            "options": ["CY8CPROTO_062_4343W"],
+            "default": "CY8CPROTO_062_4343W"
+        },
+        {
+            "type": "pickString",
+            "id": "mbedProfile",
+            "description": "What mbed profile do you want to use?",
+            "options": ["release", "develop", "debug"],
+            "default": "release"
+        },
+        {
+            "type": "pickString",
+            "id": "mbedAppType",
+            "description": "What mbed application type do you want to use?",
+            "options": ["simple", "boot", "upgrade"],
+            "default": "simple"
+        },
+        {
+            "type": "pickString",
+            "id": "openiotsdkNetworkSetupCmd",
+            "description": "Which command do you wish to use?",
+            "options": ["up", "down", "restart"],
+            "default": "up"
+        },
+        {
+            "type": "promptString",
+            "id": "openiotsdkNetworkSetupName",
+            "description": "Type the network namespace name that you want to use.",
+            "default": "ARM"
+        },
+        {
+            "type": "pickString",
+            "id": "openiotsdkDebugMode",
+            "description": "Do you want to use debug mode?",
+            "options": ["false", "true"],
+            "default": "false"
+        },
+        {
+            "type": "pickString",
+            "id": "openiotsdkLwipDebug",
+            "description": "Do you want to use LwIP debug logs?",
+            "options": ["false", "true"],
+            "default": "false"
+        },
+        {
+            "type": "pickString",
+            "id": "openiotsdkCryptoBackend",
+            "description": "Which Crypto algorithm do you wish to use?",
+            "options": ["mbedtls", "psa"],
+            "default": "mbedtls"
+        },
+        {
+            "type": "command",
+            "id": "openiotsdkExample",
+            "command": "shellCommand.execute",
+            "args": {
+                "command": "cat examples/platform/openiotsdk/supported_examples.txt",
+                "description": "What Open IoT SDK example application do you want to use?"
+            }
+        },
+        {
+            "type": "command",
+            "id": "openiotsdkUnitTest",
+            "command": "shellCommand.execute",
+            "args": {
+                "command": "cat src/test_driver/openiotsdk/unit-tests/test_components.txt",
+                "description": "What Open IoT SDK unit test application do you want to use?"
+            }
+        },
+        {
+            "type": "promptString",
+            "id": "openiotsdkNetworkNamespace",
+            "description": "Type the network namespace that you want to use. \"default\" means host default network namespace",
+            "default": "default"
+        },
+        {
+            "type": "promptString",
+            "id": "openiotsdkNetworkInterface",
+            "description": "Type the network interface name that you want to use. \"user\" means user network mode",
+            "default": "user"
+        },
+        {
+            "type": "promptString",
+            "id": "exampleGlob",
+            "description": "What applications to build (e.g. '*m5stack*' or 'esp32-*')"
+        },
+        {
+            "type": "pickString",
+            "id": "imxExampleTarget",
+            "description": "What example application type do you want to build?",
+            "options": [
+                "examples/chip-tool",
+                "examples/lighting-app/linux",
+                "examples/thermostat/linux"
+            ],
+            "default": "examples/chip-tool"
+        },
+        {
+            "type": "pickString",
+            "id": "exampleTarget",
+            "description": "What target to build",
+            "options": [
+                "ameba-amebad-all-clusters",
+                "android-androidstudio-arm-chip-tool",
+                "android-androidstudio-arm64-chip-tool",
+                "android-androidstudio-x64-chip-tool",
+                "android-androidstudio-x86-chip-tool",
+                "android-arm-chip-tool",
+                "android-arm64-chip-test",
+                "android-arm64-chip-tool",
+                "android-arm64-chip-tvserver",
+                "android-x64-chip-tool",
+                "android-x86-chip-tool",
+                "bouffalolab-bl602-iot-matter-v1-light",
+                "bouffalolab-bl602-iot-matter-v1-light-rpc-115200",
+                "bouffalolab-bl602-night-light-light",
+                "bouffalolab-xt-zb6-devkit-light",
+                "bouffalolab-xt-zb6-devkit-light-rpc-115200",
+                "bouffalolab-bl706-night-light-light",
+                "efr32-brd4161a-light",
+                "efr32-brd4163a-light",
+                "efr32-brd4164a-light",
+                "efr32-brd4166a-light",
+                "efr32-brd4170a-light",
+                "efr32-brd4186a-light",
+                "efr32-brd4187a-light",
+                "efr32-brd4304a-light",
+                "efr32-brd4161a-light-rpc",
+                "efr32-brd4163a-light-rpc",
+                "efr32-brd4164a-light-rpc",
+                "efr32-brd4166a-light-rpc",
+                "efr32-brd4170a-light-rpc",
+                "efr32-brd4186a-light-rpc",
+                "efr32-brd4187a-light-rpc",
+                "efr32-brd4304a-light-rpc",
+                "efr32-brd4161a-lock",
+                "efr32-brd4163a-lock",
+                "efr32-brd4164a-lock",
+                "efr32-brd4166a-lock",
+                "efr32-brd4170a-lock",
+                "efr32-brd4186a-lock",
+                "efr32-brd4187a-lock",
+                "efr32-brd4304a-lock",
+                "efr32-brd4161a-unit-test",
+                "efr32-brd4163a-unit-test",
+                "efr32-brd4164a-unit-test",
+                "efr32-brd4166a-unit-test",
+                "efr32-brd4170a-unit-test",
+                "efr32-brd4186a-unit-test",
+                "efr32-brd4187a-unit-test",
+                "efr32-brd4304a-unit-test",
+                "efr32-brd4161a-switch",
+                "efr32-brd4163a-switch",
+                "efr32-brd4164a-switch",
+                "efr32-brd4166a-switch",
+                "efr32-brd4170a-switch",
+                "efr32-brd4186a-switch",
+                "efr32-brd4187a-switch",
+                "efr32-brd4304a-switch",
+                "efr32-brd4161a-window-covering",
+                "efr32-brd4163a-window-covering",
+                "efr32-brd4164a-window-covering",
+                "efr32-brd4166a-window-covering",
+                "efr32-brd4170a-window-covering",
+                "efr32-brd4186a-window-covering",
+                "efr32-brd4187a-window-covering",
+                "efr32-brd4304a-window-covering",
+                "efr32-brd4338a-light-wifi-917_soc-skip_rps_generation",
+                "esp32-c3devkit-all-clusters",
+                "esp32-devkitc-all-clusters",
+                "esp32-devkitc-all-clusters-ipv6only",
+                "esp32-devkitc-bridge",
+                "esp32-devkitc-lock",
+                "esp32-devkitc-shell",
+                "esp32-devkitc-temperature-measurement",
+                "esp32-m5stack-all-clusters",
+                "esp32-m5stack-all-clusters-ipv6only",
+                "esp32-m5stack-all-clusters-rpc",
+                "esp32-m5stack-all-clusters-rpc-ipv6only",
+                "infineon-psoc6-all-clusters",
+                "infineon-psoc6-lock",
+                "infineon-psoc6-light",
+                "linux-arm64-all-clusters",
+                "linux-arm64-all-clusters-ipv6only",
+                "linux-arm64-chip-tool",
+                "linux-arm64-chip-tool-ipv6only",
+                "linux-arm64-rpc-console",
+                "linux-arm64-thermostat",
+                "linux-arm64-thermostat-ipv6only",
+                "linux-x64-all-clusters",
+                "linux-x64-all-clusters-ipv6only",
+                "linux-x64-chip-tool",
+                "linux-x64-chip-tool-ipv6only",
+                "linux-x64-rpc-console",
+                "linux-x64-thermostat",
+                "linux-x64-thermostat-ipv6only",
+                "mbed-CY8CPROTO_062_4343W-all-clusters-debug",
+                "mbed-CY8CPROTO_062_4343W-all-clusters-develop",
+                "mbed-CY8CPROTO_062_4343W-all-clusters-release",
+                "mbed-CY8CPROTO_062_4343W-light-debug",
+                "mbed-CY8CPROTO_062_4343W-light-develop",
+                "mbed-CY8CPROTO_062_4343W-light-release",
+                "mbed-CY8CPROTO_062_4343W-lock-debug",
+                "mbed-CY8CPROTO_062_4343W-lock-develop",
+                "mbed-CY8CPROTO_062_4343W-lock-release",
+                "mbed-CY8CPROTO_062_4343W-pigweed-debug",
+                "mbed-CY8CPROTO_062_4343W-pigweed-develop",
+                "mbed-CY8CPROTO_062_4343W-pigweed-release",
+                "mbed-CY8CPROTO_062_4343W-shell-debug",
+                "mbed-CY8CPROTO_062_4343W-shell-develop",
+                "mbed-CY8CPROTO_062_4343W-shell-release",
+                "nrf-nrf52840dk-light",
+                "nrf-nrf52840dk-light-rpc",
+                "nrf-nrf52840dk-lock",
+                "nrf-nrf52840dk-pump",
+                "nrf-nrf52840dk-pump-controller",
+                "nrf-nrf52840dk-shell",
+                "nrf-nrf5340dk-light",
+                "nrf-nrf5340dk-light-rpc",
+                "nrf-nrf5340dk-lock",
+                "nrf-nrf5340dk-pump",
+                "nrf-nrf5340dk-pump-controller",
+                "nrf-nrf5340dk-shell",
+                "openiotsdk-lock",
+                "openiotsdk-shell",
+                "qpg-qpg6100-lock",
+                "telink-tlsr9518adk80d-air-quality-sensor",
+                "telink-tlsr9518adk80d-all-clusters",
+                "telink-tlsr9518adk80d-all-clusters-minimal",
+                "telink-tlsr9518adk80d-bridge",
+                "telink-tlsr9518adk80d-contact-sensor",
+                "telink-tlsr9518adk80d-light",
+                "telink-tlsr9518adk80d-light-switch",
+                "telink-tlsr9518adk80d-lock-app",
+                "telink-tlsr9518adk80d-ota-requestor",
+                "telink-tlsr9518adk80d-pump-app",
+                "telink-tlsr9518adk80d-pump-controller-app",
+                "telink-tlsr9518adk80d-resource-monitoring-app",
+                "telink-tlsr9518adk80d-shell",
+                "telink-tlsr9518adk80d-smoke-co-alarm-app",
+                "telink-tlsr9518adk80d-temperature-measurement",
+                "telink-tlsr9518adk80d-thermostat",
+                "telink-tlsr9518adk80d-window-covering",
+                "tizen-arm-light"
+            ]
+        },
+        {
+            "type": "promptString",
+            "id": "tizenTargetDeviceAddress",
+            "description": "Enter the target device address and port in format <address>:<port>"
+        },
+        {
+            "id": "tizenTargetDeviceAddressSdb",
+            "type": "command",
+            "command": "shellCommand.execute",
+            "args": {
+                "command": "sdb devices | grep -v 'List of devices attached' |awk '{print $1 \"|\" $1, $3, \"(\" $2 \")\"}'",
+                "fieldSeparator": "|",
+                "description": "Select target device"
+            }
+        }
+    ]
+}

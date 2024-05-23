@@ -1,0 +1,128 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 19.8.1. [TC-MEDIAPLAYBACK-6.1] Mandatory Media Playback Verification
+
+PICS:
+    - MEDIAPLAYBACK.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Media Playback"
+    endpoint: 1
+
+tests:
+    - label:
+          "Commission DUT to TH (can be skipped if done in a preceding test)."
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Precondition: Media content in a paused state at the beginning of the
+          content"
+      command: "Pause"
+      PICS: MEDIAPLAYBACK.S.C01.Rsp
+      response:
+          values:
+              - name: "Status"
+                value: 0
+
+    - label: "Step 1: TH reads the CurrentState attribute from the DUT"
+      PICS: MEDIAPLAYBACK.S.A0000 && MEDIAPLAYBACK.S.C01.Rsp
+      command: "readAttribute"
+      attribute: "CurrentState"
+      response:
+          value: 1
+
+    - label: "Step 2: TH sends a Play command to the DUT"
+      PICS: MEDIAPLAYBACK.S.C00.Rsp
+      command: "Play"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+
+    - label: "Verify that the media state is playing"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' if media state is playing"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 3: TH reads the CurrentState attribute from the DUT"
+      PICS: MEDIAPLAYBACK.S.A0000 && MEDIAPLAYBACK.S.C00.Rsp
+      command: "readAttribute"
+      attribute: "CurrentState"
+      response:
+          value: 0
+
+    - label: "Step 4: TH sends a Pause command to the DUT"
+      PICS: MEDIAPLAYBACK.S.C01.Rsp
+      command: "Pause"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+
+    - label: "Verify that the media is paused"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C01.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' if media state is paused"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 5: TH reads the CurrentState attribute from the DUT"
+      PICS: MEDIAPLAYBACK.S.C01.Rsp && MEDIAPLAYBACK.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentState"
+      response:
+          value: 1
+
+    - label: "Step 6: TH sends a Stop command to the DUT"
+      PICS: MEDIAPLAYBACK.S.C02.Rsp
+      command: "Stop"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+
+    - label: "Verify that the media is stoped"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C02.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' if media state is stoped"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 7: TH reads the CurrentState attribute from the DUT"
+      PICS: MEDIAPLAYBACK.S.A0000 && MEDIAPLAYBACK.S.C02.Rsp
+      command: "readAttribute"
+      attribute: "CurrentState"
+      response:
+          value: 2

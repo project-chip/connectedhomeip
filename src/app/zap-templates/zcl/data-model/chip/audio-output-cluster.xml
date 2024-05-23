@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2023 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+  <cluster>
+    <domain>Media</domain>
+    <name>Audio Output</name>
+    <code>0x050b</code>
+    <define>AUDIO_OUTPUT_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <description>This cluster provides an interface for controlling the Output on a media device such as a TV.</description>
+
+    <features>
+      <feature bit="0" code="NU" name="NameUpdates" summary="Supports updates to output names">
+        <optionalConform/>
+      </feature>
+    </features>
+
+    <attribute side="server" code="0x0000" define="AUDIO_OUTPUT_LIST"           type="array" entryType="OutputInfoStruct" length="254"          writable="false"  optional="false">OutputList</attribute>
+    <attribute side="server" code="0x0001" define="AUDIO_OUTPUT_CURRENT_OUTPUT" type="int8u" default="0x00"               min="0x00" max="0xFF" writable="false"  optional="false">CurrentOutput</attribute>
+
+    <command source="client" code="0x00" name="SelectOutput" optional="false">
+      <description>Upon receipt, this SHALL change the output on the media device to the output at a specific index in the Output List.</description>
+      <arg name="Index" type="int8u"/>
+    </command>
+
+    <command source="client" code="0x01" name="RenameOutput" optional="true">
+      <description>Upon receipt, this SHALL rename the output at a specific index in the Output List. Updates to the output name SHALL appear in the TV settings menus.</description>
+      <access op="invoke" role="manage" />
+      <arg name="Index" type="int8u"/>
+      <arg name="Name" type="char_string"/>
+    </command>
+
+  </cluster>
+
+  <struct name="OutputInfoStruct">
+    <cluster code="0x050b"/>
+    <item name="Index" type="int8u"/>
+    <item name="OutputType" type="OutputTypeEnum"/>
+    <item name="Name" type="char_string"/>
+  </struct>
+
+  <enum name="OutputTypeEnum" type="enum8">
+    <cluster code="0x050b"/>
+    <item name="HDMI" value="0x00"/>
+    <item name="BT" value="0x01"/>
+    <item name="Optical" value="0x02"/>
+    <item name="Headphone" value="0x03"/>
+    <item name="Internal" value="0x04"/>
+    <item name="Other" value="0x05"/>
+  </enum>
+
+</configurator>

@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">MatterTVServer</string>
+    <string name="send_command">Send Command</string>
+    <string name="add">Add</string>
+    <string name="content_app">Content App</string>
+    <string name="terminal">Run Commands</string>
+    <string name="qr_code">QR code</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

@@ -1,0 +1,107 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# !!!!!!!!!! DO NOT RUN IN CI - ONLY USED IN MANUAL GROUP MESSAGING DEMONSTRATION !!!!!!!!!!
+
+# This test file is used in the group messaging demonstration to configure light-apps
+# Run this test on a commisionned device to add it to the group.
+# This file is used in tandem with TestGroupDemoCommand that sends the actual commands.
+#
+# To run this test file : chip-tool tests TestGroupDemoConfig <nodeid>
+#
+# Full test procedure :
+#   chip-tool tests TestGroupDemoConfig <nodeid>  - Run this command for every light app nodeid that will be used for the demonstration
+#   chip-tool tests TestGroupDemoCommand <nodeid>
+name: Group Messaging Demo - Configuration
+
+config:
+    nodeId: 0x12344321
+    cluster: "Group Key Management"
+    endpoint: 0
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "KeySet Write 1 (endpoint 0)"
+      cluster: "Group Key Management"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value: {
+                        GroupKeySetID: 0x01a1,
+                        #  TODO Revert this once MCSP is implemented
+                        # GroupKeySecurityPolicy: 1,
+                        GroupKeySecurityPolicy: 0, # 0 => TrustFirst
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1110000,
+                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+                        EpochStartTime1: 1110001,
+                        EpochKey2: "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf",
+                        EpochStartTime2: 1110002,
+                    }
+
+    - label: "Write Group Keys (endpoint 0)"
+      cluster: "Group Key Management"
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value: [{ FabricIndex: 0, GroupId: 0x0101, GroupKeySetID: 0x01a1 }]
+
+    - label: "Add Group 1 (endpoint 1)"
+      cluster: "Groups"
+      command: "AddGroup"
+      endpoint: 1
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0101
+              - name: "GroupName"
+                value: "Group #1"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0101
+
+    - label: "Install ACLs"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  # Any CASE can administer
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+                  # Any group can operate
+                  {
+                      FabricIndex: 1,
+                      Privilege: 3, # operate
+                      AuthMode: 3, # group
+                      Subjects: [0x0101],
+                      Targets: null,
+                  },
+              ]

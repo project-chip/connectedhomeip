@@ -1,0 +1,176 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 19.12.4. [TC-CONTENTLAUNCHER-10.5] Launch URL Verification
+
+PICS:
+    - CONTENTLAUNCHER.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Content Launcher"
+    endpoint: 1
+    GoodURL:
+        type: char_string
+        defaultValue: "https://csa-iot.org/"
+    BadURL:
+        type: char_string
+        defaultValue: "https://badurl"
+    UnauthorizedURL:
+        type: char_string
+        defaultValue: "https://csa-iot.org/badauth"
+    DisplayContent:
+        type: char_string
+        defaultValue: "exampleData"
+    providerNameString:
+        type: char_string
+        defaultValue: "exampleName"
+
+tests:
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Step 1: TH sends a LaunchURL command to the DUT with a known good
+          content URL string"
+      PICS: CONTENTLAUNCHER.S.C01.Rsp
+      command: "LaunchURL"
+      arguments:
+          values:
+              - name: "ContentURL"
+                value: GoodURL
+              - name: "BrandingInformation"
+                value: { ProviderName: providerNameString }
+      response:
+          values:
+              - name: "Status"
+                value: 0
+
+    - label: "Verify that DUT launched the content at the given URL"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CONTENTLAUNCHER.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please enter 'y' if DUT launched the content at the given
+                    URL"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 2: TH sends a LaunchURL command to the DUT with a known good
+          content URL string and a display string"
+      PICS: CONTENTLAUNCHER.S.C01.Rsp
+      command: "LaunchURL"
+      arguments:
+          values:
+              - name: "ContentURL"
+                value: GoodURL
+              - name: "DisplayString"
+                value: DisplayContent
+              - name: "BrandingInformation"
+                value: { ProviderName: providerNameString }
+      response:
+          values:
+              - name: "Data"
+                value: DisplayContent
+              - name: "Status"
+                value: 0
+
+    - label:
+          "Verify that DUT launched the content at the given URL with the given
+          display string in the application-specific description area"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CONTENTLAUNCHER.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please enter 'y' if DUT launched the content at the given
+                    URL with the given display string in the
+                    application-specific description area"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 3: TH sends a LaunchURL command to the DUT with a known good
+          content URL string and a brand information object."
+      PICS: CONTENTLAUNCHER.S.C01.Rsp
+      command: "LaunchURL"
+      arguments:
+          values:
+              - name: "ContentURL"
+                value: GoodURL
+              - name: "BrandingInformation"
+                value: { ProviderName: providerNameString }
+      response:
+          values:
+              - name: "Status"
+                value: 0
+
+    - label:
+          "Verify that DUT launched the content at the given URL with the player
+          interface updated as per the provided branding information"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CONTENTLAUNCHER.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please enter 'y' if DUT launched the content at the given
+                    URL with the player interface updated as per the provided
+                    branding information"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 4: TH sends a LaunchURL command to the DUT with a known
+          unreachable content URL string."
+      PICS: CONTENTLAUNCHER.S.C01.Rsp
+      command: "LaunchURL"
+      arguments:
+          values:
+              - name: "ContentURL"
+                value: BadURL
+              - name: "BrandingInformation"
+                value: { ProviderName: providerNameString }
+      response:
+          values:
+              - name: "Status"
+                value: 1 #URL_NOT_AVAILABLE
+
+    - label:
+          "Step 5: TH sends a LaunchURL command to the DUT with a known
+          un-authorized content URL string."
+      PICS: CONTENTLAUNCHER.S.C01.Rsp
+      command: "LaunchURL"
+      arguments:
+          values:
+              - name: "ContentURL"
+                value: UnauthorizedURL
+              - name: "BrandingInformation"
+                value: { ProviderName: providerNameString }
+      response:
+          values:
+              - name: "Status"
+                value: 2 #AUTH_FAILED

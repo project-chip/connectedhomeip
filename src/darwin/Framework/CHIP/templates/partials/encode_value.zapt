@@ -1,0 +1,64 @@
+{{#if isOptional}}
+  if ({{source}} != nil) {
+    auto & definedValue_{{depth}} = {{target}}.Emplace();
+    {{>encode_value target=(concat "definedValue_" depth) source=source cluster=cluster errorCode=errorCode depth=(incrementDepth depth) isOptional=false}}
+  }
+{{else if isNullable}}
+  if ({{source}} == nil) {
+    {{target}}.SetNull();
+  } else {
+    auto & nonNullValue_{{depth}} = {{target}}.SetNonNull();
+    {{>encode_value target=(concat "nonNullValue_" depth) source=source cluster=cluster errorCode=errorCode depth=(incrementDepth depth) isNullable=false}}
+  }
+{{else if isArray}}
+  {{! TODO: This is not great, with its fallible allocation and
+      whatnot.  Maybe we should just switch to encoding our ObjC types
+      directly to TLV...  We need the listFreer thing because we want
+      our allocation to live long enough, and if it's scoped to where
+      we are right now it may not (e.g. for a nullable list we're
+      inside an "else" block here).  }}
+  {
+    using ListType_{{depth}} = std::remove_reference_t<decltype({{target}})>;
+    using ListMemberType_{{depth}} = ListMemberTypeGetter<ListType_{{depth}}>::Type;
+    if ({{source}}.count != 0) {
+      auto * listHolder_{{depth}} = new ListHolder<ListMemberType_{{depth}}>({{source}}.count);
+      if (listHolder_{{depth}} == nullptr || listHolder_{{depth}}->mList == nullptr) {
+        {{errorCode}}
+      }
+      listFreer.add(listHolder_{{depth}});
+      for (size_t i_{{depth}} = 0; i_{{depth}} < {{source}}.count; ++i_{{depth}}) {
+        if ( ! [{{source}}[i_{{depth}}] isKindOfClass: [{{asObjectiveCClass type cluster forceNotList=true}} class]] ) {
+          // Wrong kind of value.
+          {{errorCode}}
+        }
+        auto element_{{depth}} = ({{asObjectiveCClass type cluster forceNotList=true}} *){{source}}[i_{{depth}}];
+        {{>encode_value target=(concat "listHolder_" depth "->mList[i_" depth "]") source=(concat "element_" depth) cluster=cluster errorCode=errorCode depth=(incrementDepth depth) isArray=false}}
+      }
+      {{target}} = ListType_{{depth}}(listHolder_{{depth}}->mList, {{source}}.count);
+    } else {
+      {{target}} = ListType_{{depth}}();
+    }
+  }
+{{else if (isOctetString type)}}
+  {{target}} = AsByteSpan({{source}});
+{{else if (isCharString type)}}
+  {{target}} = AsCharSpan({{source}});
+{{else}}
+  {{#if_is_struct type}}
+    {{#zcl_struct_items_by_struct_and_cluster_name type cluster}}
+     {{#if (isSupported (asUpperCamelCase ../cluster preserveAcronyms=true) struct=(asUpperCamelCase ../type preserveAcronyms=true) structField=(asStructPropertyName label))}}
+     {{>encode_value target=(concat ../target "." (asLowerCamelCase label)) source=(concat ../source "." (asStructPropertyName label)) cluster=../cluster errorCode=../errorCode depth=(incrementDepth ../depth)}}
+     {{/if}}
+    {{/zcl_struct_items_by_struct_and_cluster_name}}
+  {{else}}
+    {{#if_is_strongly_typed_chip_enum type}}
+      {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>({{source}}.{{asObjectiveCNumberType source type true}}Value);
+    {{else}}
+      {{#if_is_strongly_typed_bitmap type}}
+        {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>({{source}}.{{asObjectiveCNumberType source type true}}Value);
+      {{else}}
+        {{target}} = {{source}}.{{asObjectiveCNumberType source type true}}Value;
+      {{/if_is_strongly_typed_bitmap}}
+    {{/if_is_strongly_typed_chip_enum}}
+  {{/if_is_struct}}
+{{/if}}

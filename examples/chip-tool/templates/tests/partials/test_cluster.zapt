@@ -1,0 +1,87 @@
+{{#chip_tests tests includeAllClusters=true}}
+class {{filename}}Suite: public TestCommand
+{
+public:
+    {{#if ../credsIssuerConfigArg}}
+    {{filename}}Suite(CredentialIssuerCommands * credsIssuerConfig): TestCommand("{{filename}}", {{totalTests}}, credsIssuerConfig)
+    {{else}}
+    {{filename}}Suite(): TestCommand("{{filename}}", {{totalTests}})
+    {{/if}}
+    {
+        {{#chip_tests_config}}
+          {{#if (isString type)}}
+          AddArgument("{{name}}", &m{{asUpperCamelCase name}});
+          {{else}}
+          AddArgument("{{name}}",{{as_type_min_value type language='c++'}}, {{as_type_max_value type language='c++'}}, &m{{asUpperCamelCase name}});
+          {{/if}}
+        {{/chip_tests_config}}
+    }
+
+    ~{{filename}}Suite()
+    {
+        {{>teardownSaveAs}}
+    }
+
+  {{#if ../needsWaitDuration}}
+  chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr({{chip_tests_config_get_default_value "timeout"}})); }
+  {{/if}}
+
+private:
+    {{#chip_tests_config}}
+    chip::Optional<{{chipType}}> m{{asUpperCamelCase name}};
+    {{/chip_tests_config}}
+
+    {{>setupSaveAs}}
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint)
+    {
+        {{#if (chip_tests_config_has "endpoint")}}
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+        {{else}}
+        return endpoint;
+        {{/if}}
+    }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        {{#chip_tests_items}}
+        {{#unless isWait}}
+        case {{index}}:
+            {{>test_step_response}}
+            break;
+        {{/unless}}
+        {{/chip_tests_items}}
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        {{#chip_tests_items}}
+        case {{index}}: {
+            {{>test_step}}
+        }
+        {{/chip_tests_items}}
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+{{/chip_tests}}

@@ -1,0 +1,211 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+  <cluster>
+    <domain>Media</domain>
+    <name>Channel</name>
+    <code>0x0504</code>
+    <define>CHANNEL_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <globalAttribute side="either" code="0xFFFD" value="2"/> <!-- Revision   -->
+    <description>This cluster provides an interface for controlling the current Channel on a device.</description>
+
+    <features>
+      <feature bit="0" code="CL" name="ChannelList" summary="Provides list of available channels.">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="LI" name="LineupInfo" summary="Provides lineup info, which is a reference to an external source of lineup information.">
+        <optionalConform/>
+      </feature>
+      <feature bit="2" code="EG" name="ElectronicGuide" summary="Provides electronic program guide information.">
+        <optionalConform/>
+      </feature>
+      <feature bit="3" code="RP" name="RecordProgram" summary="Provides ability to record program.">
+        <optionalConform/>
+      </feature>
+    </features>
+
+    <attribute side="server" code="0x0000" define="CHANNEL_LIST"            type="array" entryType="ChannelInfoStruct" length="254"                    writable="false" optional="true">ChannelList</attribute>
+    <attribute side="server" code="0x0001" define="CHANNEL_LINEUP"          type="LineupInfoStruct"                    default="0x0" isNullable="true" writable="false" optional="true">Lineup</attribute>
+    <attribute side="server" code="0x0002" define="CHANNEL_CURRENT_CHANNEL" type="ChannelInfoStruct"                   default="0x0" isNullable="true" writable="false" optional="true">CurrentChannel</attribute>
+
+    <command source="client" code="0x00" name="ChangeChannel" response="ChangeChannelResponse" optional="true">
+      <description>Change the channel on the media player to the channel case-insensitive exact matching the value passed as an argument. </description>
+      <arg name="Match" type="char_string"/>
+    </command>
+
+    <command source="client" code="0x02" name="ChangeChannelByNumber" optional="false">
+      <description>Change the channel on the media plaeyer to the channel with the given Number in the ChannelList attribute.</description>
+      <arg name="MajorNumber" type="int16u"/>
+      <arg name="MinorNumber" type="int16u"/>
+    </command>
+
+    <command source="client" code="0x03" name="SkipChannel" optional="false">
+      <description>This command provides channel up and channel down functionality, but allows channel index jumps of size Count. When the value of the increase or decrease is larger than the number of channels remaining in the given direction, then the behavior SHALL be to return to the beginning (or end) of the channel list and continue. For example, if the current channel is at index 0 and count value of -1 is given, then the current channel should change to the last channel.</description>
+      <arg name="Count" type="int16s"/>
+    </command>
+
+    <command source="server" code="0x01" name="ChangeChannelResponse" optional="true">
+      <description>Upon receipt, this SHALL display the active status of the input list on screen.</description>
+      <arg name="Status" type="StatusEnum"/>
+      <arg name="Data"   type="char_string" optional="true"/>
+    </command>
+
+    <command source="client" code="0x04" name="GetProgramGuide" response="ProgramGuideResponse" optional="true">
+      <description>This command retrieves the program guide. It accepts several filter parameters to return specific schedule and program information from a content app. The command shall receive in response a ProgramGuideResponse.</description>
+      <arg name="StartTime" type="epoch_s" optional="true"/>
+      <arg name="EndTime" type="epoch_s" optional="true"/>
+      <arg name="ChannelList" type="ChannelInfoStruct" array="true" optional="true"/>
+      <arg name="PageToken" type="PageTokenStruct" optional="true"/>
+      <arg name="RecordingFlag" type="RecordingFlagBitmap" optional="true"/>
+      <arg name="ExternalIDList" type="AdditionalInfoStruct" array="true" optional="true"/>
+      <arg name="Data" type="octet_string" optional="true"/>
+    </command>
+
+    <command source="server" code="0x05" name="ProgramGuideResponse" optional="true" apiMaturity="provisional">
+      <description>This command is a response to the GetProgramGuide command.</description>
+      <arg name="Paging" type="ChannelPagingStruct"/>
+      <arg name="ProgramList" type="ProgramStruct" array="true"/>
+    </command>
+
+    <command source="client" code="0x06" name="RecordProgram" optional="true">
+      <description>Record a specific program or series when it goes live. This functionality enables DVR recording features.</description>
+      <arg name="ProgramIdentifier" type="char_string"/>
+      <arg name="ShouldRecordSeries" type="boolean"/>
+      <arg name="ExternalIDList" type="AdditionalInfoStruct" array="true"/>
+      <arg name="Data" type="octet_string"/>
+    </command>
+
+    <command source="client" code="0x07" name="CancelRecordProgram" optional="true">
+      <description>Cancel recording for a specific program or series.</description>
+      <arg name="ProgramIdentifier" type="char_string"/>
+      <arg name="ShouldRecordSeries" type="boolean"/>
+      <arg name="ExternalIDList" type="AdditionalInfoStruct" array="true"/>
+      <arg name="Data" type="octet_string"/>
+    </command>
+
+  </cluster>
+
+  <struct name="ChannelInfoStruct">
+    <cluster code="0x0504"/>
+    <item name="MajorNumber"       type="int16u"/>
+    <item name="MinorNumber"       type="int16u"/>
+    <item name="Name"              type="char_string" optional="true"/>
+    <item name="CallSign"          type="char_string" optional="true"/>
+    <item name="AffiliateCallSign" type="char_string" optional="true"/>
+    <item name="Identifier"        type="char_string" optional="true"/>
+    <item name="Type"              type="ChannelTypeEnum" optional="true"/>
+  </struct>
+
+  <struct name="LineupInfoStruct">
+    <cluster code="0x0504"/>
+    <item name="OperatorName"   type="char_string"/>
+    <item name="LineupName"     type="char_string" default="" optional="true"/>
+    <item name="PostalCode"     type="char_string" default="" optional="true"/>
+    <item name="LineupInfoType" type="LineupInfoTypeEnum"/>
+  </struct>
+
+  <struct name="ProgramStruct">
+    <cluster code="0x0504"/>
+    <item name="Identifier" type="char_string" max="255" optional="false"/>
+    <item name="Channel" type="ChannelInfoStruct" optional="false"/>
+    <item name="StartTime" type="epoch_s" optional="false"/>
+    <item name="EndTime" type="epoch_s" optional="false"/>
+    <item name="Title" type="char_string" max="255" optional="false"/>
+    <item name="Subtitle" type="char_string" max="255" default="" optional="true"/>
+    <item name="Description" type="char_string" max="8192" default="" optional="true"/>
+    <item name="AudioLanguages" type="char_string" array="true" max="10" default="" optional="true"/>
+    <item name="Ratings" type="char_string" array="true" max="255" default="" optional="true"/>
+    <item name="ThumbnailUrl" type="char_string" max="8192" default="" optional="true"/>
+    <item name="PosterArtUrl" type="char_string" max="8192" default="" optional="true"/>
+    <item name="DvbiUrl" type="char_string" max="8192" default="" optional="true"/>
+    <item name="ReleaseDate" type="char_string" max="30" default="" optional="true"/>
+    <item name="ParentalGuidanceText" type="char_string" max="255" default="" optional="true"/>
+    <item name="RecordingFlag" type="RecordingFlagBitmap" optional="true"/>
+    <item name="SeriesInfo" type="SeriesInfoStruct" default="0x0" isNullable="true" optional="true"/>
+    <item name="CategoryList" type="ProgramCategoryStruct" array="true" max="255" default="" optional="true"/>
+    <item name="CastList" type="ProgramCastStruct" array="true" max="255" default="" optional="true"/>
+    <item name="ExternalIDList" type="ProgramCastStruct" array="true" max="255" default="" optional="true"/>
+  </struct>
+
+  <struct name="SeriesInfoStruct">
+    <cluster code="0x0504"/>
+    <item name="Season" type="char_string" max="256" optional="false"/>
+    <item name="Episode" type="char_string" max="256" optional="false"/>
+  </struct>
+
+  <struct name="ProgramCategoryStruct">
+    <cluster code="0x0504"/>
+    <item name="Category" type="char_string" max="256" optional="false"/>
+    <item name="SubCategory" type="char_string" max="256" default="" optional="true"/>
+  </struct>
+
+  <struct name="ProgramCastStruct">
+    <cluster code="0x0504"/>
+    <item name="Name" type="char_string" max="256" optional="false"/>
+    <item name="Role" type="char_string" max="256" optional="false"/>
+  </struct>
+
+  <struct name="PageTokenStruct">
+    <cluster code="0x0504"/>
+    <item name="Limit" type="int16u" default="0" optional="true"/>
+    <item name="After" type="char_string" max="8192" default="" optional="true"/>
+    <item name="Before" type="char_string" max="8192" default="" optional="true"/>
+  </struct>
+
+  <struct name="ChannelPagingStruct">
+    <cluster code="0x0504"/>
+    <item name="PreviousToken" type="PageTokenStruct" optional="true" default="0x0" isNullable="true"/>
+    <item name="NextToken" type="PageTokenStruct" optional="true" default="0x0" isNullable="true"/>
+  </struct>
+
+  <struct name="AdditionalInfoStruct">
+    <cluster code="0x0504"/>
+    <item name="Name" type="char_string"/>
+    <item name="Value" type="char_string"/>
+  </struct>
+
+  <enum name="LineupInfoTypeEnum" type="enum8">
+    <cluster code="0x0504"/>
+    <item name="MSO" value="0x00"/>
+  </enum>
+
+  <enum name="StatusEnum" type="enum8">
+    <cluster code="0x0504"/>
+    <item name="Success" value="0x00"/>
+    <item name="MultipleMatches" value="0x01"/>
+    <item name="NoMatches" value="0x02"/>
+  </enum>
+
+  <enum name="ChannelTypeEnum" type="enum8">
+    <cluster code="0x0504"/>
+    <item name="Satellite" value="0x00"/>
+    <item name="Cable" value="0x01"/>
+    <item name="Terrestrial" value="0x02"/>
+    <item name="OTT" value="0x03"/>
+  </enum>
+
+  <bitmap name="RecordingFlagBitmap" type="bitmap32">
+    <cluster code="0x0504"/>
+    <field name="Scheduled" mask="0x1"/>
+    <field name="RecordSeries"  mask="0x2"/>
+    <field name="Recorded" mask="0x4"/>
+  </bitmap>
+
+</configurator>

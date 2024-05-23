@@ -1,0 +1,127 @@
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Binding Tests
+
+config:
+    nodeId: 0x12344321
+    cluster: "Binding"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Write empty binding table"
+      command: "writeAttribute"
+      attribute: "Binding"
+      arguments:
+          value: []
+
+    - label: "Read empty binding table"
+      command: "readAttribute"
+      attribute: "Binding"
+      response:
+          value: []
+
+    - label: "Write invalid binding table"
+      command: "writeAttribute"
+      attribute: "Binding"
+      arguments:
+          value:
+              [
+                  { FabricIndex: 0 },
+                  {
+                      FabricIndex: 0,
+                      Node: 1,
+                      Group: 1,
+                      Endpoint: 1,
+                      Cluster: 6,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Write binding table (endpoint 1)"
+      command: "writeAttribute"
+      attribute: "Binding"
+      arguments:
+          value:
+              [
+                  { FabricIndex: 0, Group: 1 },
+                  { FabricIndex: 0, Node: 1, Endpoint: 1, Cluster: 6 },
+                  { FabricIndex: 0, Node: 2, Endpoint: 1 },
+              ]
+
+    - label: "Read binding table (endpoint 1)"
+      command: "readAttribute"
+      attribute: "Binding"
+      response:
+          value:
+              [
+                  { FabricIndex: 1, Group: 1 },
+                  { FabricIndex: 1, Node: 1, Endpoint: 1, Cluster: 6 },
+                  { FabricIndex: 1, Node: 2, Endpoint: 1 },
+              ]
+
+    - label: "Write binding table (endpoint 0)"
+      command: "writeAttribute"
+      attribute: "Binding"
+      endpoint: 0
+      arguments:
+          value: [{ FabricIndex: 0, Node: 3, Endpoint: 1 }]
+
+    - label: "Read binding table (endpoint 0)"
+      command: "readAttribute"
+      attribute: "Binding"
+      endpoint: 0
+      response:
+          value: [{ FabricIndex: 1, Node: 3, Endpoint: 1 }]
+
+    - label: "Verify endpoint 1 not changed"
+      command: "readAttribute"
+      attribute: "Binding"
+      response:
+          value:
+              [
+                  { FabricIndex: 1, Group: 1 },
+                  { FabricIndex: 1, Node: 1, Endpoint: 1, Cluster: 6 },
+                  { FabricIndex: 1, Node: 2, Endpoint: 1 },
+              ]
+
+    - label: "Write over-long binding table on endpoint 1"
+      command: "writeAttribute"
+      attribute: "Binding"
+      arguments:
+          value:
+              [
+                  { FabricIndex: 0, Node: 1, Endpoint: 1, Cluster: 6 },
+                  { FabricIndex: 0, Node: 2, Endpoint: 2, Cluster: 6 },
+                  { FabricIndex: 0, Node: 3, Endpoint: 3, Cluster: 6 },
+                  { FabricIndex: 0, Node: 4, Endpoint: 4, Cluster: 6 },
+                  { FabricIndex: 0, Node: 5, Endpoint: 5, Cluster: 6 },
+                  { FabricIndex: 0, Node: 6, Endpoint: 6, Cluster: 6 },
+                  { FabricIndex: 0, Node: 7, Endpoint: 7, Cluster: 6 },
+                  { FabricIndex: 0, Node: 8, Endpoint: 8, Cluster: 6 },
+                  { FabricIndex: 0, Node: 9, Endpoint: 9, Cluster: 6 },
+                  { FabricIndex: 0, Node: 10, Endpoint: 10, Cluster: 6 },
+                  { FabricIndex: 0, Node: 11, Endpoint: 11, Cluster: 6 },
+              ]
+      response:
+          error: RESOURCE_EXHAUSTED

@@ -1,0 +1,351 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.3.2. [TC-SC-3.2] CASE Session Resumption [DUT_Responder] - REMOVED
+
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Precondition"
+      verification: |
+          1. Underlying transport is reliable, either implicitly (i.e.: TCP) or explicitly (i.e.: MRP)
+          2. CASE was previously successfully completed between the initiator and responder and the previous session context is known by both nodes.
+          execute the below mentioned command to put DUT into a commissionable state, Pls use equivalent command on the respective DUT
+           ./chip-all-clusters-app  --trace_decode 1
+
+          Once DUT reach the  commissionable state pls send below mentioned command on TH. Pls use equivalent command on the respective DUT
+           ./chip-tool pairing onnetwork 1 20202021  --trace_decode 1
+          Verify the commissioning completed with success on TH(chip-tool) from DUT
+          [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success
+
+          # 1 Please use Interactive mode to Verify this test cases
+          Here the command to enter interactive mode:--
+            ./chip-tool interactive start   --trace_decode 1
+
+          #2. Close the session(all-clusters-app), by sending mentioned command
+          sessionmanagement send-close-session 1 --evict-local-session true
+
+          After the session closed, wait until  session resumtion for the previous subscribe request
+          once the session resumed succesfully then  Verify the below test steps.
+      disabled: true
+
+    - label:
+          "Step 1a: Send Read Request from Initiator (TH) to Responder (DUT)
+          Save the value as 'read response' Note: Example for Read Request could
+          be reading OnOff attribute value from OnOff Cluster"
+      verification: |
+          onoff read on-off 1 1 --trace_decode 1
+
+
+          [1690205836.161742][5604:5607] CHIP:DMG: ReportDataMessage =
+          [1690205836.161751][5604:5607] CHIP:DMG: {
+          [1690205836.161758][5604:5607] CHIP:DMG:         AttributeReportIBs =
+          [1690205836.161773][5604:5607] CHIP:DMG:         [
+          [1690205836.161781][5604:5607] CHIP:DMG:                 AttributeReportIB =
+          [1690205836.161796][5604:5607] CHIP:DMG:                 {
+          [1690205836.161804][5604:5607] CHIP:DMG:                         AttributeDataIB =
+          [1690205836.161816][5604:5607] CHIP:DMG:                         {
+          [1690205836.161828][5604:5607] CHIP:DMG:                                 DataVersion = 0xf30c44a7,
+          [1690205836.161839][5604:5607] CHIP:DMG:                                 AttributePathIB =
+          [1690205836.161850][5604:5607] CHIP:DMG:                                 {
+          [1690205836.161862][5604:5607] CHIP:DMG:                                         Endpoint = 0x1,
+          [1690205836.161873][5604:5607] CHIP:DMG:                                         Cluster = 0x6,
+          [1690205836.161885][5604:5607] CHIP:DMG:                                         Attribute = 0x0000_0000,
+          [1690205836.161896][5604:5607] CHIP:DMG:                                 }
+          [1690205836.161911][5604:5607] CHIP:DMG:
+          [1690205836.161923][5604:5607] CHIP:DMG:                                 Data = false,
+          [1690205836.161933][5604:5607] CHIP:DMG:                         },
+          [1690205836.161949][5604:5607] CHIP:DMG:
+          [1690205836.161957][5604:5607] CHIP:DMG:                 },
+          [1690205836.161973][5604:5607] CHIP:DMG:
+          [1690205836.161980][5604:5607] CHIP:DMG:         ],
+          [1690205836.161995][5604:5607] CHIP:DMG:
+          [1690205836.162003][5604:5607] CHIP:DMG:         SuppressResponse = true,
+          [1690205836.162038][5604:5607] CHIP:DMG:         InteractionModelRevision = 1
+          [1690205836.162048][5604:5607] CHIP:DMG: }
+          [1690205836.162552][5604:5607] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 4077667495
+          [1690205836.162619][5604:5607] CHIP:TOO:   OnOff: FALSE
+      disabled: true
+
+    - label:
+          "Step 1b: Initiator (TH) sends a Close Session message to the
+          Responder (DUT)"
+      verification: |
+          sessionmanagement send-close-session 1 --evict-local-session true
+
+          281718.852349][27911:27911] CHIP:TOO: Command: sessionmanagement send-close-session 1 --evict-local-session true
+          [1690281718.852946][27911:27914] CHIP:CTL: Stopping commissioning discovery over DNS-SD
+          [1690281718.852990][27911:27914] CHIP:CTL: Setting attestation nonce to random value
+      disabled: true
+
+    - label:
+          "Step 1c: Initiator triggers a CASE session resumption. This can be
+          accomplished in the TH using a read attribute command, which will
+          automatically trigger a session resumption before reading since it has
+          no active session."
+      verification: |
+          onoff read on-off 1 1 --trace-to json:log
+      disabled: true
+
+    - label:
+          "Step 2: Initiator constructs and sends a TLV-encoded Sigma1 message
+          to Responder with resumption containing initiatorRandom
+          initiatorSessionId destinationId resumptionID initiatorResumeMIC
+          initiatorEphPubKey initiatorSessionParams"
+      verification: |
+          Sigma1 Message from Initiator:
+          "packetHeader" :
+                  {
+                          "flags" : 4,
+                          "msgCounter" : 209808419,
+                          "securityFlags" : 0,
+                          "sessionId" : 0,
+                          "sourceNodeId" : 13804960529544229277
+                  },
+                  "payload" :
+                  {
+                          "decoded" :
+                          {
+                                  "case_sigma1" :
+                                  {
+                                          "destination_id" : "hex:1044CF83361D9C05477E32115AA78C1D42FD46F2C3CD8492E50EF390F709F42C",
+                                          "initiator_eph_pub_key" : "hex:04A3953CB2E653721B91C1765621B5F33341ABCD51C6EB8B6ED41B6ECF6FD66D1DE72283AEFF02091F81A9519A65BDCB1A8FE0C60B85DE9767B3FC3C67CDF8A3C6",
+                                          "initiator_random" : "hex:0F8C93B3FACAA2DB4A0052772352C48E72D8DDC192C8177B8F8D26BC02988440",
+                                          "initiator_resume_mic" : "hex:38AA77A0C8DCF2BF748F6001968D431B",
+                                          "initiator_session_id" : "20432",
+                                          "resumption_id" : "hex:4B7113CED17477E981D74D68148235C8"
+                                  }
+                          },
+                          "hex" : "153001200F8C93B3FACAA2DB4A0052772352C48E72D8DDC192C8177B8F8D26BC029884402502D04F3003201044CF83361D9C05477E32115AA78C1D42FD46F2C3CD8492E50EF390F709F42C30044104A3953CB2E653721B91C1765621B5F33341ABCD51C6EB8B6ED41B6ECF6FD66D1DE72283AEFF02091F81A9519A65BDCB1A8FE0C60B85DE9767B3FC3C67CDF8A3C63006104B7113CED17477E981D74D68148235C830071038AA77A0C8DCF2BF748F6001968D431B18",
+                          "size" : 182
+                  },
+                  "payloadHeader" :
+                  {
+                          "exchangeFlags" : 5,
+                          "exchangeId" : 37964,
+                          "initiator" : true,
+                          "messageType" : 48,
+                          "needsAck" : true,
+                          "protocolId" : 0
+                  }
+          }
+
+          Sigma2_Resume Message:
+          1690296519.586605][34367:34370] CHIP:ATM: {
+                  "event" : "MessageReceived",
+                  "messageType" : "Unauthenticated",
+                  "packetHeader" :
+                  {
+                          "destinationNodeId" : 13804960529544229277,
+                          "flags" : 1,
+                          "msgCounter" : 61852480,
+                          "securityFlags" : 0,
+                          "sessionId" : 0
+                  },
+                  "payload" :
+                                  "case_sigma1" :
+                                  {
+                                          "destination_id" : "hex:1044CF83361D9C05477E32115AA78C1D42FD46F2C3CD8492E50EF390F709F42C",
+                                          "initiator_eph_pub_key" : "hex:04A3953CB2E653721B91C1765621B5F33341ABCD51C6EB8B6ED41B6ECF6FD66D1DE72283AEFF02091F81A9519A65BDCB1A8FE0C60B85DE9767B3FC3C67CDF8A3C6",
+                                          "initiator_random" : "hex:0F8C93B3FACAA2DB4A0052772352C48E72D8DDC192C8177B8F8D26BC02988440",
+                                          "initiator_resume_mic" : "hex:38AA77A0C8DCF2BF748F6001968D431B",
+                                          "initiator_session_id" : "20432",
+                                          "resumption_id" : "hex:4B7113CED17477E981D74D68148235C8"
+                                  }
+                          },
+                          "hex" : "153001200F8C93B3FACAA2DB4A0052772352C48E72D8DDC192C8177B8F8D26BC029884402502D04F3003201044CF83361D9C05477E32115AA78C1D42FD46F2C3CD8492E50EF390F709F42C30044104A3953CB2E653721B91C1765621B5F33341ABCD51C6EB8B6ED41B6ECF6FD66D1DE72283AEFF02091F81A9519A65BDCB1A8FE0C60B85DE9767B3FC3C67CDF8A3C63006104B7113CED17477E981D74D68148235C830071038AA77A0C8DCF2BF748F6001968D431B18",
+                          "size" : 182
+                  },
+                  "payloadHeader" :
+                  {
+                          "exchangeFlags" : 5,
+                          "exchangeId" : 37964,
+                          "initiator" : true,
+                          "messageType" : 48,
+                          "needsAck" : true,
+                          "protocolId" : 0
+                  }
+          }
+
+          Sigma2_Resume Message:
+          1690296519.586605][34367:34370] CHIP:ATM: {
+                  "event" : "MessageReceived",
+                  "messageType" : "Unauthenticated",
+                  "packetHeader" :
+                  {
+                          "destinationNodeId" : 13804960529544229277,
+                          "flags" : 1,
+                          "msgCounter" : 61852480,
+                          "securityFlags" : 0,
+                  {
+                          "decoded" :
+                          {
+                                  "case_sigma2_resume" :
+                                  {
+                                          "responder_sessoion_id" : "45029",
+                                          "resumption_id" : "hex:D507CF90EEF665047D643F91FBBA3FC1",
+                                          "sigma2_resume_mic" : "hex:FB6A8A4000CF61E00E48BBD91A0D77C3"
+                                  }
+                          },
+                          "hex" : "15300110D507CF90EEF665047D643F91FBBA3FC1300210FB6A8A4000CF61E00E48BBD91A0D77C32503E5AF18",
+                          "size" : 44
+                  },
+                  "payloadHeader" :
+                  {
+                          "ackMessageCounter" : 209808419,
+                          "exchangeFlags" : 6,
+                          "exchangeId" : 37964,
+                          "initiator" : false,
+                          "messageType" : 51,
+                          "needsAck" : true,
+                          "protocolId" : 0
+                  }
+          }
+      disabled: true
+
+    - label:
+          "Step 3: Initiator receives the Sigma2_Resume message and extracts the
+          following values resumptionID responderSessionID sigma2ResumeMIC
+          responderMRPParams"
+      verification: |
+          Sigma1 Message from Initiator:
+          "packetHeader" :
+                  {
+                          "flags" : 4,
+                          "msgCounter" : 209808419,
+                          "securityFlags" : 0,
+                          "sessionId" : 0,
+                          "sourceNodeId" : 13804960529544229277
+                  },
+                  "payload" :
+                  {
+                          "decoded" :
+                          {
+                                  "case_sigma1" :
+                                  {
+                                          "destination_id" : "hex:1044CF83361D9C05477E32115AA78C1D42FD46F2C3CD8492E50EF390F709F42C",
+                                          "initiator_eph_pub_key" : "hex:04A3953CB2E653721B91C1765621B5F33341ABCD51C6EB8B6ED41B6ECF6FD66D1DE72283AEFF02091F81A9519A65BDCB1A8FE0C60B85DE9767B3FC3C67CDF8A3C6",
+                                          "initiator_random" : "hex:0F8C93B3FACAA2DB4A0052772352C48E72D8DDC192C8177B8F8D26BC02988440",
+                                          "initiator_resume_mic" : "hex:38AA77A0C8DCF2BF748F6001968D431B",
+                                          "initiator_session_id" : "20432",
+                                          "resumption_id" : "hex:4B7113CED17477E981D74D68148235C8"
+                                  }
+                          },
+                          "hex" : "153001200F8C93B3FACAA2DB4A0052772352C48E72D8DDC192C8177B8F8D26BC029884402502D04F3003201044CF83361D9C05477E32115AA78C1D42FD46F2C3CD8492E50EF390F709F42C30044104A3953CB2E653721B91C1765621B5F33341ABCD51C6EB8B6ED41B6ECF6FD66D1DE72283AEFF02091F81A9519A65BDCB1A8FE0C60B85DE9767B3FC3C67CDF8A3C63006104B7113CED17477E981D74D68148235C830071038AA77A0C8DCF2BF748F6001968D431B18",
+                          "size" : 182
+                  },
+                  "payloadHeader" :
+                  {
+                          "exchangeFlags" : 5,
+                          "exchangeId" : 37964,
+                          "initiator" : true,
+                          "messageType" : 48,
+                          "needsAck" : true,
+                          "protocolId" : 0
+                  }
+          }
+
+          Sigma2_Resume Message:
+          1690296519.586605][34367:34370] CHIP:ATM: {
+                  "event" : "MessageReceived",
+                  "messageType" : "Unauthenticated",
+                  "packetHeader" :
+                  {
+                          "destinationNodeId" : 13804960529544229277,
+                          "flags" : 1,
+                          "msgCounter" : 61852480,
+                          "securityFlags" : 0,
+                          "sessionId" : 0
+                  },
+                  "payload" :
+                                  "case_sigma1" :
+                                  {
+                                          "destination_id" : "hex:1044CF83361D9C05477E32115AA78C1D42FD46F2C3CD8492E50EF390F709F42C",
+                                          "initiator_eph_pub_key" : "hex:04A3953CB2E653721B91C1765621B5F33341ABCD51C6EB8B6ED41B6ECF6FD66D1DE72283AEFF02091F81A9519A65BDCB1A8FE0C60B85DE9767B3FC3C67CDF8A3C6",
+                                          "initiator_random" : "hex:0F8C93B3FACAA2DB4A0052772352C48E72D8DDC192C8177B8F8D26BC02988440",
+                                          "initiator_resume_mic" : "hex:38AA77A0C8DCF2BF748F6001968D431B",
+                                          "initiator_session_id" : "20432",
+                                          "resumption_id" : "hex:4B7113CED17477E981D74D68148235C8"
+                                  }
+                          },
+                          "hex" : "153001200F8C93B3FACAA2DB4A0052772352C48E72D8DDC192C8177B8F8D26BC029884402502D04F3003201044CF83361D9C05477E32115AA78C1D42FD46F2C3CD8492E50EF390F709F42C30044104A3953CB2E653721B91C1765621B5F33341ABCD51C6EB8B6ED41B6ECF6FD66D1DE72283AEFF02091F81A9519A65BDCB1A8FE0C60B85DE9767B3FC3C67CDF8A3C63006104B7113CED17477E981D74D68148235C830071038AA77A0C8DCF2BF748F6001968D431B18",
+                          "size" : 182
+                  },
+                  "payloadHeader" :
+                  {
+                          "exchangeFlags" : 5,
+                          "exchangeId" : 37964,
+                          "initiator" : true,
+                          "messageType" : 48,
+                          "needsAck" : true,
+                          "protocolId" : 0
+                  }
+          }
+
+          Sigma2_Resume Message:
+          1690296519.586605][34367:34370] CHIP:ATM: {
+                  "event" : "MessageReceived",
+                  "messageType" : "Unauthenticated",
+                  "packetHeader" :
+                  {
+                          "destinationNodeId" : 13804960529544229277,
+                          "flags" : 1,
+                          "msgCounter" : 61852480,
+                          "securityFlags" : 0,
+                  {
+                          "decoded" :
+                          {
+                                  "case_sigma2_resume" :
+                                  {
+                                          "responder_sessoion_id" : "45029",
+                                          "resumption_id" : "hex:D507CF90EEF665047D643F91FBBA3FC1",
+                                          "sigma2_resume_mic" : "hex:FB6A8A4000CF61E00E48BBD91A0D77C3"
+                                  }
+                          },
+                          "hex" : "15300110D507CF90EEF665047D643F91FBBA3FC1300210FB6A8A4000CF61E00E48BBD91A0D77C32503E5AF18",
+                          "size" : 44
+                  },
+                  "payloadHeader" :
+                  {
+                          "ackMessageCounter" : 209808419,
+                          "exchangeFlags" : 6,
+                          "exchangeId" : 37964,
+                          "initiator" : false,
+                          "messageType" : 51,
+                          "needsAck" : true,
+                          "protocolId" : 0
+                  }
+          }
+
+      disabled: true
+
+    - label: "Step 4a: Initiator sends SigmaFinished message to Responder"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Step 4b: Verify that the responder sends response to Read Request
+          with the value that is same as 'read response'"
+      verification: |
+          [1690283831.857744][28587:28591] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 2791059975
+          [1690283831.857751][28587:28591] CHIP:TOO:   OnOff: FALSE
+      disabled: true

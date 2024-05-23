@@ -1,0 +1,116 @@
+# Copyright (c) 2020 Project CHIP Authors
+# Copyright 2023 NXP
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/nxp_sdk.gni")
+
+#allows to get common NXP SDK gn options
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+
+# Allows to get various RT gn options
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/rt_sdk.gni")
+
+import(
+    "${nxp_sdk_build_root}/${nxp_sdk_name}/${rt_platform}/${rt_platform}.gni")
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/bt_ble/bt_ble.gni")
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/lwip/lwip.gni")
+
+import("//build_overrides/openthread.gni")
+
+import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
+
+group("nxp_sdk") {
+  public_deps = [
+    ":nxp_transceiver",
+    "${nxp_sdk_build_root}/${nxp_sdk_name}/${rt_platform}:nxp_sdk",
+    nxp_sdk_driver_target,
+    nxp_sdk_target,
+  ]
+
+  if (chip_enable_ble) {
+    public_deps += [ ":nxp_bt_ble" ]
+  }
+
+  if (chip_enable_wifi) {
+    public_deps += [ ":nxp_wifi" ]
+  }
+  if (chip_enable_openthread) {
+    public_deps += [ "${openthread_root}/src/core:libopenthread_core_headers" ]
+  }
+}
+
+group("nxp_mbedtls") {
+  public_deps =
+      [ "${nxp_sdk_build_root}/${nxp_sdk_name}/${rt_platform}:nxp_mbedtls" ]
+}
+
+config("lwip_rt_config") {
+  include_dirs = [
+    "${rt_sdk_root}/middleware/lwip/src/include",
+    "${rt_sdk_root}/middleware/lwip/port",
+    "lwip/common",
+  ]
+  if (chip_enable_ethernet) {
+    include_dirs += [ "lwip/ethernet" ]
+  } else if (chip_enable_openthread && chip_enable_wifi) {
+    include_dirs += [ "lwip/wifi_openthread" ]
+  } else if (chip_enable_openthread) {
+    include_dirs += [ "lwip/openthread" ]
+  } else if (chip_enable_wifi) {
+    include_dirs += [
+      "lwip/wifi",
+      "${rt_sdk_root}/middleware/wifi_nxp/port/lwip",
+    ]
+  }
+}
+
+lwip_target("nxp_lwip") {
+  public = []
+  sources = [
+    #lwip port file
+    "${rt_sdk_root}/middleware/lwip/port/sys_arch.c",
+  ]
+  if (chip_enable_ethernet) {
+    sources += [
+      "${rt_sdk_root}/middleware/lwip/port/enet_ethernetif.c",
+      "${rt_sdk_root}/middleware/lwip/port/enet_ethernetif_kinetis.c",
+    ]
+  }
+
+  if (chip_enable_wifi) {
+    sources += [
+      "${rt_sdk_root}/middleware/wifi_nxp/port/lwip/net.c",
+      "${rt_sdk_root}/middleware/wifi_nxp/port/lwip/wifi_netif.c",
+    ]
+  }
+
+  public_configs = [ ":lwip_rt_config" ]
+
+  public_deps = [ ":nxp_sdk" ]
+  rt_sdk_root = rt_sdk_root
+}
+
+bt_ble_target("nxp_bt_ble") {
+  public_deps = [ nxp_sdk_target ]
+  rt_sdk_root = rt_sdk_root
+}
+
+rt_transceiver("nxp_transceiver") {
+  public_deps = [ nxp_sdk_target ]
+}
+
+rt_wifi("nxp_wifi") {
+  public_deps = [ nxp_sdk_target ]
+}

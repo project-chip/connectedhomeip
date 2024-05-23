@@ -1,0 +1,98 @@
+{{> header}}
+
+#include <cstdint>
+#include <cinttypes>
+
+#include <app-common/zap-generated/callback.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Commands.h>
+#include <app/util/util.h>
+#include <app/CommandHandler.h>
+#include <app/InteractionModelEngine.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/TypeTraits.h>
+
+namespace chip {
+namespace app {
+
+// Cluster specific command parsing
+
+namespace Clusters {
+
+{{#all_user_clusters_with_incoming_commands}}
+{{#unless (isInConfigList clusterName "CommandHandlerInterfaceOnlyClusters")}}
+{{#if (isServer clusterSide)}}
+namespace {{asUpperCamelCase clusterName}} {
+
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+{
+    {{#all_incoming_commands_for_cluster clusterName clusterSide}}
+    {{#first}}
+    CHIP_ERROR TLVError = CHIP_NO_ERROR;
+    bool wasHandled = false;
+    {
+        switch (aCommandPath.mCommandId)
+        {
+    {{/first}}
+        case Commands::{{asUpperCamelCase commandName}}::Id: {
+            Commands::{{asUpperCamelCase commandName}}::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAf{{asUpperCamelCase parent.clusterName}}Cluster{{asUpperCamelCase commandName}}Callback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+    {{#last}}
+        default: {
+            // Unrecognized command ID, error status will apply.
+            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
+            ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI, ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
+            return;
+        }
+        }
+    }
+
+    if (CHIP_NO_ERROR != TLVError || !wasHandled)
+    {
+      apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
+      ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+    }
+    {{/last}}
+    {{/all_incoming_commands_for_cluster}}
+}
+
+}
+
+{{/if}}
+{{/unless}}
+{{/all_user_clusters_with_incoming_commands}}
+
+} // namespace Clusters
+
+void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aReader, CommandHandler * apCommandObj)
+{
+    switch (aCommandPath.mClusterId)
+    {
+    {{#all_user_clusters_with_incoming_commands}}
+    {{#unless (isInConfigList clusterName "CommandHandlerInterfaceOnlyClusters")}}
+    {{#if (isServer clusterSide)}}
+    case Clusters::{{asUpperCamelCase clusterName}}::Id:
+        Clusters::{{asUpperCamelCase clusterName}}::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        break;
+    {{/if}}
+    {{/unless}}
+    {{/all_user_clusters_with_incoming_commands}}
+    default:
+        ChipLogError(Zcl, "Unknown cluster " ChipLogFormatMEI, ChipLogValueMEI(aCommandPath.mClusterId));
+        apCommandObj->AddStatus(
+          aCommandPath,
+          Protocols::InteractionModel::Status::UnsupportedCluster
+        );
+        break;
+    }
+}
+
+} // namespace app
+} // namespace chip

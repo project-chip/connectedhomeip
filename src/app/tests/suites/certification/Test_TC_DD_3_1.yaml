@@ -1,0 +1,184 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.3.1. [TC-DD-3.1] Commissioning Flow - Concurrent [DUT - Commissionee]
+
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+    - "!MCORE.DD.NON_CONCURRENT_CONNECTION"
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Preconditions"
+      verification: |
+          1 - 5.5 - Commissioner is on a network. - The network can either be IP-based(Ethernet or WiFi) or Thread. Commissioner can either be a Matter device which is already on a network or the test harness connected to the network.
+      disabled: true
+
+    - label:
+          "Step 1: Commissioner and Commissionee discover each other and connect
+          via the discovery mode applicable for the DUT."
+      verification: |
+          1. Place the DUT commissionee into a commissioning mode
+          For example DUT=chip-all-clusters-app: ./chip-all-clusters-app --wifi --discriminator 3841
+
+          Verify on TH as commissioner side:
+
+          For devices not on the network (i.e. BLE discovery):
+          1. Pair the device over the applicable Discovery transport using TH=chip-tool
+
+          For devices already on the network:
+          connectedhomeip/examples/chip-tool/out/debug$  ./chip-tool pairing code 1 MT:-24J0AFN00KA0648G00
+          [1674603448950] [70108:12435206] [CTL] Operational credentials provisioned on device 0x7f8cef808200
+          [1674603448950] [70108:12435206] [TOO] Secure Pairing Success
+          [1674603448950] [70108:12435206] [TOO] CASE establishment successful
+      disabled: true
+
+    - label:
+          "Step 2: Establish encryption keys with Password Authenticated Session
+          Establishment on the commissioning channel"
+      verification: |
+          Verify that the responder receives the PBKDFParamRequest message
+
+          Verify in TH as commissioner side
+          [1674603446160] [70108:12435206] [SC] Sent PBKDF param request
+          ...
+          [1674603446306] [70108:12435695] [SC] Received PBKDF param response
+      disabled: true
+
+    - label:
+          "Step 3: Commissioner SHALL re-arm Fail-safe timer on Commissionee
+          within 60s (the autonomously Fail-safe timer length set by
+          Commissionee)"
+      verification: |
+          Verify in TH as commissioner side
+
+          [1674603446689] [70108:12435206] [DMG] Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1674603446689] [70108:12435206] [CTL] Received ArmFailSafe response errorCode=0
+          [1674603446689] [70108:12435206] [CTL] Successfully finished commissioning step 'ArmFailSafe'
+      disabled: true
+
+    - label:
+          "Step 4: Commissioner SHALL configure regulatory information in the
+          Commissionee."
+      PICS: MCORE.COM.WIRELESS
+      verification: |
+          Verify in TH as commissioner side
+
+          [1674603446689] [70108:12435206] [CTL] Performing next commissioning step 'ConfigRegulatory'
+          [1674603446689] [70108:12435206] [CTL] Setting Regulatory Config
+      disabled: true
+
+    - label:
+          "Step 5: Commissioner requests operational CSR from Commissionee with
+          OperationalCSRRequest command"
+      verification: |
+          Verify in TH as commissioner side after commissioning
+
+          [1674603448682] [70108:12435206] [CTL] Generating NOC
+          [1674603448682] [70108:12435206] [CTL] Providing certificate chain to the commissioner
+          [1674603448682] [70108:12435206] [CTL] Received callback from the CA for NOC Chain generation. Status ../../examples/chip-tool/third_party/connectedhomeip/src/controller/ExampleOperationalCredentialsIssuer.cpp:396: Success
+          [1674603448682] [70108:12435206] [CTL] Successfully finished commissioning step 'GenerateNOCChain'
+      disabled: true
+
+    - label:
+          "Step 6: Commissioner configures operational credentials on DUT if not
+          previously installed"
+      verification: |
+          Verify in TH as commissioner side
+
+          [1674603448791] [70108:12435206] [DMG] Received Command Response Status for Endpoint=0 Cluster=0x0000_003E Command=0x0000_000B Status=0x0
+          [1674603448791] [70108:12435206] [CTL] Device confirmed that it has received the root certificate
+          [1674603448791] [70108:12435206] [CTL] Successfully finished commissioning step 'SendTrustedRootCert'
+      disabled: true
+
+    - label:
+          "Step 7: Commissioner configures itself as administrator in ACL on DUT
+          if needed"
+      verification: |
+          Verify in TH as commissioner side after commissioning
+
+          [1674603448949] [70108:12435206] [DMG] Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          [1674603448950] [70108:12435206] [CTL] Device returned status 0 on receiving the NOC
+      disabled: true
+
+    - label:
+          "Step 8: Commissioner configures operational network on DUT if DUT
+          both supports and requires"
+      verification: |
+          Verify in TH as commissioner side after commissioning
+
+          [1674603448950] [70108:12435206] [CTL] Operational credentials provisioned on device 0x7f8cef808200
+          [1674603448950] [70108:12435206] [TOO] Secure Pairing Success
+          [1674603448950] [70108:12435206] [TOO] CASE establishment successful
+          [1674603448950] [70108:12435206] [CTL] Successfully finished commissioning step 'SendNOC'
+      disabled: true
+
+    - label:
+          "Step 9: Commissioner instructs Commissionee to connect to operational
+          network if not already connected"
+      verification: |
+          Verify in TH as commissioner side after commissioning
+
+          [1674603448994] [70108:12435695] [DMG] Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
+          [1674603448995] [70108:12435695] [CTL] Received NetworkConfig response, networkingStatus=0
+          [1674603448995] [70108:12435695] [CTL] Successfully finished commissioning step 'WiFiNetworkSetup'
+          ...
+          [1674603453416] [70108:12435695] [DMG] Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0007
+          [1674603453417] [70108:12435695] [CTL] Received ConnectNetwork response, networkingStatus=0
+          [1674603453417] [70108:12435695] [CTL] Successfully finished commissioning step 'WiFiNetworkEnable'
+      disabled: true
+
+    - label:
+          "Step 10: Commissioner starts discovery of DUT using Operational
+          Discovery"
+      verification: |
+          Verify in TH as commissioner side
+
+          [1674603453656] [70108:12435695] [CTL] Successfully finished commissioning step 'FindOperational'
+      disabled: true
+
+    - label:
+          "Step 11: Commissioner opens a CASE session with DUT over operational
+          network"
+      verification: |
+          Verify in TH as commissioner side
+
+          [1674603448950] [70108:12435206] [TOO] CASE establishment successful
+      disabled: true
+
+    - label: "Step 12: Commissioner sends CommissioningComplete command"
+      verification: |
+          Verify in TH as commissioner side
+
+          [1674603453679] [70108:12435695] [DMG] Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
+          [1674603453679] [70108:12435695] [CTL] Received CommissioningComplete response, errorCode=0
+          [1674603453679] [70108:12435695] [CTL] Successfully finished commissioning step 'SendComplete'
+      disabled: true
+
+    - label:
+          "Step 13: Commissioning channel between the Commissioner and
+          Commissionee is terminated."
+      verification: |
+          Verify in TH as commissioner side
+
+          [1674603453680] [70108:12435200] [CTL] Shutting down the commissioner
+          [1674603453680] [70108:12435200] [CTL] Stopping commissioning discovery over DNS-SD
+          [1674603453680] [70108:12435200] [CTL] Shutting down the controller
+          [1674603453680] [70108:12435200] [IN] Expiring all sessions for fabric 0x1!!
+      disabled: true

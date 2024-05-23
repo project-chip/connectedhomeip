@@ -1,0 +1,383 @@
+# this is NOT a full configuration file, it is expected to be used
+# with `--build-upon-default-config`
+#
+# Documentation at https://detekt.dev/docs/introduction/configurations
+
+# Exclude files with pre-existing issues BEFORE detect
+# Ideally this should be driven down to 0
+
+style:
+    MagicNumber:
+        excludes:
+            - "**/examples/android/CHIPTest/app/src/test/java/com/tcl/chip/chiptest/ExampleUnitTest.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/bluetooth/BluetoothManager.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/AddressUpdateFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/ClusterDetailFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/MultiAdminClientFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/SensorClientFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/WildcardFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/provisioning/AddressCommissioningFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/provisioning/DeviceProvisioningFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/provisioning/EnterNetworkFragment.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/CommandManager.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairingCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkLongImSubscribeCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/Main.kt"
+            - "**/src/controller/java/src/matter/jsontlv/JsonToTlv.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/Base38.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/ManualOnboardingPayloadParser.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/OnboardingPayload.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/QRCodeBasicOnboardingPayloadGenerator.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/QRCodeOnboardingPayloadGenerator.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/QRCodeOnboardingPayloadParser.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/VendorId.kt"
+            - "**/src/controller/java/src/matter/tlv/tags.kt"
+            - "**/src/controller/java/src/matter/tlv/TlvWriter.kt"
+            - "**/src/controller/java/src/matter/tlv/types.kt"
+            - "**/src/controller/java/src/matter/tlv/utils.kt"
+            - "**/src/controller/java/src/matter/tlv/values.kt"
+            - "**/src/controller/java/src/matter/tlv/values.kt"
+            - "**/src/controller/java/src/matter/controller/model/Status.kt"
+            - "**/src/controller/java/tests/chip/devicecontroller/cluster/ChipClusterEventStructTest.kt"
+            - "**/src/controller/java/tests/chip/devicecontroller/cluster/ChipClusterStructTest.kt"
+            - "**/src/controller/java/tests/matter/jsontlv/JsonToTlvToJsonTest.kt"
+            - "**/src/controller/java/tests/matter/onboardingpayload/ManualCodeTest.kt"
+            - "**/src/controller/java/tests/matter/onboardingpayload/QRCodeTest.kt"
+            - "**/src/controller/java/tests/matter/tlv/TlvReaderTest.kt"
+            - "**/src/controller/java/tests/matter/tlv/TlvReadWriteTest.kt"
+            - "**/src/controller/java/tests/matter/tlv/TlvWriterTest.kt"
+            - "**/src/controller/java/generated/java/**/*"
+    WildcardImport:
+        excludes:
+            - "**/examples/android/CHIPTest/app/src/androidTest/java/com/tcl/chip/chiptest/ExampleInstrumentedTest.kt"
+            - "**/examples/android/CHIPTest/app/src/main/java/com/tcl/chip/chiptest/MainActivity.kt"
+            - "**/examples/android/CHIPTest/app/src/test/java/com/tcl/chip/chiptest/ExampleUnitTest.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/BasicClientFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/ClusterDetailFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/MultiAdminClientFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/OnOffClientFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/SensorClientFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/provisioning/UnpairDeviceFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/SelectActionFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/setuppayloadscanner/BarcodeFragment.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/Main.kt"
+            - "**/src/controller/java/generated/java/**/*"
+            - "**/src/controller/java/src/matter/jsontlv/JsonToTlv.kt"
+            - "**/src/controller/java/src/matter/jsontlv/TlvToJson.kt"
+            - "**/src/controller/java/tests/matter/jsontlv/JsonToTlvToJsonTest.kt"
+    NewLineAtEndOfFile:
+        excludes:
+            - "**/examples/android/CHIPTest/app/src/androidTest/java/com/tcl/chip/chiptest/ExampleInstrumentedTest.kt"
+            - "**/examples/android/CHIPTest/app/src/test/java/com/tcl/chip/chiptest/ExampleUnitTest.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/AddressUpdateFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/ClusterInteractionFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/ClusterInteractionHistoryFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/ClusterInteractionSettingsFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/EndpointAdapter.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/EndpointItem.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/HistoryCommandAdapter.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/HistoryCommand.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/setuppayloadscanner/BarcodeFragment.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/Argument.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/ArgumentType.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/Command.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/CommandManager.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/CredentialsIssuer.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/IPAddress.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/MatterCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/CloseSessionCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/DiscoveryFilterType.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairAddressPaseCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairAlreadyDiscoveredCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairCodeCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairCodePaseCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairCodeThreadCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairCodeWifiCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairingCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairingModeType.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairingNetworkType.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkCommissionerCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkCommissioningModeCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkDeviceTypeCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkFabricCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkInstanceNameCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkLongCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkLongImInvokeCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkLongImExtendableInvokeCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkLongImWriteCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkShortCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkVendorCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/UnpairCommand.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/Verhoeff.kt"
+    MaxLineLength:
+        excludes:
+            - "**/examples/android/CHIPTest/app/src/main/java/com/tcl/chip/chiptest/MainActivity.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/bluetooth/BluetoothManager.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/ChipClient.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/BasicClientFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/ClusterDetailFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/MultiAdminClientFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/OnOffClientFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/OpCredClientFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/SensorClientFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/WildcardFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/provisioning/DeviceProvisioningFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/setuppayloadscanner/CHIPLedgerDetailsFragment.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/Command.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/MatterCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairingCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkLongImSubscribeCommand.kt"
+            - "**/src/controller/java/generated/java/**/*"
+            - "**/src/controller/java/src/matter/jsontlv/TlvToJson.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/ManualOnboardingPayloadGenerator.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/ManualOnboardingPayloadParser.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/OnboardingPayload.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/QRCodeBasicOnboardingPayloadGenerator.kt"
+            - "**/src/controller/java/tests/matter/onboardingpayload/ManualCodeTest.kt"
+            - "**/src/controller/java/tests/matter/onboardingpayload/QRCodeTest.kt"
+    UnusedParameter:
+        excludes:
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/bluetooth/BluetoothManager.kt"
+            - "**/src/controller/java/generated/java/**/*"
+    ReturnCount:
+        excludes:
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/CHIPToolActivity.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/SensorClientFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/provisioning/EnterNetworkFragment.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/CommandManager.kt"
+            - "**/src/controller/java/generated/java/**/*"
+            - "**/src/controller/java/src/matter/onboardingpayload/Verhoeff.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/OnboardingPayload.kt"
+    UnusedPrivateProperty:
+        excludes:
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/CHIPToolActivity.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/OnOffClientFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/ClusterInteractionFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/provisioning/EnterNetworkFragment.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/MatterCommand.kt"
+            - "**/src/controller/java/src/matter/controller/ReportCallbackJni.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/Base38.kt"
+            - "**/src/controller/java/generated/java/**/*"
+    ForbiddenComment:
+        excludes:
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/MultiAdminClientFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/ClusterInteractionFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/provisioning/AddressCommissioningFragment.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/QRCodeOnboardingPayloadParser.kt"
+    ExplicitItLambdaParameter:
+        excludes:
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/ClusterDetailFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/HistoryCommandAdapter.kt"
+    ThrowsCount:
+        excludes:
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/CommandManager.kt"
+            - "**/src/controller/java/generated/java/**/*"
+            - "**/src/controller/java/src/matter/tlv/TlvReader.kt"
+            - "**/src/controller/java/src/matter/jsontlv/JsonToTlv.kt"
+            - "**/src/controller/java/src/matter/jsontlv/TlvToJson.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/ManualOnboardingPayloadParser.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/ManualOnboardingPayloadGenerator.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/Base38.kt"
+    SerialVersionUIDInSerializableClass:
+        excludes:
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/HistoryCommand.kt"
+    UnusedPrivateMember:
+        excludes:
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/setuppayloadscanner/BarcodeFragment.kt"
+            - "**/src/controller/java/generated/java/**/*"
+            - "**/src/controller/java/src/matter/controller/Messages.kt"
+            - "**/src/controller/java/src/matter/controller/model/Paths.kt"
+            - "**/src/controller/java/src/matter/controller/ReportCallbackJni.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/OnboardingPayload.kt"
+    UseCheckOrError:
+        excludes:
+            - "**/src/controller/java/generated/java/**/*"
+            - "**/src/controller/java/src/matter/tlv/tags.kt"
+            - "**/src/controller/java/src/matter/tlv/types.kt"
+    UseRequire:
+        excludes:
+            - "**/src/controller/java/generated/java/**/*"
+            - "**/src/controller/java/src/matter/jsontlv/JsonToTlv.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/Verhoeff10.kt"
+    UtilityClassWithPublicConstructor:
+        excludes:
+            - "**/src/controller/java/src/matter/onboardingpayload/Verhoeff.kt"
+    MayBeConst:
+        excludes:
+            - "**/src/controller/java/generated/java/**/*"
+            - "**/src/controller/java/src/matter/onboardingpayload/Base38.kt"
+    FunctionOnlyReturningConstant:
+        excludes:
+            - "**/src/controller/java/generated/java/**/*"
+            - "**/src/controller/java/src/matter/controller/Messages.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/QRCodeOnboardingPayloadGenerator.kt"
+
+exceptions:
+    TooGenericExceptionCaught:
+        excludes:
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/BasicClientFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/WildcardFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/SensorClientFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/setuppayloadscanner/BarcodeFragment.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/Argument.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/Main.kt"
+            - "**/src/controller/java/generated/java/**/*"
+            - "**/src/controller/java/tests/matter/onboardingpayload/ManualCodeTest.kt"
+            - "**/src/controller/java/tests/matter/onboardingpayload/QRCodeTest.kt"
+    SwallowedException:
+        excludes:
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/SensorClientFragment.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/Argument.kt"
+    TooGenericExceptionThrown:
+        excludes:
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/discover/DiscoverCommissionablesCommand.kt"
+            - "**/src/controller/java/generated/java/**/*"
+    ThrowingExceptionsWithoutMessageOrCause:
+        excludes:
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/CommandManager.kt"
+            - "**/src/controller/java/generated/java/**/*"
+
+naming:
+    VariableNaming:
+        excludes:
+            - "**/src/controller/java/generated/java/**/*"
+    FunctionNaming:
+        excludes:
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/SelectActionFragment.kt"
+            - "**/src/controller/java/generated/java/**/*"
+            - "**/src/controller/java/tests/matter/tlv/TlvReadWriteTest.kt"
+            - "**/src/controller/java/tests/matter/tlv/TlvWriterTest.kt"
+            - "**/src/controller/java/tests/matter/tlv/TlvReaderTest.kt"
+            - "**/src/controller/java/tests/matter/jsontlv/JsonToTlvToJsonTest.kt"
+            - "**/src/controller/java/tests/matter/onboardingpayload/ManualCodeTest.kt"
+            - "**/src/controller/java/tests/matter/onboardingpayload/QRCodeTest.kt"
+            - "**/examples/android/CHIPTest/app/src/test/java/com/tcl/chip/chiptest/ExampleUnitTest.kt"
+    ConstructorParameterNaming:
+        excludes:
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/HistoryCommandAdapter.kt"
+            - "**/src/controller/java/generated/java/**/*"
+    FunctionParameterNaming:
+        excludes:
+            - "**/src/controller/java/generated/java/**/*"
+    TopLevelPropertyNaming:
+        excludes:
+            - "**/src/controller/java/generated/java/**/*"
+            - "**/src/controller/java/src/matter/onboardingpayload/OnboardingPayload.kt"
+
+performance:
+    SpreadOperator:
+        excludes:
+            - "**/src/controller/java/generated/java/**/*"
+            - "**/src/controller/java/tests/matter/tlv/TlvReaderTest.kt"
+
+potential-bugs:
+    EqualsWithHashCodeExist:
+        excludes:
+            - "**/src/controller/java/generated/java/**/*"
+            - "**/src/controller/java/src/matter/onboardingpayload/OnboardingPayload.kt"
+    ImplicitDefaultLocale:
+        excludes:
+            - "**/src/controller/java/generated/java/**/*"
+            - "**/src/controller/java/src/matter/onboardingpayload/OnboardingPayload.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/ManualOnboardingPayloadGenerator.kt"
+
+complexity:
+    TooManyFunctions:
+        excludes:
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/CHIPToolActivity.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/ClusterDetailFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/AddressUpdateFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/GroupSettingFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/OnOffClientFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/OtaProviderClientFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/SensorClientFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/WildcardFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/GenericChipDeviceListener.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/SelectActionFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/setuppayloadscanner/BarcodeFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/util/TlvParseUtil.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/Command.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/CommandManager.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairingCommand.kt"
+            - "**/src/controller/java/generated/java/**/*"
+            - "**/src/controller/java/src/matter/jsontlv/JsonToTlv.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/OnboardingPayload.kt"
+            - "**/src/controller/java/src/matter/tlv/TlvReader.kt"
+            - "**/src/controller/java/src/matter/tlv/TlvWriter.kt"
+            - "**/src/controller/java/src/matter/controller/MatterControllerImpl.kt"
+            - "**/src/controller/java/src/matter/controller/CompletionListenerAdapter.kt"
+            - "**/src/controller/java/src/matter/controller/MatterController.kt"
+            - "**/src/controller/java/src/matter/controller/ReportCallbackJni.kt"
+            - "**/src/controller/java/src/matter/controller/model/States.kt"
+            - "**/src/controller/java/tests/matter/jsontlv/JsonToTlvToJsonTest.kt"
+            - "**/src/controller/java/tests/matter/onboardingpayload/ManualCodeTest.kt"
+            - "**/src/controller/java/tests/matter/onboardingpayload/QRCodeTest.kt"
+            - "**/src/controller/java/tests/matter/tlv/TlvReadWriteTest.kt"
+    NestedBlockDepth:
+        excludes:
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/WildcardFragment.kt"
+            - "**/src/controller/java/generated/java/**/*"
+    LongParameterList:
+        excludes:
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/ClusterDetailFragment.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/Command.kt"
+            - "**/src/controller/java/generated/java/**/*"
+            - "**/src/controller/java/src/matter/controller/MatterControllerImpl.kt"
+            - "**/src/controller/java/src/matter/controller/InvokeCallbackJni.kt"
+            - "**/src/controller/java/src/matter/controller/ReportCallbackJni.kt"
+            - "**/src/controller/java/src/matter/controller/model/States.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/OnboardingPayload.kt"
+    LongMethod:
+        excludes:
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/provisioning/AddressCommissioningFragment.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/CommandManager.kt"
+            - "**/src/controller/java/generated/java/**/*"
+            - "**/src/controller/java/src/matter/controller/MatterControllerImpl.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/Base38.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/ManualOnboardingPayloadGenerator.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/ManualOnboardingPayloadParser.kt"
+            - "**/src/controller/java/tests/matter/jsontlv/JsonToTlvToJsonTest.kt"
+            - "**/src/controller/java/tests/matter/onboardingpayload/ManualCodeTest.kt"
+            - "**/src/controller/java/tests/matter/onboardingpayload/QRCodeTest.kt"
+            - "**/src/controller/java/tests/matter/tlv/TlvReaderTest.kt"
+    LargeClass:
+        excludes:
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/WildcardFragment.kt"
+            - "**/src/controller/java/generated/java/**/*"
+            - "**/src/controller/java/tests/matter/tlv/TlvReadWriteTest.kt"
+            - "**/src/controller/java/tests/matter/jsontlv/JsonToTlvToJsonTest.kt"
+    CyclomaticComplexMethod:
+        excludes:
+            - "**/src/controller/java/generated/java/**/*"
+            - "**/src/controller/java/src/matter/tlv/TlvReader.kt"
+            - "**/src/controller/java/src/matter/tlv/types.kt"
+            - "**/src/controller/java/src/matter/jsontlv/TlvToJson.kt"
+    ComplexCondition:
+        excludes:
+            - "**/src/controller/java/generated/java/**/*"
+            - "**/src/controller/java/src/matter/onboardingpayload/ManualOnboardingPayloadGenerator.kt"
+
+empty-blocks:
+    EmptyFunctionBlock:
+        excludes:
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/BasicClientFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/MultiAdminClientFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/OnOffClientFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/OpCredClientFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/provisioning/AddressCommissioningFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/provisioning/DeviceProvisioningFragment.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/discover/DiscoverCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/discover/DiscoverCommissionersCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/CloseSessionCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairCodePaseCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkCommissionerCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkCommissioningModeCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkDeviceTypeCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkFabricCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkInstanceNameCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkShortCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkVendorCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/UnpairCommand.kt"
+            - "**/src/controller/java/generated/java/**/*"

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".chip.casting.app.CommissionerDiscoveryFragment">
+
+    <LinearLayout
+        android:id="@+id/castingCommissioners"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        tools:layout_editor_absoluteX="1dp"
+        tools:layout_editor_absoluteY="1dp"
+        android:padding="10sp">
+
+        <Button
+            android:id="@+id/purgeCacheButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Purge Cache" />
+
+        <Button
+            android:id="@+id/manualCommissioningButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Skip to manual commissioning >>" />
+
+        <Button
+            android:id="@+id/discoverButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Discover>" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/discovery_message_text"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+        <ListView
+            android:id = "@+id/commissionerList"
+            android:layout_width = "match_parent"
+            android:layout_height = "wrap_content"
+            android:fadeScrollbars = "false" />
+    </LinearLayout>
+
+
+</FrameLayout>

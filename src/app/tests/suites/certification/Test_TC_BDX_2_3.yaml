@@ -1,0 +1,46 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 29.2.3. [TC-BDX-2.3] Restart Synchronous file receiving
+
+PICS:
+    - MCORE.BDX.SynchronousReceiver
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "DUT sends a ReceiveInit message to TH + TH sends a ReceiveAccept
+          message back to DUT"
+      verification: |
+          Verify that the that the ReceiveInit message has the following fields Proposed Transfer Control - At least one of the PTC[RECEIVER_DRIVE] or PTC[SENDER_DRIVE] field bits shall be set. Range Control Proposed Max Block Size Start Offset - Should be set to the offset of the first byte desired in the first block transferred. Proposed Max Length - Optional File Designator Length File Designator Metadata - Optional
+      disabled: true
+
+    - label:
+          "TH sends a Block message to DUT + DUT sends a BlockAck message back
+          to TH"
+      verification: |
+          Verify that the BlockAck message has the following mandatory fields Block Counter - Must correspond to the Block Counter which was embedded in the Block being acknowledged.
+      disabled: true
+
+    - label:
+          "TH sends a BlockEOF message to DUT + DUT sends a BlockAckEOF message
+          back to TH"
+      verification: |
+          Verify that the BlockAckEOF message has the following mandatory fields Block Counter - Must correspond to the Block Counter which was embedded in the BlockEOF being acknowledged.
+      disabled: true

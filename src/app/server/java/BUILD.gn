@@ -1,0 +1,81 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("${build_root}/config/android_abi.gni")
+import("${chip_root}/build/chip/java/rules.gni")
+import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/lib/lib.gni")
+
+static_library("jni") {
+  output_name = "libCHIPAppServerJni"
+
+  sources = [
+    "AndroidAppServerWrapper.cpp",
+    "AndroidAppServerWrapper.h",
+    "CHIPAppServer-JNI.cpp",
+    "ChipAppServerDelegate.cpp",
+    "ChipAppServerDelegate.h",
+    "ChipFabricProvider-JNI.cpp",
+    "ChipFabricProvider-JNI.h",
+    "ChipThreadWork.cpp",
+    "ChipThreadWork.h",
+  ]
+
+  deps = [
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/inet",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/platform",
+    "${chip_root}/src/platform/android",
+    "${chip_root}/third_party/inipp",
+  ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
+
+  cflags = [ "-Wconversion" ]
+}
+
+android_library("java") {
+  output_name = "CHIPAppServer.jar"
+
+  deps = [
+    ":android",
+    "${chip_root}/third_party/android_deps:annotation",
+  ]
+
+  data_deps = [
+    ":jni",
+    "${chip_root}/build/chip/java:shared_cpplib",
+  ]
+
+  sources = [
+    "src/chip/appserver/ChipAppServer.java",
+    "src/chip/appserver/ChipAppServerDelegate.java",
+    "src/chip/appserver/ChipAppServerException.java",
+    "src/chip/appserver/ChipFabricProvider.java",
+    "src/chip/appserver/Fabric.java",
+  ]
+
+  javac_flags = [ "-Xlint:deprecation" ]
+
+  # TODO: add classpath support (we likely need to add something like
+  #  ..../platforms/android-26/android.jar to access BLE items)
+}
+
+java_prebuilt("android") {
+  jar_path = "${android_sdk_root}/platforms/android-26/android.jar"
+}

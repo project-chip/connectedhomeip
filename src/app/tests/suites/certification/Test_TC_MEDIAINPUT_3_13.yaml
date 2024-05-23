@@ -1,0 +1,92 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 19.5.4. [TC-MEDIAINPUT-3.13] Rename Input Verification
+
+PICS:
+    - MEDIAINPUT.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Media Input"
+    endpoint: 1
+    Index:
+        type: int8u
+        defaultValue: 1
+
+tests:
+    - label:
+          "Step 0: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    #Issue 13029
+    #This step implicitly validating the attribute(InputList)constraints, as long as the payload is being parsed successfully
+    - label:
+          "Step 1: TH reads the InputList attribute from the DUT to show list of
+          Inputs available"
+      PICS: MEDIAINPUT.S.A0000
+      command: "readAttribute"
+      attribute: "InputList"
+      response:
+          constraints:
+              type: list
+
+    - label:
+          "Step 2: TH sends a RenameInput command to DUT to rename an input from
+          the list returned in step 1"
+      PICS: MEDIAINPUT.S.C03.Rsp
+      command: "RenameInput"
+      arguments:
+          values:
+              - name: "Index"
+                value: Index
+              - name: "Name"
+                value: "A1"
+
+    # Issue 13029
+    - label:
+          "Step 3: TH reads the InputList attribute from the DUT to show list of
+          Inputs available"
+      verification: |
+          ./chip-tool mediainput read input-list 1 1
+          [1651055193.215119][155444:155449] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0507 Attribute 0x0000_0000 DataVersion: 2695202790
+          [1651055193.215226][155444:155449] CHIP:TOO:   InputList: 2 entries
+          [1651055193.215312][155444:155449] CHIP:TOO:     [1]: {
+          [1651055193.215363][155444:155449] CHIP:TOO:       Index: 1
+          [1651055193.215386][155444:155449] CHIP:TOO:       InputType: 4
+          [1651055193.215401][155444:155449] CHIP:TOO:       Name: A1
+          [1651055193.215420][155444:155449] CHIP:TOO:       Description: High-Definition Multimedia Interface
+          [1651055193.215447][155444:155449] CHIP:TOO:      }
+          [1651055193.215483][155444:155449] CHIP:TOO:     [2]: {
+          [1651055193.215506][155444:155449] CHIP:TOO:       Index: 2
+          [1651055193.215525][155444:155449] CHIP:TOO:       InputType: 4
+          [1651055193.215544][155444:155449] CHIP:TOO:       Name: HDMI
+          [1651055193.215564][155444:155449] CHIP:TOO:       Description: High-Definition Multimedia Interface
+          [1651055193.215585][155444:155449] CHIP:TOO:      }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && MEDIAINPUT.S.A0000 && MEDIAINPUT.S.C03.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"

@@ -1,0 +1,268 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 15.2.1. [TC-PCC-2.1] Attributes with server as DUT
+
+PICS:
+    - PCC.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Pump Configuration and Control"
+    endpoint: 1
+
+tests:
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH reads from the DUT the MaxPressure attribute."
+      PICS: PCC.S.A0000
+      command: "readAttribute"
+      attribute: "MaxPressure"
+      response:
+          constraints:
+              type: int16s
+              minValue: -32768
+              maxValue: 32767
+
+    - label: "Step 3: TH reads from the DUT the MaxSpeed attribute."
+      PICS: PCC.S.A0001
+      command: "readAttribute"
+      attribute: "MaxSpeed"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Step 4: TH reads from the DUT the MaxFlow attribute."
+      PICS: PCC.S.A0002
+      command: "readAttribute"
+      attribute: "MaxFlow"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Step 5: TH reads from the DUT the MinConstPressure attribute."
+      PICS: PCC.S.A0003
+      command: "readAttribute"
+      attribute: "MinConstPressure"
+      response:
+          constraints:
+              type: int16s
+              minValue: -32768
+              maxValue: 32767
+
+    - label: "Step 6: TH reads from the DUT the MaxConstPressure attribute."
+      PICS: PCC.S.A0004
+      command: "readAttribute"
+      attribute: "MaxConstPressure"
+      response:
+          constraints:
+              type: int16s
+              minValue: -32768
+              maxValue: 32767
+
+    - label: "Step 7: TH reads from the DUT the MinCompPressure attribute."
+      PICS: PCC.S.A0005
+      command: "readAttribute"
+      attribute: "MinCompPressure"
+      response:
+          constraints:
+              type: int16s
+              minValue: -32768
+              maxValue: 32767
+
+    - label: "Step 8: TH reads from the DUT the MaxCompPressure attribute."
+      PICS: PCC.S.A0006
+      command: "readAttribute"
+      attribute: "MaxCompPressure"
+      response:
+          constraints:
+              type: int16s
+              minValue: -32768
+              maxValue: 32767
+
+    - label: "Step 9: TH reads from the DUT the MinConstSpeed attribute."
+      PICS: PCC.S.A0007
+      command: "readAttribute"
+      attribute: "MinConstSpeed"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Step 10: TH reads from the DUT the MaxConstSpeed attribute."
+      PICS: PCC.S.A0008
+      command: "readAttribute"
+      attribute: "MaxConstSpeed"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Step 11: TH reads from the DUT the MinConstFlow attribute."
+      PICS: PCC.S.A0009
+      command: "readAttribute"
+      attribute: "MinConstFlow"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Step 12: TH reads from the DUT the MaxConstFlow attribute."
+      PICS: PCC.S.A000a
+      command: "readAttribute"
+      attribute: "MaxConstFlow"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Step 13: TH reads from the DUT the MinConstTemp attribute."
+      PICS: PCC.S.A000b
+      command: "readAttribute"
+      attribute: "MinConstTemp"
+      response:
+          constraints:
+              type: int16s
+              minValue: -32768
+              maxValue: 32767
+
+    - label: "Step 14: TH reads from the DUT the MaxConstTemp attribute."
+      PICS: PCC.S.A000c
+      command: "readAttribute"
+      attribute: "MaxConstTemp"
+      response:
+          constraints:
+              type: int16s
+              minValue: -32768
+              maxValue: 32767
+
+    - label: "Step 15: TH reads from the DUT the PumpStatus attribute."
+      PICS: PCC.S.A0010
+      command: "readAttribute"
+      attribute: "PumpStatus"
+      response:
+          constraints:
+              type: bitmap16
+              minValue: 0
+              maxValue: 8
+
+    - label:
+          "Step 16: TH reads from the DUT the EffectiveOperationMode attribute."
+      PICS: PCC.S.A0011
+      command: "readAttribute"
+      attribute: "EffectiveOperationMode"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 3
+
+    - label:
+          "Step 17: TH reads from the DUT the EffectiveControlMode attribute."
+      PICS: PCC.S.A0012
+      command: "readAttribute"
+      attribute: "EffectiveControlMode"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 7
+
+    - label: "Step 18: TH reads from the DUT the Capacity attribute."
+      PICS: PCC.S.A0013
+      command: "readAttribute"
+      attribute: "Capacity"
+      response:
+          constraints:
+              type: int16s
+              minValue: -32768
+              maxValue: 32767
+
+    - label: "Step 19: TH reads from the DUT the Speed attribute."
+      PICS: PCC.S.A0014
+      command: "readAttribute"
+      attribute: "Speed"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label:
+          "Step 20: TH reads from the DUT the LifetimeRunningHours attribute."
+      PICS: PCC.S.A0015
+      command: "readAttribute"
+      attribute: "LifetimeRunningHours"
+      response:
+          constraints:
+              type: int24u
+              minValue: 0
+              maxValue: 16777215
+
+    - label: "Step 21: TH reads from the DUT the Power attribute."
+      PICS: PCC.S.A0016
+      command: "readAttribute"
+      attribute: "Power"
+      response:
+          constraints:
+              type: int24u
+              minValue: 0
+              maxValue: 16777215
+
+    - label:
+          "Step 22: TH reads from the DUT the LifetimeEnergyConsumed attribute."
+      PICS: PCC.S.A0017
+      command: "readAttribute"
+      attribute: "LifetimeEnergyConsumed"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0
+              maxValue: 4294967295
+
+    - label: "Step 23: TH reads from the DUT the OperationMode attribute."
+      PICS: PCC.S.A0020
+      command: "readAttribute"
+      attribute: "OperationMode"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 3
+
+    - label: "Step 24: TH reads from the DUT the ControlMode attribute."
+      PICS: PCC.S.A0021
+      command: "readAttribute"
+      attribute: "ControlMode"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 7

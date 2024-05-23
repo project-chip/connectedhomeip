@@ -1,0 +1,191 @@
+# Copyright (c) 2020-2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/nlassert.gni")
+import("//build_overrides/nlfaultinjection.gni")
+
+import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/build/chip/tests.gni")
+import("${chip_root}/src/platform/device.gni")
+import("inet.gni")
+
+if (chip_system_config_use_open_thread_inet_endpoints) {
+  import("//build_overrides/openthread.gni")
+}
+
+if (chip_system_config_use_lwip) {
+  import("//build_overrides/lwip.gni")
+}
+
+declare_args() {
+  # Extra header to include in SystemConfig.h for project.
+  chip_inet_project_config_include = ""
+}
+
+buildconfig_header("inet_buildconfig") {
+  header = "InetBuildConfig.h"
+  header_dir = "inet"
+
+  defines = [
+    "INET_CONFIG_TEST=${chip_build_tests}",
+    "INET_CONFIG_ENABLE_IPV4=${chip_inet_config_enable_ipv4}",
+    "INET_CONFIG_ENABLE_TCP_ENDPOINT=${chip_inet_config_enable_tcp_endpoint}",
+    "INET_CONFIG_ENABLE_UDP_ENDPOINT=${chip_inet_config_enable_udp_endpoint}",
+    "HAVE_LWIP_RAW_BIND_NETIF=true",
+  ]
+
+  if (chip_inet_project_config_include != "") {
+    defines +=
+        [ "INET_PROJECT_CONFIG_INCLUDE=${chip_inet_project_config_include}" ]
+  }
+  if (chip_inet_platform_config_include != "") {
+    defines +=
+        [ "INET_PLATFORM_CONFIG_INCLUDE=${chip_inet_platform_config_include}" ]
+  }
+
+  defines += [ "INET_TCP_END_POINT_IMPL_CONFIG_FILE=<inet/TCPEndPointImpl${chip_system_config_inet}.h>" ]
+  defines += [ "INET_UDP_END_POINT_IMPL_CONFIG_FILE=<inet/UDPEndPointImpl${chip_system_config_inet}.h>" ]
+
+  visibility = [ ":inet_config_header" ]
+}
+
+source_set("inet_config_header") {
+  sources = [ "InetConfig.h" ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
+
+  public_deps = [ "${chip_root}/src/system:system_config_header" ]
+
+  deps = [ ":inet_buildconfig" ]
+}
+
+source_set("impl_header") {
+  sources = [ "InetInterfaceImpl.h" ]
+  public_configs = [ "${chip_root}/src:includes" ]
+  public_deps = [ "${chip_root}/src/system:system_config_header" ]
+}
+
+static_library("inet") {
+  output_name = "libInetLayer"
+
+  # EndpointState header is one of:
+  #   - src/inet/EndPointStateLwIP.h
+  #   - src/inet/EndPointStateNetworkFramework.h
+  #   - src/inet/EndPointStateOpenThread.h
+  #   - src/inet/EndPointStateSockets.h
+  sources = [
+    "EndPointBasis.h",
+    "EndPointState${chip_system_config_inet}.h",
+    "IANAConstants.h",
+    "IPAddress-StringFuncts.cpp",
+    "IPAddress.cpp",
+    "IPAddress.h",
+    "IPPacketInfo.cpp",
+    "IPPacketInfo.h",
+    "IPPrefix.cpp",
+    "IPPrefix.h",
+    "Inet.h",
+    "InetArgParser.cpp",
+    "InetArgParser.h",
+    "InetError.cpp",
+    "InetError.h",
+    "InetInterface.cpp",
+    "InetInterface.h",
+    "InetLayer.h",
+    "arpa-inet-compatibility.h",
+  ]
+
+  public_deps = [
+    ":impl_header",
+    ":inet_config_header",
+    "${chip_root}/src/lib/core:types",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform:platform_config_header",
+    "${chip_root}/src/system",
+  ]
+
+  if (chip_system_config_use_lwip) {
+    sources += [ "EndPointStateLwIP.cpp" ]
+    public_deps += [ "${lwip_root}:lwip" ]
+  }
+
+  if (chip_system_config_use_open_thread_inet_endpoints) {
+    public_deps += [ "${chip_root}/third_party/openthread:openthread" ]
+  }
+
+  if (chip_inet_config_enable_tcp_endpoint) {
+    # Possible TCPEndpointImpl files:
+    #  - TCPEndPointImplLwIP.cpp
+    #  - TCPEndPointImplLwIP.h
+    #  - TCPEndPointImplOpenThread.cpp
+    #  - TCPEndPointImplOpenThread.h
+    #  - TCPEndPointImplSockets.cpp
+    #  - TCPEndPointImplSockets.h
+    sources += [
+      "TCPEndPoint.cpp",
+      "TCPEndPoint.h",
+      "TCPEndPointImpl${chip_system_config_inet}.cpp",
+      "TCPEndPointImpl${chip_system_config_inet}.h",
+      "TCPEndPointImpl.h",
+    ]
+  }
+
+  if (chip_inet_config_enable_udp_endpoint) {
+    # Possible UDPEndpointImpl files:
+    #  - UDPEndPointImplLwIP.cpp
+    #  - UDPEndPointImplLwIP.h
+    #  - UDPEndPointImplNetworkFramework.cpp
+    #  - UDPEndPointImplNetworkFramework.h
+    #  - UDPEndPointImplOpenThread.cpp
+    #  - UDPEndPointImplOpenThread.h
+    #  - UDPEndPointImplSockets.cpp
+    #  - UDPEndPointImplSockets.h
+    sources += [
+      "BasicPacketFilters.h",
+      "EndpointQueueFilter.h",
+      "UDPEndPoint.cpp",
+      "UDPEndPoint.h",
+      "UDPEndPointImpl${chip_system_config_inet}.cpp",
+      "UDPEndPointImpl${chip_system_config_inet}.h",
+      "UDPEndPointImpl.h",
+    ]
+
+    if (chip_system_config_inet == "Sockets") {
+      # TODO: dependency on this one is not clear as it is only ever
+      #       enabled through CMakeLists.txt. Added here for completeness
+      sources += [ "ZephyrSocket.h" ]
+    }
+  }
+
+  if (chip_with_nlfaultinjection) {
+    sources += [
+      "InetFaultInjection.cpp",
+      "InetFaultInjection.h",
+    ]
+    public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
+  }
+
+  if (current_os == "android") {
+    public_deps += [ "${chip_root}/src/platform/android:inet" ]
+  } else {
+    sources += [ "InetInterfaceImplDefault.cpp" ]
+  }
+
+  cflags = [ "-Wconversion" ]
+  if (current_os == "nuttx") {
+    cflags -= [ "-Wconversion" ]
+  }
+}

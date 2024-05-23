@@ -1,0 +1,791 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 74.3.2. [TC-SWTCH-3.2] Primary functionality with client as DUT
+
+PICS:
+    - SWTCH.C
+    - MCORE.IDM.C.SubscribeEvent
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Note"
+      verification: |
+          NOTE: https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/linux#readme
+          Events to be executed as following
+          1. Compile app using below command in connectedhomeip folder
+          a. ./scripts/run_in_build_env.sh ./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-clang build
+          2. Build respective app (all-clusters-app)
+          3. Commission DUT to TH
+          4. Open 2nd terminal of DUT and provide the below command to obtain PID of DUT
+          ps  -aef|grep all-clusters-app
+          5. Follow the Verification step below to generate the event in 2nd terminal of DUT
+      disabled: true
+
+    - label:
+          "Step 0a: FAIL the test - at least one of SWTCH.C.F00(LS) and
+          SWTCH.C.F01(MS) has to be supported"
+      PICS: "!SWTCH.C.F00 && !SWTCH.C.F01"
+      verification: |
+          no messages needed, TH checks consistency of PICS flags
+      disabled: true
+
+    - label:
+          "Step 0b: FAIL the test - when supporting SWTCH.C.F02(MSR) also
+          SWTCH.C.F01(MS) must be supported"
+      PICS: SWTCH.C.F02 && !SWTCH.C.F01
+      verification: |
+          no messages needed, TH checks consistency of PICS flags
+      disabled: true
+
+    - label:
+          "Step 0c: FAIL the test - when supporting SWTCH.C.F03(MSL) also
+          SWTCH.C.F01(MS) must be supported"
+      PICS: SWTCH.C.F03 && !SWTCH.C.F01
+      verification: |
+          no messages needed, TH checks consistency of PICS flags
+      disabled: true
+
+    - label:
+          "Step 0d: FAIL the test - when supporting SWTCH.C.F03(MSL) also
+          SWTCH.C.F02(MSR) must be supported"
+      PICS: SWTCH.C.F03 && !SWTCH.C.F02
+      verification: |
+          no messages needed, TH checks consistency of PICS flags
+      disabled: true
+
+    - label:
+          "Step 0e: FAIL the test - when supporting SWTCH.C.F04(MSM) also
+          SWTCH.C.F01(MS) must be supported"
+      PICS: SWTCH.C.F04 && !SWTCH.C.F01
+      verification: |
+          no messages needed, TH checks consistency of PICS flags
+      disabled: true
+
+    - label:
+          "Step 0f: FAIL the test - when supporting SWTCH.C.F04(MSM) also
+          SWTCH.C.F02(MSR) must be supported"
+      PICS: SWTCH.C.F04 && !SWTCH.C.F02
+      verification: |
+          no messages needed, TH checks consistency of PICS flags
+      disabled: true
+
+    - label:
+          "Step 0g: FAIL the test - at least one of SWTCH.C.M.SwitchStatePolling
+          and SWTCH.C.M.SwitchStateEventing must be supported"
+      PICS: "!SWTCH.C.M.SwitchStatePolling && !SWTCH.C.M.SwitchStateEventing"
+      verification: |
+          no messages needed, TH checks consistency of PICS flags
+      disabled: true
+
+    - label:
+          "Step 1a: Commission DUT to TH. Use client mechanism to set it up so
+          switch state can be observed (e.g. UI shows state of switch) and/or
+          other device is controlled (e.g. light on same fabric gets controlled
+          by the switch  TH has to simulate that light). While commissioning and
+          configuring, TH records and reacts to the messages relating to the
+          switch functionality detailed in the steps below. The order of the
+          messages received may be different from the order of the sub-steps
+          1b..1d below."
+      PICS: SWTCH.C.F00
+      verification: |
+
+      disabled: true
+
+    - label: "Step 1b: DUT reads global attribute FeatureMap."
+      PICS: SWTCH.C.F00
+      verification: |
+          ./chip-tool switch read feature-map 1 1
+
+          Verify  FeatureMap value is 1 On TH (all-clusters-app) log and below is the sample log provided for the raspi platform:
+
+          ReportDataMessage =
+          [1671450600.457719][8426:8426] CHIP:DMG: {
+          [1671450600.457728][8426:8426] CHIP:DMG:         AttributeReportIBs =
+          [1671450600.457747][8426:8426] CHIP:DMG:         [
+          [1671450600.457756][8426:8426] CHIP:DMG:                 AttributeReportIB =
+          [1671450600.457954][8426:8426] CHIP:DMG:                 {
+          [1671450600.457976][8426:8426] CHIP:DMG:                         AttributeDataIB =
+          [1671450600.457991][8426:8426] CHIP:DMG:                         {
+          [1671450600.458015][8426:8426] CHIP:DMG:                                 DataVersion = 0xcfe432fa,
+          [1671450600.458038][8426:8426] CHIP:DMG:                                 AttributePathIB =
+          [1671450600.458057][8426:8426] CHIP:DMG:                                 {
+          [1671450600.458075][8426:8426] CHIP:DMG:                                         Endpoint = 0x1,
+          [1671450600.458088][8426:8426] CHIP:DMG:                                         Cluster = 0x3b,
+          [1671450600.458108][8426:8426] CHIP:DMG:                                         Attribute = 0x0000_FFFC,
+          [1671450600.458122][8426:8426] CHIP:DMG:                                 }
+          [1671450600.458137][8426:8426] CHIP:DMG:
+          [1671450600.458151][8426:8426] CHIP:DMG:                                 Data = 1,
+          [1671450600.458161][8426:8426] CHIP:DMG:                         },
+          [1671450600.458179][8426:8426] CHIP:DMG:
+          [1671450600.458188][8426:8426] CHIP:DMG:                 },
+          [1671450600.458207][8426:8426] CHIP:DMG:
+          [1671450600.458216][8426:8426] CHIP:DMG:         ],
+          [1671450600.458242][8426:8426] CHIP:DMG:
+          [1671450600.458255][8426:8426] CHIP:DMG:         SuppressResponse = true,
+          [1671450600.458273][8426:8426] CHIP:DMG:         InteractionModelRevision = 1
+          [1671450600.458286][8426:8426] CHIP:DMG: }
+      disabled: true
+
+    - label: "Step 1c: DUT reads attribute NumberOfPositions."
+      PICS: SWTCH.C.F00
+      verification: |
+          ./chip-tool switch read number-of-positions 1 1
+
+          Verify  NumberOfPositions value is 2 On TH (all-clusters-app) log and below is the sample log provided for the raspi platform:
+
+          ReportDataMessage =
+          [1671450651.817816][8426:8426] CHIP:DMG: {
+          [1671450651.817819][8426:8426] CHIP:DMG:         AttributeReportIBs =
+          [1671450651.817825][8426:8426] CHIP:DMG:         [
+          [1671450651.817828][8426:8426] CHIP:DMG:                 AttributeReportIB =
+          [1671450651.817849][8426:8426] CHIP:DMG:                 {
+          [1671450651.817853][8426:8426] CHIP:DMG:                         AttributeDataIB =
+          [1671450651.817858][8426:8426] CHIP:DMG:                         {
+          [1671450651.817862][8426:8426] CHIP:DMG:                                 DataVersion = 0xcfe432fa,
+          [1671450651.817864][8426:8426] CHIP:DMG:                                 AttributePathIB =
+          [1671450651.817868][8426:8426] CHIP:DMG:                                 {
+          [1671450651.817872][8426:8426] CHIP:DMG:                                         Endpoint = 0x1,
+          [1671450651.817876][8426:8426] CHIP:DMG:                                         Cluster = 0x3b,
+          [1671450651.817879][8426:8426] CHIP:DMG:                                         Attribute = 0x0000_0000,
+          [1671450651.817882][8426:8426] CHIP:DMG:                                 }
+          [1671450651.817888][8426:8426] CHIP:DMG:
+          [1671450651.817892][8426:8426] CHIP:DMG:                                 Data = 2,
+          [1671450651.817895][8426:8426] CHIP:DMG:                         },
+          [1671450651.817901][8426:8426] CHIP:DMG:
+          [1671450651.817905][8426:8426] CHIP:DMG:                 },
+          [1671450651.817910][8426:8426] CHIP:DMG:
+          [1671450651.817913][8426:8426] CHIP:DMG:         ],
+          [1671450651.817918][8426:8426] CHIP:DMG:
+          [1671450651.817921][8426:8426] CHIP:DMG:         SuppressResponse = true,
+          [1671450651.817925][8426:8426] CHIP:DMG:         InteractionModelRevision = 1
+          [1671450651.817928][8426:8426] CHIP:DMG: }
+      disabled: true
+
+    - label:
+          "Step 1d: DUT sets up eventing (SwitchLatched) so it will receive
+          events when the switch is operated."
+      PICS: SWTCH.C.F00 && SWTCH.C.M.SwitchStateEventing
+      verification: |
+          On Raspi platform to trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have capability to generate this event)
+
+          echo '{"Name":"SwitchLatched","NewPosition":0}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          Verify SwitchLatched event with NewPosition set to 0 on TH(all-cluster-app) log and below is the sample log provided for the raspi platform:
+
+          [1659679728.732056][2530:2538] CHIP:-: Received payload: "{"Name":"SwitchLatched","NewPosition":0}"
+          [1659679728.732389][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e7706
+          [1659679728.732429][2530:2530] CHIP:-: The latching switch is moved to a new position:0
+          [1659679728.732454][2530:2530] CHIP:ZCL: SwitchServer: OnSwitchLatch
+
+          ./chip-tool switch read-event switch-latched  1 1
+
+          Verify switch latched event has newposition set to 0 on DUT (chip-tool) logs and below is the sample log provided for the raspi platform:
+
+          [1659679766.774013][2535:2540] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
+          [1659679766.774035][2535:2540] CHIP:TOO:          Event number: 3
+          [1659679766.774055][2535:2540] CHIP:TOO:          Priority: Info
+          [1659679766.774074][2535:2540] CHIP:TOO:          Timestamp: 2181028
+          [1659679766.774157][2535:2540] CHIP:TOO:   SwitchLatched: {
+          [1659679766.774197][2535:2540] CHIP:TOO:     NewPosition: 0
+          [1659679766.774214][2535:2540] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 2a: TH simulates operation of the switch by changing state
+          (attribute CurrentPosition) from 0 to 1 and back every 10 seconds
+          (over a 1 minute period) DUT reads attribute CurrentPosition regularly"
+      PICS: SWTCH.C.F00 && SWTCH.C.M.SwitchStatePolling
+      verification: |
+          On Raspi platform to trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have capability to generate this event)
+
+          echo '{"Name":"SwitchLatched","NewPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          Verify SwitchLatched event with NewPosition set to 1 on TH(all-cluster-app) log:
+
+          [1659621148.831745][8590:8596] CHIP:-: Received payload: "{"Name":"SwitchLatched","NewPosition":1}"
+          [1659621148.832236][8590:8590] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4be58f54
+          [1659621148.832320][8590:8590] CHIP:-: The latching switch is moved to a new position:1
+          [1659621148.832380][8590:8590] CHIP:ZCL: SwitchServer: OnSwitchLatch
+          [1659621148.832494][8590:8590] CHIP:EVL: LogEvent event number: 0x0000000000000007 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x0 Sys timestamp: 0x00000000022D0CBB
+
+          In parallel to this Check the CurrentPosition value.
+
+          ./chip-tool switch read current-position 1 1
+
+          Verify CurrentPosition value is 1 on TH (all-cluster-app) logs
+
+          [1686292319.379553][30986:30986] CHIP:DMG: ReportDataMessage =
+          [1686292319.379564][30986:30986] CHIP:DMG: {
+          [1686292319.379572][30986:30986] CHIP:DMG:         AttributeReportIBs =
+          [1686292319.379590][30986:30986] CHIP:DMG:         [
+          [1686292319.379599][30986:30986] CHIP:DMG:                 AttributeReportIB =
+          [1686292319.379616][30986:30986] CHIP:DMG:                 {
+          [1686292319.379625][30986:30986] CHIP:DMG:                         AttributeDataIB =
+          [1686292319.379637][30986:30986] CHIP:DMG:                         {
+          [1686292319.379648][30986:30986] CHIP:DMG:                                 DataVersion = 0xbae40564,
+          [1686292319.379659][30986:30986] CHIP:DMG:                                 AttributePathIB =
+          [1686292319.379670][30986:30986] CHIP:DMG:                                 {
+          [1686292319.379682][30986:30986] CHIP:DMG:                                         Endpoint = 0x1,
+          [1686292319.379695][30986:30986] CHIP:DMG:                                         Cluster = 0x3b,
+          [1686292319.379707][30986:30986] CHIP:DMG:                                         Attribute = 0x0000_0001,
+          [1686292319.379717][30986:30986] CHIP:DMG:                                 }
+          [1686292319.379731][30986:30986] CHIP:DMG:
+          [1686292319.379744][30986:30986] CHIP:DMG:                                 Data = 1,
+          [1686292319.379754][30986:30986] CHIP:DMG:                         },
+          [1686292319.379769][30986:30986] CHIP:DMG:
+          [1686292319.379778][30986:30986] CHIP:DMG:                 },
+          [1686292319.379794][30986:30986] CHIP:DMG:
+          [1686292319.379803][30986:30986] CHIP:DMG:         ],
+          [1686292319.379819][30986:30986] CHIP:DMG:
+          [1686292319.379829][30986:30986] CHIP:DMG:         SuppressResponse = true,
+          [1686292319.379839][30986:30986] CHIP:DMG:         InteractionModelRevision = 1
+          [1686292319.379847][30986:30986] CHIP:DMG: }
+
+
+          TH simulates operation of the switch by changing state (attribute CurrentPosition) from 1 to 0 and  read  the CurrentPosition attribute
+
+          After 10 seconds, repeat the command with /tmp/chip_all_clusters_fifo using with value 0 as position
+
+          echo '{"Name":"SwitchLatched","NewPosition":0}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          [1686292713.872327][30986:30989] CHIP:-: Received payload: "{"Name":"SwitchLatched","NewPosition":0}"
+          [1686292713.872583][30986:30986] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to bae40566
+          [1686292713.872617][30986:30986] CHIP:-: The latching switch is moved to a new position:0
+          [1686292713.872629][30986:30986] CHIP:ZCL: SwitchServer: OnSwitchLatch
+
+          ./chip-tool switch read current-position 1 1
+
+          Verify CurrentPosition value is 0 on TH (all-cluster-app) logs
+
+          [1686293150.796547][30986:30986] CHIP:DMG: ReportDataMessage =
+          [1686293150.796549][30986:30986] CHIP:DMG: {
+          [1686293150.796551][30986:30986] CHIP:DMG:         AttributeReportIBs =
+          [1686293150.796555][30986:30986] CHIP:DMG:         [
+          [1686293150.796557][30986:30986] CHIP:DMG:                 AttributeReportIB =
+          [1686293150.796561][30986:30986] CHIP:DMG:                 {
+          [1686293150.796564][30986:30986] CHIP:DMG:                         AttributeDataIB =
+          [1686293150.796567][30986:30986] CHIP:DMG:                         {
+          [1686293150.796570][30986:30986] CHIP:DMG:                                 DataVersion = 0xbae40566,
+          [1686293150.796572][30986:30986] CHIP:DMG:                                 AttributePathIB =
+          [1686293150.796575][30986:30986] CHIP:DMG:                                 {
+          [1686293150.796578][30986:30986] CHIP:DMG:                                         Endpoint = 0x1,
+          [1686293150.796581][30986:30986] CHIP:DMG:                                         Cluster = 0x3b,
+          [1686293150.796584][30986:30986] CHIP:DMG:                                         Attribute = 0x0000_0001,
+          [1686293150.796587][30986:30986] CHIP:DMG:                                 }
+          [1686293150.796590][30986:30986] CHIP:DMG:
+          [1686293150.796594][30986:30986] CHIP:DMG:                                 Data = 0,
+          [1686293150.796597][30986:30986] CHIP:DMG:                         },
+          [1686293150.796601][30986:30986] CHIP:DMG:
+          [1686293150.796603][30986:30986] CHIP:DMG:                 },
+          [1686293150.796607][30986:30986] CHIP:DMG:
+          [1686293150.796609][30986:30986] CHIP:DMG:         ],
+          [1686293150.796613][30986:30986] CHIP:DMG:
+          [1686293150.796616][30986:30986] CHIP:DMG:         SuppressResponse = true,
+          [1686293150.796618][30986:30986] CHIP:DMG:         InteractionModelRevision = 1
+          [1686293150.796620][30986:30986] CHIP:DMG: }
+
+          Repeat the above Steps over 1 minute period of time
+      disabled: true
+
+    - label:
+          "Step 2b: TH simulates operation of the switch by changing state
+          (attribute CurrentPosition) from 0 to 1 and back every 10 seconds
+          (over a 1 minute period), and sending the event SwitchLatched (with
+          field NewPosition reflecting the new state) on every change"
+      PICS: SWTCH.C.F00 && SWTCH.C.M.SwitchStateEventing
+      verification: |
+          On Raspi platform to trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have capability to generate this event)
+
+          echo '{"Name":"SwitchLatched","NewPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          Verify SwitchLatched event with NewPosition set to 1 on TH(all-cluster-app) log:
+
+          [1659621148.831745][8590:8596] CHIP:-: Received payload: "{"Name":"SwitchLatched","NewPosition":1}"
+          [1659621148.832236][8590:8590] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4be58f54
+          [1659621148.832320][8590:8590] CHIP:-: The latching switch is moved to a new position:1
+          [1659621148.832380][8590:8590] CHIP:ZCL: SwitchServer: OnSwitchLatch
+          [1659621148.832494][8590:8590] CHIP:EVL: LogEvent event number: 0x0000000000000007 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x0 Sys timestamp: 0x00000000022D0CBB
+
+          Send the SwitchLatched event on every change of position
+          ./chip-tool switch read-event switch-latched  1 1
+
+          Verify SwitchLatched Position is changing for 0 to 1 on DUT(chip-tool) Log:
+
+          [1659680091.150093][2592:2597] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
+          [1659680091.150114][2592:2597] CHIP:TOO:          Event number: 6
+          [1659680091.150135][2592:2597] CHIP:TOO:          Priority: Info
+          [1659680091.150155][2592:2597] CHIP:TOO:          Timestamp: 2402459
+          [1659680091.150180][2592:2597] CHIP:TOO:   SwitchLatched: {
+          [1659680091.150202][2592:2597] CHIP:TOO:     NewPosition: 1
+          [1659680091.150222][2592:2597] CHIP:TOO:    }
+          [1659680091.150302][2592:2597] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
+          [1659680091.150324][2592:2597] CHIP:TOO:          Event number: 7
+          [1659680091.150345][2592:2597] CHIP:TOO:          Priority: Info
+          [1659680091.150365][2592:2597] CHIP:TOO:          Timestamp: 2431571
+          [1659680091.150390][2592:2597] CHIP:TOO:   SwitchLatched: {
+          [1659680091.150411][2592:2597] CHIP:TOO:     NewPosition: 0
+          [1659680091.150432][2592:2597] CHIP:TOO:    }
+          [1659680091.150509][2592:2597] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
+          [1659680091.150531][2592:2597] CHIP:TOO:          Event number: 8
+          [1659680091.150551][2592:2597] CHIP:TOO:          Priority: Info
+          [1659680091.150572][2592:2597] CHIP:TOO:          Timestamp: 2456884
+          [1659680091.150597][2592:2597] CHIP:TOO:   SwitchLatched: {
+          [1659680091.150630][2592:2597] CHIP:TOO:     NewPosition: 1 <= this value will change for every change in position of simulated switch
+
+          After 10 seconds, Send the above commands with NewPosition set to 0
+          Repeat above Steps back every 10 seconds (over a 1 minute period) by changing the New Position 1 to 0 and 0 to 1
+      disabled: true
+
+    - label:
+          "Step 3a: Commission DUT to TH. Use client mechanism to set it up so
+          switch state can be observed (e.g. UI shows state of switch) and/or
+          other device is controlled (e.g. light on same fabric gets controlled
+          by the switch  TH has to simulate that light). While commissioning and
+          configuring, TH records and reacts to the messages relating to the
+          switch functionality detailed in the steps below. The order of the
+          messages received may be different from the order of the sub-steps
+          3b..3d below."
+      PICS: SWTCH.C.F01
+      verification: |
+
+      disabled: true
+
+    - label: "Step 3b: DUT reads global attribute FeatureMap"
+      PICS: SWTCH.C.F01
+      verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch(LS) or MS, MSR, MSL, MSM.
+
+          In Raspi platform LS feature is implemented, So below mentioned log is for reference only
+
+          ./chip-tool switch read feature-map 1 1
+
+          Verify  FeatureMap value is  30 On TH (all-clusters-app) log
+
+          CHIP:DMG: ReportDataMessage =
+          [1671450600.457719][8426:8426] CHIP:DMG: {
+          [1671450600.457728][8426:8426] CHIP:DMG:         AttributeReportIBs =
+          [1671450600.457747][8426:8426] CHIP:DMG:         [
+          [1671450600.457756][8426:8426] CHIP:DMG:                 AttributeReportIB =
+          [1671450600.457954][8426:8426] CHIP:DMG:                 {
+          [1671450600.457976][8426:8426] CHIP:DMG:                         AttributeDataIB =
+          [1671450600.457991][8426:8426] CHIP:DMG:                         {
+          [1671450600.458015][8426:8426] CHIP:DMG:                                 DataVersion = 0xcfe432fa,
+          [1671450600.458038][8426:8426] CHIP:DMG:                                 AttributePathIB =
+          [1671450600.458057][8426:8426] CHIP:DMG:                                 {
+          [1671450600.458075][8426:8426] CHIP:DMG:                                         Endpoint = 0x1,
+          [1671450600.458088][8426:8426] CHIP:DMG:                                         Cluster = 0x3b,
+          [1671450600.458108][8426:8426] CHIP:DMG:                                         Attribute = 0x0000_FFFC,
+          [1671450600.458122][8426:8426] CHIP:DMG:                                 }
+          [1671450600.458137][8426:8426] CHIP:DMG:
+          [1671450600.458151][8426:8426] CHIP:DMG:                                 Data = 30,
+          [1671450600.458161][8426:8426] CHIP:DMG:                         },
+          [1671450600.458179][8426:8426] CHIP:DMG:
+          [1671450600.458188][8426:8426] CHIP:DMG:                 },
+          [1671450600.458207][8426:8426] CHIP:DMG:
+          [1671450600.458216][8426:8426] CHIP:DMG:         ],
+          [1671450600.458242][8426:8426] CHIP:DMG:
+          [1671450600.458255][8426:8426] CHIP:DMG:         SuppressResponse = true,
+          [1671450600.458273][8426:8426] CHIP:DMG:         InteractionModelRevision = 1
+          [1671450600.458286][8426:8426] CHIP:DMG: }
+      disabled: true
+
+    - label: "Step 3c: DUT reads attribute NumberOfPositions"
+      PICS: SWTCH.C.F01
+      verification: |
+          ./chip-tool switch read number-of-positions 1 1
+
+          Verify  NumberOfPositions value is 2 in TH (all-clusters-app) log
+
+          DMG: ReportDataMessage =
+          [1671450651.817816][8426:8426] CHIP:DMG: {
+          [1671450651.817819][8426:8426] CHIP:DMG:         AttributeReportIBs =
+          [1671450651.817825][8426:8426] CHIP:DMG:         [
+          [1671450651.817828][8426:8426] CHIP:DMG:                 AttributeReportIB =
+          [1671450651.817849][8426:8426] CHIP:DMG:                 {
+          [1671450651.817853][8426:8426] CHIP:DMG:                         AttributeDataIB =
+          [1671450651.817858][8426:8426] CHIP:DMG:                         {
+          [1671450651.817862][8426:8426] CHIP:DMG:                                 DataVersion = 0xcfe432fa,
+          [1671450651.817864][8426:8426] CHIP:DMG:                                 AttributePathIB =
+          [1671450651.817868][8426:8426] CHIP:DMG:                                 {
+          [1671450651.817872][8426:8426] CHIP:DMG:                                         Endpoint = 0x1,
+          [1671450651.817876][8426:8426] CHIP:DMG:                                         Cluster = 0x3b,
+          [1671450651.817879][8426:8426] CHIP:DMG:                                         Attribute = 0x0000_0000,
+          [1671450651.817882][8426:8426] CHIP:DMG:                                 }
+          [1671450651.817888][8426:8426] CHIP:DMG:
+          [1671450651.817892][8426:8426] CHIP:DMG:                                 Data = 2,
+          [1671450651.817895][8426:8426] CHIP:DMG:                         },
+          [1671450651.817901][8426:8426] CHIP:DMG:
+          [1671450651.817905][8426:8426] CHIP:DMG:                 },
+          [1671450651.817910][8426:8426] CHIP:DMG:
+          [1671450651.817913][8426:8426] CHIP:DMG:         ],
+          [1671450651.817918][8426:8426] CHIP:DMG:
+          [1671450651.817921][8426:8426] CHIP:DMG:         SuppressResponse = true,
+          [1671450651.817925][8426:8426] CHIP:DMG:         InteractionModelRevision = 1
+          [1671450651.817928][8426:8426] CHIP:DMG: }
+      disabled: true
+
+    - label:
+          "Step 3d: DUT sets up eventing (InitialPress and ShortRelease; if
+          SWTCH.C.F03(MSL) also LongPress and LongRelease) so it will receive
+          events when the switch is operated"
+      PICS: SWTCH.C.F01 && SWTCH.C.M.SwitchStateEventing
+      verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
+          On Raspi platform to trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have capability to generate this event)
+
+          echo '{"Name":"InitialPress","NewPosition":0}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          Verify InitialPress event with NewPosition set to 0 on TH(all-cluster-app) log:
+
+          [1659624126.646996][8590:8596] CHIP:-: Received payload: "{"Name":"InitialPress","NewPosition":0}"
+          [1659624126.647380][8590:8590] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4be58f55
+          [1659624126.647438][8590:8590] CHIP:-: The new position when the momentary switch starts to be pressed:1
+          [1659624126.647480][8590:8590] CHIP:ZCL: SwitchServer: OnInitialPress
+
+          ./chip-tool switch read-event initial-press  1 1
+
+          Verify InitialPress event with NewPosition set to 0 on DUT(chip-tool) log:
+
+          [1659683181.743214][2829:2835] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
+          [1659683181.743251][2829:2835] CHIP:TOO:          Event number: 10
+          [1659683181.743285][2829:2835] CHIP:TOO:          Priority: Info
+          [1659683181.743319][2829:2835] CHIP:TOO:          Timestamp: 4066882
+          [1659683181.743419][2829:2835] CHIP:TOO:   InitialPress: {
+          [1659683181.743470][2829:2835] CHIP:TOO:     NewPosition: 0
+          [1659683181.743506][2829:2835] CHIP:TOO:    }
+
+          echo '{"Name":"ShortRelease","PreviousPosition":0}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          Verify ShortRelease event with PreviousPosition set to 0 on TH(all-cluster-app) log:
+
+          [1659683678.805455][2530:2538] CHIP:-: Received payload: "{"Name":"ShortRelease","PreviousPosition":0}"
+          [1659683678.805739][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e7715
+          [1659683678.805777][2530:2530] CHIP:-: The the previous value of the CurrentPosition when the momentary switch has been released:1
+          [1659683678.805858][2530:2530] CHIP:ZCL: SwitchServer: OnShortRelease
+
+          ./chip-tool switch read-event short-release  1 1
+
+          Verify ShortRelease event with PreviousPosition set to 0 on DUT(chip-tool) log:
+
+          [1659683195.217253][2838:2843] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1659683195.217275][2838:2843] CHIP:TOO:          Event number: 11
+          [1659683195.217294][2838:2843] CHIP:TOO:          Priority: Info
+          [1659683195.217313][2838:2843] CHIP:TOO:          Timestamp: 4137135
+          [1659683195.217377][2838:2843] CHIP:TOO:   ShortRelease: {
+          [1659683195.217411][2838:2843] CHIP:TOO:     PreviousPosition: 0
+          [1659683195.217432][2838:2843] CHIP:TOO:    }
+
+          if SWTCH.C.F03, also:
+
+          echo '{"Name":"LongPress","NewPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          Verify LongPress event with NewPosition set to 1 on TH(all-cluster-app) log:
+
+          [1686294416.290491][30986:30989] CHIP:-: Received payload: "{"Name":"LongPress","NewPosition":1}"
+          [1686294416.290729][30986:30986] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to bae40568
+          [1686294416.290761][30986:30986] CHIP:-: The new position when the momentary switch has been pressed for a long time:1
+          [1686294416.290775][30986:30986] CHIP:ZCL: SwitchServer: OnLongPress
+
+          ./chip-tool switch read-event long-press  1 1
+
+          Verify LongPress event with NewPosition set to 1 on TH(chip-tool) log:
+
+          [1659527630.476706][4774:4779] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
+          [1659527630.476742][4774:4779] CHIP:TOO:   Event number: 5
+          [1659527630.476771][4774:4779] CHIP:TOO:   Priority: Info
+          [1659527630.476799][4774:4779] CHIP:TOO:   Timestamp: 29687750
+          [1659527630.476887][4774:4779] CHIP:TOO:   LongPress: {
+          [1659527630.476934][4774:4779] CHIP:TOO:     NewPosition: 1
+          [1659527630.476969][4774:4779] CHIP:TOO:    }
+
+          echo '{"Name":"LongRelease","PreviousPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          Verify LongRelease event with PreviousPosition set to 1 on TH(all-cluster-app) log:
+
+          [1686294209.671991][30986:30989] CHIP:-: Received payload: "{"Name":"LongRelease","PreviousPosition":1}"
+          [1686294209.672192][30986:30986] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to bae40567
+          [1686294209.672219][30986:30986] CHIP:-: The the previous value of the CurrentPosition when the momentary switch has been released after having been pressed for a long time:1
+          [1686294209.672229][30986:30986] CHIP:ZCL: SwitchServer: OnLongRelease
+
+          ./chip-tool switch read-event long-release  1 1
+
+          Verify LongRelease event with PreviousPosition set to 1 on DUT(chip-tool) log:
+
+          [1659527630.476706][4774:4779] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
+          [1659527630.476742][4774:4779] CHIP:TOO:   Event number: 6
+          [1659527630.476771][4774:4779] CHIP:TOO:   Priority: Info
+          [1659527630.476799][4774:4779] CHIP:TOO:   Timestamp: 296889750
+          [1659527630.476887][4774:4779] CHIP:TOO:   LongRelease: {
+          [1659527630.476934][4774:4779] CHIP:TOO:     PreviousPosition: 1
+          [1659527630.476969][4774:4779] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 4a: TH simulates operation of the switch by repeating these
+          steps (over a 1 minute period) change state (attribute
+          CurrentPosition) from 0 to 1 wait 0.2 seconds change state (attribute
+          CurrentPosition) from 1 to 0 wait 10 seconds DUT reads attribute
+          CurrentPosition regularly"
+      PICS: SWTCH.C.F01 && SWTCH.C.M.SwitchStatePolling
+      verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
+          On Raspi platform to trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have capability to generate this event)
+
+          change state from 0 to 1
+
+          echo '{"Name":"InitialPress","NewPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          Verify InitialPress event with NewPosition set to 1 on TH(all-cluster-app) log:
+
+          [1659624126.646996][8590:8596] CHIP:-: Received payload: "{"Name":"InitialPress","NewPosition":1}"
+          [1659624126.647380][8590:8590] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4be58f55
+          [1659624126.647438][8590:8590] CHIP:-: The new position when the momentary switch starts to be pressed:1
+          [1659624126.647480][8590:8590] CHIP:ZCL: SwitchServer: OnInitialPress
+
+          wait 10 seconds, Read the CurrentPosition attribute
+
+          ./chip-tool switch read current-position 1 1
+
+          Verify CurrentPosition value is 1 On TH(all-cluster-app) log
+
+          [1686294581.633942][30986:30986] CHIP:DMG: ReportDataMessage =
+          [1686294581.633954][30986:30986] CHIP:DMG: {
+          [1686294581.633961][30986:30986] CHIP:DMG:         AttributeReportIBs =
+          [1686294581.633979][30986:30986] CHIP:DMG:         [
+          [1686294581.633987][30986:30986] CHIP:DMG:                 AttributeReportIB =
+          [1686294581.634004][30986:30986] CHIP:DMG:                 {
+          [1686294581.634014][30986:30986] CHIP:DMG:                         AttributeDataIB =
+          [1686294581.634025][30986:30986] CHIP:DMG:                         {
+          [1686294581.634038][30986:30986] CHIP:DMG:                                 DataVersion = 0xbae40569,
+          [1686294581.634048][30986:30986] CHIP:DMG:                                 AttributePathIB =
+          [1686294581.634059][30986:30986] CHIP:DMG:                                 {
+          [1686294581.634071][30986:30986] CHIP:DMG:                                         Endpoint = 0x1,
+          [1686294581.634083][30986:30986] CHIP:DMG:                                         Cluster = 0x3b,
+          [1686294581.634095][30986:30986] CHIP:DMG:                                         Attribute = 0x0000_0001,
+          [1686294581.634119][30986:30986] CHIP:DMG:                                 }
+          [1686294581.634124][30986:30986] CHIP:DMG:
+          [1686294581.634127][30986:30986] CHIP:DMG:                                 Data = 1,
+          [1686294581.634130][30986:30986] CHIP:DMG:                         },
+          [1686294581.634134][30986:30986] CHIP:DMG:
+          [1686294581.634136][30986:30986] CHIP:DMG:                 },
+          [1686294581.634141][30986:30986] CHIP:DMG:
+          [1686294581.634143][30986:30986] CHIP:DMG:         ],
+          [1686294581.634147][30986:30986] CHIP:DMG:
+          [1686294581.634150][30986:30986] CHIP:DMG:         SuppressResponse = true,
+          [1686294581.634152][30986:30986] CHIP:DMG:         InteractionModelRevision = 1
+          [1686294581.634154][30986:30986] CHIP:DMG: }
+
+          After 0.2 seconds, send this command
+
+          echo '{"Name":"ShortRelease","PreviousPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          Verify ShortRelease event with PreviousPosition set to 1 on TH(all-cluster-app) log:
+
+          [1659683678.805455][2530:2538] CHIP:-: Received payload: "{"Name":"ShortRelease","PreviousPosition":1}"
+          [1659683678.805739][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e7715
+          [1659683678.805777][2530:2530] CHIP:-: The the previous value of the CurrentPosition when the momentary switch has been released:1
+          [1659683678.805858][2530:2530] CHIP:ZCL: SwitchServer: OnShortRelease
+
+          wait 10 seconds, Read the CurrentPosition attribute
+
+          ./chip-tool switch read current-position 1 1
+
+          Verify CurrentPosition value is 0 On TH(all-cluster-app) log
+
+          [1686294592.640335][30986:30986] CHIP:DMG: ReportDataMessage =
+          [1686294592.640348][30986:30986] CHIP:DMG: {
+          [1686294592.640360][30986:30986] CHIP:DMG:         AttributeReportIBs =
+          [1686294592.640386][30986:30986] CHIP:DMG:         [
+          [1686294592.640397][30986:30986] CHIP:DMG:                 AttributeReportIB =
+          [1686294592.640425][30986:30986] CHIP:DMG:                 {
+          [1686294592.640440][30986:30986] CHIP:DMG:                         AttributeDataIB =
+          [1686294592.640456][30986:30986] CHIP:DMG:                         {
+          [1686294592.640474][30986:30986] CHIP:DMG:                                 DataVersion = 0xbae4056a,
+          [1686294592.640490][30986:30986] CHIP:DMG:                                 AttributePathIB =
+          [1686294592.640507][30986:30986] CHIP:DMG:                                 {
+          [1686294592.640525][30986:30986] CHIP:DMG:                                         Endpoint = 0x1,
+          [1686294592.640543][30986:30986] CHIP:DMG:                                         Cluster = 0x3b,
+          [1686294592.640563][30986:30986] CHIP:DMG:                                         Attribute = 0x0000_0001,
+          [1686294592.640580][30986:30986] CHIP:DMG:                                 }
+          [1686294592.640602][30986:30986] CHIP:DMG:
+          [1686294592.640619][30986:30986] CHIP:DMG:                                 Data = 0,
+          [1686294592.640633][30986:30986] CHIP:DMG:                         },
+          [1686294592.640658][30986:30986] CHIP:DMG:
+          [1686294592.640668][30986:30986] CHIP:DMG:                 },
+          [1686294592.640690][30986:30986] CHIP:DMG:
+          [1686294592.640702][30986:30986] CHIP:DMG:         ],
+          [1686294592.640726][30986:30986] CHIP:DMG:
+          [1686294592.640739][30986:30986] CHIP:DMG:         SuppressResponse = true,
+          [1686294592.640755][30986:30986] CHIP:DMG:         InteractionModelRevision = 1
+          [1686294592.640768][30986:30986] CHIP:DMG: }
+
+
+          Repeat above steps over 1 minute period of time
+      disabled: true
+
+    - label:
+          "Step 4b: TH simulates operation of the switch by repeating these
+          steps (over a 1 minute period) change state (attribute
+          CurrentPosition) from 0 to 1, and send the event InitialPress (with
+          field NewPosition=1) wait 0.2 seconds change state (attribute
+          CurrentPosition) from 1 to 0, and send the event ShortRelease (with
+          field PreviousPosition=1) wait 10 seconds"
+      PICS: SWTCH.C.F01 && SWTCH.C.M.SwitchStateEventing
+      verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
+          On Raspi platform to trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have capability to generate this event)
+
+          echo '{"Name":"InitialPress","NewPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          Verify InitialPress event with NewPosition set to 1 on TH(all-cluster-app) log:
+
+          [1659624126.646996][8590:8596] CHIP:-: Received payload: "{"Name":"InitialPress","NewPosition":1}"
+          [1659624126.647380][8590:8590] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4be58f55
+          [1659624126.647438][8590:8590] CHIP:-: The new position when the momentary switch starts to be pressed:1
+          [1659624126.647480][8590:8590] CHIP:ZCL: SwitchServer: OnInitialPress
+
+          ./chip-tool switch read-event initial-press  1 1
+
+          Verify InitialPress event with NewPosition set to 1 on DUT(chip-tool) log:
+
+          [1659527630.476706][4774:4779] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
+          [1659527630.476742][4774:4779] CHIP:TOO:   Event number: 4
+          [1659527630.476771][4774:4779] CHIP:TOO:   Priority: Info
+          [1659527630.476799][4774:4779] CHIP:TOO:   Timestamp: 29687894
+          [1659527630.476887][4774:4779] CHIP:TOO:   InitialPress: {
+          [1659527630.476934][4774:4779] CHIP:TOO:     NewPosition: 1
+          [1659527630.476969][4774:4779] CHIP:TOO:    }
+
+          After 0.2 seconds, send this command
+
+          echo '{"Name":"ShortRelease","PreviousPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          Verify ShortRelease event with PreviousPosition set to 1 on TH(all-cluster-app) log:
+
+          [1659684051.064329][2530:2538] CHIP:-: Received payload: "{"Name":"ShortRelease","PreviousPosition":1}"
+          [1659684051.064820][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e7716
+          [1659684051.064904][2530:2530] CHIP:-: The the previous value of the CurrentPosition when the momentary switch has been released:1
+          [1659684051.064994][2530:2530] CHIP:ZCL: SwitchServer: OnShortRelease
+
+          ./chip-tool switch read-event short-release  1 1
+
+          Verify ShortRelease event with PreviousPosition set to 1 on DUT(chip-tool) log:
+
+          [1659527630.476706][4774:4779] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
+          [1659527630.476742][4774:4779] CHIP:TOO:   Event number: 5
+          [1659527630.476771][4774:4779] CHIP:TOO:   Priority: Info
+          [1659527630.476799][4774:4779] CHIP:TOO:   Timestamp: 29688000
+          [1659527630.476887][4774:4779] CHIP:TOO:   ShortRelease: {
+          [1659527630.476934][4774:4779] CHIP:TOO:     PreviousPosition: 1
+          [1659527630.476969][4774:4779] CHIP:TOO:    }
+          Repeat above steps over a 1 minute period of time
+      disabled: true
+
+    - label:
+          "Step 4c: TH simulates operation of the switch by repeating these
+          steps (over a 1 minute period) change state (field CurrentPosition)
+          from 0 to 1, and send the event InitialPress (with field
+          NewPosition=1) wait 0.75 seconds send the event LongPress (field
+          NewPosition=1) wait 2 seconds change state (field CurrentPosition)
+          from 1 to 0, and send the event LongRelease (with field
+          PreviousPosition=1) wait 8 seconds"
+      PICS: SWTCH.C.F01 && SWTCH.C.F03 && SWTCH.C.M.SwitchStateEventing
+      verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
+          On Raspi platform to trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have capability to generate this event)
+
+          echo '{"Name":"InitialPress","NewPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          Verify InitialPress event with NewPosition set to 1 on TH(all-cluster-app) log:
+
+          [1686295316.319181][30986:30989] CHIP:-: Received payload: "{"Name":"InitialPress","NewPosition":1}"
+          [1686295316.319478][30986:30986] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to bae4056b
+          [1686295316.319509][30986:30986] CHIP:-: The new position when the momentary switch starts to be pressed:1
+          [1686295316.319518][30986:30986] CHIP:ZCL: SwitchServer: OnInitialPress
+
+          ./chip-tool switch read-event initial-press   1 1
+
+          Verify InitialPress event with NewPosition set to 1 on TH(chip-tool) log:
+
+          [1659527630.476706][4774:4779] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
+          [1659527630.476742][4774:4779] CHIP:TOO:   Event number: 4
+          [1659527630.476771][4774:4779] CHIP:TOO:   Priority: Info
+          [1659527630.476799][4774:4779] CHIP:TOO:   Timestamp: 29687000
+          [1659527630.476887][4774:4779] CHIP:TOO:   InitialPress: {
+          [1659527630.476934][4774:4779] CHIP:TOO:     NewPosition: 1
+          [1659527630.476969][4774:4779] CHIP:TOO:    }
+
+          After 0.75 seconds, send this command
+
+          echo '{"Name":"LongPress","NewPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          Verify LongPress event with NewPosition set to 1 on TH(all-cluster-app) log:
+
+          [1686295316.319181][30986:30989] CHIP:-: Received payload: "{"Name":"InitialPress","NewPosition":1}"
+          [1686295316.319478][30986:30986] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to bae4056b
+          [1686295316.319509][30986:30986] CHIP:-: The new position when the momentary switch starts to be pressed:1
+          [1686295316.319518][30986:30986] CHIP:ZCL: SwitchServer: OnInitialPress
+
+          ./chip-tool switch read-event long-press 1 1
+
+          Verify LongPress event with NewPosition set to 1 on TH(chip-tool) log:
+
+          [1659527630.476706][4774:4779] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
+          [1659527630.476742][4774:4779] CHIP:TOO:   Event number: 5
+          [1659527630.476771][4774:4779] CHIP:TOO:   Priority: Info
+          [1659527630.476799][4774:4779] CHIP:TOO:   Timestamp: 29687750
+          [1659527630.476887][4774:4779] CHIP:TOO:   LongPress: {
+          [1659527630.476934][4774:4779] CHIP:TOO:     NewPosition: 1
+          [1659527630.476969][4774:4779] CHIP:TOO:    }
+
+          After 2 seconds, send this command
+
+          echo '{"Name":"LongRelease","PreviousPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          Verify LonglRelease event with PreviousPosition set to 1 on TH(all-cluster-app) log:
+
+          [1686295393.569670][30986:30989] CHIP:-: Received payload: "{"Name":"LongRelease","PreviousPosition":1}"
+          [1686295393.569925][30986:30986] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to bae4056d
+          [1686295393.569959][30986:30986] CHIP:-: The the previous value of the CurrentPosition when the momentary switch has been released after having been pressed for a long time:1
+          [1686295393.569976][30986:30986] CHIP:ZCL: SwitchServer: OnLongRelease
+
+          ./chip-tool  switch read-event long-release 1 1
+
+          Verify LonglRelease event with PreviousPosition set to 1 on TH(chip-tool) log:
+
+          [1659527630.476706][4774:4779] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
+          [1659527630.476742][4774:4779] CHIP:TOO:   Event number: 6
+          [1659527630.476771][4774:4779] CHIP:TOO:   Priority: Info
+          [1659527630.476799][4774:4779] CHIP:TOO:   Timestamp: 296889750
+          [1659527630.476887][4774:4779] CHIP:TOO:   LongRelease: {
+          [1659527630.476934][4774:4779] CHIP:TOO:     PreviousPosition: 1
+          [1659527630.476969][4774:4779] CHIP:TOO:    }
+
+          Repeat above steps Over a 1 minute period of time
+      disabled: true

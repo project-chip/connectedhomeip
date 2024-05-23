@@ -1,0 +1,83 @@
+#
+#   Copyright (c) 2022 Project CHIP Authors
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+
+# The purpose of this file is to define new default values of settings used when building multiprotocol_rpmsg child image for Matter samples.
+
+config LOG
+    default n
+
+config HEAP_MEM_POOL_SIZE
+    default 8192
+
+config MAIN_STACK_SIZE
+    default 2048
+
+config SYSTEM_WORKQUEUE_STACK_SIZE
+    default 2048
+
+config BT
+    default y
+
+config BT_HCI_RAW
+    default y
+
+config BT_MAX_CONN
+    default 1
+
+config BT_PERIPHERAL
+    default y
+
+config BT_CENTRAL
+    default n
+
+config BT_BUF_ACL_RX_SIZE
+    default 502
+
+config BT_BUF_ACL_TX_SIZE
+    default 251
+
+config BT_CTLR_DATA_LENGTH_MAX
+    default 251
+
+config BT_CTLR_ASSERT_HANDLER
+    default y
+
+config BT_HCI_RAW_RESERVE
+    default 1
+
+# Disable 2M PHY due to interoperability issues.
+config BT_CTLR_PHY_2M
+    default n
+
+# Workaround: Unable to allocate command buffer when using K_NO_WAIT since
+# Host number of completed commands does not follow normal flow control.
+config BT_BUF_CMD_TX_COUNT
+    default 10
+
+config ASSERT
+    default y
+
+config DEBUG_INFO
+    default y
+
+config EXCEPTION_STACK_TRACE
+    default y
+
+config NRF_802154_SER_RADIO
+    default y
+
+config NRF_802154_ENCRYPTION
+    default y

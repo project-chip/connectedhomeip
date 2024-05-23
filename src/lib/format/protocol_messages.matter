@@ -1,0 +1,457 @@
+/// Fake cluster for defining structures for secure channel protocol
+///
+/// This follows the `4.10.1. Secure Channel Protocol Messages`
+/// defined in the Matter specification.
+///
+/// This is NOT a real cluster.
+///
+/// Since this is a protocol decoder, the following CUSTOM (non-zap) types
+/// Are used as markers for data:
+///
+/// Protocol decoding paths:
+///    protocol_cluster_id
+///    protocol_attribute_id
+///    protocol_command_id
+///    protocol_event_id
+///
+/// Payloads:
+///    cluster_attribute_payload
+///    cluster_command_payload
+///    cluster_event_payload
+///
+/// Special types:
+///    protocol_binary_data - structures without TLV encoded data
+///
+client cluster SecureChannelProtocol = 0xFFFF0000 {
+
+  struct SessionParameterStruct {
+    optional int32u session_idle_interval = 1;
+    optional int32u session_active_interval = 2;
+    optional int16u session_active_threshold = 3;
+    int16u data_model_revision = 4;
+    int16u interaction_model_revision = 5;
+    int32u specification_version = 6;
+    int16u max_paths_per_invoke = 7;
+  }
+
+
+  struct PBKDFParamRequest {
+    octet_string<32> initiator_random = 1;
+    int16u initiator_session_id = 2;
+    int16u passcode_id = 3;
+    boolean has_pbkdf_parameters = 4;
+    optional SessionParameterStruct initiator_session_params = 5;
+  }
+
+  struct CryptoPBKDFParameterSet {
+    int32u iterations = 1;
+    octet_string<32> salt = 2; // 16..32 in size
+  }
+
+  struct PBKDFParamResponse {
+    octet_string<32> initiator_random = 1;
+    octet_string<32> responder_random = 2;
+    int16u responder_session_id = 3;
+    CryptoPBKDFParameterSet pbkdf_parameters = 4;
+    optional SessionParameterStruct responder_icd_params = 5;
+  }
+
+  struct PasePake1 {
+    octet_string pA = 1;
+  }
+
+  struct PasePake2 {
+    octet_string pB = 1;
+    octet_string cB = 2;
+  }
+
+  struct PasePake3 {
+    octet_string cA = 1;
+  }
+
+  struct CaseSigma1 {
+    octet_string<32> initiator_random = 1;
+    int16u initiator_session_id = 2;
+    octet_string<32> destination_id = 3;
+    octet_string<65> initiator_eph_pub_key = 4;
+    optional SessionParameterStruct initiator_session_params = 5;
+    optional octet_string<16> resumption_id = 6;
+    optional octet_string initiator_resume_mic = 7;
+  }
+
+  struct CaseSigma2 {
+    octet_string<32> responder_random = 1;
+    int16u responder_sessoion_id = 2;
+    octet_string<65> responder_eph_pub_key = 3;
+    octet_string encrypted2 = 4;
+    optional SessionParameterStruct responder_session_params = 5;
+  }
+
+  struct CaseSigma3 {
+    octet_string encrypted = 1;
+  }
+
+  struct CaseSigma2Resume {
+    octet_string<16> resumption_id = 1;
+    octet_string<16> sigma2_resume_mic = 2;
+    int16u responder_sessoion_id = 3;
+    optional SessionParameterStruct responder_session_params = 4;
+  }
+
+  // IDs here are based on Protocol opcodes
+  //
+  // Written here as "attributes" to force code generation
+  // to consider these active structures.
+  readonly attribute protocol_binary_data msg_counter_sync_request = 0x00;
+  readonly attribute protocol_binary_data msg_counter_sync_response = 0x01;
+  readonly attribute protocol_binary_data mrp_ack = 0x10;
+  readonly attribute PBKDFParamRequest pbkdf_param_request = 0x20;
+  readonly attribute PBKDFParamResponse pbkdf_param_response = 0x21;
+  readonly attribute PasePake1 pase_pake1 = 0x22;
+  readonly attribute PasePake2 pase_pake2 = 0x23;
+  readonly attribute PasePake3 pase_pake3 = 0x24;
+  readonly attribute CaseSigma1 case_sigma1 = 0x30;
+  readonly attribute CaseSigma2 case_sigma2 = 0x31;
+  readonly attribute CaseSigma3 case_sigma3 = 0x32;
+  readonly attribute CaseSigma2Resume case_sigma2_resume = 0x33;
+  readonly attribute protocol_binary_data status_report = 0x40;
+  readonly attribute protocol_binary_data icd_checkin = 0x50;
+}
+
+/// Fake cluster for defining structures for IM data encoding.
+///
+/// This follows the `10. Interaction Model Encoding Specification`
+/// defined in the Matter specification.
+///
+/// This is NOT a real cluster.
+///
+client cluster IMProtocol = 0xFFFF0001 {
+  struct AttributePathIB {
+    boolean enable_tag_compression = 0;
+    optional int64u node_id = 1;
+    optional int16u endpoint_id = 2;
+    optional protocol_cluster_id cluster_id = 3;
+    optional protocol_attribute_id attribute_id = 4;
+    optional nullable int16u list_index = 5;
+  }
+
+  struct EventPathIB {
+    optional int64u node_id = 0;
+    optional int16u endpoint_id = 1;
+    optional protocol_cluster_id cluster_id = 2;
+    optional protocol_event_id event_id = 3;
+    boolean is_urgent = 4;
+  }
+
+  struct EventFilterIB {
+    optional int64u node_id = 0;
+    int64u event_min = 1;
+  }
+
+  struct ClusterPathIB {
+    optional int64u node_id = 0;
+    optional int16u endpoint_id = 1;
+    optional protocol_cluster_id cluster_id = 2;
+  }
+
+  struct DataVersionFilterIB {
+    ClusterPathIB path = 0;
+    int32u data_version = 1;
+  }
+
+  struct StatusResponseMessage {
+    int8u status = 0;
+
+    // 10.2.2.2. Context Tag Encoded Action Information
+    int8u interaction_model_revison = 0xFF;
+  }
+
+  struct ReadRequestMessage {
+    optional AttributePathIB attribute_requests[] = 0;
+    optional EventPathIB event_requests[] = 1;
+    optional EventFilterIB event_filters[] = 2;
+    optional boolean fabric_filtered = 3;
+    optional DataVersionFilterIB data_version_filters[] = 4;
+    optional boolean include_attribution_data = 5;
+
+    // 10.2.2.2. Context Tag Encoded Action Information
+    int8u interaction_model_revison = 0xFF;
+  }
+
+  struct SubscribeRequestMessage {
+    boolean keep_subscriptions = 0;
+    int16u min_minterval_floor = 1;
+    int16u max_minterval_ceiling = 2;
+    optional AttributePathIB attribute_requests[] = 3;
+    optional EventPathIB event_requests[] = 4;
+    optional EventFilterIB event_filters[] = 5;
+    // NOTE: 6 is missing here ...
+    boolean fabric_filtered = 7;
+    optional DataVersionFilterIB data_version_filters[] = 8;
+
+    // 10.2.2.2. Context Tag Encoded Action Information
+    int8u interaction_model_revison = 0xFF;
+  }
+
+  struct SubscribeResponseMessage {
+    int32u subscription_id = 0;
+    // NOTE: 1 missing here
+    int16u max_interval = 2;
+
+    // 10.2.2.2. Context Tag Encoded Action Information
+    int8u interaction_model_revison = 0xFF;
+  }
+
+  enum StatusCodeEnum : ENUM8 {
+    kSuccess = 0x0;
+    kFailure = 0x01;
+    kInvalidSubscription = 0x7d;
+    kUnsupportedAccess = 0x7e;
+    kUnsupportedEndpoint = 0x7f;
+    kInvalidAction = 0x80;
+    kUnsupportedCommand = 0x81;
+    kInvalidCommand = 0x85;
+    kUnsupportedAttribute = 0x86;
+    kConstraintError = 0x87;
+    kUnsupportedWrite = 0x88;
+    kResourceExhausted = 0x89;
+    kNotFound = 0x8b;
+    kUnreportableAttribute = 0x8c;
+    kInvalidDataType = 0x8d;
+    kUnsupportedRead = 0x8f;
+    kDataVersionMismatch = 0x92;
+    kTimeout = 0x94;
+    kBusy = 0x9c;
+    kUnsupportedCluster = 0xc3;
+    kNoUpstreamSubscription = 0xc5;
+    kNeedsTimedInteraction = 0xc6;
+    kUnsupportedEvent = 0xc7;
+    kPathsExhausted = 0xc8;
+    kTimedRequestMismatch = 0xc9;
+    kFailsafeRequired = 0xca;
+    kInvalidInState = 0xcb;
+    kNoCommandResponse = 0xcc;
+    kWriteIgnored = 0xF0;
+  }
+
+  struct StatusIB {
+    StatusCodeEnum status = 0;
+    int8u cluster_status = 1;
+  }
+
+  struct AttributeStatus {
+    AttributePathIB path = 0;
+    StatusIB status = 1;
+  }
+
+  struct AttributionData {
+    // NOTE: 0 is missing
+    int8u context_information = 1;
+    int32u source_context = 2;
+
+    // at-most-one-of {
+    optional int64u node_id = 3;
+    optional int16u group_id = 4;
+    // }
+
+    // at-most-one-of {
+    optional int64u epoch_timestamp = 5;
+    optional int64u system_timestamp = 6;
+    // }
+
+    int8u fabric_index = 0xFE;
+  }
+
+  struct AttributeData {
+    optional int32u data_version = 0;
+    AttributePathIB path = 1;
+    cluster_attribute_payload data = 2;
+  }
+
+  struct AttributeReportIB {
+    AttributeStatus attribute_status = 0;
+    AttributeData attribute_data = 1;
+  }
+
+  struct EventStatusIB {
+    EventPathIB path = 0;
+    StatusIB status = 1;
+  }
+
+  struct EventDataIB {
+    EventPathIB path = 0;
+    int64u event_number = 1;
+    int8u priority = 2;
+
+    // oneof {
+    int64u epoch_timestamp = 3;
+    int64u system_timestamp = 4;
+    int64u delta_epoch_timestamp = 5;
+    int64u delta_system_timestamp = 6;
+    //  }
+
+    cluster_event_payload data = 7;
+
+    AttributionData attribution_data = 8;
+  }
+
+  struct EventReportIB {
+    EventStatusIB event_status = 0;
+    EventDataIB event_data = 1;
+  }
+
+  struct ReportDataMessage {
+    optional int32u subscription_id = 0;
+    optional AttributeReportIB attribute_reports[] = 1;
+    optional EventReportIB event_reports[] = 2;
+    optional boolean more_cunked_messages = 3;
+    optional boolean suppress_response = 4;
+
+    // 10.2.2.2. Context Tag Encoded Action Information
+    int8u interaction_model_revison = 0xFF;
+  }
+
+  struct AttributeDataIB {
+    int32u data_version = 0;
+    AttributePathIB path = 1;
+    cluster_attribute_payload data = 2;
+    AttributionData attribution_data = 3;
+  }
+
+  struct WriteRequestMessage {
+    optional boolean suppres_response = 0;
+    boolean timed_request = 1;
+    AttributeDataIB write_requests[] = 2;
+    optional boolean more_chunked_messages = 3;
+
+    // 10.2.2.2. Context Tag Encoded Action Information
+    int8u interaction_model_revison = 0xFF;
+  }
+
+  struct AttributeStatusIB {
+    AttributePathIB path = 0;
+    StatusIB status = 1;
+  }
+
+  struct WriteResponseMessage {
+    AttributeStatusIB write_responses[] = 0;
+
+    // 10.2.2.2. Context Tag Encoded Action Information
+    int8u interaction_model_revison = 0xFF;
+  }
+
+  struct CommandPathIB {
+    optional int16u endpoint_id = 0;
+    optional protocol_cluster_id cluster_id = 1;
+    optional protocol_command_id command_id = 2;
+  }
+
+  struct CommandDataIB {
+    CommandPathIB path = 0;
+    optional cluster_command_payload data = 1;
+    optional int16u command_ref = 2;
+
+    // at-most-one-of {
+    optional SuppliedAttribution supplied_attribution_data = 3;
+    optional int16u supplied_attribution_data_repeat = 4;
+    // }
+  }
+
+  enum SuppliedAttributionContextInformation : enum8 {
+     kDefaultClientAction = 0;
+     kUserInteraction = 1;
+     kClientAutomationRule = 2;
+     kClientSchedule = 3;
+     kClientTimer = 4;
+  }
+
+  struct  SuppliedAttribution {
+     SuppliedAttributeContextInformation context_information = 0;
+     int32u source_context = 1;
+  }
+
+  struct InvokeRequestMessage {
+    boolean suppress_response = 0;
+    boolean timed_request = 1;
+    CommandDataIB invoke_requests[] = 2;
+
+    // 10.2.2.2. Context Tag Encoded Action Information
+    int8u interaction_model_revison = 0xFF;
+  }
+
+  struct CommandStatusIB {
+    CommandPathIB path = 0;
+    StatusIB status = 1;
+  }
+
+  struct InvokeResponseIB {
+    CommandDataIB command = 0;
+    CommandStatusIB status = 1;
+  }
+
+  struct InvokeResponseMessage {
+    boolean suppress_response = 0;
+    InvokeResponseIB invoke_responses[] = 1;
+    optional boolean more_chunked_messages = 2;
+
+    // 10.2.2.2. Context Tag Encoded Action Information
+    int8u interaction_model_revison = 0xFF;
+  }
+
+  struct TimedRequestMessage {
+    int16u timeout = 0;
+
+    // 10.2.2.2. Context Tag Encoded Action Information
+    int8u interaction_model_revison = 0xFF;
+  }
+
+  // IDs here are based on Protocol opcodes, defined
+  // in 10.2.1 in the matter spec.
+  //
+  // Written here as "attributes" to force code generation
+  // to consider these active structures.
+  readonly attribute StatusResponseMessage status_response = 1;
+  readonly attribute ReadRequestMessage read_request = 2;
+  readonly attribute SubscribeRequestMessage subscribe_request = 3;
+  readonly attribute SubscribeResponseMessage subscribe_response = 4;
+  readonly attribute ReportDataMessage report_data = 5;
+  readonly attribute WriteRequestMessage write_request = 6;
+  readonly attribute WriteResponseMessage write_response = 7;
+  readonly attribute InvokeRequestMessage invoke_request = 8;
+  readonly attribute InvokeResponseMessage invoke_response = 9;
+  readonly attribute TimedRequestMessage timed_request = 10;
+}
+
+client cluster BdxProtocol = 0xFFFF0002 {
+  // IDs here are based on Protocol opcodes, defined
+  // in 11.21.3.1  in the matter spec.
+  //
+  // Written here as "attributes" to force code generation
+  // to consider these active structures.
+  readonly attribute octet_string send_init = 1;
+  readonly attribute octet_string send_accept = 2;
+
+  readonly attribute octet_string receive_init = 4;
+  readonly attribute octet_string receive_accept = 5;
+
+
+  readonly attribute octet_string block_query = 0x10;
+  readonly attribute octet_string block = 0x11;
+  readonly attribute octet_string block_eof = 0x12;
+  readonly attribute octet_string block_ack = 0x13;
+  readonly attribute octet_string block_ack_eof = 0x14;
+  readonly attribute octet_string block_query_with_skip = 0x15;
+}
+
+client cluster UserDirectedCommissioningProtocol = 0xFFFF0003 {
+  struct IdentificationDeclarationStruct {
+    octet_string<8> instance_name = 1;
+  }
+
+  // IDs here are based on Protocol opcodes, defined
+  // in 5.3.2 in the matter spec.
+  //
+  // Written here as "attributes" to force code generation
+  // to consider these active structures.
+  readonly attribute IdentificationDeclarationStruct identification_declaration = 0;
+}

@@ -1,0 +1,73 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Audio Output Cluster Tests
+
+config:
+    nodeId: 0x12344321
+    cluster: "Audio Output"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Read attribute Audio Output list"
+      command: "readAttribute"
+      attribute: "OutputList"
+      response:
+          value:
+              [
+                  { Index: 1, OutputType: 0, Name: "HDMI" },
+                  { Index: 2, OutputType: 0, Name: "HDMI" },
+                  { Index: 3, OutputType: 0, Name: "HDMI" },
+              ]
+
+    - label: "Read attribute current audio output"
+      command: "readAttribute"
+      attribute: "CurrentOutput"
+      response:
+          value: 1
+
+    - label: "Select Output Command"
+      command: "SelectOutput"
+      arguments:
+          values:
+              - name: "Index"
+                value: 1
+
+    - label: "Rename Output Command"
+      command: "RenameOutput"
+      arguments:
+          values:
+              - name: "Index"
+                value: 1
+              - name: "Name"
+                value: "HDMI Test"
+
+    - label: "Read attribute Audio Output list"
+      command: "readAttribute"
+      attribute: "OutputList"
+      response:
+          value:
+              [
+                  { Index: 1, OutputType: 0, Name: "HDMI Test" },
+                  { Index: 2, OutputType: 0, Name: "HDMI" },
+                  { Index: 3, OutputType: 0, Name: "HDMI" },
+              ]

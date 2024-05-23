@@ -1,0 +1,60 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Target Navigator Cluster Tests
+
+config:
+    nodeId: 0x12344321
+    cluster: "Target Navigator"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Read attribute Target Navigator list"
+      command: "readAttribute"
+      attribute: "TargetList"
+      response:
+          value:
+              [
+                  { Identifier: 1, Name: "exampleName" },
+                  { Identifier: 2, Name: "exampleName" },
+              ]
+
+    - label: "Read attribute current navigator target"
+      command: "readAttribute"
+      attribute: "CurrentTarget"
+      response:
+          value: 0
+
+    - label: "Navigate Target Request Command"
+      command: "NavigateTarget"
+      arguments:
+          values:
+              - name: "Target"
+                value: 1
+              - name: "Data"
+                value: "1"
+      response:
+          values:
+              - name: "Data"
+                value: "data response"
+              - name: "Status"
+                value: 0

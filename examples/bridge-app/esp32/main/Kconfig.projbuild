@@ -1,0 +1,27 @@
+menu "Demo"
+
+    choice
+      prompt "Rendezvous Mode"
+      default RENDEZVOUS_MODE_WIFI
+      help
+          Specifies the Rendezvous mode of the peripheral.
+
+      config RENDEZVOUS_MODE_WIFI
+          bool "Wi-Fi"
+      config RENDEZVOUS_MODE_BLE
+          bool "BLE"
+      config RENDEZVOUS_MODE_THREAD
+          bool "Thread"
+      config RENDEZVOUS_MODE_ETHERNET
+          bool "Ethernet"
+    endchoice
+
+    config RENDEZVOUS_MODE
+       int
+       range 0 8
+       default 1 if RENDEZVOUS_MODE_WIFI
+       default 2 if RENDEZVOUS_MODE_BLE
+       default 4 if RENDEZVOUS_MODE_THREAD
+       default 8 if RENDEZVOUS_MODE_ETHERNET
+
+endmenu

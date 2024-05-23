@@ -1,0 +1,540 @@
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Test Multi Admin
+
+config:
+    nodeId: 0x12344321
+    endpoint: 1
+    discriminator:
+        type: int16u
+        defaultValue: 3840
+    payload:
+        type: char_string
+        defaultValue: "MT:-24J0AFN00KA0648G00" # This value needs to be generated automatically
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved for alpha"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Open Commissioning Window from alpha"
+      endpoint: 0
+      cluster: "Administrator Commissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+
+    - label: "Commission from beta"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: 0x12345
+              - name: "payload"
+                value: payload
+
+    - label: "Wait for the commissioned device to be retrieved for beta"
+      identity: "beta"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: 0x12345
+
+    - label: "Write TestFabricScoped list from alpha"
+      identity: "alpha"
+      cluster: "Unit Testing"
+      command: "writeAttribute"
+      attribute: "list_fabric_scoped"
+      arguments:
+          value: [
+                  {
+                      #
+                      # Write in a bogus value for the fabric index. This should never actually make it across the wire,
+                      # nor be meaningfully ingested by a correct receiver.
+                      #
+                      FabricIndex: 100,
+                      fabricSensitiveInt8u: 33,
+                      optionalFabricSensitiveInt8u: 34,
+                      nullableFabricSensitiveInt8u: null,
+                      nullableOptionalFabricSensitiveInt8u: 35,
+                      fabricSensitiveCharString: "alpha1",
+                      fabricSensitiveStruct:
+                          {
+                              a: 0,
+                              b: true,
+                              c: 2,
+                              d: "",
+                              e: "",
+                              f: 1,
+                              g: 0,
+                              h: 0,
+                          },
+                      fabricSensitiveInt8uList: [1, 2, 3, 4],
+                  },
+                  {
+                      FabricIndex: 100,
+                      fabricSensitiveInt8u: 43,
+                      optionalFabricSensitiveInt8u: 44,
+                      nullableFabricSensitiveInt8u: null,
+                      nullableOptionalFabricSensitiveInt8u: 45,
+                      fabricSensitiveCharString: "alpha2",
+                      fabricSensitiveStruct:
+                          {
+                              a: 0,
+                              b: true,
+                              c: 3,
+                              d: "",
+                              e: "",
+                              f: 2,
+                              g: 0,
+                              h: 0,
+                          },
+                      fabricSensitiveInt8uList: [2, 3, 4, 5],
+                  },
+              ]
+
+    - label: "Write TestFabricScoped list from beta"
+      identity: "beta"
+      cluster: "Unit Testing"
+      command: "writeAttribute"
+      attribute: "list_fabric_scoped"
+      arguments:
+          value:
+              [
+                  {
+                      FabricIndex: 100,
+                      fabricSensitiveInt8u: 133,
+                      optionalFabricSensitiveInt8u: 134,
+                      nullableFabricSensitiveInt8u: null,
+                      nullableOptionalFabricSensitiveInt8u: 135,
+                      fabricSensitiveCharString: "beta2",
+                      fabricSensitiveStruct:
+                          {
+                              a: 0,
+                              b: true,
+                              c: 2,
+                              d: "",
+                              e: "",
+                              f: 11,
+                              g: 0,
+                              h: 0,
+                          },
+                      fabricSensitiveInt8uList: [11, 12, 13, 14],
+                  },
+                  {
+                      FabricIndex: 100,
+                      fabricSensitiveInt8u: 143,
+                      optionalFabricSensitiveInt8u: 144,
+                      nullableFabricSensitiveInt8u: null,
+                      nullableOptionalFabricSensitiveInt8u: 145,
+                      fabricSensitiveCharString: "beta3",
+                      fabricSensitiveStruct:
+                          {
+                              a: 0,
+                              b: true,
+                              c: 1,
+                              d: "",
+                              e: "",
+                              f: 12,
+                              g: 0,
+                              h: 0,
+                          },
+                      fabricSensitiveInt8uList: [12, 13, 14, 15],
+                  },
+              ]
+
+    - label: "Read back TestFabricScoped list from alpha"
+      identity: "alpha"
+      cluster: "Unit Testing"
+      command: "readAttribute"
+      attribute: "list_fabric_scoped"
+      response:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      fabricSensitiveInt8u: 33,
+                      optionalFabricSensitiveInt8u: 34,
+                      nullableFabricSensitiveInt8u: null,
+                      nullableOptionalFabricSensitiveInt8u: 35,
+                      fabricSensitiveCharString: "alpha1",
+                      fabricSensitiveStruct:
+                          {
+                              a: 0,
+                              b: true,
+                              c: 2,
+                              d: "",
+                              e: "",
+                              f: 1,
+                              g: 0,
+                              h: 0,
+                          },
+                      fabricSensitiveInt8uList: [1, 2, 3, 4],
+                  },
+                  {
+                      FabricIndex: 1,
+                      fabricSensitiveInt8u: 43,
+                      optionalFabricSensitiveInt8u: 44,
+                      nullableFabricSensitiveInt8u: null,
+                      nullableOptionalFabricSensitiveInt8u: 45,
+                      fabricSensitiveCharString: "alpha2",
+                      fabricSensitiveStruct:
+                          {
+                              a: 0,
+                              b: true,
+                              c: 3,
+                              d: "",
+                              e: "",
+                              f: 2,
+                              g: 0,
+                              h: 0,
+                          },
+                      fabricSensitiveInt8uList: [2, 3, 4, 5],
+                  },
+              ]
+
+    - label: "Read back TestFabricScoped list from beta"
+      identity: "beta"
+      cluster: "Unit Testing"
+      command: "readAttribute"
+      attribute: "list_fabric_scoped"
+      response:
+          value:
+              [
+                  {
+                      FabricIndex: 2,
+                      fabricSensitiveInt8u: 133,
+                      optionalFabricSensitiveInt8u: 134,
+                      nullableFabricSensitiveInt8u: null,
+                      nullableOptionalFabricSensitiveInt8u: 135,
+                      fabricSensitiveCharString: "beta2",
+                      fabricSensitiveStruct:
+                          {
+                              a: 0,
+                              b: true,
+                              c: 2,
+                              d: "",
+                              e: "",
+                              f: 11,
+                              g: 0,
+                              h: 0,
+                          },
+                      fabricSensitiveInt8uList: [11, 12, 13, 14],
+                  },
+                  {
+                      FabricIndex: 2,
+                      fabricSensitiveInt8u: 143,
+                      optionalFabricSensitiveInt8u: 144,
+                      nullableFabricSensitiveInt8u: null,
+                      nullableOptionalFabricSensitiveInt8u: 145,
+                      fabricSensitiveCharString: "beta3",
+                      fabricSensitiveStruct:
+                          {
+                              a: 0,
+                              b: true,
+                              c: 1,
+                              d: "",
+                              e: "",
+                              f: 12,
+                              g: 0,
+                              h: 0,
+                          },
+                      fabricSensitiveInt8uList: [12, 13, 14, 15],
+                  },
+              ]
+
+    - label: "Read back TestFabricScoped list from alpha (fabricFiltered false)"
+      identity: "alpha"
+      cluster: "Unit Testing"
+      command: "readAttribute"
+      fabricFiltered: false
+      attribute: "list_fabric_scoped"
+      response:
+          #
+          # This unfortunately makes a couple of assumptions:
+          #   1. That the total order of the entries in the returned list matches the order in which they were
+          #      written in. This does not necessarily have to be true - fabric index 2's entries could have come
+          #      before fabric index 1's.
+          #
+          #   2. That we know the specific fabric index generated by the server without querying the current fabric
+          #      index from the OperationalCredentialsCluster and using that instead.
+          #
+          #      TODO: This can be fixed using the `saveAs` function.
+          #
+          value: [
+                  {
+                      FabricIndex: 1,
+                      fabricSensitiveInt8u: 33,
+                      optionalFabricSensitiveInt8u: 34,
+                      nullableFabricSensitiveInt8u: null,
+                      nullableOptionalFabricSensitiveInt8u: 35,
+                      fabricSensitiveCharString: "alpha1",
+                      fabricSensitiveStruct:
+                          {
+                              a: 0,
+                              b: true,
+                              c: 2,
+                              d: "",
+                              e: "",
+                              f: 1,
+                              g: 0,
+                              h: 0,
+                          },
+                      fabricSensitiveInt8uList: [1, 2, 3, 4],
+                  },
+                  {
+                      FabricIndex: 1,
+                      fabricSensitiveInt8u: 43,
+                      optionalFabricSensitiveInt8u: 44,
+                      nullableFabricSensitiveInt8u: null,
+                      nullableOptionalFabricSensitiveInt8u: 45,
+                      fabricSensitiveCharString: "alpha2",
+                      fabricSensitiveStruct:
+                          {
+                              a: 0,
+                              b: true,
+                              c: 3,
+                              d: "",
+                              e: "",
+                              f: 2,
+                              g: 0,
+                              h: 0,
+                          },
+                      fabricSensitiveInt8uList: [2, 3, 4, 5],
+                  },
+                  {
+                      FabricIndex: 2,
+                      # These should actually be missing, not null, but right
+                      # now our harness treats those the same, and we have no
+                      # way to indicate "missing" in the YAML.
+                      # https://github.com/project-chip/connectedhomeip/issues/29110
+                      fabricSensitiveInt8u: null,
+                      optionalFabricSensitiveInt8u: null,
+                      nullableFabricSensitiveInt8u: null,
+                      fabricSensitiveCharString: null,
+                      fabricSensitiveStruct: null,
+                      fabricSensitiveInt8uList: null,
+                  },
+                  {
+                      FabricIndex: 2,
+                      # These should actually be missing, not null, but right
+                      # now our harness treats those the same, and we have no
+                      # way to indicate "missing" in the YAML.
+                      # https://github.com/project-chip/connectedhomeip/issues/29110
+                      fabricSensitiveInt8u: null,
+                      optionalFabricSensitiveInt8u: null,
+                      nullableFabricSensitiveInt8u: null,
+                      fabricSensitiveCharString: null,
+                      fabricSensitiveStruct: null,
+                      fabricSensitiveInt8uList: null,
+                  },
+              ]
+
+    - label: "Read back TestFabricScoped list from beta (fabricFiltered false)"
+      identity: "beta"
+      cluster: "Unit Testing"
+      command: "readAttribute"
+      fabricFiltered: false
+      attribute: "list_fabric_scoped"
+      response:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      # These should actually be missing, not null, but right
+                      # now our harness treats those the same, and we have no
+                      # way to indicate "missing" in the YAML.
+                      # https://github.com/project-chip/connectedhomeip/issues/29110
+                      fabricSensitiveInt8u: null,
+                      optionalFabricSensitiveInt8u: null,
+                      nullableFabricSensitiveInt8u: null,
+                      fabricSensitiveCharString: null,
+                      fabricSensitiveStruct: null,
+                      fabricSensitiveInt8uList: null,
+                  },
+                  {
+                      FabricIndex: 1,
+                      # These should actually be missing, not null, but right
+                      # now our harness treats those the same, and we have no
+                      # way to indicate "missing" in the YAML.
+                      # https://github.com/project-chip/connectedhomeip/issues/29110
+                      fabricSensitiveInt8u: null,
+                      optionalFabricSensitiveInt8u: null,
+                      nullableFabricSensitiveInt8u: null,
+                      fabricSensitiveCharString: null,
+                      fabricSensitiveStruct: null,
+                      fabricSensitiveInt8uList: null,
+                  },
+                  {
+                      FabricIndex: 2,
+                      fabricSensitiveInt8u: 133,
+                      optionalFabricSensitiveInt8u: 134,
+                      nullableFabricSensitiveInt8u: null,
+                      nullableOptionalFabricSensitiveInt8u: 135,
+                      fabricSensitiveCharString: "beta2",
+                      fabricSensitiveStruct:
+                          {
+                              a: 0,
+                              b: true,
+                              c: 2,
+                              d: "",
+                              e: "",
+                              f: 11,
+                              g: 0,
+                              h: 0,
+                          },
+                      fabricSensitiveInt8uList: [11, 12, 13, 14],
+                  },
+                  {
+                      FabricIndex: 2,
+                      fabricSensitiveInt8u: 143,
+                      optionalFabricSensitiveInt8u: 144,
+                      nullableFabricSensitiveInt8u: null,
+                      nullableOptionalFabricSensitiveInt8u: 145,
+                      fabricSensitiveCharString: "beta3",
+                      fabricSensitiveStruct:
+                          {
+                              a: 0,
+                              b: true,
+                              c: 1,
+                              d: "",
+                              e: "",
+                              f: 12,
+                              g: 0,
+                              h: 0,
+                          },
+                      fabricSensitiveInt8uList: [12, 13, 14, 15],
+                  },
+              ]
+
+    - label: "Write smaller TestFabricScoped list from alpha (again)"
+      identity: "alpha"
+      cluster: "Unit Testing"
+      command: "writeAttribute"
+      attribute: "list_fabric_scoped"
+      arguments:
+          value:
+              [
+                  {
+                      FabricIndex: 100,
+                      fabricSensitiveInt8u: 53,
+                      optionalFabricSensitiveInt8u: 54,
+                      nullableFabricSensitiveInt8u: null,
+                      nullableOptionalFabricSensitiveInt8u: 55,
+                      fabricSensitiveCharString: "alpha3",
+                      fabricSensitiveStruct:
+                          {
+                              a: 0,
+                              b: true,
+                              c: 2,
+                              d: "",
+                              e: "",
+                              f: 51,
+                              g: 0,
+                              h: 0,
+                          },
+                      fabricSensitiveInt8uList: [51, 52, 53, 54],
+                  },
+              ]
+
+    - label: "Read back unchanged TestFabricScoped list from beta (again)"
+      identity: "beta"
+      cluster: "Unit Testing"
+      command: "readAttribute"
+      attribute: "list_fabric_scoped"
+      response:
+          value:
+              [
+                  {
+                      FabricIndex: 2,
+                      fabricSensitiveInt8u: 133,
+                      optionalFabricSensitiveInt8u: 134,
+                      nullableFabricSensitiveInt8u: null,
+                      nullableOptionalFabricSensitiveInt8u: 135,
+                      fabricSensitiveCharString: "beta2",
+                      fabricSensitiveStruct:
+                          {
+                              a: 0,
+                              b: true,
+                              c: 2,
+                              d: "",
+                              e: "",
+                              f: 11,
+                              g: 0,
+                              h: 0,
+                          },
+                      fabricSensitiveInt8uList: [11, 12, 13, 14],
+                  },
+                  {
+                      FabricIndex: 2,
+                      fabricSensitiveInt8u: 143,
+                      optionalFabricSensitiveInt8u: 144,
+                      nullableFabricSensitiveInt8u: null,
+                      nullableOptionalFabricSensitiveInt8u: 145,
+                      fabricSensitiveCharString: "beta3",
+                      fabricSensitiveStruct:
+                          {
+                              a: 0,
+                              b: true,
+                              c: 1,
+                              d: "",
+                              e: "",
+                              f: 12,
+                              g: 0,
+                              h: 0,
+                          },
+                      fabricSensitiveInt8uList: [12, 13, 14, 15],
+                  },
+              ]
+
+    - label: "Read back TestFabricScoped list from alpha (again)"
+      identity: "alpha"
+      cluster: "Unit Testing"
+      command: "readAttribute"
+      attribute: "list_fabric_scoped"
+      response:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      fabricSensitiveInt8u: 53,
+                      optionalFabricSensitiveInt8u: 54,
+                      nullableFabricSensitiveInt8u: null,
+                      nullableOptionalFabricSensitiveInt8u: 55,
+                      fabricSensitiveCharString: "alpha3",
+                      fabricSensitiveStruct:
+                          {
+                              a: 0,
+                              b: true,
+                              c: 2,
+                              d: "",
+                              e: "",
+                              f: 51,
+                              g: 0,
+                              h: 0,
+                          },
+                      fabricSensitiveInt8uList: [51, 52, 53, 54],
+                  },
+              ]

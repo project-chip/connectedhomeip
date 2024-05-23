@@ -1,0 +1,195 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    Window Covering [TC-WNCV-3.3] StopMotion command & OperationalStatus
+    attribute Verification [DUT as Server]
+
+PICS:
+    - WNCV.S
+
+# TC-WNCV tests featuremap conditional dependencies -> use PICS
+
+config:
+    nodeId: 0x12344321
+    cluster: "Window Covering"
+    endpoint: 1
+
+tests:
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    ################ Position Init Phase #############
+    ### Step 1x -> Initialize the Covering position before any testing
+    ### MANDATORY Init Commands
+    - label:
+          "Step 1a: TH sends DownOrClose command to preposition the DUT in the
+          opposite direction"
+      command: "DownOrClose"
+      PICS: WNCV.S.C01.Rsp
+
+    - label: "Step 1b: TH waits for 6-8 seconds movement(s) on the DUT"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 6000
+
+    - label:
+          "Step 1c: TH sends UpOrOpen command to preposition the DUT in the
+          opposite direction"
+      command: "UpOrOpen"
+      PICS: WNCV.S.C00.Rsp
+
+    - label: "Step 1d: TH waits for 1-5 seconds revert motion(s) on the DUT"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 2000
+
+    - label: "Step 1e: TH reads OperationalStatus attribute from DUT"
+      command: "readAttribute"
+      attribute: "OperationalStatus"
+      PICS: WNCV.S.A000a
+      response:
+          constraints:
+              notValue: 0
+
+    - label: "Step 1f: TH waits for 2 seconds"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 2000
+
+    ######## StopMotion Command #######
+    ### Step 2x -> Check StopMotion fast effects
+    ### Before subscribe to reports
+    - label: "Step 2: Subscribe to DUT reports on OperationalStatus attribute"
+      command: "subscribeAttribute"
+      attribute: "OperationalStatus"
+      minInterval: 4
+      maxInterval: 5
+      response:
+          constraints:
+              type: bitmap8
+
+    ### MANDATORY Command
+    - label: "Step 2a: TH sends a StopMotion command to DUT"
+      command: "StopMotion"
+      PICS: WNCV.S.C02.Rsp
+
+    ### DUT Slow down and stop
+    - label: "Step 2b: TH waits for 1-5 seconds end of motion(s) on the DUT"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 3000
+
+    ### Must Be ZERO
+    # The value of bit 0..1 must be 00b & if (LF) value of bit 2..3 must be 00b & if (TL) value of bit 4..5 must be 00b
+    - label: "Step 2c: TH reads OperationalStatus attribute from DUT"
+      command: "readAttribute"
+      attribute: "OperationalStatus"
+      PICS: WNCV.S.A000a
+      response:
+          value: 0
+
+    ### DUT updates its attributes
+    - label: "Step 2d: TH waits for 100ms - 3s attributes update on the device"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 2000
+
+    ### MANDATORY reads
+    - label: "Step 2e: TH reads OperationalStatus attribute from DUT"
+      command: "readAttribute"
+      attribute: "OperationalStatus"
+      PICS: WNCV.S.A000a
+      response:
+          value: 0
+
+    ######## StopMotion w/ Lift #######
+    ### Step 3x -> Verify StopMotion longer period effects on Lift
+    ### Mandatory/Optionality Depends on (PA & LF) for all 4x Steps
+
+    ### Read Current Position -> Store this value for step 4c
+    - label:
+          "Step 3a: If (PA & LF) TH reads CurrentPositionLiftPercent100ths
+          attribute from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionLiftPercent100ths"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
+      response:
+          saveAs: attrCurrentPositionLift
+          constraints:
+              minValue: 0
+              maxValue: 10000
+
+    ### Read Target Position -> Compare this value w/ Current
+    ### Shall be tested as equals CurrentPositionLiftPercent100ths
+    - label:
+          "Step 3b: If (PA & LF) TH reads TargetPositionLiftPercent100ths
+          attribute 3c: it Must be equal with CurrentPositionLiftPercent100ths
+          from DUT"
+      command: "readAttribute"
+      attribute: "TargetPositionLiftPercent100ths"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000b && WNCV.S.A000e
+      response:
+          value: attrCurrentPositionLift
+
+    ######## StopMotion w/ Tilt #######
+    ### Step 4x -> Verify StopMotion longer period effects on Tilt
+    ### Mandatory/Optionality Depends on (PA & TL) for all 4x Steps
+
+    ### Read Current Position -> Store this value for step 4c
+    - label:
+          "Step 4a: If (PA & TL) TH reads CurrentPositionTiltPercent100ths
+          attribute from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionTiltPercent100ths"
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
+      response:
+          saveAs: attrCurrentPositionTilt
+          constraints:
+              minValue: 0
+              maxValue: 10000
+
+    ### Read Target Position -> Compare this value w/ Current
+    ### Shall be tested as equals CurrentPositionTiltPercent100ths
+    - label:
+          "Step 4b: If (PA & TL) TH reads TargetPositionTiltPercent100ths
+          attribute 4c: it Must be equal with CurrentPositionTiltPercent100ths
+          from DUT"
+      command: "readAttribute"
+      attribute: "TargetPositionTiltPercent100ths"
+      PICS:
+          WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000c && WNCV.S.A000f &&
+          PICS_SKIP_SAMPLE_APP
+      response:
+          value: attrCurrentPositionTilt

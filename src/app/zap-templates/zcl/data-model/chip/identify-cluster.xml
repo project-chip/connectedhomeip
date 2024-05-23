@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+
+  <enum name="IdentifyTypeEnum" type="enum8">
+    <cluster code="0x0003"/>
+    <item name="None" value="0x00"/>
+    <item name="LightOutput" value="0x01"/>
+    <item name="VisibleIndicator" value="0x02"/>
+    <item name="AudibleBeep" value="0x03"/>
+    <item name="Display" value="0x04"/>
+    <item name="Actuator" value="0x05"/>
+  </enum>
+
+  <enum name="EffectIdentifierEnum" type="enum8">
+    <cluster code="0x0003"/>
+    <item name="Blink" value="0x00"/>
+    <item name="Breathe" value="0x01"/>
+    <item name="Okay" value="0x02"/>
+    <item name="ChannelChange" value="0x0B"/>
+    <item name="FinishEffect" value="0xFE"/>
+    <item name="StopEffect" value="0xFF"/>
+  </enum>
+
+  <enum name="EffectVariantEnum" type="enum8">
+    <cluster code="0x0003"/>
+    <item name="Default" value="0x00"/>
+  </enum>
+
+  <cluster>
+    <domain>General</domain>
+    <name>Identify</name>
+    <code>0x0003</code>
+    <define>IDENTIFY_CLUSTER</define>
+    <description>Attributes and commands for putting a device into Identification mode (e.g. flashing a light).</description>
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+    <globalAttribute side="either" code="0xFFFD" value="4"/>
+
+    <attribute side="server" code="0x0000" define="IDENTIFY_TIME" type="int16u" writable="true"  default="0x0" optional="false">IdentifyTime</attribute>
+    <attribute side="server" code="0x0001" define="IDENTIFY_TYPE" type="IdentifyTypeEnum" writable="false" default="0x00" optional="false">IdentifyType</attribute>
+
+    <command source="client" code="0x00" name="Identify" optional="false">
+      <description>
+        Command description for Identify
+      </description>
+      <arg name="IdentifyTime" type="int16u"/>
+      <access op="invoke" privilege="manage"/>
+    </command>
+    <command source="client" code="0x40" name="TriggerEffect" optional="true">
+      <description>
+        Command description for TriggerEffect
+      </description>
+      <arg name="EffectIdentifier" type="EffectIdentifierEnum"/>
+      <arg name="EffectVariant" type="EffectVariantEnum"/>
+      <access op="invoke" privilege="manage"/>
+    </command>
+  </cluster>
+</configurator>

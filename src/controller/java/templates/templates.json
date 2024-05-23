@@ -1,0 +1,48 @@
+{
+    "name": "CHIP Android templates",
+    "version": "chip-v1",
+    "helpers": [
+        "common/ChipTypesHelper.js",
+        "common/ListHelper.js",
+        "common/StringHelper.js",
+        "partials/helper.js",
+        "templates/app/helper.js",
+        "templates/chip/helper.js",
+        "controller/java/templates/helper.js"
+    ],
+    "override": "../../../app/zap-templates/common/override.js",
+    "partials": [
+        {
+            "name": "header",
+            "path": "../../../app/zap-templates/partials/header.zapt"
+        },
+        {
+            "name": "clusters_header",
+            "path": "../../../app/zap-templates/partials/clusters_header.zapt"
+        },
+        {
+            "name": "cluster_header",
+            "path": "../../../app/zap-templates/partials/cluster_header.zapt"
+        },
+        {
+            "name": "encode_value",
+            "path": "partials/encode_value.zapt"
+        },
+        {
+            "name": "decode_value",
+            "path": "partials/decode_value.zapt"
+        }
+    ],
+    "templates": [
+        {
+            "path": "CHIPAttributeTLVValueDecoder-src.zapt",
+            "name": "CHIP cluster attribute decoder for Java (native code)",
+            "output": "src/controller/java/zap-generated/CHIPAttributeTLVValueDecoder.cpp"
+        },
+        {
+            "path": "CHIPEventTLVValueDecoder-src.zapt",
+            "name": "CHIP cluster event decoder for Java (native code)",
+            "output": "src/controller/java/zap-generated/CHIPEventTLVValueDecoder.cpp"
+        }
+    ]
+}

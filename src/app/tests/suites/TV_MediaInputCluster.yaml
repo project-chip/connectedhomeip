@@ -1,0 +1,97 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Media Input Cluster Tests
+
+config:
+    nodeId: 0x12344321
+    cluster: "Media Input"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Read attribute media input list"
+      command: "readAttribute"
+      attribute: "InputList"
+      response:
+          value:
+              [
+                  {
+                      Index: 1,
+                      InputType: 4,
+                      Name: "HDMI",
+                      Description: "High-Definition Multimedia Interface",
+                  },
+                  {
+                      Index: 2,
+                      InputType: 4,
+                      Name: "HDMI",
+                      Description: "High-Definition Multimedia Interface",
+                  },
+              ]
+
+    - label: "Read current media input"
+      command: "readAttribute"
+      attribute: "CurrentInput"
+      response:
+          value: 1
+
+    - label: "Select Input Command"
+      command: "SelectInput"
+      arguments:
+          values:
+              - name: "Index"
+                value: 1
+
+    - label: "Hide Input Status Command"
+      command: "HideInputStatus"
+
+    - label: "Show Input Status Command"
+      command: "ShowInputStatus"
+
+    - label: "Rename Input Command"
+      command: "RenameInput"
+      arguments:
+          values:
+              - name: "Index"
+                value: 1
+              - name: "Name"
+                value: "HDMI Test"
+
+    - label: "Read attribute media input list"
+      command: "readAttribute"
+      attribute: "InputList"
+      response:
+          value:
+              [
+                  {
+                      Index: 1,
+                      InputType: 4,
+                      Name: "HDMI Test",
+                      Description: "High-Definition Multimedia Interface",
+                  },
+                  {
+                      Index: 2,
+                      InputType: 4,
+                      Name: "HDMI",
+                      Description: "High-Definition Multimedia Interface",
+                  },
+              ]

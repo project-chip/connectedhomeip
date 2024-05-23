@@ -1,0 +1,41 @@
+{
+    "name": "CHIP Python templates",
+    "version": "chip-v1",
+    "helpers": [
+        "partials/helper.js",
+        "common/StringHelper.js",
+        "templates/app/helper.js",
+        "templates/chip/helper.js",
+        "controller/python/templates/helper.js"
+    ],
+    "resources": {
+        "config-data": "../../../../src/app/common/templates/config-data.yaml"
+    },
+    "override": "../../../../src/app/zap-templates/common/override.js",
+    "partials": [
+        {
+            "name": "header",
+            "path": "../../../../src/app/zap-templates/partials/header.zapt"
+        },
+        {
+            "name": "clusters_header",
+            "path": "../../../../src/app/zap-templates/partials/clusters_header.zapt"
+        },
+        {
+            "name": "cluster_header",
+            "path": "../../../../src/app/zap-templates/partials/cluster_header.zapt"
+        }
+    ],
+    "templates": [
+        {
+            "path": "python-CHIPClusters-py.zapt",
+            "name": "CHIP ZCL API for Python",
+            "output": "src/controller/python/chip/clusters/CHIPClusters.py"
+        },
+        {
+            "path": "python-cluster-Objects-py.zapt",
+            "name": "CHIP ClusterObjects for Python",
+            "output": "src/controller/python/chip/clusters/Objects.py"
+        }
+    ]
+}

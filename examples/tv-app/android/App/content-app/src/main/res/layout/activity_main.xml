@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:orientation="vertical"
+        android:padding="10sp">
+
+        <TextView
+            android:id="@+id/helloTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hello World!"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            app:layout_constraintBottom_toTopOf="@+id/commandTextView"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/commandTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/helloTextView"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:text="No Command!!"
+            app:layout_constraintBottom_toTopOf="@+id/updateAttributeButton"
+            app:layout_constraintTop_toBottomOf="@+id/helloTextView" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="10sp">
+
+            <Spinner
+                android:layout_width="20mm"
+                android:layout_height="wrap_content"
+                android:id="@+id/spinnerAttribute"
+                android:background="@android:drawable/btn_dropdown"
+                android:spinnerMode="dropdown" />
+
+
+            <Button
+                android:id="@+id/updateAttributeButton"
+                android:layout_width="20mm"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="388dp"
+                android:layout_toEndOf="@id/helloTextView"
+                android:text="Update Attribute" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="10sp">
+
+            <EditText
+                android:inputType="number"
+                android:id="@+id/setupPINText"
+                android:layout_width="20mm"
+                android:layout_height="wrap_content"
+                android:text="20202021"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+
+            <Button
+                android:id="@+id/setupPINButton"
+                android:layout_width="20mm"
+                android:layout_height="wrap_content"
+                android:text="Update PIN" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</FrameLayout>

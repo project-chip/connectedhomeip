@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+  <cluster>
+    <domain>Media</domain>
+    <name>Application Basic</name>
+    <code>0x050d</code>
+    <define>APPLICATION_BASIC_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <description>This cluster provides information about an application running on a TV or media player device which is represented as an endpoint.</description>
+    <attribute side="server" code="0x0000" define="APPLICATION_VENDOR_NAME"         type="char_string"                default=""     length="32"               writable="false" optional="true">VendorName</attribute>
+    <attribute side="server" code="0x0001" define="APPLICATION_VENDOR_ID"           type="vendor_id"                  default="0x0"  min="0x0000" max="0xFFFF" writable="false" optional="true">VendorID</attribute>
+    <attribute side="server" code="0x0002" define="APPLICATION_NAME"                type="long_char_string"           length="256"               writable="false" optional="false">ApplicationName</attribute>
+    <attribute side="server" code="0x0003" define="APPLICATION_PRODUCT_ID"          type="int16u"                     default="0x0"  min="0x0000" max="0xFFFF" writable="false" optional="true">ProductID</attribute>
+    <attribute side="server" code="0x0004" define="APPLICATION_APP"                 type="ApplicationStruct"                                                   writable="false" optional="false">Application</attribute>
+    <attribute side="server" code="0x0005" define="APPLICATION_STATUS"              type="ApplicationStatusEnum"      default="0x01" min="0x00"   max="0xFF"   writable="false" optional="false">Status</attribute>
+    <attribute side="server" code="0x0006" define="APPLICATION_VERSION"             type="char_string"                               length="32"               writable="false" optional="false">ApplicationVersion</attribute>
+    <attribute side="server" code="0x0007" define="APPLICATION_ALLOWED_VENDOR_LIST" type="array" entryType="vendor_id"               length="32"               writable="false" optional="false">
+        <description>AllowedVendorList</description>
+        <access op="read" role="administer"/>
+    </attribute>
+
+  </cluster>
+
+  <!-- ZAP does not support two identically-named structs in different clusters yet, so we just reuse the struct definition in Application Launcher
+  <struct name="ApplicationStruct">
+    <cluster code="0x050d"/>
+    <item name="CatalogVendorID" type="int16u"/>
+    <item name="ApplicationID" type="char_string"/>
+  </struct> -->
+
+  <enum name="ApplicationStatusEnum" type="enum8">
+    <cluster code="0x050d"/>
+    <item name="Stopped" value="0x00"/>
+    <item name="ActiveVisibleFocus" value="0x01"/>
+    <item name="ActiveHidden" value="0x02"/>
+    <item name="ActiveVisibleNotFocus" value="0x03"/>
+  </enum>
+</configurator>

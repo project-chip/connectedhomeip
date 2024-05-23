@@ -1,0 +1,108 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 186.2.2. [TC-WASHERCTRL-2.2] Optional rinse attributes with DUT as Server
+
+PICS:
+    - WASHERCTRL.S.F01
+
+config:
+    nodeId: 0x12344321
+    cluster: "Laundry Washer Controls"
+    endpoint: 1
+
+    NumberOfRinsesValue:
+        type: enum8
+        defaultValue: 1
+    unsupportedNumberOfRinsesValue:
+        type: enum8
+        defaultValue: 5
+
+tests:
+    - label: "Step 1: Commission DUT to TH"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH reads from the DUT the the NumberOfRinses attribute"
+      PICS: WASHERCTRL.S.A0002
+      command: "readAttribute"
+      attribute: "NumberOfRinses"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 3
+
+    - label: "Step 3: TH reads from the DUT the the SupportedRinses attribute"
+      PICS: WASHERCTRL.S.A0003
+      command: "readAttribute"
+      attribute: "SupportedRinses"
+      response:
+          constraints:
+              type: list
+              maxLength: 4
+
+    - label:
+          "Step 4: TH writes a supported NumberOfRinses attribute to DUT within
+          the range of the SupportedRinses list"
+      PICS: WASHERCTRL.S.A0002
+      command: "writeAttribute"
+      attribute: "NumberOfRinses"
+      arguments:
+          value: NumberOfRinsesValue
+
+    - label: "Wait 2 seconds"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 2000
+
+    - label:
+          "Step 5: after a few seconds, TH reads from the DUT the NumberOfRinses
+          attribute"
+      PICS: WASHERCTRL.S.A0002
+      command: "readAttribute"
+      attribute: "NumberOfRinses"
+      response:
+          value: NumberOfRinsesValue
+
+    - label: "Step 6: Operate device to set the condition to read only"
+      verification: |
+          Manual operation required
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && WASHERCTRL.S.M.ManuallyControlled
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 7: TH writes an unsupported NumberOfRinses attribute to DUT
+          while DUT is not in a valid state."
+      PICS: WASHERCTRL.S.M.ManuallyControlled && WASHERCTRL.S.A0002
+      command: "writeAttribute"
+      attribute: "NumberOfRinses"
+      arguments:
+          value: unsupportedNumberOfRinsesValue
+      response:
+          error: INVALID_IN_STATE

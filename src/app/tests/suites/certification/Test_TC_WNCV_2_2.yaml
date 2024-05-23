@@ -1,0 +1,87 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 39.2.2. [TC-WNCV-2.2] ConfigStatus attribute [DUT as Server]
+
+PICS:
+    - WNCV.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Window Covering"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Step 1a: TH reads ConfigStatus attribute from DUT, if (WNCV.S.F00(LF)
+          & WNCV.S.F02(PA_LF)) value of bit 3 must be 1b else 0b"
+      command: "readAttribute"
+      attribute: "ConfigStatus"
+      PICS: WNCV.S.A0007 && WNCV.S.F00 && WNCV.S.F02
+      response:
+          constraints:
+              type: bitmap8
+              hasMasksSet: [0x8]
+
+    - label:
+          "Step 1b: TH reads ConfigStatus attribute from DUT, if (WNCV.S.F00(LF)
+          & WNCV.S.F02(PA_LF)) value of bit 3 must be 1b else 0b"
+      command: "readAttribute"
+      attribute: "ConfigStatus"
+      PICS: WNCV.S.A0007 && !WNCV.S.F00 && !WNCV.S.F02
+      response:
+          constraints:
+              type: bitmap8
+              hasMasksClear: [0x8]
+
+    - label:
+          "Step 1c: TH reads ConfigStatus attribute from DUT, if (WNCV.S.F01(TL)
+          & WNCV.S.F04(PA_TL)) value of bit 4 must be 1b else 0b,"
+      command: "readAttribute"
+      attribute: "ConfigStatus"
+      PICS: WNCV.S.A0007 && WNCV.S.F01 && WNCV.S.F04
+      response:
+          constraints:
+              type: bitmap8
+              hasMasksSet: [0x10]
+
+    - label:
+          "Step 1d: TH reads ConfigStatus attribute from DUT, if (WNCV.S.F01(TL)
+          & WNCV.S.F04(PA_TL)) value of bit 4 must be 1b else 0b,"
+      command: "readAttribute"
+      attribute: "ConfigStatus"
+      PICS: WNCV.S.A0007 && !WNCV.S.F01 && !WNCV.S.F04
+      response:
+          constraints:
+              type: bitmap8
+              hasMasksClear: [0x10]
+
+    - label:
+          "Step 1e: TH reads ConfigStatus attribute from DUT, value of bit 0
+          must be 1b (operational)"
+      command: "readAttribute"
+      attribute: "ConfigStatus"
+      PICS: WNCV.S.A0007
+      response:
+          constraints:
+              type: bitmap8
+              hasMasksSet: [0x1]

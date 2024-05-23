@@ -1,0 +1,419 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    12.4.9. [TC-CNET-4.11] [WiFi] Verification for ConnectNetwork Command
+    [DUT-Server]
+
+PICS:
+    - CNET.S.F00
+
+config:
+    nodeId: 0x12344321
+    cluster: "Network Commissioning"
+    #PIXIT.CNET.ENDPOINT_WIFI
+    endpoint: 0
+
+    PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID:
+        type: octet_string
+        defaultValue: "hex:47524C50726976617465"
+    PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID:
+        type: octet_string
+        defaultValue: "hex:7A6967626565686F6D65"
+    PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS:
+        type: octet_string
+        defaultValue: "hex:70617373776f7264313233"
+
+tests:
+    - label: "Precondition: TH reads FeatureMap attribute from the DUT"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 1
+          constraints:
+              type: bitmap32
+
+    - label:
+          "Step 1: TH sends ArmFailSafe command to the DUT with
+          ExpiryLengthSeconds set to 900"
+      cluster: "General Commissioning"
+      command: "ArmFailSafe"
+      arguments:
+          values:
+              - name: "ExpiryLengthSeconds"
+                value: 900
+              - name: "Breadcrumb"
+                value: 0
+      response:
+          values:
+              - name: "ErrorCode"
+                value: 0
+              - name: "DebugText"
+                value: ""
+
+    - label:
+          "Step 2: TH reads Networks attribute from the DUT and saves the number
+          of entries as 'NumNetworks'"
+      PICS: CNET.S.A0001
+      command: "readAttribute"
+      attribute: "Networks"
+      response:
+          saveAs: NumNetworks
+          constraints:
+              contains:
+                  [
+                      {
+                          NetworkID: PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID,
+                          Connected: true,
+                      },
+                  ]
+
+    - label:
+          "Step 3: TH finds the index of the Networks list entry with NetworkID
+          for PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and saves it as
+          'Userwifi_netidx'"
+      verification: |
+          TH finds the index of the Networks list entry with NetworkID for PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and saves it as 'Userwifi_netidx'
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CNET.S.A0001
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 4: TH sends RemoveNetwork Command to the DUT with NetworkID
+          field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field
+          set to 1"
+      verification: |
+          Verify that DUT sends NetworkConfigResponse to command with the following fields:
+          NetworkingStatus is success
+
+          NetworkIndex is 'Userwifi_netidx'
+      PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
+      command: "RemoveNetwork"
+      arguments:
+          values:
+              - name: "NetworkID"
+                value: PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
+              - name: "Breadcrumb"
+                value: 1
+      response:
+          values:
+              - name: "NetworkingStatus"
+                value: 0
+              - name: "NetworkIndex"
+                value: 0
+
+    - label:
+          "Step 5: TH sends AddOrUpdateWiFiNetwork command to the DUT with SSID
+          field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID, Credentials field
+          set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS and Breadcrumb
+          field set to 1"
+      PICS: CNET.S.C02.Rsp && CNET.S.C05.Tx
+      command: "AddOrUpdateWiFiNetwork"
+      arguments:
+          values:
+              - name: "SSID"
+                value: PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
+              - name: "Credentials"
+                value: PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS
+              - name: "Breadcrumb"
+                value: 1
+      response:
+          values:
+              - name: "NetworkingStatus"
+                value: 0
+              - name: "DebugText"
+                constraints:
+                    maxLength: 512
+
+    - label: "Step 6: TH reads Networks attribute from the DUT"
+      PICS: CNET.S.A0001
+      command: "readAttribute"
+      attribute: "Networks"
+      response:
+          constraints:
+              contains:
+                  [
+                      {
+                          NetworkID: PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID,
+                          Connected: false,
+                      },
+                  ]
+
+    - label:
+          "Step 7: TH sends ConnectNetwork command to the DUT with NetworkID
+          field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and Breadcrumb field
+          set to 2"
+      PICS: CNET.C.C06.Tx
+      timedInteractionTimeoutMs: 5000
+      command: "ConnectNetwork"
+      arguments:
+          values:
+              - name: "NetworkID"
+                value: PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
+              - name: "Breadcrumb"
+                value: 2
+      response:
+          values:
+              - name: "NetworkingStatus"
+                value: 0
+              - name: "ErrorValue"
+                constraints:
+                    type: int32s
+
+    - label:
+          "Step 8: TH changes its WiFi connection to
+          PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID"
+      verification: |
+          Make sure TH also joins the 2nd Wifi network to have a connectivity to the DUT.
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 9: TH discovers and connects to DUT on the
+          PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID operational network"
+      PICS: CNET.S.A0001
+      command: "readAttribute"
+      attribute: "Networks"
+      response:
+          constraints:
+              contains:
+                  [
+                      {
+                          NetworkID: PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID,
+                          Connected: true,
+                      },
+                  ]
+
+    - label:
+          "Step 10: TH reads Breadcrumb attribute from the General Commissioning
+          cluster of the DUT"
+      PICS: CNET.S.C06.Rsp
+      cluster: "General Commissioning"
+      command: "readAttribute"
+      attribute: "Breadcrumb"
+      response:
+          value: 2
+          constraints:
+              type: int64u
+
+    - label:
+          "Step 11: TH sends ArmFailSafe command to the DUT with
+          ExpiryLengthSeconds set to 0. This forcibly disarms the fail-safe and
+          is expected to cause the changes of configuration to
+          NetworkCommissioning cluster done so far to be reverted."
+      cluster: "General Commissioning"
+      command: "ArmFailSafe"
+      arguments:
+          values:
+              - name: "ExpiryLengthSeconds"
+                value: 0
+              - name: "Breadcrumb"
+                value: 0
+      response:
+          values:
+              - name: "ErrorCode"
+                value: 0
+
+    #Issue: https://github.com/project-chip/connectedhomeip/issues/26848
+    - label:
+          "Step 12 & 13: TH changes its WiFi connection to
+          PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID, TH discovers and connects to DUT
+          on the PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID operational network"
+      PICS: CNET.S.A0001 && PICS_USER_PROMPT
+      verification: |
+          ./chip-tool networkcommissioning read networks 1 0
+
+          Via the TH (chip-tool), Verify:
+          -the Networks attribute has NetworkID that should be as PIXIT.CNET.WIFI_1ST_ ACCESSPOINT_SSID.
+          -that the connected status should be the type of bool value as TRUE.
+
+          [1684497703.596528][3941:3943] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 873070909
+          [1684497703.596592][3941:3943] CHIP:TOO:   Networks: 1 entries
+          [1684497703.596640][3941:3943] CHIP:TOO:     [1]: {
+          [1684497703.596668][3941:3943] CHIP:TOO:       NetworkID: 47524C50726976617465
+          [1684497703.596697][3941:3943] CHIP:TOO:       Connected: FALSE
+          [1684497703.596721][3941:3943] CHIP:TOO:      }
+          [1684497703.596882][3941:3943] CHIP:EM: <<< [E:51584i S:48726 M:88313254 (Ack:206238679)] (S) Msg TX to 1:0000000000000001 [3A8F] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 14: TH sends ArmFailSafe command to the DUT with
+          ExpiryLengthSeconds set to 900"
+      cluster: "General Commissioning"
+      command: "ArmFailSafe"
+      arguments:
+          values:
+              - name: "ExpiryLengthSeconds"
+                value: 900
+              - name: "Breadcrumb"
+                value: 0
+      response:
+          values:
+              - name: "ErrorCode"
+                value: 0
+
+    - label:
+          "Step 15: TH sends RemoveNetwork Command to the DUT with NetworkID
+          field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field
+          set to 1"
+      verification: |
+          Verify that DUT sends NetworkConfigResponse to command with the following fields:
+          NetworkingStatus is success
+
+          NetworkIndex is 'Userwifi_netidx'
+      PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
+      command: "RemoveNetwork"
+      arguments:
+          values:
+              - name: "NetworkID"
+                value: PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
+              - name: "Breadcrumb"
+                value: 1
+      response:
+          values:
+              - name: "NetworkingStatus"
+                value: 0
+              - name: "NetworkIndex"
+                value: 0
+
+    - label:
+          "Step 16: TH sends AddOrUpdateWiFiNetwork command to the DUT with SSID
+          field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID, Credentials field
+          set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS and Breadcrumb
+          field set to 1"
+      PICS: CNET.S.C02.Rsp && CNET.S.C05.Tx
+      command: "AddOrUpdateWiFiNetwork"
+      arguments:
+          values:
+              - name: "SSID"
+                value: PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
+              - name: "Credentials"
+                value: PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS
+              - name: "Breadcrumb"
+                value: 1
+      response:
+          values:
+              - name: "NetworkingStatus"
+                value: 0
+              - name: "DebugText"
+                constraints:
+                    maxLength: 512
+
+    - label:
+          "Step 17: TH sends ConnectNetwork command to the DUT with NetworkID
+          field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and Breadcrumb field
+          set to 3"
+      PICS: CNET.S.C06.Rsp && CNET.S.C07.Tx
+      command: "ConnectNetwork"
+      timedInteractionTimeoutMs: 5000
+      arguments:
+          values:
+              - name: "NetworkID"
+                value: PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
+              - name: "Breadcrumb"
+                value: 3
+      response:
+          values:
+              - name: "NetworkingStatus"
+                value: 0
+              - name: "ErrorValue"
+                constraints:
+                    type: int32s
+
+    - label:
+          "Step 18: TH changes its WiFi connection to
+          PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID"
+      verification: |
+          Make sure TH also joins the 2nd Wifi network to have a connectivity to the DUT.
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 19: TH discovers and connects to DUT on the
+          PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID operational network"
+      PICS: CNET.S.A0001
+      command: "readAttribute"
+      attribute: "Networks"
+      response:
+          constraints:
+              contains:
+                  [
+                      {
+                          NetworkID: PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID,
+                          Connected: true,
+                      },
+                  ]
+
+    - label:
+          "Step 20: TH reads Breadcrumb attribute from the General Commissioning
+          cluster of the DUT"
+      PICS: CNET.S.C06.Rsp
+      cluster: "General Commissioning"
+      command: "readAttribute"
+      attribute: "Breadcrumb"
+      response:
+          value: 3
+          constraints:
+              type: int64u
+
+    - label: "Step 21: TH sends the CommissioningComplete command to the DUT"
+      cluster: "General Commissioning"
+      command: "CommissioningComplete"
+      response:
+          values:
+              - name: "ErrorCode"
+                value: 0
+              - name: "DebugText"
+                value: ""
+
+    - label: "Step 22: TH reads Networks attribute from the DUT"
+      PICS: CNET.S.A0001
+      command: "readAttribute"
+      attribute: "Networks"
+      response:
+          constraints:
+              contains:
+                  [
+                      {
+                          NetworkID: PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID,
+                          Connected: true,
+                      },
+                  ]

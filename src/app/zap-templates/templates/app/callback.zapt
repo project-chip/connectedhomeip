@@ -1,0 +1,86 @@
+{{> header}}
+
+// Prevent multiple inclusion
+#pragma once
+
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/util/af-types.h>
+#include <app/util/basic-types.h>
+
+#include <app/CommandHandler.h>
+#include <app/CommandSender.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/ConcreteCommandPath.h>
+#include <lib/support/Span.h>
+#include <protocols/interaction_model/Constants.h>
+
+// Cluster Init Functions
+
+{{#zcl_clusters}}
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAf{{asUpperCamelCase label}}ClusterInitCallback(chip::EndpointId endpoint);
+
+{{/zcl_clusters}}
+
+// Cluster Server/Client Init Functions
+
+{{#zcl_clusters}}
+
+//
+// {{label}} Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAf{{asUpperCamelCase label}}ClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void Matter{{asUpperCamelCase label}}ClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAf{{asUpperCamelCase label}}ClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void Matter{{asUpperCamelCase label}}ClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status Matter{{asUpperCamelCase label}}ClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAf{{asUpperCamelCase label}}ClusterServerTickCallback(chip::EndpointId endpoint);
+
+{{/zcl_clusters}}
+
+// Cluster Commands Callback
+
+{{#zcl_clusters}}
+{{#zcl_commands}}
+{{#if (isClient source)}}
+{{#unless (isInConfigList parent.name "CommandHandlerInterfaceOnlyClusters")}}
+/**
+ * @brief {{parent.name}} Cluster {{name}} Command callback (from {{source}})
+ */
+bool emberAf{{asUpperCamelCase parent.label}}Cluster{{asUpperCamelCase name}}Callback(chip::app::CommandHandler * commandObj,
+      const chip::app::ConcreteCommandPath & commandPath,
+      const chip::app::Clusters::{{asUpperCamelCase parent.label}}::Commands::{{asUpperCamelCase name}}::DecodableType & commandData);
+{{/unless}}
+{{/if}}
+{{/zcl_commands}}
+{{/zcl_clusters}}

@@ -1,0 +1,33 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
+
+pw_log_BACKEND = "$dir_pw_log_basic"
+pw_assert_BACKEND = "$dir_pw_assert_log:check_backend"
+pw_sys_io_BACKEND =
+    "${chip_root}/examples/platform/mbed/pw_sys_io:pw_sys_io_mbed"
+pw_rpc_system_server_BACKEND =
+    "${chip_root}/examples/common/pigweed:system_rpc_server"
+
+pw_build_LINK_DEPS = [
+  "$dir_pw_assert:impl",
+  "$dir_pw_log:impl",
+]
+
+dir_pw_third_party_nanopb = "${chip_root}/third_party/nanopb/repo"
+pw_rpc_CONFIG = "$dir_pw_rpc:disable_global_mutex"
+
+chip_enable_pw_rpc = true

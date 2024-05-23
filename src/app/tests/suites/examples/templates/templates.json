@@ -1,0 +1,17 @@
+{
+    "name": "CHIP README Templates",
+    "version": "chip-v1",
+    "helpers": ["common/ClusterTestGeneration.js"],
+    "resources": {
+        "pics-metafile": "../../../../app/tests/suites/certification/PICS.yaml",
+        "certification-metadir": "../../../../app/tests/suites/certification",
+        "test-metadir": "../../../../app/tests/suites"
+    },
+    "templates": [
+        {
+            "path": "../TestGenExample.zapt",
+            "name": "Test Generate Example",
+            "output": "TestGenExample.out"
+        }
+    ]
+}

@@ -1,0 +1,44 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/clusterParameterRow"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+  <EditText
+      android:id="@+id/clusterParameterData"
+      android:layout_width="80dp"
+      android:layout_height="wrap_content"
+      android:layout_marginHorizontal="10dp"
+      android:padding="16dp"
+      android:inputType="text"
+      android:minWidth="48dp"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toStartOf="@id/clusterParameterNameTv"
+      tools:ignore="SpeakableTextPresentCheck" />
+
+  <TextView
+      android:id="@+id/clusterParameterNameTv"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:padding="16dp"
+      android:singleLine="false"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toStartOf="@id/clusterParameterTypeTv"
+      app:layout_constraintStart_toEndOf="@id/clusterParameterData"
+      app:layout_constraintTop_toTopOf="parent" />
+
+  <TextView
+      android:id="@+id/clusterParameterTypeTv"
+      android:textStyle="bold"
+      android:layout_width="100dp"
+      android:layout_height="wrap_content"
+      android:padding="16dp"
+      android:singleLine="false"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintStart_toEndOf="@id/clusterParameterNameTv"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintEnd_toEndOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

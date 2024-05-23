@@ -1,0 +1,144 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/lib/core/core.gni")
+import("${chip_root}/src/lib/lib.gni")
+import("${chip_root}/src/tracing/tracing_args.gni")
+
+declare_args() {
+  chip_enable_smoke_co_trigger = false
+  chip_enable_boolean_state_configuration_trigger = false
+  chip_enable_energy_evse_trigger = false
+  chip_enable_energy_reporting_trigger = false
+}
+
+config("app-main-config") {
+  include_dirs = [ "." ]
+}
+
+source_set("ota-test-event-trigger") {
+  sources = [
+    "${chip_root}/src/app/clusters/ota-requestor/OTATestEventTriggerHandler.h",
+  ]
+}
+
+source_set("smco-test-event-trigger") {
+  sources = [ "${chip_root}/src/app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerHandler.h" ]
+}
+
+source_set("boolean-state-configuration-test-event-trigger") {
+  sources = [ "${chip_root}/src/app/clusters/boolean-state-configuration-server/BooleanStateConfigurationTestEventTriggerHandler.h" ]
+}
+
+source_set("energy-evse-test-event-trigger") {
+  sources = [ "${chip_root}/src/app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h" ]
+}
+
+source_set("energy-reporting-test-event-trigger") {
+  sources = [ "${chip_root}/src/app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h" ]
+}
+
+source_set("app-main") {
+  defines = [ "ENABLE_TRACING=${matter_enable_tracing_support}" ]
+  sources = [
+    "AppMain.cpp",
+    "AppMain.h",
+    "CommissionableInit.cpp",
+    "CommissionableInit.h",
+    "CommissionerMain.cpp",
+    "CommissionerMain.h",
+    "LinuxCommissionableDataProvider.cpp",
+    "LinuxCommissionableDataProvider.h",
+    "NamedPipeCommands.cpp",
+    "NamedPipeCommands.h",
+    "Options.cpp",
+    "Options.h",
+    "testing/CustomCSRResponse.cpp",
+    "testing/CustomCSRResponse.h",
+    "testing/CustomCSRResponseOperationalKeyStore.cpp",
+    "testing/CustomCSRResponseOperationalKeyStore.h",
+  ]
+
+  public_deps = [
+    ":boolean-state-configuration-test-event-trigger",
+    ":energy-evse-test-event-trigger",
+    ":energy-reporting-test-event-trigger",
+    ":smco-test-event-trigger",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/platform/logging:force_stdio",
+  ]
+  deps = [
+    ":ota-test-event-trigger",
+    "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/src/app/server",
+  ]
+
+  if (chip_enable_pw_rpc) {
+    defines += [ "PW_RPC_ENABLED" ]
+  }
+
+  if (chip_build_libshell) {
+    defines += [ "ENABLE_CHIP_SHELL" ]
+    sources += [
+      "CommissioneeShellCommands.cpp",
+      "CommissioneeShellCommands.h",
+      "ControllerShellCommands.cpp",
+      "ControllerShellCommands.h",
+    ]
+  }
+
+  if (chip_enable_transport_trace) {
+    deps += [ "${chip_root}/examples/common/tracing:trace_handlers_decoder" ]
+  }
+
+  if (matter_enable_tracing_support) {
+    deps += [
+      "${chip_root}/examples/common/tracing:commandline",
+      "${chip_root}/src/tracing",
+    ]
+  }
+
+  defines += [
+    "CHIP_DEVICE_CONFIG_ENABLE_SMOKE_CO_TRIGGER=${chip_enable_smoke_co_trigger}",
+    "CHIP_DEVICE_CONFIG_ENABLE_BOOLEAN_STATE_CONFIGURATION_TRIGGER=${chip_enable_boolean_state_configuration_trigger}",
+    "CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER=${chip_enable_energy_evse_trigger}",
+    "CHIP_DEVICE_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER=${chip_enable_energy_reporting_trigger}",
+  ]
+
+  public_configs = [ ":app-main-config" ]
+}
+
+source_set("commissioner-main") {
+  defines = []
+  sources = [
+    "CommissionerMain.cpp",
+    "CommissionerMain.h",
+  ]
+
+  if (chip_build_libshell) {
+    defines += [ "ENABLE_CHIP_SHELL" ]
+  }
+
+  public_deps = [ "${chip_root}/src/lib" ]
+  deps = [ "${chip_root}/src/app/server" ]
+
+  if (chip_enable_transport_trace) {
+    deps += [ "${chip_root}/examples/common/tracing:trace_handlers" ]
+  }
+
+  public_configs = [ ":app-main-config" ]
+}

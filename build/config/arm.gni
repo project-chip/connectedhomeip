@@ -1,0 +1,76 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+
+if ((current_cpu == "arm" || current_cpu == "arm64") &&
+    (current_os != "mac" && current_os != "ios")) {
+  declare_args() {
+    # Build file to import for ARM defaults.
+    arm_platform_config = ""
+  }
+
+  if (arm_platform_config == "") {
+    if (current_os == "android") {
+      arm_platform_config = "${build_root}/toolchain/android/android_arm.gni"
+    }
+  }
+
+  # Allow platforms to override how ARM architecture flags are chosen by
+  # providing a file to import.
+  if (arm_platform_config != "") {
+    _platform_defaults = {
+      import(arm_platform_config)
+    }
+  }
+
+  _defaults = {
+    arm_arch = ""
+    arm_cpu = ""
+    arm_tune = ""
+    arm_fpu = ""
+    arm_float_abi = ""
+    arm_abi = ""
+    arm_use_thumb = current_os != "linux" &&
+                    (current_os != "android" || current_cpu != "arm64")
+
+    # Update defaults with platform values, if any.
+    if (arm_platform_config != "") {
+      forward_variables_from(_platform_defaults, "*")
+    }
+  }
+
+  declare_args() {
+    # ARM architecture (value for -march flag).
+    arm_arch = _defaults.arm_arch
+
+    # ARM CPU (value for -mcpu flag).
+    arm_cpu = _defaults.arm_cpu
+
+    # ARM tuning (value for -mtune flag).
+    arm_tune = _defaults.arm_tune
+
+    # ARM FPU (value for -mfpu flag).
+    arm_fpu = _defaults.arm_fpu
+
+    # ARM float ABI (value for -mfloat-abi flag).
+    arm_float_abi = _defaults.arm_float_abi
+
+    # ARM ABI (value for -mabi flag).
+    arm_abi = _defaults.arm_abi
+
+    # ARM thumb instruction set (value for -mthumb flag).
+    arm_use_thumb = _defaults.arm_use_thumb
+  }
+}

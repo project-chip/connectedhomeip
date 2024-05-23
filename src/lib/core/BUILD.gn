@@ -1,0 +1,217 @@
+# Copyright (c) 2020-2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/nlio.gni")
+import("//build_overrides/pigweed.gni")
+
+import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/build/chip/tests.gni")
+import("${chip_root}/src/inet/inet.gni")
+import("core.gni")
+
+buildconfig_header("chip_buildconfig") {
+  header = "CHIPBuildConfig.h"
+  header_dir = "core"
+
+  chip_target_style_unix = chip_target_style == "unix"
+  chip_target_style_embedded = chip_target_style == "embedded"
+
+  chip_config_memory_management_malloc =
+      chip_config_memory_management == "malloc"
+  chip_config_memory_management_platform =
+      chip_config_memory_management == "platform"
+
+  chip_config_short_error_str =
+      chip_config_short_error_str || chip_target_style_embedded
+
+  # TODO - Move CHIP_PROJECT_CONFIG_INCLUDE, CHIP_PLATFORM_CONFIG_INCLUDE here.
+  # Currently those are also used from src/system.
+  defines = [
+    "CHIP_FUZZING_ENABLED=false",
+    "CHIP_CONFIG_TEST=${chip_build_tests}",
+    "CHIP_ERROR_LOGGING=${chip_error_logging}",
+    "CHIP_PROGRESS_LOGGING=${chip_progress_logging}",
+    "CHIP_DETAIL_LOGGING=${chip_detail_logging}",
+    "CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE=${chip_log_message_max_size}",
+    "CHIP_AUTOMATION_LOGGING=${chip_automation_logging}",
+    "CHIP_PW_TOKENIZER_LOGGING=${chip_pw_tokenizer_logging}",
+    "CHIP_USE_PW_LOGGING=${chip_use_pw_logging}",
+    "CHIP_EXCHANGE_NODE_ID_LOGGING=${chip_exchange_node_id_logging}",
+    "CHIP_CONFIG_SHORT_ERROR_STR=${chip_config_short_error_str}",
+    "CHIP_CONFIG_ENABLE_ARG_PARSER=${chip_config_enable_arg_parser}",
+    "CHIP_TARGET_STYLE_UNIX=${chip_target_style_unix}",
+    "CHIP_TARGET_STYLE_EMBEDDED=${chip_target_style_embedded}",
+    "CHIP_CONFIG_MEMORY_MGMT_MALLOC=${chip_config_memory_management_malloc}",
+    "HAVE_MALLOC=${chip_config_memory_management_malloc}",
+    "HAVE_FREE=${chip_config_memory_management_malloc}",
+    "HAVE_NEW=false",
+    "CHIP_CONFIG_MEMORY_MGMT_PLATFORM=${chip_config_memory_management_platform}",
+    "CHIP_CONFIG_MEMORY_DEBUG_CHECKS=${chip_config_memory_debug_checks}",
+    "CHIP_CONFIG_MEMORY_DEBUG_DMALLOC=${chip_config_memory_debug_dmalloc}",
+    "CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES=false",
+    "CHIP_CONFIG_TRANSPORT_TRACE_ENABLED=${chip_enable_transport_trace}",
+    "CHIP_CONFIG_TRANSPORT_PW_TRACE_ENABLED=${chip_enable_transport_pw_trace}",
+    "CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST=${chip_config_minmdns_dynamic_operational_responder_list}",
+    "CHIP_CONFIG_MINMDNS_MAX_PARALLEL_RESOLVES=${chip_config_minmdns_max_parallel_resolves}",
+    "CHIP_CONFIG_CANCELABLE_HAS_INFO_STRING_FIELD=${chip_config_cancelable_has_info_string_field}",
+    "CHIP_CONFIG_BIG_ENDIAN_TARGET=${chip_target_is_big_endian}",
+    "CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_WRITE=${chip_tlv_validate_char_string_on_write}",
+    "CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_READ=${chip_tlv_validate_char_string_on_read}",
+    "CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS=${chip_enable_sending_batch_commands}",
+  ]
+
+  visibility = [ ":chip_config_header" ]
+}
+
+source_set("chip_config_header") {
+  sources = [ "CHIPConfig.h" ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
+
+  public_deps = [
+    "${chip_root}/src/ble:ble_config_header",
+    "${chip_root}/src/inet:inet_config_header",
+    "${chip_root}/src/system:system_config_header",
+  ]
+
+  deps = [ ":chip_buildconfig" ]
+
+  allow_circular_includes_from = [ "${chip_root}/src/ble:ble_config_header" ]
+}
+
+source_set("error") {
+  sources = [
+    "CHIPError.cpp",
+    "CHIPError.h",
+    "ErrorStr.cpp",
+    "ErrorStr.h",
+  ]
+
+  public_deps = [
+    ":chip_config_header",
+    "${chip_root}/src/lib/support:attributes",
+    "${chip_root}/src/lib/support:type-traits",
+  ]
+}
+
+source_set("string-builder-adapters") {
+  sources = [
+    "StringBuilderAdapters.cpp",
+    "StringBuilderAdapters.h",
+  ]
+
+  public_deps = [
+    ":error",
+    "$dir_pw_string",
+  ]
+}
+
+source_set("encoding") {
+  sources = [ "CHIPEncoding.h" ]
+  public_deps = [ "${nlio_root}:nlio" ]
+}
+
+source_set("types") {
+  sources = [
+    "CHIPSafeCasts.h",
+    "CHIPVendorIdentifiers.hpp",
+    "DataModelTypes.h",
+    "Global.h",
+    "GroupId.h",
+    "InPlace.h",
+    "NodeId.h",
+    "Optional.h",
+    "PasscodeId.h",
+    "ReferenceCounted.h",
+    "Unchecked.h",
+  ]
+
+  public_deps = [
+    ":chip_config_header",
+    "${chip_root}/src/lib/support:memory",
+    "${chip_root}/src/lib/support:verifymacros",
+  ]
+}
+
+static_library("core") {
+  output_name = "libChipCore"
+
+  sources = [
+    "CASEAuthTag.h",
+    "CHIPCallback.h",
+    "CHIPCore.h",
+    "CHIPKeyIds.cpp",
+    "CHIPKeyIds.h",
+    "CHIPPersistentStorageDelegate.h",
+    "ClusterEnums.h",
+    "OTAImageHeader.cpp",
+    "OTAImageHeader.h",
+    "PeerId.h",
+    "ScopedNodeId.h",
+    "TLV.h",
+    "TLVBackingStore.h",
+    "TLVCircularBuffer.cpp",
+    "TLVCircularBuffer.h",
+    "TLVCommon.h",
+    "TLVData.h",
+    "TLVDebug.cpp",
+    "TLVDebug.h",
+    "TLVReader.cpp",
+    "TLVReader.h",
+    "TLVTags.cpp",
+    "TLVTags.h",
+    "TLVTypes.h",
+    "TLVUpdater.cpp",
+    "TLVUpdater.h",
+    "TLVUtilities.cpp",
+    "TLVUtilities.h",
+    "TLVWriter.cpp",
+    "TLVWriter.h",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    ":chip_config_header",
+    ":error",
+    "${chip_root}/src/app/common:enums",
+    "${chip_root}/src/ble",
+    "${chip_root}/src/inet",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/system",
+  ]
+
+  allow_circular_includes_from = [
+    "${chip_root}/src/ble",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/inet",
+    "${chip_root}/src/system",
+  ]
+}
+
+static_library("vectortlv") {
+  output_name = "libVectorTlv"
+  output_dir = "${root_out_dir}/lib"
+
+  sources = [
+    "TLVVectorWriter.cpp",
+    "TLVVectorWriter.h",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [ ":core" ]
+}

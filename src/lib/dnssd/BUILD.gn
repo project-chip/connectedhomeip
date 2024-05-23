@@ -1,0 +1,132 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/nlunit_test.gni")
+import("${chip_root}/src/platform/device.gni")
+
+source_set("constants") {
+  sources = [ "Constants.h" ]
+
+  public_deps = [ "${chip_root}/src/lib/support" ]
+}
+
+source_set("types") {
+  sources = [ "Types.h" ]
+}
+
+source_set("naming") {
+  sources = [
+    "ServiceNaming.cpp",
+    "ServiceNaming.h",
+  ]
+
+  public_deps = [
+    ":constants",
+    ":types",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:error",
+    "${chip_root}/src/lib/support:span",
+  ]
+}
+
+source_set("platform_header") {
+  sources = [
+    "platform/Dnssd.h",
+    "platform/DnssdBrowseDelegate.h",
+  ]
+  public_deps = [
+    ":constants",
+    ":naming",
+    "${chip_root}/src/inet",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/system",
+  ]
+}
+
+static_library("dnssd") {
+  public_deps = [
+    ":constants",
+    ":platform_header",
+    ":types",
+    "${chip_root}/src/app/icd/server:icd-server-config",
+    "${chip_root}/src/crypto",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/messaging:configurations",
+  ]
+
+  sources = [
+    "Advertiser.cpp",
+    "Advertiser.h",
+    "IPAddressSorter.cpp",
+    "IPAddressSorter.h",
+    "Resolver.cpp",
+    "Resolver.h",
+    "ResolverProxy.cpp",
+    "ResolverProxy.h",
+    "TxtFields.cpp",
+    "TxtFields.h",
+  ]
+
+  assert(
+      chip_mdns == "none" || chip_mdns == "minimal" || chip_mdns == "platform",
+      "Please select a valid value for chip_mdns")
+
+  if (chip_mdns == "none") {
+    sources += [
+      "Advertiser_ImplNone.cpp",
+      "Resolver_ImplNone.cpp",
+    ]
+  }
+
+  if (chip_mdns_minimal) {
+    sources += [
+      "ActiveResolveAttempts.cpp",
+      "ActiveResolveAttempts.h",
+      "Advertiser_ImplMinimalMdns.cpp",
+      "Advertiser_ImplMinimalMdnsAllocator.h",
+      "IncrementalResolve.cpp",
+      "IncrementalResolve.h",
+      "MinimalMdnsServer.cpp",
+      "MinimalMdnsServer.h",
+      "Resolver_ImplMinimalMdns.cpp",
+    ]
+    public_deps += [
+      "${chip_root}/src/lib/dnssd/minimal_mdns",
+      "${chip_root}/src/tracing",
+      "${chip_root}/src/tracing:macros",
+    ]
+  }
+
+  if (chip_mdns_platform) {
+    sources += [
+      "Discovery_ImplPlatform.cpp",
+      "Discovery_ImplPlatform.h",
+    ]
+    public_deps += [ "${chip_root}/src/platform" ]
+  }
+
+  _chip_dnssd_default_none = chip_mdns == "none"
+  _chip_dnssd_default_minimal = chip_mdns == "minimal"
+  _chip_dnssd_default_platform = chip_mdns == "platform"
+
+  defines = [
+    "CHIP_DNSSD_DEFAULT_NONE=${_chip_dnssd_default_none}",
+    "CHIP_DNSSD_DEFAULT_MINIMAL=${_chip_dnssd_default_minimal}",
+    "CHIP_DNSSD_DEFAULT_PLATFORM=${_chip_dnssd_default_platform}",
+  ]
+
+  cflags = [ "-Wconversion" ]
+}

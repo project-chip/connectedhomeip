@@ -1,0 +1,535 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 42.1.1. [TC-ACE-1.1] Privileges
+
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+
+config:
+    nodeId: 0x12344321
+    cluster: "Access Control"
+    endpoint: 0
+
+tests:
+    - label: "Step 1: TH1 commissions DUT using admin node ID N1"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Read the commissioner node ID"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: commissionerNodeId
+
+    - label:
+          "Step 2: TH writes the ACL attribute with a list of
+          AccessControlEntryStruct entries containing 1 elements, granting
+          itself administer privileges on all of Endpoint 0 : struct  a)Fabric
+          Index: 1  b)Privilege field: Administer (5)  c)AuthMode field: CASE
+          (2) d)Subjects field: [N1] e)Targets field: [{Cluster: null, Endpoint:
+          0, DeviceType: null}]"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: [commissionerNodeId],
+                      Targets:
+                          [{ Cluster: null, Endpoint: 0, DeviceType: null }],
+                  },
+              ]
+
+    - label:
+          "Step 3: TH reads the NOCs attribute from the Node Operational
+          Credentials cluster using a fabric-scoped read (requires administer
+          privilege)"
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "NOCs"
+      response:
+          constraints:
+              minLength: 1
+              maxLength: 1
+
+    - label:
+          "Step 4: TH writes the Location attribute in the Basic Information
+          cluster with 'XX' (requires administer privilege)"
+      cluster: "Basic Information"
+      command: "writeAttribute"
+      attribute: "Location"
+      arguments:
+          value: "XX"
+
+    - label:
+          "Step 5: TH sends the UpdateFabricLabel command to the Node
+          Operational Credentials cluster with the Label field set to
+          'TestFabric' (requires administer privilege)"
+      cluster: "Operational Credentials"
+      command: "UpdateFabricLabel"
+      arguments:
+          values:
+              - name: "Label"
+                value: "TestFabric"
+
+    - label:
+          "Step 6: TH writes the NodeLabel attribute in the Basic Information
+          cluster with the string 'TestNode' (requires manage privilege)"
+      cluster: "Basic Information"
+      command: "writeAttribute"
+      attribute: "NodeLabel"
+      arguments:
+          value: "TestNode"
+
+    - label:
+          "Step 7: TH sends the TestEventTrigger command to the General
+          Diagnostics cluster with the EnableKey set to 0 and the EventTrigger
+          set to 0 (requires manage privilege). Note that this will cause an
+          error to be returned because the EnableKey is invalid, but still
+          indicates that the TH passed the ACL check."
+      cluster: "General Diagnostics"
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: "0"
+              - name: "EventTrigger"
+                value: 0
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 8: TH reads the VendorID attribute from the Basic Information
+          cluster (requires view privilege)"
+      cluster: "Basic Information"
+      command: "readAttribute"
+      attribute: "VendorID"
+
+    # MANAGE
+    - label:
+          "Step 9: TH writes the ACL attribute with a list of
+          AccessControlEntryStruct entries containing 2 elements, giving itself
+          administer privilege only on the Access Control cluster and manage
+          privilege on everything else on EP0 : 1.Struct : a)Fabric Index:1
+          b)Privilege field: Administer (5) c)AuthMode field: CASE (2)
+          d)Subjects field: [N1] e)Targets field: [{Cluster: 0x001F, Endpoint:
+          0}] 2.struct : a)Fabric Index: 1 b)Privilege field: Manage (4)
+          c)AuthMode field: CASE (2) d)Subjects field: [N1] e)Targets field:
+          [{Endpoint: 0}]"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: [commissionerNodeId],
+                      Targets:
+                          [{ Cluster: 0x001F, Endpoint: 0, DeviceType: null }],
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 4, # manage
+                      AuthMode: 2, # case
+                      Subjects: [commissionerNodeId],
+                      Targets:
+                          [{ Cluster: null, Endpoint: 0, DeviceType: null }],
+                  },
+              ]
+
+    - label:
+          "Step 10: TH reads the NOCs attribute from the Node Operational
+          Credentials cluster using a fabric-filtered read (requires administer
+          privilege)"
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "NOCs"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "Step 11: TH writes the Location attribute in the Basic Information
+          cluster with 'XX' (requires administer privilege)"
+      cluster: "Basic Information"
+      command: "writeAttribute"
+      attribute: "Location"
+      arguments:
+          value: "XX"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "Step 12: TH sends the UpdateFabricLabel command to the operational
+          credentials cluster with the Label field set to 'TestFabric' (requires
+          administer privilege)"
+      cluster: "Operational Credentials"
+      command: "UpdateFabricLabel"
+      arguments:
+          values:
+              - name: "Label"
+                value: "TestFabric"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label: "Step 13a: Write NodeLabel attribute (Basic - requires manage)"
+      cluster: "Basic Information"
+      command: "writeAttribute"
+      attribute: "NodeLabel"
+      arguments:
+          value: "TestNode"
+
+    - label:
+          "Step 13b: Send TestEventTrigger (General Diagnostics - requires
+          manage)"
+      cluster: "General Diagnostics"
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: "0"
+              - name: "EventTrigger"
+                value: 0
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Step 13c: Tead the VendorID attribute (Basic - requires view)"
+      cluster: "Basic Information"
+      command: "readAttribute"
+      attribute: "VendorID"
+
+    # OPERATE
+    - label:
+          "Step 14: TH writes the ACL attribute with a list of
+          AccessControlEntryStruct entries containing 2 elements, giving itself
+          administer privilege only on the Access Control cluster and operate
+          privilege on everything else on EP0. 1.Struct : a)Fabric Index: 1
+          b)Privilege field: Administer (5) c)AuthMode field: CASE (2)
+          d)Subjects field: [N1] e)Targets field: [{Cluster: 0x001F, Endpoint:
+          0}]  2.struct : a)Fabric Index: 1 b)Privilege field: Operate (3)
+          c)AuthMode field: CASE (2) d)Subjects field: [N1] e)Targets field:
+          [{Endpoint: 0}]"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: [commissionerNodeId],
+                      Targets:
+                          [{ Cluster: 0x001F, Endpoint: 0, DeviceType: null }],
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 3, # operate
+                      AuthMode: 2, # case
+                      Subjects: [commissionerNodeId],
+                      Targets:
+                          [{ Cluster: null, Endpoint: 0, DeviceType: null }],
+                  },
+              ]
+
+    - label:
+          "Step 15a: Repeat steps 10 to 12 to confirm that TH still does not
+          have administer privileges step:10 p- TH reads the NOCs attribute from
+          the Node Operational Credentials cluster using a fabric-filtered read
+          (requires administer privilege)"
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "NOCs"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "Step 15b: Repeat step:11 - TH writes the Location attribute in the
+          Basic Information cluster with 'XX' (requires administer privilege)"
+      cluster: "Basic Information"
+      command: "writeAttribute"
+      attribute: "Location"
+      arguments:
+          value: "XX"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "Step 15c: Repeat step:12 - TH sends the UpdateFabricLabel command to
+          the operational credentials cluster with the Label field set to
+          'TestFabric' (requires administer privilege) "
+      cluster: "Operational Credentials"
+      command: "UpdateFabricLabel"
+      arguments:
+          values:
+              - name: "Label"
+                value: "TestFabric"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "Step 16: TH writes the NodeLabel attribute in the Basic Information
+          cluster with the string 'TestNode' (requires manage privilege)"
+      cluster: "Basic Information"
+      command: "writeAttribute"
+      attribute: "NodeLabel"
+      arguments:
+          value: "TestNode"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "Step 17: TH sends the TestEventTrigger command to the General
+          Diagnostics cluster with the EnableKey set to 0 and the EventTrigger
+          set to 0. (requires manage privilege)"
+      cluster: "General Diagnostics"
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: "0"
+              - name: "EventTrigger"
+                value: 0
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "Step 18: Repeat step 8 to confirm that the TH still has view
+          privileges : Step 8 - TH reads the VendorID attribute from the Basic
+          Information cluster (requires view privilege)"
+      cluster: "Basic Information"
+      command: "readAttribute"
+      attribute: "VendorID"
+
+    # VIEW
+    - label:
+          "Step 19: TH1 writes the ACL attribute with a list of
+          AccessControlEntryStruct entries containing 2 elements, giving itself
+          administer privilege only on the Access Control cluster and view
+          privilege on everything else on EP0. 1.Struct : a)Fabric Index: 1
+          b)Privilege field: Administer (5) c)AuthMode field: CASE (2)
+          d)Subjects field: [N1] e)Targets field: [{Cluster: 0x001F, Endpoint:
+          0}] 2.struct : a)Fabric Index: 1 b)Privilege field: View (1)
+          c)AuthMode field: CASE (2) d)Subjects field: [N1] e)Targets field:
+          [{Endpoint: 0}]"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: [commissionerNodeId],
+                      Targets:
+                          [{ Cluster: 0x001F, Endpoint: 0, DeviceType: null }],
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 1, # view
+                      AuthMode: 2, # case
+                      Subjects: [commissionerNodeId],
+                      Targets:
+                          [{ Cluster: null, Endpoint: 0, DeviceType: null }],
+                  },
+              ]
+
+    - label:
+          "Step 20a: Repeat steps 10 to 12 to confirm that TH still does not
+          have administer privileges. Repeat step:10 - TH reads the NOCs
+          attribute from the Node Operational Credentials cluster using a
+          fabric-filtered read (requires administer privilege)"
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "NOCs"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "Step 20b: Repeat step:11 - TH writes the Location attribute in the
+          Basic Information cluster with 'XX' (requires administer privilege)"
+      cluster: "Basic Information"
+      command: "writeAttribute"
+      attribute: "Location"
+      arguments:
+          value: "XX"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "Step 20c: Repeat step:12 - TH sends the UpdateFabricLabel command to
+          the operational credentials cluster with the Label field set to
+          'TestFabric' (requires administer privilege)"
+      cluster: "Operational Credentials"
+      command: "UpdateFabricLabel"
+      arguments:
+          values:
+              - name: "Label"
+                value: "TestFabric"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "Step 21a: Repeat steps 16 to 17 to confirm that TH still does not
+          have manage privileges. Step 16 : TH writes the NodeLabel attribute in
+          the Basic Information cluster with the string 'TestNode' (requires
+          manage privilege) "
+      cluster: "Basic Information"
+      command: "writeAttribute"
+      attribute: "NodeLabel"
+      arguments:
+          value: "TestNode"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "Step 21b: Repeat steps 17 :  TH sends the TestEventTrigger command to
+          the General Diagnostics cluster with the EnableKey set to 0 and the
+          EventTrigger set to 0. (requires manage privilege)"
+      cluster: "General Diagnostics"
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: "0"
+              - name: "EventTrigger"
+                value: 0
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label: "Step 22: Tead the VendorID attribute (Basic - requires view)"
+      cluster: "Basic Information"
+      command: "readAttribute"
+      attribute: "VendorID"
+
+    # NO PRIVILEGE
+    - label:
+          "Step 23: TH writes the ACL attribute with a list of
+          AccessControlEntryStruct entries containing a single element, granting
+          Administer privilege on only the Access Control cluster and no other
+          access : 1.Struct : a)Fabric Index: 1 b)Privilege field: Administer
+          (5) c)AuthMode field: CASE (2) d)Subjects field: [N1] e)Targets field:
+          [{Cluster: 0x001F, Endpoint: 0}]"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: [commissionerNodeId],
+                      Targets:
+                          [{ Cluster: 0x001F, Endpoint: 0, DeviceType: null }],
+                  },
+              ]
+
+    - label:
+          "Step 24a: Repeat steps 10 to 12 to confirm that TH still does not
+          have administer privileges. Repeat step:10 - TH reads the NOCs
+          attribute from the Node Operational Credentials cluster using a
+          fabric-filtered read (requires administer privilege) "
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "NOCs"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "TStep 24b: Repeat step:11 - TH writes the Location attribute in the
+          Basic Information cluster with 'XX' (requires administer privilege)"
+      cluster: "Basic Information"
+      command: "writeAttribute"
+      attribute: "Location"
+      arguments:
+          value: "XX"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "Step 24c: Repeat step:12 - TH sends the UpdateFabricLabel command to
+          the operational credentials cluster with the Label field set to
+          'TestFabric' (requires administer privilege)"
+      cluster: "Operational Credentials"
+      command: "UpdateFabricLabel"
+      arguments:
+          values:
+              - name: "Label"
+                value: "TestFabric"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "Step 25a: Repeat steps 16 to 17 to confirm that TH still does not
+          have manage privileges. Step 16 : TH writes the NodeLabel attribute in
+          the Basic Information cluster with the string 'TestNode' (requires
+          manage privilege)"
+      cluster: "Basic Information"
+      command: "writeAttribute"
+      attribute: "NodeLabel"
+      arguments:
+          value: "TestNode"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "Step 25b: Repeat steps 17 :  TH sends the TestEventTrigger command to
+          the General Diagnostics cluster with the EnableKey set to 0 and the
+          EventTrigger set to 0. (requires manage privilege)"
+      cluster: "General Diagnostics"
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: "0"
+              - name: "EventTrigger"
+                value: 0
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "Step 26: TH reads the VendorID attribute from the Basic Information
+          cluster (requires view privilege)"
+      cluster: "Basic Information"
+      command: "readAttribute"
+      attribute: "VendorID"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "Step 27: TH writes the ACL attribute with a list of
+          AccessControlEntryStruct entries containing a single element,
+          restoring full access to the node. Struct : a)Fabric Index: 1
+          b)Privilege field: Administer (5) c)AuthMode field: CASE (2)
+          d)Subjects field: [N1] e)Targets field: null"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: [commissionerNodeId],
+                      Targets: null,
+                  },
+              ]

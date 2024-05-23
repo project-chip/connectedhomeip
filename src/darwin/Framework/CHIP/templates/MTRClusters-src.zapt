@@ -1,0 +1,222 @@
+{{> header excludeZapComment=true}}
+
+#import <Foundation/Foundation.h>
+
+#import "MTRClusterConstants.h"
+#import "MTRDevice_Internal.h"
+#import "MTRCluster_Internal.h"
+#import "MTRClusters_Internal.h"
+#import "MTRStructsObjc.h"
+#import "MTRCommandPayloadsObjc.h"
+#import "MTRLogging_Internal.h"
+#import "MTRDefines_Internal.h"
+
+#include <app-common/zap-generated/cluster-objects.h>
+#include <platform/CHIPDeviceLayer.h>
+
+#include <type_traits>
+
+using chip::Callback::Callback;
+using chip::Callback::Cancelable;
+using namespace chip::app::Clusters;
+using chip::Messaging::ExchangeManager;
+using chip::SessionHandle;
+using chip::Optional;
+using chip::System::Clock::Timeout;
+using chip::System::Clock::Seconds16;
+
+// NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
+{{#zcl_clusters}}
+{{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+@implementation MTRCluster{{asUpperCamelCase name preserveAcronyms=true}}
+
+{{#zcl_commands}}
+{{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
+{{#*inline "commandImpl"}}
+{{! This is used as the implementation for both the new-name and old-name bits, so check for both here. }}
+{{#if (or (isSupported cluster command=command)
+          (isSupported (compatClusterNameRemapping parent.name) command=(compatCommandNameRemapping parent.name name)))}}
+{{#*inline "callbackName"}}{{#if hasSpecificResponse}}{{cluster}}Cluster{{asUpperCamelCase responseName preserveAcronyms=true}}{{else}}CommandSuccess{{/if}}{{/inline}}
+{{#*inline "paramsType"}}
+{{#unless (isSupported cluster command=command)}}
+MTR{{compatClusterNameRemapping parent.name}}Cluster{{compatCommandNameRemapping parent.name name}}Params
+{{else}}
+MTR{{cluster}}Cluster{{command}}Params
+{{/unless}}
+{{/inline}}
+{{#unless commandHasRequiredField}}
+- (void){{asLowerCamelCase name}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion
+{
+  [self {{asLowerCamelCase name}}WithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
+{{/unless}}
+- (void){{asLowerCamelCase name}}WithParams: ({{> paramsType}} * {{#unless commandHasRequiredField}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion
+{
+    if (params == nil) {
+        params = [[{{> paramsType}} alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        {{#if hasSpecificResponse}}
+        completion(response, error);
+        {{else}}
+        completion(error);
+        {{/if}}
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    {{#if mustUseTimedInvoke}}
+    if (timedInvokeTimeoutMs == nil) {
+      timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
+    }
+    {{/if}}
+
+    using RequestType = {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+{{#if hasSpecificResponse}}
+                                     responseClass:MTR{{cluster}}Cluster{{asUpperCamelCase responseName preserveAcronyms=true}}Params.class
+{{else}}
+                                     responseClass:nil
+{{/if}}
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+{{/if}}
+{{/inline}}
+{{#if (is_str_equal source 'client')}}
+{{> commandImpl cluster=(asUpperCamelCase parent.name preserveAcronyms=true)
+                command=(asUpperCamelCase name preserveAcronyms=true)}}
+{{/if}}
+{{/zcl_commands}}
+
+{{#zcl_attributes_server}}
+{{! This is used as the implementation for both the new-name and old-name bits, so check for both here. }}
+{{#if (and
+        (or clusterRef
+            (isSupported "" globalAttribute=(asUpperCamelCase label preserveAcronyms=true)))
+        (or (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))
+            (and (isSupported (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))
+                 (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name)))))}}
+{{#*inline "cluster"}}{{asUpperCamelCase parent.name preserveAcronyms=true}}{{/inline}}
+{{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
+- (NSDictionary<NSString *, id> * _Nullable)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params {
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDType{{>cluster}}ID) attributeID:@(MTRAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) params:params];
+}
+
+{{#if (or isWritableAttribute
+      (isInConfigList (concat (asUpperCamelCase parent.name) "::" label) "DarwinForceWritable"))}}
+{{#*inline "callbackName"}}DefaultSuccess{{/inline}}
+- (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+  [self write{{>attribute}}WithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber *timedWriteTimeout = params.timedWriteTimeout;
+    {{#if mustUseTimedWrite}}
+    if (!timedWriteTimeout) {
+        timedWriteTimeout = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
+    }
+    {{/if}}
+
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDType{{>cluster}}ID) attributeID:@(MTRAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+{{/if}}
+
+{{/if}}
+{{/zcl_attributes_server}}
+
+@end
+{{/if}}
+{{#unless (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (compatClusterNameRemapping name))}}
+{{#if (isSupported (compatClusterNameRemapping name))}}
+@implementation MTRCluster{{compatClusterNameRemapping name}}
+@end
+{{/if}}
+{{/unless}}
+
+{{#if (and (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping name))
+           (isSupported (compatClusterNameRemapping name)))}}
+@implementation MTRCluster{{compatClusterNameRemapping name}} (Deprecated)
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpoint:(uint16_t)endpoint queue:(dispatch_queue_t)queue
+{
+    return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
+}
+
+{{#zcl_commands}}
+{{#if (is_str_equal source 'client')}}
+{{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
+{{#*inline "commandImpl"}}
+{{#if (and (wasIntroducedBeforeRelease "First major API revamp" cluster command=command)
+           (isSupported cluster command=command))}}
+- (void){{asLowerCamelCase command}}WithParams:(MTR{{cluster}}Cluster{{command}}Params * {{#unless commandHasRequiredField}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler
+{
+  [self {{asLowerCamelCase name}}WithParams:params expectedValues:expectedDataValueDictionaries expectedValueInterval:expectedValueIntervalMs completion:
+      {{#if hasSpecificResponse}}
+    ^(MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase responseName preserveAcronyms=true}}Params * _Nullable data, NSError * _Nullable error) {
+      // Cast is safe because subclass does not add any selectors.
+      completionHandler(static_cast<MTR{{cluster}}Cluster{{compatCommandNameRemapping parent.name responseName}}Params *>(data), error);
+    }
+    {{else}}
+    completionHandler
+    {{/if}}
+    ];
+}
+{{#unless commandHasRequiredField}}
+{{#unless (isInConfigList
+           (concat (asUpperCamelCase cluster preserveAcronyms=true) "::" (asUpperCamelCase command preserveAcronyms=true))
+           "LegacyCommandsWithOnlyOptionalArguments")}}
+{{! KeySetReadAllIndices grew this params-less API later _after_ it had already been shipped, so it needs to be special-cased here }}
+{{#unless (and (isStrEqual cluster "GroupKeyManagement")
+               (isStrEqual command "KeySetReadAllIndices"))}}
+- (void){{asLowerCamelCase command}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler
+{
+  [self {{asLowerCamelCase command}}WithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completionHandler:completionHandler];
+}
+{{/unless}}
+{{/unless}}
+{{/unless}}
+{{/if}}
+{{/inline}}
+{{> commandImpl cluster=(compatClusterNameRemapping parent.name)
+                command=(compatCommandNameRemapping parent.name name)}}
+{{/if}}
+{{/zcl_commands}}
+{{~#zcl_attributes_server}}
+{{~#*inline "attributeImpls"}}
+{{#if (and (not (isStrEqual attribute (asUpperCamelCase name preserveAcronyms=true)))
+           (isSupported (compatClusterNameRemapping parent.name) attribute=attribute))}}
+- (NSDictionary<NSString *, id> *)readAttribute{{attribute}}WithParams:(MTRReadParams * _Nullable)params
+{
+  return [self readAttribute{{asUpperCamelCase name preserveAcronyms=true}}WithParams:params];
+}
+{{#if (or isWritableAttribute
+      (isInConfigList (concat (asUpperCamelCase parent.name) "::" label) "DarwinForceWritable"))}}
+- (void)writeAttribute{{attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+  [self writeAttribute{{asUpperCamelCase name preserveAcronyms=true}}WithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs];
+}
+- (void)writeAttribute{{attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+  [self writeAttribute{{asUpperCamelCase name preserveAcronyms=true}}WithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:params];
+}
+{{/if}}
+{{/if}}
+{{/inline~}}
+{{> attributeImpls attribute=(compatAttributeNameRemapping parent.name name)}}
+{{/zcl_attributes_server}}
+@end
+{{/if}}
+
+{{/zcl_clusters}}
+
+// NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)

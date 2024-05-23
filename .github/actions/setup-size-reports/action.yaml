@@ -1,0 +1,15 @@
+name: Setup size reports
+description: Setup size reports
+inputs:
+  gh-context:
+    description: "GH Context"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up environment for size reports
+      shell: bash
+      env:
+        GH_CONTEXT: ${{ inputs.gh-context }}
+      run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"

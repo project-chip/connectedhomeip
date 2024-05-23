@@ -1,0 +1,112 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 186.2.1. [TC-WASHERCTRL-2.1] Optional Spin attributes with DUT as Server
+
+PICS:
+    - WASHERCTRL.S.F00
+
+config:
+    nodeId: 0x12344321
+    cluster: "Laundry Washer Controls"
+    endpoint: 1
+
+    SpinSpeedCurrentValue:
+        type: int8u
+        defaultValue: 3
+
+    unsupportedSpinSpeedCurrentValue:
+        type: int8u
+        defaultValue: 17
+
+tests:
+    - label: "Step 1: Commission DUT to TH"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH reads from the DUT the the SpinSpeeds attribute"
+      PICS: WASHERCTRL.S.A0000
+      command: "readAttribute"
+      attribute: "SpinSpeeds"
+      response:
+          constraints:
+              type: list
+              maxLength: 16
+
+    - label: "Step 3: TH reads from the DUT the the SpinSpeedCurrent attribute"
+      PICS: WASHERCTRL.S.A0001
+      command: "readAttribute"
+      attribute: "SpinSpeedCurrent"
+      response:
+          constraints:
+              type: int8u
+              minValue: 0
+
+    - label:
+          "Verify that the DUT response contains a uint8 with value between 0
+          and numSpinSpeeds-1 inclusive."
+      verification: |
+          On TH(Chip-tool), Verify the SpinSpeedCurrent attribute contains value is in the range of  0 and numSpinSpeeds-1.
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && WASHERCTRL.S.A0001
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 4: TH writes a supported SpinSpeedCurrent attribute that is a
+          valid index into the list of spin speeds (0 to numSpinSpeeds-1)"
+      PICS: WASHERCTRL.S.A0001
+      command: "writeAttribute"
+      attribute: "SpinSpeedCurrent"
+      arguments:
+          value: SpinSpeedCurrentValue
+
+    - label: "Wait 2 seconds"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 2000
+
+    - label:
+          "Step 5: after a few seconds, TH reads from the DUT the
+          SpinSpeedCurrent attribute"
+      PICS: WASHERCTRL.S.A0001
+      command: "readAttribute"
+      attribute: "SpinSpeedCurrent"
+      response:
+          value: SpinSpeedCurrentValue
+          constraints:
+              type: int8u
+
+    - label:
+          "Step 6: TH writes an unsupported SpinSpeedCurrent attribute that is
+          other than 0 to DUT"
+      PICS: WASHERCTRL.S.A0001
+      command: "writeAttribute"
+      attribute: "SpinSpeedCurrent"
+      arguments:
+          value: unsupportedSpinSpeedCurrentValue
+      response:
+          error: CONSTRAINT_ERROR

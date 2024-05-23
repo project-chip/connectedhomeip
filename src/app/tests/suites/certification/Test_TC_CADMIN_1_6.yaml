@@ -1,0 +1,292 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    24.1.6. [TC-CADMIN-1.6] Commissioning window handling timeout and revocation
+    using BCM [DUT - Commissionee]
+
+PICS:
+    - CADMIN.S
+    - CADMIN.S.F00
+
+config:
+    nodeId: 0x12344321
+    timeout: 300
+    nodeIdForDuplicateCommissioning:
+        type: node_id
+        defaultValue: 0x11
+    nodeId2:
+        type: node_id
+        defaultValue: 0xCAFE
+    nodeId3:
+        type: node_id
+        defaultValue: 0xC00FEE
+    endpoint: 0
+    waitAfterCommissioning:
+        type: int16u
+        defaultValue: 5000
+    payload:
+        type: char_string
+        defaultValue: "MT:-24J0AFN00KA0648G00" # This value needs to be generated automatically
+    PIXIT.CADMIN.CwDuration:
+        type: int16u
+        defaultValue: 180
+
+tests:
+    - label: "Precondition: Reset Devices to factory defaults"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "FactoryReset"
+
+    - label: "Precondition: Reset Devices to factory defaults"
+      verification: |
+          Reset Devices to factory defaults
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Factory Reset the DUT and enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 1a: TH_CR1 starts a commissioning process with DUT_CE"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: payload
+
+    - label: "Step 1b: TH_CR1 commissioned with DUT_CE"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH_CR1 opens a commissioning window on DUT_CE"
+      identity: "alpha"
+      cluster: "Administrator Commissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      PICS: CADMIN.S.C01.Rsp
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: PIXIT.CADMIN.CwDuration
+
+    - label: "Step 3: Verify that the DNS-SD advertisement shows CM=1"
+      PICS: CADMIN.S.C01.Rsp
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "commissioningMode"
+                value: 1
+
+    - label: "Wait for PIXIT.CADMIN.CwDuration + 10"
+      PICS: CADMIN.S.C01.Rsp
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: ( PIXIT.CADMIN.CwDuration + 10 ) * 1000
+
+    - label: "Step 4: TH_CR2 starts a commissioning process with DUT_CE"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S.C01.Rsp
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: payload
+      response:
+          error: FAILURE
+
+    - label: "Step 5: TH_CR1 opens a commissioning window on DUT_CE"
+      cluster: "Administrator Commissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      PICS: CADMIN.S.C01.Rsp
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: PIXIT.CADMIN.CwDuration
+
+    - label: "Waiting after opening commissioning window"
+      PICS: CADMIN.S.C01.Rsp
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
+
+    - label: "Step 6: TH_CR1 revokes the commissioning window on DUT_CE"
+      cluster: "Administrator Commissioning"
+      command: "RevokeCommissioning"
+      PICS: CADMIN.S.C02.Rsp
+      timedInteractionTimeoutMs: 10000
+
+    - label: "Step 7: TH_CR2 starts a commissioning process with DUT_CE"
+      identity: "beta"
+      PICS: CADMIN.S
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: payload
+      response:
+          error: FAILURE
+
+    - label: "Step 8: TH_CR1 revokes the commissioning window on DUT_CE"
+      cluster: "Administrator Commissioning"
+      command: "RevokeCommissioning"
+      timedInteractionTimeoutMs: 10000
+      PICS: CADMIN.S.C02.Rsp
+      response:
+          error: FAILURE
+
+    - label:
+          "Step 9a: TH_CR1 writes the mandatory attribute NodeLabel of DUT_CE"
+      identity: "alpha"
+      cluster: "Basic Information"
+      command: "writeAttribute"
+      attribute: "NodeLabel"
+      PICS: BINFO.S.A0005
+      arguments:
+          value: "chiptest"
+
+    - label: "Step 9b: TH_CR1 read the mandatory attribute NodeLabel of DUT_CE"
+      identity: "alpha"
+      cluster: "Basic Information"
+      command: "readAttribute"
+      attribute: "NodeLabel"
+      PICS: BINFO.S.A0005
+      response:
+          value: "chiptest"
+
+    - label: "Step 10: TH_CR1 opens a commissioning window on DUT_CE"
+      identity: "alpha"
+      cluster: "Administrator Commissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      PICS: CADMIN.S.C01.Rsp
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: PIXIT.CADMIN.CwDuration
+
+    - label: "Waiting after opening commissioning window"
+      PICS: CADMIN.S.C01.Rsp
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
+
+    - label: "Step 11: TH_CR1 opens another commissioning window on DUT_CE"
+      identity: "alpha"
+      cluster: "Administrator Commissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      PICS: CADMIN.S.C01.Rsp
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: PIXIT.CADMIN.CwDuration
+      response:
+          error: FAILURE
+          clusterError: 2
+
+    - label: "Step 12: TH_CR2 starts a commissioning process on DUT_CE"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: payload
+
+    - label: "DUT_CE is commissioned by TH_CR2"
+      identity: "beta"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+
+    - label:
+          "TH2 reads CurrentFabricIndex attribute and save it for future use."
+      identity: "beta"
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: TH2FabricIndex
+
+    - label:
+          "Step 13: TH_CR1 tries to revoke the commissioning window on DUT_CE
+          using RevokeCommissioning command"
+      cluster: "Administrator Commissioning"
+      command: "RevokeCommissioning"
+      PICS: CADMIN.S.C02.Rsp
+      timedInteractionTimeoutMs: 10000
+      response:
+          error: FAILURE
+          clusterError: 4
+
+    - label: "Step 14: TH_CR3 starts a commissioning process with DUT_CE"
+      identity: "gamma"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId3
+              - name: "payload"
+                value: payload
+      response:
+          error: FAILURE
+
+    - label: "Remove TH2 FabricIndex"
+      PICS: OPCREDS.S.C0a.Rsp && CADMIN.S
+      identity: "beta"
+      cluster: "Operational Credentials"
+      command: "RemoveFabric"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "FabricIndex"
+                value: TH2FabricIndex

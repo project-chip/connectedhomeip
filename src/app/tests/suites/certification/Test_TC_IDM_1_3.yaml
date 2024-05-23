@@ -1,0 +1,390 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    3.1.3. [TC-IDM-1.3] Batched Commands Invoke Request Action from DUT to TH -
+    [{DUT_Client}]
+
+PICS:
+    - MCORE.IDM.C.InvokeRequest.BatchCommands
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          Chip-repl commands used below are an example to verify the DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label:
+          "Step 0 (Pre-Condition 1): Commission TH Client to TH device (Server),
+          if not done so already."
+      verification: |
+          Ensure DUT is commissioned to TH device (Server).
+      disabled: true
+
+    - label:
+          "Step 0 (Pre-Condition 2): Commission DUT to TH device (Server), if
+          not done so already."
+      verification: |
+          Ensure DUT is commissioned to TH device (Server).
+          This likely requires opening the commissioning window with TH Client."
+      disabled: true
+
+    - label:
+          "Step 0 (Pre-Condition 3): TH Client send `FailAtFault` command to
+          `FaultInjection` cluster to TH device (Server)."
+      cluster: "FaultInjection"
+      command: "FailAtFault"
+      arguments:
+          values:
+              - name: "Type"
+                value: 3
+              - name: "Id"
+                value: 12
+              - name: "NumCallsToSkip"
+                value: 3
+              - name: "NumCallsToFail"
+                value: 1
+              - name: "TakeMutex"
+                value: false
+      verification: |
+          Equivalent TH Client command to run `chip-tool faultinjection fail-at-fault 3 12 3 1 false 1 0`
+          On TH(all-clusters-app), Verify command is successfully:
+
+          CHIP:DMG: InvokeRequestMessage =
+          CHIP:DMG: {
+          CHIP:DMG:       suppressResponse = false,
+          CHIP:DMG:       timedRequest = false,
+          CHIP:DMG:       InvokeRequests =
+          CHIP:DMG:       [
+          CHIP:DMG:               CommandDataIB =
+          CHIP:DMG:               {
+          CHIP:DMG:                       CommandPathIB =
+          CHIP:DMG:                       {
+          CHIP:DMG:                               EndpointId = 0x0,
+          CHIP:DMG:                               ClusterId = 0xfff1fc06,
+          CHIP:DMG:                               CommandId = 0x0,
+          CHIP:DMG:                       },
+          CHIP:DMG:
+          CHIP:DMG:                       CommandFields =
+          CHIP:DMG:                       {
+          CHIP:DMG:                               0x0 = 3,
+          CHIP:DMG:                               0x1 = 12,
+          CHIP:DMG:                               0x2 = 3,
+          CHIP:DMG:                               0x3 = 1,
+          CHIP:DMG:                               0x4 = false,
+          CHIP:DMG:                       },
+          CHIP:DMG:               },
+          CHIP:DMG:
+          CHIP:DMG:       ],
+          CHIP:DMG:
+          CHIP:DMG:       InteractionModelRevision = 11
+          CHIP:DMG: },
+          CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0xFFF1_FC06 e=0 p=m
+          CHIP:DMG: AccessControl: allowed
+          CHIP:DMG: Received command for Endpoint=0 Cluster=0xFFF1_FC06 Command=0x0000_0000
+          CHIP:ZCL: FaultInjection: Configure a fault of type: 3 and Id: 12 to be triggered deterministically           <--------- Verify success with this message.
+      disabled: true
+
+    - label:
+          "Step 0 (Pre-Condition 4): TH Client send `FailAtFault` command to
+          `FaultInjection` cluster to TH device (Server)."
+      cluster: "FaultInjection"
+      command: "FailAtFault"
+      arguments:
+          values:
+              - name: "Type"
+                value: 3
+              - name: "Id"
+                value: 13
+              - name: "NumCallsToSkip"
+                value: 2
+              - name: "NumCallsToFail"
+                value: 1
+              - name: "TakeMutex"
+                value: false
+      verification: |
+          Equivalent TH Client command to run `chip-tool faultinjection fail-at-fault 3 13 2 1 false 1 0`
+          On TH(all-clusters-app), Verify command is successfully:
+
+          CHIP:DMG: InvokeRequestMessage =
+          CHIP:DMG: {
+          CHIP:DMG:       suppressResponse = false,
+          CHIP:DMG:       timedRequest = false,
+          CHIP:DMG:       InvokeRequests =
+          CHIP:DMG:       [
+          CHIP:DMG:               CommandDataIB =
+          CHIP:DMG:               {
+          CHIP:DMG:                       CommandPathIB =
+          CHIP:DMG:                       {
+          CHIP:DMG:                               EndpointId = 0x0,
+          CHIP:DMG:                               ClusterId = 0xfff1fc06,
+          CHIP:DMG:                               CommandId = 0x0,
+          CHIP:DMG:                       },
+          CHIP:DMG:
+          CHIP:DMG:                       CommandFields =
+          CHIP:DMG:                       {
+          CHIP:DMG:                               0x0 = 3,
+          CHIP:DMG:                               0x1 = 13,
+          CHIP:DMG:                               0x2 = 2,
+          CHIP:DMG:                               0x3 = 1,
+          CHIP:DMG:                               0x4 = false,
+          CHIP:DMG:                       },
+          CHIP:DMG:               },
+          CHIP:DMG:
+          CHIP:DMG:       ],
+          CHIP:DMG:
+          CHIP:DMG:       InteractionModelRevision = 11
+          CHIP:DMG: },
+          CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0xFFF1_FC06 e=0 p=m
+          CHIP:DMG: AccessControl: allowed
+          CHIP:DMG: Received command for Endpoint=0 Cluster=0xFFF1_FC06 Command=0x0000_0000
+          CHIP:ZCL: FaultInjection: Configure a fault of type: 3 and Id: 13 to be triggered deterministically           <--------- Verify success with this message.
+      disabled: true
+
+    - label:
+          "Step 0 (Pre-Condition 5): TH Client send `FailAtFault` command to
+          `FaultInjection` cluster to TH device (Server)."
+      cluster: "FaultInjection"
+      command: "FailAtFault"
+      arguments:
+          values:
+              - name: "Type"
+                value: 3
+              - name: "Id"
+                value: 14
+              - name: "NumCallsToSkip"
+                value: 1
+              - name: "NumCallsToFail"
+                value: 1
+              - name: "TakeMutex"
+                value: false
+      verification: |
+          Equivalent TH Client command to run `chip-tool faultinjection fail-at-fault 3 14 1 1 false 1 0`
+          On TH(all-clusters-app), Verify command is successfully:
+
+          CHIP:DMG: InvokeRequestMessage =
+          CHIP:DMG: {
+          CHIP:DMG:       suppressResponse = false,
+          CHIP:DMG:       timedRequest = false,
+          CHIP:DMG:       InvokeRequests =
+          CHIP:DMG:       [
+          CHIP:DMG:               CommandDataIB =
+          CHIP:DMG:               {
+          CHIP:DMG:                       CommandPathIB =
+          CHIP:DMG:                       {
+          CHIP:DMG:                               EndpointId = 0x0,
+          CHIP:DMG:                               ClusterId = 0xfff1fc06,
+          CHIP:DMG:                               CommandId = 0x0,
+          CHIP:DMG:                       },
+          CHIP:DMG:
+          CHIP:DMG:                       CommandFields =
+          CHIP:DMG:                       {
+          CHIP:DMG:                               0x0 = 3,
+          CHIP:DMG:                               0x1 = 14,
+          CHIP:DMG:                               0x2 = 1,
+          CHIP:DMG:                               0x3 = 1,
+          CHIP:DMG:                               0x4 = false,
+          CHIP:DMG:                       },
+          CHIP:DMG:               },
+          CHIP:DMG:
+          CHIP:DMG:       ],
+          CHIP:DMG:
+          CHIP:DMG:       InteractionModelRevision = 11
+          CHIP:DMG: },
+          CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0xFFF1_FC06 e=0 p=m
+          CHIP:DMG: AccessControl: allowed
+          CHIP:DMG: Received command for Endpoint=0 Cluster=0xFFF1_FC06 Command=0x0000_0000
+          CHIP:ZCL: FaultInjection: Configure a fault of type: 3 and Id: 14 to be triggered deterministically           <--------- Verify success with this message.
+      disabled: true
+
+    - label: "Step 1: DUT sends the Invoke Request Message to the TH. The
+          Message should contain two valid and unique paths in the
+          CommandDataIBs, which has the specific Endpoints, specific Clusters
+          and specific Commands.
+
+          TH should be configured such that it responds to the batched commands
+          in a single InvokeResponseMessage, the ordering of CommandDataIBs in
+          the InvokeResponseMessage SHALL be in the same order as provided in
+          the request."
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT that is capable of fitting into a single InvokeResponseMessage. For comparison, the DUT behavior for this
+          test step can be simulated using chip-repl (when DUT is a commissioner/Client).
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command. Note in this example the unique path is created by using 2 different endpoints.
+
+          `await devCtrl.SendBatchCommands(0x12344321, [chip.clusters.Command.InvokeRequestInfo(1, chip.clusters.OnOff.Commands.Toggle()), chip.clusters.Command.InvokeRequestInfo(2, chip.clusters.OnOff.Commands.Toggle())])`
+
+          On TH(all-clusters-app), Verify that the EndpointIDs, CommandIDs, ClusterIDs in the InvokeRequestMessage (as below) matching with the data sent in the above command
+
+          CHIP:DMG: InvokeRequestMessage =
+          CHIP:DMG: {
+          CHIP:DMG:       suppressResponse = false,
+          CHIP:DMG:       timedRequest = true,
+          CHIP:DMG:       InvokeRequests =
+          CHIP:DMG:       [
+          CHIP:DMG:               CommandDataIB =
+          CHIP:DMG:               {
+          CHIP:DMG:                       CommandPathIB =                                     <--------- Verifying everything in this struct matches what is provided by product maker
+          CHIP:DMG:                       {
+          CHIP:DMG:                               EndpointId = 0x1,
+          CHIP:DMG:                               ClusterId = 0x6,
+          CHIP:DMG:                               CommandId = 0x2,
+          CHIP:DMG:                       },
+          CHIP:DMG:
+          CHIP:DMG:                       CommandFields =
+          CHIP:DMG:                       {
+          CHIP:DMG:                       },
+          CHIP:DMG:                       Ref = 0x0,
+          CHIP:DMG:               },
+          CHIP:DMG:
+          CHIP:DMG:               CommandDataIB =
+          CHIP:DMG:               {
+          CHIP:DMG:                       CommandPathIB =                                     <--------- Verifying everything in this struct matches what is provided by product maker
+          CHIP:DMG:                       {
+          CHIP:DMG:                               EndpointId = 0x2,
+          CHIP:DMG:                               ClusterId = 0x6,
+          CHIP:DMG:                               CommandId = 0x2,
+          CHIP:DMG:                       },
+          CHIP:DMG:
+          CHIP:DMG:                       CommandFields =
+          CHIP:DMG:                       {
+          CHIP:DMG:                       },
+          CHIP:DMG:                       Ref = 0x1,
+          CHIP:DMG:               },
+          CHIP:DMG:
+          CHIP:DMG:       ],
+          CHIP:DMG:
+          CHIP:DMG:       InteractionModelRevision = 11
+          CHIP:DMG: },
+          CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0006 e=1 p=o
+          CHIP:DMG: AccessControl: allowed
+      disabled: true
+
+    - label: "Step 2: DUT sends the Invoke Request Message to the TH. The
+          Message should contain two valid and unique paths in the
+          CommandDataIBs, which has the specific Endpoints, specific Clusters
+          and specific Commands.
+
+          TH should be configured such that it responds to the batched commands
+          over two InvokeResponseMessages. The first InvokeResponseMessage SHALL
+          contain a response to the first CommandDataIB in the
+          InvokeRequestMessage. The second InvokeReponseMessage SHALL contains a
+          response to the second CommandDataIB in the InvokeRequestMessage."
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command this on the DUT that is capable of fitting into a single InvokeResponseMessage. For comparison, the DUT behavior for this
+          test step can be simulated using chip-repl (when DUT is a commissioner/Client).
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command. Note in this example the unique path is created by using 2 different endpoints.
+
+          `await devCtrl.SendBatchCommands(0x12344321, [chip.clusters.Command.InvokeRequestInfo(1, chip.clusters.OnOff.Commands.Toggle()), chip.clusters.Command.InvokeRequestInfo(2, chip.clusters.OnOff.Commands.Toggle())])`
+
+          * Verify DUT doesn't crash by seeing next step execute.
+          * On TH(all-clusters-app), Verify following logs are seen:
+            CHIP:DMG: Response to InvokeRequestMessage overridden by fault injection
+            CHIP:DMG:    Injecting the following response:Each response will be sent in a separate InvokeResponseMessage. The order of responses will be the same as the original request.
+      disabled: true
+
+    - label: "Step 3: DUT sends the Invoke Request Message to the TH. The
+          Message should contain two valid and unique paths in the
+          CommandDataIBs, which has the specific Endpoints, specific Clusters
+          and specific Commands.
+
+          TH should be configured such that it responds to the batched commands
+          over two InvokeResponseMessages. The first InvokeResponseMessage SHALL
+          contain a response to the second CommandDataIB in the
+          InvokeRequestMessage. The second InvokeReponseMessage SHALL contains a
+          response to the first CommandDataIB in the InvokeRequestMessage."
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command this on the DUT that is capable of fitting into a single InvokeResponseMessage. For comparison, the DUT behavior for this
+          test step can be simulated using chip-repl (when DUT is a commissioner/Client).
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command. Note in this example the unique path is created by using 2 different endpoints.
+
+          `await devCtrl.SendBatchCommands(0x12344321, [chip.clusters.Command.InvokeRequestInfo(1, chip.clusters.OnOff.Commands.Toggle()), chip.clusters.Command.InvokeRequestInfo(2, chip.clusters.OnOff.Commands.Toggle())])`
+
+          * Verify DUT doesn't crash by seeing next step execute.
+          * On TH(all-clusters-app), Verify following logs are seen:
+            CHIP:DMG: Response to InvokeRequestMessage overridden by fault injection
+            CHIP:DMG:    Injecting the following response:Each response will be sent in a separate InvokeResponseMessage. The order of responses will be reversed from the original request.
+      disabled: true
+
+    - label: "Step 4: DUT sends the Invoke Request Message to the TH. The
+          Message should contain two valid and unique paths in the
+          CommandDataIBs, which has the specific Endpoints, specific Clusters
+          and specific Commands.
+
+          TH should be configured such that it responds incorrectly to the
+          batched commands in a single InvokeResponseMessages. The
+          InvokeResponseMessage SHALL contain a response to the first
+          CommandDataIB in the InvokeRequestMessage. The second response to
+          second CommandDataIB will intentionally be left out."
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command this on the DUT that is capable of fitting into a single InvokeResponseMessage. For comparison, the DUT behavior for this
+          test step can be simulated using chip-repl (when DUT is a commissioner/Client).
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command. Note in this example the unique path is created by using 2 different endpoints.
+
+          `await devCtrl.SendBatchCommands(0x12344321, [chip.clusters.Command.InvokeRequestInfo(1, chip.clusters.OnOff.Commands.Toggle()), chip.clusters.Command.InvokeRequestInfo(2, chip.clusters.OnOff.Commands.Toggle())])`
+
+          * Verify DUT doesn't crash by seeing next step execute.
+          * On TH(all-clusters-app), Verify following logs are seen:
+            CHIP:DMG: Response to InvokeRequestMessage overridden by fault injection
+            CHIP:DMG:    Injecting the following response:Single InvokeResponseMessages. Dropping response to second request
+      disabled: true
+
+    - label: "Step 5: DUT sends the Invoke Request Message to the TH. The
+          Message should contain one valid CommandDataIB, which has the specific
+          Endpoint, Specific Cluster and Specific Command.
+
+          TH should be configured such that it responds regularly to single
+          invoke request."
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command this on the DUT that is capable of fitting into a single InvokeResponseMessage. For comparison, the DUT behavior for this
+          test step can be simulated using chip-repl (when DUT is a commissioner/Client).
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command. Note in this example the unique path is created by using 2 different endpoints.
+
+          `await devCtrl.SendCommand(0x12344321, 1, chip.clusters.OnOff.Commands.Toggle())`
+
+          On TH(all-clusters-app), Verify that we recieves an InvokeRequestMessage that contains a single InvokeRequests
+
+          CHIP:DMG: InvokeRequestMessage =
+          CHIP:DMG: {
+          CHIP:DMG:       suppressResponse = false,
+          CHIP:DMG:       timedRequest = true,
+          CHIP:DMG:       InvokeRequests =                                                    <--------- Verify only one CommandDataIB in this structure
+          CHIP:DMG:       [
+          CHIP:DMG:               CommandDataIB =
+          CHIP:DMG:               {
+          CHIP:DMG:                       CommandPathIB =
+          CHIP:DMG:                       {
+          CHIP:DMG:                               EndpointId = 0x1,
+          CHIP:DMG:                               ClusterId = 0x6,
+          CHIP:DMG:                               CommandId = 0x2,
+          CHIP:DMG:                       },
+          CHIP:DMG:
+          CHIP:DMG:                       CommandFields =
+          CHIP:DMG:                       {
+          CHIP:DMG:                       },
+          CHIP:DMG:                       Ref = 0x0,
+          CHIP:DMG:               },
+          CHIP:DMG:
+          CHIP:DMG:       ],
+          CHIP:DMG:
+          CHIP:DMG:       InteractionModelRevision = 11
+          CHIP:DMG: },
+          CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0006 e=1 p=o
+          CHIP:DMG: AccessControl: allowed
+      disabled: true

@@ -1,0 +1,239 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 24.2.2. [TC-LVL-2.2] Write cluster attributes (DUT as Server)
+
+PICS:
+    - LVL.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Level Control"
+    endpoint: 1
+    OnOffTransitionTimeConfigValue:
+        type: int16u
+        defaultValue: 10
+    OnLevelConfigValue:
+        type: int8u
+        defaultValue: 5
+    OnTransitionTimeConfigValue:
+        type: int16u
+        defaultValue: 5
+    OffTransitionTimeConfigValue:
+        type: int16u
+        defaultValue: 10
+    DefaultMoveRateConfigValue:
+        type: int8u
+        defaultValue: 111
+    StartUpCurrentLevelConfigValue:
+        type: int8u
+        defaultValue: 5
+
+tests:
+    - label:
+          "Commission DUT to TH (can be skipped if done in a preceding test)."
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 1a: TH reads the OnOffTransitionTime attribute from the DUT"
+      PICS: LVL.S.A0010
+      command: "readAttribute"
+      attribute: "OnOffTransitionTime"
+      response:
+          saveAs: OnOffTransitionTimeValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label:
+          "Step 1b: TH writes the OnOffTransitionTime attribute on the DUT with
+          a different value than that read in 1a"
+      PICS: LVL.S.A0010
+      command: "writeAttribute"
+      attribute: "OnOffTransitionTime"
+      arguments:
+          value: OnOffTransitionTimeConfigValue
+
+    - label: "Step 1c: TH reads the OnOffTransitionTime attribute from the DUT"
+      PICS: LVL.S.A0010
+      command: "readAttribute"
+      attribute: "OnOffTransitionTime"
+      response:
+          value: OnOffTransitionTimeConfigValue
+          constraints:
+              type: int16u
+              notValue: OnOffTransitionTimeValue
+
+    - label: "Step 2a: TH reads the OnLevel attribute from the DUT"
+      PICS: LVL.S.A0011
+      command: "readAttribute"
+      attribute: "OnLevel"
+      response:
+          saveAs: OnLevelValue
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 254
+
+    - label:
+          "Step 2b: TH writes the OnLevel attribute on the DUT with a different
+          value than that read in 2a"
+      PICS: LVL.S.A0011
+      command: "writeAttribute"
+      attribute: "OnLevel"
+      arguments:
+          value: OnLevelConfigValue
+
+    - label: "Step 2c: TH reads the OnLevel attribute from the DUT"
+      PICS: LVL.S.A0011
+      command: "readAttribute"
+      attribute: "OnLevel"
+      response:
+          value: OnLevelConfigValue
+          constraints:
+              type: int8u
+              notValue: OnLevelValue
+
+    - label: "Step 3a: TH reads the OnTransitionTime attribute from the DUT"
+      PICS: LVL.S.A0012
+      command: "readAttribute"
+      attribute: "OnTransitionTime"
+      response:
+          saveAs: OnTransitionTimeValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label:
+          "Step 3b: TH writes the OnTransitionTime attribute on the DUT with a
+          different value than that read in 3a"
+      PICS: LVL.S.A0012
+      command: "writeAttribute"
+      attribute: "OnTransitionTime"
+      arguments:
+          value: OnTransitionTimeConfigValue
+
+    - label: "Step 3c: TH reads the OnTransitionTime attribute from the DUT"
+      PICS: LVL.S.A0012
+      command: "readAttribute"
+      attribute: "OnTransitionTime"
+      response:
+          value: OnTransitionTimeConfigValue
+          constraints:
+              type: int16u
+              notValue: OnTransitionTimeValue
+
+    - label: "Step 4a: TH reads the OffTransitionTime attribute from the DUT"
+      PICS: LVL.S.A0013
+      command: "readAttribute"
+      attribute: "OffTransitionTime"
+      response:
+          saveAs: OffTransitionTimeValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label:
+          "Step 4b: TH writes the OffTransitionTime attribute on the DUT with a
+          different value than that read in 4a"
+      PICS: LVL.S.A0013
+      command: "writeAttribute"
+      attribute: "OffTransitionTime"
+      arguments:
+          value: OffTransitionTimeConfigValue
+
+    - label: "Step 4c: TH reads the OffTransitionTime attribute from the DUT"
+      PICS: LVL.S.A0013
+      command: "readAttribute"
+      attribute: "OffTransitionTime"
+      response:
+          value: OffTransitionTimeConfigValue
+          constraints:
+              type: int16u
+              notValue: OffTransitionTimeValue
+
+    - label: "Step 5a: TH reads the DefaultMoveRate attribute from the DUT"
+      PICS: LVL.S.A0014
+      command: "readAttribute"
+      attribute: "DefaultMoveRate"
+      response:
+          saveAs: DefaultMoveRatevalue
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 255
+
+    - label:
+          "Step 5b: TH writes the DefaultMoveRate attribute on the DUT with a
+          different value than that read in 5a"
+      PICS: LVL.S.A0014
+      command: "writeAttribute"
+      attribute: "DefaultMoveRate"
+      arguments:
+          value: DefaultMoveRateConfigValue
+
+    - label: "Step 5c: TH reads the DefaultMoveRate attribute from the DUT"
+      PICS: LVL.S.A0014
+      command: "readAttribute"
+      attribute: "DefaultMoveRate"
+      response:
+          value: DefaultMoveRateConfigValue
+          constraints:
+              type: int8u
+              notValue: DefaultMoveRatevalue
+
+    - label: "Step 6a: TH reads the StartUpCurrentLevel attribute from the DUT"
+      PICS: LVL.S.A4000
+      command: "readAttribute"
+      attribute: "StartUpCurrentLevel"
+      response:
+          saveAs: StartUpCurrentLevelValue
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 255
+
+    - label:
+          "Step 6b: TH writes the StartUpCurrentLevel attribute on the DUT with
+          a different value than that read in 6a"
+      PICS: LVL.S.A4000
+      command: "writeAttribute"
+      attribute: "StartUpCurrentLevel"
+      arguments:
+          value: StartUpCurrentLevelConfigValue
+
+    - label: "Step 6c: TH reads the StartUpCurrentLevel attribute from the DUT"
+      PICS: LVL.S.A4000
+      command: "readAttribute"
+      attribute: "StartUpCurrentLevel"
+      response:
+          value: StartUpCurrentLevelConfigValue
+          constraints:
+              type: int8u
+              notValue: StartUpCurrentLevelValue
+
+    #This is a reset step that is needed to reset the value of the attribute to the default values so as to not effect other test cases.
+    - label: "writes back default value of OnOffTransitionTime attribute"
+      PICS: LVL.S.A0010
+      command: "writeAttribute"
+      attribute: "OnOffTransitionTime"
+      arguments:
+          value: 0

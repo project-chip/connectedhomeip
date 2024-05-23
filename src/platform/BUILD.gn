@@ -1,0 +1,609 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
+
+import("${build_root}/config/linux/pkg_config.gni")
+import("${chip_root}/build/chip/buildconfig_header.gni")
+
+import("device.gni")
+
+if (chip_enable_openthread) {
+  import("//build_overrides/openthread.gni")
+
+  if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
+    import("//build_overrides/ot_br_posix.gni")
+  }
+}
+
+if (chip_device_platform != "none" && chip_device_platform != "external") {
+  declare_args() {
+    # Extra header to include in CHIPDeviceConfig.h for project.
+    chip_device_project_config_include = ""
+
+    # Date the firmware was built.
+    chip_device_config_firmware_build_date = ""
+
+    # Time the firmware was built.
+    chip_device_config_firmware_build_time = ""
+
+    # Use OpenThread ftd or mtd library
+    chip_device_config_thread_ftd = chip_openthread_ftd
+
+    # Enable including the additional data in the advertisement packets
+    chip_enable_additional_data_advertising = false
+
+    # Enable default/generic test-mode CommissionableDataProvider in GenericConfigurationManagerImpl
+    # === FOR TRANSITION UNTIL ALL EXAMPLES PROVIDE THEIR OWN ===
+    # Linux platform has already transitioned.
+    chip_use_transitional_commissionable_data_provider =
+        chip_device_platform != "linux" && chip_device_platform != "android"
+
+    # Enable default/generic test-mode DeviceInstanceInfoProvider in GenericConfigurationManagerImpl
+    # === FOR TRANSITION UNTIL ALL EXAMPLES PROVIDE THEIR OWN ===
+    chip_use_transitional_device_instance_info_provider = true
+
+    # lock tracking: none/log/fatal or auto for a platform-dependent choice
+    chip_stack_lock_tracking = "auto"
+
+    # todo: below operates are not work without root permission
+    # pthread_attr_setschedpolicy in GenericPlatformManagerImpl_POSIX.cpp
+    chip_device_config_run_as_root = current_os != "android"
+
+    # Indication that the CHIP data model is included
+    chip_enable_data_model = false
+
+    # Device software version as an integer.  e.g. chip_device_config_device_software_version=7
+    chip_device_config_device_software_version = ""
+
+    # Device software version string as a string having the format "x.y"  e.g. chip_device_config_device_software_version="7.0" (but make sure to escape it from the shell!)
+    chip_device_config_device_software_version_string = ""
+
+    # Device vendor id as a decimal integer. Configurable vendor ids allowed are 65521 (0xFFF1), 65522 (0xFFF2), 655223 (0xFFF3).
+    chip_device_config_device_vendor_id = ""
+
+    # Device product id as a decimal integer. Configurable product ids allowed are in the range 32768 (0x8000) - 32867 (0x8063)
+    chip_device_config_device_product_id = ""
+
+    # Define the default number of ip addresses to discover
+    chip_max_discovered_ip_addresses = 5
+
+    # Allows enabling dynamic setting of the local MRP configuration, for
+    # devices with multiple radios that have different sleep behavior for
+    # different radios.
+    chip_device_config_enable_dynamic_mrp_config = false
+  }
+
+  if (chip_stack_lock_tracking == "auto") {
+    if (chip_device_platform == "linux" || chip_device_platform == "tizen" ||
+        chip_device_platform == "android" || current_os == "freertos" ||
+        chip_device_platform == "webos" || chip_device_platform == "darwin") {
+      # TODO: should be fatal for development. Change once bugs are fixed
+      chip_stack_lock_tracking = "fatal"
+    } else {
+      # TODO: may want to enable at least logging for embedded to find bugs
+      # this needs tuning depending on how many resources various platforms have
+      # available (mainly flash size)
+      chip_stack_lock_tracking = "none"
+    }
+  } else {
+    assert(
+        chip_stack_lock_tracking == "none" ||
+            chip_stack_lock_tracking == "log" ||
+            chip_stack_lock_tracking == "fatal",
+        "Please select a valid value for chip_stack_lock_tracking: auto, none, log, fatal")
+  }
+
+  buildconfig_header("platform_buildconfig") {
+    header = "CHIPDeviceBuildConfig.h"
+    header_dir = "platform"
+
+    chip_device_config_enable_wpa =
+        chip_enable_wifi && chip_device_platform != "darwin"
+    chip_stack_lock_tracking_log = chip_stack_lock_tracking != "none"
+    chip_stack_lock_tracking_fatal = chip_stack_lock_tracking == "fatal"
+
+    # This is used to identify which platforms implement their ThreadStackManager
+    # with the otbr posix dbus api.
+    chip_device_uses_otbr_posix_dbus =
+        chip_enable_openthread &&
+        (chip_device_platform == "linux" || chip_device_platform == "tizen" ||
+         chip_device_platform == "webos")
+
+    defines = [
+      "CHIP_DEVICE_CONFIG_ENABLE_WPA=${chip_device_config_enable_wpa}",
+      "CHIP_ENABLE_OPENTHREAD=${chip_enable_openthread}",
+      "CHIP_DEVICE_CONFIG_THREAD_FTD=${chip_device_config_thread_ftd}",
+      "CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER=${chip_openthread_border_router}",
+      "CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK=${chip_device_uses_otbr_posix_dbus}",
+      "CHIP_STACK_LOCK_TRACKING_ENABLED=${chip_stack_lock_tracking_log}",
+      "CHIP_STACK_LOCK_TRACKING_ERROR_FATAL=${chip_stack_lock_tracking_fatal}",
+      "CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING=${chip_enable_additional_data_advertising}",
+      "CHIP_DEVICE_CONFIG_RUN_AS_ROOT=${chip_device_config_run_as_root}",
+      "CHIP_DISABLE_PLATFORM_KVS=${chip_disable_platform_kvs}",
+      "CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER=${chip_use_transitional_commissionable_data_provider}",
+      "CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER=${chip_use_transitional_device_instance_info_provider}",
+      "CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG=${chip_device_config_enable_dynamic_mrp_config}",
+    ]
+
+    if (chip_device_platform == "linux" || chip_device_platform == "darwin" ||
+        chip_device_platform == "tizen" || chip_device_platform == "android" ||
+        chip_device_platform == "webos" || chip_device_platform == "bl602" ||
+        chip_device_platform == "bl702" || chip_device_platform == "bl702l") {
+      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}" ]
+    }
+
+    if (chip_enable_nfc) {
+      defines += [
+        "CHIP_DEVICE_CONFIG_ENABLE_NFC=1",
+        "CONFIG_CHIP_NFC_COMMISSIONING=1",
+      ]
+    }
+
+    defines += [
+      "CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR=${chip_enable_ota_requestor}",
+    ]
+
+    if (chip_device_project_config_include != "") {
+      defines += [ "CHIP_DEVICE_PROJECT_CONFIG_INCLUDE=${chip_device_project_config_include}" ]
+    }
+    if (chip_device_platform_config_include != "") {
+      defines += [ "CHIP_DEVICE_PLATFORM_CONFIG_INCLUDE=${chip_device_platform_config_include}" ]
+    }
+
+    if (chip_device_config_firmware_build_date != "") {
+      defines += [ "CHIP_DEVICE_CONFIG_FIRWMARE_BUILD_DATE=\"${chip_device_config_firmware_build_date}\"" ]
+    }
+    if (chip_device_config_firmware_build_time != "") {
+      defines += [ "CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME=\"${chip_device_config_firmware_build_time}\"" ]
+    }
+
+    if (chip_device_platform == "cc13x4_26x4") {
+      device_layer_target_define = "CC13X4_26X4"
+      defines += [ "CHIP_DEVICE_LAYER_TARGET=cc13xx_26xx/cc13x4_26x4" ]
+    } else if (chip_device_platform == "cc32xx") {
+      device_layer_target_define = "CC32XX"
+      defines += [ "CHIP_DEVICE_LAYER_TARGET=cc32xx" ]
+    } else if (chip_device_platform == "darwin") {
+      device_layer_target_define = "DARWIN"
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET=Darwin",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
+      ]
+    } else if (chip_device_platform == "efr32") {
+      device_layer_target_define = "EFR32"
+      defines += [ "CHIP_DEVICE_LAYER_TARGET=silabs" ]
+    } else if (chip_device_platform == "SiWx917") {
+      device_layer_target_define = "EFR32"
+      defines += [ "CHIP_DEVICE_LAYER_TARGET=silabs" ]
+    } else if (chip_device_platform == "esp32") {
+      device_layer_target_define = "ESP32"
+      defines += [ "CHIP_DEVICE_LAYER_TARGET=ESP32" ]
+    } else if (chip_device_platform == "psoc6") {
+      device_layer_target_define = "PSOC6"
+      defines += [ "CHIP_DEVICE_LAYER_TARGET=Infineon/PSOC6" ]
+    } else if (chip_device_platform == "linux") {
+      device_layer_target_define = "LINUX"
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET=Linux",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
+      ]
+    } else if (chip_device_platform == "tizen") {
+      device_layer_target_define = "TIZEN"
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET=Tizen",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
+      ]
+    } else if (chip_device_platform == "nrfconnect") {
+      device_layer_target_define = "NRFCONNECT"
+      defines += [ "CHIP_DEVICE_LAYER_TARGET=nrfconnect" ]
+    } else if (chip_device_platform == "qpg") {
+      device_layer_target_define = "QPG"
+      defines += [ "CHIP_DEVICE_LAYER_TARGET=qpg" ]
+    } else if (chip_device_platform == "nxp") {
+      import("//build_overrides/nxp_sdk.gni")
+      import("${nxp_sdk_build_root}/nxp_sdk.gni")
+      device_layer_target_define = "NXP"
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET=${nxp_device_layer}",
+        "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}",
+      ]
+    } else if (chip_device_platform == "nxp_zephyr") {
+      device_layer_target_define = "NXP_ZEPHYR"
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_NXP_ZEPHYR=1",
+        "CHIP_DEVICE_LAYER_TARGET=nxp/zephyr",
+      ]
+    } else if (chip_device_platform == "telink") {
+      device_layer_target_define = "TELINK"
+      defines += [ "CHIP_DEVICE_LAYER_TARGET=telink" ]
+    } else if (chip_device_platform == "mbed") {
+      device_layer_target_define = "MBED"
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET=mbed",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
+        "CHIP_DEVICE_ENABLE_DATA_MODEL=${chip_enable_data_model}",
+      ]
+    } else if (chip_device_platform == "bl602") {
+      device_layer_target_define = "BL602"
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET=bouffalolab/common",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
+      ]
+    } else if (chip_device_platform == "bl702") {
+      device_layer_target_define = "BL702"
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET=bouffalolab/common",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
+      ]
+    } else if (chip_device_platform == "bl702l") {
+      device_layer_target_define = "BL702L"
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET=bouffalolab/common",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
+      ]
+    } else if (chip_device_platform == "fake") {
+      device_layer_target_define = "FAKE"
+      defines += [ "CHIP_DEVICE_LAYER_TARGET=fake" ]
+    } else if (chip_device_platform == "android") {
+      device_layer_target_define = "ANDROID"
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET=android",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
+      ]
+    } else if (chip_device_platform == "ameba") {
+      device_layer_target_define = "AMEBA"
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET=Ameba",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
+      ]
+    } else if (chip_device_platform == "cyw30739") {
+      device_layer_target_define = "CYW30739"
+      defines += [ "CHIP_DEVICE_LAYER_TARGET=Infineon/CYW30739" ]
+    } else if (chip_device_platform == "webos") {
+      device_layer_target_define = "WEBOS"
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET=webos",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
+      ]
+      defines -=
+          [ "CHIP_DEVICE_CONFIG_ENABLE_WPA=${chip_device_config_enable_wpa}" ]
+    } else if (chip_device_platform == "mw320") {
+      device_layer_target_define = "MW320"
+      defines += [ "CHIP_DEVICE_LAYER_TARGET=nxp/mw320" ]
+    } else if (chip_device_platform == "zephyr") {
+      device_layer_target_define = "ZEPHYR"
+      defines += [ "CHIP_DEVICE_LAYER_TARGET=Zephyr" ]
+    } else if (chip_device_platform == "beken") {
+      device_layer_target_define = "BEKEN"
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET=Beken",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
+      ]
+    } else if (chip_device_platform == "mt793x") {
+      device_layer_target_define = "MT793X"
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET=mt793x",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
+      ]
+    } else if (chip_device_platform == "openiotsdk") {
+      device_layer_target_define = "OPEN_IOT_SDK"
+      defines += [ "CHIP_DEVICE_LAYER_TARGET=openiotsdk" ]
+    } else if (chip_device_platform == "asr") {
+      device_layer_target_define = "ASR"
+      defines += [ "CHIP_DEVICE_LAYER_TARGET=ASR" ]
+    } else if (chip_device_platform == "stm32") {
+      device_layer_target_define = "STM32"
+      defines += [ "CHIP_DEVICE_LAYER_TARGET=stm32" ]
+    } else if (chip_device_platform == "nuttx") {
+      device_layer_target_define = "NUTTX"
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET=NuttX",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
+      ]
+    } else {
+      device_layer_target_define = ""
+    }
+
+    assert(device_layer_target_define != "",
+           "Unknown chip_device_platform value: '${chip_device_platform}'")
+
+    found_device_layer_target_define = false
+    possible_device_layer_target_defines = [
+      "CC13X4_26X4",
+      "CC32XX",
+      "DARWIN",
+      "EFR32",
+      "ESP32",
+      "PSOC6",
+      "LINUX",
+      "TIZEN",
+      "NRFCONNECT",
+      "QPG",
+      "NXP",
+      "NXP_ZEPHYR",
+      "TELINK",
+      "MBED",
+      "BL602",
+      "BL702",
+      "BL702L",
+      "FAKE",
+      "ANDROID",
+      "AMEBA",
+      "CYW30739",
+      "WEBOS",
+      "MW320",
+      "ZEPHYR",
+      "BEKEN",
+      "MT793X",
+      "OPEN_IOT_SDK",
+      "ASR",
+      "STM32",
+      "NUTTX",
+    ]
+    foreach(possible_device_layer_target_define,
+            possible_device_layer_target_defines) {
+      if (possible_device_layer_target_define == device_layer_target_define) {
+        found_device_layer_target_define = true
+        defines += [
+          "CHIP_DEVICE_LAYER_TARGET_${possible_device_layer_target_define}=1",
+        ]
+      } else {
+        defines += [
+          "CHIP_DEVICE_LAYER_TARGET_${possible_device_layer_target_define}=0",
+        ]
+      }
+    }
+    assert(
+        found_device_layer_target_define,
+        "possible_device_layer_target_defines list missing '${device_layer_target_define}'")
+
+    if (chip_device_config_device_software_version != "") {
+      defines += [ "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=${chip_device_config_device_software_version}" ]
+    }
+
+    if (chip_device_config_device_software_version_string != "") {
+      defines += [ "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"${chip_device_config_device_software_version_string}\"" ]
+    }
+
+    if (chip_device_config_device_vendor_id != "") {
+      defines += [ "CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID=${chip_device_config_device_vendor_id}" ]
+    }
+
+    if (chip_device_config_device_product_id != "") {
+      defines += [ "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID=${chip_device_config_device_product_id}" ]
+    }
+
+    defines += [ "CHIP_DEVICE_CONFIG_MAX_DISCOVERED_IP_ADDRESSES=${chip_max_discovered_ip_addresses}" ]
+
+    visibility = [
+      ":platform_config_header",
+      "${chip_root}/src/ble:ble_config_header",
+      "${chip_root}/src/system:system_config_header",
+    ]
+  }
+} else if (chip_device_platform == "none") {
+  buildconfig_header("platform_buildconfig") {
+    header = "CHIPDeviceBuildConfig.h"
+    header_dir = "platform"
+
+    defines = [
+      "CHIP_DEVICE_LAYER_NONE=1",
+      "CHIP_DEVICE_LAYER_TARGET=NONE",
+    ]
+
+    if (current_os == "android") {
+      defines += [ "EXTERNAL_KEYVALUESTOREMANAGERIMPL_HEADER=\"controller/java/AndroidKeyValueStoreManagerImpl.h\"" ]
+    }
+  }
+} else {
+  group("platform_buildconfig") {
+    public_deps = [ "${chip_platform_target}:platform_buildconfig" ]
+  }
+}
+
+source_set("platform_config_header") {
+  sources = [ "../include/platform/CHIPDeviceConfig.h" ]
+
+  deps = [ ":platform_buildconfig" ]
+}
+
+if (chip_device_platform != "none") {
+  source_set("platform_base") {
+    public_deps = [
+      ":platform_config_header",
+      "${chip_root}/src/app/icd/server:icd-server-config",
+      "${chip_root}/src/ble",
+      "${chip_root}/src/credentials:build_time_header",
+      "${chip_root}/src/inet",
+      "${chip_root}/src/lib/core",
+      "${chip_root}/src/lib/support",
+      "${chip_root}/src/setup_payload:additional_data_payload",
+      "${chip_root}/src/system",
+    ]
+
+    public_configs = [ "${chip_root}/src:includes" ]
+  }
+
+  static_library("platform") {
+    output_name = "libDeviceLayer"
+
+    sources = [
+      "../include/platform/BuildTime.h",
+      "../include/platform/CHIPDeviceError.h",
+      "../include/platform/CHIPDeviceEvent.h",
+      "../include/platform/CHIPDeviceLayer.h",
+      "../include/platform/CommissionableDataProvider.h",
+      "../include/platform/ConfigurationManager.h",
+      "../include/platform/ConnectivityManager.h",
+      "../include/platform/DeviceControlServer.h",
+      "../include/platform/DeviceInstanceInfoProvider.h",
+      "../include/platform/GeneralUtils.h",
+      "../include/platform/KeyValueStoreManager.h",
+      "../include/platform/KvsPersistentStorageDelegate.h",
+      "../include/platform/PersistedStorage.h",
+      "../include/platform/PlatformManager.h",
+      "../include/platform/RuntimeOptionsProvider.h",
+      "../include/platform/TestOnlyCommissionableDataProvider.h",
+      "../include/platform/ThreadStackManager.h",
+      "../include/platform/internal/BLEManager.h",
+      "../include/platform/internal/CHIPDeviceLayerInternal.h",
+      "../include/platform/internal/DeviceNetworkInfo.h",
+      "../include/platform/internal/EventLogging.h",
+      "../include/platform/internal/GenericConfigurationManagerImpl.h",
+      "../include/platform/internal/GenericConfigurationManagerImpl.ipp",
+      "../include/platform/internal/GenericConnectivityManagerImpl.h",
+      "../include/platform/internal/GenericConnectivityManagerImpl_BLE.h",
+      "../include/platform/internal/GenericConnectivityManagerImpl_BLE.ipp",
+      "../include/platform/internal/GenericConnectivityManagerImpl_NoBLE.h",
+      "../include/platform/internal/GenericConnectivityManagerImpl_NoThread.h",
+      "../include/platform/internal/GenericConnectivityManagerImpl_NoWiFi.h",
+      "../include/platform/internal/GenericConnectivityManagerImpl_TCP.h",
+      "../include/platform/internal/GenericConnectivityManagerImpl_TCP.ipp",
+      "../include/platform/internal/GenericConnectivityManagerImpl_Thread.h",
+      "../include/platform/internal/GenericConnectivityManagerImpl_Thread.ipp",
+      "../include/platform/internal/GenericConnectivityManagerImpl_UDP.h",
+      "../include/platform/internal/GenericConnectivityManagerImpl_UDP.ipp",
+      "../include/platform/internal/GenericConnectivityManagerImpl_WiFi.h",
+      "../include/platform/internal/GenericConnectivityManagerImpl_WiFi.ipp",
+      "../include/platform/internal/GenericDeviceInstanceInfoProvider.h",
+      "../include/platform/internal/GenericDeviceInstanceInfoProvider.ipp",
+      "../include/platform/internal/GenericPlatformManagerImpl.h",
+      "../include/platform/internal/GenericPlatformManagerImpl.ipp",
+      "../include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.h",
+      "../include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp",
+      "../include/platform/internal/GenericPlatformManagerImpl_POSIX.h",
+      "../include/platform/internal/GenericPlatformManagerImpl_POSIX.ipp",
+      "../include/platform/internal/GenericPlatformManagerImpl_Zephyr.ipp",
+      "../include/platform/internal/testing/ConfigUnitTest.h",
+      "CommissionableDataProvider.cpp",
+      "DeviceControlServer.cpp",
+      "DeviceInfoProvider.cpp",
+      "DeviceInstanceInfoProvider.cpp",
+      "DiagnosticDataProvider.cpp",
+      "Entropy.cpp",
+      "GeneralUtils.cpp",
+      "Globals.cpp",
+      "LockTracker.cpp",
+      "PersistedStorage.cpp",
+      "PlatformEventSupport.cpp",
+      "RuntimeOptionsProvider.cpp",
+    ]
+
+    # Linux has its own NetworkCommissioningThreadDriver
+    if (chip_enable_openthread && chip_device_platform != "linux" &&
+        chip_device_platform != "tizen" && chip_device_platform != "webos") {
+      sources += [
+        "OpenThread/GenericNetworkCommissioningThreadDriver.cpp",
+        "OpenThread/GenericNetworkCommissioningThreadDriver.h",
+      ]
+    }
+
+    cflags = [ "-Wconversion" ]
+
+    public_deps = [
+      ":platform_base",
+      "${chip_root}/src/app/common:cluster-objects",
+      "${chip_root}/src/crypto",
+      "${chip_root}/src/lib/support",
+    ]
+
+    if (chip_device_platform == "cc13x4_26x4") {
+      _platform_target = "cc13xx_26xx/cc13x4_26x4"
+    } else if (chip_device_platform == "cc32xx") {
+      _platform_target = "cc32xx"
+    } else if (chip_device_platform == "darwin") {
+      _platform_target = "Darwin"
+    } else if (chip_device_platform == "efr32") {
+      _platform_target = "silabs/efr32"
+    } else if (chip_device_platform == "SiWx917") {
+      _platform_target = "silabs/SiWx917"
+    } else if (chip_device_platform == "esp32") {
+      _platform_target = "ESP32"
+    } else if (chip_device_platform == "linux") {
+      _platform_target = "Linux"
+    } else if (chip_device_platform == "nrfconnect") {
+      _platform_target = "nrfconnect"
+    } else if (chip_device_platform == "qpg") {
+      _platform_target = "qpg"
+    } else if (chip_device_platform == "nxp") {
+      _platform_target = "nxp/${nxp_platform}:nxp_platform"
+    } else if (chip_device_platform == "nxp_zephyr") {
+      _platform_target = "nxp/zephyr:nxp_zephyr"
+    } else if (chip_device_platform == "telink") {
+      _platform_target = "telink"
+    } else if (chip_device_platform == "mbed") {
+      _platform_target = "mbed"
+    } else if (chip_device_platform == "tizen") {
+      _platform_target = "Tizen"
+    } else if (chip_device_platform == "android") {
+      _platform_target = "android"
+    } else if (chip_device_platform == "external") {
+      _platform_target = chip_platform_target
+    } else if (chip_device_platform == "psoc6") {
+      _platform_target = "Infineon/PSOC6"
+    } else if (chip_device_platform == "ameba") {
+      _platform_target = "Ameba"
+    } else if (chip_device_platform == "webos") {
+      _platform_target = "webos"
+    } else if (chip_device_platform == "bl602") {
+      _platform_target = "bouffalolab/BL602"
+    } else if (chip_device_platform == "bl702") {
+      _platform_target = "bouffalolab/BL702"
+    } else if (chip_device_platform == "bl702l") {
+      _platform_target = "bouffalolab/BL702L"
+    } else if (chip_device_platform == "fake") {
+      _platform_target = "fake"
+    } else if (chip_device_platform == "cyw30739") {
+      _platform_target = "Infineon/CYW30739"
+    } else if (chip_device_platform == "mw320") {
+      _platform_target = "nxp/mw320"
+    } else if (chip_device_platform == "zephyr") {
+      _platform_target = "Zephyr"
+    } else if (chip_device_platform == "beken") {
+      _platform_target = "Beken"
+    } else if (chip_device_platform == "mt793x") {
+      _platform_target = "mt793x"
+    } else if (chip_device_platform == "openiotsdk") {
+      _platform_target = "openiotsdk"
+    } else if (chip_device_platform == "asr") {
+      _platform_target = "ASR"
+    } else if (chip_device_platform == "stm32") {
+      _platform_target = "stm32"
+    } else if (chip_device_platform == "nuttx") {
+      _platform_target = "NuttX"
+    } else {
+      assert(false, "Unknown chip_device_platform: ${chip_device_platform}")
+    }
+
+    public_deps += [ _platform_target ]
+
+    # The platform target needs to include the headers, so allow that here.
+    # It should be considered logically part of this target.
+    allow_circular_includes_from = [
+      _platform_target,
+      "${chip_root}/src/lib/support",
+    ]
+  }
+} else {
+  group("platform") {
+    public_deps = [ ":platform_buildconfig" ]
+  }
+}
+
+source_set("syscalls_stub") {
+  sources = [ "SyscallStubs.cpp" ]
+}

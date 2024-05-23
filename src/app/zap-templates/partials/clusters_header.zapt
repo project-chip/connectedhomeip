@@ -1,0 +1,7 @@
+{{pad '/*' 78 '-'}}*\
+{{pad "| Cluster Name" 70 ' '}}{{pad "|   ID" 9 ' '}}|
+{{pad "|" 70 '-'}}{{pad "+" 9 '-'}}|
+{{#zcl_clusters}}
+{{pad (concat "| " (asUpperCamelCase name)) 70  " "}}{{pad (concat "| " (asHex code 4)) 9 ' '}}|
+{{/zcl_clusters}}
+{{pad '\*' 78 '-'}}*/

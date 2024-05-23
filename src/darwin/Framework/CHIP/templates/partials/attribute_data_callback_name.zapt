@@ -1,0 +1,33 @@
+{{~#if isArray~}}
+  {{asUpperCamelCase parent.name preserveAcronyms=true}}{{asUpperCamelCase name preserveAcronyms=true}}List
+{{~else~}}
+  {{~#if_is_struct type~}}
+    {{~! Structs are not used as types of attributes much, so it's
+         less code to generate the callbacks on a per-attribute basis
+         than a per-struct-type basis. ~}}
+    {{asUpperCamelCase parent.name preserveAcronyms=true}}{{asUpperCamelCase name preserveAcronyms=true}}Struct
+  {{~else if_is_strongly_typed_bitmap type~}}
+      {{asUpperCamelCase parent.name preserveAcronyms=true}}{{asUpperCamelCase name preserveAcronyms=true}}
+  {{~else~}}
+    {{~#if isNullable}}Nullable{{/if~}}
+    {{~#if (isStrEqual (asUpperCamelCase type) (asUpperCamelCase "vendor_id"))~}}
+      VendorId
+    {{~else if_is_strongly_typed_chip_enum type~}}
+      {{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase type preserveAcronyms=true}}
+    {{~else if (isOctetString type)~}}
+      OctetString
+    {{~else if (isCharString type)~}}
+      CharString
+    {{~else if (or (is_str_equal type "float")
+                   (is_str_equal type "single"))~}}
+      Float
+    {{~else if (is_str_equal type "double")~}}
+      Double
+    {{~else if (is_str_equal type "boolean")~}}
+      Boolean
+    {{~else~}}
+      Int{{as_zcl_data_type_size type parent.id sizeIn='bits' roundUpToPowerOfTwo=1}}{{~#if_is_data_type_signed type parent.id~}}s{{else}}u{{/if_is_data_type_signed}}
+    {{~/if~}}
+  {{~/if_is_struct~}}
+{{~/if~}}
+Attribute{{~"remove_extra_spaces"~}}

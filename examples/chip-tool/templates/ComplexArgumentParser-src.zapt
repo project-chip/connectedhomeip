@@ -1,0 +1,17 @@
+{{> header}}
+
+#include <commands/clusters/ComplexArgument.h>
+
+{{#zcl_structs}}
+{{#if has_more_than_one_cluster}}
+{{> struct_parser_impl namespace="detail"}}
+{{/if}}
+{{/zcl_structs}}
+
+{{#zcl_clusters}}
+{{#zcl_structs}}
+{{#unless has_more_than_one_cluster}}
+{{> struct_parser_impl namespace=(as_camel_cased ../name false)}}
+{{/unless}}
+{{/zcl_structs}}
+{{/zcl_clusters}}

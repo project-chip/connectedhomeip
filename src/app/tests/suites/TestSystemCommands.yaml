@@ -1,0 +1,230 @@
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: System Commands Tests
+
+config:
+    nodeId: 0x12344321
+    cluster: "SystemCommands"
+    endpoint: 0
+    payload:
+        type: char_string
+        defaultValue: "MT:-24J0IX4122-.548G00" # This value needs to be generated
+    secondNodeId:
+        type: int64u
+        defaultValue: 0xDEADBEEF
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Stop the default accessory"
+      command: "Stop"
+
+    - label: "Start the default accessory with no command line options"
+      command: "Start"
+
+    - label: "Stop the default accessory by key"
+      command: "Stop"
+      arguments:
+          values:
+              - name: "registerKey"
+                value: "default"
+
+    - label:
+          "Start the default accessory with discriminator command line option"
+      command: "Start"
+      arguments:
+          values:
+              - name: "discriminator"
+                value: 1111
+
+    - label: "Stop the default accessory"
+      command: "Stop"
+
+    - label:
+          "Start the default accessory with discriminator and port command line
+          options"
+      command: "Start"
+      arguments:
+          values:
+              - name: "discriminator"
+                value: 1111
+              - name: "port"
+                value: 5560
+
+    - label: "Stop the default accessory"
+      command: "Stop"
+
+    - label: "Start the default accessory with minCommissioningTimeout only"
+      command: "Start"
+      arguments:
+          values:
+              - name: "minCommissioningTimeout"
+                value: 10
+
+    - label: "Stop the default accessory"
+      command: "Stop"
+
+    - label: "Start the default accessory by key with all command line options"
+      command: "Start"
+      arguments:
+          values:
+              - name: "discriminator"
+                value: 1111
+              - name: "port"
+                value: 5560
+              - name: "kvs"
+                value: "/tmp/chip_kvs_default"
+              - name: "registerKey"
+                value: "default"
+              - name: "minCommissioningTimeout"
+                value: 10
+
+    - label: "Start a second accessory with all command line options"
+      command: "Start"
+      arguments:
+          values:
+              - name: "discriminator"
+                value: 50
+              - name: "port"
+                value: 5561
+              - name: "kvs"
+                value: "/tmp/chip_kvs_lock"
+              - name: "registerKey"
+                value: "chip-lock-app"
+
+    - label: "Commission second accessory from alpha"
+      identity: "alpha"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: secondNodeId
+              - name: "payload"
+                value: payload
+
+    - label: "Wait for the second commissioned device to be retrieved for alpha"
+      identity: "alpha"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: secondNodeId
+
+    - label: "Stop the second accessory"
+      command: "Stop"
+      arguments:
+          values:
+              - name: "registerKey"
+                value: "chip-lock-app"
+
+    - label: "Start a second accessory with different KVS"
+      command: "Start"
+      arguments:
+          values:
+              - name: "discriminator"
+                value: 50
+              - name: "port"
+                value: 5561
+              - name: "kvs"
+                value: "/tmp/chip_kvs_lock2"
+              - name: "registerKey"
+                value: "chip-lock-app"
+
+    # NOTE: Since we have a new KVS, this is basically a factory reset, so we can commission again.
+    - label: "Commission second accessory with new KVS from alpha"
+      identity: "alpha"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: secondNodeId
+              - name: "payload"
+                value: payload
+
+    - label:
+          "Wait for the second commissioned device with new KVS to be retrieved
+          for alpha"
+      identity: "alpha"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: secondNodeId
+
+    - label: "Reboot the default accessory"
+      command: "Reboot"
+
+    - label: "Reboot the default accessory by key"
+      command: "Reboot"
+      arguments:
+          values:
+              - name: "registerKey"
+                value: "default"
+
+    - label: "Reboot the second accessory"
+      command: "Reboot"
+      arguments:
+          values:
+              - name: "registerKey"
+                value: "chip-lock-app"
+
+    - label: "Factory Reset the default accessory"
+      command: "FactoryReset"
+
+    - label: "Factory Reset the default accessory by key"
+      command: "FactoryReset"
+      arguments:
+          values:
+              - name: "registerKey"
+                value: "default"
+
+    - label: "Factory Reset the second accessory"
+      command: "FactoryReset"
+      arguments:
+          values:
+              - name: "registerKey"
+                value: "chip-lock-app"
+
+    - label: "Commission the now-reset second accessory from alpha"
+      identity: "alpha"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: secondNodeId
+              - name: "payload"
+                value: payload
+
+    - label:
+          "Wait for the second commissioned device (after reset) to be retrieved
+          for alpha"
+      identity: "alpha"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: secondNodeId

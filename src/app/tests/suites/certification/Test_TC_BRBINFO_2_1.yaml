@@ -1,0 +1,653 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 142.2.1. [TC-BRBINFO-2.1] Attributes [DUT-Server]
+
+PICS:
+    - BRBINFO.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Bridged Device Basic Information"
+    endpoint: 3
+
+    BRBINFO.ClusterId: 0x0039
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Step 2: TH reads attribute ID 0 from the DUT (matches in ID to
+          DataModelRevision in the parent cluster, but is absent on the
+          BridgedDeviceBasicInformation cluster)."
+      PICS: BRBINFO.S
+      cluster: "AnyCommands"
+      command: "ReadById"
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: BRBINFO.ClusterId
+              - name: "AttributeId"
+                value: 0x0000
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
+
+    - label: "Step 5: TH reads VendorName from the DUT."
+      PICS: BRBINFO.S.A0001
+      command: "readAttribute"
+      attribute: "VendorName"
+      response:
+          saveAs: VendorNameValue
+          constraints:
+              type: char_string
+              maxLength: 32
+
+    - label: "Step 6: TH writes VendorName as 'sample'"
+      PICS: BRBINFO.S.A0001
+      command: "writeAttribute"
+      attribute: "VendorName"
+      arguments:
+          value: "sample"
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 7: TH reads VendorName from the DUT."
+      PICS: BRBINFO.S.A0001
+      command: "readAttribute"
+      attribute: "VendorName"
+      response:
+          value: VendorNameValue
+
+    - label: "Step 8: TH reads VendorID from the DUT."
+      PICS: BRBINFO.S.A0002
+      command: "readAttribute"
+      attribute: "VendorID"
+      response:
+          saveAs: VendorIDValue
+          constraints:
+              type: vendor_id
+              minValue: 1
+              maxValue: 65521
+
+    - label:
+          "Verify that VendorID matches the value assigned to this manufacturer"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && BRBINFO.S.A0002
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 9: TH writes VendorID as '0x0011'"
+      PICS: BRBINFO.S.A0002
+      command: "writeAttribute"
+      attribute: "VendorID"
+      arguments:
+          value: 0x0011
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 10: TH reads VendorID from the DUT."
+      PICS: BRBINFO.S.A0002
+      command: "readAttribute"
+      attribute: "VendorID"
+      response:
+          value: VendorIDValue
+
+    - label: "Step 11: TH reads ProductName from the DUT"
+      PICS: BRBINFO.S.A0003
+      command: "readAttribute"
+      attribute: "ProductName"
+      response:
+          saveAs: ProductNameValue
+          constraints:
+              type: char_string
+              maxLength: 32
+
+    - label: "Step 12: TH writes ProductName as 'newproduct'"
+      PICS: BRBINFO.S.A0003
+      command: "writeAttribute"
+      attribute: "ProductName"
+      arguments:
+          value: "newproduct"
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 13: TH reads ProductName from the DUT"
+      PICS: BRBINFO.S.A0003
+      command: "readAttribute"
+      attribute: "ProductName"
+      response:
+          value: ProductNameValue
+
+    - label:
+          "Step 14: TH reads attribute ID 4 from the DUT (matches in ID to
+          ProductID in the parent cluster, but is absent on the
+          BridgedDeviceBasicInformation cluster)."
+      PICS: BRBINFO.S
+      cluster: "AnyCommands"
+      command: "ReadById"
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: BRBINFO.ClusterId
+              - name: "AttributeId"
+                value: 0x0004
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
+
+    - label: "Step 17: TH reads NodeLabel from the DUT"
+      PICS: BRBINFO.S.A0005
+      command: "readAttribute"
+      attribute: "NodeLabel"
+      response:
+          saveAs: NodeLabelValue
+          constraints:
+              type: char_string
+              maxLength: 32
+
+    #Issue https://github.com/project-chip/connectedhomeip/issues/23509
+    - label: "Step 18: TH writes NodeLabel from the DUT."
+      PICS: BRBINFO.S.A0005 && PICS_USER_PROMPT
+      verification: |
+          ./chip-tool bridgeddevicebasicinformation write node-label '"newnode"' 1 3
+
+          Via the TH (chip-tool), verify the SUCCESS response for NodeLabel attribute write function.
+
+          Current sample apps do not have this implementation. However, if the vendor has implemented it, the below response will be displayed.
+
+          NOTE the quotes: single-quote/double-quote/string/double-quote/single-quote
+
+
+          [1660839701.840432][2444:2449] CHIP:DMG:                         }
+          [1660839701.840505][2444:2449] CHIP:DMG:
+          [1660839701.840578][2444:2449] CHIP:DMG:                         StatusIB =
+          [1660839701.840661][2444:2449] CHIP:DMG:                         {
+          [1660839701.840742][2444:2449] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1660839701.840827][2444:2449] CHIP:DMG:                         },
+          [1660839701.840905][2444:2449] CHIP:DMG:
+          [1660839701.840973][2444:2449] CHIP:DMG:                 },
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 19: TH reads NodeLabel from the DUT"
+      PICS: BRBINFO.S.A0005 && PICS_USER_PROMPT
+      verification: |
+          ./chip-tool bridgeddevicebasicinformation read node-label 1 3
+
+          Via the TH (chip-tool), verify that the NodeLabel attribute value is changed to newnode.
+
+          Current sample apps do not have this implementation. However, if the vendor has implemented it, the below response will be displayed.
+
+          [1657696463.081741][15476:15481] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0039 Attribute 0x0000_0005 DataVersion: 2577979325
+          [1657696463.081791][15476:15481] CHIP:TOO:   NodeLabel: newnode
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 20: TH reads attribute ID 6 from the DUT (matches in ID to
+          Location in the parent cluster, but is absent on the
+          BridgedDeviceBasicInformation cluster)."
+      PICS: BRBINFO.S
+      cluster: "AnyCommands"
+      command: "ReadById"
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: BRBINFO.ClusterId
+              - name: "AttributeId"
+                value: 0x0006
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
+
+    - label: "Step 21: TH reads HardwareVersion from the DUT"
+      PICS: BRBINFO.S.A0007
+      command: "readAttribute"
+      attribute: "HardwareVersion"
+      response:
+          saveAs: HardwareVersionValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65534
+
+    - label: "Step 22: TH writes HardwareVersion as '0x4531'"
+      PICS: BRBINFO.S.A0007
+      command: "writeAttribute"
+      attribute: "HardwareVersion"
+      arguments:
+          value: 0x4531
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 23: TH reads HardwareVersion from the DUT"
+      PICS: BRBINFO.S.A0007
+      command: "readAttribute"
+      attribute: "HardwareVersion"
+      response:
+          value: HardwareVersionValue
+
+    - label: "Step 24: TH reads HardwareVersionString from the DUT."
+      PICS: BRBINFO.S.A0008
+      command: "readAttribute"
+      attribute: "HardwareVersionString"
+      response:
+          saveAs: HardwareVersionStringValue
+          constraints:
+              type: char_string
+              minLength: 1
+              maxLength: 64
+
+    - label: "Step 25: TH writes HardwareVersionString as 'newhardwareversion'"
+      PICS: BRBINFO.S.A0008
+      command: "writeAttribute"
+      attribute: "HardwareVersionString"
+      arguments:
+          value: "newhardwareversion"
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 26: TH reads HardwareVersionString from the DUT."
+      PICS: BRBINFO.S.A0008
+      command: "readAttribute"
+      attribute: "HardwareVersionString"
+      response:
+          value: HardwareVersionStringValue
+
+    - label: "Step 27: TH reads SoftwareVersion from the DUT"
+      PICS: BRBINFO.S.A0009
+      command: "readAttribute"
+      attribute: "SoftwareVersion"
+      response:
+          saveAs: SoftwareVersionValue
+          constraints:
+              minValue: 0
+              maxValue: 4294967294
+
+    - label: "Step 28: TH writes SoftwareVersion as '0x8213'"
+      PICS: BRBINFO.S.A0009
+      command: "writeAttribute"
+      attribute: "SoftwareVersion"
+      arguments:
+          value: 0x8213
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 29: TH reads SoftwareVersion from the DUT"
+      PICS: BRBINFO.S.A0009
+      command: "readAttribute"
+      attribute: "SoftwareVersion"
+      response:
+          value: SoftwareVersionValue
+
+    - label: "Step 30: TH reads SoftwareVersionString from the DUT"
+      PICS: BRBINFO.S.A000a
+      command: "readAttribute"
+      attribute: "SoftwareVersionString"
+      response:
+          saveAs: SoftwareVersionStringValue
+          constraints:
+              minLength: 1
+              maxLength: 64
+
+    - label: "Step 31: TH writes SoftwareVersionString as '1.0'"
+      PICS: BRBINFO.S.A000a
+      command: "writeAttribute"
+      attribute: "SoftwareVersionString"
+      arguments:
+          value: "1.0"
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 32: TH reads SoftwareVersionString from the DUT"
+      PICS: BRBINFO.S.A000a
+      command: "readAttribute"
+      attribute: "SoftwareVersionString"
+      response:
+          value: SoftwareVersionStringValue
+
+    - label: "Step 33: TH reads ManufacturingDate from the DUT."
+      PICS: BRBINFO.S.A000b
+      command: "readAttribute"
+      attribute: "ManufacturingDate"
+      response:
+          saveAs: ManufacturingDateValue
+          constraints:
+              type: char_string
+              minLength: 8
+              maxLength: 16
+
+    - label:
+          "Verify if the first 8 characters specify date according to ISO 8601,
+          i.e, YYYYMMDD."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && BRBINFO.S.A000b
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 34: TH writes ManufacturingDate as '20210814789452IN'"
+      PICS: BRBINFO.S.A000b
+      command: "writeAttribute"
+      attribute: "ManufacturingDate"
+      arguments:
+          value: "20210814789452IN"
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 35: TH reads ManufacturingDate from the DUT."
+      PICS: BRBINFO.S.A000b
+      command: "readAttribute"
+      attribute: "ManufacturingDate"
+      response:
+          value: ManufacturingDateValue
+
+    - label: "Step 36: TH reads PartNumber from the DUT"
+      PICS: BRBINFO.S.A000c
+      command: "readAttribute"
+      attribute: "PartNumber"
+      response:
+          saveAs: PartNumberValue
+          constraints:
+              type: char_string
+              maxLength: 32
+
+    - label: "Step 37: TH writes PartNumber as 'newpart'"
+      PICS: BRBINFO.S.A000c
+      command: "writeAttribute"
+      attribute: "PartNumber"
+      arguments:
+          value: "newpart"
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 38: TH reads PartNumber from the DUT"
+      PICS: BRBINFO.S.A000c
+      command: "readAttribute"
+      attribute: "PartNumber"
+      response:
+          value: PartNumberValue
+
+    - label: "Step 39: TH reads ProductURL from the DUT"
+      PICS: BRBINFO.S.A000d
+      command: "readAttribute"
+      attribute: "ProductURL"
+      response:
+          saveAs: ProductURLValue
+          constraints:
+              type: long_char_string
+              maxLength: 256
+
+    - label:
+          "Verify that it specifies a link to a specific web page, Verify that
+          it follows the syntax rules specified in RFC 3986."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && BRBINFO.S.A000d
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 40: TH writes ProductURL as 'https://www.example.com'"
+      PICS: BRBINFO.S.A000d
+      command: "writeAttribute"
+      attribute: "ProductURL"
+      arguments:
+          value: "https://www.example.com"
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 41: TH reads ProductURL from the DUT"
+      PICS: BRBINFO.S.A000d
+      command: "readAttribute"
+      attribute: "ProductURL"
+      response:
+          value: ProductURLValue
+
+    - label: "Step 42: TH reads ProductLabel from the DUT."
+      PICS: BRBINFO.S.A000e
+      command: "readAttribute"
+      attribute: "ProductLabel"
+      response:
+          saveAs: ProductLabelValue
+          constraints:
+              type: char_string
+              maxLength: 64
+
+    - label:
+          "Verify that it does not include the name of the vendor as defined
+          within the VendorName attribute"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && BRBINFO.S.A000e
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 43: TH writes ProductLabel as 'newproductlabel'"
+      PICS: BRBINFO.S.A000e
+      command: "writeAttribute"
+      attribute: "ProductLabel"
+      arguments:
+          value: "newproductlabel"
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 44: TH reads ProductLabel from the DUT."
+      PICS: BRBINFO.S.A000e
+      command: "readAttribute"
+      attribute: "ProductLabel"
+      response:
+          value: ProductLabelValue
+
+    - label: "Step 45: TH reads SerialNumber from the DUT."
+      PICS: BRBINFO.S.A000f
+      command: "readAttribute"
+      attribute: "SerialNumber"
+      response:
+          saveAs: SerialNumberValue
+          constraints:
+              type: char_string
+              maxLength: 32
+
+    - label: "Step 46: TH writes SerialNumber_test as 'newserialnumber'"
+      PICS: BRBINFO.S.A000f
+      command: "writeAttribute"
+      attribute: "SerialNumber"
+      arguments:
+          value: "newserialnumber"
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 47: TH reads SerialNumber from the DUT."
+      PICS: BRBINFO.S.A000f
+      command: "readAttribute"
+      attribute: "SerialNumber"
+      response:
+          value: SerialNumberValue
+
+    - label:
+          "Step 48: TH reads attribute ID 0x0010 from the DUT (matches in ID to
+          LocalConfigDisabled in the parent cluster, but is absent on the
+          BridgedDeviceBasicInformation cluster)."
+      PICS: BRBINFO.S
+      cluster: "AnyCommands"
+      command: "ReadById"
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: BRBINFO.ClusterId
+              - name: "AttributeId"
+                value: 0x0010
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
+
+    - label: "Step 51: TH reads Reachable from the DUT."
+      PICS: BRBINFO.S.A0011
+      command: "readAttribute"
+      attribute: "Reachable"
+      response:
+          value: true
+          constraints:
+              type: boolean
+
+    - label:
+          "Step 52: TH sends Write request message to DUT to change value of
+          Reachable to 'false'"
+      PICS: BRBINFO.S.A0011
+      command: "writeAttribute"
+      attribute: "Reachable"
+      arguments:
+          value: false
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 52b: TH reads Reachable from the DUT."
+      PICS: BRBINFO.S.A0011
+      command: "readAttribute"
+      attribute: "Reachable"
+      response:
+          value: true
+          constraints:
+              type: boolean
+
+    - label: "Step 53: TH reads UniqueID from the DUT."
+      PICS: BRBINFO.S.A0012
+      command: "readAttribute"
+      attribute: "UniqueID"
+      response:
+          saveAs: UniqueIDValue
+          constraints:
+              type: char_string
+              maxLength: 32
+
+    - label: "Step 54: TH writes UniqueID as 'newid'"
+      PICS: BRBINFO.S.A0012
+      command: "writeAttribute"
+      attribute: "UniqueID"
+      arguments:
+          value: "newid"
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 55: TH reads UniqueID from the DUT."
+      PICS: BRBINFO.S.A0012
+      command: "readAttribute"
+      attribute: "UniqueID"
+      response:
+          value: UniqueIDValue
+
+    - label:
+          "Step 56: TH reads attribute ID 0x0013 from the DUT (matches in ID to
+          CapabilityMinima in the parent cluster, but is absent on the
+          BridgedDeviceBasicInformation cluster)."
+      PICS: BRBINFO.S
+      cluster: "AnyCommands"
+      command: "ReadById"
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: BRBINFO.ClusterId
+              - name: "AttributeId"
+                value: 0x0013
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
+
+    - label: "Step 59: TH reads ProductAppearance from the DUT."
+      PICS: BRBINFO.S.A0014
+      command: "readAttribute"
+      attribute: "ProductAppearance"
+      response:
+          saveAs: ProductAppearancevalue
+          constraints:
+              type: ProductAppearanceStruct
+
+    - label: "Step 60: TH writes ProductAppearance to the DUT."
+      PICS: BRBINFO.S.A0014
+      command: "writeAttribute"
+      attribute: "ProductAppearance"
+      arguments:
+          value: { "Finish": 3, "PrimaryColor": 4 }
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 61: TH reads ProductAppearance attribute from the DUT."
+      PICS: BRBINFO.S.A0014
+      command: "readAttribute"
+      attribute: "ProductAppearance"
+      response:
+          value: ProductAppearancevalue
+
+    - label:
+          "Step 62: TH reads attribute ID 0x0015 from the DUT (matches in ID to
+          CapabilityMinima in the parent cluster, but is absent on the
+          BridgedDeviceBasicInformation cluster)."
+      PICS: BRBINFO.S
+      cluster: "AnyCommands"
+      command: "ReadById"
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: BRBINFO.ClusterId
+              - name: "AttributeId"
+                value: 0x0015
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
+
+    - label:
+          "Step 63: TH reads attribute ID 0x0016 from the DUT (matches in ID to
+          CapabilityMinima in the parent cluster, but is absent on the
+          BridgedDeviceBasicInformation cluster)."
+      PICS: BRBINFO.S
+      cluster: "AnyCommands"
+      command: "ReadById"
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: BRBINFO.ClusterId
+              - name: "AttributeId"
+                value: 0x0016
+      response:
+          error: UNSUPPORTED_ATTRIBUTE

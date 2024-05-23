@@ -1,0 +1,220 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 3.3 [TC-OTCCM-2.1] Change to Mode functionality with DUT as Server
+
+PICS:
+    - OTCCM.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Oven Mode"
+    endpoint: 1
+
+    #PIXIT.OVEN.MODE_CHANGE_OK
+    NewMode_CHANGE_OK:
+        type: int8u
+        defaultValue: 2
+    #PIXIT.OVEN.MODE_CHANGE_FAIL
+    NewMode_CHANGE_FAIL:
+        type: int8u
+        defaultValue: 10
+    invalid_mode_th:
+        type: int8u
+        defaultValue: 15
+
+tests:
+    - label:
+          "Step 1:Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH reads from the DUT the SupportedModes attribute."
+      PICS: OTCCM.S.A0000
+      command: "readAttribute"
+      attribute: "SupportedModes"
+      response:
+          saveAs: "supported_mode_dut"
+          constraints:
+              type: list
+              minLength: 2
+
+    - label: "Step 3: TH reads from the DUT the CurrentMode attribute."
+      PICS: OTCCM.S.A0001
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          saveAs: old_current_mode_dut
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 255
+
+    - label:
+          "Step 4: TH sends a ChangeToMode command to the DUT with NewMode set
+          to old_current_mode_dut"
+      PICS: OTCCM.S.C00.Rsp
+      command: "ChangeToMode"
+      arguments:
+          values:
+              - name: "NewMode"
+                value: old_current_mode_dut
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+
+    - label:
+          "Step 5: Manually put the device in a state from which it will FAIL to
+          transition to PIXIT.OTCCM.MODE_CHANGE_FAIL"
+      PICS:
+          OTCCM.S.M.CAN_TEST_MODE_FAILURE && PICS_SKIP_SAMPLE_APP &&
+          OTCCM.S.M.CAN_MANUALLY_CONTROLLED
+      verification: |
+          Manual operation required
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 6: TH reads from the DUT the CurrentMode attribute."
+      PICS: OTCCM.S.A0001 && OTCCM.S.M.CAN_MANUALLY_CONTROLLED
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          saveAs: Step6_current_mode_dut
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 255
+
+    #Skipping test-7 because SDK is not enabled with this failure response
+    - label:
+          "Step 7: TH sends a ChangeToMode command to the DUT with NewMode set
+          to PIXIT.OTCCM.MODE_CHANGE_FAIL"
+      PICS:
+          OTCCM.S.M.CAN_TEST_MODE_FAILURE && OTCCM.S.C00.Rsp &&
+          PICS_SKIP_SAMPLE_APP
+      verification: |
+          Note : Please skip this step as SDK is not enabled with this failure response
+
+          ./chip-tool ovenmode change-to-mode 2 1 1
+
+          Verify on TH(chip-tool) log, DUT responds contains a ChangeToModeResponse command with a GenericFailure(0x02)  status response and below is the sample log provided for the raspi platform:
+
+          [1690270057.274893][31185:31187] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0051 Command=0x0000_0001
+          [1690270057.274901][31185:31187] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0051 Command 0x0000_0001
+          [1690270057.274915][31185:31187] CHIP:TOO:   ChangeToModeResponse: {
+          [1690270057.274921][31185:31187] CHIP:TOO:     status: 0
+          [1690270057.274924][31185:31187] CHIP:TOO:    }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 8: TH reads from the DUT the CurrentMode attribute."
+      PICS: OTCCM.S.A0001
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          value: old_current_mode_dut
+          constraints:
+              type: int16u
+
+    - label:
+          "Step 9: Manually put the device in a state from which it will
+          SUCCESSFULLY transition to PIXIT.OTCCM.MODE_CHANGE_OK"
+      PICS: PICS_SKIP_SAMPLE_APP && OTCCM.S.M.CAN_MANUALLY_CONTROLLED
+      verification: |
+          Manual operation required
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 10: TH reads from the DUT the CurrentMode attribute."
+      PICS: OTCCM.S.A0001 && OTCCM.S.M.CAN_MANUALLY_CONTROLLED
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          saveAs: Step10_current_mode_dut
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 255
+
+    - label:
+          "Step 11: TH sends a ChangeToMode command to the DUT with NewMode set
+          to PIXIT.OTCCM.MODE_CHANGE_OK"
+      PICS: OTCCM.S.C00.Rsp
+      command: "ChangeToMode"
+      arguments:
+          values:
+              - name: "NewMode"
+                value: NewMode_CHANGE_OK
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+
+    - label:
+          "Step 12: TH reads from the DUT the CurrentMode attribute. Verify that
+          the DUT response contains an integer value equal to
+          PIXIT.OTCCM.MODE_CHANGE_OK"
+      PICS: OTCCM.S.A0001
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          value: NewMode_CHANGE_OK
+
+    - label:
+          "Step 13: TH sends a ChangeToMode command to the DUT with NewMode set
+          to invalid_mode_th"
+      PICS: OTCCM.S.C00.Rsp
+      command: "ChangeToMode"
+      arguments:
+          values:
+              - name: "NewMode"
+                value: invalid_mode_th
+      response:
+          values:
+              - name: "Status"
+                value: 0x01
+
+    - label:
+          "Step 14: TH reads from the DUT the CurrentMode attribute. Verify that
+          the DUT response contains an integer value equal to
+          PIXIT.OTCCM.MODE_CHANGE_OK"
+      PICS: OTCCM.S.A0001
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          value: NewMode_CHANGE_OK

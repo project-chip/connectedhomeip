@@ -1,0 +1,94 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/build/chip/tests.gni")
+import("${chip_root}/src/platform/device.gni")
+import("ble.gni")
+
+declare_args() {
+  # Extra header to include in BleConfig.h for project.
+  chip_ble_project_config_include = ""
+}
+
+buildconfig_header("ble_buildconfig") {
+  header = "BleBuildConfig.h"
+  header_dir = "ble"
+
+  defines = [ "CONFIG_NETWORK_LAYER_BLE=${chip_config_network_layer_ble}" ]
+
+  if (chip_ble_project_config_include != "") {
+    defines +=
+        [ "BLE_PROJECT_CONFIG_INCLUDE=${chip_ble_project_config_include}" ]
+  }
+  if (chip_ble_platform_config_include != "") {
+    defines +=
+        [ "BLE_PLATFORM_CONFIG_INCLUDE=${chip_ble_platform_config_include}" ]
+  }
+
+  visibility = [ ":ble_config_header" ]
+}
+
+source_set("ble_config_header") {
+  sources = [ "BleConfig.h" ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
+
+  public_deps = [ "${chip_root}/src/system:system_config_header" ]
+
+  deps = [
+    ":ble_buildconfig",
+    "${chip_root}/src/platform:platform_buildconfig",
+  ]
+}
+
+if (chip_config_network_layer_ble) {
+  static_library("ble") {
+    output_name = "libBleLayer"
+
+    sources = [
+      "BLEEndPoint.cpp",
+      "BLEEndPoint.h",
+      "Ble.h",
+      "BleApplicationDelegate.h",
+      "BleConnectionDelegate.h",
+      "BleError.cpp",
+      "BleError.h",
+      "BleLayer.cpp",
+      "BleLayer.h",
+      "BleLayerDelegate.h",
+      "BlePlatformDelegate.h",
+      "BleRole.h",
+      "BleUUID.cpp",
+      "BleUUID.h",
+      "BtpEngine.cpp",
+      "BtpEngine.h",
+      "CHIPBleServiceData.h",
+    ]
+
+    cflags = [ "-Wconversion" ]
+
+    public_deps = [
+      ":ble_config_header",
+      "${chip_root}/src/inet",
+      "${chip_root}/src/lib/support",
+    ]
+  }
+} else {
+  group("ble") {
+  }
+}

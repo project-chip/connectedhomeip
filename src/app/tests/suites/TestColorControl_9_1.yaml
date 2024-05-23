@@ -1,0 +1,769 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Copy/ Paste of the TC_CC_9.1 with shorter delays for Github CI only
+name: 25.3.24. [TC-CC-9.1] ColorLoopSet Validation
+
+config:
+    nodeId: 0x12344321
+    timeout: 400
+    cluster: "Color Control"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "TH writes 0 to the Options attribute"
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
+    - label: "TH sends On command to DUT"
+      cluster: "On/Off"
+      command: "On"
+
+    - label:
+          "TH sends EnhancedMoveToHue command to DUT with EnhancedHue=0x4000,
+          Direction=0x00 (shortest distance) and TransitionTime=0 (immediately)."
+      command: "EnhancedMoveToHue"
+      arguments:
+          values:
+              - name: "EnhancedHue"
+                value: 16384
+              - name: "Direction"
+                value: 0
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait for 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    - label:
+          "TH sends ColorLoopSet command to with UpdateFlag attribute to 0x1
+          (UpdateAction) and Action attribute to 0x0 (De-activate) to DUT."
+      command: "ColorLoopSet"
+      arguments:
+          values:
+              - name: "UpdateFlags"
+                value: 1
+              - name: "Action"
+                value: 0
+              - name: "Direction"
+                value: 0
+              - name: "Time"
+                value: 0
+              - name: "StartHue"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Read ColorLoopActive attribute from DUT"
+      command: "readAttribute"
+      attribute: "ColorLoopActive"
+      response:
+          value: 0
+
+    - label:
+          "TH sends ColorLoopSet command to with UpdateFlag attribute to 0x2
+          (UpdateDirection) and Direction attribute to 0x0 (decrement hue) to
+          DUT."
+      command: "ColorLoopSet"
+      arguments:
+          values:
+              - name: "UpdateFlags"
+                value: 2
+              - name: "Action"
+                value: 0
+              - name: "Direction"
+                value: 0
+              - name: "Time"
+                value: 0
+              - name: "StartHue"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Read ColorLoopDirection attribute from DUT"
+      command: "readAttribute"
+      attribute: "ColorLoopDirection"
+      response:
+          value: 0
+
+    - label:
+          "TH sends ColorLoopSet command to with UpdateFlag attribute to 0x4
+          (UpdateTime) and Time attribute to 5 (5s for one loop) to DUT."
+      command: "ColorLoopSet"
+      arguments:
+          values:
+              - name: "UpdateFlags"
+                value: 4
+              - name: "Action"
+                value: 0
+              - name: "Direction"
+                value: 0
+              - name: "Time"
+                value: 5
+              - name: "StartHue"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Read ColorLoopTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "ColorLoopTime"
+      response:
+          value: 5
+
+    - label:
+          "TH sends ColorLoopSet command to with UpdateFlag attribute to 0x8
+          (UpdateStartHue) and StartHue attribute to 0x00A0 to DUT."
+      command: "ColorLoopSet"
+      arguments:
+          values:
+              - name: "UpdateFlags"
+                value: 8
+              - name: "Action"
+                value: 0
+              - name: "Direction"
+                value: 0
+              - name: "Time"
+                value: 0
+              - name: "StartHue"
+                value: 160
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Read ColorLoopStartEnhancedHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "ColorLoopStartEnhancedHue"
+      response:
+          value: 160
+
+    - label:
+          "TH sends ColorLoopSet command to with UpdateFlag attribute to 0x1
+          (UpdateAction) and Action attribute to 0x1 (start from
+          ColorLoopStartEnhancedHue) to DUT."
+      command: "ColorLoopSet"
+      arguments:
+          values:
+              - name: "UpdateFlags"
+                value: 1
+              - name: "Action"
+                value: 1
+              - name: "Direction"
+                value: 0
+              - name: "Time"
+                value: 0
+              - name: "StartHue"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Read ColorLoopActive attribute from DUT"
+      command: "readAttribute"
+      attribute: "ColorLoopActive"
+      response:
+          value: 1
+
+    - label: "Read ColorLoopStoredEnhancedHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "ColorLoopStoredEnhancedHue"
+      response:
+          value: 16384
+
+    - label: "Wait for 5S"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label:
+          "Saving value for comparison in step 8d read ColorLoopStartEnhancedHue
+          attribute from DUT"
+      command: "readAttribute"
+      attribute: "ColorLoopStartEnhancedHue"
+      response:
+          saveAs: ColorLoopStartEnhancedHueStep5d
+
+    - label: "Read EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              type: int16u
+              minValue: ColorLoopStartEnhancedHueStep5d
+              maxValue: 65535
+
+    - label: "Wait for 5S"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "Read EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              type: int16u
+              minValue: ColorLoopStartEnhancedHueStep5d
+              maxValue: 65535
+
+    - label:
+          "TH sends ColorLoopSet command to with UpdateFlag attribute to 0x1
+          (UpdateAction) and Action attribute to 0x0 (De-activate) to DUT"
+      command: "ColorLoopSet"
+      arguments:
+          values:
+              - name: "UpdateFlags"
+                value: 1
+              - name: "Action"
+                value: 0
+              - name: "Direction"
+                value: 0
+              - name: "Time"
+                value: 0
+              - name: "StartHue"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Read ColorLoopActive attribute from DUT"
+      command: "readAttribute"
+      attribute: "ColorLoopActive"
+      response:
+          value: 0
+
+    - label:
+          "Saving value for comparison in step 6c read
+          ColorLoopStoredEnhancedHue attribute from DUT."
+      command: "readAttribute"
+      attribute: "ColorLoopStoredEnhancedHue"
+      response:
+          saveAs: ColorLoopStoredEnhancedHueStep6c
+
+    - label: "Read EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          value: ColorLoopStoredEnhancedHueStep6c
+
+    - label:
+          "TH sends ColorLoopSet command to with UpdateFlag attribute to 0x2
+          (UpdateDirection) and Direction attribute to 0x1 (increment hue) to
+          DUT."
+      command: "ColorLoopSet"
+      arguments:
+          values:
+              - name: "UpdateFlags"
+                value: 2
+              - name: "Action"
+                value: 0
+              - name: "Direction"
+                value: 1
+              - name: "Time"
+                value: 0
+              - name: "StartHue"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Read ColorLoopDirection attribute from DUT"
+      command: "readAttribute"
+      attribute: "ColorLoopDirection"
+      response:
+          value: 1
+
+    - label:
+          "TH sends ColorLoopSet command to with UpdateFlag attribute to 0x1
+          (UpdateAction) and Action attribute to 0x1 (start from
+          ColorLoopStartEnhancedHue) to DUT."
+      command: "ColorLoopSet"
+      arguments:
+          values:
+              - name: "UpdateFlags"
+                value: 1
+              - name: "Action"
+                value: 1
+              - name: "Direction"
+                value: 0
+              - name: "Time"
+                value: 0
+              - name: "StartHue"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Read ColorLoopActive attribute from DUT"
+      command: "readAttribute"
+      attribute: "ColorLoopActive"
+      response:
+          value: 1
+
+    - label: "Read ColorLoopStoredEnhancedHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "ColorLoopStoredEnhancedHue"
+      response:
+          value: 16384
+
+    - label: "Wait for 5S"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label:
+          "Saving value for comparision in step 8d read
+          ColorLoopStartEnhancedHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "ColorLoopStartEnhancedHue"
+      response:
+          saveAs: ColorLoopStartEnhancedHueStep8d
+
+    - label: "Read EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              type: int16u
+              minValue: ColorLoopStartEnhancedHueStep8d
+              maxValue: 65535
+
+    - label: "Wait for 5S"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "Read EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              type: int16u
+              minValue: ColorLoopStartEnhancedHueStep8d
+              maxValue: 65535
+
+    - label:
+          "TH sends ColorLoopSet command to with UpdateFlag attribute to 0x1
+          (UpdateAction) and Action attribute to 0x0 (De-activate) to DUT."
+      command: "ColorLoopSet"
+      arguments:
+          values:
+              - name: "UpdateFlags"
+                value: 1
+              - name: "Action"
+                value: 0
+              - name: "Direction"
+                value: 0
+              - name: "Time"
+                value: 0
+              - name: "StartHue"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Read ColorLoopActive attribute from DUT"
+      command: "readAttribute"
+      attribute: "ColorLoopActive"
+      response:
+          value: 0
+
+    - label:
+          "Saving value for comparision in step 9c read
+          ColorLoopStoredEnhancedHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "ColorLoopStoredEnhancedHue"
+      response:
+          saveAs: ColorLoopStoredEnhancedHueStep9c
+
+    - label: "Read EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          value: ColorLoopStoredEnhancedHueStep9c
+
+    - label:
+          "TH sends EnhancedMoveToHue command to DUT with EnhancedHue=0x4000,
+          Direction=0x00 (shortest distance) and TransitionTime=0 (immediately)."
+      command: "EnhancedMoveToHue"
+      arguments:
+          values:
+              - name: "EnhancedHue"
+                value: 16384
+              - name: "Direction"
+                value: 0
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 10ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10
+
+    - label: "Read EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          value: 16384
+
+    - label:
+          "TH sends ColorLoopSet command to with UpdateFlag attribute to 0x2
+          (UpdateDirection) and Direction attribute to 0x0 (decrement hue) to
+          DUT."
+      command: "ColorLoopSet"
+      arguments:
+          values:
+              - name: "UpdateFlags"
+                value: 2
+              - name: "Action"
+                value: 0
+              - name: "Direction"
+                value: 0
+              - name: "Time"
+                value: 0
+              - name: "StartHue"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Read ColorLoopDirection attribute from DUT"
+      command: "readAttribute"
+      attribute: "ColorLoopDirection"
+      response:
+          value: 0
+
+    - label:
+          "TH sends ColorLoopSet command to with UpdateFlag attribute to 0x1
+          (UpdateAction) and Action attribute to 0x2 (start from
+          EnhancedCurrentHue) to DUT."
+      command: "ColorLoopSet"
+      arguments:
+          values:
+              - name: "UpdateFlags"
+                value: 1
+              - name: "Action"
+                value: 2
+              - name: "Direction"
+                value: 0
+              - name: "Time"
+                value: 0
+              - name: "StartHue"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Read ColorLoopActive attribute from DUT"
+      command: "readAttribute"
+      attribute: "ColorLoopActive"
+      response:
+          value: 1
+
+    - label: "Read ColorLoopStoredEnhancedHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "ColorLoopStoredEnhancedHue"
+      response:
+          value: 16384
+
+    - label: "Wait for 5S"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label:
+          "Saving value for comparision in step 12d read
+          ColorLoopStartEnhancedHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "ColorLoopStartEnhancedHue"
+      response:
+          saveAs: ColorLoopStartEnhancedHueStep12d
+
+    - label: "Read EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              type: int16u
+              minValue: ColorLoopStartEnhancedHueStep12d
+              maxValue: 65535
+
+    - label: "Wait for 5S"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "Read EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              type: int16u
+              minValue: ColorLoopStartEnhancedHueStep12d
+              maxValue: 65535
+
+    - label:
+          "TH sends ColorLoopSet command to with UpdateFlag attribute to 0x1
+          (UpdateAction) and Action attribute to 0x0 (De-activate) to DUT."
+      command: "ColorLoopSet"
+      arguments:
+          values:
+              - name: "UpdateFlags"
+                value: 1
+              - name: "Action"
+                value: 0
+              - name: "Direction"
+                value: 0
+              - name: "Time"
+                value: 0
+              - name: "StartHue"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Read ColorLoopActive attribute from DUT"
+      command: "readAttribute"
+      attribute: "ColorLoopActive"
+      response:
+          value: 0
+
+    - label:
+          "Saving value for comparision in step 13c read
+          ColorLoopStoredEnhancedHue attribute from DUT."
+      command: "readAttribute"
+      attribute: "ColorLoopStoredEnhancedHue"
+      response:
+          saveAs: ColorLoopStoredEnhancedHueStep13c
+
+    - label: "Read EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          value: ColorLoopStoredEnhancedHueStep13c
+
+    - label:
+          "TH sends ColorLoopSet command to with UpdateFlag attribute to 0x2
+          (UpdateDirection) and Direction attribute to 0x1 (increment hue) to
+          DUT."
+      command: "ColorLoopSet"
+      arguments:
+          values:
+              - name: "UpdateFlags"
+                value: 2
+              - name: "Action"
+                value: 0
+              - name: "Direction"
+                value: 1
+              - name: "Time"
+                value: 0
+              - name: "StartHue"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Read ColorLoopDirection attribute from DUT"
+      command: "readAttribute"
+      attribute: "ColorLoopDirection"
+      response:
+          value: 1
+
+    - label:
+          "TH sends ColorLoopSet command to with UpdateFlag attribute to 0x1
+          (UpdateAction) and Action attribute to 0x2 (start from
+          EnhancedCurrentHue) to DUT"
+      command: "ColorLoopSet"
+      arguments:
+          values:
+              - name: "UpdateFlags"
+                value: 1
+              - name: "Action"
+                value: 2
+              - name: "Direction"
+                value: 0
+              - name: "Time"
+                value: 0
+              - name: "StartHue"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Read ColorLoopActive attribute from DUT"
+      command: "readAttribute"
+      attribute: "ColorLoopActive"
+      response:
+          value: 1
+
+    - label: "Read ColorLoopStoredEnhancedHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "ColorLoopStoredEnhancedHue"
+      response:
+          value: 16384
+
+    - label: "Wait for 5S"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label:
+          "Saving value for comparision in step 15d read
+          ColorLoopStartEnhancedHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "ColorLoopStartEnhancedHue"
+      response:
+          saveAs: ColorLoopStartEnhancedHueStep15d
+
+    - label: "Read EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              type: int16u
+              minValue: ColorLoopStartEnhancedHueStep15d
+              maxValue: 65535
+
+    - label: "Wait for 5S"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "Read EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              type: int16u
+              minValue: ColorLoopStartEnhancedHueStep15d
+              maxValue: 65535
+
+    - label:
+          "TH sends ColorLoopSet command to with UpdateFlag attribute to 0x1
+          (UpdateAction) and Action attribute to 0x0 (De-activate) to DUT."
+      command: "ColorLoopSet"
+      arguments:
+          values:
+              - name: "UpdateFlags"
+                value: 1
+              - name: "Action"
+                value: 0
+              - name: "Direction"
+                value: 0
+              - name: "Time"
+                value: 0
+              - name: "StartHue"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Read ColorLoopActive attribute from DUT"
+      command: "readAttribute"
+      attribute: "ColorLoopActive"
+      response:
+          value: 0
+
+    - label:
+          "Saving value for comparision in step 16b read
+          ColorLoopStoredEnhancedHue attribute from DUT."
+      command: "readAttribute"
+      attribute: "ColorLoopStoredEnhancedHue"
+      response:
+          saveAs: ColorLoopStoredEnhancedHueStep16b
+
+    - label: "Read EnhancedCurrentHue attribute from DUT"
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          value: ColorLoopStoredEnhancedHueStep16b
+
+    - label: "Turn Off light for color control tests"
+      cluster: "On/Off"
+      command: "Off"
+
+    - label: "Check on/off attribute value is false after off command"
+      cluster: "On/Off"
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0

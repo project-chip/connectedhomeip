@@ -1,0 +1,284 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 265.1.2. [TC-EEVSE-2.1] Attributes with DUT as Server
+
+PICS:
+    - EEVSE.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Energy EVSE"
+    endpoint: 1
+
+tests:
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH reads from the DUT the State attribute"
+      command: "readAttribute"
+      attribute: "State"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 6
+
+    - label: "Step 3: TH reads from the DUT the SupplyState attribute"
+      PICS: EEVSE.S.A0001
+      command: "readAttribute"
+      attribute: "SupplyState"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 4
+
+    - label: "Step 4: TH reads from the DUT the FaultState attribute"
+      PICS: EEVSE.S.A0002
+      command: "readAttribute"
+      attribute: "FaultState"
+      response:
+          constraints:
+              type: enum8
+              anyOf: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 255]
+
+    - label: "Step 5: TH reads from the DUT the ChargingEnabledUntil attribut"
+      PICS: EEVSE.S.A0003
+      command: "readAttribute"
+      attribute: "ChargingEnabledUntil"
+      response:
+          constraints:
+              type: epoch-s
+              minValue: 0
+              maxValue: 4294967295
+
+    - label:
+          "Step 6: TH reads from the DUT the DischargingEnabledUntil attribute"
+      PICS: EEVSE.S.A0004
+      command: "readAttribute"
+      attribute: "DischargingEnabledUntil"
+      response:
+          constraints:
+              type: epoch-s
+              minValue: 0
+              maxValue: 4294967295
+
+    - label: "Step 7: TH reads from the DUT the CircuitCapacity attribute"
+      PICS: EEVSE.S.A0005
+      command: "readAttribute"
+      attribute: "CircuitCapacity"
+      response:
+          constraints:
+              type: amperage_ma
+              minValue: 0
+
+    - label: "Step 8: TH reads from the DUT the MinimumChargeCurrent attribute"
+      PICS: EEVSE.S.A0006
+      command: "readAttribute"
+      attribute: "MinimumChargeCurrent"
+      response:
+          constraints:
+              type: amperage_ma
+              minValue: 0
+
+    - label: "Step 9: TH reads from the DUT the MaximumChargeCurrent attribute"
+      PICS: EEVSE.S.A0007
+      command: "readAttribute"
+      attribute: "MaximumChargeCurrent"
+      response:
+          constraints:
+              type: amperage_ma
+              minValue: 0
+
+    - label:
+          "Step 10: TH reads from the DUT the MaximumDischargeCurrent attribute"
+      PICS: EEVSE.S.A0008
+      command: "readAttribute"
+      attribute: "MaximumDischargeCurrent"
+      response:
+          constraints:
+              type: amperage_ma
+              minValue: 0
+
+    - label:
+          "Step 11: TH writes to the DUT the UserMaximumChargeCurrent attribute
+          value 3000"
+      PICS: EEVSE.S.A0009
+      command: "writeAttribute"
+      attribute: "UserMaximumChargeCurrent"
+      arguments:
+          value: 30000
+
+    - label:
+          "Step 11a: TH reads from the DUT the UserMaximumChargeCurrent
+          attribute"
+      PICS: EEVSE.S.A0009
+      command: "readAttribute"
+      attribute: "UserMaximumChargeCurrent"
+      response:
+          value: 30000
+          constraints:
+              type: amperage_ma
+
+    - label:
+          "Step 12: TH writes to the DUT the RandomizationDelayWindow attribute
+          value 600"
+      PICS: EEVSE.S.A000A
+      command: "writeAttribute"
+      attribute: "RandomizationDelayWindow"
+      arguments:
+          value: 600
+
+    - label:
+          "Step 12a: TH reads from the DUT the RandomizationDelayWindow
+          attribute"
+      PICS: EEVSE.S.A000A
+      command: "readAttribute"
+      attribute: "RandomizationDelayWindow"
+      response:
+          value: 600
+          constraints:
+              type: elapsed_s
+
+    - label: "Step 13: TH reads from the DUT the NextChargeStartTime attribute"
+      PICS: EEVSE.S.A0023
+      command: "readAttribute"
+      attribute: "NextChargeStartTime"
+      response:
+          constraints:
+              type: epoch-s
+              minValue: 0
+              maxValue: 4294967295
+
+    - label: "Step 14: TH reads from the DUT the NextChargeTargetTime attribute"
+      PICS: EEVSE.S.A0024
+      command: "readAttribute"
+      attribute: "NextChargeTargetTime"
+      response:
+          constraints:
+              type: epoch-s
+              minValue: 0
+              maxValue: 4294967295
+
+    - label:
+          "Step 15: TH reads from the DUT the NextChargeRequiredEnergy attribute"
+      PICS: EEVSE.S.A0025
+      command: "readAttribute"
+      attribute: "NextChargeRequiredEnergy"
+      response:
+          constraints:
+              type: energy-mWh
+              minValue: 0
+
+    - label: "Step 16: TH reads from the DUT the NextChargeTargetSoC attribute"
+      PICS: EEVSE.S.A0026
+      command: "readAttribute"
+      attribute: "NextChargeTargetSoC"
+      response:
+          constraints:
+              type: percent
+              minValue: 0
+              maxValue: 100
+
+    - label:
+          "Step 17: TH writes to the DUT the ApproximateEVEfficiency attribute
+          value 3500"
+      PICS: EEVSE.S.A0027
+      command: "writeAttribute"
+      attribute: "ApproximateEVEfficiency"
+      arguments:
+          value: 3500
+
+    - label:
+          "Step 17a: TH reads from the DUT the ApproximateEVEfficiency attribute"
+      PICS: EEVSE.S.A0027
+      command: "readAttribute"
+      attribute: "ApproximateEVEfficiency"
+      response:
+          value: 3500
+          constraints:
+              type: int16u
+
+    - label: "Step 18: TH reads from the DUT the StateOfCharge attribute"
+      PICS: EEVSE.S.A0030
+      command: "readAttribute"
+      attribute: "StateOfCharge"
+      response:
+          constraints:
+              type: percent
+              minValue: 0
+              maxValue: 100
+
+    - label: "Step 19: TH reads from the DUT the BatteryCapacity attribute"
+      PICS: EEVSE.S.A0031
+      command: "readAttribute"
+      attribute: "BatteryCapacity"
+      response:
+          constraints:
+              type: energy-mWh
+              minValue: 0
+
+    - label: "Step 20: TH reads from the DUT the VehicleID attribute"
+      PICS: EEVSE.S.A0032
+      command: "readAttribute"
+      attribute: "VehicleID"
+      response:
+          constraints:
+              type: char_string
+              maxLength: 32
+
+    - label: "Step 21: TH reads from the DUT the SessionID attribute"
+      PICS: EEVSE.S.A0040
+      command: "readAttribute"
+      attribute: "SessionID"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0
+              maxValue: 2147483647
+
+    - label: "Step 22: TH reads from the DUT the SessionDuration attribute"
+      PICS: EEVSE.S.A0041
+      command: "readAttribute"
+      attribute: "SessionDuration"
+      response:
+          constraints:
+              type: elapsed_s
+              minValue: 0
+              maxValue: 2147483647
+
+    - label: "Step 23: TH reads from the DUT the SessionEnergyCharged attribute"
+      PICS: EEVSE.S.A0042
+      command: "readAttribute"
+      attribute: "SessionEnergyCharged"
+      response:
+          constraints:
+              type: energy-mWh
+              minValue: 0
+
+    - label:
+          "Step 24: TH reads from the DUT the SessionEnergyDischarged attribute"
+      PICS: EEVSE.S.A0043
+      command: "readAttribute"
+      attribute: "SessionEnergyDischarged"
+      response:
+          constraints:
+              type: energy-mWh
+              minValue: 0

@@ -1,0 +1,174 @@
+{
+    "$id": "NrfConnect_Factory_Data_schema",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "description": "A representation of all factory data used in Matter's NrfConnect device",
+    "type": "object",
+    "required": [
+        "version",
+        "sn",
+        "vendor_id",
+        "product_id",
+        "vendor_name",
+        "product_name",
+        "date",
+        "hw_ver",
+        "hw_ver_str",
+        "dac_cert",
+        "dac_key",
+        "pai_cert",
+        "spake2_it",
+        "spake2_salt",
+        "spake2_verifier",
+        "discriminator"
+    ],
+    "properties": {
+        "version": {
+            "description": "Current version of the factory data set",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 65535
+        },
+        "sn": {
+            "description": "Serial number of device",
+            "type": "string",
+            "maxLength": 32
+        },
+        "vendor_id": {
+            "description": "Vendor Identifier",
+            "type": "integer",
+            "minimum": 0,
+            "maximum":  65524
+        },
+        "product_id": {
+            "description": "Product Identifier",
+            "type": "integer",
+            "minimum": 1, 
+            "maximum":  65535
+        },
+        "vendor_name": {
+            "description": "human-readable vendor name",
+            "type": "string",
+            "maxLength": 32
+        },
+        "product_name": {
+            "description": "human-readable product name",
+            "type": "string",
+            "maxLength": 32
+        },
+        "product_label": {
+            "description": "more user-friendly human-readable product name",
+            "type": "string",
+            "maxLength": 64
+        },
+        "product_url": {
+            "description": "link to product-specific web page",
+            "type": "string",
+            "maxLength": 256
+        },
+        "part_number": {
+            "description": "human-readable vendor assigned part number",
+            "type": "string",
+            "maxLength": 32
+        },
+        "date": {
+            "description": "Manufacturing date according to ISO 8601 in notation YYYY-MM-DD",
+            "type": "string",
+            "format": "date",
+            "minLength": 10,
+            "maxLength": 10,
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "hw_ver": {
+            "description": "Hardware version - integer",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 65535
+        },
+        "hw_ver_str": {
+            "description": "A string representation of hardware version",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+        },
+        "rd_uid": {
+            "description": "A randomly-generated 128-bit or longer octet string. Length has been expanded with 'hex:' prefix",
+            "type": "string",
+            "pattern": "^hex:([0-9A-Fa-f]{2}){16,}$",
+            "minLength": 36,
+            "maxLength": 68
+        },
+        "dac_cert": {
+            "description": "DAC certificate in hex-string format",
+            "type": "string",
+            "pattern": "^hex:([0-9A-Fa-f]{2})+$",
+            "minLength": 6,
+            "maxLength": 1204
+        },
+        "dac_key": {
+            "description": "DAC Private Key in hex-string format",
+            "type": "string",
+            "pattern": "^hex:([0-9A-Fa-f]{2}){32}$",
+            "minLength": 68,
+            "maxLength": 68
+        },
+        "pai_cert": {
+            "description": "PAI certificate in hex-string format",
+            "type": "string",
+            "pattern": "^hex:([0-9A-Fa-f]{2})+$",
+            "minLength": 6,
+            "maxLength": 1204
+        },
+        "passcode": {
+            "description": "A default PASE session passcode",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 99999998
+        },
+        "spake2_it": {
+            "description": "An Iteration counter for the Symmetric Password-Authenticated Key Exchange",
+            "type": "integer",
+            "minimum": 1000,
+            "maximum": 100000
+        },
+        "spake2_salt": {
+            "description": "A key-derivation function for the Symmetric Password-Authenticated Key Exchange.",
+            "type": "string",
+            "pattern": "^hex:([0-9A-Fa-f]{2})+$",
+            "minLength": 36,
+            "maxLength": 68
+        },
+        "spake2_verifier": {
+            "description": "A verifier for the Symmetric Password-Authenticated Key Exchange",
+            "type": "string",
+            "pattern": "^hex:([0-9A-Fa-f]{2})+$",
+            "minLength": 97
+        },
+        "discriminator": {
+            "description": "The Discriminator value helps to further identify potential devices during the setup process.",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4095
+        },
+        "enable_key": {
+            "description": "The Enable Key is a 128-bit value that triggers manufacturer-specific action while invoking the TestEventTrigger Command",
+            "type": "string",
+            "pattern": "^hex:([0-9A-Fa-f]{2}){16}$",
+            "minLength": 36, 
+            "maxLength": 36
+        },
+        "product_finish": {
+            "description": "Product finish provides a description of the product's external case finish method (matte, satin, polished, rugged, fabric)",
+            "type": "integer",
+            "enum": [0, 1, 2, 3, 4, 5]
+        },
+        "primary_color": { 
+            "description": "Product finish provides a description of the product's primary color",
+            "type": "integer",
+            "enum": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+        },
+        "user": {
+            "description": "A user-specific additional data which should be added to factory data. This should be a Json format.",
+            "type": "object"
+        }
+    }
+}

@@ -1,0 +1,227 @@
+#
+#   Copyright (c) 2022 Project CHIP Authors
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+
+# The purpose of this file is to define new default values of settings used when building Matter samples.
+# This file only changes defaults and thus all symbols here must be promptless
+# and safeguarded so that they only are applied when building Matter.
+
+if CHIP
+
+config LOG
+	bool
+	default y
+
+if LOG
+
+choice LOG_MODE
+	default LOG_MODE_MINIMAL
+endchoice
+
+choice MATTER_LOG_LEVEL_CHOICE
+	default MATTER_LOG_LEVEL_DBG
+endchoice
+
+config LOG_DEFAULT_LEVEL
+	int
+	default 2
+
+endif
+
+# disable synchronous printk to avoid blocking IRQs which
+# may affect time sensitive components
+config PRINTK_SYNC
+	bool
+	default n
+
+config ASSERT
+	bool
+	default y
+
+config HW_STACK_PROTECTION
+	bool
+	default y
+
+config FPU
+	bool
+	default y
+
+config SHELL
+	bool
+	default y
+
+# Enable getting reboot reasons information
+config HWINFO
+	bool
+	default y
+
+# Generic networking options
+config NET_SOCKETS_POSIX_NAMES
+	bool
+	default n
+
+# Application stack size
+config MAIN_STACK_SIZE
+	int
+	default 8192
+
+config INIT_STACKS
+	bool
+	default y
+
+config CHIP_DEVICE_VENDOR_ID
+	int
+	default 65521
+
+config CHIP_DEVICE_PRODUCT_ID
+	int
+	default 32768
+
+# Disable certain parts of Zephyr IPv6 stack
+config NET_IPV6_NBR_CACHE
+	bool
+	default n
+
+config NET_IPV6_MLD
+	bool
+	default y
+
+config NET_IF_MCAST_IPV6_ADDR_COUNT
+	int
+	default 14
+
+# Network buffers
+config NET_PKT_RX_COUNT
+	int
+	default 16
+
+config NET_PKT_TX_COUNT
+	int
+	default 16
+
+config NET_BUF_RX_COUNT
+	int
+	default 80
+
+config NET_BUF_TX_COUNT
+	int
+	default 80
+
+# Bluetooth Low Energy configs
+config BT
+	bool
+	default y
+
+config BT_PERIPHERAL
+	bool
+	default y
+
+config BT_PERIPHERAL_PREF_MIN_INT
+	int
+	default 36
+
+config BT_PERIPHERAL_PREF_MAX_INT
+	int
+	default 36
+
+config BT_GAP_AUTO_UPDATE_CONN_PARAMS
+	bool
+	default y
+
+config BT_GATT_DYNAMIC_DB
+	bool
+	default y
+
+config BT_DEVICE_NAME_DYNAMIC
+	bool
+	default y
+
+config BT_DEVICE_NAME_MAX
+	int
+	default 15
+
+config BT_MAX_CONN
+	int
+	default 1
+
+config BT_L2CAP_TX_MTU
+	int
+	default 247
+
+config BT_BUF_ACL_RX_SIZE
+	int
+	default 251
+
+config BT_BUF_ACL_TX_SIZE
+	int
+	default 251
+
+config BT_RX_STACK_SIZE
+	int
+	default 1200
+
+config CHIP_OTA_REQUESTOR
+	bool
+	default y
+
+# Enable extended discovery
+config CHIP_EXTENDED_DISCOVERY
+	bool
+	default y
+
+config NVS_LOOKUP_CACHE
+	bool
+	default y
+
+# Enable OpenThread
+config NET_L2_OPENTHREAD
+	bool
+	default y
+
+# Enable mbedTLS
+config MBEDTLS_ENABLE_HEAP
+	bool
+	default y
+
+config MBEDTLS_HEAP_SIZE
+	int
+	default 15360
+
+# Disable not used shell modules
+config SENSOR_SHELL
+	bool
+	default n
+
+config DEVICE_SHELL
+	bool
+	default n
+
+config DATE_SHELL
+	bool
+	default n
+
+config DEVMEM_SHELL
+	bool
+	default n
+
+config MCUBOOT_SHELL
+	bool
+	default n
+
+config FLASH_SHELL
+	bool
+	default n
+
+endif # CHIP

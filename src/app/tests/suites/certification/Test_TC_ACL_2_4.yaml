@@ -1,0 +1,1548 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 133.2.3. [TC-ACL-2.4] ACL attribute
+
+PICS:
+    - ACL.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Access Control"
+    endpoint: 0
+    CAT1:
+        type: int64u
+        defaultValue: 65520
+    CAT2:
+        type: int64u
+        defaultValue: 65521
+    CAT3:
+        type: int64u
+        defaultValue: 65522
+    CAT4:
+        type: int64u
+        defaultValue: 65523
+
+tests:
+    - label: "Step 1:Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Read the commissioner node ID"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: CommissionerNodeId
+
+    - label:
+          "Step 2:TH1 reads DUT Endpoint 0 OperationalCredentials cluster
+          CurrentFabricIndex attribute"
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: CurrentFabricIndexValue
+
+    - label:
+          "Step 3:TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute"
+      PICS: ACL.S.A0000
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+
+    - label:
+          "Step 4:TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute,
+          value is list of AccessControlEntryStruct containing 3 elements
+          1.struct Privilege field: Administer (5) AuthMode field: CASE (2)
+          Subjects field: [N1] Targets field: null 2 . struct Privilege field:
+          View (1) AuthMode field: CASE (3) Subjects field: [111, 222, 333, 444]
+          Targets field: [{Cluster: 11}, {Endpoint: 22}] 3..struct Privilege
+          field: Operate (3) AuthMode field: Group (3) Subjects field: [555,
+          666, 777, 888] Targets field: [{Cluster: 55}, {Endpoint: 66}]"
+      PICS: ACL.S.A0000
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 1,
+                      AuthMode: 3,
+                      Subjects: [111, 222, 333, 444],
+                      Targets:
+                          [{ Cluster: 11, Endpoint: 22, DeviceType: null }],
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 3,
+                      AuthMode: 3,
+                      Subjects: [555, 666, 777, 888],
+                      Targets:
+                          [{ Cluster: 55, Endpoint: 66, DeviceType: null }],
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+
+    - label:
+          "Step 5:TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute"
+      PICS: ACL.S.A0000
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 1,
+                      AuthMode: 3,
+                      Subjects: [111, 222, 333, 444],
+                      Targets:
+                          [{ Cluster: 11, Endpoint: 22, DeviceType: null }],
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 3,
+                      AuthMode: 3,
+                      Subjects: [555, 666, 777, 888],
+                      Targets:
+                          [{ Cluster: 55, Endpoint: 66, DeviceType: null }],
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+
+    - label:
+          "Step 6:TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute,
+          value is list of AccessControlEntryStruct containing 3 elements
+          1.struct Privilege field: Administer (5) AuthMode field: CASE (2)
+          Subjects field: [N1] Targets field: null 2.struct Privilege field:
+          Manage (4) AuthMode field: Group (3) Subjects field: [444, 333, 222,
+          111] Targets field: [{Cluster: 44}, {Endpoint: 33}] 3.struct Privilege
+          field: Administer (5) AuthMode field: CASE (2) Subjects field: [888,
+          777, 666, 555] Targets field: [{Cluster: 88}, {Endpoint: 77}]"
+      PICS: ACL.S.A0000
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 4,
+                      AuthMode: 3,
+                      Subjects: [444, 333, 222, 111],
+                      Targets:
+                          [{ Cluster: 44, Endpoint: 33, DeviceType: null }],
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [888, 777, 666, 555],
+                      Targets:
+                          [{ Cluster: 88, Endpoint: 77, DeviceType: null }],
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+
+    - label:
+          "Step 7:TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute"
+      PICS: ACL.S.A0000
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 4,
+                      AuthMode: 3,
+                      Subjects: [444, 333, 222, 111],
+                      Targets:
+                          [{ Cluster: 44, Endpoint: 33, DeviceType: null }],
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [888, 777, 666, 555],
+                      Targets:
+                          [{ Cluster: 88, Endpoint: 77, DeviceType: null }],
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+
+    - label:
+          "Step 8:TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute,
+          value is list of AccessControlEntryStruct containing 3 elements
+          1.struct Privilege field: Administer (5) AuthMode field: CASE (2)
+          Subjects field: [N1] Targets field: null 2.struct Privilege field:
+          View (1) AuthMode field: CASE (2) Subjects field: [111, 222, 333, 444]
+          Targets field: [{Cluster: 11, Endpoint: 22}, {Cluster: 33, DeviceType:
+          44}] 3.struct Privilege field: Operate (3) AuthMode field: Group (3)
+          Subjects field: [555, 666, 777, 888] Targets field: [{Cluster: 55,
+          Endpoint: 66}, {Cluster: 77, DeviceType: 88}]"
+      PICS: ACL.S.A0000
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 1,
+                      AuthMode: 2,
+                      Subjects: [111, 222, 333, 444],
+                      Targets:
+                          [
+                              { Cluster: 11, Endpoint: 22, DeviceType: null },
+                              { Cluster: 33, Endpoint: null, DeviceType: 44 },
+                          ],
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 3,
+                      AuthMode: 3,
+                      Subjects: [555, 666, 777, 888],
+                      Targets:
+                          [
+                              { Cluster: 55, Endpoint: 66, DeviceType: null },
+                              { Cluster: 77, Endpoint: null, DeviceType: 88 },
+                          ],
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+
+    - label: "Step 9:TH1 reads AccessControl cluster ACL attribute"
+      PICS: ACL.S.A0000
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 1,
+                      AuthMode: 2,
+                      Subjects: [111, 222, 333, 444],
+                      Targets:
+                          [
+                              { Cluster: 11, Endpoint: 22, DeviceType: null },
+                              { Cluster: 33, Endpoint: null, DeviceType: 44 },
+                          ],
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 3,
+                      AuthMode: 3,
+                      Subjects: [555, 666, 777, 888],
+                      Targets:
+                          [
+                              { Cluster: 55, Endpoint: 66, DeviceType: null },
+                              { Cluster: 77, Endpoint: null, DeviceType: 88 },
+                          ],
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+
+    - label:
+          "Step 10:TH1 writes DUT Endpoint 0 AccessControl cluster ACL
+          attribute, value is list of AccessControlEntryStruct containing 3
+          elements 1.struct Privilege field: Administer (5) AuthMode field: CASE
+          (2) Subjects field: [N1] Targets field: null 2.struct Privilege field:
+          View (1) AuthMode field: CASE (2) Subjects field: null Targets field:
+          [{Cluster: 11, Endpoint: 22}, {Cluster: 33, DeviceType: 44}] 3.struct
+          Privilege field: Operate (3) AuthMode field: Group (3) Subjects field:
+          null Targets field: [{Cluster: 55, Endpoint: 66}, {Cluster: 77,
+          DeviceType: 88}]"
+      PICS: ACL.S.A0000
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 1,
+                      AuthMode: 2,
+                      Subjects: null,
+                      Targets:
+                          [
+                              { Cluster: 11, Endpoint: 22, DeviceType: null },
+                              { Cluster: 33, Endpoint: null, DeviceType: 44 },
+                          ],
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 3,
+                      AuthMode: 3,
+                      Subjects: null,
+                      Targets:
+                          [
+                              { Cluster: 55, Endpoint: 66, DeviceType: null },
+                              { Cluster: 77, Endpoint: null, DeviceType: 88 },
+                          ],
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+
+    - label: "Step 11:TH1 reads AccessControl cluster ACL attribute"
+      PICS: ACL.S.A0000
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 1,
+                      AuthMode: 2,
+                      Subjects: null,
+                      Targets:
+                          [
+                              { Cluster: 11, Endpoint: 22, DeviceType: null },
+                              { Cluster: 33, Endpoint: null, DeviceType: 44 },
+                          ],
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 3,
+                      AuthMode: 3,
+                      Subjects: null,
+                      Targets:
+                          [
+                              { Cluster: 55, Endpoint: 66, DeviceType: null },
+                              { Cluster: 77, Endpoint: null, DeviceType: 88 },
+                          ],
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+
+    - label:
+          "Step 12:TH1 writes DUT Endpoint 0 AccessControl cluster ACL
+          attribute, value is list of AccessControlEntryStruct containing 3
+          elements 1.struct Privilege field: Administer (5) AuthMode field: CASE
+          (2) Subjects field: [N1] Targets field: null 2.struct Privilege field:
+          View (1) AuthMode field: CASE (2) Subjects field: [111, 222, 333, 444]
+          Targets field: null 3.struct Privilege field: Operate (3) AuthMode
+          field: Group (3) Subjects field: [555, 666, 777, 888] Targets field:
+          null"
+      PICS: ACL.S.A0000
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 1,
+                      AuthMode: 2,
+                      Subjects: [111, 222, 333, 444],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 3,
+                      AuthMode: 3,
+                      Subjects: [555, 666, 777, 888],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+
+    - label: "Step 13:TH1 reads AccessControl cluster ACL attribute"
+      PICS: ACL.S.A0000
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 1,
+                      AuthMode: 2,
+                      Subjects: [111, 222, 333, 444],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 3,
+                      AuthMode: 3,
+                      Subjects: [555, 666, 777, 888],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+
+    - label:
+          "Step 14:TH1 writes DUT Endpoint 0 AccessControl cluster ACL
+          attribute, value is list of AccessControlEntryStruct containing 2
+          elements 1.struct Privilege field: Administer (5) AuthMode field: CASE
+          (2) Subjects field: [N1] Targets field: null 2.struct Privilege field:
+          Operate (3) AuthMode field: Group (3) Subjects field: null Targets
+          field: null"
+      PICS: ACL.S.A0000
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 3,
+                      AuthMode: 3,
+                      Subjects: null,
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+
+    - label: "Step 15:TH1 reads AccessControl cluster ACL attribute"
+      PICS: ACL.S.A0000
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 3,
+                      AuthMode: 3,
+                      Subjects: null,
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+
+    - label:
+          "Step 16:TH1 writes DUT Endpoint 0 AccessControl cluster ACL
+          attribute, value is list of AccessControlEntryStruct containing 2
+          elements 1.struct Privilege field: Administer (5) AuthMode field: CASE
+          (2) Subjects field: [N1] Targets field: null 2.struct Privilege field:
+          ProxyView (2) AuthMode field: CASE (2) Subjects field: null Targets
+          field: null"
+      PICS: ACL.S.A0000
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 2,
+                      AuthMode: 2,
+                      Subjects: null,
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+
+    - label: "Step 17:TH1 reads AccessControl cluster ACL attribute"
+      PICS: ACL.S.A0000
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 2,
+                      AuthMode: 2,
+                      Subjects: null,
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+
+    - label:
+          "Step 18:TH1 reads DUT AccessControl cluster
+          SubjectsPerAccessControlEntry attribute"
+      PICS: ACL.S.A0000
+      command: "readAttribute"
+      attribute: "SubjectsPerAccessControlEntry"
+      response:
+          saveAs: MAXSUBJECTS
+
+    #Issue https://github.com/project-chip/connectedhomeip/issues/16719
+    - label:
+          "Step 19:TH1 writes DUT Endpoint 0 AccessControl cluster ACL
+          attribute, value is list of AccessControlEntryStruct containing 2
+          elements 1.struct Privilege field: Administer (5) AuthMode field: CASE
+          (2) Subjects field: [N1] Targets field: null 2.struct Privilege field:
+          Operate (3) AuthMode field: CASE (2) Subjects field: list of
+          MAXSUBJECTS random node IDs (stored as SUBJECTS) Targets field: null"
+      PICS: ACL.S.A0000 && PICS_SKIP_SAMPLE_APP
+      verification: |
+          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 3, "authMode": 2, "subjects":[33,44,55,66] , "targets": null}]' 1 0
+          On TH1(Chiptool), Verify that the status is success when writing the AccessControl cluster ACL attribute with a  value is list of AccessControlEntryStruct containing 2 elements as Subject as SUBJECTS and Target as null
+
+
+
+          [1657542321.144954][3461:3466] CHIP:DMG: {
+          [1657542321.144990][3461:3466] CHIP:DMG:        AttributeStatusIBs =
+          [1657542321.145038][3461:3466] CHIP:DMG:        [
+          [1657542321.145082][3461:3466] CHIP:DMG:                AttributeStatusIB =
+          [1657542321.145128][3461:3466] CHIP:DMG:                {
+          [1657542321.145170][3461:3466] CHIP:DMG:                        AttributePathIB =
+          [1657542321.145219][3461:3466] CHIP:DMG:                        {
+          [1657542321.145273][3461:3466] CHIP:DMG:                                Endpoint = 0x0,
+          [1657542321.145327][3461:3466] CHIP:DMG:                                Cluster = 0x1f,
+          [1657542321.145382][3461:3466] CHIP:DMG:                                Attribute = 0x0000_0000,
+          [1657542321.145428][3461:3466] CHIP:DMG:                        }
+          [1657542321.145484][3461:3466] CHIP:DMG:
+          [1657542321.145531][3461:3466] CHIP:DMG:                        StatusIB =
+          [1657542321.145583][3461:3466] CHIP:DMG:                        {
+          [1657542321.145633][3461:3466] CHIP:DMG:                                status = 0x00 (SUCCESS),
+          [1657542321.145684][3461:3466] CHIP:DMG:                        },
+          [1657542321.145730][3461:3466] CHIP:DMG:
+          [1657542321.145774][3461:3466] CHIP:DMG:                },
+          [1657542321.145831][3461:3466] CHIP:DMG:
+          [1657542321.145870][3461:3466] CHIP:DMG:                AttributeStatusIB =
+          [1657542321.145912][3461:3466] CHIP:DMG:                {
+          [1657542321.145954][3461:3466] CHIP:DMG:                        AttributePathIB =
+          [1657542321.146001][3461:3466] CHIP:DMG:                        {
+          [1657542321.146052][3461:3466] CHIP:DMG:                                Endpoint = 0x0,
+          [1657542321.146111][3461:3466] CHIP:DMG:                                Cluster = 0x1f,
+          [1657542321.146166][3461:3466] CHIP:DMG:                                Attribute = 0x0000_0000,
+          [1657542321.146218][3461:3466] CHIP:DMG:                                ListIndex = Null,
+          [1657542321.146267][3461:3466] CHIP:DMG:                        }
+          [1657542321.146321][3461:3466] CHIP:DMG:
+          [1657542321.146374][3461:3466] CHIP:DMG:                        StatusIB =
+          [1657542321.146423][3461:3466] CHIP:DMG:                        {
+          [1657542321.146472][3461:3466] CHIP:DMG:                                status = 0x00 (SUCCESS),
+          [1657542321.146523][3461:3466] CHIP:DMG:                        },
+          [1657542321.146573][3461:3466] CHIP:DMG:
+          [1657542321.146614][3461:3466] CHIP:DMG:                },
+          [1657542321.146670][3461:3466] CHIP:DMG:
+          [1657542321.146709][3461:3466] CHIP:DMG:                AttributeStatusIB =
+          [1657542321.146751][3461:3466] CHIP:DMG:                {
+          [1657542321.146792][3461:3466] CHIP:DMG:                        AttributePathIB =
+          [1657542321.146840][3461:3466] CHIP:DMG:                        {
+          [1657542321.146890][3461:3466] CHIP:DMG:                                Endpoint = 0x0,
+          [1657542321.146943][3461:3466] CHIP:DMG:                                Cluster = 0x1f,
+          [1657542321.146997][3461:3466] CHIP:DMG:                                Attribute = 0x0000_0000,
+          [1657542321.147049][3461:3466] CHIP:DMG:                                ListIndex = Null,
+          [1657542321.147099][3461:3466] CHIP:DMG:                        }
+          [1657542321.147152][3461:3466] CHIP:DMG:
+          [1657542321.147204][3461:3466] CHIP:DMG:                        StatusIB =
+          [1657542321.147254][3461:3466] CHIP:DMG:                        {
+          [1657542321.147302][3461:3466] CHIP:DMG:                                status = 0x00 (SUCCESS),
+          [1657542321.147354][3461:3466] CHIP:DMG:                        },
+          [1657542321.147403][3461:3466] CHIP:DMG:
+          [1657542321.147443][3461:3466] CHIP:DMG:                },
+          [1657542321.147490][3461:3466] CHIP:DMG:
+          [1657542321.147528][3461:3466] CHIP:DMG:        ],
+          [1657542321.147586][3461:3466] CHIP:DMG:
+          [1657542321.147625][3461:3466] CHIP:DMG:        InteractionModelRevision = 1
+          [1657542321.147663][3461:3466] CHIP:DMG: }
+          [1657542321.147865][3461:3466] CHIP:DMG: WriteClient moving to [AwaitingDe]
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    #Issue https://github.com/project-chip/connectedhomeip/issues/16719
+    - label: "Step 20:TH1 reads AccessControl cluster ACL attribute"
+      PICS: ACL.S.A0000 && PICS_SKIP_SAMPLE_APP
+      verification: |
+          ./chip-tool accesscontrol read acl 1 0
+
+           On TH1(Chiptool) ,  Verify that the AccessControlEntryStruct contains 2 elements with  Subject as SUBJECTS and Target as null
+          [1656928460.992030][4255:4260] CHIP:DMG:        ],
+          [1656928460.992075][4255:4260] CHIP:DMG:
+          [1656928460.992101][4255:4260] CHIP:DMG:        SuppressResponse = true,
+          [1656928460.992126][4255:4260] CHIP:DMG:        InteractionModelRevision = 1
+          [1656928460.992149][4255:4260] CHIP:DMG: }
+          [1656928460.992513][4255:4260] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0000 DataVersion: 1070401481
+          [1656928460.992588][4255:4260] CHIP:TOO:   ACL: 2 entries
+          [1656928460.992647][4255:4260] CHIP:TOO:     [1]: {
+          [1656928460.992687][4255:4260] CHIP:TOO:       Privilege: 5
+          [1656928460.992712][4255:4260] CHIP:TOO:       AuthMode: 2
+          [1656928460.992738][4255:4260] CHIP:TOO:       Subjects: 1 entries
+          [1656928460.992767][4255:4260] CHIP:TOO:         [1]: 112233
+          [1656928460.992794][4255:4260] CHIP:TOO:       Targets: null
+          [1656928460.992817][4255:4260] CHIP:TOO:       FabricIndex: 1
+          [1656928460.992840][4255:4260] CHIP:TOO:      }
+          [1656928460.992873][4255:4260] CHIP:TOO:     [2]: {
+          [1656928460.992896][4255:4260] CHIP:TOO:       Privilege: 3
+          [1656928460.992918][4255:4260] CHIP:TOO:       AuthMode: 2
+          [1656928460.992945][4255:4260] CHIP:TOO:       Subjects: 4 entries
+          [1656928460.992971][4255:4260] CHIP:TOO:         [1]: 33
+          [1656928460.992995][4255:4260] CHIP:TOO:         [2]: 44
+          [1656928460.993020][4255:4260] CHIP:TOO:         [3]: 55
+          [1656928460.993045][4255:4260] CHIP:TOO:         [4]: 66
+          [1656928460.993069][4255:4260] CHIP:TOO:       Targets: null
+          [1656928460.993091][4255:4260] CHIP:TOO:       FabricIndex: 1
+          [1656928460.993113][4255:4260] CHIP:TOO:      }
+          [1656928460.993204][4255:4260] CHIP:EM: Sending Standalone Ack for MessageCounter:154962728 on exchange 64378i
+          [1656928460.993291][4255:4260] CHIP:IN: Prepared secure message 0xffffad69f958 to 0x0000000000000001 (1)  o
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 21:TH1 writes DUT Endpoint 0 AccessControl cluster ACL
+          attribute, value is list of AccessControlEntryStruct containing 2
+          elements 1.struct Privilege field: Administer (5) AuthMode field: CASE
+          (2) Subjects field: [N1] Targets field: null 2.struct Privilege field:
+          Operate (3) AuthMode field: CASE (2) Subjects field: [CAT1, CAT2,
+          CAT3, CAT4] Targets field: null"
+      PICS: ACL.S.A0000
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 3,
+                      AuthMode: 2,
+                      Subjects: [CAT1, CAT2, CAT3, CAT4],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+
+    - label: "Step 22:TH1 reads AccessControl cluster ACL attribute"
+      PICS: ACL.S.A0000
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 3,
+                      AuthMode: 2,
+                      Subjects: [CAT1, CAT2, CAT3, CAT4],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+
+    - label:
+          "Step 23:TH1 reads AccessControl cluster TargetsPerAccessControlEntry
+          attribute"
+      PICS: ACL.S.A0000
+      command: "readAttribute"
+      attribute: "TargetsPerAccessControlEntry"
+      response:
+          saveAs: TargetsPerAccessControlEntryValue
+
+    #Need if support : https://github.com/project-chip/connectedhomeip/issues/16719
+    - label:
+          "Step 24:TH1 writes DUT Endpoint 0 AccessControl cluster ACL
+          attribute, value is list of AccessControlEntryStruct containing 2
+          elements 1.struct Privilege field: Administer (5) AuthMode field: CASE
+          (2) Subjects field: [N1] Targets field: null 2.struct Privilege field:
+          Operate (3) AuthMode field: CASE (2) Subjects field:null Targets
+          field: list of MAXTARGETS targets {Cluster: random} (stored as
+          TARGETS)"
+      PICS: ACL.S.A0000 && PICS_SKIP_SAMPLE_APP
+      verification: |
+          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 3, "authMode": 2, "subjects": null, "targets":[{ "cluster": 40, "endpoint": null, "deviceType": null },{ "cluster": 28, "endpoint": null, "deviceType": null },{ "cluster": 30, "endpoint": null, "deviceType": null }]}]' 1 0
+
+          Via the TH (chip-tool), Verify that the status is success when writing the AccessControl cluster ACL attribute with a  value is list of AccessControlEntryStruct containing 2 elements.
+
+          [1686292221.429177][33589:33591] CHIP:DMG: WriteResponseMessage =
+          [1686292221.429234][33589:33591] CHIP:DMG: {
+          [1686292221.429283][33589:33591] CHIP:DMG:      AttributeStatusIBs =
+          [1686292221.429355][33589:33591] CHIP:DMG:      [
+          [1686292221.429411][33589:33591] CHIP:DMG:              AttributeStatusIB =
+          [1686292221.429475][33589:33591] CHIP:DMG:              {
+          [1686292221.429534][33589:33591] CHIP:DMG:                      AttributePathIB =
+          [1686292221.429691][33589:33591] CHIP:DMG:                      {
+          [1686292221.429771][33589:33591] CHIP:DMG:                              Endpoint = 0x0,
+          [1686292221.429847][33589:33591] CHIP:DMG:                              Cluster = 0x1f,
+          [1686292221.429923][33589:33591] CHIP:DMG:                              Attribute = 0x0000_0000,
+          [1686292221.429989][33589:33591] CHIP:DMG:                      }
+          [1686292221.430067][33589:33591] CHIP:DMG:
+          [1686292221.430136][33589:33591] CHIP:DMG:                      StatusIB =
+          [1686292221.430206][33589:33591] CHIP:DMG:                      {
+          [1686292221.430277][33589:33591] CHIP:DMG:                              status = 0x00 (SUCCESS),
+          [1686292221.430346][33589:33591] CHIP:DMG:                      },
+          [1686292221.430415][33589:33591] CHIP:DMG:
+          [1686292221.430474][33589:33591] CHIP:DMG:              },
+          [1686292221.430558][33589:33591] CHIP:DMG:
+          [1686292221.430614][33589:33591] CHIP:DMG:              AttributeStatusIB =
+          [1686292221.430675][33589:33591] CHIP:DMG:              {
+          [1686292221.430734][33589:33591] CHIP:DMG:                      AttributePathIB =
+          [1686292221.430801][33589:33591] CHIP:DMG:                      {
+          [1686292221.430870][33589:33591] CHIP:DMG:                              Endpoint = 0x0,
+          [1686292221.430944][33589:33591] CHIP:DMG:                              Cluster = 0x1f,
+          [1686292221.431020][33589:33591] CHIP:DMG:                              Attribute = 0x0000_0000,
+          [1686292221.431263][33589:33591] CHIP:DMG:                              ListIndex = Null,
+          [1686292221.431342][33589:33591] CHIP:DMG:                      }
+          [1686292221.431419][33589:33591] CHIP:DMG:
+          [1686292221.431486][33589:33591] CHIP:DMG:                      StatusIB =
+          [1686292221.431554][33589:33591] CHIP:DMG:                      {
+          [1686292221.431635][33589:33591] CHIP:DMG:                              status = 0x00 (SUCCESS),
+          [1686292221.431705][33589:33591] CHIP:DMG:                      },
+          [1686292221.431774][33589:33591] CHIP:DMG:
+          [1686292221.431833][33589:33591] CHIP:DMG:              },
+          [1686292221.431918][33589:33591] CHIP:DMG:
+          [1686292221.431973][33589:33591] CHIP:DMG:              AttributeStatusIB =
+          [1686292221.432035][33589:33591] CHIP:DMG:              {
+          [1686292221.432093][33589:33591] CHIP:DMG:                      AttributePathIB =
+          [1686292221.432161][33589:33591] CHIP:DMG:                      {
+          [1686292221.432231][33589:33591] CHIP:DMG:                              Endpoint = 0x0,
+          [1686292221.432305][33589:33591] CHIP:DMG:                              Cluster = 0x1f,
+          [1686292221.432381][33589:33591] CHIP:DMG:                              Attribute = 0x0000_0000,
+          [1686292221.432453][33589:33591] CHIP:DMG:                              ListIndex = Null,
+          [1686292221.432523][33589:33591] CHIP:DMG:                      }
+          [1686292221.432600][33589:33591] CHIP:DMG:
+          [1686292221.432666][33589:33591] CHIP:DMG:                      StatusIB =
+          [1686292221.432734][33589:33591] CHIP:DMG:                      {
+          [1686292221.432803][33589:33591] CHIP:DMG:                              status = 0x00 (SUCCESS),
+          [1686292221.432873][33589:33591] CHIP:DMG:                      },
+          [1686292221.432949][33589:33591] CHIP:DMG:
+          [1686292221.433008][33589:33591] CHIP:DMG:              },
+          [1686292221.433077][33589:33591] CHIP:DMG:
+          [1686292221.433132][33589:33591] CHIP:DMG:      ],
+          [1686292221.433218][33589:33591] CHIP:DMG:
+          [1686292221.433273][33589:33591] CHIP:DMG:      InteractionModelRevision = 1
+          [1686292221.433327][33589:33591] CHIP:DMG: }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    #Issue : https://github.com/project-chip/connectedhomeip/issues/16719
+    - label: "Step 25:TH1 reads AccessControl cluster ACL attribute"
+      PICS: ACL.S.A0000 && PICS_SKIP_SAMPLE_APP
+      verification: |
+          ./chip-tool accesscontrol read acl 1 0
+
+          Via the TH (chip-tool), Verify that the AccessControlEntryStruct contains 4 elements.
+
+          [1686292292.890253][33601:33603] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0000 DataVersion: 2420291518
+          [1686292292.890488][33601:33603] CHIP:TOO:   ACL: 2 entries
+          [1686292292.890620][33601:33603] CHIP:TOO:     [1]: {
+          [1686292292.890708][33601:33603] CHIP:TOO:       Privilege: 5
+          [1686292292.890762][33601:33603] CHIP:TOO:       AuthMode: 2
+          [1686292292.890850][33601:33603] CHIP:TOO:       Subjects: 1 entries
+          [1686292292.890918][33601:33603] CHIP:TOO:         [1]: 112233
+          [1686292292.890976][33601:33603] CHIP:TOO:       Targets: null
+          [1686292292.891028][33601:33603] CHIP:TOO:       FabricIndex: 1
+          [1686292292.891078][33601:33603] CHIP:TOO:      }
+          [1686292292.891170][33601:33603] CHIP:TOO:     [2]: {
+          [1686292292.891220][33601:33603] CHIP:TOO:       Privilege: 3
+          [1686292292.891272][33601:33603] CHIP:TOO:       AuthMode: 2
+          [1686292292.891324][33601:33603] CHIP:TOO:       Subjects: null
+          [1686292292.891397][33601:33603] CHIP:TOO:       Targets: 3 entries
+          [1686292292.891480][33601:33603] CHIP:TOO:         [1]: {
+          [1686292292.891536][33601:33603] CHIP:TOO:           Cluster: 40
+          [1686292292.891590][33601:33603] CHIP:TOO:           Endpoint: null
+          [1686292292.891642][33601:33603] CHIP:TOO:           DeviceType: null
+          [1686292292.891692][33601:33603] CHIP:TOO:          }
+          [1686292292.891760][33601:33603] CHIP:TOO:         [2]: {
+          [1686292292.891815][33601:33603] CHIP:TOO:           Cluster: 28
+          [1686292292.891866][33601:33603] CHIP:TOO:           Endpoint: null
+          [1686292292.891916][33601:33603] CHIP:TOO:           DeviceType: null
+          [1686292292.891966][33601:33603] CHIP:TOO:          }
+          [1686292292.892032][33601:33603] CHIP:TOO:         [3]: {
+          [1686292292.892087][33601:33603] CHIP:TOO:           Cluster: 30
+          [1686292292.892138][33601:33603] CHIP:TOO:           Endpoint: null
+          [1686292292.892188][33601:33603] CHIP:TOO:           DeviceType: null
+          [1686292292.892238][33601:33603] CHIP:TOO:          }
+          [1686292292.892293][33601:33603] CHIP:TOO:       FabricIndex: 1
+          [1686292292.892345][33601:33603] CHIP:TOO:      }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 26:TH1 reads AccessControl cluster AccessControlEntriesPerFabric
+          attribute"
+      PICS: ACL.S.A0000
+      command: "readAttribute"
+      attribute: "AccessControlEntriesPerFabric"
+      response:
+          saveAs: MAXENTRIES
+
+    #Made following steps as prompt, As at the moment YAML doesn't support sending the elements based on the MAXENTRIES from the previous steps.
+    - label:
+          "Step 27:TH1 writes DUT Endpoint 0 AccessControl cluster ACL
+          attribute, value is list of AccessControlEntryStruct containing
+          MAXENTRIES elements 1.struct Privilege field: Administer (5) AuthMode
+          field: CASE (2) Subjects field: [N1] Targets field: null 2.struct
+          Privilege field: Operate (3) AuthMode field: CASE (2) Subjects field:
+          null Targets field: null subsequent elements same as second element"
+      PICS: ACL.S.A0000 && PICS_SKIP_SAMPLE_APP
+      verification: |
+          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, { "privilege": 3, "authMode": 2, "subjects": null, "targets":null}, { "privilege": 3, "authMode": 2, "subjects": null, "targets":null},{ "privilege": 3, "authMode": 2, "subjects": null, "targets":null}]' 1 0
+
+          Via the TH (chip-tool), Verify that the status is success when writing the AccessControl cluster ACL attribute with a value is list of AccessControlEntryStruct containing  MAXENTRIES elements.
+
+          [1686292560.130383][33642:33644] CHIP:DMG: WriteClient moving to [ResponseRe]
+          [1686292560.130530][33642:33644] CHIP:DMG: WriteResponseMessage =
+          [1686292560.130588][33642:33644] CHIP:DMG: {
+          [1686292560.130671][33642:33644] CHIP:DMG:      AttributeStatusIBs =
+          [1686292560.130749][33642:33644] CHIP:DMG:      [
+          [1686292560.130807][33642:33644] CHIP:DMG:              AttributeStatusIB =
+          [1686292560.130893][33642:33644] CHIP:DMG:              {
+          [1686292560.130955][33642:33644] CHIP:DMG:                      AttributePathIB =
+          [1686292560.131045][33642:33644] CHIP:DMG:                      {
+          [1686292560.131119][33642:33644] CHIP:DMG:                              Endpoint = 0x0,
+          [1686292560.131216][33642:33644] CHIP:DMG:                              Cluster = 0x1f,
+          [1686292560.131293][33642:33644] CHIP:DMG:                              Attribute = 0x0000_0000,
+          [1686292560.131387][33642:33644] CHIP:DMG:                      }
+          [1686292560.131469][33642:33644] CHIP:DMG:
+          [1686292560.131535][33642:33644] CHIP:DMG:                      StatusIB =
+          [1686292560.131628][33642:33644] CHIP:DMG:                      {
+          [1686292560.131702][33642:33644] CHIP:DMG:                              status = 0x00 (SUCCESS),
+          [1686292560.131793][33642:33644] CHIP:DMG:                      },
+          [1686292560.131865][33642:33644] CHIP:DMG:
+          [1686292560.131947][33642:33644] CHIP:DMG:              },
+          [1686292560.132033][33642:33644] CHIP:DMG:
+          [1686292560.132107][33642:33644] CHIP:DMG:              AttributeStatusIB =
+          [1686292560.132181][33642:33644] CHIP:DMG:              {
+          [1686292560.132241][33642:33644] CHIP:DMG:                      AttributePathIB =
+          [1686292560.132330][33642:33644] CHIP:DMG:                      {
+          [1686292560.132400][33642:33644] CHIP:DMG:                              Endpoint = 0x0,
+          [1686292560.132497][33642:33644] CHIP:DMG:                              Cluster = 0x1f,
+          [1686292560.132573][33642:33644] CHIP:DMG:                              Attribute = 0x0000_0000,
+          [1686292560.132666][33642:33644] CHIP:DMG:                              ListIndex = Null,
+          [1686292560.132738][33642:33644] CHIP:DMG:                      }
+          [1686292560.132843][33642:33644] CHIP:DMG:
+          [1686292560.132911][33642:33644] CHIP:DMG:                      StatusIB =
+          [1686292560.132979][33642:33644] CHIP:DMG:                      {
+          [1686292560.133074][33642:33644] CHIP:DMG:                              status = 0x00 (SUCCESS),
+          [1686292560.133146][33642:33644] CHIP:DMG:                      },
+          [1686292560.133237][33642:33644] CHIP:DMG:
+          [1686292560.133297][33642:33644] CHIP:DMG:              },
+          [1686292560.133402][33642:33644] CHIP:DMG:
+          [1686292560.133461][33642:33644] CHIP:DMG:              AttributeStatusIB =
+          [1686292560.133522][33642:33644] CHIP:DMG:              {
+          [1686292560.133708][33642:33644] CHIP:DMG:                      AttributePathIB =
+          [1686292560.133801][33642:33644] CHIP:DMG:                      {
+          [1686292560.133873][33642:33644] CHIP:DMG:                              Endpoint = 0x0,
+          [1686292560.133947][33642:33644] CHIP:DMG:                              Cluster = 0x1f,
+          [1686292560.134046][33642:33644] CHIP:DMG:                              Attribute = 0x0000_0000,
+          [1686292560.134119][33642:33644] CHIP:DMG:                              ListIndex = Null,
+          [1686292560.134210][33642:33644] CHIP:DMG:                      }
+          [1686292560.134288][33642:33644] CHIP:DMG:
+          [1686292560.134372][33642:33644] CHIP:DMG:                      StatusIB =
+          [1686292560.134440][33642:33644] CHIP:DMG:                      {
+          [1686292560.134531][33642:33644] CHIP:DMG:                              status = 0x00 (SUCCESS),
+          [1686292560.134601][33642:33644] CHIP:DMG:                      },
+          [1686292560.134690][33642:33644] CHIP:DMG:
+          [1686292560.134751][33642:33644] CHIP:DMG:              },
+          [1686292560.134837][33642:33644] CHIP:DMG:
+          [1686292560.134914][33642:33644] CHIP:DMG:              AttributeStatusIB =
+          [1686292560.134976][33642:33644] CHIP:DMG:              {
+          [1686292560.135063][33642:33644] CHIP:DMG:                      AttributePathIB =
+          [1686292560.135132][33642:33644] CHIP:DMG:                      {
+          [1686292560.135221][33642:33644] CHIP:DMG:                              Endpoint = 0x0,
+          [1686292560.135297][33642:33644] CHIP:DMG:                              Cluster = 0x1f,
+          [1686292560.135372][33642:33644] CHIP:DMG:                              Attribute = 0x0000_0000,
+          [1686292560.135466][33642:33644] CHIP:DMG:                              ListIndex = Null,
+          [1686292560.135537][33642:33644] CHIP:DMG:                      }
+          [1686292560.135634][33642:33644] CHIP:DMG:
+          [1686292560.135701][33642:33644] CHIP:DMG:                      StatusIB =
+          [1686292560.135789][33642:33644] CHIP:DMG:                      {
+          [1686292560.135859][33642:33644] CHIP:DMG:                              status = 0x00 (SUCCESS),
+          [1686292560.135967][33642:33644] CHIP:DMG:                      },
+          [1686292560.136043][33642:33644] CHIP:DMG:
+          [1686292560.136102][33642:33644] CHIP:DMG:              },
+          [1686292560.136210][33642:33644] CHIP:DMG:
+          [1686292560.136266][33642:33644] CHIP:DMG:              AttributeStatusIB =
+          [1686292560.136349][33642:33644] CHIP:DMG:              {
+          [1686292560.136409][33642:33644] CHIP:DMG:                      AttributePathIB =
+          [1686292560.136496][33642:33644] CHIP:DMG:                      {
+          [1686292560.136567][33642:33644] CHIP:DMG:                              Endpoint = 0x0,
+          [1686292560.136642][33642:33644] CHIP:DMG:                              Cluster = 0x1f,
+          [1686292560.136739][33642:33644] CHIP:DMG:                              Attribute = 0x0000_0000,
+          [1686292560.136811][33642:33644] CHIP:DMG:                              ListIndex = Null,
+          [1686292560.136900][33642:33644] CHIP:DMG:                      }
+          [1686292560.136979][33642:33644] CHIP:DMG:
+          [1686292560.137065][33642:33644] CHIP:DMG:                      StatusIB =
+          [1686292560.137134][33642:33644] CHIP:DMG:                      {
+          [1686292560.137201][33642:33644] CHIP:DMG:                              status = 0x00 (SUCCESS),
+          [1686292560.137295][33642:33644] CHIP:DMG:                      },
+          [1686292560.137366][33642:33644] CHIP:DMG:
+          [1686292560.137451][33642:33644] CHIP:DMG:              },
+          [1686292560.137522][33642:33644] CHIP:DMG:
+          [1686292560.137630][33642:33644] CHIP:DMG:      ],
+          [1686292560.137740][33642:33644] CHIP:DMG:
+          [1686292560.137816][33642:33644] CHIP:DMG:      InteractionModelRevision = 1
+          [1686292560.137873][33642:33644] CHIP:DMG: }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 28:TH1 reads AccessControl cluster ACL attribute"
+      PICS: ACL.S.A0000 && PICS_SKIP_SAMPLE_APP
+      verification: |
+          ./chip-tool accesscontrol read acl 1 0
+
+          Via the TH (chip-tool), Verify that the AccessControlEntryStruct containing MAXENTRIES elements.
+
+          [1686292633.355733][33659:33661] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0000 DataVersion: 2420291523
+          [1686292633.355957][33659:33661] CHIP:TOO:   ACL: 4 entries
+          [1686292633.356089][33659:33661] CHIP:TOO:     [1]: {
+          [1686292633.356177][33659:33661] CHIP:TOO:       Privilege: 5
+          [1686292633.356262][33659:33661] CHIP:TOO:       AuthMode: 2
+          [1686292633.356356][33659:33661] CHIP:TOO:       Subjects: 1 entries
+          [1686292633.356450][33659:33661] CHIP:TOO:         [1]: 112233
+          [1686292633.356510][33659:33661] CHIP:TOO:       Targets: null
+          [1686292633.356599][33659:33661] CHIP:TOO:       FabricIndex: 1
+          [1686292633.356652][33659:33661] CHIP:TOO:      }
+          [1686292633.356726][33659:33661] CHIP:TOO:     [2]: {
+          [1686292633.356803][33659:33661] CHIP:TOO:       Privilege: 3
+          [1686292633.356855][33659:33661] CHIP:TOO:       AuthMode: 2
+          [1686292633.356905][33659:33661] CHIP:TOO:       Subjects: null
+          [1686292633.356977][33659:33661] CHIP:TOO:       Targets: null
+          [1686292633.357024][33659:33661] CHIP:TOO:       FabricIndex: 1
+          [1686292633.357073][33659:33661] CHIP:TOO:      }
+          [1686292633.357166][33659:33661] CHIP:TOO:     [3]: {
+          [1686292633.357221][33659:33661] CHIP:TOO:       Privilege: 3
+          [1686292633.357272][33659:33661] CHIP:TOO:       AuthMode: 2
+          [1686292633.357345][33659:33661] CHIP:TOO:       Subjects: null
+          [1686292633.357395][33659:33661] CHIP:TOO:       Targets: null
+          [1686292633.357446][33659:33661] CHIP:TOO:       FabricIndex: 1
+          [1686292633.357513][33659:33661] CHIP:TOO:      }
+          [1686292633.357659][33659:33661] CHIP:TOO:     [4]: {
+          [1686292633.357717][33659:33661] CHIP:TOO:       Privilege: 3
+          [1686292633.357793][33659:33661] CHIP:TOO:       AuthMode: 2
+          [1686292633.357845][33659:33661] CHIP:TOO:       Subjects: null
+          [1686292633.357895][33659:33661] CHIP:TOO:       Targets: null
+          [1686292633.357963][33659:33661] CHIP:TOO:       FabricIndex: 1
+          [1686292633.358021][33659:33661] CHIP:TOO:      }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 29:TH1 writes DUT Endpoint 0 AccessControl cluster ACL
+          attribute, value is list of AccessControlEntryStruct containing 2
+          elements 1.struct Privilege field: Administer (5) AuthMode field: CASE
+          (2) Subjects field: [N1] Targets field: null 2.struct Privilege field:
+          Operate (3) AuthMode field: PASE (1) Subjects field: null Targets
+          field: null"
+      PICS: ACL.S.A0000
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 3,
+                      AuthMode: 1,
+                      Subjects: null,
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Step 30:TH1 reads AccessControl cluster ACL attribute"
+      PICS: ACL.S.A0000
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+
+    - label:
+          "Step 31:TH1 writes DUT Endpoint 0 AccessControl cluster ACL
+          attribute, value is list of AccessControlEntryStruct containing 2
+          elements 1.struct Privilege field: Administer (5) AuthMode field: CASE
+          (2) Subjects field: [N1] Targets field: null 2.struct Privilege field:
+          Administer (5) AuthMode field: Group (3) Subjects field: null Targets
+          field: null"
+      PICS: ACL.S.A0000
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 5,
+                      AuthMode: 3,
+                      Subjects: null,
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 32:TH1 writes DUT Endpoint 0 AccessControl cluster ACL
+          attribute, value is list of AccessControlEntryStruct containing 2
+          elements 1.struct Privilege field: Administer (5) AuthMode field: CASE
+          (2) Subjects field: [N1] Targets field: null 2.struct Privilege field:
+          invalid value (not 1-5) AuthMode field: CASE (2) Subjects field: null
+          Targets field: null"
+      PICS: ACL.S.A0000
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: AccessControlEntryPrivilegeEnum.UnknownEnumValue,
+                      AuthMode: 2,
+                      Subjects: null,
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 33:TH1 writes AccessControl cluster ACL attribute, value is list
+          of AccessControlEntryStruct containing 2 elements"
+      PICS: ACL.S.A0000
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 3,
+                      AuthMode: AccessControlEntryAuthModeEnum.UnknownEnumValue,
+                      Subjects: null,
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 34:TH1 writes AccessControl cluster ACL attribute, value is list
+          of AccessControlEntryStruct containing 2 elements"
+      PICS: ACL.S.A0000
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 3,
+                      AuthMode: 2,
+                      Subjects: [0],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 35:TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute
+          value is list of AccessControlEntryStruct containing 2 elements
+          1.struct Privilege field: Administer (5) AuthMode field: CASE (2)
+          Subjects field: [N1] Targets field: null 2.struct Privilege field:
+          Operate (3) AuthMode field: CASE (2) Subjects field:
+          [0xFFFFFFFFFFFFFFFF] Targets field: null"
+      PICS: ACL.S.A0000
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 3,
+                      AuthMode: 2,
+                      Subjects: ["18446744073709551615"],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 36:TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute
+          value is list of AccessControlEntryStruct containing 2 elements
+          1.struct Privilege field: Administer (5) AuthMode field: CASE (2)
+          Subjects field: [N1] Targets field: null 2.struct Privilege field:
+          Operate (3) AuthMode field: CASE (2) Subjects field:
+          [0xFFFFFFFD00000000] Targets field: null"
+      PICS: ACL.S.A0000
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 3,
+                      AuthMode: 2,
+                      Subjects: ["18446744060824649728"],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 37:TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute
+          value is list of AccessControlEntryStruct containing 2 elements struct
+          Privilege field: Administer (5) AuthMode field: CASE (2) Subjects
+          field: [N1] Targets field: null struct Privilege field: Operate (3)
+          AuthMode field: CASE (2) Subjects field: [0xFFFFFFFFFFFF0000] Targets
+          field: null"
+      PICS: ACL.S.A0000
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 3,
+                      AuthMode: 2,
+                      Subjects: ["18446744073709486080"],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 38:TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute
+          value is list of AccessControlEntryStruct containing 2 elements
+          1.struct Privilege field: Administer (5) AuthMode field: CASE (2)
+          Subjects field: [N1] Targets field: null 2.struct Privilege field:
+          Operate (3) AuthMode field: CASE (2) Subjects field: null Targets
+          field: [{}]"
+      PICS: ACL.S.A0000
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 3,
+                      AuthMode: 2,
+                      Subjects: null,
+                      Targets:
+                          [{ Cluster: null, Endpoint: null, DeviceType: null }],
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 39:TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute
+          value is list of AccessControlEntryStruct containing 2 elements
+          1.struct Privilege field: Administer (5) AuthMode field: CASE (2)
+          Subjects field: [N1] Targets field: null 2.struct Privilege field:
+          Operate (3) AuthMode field: CASE (2) Subjects field: null Targets
+          field: [{Cluster: 0xFFFFFFFF}]"
+      PICS: ACL.S.A0000
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 3,
+                      AuthMode: 2,
+                      Subjects: null,
+                      Targets:
+                          [
+                              {
+                                  Cluster: 4294967295,
+                                  Endpoint: null,
+                                  DeviceType: null,
+                              },
+                          ],
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 40:TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute
+          value is list of AccessControlEntryStruct containing 2 elements 1.
+          struct  Privilege field: Administer (5)  AuthMode field: CASE
+          (2)  Subjects field: [N1]  Targets field: null 2. struct  Privilege
+          field: Operate (3)  AuthMode field: CASE (2)  Subjects field:
+          null  Targets field: [{Endpoint: 65535}]"
+      PICS: ACL.S.A0000
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 3,
+                      AuthMode: 2,
+                      Subjects: null,
+                      Targets:
+                          [
+                              {
+                                  Cluster: null,
+                                  Endpoint: 65535,
+                                  DeviceType: null,
+                              },
+                          ],
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 41:TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute
+          value is list of AccessControlEntryStruct containing 2 elements
+          1.struct Privilege field: Administer (5) AuthMode field: CASE (2)
+          Subjects field: [N1] Targets field: null 2.struct Privilege field:
+          Operate (3) AuthMode field: CASE (2) Subjects field: null Targets
+          field: [{DeviceType: 0xFFFFFFFF}]"
+      PICS: ACL.S.A0000
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 3,
+                      AuthMode: 2,
+                      Subjects: null,
+                      Targets:
+                          [
+                              {
+                                  Cluster: null,
+                                  Endpoint: null,
+                                  DeviceType: 4294967295,
+                              },
+                          ],
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 42:TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute
+          value is list of AccessControlEntryStruct containing 2 elements
+          1.struct Privilege field: Administer (5) AuthMode field: CASE (2)
+          Subjects field: [N1] Targets field: null 2.struct Privilege field:
+          Operate (3) AuthMode field: CASE (2) Subjects field: null Targets
+          field: [{Endpoint: 22, DeviceType: 33}]"
+      PICS: ACL.S.A0000
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 3,
+                      AuthMode: 2,
+                      Subjects: null,
+                      Targets:
+                          [{ Cluster: null, Endpoint: 22, DeviceType: 33 }],
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 43:TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute
+          value is list of AccessControlEntryStruct containing 2 elements
+          1.struct Privilege field: Administer (5) AuthMode field: CASE (2)
+          Subjects field: [N1] Targets field: null 2.struct Privilege field:
+          Operate (3) AuthMode field: CASE (2) Subjects field: null Targets
+          field: [{Cluster: 11, Endpoint: 22, DeviceType: 33}]"
+      PICS: ACL.S.A0000
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+                  {
+                      Privilege: 3,
+                      AuthMode: 2,
+                      Subjects: null,
+                      Targets: [{ Cluster: 11, Endpoint: 22, DeviceType: 33 }],
+                      FabricIndex: CurrentFabricIndexValue,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 44:TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute
+          value is an empty list"
+      PICS: ACL.S.A0000
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                  },
+              ]

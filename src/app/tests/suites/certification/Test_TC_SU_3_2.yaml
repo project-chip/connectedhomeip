@@ -1,0 +1,167 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    3.7.2. [TC-SU-3.2] Handling different QueryImageResponse scenarios on
+    Provider
+
+PICS:
+    - MCORE.OTA.Provider
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "Step 1: OTA-R/TH sends a QueryImage Command to the DUT.
+          RequestorCanConsent field can be set to either True or False in the
+          QueryImage Command. DUT responds with the QueryImageResponse to the
+          OTA-R/TH."
+      verification: |
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
+
+          On the OTA Requestor log,
+          Verify DUT sends a QueryImageResponse with following fields:
+          Status - UpdateAvailable
+          DelayedActionTime if present should be of type uint32.
+          ImageURI - contain a URI where the OTA Requestor SHOULD download a Software Image
+          SoftwareVersion is the same as the new software image version.
+          SoftwareVersionString - This is the string type of the Software version.
+          UpdateToken - verify it is within 8-32 bytes.
+          UserConsentNeeded - Value is bool type.
+
+          [1673337981.104652][28428:28428] CHIP:SWU: QueryImageResponse:
+          [1673337981.104695][28428:28428] CHIP:SWU:   status: 0
+          [1673337981.104735][28428:28428] CHIP:SWU:   imageURI: bdx://000000000000007B/ota-requestor-app.ota
+          [1673337981.104776][28428:28428] CHIP:SWU:   softwareVersion: 2
+          [1673337981.104816][28428:28428] CHIP:SWU:   softwareVersionString: 2.0
+          [1673337981.104856][28428:28428] CHIP:SWU:   updateToken: 32
+          [1673337981.104896][28428:28428] CHIP:SWU:   userConsentNeeded: 0
+          [1673337981.104948][28428:28428] CHIP:SWU: Update available from version 1 to 2
+      disabled: true
+
+    - label:
+          "Step 2: There should not be any new software update available for the
+          OTA-R/TH. OTA-R/TH sends a QueryImage Command to the DUT. DUT responds
+          with the QueryImageResponse to the OTA-R/TH."
+      verification: |
+          ./chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin -q updateNotAvailable
+
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
+
+          Verify that the DUT sends a QueryImageResponse Command to the OTA-R/TH with followig fields:
+           - Status - NotAvailable
+           - UserConsentNeeded - value is bool type
+
+          [1673423580.333750][2898:2898] CHIP:SWU: QueryImageResponse:
+          [1673423580.333776][2898:2898] CHIP:SWU:   status: 2
+          [1673423580.333803][2898:2898] CHIP:SWU:   userConsentNeeded: 0
+      disabled: true
+
+    - label:
+          "Step 3: OTA-R/TH sends a QueryImage Command to the DUT.
+          ProtocolSupported field should list BDX. DUT responds with the
+          QueryImageResponse to the OTA-R/TH."
+      verification: |
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
+
+          Verify that the DUT sends a QueryImageResponse Command to the OTA-R/TH with following fields:
+           - Verify the following fields in the image URI field.
+           - Verify the URI’s scheme field is “bdx” in lowercase characters and authority field contains only the string representation of the Operational Node ID of the Node where to proceed with the download.
+           - Verify that the encoding of the Node ID in the host field uses an uppercase hexadecimal format, using exactly 16 characters to encode the network byte order value of the NodeID.
+           - Verify that the Operational Node ID in the host field matches with the NodeID of the OTA Provider responding with the QueryImageResponse.
+           - Verify that the the user section of the authority field is absent.
+           - Verify that the URI does not contain
+                 Query field.
+                 Fragment field.
+           - Verify that the path field has the absolute path to the software image.
+           - Verify that the path has only valid URI characters.
+           - Verify that the URI is 24 characters or longer.
+           - Verify the presence of prefix 'bdx://'.
+
+          [1673417165.348812][2114:2114] CHIP:SWU: QueryImageResponse:
+          [1673417165.348861][2114:2114] CHIP:SWU:   status: 0
+          [1673417165.348908][2114:2114] CHIP:SWU:   imageURI: bdx://000000000000007B/ota-requestor-app.ota
+          [1673417165.348957][2114:2114] CHIP:SWU:   softwareVersion: 2
+          [1673417165.349003][2114:2114] CHIP:SWU:   softwareVersionString: 2.0
+          [1673417165.349050][2114:2114] CHIP:SWU:   updateToken: 32
+          [1673417165.349096][2114:2114] CHIP:SWU:   userConsentNeeded: 0
+          [1673417165.349155][2114:2114] CHIP:SWU: Update available from version 1 to 2
+
+
+          Verify all the image URI field requirements.
+      disabled: true
+
+    - label:
+          "Step 4: OTA-R/TH sends a QueryImage Command to the DUT.
+          ProtocolSupported field should list 'https'. DUT responds with a
+          QueryImageResponse to the OTA-R/TH."
+      verification: |
+          Out of scope
+      disabled: true
+
+    - label:
+          "Step 5: OTA-R/TH sends a QueryImage Command to the DUT. DUT responds
+          with the QueryImageResponse with QueryStatus set to 'Busy',
+          DelayedActionTime set to 3 minutes. On the subsequent QueryImage
+          command, DUT sends a QueryImageResponse back to OTA-R/TH. QueryStatus
+          is set to 'UpdateAvailable'."
+      PICS: OTAP.S.M.DelayedActionTime
+      verification: |
+          ./chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin -q busy -t 180
+
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
+
+          Wait for 3 mins, Verify that the DUT sends a QueryImageResponse Command to the OTA-R/TH with following fields:
+           - Status - Busy.
+           - DelayedActionTime - 3 minutes.
+
+          [1673425035.586964][3055:3055] CHIP:SWU: QueryImageResponse:
+          [1673425035.586994][3055:3055] CHIP:SWU:   status: 1
+          [1673425035.587022][3055:3055] CHIP:SWU:   delayedActionTime: 180 seconds
+          [1673425035.587052][3055:3055] CHIP:SWU:   userConsentNeeded: 0
+          [1673425035.587083][3055:3055] CHIP:SWU: Scheduling a retry
+
+
+          Verify that the OTA-R/TH starts the download from the DUT after the second QueryImageResponse with UpdateAvailable status.
+
+          [1673425215.698563][3055:3055] CHIP:SWU: QueryImageResponse:
+          [1673425215.698602][3055:3055] CHIP:SWU:   status: 0
+          [1673425215.698633][3055:3055] CHIP:SWU:   imageURI: bdx://000000000000007B/ota-requestor-app.ota
+          [1673425215.698664][3055:3055] CHIP:SWU:   softwareVersion: 2
+          [1673425215.698695][3055:3055] CHIP:SWU:   softwareVersionString: 2.0
+          [1673425215.698731][3055:3055] CHIP:SWU:   updateToken: 32
+          [1673425215.698760][3055:3055] CHIP:SWU:   userConsentNeeded: 0
+          [1673425215.698801][3055:3055] CHIP:SWU: Update available from version 1 to 2
+
+          Verify that the Image downloaded by the OTA-R/TH is valid and is the same image that was supposed to be downloaded.
+
+          ./chip-tool  basicinformation read software-version 321 0
+
+          Verify that SoftwareVersion value is 2 On TH(chip-tool) log:
+
+          [1653636406.637617][11116:11121] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_000A DataVersion: 1527020963
+          [1653636406.637708][11116:11121] CHIP:TOO:   SoftwareVersion: 2
+      disabled: true

@@ -1,0 +1,29 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+
+import("${build_root}/config/android/config.gni")
+import("${build_root}/config/android_abi.gni")
+
+# Place a copy of the shared c++ support library in the jni output directory
+# See:
+#   https://developer.android.com/ndk/guides/cpp-support
+#
+# Generally CHIP cannot ensure a single shared library per java application, so a shared
+# CPP support library is used
+copy("shared_cpplib") {
+  sources = [ "${android_ndk_root}/sources/cxx-stl/llvm-libc++/libs/${android_abi}/libc++_shared.so" ]
+  outputs = [ "${root_out_dir}/lib/jni/${android_abi}/libc++_shared.so" ]
+}

@@ -1,0 +1,18 @@
+FROM debian:bullseye
+
+ARG DEVICE_NAME
+
+RUN apt-get update && \
+    apt-get install -y \
+    libglib2.0-0 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY out/${DEVICE_NAME} /chef_device
+COPY out/${DEVICE_NAME}.map /chef_device.map
+COPY out/${DEVICE_NAME}.matter /chef_device.matter
+COPY out/${DEVICE_NAME}_meta.yaml /chef_device_meta.yaml
+
+ENV DBUS_SYSTEM_BUS_ADDRESS="unix:path=/var/run/dbus/system_bus_socket"
+
+CMD ["/chef_device"]

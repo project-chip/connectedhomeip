@@ -1,0 +1,206 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/efr32_sdk.gni")
+import("//build_overrides/jlink.gni")
+import("//build_overrides/openthread.gni")
+import("${chip_root}/src/lwip/lwip.gni")
+import("${chip_root}/src/platform/device.gni")
+import("${efr32_sdk_build_root}/silabs_board.gni")
+
+if (wifi_soc == true) {  # CCP board
+  import("${efr32_sdk_build_root}/SiWx917_sdk.gni")
+} else {
+  import("${efr32_sdk_build_root}/efr32_sdk.gni")
+}
+
+declare_args() {
+  # Build target to use for efr32 SDK. Use this to set global SDK defines.
+  silabs_sdk_target = ""
+
+  sl_matter_version_str = ""
+  sl_matter_version = 1
+  sl_hardware_version = 1
+}
+
+config("silabs_config") {
+  defines = []
+  if (sl_matter_version_str != "") {
+    defines += [ "SL_MATTER_VERSION_STRING=\"${sl_matter_version_str}\"" ]
+  }
+  if (sl_matter_version != 1) {
+    defines += [ "SL_MATTER_VERSION=${sl_matter_version}" ]
+  }
+  if (sl_hardware_version != 1) {
+    defines += [ "SL_HARDWARE_VERSION=${sl_hardware_version}" ]
+  }
+}
+
+assert(silabs_sdk_target != "", "silabs_sdk_target must be specified")
+group("efr32_sdk") {
+  public_deps = [ silabs_sdk_target ]
+  public_configs = [ ":silabs_config" ]
+}
+
+if (chip_with_lwip) {
+  group("lwip") {
+    public_deps = [ "silabs_lwip:lwip" ]
+  }
+}
+
+if (wifi_soc != true) {  # CCP board
+  # Openthread GSDK libraries configurations
+
+  if (use_silabs_thread_lib) {
+    config("libopenthread-platform_config") {
+      include_dirs = [ "${openthread_root}/examples/platforms" ]
+
+      defines = [ "SL_CONFIG_OPENTHREAD_LIB=1" ]
+    }
+
+    copy("copy_openthread_system") {
+      sources = [ "${openthread_root}/examples/platforms/openthread-system.h" ]
+
+      outputs =
+          [ "${root_gen_dir}/include/openthread/platform/{{source_file_part}}" ]
+    }
+
+    source_set("openthread_system") {
+      sources =
+          [ "${root_gen_dir}/include/openthread/platform/openthread-system.h" ]
+      deps = [ ":copy_openthread_system" ]
+    }
+
+    source_set("libopenthread-platform") {
+      sources = [ "${openthread_root}/examples/platforms/openthread-system.h" ]
+
+      public_deps = [ ":openthread_system" ]
+
+      public_configs = [ ":libopenthread-platform_config" ]
+    }
+
+    config("openthread_efr32_config") {
+      defines = [
+        "RADIO_CONFIG_DMP_SUPPORT=1",
+        "${silabs_board}=1",
+        "${silabs_mcu}",
+        "OPENTHREAD_CORE_CONFIG_PLATFORM_CHECK_FILE=\"openthread-core-efr32-config-check.h\"",
+      ]
+
+      include_dirs = [
+        "${chip_root}/examples/platform/silabs/efr32",
+        "${chip_root}/examples/platform/silabs",
+        "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}",
+        "${sl_ot_efr32_root}",
+        "${openthread_root}/src/",
+      ]
+
+      # temporarily disable check until gsdk pulls in a more recent version
+      cflags = [ "-Wno-format-nonliteral" ]
+    }
+
+    source_set("openthread_core_config_efr32") {
+      sources = [
+        "${sl_ot_efr32_root}/openthread-core-efr32-config-check.h",
+        "${sl_ot_efr32_root}/openthread-core-efr32-config.h",
+      ]
+
+      public_deps = [
+        ":libopenthread-platform",
+        "${efr32_sdk_build_root}:efr32_sdk",
+      ]
+
+      public_configs = [ ":openthread_efr32_config" ]
+    }
+
+    source_set("ot-efr32-cert") {
+      if (enable_openthread_cli) {
+        sources = [
+          "${openthread_root}/examples/apps/cli/cli_uart.cpp",
+          "${openthread_root}/src/cli/cli.cpp",
+          "${openthread_root}/src/cli/cli.hpp",
+          "${openthread_root}/src/cli/cli_bbr.cpp",
+          "${openthread_root}/src/cli/cli_bbr.hpp",
+          "${openthread_root}/src/cli/cli_br.cpp",
+          "${openthread_root}/src/cli/cli_br.hpp",
+          "${openthread_root}/src/cli/cli_coap.cpp",
+          "${openthread_root}/src/cli/cli_coap.hpp",
+          "${openthread_root}/src/cli/cli_coap_secure.cpp",
+          "${openthread_root}/src/cli/cli_coap_secure.hpp",
+          "${openthread_root}/src/cli/cli_commissioner.cpp",
+          "${openthread_root}/src/cli/cli_commissioner.hpp",
+          "${openthread_root}/src/cli/cli_config.h",
+          "${openthread_root}/src/cli/cli_dataset.cpp",
+          "${openthread_root}/src/cli/cli_dataset.hpp",
+          "${openthread_root}/src/cli/cli_dns.cpp",
+          "${openthread_root}/src/cli/cli_dns.hpp",
+          "${openthread_root}/src/cli/cli_history.cpp",
+          "${openthread_root}/src/cli/cli_history.hpp",
+          "${openthread_root}/src/cli/cli_joiner.cpp",
+          "${openthread_root}/src/cli/cli_joiner.hpp",
+          "${openthread_root}/src/cli/cli_mac_filter.cpp",
+          "${openthread_root}/src/cli/cli_mac_filter.hpp",
+          "${openthread_root}/src/cli/cli_network_data.cpp",
+          "${openthread_root}/src/cli/cli_network_data.hpp",
+          "${openthread_root}/src/cli/cli_output.cpp",
+          "${openthread_root}/src/cli/cli_output.hpp",
+          "${openthread_root}/src/cli/cli_srp_client.cpp",
+          "${openthread_root}/src/cli/cli_srp_client.hpp",
+          "${openthread_root}/src/cli/cli_srp_server.cpp",
+          "${openthread_root}/src/cli/cli_srp_server.hpp",
+          "${openthread_root}/src/cli/cli_tcp.cpp",
+          "${openthread_root}/src/cli/cli_tcp.hpp",
+          "${openthread_root}/src/cli/cli_udp.cpp",
+          "${openthread_root}/src/cli/cli_udp.hpp",
+          "${openthread_root}/src/cli/x509_cert_key.hpp",
+        ]
+      }
+
+      public_configs = [
+        ":openthread_efr32_config",
+        ":libopenthread-platform_config",
+      ]
+
+      public_deps = [
+        ":libopenthread-platform",
+        ":openthread_core_config_efr32",
+        "${openthread_root}/include/openthread:openthread",
+        "${openthread_root}/src/core/:libopenthread_core_headers",
+        "${segger_rtt_root}:segger_rtt",
+      ]
+
+      deps = [ "${efr32_sdk_build_root}:efr32_sdk" ]
+
+      # selected thread device type FTD or MTD
+      XTD = "ftd"
+      if (!chip_openthread_ftd) {
+        XTD = "mtd"
+      }
+
+      # Use silabs openthread library stack with or without coap api enabled
+      COAP_API = ""
+      if (use_thread_coap_lib) {
+        COAP_API = "coap_"
+      }
+
+      public_configs += [ "${openthread_root}:openthread_${XTD}_config" ]
+
+      libs = [
+        "${sl_ot_libs_path}/libs/libsl_ot_stack_${XTD}_${COAP_API}${silabs_family}_gcc.a",
+        "${sl_ot_libs_path}/libs/libsl_platform_${XTD}_dmp_${silabs_family}_gcc.a",
+      ]
+    }
+  }
+}

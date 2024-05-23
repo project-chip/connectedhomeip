@@ -1,0 +1,104 @@
+#
+#    Copyright (c) 2020 Project CHIP Authors
+#    Copyright (c) 2018 Nest Labs, Inc.
+#    All rights reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+#    Description:
+#      Some useful defaults for the demo app configuration.
+#
+
+
+# Default to 921600 baud when flashing and monitoring device
+CONFIG_ESPTOOLPY_BAUD_921600B=y
+CONFIG_ESPTOOLPY_BAUD=921600
+CONFIG_ESPTOOLPY_COMPRESSED=y
+CONFIG_ESPTOOLPY_MONITOR_BAUD_115200B=y
+CONFIG_ESPTOOLPY_MONITOR_BAUD=115200
+
+#enable BT
+CONFIG_BT_ENABLED=y
+CONFIG_BT_NIMBLE_ENABLED=y
+
+#disable BT connection reattempt
+CONFIG_BT_NIMBLE_ENABLE_CONN_REATTEMPT=n
+
+#enable lwip ipv6 autoconfig
+CONFIG_LWIP_IPV6_AUTOCONFIG=y
+
+# Use a custom partition table
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_FILENAME="partitions.csv"
+
+# Compiler options
+CONFIG_COMPILER_OPTIMIZATION_SIZE=y
+CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE=y
+
+# Bluetooth controller
+CONFIG_BTDM_CTRL_BLE_MAX_CONN=1
+CONFIG_BTDM_CTRL_BLE_MAX_CONN_EFF=1
+
+# NimBLE Options 
+CONFIG_BT_NIMBLE_MAX_CONNECTIONS=1
+
+# Wi-Fi
+CONFIG_ESP32_WIFI_STATIC_RX_BUFFER_NUM=4
+CONFIG_ESP32_WIFI_DYNAMIC_RX_BUFFER_NUM=8
+CONFIG_ESP32_WIFI_DYNAMIC_TX_BUFFER_NUM=16
+
+# FreeRTOS
+CONFIG_FREERTOS_UNICORE=y
+
+# Add RTC memory to system heap
+CONFIG_ESP_SYSTEM_ALLOW_RTC_FAST_MEM_AS_HEAP=y
+
+# LWIP
+CONFIG_LWIP_TCPIP_RECVMBOX_SIZE=16
+
+# TCP
+CONFIG_LWIP_TCP_SYNMAXRTX=6
+
+# Compatibility options
+CONFIG_BTDM_CONTROLLER_BLE_MAX_CONN=1
+CONFIG_BTDM_CONTROLLER_BLE_MAX_CONN_EFF=1
+CONFIG_NIMBLE_MAX_CONNECTIONS=1
+CONFIG_TCPIP_RECVMBOX_SIZE=16
+CONFIG_TCP_SYNMAXRTX=6
+
+# Product id
+CONFIG_DEVICE_VENDOR_ID=0xFFF1
+CONFIG_DEVICE_PRODUCT_ID=0x800D
+
+# Main task needs a bit more stack than the default
+# default is 3584, bump this up to 4k.
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=4096
+
+#enable lwIP route hooks
+CONFIG_LWIP_HOOK_IP6_ROUTE_DEFAULT=y
+CONFIG_LWIP_HOOK_ND6_GET_GW_DEFAULT=y
+
+# Disable softap support by default
+CONFIG_ESP_WIFI_SOFTAP_SUPPORT=n
+
+# Enable HKDF in mbedtls
+CONFIG_MBEDTLS_HKDF_C=y
+
+# Increase LwIP IPv6 address number
+CONFIG_LWIP_IPV6_NUM_ADDRESSES=6
+
+# Enable the diagnostic logs transfer over BDX protocol
+CONFIG_CHIP_ENABLE_BDX_LOG_TRANSFER=y
+
+CONFIG_ESP32_ENABLE_COREDUMP_TO_FLASH=y
+CONFIG_ESP32_COREDUMP_DATA_FORMAT_ELF=y

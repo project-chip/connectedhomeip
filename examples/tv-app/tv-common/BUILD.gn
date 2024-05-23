@@ -1,0 +1,83 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/src/app/chip_data_model.gni")
+import("${chip_root}/src/lib/lib.gni")
+
+chip_data_model("tv-common") {
+  zap_file = "tv-app.zap"
+  is_server = true
+}
+
+config("config") {
+  include_dirs = [
+    "include",
+    "clusters",
+  ]
+  if (chip_build_libshell) {
+    include_dirs += [ "shell" ]
+  }
+}
+
+source_set("tv-common-sources") {
+  deps = [
+    "${chip_root}/examples/platform/linux:app-main",
+    "${chip_root}/examples/tv-app/tv-common",
+    "${chip_root}/src/lib",
+  ]
+  public_configs = [ ":config" ]
+  sources = [
+    "clusters/account-login/AccountLoginManager.cpp",
+    "clusters/account-login/AccountLoginManager.h",
+    "clusters/application-basic/ApplicationBasicManager.cpp",
+    "clusters/application-basic/ApplicationBasicManager.h",
+    "clusters/application-launcher/ApplicationLauncherManager.cpp",
+    "clusters/application-launcher/ApplicationLauncherManager.h",
+    "clusters/audio-output/AudioOutputManager.cpp",
+    "clusters/audio-output/AudioOutputManager.h",
+    "clusters/channel/ChannelManager.cpp",
+    "clusters/channel/ChannelManager.h",
+    "clusters/content-control/ContentController.cpp",
+    "clusters/content-control/ContentController.h",
+    "clusters/content-launcher/ContentLauncherManager.cpp",
+    "clusters/content-launcher/ContentLauncherManager.h",
+    "clusters/keypad-input/KeypadInputManager.cpp",
+    "clusters/keypad-input/KeypadInputManager.h",
+    "clusters/low-power/LowPowerManager.cpp",
+    "clusters/low-power/LowPowerManager.h",
+    "clusters/media-input/MediaInputManager.cpp",
+    "clusters/media-input/MediaInputManager.h",
+    "clusters/media-playback/MediaPlaybackManager.cpp",
+    "clusters/media-playback/MediaPlaybackManager.h",
+    "clusters/messages/MessagesManager.cpp",
+    "clusters/messages/MessagesManager.h",
+    "clusters/target-navigator/TargetNavigatorManager.cpp",
+    "clusters/target-navigator/TargetNavigatorManager.h",
+    "clusters/wake-on-lan/WakeOnLanManager.cpp",
+    "clusters/wake-on-lan/WakeOnLanManager.h",
+    "include/AppTv.h",
+    "include/CHIPProjectAppConfig.h",
+    "src/AppTv.cpp",
+    "src/ZCLCallbacks.cpp",
+  ]
+
+  if (chip_build_libshell) {
+    sources += [
+      "shell/AppTvShellCommands.cpp",
+      "shell/AppTvShellCommands.h",
+    ]
+  }
+}

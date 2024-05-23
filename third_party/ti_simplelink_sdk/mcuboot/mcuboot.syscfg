@@ -1,0 +1,106 @@
+/*
+ * Copyright (c) 2022, Texas Instruments Incorporated
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * *  Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * *  Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * *  Neither the name of Texas Instruments Incorporated nor the names of
+ *    its contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+/*
+ *  mcuboot.syscfg
+ */
+
+const Button      = scripting.addModule("/ti/drivers/apps/Button");
+const Button1     = Button.addInstance();
+const Button2     = Button.addInstance();
+const LED         = scripting.addModule("/ti/drivers/apps/LED");
+const LED1        = LED.addInstance();
+const LED2        = LED.addInstance();
+
+/* ======== Board ======== */
+const deviceId = system.deviceData.deviceId;
+
+/**
+ * Import the modules used in this configuration.
+ */
+const CCFG = scripting.addModule("/ti/devices/CCFG");
+const ccfgSettings = system.getScript("/ti/common/lprf_ccfg_settings.js").ccfgSettings;
+for(var setting in ccfgSettings)
+{
+    CCFG[setting] = ccfgSettings[setting];
+}
+
+if (deviceId.match(/CC13.2.7|CC26.2.7/))
+{
+    // mcuboot stored at end of flash alongside CCFG
+    CCFG.setFlashVectorTable = true;
+    CCFG.addressFlashVectorTable = 0x000AC000;
+}
+else if (deviceId.match(/CC13.4|CC26.[34]/))
+{
+    // mcuboot stored at the beginning of flash
+    CCFG.setFlashVectorTable = true;
+    CCFG.addressFlashVectorTable = 0x00000000;
+}
+else if (deviceId.match(/CC23.0/)) {
+    // Nothing to do. Default pBldrVtor = 0x00000000
+}
+else
+{
+    // error
+}
+
+CCFG.ccfgTemplate.$name      = "ti_devices_CCFG_CCFGCC26XXTemplate0";
+
+/* ======== GPIO ======== */
+
+Button1.$name                    = "CONFIG_BTN_LEFT";
+if (deviceId.match(/CC2674R/))
+{
+    Button1.button.$assign           = "DIO_13";
+}
+else
+{
+    Button1.button.$assign           = "DIO_15";
+}
+Button1.gpioPin.$name            = "CONFIG_GPIO_BTN1";
+Button1.gpioPin.pull             = "Pull Up";
+Button1.gpioPin.interruptTrigger = "Falling Edge";
+
+Button2.$name                    = "CONFIG_BTN_RIGHT";
+Button2.button.$assign           = "DIO_14";
+Button2.gpioPin.$name            = "CONFIG_GPIO_BTN2";
+Button2.gpioPin.pull             = "Pull Up";
+Button2.gpioPin.interruptTrigger = "Falling Edge";
+
+LED1.$name          = "CONFIG_LED_RED";
+LED1.ledPin.$assign = "DIO_6";
+LED1.gpioPin.$name  = "CONFIG_GPIO_RLED";
+
+LED2.$name          = "CONFIG_LED_GREEN";
+LED2.ledPin.$assign = "DIO_7";
+LED2.gpioPin.$name  = "CONFIG_GPIO_GLED";

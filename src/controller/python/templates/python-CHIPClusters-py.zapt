@@ -1,0 +1,92 @@
+'''
+{{> header}}
+'''
+
+import ctypes
+
+from chip import exceptions
+
+__all__ = ["ChipClusters"]
+
+
+class ChipClusters:
+    SUCCESS_DELEGATE = ctypes.CFUNCTYPE(None)
+    FAILURE_DELEGATE = ctypes.CFUNCTYPE(None, ctypes.c_uint8)
+
+{{#zcl_clusters}}
+    _{{asDelimitedMacro name}}_CLUSTER_INFO = {
+        "clusterName": "{{asUpperCamelCase name}}",
+        "clusterId": {{asMEI manufacturerCode code}},
+        "commands": {
+{{#zcl_commands_source_client}}
+            {{asMEI manufacturerCode code}}: {
+                "commandId": {{asMEI manufacturerCode code}},
+                "commandName": "{{asUpperCamelCase commandName}}",
+                "args": {
+{{#zcl_command_arguments}}
+     {{#if_is_struct type}}
+                    "{{asLowerCamelCase label}}": "{{type}}",
+    {{else}}
+                    "{{asLowerCamelCase label}}": "{{#if (isCharString type)}}str{{else}}{{as_underlying_python_zcl_type type ../../id}}{{/if}}",
+    {{/if_is_struct}}
+{{/zcl_command_arguments}}
+                },
+            },
+{{/zcl_commands_source_client}}
+        },
+        "attributes": {
+{{#zcl_attributes_server removeKeys='isOptional'}}
+            {{asMEI manufacturerCode code}}: {
+                "attributeName": "{{asUpperCamelCase name}}",
+                "attributeId": {{asMEI manufacturerCode code}},
+                "type": "{{as_underlying_python_zcl_type type ../id}}",
+                {{#if isReportableAttribute}}
+                "reportable": True,
+                {{/if}}
+                {{#if isWritableAttribute}}
+                "writable": True,
+                {{/if}}
+            },
+{{/zcl_attributes_server}}
+        },
+    }
+{{/zcl_clusters}}
+
+    _CLUSTER_ID_DICT = {
+{{#zcl_clusters}}
+        {{asMEI manufacturerCode code}}: _{{asDelimitedMacro name}}_CLUSTER_INFO,
+{{/zcl_clusters}}
+    }
+
+    _CLUSTER_NAME_DICT = {
+{{#zcl_clusters}}
+        "{{asUpperCamelCase name}}": _{{asDelimitedMacro name}}_CLUSTER_INFO,
+{{/zcl_clusters}}
+    }
+
+    def __init__(self, chipstack):
+        self._ChipStack = chipstack
+
+    def GetClusterInfoById(self, cluster_id: int):
+        data = ChipClusters._CLUSTER_ID_DICT.get(cluster_id, None)
+        if not data:
+            raise exceptions.UnknownCluster(cluster_id)
+        return data
+
+    def ListClusterInfo(self):
+        return ChipClusters._CLUSTER_NAME_DICT
+
+    def ListClusterCommands(self):
+        return {clusterName: {
+            command["commandName"]: command["args"] for command in clusterInfo["commands"].values()
+        } for clusterName, clusterInfo in ChipClusters._CLUSTER_NAME_DICT.items()}
+
+    def ListClusterAttributes(self):
+        return {clusterName: {
+            attribute["attributeName"]: attribute for attribute in clusterInfo["attributes"].values()
+        } for clusterName, clusterInfo in ChipClusters._CLUSTER_NAME_DICT.items()}
+
+    # Init native functions
+
+    def InitLib(self, chipLib):
+        self._chipLib = chipLib

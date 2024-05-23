@@ -1,0 +1,187 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/nlassert.gni")
+
+import("${chip_root}/build/chip/buildconfig_header.gni")
+
+import("crypto.gni")
+
+if (chip_crypto == "") {
+  if (current_os == "android" || current_os == "freertos" ||
+      current_os == "zephyr" || current_os == "mbed" || current_os == "webos" ||
+      current_os == "cmsis-rtos") {
+    chip_crypto = "mbedtls"
+  } else if (current_os == "mac" || current_os == "ios") {
+    chip_crypto = "boringssl"
+  } else {
+    chip_crypto = "openssl"
+  }
+}
+
+assert(
+    chip_crypto == "mbedtls" || chip_crypto == "psa" ||
+        chip_crypto == "openssl" || chip_crypto == "boringssl" ||
+        chip_crypto == "platform",
+    "Please select a valid crypto implementation: mbedtls, psa, openssl, boringssl, platform")
+
+buildconfig_header("crypto_buildconfig") {
+  header = "CryptoBuildConfig.h"
+  header_dir = "crypto"
+
+  chip_crypto_mbedtls = chip_crypto == "mbedtls"
+  chip_crypto_psa = chip_crypto == "psa"
+  chip_crypto_openssl = chip_crypto == "openssl"
+  chip_crypto_boringssl = chip_crypto == "boringssl"
+  chip_crypto_platform = chip_crypto == "platform"
+
+  defines = [
+    "CHIP_CRYPTO_MBEDTLS=${chip_crypto_mbedtls}",
+    "CHIP_CRYPTO_PSA=${chip_crypto_psa}",
+    "CHIP_CRYPTO_PSA_SPAKE2P=${chip_crypto_psa_spake2p}",
+    "CHIP_CRYPTO_OPENSSL=${chip_crypto_openssl}",
+    "CHIP_CRYPTO_BORINGSSL=${chip_crypto_boringssl}",
+    "CHIP_CRYPTO_PLATFORM=${chip_crypto_platform}",
+  ]
+}
+
+source_set("public_headers") {
+  sources = [
+    "CHIPCryptoPAL.h",
+    "OperationalKeystore.h",
+    "SessionKeystore.h",
+  ]
+
+  public_deps = [
+    ":crypto_buildconfig",
+    "${chip_root}/src/lib/asn1",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:types",
+    "${chip_root}/src/lib/support",
+    "${nlassert_root}:nlassert",
+  ]
+}
+
+if (chip_crypto == "openssl") {
+  import("${build_root}/config/linux/pkg_config.gni")
+
+  pkg_config("openssl_config") {
+    packages = [ "openssl" ]
+  }
+
+  source_set("cryptopal_openssl") {
+    sources = [ "CHIPCryptoPALOpenSSL.cpp" ]
+    public_configs = [ ":openssl_config" ]
+    public_deps = [ ":public_headers" ]
+  }
+} else if (chip_crypto == "boringssl") {
+  import("${chip_root}/build_overrides/boringssl.gni")
+
+  source_set("cryptopal_boringssl") {
+    # BoringSSL is close enough to OpenSSL that it uses same PAL, with minor #ifdef differences
+    sources = [ "CHIPCryptoPALOpenSSL.cpp" ]
+    public_deps = [
+      ":public_headers",
+      "${boringssl_root}:boringssl",
+    ]
+  }
+} else if (chip_crypto == "mbedtls") {
+  import("//build_overrides/mbedtls.gni")
+
+  source_set("cryptopal_mbedtls") {
+    sources = [
+      "CHIPCryptoPALmbedTLS.cpp",
+      "CHIPCryptoPALmbedTLS.h",
+      "CHIPCryptoPALmbedTLSCert.cpp",
+    ]
+    public_deps = [ ":public_headers" ]
+
+    if (!chip_external_mbedtls) {
+      public_deps += [ "${mbedtls_root}:mbedtls" ]
+    }
+  }
+} else if (chip_crypto == "psa") {
+  import("//build_overrides/mbedtls.gni")
+
+  source_set("cryptopal_psa") {
+    sources = [
+      "CHIPCryptoPALPSA.cpp",
+      "CHIPCryptoPALPSA.h",
+      "CHIPCryptoPALmbedTLS.h",
+      "CHIPCryptoPALmbedTLSCert.cpp",
+    ]
+    public_deps = [ ":public_headers" ]
+
+    if (!chip_external_mbedtls) {
+      public_deps += [ "${mbedtls_root}:mbedtls" ]
+    }
+  }
+}
+
+static_library("crypto") {
+  output_name = "libChipCrypto"
+
+  sources = [
+    "CHIPCryptoPAL.cpp",
+    "DefaultSessionKeystore.h",
+    "PersistentStorageOperationalKeystore.cpp",
+    "PersistentStorageOperationalKeystore.h",
+    "RandUtils.cpp",
+    "RandUtils.h",
+  ]
+
+  if (chip_crypto == "psa") {
+    sources += [
+      "PSAOperationalKeystore.cpp",
+      "PSAOperationalKeystore.h",
+      "PSASessionKeystore.cpp",
+      "PSASessionKeystore.h",
+    ]
+  } else {
+    sources += [
+      "RawKeySessionKeystore.cpp",
+      "RawKeySessionKeystore.h",
+    ]
+  }
+
+  if (chip_crypto_psa_spake2p) {
+    sources += [
+      "PSASpake2p.cpp",
+      "PSASpake2p.h",
+    ]
+  }
+
+  public_configs = []
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [ ":public_headers" ]
+
+  if (chip_crypto == "mbedtls") {
+    public_deps += [ ":cryptopal_mbedtls" ]
+  } else if (chip_crypto == "psa") {
+    public_deps += [ ":cryptopal_psa" ]
+  } else if (chip_crypto == "openssl") {
+    public_deps += [ ":cryptopal_openssl" ]
+  } else if (chip_crypto == "boringssl") {
+    public_deps += [ ":cryptopal_boringssl" ]
+  } else if (chip_crypto == "platform") {
+    # Platform implementation is responsible for bringing their
+    # own implementation and dependencies
+  } else {
+    assert(false, "Invalid CHIP crypto")
+  }
+}

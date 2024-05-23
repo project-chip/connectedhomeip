@@ -1,0 +1,47 @@
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("//build_overrides/pigweed.gni")
+import("$dir_pw_build/python.gni")
+
+pw_python_package("chef") {
+  setup = [
+    "pyproject.toml",
+    "setup.cfg",
+    "setup.py",
+  ]
+
+  inputs = [
+    "sample_app_util/test_files/sample_zap_file.zap",
+    "sample_app_util/test_files/sample_zap_file_meta.yaml",
+  ]
+
+  sources = [
+    "__init__.py",
+    "chef.py",
+    "constants.py",
+    "sample_app_util/__init__.py",
+    "sample_app_util/sample_app_util.py",
+    "sample_app_util/zap_file_parser.py",
+    "stateful_shell.py",
+  ]
+
+  tests = [
+    "test_stateful_shell.py",
+    "sample_app_util/test_zap_file_parser.py",
+  ]
+}

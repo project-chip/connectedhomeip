@@ -1,0 +1,1127 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#`
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: GroupKeyManagement Cluster Tests
+
+config:
+    nodeId: 0x12344321
+    cluster: "Group Key Management"
+    endpoint: 0
+    payload:
+        type: char_string
+        defaultValue: "MT:-24J0AFN00KA0648G00" # This value needs to be generated automatically
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved for alpha"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Open Commissioning Window from alpha"
+      cluster: "Administrator Commissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+
+    - label: "Commission from beta"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: payload
+
+    - label: "Wait for the commissioned device to be retrieved for beta"
+      identity: "beta"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Read maxGroupsPerFabric"
+      command: "readAttribute"
+      attribute: "MaxGroupsPerFabric"
+      response:
+          constraints:
+              minValue: 4
+
+    - label: "Read maxGroupKeysPerFabric"
+      command: "readAttribute"
+      attribute: "MaxGroupKeysPerFabric"
+      response:
+          constraints:
+              minValue: 3
+
+    - label: "Read the ClusterRevision attribute"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          saveAs: ClusterRevisionValue
+          constraints:
+              minValue: 1
+              maxValue: 2
+              type: int16u
+
+    - label: "Creates a new variable to hold if the cluster revision is == 2"
+      cluster: EqualityCommands
+      command: UnsignedNumberEquals
+      arguments:
+          values:
+              - name: Value1
+                value: ClusterRevisionValue
+              - name: Value2
+                value: 2
+      response:
+          - values:
+                - name: Equals
+                  saveAs: ClusterIsRevision2
+
+    ########### KeySetWrite Epoch0 field validations
+    - label: "KeySetWrite with EpochKey0 null fails INVALID_COMMAND"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: null,
+                        EpochStartTime0: 1110000,
+                        EpochKey1: null,
+                        EpochStartTime1: null,
+                        EpochKey2: null,
+                        EpochStartTime2: null,
+                    }
+      response:
+          error: INVALID_COMMAND
+
+    - label: "KeySetWrite with EpochStartTime0 null fails INVALID_COMMAND"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: null,
+                        EpochKey1: null,
+                        EpochStartTime1: null,
+                        EpochKey2: null,
+                        EpochStartTime2: null,
+                    }
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "KeySetWrite with EpochStartTime0 set to zero fails INVALID_COMMAND"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 0,
+                        EpochKey1: null,
+                        EpochStartTime1: null,
+                        EpochKey2: null,
+                        EpochStartTime2: null,
+                    }
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "KeySetWrite with EpochKey0 with length 1 != 16 fails with
+          CONSTRAINT_ERROR"
+      runIf: ClusterIsRevision2
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0",
+                        EpochStartTime0: 1,
+                        EpochKey1: null,
+                        EpochStartTime1: null,
+                        EpochKey2: null,
+                        EpochStartTime2: null,
+                    }
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "KeySetWrite with EpochKey0 with length 0 != 16 fails with
+          CONSTRAINT_ERROR"
+      runIf: ClusterIsRevision2
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "",
+                        EpochStartTime0: 1,
+                        EpochKey1: null,
+                        EpochStartTime1: null,
+                        EpochKey2: null,
+                        EpochStartTime2: null,
+                    }
+      response:
+          error: CONSTRAINT_ERROR
+
+    ########### KeySetWrite Epoch1 field validations
+    - label: "KeySetWrite with EpochStartTime1 null fails INVALID_COMMAND"
+      runIf: ClusterIsRevision2
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1110000,
+                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+                        EpochStartTime1: null,
+                        EpochKey2: null,
+                        EpochStartTime2: null,
+                    }
+      response:
+          error: INVALID_COMMAND
+
+    - label: "KeySetWrite with EpochKey1 null fails INVALID_COMMAND"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1110000,
+                        EpochKey1: null,
+                        EpochStartTime1: 1110001,
+                        EpochKey2: null,
+                        EpochStartTime2: null,
+                    }
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "KeySetWrite with EpochKey1 with length 1 != 16 fails with
+          CONSTRAINT_ERROR"
+      runIf: ClusterIsRevision2
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1110000,
+                        EpochKey1: "\xb0",
+                        EpochStartTime1: 1110001,
+                        EpochKey2: null,
+                        EpochStartTime2: null,
+                    }
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "KeySetWrite with EpochKey1 with length 0 != 16 fails with
+          CONSTRAINT_ERROR"
+      runIf: ClusterIsRevision2
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1110000,
+                        EpochKey1: "",
+                        EpochStartTime1: 1110001,
+                        EpochKey2: null,
+                        EpochStartTime2: null,
+                    }
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "KeySetWrite with EpochStartTime1 not later than EpochStart0 fails
+          with INVALID_COMMAND"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1110000,
+                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+                        EpochStartTime1: 1,
+                        EpochKey2: null,
+                        EpochStartTime2: null,
+                    }
+      response:
+          error: INVALID_COMMAND
+
+    ########### KeySetWrite Epoch2 field validations
+    - label: "KeySetWrite with EpochStartTime2 null fails INVALID_COMMAND"
+      command: "KeySetWrite"
+      runIf: ClusterIsRevision2
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1110000,
+                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+                        EpochStartTime1: 1110001,
+                        EpochKey2: "\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff",
+                        EpochStartTime2: null,
+                    }
+      response:
+          error: INVALID_COMMAND
+
+    - label: "KeySetWrite with EpochKey2 null fails INVALID_COMMAND"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1110000,
+                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+                        EpochStartTime1: 1110001,
+                        EpochKey2: null,
+                        EpochStartTime2: 1110002,
+                    }
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "KeySetWrite with EpochKey2 with length 1 != 16 fails with
+          CONSTRAINT_ERROR"
+      runIf: ClusterIsRevision2
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1110000,
+                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+                        EpochStartTime1: 1110001,
+                        EpochKey2: "\xc0",
+                        EpochStartTime2: 1110002,
+                    }
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "KeySetWrite with EpochKey2 with length 0 != 16 fails with
+          CONSTRAINT_ERROR"
+      runIf: ClusterIsRevision2
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1110000,
+                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+                        EpochStartTime1: 1110001,
+                        EpochKey2: "",
+                        EpochStartTime2: 1110002,
+                    }
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "KeySetWrite with EpochStartTime2 not later than EpochStart1 fails
+          with INVALID_COMMAND"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1110000,
+                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+                        EpochStartTime1: 1110001,
+                        EpochKey2: "\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff",
+                        EpochStartTime2: 100,
+                    }
+      response:
+          error: INVALID_COMMAND
+
+    ################ Rest of normal checks for KeySetWrite
+    - label: "KeySet Write 1"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1110000,
+                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+                        EpochStartTime1: 1110001,
+                        EpochKey2: "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf",
+                        EpochStartTime2: 1110002,
+                    }
+
+    - label: "KeySet Write 2 CacheAndSync"
+      command: "KeySetWrite"
+      PICS: GRPKEY.S.F00
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a2,
+                        GroupKeySecurityPolicy: 1,
+                        EpochKey0: "\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf",
+                        EpochStartTime0: 2110000,
+                        EpochKey1: "\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef",
+                        EpochStartTime1: 2110001,
+                        EpochKey2: "\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff",
+                        EpochStartTime2: 2110002,
+                    }
+
+    - label: "KeySet Write 2 TrustFirst"
+      command: "KeySetWrite"
+      PICS: "!GRPKEY.S.F00"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a2,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf",
+                        EpochStartTime0: 2110000,
+                        EpochKey1: "\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef",
+                        EpochStartTime1: 2110001,
+                        EpochKey2: "\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff",
+                        EpochStartTime2: 2110002,
+                    }
+
+    - label: "KeySet Write 3 CacheAndSync"
+      identity: "beta"
+      command: "KeySetWrite"
+      PICS: GRPKEY.S.F00
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a3,
+                        GroupKeySecurityPolicy: 1,
+                        EpochKey0:
+                            "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
+                        EpochStartTime0: 2110000,
+                        EpochKey1: "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
+                        EpochStartTime1: 2110001,
+                        EpochKey2:
+                            "\x20\x21\x22\x23\x24\x25\x26\x27\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f",
+                        EpochStartTime2: 2110002,
+                    }
+
+    - label: "KeySet Write 3 TrustFirst"
+      identity: "beta"
+      command: "KeySetWrite"
+      PICS: "!GRPKEY.S.F00"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a3,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0:
+                            "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
+                        EpochStartTime0: 2110000,
+                        EpochKey1: "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
+                        EpochStartTime1: 2110001,
+                        EpochKey2:
+                            "\x20\x21\x22\x23\x24\x25\x26\x27\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f",
+                        EpochStartTime2: 2110002,
+                    }
+
+    - label: "KeySet Read"
+      command: "KeySetRead"
+      arguments:
+          values:
+              - name: "GroupKeySetID"
+                value: 0x01a1
+      response:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: null,
+                        EpochStartTime0: 1110000,
+                        EpochKey1: null,
+                        EpochStartTime1: 1110001,
+                        EpochKey2: null,
+                        EpochStartTime2: 1110002,
+                    }
+
+    - label: "KeySet Read All Indices"
+      command: "KeySetReadAllIndices"
+      response:
+          values:
+              - name: "GroupKeySetIDs"
+                constraints:
+                    # Note: There's always an IPK keyset with index 0
+                    contains: [0x01a1, 0x01a2, 0]
+
+    - label: "Write one keyset too many when already full"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x0222,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xd1\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf",
+                        EpochStartTime0: 3110000,
+                        EpochKey1: "\xe1\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef",
+                        EpochStartTime1: 3110001,
+                        EpochKey2: "\xf1\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff",
+                        EpochStartTime2: 3110002,
+                    }
+      response:
+          error: RESOURCE_EXHAUSTED
+
+    - label: "Try to remove KeySet index 0 should fail"
+      command: "KeySetRemove"
+      arguments:
+          values:
+              - name: "GroupKeySetID"
+                value: 0
+      response:
+          error: INVALID_COMMAND
+
+    - label: "Write Group Keys (invalid)"
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value: [{ FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0 }]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Write Group Keys (too many)"
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value:
+              [
+                  { FabricIndex: 1, GroupId: 0x0101, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0101, GroupKeySetID: 0x01a2 },
+                  { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a2 },
+                  { FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a2 },
+                  { FabricIndex: 1, GroupId: 0x0104, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0104, GroupKeySetID: 0x01a2 },
+                  { FabricIndex: 1, GroupId: 0x0105, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0105, GroupKeySetID: 0x01a2 },
+                  { FabricIndex: 1, GroupId: 0x0106, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0106, GroupKeySetID: 0x01a2 },
+                  { FabricIndex: 1, GroupId: 0x0107, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0107, GroupKeySetID: 0x01a2 },
+              ]
+      response:
+          error: FAILURE
+
+    - label: "Write Group Keys on alpha"
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value:
+              [
+                  { FabricIndex: 1, GroupId: 0x0101, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a2 },
+                  { FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0104, GroupKeySetID: 0x01a2 },
+              ]
+
+    - label: "Write Group Keys on beta"
+      identity: "beta"
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value: [
+                  # Note: the FabricIndex here does not matter; it's not sent on the wire.
+                  { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 1, GroupId: 0x0104, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 1, GroupId: 0x0105, GroupKeySetID: 0x01a3 },
+              ]
+
+    - label: "Read Group Keys on alpha"
+      command: "readAttribute"
+      attribute: "GroupKeyMap"
+      response:
+          value:
+              [
+                  { FabricIndex: 1, GroupId: 0x0101, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a2 },
+                  { FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0104, GroupKeySetID: 0x01a2 },
+              ]
+
+    - label: "Read Group Keys on alpha without fabric filtering"
+      command: "readAttribute"
+      attribute: "GroupKeyMap"
+      fabricFiltered: false
+      response:
+          value:
+              [
+                  { FabricIndex: 1, GroupId: 0x0101, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a2 },
+                  { FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0104, GroupKeySetID: 0x01a2 },
+                  { FabricIndex: 2, GroupId: 0x0102, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 2, GroupId: 0x0103, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 2, GroupId: 0x0104, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 2, GroupId: 0x0105, GroupKeySetID: 0x01a3 },
+              ]
+
+    - label: "Read Group Keys on beta"
+      identity: "beta"
+      command: "readAttribute"
+      attribute: "GroupKeyMap"
+      response:
+          value:
+              [
+                  { FabricIndex: 2, GroupId: 0x0102, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 2, GroupId: 0x0103, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 2, GroupId: 0x0104, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 2, GroupId: 0x0105, GroupKeySetID: 0x01a3 },
+              ]
+
+    - label: "Read Group Keys on beta without fabric filtering"
+      identity: "beta"
+      command: "readAttribute"
+      attribute: "GroupKeyMap"
+      fabricFiltered: false
+      response:
+          value:
+              [
+                  { FabricIndex: 1, GroupId: 0x0101, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a2 },
+                  { FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0104, GroupKeySetID: 0x01a2 },
+                  { FabricIndex: 2, GroupId: 0x0102, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 2, GroupId: 0x0103, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 2, GroupId: 0x0104, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 2, GroupId: 0x0105, GroupKeySetID: 0x01a3 },
+              ]
+
+    - label: "Add Group 1"
+      cluster: "Groups"
+      endpoint: 1
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0101
+              - name: "GroupName"
+                value: "Group #1"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0101
+
+    - label: "Add Group 2"
+      cluster: "Groups"
+      endpoint: 1
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0102
+              - name: "GroupName"
+                value: "Group #2"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0102
+
+    - label: "Add Group 3"
+      cluster: "Groups"
+      endpoint: 1
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0103
+              - name: "GroupName"
+                value: "Group #3"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0103
+
+    - label: "Add Group 4"
+      cluster: "Groups"
+      endpoint: 1
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0104
+              - name: "GroupName"
+                value: "Group #4"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0104
+
+    - label: "Add Group 5"
+      identity: "beta"
+      cluster: "Groups"
+      endpoint: 1
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0105
+              - name: "GroupName"
+                value: "Group #5"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0105
+
+    - label: "Read GroupTable from alpha"
+      command: "readAttribute"
+      attribute: "GroupTable"
+      response:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0101,
+                      Endpoints: [1],
+                      GroupName: "Group #1",
+                  },
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0102,
+                      Endpoints: [1],
+                      GroupName: "Group #2",
+                  },
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0103,
+                      Endpoints: [1],
+                      GroupName: "Group #3",
+                  },
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0104,
+                      Endpoints: [1],
+                      GroupName: "Group #4",
+                  },
+              ]
+
+    - label: "Read GroupTable from alpha without fabric filtering"
+      command: "readAttribute"
+      attribute: "GroupTable"
+      fabricFiltered: false
+      response:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0101,
+                      Endpoints: [1],
+                      GroupName: "Group #1",
+                  },
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0102,
+                      Endpoints: [1],
+                      GroupName: "Group #2",
+                  },
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0103,
+                      Endpoints: [1],
+                      GroupName: "Group #3",
+                  },
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0104,
+                      Endpoints: [1],
+                      GroupName: "Group #4",
+                  },
+                  {
+                      FabricIndex: 2,
+                      GroupId: 0x0105,
+                      Endpoints: [1],
+                      GroupName: "Group #5",
+                  },
+              ]
+
+    - label: "Read GroupTable from beta"
+      identity: "beta"
+      command: "readAttribute"
+      attribute: "GroupTable"
+      response:
+          value:
+              [
+                  {
+                      FabricIndex: 2,
+                      GroupId: 0x0105,
+                      Endpoints: [1],
+                      GroupName: "Group #5",
+                  },
+              ]
+
+    - label: "Read GroupTable from beta without fabric filtering"
+      identity: "beta"
+      command: "readAttribute"
+      attribute: "GroupTable"
+      fabricFiltered: false
+      response:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0101,
+                      Endpoints: [1],
+                      GroupName: "Group #1",
+                  },
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0102,
+                      Endpoints: [1],
+                      GroupName: "Group #2",
+                  },
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0103,
+                      Endpoints: [1],
+                      GroupName: "Group #3",
+                  },
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0104,
+                      Endpoints: [1],
+                      GroupName: "Group #4",
+                  },
+                  {
+                      FabricIndex: 2,
+                      GroupId: 0x0105,
+                      Endpoints: [1],
+                      GroupName: "Group #5",
+                  },
+              ]
+
+    - label: "KeySet Remove 1"
+      command: "KeySetRemove"
+      arguments:
+          values:
+              - name: "GroupKeySetID"
+                value: 0x01a1
+
+    - label: "KeySet Read (removed)"
+      command: "KeySetRead"
+      arguments:
+          values:
+              - name: "GroupKeySetID"
+                value: 0x01a1
+      response:
+          error: NOT_FOUND
+
+    - label: "KeySet Read (not removed) CacheAndSync"
+      command: "KeySetRead"
+      PICS: GRPKEY.S.F00
+      arguments:
+          values:
+              - name: "GroupKeySetID"
+                value: 0x01a2
+      response:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a2,
+                        GroupKeySecurityPolicy: 1,
+                        EpochKey0: null,
+                        EpochStartTime0: 2110000,
+                        EpochKey1: null,
+                        EpochStartTime1: 2110001,
+                        EpochKey2: null,
+                        EpochStartTime2: 2110002,
+                    }
+
+    - label: "KeySet Read (not removed) TrustFirst"
+      command: "KeySetRead"
+      PICS: GRPKEY.S.F00
+      arguments:
+          values:
+              - name: "GroupKeySetID"
+                value: 0x01a2
+      response:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a2,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: null,
+                        EpochStartTime0: 2110000,
+                        EpochKey1: null,
+                        EpochStartTime1: 2110001,
+                        EpochKey2: null,
+                        EpochStartTime2: 2110002,
+                    }
+
+    - label: "Remove Group 1"
+      cluster: "Groups"
+      endpoint: 1
+      command: "RemoveGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0101
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0101
+
+    - label: "Read GroupTable 2"
+      command: "readAttribute"
+      attribute: "GroupTable"
+      response:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0102,
+                      Endpoints: [1],
+                      GroupName: "Group #2",
+                  },
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0103,
+                      Endpoints: [1],
+                      GroupName: "Group #3",
+                  },
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0104,
+                      Endpoints: [1],
+                      GroupName: "Group #4",
+                  },
+              ]
+
+    - label: "Remove All"
+      cluster: "Groups"
+      endpoint: 1
+      command: "RemoveAllGroups"
+
+    - label: "Read GroupTable 3"
+      command: "readAttribute"
+      attribute: "GroupTable"
+      response:
+          value: []
+
+    - label: "KeySet Remove 2"
+      command: "KeySetRemove"
+      arguments:
+          values:
+              - name: "GroupKeySetID"
+                value: 0x01a2
+
+    - label: "KeySet Read (also removed)"
+      command: "KeySetRead"
+      arguments:
+          values:
+              - name: "GroupKeySetID"
+                value: 0x01a2
+      response:
+          error: NOT_FOUND
+
+    - label: "KeySet Write 1"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1110000,
+                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+                        EpochStartTime1: 1110001,
+                        EpochKey2: "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf",
+                        EpochStartTime2: 1110002,
+                    }
+
+    - label: "KeySet Write 2 CacheAndSync"
+      command: "KeySetWrite"
+      PICS: GRPKEY.S.F00
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a2,
+                        GroupKeySecurityPolicy: 1,
+                        EpochKey0: "\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf",
+                        EpochStartTime0: 2110000,
+                        EpochKey1: "\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef",
+                        EpochStartTime1: 2110001,
+                        EpochKey2: "\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff",
+                        EpochStartTime2: 2110002,
+                    }
+
+    - label: "KeySet Write 2 TrustFirst"
+      command: "KeySetWrite"
+      PICS: "!GRPKEY.S.F00"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a2,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf",
+                        EpochStartTime0: 2110000,
+                        EpochKey1: "\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef",
+                        EpochStartTime1: 2110001,
+                        EpochKey2: "\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff",
+                        EpochStartTime2: 2110002,
+                    }
+
+    - label: "Map Group 1 and Group 2 to KeySet 1 and group 2 to KeySet 2"
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value:
+              [
+                  { FabricIndex: 1, GroupId: 0x0101, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a2 },
+                  { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a1 },
+              ]
+
+    - label: "Remove keyset 1"
+      command: "KeySetRemove"
+      arguments:
+          values:
+              - name: "GroupKeySetID"
+                value: 0x01a1
+
+    - label: "TH verifies GroupKeyMap entries for KeySet 1 have been removed"
+      cluster: "Group Key Management"
+      endpoint: 0
+      command: "readAttribute"
+      attribute: "GroupKeyMap"
+      response:
+          value: [{ FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a2 }]
+    - label: "Remove keyset 2"
+      command: "KeySetRemove"
+      arguments:
+          values:
+              - name: "GroupKeySetID"
+                value: 0x01a2
+
+    - label: "TH verifies GroupKeyMap entries for KeySet 2 have been removed"
+      cluster: "Group Key Management"
+      endpoint: 0
+      command: "readAttribute"
+      attribute: "GroupKeyMap"
+      response:
+          value: []
+
+    - label: "TH tries to remove a non-existent key"
+      cluster: "Group Key Management"
+      endpoint: 0
+      command: "KeySetRemove"
+      arguments:
+          values:
+              - name: "GroupKeySetID"
+                value: 0x0111
+      response:
+          error: NOT_FOUND

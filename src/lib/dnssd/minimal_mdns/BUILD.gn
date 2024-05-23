@@ -1,0 +1,164 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+declare_args() {
+  # Makes unicast queries use a separate UDP endpoint that have an ephemeral port
+  #
+  # In practice this means unicast replies will be received on a dedicated port
+  # and will work even if competing mdns servers (including other chip apps)
+  # run on the same machine.
+  #
+  # Downside is that replies sent to a port other than 5353 are considered
+  # LEGACY by mDNS and will include the query section in them (i.e. larger
+  # payloads) and clients need to allocate more resources for this (need one
+  # more UDP socket and corresponding code for the unicast query sending)
+  chip_use_ephemeral_port_for_mdns_unicast_query =
+      current_os == "mac" || current_os == "linux" || current_os == "android" ||
+      current_os == "webos"
+
+  # This enables verbose logging of sent/received mDNS messages. However, will incur extra RAM and
+  # time.
+  chip_minmdns_high_verbosity = false
+
+  # MinMdns address policy to be compiled in.
+  # Supported values:
+  #   - "default" will compile in AddressPolicy_DefaultImpl.h/cpp
+  #   - "libnl" will compile in AddressPolicy_LibNlImpl.h/cpp (linux only)
+  #   - "none" will NOT compile any default policy, app is expected to call
+  #     SetAddressPolicy apropriately
+  chip_minmdns_default_policy = "default"
+}
+
+config("config") {
+  defines = []
+
+  if (chip_use_ephemeral_port_for_mdns_unicast_query) {
+    defines += [ "CHIP_MINMDNS_USE_EPHEMERAL_UNICAST_PORT=1" ]
+  } else {
+    defines += [ "CHIP_MINMDNS_USE_EPHEMERAL_UNICAST_PORT=0" ]
+  }
+
+  if (chip_minmdns_high_verbosity) {
+    defines += [ "CHIP_MINMDNS_HIGH_VERBOSITY=1" ]
+  } else {
+    defines += [ "CHIP_MINMDNS_HIGH_VERBOSITY=0" ]
+  }
+
+  if (chip_minmdns_default_policy == "default") {
+    defines += [ "CHIP_MINMDNS_DEFAULT_POLICY=1" ]
+  } else if (chip_minmdns_default_policy == "libnl") {
+    assert(current_os == "linux", "LibNL only supported on linux")
+    defines += [ "CHIP_MINMDNS_LIBNL_POLICY=1" ]
+  } else {
+    assert(chip_minmdns_default_policy == "none",
+           "minmdns default policy should be a supported value")
+  }
+}
+
+source_set("address_policy") {
+  sources = [
+    "AddressPolicy.cpp",
+    "AddressPolicy.h",
+    "ListenIterator.h",
+    "ServerIPAddresses.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/inet",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
+static_library("default_policy") {
+  sources = [
+    "AddressPolicy_DefaultImpl.cpp",
+    "AddressPolicy_DefaultImpl.h",
+  ]
+
+  public_deps = [
+    ":address_policy",
+    "${chip_root}/src/inet",
+  ]
+
+  cflags = [ "-Wconversion" ]
+}
+
+if (current_os == "linux" && chip_minmdns_default_policy == "libnl") {
+  import("${build_root}/config/linux/pkg_config.gni")
+
+  pkg_config("libnl_config") {
+    packages = [
+      "libnl-3.0",
+      "libnl-route-3.0",
+    ]
+  }
+
+  static_library("libnl_policy") {
+    sources = [
+      "AddressPolicy_LibNlImpl.cpp",
+      "AddressPolicy_LibNlImpl.h",
+    ]
+
+    public_deps = [
+      ":address_policy",
+      "${chip_root}/src/inet",
+    ]
+
+    public_configs = [ ":libnl_config" ]
+  }
+}
+
+static_library("minimal_mdns") {
+  sources = [
+    "Logging.h",
+    "Parser.cpp",
+    "Parser.h",
+    "Query.h",
+    "QueryBuilder.h",
+    "QueryReplyFilter.h",
+    "RecordData.cpp",
+    "RecordData.h",
+    "ResponseBuilder.h",
+    "ResponseSender.cpp",
+    "ResponseSender.h",
+    "Server.cpp",
+    "Server.h",
+  ]
+
+  if (chip_minmdns_high_verbosity) {
+    sources += [ "Logging.cpp" ]
+  }
+
+  public_deps = [
+    ":address_policy",
+    "${chip_root}/src/inet",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/dnssd/minimal_mdns/core",
+    "${chip_root}/src/lib/dnssd/minimal_mdns/responders",
+    "${chip_root}/src/platform",
+  ]
+
+  if (chip_minmdns_default_policy == "default") {
+    public_deps += [ ":default_policy" ]
+  } else if (chip_minmdns_default_policy == "libnl") {
+    public_deps += [ ":libnl_policy" ]
+  }
+
+  public_configs = [ ":config" ]
+
+  cflags = [ "-Wconversion" ]
+}

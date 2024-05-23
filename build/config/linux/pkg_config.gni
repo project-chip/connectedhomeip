@@ -1,0 +1,145 @@
+# Copyright (c) 2013 The Chromium Authors. All rights reserved.
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#    * Redistributions of source code must retain the above copyright
+# notice, this list of conditions and the following disclaimer.
+#    * Redistributions in binary form must reproduce the above
+# copyright notice, this list of conditions and the following disclaimer
+# in the documentation and/or other materials provided with the
+# distribution.
+#    * Neither the name of Google Inc. nor the names of its
+# contributors may be used to endorse or promote products derived from
+# this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+# Defines a config specifying the result of running pkg-config for the given
+# packages. Put the package names you want to query in the "packages" variable
+# inside the template invocation.
+#
+# You can also add defines via the "defines" variable. This can be useful to
+# add this to the config to pass defines that the library expects to get by
+# users of its headers.
+#
+# Example:
+#   pkg_config("mything") {
+#     packages = [ "mything1", "mything2" ]
+#     defines = [ "ENABLE_AWESOME" ]
+#   }
+#
+# You can also use "extra args" to filter out results (see pkg-config.py):
+#   extra_args = [ "-v, "foo" ]
+# To ignore libs and ldflags (only cflags/defines will be set, which is useful
+# when doing manual dynamic linking), set:
+#   ignore_libs = true
+
+import("//build_overrides/build.gni")
+import("${build_root}/config/sysroot.gni")
+
+declare_args() {
+  # A pkg-config wrapper to call instead of trying to find and call the right
+  # pkg-config directly. Wrappers like this are common in cross-compilation
+  # environments.
+  # Leaving it blank defaults to searching PATH for 'pkg-config' and relying on
+  # the sysroot mechanism to find the right .pc files.
+  pkg_config = ""
+
+  # A optional pkg-config wrapper to use for tools built on the host.
+  host_pkg_config = ""
+
+  system_libdir = "lib"
+}
+
+pkg_config_script = "${build_root}/config/linux/pkg-config.py"
+
+# Define the args we pass to the pkg-config script for other build files that
+# need to invoke it manually.
+pkg_config_args = []
+
+if (pkg_config != "") {
+  pkg_config_args += [
+    "-p",
+    pkg_config,
+  ]
+}
+
+if (host_pkg_config != "") {
+  host_pkg_config_args = [
+    "-p",
+    host_pkg_config,
+  ]
+} else {
+  host_pkg_config_args = pkg_config_args
+}
+
+if (sysroot != "") {
+  pkg_config_args += [
+    "-s",
+    sysroot,
+  ]
+
+  if (system_libdir != "") {
+    pkg_config_args += [
+      "--system_libdir",
+      system_libdir,
+    ]
+  }
+}
+
+template("pkg_config") {
+  assert(defined(invoker.packages),
+         "Variable |packages| must be defined to be a list in pkg_config.")
+  config(target_name) {
+    if (host_toolchain == current_toolchain) {
+      args = host_pkg_config_args + invoker.packages
+    } else {
+      args = pkg_config_args + invoker.packages
+    }
+    if (defined(invoker.extra_args)) {
+      args += invoker.extra_args
+    }
+
+    pkgresult = exec_script(pkg_config_script, args, "value")
+    cflags = pkgresult[1]
+
+    foreach(include, pkgresult[0]) {
+      cflags += [ "-I$include" ]
+    }
+
+    if (!defined(invoker.ignore_libs) || !invoker.ignore_libs) {
+      libs = pkgresult[2]
+      lib_dirs = pkgresult[3]
+    }
+
+    # Link libraries statically for OSS-Fuzz fuzzer build
+    if (oss_fuzz) {
+      libs = []
+      ldflags = [ "-Wl,-Bstatic" ]
+      foreach(lib, pkgresult[2]) {
+        ldflags += [ "-l$lib" ]
+      }
+      ldflags += [ "-Wl,-Bdynamic" ]
+      lib_dirs = pkgresult[3]
+    }
+
+    forward_variables_from(invoker,
+                           [
+                             "defines",
+                             "visibility",
+                           ])
+  }
+}

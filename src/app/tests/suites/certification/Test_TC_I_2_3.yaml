@@ -1,0 +1,276 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 57.2.3. [TC-I-2.3] Secondary functionality with server as DUT
+
+PICS:
+    - I.S
+    - I.S.C40.Rsp
+
+config:
+    nodeId: 0x12344321
+    cluster: "Identify"
+    endpoint: 1
+
+tests:
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Step 2a: TH sends TriggerEffect command to DUT, with the effect
+          identifier field set to 0x00 (blink) and the effect variant field set
+          to 0x00 (default)"
+      PICS: I.S.C40.Rsp
+      command: "TriggerEffect"
+      arguments:
+          values:
+              - name: "EffectIdentifier"
+                value: 0
+              - name: "EffectVariant"
+                value: 0
+
+    - label: "DUT executes a blink effect"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && I.S.C40.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 2b: TH sends TriggerEffect command to DUT, with the effect
+          identifier field set to 0x01 (breathe) and the effect variant field
+          set to 0x00 (default)."
+      PICS: I.S.C40.Rsp
+      command: "TriggerEffect"
+      arguments:
+          values:
+              - name: "EffectIdentifier"
+                value: 1
+              - name: "EffectVariant"
+                value: 0
+
+    - label: "DUT executes a breathe effect"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && I.S.C40.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 2c: TH sends TriggerEffect command to DUT, with the effect
+          identifier field set to 0x02 (okay) and the effect variant field set
+          to 0x00 (default)."
+      PICS: I.S.C40.Rsp
+      command: "TriggerEffect"
+      arguments:
+          values:
+              - name: "EffectIdentifier"
+                value: 2
+              - name: "EffectVariant"
+                value: 0
+
+    - label: "DUT executes an okay effect"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && I.S.C40.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 2d:TH sends TriggerEffect command to DUT, with the effect
+          identifier field set to 0x0b (channel change) and the effect variant
+          field set to 0x00 (default)."
+      PICS: I.S.C40.Rsp
+      command: "TriggerEffect"
+      arguments:
+          values:
+              - name: "EffectIdentifier"
+                value: 11
+              - name: "EffectVariant"
+                value: 0
+
+    - label: "DUT executes a channel change effect"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && I.S.C40.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 2e: TH sends TriggerEffect command to DUT, with the effect
+          identifier field set to 0x01 (breathe) and the effect variant field
+          set to 0x00 (default)."
+      PICS: I.S.C40.Rsp
+      command: "TriggerEffect"
+      arguments:
+          values:
+              - name: "EffectIdentifier"
+                value: 1
+              - name: "EffectVariant"
+                value: 0
+
+    - label: "DUT executes a breathe effect"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && I.S.C40.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 2f: TH sends TriggerEffect command to DUT, with the effect
+          identifier field set to 0xfe (finish effect) and the effect variant
+          field set to 0x00 (default)."
+      PICS: I.S.C40.Rsp
+      command: "TriggerEffect"
+      arguments:
+          values:
+              - name: "EffectIdentifier"
+                value: 254
+              - name: "EffectVariant"
+                value: 0
+
+    - label: "DUT stops the breathe effect after the current effect sequence"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && I.S.C40.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 2g: TH sends TriggerEffect command to DUT, with the effect
+          identifier field set to 0x01 (breathe) and the effect variant field
+          set to 0x00 (default)."
+      PICS: I.S.C40.Rsp
+      command: "TriggerEffect"
+      arguments:
+          values:
+              - name: "EffectIdentifier"
+                value: 1
+              - name: "EffectVariant"
+                value: 0
+
+    - label: "DUT executes a breathe effect"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && I.S.C40.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 2h: TH sends TriggerEffect command to DUT, with the effect
+          identifier field set to 0xff (stop effect) and the effect variant
+          field set to 0x00 (default)."
+      PICS: I.S.C40.Rsp
+      command: "TriggerEffect"
+      arguments:
+          values:
+              - name: "EffectIdentifier"
+                value: 255
+              - name: "EffectVariant"
+                value: 0
+
+    - label: "DUT stops the breathe effect as soon as possible."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && I.S.C40.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 3a: TH sends TriggerEffect command to DUT, with the effect
+          identifier field set to 0x00 (blink) and the effect variant field set
+          to 0x42 (unknown)."
+      PICS: I.S.C40.Rsp
+      command: "TriggerEffect"
+      arguments:
+          values:
+              - name: "EffectIdentifier"
+                value: 0
+              - name: "EffectVariant"
+                value: EffectVariantEnum.UnknownEnumValue(66)
+
+    - label: "Check DUT executes a blink effect."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && I.S.C40.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 3b: TH sends TriggerEffect command to DUT, with the effect
+          identifier field set to 0xff (stop effect) and the effect variant
+          field set to 0x00 (default)."
+      PICS: I.S.C40.Rsp
+      command: "TriggerEffect"
+      arguments:
+          values:
+              - name: "EffectIdentifier"
+                value: 255
+              - name: "EffectVariant"
+                value: 0
+
+    - label:
+          "DUT stops any effect that may be still running as soon as possible"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && I.S.C40.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"

@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+  <enum name="CommissioningErrorEnum" type="enum8">
+    <cluster code="0x0030"/>
+    <item name="OK" value="0x0"/>
+    <item name="ValueOutsideRange" value="0x1"/>
+    <item name="InvalidAuthentication" value="0x2"/>
+    <item name="NoFailSafe" value="0x3"/>
+    <item name="BusyWithOtherAdmin" value="0x4"/>
+  </enum>
+  <enum name="RegulatoryLocationTypeEnum" type="enum8">
+    <cluster code="0x0030"/>
+    <item name="Indoor" value="0x0"/>
+    <item name="Outdoor" value="0x1"/>
+    <item name="IndoorOutdoor" value="0x2"/>
+  </enum>
+  <struct name="BasicCommissioningInfo">
+    <cluster code="0x0030"/>
+    <item fieldId="0" name="FailSafeExpiryLengthSeconds" type="int16u"/>
+    <item fieldId="1" name="MaxCumulativeFailsafeSeconds" type="int16u"/>
+  </struct>
+  <cluster>
+    <domain>General</domain>
+    <name>General Commissioning</name>
+    <code>0x0030</code>
+    <define>GENERAL_COMMISSIONING_CLUSTER</define>
+    <description>This cluster is used to manage global aspects of the Commissioning flow.</description>
+    <attribute side="server" code="0x00" define="BREADCRUMB" type="int64u" writable="true" default="0x0000000000000000" optional="false">
+      <description>Breadcrumb</description>
+      <access op="read" privilege="view"/>
+      <access op="write" privilege="administer"/>
+    </attribute>
+    <attribute side="server" code="0x01" define="BASIC_COMMISSIONING_INFO" type="BasicCommissioningInfo" writable="false" optional="false">BasicCommissioningInfo</attribute>
+    <attribute side="server" code="0x02" define="REGULATORY_CONFIG" type="RegulatoryLocationTypeEnum" writable="false" optional="false">RegulatoryConfig</attribute>
+    <attribute side="server" code="0x03" define="LOCATION_CAPABILITY" type="RegulatoryLocationTypeEnum" writable="false" optional="false">LocationCapability</attribute>
+    <attribute side="server" code="0x04" define="SUPPORTS_CONCURRENT_CONNECTION" type="boolean" writable="false" default="1" optional="false">SupportsConcurrentConnection</attribute>
+
+    <command source="client" code="0x00" name="ArmFailSafe" response="ArmFailSafeResponse" optional="false" cli="chip fabric_commissioning armfailsafe">
+      <description>Arm the persistent fail-safe timer with an expiry time of now + ExpiryLengthSeconds using device clock</description>
+      <arg name="ExpiryLengthSeconds" type="int16u"/>
+      <arg name="Breadcrumb" type="int64u"/>
+      <access op="invoke" privilege="administer"/>
+    </command>
+    <command source="server" code="0x01" name="ArmFailSafeResponse" optional="false" cli="chip fabric_commissioning armfailsaferesponse">
+      <description>Success/failure response for ArmFailSafe command</description>
+      <arg name="ErrorCode" type="CommissioningErrorEnum"/>
+      <arg name="DebugText" type="char_string" length="128"/>
+    </command>
+    <command source="client" code="0x02" name="SetRegulatoryConfig" response="SetRegulatoryConfigResponse" cli="chip fabric_commissioning setregulatoryconfig">
+      <description>Set the regulatory configuration to be used during commissioning</description>
+      <arg name="NewRegulatoryConfig" type="RegulatoryLocationTypeEnum"/>
+      <arg name="CountryCode" type="char_string" length="2"/>
+      <arg name="Breadcrumb" type="int64u"/>
+      <access op="invoke" privilege="administer"/>
+    </command>
+    <command source="server" code="0x03" name="SetRegulatoryConfigResponse" cli="chip fabric_commissioning setregulatoryconfigresponse">
+      <description>Success/failure response for SetRegulatoryConfig command</description>
+      <arg name="ErrorCode" type="CommissioningErrorEnum"/>
+      <arg name="DebugText" type="char_string"/>
+    </command>
+    <command source="client" code="0x04" name="CommissioningComplete" response="CommissioningCompleteResponse" isFabricScoped="true" optional="false" cli="chip fabric_commissioning commissioningcomplete">
+      <description>Signals the Server that the Client has successfully completed all steps of Commissioning/Recofiguration needed during fail-safe period.</description>
+      <access op="invoke" privilege="administer"/>
+    </command>
+    <command source="server" code="0x05" name="CommissioningCompleteResponse" optional="false" cli="chip fabric_commissioning commissioningcompleteresponse">
+      <description>Indicates to client whether CommissioningComplete command succeeded</description>
+      <arg name="ErrorCode" type="CommissioningErrorEnum"/>
+      <arg name="DebugText" type="char_string"/>
+    </command>
+  </cluster>
+</configurator>

@@ -1,0 +1,92 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/openthread.gni")
+
+import("${chip_root}/src/platform/device.gni")
+
+declare_args() {
+  # Enable server command only on linux for now.
+  chip_shell_cmd_server = current_os == "linux" || current_os == "mac"
+}
+
+config("shell_common_config") {
+  include_dirs = [
+    ".",
+    "include",
+    "${chip_root}/src/lib/shell",
+  ]
+
+  defines = [
+    "ENABLE_CHIP_SHELL",
+    "OPENTHREAD_CONFIG_CLI_TRANSPORT=OT_CLI_TRANSPORT_CONSOLE",
+    "CHIP_SHELL_ENABLE_CMD_SERVER=${chip_shell_cmd_server}",
+  ]
+}
+
+static_library("shell_common") {
+  sources = [
+    "cmd_misc.cpp",
+    "cmd_otcli.cpp",
+    "globals.cpp",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/lib/shell",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
+    "${chip_root}/src/protocols",
+  ]
+
+  if (chip_enable_openthread &&
+      (current_os == "freertos" || current_os == "zephyr")) {
+    public_deps += [
+      "${chip_root}/third_party/openthread:openthread",
+      "${chip_root}/third_party/openthread:openthread_cli",
+    ]
+  }
+
+  if (chip_shell_cmd_server) {
+    sources += [ "cmd_server.cpp" ]
+
+    import("${chip_root}/src/app/chip_data_model.gni")
+
+    sources += [
+      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
+      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/device-energy-management-stub.cpp",
+      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/energy-evse-stub.cpp",
+      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp",
+      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
+      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
+      "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementDelegateImpl.cpp",
+      "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementManager.cpp",
+      "${chip_root}/examples/energy-management-app/energy-management-common/src/ElectricalPowerMeasurementDelegate.cpp",
+      "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp",
+      "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
+    ]
+
+    include_dirs = [
+      "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
+      "${chip_root}/examples/energy-management-app/energy-management-common/include",
+    ]
+
+    public_deps +=
+        [ "${chip_root}/examples/all-clusters-app/all-clusters-common" ]
+  }
+
+  public_configs = [ ":shell_common_config" ]
+
+  cflags = [ "-Wconversion" ]
+}

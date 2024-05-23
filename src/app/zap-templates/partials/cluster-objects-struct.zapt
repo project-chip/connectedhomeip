@@ -1,0 +1,146 @@
+{{#if header}}
+namespace {{asUpperCamelCase name}} {
+    enum class Fields : uint8_t {
+    {{#zcl_struct_items}}
+    k{{asUpperCamelCase label}} = {{fieldIdentifier}},
+    {{/zcl_struct_items}}
+    };
+
+    struct Type {
+    public:
+        {{#zcl_struct_items}}
+        {{zapTypeToEncodableClusterObjectType type}} {{asLowerCamelCase label}}{{> cluster_objects_field_init}};
+        {{/zcl_struct_items}}
+
+        {{#unless struct_contains_array}}
+        CHIP_ERROR Decode(TLV::TLVReader &reader);
+        {{/unless}}
+
+        static constexpr bool kIsFabricScoped = {{isFabricScoped}};
+
+        {{#if isFabricScoped}}
+        auto GetFabricIndex() const {
+            return fabricIndex;
+        }
+
+        void SetFabricIndex(chip::FabricIndex fabricIndex_) {
+            fabricIndex = fabricIndex_;
+        }
+
+        CHIP_ERROR EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+        CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
+
+    private:
+        CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
+        {{else}}
+        CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+        {{/if}}
+    };
+
+    {{#if struct_contains_array}}
+    struct DecodableType {
+    public:
+        {{#zcl_struct_items}}
+        {{zapTypeToDecodableClusterObjectType type}} {{asLowerCamelCase label}}{{> cluster_objects_field_init}};
+        {{/zcl_struct_items}}
+
+        CHIP_ERROR Decode(TLV::TLVReader &reader);
+
+        static constexpr bool kIsFabricScoped = {{isFabricScoped}};
+
+        {{#if isFabricScoped}}
+        auto GetFabricIndex() const {
+            return fabricIndex;
+        }
+
+        void SetFabricIndex(chip::FabricIndex fabricIndex_) {
+            fabricIndex = fabricIndex_;
+        }
+        {{/if}}
+    };
+    {{else}}
+    using DecodableType = Type;
+    {{/if}}
+
+} // namespace {{asUpperCamelCase name}}
+{{else}}
+
+namespace {{asUpperCamelCase name}} {
+{{#if isFabricScoped}}
+CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    return DoEncode(aWriter, aTag, NullOptional);
+}
+
+CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+{
+    return DoEncode(aWriter, aTag, MakeOptional(aAccessingFabricIndex));
+}
+
+CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
+{
+    {{#if struct_has_fabric_sensitive_fields}}
+    bool includeSensitive = !aAccessingFabricIndex.HasValue() || (aAccessingFabricIndex.Value() == fabricIndex);
+    {{/if}}
+
+    DataModel::WrappedStructEncoder encoder{aWriter, aTag};
+
+    {{#zcl_struct_items}}
+    {{#if (is_num_equal fieldIdentifier 254)}}
+    if (aAccessingFabricIndex.HasValue()) {
+      encoder.Encode(to_underlying(Fields::k{{asUpperCamelCase label}}), {{asLowerCamelCase label}});
+    }
+    {{else if isFabricSensitive}}
+    if (includeSensitive) {
+      encoder.Encode(to_underlying(Fields::k{{asUpperCamelCase label}}), {{asLowerCamelCase label}});
+    }
+    {{else}}
+    encoder.Encode(to_underlying(Fields::k{{asUpperCamelCase label}}), {{asLowerCamelCase label}});
+    {{/if}}
+    {{/zcl_struct_items}}
+
+    return encoder.Finalize();
+}
+{{else}}
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{aWriter, aTag};
+    {{#zcl_struct_items}}
+    encoder.Encode(to_underlying(Fields::k{{asUpperCamelCase label}}), {{asLowerCamelCase label}});
+    {{/zcl_struct_items}}
+    return encoder.Finalize();
+}
+{{/if}}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
+    detail::StructDecodeIterator __iterator(reader);
+    while (true) {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element)) {
+           return std::get<CHIP_ERROR>(__element);
+        }
+
+        {{#zcl_struct_items}}
+        {{#first}}
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        {{/first~}}
+        {{! NOTE: using if/else instead of switch because it seems to generate smaller code. ~}}
+        if (__context_tag == to_underlying(Fields::k{{asUpperCamelCase label}}))
+        {
+           err = DataModel::Decode(reader, {{asLowerCamelCase label}});
+        }
+        else
+        {{#last}}
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+        {{/last}}
+        {{/zcl_struct_items}}
+    }
+}
+
+} // namespace {{asUpperCamelCase name}}
+{{/if}}

@@ -1,0 +1,126 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 3.2.1. [TC-DRYERCTRL-2.1]  Optional Dryness attributes with server as DUT
+
+PICS:
+    - DRYERCTRL.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Laundry Dryer Controls"
+    endpoint: 1
+
+    unsupportedSelectedDrynessLevel:
+        type: int8u
+        defaultValue: 4
+
+    SupportedDrynessLevel:
+        type: int8u
+        defaultValue: 1
+
+tests:
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Step 2: TH reads from the DUT the mandatory attribute:
+          SupportedDrynessLevels"
+      PICS: DRYERCTRL.S.A0000
+      command: "readAttribute"
+      attribute: "SupportedDrynessLevels"
+      response:
+          constraints:
+              type: list
+              maxLength: 4
+
+    - label:
+          "Step 3: TH reads from the DUT the mandatory attribute:
+          SelectedDrynessLevel"
+      PICS: DRYERCTRL.S.A0001
+      command: "readAttribute"
+      attribute: "SelectedDrynessLevel"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 3
+
+    - label:
+          "Step 4:TH writes a supported SelectedDrynessLevel attribute that is
+          within the list of SupportedDrynessLevels"
+      PICS: DRYERCTRL.S.A0001
+      command: "writeAttribute"
+      attribute: "SelectedDrynessLevel"
+      arguments:
+          value: SupportedDrynessLevel
+
+    - label: "Wait 2 seconds"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 2000
+
+    - label:
+          "Step 5: after a few seconds, TH reads from the DUT the
+          SelectedDrynessLevel attribute"
+      PICS: DRYERCTRL.S.A0001
+      command: "readAttribute"
+      attribute: "SelectedDrynessLevel"
+      response:
+          value: SupportedDrynessLevel
+          constraints:
+              type: enum8
+
+    - label:
+          "Step 6: TH writes an unsupported SelectedDrynessLevel attribute that
+          is not in list of SupportedDrynessLevels to DUT"
+      PICS: DRYERCTRL.S.A0001
+      command: "writeAttribute"
+      attribute: "SelectedDrynessLevel"
+      arguments:
+          value: unsupportedSelectedDrynessLevel
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Step 6: Operate device to set the condition to read only"
+      verification: |
+          Manual operation required
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && DRYERCTRL.S.M.ManuallyControlled
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 7: TH writes a supported SelectedDrynessLevel attribute to DUT
+          while DUT is not in a valid state."
+      PICS: DRYERCTRL.S.M.ManuallyControlled && DRYERCTRL.S.A0001
+      command: "writeAttribute"
+      attribute: "SelectedDrynessLevel"
+      arguments:
+          value: SupportedDrynessLevel
+      response:
+          error: INVALID_IN_STATE

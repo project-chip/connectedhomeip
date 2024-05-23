@@ -1,0 +1,155 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("${build_root}/toolchain/flashable_executable.gni")
+import("${chip_root}/src/platform/device.gni")
+import("qpg_sdk.gni")
+
+# Run the generator script that takes a .HEX file and adds the OTA header to it.
+#
+# This requires a Python script, given by ota_header_generator,
+# to construct the resulting image containing the OTA header,
+# do any optional adjustments (like image compression) and produce
+# the end result, given by ota_header_script_name.
+#
+# As used by qpg_executable(), the generator script requires three arguments,
+#   chip_root       - The path to the root tree of Matter
+#   in_hex          - The HEX file to be patched with OTA header
+#   out_ota         - The out file, containing the OTA header in front
+#                     of the original HEX binary data
+template("gen_ota_header") {
+  forward_variables_from(invoker,
+                         [
+                           "ota_header_generator",
+                           "ota_header_script_name",
+                           "ota_header_options",
+                           "deps",
+                           "data_deps",
+                         ])
+
+  action(target_name) {
+    outputs = [ ota_header_script_name ]
+
+    args = ota_header_options
+    script = ota_header_generator
+  }
+}
+
+template("qpg_executable") {
+  output_base_name = get_path_info(invoker.output_name, "name")
+
+  qpg_target_name = target_name
+  executable_target_name = "${target_name}.out"
+
+  # The executable is the final target.
+  if (chip_enable_ota_requestor) {
+    final_target = "$executable_target_name.ota"
+  } else {
+    final_target = executable_target_name
+  }
+
+  objcopy_image_name = invoker.output_name + ".hex"
+  objcopy_image_format = "ihex"
+  objcopy = "arm-none-eabi-objcopy"
+
+  defines = []
+  if (defined(invoker.defines)) {
+    defines += invoker.defines
+  }
+
+  # Copy flashing dependencies to the output directory so that the output
+  # is collectively self-contained; this allows flashing to work reliably
+  # even if the build and flashing steps take place on different machines
+  # or in different containers.
+
+  flashing_runtime_target = target_name + ".flashing_runtime"
+  flashing_script_inputs = [
+    "${chip_root}/scripts/flashing/firmware_utils.py",
+    "${chip_root}/scripts/flashing/qpg_firmware_utils.py",
+  ]
+
+  copy(flashing_runtime_target) {
+    sources = flashing_script_inputs
+    outputs = [ "${root_out_dir}/{{source_file_part}}" ]
+  }
+
+  flashing_script_generator =
+      "${chip_root}/scripts/flashing/gen_flashing_script.py"
+  flashing_script_name = output_base_name + ".flash.py"
+  flashing_options = [ "qpg" ]
+
+  flashable_executable(executable_target_name) {
+    forward_variables_from(invoker, "*")
+    data_deps = [ ":${flashing_runtime_target}" ]
+  }
+
+  # If OTA requestor is enabled, generate OTA image from HEX
+  if (chip_enable_ota_requestor) {
+    gen_ota_header("$executable_target_name.ota") {
+      ota_header_script_name = "${root_out_dir}/${executable_target_name}.ota"
+      out_dir = rebase_path(root_out_dir, root_build_dir)
+      ota_header_generator = "${qpg_sdk_root}/Tools/Ota/generate_ota_img.py"
+
+      ota_header_options = [
+        string_join("=",
+                    [
+                      "--chip_root",
+                      rebase_path(chip_root, root_build_dir),
+                    ]),
+        string_join("=",
+                    [
+                      "--in_file",
+                      "${out_dir}/${invoker.output_name}.hex",
+                    ]),
+        string_join("=",
+                    [
+                      "--out_file",
+                      "${out_dir}/${invoker.output_name}.ota",
+                    ]),
+        string_join("=",
+                    [
+                      "--pem_file_path",
+                      rebase_path(qpg_sdk_root, root_build_dir) +
+                          "/Tools/Ota/example_private_key.pem.example",
+                    ]),
+        "--pem_password=test1234",
+        "--sign",
+      ]
+
+      # Use build-time overrules in OTA header creation
+      # Normally taken from CHIPProjectConfig.h by scripting
+      if (matter_device_vid != "") {
+        ota_header_options += [ "-vid=${matter_device_vid}" ]
+      }
+      if (matter_device_pid != "") {
+        ota_header_options += [ "-pid=${matter_device_pid}" ]
+      }
+      if (matter_ota_test_image) {
+        ota_header_options += [ "-tui" ]
+      }
+      deps = [ ":$executable_target_name" ]
+    }
+  }
+
+  group(qpg_target_name) {
+    data_deps = [ ":$final_target" ]
+
+    if (defined(invoker.data_deps)) {
+      data_deps += invoker.data_deps
+    }
+  }
+}

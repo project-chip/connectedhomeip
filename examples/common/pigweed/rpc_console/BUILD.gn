@@ -1,0 +1,45 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
+import("$dir_pw_build/python_dist.gni")
+
+group("default") {
+  deps = [
+    ":chip_rpc_distribution.wheel",
+    ":pip_install_editable_chip_rpc",
+    "py:chip_rpc._build_wheel",
+    "py:chip_rpc_wheel",
+  ]
+}
+
+# This target creates a single Python package and wheel for chip-rpc. It will
+# merge all Python dependencies from Pigweed and Matter. The output is located
+# in:
+#   out/obj/chip_rpc_distribution/  <- source files here
+#   out/obj/chip_rpc_distribution._build_wheel/chip_rpc-0.0.1-py3-none-any.whl
+pw_python_distribution("chip_rpc_distribution") {
+  packages = [ "py:chip_rpc" ]
+  generate_setup_cfg = {
+    name = "chip_rpc"
+    version = "0.0.1"
+    include_default_pyproject_file = true
+    append_date_to_version = true
+  }
+}
+
+pw_internal_pip_install("pip_install_editable_chip_rpc") {
+  packages = [ "py:chip_rpc" ]
+  editable = true
+}

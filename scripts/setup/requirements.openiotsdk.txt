@@ -1,0 +1,2 @@
+pytest-json-report>=1.5.0
+imgtool>=1.6.0

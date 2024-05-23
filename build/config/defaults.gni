@@ -1,0 +1,126 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+
+import("${build_root}/config/compiler/compiler.gni")
+import("${build_root}/config/custom_toolchain.gni")
+
+declare_args() {
+  # Default configs for abi.
+  default_configs_abi = [ "${build_root}/config/compiler:abi_default" ]
+
+  # Default configs for debugging.
+  default_configs_debug = [ "${build_root}/config/compiler:debug_default" ]
+
+  # Default configs for specs.
+  default_configs_specs = [ "${build_root}/config/compiler:specs_default" ]
+
+  # Default configs for optimization.
+  default_configs_optimize =
+      [ "${build_root}/config/compiler:optimize_default" ]
+
+  # Default configs for language.
+  default_configs_std = [ "${build_root}/config/compiler:std_default" ]
+
+  # Defaults configs for symbols.
+  default_configs_symbols = [ "${build_root}/config/compiler:symbols_default" ]
+
+  # Defaults configs for aliasing.
+  default_configs_aliasing =
+      [ "${build_root}/config/compiler:aliasing_default" ]
+
+  # Defaults configs for size.
+  default_configs_size = [ "${build_root}/config/compiler:size_default" ]
+
+  # Defaults configs for exceptions.
+  default_configs_exceptions =
+      [ "${build_root}/config/compiler:exceptions_default" ]
+
+  # Default configs for unwind tables.
+  default_configs_unwind_tables =
+      [ "${build_root}/config/compiler:unwind_tables_default" ]
+
+  # Defaults configs for rtti.
+  default_configs_rtti = [ "${build_root}/config/compiler:rtti_default" ]
+
+  # Defaults configs for pic.
+  default_configs_pic = [ "${build_root}/config/compiler:pic_default" ]
+
+  # Defaults configs for pie.
+  default_configs_pie = [ "${build_root}/config/compiler:pie_default" ]
+
+  # Defaults configs for warnings.
+  default_configs_warnings =
+      [ "${build_root}/config/compiler:warnings_default" ]
+
+  # Defaults cosmetic configs.
+  default_configs_cosmetic =
+      [ "${build_root}/config/compiler:cosmetic_default" ]
+
+  # Default configs for runtime library.
+  default_configs_runtime = [ "${build_root}/config/compiler:runtime_default" ]
+
+  # Defaults sanitizer configs.
+  default_configs_sanitize =
+      [ "${build_root}/config/compiler:sanitize_default" ]
+
+  # Defaults fuzzing configs.
+  default_configs_fuzzing = [ "${build_root}/config/compiler:fuzzing_default" ]
+
+  # Defaults coverage configs.
+  default_configs_coverage =
+      [ "${build_root}/config/compiler:coverage_default" ]
+
+  # Defaults target-specific configs.
+  default_configs_target = [ "${build_root}/config/compiler:target_default" ]
+
+  # Default configs for dead code elimination.
+  default_configs_dead_code =
+      [ "${build_root}/config/compiler:dead_code_elimination_default" ]
+
+  # Default configs for prefix mappings.
+  default_configs_prefix_mappings =
+      [ "${build_root}/config/compiler:prefix_mappings_default" ]
+
+  # Extra default configs.
+  default_configs_extra = []
+}
+
+default_configs = []
+default_configs += default_configs_abi
+default_configs += default_configs_debug
+default_configs += default_configs_optimize
+default_configs += default_configs_std
+default_configs += default_configs_symbols
+default_configs += default_configs_size
+default_configs += default_configs_specs
+default_configs += default_configs_exceptions
+default_configs += default_configs_unwind_tables
+default_configs += default_configs_pic
+default_configs += default_configs_rtti
+default_configs += default_configs_warnings
+default_configs += default_configs_cosmetic
+default_configs += default_configs_runtime
+default_configs += default_configs_aliasing
+default_configs += default_configs_sanitize
+default_configs += default_configs_fuzzing
+default_configs += default_configs_coverage
+default_configs += default_configs_target
+default_configs += default_configs_dead_code
+default_configs += default_configs_prefix_mappings
+default_configs += default_configs_extra
+
+executable_default_configs = []
+executable_default_configs += default_configs_pie

@@ -1,0 +1,329 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/freertos.gni")
+import("//build_overrides/qpg_sdk.gni")
+import("${freertos_root}/freertos.gni")
+import("${qpg_sdk_build_root}/qpg_sdk.gni")
+
+declare_args() {
+  # Build target to use for QPG SDK. Use this to set global SDK defines.
+  qpg_sdk_target = ""
+}
+
+assert(qpg_sdk_target != "", "qpg_sdk_target must be specified")
+
+group("qpg_sdk") {
+  public_deps = [
+    ":freertos",
+    qpg_sdk_target,
+  ]
+  public_configs = [ ":qpg_include_paths_config" ]
+}
+
+config("qpg_include_paths_config") {
+  include_dirs = [
+    "${qpg_sdk_root}/Components/Qorvo/BaseUtils/gpNvm/inc",
+    "${qpg_sdk_root}/Components/Qorvo/HAL_PLATFORM/inc",
+    "${qpg_sdk_root}/Components/Qorvo/OS/gpLog/inc",
+    "${qpg_sdk_root}/Components/Qorvo/OS/gpReset/inc",
+    "${qpg_sdk_root}/Components/Qorvo/OS/gpSched/inc",
+    "${qpg_sdk_root}/Components/Qorvo/OS/gpAssert/inc",
+    "${qpg_sdk_root}/Components/Qorvo/HAL_PLATFORM/inc/compiler/ARMGCCEMB",
+    "${qpg_sdk_root}/Components/Qorvo/Matter/qvCHIP/inc",
+  ]
+}
+
+config("qpg_freertos_config") {
+  include_dirs = [
+    "${qpg_sdk_root}/Applications/Matter/shared/config/inc",
+    "${qpg_sdk_root}/Components/ThirdParty/Lwip",
+    "${freertos_root}/repo/portable/GCC/ARM_CM3",
+  ]
+}
+
+freertos_target("freertos") {
+  sources = [
+    "${freertos_root}/repo/portable/GCC/ARM_CM3/port.c",
+    "${freertos_root}/repo/portable/MemMang/heap_3.c",
+  ]
+
+  public_configs = [ ":qpg_freertos_config" ]
+}
+
+template("qpg_make_build") {
+  forward_variables_from(invoker,
+                         [
+                           "make_sources",
+                           "make_args",
+                           "make_output",
+                         ])
+  action(target_name) {
+    script = "make.py"
+    sources = make_sources
+    outputs = make_output
+    args = [
+      "-s",
+
+      #use PATH variable lookup for compiler
+      "TOOLCHAIN=",
+    ]
+    args += make_args
+  }
+}
+
+qpg_make_build("qpg_mbedtls_alt") {
+  make_sources = [ "${qpg_sdk_root}/Components/ThirdParty/Silex" ]
+  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/mbedtls_alt_${qpg_target_ic}/libmbedtls_alt_${qpg_target_ic}.a" ]
+  make_args = [
+    "-f",
+    rebase_path(qpg_sdk_root, root_build_dir) +
+        "/Libraries/Qorvo/mbedtls_alt/Makefile.mbedtls_alt_${qpg_target_ic}",
+    "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
+        "/${qpg_sdk_lib_dir}/mbedtls_alt_${qpg_target_ic}",
+  ]
+}
+
+static_library("qpg_mbedtls_alt_lib") {
+  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_mbedtls_alt" ]
+  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/mbedtls_alt_${qpg_target_ic}/libmbedtls_alt_${qpg_target_ic}.a" ]
+}
+
+qpg_make_build("qpg_stack") {
+  make_sources = [ "${qpg_sdk_root}/Components/Qorvo" ]
+  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/QorvoStack/libQorvoStack_${qpg_target_ic}${qpg_flavour}.a" ]
+  make_args = [
+    "-f",
+    rebase_path(qpg_sdk_root, root_build_dir) + "/Libraries/Qorvo/QorvoStack/Makefile.QorvoStack_${qpg_target_ic}${qpg_flavour}",
+    "FREERTOS_REPO_DIR=" + rebase_path(chip_root, root_build_dir) +
+        "/third_party/freertos/repo",
+    "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
+        "/${qpg_sdk_lib_dir}/QorvoStack",
+  ]
+}
+
+static_library("qpg_stack_lib") {
+  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_stack" ]
+  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/QorvoStack/libQorvoStack_${qpg_target_ic}${qpg_flavour}.a" ]
+}
+
+qpg_make_build("qpg_glue") {
+  make_sources = [ "${qpg_sdk_root}/Components/Qorvo/Matter" ]
+  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/MatterQorvoGlue/libMatterQorvoGlue_${qpg_target_ic}${qpg_flavour}_libbuild.a" ]
+  make_args = [
+    "-f",
+    rebase_path(qpg_sdk_root, root_build_dir) + "/Libraries/Qorvo/MatterQorvoGlue/Makefile.MatterQorvoGlue_${qpg_target_ic}${qpg_flavour}_libbuild",
+    "FREERTOS_REPO_DIR=" + rebase_path(chip_root, root_build_dir) +
+        "/third_party/freertos/repo",
+    "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
+        "/${qpg_sdk_lib_dir}/MatterQorvoGlue",
+  ]
+}
+static_library("qpg_glue_lib") {
+  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_glue" ]
+  if (qpg_target_ic == "qpg6105") {
+    libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/MatterQorvoGlue/libMatterQorvoGlue_${qpg_target_ic}${qpg_flavour}_libbuild.a" ]
+  } else {
+    assert(false, "QPG target not specified")
+  }
+}
+
+# openthread toevoegen
+# bootloader build
+#
+qpg_make_build("qpg_bootloader") {
+  make_sources = [ "${qpg_sdk_root}/Libraries/Qorvo/Bootloader" ]
+  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/BootloaderSections_${qpg_target_ic}_compr_secure/libBootloaderSections_${qpg_target_ic}_compr_secure.a" ]
+  make_args = [
+    "-f",
+    rebase_path(qpg_sdk_root, root_build_dir) + "/Libraries/Qorvo/Bootloader/Makefile.BootloaderSections_${qpg_target_ic}_compr_secure",
+    "FREERTOS_REPO_DIR=" + rebase_path(chip_root, root_build_dir) +
+        "/third_party/freertos/repo",
+    "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
+        "/${qpg_sdk_lib_dir}/BootloaderSections_${qpg_target_ic}_compr_secure",
+    "UMB_WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
+        "/${qpg_sdk_lib_dir}/Bootloader_QPG6105DK_B01_nrt_flash_compr_secure",
+  ]
+}
+config("qpg_retain_bootloader") {
+  ldflags = [
+    "-Wl,-u_binary_bl_userlicense_bin_start",
+    "-Wl,-u_binary_bootloader_bin_start",
+    "-Wl,--no-warn-rwx-segment",
+  ]
+}
+
+static_library("qpg_bootloader_lib") {
+  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_bootloader" ]
+  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/BootloaderSections_${qpg_target_ic}_compr_secure/libBootloaderSections_${qpg_target_ic}_compr_secure.a" ]
+  public_configs = [ ":qpg_retain_bootloader" ]
+}
+
+qpg_make_build("qpg_openthread_glue") {
+  make_sources = [ "${qpg_sdk_root}/Components/Qorvo/Matter" ]
+  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/OpenThreadQorvoGlue_${qpg_target_ic}_ftd/libOpenThreadQorvoGlue_${qpg_target_ic}_ftd.a" ]
+  make_args = [
+    "-f",
+    rebase_path(qpg_sdk_root, root_build_dir) + "/Libraries/Qorvo/OpenThreadQorvoGlue/Makefile.OpenThreadQorvoGlue_${qpg_target_ic}_ftd",
+    "FREERTOS_REPO_DIR=" + rebase_path(chip_root, root_build_dir) +
+        "/third_party/freertos/repo",
+    "OPENTHREAD_REPO_DIR =" + rebase_path(chip_root, root_build_dir) +
+        "/third_party/openthread/repo",
+    "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
+        "/${qpg_sdk_lib_dir}/OpenThreadQorvoGlue_${qpg_target_ic}_ftd",
+  ]
+}
+static_library("qpg_openthread_glue_lib") {
+  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_openthread_glue" ]
+  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/OpenThreadQorvoGlue_${qpg_target_ic}_ftd/libOpenThreadQorvoGlue_${qpg_target_ic}_ftd.a" ]
+}
+
+qpg_make_build("qpg_light_factorydata") {
+  make_sources = [ "${qpg_sdk_root}/Tools/FactoryData" ]
+  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FactoryData_light_static_pake/libFactoryData_light_static_pake.a" ]
+  make_args = [
+    "-f",
+    rebase_path(qpg_sdk_root, root_build_dir) +
+        "/Libraries/Qorvo/FactoryData/Makefile.FactoryData_light_static_pake",
+    "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
+        "/${qpg_sdk_lib_dir}/FactoryData_light_static_pake",
+  ]
+}
+static_library("qpg_light_factorydata_lib") {
+  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_light_factorydata" ]
+  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FactoryData_light_static_pake/libFactoryData_light_static_pake.a" ]
+  public_configs = [ ":qpg_retain_factorydata" ]
+}
+
+qpg_make_build("qpg_lock_factorydata") {
+  make_sources = [ "${qpg_sdk_root}/Tools/FactoryData" ]
+  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FactoryData_lock_static_pake/libFactoryData_lock_static_pake.a" ]
+  make_args = [
+    "-f",
+    rebase_path(qpg_sdk_root, root_build_dir) +
+        "/Libraries/Qorvo/FactoryData/Makefile.FactoryData_lock_static_pake",
+    "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
+        "/${qpg_sdk_lib_dir}/FactoryData_lock_static_pake",
+  ]
+}
+static_library("qpg_lock_factorydata_lib") {
+  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_lock_factorydata" ]
+  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FactoryData_lock_static_pake/libFactoryData_lock_static_pake.a" ]
+  public_configs = [ ":qpg_retain_factorydata" ]
+}
+
+qpg_make_build("qpg_switch_factorydata") {
+  make_sources = [ "${qpg_sdk_root}/Tools/FactoryData" ]
+  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FactoryData_switch_static_pake/libFactoryData_switch_static_pake.a" ]
+  make_args = [
+    "-f",
+    rebase_path(qpg_sdk_root, root_build_dir) +
+        "/Libraries/Qorvo/FactoryData/Makefile.FactoryData_switch_static_pake",
+    "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
+        "/${qpg_sdk_lib_dir}/FactoryData_switch_static_pake",
+  ]
+}
+
+static_library("qpg_switch_factorydata_lib") {
+  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_switch_factorydata" ]
+  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FactoryData_switch_static_pake/libFactoryData_switch_static_pake.a" ]
+  public_configs = [ ":qpg_retain_factorydata" ]
+}
+
+qpg_make_build("qpg_thermostat_factorydata") {
+  make_sources = [ "${qpg_sdk_root}/Tools/FactoryData" ]
+  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FactoryData_thermostaticRadiatorValve_static_pake/libFactoryData_thermostaticRadiatorValve_static_pake.a" ]
+  make_args = [
+    "-f",
+    rebase_path(qpg_sdk_root, root_build_dir) + "/Libraries/Qorvo/FactoryData/Makefile.FactoryData_thermostaticRadiatorValve_static_pake",
+    "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
+        "/${qpg_sdk_lib_dir}/FactoryData_thermostaticRadiatorValve_static_pake",
+  ]
+}
+
+static_library("qpg_thermostat_factorydata_lib") {
+  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_thermostat_factorydata" ]
+  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FactoryData_thermostaticRadiatorValve_static_pake/libFactoryData_thermostaticRadiatorValve_static_pake.a" ]
+  public_configs = [ ":qpg_retain_factorydata" ]
+}
+
+config("qpg_retain_factorydata") {
+  ldflags = [
+    "-Wl,-u_binary_factory_data_bin_start",
+    "-Wl,-u_binary_factory_data_start",
+  ]
+}
+
+qpg_make_build("qpg_light_firmwaredata") {
+  make_sources = [ "${qpg_sdk_root}/Tools/FactoryData" ]
+  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FirmwareData_light/libFirmwareData_light.a" ]
+  make_args = [
+    "-f",
+    rebase_path(qpg_sdk_root, root_build_dir) +
+        "/Libraries/Qorvo/FactoryData/Makefile.FirmwareData_light",
+    "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
+        "/${qpg_sdk_lib_dir}/FirmwareData_light",
+  ]
+}
+static_library("qpg_light_firmwaredata_lib") {
+  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_light_firmwaredata" ]
+  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FirmwareData_light/libFirmwareData_light.a" ]
+}
+
+qpg_make_build("qpg_lock_firmwaredata") {
+  make_sources = [ "${qpg_sdk_root}/Tools/FactoryData" ]
+  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FirmwareData_lock/libFirmwareData_lock.a" ]
+  make_args = [
+    "-f",
+    rebase_path(qpg_sdk_root, root_build_dir) +
+        "/Libraries/Qorvo/FactoryData/Makefile.FirmwareData_lock",
+    "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
+        "/${qpg_sdk_lib_dir}/FirmwareData_lock",
+  ]
+}
+static_library("qpg_lock_firmwaredata_lib") {
+  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_lock_firmwaredata" ]
+  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FirmwareData_lock/libFirmwareData_lock.a" ]
+}
+
+qpg_make_build("qpg_switch_firmwaredata") {
+  make_sources = [ "${qpg_sdk_root}/Tools/FactoryData" ]
+  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FirmwareData_switch/libFirmwareData_switch.a" ]
+  make_args = [
+    "-f",
+    rebase_path(qpg_sdk_root, root_build_dir) +
+        "/Libraries/Qorvo/FactoryData/Makefile.FirmwareData_switch",
+    "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
+        "/${qpg_sdk_lib_dir}/FirmwareData_switch",
+  ]
+}
+static_library("qpg_switch_firmwaredata_lib") {
+  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_switch_firmwaredata" ]
+  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FirmwareData_switch/libFirmwareData_switch.a" ]
+}
+
+qpg_make_build("qpg_thermostat_firmwaredata") {
+  make_sources = [ "${qpg_sdk_root}/Tools/FactoryData" ]
+  make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FirmwareData_thermostaticRadiatorValve/libFirmwareData_thermostaticRadiatorValve.a" ]
+  make_args = [
+    "-f",
+    rebase_path(qpg_sdk_root, root_build_dir) + "/Libraries/Qorvo/FactoryData/Makefile.FirmwareData_thermostaticRadiatorValve",
+    "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
+        "/${qpg_sdk_lib_dir}/FirmwareData_thermostaticRadiatorValve",
+  ]
+}
+static_library("qpg_thermostat_firmwaredata_lib") {
+  deps = [ "${chip_root}/third_party/qpg_sdk:qpg_thermostat_firmwaredata" ]
+  libs = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FirmwareData_thermostaticRadiatorValve/libFirmwareData_thermostaticRadiatorValve.a" ]
+}

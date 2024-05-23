@@ -1,0 +1,120 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 80.5.1. [TC-MOD-3.1] OnMode verification with DUT as Server
+
+PICS:
+    - MOD.S.A0005
+
+config:
+    nodeId: 0x12344321
+    cluster: "Mode Select"
+    endpoint: 1
+    #Configure newmode value
+    NewMode:
+        type: int8u
+        defaultValue: 7
+    WaitTime:
+        type: int16u
+        defaultValue: 5000
+
+tests:
+    - label:
+          "Step 0: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 1: TH reads from the DUT the OnMode attribute."
+      PICS: MOD.S.A0005 && MOD.S.F00
+      command: "readAttribute"
+      attribute: "OnMode"
+      response:
+          saveAs: on_mode_dut
+
+    - label: "Step 2a: TH reads from the DUT the CurrentMode attribute."
+      PICS: MOD.S.A0003 && MOD.S.F00
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          saveAs: old_current_mode_dut
+
+    - label:
+          "Step 2b: If the OnMode and CurrentMode attributes have the same
+          value, proceed to step 2c, Otherwise proceed to step 3a"
+      PICS: MOD.S.A0003 && MOD.S.A0005 && MOD.S.F00
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: on_mode_dut
+              - name: "Value2"
+                value: old_current_mode_dut
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsExpectedValue
+
+    - label: "Step 2c: TH reads the SupportedModes attribute from the DUT"
+      runIf: IsExpectedValue
+      PICS: MOD.S.A0005 && MOD.S.F00
+      command: "readAttribute"
+      attribute: "SupportedModes"
+      response:
+          constraints:
+              type: list
+
+    - label:
+          "Step 2d: Select a value from the list in step 2c with a different
+          value than the onMode value read in step 1. TH sends a ChangeToMode
+          command to the TH with the selected value."
+      runIf: IsExpectedValue
+      PICS: MOD.S.A0002 && MOD.S.C00.Rsp && MOD.S.F00
+      command: "ChangeToMode"
+      arguments:
+          values:
+              - name: "NewMode"
+                value: NewMode
+
+    - label: "Step 3a: TH sends an Off command to the DUT"
+      PICS: OO.S.C00.Rsp && MOD.S.F00
+      cluster: "On/Off"
+      command: "Off"
+
+    - label: "Step 3b: TH sends an On command to the DUT"
+      PICS: OO.S.C01.Rsp && MOD.S.F00
+      cluster: "On/Off"
+      command: "On"
+
+    - label: "Wait to turn on/Off light"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: WaitTime
+
+    - label: "Step 3c: TH reads the CurrentMode attribute from the DUT"
+      PICS: MOD.S.A0003 && MOD.S.F00
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          constraints:
+              anyOf: [old_current_mode_dut, NewMode]

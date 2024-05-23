@@ -1,0 +1,96 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/nlunit_test.gni")
+import("//build_overrides/pigweed.gni")
+
+import("${chip_root}/build/chip/chip_test_suite.gni")
+import("${chip_root}/build/chip/tests.gni")
+import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/system/system.gni")
+
+config("tests_config") {
+  include_dirs = [ "." ]
+}
+
+static_library("helpers") {
+  output_name = "libInetTestHelpers"
+  output_dir = "${root_out_dir}/lib"
+
+  sources = [
+    "TestInetCommon.h",
+    "TestInetCommonOptions.cpp",
+    "TestInetCommonOptions.h",
+    "TestInetCommonPosix.cpp",
+    "TestInetLayerCommon.cpp",
+    "TestInetLayerCommon.hpp",
+    "TestSetupSignalling.h",
+    "TestSetupSignallingPosix.cpp",
+  ]
+
+  if (current_os != "mbed") {
+    sources += [ "TestInetLayer.cpp" ]
+  }
+
+  if (chip_with_nlfaultinjection) {
+    sources += [
+      "TestSetupFaultInjection.h",
+      "TestSetupFaultInjectionPosix.cpp",
+    ]
+  }
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    "${chip_root}/src/inet",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/platform",
+    "${nlunit_test_root}:nlunit-test",
+  ]
+}
+
+chip_test_suite("tests") {
+  output_name = "libInetLayerTests"
+
+  public_configs = [ ":tests_config" ]
+
+  public_deps = [
+    ":helpers",
+    "${chip_root}/src/inet",
+    "${chip_root}/src/lib/core",
+  ]
+  test_sources = [
+    "TestBasicPacketFilters.cpp",
+    "TestInetAddress.cpp",
+    "TestInetErrorStr.cpp",
+  ]
+  sources = []
+
+  if (chip_system_config_use_sockets && current_os != "zephyr") {
+    test_sources += [ "TestInetEndPoint.cpp" ]
+  }
+
+  # This fails on Raspberry Pi (Linux arm64), so only enable on Linux
+  # x64.
+  if (current_os != "mac" && current_os != "zephyr" &&
+      chip_device_platform != "esp32" && current_cpu == "x64" &&
+      chip_device_platform != "ameba") {
+    # TODO: This test does not seem executed
+    sources += [ "TestLwIPDNS.cpp" ]
+  }
+
+  cflags = [ "-Wconversion" ]
+}

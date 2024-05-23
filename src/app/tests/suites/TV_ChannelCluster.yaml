@@ -1,0 +1,718 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Channel Cluster Tests
+
+config:
+    nodeId: 0x12344321
+    cluster: "Channel"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Read attribute Channel list"
+      command: "readAttribute"
+      attribute: "ChannelList"
+      response:
+          value:
+              [
+                  {
+                      MajorNumber: 6,
+                      MinorNumber: 0,
+                      Name: "ABC",
+                      CallSign: "KAAL-TV",
+                      AffiliateCallSign: "KAAL",
+                  },
+                  {
+                      MajorNumber: 9,
+                      MinorNumber: 1,
+                      Name: "PBS",
+                      CallSign: "KCTS-TV",
+                      AffiliateCallSign: "KCTS",
+                  },
+                  {
+                      MajorNumber: 9,
+                      MinorNumber: 2,
+                      Name: "PBS Kids",
+                      CallSign: "KCTS-TV",
+                      AffiliateCallSign: "KCTS",
+                  },
+                  {
+                      MajorNumber: 9,
+                      MinorNumber: 3,
+                      Name: "World Channel",
+                      CallSign: "KCTS-TV",
+                      AffiliateCallSign: "KCTS",
+                  },
+              ]
+
+    - label: "Read attribute channel lineup"
+      command: "readAttribute"
+      attribute: "Lineup"
+      response:
+          value:
+              {
+                  OperatorName: "Comcast",
+                  LineupName: "Comcast King County",
+                  PostalCode: "98052",
+                  LineupInfoType: 0,
+              }
+
+    - label: "Read attribute current channel"
+      command: "readAttribute"
+      attribute: "CurrentChannel"
+      response:
+          value:
+              {
+                  MajorNumber: 6,
+                  MinorNumber: 0,
+                  Name: "ABC",
+                  CallSign: "KAAL-TV",
+                  AffiliateCallSign: "KAAL",
+              }
+
+    - label: "Change Channel Command"
+      command: "ChangeChannel"
+      arguments:
+          values:
+              - name: "Match"
+                value: "PBS"
+      response:
+          values:
+              - name: "Data"
+                value: "data response"
+              - name: "Status"
+                value: 0
+
+    - label: "Change Channel By Number Command"
+      command: "ChangeChannelByNumber"
+      arguments:
+          values:
+              - name: "MajorNumber"
+                value: 6
+              - name: "MinorNumber"
+                value: 0
+
+    - label: "Skip Channel Command"
+      command: "SkipChannel"
+      arguments:
+          values:
+              - name: "Count"
+                value: 2
+
+    - label: "Verify that Skip Channel Command set correct current channel"
+      command: "readAttribute"
+      attribute: "CurrentChannel"
+      response:
+          value:
+              {
+                  MajorNumber: 9,
+                  MinorNumber: 2,
+                  Name: "PBS Kids",
+                  CallSign: "KCTS-TV",
+                  AffiliateCallSign: "KCTS",
+              }
+
+    - label: "Skip Channel Command"
+      command: "SkipChannel"
+      arguments:
+          values:
+              - name: "Count"
+                value: 123
+
+    - label: "Verify that Skip Channel Command set correct current channel"
+      command: "readAttribute"
+      attribute: "CurrentChannel"
+      response:
+          value:
+              {
+                  MajorNumber: 9,
+                  MinorNumber: 1,
+                  Name: "PBS",
+                  CallSign: "KCTS-TV",
+                  AffiliateCallSign: "KCTS",
+              }
+
+    #############################
+    # Test Skip Channel Up 1..8 #
+    #############################
+
+    - label: "Test 1.1 - Start from Channel 3"
+      command: "ChangeChannelByNumber"
+      arguments:
+          values:
+              - name: "MajorNumber"
+                value: 9
+              - name: "MinorNumber"
+                value: 2
+
+    - label: "Test 1.2 - Skip Up By 1"
+      command: "SkipChannel"
+      arguments:
+          values:
+              - name: "Count"
+                value: 1
+
+    - label:
+          "Test 1.3 - Verify that Skip Channel Command set correct current
+          channel"
+      command: "readAttribute"
+      attribute: "CurrentChannel"
+      response:
+          value:
+              {
+                  MajorNumber: 9,
+                  MinorNumber: 3,
+                  Name: "World Channel",
+                  CallSign: "KCTS-TV",
+                  AffiliateCallSign: "KCTS",
+              }
+
+    # Test Skip Channel Up 2 #
+
+    - label: "Test 2.1 - Start from Channel 3"
+      command: "ChangeChannelByNumber"
+      arguments:
+          values:
+              - name: "MajorNumber"
+                value: 9
+              - name: "MinorNumber"
+                value: 2
+
+    - label: "Test 2.2 - Skip Up By 2"
+      command: "SkipChannel"
+      arguments:
+          values:
+              - name: "Count"
+                value: 2
+
+    - label:
+          "Test 2.3 - Verify that Skip Channel Command set correct current
+          channel"
+      command: "readAttribute"
+      attribute: "CurrentChannel"
+      response:
+          value:
+              {
+                  MajorNumber: 6,
+                  MinorNumber: 0,
+                  Name: "ABC",
+                  CallSign: "KAAL-TV",
+                  AffiliateCallSign: "KAAL",
+              }
+
+    # Test Skip Channel Up 3 #
+
+    - label: "Test 3.1 - Start from Channel 3"
+      command: "ChangeChannelByNumber"
+      arguments:
+          values:
+              - name: "MajorNumber"
+                value: 9
+              - name: "MinorNumber"
+                value: 2
+
+    - label: "Test 3.2 - Skip Up By 3"
+      command: "SkipChannel"
+      arguments:
+          values:
+              - name: "Count"
+                value: 3
+
+    - label:
+          "Test 3.3 - Verify that Skip Channel Command set correct current
+          channel"
+      command: "readAttribute"
+      attribute: "CurrentChannel"
+      response:
+          value:
+              {
+                  MajorNumber: 9,
+                  MinorNumber: 1,
+                  Name: "PBS",
+                  CallSign: "KCTS-TV",
+                  AffiliateCallSign: "KCTS",
+              }
+
+    # Test Skip Channel Up 4 #
+
+    - label: "Test 4.1 - Start from Channel 3"
+      command: "ChangeChannelByNumber"
+      arguments:
+          values:
+              - name: "MajorNumber"
+                value: 9
+              - name: "MinorNumber"
+                value: 2
+
+    - label: "Test 4.2 - Skip Up By 4"
+      command: "SkipChannel"
+      arguments:
+          values:
+              - name: "Count"
+                value: 4
+
+    - label:
+          "Test 4.3 - Verify that Skip Channel Command set correct current
+          channel"
+      command: "readAttribute"
+      attribute: "CurrentChannel"
+      response:
+          value:
+              {
+                  MajorNumber: 9,
+                  MinorNumber: 2,
+                  Name: "PBS Kids",
+                  CallSign: "KCTS-TV",
+                  AffiliateCallSign: "KCTS",
+              }
+
+    # Test Skip Channel Up 5 #
+
+    - label: "Test 5.2 - Skip Up By 5"
+      command: "SkipChannel"
+      arguments:
+          values:
+              - name: "Count"
+                value: 5
+
+    - label:
+          "Test 5.3 - Verify that Skip Channel Command set correct current
+          channel"
+      command: "readAttribute"
+      attribute: "CurrentChannel"
+      response:
+          value:
+              {
+                  MajorNumber: 9,
+                  MinorNumber: 3,
+                  Name: "World Channel",
+                  CallSign: "KCTS-TV",
+                  AffiliateCallSign: "KCTS",
+              }
+
+    # Test Skip Channel Up 6 #
+
+    - label: "Test 6.1 - Start from Channel 3"
+      command: "ChangeChannelByNumber"
+      arguments:
+          values:
+              - name: "MajorNumber"
+                value: 9
+              - name: "MinorNumber"
+                value: 2
+
+    - label: "Test 6.2 - Skip Up By 6"
+      command: "SkipChannel"
+      arguments:
+          values:
+              - name: "Count"
+                value: 6
+
+    - label:
+          "Test 6.3 - Verify that Skip Channel Command set correct current
+          channel"
+      command: "readAttribute"
+      attribute: "CurrentChannel"
+      response:
+          value:
+              {
+                  MajorNumber: 6,
+                  MinorNumber: 0,
+                  Name: "ABC",
+                  CallSign: "KAAL-TV",
+                  AffiliateCallSign: "KAAL",
+              }
+
+    # Test Skip Channel Up 7 #
+
+    - label: "Test 7.1 - Start from Channel 3"
+      command: "ChangeChannelByNumber"
+      arguments:
+          values:
+              - name: "MajorNumber"
+                value: 9
+              - name: "MinorNumber"
+                value: 2
+
+    - label: "Test 7.2 - Skip Up By 7"
+      command: "SkipChannel"
+      arguments:
+          values:
+              - name: "Count"
+                value: 7
+
+    - label:
+          "Test 7.3 - Verify that Skip Channel Command set correct current
+          channel"
+      command: "readAttribute"
+      attribute: "CurrentChannel"
+      response:
+          value:
+              {
+                  MajorNumber: 9,
+                  MinorNumber: 1,
+                  Name: "PBS",
+                  CallSign: "KCTS-TV",
+                  AffiliateCallSign: "KCTS",
+              }
+
+    # Test Skip Channel Up 8 #
+
+    - label: "Test 8.1 - Start from Channel 3"
+      command: "ChangeChannelByNumber"
+      arguments:
+          values:
+              - name: "MajorNumber"
+                value: 9
+              - name: "MinorNumber"
+                value: 2
+
+    - label: "Test 8.2 - Skip Up By 8"
+      command: "SkipChannel"
+      arguments:
+          values:
+              - name: "Count"
+                value: 8
+
+    - label:
+          "Test 8.3 - Verify that Skip Channel Command set correct current
+          channel"
+      command: "readAttribute"
+      attribute: "CurrentChannel"
+      response:
+          value:
+              {
+                  MajorNumber: 9,
+                  MinorNumber: 2,
+                  Name: "PBS Kids",
+                  CallSign: "KCTS-TV",
+                  AffiliateCallSign: "KCTS",
+              }
+
+    ###############################
+    # Test Skip Channel Down 1..8 #
+    ###############################
+
+    - label: "Test 1.2 - Skip Down By 1"
+      command: "SkipChannel"
+      arguments:
+          values:
+              - name: "Count"
+                value: -1
+
+    - label:
+          "Test 1.3 - Verify that Skip Channel Command set correct current
+          channel"
+      command: "readAttribute"
+      attribute: "CurrentChannel"
+      response:
+          value:
+              {
+                  MajorNumber: 9,
+                  MinorNumber: 1,
+                  Name: "PBS",
+                  CallSign: "KCTS-TV",
+                  AffiliateCallSign: "KCTS",
+              }
+
+    # Test Skip Channel Down 2 #
+
+    - label: "Test 2.1 - Start from Channel 3"
+      command: "ChangeChannelByNumber"
+      arguments:
+          values:
+              - name: "MajorNumber"
+                value: 9
+              - name: "MinorNumber"
+                value: 2
+
+    - label: "Test 2.2 - Skip Down By 2"
+      command: "SkipChannel"
+      arguments:
+          values:
+              - name: "Count"
+                value: -2
+
+    - label:
+          "Test 2.3 - Verify that Skip Channel Command set correct current
+          channel"
+      command: "readAttribute"
+      attribute: "CurrentChannel"
+      response:
+          value:
+              {
+                  MajorNumber: 6,
+                  MinorNumber: 0,
+                  Name: "ABC",
+                  CallSign: "KAAL-TV",
+                  AffiliateCallSign: "KAAL",
+              }
+
+    # Test Skip Channel Down 3 #
+
+    - label: "Test 3.1 - Start from Channel 3"
+      command: "ChangeChannelByNumber"
+      arguments:
+          values:
+              - name: "MajorNumber"
+                value: 9
+              - name: "MinorNumber"
+                value: 2
+
+    - label: "Test 3.2 - Skip Down By 3"
+      command: "SkipChannel"
+      arguments:
+          values:
+              - name: "Count"
+                value: -3
+
+    - label:
+          "Test 3.3 - Verify that Skip Channel Command set correct current
+          channel"
+      command: "readAttribute"
+      attribute: "CurrentChannel"
+      response:
+          value:
+              {
+                  MajorNumber: 9,
+                  MinorNumber: 3,
+                  Name: "World Channel",
+                  CallSign: "KCTS-TV",
+                  AffiliateCallSign: "KCTS",
+              }
+
+    # Test Skip Channel Down 4 #
+
+    - label: "Test 4.1 - Start from Channel 3"
+      command: "ChangeChannelByNumber"
+      arguments:
+          values:
+              - name: "MajorNumber"
+                value: 9
+              - name: "MinorNumber"
+                value: 2
+
+    - label: "Test 4.2 - Skip Down By 4"
+      command: "SkipChannel"
+      arguments:
+          values:
+              - name: "Count"
+                value: -4
+
+    - label:
+          "Test 4.3 - Verify that Skip Channel Command set correct current
+          channel"
+      command: "readAttribute"
+      attribute: "CurrentChannel"
+      response:
+          value:
+              {
+                  MajorNumber: 9,
+                  MinorNumber: 2,
+                  Name: "PBS Kids",
+                  CallSign: "KCTS-TV",
+                  AffiliateCallSign: "KCTS",
+              }
+
+    # Test Skip Channel Down 5 #
+
+    - label: "Test 5.2 - Skip Down By 5"
+      command: "SkipChannel"
+      arguments:
+          values:
+              - name: "Count"
+                value: -5
+
+    - label:
+          "Test 5.3 - Verify that Skip Channel Command set correct current
+          channel"
+      command: "readAttribute"
+      attribute: "CurrentChannel"
+      response:
+          value:
+              {
+                  MajorNumber: 9,
+                  MinorNumber: 1,
+                  Name: "PBS",
+                  CallSign: "KCTS-TV",
+                  AffiliateCallSign: "KCTS",
+              }
+
+    # Test Skip Channel Down 6 #
+
+    - label: "Test 6.1 - Start from Channel 3"
+      command: "ChangeChannelByNumber"
+      arguments:
+          values:
+              - name: "MajorNumber"
+                value: 9
+              - name: "MinorNumber"
+                value: 2
+
+    - label: "Test 6.2 - Skip Down By 6"
+      command: "SkipChannel"
+      arguments:
+          values:
+              - name: "Count"
+                value: -6
+
+    - label:
+          "Test 6.3 - Verify that Skip Channel Command set correct current
+          channel"
+      command: "readAttribute"
+      attribute: "CurrentChannel"
+      response:
+          value:
+              {
+                  MajorNumber: 6,
+                  MinorNumber: 0,
+                  Name: "ABC",
+                  CallSign: "KAAL-TV",
+                  AffiliateCallSign: "KAAL",
+              }
+
+    # Test Skip Channel Down 7 #
+
+    - label: "Test 7.1 - Start from Channel 3"
+      command: "ChangeChannelByNumber"
+      arguments:
+          values:
+              - name: "MajorNumber"
+                value: 9
+              - name: "MinorNumber"
+                value: 2
+
+    - label: "Test 7.2 - Skip Down By 7"
+      command: "SkipChannel"
+      arguments:
+          values:
+              - name: "Count"
+                value: -7
+
+    - label:
+          "Test 7.3 - Verify that Skip Channel Command set correct current
+          channel"
+      command: "readAttribute"
+      attribute: "CurrentChannel"
+      response:
+          value:
+              {
+                  MajorNumber: 9,
+                  MinorNumber: 3,
+                  Name: "World Channel",
+                  CallSign: "KCTS-TV",
+                  AffiliateCallSign: "KCTS",
+              }
+
+    # Test Skip Channel Down 8 #
+
+    - label: "Test 8.1 - Start from Channel 3"
+      command: "ChangeChannelByNumber"
+      arguments:
+          values:
+              - name: "MajorNumber"
+                value: 9
+              - name: "MinorNumber"
+                value: 2
+
+    - label: "Test 8.2 - Skip Down By 8"
+      command: "SkipChannel"
+      arguments:
+          values:
+              - name: "Count"
+                value: -8
+
+    - label:
+          "Test 8.3 - Verify that Skip Channel Command set correct current
+          channel"
+      command: "readAttribute"
+      attribute: "CurrentChannel"
+      response:
+          value:
+              {
+                  MajorNumber: 9,
+                  MinorNumber: 2,
+                  Name: "PBS Kids",
+                  CallSign: "KCTS-TV",
+                  AffiliateCallSign: "KCTS",
+              }
+
+    ###############################
+    # Test Skip Channel Up 32,767 #
+    ###############################
+
+    - label: "Test 1.2 - Skip Up By 32,767"
+      command: "SkipChannel"
+      arguments:
+          values:
+              - name: "Count"
+                value: 32767
+
+    - label:
+          "Test 1.3 - Verify that Skip Channel Command set correct current
+          channel"
+      command: "readAttribute"
+      attribute: "CurrentChannel"
+      response:
+          value:
+              {
+                  MajorNumber: 9,
+                  MinorNumber: 1,
+                  Name: "PBS",
+                  CallSign: "KCTS-TV",
+                  AffiliateCallSign: "KCTS",
+              }
+
+    #################################
+    # Test Skip Channel Down 32,768 #
+    #################################
+
+    - label: "Test 1.1 - Start from Channel 3"
+      command: "ChangeChannelByNumber"
+      arguments:
+          values:
+              - name: "MajorNumber"
+                value: 9
+              - name: "MinorNumber"
+                value: 2
+
+    - label: "Test 1.2 - Skip Down By 32,768"
+      command: "SkipChannel"
+      arguments:
+          values:
+              - name: "Count"
+                value: -32768
+
+    - label:
+          "Test 1.3 - Verify that Skip Channel Command set correct current
+          channel"
+      command: "readAttribute"
+      attribute: "CurrentChannel"
+      response:
+          value:
+              {
+                  MajorNumber: 9,
+                  MinorNumber: 2,
+                  Name: "PBS Kids",
+                  CallSign: "KCTS-TV",
+                  AffiliateCallSign: "KCTS",
+              }

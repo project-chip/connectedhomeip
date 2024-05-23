@@ -1,0 +1,103 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/chip/tools.gni")
+
+static_library("minimal-mdns-example-common") {
+  sources = [
+    "PacketReporter.cpp",
+    "PacketReporter.h",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    "${chip_root}/src/lib",
+    "${chip_root}/src/lib/dnssd/minimal_mdns",
+  ]
+}
+
+executable("minimal-mdns-tester") {
+  sources = [ "tester.cpp" ]
+
+  deps = [
+    ":minimal-mdns-example-common",
+    "${chip_root}/examples/common/tracing:commandline",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/lib/dnssd/minimal_mdns",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  output_dir = root_out_dir
+}
+
+executable("minimal-mdns-client") {
+  sources = [ "client.cpp" ]
+
+  deps = [
+    ":minimal-mdns-example-common",
+    "${chip_root}/examples/common/tracing:commandline",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/lib/dnssd/minimal_mdns",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  output_dir = root_out_dir
+}
+
+executable("minimal-mdns-server") {
+  sources = [ "server.cpp" ]
+
+  deps = [
+    ":minimal-mdns-example-common",
+    "${chip_root}/examples/common/tracing:commandline",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/lib/dnssd/minimal_mdns",
+    "${chip_root}/src/lib/dnssd/minimal_mdns/responders",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  output_dir = root_out_dir
+}
+
+executable("mdns-advertiser") {
+  sources = [ "advertiser.cpp" ]
+
+  deps = [
+    ":minimal-mdns-example-common",
+    "${chip_root}/examples/common/tracing:commandline",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/lib/dnssd",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  output_dir = root_out_dir
+}
+
+group("default") {
+  deps = [
+    ":mdns-advertiser",
+    ":minimal-mdns-client",
+    ":minimal-mdns-example-common",
+    ":minimal-mdns-server",
+    ":minimal-mdns-tester",
+  ]
+}

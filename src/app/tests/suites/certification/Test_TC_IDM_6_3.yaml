@@ -1,0 +1,58 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.6.3. [TC-IDM-6.3] Events Read Interaction from DUT to TH. [{DUT_Client}]
+
+PICS:
+    - MCORE.IDM.C.ReadRequest
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label:
+          "Step 1: DUT sends Read Request Message to the TH for a supported
+          event."
+      verification: |
+          ./chip-tool any  read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
+           On TH(all-clusters-app) verify that the Read Request Message received has these fields
+           EventRequests, EventFilters and FabricFiltered
+          [1686303592.748696][56178:56178] CHIP:EM: >>> [E:32870r S:9444 M:75048559] (S) Msg RX from 1:000000000001B669 [A822] --- Type 0001:02 (IM:ReadRequest)
+          [1686303592.748814][56178:56178] CHIP:EM: Handling via exchange: 32870r, Delegate: 0xaaaabd7c15b0
+          [1686303592.748905][56178:56178] CHIP:IM: Received Read request
+          [1686303592.748998][56178:56178] CHIP:DMG: ReadRequestMessage =
+          [1686303592.749056][56178:56178] CHIP:DMG: {
+          [1686303592.749105][56178:56178] CHIP:DMG:         EventPathIBs =
+          [1686303592.749165][56178:56178] CHIP:DMG:         [
+          [1686303592.749253][56178:56178] CHIP:DMG:                 EventPath =
+          [1686303592.749315][56178:56178] CHIP:DMG:                 {
+          [1686303592.749374][56178:56178] CHIP:DMG:                 },
+          [1686303592.749459][56178:56178] CHIP:DMG:
+          [1686303592.749515][56178:56178] CHIP:DMG:         ],
+          [1686303592.749597][56178:56178] CHIP:DMG:
+          [1686303592.749657][56178:56178] CHIP:DMG:         isFabricFiltered = true,
+          [1686303592.749760][56178:56178] CHIP:DMG:         InteractionModelRevision = 1
+          [1686303592.749842][56178:56178] CHIP:DMG: },
+          [1686303592.750060][56178:56178] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1686303592.750278][56178:56178] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1686303592.750433][56178:56178] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0033 e=0 p=v
+      disabled: true

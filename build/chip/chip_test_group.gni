@@ -1,0 +1,80 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/chip/tests.gni")
+
+assert(chip_build_tests)
+
+template("chip_test_group") {
+  _test_group_name = target_name
+
+  # Generate a .a file with all of the tests in it.
+  _build_monolithic_library = defined(invoker.build_monolithic_library) &&
+                              invoker.build_monolithic_library
+
+  if (_build_monolithic_library) {
+    _target_type = "static_library"
+  } else {
+    _target_type = "group"
+  }
+
+  _lib_target_name = "${_test_group_name}.lib"
+
+  target(_target_type, _lib_target_name) {
+    forward_variables_from(invoker,
+                           "*",
+                           [
+                             "build_monolithic_library",
+                             "deps",
+                             "tests",
+                           ])
+
+    deps = []
+    if (defined(invoker.deps)) {
+      deps = invoker.deps
+    }
+    foreach(_test, invoker.tests) {
+      deps += [ get_label_info(_test, "label_no_toolchain") + ".lib" ]
+    }
+
+    if (_build_monolithic_library && chip_build_test_static_libraries) {
+      complete_static_lib = true
+    }
+  }
+
+  group("${_test_group_name}") {
+    deps = []
+    data_deps = invoker.tests
+
+    if (_build_monolithic_library) {
+      deps += [ ":${_lib_target_name}" ]
+    }
+  }
+
+  if (chip_pw_run_tests) {
+    group("${_test_group_name}_run") {
+      if (chip_link_tests) {
+        deps = []
+        if (defined(invoker.deps)) {
+          deps = invoker.deps
+        }
+        foreach(_test, invoker.tests) {
+          deps += [ get_label_info(_test, "label_no_toolchain") + "_run" ]
+        }
+      }
+    }
+  }
+}

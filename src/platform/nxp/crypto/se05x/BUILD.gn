@@ -1,0 +1,65 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/nlassert.gni")
+import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/src/crypto/crypto.gni")
+import("${chip_root}/src/platform/nxp/crypto/se05x/args.gni")
+
+if (chip_crypto == "platform") {
+  import("//build_overrides/mbedtls.gni")
+}
+
+source_set("public_headers") {
+  sources = [
+    "CHIPCryptoPAL.h",
+    "OperationalKeystore.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/lib/asn1",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${nlassert_root}:nlassert",
+  ]
+}
+
+static_library("nxp_crypto_lib") {
+  sources = [
+    "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHost.cpp",
+    "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_hkdf.cpp",
+    "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_hmac.cpp",
+    "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_p256.cpp",
+    "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_pbkdf.cpp",
+    "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_rng.cpp",
+    "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_utils.cpp",
+    "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPAL_HostFallBack.cpp",
+  ]
+
+  public_deps = [ ":public_headers" ]
+  deps = [ "${chip_root}/${nxp_crypto_mw_root}:se05x" ]
+
+  external_mbedtls = current_os == "zephyr"
+
+  if (!external_mbedtls) {
+    public_deps += [ "${mbedtls_root}:mbedtls" ]
+  }
+
+  include_dirs = [
+    ".",
+    "${chip_root}/src/crypto",
+    "${chip_root}/src/platform/nxp/crypto/se05x",
+  ]
+}

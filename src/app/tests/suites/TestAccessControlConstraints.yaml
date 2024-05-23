@@ -1,0 +1,321 @@
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: User Label Cluster Tests
+
+config:
+    nodeId: 0x12344321
+    cluster: "Access Control"
+    endpoint: 0
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Read the commissioner node ID from the alpha fabric"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: commissionerNodeIdAlpha
+
+    - label: "Constraint error: PASE reserved for future (TC-ACL-2.4 step 29)"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # Administer
+                      AuthMode: 2, # CASE
+                      Subjects: [commissionerNodeIdAlpha],
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 3,
+                      AuthMode: 1, # PASE
+                      Subjects: [],
+                      Targets: null,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Constraint error: Invalid combination administer + group (TC-ACL-2.4
+          step 31)"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # Administer
+                      AuthMode: 2, # CASE
+                      Subjects: [commissionerNodeIdAlpha],
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # Administer
+                      AuthMode: 3, # Group
+                      Subjects: [],
+                      Targets: null,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Constraint error: Invalid provilege value (TC-ACL-2.4 step 32)"
+      # TODO: this test is disabled since the input is accepted. Test case
+      #       says privilege value is invalid, but it is set to OPERATE | PROXY_VIEW
+      #       so it is unclear what the behavior should be here.
+      disabled: true
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # Administer
+                      AuthMode: 2, # CASE
+                      Subjects: [commissionerNodeIdAlpha],
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 6,
+                      AuthMode: 2,
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Constraint error:  Invalid auth mode (TC-ACL-2.4 step 33)"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # Administer
+                      AuthMode: 2, # CASE
+                      Subjects: [commissionerNodeIdAlpha],
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 3,
+                      AuthMode: AccessControlEntryAuthModeEnum.UnknownEnumValue,
+                      Subjects: [],
+                      Targets: null,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Constraint error:  Invalid subject (TC-ACL-2.4 step 34)"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # Administer
+                      AuthMode: 2, # CASE
+                      Subjects: [commissionerNodeIdAlpha],
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 3,
+                      AuthMode: 2,
+                      Subjects: [0],
+                      Targets: null,
+                  }, # invalid subject
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Constraint error:  Invalid target (TC-ACL-2.4 step 38)"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # Administer
+                      AuthMode: 2, # CASE
+                      Subjects: [commissionerNodeIdAlpha],
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 3,
+                      AuthMode: 2,
+                      Subjects: null,
+                      # Targets contains an invalid target
+                      Targets:
+                          [{ Cluster: null, Endpoint: null, DeviceType: null }],
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Constraint error:  target has both endpoint and device type
+          (TC-ACL-2.4 step 42)"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # Administer
+                      AuthMode: 2, # CASE
+                      Subjects: [commissionerNodeIdAlpha],
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 3,
+                      AuthMode: 2,
+                      Subjects: null,
+                      # Targets contains both endpoint and device type (invalid)
+                      Targets:
+                          [{ Cluster: null, Endpoint: 22, DeviceType: 33 }],
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Constraint error: Invalid privilege value step 32)"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # Administer
+                      AuthMode: 2, # CASE
+                      Subjects: [commissionerNodeIdAlpha],
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: AccessControlEntryPrivilegeEnum.UnknownEnumValue,
+                      AuthMode: 2, # CASE
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Constraint error: invalid subject 0xFFFF_FFFF_FFFF_FFFF (TC-ACL-2.4
+          step 35)"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # Administer
+                      AuthMode: 2, # CASE
+                      Subjects: [commissionerNodeIdAlpha],
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 3, # Operate
+                      AuthMode: 2, # CASE
+                      Subjects: ["18446744073709551615"],
+                      Targets: null,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Constraint error: invalid subject 0xFFFF_FFFD_0000_0000 (TC-ACL-2.4
+          step 36)"
+      # TODO: determine if the invalid subject value here is really a correct
+      #       invalid subject value. Test case plan is not clear.
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # Administer
+                      AuthMode: 2, # CASE
+                      Subjects: [commissionerNodeIdAlpha],
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 3, # Operate
+                      AuthMode: 2, # CASE
+                      Subjects: ["18446744060824649728"],
+                      Targets: null,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Constraint error: invalid subject 0xFFFF_FFFF_FFFF_0000 (TC-ACL-2.4
+          step 37)"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # Administer
+                      AuthMode: 2, # CASE
+                      Subjects: [commissionerNodeIdAlpha],
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 3, # Operate
+                      AuthMode: 2, # CASE
+                      Subjects: ["18446744073709486080"],
+                      Targets: null,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR

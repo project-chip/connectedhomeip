@@ -1,0 +1,67 @@
+/*
+ *
+ *    Copyright (c) 2023 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+package chip.devicecontroller;
+
+import chip.clusterinfo.CommandParameterInfo;
+import chip.clusterinfo.InteractionInfo;
+import chip.devicecontroller.ChipClusters.DefaultClusterCallback;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class ClusterWriteMapping {
+  public Map<String, Map<String, InteractionInfo>> getWriteAttributeMap() {
+    Map<String, Map<String, InteractionInfo>> writeAttributeMap = new HashMap<>();
+
+    {%- for cluster in clientClusters | sort(attribute='code') %}
+      {%-  set typeLookup = idl | createLookupContext(cluster) %}
+    Map<String, InteractionInfo> write{{cluster.name}}InteractionInfo = new LinkedHashMap<>();
+      {%- for attribute in cluster.attributes | sort(attribute='name') | attributesWithCallback(typeLookup) %}
+        {#- TODO: add support for struct-typed attributes -#}
+        {% if not attribute.definition.is_list and attribute.is_writable %}
+    Map<String, CommandParameterInfo> write{{cluster.name}}{{attribute.definition.name | upfirst}}CommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        {%-  set encodable = attribute.definition | asEncodable(typeLookup) %}
+    CommandParameterInfo {{cluster.name | lowfirst_except_acronym}}{{attribute.definition.name | lowfirst_except_acronym}}CommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            {{ encodable.boxed_java_type }}.class, {# {{asJavaType type null parent.parent.name removeGenericType=true}}.class, #}
+            {{ encodable.boxed_java_type }}.class {# {{asJavaType type null parent.parent.name underlyingType=true}}.class #}
+        );
+    write{{cluster.name}}{{attribute.definition.name | upfirst}}CommandParams.put(
+        "value",
+        {{cluster.name | lowfirst_except_acronym}}{{attribute.definition.name | lowfirst_except_acronym}}CommandParameterInfo
+    );
+    InteractionInfo write{{cluster.name}}{{attribute.definition.name | upfirst}}AttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.{{cluster.name}}Cluster) cluster).write{{attribute.definition.name | upfirst}}Attribute(
+          (DefaultClusterCallback) callback,
+          ({{ encodable.boxed_java_type }}) commandArguments.get("value")
+          {%- if attribute.requires_timed_write -%}, 10000 {% endif %}
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      write{{cluster.name}}{{attribute.definition.name | upfirst}}CommandParams
+    );
+    write{{cluster.name}}InteractionInfo.put("write{{attribute.definition.name | upfirst}}Attribute", write{{cluster.name}}{{attribute.definition.name | upfirst}}AttributeInteractionInfo);
+        {%- endif %}
+      {%- endfor %}
+    writeAttributeMap.put("{{cluster.name | lowfirst_except_acronym}}", write{{cluster.name}}InteractionInfo);
+    {%-  endfor -%}
+
+    return writeAttributeMap;
+  }
+}

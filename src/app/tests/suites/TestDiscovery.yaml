@@ -1,0 +1,336 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Test Discovery
+
+config:
+    nodeId: 0x12344321
+    endpoint: 0
+    discriminator:
+        type: int16u
+        defaultValue: 3840
+    shortDiscriminator:
+        type: int16u
+        defaultValue: 15
+    vendorId:
+        type: int16u
+        defaultValue: 65521
+    productId:
+        type: int16u
+        defaultValue: 32769
+    deviceType:
+        type: int16u
+        defaultValue: 65535
+
+tests:
+    - label: "Stop target device"
+      cluster: "SystemCommands"
+      command: "Stop"
+
+    - label:
+          "Start target device with the provided discriminator for basic
+          commissioning advertisement"
+      cluster: "SystemCommands"
+      command: "Start"
+      arguments:
+          values:
+              - name: "discriminator"
+                value: discriminator
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Open Commissioning Window with too-short timeout"
+      cluster: "Administrator Commissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 120
+      response:
+          error: INVALID_COMMAND
+
+    - label: "Open Commissioning Window with too-long timeout"
+      cluster: "Administrator Commissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 1000
+      response:
+          error: INVALID_COMMAND
+
+    - label: "Open Commissioning Window"
+      cluster: "Administrator Commissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+
+    - label: "Check Instance Name"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "instanceName"
+                saveAs: deviceInstanceNameBeforeReboot
+                constraints:
+                    minLength: 16
+                    maxLength: 16
+                    isUpperCase: true
+                    isHexString: true
+
+    # TODO:
+    #  Find a way to validate the service type and the service domain
+
+    - label: "Check Hostname"
+      PICS: "(MCORE.COM.WIFI || MCORE.COM.ETH) && !MCORE.COM.THR"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "hostName"
+                constraints:
+                    minLength: 12
+                    maxLength: 16
+                    isUpperCase: true
+                    isHexString: true
+
+    - label: "Check Hostname"
+      PICS: "(!MCORE.COM.WIFI && !MCORE.COM.ETH) && MCORE.COM.THR"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "hostName"
+                constraints:
+                    minLength: 16
+                    maxLength: 16
+                    isUpperCase: true
+                    isHexString: true
+
+    # Commissioning Subtypes
+
+    - label: "Check Long Discriminator _L"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByLongDiscriminator"
+      arguments:
+          values:
+              - name: "value"
+                value: discriminator
+
+    - label: "Check Short Discriminator (_S)"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByShortDiscriminator"
+      arguments:
+          values:
+              - name: "value"
+                value: shortDiscriminator
+
+    - label: "Check Commissioning Mode (_CM)"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByCommissioningMode"
+
+    - label: "Check Vendor ID (_V)"
+      PICS: MCORE.SC.VENDOR_SUBTYPE
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByVendorId"
+      arguments:
+          values:
+              - name: "value"
+                value: vendorId
+
+    - label: "Check Device Type ID (_T)"
+      PICS: MCORE.SC.DEVTYPE_SUBTYPE
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionableByDeviceType"
+      arguments:
+          values:
+              - name: "value"
+                value: deviceType
+
+    # TXT Records
+
+    - label: "TXT key for discriminator (D)"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "longDiscriminator"
+                value: discriminator
+                constraints:
+                    minValue: 0
+                    maxValue: 4096
+
+    - label: "TXT key for Vendor ID and Product ID (VP)"
+      PICS: MCORE.SC.VP_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "vendorId"
+                value: vendorId
+
+    # Maybe it should be a PICS code to differentiate between manufacturer that wants to broadcast the
+    # product id ?
+    - label: "TXT key for Vendor ID and Product ID (VP)"
+      PICS: MCORE.SC.VP_KEY
+      disabled: true # [TestDiscovery] Enable back TXT key for Vendor ID and Product ID (VP) #25017
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "productId"
+                value: productId
+
+    - label: "Optional TXT key for MRP Session Idle Interval (SII)"
+      PICS: MCORE.SC.SII_COMM_DISCOVERY_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "mrpRetryIntervalIdle"
+                constraints:
+                    minValue: 0
+                    maxValue: 3600000
+
+    - label: "Optional TXT key for MRP Session Active Interval (SAI)"
+      PICS: MCORE.SC.SAI_COMM_DISCOVERY_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "mrpRetryIntervalActive"
+                constraints:
+                    minValue: 0
+                    maxValue: 3600000
+
+    - label: "TXT key for commissioning mode (CM)"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "commissioningMode"
+                value: 1
+
+    - label: "Optional TXT key for device type (DT)"
+      PICS: MCORE.SC.DT_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "deviceType"
+                value: deviceType
+
+    - label: "Optional TXT key for device name (DN)"
+      PICS: MCORE.SC.DN_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "deviceName"
+                constraints:
+                    maxLength: 32
+
+    - label: "Optional TXT key for rotating device identifier (RI)"
+      PICS: MCORE.SC.RI_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "rotatingIdLen"
+                constraints:
+                    maxValue: 100
+
+    - label: "Optional TXT key for pairing hint (PH)"
+      PICS: MCORE.SC.PH_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "pairingHint"
+                constraints:
+                    notValue: 0
+
+    - label: "Optional TXT key for pairing instructions (PI)"
+      PICS: MCORE.SC.PI_KEY
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "pairingInstruction"
+                constraints:
+                    maxLength: 128
+
+    - label: "Check IPs"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "numIPs"
+                constraints:
+                    minValue: 1
+
+    - label: "Stop target device"
+      cluster: "SystemCommands"
+      command: "Stop"
+
+    - label:
+          "Start target device with the provided discriminator for basic
+          commissioning advertisement"
+      cluster: "SystemCommands"
+      command: "Start"
+      arguments:
+          values:
+              - name: "discriminator"
+                value: discriminator
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Open Commissioning Window"
+      cluster: "Administrator Commissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+
+    - label: "Check Instance Name"
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "instanceName"
+                constraints:
+                    minLength: 16
+                    maxLength: 16
+                    isUpperCase: true
+                    isHexString: true
+                    notValue: deviceInstanceNameBeforeReboot

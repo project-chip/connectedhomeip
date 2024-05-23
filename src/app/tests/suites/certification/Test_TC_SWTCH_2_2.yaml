@@ -1,0 +1,1395 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 74.2.2. [TC-SWTCH-2.2] Primary functionality with server as DUT
+
+PICS:
+    - SWTCH.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          NOTE: https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/linux#readme
+
+          Events to be executed as following
+          1. Compile app using below command in connectedhomeip folder
+          a. ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-clang build"
+          2. Build respective app (all-clusters-app)
+          3. Commission DUT to TH
+          4. Open 2nd terminal of DUT and provide the below command to obtain PID of DUT ps  -aef|grep all-clusters-app
+          5. Follow the Verification step below to generate the event in 2nd terminal of DUT
+      disabled: true
+
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)"
+      verification: |
+          Commission DUT to TH
+      disabled: true
+
+    - label: "Step 2a: Set up subscription to SwitchLatched event"
+      PICS: SWTCH.S.F00
+      verification: |
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          ./chip-tool interactive start
+
+          Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
+
+          switch subscribe-event switch-latched 1 100 1 1
+
+          [1697604266.130621][7393:7395] CHIP:DMG: SubscribeResponseMessage =
+          [1697604266.130624][7393:7395] CHIP:DMG: {
+          [1697604266.130628][7393:7395] CHIP:DMG:         SubscriptionId = 0xf6d55121,
+          [1697604266.130632][7393:7395] CHIP:DMG:         MaxInterval = 0x64,
+          [1697604266.130636][7393:7395] CHIP:DMG:         InteractionModelRevision = 11
+          [1697604266.130640][7393:7395] CHIP:DMG: }
+      disabled: true
+
+    - label: "Step 2b: Operator sets switch to first position (zero) on the DUT"
+      PICS: SWTCH.S.F00
+      verification: |
+          On Raspi platform to trigger the event,  give the below command by opening an another terminal in DUT
+          (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have the capability to generate this event)
+
+          echo '{"Name":"SwitchLatched","NewPosition":0}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the SwitchLatched event with NewPosition 0:
+
+          [1697604377.953057][7384:7386] CHIP:-: Received payload: "{"Name":"SwitchLatched","NewPosition":0}"
+          [1697604377.955361][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4dbcc0a9
+          [1697604377.955421][7384:7384] CHIP:-: The latching switch is moved to a new position:0
+          [1697604377.955430][7384:7384] CHIP:ZCL: SwitchServer: OnSwitchLatch
+          [1697604377.955474][7384:7384] CHIP:EVL: LogEvent event number: 0x0000000000000006 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x0 Epoch timestamp: 0x0000018B411B1D63
+      disabled: true
+
+    - label: "Step 2c: TH reads the CurrentPosition attribute from the DUT"
+      PICS: SWTCH.S.F00
+      verification: |
+          switch read current-position 1 1
+
+          Verify CurrentPosition value is 0 in TH(chip-tool) Log and below is the sample log provided for the raspi platform:
+
+          [1646209289.746157][2617:2622] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001DataVersion: 1206711661
+          [1646209289.746228][2617:2622] CHIP:TOO:   CurrentPosition: 0
+      disabled: true
+
+    - label: "Step 2d: Operator sets switch to second position (one) on the DUT"
+      PICS: SWTCH.S.F00
+      verification: |
+          On Raspi platform to trigger the event give the below command by opening an another terminal in DUT
+          (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have the capability to generate this event)
+
+          echo '{"Name":"SwitchLatched","NewPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the SwitchLatched event with NewPosition set to 1:
+
+          [1697604732.758383][7384:7386] CHIP:-: Received payload: "{"Name":"SwitchLatched","NewPosition":1}"
+          [1697604732.758668][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4dbcc0aa
+          [1697604732.758703][7384:7384] CHIP:-: The latching switch is moved to a new position:1
+          [1697604732.758712][7384:7384] CHIP:ZCL: SwitchServer: OnSwitchLatch
+          [1697604732.758757][7384:7384] CHIP:EVL: LogEvent event number: 0x0000000000000007 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x0 Epoch timestamp: 0x0000018B41208756
+
+          switch read-event switch-latched 1 1
+
+          Verify TH receives SwitchLatched event with NewPosition set to 1 on TH(Chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1687257297.110327][17168:17170] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000 [1687257297.110330][17168:17170] CHIP:TOO: Event number: 7
+          [1687257297.110333][17168:17170] CHIP:TOO: Priority: Info
+          [1687257297.110336][17168:17170] CHIP:TOO: Timestamp: 1687257190679
+          [1687257297.110341][17168:17170] CHIP:TOO: SwitchLatched: {
+          [1687257297.110345][17168:17170] CHIP:TOO: NewPosition: 1
+          [1687257297.110349][17168:17170] CHIP:TOO: }
+      disabled: true
+
+    - label: "Step 2e: TH reads CurrentPosition attribute from the DUT"
+      PICS: SWTCH.S.F00
+      verification: |
+          switch read current-position 1 1
+
+          Verify CurrentPosition value is 1 in TH(chip-tool) Log and below is the sample log provided for the raspi platform:
+
+          [1646209289.746157][2617:2622] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001DataVersion: 1206711661
+          [1646209289.746228][2617:2622] CHIP:TOO:  CurrentPosition: 1
+      disabled: true
+
+    - label:
+          "Step 2f: If NumberOfPositions>2 (see 2a of TC-SWTCH-2.1) : - Operator
+          sets switch to next position on the DUT - TH reads the CurrentPosition
+          attribute from the DUT"
+      PICS: SWTCH.S.F00
+      verification: |
+          If NumberOfPositions>2, then Set switch to next position Otherwise skip this step.
+
+          For checking the number of positions that switch supports, Please read the NumberOfPositions attribute From TC-SWTCH-2.1 in step 2a .
+
+          switch read number-of-positions 1 1
+
+          Verify the "NumberOfPositions" attribute value On TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
+
+          [1697605547.057869][7525:7527] CHIP:DMG: }
+          [1697605547.058012][7525:7527] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0000 DataVersion: 1304215724
+          [1697605547.058063][7525:7527] CHIP:TOO:   NumberOfPositions: 2
+
+          On Raspi platform to trigger the event give the below command by opening an another terminal in DUT
+          (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have the capability to generate this event)
+
+          echo '{"Name":"SwitchLatched","NewPosition":2}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the SwitchLatched event with NewPosition set to 2:
+
+          [1697615458.515582][7384:7386] CHIP:-: Received payload: "{"Name":"SwitchLatched","NewPosition":2}"
+          [1697615458.515822][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4dbcc0c5
+          [1697615458.515854][7384:7384] CHIP:-: The latching switch is moved to a new position:3
+          [1697615458.515867][7384:7384] CHIP:ZCL: SwitchServer: OnSwitchLatch
+          [1697615458.516014][7384:7384] CHIP:EVL: Dropped 1 event from buffer with priority 1 and event number  0x000000000000000B due to overflow: event priority_level: 1
+          [1697615458.516081][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
+          [1697615458.516110][7384:7384] CHIP:EVL: LogEvent event number: 0x0000000000000024 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x0 Epoch timestamp: 0x0000018B41C430D3
+
+          switch read-event switch-latched 1 1
+
+          Verify TH receives SwitchLatched event with NewPosition set to 2 on TH(Chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1697615514.717194][7767:7769] CHIP:DMG: }
+          [1697615514.717359][7767:7769] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
+          [1697615514.717371][7767:7769] CHIP:TOO:   Event number: 36
+          [1697615514.717383][7767:7769] CHIP:TOO:   Priority: Info
+          [1697615514.717396][7767:7769] CHIP:TOO:   Timestamp: 1697615458515
+          [1697615514.717430][7767:7769] CHIP:TOO:   SwitchLatched: {
+          [1697615514.717449][7767:7769] CHIP:TOO:     NewPosition: 2
+          [1697615514.717464][7767:7769] CHIP:TOO:    }
+
+          In the current SDK development, Max number of positions is configured as 2, hence the current  test step should fail as NewPosition reached more than the Max NumberOfPositions.
+          If the DUT supports NumberOfPositions>2, then, position should increase to the next level. Below is the sample command to execute to check the CurrentPosition
+
+          switch read current-position 1 1
+
+          Verify CurrentPosition value is 2 On TH(chip-tool) Log and below is the sample log provided for the raspi platform:
+
+          [1659600502.023560][4306:4311] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001 DataVersion: 391463069
+          [1687847841.651568][19369:19371] CHIP:TOO:   CurrentPosition: 2
+      disabled: true
+
+    - label:
+          "Step 2g: If NumberOfPositions>3 : - Repeat step 2f for
+          NumberOfPositions-3 times - After each time Operator has set switch to
+          next position on the DUT, - TH reads CurrentPosition attribute from
+          the DUT"
+      PICS: SWTCH.S.F00
+      verification: |
+          If NumberOfPositions>3, then Set the switch to next position Otherwise skip this step.
+
+          For checking the number of positions that switch supports, Please read the NumberOfPositions attribute From TC-SWTCH-2.1 in step 2a .
+
+          switch read number-of-positions 1 1
+
+          Verify the "NumberOfPositions" attribute value On TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
+
+          [1697605547.057869][7525:7527] CHIP:DMG: }
+          [1697605547.058012][7525:7527] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0000 DataVersion: 1304215724
+          [1697605547.058063][7525:7527] CHIP:TOO:   NumberOfPositions: 2
+
+          In Raspi platform to change the switch to third position use the below sample command, its required to  use equivalent command on the respective DUT. Open one more terminal on DUT side to execute the echo command .
+
+          echo '{"Name":"SwitchLatched","NewPosition":3}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the SwitchLatched event with NewPosition set to 3:
+
+          [1659600438.058928][7312:7321] CHIP:-: Received payload: "{"Name":"SwitchLatched","NewPosition":3}"
+          [1659600438.059436][7312:7312] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 1755409d
+          [1659600438.059519][7312:7312] CHIP:-: The latching switch is moved to a new position:3
+          [1659600438.059644][7312:7312] CHIP:ZCL: SwitchServer: OnSwitchLatch
+          [1659600438.059857][7312:7312] CHIP:EVL: LogEvent event number: 0x0000000000020006 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x0 Sys timestamp: 0x0000000000F10746
+
+          switch read-event switch-latched 1 1
+
+          Verify SwitchLatched event with NewPosition set to 3 on TH(Chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1687258513.235224][17561:17563] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
+          [1687258513.235227][17561:17563] CHIP:TOO:   Event number: 9
+          [1687258513.235230][17561:17563] CHIP:TOO:   Priority: Info
+          [1687258513.235231][17561:17563] CHIP:TOO:   Timestamp: 1687258318347
+          [1687258513.235235][17561:17563] CHIP:TOO:   SwitchLatched: {
+          [1687258513.235238][17561:17563] CHIP:TOO:     NewPosition: 3
+          [1687258513.235239][17561:17563] CHIP:TOO:    }
+
+          In the current SDK development, Max number of positions are configured as 2, hence the current  test step should fail as its reached more than the Max NumberOfPositions.
+          If the DUT supports NumberOfPositions>3, then position should increase to the next level. Below is the sample command to execute to check the CurrentPosition
+
+          switch read current-position 1 1
+
+          Verify CurrentPosition value is 3 On TH(chip-tool) Log and below is the sample log provided for the raspi platform and below is the sample log provided for the raspi platform:
+
+          [1659600502.023560][4306:4311] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001 DataVersion: 391463069
+          [1687847873.385882][19378:19380] CHIP:TOO:   CurrentPosition: 3
+      disabled: true
+
+    - label: "Step 2h: Operator returns switch to first position on the DUT"
+      PICS: SWTCH.S.F00
+      verification: |
+          On Raspi platform to trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have capability to generate this event)
+
+          echo '{"Name":"SwitchLatched","NewPosition":0}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the SwitchLatched event with NewPosition set to 0:
+
+          [1697606147.106734][7384:7386] CHIP:-: Received payload: "{"Name":"SwitchLatched","NewPosition":0}"
+          [1697606147.106976][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4dbcc0ae
+          [1697606147.107012][7384:7384] CHIP:-: The latching switch is moved to a new position:0
+          [1697606147.107023][7384:7384] CHIP:ZCL: SwitchServer: OnSwitchLatch
+          [1697606147.107137][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
+          [1697606147.107170][7384:7384] CHIP:EVL: LogEvent event number: 0x000000000000000B priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x0 Epoch timestamp: 0x0000018B41361C23
+
+          switch read-event switch-latched 1 1
+
+          Verify TH receives SwitchLatched event with NewPosition set to 0 on TH(Chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1697606183.274301][7536:7538] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
+          [1697606183.274313][7536:7538] CHIP:TOO:   Event number: 11
+          [1697606183.274320][7536:7538] CHIP:TOO:   Priority: Info
+          [1697606183.274325][7536:7538] CHIP:TOO:   Timestamp: 1697606147107
+          [1697606183.274350][7536:7538] CHIP:TOO:   SwitchLatched: {
+          [1697606183.274362][7536:7538] CHIP:TOO:     NewPosition: 0
+          [1697606183.274373][7536:7538] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 2i: TH reads the CurrentPosition attribute from the DUT"
+      PICS: SWTCH.S.F00
+      verification: |
+          switch read current-position 1 1
+
+          Verify CurrentPosition value is 0 On TH(chip-tool) Log and below is the sample log provided for the raspi platform:
+
+          [1646209289.746157][2617:2622] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001DataVersion: 1206711661
+          [1646209289.746228][2617:2622] CHIP:TOO:   CurrentPosition: 0
+      disabled: true
+
+    - label: "Step 3a: Set up subscription to InitialPress event"
+      PICS: SWTCH.S.F01
+      verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+           ./chip-tool interactive start
+
+          Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
+
+          switch subscribe-event initial-press 1 100 1 1
+
+          [1697606330.206997][7536:7538] CHIP:DMG: SubscribeResponseMessage =
+          [1697606330.207001][7536:7538] CHIP:DMG: {
+          [1697606330.207004][7536:7538] CHIP:DMG:         SubscriptionId = 0x460ae381,
+          [1697606330.207008][7536:7538] CHIP:DMG:         MaxInterval = 0x64,
+          [1697606330.207011][7536:7538] CHIP:DMG:         InteractionModelRevision = 11
+          [1697606330.207014][7536:7538] CHIP:DMG: }
+      disabled: true
+
+    - label: "Step 3b: Operator does not operate switch on the DUT"
+      PICS: SWTCH.S.F01
+      verification: |
+          no Matter messages
+      disabled: true
+
+    - label: "Step 3c: TH reads the CurrentPosition attribute from the DUT"
+      PICS: SWTCH.S.F01
+      verification: |
+          switch read current-position 1 1
+
+          Verify CurrentPosition value is 0 On TH (chip-tool) Log and below is the sample log provided for the raspi platform:
+
+          [1646209289.746157][2617:2622] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001DataVersion: 1206711661
+          [1687847957.516951][19394:19396] CHIP:TOO:   CurrentPosition: 0
+      disabled: true
+
+    - label: "Step 3d: Operator operates switch (keep it pressed)"
+      PICS: SWTCH.S.F01
+      verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
+          On Raspi platform to trigger the event give the below command by opening an another terminal in DUT
+          (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have the capability to generate this event)
+
+          echo '{"Name":"InitialPress","NewPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the InitialPress event with NewPosition set to 1:
+
+          [1697606594.815345][7384:7386] CHIP:-: Received payload: "{"Name":"InitialPress","NewPosition":1}"
+          [1697606594.815586][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4dbcc0af
+          [1697606594.815620][7384:7384] CHIP:-: The new position when the momentary switch starts to be pressed:1
+          [1697606594.815631][7384:7384] CHIP:ZCL: SwitchServer: OnInitialPress
+          [1697606594.815743][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
+          [1697606594.815773][7384:7384] CHIP:EVL: LogEvent event number: 0x000000000000000C priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x1 Epoch timestamp: 0x0000018B413CF0FF
+
+          switch read-event initial-press   1 1
+
+          Verify TH receives InitialPress event with NewPosition set to 1 on TH(Chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1697606630.390750][7536:7538] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
+          [1697606630.390763][7536:7538] CHIP:TOO:   Event number: 12
+          [1697606630.390771][7536:7538] CHIP:TOO:   Priority: Info
+          [1697606630.390780][7536:7538] CHIP:TOO:   Timestamp: 1697606594815
+          [1697606630.390822][7536:7538] CHIP:TOO:   InitialPress: {
+          [1697606630.390840][7536:7538] CHIP:TOO:     NewPosition: 1
+          [1697606630.390851][7536:7538] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 3e: TH reads the CurrentPosition attribute from the DUT"
+      PICS: SWTCH.S.F01
+      verification: |
+          switch read current-position 1 1
+
+          Verify CurrentPosition  value is 1 On TH(chip-tool) Log and below is the sample log provided for the raspi platform:
+
+          [1646209289.746157][2617:2622] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001DataVersion: 1206711661
+          [1687847982.359195][19398:19400] CHIP:TOO:   CurrentPosition: 1
+      disabled: true
+
+    - label: "Step 3f: Operator releases switch on the DUT"
+      PICS: SWTCH.S.F01
+      verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
+          On Raspi platform to trigger the event give the below command by opening an another terminal in DUT
+          (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have the capability to generate this event)
+
+          echo '{"Name":"ShortRelease","PreviousPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the ShortRelease event with PreviousPosition set to 1:
+
+          [1697606778.141141][7384:7386] CHIP:-: Received payload: "{"Name":"ShortRelease","PreviousPosition":1}"
+          [1697606778.141356][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4dbcc0b0
+          [1697606778.141394][7384:7384] CHIP:-: The the previous value of the CurrentPosition when the momentary switch has been released:1
+          [1697606778.141410][7384:7384] CHIP:ZCL: SwitchServer: OnShortRelease
+          [1697606778.141548][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
+          [1697606778.141592][7384:7384] CHIP:EVL: LogEvent event number: 0x000000000000000D priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x3 Epoch timestamp: 0x0000018B413FBD1D
+      disabled: true
+
+    - label: "Step 3g: TH reads the CurrentPosition attribute from the DUT"
+      PICS: SWTCH.S.F01
+      verification: |
+          switch read current-position 1 1
+
+          Verify CurrentPosition value is 0 On TH(chip-tool) Log and below is the sample log provided for the raspi platform:
+
+          [1646209289.746157][2617:2622] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001DataVersion: 1206711661
+          [1687848004.040125][19402:19404] CHIP:TOO:   CurrentPosition: 0
+      disabled: true
+
+    - label:
+          "Step 4a: Set up subscription to InitialPress and ShortRelease events"
+      PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
+      verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
+
+          Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
+
+          switch subscribe-event initial-press 1 100 1 1
+
+          [1697607013.770976][7736:7738] CHIP:DMG: SubscribeResponseMessage =
+          [1697607013.770988][7736:7738] CHIP:DMG: {
+          [1697607013.770998][7736:7738] CHIP:DMG:         SubscriptionId = 0xfba47d40,
+          [1697607013.771010][7736:7738] CHIP:DMG:         MaxInterval = 0x64,
+          [1697607013.771021][7736:7738] CHIP:DMG:         InteractionModelRevision = 11
+          [1697607013.771030][7736:7738] CHIP:DMG: }
+
+          Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
+
+          switch subscribe-event short-release 1 100 1 1
+
+          [1697607082.641213][7736:7738] CHIP:DMG: SubscribeResponseMessage =
+          [1697607082.641216][7736:7738] CHIP:DMG: {
+          [1697607082.641221][7736:7738] CHIP:DMG:         SubscriptionId = 0xbe6a8e5d,
+          [1697607082.641225][7736:7738] CHIP:DMG:         MaxInterval = 0x64,
+          [1697607082.641229][7736:7738] CHIP:DMG:         InteractionModelRevision = 11
+          [1697607082.641233][7736:7738] CHIP:DMG: }
+      disabled: true
+
+    - label: "Step 4b: Operator does not operate switch on the DUT"
+      PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
+      verification: |
+          no Matter messages
+      disabled: true
+
+    - label: "Step 4c: Operator operates switch (press briefly) on the DUT"
+      PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
+      verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
+
+
+          echo '{"Name":"InitialPress","NewPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the InitialPress event with NewPosition set to 1:
+
+          [1697607350.058984][7384:7386] CHIP:-: Received payload: "{"Name":"InitialPress","NewPosition":1}"
+          [1697607350.059268][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4dbcc0b2
+          [1697607350.059302][7384:7384] CHIP:-: The new position when the momentary switch starts to be pressed:1
+          [1697607350.059311][7384:7384] CHIP:ZCL: SwitchServer: OnInitialPress
+          [1697607350.059431][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
+          [1697607350.059466][7384:7384] CHIP:EVL: LogEvent event number: 0x000000000000000F priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x1 Epoch timestamp: 0x0000018B4148772B
+
+          switch read-event initial-press   1 1
+
+          Verify TH receive InitialPress event with NewPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
+
+          [1697607828.913031][7767:7769] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
+          [1697607828.913034][7767:7769] CHIP:TOO:   Event number: 17
+          [1697607828.913037][7767:7769] CHIP:TOO:   Priority: Info
+          [1697607828.913040][7767:7769] CHIP:TOO:   Timestamp: 1697607697125
+          [1697607828.913046][7767:7769] CHIP:TOO:   InitialPress: {
+          [1697607828.913050][7767:7769] CHIP:TOO:     NewPosition: 1
+          [1697607828.913054][7767:7769] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 4d: Operator releases switch from the DUT"
+      PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
+      verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
+
+          echo '{"Name":"ShortRelease","PreviousPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the ShortRelease event with PreviousPosition set to 1:
+
+          [1697607957.484361][7384:7386] CHIP:-: Received payload: "{"Name":"ShortRelease","PreviousPosition":1}"
+          [1697607957.484562][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4dbcc0b6
+          [1697607957.484610][7384:7384] CHIP:-: The the previous value of the CurrentPosition when the momentary switch has been released:1
+          [1697607957.484622][7384:7384] CHIP:ZCL: SwitchServer: OnShortRelease
+          [1697607957.484732][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
+          [1697607957.484765][7384:7384] CHIP:EVL: LogEvent event number: 0x0000000000000013 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x3 Epoch timestamp: 0x0000018B4151BBEC
+
+          switch read-event short-release 1 1
+
+          Verify TH receive ShortRelease event with PreviousPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
+
+          [1697608045.926586][7767:7769] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1697608045.926590][7767:7769] CHIP:TOO:   Event number: 19
+          [1697608045.926593][7767:7769] CHIP:TOO:   Priority: Info
+          [1697608045.926596][7767:7769] CHIP:TOO:   Timestamp: 1697607957484
+          [1697608045.926601][7767:7769] CHIP:TOO:   ShortRelease: {
+          [1697608045.926605][7767:7769] CHIP:TOO:     PreviousPosition: 1
+          [1697608045.926608][7767:7769] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 4e: Operator operates switch (keep pressed for long time, e.g. 5
+          seconds) on the DUT"
+      PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
+      verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
+          On Raspi platform to trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have capability to generate this event)
+
+          echo '{"Name":"InitialPress","NewPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the InitialPress event with NewPosition set to 1:
+
+          [1697608104.080281][7384:7386] CHIP:-: Received payload: "{"Name":"InitialPress","NewPosition":1}"
+          [1697608104.080508][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4dbcc0b7
+          [1697608104.080548][7384:7384] CHIP:-: The new position when the momentary switch starts to be pressed:1
+          [1697608104.080561][7384:7384] CHIP:ZCL: SwitchServer: OnInitialPress
+          [1697608104.080675][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
+          [1697608104.080709][7384:7384] CHIP:EVL: LogEvent event number: 0x0000000000000014 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x1 Epoch timestamp: 0x0000018B4153F890
+
+          switch read-event initial-press   1 1
+
+          Verify InitialPress event with NewPosition set to 1 on TH (chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1697608164.378204][7767:7769] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
+          [1697608164.378207][7767:7769] CHIP:TOO:   Event number: 20
+          [1697608164.378209][7767:7769] CHIP:TOO:   Priority: Info
+          [1697608164.378211][7767:7769] CHIP:TOO:   Timestamp: 1697608104080
+          [1697608164.378214][7767:7769] CHIP:TOO:   InitialPress: {
+          [1697608164.378217][7767:7769] CHIP:TOO:     NewPosition: 1
+          [1697608164.378219][7767:7769] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 4f: Operator releases switch from the DUT"
+      PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
+      verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
+          On Raspi platform to trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have capability to generate this event)
+
+          echo '{"Name":"ShortRelease","PreviousPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the ShortRelease event with PreviousPosition set to 1:
+
+          [1697608242.275996][7384:7386] CHIP:-: Received payload: "{"Name":"ShortRelease","PreviousPosition":1}"
+          [1697608242.276246][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4dbcc0b8
+          [1697608242.276280][7384:7384] CHIP:-: The the previous value of the CurrentPosition when the momentary switch has been released:1
+          [1697608242.276296][7384:7384] CHIP:ZCL: SwitchServer: OnShortRelease
+          [1697608242.276424][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
+          [1697608242.276468][7384:7384] CHIP:EVL: LogEvent event number: 0x0000000000000015 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x3 Epoch timestamp: 0x0000018B41561464
+
+          switch read-event short-release 1 1
+
+          Verify TH receives ShortRelease event with PreviousPosition set to 1 on TH (chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1697608382.457912][7767:7769] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1697608382.457915][7767:7769] CHIP:TOO:   Event number: 21
+          [1697608382.457917][7767:7769] CHIP:TOO:   Priority: Info
+          [1697608382.457919][7767:7769] CHIP:TOO:   Timestamp: 1697608242276
+          [1697608382.457923][7767:7769] CHIP:TOO:   ShortRelease: {
+          [1697608382.457927][7767:7769] CHIP:TOO:     PreviousPosition: 1
+          [1697608382.457929][7767:7769] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 5a: Set up subscription to InitialPress, LongPress,
+          ShortRelease, LongRelease events"
+      PICS: SWTCH.S.F01 && SWTCH.S.F03
+      verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          ./chip-tool interactive start
+
+          Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
+
+          switch subscribe-event  initial-press 1 100 1 1
+
+
+          [1697608480.015747][7767:7769] CHIP:DMG: SubscribeResponseMessage =
+          [1697608480.015750][7767:7769] CHIP:DMG: {
+          [1697608480.015753][7767:7769] CHIP:DMG:         SubscriptionId = 0x9c490538,
+          [1697608480.015756][7767:7769] CHIP:DMG:         MaxInterval = 0x64,
+          [1697608480.015758][7767:7769] CHIP:DMG:         InteractionModelRevision = 11
+          [1697608480.015761][7767:7769] CHIP:DMG: }
+
+          Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
+
+          switch subscribe-event  long-press 1 100 1 1
+
+          [1697608527.530605][7767:7769] CHIP:DMG: SubscribeResponseMessage =
+          [1697608527.530609][7767:7769] CHIP:DMG: {
+          [1697608527.530613][7767:7769] CHIP:DMG:         SubscriptionId = 0xaa07867b,
+          [1697608527.530619][7767:7769] CHIP:DMG:         MaxInterval = 0x64,
+          [1697608527.530623][7767:7769] CHIP:DMG:         InteractionModelRevision = 11
+          [1697608527.530628][7767:7769] CHIP:DMG: }
+
+          Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
+
+          switch subscribe-event short-release 1 100 1 1
+
+          [1697608580.243388][7767:7769] CHIP:DMG: SubscribeResponseMessage =
+          [1697608580.243391][7767:7769] CHIP:DMG: {
+          [1697608580.243394][7767:7769] CHIP:DMG:         SubscriptionId = 0x9b71447a,
+          [1697608580.243397][7767:7769] CHIP:DMG:         MaxInterval = 0x64,
+          [1697608580.243400][7767:7769] CHIP:DMG:         InteractionModelRevision = 11
+          [1697608580.243402][7767:7769] CHIP:DMG: }
+
+          Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
+
+          switch subscribe-event  long-release 1 100 1 1
+
+          [1697608657.944735][7767:7769] CHIP:DMG: SubscribeResponseMessage =
+          [1697608657.944738][7767:7769] CHIP:DMG: {
+          [1697608657.944741][7767:7769] CHIP:DMG:         SubscriptionId = 0x3d884dce,
+          [1697608657.944745][7767:7769] CHIP:DMG:         MaxInterval = 0x64,
+          [1697608657.944748][7767:7769] CHIP:DMG:         InteractionModelRevision = 11
+          [1697608657.944751][7767:7769] CHIP:DMG: }
+      disabled: true
+
+    - label: "Step 5b: Operator does not operate switch on the DUT"
+      PICS: SWTCH.S.F01 && SWTCH.S.F03
+      verification: |
+          no Matter messages
+      disabled: true
+
+    - label: "Step 5c: Operator operates switch (press briefly) on the DUT"
+      PICS: SWTCH.S.F01 && SWTCH.S.F03
+      verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
+
+          echo '{"Name":"InitialPress","NewPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the InitialPress event with NewPosition set to 1:
+
+          [1697608754.628837][7384:7386] CHIP:-: Received payload: "{"Name":"InitialPress","NewPosition":1}"
+          [1697608754.629085][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4dbcc0b9
+          [1697608754.629120][7384:7384] CHIP:-: The new position when the momentary switch starts to be pressed:1
+          [1697608754.629132][7384:7384] CHIP:ZCL: SwitchServer: OnInitialPress
+          [1697608754.629247][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
+          [1697608754.629277][7384:7384] CHIP:EVL: LogEvent event number: 0x0000000000000016 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x1 Epoch timestamp: 0x0000018B415DE5C5
+
+          switch read-event initial-press   1 1
+
+          Verify TH receives InitialPress event with NewPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
+
+          [1697608808.722369][7767:7769] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
+          [1697608808.722371][7767:7769] CHIP:TOO:   Event number: 22
+          [1697608808.722374][7767:7769] CHIP:TOO:   Priority: Info
+          [1697608808.722376][7767:7769] CHIP:TOO:   Timestamp: 1697608754629
+          [1697608808.722380][7767:7769] CHIP:TOO:   InitialPress: {
+          [1697608808.722383][7767:7769] CHIP:TOO:     NewPosition: 1
+          [1697608808.722385][7767:7769] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 5d: Operator releases switch from the DUT"
+      PICS: SWTCH.S.F01 && SWTCH.S.F03
+      verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
+
+          echo '{"Name":"ShortRelease","PreviousPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the ShortRelease event with PreviousPosition set to 1:
+
+          [1697608936.890550][7384:7386] CHIP:-: Received payload: "{"Name":"ShortRelease","PreviousPosition":1}"
+          [1697608936.890789][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4dbcc0ba
+          [1697608936.890824][7384:7384] CHIP:-: The the previous value of the CurrentPosition when the momentary switch has been released:1
+          [1697608936.890833][7384:7384] CHIP:ZCL: SwitchServer: OnShortRelease
+          [1697608936.890948][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
+          [1697608936.890983][7384:7384] CHIP:EVL: LogEvent event number: 0x0000000000000017 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x3 Epoch timestamp: 0x0000018B4160ADBA
+
+          switch read-event short-release 1 1
+
+          Verify TH receives ShortRelease event with PreviousPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
+
+          [1697608970.793400][7767:7769] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1697608970.793402][7767:7769] CHIP:TOO:   Event number: 23
+          [1697608970.793405][7767:7769] CHIP:TOO:   Priority: Info
+          [1697608970.793408][7767:7769] CHIP:TOO:   Timestamp: 1697608936890
+          [1697608970.793414][7767:7769] CHIP:TOO:   ShortRelease: {
+          [1697608970.793417][7767:7769] CHIP:TOO:     PreviousPosition: 1
+          [1697608970.793421][7767:7769] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 5e: Operator operates switch (keep pressed for long time, e.g. 5
+          seconds) on the DUT"
+      PICS: SWTCH.S.F01 && SWTCH.S.F03
+      verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
+
+          echo '{"Name":"InitialPress","NewPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the InitialPress event with NewPosition set to 1:
+
+          [1697609110.498463][7384:7386] CHIP:-: Received payload: "{"Name":"InitialPress","NewPosition":1}"
+          [1697609110.498726][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4dbcc0bb
+          [1697609110.498757][7384:7384] CHIP:-: The new position when the momentary switch starts to be pressed:1
+          [1697609110.498766][7384:7384] CHIP:ZCL: SwitchServer: OnInitialPress
+          [1697609110.498925][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 2
+          [1697609110.499002][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
+          [1697609110.499030][7384:7384] CHIP:EVL: LogEvent event number: 0x0000000000000018 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x1 Epoch timestamp: 0x0000018B416353E2
+
+          switch read-event initial-press   1 1
+
+          Verify InitialPress event with NewPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
+
+          [1697609188.273452][7767:7769] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
+          [1697609188.273455][7767:7769] CHIP:TOO:   Event number: 24
+          [1697609188.273457][7767:7769] CHIP:TOO:   Priority: Info
+          [1697609188.273459][7767:7769] CHIP:TOO:   Timestamp: 1697609110498
+          [1697609188.273463][7767:7769] CHIP:TOO:   InitialPress: {
+          [1697609188.273466][7767:7769] CHIP:TOO:     NewPosition: 1
+          [1697609188.273469][7767:7769] CHIP:TOO:    }
+
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
+
+          echo '{"Name":"LongPress","NewPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the longPress event with NewPosition set to 1:
+
+          [1697609280.508624][7384:7386] CHIP:-: Received payload: "{"Name":"LongPress","NewPosition":1}"
+          [1697609280.508890][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4dbcc0bc
+          [1697609280.508924][7384:7384] CHIP:-: The new position when the momentary switch has been pressed for a long time:1
+          [1697609280.508933][7384:7384] CHIP:ZCL: SwitchServer: OnLongPress
+          [1697609280.509078][7384:7384] CHIP:EVL: Dropped 1 event from buffer with priority 1 and event number  0x0000000000000001 due to overflow: event priority_level: 1
+          [1697609280.509144][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
+          [1697609280.509174][7384:7384] CHIP:EVL: LogEvent event number: 0x0000000000000019 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x2 Epoch timestamp: 0x0000018B4165EBFC
+          [1697609280.509203][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_005C update version to e31eae9f
+
+
+          switch read-event long-press 1 1
+
+          Verify TH receives longPress event with NewPosition set to 1 on TH (chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1697609316.967370][7767:7769] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0002
+          [1697609316.967375][7767:7769] CHIP:TOO:   Event number: 25
+          [1697609316.967376][7767:7769] CHIP:TOO:   Priority: Info
+          [1697609316.967380][7767:7769] CHIP:TOO:   Timestamp: 1697609280508
+          [1697609316.967391][7767:7769] CHIP:TOO:   LongPress: {
+          [1697609316.967397][7767:7769] CHIP:TOO:     NewPosition: 1
+          [1697609316.967402][7767:7769] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 5f: Operator releases switch from the DUT"
+      PICS: SWTCH.S.F01 && SWTCH.S.F03
+      verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
+
+          echo '{"Name":"LongRelease","PreviousPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the LongRelease event with previousPosition set to 1:
+
+          [1697609417.101354][7384:7386] CHIP:-: Received payload: "{"Name":"LongRelease","PreviousPosition":1}"
+          [1697609417.101563][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4dbcc0bd
+          [1697609417.101600][7384:7384] CHIP:-: The the previous value of the CurrentPosition when the momentary switch has been released after having been pressed for a long time:1
+          [1697609417.101614][7384:7384] CHIP:ZCL: SwitchServer: OnLongRelease
+          [1697609417.101765][7384:7384] CHIP:EVL: Dropped 1 event from buffer with priority 1 and event number  0x0000000000000004 due to overflow: event priority_level: 1
+          [1697609417.101831][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
+          [1697609417.101862][7384:7384] CHIP:EVL: LogEvent event number: 0x000000000000001C priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x4 Epoch timestamp: 0x0000018B4168018D
+
+           switch read-event long-release 1 1
+
+          Verify TH receives LongRelease event with previousPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
+
+          [1697609485.675506][7767:7769] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0004
+          [1697609485.675509][7767:7769] CHIP:TOO:   Event number: 28
+          [1697609485.675511][7767:7769] CHIP:TOO:   Priority: Info
+          [1697609485.675513][7767:7769] CHIP:TOO:   Timestamp: 1697609417101
+          [1697609485.675531][7767:7769] CHIP:TOO:   LongRelease: {
+          [1697609485.675538][7767:7769] CHIP:TOO:     PreviousPosition: 1
+          [1697609485.675542][7767:7769] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 6a: Set up subscription to InitialPress, ShortRelease,
+          MultiPressOngoing, MultiPressComplete events"
+      PICS: SWTCH.S.F01 && SWTCH.S.F04
+      verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+
+          ./chip-tool interactive start
+
+          Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
+
+          switch subscribe-event initial-press 1 100 1 1
+
+          [1697609572.733866][7767:7769] CHIP:DMG: SubscribeResponseMessage =
+          [1697609572.733870][7767:7769] CHIP:DMG: {
+          [1697609572.733872][7767:7769] CHIP:DMG:         SubscriptionId = 0xdb9c2f95,
+          [1697609572.733875][7767:7769] CHIP:DMG:         MaxInterval = 0x64,
+          [1697609572.733878][7767:7769] CHIP:DMG:         InteractionModelRevision = 11
+          [1697609572.733880][7767:7769] CHIP:DMG: }
+
+          Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
+
+          switch subscribe-event short-release 1 100 1 1
+
+          [1697609772.052026][7767:7769] CHIP:DMG: SubscribeResponseMessage =
+          [1697609772.052029][7767:7769] CHIP:DMG: {
+          [1697609772.052032][7767:7769] CHIP:DMG:         SubscriptionId = 0xd48293d0,
+          [1697609772.052035][7767:7769] CHIP:DMG:         MaxInterval = 0x64,
+          [1697609772.052038][7767:7769] CHIP:DMG:         InteractionModelRevision = 11
+          [1697609772.052040][7767:7769] CHIP:DMG: }
+
+          Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
+
+          switch subscribe-event multi-press-ongoing 1 100 1 1
+
+          [1697609745.441125][7767:7769] CHIP:DMG: SubscribeResponseMessage =
+          [1697609745.441128][7767:7769] CHIP:DMG: {
+          [1697609745.441131][7767:7769] CHIP:DMG:         SubscriptionId = 0x2161432e,
+          [1697609745.441134][7767:7769] CHIP:DMG:         MaxInterval = 0x64,
+          [1697609745.441136][7767:7769] CHIP:DMG:         InteractionModelRevision = 11
+          [1697609745.441139][7767:7769] CHIP:DMG: }
+
+          Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
+
+          switch subscribe-event multi-press-complete 1 100 1 1
+
+          [1697609646.344664][7767:7769] CHIP:DMG: SubscribeResponseMessage =
+          [1697609646.344669][7767:7769] CHIP:DMG: {
+          [1697609646.344674][7767:7769] CHIP:DMG:         SubscriptionId = 0x9177cb65,
+          [1697609646.344679][7767:7769] CHIP:DMG:         MaxInterval = 0x64,
+          [1697609646.344684][7767:7769] CHIP:DMG:         InteractionModelRevision = 11
+          [1697609646.344688][7767:7769] CHIP:DMG: }
+      disabled: true
+
+    - label: "Step 6b: Operator does not operate switch on the DUT"
+      PICS: SWTCH.S.F01 && SWTCH.S.F04
+      verification: |
+          no Matter messages for this step
+      disabled: true
+
+    - label: "Step 6c: Operator operates switch (press briefly) on the DUT"
+      PICS: SWTCH.S.F01 && SWTCH.S.F04
+      verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
+
+          echo '{"Name":"InitialPress","NewPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the InitialPress event with NewPosition set to 1:
+
+          [1697609895.678486][7384:7386] CHIP:-: Received payload: "{"Name":"InitialPress","NewPosition":1}"
+          [1697609895.678744][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4dbcc0be
+          [1697609895.678786][7384:7384] CHIP:-: The new position when the momentary switch starts to be pressed:1
+          [1697609895.678800][7384:7384] CHIP:ZCL: SwitchServer: OnInitialPress
+          [1697609895.678917][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
+          [1697609895.678949][7384:7384] CHIP:EVL: LogEvent event number: 0x000000000000001D priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x1 Epoch timestamp: 0x0000018B416F4EFE
+
+          switch read-event initial-press   1 1
+
+          Verify TH receives InitialPress event with NewPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
+
+          [1697609943.498311][7767:7769] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
+          [1697609943.498313][7767:7769] CHIP:TOO:   Event number: 29
+          [1697609943.498315][7767:7769] CHIP:TOO:   Priority: Info
+          [1697609943.498317][7767:7769] CHIP:TOO:   Timestamp: 1697609895678
+          [1697609943.498320][7767:7769] CHIP:TOO:   InitialPress: {
+          [1697609943.498323][7767:7769] CHIP:TOO:     NewPosition: 1
+          [1697609943.498325][7767:7769] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 6d: Operator releases switch from the DUT"
+      PICS: SWTCH.S.F01 && SWTCH.S.F04
+      verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
+
+
+          echo '{"Name":"ShortRelease","PreviousPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the ShortRelease event with PreviousPosition set to 1:
+
+          [1697610020.642902][7384:7386] CHIP:-: Received payload: "{"Name":"ShortRelease","PreviousPosition":1}"
+          [1697610020.643151][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4dbcc0bf
+          [1697610020.643184][7384:7384] CHIP:-: The the previous value of the CurrentPosition when the momentary switch has been released:1
+          [1697610020.643194][7384:7384] CHIP:ZCL: SwitchServer: OnShortRelease
+          [1697610020.643356][7384:7384] CHIP:EVL: Dropped 1 event from buffer with priority 1 and event number  0x0000000000000005 due to overflow: event priority_level: 1
+          [1697610020.643427][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
+          [1697610020.643456][7384:7384] CHIP:EVL: LogEvent event number: 0x000000000000001E priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x3 Epoch timestamp: 0x0000018B41713723
+
+          switch read-event short-release 1 1
+
+          Verify TH receives ShortRelease event with PreviousPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
+
+          [1697610069.134658][7767:7769] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1697610069.134661][7767:7769] CHIP:TOO:   Event number: 30
+          [1697610069.134663][7767:7769] CHIP:TOO:   Priority: Info
+          [1697610069.134665][7767:7769] CHIP:TOO:   Timestamp: 1697610020643
+          [1697610069.134669][7767:7769] CHIP:TOO:   ShortRelease: {
+          [1697610069.134672][7767:7769] CHIP:TOO:     PreviousPosition: 1
+          [1697610069.134675][7767:7769] CHIP:TOO:    }
+
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
+
+          echo '{"Name":"MultiPressComplete","PreviousPosition":1,"TotalNumberOfPressesCounted":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the MultiPressComplete event with PreviousPosition set to 1:
+
+          [1697610133.480979][7384:7386] CHIP:-: Received payload: "{"Name":"MultiPressComplete","PreviousPosition":1,"TotalNumberOfPressesCounted":1}"
+          [1697610133.481239][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4dbcc0c0
+          [1697610133.481271][7384:7384] CHIP:-: The previous position when the momentary switch has been pressed in a multi-press sequence:1
+          [1697610133.481280][7384:7384] CHIP:-: 1 times the momentary switch has been pressed
+          [1697610133.481287][7384:7384] CHIP:ZCL: SwitchServer: OnMultiPressComplete
+          [1697610133.481399][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
+          [1697610133.481431][7384:7384] CHIP:EVL: LogEvent event number: 0x000000000000001F priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x6 Epoch timestamp: 0x0000018B4172EFE9
+
+          switch read-event multi-press-complete 1 1
+
+          Verify TH receives MultiPressComplete event with PreviousPosition set to 1 and TotalNumberOfPressesCounted set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
+
+          [1697610193.287175][7767:7769] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0006
+          [1697610193.287187][7767:7769] CHIP:TOO:   Event number: 31
+          [1697610193.287198][7767:7769] CHIP:TOO:   Priority: Info
+          [1697610193.287207][7767:7769] CHIP:TOO:   Timestamp: 1697610133481
+          [1697610193.287241][7767:7769] CHIP:TOO:   MultiPressComplete: {
+          [1697610193.287261][7767:7769] CHIP:TOO:     PreviousPosition: 1
+          [1697610193.287273][7767:7769] CHIP:TOO:     TotalNumberOfPressesCounted: 1
+          [1697610193.287285][7767:7769] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 6e: Operator operates switch (press briefly) on the DUT"
+      PICS: SWTCH.S.F01 && SWTCH.S.F04
+      verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
+
+          echo '{"Name":"InitialPress","NewPosition":1}' > /tmp/chip_all_clusters_<PID>  (PID of DUT)
+
+          DUT generated the InitialPress event with NewPosition set to 1:
+
+          [1697609895.678486][7384:7386] CHIP:-: Received payload: "{"Name":"InitialPress","NewPosition":1}"
+          [1697609895.678744][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4dbcc0be
+          [1697609895.678786][7384:7384] CHIP:-: The new position when the momentary switch starts to be pressed:1
+          [1697609895.678800][7384:7384] CHIP:ZCL: SwitchServer: OnInitialPress
+          [1697609895.678917][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
+          [1697609895.678949][7384:7384] CHIP:EVL: LogEvent event number: 0x000000000000001D priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x1 Epoch timestamp: 0x0000018B416F4EFE
+
+          switch read-event initial-press   1 1
+
+          Verify TH receives InitialPress event with NewPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
+
+          [1697609943.498311][7767:7769] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
+          [1697609943.498313][7767:7769] CHIP:TOO:   Event number: 29
+          [1697609943.498315][7767:7769] CHIP:TOO:   Priority: Info
+          [1697609943.498317][7767:7769] CHIP:TOO:   Timestamp: 1697609895678
+          [1697609943.498320][7767:7769] CHIP:TOO:   InitialPress: {
+          [1697609943.498323][7767:7769] CHIP:TOO:     NewPosition: 1
+          [1697609943.498325][7767:7769] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 6f: Operator releases switch from the DUT"
+      PICS: SWTCH.S.F01 && SWTCH.S.F04
+      verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
+
+          echo '{"Name":"ShortRelease","PreviousPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the ShortRelease event with PreviousPosition set to 1:
+
+          [1697610020.642902][7384:7386] CHIP:-: Received payload: "{"Name":"ShortRelease","PreviousPosition":1}"
+          [1697610020.643151][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4dbcc0bf
+          [1697610020.643184][7384:7384] CHIP:-: The the previous value of the CurrentPosition when the momentary switch has been released:1
+          [1697610020.643194][7384:7384] CHIP:ZCL: SwitchServer: OnShortRelease
+          [1697610020.643356][7384:7384] CHIP:EVL: Dropped 1 event from buffer with priority 1 and event number  0x0000000000000005 due to overflow: event priority_level: 1
+          [1697610020.643427][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
+          [1697610020.643456][7384:7384] CHIP:EVL: LogEvent event number: 0x000000000000001E priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x3 Epoch timestamp: 0x0000018B41713723
+
+          switch read-event short-release 1 1
+
+          Verify TH receives ShortRelease event with PreviousPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
+
+          [1697610069.134658][7767:7769] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1697610069.134661][7767:7769] CHIP:TOO:   Event number: 30
+          [1697610069.134663][7767:7769] CHIP:TOO:   Priority: Info
+          [1697610069.134665][7767:7769] CHIP:TOO:   Timestamp: 1697610020643
+          [1697610069.134669][7767:7769] CHIP:TOO:   ShortRelease: {
+          [1697610069.134672][7767:7769] CHIP:TOO:     PreviousPosition: 1
+          [1697610069.134675][7767:7769] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 6g: Briefly after 6f, Operator operates switch again on the
+          DUT(press briefly)"
+      PICS: SWTCH.S.F01 && SWTCH.S.F04
+      verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
+
+          echo '{"Name":"InitialPress","NewPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the InitialPress event with NewPosition set to 1:
+
+          [1697609895.678486][7384:7386] CHIP:-: Received payload: "{"Name":"InitialPress","NewPosition":1}"
+          [1697609895.678744][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4dbcc0be
+          [1697609895.678786][7384:7384] CHIP:-: The new position when the momentary switch starts to be pressed:1
+          [1697609895.678800][7384:7384] CHIP:ZCL: SwitchServer: OnInitialPress
+          [1697609895.678917][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
+          [1697609895.678949][7384:7384] CHIP:EVL: LogEvent event number: 0x000000000000001D priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x1 Epoch timestamp: 0x0000018B416F4EFE
+
+          switch read-event initial-press   1 1
+
+          Verify TH receives InitialPress event with NewPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
+
+          [1697609943.498311][7767:7769] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
+          [1697609943.498313][7767:7769] CHIP:TOO:   Event number: 29
+          [1697609943.498315][7767:7769] CHIP:TOO:   Priority: Info
+          [1697609943.498317][7767:7769] CHIP:TOO:   Timestamp: 1697609895678
+          [1697609943.498320][7767:7769] CHIP:TOO:   InitialPress: {
+          [1697609943.498323][7767:7769] CHIP:TOO:     NewPosition: 1
+          [1697609943.498325][7767:7769] CHIP:TOO:    }
+
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
+
+          echo '{"Name":"MultiPressOngoing","NewPosition":1,"CurrentNumberOfPressesCounted":2}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the MultiPressongoing event with NewPosition set to 1:
+
+          [1697610439.738698][7384:7386] CHIP:-: Received payload: "{"Name":"MultiPressOngoing","NewPosition":1,"CurrentNumberOfPressesCounted":2}"
+          [1697610439.738953][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4dbcc0c1
+          [1697610439.738982][7384:7384] CHIP:-: The new position when the momentary switch has been pressed in a multi-press sequence:1
+          [1697610439.738995][7384:7384] CHIP:-: 2 times the momentary switch has been pressed
+          [1697610439.739001][7384:7384] CHIP:ZCL: SwitchServer: OnMultiPressOngoing
+          [1697610439.739129][7384:7384] CHIP:EVL: Dropped 1 event from buffer with priority 1 and event number  0x0000000000000006 due to overflow: event priority_level: 1
+          [1697610439.739190][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
+          [1697610439.739220][7384:7384] CHIP:EVL: LogEvent event number: 0x0000000000000020 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x5 Epoch timestamp: 0x0000018B41779C3B
+
+          switch read-event multi-press-ongoing 1 1
+
+          Verify TH receives  MultiPressongoing event with NewPosition set to 1 and CurrentNumberOfPressesCounted set to 2 on TH chip-tool log and below is the sample log provided for the raspi platform:
+
+          [1697610464.005842][7767:7769] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0005
+          [1697610464.005846][7767:7769] CHIP:TOO:   Event number: 32
+          [1697610464.005848][7767:7769] CHIP:TOO:   Priority: Info
+          [1697610464.005850][7767:7769] CHIP:TOO:   Timestamp: 1697610439739
+          [1697610464.005861][7767:7769] CHIP:TOO:   MultiPressOngoing: {
+          [1697610464.005866][7767:7769] CHIP:TOO:     NewPosition: 1
+          [1697610464.005869][7767:7769] CHIP:TOO:     CurrentNumberOfPressesCounted: 2
+          [1697610464.005872][7767:7769] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 6h: Operator releases switch from the DUT"
+      PICS: SWTCH.S.F01 && SWTCH.S.F04
+      verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
+
+          echo '{"Name":"ShortRelease","PreviousPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the ShortRelease event with PreviousPosition set to 1:
+
+          [1697610020.642902][7384:7386] CHIP:-: Received payload: "{"Name":"ShortRelease","PreviousPosition":1}"
+          [1697610020.643151][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4dbcc0bf
+          [1697610020.643184][7384:7384] CHIP:-: The the previous value of the CurrentPosition when the momentary switch has been released:1
+          [1697610020.643194][7384:7384] CHIP:ZCL: SwitchServer: OnShortRelease
+          [1697610020.643356][7384:7384] CHIP:EVL: Dropped 1 event from buffer with priority 1 and event number  0x0000000000000005 due to overflow: event priority_level: 1
+          [1697610020.643427][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
+          [1697610020.643456][7384:7384] CHIP:EVL: LogEvent event number: 0x000000000000001E priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x3 Epoch timestamp: 0x0000018B41713723
+
+          switch read-event short-release 1 1
+
+          Verify TH receives ShortRelease event with PreviousPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
+
+          [1697610069.134658][7767:7769] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1697610069.134661][7767:7769] CHIP:TOO:   Event number: 30
+          [1697610069.134663][7767:7769] CHIP:TOO:   Priority: Info
+          [1697610069.134665][7767:7769] CHIP:TOO:   Timestamp: 1697610020643
+          [1697610069.134669][7767:7769] CHIP:TOO:   ShortRelease: {
+          [1697610069.134672][7767:7769] CHIP:TOO:     PreviousPosition: 1
+          [1697610069.134675][7767:7769] CHIP:TOO:    }
+
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
+
+          echo '{"Name":"MultiPressComplete","PreviousPosition":1,"TotalNumberOfPressesCounted":2}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the MultiPressComplete event with PreviousPosition set to 1 and TotalNumberOfPressesCounted set to 2 :
+
+          [1697610593.918223][7384:7386] CHIP:-: Received payload: "{"Name":"MultiPressComplete","PreviousPosition":1,"TotalNumberOfPressesCounted":2}"
+          [1697610593.918505][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4dbcc0c2
+          [1697610593.918536][7384:7384] CHIP:-: The previous position when the momentary switch has been pressed in a multi-press sequence:1
+          [1697610593.918545][7384:7384] CHIP:-: 2 times the momentary switch has been pressed
+          [1697610593.918552][7384:7384] CHIP:ZCL: SwitchServer: OnMultiPressComplete
+          [1697610593.918693][7384:7384] CHIP:EVL: Dropped 1 event from buffer with priority 1 and event number  0x0000000000000007 due to overflow: event priority_level: 1
+          [1697610593.918774][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
+          [1697610593.918814][7384:7384] CHIP:EVL: LogEvent event number: 0x0000000000000021 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x6 Epoch timestamp: 0x0000018B4179F67E
+
+          switch read-event multi-press-complete 1 1
+
+          Verify TH receives MultiPressComplete event with PreviousPosition set to 1 and TotalNumberOfPressesCounted set to 2 on TH chip-tool log and below is the sample log provided for the raspi platform:
+
+          [1697610633.998752][7767:7769] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0006
+          [1697610633.998762][7767:7769] CHIP:TOO:   Event number: 33
+          [1697610633.998769][7767:7769] CHIP:TOO:   Priority: Info
+          [1697610633.998776][7767:7769] CHIP:TOO:   Timestamp: 1697610593918
+          [1697610633.998792][7767:7769] CHIP:TOO:   MultiPressComplete: {
+          [1697610633.998803][7767:7769] CHIP:TOO:     PreviousPosition: 1
+          [1697610633.998811][7767:7769] CHIP:TOO:     TotalNumberOfPressesCounted: 2
+          [1697610633.998821][7767:7769] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 6i: If MultiPressMax == 2 (see 2c of TC-SWTCH-2.1), skip steps
+          6j .. 6o"
+      PICS: SWTCH.S.F01 && SWTCH.S.F04
+      verification: |
+          no Matter messages for this step
+      disabled: true
+
+    - label: "Step 6j: Operator operates switch (press briefly) on the DUT"
+      PICS: ""
+      verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
+
+          echo '{"Name":"InitialPress","NewPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the InitialPress event with NewPosition set to 1:
+
+          [1697609895.678486][7384:7386] CHIP:-: Received payload: "{"Name":"InitialPress","NewPosition":1}"
+          [1697609895.678744][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4dbcc0be
+          [1697609895.678786][7384:7384] CHIP:-: The new position when the momentary switch starts to be pressed:1
+          [1697609895.678800][7384:7384] CHIP:ZCL: SwitchServer: OnInitialPress
+          [1697609895.678917][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
+          [1697609895.678949][7384:7384] CHIP:EVL: LogEvent event number: 0x000000000000001D priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x1 Epoch timestamp: 0x0000018B416F4EFE
+
+          switch read-event initial-press   1 1
+
+          Verify TH receives InitialPress event with NewPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
+
+          [1697609943.498311][7767:7769] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
+          [1697609943.498313][7767:7769] CHIP:TOO:   Event number: 29
+          [1697609943.498315][7767:7769] CHIP:TOO:   Priority: Info
+          [1697609943.498317][7767:7769] CHIP:TOO:   Timestamp: 1697609895678
+          [1697609943.498320][7767:7769] CHIP:TOO:   InitialPress: {
+          [1697609943.498323][7767:7769] CHIP:TOO:     NewPosition: 1
+          [1697609943.498325][7767:7769] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 6k: Operator releases switch from the DUT"
+      PICS: SWTCH.S.F01 && SWTCH.S.F04
+      verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
+
+          echo '{"Name":"ShortRelease","PreviousPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the ShortRelease event with PreviousPosition set to 1:
+
+          [1697610020.642902][7384:7386] CHIP:-: Received payload: "{"Name":"ShortRelease","PreviousPosition":1}"
+          [1697610020.643151][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4dbcc0bf
+          [1697610020.643184][7384:7384] CHIP:-: The the previous value of the CurrentPosition when the momentary switch has been released:1
+          [1697610020.643194][7384:7384] CHIP:ZCL: SwitchServer: OnShortRelease
+          [1697610020.643356][7384:7384] CHIP:EVL: Dropped 1 event from buffer with priority 1 and event number  0x0000000000000005 due to overflow: event priority_level: 1
+          [1697610020.643427][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
+          [1697610020.643456][7384:7384] CHIP:EVL: LogEvent event number: 0x000000000000001E priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x3 Epoch timestamp: 0x0000018B41713723
+
+           switch read-event short-release 1 1
+
+          Verify TH receives ShortRelease event with PreviousPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
+
+          [1697610069.134658][7767:7769] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1697610069.134661][7767:7769] CHIP:TOO:   Event number: 30
+          [1697610069.134663][7767:7769] CHIP:TOO:   Priority: Info
+          [1697610069.134665][7767:7769] CHIP:TOO:   Timestamp: 1697610020643
+          [1697610069.134669][7767:7769] CHIP:TOO:   ShortRelease: {
+          [1697610069.134672][7767:7769] CHIP:TOO:     PreviousPosition: 1
+          [1697610069.134675][7767:7769] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 6l: Briefly after 6k, operator operates switch again on the DUT
+          (press briefly)"
+      PICS: SWTCH.S.F01 && SWTCH.S.F04
+      verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
+
+          echo '{"Name":"InitialPress","NewPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the InitialPress event with NewPosition set to 1:
+
+          [1697609895.678486][7384:7386] CHIP:-: Received payload: "{"Name":"InitialPress","NewPosition":1}"
+          [1697609895.678744][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4dbcc0be
+          [1697609895.678786][7384:7384] CHIP:-: The new position when the momentary switch starts to be pressed:1
+          [1697609895.678800][7384:7384] CHIP:ZCL: SwitchServer: OnInitialPress
+          [1697609895.678917][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
+          [1697609895.678949][7384:7384] CHIP:EVL: LogEvent event number: 0x000000000000001D priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x1 Epoch timestamp: 0x0000018B416F4EFE
+
+          switch read-event initial-press   1 1
+
+          Verify TH receives InitialPress event with NewPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
+
+          [1697609943.498311][7767:7769] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
+          [1697609943.498313][7767:7769] CHIP:TOO:   Event number: 29
+          [1697609943.498315][7767:7769] CHIP:TOO:   Priority: Info
+          [1697609943.498317][7767:7769] CHIP:TOO:   Timestamp: 1697609895678
+          [1697609943.498320][7767:7769] CHIP:TOO:   InitialPress: {
+          [1697609943.498323][7767:7769] CHIP:TOO:     NewPosition: 1
+          [1697609943.498325][7767:7769] CHIP:TOO:    }
+
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
+
+          echo '{"Name":"MultiPressOngoing","NewPosition":1,"CurrentNumberOfPressesCounted":2}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the MultiPressongoing event with NewPosition set to 1 and CurrentNumberOfPressesCounted set to 2:
+
+          [1697611293.571665][7384:7386] CHIP:-: Received payload: "{"Name":"MultiPressOngoing","NewPosition":1,"CurrentNumberOfPressesCounted":2}"
+          [1697611293.571907][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4dbcc0c4
+          [1697611293.571940][7384:7384] CHIP:-: The new position when the momentary switch has been pressed in a multi-press sequence:1
+          [1697611293.571949][7384:7384] CHIP:-: 2 times the momentary switch has been pressed
+          [1697611293.571955][7384:7384] CHIP:ZCL: SwitchServer: OnMultiPressOngoing
+          [1697611293.572127][7384:7384] CHIP:EVL: Dropped 1 event from buffer with priority 1 and event number  0x000000000000000A due to overflow: event priority_level: 1
+          [1697611293.572215][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
+          [1697611293.572258][7384:7384] CHIP:EVL: LogEvent event number: 0x0000000000000023 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x5 Epoch timestamp: 0x0000018B4184A383
+
+          switch read-event  multi-press-ongoing  1 1
+
+          Verify MultiPressongoing event with NewPosition set to 1 and CurrentNumberOfPressesCounted set to 2 on TH chip-tool log and below is the sample log provided for the raspi platform:
+
+          [1659695330.923244][3912:3918] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0005
+          [1659695330.923264][3912:3918] CHIP:TOO:          Event number: 45
+          [1659695330.923283][3912:3918] CHIP:TOO:          Priority: Info
+          [1659695330.923302][3912:3918] CHIP:TOO:          Timestamp: 17754336
+          [1659695330.923326][3912:3918] CHIP:TOO:   MultiPressOngoing: {
+          [1659695330.923346][3912:3918] CHIP:TOO:     NewPosition: 1
+          [1659695330.923366][3912:3918] CHIP:TOO:     CurrentNumberOfPressesCounted: 2
+          [1659695330.923385][3912:3918] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 6m: Operator releases switch from the DUT"
+      PICS: SWTCH.S.F01 && SWTCH.S.F04
+      verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
+
+          echo '{"Name":"ShortRelease","PreviousPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the ShortRelease event with PreviousPosition set to 1:
+
+          [1697610020.642902][7384:7386] CHIP:-: Received payload: "{"Name":"ShortRelease","PreviousPosition":1}"
+          [1697610020.643151][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4dbcc0bf
+          [1697610020.643184][7384:7384] CHIP:-: The the previous value of the CurrentPosition when the momentary switch has been released:1
+          [1697610020.643194][7384:7384] CHIP:ZCL: SwitchServer: OnShortRelease
+          [1697610020.643356][7384:7384] CHIP:EVL: Dropped 1 event from buffer with priority 1 and event number  0x0000000000000005 due to overflow: event priority_level: 1
+          [1697610020.643427][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
+          [1697610020.643456][7384:7384] CHIP:EVL: LogEvent event number: 0x000000000000001E priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x3 Epoch timestamp: 0x0000018B41713723
+
+          switch read-event short-release 1 1
+
+          Verify TH receives ShortRelease event with PreviousPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
+
+          [1697610069.134658][7767:7769] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1697610069.134661][7767:7769] CHIP:TOO:   Event number: 30
+          [1697610069.134663][7767:7769] CHIP:TOO:   Priority: Info
+          [1697610069.134665][7767:7769] CHIP:TOO:   Timestamp: 1697610020643
+          [1697610069.134669][7767:7769] CHIP:TOO:   ShortRelease: {
+          [1697610069.134672][7767:7769] CHIP:TOO:     PreviousPosition: 1
+          [1697610069.134675][7767:7769] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 6n: Briefly after 6m, operator operates switch again (press
+          briefly)"
+      PICS: SWTCH.S.F01 && SWTCH.S.F04
+      verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
+
+          echo '{"Name":"InitialPress","NewPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the InitialPress event with NewPosition set to 1:
+
+          [1697609895.678486][7384:7386] CHIP:-: Received payload: "{"Name":"InitialPress","NewPosition":1}"
+          [1697609895.678744][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4dbcc0be
+          [1697609895.678786][7384:7384] CHIP:-: The new position when the momentary switch starts to be pressed:1
+          [1697609895.678800][7384:7384] CHIP:ZCL: SwitchServer: OnInitialPress
+          [1697609895.678917][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
+          [1697609895.678949][7384:7384] CHIP:EVL: LogEvent event number: 0x000000000000001D priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x1 Epoch timestamp: 0x0000018B416F4EFE
+
+          switch read-event  initial-press 1 1
+
+          Verify TH receives InitialPress event with NewPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
+
+          [1697609943.498311][7767:7769] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0001
+          [1697609943.498313][7767:7769] CHIP:TOO:   Event number: 29
+          [1697609943.498315][7767:7769] CHIP:TOO:   Priority: Info
+          [1697609943.498317][7767:7769] CHIP:TOO:   Timestamp: 1697609895678
+          [1697609943.498320][7767:7769] CHIP:TOO:   InitialPress: {
+          [1697609943.498323][7767:7769] CHIP:TOO:     NewPosition: 1
+          [1697609943.498325][7767:7769] CHIP:TOO:    }
+
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
+
+          echo '{"Name":"MultiPressOngoing","NewPosition":1,"CurrentNumberOfPressesCounted":3}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the MultiPressongoing event with NewPosition set to 1 and CurrentNumberOfPressesCounted set to 3:
+
+          [1686290991.699382][30125:30127] CHIP:-: Received payload: "{"Name":"MultiPressOngoing","NewPosition":1,"CurrentNumberOfPressesCounted":3}"
+          [1686290991.699646][30125:30125] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 89759738
+          [1686290991.699678][30125:30125] CHIP:-: The new position when the momentary switch has been pressed in a multi-press sequence:1
+          [1686290991.699687][30125:30125] CHIP:-: 3 times the momentary switch has been pressed
+          [1686290991.699694][30125:30125] CHIP:ZCL: SwitchServer: OnMultiPressOngoing
+
+          switch read-event  multi-press-ongoing  1 1
+
+          Verify TH receives  MultiPressongoing event with NewPosition set to 1 and CurrentNumberOfPressesCounted set to 3 on TH chip-tool log and below is the sample log provided for the raspi platform:
+
+          [1659698336.786184][4081:4086] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0005
+          [1659698336.786209][4081:4086] CHIP:TOO:          Event number: 57
+          [1659698336.786233][4081:4086] CHIP:TOO:          Priority: Info
+          [1659698336.786256][4081:4086] CHIP:TOO:          Timestamp: 20718400
+          [1659698336.786287][4081:4086] CHIP:TOO:   MultiPressOngoing: {
+          [1659698336.786312][4081:4086] CHIP:TOO:     NewPosition: 1
+          [1659698336.786337][4081:4086] CHIP:TOO:     CurrentNumberOfPressesCounted: 3
+          [1659698336.786360][4081:4086] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 6o: Operator releases switch from the DUT"
+      PICS: SWTCH.S.F01 && SWTCH.S.F04
+      verification: |
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
+
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
+
+          echo '{"Name":"ShortRelease","PreviousPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          DUT generated the ShortRelease event with PreviousPosition set to 1:
+
+          [1697610020.642902][7384:7386] CHIP:-: Received payload: "{"Name":"ShortRelease","PreviousPosition":1}"
+          [1697610020.643151][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4dbcc0bf
+          [1697610020.643184][7384:7384] CHIP:-: The the previous value of the CurrentPosition when the momentary switch has been released:1
+          [1697610020.643194][7384:7384] CHIP:ZCL: SwitchServer: OnShortRelease
+          [1697610020.643356][7384:7384] CHIP:EVL: Dropped 1 event from buffer with priority 1 and event number  0x0000000000000005 due to overflow: event priority_level: 1
+          [1697610020.643427][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
+          [1697610020.643456][7384:7384] CHIP:EVL: LogEvent event number: 0x000000000000001E priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x3 Epoch timestamp: 0x0000018B41713723
+
+          switch read-event short-release  1 1
+
+          Verify TH receives ShortRelease event with PreviousPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
+
+          [1697610069.134658][7767:7769] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
+          [1697610069.134661][7767:7769] CHIP:TOO:   Event number: 30
+          [1697610069.134663][7767:7769] CHIP:TOO:   Priority: Info
+          [1697610069.134665][7767:7769] CHIP:TOO:   Timestamp: 1697610020643
+          [1697610069.134669][7767:7769] CHIP:TOO:   ShortRelease: {
+          [1697610069.134672][7767:7769] CHIP:TOO:     PreviousPosition: 1
+          [1697610069.134675][7767:7769] CHIP:TOO:    }
+
+
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
+
+          echo '{"Name":"MultiPressComplete","PreviousPosition":1,"TotalNumberOfPressesCounted":3}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          Verify MultiPressonComplete event with PreviousPosition set to 1 and TotalNumberOfPressesCounted set to 3 on TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
+
+          [1659694592.347850][2530:2538] CHIP:-: Received payload: "{"Name":"MultiPressComplete","PreviousPosition":1,"TotalNumberOfPressesCounted":3}"
+          [1659694592.348389][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e772b
+          [1659694592.348481][2530:2530] CHIP:-: The new position when the momentary switch has been pressed in a multi-press sequence:1
+
+           switch read-event multi-press-complete 1 1
+
+          Verify TH receives MultiPressonComplete event with PreviousPosition set to 1 and TotalNumberOfPressesCounted set to 3 on TH (chip-tool) log and below is the sample log provided for the raspi platform:
+
+          [1659695330.923244][3912:3918] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0005
+          [1659695330.923264][3912:3918] CHIP:TOO:          Event number: 45
+          [1659695330.923283][3912:3918] CHIP:TOO:          Priority: Info
+          [1659695330.923302][3912:3918] CHIP:TOO:          Timestamp: 17754336
+          [1659695330.923326][3912:3918] CHIP:TOO:   MultiPressComplete: {
+          [1659695330.923346][3912:3918] CHIP:TOO:     PreviousPosition: 1
+          [1659695330.923366][3912:3918] CHIP:TOO:     TotalNumberOfPressesCounted: 3
+          [1659695330.923385][3912:3918] CHIP:TOO:    }
+      disabled: true

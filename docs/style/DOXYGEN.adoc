@@ -1,0 +1,240 @@
+[.text-center]
+= Project Connected Home over IP Software
+
+:plusplus: ++
+
+== Doxygen Best Practices, Conventions, and Style
+
+=== Comments
+
+Due to Project CHIP’s infrastructure nature, it will be consumed by
+other teams, both inside and outside Project CHIP. Therefore it is
+critical that how it works, how it behaves, and how it is
+interfaced with are **clearly** documented.
+
+In support of this effort Project CHIP uses
+http://www.doxygen.org/[Doxygen] to
+markup (or markdown) all C, C{plusplus}, Objective C, Objective C{plusplus}, Perl,
+Python, and Java code to:
+
+* Detail what the various source and header files are and how they fit
+into the broader context.
+* Detail what the various C{plusplus} / Objective C{plusplus} namespaces are.
+* Detail what the constants, C preprocessor definitions, and
+enumerations are.
+* Detail what the globals are and how they are to be used.
+* Detail what the free function and object / class methods are and how
+they are to be used, what their parameters are, and what their return
+values are.
+* Detail any other important technical information or theory of
+operation unique and relevant to the stack that is not otherwise
+captured in architecture, design, or protocol documentation.
+
+==== File
+
+Every C, C{plusplus}, Objective C, Objective C{plusplus}, Perl, Python, Shell, and Java
+source file should, at minimum, have a standard, boilerplate Project
+CHIP file header that also describes what the file is and how, if
+applicable, it fits into the broader implementation.
+
+Canonical examples for C, C{plusplus}, Objective C, and Objective C{plusplus} and
+Python, Perl, and shell are shown in Listing 1 and Listing 2 below.
+
+[source,C]
+----
+/*
+ *    Copyright (c) <Create year>[-<Last modified year>] Project CHIP Authors.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License. 
+ */
+
+/**
+ *    @file
+ *        <Brief description>
+ *
+ *      [<Detailed description>]
+ */
+----
+[.text-center]
+*Listing 1.* Standard, boilerplate Project CHIP file header for C, C{plusplus},
+Objective C, and Objective C{plusplus}..
+
+[source,perl]
+----
+#
+#    Copyright (c) <Create year>[-<Last modified year>] Project CHIP Authors.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
+##
+#    @file
+#        <Brief description>
+#
+#      [<Detailed description>]
+#
+----
+[.text-center]
+*Listing 2.* Standard, boilerplate Project CHIP file header for Perl,
+Python, shell, and make.
+
+where:
+
+* _<Create year>_ is the year the file was created.
+* _<Last modified year>_ is, optionally, the year the file was last
+modified if it is different from _<Create year>_.
+* _<Brief description>_ is a succinct description of what the file is.
+* _<Detailed description>_ is, optionally, a more in-depth description of
+what the file is and how it fits into the broader context.
+
+For header files, a good prologue for _<Brief description>_ is "This file
+defines...", describing what is being defined or declared. Likewise, for
+source files, a good prologue for _<Brief description>_ is "This file
+implements...", describing what is being implemented. Usually,
+copy-and-pasting the brief description from the header to the source and
+changing the prologue from "defines" to "implements" is sufficient.
+
+The _<Detailed description>_, if present, could be a link to one or more
+of the architecture, design, or protocol specifications or some more in
+depth but still succinct information about where the file and what it
+defines or implements fit into the broader design or implementation.
+
+===== Motivation and Rationale
+
+The motivation and rationale for this is not from a legal perspective
+and as a consequence is not in opposition to guidance from legal.
+However, when Project CHIP provides a substantial amount of code as
+reference code and as an SDK to third-parties and other work group member
+companies, this makes it very clear—and consistently so—what code belongs
+to and is authored by Project CHIP and what is not.
+
+==== Functions and Methods
+
+Every non-trival or non-default public, and ideally private, free function
+and class method should likewise have a prologue comment that:
+
+* Briefly describes what it is and what it does.
+* Describes in detail, optionally, what it is and what it does.
+* Describes the purpose, function, and influence of each parameter as
+well as whether it is an input, an output, or both.
+* Describes the return value or values, if present, and the expected range or
+constraints of it.
+
+The goal of function and method comments are to not simply echo back to the
+reader what is in the API signature but to provide value-added insight. Also,
+remember that what may be intuitive and self-evident to you as a domain expert
+today may not be to your future self or others who are uninitiated in the domain.
+The project's success will be measured by the ease, speed, and breadth of its adoption.
+Your comments, alongside examples, will contribute toward this goal. When in doubt,
+err on the side of being generous with your comments rather than parsimonious.
+
+An example is shown in Listing 3 below for C, C{plusplus}, Objective C, and
+Objective C{plusplus}. Adapt as appropriate for Perl, Python and Shell.
+
+[source,C]
+----
+/**
+ * Parse and attempt to convert a string to a 64-bit unsigned integer,
+ * applying the appropriate interpretation based on the base parameter.
+ *
+ * @param[in]  str     A pointer to a NULL-terminated C string representing
+ *                     the integer to parse.
+ * @param[out] output  A reference to storage for a 64-bit unsigned integer
+ *                     to which the parsed value will be stored on success.
+ * @param[in]  base    The base according to which the string should be
+ *                     interpreted and parsed. If 0 or 16, the string may
+ *                     be hexadecimal and prefixed with "0x". Otherwise, a 0
+ *                     is implied as 10 unless a leading 0 is encountered in
+ *                     which case 8 is implied.
+ *
+ * @retval  0 on success.
+ * @retval  #EINVAL if the given base contains an unsupported value or if no
+ *          conversion was performed.
+ * @retval  #ERANGE if the resulting value was out of range.
+ */
+----
+[.text-center]
+*Listing 3.* Standard Doxygen-compatible free function or method comment
+for C, C{plusplus}, Objective C, and Objective C{plusplus}.
+
+In addition, developers should well document the bodies of their
+functions and methods, describing the overall flow, design intent, error
+handling nuances, historical bugs encountered and resolved, and so
+forth. While these types of comments do not typically become part of the
+external documentation, they are invaluable to future maintainers of the
+code.
+
+==== Other
+
+===== Dos
+
+* *Do* use the '@' Doxygen markup style rather than the '\' markup style.
+* *Do* also consider consulting tips on
+http://centerforplainlanguage.org/5-steps-to-plain-language/[Plain
+Language] for additional style and tone input.
+* *Do* use consistent terminology and lingo.
+* *Do* properly paragraph justify and wrap your documentation.
+
+** See your editor's documentation on how to do this (for example, M-q in Emacs).
+
+===== Don'ts
+
+* *Do not* forget to document your files, enumerations, constants,
+classes, objects, namespaces, functions, and methods.
+* *Do not* include the file name in any Doxygen file comments or
+directives.
+
+** Your editor knows the [.underline]#file name#, source code control knows the file
+name, and you know the file name.
+** When it changes on the file system, having to change it in the file
+comments is simply an added burden.
+
+* *Do not* include [.underline]#your name# in any Doxygen comments or directives.
+
+** Source code control knows who you are and what file revisions you own.
+** We do not want Project CHIP consumers knowing who you are and calling
+or e-mailing you directly for support.
+
+* *Do not* include the [.underline]#modification date# the file was last changed in
+Doxygen comments or directives, [.underline]#except for the copyright header#.
+
+** Source code control knows when the file was last changed and the date
+other revisions were made.
+
+* *Do not* include subjective or opinionated commentary or expose
+proprietary and confidential information not relevant to the code or
+APIs.
+
+** This content *will be* published to and for consumption by members, the
+CHIP community, and the general public.
+
+== Revision History
+
+[cols="^1,^1,<2,<3",options="header"]
+|===
+|Revision |Date |Modified By |Description
+|1 |2020-06-11 |Grant Erickson |Initial revision.
+|===
+
+[.text-center]
+_Project Connect Home over IP Public Information_

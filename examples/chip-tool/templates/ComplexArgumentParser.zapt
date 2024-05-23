@@ -1,0 +1,20 @@
+{{> header}}
+
+#include <json/json.h>
+
+#include <lib/core/CHIPError.h>
+#include <app-common/zap-generated/cluster-objects.h>
+
+{{#zcl_structs}}
+{{#if has_more_than_one_cluster}}
+{{> struct_parser_decl namespace="detail"}}
+{{/if}}
+{{/zcl_structs}}
+
+{{#zcl_clusters}}
+{{#zcl_structs}}
+{{#unless has_more_than_one_cluster}}
+{{> struct_parser_decl namespace=(as_camel_cased ../name false)}}
+{{/unless}}
+{{/zcl_structs}}
+{{/zcl_clusters}}

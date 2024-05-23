@@ -1,0 +1,701 @@
+# Copyright (c) 2022 Project CHIP Authors
+# Copyright 2023 NXP
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/nxp_sdk.gni")
+
+#allows to get common NXP SDK gn options
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+
+# Allows to get various RT gn options
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/rt_sdk.gni")
+declare_args() {
+  board_version = "A1"
+  deviceBoardName = "RW612"
+  cpu1_cpu2_fw_type = "sb"
+}
+
+if (is_sdk_internal) {
+  DRIVER_FILES_PATH = "${rt_sdk_root}/platform/drivers"
+  UTILITIES_FILES_PATH = "${rt_sdk_root}/platform/utilities"
+} else {
+  if (!is_sdk_package) {
+    # sdk github is used (default sdk type) #
+    DRIVER_FILES_PATH = "${rt_core_sdk_root}/drivers"
+    UTILITIES_FILES_PATH = "${rt_core_sdk_root}/utilities"
+  }
+}
+
+if (is_sdk_package) {
+  COMPONENT_FILES_PATH = "${rt_sdk_root}/components"
+  DRIVER_FILES_PATH = "${rt_sdk_root}/devices/${deviceBoardName}/drivers"
+  DRIVER_USART_FILES_PATH = "${DRIVER_FILES_PATH}"
+  DRIVER_DMA_FILES_PATH = "${DRIVER_FILES_PATH}"
+  DRIVER_MRT_FILES_PATH = "${DRIVER_FILES_PATH}"
+  DRIVER_TRNG_FILES_PATH = "${DRIVER_FILES_PATH}"
+  DRIVER_FLEXSPI_FILES_PATH = "${DRIVER_FILES_PATH}"
+  DRIVER_LPC_GPIO_FILES_PATH = "${DRIVER_FILES_PATH}"
+  DRIVER_ENET_FILES_PATH = "${DRIVER_FILES_PATH}"
+  DRIVER_DCP_FILES_PATH = "${DRIVER_FILES_PATH}"
+  DRIVER_CACHE_FILES_PATH = "${DRIVER_FILES_PATH}"
+  DRIVER_COMMON_FILES_PATH = "${DRIVER_FILES_PATH}"
+  DRIVER_DEVICE_FILES_PATH = "${DRIVER_FILES_PATH}"
+  DRIVER_FLEXCOMM_FILES_PATH = "${DRIVER_FILES_PATH}"
+  DRIVER_IMU_FILES_PATH = "${DRIVER_FILES_PATH}"
+  DRIVER_GDMA_FILES_PATH = "${DRIVER_FILES_PATH}"
+  DRIVER_INPUTMUX_FILES_PATH = "${DRIVER_FILES_PATH}"
+  DRIVER_PINT_FILES_PATH = "${DRIVER_FILES_PATH}"
+  COMPONENT_CRC_FILES_PATH = "${COMPONENT_FILES_PATH}/crc"
+  COMPONENT_RNG_FILES_PATH = "${COMPONENT_FILES_PATH}/rng"
+  COMPONENT_RPMSG_FILES_PATH = "${COMPONENT_FILES_PATH}/rpmsg"
+  COMPONENT_UART_FILES_PATH = "${COMPONENT_FILES_PATH}/uart"
+  COMPONENT_TIMER_FILES_PATH = "${COMPONENT_FILES_PATH}/timer"
+  COMPONENT_GPIO_FILES_PATH = "${COMPONENT_FILES_PATH}/gpio"
+  COMPONENT_SILICON_ID_FILES_PATH = "${COMPONENT_FILES_PATH}/silicon_id"
+  COMPONENT_SILICON_ID_SOCS_FILES_PATH =
+      "${COMPONENT_SILICON_ID_FILES_PATH}/socs"
+  COMPONENT_MEM_MANAGER_FILES_PATH = "${COMPONENT_FILES_PATH}/mem_manager"
+  UTILITIES_FILES_PATH = "${rt_sdk_root}/utilities"
+  UTILITIES_DEVICE_FILES_PATH =
+      "${rt_sdk_root}/devices/${deviceBoardName}/utilities"
+  UTILITIES_ASSERT_FILES_PATH = "${UTILITIES_DEVICE_FILES_PATH}"
+  UTILITIES_SHELL_FILES_PATH = "${UTILITIES_DEVICE_FILES_PATH}"
+  DEBUG_CONSOLE_FILES_PATH = "${UTILITIES_DEVICE_FILES_PATH}/debug_console_lite"
+  FORMAT_FILES_PATH = "${UTILITIES_DEVICE_FILES_PATH}/format"
+  STR_FILES_PATH = "${UTILITIES_DEVICE_FILES_PATH}/str"
+  WIFI_BT_TEMPLATE_PATH = "${COMPONENT_FILES_PATH}/wifi_bt_module/template"
+} else {
+  # sdk github or internal sdk (bitbucket) are used #
+  COMPONENT_FILES_PATH = "${rt_core_sdk_root}/components"
+  DRIVER_FLEXCOMM_FILES_PATH = "${DRIVER_FILES_PATH}/flexcomm"
+  DRIVER_USART_FILES_PATH = "${DRIVER_FLEXCOMM_FILES_PATH}/usart"
+  DRIVER_DMA_FILES_PATH = "${DRIVER_FILES_PATH}/lpc_dma"
+  DRIVER_MRT_FILES_PATH = "${DRIVER_FILES_PATH}/mrt"
+  DRIVER_TRNG_FILES_PATH = "${DRIVER_FILES_PATH}/trng"
+  DRIVER_FLEXSPI_FILES_PATH = "${DRIVER_FILES_PATH}/flexspi"
+  DRIVER_LPC_GPIO_FILES_PATH = "${DRIVER_FILES_PATH}/lpc_gpio"
+  DRIVER_ENET_FILES_PATH = "${DRIVER_FILES_PATH}/enet"
+  DRIVER_DCP_FILES_PATH = "${DRIVER_FILES_PATH}/dcp"
+  DRIVER_CACHE_FILES_PATH = "${DRIVER_FILES_PATH}/cache/cache64"
+  DRIVER_COMMON_FILES_PATH = "${DRIVER_FILES_PATH}/common"
+  DRIVER_DEVICE_FILES_PATH =
+      "${rt_core_sdk_root}/devices/${deviceBoardName}/drivers"
+  DRIVER_IMU_FILES_PATH = "${DRIVER_FILES_PATH}/imu"
+  DRIVER_GDMA_FILES_PATH = "${DRIVER_FILES_PATH}/gdma"
+  DRIVER_INPUTMUX_FILES_PATH = "${DRIVER_FILES_PATH}/inputmux"
+  DRIVER_PINT_FILES_PATH = "${DRIVER_FILES_PATH}/pint"
+  COMPONENT_CRC_FILES_PATH = "${COMPONENT_FILES_PATH}/crc"
+  COMPONENT_RNG_FILES_PATH = "${COMPONENT_FILES_PATH}/rng"
+  COMPONENT_RPMSG_FILES_PATH = "${COMPONENT_FILES_PATH}/rpmsg"
+  COMPONENT_UART_FILES_PATH = "${COMPONENT_FILES_PATH}/uart"
+  COMPONENT_TIMER_FILES_PATH = "${COMPONENT_FILES_PATH}/timer"
+  COMPONENT_GPIO_FILES_PATH = "${COMPONENT_FILES_PATH}/gpio"
+  COMPONENT_MEM_MANAGER_FILES_PATH = "${COMPONENT_FILES_PATH}/mem_manager"
+  COMPONENT_SILICON_ID_FILES_PATH = "${COMPONENT_FILES_PATH}/silicon_id"
+  COMPONENT_SILICON_ID_SOCS_FILES_PATH =
+      "${COMPONENT_SILICON_ID_FILES_PATH}/socs"
+  UTILITIES_DEVICE_FILES_PATH =
+      "${rt_core_sdk_root}/devices/${deviceBoardName}/utilities"
+  UTILITIES_ASSERT_FILES_PATH = "${UTILITIES_FILES_PATH}/assert"
+  UTILITIES_SHELL_FILES_PATH = "${UTILITIES_FILES_PATH}/shell"
+  DEBUG_CONSOLE_FILES_PATH = "${UTILITIES_FILES_PATH}/debug_console_lite"
+  FORMAT_FILES_PATH = "${UTILITIES_FILES_PATH}/misc_utilities"
+  STR_FILES_PATH = "${UTILITIES_FILES_PATH}/str"
+  WIFI_BT_TEMPLATE_PATH = "${COMPONENT_FILES_PATH}/wifi_bt_module/template"
+}
+
+ELS_PKC_CL_PATH = "${rt_sdk_root}/components/els_pkc/"
+
+template("rw61x_sdk_drivers") {
+  # Convert the CPU1/CPU2 fw binaries into src files
+  fw_bin_path = "${rt_sdk_root}/components/conn_fwloader"
+  fw_args = [
+    "-t",
+    cpu1_cpu2_fw_type,
+    rebase_path(fw_bin_path, root_build_dir),
+  ]
+
+  #In case A0 target board version, explicitly generate A0 fw binaries
+  if (board_version == "A0") {
+    fw_args += [
+      "-r",
+      board_version,
+    ]
+  }
+
+  print(exec_script(
+            "${rt_sdk_root}/components/conn_fwloader/script/fw_bin2c_conv.py",
+            fw_args,
+            "list lines"))
+
+  config("${target_name}_config") {
+    include_dirs = []
+
+    if (defined(invoker.include_dirs)) {
+      include_dirs += invoker.include_dirs
+    }
+
+    _rw61x_sdk_drivers_include_dirs = [
+      #Drivers files
+      "${DRIVER_DEVICE_FILES_PATH}",
+      "${rt_core_sdk_root}/devices/${deviceBoardName}",
+      "${COMPONENT_CRC_FILES_PATH}",
+      "${COMPONENT_RNG_FILES_PATH}",
+      "${COMPONENT_RPMSG_FILES_PATH}",
+      "${COMPONENT_UART_FILES_PATH}",
+      "${COMPONENT_TIMER_FILES_PATH}",
+      "${COMPONENT_GPIO_FILES_PATH}",
+      "${COMPONENT_SILICON_ID_FILES_PATH}",
+      "${COMPONENT_SILICON_ID_SOCS_FILES_PATH}",
+      "${COMPONENT_MEM_MANAGER_FILES_PATH}",
+      "${DRIVER_COMMON_FILES_PATH}",
+      "${DRIVER_FLEXCOMM_FILES_PATH}",
+      "${DRIVER_USART_FILES_PATH}",
+      "${DRIVER_LPC_GPIO_FILES_PATH}",
+      "${DRIVER_DCP_FILES_PATH}",
+      "${DRIVER_ENET_FILES_PATH}",
+      "${DRIVER_CACHE_FILES_PATH}",
+      "${DRIVER_MRT_FILES_PATH}",
+      "${DRIVER_TRNG_FILES_PATH}",
+      "${DRIVER_FLEXSPI_FILES_PATH}",
+      "${DRIVER_DMA_FILES_PATH}",
+      "${UTILITIES_FILES_PATH}",
+      "${UTILITIES_DEVICE_FILES_PATH}",
+      "${DEBUG_CONSOLE_FILES_PATH}",
+      "${FORMAT_FILES_PATH}",
+      "${STR_FILES_PATH}",
+      "${DRIVER_IMU_FILES_PATH}",
+      "${DRIVER_GDMA_FILES_PATH}",
+      "${DRIVER_INPUTMUX_FILES_PATH}",
+      "${DRIVER_PINT_FILES_PATH}",
+
+      # XIP
+      "${rt_core_sdk_root}/components/flash/mflash",
+      "${rt_core_sdk_root}/components/flash/mflash/rdrw612bga",
+
+      # loader files
+      "${rt_core_sdk_root}/components/conn_fwloader/include",
+
+      #power manager
+      "${rt_core_sdk_root}/components/power_manager/core",
+      "${rt_core_sdk_root}/components/power_manager/devices/RW612",
+
+      #flash config
+      "${rt_core_sdk_root}/boards/rdrw612bga/flash_config",
+
+      # freertos
+      "${rt_sdk_freertos_kernel}/portable/GCC/ARM_CM33_NTZ/non_secure",
+
+      # framework
+      "${rt_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/configs",
+      "${rt_sdk_root}/middleware/wireless/framework/FactoryDataProvider",
+    ]
+
+    libs = []
+
+    if (defined(invoker.defines)) {
+      defines += invoker.defines
+    } else {
+      defines = []
+    }
+
+    defines += [
+      "CPU_RW612ETA1I",
+      "CPU3",
+      "FSL_RTOS_FREE_RTOS",
+
+      #   when DEBUG_CONSOLE_TRANSFER_NON_BLOCKING is defined
+      #   SERIAL_MANAGER_NON_BLOCKING_MODE is set to 1 by default
+      #"SERIAL_MANAGER_NON_BLOCKING_MODE=1",
+      "IMU_TASK_STACK_SIZE=1024",
+      "RPMSG_TXQ_BUFSIZE=16",
+      "RPMSG_TXQ_BUFLENGTH=256",
+      "gMemManagerLightExtendHeapAreaUsage=1",
+      "APP_FLEXSPI_AMBA_BASE=0x08000000",
+      "gAspCapability_d=1",
+      "FFU_CNS_TX_PWR_TABLE_CALIBRATION=1",
+      "USE_RTOS=1",
+      "BOOT_HEADER_ENABLE=1",
+      "WIFI_BOARD_RW610",
+
+      # This allows the CPU1/CPU2 fw to be embedded in the application
+      "gPlatformMonolithicApp_d=1",
+    ]
+
+    if (board_version != "A1") {
+      defines += [ "RW610_A1=0" ]
+    }
+
+    if (rw610_mbedtls_port_els_pkc) {
+      defines += [
+        # needed to compile els_pkc port for mbedtls
+        "MBEDTLS_MCUX_ELS_PKC_API",
+      ]
+      _rw61x_sdk_drivers_include_dirs += [
+        "${ELS_PKC_CL_PATH}",
+        "${ELS_PKC_CL_PATH}/src/compiler",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClAead/inc",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClAead/inc/internal",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClAeadModes/inc",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClAeadModes/inc/internal",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClAes/inc",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClAes/inc/internal",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClCipher/inc",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClCipher/inc/internal",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClCipherModes/inc",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClCipherModes/inc/internal",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClCore/inc",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/inc",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/inc/internal",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEls/inc",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEls/inc/internal",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClHash/inc",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClHashModes/inc",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClHashModes/inc/internal",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClHmac/inc",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClKey/inc",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClMac/inc",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClMac/inc/internal",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClMacModes/inc",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClMacModes/inc/internal",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClMath/inc",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClMath/inc/internal",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClMemory/inc",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClPadding/inc",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClPadding/inc/internal",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClPkc/inc",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClPkc/inc/internal",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClPrng/inc",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClPrng/inc/internal",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRandom/inc",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRandom/inc/internal",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRandomModes/inc",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRandomModes/inc/internal",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/inc",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClSession/inc",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClSession/inc/internal",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClTrng/inc",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClTrng/inc/internal",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxCsslCPreProcessor/inc",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxCsslDataIntegrity/inc",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxCsslFlowProtection/inc",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxCsslMemory/inc",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxCsslMemory/inc/internal",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxCsslParamIntegrity/inc",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxCsslSecureCounter/inc",
+        "${ELS_PKC_CL_PATH}/src/inc",
+        "${ELS_PKC_CL_PATH}/src/inc/impl",
+        "${ELS_PKC_CL_PATH}/src/platforms/rw61x",
+        "${ELS_PKC_CL_PATH}/src/platforms/rw61x/inc",
+      ]
+    }
+
+    if (chip_enable_wifi) {
+      _rw61x_sdk_drivers_include_dirs += [
+        "${rt_sdk_root}/middleware/wifi_nxp/wifidriver",
+
+        # Include lpm.h and host_sleep.h files
+        "${rt_sdk_root}/boards/rdrw612bga/wifi_examples/common/lpm",
+
+        # wifi config file path
+        "${WIFI_BT_TEMPLATE_PATH}",
+      ]
+    }
+
+    if (chip_enable_ble) {
+      libs += [
+        #ethermind bt libs
+        "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/private/lib/mcux/default/ble/cm33nodsp/gcc/libethermind_ble_core.a",
+        "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/private/lib/mcux/default/ble/cm33nodsp/gcc/libethermind_ble_gatt.a",
+        "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/private/lib/mcux/default/ble/cm33nodsp/gcc/libethermind_ble_protocol.a",
+        "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/private/lib/mcux/default/ble/cm33nodsp/gcc/libethermind_ble_util.a",
+      ]
+      defines += [
+        "gPlatformDisableBleLowPower_d=1",
+        "BT_PLATFORM",
+        "GATT_DB",
+        "CFG_BLE",
+      ]
+    }
+
+    if (chip_enable_matter_cli) {
+      #When the CLI is enabled the debug console should be moved in UART0 for RW61x
+      defines += [ "DEBUG_CONSOLE_UART_INDEX=0" ]
+    }
+
+    if (chip_enable_openthread) {
+      if (!spinel_interface_rpmsg) {
+        _rw61x_sdk_drivers_include_dirs += [
+          "${rt_sdk_root}/middleware/wireless/ieee-802.15.4/ieee_802_15_4/phy/interface",
+          "${rt_sdk_root}/middleware/wireless/ieee-802.15.4/ieee_802_15_4/phy/source/RW610N/RW610_RPMSG",
+          "${rt_sdk_root}/middleware/wireless/ieee-802.15.4/utils",
+        ]
+      } else {
+        defines += [ "SPINEL_INTERFACE_RPMSG" ]
+      }
+    }
+
+    cflags = []
+    cflags_c = []
+
+    if (defined(invoker.cflags)) {
+      cflags += invoker.cflags
+    }
+
+    cflags_c += [
+      "-Wno-unused-variable",
+      "-Wno-int-in-bool-context",
+      "-Wno-memset-elt-size",
+      "-Wno-parentheses",
+      "-Wno-vla",
+      "-Wno-cpp",
+      "-Wno-int-conversion",
+      "-Wno-error",
+    ]
+
+    # Now add our "system-header" include dirs
+    foreach(include_dir, _rw61x_sdk_drivers_include_dirs) {
+      cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
+    }
+  }
+
+  source_set(target_name) {
+    forward_variables_from(invoker, "*")
+
+    if (!defined(sources)) {
+      sources = []
+    }
+
+    sources += [
+      "${COMPONENT_CRC_FILES_PATH}/fsl_adapter_software_crc.c",
+      "${COMPONENT_GPIO_FILES_PATH}/fsl_adapter_lpc_gpio.c",
+      "${COMPONENT_MEM_MANAGER_FILES_PATH}/fsl_component_mem_manager_light.c",
+
+      #"${COMPONENT_RNG_FILES_PATH}/fsl_adapter_trng.c",
+      "${COMPONENT_RNG_FILES_PATH}/fsl_adapter_software_rng.c",
+      "${COMPONENT_RPMSG_FILES_PATH}/fsl_adapter_rfimu.c",
+      "${COMPONENT_SILICON_ID_FILES_PATH}/fsl_silicon_id.c",
+      "${COMPONENT_TIMER_FILES_PATH}/fsl_adapter_mrt.c",
+      "${COMPONENT_UART_FILES_PATH}/fsl_adapter_usart.c",
+      "${DEBUG_CONSOLE_FILES_PATH}/fsl_debug_console.c",
+      "${DRIVER_CACHE_FILES_PATH}/fsl_cache.c",
+      "${DRIVER_COMMON_FILES_PATH}/fsl_common.c",
+      "${DRIVER_COMMON_FILES_PATH}/fsl_common_arm.c",
+      "${DRIVER_DEVICE_FILES_PATH}/fsl_clock.c",
+      "${DRIVER_DEVICE_FILES_PATH}/fsl_ocotp.c",
+      "${DRIVER_DEVICE_FILES_PATH}/fsl_power.c",
+      "${DRIVER_DEVICE_FILES_PATH}/fsl_reset.c",
+      "${DRIVER_ENET_FILES_PATH}/fsl_enet.c",
+      "${DRIVER_FLEXCOMM_FILES_PATH}/fsl_flexcomm.c",
+      "${DRIVER_FLEXSPI_FILES_PATH}/fsl_flexspi.c",
+      "${DRIVER_GDMA_FILES_PATH}/fsl_gdma.c",
+      "${DRIVER_IMU_FILES_PATH}/fsl_imu.c",
+      "${DRIVER_INPUTMUX_FILES_PATH}/fsl_inputmux.c",
+      "${DRIVER_LPC_GPIO_FILES_PATH}/fsl_gpio.c",
+      "${DRIVER_MRT_FILES_PATH}/fsl_mrt.c",
+      "${DRIVER_PINT_FILES_PATH}/fsl_pint.c",
+      "${DRIVER_TRNG_FILES_PATH}/fsl_trng.c",
+      "${DRIVER_USART_FILES_PATH}/fsl_usart.c",
+      "${DRIVER_USART_FILES_PATH}/fsl_usart_dma.c",
+      "${FORMAT_FILES_PATH}/fsl_format.c",
+      "${UTILITIES_SHELL_FILES_PATH}/fsl_shell.c",
+
+      #sdk hook
+      "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/zephyr/kernel.c",
+      "${rt_core_sdk_root}/boards/rdrw612bga/flash_config/flash_config.c",
+
+      # Loader files
+      "${rt_core_sdk_root}/components/conn_fwloader/fsl_loader.c",
+      "${rt_core_sdk_root}/components/conn_fwloader/life_cycle.c",
+      "${rt_core_sdk_root}/components/conn_fwloader/nboot_hal.c",
+      "${rt_core_sdk_root}/components/flash/mflash/rdrw612bga/mflash_drv.c",
+
+      # comment fsl_str.c if using debug console light
+      #"${STR_FILES_PATH}/fsl_str.c",
+      # flash
+      "${rt_core_sdk_root}/components/internal_flash/rdrw612bga/fsl_adapter_flexspi_nor_flash.c",
+
+      # power manager
+      "${rt_core_sdk_root}/components/power_manager/core/fsl_pm_core.c",
+
+      #startup files
+      "${rt_core_sdk_root}/devices/${deviceBoardName}/gcc/startup_${deviceBoardName}.S",
+      "${rt_core_sdk_root}/devices/${deviceBoardName}/system_${deviceBoardName}.c",
+
+      # freertos files
+      "${rt_sdk_freertos_kernel}/portable/GCC/ARM_CM33_NTZ/non_secure/port.c",
+      "${rt_sdk_freertos_kernel}/portable/GCC/ARM_CM33_NTZ/non_secure/portasm.c",
+      "${rt_sdk_freertos_kernel}/portable/MemMang/heap_4.c",
+
+      # fw binaries for cpu1/cpu2
+      "${rt_sdk_root}/components/conn_fwloader/${board_version}/fw_cpu1.c",
+      "${rt_sdk_root}/components/conn_fwloader/${board_version}/fw_cpu2_ble.c",
+      "${rt_sdk_root}/components/conn_fwloader/${board_version}/fw_cpu2_combo.c",
+
+      # this platform file is needed for BLE/15.4 Controller wake up
+      "${rt_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform_ble.c",
+
+      # framework coex file to initialize controllers
+      "${rt_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform_coex.c",
+    ]
+
+    if (sdk_fsl_assert_support) {
+      sources += [ "${UTILITIES_ASSERT_FILES_PATH}/fsl_assert.c" ]
+    }
+
+    if (rw610_mbedtls_port_els_pkc) {
+      # els_pkc component for mbedtls els_pkc port
+      sources += [
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClAead/src/mcuxClAead.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClAeadModes/src/mcuxClAeadModes_Els_AesCcm.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClAeadModes/src/mcuxClAeadModes_Els_AesGcm.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClAeadModes/src/mcuxClAeadModes_Els_CcmEngineAes.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClAeadModes/src/mcuxClAeadModes_Els_GcmEngineAes.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClAeadModes/src/mcuxClAeadModes_Els_Modes.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClAeadModes/src/mcuxClAeadModes_Els_Multipart.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClAeadModes/src/mcuxClAeadModes_Els_Oneshot.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClAes/src/mcuxClAes_KeyTypes.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClCipher/src/mcuxClCipher.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClCipherModes/src/mcuxClCipherModes_Els_Aes.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClCipherModes/src/mcuxClCipherModes_Els_EngineAes.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClCipherModes/src/mcuxClCipherModes_Helper.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClCipherModes/src/mcuxClCipherModes_Modes.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Constants.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_EdDSA_GenerateKeyPair.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_EdDSA_GenerateKeyPair_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_EdDSA_GenerateSignature.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_EdDSA_GenerateSignatureMode.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_EdDSA_GenerateSignature_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_EdDSA_InitPrivKeyInputMode.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_EdDSA_Internal_CalcHashModN.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_EdDSA_Internal_CalcHashModN_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_EdDSA_Internal_DecodePoint_Ed25519.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_EdDSA_Internal_DecodePoint_Ed448.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_EdDSA_Internal_DecodePoint_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_EdDSA_Internal_SetupEnvironment.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_EdDSA_Internal_SignatureMechanisms.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_EdDSA_VerifySignature.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Internal_BlindedScalarMult.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Internal_Convert_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Internal_GenerateMultiplicativeBlinding.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Internal_InterleaveScalar.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Internal_InterleaveTwoScalars.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Internal_Interleave_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Internal_PointComparison_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Internal_RecodeAndReorderScalar.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Internal_SetupEnvironment.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Internal_SetupEnvironment_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Internal_Types.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_KeyTypes.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Mont_DhKeyAgreement.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Mont_DhKeyGeneration.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Mont_Internal_DhSetupEnvironment.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Mont_Internal_MontDhX.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Mont_Internal_MontDhX_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Mont_Internal_SecureScalarMult_XZMontLadder.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Mont_Internal_SecureScalarMult_XZMontLadder_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_SignatureMechanisms.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_TwEd_Internal_FixScalarMult.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_TwEd_Internal_PlainFixScalarMult25519.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_TwEd_Internal_PlainPtrSelectComb.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_TwEd_Internal_PlainPtrSelectML.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_TwEd_Internal_PlainVarScalarMult.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_TwEd_Internal_PointArithmeticEd25519.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_TwEd_Internal_PointArithmeticEd25519_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_TwEd_Internal_PointSubtraction_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_TwEd_Internal_PointValidation_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_TwEd_Internal_PrecPointImportAndValidate.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_TwEd_Internal_VarScalarMult.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_TwEd_Internal_VarScalarMult_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_WeierECC_Internal_GenerateCustomKeyType.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_WeierECC_Internal_GenerateDomainParams.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_WeierECC_Internal_GenerateDomainParams_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_WeierECC_Internal_SetupEnvironment.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Weier_Internal_ConvertPoint_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Weier_Internal_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Weier_Internal_KeyGen.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Weier_Internal_KeyGen_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Weier_Internal_PointArithmetic.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Weier_Internal_PointArithmetic_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Weier_Internal_PointCheck.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Weier_Internal_PointCheck_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Weier_Internal_PointMult.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Weier_Internal_SecurePointMult_CoZMontLadder.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Weier_Internal_SecurePointMult_CoZMontLadder_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Weier_Internal_SetupEnvironment.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Weier_KeyGen.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Weier_KeyGen_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Weier_PointMult.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Weier_PointMult_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Weier_Sign.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Weier_Sign_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Weier_Verify.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Weier_Verify_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEls/src/mcuxClEls_Aead.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEls/src/mcuxClEls_Cipher.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEls/src/mcuxClEls_Cmac.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEls/src/mcuxClEls_Common.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEls/src/mcuxClEls_Ecc.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEls/src/mcuxClEls_GlitchDetector.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEls/src/mcuxClEls_Hash.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEls/src/mcuxClEls_Hmac.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEls/src/mcuxClEls_Kdf.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEls/src/mcuxClEls_KeyManagement.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEls/src/mcuxClEls_Rng.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClHash/src/mcuxClHash_api_multipart_common.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClHash/src/mcuxClHash_api_multipart_compute.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClHash/src/mcuxClHash_api_oneshot_compute.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClHashModes/src/mcuxClHashModes_Core_els_sha2.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClHashModes/src/mcuxClHashModes_Internal_els_sha2.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClHmac/src/mcuxClHmac_Els.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClHmac/src/mcuxClHmac_Functions.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClHmac/src/mcuxClHmac_Helper.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClHmac/src/mcuxClHmac_KeyTypes.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClHmac/src/mcuxClHmac_Modes.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClHmac/src/mcuxClHmac_Sw.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClKey/src/mcuxClKey.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClKey/src/mcuxClKey_Protection.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClMac/src/mcuxClMac.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClMacModes/src/mcuxClMacModes.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClMacModes/src/mcuxClMacModes_Els_Cbcmac.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClMacModes/src/mcuxClMacModes_Els_Cmac.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClMacModes/src/mcuxClMacModes_Els_Functions.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClMacModes/src/mcuxClMacModes_Modes.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClMath/src/mcuxClMath_ExactDivide.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClMath/src/mcuxClMath_ExactDivideOdd.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClMath/src/mcuxClMath_ExactDivideOdd_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClMath/src/mcuxClMath_ModExp_SqrMultL2R.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClMath/src/mcuxClMath_ModInv.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClMath/src/mcuxClMath_ModInv_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClMath/src/mcuxClMath_NDash.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClMath/src/mcuxClMath_NDash_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClMath/src/mcuxClMath_QDash.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClMath/src/mcuxClMath_QDash_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClMath/src/mcuxClMath_ReduceModEven.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClMath/src/mcuxClMath_SecModExp.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClMath/src/mcuxClMath_SecModExp_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClMath/src/mcuxClMath_Utils.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClMemory/src/mcuxClMemory.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClPadding/src/mcuxClPadding.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClPkc/src/mcuxClPkc_Calculate.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClPkc/src/mcuxClPkc_ImportExport.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClPkc/src/mcuxClPkc_Initialize.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClPkc/src/mcuxClPkc_UPTRT.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClPrng/src/mcuxClPrng_ELS.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRandom/src/mcuxClRandom_DRBG.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRandom/src/mcuxClRandom_PRNG.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRandomModes/src/mcuxClRandomModes_CtrDrbg.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRandomModes/src/mcuxClRandomModes_CtrDrbg_Els.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRandomModes/src/mcuxClRandomModes_CtrDrbg_PrDisabled.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRandomModes/src/mcuxClRandomModes_ElsMode.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRandomModes/src/mcuxClRandomModes_NormalMode.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRandomModes/src/mcuxClRandomModes_PatchMode.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRandomModes/src/mcuxClRandomModes_PrDisabled.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRandomModes/src/mcuxClRandomModes_TestMode.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_ComputeD.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_ComputeD_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_GenerateProbablePrime.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_KeyGeneration_Crt.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_KeyGeneration_Crt_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_KeyGeneration_Plain.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_Mgf1.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_MillerRabinTest.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_MillerRabinTest_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_ModInv.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_NoEncode.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_NoVerify.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_Pkcs1v15Encode_sign.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_Pkcs1v15Verify.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_PrivateCrt.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_PrivateCrt_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_PrivatePlain.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_PssEncode.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_PssVerify.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_Public.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_Public_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_RemoveBlinding.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_RemoveBlinding_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_Sign.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_TestPQDistance.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_TestPQDistance_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_TestPrimeCandidate.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_TestPrimeCandidate_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_Verify.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_VerifyE.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClSession/src/mcuxClSession.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClTrng/src/mcuxClTrng_SA_TRNG.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxCsslMemory/src/mcuxCsslMemory_Clear.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxCsslMemory/src/mcuxCsslMemory_Compare.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxCsslMemory/src/mcuxCsslMemory_Copy.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxCsslMemory/src/mcuxCsslMemory_Internal_SecureCompare_Stub.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxCsslMemory/src/mcuxCsslMemory_Set.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxCsslParamIntegrity/src/mcuxCsslParamIntegrity.c",
+        "${ELS_PKC_CL_PATH}/src/platforms/rw61x/mcux_els.c",
+        "${ELS_PKC_CL_PATH}/src/platforms/rw61x/mcux_pkc.c",
+      ]
+    }
+
+    if (chip_enable_ble) {
+      sources += [
+        "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/export/extension/gatt_db_pl.c",
+        "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/controller/controller_rw610.c",
+        "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/hci_platform.c",
+      ]
+    }
+
+    if (chip_enable_wifi) {
+      sources += [
+        "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/mlan_11ax.c",
+        "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/mlan_11k.c",
+        "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/mlan_11v.c",
+        "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/mlan_action.c",
+        "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/mlan_mbo.c",
+        "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/wifi-imu.c",
+      ]
+    }
+
+    if (chip_enable_openthread) {
+      sources += [
+        "${rt_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform_hdlc.c",
+        "${rt_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform_ot.c",
+      ]
+      if (!spinel_interface_rpmsg) {
+        sources += [
+          "${rt_sdk_root}/middleware/wireless/ieee-802.15.4/ieee_802_15_4/phy/source/RW610N/RW610_RPMSG/ASP.c",
+          "${rt_sdk_root}/middleware/wireless/ieee-802.15.4/ieee_802_15_4/phy/source/RW610N/RW610_RPMSG/Phy.c",
+        ]
+      }
+    }
+
+    if (!defined(public_configs)) {
+      public_configs = []
+    }
+
+    if (!defined(public_deps)) {
+      public_deps = []
+    }
+
+    if (!defined(deps)) {
+      deps = []
+    }
+
+    public_configs += [ ":${target_name}_config" ]
+    public_deps += [ nxp_sdk_target ]
+
+    if (chip_enable_openthread) {
+      #Dep to ot header files required for mbedtls as mbedtls config file has a dependency to ot
+      deps += [ "${openthread_root}/src/core:libopenthread_core_headers" ]
+    }
+  }
+}

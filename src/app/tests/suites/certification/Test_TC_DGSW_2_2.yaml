@@ -1,0 +1,78 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.2.2. [TC-DGSW-2.2] Event Functionality [{DUT_Sever}]
+
+PICS:
+    - DGSW.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          NOTE: https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/linux#readme
+          Events to be executed as following
+          1. Compile app using below command in connectedhomeip folder
+          a. ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target linux-arm64-all-clusters-no-ble-asan-clang build"
+          2. Build respective app (all-clusters-app)
+          3. Commission DUT to TH
+          4. Open 2nd terminal of DUT and provide the below command to obtain PID of DUT ps  -aef|grep all-clusters-app
+          5. Follow the Verification step below to generate the event in 2nd terminal of DUT
+      disabled: true
+
+    - label: "Step 1: Commission DUT to TH"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Step 2: DUT sends an event report to TH. TH reads a list of
+          SoftwareFault struct from DUT."
+      PICS: DGSW.S.E00
+      verification: |
+          Provision DUT and TH.
+
+          On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
+
+           echo '{"Name":"SoftwareFault"}' > /tmp/chip_all_clusters_fifo_<PID>   (PID of all-clusters-app by using command provided in note above)
+
+
+          On  TH Send the below command
+          ./chip-tool softwarediagnostics read-event software-fault 1 0
+
+          Via the TH (chip-tool), verify:
+          -that SoftwareFault event contains softwarefault with ID, Name, Fault recording.
+          -ID is in the type of uint64.
+          -Name is in the type of string with max 8 chars.
+          -FaultRecording is in the type of Octet string with max 1024 chars and Priority should be Info.
+
+          [1655375196.291424][35133:35138] CHIP:DMG:         SuppressResponse = true,
+          [1655375196.291478][35133:35138] CHIP:DMG:         InteractionModelRevision = 1
+          [1655375196.291527][35133:35138] CHIP:DMG: }
+          [1655375196.291829][35133:35138] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
+          [1655375196.291882][35133:35138] CHIP:TOO:          Event number: 6
+          [1655375196.291931][35133:35138] CHIP:TOO:          Priority: Info
+          [1655375196.291978][35133:35138] CHIP:TOO:          Timestamp: 6164894
+          [1655375196.292119][35133:35138] CHIP:TOO:   SoftwareFault: {
+          [1655375196.292173][35133:35138] CHIP:TOO:     SoftwareFault: {
+          [1655375196.292235][35133:35138] CHIP:TOO:       Id: 2677
+          [1655375196.292287][35133:35138] CHIP:TOO:       Name: 2677
+          [1655375196.292341][35133:35138] CHIP:TOO:       FaultRecording: 546875204A756E2031362031303A32363A313420323032320A
+          [1655375196.292391][35133:35138] CHIP:TOO:      }
+      disabled: true

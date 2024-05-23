@@ -1,0 +1,824 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 25.2.1. [TC-CC-2.1] Attributes with server as DUT
+
+PICS:
+    - CC.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Color Control"
+    endpoint: 1
+
+tests:
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH reads from the DUT the (0x0000) CurrentHue attribute"
+      PICS: CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 254
+
+    - label:
+          "Step 3: TH reads from the DUT the (0x0001) CurrentSaturation
+          attribute"
+      PICS: CC.S.A0001
+      command: "readAttribute"
+      attribute: "CurrentSaturation"
+      response:
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 254
+
+    - label:
+          "Step 4: TH reads from the DUT the (0x0002) RemainingTime attribute"
+      PICS: CC.S.A0002
+      command: "readAttribute"
+      attribute: "RemainingTime"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65534
+
+    - label: "Step 5: TH reads from the DUT the (0x0003) CurrentX attribute"
+      PICS: CC.S.A0003
+      command: "readAttribute"
+      attribute: "CurrentX"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Step 6: TH reads from the DUT the (0x0004) CurrentY attribute"
+      PICS: CC.S.A0004
+      command: "readAttribute"
+      attribute: "CurrentY"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65279
+
+    - label:
+          "Step 7: TH reads from the DUT the (0x0005) DriftCompensation
+          attribute"
+      PICS: CC.S.A0005
+      command: "readAttribute"
+      attribute: "DriftCompensation"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 4
+
+    - label:
+          "Step 8: TH reads from the DUT the (0x0006) CompensationText attribute"
+      PICS: CC.S.A0006
+      command: "readAttribute"
+      attribute: "CompensationText"
+      response:
+          constraints:
+              type: char_string
+              maxLength: 254
+
+    - label:
+          "Step 9: TH reads from the DUT the (0x0007) ColorTemperatureMireds
+          attribute"
+      PICS: CC.S.A0007
+      command: "readAttribute"
+      attribute: "ColorTemperatureMireds"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Step 10: TH reads from the DUT the (0x0008) ColorMode attribute"
+      PICS: CC.S.A0008
+      command: "readAttribute"
+      attribute: "ColorMode"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 2
+
+    - label: "Step 11: TH reads from the DUT the (0x000f) Options attribute"
+      PICS: CC.S.A000f
+      command: "readAttribute"
+      attribute: "Options"
+      response:
+          constraints:
+              type: bitmap8
+              minValue: 0
+              maxValue: 4
+
+    - label:
+          "Step 12: TH reads from the DUT the (0x4000) EnhancedCurrentHue
+          attribute"
+      PICS: CC.S.A4000
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label:
+          "Step 13: TH reads from the DUT the (0x4001) EnhancedColorMode
+          attribute"
+      PICS: CC.S.A4001
+      command: "readAttribute"
+      attribute: "EnhancedColorMode"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 3
+
+    - label:
+          "Step 14:TH reads from the DUT the (0x4002) ColorLoopActive attribute"
+      PICS: CC.S.A4002
+      command: "readAttribute"
+      attribute: "ColorLoopActive"
+      response:
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 254
+
+    - label:
+          "Step 15: TH reads from the DUT the (0x4003) ColorLoopDirection
+          attribute"
+      PICS: CC.S.A4003
+      command: "readAttribute"
+      attribute: "ColorLoopDirection"
+      response:
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 254
+
+    - label:
+          "Step 16: TH reads from the DUT the (0x4004) ColorLoopTime attribute"
+      PICS: CC.S.A4004
+      command: "readAttribute"
+      attribute: "ColorLoopTime"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label:
+          "Step 17: TH reads from the DUT the (0x4005) ColorLoopStartEnhancedHue
+          attribute"
+      PICS: CC.S.A4005
+      command: "readAttribute"
+      attribute: "ColorLoopStartEnhancedHue"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label:
+          "Step 18: TH reads from the DUT the (0x4006)
+          ColorLoopStoredEnhancedHue attributeT"
+      PICS: CC.S.A4006
+      command: "readAttribute"
+      attribute: "ColorLoopStoredEnhancedHue"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label:
+          "Step 18a: Saving for comparision in step 19 reads FeatureMap
+          attribute from DUT"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          saveAs: FeatureMapValue
+
+    - label:
+          "Step 19: TH reads from the DUT the (0x400a) ColorCapabilities
+          attribute"
+      PICS: CC.S.A400a
+      command: "readAttribute"
+      attribute: "ColorCapabilities"
+      response:
+          value: FeatureMapValue
+          constraints:
+              type: bitmap16
+              minValue: 0
+              maxValue: 31
+
+    - label:
+          "Step 20: TH reads from the DUT the (0x400b)
+          ColorTempPhysicalMinMireds attribute"
+      PICS: CC.S.A400b
+      command: "readAttribute"
+      attribute: "ColorTempPhysicalMinMireds"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65279
+
+    - label:
+          "Step 21: TH reads from the DUT the (0x400c)
+          ColorTempPhysicalMaxMireds attribute"
+      PICS: CC.S.A400c
+      command: "readAttribute"
+      attribute: "ColorTempPhysicalMaxMireds"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65279
+
+    - label:
+          "Step 22: TH reads from the DUT the (0x400d)
+          CoupleColorTempToLevelMinMireds attribute"
+      PICS: CC.S.A400d
+      command: "readAttribute"
+      attribute: "CoupleColorTempToLevelMinMireds"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65279
+
+    - label:
+          "Step 23: TH reads from the DUT the (0x4010)
+          StartUpColorTemperatureMireds attribute"
+      PICS: CC.S.A4010
+      command: "readAttribute"
+      attribute: "StartUpColorTemperatureMireds"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65279
+
+    #Defined Primaries Information Attribute Set
+    - label:
+          "Step 24: TH reads from the DUT the (0x0010) NumberOfPrimaries
+          attribute"
+      PICS: CC.S.A0010
+      command: "readAttribute"
+      attribute: "NumberOfPrimaries"
+      response:
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 6
+
+    - label:
+          "Step 25: TH reads Primary1X attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 1 or more"
+      verification: |
+          ./chip-tool colorcontrol read  primary1x 1 1
+
+          On TH(chip-tool)  Logs, Verify that "Primary1X" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary1X" value is 0.
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0011 DataVersion: 540305990
+          [1651483665.109697][3245:3250] CHIP:TOO:    Primary1X: 0
+          [1651483665.109797][3245:3250] CHIP:EM: Sending Standalone Ack for MessageCounter:12731123 on exchange 55053i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0011
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 26: TH reads Primary1Y attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 1 or more"
+      verification: |
+          ./chip-tool colorcontrol read  primary1y 1 1
+
+
+          On TH(chip-tool)  Logs, Verify  that "Primary1Y" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary1Y" value is 0.
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0012 DataVersion: 540305990
+          [1651483698.733322][3253:3259] CHIP:TOO:    Primary1Y: 0
+          [1651483698.733420][3253:3259] CHIP:EM: Sending Standalone Ack for MessageCounter:7863787 on exchange 13103i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0012
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 27: TH reads Primary1Intensity attribute from DUT and Verify
+          that the DUT response contains an uint8 if NumberOfPrimaries is 1 or
+          more"
+      verification: |
+          ./chip-tool colorcontrol read primary1intensity 1 1
+
+          On TH(chip-tool)  Logs, Verify that "Primary1Intensity" attribute value is an uint8 and below is the sample log provided for the raspi platform, In RPI "Primary1Intensity" value is 0.
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0013 DataVersion: 540305990
+          [1651483742.297459][3263:3268] CHIP:TOO:   Primary1Intensity: 0
+          [1651483742.297558][3263:3268] CHIP:EM: Sending Standalone Ack for MessageCounter:10210809 on exchange 7007i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0013
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 28: TH reads Primary2X attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 2 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary2x 1 1
+
+          On TH(chip-tool)  Logs, Verify that "Primary2X" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary2X" value is 0.
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0015 DataVersion: 540305990
+          [1651483777.233498][3270:3275] CHIP:TOO:   Primary2X: 0
+          [1651483777.233614][3270:3275] CHIP:EM: Sending Standalone Ack for MessageCounter:1684573 on exchange 21377i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0015
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 29: TH reads Primary2Y attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 2 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary2y 1 1
+
+          On TH(chip-tool)  Logs, Verify  that "Primary2Y" value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary2Y" value is 0.
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0016 DataVersion: 540305990
+          [1651483805.650796][3279:3284] CHIP:TOO:  Primary2Y: 0
+          [1651483805.650942][3279:3284] CHIP:EM: Sending Standalone Ack for MessageCounter:16277541 on exchange 10435i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0016
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 30: TH reads Primary2Intensity attribute from DUT and Verify
+          that the DUT response contains an uint8 if NumberOfPrimaries is 2 or
+          more"
+      verification: |
+          ./chip-tool colorcontrol read primary2intensity 1 1
+
+          On TH(chip-tool)  Logs, Verify  that "Primary2Intensity" attribute value is an uint8 and below is the sample log provided for the raspi platform, In RPI "Primary2Intensity" value is 0.
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0017 DataVersion: 540305990
+          [1651483834.596380][3285:3290] CHIP:TOO:  Primary2Intensity: 0
+          [1651483834.596470][3285:3290] CHIP:EM: Sending Standalone Ack for MessageCounter:5986355 on exchange 855i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0017
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 31: TH reads Primary3X attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 3 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary3x 1 1
+
+          On TH(chip-tool)  Logs, Verify  that "Primary3X" value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary3X" value is 0.
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0019 DataVersion: 540305990
+          [1651483937.072323][3298:3303] CHIP:TOO:   Primary3X: 0
+          [1651483937.072405][3298:3303] CHIP:EM: Sending Standalone Ack for MessageCounter:6092298 on exchange 12519i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0019
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 32: TH reads Primary3Y attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 3 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary3y 1 1
+
+          On TH(chip-tool)  Logs, Verify  that "Primary3Y" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary3Y" value is 0.
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_001A DataVersion: 540305990
+          [1651483967.386334][3305:3310] CHIP:TOO:   Primary3Y: 0
+          [1651483967.386427][3305:3310] CHIP:EM: Sending Standalone Ack for MessageCounter:3329418 on exchange 11657i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A001a
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 33: TH reads Primary3Intensity attribute from DUT and Verify
+          that the DUT response contains an uint8 if NumberOfPrimaries is 3 or
+          more"
+      verification: |
+          ./chip-tool colorcontrol read primary3intensity 1 1
+
+          On TH(chip-tool)  Logs, Verify  that "Primary3Intensity" attribute value is an uint8  and below is the sample log provided for the raspi platform, In RPI "Primary3Intensity" value is 0.
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_001B DataVersion: 540305990
+          [1651484113.812178][3316:3321] CHIP:TOO:   Primary3Intensity: 0
+          [1651484113.812270][3316:3321] CHIP:EM: Sending Standalone Ack for MessageCounter:41658 on exchange 9618i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A001b
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    #Additional Defined Primaries Information Attribute Set
+    - label:
+          "Step 34: TH reads Primary4X attribute from DUT Verify that the DUT
+          response contains an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is
+          4 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary4x 1 1
+
+          On TH(chip-tool)  Logs, Verify  that "Primary4X" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary4X" value is 0.
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0020 DataVersion: 540305990
+          [1651484143.778301][3324:3329] CHIP:TOO:   Primary4X: 0
+          [1651484143.778392][3324:3329] CHIP:EM: Sending Standalone Ack for MessageCounter:2094184 on exchange 50270i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0020
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 35: TH reads Primary4Y attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 4 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary4y 1 1
+
+          On TH(chip-tool)  Logs, Verify  that "Primary4Y" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary4Y" value is 0.
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0021 DataVersion: 540305990
+          [1651484171.921901][3334:3339] CHIP:TOO:   Primary4Y: 0
+          [1651484171.921984][3334:3339] CHIP:EM: Sending Standalone Ack for MessageCounter:3701827 on exchange 16726i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0021
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 36: TH reads Primary4Intensity attribute from DUT and Verify
+          that the DUT response contains an uint8 if NumberOfPrimaries is 4 or
+          more"
+      verification: |
+          ./chip-tool colorcontrol read primary4intensity 1 1
+
+          On TH(chip-tool)  Logs, Verify that "Primary4Intensity" attribute value is an uint8 and below is the sample log provided for the raspi platform, In RPI "Primary4Intensity" value is 0.
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0022 DataVersion: 540305990
+          [1651484198.443415][3341:3346] CHIP:TOO:   Primary4Intensity: 0
+          [1651484198.443528][3341:3346] CHIP:EM: Sending Standalone Ack for MessageCounter:1740063 on exchange 36245i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0022
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 37: TH reads Primary5X attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 5 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary5x 1 1
+
+          On TH(chip-tool)  Logs, Verify that "Primary5X" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary5X" value is 0.
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0024 DataVersion: 540305990
+          [1651484241.467661][3350:3355] CHIP:TOO:   Primary5X: 0
+          [1651484241.467788][3350:3355] CHIP:EM: Sending Standalone Ack for MessageCounter:5350139 on exchange 63040i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0024
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 38: TH reads Primary5Y attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 5 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary5y 1 1
+
+          On TH(chip-tool)  Logs, Verify that "Primary5Y" attribute value is an uint16 and below is the sample log provided for the raspi platform, In RPI "Primary5Y" value is 0.
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0025 DataVersion: 540305990
+          [1651484286.709863][3358:3363] CHIP:TOO:  Primary5Y: 0
+          [1651484286.709964][3358:3363] CHIP:EM: Sending Standalone Ack for MessageCounter:7199124 on exchange 47604i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0025
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 39: TH reads Primary5Intensity attribute from DUT and Verify
+          that the DUT response contains an uint8 if NumberOfPrimaries is 5 or
+          more"
+      verification: |
+          ./chip-tool colorcontrol read primary5intensity 1 1
+
+          On TH(chip-tool)  Logs, Verify that "Primary5Intensity" attribute value is an uint8 and below is the sample log provided for the raspi platform, In RPI "Primary5Intensity" value is 0.
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0026 DataVersion: 540305990
+          [1651484304.715731][3365:3370] CHIP:TOO:  Primary5Intensity: 0
+          [1651484304.715829][3365:3370] CHIP:EM: Sending Standalone Ack for MessageCounter:8654922 on exchange 29272i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0026
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 40: TH reads Primary6X attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 6 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary6x 1 1
+
+          On TH(chip-tool)  Logs, Verify  that "Primary6X" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary6X" value is 0.
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0028 DataVersion: 540305990
+          [1651484349.601181][3372:3377] CHIP:TOO:  Primary6X: 0
+          [1651484349.601269][3372:3377] CHIP:EM: Sending Standalone Ack for MessageCounter:13704291 on exchange 30507i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0028
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 41: TH reads Primary6Y attribute from DUT and Verify that the
+          DUT response contains an uint16 [Min:0 Max:0xfeff] if
+          NumberOfPrimaries is 6 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary6y 1 1
+
+          On TH(chip-tool)  Logs, Verify  that "Primary6Y" attribute value is an uint16 [Min:0 Max:0xfeff] and below is the sample log provided for the raspi platform, In RPI "Primary6Y" value is 0.
+
+          [1663318323.234522][132277:132282] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0029 DataVersion: 3053940635
+          [1663318323.234951][132277:132282] CHIP:TOO:   Primary6Y: 0
+          [1663318323.235117][132277:132282] CHIP:EM: Sending Standalone Ack for MessageCounter:208977845 on exchange 35151i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0029
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 42: TH reads Primary6Intensity attribute from DUT and Verify
+          that the DUT response contains an uint8 if NumberOfPrimaries is 6 or
+          more"
+      verification: |
+          ./chip-tool colorcontrol read primary6intensity 1 1
+
+          On TH(chip-tool)  Logs, Verify  that "Primary6Intensity" value is an uint8 and below is the sample log provided for the raspi platform, In RPI "Primary6Intensity" value is 0.
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_002A DataVersion: 540305990
+          [1651484392.490974][3378:3383] CHIP:TOO:  Primary6Intensity: 0
+          [1651484392.491074][3378:3383] CHIP:EM: Sending Standalone Ack for MessageCounter:2427165 on exchange 17769i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A002a
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    #Defined Color Points Settings Attribute Set
+    - label: "Step 43: TH reads from the DUT the (0x0030) WhitePointX attribute"
+      PICS: CC.S.A0030
+      command: "readAttribute"
+      attribute: "WhitePointX"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Step 44: TH reads from the DUT the (0x0031) WhitePointY attribute"
+      PICS: CC.S.A0031
+      command: "readAttribute"
+      attribute: "WhitePointY"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65279
+
+    - label:
+          "Step 45: TH reads from the DUT the (0x0032) ColorPointRX attribute"
+      PICS: CC.S.A0032
+      command: "readAttribute"
+      attribute: "ColorPointRX"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65279
+
+    - label:
+          "Step 46: TH reads from the DUT the (0x0033) ColorPointRY attribute"
+      PICS: CC.S.A0033
+      command: "readAttribute"
+      attribute: "ColorPointRY"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65279
+
+    - label:
+          "Step 47: TH reads from the DUT the (0x0034) ColorPointRIntensity
+          attribute"
+      PICS: CC.S.A0034
+      command: "readAttribute"
+      attribute: "ColorPointRIntensity"
+      response:
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 255
+
+    - label:
+          "Step 48: TH reads from the DUT the (0x0036) ColorPointGX attribute"
+      PICS: CC.S.A0036
+      command: "readAttribute"
+      attribute: "ColorPointGX"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65279
+
+    - label:
+          "Step 49: TH reads from the DUT the (0x0037) ColorPointGY attribute"
+      PICS: CC.S.A0037
+      command: "readAttribute"
+      attribute: "ColorPointGY"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65279
+
+    - label:
+          "Step 50: TH reads from the DUT the (0x0038) ColorPointGIntensity
+          attribute"
+      PICS: CC.S.A0038
+      command: "readAttribute"
+      attribute: "ColorPointGIntensity"
+      response:
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 255
+
+    - label:
+          "Step 51: TH reads from the DUT the (0x003a) ColorPointBX attribute"
+      PICS: CC.S.A003a
+      command: "readAttribute"
+      attribute: "ColorPointBX"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65279
+
+    - label:
+          "Step 52: TH reads from the DUT the (0x003b) ColorPointBY attribute"
+      PICS: CC.S.A003b
+      command: "readAttribute"
+      attribute: "ColorPointBY"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65279
+
+    - label:
+          "Step 53: TH reads from the DUT the (0x003c) ColorPointBIntensity
+          attribute"
+      PICS: CC.S.A003c
+      command: "readAttribute"
+      attribute: "ColorPointBIntensity"
+      response:
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 255

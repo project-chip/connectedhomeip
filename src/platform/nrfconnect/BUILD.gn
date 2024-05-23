@@ -1,0 +1,135 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/nrfconnect/args.gni")
+
+assert(chip_device_platform == "nrfconnect")
+
+static_library("nrfconnect") {
+  sources = [
+    "../SingletonConfigurationManager.cpp",
+    "../Zephyr/BLEAdvertisingArbiter.cpp",
+    "../Zephyr/BLEAdvertisingArbiter.h",
+    "../Zephyr/BLEManagerImpl.cpp",
+    "../Zephyr/ConfigurationManagerImpl.cpp",
+    "../Zephyr/DiagnosticDataProviderImpl.cpp",
+    "../Zephyr/DiagnosticDataProviderImpl.h",
+    "../Zephyr/KeyValueStoreManagerImpl.cpp",
+    "../Zephyr/Logging.cpp",
+    "../Zephyr/PlatformManagerImpl.cpp",
+    "../Zephyr/SysHeapMalloc.h",
+    "../Zephyr/SystemTimeSupport.cpp",
+    "../Zephyr/ZephyrConfig.cpp",
+    "../Zephyr/ZephyrConfig.h",
+    "BLEManagerImpl.h",
+    "BlePlatformConfig.h",
+    "CHIPDevicePlatformConfig.h",
+    "CHIPDevicePlatformEvent.h",
+    "CHIPPlatformConfig.h",
+    "ConfigurationManagerImpl.h",
+    "ConnectivityManagerImpl.cpp",
+    "ConnectivityManagerImpl.h",
+    "DiagnosticDataProviderImplNrf.cpp",
+    "DiagnosticDataProviderImplNrf.h",
+    "ExternalFlashManager.h",
+    "InetPlatformConfig.h",
+    "KeyValueStoreManagerImpl.h",
+    "PlatformManagerImpl.h",
+    "Reboot.cpp",
+    "Reboot.h",
+    "SystemPlatformConfig.h",
+  ]
+
+  public = [
+    "${chip_root}/src/credentials/CHIPCert.h",
+    "${chip_root}/src/credentials/CertificationDeclaration.h",
+    "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
+  ]
+
+  public_deps = [ "${chip_root}/src/platform:platform_base" ]
+  deps = [ "${chip_root}/src/platform/logging:headers" ]
+
+  if (chip_enable_factory_data) {
+    sources += [
+      "FactoryDataParser.c",
+      "FactoryDataParser.h",
+      "FactoryDataProvider.cpp",
+      "FactoryDataProvider.h",
+    ]
+  } else {
+    sources += [
+      "DeviceInstanceInfoProviderImpl.cpp",
+      "DeviceInstanceInfoProviderImpl.h",
+    ]
+  }
+
+  if (chip_enable_openthread || chip_enable_wifi) {
+    sources += [
+      "../Zephyr/InetUtils.cpp",
+      "../Zephyr/InetUtils.h",
+    ]
+  }
+
+  if (chip_enable_openthread) {
+    sources += [
+      "../OpenThread/OpenThreadUtils.cpp",
+      "../Zephyr/ThreadStackManagerImpl.cpp",
+      "ThreadStackManagerImpl.h",
+    ]
+
+    if (chip_mdns_platform) {
+      sources += [
+        "../OpenThread/DnssdImpl.cpp",
+        "../OpenThread/OpenThreadDnssdImpl.cpp",
+        "../OpenThread/OpenThreadDnssdImpl.h",
+      ]
+      deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
+    }
+  }
+
+  if (chip_enable_wifi) {
+    sources += [
+      "OTAImageProcessorImplWiFi.h",
+      "wifi/ConnectivityManagerImplWiFi.cpp",
+      "wifi/ConnectivityManagerImplWiFi.h",
+      "wifi/NrfWiFiDriver.cpp",
+      "wifi/NrfWiFiDriver.h",
+      "wifi/WiFiManager.cpp",
+      "wifi/WiFiManager.h",
+    ]
+  }
+
+  if (chip_enable_nfc) {
+    sources += [
+      "../Zephyr/NFCManagerImpl.cpp",
+      "NFCManagerImpl.h",
+    ]
+  }
+
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "OTAImageProcessorImpl.cpp",
+      "OTAImageProcessorImpl.h",
+    ]
+  }
+
+  if (chip_malloc_sys_heap) {
+    sources += [ "../Zephyr/SysHeapMalloc.cpp" ]
+  }
+
+  cflags = [ "-Wconversion" ]
+}

@@ -1,0 +1,681 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("${chip_root}/build/chip/java/config.gni")
+import("${chip_root}/build/config/android/config.gni")
+
+javac_runner = "${chip_root}/build/chip/java/javac_runner.py"
+kotlinc_runner = "${chip_root}/build/chip/java/kotlinc_runner.py"
+jar_runner = "${chip_root}/build/chip/java/jar_runner.py"
+write_build_config = "${chip_root}/build/chip/java/write_build_config.py"
+
+assert(android_sdk_root != "" || matter_enable_java_compilation,
+       "android_sdk_root must be specified or JAVA_PATH must be set.")
+
+# Declare a java library target
+#
+#   sources: List of .java files included in this library. Mutually exclusive with jar_path.
+#
+#   jar_path: A path to an existing JAR. Mutually exclusive with sources.
+#
+#   deps: List of dependent .jar files needed by this library.
+#
+#   output_name: File name for the output .jar (not including extension).
+#     Defaults to the input .jar file name.
+#
+#   javac_flags: additional flags to pass to the javac compiler
+#
+template("java_library") {
+  # Figure out the output name
+  _jar_name = target_name
+  if (defined(invoker.output_name)) {
+    _jar_name = invoker.output_name
+  } else {
+    _jar_name += ".jar"
+  }
+
+  _deps = []
+  if (defined(invoker.deps)) {
+    _deps = invoker.deps
+  }
+
+  # What files will be compiled
+  _java_files = []
+  if (defined(invoker.sources)) {
+    _java_files = invoker.sources
+  }
+
+  _is_prebuilt = defined(invoker.jar_path)
+
+  _jar_output = ""
+  _target_dir_name = get_label_info(":$target_name", "dir")
+  if (_is_prebuilt) {
+    assert(_java_files == [])
+    _jar_output = "$root_out_dir/lib/$_target_dir_name/" +
+                  get_path_info(invoker.jar_path, "name") + ".jar"
+  } else {
+    _jar_output = "$root_out_dir/lib/$_target_dir_name/$_jar_name"
+  }
+
+  # Generate a list containing the expected build_config filepath of every dependency.
+  _deps_configs = []
+  foreach(_dep, _deps) {
+    _dep_gen_dir = get_label_info(_dep, "target_gen_dir")
+    _dep_name = get_label_info(_dep, "name")
+    _dep_config = "$_dep_gen_dir/$_dep_name.json"
+    _deps_configs += [ _dep_config ]
+  }
+  _rebased_deps_configs = rebase_path(_deps_configs, root_build_dir)
+
+  # Create the name for this target's build_config.
+  _library_target_name = target_name
+  _build_config = "$target_gen_dir/$_library_target_name.json"
+  _rebased_build_config = rebase_path(_build_config, root_build_dir)
+
+  # Write the build_config file for this target.
+  _config_target_name = target_name + "_config"
+  action(_config_target_name) {
+    script = write_build_config
+
+    deps = _deps
+
+    outputs = [ _build_config ]
+    args = [
+      "--jar-path",
+      rebase_path(_jar_output, root_build_dir),
+      "--build-config",
+      _rebased_build_config,
+      "--deps-configs=$_rebased_deps_configs",
+    ]
+  }
+
+  # Building from sources - perform Java compilation and JAR creation.
+  if (!_is_prebuilt) {
+    # Additional flags
+    _javac_flags = [
+      "-Werror",
+      "-Xlint:all",
+    ]
+    if (defined(invoker.javac_flags)) {
+      _javac_flags += invoker.javac_flags
+    }
+
+    # Data deps
+    _data_deps = []
+    if (defined(invoker.data_deps)) {
+      _data_deps = invoker.data_deps
+    }
+
+    # Generates a .sources file containing all sources to be compiled
+    _java_sources_file = "$target_gen_dir/$target_name.sources"
+    if (defined(invoker.java_sources_file)) {
+      _java_sources_file = invoker.java_sources_file
+    }
+    write_file(_java_sources_file, rebase_path(_java_files, root_build_dir))
+
+    # Compiles the given files into a directory and generates a 'class list'
+    _javac_target_name = target_name + "__javac"
+    _class_dir = rebase_path(target_out_dir, root_build_dir) + "/" +
+                 target_name + "/classes"
+    _class_list_file = "$target_gen_dir/$target_name.classlist"
+    action(_javac_target_name) {
+      sources = _java_files
+      deps = [ ":$_config_target_name" ]
+
+      outputs = [ _class_list_file ]
+
+      script = javac_runner
+
+      args = [
+               "--classdir",
+               _class_dir,
+               "--outfile",
+               rebase_path(_class_list_file, root_build_dir),
+               "--build-config",
+               _rebased_build_config,
+               "--",
+               "-d",
+               _class_dir,
+               "@" + rebase_path(_java_sources_file, root_build_dir),
+             ] + _javac_flags
+    }
+
+    # Bundles all files within the 'class directory' into a jar file
+    action(target_name) {
+      deps = [ ":$_javac_target_name" ] + _deps
+
+      data_deps = _data_deps
+
+      outputs = [ _jar_output ]
+
+      script = jar_runner
+
+      args = [
+        "cf",
+        rebase_path(_jar_output, root_build_dir),
+        "-C",
+        _class_dir,
+        ".",
+      ]
+    }
+  } else {
+    # Using pre-specified JAR instead of building from sources - simply copy the JAR to the output directory.
+    _original_jar_path = invoker.jar_path
+    copy(target_name) {
+      sources = [ _original_jar_path ]
+      outputs = [ _jar_output ]
+      deps = [ ":$_config_target_name" ] + _deps
+    }
+  }
+}
+
+# Declare a Java executable target
+#
+#  Manifext.txt: contains the given class as the entrypoint about the files packaged in a Java executable target.
+#
+#   sources: List of .java files included in this binary. Mutually exclusive with jar_path.
+#
+#   jar_path: A path to an existing JAR. Mutually exclusive with sources.
+#
+#   deps: List of dependent .jar files needed by this binary.
+#
+#   output_name: File name for the output binary under root_build_dir/bin.
+#
+#   javac_flags: additional flags to pass to the javac compiler
+#
+template("java_binary") {
+  # Figure out the output name
+  _jar_name = target_name
+  if (defined(invoker.output_name)) {
+    _jar_name = invoker.output_name
+  } else {
+    _jar_name += ".jar"
+  }
+
+  _deps = []
+  if (defined(invoker.deps)) {
+    _deps = invoker.deps
+  }
+
+  # What files will be compiled
+  _java_files = []
+  if (defined(invoker.sources)) {
+    _java_files = invoker.sources
+  }
+
+  _is_prebuilt = defined(invoker.jar_path)
+
+  _jar_output = ""
+  _target_dir_name = get_label_info(":$target_name", "dir")
+  if (_is_prebuilt) {
+    assert(_java_files == [])
+    _jar_output = "$root_out_dir/bin/$_target_dir_name/" +
+                  get_path_info(invoker.jar_path, "name") + ".jar"
+  } else {
+    _jar_output = "$root_out_dir/bin/$_target_dir_name/$_jar_name"
+  }
+
+  # Generate a list containing the expected build_config filepath of every dependency.
+  _deps_configs = []
+  foreach(_dep, _deps) {
+    _dep_gen_dir = get_label_info(_dep, "target_gen_dir")
+    _dep_name = get_label_info(_dep, "name")
+    _dep_config = "$_dep_gen_dir/$_dep_name.json"
+    _deps_configs += [ _dep_config ]
+  }
+  _rebased_deps_configs = rebase_path(_deps_configs, root_build_dir)
+
+  # Create the name for this target's build_config.
+  _library_target_name = target_name
+  _build_config = "$target_gen_dir/$_library_target_name.json"
+  _rebased_build_config = rebase_path(_build_config, root_build_dir)
+
+  # Write the build_config file for this target.
+  _config_target_name = target_name + "_config"
+  action(_config_target_name) {
+    script = write_build_config
+
+    deps = _deps
+
+    outputs = [ _build_config ]
+    args = [
+      "--jar-path",
+      rebase_path(_jar_output, root_build_dir),
+      "--build-config",
+      _rebased_build_config,
+      "--deps-configs=$_rebased_deps_configs",
+    ]
+  }
+
+  # Building from sources - perform Java compilation and JAR creation.
+  if (!_is_prebuilt) {
+    # Additional flags
+    _javac_flags = [
+      "-Werror",
+      "-Xlint:all",
+    ]
+    if (defined(invoker.javac_flags)) {
+      _javac_flags += invoker.javac_flags
+    }
+
+    # Data deps
+    _data_deps = []
+    if (defined(invoker.data_deps)) {
+      _data_deps = invoker.data_deps
+    }
+
+    # Generates a .sources file containing all sources to be compiled
+    _java_sources_file = "$target_gen_dir/$target_name.sources"
+    if (defined(invoker.java_sources_file)) {
+      _java_sources_file = invoker.java_sources_file
+    }
+    write_file(_java_sources_file, rebase_path(_java_files, root_build_dir))
+
+    # Compiles the given files into a directory and generates a 'class list'
+    _javac_target_name = target_name + "__javac"
+    _class_dir = rebase_path(target_out_dir, root_build_dir) + "/" +
+                 target_name + "/classes"
+    _class_list_file = "$target_gen_dir/$target_name.classlist"
+    action(_javac_target_name) {
+      sources = _java_files
+      deps = [ ":$_config_target_name" ]
+
+      outputs = [ _class_list_file ]
+
+      script = javac_runner
+
+      args = [
+               "--classdir",
+               _class_dir,
+               "--outfile",
+               rebase_path(_class_list_file, root_build_dir),
+               "--build-config",
+               _rebased_build_config,
+               "--",
+               "-d",
+               _class_dir,
+               "@" + rebase_path(_java_sources_file, root_build_dir),
+             ] + _javac_flags
+    }
+
+    # Bundles all files within the 'class directory' into a jar file
+    action(target_name) {
+      deps = [ ":$_javac_target_name" ] + _deps
+
+      data_deps = _data_deps
+
+      outputs = [ _jar_output ]
+
+      script = jar_runner
+
+      args = [
+        "cfm",
+        rebase_path(_jar_output, root_build_dir),
+        "Manifest.txt",
+        "-C",
+        _class_dir,
+        ".",
+      ]
+    }
+  } else {
+    # Using pre-specified JAR instead of building from sources - simply copy the JAR to the output directory.
+    _original_jar_path = invoker.jar_path
+    copy(target_name) {
+      sources = [ _original_jar_path ]
+      outputs = [ _jar_output ]
+      deps = [ ":$_config_target_name" ] + _deps
+    }
+  }
+}
+
+# Declare a kotlin library target
+#
+#   sources: List of .kt files included in this library. Mutually exclusive with jar_path.
+#
+#   jar_path: A path to an existing JAR. Mutually exclusive with sources.
+#
+#   deps: List of dependent .jar files needed by this library.
+#
+#   output_name: File name for the output .jar (not including extension).
+#     Defaults to the input .jar file name.
+#
+#   kotlinc_flags: additional flags to pass to the kotlinc compiler
+#
+template("kotlin_library") {
+  # Figure out the output name
+  _jar_name = target_name
+  if (defined(invoker.output_name)) {
+    _jar_name = invoker.output_name
+  } else {
+    _jar_name += ".jar"
+  }
+
+  _deps = []
+  if (defined(invoker.deps)) {
+    _deps = invoker.deps
+  }
+
+  # What files will be compiled
+  _kotlin_files = []
+  if (defined(invoker.sources)) {
+    _kotlin_files = invoker.sources
+  }
+
+  _is_prebuilt = defined(invoker.jar_path)
+
+  _jar_output = ""
+  _target_dir_name = get_label_info(":$target_name", "dir")
+  if (_is_prebuilt) {
+    assert(_kotlin_files == [])
+    _jar_output = "$root_out_dir/lib/$_target_dir_name/" +
+                  get_path_info(invoker.jar_path, "name") + ".jar"
+  } else {
+    _jar_output = "$root_out_dir/lib/$_target_dir_name/$_jar_name"
+  }
+
+  # Generate a list containing the expected build_config filepath of every dependency.
+  _deps_configs = []
+  foreach(_dep, _deps) {
+    _dep_gen_dir = get_label_info(_dep, "target_gen_dir")
+    _dep_name = get_label_info(_dep, "name")
+    _dep_config = "$_dep_gen_dir/$_dep_name.json"
+    _deps_configs += [ _dep_config ]
+  }
+  _rebased_deps_configs = rebase_path(_deps_configs, root_build_dir)
+
+  # Create the name for this target's build_config.
+  _library_target_name = target_name
+  _build_config = "$target_gen_dir/$_library_target_name.json"
+  _rebased_build_config = rebase_path(_build_config, root_build_dir)
+
+  # Write the build_config file for this target.
+  _config_target_name = target_name + "_config"
+  action(_config_target_name) {
+    script = write_build_config
+
+    deps = _deps
+
+    outputs = [ _build_config ]
+    args = [
+      "--jar-path",
+      rebase_path(_jar_output, root_build_dir),
+      "--build-config",
+      _rebased_build_config,
+      "--deps-configs=$_rebased_deps_configs",
+    ]
+  }
+
+  # Building from sources - perform Kotlin compilation and JAR creation.
+  if (!_is_prebuilt) {
+    # Additional flags
+    _kotlinc_flags = [
+      "-Werror",
+      "-Xlint:all",
+    ]
+    if (defined(invoker.kotlinc_flags)) {
+      _kotlinc_flags += invoker.kotlinc_flags
+    }
+
+    # Data deps
+    _data_deps = []
+    if (defined(invoker.data_deps)) {
+      _data_deps = invoker.data_deps
+    }
+
+    # Generates a .sources file containing all sources to be compiled
+    _kotlin_sources_file = "$target_gen_dir/$target_name.sources"
+    if (defined(invoker.kotlin_sources_file)) {
+      _kotlin_sources_file = invoker.kotlin_sources_file
+    }
+    write_file(_kotlin_sources_file, rebase_path(_kotlin_files, root_build_dir))
+
+    # Compiles the given files into a directory and generates a 'class list'
+    _kotlinc_target_name = target_name + "__kotlinc"
+    _class_dir = rebase_path(target_out_dir, root_build_dir) + "/" +
+                 target_name + "/classes"
+    _class_list_file = "$target_gen_dir/$target_name.classlist"
+    action(_kotlinc_target_name) {
+      sources = _kotlin_files
+      deps = [ ":$_config_target_name" ]
+
+      outputs = [ _class_list_file ]
+
+      script = kotlinc_runner
+
+      args = [
+               "--classdir",
+               _class_dir,
+               "--outfile",
+               rebase_path(_class_list_file, root_build_dir),
+               "--build-config",
+               _rebased_build_config,
+               "--",
+               "-d",
+               _class_dir,
+               "@" + rebase_path(_kotlin_sources_file, root_build_dir),
+             ] + _kotlinc_flags
+    }
+
+    # Bundles all files within the 'class directory' into a jar file
+    action(target_name) {
+      deps = [ ":$_kotlinc_target_name" ] + _deps
+
+      data_deps = _data_deps
+
+      outputs = [ _jar_output ]
+
+      script = jar_runner
+
+      args = [
+        "cf",
+        rebase_path(_jar_output, root_build_dir),
+        "-C",
+        _class_dir,
+        ".",
+      ]
+    }
+  } else {
+    # Using pre-specified JAR instead of building from sources - simply copy the JAR to the output directory.
+    _original_jar_path = invoker.jar_path
+    copy(target_name) {
+      sources = [ _original_jar_path ]
+      outputs = [ _jar_output ]
+      deps = [ ":$_config_target_name" ] + _deps
+    }
+  }
+}
+
+# Declare a Kotlin executable target
+#
+#  Manifext.txt: contains the given class as the entrypoint about the files packaged in a Kotlin executable target.
+#
+#   sources: List of .kt files included in this binary. Mutually exclusive with jar_path.
+#
+#   jar_path: A path to an existing JAR. Mutually exclusive with sources.
+#
+#   deps: List of dependent .jar files needed by this binary.
+#
+#   output_name: File name for the output binary under root_build_dir/bin.
+#
+#   kotlinc_flags: additional flags to pass to the kotlinc compiler
+#
+template("kotlin_binary") {
+  # Figure out the output name
+  _jar_name = target_name
+  if (defined(invoker.output_name)) {
+    _jar_name = invoker.output_name
+  } else {
+    _jar_name += ".jar"
+  }
+
+  _deps = []
+  if (defined(invoker.deps)) {
+    _deps = invoker.deps
+  }
+
+  # What files will be compiled
+  _kotlin_files = []
+  if (defined(invoker.sources)) {
+    _kotlin_files = invoker.sources
+  }
+
+  _is_prebuilt = defined(invoker.jar_path)
+
+  _jar_output = ""
+  _target_dir_name = get_label_info(":$target_name", "dir")
+  if (_is_prebuilt) {
+    assert(_kotlin_files == [])
+    _jar_output = "$root_out_dir/bin/$_target_dir_name/" +
+                  get_path_info(invoker.jar_path, "name") + ".jar"
+  } else {
+    _jar_output = "$root_out_dir/bin/$_target_dir_name/$_jar_name"
+  }
+
+  # Generate a list containing the expected build_config filepath of every dependency.
+  _deps_configs = []
+  foreach(_dep, _deps) {
+    _dep_gen_dir = get_label_info(_dep, "target_gen_dir")
+    _dep_name = get_label_info(_dep, "name")
+    _dep_config = "$_dep_gen_dir/$_dep_name.json"
+    _deps_configs += [ _dep_config ]
+  }
+  _rebased_deps_configs = rebase_path(_deps_configs, root_build_dir)
+
+  # Create the name for this target's build_config.
+  _library_target_name = target_name
+  _build_config = "$target_gen_dir/$_library_target_name.json"
+  _rebased_build_config = rebase_path(_build_config, root_build_dir)
+
+  # Write the build_config file for this target.
+  _config_target_name = target_name + "_config"
+  action(_config_target_name) {
+    script = write_build_config
+
+    deps = _deps
+
+    outputs = [ _build_config ]
+    args = [
+      "--jar-path",
+      rebase_path(_jar_output, root_build_dir),
+      "--build-config",
+      _rebased_build_config,
+      "--deps-configs=$_rebased_deps_configs",
+    ]
+  }
+
+  # Building from sources - perform Kotlin compilation and JAR creation.
+  if (!_is_prebuilt) {
+    # Additional flags
+    _kotlinc_flags = [
+      "-Werror",
+      "-Xlint:all",
+    ]
+    if (defined(invoker.kotlinc_flags)) {
+      _kotlinc_flags += invoker.kotlinc_flags
+    }
+
+    # Data deps
+    _data_deps = []
+    if (defined(invoker.data_deps)) {
+      _data_deps = invoker.data_deps
+    }
+
+    # Generates a .sources file containing all sources to be compiled
+    _kotlin_sources_file = "$target_gen_dir/$target_name.sources"
+    if (defined(invoker.kotlin_sources_file)) {
+      _kotlin_sources_file = invoker.kotlin_sources_file
+    }
+    write_file(_kotlin_sources_file, rebase_path(_kotlin_files, root_build_dir))
+
+    # Compiles the given files into a directory and generates a 'class list'
+    _kotlinc_target_name = target_name + "__kotlinc"
+    _class_dir = rebase_path(target_out_dir, root_build_dir) + "/" +
+                 target_name + "/classes"
+    _class_list_file = "$target_gen_dir/$target_name.classlist"
+    action(_kotlinc_target_name) {
+      sources = _kotlin_files
+      deps = [ ":$_config_target_name" ]
+
+      outputs = [ _class_list_file ]
+
+      script = kotlinc_runner
+
+      args = [
+               "--classdir",
+               _class_dir,
+               "--outfile",
+               rebase_path(_class_list_file, root_build_dir),
+               "--build-config",
+               _rebased_build_config,
+               "--",
+               "-d",
+               _class_dir,
+               "@" + rebase_path(_kotlin_sources_file, root_build_dir),
+             ] + _kotlinc_flags
+    }
+
+    # Bundles all files within the 'class directory' into a jar file
+    action(target_name) {
+      deps = [ ":$_kotlinc_target_name" ] + _deps
+
+      data_deps = _data_deps
+
+      outputs = [ _jar_output ]
+
+      script = jar_runner
+
+      args = [
+        "cfm",
+        rebase_path(_jar_output, root_build_dir),
+        "Manifest.txt",
+        "-C",
+        _class_dir,
+        ".",
+      ]
+    }
+  } else {
+    # Using pre-specified JAR instead of building from sources - simply copy the JAR to the output directory.
+    _original_jar_path = invoker.jar_path
+    copy(target_name) {
+      sources = [ _original_jar_path ]
+      outputs = [ _jar_output ]
+      deps = [ ":$_config_target_name" ] + _deps
+    }
+  }
+}
+
+template("android_library") {
+  java_library(target_name) {
+    forward_variables_from(invoker, "*")
+
+    if (!defined(javac_flags)) {
+      javac_flags = []
+    }
+
+    javac_flags += [
+      "-Xlint:-options",
+      "-source",
+      "8",
+      "-target",
+      "8",
+    ]
+  }
+}
+
+template("java_prebuilt") {
+  java_library(target_name) {
+    forward_variables_from(invoker, "*")
+  }
+}

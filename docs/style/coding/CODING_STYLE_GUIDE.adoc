@@ -1,0 +1,721 @@
+[.text-center]
+= Project Connected Home over IP Software
+:listing-caption: *Listing*
+:toc: macro
+:toclevels: 7
+:sectnumlevels: 7
+:sectanchors:
+:sectlinks:
+
+:plusplus: ++
+
+:sectnums!:
+
+== Best Practices, Coding Conventions, and Style
+
+[.text-center]
+_Revision 5_ +
+_2020-09-22_
+
+[.text-center]
+*Status:* [red]*Approved* / [red]*Active*
+
+toc::[]
+
+== Typographic and Syntactic Conventions
+
+The following syntactic conventions are used throughout this document:
+
+_shall_::
+
+is used to indicate a mandatory rule or guideline that must be adhered
+to without exception to claim compliance with this specification.
+
+_should_::
+
+is used to indicate a rule or guideline that serves as a strong
+preference to suggested practice and is to be followed in the absence of
+a compelling reason to do otherwise.
+
+_may_::
+
+is used to indicate a rule or guideline that serves as a reference to
+suggested practice.
+
+== Introduction
+
+There are likely as many unique combinations of software engineering and
+development standards, conventions, and practices as there organizations
+that do such work. This document pulls together those that Project
+Connected Home over IP believes best for our organization, its efforts,
+and products that consume those efforts, with a particular emphasis on
+embedded systems with C or C{plusplus} language development and runtime
+environments.
+
+This document and requirements should be considered canonical for all
+Project Connected Home over IP shared infrastructure software, including
+both RTOS-based and non-RTOS-based projects on both tightly- and
+loosely-constrained system platforms.
+
+The document is broadly categorized at the highest level into:
+
+* Best Practices and Conventions
+* Format and Style
+
+And, within conventions, further sub-categorized into those that apply
+to:
+
+* Tightly-constrained
+* Loosely-constrained
+
+system platforms. Applicability to tightly-constrained systems also
+generally applies to shared infrastructure software that is used on both
+tightly- and loosely-constrained systems.
+
+link:#id.jzphr1iiku89[Figure 1 below] attempts to illustrate both
+qualitative and quantitative applicability of these guidelines to
+Project Connected Home over IP software.
+
+Generally, product-specific applications have the greatest flexibility
+and latitude in applying these guidelines to their software. Whereas,
+shared infrastructure bears the least flexibility and bears the greatest
+adherence to these guidelines.
+
+image:CODING_STYLE_GUIDE-figure1.png[Figure 1. Graphical summary of the
+qualitative and quantitative applicability to Project CHIP software.]
+
+[[id.jzphr1iiku89]]
+
+[.text-center]
+*Figure 1.* Graphical summary of the qualitative and quantitative
+applicability to Project CHIP software.
+
+:sectnums:
+
+== Standards
+
+Project CHIP embedded software development adopts the minimum C and C{plusplus}
+standards listed in Table 2.1 below.
+
+[[t.4d8bfeef046f29261fc72f1a903d6d10a909957a]][[t.2]]
+
+[cols=3,options="header"]
+|===
+|Language |Minimum Standard |Aliases
+
+|C|ISO9899:1999|ISO C99, C99
+|C{plusplus}|ISO14882:2014|ISO C{plusplus}14, C{plusplus}14
+|===
+[.text-center]
+*Table 2.1.* C and C{plusplus} language minimum standards adopted by Project CHIP
+software.
+
+Product-specific software may elect to use later standards to the extent
+their software is not broadly shared inside or outside Project CHIP.
+
+=== C
+
+Project CHIP embedded software development uses and enforces the
+ISO9899:1999 (aka ISO C99, C99) C language standard as the minimum.
+
+Wherever possible, particularly in non-product-specific,
+shared-infrastructure software, toolchain-specific (e.g GCC/GNU)
+extensions or the use of later standards shall be avoided or shall be
+leveraged through toolchain-compatibility preprocessor macros.
+
+==== Motivation and Rationale
+
+At the time of this writing, the C99 standard has been out for over 20
+years. Project CHIP and both the new and contributed source code that
+comprise it have only existed for the last seven to eight of those
+20-plus years.
+
+This is beyond more than adequate time for this standard to be pervasive
+throughout any toolchain vendor’s C compiler and saves team members from
+worrying about ISO9899:1990 (aka ISO C90, C90) portability issues that
+have long-since been solved by C99.
+
+=== C{plusplus}
+
+Project CHIP embedded software development uses the ISO14882:2014 (aka
+ISO C{plusplus}14) language standard as a baseline for source code
+compatibility. Conformance with other standards, for example, ISO14882:1998
+(aka ISO C{plusplus}98), may be additionally required in cases where wider
+portability is necessary, but in all cases, ISO C{plusplus}14 is the baseline
+requirement.
+
+Wherever possible, particularly in non-product-specific,
+shared-infrastructure software, toolchain-specific (e.g GCC/GNU)
+extensions or the use of later standards shall be avoided or shall be
+leveraged through toolchain-compatibility preprocessor macros.
+
+==== Motivation and Rationale
+
+CHIP strives to use the latest C++ functionality as long as existing compilers
+support such standards.
+
+C{plusplus}14 is considered pervasive enough to be used. As compilers start
+supporting standards such as C{plusplus}17, C{plusplus}20 and beyond,
+CHIP may follow suit.
+
+== Conventions and Best Practices
+
+=== Common
+
+The following sections summarize those best practices that are
+independent of particular nuances of either the C or C{plusplus} languages.
+
+==== When in Rome
+
+The most important convention and practice in the Project CHIP embedded
+software is "_When in Rome..._", per the quote below.
+
+[quote, St. Ambrose]
+____
+If you should be in Rome, live in the Roman manner; if you should be
+elsewhere, live as they do there.
+____
+
+===== Motivation and Rationale
+
+At this stage in the work group’s and the team’s life cycle, it is rare
+the project or subsystem that is entirely new and built from scratch.
+More often than not, development will involve extending, enhancing, and
+fixing existing code in existing projects.
+
+When in this situation, it is mandatory you observe how things are done
+in this context and do the best that you can to follow the prevailing
+conventions present. Not doing so can lead to readability and
+maintenance problems down the line and will likely earn you the
+disapprobation of the code’s _owner_ or other team members.
+
+Your extensions or fixes to existing code should be *indistinguishable*,
+stylistically, from the original code such that the only way to
+ascertain ownership and responsibility is to use the source code control
+system’s change attribution (aka _blame_) feature.
+
+If you find the conventions so foreign or otherwise confusing, it may be
+best to let whoever owns the file make the necessary changes or seek the
+counsel of others in the group to find out what the right thing to do
+is. Never just start changing code wholesale for personal reasons
+without consulting others first.
+
+==== Language-independent
+
+===== Commenting Out or Disabling Code
+
+Unused code shall not be disabled by commenting it out with C- or
+C{plusplus}-style comments or with preprocessor `#if 0 ... #endif` semantics.
+
+====== Motivation and Rationale
+
+Code should either be actively maintained and "in" the source base for a
+purpose or removed entirely. Code that is disabled in this way is
+generally sloppy and does not convey a sense of certainty and direction
+in the code.
+
+Anyone who is interested in the history of a particular source code file
+should use the source code control system to browse it.
+
+Code that is debug- or test-only should be moved to a conditionally
+compiled test source file or conditionalized with an appropriate
+`WITH_DEBUG`, `WANT_DEBUG`, `WITH_TESTS`, `WANT_TESTS`, or some similar such
+preprocessor mnemonic that can be asserted from the build system.
+
+===== Use C _stdint.h_ or C{plusplus} _cstdint_ for Plain Old Data Types
+
+Standard, scalar data types defined in _stdint.h_ \(C) or _cstdint_ (C{plusplus})
+should be used for basic signed and unsigned integer types, especially
+when size and serialization to non-volatile storage or across a network
+is concerned.
+
+Examples of these are: `uint8_t`, `int8_t`, etc.
+
+====== Motivation and Rationale
+
+These types have been effectively standardized since C99 and should be
+available on every platform and provide more neutral portability than
+OS-specific types such as `u8`, `UInt8`, etc. Moreover, because these are
+pervasive, you do not need to spend any time and energy as a developer
+and engineer creating more such types on your own—the compiler vendors
+have already done the hard work for you.
+
+Additionally, using traditional scalar types such as `char`, `int`, `short`, or
+`long` have portability issues where data width is concerned because these
+types are either signed- or sized-differently on different processor
+architectures and and ABIs for those architectures. For example, a char is signed
+on some architectures and unsigned on others and a long is 32-bits on some
+architectures and 64-bits on others.
+
+==== Language-dependent
+
+=====	C{plusplus}
+
+======	Avoid `using namespace` Statements in Headers
+
+By doing this, you are effectively forcing every other module that
+includes the header to also be using the namespace. This causes
+namespace pollution and generally defeats the purposes of namespaces.
+Fully-qualified symbols should be used instead.
+
+=== Tightly-constrained Systems and Shared Infrastructure
+
+Applicability to tightly-constrained systems also generally applies to
+shared infrastructure software that is used on both tightly- and
+loosely-constrained systems.
+
+==== Avoid Heap-based Resource Allocation
+
+Heap-based resource allocation should be avoided.
+
+===== Motivation and Rationale
+
+As emphasized throughout this document, the software produced by Project
+CHIP is consumed both inside and outside Project CHIP, across a variety
+of platforms. The capabilities of these platforms are broad, spanning
+soft real-time, deeply-embedded systems based on RTOSes that
+may cover life safety and/or physical security applications to richer,
+softly-embedded systems based on non-RTOS platforms such as Darwin or
+Linux. While the latter are apt to have fully-functional heaps, the
+former explicitly may not.
+
+Consequently, when planning new or extending existing Project CHIP code,
+consider the platforms to which the code is targeted. If the platforms
+include those deeply-embedded platforms absent functioning heaps, then
+heap-based resource allocation is absolutely forbidden. If not,
+consideration should be made to the cost / benefit trade-offs of
+heap-based allocation and, if possible, it should be avoided using one
+of the recommended techniques below.
+
+===== Alternatives
+
+In either case, recommended resource allocation alternatives are:
+
+* In Place Allocation and Initialization
+* Pool-based Allocators
+* Platform-defined and -assigned Allocators
+
+The interfaces in https://github.com/project-chip/connectedhomeip/blob/master/src/lib/support/CHIPMem.h[_src/lib/support/CHIPMem.h_] provide support for
+the latter two alternatives.
+
+====== Use In Place Allocation and Initialization
+
+Regardless of whether the source code and runtime are C or C{plusplus}, the
+first step is creating storage for the object being allocated and
+initialized. For simple
+https://en.wikipedia.org/wiki/Passive_data_structure[plain-old-data
+(POD)] data structures, this can be done by just allocating the
+structure at an appropriate scope. Alternatively, _raw_ storage can be
+allocated and then cast. However, great care must be taken with the
+latter approach to ensure that natural machine alignments and language
+strict-aliasing rules are observed. With the simple data structure
+declaration, the compiler does this on your behalf. With the raw
+approach, you must do this.
+
+Once the storage has been allocated, then use symmetric initializers and
+deinitializers such as those, for example, for `pthread_attr_t`. An
+example is shown in the listing below.
+
+[source,C,caption='',title='{listing-caption} *{counter:refnum}*. Using in place allocation and initialization in C or C{plusplus}.']
+----
+#include <pthread.h>
+#include <stdint.h>
+
+...
+
+// Preprocessor Definitions
+
+// Allocate the structure using "raw" storage.
+
+#if defined(__cplusplus) && (__cplusplus >= 201103L)
+#include <type_traits>
+
+#define chipDEFINE_ALIGNED_VAR(name, size, align_type) \
+	typename std::aligned_storage<size, alignof(align_type)>::type name;
+
+#else
+#define chipDEFINE_ALIGNED_VAR(name, size, align_type) \
+    align_type name[(((size) + (sizeof (align_type) - 1)) / sizeof (align_type))]
+
+#endif // defined(__cplusplus) && (__cplusplus >= 201103L)
+
+// Forward Declarations
+
+extern void * foobar_entry(void *aArgument);
+
+// Global Variables
+
+#if USE_STRUCT_STORAGE
+// Allocate the structure directly.
+static pthread_attr_t sThreadAttributes;
+
+#elif USE_RAW_STORAGE
+static chipDEFINE_ALIGNED_VAR(sThreadAttributes, sizeof (pthread_attr_t), uint64_t);
+
+#endif // USE_STRUCT_STORAGE
+
+int foobar()
+{
+    int              retval;
+    int              status;
+    pthread_t        thread;
+    pthread_attr_t * attrs = (pthread_attr_t *)&sThreadAttributes;
+
+    // Now "construct" or initialize the storage.
+    retval = pthread_attr_init(attrs);
+
+    if (retval == 0)
+    {
+        retval = pthread_create(&thread, attrs, foobar_entry, NULL);
+
+        if (retval == 0)
+        {
+            status = pthread_join(thread, NULL);
+
+            if (status != 0)
+            {
+                retval = status;
+            }
+
+            status = pthread_attr_destroy(attrs);
+
+            if (status != 0)
+            {
+                retval = status;
+            }
+        }
+    }
+
+    return (retval);
+}
+----
+
+For non-scalar types and objects such as C{plusplus} classes, this gets slightly
+trickier since C{plusplus} constructors and destructors must be accounted for
+and invoked. Fortunately, C{plusplus} has placement new which handles this.
+The listing below modifies the listing above using C{plusplus} placement new
+to ensure the class is properly constructed before initialization and
+destructed after deinitialization.
+
+[source,C++,caption='',title='{listing-caption} *{counter:refnum}*. Using C{plusplus} placement new for in place allocation and initialization.']
+----
+#include <new>
+
+#include <pthread.h>
+#include <stdint.h>
+
+...
+
+// Preprocessor Definitions
+
+// Allocate the structure using "raw" storage.
+
+#if defined(__cplusplus) && (__cplusplus >= 201103L)
+#include <type_traits>
+
+#define chipDEFINE_ALIGNED_VAR(name, size, align_type) \
+	typename std::aligned_storage<size, alignof(align_type)>::type name;
+
+#else
+#define chipDEFINE_ALIGNED_VAR(name, size, align_type) \
+    align_type name[(((size) + (sizeof (align_type) - 1)) / sizeof (align_type))]
+
+#endif // defined(__cplusplus) && (__cplusplus >= 201103L)
+
+// Type Declarations
+
+class ThreadAttributes
+{
+public:
+    ThreadAttributes() {};
+    ~ThreadAttributes() {};
+
+    operator pthread_attr_t *() { return &mAttributes; }
+
+private:
+    pthread_attr_t mAttributes;
+};
+
+// Forward Declarations
+
+extern void * foobar_entry(void *aArgument);
+
+// Global Variables
+
+static chipDEFINE_ALIGNED_VAR(sThreadAttributes, sizeof (ThreadAttributes), uint64_t);
+
+int foobar()
+{
+    int                retval = -1;
+    int                status;
+    pthread_t          thread;
+    ThreadAttributes * ta;
+    pthread_attr_t *   attrs;
+
+    ta = new (&sThreadAttributes) ThreadAttributes;
+
+    if (ta != NULL)
+    {
+        attrs = static_cast<pthread_attr_t *>(*ta);
+
+        // Now "construct" or initialize the storage.
+        retval = pthread_attr_init(attrs);
+
+        if (retval == 0)
+        {
+            retval = pthread_create(&thread, attrs, foobar_entry, NULL);
+
+            if (retval == 0)
+            {
+                status = pthread_join(thread, NULL);
+
+                if (status != 0)
+                {
+                    retval = status;
+                }
+
+                status = pthread_attr_destroy(attrs);
+
+                if (status != 0)
+                {
+                    retval = status;
+                }
+            }
+        }
+
+        ta->~ThreadAttributes();
+    }
+
+    return retval;
+}
+----
+
+====== Use Pool-based Allocators
+
+In place allocation allows the successful allocation, initialization,
+deinitialization, and deallocation of a single object allocated from
+preallocated storage. However, if the desire exists for a fixed,
+configurable pool of objects where 0 to `n` of such objects can be
+allocated at any one time, a pool allocator for that specific object
+type must be created.
+
+As shown in the listing below, a pool allocator for a `Foo` class of
+`CHIP_FOO_COUNT` objects is effected, assuming the existence of another
+helper class, StaticAllocatorBitmap, which uses a bitmap to track the
+storage of objects from a static array of storage.
+
+[source,C++,caption='',title='{listing-caption} *{counter:refnum}*. Using pool-based allocators.']
+----
+
+#include <stdint.h>
+
+// Preprocessor Definitions
+
+// Allocate the structure using "raw" storage.
+
+#if defined(__cplusplus) && (__cplusplus >= 201103L)
+#include <type_traits>
+
+#define chipDEFINE_ALIGNED_VAR(name, size, align_type) \
+	typename std::aligned_storage<size, alignof(align_type)>::type name;
+
+#else
+#define chipDEFINE_ALIGNED_VAR(name, size, align_type) \
+    align_type name[(((size) + (sizeof (align_type) - 1)) / sizeof (align_type))]
+
+#endif // defined(__cplusplus) && (__cplusplus >= 201103L)
+
+// Type Definitions
+
+class Foo
+{
+public:
+    Foo();
+    Foo(const Foo &inFoo);
+    ~Foo();
+};
+
+// Global Variables
+
+static chipDEFINE_ALIGNED_VAR(sFooAllocatorBuffer, sizeof (StaticAllocatorBitmap), uint32_t);
+static StaticAllocatorBitmap *sFooAllocator;
+
+static void CreateFooAllocator(void *inStorage,
+                               const StaticAllocatorBitmap::size_type &inStorageSize,
+                               const StaticAllocatorBitmap::size_type &inElementCount,
+                               StaticAllocatorBitmap::InitializeFunction inInitialize,
+                               StaticAllocatorBitmap::DestroyFunction inDestroy)
+{
+    sFooAllocator = new (sFooAllocatorBuffer)
+        StaticAllocatorBitmap(inStorage,
+                              inStorageSize,
+                              inElementCount,
+                              inInitialize,
+                              inDestroy);
+}
+
+static StaticAllocatorBitmap &GetFooAllocator()
+{
+    return *sFooAllocator;
+}
+
+static void *FooInitialize(AllocatorBase &inAllocator, void *inObject)
+{
+    memset(inObject, 0, sizeof(Foo));
+
+    return inObject;
+}
+
+static void FooDestroy(AllocatorBase &inAllocator, void *inObject)
+{
+    return;
+}
+
+int Init()
+{
+    static const size_t sFooCount = CHIP_FOO_COUNT;
+    static chipAllocatorStaticBitmapStorageDefine(sFooStorage, Foo, sFooCount, uint32_t, sizeof (void *));
+    int retval = 0;
+
+    CreateFooAllocator(sFooStorage,
+                       sizeof (sFooStorage),
+                       sFooCount,
+                       FooInitialize,
+                       FooDestroy);
+
+    return retval;
+}
+
+Foo * FooAllocate()
+{
+    Foo *foo;
+
+    foo = static_cast<Foo *>(GetFooAllocator().allocate());
+
+    return foo;
+}
+
+void FooDeallocate(Foo *inFoo)
+{
+    GetFooAllocator().deallocate(inFoo);
+}
+----
+
+====== Use Platform-defined and -assigned Allocators
+
+This is a variation on both in place allocation and pool-based
+allocation in that it completely delegates resource allocation to the
+system integrator and the platform on which the particular software
+subsystem is running.
+
+The advantage of this approach is that it allows the platform to decide
+how resource allocation will be handled and allows the package to scale
+independently of platform resource allocation.
+
+The package may define default implementations for a few types of
+platform allocation strategies, such as heap-based allocators and
+pool-based allocators.
+
+There are a range of granularities for achieving this type of
+delegation, depending on the desired size of the API surface, as shown
+in the listings below.
+
+[source,C++,caption='',title='{listing-caption} *{counter:refnum}*. Using a common allocator method pattern with unique allocators per object, accessed from a unique singleton access per allocator.']
+----
+
+chipPlatformInitFooAllocator();
+chipPlatformInitBarAllocator();
+…
+foo = chipPlatformGetFooAllocator().allocate();
+…
+chipPlatformGetFooAllocator().deallocate(foo);
+…
+bar = chipPlatformGetBarAllocator().allocate();
+…
+chipPlatformGetBarAllocator().deallocate(bar);
+----
+
+[source,C++,caption='',title='{listing-caption} *{counter:refnum}*. Using a common allocator method pattern with unique allocators per object, accessed from a common singleton access with type per allocator.']
+----
+chipPlatformInitAllocator(CHIP_FOO_T);
+chipPlatformInitAllocator(CHIP_BAR_T);
+…
+foo = chipPlatformGetAllocator(CHIP_FOO_T).allocate();
+…
+chipPlatformGetAllocator(CHIP_FOO_T).deallocate(foo);
+…
+bar = chipPlatformGetAllocator(CHIP_BAR_T).allocate();
+…
+chipPlatformGetAllocator(CHIP_BAR_T).deallocate(bar);
+----
+
+[source,C,caption='',title='{listing-caption} *{counter:refnum}*. Using unique allocators per object.']
+----
+chipPlatformInitFooAllocator();
+chipPlatformInitBarAllocator();
+…
+foo = chipPlatformFooAllocate();
+…
+chipPlatformFooDeallocate(foo);
+…
+bar = chipPlatformBarAllocate();
+…
+chipPlatformBarDeallocate(bar);
+----
+
+[source,C,caption='',title='{listing-caption} *{counter:refnum}*. Using a common allocator pattern with unique allocators per object, accessed from a common interface with type per allocator.']
+----
+
+chipPlatformInitAllocator(CHIP_FOO_T);
+chipPlatformInitAllocator(CHIP_BAR_T);
+…
+foo = chipPlatformAllocate(CHIP_FOO_T);
+…
+chipPlatformDeallocate(CHIP_FOO_T, foo);
+…
+bar = chipPlatformAllocate(CHIP_BAR_T);
+…
+chipPlatformBarDeallocate(CHIP_BAR_T, bar);
+----
+
+:sectnums!:
+
+== Recommended Reading
+
+While the following references and reading are not part of the formal
+best practices, coding conventions, and style cannon, they are
+informative and useful guides for improving the style and quality of the
+code you write:
+
+. Jet Propulsion Laboratory.
+http://lars-lab.jpl.nasa.gov/JPL_Coding_Standard_C.pdf[JPL
+Institutional Coding Standard for the C Programming Language.] Version
+1.0. March 3, 2009.
+. Jet Propulsion Laboratory.
+http://pixelscommander.com/wp-content/uploads/2014/12/P10.pdf[The
+Power of Ten – Rules for Developing Safety Critical Code]. December
+2014.
+. Meyers, Scott. Effective C{plusplus}: 55 Specific Ways to Improve Your
+Programs and Designs. Third Edition. 2005.
+. Meyers, Scott. More Effective C{plusplus}: 35 New Ways to Improve Your
+Programs and Designs. 1996.
+. Meyers. Scott. https://www.artima.com/shop/effective_cpp_in_an_embedded_environment[Effective C{plusplus} in an Embedded Environment]. 2015.
+. Motor Industry Software Reliability Association. Guidelines for the
+Use of the C Language in Critical Systems. March 2013.
+. Motor Industry Software Reliability Association. Guidelines for the
+Use of the C{plusplus} Language in Critical Systems. June 2008.
+
+== Revision History
+
+[cols="^1,^1,<2,<3",options="header"]
+|===
+|Revision |Date |Modified By |Description
+|5 |2020-09-22 |Grant Erickson |Added Tightly-constrained Systems and Shared Infrastructure > Avoid Heap-based Resource Allocation
+|4 |2020-09-15 |Grant Erickson |Added Common > Language-dependent > Avoid `using namespace` Statements in Headers
+|3 |2020-09-01 |Grant Erickson |Added Common > Language-independent > Use C _stdint.h_ or C{plusplus} _cstdint_ for Plain Old Data Types
+|2 |2020-07-09 |Grant Erickson |Added Common > Language-independent > Commenting Out or Disabling Code
+|1 |2020-07-08 |Grant Erickson |Initial revision.
+|===
+
+[.text-center]
+_Project Connect Home over IP Public Information_

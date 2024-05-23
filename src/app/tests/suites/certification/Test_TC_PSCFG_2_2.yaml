@@ -1,0 +1,102 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 65.2.2. [TC-PSCFG-2.2] Primary functionality with server as DUT
+
+PICS:
+    - PSCFG.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Preconditions:"
+      verification: |
+          This test case is verified after the device is provisioned. Pls provision device first, Pass appropriate nodeID in the below command
+      disabled: true
+
+    - label: "Step 1: Commission DUT to TH"
+      verification: |
+
+      disabled: true
+
+    - label: "Step 2: TH reads the Sources attribute from the DUT"
+      PICS: PSCFG.S.A0000
+      verification: |
+          ./chip-tool powersourceconfiguration read sources 1 0
+
+           verify  that source attribute provides a list. The list has not more than 6 entries. Each entry in this list is a valid endpoint number.
+          Each list entry is unique and there are no duplicates. on TH(chip-tool) log:
+          Below is the example log which is observed in the RPI platform the value may be differ based on the dut implementation.
+
+          [1686219805.562367][91291:91293] CHIP:DMG: }
+          [1686219805.562469][91291:91293] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002E Attribute 0x0000_0000 DataVersion: 272662560
+          [1686219805.562514][91291:91293] CHIP:TOO:   Sources: 3 entries
+          [1686219805.562532][91291:91293] CHIP:TOO:     [1]: 2
+          [1686219805.562539][91291:91293] CHIP:TOO:     [2]: 1
+          [1686219805.562545][91291:91293] CHIP:TOO:     [3]: 0
+          [1686219805.562596][91291:91293] CHIP:EM: <<< [E:30046i S:19475 M:182449019 (Ack:91024710)] (S) Msg TX to 1:0000000000000001 [6D93] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1686219805.562609][91291:91293] CHIP:IN: (S) Sending msg 182449019 on secure session with LSID: 19475
+          [1686219805.562637][91291:91293] CHIP:EM: Flushed pending ack for MessageCounter:91024710 on exchange 30046i
+      disabled: true
+
+    - label:
+          "Step 3a: TH reads the Order attribute from Power Source Cluster at
+          Endpoint[eNr] of the DUT"
+      verification: |
+          ./chip-tool powersource read order 1 2
+
+          verify  that order attribute succeeds with no error.The order value is the same or greater than the order value of the previous iteration on TH(chip-tool) log:
+          Below is the example log which is observed in the RPI platform the value may be differ based on the dut implementation.
+
+          [1686219827.164815][91294:91296] CHIP:DMG:         InteractionModelRevision = 1
+          [1686219827.164821][91294:91296] CHIP:DMG: }
+          [1686219827.164892][91294:91296] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_002F Attribute 0x0000_0001 DataVersion: 2160895838
+          [1686219827.164931][91294:91296] CHIP:TOO:   Order: 1
+          [1686219827.164982][91294:91296] CHIP:EM: <<< [E:29044i S:64686 M:59474258 (Ack:139097391)] (S) Msg TX to 1:0000000000000001 [6D93] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1686219827.164994][91294:91296] CHIP:IN: (S) Sending msg 59474258 on secure session with LSID: 64686
+          [1686219827.165022][91294:91296] CHIP:EM: Flushed pending ack for MessageCounter:139097391 on exchange 29044i
+
+
+
+          ./chip-tool powersource read order 1 1
+
+          verify  that order attribute succeeds with no error.The order value is the same or greater than the order value of the previous iteration on TH(chip-tool) log:
+          Below is the example log which is observed in the RPI platform the value may be differ based on the dut implementation.
+
+          [1686219840.688775][91298:91300] CHIP:DMG:         SuppressResponse = true,
+          [1686219840.688780][91298:91300] CHIP:DMG:         InteractionModelRevision = 1
+          [1686219840.688785][91298:91300] CHIP:DMG: }
+          [1686219840.688851][91298:91300] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_002F Attribute 0x0000_0001 DataVersion: 4007458595
+          [1686219840.688873][91298:91300] CHIP:TOO:   Order: 2
+          [1686219840.688926][91298:91300] CHIP:EM: <<< [E:54321i S:51057 M:220237798 (Ack:216548812)] (S) Msg TX to 1:0000000000000001 [6D93] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1686219840.688937][91298:91300] CHIP:IN: (S) Sending msg 220237798 on secure session with LSID: 51057
+          [1686219840.688962][91298:91300] CHIP:EM: Flushed pending ack for MessageCounter:216548812 on exchange 54321i
+          [1686219840.689057][91298:91298] CHIP:CTL: Shutting down the commissioner
+
+
+          ./chip-tool powersource read order 1 0
+
+          verify  that order attribute succeeds with no error.The order value is the same or greater than the order value of the previous iteration on TH(chip-tool) log:
+          Below is the example log which is observed in the RPI platform the value may be differ based on the dut implementation.
+
+          [1686219853.940142][91302:91304] CHIP:DMG: }
+          [1686219853.940215][91302:91304] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002F Attribute 0x0000_0001 DataVersion: 336265014
+          [1686219853.940248][91302:91304] CHIP:TOO:   Order: 3
+          [1686219853.940312][91302:91304] CHIP:EM: <<< [E:50949i S:33475 M:232313504 (Ack:30099776)] (S) Msg TX to 1:0000000000000001 [6D93] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1686219853.940324][91302:91304] CHIP:IN: (S) Sending msg 232313504 on secure session with LSID: 33475
+      disabled: true

@@ -1,0 +1,62 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+declare_args() {
+  # Use clang to build.
+  is_clang = current_os == "android"
+
+  # Optimize for size by default.
+  optimize_for_size = true
+
+  # Optimize debug builds with -Og.
+  optimize_debug = current_os == "freertos" || current_os == "zephyr" ||
+                   current_os == "mbed" || current_os == "cmsis-rtos"
+
+  # Optimization level for debug. Only has an effect if optimize_debug is true.
+  optimize_debug_level = "g"
+
+  # Symbol level for debugging.
+  symbol_level = 2
+
+  # Enable position independent code (-fPIC).
+  enable_pic =
+      current_os == "linux" || current_os == "mac" || current_os == "android"
+
+  # Enable position independent executables (-pie).
+  enable_pie = current_os == "linux"
+
+  # Remove unwind tables from the binary to save space.
+  exclude_unwind_tables = current_os != "android"
+
+  # C standard level (value for -std flag).
+  c_standard = "gnu11"
+
+  # C++ standard level (value for -std flag).
+  cpp_standard = "gnu++17"
+
+  # enable libfuzzer
+  is_libfuzzer = false
+
+  # Generate code coverage analysis artifacts when enabled.
+  use_coverage = false
+
+  # Enable address sanitizer
+  is_asan = false
+
+  # Debug prefix mapping (values for -fdebug-prefix-map=).
+  prefix_mappings = []
+
+  # Enable fuzzer build for OSS-Fuzz
+  oss_fuzz = false
+}

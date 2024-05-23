@@ -1,0 +1,7 @@
+cbor>=1.0.0
+click
+cryptography>=2.6
+ecdsa>=0.17.0
+intelhex
+jsonschema
+ecdsa

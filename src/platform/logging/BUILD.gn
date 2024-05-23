@@ -1,0 +1,68 @@
+# See Project CHIP LICENSE file for licensing information.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
+
+import("${chip_root}/src/platform/device.gni")
+
+source_set("headers") {
+  public = [ "LogV.h" ]
+}
+
+if (current_os == "android") {
+  static_library("android") {
+    sources = [ "impl/android/Logging.cpp" ]
+    deps = [
+      ":headers",
+      "${chip_root}/src/lib/core:chip_config_header",
+      "${chip_root}/src/lib/support:attributes",
+      "${chip_root}/src/lib/support:logging_constants",
+      "${chip_root}/src/platform:platform_config_header",
+      "${chip_root}/src/platform/logging:headers",
+    ]
+
+    libs = [ "log" ]
+  }
+}
+
+# We need to reference the output file of ":stdio" at build time,
+# but get_target_outputs() does not work for binary targets. As a
+# workaround, define a reasonable path and make the target use it.
+stdio_archive = "$root_out_dir/liblogging-stdio.a"
+
+static_library("stdio") {
+  if (chip_device_platform == "darwin") {
+    sources = [ "impl/stdio/darwin/Logging.cpp" ]
+  } else {
+    sources = [ "impl/stdio/Logging.cpp" ]
+  }
+
+  deps = [
+    ":headers",
+    "${chip_root}/src/lib/core:chip_config_header",
+    "${chip_root}/src/lib/support:attributes",
+    "${chip_root}/src/lib/support:logging_constants",
+    "${chip_root}/src/platform:platform_config_header",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+
+  # Ensure we end up with the expected output file name
+  output_dir = get_path_info(stdio_archive, "dir")
+  output_name = get_path_info(stdio_archive, "name")
+  output_extension = get_path_info(stdio_archive, "extension")
+  output_prefix_override = true
+}
+
+# Depending on this target (via public_deps) pulls in the stdio
+# logger and ensures it takes precendce over the platform backend.
+group("force_stdio") {
+  deps = [ ":stdio" ]
+  public_configs = [ ":force_stdio_config" ]
+}
+
+config("force_stdio_config") {
+  # Ensure the linker sees the stdio implementation first. This
+  # works because ldflags come before inputs on the command line.
+  ldflags = [ rebase_path(stdio_archive, root_build_dir) ]
+}

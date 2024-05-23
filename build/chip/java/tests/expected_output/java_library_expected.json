@@ -1,0 +1,18 @@
+{
+    "deps_info": {
+        "name": "java_library.json",
+        "jar_path": "lib/build/chip/java/tests/java_library.jar",
+        "deps_configs": [
+            "gen/build/chip/java/tests/child_library.json",
+            "gen/build/chip/java/tests/child_library_2.json",
+            "gen/build/chip/java/tests/java_prebuilt.json"
+        ],
+        "deps_jars": [
+            "lib/build/chip/java/tests/child_library.jar",
+            "lib/build/chip/java/tests/child_library_2.jar",
+            "lib/build/chip/java/tests/grandchild_library.jar",
+            "lib/build/chip/java/tests/prebuilt_jar.jar",
+            "lib/build/chip/java/tests/child_jar.jar"
+        ]
+    }
+}

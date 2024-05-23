@@ -1,0 +1,8 @@
+{
+    "deps_info": {
+        "name": "child_prebuilt.json",
+        "jar_path": "lib/build/chip/java/tests/child_jar.jar",
+        "deps_configs": [],
+        "deps_jars": []
+    }
+}

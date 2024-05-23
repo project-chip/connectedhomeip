@@ -1,0 +1,97 @@
+/*
+ *
+ *    Copyright (c) 2022 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#include <controller/java/CHIPAttributeTLVValueDecoder.h>
+
+#include <app/data-model/Decode.h>
+#include <app/data-model/DecodableList.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Events.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <jni.h>
+#include <lib/support/JniReferences.h>
+#include <lib/support/JniTypeWrappers.h>
+#include <lib/support/TypeTraits.h>
+
+namespace chip {
+
+jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    
+    switch (aPath.mClusterId)
+    {
+        {{#zcl_clusters}}
+        case app::Clusters::{{asUpperCamelCase name}}::Id: {
+            using namespace app::Clusters::{{asUpperCamelCase name}};
+            switch (aPath.mEventId)
+            {
+                {{#zcl_events}}
+                case Events::{{asUpperCamelCase name}}::Id: {
+                    Events::{{asUpperCamelCase name}}::DecodableType cppValue;
+                    *aError = app::DataModel::Decode(aReader, cppValue);
+                    if (*aError != CHIP_NO_ERROR)
+                    {
+                        return nullptr;
+                    }
+                    {{#zcl_event_fields}}
+                    {{>decode_value target=(concat "value_" (asLowerCamelCase name)) source=(concat "cppValue." (asLowerCamelCase name)) cluster=parent.parent.name depth=0 earlyReturn="nullptr"}}
+
+                    {{/zcl_event_fields}}
+                    jclass {{asLowerCamelCase name}}StructClass;
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/ChipEventStructs${{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Event", {{asLowerCamelCase name}}StructClass);
+                    if (err != CHIP_NO_ERROR) {
+                        ChipLogError(Zcl, "Could not find class ChipEventStructs${{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Event");
+                        return nullptr;
+                    }
+
+                    jmethodID {{asLowerCamelCase name}}StructCtor;
+                    err = chip::JniReferences::GetInstance().FindMethod(
+                       env, {{asLowerCamelCase name}}StructClass, "<init>",
+                       "({{#zcl_event_fields}}{{asJniSignature type null (asUpperCamelCase parent.parent.name) true}}{{/zcl_event_fields}})V",
+                       &{{asLowerCamelCase name}}StructCtor);
+                    if (err != CHIP_NO_ERROR || {{asLowerCamelCase name}}StructCtor == nullptr) {
+                        ChipLogError(Zcl, "Could not find ChipEventStructs${{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Event constructor");
+                        return nullptr;
+                    }
+
+                    jobject value = env->NewObject({{asLowerCamelCase name}}StructClass, {{asLowerCamelCase name}}StructCtor
+                    {{#zcl_event_fields}}
+                    , value_{{asLowerCamelCase name}}
+                    {{/zcl_event_fields}}
+                    );
+
+                    return value;
+                }
+                {{/zcl_events}}
+                default:
+                    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+                    break;
+            }
+            break;
+        }
+        {{/zcl_clusters}}
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+    } 
+    return nullptr;
+}
+
+} // namespace chip

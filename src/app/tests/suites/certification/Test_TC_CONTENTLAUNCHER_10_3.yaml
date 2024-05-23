@@ -1,0 +1,188 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 19.12.2. [TC-CONTENTLAUNCHER-10.3] Launch Content Verification
+
+PICS:
+    - CONTENTLAUNCHER.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Content Launcher"
+    endpoint: 1
+    data:
+        type: char_string
+        defaultValue: "exampleData"
+    SearchValue:
+        type: char_string
+        defaultValue: "exampleValue"
+    ExternalIdName:
+        type: char_string
+        defaultValue: "name"
+    ExternalIdValue:
+        type: char_string
+        defaultValue: "value"
+
+tests:
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Step 1: TH sends a LaunchContent command to the DUT with a search
+          parameter and string, and AutoPlay flag set to false"
+      PICS: CONTENTLAUNCHER.S.C00.Rsp
+      command: "LaunchContent"
+      arguments:
+          values:
+              - name: "AutoPlay"
+                value: false
+              - name: "Data"
+                value: data
+              - name: "Search"
+                value:
+                    {
+                        ParameterList:
+                            [
+                                {
+                                    Type: 0,
+                                    Value: SearchValue,
+                                    ExternalIDList:
+                                        [
+                                            {
+                                                Name: ExternalIdName,
+                                                Value: ExternalIdValue,
+                                            },
+                                        ],
+                                },
+                            ],
+                    }
+              - name: "UseCurrentContext"
+                value: false
+              - name: "PlaybackPreferences"
+                value:
+                    {
+                        PlaybackPosition: 0,
+                        TextTrack:
+                            {
+                                LanguageCode: "exampleLanguageCode",
+                                Characteristics: [0],
+                                AudioOutputIndex: 0,
+                            },
+                        AudioTracks:
+                            [
+                                {
+                                    LanguageCode: "exampleLanguageCode",
+                                    Characteristics: [0],
+                                    AudioOutputIndex: 0,
+                                },
+                            ],
+                    }
+      response:
+          values:
+              - name: "Data"
+                value: data
+              - name: "Status"
+                value: 0
+
+    - label:
+          "Verify that DUT present via its user interface a list of matches
+          based on the provided search criteria."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CONTENTLAUNCHER.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please enter 'y' if DUT present via its user interface a
+                    list of matches based on the provided search criteria."
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 2: TH sends a LaunchContent command to the DUT with a search
+          parameter and string, and AutoPlay flag set to true"
+      PICS: CONTENTLAUNCHER.S.C00.Rsp
+      command: "LaunchContent"
+      arguments:
+          values:
+              - name: "AutoPlay"
+                value: true
+              - name: "Data"
+                value: data
+              - name: "Search"
+                value:
+                    {
+                        ParameterList:
+                            [
+                                {
+                                    Type: 0,
+                                    Value: SearchValue,
+                                    ExternalIDList:
+                                        [
+                                            {
+                                                Name: ExternalIdName,
+                                                Value: ExternalIdValue,
+                                            },
+                                        ],
+                                },
+                            ],
+                    }
+              - name: "UseCurrentContext"
+                value: false
+              - name: "PlaybackPreferences"
+                value:
+                    {
+                        PlaybackPosition: 0,
+                        TextTrack:
+                            {
+                                LanguageCode: "exampleLanguageCode",
+                                Characteristics: [0],
+                                AudioOutputIndex: 0,
+                            },
+                        AudioTracks:
+                            [
+                                {
+                                    LanguageCode: "exampleLanguageCode",
+                                    Characteristics: [0],
+                                    AudioOutputIndex: 0,
+                                },
+                            ],
+                    }
+      response:
+          values:
+              - name: "Data"
+                value: data
+              - name: "Status"
+                value: 0
+
+    - label:
+          "Verify that DUT should also begin playing content that best matched
+          the given search criteria"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CONTENTLAUNCHER.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please enter 'y' if DUT begin playing content that best
+                    matched the given search criteria"
+              - name: "expectedValue"
+                value: "y"

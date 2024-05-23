@@ -1,0 +1,89 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 9.2.2. [TC-RH-2.2] Primary functionality with server as DUT
+
+PICS:
+    - RH.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Relative Humidity Measurement"
+    endpoint: 1
+
+tests:
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH reads MinMeasuredValue attribute from DUT."
+      PICS: RH.S.A0001
+      command: "readAttribute"
+      attribute: "MinMeasuredValue"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 9999
+
+    - label: "Step 3: TH reads MaxMeasuredValue attribute from DUT."
+      PICS: RH.S.A0002
+      command: "readAttribute"
+      attribute: "MaxMeasuredValue"
+      response:
+          constraints:
+              type: int16u
+              minValue: 1
+              maxValue: 10000
+
+    - label: "Step 4: TH reads MeasuredValue attribute from DUT."
+      command: "readAttribute"
+      attribute: "MeasuredValue"
+      PICS: RH.S.A0000
+      response:
+          saveAs: ValueBeforeChange
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 10000
+
+    - label:
+          "Step 5: Operate on device to change the relative humidity
+          significantly"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && RH.M.ManuallyControlled
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 6: after a few seconds, TH reads MeasuredValue attribute from
+          DUT."
+      command: "readAttribute"
+      attribute: "MeasuredValue"
+      PICS: RH.S.A0000 && RH.M.ManuallyControlled
+      response:
+          constraints:
+              type: int16u
+              notValue: ValueBeforeChange

@@ -1,0 +1,83 @@
+digraph RendezvousSession
+{
+  node [fillcolor="gray", style=filled]
+
+  # This section represents controller-only elements
+  subgraph cluster_controller {
+    label=<<b>Controller</b>>
+    node [fillcolor="white:gray", gradientangle=90]
+
+    DeviceCommissioner [shape=record label=<{DeviceCommissioner|<font point-size="11">RendezvousSessionDelegate</font>}>, URL="@ref chip::Controller::DeviceCommissioner"]
+  }
+
+  # This section represents device-only elements
+  subgraph cluster_device {
+    label=<<b>Device</b>>
+    node [fillcolor="white:gray", gradientangle=90]
+
+    RendezvousDeviceDelegate [shape=record label=<{RendezvousDeviceDelegate|<font point-size="11">RendezvousSessionDelegate</font>}> URL="@ref chip::RendezvousSessionDelegate"]
+  }
+
+  # This section represents elements which belongs to src/transport/
+  subgraph rendezvousSession {
+    node [fillcolor="white:gray", gradientangle=90]
+
+    RendezvousSession [shape=record, label=<{RendezvousSession|<font point-size="11">SessionEstablishmentDelegate</font>}>, URL="@ref chip::SessionEstablishmentDelegate"]
+  }
+
+  # This section represents methods which belongs to PASESession
+  subgraph cluster_securePairingSession {
+    label=<<b>PASESession</b>>
+    node [fillcolor="gray"]
+
+    WaitForPairing [URL="@ref chip::PASESession::WaitForPairing"]
+    Pair [URL="@ref chip::PASESession::Pair"]
+    DeriveSecureSession [URL="@ref chip::PASESession::DeriveSecureSession"]
+  }
+
+  # This section represents methods which belongs to RendezvousParameters
+  subgraph cluster_RendezvousParameters {
+    label=<<b>RendezvousParameters</b>>
+    node [fillcolor="gray"]
+
+    HasDiscriminator [URL="@ref chip::RendezvousParameters::HasDiscriminator"]
+    HasConnectionObject [URL="@ref chip::RendezvousParameters::HasConnectionObject"]
+  }
+
+  # This section represents callbacks which belongs to RendezvousSessionDelegate
+  subgraph cluster_rendezvousSessionDelegate {
+    label=<<b>RendezvousSessionDelegate</b>>
+    node [fillcolor="white"]
+
+    OnRendezvousConnectionOpened [URL="@ref chip::RendezvousSessionDelegate::OnRendezvousConnectionOpened"]
+    OnRendezvousConnectionClosed [URL="@ref chip::RendezvousSessionDelegate::OnRendezvousConnectionClosed"]
+    OnRendezvousError [URL="@ref chip::RendezvousSessionDelegate::OnRendezvousError"]
+  }
+
+  # This section represents callbacks which belongs to SessionEstablishmentDelegate
+  subgraph cluster_secureSessionEstablishmentDelegate {
+    label=<<b>SessionEstablishmentDelegate</b>>
+    node [fillcolor="white"]
+
+    OnSessionEstablishmentError [URL="@ref chip::SessionEstablishmentDelegate::OnSessionEstablishmentError"]
+    OnSessionEstablished [URL="@ref chip::SessionEstablishmentDelegate::OnSessionEstablished"]
+  }
+
+  #############################
+  # Main relationships
+  #############################
+  {DeviceCommissioner, RendezvousDeviceDelegate} -> RendezvousSession
+
+  RendezvousSession -> HasDiscriminator
+
+  HasDiscriminator -> DelegateConnection [label=YES]
+  DelegateConnection -> Pair
+
+  HasDiscriminator -> HasConnectionObject [label=NO]
+  HasConnectionObject -> Pair [label=YES]
+
+  HasConnectionObject -> WaitForPairing [label=NO]
+
+  OnSessionEstablishmentError -> OnRendezvousError
+  OnSessionEstablished -> DeriveSecureSession -> OnRendezvousConnectionOpened
+}

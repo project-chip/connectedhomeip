@@ -1,0 +1,101 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.2.1. [TC-SU-2.1] QueryImage Command from DUT to OTA-P
+
+PICS:
+    - MCORE.OTA.Requestor
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Step 1: DUT sends a QueryImage command to the TH/OTA-P"
+      verification: |
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
+
+          Verify OTA Provider receives QueryImage command with following fields:
+           - VendorID - Should match the value reported by the Basic Information Cluster VendorId attribute of the DUT.
+           - ProductID - Should match the value reported by the Basic Information Cluster ProductId attribute of the DUT.
+           - SoftwareVersion - Should match the value reported by the Basic Information Cluster SoftwareVersion attribute of the DUT.
+           - Verify the ProtocolsSupported lists the BDX Synchronous protocol.
+           - HardwareVersion - If present, verify that it matches the value reported by the Basic Information Cluster HardwareVersion attribute of the DUT.
+           - Location field is same as Basic Information Cluster Attribute of the DUT.
+           -  If (MCORE.OTA.RequestorConsent) RequestorCanConsent field should be set to True. Otherwise it should be False and below is the sample log provided for the raspi platform:
+
+          [1645743053317] [97806:20280749] CHIP: [ZCL] OTA Provider received QueryImage
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   VendorID: 0xfff1
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   ProductID: 32769
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   SoftwareVersion: 1
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   ProtocolsSupported: [
+          [1645743053317] [97806:20280749] CHIP: [ZCL]     0
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   ]
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   HardwareVersion: 0
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   Location: XX
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   RequestorCanConsent: 0
+      disabled: true
+
+    - label:
+          "Step 2: DUT sends a QueryImage command to the TH/OTA-P. Wait for 2
+          minutes."
+      verification: |
+          Run the OTA Provider App using the command:
+
+          ./chip-ota-provider-app --discriminator ${PROVIDER_LONG_DISCRIMINATOR} --secured-device-port ${PROVIDER_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --filepath ${SW_IMAGE_FILE} -q busy
+
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
+
+          Wait for 2 mins, Verify OTA Provider sent QueryImage command only once in that 2 minute interval and below is the sample log provided for the raspi platform:
+
+          [1685440417.351366][20914:20914] CHIP:DMG: Received command for Endpoint=0 Cluster=0x0000_0029 Command=0x0000_0000
+          [1685440417.351432][20914:20914] CHIP:ZCL: OTA Provider received QueryImage
+          [1685440417.351457][20914:20914] CHIP:ZCL:   VendorID: 0xfff1
+          [1685440417.351481][20914:20914] CHIP:ZCL:   ProductID: 32769
+          [1685440417.351504][20914:20914] CHIP:ZCL:   SoftwareVersion: 1
+          [1685440417.351527][20914:20914] CHIP:ZCL:   ProtocolsSupported: [
+          [1685440417.351556][20914:20914] CHIP:ZCL:     0
+          [1685440417.351580][20914:20914] CHIP:ZCL:   ]
+          [1685440417.351603][20914:20914] CHIP:ZCL:   HardwareVersion: 0
+          [1685440417.351627][20914:20914] CHIP:ZCL:   Location: XX
+          [1685440417.351651][20914:20914] CHIP:ZCL:   RequestorCanConsent: 0
+      disabled: true
+
+    - label:
+          "Step 3: TH2/Administrator sends an AnnounceOTAProvider command to the
+          DUT."
+      verification: |
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+
+          where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
+
+          Verify that the DUT queries the indicated OTA Provider at the ProviderLocation at its next upcoming OTA Provider query On OTA Provider log and below is the sample log provided for the raspi platform:
+
+          [1645743053317] [97806:20280749] CHIP: [ZCL] OTA Provider received QueryImage
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   VendorID: 0xfff1
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   ProductID: 32769
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   SoftwareVersion: 1
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   ProtocolsSupported: [
+          [1645743053317] [97806:20280749] CHIP: [ZCL]     0
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   ]
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   HardwareVersion: 0
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   Location: XX
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   RequestorCanConsent: 0
+      disabled: true

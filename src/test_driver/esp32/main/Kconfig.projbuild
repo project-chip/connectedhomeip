@@ -1,0 +1,41 @@
+#
+#    Copyright (c) 2020 Project CHIP Authors
+#    All rights reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+#    Description:
+#      Configuration options CHIP ESP32 demo application.
+#
+
+menu "Crypto Tests"
+
+    choice
+        prompt "Device Type"
+        default DEVICE_TYPE_ESP32_DEVKITC
+        help
+            Specifies the type of ESP32 device.
+
+            Note that the "ESP32-DevKitC" choice is compatible with a number of clone devices
+            available from third-party manufacturers.
+
+        config DEVICE_TYPE_ESP32_DEVKITC
+            bool "ESP32-DevKitC"
+        config DEVICE_TYPE_M5STACK
+            bool "M5Stack"
+    endchoice
+
+    config CHIP_PROJECT_CONFIG
+        string "CHIP Project Configuration file"
+        default "main/include/CHIPProjectConfig.h"
+endmenu

@@ -1,0 +1,155 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 51.2.1. [TC-DGWIFI-2.1] Attributes with server as DUT
+
+PICS:
+    - DGWIFI.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "WiFi Network Diagnostics"
+    endpoint: 0
+
+tests:
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH reads BSSID attribute from DUT"
+      PICS: DGWIFI.S.A0000
+      command: "readAttribute"
+      attribute: "BSSID"
+      response:
+          constraints:
+              type: octet_string
+
+    #issue #13645
+    - label: "Step 3: TH reads SecurityType attribute constraints"
+      PICS: DGWIFI.S.A0001
+      command: "readAttribute"
+      attribute: "SecurityType"
+      response:
+          constraints:
+              type: enum8
+
+    - label: "Step 4: TH reads WiFiVersion attribute constraints"
+      PICS: DGWIFI.S.A0002
+      command: "readAttribute"
+      attribute: "WiFiVersion"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 6
+
+    - label: "Step 5: TH reads ChannelNumber attribute constraints"
+      PICS: DGWIFI.S.A0003
+      command: "readAttribute"
+      attribute: "ChannelNumber"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Step 6: TH reads RSSI attribute constraints"
+      PICS: DGWIFI.S.A0004
+      command: "readAttribute"
+      attribute: "RSSI"
+      response:
+          constraints:
+              type: int8s
+              minValue: -120
+              maxValue: 0
+
+    - label: "Step 7: TH reads BeaconLostCount attribute constraints"
+      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A0005
+      command: "readAttribute"
+      attribute: "BeaconLostCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 8: TH reads BeaconRxCount attribute constraints"
+      PICS: DGWIFI.S.A0006
+      command: "readAttribute"
+      attribute: "BeaconRxCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 9: TH reads PacketMulticastRxCount attribute constraints"
+      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A0007
+      command: "readAttribute"
+      attribute: "PacketMulticastRxCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 10: TH reads PacketMulticastTxCount attribute constraints"
+      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A0008
+      command: "readAttribute"
+      attribute: "PacketMulticastTxCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 11: TH reads PacketUnicastRxCount attribute constraints"
+      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A0009
+      command: "readAttribute"
+      attribute: "PacketUnicastRxCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 12: TH reads PacketUnicastTxCount attribute constraints"
+      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A000a
+      command: "readAttribute"
+      attribute: "PacketUnicastTxCount"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+
+    - label: "Step 13: TH reads CurrentMaxRate attribute constraints"
+      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A000b
+      command: "readAttribute"
+      attribute: "CurrentMaxRate"
+      response:
+          constraints:
+              type: int64u
+
+    - label: "Step 14: TH reads OverrunCount attribute constraints"
+      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A000c
+      command: "readAttribute"
+      attribute: "OverrunCount"
+      response:
+          constraints:
+              type: int64u

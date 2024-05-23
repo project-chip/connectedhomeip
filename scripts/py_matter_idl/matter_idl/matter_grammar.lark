@@ -1,0 +1,127 @@
+struct: struct_qualities "struct"i id "{" (struct_field ";")* "}"
+struct_quality: "fabric_scoped"i -> struct_fabric_scoped
+struct_qualities: struct_quality*
+
+// Composing elements may be at different maturity level
+// This only contains non-stable items. Items without a maturity
+// flag are to be assumed "stable"
+?maturity: "provisional"i -> provisional_api_maturity
+         | "internal"i -> internal_api_maturity
+         | "deprecated"i -> deprecated_api_maturity
+         | "stable"i -> stable_api_maturity
+
+enum: "enum"i id ":" type "{" constant_entry* "}"
+bitmap: "bitmap"i id ":" type "{" constant_entry* "}"
+
+?access_privilege: "view"i       -> view_privilege
+                 | "operate"i    -> operate_privilege
+                 | "manage"i     -> manage_privilege
+                 | "administer"i -> administer_privilege
+
+?attribute_access_type: "read"i  -> read_access
+                      | "write"i -> write_access
+
+event_access: "access" "(" ("read" ":" access_privilege)? ")"
+
+event_with_access: "event" event_access? id
+
+event: event_qualities event_priority event_with_access "=" positive_integer "{" (struct_field ";")* "}"
+
+event_quality: "fabric_sensitive" -> event_fabric_sensitive
+event_qualities: event_quality*
+
+?event_priority: "critical"i -> critical_priority
+               | "info"i     -> info_priority
+               | "debug"i    -> debug_priority
+
+attribute_access_entry: attribute_access_type ":" access_privilege
+
+attribute_access: "access"i "(" (attribute_access_entry ("," attribute_access_entry)* )? ")"
+
+attribute_with_access: attribute_access? struct_field
+
+attribute: attribute_qualities "attribute"i attribute_with_access ";"
+attribute_quality: "readonly"i -> attr_readonly
+                 | "nosubscribe"i -> attr_nosubscribe
+                 | "timedwrite"i -> attr_timed
+attribute_qualities: attribute_quality* -> attribute_qualities
+
+request_struct: "request"i struct
+
+// Response structures must have a response id
+response_struct: "response"i "struct"i id "=" positive_integer "{" (struct_field ";") * "}"
+
+command_quality: "timed"i -> timed_command
+                 | "fabric"i -> fabric_scoped_command
+command_qualities: command_quality*
+
+command_access: "access"i "(" ("invoke"i ":" access_privilege)? ")"
+
+command_with_access: "command"i command_access? id
+
+command: command_qualities command_with_access "(" id? ")" ":" id "=" positive_integer ";"
+
+cluster_revision: "revision"i positive_integer ";"
+
+// NOTE:
+//   Client or server cluster entries are for backwards compatibility only and have
+//   no direct meaning currently
+cluster: [maturity] ( "client" | "server" )? "cluster"i id "=" positive_integer "{" [cluster_revision] cluster_content* "}"
+
+?cluster_content: [maturity] (enum|bitmap|event|attribute|struct|request_struct|response_struct|command)
+
+endpoint: "endpoint"i positive_integer "{" endpoint_content* "}"
+?endpoint_content: endpoint_cluster_binding | endpoint_server_cluster | endpoint_device_type
+
+endpoint_device_type: "device" "type" id "=" positive_integer "," "version" positive_integer ";"
+endpoint_cluster_binding: "binding"i "cluster"i id ";"
+endpoint_server_cluster: "server"i "cluster"i id "{" endpoint_cluster_entry* "}"
+
+
+endpoint_attribute_storage: "ram"i      -> ram_attribute
+                          | "persist"i  -> persist_attribute
+                          | "callback"i -> callback_attribute
+
+?endpoint_cluster_entry: endpoint_emitted_event | endpoint_attribute_instantiation | endpoint_command_instantiation
+
+endpoint_emitted_event: "emits"i "event"i id ";"
+endpoint_attribute_instantiation: endpoint_attribute_storage "attribute"i id default_value? ";"
+endpoint_command_instantiation: "handle"i "command"i id ";"
+
+bool_default: "true"i  -> bool_default_true
+            | "false"i -> bool_default_false
+?default_value: "default"i "=" (integer | ESCAPED_STRING | bool_default)
+
+constant_entry: [maturity] id "=" positive_integer ";"
+positive_integer: POSITIVE_INTEGER | HEX_INTEGER
+negative_integer: "-" positive_integer
+
+integer: positive_integer | negative_integer
+
+struct_field: [maturity] member_attribute* field
+
+member_attribute: "optional"i -> optional
+                | "nullable"i -> nullable
+                | "fabric_sensitive"i -> fabric_sensitive
+
+field: data_type id list_marker? "=" positive_integer
+list_marker: "[" "]"
+
+data_type: type ("<" positive_integer ">")?
+
+id: ID
+type: ID
+
+POSITIVE_INTEGER: /\d+/
+HEX_INTEGER: /0x[A-Fa-f0-9]+/
+ID: /[a-zA-Z_][a-zA-Z0-9_]*/
+
+idl: (cluster|endpoint)*
+
+%import common.ESCAPED_STRING
+%import common.WS
+%import common.C_COMMENT
+%import common.CPP_COMMENT
+%ignore WS
+%ignore C_COMMENT
+%ignore CPP_COMMENT

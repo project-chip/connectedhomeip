@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2023 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="General"/>
+
+  <!-- Deprecated because this is a zigbee-only cluster -->
+  <cluster apiMaturity="deprecated">
+    <name>Binary Input (Basic)</name>
+    <domain>General</domain>
+    <description>An interface for reading the value of a binary measurement and accessing various characteristics of that measurement. </description>
+    <code>0x000F</code>
+    <define>BINARY_INPUT_BASIC_CLUSTER</define>
+
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+
+    <attribute side="server" code="0x0004" define="ACTIVE_TEXT" type="char_string" length="16" writable="true" default="" optional="true">active text</attribute>
+    <attribute side="server" code="0x001C" define="DESCRIPTION" type="char_string" length="16" writable="true" default="" optional="true">description</attribute>
+    <attribute side="server" code="0x002E" define="INACTIVE_TEXT" type="char_string" length="16" writable="true" default="" optional="true">inactive text</attribute>
+    <attribute side="server" code="0x0051" define="OUT_OF_SERVICE" type="boolean" min="0x00" max="0x01" writable="true" default="0x00" optional="false">out of service</attribute>
+    <attribute side="server" code="0x0054" define="POLARITY" type="enum8" writable="false" default="0x00" optional="true">polarity</attribute>
+    <attribute side="server" code="0x0055" define="PRESENT_VALUE" type="boolean" writable="true" reportable="true" optional="false">present value</attribute>
+    <attribute side="server" code="0x0067" define="RELIABILITY" type="enum8" writable="true" default="0x00" optional="true">reliability</attribute>
+    <attribute side="server" code="0x006F" define="STATUS_FLAGS" type="bitmap8" min="0x00" max="0x0F" writable="false" default="0x00" reportable="true" optional="false">status flags</attribute>
+    <attribute side="server" code="0x0100" define="APPLICATION_TYPE" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">application type</attribute>
+  </cluster>
+</configurator>

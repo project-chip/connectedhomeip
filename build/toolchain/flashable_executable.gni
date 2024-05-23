@@ -1,0 +1,167 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+
+# Convert a binary to a target format using objcopy.
+
+template("objcopy_convert") {
+  forward_variables_from(invoker,
+                         [
+                           "conversion_input",
+                           "conversion_output",
+                           "conversion_target_format",
+                           "deps",
+                           "objcopy",
+                         ])
+
+  action(target_name) {
+    inputs = [ conversion_input ]
+    outputs = [ conversion_output ]
+
+    args = [
+      objcopy,
+      "-O",
+      conversion_target_format,
+      rebase_path(conversion_input, root_build_dir),
+      rebase_path(conversion_output, root_build_dir),
+    ]
+    script = "${build_root}/gn_run_binary.py"
+  }
+}
+
+# Build a script to perform a device flashing operation.
+#
+# This requires a Python script, given by flashing_script_generator,
+# to construct the resulting flashing script, given by flashing_script_name.
+#
+# As used by flashable_executable(), the generator script requires two options,
+#   --output SCRIPT       - The generated script
+#   --application IMAGE   - The file to be flashed
+# plus any platform- or target-specific options as passed in by
+# flashable_executable()'s flashing_options.
+
+template("gen_flashing_script") {
+  forward_variables_from(invoker,
+                         [
+                           "flashing_script_generator",
+                           "flashing_script_name",
+                           "flashing_script_inputs",
+                           "flashing_options",
+                           "deps",
+                           "data_deps",
+                         ])
+
+  action(target_name) {
+    outputs = [ flashing_script_name ]
+
+    args = flashing_options
+    args += [
+      "--output",
+      rebase_path(flashing_script_name, root_build_dir),
+    ]
+
+    script = flashing_script_generator
+    inputs = flashing_script_inputs
+  }
+}
+
+# Build target for an executable, optionally converted to the preferred form
+# for flashing, plus a script that performs the flashing operation.
+#
+# The intent is that every flashable (or testable) build target in CHIP will
+# ultimately be flashable/runnable in a consistent way.
+
+template("flashable_executable") {
+  executable_target = "$target_name.executable"
+
+  if (defined(invoker.flashing_script_name)) {
+    # Generating the flashing script is the final target.
+    final_target = "$target_name.flashing"
+  } else if (defined(invoker.objcopy_image_name)) {
+    # Converted image is the final target.
+    final_target = "$target_name.image"
+  } else {
+    # The executable is the final target.
+    final_target = executable_target
+  }
+
+  if (defined(invoker.flashbundle_name)) {
+    flashbundle_name = invoker.flashbundle_name
+  } else {
+    flashbundle_name = "${target_name}.flashbundle.txt"
+  }
+
+  group(target_name) {
+    data_deps = [ ":$final_target" ]
+
+    if (defined(invoker.data_deps)) {
+      data_deps += invoker.data_deps
+    }
+
+    write_runtime_deps = "${root_out_dir}/${flashbundle_name}"
+  }
+
+  if (defined(invoker.objcopy_image_name)) {
+    # Executable target must be converted for flashing.
+    assert(defined(invoker.objcopy_image_format))
+    assert(defined(invoker.objcopy))
+
+    image_target = "$target_name.image"
+    image_name = invoker.objcopy_image_name
+    image_format = invoker.objcopy_image_format
+    objcopy = invoker.objcopy
+
+    objcopy_convert(image_target) {
+      conversion_input = "${root_out_dir}/${invoker.output_name}"
+      conversion_output = "${root_out_dir}/${image_name}"
+      conversion_target_format = image_format
+      deps = [ ":$executable_target" ]
+    }
+  }
+
+  if (defined(invoker.flashing_script_name)) {
+    if (!defined(image_target)) {
+      # The executable can be flashed directly.
+      image_target = executable_target
+      image_name = invoker.output_name
+    }
+
+    gen_flashing_script("$target_name.flashing") {
+      flashing_script_generator = invoker.flashing_script_generator
+      flashing_script_inputs = invoker.flashing_script_inputs
+      flashing_script_name = "$root_out_dir/${invoker.flashing_script_name}"
+      if (defined(invoker.flashing_options)) {
+        flashing_options = invoker.flashing_options
+      } else {
+        flashing_options = []
+      }
+
+      # Allows to set a different image name in the flasher script
+      if (defined(invoker.flashing_image_name)) {
+        image_name = invoker.flashing_image_name
+      }
+
+      flashing_options += [
+        "--application",
+        rebase_path(image_name, root_out_dir, root_out_dir),
+      ]
+      data_deps = [ ":$image_target" ]
+    }
+  }
+
+  executable(executable_target) {
+    forward_variables_from(invoker, "*")
+  }
+}

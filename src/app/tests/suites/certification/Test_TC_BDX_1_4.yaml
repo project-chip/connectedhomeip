@@ -1,0 +1,61 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 28.1.4. [TC-BDX-1.4] Response to Receiver Initiated BDX Transfer session
+
+PICS:
+    - MCORE.BDX.Sender
+    - MCORE.BDX.Responder
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Preconditions"
+      verification: |
+          This test can be verified using TC-SU-3.3 from the OTA Software Update section. Pls refer to OTA section for steps.
+      disabled: true
+
+    - label:
+          "Step 1: TH sends a ReceiveInit message to DUT + DUT sends a
+          ReceiveAccept message back to TH."
+      verification: |
+          On OTA Reference Requester App logs, Verify that the ReceiveAccept message has the following mandatory fields.
+          - Transfer Control
+          - Range Control
+          - Max Block Size
+          - Length
+
+          [1636410922200] [59208:62970584] CHIP: [ATM] Handling received BDX Message
+          [1636410922200] [59208:62970584] CHIP: [ATM] ReceiveAccept
+          [1636410922200] [59208:62970584] CHIP: [ATM]   Transfer Control: 0x20
+          [1636410922200] [59208:62970584] CHIP: [ATM]   Range Control: 0x0
+          [1636410922200] [59208:62970584] CHIP: [ATM]   Max Block Size: 1024
+          [1636410922200] [59208:62970584] CHIP: [ATM]   Length: 0x0000000000000000
+
+          Compare with
+
+          [1636410920973] [59208:62970584] CHIP: [ATM] Sending BDX Message
+          [1636410920973] [59208:62970584] CHIP: [ATM] ReceiveInit
+          [1636410920973] [59208:62970584] CHIP: [ATM]   Proposed Transfer Control: 0x20
+          [1636410920973] [59208:62970584] CHIP: [ATM]   Range Control: 0x0
+          [1636410920973] [59208:62970584] CHIP: [ATM]   Proposed Max Block Size: 1024
+          [1636410920973] [59208:62970584] CHIP: [ATM]   Start Offset: 0x0000000000000000
+          [1636410920973] [59208:62970584] CHIP: [ATM]   Proposed Max Length: 0x0000000000000000
+          [1636410920973] [59208:62970584] CHIP: [ATM]   File Designator Length: 8
+          [1636410920973] [59208:62970584] CHIP: [ATM]   File Designator: test.txt
+      disabled: true

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/addressUpdateFragment"
+        android:name="com.google.chip.chiptool.clusterclient.AddressUpdateFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true" />
+
+    <GridLayout
+        android:id="@+id/buttonGrid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/addressUpdateFragment"
+        android:columnCount="3"
+        android:rowCount="2">
+        <TextView
+            android:id="@+id/onBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:layout_margin="8dp"
+            android:layout_gravity="center"
+            android:layout_columnWeight="1"
+            android:layout_column="0"
+            android:layout_row="0"
+            android:background="@android:color/darker_gray"
+            android:text="@string/send_command_on_btn_text"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/toggleBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_row="0"
+            android:padding="16dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:background="@android:color/darker_gray"
+            android:text="@string/send_command_toggle_btn_text"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/offBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="2"
+            android:layout_row="0"
+            android:padding="16dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:background="@android:color/darker_gray"
+            android:text="@string/send_command_off_btn_text"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/readBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_row="1"
+            android:padding="16dp"
+            android:layout_margin="8dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:background="@android:color/darker_gray"
+            android:text="@string/read_on_off_attribute_btn_text"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/showSubscribeDialogBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_row="1"
+            android:padding="16dp"
+            android:layout_margin="8dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:background="@android:color/darker_gray"
+            android:text="@string/show_subscribe_dialog_btn_text"
+            android:textSize="16sp"/>
+    </GridLayout>
+
+    <SeekBar
+        android:id="@+id/levelBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/buttonGrid"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:max="254"
+        android:padding="16dp" />
+
+    <TextView
+        android:id="@+id/commandStatusTv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/levelBar"
+        android:padding="16dp"
+        android:minLines="4"
+        android:singleLine="false"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/reportStatusTv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/commandStatusTv"
+        android:padding="16dp"
+        android:minLines="4"
+        android:singleLine="false"
+        android:textSize="20sp" />
+
+</RelativeLayout>

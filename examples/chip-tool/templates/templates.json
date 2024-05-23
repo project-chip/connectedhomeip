@@ -1,0 +1,69 @@
+{
+    "name": "CHIP Tool templates",
+    "version": "chip-v1",
+    "helpers": [
+        "partials/helper.js",
+        "common/StringHelper.js",
+        "templates/app/helper.js",
+        "templates/chip/helper.js",
+        "chip-tool/templates/helper.js"
+    ],
+    "override": "../../../src/app/zap-templates/common/override.js",
+    "partials": [
+        {
+            "name": "header",
+            "path": "../../../src/app/zap-templates/partials/header.zapt"
+        },
+        {
+            "name": "clusters_header",
+            "path": "../../../src/app/zap-templates/partials/clusters_header.zapt"
+        },
+        {
+            "name": "cluster_header",
+            "path": "../../../src/app/zap-templates/partials/cluster_header.zapt"
+        },
+        {
+            "name": "struct_parser_decl",
+            "path": "partials/StructParserDecl.zapt"
+        },
+        {
+            "name": "struct_parser_impl",
+            "path": "partials/StructParserImpl.zapt"
+        },
+        {
+            "name": "struct_logger_decl",
+            "path": "partials/StructLoggerDecl.zapt"
+        },
+        {
+            "name": "struct_logger_impl",
+            "path": "partials/StructLoggerImpl.zapt"
+        }
+    ],
+    "templates": [
+        {
+            "path": "commands.zapt",
+            "name": "Cluster Commands header",
+            "output": "cluster/Commands.h"
+        },
+        {
+            "path": "logging/DataModelLogger.zapt",
+            "name": "Data Model Logger header",
+            "output": "cluster/logging/DataModelLogger.h"
+        },
+        {
+            "path": "logging/DataModelLogger-src.zapt",
+            "name": "Data Model Logger",
+            "output": "cluster/logging/DataModelLogger.cpp"
+        },
+        {
+            "path": "ComplexArgumentParser.zapt",
+            "name": "Complex Argument Parser header",
+            "output": "cluster/ComplexArgumentParser.h"
+        },
+        {
+            "path": "ComplexArgumentParser-src.zapt",
+            "name": "Complex Argument Parser",
+            "output": "cluster/ComplexArgumentParser.cpp"
+        }
+    ]
+}

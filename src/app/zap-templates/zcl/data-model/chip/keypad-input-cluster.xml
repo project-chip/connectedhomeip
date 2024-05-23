@@ -1,0 +1,156 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+  <cluster>
+    <domain>Media</domain>
+    <name>Keypad Input</name>
+    <code>0x0509</code>
+    <define>KEYPAD_INPUT_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <description>This cluster provides an interface for controlling a device like a TV using action commands such as UP, DOWN, and SELECT.</description>
+
+    <features>
+      <feature bit="0" code="NV" name="NavigationKeyCodes" summary="Supports UP, DOWN, LEFT, RIGHT, SELECT, BACK, EXIT, MENU">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="LK" name="LocationKeys" summary="Supports CEC keys 0x0A (Settings) and 0x09 (Home)">
+        <optionalConform/>
+      </feature>
+      <feature bit="2" code="NK" name="NumberKeys" summary="Supports numeric input 0..9">
+        <optionalConform/>
+      </feature>
+    </features>
+
+    <command source="client" code="0x00" name="SendKey" response="SendKeyResponse" optional="false">
+      <description>Upon receipt, this SHALL process a keycode as input to the media device.</description>
+      <arg name="KeyCode" type="CECKeyCodeEnum"/>
+    </command>
+
+    <command source="server" code="0x01" name="SendKeyResponse" optional="false">
+      <description>This command SHALL be generated in response to a SendKey Request command.</description>
+      <arg name="Status" type="StatusEnum"/>
+    </command>
+
+  </cluster>
+
+  <enum name="StatusEnum" type="enum8">
+    <cluster code="0x0509"/>
+    <item name="Success" value="0x00"/>
+    <item name="UnsupportedKey" value="0x01"/>
+    <item name="InvalidKeyInCurrentState" value="0x02"/>
+  </enum>
+
+  <enum name="CECKeyCodeEnum" type="enum8">
+    <cluster code="0x0509"/>
+    <item name="Select" value="0x00"/>
+    <item name="Up" value="0x01"/>
+    <item name="Down" value="0x02"/>
+    <item name="Left" value="0x03"/>
+    <item name="Right" value="0x04"/>
+    <item name="RightUp" value="0x05"/>
+    <item name="RightDown" value="0x06"/>
+    <item name="LeftUp" value="0x07"/>
+    <item name="LeftDown" value="0x08"/>
+    <item name="RootMenu" value="0x09"/>
+    <item name="SetupMenu" value="0x0A"/>
+    <item name="ContentsMenu" value="0x0B"/>
+    <item name="FavoriteMenu" value="0x0C"/>
+    <item name="Exit" value="0x0D"/>
+    <!-- RESERVED = 0x0E - 0x0F -->
+    <item name="MediaTopMenu" value="0x10"/>
+    <item name="MediaContextSensitiveMenu" value="0x11"/>
+    <!-- RESERVED = 0x12 – 0x1C -->
+    <item name="NumberEntryMode" value="0x1D"/>
+    <item name="Number11" value="0x1E"/>
+    <item name="Number12" value="0x1F"/>
+    <item name="Number0OrNumber10" value="0x20"/>
+    <item name="Numbers1" value="0x21"/>
+    <item name="Numbers2" value="0x22"/>
+    <item name="Numbers3" value="0x23"/>
+    <item name="Numbers4" value="0x24"/>
+    <item name="Numbers5" value="0x25"/>
+    <item name="Numbers6" value="0x26"/>
+    <item name="Numbers7" value="0x27"/>
+    <item name="Numbers8" value="0x28"/>
+    <item name="Numbers9" value="0x29"/>
+    <item name="Dot" value="0x2A"/>
+    <item name="Enter" value="0x2B"/>
+    <item name="Clear" value="0x2C"/>
+    <!-- RESERVED = 0x2D - 0x2E -->
+    <item name="NextFavorite" value="0x2F"/>
+    <item name="ChannelUp" value="0x30"/>
+    <item name="ChannelDown" value="0x31"/>
+    <item name="PreviousChannel" value="0x32"/>
+    <item name="SoundSelect" value="0x33"/>
+    <item name="InputSelect" value="0x34"/>
+    <item name="DisplayInformation" value="0x35"/>
+    <item name="Help" value="0x36"/>
+    <item name="PageUp" value="0x37"/>
+    <item name="PageDown" value="0x38"/>
+    <!-- RESERVED = 0x39 - 0x3F -->
+    <item name="Power" value="0x40"/>
+    <item name="VolumeUp" value="0x41"/>
+    <item name="VolumeDown" value="0x42"/>
+    <item name="Mute" value="0x43"/>
+    <item name="Play" value="0x44"/>
+    <item name="Stop" value="0x45"/>
+    <item name="Pause" value="0x46"/>
+    <item name="Record" value="0x47"/>
+    <item name="Rewind" value="0x48"/>
+    <item name="FastForward" value="0x49"/>
+    <item name="Eject" value="0x4A"/>
+    <item name="Forward" value="0x4B"/>
+    <item name="Backward" value="0x4C"/>
+    <item name="StopRecord" value="0x4D"/>
+    <item name="PauseRecord" value="0x4E"/>
+    <item name="Reserved" value="0x4F"/>
+    <item name="Angle" value="0x50"/>
+    <item name="SubPicture" value="0x51"/>
+    <item name="VideoOnDemand" value="0x52"/>
+    <item name="ElectronicProgramGuide" value="0x53"/>
+    <item name="TimerProgramming" value="0x54"/>
+    <item name="InitialConfiguration" value="0x55"/>
+    <item name="SelectBroadcastType" value="0x56"/>
+    <item name="SelectSoundPresentation" value="0x57"/>
+    <!-- RESERVED = 0x58-0x5F -->
+    <item name="PlayFunction" value="0x60"/>
+    <item name="PausePlayFunction" value="0x61"/>
+    <item name="RecordFunction" value="0x62"/>
+    <item name="PauseRecordFunction" value="0x63"/>
+    <item name="StopFunction" value="0x64"/>
+    <item name="MuteFunction" value="0x65"/>
+    <item name="RestoreVolumeFunction" value="0x66"/>
+    <item name="TuneFunction" value="0x67"/>
+    <item name="SelectMediaFunction" value="0x68"/>
+    <item name="SelectAvInputFunction" value="0x69"/>
+    <item name="SelectAudioInputFunction" value="0x6A"/>
+    <item name="PowerToggleFunction" value="0x6B"/>
+    <item name="PowerOffFunction" value="0x6C"/>
+    <item name="PowerOnFunction" value="0x6D"/>
+    <!-- RESERVED = 0x6E-0x70 -->
+    <item name="F1Blue" value="0x71"/>
+    <item name="F2Red" value="0x72"/>
+    <item name="F3Green" value="0x73"/>
+    <item name="F4Yellow" value="0x74"/>
+    <item name="F5" value="0x75"/>
+    <item name="Data" value="0x76"/>
+  </enum>
+
+
+</configurator>

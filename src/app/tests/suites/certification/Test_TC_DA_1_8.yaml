@@ -1,0 +1,1341 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    29.1.8. [TC-DA-1.8] Device Attestation Request Validation-Success Scenario
+    [DUT-Commissioner]
+
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Precondition/Test case description"
+      verification: |
+          (for all steps, PIs use equivalent command on their respective platform)
+          set the $CHIP_ROOT environment variable to the location of the connectedhomeip directory (cd to the connectedhomeip directory, use command `export CHIP_ROOT=$(pwd -P)`
+          For each scenario outlined in the sheet TC-DA-1.8 test cases, perform the following actions
+          - Start the TH using the required certificate set and PID. For chip-all-clusters-app, use the command given in the chip-all-clusters app command column
+          - Have the DUT commission the TH. Verify that the DUT indicates that the device is not genuine, or otherwise indicates a failure of device attestation, within its error handling APIs or user interface.
+          - factory reset the TH
+      disabled: true
+
+    - label:
+          "Step 1:Precondition: For each of the following test cases, start the
+          TH using the appropriate certificate set, commission the TH using the
+          DUT, then factory reset the TH:"
+      verification: |
+          Perform the following actions (PIs use equivalent command on their respective platform)
+          - Start the TH using the required certificate set and PID. For chip-all-clusters-app, use the command given in the chip-all-clusters app command column
+          - Have the DUT commission the TH. Verify that the TH is successfully commissioned for each test case
+          - factory reset the TH
+            command when using chip-all-clusters-app: sudo rm -rf /tmp/chip_*
+      disabled: true
+
+    - label:
+          "Step 1: CD Test Vector: The product_id_array field has one PID value
+          which matches the PID value in DAC."
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_cd_dac_origin_vid_pid_present_match/test_case_vector.json --product-id 32768
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1690284781.863086][15687:15687] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1690284781.863091][15687:15687] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1690284781.863094][15687:15687] CHIP:SVR: Commissioning completed successfully
+          [1690284781.863099][15687:15687] CHIP:DIS: Updating services using commissioning mode 0
+          [1690284781.863232][15687:15687] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1690284781.863516][15687:15687] CHIP:DL: Using wifi MAC for hostname
+          [1690284781.863520][15687:15687] CHIP:DIS: Advertise operational node BC763936FB9BFB4F-0000000000000001
+          [1690284781.863527][15687:15687] CHIP:DIS: Responding with _matter._tcp.local
+          [1690284781.863530][15687:15687] CHIP:DIS: Responding with BC763936FB9BFB4F-0000000000000001._matter._tcp.local
+          [1690284781.863533][15687:15687] CHIP:DIS: Responding with BC763936FB9BFB4F-0000000000000001._matter._tcp.local
+          [1690284781.863535][15687:15687] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690284781.863537][15687:15687] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690284781.863540][15687:15687] CHIP:DIS: Responding with _IBC763936FB9BFB4F._sub._matter._tcp.local
+          [1690284781.863541][15687:15687] CHIP:DIS: CHIP minimal mDNS configured as 'Operational device'; instance name: BC763936FB9BFB4F-0000000000000001.
+          [1690284781.863659][15687:15687] CHIP:DIS: mDNS service published: _matter._tcp
+      disabled: true
+
+    - label:
+          "Step 2: DAC Test Vector: Valid certificate signature algorithm
+          ECDSA_WITH_SHA256"
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_dac_sig_algo_ecdsa_with_sha256/test_case_vector.json --product-id 32768
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+          [1690282264.371827][14553:14553] CHIP:IN: (S) Sending msg 23779882 on secure session with LSID: 16850
+          [1690282264.371844][14553:14553] CHIP:DMG: Command handler moving to [CommandSen]
+          [1690282264.371847][14553:14553] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1690282264.371851][14553:14553] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1690282264.371855][14553:14553] CHIP:SVR: Commissioning completed successfully
+          [1690282264.371860][14553:14553] CHIP:DIS: Updating services using commissioning mode 0
+          [1690282264.372005][14553:14553] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1690282264.372310][14553:14553] CHIP:DL: Using wifi MAC for hostname
+          [1690282264.372315][14553:14553] CHIP:DIS: Advertise operational node 1D83B90391F33656-0000000000000001
+          [1690282264.372322][14553:14553] CHIP:DIS: Responding with _matter._tcp.local
+          [1690282264.372324][14553:14553] CHIP:DIS: Responding with 1D83B90391F33656-0000000000000001._matter._tcp.local
+          [1690282264.372327][14553:14553] CHIP:DIS: Responding with 1D83B90391F33656-0000000000000001._matter._tcp.local
+          [1690282264.372329][14553:14553] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690282264.372331][14553:14553] CHIP:DIS: Responding with 8C1D96786A130000.local
+      disabled: true
+
+    - label:
+          "Step 3: PAI Test Vector: Certificate Key Usage extension
+          digitalSignature field is wrong (not present for DAC and present for
+          PAI, which is OK as optional)"
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_pai_ext_key_usage_dig_sig_wrong/test_case_vector.json --product-id 32768
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1690282103.319220][14495:14495] CHIP:DMG: Command handler moving to [CommandSen]
+          [1690282103.319223][14495:14495] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1690282103.319228][14495:14495] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1690282103.319231][14495:14495] CHIP:SVR: Commissioning completed successfully
+          [1690282103.319237][14495:14495] CHIP:DIS: Updating services using commissioning mode 0
+          [1690282103.319424][14495:14495] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1690282103.319836][14495:14495] CHIP:DL: Using wifi MAC for hostname
+          [1690282103.319841][14495:14495] CHIP:DIS: Advertise operational node 245D3DEA8B49CCBC-0000000000000001
+          [1690282103.319847][14495:14495] CHIP:DIS: Responding with _matter._tcp.local
+      disabled: true
+
+    - label: "Step 4: CD Test Vector: Valid CMS digest algorithm SHA256."
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_cd_cms_digest_algo_sha256/test_case_vector.json --product-id 32768
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1690283252.582992][15010:15010] CHIP:IN: (S) Sending msg 90677485 on secure session with LSID: 13429
+          [1690283252.583011][15010:15010] CHIP:DMG: Command handler moving to [CommandSen]
+          [1690283252.583014][15010:15010] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1690283252.583020][15010:15010] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1690283252.583024][15010:15010] CHIP:SVR: Commissioning completed successfully
+          [1690283252.583031][15010:15010] CHIP:DIS: Updating services using commissioning mode 0
+          [1690283252.583246][15010:15010] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1690283252.583664][15010:15010] CHIP:DL: Using wifi MAC for hostname
+          [1690283252.583669][15010:15010] CHIP:DIS: Advertise operational node 4A9A302B80B2F60D-0000000000000001
+          [1690283252.583676][15010:15010] CHIP:DIS: Responding with _matter._tcp.local
+          [1690283252.583679][15010:15010] CHIP:DIS: Responding with 4A9A302B80B2F60D-0000000000000001._matter._tcp.local
+          [1690283252.583682][15010:15010] CHIP:DIS: Responding with 4A9A302B80B2F60D-00000000000
+      disabled: true
+
+    - label:
+          "Step 5: DAC Test Vector: Fallback VID and PID encoding example from
+          spec: valid and recommended since easily human-readable"
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_dac_vidpid_fallback_encoding_02/test_case_vector.json --product-id 177
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1691133857.877392][11175:11175] CHIP:IN: (S) Sending msg 86521032 on secure session with LSID: 18679
+          [1691133857.877592][11175:11175] CHIP:DMG: Command handler moving to [CommandSen]
+          [1691133857.877626][11175:11175] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1691133857.877673][11175:11175] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1691133857.877703][11175:11175] CHIP:SVR: Commissioning completed successfully
+          [1691133857.877753][11175:11175] CHIP:DIS: Updating services using commissioning mode 0
+          [1691133857.889402][11175:11175] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1691133857.918651][11175:11175] CHIP:DL: Using wifi MAC for hostname
+          [1691133857.918706][11175:11175] CHIP:DIS: Advertise operational node 3CBA812920C1A81B-0000000000000001
+          [1691133857.918754][11175:11175] CHIP:DIS: Responding with _matter._tcp.local
+      disabled: true
+
+    - label:
+          "Step 6: PAI Test Vector: Valid certificate public key curve
+          prime256v1"
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_pai_sig_curve_prime256v1/test_case_vector.json --product-id 32768
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+          [1690281511.267951][14201:14201] CHIP:IN: (S) Sending msg 224547489 on secure session with LSID: 18074
+          [1690281511.267975][14201:14201] CHIP:DMG: Command handler moving to [CommandSen]
+          [1690281511.267978][14201:14201] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1690281511.267985][14201:14201] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1690281511.267989][14201:14201] CHIP:SVR: Commissioning completed successfully
+          [1690281511.267996][14201:14201] CHIP:DIS: Updating services using commissioning mode 0
+          [1690281511.268177][14201:14201] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1690281511.268587][14201:14201] CHIP:DL: Using wifi MAC for hostname
+          [1690281511.268593][14201:14201] CHIP:DIS: Advertise operational node C149B332A9D60CE1-0000000000000001
+          [1690281511.268603][14201:14201] CHIP:DIS: Responding with _matter._tcp.local
+          [1690281511.268607][14201:14201] CHIP:DIS: Responding with C149B332A9D60CE1-0000000000000001._matter._tcp.local
+          [1690281511.268611][14201:14201] CHIP:DIS: Responding with C149B332A9D60CE1-0000000000000001._matter._tcp.local
+          [1690281511.268614][14201:14201] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690281511.268616][14201:14201] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690281511.268621][14201:14201] CHIP:DIS: Responding with _IC149B332A9D60CE1._sub._matter._tcp.local
+          [1690281511.268623][14201:14201] CHIP:DIS: CHIP minimal mDNS configured as 'Operational device'; instance name: C149B332A9D60CE1-0000000000000001.
+          [1690281511.268802][14201:14201] CHIP:DIS: mDNS service published: _matter._tcp
+      disabled: true
+
+    - label:
+          "Step 7: DAC Test Vector: Fallback VID and PID encoding example from
+          spec: valid, but highly discouraged, since embedding of substrings
+          within other substrings may be confusing to human readers"
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_dac_vidpid_fallback_encoding_05/test_case_vector.json --product-id 177
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1691133794.712296][11157:11157] CHIP:IN: (S) Sending msg 176064909 on secure session with LSID: 23128
+          [1691133794.712460][11157:11157] CHIP:DMG: Command handler moving to [CommandSen]
+          [1691133794.712484][11157:11157] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1691133794.712519][11157:11157] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1691133794.712541][11157:11157] CHIP:SVR: Commissioning completed successfully
+          [1691133794.712578][11157:11157] CHIP:DIS: Updating services using commissioning mode 0
+          [1691133794.721139][11157:11157] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1691133794.750359][11157:11157] CHIP:DL: Using wifi MAC for hostname
+          [1691133794.750415][11157:11157] CHIP:DIS: Advertise operational node 3CBA812920C1A81B-0000000000000001
+          [1691133794.750462][11157:11157] CHIP:DIS: Responding with _matter._tcp.local
+          [1691133794.750483][11157:11157] CHIP:DIS: Responding with 3CBA812920C1A81B-0000000000000001._matter._tcp.local
+          [1691133794.750507][11157:11157] CHIP:DIS: Responding with 3CBA812920C1A81B-0000000000000001._matter._tcp.local
+          [1691133794.750525][11157:11157] CHIP:DIS: Responding with E45F010F1A010000.local
+          [1691133794.750541][11157:11157] CHIP:DIS: Responding with E45F010F1A010000.local
+      disabled: true
+
+    - label:
+          "Step 8: PAI Test Vector: Valid certificate signature algorithm
+          ECDSA_WITH_SHA256"
+
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_pai_sig_algo_ecdsa_with_sha256/test_case_vector.json --product-id 32768
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1690282205.406742][14526:14526] CHIP:DMG: Command handler moving to [CommandSen]
+          [1690282205.406744][14526:14526] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1690282205.406749][14526:14526] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1690282205.406752][14526:14526] CHIP:SVR: Commissioning completed successfully
+          [1690282205.406757][14526:14526] CHIP:DIS: Updating services using commissioning mode 0
+          [1690282205.406908][14526:14526] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1690282205.407193][14526:14526] CHIP:DL: Using wifi MAC for hostname
+          [1690282205.407198][14526:14526] CHIP:DIS: Advertise operational node 0BC515CC89B3B451-0000000000000001
+          [1690282205.407204][14526:14526] CHIP:DIS: Responding with _matter._tcp.local
+          [1690282205.407207][14526:14526] CHIP:DIS: Responding with 0BC515CC89B3B451-0000000000000001._matter._tcp.local
+          [1690282205.407210][14526:14526] CHIP:DIS: Responding with 0BC515CC89B3B451-0000000000000001._matter._tcp.local
+          [1690282205.407212][14526:14526] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690282205.407213][14526:14526] CHIP:DIS: Responding with 8C1D96786A130000.local
+      disabled: true
+
+    - label:
+          "Step 9: DAC Test Vector: Fallback VID and PID encoding example from
+          spec: valid, but less readable"
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_dac_vidpid_fallback_encoding_04/test_case_vector.json --product-id 177
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1691134005.932359][11214:11214] CHIP:DMG: Command handler moving to [CommandSen]
+          [1691134005.932385][11214:11214] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1691134005.932425][11214:11214] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1691134005.932449][11214:11214] CHIP:SVR: Commissioning completed successfully
+          [1691134005.932492][11214:11214] CHIP:DIS: Updating services using commissioning mode 0
+          [1691134005.942626][11214:11214] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1691134005.972635][11214:11214] CHIP:DL: Using wifi MAC for hostname
+          [1691134005.972688][11214:11214] CHIP:DIS: Advertise operational node 3CBA812920C1A81B-0000000000000001
+          [1691134005.972733][11214:11214] CHIP:DIS: Responding with _matter._tcp.local
+          [1691134005.972754][11214:11214] CHIP:DIS: Responding with 3CBA812920C1A81B-0000000000000001._matter._tcp.local
+          [1691134005.972778][11214:11214] CHIP:DIS: Responding with 3CBA812920C1A81B-0000000000000001._matter._tcp.local
+          [1691134005.972796][11214:11214] CHIP:DIS: Responding with E45F010F1A010000.local
+      disabled: true
+
+    - label:
+          "Step 10: CD Test Vector: Valid CMS signature algorithm
+          ECDSA_WITH_SHA256."
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_cd_cms_sig_algo_ecdsa_with_sha256/test_case_vector.json --product-id 32768
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1690285168.741667][16055:16055] CHIP:EM: <<< [E:60515r S:59089 M:252248938 (Ack:182146297)] (S) Msg TX to 1:000000000001B669 [81EE] --- Type 0001:09 (IM:InvokeCommandResponse)
+          [1690285168.741672][16055:16055] CHIP:IN: (S) Sending msg 252248938 on secure session with LSID: 59089
+          [1690285168.741691][16055:16055] CHIP:DMG: Command handler moving to [CommandSen]
+          [1690285168.741693][16055:16055] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1690285168.741698][16055:16055] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1690285168.741700][16055:16055] CHIP:SVR: Commissioning completed successfully
+          [1690285168.741705][16055:16055] CHIP:DIS: Updating services using commissioning mode 0
+          [1690285168.741839][16055:16055] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1690285168.742127][16055:16055] CHIP:DL: Using wifi MAC for hostname
+          [1690285168.742132][16055:16055] CHIP:DIS: Advertise operational node 5C044033A18D81EE-0000000000000001
+          [1690285168.742139][16055:16055] CHIP:DIS: Responding with _matter._tcp.local
+          [1690285168.742141][16055:16055] CHIP:DIS: Responding with 5C044033A18D81EE-0000000000000001._matter._tcp.local
+          [1690285168.742145][16055:16055] CHIP:DIS: Responding with 5C044033A18D81EE-0000000000000001._matter._tcp.local
+          [1690285168.742147][16055:16055] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690285168.742148][16055:16055] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690285168.742152][16055:16055] CHIP:DIS: Responding with _I5C044033A18D81EE._sub._matter._tcp.local
+          [1690285168.742154][16055:16055] CHIP:DIS: CHIP minimal mDNS configured as 'Operational device'; instance name: 5C044033A18D81EE-0000000000000001.
+          [1690285168.742275][16055:16055] CHIP:DIS: mDNS service published: _matter._tcp
+          [1690285168.742282][16055:16055] CHIP:IN: Expiring all PASE sessions
+          [1690285168.742284][16055:16055] CHIP:IN: SecureSession[0x55e03b27a900]: MarkForEviction Type:1 LSID:59088
+          [1690285168.742287][16055:16055] CHIP:SC: SecureSession[0x55e03b27a900, LSID:59088]: State change 'kActive' --> 'kPendingEviction'
+          [1690285168.742290][16055:16055] CHIP:IN: SecureSession[0x55e03b27a900]: Released - Type:1 LSID:59088
+      disabled: true
+
+    - label:
+          "Step 11: PAI Test Vector: Fallback VID and PID encoding example from
+          spec: valid, but less readable"
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_pai_vidpid_fallback_encoding_04/test_case_vector.json --product-id 177
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1691133565.491036][11098:11098] CHIP:DMG: Command handler moving to [CommandSen]
+          [1691133565.491066][11098:11098] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1691133565.491112][11098:11098] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1691133565.491139][11098:11098] CHIP:SVR: Commissioning completed successfully
+          [1691133565.491182][11098:11098] CHIP:DIS: Updating services using commissioning mode 0
+          [1691133565.500346][11098:11098] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1691133565.528577][11098:11098] CHIP:DL: Using wifi MAC for hostname
+          [1691133565.528631][11098:11098] CHIP:DIS: Advertise operational node 3CBA812920C1A81B-0000000000000001
+          [1691133565.528676][11098:11098] CHIP:DIS: Responding with _matter._tcp.local
+          [1691133565.528697][11098:11098] CHIP:DIS: Responding with 3CBA812920C1A81B-0000000000000001._matter._tcp.local
+          [1691133565.528721][11098:11098] CHIP:DIS: Responding with 3CBA812920C1A81B-0000000000000001._matter._tcp.local
+          [1691133565.528739][11098:11098] CHIP:DIS: Responding with E45F010F1A010000.local
+          [1691133565.528756][11098:11098] CHIP:DIS: Responding with E45F010F1A010000.local
+          [1691133565.528780][11098:11098] CHIP:DIS: Responding with _I3CBA812920C1A81B._sub._matter._tcp.local
+          [1691133565.528798][11098:11098] CHIP:DIS: CHIP minimal mDNS configured as 'Operational device'; instance name: 3CBA812920C1A81B-0000000000000001.
+          [1691133565.543946][11098:11098] CHIP:DIS: mDNS service published: _matter._tcp
+      disabled: true
+
+    - label:
+          "Step 12: DAC Test Vector: Certificate includes optional Extended Key
+          Usage extension"
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_dac_ext_extended_key_usage_present/test_case_vector.json --product-id 32768
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1690281699.777371][14314:14314] CHIP:IN: (S) Sending msg 237488731 on secure session with LSID: 53990
+          [1690281699.777407][14314:14314] CHIP:DMG: Command handler moving to [CommandSen]
+          [1690281699.777410][14314:14314] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1690281699.777416][14314:14314] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1690281699.777420][14314:14314] CHIP:SVR: Commissioning completed successfully
+          [1690281699.777426][14314:14314] CHIP:DIS: Updating services using commissioning mode 0
+          [1690281699.777580][14314:14314] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1690281699.777915][14314:14314] CHIP:DL: Using wifi MAC for hostname
+          [1690281699.777921][14314:14314] CHIP:DIS: Advertise operational node 4B076F272AA45A20-0000000000000001
+          [1690281699.777929][14314:14314] CHIP:DIS: Responding with _matter._tcp.local
+      disabled: true
+
+    - label:
+          "Step 14: DAC Test Vector: Mix of Fallback and Matter OID encoding for
+          VID and PID: valid, Matter OIDs are used and wrong values in the
+          common-name are ignored"
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_dac_vidpid_fallback_encoding_15/test_case_vector.json --product-id 177
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          691133646.091682][11117:11117] CHIP:EM: <<< [E:50678r S:27653 M:163771128 (Ack:45828179)] (S) Msg TX to 1:000000000001B669 [A81B] --- Type 0001:09 (IM:InvokeCommandResponse)
+          [1691133646.091736][11117:11117] CHIP:IN: (S) Sending msg 163771128 on secure session with LSID: 27653
+          [1691133646.091927][11117:11117] CHIP:DMG: Command handler moving to [CommandSen]
+          [1691133646.091951][11117:11117] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1691133646.091990][11117:11117] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1691133646.092012][11117:11117] CHIP:SVR: Commissioning completed successfully
+          [1691133646.092051][11117:11117] CHIP:DIS: Updating services using commissioning mode 0
+          [1691133646.101029][11117:11117] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1691133646.130460][11117:11117] CHIP:DL: Using wifi MAC for hostname
+      disabled: true
+
+    - label:
+          "Step 15: CD Test Vector: The product_id_array field has one PID value
+          which matches the PID value in DAC."
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_cd_pid_array_count01_valid/test_case_vector.json --product-id 32768
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1690280928.950144][13907:13907] CHIP:DMG: {
+          [1690280928.950146][13907:13907] CHIP:DMG:     peer_address = UDP:[fe80::5a6b:cc3a:f0c1:ab99%wlp0s20f3]:44344
+          [1690280928.950147][13907:13907] CHIP:DMG: }
+          [1690280928.950149][13907:13907] CHIP:DMG:
+          [1690280928.950160][13907:13907] CHIP:EM: <<< [E:42046r S:55761 M:4615769 (Ack:127152057)] (S) Msg TX to 1:000000000001B669 [BCFB] --- Type 0001:09 (IM:InvokeCommandResponse)
+          [1690280928.950165][13907:13907] CHIP:IN: (S) Sending msg 4615769 on secure session with LSID: 55761
+          [1690280928.950185][13907:13907] CHIP:DMG: Command handler moving to [CommandSen]
+          [1690280928.950187][13907:13907] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1690280928.950192][13907:13907] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1690280928.950195][13907:13907] CHIP:SVR: Commissioning completed successfully
+          [1690280928.950200][13907:13907] CHIP:DIS: Updating services using commissioning mode 0
+          [1690280928.950333][13907:13907] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1690280928.950625][13907:13907] CHIP:DL: Using wifi MAC for hostname
+          [1690280928.950629][13907:13907] CHIP:DIS: Advertise operational node 48D63053063CBCFB-0000000000000001
+          [1690280928.950636][13907:13907] CHIP:DIS: Responding with _matter._tcp.local
+          [1690280928.950638][13907:13907] CHIP:DIS: Responding with 48D63053063CBCFB-0000000000000001._matter._tcp.local
+          [1690280928.950642][13907:13907] CHIP:DIS: Responding with 48D63053063CBCFB-0000000000000001._matter._tcp.local
+          [1690280928.950644][13907:13907] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690280928.950646][13907:13907] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690280928.950650][13907:13907] CHIP:DIS: Responding with _I48D63053063CBCFB._sub._matter._tcp.local
+          [1690280928.950651][13907:13907] CHIP:DIS: CHIP minimal mDNS configured as 'Operational device'; instance name: 48D63053063CBCFB-0000000000000001.
+          [1690280928.950815][13907:13907] CHIP:DIS: mDNS service published: _matter._tcp
+      disabled: true
+
+    - label: "Step 16: CD Test Vector: Valid format_version field set to 1."
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_cd_format_version_1/test_case_vector.json --product-id 32768
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+          [1690283303.542736][15037:15037] CHIP:IN: (S) Sending msg 210903775 on secure session with LSID: 64447
+          [1690283303.542761][15037:15037] CHIP:DMG: Command handler moving to [CommandSen]
+          [1690283303.542763][15037:15037] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1690283303.542769][15037:15037] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1690283303.542772][15037:15037] CHIP:SVR: Commissioning completed successfully
+          [1690283303.542778][15037:15037] CHIP:DIS: Updating services using commissioning mode 0
+          [1690283303.542948][15037:15037] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1690283303.543270][15037:15037] CHIP:DL: Using wifi MAC for hostname
+          [1690283303.543275][15037:15037] CHIP:DIS: Advertise operational node 5F5C8ABEB09C0582-0000000000000001
+          [1690283303.543281][15037:15037] CHIP:DIS: Responding with _matter._tcp.local
+          [1690283303.543283][15037:15037] CHIP:DIS: Responding with 5F5C8ABEB09C0582-0000000000000001._matter._tcp.local
+          [1690283303.543287][15037:15037] CHIP:DIS: Responding with 5F5C8ABEB09C0582-0000000000000001._matter._tcp.local
+          [1690283303.543290][15037:15037] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690283303.543293][15037:15037] CHIP:DIS: Responding with 8C1D96786A130000.local
+      disabled: true
+
+    - label: "Step 17: CD Test Vector: Valid CMS eContentType pkcs7-data."
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_cd_cms_econtent_type_pkcs7_data/test_case_vector.json --product-id 32768
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1690284421.688328][15513:15513] CHIP:EM: <<< [E:57094r S:37474 M:62088858 (Ack:198482245)] (S) Msg TX to 1:000000000001B669 [9014] --- Type 0001:09 (IM:InvokeCommandResponse)
+          [1690284421.688334][15513:15513] CHIP:IN: (S) Sending msg 62088858 on secure session with LSID: 37474
+          [1690284421.688360][15513:15513] CHIP:DMG: Command handler moving to [CommandSen]
+          [1690284421.688362][15513:15513] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1690284421.688382][15513:15513] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1690284421.688386][15513:15513] CHIP:SVR: Commissioning completed successfully
+          [1690284421.688393][15513:15513] CHIP:DIS: Updating services using commissioning mode 0
+          [1690284421.688535][15513:15513] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1690284421.688930][15513:15513] CHIP:DL: Using wifi MAC for hostname
+          [1690284421.688935][15513:15513] CHIP:DIS: Advertise operational node 77378B1179759014-0000000000000001
+          [1690284421.688945][15513:15513] CHIP:DIS: Responding with _matter._tcp.local
+          [1690284421.688948][15513:15513] CHIP:DIS: Responding with 77378B1179759014-0000000000000001._matter._tcp.local
+          [1690284421.688952][15513:15513] CHIP:DIS: Responding with 77378B1179759014-0000000000000001._matter._tcp.local
+          [1690284421.688955][15513:15513] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690284421.688957][15513:15513] CHIP:DIS: Responding with 8C1D96786A130000.local
+      disabled: true
+
+    - label:
+          "Step 19: DAC Test Vector: Fallback VID and PID encoding example from
+          spec: valid example showing that order or separators are not
+          considered at all for the overall validity of the embedded fields"
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_dac_vidpid_fallback_encoding_03/test_case_vector.json --product-id 177
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1691133683.498853][11126:11126] CHIP:EM: <<< [E:25280r S:10496 M:16556542 (Ack:4636808)] (S) Msg TX to 1:000000000001B669 [A81B] --- Type 0001:09 (IM:InvokeCommandResponse)
+          [1691133683.498897][11126:11126] CHIP:IN: (S) Sending msg 16556542 on secure session with LSID: 10496
+          [1691133683.499062][11126:11126] CHIP:DMG: Command handler moving to [CommandSen]
+          [1691133683.499084][11126:11126] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1691133683.499121][11126:11126] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1691133683.499143][11126:11126] CHIP:SVR: Commissioning completed successfully
+          [1691133683.499178][11126:11126] CHIP:DIS: Updating services using commissioning mode 0
+          [1691133683.507672][11126:11126] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1691133683.538207][11126:11126] CHIP:DL: Using wifi MAC for hostname
+          [1691133683.538269][11126:11126] CHIP:DIS: Advertise operational node 3CBA812920C1A81B-0000000000000001
+          [1691133683.538318][11126:11126] CHIP:DIS: Responding with _matter._tcp.local
+      disabled: true
+
+    - label:
+          "Step 20: CD Test Vector: The authorized_paa_list contains one valid
+          PAA which is authorized to sign the PAI."
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_cd_authorized_paa_list_count1_valid/test_case_vector.json --product-id 32768
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1690284610.899952][15595:15595] CHIP:IN: (S) Sending msg 181434251 on secure session with LSID: 27220
+          [1690284610.899971][15595:15595] CHIP:DMG: Command handler moving to [CommandSen]
+          [1690284610.899974][15595:15595] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1690284610.899980][15595:15595] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1690284610.899983][15595:15595] CHIP:SVR: Commissioning completed successfully
+          [1690284610.899990][15595:15595] CHIP:DIS: Updating services using commissioning mode 0
+          [1690284610.900176][15595:15595] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1690284610.900592][15595:15595] CHIP:DL: Using wifi MAC for hostname
+          [1690284610.900597][15595:15595] CHIP:DIS: Advertise operational node B50245B397D68077-0000000000000001
+          [1690284610.900604][15595:15595] CHIP:DIS: Responding with _matter._tcp.local
+          [1690284610.900608][15595:15595] CHIP:DIS: Responding with B50245B397D68077-0000000000000001._matter._tcp.local
+          [1690284610.900611][15595:15595] CHIP:DIS: Responding with B50245B397D68077-0000000000000001._matter._tcp.local
+          [1690284610.900612][15595:15595] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690284610.900614][15595:15595] CHIP:DIS: Responding with 8C1D96786A130000.local
+      disabled: true
+
+    - label:
+          "Step 21: DAC Test Vector: Certificate includes optional Authority
+          Information Access extension"
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_dac_ext_authority_info_access_present/test_case_vector.json --product-id 32768
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+          [1690282820.254108][14791:14791] CHIP:EM: <<< [E:60778r S:62234 M:190073547 (Ack:21030011)] (S) Msg TX to 1:000000000001B669 [D14E] --- Type 0001:09 (IM:InvokeCommandResponse)
+          [1690282820.254113][14791:14791] CHIP:IN: (S) Sending msg 190073547 on secure session with LSID: 62234
+          [1690282820.254132][14791:14791] CHIP:DMG: Command handler moving to [CommandSen]
+          [1690282820.254134][14791:14791] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1690282820.254140][14791:14791] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1690282820.254144][14791:14791] CHIP:SVR: Commissioning completed successfully
+          [1690282820.254151][14791:14791] CHIP:DIS: Updating services using commissioning mode 0
+          [1690282820.254349][14791:14791] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1690282820.254759][14791:14791] CHIP:DL: Using wifi MAC for hostname
+          [1690282820.254764][14791:14791] CHIP:DIS: Advertise operational node CEA5FEC505CBD14E-0000000000000001
+          [1690282820.254771][14791:14791] CHIP:DIS: Responding with _matter._tcp.local
+          [1690282820.254774][14791:14791] CHIP:DIS: Responding with CEA5FEC505CBD14E-0000000000000001._matter._tcp.local
+          [1690282820.254777][14791:14791] CHIP:DIS: Responding with CEA5FEC505CBD14E-0000000000000001._matter._tcp.local
+          [1690282820.254779][14791:14791] CHIP:DIS: Responding with 8C1D96786A130000.local
+      disabled: true
+
+    - label:
+          "Step 22: PAI Test Vector: Certificate includes optional Subject
+          Alternative Name extension"
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_pai_ext_subject_alt_name_present/test_case_vector.json --product-id 32768
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1690281643.630949][14294:14294] CHIP:DMG:
+          [1690281643.630963][14294:14294] CHIP:EM: <<< [E:39979r S:47218 M:84512679 (Ack:239864246)] (S) Msg TX to 1:000000000001B669 [1239] --- Type 0001:09 (IM:InvokeCommandResponse)
+          [1690281643.630969][14294:14294] CHIP:IN: (S) Sending msg 84512679 on secure session with LSID: 47218
+          [1690281643.630996][14294:14294] CHIP:DMG: Command handler moving to [CommandSen]
+          [1690281643.630999][14294:14294] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1690281643.631018][14294:14294] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1690281643.631022][14294:14294] CHIP:SVR: Commissioning completed successfully
+          [1690281643.631028][14294:14294] CHIP:DIS: Updating services using commissioning mode 0
+          [1690281643.631184][14294:14294] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1690281643.631535][14294:14294] CHIP:DL: Using wifi MAC for hostname
+          [1690281643.631541][14294:14294] CHIP:DIS: Advertise operational node 5CFD1EA3CA4F1239-0000000000000001
+          [1690281643.631549][14294:14294] CHIP:DIS: Responding with _matter._tcp.local
+          [1690281643.631552][14294:14294] CHIP:DIS: Responding with 5CFD1EA3CA4F1239-0000000000000001._matter._tcp.local
+          [1690281643.631557][14294:14294] CHIP:DIS: Responding with 5CFD1EA3CA4F1239-0000000000000001._matter._tcp.local
+          [1690281643.631559][14294:14294] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690281643.631561][14294:14294] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690281643.631566][14294:14294] CHIP:DIS: Responding with _I5CFD1EA3CA4F1239._sub._matter._tcp.local
+          [1690281643.631569][14294:14294] CHIP:DIS: CHIP minimal mDNS configured as 'Operational devic
+      disabled: true
+
+    - label:
+          "Step 23: PAI Test Vector: Valid certificate version field set to
+          v3(2)"
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_pai_cert_version_v3/test_case_vector.json --product-id 32768
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1690284881.973167][15840:15840] CHIP:IN: (S) Sending msg 66827213 on secure session with LSID: 9046
+          [1690284881.973187][15840:15840] CHIP:DMG: Command handler moving to [CommandSen]
+          [1690284881.973189][15840:15840] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1690284881.973194][15840:15840] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1690284881.973198][15840:15840] CHIP:SVR: Commissioning completed successfully
+          [1690284881.973204][15840:15840] CHIP:DIS: Updating services using commissioning mode 0
+          [1690284881.973368][15840:15840] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1690284881.973707][15840:15840] CHIP:DL: Using wifi MAC for hostname
+          [1690284881.973712][15840:15840] CHIP:DIS: Advertise operational node 7EA725F8C916B163-0000000000000001
+          [1690284881.973718][15840:15840] CHIP:DIS: Responding with _matter._tcp.local
+          [1690284881.973722][15840:15840] CHIP:DIS: Responding with 7EA725F8C916B163-0000000000000001._matter._tcp.local
+          [1690284881.973727][15840:15840] CHIP:DIS: Responding with 7EA725F8C916B163-0000000000000001._matter._tcp.local
+          [1690284881.973730][15840:15840] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690284881.973732][15840:15840] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690284881.973736][15840:15840] CHIP:DIS: Responding with _I7EA725F8C916B163._sub._matter._tcp.local
+          [1690284881.973738][15840:15840] CHIP:DIS: CHIP minimal mDNS configured as 'Operational device'; instance name: 7EA725F8C916B163-0000000000000001.
+          [1690284881.973870][15840:15840] CHIP:DIS: mDNS service published: _matter._tcp
+          [1690284881.973878][15840:15840] CHIP:IN: Expiring all PASE sessions
+      disabled: true
+
+    - label:
+          "Step 24: DAC Test Vector: Valid certificate public key curve
+          prime256v1"
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_dac_sig_curve_prime256v1/test_case_vector.json --product-id 32768
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1690281455.843936][14173:14173] CHIP:DMG: Command handler moving to [CommandSen]
+          [1690281455.843939][14173:14173] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1690281455.843945][14173:14173] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1690281455.843948][14173:14173] CHIP:SVR: Commissioning completed successfully
+          [1690281455.843955][14173:14173] CHIP:DIS: Updating services using commissioning mode 0
+          [1690281455.844138][14173:14173] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1690281455.844557][14173:14173] CHIP:DL: Using wifi MAC for hostname
+          [1690281455.844562][14173:14173] CHIP:DIS: Advertise operational node 11190E6CBCA37351-0000000000000001
+          [1690281455.844572][14173:14173] CHIP:DIS: Responding with _matter._tcp.local
+          [1690281455.844574][14173:14173] CHIP:DIS: Responding with 11190E6CBCA37351-0000000000000001._matter._tcp.local
+          [1690281455.844577][14173:14173] CHIP:DIS: Responding with 11190E6CBCA37351-0000000000000001._matter._tcp.local
+          [1690281455.844579][14173:14173] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690281455.844580][14173:14173] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690281455.844584][14173:14173] CHIP:DIS: Responding with _I11190E6CBCA37351._sub._matter._tcp.local
+          [1690281455.844585][14173:14173] CHIP:DIS: CHIP minimal mDNS configured as 'Operational device'; instance name: 11190E6CBCA37351-0000000000000001.
+          [1690281455.844712][14173:14173] CHIP:DIS: mDNS service published: _matter._tcp
+      disabled: true
+
+    - label:
+          "Step 25: CD Test Vector: Origin VID/PID different than VID/PID
+          (correct use of origin)"
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_cd_origin_pid_vid_correct/test_case_vector.json --product-id 32768
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1690284963.167271][15885:15885] CHIP:EM: <<< [E:48097r S:38151 M:153690039 (Ack:256986686)] (S) Msg TX to 1:000000000001B669 [DC37] --- Type 0001:09 (IM:InvokeCommandResponse)
+          [1690284963.167276][15885:15885] CHIP:IN: (S) Sending msg 153690039 on secure session with LSID: 38151
+          [1690284963.167295][15885:15885] CHIP:DMG: Command handler moving to [CommandSen]
+          [1690284963.167297][15885:15885] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1690284963.167301][15885:15885] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1690284963.167305][15885:15885] CHIP:SVR: Commissioning completed successfully
+          [1690284963.167310][15885:15885] CHIP:DIS: Updating services using commissioning mode 0
+          [1690284963.167458][15885:15885] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1690284963.167793][15885:15885] CHIP:DL: Using wifi MAC for hostname
+          [1690284963.167799][15885:15885] CHIP:DIS: Advertise operational node D641EF3E2998DC37-0000000000000001
+          [1690284963.167806][15885:15885] CHIP:DIS: Responding with _matter._tcp.local
+          [1690284963.167809][15885:15885] CHIP:DIS: Responding with D641EF3E2998DC37-0000000000000001._matter._tcp.local
+          [1690284963.167813][15885:15885] CHIP:DIS: Responding with D641EF3E2998DC37-0000000000000001._matter._tcp.local
+          [1690284963.167815][15885:15885] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690284963.167817][15885:15885] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690284963.167821][15885:15885] CHIP:DIS: Responding with _ID641EF3E2998DC37._sub._matter._tcp.local
+          [1690284963.167822][15885:15885] CHIP:DIS: CHIP minimal mDNS configured as 'Operational device'; instance name: D641EF3E2998DC37-0000000000000001.
+          [1690284963.167955][15885:15885] CHIP:DIS: mDNS service published: _matter._tcp
+          [1690284963.167963][15885:15885] CHIP:IN: Expiring all PASE sessions
+          [1690284963.167966][15885:15885] CHIP:IN: SecureSession[0x55781da28900]: MarkForEviction Type:1 LSID:38150
+          [1690284963.167968][15885:15885] CHIP:SC: SecureSession[0x55781da28900, LSID:38150]: State change 'kActive' --> 'kPendingEviction'
+          [1690284963.167971][15885:15885] CHIP:IN: SecureSession[0x55781da28900]: Released - Type:1 LSID:38150
+      disabled: true
+
+    - label:
+          "Step 26: DAC Test Vector: Fallback VID and PID encoding example:
+          valid, but less human-readable"
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_dac_vidpid_fallback_encoding_11/test_case_vector.json --product-id 177
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1691133604.268090][11108:11108] CHIP:IN: (S) Sending msg 242960033 on secure session with LSID: 63451
+          [1691133604.268262][11108:11108] CHIP:DMG: Command handler moving to [CommandSen]
+          [1691133604.268288][11108:11108] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1691133604.268325][11108:11108] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1691133604.268347][11108:11108] CHIP:SVR: Commissioning completed successfully
+          [1691133604.268383][11108:11108] CHIP:DIS: Updating services using commissioning mode 0
+          [1691133604.276764][11108:11108] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1691133604.304404][11108:11108] CHIP:DL: Using wifi MAC for hostname
+          [1691133604.304458][11108:11108] CHIP:DIS: Advertise operational node 3CBA812920C1A81B-0000000000000001
+          [1691133604.304504][11108:11108] CHIP:DIS: Responding with _matter._tcp.local
+          [1691133604.304525][11108:11108] CHIP:DIS: Responding with 3CBA812920C1A81B-0000000000000001._matter._tcp.local
+          [1691133604.304549][11108:11108] CHIP:DIS: Responding with 3CBA812920C1A81B-0000000000000001._matter._tcp.local
+          [1691133604.304567][11108:11108] CHIP:DIS: Responding with E45F010F1A010000.local
+          [1691133604.304584][11108:11108] CHIP:DIS: Responding with E45F010F1A010000.local
+          [1691133604.304607][11108:11108] CHIP:DIS: Responding with _I3CBA812920C1A81B._sub._matter._tcp.local
+          [1691133604.304625][11108:11108] CHIP:DIS: CHIP minimal mDNS configured as 'Operational device'; instance name: 3CBA812920C1A81B-0000000000000001.
+          [1691133604.318978][11108:11108] CHIP:DIS: mDNS service published: _matter._tcp
+      disabled: true
+
+    - label:
+          "Step 27: CD Test Vector: The optional authorized_paa_list field is
+          not present."
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_cd_authorized_paa_list_missing/test_case_vector.json --product-id 32768
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+          ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1696578156.356111][16897:16897] CHIP:DMG: Command handler moving to [CommandSen]
+          [1696578156.356116][16897:16897] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1696578156.356122][16897:16897] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1696578156.356125][16897:16897] CHIP:SVR: Commissioning completed successfully
+          [1696578156.356135][16897:16897] CHIP:DIS: Updating services using commissioning mode 0
+          [1696578156.356317][16897:16897] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1696578156.356884][16897:16897] CHIP:DL: Using wifi MAC for hostname
+          [1696578156.356892][16897:16897] CHIP:DIS: Advertise operational node 35F3EA0B1085A647-0000000000000001
+          [1696578156.356901][16897:16897] CHIP:DIS: Responding with _matter._tcp.local
+          [1696578156.356904][16897:16897] CHIP:DIS: Responding with 35F3EA0B1085A647-0000000000000001._matter._tcp.local
+          [1696578156.356907][16897:16897] CHIP:DIS: Responding with 35F3EA0B1085A647-0000000000000001._matter._tcp.local
+          [1696578156.356910][16897:16897] CHIP:DIS: Responding with 8C1D96786A130000.local
+      disabled: true
+
+    - label:
+          "Step 28: PAI Test Vector: Certificate Basic Constraint extension
+          PathLen field set to 0"
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_pai_ext_basic_pathlen0/test_case_vector.json --product-id 32768
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1690282754.571961][14759:14759] CHIP:IN: (S) Sending msg 91936501 on secure session with LSID: 30223
+          [1690282754.571981][14759:14759] CHIP:DMG: Command handler moving to [CommandSen]
+          [1690282754.571983][14759:14759] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1690282754.571988][14759:14759] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1690282754.571991][14759:14759] CHIP:SVR: Commissioning completed successfully
+          [1690282754.571996][14759:14759] CHIP:DIS: Updating services using commissioning mode 0
+          [1690282754.572134][14759:14759] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1690282754.572426][14759:14759] CHIP:DL: Using wifi MAC for hostname
+          [1690282754.572430][14759:14759] CHIP:DIS: Advertise operational node 58FC20AC9B9D8E05-0000000000000001
+          [1690282754.572437][14759:14759] CHIP:DIS: Responding with _matter._tcp.local
+          [1690282754.572439][14759:14759] CHIP:DIS: Responding with 58FC20AC9B9D8E05-0000000000000001._matter._tcp.local
+          [1690282754.572443][14759:14759] CHIP:DIS: Responding with 58FC20AC9B9D8E05-0000000000000001._matter._tcp.local
+          [1690282754.572445][14759:14759] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690282754.572446][14759:14759] CHIP:DIS: Responding with 8C1D96786A130000.local
+      disabled: true
+
+    - label:
+          "Step 29: PAI Test Vector: Certificate includes optional Extended Key
+          Usage extension"
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider credentials/development/commissioner_dut/struct_pai_ext_extended_key_usage_present/test_case_vector.json --product-id 32768
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1690283021.015921][14889:14889] CHIP:EM: <<< [E:60698r S:45413 M:45750376 (Ack:107099218)] (S) Msg TX to 1:000000000001B669 [1780] --- Type 0001:09 (IM:InvokeCommandResponse)
+          [1690283021.015926][14889:14889] CHIP:IN: (S) Sending msg 45750376 on secure session with LSID: 45413
+          [1690283021.015944][14889:14889] CHIP:DMG: Command handler moving to [CommandSen]
+          [1690283021.015946][14889:14889] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1690283021.015952][14889:14889] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1690283021.015955][14889:14889] CHIP:SVR: Commissioning completed successfully
+          [1690283021.015961][14889:14889] CHIP:DIS: Updating services using commissioning mode 0
+          [1690283021.016106][14889:14889] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1690283021.016432][14889:14889] CHIP:DL: Using wifi MAC for hostname
+          [1690283021.016437][14889:14889] CHIP:DIS: Advertise operational node 6189A454650D1780-0000000000000001
+          [1690283021.016444][14889:14889] CHIP:DIS: Responding with _matter._tcp.local
+          [1690283021.016448][14889:14889] CHIP:DIS: Responding with 6189A454650D1780-0000000000000001._matter._tcp.local
+          [1690283021.016451][14889:14889] CHIP:DIS: Responding with 6189A454650D1780-0000000000000001._matter._tcp.local
+          [1690283021.016453][14889:14889] CHIP:DIS: Responding with 8C1D96786A130000.local
+      disabled: true
+
+    - label:
+          "Step 30: CD Test Vector: The authorized_paa_list contains two PAAs
+          one of which is valid PAA authorized to sign the PAI."
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_cd_authorized_paa_list_count2_valid/test_case_vector.json --product-id 32768
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1690281322.025731][14131:14131] CHIP:IN: (S) Sending msg 41804784 on secure session with LSID: 9174
+          [1690281322.025755][14131:14131] CHIP:DMG: Command handler moving to [CommandSen]
+          [1690281322.025758][14131:14131] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1690281322.025764][14131:14131] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1690281322.025767][14131:14131] CHIP:SVR: Commissioning completed successfully
+          [1690281322.025775][14131:14131] CHIP:DIS: Updating services using commissioning mode 0
+          [1690281322.025963][14131:14131] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1690281322.026393][14131:14131] CHIP:DL: Using wifi MAC for hostname
+          [1690281322.026399][14131:14131] CHIP:DIS: Advertise operational node 84F519477133A8DD-0000000000000001
+          [1690281322.026406][14131:14131] CHIP:DIS: Responding with _matter._tcp.local
+          [1690281322.026409][14131:14131] CHIP:DIS: Responding with 84F519477133A8DD-0000000000000001._matter._tcp.local
+          [1690281322.026412][14131:14131] CHIP:DIS: Responding with 84F519477133A8DD-0000000000000001._matter._tcp.local
+          [1690281322.026414][14131:14131] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690281322.026415][14131:14131] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690281322.026418][14131:14131] CHIP:DIS: Responding with _I84F519477133A8DD._sub._matter._tcp.local
+          [1690281322.026420][14131:14131] CHIP:DIS: CHIP minimal mDNS configured as 'Operational device'; instance name: 84F519477133A8DD-0000000000000001.
+          [1690281322.026553][14131:14131] CHIP:DIS: mDNS service published: _matter._tcp
+          [1690281322.026574][14131:14131] CHIP:IN: Expiring all PASE sessions
+          [1690281322.026577][14131:14131] CHIP:IN: SecureSession[0x5622cf2b9900]: MarkForEviction Type:1 LSID:9173
+          [1690281322.026580][14131:14131] CHIP:SC: SecureSession[0x5622cf2b9900, LSID:9173]: State change 'kActive' --> 'kPendingEviction'
+          [1690281322.026585][14131:14131] CHIP:IN: SecureSession[0x5622cf2b9900]: Released - Type:1 LSID:9173
+      disabled: true
+
+    - label:
+          "Step 31: PAI Test Vector: Fallback VID and PID encoding example:
+          valid, but less human-readable"
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_pai_vidpid_fallback_encoding_11/test_case_vector.json --product-id 177
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1691133504.964515][11082:11082] CHIP:IN: (S) Sending msg 180652456 on secure session with LSID: 17161
+          [1691133504.964688][11082:11082] CHIP:DMG: Command handler moving to [CommandSen]
+          [1691133504.964712][11082:11082] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1691133504.964751][11082:11082] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1691133504.964774][11082:11082] CHIP:SVR: Commissioning completed successfully
+          [1691133504.964812][11082:11082] CHIP:DIS: Updating services using commissioning mode 0
+          [1691133504.973810][11082:11082] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1691133505.002105][11082:11082] CHIP:DL: Using wifi MAC for hostname
+          [1691133505.002160][11082:11082] CHIP:DIS: Advertise operational node 3CBA812920C1A81B-0000000000000001
+          [1691133505.002206][11082:11082] CHIP:DIS: Responding with _matter._tcp.local
+          [1691133505.002228][11082:11082] CHIP:DIS: Responding with 3CBA812920C1A81B-0000000000000001._matter._tcp.local
+          [1691133505.002252][11082:11082] CHIP:DIS: Responding with 3CBA812920C1A81B-0000000000000001._matter._tcp.local
+          [1691133505.002270][11082:11082] CHIP:DIS: Responding with E45F010F1A010000.local
+          [1691133505.002287][11082:11082] CHIP:DIS: Responding with E45F010F1A010000.local
+      disabled: true
+
+    - label:
+          "Step 32: PAI Test Vector: Certificate includes optional Authority
+          Information Access extension"
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_pai_ext_authority_info_access_present/test_case_vector.json --product-id 32768
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1690281588.041492][14260:14260] CHIP:IN: (S) Sending msg 97011383 on secure session with LSID: 55955
+          [1690281588.041512][14260:14260] CHIP:DMG: Command handler moving to [CommandSen]
+          [1690281588.041514][14260:14260] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1690281588.041518][14260:14260] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1690281588.041521][14260:14260] CHIP:SVR: Commissioning completed successfully
+          [1690281588.041527][14260:14260] CHIP:DIS: Updating services using commissioning mode 0
+          [1690281588.041673][14260:14260] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1690281588.041987][14260:14260] CHIP:DL: Using wifi MAC for hostname
+          [1690281588.041991][14260:14260] CHIP:DIS: Advertise operational node 2B6360850F2AA29E-0000000000000001
+          [1690281588.041998][14260:14260] CHIP:DIS: Responding with _matter._tcp.local
+          [1690281588.042001][14260:14260] CHIP:DIS: Responding with 2B6360850F2AA29E-0000000000000001._matter._tcp.local
+          [1690281588.042004][14260:14260] CHIP:DIS: Responding with 2B6360850F2AA29E-0000000000000001._matter._tcp.local
+          [1690281588.042006][14260:14260] CHIP:DIS: Responding with 8C1D96786A130000.local
+      disabled: true
+
+    - label:
+          "Step 33: CD Test Vector: The product_id_array field has 10 PID values
+          one of which matches the PID value in DAC."
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_cd_pid_array_count10_valid/test_case_vector.json --product-id 32768
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1690283198.563854][14969:14969] CHIP:DMG:
+          [1690283198.563874][14969:14969] CHIP:EM: <<< [E:31520r S:48689 M:92701905 (Ack:201369370)] (S) Msg TX to 1:000000000001B669 [665B] --- Type 0001:09 (IM:InvokeCommandResponse)
+          [1690283198.563880][14969:14969] CHIP:IN: (S) Sending msg 92701905 on secure session with LSID: 48689
+          [1690283198.563904][14969:14969] CHIP:DMG: Command handler moving to [CommandSen]
+          [1690283198.563906][14969:14969] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1690283198.563912][14969:14969] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1690283198.563931][14969:14969] CHIP:SVR: Commissioning completed successfully
+          [1690283198.563937][14969:14969] CHIP:DIS: Updating services using commissioning mode 0
+          [1690283198.564081][14969:14969] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1690283198.564368][14969:14969] CHIP:DL: Using wifi MAC for hostname
+          [1690283198.564373][14969:14969] CHIP:DIS: Advertise operational node ED9E34CD70DA665B-0000000000000001
+          [1690283198.564379][14969:14969] CHIP:DIS: Responding with _matter._tcp.local
+          [1690283198.564382][14969:14969] CHIP:DIS: Responding with ED9E34CD70DA665B-0000000000000001._matter._tcp.local
+          [1690283198.564385][14969:14969] CHIP:DIS: Responding with ED9E34CD70DA665B-0000000000000001._matter._tcp.local
+          [1690283198.564388][14969:14969] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690283198.564391][14969:14969] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690283198.564395][14969:14969] CHIP:DIS: Responding with _IED9E34CD70DA665B._sub._matter._tcp.local
+      disabled: true
+
+    - label:
+          "Step 34: PAI Test Vector: Fallback VID and PID encoding example from
+          spec: valid and recommended since easily human-readable"
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_pai_vidpid_fallback_encoding_01/test_case_vector.json --product-id 177
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+
+          [1691133717.188791][11135:11135] CHIP:DMG: Command handler moving to [CommandSen]
+          [1691133717.188813][11135:11135] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1691133717.188851][11135:11135] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1691133717.188873][11135:11135] CHIP:SVR: Commissioning completed successfully
+          [1691133717.188963][11135:11135] CHIP:DIS: Updating services using commissioning mode 0
+          [1691133717.197295][11135:11135] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1691133717.227051][11135:11135] CHIP:DL: Using wifi MAC for hostname
+          [1691133717.227105][11135:11135] CHIP:DIS: Advertise operational node 3CBA812920C1A81B-0000000000000001
+          [1691133717.227151][11135:11135] CHIP:DIS: Responding with _matter._tcp.local
+          [1691133717.227173][11135:11135] CHIP:DIS: Responding with 3CBA812920C1A81B-0000000000000001._matter._tcp.local
+          [1691133717.227196][11135:11135] CHIP:DIS: Responding with 3CBA812920C1A81B-0000000000000001._matter._tcp.local
+          [1691133717.227213][11135:11135] CHIP:DIS: Responding with E45F010F1A010000.local
+          [1691133717.227230][11135:11135] CHIP:DIS: Responding with E45F010F1A010000.local
+      disabled: true
+
+    - label:
+          "Step 35: PAI Test Vector: Mix of Fallback and Matter OID encoding for
+          VID and PID: valid, Matter OIDs are used and wrong values in the
+          common-name are ignored"
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_pai_vidpid_fallback_encoding_15/test_case_vector.json --product-id 177
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+
+          [1691133823.605618][11166:11166] CHIP:IN: (S) Sending msg 86167972 on secure session with LSID: 25854
+          [1691133823.605816][11166:11166] CHIP:DMG: Command handler moving to [CommandSen]
+          [1691133823.605843][11166:11166] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1691133823.605884][11166:11166] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1691133823.605908][11166:11166] CHIP:SVR: Commissioning completed successfully
+          [1691133823.605951][11166:11166] CHIP:DIS: Updating services using commissioning mode 0
+          [1691133823.615735][11166:11166] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1691133823.644833][11166:11166] CHIP:DL: Using wifi MAC for hostname
+          [1691133823.644901][11166:11166] CHIP:DIS: Advertise operational node 3CBA812920C1A81B-0000000000000001
+          [1691133823.644958][11166:11166] CHIP:DIS: Responding with _matter._tcp.local
+          [1691133823.644980][11166:11166] CHIP:DIS: Responding with 3CBA812920C1A81B-0000000000000001._matter._tcp.local
+          [1691133823.645003][11166:11166] CHIP:DIS: Responding with 3CBA812920C1A81B-0000000000000001._matter._tcp.local
+          [1691133823.645021][11166:11166] CHIP:DIS: Responding with E45F010F1A010000.local
+      disabled: true
+
+    - label:
+          "Step 36: CD Test Vector: The dac_origin_vendor_id and
+          dac_origin_product_id fields are not present."
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_cd_dac_origin_vid_pid_missing/test_case_vector.json --product-id 32768
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1690282050.659492][14471:14471] CHIP:IN: (S) Sending msg 139602564 on secure session with LSID: 47523
+          [1690282050.659514][14471:14471] CHIP:DMG: Command handler moving to [CommandSen]
+          [1690282050.659516][14471:14471] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1690282050.659521][14471:14471] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1690282050.659525][14471:14471] CHIP:SVR: Commissioning completed successfully
+          [1690282050.659530][14471:14471] CHIP:DIS: Updating services using commissioning mode 0
+          [1690282050.659681][14471:14471] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1690282050.659967][14471:14471] CHIP:DL: Using wifi MAC for hostname
+          [1690282050.659972][14471:14471] CHIP:DIS: Advertise operational node E18AD0BA9454A7B3-0000000000000001
+          [1690282050.659978][14471:14471] CHIP:DIS: Responding with _matter._tcp.local
+          [1690282050.659981][14471:14471] CHIP:DIS: Responding with E18AD0BA9454A7B3-0000000000000001._matter._tcp.local
+          [1690282050.659983][14471:14471] CHIP:DIS: Responding with E18AD0BA9454A7B3-0000000000000001._matter._tcp.local
+          [1690282050.659986][14471:14471] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690282050.659988][14471:14471] CHIP:DIS: Responding with 8C1D96786A130000.local
+      disabled: true
+
+    - label:
+          "Step 37: PAI Test Vector: Fallback VID and PID encoding example from
+          spec: valid, but highly discouraged, since embedding of substrings
+          within other substrings may be confusing to human readers"
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_pai_vidpid_fallback_encoding_05/test_case_vector.json --product-id 177
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1691133942.195845][11196:11196] CHIP:DMG: Command handler moving to [CommandSen]
+          [1691133942.195895][11196:11196] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1691133942.195932][11196:11196] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1691133942.195954][11196:11196] CHIP:SVR: Commissioning completed successfully
+          [1691133942.195992][11196:11196] CHIP:DIS: Updating services using commissioning mode 0
+          [1691133942.204326][11196:11196] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1691133942.234088][11196:11196] CHIP:DL: Using wifi MAC for hostname
+          [1691133942.234144][11196:11196] CHIP:DIS: Advertise operational node 3CBA812920C1A81B-0000000000000001
+          [1691133942.234191][11196:11196] CHIP:DIS: Responding with _matter._tcp.local
+          [1691133942.234211][11196:11196] CHIP:DIS: Responding with 3CBA812920C1A81B-0000000000000001._matter._tcp.local
+          [1691133942.234236][11196:11196] CHIP:DIS: Responding with 3CBA812920C1A81B-0000000000000001._matter._tcp.local
+          [1691133942.234253][11196:11196] CHIP:DIS: Responding with E45F010F1A010000.local
+          [1691133942.234270][11196:11196] CHIP:DIS: Responding with E45F010F1A010000.local
+          [1691133942.234293][11196:11196] CHIP:DIS: Responding with _I3CBA812920C1A81B._sub._matter._tcp.local
+          [1691133942.234310][11196:11196] CHIP:DIS: CHIP minimal mDNS configured as 'Operational device'; instance name: 3CBA812920C1A81B-0000000000000001.
+          [1691133942.248506][11196:11196] CHIP:DIS: mDNS service published: _matter._tcp
+          [1691133942.248592][11196:11196] CHIP:IN: Expiring all PASE sessions
+      disabled: true
+
+    - label:
+          "Step 38: DAC Test Vector: Fallback VID and PID encoding example from
+          spec: valid and recommended since easily human-readable"
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_dac_vidpid_fallback_encoding_01/test_case_vector.json --product-id 177
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1691133758.299501][11147:11147] CHIP:DMG: Command handler moving to [CommandSen]
+          [1691133758.299527][11147:11147] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1691133758.299566][11147:11147] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1691133758.299588][11147:11147] CHIP:SVR: Commissioning completed successfully
+          [1691133758.299645][11147:11147] CHIP:DIS: Updating services using commissioning mode 0
+          [1691133758.308433][11147:11147] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1691133758.337691][11147:11147] CHIP:DL: Using wifi MAC for hostname
+          [1691133758.337745][11147:11147] CHIP:DIS: Advertise operational node 3CBA812920C1A81B-0000000000000001
+          [1691133758.337792][11147:11147] CHIP:DIS: Responding with _matter._tcp.local
+          [1691133758.337813][11147:11147] CHIP:DIS: Responding with 3CBA812920C1A81B-0000000000000001._matter._tcp.local
+          [1691133758.337837][11147:11147] CHIP:DIS: Responding with 3CBA812920C1A81B-0000000000000001._matter._tcp.local
+          [1691133758.337855][11147:11147] CHIP:DIS: Responding with E45F010F1A010000.local
+      disabled: true
+
+    - label:
+          "Step 39: CD Test Vector: The product_id_array field has 100 PID
+          values one of which matches the PID value in DAC."
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_cd_pid_array_count100_valid/test_case_vector.json --product-id 32768
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+          [1690281746.033133][14335:14335] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1690281746.033152][14335:14335] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1690281746.033155][14335:14335] CHIP:SVR: Commissioning completed successfully
+          [1690281746.033161][14335:14335] CHIP:DIS: Updating services using commissioning mode 0
+          [1690281746.033313][14335:14335] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1690281746.033672][14335:14335] CHIP:DL: Using wifi MAC for hostname
+          [1690281746.033678][14335:14335] CHIP:DIS: Advertise operational node B859A17C7F0CAC6A-0000000000000001
+          [1690281746.033685][14335:14335] CHIP:DIS: Responding with _matter._tcp.local
+          [1690281746.033687][14335:14335] CHIP:DIS: Responding with B859A17C7F0CAC6A-0000000000000001._matter._tcp.local
+          [1690281746.033689][14335:14335] CHIP:DIS: Responding with B859A17C7F0CAC6A-0000000000000001._matter._tcp.local
+          [1690281746.033692][14335:14335] CHIP:DIS: Responding with 8C1D96786A130000.local
+      disabled: true
+
+    - label:
+          "Step 40: CD Test Vector: The authorized_paa_list contains ten PAAs
+          one of which is valid PAA authorized to sign the PAI."
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_cd_authorized_paa_list_count10_valid/test_case_vector.json --product-id 32768
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+
+          [1690284741.166276][15669:15669] CHIP:EM: <<< [E:33408r S:14062 M:243658599 (Ack:15676972)] (S) Msg TX to 1:000000000001B669 [8D32] --- Type 0001:09 (IM:InvokeCommandResponse)
+          [1690284741.166281][15669:15669] CHIP:IN: (S) Sending msg 243658599 on secure session with LSID: 14062
+          [1690284741.166299][15669:15669] CHIP:DMG: Command handler moving to [CommandSen]
+          [1690284741.166301][15669:15669] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1690284741.166306][15669:15669] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1690284741.166308][15669:15669] CHIP:SVR: Commissioning completed successfully
+          [1690284741.166313][15669:15669] CHIP:DIS: Updating services using commissioning mode 0
+          [1690284741.166452][15669:15669] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1690284741.166760][15669:15669] CHIP:DL: Using wifi MAC for hostname
+          [1690284741.166765][15669:15669] CHIP:DIS: Advertise operational node E065C8CE19D78D32-0000000000000001
+          [1690284741.166773][15669:15669] CHIP:DIS: Responding with _matter._tcp.local
+          [1690284741.166775][15669:15669] CHIP:DIS: Responding with E065C8CE19D78D32-0000000000000001._matter._tcp.local
+          [1690284741.166779][15669:15669] CHIP:DIS: Responding with E065C8CE19D78D32-0000000000000001._matter._tcp.local
+          [1690284741.166781][15669:15669] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690284741.166783][15669:15669] CHIP:DIS: Responding with 8C1D96786A130000.local
+      disabled: true
+
+    - label: "Step 41: CD Test Vector: Valid CMS version set to v3."
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_cd_cms_v3/test_case_vector.json --product-id 32768
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+          [1690282393.467881][14612:14612] CHIP:IN: (S) Sending msg 94459263 on secure session with LSID: 43887
+          [1690282393.467938][14612:14612] CHIP:DMG: Command handler moving to [CommandSen]
+          [1690282393.467944][14612:14612] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1690282393.467957][14612:14612] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1690282393.467976][14612:14612] CHIP:SVR: Commissioning completed successfully
+          [1690282393.467981][14612:14612] CHIP:DIS: Updating services using commissioning mode 0
+          [1690282393.468129][14612:14612] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1690282393.468468][14612:14612] CHIP:DL: Using wifi MAC for hostname
+          [1690282393.468473][14612:14612] CHIP:DIS: Advertise operational node 49B289AA3BF98F84-0000000000000001
+          [1690282393.468480][14612:14612] CHIP:DIS: Responding with _matter._tcp.local
+          [1690282393.468482][14612:14612] CHIP:DIS: Responding with 49B289AA3BF98F84-0000000000000001._matter._tcp.local
+          [1690282393.468485][14612:14612] CHIP:DIS: Responding with 49B289AA3BF98F84-0000000000000001._matter._tcp.local
+          [1690282393.468487][14612:14612] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690282393.468490][14612:14612] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690282393.468495][14612:14612] CHIP:DIS: Responding with _I49B289AA3BF98F84._sub._matter._tcp.local
+          [1690282393.468497][14612:14612] CHIP:DIS: CHIP minimal mDNS configured as 'Operational device'; instance name: 49B289AA3BF98F84-0000000000000001.
+          [1690282393.468648][14612:14612] CHIP:DIS: mDNS service published: _matter._tcp
+      disabled: true
+
+    - label:
+          "Step 42: CD Test Vector: The version_number field matches the VID and
+          PID used in a DeviceSoftwareVersionModel entry in the DCL matching the
+          certification record associated with the product presenting this CD."
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_cd_version_number_match/test_case_vector.json --product-id 32768
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1690284319.839377][15436:15436] CHIP:DMG: Command handler moving to [CommandSen]
+          [1690284319.839380][15436:15436] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1690284319.839386][15436:15436] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1690284319.839390][15436:15436] CHIP:SVR: Commissioning completed successfully
+          [1690284319.839397][15436:15436] CHIP:DIS: Updating services using commissioning mode 0
+          [1690284319.839563][15436:15436] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1690284319.839898][15436:15436] CHIP:DL: Using wifi MAC for hostname
+          [1690284319.839904][15436:15436] CHIP:DIS: Advertise operational node 3C17C1D4CC8533E7-0000000000000001
+          [1690284319.839913][15436:15436] CHIP:DIS: Responding with _matter._tcp.local
+          [1690284319.839916][15436:15436] CHIP:DIS: Responding with 3C17C1D4CC8533E7-0000000000000001._matter._tcp.local
+          [1690284319.839920][15436:15436] CHIP:DIS: Responding with 3C17C1D4CC8533E7-0000000000000001._matter._tcp.local
+          [1690284319.839923][15436:15436] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690284319.839925][15436:15436] CHIP:DIS: Responding with 8C1D96786A130000.local
+      disabled: true
+
+    - label:
+          "Step 43: CD Test Vector: The subjectKeyIdentifier contains SKID of a
+          well-known Zigbee Alliance certificate."
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_cd_signer_info_skid_valid/test_case_vector.json --product-id 32768
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1690282693.478614][14715:14715] CHIP:EM: <<< [E:60094r S:39472 M:208019369 (Ack:213101818)] (S) Msg TX to 1:000000000001B669 [185C] --- Type 0001:09 (IM:InvokeCommandResponse)
+          [1690282693.478621][14715:14715] CHIP:IN: (S) Sending msg 208019369 on secure session with LSID: 39472
+          [1690282693.478644][14715:14715] CHIP:DMG: Command handler moving to [CommandSen]
+          [1690282693.478646][14715:14715] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1690282693.478664][14715:14715] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1690282693.478669][14715:14715] CHIP:SVR: Commissioning completed successfully
+          [1690282693.478675][14715:14715] CHIP:DIS: Updating services using commissioning mode 0
+          [1690282693.478862][14715:14715] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1690282693.479280][14715:14715] CHIP:DL: Using wifi MAC for hostname
+          [1690282693.479301][14715:14715] CHIP:DIS: Advertise operational node 7C5CE67CD6B2185C-0000000000000001
+          [1690282693.479311][14715:14715] CHIP:DIS: Responding with _matter._tcp.local
+          [1690282693.479314][14715:14715] CHIP:DIS: Responding with 7C5CE67CD6B2185C-0000000000000001._matter._tcp.local
+          [1690282693.479318][14715:14715] CHIP:DIS: Responding with 7C5CE67CD6B2185C-0000000000000001._matter._tcp.local
+          [1690282693.479321][14715:14715] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690282693.479323][14715:14715] CHIP:DIS: Responding with 8C1D96786A130000.local
+      disabled: true
+
+    - label:
+          "Step 44: PAI Test Vector: Fallback VID and PID encoding example from
+          spec: valid example showing that order or separators are not
+          considered at all for the overall validity of the embedded fields"
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_pai_vidpid_fallback_encoding_03/test_case_vector.json --product-id 177
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1691132563.220796][11028:11028] CHIP:EM: <<< [E:46477r S:48989 M:134841745 (Ack:88555256)] (S) Msg TX to 1:000000000001B669 [A81B] --- Type 0001:09 (IM:InvokeCommandResponse)
+          [1691132563.220859][11028:11028] CHIP:IN: (S) Sending msg 134841745 on secure session with LSID: 48989
+          [1691132563.221085][11028:11028] CHIP:DMG: Command handler moving to [CommandSen]
+          [1691132563.221114][11028:11028] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1691132563.221159][11028:11028] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1691132563.221185][11028:11028] CHIP:SVR: Commissioning completed successfully
+          [1691132563.221227][11028:11028] CHIP:DIS: Updating services using commissioning mode 0
+          [1691132563.230310][11028:11028] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1691132563.259708][11028:11028] CHIP:DL: Using wifi MAC for hostname
+          [1691132563.259762][11028:11028] CHIP:DIS: Advertise operational node 3CBA812920C1A81B-0000000000000001
+          [1691132563.259809][11028:11028] CHIP:DIS: Responding with _matter._tcp.local
+          [1691132563.259831][11028:11028] CHIP:DIS: Responding with 3CBA812920C1A81B-0000000000000001._matter._tcp.local
+          [1691132563.259855][11028:11028] CHIP:DIS: Responding with 3CBA812920C1A81B-0000000000000001._matter._tcp.local
+          [1691132563.259872][11028:11028] CHIP:DIS: Responding with E45F010F1A010000.local
+          [1691132563.259888][11028:11028] CHIP:DIS: Responding with E45F010F1A010000.local
+      disabled: true
+
+    - label:
+          "Step 45: DAC Test Vector: Certificate includes optional Subject
+          Alternative Name extension"
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_dac_ext_subject_alt_name_present/test_case_vector.json --product-id 32768
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1690284666.597714][15618:15618] CHIP:IN: (S) Sending msg 208022493 on secure session with LSID: 54251
+          [1690284666.597737][15618:15618] CHIP:DMG: Command handler moving to [CommandSen]
+          [1690284666.597739][15618:15618] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1690284666.597761][15618:15618] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1690284666.597764][15618:15618] CHIP:SVR: Commissioning completed successfully
+          [1690284666.597769][15618:15618] CHIP:DIS: Updating services using commissioning mode 0
+          [1690284666.597908][15618:15618] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1690284666.598238][15618:15618] CHIP:DL: Using wifi MAC for hostname
+          [1690284666.598243][15618:15618] CHIP:DIS: Advertise operational node C9AE838209F8DA83-0000000000000001
+          [1690284666.598249][15618:15618] CHIP:DIS: Responding with _matter._tcp.local
+          [1690284666.598251][15618:15618] CHIP:DIS: Responding with C9AE838209F8DA83-0000000000000001._matter._tcp.local
+          [1690284666.598255][15618:15618] CHIP:DIS: Responding with C9AE838209F8DA83-0000000000000001._matter._tcp.local
+          [1690284666.598256][15618:15618] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690284666.598258][15618:15618] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690284666.598261][15618:15618] CHIP:DIS: Responding with _IC9AE838209F8DA83._sub._matter._tcp.local
+      disabled: true
+
+    - label:
+          "Step 46: DAC Test Vector: Valid certificate version field set to
+          v3(2)"
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_dac_cert_version_v3/test_case_vector.json --product-id 32768
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1690285010.058545][15920:15920] CHIP:EM: <<< [E:56176r S:34847 M:35213965 (Ack:162929554)] (S) Msg TX to 1:000000000001B669 [D8B9] --- Type 0001:09 (IM:InvokeCommandResponse)
+          [1690285010.058550][15920:15920] CHIP:IN: (S) Sending msg 35213965 on secure session with LSID: 34847
+          [1690285010.058568][15920:15920] CHIP:DMG: Command handler moving to [CommandSen]
+          [1690285010.058571][15920:15920] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1690285010.058577][15920:15920] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1690285010.058581][15920:15920] CHIP:SVR: Commissioning completed successfully
+          [1690285010.058588][15920:15920] CHIP:DIS: Updating services using commissioning mode 0
+          [1690285010.058786][15920:15920] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1690285010.059205][15920:15920] CHIP:DL: Using wifi MAC for hostname
+          [1690285010.059210][15920:15920] CHIP:DIS: Advertise operational node 50778ED0BE0AD8B9-0000000000000001
+          [1690285010.059216][15920:15920] CHIP:DIS: Responding with _matter._tcp.local
+          [1690285010.059219][15920:15920] CHIP:DIS: Responding with 50778ED0BE0AD8B9-0000000000000001._matter._tcp.local
+          [1690285010.059222][15920:15920] CHIP:DIS: Responding with 50778ED0BE0AD8B9-0000000000000001._matter._tcp.local
+          [1690285010.059224][15920:15920] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690285010.059226][15920:15920] CHIP:DIS: Responding with 8C1D96786A130000.local
+          [1690285010.059229][15920:15920] CHIP:DIS: Responding with _I50778ED0BE0AD8B9._sub._matter._tcp.local
+          [1690285010.059231][15920:15920] CHIP:DIS: CHIP minimal mDNS configured as 'Operational device'; instance name: 50778ED0BE0AD8B9-0000000000000001.
+          [1690285010.059353][15920:15920] CHIP:DIS: mDNS service published: _matter._tcp
+          [1690285010.059362][15920:15920] CHIP:IN: Expiring all PASE sessions
+          [1690285010.059364][15920:15920] CHIP:IN: SecureSession[0x560f3fe66900]: MarkForEviction Type:1 LSID:34846
+          [1690285010.059367][15920:15920] CHIP:SC: SecureSession[0x560f3fe66900, LSID:34846]: State change 'kActive' --> 'kPendingEviction'
+          [1690285010.059371][15920:15920] CHIP:IN: SecureSession[0x560f3fe66900]: Released - Type:1 LSID:34846
+      disabled: true
+
+    - label:
+          "Step 47: PAI Test Vector: Fallback VID and PID encoding example from
+          spec: valid and recommended since easily human-readable "
+      verification: |
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_pai_vidpid_fallback_encoding_02/test_case_vector.json --product-id 177
+
+          Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
+           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+
+          On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
+
+          [1691133976.341499][11204:11204] CHIP:DMG: Command handler moving to [CommandSen]
+          [1691133976.341528][11204:11204] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1691133976.341572][11204:11204] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1691133976.341598][11204:11204] CHIP:SVR: Commissioning completed successfully
+          [1691133976.341644][11204:11204] CHIP:DIS: Updating services using commissioning mode 0
+          [1691133976.352197][11204:11204] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1691133976.381983][11204:11204] CHIP:DL: Using wifi MAC for hostname
+          [1691133976.382037][11204:11204] CHIP:DIS: Advertise operational node 3CBA812920C1A81B-0000000000000001
+          [1691133976.382084][11204:11204] CHIP:DIS: Responding with _matter._tcp.local
+          [1691133976.382105][11204:11204] CHIP:DIS: Responding with 3CBA812920C1A81B-0000000000000001._matter._tcp.local
+          [1691133976.382128][11204:11204] CHIP:DIS: Responding with 3CBA812920C1A81B-0000000000000001._matter._tcp.local
+          [1691133976.382146][11204:11204] CHIP:DIS: Responding with E45F010F1A010000.local
+          [1691133976.382162][11204:11204] CHIP:DIS: Responding with E45F010F1A010000.local
+      disabled: true

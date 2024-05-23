@@ -1,0 +1,221 @@
+{{> header}}
+
+#pragma once
+
+#include <app/data-model/DecodableList.h>
+#include <app/data-model/Decode.h>
+#include <app/data-model/Encode.h>
+#include <app/data-model/List.h>
+#include <app/data-model/NullObject.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/EventLoggingTypes.h>
+#include <app/util/basic-types.h>
+#include <lib/core/ClusterEnums.h>
+#include <lib/support/BitMask.h>
+#include <protocols/interaction_model/Constants.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Commands.h>
+#include <app-common/zap-generated/ids/Events.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+
+namespace detail {
+// Structs shared across multiple clusters.
+namespace Structs {
+
+{{#zcl_structs}}
+{{#if has_more_than_one_cluster}}
+{{> cluster_objects_struct header=true}}
+{{/if}}
+{{/zcl_structs}}
+} // namespace Structs
+} // namespace detail
+
+namespace Globals {
+namespace Attributes {
+{{#zcl_attributes_server}}
+{{#unless clusterRef}}
+namespace {{asUpperCamelCase label}} {
+  {{> cluster_objects_attribute_typeinfo ns=""}}
+} // namespace {{asUpperCamelCase label}}
+
+{{/unless}}
+{{/zcl_attributes_server}}
+} // namespace Attributes
+} // namespace Globals
+
+{{#zcl_clusters}}
+namespace {{asUpperCamelCase name}} {
+{{#zcl_structs}}
+{{#first}}
+namespace Structs {
+{{/first}}
+{{#if has_more_than_one_cluster}}
+namespace {{asUpperCamelCase name}} = Clusters::detail::Structs::{{asUpperCamelCase name}};
+{{else}}
+{{> cluster_objects_struct header=true}}
+{{/if}}
+{{#last}}
+} // namespace Structs
+{{/last}}
+{{/zcl_structs}}
+
+{{#zcl_commands}}
+{{#first}}
+namespace Commands {
+ // Forward-declarations so we can reference these later.
+{{/first}}
+
+namespace {{asUpperCamelCase name}} {
+ struct Type;
+ struct DecodableType;
+} // namespace {{asUpperCamelCase name}}
+{{#last}}
+
+} // namespace Commands
+{{/last}}
+{{/zcl_commands}}
+
+{{#zcl_commands}}
+{{#first}}
+namespace Commands {
+{{/first}}
+namespace {{asUpperCamelCase name}} {
+enum class Fields : uint8_t {
+    {{#zcl_command_arguments}}
+    k{{asUpperCamelCase label}} = {{fieldIdentifier}},
+    {{/zcl_command_arguments}}
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::{{asUpperCamelCase name}}::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
+
+    {{#zcl_command_arguments}}
+    {{zapTypeToEncodableClusterObjectType type}} {{asLowerCamelCase label}}{{> cluster_objects_field_init}};
+    {{/zcl_command_arguments}}
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType =
+    {{~#if responseName}}
+      Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase responseName}}::DecodableType;
+    {{else}}
+      DataModel::NullObjectType;
+    {{/if}}
+
+    static constexpr bool MustUseTimedInvoke() { return {{mustUseTimedInvoke}}; }
+};
+
+struct DecodableType {
+public:
+    static constexpr CommandId GetCommandId() { return Commands::{{asUpperCamelCase name}}::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
+
+    {{#zcl_command_arguments}}
+    {{zapTypeToDecodableClusterObjectType type}} {{asLowerCamelCase label}}{{> cluster_objects_field_init}};
+    {{/zcl_command_arguments}}
+    CHIP_ERROR Decode(TLV::TLVReader &reader);
+};
+}; // namespace {{asUpperCamelCase name}}
+{{#last}}
+} // namespace Commands
+{{/last}}
+{{/zcl_commands}}
+
+namespace Attributes {
+
+{{#zcl_attributes_server}}
+namespace {{asUpperCamelCase label}} {
+    {{#if clusterRef}}
+      {{> cluster_objects_attribute_typeinfo ns=parent.name}}
+    {{else}}
+      struct TypeInfo : public Clusters::Globals::Attributes::{{asUpperCamelCase label}}::TypeInfo {
+          static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
+      };
+    {{/if}}
+} // namespace {{asUpperCamelCase label}}
+{{/zcl_attributes_server}}
+
+struct TypeInfo
+{
+    struct DecodableType {
+        static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase name}}::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader &reader, const ConcreteAttributePath &path);
+
+{{#zcl_attributes_server}}
+        {{! isOptional=false because optional attributes don't get represented
+            as Optional types here. }}
+        Attributes::{{asUpperCamelCase label}}::TypeInfo::DecodableType {{asLowerCamelCase label}}{{> cluster_objects_field_init ns=parent.name isOptional=false}};
+{{/zcl_attributes_server}}
+    };
+};
+} // namespace Attributes
+{{#zcl_events}}
+{{#first}}
+namespace Events {
+{{/first}}
+namespace {{asUpperCamelCase name}} {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::{{asUpperCamelCase priority}};
+
+enum class Fields : uint8_t {
+    {{#zcl_event_fields}}
+    k{{asUpperCamelCase name}} = {{fieldIdentifier}},
+    {{/zcl_event_fields}}
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::{{asUpperCamelCase name}}::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
+    static constexpr bool kIsFabricScoped = {{isFabricSensitive}};
+
+    {{#zcl_event_fields}}
+    {{zapTypeToEncodableClusterObjectType type}} {{asLowerCamelCase name}}{{> cluster_objects_field_init}};
+    {{/zcl_event_fields}}
+
+    {{#if isFabricSensitive}}
+    auto GetFabricIndex() const {
+        return fabricIndex;
+    }
+    {{/if}}
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType {
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::{{asUpperCamelCase name}}::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
+
+    {{#zcl_event_fields}}
+    {{zapTypeToDecodableClusterObjectType type}} {{asLowerCamelCase name}}{{> cluster_objects_field_init}};
+    {{/zcl_event_fields}}
+
+    CHIP_ERROR Decode(TLV::TLVReader &reader);
+};
+} // namespace {{asUpperCamelCase name}}
+{{#last}}
+} // namespace Events
+{{/last}}
+{{/zcl_events}}
+} // namespace {{asUpperCamelCase name}}
+{{/zcl_clusters}}
+
+} // namespace Clusters
+
+bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand);
+bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand);
+
+} // namespace app
+} // namespace chip

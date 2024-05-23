@@ -1,0 +1,237 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Mode Select Cluster Tests
+
+config:
+    nodeId: 0x12344321
+    cluster: "Mode Select"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+    - label: "Read Description"
+      command: "readAttribute"
+      attribute: "Description"
+      response:
+          value: "Coffee"
+
+    - label: "Read StandardNamespace"
+      command: "readAttribute"
+      attribute: "StandardNamespace"
+      response:
+          value: 0
+
+    - label: "Read SupportedModes"
+      command: "readAttribute"
+      attribute: "SupportedModes"
+      response:
+          value:
+              [
+                  { Label: "Black", Mode: 0, SemanticTags: [{ "Value": 0 }] },
+                  {
+                      Label: "Cappuccino",
+                      Mode: 4,
+                      SemanticTags: [{ "Value": 0 }],
+                  },
+                  {
+                      Label: "Espresso",
+                      Mode: 7,
+                      SemanticTags: [{ "Value": 0 }],
+                  },
+              ]
+          constraints:
+              type: list
+              minLength: 3
+              maxLength: 3
+
+    - label: "Read CurrentMode"
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          value: 0
+
+    - label: "Read StartUpMode"
+      command: "readAttribute"
+      attribute: "StartUpMode"
+      response:
+          value: 0
+
+    - label: "Read OnMode"
+      command: "readAttribute"
+      attribute: "OnMode"
+      response:
+          value: null
+
+    - label: "Change to Supported Mode"
+      command: "ChangeToMode"
+      arguments:
+          values:
+              - name: "NewMode"
+                value: 4
+
+    - label: "Verify Current Mode Change"
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          value: 4
+          saveAs: currentModeBeforeToggle
+
+    - label: "Change to Unsupported Mode"
+      command: "ChangeToMode"
+      arguments:
+          values:
+              - name: "NewMode"
+                value: 2
+      response:
+          error: INVALID_COMMAND
+
+    - label: "Toggle OnOff"
+      cluster: "On/Off"
+      command: "Off"
+
+    - label: "Toggle OnOff"
+      cluster: "On/Off"
+      command: "On"
+
+    - label: "Verify Current Mode does not change when OnMode is null"
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          value: currentModeBeforeToggle
+
+    - label: "Change to Unsupported OnMode"
+      command: "writeAttribute"
+      attribute: "OnMode"
+      arguments:
+          value: 2
+      response:
+          error: INVALID_COMMAND
+
+    - label: "Change OnMode"
+      command: "writeAttribute"
+      attribute: "OnMode"
+      arguments:
+          value: 7
+
+    - label: "Verify OnMode"
+      command: "readAttribute"
+      attribute: "OnMode"
+      response:
+          saveAs: OnModeValue
+          value: 7
+
+    - label: "Toggle OnOff"
+      cluster: "On/Off"
+      command: "Off"
+
+    - label: "Toggle OnOff"
+      cluster: "On/Off"
+      command: "On"
+
+    - label: "Verify Current Mode Changes if OnMode is not null"
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          value: OnModeValue
+
+    - label: "Change to Unsupported StartUp Mode"
+      command: "writeAttribute"
+      attribute: "StartUpMode"
+      arguments:
+          value: 2
+      response:
+          error: INVALID_COMMAND
+
+    - label: "Change to Supported StartUp Mode"
+      command: "writeAttribute"
+      attribute: "StartUpMode"
+      arguments:
+          value: 7
+
+    - label: "Verify StartUp Mode Change"
+      command: "readAttribute"
+      attribute: "StartUpMode"
+      response:
+          value: 7
+
+    - label: "Change CurrentMode to another value"
+      command: "ChangeToMode"
+      arguments:
+          values:
+              - name: "NewMode"
+                value: 0
+
+    - label: "Change On Mode"
+      command: "writeAttribute"
+      attribute: "OnMode"
+      arguments:
+          value: 4
+
+    - label: "Set StartUpOnOff"
+      cluster: "On/Off"
+      command: "writeAttribute"
+      attribute: "StartUpOnOff"
+      arguments:
+          value: 1
+
+    - label: "Reboot target device"
+      cluster: "SystemCommands"
+      command: "Reboot"
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Verify Current Mode Change based on OnMode, as it overwrites
+          StartUpMode"
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          value: 4
+
+    - label: "Change On Mode to Null"
+      command: "writeAttribute"
+      attribute: "OnMode"
+      arguments:
+          value: null
+
+    - label: "Reboot target device"
+      cluster: "SystemCommands"
+      command: "Reboot"
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Verify Current Mode Change based on new StartUp Mode"
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          value: 7

@@ -1,0 +1,76 @@
+{{#if isOptional}}
+  VerifyOrReturn(CheckValuePresent("{{label}}", {{actual}}));
+  {{>valueEquals label=(concat label ".Value()") actual=(concat actual ".Value()") expected=expected isOptional=false cluster=cluster depth=(incrementDepth depth)}}
+{{else if isNullable}}
+  {{#if (isLiteralNull expected)}}
+    VerifyOrReturn(CheckValueNull("{{label}}", {{actual}}));
+  {{else}}
+    {{#if (chip_tests_variables_has expected)}}
+      {{#if (chip_tests_variables_is_nullable expected)}}
+      {{! Expected value is also a nullable. }}
+      if ({{expected}}.IsNull()) {
+        VerifyOrReturn(CheckValueNull("{{label}}", {{actual}}));
+      }
+      else
+      {
+        VerifyOrReturn(CheckValueNonNull("{{label}}", {{actual}}));
+        {{>valueEquals label=(concat label ".Value()") actual=(concat actual ".Value()") expected=(concat expected ".Value()") isNullable=false keepAsExpected=true cluster=cluster depth=(incrementDepth depth)}}
+      }
+      {{else}}
+        VerifyOrReturn(CheckValueNonNull("{{label}}", {{actual}}));
+        {{>valueEquals label=(concat label ".Value()") actual=(concat actual ".Value()") expected=expected isNullable=false keepAsExpected=true cluster=cluster depth=(incrementDepth depth)}}
+      {{/if}}
+    {{else}}
+      VerifyOrReturn(CheckValueNonNull("{{label}}", {{actual}}));
+      {{>valueEquals label=(concat label ".Value()") actual=(concat actual ".Value()") expected=expected isNullable=false cluster=cluster depth=(incrementDepth depth)}}
+    {{/if}}
+  {{/if}}
+{{else if isArray}}
+    {{ensureIsArray expected~}}
+    {
+      auto iter_{{depth}} = {{actual}}.begin();
+      {{#each expected}}
+        VerifyOrReturn(CheckNextListItemDecodes<decltype({{../actual}})>("{{../label}}", iter_{{../depth}}, {{@index}}));
+        {{>valueEquals label=(concat ../label "[" @index "]") actual=(concat "iter_" ../depth ".GetValue()") expected=this isArray=false type=../type chipType=../chipType cluster=../cluster depth=(incrementDepth ../depth) parent=../parent}}
+      {{/each}}
+      VerifyOrReturn(CheckNoMoreListItems<decltype({{actual}})>("{{label}}", iter_{{depth}}, {{expected.length}}));
+    }
+{{else if isEvent}}
+    {{#zcl_events_fields_by_event_name type}}
+      {{#if (hasProperty ../expected label)}}
+        {{>valueEquals label=(concat ../label "." (asLowerCamelCase label)) actual=(concat ../actual "." (asLowerCamelCase label)) expected=(lookup ../expected label) cluster=../cluster depth=(incrementDepth ../depth)}}
+      {{/if}}
+    {{/zcl_events_fields_by_event_name}}
+{{else}}
+  {{#if_is_struct type}}
+    {{! Iterate over the actual types in the struct, so we pick up the right
+        type/optionality/nullability information for them for our recursive
+        call. }}
+    {{#zcl_struct_items_by_struct_and_cluster_name type cluster}}
+      {{#if (hasProperty ../expected label)}}
+        {{>valueEquals label=(concat ../label "." (asLowerCamelCase label)) actual=(concat ../actual "." (asLowerCamelCase label)) expected=(lookup ../expected label) cluster=../cluster depth=(incrementDepth ../depth)}}
+      {{/if}}
+    {{/zcl_struct_items_by_struct_and_cluster_name}}
+    {{! Maybe we should add a check for properties in the expected object (other
+        than "global") that are not present in the struct ? }}
+  {{else}}
+    VerifyOrReturn(CheckValue{{#if (isString type)}}AsString{{/if}}("{{label}}", {{actual}}, 
+      {{~#if (chip_tests_variables_has expected)}}{{expected}}
+      {{else if (chip_tests_config_has expected)}}
+        m{{asUpperCamelCase expected}}.HasValue() ? m{{asUpperCamelCase expected}}.Value() :
+        {{#if (isCharString type)}}
+          chip::Span<const char>("{{chip_tests_config_get_default_value expected}}", {{utf8StringLength (chip_tests_config_get_default_value expected)}})
+        {{else if (isOctetString type)}}
+          {{> octetStringValue value=(chip_tests_config_get_default_value expected)}}
+        {{else}}
+          {{asTypedExpression (chip_tests_config_get_default_value expected) type}}
+        {{/if}}
+      {{else if keepAsExpected}}{{expected}}
+      {{else if (isOctetString type)}}
+        {{> octetStringValue value=expected}}
+      {{else if (isCharString type)}}chip::CharSpan("{{expected}}", {{utf8StringLength expected}})
+      {{else}}{{asTypedExpression expected type}}
+      {{/if}}
+    ));
+  {{/if_is_struct}}
+{{/if}}

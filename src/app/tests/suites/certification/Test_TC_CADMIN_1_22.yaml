@@ -1,0 +1,199 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    30.1.22. [TC-CADMIN-1.22] Open commissioning window - durations max and
+    max+1 [ECM] [DUT - Commissionee]
+
+PICS:
+    - CADMIN.S
+
+config:
+    nodeId: 0x12344321
+    timeout: 950
+    endpoint: 0
+    payload:
+        type: char_string
+        defaultValue: "MT:-24J0AFN00KA0648G00"
+    discriminator:
+        type: int16u
+        defaultValue: 3840
+    PakeVerifier:
+        type: octet_string
+        defaultValue: "hex:b96170aae803346884724fe9a3b287c30330c2a660375d17bb205a8cf1aecb350457f8ab79ee253ab6a8e46bb09e543ae422736de501e3db37d441fe344920d09548e4c18240630c4ff4913c53513839b7c07fcc0627a1b8573a149fcd1fa466cf"
+
+tests:
+    - label: "Precondition: Reset Devices to factory defaults"
+      cluster: "SystemCommands"
+      PICS: PICS_SDK_CI_ONLY
+      command: "FactoryReset"
+
+    - label: "Precondition: Reset Devices to factory defaults"
+      verification: |
+          Reset Devices to factory defaults
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Factory Reset the DUT and enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 1: TH_CR1 starts a commissioning process with DUT_CE"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: payload
+
+    - label: "Step 1: TH_CR1 commissioned with DUT_CE"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      PICS: CADMIN.S.C00.Rsp
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Step 2: TH_CR1 opens a commissioning window on DUT_CE using ECM with
+          a value of 900 seconds"
+      verification: |
+          On TH_CR1 - (chip tool), open commissioning window
+
+          ./chip-tool pairing open-commissioning-window 1 1 900 1000 3840
+
+          Verify Manual pairing code on TH_CR1(chip-tool) Log
+
+          [1635925713.966786][9695:9700] CHIP:SC: Success status report received. Session was established
+          [1635925713.966839][9695:9700] CHIP:IN: New secure session created for device 0x0000000000000001, key 33!!
+          [1635925713.966938][9695:9700] CHIP:CTL: OpenCommissioningWindow for device ID 1
+          [1635925713.972601][9695:9700] CHIP:DMG: ICR moving to [AddingComm]
+          [1635925713.972705][9695:9700] CHIP:DMG: ICR moving to [AddedComma]
+          [1635925713.972815][9695:9700] CHIP:IN: Prepared encrypted message 0xaaaad9b57d10 to 0x0000000000000001 of type 0x8 and protocolId (0, 1) on exchange 31056i with MessageCounter:0.
+          [1635925713.972876][9695:9700] CHIP:IN: Sending encrypted msg 0xaaaad9b57d10 with MessageCounter:0 to 0x0000000000000001 at monotonic time: 13449459 msec
+          [1635925713.973006][9695:9700] CHIP:DMG: ICR moving to [CommandSen]
+          [1635925713.973061][9695:9700] CHIP:CTL: Manual pairing code: [35484132896]
+          [1635925713.973120][9695:9700] CHIP:CTL: SetupQRCode: [MT:00000CQM00A7F87ZT10]
+          [1635925713.973178][9695:9700] CHIP:EM: Sending Standalone Ack for MessageCounter:1964916542 on exchange 31055i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && CADMIN.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 2a: TH_CR1 opens a commissioning window on DUT_CE using ECM with
+          a value of 900 seconds"
+      cluster: "Administrator Commissioning"
+      command: "OpenCommissioningWindow"
+      PICS: CADMIN.S.C00.Rsp && PICS_SDK_CI_ONLY
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 900
+              - name: "PAKEPasscodeVerifier"
+                value: PakeVerifier
+              - name: "Discriminator"
+                value: discriminator
+              - name: "Iterations"
+                value: 1000
+              - name: "Salt"
+                value: "SPAKE2P Key Salt"
+
+    - label: "Step 3: Wait for commissioning Window to 901 seconds"
+      PICS: CADMIN.S.C00.Rsp
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 901000
+
+    - label:
+          "Step 4: TH_CR1 reads the window status to verify the DUT_CE window is
+          closed"
+      cluster: "Administrator Commissioning"
+      command: "readAttribute"
+      attribute: "WindowStatus"
+      PICS: CADMIN.S.A0000
+      response:
+          value: 0
+
+    - label:
+          "Step 5: TH_CR1 opens a commissioning window on DUT_CE using ECM with
+          a value of 901 seconds"
+      verification: |
+          On TH_CR1 (chip tool), open commissioning window
+
+          ./chip-tool  pairing open-commissioning-window 1 1 901 2000 3841
+
+          Verify DUT_CE responds General error 0x85 on TH_CR1 (chip-tool) log
+
+          CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x85
+          [1652860801.225084][9512:9517] CHIP:TOO: Error: IM Error 0x00000585: General error: 0x85 (INVALID_COMMAND)
+          [1652860801.225173][9512:9517] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1652860801.225294][9512:9517] CHIP:EM: Sending Standalone Ack for MessageCounter:4191961 on exchange 37827i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && CADMIN.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 5a: TH_CR1 opens a commissioning window on DUT_CE using ECM with
+          a value of 901 seconds"
+      cluster: "Administrator Commissioning"
+      command: "OpenCommissioningWindow"
+      PICS: CADMIN.S.C00.Rsp && PICS_SDK_CI_ONLY
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 901
+              - name: "PAKEPasscodeVerifier"
+                value: PakeVerifier
+              - name: "Discriminator"
+                value: discriminator
+              - name: "Iterations"
+                value: 1000
+              - name: "Salt"
+                value: "SPAKE2P Key Salt"
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "Step 6: TH_CR1 reads the window status to verify the DUT_CE window is
+          closed"
+      cluster: "Administrator Commissioning"
+      command: "readAttribute"
+      attribute: "WindowStatus"
+      PICS: CADMIN.S.A0000
+      response:
+          value: 0

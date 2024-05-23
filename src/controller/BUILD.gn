@@ -1,0 +1,137 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/lib/lib.gni")
+import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/python.gni")
+
+source_set("nodatamodel") {
+  sources = [ "EmptyDataModelHandler.cpp" ]
+
+  public_deps = [ "${chip_root}/src/app" ]
+}
+
+CHIP_CONTROLLER_HEADERS = [ "ExampleOperationalCredentialsIssuer.h" ]
+CHIP_READ_CLIENT_HEADERS = [
+  "CommissioningWindowOpener.h",
+  "CurrentFabricRemover.h",
+]
+
+# This source set exists specifically to deny including them without dependencies
+# if "controller" sources do not contain them
+#
+# They are NOT intended to be used directly.
+#
+# The intent for this is to force gn to be aware that these files are known and
+# error out as `include not allowed due to missing dependency` even if
+# controller is built without these sources
+source_set("gen_check_chip_controller_headers") {
+  sources = CHIP_CONTROLLER_HEADERS
+}
+
+source_set("gen_check_chip_read_client_headers") {
+  sources = CHIP_READ_CLIENT_HEADERS
+}
+
+source_set("delegates") {
+  sources = [ "OperationalCredentialsDelegate.h" ]
+}
+
+static_library("controller") {
+  output_name = "libChipController"
+
+  sources = [
+    # TODO: these dependencies are broken. Specifically:
+    #       a) ChipDeviceControllerFactory.h includes CHIPDeviceController.h
+    #       b) CHIPDeviceController.cpp is only compiled for read_client
+    # These conditionals are NOT ok and should have been solved with separate
+    # source sets - either include some functionality or do not
+    #
+    # Then CHIPDeviceController.h pulls in AbstractDnssdDiscoveryController and everything
+    # cascades. In the end it looks like basically every header file is pulled in.
+    #
+    # Unfortunately this is hard to fix in one go, hence these odd list of header-only
+    # dependencies
+    "AbstractDnssdDiscoveryController.h",
+    "AutoCommissioner.h",
+    "CHIPCluster.h",
+    "CHIPCommissionableNodeController.h",
+    "CHIPDeviceController.h",
+    "CHIPDeviceControllerSystemState.h",
+    "CommandSenderAllocator.h",
+    "CommissioneeDeviceProxy.h",
+    "CommissioningDelegate.h",
+    "DeviceDiscoveryDelegate.h",
+    "DevicePairingDelegate.h",
+    "InvokeInteraction.h",
+    "ReadInteraction.h",
+    "SetUpCodePairer.h",
+    "TypedCommandCallback.h",
+    "TypedReadCallback.h",
+    "WriteInteraction.h",
+  ]
+
+  if (chip_controller && chip_build_controller) {
+    sources += CHIP_CONTROLLER_HEADERS
+    sources += [
+      "AbstractDnssdDiscoveryController.cpp",
+      "AutoCommissioner.cpp",
+      "CHIPCommissionableNodeController.cpp",
+      "CHIPDeviceControllerFactory.cpp",
+      "CHIPDeviceControllerFactory.h",
+      "CommissioneeDeviceProxy.cpp",
+      "CommissionerDiscoveryController.cpp",
+      "CommissionerDiscoveryController.h",
+      "CommissioningDelegate.cpp",
+      "ExampleOperationalCredentialsIssuer.cpp",
+      "SetUpCodePairer.cpp",
+    ]
+    if (chip_enable_read_client) {
+      sources += CHIP_READ_CLIENT_HEADERS
+      sources += [
+        "CHIPDeviceController.cpp",
+        "CommissioningWindowOpener.cpp",
+        "CurrentFabricRemover.cpp",
+      ]
+    }
+  }
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    "${chip_root}/src/app",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/dnssd",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/messaging",
+    "${chip_root}/src/platform",
+    "${chip_root}/src/protocols",
+    "${chip_root}/src/setup_payload",
+    "${chip_root}/src/tracing",
+    "${chip_root}/src/tracing:macros",
+    "${chip_root}/src/transport",
+  ]
+
+  deps = [ "${chip_root}/src/lib/address_resolve" ]
+
+  if (chip_controller && chip_build_controller) {
+    # ExampleOperationalCredentialsIssuer uses TestGroupData
+    deps += [ "${chip_root}/src/lib/support:testing" ]
+  }
+
+  public_configs = [ "${chip_root}/src:includes" ]
+}

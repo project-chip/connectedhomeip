@@ -1,0 +1,134 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 80.2.1. [TC-MOD-1.2] Cluster attributes with DUT as Server
+
+PICS:
+    - MOD.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Precondition"
+      verification: |
+          This test case is verified after the device is provisioned. Pls provision device first, Pass appropriate nodeID in the below command
+      disabled: true
+
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      verification: |
+
+      disabled: true
+
+    - label: "Step 1: TH reads the SupportedModes attribute from DUT"
+      PICS: MOD.S.A0002
+      verification: |
+          ./chip-tool modeselect read supported-modes 1 1
+
+          Verify that the DUT response contains list of supported modes.
+          - Each mode should be a struct containing a label (user understandable string describing the mode), mode number (integer that identifies the mode and is unique within this SupportedMode list) and  list of semantic tags
+          - Record the mode numbers for use in steps 2, 3, and 4.
+          - MfgCode and Value fields present in the SemanticTags structs should be no larger than 16 bits on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
+
+          [1654595167.600241][14362:14367] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 366231602
+          [1654595167.600345][14362:14367] CHIP:TOO:   SupportedModes: 3 entries
+          [1654595167.600403][14362:14367] CHIP:TOO:     [1]: {
+          [1654595167.600430][14362:14367] CHIP:TOO:       Label: Black
+          [1654595167.600466][14362:14367] CHIP:TOO:       Mode: 0
+          [1654595167.600495][14362:14367] CHIP:TOO:       SemanticTags: 1 entries
+          [1654595167.600564][14362:14367] CHIP:TOO:         [1]: {
+          [1654595167.600589][14362:14367] CHIP:TOO:           MfgCode: 0
+          [1654595167.600612][14362:14367] CHIP:TOO:           Value: 0
+          [1654595167.600637][14362:14367] CHIP:TOO:          }
+          [1654595167.600662][14362:14367] CHIP:TOO:      }
+          [1654595167.600695][14362:14367] CHIP:TOO:     [2]: {
+          [1654595167.600719][14362:14367] CHIP:TOO:       Label: Cappuccino
+          [1654595167.600742][14362:14367] CHIP:TOO:       Mode: 4
+          [1654595167.600768][14362:14367] CHIP:TOO:       SemanticTags: 1 entries
+          [1654595167.600796][14362:14367] CHIP:TOO:         [1]: {
+          [1654595167.600820][14362:14367] CHIP:TOO:           MfgCode: 0
+          [1654595167.600842][14362:14367] CHIP:TOO:           Value: 0
+          [1654595167.600865][14362:14367] CHIP:TOO:          }
+          [1654595167.600889][14362:14367] CHIP:TOO:      }
+          [1654595167.600921][14362:14367] CHIP:TOO:     [3]: {
+          [1654595167.600945][14362:14367] CHIP:TOO:       Label: Espresso
+          [1654595167.600968][14362:14367] CHIP:TOO:       Mode: 7
+          [1654595167.600993][14362:14367] CHIP:TOO:       SemanticTags: 1 entries
+          [1654595167.601022][14362:14367] CHIP:TOO:         [1]: {
+          [1654595167.601046][14362:14367] CHIP:TOO:           MfgCode: 0
+          [1654595167.601068][14362:14367] CHIP:TOO:           Value: 0
+          [1654595167.601091][14362:14367] CHIP:TOO:          }
+          [1654595167.601115][14362:14367] CHIP:TOO:      }
+      disabled: true
+
+    - label: "Step 2: TH reads the CurrentMode attribute from the DUT"
+      PICS: MOD.S.A0003
+      verification: |
+          ./chip-tool modeselect read current-mode 1 1
+
+          Verify on TH(chip-tool) logs, CurrentMode attribute value is an integer that is in the list of modes returned in step 1, below is the sample log provided for the raspi platform:
+
+          [1645776767.611140][4667:4672] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000DataVersion: 3781469718
+          [1645776767.611214][4667:4672] CHIP:TOO:   CurrentMode: 0
+      disabled: true
+
+    - label: "Step 3: TH reads the OnMode attribute from the DUT"
+      PICS: MOD.S.A0005
+      verification: |
+          ./chip-tool modeselect read on-mode 1 1
+
+          Verify on TH(chip-tool) logs, OnMode attribute value is an integer that is in the list of modes returned in step 1(As per spec default value is null) , below is the sample log provided for the raspi platform:
+
+          [1649676072.465968][10754:10759] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0005 DataVersion: 4277065072
+          [1649676072.466094][10754:10759] CHIP:TOO:   OnMode: null
+      disabled: true
+
+    - label: "Step 4: TH reads the StartUpMode attribute from the DUT"
+      PICS: MOD.S.A0004
+      verification: |
+          ./chip-tool modeselect read start-up-mode 1 1
+
+          Verify on TH(chip-tool) logs, StartUpMode attribute value is an integer that is in the list of modes returned in step 1,  below is the sample log provided for the raspi platform:
+
+          [1649677014.496348][10778:10784] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0004 DataVersion: 4277065072
+          [1649677014.496469][10778:10784] CHIP:TOO:   StartUpMode: 0
+      disabled: true
+
+    - label: "Step 5: TH reads the Description attribute from the DUT"
+      PICS: MOD.S.A0000
+      verification: |
+          ./chip-tool modeselect read description 1 1
+
+          Verify on TH(chip-tool) logs , Description value is human readable text string and below is the sample log provided for the raspi platform:
+
+          [1649677114.614974][10787:10792] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000 DataVersion: 4277065072
+          [1649677114.615110][10787:10792] CHIP:TOO:   Description: Coffee
+      disabled: true
+
+    - label: "Step 6: TH reads the StandardNamespace attribute from the DUT"
+      PICS: MOD.S.A0001
+      verification: |
+          ./chip-tool modeselect read standard-namespace 1 1
+
+          Verify on TH(chip-tool) logs, StandardNamespace attribute value is an enum16,  below is the sample log provided for the raspi platform:
+
+          [1689750113.807806][3472:3474] CHIP:DMG: }
+          [1689750113.807960][3472:3474] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0001 DataVersion: 628878473
+          [1689750113.808031][3472:3474] CHIP:TOO:   StandardNamespace: 0
+      disabled: true

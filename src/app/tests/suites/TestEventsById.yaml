@@ -1,0 +1,262 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Events Tests
+
+config:
+    nodeId: 0x12344321
+    endpoint: 1
+    cluster: "Unit Testing"
+
+    UnsupportedCluster: 0xFFF11FFF
+    UnsupportedEvent: 0xFFF11FFF
+    UnsupportedEndPoint: 254
+
+    ReadRequestMessage.Cluster: 0xFFF1FC05
+    ReadRequestMessage.Event: 0x0001
+    ReadRequestMessage.EndPoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Read Request Message with a path that indicates a specific endpoint
+          that is unsupported"
+      cluster: "AnyCommands"
+      command: "ReadEventById"
+      endpoint: UnsupportedEndPoint
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: ReadRequestMessage.Cluster
+              - name: "EventId"
+                value: ReadRequestMessage.Event
+      response:
+          error: UNSUPPORTED_ENDPOINT
+
+    - label:
+          "Read Request Message with a path that indicates a specific cluster
+          that is unsupported"
+      cluster: "AnyCommands"
+      command: "ReadEventById"
+      endpoint: ReadRequestMessage.EndPoint
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: UnsupportedCluster
+              - name: "EventId"
+                value: ReadRequestMessage.Event
+      response:
+          error: UNSUPPORTED_CLUSTER
+
+    - label:
+          "Read Request Message with a path that indicates a specific event that
+          is unsupported"
+      cluster: "AnyCommands"
+      command: "ReadEventById"
+      endpoint: ReadRequestMessage.EndPoint
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: ReadRequestMessage.Cluster
+              - name: "EventId"
+                value: UnsupportedEvent
+      response: []
+
+    - label:
+          "Read Request Message with a path that indicates an event with no
+          results"
+      cluster: "AnyCommands"
+      command: "ReadEventById"
+      endpoint: ReadRequestMessage.EndPoint
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: ReadRequestMessage.Cluster
+              - name: "EventId"
+                value: ReadRequestMessage.Event
+      response: []
+
+    - label: "Create an event on the accessory"
+      command: "TestEmitTestEventRequest"
+      endpoint: ReadRequestMessage.EndPoint
+      arguments:
+          values:
+              - name: "arg1"
+                value: 1
+              - name: "arg2"
+                value: 2
+              - name: "arg3"
+                value: true
+      response:
+          values:
+              - name: "value"
+                saveAs: eventNumber
+
+    - label: "Read the event back"
+      cluster: "AnyCommands"
+      command: "ReadEventById"
+      endpoint: ReadRequestMessage.EndPoint
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: ReadRequestMessage.Cluster
+              - name: "EventId"
+                value: ReadRequestMessage.Event
+      response:
+          value: { arg1: 1, arg2: 2, arg3: true }
+
+    - label: "Read the event with eventNumber set to the event value"
+      cluster: "AnyCommands"
+      command: "ReadEventById"
+      endpoint: ReadRequestMessage.EndPoint
+      eventNumber: eventNumber
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: ReadRequestMessage.Cluster
+              - name: "EventId"
+                value: ReadRequestMessage.Event
+      response:
+          value: { arg1: 1, arg2: 2, arg3: true }
+
+    - label: "Read the event with eventNumber set to the event value + 1"
+      cluster: "AnyCommands"
+      command: "ReadEventById"
+      endpoint: ReadRequestMessage.EndPoint
+      eventNumber: eventNumber + 1
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: ReadRequestMessage.Cluster
+              - name: "EventId"
+                value: ReadRequestMessage.Event
+      response: []
+
+    - label: "Generate a second event on the accessory"
+      command: "TestEmitTestEventRequest"
+      endpoint: ReadRequestMessage.EndPoint
+      arguments:
+          values:
+              - name: "arg1"
+                value: 3
+              - name: "arg2"
+                value: 1
+              - name: "arg3"
+                value: false
+      response:
+          values:
+              - name: "value"
+                value: eventNumber + 1
+
+    - label: "Read the event back"
+      cluster: "AnyCommands"
+      command: "ReadEventById"
+      endpoint: ReadRequestMessage.EndPoint
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: ReadRequestMessage.Cluster
+              - name: "EventId"
+                value: ReadRequestMessage.Event
+      response:
+          - values:
+                - value: { arg1: 1, arg2: 2, arg3: true }
+          - values:
+                - value: { arg1: 3, arg2: 1, arg3: false }
+
+    - label: "Subscribe to the event"
+      cluster: "AnyCommands"
+      command: "SubscribeEventById"
+      endpoint: ReadRequestMessage.EndPoint
+      minInterval: 3
+      maxInterval: 5
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: ReadRequestMessage.Cluster
+              - name: "EventId"
+                value: ReadRequestMessage.Event
+      response:
+          - values:
+                - value: { arg1: 1, arg2: 2, arg3: true }
+          - values:
+                - value: { arg1: 3, arg2: 1, arg3: false }
+
+    - label: "Generate a third event on the accessory"
+      command: "TestEmitTestEventRequest"
+      endpoint: ReadRequestMessage.EndPoint
+      arguments:
+          values:
+              - name: "arg1"
+                value: 4
+              - name: "arg2"
+                value: 3
+              - name: "arg3"
+                value: true
+      response:
+          values:
+              - name: "value"
+                value: eventNumber + 2
+
+    - label: "Check for event report"
+      command: "waitForReport"
+      event: "TestEvent"
+      endpoint: ReadRequestMessage.EndPoint
+      response:
+          values:
+              - name: "TestEvent"
+                value: { arg1: 4, arg2: 3, arg3: true }
+
+    - label:
+          "Read Request Message with a path that indicates a specific
+          endpoint/cluster and a wildcard event"
+      cluster: "AnyCommands"
+      command: "ReadEventById"
+      endpoint: ReadRequestMessage.EndPoint
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: ReadRequestMessage.Cluster
+              - name: "EventId"
+                value: "*"
+      response:
+          - values:
+                - value: { arg1: 1, arg2: 2, arg3: true }
+          - values:
+                - value: { arg1: 3, arg2: 1, arg3: false }
+          - values:
+                - value: { arg1: 4, arg2: 3, arg3: true }
+
+    - label:
+          "Read Request Message with a path that indicates a specific
+          endpoint/event and a wildcard cluster"
+      cluster: "AnyCommands"
+      command: "ReadEventById"
+      endpoint: ReadRequestMessage.EndPoint
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: "*"
+              - name: "EventId"
+                value: ReadRequestMessage.EndPoint
+      response:
+          # Not a valid event request path.
+          error: FAILURE

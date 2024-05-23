@@ -1,0 +1,23 @@
+{{pad '/*' 78 '-'}}*\
+{{pad (concat "| Cluster " (asUpperCamelCase name)) 70 ' '~}}
+  {{~#if manufacturerCode}}
+    {{~pad (concat "| " (asMEI manufacturerCode code)) ' '}}
+  {{~else}}
+    {{~pad (concat "| " (asHex code 4)) ' '}}
+  {{~/if}} |
+{{pad "|" 79 '-'}}|
+{{pad "| Commands: " 70 ' '}}{{pad "| " 9 ' '}}|
+{{#zcl_commands_source_client}}
+{{pad (concat "| * " (asUpperCamelCase name)) 70 ' '}}{{pad (concat "|   " (asHex code 2)) 9 ' '}}|
+{{/zcl_commands_source_client}}
+{{pad "|" 79 '-'}}|
+{{pad "| Attributes: " 70 ' '}}{{pad "| " 9 ' '}}|
+{{#zcl_attributes_server}}
+{{pad (concat "| * " (asUpperCamelCase name)) 70 ' '}}{{pad (concat "| " (asHex code 4)) 9 ' '}}|
+{{/zcl_attributes_server}}
+{{pad "|" 79 '-'}}|
+{{pad "| Events: " 70 ' '}}{{pad "| " 9 ' '}}|
+{{#zcl_events}}
+{{pad (concat "| * " (asUpperCamelCase name)) 70 ' '}}{{pad (concat "| " (asHex code 4)) 9 ' '}}|
+{{/zcl_events}}
+{{pad '\*' 78 '-'}}*/

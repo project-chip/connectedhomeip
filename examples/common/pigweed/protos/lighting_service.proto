@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+import 'pw_protobuf_protos/common.proto';
+
+package chip.rpc;
+
+
+message LightingColor {
+  // Values are between 0x00 and 0xFE inclusive
+  uint32 hue = 1;
+  uint32 saturation = 2;
+}
+
+message LightingState {
+  bool on = 1;
+
+  // level is between 0 and 255 inclusively.
+  optional uint32 level = 2;
+
+  optional LightingColor color = 3;
+}
+
+service Lighting {
+  // Set will return OK if all supported fields are successfully applied, any
+  // unsupported fields will be ignored.
+  // Get can be used to determine which fields are supported.
+  rpc Set(LightingState) returns (pw.protobuf.Empty){}
+
+  // Get will populate all of the supported lighting state fields with the
+  // current values. This can be used to discover the devices supported
+  // lighting features.
+  rpc Get(pw.protobuf.Empty) returns (LightingState){}
+}

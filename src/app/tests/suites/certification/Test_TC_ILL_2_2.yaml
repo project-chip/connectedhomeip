@@ -1,0 +1,117 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 71.2.2. [TC-ILL-2.2] Primary Functionality with Server as DUT
+
+PICS:
+    - ILL.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Illuminance Measurement"
+    endpoint: 1
+
+tests:
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2a: TH reads MinMeasuredValue attribute from DUT"
+      PICS: ILL.S.A0001
+      command: "readAttribute"
+      attribute: "MinMeasuredValue"
+      response:
+          saveAs: MinMeasuredValueValue
+          constraints:
+              type: int16u
+
+    - label: "Step 2b: TH reads MaxMeasuredValue attribute from DUT"
+      PICS: ILL.S.A0002
+      command: "readAttribute"
+      attribute: "MaxMeasuredValue"
+      response:
+          saveAs: MaxMeasuredValueValue
+          constraints:
+              type: int16u
+
+    - label: "Step 3: Cover the sensor or darken the room"
+      verification: |
+          Manual operation
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for Success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Wait 1s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label:
+          "Step 4: After a few seconds, TH reads MeasuredValue attribute from
+          DUT."
+      PICS: ILL.S.A0000 && PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "MeasuredValue"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+
+    - label: "Step 5: Expose the sensor again to light"
+      verification: |
+          Manual operation
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for Success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Wait 1s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label:
+          "Step 6: After a few seconds, TH reads MeasuredValue attribute from
+          DUT."
+      PICS: ILL.S.A0000 && PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "MeasuredValue"
+      response:
+          constraints:
+              type: int16u
+              maxValue: 65534

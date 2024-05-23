@@ -1,0 +1,184 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("${build_root}/config/compiler/compiler.gni")
+
+import("${chip_root}/src/lib/lib.gni")
+import("${chip_root}/src/platform/device.gni")
+
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+
+if (chip_enable_pw_rpc) {
+  import("//build_overrides/pigweed.gni")
+  import("$dir_pw_build/target_types.gni")
+  import("${chip_root}/examples/common/pigweed/rpc_config.gni")
+}
+
+source_set("chip-all-clusters-common") {
+  sources = [
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/air-quality-instance.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/boolcfg-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/concentration-measurement-instances.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/device-energy-management-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/dishwasher-alarm-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/dishwasher-mode.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/electrical-energy-measurement-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/electrical-power-measurement-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/energy-evse-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/energy-preference-delegate.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/fan-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-dryer-controls-delegate-impl.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-controls-delegate-impl.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-mode.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/microwave-oven-mode.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/operational-state-delegate-impl.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/oven-modes.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/oven-operational-state-delegate.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/power-topology-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/resource-monitoring-delegates.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/rvc-modes.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/rvc-operational-state-delegate-impl.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/tcc-mode.cpp",
+    "${chip_root}/examples/all-clusters-app/linux/diagnostic-logs-provider-delegate-impl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementDelegateImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementManager.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/ElectricalPowerMeasurementDelegate.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/device-energy-management-mode.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/energy-evse-mode.cpp",
+    "AllClustersCommandDelegate.cpp",
+    "AppOptions.cpp",
+    "ValveControlDelegate.cpp",
+    "WindowCoveringManager.cpp",
+    "include/tv-callbacks.cpp",
+    "include/tv-callbacks.h",
+    "main-common.cpp",
+  ]
+
+  deps = [
+    "${chip_root}/examples/all-clusters-app/all-clusters-common",
+    "${chip_root}/examples/platform/linux:app-main",
+    "${chip_root}/src/app/tests/suites/credentials:dac_provider",
+    "${chip_root}/src/lib",
+    "${chip_root}/third_party/jsoncpp",
+  ]
+
+  include_dirs = [
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
+    "${chip_root}/examples/energy-management-app/energy-management-common/include",
+  ]
+
+  if (chip_enable_pw_rpc) {
+    defines = rpc_defines
+    sources += rpc_sources
+    deps += rpc_deps
+
+    deps += pw_build_LINK_DEPS
+
+    include_dirs += [ "${chip_root}/examples/common" ]
+  } else {
+    # The system_rpc_server.cc file is in pigweed and doesn't compile with
+    # -Wconversion, remove check for RPC build only.
+    cflags = [ "-Wconversion" ]
+  }
+
+  if (chip_build_libshell) {
+    defines = [ "ENABLE_CHIP_SHELL" ]
+  }
+}
+
+source_set("chip-lock-app-common") {
+  sources = [
+    "${chip_root}/examples/lock-app/lock-common/include/LockEndpoint.h",
+    "${chip_root}/examples/lock-app/lock-common/include/LockManager.h",
+    "${chip_root}/examples/lock-app/lock-common/src/LockEndpoint.cpp",
+    "${chip_root}/examples/lock-app/lock-common/src/LockManager.cpp",
+    "${chip_root}/examples/lock-app/lock-common/src/ZCLDoorLockCallbacks.cpp",
+  ]
+
+  deps = [ "${chip_root}/examples/all-clusters-app/all-clusters-common" ]
+
+  include_dirs = [ "${chip_root}/examples/lock-app/lock-common/include" ]
+
+  cflags = [ "-Wconversion" ]
+}
+
+if (is_libfuzzer) {
+  executable("chip-all-clusters-app-fuzzing") {
+    sources = [ "fuzzing-main.cpp" ]
+
+    deps = [
+      ":chip-all-clusters-common",
+      "${chip_root}/examples/platform/linux:app-main",
+    ]
+
+    cflags = [ "-Wconversion" ]
+
+    output_dir = root_out_dir
+  }
+} else {
+  executable("chip-all-clusters-app") {
+    sources = [ "main.cpp" ]
+
+    deps = [
+      ":chip-all-clusters-common",
+      "${chip_root}/examples/platform/linux:app-main",
+    ]
+
+    cflags = [ "-Wconversion" ]
+
+    include_dirs =
+        [ "${chip_root}/examples/all-clusters-app/all-clusters-common/include" ]
+
+    output_dir = root_out_dir
+  }
+
+  if (chip_device_platform == "darwin") {
+    action("codesign") {
+      script = "entitlements/codesign.py"
+      public_deps = [ ":chip-all-clusters-app" ]
+
+      args = [
+        "--target_path",
+        rebase_path("${root_build_dir}/chip-all-clusters-app", root_build_dir),
+        "--log_path",
+        rebase_path("${root_build_dir}/codesign_log.txt", root_build_dir),
+      ]
+
+      output_name = "codesign_log.txt"
+      outputs = [ "${root_build_dir}/${output_name}" ]
+    }
+  }
+}
+
+group("linux") {
+  deps = []
+  if (is_libfuzzer) {
+    deps += [ ":chip-all-clusters-app-fuzzing" ]
+  } else {
+    deps += [ ":chip-all-clusters-app" ]
+  }
+}
+
+group("default") {
+  deps = [ ":linux" ]
+}

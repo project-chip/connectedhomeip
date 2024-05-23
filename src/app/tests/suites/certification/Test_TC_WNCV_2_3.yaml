@@ -1,0 +1,185 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 36.2.3. [TC-WNCV-2.3] Mode attribute [DUT as Server]
+
+PICS:
+    - WNCV.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Window Covering"
+    endpoint: 1
+
+tests:
+    - label: "Step Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    ### ------------------------------------------------------
+    ### Step 1x -> Check Lift Reversal (If PICS_WNCV.S.M.Reversal)
+    ## Set b0
+    - label: "Step 1a: TH set the Mode Attribute bit0 of the DUT"
+      command: "writeAttribute"
+      attribute: "Mode"
+      PICS: "WNCV.S.M.Reversal && WNCV.S.A0017"
+      arguments:
+          value: 0x01
+
+    ## Value of bit2 must be 1b
+    - label: "Step 1b: TH reads ConfigStatus attribute from DUT"
+      command: "readAttribute"
+      attribute: "ConfigStatus"
+      PICS: "WNCV.S.M.Reversal && WNCV.S.A0007"
+      response:
+          constraints:
+              minValue: 0x04
+              maxValue: 0x7F
+
+    ## Clear b0
+    - label: "Step 1c: TH clear the Mode Attribute bit0 of the DUT"
+      command: "writeAttribute"
+      attribute: "Mode"
+      PICS: "WNCV.S.M.Reversal && WNCV.S.A0017"
+      arguments:
+          value: 0x00
+
+    ## Value of bit2 must be 0b
+    - label: "Step 1d: TH reads ConfigStatus attribute from DUT"
+      command: "readAttribute"
+      attribute: "ConfigStatus"
+      PICS: "WNCV.S.M.Reversal && WNCV.S.A0007"
+      response:
+          constraints:
+              minValue: 0x00
+              maxValue: 0x7F
+
+    ### ------------------------------------------------------
+    ### Step 2x -> Check Calibration mode
+    ## Set b1
+    - label: "Step 2a: TH set the Mode Attribute bit1 of the DUT"
+      command: "writeAttribute"
+      attribute: "Mode"
+      PICS: "WNCV.S.M.Calibration && WNCV.S.A0017"
+      arguments:
+          value: 0x02
+
+    ## Value of bitO can be 0b
+    - label: "Step 2b: TH reads ConfigStatus attribute from DUT"
+      command: "readAttribute"
+      attribute: "ConfigStatus"
+      PICS: "WNCV.S.M.Calibration && WNCV.S.A0007"
+      response:
+          saveAs: configStatusValA
+          constraints:
+              minValue: 0x00
+              maxValue: 0x7F
+
+    ## If (ConfigStatus bit0 == 0) Verify DUT responds with FAILURE (value 0x01) status response
+    - label:
+          "Step 2c: If (ConfigStatus bit0 == 0) TH send DownOrClose command to
+          the DUT"
+      command: "DownOrClose"
+      PICS: "WNCV.S.M.Calibration && WNCV.S.C01.Rsp"
+      response:
+          error: FAILURE
+
+    ## Clear b1
+    - label: "Step 2d: TH clear the Mode Attribute bit1 of the DUT"
+      command: "writeAttribute"
+      attribute: "Mode"
+      PICS: "WNCV.S.M.Calibration && WNCV.S.A0017"
+      arguments:
+          value: 0x00
+
+    ## Value of bitO must be 1b
+    - label: "Step 2e: TH reads ConfigStatus attribute from DUT"
+      command: "readAttribute"
+      attribute: "ConfigStatus"
+      PICS: "WNCV.S.M.Calibration && WNCV.S.A0007"
+      response:
+          constraints:
+              minValue: 0x01
+              maxValue: 0x7F
+
+    ## Value of bit1 must be 0b
+    - label: "Step 2f: TH reads the Mode Attribute from the DUT"
+      command: "readAttribute"
+      attribute: "Mode"
+      PICS: "WNCV.S.M.Calibration && WNCV.S.A0017"
+      response:
+          constraints:
+              minValue: 0x00
+              maxValue: 0x7F
+
+    ## Verify DUT responds with SUCCESS status response
+    - label: "Step 2g: TH send DownOrClose command to the DUT"
+      command: "DownOrClose"
+      PICS: "WNCV.S.M.Calibration && WNCV.S.C01.Rsp"
+
+    ### ------------------------------------------------------
+    ### Step 3x -> Check Maintenance mode
+    ## Set b2
+    - label: "Step 3a: TH set the Mode Attribute bit2 of the DUT"
+      command: "writeAttribute"
+      attribute: "Mode"
+      PICS: "WNCV.S.M.Maintenance && WNCV.S.A0017"
+      arguments:
+          value: 0x04
+
+    ## If Verify DUT responds with BUSY (value 0x9c) status response
+    - label: "Step 3b: TH send DownOrClose command to the DUT"
+      command: "DownOrClose"
+      PICS: "WNCV.S.M.Maintenance && WNCV.S.C01.Rsp"
+      response:
+          error: BUSY
+
+    ## Value of bitO must be 0b
+    - label: "Step 3c: TH reads ConfigStatus attribute from DUT"
+      command: "readAttribute"
+      PICS: "WNCV.S.M.Maintenance && WNCV.S.A0007"
+      attribute: "ConfigStatus"
+      response:
+          saveAs: configStatusValB
+          constraints:
+              minValue: 0x00
+              maxValue: 0x7F
+
+    ## Clear b2
+    - label: "Step 3d: TH clear the Mode Attribute bit2 of the DUT"
+      command: "writeAttribute"
+      attribute: "Mode"
+      PICS: "WNCV.S.M.Maintenance && WNCV.S.A0017"
+      arguments:
+          value: 0x00
+
+    ## Verify DUT responds with SUCCESS status response
+    - label: "Step 3e: TH send DownOrClose command to the DUT"
+      command: "DownOrClose"
+      PICS: "WNCV.S.M.Maintenance && WNCV.S.C01.Rsp"
+
+    ## Value of bitO must be 1b
+    - label: "Step 3f: TH reads ConfigStatus attribute from DUT"
+      command: "readAttribute"
+      attribute: "ConfigStatus"
+      PICS: "WNCV.S.M.Maintenance && WNCV.S.A0007"
+      response:
+          constraints:
+              minValue: 0x01
+              maxValue: 0x7F

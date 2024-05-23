@@ -1,0 +1,128 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 36.2.1. [TC-PRS-2.1] Attributes with server as DUT
+
+PICS:
+    - PRS.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Pressure Measurement"
+    endpoint: 1
+
+tests:
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH reads from the DUT the MinMeasuredValue attribute."
+      PICS: PRS.S.A0001
+      command: "readAttribute"
+      attribute: "MinMeasuredValue"
+      response:
+          saveAs: MinMeasuredValueValue
+          constraints:
+              type: int16s
+              minValue: -32767
+              maxValue: 32766
+
+    - label: "Step 3: TH reads from the DUT the MaxMeasuredValue attribute."
+      PICS: PRS.S.A0002
+      command: "readAttribute"
+      attribute: "MaxMeasuredValue"
+      response:
+          saveAs: MaxMeasuredValueValue
+          constraints:
+              type: int16s
+              minValue: MinMeasuredValueValue
+              maxValue: 32767
+
+    - label: "Step 4: TH reads from the DUT the MeasuredValue attribute."
+      PICS: PRS.S.A0000
+      command: "readAttribute"
+      attribute: "MeasuredValue"
+      response:
+          constraints:
+              type: int16s
+              minValue: MinMeasuredValueValue
+              maxValue: MaxMeasuredValueValue
+
+    - label: "Step 5: TH reads from the DUT the Tolerance attribute."
+      PICS: PRS.S.A0003
+      command: "readAttribute"
+      attribute: "Tolerance"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 2048
+
+    - label: "Step 6: TH reads from the DUT the MinScaledValue attribute."
+      PICS: PRS.S.A0011
+      command: "readAttribute"
+      attribute: "MinScaledValue"
+      response:
+          saveAs: MinScaledValueValue
+          constraints:
+              type: int16s
+              minValue: -32767
+              maxValue: 32766
+
+    - label: "Step 7: TH reads from the DUT the MaxScaledValue attribute."
+      PICS: PRS.S.A0012
+      command: "readAttribute"
+      attribute: "MaxScaledValue"
+      response:
+          saveAs: MaxScaledValueValue
+          constraints:
+              type: int16s
+              minValue: MinScaledValueValue
+              maxValue: 32767
+
+    - label: "Step 8: TH reads from the DUT the ScaledValue attribute."
+      PICS: PRS.S.A0010
+      command: "readAttribute"
+      attribute: "ScaledValue"
+      response:
+          constraints:
+              type: int16s
+              minValue: MinScaledValueValue
+              maxValue: MaxScaledValueValue
+
+    - label: "Step 9: TH reads from the DUT the ScaledTolerance attribute."
+      PICS: PRS.S.A0013
+      command: "readAttribute"
+      attribute: "ScaledTolerance"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 2048
+
+    - label: "Step 10: TH reads from the DUT the Scale attribute."
+      PICS: PRS.S.A0014
+      command: "readAttribute"
+      attribute: "Scale"
+      response:
+          constraints:
+              type: int8s
+              minValue: -127
+              maxValue: 127

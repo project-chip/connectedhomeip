@@ -1,0 +1,58 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Recent Fail Summary
+on:
+  schedule:
+    - cron: "10 0 * * *"
+  workflow_dispatch:
+
+concurrency:
+    group: ${{ github.workflow }}
+
+jobs:
+  list_workflows:
+    name: Summarize Recent Workflow Failures
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install pandas python-slugify pyyaml tabulate
+      - name: Run Summarization Script
+        run: python scripts/tools/summarize_fail.py
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Update Docs
+        uses: test-room-7/action-update-file@v1
+        with:
+          file-path: docs/daily_pass_percentage.md
+          commit-msg: Update daily pass percentage
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          branch: daily_pass_percentage
+      - name: Upload Logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: workflow-fail-summary
+          path: |
+            fail_run_list.json
+            all_run_list.json
+            recent_fails.csv
+            recent_fails_frequency.csv
+            failure_cause_summary.csv
+            workflow_pass_rate.csv
+            workflow_pass_rate.sqlite3
+            recent_fails_logs
+            workflow_pass_rate
+          retention-days: 5
+        

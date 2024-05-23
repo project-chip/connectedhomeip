@@ -1,0 +1,293 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/nlunit_test.gni")
+import("//build_overrides/pigweed.gni")
+
+import("${chip_root}/build/chip/chip_test_suite.gni")
+import("${chip_root}/src/app/icd/icd.gni")
+import("${chip_root}/src/crypto/crypto.gni")
+import("${chip_root}/src/platform/device.gni")
+
+static_library("helpers") {
+  output_name = "libAppTestHelpers"
+  output_dir = "${root_out_dir}/lib"
+
+  sources = [
+    "${chip_root}/src/app/reporting/tests/MockReportScheduler.cpp",
+    "AppTestContext.cpp",
+    "AppTestContext.h",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  deps = [
+    "${chip_root}/src/access",
+    "${chip_root}/src/app",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/transport/raw/tests:helpers",
+  ]
+
+  public_deps = [ "${chip_root}/src/messaging/tests:helpers" ]
+}
+
+source_set("binding-test-srcs") {
+  sources = [
+    "${chip_root}/src/app/clusters/bindings/PendingNotificationMap.cpp",
+    "${chip_root}/src/app/clusters/bindings/PendingNotificationMap.h",
+    "${chip_root}/src/app/util/binding-table.cpp",
+    "${chip_root}/src/app/util/binding-table.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
+source_set("ota-requestor-test-srcs") {
+  sources = [
+    "${chip_root}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp",
+    "${chip_root}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.h",
+    "${chip_root}/src/app/clusters/ota-requestor/OTARequestorStorage.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
+source_set("time-sync-data-provider-test-srcs") {
+  sources = [ "${chip_root}/src/app/clusters/time-synchronization-server/TimeSyncDataProvider.cpp" ]
+
+  public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
+source_set("power-cluster-test-srcs") {
+  sources = [
+    "${chip_root}/src/app/clusters/power-source-server/power-source-server.cpp",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
+source_set("scenes-table-test-srcs") {
+  sources = [
+    "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSets.h",
+    "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSetsImpl.cpp",
+    "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSetsImpl.h",
+    "${chip_root}/src/app/clusters/scenes-server/SceneHandlerImpl.cpp",
+    "${chip_root}/src/app/clusters/scenes-server/SceneHandlerImpl.h",
+    "${chip_root}/src/app/clusters/scenes-server/SceneTable.h",
+    "${chip_root}/src/app/clusters/scenes-server/SceneTableImpl.cpp",
+    "${chip_root}/src/app/clusters/scenes-server/SceneTableImpl.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app",
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
+source_set("operational-state-test-srcs") {
+  sources = [ "${chip_root}/src/app/clusters/operational-state-server/operational-state-cluster-objects.h" ]
+
+  public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
+source_set("ember-apptest-compatibility") {
+  sources = [
+    "ember-test-compatibility.cpp",
+    "ember-test-compatibility.h",
+  ]
+  public_configs = [ "${chip_root}/src/lib/support/pw_log_chip:config" ]
+
+  public_deps = [
+    "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
+chip_test_suite("tests") {
+  output_name = "libAppTests"
+
+  sources = [
+    "CommandHandlerTestAccess.h",
+    "CommandSenderTestAccess.h",
+    "EngineTestAccess.h",
+    "ReadHandlerTestAccess.h",
+    "WriteClientTestAccess.h",
+    "WriteHandlerTestAccess.h",
+  ]
+  test_sources = [
+    "TestBindingTable.cpp",
+    "TestBuilderParser.cpp",
+    "TestMessageDef.cpp",
+    "TestNullable.cpp",
+    "TestStatusIB.cpp",
+    "TestStatusResponseMessage.cpp",
+  ]
+
+  if (!chip_fake_platform) {
+    test_sources += [ "TestFailSafeContext.cpp" ]
+  }
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    ":binding-test-srcs",
+    ":ember-apptest-compatibility",
+    ":operational-state-test-srcs",
+    ":ota-requestor-test-srcs",
+    ":time-sync-data-provider-test-srcs",
+    "${chip_root}/src/app",
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/icd/client:manager",
+    "${chip_root}/src/app/tests:helpers",
+    "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support:test_utils",
+    "${chip_root}/src/lib/support:testing",
+  ]
+}
+
+chip_test_suite_using_nltest("tests_nltest") {
+  output_name = "libAppTestsNL"
+
+  test_sources = [
+    "TestAclAttribute.cpp",
+    "TestAclEvent.cpp",
+    "TestAttributeAccessInterfaceCache.cpp",
+    "TestAttributePathExpandIterator.cpp",
+    "TestAttributePersistenceProvider.cpp",
+    "TestAttributeValueDecoder.cpp",
+    "TestAttributeValueEncoder.cpp",
+    "TestBasicCommandPathRegistry.cpp",
+    "TestClusterInfo.cpp",
+    "TestCommandInteraction.cpp",
+    "TestCommandPathParams.cpp",
+    "TestConcreteAttributePath.cpp",
+    "TestDataModelSerialization.cpp",
+    "TestDefaultOTARequestorStorage.cpp",
+    "TestEventLoggingNoUTCTime.cpp",
+    "TestEventOverflow.cpp",
+    "TestEventPathParams.cpp",
+    "TestFabricScopedEventLogging.cpp",
+    "TestInteractionModelEngine.cpp",
+    "TestNumericAttributeTraits.cpp",
+    "TestOperationalStateClusterObjects.cpp",
+    "TestPendingNotificationMap.cpp",
+    "TestPendingResponseTrackerImpl.cpp",
+    "TestPowerSourceCluster.cpp",
+    "TestReadInteraction.cpp",
+    "TestReportingEngine.cpp",
+    "TestTestEventTriggerDelegate.cpp",
+    "TestTimeSyncDataProvider.cpp",
+    "TestTimedHandler.cpp",
+    "TestWriteInteraction.cpp",
+  ]
+
+  # DefaultICDClientStorage assumes that raw AES key is used by the application
+  if (chip_crypto != "psa") {
+    test_sources += [ "TestDefaultICDClientStorage.cpp" ]
+  }
+
+  #
+  # On NRF platforms, the allocation of a large number of pbufs in this test
+  # to exercise chunking causes it to run out of memory. For now, disable it there.
+  #
+  if (chip_device_platform != "nrfconnect") {
+    test_sources += [ "TestBufferedReadCallback.cpp" ]
+    test_sources += [ "TestClusterStateCache.cpp" ]
+  }
+
+  # On NRF, Open IoT SDK and fake platforms we do not have a realtime clock available, so
+  # TestEventLogging.cpp would be testing the same thing as
+  # TestEventLoggingNoUTCTime, but it's not set up to deal with the timestamps
+  # being that low.
+  if (chip_device_platform != "nrfconnect" &&
+      chip_device_platform != "openiotsdk" && chip_device_platform != "fake") {
+    test_sources += [ "TestEventLogging.cpp" ]
+  }
+
+  # The platform manager is not properly clearing queues in test teardown, which results in
+  # DrainIO calls not being able to run in expected time (5seconds) if unprocessed reported engine
+  # runs are remaining, causing tests to crash in Open IoT SDK and Zephyr tests since they are
+  # running all tests in one file. We need to figure out how to properly clean the event queues
+  # before enabling this test for these platforms.
+  if (chip_device_platform != "nrfconnect" &&
+      chip_device_platform != "openiotsdk") {
+    test_sources += [ "TestReportScheduler.cpp" ]
+  }
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    ":binding-test-srcs",
+    ":ember-apptest-compatibility",
+    ":operational-state-test-srcs",
+    ":ota-requestor-test-srcs",
+    ":time-sync-data-provider-test-srcs",
+    "${chip_root}/src/app",
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/icd/client:manager",
+    "${chip_root}/src/app/tests:helpers",
+    "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support:test_utils",
+    "${chip_root}/src/lib/support:testing",
+    "${chip_root}/src/lib/support:testing_nlunit",
+    "${nlunit_test_root}:nlunit-test",
+  ]
+
+  if (chip_device_platform != "android") {
+    test_sources += [
+      "TestExtensionFieldSets.cpp",
+      "TestSceneTable.cpp",
+    ]
+    public_deps += [
+      ":power-cluster-test-srcs",
+      ":scenes-table-test-srcs",
+    ]
+  }
+
+  if (chip_config_network_layer_ble &&
+      (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
+    test_sources += [ "TestCommissionManager.cpp" ]
+    public_deps += [
+      "${chip_root}/src/app/server",
+      "${chip_root}/src/messaging/tests/echo:common",
+    ]
+  }
+
+  if (chip_persist_subscriptions) {
+    test_sources += [ "TestSimpleSubscriptionResumptionStorage.cpp" ]
+  }
+}

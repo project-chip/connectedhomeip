@@ -1,0 +1,56 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("${build_root}/config/compiler/compiler.gni")
+
+import("BUILD.generated.gni")
+
+config("boringssl_config") {
+  include_dirs = [ "src/include" ]
+
+  # We want the basic crypto impl with no asm primitives until we hook-up platform-based
+  # support to the build later.
+  defines = [ "OPENSSL_NO_ASM=1" ]
+}
+
+config("boringssl_config_disable_warnings") {
+  cflags = [
+    "-Wno-unused-variable",
+    "-Wno-conversion",
+  ]
+
+  if (is_clang) {
+    cflags += [ "-Wno-shorten-64-to-32" ]
+  }
+}
+
+all_sources = crypto_sources
+
+all_headers = crypto_headers
+
+static_library("boringssl") {
+  cflags = [ "-O2" ]
+
+  public = all_headers
+
+  sources = all_sources
+
+  public_configs = [ ":boringssl_config" ]
+
+  # The disable-warnings config should not be a public config, since
+  # that would make it apply to compilations of anything that depends
+  # on boringssl, not just boringssl itself.
+  configs += [ ":boringssl_config_disable_warnings" ]
+}

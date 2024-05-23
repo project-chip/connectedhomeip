@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2023 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+  <bitmap name="AlarmBitmap" type="bitmap32">
+     <cluster code="0x0057" />
+     <field name="DoorOpen" mask="0x01"/>
+  </bitmap>
+  <cluster>
+    <name>Refrigerator Alarm</name>
+    <domain>Appliances</domain>
+    <description>Attributes and commands for configuring the Refrigerator alarm.</description>
+    <code>0x0057</code>
+    <define>REFRIGERATOR_ALARM_CLUSTER</define>
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+
+    <attribute side="server" code="0x0000" define="MASK" type="AlarmBitmap" default="0" writable="false" optional="false">Mask</attribute>
+    <attribute side="server" code="0x0002" define="STATE" type="AlarmBitmap" default="0" writable="false" optional="false">State</attribute>
+    <attribute side="server" code="0x0003" define="SUPPORTED" type="AlarmBitmap" default="0" writable="false" optional="false">Supported</attribute>
+
+    <event side="server" code="0x00" priority="info" name="Notify" optional="false">
+        <description>Notify</description>
+        <field id="0" name="Active" type="AlarmBitmap" />
+        <field id="1" name="Inactive" type="AlarmBitmap" />
+        <field id="2" name="State" type="AlarmBitmap" />
+        <field id="3" name="Mask" type="AlarmBitmap" />
+    </event>
+  </cluster>
+</configurator>

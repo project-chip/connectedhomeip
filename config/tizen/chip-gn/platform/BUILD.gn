@@ -1,0 +1,89 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/tizen.gni")
+import("${chip_root}/config/tizen/chip-gn/args.gni")
+
+import("${build_root}/config/linux/pkg_config.gni")
+import("${chip_root}/src/platform/device.gni")
+
+pkg_config("dlog") {
+  packages = [ "dlog" ]
+}
+
+pkg_config("capi-appfw-preference") {
+  packages = [ "capi-appfw-preference" ]
+}
+
+pkg_config("glib") {
+  packages = [
+    "glib-2.0",
+    "gio-unix-2.0",
+  ]
+}
+
+pkg_config("capi-system-info") {
+  packages = [ "capi-system-info" ]
+}
+
+if (chip_mdns == "platform") {
+  pkg_config("nsd-dns-sd") {
+    packages = [ "nsd-dns-sd" ]
+  }
+}
+
+if (chip_enable_wifi) {
+  pkg_config("capi-network-wifi-manager") {
+    packages = [ "capi-network-wifi-manager" ]
+  }
+}
+
+if (chip_enable_ble) {
+  pkg_config("capi-network-bluetooth") {
+    packages = [ "capi-network-bluetooth" ]
+  }
+}
+
+if (chip_enable_openthread) {
+  pkg_config("capi-network-thread") {
+    packages = [ "capi-network-thread" ]
+  }
+}
+
+source_set("tizen") {
+  public_configs = [
+    ":dlog",
+    ":glib",
+    ":capi-appfw-preference",
+    ":capi-system-info",
+  ]
+
+  if (chip_mdns == "platform") {
+    public_configs += [ ":nsd-dns-sd" ]
+  }
+
+  if (chip_enable_wifi) {
+    public_configs += [ ":capi-network-wifi-manager" ]
+  }
+
+  if (chip_enable_ble) {
+    public_configs += [ ":capi-network-bluetooth" ]
+  }
+
+  if (chip_enable_openthread) {
+    public_configs += [ ":capi-network-thread" ]
+  }
+}

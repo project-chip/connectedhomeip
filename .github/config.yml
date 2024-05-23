@@ -1,0 +1,8 @@
+todo:
+  keyword: ["@todo", "TODO", "TODO:"]     # string|string[]
+  bodyKeyword: ["@body", "BODY", "BODY:"] # string|string[]
+  blobLines: 10                           # number|boolean, 0 or false to disable
+  autoAssign: true                        # string|string[]|boolean
+  label: ["todo"]                         # boolean|string|string[]
+  reopenClosed: true                      # boolean
+  exclude: ".*lint\\.yaml|.*/(zzz_generated|zap-generated)/.*" # string

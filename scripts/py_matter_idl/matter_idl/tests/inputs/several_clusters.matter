@@ -1,0 +1,42 @@
+cluster First = 1 {
+    attribute int16u someInteger = 1;
+}
+
+cluster Second = 2 {
+    fabric_scoped struct FabricDescriptorStruct {
+      octet_string<65> rootPublicKey = 1;
+      vendor_id vendorID = 2;
+      fabric_id fabricID = 3;
+      node_id nodeID = 4;
+      char_string<32> label = 5;
+      fabric_idx fabricIndex = 254;
+    }
+
+    readonly attribute FabricDescriptorStruct fabrics[] = 0;
+    readonly attribute octet_string<32> someBytes = 123;
+}
+
+cluster Third = 3 {
+    enum MyEnum : enum8 {
+      kUnknown = 0;
+      kKnown = 100;
+    }
+
+    bitmap LevelControlOptions : BITMAP8 {
+      kExecuteIfOff = 0x1;
+      kCoupleColorTempToLevel = 0x2;
+    }
+
+    attribute MyEnum someEnum = 10;
+    attribute LevelControlOptions options = 20;
+}
+
+endpoint 0 {
+  device type rootdevice = 22, version 1;
+  binding cluster Second;
+
+  server cluster Third {
+    ram attribute someEnum;
+    ram attribute clusterRevision default = 2;
+  }
+}

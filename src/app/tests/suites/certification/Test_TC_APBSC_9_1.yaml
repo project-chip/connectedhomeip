@@ -1,0 +1,102 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 19.11.1. [TC-APBSC-9.1] Application Basic Attribute Verification
+
+PICS:
+    - APBSC.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Application Basic"
+    endpoint: 3
+
+tests:
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 1: TH reads the VendorName attribute from the DUT"
+      PICS: APBSC.S.A0000
+      command: "readAttribute"
+      attribute: "VendorName"
+      response:
+          constraints:
+              type: char_string
+              maxLength: 32
+
+    - label: "Step 2: TH reads the VendorID attribute from the DUT"
+      PICS: APBSC.S.A0001
+      command: "readAttribute"
+      attribute: "VendorID"
+      response:
+          constraints:
+              type: vendor_id
+
+    - label: "Step 3: TH reads the ApplicationName attribute from the DUT"
+      PICS: APBSC.S.A0002
+      command: "readAttribute"
+      attribute: "ApplicationName"
+      response:
+          constraints:
+              type: long_char_string
+              maxLength: 256
+
+    - label: "Step 4: TH reads the ProductID attribute from the DUT"
+      PICS: APBSC.S.A0003
+      command: "readAttribute"
+      attribute: "ProductID"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Step 5: TH reads the Application attribute from the DUT"
+      PICS: APBSC.S.A0004
+      command: "readAttribute"
+      attribute: "Application"
+      response:
+          constraints:
+              type: ApplicationStruct
+
+    - label: "Step 6: TH reads the Status attribute from the DUT"
+      PICS: APBSC.S.A0005
+      command: "readAttribute"
+      attribute: "Status"
+      response:
+          constraints:
+              minValue: 0
+              maxValue: 3
+
+    - label: "Step 7: TH reads the ApplicationVersion attribute from the DUT"
+      PICS: APBSC.S.A0006
+      command: "readAttribute"
+      attribute: "ApplicationVersion"
+      response:
+          constraints:
+              type: char_string
+              maxLength: 32
+
+    - label: "Step 8: TH reads the AllowedVendorList attribute from the DUT"
+      PICS: APBSC.S.A0007
+      command: "readAttribute"
+      attribute: "AllowedVendorList"
+      response:
+          constraints:
+              type: list

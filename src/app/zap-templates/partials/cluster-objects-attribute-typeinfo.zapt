@@ -1,0 +1,26 @@
+struct TypeInfo {
+{{! forceNotOptional=true because the optionality is on the attribute
+    itself, but we want just the type of the attribute. }}
+{{#if entryType}}
+    using Type = {{zapTypeToEncodableClusterObjectType entryType ns=ns forceNotOptional=true}};
+    using DecodableType = {{zapTypeToDecodableClusterObjectType entryType ns=ns forceNotOptional=true}};
+    using DecodableArgType = {{zapTypeToDecodableClusterObjectType entryType ns=ns forceNotOptional=true isArgument=true}};
+{{else}}
+    using Type = {{zapTypeToEncodableClusterObjectType type ns=ns forceNotOptional=true}};
+    using DecodableType = {{zapTypeToDecodableClusterObjectType type ns=ns forceNotOptional=true}};
+    using DecodableArgType = {{zapTypeToDecodableClusterObjectType type ns=ns forceNotOptional=true isArgument=true}};
+{{/if}}
+
+    {{#if clusterRef}}
+    static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
+    {{/if}}
+    static constexpr AttributeId GetAttributeId() { return Attributes::{{asUpperCamelCase label}}::Id; }
+    static constexpr bool MustUseTimedWrite() { return {{mustUseTimedWrite}}; }
+    {{#unless isArray}}
+    {{#if (isString type)}}
+    {{#if maxLength}}
+    static constexpr size_t MaxLength() { return {{maxLength}}; }
+    {{/if}}
+    {{/if}}
+    {{/unless}}
+};

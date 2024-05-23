@@ -1,0 +1,105 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    3.9.1. [TC-SU-3.4] Handling different ApplyUpdateResponse scenarios on
+    Provider
+
+PICS:
+    - MCORE.OTA.Provider
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "Step 1: OTA-R/TH on completion of image download sends an
+          ApplyUpdateRequest Command to the DUT."
+      verification: |
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
+
+          Verify that the DUT sends an ApplyUpdateResponse Command to the OTA Requestor with following fields:
+           - Action - Proceed.
+           - DelayedActionTime - Zero or non zero.
+
+          [1645743059328] [97809:20280957] CHIP: [SWU] ApplyUpdateResponse:
+          [1645743059328] [97809:20280957] CHIP: [SWU]   action: 0
+          [1645743059328] [97809:20280957] CHIP: [SWU]   delayedActionTime: 0 seconds
+      disabled: true
+
+    - label:
+          "Step 2: OTA-R/TH on completion of image download sends an
+          ApplyUpdateRequest command to the DUT. DUT responds with the
+          ApplyUpdateResponse with Action set to 'AwaitNextAction',
+          DelayedActionTime set to 3 minutes. On the subsequent
+          ApplyUpdateRequest command, DUT sends a ApplyUpdateResponse back to
+          DUT. Action is set to Proceed."
+      verification: |
+          Run the OTA Requestor App using command
+
+          chip-ota-requestor-app --discriminator ${REQUESTOR_LONG_DISCRIMINATOR} --secured-device-port ${REQUESTOR_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --periodicQueryTimeout ${TIME_IN_SECONDS} --autoApplyImage
+
+          chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin -a awaitNextAction -p 180
+
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
+
+          Verify that the DUT sends an ApplyUpdateResponse Command to the OTA Requestor with following fields:
+           - Action - AwaitNextAction.
+           - DelayedActionTime - 3 minutes.
+
+          [1651273867647] [25752:35374182] CHIP: [SWU] ApplyUpdateResponse:
+          [1651273867647] [25752:35374182] CHIP: [SWU]   action: 1
+          [1651273867647] [25752:35374182] CHIP: [SWU]   delayedActionTime: 180 seconds
+
+          Verify on the OTA Requestor logs after subsequent ApplyUpdateRequest:
+
+          [1651274047655] [25752:35376683] CHIP: [SWU] ApplyUpdateResponse:
+          [1651274047655] [25752:35376683] CHIP: [SWU]   action: 0
+          [1651274047655] [25752:35376683] CHIP: [SWU]   delayedActionTime: 0 seconds
+      disabled: true
+
+    - label:
+          "Step 3: OTA-R/TH on completion of image download sends an
+          ApplyUpdateRequest command to the DUT. DUT responds with the
+          ApplyUpdateResponse with Action set to 'Discontinue'. Initiate another
+          QueryImage Command from OTA-R/TH to the DUT."
+      verification: |
+          Run the OTA Requestor App using command
+
+          chip-ota-requestor-app --discriminator ${REQUESTOR_LONG_DISCRIMINATOR} --secured-device-port ${REQUESTOR_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --periodicQueryTimeout ${TIME_IN_SECONDS}
+
+          chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin -a discontinue
+
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
+          Verify that the DUT sends an ApplyUpdateResponse Command to the OTA Requestor with "Discontinue" in the action field of the response.
+
+          [1651275906536] [26578:35409308] CHIP: [SWU] ApplyUpdateResponse:
+          [1651275906536] [26578:35409308] CHIP: [SWU]   action: 2
+          [1651275906536] [26578:35409308] CHIP: [SWU]   delayedActionTime: 0 seconds
+
+          Verify that the entire OTA process is restarted on DUT when OTA-R/TH sends another QueryImage Request.
+
+          [1651274047655] [25752:35376683] CHIP: [SWU] ApplyUpdateResponse:
+          [1651274047655] [25752:35376683] CHIP: [SWU]   action: 0
+          [1651274047655] [25752:35376683] CHIP: [SWU]   delayedActionTime: 0 seconds
+      disabled: true

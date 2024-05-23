@@ -1,0 +1,167 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/asr.gni")
+import("${asr_sdk_build_root}/asr_sdk.gni")
+import("${chip_root}/src/platform/ASR/args.gni")
+
+declare_args() {
+  # Build target to use for asr SDK. Use this to set global SDK defines.
+  asr_target_project = ""
+}
+
+assert(asr_target_project != "", "asr_target_project must be specified")
+
+# Add includes, cflags, asmflags, etc in config
+config("asr_sdk_config") {
+  _include_dirs = [
+    "${asr_sdk_build_root}/asr_sdk/config",
+    "${asr_sdk_build_root}/asr_sdk/config/lwip_if",
+    "${asr_sdk_build_root}/asr_sdk/lib",
+    "${asr_sdk_build_root}/asr_sdk/lib/security",
+    "${asr_sdk_build_root}/asr_sdk/version",
+    "${asr_sdk_build_root}/asr_sdk/driver/inc",
+    "${asr_sdk_build_root}/asr_sdk/common",
+    "${asr_sdk_build_root}/asr_sdk/common/easylogger",
+    "${asr_sdk_build_root}/asr_sdk/platform/duet",
+    "${asr_sdk_build_root}/asr_sdk/platform/CMSIS/Include",
+    "${asr_sdk_build_root}/asr_sdk/platform/system/include",
+    "${asr_sdk_build_root}/../components/freertos/Source/include",
+    "${asr_sdk_build_root}/../components/freertos/Source/portable/MemMang",
+    "${asr_sdk_build_root}/../components/freertos/Source/portable/GCC/ARM_CM4F",
+    "${asr_sdk_build_root}/../components/lwip_2.1.2/include",
+    "${asr_sdk_build_root}/../components/lwip_2.1.2/port/include",
+    "${asr_sdk_build_root}/../components/lwip_2.1.2/include/lwip",
+    "${asr_sdk_build_root}/../components/lwip_2.1.2/include/lwip/prot",
+    "${asr_sdk_build_root}/../components/lwip_2.1.2/include/netif",
+    "${asr_sdk_build_root}/../components/mbedtls-2.18/include",
+    "${asr_sdk_build_root}/../components/mbedtls-2.18/include/mbedtls",
+    "${asr_sdk_build_root}/../components/mbedtls-2.18/asr_mbedtls/",
+    "${asr_sdk_build_root}/../components/mbedtls-2.18/asr_mbedtls/alt",
+  ]
+
+  # Also add project include path (passed in from project build)
+  proj_path = get_label_info(asr_target_project, "dir")
+  _include_dirs += [ "/" + rebase_path("${proj_path}/include", "/", ".") ]
+
+  cflags = []
+  foreach(include_dir, _include_dirs) {
+    cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
+  }
+
+  # Pull out defines from generated json
+  defines = [
+    "_SPI_FLASH_120MHz_",
+    "PS_CLOSE_APLL",
+    "LEGA_A0V2",
+    "LEGA_CM4",
+    "_SPI_FLASH_ENABLE_",
+    "SYSTEM_SUPPORT_OS",
+    "WIFI_DEVICE",
+    "CFG_BATX=1",
+    "CFG_BARX=1",
+    "CFG_REORD_BUF=4",
+    "CFG_SPC=4",
+    "CFG_TXDESC0=4",
+    "CFG_TXDESC1=4",
+    "CFG_TXDESC2=4",
+    "CFG_TXDESC3=4",
+    "CFG_TXDESC4=4",
+    "CFG_CMON",
+    "CFG_MDM_VER_V21",
+    "CFG_SOFTAP_SUPPORT",
+    "CFG_SNIFFER_SUPPORT",
+    "CFG_CUS_FRAME",
+    "CFG_DBG=1",
+    "__FPU_PRESENT=1",
+    "DX_CC_TEE",
+    "HASH_SHA_512_SUPPORTED",
+    "CC_HW_VERSION=0xF0",
+    "DLLI_MAX_BUFF_SIZE=0x10000",
+    "SSI_CONFIG_TRNG_MODE=0",
+    "AT_USER_DEBUG",
+    "SYSTEM_RECOVERY",
+    "SYSTEM_COREDUMP",
+    "CFG_IOT_PLT",
+    "CLOUD_AUTH",
+    "CFG_BAIDU",
+    "CFG_OS_VERSION_CHECK",
+    "CFG_SAE",
+    "CFG_SAE_AUTH_OPT",
+    "CFG_MFP",
+    "CONFIG_IEEE80211W",
+    "WFA_CERTIFICATE_N",
+    "USE_SMALL_STACK",
+    "CFG_RESET_OPT",
+    "SYSTEM_RECOVERY",
+    "LWIP_DUALSTACK",
+    "SECURITY_ENGINE_INIT",
+    "MBEDTLS_HW",
+    "MBEDTLS_HW_ECC",
+    "MBEDTLS_HW_AES",
+    "MBEDTLS_HW_HASH",
+    "MBEDTLS_USER_CONFIG_FILE=<mbedtls_user_config.h>",
+    "CONFIG_ENABLE_ASR_LEGA_RTOS=1",
+    "CFG_EASY_LOG_ENABLE=1",
+    "CFG_EASY_LOG_MODULE_EN=1",
+  ]
+
+  cflags_c = [
+    "-mcpu=cortex-m4",
+    "-Os",
+    "-mfloat-abi=softfp",
+    "-mfpu=fpv4-sp-d16",
+    "-mthumb",
+    "-fno-builtin-printf",
+    "-fno-builtin-sprintf",
+    "-fno-builtin-snprintf",
+    "-ffunction-sections",
+    "-fdata-sections",
+    "-g",
+    "-Wall",
+  ]
+
+  cflags_cc = cflags_c
+
+  asmflags = cflags_c
+
+  ldflags = cflags_c
+
+  cflags_c += [
+    "-Wno-sign-compare",
+    "-Wno-unused-function",
+    "-Wno-pointer-sign",
+    "-Wno-type-limits",
+  ]
+
+  ldflags += [
+    "-Wl,--wrap=printf",
+    "-Wl,--wrap=sprintf",
+    "-Wl,--wrap=snprintf",
+    "-Wl,--gc-sections",
+  ]
+
+  libs = [
+    "${chip_root}/third_party/asr/${asr_ic_family}/asr_sdk/lib/libasr_wifi_v6.a",
+    "${chip_root}/third_party/asr/${asr_ic_family}/asr_sdk/lib/security/lib_security.a",
+  ]
+
+  linker_script_flags = "${asr_sdk_build_root}/asr_sdk/demo/ld/gcc.ld"
+  ldflags += [ "-T" + rebase_path(linker_script_flags, root_build_dir) ]
+}
+
+group("asr_build") {
+  public_configs = [ ":asr_sdk_config" ]
+  public_deps = [ asr_target_project ]
+}

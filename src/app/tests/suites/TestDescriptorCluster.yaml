@@ -1,0 +1,111 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Descriptor Cluster Tests
+
+config:
+    nodeId: 0x12344321
+    cluster: "Descriptor"
+    endpoint: 0
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Read attribute Device list"
+      command: "readAttribute"
+      attribute: "DeviceTypeList"
+      response:
+          value:
+              [{ DeviceType: 17, Revision: 1 }, { DeviceType: 22, Revision: 1 }]
+
+    - label: "Read attribute Server list"
+      command: "readAttribute"
+      attribute: "ServerList"
+      response:
+          value: [
+                  0x0003, # Identify
+                  0x0004, # Groups
+                  0x001D, # Descriptor
+                  0x001E, # Binding
+                  0x001F, # Access Control
+                  0x0028, # Basic Information
+                  0x002A, # OTA Software Update Requestor
+                  0x002B, # Localization Configuration
+                  0x002C, # Time Format Localization
+                  0x002D, # Unit Localization
+                  0x002E, # Power Source Configuration
+                  0x002F, # Power Source
+                  0x0030, # General Commissioning
+                  0x0031, # Network Commissioning
+                  0x0032, # Diagnostic Logs
+                  0x0033, # General Diagnostics
+                  0x0034, # Software Diagnostics
+                  0x0035, # Thread Network Diagnostiscs
+                  0x0036, # WiFi Network Diagnostics
+                  0x0037, # Ethernet Network Diagnostics
+                  0x0038, # Time Synchronization
+                  0x003C, # Administrator Commissioning
+                  0x003E, # Operational Credentials
+                  0x003F, # Group Key Management
+                  0x0040, # Fixed Label
+                  0x0041, # User Label
+                  0x0405, # Relative Humidity Measurement (why on EP0?)
+                  0xFFF1FC06, # Fault Injection
+              ]
+
+    - label: "Read attribute Client list"
+      command: "readAttribute"
+      attribute: "ClientList"
+      response:
+          value: [
+                  0x0029, # OTA Software Update Provider
+              ]
+
+    - label: "Read attribute Parts list"
+      command: "readAttribute"
+      attribute: "PartsList"
+      response:
+          value: [1, 2]
+
+    - label: "Read attribute ClusterRevision"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 2
+          constraints:
+              type: int16u
+
+    - label: "Read attribute Tag list"
+      command: "readAttribute"
+      attribute: "TagList"
+      response:
+          value:
+              [
+                  { MfgCode: null, NamespaceID: 7, Tag: 0 },
+                  { MfgCode: null, NamespaceID: 8, Tag: 3 },
+              ]
+
+    - label: "Read feature map Attribute"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]

@@ -1,0 +1,203 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 3.2.2. [TC-OO-2.2] Primary functionality with server as DUT
+
+PICS:
+    - OO.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "On/Off"
+    endpoint: 1
+
+tests:
+    - label: "Step 1: Commission DUT to TH"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2a: TH sends Off command to DUT"
+      PICS: OO.S.C00.Rsp
+      command: "Off"
+
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "Step 2b: after a few seconds, TH reads OnOff attribute from DUT"
+      PICS: OO.S.A0000
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0
+
+    - label: "Step 3a: TH sends On command to DUT"
+      PICS: OO.S.C01.Rsp
+      command: "On"
+
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "Step 3b: after a few seconds, TH reads OnOff attribute from DUT"
+      PICS: OO.S.A0000
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 1
+
+    - label: "Step 3c: TH sends On command to DUT"
+      PICS: OO.S.C01.Rsp
+      command: "On"
+
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "Step 3d: after a few seconds, TH reads OnOff attribute from DUT"
+      PICS: OO.S.A0000
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 1
+
+    - label: "Step 4a: TH sends Off command to DUT"
+      PICS: OO.S.C00.Rsp
+      command: "Off"
+
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "Step 4b: after a few seconds, TH reads OnOff attribute from DUT"
+      PICS: OO.S.A0000
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0
+
+    - label: "Step 4c: TH sends Off command to DUT"
+      PICS: OO.S.C00.Rsp
+      command: "Off"
+
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "Step 4d: after a few seconds, TH reads OnOff attribute from DUT"
+      PICS: OO.S.A0000
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0
+
+    - label: "Step 5a: TH sends Toggle command to DUT"
+      PICS: OO.S.C02.Rsp
+      command: "Toggle"
+
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "Step 5b: after a few seconds, TH reads OnOff attribute from DUT"
+      PICS: OO.S.A0000
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 1
+
+    - label: "Step 5c: TH sends Toggle command to DUT"
+      PICS: OO.S.C02.Rsp
+      command: "Toggle"
+
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "Step 5d: after a few seconds, TH reads OnOff attribute from DUT"
+      PICS: OO.S.A0000
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0
+
+    - label: "Step 6a: Operate on device to set OnOff attribute manually to on"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && OO.M.ManuallyControlled && OO.S.A0000
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    # Skipped this step because the above test need manual input
+    - label: "Step 6b: after a few seconds, TH reads OnOff attribute from DUT"
+      PICS: PICS_SKIP_SAMPLE_APP && OO.S.A0000 && OO.M.ManuallyControlled
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 1
+
+    - label: "Step 6c: Operate on device to set OnOff attribute manually to off"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && OO.M.ManuallyControlled && OO.S.A0000
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    # Skipped the step because the above test need manual input
+    - label: "Step 6d: after a few seconds, TH reads OnOff attribute from DUT"
+      PICS: PICS_SKIP_SAMPLE_APP && OO.S.A0000 && OO.M.ManuallyControlled
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0

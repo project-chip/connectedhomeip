@@ -1,0 +1,44 @@
+{{#if isOptional}}
+  if ({{source}}.HasValue()) {
+    {{>decodable_value target=target source=(concat source ".Value()") cluster=cluster depth=(incrementDepth depth) isOptional=false}}
+  } else {
+    {{target}} = nil;
+  }
+{{else if isNullable}}
+  if ({{source}}.IsNull()) {
+    {{target}} = nil;
+  } else {
+    {{>decodable_value target=target source=(concat source ".Value()") cluster=cluster depth=(incrementDepth depth) isNullable=false}}
+  }
+{{else if isArray}}
+  { // Scope for our temporary variables
+    auto * array_{{depth}} = [NSMutableArray new];
+    for (auto & entry_{{depth}} : {{source}}) {
+      {{asObjectiveCClass type cluster forceNotList=true}} * newElement_{{depth}};
+      {{>decodable_value target=(concat "newElement_" depth) source=(concat "entry_" depth) cluster=cluster depth=(incrementDepth depth) isArray=false}}
+      [array_{{depth}} addObject:newElement_{{depth}}];
+    }
+    {{target}} = array_{{depth}};
+  }
+{{else}}
+  {{#if_is_struct type}}
+    {{target}} = [{{asObjectiveCClass type cluster forceNotList=true}} new];
+    {{#zcl_struct_items_by_struct_and_cluster_name type cluster}}
+      {{>decodable_value target=(concat ../target "." (asStructPropertyName label)) source=(concat ../source "." (asLowerCamelCase label)) cluster=../cluster depth=(incrementDepth ../depth) }}
+    {{/zcl_struct_items_by_struct_and_cluster_name}}
+  {{else}}
+    {{#if_is_strongly_typed_chip_enum type}}
+      {{target}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:chip::to_underlying({{source}})];
+    {{else}}
+      {{#if_is_strongly_typed_bitmap type}}
+        {{target}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:{{source}}.Raw()];
+      {{else if (isOctetString type)}}
+        {{target}} = [NSData dataWithBytes:{{source}}.data() length:{{source}}.size()];
+      {{else if (isCharString type)}}
+        {{target}} = [[NSString alloc] initWithBytes:{{source}}.data() length:{{source}}.size() encoding:NSUTF8StringEncoding];
+      {{else}}
+        {{target}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:{{source}}];
+      {{/if_is_strongly_typed_bitmap}}
+    {{/if_is_strongly_typed_chip_enum}}
+  {{/if_is_struct}}
+{{/if}}

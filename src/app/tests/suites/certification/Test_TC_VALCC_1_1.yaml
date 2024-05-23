@@ -1,0 +1,186 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 62.1.1. [TC-VALCC-1.1] Global attributes with server as DUT
+
+PICS:
+    - VALCC.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Valve Configuration and Control"
+    endpoint: 1
+
+tests:
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: Read the global attribute: ClusterRevision"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 1
+          constraints:
+              type: int16u
+
+    - label: "Step 3a: Read the global attribute: FeatureMap"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: ( !VALCC.S.F00 && !VALCC.S.F01 )
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
+
+    - label:
+          "Step 3b: Given VALCC.S.F00(TS) ensure featuremap has the correct bit
+          set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: VALCC.S.F00
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
+
+    - label:
+          "Step 3c: Given VALCC.S.F01(LVL) ensure featuremap has the correct bit
+          set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: VALCC.S.F01
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2]
+
+    - label: "Step 4a: Read the global attribute: AttributeList"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 3, 4, 65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "Step 4a: Read the global attribute: AttributeList"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 3, 4, 65528, 65529, 65531, 65532, 65533]
+
+    - label:
+          "Step 4b: Read the feature dependent(VALCC.S.F00) attribute in
+          AttributeList"
+      PICS: VALCC.S.F00
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [2]
+
+    - label:
+          "Step 4c: Read the feature dependent(VALCC.S.F01) attribute in
+          AttributeList"
+      PICS: VALCC.S.F01
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [6, 7]
+
+    - label:
+          "Step 4d: Read the feature dependent(VALCC.S.F01) optional attribute
+          in AttributeList"
+      PICS: VALCC.S.F01 && VALCC.S.A0008
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [8]
+
+    - label:
+          "Step 4e: Read the feature dependent(VALCC.S.F01) optional attribute
+          in AttributeList"
+      PICS: VALCC.S.F01 && VALCC.S.A000a
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [10]
+
+    - label:
+          "Step 4f: TH reads optional (ValveFault) attribute in AttributeList"
+      PICS: VALCC.S.A0009
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [9]
+
+    - label: "Step 5a: Read the global attribute: EventList"
+      PICS: PICS_EVENT_LIST_ENABLED && !VALCC.S.E00 && !VALCC.S.E01
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Step 5b: Read the optional (ValveStateChanged) event in EventList"
+      PICS: PICS_EVENT_LIST_ENABLED && VALCC.S.E00
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
+
+    - label: "Step 5c: Read the optional (ValveFault) event in EventList"
+      PICS: PICS_EVENT_LIST_ENABLED && VALCC.S.E01
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [1]
+
+    - label: "Step 6: Read the global attribute: AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1]
+
+    - label: "Step 7: Read the global attribute: GeneratedCommandList"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list

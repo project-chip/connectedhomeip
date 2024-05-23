@@ -1,0 +1,237 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 24.2.1. [TC-LVL-2.1] Read cluster attributes (DUT as Server)
+
+PICS:
+    - LVL.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Level Control"
+    endpoint: 1
+
+tests:
+    - label:
+          "Commission DUT to TH (can be skipped if done in a preceding test)."
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 1: TH reads the CurrentLevel attribute from the DUT"
+      PICS: LVL.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentLevel"
+      response:
+          saveAs: CurrentLevelValue
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 254
+
+    - label: "Step 2: TH reads the RemainingTime attribute from the DUT"
+      PICS: LVL.S.A0001
+      command: "readAttribute"
+      attribute: "RemainingTime"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Step 3a: TH reads the MinLevel attribute from the DUT"
+      PICS: LVL.S.A0002 && LVL.S.F01
+      command: "readAttribute"
+      attribute: "MinLevel"
+      response:
+          value: 1
+          saveAs: MinLevelValue
+          constraints:
+              type: int8u
+
+    - label: "Step 3b: TH reads the MinLevel attribute from the DUT"
+      PICS: LVL.S.A0002 && !LVL.S.F01
+      command: "readAttribute"
+      attribute: "MinLevel"
+      response:
+          saveAs: MinLevelFeatureMapNotSupportedValue
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 254
+
+    - label: "Step 4: TH reads the MaxLevel attribute from the DUT"
+      PICS: LVL.S.A0003 && LVL.S.F01
+      command: "readAttribute"
+      attribute: "MaxLevel"
+      response:
+          value: 254
+          saveAs: MaxLevelValue
+          constraints:
+              type: int8u
+              minValue: MinLevelValue
+
+    - label: "Step 4a: TH reads the MaxLevel attribute from the DUT"
+      PICS: LVL.S.A0003 && !LVL.S.F01
+      command: "readAttribute"
+      attribute: "MaxLevel"
+      response:
+          saveAs: MaxLevelFeatureMapNotSupportedValue
+          constraints:
+              type: int8u
+              minValue: MinLevelFeatureMapNotSupportedValue
+              maxValue: 254
+
+    - label: "Step 4b & 4C TH reads the CurrentLevel attribute"
+      PICS: LVL.S.F01 && LVL.S.A0002 && LVL.S.A0003
+      command: "readAttribute"
+      attribute: "CurrentLevel"
+      response:
+          constraints:
+              type: int8u
+              minValue: MinLevelValue
+              maxValue: MaxLevelValue
+
+    - label: "Step 4b & 4C TH reads the CurrentLevel attribute"
+      PICS: LVL.S.A0002 && LVL.S.A0003 && !LVL.S.F01
+      command: "readAttribute"
+      attribute: "CurrentLevel"
+      response:
+          constraints:
+              type: int8u
+              minValue: MinLevelFeatureMapNotSupportedValue
+              maxValue: MaxLevelFeatureMapNotSupportedValue
+
+    - label: "Step 5: TH reads the CurrentFrequency attribute from the DUT"
+      PICS: LVL.S.A0004
+      command: "readAttribute"
+      attribute: "CurrentFrequency"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Step 6: TH reads the MinFrequency attribute from the DUT"
+      PICS: LVL.S.A0005
+      command: "readAttribute"
+      attribute: "MinFrequency"
+      response:
+          saveAs: MinFrequencyValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Step 7: TH reads the MaxFrequency attribute from the DUT"
+      PICS: LVL.S.A0006
+      command: "readAttribute"
+      attribute: "MaxFrequency"
+      response:
+          saveAs: MaxFrequencyValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Step 7b & 7C TH reads the CurrentFrequency attribute"
+      PICS: LVL.S.A0004 && LVL.S.A0005 && LVL.S.A0006
+      command: "readAttribute"
+      attribute: "CurrentFrequency"
+      response:
+          constraints:
+              type: int16u
+              minValue: MinFrequencyValue
+              maxValue: MaxFrequencyValue
+
+    - label: "Step 8: TH reads the OnOffTransitionTime attribute"
+      PICS: LVL.S.A0010
+      command: "readAttribute"
+      attribute: "OnOffTransitionTime"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Step 9a: TH reads the OnLevel attribute from the DUT"
+      PICS: LVL.S.F01 && LVL.S.A0011
+      command: "readAttribute"
+      attribute: "OnLevel"
+      response:
+          constraints:
+              type: int8u
+              minValue: MinLevelValue
+              maxValue: MaxLevelValue
+
+    - label: "Step 9b: TH reads the OnLevel attribute from the DUT"
+      PICS: LVL.S.A0011 && !LVL.S.F01
+      command: "readAttribute"
+      attribute: "OnLevel"
+      response:
+          constraints:
+              type: int8u
+              minValue: MinLevelFeatureMapNotSupportedValue
+              maxValue: MaxLevelFeatureMapNotSupportedValue
+
+    - label: "Step 10: TH reads the OnTransitionTime attribute from the DUT"
+      PICS: LVL.S.A0012
+      command: "readAttribute"
+      attribute: "OnTransitionTime"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Step 11: TH reads the OffTransitionTime attribute from the DUT"
+      PICS: LVL.S.A0013
+      command: "readAttribute"
+      attribute: "OffTransitionTime"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Step 12: TH reads the DefaultMoveRate attribute from the DUT"
+      PICS: LVL.S.A0014
+      command: "readAttribute"
+      attribute: "DefaultMoveRate"
+      response:
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 255
+
+    - label: "Step 13: TH reads the Options attribute from the DUT"
+      PICS: LVL.S.A000f
+      command: "readAttribute"
+      attribute: "Options"
+      response:
+          constraints:
+              type: bitmap8
+
+    - label: "Step 14: TH reads the StartUpCurrentLevel attribute from the DUT"
+      PICS: LVL.S.A4000
+      command: "readAttribute"
+      attribute: "StartUpCurrentLevel"
+      response:
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 255

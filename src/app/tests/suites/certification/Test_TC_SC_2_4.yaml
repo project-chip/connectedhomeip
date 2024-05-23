@@ -1,0 +1,52 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 14.2.4. [TC-SC-2.4] PASE Error Handling [DUT - Initiator/Commissioner]
+
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "DUT generates and sends PBKDFParamRequest"
+      verification: |
+          Verify TH receives the PBKDFParamRequest message.
+      disabled: true
+
+    - label: "TH generates and sends PBKDFParamResponse"
+      verification: |
+          Verify DUT receives the PBKDFParamResponse message.
+      disabled: true
+
+    - label: "DUT generates and sends Pake1"
+      verification: |
+          Verify TH receives the Pake1 message.
+      disabled: true
+
+    - label:
+          "TH generates and sends Pake2 with an invalid key confirmation message
+          (cB)"
+      verification: |
+          Verify DUT receives the Pake2 message.
+      disabled: true
+
+    - label: "DUT verifies Pake2.cB."
+      verification: |
+          Verify that the DUT fails verification and sends a status report to the TH with a FAILURE general code (value 1), protocol ID of SECURE_CHANNEL (0x0000), and Protocol code of INVALID_PARAMETER (0X0002). Verify that the DUT performs no further processing after sending the status report.
+      disabled: true

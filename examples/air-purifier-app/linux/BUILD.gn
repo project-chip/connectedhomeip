@@ -1,0 +1,62 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/src/app/common_flags.gni")
+
+assert(chip_build_tools)
+
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+
+config("includes") {
+  include_dirs = [
+    ".",
+    "include",
+  ]
+}
+
+executable("chip-air-purifier-app") {
+  sources = [
+    "${chip_root}/examples/air-purifier-app/air-purifier-common/src/air-purifier-manager.cpp",
+    "${chip_root}/examples/air-purifier-app/air-purifier-common/src/air-quality-sensor-manager.cpp",
+    "${chip_root}/examples/air-purifier-app/air-purifier-common/src/filter-delegates.cpp",
+    "${chip_root}/examples/air-purifier-app/air-purifier-common/src/thermostat-manager.cpp",
+    "include/CHIPProjectAppConfig.h",
+    "main.cpp",
+  ]
+
+  deps = [
+    "${chip_root}/examples/air-purifier-app/air-purifier-common",
+    "${chip_root}/examples/platform/linux:app-main",
+    "${chip_root}/src/lib",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  include_dirs = [
+    "include",
+    "${chip_root}/examples/air-purifier-app/air-purifier-common/include",
+  ]
+  output_dir = root_out_dir
+}
+
+group("linux") {
+  deps = [ ":chip-air-purifier-app" ]
+}
+
+group("default") {
+  deps = [ ":linux" ]
+}

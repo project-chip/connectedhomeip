@@ -1,0 +1,50 @@
+import("//build_overrides/chip.gni")
+import("//build_overrides/efr32_sdk.gni")
+import("${efr32_sdk_build_root}/efr32_sdk.gni")
+
+rs911x_src_plat = [
+  "${examples_plat_dir}/rs911x/sl_wifi_if.cpp",
+  "${examples_plat_dir}/rs911x/wfx_rsi_host.cpp",
+  "${examples_plat_dir}/rs911x/hal/rsi_hal_mcu_interrupt.c",
+  "${examples_plat_dir}/rs911x/hal/sl_si91x_ncp_utility.c",
+  "${examples_plat_dir}/rs911x/hal/efx32_ncp_host.c",
+  "${silabs_plat_efr32_wifi_dir}/wfx_notify.cpp",
+]
+
+rs9117_inc_plat = [
+  "${examples_plat_dir}/rs911x",
+  "${examples_plat_dir}/rs911x/hal",
+  "${wifi_sdk_root}/components/si91x/ble/inc",
+]
+
+rs911x_cflags = [ "-Wno-empty-body" ]
+rs9117_src_sapi = [
+  # sl_si91x_wireless component
+  "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_si91x_driver.c",
+  "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_rsi_utility.c",
+  "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_si91x_callback_framework.c",
+  "${wifi_sdk_root}/components/device/silabs/si91x/wireless/threading/sli_si91x_multithreaded.c",
+  "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sl_net_rsi_utility.c",
+  "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sl_net_si91x_integration_handler.c",
+  "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sl_si91x_net_credentials.c",
+  "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ncp_interface/spi/sl_si91x_spi.c",
+  "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ncp_interface/sl_si91x_ncp_driver.c",
+
+  # wifi component
+  "${wifi_sdk_root}/components/protocol/wifi/src/sl_wifi_callback_framework.c",
+  "${wifi_sdk_root}/components/protocol/wifi/si91x/sl_wifi.c",
+
+  # basic_network_manager component
+  "${wifi_sdk_root}/components/service/network_manager/src/sl_net_basic_credentials.c",
+  "${wifi_sdk_root}/components/service/network_manager/src/sl_net_basic_profiles.c",
+
+  # si91x_basic_buffers component
+  "${wifi_sdk_root}/components/device/silabs/si91x/wireless/memory/malloc_buffers.c",
+
+  # si91x_support component
+  "${wifi_sdk_root}/components/common/src/sl_utility.c",
+
+  # network_manager component
+  "${wifi_sdk_root}/components/service/network_manager/src/sl_net_basic_certificate_store.c",
+  "${wifi_sdk_root}/components/service/network_manager/src/sl_net.c",
+]

@@ -1,0 +1,81 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("${chip_root}/build/chip/buildconfig_header.gni")
+
+declare_args() {
+  # Enable adding optional rotating device id to the additional data.
+  chip_enable_rotating_device_id = false
+}
+
+buildconfig_header("additional_data_payload_buildconfig") {
+  header = "CHIPAdditionalDataPayloadBuildConfig.h"
+  header_dir = "setup_payload"
+
+  defines =
+      [ "CHIP_ENABLE_ROTATING_DEVICE_ID=${chip_enable_rotating_device_id}" ]
+}
+
+source_set("additional_data_payload") {
+  sources = [
+    "AdditionalDataPayload.h",
+    "AdditionalDataPayloadGenerator.cpp",
+    "AdditionalDataPayloadGenerator.h",
+    "AdditionalDataPayloadParser.cpp",
+    "AdditionalDataPayloadParser.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/crypto",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/protocols:type_definitions",
+    "${chip_root}/src/setup_payload:additional_data_payload_buildconfig",
+  ]
+}
+
+static_library("setup_payload") {
+  output_name = "libSetupPayload"
+
+  sources = [
+    "Base38.h",
+    "Base38Decode.cpp",
+    "Base38Decode.h",
+    "Base38Encode.cpp",
+    "Base38Encode.h",
+    "ManualSetupPayloadGenerator.cpp",
+    "ManualSetupPayloadGenerator.h",
+    "ManualSetupPayloadParser.cpp",
+    "ManualSetupPayloadParser.h",
+    "QRCodeSetupPayloadGenerator.cpp",
+    "QRCodeSetupPayloadGenerator.h",
+    "QRCodeSetupPayloadParser.cpp",
+    "QRCodeSetupPayloadParser.h",
+    "SetupPayload.cpp",
+    "SetupPayload.h",
+    "SetupPayloadHelper.cpp",
+    "SetupPayloadHelper.h",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    ":additional_data_payload",
+    "${chip_root}/src/crypto",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+}

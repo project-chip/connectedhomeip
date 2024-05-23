@@ -1,0 +1,75 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.4.6. [TC-SC-4.6]Commissioner Discovery [DUT as Commissioner]
+
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+    - MCORE.DD.COMM_DISCOVERY
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as commissioner test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Precondition"
+      verification: |
+          1. DUT is connected to the IP network or supports SoftAP
+          2. DUT and TH support Commissioner Discovery
+      disabled: true
+
+    - label:
+          "Step 1: DUT is instructed to start advertising its presence as a
+          commissioner in the network"
+      verification: |
+          To verify this test case use TV Reference app
+      disabled: true
+
+    - label: "Step 2: Check DNS-SD subtypes used by DUT"
+      PICS:
+          MCORE.SC.DEVTYPE_SUBTYPE && MCORE.SC.VP_KEY && MCORE.SC.DT_KEY &&
+          MCORE.SC.DN_KEY
+      verification: |
+          Execute the following command on the TH and verify the AAA records:
+
+          ubuntu@ubuntu:~$
+          avahi-browse -rt _matterd._udp
+
+          ++   eth0 IPv6 8BA9B3B40B98E9BB                              _matterd._udp        local
+          =   eth0 IPv6 8BA9B3B40B98E9BB                              _matterd._udp        local
+          hostname = [E45F0149AE290000.local]
+          address = [fe80::e65f:1ff:fe49:ae29]
+          port = [5650]
+          txt = ["T=1" "SAI=300" "SII=5000" "DN=Test TV" "DT=35" "VP=65521+32769"]
+
+
+
+
+
+
+
+          to look for subtypes, on the raspi run $ avahi-browse -p _services._dns-sd._udp | grep _matterd
+
+          +;eth0;IPv6;_CM;_sub._matterd._udp;local
+          +;eth0;IPv6;_L3840;_sub._matterd._udp;local
+          +;eth0;IPv6;_S0;_sub._matterd._udp;local
+          +;eth0;IPv6;_V9050;_sub._matterd._udp;local
+      disabled: true

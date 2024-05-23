@@ -1,0 +1,139 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    3.13.2. [TC-MC-11.2] Casting Video Player via UX Screen with PIN
+    Verification (DUT as Server)
+
+PICS:
+    - MC.S.M.UDC
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "Step 1: TH start scanning for available commissioners using
+          Commissioner Discovery"
+      verification: |
+          ./chip-tv-casting-app
+
+          The shell should show a discovered commissioner, similar to the following:
+
+          [1653089767279] [88361:1149415] CHIP: [SVR] Discovered Commissioner #0
+          [1653089767279] [88361:1149415] CHIP: [DIS]         Hostname: 147dda9ac00a
+          [1653089767279] [88361:1149415] CHIP: [DIS]         IP Address #1: 169.254.81.148
+          [1653089767279] [88361:1149415] CHIP: [DIS]         Port: 5650
+          [1653089767279] [88361:1149415] CHIP: [DIS]         Mrp Interval idle: 5000 ms
+          [1653089767279] [88361:1149415] CHIP: [DIS]         Mrp Interval active: 2000 ms
+          [1653089767279] [88361:1149415] CHIP: [DIS]         Device Name: Test TV
+          [1653089767279] [88361:1149415] CHIP: [DIS]         Vendor ID: 65521
+          [1653089767279] [88361:1149415] CHIP: [DIS]         Product ID: 32769
+          [1653089767279] [88361:1149415] CHIP: [DIS]         Device Type: 35
+          [1653089767279] [88361:1149415] CHIP: [DIS]         Instance Name: 3DC86F5236D636CB
+          [1653089767279] [88361:1149415] CHIP: [DIS]         Commissioning Mode: 0
+          [1653089767279] [88361:1149415] CHIP: [SVR] 1 commissioner(s) discovered. Select one (by number# above) to request commissioning from:
+          [1653089767279] [88361:1149415] CHIP: [SVR] Example: cast request 0
+      disabled: true
+
+    - label:
+          "Step 2: TH is instructed to select the commissioner found in step 1"
+      verification: |
+          Into the shell, enter "cast request 0" to send a user-directed-commissioning request to the DUT
+
+          > cast request 0
+          [1653179218011] [47890:1899175] CHIP: [DL] request
+          [1653179218011] [47890:1899175] CHIP: [SVR]   ------- PrepareForCommissioning
+          [1653179218011] [47890:1899175] CHIP: [SVR] Server initializing...
+      disabled: true
+
+    - label:
+          "Step 3: TH provides 11/21 digit manual pairing code or setup
+          passcode."
+      verification: |
+          The TH should display the setup passcode in the shell output (20202021 is the passcode below):
+
+          [1653179750840] [48426:1909867] CHIP: [DL] Device Configuration:
+          [1653179750840] [48426:1909867] CHIP: [DL]   Serial Number: TEST_SN
+          [1653179750840] [48426:1909867] CHIP: [DL]   Vendor Id: 65521 (0xFFF1)
+          [1653179750841] [48426:1909867] CHIP: [DL]   Product Id: 32769 (0x8001)
+          [1653179750841] [48426:1909867] CHIP: [DL]   Hardware Version: 0
+          [1653179750841] [48426:1909867] CHIP: [DL]   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
+          [1653179750841] [48426:1909867] CHIP: [DL]   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 0 (0x0)
+          [1653179750841] [48426:1909867] CHIP: [DL]   Manufacturing Date: (not set)
+          [1653179750841] [48426:1909867] CHIP: [DL]   Device Type: 35 (0x23)
+          Done
+      disabled: true
+
+    - label:
+          "Step 4: DUT Prompts user to enter the pairing code (provided by TH in
+          previous step)."
+      verification: |
+          Into the DUT UX, accept request for commissioning. Manufacturer may utilize a custom method for obtaining user consent other than an on-screen prompt.
+
+          The following is the tv-app shell command to accept the request
+
+          > controller ux ok 20202021
+
+          The commissioning success completion is indicated in the TH with the following shell output:
+
+          [1653088463910] [86837:1122544] CHIP: [SVR] Commissioning completed successfully
+      disabled: true
+
+    - label: "Step 5: TH reads the endpoints from the DUT"
+      verification: |
+          Into the shell, enter "cast cluster descriptor read device-list 0 1" to read the device list of the descriptor cluster on endpoint 1
+
+          > cast cluster descriptor read device-type-list   0 1
+          ....
+          [1653180010083] [48426:1914389] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 2009082322
+          [1653180010083] [48426:1914389] CHIP: [TOO]   device list: 1 entries
+          [1653180010083] [48426:1914389] CHIP: [TOO]     [1]: {
+          [1653180010083] [48426:1914389] CHIP: [TOO]       Type: 35
+          [1653180010083] [48426:1914389] CHIP: [TOO]       Revision: 1
+          [1653180010083] [48426:1914389] CHIP: [TOO]      }
+      disabled: true
+
+    - label: "Step 6: TH reads the endpoints from the DUT"
+      verification: |
+          Into the shell, enter "cast cluster descriptor read device-list 0 2" to read the device list of the descriptor cluster on endpoint 2
+
+          > cast cluster descriptor read device-type-list 0 2
+          ....
+          [1653180162379] [48426:1917385] CHIP: [TOO] Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 631462374
+          [1653180162379] [48426:1917385] CHIP: [TOO]   device list: 1 entries
+          [1653180162379] [48426:1917385] CHIP: [TOO]     [1]: {
+          [1653180162379] [48426:1917385] CHIP: [TOO]       Type: 34
+          [1653180162379] [48426:1917385] CHIP: [TOO]       Revision: 1
+          [1653180162379] [48426:1917385] CHIP: [TOO]      }
+      disabled: true
+
+    - label: "Step 7: TH reads the endpoints from the DUT"
+      verification: |
+          Into the shell, enter "cast cluster descriptor read device-list 0 4" to read the device list of the descriptor cluster on endpoint 4
+          Descriptor cluster is supporting  endpoint 1 and 2 in RPI platform hence if TH  tried to read the device list of the descriptor cluster on endpoint 4  from the DUT, DUT should send the response as UNSUPPORTED_ENDPOINT,
+
+          It may vary based the DUT
+          > cast cluster descriptor read device-type-list 0 4
+          ....
+          [1653180214397] [48426:1919098] CHIP: [TOO] Endpoint: 6 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 4094146641
+          [1653180214397] [48426:1919098] CHIP: [TOO]   device list: 1 entries
+          [1653180214397] [48426:1919098] CHIP: [TOO]     [1]: {
+          [1653180214397] [48426:1919098] CHIP: [TOO]       Type: 36
+          [1653180214397] [48426:1919098] CHIP: [TOO]       Revision: 1
+          [1653180214397] [48426:1919098] CHIP: [TOO]      }
+      disabled: true

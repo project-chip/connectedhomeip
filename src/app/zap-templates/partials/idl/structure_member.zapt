@@ -1,0 +1,16 @@
+{{~#if isOptional~}} optional {{/if~}}
+{{~#if isNullable~}} nullable {{/if~}}
+{{~#if isFabricSensitive~}} fabric_sensitive {{/if~}}
+
+{{type}} 
+  {{~#unless isArray~}} 
+    {{~#if (isString type)~}}
+      {{~#if maxLength~}} 
+        <{{maxLength}}> 
+      {{~/if~}}
+    {{~/if}} 
+  {{~/unless}} {{asLowerCamelCase label~}}
+
+{{~#if isArray~}}
+  []
+{{~/if}} = {{fieldIdentifier}};

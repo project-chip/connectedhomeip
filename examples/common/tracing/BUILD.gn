@@ -1,0 +1,132 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("${build_root}/config/compiler/compiler.gni")
+import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/src/lib/lib.gni")
+
+declare_args() {
+  matter_commandline_enable_perfetto_tracing = current_os == "linux"
+}
+
+config("default_config") {
+  include_dirs = [ "." ]
+}
+
+buildconfig_header("tracing_features") {
+  header = "enabled_features.h"
+  header_dir = "tracing"
+
+  defines = [
+    "ENABLE_PERFETTO_TRACING=${matter_commandline_enable_perfetto_tracing}",
+  ]
+}
+
+source_set("commandline") {
+  sources = [
+    "TracingCommandLineArgument.cpp",
+    "TracingCommandLineArgument.h",
+  ]
+
+  deps = [
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/tracing",
+    "${chip_root}/src/tracing/json",
+  ]
+
+  public_deps = [ ":tracing_features" ]
+
+  public_configs = [ ":default_config" ]
+
+  if (matter_commandline_enable_perfetto_tracing) {
+    public_deps += [
+      "${chip_root}/src/tracing/perfetto",
+      "${chip_root}/src/tracing/perfetto:file_output",
+    ]
+
+    deps += [
+      "${chip_root}/src/tracing/perfetto:event_storage",
+      "${chip_root}/src/tracing/perfetto:simple_initialization",
+    ]
+  }
+
+  cflags = [ "-Wconversion" ]
+}
+
+source_set("trace_handlers") {
+  sources = [ "TraceHandlers.cpp" ]
+
+  deps = [ "${chip_root}/src/lib" ]
+
+  public_configs = [ ":default_config" ]
+
+  cflags = [ "-Wconversion" ]
+}
+
+source_set("trace_handlers_decoder") {
+  sources = [
+    "TraceDecoder.cpp",
+    "TraceHandlers.cpp",
+    "decoder/TraceDecoderProtocols.cpp",
+    "decoder/bdx/Decoder.cpp",
+    "decoder/echo/Decoder.cpp",
+    "decoder/interaction_model/Decoder.cpp",
+    "decoder/interaction_model/DecoderCustomLog.cpp",
+    "decoder/logging/Log.cpp",
+    "decoder/logging/ToCertificateString.cpp",
+    "decoder/secure_channel/Decoder.cpp",
+    "decoder/udc/Decoder.cpp",
+  ]
+
+  public_configs = [ ":default_config" ]
+
+  deps = [
+    "${chip_root}/src/lib",
+    "${chip_root}/src/lib/core:types",
+  ]
+  public_deps = [ "${chip_root}/third_party/jsoncpp" ]
+
+  cflags = [ "-Wconversion" ]
+}
+
+executable("chip-trace-decoder") {
+  sources = [
+    "TraceDecoder.cpp",
+    "TraceDecoderArgumentParser.cpp",
+    "decoder/TraceDecoderProtocols.cpp",
+    "decoder/bdx/Decoder.cpp",
+    "decoder/echo/Decoder.cpp",
+    "decoder/interaction_model/Decoder.cpp",
+    "decoder/interaction_model/DecoderCustomLog.cpp",
+    "decoder/logging/Log.cpp",
+    "decoder/logging/ToCertificateString.cpp",
+    "decoder/secure_channel/Decoder.cpp",
+    "decoder/udc/Decoder.cpp",
+    "main.cpp",
+  ]
+
+  output_dir = root_out_dir
+
+  deps = [ "${chip_root}/src/platform/logging:force_stdio" ]
+
+  public_deps = [
+    "${chip_root}/src/lib",
+    "${chip_root}/src/lib/core:types",
+    "${chip_root}/third_party/jsoncpp",
+  ]
+
+  cflags = [ "-Wconversion" ]
+}

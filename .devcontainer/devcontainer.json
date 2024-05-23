@@ -1,0 +1,61 @@
+{
+    "name": "CHIP Ubuntu Development Environment",
+    "runArgs": [
+        "--cap-add=SYS_PTRACE",
+        "--security-opt",
+        "seccomp=unconfined",
+        "--network=host",
+        "--privileged",
+        "-v",
+        "/dev/bus/usb:/dev/bus/usb:ro",
+        "--device-cgroup-rule=a 189:* rmw",
+        "--add-host=host.docker.internal:host-gateway"
+    ],
+    "mounts": [
+        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+    ],
+    "initializeCommand": "bash .devcontainer/build.sh --tag matter-dev-environment:local --version 22",
+    "image": "matter-dev-environment:local",
+    "remoteUser": "vscode",
+    "customizations": {
+        "vscode": {
+            // Add the IDs of extensions you want installed when the container is created in the array below.
+            "extensions": [
+                "mcu-debug.debug-tracker-vscode",
+                "aaron-bond.better-comments",
+                "augustocdias.tasks-shell-input",
+                "christian-kohler.path-intellisense",
+                "eamodio.gitlens",
+                "editorconfig.editorconfig",
+                "esbenp.prettier-vscode",
+                "foxundermoon.shell-format",
+                "github.vscode-pull-request-github",
+                "maelvalais.autoconf",
+                "marus25.cortex-debug",
+                "ms-azuretools.vscode-docker",
+                "ms-vscode.cpptools",
+                "msedge-dev.gnls",
+                "redhat.vscode-yaml",
+                "vadimcn.vscode-lldb",
+                "xaver.clang-format",
+                "yuichinukiyama.vscode-preview-server",
+                "yzhang.markdown-all-in-one"
+            ],
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "terminal.integrated.profiles.linux": {
+                    "bash": {
+                        "path": "/bin/bash",
+                        "args": ["-l"]
+                    }
+                }
+            }
+        }
+    },
+    "remoteEnv": {
+        "GIT_PS1_SHOWDIRTYSTATE": "1",
+        "GIT_PS1_SHOWSTASHSTATE": "1",
+        "GIT_PS1_SHOWCOLORHINTS": "true",
+        "PROMPT_COMMAND": "${localEnv:PROMPT_COMMAND}"
+    }
+}

@@ -1,0 +1,52 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/nxp_sdk.gni")
+
+config("support_config") {
+  include_dirs = [ "../../../../.." ]
+
+  # Link options that provides replace dynamic memory operations in standard
+  # library with the FreeRTOS malloc in platform code.
+  ldflags = [
+    # memory allocation -- these must be re-entrant and do locking
+    "-Wl,--wrap=malloc",
+    "-Wl,--wrap=free",
+    "-Wl,--wrap=realloc",
+    "-Wl,--wrap=calloc",
+    "-Wl,--wrap=MemoryAlloc",
+
+    # Wrap these in case internal newlib call them (e.g. strdup will)
+    # directly call _malloc_r)
+    "-Wl,--wrap=_malloc_r",
+    "-Wl,--wrap=_realloc_r",
+    "-Wl,--wrap=_free_r",
+    "-Wl,--wrap=_calloc_r",
+  ]
+}
+
+source_set("freertos_mbedtls_utils") {
+  sources = [
+    "FreeRtosHooks.c",
+    "FreeRtosHooks.h",
+    "Memconfig.cpp",
+  ]
+
+  deps = [ "${chip_root}/src/lib/support" ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_configs = [ ":support_config" ]
+}

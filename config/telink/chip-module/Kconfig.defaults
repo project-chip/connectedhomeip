@@ -1,0 +1,428 @@
+#
+#   Copyright (c) 2023-2024 Project CHIP Authors
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+
+# The purpose of this file is to define new default values of settings used when building Matter samples.
+# This file only changes defaults and thus all symbols here must be promptless
+# and safeguarded so that they only are applied when building Matter.
+
+if CHIP
+
+config CHIP_PROJECT_CONFIG
+    string "Project configuration file for Matter"
+    default "include/CHIPProjectConfig.h"
+
+config LOG
+    default y
+
+if LOG
+
+choice LOG_MODE
+    default LOG_MODE_MINIMAL
+endchoice
+
+choice MATTER_LOG_LEVEL_CHOICE
+    default MATTER_LOG_LEVEL_INF
+endchoice
+
+config CHIP_APP_LOG_LEVEL
+    default 3 # info
+
+config LOG_DEFAULT_LEVEL
+    default 1 # error
+
+config CHIP_LOG_SIZE_OPTIMIZATION
+    default y
+
+endif
+
+config SHELL
+    default y if CHIP_LIB_SHELL
+
+config PTHREAD_IPC
+    bool
+    default n
+
+config POSIX_MAX_FDS
+    int
+    default 16
+
+# Application stack size
+config MAIN_STACK_SIZE
+    default 3240 if PM
+    default 4096
+
+config INIT_STACKS
+    default y
+
+config IDLE_STACK_SIZE
+    default 512 if PM
+
+config ISR_STACK_SIZE
+    default 502 if PM
+
+config SYSTEM_WORKQUEUE_STACK_SIZE
+    default 616 if PM
+
+config HEAP_MEM_POOL_SIZE
+    default 256
+
+config COMMON_LIBC_MALLOC_ARENA_SIZE 
+    default 12288
+
+config NET_IPV6_MLD
+    default n
+
+# Network buffers
+config NET_PKT_RX_COUNT
+    default 4 if PM
+    default 8
+
+config NET_PKT_TX_COUNT
+    default 4 if PM
+    default 8
+
+config NET_BUF_RX_COUNT
+    default 16 if PM
+    default 32
+
+config NET_BUF_TX_COUNT
+    default 16 if PM
+    default 32
+
+config GPIO
+    default y
+
+# Bluetooth Low Energy configs
+
+config BT
+    default n if BOARD_TLSR9118BDK40D
+    default y
+
+if BT
+
+config BT_PERIPHERAL
+    default y
+
+config BT_GATT_DYNAMIC_DB
+    default y
+
+config BT_DEVICE_NAME_DYNAMIC
+    default y
+
+config BT_DEVICE_NAME_MAX
+    default 15
+
+config BT_MAX_CONN
+    default 1
+
+config BT_L2CAP_TX_MTU
+    default 247
+
+config BT_BUF_ACL_RX_SIZE
+    default 251
+
+config BT_BUF_ACL_TX_SIZE
+    default 251
+
+config BT_RX_STACK_SIZE
+    default 810
+
+config BT_HCI_TX_STACK_SIZE
+    default 640
+
+config BT_DEVICE_NAME_GATT_WRITABLE
+    bool
+    default n
+
+config B9X_BLE_CTRL_THREAD_STACK_SIZE
+    default 576
+
+config B9X_BLE_CTRL_MASTER_MAX_NUM
+    default 0
+
+config B9X_BLE_CTRL_SLAVE_MAX_NUM
+    default 1
+
+config B9X_BLE_CTRL_RF_POWER
+    default 3 if PM 
+    default 9
+
+choice B9X_BLE_CTRL_MAC_TYPE
+    default B9X_BLE_CTRL_MAC_TYPE_RANDOM_STATIC
+endchoice
+
+endif
+
+# Board retention config
+if BOARD_TLSR9528A_RETENTION || BOARD_TLSR9258A_RETENTION || BOARD_TLSR9518ADK80D_RETENTION
+config SOC_SERIES_RISCV_TELINK_B9X_NON_RETENTION_RAM_CODE
+    default y if PM
+
+config TELINK_B9X_MATTER_RETENTION_LAYOUT
+    default y if PM
+
+config PWM
+    default n
+endif
+
+# Board non-retention config
+if BOARD_TLSR9118BDK40D || BOARD_TLSR9528A || BOARD_TLSR9258A || BOARD_TLSR9518ADK80D
+config PWM
+    default y
+endif
+
+# Config dynamic interrupts to have posibility to switch between BLE/Thread radio drivers
+config DYNAMIC_INTERRUPTS
+    default y
+
+config CHIP_OTA_REQUESTOR
+    default y
+
+# In current config/zephyr/Kconfig
+# next deprecated values are selected
+# warning: Deprecated symbol CPLUSPLUS is enabled.
+# warning: Deprecated symbol LIB_CPLUSPLUS is enabled.
+# new one are:
+# CONFIG_CPP
+# CONFIG_LIBCPP_IMPLEMENTATION
+# See https://docs.zephyrproject.org/latest/releases/release-notes-3.3.html
+# Since not only Telink is using Zephyr just suppress warnings
+config WARN_DEPRECATED
+    default n
+
+# Reboot system when fault happened
+config TELINK_SOC_REBOOT_ON_FAULT
+    default y
+
+config NVS_LOOKUP_CACHE
+    default y
+
+config NVS_LOOKUP_CACHE_SIZE
+    default 2048 if !PM
+
+# Set multiplicator of Name Value Storage (NVS) as 1 to reach NVS sector size 4KB
+# nvs_sector_size = flash_page_size * mult = 4KB * 1 = 4KB
+config SETTINGS_NVS_SECTOR_SIZE_MULT
+    default 1
+
+# Set sector counter of NVS
+config SETTINGS_NVS_SECTOR_COUNT
+    default 12
+
+# Enable OpenThread
+
+config NET_L2_OPENTHREAD
+    default y if !WIFI
+
+if NET_L2_OPENTHREAD
+
+config CHIP_OPENTHREAD_CONFIG
+    string "Custom OpenThread configuration file"
+    default "../../platform/telink/project_include/OpenThreadConfig.h"
+
+choice CHIP_THREAD_DEVICE_ROLE
+    prompt "Thread network device role"
+    default CHIP_THREAD_DEVICE_ROLE_ROUTER
+config CHIP_THREAD_DEVICE_ROLE_ROUTER
+	depends on !PM
+	bool "thread device router"
+config CHIP_THREAD_DEVICE_ROLE_END_DEVICE
+	depends on !PM
+	bool "thread end device"
+config CHIP_THREAD_DEVICE_ROLE_SLEEPY_END_DEVICE
+	bool "thread sleepy end device"
+endchoice
+
+choice OPENTHREAD_DEVICE_TYPE
+	default OPENTHREAD_FTD if CHIP_THREAD_DEVICE_ROLE_ROUTER
+	default OPENTHREAD_MTD if CHIP_THREAD_DEVICE_ROLE_END_DEVICE || CHIP_THREAD_DEVICE_ROLE_SLEEPY_END_DEVICE
+endchoice
+
+config CHIP_ENABLE_ICD_SUPPORT
+	default y if CHIP_THREAD_DEVICE_ROLE_SLEEPY_END_DEVICE
+
+config OPENTHREAD_THREAD_STACK_SIZE
+    default 2178 if PM
+
+config OPENTHREAD_RADIO_WORKQUEUE_STACK_SIZE
+    default 361 if PM
+    default 608
+
+config OPENTHREAD_SLAAC
+    default y
+
+config OPENTHREAD_MANUAL_START
+    default y
+
+config OPENTHREAD_DEFAULT_TX_POWER
+    default 3 if PM
+    default 9
+
+endif # NET_L2_OPENTHREAD
+
+config NET_TX_STACK_SIZE
+    default 554 if PM
+
+config NET_RX_STACK_SIZE
+    default 554 if PM
+
+# Disable certain parts of Zephyr IPv6 stack
+config NET_IPV6_NBR_CACHE
+    bool
+    default n
+
+config NET_MAX_CONN
+    default 1
+
+config NET_MAX_CONTEXTS
+    default 1
+
+config NET_CONFIG_INIT_TIMEOUT
+    default 0
+
+
+config CHIP_WIFI
+	bool "Enable Telink Wi-Fi support"
+	default y if BOARD_TLSR9118BDK40D
+	select WIFI_W91
+	select WIFI
+	select NET_STATISTICS
+	select NET_L2_ETHERNET
+	select NET_IPV6_ND # enable Neighbor Discovery to handle Router Advertisements
+	select NET_IPV6_NBR_CACHE
+	select NET_STATISTICS_USER_API
+
+if CHIP_WIFI
+
+config CHIP_WIFI_CONNECTION_RECOVERY_MINIMUM_INTERVAL
+	int "Define the minimum connection recovery time interval in milliseconds"
+	depends on CHIP_WIFI
+	default 500
+	help
+	  Specifies the minimum connection recovery interval (in milliseconds).
+
+config CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL
+	int "Define the maximum connection recovery time interval in milliseconds"
+	depends on CHIP_WIFI
+	default 3600000 # 1 hour
+	help
+	  Specifies the maximum connection recovery interval (in milliseconds).
+
+config CHIP_WIFI_CONNECTION_RECOVERY_MAX_RETRIES_NUMBER
+	int "Define the maximum amount of connection recovery occurrences"
+	depends on CHIP_WIFI
+	default 0
+	help
+	  Specifies the maximum number of connection recovery attempts.
+	  If set to 0, no limitation is applied and attempts
+	  to recover the connection are performed indefinitely.
+
+config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
+	int "Define the connection recovery jitter in milliseconds"
+	depends on CHIP_WIFI
+	default 2000
+	help
+	  Specifies the maximum connection recovery jitter interval (in milliseconds).
+	  Once the wait time reaches the current maximum value (defined by CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL),
+	  a random jitter interval is added to it to avoid periodicity. The random jitter is selected
+	  within range [-JITTER; +JITTER].
+
+endif # CHIP_WIFI
+
+config CHIP_ENABLE_PAIRING_AUTOSTART
+    bool "Open commissioning window on boot"
+    default y
+    help
+        Opens the commissioning window automatically at application boot time if
+        the node is not yet commissioned.
+
+# Configure MBEDTLS lib
+config MBEDTLS
+	default y
+
+config MBEDTLS_USER_CONFIG_ENABLE
+    default y
+
+config MBEDTLS_USER_CONFIG_FILE
+    default "telink-mbedtls-config.h"
+
+config MBEDTLS_CIPHER_CCM_ENABLED
+	default y
+
+config MBEDTLS_PK_WRITE_C
+    default y
+
+config MBEDTLS_ECP_C
+	default y
+
+config MBEDTLS_ECP_DP_SECP256R1_ENABLED
+	default y
+
+config MBEDTLS_ECDH_C
+	default y
+
+config MBEDTLS_ECDSA_C
+	default y
+
+# getopt version
+config GETOPT_LONG
+    default y
+
+# Disable not used shell modules
+
+config SHELL_WILDCARD
+    default n
+
+config SHELL_VT100_COLORS
+    default n
+
+config SHELL_STATS
+    default n
+
+config KERNEL_SHELL
+    default n
+
+config SENSOR_SHELL
+    default n
+
+config DEVICE_SHELL
+    default n
+
+config DATE_SHELL
+    default n
+
+config DEVMEM_SHELL
+    default n
+
+config MCUBOOT_SHELL
+    default n
+
+config FLASH_SHELL
+    default n
+
+config HWINFO_SHELL
+    default n
+
+config PWM_SHELL
+    default n
+
+config OPENTHREAD_SHELL
+    default n
+
+config CHIP_TASK_STACK_SIZE
+	default 4864 if PM
+
+endif

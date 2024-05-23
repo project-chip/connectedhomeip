@@ -1,0 +1,191 @@
+{
+    "C_Cpp.intelliSenseEngineFallback": "Enabled",
+    "C_Cpp.default.includePath": [
+        "${workspaceFolder}/build/default/src/",
+        "${workspaceFolder}/build/default/src/**",
+        "${workspaceFolder}/build/default/src/include/**",
+        "${workspaceFolder}/build/default/src/lib/**",
+        "${workspaceFolder}/config/standalone/",
+        "${workspaceFolder}/config/standalone/**",
+        "${workspaceFolder}/examples/**",
+        "${workspaceFolder}/src/**",
+        "${workspaceFolder}/src/include/",
+        "${workspaceFolder}/src/include/**",
+        "${workspaceFolder}/src/lib/**",
+        "${workspaceFolder}/src/system/**",
+        "${workspaceFolder}/third_party/nlassert/repo/include/**",
+        "${workspaceFolder}/third_party/nlio/repo/include/**",
+        "${workspaceFolder}/darwin/Framework/CHIP/**",
+        "${workspaceFolder}/src/messaging/**",
+        "${workspaceFolder}/src/protocols/**",
+        "${workspaceFolder}/src/tracing/**",
+        "${workspaceFolder}/src/transport/**",
+        "${workspaceFolder}/src/inet/**",
+        "${workspaceFolder}/src/credentials/**",
+        "${workspaceFolder}/src/data_model/**",
+        "${workspaceFolder}/src/app/**",
+        "${workspaceFolder}/src/crytpo/**",
+        "${workspaceFolder}/src/platform/**"
+    ],
+    "[cpp]": {
+        "editor.defaultFormatter": "xaver.clang-format"
+    },
+    "[dockerfile]": {
+        "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+    },
+    "[jsonc]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[shellscript]": {
+        "editor.defaultFormatter": "foxundermoon.shell-format"
+    },
+    "[properties]": {
+        "editor.defaultFormatter": "foxundermoon.shell-format"
+    },
+    "[markdown]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "files.associations": {
+        "*.mm": "cpp",
+        "iostream": "cpp",
+        "array": "cpp",
+        "atomic": "cpp",
+        "*.tcc": "cpp",
+        "cctype": "cpp",
+        "clocale": "cpp",
+        "cmath": "cpp",
+        "cstdarg": "cpp",
+        "cstddef": "cpp",
+        "cstdint": "cpp",
+        "cstdio": "cpp",
+        "cstdlib": "cpp",
+        "cwchar": "cpp",
+        "cwctype": "cpp",
+        "deque": "cpp",
+        "unordered_map": "cpp",
+        "vector": "cpp",
+        "exception": "cpp",
+        "algorithm": "cpp",
+        "functional": "cpp",
+        "iterator": "cpp",
+        "memory": "cpp",
+        "memory_resource": "cpp",
+        "optional": "cpp",
+        "string": "cpp",
+        "string_view": "cpp",
+        "system_error": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp",
+        "fstream": "cpp",
+        "initializer_list": "cpp",
+        "iosfwd": "cpp",
+        "istream": "cpp",
+        "limits": "cpp",
+        "new": "cpp",
+        "ostream": "cpp",
+        "sstream": "cpp",
+        "stdexcept": "cpp",
+        "streambuf": "cpp",
+        "cinttypes": "cpp",
+        "typeinfo": "cpp",
+        "*.ipp": "cpp",
+        "aes.h": "c",
+        "stdio.h": "c",
+        "complex": "cpp",
+        "cstring": "cpp",
+        "ctime": "cpp",
+        "bitset": "cpp",
+        "iomanip": "cpp",
+        "hashtable": "cpp",
+        "__bit_reference": "cpp",
+        "__config": "cpp",
+        "__debug": "cpp",
+        "__errc": "cpp",
+        "__functional_base": "cpp",
+        "__hash_table": "cpp",
+        "__locale": "cpp",
+        "__mutex_base": "cpp",
+        "__node_handle": "cpp",
+        "__nullptr": "cpp",
+        "__split_buffer": "cpp",
+        "__string": "cpp",
+        "__threading_support": "cpp",
+        "__tree": "cpp",
+        "__tuple": "cpp",
+        "bit": "cpp",
+        "chrono": "cpp",
+        "ios": "cpp",
+        "locale": "cpp",
+        "map": "cpp",
+        "mutex": "cpp",
+        "queue": "cpp",
+        "ratio": "cpp",
+        "set": "cpp",
+        "stack": "cpp",
+        "regex": "cpp",
+        "condition_variable": "cpp",
+        "numeric": "cpp",
+        "random": "cpp",
+        "thread": "cpp",
+        "variant": "cpp",
+        "any": "cpp"
+    },
+    // Configure paths or glob patterns to exclude from file watching.
+    "files.watcherExclude": {
+        "**/.git/objects/**": true,
+        "**/.git/subtree-cache/**": true,
+        "out/": true,
+        "**/third_party/**": true
+    },
+    "files.eol": "\n",
+    "editor.formatOnSave": true,
+    "better-comments.tags": [
+        {
+            "tag": "!",
+            "color": "#FF2D00",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "?",
+            "color": "#3498DB",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "//",
+            "color": "#474747",
+            "strikethrough": true,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "todo",
+            "color": "#FF8C00",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "fixme",
+            "color": "#FF8C00",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        },
+        {
+            "tag": "*",
+            "color": "#98C379",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        }
+    ],
+    "clang-format.fallbackStyle": "WebKit",
+    "files.trimFinalNewlines": true,
+    "C_Cpp.default.cppStandard": "gnu++17",
+    "C_Cpp.default.cStandard": "gnu11",
+    "cmake.configureOnOpen": false,
+    "search.followSymlinks": false,
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.autopep8"
+    },
+    "python.formatting.provider": "none"
+}

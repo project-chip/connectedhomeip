@@ -1,0 +1,106 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 263.1.1. [TC-DISHM-1.1] Global attributes with DUT as Server
+
+PICS:
+    - DISHM.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      verification: |
+
+      disabled: true
+
+    - label: "Step 2: TH reads from the DUT the ClusterRevision attribute."
+      verification: |
+          ./chip-tool dishwashermode read cluster-revision 1 1
+
+          Verify the "ClusterRevision" value is of unit16 and reflects the highest revision number 2 on the TH(Chip-tool) and below is the sample log provided for the raspi platform:
+
+          CHIP:DMG : }
+          CHIP:TOO : Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_FFFD DataVersion: 2488070594
+          CHIP:TOO :   ClusterRevision: 2
+      disabled: true
+
+    - label: "Step 3: TH reads from the DUT the FeatureMap attribute."
+      verification: |
+          ./chip-tool dishwashermode read feature-map 1 1
+
+          On the TH(Chip-tool) Log, Verify featureMap value is 0 and below is the sample log provided for the raspi platform:
+
+          [1690365613.351850][27441:27443] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_FFFC DataVersion: 1130015440
+          [1690365613.351911][27441:27443] CHIP:TOO:   FeatureMap: 1
+      disabled: true
+
+    - label: "Step 4: TH reads from the DUT the AttributeList attribute."
+      verification: |
+          ./chip-tool dishwashermode read attribute-list 1 1
+
+          Verify the "AttributeList " should include the mandatory attributes (values 0, 1),
+          - Global attributes  (value 65533, 65532, 65531, 65529 and 65528) and
+          - List may include optional attribute(value 0x0002), if DISHM.S.A0002(StartUpMode) supports, on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
+
+          [1696402605.599359][7921:7923] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_FFFB DataVersion: 712950283
+          [1696402605.599377][7921:7923] CHIP:TOO:   AttributeList: 9 entries
+          [1696402605.599382][7921:7923] CHIP:TOO:     [1]: 0
+          [1696402605.599385][7921:7923] CHIP:TOO:     [2]: 1
+          [1696402605.599388][7921:7923] CHIP:TOO:     [3]: 2
+          [1696402605.599391][7921:7923] CHIP:TOO:     [4]: 3
+          [1696402605.599393][7921:7923] CHIP:TOO:     [5]: 65528
+          [1696402605.599396][7921:7923] CHIP:TOO:     [6]: 65529
+          [1696402605.599399][7921:7923] CHIP:TOO:     [7]: 65531
+          [1696402605.599402][7921:7923] CHIP:TOO:     [8]: 65532
+          [1696402605.599404][7921:7923] CHIP:TOO:     [9]: 65533
+      disabled: true
+
+    - label: "Step 5: TH reads from the DUT the EventList attribute."
+      verification: |
+          ./chip-tool dishwashermode read event-list 1 1
+
+          * Step 5 is currently not supported and SHALL be skipped.
+
+          [1696402636.316151][7926:7928] CHIP:DMG: }
+          [1696402636.316183][7926:7928] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      disabled: true
+
+    - label: "Step 6: TH reads from the DUT the AcceptedCommandList attribute."
+      verification: |
+          ./chip-tool dishwashermode read accepted-command-list 1 1
+
+          Verify the "AcceptedCommandList" contains a list of mandatory commands (value 0) on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
+
+          [1690365651.143190][27451:27453] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_FFF9 DataVersion: 1130015440
+          [1690365651.143256][27451:27453] CHIP:TOO:   AcceptedCommandList: 1 entries
+          [1690365651.143284][27451:27453] CHIP:TOO:     [1]: 0
+      disabled: true
+
+    - label: "Step 7: TH reads from the DUT the GeneratedCommandList attribute."
+      verification: |
+          ./chip-tool dishwashermode read generated-command-list 1 1
+
+          Verify " GeneratedCommandList" contains a list of mandatory commands (value 1)  on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
+
+          [1689997224.280302][360025:360027] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_FFF8 DataVersion: 1427220838
+          [1689997224.280330][360025:360027] CHIP:TOO:   GeneratedCommandList: 1 entries
+          [1689997224.280346][360025:360027] CHIP:TOO:     [1]: 1
+      disabled: true

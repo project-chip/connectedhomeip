@@ -1,0 +1,19 @@
+{{#if command.hasSpecificResponse}}
+{{#*inline "clusterName"}}
+{{~#if compatRemapNames~}}
+{{compatClusterNameRemapping command.parent.name}}
+{{~else~}}
+{{asUpperCamelCase command.parent.name preserveAcronyms=true}}
+{{~/if~}}
+{{/inline}}
+{{#*inline "responseName"}}
+{{~#if compatRemapNames~}}
+{{compatCommandNameRemapping command.parent.name command.responseName}}
+{{~else~}}
+{{asUpperCamelCase command.responseName preserveAcronyms=true}}
+{{~/if~}}
+{{/inline}}
+void (^)(MTR{{> clusterName}}Cluster{{> responseName}}Params * _Nullable data, NSError * _Nullable error)
+{{else}}
+MTRStatusCompletion
+{{/if}}

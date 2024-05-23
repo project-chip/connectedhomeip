@@ -1,0 +1,43 @@
+{{#*inline "data"}}
+{{#if isNullable}}{{asPropertyValue}}.Value().data(){{else}}{{asPropertyValue}}.data(){{/if}}
+{{/inline}}
+{{#*inline "size"}}
+{{#if isNullable}}{{asPropertyValue}}.Value().size(){{else}}{{asPropertyValue}}.size(){{/if}}
+{{/inline}}
+{{#*inline "saveAsTarget"~}}
+{{saveAs}}{{#if isOptional}}.Emplace(){{/if}}
+{{~/inline}}
+{{#if saveAs}}
+    {{#if (isString type)}}
+        {{#if isOptional}}
+        if ({{asPropertyValue dontUnwrapValue=true}}.HasValue()) {
+        {{/if}}
+        {{#if isNullable}}
+            if ({{asPropertyValue}}.IsNull()){
+                {{> saveAsTarget}}.SetNull();
+            }
+            else {
+        {{/if}}
+        if ({{saveAs}}Buffer != nullptr)
+        {
+            chip::Platform::MemoryFree({{saveAs}}Buffer);
+        }
+        {{saveAs}}Buffer = static_cast<{{#if (isOctetString type)}}uint8_t{{else}}char{{/if}} *>(chip::Platform::MemoryAlloc({{>size}}));
+        memcpy({{saveAs}}Buffer, {{>data}}, {{>size}});
+        {{#if isNullable}}
+            {{> saveAsTarget}}.SetNonNull({{saveAs}}Buffer, {{>size}});
+            }
+        {{else}}
+            {{> saveAsTarget}} = {{chipType}}({{saveAs}}Buffer, {{>size}});
+        {{/if}}
+        {{#if isOptional}}
+        }
+        else
+        {
+            {{saveAs}} = NullOptional;
+        }
+        {{/if}}
+    {{else}}
+        {{saveAs}} = {{asPropertyValue dontUnwrapValue=true}};
+    {{/if}}
+{{/if}}

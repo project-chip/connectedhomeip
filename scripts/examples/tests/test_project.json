@@ -1,0 +1,307 @@
+{
+    "build_settings": {
+        "build_dir": "out/",
+        "default_toolchain": "//TEST_TOOLCHAIN",
+        "gen_input_files": ["//TEST.gn"],
+        "root_path": "//TEST_ROOT_PATH"
+    },
+    "targets": {
+        "//:base_targetname": {
+            "type": "unknown"
+        },
+        "//root:targetname": {
+            "type": "unknown"
+        },
+        "//root:toolchain_targetname(//test_toolchain/python_toolchain:python)": {
+            "type": "unknown"
+        },
+        "//:group_test": {
+            "type": "group",
+            "deps": ["//root:dep_action", "//root:dep_static_lib"],
+            "sources": [
+                "src_1.cxx",
+                "src_2.c",
+                "src_3.asm",
+                "src_4.h",
+                "src_5.hpp",
+                "src_6.others"
+            ],
+            "inputs": ["input_1.c"]
+        },
+        "//:executable_test": {
+            "asmflags": ["-march=armv8-a"],
+            "cflags": ["-march=armv8-a", "-O0"],
+            "cflags_c": ["-std=gnu11"],
+            "cflags_cc": ["-std=gnu++14", "-fno-rtti"],
+            "cflags_objc": ["-std=gnu11"],
+            "cflags_objcc": ["-std=gnu++14"],
+            "check_includes": true,
+            "configs": [
+                "//build/config/compiler:abi_default",
+                "//build/config/compiler:debug_default"
+            ],
+            "defines": ["CHIP_HAVE_CONFIG_H=1"],
+            "deps": ["//root:dep_action", "//root:dep_static_lib"],
+            "externs": {},
+            "include_dirs": ["//src/include/", "//src/"],
+            "ldflags": ["-march=armv8-a", "-O0"],
+            "libs": ["log"],
+            "metadata": {},
+            "output_dir": "//out/android_arm64/tests/",
+            "outputs": [
+                "//out/android_arm64/tests/TestStreamerStdio",
+                "//out/android_arm64/tests/TestStreamerStdio.map"
+            ],
+            "public": "*",
+            "public_configs": ["//src:includes", "//src/lib:includes"],
+            "source_outputs": {
+                "//src/lib/shell/tests/TestStreamerStdioDriver.cpp": [
+                    "obj/src/lib/shell/tests/TestStreamerStdio.TestStreamerStdioDriver.cpp.o"
+                ]
+            },
+            "sources": ["//src/lib/shell/tests/TestStreamerStdioDriver.cpp"],
+            "testonly": false,
+            "toolchain": "//build/toolchain/android:android_arm64",
+            "type": "executable",
+            "visibility": ["*"]
+        },
+        "//root:shared_library_test": {
+            "asmflags": ["-march=armv8-a"],
+            "cflags": ["-march=armv8-a", "-O0"],
+            "cflags_c": ["-std=gnu11"],
+            "cflags_cc": ["-std=gnu++14", "-fno-rtti"],
+            "cflags_objc": ["-std=gnu11"],
+            "cflags_objcc": ["-std=gnu++14"],
+            "check_includes": true,
+            "configs": [
+                "//build/config/compiler:abi_default",
+                "//build/config/compiler:debug_default"
+            ],
+            "defines": ["CHIP_HAVE_CONFIG_H=1"],
+            "deps": ["//root:dep_action", "//root:dep_static_lib"],
+            "externs": {},
+            "include_dirs": [
+                "//src/include/",
+                "//src/",
+                "//out/android_arm64/gen/include/",
+                "//src/lib/",
+                "//config/standalone/",
+                "//third_party/nlassert/repo/include/",
+                "//third_party/nlio/repo/include/",
+                "//third_party/nlfaultinjection/include/",
+                "//third_party/nlunit-test/repo/src/"
+            ],
+            "ldflags": ["-march=armv8-a", "-O0"],
+            "libs": ["log"],
+            "output_dir": "//out/android_arm64/tests/",
+            "outputs": [
+                "//out/android_arm64/tests/TestASN1.so",
+                "//out/android_arm64/tests/TestASN1.map"
+            ],
+            "public": "*",
+            "public_configs": ["//src:includes", "//src/lib:includes"],
+            "source_outputs": {
+                "//out/android_arm64/gen/TestASN1.driver.cpp": [
+                    "obj/out/android_arm64/gen/TestASN1.TestASN1.driver.cpp.o"
+                ]
+            },
+            "sources": ["//out/android_arm64/gen/TestASN1.driver.cpp"],
+            "testonly": false,
+            "toolchain": "//build/toolchain/android:android_arm64",
+            "type": "shared_library",
+            "visibility": ["*"]
+        },
+        "//root:static_library_test": {
+            "asmflags": ["-march=armv8-a"],
+            "cflags": ["-Wconversion", "-march=armv8-a"],
+            "cflags_c": ["-std=gnu11"],
+            "cflags_cc": ["-std=gnu++14", "-fno-rtti"],
+            "cflags_objc": ["-std=gnu11"],
+            "cflags_objcc": ["-std=gnu++14"],
+            "check_includes": true,
+            "configs": [
+                "//build/config/compiler:abi_default",
+                "//build/config/compiler:debug_default"
+            ],
+            "defines": ["CHIP_HAVE_CONFIG_H=1"],
+            "deps": ["//root:dep_action", "//root:dep_static_lib"],
+            "externs": {},
+            "include_dirs": ["//src/include/", "//src/"],
+            "ldflags": ["-march=armv8-a", "-O0"],
+            "libs": ["log"],
+            "metadata": {},
+            "output_dir": "//out/android_arm64/lib/",
+            "output_name": "libTestShell",
+            "outputs": ["//out/android_arm64/lib/libTestShell.a"],
+            "public": "*",
+            "public_configs": ["//src:includes", "//src/lib:includes"],
+            "source_outputs": {
+                "//src/lib/shell/tests/TestStreamerStdio.cpp": [
+                    "obj/src/lib/shell/tests/libTestShell.TestStreamerStdio.cpp.o"
+                ]
+            },
+            "sources": [
+                "//src/lib/shell/tests/TestStreamerStdio.cpp",
+                "//src/lib/shell/tests/TestStreamerStdio.h"
+            ],
+            "testonly": false,
+            "toolchain": "//build/toolchain/android:android_arm64",
+            "type": "static_library",
+            "visibility": ["*"]
+        },
+        "//root:source_set_test": {
+            "asmflags": ["-march=armv8-a"],
+            "cflags": ["-march=armv8-a", "-O0"],
+            "cflags_c": ["-std=gnu11"],
+            "cflags_cc": ["-std=gnu++14", "-fno-rtti"],
+            "cflags_objc": ["-std=gnu11"],
+            "cflags_objcc": ["-std=gnu++14"],
+            "check_includes": true,
+            "configs": [
+                "//build/config/compiler:abi_default",
+                "//build/config/compiler:debug_default"
+            ],
+            "defines": ["CHIP_HAVE_CONFIG_H=1"],
+            "deps": ["//root:dep_action", "//root:dep_static_lib"],
+            "externs": {},
+            "include_dirs": ["//src/include/", "//src/"],
+            "ldflags": ["-march=armv8-a", "-O0"],
+            "libs": ["log"],
+            "metadata": {},
+            "public": "*",
+            "public_configs": ["//src:includes", "//src/lib:includes"],
+            "source_outputs": {
+                "//src/lib/shell/Engine.cpp": [
+                    "obj/src/lib/shell/shell_core.Engine.cpp.o"
+                ],
+                "//src/lib/shell/streamer.cpp": [
+                    "obj/src/lib/shell/shell_core.streamer.cpp.o"
+                ]
+            },
+            "sources": [
+                "//src/lib/shell/Commands.h",
+                "//src/lib/shell/Engine.cpp"
+            ],
+            "testonly": false,
+            "toolchain": "//build/toolchain/android:android_arm64",
+            "type": "source_set",
+            "visibility": ["*"]
+        },
+        "//root:copy_test": {
+            "deps": [],
+            "metadata": {},
+            "outputs": [
+                "//out/android_arm64/lib/jni/arm64-v8a/libc++_shared.so"
+            ],
+            "public": "*",
+            "sources": [
+                "~/Library/Android/sdk/ndk/21.0.6113669/sources/cxx-stl/llvm-libc++/libs/arm64-v8a/libc++_shared.so"
+            ],
+            "testonly": false,
+            "toolchain": "//build/toolchain/android:android_arm64",
+            "type": "copy",
+            "visibility": ["*"]
+        },
+        "//root:action_test": {
+            "args": ["--gn-root", "../../"],
+            "deps": [],
+            "inputs": [
+                "//integrations/mobly/setup.py",
+                "//third_party/pigweed/repo/pw_build/py/pw_build/nop.py"
+            ],
+            "metadata": {},
+            "outputs": [
+                "//out/android_arm64/python/gen/integrations/mobly/chip_mobly.pw_pystamp"
+            ],
+            "public": "*",
+            "script": "//third_party/pigweed/repo/pw_build/py/pw_build/python_runner.py",
+            "testonly": false,
+            "toolchain": "//third_party/pigweed/repo/pw_build/python_toolchain:python",
+            "type": "action",
+            "visibility": ["*"]
+        },
+        "//root:action_foreach_test": {
+            "args": ["--gn-root", "../../"],
+            "deps": ["//root:dep_action", "//root:dep_static_lib"],
+            "metadata": {},
+            "output_patterns": [
+                "//out/android_arm64/python/gen/integrations/mobly/{{source_target_relative}}.pylint.passed"
+            ],
+            "outputs": [
+                "//out/android_arm64/python/gen/integrations/mobly/setup.py.pylint.passed"
+            ],
+            "public": "*",
+            "script": "//third_party/pigweed/repo/pw_build/py/pw_build/python_runner.py",
+            "source_outputs": {
+                "//integrations/mobly/setup.py": [
+                    "python/gen/integrations/mobly/setup.py.pylint.passed"
+                ]
+            },
+            "sources": ["//integrations/mobly/setup.py"],
+            "testonly": false,
+            "toolchain": "//third_party/pigweed/repo/pw_build/python_toolchain:python",
+            "type": "action_foreach",
+            "visibility": ["*"]
+        },
+        "//root:generated_file_test": {
+            "data_keys": ["protoc_includes"],
+            "deps": [],
+            "metadata": {
+                "protoc_includes": [
+                    "protocol_buffer/gen/third_party/pigweed/repo/pw_protobuf_compiler/test_protos.proto_library/sources"
+                ]
+            },
+            "output_conversion": "",
+            "outputs": [
+                "//out/android_arm64/protocol_buffer/gen/third_party/pigweed/repo/pw_protobuf_compiler/test_protos.proto_library/includes.txt"
+            ],
+            "public": "*",
+            "rebase": null,
+            "testonly": false,
+            "toolchain": "//third_party/pigweed/repo/pw_protobuf_compiler/toolchain:protocol_buffer",
+            "type": "generated_file",
+            "visibility": ["*"],
+            "walk_keys": [""]
+        },
+        "//root:dep_action": {
+            "args": ["--gn-root", "../../"],
+            "deps": [],
+            "inputs": [
+                "//integrations/mobly/setup.py",
+                "//third_party/pigweed/repo/pw_build/py/pw_build/nop.py"
+            ],
+            "metadata": {},
+            "outputs": [
+                "//out/android_arm64/python/gen/integrations/mobly/chip_mobly.pw_pystamp"
+            ],
+            "public": "*",
+            "script": "//third_party/pigweed/repo/pw_build/py/pw_build/python_runner.py",
+            "testonly": false,
+            "toolchain": "//third_party/pigweed/repo/pw_build/python_toolchain:python",
+            "type": "action",
+            "visibility": ["*"]
+        },
+        "//root:dep_static_lib": {
+            "defines": ["DEP_DEFINES=1"],
+            "include_dirs": ["//dep/include/", "//dep/"],
+            "ldflags": ["-deps"],
+            "libs": ["deplog"],
+            "metadata": {},
+            "output_dir": "//out/android_arm64/lib/",
+            "output_name": "libTestShell",
+            "outputs": ["//out/android_arm64/lib/libTestShell.a"],
+            "public": "*",
+            "public_configs": ["//src:includes", "//src/lib:includes"],
+            "source_outputs": {
+                "//src/lib/shell/tests/TestStreamerStdio.cpp": [
+                    "obj/src/lib/shell/tests/libTestShell.TestStreamerStdio.cpp.o"
+                ]
+            },
+            "sources": [
+                "//src/lib/shell/tests/TestStreamerStdio.cpp",
+                "//src/lib/shell/tests/TestStreamerStdio.h"
+            ],
+            "type": "static_library"
+        }
+    }
+}

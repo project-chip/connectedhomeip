@@ -1,0 +1,466 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Test Cluster Constraints Tests
+
+config:
+    nodeId: 0x12344321
+    cluster: "Unit Testing"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    # Tests for List of INT8U attribute
+    - label: "Write attribute LIST With List of INT8U"
+      command: "writeAttribute"
+      attribute: "list_int8u"
+      arguments:
+          value: [1, 2, 3, 4]
+
+    - label:
+          "Read attribute LIST With Partial List of INT8U that should be in it"
+      command: "readAttribute"
+      attribute: "list_int8u"
+      response:
+          constraints:
+              contains: [2, 3, 4]
+
+    - label:
+          "Read attribute LIST With Partial List of INT8U that should not be
+          included"
+      command: "readAttribute"
+      attribute: "list_int8u"
+      response:
+          constraints:
+              excludes: [0, 5]
+
+    - label: "Write attribute LIST Back to Default Value"
+      command: "writeAttribute"
+      attribute: "list_int8u"
+      arguments:
+          value: []
+
+    # Tests for Bitmap32 attribute
+
+    - label: "Read attribute BITMAP32 Default Value"
+      command: "readAttribute"
+      attribute: "bitmap32"
+      response:
+          value: 0
+
+    - label: "Write attribute BITMAP32 with MaskVal1 and MaskVal3"
+      command: "writeAttribute"
+      attribute: "bitmap32"
+      arguments:
+          value: 5 # MaskVal1 | MaskVal3
+
+    - label:
+          "Read attribute BITMAP32 with MaskVal1 and MaskVal3 and ensure
+          MaskVal2 is not set"
+      command: "readAttribute"
+      attribute: "bitmap32"
+      response:
+          value: 5 # MaskVal1 | MaskVal3
+          constraints:
+              hasMasksClear: [0x02] # [MaskVal2]
+
+    - label:
+          "Read attribute BITMAP32 with MaskVal1 and MaskVal3 and ensure
+          MaskVal1 is set"
+      command: "readAttribute"
+      attribute: "bitmap32"
+      response:
+          value: 5 # MaskVal1 | MaskVal3
+          constraints:
+              hasMasksSet: [0x01] # [MaskVal1]
+
+    - label:
+          "Read attribute BITMAP32 with MaskVal1 and MaskVal3 and ensure
+          MaskVal3 is set"
+      command: "readAttribute"
+      attribute: "bitmap32"
+      response:
+          value: 5 # MaskVal1 | MaskVal3
+          constraints:
+              hasMasksSet: [0x04] # [MaskVal3]
+
+    - label:
+          "Read attribute BITMAP32 with MaskVal1 and MaskVal3 and ensure
+          Maskval1 and MaskVal3 are set"
+      command: "readAttribute"
+      attribute: "bitmap32"
+      response:
+          value: 5 # MaskVal1 | MaskVal3
+          constraints:
+              hasMasksSet: [0x01, 0x04] # [MaskVal1, MaskVal3]
+
+    - label: "Write attribute BITMAP32 with MaskVal1"
+      command: "writeAttribute"
+      attribute: "bitmap32"
+      arguments:
+          value: 1 # MaskVal1
+
+    - label:
+          "Read attribute BITMAP32 with MaskVal1 and ensure Maskval1 or MaskVal3
+          are set"
+      command: "readAttribute"
+      attribute: "bitmap32"
+      response:
+          value: 1 # MaskVal1
+          constraints:
+              hasMasksSet: [0x05] # [MaskVal1, MaskVal3]
+
+    - label: "Write attribute BITMAP32 Back to Default Value"
+      command: "writeAttribute"
+      attribute: "bitmap32"
+      arguments:
+          value: 0
+
+    # Tests for INT32U attribute
+
+    - label: "Write attribute INT32U Value"
+      command: "writeAttribute"
+      attribute: "int32u"
+      arguments:
+          value: 5
+
+    - label: "Read attribute INT32U Value MinValue Constraints"
+      command: "readAttribute"
+      attribute: "int32u"
+      response:
+          constraints:
+              minValue: 5
+
+    - label: "Read attribute INT32U Value MaxValue Constraints"
+      command: "readAttribute"
+      attribute: "int32u"
+      response:
+          constraints:
+              maxValue: 5
+
+    - label: "Read attribute INT32U Value NotValue Constraints"
+      command: "readAttribute"
+      attribute: "int32u"
+      response:
+          constraints:
+              notValue: 6
+
+    - label: "Write attribute INT32U Value Back to Default Value"
+      command: "writeAttribute"
+      attribute: "int32u"
+      arguments:
+          value: 0
+
+    # Tests for CHAR_STRING attribute
+
+    - label: "Write attribute CHAR_STRING Value"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: "** Test **"
+
+    - label: "Read attribute CHAR_STRING Value MinLength Constraints"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          constraints:
+              minLength: 5
+
+    - label: "Read attribute CHAR_STRING Value MaxLength Constraints"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          constraints:
+              maxLength: 20
+
+    - label: "Read attribute CHAR_STRING Value StartsWith Constraints"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          constraints:
+              startsWith: "**"
+
+    - label: "Read attribute CHAR_STRING Value EndsWith Constraints"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          constraints:
+              endsWith: "**"
+
+    - label: "Write attribute CHAR_STRING Value"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: "lowercase"
+
+    - label:
+          "Read attribute CHAR_STRING Value isLowerCase/isUpperCase Constraints"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          constraints:
+              isLowerCase: true
+              isUpperCase: false
+
+    - label: "Write attribute CHAR_STRING Value"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: "UPPERCASE"
+
+    - label:
+          "Read attribute CHAR_STRING Value isLowerCase/isUpperCase Constraints"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          constraints:
+              isUpperCase: true
+              isLowerCase: false
+
+    - label: "Write attribute CHAR_STRING Value"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: "lowUPPER"
+
+    - label:
+          "Read attribute CHAR_STRING Value isLowerCase/isUpperCase Constraints"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          constraints:
+              isUpperCase: false
+              isLowerCase: false
+
+    - label: "Write attribute CHAR_STRING Value with only digits"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: "1234567890"
+
+    - label:
+          "Read attribute CHAR_STRING Value isLowerCase/isUpperCase Constraints"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          constraints:
+              isUpperCase: true
+              isLowerCase: true
+
+    - label: "Write attribute CHAR_STRING Value with only non-letters"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: "12.4,76:"
+
+    - label:
+          "Read attribute CHAR_STRING Value isLowerCase/isUpperCase Constraints"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          constraints:
+              isUpperCase: true
+              isLowerCase: true
+
+    - label:
+          "Write attribute CHAR_STRING Value with uppercase letters and symbols"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: "ABC;.* "
+
+    - label:
+          "Read attribute CHAR_STRING Value isLowerCase/isUpperCase Constraints"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          constraints:
+              isUpperCase: true
+              isLowerCase: false
+
+    - label:
+          "Write attribute CHAR_STRING Value with lowercase letters and symbols"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: "abc;.* "
+
+    - label:
+          "Read attribute CHAR_STRING Value isLowerCase/isUpperCase Constraints"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          constraints:
+              isUpperCase: false
+              isLowerCase: true
+
+    - label: "Write attribute CHAR_STRING Value which is empty"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: ""
+
+    - label:
+          "Read attribute CHAR_STRING Value isLowerCase/isUpperCase Constraints"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          constraints:
+              isUpperCase: true
+              isLowerCase: true
+
+    - label: "Write attribute CHAR_STRING Value"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: "ABCDEF012V"
+
+    - label: "Read attribute CHAR_STRING Value isHexString Constraints"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          constraints:
+              isHexString: false
+
+    - label: "Write attribute CHAR_STRING Value"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: "ABCDEF0123"
+
+    - label: "Read attribute CHAR_STRING Value isHexString Constraints"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          constraints:
+              isHexString: true
+
+    - label: "Write attribute CHAR_STRING Value Back to Default Value"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: ""
+
+    # Tests for NULLABLE_CHAR_STRING attribute
+
+    - label: "Write attribute NULLABLE_CHAR_STRING Value"
+      command: "writeAttribute"
+      attribute: "nullable_char_string"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_CHAR_STRING Value MinLength Constraints"
+      command: "readAttribute"
+      attribute: "nullable_char_string"
+      response:
+          constraints:
+              minLength: 5
+
+    - label: "Read attribute NULLABLE_CHAR_STRING Value MaxLength Constraints"
+      command: "readAttribute"
+      attribute: "nullable_char_string"
+      response:
+          constraints:
+              maxLength: 20
+
+    - label: "Write attribute NULLABLE_CHAR_STRING Value Back to Default Value"
+      command: "writeAttribute"
+      attribute: "nullable_char_string"
+      arguments:
+          value: ""
+
+    # Tests for hasValue attribute
+
+    - label: "Read attribute NULLABLE_INT8U Default Value"
+      command: "readAttribute"
+      attribute: "nullable_int8u"
+      response:
+          value: 0
+
+    - label: "Write attribute NULLABLE_INT8U with a value"
+      command: "writeAttribute"
+      attribute: "nullable_int8u"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_INT8U with a value"
+      command: "readAttribute"
+      attribute: "nullable_int8u"
+      response:
+          constraints:
+              hasValue: true
+
+    - label: "Write attribute NULLABLE_INT8U without a value"
+      command: "writeAttribute"
+      attribute: "nullable_int8u"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_INT8U with a value"
+      command: "readAttribute"
+      attribute: "nullable_int8u"
+      response:
+          constraints:
+              hasValue: false
+
+    - label: "Write attribute NULLABLE_INT8U back to Default Value"
+      command: "writeAttribute"
+      attribute: "nullable_int8u"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_OCTET_STRING Default Value"
+      command: "readAttribute"
+      attribute: "nullable_octet_string"
+      response:
+          value: ""
+
+    - label: "Write attribute NULLABLE_OCTET_STRING"
+      command: "writeAttribute"
+      attribute: "nullable_octet_string"
+      arguments:
+          value: "TestValue"
+
+    - label: "Read attribute NULLABLE_OCTET_STRING"
+      command: "readAttribute"
+      attribute: "nullable_octet_string"
+      response:
+          constraints:
+              hasValue: true
+
+    - label: "Write attribute NULLABLE_OCTET_STRING"
+      command: "writeAttribute"
+      attribute: "nullable_octet_string"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_OCTET_STRING"
+      command: "readAttribute"
+      attribute: "nullable_octet_string"
+      response:
+          constraints:
+              hasValue: false
+
+    - label: "Write attribute NULLABLE_OCTET_STRING back to Default Value"
+      command: "writeAttribute"
+      attribute: "nullable_octet_string"
+      arguments:
+          value: ""

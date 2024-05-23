@@ -1,0 +1,2656 @@
+<?xml version="1.0"?>
+
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+    <deviceType>
+        <name>MA-orphan</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Orphan Clusters</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0xFFF10001</deviceId>
+        <clusters lockOthers="true">
+            <include cluster="Proxy Configuration" client="false" server="true" clientLocked="true" serverLocked="true"/>
+            <include cluster="Proxy Discovery" client="false" server="true" clientLocked="true" serverLocked="true"/>
+            <include cluster="Proxy Valid" client="false" server="true" clientLocked="true" serverLocked="true"/>
+            <include cluster="Pulse Width Modulation" client="false" server="true" clientLocked="true" serverLocked="true"/>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-rootdevice</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Root Node</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0016</deviceId>
+        <class>Node</class>
+        <scope>Node</scope>
+        <clusters lockOthers="true">
+            <include cluster="Access Control" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>ACL</requireAttribute>
+                <requireAttribute>EXTENSION</requireAttribute>
+            </include>
+            <include cluster="Basic Information" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DATA_MODEL_REVISION</requireAttribute>
+                <requireAttribute>VENDOR_NAME</requireAttribute>
+                <requireAttribute>VENDOR_ID</requireAttribute>
+                <requireAttribute>PRODUCT_NAME</requireAttribute>
+                <requireAttribute>PRODUCT_ID</requireAttribute>
+                <requireAttribute>NODE_LABEL</requireAttribute>
+                <requireAttribute>LOCATION</requireAttribute>
+                <requireAttribute>HARDWARE_VERSION</requireAttribute>
+                <requireAttribute>HARDWARE_VERSION_STRING</requireAttribute>
+                <requireAttribute>SOFTWARE_VERSION</requireAttribute>
+                <requireAttribute>SOFTWARE_VERSION_STRING</requireAttribute>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="General Commissioning" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireCommand>SetRegulatoryConfig</requireCommand>
+            </include>
+            <include cluster="Power Source Configuration" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Time Synchronization" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Group Key Management" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Network Commissioning" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Administrator Commissioning" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Operational Credentials" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Localization Configuration" client="false" server="true" clientLocked="true" serverLocked="false">
+                <requireAttribute>ACTIVE_LOCALE</requireAttribute>
+                <requireAttribute>SUPPORTED_LOCALES</requireAttribute>
+            </include>
+            <include cluster="Time Format Localization" client="false" server="false" clientLocked="true" serverLocked="false">
+                <requireAttribute>HOUR_FORMAT</requireAttribute>
+            </include>
+            <include cluster="Unit Localization" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="General Diagnostics" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>UP_TIME</requireAttribute>
+            </include>
+            <include cluster="Diagnostic Logs" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Software Diagnostics" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Ethernet Network Diagnostics" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="WiFi Network Diagnostics" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Thread Network Diagnostics" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="ICD Management" client="false" server="false" clientLocked="true" serverLocked="false">
+                <features>
+                    <feature code="" name="LITS">
+                    <otherwiseConform>
+                        <provisionalConform/>
+                        <mandatoryConform>
+                        <feature name="LIT"/>
+                        </mandatoryConform>
+                    </otherwiseConform>
+                    </feature>
+                </features>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-powersource</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Power Source</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0011</deviceId>
+        <class>Utility</class>
+        <scope>Node</scope>
+        <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Power Source" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-electricalsensor</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Electrical Sensor</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0510</deviceId>
+        <class>Utility</class>
+        <scope>Node</scope>
+        <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Power Topology" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Electrical Energy Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Electrical Power Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-otarequestor</name>
+        <domain>CHIP</domain>
+        <typeName>Matter OTA Requestor</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0012</deviceId>
+        <class>Utility</class>
+        <scope>Node</scope>
+        <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="OTA Software Update Requestor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="OTA Software Update Provider" client="true" server="false" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-otaprovider</name>
+        <domain>CHIP</domain>
+        <typeName>Matter OTA Provider</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0014</deviceId>
+        <class>Utility</class>
+        <scope>Node</scope>
+        <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="OTA Software Update Provider" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="OTA Software Update Requestor" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-aggregator</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Aggregator</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x000e</deviceId>
+        <class>Dynamic Utility</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Actions" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-bridgeddevice</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Bridged Device</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0013</deviceId>
+        <class>Utility</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Bridged Device Basic" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>REACHABLE</requireAttribute>
+            </include>
+            <include cluster="Power Source Configuration" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Power Source" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-onofflight</name>
+        <domain>CHIP</domain>
+        <typeName>Matter On/Off Light</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0100</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
+                <requireCommand>AddGroup</requireCommand>
+                <requireCommand>AddGroupResponse</requireCommand>
+                <requireCommand>ViewGroup</requireCommand>
+                <requireCommand>ViewGroupResponse</requireCommand>
+                <requireCommand>GetGroupMembership</requireCommand>
+                <requireCommand>GetGroupMembershipResponse</requireCommand>
+                <requireCommand>RemoveGroup</requireCommand>
+                <requireCommand>RemoveGroupResponse</requireCommand>
+                <requireCommand>RemoveAllGroups</requireCommand>
+                <requireCommand>AddGroupIfIdentifying</requireCommand>
+            </include>
+            <include cluster="Scenes Management" client="false" server="true" clientLocked="false" serverLocked="true">
+                <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
+                <requireCommand>AddScene</requireCommand>
+                <requireCommand>AddSceneResponse</requireCommand>
+                <requireCommand>ViewScene</requireCommand>
+                <requireCommand>ViewSceneResponse</requireCommand>
+                <requireCommand>RemoveScene</requireCommand>
+                <requireCommand>RemoveSceneResponse</requireCommand>
+                <requireCommand>RemoveAllScenes</requireCommand>
+                <requireCommand>RemoveAllScenesResponse</requireCommand>
+                <requireCommand>StoreScene</requireCommand>
+                <requireCommand>StoreSceneResponse</requireCommand>
+                <requireCommand>RecallScene</requireCommand>
+                <requireCommand>GetSceneMembership</requireCommand>
+                <requireCommand>GetSceneMembershipResponse</requireCommand>
+                <requireCommand>CopyScene</requireCommand>
+                <requireCommand>CopySceneResponse</requireCommand>
+            </include>
+            <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="" name="LT">
+                    <mandatoryConform/>
+                    </feature>
+                </features>
+                <requireAttribute>ON_OFF</requireAttribute>
+                <requireAttribute>GLOBAL_SCENE_CONTROL</requireAttribute>
+                <requireAttribute>ON_TIME</requireAttribute>
+                <requireAttribute>OFF_WAIT_TIME</requireAttribute>
+                <requireAttribute>START_UP_ON_OFF</requireAttribute>
+                <requireCommand>Off</requireCommand>
+                <requireCommand>On</requireCommand>
+                <requireCommand>Toggle</requireCommand>
+                <requireCommand>OffWithEffect</requireCommand>
+                <requireCommand>OnWithRecallGlobalScene</requireCommand>
+                <requireCommand>OnWithTimedOff</requireCommand>
+            </include>
+            <include cluster="Level Control" client="false" server="false" clientLocked="true" serverLocked="false">
+                <features>
+                    <feature code="" name="OO">
+                    <mandatoryConform/>
+                    </feature>
+                    <feature code="" name="LT">
+                    <mandatoryConform/>
+                    </feature>
+                </features>
+                <requireAttribute>CURRENT_LEVEL</requireAttribute>
+                <requireAttribute>OPTIONS</requireAttribute>
+                <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
+                <requireAttribute>MINIMUM_LEVEL</requireAttribute>
+                <requireAttribute>ON_LEVEL</requireAttribute>
+                <requireAttribute>START_UP_CURRENT_LEVEL</requireAttribute>
+                <requireCommand>MoveToLevel</requireCommand>
+                <requireCommand>Move</requireCommand>
+                <requireCommand>Step</requireCommand>
+                <requireCommand>Stop</requireCommand>
+                <requireCommand>MoveToLevelWithOnOff</requireCommand>
+                <requireCommand>MoveWithOnOff</requireCommand>
+                <requireCommand>StepWithOnOff</requireCommand>
+                <requireCommand>StopWithOnOff</requireCommand>
+            </include>
+            <include cluster="Occupancy Sensing" client="false" server="false" clientLocked="false" serverLocked="true" />
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-dimmablelight</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Dimmable Light</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0101</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <superset>Matter On/Off Light</superset>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Binding" client="false" server="false" clientLocked="true" serverLocked="false">
+                <requireAttribute>BINDING</requireAttribute>
+            </include>
+            <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
+                <requireCommand>AddGroup</requireCommand>
+                <requireCommand>AddGroupResponse</requireCommand>
+                <requireCommand>ViewGroup</requireCommand>
+                <requireCommand>ViewGroupResponse</requireCommand>
+                <requireCommand>GetGroupMembership</requireCommand>
+                <requireCommand>GetGroupMembershipResponse</requireCommand>
+                <requireCommand>RemoveGroup</requireCommand>
+                <requireCommand>RemoveGroupResponse</requireCommand>
+                <requireCommand>RemoveAllGroups</requireCommand>
+                <requireCommand>AddGroupIfIdentifying</requireCommand>
+            </include>
+            <include cluster="Scenes Management" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
+                <requireCommand>AddScene</requireCommand>
+                <requireCommand>AddSceneResponse</requireCommand>
+                <requireCommand>ViewScene</requireCommand>
+                <requireCommand>ViewSceneResponse</requireCommand>
+                <requireCommand>RemoveScene</requireCommand>
+                <requireCommand>RemoveSceneResponse</requireCommand>
+                <requireCommand>RemoveAllScenes</requireCommand>
+                <requireCommand>RemoveAllScenesResponse</requireCommand>
+                <requireCommand>StoreScene</requireCommand>
+                <requireCommand>StoreSceneResponse</requireCommand>
+                <requireCommand>RecallScene</requireCommand>
+                <requireCommand>GetSceneMembership</requireCommand>
+                <requireCommand>GetSceneMembershipResponse</requireCommand>
+                <requireCommand>CopyScene</requireCommand>
+                <requireCommand>CopySceneResponse</requireCommand>
+            </include>
+            <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="" name="LT">
+                    <mandatoryConform/>
+                    </feature>
+                </features>
+                <requireAttribute>ON_OFF</requireAttribute>
+                <requireAttribute>GLOBAL_SCENE_CONTROL</requireAttribute>
+                <requireAttribute>ON_TIME</requireAttribute>
+                <requireAttribute>OFF_WAIT_TIME</requireAttribute>
+                <requireAttribute>START_UP_ON_OFF</requireAttribute>
+                <requireCommand>Off</requireCommand>
+                <requireCommand>On</requireCommand>
+                <requireCommand>Toggle</requireCommand>
+                <requireCommand>OffWithEffect</requireCommand>
+                <requireCommand>OnWithRecallGlobalScene</requireCommand>
+                <requireCommand>OnWithTimedOff</requireCommand>
+            </include>
+            <include cluster="Level Control" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="" name="LT">
+                    <mandatoryConform/>
+                    </feature>
+                    <feature code="" name="OO">
+                    <mandatoryConform/>
+                    </feature>
+                </features>
+                <requireAttribute>CURRENT_LEVEL</requireAttribute>
+                <requireAttribute>OPTIONS</requireAttribute>
+                <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
+                <requireAttribute>MINIMUM_LEVEL</requireAttribute>
+                <requireAttribute>ON_LEVEL</requireAttribute>
+                <requireAttribute>START_UP_CURRENT_LEVEL</requireAttribute>
+                <requireCommand>MoveToLevel</requireCommand>
+                <requireCommand>Move</requireCommand>
+                <requireCommand>Step</requireCommand>
+                <requireCommand>Stop</requireCommand>
+                <requireCommand>MoveToLevelWithOnOff</requireCommand>
+                <requireCommand>MoveWithOnOff</requireCommand>
+                <requireCommand>StepWithOnOff</requireCommand>
+                <requireCommand>StopWithOnOff</requireCommand>
+            </include>
+            <include cluster="Occupancy Sensing" client="false" server="false" clientLocked="false" serverLocked="true" />
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-colortemperaturelight</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Color Temperature Light</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x010C</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <superset>Matter Dimmable Light</superset>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
+                <requireCommand>AddGroup</requireCommand>
+                <requireCommand>AddGroupResponse</requireCommand>
+                <requireCommand>ViewGroup</requireCommand>
+                <requireCommand>ViewGroupResponse</requireCommand>
+                <requireCommand>GetGroupMembership</requireCommand>
+                <requireCommand>GetGroupMembershipResponse</requireCommand>
+                <requireCommand>RemoveGroup</requireCommand>
+                <requireCommand>RemoveGroupResponse</requireCommand>
+                <requireCommand>RemoveAllGroups</requireCommand>
+                <requireCommand>AddGroupIfIdentifying</requireCommand>
+            </include>
+            <include cluster="Scenes Management" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
+                <requireCommand>AddScene</requireCommand>
+                <requireCommand>AddSceneResponse</requireCommand>
+                <requireCommand>ViewScene</requireCommand>
+                <requireCommand>ViewSceneResponse</requireCommand>
+                <requireCommand>RemoveScene</requireCommand>
+                <requireCommand>RemoveSceneResponse</requireCommand>
+                <requireCommand>RemoveAllScenes</requireCommand>
+                <requireCommand>RemoveAllScenesResponse</requireCommand>
+                <requireCommand>StoreScene</requireCommand>
+                <requireCommand>StoreSceneResponse</requireCommand>
+                <requireCommand>RecallScene</requireCommand>
+                <requireCommand>GetSceneMembership</requireCommand>
+                <requireCommand>GetSceneMembershipResponse</requireCommand>
+                <requireCommand>CopyScene</requireCommand>
+                <requireCommand>CopySceneResponse</requireCommand>
+            </include>
+            <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="" name="LT">
+                    <mandatoryConform/>
+                    </feature>
+                </features>
+                <requireAttribute>ON_OFF</requireAttribute>
+                <requireAttribute>GLOBAL_SCENE_CONTROL</requireAttribute>
+                <requireAttribute>ON_TIME</requireAttribute>
+                <requireAttribute>OFF_WAIT_TIME</requireAttribute>
+                <requireAttribute>START_UP_ON_OFF</requireAttribute>
+                <requireCommand>Off</requireCommand>
+                <requireCommand>On</requireCommand>
+                <requireCommand>Toggle</requireCommand>
+                <requireCommand>OffWithEffect</requireCommand>
+                <requireCommand>OnWithRecallGlobalScene</requireCommand>
+                <requireCommand>OnWithTimedOff</requireCommand>
+            </include>
+            <include cluster="Level Control" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="" name="OO">
+                    <mandatoryConform/>
+                    </feature>
+                    <feature code="" name="LT">
+                    <mandatoryConform/>
+                    </feature>
+                </features>
+                <requireAttribute>CURRENT_LEVEL</requireAttribute>
+                <requireAttribute>OPTIONS</requireAttribute>
+                <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
+                <requireAttribute>MINIMUM_LEVEL</requireAttribute>
+                <requireAttribute>ON_LEVEL</requireAttribute>
+                <requireAttribute>START_UP_CURRENT_LEVEL</requireAttribute>
+                <requireCommand>MoveToLevel</requireCommand>
+                <requireCommand>Move</requireCommand>
+                <requireCommand>Step</requireCommand>
+                <requireCommand>Stop</requireCommand>
+                <requireCommand>MoveToLevelWithOnOff</requireCommand>
+                <requireCommand>MoveWithOnOff</requireCommand>
+                <requireCommand>StepWithOnOff</requireCommand>
+                <requireCommand>StopWithOnOff</requireCommand>
+            </include>
+            <include cluster="Color Control" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="" name="CT">
+                    <mandatoryConform/>
+                    </feature>
+                </features>
+                <requireAttribute>COLOR_CONTROL_REMAINING_TIME</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_COLOR_TEMPERATURE</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_COLOR_MODE</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_OPTIONS</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_ENHANCED_COLOR_MODE</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_NUMBER_OF_PRIMARIES</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_COLOR_CAPABILITIES</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MIN</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MAX</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_TEMPERATURE_LEVEL_MIN_MIREDS</requireAttribute>
+                <requireAttribute>START_UP_COLOR_TEMPERATURE_MIREDS</requireAttribute>
+                <requireCommand>MoveToColorTemperature</requireCommand>
+                <requireCommand>StopMoveStep</requireCommand>
+                <requireCommand>MoveColorTemperature</requireCommand>
+                <requireCommand>StepColorTemperature</requireCommand>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-extendedcolorlight</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Extended Color Light</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x010D</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <superset>Matter Color Temperature Light</superset>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
+                <requireCommand>AddGroup</requireCommand>
+                <requireCommand>AddGroupResponse</requireCommand>
+                <requireCommand>ViewGroup</requireCommand>
+                <requireCommand>ViewGroupResponse</requireCommand>
+                <requireCommand>GetGroupMembership</requireCommand>
+                <requireCommand>GetGroupMembershipResponse</requireCommand>
+                <requireCommand>RemoveGroup</requireCommand>
+                <requireCommand>RemoveGroupResponse</requireCommand>
+                <requireCommand>RemoveAllGroups</requireCommand>
+                <requireCommand>AddGroupIfIdentifying</requireCommand>
+            </include>
+            <include cluster="Scenes Management" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
+                <requireCommand>AddScene</requireCommand>
+                <requireCommand>AddSceneResponse</requireCommand>
+                <requireCommand>ViewScene</requireCommand>
+                <requireCommand>ViewSceneResponse</requireCommand>
+                <requireCommand>RemoveScene</requireCommand>
+                <requireCommand>RemoveSceneResponse</requireCommand>
+                <requireCommand>RemoveAllScenes</requireCommand>
+                <requireCommand>RemoveAllScenesResponse</requireCommand>
+                <requireCommand>StoreScene</requireCommand>
+                <requireCommand>StoreSceneResponse</requireCommand>
+                <requireCommand>RecallScene</requireCommand>
+                <requireCommand>GetSceneMembership</requireCommand>
+                <requireCommand>GetSceneMembershipResponse</requireCommand>
+            </include>
+            <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="" name="LT">
+                    <mandatoryConform/>
+                    </feature>
+                </features>
+                <requireAttribute>ON_OFF</requireAttribute>
+                <requireAttribute>GLOBAL_SCENE_CONTROL</requireAttribute>
+                <requireAttribute>ON_TIME</requireAttribute>
+                <requireAttribute>OFF_WAIT_TIME</requireAttribute>
+                <requireAttribute>START_UP_ON_OFF</requireAttribute>
+                <requireCommand>Off</requireCommand>
+                <requireCommand>On</requireCommand>
+                <requireCommand>Toggle</requireCommand>
+                <requireCommand>OffWithEffect</requireCommand>
+                <requireCommand>OnWithRecallGlobalScene</requireCommand>
+                <requireCommand>OnWithTimedOff</requireCommand>
+            </include>
+            <include cluster="Level Control" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="" name="OO">
+                    <mandatoryConform/>
+                    </feature>
+                    <feature code="" name="LT">
+                    <mandatoryConform/>
+                    </feature>
+                </features>
+                <requireAttribute>CURRENT_LEVEL</requireAttribute>
+                <requireAttribute>OPTIONS</requireAttribute>
+                <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
+                <requireAttribute>MINIMUM_LEVEL</requireAttribute>
+                <requireAttribute>ON_LEVEL</requireAttribute>
+                <requireAttribute>START_UP_CURRENT_LEVEL</requireAttribute>
+                <requireCommand>MoveToLevel</requireCommand>
+                <requireCommand>Move</requireCommand>
+                <requireCommand>Step</requireCommand>
+                <requireCommand>Stop</requireCommand>
+                <requireCommand>MoveToLevelWithOnOff</requireCommand>
+                <requireCommand>MoveWithOnOff</requireCommand>
+                <requireCommand>StepWithOnOff</requireCommand>
+                <requireCommand>StopWithOnOff</requireCommand>
+            </include>
+            <include cluster="Color Control" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="" name="HS">
+                    <optionalConform/>
+                    </feature>
+                    <feature code="" name="EHUE">
+                    <optionalConform/>
+                    </feature>
+                    <feature code="" name="CL">
+                    <optionalConform/>
+                    </feature>
+                    <feature code="" name="XY">
+                    <mandatoryConform/>
+                    </feature>
+                    <feature code="" name="CT">
+                    <mandatoryConform/>
+                    </feature>
+                </features>
+                <requireAttribute>COLOR_CONTROL_REMAINING_TIME</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_CURRENT_X</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_CURRENT_Y</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_COLOR_TEMPERATURE</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_COLOR_MODE</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_OPTIONS</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_NUMBER_OF_PRIMARIES</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_ENHANCED_COLOR_MODE</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_COLOR_CAPABILITIES</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MIN</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MAX</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_TEMPERATURE_LEVEL_MIN_MIREDS</requireAttribute>
+                <requireAttribute>START_UP_COLOR_TEMPERATURE_MIREDS</requireAttribute>
+                <requireCommand>MoveToColor</requireCommand>
+                <requireCommand>MoveColor</requireCommand>
+                <requireCommand>StepColor</requireCommand>
+                <requireCommand>MoveToColorTemperature</requireCommand>
+                <requireCommand>StopMoveStep</requireCommand>
+                <requireCommand>MoveColorTemperature</requireCommand>
+                <requireCommand>StepColorTemperature</requireCommand>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-onoffpluginunit</name>
+        <domain>CHIP</domain>
+        <typeName>Matter On/Off Plug-in Unit</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x010A</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
+                <requireCommand>AddGroup</requireCommand>
+                <requireCommand>AddGroupResponse</requireCommand>
+                <requireCommand>ViewGroup</requireCommand>
+                <requireCommand>ViewGroupResponse</requireCommand>
+                <requireCommand>GetGroupMembership</requireCommand>
+                <requireCommand>GetGroupMembershipResponse</requireCommand>
+                <requireCommand>RemoveGroup</requireCommand>
+                <requireCommand>RemoveGroupResponse</requireCommand>
+                <requireCommand>RemoveAllGroups</requireCommand>
+                <requireCommand>AddGroupIfIdentifying</requireCommand>
+            </include>
+            <include cluster="Scenes Management" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
+                <requireCommand>AddScene</requireCommand>
+                <requireCommand>AddSceneResponse</requireCommand>
+                <requireCommand>ViewScene</requireCommand>
+                <requireCommand>ViewSceneResponse</requireCommand>
+                <requireCommand>RemoveScene</requireCommand>
+                <requireCommand>RemoveSceneResponse</requireCommand>
+                <requireCommand>RemoveAllScenes</requireCommand>
+                <requireCommand>RemoveAllScenesResponse</requireCommand>
+                <requireCommand>StoreScene</requireCommand>
+                <requireCommand>StoreSceneResponse</requireCommand>
+                <requireCommand>RecallScene</requireCommand>
+                <requireCommand>GetSceneMembership</requireCommand>
+                <requireCommand>GetSceneMembershipResponse</requireCommand>
+            </include>
+            <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="" name="LT">
+                    <mandatoryConform/>
+                    </feature>
+                </features>
+                <requireAttribute>ON_OFF</requireAttribute>
+                <requireAttribute>GLOBAL_SCENE_CONTROL</requireAttribute>
+                <requireAttribute>ON_TIME</requireAttribute>
+                <requireAttribute>OFF_WAIT_TIME</requireAttribute>
+                <requireAttribute>START_UP_ON_OFF</requireAttribute>
+                <requireCommand>Off</requireCommand>
+                <requireCommand>On</requireCommand>
+                <requireCommand>Toggle</requireCommand>
+                <requireCommand>OffWithEffect</requireCommand>
+                <requireCommand>OnWithRecallGlobalScene</requireCommand>
+                <requireCommand>OnWithTimedOff</requireCommand>
+            </include>
+            <include cluster="Level Control" client="false" server="false" clientLocked="true" serverLocked="false">
+                <features>
+                    <feature code="" name="OO">
+                    <mandatoryConform/>
+                    </feature>
+                    <feature code="" name="LT">
+                    <mandatoryConform/>
+                    </feature>
+                </features>
+                <requireAttribute>CURRENT_LEVEL</requireAttribute>
+                <requireAttribute>OPTIONS</requireAttribute>
+                <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
+                <requireAttribute>MINIMUM_LEVEL</requireAttribute>
+                <requireAttribute>ON_LEVEL</requireAttribute>
+                <requireAttribute>START_UP_CURRENT_LEVEL</requireAttribute>
+                <requireCommand>MoveToLevel</requireCommand>
+                <requireCommand>Move</requireCommand>
+                <requireCommand>Step</requireCommand>
+                <requireCommand>Stop</requireCommand>
+                <requireCommand>MoveToLevelWithOnOff</requireCommand>
+                <requireCommand>MoveWithOnOff</requireCommand>
+                <requireCommand>StepWithOnOff</requireCommand>
+                <requireCommand>StopWithOnOff</requireCommand>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-dimmablepluginunit</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Dimmable Plug-in Unit</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x010B</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
+                <requireCommand>AddGroup</requireCommand>
+                <requireCommand>AddGroupResponse</requireCommand>
+                <requireCommand>ViewGroup</requireCommand>
+                <requireCommand>ViewGroupResponse</requireCommand>
+                <requireCommand>GetGroupMembership</requireCommand>
+                <requireCommand>GetGroupMembershipResponse</requireCommand>
+                <requireCommand>RemoveGroup</requireCommand>
+                <requireCommand>RemoveGroupResponse</requireCommand>
+                <requireCommand>RemoveAllGroups</requireCommand>
+                <requireCommand>AddGroupIfIdentifying</requireCommand>
+            </include>
+            <include cluster="Scenes Management" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
+                <requireCommand>AddScene</requireCommand>
+                <requireCommand>AddSceneResponse</requireCommand>
+                <requireCommand>ViewScene</requireCommand>
+                <requireCommand>ViewSceneResponse</requireCommand>
+                <requireCommand>RemoveScene</requireCommand>
+                <requireCommand>RemoveSceneResponse</requireCommand>
+                <requireCommand>RemoveAllScenes</requireCommand>
+                <requireCommand>RemoveAllScenesResponse</requireCommand>
+                <requireCommand>StoreScene</requireCommand>
+                <requireCommand>StoreSceneResponse</requireCommand>
+                <requireCommand>RecallScene</requireCommand>
+                <requireCommand>GetSceneMembership</requireCommand>
+                <requireCommand>GetSceneMembershipResponse</requireCommand>
+            </include>
+            <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="" name="LT">
+                    <mandatoryConform/>
+                    </feature>
+                </features>
+                <requireAttribute>ON_OFF</requireAttribute>
+                <requireAttribute>GLOBAL_SCENE_CONTROL</requireAttribute>
+                <requireAttribute>ON_TIME</requireAttribute>
+                <requireAttribute>OFF_WAIT_TIME</requireAttribute>
+                <requireAttribute>START_UP_ON_OFF</requireAttribute>
+                <requireCommand>Off</requireCommand>
+                <requireCommand>On</requireCommand>
+                <requireCommand>Toggle</requireCommand>
+                <requireCommand>OffWithEffect</requireCommand>
+                <requireCommand>OnWithRecallGlobalScene</requireCommand>
+                <requireCommand>OnWithTimedOff</requireCommand>
+            </include>
+            <include cluster="Level Control" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="" name="OO">
+                    <mandatoryConform/>
+                    </feature>
+                    <feature code="" name="LT">
+                    <mandatoryConform/>
+                    </feature>
+                </features>
+                <requireAttribute>CURRENT_LEVEL</requireAttribute>
+                <requireAttribute>OPTIONS</requireAttribute>
+                <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
+                <requireAttribute>MINIMUM_LEVEL</requireAttribute>
+                <requireAttribute>ON_LEVEL</requireAttribute>
+                <requireAttribute>START_UP_CURRENT_LEVEL</requireAttribute>
+                <requireCommand>MoveToLevel</requireCommand>
+                <requireCommand>Move</requireCommand>
+                <requireCommand>Step</requireCommand>
+                <requireCommand>Stop</requireCommand>
+                <requireCommand>MoveToLevelWithOnOff</requireCommand>
+                <requireCommand>MoveWithOnOff</requireCommand>
+                <requireCommand>StepWithOnOff</requireCommand>
+                <requireCommand>StopWithOnOff</requireCommand>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-pump</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Pump</typeName>
+        <profileId editable="false">0x0999</profileId>
+        <deviceId editable="false">0x0303</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+                <requireCommand>IdentifyQuery</requireCommand>
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Binding" client="false" server="false" clientLocked="true" serverLocked="false">
+                <requireAttribute>BINDING</requireAttribute>
+            </include>
+            <include cluster="Groups" client="false" server="false" clientLocked="true" serverLocked="false">
+                <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
+                <requireCommand>AddGroup</requireCommand>
+                <requireCommand>AddGroupResponse</requireCommand>
+                <requireCommand>ViewGroup</requireCommand>
+                <requireCommand>ViewGroupResponse</requireCommand>
+                <requireCommand>GetGroupMembership</requireCommand>
+                <requireCommand>GetGroupMembershipResponse</requireCommand>
+                <requireCommand>RemoveGroup</requireCommand>
+                <requireCommand>RemoveGroupResponse</requireCommand>
+                <requireCommand>RemoveAllGroups</requireCommand>
+                <requireCommand>AddGroupIfIdentifying</requireCommand>
+            </include>
+            <include cluster="Scenes Management" client="false" server="false" clientLocked="true" serverLocked="false">
+                <requireAttribute>SCENE_COUNT</requireAttribute>
+                <requireAttribute>CURRENT_SCENE</requireAttribute>
+                <requireAttribute>CURRENT_GROUP</requireAttribute>
+                <requireAttribute>SCENE_VALID</requireAttribute>
+                <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
+                <requireCommand>AddScene</requireCommand>
+                <requireCommand>AddSceneResponse</requireCommand>
+                <requireCommand>ViewScene</requireCommand>
+                <requireCommand>ViewSceneResponse</requireCommand>
+                <requireCommand>RemoveScene</requireCommand>
+                <requireCommand>RemoveSceneResponse</requireCommand>
+                <requireCommand>RemoveAllScenes</requireCommand>
+                <requireCommand>RemoveAllScenesResponse</requireCommand>
+                <requireCommand>StoreScene</requireCommand>
+                <requireCommand>StoreSceneResponse</requireCommand>
+                <requireCommand>RecallScene</requireCommand>
+                <requireCommand>GetSceneMembership</requireCommand>
+                <requireCommand>GetSceneMembershipResponse</requireCommand>
+            </include>
+            <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>ON_OFF</requireAttribute>
+                <requireCommand>Off</requireCommand>
+                <requireCommand>On</requireCommand>
+                <requireCommand>Toggle</requireCommand>
+            </include>
+            <include cluster="Pump Configuration and Control" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>MAX_PRESSURE</requireAttribute>
+                <requireAttribute>MAX_SPEED</requireAttribute>
+                <requireAttribute>MAX_FLOW</requireAttribute>
+                <requireAttribute>EffectiveOperationMode</requireAttribute>
+                <requireAttribute>EffectiveControlMode</requireAttribute>
+                <requireAttribute>Capacity</requireAttribute>
+                <requireAttribute>OperationMode</requireAttribute>
+            </include>
+            <include cluster="Level Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Pressure Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Flow Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Occupancy Sensing" client="false" server="false" clientLocked="false" serverLocked="true" />
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-onofflightswitch</name>
+        <domain>CHIP</domain>
+        <typeName>Matter On/Off Light Switch</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0103</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="true" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Binding" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>BINDING</requireAttribute>
+            </include>
+            <include cluster="Groups" client="false" server="false" clientLocked="false" serverLocked="true">
+                <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
+                <requireCommand>AddGroup</requireCommand>
+                <requireCommand>AddGroupResponse</requireCommand>
+                <requireCommand>ViewGroup</requireCommand>
+                <requireCommand>ViewGroupResponse</requireCommand>
+                <requireCommand>GetGroupMembership</requireCommand>
+                <requireCommand>GetGroupMembershipResponse</requireCommand>
+                <requireCommand>RemoveGroup</requireCommand>
+                <requireCommand>RemoveGroupResponse</requireCommand>
+                <requireCommand>RemoveAllGroups</requireCommand>
+                <requireCommand>AddGroupIfIdentifying</requireCommand>
+            </include>
+            <include cluster="Scenes Management" client="false" server="false" clientLocked="false" serverLocked="true">
+                <requireAttribute>SCENE_COUNT</requireAttribute>
+                <requireAttribute>CURRENT_SCENE</requireAttribute>
+                <requireAttribute>CURRENT_GROUP</requireAttribute>
+                <requireAttribute>SCENE_VALID</requireAttribute>
+                <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
+                <requireCommand>AddScene</requireCommand>
+                <requireCommand>AddSceneResponse</requireCommand>
+                <requireCommand>ViewScene</requireCommand>
+                <requireCommand>ViewSceneResponse</requireCommand>
+                <requireCommand>RemoveScene</requireCommand>
+                <requireCommand>RemoveSceneResponse</requireCommand>
+                <requireCommand>RemoveAllScenes</requireCommand>
+                <requireCommand>RemoveAllScenesResponse</requireCommand>
+                <requireCommand>StoreScene</requireCommand>
+                <requireCommand>StoreSceneResponse</requireCommand>
+                <requireCommand>RecallScene</requireCommand>
+                <requireCommand>GetSceneMembership</requireCommand>
+                <requireCommand>GetSceneMembershipResponse</requireCommand>
+            </include>
+            <include cluster="On/Off" client="true" server="false" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-dimmerswitch</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Dimmer Switch</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0104</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <superset>Matter On/Off Light Switch</superset>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="true" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Binding" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>BINDING</requireAttribute>
+            </include>
+            <include cluster="Groups" client="false" server="false" clientLocked="false" serverLocked="true">
+                <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
+                <requireCommand>AddGroup</requireCommand>
+                <requireCommand>AddGroupResponse</requireCommand>
+                <requireCommand>ViewGroup</requireCommand>
+                <requireCommand>ViewGroupResponse</requireCommand>
+                <requireCommand>GetGroupMembership</requireCommand>
+                <requireCommand>GetGroupMembershipResponse</requireCommand>
+                <requireCommand>RemoveGroup</requireCommand>
+                <requireCommand>RemoveGroupResponse</requireCommand>
+                <requireCommand>RemoveAllGroups</requireCommand>
+                <requireCommand>AddGroupIfIdentifying</requireCommand>
+            </include>
+            <include cluster="Scenes Management" client="false" server="false" clientLocked="false" serverLocked="true">
+                <requireAttribute>SCENE_COUNT</requireAttribute>
+                <requireAttribute>CURRENT_SCENE</requireAttribute>
+                <requireAttribute>CURRENT_GROUP</requireAttribute>
+                <requireAttribute>SCENE_VALID</requireAttribute>
+                <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
+                <requireCommand>AddScene</requireCommand>
+                <requireCommand>AddSceneResponse</requireCommand>
+                <requireCommand>ViewScene</requireCommand>
+                <requireCommand>ViewSceneResponse</requireCommand>
+                <requireCommand>RemoveScene</requireCommand>
+                <requireCommand>RemoveSceneResponse</requireCommand>
+                <requireCommand>RemoveAllScenes</requireCommand>
+                <requireCommand>RemoveAllScenesResponse</requireCommand>
+                <requireCommand>StoreScene</requireCommand>
+                <requireCommand>StoreSceneResponse</requireCommand>
+                <requireCommand>RecallScene</requireCommand>
+                <requireCommand>GetSceneMembership</requireCommand>
+                <requireCommand>GetSceneMembershipResponse</requireCommand>
+            </include>
+            <include cluster="On/Off" client="true" server="false" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Level Control" client="true" server="false" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-colordimmerswitch</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Color Dimmer Switch</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0105</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <superset>Matter Dimmer Switch</superset>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="true" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Binding" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>BINDING</requireAttribute>
+            </include>
+            <include cluster="Groups" client="false" server="false" clientLocked="false" serverLocked="true">
+                <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
+                <requireCommand>AddGroup</requireCommand>
+                <requireCommand>AddGroupResponse</requireCommand>
+                <requireCommand>ViewGroup</requireCommand>
+                <requireCommand>ViewGroupResponse</requireCommand>
+                <requireCommand>GetGroupMembership</requireCommand>
+                <requireCommand>GetGroupMembershipResponse</requireCommand>
+                <requireCommand>RemoveGroup</requireCommand>
+                <requireCommand>RemoveGroupResponse</requireCommand>
+                <requireCommand>RemoveAllGroups</requireCommand>
+                <requireCommand>AddGroupIfIdentifying</requireCommand>
+            </include>
+            <include cluster="Scenes Management" client="false" server="false" clientLocked="false" serverLocked="true">
+                <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
+                <requireCommand>AddScene</requireCommand>
+                <requireCommand>AddSceneResponse</requireCommand>
+                <requireCommand>ViewScene</requireCommand>
+                <requireCommand>ViewSceneResponse</requireCommand>
+                <requireCommand>RemoveScene</requireCommand>
+                <requireCommand>RemoveSceneResponse</requireCommand>
+                <requireCommand>RemoveAllScenes</requireCommand>
+                <requireCommand>RemoveAllScenesResponse</requireCommand>
+                <requireCommand>StoreScene</requireCommand>
+                <requireCommand>StoreSceneResponse</requireCommand>
+                <requireCommand>RecallScene</requireCommand>
+                <requireCommand>GetSceneMembership</requireCommand>
+                <requireCommand>GetSceneMembershipResponse</requireCommand>
+            </include>
+            <include cluster="On/Off" client="true" server="false" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Level Control" client="true" server="false" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Color Control" client="true" server="false" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-controlbridge</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Control Bridge</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0840</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="true" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+                <requireCommand>IdentifyQuery</requireCommand>
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Binding" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>BINDING</requireAttribute>
+            </include>
+            <include cluster="Groups" client="true" server="false" clientLocked="true" serverLocked="true">
+            </include>
+            <include cluster="Scenes Management" client="true" server="false" clientLocked="true" serverLocked="true">
+            </include>
+            <include cluster="On/Off" client="true" server="false" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Level Control" client="true" server="false" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Color Control" client="true" server="false" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Illuminance Measurement" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Occupancy Sensing" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-pumpcontroller</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Pump Controller</typeName>
+        <profileId editable="false">0x0999</profileId>
+        <deviceId editable="false">0x0304</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="false" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+                <requireCommand>IdentifyQuery</requireCommand>
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Binding" client="true" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>BINDING</requireAttribute>
+            </include>
+            <include cluster="Groups" client="false" server="false" clientLocked="false" serverLocked="true">
+                <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
+                <requireCommand>AddGroup</requireCommand>
+                <requireCommand>AddGroupResponse</requireCommand>
+                <requireCommand>ViewGroup</requireCommand>
+                <requireCommand>ViewGroupResponse</requireCommand>
+                <requireCommand>GetGroupMembership</requireCommand>
+                <requireCommand>GetGroupMembershipResponse</requireCommand>
+                <requireCommand>RemoveGroup</requireCommand>
+                <requireCommand>RemoveGroupResponse</requireCommand>
+                <requireCommand>RemoveAllGroups</requireCommand>
+                <requireCommand>AddGroupIfIdentifying</requireCommand>
+            </include>
+            <include cluster="Scenes Management" client="false" server="false" clientLocked="false" serverLocked="true">
+                <requireAttribute>SCENE_COUNT</requireAttribute>
+                <requireAttribute>CURRENT_SCENE</requireAttribute>
+                <requireAttribute>CURRENT_GROUP</requireAttribute>
+                <requireAttribute>SCENE_VALID</requireAttribute>
+                <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
+                <requireCommand>AddScene</requireCommand>
+                <requireCommand>AddSceneResponse</requireCommand>
+                <requireCommand>ViewScene</requireCommand>
+                <requireCommand>ViewSceneResponse</requireCommand>
+                <requireCommand>RemoveScene</requireCommand>
+                <requireCommand>RemoveSceneResponse</requireCommand>
+                <requireCommand>RemoveAllScenes</requireCommand>
+                <requireCommand>RemoveAllScenesResponse</requireCommand>
+                <requireCommand>StoreScene</requireCommand>
+                <requireCommand>StoreSceneResponse</requireCommand>
+                <requireCommand>RecallScene</requireCommand>
+                <requireCommand>GetSceneMembership</requireCommand>
+                <requireCommand>GetSceneMembershipResponse</requireCommand>
+            </include>
+            <include cluster="On/Off" client="true" server="false" clientLocked="true" serverLocked="true">
+            </include>
+            <include cluster="Pump Configuration and Control" client="true" server="false" clientLocked="true" serverLocked="true">
+            </include>
+            <include cluster="Level Control" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Temperature Measurement" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Pressure Measurement" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Flow Measurement" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-genericswitch</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Generic Switch</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x000f</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+                <requireCommand>IdentifyQuery</requireCommand>
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Switch" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Fixed Label" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="User Label" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-contactsensor</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Contact Sensor</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0015</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+                <requireCommand>IdentifyQuery</requireCommand>
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Boolean State" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>STATE_VALUE</requireAttribute>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-lightsensor</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Light Sensor</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0106</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+                <requireCommand>IdentifyQuery</requireCommand>
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Binding" client="false" server="false" clientLocked="true" serverLocked="false">
+                <requireAttribute>BINDING</requireAttribute>
+            </include>
+            <include cluster="Groups" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Illuminance Measurement" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>ILLUM_MEASURED_VALUE</requireAttribute>
+                <requireAttribute>ILLUM_MIN_MEASURED_VALUE</requireAttribute>
+                <requireAttribute>ILLUM_MAX_MEASURED_VALUE</requireAttribute>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-occupancysensor</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Occupancy Sensor</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0107</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+                <requireCommand>IdentifyQuery</requireCommand>
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Binding" client="false" server="false" clientLocked="true" serverLocked="false">
+                <requireAttribute>BINDING</requireAttribute>
+            </include>
+            <include cluster="Groups" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Occupancy Sensing" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>OCCUPANCY</requireAttribute>
+                <requireAttribute>OCCUPANCY_SENSOR_TYPE</requireAttribute>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-tempsensor</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Temperature Sensor</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0302</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+                <requireCommand>IdentifyQuery</requireCommand>
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Temperature Measurement" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-pressuresensor</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Pressure Sensor</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0305</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+                <requireCommand>IdentifyQuery</requireCommand>
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Pressure Measurement" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-flowsensor</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Flow Sensor</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0306</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+                <requireCommand>IdentifyQuery</requireCommand>
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Flow Measurement" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-humiditysensor</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Humidity Sensor</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0307</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+                <requireCommand>IdentifyQuery</requireCommand>
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Relative Humidity Measurement" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-onoffsensor</name>
+        <domain>CHIP</domain>
+        <typeName>Matter On/Off Sensor</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0850</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="true" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+                <requireCommand>IdentifyQuery</requireCommand>
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Binding" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>BINDING</requireAttribute>
+            </include>
+            <include cluster="Groups" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Scenes Management" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="On/Off" client="true" server="false" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Level Control" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Color Control" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-doorlock</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Door Lock</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x000A</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+                <requireCommand>IdentifyQuery</requireCommand>
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Door Lock" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="" name="USR">
+                    <mandatoryConform>
+                        <andTerm>
+                        <condition name="Matter"/>
+                        <orTerm>
+                            <feature name="PIN"/>
+                            <feature name="RID"/>
+                            <feature name="FPG"/>
+                            <feature name="FACE"/>
+                        </orTerm>
+                        </andTerm>
+                    </mandatoryConform>
+                    </feature>
+                    <feature code="" name="RID">
+                    <otherwiseConform>
+                        <provisionalConform/>
+                        <optionalConform/>
+                    </otherwiseConform>
+                    </feature>
+                </features>
+            </include>
+            <include cluster="Time Synchronization" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-doorlockcontroller</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Door Lock Controller</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x000B</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Binding" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>BINDING</requireAttribute>
+            </include>
+            <include cluster="Door Lock" client="true" server="false" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Time Synchronization" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-windowcovering</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Window Covering</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0202</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+                <requireCommand>IdentifyQuery</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Scenes Management" client="false" server="false" clientLocked="true" serverLocked="false">
+                <requireAttribute>SCENE_COUNT</requireAttribute>
+                <requireAttribute>CURRENT_SCENE</requireAttribute>
+                <requireAttribute>CURRENT_GROUP</requireAttribute>
+                <requireAttribute>SCENE_VALID</requireAttribute>
+                <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
+                <requireCommand>AddScene</requireCommand>
+                <requireCommand>AddSceneResponse</requireCommand>
+                <requireCommand>ViewScene</requireCommand>
+                <requireCommand>ViewSceneResponse</requireCommand>
+                <requireCommand>RemoveScene</requireCommand>
+                <requireCommand>RemoveSceneResponse</requireCommand>
+                <requireCommand>RemoveAllScenes</requireCommand>
+                <requireCommand>RemoveAllScenesResponse</requireCommand>
+                <requireCommand>StoreScene</requireCommand>
+                <requireCommand>StoreSceneResponse</requireCommand>
+                <requireCommand>RecallScene</requireCommand>
+                <requireCommand>GetSceneMembership</requireCommand>
+                <requireCommand>GetSceneMembershipResponse</requireCommand>
+            </include>
+            <include cluster="Groups" client="false" server="false" clientLocked="true" serverLocked="false">
+                <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
+                <requireCommand>AddGroup</requireCommand>
+                <requireCommand>AddGroupResponse</requireCommand>
+                <requireCommand>ViewGroup</requireCommand>
+                <requireCommand>ViewGroupResponse</requireCommand>
+                <requireCommand>GetGroupMembership</requireCommand>
+                <requireCommand>GetGroupMembershipResponse</requireCommand>
+                <requireCommand>RemoveGroup</requireCommand>
+                <requireCommand>RemoveGroupResponse</requireCommand>
+                <requireCommand>RemoveAllGroups</requireCommand>
+                <requireCommand>AddGroupIfIdentifying</requireCommand>
+            </include>
+            <include cluster="Window Covering" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="" name="Absolute">
+                    <mandatoryConform>
+                        <condition name="Zigbee"/>
+                    </mandatoryConform>
+                    </feature>
+                </features>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-windowcoveringcontroller</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Window Covering Controller</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0203</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="false" clientLocked="false" serverLocked="false">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+                <requireCommand>IdentifyQuery</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Binding" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>BINDING</requireAttribute>
+            </include>
+            <include cluster="Scenes Management" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Groups" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Window Covering" client="true" server="false" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="" name="Absolute">
+                    <mandatoryConform>
+                        <condition name="Zigbee"/>
+                    </mandatoryConform>
+                    </feature>
+                </features>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-heatcool</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Heating/Cooling Unit</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0300</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+                <requireCommand>IdentifyQuery</requireCommand>
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Binding" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>BINDING</requireAttribute>
+            </include>
+            <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
+                <requireCommand>AddGroup</requireCommand>
+                <requireCommand>AddGroupResponse</requireCommand>
+                <requireCommand>ViewGroup</requireCommand>
+                <requireCommand>ViewGroupResponse</requireCommand>
+                <requireCommand>GetGroupMembership</requireCommand>
+                <requireCommand>GetGroupMembershipResponse</requireCommand>
+                <requireCommand>RemoveGroup</requireCommand>
+                <requireCommand>RemoveGroupResponse</requireCommand>
+                <requireCommand>RemoveAllGroups</requireCommand>
+                <requireCommand>AddGroupIfIdentifying</requireCommand>
+            </include>
+            <include cluster="Scenes Management" client="false" server="false" clientLocked="true" serverLocked="false">
+                <requireAttribute>SCENE_COUNT</requireAttribute>
+                <requireAttribute>CURRENT_SCENE</requireAttribute>
+                <requireAttribute>CURRENT_GROUP</requireAttribute>
+                <requireAttribute>SCENE_VALID</requireAttribute>
+                <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
+                <requireCommand>AddScene</requireCommand>
+                <requireCommand>AddSceneResponse</requireCommand>
+                <requireCommand>ViewScene</requireCommand>
+                <requireCommand>ViewSceneResponse</requireCommand>
+                <requireCommand>RemoveScene</requireCommand>
+                <requireCommand>RemoveSceneResponse</requireCommand>
+                <requireCommand>RemoveAllScenes</requireCommand>
+                <requireCommand>RemoveAllScenesResponse</requireCommand>
+                <requireCommand>StoreScene</requireCommand>
+                <requireCommand>StoreSceneResponse</requireCommand>
+                <requireCommand>RecallScene</requireCommand>
+                <requireCommand>GetSceneMembership</requireCommand>
+                <requireCommand>GetSceneMembershipResponse</requireCommand>
+            </include>
+            <include cluster="Thermostat" client="true" server="false" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Fan Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Level Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-thermostat</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Thermostat</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0301</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+                <requireCommand>IdentifyQuery</requireCommand>
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Binding" client="false" server="false" clientLocked="true" serverLocked="false">
+                <requireAttribute>BINDING</requireAttribute>
+            </include>
+            <include cluster="Scenes Management" client="false" server="false" clientLocked="true" serverLocked="false">
+                <requireAttribute>SCENE_COUNT</requireAttribute>
+                <requireAttribute>CURRENT_SCENE</requireAttribute>
+                <requireAttribute>CURRENT_GROUP</requireAttribute>
+                <requireAttribute>SCENE_VALID</requireAttribute>
+                <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
+                <requireCommand>AddScene</requireCommand>
+                <requireCommand>AddSceneResponse</requireCommand>
+                <requireCommand>ViewScene</requireCommand>
+                <requireCommand>ViewSceneResponse</requireCommand>
+                <requireCommand>RemoveScene</requireCommand>
+                <requireCommand>RemoveSceneResponse</requireCommand>
+                <requireCommand>RemoveAllScenes</requireCommand>
+                <requireCommand>RemoveAllScenesResponse</requireCommand>
+                <requireCommand>StoreScene</requireCommand>
+                <requireCommand>StoreSceneResponse</requireCommand>
+                <requireCommand>RecallScene</requireCommand>
+                <requireCommand>GetSceneMembership</requireCommand>
+                <requireCommand>GetSceneMembershipResponse</requireCommand>
+            </include>
+            <include cluster="Groups" client="false" server="false" clientLocked="true" serverLocked="false">
+                <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
+                <requireCommand>AddGroup</requireCommand>
+                <requireCommand>AddGroupResponse</requireCommand>
+                <requireCommand>ViewGroup</requireCommand>
+                <requireCommand>ViewGroupResponse</requireCommand>
+                <requireCommand>GetGroupMembership</requireCommand>
+                <requireCommand>GetGroupMembershipResponse</requireCommand>
+                <requireCommand>RemoveGroup</requireCommand>
+                <requireCommand>RemoveGroupResponse</requireCommand>
+                <requireCommand>RemoveAllGroups</requireCommand>
+                <requireCommand>AddGroupIfIdentifying</requireCommand>
+            </include>
+            <include cluster="Thermostat" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Time Synchronization" client="false" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Thermostat User Interface Configuration" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Fan Control" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Temperature Measurement" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Occupancy Sensing" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Relative Humidity Measurement" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-fan</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Fan</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x002B</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
+                <requireCommand>AddGroup</requireCommand>
+                <requireCommand>AddGroupResponse</requireCommand>
+                <requireCommand>ViewGroup</requireCommand>
+                <requireCommand>ViewGroupResponse</requireCommand>
+                <requireCommand>GetGroupMembership</requireCommand>
+                <requireCommand>GetGroupMembershipResponse</requireCommand>
+                <requireCommand>RemoveGroup</requireCommand>
+                <requireCommand>RemoveGroupResponse</requireCommand>
+                <requireCommand>RemoveAllGroups</requireCommand>
+                <requireCommand>AddGroupIfIdentifying</requireCommand>
+            </include>
+            <include cluster="Fan Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-casting-videoplayer</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Casting Video Player</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0023</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Media Playback" client="false" server="true" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Keypad Input" client="false" server="true" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Application Launcher" client="false" server="true" clientLocked="false" serverLocked="false">
+                <features>
+                    <feature code="" name="Application">
+                    <mandatoryConform/>
+                    </feature>
+                </features>
+            </include>
+            <include cluster="Media Input" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="On/Off" client="false" server="true" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Channel" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Audio Output" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Low Power" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Wake on LAN" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Target Navigator" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Account Login" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Content Launcher" client="false" server="true" clientLocked="false" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-basic-videoplayer</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Basic Video Player</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0028</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Media Playback" client="false" server="true" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Keypad Input" client="false" server="true" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Media Input" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="On/Off" client="false" server="true" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Channel" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Audio Output" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Low Power" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Wake on LAN" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Target Navigator" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-casting-videoclient</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Casting Video Client</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0029</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Binding" client="false" server="true" clientLocked="false" serverLocked="true">
+                <requireAttribute>BINDING</requireAttribute>
+            </include>
+            <include cluster="Media Playback" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Content Launcher" client="true" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Keypad Input" client="true" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Account Login" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="On/Off" client="true" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Level Control" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Wake on LAN" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Channel" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Target Navigator" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Media Input" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Low Power" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Audio Output" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Application Launcher" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Application Basic" client="true" server="false" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-video-remotecontrol</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Video Remote Control</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x002A</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Binding" client="false" server="true" clientLocked="false" serverLocked="true">
+                <requireAttribute>BINDING</requireAttribute>
+            </include>
+            <include cluster="Media Playback" client="true" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Content Launcher" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Keypad Input" client="true" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Account Login" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="On/Off" client="true" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Level Control" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Wake on LAN" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Channel" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Target Navigator" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Media Input" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Low Power" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Audio Output" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Application Launcher" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-speaker</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Speaker</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0022</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+                <requireCommand>IdentifyQuery</requireCommand>
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="On/Off" client="false" server="true" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Level Control" client="false" server="true" clientLocked="false" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-contentapp</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Content App</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0024</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+                <requireCommand>IdentifyQuery</requireCommand>
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Application Basic" client="false" server="true" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Keypad Input" client="false" server="true" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Application Launcher" client="false" server="true" clientLocked="false" serverLocked="true">
+                <features>
+                    <feature code="" name="Application">
+                    <disallowConform/>
+                    </feature>
+                </features>
+            </include>
+            <include cluster="Account Login" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Content Launcher" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Media Playback" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Target Navigator" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Channel" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-modeselect</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Mode Select</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0027</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+                <requireCommand>IdentifyQuery</requireCommand>
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Mode Select" client="false" server="true" clientLocked="false" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-room-airconditioner</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Room Air Conditioner</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0072</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+            </include>
+            <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="" name="DF">
+                    <mandatoryConform/>
+                    </feature>
+                </features>
+                <requireAttribute>ON_OFF</requireAttribute>
+                <requireCommand>Off</requireCommand>
+                <requireCommand>On</requireCommand>
+                <requireCommand>Toggle</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Groups" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Scenes Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Thermostat" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Thermostat User Interface Configuration" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Fan Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Relative Humidity Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-smokecoalarm</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Smoke CO Alarm</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0076</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+            </include>
+            <include cluster="Groups" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Smoke CO Alarm" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Relative Humidity Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Carbon Monoxide" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Power Source" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-air-purifier</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Air Purifier</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x002D</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+            </include>
+            <include cluster="Groups" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Fan Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="HEPA Filter Monitoring" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Activated Carbon Filter Monitoring" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-air-quality-sensor</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Air Quality Sensor</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x002C</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+            </include>
+            <include cluster="Air Quality" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Temperature Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Relative Humidity Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Carbon Monoxide Concentration Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Carbon Dioxide Concentration Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Nitrogen Dioxide Concentration Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Ozone Concentration Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Formaldehyde Concentration Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="PM1 Concentration Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="PM2.5 Concentration Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="PM10 Concentration Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Radon Concentration Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Total Volatile Organic Compounds Concentration Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-dishwasher</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Dishwasher</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0075</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="On/Off" client="false" server="false" clientLocked="true" serverLocked="false">
+                <features>
+                    <feature code="" name="DF">
+                    <mandatoryConform/>
+                    </feature>
+                </features>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Temperature Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Dishwasher Mode" client="false" server="false" clientLocked="true" serverLocked="false">
+                <features>
+                    <feature code="" name="OnOff">
+                    <disallowConform/>
+                    </feature>
+                </features>
+            </include>
+            <include cluster="Dishwasher Alarm" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Operational State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+     <deviceType>
+        <name>MA-oven</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Oven</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x007B</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-microwave-oven</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Microwave Oven</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0079</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Fan Control" client="false" server="false" clientLocked="true" serverLocked="false">
+                <features>
+                    <feature code="" name="Wind">
+                    <disallowConform/>
+                    </feature>
+                    <feature code="" name="AirflowDirection">
+                    <disallowConform/>
+                    </feature>
+                </features>
+            </include>
+            <include cluster="Microwave Oven Mode"  client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Microwave Oven Control"  client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Operational State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-refrigerator</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Refrigerator</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0070</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Refrigerator And Temperature Controlled Cabinet Mode" client="false" server="false" clientLocked="true" serverLocked="false">
+                <features>
+                    <feature code="" name="OnOff">
+                    <disallowConform/>
+                    </feature>
+                </features>
+            </include>
+            <include cluster="Refrigerator Alarm" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-laundry-washer</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Laundry Washer</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0073</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="On/Off" client="false" server="false" clientLocked="true" serverLocked="false">
+                <features>
+                    <feature code="" name="DF">
+                    <mandatoryConform/>
+                    </feature>
+                </features>
+            </include>
+            <include cluster="Laundry Washer Mode" client="false" server="false" clientLocked="true" serverLocked="false">
+                <features>
+                    <feature code="" name="OnOff">
+                    <disallowConform/>
+                    </feature>
+                </features>
+            </include>
+            <include cluster="Laundry Washer Controls" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Temperature Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Operational State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+        <deviceType>
+        <name>MA-laundry-dryer</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Laundry Dryer</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x007C</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="On/Off" client="false" server="false" clientLocked="true" serverLocked="false">
+                <features>
+                    <feature code="" name="DF">
+                    <mandatoryConform/>
+                    </feature>
+                </features>
+            </include>
+            <include cluster="Laundry Washer Mode" client="false" server="false" clientLocked="true" serverLocked="false">
+                <features>
+                    <feature code="" name="OnOff">
+                    <disallowConform/>
+                    </feature>
+                </features>
+            </include>
+            <include cluster="Laundry Dryer Controls" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Temperature Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Operational State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-extractor-hood</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Extractor Hood</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x007A</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="HEPA Filter Monitoring" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Activated Carbon Filter Monitoring" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Fan Control" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="" name="Rocking">
+                    <disallowConform/>
+                    </feature>
+                    <feature code="" name="Wind">
+                    <disallowConform/>
+                    </feature>
+                    <feature code="" name="AirflowDirection">
+                    <disallowConform/>
+                    </feature>
+                </features>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-robotic-vacuum-cleaner</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Robotic Vacuum Cleaner</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0074</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="RVC Run Mode" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="RVC Clean Mode" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="RVC Operational State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-temperature-controlled-cabinet</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Temperature Controlled Cabinet</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0071</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Temperature Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Refrigerator And Temperature Controlled Cabinet Mode" client="false" server="false" clientLocked="true" serverLocked="false">
+                <features>
+                    <feature code="" name="OnOff">
+                    <disallowConform/>
+                    </feature>
+                </features>
+            </include>
+            <include cluster="Oven Mode" client="false" server="false" clientLocked="true" serverLocked="false">
+                <features>
+                    <feature code="" name="OnOff">
+                    <disallowConform/>
+                    </feature>
+                </features>
+            </include>
+            <include cluster="Oven Cavity Operational State" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-water-freeze-detector</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Water Freeze Detector</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0041</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Boolean State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Boolean State Configuration" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-water-valve</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Water Valve</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0042</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Valve Configuration and Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-water-leak-detector</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Water Leak Detector</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0043</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Boolean State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Boolean State Configuration" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-rain-sensor</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Rain Sensor</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0044</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Boolean State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Boolean State Configuration" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-network-infrastructure-manager</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Network Infrastructure Manager</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0xFFF10010</deviceId><!-- TODO: ID-TBD -->
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"/>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-all-clusters-app</name>
+        <domain>CHIP</domain>
+        <typeName>Matter All-clusters-app Server Example</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0xFFF10003</deviceId>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+                <requireCommand>IdentifyQuery</requireCommand>
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Binding" client="false" server="true" clientLocked="true" serverLocked="false">
+                <requireAttribute>BINDING</requireAttribute>
+            </include>
+            <include cluster="Barrier Control" client="true" server="true" clientLocked="true" serverLocked="true">
+                <requireCommand>BarrierControlGoToPercent</requireCommand>
+                <requireCommand>BarrierControlStop</requireCommand>
+            </include>
+            <include cluster="Color Control" client="true" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>COLOR_CONTROL_CURRENT_HUE</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_CURRENT_SATURATION</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_REMAINING_TIME</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_CURRENT_X</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_CURRENT_Y</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_DRIFT_COMPENSATION</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_COMPENSATION_TEXT</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_COLOR_TEMPERATURE</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_COLOR_MODE</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_OPTIONS</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_NUMBER_OF_PRIMARIES</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_PRIMARY_1_X</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_PRIMARY_1_Y</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_PRIMARY_1_INTENSITY</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_PRIMARY_2_X</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_PRIMARY_2_Y</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_PRIMARY_2_INTENSITY</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_PRIMARY_3_X</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_PRIMARY_3_Y</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_PRIMARY_3_INTENSITY</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_PRIMARY_4_X</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_PRIMARY_4_Y</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_PRIMARY_4_INTENSITY</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_PRIMARY_5_X</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_PRIMARY_5_Y</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_PRIMARY_5_INTENSITY</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_PRIMARY_6_X</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_PRIMARY_6_Y</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_PRIMARY_6_INTENSITY</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_WHITE_POINT_X</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_WHITE_POINT_Y</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_COLOR_POINT_R_X</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_COLOR_POINT_R_Y</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_COLOR_POINT_R_INTENSITY</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_COLOR_POINT_G_X</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_COLOR_POINT_G_Y</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_COLOR_POINT_G_INTENSITY</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_COLOR_POINT_B_X</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_COLOR_POINT_B_Y</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_COLOR_POINT_B_INTENSITY</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_TEMPERATURE_LEVEL_MIN_MIREDS</requireAttribute>
+                <requireAttribute>START_UP_COLOR_TEMPERATURE_MIREDS</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_ENHANCED_CURRENT_HUE</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_ENHANCED_COLOR_MODE</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_COLOR_LOOP_ACTIVE</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_COLOR_LOOP_DIRECTION</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_COLOR_LOOP_TIME</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_COLOR_START_ENHANCED_HUE</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_COLOR_STORED_ENHANCED_HUE</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_COLOR_CAPABILITIES</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MIN</requireAttribute>
+                <requireAttribute>COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MAX</requireAttribute>
+                <requireCommand>MoveToHue</requireCommand>
+                <requireCommand>MoveHue</requireCommand>
+                <requireCommand>StepHue</requireCommand>
+                <requireCommand>MoveToSaturation</requireCommand>
+                <requireCommand>MoveSaturation</requireCommand>
+                <requireCommand>StepSaturation</requireCommand>
+                <requireCommand>MoveToHueAndSaturation</requireCommand>
+                <requireCommand>MoveToColor</requireCommand>
+                <requireCommand>MoveColor</requireCommand>
+                <requireCommand>StepColor</requireCommand>
+                <requireCommand>MoveToColorTemperature</requireCommand>
+                <requireCommand>MoveColorTemperature</requireCommand>
+                <requireCommand>StepColorTemperature</requireCommand>
+                <requireCommand>StopMoveStep</requireCommand>
+            </include>
+            <include cluster="Door Lock" client="true" server="true" clientLocked="true" serverLocked="true">
+                <requireCommand>LockDoor</requireCommand>
+                <requireCommand>UnlockDoor</requireCommand>
+                <requireCommand>SetUser</requireCommand>
+                <requireCommand>GetUser</requireCommand>
+                <requireCommand>GetUserResponse</requireCommand>
+                <requireCommand>ClearUser</requireCommand>
+                <requireCommand>SetCredential</requireCommand>
+                <requireCommand>SetCredentialResponse</requireCommand>
+                <requireCommand>SetCredentialStatus</requireCommand>
+                <requireCommand>SetCredentialStatusResponse</requireCommand>
+                <requireCommand>ClearCredential</requireCommand>
+            </include>
+            <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
+                <requireCommand>AddGroup</requireCommand>
+                <requireCommand>AddGroupResponse</requireCommand>
+                <requireCommand>ViewGroup</requireCommand>
+                <requireCommand>ViewGroupResponse</requireCommand>
+                <requireCommand>GetGroupMembership</requireCommand>
+                <requireCommand>GetGroupMembershipResponse</requireCommand>
+                <requireCommand>RemoveGroup</requireCommand>
+                <requireCommand>RemoveGroupResponse</requireCommand>
+                <requireCommand>RemoveAllGroups</requireCommand>
+                <requireCommand>AddGroupIfIdentifying</requireCommand>
+            </include>
+            <include cluster="Level Control" client="true" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>CURRENT_LEVEL</requireAttribute>
+                <requireCommand>MoveToLevel</requireCommand>
+                <requireCommand>Move</requireCommand>
+                <requireCommand>Step</requireCommand>
+                <requireCommand>Stop</requireCommand>
+                <requireCommand>MoveToLevelWithOnOff</requireCommand>
+                <requireCommand>MoveWithOnOff</requireCommand>
+                <requireCommand>StepWithOnOff</requireCommand>
+                <requireCommand>StopWithOnOff</requireCommand>
+            </include>
+            <include cluster="On/Off" client="true" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>ON_OFF</requireAttribute>
+                <requireCommand>Off</requireCommand>
+                <requireCommand>On</requireCommand>
+                <requireCommand>Toggle</requireCommand>
+            </include>
+            <include cluster="Scenes Management" client="true" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>SCENE_COUNT</requireAttribute>
+                <requireAttribute>CURRENT_SCENE</requireAttribute>
+                <requireAttribute>CURRENT_GROUP</requireAttribute>
+                <requireAttribute>SCENE_VALID</requireAttribute>
+                <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
+                <requireCommand>AddScene</requireCommand>
+                <requireCommand>AddSceneResponse</requireCommand>
+                <requireCommand>ViewScene</requireCommand>
+                <requireCommand>ViewSceneResponse</requireCommand>
+                <requireCommand>RemoveScene</requireCommand>
+                <requireCommand>RemoveSceneResponse</requireCommand>
+                <requireCommand>RemoveAllScenes</requireCommand>
+                <requireCommand>RemoveAllScenesResponse</requireCommand>
+                <requireCommand>StoreScene</requireCommand>
+                <requireCommand>StoreSceneResponse</requireCommand>
+                <requireCommand>RecallScene</requireCommand>
+                <requireCommand>GetSceneMembership</requireCommand>
+                <requireCommand>GetSceneMembershipResponse</requireCommand>
+            </include>
+            <include cluster="Temperature Measurement" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-secondary-network-commissioning</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Secondary Network Commissioning Device Type</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0xFFF10002</deviceId>
+        <clusters lockOthers="true">
+            <include cluster="Network Commissioning" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>Cooktop</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Cooktop</typeName>
+        <class>Simple</class>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0078</deviceId>
+        <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+            </include>
+            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="" name="OFFONLY">
+                    <mandatoryConform/>
+                    </feature>
+                </features>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>Cook Surface</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Cook Surface</typeName>
+        <class>Simple</class>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0077</deviceId>
+        <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+            </include>
+            <include cluster="Temperature Control" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+        <deviceType>
+        <name>Energy EVSE</name>
+        <domain>CHIP</domain>
+        <typeName>Matter EVSE</typeName>
+        <class>Simple</class>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x050C</deviceId>
+        <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Energy EVSE" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Energy EVSE Mode" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+</configurator>

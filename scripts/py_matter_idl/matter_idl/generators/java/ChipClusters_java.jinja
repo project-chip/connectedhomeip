@@ -1,0 +1,568 @@
+{%- macro encode_value(source, encodable, depth) -%}
+  {%- if encodable.is_nullable -%}
+    @Nullable {{encode_value(source, encodable.without_nullable(), depth + 1)}}
+  {%- elif encodable.is_optional -%}
+    Optional<{{encode_value(source, encodable.without_optional(), depth + 1)}}>
+  {%- elif encodable.is_list -%}
+    ArrayList<{{encode_value(source, encodable.without_list(), depth + 1)}}>
+  {%- elif encodable.is_struct -%}
+    {%- set struct = encodable.get_underlying_struct() -%}
+    ChipStructs.{{source.name}}Cluster{{struct.name}}
+  {%- else -%}
+    {{encodable.boxed_java_type}}
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro encode_value_without_optional(source, encodable, depth) -%}
+  {%- if encodable.is_nullable -%}
+    @Nullable {{encode_value_without_optional(source, encodable.without_nullable(), depth + 1)}}
+  {%- elif encodable.is_list -%}
+    List<{{encode_value_without_optional(source, encodable.without_list(), depth + 1)}}>
+  {%- elif encodable.is_struct -%}
+    {%- set struct = encodable.get_underlying_struct() -%}
+    ChipStructs.{{source.name}}Cluster{{struct.name}}
+  {%- else -%}
+    {{encodable.boxed_java_type}}
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro encode_value_without_optional_nullable(source, encodable, depth) -%}
+  {%- if encodable.is_list -%}
+    ArrayList<{{encode_value_without_optional_nullable(source, encodable.without_list(), depth + 1)}}>
+  {%- elif encodable.is_struct -%}
+    {%- set struct = encodable.get_underlying_struct() -%}
+    ChipStructs.{{source.name}}Cluster{{struct.name}}
+  {%- else -%}
+    {{encodable.boxed_java_type}}
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro encode_tlv(source, encodable, variable, depth) -%}
+  {%- if encodable.is_nullable -%}
+    {{variable}} != null ? {{encode_tlv(source, encodable.without_nullable(), variable, depth + 1)}} : new NullType()
+  {%- elif encodable.is_optional -%}
+    {{variable}}.<BaseTLVType>map(({{"nonOptional{}".format(variable)}}) -> {{encode_tlv(source, encodable.without_optional(), "nonOptional{}".format(variable), depth + 1)}}).orElse(new EmptyType())
+  {%- elif encodable.is_list -%}
+    ArrayType.generateArrayType({{variable}}, ({{"element{}".format(variable)}}) -> {{encode_tlv(source, encodable.without_list(), "element{}".format(variable), depth + 1)}})
+  {%- elif encodable.is_struct -%}
+    {%- set struct = encodable.get_underlying_struct() -%}
+    {{variable}}.encodeTlv()
+  {%- else -%}
+    new {{encodable.java_tlv_type}}Type({{variable}})
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro decode_tlv(source, encodable, variable, depth) -%}
+  {%- if encodable.is_optional -%}
+    Optional.of({{decode_tlv(source, encodable.without_optional(), variable, depth + 1)}})
+  {%- elif encodable.is_list -%}
+    {{variable}}.map(({{"element{}".format(variable)}}) -> {{decode_tlv(source, encodable.without_list(), "element{}".format(variable), depth + 1)}})
+  {%- elif encodable.is_struct -%}
+    {%- set struct = encodable.get_underlying_struct() -%}
+    ChipStructs.{{source.name}}Cluster{{struct.name}}.decodeTlv({{variable}})
+  {%- else -%}
+    {{variable}}.value({{encodable.boxed_java_type}}.class)
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro get_tlvType(encodable) -%}
+  {%- if encodable.is_list -%}
+    Array
+  {%- elif encodable.is_struct -%}
+    Struct
+  {%- else -%}
+    {{encodable.java_tlv_type}}
+  {%- endif -%}
+{%- endmacro -%}
+
+/*
+ *
+ *    Copyright (c) 2023 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+package chip.devicecontroller;
+
+import chip.devicecontroller.model.AttributeState;
+import chip.devicecontroller.model.AttributeWriteRequest;
+import chip.devicecontroller.model.ChipAttributePath;
+import chip.devicecontroller.model.ChipEventPath;
+import chip.devicecontroller.model.ClusterState;
+import chip.devicecontroller.model.EndpointState;
+import chip.devicecontroller.model.InvokeElement;
+import chip.devicecontroller.model.NodeState;
+import chip.devicecontroller.model.Status;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import static chip.devicecontroller.ChipTLVType.*;
+
+public class ChipClusters {
+
+  public interface BaseClusterCallback {
+    void onError(Exception error);
+  }
+
+  public interface DefaultClusterCallback extends BaseClusterCallback {
+    void onSuccess();
+  }
+
+  public interface BaseAttributeCallback {
+    void onError(Exception error);
+    default void onSubscriptionEstablished(long subscriptionId) {}
+  }
+
+  public interface CharStringAttributeCallback extends BaseAttributeCallback {
+    /** Indicates a successful read for a CHAR_STRING attribute. */
+    void onSuccess(String value);
+  }
+
+  public interface OctetStringAttributeCallback extends BaseAttributeCallback {
+    /** Indicates a successful read for an OCTET_STRING attribute. */
+    void onSuccess(byte[] value);
+  }
+
+  public interface IntegerAttributeCallback extends BaseAttributeCallback {
+    void onSuccess(int value);
+  }
+
+  public interface LongAttributeCallback extends BaseAttributeCallback {
+    void onSuccess(long value);
+  }
+
+  public interface BooleanAttributeCallback extends BaseAttributeCallback {
+    void onSuccess(boolean value);
+  }
+
+  public interface FloatAttributeCallback extends BaseAttributeCallback {
+    void onSuccess(float value);
+  }
+
+  public interface DoubleAttributeCallback extends BaseAttributeCallback {
+    void onSuccess(double value);
+  }
+
+  public static abstract class BaseChipCluster {
+    protected long chipClusterPtr;
+
+    protected long devicePtr;
+    protected int endpointId;
+    protected long clusterId;
+
+    private Optional<Long> timeoutMillis = Optional.empty();
+
+    public BaseChipCluster(long devicePtr, int endpointId, long clusterId) {
+      this.devicePtr = devicePtr;
+      this.endpointId = endpointId;
+      this.clusterId = clusterId;
+    }
+
+    /**
+     * Sets the timeout, in milliseconds, after which commands sent through this cluster will fail
+     * with a timeout (regardless of whether or not a response has been received). If set to an
+     * empty optional, the default timeout will be used.
+     */
+    public void setCommandTimeout(Optional<Long> timeoutMillis) {
+      this.timeoutMillis = timeoutMillis;
+    }
+
+    /** Returns the current timeout (in milliseconds) for commands sent through this cluster. */
+    public Optional<Long> getCommandTimeout() {
+      return timeoutMillis == null ? Optional.empty() : timeoutMillis;
+    }
+
+    @Deprecated
+    public abstract long initWithDevice(long devicePtr, int endpointId);
+
+    protected void readAttribute(
+        ReportCallbackImpl callback,
+        long attributeId,
+        boolean isFabricFiltered) {
+      ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, attributeId);
+      ChipInteractionClient.read(0, jniCallback.getCallbackHandle(), devicePtr, Arrays.asList(path), null, null, isFabricFiltered, timeoutMillis.orElse(0L).intValue(), null);
+    }
+
+    protected void writeAttribute(
+        WriteAttributesCallbackImpl callback,
+        long attributeId,
+        BaseTLVType value,
+        int timedRequestTimeoutMs) {
+      WriteAttributesCallbackJni jniCallback = new WriteAttributesCallbackJni(callback);
+      byte[] tlv = encodeToTlv(value);
+      AttributeWriteRequest writeRequest = AttributeWriteRequest.newInstance(endpointId, clusterId, attributeId, tlv);
+      ChipInteractionClient.write(0, jniCallback.getCallbackHandle(), devicePtr, Arrays.asList(writeRequest), timedRequestTimeoutMs, timeoutMillis.orElse(0L).intValue());
+    }
+
+    protected void subscribeAttribute(
+        ReportCallbackImpl callback,
+        long attributeId,
+        int minInterval,
+        int maxInterval) {
+      ReportCallbackJni jniCallback = new ReportCallbackJni(callback, callback, callback);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, attributeId);
+      int fabricIndex = ChipInteractionClient.getFabricIndex(devicePtr);
+      long deviceId = ChipInteractionClient.getRemoteDeviceId(devicePtr);
+      ChipInteractionClient.subscribe(0, jniCallback.getCallbackHandle(), devicePtr, Arrays.asList(path), null, null, minInterval, maxInterval, false, true, timeoutMillis.orElse(0L).intValue(), null, ChipICDClient.isPeerICDClient(fabricIndex, deviceId));
+    }
+
+    protected void invoke(
+        InvokeCallbackImpl callback,
+        long commandId,
+        BaseTLVType value,
+        int timedRequestTimeoutMs) {
+      InvokeCallbackJni jniCallback = new InvokeCallbackJni(callback);
+      byte[] tlv = encodeToTlv(value);
+      InvokeElement element = InvokeElement.newInstance(endpointId, clusterId, commandId, tlv, null);
+      ChipInteractionClient.invoke(0, jniCallback.getCallbackHandle(), devicePtr, element, timedRequestTimeoutMs, timeoutMillis.orElse(0L).intValue());
+    }
+
+    private static native byte[] encodeToTlv(BaseTLVType value);
+
+    static native BaseTLVType decodeFromTlv(byte[] tlv);
+
+    @Deprecated
+    public void deleteCluster(long chipClusterPtr) {}
+    @SuppressWarnings("deprecation")
+    protected void finalize() throws Throwable {
+      super.finalize();
+
+      if (chipClusterPtr != 0) {
+        deleteCluster(chipClusterPtr);
+        chipClusterPtr = 0;
+      }
+    }
+  }
+
+  abstract static class ReportCallbackImpl implements ReportCallback, SubscriptionEstablishedCallback, ResubscriptionAttemptCallback {
+    private BaseAttributeCallback callback;
+    private ChipAttributePath path;
+
+    private static final long CHIP_ERROR_UNSUPPORTED_ATTRIBUTE = 0x86;
+
+    ReportCallbackImpl(BaseAttributeCallback callback, ChipAttributePath path) {
+      this.callback = callback;
+      this.path = path;
+    }
+
+    @Override
+    public void onError(
+        @Nullable ChipAttributePath attributePath,
+        @Nullable ChipEventPath eventPath,
+        @Nonnull Exception e) {
+      callback.onError(e);
+    }
+
+    @Override
+    public void onReport(NodeState nodeState) {
+      if (nodeState == null) {
+        callback.onError(new ChipClusterException());
+        return;
+      }
+
+      EndpointState endpointState = nodeState.getEndpointState((int)path.getEndpointId().getId());
+      if (endpointState == null) {
+        callback.onError(new ChipClusterException(CHIP_ERROR_UNSUPPORTED_ATTRIBUTE));
+        return;
+      }
+
+      ClusterState clusterState = endpointState.getClusterState(path.getClusterId().getId());
+      if (clusterState == null) {
+        callback.onError(new ChipClusterException(CHIP_ERROR_UNSUPPORTED_ATTRIBUTE));
+        return;
+      }
+
+      AttributeState attributeState = clusterState.getAttributeState(path.getAttributeId().getId());
+      if (attributeState == null) {
+        callback.onError(new ChipClusterException(CHIP_ERROR_UNSUPPORTED_ATTRIBUTE));
+        return;
+      }
+
+      byte[] tlv = attributeState.getTlv();
+      if (tlv == null) {
+          callback.onError(new ChipClusterException(CHIP_ERROR_UNSUPPORTED_ATTRIBUTE));
+          return;
+      }
+
+      onSuccess(tlv);
+    }
+
+    @Override
+    public void onSubscriptionEstablished(long subscriptionId) {
+      callback.onSubscriptionEstablished(subscriptionId);
+    }
+
+    @Override
+    public void onResubscriptionAttempt(long terminationCause, long nextResubscribeIntervalMsec) {}
+
+    public abstract void onSuccess(byte[] tlv);
+  }
+
+  static class WriteAttributesCallbackImpl implements WriteAttributesCallback {
+    private DefaultClusterCallback callback;
+
+    WriteAttributesCallbackImpl(DefaultClusterCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onResponse(ChipAttributePath attributePath, Status status) {
+      if (status.getStatus() == Status.Code.Success)
+      {
+        callback.onSuccess();
+      }
+      else
+      {
+        callback.onError(new StatusException(status.getStatus()));
+      }
+    }
+
+    @Override
+    public void onError(@Nullable ChipAttributePath attributePath, Exception e) {
+      callback.onError(e);
+    }
+  }
+
+  abstract static class InvokeCallbackImpl implements InvokeCallback {
+    private BaseClusterCallback callback;
+
+    private static final long CHIP_ERROR_UNSUPPORTED_COMMAND = 0x81;
+
+    InvokeCallbackImpl(BaseClusterCallback callback) {
+      this.callback = callback;
+    }
+
+    public void onError(Exception e) {
+      callback.onError(e);
+    }
+
+    public void onResponse(InvokeElement invokeElement, long successCode) {
+      byte[] tlv = invokeElement.getTlvByteArray();
+      if (tlv == null) {
+        onResponse(null);
+        return;
+      }
+      BaseTLVType value = BaseChipCluster.decodeFromTlv(tlv);
+      if (value == null || value.type() != TLVType.Struct) {
+        callback.onError(new ChipClusterException(CHIP_ERROR_UNSUPPORTED_COMMAND));
+        return;
+      }
+      onResponse((StructType)value);
+    }
+
+    public abstract void onResponse(StructType value);
+  }
+{% for cluster in clientClusters | sort(attribute='code') %}
+{%- set typeLookup = idl | createLookupContext(cluster) %}
+  public static class {{cluster.name}}Cluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = {{cluster.code}}L;
+{% for attribute in cluster.attributes | sort(attribute='code') %}
+    private static final long {{attribute.definition.name | constcase}}_ATTRIBUTE_ID = {{attribute.definition.code}}L;
+{%- endfor %}
+
+    public {{cluster.name}}Cluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId, CLUSTER_ID);
+    }
+
+    @Override
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
+{% for command in cluster.commands | sort(attribute='code') -%}
+{%- set callbackName = command | javaCommandCallbackName() -%}
+{%- if not command.is_timed_invoke %}
+    public void {{command.name | lowfirst_except_acronym}}({{callbackName}}Callback callback
+{%- if command.input_param -%}
+{%- for field in (cluster.structs | named(command.input_param)).fields -%}
+{%- set encodable = field | asEncodable(typeLookup) -%}
+    , {{encode_value(cluster, encodable, 0)}} {{field.name | lowfirst_except_acronym}}
+{%- endfor -%}
+{%- endif -%}
+    ) {
+      {{command.name | lowfirst_except_acronym}}(callback
+{%- if command.input_param -%}
+{%- for field in (cluster.structs | named(command.input_param)).fields -%}
+    , {{field.name | lowfirst_except_acronym}}
+{%- endfor -%}
+{%- endif -%}
+    , 0);
+    }
+{%- endif %}
+
+    public void {{command.name | lowfirst_except_acronym}}({{callbackName}}Callback callback
+{%- if command.input_param -%}
+{%- for field in (cluster.structs | named(command.input_param)).fields -%}
+{%- set encodable = field | asEncodable(typeLookup) -%}
+    , {{encode_value(cluster, encodable, 0)}} {{field.name | lowfirst_except_acronym}}
+{%- endfor -%}
+{%- endif -%}
+    , int timedInvokeTimeoutMs) {
+      final long commandId = {{command.code}}L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+{%- if command.input_param -%}
+{%- for field in (cluster.structs | named(command.input_param)).fields -%}
+{%- set encodable = field | asEncodable(typeLookup) %}
+      final long {{field.name | lowfirst_except_acronym}}FieldID = {{field.code}}L;
+      BaseTLVType {{field.name | lowfirst_except_acronym}}tlvValue = {{encode_tlv(cluster, encodable, (field.name | lowfirst_except_acronym), 0)}};
+      elements.add(new StructElement({{field.name | lowfirst_except_acronym}}FieldID, {{field.name | lowfirst_except_acronym}}tlvValue));
+{% endfor -%}
+{%- endif %}
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+{%- if command | isCommandNotDefaultCallback() %}
+{%- for field in (cluster.structs | named(command.output_param)).fields -%}
+{%- set encodable = field | asEncodable(typeLookup) %}
+{%- set encodable2 = field | asEncodable(typeLookup) %}
+          final long {{field.name | lowfirst_except_acronym}}FieldID = {{field.code}}L;
+          {{encode_value(cluster, encodable, 0)}} {{field.name | lowfirst_except_acronym}}
+{%- if encodable2.is_nullable -%}
+{{" = null"}}
+{%- elif encodable2.is_optional -%}
+{{" = Optional.empty()"}}
+{%- else -%}
+{{" = null"}}
+{%- endif -%}
+;
+{%- endfor %}
+          for (StructElement element: invokeStructValue.value()) {
+{%- for field in (cluster.structs | named(command.output_param)).fields -%}
+{%- set encodable = field | asEncodable(typeLookup) %}
+            {% if loop.index0 > 0 -%}{{"} else "}}{%- endif -%}if (element.contextTagNum() == {{field.name | lowfirst_except_acronym}}FieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.{{get_tlvType(encodable)}}) {
+                {{get_tlvType(encodable)}}Type castingValue = element.value({{get_tlvType(encodable)}}Type.class);
+                {{field.name | lowfirst_except_acronym}} = {{decode_tlv(cluster, encodable, "castingValue", 0)}};
+              }
+{%- endfor -%}
+{% raw %}
+            }
+{%- endraw %}
+          }
+          callback.onSuccess(
+{%- for field in (cluster.structs | named(command.output_param)).fields -%}
+      {{field.name | lowfirst_except_acronym}}
+      {%- if loop.index0 < loop.length - 1 -%}{{", "}}{%- endif -%}
+{%- endfor -%}
+            );
+{%- else %}
+          callback.onSuccess();
+{%- endif %}
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+{% endfor %}
+{%- set already_handled_command = [] -%}
+{%- for command in cluster.commands | sort(attribute='code') -%}
+{%- if command | isCommandNotDefaultCallback() -%}
+{%- set callbackName = command | javaCommandCallbackName() -%}
+{%- if callbackName not in already_handled_command %}
+    public interface {{callbackName}}Callback extends BaseClusterCallback {
+      void onSuccess(
+{%- for field in (cluster.structs | named(command.output_param)).fields -%}
+{%- set encodable = field | asEncodable(typeLookup) -%}
+      {{encode_value(cluster, encodable, 0)}} {{field.name | lowfirst_except_acronym}}
+      {%- if loop.index0 < loop.length - 1 -%}{{", "}}{%- endif -%}
+{%- endfor -%}
+      );
+    }
+{% if already_handled_command.append(callbackName) -%}
+{#- This block does nothing, it only exists to append to already_handled_command. -#}
+{%- endif -%}
+{%- endif -%}
+{%- endif -%}
+{%- endfor %}
+{%- set already_handled_attribute = [] -%}
+{% for attribute in cluster.attributes | rejectattr('definition', 'is_field_global_name', typeLookup) %}
+{%- set encodable = attribute.definition | asEncodable(typeLookup) -%}
+{%- set interfaceName = attribute | javaAttributeCallbackName(typeLookup) -%}
+{%- if interfaceName not in already_handled_attribute %}
+    public interface {{interfaceName}} extends BaseAttributeCallback {
+      void onSuccess({{encode_value_without_optional(cluster, encodable, 0)}} value);
+    }
+{% if already_handled_attribute.append(interfaceName) -%}
+{#- This block does nothing, it only exists to append to already_handled_attribute. -#}
+{%- endif -%}
+{%- endif -%}
+{% endfor -%}
+{% for attribute in cluster.attributes | sort(attribute='code') -%}
+{%- if attribute | isFabricScopedList(typeLookup) %}
+    public void read{{attribute.definition.name | upfirst}}Attribute(
+        {{attribute | javaAttributeCallbackName(typeLookup) }} callback) {
+      read{{attribute.definition.name | upfirst}}AttributeWithFabricFilter(callback, true);
+    }
+
+    public void read{{attribute.definition.name | upfirst}}AttributeWithFabricFilter(
+        {{attribute | javaAttributeCallbackName(typeLookup) }} callback, boolean isFabricFiltered) {
+{%- else %}
+    public void read{{attribute.definition.name | upfirst}}Attribute(
+        {{attribute | javaAttributeCallbackName(typeLookup) }} callback) {
+{%- endif %}
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, {{attribute.definition.name | constcase}}_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            {%- set encodable = attribute.definition | asEncodable(typeLookup) %}
+            {{encode_value_without_optional(cluster, encodable, 0)}} value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, {{attribute.definition.name | constcase}}_ATTRIBUTE_ID, {% if attribute | isFabricScopedList(typeLookup) -%}isFabricFiltered{%- else -%}true{%- endif -%});
+    }
+{% if attribute.is_writable %}
+{%- set encodable = attribute.definition | asEncodable(typeLookup) -%}
+{%- set encodable2 = attribute.definition | asEncodable(typeLookup) -%}
+{%- set encodable3 = attribute.definition | asEncodable(typeLookup) -%}
+{%- if not attribute.requires_timed_write %}
+    public void write{{attribute.definition.name | upfirst}}Attribute(DefaultClusterCallback callback, {{encode_value_without_optional_nullable(cluster, encodable, 0)}} value) {
+      write{{attribute.definition.name | upfirst}}Attribute(callback, value, 0);
+    }
+{% endif %}
+    public void write{{attribute.definition.name | upfirst}}Attribute(DefaultClusterCallback callback, {{encode_value_without_optional_nullable(cluster, encodable2, 0)}} value, int timedWriteTimeoutMs) {
+      {%- if encodable3.is_optional %}
+      BaseTLVType tlvValue = {{encode_tlv(cluster, encodable3.without_optional(), "value", 0)}};
+      {%- else %}
+      BaseTLVType tlvValue = {{encode_tlv(cluster, encodable3, "value", 0)}};
+      {%- endif %}
+      writeAttribute(new WriteAttributesCallbackImpl(callback), {{attribute.definition.name | constcase}}_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+{% endif %}
+{%- if attribute.is_subscribable %}
+    public void subscribe{{attribute.definition.name | upfirst}}Attribute(
+        {{attribute | javaAttributeCallbackName(typeLookup) }} callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, {{attribute.definition.name | constcase}}_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            {%- set encodable = attribute.definition | asEncodable(typeLookup) %}
+            {{encode_value_without_optional(cluster, encodable, 0)}} value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, {{attribute.definition.name | constcase}}_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+{% endif -%}
+{%- endfor -%}
+{% raw %}  }
+{% endraw %}
+{%- endfor -%}
+}

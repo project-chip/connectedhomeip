@@ -1,0 +1,64 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
+import("$dir_pw_build/python.gni")
+import("${chip_root}/build/chip/java/rules.gni")
+
+pw_python_action("java_build_test") {
+  inputs = [
+    "expected_output/child_library_2_expected.json",
+    "expected_output/grandchild_library_expected.json",
+    "expected_output/child_library_expected.json",
+    "expected_output/java_library_expected.json",
+    "expected_output/child_prebuilt_expected.json",
+    "expected_output/java_prebuilt_expected.json",
+  ]
+  deps = [ ":java_library" ]
+  script = "test.py"
+  stamp = true
+}
+
+java_library("java_library") {
+  sources = [ "IncludedInSources.java" ]
+  deps = [
+    ":child_library",
+    ":child_library_2",
+    ":java_prebuilt",
+  ]
+}
+
+java_library("child_library") {
+  sources = [ "IncludedInChildSources.java" ]
+}
+
+java_library("child_library_2") {
+  sources = [ "IncludedInChildSources2.java" ]
+
+  deps = [ ":grandchild_library" ]
+}
+
+java_library("grandchild_library") {
+  sources = [ "IncludedInGrandchildSources.java" ]
+}
+
+java_prebuilt("java_prebuilt") {
+  jar_path = "prebuilt_jar.jar"
+  deps = [ ":child_prebuilt" ]
+}
+
+java_prebuilt("child_prebuilt") {
+  jar_path = "child_jar.jar"
+}

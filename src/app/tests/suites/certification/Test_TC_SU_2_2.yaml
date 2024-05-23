@@ -1,0 +1,180 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    3.2.2. [TC-SU-2.2] Handling different QueryImageResponse scenarios on
+    Requestor
+
+PICS:
+    - MCORE.OTA.Requestor
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "Step 1: DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P
+          sends a QueryImageResponse back to DUT. QueryStatus is set to
+          'UpdateAvailable'. Set ImageURI to the location where the image is
+          located."
+      verification: |
+          Run the OTA Provider App using the command:
+
+          ./chip-ota-provider-app --discriminator ${PROVIDER_LONG_DISCRIMINATOR} --secured-device-port ${PROVIDER_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --filepath ${SW_IMAGE_FILE} -q updateAvailable
+
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
+
+          Verify that the transfer of the software image happens all the way until the last Block is acknowledged from OTA Provider to DUT and below is the sample log provided for the raspi platform:
+
+          [1645748688025] [99779:20370762] CHIP: [BDX] OutputEvent type: AckEOFReceived
+          [1645748688025] [99779:20370762] CHIP: [BDX] Transfer completed, got AckEOF
+      disabled: true
+
+    - label:
+          "Step 2: DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P
+          sends a QueryImageResponse back to DUT. QueryStatus is set to 'Busy',
+          DelayedActionTime is set to 60 seconds."
+      verification: |
+          Run the OTA Provider App using the command:
+
+          ./chip-ota-provider-app --discriminator ${PROVIDER_LONG_DISCRIMINATOR} --secured-device-port ${PROVIDER_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --filepath ${SW_IMAGE_FILE} -q busy -t 60
+
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
+
+          Verify that the DUT does not send a QueryImage command before the minimum interval defined by spec which is 2 minutes (120 seconds) from the last QueryImage command and below is the sample log provided for the raspi platform:
+
+          [1685509007.911471][32186:32186] CHIP:SWU: QueryImageResponse:
+          [1685509007.911485][32186:32186] CHIP:SWU:   status: 1
+          [1685509007.911497][32186:32186] CHIP:SWU:   delayedActionTime: 60 seconds
+          [1685509007.911511][32186:32186] CHIP:SWU:   userConsentNeeded: 0
+          [1685509007.911526][32186:32186] CHIP:SWU: Scheduling a retry; delay: 120
+          [1685509007.911554][32186:32186] CHIP:DMG: Endpoint 0, Cluster 0x0000_002A update version to a098eea1
+      disabled: true
+
+    - label:
+          "Step 3: DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P
+          sends a QueryImageResponse back to DUT. QueryStatus is set to
+          'NotAvailable'."
+      verification: |
+          Run the OTA Provider App using the command:
+
+
+          ./chip-ota-provider-app --discriminator ${PROVIDER_LONG_DISCRIMINATOR} --secured-device-port ${PROVIDER_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --filepath ${SW_IMAGE_FILE} -q updateNotAvailable -t 60
+
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
+
+          Verify that the DUT does not send a QueryImage command before the minimum interval defined by spec which is 2 minutes (120 seconds) from the last QueryImage command.
+      disabled: true
+
+    - label:
+          "Step 4: DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P
+          sends a QueryImageResponse back to DUT. QueryStatus is set to Busy,
+          Set DelayedActionTime to 3 minutes. On the subsequent QueryImage
+          command, TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus
+          is set to 'UpdateAvailable'."
+      verification: |
+          Run the OTA Provider App using the command:
+
+          ./chip-ota-provider-app --discriminator ${PROVIDER_LONG_DISCRIMINATOR} --secured-device-port ${PROVIDER_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --filepath ${SW_IMAGE_FILE} -q busy -t 180
+
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
+
+          Verify that the DUT waits for the time mentioned in the DelayedActionTime (3 minutes) before issuing another QueryImage command to the TH/OTA-P.
+
+          [1686297156.871478][41968:41968] CHIP:DMG: },
+          [1686297156.871552][41968:41968] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0029 Command=0x0000_0001
+          [1686297156.871596][41968:41968] CHIP:SWU: QueryImageResponse:
+          [1686297156.871619][41968:41968] CHIP:SWU:   status: 1
+          [1686297156.871640][41968:41968] CHIP:SWU:   delayedActionTime: 180 seconds
+          [1686297156.871663][41968:41968] CHIP:SWU:   userConsentNeeded: 0
+          [1686297156.871688][41968:41968] CHIP:SWU: Scheduling a retry; delay: 180
+
+
+          Verify there is a transfer of the software image after the 180 second QueryImageResponse with UpdateAvailable status from the TH/OTA-P to the DUT.
+      disabled: true
+
+    - label:
+          "Step 5: DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P
+          sends a QueryImageResponse back to DUT. QueryStatus is set to
+          'UpdateAvailable', ImageURI should have the https url from where the
+          image can be downloaded."
+      PICS: MCORE.OTA.HTTPS
+      verification: |
+          Out of scope
+      disabled: true
+
+    - label:
+          "Step 6: DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P
+          sends a QueryImageResponse back to DUT. QueryStatus is set to
+          'UpdateAvailable', Software Version should be set to the same or an
+          older (numerically lower) version."
+      verification: |
+          Run the OTA Provider App using the command:
+
+          ./chip-ota-provider-app --discriminator ${PROVIDER_LONG_DISCRIMINATOR} --secured-device-port ${PROVIDER_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --filepath ${SW_IMAGE_FILE}
+
+          Software Version of the SW_IMAGE_FILE used in above command should be the same or an older (numerically lower) version than the DUT.
+
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
+
+          Verify  DUT does not start transferring of the software image. If Software Version is same or an older (numerically lower) version.
+
+          [1687344602.016065][20388:20388] CHIP:SWU: QueryImageResponse:
+          [1687344602.016074][20388:20388] CHIP:SWU:   status: 0
+          [1687344602.016081][20388:20388] CHIP:SWU:   imageURI: bdx://000000000000007B/ota-requestor-app.ota
+          [1687344602.016091][20388:20388] CHIP:SWU:   softwareVersion: 2
+          [1687344602.016099][20388:20388] CHIP:SWU:   softwareVersionString: 2.0
+          [1687344602.016111][20388:20388] CHIP:SWU:   updateToken: 32
+          [1687344602.016122][20388:20388] CHIP:SWU:   userConsentNeeded: 0
+          [1687344602.016140][20388:20388] CHIP:SWU: Available update version 2 is <= current version 2, update ignored
+          [1687344602.016165][20388:20388] CHIP:DMG: Endpoint 0, Cluster 0x0000_002A update version to b1977188
+      disabled: true
+
+    - label:
+          "Step 7: DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P
+          sends a QueryImageResponse back to DUT. QueryStatus is set to
+          'UpdateAvailable', ImageURI field contains an invalid BDX ImageURI."
+      verification: |
+          Run the OTA Provider App using the command:
+
+          ./chip-ota-provider-app --discriminator ${PROVIDER_LONG_DISCRIMINATOR} --secured-device-port ${PROVIDER_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --filepath ${SW_IMAGE_FILE} -i bdx://0000000000000001
+
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
+
+          Verify DUT does not start transferring of the software image.If ImageURI field contains an invalid BDX ImageURI.
+
+          [1687344102.587511][18508:18508] CHIP:SWU: QueryImageResponse:
+          [1687344102.587513][18508:18508] CHIP:SWU:   status: 0
+          [1687344102.587516][18508:18508] CHIP:SWU:   imageURI: bdx://0000000000000001
+          [1687344102.587518][18508:18508] CHIP:SWU:   softwareVersion: 2
+          [1687344102.587521][18508:18508] CHIP:SWU:   softwareVersionString: 2.0
+          [1687344102.587523][18508:18508] CHIP:SWU:   updateToken: 32
+          [1687344102.587525][18508:18508] CHIP:SWU:   userConsentNeeded: 0
+          [1687344102.587530][18508:18508] CHIP:SWU: QueryImageResponse contains invalid fields: src/protocols/bdx/BdxUri.cpp:43: CHIP Error 0x0000001E: Invalid string length
+      disabled: true

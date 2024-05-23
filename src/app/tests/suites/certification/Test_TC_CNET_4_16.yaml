@@ -1,0 +1,119 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    12.4.14. [TC-CNET-4.16] [Thread] NetworkIDNotFound value as
+    LastNetworkingStatus argument validation [DUT-Server]
+
+PICS:
+    - CNET.S.F01
+
+config:
+    nodeId: 0x12344321
+    cluster: "Network Commissioning"
+    #PIXIT.CNET.ENDPOINT_THREAD
+    endpoint: 0
+
+    PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET:
+        type: octet_string
+        defaultValue: "hex:1111111122222222"
+
+tests:
+    - label: "Precondition : Factory reset the DUT"
+      verification: |
+          Reset Devices to factory defaults
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Factory Reset the DUT and enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Precondition: TH reads FeatureMap attribute from the DUT"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 2
+          constraints:
+              type: bitmap32
+
+    - label:
+          "Precondition: DUT MaxNetworks attribute value is at least 1 and is
+          saved as 'MaxNetworksValue' for future use"
+      PICS: CNET.S.A0000
+      command: "readAttribute"
+      attribute: "MaxNetworks"
+      response:
+          saveAs: MaxNetworksValue
+          constraints:
+              type: int8u
+              minValue: 1
+              maxValue: 255
+
+    - label:
+          "Step 1: TH sends ArmFailSafe command to the DUT with
+          ExpiryLengthSeconds set to 900"
+      cluster: "General Commissioning"
+      command: "ArmFailSafe"
+      arguments:
+          values:
+              - name: "ExpiryLengthSeconds"
+                value: 900
+              - name: "Breadcrumb"
+                value: 0
+      response:
+          values:
+              - name: "ErrorCode"
+                value: 0
+              - name: "DebugText"
+                value: ""
+
+    - label:
+          "Step 2: TH sends RemoveNetwork Command to the DUT with NetworkID
+          field set to the extended PAN ID of
+          PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET, which does not match the
+          commissioned network, and Breadcrumb field set to 1"
+      PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
+      command: "RemoveNetwork"
+      arguments:
+          values:
+              - name: "NetworkID"
+                value: PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET
+              - name: "Breadcrumb"
+                value: 1
+      response:
+          values:
+              - name: "NetworkingStatus"
+                value: 3
+
+    - label:
+          "Step 3: TH sends ConnectNetwork Command to the DUT with NetworkID
+          value as the extended PAN ID of
+          PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET, which does not match the
+          commissioned network, and Breadcrumb field set to 1"
+      PICS: CNET.S.C06.Rsp && CNET.S.C07.Tx
+      command: "ConnectNetwork"
+      arguments:
+          values:
+              - name: "NetworkID"
+                value: PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET
+              - name: "Breadcrumb"
+                value: 1
+      response:
+          values:
+              - name: "NetworkingStatus"
+                value: 3

@@ -1,0 +1,101 @@
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: User Label Cluster Tests
+
+config:
+    nodeId: 0x12344321
+    cluster: "User Label"
+    endpoint: 0
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Commit User Label List"
+      command: "writeAttribute"
+      attribute: "LabelList"
+      arguments:
+          value:
+              [
+                  { Label: "room", Value: "bedroom 1" },
+                  { Label: "orientation", Value: "South" },
+                  { Label: "floor", Value: "2" },
+                  { Label: "direction", Value: "down" },
+              ]
+
+    - label: "Verify committed User Label List"
+      command: "readAttribute"
+      attribute: "LabelList"
+      response:
+          value:
+              [
+                  { Label: "room", Value: "bedroom 1" },
+                  { Label: "orientation", Value: "South" },
+                  { Label: "floor", Value: "2" },
+                  { Label: "direction", Value: "down" },
+              ]
+
+    - label: "Clear User Label List"
+      command: "writeAttribute"
+      attribute: "LabelList"
+      arguments:
+          value: []
+
+    - label: "Read User Label List"
+      command: "readAttribute"
+      attribute: "LabelList"
+      response:
+          value: []
+
+    - label: "Write User Label List"
+      command: "writeAttribute"
+      attribute: "LabelList"
+      arguments:
+          value:
+              [
+                  { Label: "room", Value: "bedroom 2" },
+                  { Label: "orientation", Value: "North" },
+                  { Label: "floor", Value: "5" },
+                  { Label: "direction", Value: "up" },
+              ]
+
+    - label: "Reboot target device"
+      cluster: "SystemCommands"
+      command: "Reboot"
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Verify User Label List after reboot"
+      command: "readAttribute"
+      attribute: "LabelList"
+      response:
+          value:
+              [
+                  { Label: "room", Value: "bedroom 2" },
+                  { Label: "orientation", Value: "North" },
+                  { Label: "floor", Value: "5" },
+                  { Label: "direction", Value: "up" },
+              ]

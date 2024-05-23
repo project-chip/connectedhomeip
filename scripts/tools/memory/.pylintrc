@@ -1,0 +1,12 @@
+[BASIC]
+disable=too-few-public-methods,bad-whitespace,broad-except
+
+no-docstring-rgx=main|__init__
+docstring-min-length=5
+min-public-methods=1
+max-args=7
+max-locals=16
+
+argument-rgx=[a-z_][a-z0-9_]*$
+attr-rgx=[a-z_][a-z0-9_]*$
+variable-rgx=[a-z_][a-z0-9_]*$

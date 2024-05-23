@@ -1,0 +1,78 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Example Cluster Tests
+
+config:
+    cluster: "ExampleCluster"
+
+tests:
+    - label: "Call a command that returns a success"
+      command: "CommandSuccess"
+
+    - label: "Call a command that returns an error"
+      command: "CommandError"
+      response:
+          error: UNSUPPORTED_COMMAND
+
+    - label: "Call a command with some return values"
+      command: "CommandWithReturnValues"
+      response:
+          values:
+              - name: "BooleanTrue"
+                value: true
+              - name: "BooleanFalse"
+                value: false
+              - name: "PositiveNumber"
+                value: 123456789
+              - name: "NegativeNumber"
+                value: -123456789
+              - name: "ListOfBoolean"
+                value: [true, false, true]
+              - name: "Struct"
+                value:
+                    {
+                        "boolean": true,
+                        "number": 1,
+                        "struct": { "boolean": false, "number": 2 },
+                        "list":
+                            [
+                                { "boolean": true, "number": 1 },
+                                { "boolean": false, "number": 3 },
+                            ],
+                    }
+
+    - label: "Call a command with some input values"
+      command: "CommandWithInputValues"
+      arguments:
+          values:
+              - name: "Argument1"
+                value: 123
+              - name: "Argument2"
+                value: 456
+      response:
+          - values:
+                - name: "ReturnValue"
+                  value: 579
+
+    - label:
+          "Call a command with some input values but expect a failure this time
+          because some argument is missing"
+      command: "CommandWithInputValues"
+      arguments:
+          values:
+              - name: "Argument1"
+                value: 123
+      response:
+          error: INVALID_COMMAND

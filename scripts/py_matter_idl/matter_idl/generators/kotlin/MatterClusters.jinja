@@ -1,0 +1,479 @@
+{%- macro encode_value(source, encodable, depth) -%}
+  {%- if encodable.is_nullable and encodable.is_optional -%}
+    {{encode_value(source, encodable.without_nullable().without_optional(), depth + 1)}}?
+  {%- elif encodable.is_nullable -%}
+    {{encode_value(source, encodable.without_nullable(), depth + 1)}}?
+  {%- elif encodable.is_optional -%}
+    {{encode_value(source, encodable.without_optional(), depth + 1)}}?
+  {%- elif encodable.is_list -%}
+    List<{{encode_value(source, encodable.without_list(), depth + 1)}}>
+  {%- elif encodable.is_struct -%}
+    {%- set struct = encodable.get_underlying_struct() -%}
+    {{source.name}}Cluster{{struct.name}}
+  {%- else -%}
+    {{encodable.kotlin_type}}
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro encode_value_without_optional(source, encodable, depth) -%}
+  {%- if encodable.is_nullable -%}
+    {{encode_value_without_optional(source, encodable.without_nullable(), depth + 1)}}?
+  {%- elif encodable.is_list -%}
+    List<{{encode_value_without_optional(source, encodable.without_list(), depth + 1)}}>
+  {%- elif encodable.is_struct -%}
+    {%- set struct = encodable.get_underlying_struct() -%}
+    {{source.name}}Cluster{{struct.name}}
+  {%- else -%}
+    {{encodable.kotlin_type}}
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro encode_value_without_optional_nullable(source, encodable, depth) -%}
+  {%- if encodable.is_list -%}
+    List<{{encode_value_without_optional_nullable(source, encodable.without_list(), depth + 1)}}>
+  {%- elif encodable.is_struct -%}
+    {%- set struct = encodable.get_underlying_struct() -%}
+    {{source.name}}Cluster{{struct.name}}
+  {%- else -%}
+    {{encodable.kotlin_type}}
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro encode_tlv(encodable, tag, name, depth) %}
+  {%- if encodable.is_optional and encodable.is_nullable -%}
+    {{name}}?.let {
+      {{encode_tlv(encodable.without_optional().without_nullable(), tag, name, depth + 1)}}
+    }
+  {%- elif encodable.is_optional -%}
+    {{name}}?.let {
+      {{encode_tlv(encodable.without_optional(), tag, name, depth + 1)}}
+    }
+  {%- elif encodable.is_nullable -%}
+    {{name}}?.let {
+      {{encode_tlv(encodable.without_nullable(), tag, name, depth + 1)}}
+    }     
+  {%- elif encodable.is_list -%}
+      tlvWriter.startArray({{tag}})
+      for (item in {{name}}.iterator()) {
+        {{encode_tlv(encodable.without_list(), "AnonymousTag", "item", depth + 1)}}
+      }
+      tlvWriter.endArray()
+  {%- elif encodable.is_struct -%}
+      {{name}}.toTlv({{tag}}, tlvWriter)
+  {%- else -%}
+      tlvWriter.put({{tag}}, {{name}})
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro decode_tlv(source, encodable, tag, depth) %}
+  {%- if encodable.is_nullable -%}
+    if (!tlvReader.isNull()) {
+      {{decode_tlv(source, encodable.without_nullable(), tag, depth + 1)}}
+    } else {
+      tlvReader.getNull({{tag}})
+      null
+    }
+  {%- elif encodable.is_optional -%}
+    if (tlvReader.isNextTag({{tag}})) {
+      {{decode_tlv(source, encodable.without_optional(), tag, depth + 1)}}
+    } else {
+      null
+    }
+  {%- elif encodable.is_list -%}
+    {%- set encodablewithoutlist = encodable.without_list() -%}
+    buildList<{{encode_value(source, encodablewithoutlist, depth + 1)}}> {
+      tlvReader.enterArray({{tag}})
+      while(!tlvReader.isEndOfContainer()) {
+        add({{decode_tlv(source, encodablewithoutlist, "AnonymousTag", depth + 1)}})
+      }
+      tlvReader.exitContainer()
+    }
+  {%- elif encodable.is_struct -%}
+      {%- set struct = encodable.get_underlying_struct() -%}
+      {{source.name}}Cluster{{struct.name}}.fromTlv({{tag}}, tlvReader)
+  {%- else -%}
+      tlvReader.get{{encodable.kotlin_type}}({{tag}})
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro contextSpecificTag(field) -%}
+  ContextSpecificTag(TAG_{{field.name | constcase}})
+{%- endmacro -%}
+
+{%- macro contextSpecificTag1(tag_value) -%}
+  ContextSpecificTag({{tag_value}})
+{%- endmacro -%}
+
+/*
+ *
+ *    Copyright (c) 2023 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+package matter.controller.cluster.clusters
+
+import java.util.logging.Level
+import java.util.logging.Logger
+import java.time.Duration
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.transform
+import matter.controller.MatterController
+import matter.controller.ReadRequest
+import matter.controller.ReadData
+import matter.controller.ReadFailure
+import matter.controller.ReadResponse
+import matter.controller.SubscribeRequest
+import matter.controller.SubscriptionState
+import matter.controller.ByteSubscriptionState
+import matter.controller.ShortSubscriptionState
+import matter.controller.IntSubscriptionState
+import matter.controller.LongSubscriptionState
+import matter.controller.FloatSubscriptionState
+import matter.controller.DoubleSubscriptionState
+import matter.controller.CharSubscriptionState
+import matter.controller.BooleanSubscriptionState
+import matter.controller.UByteSubscriptionState
+import matter.controller.UShortSubscriptionState
+import matter.controller.UIntSubscriptionState
+import matter.controller.ULongSubscriptionState
+import matter.controller.StringSubscriptionState
+import matter.controller.ByteArraySubscriptionState
+import matter.controller.WriteRequest
+import matter.controller.WriteRequests
+import matter.controller.WriteResponse
+import matter.controller.AttributeWriteError
+import matter.controller.InvokeRequest
+import matter.controller.InvokeResponse
+import matter.controller.model.AttributePath
+import matter.controller.model.CommandPath
+import matter.controller.cluster.structs.*
+import matter.tlv.AnonymousTag
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvParsingException
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
+{% set typeLookup = idl | createLookupContext(cluster) %}
+class {{cluster.name}}Cluster(private val controller: MatterController, private val endpointId: UShort) {
+
+{%- set already_handled_command = [] -%}
+{%- for command in cluster.commands | sort(attribute='code') -%}
+{%- if command | isCommandNotDefaultCallback() -%}
+{%- set callbackName = command | javaCommandCallbackName() -%}
+{%- if callbackName not in already_handled_command %}
+  class {{callbackName}}(
+{%- for field in (cluster.structs | named(command.output_param)).fields %}
+    val {{field.name | lowfirst_except_acronym}}: {{encode_value(cluster, field | asEncodable(typeLookup), 0)}}
+{%- if not loop.last %}, {% endif %}
+{%- endfor %}
+  )
+{% if already_handled_command.append(callbackName) -%}
+{%- endif -%}
+{%- endif -%}
+{%- endif -%}
+{%- endfor %}
+
+{%- set already_handled_attribute = [] -%}
+{% for attribute in cluster.attributes | rejectattr('definition', 'is_field_global_name', typeLookup) %}
+{%- set encodable = attribute.definition | asEncodable(typeLookup) -%}
+{%- set interfaceName = attribute | javaAttributeCallbackName(typeLookup) -%}
+{%- if interfaceName not in already_handled_attribute %}
+{%- set valueType = encode_value(cluster, encodable, 0) -%}
+  class {{interfaceName}}(
+    val value: {{valueType}}
+  )
+
+  sealed class {{interfaceName}}SubscriptionState {
+    data class Success(
+    val value: {{valueType}}
+    ) : {{interfaceName}}SubscriptionState()
+    
+    data class Error(val exception: Exception) : {{interfaceName}}SubscriptionState()
+
+    object SubscriptionEstablished : {{interfaceName}}SubscriptionState()    
+  }  
+{% if already_handled_attribute.append(interfaceName) -%}
+{#- This block does nothing, it only exists to append to already_handled_attribute. -#}
+{%- endif -%}
+{%- endif -%}
+{% endfor -%}
+
+{% for command in cluster.commands | sort(attribute='code') -%}
+{%- set callbackName = command | javaCommandCallbackName() %}
+  suspend fun {{command.name | lowfirst_except_acronym}}(
+    {%- if command.input_param -%}
+      {%- for field in (cluster.structs | named(command.input_param)).fields -%}
+        {{field.name | lowfirst_except_acronym}}: {{encode_value(cluster, field | asEncodable(typeLookup), 0)}}
+      , 
+      {%- endfor -%}
+    {%- endif -%}
+    timedInvokeTimeout: Duration {%- if not command.is_timed_invoke -%}? = null {%- endif -%}
+  )
+{%- if command | hasResponse -%}
+    : {{callbackName}} {
+{%- else %} {
+{%- endif %}
+    val commandId: UInt = {{command.code}}u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+    {%- if command.input_param -%}    
+    {% for field in (cluster.structs | named(command.input_param)).fields %}
+    {%- set encodable = field | asEncodable(typeLookup) %}
+
+    val TAG_{{field.name | constcase}}_REQ: Int = {{field.code}}
+    {{encode_tlv(encodable, "ContextSpecificTag(TAG_" + field.name | constcase + "_REQ)", field.name | lowfirst_except_acronym, 0)}}
+    {%- endfor -%}
+    {%- endif %}    
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    {%- if command | hasResponse %}
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    {%- set struct = cluster.structs | named(command.output_param) -%}    
+    {%- for field in struct.fields %}
+    val TAG_{{field.name | constcase}}: Int = {{field.code}}
+    {% set encodable = field | asEncodable(typeLookup) -%}
+    {%- if encodable.is_optional or encodable.is_nullable-%}
+    var {{field.name | lowfirst_except_acronym}}_decoded: {{encode_value(cluster, field | asEncodable(typeLookup), 0)}} = null
+    {%- else -%}
+    var {{field.name | lowfirst_except_acronym}}_decoded: {{encode_value(cluster, field | asEncodable(typeLookup), 0)}}? = null
+    {%- endif %}
+    {% endfor %}
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      {% for field in struct.fields %}
+      if (tag == ContextSpecificTag(TAG_{{field.name | constcase}})) {
+        {%- set encodable = field | asEncodable(typeLookup) -%}
+        {%- if encodable.is_optional or encodable.is_nullable -%}
+        {{field.name | lowfirst_except_acronym}}_decoded = 
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            {{decode_tlv(cluster, encodable, "tag", 0)}}  
+          }
+        {%- else -%}
+        {{field.name | lowfirst_except_acronym}}_decoded = {{decode_tlv(cluster, encodable, "tag", 0)}}
+        {%- endif -%}
+      }  
+      {% endfor %}
+
+      else {
+        tlvReader.skipElement()
+      }
+    }
+
+    {% for field in struct.fields %}
+    {% set encodable = field | asEncodable(typeLookup) -%}
+    {% if not encodable.is_optional and not encodable.is_nullable %}
+    if ({{field.name | lowfirst_except_acronym}}_decoded == null) {
+      throw IllegalStateException("{{field.name | lowfirst_except_acronym}} not found in TLV")  
+    }
+    {%- endif %}
+    {% endfor %}
+
+    tlvReader.exitContainer()
+
+    return {{callbackName}}(
+      {%- for field in (cluster.structs | named(command.output_param)).fields %}
+      {{field.name | lowfirst_except_acronym}}_decoded{% if not loop.last %},{% endif %}
+      {%- endfor %}
+    )
+    {%- endif %}
+  }
+{% endfor -%}
+
+{% for attribute in cluster.attributes | sort(attribute='code') %}
+{%- set interfaceName = attribute | javaAttributeCallbackName(typeLookup) %}
+{%- set attribute_id = "ATTRIBUTE_ID_" + attribute.definition.name | upper %}
+{%- set encodable = attribute.definition | asEncodable(typeLookup) %}
+{%- if attribute.definition is is_field_global_name(typeLookup) and encodable.is_optional -%}
+  suspend fun read{{ attribute.definition.name | upfirst }}Attribute(): {{interfaceName}}? {
+{%- else -%}
+  suspend fun read{{ attribute.definition.name | upfirst }}Attribute(): {{interfaceName}} {
+{%- endif -%}
+    val ATTRIBUTE_ID: UInt = {{attribute.definition.code}}u
+
+    val attributePath = AttributePath(
+      endpointId = endpointId, 
+      clusterId = CLUSTER_ID,
+      attributeId = ATTRIBUTE_ID
+    )
+
+    val readRequest = ReadRequest(
+      eventPaths = emptyList(),
+      attributePaths = listOf(attributePath)
+    )
+    
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")     
+    }    
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }        
+       
+    requireNotNull(attributeData) { 
+      "{{ attribute.definition.name | capitalize }} attribute not found in response" 
+    }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: {{encode_value(cluster, encodable, 0)}} = {{decode_tlv(cluster, attribute.definition | asEncodable(typeLookup), "AnonymousTag", 0)}}
+
+{% if attribute.definition is is_field_global_name(typeLookup) %}
+    return decodedValue
+{%- else %}
+    return {{interfaceName}}(decodedValue)  
+{%- endif %}
+  }
+{% if attribute.is_writable %}
+{%- set encodable = attribute.definition | asEncodable(typeLookup) -%}
+{%- set attribute_id = "ATTRIBUTE_ID_" + attribute.definition.name | upper %}
+  suspend fun write{{ attribute.definition.name | upfirst }}Attribute(
+    value: {{ encode_value_without_optional_nullable(cluster, encodable, 0) }},
+    timedWriteTimeout: Duration {%- if not attribute.requires_timed_write -%}? = null {%- endif -%}
+  ) {
+    val ATTRIBUTE_ID: UInt = {{attribute.definition.code}}u
+
+    val tlvWriter = TlvWriter()
+    {%- set encodable = attribute.definition | asEncodable(typeLookup) %}
+    {%- if encodable.is_optional -%}
+        {%- set encodable = encodable.without_optional() %}
+    {%- endif %}
+    {%- if encodable.is_nullable -%}
+        {%- set encodable = encodable.without_nullable() %}
+    {%- endif %}      
+    {%- set tag = contextSpecificTag(attribute) %}
+    {{encode_tlv(encodable, "AnonymousTag", "value", 0)}} 
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests = listOf(
+          WriteRequest(
+            attributePath = AttributePath(
+              endpointId,
+              clusterId = CLUSTER_ID,
+              attributeId = ATTRIBUTE_ID
+            ),
+            tlvPayload = tlvWriter.getEncoded()
+          )
+        ),
+        timedRequest = timedWriteTimeout
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.FINE, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }   
+  }
+{% endif %}
+{%- if attribute.is_subscribable %}
+{%- set encodable = attribute.definition | asEncodable(typeLookup) %}
+{%- set encodable_was_optional = encodable.is_optional or encodable.is_nullable %}
+  suspend fun subscribe{{ attribute.definition.name | upfirst }}Attribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<{{interfaceName}}SubscriptionState> {
+    val ATTRIBUTE_ID: UInt = {{attribute.definition.code}}u
+    val attributePaths = listOf(
+      AttributePath(
+          endpointId = endpointId,
+          clusterId = CLUSTER_ID,
+          attributeId = ATTRIBUTE_ID
+      )
+    )
+
+    val subscribeRequest: SubscribeRequest = SubscribeRequest(
+      eventPaths = emptyList(), 
+      attributePaths = attributePaths, 
+      minInterval = Duration.ofSeconds(minInterval.toLong()), 
+      maxInterval = Duration.ofSeconds(maxInterval.toLong())
+    )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit({{interfaceName}}SubscriptionState.Error(Exception("Subscription terminated with error code: ${subscriptionState.terminationCause}")))
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+              it.path.attributeId == ATTRIBUTE_ID
+            }        
+             
+          requireNotNull(attributeData) { 
+            "{{ attribute.definition.name | capitalize }} attribute not found in Node State update" 
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: {{encode_value(cluster, encodable, 0)}} = {{decode_tlv(cluster, attribute.definition | asEncodable(typeLookup), "AnonymousTag", 0)}}
+
+          {% if encodable_was_optional-%}
+          decodedValue?.let {
+            emit({{interfaceName}}SubscriptionState.Success(it))
+          }
+          {% else -%}
+          emit({{interfaceName}}SubscriptionState.Success(decodedValue))
+          {%- endif %}
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit({{interfaceName}}SubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }    
+  }
+{% endif -%}
+{%- endfor %}
+  companion object {
+    private val logger = Logger.getLogger({{cluster.name}}Cluster::class.java.name)
+    const val CLUSTER_ID: UInt = {{cluster.code}}u
+  }
+}

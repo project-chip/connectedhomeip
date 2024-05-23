@@ -1,0 +1,351 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 12.2.2. [TC-TSUIC-2.2] Primary functionality with server as DUT
+
+PICS:
+    - TSUIC.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Thermostat User Interface Configuration"
+    endpoint: 1
+
+tests:
+    - label: "Step 1: Commission DUT to TH"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Step 2a: TH writes a value of 0 to TemperatureDisplayMode attribute
+          of DUT"
+      PICS: TSUIC.S.A0000
+      command: "writeAttribute"
+      attribute: "TemperatureDisplayMode"
+      arguments:
+          value: 0
+
+    - label: "Verify device temperature displayed in °C"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && TSUIC.S.A0000
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 2b: TH reads the TemperatureDisplayMode attribute of DUT"
+      PICS: TSUIC.S.A0000
+      command: "readAttribute"
+      attribute: "TemperatureDisplayMode"
+      response:
+          value: 0
+
+    - label:
+          "Step 2c: TH writes a value of 1 to TemperatureDisplayMode attribute
+          of DUT"
+      PICS: TSUIC.S.A0000
+      command: "writeAttribute"
+      attribute: "TemperatureDisplayMode"
+      arguments:
+          value: 1
+
+    - label: "Verify device temperature displayed in °F"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && TSUIC.S.A0000
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 2d: TH reads the TemperatureDisplayMode attribute of DUT"
+      PICS: TSUIC.S.A0000
+      command: "readAttribute"
+      attribute: "TemperatureDisplayMode"
+      response:
+          value: 1
+
+    - label:
+          "Step 2e: TH writes a value of greater than 1 to
+          TemperatureDisplayMode attribute of DUT"
+      PICS: TSUIC.S.A0000
+      command: "writeAttribute"
+      attribute: "TemperatureDisplayMode"
+      arguments:
+          value: 2
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Step 2f: TH reads the TemperatureDisplayMode attribute of DUT"
+      PICS: TSUIC.S.A0000
+      command: "readAttribute"
+      attribute: "TemperatureDisplayMode"
+      response:
+          value: 1
+
+    - label: "Step 3a: TH writes a value of 0 to KeypadLockout attribute of DUT"
+      PICS: TSUIC.S.A0001
+      command: "writeAttribute"
+      attribute: "KeypadLockout"
+      arguments:
+          value: 0
+
+    - label: "Verify all device functionality available to the user"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && TSUIC.S.A0001
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 3b: TH reads the KeypadLockout attribute of DUT"
+      PICS: TSUIC.S.A0001
+      command: "readAttribute"
+      attribute: "KeypadLockout"
+      response:
+          value: 0
+
+    - label: "Step 3c: TH writes a value of 1 to KeypadLockout attribute of DUT"
+      PICS: TSUIC.S.A0001
+      command: "writeAttribute"
+      attribute: "KeypadLockout"
+      arguments:
+          value: 1
+
+    - label: "Verify device operates at Level 1 reduced functionality"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && TSUIC.S.A0001
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 3d: TH reads the KeypadLockout attribute of DUT"
+      PICS: TSUIC.S.A0001
+      command: "readAttribute"
+      attribute: "KeypadLockout"
+      response:
+          value: 1
+
+    - label: "Step 3e: TH writes a value of 2 to KeypadLockout attribute of DUT"
+      PICS: TSUIC.S.A0001
+      command: "writeAttribute"
+      attribute: "KeypadLockout"
+      arguments:
+          value: 2
+
+    - label: "Verify device operates at Level 2 reduced functionality"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && TSUIC.S.A0001
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 3f: TH reads the KeypadLockout attribute of DUT"
+      PICS: TSUIC.S.A0001
+      command: "readAttribute"
+      attribute: "KeypadLockout"
+      response:
+          value: 2
+
+    - label: "Step 3g: TH writes a value of 3 to KeypadLockout attribute of DUT"
+      PICS: TSUIC.S.A0001
+      command: "writeAttribute"
+      attribute: "KeypadLockout"
+      arguments:
+          value: 3
+
+    - label: "Verify device operates at Level 3 reduced functionality"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && TSUIC.S.A0001
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 3h: TH reads the KeypadLockout attribute of DUT"
+      PICS: TSUIC.S.A0001
+      command: "readAttribute"
+      attribute: "KeypadLockout"
+      response:
+          value: 3
+
+    - label: "Step 3i: TH writes a value of 4 to KeypadLockout attribute of DUT"
+      PICS: TSUIC.S.A0001
+      command: "writeAttribute"
+      attribute: "KeypadLockout"
+      arguments:
+          value: 4
+
+    - label: "Verify device operates at Level 4 reduced functionality"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && TSUIC.S.A0001
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 3j: TH reads the KeypadLockout attribute of DUT"
+      PICS: TSUIC.S.A0001
+      command: "readAttribute"
+      attribute: "KeypadLockout"
+      response:
+          value: 4
+
+    - label: "Step 3k: TH writes a value of 5 to KeypadLockout attribute of DUT"
+      PICS: TSUIC.S.A0001
+      command: "writeAttribute"
+      attribute: "KeypadLockout"
+      arguments:
+          value: 5
+
+    - label: "Verify device operates at least functionality level"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && TSUIC.S.A0001
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 3l: TH reads the KeypadLockout attribute of DUT"
+      PICS: TSUIC.S.A0001
+      command: "readAttribute"
+      attribute: "KeypadLockout"
+      response:
+          value: 5
+
+    - label:
+          "Step 3m: Writes a value of greater than 5 to KeypadLockout attribute
+          of DUT"
+      PICS: TSUIC.S.A0001
+      command: "writeAttribute"
+      attribute: "KeypadLockout"
+      arguments:
+          value: 6
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Step 3n: TH reads the KeypadLockout attribute of DUT"
+      PICS: TSUIC.S.A0001
+      command: "readAttribute"
+      attribute: "KeypadLockout"
+      response:
+          value: 5
+
+    - label:
+          "Step 4a: TH writes a value of 0 to ScheduleProgrammingVisibility
+          attribute of DUT"
+      PICS: TSUIC.S.A0002
+      command: "writeAttribute"
+      attribute: "ScheduleProgrammingVisibility"
+      arguments:
+          value: 0
+
+    - label:
+          "Verify local schedule programming functionality is enabled at the
+          thermostat"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && TSUIC.S.A0002
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 4b: TH reads the ScheduleProgrammingVisibility attribute of DUT"
+      PICS: TSUIC.S.A0002
+      command: "readAttribute"
+      attribute: "ScheduleProgrammingVisibility"
+      response:
+          value: 0
+
+    - label:
+          "Step 4c: TH writes a value of 1 to ScheduleProgrammingVisibility
+          attribute of DUT"
+      PICS: TSUIC.S.A0002
+      command: "writeAttribute"
+      attribute: "ScheduleProgrammingVisibility"
+      arguments:
+          value: 1
+
+    - label:
+          "Verify local schedule programming functionality is disabled at the
+          thermostat"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && TSUIC.S.A0002
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 4d: TH reads the ScheduleProgrammingVisibility attribute of DUT"
+      PICS: TSUIC.S.A0002
+      command: "readAttribute"
+      attribute: "ScheduleProgrammingVisibility"
+      response:
+          value: 1
+
+    - label:
+          "Step 4e: TH writes a value of greater than 1 to
+          ScheduleProgrammingVisibility attribute of DUT"
+      PICS: TSUIC.S.A0002
+      command: "writeAttribute"
+      attribute: "ScheduleProgrammingVisibility"
+      arguments:
+          value: 2
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 4f: TH reads the ScheduleProgrammingVisibility attribute of DUT"
+      PICS: TSUIC.S.A0002
+      command: "readAttribute"
+      attribute: "ScheduleProgrammingVisibility"
+      response:
+          value: 1

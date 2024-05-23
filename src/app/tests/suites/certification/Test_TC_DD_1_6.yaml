@@ -1,0 +1,50 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.1.6. [TC-DD-1.6] QR Code Format and Label [DUT - Commissionee]
+
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+    - MCORE.DD.QR
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Preconditions"
+      verification: |
+          Final label of DUT is ready to be scanned
+      disabled: true
+
+    - label: "Step 1: Scan the DUTs QR code using the TH QR code reader"
+      verification: |
+          1. Scan the QR code with a QR Code scanning device.
+          2. Vendor specific field testcase that should be manually verified using the requirements in the Expected Outcome.
+      disabled: true
+
+    - label: "Step 2: Verify QR code version"
+      verification: |
+          1. Manually verify the QR code version by referring to section 5.1.3.2 "QR Code Format" of the spec document to ensure it follows the ISO/IEC 18004:2015 (https://www.iso.org/standard/62021.html) specifications with accurate:
+          - Module size
+          - ECC Level
+          - Alphanumeric capacity
+          - Total available payload, excluding prefix (bits)
+          - Available payload for TLV data (bits)
+          2. Vendor specific field test case that should be manually verified using the requirements in the Expected Outcome.
+
+          Note: chip-tool is not used to verify this test step
+      disabled: true

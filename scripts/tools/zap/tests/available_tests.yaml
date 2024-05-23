@@ -1,0 +1,25 @@
+# These are the available tests codegen.py
+#
+# General format is:
+# <input-zap>
+#   <template>:
+#      <output_file> : <golden_path>
+#
+# Where
+#   - input-zap is the input zap file
+#   - template is the code generation template
+#   - output_file/golden_path are the expected output file names
+#     and the expected content for those output files.
+inputs/all-clusters-app.zap:
+    ../../../../src/app/zap-templates/app-templates.json:
+        endpoint_config.h: outputs/all-clusters-app/app-templates/endpoint_config.h
+        gen_config.h: outputs/all-clusters-app/app-templates/gen_config.h
+        access.h: outputs/all-clusters-app/app-templates/access.h
+        IMClusterCommandHandler.cpp: outputs/all-clusters-app/app-templates/IMClusterCommandHandler.cpp
+
+inputs/lighting-app.zap:
+    ../../../../src/app/zap-templates/app-templates.json:
+        endpoint_config.h: outputs/lighting-app/app-templates/endpoint_config.h
+        gen_config.h: outputs/lighting-app/app-templates/gen_config.h
+        access.h: outputs/lighting-app/app-templates/access.h
+        IMClusterCommandHandler.cpp: outputs/lighting-app/app-templates/IMClusterCommandHandler.cpp

@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2023 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+
+  <enum name="OperationalStateEnum" type="enum8">
+    <cluster code="0x0061"/>
+    <item name="SeekingCharger" value="0x40"/>
+    <item name="Charging"       value="0x41"/>
+    <item name="Docked"         value="0x42"/>
+  </enum>
+
+  <enum name="ErrorStateEnum" type="enum8">
+    <cluster code="0x0061"/>
+    <item name="FailedToFindChargingDock"   value="0x40"/>
+    <item name="Stuck"                      value="0x41"/>
+    <item name="DustBinMissing"             value="0x42"/>
+    <item name="DustBinFull"                value="0x43"/>
+    <item name="WaterTankEmpty"             value="0x44"/>
+    <item name="WaterTankMissing"           value="0x45"/>
+    <item name="WaterTankLidOpen"           value="0x46"/>
+    <item name="MopCleaningPadMissing"      value="0x47"/>
+  </enum>
+
+  <cluster>
+    <domain>Robots</domain>
+    <name>RVC Operational State</name>
+    <code>0x0061</code>
+    <define>OPERATIONAL_STATE_RVC_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <description>This cluster supports remotely monitoring and, where supported, changing the operational state of a Robotic Vacuum.</description>
+
+    <globalAttribute side="either" code="0xFFFD" value="1" />
+
+    <attribute side="server" code="0x0000" define="PHASE_LIST"              type="array" entryType="char_string"                                     writable="false" isNullable="true"  optional="false">PhaseList</attribute>
+    <attribute side="server" code="0x0001" define="CURRENT_PHASE"           type="int8u"                                    min="0x00" max="0x1F"    writable="false" isNullable="true"  optional="false">CurrentPhase</attribute>
+    <attribute side="server" code="0x0002" define="COUNTDOWN_TIME"          type="elapsed_s"                                min="0"    max="259200"  writable="false" isNullable="true"  optional="true">CountdownTime</attribute>
+    <attribute side="server" code="0x0003" define="OPERATIONAL_STATE_LIST"  type="array" entryType="OperationalStateStruct"                          writable="false"                    optional="false">OperationalStateList</attribute>
+
+<!--
+The type of this attribute in the spec is OperationalStateEnum, but the OperationalStateEnum in our XML
+excludes the values from the base OperationalState cluster.  Just use ENUM8 for the type, so it allows
+both values from this cluster and from the base cluster.
+-->
+    <attribute side="server" code="0x0004" define="OPERATIONAL_STATE"       type="enum8"                                                             writable="false"                    optional="false">OperationalState</attribute>
+    <attribute side="server" code="0x0005" define="OPERATIONAL_ERROR"       type="ErrorStateStruct"                                                  writable="false"                    optional="false">OperationalError</attribute>
+
+    <command source="client" code="0x00" name="Pause" response="OperationalCommandResponse" optional="true">
+      <description>Upon receipt, the device SHALL pause its operation if it is possible based on the current function of the server.</description>
+    </command>
+
+    <!-- Command Stop with code 0x01 is deprecated -->
+
+    <!-- Command Start with code 0x02 is deprecated -->
+
+    <command source="client" code="0x03" name="Resume" response="OperationalCommandResponse" optional="true">
+      <description>Upon receipt, the device SHALL resume its operation from the point it was at when it received the Pause command, or from the point when it was paused by means outside of this cluster (for example by manual button press).</description>
+    </command>
+
+    <command source="server" code="0x04" name="OperationalCommandResponse" optional="true">
+      <description>This command SHALL be generated in response to any of the Start, Stop, Pause, or Resume commands.</description>
+      <arg name="CommandResponseState" type="ErrorStateStruct"/>
+    </command>
+
+    <command source="client" code="0x80" name="GoHome" response="OperationalCommandResponse" optional="true">
+      <description>On receipt of this command, the device SHALL start seeking the charging dock, if possible in the current state of the device.</description>
+    </command>
+
+    <event side="server" code="0x00" priority="critical" name="OperationalError" optional="false">
+      <description>OperationalError</description>
+      <field id="0" name="ErrorState" type="ErrorStateStruct" />
+    </event>
+
+     <event side="server" code="0x01" priority="info" name="OperationCompletion" optional="true">
+      <description>OperationCompletion</description>
+      <field id="0" name="CompletionErrorCode"  type="enum8"                            optional="false"/>
+      <field id="1" name="TotalOperationalTime" type="elapsed_s"      isNullable="true" optional="true"/>
+      <field id="2" name="PausedTime"           type="elapsed_s"      isNullable="true" optional="true"/>
+    </event>
+
+  </cluster>
+</configurator>

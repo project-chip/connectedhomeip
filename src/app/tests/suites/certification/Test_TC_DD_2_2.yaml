@@ -1,0 +1,218 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    3.2.2. [TC-DD-2.2] Discovery by Commissioner Verification [DUT -
+    Commissioner]
+
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the DUT as commissioner test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Preconditions"
+      verification: |
+          1 - 5.4.3. Discovery by Commissioner - DUT supports BLE (central role), Wi-Fi and IP connectivity - Wi-Fi certified n client
+
+          2 - Test Harness must support all discovery transport technologies as the DUT (i.e. BLE, Wi-Fi and IP connectivity)
+
+          To put the DUT into commissionable state and verify commissionable state.
+          This step is same in couple of other cases (like DD) so use the same verification method here too i.e. if your DUT is discoverable over mDNS then use "chiptool discover commissionables"  to discover mDNS adv and provision the device using "chip-tool pairing code node-id payload".
+          otherwise if your DUT is advertising over BLE , pls use the "/chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1" command to discover and provision the device (BTW the SSID , passwd, descriminator ..etc are configurable parameters for your DUT)
+      disabled: true
+
+    - label:
+          "Step 1a: TH starts matter announcement procedure using BLE transport"
+      PICS: MCORE.DD.DISCOVERY_BLE
+      verification: |
+          ./chip-all-clusters-app --wifi  --discriminator 3841
+          Verify in TH as commissionee side:
+
+          [1657221603.350406][368108:368108] CHIP:DL: Device Configuration:
+          [1657221603.350445][368108:368108] CHIP:DL:   Serial Number: TEST_SN
+          [1657221603.350488][368108:368108] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
+          [1657221603.350523][368108:368108] CHIP:DL:   Product Id: 32769 (0x8001)
+          [1657221603.350555][368108:368108] CHIP:DL:   Hardware Version: 0
+          [1657221603.350579][368108:368108] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
+          [1657221603.350599][368108:368108] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3841 (0xF01)
+          [1657221603.350627][368108:368108] CHIP:DL:   Manufacturing Date: (not set)
+          [1657221603.350649][368108:368108] CHIP:DL:   Device Type: 65535 (0xFFFF)
+          [1657221603.350684][368108:368108] CHIP:SVR: SetupQRCode: [MT:-24J048N01KA0648G00]
+          [1657221603.350719][368108:368108] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
+          [1657221603.350739][368108:368108] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J048N01KA0648G00
+          [1657221603.350773][368108:368108] CHIP:SVR: Manual pairing code: [749701123365521327694]
+          [1657221603.350846][368108:368108] CHIP:DMG: Endpoint 0, Cluster 0x0000_001D update version to 4dd11284
+      disabled: true
+
+    - label:
+          "Step 1b: DUT starts BLE scan across all three advertising channels
+          with a sufficient dwell time, interval, and overall duration of scan"
+      PICS: MCORE.DD.DISCOVERY_BLE
+      verification: |
+          1. Discover commissionables over BLE using DUT=chip-tool pairing
+
+          Verify in TH as commissionee side:
+          [1651743348.446452][5072:5072] CHIP:IN: New secure session created for device <FFFFFFFB00000000, 0>, LSID:2138 PSID:14881!
+          [1651743348.446962][5072:5072] CHIP:SVR: Commissioning completed session establishment step
+      disabled: true
+
+    - label: "Step 2a: DUT starts scan in background using BLE transport"
+      PICS: MCORE.DD.DISCOVERY_BLE
+      verification: |
+          1. Discover commissionables over BLE using DUT=chip-tool pairing command
+
+          Verify in TH as commissionee side:
+          [1651743348.446452][5072:5072] CHIP:IN: New secure session created for device <FFFFFFFB00000000, 0>, LSID:2138 PSID:14881!
+          [1651743348.446962][5072:5072] CHIP:SVR: Commissioning completed session establishment step
+      disabled: true
+
+    - label: "Step 2b: TH starts matter announcement using BLE transport"
+      PICS: MCORE.DD.DISCOVERY_BLE
+      verification: |
+          $ ./out/all-clusters-app/chip-all-clusters-app --wifi --discriminator 3841
+
+          Verify in TH as commissionee side
+          [1653087913.247229][8083:8083] CHIP:SVR: Server Listening...
+          [1653087913.247636][8083:8083] CHIP:DL: Device Configuration:
+          [1653087913.248094][8083:8083] CHIP:DL:   Serial Number: TEST_SN
+          [1653087913.248608][8083:8083] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
+          [1653087913.249146][8083:8083] CHIP:DL:   Product Id: 32769 (0x8001)
+          [1653087913.249610][8083:8083] CHIP:DL:   Hardware Version: 0
+          [1653087913.250082][8083:8083] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
+          [1653087913.250739][8083:8083] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3841 (0xF01)
+          [1653087913.251234][8083:8083] CHIP:DL:   Manufacturing Date: (not set)
+          [1653087913.251732][8083:8083] CHIP:DL:   Device Type: 65535 (0xFFFF)
+          [1653087913.252171][8083:8083] CHIP:SVR: SetupQRCode: [MT:-24J048N01KA0648G00]
+          [1653087913.252710][8083:8083] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
+          [1653087913.253175][8083:8083] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J048N01KA0648G00
+          [1653087913.253681][8083:8083] CHIP:SVR: Manual pairing code: [749701123365521327694]
+          [1653087913.254268][8083:8083] CHIP:DMG: Endpoint 0, Cluster 0x0000_001D update version to 29f72814
+      disabled: true
+
+    - label:
+          "Step 2c: DUT must find TH and provide onboarding data for
+          validation.Pass Criteria: DUT is able to report the Onboarding payload
+          as set on TH"
+      PICS: MCORE.DD.DISCOVERY_BLE
+      verification: |
+          1. Discover commissionables over BLE using DUT=chip-tool pairing command
+
+          Verify in TH as commissionee side:
+          [1651743346.152716][5072:5075] CHIP:DL: Device E4:5F:01:0F:3B:B1 (Path: /org/bluez/hci0/dev_E4_5F_01_0F_3B_B1) Connected
+          [1651743347.908807][5072:5075] CHIP:DL: BluezCharacteristicAcquireWrite is called, conn: 0xffffa0043700
+          [1651743347.911151][5072:5075] CHIP:DL: c1 BluezCharacteristicWriteFD mtu, 517
+          [1651743347.911349][5072:5075] CHIP:BLE: Write request received debug 0xffffa0043700
+          [1651743347.911754][5072:5072] CHIP:BLE: local and remote recv window sizes = 6
+          [1651743347.911829][5072:5072] CHIP:BLE: selected BTP version 4
+          [1651743347.911877][5072:5072] CHIP:BLE: using BTP fragment sizes rx 244 / tx 244.
+          [1651743348.006770][5072:5075] CHIP:DL: CHIPoBLE subscribe received
+          [1651743348.007026][5072:5072] CHIP:IN: BLE EndPoint 0xaaaab7bb3c20 Connection Complete
+          [1651743348.007132][5072:5072] CHIP:DL: HandlePlatformSpecificBLEEvent 32778
+          [1651743348.007196][5072:5072] CHIP:DL: Receive kCHIPoBLEConnectionEstablished
+          [1651743348.150980][5072:5075] CHIP:BLE: Indication confirmation, 0xffffa0043700
+          [1651743348.199997][5072:5075] CHIP:DL: c1 BluezCharacteristicWriteFD mtu, 517
+          [1651743348.200614][5072:5075] CHIP:BLE: Write request received debug 0xffffa0043700
+          [1651743348.201013][5072:5072] CHIP:EM: Received message of type 0x20 with protocolId (0, 0) and MessageCounter:3306320356 on exchange 29381r
+          [1651743348.201117][5072:5072] CHIP:EM: Handling via exchange: 29381r, Delegate: 0xaaaab7bb2a90
+          [1651743348.201191][5072:5072] CHIP:SC: Received PBKDF param request
+          [1651743348.201280][5072:5072] CHIP:SC: Peer assigned session ID 14881
+          [1651743348.201349][5072:5072] CHIP:SC: Found MRP parameters in the message
+          [1651743348.201520][5072:5072] CHIP:SC: Including MRP parameters in PBKDF param response
+          [1651743348.201884][5072:5072] CHIP:IN: Prepared unauthenticated message 0xffffdcf2ef78 to 0x0000000000000000 (0)  of type 0x21 and protocolId (0, 0) on exchange 29381r with MessageCounter:2627159088.
+          [1651743348.201989][5072:5072] CHIP:IN: Sending unauthenticated msg 0xffffdcf2ef78 with MessageCounter:2627159088 to 0x0000000000000000 at monotonic time: 0000000000FF6731 msec
+          [1651743348.202196][5072:5072] CHIP:SC: Sent PBKDF param response
+          [1651743348.298384][5072:5075] CHIP:BLE: Indication confirmation, 0xffffa0043700
+          [1651743348.299274][5072:5075] CHIP:DL: c1 BluezCharacteristicWriteFD mtu, 517
+          [1651743348.300132][5072:5075] CHIP:BLE: Write request received debug 0xffffa0043700
+          [1651743348.300571][5072:5072] CHIP:EM: Received message of type 0x22 with protocolId (0, 0) and MessageCounter:3306320357 on exchange 29381r
+          [1651743348.300655][5072:5072] CHIP:EM: Found matching exchange: 29381r, Delegate: 0xaaaab7bb2a90
+          [1651743348.300741][5072:5072] CHIP:SC: Received spake2p msg1
+          [1651743348.304696][5072:5072] CHIP:IN: Prepared unauthenticated message 0xffffdcf2ee58 to 0x0000000000000000 (0)  of type 0x23 and protocolId (0, 0) on exchange 29381r with MessageCounter:2627159089.
+          [1651743348.304817][5072:5072] CHIP:IN: Sending unauthenticated msg 0xffffdcf2ee58 with MessageCounter:2627159089 to 0x0000000000000000 at monotonic time: 0000000000FF6798 msec
+          [1651743348.305007][5072:5072] CHIP:SC: Sent spake2p msg2
+          [1651743348.444144][5072:5075] CHIP:BLE: Indication confirmation, 0xffffa0043700
+          [1651743348.444992][5072:5075] CHIP:DL: c1 BluezCharacteristicWriteFD mtu, 517
+          [1651743348.445608][5072:5075] CHIP:BLE: Write request received debug 0xffffa0043700
+          [1651743348.445888][5072:5072] CHIP:EM: Received message of type 0x24 with protocolId (0, 0) and MessageCounter:3306320358 on exchange 29381r
+          [1651743348.445943][5072:5072] CHIP:EM: Found matching exchange: 29381r, Delegate: 0xaaaab7bb2a90
+          [1651743348.446001][5072:5072] CHIP:SC: Received spake2p msg3
+          [1651743348.446130][5072:5072] CHIP:SC: Sending status report. Protocol code 0, exchange 29381
+          [1651743348.446202][5072:5072] CHIP:IN: Prepared unauthenticated message 0xffffdcf2eea8 to 0x0000000000000000 (0)  of type 0x40 and protocolId (0, 0) on exchange 29381r with MessageCounter:2627159090.
+          [1651743348.446262][5072:5072] CHIP:IN: Sending unauthenticated msg 0xffffdcf2eea8 with MessageCounter:2627159090 to 0x0000000000000000 at monotonic time: 0000000000FF6825 msec
+          [1651743348.446452][5072:5072] CHIP:IN: New secure session created for device <FFFFFFFB00000000, 0>, LSID:2138 PSID:14881!
+          [1651743348.446962][5072:5072] CHIP:SVR: Commissioning completed session establishment step
+      disabled: true
+
+    - label: "Step 3a: TH starts SoftAP and begin matter announcement procedure"
+      PICS: MCORE.DD.DISCOVERY_SOFTAP
+      verification: |
+          Out of Scope
+          SoftAP commissioning not currently supported on TH=all-clusters-app
+      disabled: true
+
+    - label:
+          "Step 3b: DUT starts Wi-Fi scan of all 2.4 GHz Wi-Fi channels allowed
+          per its operational regulatory domain (channels 1, 6, and 11 are
+          preferred)"
+      PICS: MCORE.DD.DISCOVERY_SOFTAP
+      verification: |
+          Out of Scope
+          SoftAP commissioning not currently supported on TH=all-clusters-app
+      disabled: true
+
+    - label: "Step 4a: DUT scans using Wi-Fi in background"
+      PICS: MCORE.DD.DISCOVERY_SOFTAP
+      verification: |
+          Out of Scope
+          SoftAP commissioning not currently supported on TH=all-clusters-app
+      disabled: true
+
+    - label: "Step 4b: TH starts SoftAP and begin matter announcement procedure"
+      PICS: MCORE.DD.DISCOVERY_SOFTAP
+      verification: |
+          Out of Scope
+          SoftAP commissioning not currently supported on TH=all-clusters-app
+      disabled: true
+
+    - label:
+          "Step 4c: DUT must find TH and provide onboarding data for
+          validation.Pass Criteria: DUT is able to report the Onboarding payload
+          as set on TH"
+      PICS: MCORE.DD.DISCOVERY_SOFTAP
+      verification: |
+          Out of Scope
+          SoftAP commissioning not currently supported on TH=all-clusters-app
+      disabled: true
+
+    - label:
+          "Step 5: With DUT and TH connected to the same network over IP, DUT
+          performs service discovery using DNS-SD"
+      verification: |
+          1. TH is in commissioning mode and discoverable by DUT over IP through DNS-SD advertisements. This can also be verified using through the DUT's pairing command over IP.
+
+          Verify in TH as commissionee side:
+          $ ./out/all-clusters-app/chip-all-clusters-app
+          [1674677598.616629][246997:246997] CHIP:IN: New secure session activated for device <FFFFFFFB00000000, 0>, LSID:34764 PSID:10974!
+          [1674677598.616691][246997:246997] CHIP:SVR: Commissioning completed session establishment step
+      disabled: true

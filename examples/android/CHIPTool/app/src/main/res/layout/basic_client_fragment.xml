@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/addressUpdateFragment"
+        android:name="com.google.chip.chiptool.clusterclient.AddressUpdateFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true" />
+
+    <EditText
+        android:id="@+id/nodeLabelEd"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/addressUpdateFragment"
+        android:layout_alignParentStart="true"
+        android:layout_margin="10dp"
+        android:hint="@string/basic_cluster_write_user_label_hint_text"
+        android:inputType="text"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/writeNodeLabelBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/addressUpdateFragment"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="10dp"
+        android:layout_toEndOf="@id/nodeLabelEd"
+        android:text="@string/basic_cluster_write_btn_text" />
+
+    <EditText
+        android:id="@+id/locationEd"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/nodeLabelEd"
+        android:layout_alignParentStart="true"
+        android:layout_margin="10dp"
+        android:layout_toEndOf="@id/writeNodeLabelBtn"
+        android:hint="@string/basic_cluster_write_location_hint_text"
+        android:inputType="text"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/writeLocationBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/nodeLabelEd"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="10dp"
+        android:layout_toEndOf="@id/locationEd"
+        android:text="@string/basic_cluster_write_btn_text" />
+
+    <TextView
+        android:id="@+id/writeLocalConfigDisabled"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/locationEd"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:text="@string/basic_cluster_local_config_disabled_btn_text"
+        android:textSize="18sp" />
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/writeLocalConfigDisabledSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/locationEd"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_toEndOf="@id/writeLocalConfigDisabled" />
+
+    <Spinner
+        android:id="@+id/attributeNameSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/writeLocalConfigDisabledSwitch"
+        android:layout_margin="10dp"
+        android:spinnerMode="dialog"></Spinner>
+
+    <Button
+        android:id="@+id/readAttributeBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/attributeNameSpinner"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="5dp"
+        android:text="@string/basic_cluster_read_attribute_btn_text" />
+
+    <TextView
+        android:id="@+id/basicClusterCommandStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/readAttributeBtn"
+        android:minLines="4"
+        android:padding="16dp"
+        android:singleLine="false"
+        android:textSize="20sp" />
+
+</RelativeLayout>

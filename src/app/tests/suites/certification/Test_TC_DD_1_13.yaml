@@ -1,0 +1,106 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    3.1.13. [TC-DD-1.13] Onboarding Payload Verification - Custom Flow = 1 [DUT
+    - Commissionee]
+
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+    - MCORE.DD.QR
+    - MCORE.DD.USER_INTENT_COMM_FLOW
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Preconditions"
+      verification: |
+          QR Code/ Manual Pairing Code is printed on the Commissionee device or in additional provided materials (ex: manual, companion app, web service).
+
+          To put the DUT into commissionable state and verify commissionable state.
+          This step is same in couple of other cases (like DD) so use the same verification method here too i.e. if your DUT is discoverable over mDNS then use 'chiptool discover commissionables'  to discover mDNS adv and provision the device using 'chip-tool pairing code node-id payload'.
+          otherwise if your DUT is advertising over BLE , pls use the '/chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1' command to discover and provision the device (BTW the SSID , passwd, descriminator ..etc are configurable parameters for your DUT)
+      disabled: true
+
+    - label: "Step 1: Power on the DUT device."
+      verification: |
+          1. Verify DUT is NOT advertising in commissioning mode. On DUT, the DUT should not show up
+
+          For devices already on the network:
+          ./chip-tool discover commissionables
+          TH Commissioner should not discover the DUT here
+
+          For devices not on the network (i.e. BLE discovery):
+          1. Discover commissionables over BLE using a BLE discovery tool of choice.
+          Try NRF Connect app (https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop)
+          OR
+          HCIDump (https://ubuntu.com/core/docs/bluez/reference/commands)
+          TH Commissioner should not discover the DUT here
+      disabled: true
+
+    - label:
+          "Step 2: Scan the DUTs QR code from the previous step using the TH."
+      verification: |
+          1. Run DUT. Example for DUT=all-clusters app
+          ./chip-all-clusters-app --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --custom-flow 0 --capabilities 4 --discriminator 3840 --passcode 20202021
+
+          2. Parse onboarding payload using TH=chip-tool
+            ./chip-tool payload parse-setup-payload MT:-24J0AFN00KA0648G00
+
+          Verify in TH (CHIP-TOOL)
+          [1667813639.186249][10493:10493] CHIP:SPL: Parsing base38Representation: MT:-24J0AFN00KA0648G00
+          [1667813639.186572][10493:10493] CHIP:SPL: Version:             0
+          [1667813639.186637][10493:10493] CHIP:SPL: VendorID:            65521
+          [1667813639.186688][10493:10493] CHIP:SPL: ProductID:           32769
+          [1667813639.186740][10493:10493] CHIP:SPL: Custom flow:         0    (STANDARD)
+          [1667813639.186855][10493:10493] CHIP:SPL: Discovery Bitmask:   0x04 (On IP network)
+          [1667813639.186917][10493:10493] CHIP:SPL: Long discriminator:  3840   (0xf00)
+          [1667813639.186974][10493:10493] CHIP:SPL: Passcode:            20202021
+      disabled: true
+
+    - label:
+          "Step 3: Follow any DUT-specific steps for putting the DUT
+          Commissionee into commissioning mode"
+      verification: |
+          1. Follow vendor-specific steps from the pairing hint to put DUT into commissioning mode
+          2. Verify DUT is advertising in commissioning mode. On DUT,
+
+          For devices already on the network:
+          ./chip-tool discover commissionables
+          Verify in TH (CHIP-TOOL)
+
+          [1651192893436] [15304:442604] CHIP: [DL] Mdns: OnNewAddress interface: 24 ip:fe80::dea6:32ff:fe8d:6e32
+          [1651192893436] [15304:442604] CHIP: [DIS]         Vendor ID: 65521
+          [1651192893436] [15304:442604] CHIP: [DIS]         Product ID: 32769
+          [1651192893436] [15304:442604] CHIP: [DIS]         Long Discriminator: 3840
+          [1651192893436] [15304:442604] CHIP: [DIS]         Pairing Hint: 33
+          [1651192893436] [15304:442604] CHIP: [DIS]         Hostname: DCA6328D6E320000
+          [1651192893436] [15304:442604] CHIP: [DIS]         Instance Name: 914762134DA8E7D1
+          [1651192893436] [15304:442604] CHIP: [DIS]         IP Address #1: fe80::dea6:32ff:fe8d:6e32
+          [1651192893436] [15304:442604] CHIP: [DIS]         Port: 5540
+          [1651192893436] [15304:442604] CHIP: [DIS]         Commissioning Mode: 1
+          [1651192893436] [15304:442604] CHIP: [DIS]         Mrp Interval idle: 5000 ms
+          [1651192893436] [15304:442604] CHIP: [DIS]         Mrp Interval active: 300 ms
+
+          For devices not on the network (i.e. BLE discovery):
+          1. Discover commissionables over BLE using a BLE discovery tool of choice.
+          Try NRF Connect app (https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop)
+          OR
+          HCIDump (https://ubuntu.com/core/docs/bluez/reference/commands)
+          Observe the DUT advertising in a commissionable state
+      disabled: true

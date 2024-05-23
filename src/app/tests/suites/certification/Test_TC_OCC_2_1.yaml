@@ -1,0 +1,180 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 30.2.1. [TC-OCC-2.1] Attributes with server as DUT
+
+PICS:
+    - OCC.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Occupancy Sensing"
+    endpoint: 1
+
+tests:
+    - label: "Step 1: Commission DUT to TH"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH reads from the DUT the (0x0000) Occupancy attribute"
+      PICS: OCC.S.A0000
+      command: "readAttribute"
+      attribute: "Occupancy"
+      response:
+          constraints:
+              type: bitmap8
+              minValue: 0
+              maxValue: 1
+
+    - label:
+          "Step 3: TH reads from the DUT the (0x0001) OccupancySensorType
+          attribute"
+      PICS: OCC.S.A0001
+      command: "readAttribute"
+      attribute: "OccupancySensorType"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 3
+
+    - label:
+          "Step 4:TH reads from the DUT the (0x0002) OccupancySensorTypeBitmap
+          attribute"
+      PICS: OCC.S.A0002
+      command: "readAttribute"
+      attribute: "OccupancySensorTypeBitmap"
+      response:
+          constraints:
+              type: bitmap8
+              minValue: 1
+              maxValue: 7
+
+    - label:
+          "Step 5: TH reads from the DUT the (0x0010)
+          PIROccupiedToUnoccupiedDelay optional attribute, if PIR sensor"
+      PICS: OCC.S.A0010
+      command: "readAttribute"
+      attribute: "PIROccupiedToUnoccupiedDelay"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label:
+          "Step 6: TH reads from the DUT the (0x0011)
+          PIRUnoccupiedToOccupiedDelay optional attribute, if PIR sensor"
+      PICS: OCC.S.A0011
+      command: "readAttribute"
+      attribute: "PIRUnoccupiedToOccupiedDelay"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label:
+          "Step 7: TH reads from the DUT the (0x0012)
+          PIRUnoccupiedToOccupiedThreshold optional attribute, if PIR sensor"
+      PICS: OCC.S.A0012
+      command: "readAttribute"
+      attribute: "PIRUnoccupiedToOccupiedThreshold"
+      response:
+          constraints:
+              type: int8u
+              minValue: 1
+              maxValue: 254
+
+    - label:
+          "Step 8: TH reads from the DUT the (0x0020)
+          UltrasonicOccupiedToUnoccupiedDelay optional attribute, if ultrasonic
+          sensor"
+      PICS: OCC.S.A0020
+      command: "readAttribute"
+      attribute: "UltrasonicOccupiedToUnoccupiedDelay"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label:
+          "Step 9: TH reads from the DUT the (0x0021)
+          UltrasonicUnoccupiedToOccupiedDelay optional attribute, if ultrasonic
+          sensor"
+      PICS: OCC.S.A0021
+      command: "readAttribute"
+      attribute: "UltrasonicUnoccupiedToOccupiedDelay"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label:
+          "Step 10: TH reads from the DUT the (0x0022)
+          UltrasonicUnoccupiedToOccupiedThreshold optional attribute, if
+          ultrasonic sensor"
+      PICS: OCC.S.A0022
+      command: "readAttribute"
+      attribute: "UltrasonicUnoccupiedToOccupiedThreshold"
+      response:
+          constraints:
+              type: int8u
+              minValue: 1
+              maxValue: 254
+
+    - label:
+          "Step 11:TH reads from the DUT the (0x0030)
+          PhysicalContactOccupiedToUnoccupiedDelay optional attribute, if
+          Physical Contact sensor"
+      PICS: OCC.S.A0030
+      command: "readAttribute"
+      attribute: "PhysicalContactOccupiedToUnoccupiedDelay"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label:
+          "Step 12: TH reads from the DUT the (0x0031)
+          PhysicalContactUnoccupiedToOccupiedDelay optional attribute, if
+          Physical Contact sensor"
+      PICS: OCC.S.A0031
+      command: "readAttribute"
+      attribute: "PhysicalContactUnoccupiedToOccupiedDelay"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label:
+          "Step 13: TH reads from the DUT the (0x0032)
+          PhysicalContactUnoccupiedToOccupiedThreshold optional attribute, if
+          Physical Contact sensor"
+      PICS: OCC.S.A0032
+      command: "readAttribute"
+      attribute: "PhysicalContactUnoccupiedToOccupiedThreshold"
+      response:
+          constraints:
+              type: int8u
+              minValue: 1
+              maxValue: 254

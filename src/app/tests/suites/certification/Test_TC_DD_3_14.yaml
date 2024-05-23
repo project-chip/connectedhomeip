@@ -1,0 +1,235 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    3.3.14. [TC-DD-3.14] Commissioning Flow - QR Code - Negative Scenario [DUT -
+    Commissioner]
+
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+    - MCORE.DD.QR_COMMISSIONING
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the DUT as commissioner test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Preconditions"
+      verification: |
+          1 - DUT is on an operational network and has accurate date, time, timezone, regulatory, and fabric information available.
+
+          2 - 5.1.3 - QR Code is printed on the Commissionee device or in additional provided materials (ex: manual, companion app, web service).
+
+          An example onboarding QR code could be "MT:-24J029Q00KA0648G00" (following 5.1.3 "QR Code", Table 34 "Packed Binary Data Structure for Onboarding Payload") which includes:
+
+          - 3-bit Version String=000
+
+          - 16-bit Vendor ID=0xFFF1 (as defined in section 2.5.2. "Vendor Identifier")
+
+          - 16-bit Product ID=0x8001 (as defined in section 2.5.3. "Product Identifier")
+
+          - 2-bit Custom Flow=10 (Custom Commissioning Flow = 2)
+
+          - 8-bit Discovery Capabilities Bitmask=00000100 (OnNetwork)
+
+          - 12-bit Discriminator=0xF00
+
+          - 27-bit Passcode=20202021
+
+          - 4-bit Padding=0000
+
+          - no variable-length TLV Data included (as defined in section 5.1.3.1. "Payload", subsection "TLV Data")
+      disabled: true
+
+    - label: "Step 1: Locate and scan/read the Commissionees QR code using DUT"
+      verification: |
+          Verify on the TH (All-cluster-app)
+          ./chip-all-clusters-app --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --custom-flow 2 --capabilities 4 --discriminator 3840 --passcode 20202021
+
+          [1657235470.970680][371041:371041] CHIP:DL: Device Configuration:
+          [1657235470.970772][371041:371041] CHIP:DL:   Serial Number: (not set)
+          [1657235470.970811][371041:371041] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
+          [1657235470.970845][371041:371041] CHIP:DL:   Product Id: 32769 (0x8001)
+          [1657235470.970892][371041:371041] CHIP:DL:   Hardware Version: 0
+          [1657235470.970929][371041:371041] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
+          [1657235470.970984][371041:371041] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3840 (0xF00)
+          [1657235470.971031][371041:371041] CHIP:DL:   Manufacturing Date: (not set)
+          [1657235470.971095][371041:371041] CHIP:DL:   Device Type: 65535 (0xFFFF)
+          [1657235470.971147][371041:371041] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
+          [1657235470.971199][371041:371041] CHIP:SVR: SetupQRCode: [MT:-24J029Q00KA0648G00]
+          [1657235470.971258][371041:371041] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
+          [1657235470.971293][371041:371041] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J029Q00KA0648G00
+      disabled: true
+
+    - label:
+          "Step 2a: Version String: Using the QR code from Step 1, generate a
+          new QR code but substituting out the current Version String with an
+          invalid Version String (i.e. '010' or any non-zero 3-bit value)"
+      verification: |
+          1. Use chip-tool's "payload generate-qrcode" command to help generate the new, invalid QR code
+          Verify on the TH (All-cluster-app)
+           ./chip-tool payload generate-qrcode --existing-payload MT:-24J029Q00KA0648G00 --allow-invalid-payload 1  --version 2
+          [1657235626568] [31698:16839018] CHIP: [TOO] QR Code: MT:034J029Q00KA0648G00
+      disabled: true
+
+    - label:
+          "Step 2b: Scan/read the QR code, generated in the previous step, using
+          the DUT"
+      verification: |
+          Verify on the DUT (Chip-tool):
+
+          ./chip-tool pairing code 1 MT:-034J029Q00KA0648G00
+
+          Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:50: CHIP Error 0x0000002F: Invalid argument
+
+          No applicable TH Logs
+      disabled: true
+
+    - label:
+          "Step 3a: Using the QR code from Step 1, ensure the THs Discovery
+          Capability bit string is NOT set to BLE for discovery (i.e. set to
+          OnNetwork discovery capability)"
+      PICS: MCORE.DD.DISCOVERY_BLE
+      verification: |
+          1. Use chip-tool's "payload generate-qrcode" command to help generate the new, invalid QR code
+          Verify on the TH (All-cluster-app)
+           ./chip-tool payload generate-qrcode --existing-payload MT:-24J029Q00KA0648G00 --allow-invalid-payload 1  --rendezvous 4
+          [1657235754393] [31702:16840391] CHIP: [TOO] QR Code: MT:-24J029Q00KA0648G00
+
+          Verify on the DUT (Chip-tool):
+          No applicable logs on the DUT side
+      disabled: true
+
+    - label: "Step 3b: Scan/read the QR code of the TH device using the DUT"
+      PICS: MCORE.DD.DISCOVERY_BLE
+      verification: |
+          Verify on the DUT (Chip-tool):
+          ./chip-tool pairing code 1 MT:-24J029Q00KA0648G00
+          [1657235905214] [31706:16841970] CHIP: [CTL] Discovered device to be commissioned over DNS-SD
+          ...
+          [1657235906071] [31706:16841969] CHIP: [TOO] Device commissioning completed with success
+      disabled: true
+
+    - label:
+          "Step 4a: Passcode: Using the QR code from Step 1, generate a new QR
+          code using all the same Onboarding Payload components except for the
+          Passcode. For each passcode in the following list, set the Passcode
+          component to one of the invalid Passcodes and generate a new QR code
+          using all the same Onboarding Payload components and one Passcode from
+          the list: 00000000, 11111111, 22222222, 33333333, 44444444, 55555555,
+          66666666, 77777777, 88888888, 99999999, 12345678, 87654321"
+      verification: |
+          No applicable TH or DUT Logs
+          "MT:-24J029Q00OC0000000" (00000000),
+          "MT:-24J029Q00KMSP0Z800" (11111111),
+          "MT:-24J029Q00GWID1WH00" (22222222),
+          "MT:-24J029Q00C4912TQ00" (33333333),
+          "MT:-24J029Q008E.Q2QZ00" (44444444),
+          "MT:-24J029Q004ORE3N610" (55555555),
+          "MT:-24J029Q000YH24KF10" (66666666),
+          "MT:-24J029Q00Y58S4HO10" (77777777),
+          "MT:-24J029Q00UF-F5EX10" (88888888),
+          "MT:-24J029Q00QPQ36B420" (99999999),
+          "MT:-24J029Q004QG46Y900" (12345678),
+          "MT:-24J029Q00YX018EW10" (87654321)
+      disabled: true
+
+    - label:
+          "Step 4b: Scan each of the generated QR codes from the previous step
+          using DUT"
+      verification: |
+          Verify on the DUT (Chip-tool):
+          No applicable TH Logs
+
+          ./chip-tool pairing code 1 MT:-24J029Q00OC0000000
+
+          Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:50: CHIP Error 0x0000002F: Invalid argument
+
+
+           ./chip-tool pairing code 1 MT:-24J029Q00OC0000000
+          Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:50: CHIP Error 0x0000002F: Invalid argument
+
+
+           ./chip-tool pairing code 1 MT:-24J029Q00KMSP0Z800
+          Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:50: CHIP Error 0x0000002F: Invalid argument
+
+
+           ./chip-tool pairing code 1 MT:-24J029Q00GWID1WH00
+          Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:50: CHIP Error 0x0000002F: Invalid argument
+
+
+           ./chip-tool pairing code 1 MT:-24J029Q00C4912TQ00
+          Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:50: CHIP Error 0x0000002F: Invalid argument
+
+
+           ./chip-tool pairing code 1 MT:-24J029Q008E.Q2QZ00
+          Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:50: CHIP Error 0x0000002F: Invalid argument
+
+
+           ./chip-tool pairing code 1 MT:-24J029Q004ORE3N610
+          Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:50: CHIP Error 0x0000002F: Invalid argument
+
+
+           ./chip-tool pairing code 1 MT:-24J029Q000YH24KF10
+          Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:50: CHIP Error 0x0000002F: Invalid argument
+
+
+           ./chip-tool pairing code 1 MT:-24J029Q00Y58S4HO10
+          Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:50: CHIP Error 0x0000002F: Invalid argument
+
+
+           ./chip-tool pairing code 1 MT:-24J029Q00UF-F5EX10
+          Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:50: CHIP Error 0x0000002F: Invalid argument
+
+
+           ./chip-tool pairing code 1 MT:-24J029Q00QPQ36B420
+          Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:50: CHIP Error 0x0000002F: Invalid argument
+
+
+           ./chip-tool pairing code 1 MT:-24J029Q004QG46Y900
+          Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:50: CHIP Error 0x0000002F: Invalid argument
+
+
+           ./chip-tool pairing code 1 MT:-24J029Q00YX018EW10
+          Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:50: CHIP Error 0x0000002F: Invalid argument
+      disabled: true
+
+    - label:
+          "Step 5a: Prefix: Using the QR code from Step 1, generate a new QR
+          code but substituting out the current Prefix with an invalid Prefix
+          that is not 'MT:' (i.e. Prefix='AB:')"
+      verification: |
+          AB:-24J029Q00KA0648G00
+
+          No applicable TH or DUT Logs
+      disabled: true
+
+    - label:
+          "Step 5b: Scan/read the QR code, generated in the previous step, using
+          the DUT"
+      verification: |
+          Verify on the DUT (Chip-tool):
+
+           ./chip-tool pairing code 1 AB:-24J029Q00KA0648G00
+          [1657236169984] [31732:16844455] CHIP: [TOO] Run command failure: ../../examples/chip-tool/third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:50: CHIP Error 0x00000013: Integrity check failed
+
+          No applicable TH Logs
+      disabled: true

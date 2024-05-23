@@ -1,0 +1,42 @@
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+java_path = getenv("JAVA_PATH")
+declare_args() {
+  java_matter_controller_dependent_paths = []
+
+  # The class of each cluster created by ZAP is added to the library. (e.g., ChipClusters)
+  matter_enable_java_generated_api = true
+
+  # The API of TLV decoder created by ZAP is added to the library.
+  # If the 'matter_enable_java_generated_api' feature is enabled, this feature must be enabled.
+  matter_enable_tlv_decoder_api = true
+
+  matter_enable_java_compilation = false
+  if (java_path != "" && (current_os == "linux" || current_os == "mac")) {
+    java_matter_controller_dependent_paths += [ "${java_path}/include/" ]
+
+    if (current_os == "mac") {
+      java_matter_controller_dependent_paths +=
+          [ "${java_path}/include/darwin/" ]
+    } else {
+      java_matter_controller_dependent_paths +=
+          [ "${java_path}/include/linux/" ]
+    }
+
+    matter_enable_java_generated_api = false
+    matter_enable_tlv_decoder_api = false
+    matter_enable_java_compilation = true
+  }
+}

@@ -1,0 +1,86 @@
+# Copyright (c) 2020-2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/src/lwip/lwip.gni")
+
+declare_args() {
+  # Use the lwIP library.
+  chip_system_config_use_lwip = chip_with_lwip && current_os == "freertos"
+
+  # Use BSD/POSIX socket API.
+  chip_system_config_use_sockets = current_os != "freertos"
+
+  # Mutex implementation: posix, freertos, none.
+  chip_system_config_locking = ""
+
+  # Clock implementation: clock_gettime, gettimeofday
+  chip_system_config_clock = "clock_gettime"
+
+  # Enable metrics collection.
+  chip_system_config_provide_statistics = true
+
+  # Use OpenThread TCP/UDP stack directly
+  chip_system_config_use_open_thread_inet_endpoints = false
+}
+
+declare_args() {
+  # do not use libev by default
+  chip_system_config_use_libev = false
+
+  # use the dispatch library on darwin targets
+  chip_system_config_use_dispatch = chip_system_config_use_sockets &&
+                                    (current_os == "mac" || current_os == "ios")
+}
+
+declare_args() {
+  # Event loop type.
+  if (chip_system_config_use_lwip ||
+      chip_system_config_use_open_thread_inet_endpoints) {
+    chip_system_config_event_loop = "FreeRTOS"
+  } else {
+    chip_system_config_event_loop = "Select"
+  }
+}
+
+if (chip_system_config_locking == "") {
+  if (current_os == "freertos") {
+    chip_system_config_locking = "freertos"
+  } else if (current_os == "mbed") {
+    chip_system_config_locking = "mbed"
+  } else if (current_os == "cmsis-rtos") {
+    chip_system_config_locking = "cmsis-rtos"
+  } else if (current_os == "zephyr") {
+    chip_system_config_locking = "zephyr"
+  } else if (chip_system_config_use_dispatch == false) {
+    chip_system_config_locking = "posix"
+  } else {
+    chip_system_config_locking = "none"
+  }
+}
+
+assert(
+    chip_system_config_locking == "posix" ||
+        chip_system_config_locking == "freertos" ||
+        chip_system_config_locking == "none" ||
+        chip_system_config_locking == "mbed" ||
+        chip_system_config_locking == "cmsis-rtos" ||
+        chip_system_config_locking == "zephyr",
+    "Please select a valid mutex implementation: posix, freertos, mbed, cmsis-rtos, zephyr, none")
+
+assert(
+    chip_system_config_clock == "clock_gettime" ||
+        chip_system_config_clock == "gettimeofday",
+    "Please select a valid clock implementation: clock_gettime, gettimeofday")

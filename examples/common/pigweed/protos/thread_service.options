@@ -1,0 +1,2 @@
+chip.rpc.ThreadNetworkInfo.network_name max_size:17    // Maximum size of the Thread Network Name field + 1 for null
+chip.rpc.ThreadNetworkInfo.extended_pan_id max_size:8  // Size of extended pan id in bytes

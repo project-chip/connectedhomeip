@@ -1,0 +1,145 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 81.3.3. [TC-MOD-3.3] OTA Mode Verification (DUT as Server)
+
+PICS:
+    - MOD.S.A0004
+
+config:
+    nodeId: 0x12344321
+    cluster: "Mode Select"
+    endpoint: 1
+    #Configure newmode value
+    NewMode:
+        type: int8u
+        defaultValue: 7
+
+tests:
+    - label:
+          "Commission DUT to TH (can be skipped if done in a preceding test)."
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 1: TH reads the StartUpMode attribute from the DUT"
+      PICS: MOD.S.A0004
+      command: "readAttribute"
+      attribute: "StartUpMode"
+      response:
+          saveAs: StartUpModeValue
+          constraints:
+              type: int8u
+
+    - label: "Step 2a: TH reads the CurrentMode attribute from the DUT"
+      PICS: MOD.S.A0003
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          saveAs: CurrentModeValue
+          constraints:
+              type: int8u
+
+    - label:
+          "Step 2b: If the StartUpMode and CurrentMode attributes have the same
+          value, proceed to step 2c, Otherwise proceed to step 3a"
+      PICS: MOD.S.A0003 && MOD.S.A0004
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: StartUpModeValue
+              - name: "Value2"
+                value: CurrentModeValue
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsExpectedValue
+
+    - label: "Step 2c: TH reads the SupportedModes attribute from the DUT"
+      runIf: IsExpectedValue
+      PICS: MOD.S.A0002
+      command: "readAttribute"
+      attribute: "SupportedModes"
+      response:
+          constraints:
+              type: list
+
+    - label:
+          "Step 2d: Select a value from the list in step 2c with a different
+          value than the StartUpMode value read in step 1. TH sends a
+          ChangeToMode command to the DUT with the selected value"
+      runIf: IsExpectedValue
+      PICS: MOD.S.A0002 && MOD.S.C00.Rsp
+      command: "ChangeToMode"
+      arguments:
+          values:
+              - name: "NewMode"
+                value: NewMode
+
+    - label:
+          "Step 3a: Perform an OTA update on the device that requires a reboot.
+          Allow for the DUT to update and fully reboot."
+      verification: |
+          To perform an OTA update on Thread device follow the cmmds below:
+
+          Step-1 :Run the below command in the path, Where we built the OTA provider app . (In this example , the path is  connectedhomeip/out/debug ./chip-ota-provider-app -f  )
+
+          ./chip-ota-provider-app -f ~/chip_repos/connectedhomeip/examples/all-clusters-app/nrfconnect/build2/zephyr/matter.ota
+
+          Execute the  command using chip-tool and verify the response as below.
+
+          Step-2: ./chip-tool pairing onnetwork 2 20202021
+
+          [1659104612.593187][62366:62371] CHIP:CTL: Successfully finished commissioning step 'ReadCommissioningInfo'
+
+          Step-3 : ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": [{"cluster": 41, "endpoint": null, "deviceType": null}]}]' 2 0
+
+          [1651101661960] [90832:7598169] CHIP: [DMG]                                 status = 0x00 (SUCCESS),
+
+
+          Step-4: ./chip-tool otasoftwareupdaterequestor write default-otaproviders '[{"fabricIndex": 1, "providerNodeID": 2, "endpoint": 0}]' 1 0
+
+          Step-5: ./chip-tool otasoftwareupdaterequestor announce-otaprovider 2 0 0 0 1 0
+
+          Make sure the OTA update is succesful. Refer OTA testcases for the command & its output. .
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 3b: TH reads the CurrentMode attribute from the DUT"
+      PICS: MOD.S.A0003
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          constraints:
+              anyOf: [NewMode, CurrentModeValue]

@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021-2023 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+  <cluster>
+    <domain>Media</domain>
+    <name>Target Navigator</name>
+    <code>0x0505</code>
+    <define>TARGET_NAVIGATOR_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <globalAttribute side="either" code="0xFFFD" value="2"/> <!-- Revision   -->
+    <description>This cluster provides an interface for UX navigation within a set of targets on a device or endpoint.</description>
+    <attribute side="server" code="0x0000" define="TARGET_NAVIGATOR_LIST"           type="array" entryType="TargetInfoStruct"    length="254" writable="false" optional="false">TargetList</attribute>
+    <attribute side="server" code="0x0001" define="TARGET_NAVIGATOR_CURRENT_TARGET" type="int8u" default="0"            min="0x00" max="0xFF" writable="false" optional="true">CurrentTarget</attribute>
+
+    <command source="client" code="0x00" name="NavigateTarget" response="NavigateTargetResponse" optional="false">
+      <description>Upon receipt, this SHALL navigation the UX to the target identified.</description>
+      <arg name="Target" type="int8u"/>
+      <arg name="Data"   type="char_string" optional="true"/>
+    </command>
+
+    <command source="server" code="0x01" name="NavigateTargetResponse" optional="false">
+      <description>This command SHALL be generated in response to NavigateTarget commands.</description>
+      <arg name="Status" type="StatusEnum"/>
+      <arg name="Data"   type="char_string" optional="true"/>
+    </command>
+
+    <event side="server" code="0x00" priority="info" name="TargetUpdated" optional="false">
+      <description>This field SHALL indicate the updated target list as defined by the TargetList attribute if there is a change in the list of targets. Otherwise this field can be omitted from the event.</description>
+      <field id="0" name="TargetList" array="true" type="TargetInfoStruct"  />
+      <field id="1" name="CurrentTarget" type="int8u" />
+      <field id="2" name="Data" length="900" type="octet_string" />
+    </event>
+  </cluster>
+
+  <enum name="StatusEnum" type="enum8">
+    <cluster code="0x0505"/>
+    <item name="Success"        value="0x00"/>
+    <item name="TargetNotFound" value="0x01"/>
+    <item name="NotAllowed"     value="0x02"/>
+  </enum>
+
+  <struct name="TargetInfoStruct">
+    <cluster code="0x0505"/>
+    <item name="Identifier" type="int8u" length="254"/>
+    <item name="Name"       type="char_string"/>
+  </struct>
+</configurator>

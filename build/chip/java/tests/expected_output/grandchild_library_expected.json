@@ -1,0 +1,8 @@
+{
+    "deps_info": {
+        "name": "grandchild_library.json",
+        "jar_path": "lib/build/chip/java/tests/grandchild_library.jar",
+        "deps_configs": [],
+        "deps_jars": []
+    }
+}

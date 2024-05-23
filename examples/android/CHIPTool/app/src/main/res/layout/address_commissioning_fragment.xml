@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+  <TextView
+      android:id="@+id/address_commissioning_fragment_title"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/address_commissioning_title_text"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      android:textSize="16sp"
+      android:layout_marginTop="16dp"
+      app:layout_constraintTop_toTopOf="parent" />
+
+  <androidx.constraintlayout.helper.widget.Flow
+      android:id="@+id/address_commissioning_fragment_flow"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      app:constraint_referenced_ids="addressLabel,addressEditText,discriminatorLabel,discriminatorEditText,pincodeLabel,pincodeEditText,portLabel,portEditText"
+      app:flow_horizontalStyle="packed"
+      app:flow_wrapMode="aligned"
+      app:flow_maxElementsWrap="2"
+      app:flow_horizontalBias="0.0"
+      app:flow_horizontalGap="8dp"
+      android:layout_margin="16dp"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/address_commissioning_fragment_title" />
+
+  <TextView
+      android:id="@+id/addressLabel"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:padding="8dp"
+      android:textSize="16sp"
+      android:text="@string/enter_device_address_label_text" />
+
+  <EditText
+      android:id="@+id/addressEditText"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:inputType="text" />
+
+  <TextView
+      android:id="@+id/discriminatorLabel"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:padding="8dp"
+      android:textSize="16sp"
+      android:text="@string/enter_discriminator_label_text" />
+
+  <EditText
+      android:id="@+id/discriminatorEditText"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:inputType="number"
+      android:text="@string/default_discriminator" />
+
+  <TextView
+      android:id="@+id/pincodeLabel"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:padding="8dp"
+      android:textSize="16sp"
+      android:text="@string/enter_pincode_label_text" />
+
+  <EditText
+      android:id="@+id/pincodeEditText"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_margin="16dp"
+      android:inputType="number"
+      android:text="@string/default_pincode" />
+
+  <TextView
+      android:id="@+id/portLabel"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:padding="8dp"
+      android:textSize="16sp"
+      android:text="@string/enter_port_label_text" />
+
+  <EditText
+      android:id="@+id/portEditText"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_margin="16dp"
+      android:inputType="number"
+      android:text="@string/default_port" />
+
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical"
+      android:layout_margin="16dp"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/address_commissioning_fragment_flow">
+
+    <Button
+        android:id="@+id/wifiScanBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/wifi_scan_btn_text"/>
+
+    <Spinner
+        android:id="@+id/wifiScanListSpinner"
+        android:padding="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/wifiConnectBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/wifi_connect_btn_text"/>
+
+    <Button
+        android:id="@+id/discoverBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/dns_discover_btn_text"/>
+
+    <Spinner
+        android:id="@+id/discoverListSpinner"
+        android:padding="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+  </LinearLayout>
+  <Button
+      android:id="@+id/commissionBtn"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_margin="16dp"
+      android:text="@string/commission_btn_text"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="1.0"
+      app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

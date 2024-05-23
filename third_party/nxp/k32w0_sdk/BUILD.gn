@@ -1,0 +1,104 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/mbedtls.gni")
+import("//build_overrides/nxp_sdk.gni")
+
+import("${mbedtls_root}/mbedtls.gni")
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
+
+declare_args() {
+  # Build target to use for k32w0 SDK. Use this to set global SDK defines.
+  k32w0_sdk_target = ""
+}
+
+assert(k32w0_sdk_target != "", "k32w0_sdk_target must be specified")
+
+group("nxp_sdk") {
+  public_deps = [ k32w0_sdk_target ]
+}
+
+config("mbedtls_k32w0_config") {
+  defines = [
+    "MBEDTLS_CONFIG_FILE=<third_party/openthread/repo/third_party/mbedtls/mbedtls-config.h>",
+    "MBEDTLS_USER_CONFIG_FILE=<src/platform/nxp/k32w/k32w0/k32w0-chip-mbedtls-config.h>",
+
+    # These options should really be in the config.h...
+    "MBEDTLS_FREESCALE_FREERTOS_CALLOC_ALT=1",
+    "MBEDTLS_THREADING_C=1",
+    "MBEDTLS_THREADING_ALT=1",
+    "MBEDTLS_X509_CSR_WRITE_C",
+    "MBEDTLS_X509_CREATE_C",
+    "MBEDTLS_PEM_WRITE_C",
+    "MBEDTLS_HKDF_C",
+    "MBEDTLS_PKCS5_C",
+  ]
+
+  if (chip_mdns == "none") {
+    defines += [
+      "MBEDTLS_PK_WRITE_C",
+      "MBEDTLS_OID_C",
+      "MBEDTLS_BASE64_C",
+    ]
+  }
+
+  if (chip_with_factory_data == 1) {
+    defines += [
+      "MBEDTLS_X509_CRT_PARSE_C",
+      "MBEDTLS_X509_USE_C",
+    ]
+  }
+
+  if (chip_crypto == "platform" && chip_crypto_flavor == "tinycrypt") {
+    defines += [
+      "MBEDTLS_USE_TINYCRYPT",
+      "MBEDTLS_OPTIMIZE_TINYCRYPT_ASM",
+    ]
+  }
+
+  include_dirs = [ chip_root ]
+
+  if (chip_crypto == "platform" && chip_crypto_flavor == "tinycrypt") {
+    include_dirs += [
+      "${chip_root}/third_party/openthread/ot-nxp/third_party/tinycrypt/inc",
+    ]
+  }
+}
+
+mbedtls_target("mbedtls") {
+  sources = [
+    "${k32w0_sdk_root}/middleware/mbedtls/port/ksdk/aes_alt.c",
+    "${k32w0_sdk_root}/middleware/mbedtls/port/matter/ksdk_mbedtls.c",
+  ]
+
+  if (chip_crypto == "platform" && chip_crypto_flavor == "tinycrypt") {
+    sources += [
+      "${chip_root}/third_party/openthread/ot-nxp/third_party/tinycrypt/src/ecc.c",
+      "${chip_root}/third_party/openthread/ot-nxp/third_party/tinycrypt/src/ecc_dh.c",
+      "${chip_root}/third_party/openthread/ot-nxp/third_party/tinycrypt/src/ecc_dsa.c",
+      "${chip_root}/third_party/openthread/ot-nxp/third_party/tinycrypt/src/tinycrypt_util.c",
+    ]
+  }
+
+  public_configs = [ ":mbedtls_k32w0_config" ]
+
+  public_deps = [
+    ":nxp_sdk",
+    "${chip_root}/third_party/openthread/platforms/nxp/k32w/k32w0:openthread_mbedtls_config_k32w0",
+  ]
+}

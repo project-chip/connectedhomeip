@@ -1,0 +1,59 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
+
+import("$dir_pw_build/python.gni")
+import("$dir_pw_build/python_dist.gni")
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+
+pw_python_package("chip_rpc") {
+  setup = [
+    "pyproject.toml",
+    "setup.cfg",
+    "setup.py",
+  ]
+  sources = [
+    "chip_rpc/__init__.py",
+    "chip_rpc/console.py",
+    "chip_rpc/plugins/device_toolbar.py",
+    "chip_rpc/plugins/helper_scripts.py",
+  ]
+  python_deps = [
+    "$dir_pw_console/py",
+    "$dir_pw_hdlc/py",
+    "$dir_pw_log_tokenized/py",
+    "$dir_pw_protobuf_compiler/py",
+    "$dir_pw_rpc/py",
+    "$dir_pw_system/py",
+    "$dir_pw_tokenizer/py",
+    "${chip_root}/examples/common/pigweed:attributes_service.python",
+    "${chip_root}/examples/common/pigweed:boolean_state_service.python",
+    "${chip_root}/examples/common/pigweed:button_service.python",
+    "${chip_root}/examples/common/pigweed:descriptor_service.python",
+    "${chip_root}/examples/common/pigweed:device_service.python",
+    "${chip_root}/examples/common/pigweed:echo_service.python",
+    "${chip_root}/examples/common/pigweed:lighting_service.python",
+    "${chip_root}/examples/common/pigweed:locking_service.python",
+    "${chip_root}/examples/common/pigweed:ot_cli_service.python",
+    "${chip_root}/examples/common/pigweed:thread_service.python",
+    "${chip_root}/examples/common/pigweed:wifi_service.python",
+  ]
+}
+
+pw_python_wheels("chip_rpc_wheel") {
+  packages = [ ":chip_rpc" ]
+  directory = "$root_out_dir/chip_rpc_console_wheels"
+}

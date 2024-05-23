@@ -1,0 +1,316 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    4.1.3. [TC-DA-1.3] Device Attestation Request Validation [DUT -
+    Commissioner]
+
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Pre-Conditions"
+      verification: |
+          1. PAI, DAC certificates are obtained and validated against externally obtained PAA certificate
+          2. Operations happen within the Fail-Safe Context
+          3. TH1 should be known about Commissioner based error condition/warning
+      disabled: true
+
+    - label: "Step 1: Start the commissioning process of TH1 on DUT"
+      verification: |
+          sudo ./chip-all-clusters-app --wifi  --trace_decode 1
+
+          DUT as commissioner side:
+          ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3840  --trace_decode 1
+      disabled: true
+
+    - label: "Step 2: DUT generates 32-byte AttestationNonce"
+      verification: |
+          During provision, DUT sends AttestationRequest Command with AttestationNonce
+
+          [1659763321.702266][2548:2548] CHIP:DMG:     }
+          [1659763321.702302][2548:2548] CHIP:DMG:     Attestation Nonce (32) = CF9146F33636FEC51CDCB9161D2F5EE72E4F1196CC9D5FAB417F388AFA42F110
+          [1659763321.702332][2548:2548] CHIP:DMG:     Timestamp = 0
+      disabled: true
+
+    - label:
+          "Step 3: DUT sends AttestationRequest Command with AttestationNonce as
+          field to the TH1."
+      verification: |
+          During provision, DUT sends AttestationRequest Command with AttestationNonce as field to the TH. verify the below log in TH(all-clusters-app). As the current TH ref app (all-clusters-app) doesnot decode the received request message, nonce value has been shown from the TH ref app response message , as TH ref app use the same nonce value in the response message
+
+          [1659763321.692977][2548:2548] CHIP:DMG: AccessControl: implicit admin (PASE)
+          [1659763321.693005][2548:2548] CHIP:DMG: Received command for Endpoint=0 Cluster=0x0000_003E Command=0x0000_0000
+          [1659763321.693048][2548:2548] CHIP:ZCL: OpCreds: Received an AttestationRequest command
+          [1659763321.693074][2548:2548] CHIP:EM: Sending Standalone Ack for MessageCounter:128550767 on exchange 38669r
+          [1659763321.693328][2548:2548] CHIP:IN: Prepared secure message 0xfffff076ad48 to 0xFFFFFFFB00000000 (0)  of type 0x10 and protocolId (0, 0) on exchange 38669r with MessageCounter:160974649.
+          [1659763321.693377][2548:2548] CHIP:IN: Sending encrypted msg 0xfffff076ad48 with MessageCounter:160974649 to 0xFFFFFFFB00000000 (0) at monotonic time: 000000000011C37A msec
+          [1659763321.693710][2548:2548] CHIP:DMG: >> to UDP:[fe80::e65f:1ff:fe0f:3baf%eth0]:40837 | 160974649 | [Secure Channel  (0) / Standalone Ack (0x10) / Session = 11953 / Exchange = 38669]
+          [1659763321.693756][2548:2548] CHIP:DMG: Header Flags =
+          [1659763321.693778][2548:2548] CHIP:DMG: {
+
+          [1659763321.698173][2548:2548] CHIP:DMG:
+          [1659763321.698335][2548:2548] CHIP:DMG: Attestation Elements (585 bytes) =
+          [1659763321.698363][2548:2548] CHIP:DMG: {
+          [1659763321.698393][2548:2548] CHIP:DMG:     Certification Declaration =
+          [1659763321.698414][2548:2548] CHIP:DMG:     {
+          [1659763321.699353][2548:2548] CHIP:DMG:         Format Version = 1
+          [1659763321.699394][2548:2548] CHIP:DMG:         Vendor Id = 65521
+          [1659763321.699418][2548:2548] CHIP:DMG:         Product Ids =
+          [1659763321.699440][2548:2548] CHIP:DMG:         {
+          [1659763321.699463][2548:2548] CHIP:DMG:             Product Id = 32768
+          [1659763321.699486][2548:2548] CHIP:DMG:             Product Id = 32769
+          [1659763321.699509][2548:2548] CHIP:DMG:             Product Id = 32770
+          [1659763321.700010][2548:2548] CHIP:DMG:             Product Id = 32789
+
+          [1659763321.702099][2548:2548] CHIP:DMG:         }
+          [1659763321.702123][2548:2548] CHIP:DMG:         Device Type Id = 22
+          [1659763321.702149][2548:2548] CHIP:DMG:         Certificate Id (19) = ZIG20142ZB330003-24
+          [1659763321.702173][2548:2548] CHIP:DMG:         Security Level = 0
+          [1659763321.702197][2548:2548] CHIP:DMG:         Security Information = 0
+          [1659763321.702220][2548:2548] CHIP:DMG:         Version Number = 9876
+          [1659763321.702243][2548:2548] CHIP:DMG:         Certification Type = 0
+          [1659763321.702266][2548:2548] CHIP:DMG:     }
+          [1659763321.702302][2548:2548] CHIP:DMG:     Attestation Nonce (32) = CF9146F33636FEC51CDCB9161D2F5EE72E4F1196CC9D5FAB417F388AFA42F110
+          [1659763321.702332][2548:2548] CHIP:DMG:     Timestamp = 0
+          [1659763321.702353][2548:2548] CHIP:DMG: }
+          [1659763321.702381][2548:2548] CHIP:DMG:
+          [1659763321.702423][2548:2548] CHIP:DMG: InvokeResponseMessage =
+          [1659763321.702457][2548:2548] CHIP:DMG: {
+          [1659763321.702486][2548:2548] CHIP:DMG:         suppressResponse = false,
+          [1659763321.702510][2548:2548] CHIP:DMG:         InvokeResponseIBs =
+          [1659763321.702542][2548:2548] CHIP:DMG:         [
+          [1659763321.702576][2548:2548] CHIP:DMG:                 InvokeResponseIB =
+          [1659763321.702609][2548:2548] CHIP:DMG:                 {
+          [1659763321.702644][2548:2548] CHIP:DMG:                         CommandDataIB =
+          [1659763321.702685][2548:2548] CHIP:DMG:                         {
+          [1659763321.702715][2548:2548] CHIP:DMG:                                 CommandPathIB =
+          [1659763321.702757][2548:2548] CHIP:DMG:                                 {
+          [1659763321.702791][2548:2548] CHIP:DMG:                                         EndpointId = 0x0,
+          [1659763321.702836][2548:2548] CHIP:DMG:                                         ClusterId = 0x3e,
+          [1659763321.702877][2548:2548] CHIP:DMG:                                         CommandId = 0x1,
+          [1659763321.702909][2548:2548] CHIP:DMG:                                 },
+          [1659763321.702953][2548:2548] CHIP:DMG:
+          [1659763321.702992][2548:2548] CHIP:DMG:                                 CommandFields =
+          [1659763321.703025][2548:2548] CHIP:DMG:                                 {
+          [1659763321.703069][2548:2548] CHIP:DMG:                                         0x0 = [
+          [1659763321.703255][2548:2548] CHIP:DMG:                                                         0x15, 0x31, 0x1, 0x1d, 0x2, 0x30, 0x82, 0x2, 0x19, 0x6, 0x9, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0xd, 0x1, 0x7, 0x2, 0xa0, 0x82, 0x2, 0xa, 0x30, 0x82, 0x2, 0x6, 0x2, 0x1, 0x3, 0x31, 0xd, 0x30, 0xb, 0x6, 0x9, 0x60, 0x86, 0x48, 0x1, 0x65, 0x3, 0x4, 0x2, 0x1, 0x30, 0x82, 0x1, 0x71, 0x6, 0x9, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0xd, 0x1, 0x7, 0x1, 0xa0, 0x82, 0x1, 0x62, 0x4, 0x82, 0x1, 0x5e, 0x15, 0x24, 0x0, 0x1, 0x25, 0x1, 0xf1, 0xff, 0x36, 0x2, 0x5, 0x0, 0x80, 0x5, 0x1, 0x80, 0x5, 0x2, 0x80, 0x5, 0x3, 0x80, 0x5, 0x4, 0x80, 0x5, 0x5, 0x80, 0x5, 0x6, 0x80, 0x5, 0x7, 0x80, 0x5, 0x8, 0x80, 0x5, 0x9, 0x80, 0x5, 0xa, 0x80, 0x5, 0xb, 0x80, 0x5, 0xc, 0x80, 0x5, 0xd, 0x80, 0x5, 0xe, 0x80, 0x5, 0xf, 0x80, 0x5, 0x10, 0x80, 0x5, 0x11, 0x80, 0x5, 0x12, 0x80, 0x5, 0x13, 0x80, 0x5, 0x14, 0x80, 0x5, 0x15, 0x80, 0x5, 0x16, 0x80, 0x5, 0x17, 0x80, 0x5, 0x18, 0x80, 0x5, 0x19, 0x80, 0x5, 0x1a, 0x80, 0x5, 0x1b, 0x80, 0x5, 0x1c, 0x80, 0x5, 0x1d, 0x80, 0x5, 0x1e, 0x80, 0x5, 0x1f, 0x80, 0x5, 0x20, 0x80, 0x5, 0x21, 0x80, 0x5, 0x22, 0x80, 0x5, 0x23, 0x80, 0x5, 0x24, 0x80, 0x5, 0x25, 0x80, 0x5, 0x26, 0x80, 0x5, 0x27, 0x80, 0x5, 0x28, 0x80, 0x5, 0x29, 0x80, 0x5, 0x2a, 0x80, 0x5, 0x2b, 0x80, 0x5, 0x2c, 0x80, 0x5, 0x2d, 0x80, 0x5, 0x2e, 0x80, 0x5, 0x2f, 0x80, 0x5, 0x30, 0x80, 0x5, 0x31, 0x80, 0x5, 0x32, 0x80, 0x5, 0x33, 0x80, 0x5, 0x34, 0x80, 0x5, 0x35, 0x80, 0x5, 0x36, 0x80, 0x5, 0x37, 0x80, 0x5, 0x38, 0x80, 0x5, 0x39, 0x80, 0x5, 0x3a, 0x80, 0x5, 0x3b, 0x80, 0x5, 0x3c, 0x80, 0x5, 0x3d, 0x80, 0x5, 0x3e, 0x80, 0x5, 0x3f, 0x80, 0x5, 0x40, 0x80, 0x5, 0x41, 0x80, 0x5, 0x42, 0x80, 0x5, 0x43, 0x80, 0x5, 0x44, 0x80, 0x5, 0x45, 0x80, 0x5, 0x46, 0x80, 0x5, 0x47, 0x80, 0x5, 0x48, 0x80, 0x5, 0x49, 0x80, 0x5, 0x4a, 0x80, 0x5, 0
+          [1659763321.703346][2548:2548] CHIP:DMG:                                         ] (585 bytes)
+          [1659763321.703385][2548:2548] CHIP:DMG:                                         0x1 = [
+          [1659763321.703437][2548:2548] CHIP:DMG:                                                         0x10, 0x8d, 0x56, 0xec, 0x4f, 0x23, 0xe, 0x70, 0x29, 0x34, 0x30, 0x39, 0xcf, 0xae, 0xe1, 0x29, 0xb8, 0x9, 0x11, 0x78, 0xc6, 0x96, 0xe6, 0xf, 0x80, 0x9e, 0x4e, 0xf4, 0xe1, 0xd2, 0x74, 0xb1, 0x50, 0xa7, 0x51, 0xff, 0xc1, 0x9f, 0x8a, 0x93, 0xc0, 0x6c, 0xc8, 0xd7, 0x5a, 0xbe, 0x43, 0x4b, 0xf2, 0x6a, 0x75, 0xfd, 0x15, 0xac, 0xc4, 0xdc, 0x99, 0x7, 0xd9, 0xd5, 0xab, 0xee, 0x70, 0x9e,
+          [1659763321.703477][2548:2548] CHIP:DMG:                                         ] (64 bytes)
+          [1659763321.703527][2548:2548] CHIP:DMG:                                 },
+          [1659763321.703559][2548:2548] CHIP:DMG:                         },
+          [1659763321.703603][2548:2548] CHIP:DMG:
+          [1659763321.703637][2548:2548] CHIP:DMG:                 },
+          [1659763321.703670][2548:2548] CHIP:DMG:
+          [1659763321.703704][2548:2548] CHIP:DMG:         ],
+          [1659763321.703735][2548:2548] CHIP:DMG:
+          [1659763321.703768][2548:2548] CHIP:DMG:         InteractionModelRevision = 1
+          [1659763321.703792][2548:2548] CHIP:DMG: },
+          [1659763321.703825][2548:2548] CHIP:DMG:
+          [1659763321.704081][2548:2548] CHIP:DMG: ICR moving to [CommandSen]
+          [1659763321.704116][2548:2548] CHIP:DMG: ICR moving to [AwaitingDe]
+      disabled: true
+
+    - label:
+          "Step 4: TH1 records the AttestationNonce received in
+          AttestationRequest as Nonce_1"
+      verification: |
+          During provision, TH1(all-clusters-app) records the AttestationNonce received in AttestationRequest as Nonce_1  for usage in later steps.
+
+
+          [1659763321.702266][2548:2548] CHIP:DMG:     }
+          [1659763321.702302][2548:2548] CHIP:DMG:     Attestation Nonce (32) = CF9146F33636FEC51CDCB9161D2F5EE72E4F1196CC9D5FAB417F388AFA42F110
+          [1659763321.702332][2548:2548] CHIP:DMG:     Timestamp = 0
+      disabled: true
+
+    - label:
+          "Step 5: TH1 responds with a well-formed AttestationResponse Command"
+      verification: |
+          During provision,  On TH(all-clusters-app) Verify that DUT responds with a well-formed AttestationResponse Command.
+
+          [1659763321.702423][2548:2548] CHIP:DMG: InvokeResponseMessage =
+          [1659763321.702457][2548:2548] CHIP:DMG: {
+          [1659763321.702486][2548:2548] CHIP:DMG:         suppressResponse = false,
+          [1659763321.702510][2548:2548] CHIP:DMG:         InvokeResponseIBs =
+          [1659763321.702542][2548:2548] CHIP:DMG:         [
+          [1659763321.702576][2548:2548] CHIP:DMG:                 InvokeResponseIB =
+          [1659763321.702609][2548:2548] CHIP:DMG:                 {
+          [1659763321.702644][2548:2548] CHIP:DMG:                         CommandDataIB =
+          [1659763321.702685][2548:2548] CHIP:DMG:                         {
+          [1659763321.702715][2548:2548] CHIP:DMG:                                 CommandPathIB =
+          [1659763321.702757][2548:2548] CHIP:DMG:                                 {
+          [1659763321.702791][2548:2548] CHIP:DMG:                                         EndpointId = 0x0,
+          [1659763321.702836][2548:2548] CHIP:DMG:                                         ClusterId = 0x3e,
+          [1659763321.702877][2548:2548] CHIP:DMG:                                         CommandId = 0x1,
+          [1659763321.702909][2548:2548] CHIP:DMG:                                 },
+          [1659763321.702953][2548:2548] CHIP:DMG:
+          [1659763321.702992][2548:2548] CHIP:DMG:                                 CommandFields =
+          [1659763321.703025][2548:2548] CHIP:DMG:                                 {
+          [1659763321.703069][2548:2548] CHIP:DMG:                                         0x0 = [
+          [1659763321.703255][2548:2548] CHIP:DMG:                                                         0x15, 0x31, 0x1, 0x1d, 0x2, 0x30, 0x82, 0x2, 0x19, 0x6, 0x9, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0xd, 0x1, 0x7, 0x2, 0xa0, 0x82, 0x2, 0xa, 0x30, 0x82, 0x2, 0x6, 0x2, 0x1, 0x3, 0x31, 0xd, 0x30, 0xb, 0x6, 0x9, 0x60, 0x86, 0x48, 0x1, 0x65, 0x3, 0x4, 0x2, 0x1, 0x30, 0x82, 0x1, 0x71, 0x6, 0x9, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0xd, 0x1, 0x7, 0x1, 0xa0, 0x82, 0x1, 0x62, 0x4, 0x82, 0x1, 0x5e, 0x15, 0x24, 0x0, 0x1, 0x25, 0x1, 0xf1, 0xff, 0x36, 0x2, 0x5, 0x0, 0x80, 0x5, 0x1, 0x80, 0x5, 0x2, 0x80, 0x5, 0x3, 0x80, 0x5, 0x4, 0x80, 0x5, 0x5, 0x80, 0x5, 0x6, 0x80, 0x5, 0x7, 0x80, 0x5, 0x8, 0x80, 0x5, 0x9, 0x80, 0x5, 0xa, 0x80, 0x5, 0xb, 0x80, 0x5, 0xc, 0x80, 0x5, 0xd, 0x80, 0x5, 0xe, 0x80, 0x5, 0xf, 0x80, 0x5, 0x10, 0x80, 0x5, 0x11, 0x80, 0x5, 0x12, 0x80, 0x5, 0x13, 0x80, 0x5, 0x14, 0x80, 0x5, 0x15, 0x80, 0x5, 0x16, 0x80, 0x5, 0x17, 0x80, 0x5, 0x18, 0x80, 0x5, 0x19, 0x80, 0x5, 0x1a, 0x80, 0x5, 0x1b, 0x80, 0x5, 0x1c, 0x80, 0x5, 0x1d, 0x80, 0x5, 0x1e, 0x80, 0x5, 0x1f, 0x80, 0x5, 0x20, 0x80, 0x5, 0x21, 0x80, 0x5, 0x22, 0x80, 0x5, 0x23, 0x80, 0x5, 0x24, 0x80, 0x5, 0x25, 0x80, 0x5, 0x26, 0x80, 0x5, 0x27, 0x80, 0x5, 0x28, 0x80, 0x5, 0x29, 0x80, 0x5, 0x2a, 0x80, 0x5, 0x2b, 0x80, 0x5, 0x2c, 0x80, 0x5, 0x2d, 0x80, 0x5, 0x2e, 0x80, 0x5, 0x2f, 0x80, 0x5, 0x30, 0x80, 0x5, 0x31, 0x80, 0x5, 0x32, 0x80, 0x5, 0x33, 0x80, 0x5, 0x34, 0x80, 0x5, 0x35, 0x80, 0x5, 0x36, 0x80, 0x5, 0x37, 0x80, 0x5, 0x38, 0x80, 0x5, 0x39, 0x80, 0x5, 0x3a, 0x80, 0x5, 0x3b, 0x80, 0x5, 0x3c, 0x80, 0x5, 0x3d, 0x80, 0x5, 0x3e, 0x80, 0x5, 0x3f, 0x80, 0x5, 0x40, 0x80, 0x5, 0x41, 0x80, 0x5, 0x42, 0x80, 0x5, 0x43, 0x80, 0x5, 0x44, 0x80, 0x5, 0x45, 0x80, 0x5, 0x46, 0x80, 0x5, 0x47, 0x80, 0x5, 0x48, 0x80, 0x5, 0x49, 0x80, 0x5, 0x4a, 0x80, 0x5, 0
+          [1659763321.703346][2548:2548] CHIP:DMG:                                         ] (585 bytes)
+          [1659763321.703385][2548:2548] CHIP:DMG:                                         0x1 = [
+          [1659763321.703437][2548:2548] CHIP:DMG:                                                         0x10, 0x8d, 0x56, 0xec, 0x4f, 0x23, 0xe, 0x70, 0x29, 0x34, 0x30, 0x39, 0xcf, 0xae, 0xe1, 0x29, 0xb8, 0x9, 0x11, 0x78, 0xc6, 0x96, 0xe6, 0xf, 0x80, 0x9e, 0x4e, 0xf4, 0xe1, 0xd2, 0x74, 0xb1, 0x50, 0xa7, 0x51, 0xff, 0xc1, 0x9f, 0x8a, 0x93, 0xc0, 0x6c, 0xc8, 0xd7, 0x5a, 0xbe, 0x43, 0x4b, 0xf2, 0x6a, 0x75, 0xfd, 0x15, 0xac, 0xc4, 0xdc, 0x99, 0x7, 0xd9, 0xd5, 0xab, 0xee, 0x70, 0x9e,
+          [1659763321.703477][2548:2548] CHIP:DMG:                                         ] (64 bytes)
+          [1659763321.703527][2548:2548] CHIP:DMG:                                 },
+          [1659763321.703559][2548:2548] CHIP:DMG:                         },
+          [1659763321.703603][2548:2548] CHIP:DMG:
+          [1659763321.703637][2548:2548] CHIP:DMG:                 },
+          [1659763321.703670][2548:2548] CHIP:DMG:
+          [1659763321.703704][2548:2548] CHIP:DMG:         ],
+          [1659763321.703735][2548:2548] CHIP:DMG:
+          [1659763321.703768][2548:2548] CHIP:DMG:         InteractionModelRevision = 1
+          [1659763321.703792][2548:2548] CHIP:DMG: },
+          [1659763321.703825][2548:2548] CHIP:DMG:
+          [1659763321.704081][2548:2548] CHIP:DMG: ICR moving to [CommandSen]
+          [1659763321.704116][2548:2548] CHIP:DMG: ICR moving to [AwaitingDe]"
+      disabled: true
+
+    - label: "Verify that DUT Completes the commissioning process successfully"
+      verification: |
+          Verify that DUT Completes the commissioning process successfully on TH(all-clusters-app)
+
+          [1655979694.071847][22876:22881] CHIP:CTL: Received CommissioningComplete response, errorCode=0
+          [1655979694.071913][22876:22881] CHIP:CTL: Successfully finished commissioning step "SendComplete"
+          [1655979694.071968][22876:22881] CHIP:CTL: Commissioning stage next step: "SendComplete" -> "Cleanup"
+          [1655979694.072031][22876:22881] CHIP:CTL: Performing next commissioning step "Cleanup"
+          [1655979694.072081][22876:22881] CHIP:DIS: Closing all BLE connections
+          [1655979694.072136][22876:22881] CHIP:IN: Clearing BLE pending packets.
+          [1655979694.072268][22876:22881] CHIP:BLE: Auto-closing end point"s BLE connection.
+          [1655979694.072328][22876:22881] CHIP:DL: Closing BLE GATT connection (con 0xffffa806f3f0)
+          [1655979694.072477][22876:22881] CHIP:CTL: Successfully finished commissioning step "Cleanup"
+          [1655979694.072547][22876:22881] CHIP:TOO: Device commissioning completed with success
+      disabled: true
+
+    - label: "Step 7: Factory Reset TH1 so that it is commissionable again"
+      verification: |
+          On Raspi platform below commands are used to perform factory_reset operation.
+          sudo rm -rf /tmp/chip_*
+      disabled: true
+
+    - label: "Step 8: Start the commissioning process of TH1 on DUT again"
+      verification: |
+          sudo ./chip-all-clusters-app --wifi   --trace_decode 1 --discriminator 3841
+
+          ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1
+      disabled: true
+
+    - label: "Step 9: DUT generates 32-byte AttestationNonce"
+      verification: |
+          During provision, DUT sends AttestationRequest Command with AttestationNonce To TH1(all-clusters-app)
+
+          [1663223294.633898][55761:55766] CHIP:DMG:         Version Number = 9876
+          [1663223294.633900][55761:55766] CHIP:DMG:         Certification Type = 0
+          [1663223294.633902][55761:55766] CHIP:DMG:     }
+          [1663223294.633905][55761:55766] CHIP:DMG:     Attestation Nonce (32) = 22E70904B9D9ACF6EF5FC408EADEBA384B1E52D56BC43921F12A689CD7BAB6F5
+          [1663223294.633907][55761:55766] CHIP:DMG:     Timestamp = 0
+          [1663223294.633909][55761:55766] CHIP:DMG: }
+          [1663223294.633912][55761:55766] CHIP:DMG:
+      disabled: true
+
+    - label:
+          "Step 10: DUT sends AttestationRequest Command with AttestationNonce
+          as field to the TH1."
+      verification: |
+          During provision, DUT(chip-tool) sends AttestationRequest Command with AttestationNonce as field to the TH1(all-clusters-app) verify the below log in TH1(all-clusters-app). As the current TH1 ref app (all-clusters-app) doesnot decode the received request message, nonce value has been shown from the TH1 ref app response message , as TH1 ref app use the same nonce value in the response message
+
+          [1663223294.631711][55752:55752] CHIP:DMG: AccessControl: checking f=0 a=p s=0xFFFFFFFB00000000 t= c=0x0000_003E e=0 p=a
+          [1663223294.631714][55752:55752] CHIP:DMG: AccessControl: implicit admin (PASE)
+          [1663223294.631717][55752:55752] CHIP:DMG: Received command for Endpoint=0 Cluster=0x0000_003E Command=0x0000_0000
+          [1663223294.631721][55752:55752] CHIP:ZCL: OpCreds: Received an AttestationRequest command
+          [1663223294.631723][55752:55752] CHIP:EM: Sending Standalone Ack for MessageCounter:18543861 on exchange 24742r
+          [1663223294.631756][55752:55752] CHIP:IN: Prepared secure message 0x7ffde635fa90 to 0xFFFFFFFB00000000 (0)  of type 0x10 and protocolId (0, 0) on exchange 24742r with MessageCounter:52323910.
+          [1663223294.631761][55752:55752] CHIP:IN: Sending encrypted msg 0x7ffde635fa90 with MessageCounter:52323910 to 0xFFFFFFFB00000000 (0) at monotonic time: 0000000004124563 msec
+          [1663223294.631807][55752:55752] CHIP:DMG: >> to UDP:[fe80::b7b8:ff3e:9ace:3e12%wlp0s20f3]:49869 | 52323910 | [Secure Channel  (0) / Standalone Ack (0x10) / Session = 21207 / Exchange = 24742]
+          [1663223294.631812][55752:55752] CHIP:DMG: Header Flags =
+          [1663223294.631813][55752:55752] CHIP:DMG: {
+          [1663223294.631818][55752:55752] CHIP:DMG:     Exchange (0x02) =
+
+          [1663223294.632536][55752:55752] CHIP:DMG: }
+          [1663223294.632539][55752:55752] CHIP:DMG:
+          [1663223294.632571][55752:55752] CHIP:DMG: Attestation Elements (585 bytes) =
+          [1663223294.632573][55752:55752] CHIP:DMG: {
+          [1663223294.632576][55752:55752] CHIP:DMG:     Certification Declaration =
+          [1663223294.632578][55752:55752] CHIP:DMG:     {
+          [1663223294.632727][55752:55752] CHIP:DMG:         Format Version = 1
+          [1663223294.632730][55752:55752] CHIP:DMG:         Vendor Id = 65521
+          [1663223294.632732][55752:55752] CHIP:DMG:         Product Ids =
+          [1663223294.632735][55752:55752] CHIP:DMG:         {
+          [1663223294.632738][55752:55752] CHIP:DMG:             Product Id = 32768
+          [1663223294.632741][55752:55752] CHIP:DMG:             Product Id = 32769
+          [1663223294.632744][55752:55752] CHIP:DMG:             Product Id = 32770
+          [1663223294.632747][55752:55752] CHIP:DMG:             Product Id = 32771
+          [1663223294.632749][55752:55752] CHIP:DMG:             Product Id = 32772
+          [1663223294.632752][55752:55752] CHIP:DMG:             Product Id = 32773
+          [1663223294.632755][55752:55752] CHIP:DMG:             Product Id = 32774
+          [1663223294.632758][55752:55752] CHIP:DMG:             Product Id = 32775
+          [1663223294.632761][55752:55752] CHIP:DMG:             Product Id = 32776
+          [1663223294.632763][55752:55752] CHIP:DMG:             Product Id = 32777
+          [1663223294.632766][55752:55752] CHIP:DMG:             Product Id = 32778
+          [1663223294.632768][55752:55752] CHIP:DMG:             Product Id = 32779
+          [1663223294.632771][55752:55752] CHIP:DMG:             Product Id = 32780
+          [1663223294.632773][55752:55752] CHIP:DMG:             Product Id = 32781
+          [1663223294.632776][55752:55752] CHIP:DMG:             Product Id = 32782
+          [1663223294.632778][55752:55752] CHIP:DMG:             Product Id = 32783
+          [1663223294.632781][55752:55752] CHIP:DMG:             Product Id = 32784
+          [1663223294.632784][55752:55752] CHIP:DMG:             Product Id = 32785
+          [1663223294.632786][55752:55752] CHIP:DMG:             Product Id = 32786
+          [1663223294.632997][55752:55752] CHIP:DMG:             Product Id = 32867
+          [1663223294.632999][55752:55752] CHIP:DMG:         }
+          [1663223294.633001][55752:55752] CHIP:DMG:         Device Type Id = 22
+          [1663223294.633004][55752:55752] CHIP:DMG:         Certificate Id (19) = ZIG20142ZB330003-24
+          [1663223294.633006][55752:55752] CHIP:DMG:         Security Level = 0
+          [1663223294.633009][55752:55752] CHIP:DMG:         Security Information = 0
+          [1663223294.633011][55752:55752] CHIP:DMG:         Version Number = 9876
+          [1663223294.633013][55752:55752] CHIP:DMG:         Certification Type = 0
+          [1663223294.633015][55752:55752] CHIP:DMG:     }
+          [1663223294.633018][55752:55752] CHIP:DMG:     Attestation Nonce (32) = 22E70904B9D9ACF6EF5FC408EADEBA384B1E52D56BC43921F12A689CD7BAB6F5
+          [1663223294.633020][55752:55752] CHIP:DMG:     Timestamp = 0
+          [1663223294.633022][55752:55752] CHIP:DMG: }
+          [1663223294.633024][55752:55752] CHIP:DMG:
+          [1663223294.633031][55752:55752] CHIP:DMG: InvokeResponseMessage =
+      disabled: true
+
+    - label:
+          "Step 11: TH1 records the AttestationNonce received in
+          AttestationRequest as Nonce_2"
+      verification: |
+          During provision, TH1(all-clusters-app) records the AttestationNonce received in AttestationRequest as Nonce_2
+          [1663223294.633013][55752:55752] CHIP:DMG:         Certification Type = 0
+          [1663223294.633015][55752:55752] CHIP:DMG:     }
+          [1663223294.633018][55752:55752] CHIP:DMG:     Attestation Nonce (32) = 22E70904B9D9ACF6EF5FC408EADEBA384B1E52D56BC43921F12A689CD7BAB6F5
+          [1663223294.633020][55752:55752] CHIP:DMG:     Timestamp = 0
+          [1663223294.633022][55752:55752] CHIP:DMG: }
+      disabled: true
+
+    - label: "Verify that the Nonce_1 and Nonce_2 are different."
+      verification: |
+          Verify the value of NONCE in step 9 and 3 are different
+
+          NONCE value in step 3 is      Attestation Nonce (32) = CF9146F33636FEC51CDCB9161D2F5EE72E4F1196CC9D5FAB417F388AFA42F110
+          NONCE value in step 9 is Attestation Nonce (32) = 8A02A4533766C4310201E4E6DE820A51877AF337961BF2D12848268B8F323363
+      disabled: true

@@ -1,0 +1,301 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    Window Covering [TC-WNCV-3.2] DownOrClose command & OperationalStatus
+    attribute Verification [DUT as Server]
+
+PICS:
+    - WNCV.S
+
+# TC-WNCV tests featuremap conditional dependencies -> use PICS
+
+config:
+    nodeId: 0x12344321
+    cluster: "Window Covering"
+    endpoint: 1
+
+    Step1bWaitTime:
+        type: int16u
+        defaultValue: 5000
+    Step2bWaitTime:
+        type: int16u
+        defaultValue: 200
+    Step2eWaitTime:
+        type: int16u
+        defaultValue: 1000
+    Step4bWaitTime:
+        type: int16u
+        defaultValue: 1000
+    Step5aWaitTime:
+        type: int16u
+        defaultValue: 200
+
+tests:
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    ################ Position Init Phase #############
+    ### Step 1x -> Initialize the Covering position before any testing
+    ### MANDATORY Init Commands
+    - label:
+          "Step 1a: TH sends UpOrOpen command to preposition the DUT in the
+          opposite direction"
+      command: "UpOrOpen"
+      PICS: WNCV.S.C00.Rsp
+
+    - label: "Step 1b: TH Waits for 10 seconds movement(s) on the device"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: Step1bWaitTime
+
+    ###
+    ### Mandatory Depends on the FeatureMap
+    - label:
+          "Step 1c: If (PA & LF) TH reads CurrentPositionLiftPercent100ths
+          attribute from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionLiftPercent100ths"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
+      response:
+          constraints:
+              type: percent100ths
+              minValue: 0
+              maxValue: 9999
+
+    ### Optional Depends on the FeatureMap
+    - label:
+          "Step 1d: If (PA & LF) TH reads CurrentPositionLiftPercentage optional
+          attribute from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionLiftPercentage"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A0008
+      response:
+          constraints:
+              type: percent
+              minValue: 0
+              maxValue: 99
+
+    ### Mandatory Depends on the FeatureMap
+    - label:
+          "Step 1e: If (PA & TL) TH reads CurrentPositionTiltPercent100ths
+          attribute from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionTiltPercent100ths"
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
+      response:
+          constraints:
+              type: percent100ths
+              minValue: 0
+              maxValue: 9999
+
+    ### Optional Depends on the FeatureMap
+    - label:
+          "Step 1f: If (PA & TL) TH reads CurrentPositionTiltPercentage optional
+          attribute from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionTiltPercentage"
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A0009
+      response:
+          constraints:
+              type: percent
+              minValue: 0
+              maxValue: 99
+
+    ######## DownOrClose Command #######
+    ### Step 2x -> Check DownOrClose Fast effects
+
+    ### MANDATORY Command
+    - label: "Step 2a: TH sends DownOrClose command to DUT"
+      command: "DownOrClose"
+      PICS: WNCV.S.C01.Rsp
+
+    ### Depending on the DUT specs we might prefer a arguments here
+    - label: "Step 2b: TH waits for 100-1000 ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: Step2bWaitTime
+
+    ### Mandatory Depends on the FeatureMap
+    - label:
+          "Step 2c: If (PA & LF) TH reads TargetPositionLiftPercent100ths
+          attribute from DUT"
+      command: "readAttribute"
+      attribute: "TargetPositionLiftPercent100ths"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000b
+      response:
+          value: 10000
+
+    ### Mandatory Depends on the FeatureMap
+    - label:
+          "Step 2d: If (PA & TL) TH reads TargetPositionTiltPercent100ths
+          attribute from DUT"
+      command: "readAttribute"
+      attribute: "TargetPositionTiltPercent100ths"
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000c
+      response:
+          value: 10000
+
+    - label: "Step 2e: TH leave the device moving for 2 seconds"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: Step2eWaitTime
+
+    ######## DownOrClose Reports #######
+    ### Step 3x -> Check DownOrClose Mid term effects
+    ### Depends on the FeatureMap
+    # The value of bit 0..1 must be 10b & if (LF) value of bit 2..3 must be 10b else 00b & if (TL) value of bit 4..5 must be 10b else 00b
+    # Only 3 possibilities are possible here : 0Ah = 10, 22h = 34 or 2Ah = 42 then check a range for simplicity [10 - 42]
+    - label: "Step 3a: TH reads OperationalStatus attribute from DUT"
+      PICS: WNCV.S.A000a
+      command: "readAttribute"
+      attribute: "OperationalStatus"
+      response:
+          constraints:
+              type: bitmap8
+              anyOf: [10, 34, 42]
+
+    ### Depending on the DUT specs we might prefer a arguments here
+    - label: "Step 3a: DUT updates its attributes"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 3000
+
+    ### Mandatory Depends on the FeatureMap
+    - label:
+          "Step 3b: If (PA & LF) TH reads CurrentPositionLiftPercent100ths
+          attribute from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionLiftPercent100ths"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
+      response:
+          constraints:
+              type: percent100ths
+              minValue: 1
+              maxValue: 10000
+
+    ### Optional Depends on the FeatureMap
+    - label:
+          "Step 3c: If (PA & LF) TH reads CurrentPositionLiftPercentage optional
+          attribute from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionLiftPercentage"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A0008
+      response:
+          constraints:
+              type: percent
+              minValue: 1
+              maxValue: 100
+
+    ### Mandatory Depends on the FeatureMap
+    - label:
+          "Step 3d: If (PA & TL) TH reads CurrentPositionTiltPercent100ths
+          attribute from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionTiltPercent100ths"
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
+      response:
+          constraints:
+              type: percent100ths
+              minValue: 1
+              maxValue: 10000
+
+    ### Optional Depends on the FeatureMap
+    - label:
+          "Step 3e: If (PA & LF) TH reads CurrentPositionTiltPercentage optional
+          attribute from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionTiltPercentage"
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A0009
+      response:
+          constraints:
+              type: percent
+              minValue: 1
+              maxValue: 100
+
+    ######## STOP #######
+    ### Step 4x -> Check StopMotion fast effects
+    ### MANDATORY Command
+    - label: "Step 4a: TH sends a StopMotion command to DUT"
+      command: "StopMotion"
+      PICS: WNCV.S.C02.Rsp
+
+    - label: "Step 4b: TH waits for 1-5 seconds end of motion(s) on the DUT"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: Step4bWaitTime
+
+    ### Must Be ZERO
+    # The value of bit 0..1 must be 00b & if (LF) value of bit 2..3 must be 00b & if (TL) value of bit 4..5 must be 00b
+    - label: "Step 4c: TH reads OperationalStatus attribute from DUT"
+      command: "readAttribute"
+      attribute: "OperationalStatus"
+      PICS: WNCV.S.A000a
+      response:
+          value: 0
+
+    ### Step 5x -> Check Stop Motion longer period effect
+    - label: "Step 5a: TH waits for 100-1000 ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: Step5aWaitTime
+
+    ### Mandatory Depends on the FeatureMap shall be tested as equals CurrentPositionLiftPercent100ths
+    - label:
+          "Step 5b: If (PA & LF) TH reads TargetPositionLiftPercent100ths
+          attribute from DUT"
+      command: "readAttribute"
+      attribute: "TargetPositionLiftPercent100ths"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000b
+      response:
+          constraints:
+              type: percent100ths
+              minValue: 1
+              maxValue: 10000
+
+    ### Mandatory Depends on the FeatureMap shall be tested as equals CurrentPositionTiltPercent100ths
+    - label:
+          "Step 5c: If (PA & TL) TH reads TargetPositionTiltPercent100ths
+          attribute from DUT"
+      command: "readAttribute"
+      attribute: "TargetPositionTiltPercent100ths"
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000c
+      response:
+          constraints:
+              type: percent100ths
+              minValue: 1
+              maxValue: 10000

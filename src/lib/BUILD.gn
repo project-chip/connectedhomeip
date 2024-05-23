@@ -1,0 +1,62 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("lib.gni")
+
+static_library("lib") {
+  public_deps = [
+    "${chip_root}/src/app",
+    "${chip_root}/src/ble",
+    "${chip_root}/src/crypto",
+    "${chip_root}/src/inet",
+    "${chip_root}/src/lib/asn1",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/dnssd",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/messaging",
+    "${chip_root}/src/platform",
+    "${chip_root}/src/protocols",
+    "${chip_root}/src/setup_payload",
+    "${chip_root}/src/system",
+    "${chip_root}/src/transport",
+  ]
+
+  # See src/lib/lib.gni for declaration of this build arg.
+  if (chip_build_controller) {
+    public_deps += [ "${chip_root}/src/controller" ]
+  }
+
+  # Only include the shell if it is being used. The shell is
+  # a debug feature mostly useful for embedded examples.
+  # See src/lib/lib.gni for declaration of this build arg.
+  if (chip_build_libshell) {
+    public_deps += [ "${chip_root}/src/lib/shell" ]
+  }
+
+  # Only include the DefaultAttestationVerifier if needed in the build.
+  # See src/lib/lib.gni for declaration of this build arg.
+  if (chip_build_default_attestation_verifier) {
+    public_deps +=
+        [ "${chip_root}/src/credentials:default_attestation_verifier" ]
+  }
+
+  cflags = [ "-Wconversion" ]
+
+  output_name = "libCHIP"
+
+  output_dir = "${root_out_dir}/lib"
+
+  complete_static_lib = true
+}

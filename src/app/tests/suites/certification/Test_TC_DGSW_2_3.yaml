@@ -1,0 +1,140 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.2.3. [TC-DGSW-2.3] Command Received [DUT Sever]
+
+PICS:
+    - DGSW.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Commission DUT to TH"
+      verification: |
+
+      disabled: true
+
+    - label: "Step 2a: TH sends ResetWatermarks to DUT."
+      PICS: DGSW.S.C00.Rsp
+      verification: |
+          ./chip-tool softwarediagnostics  reset-watermarks 1 0
+
+          Via the TH (chip-tool), verify the success response for sending ResetWatermarks command.
+
+          [1657022305.316864][7266:7271] CHIP:DMG: InvokeResponseMessage =
+          [1657022305.316900][7266:7271] CHIP:DMG: {
+          [1657022305.316935][7266:7271] CHIP:DMG:         suppressResponse = false,
+          [1657022305.316972][7266:7271] CHIP:DMG:         InvokeResponseIBs =
+          [1657022305.317018][7266:7271] CHIP:DMG:         [
+          [1657022305.317055][7266:7271] CHIP:DMG:                 InvokeResponseIB =
+          [1657022305.317109][7266:7271] CHIP:DMG:                 {
+          [1657022305.317151][7266:7271] CHIP:DMG:                         CommandStatusIB =
+          [1657022305.317200][7266:7271] CHIP:DMG:                         {
+          [1657022305.317244][7266:7271] CHIP:DMG:                                 CommandPathIB =
+          [1657022305.317294][7266:7271] CHIP:DMG:                                 {
+          [1657022305.317344][7266:7271] CHIP:DMG:                                         EndpointId = 0x0,
+          [1657022305.317397][7266:7271] CHIP:DMG:                                         ClusterId = 0x34,
+          [1657022305.317447][7266:7271] CHIP:DMG:                                         CommandId = 0x0,
+          [1657022305.317496][7266:7271] CHIP:DMG:                                 },
+          [1657022305.317551][7266:7271] CHIP:DMG:
+          [1657022305.317596][7266:7271] CHIP:DMG:                                 StatusIB =
+          [1657022305.317645][7266:7271] CHIP:DMG:                                 {
+          [1657022305.317694][7266:7271] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1657022305.317743][7266:7271] CHIP:DMG:                                 },
+          [1657022305.317797][7266:7271] CHIP:DMG:
+          [1657022305.317928][7266:7271] CHIP:DMG:                         },
+          [1657022305.317980][7266:7271] CHIP:DMG:
+          [1657022305.318021][7266:7271] CHIP:DMG:                 },
+          [1657022305.318067][7266:7271] CHIP:DMG:
+          [1657022305.318103][7266:7271] CHIP:DMG:         ],
+          [1657022305.318146][7266:7271] CHIP:DMG:
+          [1657022305.318182][7266:7271] CHIP:DMG:         InteractionModelRevision = 1
+          [1657022305.318217][7266:7271] CHIP:DMG: },
+          [1657022305.318300][7266:7271] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0034 Command=0x0000_0000 Status=0x0
+          [1657022305.318359][7266:7271] CHIP:DMG: ICR moving to [AwaitingDe]
+      disabled: true
+
+    - label:
+          "Step 2b: TH reads a list of ThreadMetrics struct attributes from DUT."
+      PICS: DGSW.S.A0000
+      verification: |
+          ./chip-tool softwarediagnostics read thread-metrics 1 0
+
+          Via the TH (chip-tool), verify:
+          -that ThreadMetrics attribute contains entries with ThreadMetrics Struct.
+          -that the entries are matched with StackFreeMinimum and StackFreeCurrent values of ThreadMetrics.
+
+          [1654697032.107109][7037:7042] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_0000 DataVersion: 1044289564
+          [1654697032.107255][7037:7042] CHIP:TOO:   ThreadMetrics: 6 entries
+          [1654697032.107333][7037:7042] CHIP:TOO:     [1]: {
+          [1654697032.107376][7037:7042] CHIP:TOO:       Id: 8972
+          [1654697032.107413][7037:7042] CHIP:TOO:       Name: 8972
+          [1654697032.107449][7037:7042] CHIP:TOO:      }
+          [1654697032.107492][7037:7042] CHIP:TOO:     [2]: {
+          [1654697032.107526][7037:7042] CHIP:TOO:       Id: 8971
+          [1654697032.107559][7037:7042] CHIP:TOO:       Name: 8971
+          [1654697032.107591][7037:7042] CHIP:TOO:      }
+          [1654697032.107632][7037:7042] CHIP:TOO:     [3]: {
+          [1654697032.107667][7037:7042] CHIP:TOO:       Id: 8970
+          [1654697032.107700][7037:7042] CHIP:TOO:       Name: 8970
+          [1654697032.107733][7037:7042] CHIP:TOO:      }
+          [1654697032.107774][7037:7042] CHIP:TOO:     [4]: {
+          [1654697032.107808][7037:7042] CHIP:TOO:       Id: 8969
+          [1654697032.107842][7037:7042] CHIP:TOO:       Name: 8969
+          [1654697032.107875][7037:7042] CHIP:TOO:      }
+          [1654697032.107915][7037:7042] CHIP:TOO:     [5]: {
+          [1654697032.107950][7037:7042] CHIP:TOO:       Id: 8968
+          [1654697032.107982][7037:7042] CHIP:TOO:       Name: 8968
+          [1654697032.108015][7037:7042] CHIP:TOO:      }
+          [1654697032.108056][7037:7042] CHIP:TOO:     [6]: {
+          [1654697032.108090][7037:7042] CHIP:TOO:       Id: 8967
+          [1654697032.108122][7037:7042] CHIP:TOO:       Name: 8967
+          [1654697032.108154][7037:7042] CHIP:TOO:      }
+      disabled: true
+
+    - label: "Step 2c: TH reads CurrentHeapHighWatermark attribute from DUT."
+      PICS: DGSW.S.A0003
+      verification: |
+          ./chip-tool  softwarediagnostics  read current-heap-used 1 0
+
+          Via the TH (chip-tool), verify that CurrentHeapUsed attribute value with in the range of uint64.
+
+          [1663066847.710531][4064:4069] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_0002 DataVersion: 2808275719
+          [1663066847.714122][4064:4069] CHIP:TOO:   CurrentHeapUsed: 1389168
+
+
+          ./chip-tool softwarediagnostics read current-heap-high-watermark 1 0
+
+          Via the TH (chip-tool), verify:
+          -that CurrentHeapHighWatermark attribute value with in the range of uint64.
+          -that the value is higher than or equal to CurrentHeapUsed.
+
+          [1663066925.496916][4072:4077] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_0003 DataVersion: 2808275719
+          [1663066925.496999][4072:4077] CHIP:TOO:   CurrentHeapHighWatermark: 1389328
+      disabled: true
+
+    - label: "Step 2d: TH reads a CurrentHeapUsed attribute value from DUT."
+      PICS: DGSW.S.A0002
+      verification: |
+          ./chip-tool  softwarediagnostics  read current-heap-used 1 0
+
+          Via the TH (chip-tool), verify that CurrentHeapUsed attribute value with in the range of uint64.
+
+          [1663066954.656376][4079:4084] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_0002 DataVersion: 2808275719
+          [1663066954.656505][4079:4084] CHIP:TOO:   CurrentHeapUsed: 1389360
+      disabled: true

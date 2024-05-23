@@ -1,0 +1,177 @@
+steps:
+    - name: "ghcr.io/project-chip/chip-build-vscode:50"
+      entrypoint: "bash"
+      args:
+          - "-c"
+          - |
+              git config --global --add safe.directory "*"
+              python scripts/checkout_submodules.py --shallow --recursive --platform esp32 nrfconnect silabs linux android 
+      id: Submodules
+    - name: "ghcr.io/project-chip/chip-build-vscode:50"
+      # NOTE: silabs boostrap is NOT done with the rest as it requests a conflicting
+      #       jinja2 version (asks for 3.1.3 when constraints.txt asks for 3.0.3)
+      env:
+          - PW_ENVIRONMENT_ROOT=/pwenv
+      args:
+          - "-c"
+          - source ./scripts/bootstrap.sh -p all,esp32,nrfconnect,linux,android
+      id: Bootstrap
+      waitFor:
+          - Submodules
+      entrypoint: /usr/bin/bash
+      volumes:
+          - name: pwenv
+            path: /pwenv
+      timeout: 900s
+
+    - name: "ghcr.io/project-chip/chip-build-vscode:50"
+      id: ESP32
+      env:
+          - PW_ENVIRONMENT_ROOT=/pwenv
+      args:
+          - >-
+              perl -i -pe 's/^gdbgui==/# gdbgui==/' /opt/espressif/esp-idf/requirements.txt &&
+              ./scripts/build/build_examples.py --enable-flashbundle --target
+              esp32-devkitc-light-rpc --target
+              esp32-m5stack-all-clusters-ipv6only --target
+              esp32-m5stack-all-clusters-rpc-ipv6only --target
+              esp32-m5stack-light --target
+              esp32-m5stack-light-ipv6only --target
+              esp32-m5stack-ota-requestor build --create-archives
+              /workspace/artifacts/
+      waitFor:
+          - Bootstrap
+      entrypoint: ./scripts/run_in_build_env.sh
+      volumes:
+          - name: pwenv
+            path: /pwenv
+    - name: "ghcr.io/project-chip/chip-build-vscode:50"
+      id: NRFConnect
+      env:
+          - PW_ENVIRONMENT_ROOT=/pwenv
+      args:
+          - >-
+              ./scripts/build/build_examples.py --enable-flashbundle
+              --target nrf-nrf52840dk-light
+              --target nrf-nrf52840dk-light-rpc
+              --target nrf-nrf52840dk-lock
+              --target nrf-nrf52840dongle-light
+              build
+              --create-archives /workspace/artifacts/
+      waitFor:
+          - Bootstrap
+          - ESP32
+      entrypoint: ./scripts/run_in_build_env.sh
+      volumes:
+          - name: pwenv
+            path: /pwenv
+
+    - name: "ghcr.io/project-chip/chip-build-vscode:50"
+      id: EFR32
+      env:
+          - PW_ENVIRONMENT_ROOT=/pwenv
+      args:
+          - >-
+              ./scripts/build/build_examples.py --enable-flashbundle
+              --target efr32-brd4161a-light
+              --target efr32-brd4161a-light-rpc
+              --target efr32-brd4161a-lock-openthread-mtd
+              --target efr32-brd4161a-lock-rpc-openthread-mtd
+              --target efr32-brd4187c-unit-test
+              build
+              --create-archives /workspace/artifacts/
+      waitFor:
+          - Bootstrap
+          - NRFConnect
+      entrypoint: ./scripts/run_in_build_env.sh
+      volumes:
+          - name: pwenv
+            path: /pwenv
+
+    - name: "ghcr.io/project-chip/chip-build-vscode:50"
+      id: Linux
+      env:
+          - PW_ENVIRONMENT_ROOT=/pwenv
+      args:
+          - >-
+              ./scripts/build/build_examples.py
+              --enable-flashbundle
+              --target linux-arm64-all-clusters-clang
+              --target linux-arm64-all-clusters-nodeps-ipv6only
+              --target linux-arm64-all-clusters-minimal-ipv6only-clang
+              --target linux-arm64-bridge-ipv6only-clang
+              --target linux-arm64-chip-tool-ipv6only-clang
+              --target linux-arm64-chip-tool-nodeps-ipv6only
+              --target linux-arm64-light-clang-rpc-ipv6only
+              --target linux-arm64-light-clang-rpc-ipv6only-minmdns-verbose
+              --target linux-arm64-lock-ipv6only-clang
+              --target linux-arm64-minmdns-clang
+              --target linux-arm64-ota-provider-nodeps-ipv6only
+              --target linux-arm64-ota-requestor-nodeps-ipv6only
+              --target linux-arm64-python-bindings-clang
+              --target linux-arm64-shell-ipv6only-clang
+              --target linux-arm64-thermostat-ipv6only-clang
+              --target linux-x64-address-resolve-tool
+              --target linux-x64-all-clusters-nodeps
+              --target linux-x64-all-clusters-coverage
+              --target linux-x64-bridge-ipv6only
+              --target linux-x64-chip-cert
+              --target linux-x64-chip-tool-ipv6only
+              --target linux-x64-chip-tool-ipv6only-minmdns-verbose
+              --target linux-x64-contact-sensor-no-ble-with-ui
+              --target linux-x64-efr32-test-runner
+              --target linux-x64-light-no-ble-with-ui
+              --target linux-x64-light-rpc-ipv6only
+              --target linux-x64-light-rpc-ipv6only-minmdns-verbose
+              --target linux-x64-lock-ipv6only
+              --target linux-x64-minmdns-ipv6only
+              --target linux-x64-ota-provider-ipv6only
+              --target linux-x64-ota-requestor-ipv6only
+              --target linux-x64-python-bindings
+              --target linux-x64-rpc-console
+              --target linux-x64-shell-ipv6only
+              --target linux-x64-thermostat-ipv6only
+              build
+              --create-archives /workspace/artifacts/
+      waitFor:
+          - Bootstrap
+          - EFR32
+      entrypoint: ./scripts/run_in_build_env.sh
+      volumes:
+          - name: pwenv
+            path: /pwenv
+
+    - name: "ghcr.io/project-chip/chip-build-vscode:50"
+      id: Android
+      env:
+          - PW_ENVIRONMENT_ROOT=/pwenv
+      args:
+          - >-
+              ./scripts/build/build_examples.py --enable-flashbundle
+              --target 'android-arm64-chip-tool'
+              build
+              --create-archives /workspace/artifacts/
+      waitFor:
+          - Bootstrap
+          - Linux
+      entrypoint: ./scripts/run_in_build_env.sh
+      volumes:
+          - name: pwenv
+            path: /pwenv
+
+logsBucket: matter-build-automation-build-logs
+
+# Global timeout for all steps
+timeout: 14400s
+queueTtl: 21600s
+
+artifacts:
+    objects:
+        location: "gs://matter-build-automation-artifacts/$PROJECT_ID/$COMMIT_SHA/"
+        paths: ["/workspace/artifacts/*.tar.gz"]
+
+# Using higher CPU machines generally speeds up builds by > 4x (faster as we spend more time
+# building instead of docker download/checkout/bootstrap)
+options:
+    machineType: "E2_HIGHCPU_32"
+    diskSizeGb: 500

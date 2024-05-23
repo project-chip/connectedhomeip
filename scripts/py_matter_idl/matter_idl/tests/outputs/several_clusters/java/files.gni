@@ -1,0 +1,9 @@
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+structs_sources = [
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/SecondClusterFabricDescriptorStruct.kt",
+]
+
+eventstructs_sources = [
+]

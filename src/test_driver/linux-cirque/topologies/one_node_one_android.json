@@ -1,0 +1,16 @@
+{
+    "device0": {
+        "type": "CHIP-00",
+        "base_image": "@default",
+        "capability": ["Thread", "Interactive", "Mount"],
+        "mount_pairs": [["{chip_repo}", "{chip_repo}"]],
+        "rcp_mode": true
+    },
+    "device1": {
+        "type": "ANDROID-EMULATOR",
+        "base_image": "android-emulator",
+        "capability": ["Interactive", "LanAccess", "Mount", "Xvnc"],
+        "mount_pairs": [["/dev/kvm", "/dev/kvm"]],
+        "xvnc_localhost": 0
+    }
+}

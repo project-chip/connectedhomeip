@@ -1,0 +1,165 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+
+  <enum name="HardwareFaultEnum" type="enum8">
+    <cluster code="0x0033"/>
+    <item name="Unspecified" value="0x00"/>
+    <item name="Radio" value="0x01"/>
+    <item name="Sensor" value="0x02"/>
+    <item name="ResettableOverTemp" value="0x03"/>
+    <item name="NonResettableOverTemp" value="0x04"/>
+    <item name="PowerSource" value="0x05"/>
+    <item name="VisualDisplayFault" value="0x06"/>
+    <item name="AudioOutputFault" value="0x07"/>
+    <item name="UserInterfaceFault" value="0x08"/>
+    <item name="NonVolatileMemoryError" value="0x09"/>
+    <item name="TamperDetected" value="0x0A"/>
+  </enum>
+  <enum name="RadioFaultEnum" type="enum8">
+    <cluster code="0x0033"/>
+    <item name="Unspecified" value="0x00"/>
+    <item name="WiFiFault" value="0x01"/>
+    <item name="CellularFault" value="0x02"/>
+    <item name="ThreadFault" value="0x03"/>
+    <item name="NFCFault" value="0x04"/>
+    <item name="BLEFault" value="0x05"/>
+    <item name="EthernetFault" value="0x06"/>
+  </enum>
+  <enum name="NetworkFaultEnum" type="enum8">
+    <cluster code="0x0033"/>
+    <item name="Unspecified" value="0x00"/>
+    <item name="HardwareFailure" value="0x01"/>
+    <item name="NetworkJammed" value="0x02"/>
+    <item name="ConnectionFailed" value="0x03"/>
+  </enum>
+  <enum name="BootReasonEnum" type="enum8">
+    <cluster code="0x0033"/>
+    <item name="Unspecified" value="0x00"/>
+    <item name="PowerOnReboot" value="0x01"/>
+    <item name="BrownOutReset" value="0x02"/>
+    <item name="SoftwareWatchdogReset" value="0x03"/>
+    <item name="HardwareWatchdogReset" value="0x04"/>
+    <item name="SoftwareUpdateCompleted" value="0x05"/>
+    <item name="SoftwareReset" value="0x06"/>
+  </enum>
+  <enum name="InterfaceTypeEnum" type="enum8">
+    <cluster code="0x0033"/>
+    <item name="Unspecified" value="0x00"/>
+    <item name="WiFi" value="0x01"/>
+    <item name="Ethernet" value="0x02"/>
+    <item name="Cellular" value="0x03"/>
+    <item name="Thread" value="0x04"/>
+  </enum>
+  <struct name="NetworkInterface">
+    <cluster code="0x0033"/>
+    <item code="0x00" name="Name" type="char_string" length="32"/>
+    <item code="0x01" name="IsOperational" type="boolean"/>
+    <item code="0x02" name="OffPremiseServicesReachableIPv4" type="boolean" isNullable="true"/>
+    <item code="0x03" name="OffPremiseServicesReachableIPv6" type="boolean" isNullable="true"/>
+    <!-- TODO(#14075): HWADR not supported yet -->
+    <item code="0x04" name="HardwareAddress" type="octet_string" length="8"/>
+    <item code="0x05" name="IPv4Addresses" type="octet_string" array="true"/>
+    <item code="0x06" name="IPv6Addresses" type="octet_string" array="true"/>
+    <item code="0x07" name="Type" type="InterfaceTypeEnum"/>
+  </struct>
+  <cluster>
+    <domain>General</domain>
+    <name>General Diagnostics</name>
+    <code>0x0033</code>
+    <define>GENERAL_DIAGNOSTICS_CLUSTER</define>
+    <description>The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems.</description>
+    <globalAttribute side="either" code="0xFFFD" value="2"/>
+
+    <features>
+      <feature bit="0" code="DMTEST" name="DataModelTest" summary="Support specific testing needs for extended Data Model features">
+        <optionalConform/>
+      </feature>
+    </features>
+
+    <attribute side="server" code="0x00" define="NETWORK_INTERFACES" type="array" entryType="NetworkInterface" length="8" writable="false" optional="false">NetworkInterfaces</attribute>
+    <attribute side="server" code="0x01" define="REBOOT_COUNT" type="int16u" writable="false" default="0x0000" optional="false">RebootCount</attribute>
+    <!-- ***NOTE***: UpTime attribute is mandatory starting at Rev >= 2, but because of backwards compatibility, has to be optional here.
+         The device type config and cert tests (TC-DGGEN-1.1/2.1) ensure that it is present. -->
+    <attribute side="server" code="0x02" define="UP_TIME" type="int64u" writable="false" default="0x0000000000000000" optional="true">UpTime</attribute>
+    <attribute side="server" code="0x03" define="TOTAL_OPERATIONAL_HOURS" type="int32u" writable="false" default="0x00000000" optional="true">TotalOperationalHours</attribute>
+    <attribute side="server" code="0x04" define="BOOT_REASONS" type="BootReasonEnum" writable="false" optional="true">BootReason</attribute>
+    <attribute side="server" code="0x05" define="ACTIVE_HARDWARE_FAULTS" type="array" entryType="HardwareFaultEnum" writable="false" optional="true">ActiveHardwareFaults</attribute>
+    <attribute side="server" code="0x06" define="ACTIVE_RADIO_FAULTS" type="array" entryType="RadioFaultEnum" writable="false" optional="true">ActiveRadioFaults</attribute>
+    <attribute side="server" code="0x07" define="ACTIVE_NETWORK_FAULTS" type="array" entryType="NetworkFaultEnum" writable="false" optional="true">ActiveNetworkFaults</attribute>
+    <attribute side="server" code="0x08" define="TEST_EVENT_TRIGGERS_ENABLED" type="boolean" writable="false" optional="false">TestEventTriggersEnabled</attribute>
+    <!--
+        WARNING !!!!! Attribute 0x0009 (previously AverageWearCount, see #30002/#29285)
+        was previously mistakenly added in SDK without being in spec and WAS REMOVED.
+
+        Previously (disallowed):
+        <attribute side="server" code="0x09" define="AVERAGE_WEAR_COUNT" type="int32u" writable="false" default="0x00000000" optional="true">AverageWearCount</attribute>
+
+         ====== ID 0x0009 is reserved, do not use ======
+    -->
+
+    <command source="client" code="0x00" name="TestEventTrigger" optional="false">
+      <description>Provide a means for certification tests to trigger some test-plan-specific events</description>
+      <arg name="EnableKey" type="octet_string" length="16"/>
+      <arg name="EventTrigger" type="int64u"/>
+      <access op="invoke" role="manage"/>
+    </command>
+
+    <command source="client" code="0x01" name="TimeSnapshot" response="TimeSnapshotResponse" optional="false" apiMaturity="provisional">
+      <description>Take a snapshot of system time and epoch time.</description>
+    </command>
+
+    <command source="server" code="0x02" name="TimeSnapshotResponse" optional="false" apiMaturity="provisional">
+      <description>Response for the TimeSnapshot command.</description>
+      <arg name="SystemTimeMs" type="systime_ms" optional="false"/>
+      <arg name="PosixTimeMs" type="posix_ms" isNullable="true" optional="false"/>
+    </command>
+
+    <command source="client" code="0x03" name="PayloadTestRequest" response="PayloadTestResponse" optional="true" apiMaturity="provisional">
+      <description>Request a variable length payload response.</description>
+      <arg name="EnableKey" type="octet_string" length="16"/>
+      <arg name="Value" type="int8u"/>
+      <arg name="Count" type="int16u" max="2048"/>
+    </command>
+
+    <command source="server" code="0x04" name="PayloadTestResponse" optional="true" apiMaturity="provisional">
+      <description>Response for the PayloadTestRequest command.</description>
+      <arg name="Payload" type="octet_string" max="2048" optional="false"/>
+    </command>
+
+    <event side="server" code="0x00" name="HardwareFaultChange" priority="critical" optional="true">
+      <description>Indicate a change in the set of hardware faults currently detected by the Node.</description>
+      <field id="0" name="Current" type="HardwareFaultEnum" array="true"/>
+      <field id="1" name="Previous" type="HardwareFaultEnum" array="true"/>
+    </event>
+    <event side="server" code="0x01" name="RadioFaultChange" priority="critical" optional="true">
+      <description>Indicate a change in the set of radio faults currently detected by the Node.</description>
+      <field id="0" name="Current" type="RadioFaultEnum" array="true"/>
+      <field id="1" name="Previous" type="RadioFaultEnum" array="true"/>
+    </event>
+    <event side="server" code="0x02" name="NetworkFaultChange" priority="critical" optional="true">
+      <description>Indicate a change in the set of network faults currently detected by the Node.</description>
+      <field id="0" name="Current" type="NetworkFaultEnum" array="true"/>
+      <field id="1" name="Previous" type="NetworkFaultEnum" array="true"/>
+    </event>
+    <event side="server" code="0x03" name="BootReason" priority="critical" optional="false">
+      <description>Indicate the reason that caused the device to start-up.</description>
+      <field id="0" name="BootReason" type="BootReasonEnum"/>
+    </event>
+  </cluster>
+</configurator>

@@ -1,0 +1,104 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    Window Covering [TC-WNCV-4.3] GoToLiftPercentage command Limits Verification
+    [DUT as Server]
+
+PICS:
+    - WNCV.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Window Covering"
+    endpoint: 1
+
+tests:
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    ### CONDITIONAL LIFT Tests from FeatureMap
+    ######## Check attribute coherence #######
+    ### Step 1x -> Verify the Lift Percent100ths and Percent attributes
+    ### Shall be tested as equals CurrentPositionLiftPercent100ths
+    - label:
+          "Step 1a: If (PA_LF & LF) TH reads CurrentPositionLiftPercent100ths
+          from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionLiftPercent100ths"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
+      response:
+          saveAs: attrCurrentPositionLiftPercent100ths
+          constraints:
+              minValue: 0
+              maxValue: 10000
+
+    - label:
+          "Step 1b 1c: If (PA_LF & LF) TH reads CurrentPositionLiftPercentage
+          from DUT + assert CurrentPositionLiftPercent100ths/100 equals
+          CurrentPositionLiftPercentage"
+      command: "readAttribute"
+      attribute: "CurrentPositionLiftPercentage"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A0008 && WNCV.S.A000e
+      response:
+          value: attrCurrentPositionLiftPercent100ths / 100
+          constraints:
+              minValue: 0
+              maxValue: 100
+
+    ######## Command BadParams 1 #######
+    ### Step 2x -> Verify the GoToLiftPercentage with a BadParam
+
+    # - label: "Step 2a: TH Generate a random badParam"
+    # since we don't know how to generate a random bad param
+    # we use a default badParam for this test
+
+    - label: "Step 2b: TH sends GoToLiftPercentage command with BadParam to DUT"
+      command: "GoToLiftPercentage"
+      PICS: WNCV.S.F00 && WNCV.S.F02 || WNCV.S.F00 && WNCV.S.C05.Rsp
+      arguments:
+          values:
+              - name: "liftPercent100thsValue"
+                value: 0x3000
+      response:
+          error: CONSTRAINT_ERROR
+
+    ######## Command BadParams 2 ######
+    ### Step 3x -> Verify the GoToLiftPercentage with 10001 as param
+    - label: "Step 3a: TH sends GoToLiftPercentage command with 10001 to DUT"
+      command: "GoToLiftPercentage"
+      PICS: WNCV.S.F00 && WNCV.S.F02 || WNCV.S.F00 && WNCV.S.C05.Rsp
+      arguments:
+          values:
+              - name: "liftPercent100thsValue"
+                value: 10001
+      response:
+          error: CONSTRAINT_ERROR
+
+    ######## Command BadParams 3 ######
+    ### Step 4x -> Verify the GoToLiftPercentage with 0xFFFF as param
+    - label: "Step 4a: TH sends GoToLiftPercentage command with 0xFFFF to DUT"
+      command: "GoToLiftPercentage"
+      PICS: WNCV.S.F00 && WNCV.S.F02 || WNCV.S.F00 && WNCV.S.C05.Rsp
+      arguments:
+          values:
+              - name: "liftPercent100thsValue"
+                value: 0xFFFF
+      response:
+          error: CONSTRAINT_ERROR

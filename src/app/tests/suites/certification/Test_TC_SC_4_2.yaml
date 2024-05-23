@@ -1,0 +1,83 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.4.2. [TC-SC-4.2] Discovery [DUT as Commissioner]
+
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the  DUT as controller test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Precondition"
+      verification: |
+          1. TH is not commissioned
+      disabled: true
+
+    - label:
+          "Step 1: By any means, TH adds an unknown key/value pair in the
+          advertised data(e.g. AB=12345) and is in Commissioning Mode"
+      verification: |
+          Run all cluster app in one TH Terminal
+
+          Run the  unknown key/value pair on second TH Terminal with the same discriminator as the one in the first teminal:
+
+          avahi-publish-service --subtype=_S3._sub._matterc._udp --subtype=_L840._sub._matterc._udp DD200C20D25AE5F7 --subtype=_CM._sub._matterc._udp _matterc._udp 11111 D=3840 CM=1  INVALID_TEST=40 SII=5000 SAI=300 PH=36 PI= VP=65521+3276 T=1
+          TH(all-clusters-app) must advertise with new data added
+          Established under name 'DD200C20D25AE5F7'
+      disabled: true
+
+    - label: "Step 2: DUT attempts to commission TH"
+      verification: |
+          Verify the DUT is able to commission the TH, in spite of the avahi publish with unknown key/value pair.
+          As an example, In the case of chip-tool as commissioner, you can verify commissioning DUT with the below command, (Use the equivalent command on the DUT)
+
+          ./chip-tool pairing code 1 MT:-24J0YXE00KA0648G00
+
+          [1661234861.142378][2599:2602] CHIP:BLE: New device scanned: E4:5F:01:0B:F6:6F
+          [1661234861.142474][2599:2602] CHIP:BLE: Device discriminator match. Attempting to connect.
+          [1661234861.146984][2599:2602] CHIP:BLE: Scan complete notification without an active scan.
+          [1661234861.805967][2599:2604] CHIP:DL: Avahi browse: all for now
+          [1661234861.810750][2599:2604] CHIP:DL: Avahi resolve found
+          [1661234861.810840][2599:2604] CHIP:DIS: Discovered node:
+          [1661234861.810861][2599:2604] CHIP:DIS:         Hostname: E45F010BF66D0000
+          [1661234861.810887][2599:2604] CHIP:DIS:         IP Address #1: fe80::e65f:1ff:fe0b:f66e
+          [1661234861.810908][2599:2604] CHIP:DIS:         Port: 5540
+          [1661234861.810928][2599:2604] CHIP:DIS:         Mrp Interval idle: 5000 ms
+          [1661234861.810947][2599:2604] CHIP:DIS:         Mrp Interval active: 300 ms
+          [1661234861.810966][2599:2604] CHIP:DIS:         TCP Supported: 1
+          [1661234861.810985][2599:2604] CHIP:DIS:         Vendor ID: 65521
+          [1661234861.811004][2599:2604] CHIP:DIS:         Product ID: 32769
+          [1661234861.811023][2599:2604] CHIP:DIS:         Long Discriminator: 3840
+          [1661234861.811042][2599:2604] CHIP:DIS:         Pairing Hint: 33
+          [1661234861.811062][2599:2604] CHIP:DIS:         Instance Name: BE02F0C82E75A3BF
+          [1661234861.811081][2599:2604] CHIP:DIS:         Commissioning Mode: 1
+
+          [1661234862.488290][2599:2604] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
+          [1661234862.488362][2599:2604] CHIP:CTL: Received CommissioningComplete response, errorCode=0
+          [1661234862.488421][2599:2604] CHIP:CTL: Successfully finished commissioning step 'SendComplete'
+          [1661234862.488467][2599:2604] CHIP:CTL: Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1661234862.488521][2599:2604] CHIP:CTL: Performing next commissioning step 'Cleanup'
+          [1661234862.488624][2599:2604] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
+          [1661234862.488684][2599:2604] CHIP:TOO: Device commissioning completed with success
+      disabled: true

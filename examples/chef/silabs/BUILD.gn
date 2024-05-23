@@ -1,0 +1,176 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/efr32_sdk.gni")
+import("//build_overrides/pigweed.gni")
+
+import("${build_root}/config/defaults.gni")
+import("${efr32_sdk_build_root}/efr32_sdk.gni")
+import("${efr32_sdk_build_root}/silabs_executable.gni")
+
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+import("${chip_root}/src/platform/device.gni")
+
+import("${chip_root}/src/app/chip_data_model.gni")
+
+if (chip_enable_pw_rpc) {
+  import("//build_overrides/pigweed.gni")
+  import("$dir_pw_build/target_types.gni")
+}
+
+assert(current_os == "freertos")
+
+chef_project_dir = "${chip_root}/examples/chef"
+efr32_project_dir = "${chef_project_dir}/efr32"
+examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
+examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
+app_data_model = "${efr32_project_dir}:chef-comon"
+import("${examples_plat_dir}/args.gni")
+
+declare_args() {
+  # Dump memory usage at link time.
+  chip_print_memory_usage = false
+  sample_name = ""
+}
+
+chip_data_model("chef-common") {
+  zap_file = "${chef_project_dir}/devices/${sample_name}.zap"
+  is_server = true
+}
+
+efr32_sdk("sdk") {
+  sources = [
+    "${efr32_project_dir}/include/CHIPProjectConfig.h",
+    "${examples_common_plat_dir}/FreeRTOSConfig.h",
+  ]
+
+  include_dirs = [
+    "${chip_root}/src/platform/silabs/efr32",
+    "${efr32_project_dir}/include",
+    "${examples_plat_dir}",
+    "${chip_root}/src/lib",
+    "${examples_common_plat_dir}",
+  ]
+
+  if (use_wf200) {
+    # TODO efr32_sdk should not need a header from this location
+    include_dirs += [ "${examples_plat_dir}/wf200" ]
+  }
+
+  defines = []
+  if (chip_enable_pw_rpc) {
+    defines += [
+      "HAL_VCOM_ENABLE=1",
+      "PW_RPC_ENABLED",
+    ]
+  }
+}
+
+silabs_executable("chef_app") {
+  output_name = "matter-silabs-chef-example.out"
+  include_dirs = [ "include" ]
+  defines = []
+
+  sources = [
+    "src/AppTask.cpp",
+    "src/LightingManager.cpp",
+    "src/ZclCallbacks.cpp",
+    "src/main.cpp",
+  ]
+
+  deps = [
+    ":chef-common",
+    ":sdk",
+    "${examples_plat_dir}:efr32-common",
+  ]
+
+  if (chip_enable_pw_rpc) {
+    defines += [
+      "PW_RPC_ENABLED",
+      "PW_RPC_ATTRIBUTE_SERVICE=1",
+      "PW_RPC_BUTTON_SERVICE=1",
+      "PW_RPC_DESCRIPTOR_SERVICE=1",
+      "PW_RPC_DEVICE_SERVICE=1",
+      "PW_RPC_LIGHTING_SERVICE=1",
+      "PW_RPC_OTCLI_SERVICE=1",
+      "PW_RPC_THREAD_SERVICE=1",
+      "PW_RPC_TRACING_SERVICE=1",
+    ]
+
+    sources += [
+      "${chip_root}/examples/common/pigweed/RpcService.cpp",
+      "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
+      "${examples_common_plat_dir}/PigweedLogger.cpp",
+      "${examples_common_plat_dir}/Rpc.cpp",
+    ]
+
+    deps += [
+      "$dir_pw_hdlc:default_addresses",
+      "$dir_pw_hdlc:rpc_channel_output",
+      "$dir_pw_stream:sys_io_stream",
+      "$dir_pw_trace",
+      "$dir_pw_trace_tokenized",
+      "$dir_pw_trace_tokenized:trace_rpc_service",
+      "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
+      "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:ot_cli_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:thread_service.nanopb_rpc",
+      "${examples_common_plat_dir}/pw_sys_io:pw_sys_io_silabs",
+    ]
+
+    deps += pw_build_LINK_DEPS
+
+    include_dirs += [
+      "${chip_root}/examples/common",
+      "${chip_root}/examples/common/pigweed/efr32",
+    ]
+  }
+
+  ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
+
+  inputs = [ ldscript ]
+
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+
+  if (chip_print_memory_usage) {
+    ldflags += [
+      "-Wl,--print-memory-usage",
+      "-fstack-usage",
+    ]
+  }
+
+  # WiFi Settings
+  if (chip_enable_wifi) {
+    ldflags += [
+      "-Wl,--defsym",
+      "-Wl,SILABS_WIFI=1",
+    ]
+  }
+
+  output_dir = root_out_dir
+}
+
+group("efr32") {
+  deps = [ ":chef_app" ]
+}
+
+group("default") {
+  deps = [ ":efr32" ]
+}
