@@ -100,4 +100,9 @@ MTR_TESTABLE
 // Returns min or max, if it is below or above, respectively.
 NSNumber * MTRClampedNumber(NSNumber * aNumber, NSNumber * min, NSNumber * max);
 
+#pragma mark - Constants
+
+static NSString * const kDefaultSubscriptionPoolSizeOverrideKey = @"subscriptionPoolSizeOverride";
+static NSString * const kSRPTimeoutInMsecsUserDefaultKey = @"SRPTimeoutInMSecsOverride";
+
 NS_ASSUME_NONNULL_END

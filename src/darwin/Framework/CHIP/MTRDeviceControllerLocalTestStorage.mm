@@ -18,22 +18,19 @@
 #import "MTRDeviceControllerLocalTestStorage.h"
 #import "MTRLogging_Internal.h"
 
-static NSString * const kLocalTestUserDefaultDomain = @"org.csa-iot.matter.darwintest";
-static NSString * const kLocalTestUserDefaultEnabledKey = @"enableTestStorage";
-
 @implementation MTRDeviceControllerLocalTestStorage {
     id<MTRDeviceControllerStorageDelegate> _passThroughStorage;
 }
 
 + (BOOL)localTestStorageEnabled
 {
-    NSUserDefaults * defaults = [[NSUserDefaults alloc] initWithSuiteName:kLocalTestUserDefaultDomain];
+    NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
     return [defaults boolForKey:kLocalTestUserDefaultEnabledKey];
 }
 
 + (void)setLocalTestStorageEnabled:(BOOL)localTestStorageEnabled
 {
-    NSUserDefaults * defaults = [[NSUserDefaults alloc] initWithSuiteName:kLocalTestUserDefaultDomain];
+    NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
     [defaults setBool:localTestStorageEnabled forKey:kLocalTestUserDefaultEnabledKey];
     MTR_LOG("MTRDeviceControllerLocalTestStorage setLocalTestStorageEnabled %d", localTestStorageEnabled);
     BOOL storedLocalTestStorageEnabled = [defaults boolForKey:kLocalTestUserDefaultEnabledKey];
@@ -58,7 +55,7 @@ static NSString * const kLocalTestUserDefaultEnabledKey = @"enableTestStorage";
                               sharingType:(MTRStorageSharingType)sharingType
 {
     if (sharingType == MTRStorageSharingTypeNotShared) {
-        NSUserDefaults * defaults = [[NSUserDefaults alloc] initWithSuiteName:kLocalTestUserDefaultDomain];
+        NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
         NSData * storedData = [defaults dataForKey:key];
         NSError * error;
         id value = [NSKeyedUnarchiver unarchivedObjectOfClasses:MTRDeviceControllerStorageClasses() fromData:storedData error:&error];
@@ -86,7 +83,7 @@ static NSString * const kLocalTestUserDefaultEnabledKey = @"enableTestStorage";
             MTR_LOG_ERROR("MTRDeviceControllerLocalTestStorage storeValue: failed to convert value object to data %@", error);
             return NO;
         }
-        NSUserDefaults * defaults = [[NSUserDefaults alloc] initWithSuiteName:kLocalTestUserDefaultDomain];
+        NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
         [defaults setObject:data forKey:key];
         return YES;
     } else {
@@ -105,7 +102,7 @@ static NSString * const kLocalTestUserDefaultEnabledKey = @"enableTestStorage";
           sharingType:(MTRStorageSharingType)sharingType
 {
     if (sharingType == MTRStorageSharingTypeNotShared) {
-        NSUserDefaults * defaults = [[NSUserDefaults alloc] initWithSuiteName:kLocalTestUserDefaultDomain];
+        NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
         [defaults removeObjectForKey:key];
         return YES;
     } else {
@@ -121,7 +118,7 @@ static NSString * const kLocalTestUserDefaultEnabledKey = @"enableTestStorage";
 - (NSDictionary<NSString *, id<NSSecureCoding>> *)valuesForController:(MTRDeviceController *)controller securityLevel:(MTRStorageSecurityLevel)securityLevel sharingType:(MTRStorageSharingType)sharingType
 {
     if (sharingType == MTRStorageSharingTypeNotShared) {
-        NSUserDefaults * defaults = [[NSUserDefaults alloc] initWithSuiteName:kLocalTestUserDefaultDomain];
+        NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
         return [defaults dictionaryRepresentation];
     } else {
         if (_passThroughStorage && [_passThroughStorage respondsToSelector:@selector(valuesForController:securityLevel:sharingType:)]) {
@@ -136,7 +133,7 @@ static NSString * const kLocalTestUserDefaultEnabledKey = @"enableTestStorage";
 - (BOOL)controller:(MTRDeviceController *)controller storeValues:(NSDictionary<NSString *, id<NSSecureCoding>> *)values securityLevel:(MTRStorageSecurityLevel)securityLevel sharingType:(MTRStorageSharingType)sharingType
 {
     if (sharingType == MTRStorageSharingTypeNotShared) {
-        NSUserDefaults * defaults = [[NSUserDefaults alloc] initWithSuiteName:kLocalTestUserDefaultDomain];
+        NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
         BOOL success = YES;
         for (NSString * key in values) {
             NSError * error = nil;

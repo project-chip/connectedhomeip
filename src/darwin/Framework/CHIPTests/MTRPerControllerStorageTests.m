@@ -2051,9 +2051,6 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     [controller shutdown];
 }
 
-static NSString * const kLocalTestUserDefaultDomain = @"org.csa-iot.matter.darwintest";
-static NSString * const kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey = @"subscriptionPoolSizeOverride";
-
 // TODO: This might also want to go in a separate test file, with some shared setup for commissioning devices per test
 - (void)doTestSubscriptionPoolWithSize:(NSInteger)subscriptionPoolSize
 {
@@ -2075,11 +2072,11 @@ static NSString * const kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey = @
 
     NSError * error;
 
-    NSUserDefaults * defaults = [[NSUserDefaults alloc] initWithSuiteName:kLocalTestUserDefaultDomain];
-    NSNumber * subscriptionPoolSizeOverrideOriginalValue = [defaults objectForKey:kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey];
+    NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
+    NSNumber * subscriptionPoolSizeOverrideOriginalValue = [defaults objectForKey:kDefaultSubscriptionPoolSizeOverrideKey];
 
     // Test DeviceController with a Subscription pool
-    [defaults setInteger:subscriptionPoolSize forKey:kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey];
+    [defaults setInteger:subscriptionPoolSize forKey:kDefaultSubscriptionPoolSizeOverrideKey];
 
     MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
     MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
@@ -2182,9 +2179,9 @@ static NSString * const kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey = @
     XCTAssertFalse([controller isRunning]);
 
     if (subscriptionPoolSizeOverrideOriginalValue) {
-        [defaults setInteger:subscriptionPoolSizeOverrideOriginalValue.integerValue forKey:kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey];
+        [defaults setInteger:subscriptionPoolSizeOverrideOriginalValue.integerValue forKey:kDefaultSubscriptionPoolSizeOverrideKey];
     } else {
-        [defaults removeObjectForKey:kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey];
+        [defaults removeObjectForKey:kDefaultSubscriptionPoolSizeOverrideKey];
     }
 }
 

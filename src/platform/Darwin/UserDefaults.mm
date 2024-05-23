@@ -21,15 +21,12 @@
 
 #import <Foundation/Foundation.h>
 
-static NSString * const kUserDefaultDomain = @"org.csa-iot.matter.darwin";
-static NSString * const kSRPTimeoutInMsecsUserDefaultKey = @"SRPTimeoutInMSecsOverride";
-
 namespace chip {
 namespace Platform {
 
     std::optional<uint16_t> GetUserDefaultDnssdSRPTimeoutInMSecs()
     {
-        NSUserDefaults * defaults = [[NSUserDefaults alloc] initWithSuiteName:kUserDefaultDomain];
+        NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
         NSInteger srpTimeoutValue = [defaults integerForKey:kSRPTimeoutInMsecsUserDefaultKey];
         if (CanCastTo<uint16_t>(srpTimeoutValue)) {
             uint16_t timeoutinMsecs = static_cast<uint16_t>(srpTimeoutValue);
