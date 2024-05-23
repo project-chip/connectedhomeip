@@ -610,7 +610,7 @@ bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceInde
 
         // mType(service name) exactly matches with operational service name
         if (strncmp(services[i].mType, kOperationalServiceName, sizeof(services[i].mType)) == 0 &&
-                                        strlen(services[i].mType) == strlen(kOperationalServiceName))
+            strlen(services[i].mType) == strlen(kOperationalServiceName))
         {
             service.ToDiscoveredOperationalNodeBrowseData(nodeData);
         }

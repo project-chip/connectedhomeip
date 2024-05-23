@@ -93,12 +93,11 @@ static void HandleNodeBrowse(void * context, DnssdService * services, size_t ser
         discoveryContext->Retain();
         // For some platforms browsed services are already resolved, so verify if resolve is really needed or call resolve callback
 
-        auto & ipAddress         = services[i].mAddress;
+        auto & ipAddress = services[i].mAddress;
 
         // mType(service name) exactly matches with operational service name
         bool isOperationalBrowse = (strncmp(services[i].mType, kOperationalServiceName, sizeof(services[i].mType)) == 0 &&
                                     strlen(services[i].mType) == strlen(kOperationalServiceName));
-
 
         // For operational browse result we currently don't need IP address hence skip resolution and handle differently.
         if (isOperationalBrowse)
