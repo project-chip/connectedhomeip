@@ -44,13 +44,20 @@
 #include <lib/support/CHIPPlatformMemory.h>
 #include <mbedtls/platform.h>
 #include <platform/DeviceInstanceInfoProvider.h>
-#include <platform/Infineon/CYW30739/FactoryDataProvider.h>
 #include <platform/KeyValueStoreManager.h>
 #include <protocols/secure_channel/PASESession.h>
-#ifdef BOARD_ENABLE_OPTIGA
-#include "wiced_optiga.h"
-#endif
 #include <wiced_rtos.h>
+
+#ifdef BOARD_USE_OPTIGA
+#include "wiced_optiga.h"
+#ifdef USE_PROVISIONED_OPTIGA
+#include <platform/Infineon/CYW30739/OptigaFactoryDataProvider.h>
+#else /* !USE_PROVISIONED_OPTIGA */
+#include <platform/Infineon/CYW30739/UnprovisionedOptigaFactoryDataProvider.h>
+#endif /* USE_PROVISIONED_OPTIGA */
+#else  /* !BOARD_USE_OPTIGA */
+#include <platform/Infineon/CYW30739/FactoryDataProvider.h>
+#endif /* BOARD_USE_OPTIGA */
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -60,7 +67,15 @@ using namespace ::chip::Shell;
 using namespace ::chip::app;
 
 static DeviceInfoProviderImpl sExampleDeviceInfoProvider;
+#ifdef BOARD_USE_OPTIGA
+#ifdef USE_PROVISIONED_OPTIGA
+static OptigaFactoryDataProvider sFactoryDataProvider;
+#else  /* !USE_PROVISIONED_OPTIGA */
+static UnprovisionedOptigaFactoryDataProvider sFactoryDataProvider;
+#endif /* USE_PROVISIONED_OPTIGA */
+#else  /* !BOARD_USE_OPTIGA */
 static FactoryDataProvider sFactoryDataProvider;
+#endif /* BOARD_USE_OPTIGA */
 
 // NOTE! This key is for test/certification only and should not be available in production devices!
 uint8_t sTestEventTriggerEnableKey[chip::TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
@@ -135,7 +150,7 @@ void CYW30739MatterConfig::InitBoard(void)
 #ifdef BOARD_ENABLE_DISPLAY
     GUI_Init();
 #endif
-#ifdef BOARD_ENABLE_OPTIGA
+#ifdef BOARD_USE_OPTIGA
     wiced_optiga_init();
 #endif
 }
@@ -185,6 +200,8 @@ void CYW30739MatterConfig::InitApp(void)
 {
     LogAppInit();
     ConfigurationMgr().LogDeviceConfig();
+
+    sFactoryDataProvider.Init();
 
     // Print QR Code URL
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
