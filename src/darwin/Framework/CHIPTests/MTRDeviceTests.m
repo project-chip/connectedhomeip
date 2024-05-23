@@ -3714,7 +3714,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                   timeBetweenReportsTooShortThreshold:baseTestDelayTime * 0.4
                timeBetweenReportsTooShortMinThreshold:baseTestDelayTime * 0.2
                 reportToPersistenceDelayMaxMultiplier:baseTestDelayTime * 5
-          deviceReportingExcessivelyIntervalThreshold:baseTestDelayTime * 10];
+          deviceReportingExcessivelyIntervalThreshold:baseTestDelayTime * 7];
     [device setStorageBehaviorConfiguration:config];
 
     [device setDelegate:delegate queue:queue];
