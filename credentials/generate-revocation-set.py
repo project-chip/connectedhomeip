@@ -299,7 +299,7 @@ def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool
             logging.warning("CRL Signer's AKID does not match with PAA Certificate SKID, continue...")
             continue
 
-        # verify if PAA singed the crl's public key
+        # verify if PAA singed the crl signer certificate
         try:
             paa_certificate_object.public_key().verify(crl_signer_certificate.signature,
                                                        crl_signer_certificate.tbs_certificate_bytes,
@@ -310,13 +310,18 @@ def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool
             continue
 
         # 6. Obtain the CRL
+        logging.debug(f"Fetching CRL from {revocation_point['dataURL']}")
         try:
             r = requests.get(revocation_point["dataURL"], timeout=5)
-        except requests.exceptions.Timeout:
-            logging.warning("Timeout fetching CRL from ", revocation_point["dataURL"])
+        except Exception as e:
+            logging.error('Failed to fetch CRL')
             continue
 
-        crl_file = x509.load_der_x509_crl(r.content)
+        try:
+            crl_file = x509.load_der_x509_crl(r.content)
+        except Exception as e:
+            logging.error('Failed to load CRL')
+            continue
 
         # 7. Perform CRL File Validation
         crl_authority_key_id = crl_file.extensions.get_extension_for_oid(x509.OID_AUTHORITY_KEY_IDENTIFIER).value.key_identifier
