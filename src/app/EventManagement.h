@@ -199,7 +199,7 @@ struct LogStorageResources
 class EventScheduler
 {
 public:
-    virtual ~EventScheduler() = default;
+    virtual ~EventScheduler()                                                                   = default;
     CHIP_ERROR virtual ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBytesWritten) = 0;
 };
 
@@ -248,8 +248,7 @@ public:
     void Init(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers, CircularEventBuffer * apCircularEventBuffer,
               const LogStorageResources * const apLogStorageResources,
               MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter,
-              System::Clock::Milliseconds64 aMonotonicStartupTime,
-              EventScheduler* apEventScheduler = nullptr);
+              System::Clock::Milliseconds64 aMonotonicStartupTime, EventScheduler * apEventScheduler = nullptr);
 
     static EventManagement & GetInstance();
 
@@ -584,7 +583,7 @@ private:
 
     System::Clock::Milliseconds64 mMonotonicStartupTime;
 
-    EventScheduler* mpEventScheduler = nullptr;
+    EventScheduler * mpEventScheduler = nullptr;
 };
 
 } // namespace app
