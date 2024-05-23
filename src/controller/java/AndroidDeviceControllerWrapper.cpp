@@ -1091,7 +1091,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::SyncDeleteKeyValue(const char * key)
 void AndroidDeviceControllerWrapper::StartDnssd()
 {
     FabricTable * fabricTable = DeviceControllerFactory::GetInstance().GetSystemState()->Fabrics();
-    VerifyOrReturn(fabricTable != nullptr, ChipLogError(controller, "Fail to get fabricTable in StartDnssd"));
+    VerifyOrReturn(fabricTable != nullptr, ChipLogError(Controller, "Fail to get fabricTable in StartDnssd"));
     chip::app::DnssdServer::Instance().SetFabricTable(fabricTable);
     chip::app::DnssdServer::Instance().StartServer();
 }
