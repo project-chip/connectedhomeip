@@ -34,8 +34,6 @@ static_library("CYW30739") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
-    "FactoryDataProvider.cpp",
-    "FactoryDataProvider.h",
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
@@ -57,6 +55,8 @@ static_library("CYW30739") {
     "EventFlags.h",
     "FactoryDataProvider.h",
     "OTAImageProcessorImpl.h",
+    "OptigaFactoryDataProvider.h",
+    "UnprovisionedOptigaFactoryDataProvider.h",
     "cycfg_gatt_db.h",
   ]
 

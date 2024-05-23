@@ -2258,6 +2258,8 @@ endpoint 0 {
     ram      attribute lastNetworkingStatus;
     ram      attribute lastNetworkID;
     ram      attribute lastConnectErrorValue;
+    callback attribute supportedThreadFeatures;
+    callback attribute threadVersion;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2293,6 +2295,7 @@ endpoint 0 {
     callback attribute networkInterfaces;
     callback attribute rebootCount;
     callback attribute upTime;
+    callback attribute totalOperationalHours;
     callback attribute bootReason;
     callback attribute activeHardwareFaults;
     callback attribute activeRadioFaults;
@@ -2480,7 +2483,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x0001;
+    ram      attribute featureMap default = 0x0000;
     ram      attribute clusterRevision default = 2;
   }
 }
@@ -2558,7 +2561,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x181;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 7;
 
     handle command LockDoor;
     handle command UnlockDoor;

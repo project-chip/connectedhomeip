@@ -399,7 +399,7 @@ private:
     if (timeout <= 0) {
         timeoutInSeconds = 0;
     } else if (timeout > UINT16_MAX) {
-        MTR_LOG_INFO("Warning: timeout is too large. It will be truncated to UINT16_MAX.");
+        MTR_LOG("Warning: timeout is too large. It will be truncated to UINT16_MAX.");
         timeoutInSeconds = UINT16_MAX;
     } else {
         timeoutInSeconds = static_cast<uint16_t>(timeout);
@@ -448,7 +448,7 @@ private:
                                           abortHandler:(AbortHandler)abortHandler;
 {
     assertChipStackLockedByCurrentThread();
-    MTR_LOG_DEFAULT("BDX Transfer Session Begin: %@", fileDesignator);
+    MTR_LOG("BDX Transfer Session Begin: %@", fileDesignator);
 
     auto * download = [_downloads get:fileDesignator fabricIndex:fabricIndex nodeID:nodeID];
     VerifyOrReturn(nil != download, completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_FOUND]));
@@ -464,7 +464,7 @@ private:
                                            completion:(MTRStatusCompletion)completion
 {
     assertChipStackLockedByCurrentThread();
-    MTR_LOG_DEFAULT("BDX Transfer Session Data: %@: %@", fileDesignator, data);
+    MTR_LOG("BDX Transfer Session Data: %@: %@", fileDesignator, data);
 
     auto * download = [_downloads get:fileDesignator fabricIndex:fabricIndex nodeID:nodeID];
     VerifyOrReturn(nil != download, completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_FOUND]));
@@ -482,7 +482,7 @@ private:
                                                error:(NSError * _Nullable)error
 {
     assertChipStackLockedByCurrentThread();
-    MTR_LOG_DEFAULT("BDX Transfer Session End: %@: %@", fileDesignator, error);
+    MTR_LOG("BDX Transfer Session End: %@: %@", fileDesignator, error);
 
     auto * download = [_downloads get:fileDesignator fabricIndex:fabricIndex nodeID:nodeID];
     VerifyOrReturn(nil != download);
