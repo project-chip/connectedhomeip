@@ -1,7 +1,7 @@
 # Matter Linux Contact Sensor Example
 
-An example showing the use of CHIP on the Linux. The document will describe how
-to build and run Matter Linux Contact Sensor Example on Raspberry Pi. This doc
+An example showing the use of CHIP on the Linux. This document will describe how
+to build and run Matter Linux Contact Sensor Example on Raspberry Pi. This document
 is tested on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu
 for Raspberry Pi Desktop 20.10 (aarch64)**
 
