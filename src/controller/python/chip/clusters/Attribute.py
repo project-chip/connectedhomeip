@@ -429,6 +429,7 @@ class SubscriptionTransaction:
         self._onResubscriptionAttemptedCb: Callable[[SubscriptionTransaction,
                                                      int, int], None] = DefaultResubscriptionAttemptedCallback
         self._onAttributeChangeCb: Callable[[TypedAttributePath, SubscriptionTransaction], None] = DefaultAttributeChangeCallback
+        self._onRawAttributeChangeCb: Optional[Callable[[AttributePath, SubscriptionTransaction]]] = None
         self._onEventChangeCb: Callable[[EventReadResult, SubscriptionTransaction], None] = DefaultEventChangeCallback
         self._onErrorCb: Callable[[int, SubscriptionTransaction], None] = DefaultErrorCallback
         self._readTransaction = transaction
@@ -453,6 +454,18 @@ class SubscriptionTransaction:
             return eval(f'data[path.Path.EndpointId][path.ClusterType].{path.AttributeName}')
         else:
             return data[path.Path.EndpointId][path.ClusterType][path.AttributeType]
+
+    def GetTLVAttributes(self) -> Dict[int, Dict[int, Dict[int, Any]]]:
+        '''Returns the attributes value cache in raw/tag dict value tracking
+        the latest state on the publisher.
+        '''
+        return self._readTransaction._cache.attributeTLVCache
+
+
+    def GetTLVAttribute(self, path: AttributePath) -> bytes:
+        '''Returns a specific attribute given a AttributePath.
+        '''
+        return self._readTransaction._cache.attributeTLVCache[path.EndpointId][path.ClusterId][path.AttributeId]
 
     def GetEvents(self):
         return self._readTransaction.GetAllEventValues()
@@ -534,8 +547,14 @@ class SubscriptionTransaction:
         Sets the callback function for the attribute value change event,
         accepts a Callable accepts an attribute path and the cached data.
         '''
-        if callback is not None:
-            self._onAttributeChangeCb = callback
+        self._onAttributeChangeCb = callback
+
+    def SetRawAttributeUpdateCallback(self, callback: Callable[[AttributePath, SubscriptionTransaction], None]):
+        '''
+        Sets the callback function for raw attribute value change event,
+        accepts a Callable which accepts an attribute path and the cached data.
+        '''
+        self._onRawAttributeChangeCb = callback
 
     def SetEventUpdateCallback(self, callback: Callable[[EventReadResult, SubscriptionTransaction], None]):
         if callback is not None:
@@ -552,6 +571,10 @@ class SubscriptionTransaction:
     @property
     def OnAttributeChangeCb(self) -> Callable[[TypedAttributePath, SubscriptionTransaction], None]:
         return self._onAttributeChangeCb
+
+    @property
+    def OnRawAttributeChangeCb(self) -> Callable[[TypedAttributePath, SubscriptionTransaction], None]:
+        return self._onRawAttributeChangeCb
 
     @property
     def OnEventChangeCb(self) -> Callable[[EventReadResult, SubscriptionTransaction], None]:
@@ -767,14 +790,19 @@ class AsyncReadTransaction:
     def _handleReportEnd(self):
         if (self._subscription_handler is not None):
             for change in self._changedPathSet:
-                try:
-                    attribute_path = TypedAttributePath(Path=change)
-                except (KeyError, ValueError) as err:
-                    # path could not be resolved into a TypedAttributePath
-                    LOGGER.exception(err)
-                    continue
-                self._subscription_handler.OnAttributeChangeCb(
-                    attribute_path, self._subscription_handler)
+                if self._subscription_handler.OnAttributeChangeCb:
+                    try:
+                        attribute_path = TypedAttributePath(Path=change)
+                    except (KeyError, ValueError) as err:
+                        # path could not be resolved into a TypedAttributePath
+                        LOGGER.exception(err)
+                        continue
+                    self._subscription_handler.OnAttributeChangeCb(
+                        attribute_path, self._subscription_handler)
+
+                if self._subscription_handler.OnRawAttributeChangeCb:
+                    self._subscription_handler.OnRawAttributeChangeCb(
+                        change, self._subscription_handler)
 
             # Clear it out once we've notified of all changes in this transaction.
         self._changedPathSet = set()
