@@ -91,13 +91,6 @@ public:
     static void SetUpTestSuite() { chip::Test::LoopbackMessagingContext::SetUpTestSuite(); }
     static void TearDownTestSuite() { chip::Test::LoopbackMessagingContext::TearDownTestSuite(); }
 
-    void SetUp() override
-    {
-        ConfigInitializeNodes(false);
-        chip::Test::LoopbackMessagingContext::SetUp();
-    }
-    static void TearDownTestSuite() { chip::Test::LoopbackMessagingContext::TearDownTestSuite(); }
-
     void SetUp() override { chip::Test::LoopbackMessagingContext::SetUp(); }
 
     void TearDown() override { chip::Test::LoopbackMessagingContext::TearDown(); }
