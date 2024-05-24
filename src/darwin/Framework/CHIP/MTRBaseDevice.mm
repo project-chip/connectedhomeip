@@ -283,7 +283,7 @@ public:
         ErrorCallback errorCallback, MTRDeviceResubscriptionScheduledHandler _Nullable resubscriptionScheduledHandler,
         MTRSubscriptionEstablishedHandler _Nullable subscriptionEstablishedHandler, OnDoneHandler _Nullable onDoneHandler)
         : MTRBaseSubscriptionCallback(attributeReportCallback, eventReportCallback, errorCallback, resubscriptionScheduledHandler,
-              subscriptionEstablishedHandler, onDoneHandler)
+            subscriptionEstablishedHandler, onDoneHandler)
     {
     }
 
