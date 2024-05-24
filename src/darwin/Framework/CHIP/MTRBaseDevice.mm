@@ -283,7 +283,7 @@ public:
         ErrorCallback errorCallback, MTRDeviceResubscriptionScheduledHandler _Nullable resubscriptionScheduledHandler,
         MTRSubscriptionEstablishedHandler _Nullable subscriptionEstablishedHandler, OnDoneHandler _Nullable onDoneHandler)
         : MTRBaseSubscriptionCallback(attributeReportCallback, eventReportCallback, errorCallback, resubscriptionScheduledHandler,
-            subscriptionEstablishedHandler, onDoneHandler)
+              subscriptionEstablishedHandler, onDoneHandler)
     {
     }
 
@@ -571,7 +571,7 @@ NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV
         return _MakeDataValueDictionary(typeName, array, dataVersion);
     }
     default:
-        MTR_LOG_ERROR("Error: Unsupported TLV type for conversion: %u", (unsigned) data->GetType());
+        MTR_LOG_ERROR("Error: Unsupported TLV type for conversion: %u", static_cast<unsigned> data->GetType());
         return nil;
     }
 }
