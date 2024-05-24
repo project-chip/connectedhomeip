@@ -25,7 +25,9 @@
 namespace chip {
 namespace Controller {
 
-bool AddressListsSameExceptOrder(const size_t sourceNumIPs, const size_t destinationNumIPs, const Inet::IPAddress source[Dnssd::CommissionNodeData::kMaxIPAddresses], const Inet::IPAddress destination[Dnssd::CommissionNodeData::kMaxIPAddresses])
+bool AddressListsSameExceptOrder(const size_t sourceNumIPs, const size_t destinationNumIPs,
+                                 const Inet::IPAddress source[Dnssd::CommissionNodeData::kMaxIPAddresses],
+                                 const Inet::IPAddress destination[Dnssd::CommissionNodeData::kMaxIPAddresses])
 {
     size_t sameIpAddress                                                 = 0;
     bool addressUsed[chip::Dnssd::CommonResolutionData::kMaxIPAddresses] = { false };
