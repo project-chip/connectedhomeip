@@ -16,11 +16,10 @@
  *
  */
 
-#include "commands/common/Commands.h"
-
-#include "commands/clusters/SubscriptionsCommands.h"
-#include "commands/interactive/Commands.h"
-#include "commands/pairing/Commands.h"
+#include <commands/clusters/SubscriptionsCommands.h>
+#include <commands/common/Commands.h>
+#include <commands/interactive/Commands.h>
+#include <commands/pairing/Commands.h>
 #include <zap-generated/cluster/Commands.h>
 
 #include <iostream>

@@ -17,6 +17,7 @@
 #import <Matter/MTRDefines.h>
 
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
+#import <Matter/MTRDeviceStorageBehaviorConfiguration.h>
 #import <Matter/MTROTAProviderDelegate.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -84,6 +85,13 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  * If this value is 0, the maximum subscription establishments allowed at a time will be set to 1.
  */
 @property (nonatomic, assign) NSUInteger concurrentSubscriptionEstablishmentsAllowedOnThread MTR_NEWLY_AVAILABLE;
+
+/**
+ * Sets the storage behavior configuration - see MTRDeviceStorageBehaviorConfiguration.h for details
+ *
+ * If this value is nil, a default storage behavior configuration will be used.
+ */
+@property (nonatomic, copy, nullable) MTRDeviceStorageBehaviorConfiguration * storageBehaviorConfiguration;
 
 @end
 
