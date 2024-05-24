@@ -2551,7 +2551,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         MTRBaseDevice * baseDevice = [self newBaseDevice];
         // Make sure to use writeRequests here, because that's what our batching
         // handler will modify as needed.
-        NSCAssert(writeRequests.count == 1, @"Incorrect number of write requests: %lu", static_cast<unsigned long> (writeRequests.count));
+        NSCAssert(writeRequests.count == 1, @"Incorrect number of write requests: %lu", static_cast<unsigned long>(writeRequests.count));
 
         auto * request = writeRequests[0];
         MTRAttributePath * path = request[MTRDeviceWriteRequestFieldPathIndex];
