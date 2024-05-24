@@ -1,25 +1,20 @@
-# Deprecation notice
-
-chip-device-ctrl is no longer maintained and should not be used.
-
-Matter-repl is the current python controller implementation.
-
 # Working with Python CHIP Controller
 
-The Python CHIP Controller is a tool that allows to commission a Matter device
-into the network and to communicate with it using the Zigbee Cluster Library
-(ZCL) messages.
+The Python CHIP controller is a library that allows to create a Matter fabric
+and commission Matter devices with it.
 
-> The chip-device-ctrl tool will be deprecated, and will be replaced by
-> chip-repl. Continue reading to see how to do the same thing with chip-repl.
+The `chip-repl` is a REPl which sets up a Python CHIP Controller and allows to
+explore the Python CHIP Controller API and communicate with devices from the
+command line.
 
 <hr>
 
 -   [Source files](#source-files)
--   [Building Android CHIPTool](#building-and-installing)
--   [Running the tool](#running-the-tool)
--   [Using Python CHIP Controller for Matter accessory testing](#using-python-chip-controller-for-matter-accessory-testing)
--   [List of commands](#list-of-commands)
+-   [Building Python CHIP Controller](#building-and-installing)
+-   [Running the CHIP REPL](#running-the-chip-repl)
+-   [Using Python CHIP Controller REPL for Matter accessory testing](#using-python-chip-controller-repl-for-matter-accessory-testing)
+-   [Example usage of the Python CHIP Controller REPL](#example-usage-of-the-python-chip-controller-repl)
+-   [Explore Clusters, Attributes and Commands](#explore-clusters-attributes-and-commands)
 
 <hr>
 
@@ -85,35 +80,31 @@ To build and run the Python CHIP controller:
     scripts/build_python.sh -m platform -i separate
     ```
 
-    > Note: To get more details about available build configurations, run the
+    > Note: This builds the Python CHIP Controller along with the CHIP REPL as
+    > Python wheels and installs it into a separate Python virtual environment.
+    > To get more details about available build configurations, run the
     > following command: `scripts/build_python.sh --help`
 
 <hr>
 
-## Running the tool
+## Running the CHIP REPL
 
-1. Activate the Python virtual environment:
+1. Activate the Python virtual environment with the Python CHIP Controller
+   installed:
 
     ```
     source out/python_env/bin/activate
     ```
 
-2. Run the Python CHIP controller with root privileges, which is required to
-   obtain access to the Bluetooth interface:
+2. Run the CHIP REPL to explore the API of the Python CHIP controller:
 
     ```
-    sudo out/python_env/bin/chip-device-ctrl
-    ```
-
-    You can also select the Bluetooth LE interface using command line argument:
-
-    ```
-    sudo out/python_env/bin/chip-device-ctrl --bluetooth-adapter=hci2
+    chip-repl
     ```
 
 <hr>
 
-## Using Python CHIP Controller for Matter accessory testing
+## Using Python CHIP Controller REPL for Matter accessory testing
 
 This section describes how to use Python CHIP controller to test the Matter
 accessory. Below steps depend on the application clusters that you implemented
@@ -135,13 +126,14 @@ require physical trigger, for example pushing a button. Follow the documentation
 of the Matter accessory example to learn how Bluetooth LE advertising is enabled
 for the given example.
 
-### Step 3: Discover Matter accessory device over Bluetooth LE
+### Step 3: Discover commissionable Matter accessory device
 
-An uncommissioned accessory device advertises over Bluetooth LE. Run the
-following command to scan all advertised Matter devices:
+An uncommissioned accessory device advertises over Bluetooth LE or via mDNS if
+already on the network. Run the following command to scan all advertised Matter
+devices:
 
 ```
-chip-device-ctrl > ble-scan
+devCtrl.DiscoverCommissionableNodes()
 ```
 
 ### Step 4: Set network pairing credentials
@@ -177,11 +169,12 @@ network interface, such as Thread or Wi-Fi.
     datasets directly from the Thread Border Router, you might also use a
     different out-of-band method.
 
-2. Set the previously obtained Active Operational Dataset as a hex-encoded value
-   using the following command:
+2. Set the previously obtained Active Operational Dataset as a byte array using
+   the following command:
 
     ```
-    chip-device-ctrl > set-pairing-thread-credential 0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8
+    thread_dataset = bytes.fromhex("0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8")
+    devCtrl.SetThreadOperationalDataset(thread_dataset)
     ```
 
 #### Setting Wi-Fi network credentials
@@ -190,10 +183,8 @@ Assuming your Wi-Fi SSID is _TESTSSID_, and your Wi-Fi password is _P455W4RD_,
 set the credentials to the controller by executing the following command:
 
 ```
-chip-device-ctrl > set-pairing-wifi-credential TESTSSID P455W4RD
+devCtrl.SetWiFiCredentials(<ssid>, <password>)
 ```
-
-**REPL Command**: `devCtrl.SetWiFiCredentials(<ssid>, <password>)`
 
 ### Step 5: Commission the Matter accessory device over Bluetooth LE
 
@@ -222,15 +213,25 @@ with the following assumptions for the Matter accessory device:
 -   The temporary Node ID is _1234_
 
 ```
-chip-device-ctrl > connect -ble 3840 20202021 1234
+devCtrl.ConnectBLE(3840, 20202021, 1234)
 ```
-
-**REPL Command:**
-`devCtrl.ConnectBLE(<discriminator>, <setup pincode>, <temporary node id>)`
 
 You can skip the last parameter, the Node ID, in the command. If you skip it,
 the controller will assign it randomly. In that case, note down the Node ID,
 because it is required later in the configuration process.
+
+It is also possible to use the QR setup code instead. It typically is shown on
+the terminal of the device as well. For example:
+
+```
+CHIP:SVR: SetupQRCode: [MT:-24J0AFN00KA0648G00]
+```
+
+Use the following command to commission the device with the QR code:
+
+```
+devCtrl.CommissionWithCode("MT:-24J0AFN00KA0648G00", 1234)
+```
 
 After connecting the device over Bluetooth LE, the controller will go through
 the following stages:
@@ -255,429 +256,155 @@ the following stages:
     finished and the Python CHIP controller is now using only the IPv6 traffic
     to reach the device.
 
-### Step 6: Control application ZCL clusters.
+### Step 6: Control application clusters.
 
 For the light bulb example, execute the following command to toggle the LED
 state:
 
 ```
-chip-device-ctrl > zcl OnOff Toggle 1234 1 0
+await devCtrl.SendCommand(1234, 1, Clusters.OnOff.Commands.Toggle())
 ```
-
-**REPL Command:**
-`await devCtrl.SendCommand(1234, 1, Clusters.OnOff.Commands.Toggle())`
 
 To change the brightness of the LED, use the following command, with the level
 value somewhere between 0 and 255.
 
 ```
-chip-device-ctrl > zcl LevelControl MoveToLevel 1234 1 0 level=50
+commandToSend = LevelControl.Commands.MoveToLevel(level=50, transitionTime=Null, optionsMask=0, optionsOverride=0)
+await devCtrl.SendCommand(1234, 1, commandToSend)
 ```
-
-**REPL Command:**
-`await devCtrl.SendCommand(1234, 1, LevelControl.Commands.MoveToLevel(level=50, transitionTime=Null, optionsMask=0, optionsOverride=0))`
 
 ### Step 7: Read basic information out of the accessory.
 
 Every Matter accessory device supports a Basic Information Cluster, which
 maintains collection of attributes that a controller can obtain from a device,
-such as the vendor name, the product name, or software version. Use `zclread`
-command to read those values from the device:
+such as the vendor name, the product name, or software version. Use
+`ReadAttribute()` command to read those values from the device:
 
 ```
-chip-device-ctrl > zclread BasicInformation VendorName 1234 1 0
-chip-device-ctrl > zclread BasicInformation ProductName 1234 1 0
-chip-device-ctrl > zclread BasicInformation SoftwareVersion 1234 1 0
+attributes = [
+    (0, Clusters.BasicInformation.Attributes.VendorName),
+    (0, Clusters.BasicInformation.Attributes.ProductName),
+    (0, Clusters.BasicInformation.Attributes.SoftwareVersion),
+]
+await devCtrl.ReadAttribute(1234, attributes)
 ```
 
-**REPL Command:**
-`await devCtrl.ReadAttribute(1234, [(1, Clusters.BasicInformation.Attributes.VendorName)])`
-
-> Use the `zcl ? BasicInformation` command to list all available commands for
-> Basic Information Cluster.
->
 > In REPL, you can type `Clusters.BasicInformation.Attributes.` and then use the
 > TAB key.
 
 <hr>
 
-## List of commands
+## Example usage of the Python CHIP Controller REPL
 
-### `ble-adapter-print`
+These section covers a few useful commands of the Python CHIP Controller along
+with examples demonstrating how they can be called from the REPL.
 
-> BLE adapter operations is not yet supported in REPL
+The
+[CHIP Device Controller API documentation offer](https://project-chip.github.io/connectedhomeip-doc/testing/ChipDeviceCtrlAPI.html#chip-chipdevicectrl)
+the full list of available commands.
 
-Print the available Bluetooth adapters on device. Takes no arguments:
-
-```
-chip-device-ctrl > ble-adapter-print
-2021-03-04 16:09:40,930 ChipBLEMgr   INFO     AdapterName: hci0   AdapterAddress: 00:AA:01:00:00:23
-```
-
-### `ble-debug-log`
-
-> BLE adapter operations is not yet supported in REPL
-
-Enable the Bluetooth LE debug logs.
-
-```
-chip-device-ctrl > ble-debug-log 1
-```
-
-### `ble-scan [-t <timeout>] [identifier]`
-
-> BLE adapter operations is not yet supported in REPL
-
-Start a scan action to search for valid CHIP devices over Bluetooth LE (for at
-most _timeout_ seconds). Stop when the device is matching the identifier or the
-counter times out.
-
-```
-chip-device-ctrl > ble-scan
-2021-05-29 22:28:05,461 ChipBLEMgr   INFO     scanning started
-2021-05-29 22:28:07,206 ChipBLEMgr   INFO     Name            = ChipLight
-2021-05-29 22:28:07,206 ChipBLEMgr   INFO     ID              = f016e23d-0d00-35d5-93e7-588acdbc7e54
-2021-05-29 22:28:07,207 ChipBLEMgr   INFO     RSSI            = -79
-2021-05-29 22:28:07,207 ChipBLEMgr   INFO     Address         = E0:4D:84:3C:BB:C3
-2021-05-29 22:28:07,209 ChipBLEMgr   INFO     Pairing State   = 0
-2021-05-29 22:28:07,209 ChipBLEMgr   INFO     Discriminator   = 3840
-2021-05-29 22:28:07,209 ChipBLEMgr   INFO     Vendor Id       = 9050
-2021-05-29 22:28:07,209 ChipBLEMgr   INFO     Product Id      = 20044
-2021-05-29 22:28:07,210 ChipBLEMgr   INFO     Adv UUID        = 0000fff6-0000-1000-8000-00805f9b34fb
-2021-05-29 22:28:07,210 ChipBLEMgr   INFO     Adv Data        = 00000f5a234c4e
-2021-05-29 22:28:07,210 ChipBLEMgr   INFO
-2021-05-29 22:28:16,246 ChipBLEMgr   INFO     scanning stopped
-```
-
-### `set-pairing-thread-credential <threadOperationalDataset>`
+### `SetThreadOperationalDataset(<thread-dataset>)`
 
 Provides the controller with Thread network credentials that will be used in the
 device commissioning procedure to configure the device with a Thread interface.
 
 ```
-chip-device-ctrl > set-pairing-thread-credential 0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8
+thread_dataset = bytes.fromhex("0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8")
+devCtrl.SetThreadOperationalDataset(thread_dataset)
 ```
 
-**REPL Commands:**
-`devCtrl.SetThreadOperationalDataset(bytes.FromHex("0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8"))`
-
-### `set-pairing-wifi-credential <ssid> <credentials>`
+### `SetWiFiCredentials(<ssid>: str, <password>: str)`
 
 Provides the controller with Wi-Fi network credentials that will be used in the
 device commissioning procedure to configure the device with a Wi-Fi interface.
 
 ```
-chip-device-ctrl > set-pairing-wifi-credential TESTSSID P455W4RD
+devCtrl.SetWiFiCredentials('TESTSSID', 'P455W4RD')
 ```
 
-**REPL Commands:** `devCtrl.SetWiFiCredentials('TESTSSID', 'P455W4RD')`
+### `CommissionWithCode(<setupPayload>: str, <nodeid>: int, <discoveryType>: DiscoveryType)`
 
-### `connect -ip <address> <SetUpPinCode> [<nodeid>]`
-
-Do key exchange and establish a secure session between controller and device
-using IP transport.
-
-The Node ID will be used by controller to distinguish multiple devices. This
-does not match the spec and will be removed later. The nodeid will not be
-persisted by controller / device.
-
-If no nodeid given, a random Node ID will be used.
-
-**REPL Commands:**
-`devCtrl.CommissionIP(b'<ip address>', <setup pin code>, <nodeid>)`
-
-### `connect -ble <discriminator> <SetUpPinCode> [<nodeid>]`
-
-Do key exchange and establish a secure session between controller and device
-using Bluetooth LE transport.
-
-The Node ID will be used by controller to distinguish multiple devices. This
-does not match the spec and will be removed later. The nodeid will not be
-persisted by controller / device.
-
-If no nodeid given, a random Node ID will be used.
-
-**REPL Commands:**
-`devCtrl.ConnectBLE(<discriminator>, <setup pin code>, <nodeid>)`
-
-### `close-session <nodeid>`
-
-If case there exists an open session (PASE or CASE) to the device with a given
-Node ID, mark it as expired.
-
-**REPL Commands:** `devCtrl.CloseSession(<nodeid>)`
-
-### `discover`
-
-> To be implemented in REPL
-
-Discover available Matter accessory devices:
+Commission with the given nodeid from the setupPayload. setupPayload may be a QR
+or the manual setup code.
 
 ```
-chip-device-ctrl > discover -all
+devCtrl.CommissionWithCode("MT:-24J0AFN00KA0648G00", 1234)
 ```
 
-### `resolve <node_id>`
+### `SendCommand(<nodeid>: int, <endpoint>: int, Clusters.<cluster>.Commands.<command>(<arguments>))`
 
-> To be implemented in REPL
-
-Resolve DNS-SD name corresponding with the given Node ID and update address of
-the node in the device controller:
-
-```
-chip-device-ctrl > resolve 1234
-```
-
-### `setup-payload generate [-v <Vendor ID>] [-p <Product ID>] [-cf <Custom Flow>] [-dc <Discovery Capabilities>] [-dv <Discriminator Value>] [-ps <Passcode>]`
-
-> To be implemented in REPL
-
-Print the generated Onboarding Payload Contents in human-readable (Manual
-Pairing Code) and machine-readable (QR Code) format:
-
-```
-chip-device-ctrl > setup-payload generate -v 9050 -p 65279 -cf 0 -dc 2 -dv 2976 -ps 34567890
-Manual pairing code: [26318621095]
-SetupQRCode: [MT:YNJV7VSC00CMVH7SR00]
-```
-
-### `setup-payload parse-manual <manual-pairing-code>`
-
-> To be implemented in REPL
-
-Print the commissioning information encoded in the Manual Pairing Code:
-
-```
-chip-device-ctrl > setup-payload parse-manual 34970112332
-Version: 0
-VendorID: 0
-ProductID: 0
-CommissioningFlow: 0
-RendezvousInformation: 0
-Discriminator: 3840
-SetUpPINCode: 20202021
-```
-
-### `setup-payload parse-qr <qr-code>`
-
-> To be implemented in REPL
-
-Print the commissioning information encoded in the QR Code payload:
-
-```
-chip-device-ctrl > setup-payload parse-qr "VP:vendorpayload%MT:W0GU2OTB00KA0648G00"
-Version: 0
-VendorID: 9050
-ProductID: 20043
-CommissioningFlow: 0
-RendezvousInformation: 2 [BLE]
-Discriminator: 3840
-SetUpPINCode: 20202021
-```
-
-### `zcl <Cluster> <Command> <NodeId> <EndpointId> <GroupId> [arguments]`
-
-Send a ZCL command to the device. For example:
-
-```
-chip-device-ctrl > zcl LevelControl MoveWithOnOff 12344321 1 0 moveMode=1 rate=2
-```
-
-**Format of arguments**
-
-For any integer and char string (null terminated) types, just use `key=value`,
-for example: `rate=2`, `string=123`, `string_2="123 456"`
-
-For byte string type, use `key=encoding:value`, currently, we support `str` and
-`hex` encoding, the `str` encoding will encode a NULL terminated string. For
-example, `networkId=hex:0123456789abcdef` (for
-`[0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef]`), `ssid=str:Test` (for
-`['T', 'e', 's', 't', 0x00]`).
-
-For boolean type, use `key=True` or `key=False`.
-
-**REPL Commands:**
+Send a Matter command to the device. For example:
 
 ```python
-# await devCtrl.SendCommand(<nodeid>, <endpoint>, Clusters.<cluster>.Commands.<command>(<arguments>))
-# e.g.
-await devCtrl.SendCommand(12344321, 1, Clusters.LevelControl.Commands.MoveWithOnOff(moveMode=1, rate=2, optionsMask=0, optionsOverride=0))
+commandToSend = Clusters.LevelControl.Commands.MoveWithOnOff(moveMode=1, rate=2, optionsMask=0, optionsOverride=0)
+await devCtrl.SendCommand(1234, 1, commandToSend)
 ```
 
-### `zcl ?`
-
-List available clusters:
+To see available arguments just create a command object without argument:
 
 ```
-chip-device-ctrl > zcl ?
-AccountLogin
-ApplicationBasic
-ApplicationLauncher
-AudioOutput
-BarrierControl
-BasicInformation
-Binding
-BridgedDeviceBasicInformation
-ColorControl
-ContentLaunch
-Descriptor
-DoorLock
-EthernetNetworkDiagnostics
-FixedLabel
-GeneralCommissioning
-GeneralDiagnostics
-GroupKeyManagement
-Groups
-Identify
-KeypadInput
-LevelControl
-LowPower
-MediaInput
-MediaPlayback
-NetworkCommissioning
-OnOff
-OperationalCredentials
-PumpConfigurationAndControl
-RelativeHumidityMeasurement
-ScenesManagement
-SoftwareDiagnostics
-Switch
-Channel
-TargetNavigator
-TemperatureMeasurement
-TestCluster
-Thermostat
-TrustedRootCertificates
-WakeOnLan
-WindowCovering
+Clusters.LevelControl.Commands.MoveWithOnOff()
 ```
 
-**REPL Commands**
-
-Type `Clusters.` and hit TAB
-
-### `zcl ? <Cluster>`
-
-List available commands in cluster. For example, for _Basic Information_
-cluster:
+Shows which arguments are available:
 
 ```
-chip-device-ctrl > zcl ? BasicInformation
-DataModelRevision
-VendorName
-VendorID
-ProductName
-ProductID
-UserLabel
-Location
-HardwareVersion
-HardwareVersionString
-SoftwareVersion
-SoftwareVersionString
-ManufacturingDate
-PartNumber
-ProductURL
-ProductLabel
-SerialNumber
-LocalConfigDisabled
-ClusterRevision
+MoveWithOnOff(
+│   moveMode=0,
+│   rate=Null,
+│   optionsMask=0,
+│   optionsOverride=0
+)
 ```
 
-**REPL Commands**
+### `ReadAttribute(<nodeid>: int, [(<endpoint id>: int, Clusters.<cluster>.Attributes.<attribute>)])`
 
-Type `Clusters.(cluster name).Commands.` and hit TAB
-
-### `zclread <Cluster> <Attribute> <NodeId> <EndpointId> <GroupId> [arguments]`
-
-Read the value of ZCL attribute. For example:
-
-```
-chip-device-ctrl > zclread BasicInformation VendorName 1234 1 0
-```
-
-**REPL Commands**
+Read the value of an attribute. For example:
 
 ```python
-# devCtrl.ReadAttribute(<nodeid>, [(<endpoint id>, Clusters.<cluster>.Attributes.<attribute>)])
-# e.g.
-await devCtrl.ReadAttribute(1234, [(1, Clusters.BasicInformation.Attributes.VendorName)])
+await devCtrl.ReadAttribute(1234, [(0, Clusters.BasicInformation.Attributes.VendorName)])
 ```
 
-### `zclwrite <cluster> <attribute> <nodeid> <endpoint> <groupid> <value>`
+### `WriteAttribute(<nodeid>: int, [(<endpointid>: int, Clusters.<cluster>.Attributes.<attribute>(value=<attribute value>))])`
 
-Write the value to a ZCL attribute. For example:
-
-```
-chip-device-ctrl > zclwrite TestCluster Int8u 1 1 0 1
-chip-device-ctrl > zclwrite TestCluster Boolean 1 1 0 True
-chip-device-ctrl > zclwrite TestCluster OctetString 1 1 0 str:123123
-chip-device-ctrl > zclwrite TestCluster CharString 1 1 0 233233
-```
-
-Note: The format of the value is the same as the format of argument values for
-ZCL cluster commands.
-
-**REPL Commands**
+Write a value to an attribute. For example:
 
 ```python
-# devCtrl.WriteAttribute(<nodeid>, [(<endpointid>, Clusters.<cluster>.Attributes.<attribute>(value=<attribute value>))])
-# e.g.
-await devCtrl.WriteAttribute(1, [(1, Clusters.UnitTesting.Attributes.Int8u(value=1))])
-await devCtrl.WriteAttribute(1, [(1, Clusters.UnitTesting.Attributes.Boolean(value=True))])
-await devCtrl.WriteAttribute(1, [(1, Clusters.UnitTesting.Attributes.OctetString(value=b'123123\x00'))])
-await devCtrl.WriteAttribute(1, [(1, Clusters.UnitTesting.Attributes.CharString(value='233233'))])
+await devCtrl.WriteAttribute(1234, [(1, Clusters.UnitTesting.Attributes.Int8u(value=1))])
+await devCtrl.WriteAttribute(1234, [(1, Clusters.UnitTesting.Attributes.Boolean(value=True))])
+await devCtrl.WriteAttribute(1234, [(1, Clusters.UnitTesting.Attributes.OctetString(value=b'123123\x00'))])
+await devCtrl.WriteAttribute(1234, [(1, Clusters.UnitTesting.Attributes.CharString(value='233233'))])
 ```
 
-### `zclsubscribe <Cluster> <Attribute> <Nodeid> <Endpoint> <MinInterval> <MaxInterval>`
+### `ReadAttribute(<nodeid>: int, [(<endpoint>: int, Clusters.<cluster>.Attributes.<attribute>)], reportInterval=(<min interval>: int, <max interval>: int))`
 
-Configure ZCL attribute reporting settings. For example:
-
-```
-chip-device-ctrl > zclsubscribe OccupancySensing Occupancy 1234 1 10 20
-```
-
-**REPL Commands**
+Configure Matter attribute reporting settings. For example:
 
 ```python
-# devCtrl.ReadAttribute(<nodeid>, [(<endpoint>, Clusters.<cluster>.Attributes.<attribute>)], reportInterval=(<min interval>, <max interval>))
-# e.g.
-await devCtrl.ReadAttribute(1, [(1, Clusters.OccupancySensing.Attributes.Occupancy)], reportInterval=(10, 20))
+await devCtrl.ReadAttribute(1234, [(1, Clusters.OccupancySensing.Attributes.Occupancy)], reportInterval=(10, 20))
 ```
 
-### `zclsubscribe -shutdown <subscription id>`
-
-Shutdown an existing attribute subscription.
-
-```
-chip-device-ctrl > zclsubscribe -shutdown 0xdeadbeefcafe
-```
-
-The subscription id can be obtained from previous subscription messages:
-
-```
-chip-device-ctrl > zclsubscribe OnOff OnOff 1 1 10 20
-(omitted messages)
-[1633922898.965587][1117858:1117866] CHIP:DMG: SubscribeResponse =
-[1633922898.965599][1117858:1117866] CHIP:DMG: {
-[1633922898.965610][1117858:1117866] CHIP:DMG:  SubscriptionId = 0xdeadbeefcafe,
-[1633922898.965622][1117858:1117866] CHIP:DMG:  MinIntervalFloorSeconds = 0xa,
-[1633922898.965633][1117858:1117866] CHIP:DMG:  MaxIntervalCeilingSeconds = 0x14,
-[1633922898.965644][1117858:1117866] CHIP:DMG: }
-[1633922898.965662][1117858:1117866] CHIP:ZCL: SubscribeResponse:
-[1633922898.965673][1117858:1117866] CHIP:ZCL:   SubscriptionId:        0xdeadbeefcafe
-[1633922898.965683][1117858:1117866] CHIP:ZCL:   ApplicationIdentifier: 0
-[1633922898.965694][1117858:1117866] CHIP:ZCL:   status: EMBER_ZCL_STATUS_SUCCESS (0x00)
-[1633922898.965709][1117858:1117866] CHIP:ZCL:   attributeValue: false
-(omitted messages)
-```
-
-The subscription id is `0xdeadbeefcafe` in this case
-
-**REPL Commands**
+To shutdown an existing attribute subscription use the `Shutdown()` function on
+the returned subscription object:
 
 ```python
-# SubscriptionTransaction.Shutdown()
-# e.g.
-sub = await devCtrl.ReadAttribute(1, [(1, Clusters.OccupancySensing.Attributes.Occupancy)], reportInterval=(10, 20))
+sub = await devCtrl.ReadAttribute(1234, [(1, Clusters.OccupancySensing.Attributes.Occupancy)], reportInterval=(10, 20))
 sub.Shutdown()
 ```
+
+## Explore Clusters, Attributes and Commands
+
+In the Python REPL the Clusters and Attributes are classes. The `Clusters`
+module contains all clusters. Tab completion can be used to explore available
+clusters, attributes and commands.
+
+For example, to get a list of Clusters, type `Clusters.` and hit tab. Continue
+to hit tab to cycle through the available Clusters. Pressing return will select
+the Cluster.
+
+To explore Attributes, use the same technique but with the Attributes sub-class
+of the Clusters class, for example, type `Clusters.(cluster name).Attributes.`
+and hit tab.
+
+The same is true for Commands, use the Commands sub-class. type
+`Clusters.(cluster name).Commands.` and hit tab.

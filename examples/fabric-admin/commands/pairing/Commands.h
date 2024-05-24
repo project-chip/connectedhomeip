@@ -18,15 +18,15 @@
 
 #pragma once
 
-#include "commands/common/Commands.h"
-#include "commands/pairing/GetCommissionerNodeIdCommand.h"
-#include "commands/pairing/GetCommissionerRootCertificateCommand.h"
-#include "commands/pairing/IssueNOCChainCommand.h"
-#include "commands/pairing/OpenCommissioningWindowCommand.h"
-#include "commands/pairing/PairingCommand.h"
+#include <commands/common/Commands.h>
+#include <commands/common/CredentialIssuerCommands.h>
+#include <commands/pairing/GetCommissionerNodeIdCommand.h>
+#include <commands/pairing/GetCommissionerRootCertificateCommand.h>
+#include <commands/pairing/IssueNOCChainCommand.h>
+#include <commands/pairing/OpenCommissioningWindowCommand.h>
+#include <commands/pairing/PairingCommand.h>
 
 #include <app/server/Dnssd.h>
-#include <commands/common/CredentialIssuerCommands.h>
 #include <lib/dnssd/Resolver.h>
 
 class Unpair : public PairingCommand

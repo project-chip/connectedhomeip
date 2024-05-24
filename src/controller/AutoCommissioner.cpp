@@ -125,6 +125,8 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
 
     mParams = params;
 
+    mNeedIcdRegistration = false;
+
     if (haveMaybeDanglingBufferPointers)
     {
         mParams.ClearExternalBufferDependentValues();

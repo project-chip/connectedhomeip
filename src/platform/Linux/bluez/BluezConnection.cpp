@@ -335,7 +335,7 @@ void BluezConnection::SubscribeCharacteristicDone(GObject * aObject, GAsyncResul
     auto * pC2 = reinterpret_cast<BluezGattCharacteristic1 *>(aObject);
 
     GAutoPtr<GError> error;
-    gboolean success = bluez_gatt_characteristic1_call_write_value_finish(pC2, aResult, &error.GetReceiver());
+    gboolean success = bluez_gatt_characteristic1_call_start_notify_finish(pC2, aResult, &error.GetReceiver());
 
     VerifyOrReturn(success == TRUE, ChipLogError(DeviceLayer, "FAIL: SubscribeCharacteristic : %s", error->message));
 
@@ -367,7 +367,7 @@ void BluezConnection::UnsubscribeCharacteristicDone(GObject * aObject, GAsyncRes
     auto * pC2 = reinterpret_cast<BluezGattCharacteristic1 *>(aObject);
 
     GAutoPtr<GError> error;
-    gboolean success = bluez_gatt_characteristic1_call_write_value_finish(pC2, aResult, &error.GetReceiver());
+    gboolean success = bluez_gatt_characteristic1_call_stop_notify_finish(pC2, aResult, &error.GetReceiver());
 
     VerifyOrReturn(success == TRUE, ChipLogError(DeviceLayer, "FAIL: UnsubscribeCharacteristic : %s", error->message));
 

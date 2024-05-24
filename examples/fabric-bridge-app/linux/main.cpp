@@ -26,6 +26,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/EventLogging.h>
 #include <app/reporting/reporting.h>
+#include <app/server/Server.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
@@ -39,16 +40,14 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
-#include <pthread.h>
-#include <sys/ioctl.h>
-
 #include "CommissionableInit.h"
 #include "Device.h"
-#include <app/server/Server.h>
 
 #include <cassert>
 #include <iostream>
 #include <string>
+#include <sys/ioctl.h>
+#include <thread>
 
 using namespace chip;
 using namespace chip::app;
@@ -58,11 +57,40 @@ using namespace chip::Transport;
 using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters;
 
+#define POLL_INTERVAL_MS (100)
+
 namespace {
 
 EndpointId gCurrentEndpointId;
 EndpointId gFirstDynamicEndpointId;
 Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT + 1];
+
+bool KeyboardHit()
+{
+    int bytesWaiting;
+    ioctl(0, FIONREAD, &bytesWaiting);
+    return bytesWaiting > 0;
+}
+
+void BridgePollingThread()
+{
+    while (true)
+    {
+        if (KeyboardHit())
+        {
+            int ch = getchar();
+            if (ch == 'e')
+            {
+                ChipLogProgress(DeviceLayer, "Exiting.....");
+                exit(0);
+            }
+            continue;
+        }
+
+        // Sleep to avoid tight loop reading commands
+        usleep(POLL_INTERVAL_MS * 1000);
+    }
+}
 
 } // namespace
 
@@ -245,42 +273,6 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(Endpoi
     return ret;
 }
 
-#define POLL_INTERVAL_MS (100)
-uint8_t poll_prescale = 0;
-
-bool kbhit()
-{
-    int byteswaiting;
-    ioctl(0, FIONREAD, &byteswaiting);
-    return byteswaiting > 0;
-}
-
-const int16_t oneDegree = 100;
-
-void * bridge_polling_thread(void * context)
-{
-    while (true)
-    {
-        if (kbhit())
-        {
-            int ch = getchar();
-
-            // Commands used for the actions bridge test plan.
-            if (ch == 'e')
-            {
-                ChipLogProgress(DeviceLayer, "Exiting.....");
-                exit(0);
-            }
-            continue;
-        }
-
-        // Sleep to avoid tight loop reading commands
-        usleep(POLL_INTERVAL_MS * 1000);
-    }
-
-    return nullptr;
-}
-
 void ApplicationInit()
 {
     // Clear out the device database
@@ -292,15 +284,9 @@ void ApplicationInit()
         static_cast<int>(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1))) + 1);
     gCurrentEndpointId = gFirstDynamicEndpointId;
 
-    {
-        pthread_t poll_thread;
-        int res = pthread_create(&poll_thread, nullptr, bridge_polling_thread, nullptr);
-        if (res)
-        {
-            printf("Error creating polling thread: %d\n", res);
-            exit(1);
-        }
-    }
+    // Start a thread for bridge polling
+    std::thread pollingThread(BridgePollingThread);
+    pollingThread.detach();
 }
 
 void ApplicationShutdown() {}
