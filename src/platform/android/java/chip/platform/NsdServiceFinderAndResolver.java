@@ -125,8 +125,11 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
                     () -> {
                       chipMdnsCallback.handleServiceResolve(
                           serviceInfo.getServiceName(),
-                          // Use the target service info since the resolved service info sometimes appends a "." at the front likely because it is trying to strip the service name out of it and something is missed.
-                          // The target service info service type should be effectively the same as the resolved service info.
+                          // Use the target service info since the resolved service info sometimes
+                          // appends a "." at the front likely because it is trying to strip the
+                          // service name out of it and something is missed.
+                          // The target service info service type should be effectively the same as
+                          // the resolved service info.
                           NsdServiceFinderAndResolver.this.targetServiceInfo.getServiceType(),
                           null,
                           null,
@@ -165,8 +168,11 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
                       // TODO: Find out if DNS-SD results for Android should contain interface ID
                       chipMdnsCallback.handleServiceResolve(
                           serviceInfo.getServiceName(),
-                          // Use the target service info since the resolved service info sometimes appends a "." at the front likely because it is trying to strip the service name out of it and something is missed.
-                          // The target service info service type should be effectively the same as the resolved service info.
+                          // Use the target service info since the resolved service info sometimes
+                          // appends a "." at the front likely because it is trying to strip the
+                          // service name out of it and something is missed.
+                          // The target service info service type should be effectively the same as
+                          // the resolved service info.
                           NsdServiceFinderAndResolver.this.targetServiceInfo.getServiceType(),
                           hostName,
                           address,
