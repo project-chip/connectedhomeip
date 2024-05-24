@@ -93,17 +93,17 @@ NSString * const MTRDataVersionKey = @"dataVersion";
 }
 @end
 
-// Stores essential-for-logging attributes immutably for use in logs
-@interface MTRDeviceEssentialAttributes : NSObject
+// convenience object for commonly-logged device attributes
+@interface MTRDeviceInformationalAttributes : NSObject
 @property (readonly) UInt16 vendorID;
 @property (readonly) UInt16 productID;
 @property (readonly) BOOL usesThread;
 
-- (void)addEssentialAttributesToCurrentMetricScope;
+- (void)addInformationalAttributesToCurrentMetricScope;
 
 @end
 
-@implementation MTRDeviceEssentialAttributes
+@implementation MTRDeviceInformationalAttributes
 
 - (instancetype)initWithVendorID:(UInt16)vendorID productID:(UInt16)productID usesThread:(BOOL)usesThread {
     self = [super init];
@@ -117,7 +117,7 @@ NSString * const MTRDataVersionKey = @"dataVersion";
     return self;
 }
 
-- (void)addEssentialAttributesToCurrentMetricScope {
+- (void)addInformationalAttributesToCurrentMetricScope {
     using namespace chip::Tracing::DarwinFramework;
     MATTER_LOG_METRIC(kMetricDeviceVendorID, _vendorID);
     MATTER_LOG_METRIC(kMetricDeviceProductID, _productID);
@@ -1926,11 +1926,11 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         // (removals are OK)
         
         // log when a device violates expectations for Changes Omitted Quality attributes.
-        MTRDeviceEssentialAttributes * attributes = [self _essentialAttributesForCurrentState];
+        MTRDeviceInformationalAttributes * attributes = [self _informationalAttributesForCurrentState];
         
         using namespace chip::Tracing::DarwinFramework;
         MATTER_LOG_METRIC_BEGIN(kMetricUnexpectedCQualityUpdate);
-        [attributes addEssentialAttributesToCurrentMetricScope];
+        [attributes addInformationalAttributesToCurrentMetricScope];
         MATTER_LOG_METRIC_END(kMetricUnexpectedCQualityUpdate);
         
         return;
@@ -3688,7 +3688,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 #pragma mark Log Help
 
-- (MTRDeviceEssentialAttributes *)_essentialAttributesForCurrentState {
+- (MTRDeviceInformationalAttributes *)_informationalAttributesForCurrentState {
     MTRClusterPath * basicInfoClusterPath = [MTRClusterPath clusterPathWithEndpointID:@(kRootEndpointId) clusterID:@(MTRClusterIDTypeBasicInformationID)];
     MTRDeviceClusterData * basicInfoClusterData = [self _clusterDataForPath:basicInfoClusterPath];
     
@@ -3699,7 +3699,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     
     BOOL usesThread = [self _deviceUsesThread];
     
-    return [[MTRDeviceEssentialAttributes alloc] initWithVendorID:vendorID productID:productID usesThread:usesThread];
+    return [[MTRDeviceInformationalAttributes alloc] initWithVendorID:vendorID productID:productID usesThread:usesThread];
 }
 
 @end
