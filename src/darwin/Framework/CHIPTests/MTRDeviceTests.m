@@ -36,6 +36,7 @@
 #import "MTRTestStorage.h"
 
 #import <math.h> // For INFINITY
+#import <os/lock.h>
 
 // system dependencies
 #import <XCTest/XCTest.h>
