@@ -39,8 +39,8 @@ int main(int argc, char * argv[])
         return -1;
     }
 
-    WiFiNetworkManagement::Server::Instance().SetNetworkCredentials(ByteSpanFromCharSpan("MatterAP"_span),
-                                                                    ByteSpanFromCharSpan("Setec Astronomy"_span));
+    WiFiNetworkManagementServer::Instance().SetNetworkCredentials(ByteSpanFromCharSpan("MatterAP"_span),
+                                                                  ByteSpanFromCharSpan("Setec Astronomy"_span));
 
     ChipLinuxAppMainLoop();
     return 0;

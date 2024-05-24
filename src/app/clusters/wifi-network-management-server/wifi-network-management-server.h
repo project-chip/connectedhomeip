@@ -30,31 +30,31 @@ void emberAfWiFiNetworkManagementClusterServerInitCallback(chip::EndpointId);
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace WiFiNetworkManagement {
 
-class Server : private AttributeAccessInterface, private CommandHandlerInterface
+class WiFiNetworkManagementServer : private AttributeAccessInterface, private CommandHandlerInterface
 {
 public:
-    static Server & Instance();
+    static WiFiNetworkManagementServer & Instance();
 
     CHIP_ERROR ClearNetworkCredentials();
     CHIP_ERROR SetNetworkCredentials(ByteSpan ssid, ByteSpan passphrase);
 
 private:
-    friend Global<Server>;
+    friend Global<WiFiNetworkManagementServer>;
     friend void ::emberAfWiFiNetworkManagementClusterServerInitCallback(chip::EndpointId);
 
-    Server();
-    ~Server();
+    WiFiNetworkManagementServer();
+    ~WiFiNetworkManagementServer();
     CHIP_ERROR Init(EndpointId endpoint);
 
-    Server(Server const &)             = delete;
-    Server & operator=(Server const &) = delete;
+    WiFiNetworkManagementServer(WiFiNetworkManagementServer const &)             = delete;
+    WiFiNetworkManagementServer & operator=(WiFiNetworkManagementServer const &) = delete;
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
     void InvokeCommand(HandlerContext & handlerContext) override;
 
-    void HandleNetworkPassphraseRequest(HandlerContext & ctx, const Commands::NetworkPassphraseRequest::DecodableType & req);
+    void HandleNetworkPassphraseRequest(HandlerContext & ctx,
+                                        const WiFiNetworkManagement::Commands::NetworkPassphraseRequest::DecodableType & req);
 
     EndpointId mEndpointId = kInvalidEndpointId;
 
@@ -69,7 +69,6 @@ private:
     bool HaveNetworkCredentials() { return mSsidLen > 0; }
 };
 
-} // namespace WiFiNetworkManagement
 } // namespace Clusters
 } // namespace app
 } // namespace chip
