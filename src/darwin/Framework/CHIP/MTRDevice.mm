@@ -2158,7 +2158,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
                        return;
                    }
 
-                   MTR_LOG("%@ Subscribe with data version list size %lu, reduced by %lu", self, (unsigned long) dataVersions.count, (unsigned long) dataVersionFilterListSizeReduction);
+                   MTR_LOG("%@ Subscribe with data version list size %lu, reduced by %lu", self, static_cast<unsigned long>(dataVersions.count), static_cast<unsigned long>(dataVersionFilterListSizeReduction));
 
                    // Callback and ClusterStateCache and ReadClient will be deleted
                    // when OnDone is called.
@@ -2388,8 +2388,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 auto readItem = readRequestsNext.firstObject;
                 [readRequestsNext removeObjectAtIndex:0];
                 [readRequestsCurrent addObject:readItem];
-                MTR_LOG("Batching read attribute work item [%llu]: added %@ (now %tu requests total) [0x%016llX:%@:0x%llx:0x%llx]",
-                    workItemID, readItem, readRequestsCurrent.count, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
+                MTR_LOG("Batching read attribute work item [%llu]: added %@ (now %lu requests total) [0x%016llX:%@:0x%llx:0x%llx]",
+                    workItemID, readItem, static_cast<unsigned long>(readRequestsCurrent.count), nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
                 outcome = MTRBatchedPartially;
             }
             NSCAssert(readRequestsNext.count == 0, @"should have batched everything or returned early");
@@ -2516,7 +2516,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
         if (writeRequestsCurrent.count != 1) {
             // Very unexpected!
-            MTR_LOG_ERROR("Batching write attribute work item [%llu]: Unexpected write request count %tu", workItemID, writeRequestsCurrent.count);
+            MTR_LOG_ERROR("Batching write attribute work item [%llu]: Unexpected write request count %lu", workItemID, static_cast<unsigned long>(writeRequestsCurrent.count));
             return MTRNotBatched;
         }
 
@@ -2551,7 +2551,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         MTRBaseDevice * baseDevice = [self newBaseDevice];
         // Make sure to use writeRequests here, because that's what our batching
         // handler will modify as needed.
-        NSCAssert(writeRequests.count == 1, @"Incorrect number of write requests: %tu", writeRequests.count);
+        NSCAssert(writeRequests.count == 1, @"Incorrect number of write requests: %lu", static_cast<unsigned long>(writeRequests.count));
 
         auto * request = writeRequests[0];
         MTRAttributePath * path = request[MTRDeviceWriteRequestFieldPathIndex];
