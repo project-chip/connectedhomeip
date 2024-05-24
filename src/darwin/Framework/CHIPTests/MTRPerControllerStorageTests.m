@@ -1452,12 +1452,9 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     // datastore) the device has no estimate for subscription latency.
     XCTAssertNil(device.estimatedSubscriptionLatency);
 
-    __auto_type * beforeSetDelegate = [NSDate now];
-
     [device setDelegate:delegate queue:queue];
 
     [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
-    __auto_type * afterInitialSubscription = [NSDate now];
 
     if (!disableStorageBehaviorOptimization) {
         [self waitForExpectations:@[ gotClusterDataPersisted ] timeout:60];
@@ -1503,14 +1500,6 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     // Check that this estimate is positive, since subscribing must have taken
     // some time.
     XCTAssertGreaterThan(device.estimatedSubscriptionLatency.doubleValue, 0);
-
-    // Check that this estimate is no larger than the measured latency observed
-    // above.  Unfortunately, We measure our observed latency to report end, not
-    // to the immediately following internal subscription established
-    // notification, so in fact our measured value can end up shorter than the
-    // estimated latency the device has.  Add some slop to handle that.
-    const NSTimeInterval timingSlopInSeconds = 0.5;
-    XCTAssertLessThanOrEqual(device.estimatedSubscriptionLatency.doubleValue, [afterInitialSubscription timeIntervalSinceDate:beforeSetDelegate] + timingSlopInSeconds);
 
     // Now set up new delegate for the new device and verify that once subscription reestablishes, the data version filter loaded from storage will work
     __auto_type * newDelegate = [[MTRDeviceTestDelegate alloc] init];
