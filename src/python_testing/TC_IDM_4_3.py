@@ -24,7 +24,7 @@ import time
 import chip.clusters as Clusters
 from chip.ChipDeviceCtrl import ChipDeviceController
 from chip.clusters import ClusterObjects as ClusterObjects
-from chip.clusters.Attribute import AttributePath, TypedAttributePath
+from chip.clusters.Attribute import AttributePath, TypedAttributePath, AsyncReadTransaction
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
 from matter_testing_support import AttributeChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main, EventChangeCallback
@@ -91,9 +91,13 @@ class TC_IDM_4_3(MatterBaseTest):
                 # TestStep(21, "TH sends a subscription request to subscribe to all attributes from a specific cluster on all endpoints. AttributePath = [[Cluster = ClusterID]]. Set the MinIntervalFloor to some value say \"N\"(seconds). Change all or few of the attributes on the DUT",
                 #          "Verify that the DUT sends reports for all the attributes that have changed after N seconds.")
                 ]
-        
+
+    def on_notify_subscription_still_active(self):
+        print("NotifyLogic")
+
     @async_test_body
     async def test_TC_IDM_4_3(self):
+        print("Hey there")
 
         # Test setup
         node_label_attr = Clusters.BasicInformation.Attributes.NodeLabel
@@ -111,22 +115,25 @@ class TC_IDM_4_3(MatterBaseTest):
             reportInterval=(3, 5),
             keepSubscriptions=False
         )
-        
-        
-        
-        
+
+
+
+
+
+
+
+        sub_th_step1a.SetNotifySubscriptionStillActiveCallback(self.on_notify_subscription_still_active)
+
         secs = 60
         print(f"\n\n\n\n\nTime to sleep {secs} second(s)")
         time.sleep(secs)
         print(f"Rise and shine after {secs} second(s)\n\n\n\n\n")
 
-        
-        
-        
-        
-        
-        
-        
+
+
+
+
+
 
         # Verify that the subscription is activated between TH and DUT
         # Verify on the TH, a report data message is received.
@@ -150,14 +157,14 @@ class TC_IDM_4_3(MatterBaseTest):
         # Set Attribute Update Callback
         node_label_update_cb = AttributeChangeCallback(node_label_attr)
         sub_th_step1a.SetAttributeUpdateCallback(node_label_update_cb)
-    
+
         # Modify attribute value
         new_node_label_write = "NewNodeLabel_11001100"
         await TH.WriteAttribute(
             self.dut_node_id,
             [(0, node_label_attr(value=new_node_label_write))]
         )
-        
+
         node_label_update_cb.wait_for_report()
 
 
