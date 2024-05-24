@@ -510,13 +510,13 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
 {
     // Sanity check for kStructureSize to ensure that it matches the PacketBuffer size.
     static_assert(PacketBuffer::kStructureSize == sizeof(PacketBuffer), "PacketBuffer size mismatch");
-    // Setting a static upper bound on kStructureSize to ensure the summation of all the sizes do not overflow.
+    // Setting a static upper bound on kStructureSize to ensure the summation of all the sizes does not overflow.
     static_assert(PacketBuffer::kStructureSize <= UINT16_MAX, "kStructureSize should not exceed UINT16_MAX.");
-    // Setting a static upper bound on the maximum buffer size allocation for regular sized messages(not large).
+    // Setting a static upper bound on the maximum buffer size allocation for regular sized messages (not large).
     static_assert(PacketBuffer::kMaxSizeWithoutReserve <= UINT16_MAX, "kMaxSizeWithoutReserve should not exceed UINT16_MAX.");
 
     // Ensure that aAvailableSize is bound within a max and is not big enough to cause overflow during
-    // subsequent addtion of all the sizes.
+    // subsequent addition of all the sizes.
     if (aAvailableSize > UINT32_MAX)
     {
         ChipLogError(chipSystemLayer,
