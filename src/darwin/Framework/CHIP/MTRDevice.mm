@@ -101,6 +101,14 @@ NSNumber * MTRClampedNumber(NSNumber * aNumber, NSNumber * min, NSNumber * max)
     return aNumber;
 }
 
+/* BEGIN DRAGONS: Note methods here cannot be renamed, and are used by private callers, do not rename, remove or modify behavior here */
+
+@interface NSObject (MatterPrivateForInternalDragonsDoNotFeed)
+- (void)_deviceInternalStateChanged:(MTRDevice *)device;
+@end
+
+/* END DRAGONS */
+
 #pragma mark - SubscriptionCallback class declaration
 using namespace chip;
 using namespace chip::app;
@@ -118,8 +126,8 @@ public:
         UnsolicitedMessageFromPublisherHandler unsolicitedMessageFromPublisherHandler, ReportBeginHandler reportBeginHandler,
         ReportEndHandler reportEndHandler)
         : MTRBaseSubscriptionCallback(attributeReportCallback, eventReportCallback, errorCallback, resubscriptionCallback,
-            subscriptionEstablishedHandler, onDoneHandler, unsolicitedMessageFromPublisherHandler, reportBeginHandler,
-            reportEndHandler)
+              subscriptionEstablishedHandler, onDoneHandler, unsolicitedMessageFromPublisherHandler, reportBeginHandler,
+              reportEndHandler)
     {
     }
 
@@ -3278,10 +3286,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 @end
 
 /* BEGIN DRAGONS: Note methods here cannot be renamed, and are used by private callers, do not rename, remove or modify behavior here */
-
-@interface NSObject (MatterPrivateForInternalDragonsDoNotFeed)
-- (void)_deviceInternalStateChanged:(MTRDevice *)device;
-@end
 
 @implementation MTRDevice (MatterPrivateForInternalDragonsDoNotFeed)
 
