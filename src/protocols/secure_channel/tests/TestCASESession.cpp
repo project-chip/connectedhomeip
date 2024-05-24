@@ -71,7 +71,6 @@ public:
         chip::Test::LoopbackMessagingContext::SetUp();
     }
     virtual void TearDown() override { chip::Test::LoopbackMessagingContext::TearDown(); }
-
 };
 
 void ServiceEvents(TestContext & ctx)
