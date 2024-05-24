@@ -47,8 +47,8 @@ limitations under the License.
     <attribute side="server" code="0x0003" define="MIN_POWER"           type="int8u"     default="10"  writable="false" optional="true">MinPower</attribute>
     <attribute side="server" code="0x0004" define="MAX_POWER"           type="int8u"     default="100" writable="false" optional="true">MaxPower</attribute>
     <attribute side="server" code="0x0005" define="POWER_STEP"          type="int8u"     default="10"  writable="false" optional="true">PowerStep</attribute>
-    <attribute side="server" code="0x0006" define="SUPPORTED_WATTS"     type="array" entryType="int16u" writable="false" optional="true">SupportedWatts</attribute>
-    <attribute side="server" code="0x0007" define="SELECTED_WATT_INDEX" type="int8u"                   writable="false" optional="true">SelectedWattIndex</attribute>
+    <attribute apiMaturity="provisional" side="server" code="0x0006" define="SUPPORTED_WATTS"     type="array" entryType="int16u" writable="false" optional="true">SupportedWatts</attribute>
+    <attribute apiMaturity="provisional" side="server" code="0x0007" define="SELECTED_WATT_INDEX" type="int8u"                   writable="false" optional="true">SelectedWattIndex</attribute>
     <attribute side="server" code="0x0008" define="WATT_RATING"         type="int16u"                  writable="false" optional="true">WattRating</attribute>
 
     <command source="client" code="0x00" name="SetCookingParameters" optional="false">
