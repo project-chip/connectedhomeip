@@ -571,7 +571,7 @@ NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV
         return _MakeDataValueDictionary(typeName, array, dataVersion);
     }
     default:
-        MTR_LOG_ERROR("Error: Unsupported TLV type for conversion: %u", static_cast<unsigned> data->GetType());
+        MTR_LOG_ERROR("Error: Unsupported TLV type for conversion: %u", static_cast<unsigned> (data->GetType()));
         return nil;
     }
 }

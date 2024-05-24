@@ -265,14 +265,14 @@ using namespace chip::Tracing::DarwinFramework;
                 concurrentSubscriptionPoolSize = static_cast<NSUInteger>(subscriptionPoolSizeOverride);
             }
 
-            MTR_LOG(" *** Overriding pool size of MTRDeviceController with: %lu", static_cast<unsigned long> concurrentSubscriptionPoolSize);
+            MTR_LOG(" *** Overriding pool size of MTRDeviceController with: %lu", static_cast<unsigned long> (concurrentSubscriptionPoolSize));
         }
 
         if (!concurrentSubscriptionPoolSize) {
             concurrentSubscriptionPoolSize = 1;
         }
 
-        MTR_LOG("Setting up pool size of MTRDeviceController with: %lu", static_cast<unsigned long> concurrentSubscriptionPoolSize);
+        MTR_LOG("Setting up pool size of MTRDeviceController with: %lu", static_cast<unsigned long> (concurrentSubscriptionPoolSize));
 
         _concurrentSubscriptionPool = [[MTRAsyncWorkQueue alloc] initWithContext:self width:concurrentSubscriptionPoolSize];
 
@@ -1842,7 +1842,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 - (BOOL)openPairingWindow:(uint64_t)deviceID duration:(NSUInteger)duration error:(NSError * __autoreleasing *)error
 {
     if (duration > UINT16_MAX) {
-        MTR_LOG_ERROR("Error: Duration %lu is too large. Max value %d", static_cast<unsigned long> duration, UINT16_MAX);
+        MTR_LOG_ERROR("Error: Duration %lu is too large. Max value %d", static_cast<unsigned long>(duration), UINT16_MAX);
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
         }
@@ -1868,7 +1868,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
                                  error:(NSError * __autoreleasing *)error
 {
     if (duration > UINT16_MAX) {
-        MTR_LOG_ERROR("Error: Duration %lu is too large. Max value %d", static_cast<unsigned long> duration, UINT16_MAX);
+        MTR_LOG_ERROR("Error: Duration %lu is too large. Max value %d", static_cast<unsigned long>(duration), UINT16_MAX);
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
         }
@@ -1876,7 +1876,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     }
 
     if (discriminator > 0xfff) {
-        MTR_LOG_ERROR("Error: Discriminator %lu is too large. Max value %d", static_cast<unsigned long> discriminator, 0xfff);
+        MTR_LOG_ERROR("Error: Discriminator %lu is too large. Max value %d", static_cast<unsigned long>(discriminator), 0xfff);
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
         }
