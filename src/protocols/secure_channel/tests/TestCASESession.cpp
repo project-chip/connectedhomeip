@@ -64,7 +64,13 @@ public:
     static void SetUpTestSuite();
     // Performs shared teardown for all tests in the test suite
     static void TearDownTestSuite();
-    virtual void SetUp() override { chip::Test::LoopbackMessagingContext::SetUp(); }
+
+    virtual void SetUp() override
+    {
+        ConfigInitializeNodes(false);
+        chip::Test::LoopbackMessagingContext::SetUp();
+    }
+
     virtual void TearDown() override { chip::Test::LoopbackMessagingContext::TearDown(); }
 
     void ServiceEvents();
