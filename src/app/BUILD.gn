@@ -246,8 +246,6 @@ static_library("interaction-model") {
       "dynamic_server/AccessControl.cpp",
       "dynamic_server/AccessControl.h",
       "dynamic_server/DynamicDispatcher.cpp",
-      "util/privilege-storage.cpp",
-      "util/privilege-storage.h",
     ]
 
     public_deps += [
@@ -305,6 +303,12 @@ source_set("required-privileges") {
     ":paths",
     "${chip_root}/src/access:types",
   ]
+  if (chip_build_controller_dynamic_server) {
+    sources += [
+      "util/privilege-storage.cpp",
+      "util/privilege-storage.h",
+    ]
+  }
 }
 
 source_set("status-response") {
