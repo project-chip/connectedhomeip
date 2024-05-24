@@ -1,0 +1,116 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: X.1.1. [TC-MTRID-1.1] Global Attributes with DUT as Server
+
+PICS:
+    - MTRID.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Meter Identification"
+    endpoint: 1
+
+tests:
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: Read the global attribute: ClusterRevision"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 3  
+          constraints:
+              type: int16u
+
+    - label: "Step 3: Read the global attribute: FeatureMap"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
+
+    - label: "Step 4a: Read the global attribute: AttributeList"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [
+                         0x0000,
+                         0x0001,
+                         0x0002,
+                         0x0009,
+                         0x000A,
+                         0x000B,
+                         0xFFF8, # GeneratedCommandList
+                         0xFFF9, # AcceptedCommandList
+                         0xFFFA, # EventList
+                         0xFFFB, # AttributeList
+                         0xFFFC, # FeatureMap
+                         0xFFFD  # ClusterRevision                          
+                        ]
+
+    - label: "Step 4a: Read the global attribute: AttributeList"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [
+                         0x0000,
+                         0x0001,
+                         0x0002,
+                         0x0009,
+                         0x000A,
+                         0x000B,
+                         0xFFF8, # GeneratedCommandList
+                         0xFFF9, # AcceptedCommandList
+                         0xFFFB, # AttributeList
+                         0xFFFC, # FeatureMap
+                         0xFFFD  # ClusterRevision                          
+                        ]
+
+    - label: "Step 5: Read the global attribute: EventList"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Step 6: Read the global attribute: AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Step 7: Read the global attribute: GeneratedCommandList"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
