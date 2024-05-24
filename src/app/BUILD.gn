@@ -308,6 +308,14 @@ source_set("required-privileges") {
       "util/privilege-storage.cpp",
       "util/privilege-storage.h",
     ]
+
+    public_deps += [
+      ":global-attributes",
+      "${chip_root}/src/access",
+      "${chip_root}/src/app/dynamic_server:mock-codegen-includes",
+    ]
+
+    public_configs += [ ":config-controller-dynamic-server" ]
   }
 }
 
