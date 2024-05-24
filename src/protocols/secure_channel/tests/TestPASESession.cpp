@@ -88,10 +88,13 @@ class TestPASESession : public chip::Test::LoopbackMessagingContext, public ::te
 {
 public:
     // Performs shared setup for all tests in the test suite
-    static void SetUpTestSuite()
+    static void SetUpTestSuite() { chip::Test::LoopbackMessagingContext::SetUpTestSuite(); }
+    static void TearDownTestSuite() { chip::Test::LoopbackMessagingContext::TearDownTestSuite(); }
+
+    void SetUp() override
     {
         ConfigInitializeNodes(false);
-        chip::Test::LoopbackMessagingContext::SetUpTestSuite();
+        chip::Test::LoopbackMessagingContext::SetUp();
     }
     static void TearDownTestSuite() { chip::Test::LoopbackMessagingContext::TearDownTestSuite(); }
 

@@ -336,7 +336,6 @@ CHIP_ERROR InitCredentialSets()
 
 void TestCASESession::SetUpTestSuite()
 {
-    ConfigInitializeNodes(false);
     CHIP_ERROR err = CHIP_NO_ERROR;
     LoopbackMessagingContext::SetUpTestSuite();
 
