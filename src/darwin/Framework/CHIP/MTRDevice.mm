@@ -118,8 +118,8 @@ public:
         UnsolicitedMessageFromPublisherHandler unsolicitedMessageFromPublisherHandler, ReportBeginHandler reportBeginHandler,
         ReportEndHandler reportEndHandler)
         : MTRBaseSubscriptionCallback(attributeReportCallback, eventReportCallback, errorCallback, resubscriptionCallback,
-            subscriptionEstablishedHandler, onDoneHandler, unsolicitedMessageFromPublisherHandler, reportBeginHandler,
-            reportEndHandler)
+              subscriptionEstablishedHandler, onDoneHandler, unsolicitedMessageFromPublisherHandler, reportBeginHandler,
+              reportEndHandler)
     {
     }
 
@@ -3292,11 +3292,11 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     return HaveSubscriptionEstablishedRightNow(_internalDeviceState);
 }
 
-- (void)_deviceMayBeOnline
+- (void)_deviceMayBeReachable
 {
     assertChipStackLockedByCurrentThread();
 
-    MTR_LOG("%@ deviceMayBeOnline called", self);
+    MTR_LOG("%@ _deviceMayBeReachable called", self);
 
     [self _triggerResubscribeWithReason:"SPI client indicated the device may now be online"
                     nodeLikelyReachable:YES];
