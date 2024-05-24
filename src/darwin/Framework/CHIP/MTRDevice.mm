@@ -101,6 +101,14 @@ NSNumber * MTRClampedNumber(NSNumber * aNumber, NSNumber * min, NSNumber * max)
     return aNumber;
 }
 
+/* BEGIN DRAGONS: Note methods here cannot be renamed, and are used by private callers, do not rename, remove or modify behavior here */
+
+@interface NSObject (MatterPrivateForInternalDragonsDoNotFeed)
+- (void)_deviceInternalStateChanged:(MTRDevice *)device;
+@end
+
+/* END DRAGONS */
+
 #pragma mark - SubscriptionCallback class declaration
 using namespace chip;
 using namespace chip::app;
@@ -949,6 +957,15 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     _internalDeviceState = state;
     if (lastState != state) {
         MTR_LOG("%@ internal state change %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
+
+        /* BEGIN DRAGONS: This is a huge hack for a specific use case, do not rename, remove or modify behavior here */
+        id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
+        if ([delegate respondsToSelector:@selector(_deviceInternalStateChanged:)]) {
+            dispatch_async(_delegateQueue, ^{
+                [(id) delegate _deviceInternalStateChanged:self];
+            });
+        }
+        /* END DRAGONS */
     }
 }
 
@@ -3503,6 +3520,31 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     [self.temporaryMetaDataCache removeObjectForKey:[NSString stringWithFormat:@"%@:%@", key, endpointID]];
 }
+
+@end
+
+/* BEGIN DRAGONS: Note methods here cannot be renamed, and are used by private callers, do not rename, remove or modify behavior here */
+
+@implementation MTRDevice (MatterPrivateForInternalDragonsDoNotFeed)
+
+- (BOOL)_deviceHasActiveSubscription
+{
+    std::lock_guard lock(_lock);
+
+    return HaveSubscriptionEstablishedRightNow(_internalDeviceState);
+}
+
+- (void)_deviceMayBeReachable
+{
+    assertChipStackLockedByCurrentThread();
+
+    MTR_LOG("%@ _deviceMayBeReachable called", self);
+
+    [self _triggerResubscribeWithReason:"SPI client indicated the device may now be reachable"
+                    nodeLikelyReachable:YES];
+}
+
+/* END DRAGONS */
 
 @end
 
