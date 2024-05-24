@@ -96,4 +96,20 @@
     }
 }
 
+- (void)unitTestClusterDataPersisted:(MTRDevice *)device
+{
+    if (self.onClusterDataPersisted != nil) {
+        self.onClusterDataPersisted();
+    }
+}
+
+@end
+
+@implementation MTRDeviceTestDelegateWithSubscriptionSetupOverride
+
+- (BOOL)unitTestShouldSetUpSubscriptionForDevice:(MTRDevice *)device
+{
+    return !_skipSetupSubscription;
+}
+
 @end
