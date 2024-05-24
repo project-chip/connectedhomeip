@@ -20,8 +20,8 @@
 #include <access/AccessControl.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/RequiredPrivilege.h>
-#include <app/util/MatterCallbacks.h>
 #include <app/StatusResponse.h>
+#include <app/util/MatterCallbacks.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/TLVData.h>
