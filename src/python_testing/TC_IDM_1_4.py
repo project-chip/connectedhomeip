@@ -74,7 +74,11 @@ class TC_IDM_1_4(MatterBaseTest):
         cap_for_batch_commands = 100
         number_of_commands_to_send = min(max_paths_per_invoke + 1, cap_for_batch_commands)
 
+        # Use a valid (according to MEI definition) command-id (in this case belonging to Test Vendor MC with prefix 0xfff4)
+        # which should never be existing on a prodiction device. We use this decodable id to prevent hitting issues with the
+        # specification being not clearly defined in respect to decoding vs processing the invoke requests.
         invalid_command_id = 0xfff4_00ff
+
         list_of_commands_to_send = []
         for endpoint_index in range(number_of_commands_to_send):
             # Using Toggle command to form the base as it is a command that doesn't take
