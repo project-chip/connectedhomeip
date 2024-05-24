@@ -57,6 +57,7 @@
         "Test_TC_DGETH_2_2"
     ],
     "DiagnosticsLogs": ["Test_TC_DLOG_1_1"],
+    "DishwasherMode": ["Test_TC_DISHM_1_1"],
     "EnergyEVSE": ["Test_TC_EEVSE_1_1", "Test_TC_EEVSE_2_1"],
     "EnergyEVSEMode": [
         "Test_TC_EEVSEM_1_1",
@@ -406,6 +407,7 @@
         "DeviceEnergyManagementMode",
         "Descriptor",
         "DiagnosticsLogs",
+        "DishwasherMode",
         "EthernetNetworkDiagnostics",
         "EnergyEVSE",
         "EnergyEVSEMode",
