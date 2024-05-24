@@ -304,22 +304,21 @@ def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool
             paa_certificate_object.public_key().verify(crl_signer_certificate.signature,
                                                        crl_signer_certificate.tbs_certificate_bytes,
                                                        ec.ECDSA(crl_signer_certificate.signature_hash_algorithm))
-        except Exception as e:
+        except Exception:
             logging.warning("CRL Signer Certificate is not signed by PAA Certificate, continue...")
-            logging.error("Error: ", e)
             continue
 
         # 6. Obtain the CRL
         logging.debug(f"Fetching CRL from {revocation_point['dataURL']}")
         try:
             r = requests.get(revocation_point["dataURL"], timeout=5)
-        except Exception as e:
+        except Exception:
             logging.error('Failed to fetch CRL')
             continue
 
         try:
             crl_file = x509.load_der_x509_crl(r.content)
-        except Exception as e:
+        except Exception:
             logging.error('Failed to load CRL')
             continue
 
@@ -374,16 +373,10 @@ def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool
                 pass
 
             # b.
-            try:
-                revoked_cert_authority_key_id = revoked_cert.extensions.get_extension_for_oid(
-                    x509.OID_AUTHORITY_KEY_IDENTIFIER).value.key_identifier
-
-                if revoked_cert_authority_key_id is None or revoked_cert_authority_key_id != crl_signer_subject_key_id:
-                    logging.warning("CRL Authority Key ID is not CRL Signer Subject Key ID, continue...")
-                    continue
-            except Exception:
-                logging.warning("CRL Authority Key ID not found, continue...")
-                continue
+            # TODO: Verify that the certificate chain of the entry is linking to the same PAA
+            #       that issued the CRLSignerCertificate for this entry, including path through
+            #       CRLSignerDelegator if present. If the PAAs under which were issued the certificate
+            #       and the CRLSignerCertificate are different, ignore the entry.
 
             # c. and d.
             serialnumber_list.append(bytes(str('{:02X}'.format(revoked_cert.serial_number)), 'utf-8').decode('utf-8'))
