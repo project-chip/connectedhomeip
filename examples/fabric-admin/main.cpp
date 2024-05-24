@@ -18,13 +18,42 @@
 
 #include <commands/clusters/SubscriptionsCommands.h>
 #include <commands/common/Commands.h>
+#include <commands/fabric-sync/Commands.h>
 #include <commands/interactive/Commands.h>
 #include <commands/pairing/Commands.h>
 #include <zap-generated/cluster/Commands.h>
 
 #include <iostream>
 #include <string>
+#include <thread>
 #include <vector>
+
+#if defined(PW_RPC_ENABLED)
+#include <rpc/RpcClient.h>
+#include <rpc/RpcServer.h>
+#endif
+
+#define RETRY_INTERVAL_S (3)
+
+void ApplicationInit()
+{
+#if defined(PW_RPC_ENABLED)
+    InitRpcServer(kFabricAdminServerPort);
+    ChipLogProgress(NotSpecified, "PW_RPC initialized.");
+
+    while (true)
+    {
+        if (InitRpcClient(kFabricBridgeServerPort) == CHIP_NO_ERROR)
+        {
+            ChipLogProgress(NotSpecified, "Connected to Fabric-Bridge");
+            break;
+        }
+
+        ChipLogError(NotSpecified, "Failed to connect to Fabric-Bridge, retry in %d seconds....", RETRY_INTERVAL_S);
+        std::this_thread::sleep_for(std::chrono::seconds(RETRY_INTERVAL_S));
+    }
+#endif
+}
 
 // ================================================================================
 // Main Code
@@ -45,6 +74,7 @@ int main(int argc, char * argv[])
     ExampleCredentialIssuerCommands credIssuerCommands;
     Commands commands;
 
+    registerCommandsFabricSync(commands, &credIssuerCommands);
     registerCommandsInteractive(commands, &credIssuerCommands);
     registerCommandsPairing(commands, &credIssuerCommands);
     registerClusters(commands, &credIssuerCommands);
@@ -55,6 +85,8 @@ int main(int argc, char * argv[])
     {
         c_args.push_back(const_cast<char *>(arg.c_str()));
     }
+
+    ApplicationInit();
 
     return commands.Run(static_cast<int>(c_args.size()), c_args.data());
 }
