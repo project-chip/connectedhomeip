@@ -1170,33 +1170,26 @@ class ChipDeviceControllerBase():
         # Concrete path
         typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]]
     ]):
-        endpoint = None
-        cluster = None
-        attribute = None
-
         if pathTuple == ('*') or pathTuple == ():
             # Wildcard
-            pass
+            return ClusterAttribute.AttributePath()
         elif not isinstance(pathTuple, tuple):
             if isinstance(pathTuple, int):
-                endpoint = pathTuple
+                return ClusterAttribute.AttributePath(EndpointId=pathTuple)
             elif issubclass(pathTuple, ClusterObjects.Cluster):
-                cluster = pathTuple
+                return ClusterAttribute.AttributePath.from_cluster(EndpointId=None, Cluster=pathTuple)
             elif issubclass(pathTuple, ClusterObjects.ClusterAttributeDescriptor):
-                attribute = pathTuple
+                return ClusterAttribute.AttributePath.from_attribute(EndpointId=None, Attribute=pathTuple)
             else:
                 raise ValueError("Unsupported Attribute Path")
         else:
             # endpoint + (cluster) attribute / endpoint + cluster
-            endpoint = pathTuple[0]
             if issubclass(pathTuple[1], ClusterObjects.Cluster):
-                cluster = pathTuple[1]
+                return ClusterAttribute.AttributePath.from_cluster(EndpointId=pathTuple[0], Cluster=pathTuple[1])
             elif issubclass(pathTuple[1], ClusterAttribute.ClusterAttributeDescriptor):
-                attribute = pathTuple[1]
+                return ClusterAttribute.AttributePath.from_attribute(EndpointId=pathTuple[0], Attribute=pathTuple[1])
             else:
                 raise ValueError("Unsupported Attribute Path")
-        return ClusterAttribute.AttributePath(
-            EndpointId=endpoint, Cluster=cluster, Attribute=attribute)
 
     def _parseDataVersionFilterTuple(self, pathTuple: typing.List[typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int]]):
         endpoint = None
@@ -1209,7 +1202,7 @@ class ChipDeviceControllerBase():
         else:
             raise ValueError("Unsupported Cluster Path")
         dataVersion = pathTuple[2]
-        return ClusterAttribute.DataVersionFilter(
+        return ClusterAttribute.DataVersionFilter.from_cluster(
             EndpointId=endpoint, Cluster=cluster, DataVersion=dataVersion)
 
     def _parseEventPathTuple(self, pathTuple: typing.Union[
@@ -1226,39 +1219,31 @@ class ChipDeviceControllerBase():
         typing.Tuple[int,
                      typing.Type[ClusterObjects.ClusterEvent], int]
     ]):
-        endpoint = None
-        cluster = None
-        event = None
-        urgent = False
         if pathTuple in [('*'), ()]:
             # Wildcard
-            pass
+            return ClusterAttribute.EventPath()
         elif not isinstance(pathTuple, tuple):
             logging.debug(type(pathTuple))
             if isinstance(pathTuple, int):
-                endpoint = pathTuple
+                return ClusterAttribute.EventPath(EndpointId=pathTuple)
             elif issubclass(pathTuple, ClusterObjects.Cluster):
-                cluster = pathTuple
+                return ClusterAttribute.EventPath.from_cluster(EndpointId=None, Cluster=pathTuple)
             elif issubclass(pathTuple, ClusterObjects.ClusterEvent):
-                event = pathTuple
+                return ClusterAttribute.EventPath.from_event(EndpointId=None, Event=pathTuple)
             else:
                 raise ValueError("Unsupported Event Path")
         else:
             if pathTuple[0] == '*':
-                urgent = pathTuple[-1]
-                pass
+                return ClusterAttribute.EventPath(Urgent=pathTuple[-1])
             else:
+                urgent = bool(pathTuple[-1]) if len(pathTuple) > 2 else False
                 # endpoint + (cluster) event / endpoint + cluster
-                endpoint = pathTuple[0]
                 if issubclass(pathTuple[1], ClusterObjects.Cluster):
-                    cluster = pathTuple[1]
+                    return ClusterAttribute.EventPath.from_cluster(EndpointId=pathTuple[0], Cluster=pathTuple[1], Urgent=urgent)
                 elif issubclass(pathTuple[1], ClusterAttribute.ClusterEvent):
-                    event = pathTuple[1]
+                    return ClusterAttribute.EventPath.from_event(EndpointId=pathTuple[0], Event=pathTuple[1], Urgent=urgent)
                 else:
                     raise ValueError("Unsupported Attribute Path")
-                urgent = bool(pathTuple[-1]) if len(pathTuple) > 2 else False
-        return ClusterAttribute.EventPath(
-            EndpointId=endpoint, Cluster=cluster, Event=event, Urgent=urgent)
 
     async def Read(self, nodeid: int, attributes: typing.List[typing.Union[
         None,  # Empty tuple, all wildcard
@@ -1530,7 +1515,7 @@ class ChipDeviceControllerBase():
 
         result = asyncio.run(self.ReadAttribute(
             nodeid, [(endpoint, attributeType)]))
-        path = ClusterAttribute.AttributePath(
+        path = ClusterAttribute.AttributePath.from_attribute(
             EndpointId=endpoint, Attribute=attributeType)
         return im.AttributeReadResult(path=im.AttributePath(nodeId=nodeid, endpointId=path.EndpointId, clusterId=path.ClusterId, attributeId=path.AttributeId),
                                       status=0, value=result[endpoint][clusterType][attributeType], dataVersion=result[endpoint][clusterType][ClusterAttribute.DataVersion])
