@@ -3302,7 +3302,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     MTR_LOG("%@ _deviceMayBeReachable called", self);
 
-    [self _triggerResubscribeWithReason:"SPI client indicated the device may now be online"
+    [self _triggerResubscribeWithReason:"SPI client indicated the device may now be reachable"
                     nodeLikelyReachable:YES];
 }
 
