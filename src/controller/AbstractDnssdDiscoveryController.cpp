@@ -25,8 +25,7 @@
 namespace chip {
 namespace Controller {
 
-bool compareIpAddresses(const size_t sourceNumIPs, const size_t destinationNumIPs, const Inet::IPAddress * source,
-                        const Inet::IPAddress * destination)
+bool AddressListsSameExceptOrder(const size_t sourceNumIPs, const size_t destinationNumIPs, const Inet::IPAddress source[Dnssd::CommissionNodeData::kMaxIPAddresses], const Inet::IPAddress destination[Dnssd::CommissionNodeData::kMaxIPAddresses])
 {
     size_t sameIpAddress                                                 = 0;
     bool addressUsed[chip::Dnssd::CommonResolutionData::kMaxIPAddresses] = { false };
@@ -65,7 +64,7 @@ void AbstractDnssdDiscoveryController::OnNodeDiscovered(const chip::Dnssd::Disco
             continue;
         }
         if (strcmp(discoveredNode.hostName, nodeData.hostName) == 0 && discoveredNode.port == nodeData.port &&
-            compareIpAddresses(discoveredNode.numIPs, nodeData.numIPs, discoveredNode.ipAddress, nodeData.ipAddress))
+            AddressListsSameExceptOrder(discoveredNode.numIPs, nodeData.numIPs, discoveredNode.ipAddress, nodeData.ipAddress))
         {
             discoveredNode = nodeData;
             if (mDeviceDiscoveryDelegate != nullptr)
