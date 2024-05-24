@@ -1,0 +1,151 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+name: X.2.1. [TC-MTRID-2.1] Attributes with server as DUT
+
+PICS:
+    - MTRID.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Meter Identification"
+    endpoint: 1
+
+tests:
+    - label: "Step 1: Commission DUT to TH"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH reads the CompanyName attribute from the DUT"
+      PICS: MTRID.S.A0000
+      command: "readAttribute"
+      attribute: "CompanyName"
+      response:
+          constraints:
+              type: char_string
+              maxLength: 16
+
+    - label: "Step 3: TH reads the MeterTypeID attribute from the DUT"
+      PICS: MTRID.S.A0001
+      command: "readAttribute"
+      attribute: "MeterTypeID"
+      response:
+          constraints:
+              type: int16u
+
+    - label: "Step 4: TH reads the DataQualityID attribute from the DUT"
+      PICS: MTRID.S.A0002
+      command: "readAttribute"
+      attribute: "DataQualityID"
+      response:
+          constraints:
+              type: int16u
+
+    - label: "Step 5: TH reads the CustomerName attribute from the DUT"
+      PICS: MTRID.S.A0003
+      command: "readAttribute"
+      attribute: "CustomerName"
+      response:
+          constraints:
+              type: char_string
+              maxLength: 16
+
+    - label: "Step 5a: TH writes the CustomerName attribute as 'CUSTOMERNAME'"
+      PICS: MTRID.S.A0003
+      command: "writeAttribute"
+      attribute: "CustomerName"
+      arguments:
+          value: "CUSTOMERNAME"
+
+    - label: "Step 5b: TH reads the CustomerName attribute from the DUT"
+      PICS: MTRID.S.A0003
+      command: "readAttribute"
+      attribute: "CustomerName"
+      response:
+        value: "CUSTOMERNAME"
+
+    - label: "Step 6: TH reads the Model attribute from the DUT"
+      PICS: MTRID.S.A0004
+      command: "readAttribute"
+      attribute: "Model"
+      response:
+          constraints:
+              type: octstr
+              maxLength: 16
+
+    - label: "Step 7: TH reads the PartNumber attribute from the DUT"
+      PICS: MTRID.S.A0005
+      command: "readAttribute"
+      attribute: "PartNumber"
+      response:
+          constraints:
+              type: octstr
+              maxLength: 16
+
+    - label: "Step 8: TH reads the ProductRevision attribute from the DUT"
+      PICS: MTRID.S.A0006
+      command: "readAttribute"
+      attribute: "ProductRevision"
+      response:
+          constraints:
+              type: octstr
+              maxLength: 6
+
+    - label: "Step 9: TH reads the SoftwareRevision attribute from the DUT"
+      PICS: MTRID.S.A0007
+      command: "readAttribute"
+      attribute: "SoftwareRevision"
+      response:
+          constraints:
+              type: octstr
+              maxLength: 6
+
+    - label: "Step 10: TH reads the UtilityName attribute from the DUT"
+      PICS: MTRID.S.A0008
+      command: "readAttribute"
+      attribute: "UtilityName"
+      response:
+          constraints:
+              type: char_string
+              maxLength: 16
+
+    - label: "Step 11: TH reads the POD attribute from the DUT"
+      PICS: MTRID.S.A0009
+      command: "readAttribute"
+      attribute: "POD"
+      response:
+          constraints:
+              type: char_string
+              maxLength: 16
+
+    - label: "Step 12: TH reads the AvailablePower attribute from the DUT"
+      PICS: MTRID.S.A000A
+      command: "readAttribute"
+      attribute: "AvailablePower"
+      response:
+          constraints:
+              type: int24
+
+    - label: "Step 13: TH reads the PowerThreshold attribute from the DUT"
+      PICS: MTRID.S.A000B
+      command: "readAttribute"
+      attribute: "PowerThreshold"
+      response:
+          constraints:
+              type: int24
