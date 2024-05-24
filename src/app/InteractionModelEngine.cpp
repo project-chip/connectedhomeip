@@ -70,7 +70,7 @@ InteractionModelEngine * InteractionModelEngine::GetInstance()
 CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable,
                                         reporting::ReportScheduler * reportScheduler, CASESessionManager * apCASESessionMgr,
                                         SubscriptionResumptionStorage * subscriptionResumptionStorage,
-                                        EventManagement* eventManagement)
+                                        EventManagement * eventManagement)
 {
     VerifyOrReturnError(apFabricTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(apExchangeMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);

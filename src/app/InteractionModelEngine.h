@@ -133,7 +133,7 @@ public:
     CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable,
                     reporting::ReportScheduler * reportScheduler, CASESessionManager * apCASESessionMgr = nullptr,
                     SubscriptionResumptionStorage * subscriptionResumptionStorage = nullptr,
-                    EventManagement* eventManagement = nullptr);
+                    EventManagement * eventManagement                             = nullptr);
 
     void Shutdown();
 
