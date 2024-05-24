@@ -25,6 +25,11 @@ namespace DeviceLayer {
 
 using namespace chip::DeviceLayer::Internal;
 
+CHIP_ERROR FactoryDataProvider::Init()
+{
+    return CHIP_NO_ERROR;
+}
+
 /*
  * Members functions that implement the CommissionableDataProvider
  */

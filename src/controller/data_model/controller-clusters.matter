@@ -3988,7 +3988,7 @@ cluster ActivatedCarbonFilterMonitoring = 114 {
 }
 
 /** This cluster is used to configure a boolean sensor. */
-provisional cluster BooleanStateConfiguration = 128 {
+cluster BooleanStateConfiguration = 128 {
   revision 1;
 
   bitmap AlarmModeBitmap : bitmap8 {
@@ -4046,7 +4046,7 @@ provisional cluster BooleanStateConfiguration = 128 {
 }
 
 /** This cluster is used to configure a valve. */
-provisional cluster ValveConfigurationAndControl = 129 {
+cluster ValveConfigurationAndControl = 129 {
   revision 1;
 
   enum StatusCodeEnum : enum8 {

@@ -140,7 +140,7 @@ qpg_executable("lighting_app") {
     }
   }
 
-  ldscript = "${qpg_sdk_root}/Libraries/Qorvo/QorvoStack/gen/QorvoStack_${qpg_target_ic}/QorvoStack_${qpg_target_ic}.ld"
+  ldscript = "${qpg_sdk_root}/Libraries/Qorvo/QorvoStack/gen/QorvoStack_${qpg_target_ic}${qpg_flavour}/QorvoStack_${qpg_target_ic}${qpg_flavour}.ld"
 
   inputs = [ ldscript ]
 
