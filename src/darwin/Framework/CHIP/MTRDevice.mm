@@ -359,10 +359,6 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
 
 @property (nonatomic) MTRInternalDeviceState internalDeviceState;
 
-// TODO:  cache this once I understand the point in the MTRDevice lifecycle that the relevant attributes will be present.
-// kmo 22 may 2024 14h55
-// @property (nonatomic) MTRDeviceEssentialAttributes * essentialAttributes;
-
 #define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS (1)
 #define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MAX_WAIT_SECONDS (3600)
 @property (nonatomic) uint32_t lastSubscriptionAttemptWait;
@@ -1754,8 +1750,6 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         BOOL isStartUpEvent = (eventPath.cluster.unsignedLongValue == MTRClusterIDTypeBasicInformationID)
             && (eventPath.event.unsignedLongValue == MTREventIDTypeClusterBasicInformationEventStartUpID);
         if (isStartUpEvent) {
-            // REVIEWERS:  this seems like a good place to set up / cache
-            // the essential device attributes - is it?
             if (_estimatedStartTimeFromGeneralDiagnosticsUpTime) {
                 // If UpTime was received, make use of it as mark of system start time
                 MTR_LOG("%@ StartUp event: set estimated start time forward to %@", self,
