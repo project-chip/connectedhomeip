@@ -265,14 +265,14 @@ using namespace chip::Tracing::DarwinFramework;
                 concurrentSubscriptionPoolSize = static_cast<NSUInteger>(subscriptionPoolSizeOverride);
             }
 
-            MTR_LOG(" *** Overriding pool size of MTRDeviceController with: %tu", concurrentSubscriptionPoolSize);
+            MTR_LOG(" *** Overriding pool size of MTRDeviceController with: %lu", (unsigned long) concurrentSubscriptionPoolSize);
         }
 
         if (!concurrentSubscriptionPoolSize) {
             concurrentSubscriptionPoolSize = 1;
         }
 
-        MTR_LOG("Setting up pool size of MTRDeviceController with: %tu", concurrentSubscriptionPoolSize);
+        MTR_LOG("Setting up pool size of MTRDeviceController with: %lu", (unsigned long) concurrentSubscriptionPoolSize);
 
         _concurrentSubscriptionPool = [[MTRAsyncWorkQueue alloc] initWithContext:self width:concurrentSubscriptionPoolSize];
 
@@ -936,8 +936,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (MTRBaseDevice *)deviceBeingCommissionedWithNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error
 {
-    auto block = ^MTRBaseDevice *
-    {
+    auto block = ^MTRBaseDevice * {
         chip::CommissioneeDeviceProxy * deviceProxy;
 
         auto errorCode = self->_cppCommissioner->GetDeviceBeingCommissioned(nodeID.unsignedLongLongValue, &deviceProxy);
@@ -1096,8 +1095,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (NSData * _Nullable)attestationChallengeForDeviceID:(NSNumber *)deviceID
 {
-    auto block = ^NSData *
-    {
+    auto block = ^NSData * {
         chip::CommissioneeDeviceProxy * deviceProxy;
 
         auto errorCode = CHIP_NO_ERROR;
@@ -1842,7 +1840,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 - (BOOL)openPairingWindow:(uint64_t)deviceID duration:(NSUInteger)duration error:(NSError * __autoreleasing *)error
 {
     if (duration > UINT16_MAX) {
-        MTR_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT16_MAX);
+        MTR_LOG_ERROR("Error: Duration %lu is too large. Max value %d", (unsigned long) duration, UINT16_MAX);
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
         }
@@ -1868,7 +1866,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
                                  error:(NSError * __autoreleasing *)error
 {
     if (duration > UINT16_MAX) {
-        MTR_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT16_MAX);
+        MTR_LOG_ERROR("Error: Duration %lu is too large. Max value %d", (unsigned long) duration, UINT16_MAX);
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
         }
@@ -1876,7 +1874,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     }
 
     if (discriminator > 0xfff) {
-        MTR_LOG_ERROR("Error: Discriminator %tu is too large. Max value %d", discriminator, 0xfff);
+        MTR_LOG_ERROR("Error: Discriminator %lu is too large. Max value %d", (unsigned long) discriminator, 0xfff);
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
         }
@@ -1895,8 +1893,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         return nil;
     }
 
-    auto block = ^NSString *
-    {
+    auto block = ^NSString * {
         chip::SetupPayload setupPayload;
         errorCode = chip::Controller::AutoCommissioningWindowOpener::OpenCommissioningWindow(self->_cppCommissioner, deviceID,
             chip::System::Clock::Seconds16(static_cast<uint16_t>(duration)), chip::Crypto::kSpake2p_Min_PBKDF_Iterations,

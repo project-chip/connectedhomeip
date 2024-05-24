@@ -185,7 +185,7 @@ MTR_DIRECT_MEMBERS
         state = @"enqueued";
         break;
     default:
-        return [NSString stringWithFormat:@"<%@ %llu running retry: %tu>", self.class, _uniqueID, self.retryCount];
+        return [NSString stringWithFormat:@"<%@ %llu running retry: %ld>", self.class, _uniqueID, (long) self.retryCount];
     }
     return [NSString stringWithFormat:@"<%@ %llu %@>", self.class, _uniqueID, state];
 }
@@ -236,7 +236,7 @@ struct ContextSnapshot {
 {
     ContextSnapshot context(self);
     std::lock_guard lock(_lock);
-    return [NSString stringWithFormat:@"<%@ context: %@, items count: %tu>", self.class, context.description, _items.count];
+    return [NSString stringWithFormat:@"<%@ context: %@, items count: %lu>", self.class, context.description, (unsigned long) _items.count];
 }
 
 - (void)enqueueWorkItem:(MTRAsyncWorkItem *)item
@@ -268,9 +268,9 @@ struct ContextSnapshot {
         // Logging the description once is enough because other log messages
         // related to the work item (execution, completion etc) can easily be
         // correlated using the unique id.
-        MTR_LOG("MTRAsyncWorkQueue<%@, items count: %tu> enqueued work item [%llu]: %@", context.description, _items.count, item.uniqueID, description);
+        MTR_LOG("MTRAsyncWorkQueue<%@, items count: %lu> enqueued work item [%llu]: %@", context.description, (unsigned long) _items.count, item.uniqueID, description);
     } else {
-        MTR_LOG("MTRAsyncWorkQueue<%@, items count: %tu> enqueued work item [%llu]", context.description, _items.count, item.uniqueID);
+        MTR_LOG("MTRAsyncWorkQueue<%@, items count: %lu> enqueued work item [%llu]", context.description, (unsigned long) _items.count, item.uniqueID);
     }
 
     [self _callNextReadyWorkItemWithContext:context];
@@ -280,7 +280,7 @@ struct ContextSnapshot {
 {
     ContextSnapshot context(self); // outside of lock
     std::lock_guard lock(_lock);
-    MTR_LOG("MTRAsyncWorkQueue<%@> invalidate %tu items", context.description, _items.count);
+    MTR_LOG("MTRAsyncWorkQueue<%@> invalidate %lu items", context.description, (unsigned long) _items.count);
     for (MTRAsyncWorkItem * item in _items) {
         [item cancel];
     }
@@ -316,7 +316,7 @@ struct ContextSnapshot {
 
     [workItem markComplete];
     [_items removeObjectAtIndex:indexOfWorkItem];
-    MTR_LOG("MTRAsyncWorkQueue<%@, items count: %tu> completed work item [%llu]", context.description, _items.count, workItem.uniqueID);
+    MTR_LOG("MTRAsyncWorkQueue<%@, items count: %lu> completed work item [%llu]", context.description, (unsigned long) _items.count, workItem.uniqueID);
 
     // sanity check running work item count is positive
     if (_runningWorkItemCount == 0) {
