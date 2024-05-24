@@ -299,10 +299,12 @@ static_library("attribute-access") {
 
 source_set("required-privileges") {
   sources = [ "RequiredPrivilege.h" ]
+
   public_deps = [
     ":paths",
     "${chip_root}/src/access:types",
   ]
+
   if (chip_build_controller_dynamic_server) {
     sources += [
       "util/privilege-storage.cpp",
@@ -315,7 +317,7 @@ source_set("required-privileges") {
       "${chip_root}/src/app/dynamic_server:mock-codegen-includes",
     ]
 
-    public_configs += [ ":config-controller-dynamic-server" ]
+    public_configs = [ ":config-controller-dynamic-server" ]
   }
 }
 
