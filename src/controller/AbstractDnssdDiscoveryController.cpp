@@ -25,18 +25,19 @@
 namespace chip {
 namespace Controller {
 
-bool compareIpAddresses(const size_t sourceNumIPs, const size_t destinationNumIPs, const Inet::IPAddress *source, const Inet::IPAddress *destination)
+bool compareIpAddresses(const size_t sourceNumIPs, const size_t destinationNumIPs, const Inet::IPAddress * source,
+                        const Inet::IPAddress * destination)
 {
-    size_t sameIpAddress = 0;
-    bool addressUsed[chip::Dnssd::CommonResolutionData::kMaxIPAddresses] = {false};
+    size_t sameIpAddress                                                 = 0;
+    bool addressUsed[chip::Dnssd::CommonResolutionData::kMaxIPAddresses] = { false };
     if (sourceNumIPs != destinationNumIPs)
     {
         return false;
     }
 
-    for (size_t s = 0 ; s < sourceNumIPs ; s++)
+    for (size_t s = 0; s < sourceNumIPs; s++)
     {
-        for (size_t d = 0 ; d < destinationNumIPs ; d++)
+        for (size_t d = 0; d < destinationNumIPs; d++)
         {
             if (!addressUsed[d] && source[s] == destination[d])
             {
