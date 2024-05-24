@@ -21,6 +21,7 @@
 
 #import "MTRAsyncWorkQueue.h"
 #import "MTRDefines_Internal.h"
+#import "MTRDeviceStorageBehaviorConfiguration_Internal.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -113,11 +114,21 @@ MTR_TESTABLE
 - (NSUInteger)unitTestAttributeCount;
 #endif
 
+- (void)setStorageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration;
+
 @end
 
 #pragma mark - Utility for clamping numbers
 // Returns a NSNumber object that is aNumber if it falls within the range [min, max].
 // Returns min or max, if it is below or above, respectively.
 NSNumber * MTRClampedNumber(NSNumber * aNumber, NSNumber * min, NSNumber * max);
+
+#pragma mark - Constants
+
+static NSString * const kDefaultSubscriptionPoolSizeOverrideKey = @"subscriptionPoolSizeOverride";
+static NSString * const kTestStorageUserDefaultEnabledKey = @"enableTestStorage";
+
+// Declared inside platform, but noting here for reference
+// static NSString * const kSRPTimeoutInMsecsUserDefaultKey = @"SRPTimeoutInMSecsOverride";
 
 NS_ASSUME_NONNULL_END

@@ -32,6 +32,7 @@
 #import "MTRBaseDevice.h"
 #import "MTRDeviceController.h"
 #import "MTRDeviceControllerDataStore.h"
+#import "MTRDeviceStorageBehaviorConfiguration.h"
 
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceControllerStartupParams.h>
@@ -113,7 +114,8 @@ NS_ASSUME_NONNULL_BEGIN
                otaProviderDelegate:(id<MTROTAProviderDelegate> _Nullable)otaProviderDelegate
           otaProviderDelegateQueue:(dispatch_queue_t _Nullable)otaProviderDelegateQueue
                   uniqueIdentifier:(NSUUID *)uniqueIdentifier
-    concurrentSubscriptionPoolSize:(NSUInteger)concurrentSubscriptionPoolSize;
+    concurrentSubscriptionPoolSize:(NSUInteger)concurrentSubscriptionPoolSize
+      storageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration;
 
 /**
  * Check whether this controller is running on the given fabric, as represented
