@@ -1883,7 +1883,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     }
 
     [clusterData storeValue:value forAttribute:path.attribute];
-    
+
     if (value != nil
         && isFromSubscription
         && !_receivingPrimingReport
