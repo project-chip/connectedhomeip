@@ -93,39 +93,6 @@ NSString * const MTRDataVersionKey = @"dataVersion";
 }
 @end
 
-// convenience object for commonly-logged device attributes
-@interface MTRDeviceInformationalAttributes : NSObject
-@property (readonly) UInt16 vendorID;
-@property (readonly) UInt16 productID;
-@property (readonly) BOOL usesThread;
-
-- (void)addInformationalAttributesToCurrentMetricScope;
-
-@end
-
-@implementation MTRDeviceInformationalAttributes
-
-- (instancetype)initWithVendorID:(UInt16)vendorID productID:(UInt16)productID usesThread:(BOOL)usesThread {
-    self = [super init];
-    
-    if (self) {
-        _vendorID = vendorID;
-        _productID = productID;
-        _usesThread = usesThread;
-    }
-    
-    return self;
-}
-
-- (void)addInformationalAttributesToCurrentMetricScope {
-    using namespace chip::Tracing::DarwinFramework;
-    MATTER_LOG_METRIC(kMetricDeviceVendorID, _vendorID);
-    MATTER_LOG_METRIC(kMetricDeviceProductID, _productID);
-    MATTER_LOG_METRIC(kMetricDeviceUsesThread, _usesThread);
-}
-
-@end
-
 NSNumber * MTRClampedNumber(NSNumber * aNumber, NSNumber * min, NSNumber * max)
 {
     if ([aNumber compare:min] == NSOrderedAscending) {
@@ -1916,7 +1883,7 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
     }
 
     [clusterData storeValue:value forAttribute:path.attribute];
-
+    
     if (value != nil
         && isFromSubscription
         && !_receivingPrimingReport
@@ -1926,11 +1893,9 @@ static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribe
         // (removals are OK)
         
         // log when a device violates expectations for Changes Omitted Quality attributes.
-        MTRDeviceInformationalAttributes * attributes = [self _informationalAttributesForCurrentState];
-        
         using namespace chip::Tracing::DarwinFramework;
         MATTER_LOG_METRIC_BEGIN(kMetricUnexpectedCQualityUpdate);
-        [attributes addInformationalAttributesToCurrentMetricScope];
+        [self _addInformationalAttributesToCurrentMetricScope];
         MATTER_LOG_METRIC_END(kMetricUnexpectedCQualityUpdate);
         
         return;
@@ -3688,18 +3653,40 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 #pragma mark Log Help
 
-- (MTRDeviceInformationalAttributes *)_informationalAttributesForCurrentState {
-    MTRClusterPath * basicInfoClusterPath = [MTRClusterPath clusterPathWithEndpointID:@(kRootEndpointId) clusterID:@(MTRClusterIDTypeBasicInformationID)];
-    MTRDeviceClusterData * basicInfoClusterData = [self _clusterDataForPath:basicInfoClusterPath];
+- (NSNumber *)_informationalNumberAtAttributePath:(MTRAttributePath *)attributePath {
+    auto * cachedData = [self _cachedAttributeValueForPath:attributePath];
     
-    NSNumber * vidObj = basicInfoClusterData.attributes[@(MTRAttributeIDTypeClusterBasicInformationAttributeVendorIDID)][MTRValueKey];
-    UInt16 vendorID = vidObj.unsignedShortValue;
-    NSNumber * pidObj = basicInfoClusterData.attributes[@(MTRAttributeIDTypeClusterBasicInformationAttributeProductIDID)][MTRValueKey];
-    UInt16 productID = pidObj.unsignedShortValue;
+    auto * attrReport = [[MTRAttributeReport alloc] initWithResponseValue:@{
+        MTRAttributePathKey : attributePath,
+        MTRDataKey : cachedData,
+    } error:nil];
+    // REVIEWERS:  is it worth logging the `error` above?
     
+    return attrReport.value;
+}
+
+- (NSNumber *)_informationalVendorID {
+    auto * vendorIDPath = [MTRAttributePath attributePathWithEndpointID:@(kRootEndpointId)
+                                                                          clusterID:@(MTRClusterIDTypeBasicInformationID)
+                                                                        attributeID:@(MTRClusterBasicAttributeVendorIDID)];
+    
+    return [self _informationalNumberAtAttributePath:vendorIDPath];
+}
+
+- (NSNumber *)_informationalProductID {
+    auto * productIDPath = [MTRAttributePath attributePathWithEndpointID:@(kRootEndpointId)
+                                                                          clusterID:@(MTRClusterIDTypeBasicInformationID)
+                                                                        attributeID:@(MTRClusterBasicAttributeProductIDID)];
+    
+    return [self _informationalNumberAtAttributePath:productIDPath];
+}
+
+- (void)_addInformationalAttributesToCurrentMetricScope {
+    using namespace chip::Tracing::DarwinFramework;
+    MATTER_LOG_METRIC(kMetricDeviceVendorID, [self _informationalVendorID].unsignedShortValue);
+    MATTER_LOG_METRIC(kMetricDeviceProductID, [self _informationalProductID].unsignedShortValue);
     BOOL usesThread = [self _deviceUsesThread];
-    
-    return [[MTRDeviceInformationalAttributes alloc] initWithVendorID:vendorID productID:productID usesThread:usesThread];
+    MATTER_LOG_METRIC(kMetricDeviceUsesThread, usesThread);
 }
 
 @end
