@@ -1378,6 +1378,30 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRServiceAreaClusterSelectLocationsParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRServiceAreaClusterSelectLocationsResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ServiceArea::Commands::SelectLocationsResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRServiceAreaClusterSkipCurrentParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRServiceAreaClusterSkipCurrentResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ServiceArea::Commands::SkipCurrentResponse::DecodableType &)decodableStruct;
+
+@end
+
 @interface MTRThermostatClusterSetpointRaiseLowerParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;

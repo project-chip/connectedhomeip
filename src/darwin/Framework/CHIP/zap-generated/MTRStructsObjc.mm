@@ -6232,6 +6232,174 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRServiceAreaClusterHomeLocationStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _locationName = @"";
+
+        _floorNumber = nil;
+
+        _areaType = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRServiceAreaClusterHomeLocationStruct alloc] init];
+
+    other.locationName = self.locationName;
+    other.floorNumber = self.floorNumber;
+    other.areaType = self.areaType;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: locationName:%@; floorNumber:%@; areaType:%@; >", NSStringFromClass([self class]), _locationName, _floorNumber, _areaType];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRServiceAreaClusterLocationInfoStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _homeLocationInfo = nil;
+
+        _landmarkTag = nil;
+
+        _positionTag = nil;
+
+        _surfaceTag = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRServiceAreaClusterLocationInfoStruct alloc] init];
+
+    other.homeLocationInfo = self.homeLocationInfo;
+    other.landmarkTag = self.landmarkTag;
+    other.positionTag = self.positionTag;
+    other.surfaceTag = self.surfaceTag;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: homeLocationInfo:%@; landmarkTag:%@; positionTag:%@; surfaceTag:%@; >", NSStringFromClass([self class]), _homeLocationInfo, _landmarkTag, _positionTag, _surfaceTag];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRServiceAreaClusterLocationStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _locationId = @(0);
+
+        _mapId = nil;
+
+        _locationInfo = [MTRServiceAreaClusterLocationInfoStruct new];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRServiceAreaClusterLocationStruct alloc] init];
+
+    other.locationId = self.locationId;
+    other.mapId = self.mapId;
+    other.locationInfo = self.locationInfo;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: locationId:%@; mapId:%@; locationInfo:%@; >", NSStringFromClass([self class]), _locationId, _mapId, _locationInfo];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRServiceAreaClusterMapStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _mapId = @(0);
+
+        _name = @"";
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRServiceAreaClusterMapStruct alloc] init];
+
+    other.mapId = self.mapId;
+    other.name = self.name;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: mapId:%@; name:%@; >", NSStringFromClass([self class]), _mapId, _name];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRServiceAreaClusterProgressStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _locationId = @(0);
+
+        _status = @(0);
+
+        _totalOperationalTime = nil;
+
+        _estimatedTime = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRServiceAreaClusterProgressStruct alloc] init];
+
+    other.locationId = self.locationId;
+    other.status = self.status;
+    other.totalOperationalTime = self.totalOperationalTime;
+    other.estimatedTime = self.estimatedTime;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: locationId:%@; status:%@; totalOperationalTime:%@; estimatedTime:%@; >", NSStringFromClass([self class]), _locationId, _status, _totalOperationalTime, _estimatedTime];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRPumpConfigurationAndControlClusterSupplyVoltageLowEvent
 - (instancetype)init
 {

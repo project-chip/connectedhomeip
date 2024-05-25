@@ -8310,6 +8310,99 @@ class ChipClusters:
             },
         },
     }
+    _SERVICE_AREA_CLUSTER_INFO = {
+        "clusterName": "ServiceArea",
+        "clusterId": 0x00000150,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "SelectLocations",
+                "args": {
+                    "newLocations": "int",
+                },
+            },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "SkipCurrent",
+                "args": {
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "SupportedLocations",
+                "attributeId": 0x00000000,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "SupportedMaps",
+                "attributeId": 0x00000001,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "SelectedLocations",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "CurrentLocation",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "EstimatedEndTime",
+                "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "Progress",
+                "attributeId": 0x00000005,
+                "type": "",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _PUMP_CONFIGURATION_AND_CONTROL_CLUSTER_INFO = {
         "clusterName": "PumpConfigurationAndControl",
         "clusterId": 0x00000200,
@@ -14616,6 +14709,7 @@ class ChipClusters:
         0x00000101: _DOOR_LOCK_CLUSTER_INFO,
         0x00000102: _WINDOW_COVERING_CLUSTER_INFO,
         0x00000103: _BARRIER_CONTROL_CLUSTER_INFO,
+        0x00000150: _SERVICE_AREA_CLUSTER_INFO,
         0x00000200: _PUMP_CONFIGURATION_AND_CONTROL_CLUSTER_INFO,
         0x00000201: _THERMOSTAT_CLUSTER_INFO,
         0x00000202: _FAN_CONTROL_CLUSTER_INFO,
@@ -14737,6 +14831,7 @@ class ChipClusters:
         "DoorLock": _DOOR_LOCK_CLUSTER_INFO,
         "WindowCovering": _WINDOW_COVERING_CLUSTER_INFO,
         "BarrierControl": _BARRIER_CONTROL_CLUSTER_INFO,
+        "ServiceArea": _SERVICE_AREA_CLUSTER_INFO,
         "PumpConfigurationAndControl": _PUMP_CONFIGURATION_AND_CONTROL_CLUSTER_INFO,
         "Thermostat": _THERMOSTAT_CLUSTER_INFO,
         "FanControl": _FAN_CONTROL_CLUSTER_INFO,

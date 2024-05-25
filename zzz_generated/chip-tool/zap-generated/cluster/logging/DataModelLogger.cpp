@@ -3231,6 +3231,179 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::ServiceArea::Structs::HomeLocationStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("LocationName", indent + 1, value.locationName);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LocationName'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FloorNumber", indent + 1, value.floorNumber);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FloorNumber'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("AreaType", indent + 1, value.areaType);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AreaType'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::ServiceArea::Structs::LocationInfoStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("HomeLocationInfo", indent + 1, value.homeLocationInfo);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'HomeLocationInfo'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("LandmarkTag", indent + 1, value.landmarkTag);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LandmarkTag'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("PositionTag", indent + 1, value.positionTag);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PositionTag'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("SurfaceTag", indent + 1, value.surfaceTag);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SurfaceTag'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::ServiceArea::Structs::LocationStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("LocationId", indent + 1, value.locationId);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LocationId'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("MapId", indent + 1, value.mapId);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MapId'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("LocationInfo", indent + 1, value.locationInfo);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LocationInfo'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::ServiceArea::Structs::MapStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("MapId", indent + 1, value.mapId);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MapId'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Name", indent + 1, value.name);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Name'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::ServiceArea::Structs::ProgressStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("LocationId", indent + 1, value.locationId);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LocationId'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Status", indent + 1, value.status);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Status'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("TotalOperationalTime", indent + 1, value.totalOperationalTime);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TotalOperationalTime'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("EstimatedTime", indent + 1, value.estimatedTime);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EstimatedTime'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::Thermostat::Structs::ScheduleTransitionStruct::DecodableType & value)
@@ -7704,6 +7877,24 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     ReturnErrorOnFailure(DataModelLogger::LogValue("creatorFabricIndex", indent + 1, value.creatorFabricIndex));
     ReturnErrorOnFailure(DataModelLogger::LogValue("lastModifiedFabricIndex", indent + 1, value.lastModifiedFabricIndex));
     ReturnErrorOnFailure(DataModelLogger::LogValue("nextCredentialIndex", indent + 1, value.nextCredentialIndex));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const ServiceArea::Commands::SelectLocationsResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("statusText", indent + 1, value.statusText));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const ServiceArea::Commands::SkipCurrentResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("statusText", indent + 1, value.statusText));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -13722,6 +13913,76 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
+    case ServiceArea::Id: {
+        switch (path.mAttributeId)
+        {
+        case ServiceArea::Attributes::SupportedLocations::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::LocationStruct::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SupportedLocations", 1, value);
+        }
+        case ServiceArea::Attributes::SupportedMaps::Id: {
+            chip::app::DataModel::Nullable<
+                chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::MapStruct::DecodableType>>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SupportedMaps", 1, value);
+        }
+        case ServiceArea::Attributes::SelectedLocations::Id: {
+            chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<uint32_t>> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SelectedLocations", 1, value);
+        }
+        case ServiceArea::Attributes::CurrentLocation::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CurrentLocation", 1, value);
+        }
+        case ServiceArea::Attributes::EstimatedEndTime::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EstimatedEndTime", 1, value);
+        }
+        case ServiceArea::Attributes::Progress::Id: {
+            chip::app::DataModel::Nullable<
+                chip::app::DataModel::DecodableList<chip::app::Clusters::ServiceArea::Structs::ProgressStruct::DecodableType>>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Progress", 1, value);
+        }
+        case ServiceArea::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+        }
+        case ServiceArea::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+        }
+        case ServiceArea::Attributes::EventList::Id: {
+            chip::app::DataModel::DecodableList<chip::EventId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EventList", 1, value);
+        }
+        case ServiceArea::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case ServiceArea::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case ServiceArea::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
     case PumpConfigurationAndControl::Id: {
         switch (path.mAttributeId)
         {
@@ -18423,6 +18684,22 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             DoorLock::Commands::GetCredentialStatusResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GetCredentialStatusResponse", 1, value);
+        }
+        }
+        break;
+    }
+    case ServiceArea::Id: {
+        switch (path.mCommandId)
+        {
+        case ServiceArea::Commands::SelectLocationsResponse::Id: {
+            ServiceArea::Commands::SelectLocationsResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SelectLocationsResponse", 1, value);
+        }
+        case ServiceArea::Commands::SkipCurrentResponse::Id: {
+            ServiceArea::Commands::SkipCurrentResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SkipCurrentResponse", 1, value);
         }
         }
         break;

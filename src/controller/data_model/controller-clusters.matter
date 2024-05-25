@@ -5982,6 +5982,296 @@ deprecated cluster BarrierControl = 259 {
   command BarrierControlStop(): DefaultSuccess = 1;
 }
 
+/** The Service Area cluster provides an interface for controlling the locations where a device should operate, and for querying the current location. */
+cluster ServiceArea = 336 {
+  revision 1; // NOTE: Default/not specifically set
+
+  enum AreaTypeTag : enum8 {
+    kAisle = 0;
+    kAttic = 1;
+    kBackDoor = 2;
+    kBackYard = 3;
+    kBalcony = 4;
+    kBallroom = 5;
+    kBathroom = 6;
+    kBedroom = 7;
+    kBorder = 8;
+    kBoxroom = 9;
+    kBreakfastRoom = 10;
+    kCarport = 11;
+    kCellar = 12;
+    kCloakroom = 13;
+    kCloset = 14;
+    kConservatory = 15;
+    kCorridor = 16;
+    kCraftRoom = 17;
+    kCupboard = 18;
+    kDeck = 19;
+    kDen = 20;
+    kDining = 21;
+    kDrawingRoom = 22;
+    kDressingRoom = 23;
+    kDriveway = 24;
+    kElevator = 25;
+    kEnsuite = 26;
+    kEntrance = 27;
+    kEntryway = 28;
+    kFamilyRoom = 29;
+    kFoyer = 30;
+    kFrontDoor = 31;
+    kFrontYard = 32;
+    kGameRoom = 33;
+    kGarage = 34;
+    kGarageDoor = 35;
+    kGarden = 36;
+    kGardenDoor = 37;
+    kGuestBathroom = 38;
+    kGuestBedroom = 39;
+    kGuestRestroom = 40;
+    kGuestRoom = 41;
+    kGym = 42;
+    kHallway = 43;
+    kKidsRoom = 44;
+    kKidsBedroom = 45;
+    kKitchen = 46;
+    kLarder = 47;
+    kLaundryRoom = 48;
+    kLawn = 49;
+    kLibrary = 50;
+    kLivingRoom = 51;
+    kLounge = 52;
+    kManCave = 53;
+    kMasterBathroom = 54;
+    kMasterBedroom = 55;
+    kMediaTVRoom = 56;
+    kMudRoom = 57;
+    kMusicRoom = 58;
+    kNursery = 59;
+    kOffice = 60;
+    kOutdoorKitchen = 61;
+    kOutside = 62;
+    kPantry = 63;
+    kParkingLot = 64;
+    kParlor = 65;
+    kPatio = 66;
+    kPlayRoom = 67;
+    kPoolRoom = 68;
+    kPorch = 69;
+    kRamp = 70;
+    kReceptionRoom = 71;
+    kRecreationRoom = 72;
+    kRestroom = 73;
+    kRoof = 74;
+    kSauna = 75;
+    kScullery = 76;
+    kSewingRoom = 77;
+    kShed = 78;
+    kSideDoor = 79;
+    kSideYard = 80;
+    kSittingRoom = 81;
+    kSnug = 82;
+    kSpa = 83;
+    kStaircase = 84;
+    kSteamRoom = 85;
+    kStorageRoom = 86;
+    kStudio = 87;
+    kStudy = 88;
+    kSunRoom = 89;
+    kSwimmingPool = 90;
+    kTerrace = 91;
+    kUtilityRoom = 92;
+    kWard = 93;
+    kWorkshop = 94;
+  }
+
+  enum FloorSurfaceTag : enum8 {
+    kCarpet = 0;
+    kCeramic = 1;
+    kConcrete = 2;
+    kCork = 3;
+    kDeepCarpet = 4;
+    kDirt = 5;
+    kEngineeredWood = 6;
+    kGlass = 7;
+    kGrass = 8;
+    kHardwood = 9;
+    kLaminate = 10;
+    kLinoleum = 11;
+    kMat = 12;
+    kMetal = 13;
+    kPlastic = 14;
+    kPolishedConcrete = 15;
+    kRubber = 16;
+    kRug = 17;
+    kSand = 18;
+    kStone = 19;
+    kTatami = 20;
+    kTerrazzo = 21;
+    kTile = 22;
+    kVinyl = 23;
+  }
+
+  enum LandmarkTag : enum8 {
+    kAirConditioner = 0;
+    kAirPurifier = 1;
+    kBackDoor = 2;
+    kBarStool = 3;
+    kBathMat = 4;
+    kBathtub = 5;
+    kBed = 6;
+    kBookshelf = 7;
+    kChair = 8;
+    kChristmasTree = 9;
+    kCoatRack = 10;
+    kCoffeeTable = 11;
+    kCookingRange = 12;
+    kCouch = 13;
+    kCountertop = 14;
+    kCradle = 15;
+    kCrib = 16;
+    kDesk = 17;
+    kDiningTable = 18;
+    kDishwasher = 19;
+    kDoor = 20;
+    kDresser = 21;
+    kLaundryDryer = 22;
+    kFan = 23;
+    kFireplace = 24;
+    kFreezer = 25;
+    kFrontDoor = 26;
+    kHighChair = 27;
+    kKitchenIsland = 28;
+    kLamp = 29;
+    kLitterBox = 30;
+    kMirror = 31;
+    kNightstand = 32;
+    kOven = 33;
+    kPetBed = 34;
+    kPetBowl = 35;
+    kPetCrate = 36;
+    kRefrigerator = 37;
+    kScratchingPost = 38;
+    kShoeRack = 39;
+    kShower = 40;
+    kSideDoor = 41;
+    kSink = 42;
+    kSofa = 43;
+    kStove = 44;
+    kTable = 45;
+    kToilet = 46;
+    kTrashCan = 47;
+    kLaundryWasher = 48;
+    kWindow = 49;
+    kWineCooler = 50;
+  }
+
+  enum OperationalStatusEnum : enum8 {
+    kPending = 0;
+    kOperating = 1;
+    kSkipped = 2;
+    kCompleted = 3;
+  }
+
+  enum PositionTag : enum8 {
+    kLeft = 0;
+    kRight = 1;
+    kTop = 2;
+    kBottom = 3;
+    kMiddle = 4;
+    kRow = 5;
+    kColumn = 6;
+    kUnder = 7;
+    kNextTo = 8;
+    kAround = 9;
+    kOn = 10;
+    kAbove = 11;
+    kFrontOf = 12;
+    kBehind = 13;
+  }
+
+  enum SelectLocationsStatus : enum8 {
+    kSuccess = 0;
+    kUnsupportedLocation = 1;
+    kDuplicatedLocations = 2;
+    kInvalidInMode = 3;
+    kInvalidSet = 4;
+  }
+
+  enum SkipCurrentStatus : enum8 {
+    kSuccess = 0;
+    kInvalidLocationList = 1;
+    kInvalidInMode = 2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kListOrder = 0x1;
+    kSelectWhileRunning = 0x2;
+  }
+
+  struct HomeLocationStruct {
+    char_string<128> locationName = 0;
+    nullable int16s floorNumber = 1;
+    nullable AreaTypeTag areaType = 2;
+  }
+
+  struct LocationInfoStruct {
+    nullable HomeLocationStruct homeLocationInfo = 0;
+    nullable LandmarkTag landmarkTag = 1;
+    nullable PositionTag positionTag = 2;
+    nullable FloorSurfaceTag surfaceTag = 3;
+  }
+
+  struct LocationStruct {
+    int32u locationId = 0;
+    nullable int8u mapId = 1;
+    LocationInfoStruct locationInfo = 2;
+  }
+
+  struct MapStruct {
+    int8u mapId = 0;
+    char_string<64> name = 1;
+  }
+
+  struct ProgressStruct {
+    int32u locationId = 0;
+    OperationalStatusEnum status = 1;
+    optional nullable elapsed_s totalOperationalTime = 2;
+    optional nullable elapsed_s estimatedTime = 3;
+  }
+
+  readonly attribute LocationStruct supportedLocations[] = 0;
+  readonly attribute nullable MapStruct supportedMaps[] = 1;
+  readonly attribute nullable int32u selectedLocations[] = 2;
+  readonly attribute optional nullable int32u currentLocation = 3;
+  readonly attribute optional nullable epoch_s estimatedEndTime = 4;
+  readonly attribute optional nullable ProgressStruct progress[] = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct SelectLocationsRequest {
+    nullable int32u newLocations[] = 0;
+  }
+
+  response struct SelectLocationsResponse = 1 {
+    SelectLocationsStatus status = 0;
+    char_string<256> statusText = 1;
+  }
+
+  response struct SkipCurrentResponse = 3 {
+    SkipCurrentStatus status = 0;
+    char_string<256> statusText = 1;
+  }
+
+  /** Command used to select a set of device locations, where the device is to operate */
+  command SelectLocations(SelectLocationsRequest): SelectLocationsResponse = 0;
+  /** This command is used to skip the current location where the device operates. */
+  command SkipCurrent(): SkipCurrentResponse = 2;
+}
+
 /** An interface for configuring and controlling pumps. */
 cluster PumpConfigurationAndControl = 512 {
   revision 3;

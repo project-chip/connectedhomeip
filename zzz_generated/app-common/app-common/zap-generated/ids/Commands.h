@@ -1235,6 +1235,28 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace BarrierControl
 
+namespace ServiceArea {
+namespace Commands {
+
+namespace SelectLocations {
+static constexpr CommandId Id = 0x00000000;
+} // namespace SelectLocations
+
+namespace SelectLocationsResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace SelectLocationsResponse
+
+namespace SkipCurrent {
+static constexpr CommandId Id = 0x00000002;
+} // namespace SkipCurrent
+
+namespace SkipCurrentResponse {
+static constexpr CommandId Id = 0x00000003;
+} // namespace SkipCurrentResponse
+
+} // namespace Commands
+} // namespace ServiceArea
+
 namespace Thermostat {
 namespace Commands {
 

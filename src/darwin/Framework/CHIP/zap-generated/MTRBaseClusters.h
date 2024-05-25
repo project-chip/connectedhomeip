@@ -9411,6 +9411,118 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @end
 
 /**
+ * Cluster Service Area
+ *
+ * The Service Area cluster provides an interface for controlling the locations where a device should operate, and for querying the current location.
+ */
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRBaseClusterServiceArea : MTRGenericBaseCluster
+
+/**
+ * Command SelectLocations
+ *
+ * Command used to select a set of device locations, where the device is to operate
+ */
+- (void)selectLocationsWithParams:(MTRServiceAreaClusterSelectLocationsParams *)params completion:(void (^)(MTRServiceAreaClusterSelectLocationsResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Command SkipCurrent
+ *
+ * This command is used to skip the current location where the device operates.
+ */
+- (void)skipCurrentWithParams:(MTRServiceAreaClusterSkipCurrentParams * _Nullable)params completion:(void (^)(MTRServiceAreaClusterSkipCurrentResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)skipCurrentWithCompletion:(void (^)(MTRServiceAreaClusterSkipCurrentResponseParams * _Nullable data, NSError * _Nullable error))completion
+    MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeSupportedLocationsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeSupportedLocationsWithParams:(MTRSubscribeParams *)params
+                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                         reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeSupportedLocationsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeSupportedMapsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeSupportedMapsWithParams:(MTRSubscribeParams *)params
+                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                    reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeSupportedMapsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeSelectedLocationsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeSelectedLocationsWithParams:(MTRSubscribeParams *)params
+                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                        reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeSelectedLocationsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeCurrentLocationWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeCurrentLocationWithParams:(MTRSubscribeParams *)params
+                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeCurrentLocationWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeEstimatedEndTimeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeEstimatedEndTimeWithParams:(MTRSubscribeParams *)params
+                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeEstimatedEndTimeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeProgressWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeProgressWithParams:(MTRSubscribeParams *)params
+                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                               reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeProgressWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
+                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                           reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeGeneratedCommandListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
+                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                          reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeAcceptedCommandListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeEventListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeEventListWithParams:(MTRSubscribeParams *)params
+                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeEventListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
+                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                    reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeAttributeListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
+                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeFeatureMapWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
+                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeClusterRevisionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+@interface MTRBaseClusterServiceArea (Availability)
+
+/**
+ * For all instance methods (reads, writes, commands) that take a completion,
+ * the completion will be called on the provided queue.
+ */
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                              endpointID:(NSNumber *)endpointID
+                                   queue:(dispatch_queue_t)queue MTR_PROVISIONALLY_AVAILABLE;
+
+@end
+
+/**
  * Cluster Pump Configuration and Control
  *
  * An interface for configuring and controlling pumps.
@@ -18632,6 +18744,228 @@ typedef NS_OPTIONS(uint16_t, MTRBarrierControlSafetyStatus) {
     MTRBarrierControlSafetyStatusTemperDetected MTR_PROVISIONALLY_AVAILABLE = 0x2,
     MTRBarrierControlSafetyStatusFailedCommunication MTR_PROVISIONALLY_AVAILABLE = 0x4,
     MTRBarrierControlSafetyStatusPositionFailure MTR_PROVISIONALLY_AVAILABLE = 0x8,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRServiceAreaAreaTypeTag) {
+    MTRServiceAreaAreaTypeTagAisle MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRServiceAreaAreaTypeTagAttic MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRServiceAreaAreaTypeTagBackDoor MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRServiceAreaAreaTypeTagBackYard MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRServiceAreaAreaTypeTagBalcony MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRServiceAreaAreaTypeTagBallroom MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRServiceAreaAreaTypeTagBathroom MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRServiceAreaAreaTypeTagBedroom MTR_PROVISIONALLY_AVAILABLE = 0x07,
+    MTRServiceAreaAreaTypeTagBorder MTR_PROVISIONALLY_AVAILABLE = 0x08,
+    MTRServiceAreaAreaTypeTagBoxroom MTR_PROVISIONALLY_AVAILABLE = 0x09,
+    MTRServiceAreaAreaTypeTagBreakfastRoom MTR_PROVISIONALLY_AVAILABLE = 0x0A,
+    MTRServiceAreaAreaTypeTagCarport MTR_PROVISIONALLY_AVAILABLE = 0x0B,
+    MTRServiceAreaAreaTypeTagCellar MTR_PROVISIONALLY_AVAILABLE = 0x0C,
+    MTRServiceAreaAreaTypeTagCloakroom MTR_PROVISIONALLY_AVAILABLE = 0x0D,
+    MTRServiceAreaAreaTypeTagCloset MTR_PROVISIONALLY_AVAILABLE = 0x0E,
+    MTRServiceAreaAreaTypeTagConservatory MTR_PROVISIONALLY_AVAILABLE = 0x0F,
+    MTRServiceAreaAreaTypeTagCorridor MTR_PROVISIONALLY_AVAILABLE = 0x10,
+    MTRServiceAreaAreaTypeTagCraftRoom MTR_PROVISIONALLY_AVAILABLE = 0x11,
+    MTRServiceAreaAreaTypeTagCupboard MTR_PROVISIONALLY_AVAILABLE = 0x12,
+    MTRServiceAreaAreaTypeTagDeck MTR_PROVISIONALLY_AVAILABLE = 0x13,
+    MTRServiceAreaAreaTypeTagDen MTR_PROVISIONALLY_AVAILABLE = 0x14,
+    MTRServiceAreaAreaTypeTagDining MTR_PROVISIONALLY_AVAILABLE = 0x15,
+    MTRServiceAreaAreaTypeTagDrawingRoom MTR_PROVISIONALLY_AVAILABLE = 0x16,
+    MTRServiceAreaAreaTypeTagDressingRoom MTR_PROVISIONALLY_AVAILABLE = 0x17,
+    MTRServiceAreaAreaTypeTagDriveway MTR_PROVISIONALLY_AVAILABLE = 0x18,
+    MTRServiceAreaAreaTypeTagElevator MTR_PROVISIONALLY_AVAILABLE = 0x19,
+    MTRServiceAreaAreaTypeTagEnsuite MTR_PROVISIONALLY_AVAILABLE = 0x1A,
+    MTRServiceAreaAreaTypeTagEntrance MTR_PROVISIONALLY_AVAILABLE = 0x1B,
+    MTRServiceAreaAreaTypeTagEntryway MTR_PROVISIONALLY_AVAILABLE = 0x1C,
+    MTRServiceAreaAreaTypeTagFamilyRoom MTR_PROVISIONALLY_AVAILABLE = 0x1D,
+    MTRServiceAreaAreaTypeTagFoyer MTR_PROVISIONALLY_AVAILABLE = 0x1E,
+    MTRServiceAreaAreaTypeTagFrontDoor MTR_PROVISIONALLY_AVAILABLE = 0x1F,
+    MTRServiceAreaAreaTypeTagFrontYard MTR_PROVISIONALLY_AVAILABLE = 0x20,
+    MTRServiceAreaAreaTypeTagGameRoom MTR_PROVISIONALLY_AVAILABLE = 0x21,
+    MTRServiceAreaAreaTypeTagGarage MTR_PROVISIONALLY_AVAILABLE = 0x22,
+    MTRServiceAreaAreaTypeTagGarageDoor MTR_PROVISIONALLY_AVAILABLE = 0x23,
+    MTRServiceAreaAreaTypeTagGarden MTR_PROVISIONALLY_AVAILABLE = 0x24,
+    MTRServiceAreaAreaTypeTagGardenDoor MTR_PROVISIONALLY_AVAILABLE = 0x25,
+    MTRServiceAreaAreaTypeTagGuestBathroom MTR_PROVISIONALLY_AVAILABLE = 0x26,
+    MTRServiceAreaAreaTypeTagGuestBedroom MTR_PROVISIONALLY_AVAILABLE = 0x27,
+    MTRServiceAreaAreaTypeTagGuestRestroom MTR_PROVISIONALLY_AVAILABLE = 0x28,
+    MTRServiceAreaAreaTypeTagGuestRoom MTR_PROVISIONALLY_AVAILABLE = 0x29,
+    MTRServiceAreaAreaTypeTagGym MTR_PROVISIONALLY_AVAILABLE = 0x2A,
+    MTRServiceAreaAreaTypeTagHallway MTR_PROVISIONALLY_AVAILABLE = 0x2B,
+    MTRServiceAreaAreaTypeTagKidsRoom MTR_PROVISIONALLY_AVAILABLE = 0x2C,
+    MTRServiceAreaAreaTypeTagKidsBedroom MTR_PROVISIONALLY_AVAILABLE = 0x2D,
+    MTRServiceAreaAreaTypeTagKitchen MTR_PROVISIONALLY_AVAILABLE = 0x2E,
+    MTRServiceAreaAreaTypeTagLarder MTR_PROVISIONALLY_AVAILABLE = 0x2F,
+    MTRServiceAreaAreaTypeTagLaundryRoom MTR_PROVISIONALLY_AVAILABLE = 0x30,
+    MTRServiceAreaAreaTypeTagLawn MTR_PROVISIONALLY_AVAILABLE = 0x31,
+    MTRServiceAreaAreaTypeTagLibrary MTR_PROVISIONALLY_AVAILABLE = 0x32,
+    MTRServiceAreaAreaTypeTagLivingRoom MTR_PROVISIONALLY_AVAILABLE = 0x33,
+    MTRServiceAreaAreaTypeTagLounge MTR_PROVISIONALLY_AVAILABLE = 0x34,
+    MTRServiceAreaAreaTypeTagManCave MTR_PROVISIONALLY_AVAILABLE = 0x35,
+    MTRServiceAreaAreaTypeTagMasterBathroom MTR_PROVISIONALLY_AVAILABLE = 0x36,
+    MTRServiceAreaAreaTypeTagMasterBedroom MTR_PROVISIONALLY_AVAILABLE = 0x37,
+    MTRServiceAreaAreaTypeTagMediaTVRoom MTR_PROVISIONALLY_AVAILABLE = 0x38,
+    MTRServiceAreaAreaTypeTagMudRoom MTR_PROVISIONALLY_AVAILABLE = 0x39,
+    MTRServiceAreaAreaTypeTagMusicRoom MTR_PROVISIONALLY_AVAILABLE = 0x3A,
+    MTRServiceAreaAreaTypeTagNursery MTR_PROVISIONALLY_AVAILABLE = 0x3B,
+    MTRServiceAreaAreaTypeTagOffice MTR_PROVISIONALLY_AVAILABLE = 0x3C,
+    MTRServiceAreaAreaTypeTagOutdoorKitchen MTR_PROVISIONALLY_AVAILABLE = 0x3D,
+    MTRServiceAreaAreaTypeTagOutside MTR_PROVISIONALLY_AVAILABLE = 0x3E,
+    MTRServiceAreaAreaTypeTagPantry MTR_PROVISIONALLY_AVAILABLE = 0x3F,
+    MTRServiceAreaAreaTypeTagParkingLot MTR_PROVISIONALLY_AVAILABLE = 0x40,
+    MTRServiceAreaAreaTypeTagParlor MTR_PROVISIONALLY_AVAILABLE = 0x41,
+    MTRServiceAreaAreaTypeTagPatio MTR_PROVISIONALLY_AVAILABLE = 0x42,
+    MTRServiceAreaAreaTypeTagPlayRoom MTR_PROVISIONALLY_AVAILABLE = 0x43,
+    MTRServiceAreaAreaTypeTagPoolRoom MTR_PROVISIONALLY_AVAILABLE = 0x44,
+    MTRServiceAreaAreaTypeTagPorch MTR_PROVISIONALLY_AVAILABLE = 0x45,
+    MTRServiceAreaAreaTypeTagRamp MTR_PROVISIONALLY_AVAILABLE = 0x46,
+    MTRServiceAreaAreaTypeTagReceptionRoom MTR_PROVISIONALLY_AVAILABLE = 0x47,
+    MTRServiceAreaAreaTypeTagRecreationRoom MTR_PROVISIONALLY_AVAILABLE = 0x48,
+    MTRServiceAreaAreaTypeTagRestroom MTR_PROVISIONALLY_AVAILABLE = 0x49,
+    MTRServiceAreaAreaTypeTagRoof MTR_PROVISIONALLY_AVAILABLE = 0x4A,
+    MTRServiceAreaAreaTypeTagSauna MTR_PROVISIONALLY_AVAILABLE = 0x4B,
+    MTRServiceAreaAreaTypeTagScullery MTR_PROVISIONALLY_AVAILABLE = 0x4C,
+    MTRServiceAreaAreaTypeTagSewingRoom MTR_PROVISIONALLY_AVAILABLE = 0x4D,
+    MTRServiceAreaAreaTypeTagShed MTR_PROVISIONALLY_AVAILABLE = 0x4E,
+    MTRServiceAreaAreaTypeTagSideDoor MTR_PROVISIONALLY_AVAILABLE = 0x4F,
+    MTRServiceAreaAreaTypeTagSideYard MTR_PROVISIONALLY_AVAILABLE = 0x50,
+    MTRServiceAreaAreaTypeTagSittingRoom MTR_PROVISIONALLY_AVAILABLE = 0x51,
+    MTRServiceAreaAreaTypeTagSnug MTR_PROVISIONALLY_AVAILABLE = 0x52,
+    MTRServiceAreaAreaTypeTagSpa MTR_PROVISIONALLY_AVAILABLE = 0x53,
+    MTRServiceAreaAreaTypeTagStaircase MTR_PROVISIONALLY_AVAILABLE = 0x54,
+    MTRServiceAreaAreaTypeTagSteamRoom MTR_PROVISIONALLY_AVAILABLE = 0x55,
+    MTRServiceAreaAreaTypeTagStorageRoom MTR_PROVISIONALLY_AVAILABLE = 0x56,
+    MTRServiceAreaAreaTypeTagStudio MTR_PROVISIONALLY_AVAILABLE = 0x57,
+    MTRServiceAreaAreaTypeTagStudy MTR_PROVISIONALLY_AVAILABLE = 0x58,
+    MTRServiceAreaAreaTypeTagSunRoom MTR_PROVISIONALLY_AVAILABLE = 0x59,
+    MTRServiceAreaAreaTypeTagSwimmingPool MTR_PROVISIONALLY_AVAILABLE = 0x5A,
+    MTRServiceAreaAreaTypeTagTerrace MTR_PROVISIONALLY_AVAILABLE = 0x5B,
+    MTRServiceAreaAreaTypeTagUtilityRoom MTR_PROVISIONALLY_AVAILABLE = 0x5C,
+    MTRServiceAreaAreaTypeTagWard MTR_PROVISIONALLY_AVAILABLE = 0x5D,
+    MTRServiceAreaAreaTypeTagWorkshop MTR_PROVISIONALLY_AVAILABLE = 0x5E,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRServiceAreaFloorSurfaceTag) {
+    MTRServiceAreaFloorSurfaceTagCarpet MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRServiceAreaFloorSurfaceTagCeramic MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRServiceAreaFloorSurfaceTagConcrete MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRServiceAreaFloorSurfaceTagCork MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRServiceAreaFloorSurfaceTagDeepCarpet MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRServiceAreaFloorSurfaceTagDirt MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRServiceAreaFloorSurfaceTagEngineeredWood MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRServiceAreaFloorSurfaceTagGlass MTR_PROVISIONALLY_AVAILABLE = 0x07,
+    MTRServiceAreaFloorSurfaceTagGrass MTR_PROVISIONALLY_AVAILABLE = 0x08,
+    MTRServiceAreaFloorSurfaceTagHardwood MTR_PROVISIONALLY_AVAILABLE = 0x09,
+    MTRServiceAreaFloorSurfaceTagLaminate MTR_PROVISIONALLY_AVAILABLE = 0x0A,
+    MTRServiceAreaFloorSurfaceTagLinoleum MTR_PROVISIONALLY_AVAILABLE = 0x0B,
+    MTRServiceAreaFloorSurfaceTagMat MTR_PROVISIONALLY_AVAILABLE = 0x0C,
+    MTRServiceAreaFloorSurfaceTagMetal MTR_PROVISIONALLY_AVAILABLE = 0x0D,
+    MTRServiceAreaFloorSurfaceTagPlastic MTR_PROVISIONALLY_AVAILABLE = 0x0E,
+    MTRServiceAreaFloorSurfaceTagPolishedConcrete MTR_PROVISIONALLY_AVAILABLE = 0x0F,
+    MTRServiceAreaFloorSurfaceTagRubber MTR_PROVISIONALLY_AVAILABLE = 0x10,
+    MTRServiceAreaFloorSurfaceTagRug MTR_PROVISIONALLY_AVAILABLE = 0x11,
+    MTRServiceAreaFloorSurfaceTagSand MTR_PROVISIONALLY_AVAILABLE = 0x12,
+    MTRServiceAreaFloorSurfaceTagStone MTR_PROVISIONALLY_AVAILABLE = 0x13,
+    MTRServiceAreaFloorSurfaceTagTatami MTR_PROVISIONALLY_AVAILABLE = 0x14,
+    MTRServiceAreaFloorSurfaceTagTerrazzo MTR_PROVISIONALLY_AVAILABLE = 0x15,
+    MTRServiceAreaFloorSurfaceTagTile MTR_PROVISIONALLY_AVAILABLE = 0x16,
+    MTRServiceAreaFloorSurfaceTagVinyl MTR_PROVISIONALLY_AVAILABLE = 0x17,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRServiceAreaLandmarkTag) {
+    MTRServiceAreaLandmarkTagAirConditioner MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRServiceAreaLandmarkTagAirPurifier MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRServiceAreaLandmarkTagBackDoor MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRServiceAreaLandmarkTagBarStool MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRServiceAreaLandmarkTagBathMat MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRServiceAreaLandmarkTagBathtub MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRServiceAreaLandmarkTagBed MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRServiceAreaLandmarkTagBookshelf MTR_PROVISIONALLY_AVAILABLE = 0x07,
+    MTRServiceAreaLandmarkTagChair MTR_PROVISIONALLY_AVAILABLE = 0x08,
+    MTRServiceAreaLandmarkTagChristmasTree MTR_PROVISIONALLY_AVAILABLE = 0x09,
+    MTRServiceAreaLandmarkTagCoatRack MTR_PROVISIONALLY_AVAILABLE = 0x0A,
+    MTRServiceAreaLandmarkTagCoffeeTable MTR_PROVISIONALLY_AVAILABLE = 0x0B,
+    MTRServiceAreaLandmarkTagCookingRange MTR_PROVISIONALLY_AVAILABLE = 0x0C,
+    MTRServiceAreaLandmarkTagCouch MTR_PROVISIONALLY_AVAILABLE = 0x0D,
+    MTRServiceAreaLandmarkTagCountertop MTR_PROVISIONALLY_AVAILABLE = 0x0E,
+    MTRServiceAreaLandmarkTagCradle MTR_PROVISIONALLY_AVAILABLE = 0x0F,
+    MTRServiceAreaLandmarkTagCrib MTR_PROVISIONALLY_AVAILABLE = 0x10,
+    MTRServiceAreaLandmarkTagDesk MTR_PROVISIONALLY_AVAILABLE = 0x11,
+    MTRServiceAreaLandmarkTagDiningTable MTR_PROVISIONALLY_AVAILABLE = 0x12,
+    MTRServiceAreaLandmarkTagDishwasher MTR_PROVISIONALLY_AVAILABLE = 0x13,
+    MTRServiceAreaLandmarkTagDoor MTR_PROVISIONALLY_AVAILABLE = 0x14,
+    MTRServiceAreaLandmarkTagDresser MTR_PROVISIONALLY_AVAILABLE = 0x15,
+    MTRServiceAreaLandmarkTagLaundryDryer MTR_PROVISIONALLY_AVAILABLE = 0x16,
+    MTRServiceAreaLandmarkTagFan MTR_PROVISIONALLY_AVAILABLE = 0x17,
+    MTRServiceAreaLandmarkTagFireplace MTR_PROVISIONALLY_AVAILABLE = 0x18,
+    MTRServiceAreaLandmarkTagFreezer MTR_PROVISIONALLY_AVAILABLE = 0x19,
+    MTRServiceAreaLandmarkTagFrontDoor MTR_PROVISIONALLY_AVAILABLE = 0x1A,
+    MTRServiceAreaLandmarkTagHighChair MTR_PROVISIONALLY_AVAILABLE = 0x1B,
+    MTRServiceAreaLandmarkTagKitchenIsland MTR_PROVISIONALLY_AVAILABLE = 0x1C,
+    MTRServiceAreaLandmarkTagLamp MTR_PROVISIONALLY_AVAILABLE = 0x1D,
+    MTRServiceAreaLandmarkTagLitterBox MTR_PROVISIONALLY_AVAILABLE = 0x1E,
+    MTRServiceAreaLandmarkTagMirror MTR_PROVISIONALLY_AVAILABLE = 0x1F,
+    MTRServiceAreaLandmarkTagNightstand MTR_PROVISIONALLY_AVAILABLE = 0x20,
+    MTRServiceAreaLandmarkTagOven MTR_PROVISIONALLY_AVAILABLE = 0x21,
+    MTRServiceAreaLandmarkTagPetBed MTR_PROVISIONALLY_AVAILABLE = 0x22,
+    MTRServiceAreaLandmarkTagPetBowl MTR_PROVISIONALLY_AVAILABLE = 0x23,
+    MTRServiceAreaLandmarkTagPetCrate MTR_PROVISIONALLY_AVAILABLE = 0x24,
+    MTRServiceAreaLandmarkTagRefrigerator MTR_PROVISIONALLY_AVAILABLE = 0x25,
+    MTRServiceAreaLandmarkTagScratchingPost MTR_PROVISIONALLY_AVAILABLE = 0x26,
+    MTRServiceAreaLandmarkTagShoeRack MTR_PROVISIONALLY_AVAILABLE = 0x27,
+    MTRServiceAreaLandmarkTagShower MTR_PROVISIONALLY_AVAILABLE = 0x28,
+    MTRServiceAreaLandmarkTagSideDoor MTR_PROVISIONALLY_AVAILABLE = 0x29,
+    MTRServiceAreaLandmarkTagSink MTR_PROVISIONALLY_AVAILABLE = 0x2A,
+    MTRServiceAreaLandmarkTagSofa MTR_PROVISIONALLY_AVAILABLE = 0x2B,
+    MTRServiceAreaLandmarkTagStove MTR_PROVISIONALLY_AVAILABLE = 0x2C,
+    MTRServiceAreaLandmarkTagTable MTR_PROVISIONALLY_AVAILABLE = 0x2D,
+    MTRServiceAreaLandmarkTagToilet MTR_PROVISIONALLY_AVAILABLE = 0x2E,
+    MTRServiceAreaLandmarkTagTrashCan MTR_PROVISIONALLY_AVAILABLE = 0x2F,
+    MTRServiceAreaLandmarkTagLaundryWasher MTR_PROVISIONALLY_AVAILABLE = 0x30,
+    MTRServiceAreaLandmarkTagWindow MTR_PROVISIONALLY_AVAILABLE = 0x31,
+    MTRServiceAreaLandmarkTagWineCooler MTR_PROVISIONALLY_AVAILABLE = 0x32,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRServiceAreaOperationalStatus) {
+    MTRServiceAreaOperationalStatusPending MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRServiceAreaOperationalStatusOperating MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRServiceAreaOperationalStatusSkipped MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRServiceAreaOperationalStatusCompleted MTR_PROVISIONALLY_AVAILABLE = 0x03,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRServiceAreaPositionTag) {
+    MTRServiceAreaPositionTagLeft MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRServiceAreaPositionTagRight MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRServiceAreaPositionTagTop MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRServiceAreaPositionTagBottom MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRServiceAreaPositionTagMiddle MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRServiceAreaPositionTagRow MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRServiceAreaPositionTagColumn MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRServiceAreaPositionTagUnder MTR_PROVISIONALLY_AVAILABLE = 0x07,
+    MTRServiceAreaPositionTagNextTo MTR_PROVISIONALLY_AVAILABLE = 0x08,
+    MTRServiceAreaPositionTagAround MTR_PROVISIONALLY_AVAILABLE = 0x09,
+    MTRServiceAreaPositionTagOn MTR_PROVISIONALLY_AVAILABLE = 0x0A,
+    MTRServiceAreaPositionTagAbove MTR_PROVISIONALLY_AVAILABLE = 0x0B,
+    MTRServiceAreaPositionTagFrontOf MTR_PROVISIONALLY_AVAILABLE = 0x0C,
+    MTRServiceAreaPositionTagBehind MTR_PROVISIONALLY_AVAILABLE = 0x0D,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRServiceAreaSelectLocationsStatus) {
+    MTRServiceAreaSelectLocationsStatusSuccess MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRServiceAreaSelectLocationsStatusUnsupportedLocation MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRServiceAreaSelectLocationsStatusDuplicatedLocations MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRServiceAreaSelectLocationsStatusInvalidInMode MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRServiceAreaSelectLocationsStatusInvalidSet MTR_PROVISIONALLY_AVAILABLE = 0x04,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRServiceAreaSkipCurrentStatus) {
+    MTRServiceAreaSkipCurrentStatusSuccess MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRServiceAreaSkipCurrentStatusInvalidLocationList MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRServiceAreaSkipCurrentStatusInvalidInMode MTR_PROVISIONALLY_AVAILABLE = 0x02,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_OPTIONS(uint32_t, MTRServiceAreaFeature) {
+    MTRServiceAreaFeatureListOrder MTR_PROVISIONALLY_AVAILABLE = 0x1,
+    MTRServiceAreaFeatureSelectWhileRunning MTR_PROVISIONALLY_AVAILABLE = 0x2,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRPumpConfigurationAndControlControlMode) {

@@ -252,6 +252,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeBarrierControlID:
         result = @"BarrierControl";
         break;
+    case MTRClusterIDTypeServiceAreaID:
+        result = @"ServiceArea";
+        break;
     case MTRClusterIDTypePumpConfigurationAndControlID:
         result = @"PumpConfigurationAndControl";
         break;
@@ -5196,6 +5199,64 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             break;
 
         case MTRAttributeIDTypeClusterBarrierControlAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+            break;
+        }
+
+    case MTRClusterIDTypeServiceAreaID:
+
+        switch (attributeID) {
+
+            // Cluster ServiceArea attributes
+        case MTRAttributeIDTypeClusterServiceAreaAttributeSupportedLocationsID:
+            result = @"SupportedLocations";
+            break;
+
+        case MTRAttributeIDTypeClusterServiceAreaAttributeSupportedMapsID:
+            result = @"SupportedMaps";
+            break;
+
+        case MTRAttributeIDTypeClusterServiceAreaAttributeSelectedLocationsID:
+            result = @"SelectedLocations";
+            break;
+
+        case MTRAttributeIDTypeClusterServiceAreaAttributeCurrentLocationID:
+            result = @"CurrentLocation";
+            break;
+
+        case MTRAttributeIDTypeClusterServiceAreaAttributeEstimatedEndTimeID:
+            result = @"EstimatedEndTime";
+            break;
+
+        case MTRAttributeIDTypeClusterServiceAreaAttributeProgressID:
+            result = @"Progress";
+            break;
+
+        case MTRAttributeIDTypeClusterServiceAreaAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterServiceAreaAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterServiceAreaAttributeEventListID:
+            result = @"EventList";
+            break;
+
+        case MTRAttributeIDTypeClusterServiceAreaAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterServiceAreaAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterServiceAreaAttributeClusterRevisionID:
             result = @"ClusterRevision";
             break;
 

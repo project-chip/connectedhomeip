@@ -758,6 +758,15 @@ static BOOL CommandNeedsTimedInvokeInBarrierControlCluster(AttributeId aAttribut
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInServiceAreaCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ServiceArea;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInPumpConfigurationAndControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::PumpConfigurationAndControl;
@@ -1352,6 +1361,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::BarrierControl::Id: {
         return CommandNeedsTimedInvokeInBarrierControlCluster(commandID);
+    }
+    case Clusters::ServiceArea::Id: {
+        return CommandNeedsTimedInvokeInServiceAreaCluster(commandID);
     }
     case Clusters::PumpConfigurationAndControl::Id: {
         return CommandNeedsTimedInvokeInPumpConfigurationAndControlCluster(commandID);
