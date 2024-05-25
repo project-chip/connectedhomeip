@@ -36,7 +36,7 @@ public:
     pw::Status OpenCommissioningWindow(const chip_rpc_DeviceInfo & request, chip_rpc_OperationStatus & response) override
     {
         chip::NodeId nodeId = request.node_id;
-        printf("Received OpenCommissioningWindow request: 0x%" PRIx64 "\n", nodeId);
+        printf("Received OpenCommissioningWindow request: 0x%llx\n", nodeId);
         response.success = false;
 
         return pw::OkStatus();

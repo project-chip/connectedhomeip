@@ -42,7 +42,10 @@
 
 #include "CommissionableInit.h"
 #include "Device.h"
+<<<<<<< HEAD
 #include "DeviceManager.h"
+=======
+>>>>>>> 9631848953 (Add bridge_enable_pw_rpc build flag)
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE)
 #include "RpcClient.h"
 #include "RpcServer.h"

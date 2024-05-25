@@ -31,7 +31,7 @@ public:
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override { return RunCommand(mNodeId); }
 
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(30); }
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(1); }
 
 private:
     chip::NodeId mNodeId;
