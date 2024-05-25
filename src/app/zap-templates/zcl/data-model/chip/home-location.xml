@@ -23,96 +23,104 @@ limitations under the License.
 
     <item value="0x00" name="Aisle"/>
     <item value="0x01" name="Attic"/>
-    <item value="0x02" name="Back Yard"/>
-    <item value="0x03" name="Balcony"/>
-    <item value="0x04" name="Ballroom"/>
-    <item value="0x05" name="Bathroom"/>
-    <item value="0x06" name="Bedroom"/>
-    <item value="0x07" name="Border"/>
-    <item value="0x08" name="Boxroom"/>
-    <item value="0x09" name="Breakfast Room"/>
-    <item value="0x0A" name="Carport"/>
-    <item value="0x0B" name="Cellar"/>
-    <item value="0x0C" name="Cloakroom"/>
-    <item value="0x0D" name="Closet"/>
-    <item value="0x0E" name="Conservatory"/>
-    <item value="0x0F" name="Corridor"/>
+    <item value="0x02" name="Back Door"/>
+    <item value="0x03" name="Back Yard"/>
+    <item value="0x04" name="Balcony"/>
+    <item value="0x05" name="Ballroom"/>
+    <item value="0x06" name="Bathroom"/>
+    <item value="0x07" name="Bedroom"/>
+    <item value="0x08" name="Border"/>
+    <item value="0x09" name="Boxroom"/>
+    <item value="0x0A" name="Breakfast Room"/>
+    <item value="0x0B" name="Carport"/>
+    <item value="0x0C" name="Cellar"/>
+    <item value="0x0D" name="Cloakroom"/>
+    <item value="0x0E" name="Closet"/>
+    <item value="0x0F" name="Conservatory"/>
 
-    <item value="0x10" name="Cupboard"/>
-    <item value="0x11" name="Deck"/>
-    <item value="0x12" name="Den"/>
-    <item value="0x13" name="Dining"/>
-    <item value="0x14" name="Drawing Room"/>
-    <item value="0x15" name="Dressing Room"/>
-    <item value="0x16" name="Driveway"/>
-    <item value="0x17" name="Elevator"/>
-    <item value="0x18" name="Ensuite"/>
-    <item value="0x19" name="Entrance"/>
-    <item value="0x1A" name="Entryway"/>
-    <item value="0x1B" name="Family Room"/>
-    <item value="0x1C" name="Foyer"/>
-    <item value="0x1D" name="Front Yard"/>
-    <item value="0x1E" name="Game Room"/>
-    <item value="0x1F" name="Garage"/>
+    <item value="0x10" name="Corridor"/>
+    <item value="0x11" name="Craft Room"/>
+    <item value="0x12" name="Cupboard"/>
+    <item value="0x13" name="Deck"/>
+    <item value="0x14" name="Den"/>
+    <item value="0x15" name="Dining"/>
+    <item value="0x16" name="Drawing Room"/>
+    <item value="0x17" name="Dressing Room"/>
+    <item value="0x18" name="Driveway"/>
+    <item value="0x19" name="Elevator"/>
+    <item value="0x1A" name="Ensuite"/>
+    <item value="0x1B" name="Entrance"/>
+    <item value="0x1C" name="Entryway"/>
+    <item value="0x1D" name="Family Room"/>
+    <item value="0x1E" name="Foyer"/>
+    <item value="0x1F" name="Front Door"/>
 
-    <item value="0x20" name="Garden"/>
-    <item value="0x21" name="Guest Bathroom"/>
-    <item value="0x22" name="Guest Bedroom"/>
-    <item value="0x23" name="Guest Restroom"/>
-    <item value="0x24" name="Guest Room"/>
-    <item value="0x25" name="Gym"/>
-    <item value="0x26" name="Hallway"/>
-    <item value="0x27" name="Kids Room"/>
-    <item value="0x28" name="Kids Bedroom"/>
-    <item value="0x29" name="Kitchen"/>
-    <item value="0x2A" name="Larder"/>
-    <item value="0x2B" name="Laundry Room"/>
-    <item value="0x2C" name="Lawn"/>
-    <item value="0x2D" name="Library"/>
-    <item value="0x2E" name="Living Room"/>
-    <item value="0x2F" name="Lounge"/>
+    <item value="0x20" name="Front Yard"/>
+    <item value="0x21" name="Game Room"/>
+    <item value="0x22" name="Garage"/>
+    <item value="0x23" name="Garage Door"/>
+    <item value="0x24" name="Garden"/>
+    <item value="0x25" name="Garden Door"/>
+    <item value="0x26" name="Guest Bathroom"/>
+    <item value="0x27" name="Guest Bedroom"/>
+    <item value="0x28" name="Guest Restroom"/>
+    <item value="0x29" name="Guest Room"/>
+    <item value="0x2A" name="Gym"/>
+    <item value="0x2B" name="Hallway"/>
+    <item value="0x2C" name="Kids Room"/>
+    <item value="0x2D" name="Kids Bedroom"/>
+    <item value="0x2E" name="Kitchen"/>
+    <item value="0x2F" name="Larder"/>
 
-    <item value="0x30" name="Man Cave"/>
-    <item value="0x31" name="Master Bathroom"/>
-    <item value="0x32" name="Master Bedroom"/>
-    <item value="0x33" name="Media/TV Room"/>
-    <item value="0x34" name="Mud Room"/>
-    <item value="0x35" name="Music Room"/>
-    <item value="0x36" name="Nursery"/>
-    <item value="0x37" name="Office"/>
-    <item value="0x38" name="Outdoor Kitchen"/>
-    <item value="0x39" name="Pantry"/>
-    <item value="0x3A" name="Parking Lot"/>
-    <item value="0x3B" name="Parlor"/>
-    <item value="0x3C" name="Patio"/>
-    <item value="0x3D" name="Play Room"/>
-    <item value="0x3E" name="Pool Room"/>
-    <item value="0x3F" name="Porch"/>
+    <item value="0x30" name="Laundry Room"/>
+    <item value="0x31" name="Lawn"/>
+    <item value="0x32" name="Library"/>
+    <item value="0x33" name="Living Room"/>
+    <item value="0x34" name="Lounge"/>
+    <item value="0x35" name="Man Cave"/>
+    <item value="0x36" name="Master Bathroom"/>
+    <item value="0x37" name="Master Bedroom"/>
+    <item value="0x38" name="Media/TV Room"/>
+    <item value="0x39" name="Mud Room"/>
+    <item value="0x3A" name="Music Room"/>
+    <item value="0x3B" name="Nursery"/>
+    <item value="0x3C" name="Office"/>
+    <item value="0x3D" name="Outdoor Kitchen"/>
+    <item value="0x3E" name="Outside"/>
+    <item value="0x3F" name="Pantry"/>
 
-    <item value="0x40" name="Ramp"/>
-    <item value="0x41" name="Reception Room"/>
-    <item value="0x42" name="Recreation Room"/>
-    <item value="0x43" name="Restroom"/>
-    <item value="0x44" name="Roof"/>
-    <item value="0x45" name="Sauna"/>
-    <item value="0x46" name="Scullery"/>
-    <item value="0x47" name="Shed"/>
-    <item value="0x48" name="Side Yard"/>
-    <item value="0x49" name="Sitting Room"/>
-    <item value="0x4A" name="Snug"/>
-    <item value="0x4B" name="Spa"/>
-    <item value="0x4C" name="Staircase"/>
-    <item value="0x4D" name="Steam Room"/>
-    <item value="0x4E" name="Storage Room"/>
-    <item value="0x4F" name="Studio"/>
+    <item value="0x40" name="Parking Lot"/>
+    <item value="0x41" name="Parlor"/>
+    <item value="0x42" name="Patio"/>
+    <item value="0x43" name="Play Room"/>
+    <item value="0x44" name="Pool Room"/>
+    <item value="0x45" name="Porch"/>
+    <item value="0x46" name="Ramp"/>
+    <item value="0x47" name="Reception Room"/>
+    <item value="0x48" name="Recreation Room"/>
+    <item value="0x49" name="Restroom"/>
+    <item value="0x4A" name="Roof"/>
+    <item value="0x4B" name="Sauna"/>
+    <item value="0x4C" name="Scullery"/>
+    <item value="0x4D" name="Sewing Room"/>
+    <item value="0x4E" name="Shed"/>
+    <item value="0x4F" name="Side Door"/>
 
-    <item value="0x50" name="Study"/>
-    <item value="0x51" name="Sun Room"/>
-    <item value="0x52" name="Swimming Pool"/>
-    <item value="0x53" name="Terrace"/>
-    <item value="0x54" name="Utility Room"/>
-    <item value="0x55" name="Ward"/>
-    <item value="0x56" name="Workshop"/>
+    <item value="0x50" name="Side Yard"/>
+    <item value="0x51" name="Sitting Room"/>
+    <item value="0x52" name="Snug"/>
+    <item value="0x53" name="Spa"/>
+    <item value="0x54" name="Staircase"/>
+    <item value="0x55" name="Steam Room"/>
+    <item value="0x56" name="Storage Room"/>
+    <item value="0x57" name="Studio"/>
+    <item value="0x58" name="Study"/>
+    <item value="0x59" name="Sun Room"/>
+    <item value="0x5A" name="Swimming Pool"/>
+    <item value="0x5B" name="Terrace"/>
+    <item value="0x5C" name="Utility Room"/>
+    <item value="0x5D" name="Ward"/>
+    <item value="0x5E" name="Workshop"/>
   </enum>
 
 
@@ -121,8 +129,8 @@ limitations under the License.
     <cluster code="0x0150"/>
     <!-- expected future use in Basic Information Cluster code="0x0028" -->
 
-    <item fieldId="0" name="LocationName"    type="char_string" length="64" isNullable="false"/>
-    <item fieldId="1" name="FloorNumber"     type="int16s"                  isNullable="true"/>
-    <item fieldId="2" name="AreaType"        type="AreaTypeTag"             isNullable="true"/>
+    <item fieldId="0" name="LocationName"    type="char_string" length="128" isNullable="false"/>
+    <item fieldId="1" name="FloorNumber"     type="int16s"                   isNullable="true"/>
+    <item fieldId="2" name="AreaType"        type="AreaTypeTag"              isNullable="true"/>
   </struct>
 </configurator>
