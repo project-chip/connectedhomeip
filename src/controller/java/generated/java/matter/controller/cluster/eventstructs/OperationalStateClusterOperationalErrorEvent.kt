@@ -16,7 +16,9 @@
  */
 package matter.controller.cluster.eventstructs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -42,14 +44,10 @@ class OperationalStateClusterOperationalErrorEvent(
   companion object {
     private const val TAG_ERROR_STATE = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): OperationalStateClusterOperationalErrorEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : OperationalStateClusterOperationalErrorEvent {
       tlvReader.enterStructure(tlvTag)
-      val errorState =
-        matter.controller.cluster.structs.OperationalStateClusterErrorStateStruct.fromTlv(
-          ContextSpecificTag(TAG_ERROR_STATE),
-          tlvReader
-        )
-
+      val errorState = matter.controller.cluster.structs.OperationalStateClusterErrorStateStruct.fromTlv(ContextSpecificTag(TAG_ERROR_STATE), tlvReader)
+      
       tlvReader.exitContainer()
 
       return OperationalStateClusterOperationalErrorEvent(errorState)

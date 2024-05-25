@@ -17,20 +17,23 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ScenesManagementClusterSceneInfoStruct(
-  val sceneCount: UInt,
-  val currentScene: UInt,
-  val currentGroup: UInt,
-  val sceneValid: Boolean,
-  val remainingCapacity: UInt,
-  val fabricIndex: UInt
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ScenesManagementClusterSceneInfoStruct (
+    val sceneCount: UInt,
+    val currentScene: UInt,
+    val currentGroup: UInt,
+    val sceneValid: Boolean,
+    val remainingCapacity: UInt,
+    val fabricIndex: UInt) {
+  override fun toString(): String  = buildString {
     append("ScenesManagementClusterSceneInfoStruct {\n")
     append("\tsceneCount : $sceneCount\n")
     append("\tcurrentScene : $currentScene\n")
@@ -62,7 +65,7 @@ class ScenesManagementClusterSceneInfoStruct(
     private const val TAG_REMAINING_CAPACITY = 4
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ScenesManagementClusterSceneInfoStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ScenesManagementClusterSceneInfoStruct {
       tlvReader.enterStructure(tlvTag)
       val sceneCount = tlvReader.getUInt(ContextSpecificTag(TAG_SCENE_COUNT))
       val currentScene = tlvReader.getUInt(ContextSpecificTag(TAG_CURRENT_SCENE))
@@ -70,17 +73,10 @@ class ScenesManagementClusterSceneInfoStruct(
       val sceneValid = tlvReader.getBoolean(ContextSpecificTag(TAG_SCENE_VALID))
       val remainingCapacity = tlvReader.getUInt(ContextSpecificTag(TAG_REMAINING_CAPACITY))
       val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
-
+      
       tlvReader.exitContainer()
 
-      return ScenesManagementClusterSceneInfoStruct(
-        sceneCount,
-        currentScene,
-        currentGroup,
-        sceneValid,
-        remainingCapacity,
-        fabricIndex
-      )
+      return ScenesManagementClusterSceneInfoStruct(sceneCount, currentScene, currentGroup, sceneValid, remainingCapacity, fabricIndex)
     }
   }
 }

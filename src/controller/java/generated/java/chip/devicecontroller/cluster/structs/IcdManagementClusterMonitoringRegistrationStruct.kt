@@ -17,17 +17,20 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class IcdManagementClusterMonitoringRegistrationStruct(
-  val checkInNodeID: ULong,
-  val monitoredSubject: ULong,
-  val fabricIndex: UInt
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class IcdManagementClusterMonitoringRegistrationStruct (
+    val checkInNodeID: ULong,
+    val monitoredSubject: ULong,
+    val fabricIndex: UInt) {
+  override fun toString(): String  = buildString {
     append("IcdManagementClusterMonitoringRegistrationStruct {\n")
     append("\tcheckInNodeID : $checkInNodeID\n")
     append("\tmonitoredSubject : $monitoredSubject\n")
@@ -50,22 +53,15 @@ class IcdManagementClusterMonitoringRegistrationStruct(
     private const val TAG_MONITORED_SUBJECT = 2
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): IcdManagementClusterMonitoringRegistrationStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : IcdManagementClusterMonitoringRegistrationStruct {
       tlvReader.enterStructure(tlvTag)
       val checkInNodeID = tlvReader.getULong(ContextSpecificTag(TAG_CHECK_IN_NODE_I_D))
       val monitoredSubject = tlvReader.getULong(ContextSpecificTag(TAG_MONITORED_SUBJECT))
       val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
-
+      
       tlvReader.exitContainer()
 
-      return IcdManagementClusterMonitoringRegistrationStruct(
-        checkInNodeID,
-        monitoredSubject,
-        fabricIndex
-      )
+      return IcdManagementClusterMonitoringRegistrationStruct(checkInNodeID, monitoredSubject, fabricIndex)
     }
   }
 }

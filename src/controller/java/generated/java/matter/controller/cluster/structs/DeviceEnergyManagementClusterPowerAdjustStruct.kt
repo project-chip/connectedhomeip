@@ -16,7 +16,9 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -60,15 +62,10 @@ class DeviceEnergyManagementClusterPowerAdjustStruct(
       val maxPower = tlvReader.getLong(ContextSpecificTag(TAG_MAX_POWER))
       val minDuration = tlvReader.getUInt(ContextSpecificTag(TAG_MIN_DURATION))
       val maxDuration = tlvReader.getUInt(ContextSpecificTag(TAG_MAX_DURATION))
-
+      
       tlvReader.exitContainer()
 
-      return DeviceEnergyManagementClusterPowerAdjustStruct(
-        minPower,
-        maxPower,
-        minDuration,
-        maxDuration
-      )
+      return DeviceEnergyManagementClusterPowerAdjustStruct(minPower, maxPower, minDuration, maxDuration)
     }
   }
 }
