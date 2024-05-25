@@ -16,13 +16,17 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class DemandResponseLoadControlClusterDutyCycleControlStruct(val dutyCycle: UByte) {
+class DemandResponseLoadControlClusterDutyCycleControlStruct(
+  val dutyCycle: UByte
+) {
   override fun toString(): String = buildString {
     append("DemandResponseLoadControlClusterDutyCycleControlStruct {\n")
     append("\tdutyCycle : $dutyCycle\n")
@@ -40,13 +44,10 @@ class DemandResponseLoadControlClusterDutyCycleControlStruct(val dutyCycle: UByt
   companion object {
     private const val TAG_DUTY_CYCLE = 0
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): DemandResponseLoadControlClusterDutyCycleControlStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DemandResponseLoadControlClusterDutyCycleControlStruct {
       tlvReader.enterStructure(tlvTag)
       val dutyCycle = tlvReader.getUByte(ContextSpecificTag(TAG_DUTY_CYCLE))
-
+      
       tlvReader.exitContainer()
 
       return DemandResponseLoadControlClusterDutyCycleControlStruct(dutyCycle)

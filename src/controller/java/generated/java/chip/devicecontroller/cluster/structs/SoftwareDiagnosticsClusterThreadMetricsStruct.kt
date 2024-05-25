@@ -17,20 +17,22 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class SoftwareDiagnosticsClusterThreadMetricsStruct(
-  val id: ULong,
-  val name: Optional<String>,
-  val stackFreeCurrent: Optional<ULong>,
-  val stackFreeMinimum: Optional<ULong>,
-  val stackSize: Optional<ULong>
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class SoftwareDiagnosticsClusterThreadMetricsStruct (
+    val id: ULong,
+    val name: Optional<String>,
+    val stackFreeCurrent: Optional<ULong>,
+    val stackFreeMinimum: Optional<ULong>,
+    val stackSize: Optional<ULong>) {
+  override fun toString(): String  = buildString {
     append("SoftwareDiagnosticsClusterThreadMetricsStruct {\n")
     append("\tid : $id\n")
     append("\tname : $name\n")
@@ -45,21 +47,21 @@ class SoftwareDiagnosticsClusterThreadMetricsStruct(
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_ID), id)
       if (name.isPresent) {
-        val optname = name.get()
-        put(ContextSpecificTag(TAG_NAME), optname)
-      }
+      val optname = name.get()
+      put(ContextSpecificTag(TAG_NAME), optname)
+    }
       if (stackFreeCurrent.isPresent) {
-        val optstackFreeCurrent = stackFreeCurrent.get()
-        put(ContextSpecificTag(TAG_STACK_FREE_CURRENT), optstackFreeCurrent)
-      }
+      val optstackFreeCurrent = stackFreeCurrent.get()
+      put(ContextSpecificTag(TAG_STACK_FREE_CURRENT), optstackFreeCurrent)
+    }
       if (stackFreeMinimum.isPresent) {
-        val optstackFreeMinimum = stackFreeMinimum.get()
-        put(ContextSpecificTag(TAG_STACK_FREE_MINIMUM), optstackFreeMinimum)
-      }
+      val optstackFreeMinimum = stackFreeMinimum.get()
+      put(ContextSpecificTag(TAG_STACK_FREE_MINIMUM), optstackFreeMinimum)
+    }
       if (stackSize.isPresent) {
-        val optstackSize = stackSize.get()
-        put(ContextSpecificTag(TAG_STACK_SIZE), optstackSize)
-      }
+      val optstackSize = stackSize.get()
+      put(ContextSpecificTag(TAG_STACK_SIZE), optstackSize)
+    }
       endStructure()
     }
   }
@@ -71,43 +73,33 @@ class SoftwareDiagnosticsClusterThreadMetricsStruct(
     private const val TAG_STACK_FREE_MINIMUM = 3
     private const val TAG_STACK_SIZE = 4
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): SoftwareDiagnosticsClusterThreadMetricsStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : SoftwareDiagnosticsClusterThreadMetricsStruct {
       tlvReader.enterStructure(tlvTag)
       val id = tlvReader.getULong(ContextSpecificTag(TAG_ID))
-      val name =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_NAME))) {
-          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))
-        } else {
-          Optional.empty()
-        }
-      val stackFreeCurrent =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_STACK_FREE_CURRENT))) {
-          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_STACK_FREE_CURRENT)))
-        } else {
-          Optional.empty()
-        }
-      val stackFreeMinimum =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_STACK_FREE_MINIMUM))) {
-          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_STACK_FREE_MINIMUM)))
-        } else {
-          Optional.empty()
-        }
-      val stackSize =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_STACK_SIZE))) {
-          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_STACK_SIZE)))
-        } else {
-          Optional.empty()
-        }
-
+      val name = if (tlvReader.isNextTag(ContextSpecificTag(TAG_NAME))) {
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))
+    } else {
+      Optional.empty()
+    }
+      val stackFreeCurrent = if (tlvReader.isNextTag(ContextSpecificTag(TAG_STACK_FREE_CURRENT))) {
+      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_STACK_FREE_CURRENT)))
+    } else {
+      Optional.empty()
+    }
+      val stackFreeMinimum = if (tlvReader.isNextTag(ContextSpecificTag(TAG_STACK_FREE_MINIMUM))) {
+      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_STACK_FREE_MINIMUM)))
+    } else {
+      Optional.empty()
+    }
+      val stackSize = if (tlvReader.isNextTag(ContextSpecificTag(TAG_STACK_SIZE))) {
+      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_STACK_SIZE)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
-      return SoftwareDiagnosticsClusterThreadMetricsStruct(
-        id,
-        name,
-        stackFreeCurrent,
-        stackFreeMinimum,
-        stackSize
-      )
+      return SoftwareDiagnosticsClusterThreadMetricsStruct(id, name, stackFreeCurrent, stackFreeMinimum, stackSize)
     }
   }
 }

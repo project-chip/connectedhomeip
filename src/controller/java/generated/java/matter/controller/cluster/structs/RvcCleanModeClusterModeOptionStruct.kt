@@ -16,6 +16,7 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -59,15 +60,14 @@ class RvcCleanModeClusterModeOptionStruct(
       tlvReader.enterStructure(tlvTag)
       val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
       val mode = tlvReader.getUByte(ContextSpecificTag(TAG_MODE))
-      val modeTags =
-        buildList<RvcCleanModeClusterModeTagStruct> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_MODE_TAGS))
-          while (!tlvReader.isEndOfContainer()) {
-            add(RvcCleanModeClusterModeTagStruct.fromTlv(AnonymousTag, tlvReader))
-          }
-          tlvReader.exitContainer()
-        }
-
+      val modeTags = buildList<RvcCleanModeClusterModeTagStruct> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_MODE_TAGS))
+      while(!tlvReader.isEndOfContainer()) {
+        add(RvcCleanModeClusterModeTagStruct.fromTlv(AnonymousTag, tlvReader))
+      }
+      tlvReader.exitContainer()
+    }
+      
       tlvReader.exitContainer()
 
       return RvcCleanModeClusterModeOptionStruct(label, mode, modeTags)
