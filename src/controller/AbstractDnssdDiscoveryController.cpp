@@ -22,34 +22,32 @@
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <bitset>
+
 namespace chip {
 namespace Controller {
 
-bool AddressListsSameExceptOrder(const size_t sourceNumIPs, const size_t destinationNumIPs,
-                                 const Inet::IPAddress source[Dnssd::CommissionNodeData::kMaxIPAddresses],
-                                 const Inet::IPAddress destination[Dnssd::CommissionNodeData::kMaxIPAddresses])
+static bool SameExceptOrder(const chip::Span<const Inet::IPAddress> &source, const chip::Span<const Inet::IPAddress> &destination)
 {
-    size_t sameIpAddress                                                 = 0;
-    bool addressUsed[chip::Dnssd::CommonResolutionData::kMaxIPAddresses] = { false };
-    if (sourceNumIPs != destinationNumIPs)
+    std::bitset<chip::Dnssd::CommonResolutionData::kMaxIPAddresses> addressUsed;
+    if (source.size() != destination.size())
     {
         return false;
     }
 
-    for (size_t s = 0; s < sourceNumIPs; s++)
+    for (size_t s = 0; s < source.size(); s++)
     {
-        for (size_t d = 0; d < destinationNumIPs; d++)
+        for (size_t d = 0; d < destination.size(); d++)
         {
             if (!addressUsed[d] && source[s] == destination[d])
             {
                 // Change the user flag so that the compared target is no longer used
-                addressUsed[d] = true;
-                sameIpAddress++;
+                addressUsed.set(d, true);
                 break;
             }
         }
     }
-    return sameIpAddress == destinationNumIPs;
+    return addressUsed.count() == destination.size();
 }
 
 void AbstractDnssdDiscoveryController::OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & discNodeData)
@@ -65,8 +63,10 @@ void AbstractDnssdDiscoveryController::OnNodeDiscovered(const chip::Dnssd::Disco
         {
             continue;
         }
+        chip::Span<const Inet::IPAddress> discoveredNodeIPAddressSpan(&discoveredNode.ipAddress[0], discoveredNode.numIPs);
+        chip::Span<const Inet::IPAddress> nodeDataIPAddressSpan(&nodeData.ipAddress[0], nodeData.numIPs);
         if (strcmp(discoveredNode.hostName, nodeData.hostName) == 0 && discoveredNode.port == nodeData.port &&
-            AddressListsSameExceptOrder(discoveredNode.numIPs, nodeData.numIPs, discoveredNode.ipAddress, nodeData.ipAddress))
+            SameExceptOrder(discoveredNodeIPAddressSpan, nodeDataIPAddressSpan))
         {
             discoveredNode = nodeData;
             if (mDeviceDiscoveryDelegate != nullptr)
