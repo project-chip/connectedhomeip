@@ -27,7 +27,7 @@
 namespace chip {
 namespace Controller {
 
-static bool SameExceptOrder(const chip::Span<const Inet::IPAddress> &source, const chip::Span<const Inet::IPAddress> &destination)
+static bool SameExceptOrder(const chip::Span<const Inet::IPAddress> & source, const chip::Span<const Inet::IPAddress> & destination)
 {
     std::bitset<chip::Dnssd::CommonResolutionData::kMaxIPAddresses> addressUsed;
     if (source.size() != destination.size())
