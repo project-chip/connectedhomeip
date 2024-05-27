@@ -159,7 +159,7 @@ class feature:
         return ConformanceDecision.NOT_APPLICABLE
 
     def __str__(self):
-        return f'{self.code}'
+        return self.code
 
 
 class device_feature:
@@ -172,7 +172,7 @@ class device_feature:
         return ConformanceDecision.OPTIONAL
 
     def __str__(self):
-        return f'{self.feature}'
+        return self.feature
 
 
 class attribute:
@@ -186,7 +186,7 @@ class attribute:
         return ConformanceDecision.NOT_APPLICABLE
 
     def __str__(self):
-        return f'{self.name}'
+        return self.name
 
 
 class command:
@@ -200,7 +200,7 @@ class command:
         return ConformanceDecision.NOT_APPLICABLE
 
     def __str__(self):
-        return f'{self.name}'
+        return self.name
 
 
 def strip_outer_parentheses(inner: str) -> str:
