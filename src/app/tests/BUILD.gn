@@ -147,7 +147,6 @@ chip_test_suite("tests") {
     "WriteHandlerTestAccess.h",
   ]
   test_sources = [
-    "TestAclAttribute.cpp",
     "TestAclEvent.cpp",
     "TestBindingTable.cpp",
     "TestBuilderParser.cpp",
@@ -160,6 +159,10 @@ chip_test_suite("tests") {
     "TestTimedHandler.cpp",
     "TestWriteInteraction.cpp",
   ]
+
+  # TestAclAttribute is a test that causes failures in TestAclEvent or TestReadInteraction if it is run before them on Zephyr Native_Posix used by Nordic CI.
+  ##TODO  resolve this test to make sure its teardown does not cause failures in those tests. and put it in the above test_sources list
+  test_sources += [ "TestAclAttribute.cpp" ]
 
   if (!chip_fake_platform) {
     test_sources += [ "TestFailSafeContext.cpp" ]
