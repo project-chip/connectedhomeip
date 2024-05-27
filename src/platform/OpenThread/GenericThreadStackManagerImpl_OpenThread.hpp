@@ -1353,7 +1353,7 @@ template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnSrpClientStateChange(const otSockAddr * aServerSockAddr,
                                                                                  void * aContext)
 {
-    if (aServerSockAddr)
+    if (aServerSockAddr != nullptr)
     {
         ChipLogProgress(DeviceLayer, "SRP Client was started, detected server: %04x:%04x:%04x:%04x:%04x:%04x:%04x:%04x",
                         Encoding::BigEndian::HostSwap16(aServerSockAddr->mAddress.mFields.m16[0]),
