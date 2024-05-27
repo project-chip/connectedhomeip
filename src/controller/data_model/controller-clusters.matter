@@ -2804,7 +2804,7 @@ provisional cluster Timer = 71 {
 }
 
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of an Oven. */
-provisional cluster OvenCavityOperationalState = 72 {
+cluster OvenCavityOperationalState = 72 {
   revision 1;
 
   enum ErrorStateEnum : enum8 {
@@ -2870,7 +2870,7 @@ provisional cluster OvenCavityOperationalState = 72 {
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
-provisional cluster OvenMode = 73 {
+cluster OvenMode = 73 {
   revision 1;
 
   enum ModeTag : enum16 {

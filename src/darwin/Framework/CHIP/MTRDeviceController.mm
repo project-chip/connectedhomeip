@@ -128,6 +128,8 @@ using namespace chip::Tracing::DarwinFramework;
 
     // _serverEndpoints is only touched on the Matter queue.
     NSMutableArray<MTRServerEndpoint *> * _serverEndpoints;
+
+    MTRDeviceStorageBehaviorConfiguration * _storageBehaviorConfiguration;
 }
 
 - (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters error:(NSError * __autoreleasing *)error
@@ -145,9 +147,6 @@ using namespace chip::Tracing::DarwinFramework;
     return [MTRDeviceControllerFactory.sharedInstance initializeController:self withParameters:controllerParameters error:error];
 }
 
-static NSString * const kLocalTestUserDefaultDomain = @"org.csa-iot.matter.darwintest";
-static NSString * const kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey = @"subscriptionPoolSizeOverride";
-
 - (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
                              queue:(dispatch_queue_t)queue
                    storageDelegate:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
@@ -156,6 +155,7 @@ static NSString * const kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey = @
           otaProviderDelegateQueue:(dispatch_queue_t _Nullable)otaProviderDelegateQueue
                   uniqueIdentifier:(NSUUID *)uniqueIdentifier
     concurrentSubscriptionPoolSize:(NSUInteger)concurrentSubscriptionPoolSize
+      storageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration
 {
     if (self = [super init]) {
         // Make sure our storage is all set up to work as early as possible,
@@ -256,27 +256,29 @@ static NSString * const kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey = @
         }
 
         // Provide a way to test different subscription pool sizes without code change
-        NSUserDefaults * defaults = [[NSUserDefaults alloc] initWithSuiteName:kLocalTestUserDefaultDomain];
-        if ([defaults objectForKey:kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey]) {
-            NSInteger subscriptionPoolSizeOverride = [defaults integerForKey:kLocalTestUserDefaultSubscriptionPoolSizeOverrideKey];
+        NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
+        if ([defaults objectForKey:kDefaultSubscriptionPoolSizeOverrideKey]) {
+            NSInteger subscriptionPoolSizeOverride = [defaults integerForKey:kDefaultSubscriptionPoolSizeOverrideKey];
             if (subscriptionPoolSizeOverride < 1) {
                 concurrentSubscriptionPoolSize = 1;
             } else {
                 concurrentSubscriptionPoolSize = static_cast<NSUInteger>(subscriptionPoolSizeOverride);
             }
 
-            MTR_LOG(" *** Overriding pool size of MTRDeviceController with: %tu", concurrentSubscriptionPoolSize);
+            MTR_LOG(" *** Overriding pool size of MTRDeviceController with: %lu", static_cast<unsigned long>(concurrentSubscriptionPoolSize));
         }
 
         if (!concurrentSubscriptionPoolSize) {
             concurrentSubscriptionPoolSize = 1;
         }
 
-        MTR_LOG("Setting up pool size of MTRDeviceController with: %tu", concurrentSubscriptionPoolSize);
+        MTR_LOG("Setting up pool size of MTRDeviceController with: %lu", static_cast<unsigned long>(concurrentSubscriptionPoolSize));
 
         _concurrentSubscriptionPool = [[MTRAsyncWorkQueue alloc] initWithContext:self width:concurrentSubscriptionPoolSize];
 
         _storedFabricIndex = chip::kUndefinedFabricIndex;
+
+        _storageBehaviorConfiguration = storageBehaviorConfiguration;
     }
     return self;
 }
@@ -991,6 +993,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             [deviceToReturn setPersistedDeviceData:deviceData];
         }
     }
+
+    [deviceToReturn setStorageBehaviorConfiguration:_storageBehaviorConfiguration];
 
     return deviceToReturn;
 }
@@ -1838,7 +1842,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 - (BOOL)openPairingWindow:(uint64_t)deviceID duration:(NSUInteger)duration error:(NSError * __autoreleasing *)error
 {
     if (duration > UINT16_MAX) {
-        MTR_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT16_MAX);
+        MTR_LOG_ERROR("Error: Duration %lu is too large. Max value %d", static_cast<unsigned long>(duration), UINT16_MAX);
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
         }
@@ -1864,7 +1868,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
                                  error:(NSError * __autoreleasing *)error
 {
     if (duration > UINT16_MAX) {
-        MTR_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT16_MAX);
+        MTR_LOG_ERROR("Error: Duration %lu is too large. Max value %d", static_cast<unsigned long>(duration), UINT16_MAX);
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
         }
@@ -1872,7 +1876,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     }
 
     if (discriminator > 0xfff) {
-        MTR_LOG_ERROR("Error: Discriminator %tu is too large. Max value %d", discriminator, 0xfff);
+        MTR_LOG_ERROR("Error: Discriminator %lu is too large. Max value %d", static_cast<unsigned long>(discriminator), 0xfff);
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
         }
