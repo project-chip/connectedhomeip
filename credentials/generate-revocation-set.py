@@ -64,6 +64,17 @@ def extract_single_integer_attribute(subject, oid):
     return None
 
 
+def extract_single_attribute_from_cn(cn, marker):
+    val_len = 4
+    start_idx = cn.find(marker)
+
+    if start_idx != -1:
+        val_start_idx = start_idx + len(marker)
+        return int(cn[val_start_idx:val_start_idx + val_len], 16)
+
+    return None
+
+
 def parse_vid_pid_from_distinguished_name(distinguished_name):
     # VID/PID encoded using Matter specific RDNs
     vid = extract_single_integer_attribute(distinguished_name, OID_VENDOR_ID)
@@ -72,14 +83,8 @@ def parse_vid_pid_from_distinguished_name(distinguished_name):
     # Fallback method to get the VID/PID, encoded in CN as "Mvid:FFFF Mpid:1234"
     if vid is None and pid is None:
         cn = distinguished_name.get_attributes_for_oid(x509.ObjectIdentifier("2.5.4.3"))[0].value
-
-        vid_start = cn.find('Mvid:')
-        if vid_start != -1:
-            vid = int(cn[vid_start + 5:vid_start + 9], 16)
-
-        pid_start = cn.find('Mpid:')
-        if pid_start != -1:
-            pid = int(cn[pid_start + 5:pid_start + 9], 16)
+        vid = extract_single_attribute_from_cn(cn, 'Mvid:')
+        pid = extract_single_attribute_from_cn(cn, 'Mpid:')
 
     return vid, pid
 
