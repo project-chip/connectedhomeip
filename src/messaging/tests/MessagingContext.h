@@ -101,7 +101,7 @@ public:
     ~MessagingContext() { VerifyOrDie(mInitialized == false); }
 
     // Whether Alice and Bob are initialized, must be called before Init
-    static void ConfigInitializeNodes(bool initializeNodes) { sInitializeNodes = initializeNodes; }
+    void ConfigInitializeNodes(bool initializeNodes) { mInitializeNodes = initializeNodes; }
 
     /// Initialize the underlying layers and test suite pointer
     CHIP_ERROR Init(TransportMgrBase * transport, IOContext * io);
@@ -178,7 +178,7 @@ public:
     System::Layer & GetSystemLayer() { return mIOContext->GetSystemLayer(); }
 
 private:
-    static bool sInitializeNodes;
+    bool mInitializeNodes = true;
     bool mInitialized;
     FabricTable mFabricTable;
 
