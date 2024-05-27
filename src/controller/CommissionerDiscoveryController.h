@@ -237,7 +237,7 @@ public:
 
     /**
      * @brief
-     *   Called to check app's installation status. 
+     *   Called to check app's installation status.
      *
      * This will be called by the main chip thread so any blocking work should be moved to a separate thread.
      *

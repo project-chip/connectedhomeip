@@ -159,7 +159,7 @@ class MyAppInstallationService : public AppInstallationService
         return ContentAppPlatform::GetInstance().LoadContentAppByClient(vendorId, productId) != nullptr;
     }
 
-    CommissionerDeclaration::CdError GetInstallationStatusOfApp(uint16_t vendorId, uint16_t productId) override 
+    CommissionerDeclaration::CdError GetInstallationStatusOfApp(uint16_t vendorId, uint16_t productId) override
     {
         ContentAppFactoryImpl * factory = GetContentAppFactoryImpl();
         return factory->GetAppInstallationStatus(vendorId, productId);
