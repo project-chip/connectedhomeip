@@ -5864,6 +5864,21 @@ cluster ColorControl = 768 {
     kColorTemperature = 2;
   }
 
+  enum DriftCompensation : enum8 {
+    kNone = 0;
+    kOtherUnknown = 1;
+    kTemperaturemonitoring = 2;
+    kOpticalLuminanceMonitoringAndFeedback = 3;
+    kOpticalColorMonitoringAndFeedback = 4;
+  }
+
+  enum EnhancedColorMode : enum8 {
+    kCurrentHueAndCurrentSaturation = 0;
+    kCurrentXAndCurrentY = 1;
+    kColorTemperature = 2;
+    kEnhancedCurrentHueAndCurrentSaturation = 3;
+  }
+
   enum HueDirection : enum8 {
     kShortestDistance = 0;
     kLongestDistance = 1;
@@ -5901,6 +5916,10 @@ cluster ColorControl = 768 {
     kColorTemperatureSupported = 0x10;
   }
 
+  bitmap ColorControlOptions : bitmap8 {
+    kExecuteIfOff = 0x1;
+  }
+
   bitmap ColorLoopUpdateFlags : bitmap8 {
     kUpdateAction = 0x1;
     kUpdateDirection = 0x2;
@@ -5921,11 +5940,11 @@ cluster ColorControl = 768 {
   readonly attribute optional int16u remainingTime = 2;
   readonly attribute optional int16u currentX = 3;
   readonly attribute optional int16u currentY = 4;
-  readonly attribute optional enum8 driftCompensation = 5;
+  readonly attribute optional DriftCompensation driftCompensation = 5;
   readonly attribute optional char_string<254> compensationText = 6;
   readonly attribute optional int16u colorTemperatureMireds = 7;
   readonly attribute enum8 colorMode = 8;
-  attribute bitmap8 options = 15;
+  attribute ColorControlOptions options = 15;
   readonly attribute nullable int8u numberOfPrimaries = 16;
   readonly attribute optional int16u primary1X = 17;
   readonly attribute optional int16u primary1Y = 18;
@@ -5957,7 +5976,7 @@ cluster ColorControl = 768 {
   attribute access(write: manage) optional int16u colorPointBY = 59;
   attribute access(write: manage) optional nullable int8u colorPointBIntensity = 60;
   readonly attribute optional int16u enhancedCurrentHue = 16384;
-  readonly attribute enum8 enhancedColorMode = 16385;
+  readonly attribute EnhancedColorMode enhancedColorMode = 16385;
   readonly attribute optional int8u colorLoopActive = 16386;
   readonly attribute optional int8u colorLoopDirection = 16387;
   readonly attribute optional int16u colorLoopTime = 16388;

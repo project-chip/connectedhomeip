@@ -34913,7 +34913,7 @@ class ColorControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="remainingTime", Tag=0x00000002, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="currentX", Tag=0x00000003, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="currentY", Tag=0x00000004, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="driftCompensation", Tag=0x00000005, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="driftCompensation", Tag=0x00000005, Type=typing.Optional[ColorControl.Enums.DriftCompensation]),
                 ClusterObjectFieldDescriptor(Label="compensationText", Tag=0x00000006, Type=typing.Optional[str]),
                 ClusterObjectFieldDescriptor(Label="colorTemperatureMireds", Tag=0x00000007, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="colorMode", Tag=0x00000008, Type=uint),
@@ -34949,7 +34949,7 @@ class ColorControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="colorPointBY", Tag=0x0000003B, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="colorPointBIntensity", Tag=0x0000003C, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="enhancedCurrentHue", Tag=0x00004000, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="enhancedColorMode", Tag=0x00004001, Type=uint),
+                ClusterObjectFieldDescriptor(Label="enhancedColorMode", Tag=0x00004001, Type=ColorControl.Enums.EnhancedColorMode),
                 ClusterObjectFieldDescriptor(Label="colorLoopActive", Tag=0x00004002, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="colorLoopDirection", Tag=0x00004003, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="colorLoopTime", Tag=0x00004004, Type=typing.Optional[uint]),
@@ -34973,7 +34973,7 @@ class ColorControl(Cluster):
     remainingTime: 'typing.Optional[uint]' = None
     currentX: 'typing.Optional[uint]' = None
     currentY: 'typing.Optional[uint]' = None
-    driftCompensation: 'typing.Optional[uint]' = None
+    driftCompensation: 'typing.Optional[ColorControl.Enums.DriftCompensation]' = None
     compensationText: 'typing.Optional[str]' = None
     colorTemperatureMireds: 'typing.Optional[uint]' = None
     colorMode: 'uint' = None
@@ -35009,7 +35009,7 @@ class ColorControl(Cluster):
     colorPointBY: 'typing.Optional[uint]' = None
     colorPointBIntensity: 'typing.Union[None, Nullable, uint]' = None
     enhancedCurrentHue: 'typing.Optional[uint]' = None
-    enhancedColorMode: 'uint' = None
+    enhancedColorMode: 'ColorControl.Enums.EnhancedColorMode' = None
     colorLoopActive: 'typing.Optional[uint]' = None
     colorLoopDirection: 'typing.Optional[uint]' = None
     colorLoopTime: 'typing.Optional[uint]' = None
@@ -35056,6 +35056,29 @@ class ColorControl(Cluster):
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3,
+
+        class DriftCompensation(MatterIntEnum):
+            kNone = 0x00
+            kOtherUnknown = 0x01
+            kTemperaturemonitoring = 0x02
+            kOpticalLuminanceMonitoringAndFeedback = 0x03
+            kOpticalColorMonitoringAndFeedback = 0x04
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 5,
+
+        class EnhancedColorMode(MatterIntEnum):
+            kCurrentHueAndCurrentSaturation = 0x00
+            kCurrentXAndCurrentY = 0x01
+            kColorTemperature = 0x02
+            kEnhancedCurrentHueAndCurrentSaturation = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 4,
 
         class HueDirection(MatterIntEnum):
             kShortestDistance = 0x00
@@ -35113,6 +35136,9 @@ class ColorControl(Cluster):
             kColorLoopSupported = 0x4
             kXYAttributesSupported = 0x8
             kColorTemperatureSupported = 0x10
+
+        class ColorControlOptions(IntFlag):
+            kExecuteIfOff = 0x1
 
         class ColorLoopUpdateFlags(IntFlag):
             kUpdateAction = 0x1
@@ -35669,9 +35695,9 @@ class ColorControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[ColorControl.Enums.DriftCompensation])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Optional[ColorControl.Enums.DriftCompensation]' = None
 
         @dataclass
         class CompensationText(ClusterAttributeDescriptor):
@@ -36245,9 +36271,9 @@ class ColorControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=ColorControl.Enums.EnhancedColorMode)
 
-            value: 'uint' = 0
+            value: 'ColorControl.Enums.EnhancedColorMode' = 0
 
         @dataclass
         class ColorLoopActive(ClusterAttributeDescriptor):

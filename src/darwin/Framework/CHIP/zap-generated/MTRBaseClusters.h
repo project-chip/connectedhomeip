@@ -20219,6 +20219,21 @@ typedef NS_ENUM(uint8_t, MTRColorControlColorMode) {
     MTRColorControlColorModeColorTemperature MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+typedef NS_ENUM(uint8_t, MTRColorControlDriftCompensation) {
+    MTRColorControlDriftCompensationNone MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRColorControlDriftCompensationOtherUnknown MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRColorControlDriftCompensationTemperaturemonitoring MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRColorControlDriftCompensationOpticalLuminanceMonitoringAndFeedback MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRColorControlDriftCompensationOpticalColorMonitoringAndFeedback MTR_PROVISIONALLY_AVAILABLE = 0x04,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRColorControlEnhancedColorMode) {
+    MTRColorControlEnhancedColorModeCurrentHueAndCurrentSaturation MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRColorControlEnhancedColorModeCurrentXAndCurrentY MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRColorControlEnhancedColorModeColorTemperature MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRColorControlEnhancedColorModeEnhancedCurrentHueAndCurrentSaturation MTR_PROVISIONALLY_AVAILABLE = 0x03,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRColorControlHueDirection) {
     MTRColorControlHueDirectionShortestDistance MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
     MTRColorControlHueDirectionLongestDistance MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
@@ -20255,6 +20270,10 @@ typedef NS_OPTIONS(uint16_t, MTRColorControlColorCapabilities) {
     MTRColorControlColorCapabilitiesXYAttributesSupported MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x8,
     MTRColorControlColorCapabilitiesColorTemperatureSupported MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x10,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+typedef NS_OPTIONS(uint8_t, MTRColorControlOptions) {
+    MTRColorControlOptionsExecuteIfOff MTR_PROVISIONALLY_AVAILABLE = 0x1,
+} MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint8_t, MTRColorControlColorLoopUpdateFlags) {
     MTRColorControlColorLoopUpdateFlagsUpdateAction MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,

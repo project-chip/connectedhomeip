@@ -32476,9 +32476,9 @@ struct TypeInfo
 namespace DriftCompensation {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::ColorControl::DriftCompensation;
+    using DecodableType    = chip::app::Clusters::ColorControl::DriftCompensation;
+    using DecodableArgType = chip::app::Clusters::ColorControl::DriftCompensation;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DriftCompensation::Id; }
@@ -32525,9 +32525,9 @@ struct TypeInfo
 namespace Options {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitMask<chip::app::Clusters::ColorControl::ColorControlOptions>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::ColorControl::ColorControlOptions>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::ColorControl::ColorControlOptions>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Options::Id; }
@@ -32909,9 +32909,9 @@ struct TypeInfo
 namespace EnhancedColorMode {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::ColorControl::EnhancedColorMode;
+    using DecodableType    = chip::app::Clusters::ColorControl::EnhancedColorMode;
+    using DecodableArgType = chip::app::Clusters::ColorControl::EnhancedColorMode;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnhancedColorMode::Id; }
@@ -33088,11 +33088,13 @@ struct TypeInfo
         Attributes::RemainingTime::TypeInfo::DecodableType remainingTime         = static_cast<uint16_t>(0);
         Attributes::CurrentX::TypeInfo::DecodableType currentX                   = static_cast<uint16_t>(0);
         Attributes::CurrentY::TypeInfo::DecodableType currentY                   = static_cast<uint16_t>(0);
-        Attributes::DriftCompensation::TypeInfo::DecodableType driftCompensation = static_cast<uint8_t>(0);
+        Attributes::DriftCompensation::TypeInfo::DecodableType driftCompensation =
+            static_cast<chip::app::Clusters::ColorControl::DriftCompensation>(0);
         Attributes::CompensationText::TypeInfo::DecodableType compensationText;
         Attributes::ColorTemperatureMireds::TypeInfo::DecodableType colorTemperatureMireds = static_cast<uint16_t>(0);
         Attributes::ColorMode::TypeInfo::DecodableType colorMode                           = static_cast<uint8_t>(0);
-        Attributes::Options::TypeInfo::DecodableType options                               = static_cast<uint8_t>(0);
+        Attributes::Options::TypeInfo::DecodableType options =
+            static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorControlOptions>>(0);
         Attributes::NumberOfPrimaries::TypeInfo::DecodableType numberOfPrimaries;
         Attributes::Primary1X::TypeInfo::DecodableType primary1X = static_cast<uint16_t>(0);
         Attributes::Primary1Y::TypeInfo::DecodableType primary1Y = static_cast<uint16_t>(0);
@@ -33123,8 +33125,9 @@ struct TypeInfo
         Attributes::ColorPointBX::TypeInfo::DecodableType colorPointBX = static_cast<uint16_t>(0);
         Attributes::ColorPointBY::TypeInfo::DecodableType colorPointBY = static_cast<uint16_t>(0);
         Attributes::ColorPointBIntensity::TypeInfo::DecodableType colorPointBIntensity;
-        Attributes::EnhancedCurrentHue::TypeInfo::DecodableType enhancedCurrentHue                 = static_cast<uint16_t>(0);
-        Attributes::EnhancedColorMode::TypeInfo::DecodableType enhancedColorMode                   = static_cast<uint8_t>(0);
+        Attributes::EnhancedCurrentHue::TypeInfo::DecodableType enhancedCurrentHue = static_cast<uint16_t>(0);
+        Attributes::EnhancedColorMode::TypeInfo::DecodableType enhancedColorMode =
+            static_cast<chip::app::Clusters::ColorControl::EnhancedColorMode>(0);
         Attributes::ColorLoopActive::TypeInfo::DecodableType colorLoopActive                       = static_cast<uint8_t>(0);
         Attributes::ColorLoopDirection::TypeInfo::DecodableType colorLoopDirection                 = static_cast<uint8_t>(0);
         Attributes::ColorLoopTime::TypeInfo::DecodableType colorLoopTime                           = static_cast<uint16_t>(0);
