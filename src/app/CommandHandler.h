@@ -57,6 +57,30 @@
 namespace chip {
 namespace app {
 
+/// Defines an abstract class of something that can be encoded
+/// into a TLV with a given data tag
+class EncoderToTLV
+{
+public:
+    virtual ~EncoderToTLV() = default;
+
+    virtual CHIP_ERROR Encode(TLV::TLVWriter &, TLV::Tag tag) = 0;
+};
+/// Defines an abstract class of something that can be encoded
+/// into a TLV with a given data tag
+
+template <typename T>
+class DataModelEncoderToTLV : public EncoderToTLV
+{
+public:
+    DataModelEncoderToTLV(const T & value) : mValue(value) {}
+
+    virtual CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) { return DataModel::Encode(writer, tag, mValue); }
+
+private:
+    const T & mValue;
+};
+
 class CommandHandler
 {
 public:
@@ -327,12 +351,29 @@ public:
      * @param [in] aData the data for the response.
      */
     template <typename CommandData>
-    CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
+    inline CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
+    {
+        DataModelEncoderToTLV<CommandData> encoder(aData);
+        return AddResponseDataViaEncoder(aRequestCommandPath, CommandData::GetCommandId(), encoder);
+    }
+
+    /**
+     * API for adding a data response.  The template parameter T is generally
+     * expected to be a ClusterName::Commands::CommandName::Type struct, but any
+     * object that can be encoded using the DataModel::Encode machinery and
+     * exposes the right command id will work.
+     *
+     * @param [in] aRequestCommandPath the concrete path of the command we are
+     *             responding to.
+     * @param [in] aData the data for the response.
+     */
+    CHIP_ERROR AddResponseDataViaEncoder(const ConcreteCommandPath & aRequestCommandPath, CommandId commandId,
+                                         EncoderToTLV & encoder)
     {
         // Return early when response should not be sent out.
         VerifyOrReturnValue(ResponsesAccepted(), CHIP_NO_ERROR);
-
-        return TryAddingResponse([&]() -> CHIP_ERROR { return TryAddResponseData(aRequestCommandPath, aData); });
+        return TryAddingResponse(
+            [&]() -> CHIP_ERROR { return TryAddResponseDataViaEncoder(aRequestCommandPath, commandId, encoder); });
     }
 
     /**
@@ -350,9 +391,18 @@ public:
      * @param [in] aData the data for the response.
      */
     template <typename CommandData>
-    void AddResponse(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
+    inline void AddResponse(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
-        if (AddResponseData(aRequestCommandPath, aData) != CHIP_NO_ERROR)
+        DataModelEncoderToTLV<CommandData> encoder(aData);
+        return AddResponseViaEncoder(aRequestCommandPath, CommandData::GetCommandId(), encoder);
+    }
+
+    /**
+     * API for adding a response with a given encoder of TLV data.
+     */
+    void AddResponseViaEncoder(const ConcreteCommandPath & aRequestCommandPath, CommandId commandId, EncoderToTLV & encoder)
+    {
+        if (AddResponseDataViaEncoder(aRequestCommandPath, commandId, encoder) != CHIP_NO_ERROR)
         {
             AddStatus(aRequestCommandPath, Protocols::InteractionModel::Status::Failure);
         }
@@ -630,7 +680,6 @@ private:
         return PrepareInvokeResponseCommand(aResponseCommandPath, prepareParams);
     }
 
-    // TODO(#31627): It would be awesome if we could remove this template all together.
     /**
      * If this function fails, it may leave our TLV buffer in an inconsistent state.
      * Callers should snapshot as needed before calling this function, and roll back
@@ -640,26 +689,14 @@ private:
      *             responding to.
      * @param [in] aData the data for the response.
      */
-    template <typename CommandData>
-    CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
+    CHIP_ERROR TryAddResponseDataViaEncoder(const ConcreteCommandPath & aRequestCommandPath, CommandId commandId,
+                                            EncoderToTLV & encoder)
     {
-        // This method, templated with CommandData, captures all the components needs
-        // from CommandData with as little code as possible.
-        //
-        // Previously, non-essential code was unnecessarily templated, leading to
-        // compilation and duplication N times. By isolating only the code segments
-        // that genuinely require templating, minimizes duplicate compiled code.
-        ConcreteCommandPath responseCommandPath = { aRequestCommandPath.mEndpointId, aRequestCommandPath.mClusterId,
-                                                    CommandData::GetCommandId() };
+        ConcreteCommandPath responseCommandPath = { aRequestCommandPath.mEndpointId, aRequestCommandPath.mClusterId, commandId };
         ReturnErrorOnFailure(TryAddResponseDataPreEncode(aRequestCommandPath, responseCommandPath));
         TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields), aData));
-
-        // FinishCommand technically should be refactored out as it is not a command that needs templating.
-        // But, because there is only a single function call, keeping it here takes less code. If there is
-        // ever more code between DataModel::Encode and the end of this function, it should be broken out into
-        // TryAddResponseDataPostEncode.
+        ReturnErrorOnFailure(encoder.Encode(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields)));
         return FinishCommand(/* aEndDataStruct = */ false);
     }
 
