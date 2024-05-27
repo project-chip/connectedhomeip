@@ -50,12 +50,9 @@ from . import discovery
 from .clusters import Attribute as ClusterAttribute
 from .clusters import ClusterObjects as ClusterObjects
 from .clusters import Command as ClusterCommand
-from .clusters import Objects as GeneratedObjects
 from .clusters.CHIPClusters import ChipClusters
 from .crypto import p256keypair
-from .exceptions import UnknownAttribute, UnknownCommand
-from .interaction_model import InteractionModelError, SessionParameters, SessionParametersStruct
-from .interaction_model import delegate as im
+from .interaction_model import SessionParameters, SessionParametersStruct
 from .native import PyChipError
 
 __all__ = ["ChipDeviceController", "CommissioningParameters"]
@@ -1479,83 +1476,6 @@ class ChipDeviceControllerBase():
             return res
         else:
             return res.events
-
-    def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args, blocking=False):
-        ''' Wrapper over SendCommand that catches the exceptions
-            Returns a tuple of (errorCode, CommandResponse)
-        '''
-        self.CheckIsActive()
-
-        req = None
-        try:
-            req = eval(
-                f"GeneratedObjects.{cluster}.Commands.{command}")(**args)
-        except BaseException:
-            raise UnknownCommand(cluster, command)
-        try:
-            res = asyncio.run(self.SendCommand(nodeid, endpoint, req))
-            logging.debug(f"CommandResponse {res}")
-            return (0, res)
-        except InteractionModelError as ex:
-            return (int(ex.status), None)
-
-    def ZCLReadAttribute(self, cluster, attribute, nodeid, endpoint, groupid, blocking=True):
-        ''' Wrapper over ReadAttribute for a single attribute
-            Returns an AttributeReadResult
-        '''
-        self.CheckIsActive()
-
-        clusterType = getattr(GeneratedObjects, cluster)
-
-        try:
-            attributeType = eval(
-                f"GeneratedObjects.{cluster}.Attributes.{attribute}")
-        except BaseException:
-            raise UnknownAttribute(cluster, attribute)
-
-        result = asyncio.run(self.ReadAttribute(
-            nodeid, [(endpoint, attributeType)]))
-        path = ClusterAttribute.AttributePath.from_attribute(
-            EndpointId=endpoint, Attribute=attributeType)
-        return im.AttributeReadResult(path=im.AttributePath(nodeId=nodeid, endpointId=path.EndpointId, clusterId=path.ClusterId, attributeId=path.AttributeId),
-                                      status=0, value=result[endpoint][clusterType][attributeType], dataVersion=result[endpoint][clusterType][ClusterAttribute.DataVersion])
-
-    def ZCLWriteAttribute(self, cluster: str, attribute: str, nodeid, endpoint, groupid, value, dataVersion=0, blocking=True):
-        ''' Wrapper over WriteAttribute for a single attribute
-            return PyChipError
-        '''
-        req = None
-        try:
-            req = eval(
-                f"GeneratedObjects.{cluster}.Attributes.{attribute}")(value)
-        except BaseException:
-            raise UnknownAttribute(cluster, attribute)
-
-        return asyncio.run(self.WriteAttribute(nodeid, [(endpoint, req, dataVersion)]))
-
-    def ZCLSubscribeAttribute(self, cluster, attribute, nodeid, endpoint, minInterval, maxInterval, blocking=True,
-                              keepSubscriptions=False, autoResubscribe=True):
-        ''' Wrapper over ReadAttribute for a single attribute
-            Returns a SubscriptionTransaction. See ReadAttribute for more information.
-        '''
-        self.CheckIsActive()
-
-        req = None
-        try:
-            req = eval(f"GeneratedObjects.{cluster}.Attributes.{attribute}")
-        except BaseException:
-            raise UnknownAttribute(cluster, attribute)
-        return asyncio.run(self.ReadAttribute(nodeid, [(endpoint, req)], None, False, reportInterval=(minInterval, maxInterval),
-                                              keepSubscriptions=keepSubscriptions, autoResubscribe=autoResubscribe))
-
-    def ZCLCommandList(self):
-        self.CheckIsActive()
-        return self._Cluster.ListClusterCommands()
-
-    def ZCLAttributeList(self):
-        self.CheckIsActive()
-
-        return self._Cluster.ListClusterAttributes()
 
     def SetBlockingCB(self, blockingCB):
         self.CheckIsActive()
