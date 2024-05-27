@@ -36,8 +36,8 @@ extern "C" int main(void)
 
     LOG_INF("Starting CHIP tests!");
     int status = 0;
-    status += chip::test::RunAllTests();
     status += RunRegisteredUnitTests();
+    status += chip::test::RunAllTests();
     LOG_INF("CHIP test status: %d", status);
 
     _exit(status);
