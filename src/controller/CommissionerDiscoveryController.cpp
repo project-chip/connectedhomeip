@@ -240,13 +240,16 @@ void CommissionerDiscoveryController::InternalOk()
         }
         ChipLogDetail(Controller, "------Via Shell Enter: app install <pid> <vid>");
 
-        CommissionerDeclaration::CdError appInstallStatus = mAppInstallationService->GetInstallationStatusOfApp(client->GetVendorId(), client->GetProductId());
+        CommissionerDeclaration::CdError appInstallStatus =
+            mAppInstallationService->GetInstallationStatusOfApp(client->GetVendorId(), client->GetProductId());
 
-        if (appInstallStatus != CommissionerDeclaration::CdError::kNoError) {
+        if (appInstallStatus != CommissionerDeclaration::CdError::kNoError)
+        {
             // notify client the current app's installation status
             CommissionerDeclaration cd;
             cd.SetErrorCode(appInstallStatus);
-            mUdcServer->SendCDCMessage(cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
+            mUdcServer->SendCDCMessage(cd,
+                                       Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
         }
         return;
     }

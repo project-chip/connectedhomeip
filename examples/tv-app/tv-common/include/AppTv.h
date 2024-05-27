@@ -151,7 +151,8 @@ public:
     void SetAppInstallationStatus(uint16_t vendorId, uint16_t productId,
                                   Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError status);
     // Get App's Installation Status
-    Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError GetAppInstallationStatus(uint16_t vendorId, uint16_t productId);
+    Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError GetAppInstallationStatus(uint16_t vendorId,
+                                                                                                    uint16_t productId);
 
 protected:
     std::vector<std::unique_ptr<ContentAppImpl>> mContentApps;
