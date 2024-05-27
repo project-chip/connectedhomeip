@@ -47,7 +47,7 @@ tests:
       attribute: "MeterTypeID"
       response:
           constraints:
-              type: int16u
+              type: enum
 
     - label: "Step 4: TH reads the DataQualityID attribute from the DUT"
       PICS: MTRID.S.A0002
@@ -55,7 +55,7 @@ tests:
       attribute: "DataQualityID"
       response:
           constraints:
-              type: int16u
+              type: enum
 
     - label: "Step 5: TH reads the CustomerName attribute from the DUT"
       PICS: MTRID.S.A0003
@@ -125,10 +125,10 @@ tests:
               type: char_string
               maxLength: 16
 
-    - label: "Step 11: TH reads the POD attribute from the DUT"
+    - label: "Step 11: TH reads the PointOfDelivery attribute from the DUT"
       PICS: MTRID.S.A0009
       command: "readAttribute"
-      attribute: "POD"
+      attribute: "PointOfDelivery"
       response:
           constraints:
               type: char_string
@@ -140,7 +140,7 @@ tests:
       attribute: "AvailablePower"
       response:
           constraints:
-              type: int24
+              type: power-mW
 
     - label: "Step 13: TH reads the PowerThreshold attribute from the DUT"
       PICS: MTRID.S.A000B
