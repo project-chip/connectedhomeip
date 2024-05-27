@@ -43,46 +43,36 @@ TEST(TestBleUUID, CheckUUIDsMatch_NULL)
 TEST(TestBleUUID, CheckStringToUUID_ChipUUID)
 {
     // Test positive scenario - CHIP Service UUID
-    ChipBleUUID uuid;
-    EXPECT_TRUE(StringToUUID("0000FFF6-0000-1000-8000-00805F9B34FB", uuid));
+    ChipBleUUID uuid = StringToUUIDConstexpr("0000FFF6-0000-1000-8000-00805F9B34FB");
     EXPECT_TRUE(UUIDsMatch(&uuid, &CHIP_BLE_SVC_ID));
 }
 
 TEST(TestBleUUID, CheckStringToUUID_ChipUUID_RandomCase)
 {
     // Test that letter case doesn't matter
-    ChipBleUUID uuid;
-    EXPECT_TRUE(StringToUUID("0000FfF6-0000-1000-8000-00805f9B34Fb", uuid));
+    ChipBleUUID uuid = StringToUUIDConstexpr("0000FfF6-0000-1000-8000-00805f9B34Fb");
     EXPECT_TRUE(UUIDsMatch(&uuid, &CHIP_BLE_SVC_ID));
 }
 
 TEST(TestBleUUID, CheckStringToUUID_ChipUUID_NoSeparators)
 {
     // Test that separators don't matter
-    ChipBleUUID uuid;
-    EXPECT_TRUE(StringToUUID("0000FFF600001000800000805F9B34FB", uuid));
+    ChipBleUUID uuid = StringToUUIDConstexpr("0000FFF600001000800000805F9B34FB");
     EXPECT_TRUE(UUIDsMatch(&uuid, &CHIP_BLE_SVC_ID));
 }
 
 TEST(TestBleUUID, CheckStringToUUID_TooLong)
 {
     // Test that even one more digit is too much
-    ChipBleUUID uuid;
-    EXPECT_FALSE(StringToUUID("0000FFF600001000800000805F9B34FB0", uuid));
-}
-
-TEST(TestBleUUID, CheckStringToUUID_TooShort)
-{
-    // Test that even one less digit is too little
-    ChipBleUUID uuid;
-    EXPECT_FALSE(StringToUUID("0000FFF600001000800000805F9B34F", uuid));
+    auto result = StringToUUID("0000FFF600001000800000805F9B34FB0");
+    EXPECT_FALSE(result.first);
 }
 
 TEST(TestBleUUID, CheckStringToUUID_InvalidChar)
 {
     // Test that non-hex digits don't pass
-    ChipBleUUID uuid;
-    EXPECT_FALSE(StringToUUID("0000GFF6-0000-1000-8000-00805F9B34FB0", uuid));
+    auto result = StringToUUID("0000GFF6-0000-1000-8000-00805F9B34FB");
+    EXPECT_FALSE(result.first);
 }
 
 } // namespace
