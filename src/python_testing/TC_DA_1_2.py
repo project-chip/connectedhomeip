@@ -56,7 +56,7 @@ def parse_single_vidpid_from_common_name(commonName: str, tag_str: str) -> str:
         return None
 
     s = sp[1][:4]
-    if not s.isupper() or len(s) != 4:
+    if not (s.isnumeric() or s.isupper()) or len(s) != 4:
         asserts.fail(f"Improperly encoded PID or VID when using fallback encoding {tag_str}:{s}")
         return None
 
