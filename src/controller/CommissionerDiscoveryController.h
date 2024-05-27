@@ -245,7 +245,8 @@ public:
      *  @param[in]    productId          The productId in the DNS-SD advertisement of the requesting commissionee.
      *
      */
-    virtual chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError GetInstallationStatusOfApp(uint16_t vendorId, uint16_t productId) = 0;
+    virtual chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError
+    GetInstallationStatusOfApp(uint16_t vendorId, uint16_t productId) = 0;
 
     virtual ~AppInstallationService() = default;
 };

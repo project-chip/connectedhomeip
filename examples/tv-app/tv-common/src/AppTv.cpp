@@ -637,19 +637,21 @@ void ContentAppFactoryImpl::SetAppInstallationStatus(uint16_t vendorId, uint16_t
 {
     std::map<uint16_t, Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError>::iterator it;
     it = mAppInstallationStatus.find(vendorId);
-    if (it != mAppInstallationStatus.end()) {
+    if (it != mAppInstallationStatus.end())
+    {
         mAppInstallationStatus[vendorId] = status;
         return;
     }
 
-    mAppInstallationStatus.insert({vendorId, status});
+    mAppInstallationStatus.insert({ vendorId, status });
 }
 
 CommissionerDeclaration::CdError ContentAppFactoryImpl::GetAppInstallationStatus(uint16_t vendorId, uint16_t productId)
 {
     std::map<uint16_t, Protocols::UserDirectedCommissioning::CommissionerDeclaration::CdError>::iterator it;
     it = mAppInstallationStatus.find(vendorId);
-    if (it != mAppInstallationStatus.end()) {
+    if (it != mAppInstallationStatus.end())
+    {
         return mAppInstallationStatus[vendorId];
     }
 
