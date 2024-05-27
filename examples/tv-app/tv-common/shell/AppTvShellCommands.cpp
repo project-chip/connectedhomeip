@@ -205,6 +205,9 @@ static CHIP_ERROR PrintAllCommands()
     streamer_printf(sout,
                     "  add-admin-vendor <vid>         Add vendor ID to list which will receive admin privileges. Usage: app "
                     "add-admin-vendor 65521\r\n");
+    streamer_printf(sout, "  app install <vid> <pid>              Install app with given vendor ID  and product ID. Usage: app install 65521 32768\r\n");
+    streamer_printf(sout, "  app uinstall <vid> <pid>              Uinstall app at given vendor ID  and product ID. Usage: app uninstall 65521 32768\r\n");
+    streamer_printf(sout, "  app setinstallstatus <vid> <pid>              Set app's installation status for a given vendor ID  and product ID. Usage: app setinstallstatus 65521 32768 13. Installation status can be found at: UserDirectedCommissioning.h\r\n");
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     streamer_printf(sout, "  print-app-access     Print all ACLs for app platform fabric. Usage: app print-app-access\r\n");

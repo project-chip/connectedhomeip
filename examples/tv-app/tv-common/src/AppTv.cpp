@@ -163,10 +163,6 @@ class MyAppInstallationService : public AppInstallationService
     {
         ContentAppFactoryImpl * factory = GetContentAppFactoryImpl();
         return factory->GetAppInstallationStatus(vendorId, productId);
-
-        // ContentAppFactoryImpl * factory = GetContentAppFactoryImpl();
-        // factory->InstallContentApp(vendorId, productId);
-        // return CommissionerDeclaration::CdError::kAppInstallConsentPending;
     }
 };
 
