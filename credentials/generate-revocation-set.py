@@ -64,6 +64,26 @@ def extract_single_integer_attribute(subject, oid):
     return None
 
 
+def parse_vid_pid_from_distinguished_name(distinguished_name):
+    # VID/PID encoded using Matter specific RDNs
+    vid = extract_single_integer_attribute(distinguished_name, OID_VENDOR_ID)
+    pid = extract_single_integer_attribute(distinguished_name, OID_PRODUCT_ID)
+
+    # Fallback method to get the VID/PID, encoded in CN as "Mvid:FFFF Mpid:1234"
+    if vid is None and pid is None:
+        cn = distinguished_name.get_attributes_for_oid(x509.ObjectIdentifier("2.5.4.3"))[0].value
+
+        vid_start = cn.find('Mvid:')
+        if vid_start != -1:
+            vid = int(cn[vid_start + 5:vid_start + 9], 16)
+
+        pid_start = cn.find('Mpid:')
+        if pid_start != -1:
+            pid = int(cn[pid_start + 5:pid_start + 9], 16)
+
+    return vid, pid
+
+
 class DCLDClient:
     '''
     A client for interacting with DCLD using either the REST API or command line interface (CLI).
@@ -248,14 +268,11 @@ def main(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: bool
         is_paa = revocation_point["isPAA"]
 
         # 3. && 4. Validate VID/PID
-        # TODO: Need to support alternate representation of VID/PID (see spec "6.2.2.2. Encoding of Vendor ID and Product ID in subject and issuer fields")
-        crl_vid = extract_single_integer_attribute(crl_signer_certificate.subject, OID_VENDOR_ID)
-        crl_pid = extract_single_integer_attribute(crl_signer_certificate.subject, OID_PRODUCT_ID)
+        crl_vid, crl_pid = parse_vid_pid_from_distinguished_name(crl_signer_certificate.subject)
 
         if is_paa:
             if crl_vid is not None:
                 if vid != crl_vid:
-                    # TODO: Need to log all situations where a continue is called
                     logging.warning("VID is not CRL VID, continue...")
                     continue
         else:
