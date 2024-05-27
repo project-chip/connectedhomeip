@@ -4256,9 +4256,11 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 } // namespace CurrentY
 
 namespace DriftCompensation {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint8_t * value); // enum8
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint,
+                                        chip::app::Clusters::ColorControl::DriftCompensation * value); // DriftCompensation
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::ColorControl::DriftCompensation value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::ColorControl::DriftCompensation value,
+                                        MarkAttributeDirty markDirty);
 } // namespace DriftCompensation
 
 namespace CompensationText {
@@ -4280,9 +4282,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 } // namespace ColorMode
 
 namespace Options {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint8_t * value); // bitmap8
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status
+Get(chip::EndpointId endpoint,
+    chip::BitMask<chip::app::Clusters::ColorControl::ColorControlOptions> * value); // ColorControlOptions
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::ColorControl::ColorControlOptions> value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::ColorControl::ColorControlOptions> value,
+                                        MarkAttributeDirty markDirty);
 } // namespace Options
 
 namespace NumberOfPrimaries {
@@ -4522,9 +4529,11 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 } // namespace EnhancedCurrentHue
 
 namespace EnhancedColorMode {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint8_t * value); // enum8
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status Get(chip::EndpointId endpoint,
+                                        chip::app::Clusters::ColorControl::EnhancedColorMode * value); // EnhancedColorMode
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::ColorControl::EnhancedColorMode value);
+Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::ColorControl::EnhancedColorMode value,
+                                        MarkAttributeDirty markDirty);
 } // namespace EnhancedColorMode
 
 namespace ColorLoopActive {

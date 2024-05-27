@@ -14500,7 +14500,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("CurrentY", 1, value);
         }
         case ColorControl::Attributes::DriftCompensation::Id: {
-            uint8_t value;
+            chip::app::Clusters::ColorControl::DriftCompensation value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("DriftCompensation", 1, value);
         }
@@ -14520,7 +14520,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ColorMode", 1, value);
         }
         case ColorControl::Attributes::Options::Id: {
-            uint8_t value;
+            chip::BitMask<chip::app::Clusters::ColorControl::ColorControlOptions> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Options", 1, value);
         }
@@ -14680,7 +14680,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("EnhancedCurrentHue", 1, value);
         }
         case ColorControl::Attributes::EnhancedColorMode::Id: {
-            uint8_t value;
+            chip::app::Clusters::ColorControl::EnhancedColorMode value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EnhancedColorMode", 1, value);
         }
