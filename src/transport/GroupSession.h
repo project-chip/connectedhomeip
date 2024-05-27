@@ -75,13 +75,6 @@ public:
         return System::Clock::Timeout();
     }
 
-    System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity) const override
-    {
-        // There are no timeouts for group sessions.
-        VerifyOrDie(false);
-        return System::Clock::Timeout();
-    }
-
     GroupId GetGroupId() const { return mGroupId; }
 
 private:
@@ -130,13 +123,6 @@ public:
 
     System::Clock::Milliseconds32 GetAckTimeout() const override
     {
-        VerifyOrDie(false);
-        return System::Clock::Timeout();
-    }
-
-    System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity) const override
-    {
-        // There are no timeouts for group sessions.
         VerifyOrDie(false);
         return System::Clock::Timeout();
     }

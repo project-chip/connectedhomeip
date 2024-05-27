@@ -179,27 +179,6 @@ public:
         return System::Clock::Timeout();
     }
 
-    System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity) const override
-    {
-        switch (mPeerAddress.GetTransportType())
-        {
-        case Transport::Type::kUdp: {
-            const auto & maybeLocalMRPConfig = GetLocalMRPConfig();
-            const auto & defaultMRRPConfig   = GetDefaultMRPConfig();
-            const auto & localMRPConfig      = maybeLocalMRPConfig.ValueOr(defaultMRRPConfig);
-            return GetRetransmissionTimeout(localMRPConfig.mActiveRetransTimeout, localMRPConfig.mIdleRetransTimeout,
-                                            ourLastActivity, localMRPConfig.mActiveThresholdTime);
-        }
-        case Transport::Type::kTcp:
-            return System::Clock::Seconds16(30);
-        case Transport::Type::kBle:
-            return System::Clock::Milliseconds32(BTP_ACK_TIMEOUT_MS);
-        default:
-            break;
-        }
-        return System::Clock::Timeout();
-    }
-
     const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
     void SetPeerAddress(const PeerAddress & address) { mPeerAddress = address; }
 

@@ -70,10 +70,7 @@ System::Clock::Timeout Session::ComputeRoundTripTimeout(System::Clock::Timeout u
     {
         return System::Clock::kZero;
     }
-
-    // Treat us as active for purposes of GetMessageReceiptTimeout(), since the
-    // other side would be responding to our message.
-    return GetAckTimeout() + upperlayerProcessingTimeout + GetMessageReceiptTimeout(System::SystemClock().GetMonotonicTimestamp());
+    return GetAckTimeout() + upperlayerProcessingTimeout;
 }
 
 uint16_t Session::SessionIdForLogging() const

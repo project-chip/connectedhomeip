@@ -938,26 +938,24 @@ CHIP_ERROR ReadClient::ComputeLivenessCheckTimerTimeout(System::Clock::Timeout *
 
     //
     // To calculate the duration we're willing to wait for a report to come to us, we take into account the maximum interval of
-    // the subscription AND the time it takes for the report to make it to us in the worst case.
+    // the subscription AND the time it takes for the report to make it to us in the worst case. This latter bit involves
+    // computing the Ack timeout from the publisher for the ReportData message being sent to us using our IDLE interval as the
+    // basis for that computation.
     //
-    // We have no way to estimate what the network latency will be, but we do know the other side will time out its ReportData
-    // after its computed round-trip timeout plus the processing time it gives us (app::kExpectedIMProcessingTime).  Once it
-    // times out, assuming it sent the report at all, there's no point in us thinking we still have a subscription.
+    // Make sure to use the retransmission computation that includes backoff.  For purposes of that computation, treat us as
+    // active now (since we are right now sending/receiving messages), and use the default "how long are we guaranteed to stay
+    // active" threshold for now.
     //
-    // We can't use ComputeRoundTripTimeout() on the session for two reasons: we want the roundtrip timeout from the point of
-    // view of the peer, not us, and we want to start off with the assumption the peer will likely have, which is that we are
-    // idle, whereas ComputeRoundTripTimeout() uses the current activity state of the peer.
+    // TODO: We need to find a good home for this logic that will correctly compute this based on transport. For now, this will
+    // suffice since we don't use TCP as a transport currently and subscriptions over BLE aren't really a thing.
     //
-    // So recompute the round-trip timeout directly.  Assume MRP, since in practice that is likely what is happening.
-    auto & peerMRPConfig = mReadPrepareParams.mSessionHolder->GetRemoteMRPConfig();
-    // Peer will assume we are idle (hence we pass kZero to GetMessageReceiptTimeout()), but will assume we treat it as active
-    // for the response, so to match the retransmission timeout computation for the message back to the peeer, we should treat
-    // it as active.
-    auto roundTripTimeout = mReadPrepareParams.mSessionHolder->GetMessageReceiptTimeout(System::Clock::kZero) +
-        kExpectedIMProcessingTime +
-        GetRetransmissionTimeout(peerMRPConfig.mActiveRetransTimeout, peerMRPConfig.mIdleRetransTimeout,
-                                 System::SystemClock().GetMonotonicTimestamp(), peerMRPConfig.mActiveThresholdTime);
-    *aTimeout = System::Clock::Seconds16(mMaxInterval) + roundTripTimeout;
+    const auto & localMRPConfig   = GetLocalMRPConfig();
+    const auto & defaultMRPConfig = GetDefaultMRPConfig();
+    const auto & ourMrpConfig     = localMRPConfig.ValueOr(defaultMRPConfig);
+    auto publisherTransmissionTimeout =
+        GetRetransmissionTimeout(ourMrpConfig.mActiveRetransTimeout, ourMrpConfig.mIdleRetransTimeout,
+                                 System::SystemClock().GetMonotonicTimestamp(), ourMrpConfig.mActiveThresholdTime);
+    *aTimeout = System::Clock::Seconds16(mMaxInterval) + publisherTransmissionTimeout;
     return CHIP_NO_ERROR;
 }
 

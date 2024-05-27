@@ -2140,10 +2140,6 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 10;
     XCTAssertTrue(controller.running);
     MTRSetMessageReliabilityParameters(@2000, @2000, @2000, @2000);
     [controller shutdown];
-
-    // Now reset back to the default state, so timings in other tests are not
-    // affected.
-    MTRSetMessageReliabilityParameters(nil, nil, nil, nil);
 }
 
 // TODO: This might also want to go in a separate test file, with some shared setup for commissioning devices per test
