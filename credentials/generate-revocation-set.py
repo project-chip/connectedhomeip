@@ -32,6 +32,7 @@ import requests
 from click_option_group import RequiredMutuallyExclusiveOptionGroup, optgroup
 from cryptography import x509
 from cryptography.hazmat.primitives.asymmetric import ec
+from cryptography.x509.oid import NameOID
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
@@ -64,13 +65,14 @@ def extract_single_integer_attribute(subject, oid):
     return None
 
 
-def extract_single_attribute_from_cn(cn, marker):
+def extract_fallback_tag_from_common_name(cn, marker):
     val_len = 4
     start_idx = cn.find(marker)
 
     if start_idx != -1:
         val_start_idx = start_idx + len(marker)
-        return int(cn[val_start_idx:val_start_idx + val_len], 16)
+        val = cn[val_start_idx:val_start_idx + val_len]
+        return int(val, 16) if len(val) == 4 else None
 
     return None
 
@@ -82,9 +84,9 @@ def parse_vid_pid_from_distinguished_name(distinguished_name):
 
     # Fallback method to get the VID/PID, encoded in CN as "Mvid:FFFF Mpid:1234"
     if vid is None and pid is None:
-        cn = distinguished_name.get_attributes_for_oid(x509.ObjectIdentifier("2.5.4.3"))[0].value
-        vid = extract_single_attribute_from_cn(cn, 'Mvid:')
-        pid = extract_single_attribute_from_cn(cn, 'Mpid:')
+        cn = distinguished_name.get_attributes_for_oid(x509.ObjectIdentifier(NameOID.COMMON_NAME))[0].value
+        vid = extract_fallback_tag_from_common_name(cn, 'Mvid:')
+        pid = extract_fallback_tag_from_common_name(cn, 'Mpid:')
 
     return vid, pid
 
